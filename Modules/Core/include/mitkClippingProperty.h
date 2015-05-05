@@ -60,7 +60,7 @@ public:
   const Vector3D &GetNormal() const;
   void SetNormal( const Vector3D &normal );
 
-  virtual std::string GetValueAsString() const;
+  virtual std::string GetValueAsString() const override;
 
   using BaseProperty::operator =;
 
@@ -80,10 +80,10 @@ private:
   // purposely not implemented
   ClippingProperty& operator=(const ClippingProperty&);
 
-  virtual bool IsEqual(const BaseProperty& property) const;
-  virtual bool Assign(const BaseProperty& property);
+  virtual bool IsEqual(const BaseProperty& property) const override;
+  virtual bool Assign(const BaseProperty& property) override;
 
-  virtual itk::LightObject::Pointer InternalClone() const;
+  virtual itk::LightObject::Pointer InternalClone() const override;
 
 };
 

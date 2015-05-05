@@ -56,9 +56,9 @@ namespace mitk
 
   public:
 
-    mitkClassMacro(SurfaceInterpolationController, itk::Object);
-    itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self);
+    mitkClassMacroItkParent(SurfaceInterpolationController, itk::Object)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     struct ContourPositionInformation {
       Surface::Pointer contour;

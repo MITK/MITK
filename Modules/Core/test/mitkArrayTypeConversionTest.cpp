@@ -41,14 +41,14 @@ private:
 
 public:
 
-  void setUp(void)
+  void setUp(void) override
   {
     b[0] = a[0] = 1.0;
     b[1] = a[1] = 2.12;
     b[2] = a[2] = 3.13;
   }
 
-  void tearDown(void)
+  void tearDown(void) override
   {
 
   }

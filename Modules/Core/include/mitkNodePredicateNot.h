@@ -41,11 +41,11 @@ namespace mitk {
 
     //##Documentation
     //## @brief Reimplemented, only one child predicate is allowed for the NOT predicate.
-    virtual void AddPredicate(const mitk::NodePredicateBase* p);
+    virtual void AddPredicate(const mitk::NodePredicateBase* p) override;
 
     //##Documentation
     //## @brief Checks, if the node does not fulfill the child predicate condition
-    virtual bool CheckNode(const mitk::DataNode* node) const;
+    virtual bool CheckNode(const mitk::DataNode* node) const override;
   protected:
     //##Documentation
     //## @brief Constructor

@@ -24,7 +24,7 @@ class ItkLoggingTestClass : public itk::Object
   {
   public:
 
-    mitkClassMacro( ItkLoggingTestClass , itk::Object );
+    mitkClassMacroItkParent( ItkLoggingTestClass , itk::Object );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

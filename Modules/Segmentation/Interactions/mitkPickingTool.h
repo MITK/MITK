@@ -51,13 +51,13 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual const char* GetName() const;
-    us::ModuleResource GetIconResource() const;
+    virtual const char** GetXPM() const override;
+    virtual const char* GetName() const override;
+    us::ModuleResource GetIconResource() const override;
 
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     virtual DataNode::Pointer GetPointSetNode();
 

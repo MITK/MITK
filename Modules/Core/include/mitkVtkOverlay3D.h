@@ -43,7 +43,7 @@ public:
 
 protected:
 
-  virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
+  virtual void UpdateVtkOverlay(BaseRenderer *renderer) override = 0;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit VtkOverlay3D();

@@ -111,7 +111,7 @@ public:
 private:
 
   /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu
-  void contextMenuEvent ( QContextMenuEvent * );
+  void contextMenuEvent ( QContextMenuEvent * ) override;
 
   /// change notifications from the mitkLevelWindowManager
   void OnPropertyModified(const itk::EventObject& e);
@@ -152,7 +152,7 @@ protected:
   /*!
   * repaint the slider and the scale
   */
-  void paintEvent( QPaintEvent* e );
+  void paintEvent( QPaintEvent* e ) override;
 
   /*!
   * method implements the component behaviour
@@ -161,9 +161,9 @@ protected:
   *
   * checks if left mouse button is pressed and if CTRL is pressed and changes sliderbar in movedirection accordingly
   */
-  void mouseMoveEvent( QMouseEvent* mouseEvent );
+  void mouseMoveEvent( QMouseEvent* mouseEvent ) override;
 
-  void enterEvent ( QEvent * event  );
+  void enterEvent ( QEvent * event  ) override;
 
   /*!
   *  registers events when a mousebutton is pressed
@@ -172,17 +172,17 @@ protected:
   *
   * also checks if CTRL is pressed and sets the bool variable m_CtrlPressed
   */
-  void mousePressEvent( QMouseEvent* mouseEvent );
+  void mousePressEvent( QMouseEvent* mouseEvent ) override;
 
   /*!
   *  sets the variable m_MouseDown to false
   */
-  void mouseReleaseEvent( QMouseEvent* mouseEvent );
+  void mouseReleaseEvent( QMouseEvent* mouseEvent ) override;
 
   /*!
   * causes an update of the sliderbar when resizing the window
   */
-  void virtual resizeEvent ( QResizeEvent * event );
+  void virtual resizeEvent ( QResizeEvent * event ) override;
 
 protected slots:
 

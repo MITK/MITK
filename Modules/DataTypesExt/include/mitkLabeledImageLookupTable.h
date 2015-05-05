@@ -55,7 +55,7 @@ public:
    */
   typedef unsigned char LabelType;
 
-  LabeledImageLookupTable& operator=(const LookupTable& other);
+  LabeledImageLookupTable& operator=(const LookupTable& other) override;
 
   /**
    * Sets the color for a given label
@@ -112,7 +112,7 @@ protected:
 
 private:
 
-  itk::LightObject::Pointer InternalClone() const;
+  itk::LightObject::Pointer InternalClone() const override;
 };
 
 }

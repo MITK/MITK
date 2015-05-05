@@ -46,11 +46,11 @@ public:
    * @param idx the index of the output for which an object should be created
    * @returns the new object
    */
-  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
 
   /**
    */
-  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
+  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
 protected:
   LabelSetImageSource();

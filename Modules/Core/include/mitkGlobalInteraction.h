@@ -223,7 +223,7 @@ namespace mitk {
     **/
     ~GlobalInteraction();
 
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
 
     /*
     *@brief adds the given interactor to the list of selected interactors.

@@ -35,23 +35,23 @@ public:
   QmitkScaleLogarithmicTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkScaleLogarithmicTransformView();
 
-  virtual mitk::TransformParameters::TransformType GetTransformType();
+  virtual mitk::TransformParameters::TransformType GetTransformType() override;
 
-  virtual itk::Object::Pointer GetTransform();
+  virtual itk::Object::Pointer GetTransform() override;
 
-  virtual itk::Array<double> GetTransformParameters();
+  virtual itk::Array<double> GetTransformParameters() override;
 
-  virtual void SetTransformParameters(itk::Array<double> transformValues);
+  virtual void SetTransformParameters(itk::Array<double> transformValues) override;
 
-  virtual QString GetName();
+  virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent);
+  virtual void SetupUI(QWidget* parent) override;
 
-  virtual itk::Array<double> GetScales();
+  virtual itk::Array<double> GetScales() override;
 
-  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams);
+  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams) override;
 
-  virtual int GetNumberOfTransformParameters();
+  virtual int GetNumberOfTransformParameters() override;
 
 private:
 

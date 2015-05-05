@@ -31,14 +31,14 @@ namespace mitk
   {
   public:
 
-    void Load(us::ModuleContext* context)
+    void Load(us::ModuleContext* context) override
     {
       /*register ToolManager provider service*/
       m_ToolManagerProvider = mitk::ToolManagerProvider::New();
       context->RegisterService<mitk::ToolManagerProvider>(m_ToolManagerProvider);
     }
 
-    void Unload(us::ModuleContext*)
+    void Unload(us::ModuleContext*) override
     {
     }
 

@@ -114,13 +114,13 @@ public:
   {
   }
 
-  virtual void Close()
+  virtual void Close() override
   {
     us::GetModuleContext()->RemoveModuleListener(this, &ShaderRepositoryTracker::HandleModuleEvent);
     Superclass::Close();
   }
 
-  virtual void Open()
+  virtual void Open() override
   {
     us::GetModuleContext()->AddModuleListener(this, &ShaderRepositoryTracker::HandleModuleEvent);
     Superclass::Open();
@@ -130,7 +130,7 @@ private:
 
   typedef us::ServiceTracker<mitk::IShaderRepository> Superclass;
 
-  TrackedType AddingService(const ServiceReferenceType &reference)
+  TrackedType AddingService(const ServiceReferenceType &reference) override
   {
     mitk::IShaderRepository* shaderRepo = Superclass::AddingService(reference);
     if (shaderRepo)
@@ -153,7 +153,7 @@ private:
     return shaderRepo;
   }
 
-  void RemovedService(const ServiceReferenceType& /*reference*/, TrackedType tracked)
+  void RemovedService(const ServiceReferenceType& /*reference*/, TrackedType tracked) override
   {
     m_ShaderRepositories.erase(std::remove(m_ShaderRepositories.begin(), m_ShaderRepositories.end(), tracked),
                                m_ShaderRepositories.end());
@@ -255,7 +255,7 @@ public:
   /** Run-time type information (and related methods). */
   itkTypeMacro(FixedNiftiImageIO, Superclass)
 
-  virtual bool SupportsDimension(unsigned long dim)
+  virtual bool SupportsDimension(unsigned long dim) override
   {
     return dim > 1 && dim < 5;
   }

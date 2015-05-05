@@ -52,7 +52,7 @@ class MITKSEGMENTATION_EXPORT SegmentationInterpolationAlgorithm : public itk::O
 {
   public:
 
-    mitkClassMacro(SegmentationInterpolationAlgorithm, itk::Object);
+    mitkClassMacroItkParent(SegmentationInterpolationAlgorithm, itk::Object);
 
     virtual Image::Pointer Interpolate(Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
                                        Image::ConstPointer upperSlice, unsigned int upperSliceIndex,

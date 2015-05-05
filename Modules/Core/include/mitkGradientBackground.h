@@ -40,7 +40,7 @@ class MITKCORE_EXPORT GradientBackground : public itk::Object
 {
 public:
 
-  mitkClassMacro( GradientBackground, itk::Object );
+  mitkClassMacroItkParent( GradientBackground, itk::Object );
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)

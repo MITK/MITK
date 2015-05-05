@@ -32,7 +32,7 @@ class StringPropertySerializer : public BasePropertySerializer
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (const StringProperty* prop = dynamic_cast<const StringProperty*>(m_Property.GetPointer()))
       {
@@ -43,7 +43,7 @@ class StringPropertySerializer : public BasePropertySerializer
       else return NULL;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return NULL;
       const char* s( element->Attribute("value") );

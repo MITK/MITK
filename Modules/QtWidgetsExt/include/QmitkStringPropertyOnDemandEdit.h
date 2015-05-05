@@ -36,7 +36,7 @@ class MITKQTWIDGETSEXT_EXPORT QClickableLabel2 : public QLabel
     {
     }
 
-    virtual void mouseReleaseEvent( QMouseEvent* )
+    virtual void mouseReleaseEvent( QMouseEvent* ) override
     {
       emit clicked();
     }
@@ -55,8 +55,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, p
 
   protected:
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+    virtual void PropertyChanged() override;
+    virtual void PropertyRemoved() override;
 
     mitk::StringProperty* m_StringProperty;
 

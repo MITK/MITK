@@ -59,7 +59,7 @@ class MITKQTOVERLAYS_EXPORT QmitkScalarBar : public QWidget
 
   protected:
 
-    void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event) override;
 
     void SetupGeometry( alignment align );
 

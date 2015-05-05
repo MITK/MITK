@@ -45,7 +45,7 @@ class MITKCORE_EXPORT CoreObjectFactoryBase : public itk::Object
     typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
     typedef std::multimap<std::string, std::string> MultimapType;
 
-    mitkClassMacro(CoreObjectFactoryBase,itk::Object)
+    mitkClassMacroItkParent(CoreObjectFactoryBase,itk::Object)
 
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) = 0;
     virtual void SetDefaultProperties(mitk::DataNode* node) = 0;

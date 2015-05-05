@@ -38,7 +38,7 @@ class MITKCORE_EXPORT RenderWindowFrame : public itk::Object
 {
 public:
 
-  mitkClassMacro( RenderWindowFrame, itk::Object );
+  mitkClassMacroItkParent( RenderWindowFrame, itk::Object );
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

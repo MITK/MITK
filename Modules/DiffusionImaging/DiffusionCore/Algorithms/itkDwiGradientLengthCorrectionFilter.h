@@ -42,9 +42,9 @@ public:
     itkCloneMacro(Self)
     itkTypeMacro(DwiGradientLengthCorrectionFilter,ProcessObject)
 
-    void GenerateData();
+    void GenerateData() override;
 
-    virtual void Update(){
+    virtual void Update() override{
         this->GenerateData();
     }
 

@@ -64,7 +64,7 @@ namespace mitk
     /*!
     * \brief Starts the histogram matching.
     */
-    virtual void GenerateData()
+    virtual void GenerateData() override
     {
       if (this->GetInput())
       {

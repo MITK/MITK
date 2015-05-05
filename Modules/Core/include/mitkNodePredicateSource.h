@@ -45,7 +45,7 @@ namespace mitk {
 
       //##Documentation
       //## @brief Checks, if m_BaseNode is a source node of childNode  (e.g. if childNode "was created from" m_BaseNode)
-      virtual bool CheckNode(const mitk::DataNode* childNode) const;
+      virtual bool CheckNode(const mitk::DataNode* childNode) const override;
 
     protected:
       //##Documentation

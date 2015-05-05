@@ -63,7 +63,7 @@ protected:
   QmitkFastMarchingTool3DGUI();
   virtual ~QmitkFastMarchingTool3DGUI();
 
-  void BusyStateChanged(bool);
+  void BusyStateChanged(bool) override;
 
   void Update();
 

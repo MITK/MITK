@@ -43,13 +43,13 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPopupColorChooser : public QFrame
 
   protected:
 
-    virtual void keyReleaseEvent(QKeyEvent*);
+    virtual void keyReleaseEvent(QKeyEvent*) override;
 
-    virtual void mouseMoveEvent(QMouseEvent*);
-    virtual void mouseReleaseEvent(QMouseEvent*);
-    virtual void closeEvent(QCloseEvent*);
+    virtual void mouseMoveEvent(QMouseEvent*) override;
+    virtual void mouseReleaseEvent(QMouseEvent*) override;
+    virtual void closeEvent(QCloseEvent*) override;
 
-    virtual void paintEvent(QPaintEvent*);
+    virtual void paintEvent(QPaintEvent*) override;
     void drawGradient(QPainter* p);
 
   private:
@@ -81,8 +81,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkColorPropertyEditor : public QmitkColorProper
 
   protected:
 
-    virtual void mousePressEvent(QMouseEvent*);
-    virtual void mouseReleaseEvent(QMouseEvent*);
+    virtual void mousePressEvent(QMouseEvent*) override;
+    virtual void mouseReleaseEvent(QMouseEvent*) override;
 
     static QmitkPopupColorChooser* colorChooser;
     static int colorChooserRefCount;

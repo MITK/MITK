@@ -52,11 +52,11 @@ class MITKSEGMENTATION_EXPORT DrawPaintbrushTool : public PaintbrushTool
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual us::ModuleResource GetCursorIconResource() const;
-    us::ModuleResource GetIconResource() const;
+    virtual const char** GetXPM() const override;
+    virtual us::ModuleResource GetCursorIconResource() const override;
+    us::ModuleResource GetIconResource() const override;
 
-    virtual const char* GetName() const;
+    virtual const char* GetName() const override;
 
   protected:
 

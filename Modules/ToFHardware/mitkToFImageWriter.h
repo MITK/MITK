@@ -43,7 +43,7 @@ namespace mitk
 
     ~ToFImageWriter();
 
-    mitkClassMacro( ToFImageWriter , itk::Object );
+    mitkClassMacroItkParent( ToFImageWriter , itk::Object );
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

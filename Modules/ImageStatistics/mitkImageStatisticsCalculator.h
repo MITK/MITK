@@ -249,7 +249,7 @@ public:
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
   typedef std::vector< Statistics > StatisticsContainer;
 
-  mitkClassMacro( ImageStatisticsCalculator, itk::Object );
+  mitkClassMacroItkParent( ImageStatisticsCalculator, itk::Object );
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

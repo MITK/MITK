@@ -146,9 +146,9 @@ protected:
 
   IdxToLabelMapType m_IdxToLabels;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
   virtual void CreateSurface( int time, vtkImageData *vtkimage, mitk::Surface * surface, LabelType label );
 

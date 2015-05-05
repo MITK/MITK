@@ -38,14 +38,14 @@ namespace mitk
     virtual ~NrrdQBallImageWriter();
 
     using AbstractFileWriter::Write;
-    virtual void Write();
+    virtual void Write() override;
 
-    virtual ConfidenceLevel GetConfidenceLevel() const;
+    virtual ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
 
     NrrdQBallImageWriter(const NrrdQBallImageWriter& other);
-    virtual mitk::NrrdQBallImageWriter* Clone() const;
+    virtual mitk::NrrdQBallImageWriter* Clone() const override;
   };
 
 

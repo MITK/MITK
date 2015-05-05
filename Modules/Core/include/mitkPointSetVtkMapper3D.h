@@ -102,8 +102,8 @@ namespace mitk {
 
     //overwritten from VtkMapper3D to be able to return a
     //m_PointsAssembly which is much faster than a vtkAssembly
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
-    virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
+    virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer) override;
 
 
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
@@ -113,7 +113,7 @@ namespace mitk {
     */
     DEPRECATED(void ReleaseGraphicsResources(vtkWindow *renWin));
 
-    void ReleaseGraphicsResources(mitk::BaseRenderer* renderer);
+    void ReleaseGraphicsResources(mitk::BaseRenderer* renderer) override;
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
@@ -122,8 +122,8 @@ namespace mitk {
 
     virtual ~PointSetVtkMapper3D();
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    virtual void ResetMapper( BaseRenderer* renderer );
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+    virtual void ResetMapper( BaseRenderer* renderer ) override;
     virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
     virtual void CreateContour();
     virtual void CreateVTKRenderObjects();

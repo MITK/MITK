@@ -36,11 +36,11 @@ public:
 
   itkNewMacro( DiffusionDICOMFileReader )
 
-  virtual void AnalyzeInputFiles();
+  virtual void AnalyzeInputFiles() override;
 
-  virtual bool LoadImages();
+  virtual bool LoadImages() override;
 
-  virtual bool CanHandleFile(const std::string &filename);
+  virtual bool CanHandleFile(const std::string &filename) override;
 
   void SetResolveMosaic( bool flag )
   {

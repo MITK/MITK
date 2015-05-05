@@ -57,7 +57,7 @@ namespace mitk {
       virtual ~TSpecificStateMachineFunctor() {} // virtual destructor
 
       // override function "Call"
-      virtual bool DoAction(Action* action, const StateEvent* stateEvent)
+      virtual bool DoAction(Action* action, const StateEvent* stateEvent) override
       {
         return (*m_Object.*m_MemberFunctionPointer)(action, stateEvent);             // execute member function
       }
@@ -197,7 +197,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     * can reach ist, but it can't be overwritten by a subclass
     * *ATTENTION*: THIS METHOD SHOULD NOT BE CALLED FROM OTHER CLASSES DIRECTLY!
     **/
-    virtual void ExecuteOperation(Operation* operation);
+    virtual void ExecuteOperation(Operation* operation) override;
 
     /**
     * @brief Friend so that UndoModel can call ExecuteOperation for Undo.

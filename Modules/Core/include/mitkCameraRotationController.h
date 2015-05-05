@@ -42,7 +42,7 @@ public:
     m_RenderWindow = renWin;
   }
 
-  virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
+  virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent ) override;
 
 protected:
   CameraRotationController(const char * type = NULL);

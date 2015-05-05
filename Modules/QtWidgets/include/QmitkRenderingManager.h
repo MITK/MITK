@@ -48,19 +48,19 @@ public:
   mitkClassMacro( QmitkRenderingManager, mitk::RenderingManager );
   virtual ~QmitkRenderingManager();
 
-  virtual void DoMonitorRendering();
-  virtual void DoFinishAbortRendering();
+  virtual void DoMonitorRendering() override;
+  virtual void DoFinishAbortRendering() override;
 
-  virtual bool event( QEvent *event );
+  virtual bool event( QEvent *event ) override;
 
 protected:
   itkFactorylessNewMacro(Self);
 
   QmitkRenderingManager();
 
-  virtual void GenerateRenderingRequestEvent();
+  virtual void GenerateRenderingRequestEvent() override;
 
-  virtual void StartOrResetTimer();
+  virtual void StartOrResetTimer() override;
 
   int pendingTimerCallbacks;
 

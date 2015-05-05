@@ -41,7 +41,7 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
 {
   public:
 
-    mitkClassMacro(BaseProperty,itk::Object)
+    mitkClassMacroItkParent(BaseProperty,itk::Object)
     itkCloneMacro(Self)
 
     /*! @brief Subclasses must implement IsEqual(const BaseProperty&) to support comparison.

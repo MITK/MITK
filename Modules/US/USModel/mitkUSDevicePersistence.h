@@ -38,7 +38,7 @@ namespace mitk {
    class USDevicePersistence : public itk::Object
     {
     public:
-      mitkClassMacro(USDevicePersistence, itk::Object);
+      mitkClassMacroItkParent(USDevicePersistence, itk::Object);
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 

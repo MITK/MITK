@@ -35,7 +35,7 @@ namespace mitk
   class TargetPointsCalculator : public itk::Object
     {
     public:
-    mitkClassMacro(TargetPointsCalculator, itk::Object);
+    mitkClassMacroItkParent(TargetPointsCalculator, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

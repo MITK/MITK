@@ -55,7 +55,7 @@ public:
   /**
 * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
 */
-  void setUp()
+  void setUp() override
   {
     //generate two sets of points
     m_PointsOne = vtkSmartPointer<vtkPoints>::New();
@@ -109,7 +109,7 @@ public:
     m_Surface3DTwoTimeSteps->SetVtkPolyData( polyDataTwo, 1 );
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_Surface3D = NULL;
     m_Surface3DTwoTimeSteps = NULL;

@@ -44,7 +44,7 @@ public:
   /** @brief Get the Mesh to map */
   const mitk::Mesh *GetInput(void);
 
-  virtual void Paint( mitk::BaseRenderer *renderer );
+  virtual void Paint( mitk::BaseRenderer *renderer ) override;
 
 protected:
   MeshMapper2D();

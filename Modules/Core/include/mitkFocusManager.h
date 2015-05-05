@@ -39,7 +39,7 @@ namespace mitk {
   class MITKCORE_EXPORT FocusManager : public itk::Object
 {
   public:
-  mitkClassMacro(FocusManager, itk::Object);
+  mitkClassMacroItkParent(FocusManager, itk::Object);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

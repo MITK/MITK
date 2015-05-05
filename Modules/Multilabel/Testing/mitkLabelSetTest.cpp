@@ -60,7 +60,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
      m_InitialNumberOfLabels = 200;
      m_LabelSet = mitk::LabelSet::New();
@@ -70,7 +70,7 @@ public:
      m_LabelSet->SetActiveLabel(0);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     // Reset label set
     m_LabelSet = 0;

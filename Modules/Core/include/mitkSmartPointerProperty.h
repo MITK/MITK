@@ -54,7 +54,7 @@ class MITKCORE_EXPORT SmartPointerProperty : public BaseProperty
     void SetValue(const ValueType&);
 
     /// mainly for XML output
-    virtual std::string GetValueAsString() const;
+    virtual std::string GetValueAsString() const override;
 
     static void PostProcessXMLReading();
 
@@ -77,10 +77,10 @@ class MITKCORE_EXPORT SmartPointerProperty : public BaseProperty
     // purposely not implemented
     SmartPointerProperty& operator=(const SmartPointerProperty&);
 
-    itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty&) const;
-    virtual bool Assign(const BaseProperty&);
+    virtual bool IsEqual(const BaseProperty&) const override;
+    virtual bool Assign(const BaseProperty&) override;
 
     typedef std::map<itk::Object*, unsigned int>             ReferenceCountMapType;
     typedef std::map<itk::Object*, std::string>              ReferencesUIDMapType;

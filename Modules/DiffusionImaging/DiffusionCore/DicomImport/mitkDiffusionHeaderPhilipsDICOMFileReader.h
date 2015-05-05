@@ -32,7 +32,7 @@ public:
   mitkClassMacro( DiffusionHeaderPhilipsDICOMFileReader, DiffusionHeaderDICOMFileReader )
   itkNewMacro( Self )
 
-  virtual bool ReadDiffusionHeader(std::string filename);
+  virtual bool ReadDiffusionHeader(std::string filename) override;
 
 protected:
   DiffusionHeaderPhilipsDICOMFileReader();

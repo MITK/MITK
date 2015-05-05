@@ -87,7 +87,7 @@ namespace mitk {
   {
   public:
 
-    void ComputeFromBaseData(BaseData* baseData)
+    void ComputeFromBaseData(BaseData* baseData) override
     {
       m_Container.ComputeFromBaseData(baseData);
     }
@@ -100,7 +100,7 @@ namespace mitk {
     ConnectomicsHistogramsContainer m_Container;
 
   private:
-    ConnectomicsHistogramBase* GetHistogram()
+    ConnectomicsHistogramBase* GetHistogram() override
     {
       return NULL;
     }

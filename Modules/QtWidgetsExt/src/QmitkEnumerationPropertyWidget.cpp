@@ -44,7 +44,7 @@ public:
     this->EndModifyProperty();
   }
 
-  virtual void PropertyChanged()
+  virtual void PropertyChanged() override
   {
     if (m_EnumerationProperty)
     {
@@ -52,7 +52,7 @@ public:
     }
   }
 
-  virtual void PropertyRemoved()
+  virtual void PropertyRemoved() override
   {
     m_Property = 0;
     m_EnumerationProperty = 0;

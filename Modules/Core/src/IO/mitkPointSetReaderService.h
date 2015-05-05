@@ -47,7 +47,7 @@ public:
   virtual ~PointSetReaderService();
 
   using AbstractFileReader::Read;
-  virtual std::vector< itk::SmartPointer<BaseData> > Read();
+  virtual std::vector< itk::SmartPointer<BaseData> > Read() override;
 
 private:
 
@@ -56,7 +56,7 @@ private:
   mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet,
                                     TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);
 
-  virtual PointSetReaderService* Clone() const;
+  virtual PointSetReaderService* Clone() const override;
 };
 
 }

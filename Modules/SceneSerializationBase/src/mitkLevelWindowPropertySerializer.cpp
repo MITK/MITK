@@ -32,7 +32,7 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (const LevelWindowProperty* prop = dynamic_cast<const LevelWindowProperty*>(m_Property.GetPointer()))
       {
@@ -65,7 +65,7 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
       else return NULL;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return NULL;
 

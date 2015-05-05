@@ -34,11 +34,11 @@ class MITKQTWIDGETS_EXPORT QmitkApplicationCursor : public mitk::ApplicationCurs
     // Will be instantiated automatically from QmitkApplicationCursor.cpp once
     QmitkApplicationCursor();
 
-    virtual void PushCursor(const char* XPM[], int hotspotX, int hotspotY);
-    virtual void PushCursor(std::istream&, int hotspotX, int hotspotY);
-    virtual void PopCursor();
-    virtual const mitk::Point2I GetCursorPosition();
-    virtual void SetCursorPosition(const mitk::Point2I&);
+    virtual void PushCursor(const char* XPM[], int hotspotX, int hotspotY) override;
+    virtual void PushCursor(std::istream&, int hotspotX, int hotspotY) override;
+    virtual void PopCursor() override;
+    virtual const mitk::Point2I GetCursorPosition() override;
+    virtual void SetCursorPosition(const mitk::Point2I&) override;
 
 
   protected:

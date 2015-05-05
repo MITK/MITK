@@ -38,7 +38,7 @@ public:
     mbilog::BackendCout();
   }
 
-  void ProcessMessage(const mbilog::LogMessage &l)
+  void ProcessMessage(const mbilog::LogMessage &l) override
   {
     m_Called = true;
     mbilog::BackendCout::ProcessMessage(l);
@@ -64,7 +64,7 @@ class mitkTestLoggingThread : public itk::Object
 {
 public:
 
-mitkClassMacro(mitkTestLoggingThread,itk::Object);
+mitkClassMacroItkParent(mitkTestLoggingThread,itk::Object);
 mitkNewMacro1Param(mitkTestLoggingThread,itk::MultiThreader::Pointer);
 
 int NumberOfMessages;

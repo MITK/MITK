@@ -65,11 +65,11 @@ public:
   itkGetConstMacro(BackgroundValue,float);
   itkSetMacro(BackgroundValue,float);
 
-  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion() override;
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   const mitk::Surface *GetInput(void);
 

@@ -155,7 +155,7 @@ namespace mitk {
     //## @brief Overload of function Modified() to prohibit several calls of Modified() using the ModifiedLock class.
     //##
     //## For the use of Modified(), see class ModifiedLock.
-    void Modified() const;
+    void Modified() const override;
 
     friend class ModifiedLock;
 
@@ -248,7 +248,7 @@ namespace mitk {
 
     //##Documentation
     //##@brief executes affine operations (translate, rotate, scale)
-    virtual void ExecuteOperation(Operation* operation);
+    virtual void ExecuteOperation(Operation* operation) override;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates
@@ -550,9 +550,9 @@ namespace mitk {
     //##  newGeometry->UnRegister();
     //##  return newGeometry.GetPointer();
     //## \endcode
-    virtual itk::LightObject::Pointer InternalClone() const = 0;
+    virtual itk::LightObject::Pointer InternalClone() const override = 0;
 
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     static const std::string GetTransformAsString(TransformType* transformType);
 

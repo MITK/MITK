@@ -69,7 +69,7 @@ namespace mitk
     /**
     * @brief Convert the given Actions to Operations and send to data and UndoController
     **/
-    virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
+    virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent ) override;
   };
 }
 

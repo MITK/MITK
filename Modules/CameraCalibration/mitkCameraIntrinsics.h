@@ -45,7 +45,7 @@ namespace mitk
     ///
     /// smartpointer typedefs
     ///
-    mitkClassMacro(CameraIntrinsics, itk::Object);
+    mitkClassMacroItkParent(CameraIntrinsics, itk::Object);
     ///
     /// the static new function
     ///

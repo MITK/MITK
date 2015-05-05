@@ -81,7 +81,7 @@ class MITKCORE_EXPORT RenderingManager : public itk::Object
 {
 public:
 
-  mitkClassMacro(RenderingManager,itk::Object);
+  mitkClassMacroItkParent(RenderingManager,itk::Object);
 
   typedef std::vector< vtkRenderWindow* > RenderWindowVector;
   typedef std::vector< float > FloatVector;
@@ -397,7 +397,7 @@ public:
   itkCloneMacro(Self)
 
 protected:
-  virtual void GenerateRenderingRequestEvent()
+  virtual void GenerateRenderingRequestEvent() override
   {
    // ForceImmediateUpdateAll();
   };

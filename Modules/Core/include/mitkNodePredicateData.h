@@ -44,7 +44,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type
-    virtual bool CheckNode(const mitk::DataNode* node) const;
+    virtual bool CheckNode(const mitk::DataNode* node) const override;
 
   protected:
     //##Documentation

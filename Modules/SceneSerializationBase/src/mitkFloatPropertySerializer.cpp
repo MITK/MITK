@@ -32,7 +32,7 @@ class FloatPropertySerializer : public BasePropertySerializer
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (const FloatProperty* prop = dynamic_cast<const FloatProperty*>(m_Property.GetPointer()))
       {
@@ -43,7 +43,7 @@ class FloatPropertySerializer : public BasePropertySerializer
       else return NULL;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return NULL;
 

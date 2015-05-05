@@ -39,7 +39,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         typedef itk::RGBPixel< float > FloatRGBPixelType;
         typedef itk::RGBPixel< double > DoubleRGBPixelType;
 
-        mitkClassMacro(ImageToOpenCVImageFilter, itk::Object);
+        mitkClassMacroItkParent(ImageToOpenCVImageFilter, itk::Object);
         itkFactorylessNewMacro(Self)
         itkCloneMacro(Self)
 

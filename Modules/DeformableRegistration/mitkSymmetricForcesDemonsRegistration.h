@@ -85,7 +85,7 @@ namespace mitk
     /*!
     * \brief Starts the symmetric forces demons registration.
     */
-    virtual void GenerateData()
+    virtual void GenerateData() override
     {
       if (this->GetInput())
       {

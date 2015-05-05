@@ -31,12 +31,12 @@ public:
   /*!
   \brief method to return another color
   */
-  virtual Color GetNextColor();
+  virtual Color GetNextColor() override;
 
   /*!
   \brief method to set the color-index to begin again
   */
-  virtual void GoToBegin();
+  virtual void GoToBegin() override;
 
 private:
   /*!

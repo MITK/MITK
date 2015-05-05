@@ -36,17 +36,17 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual void UpdateOutputInformation();
+  virtual void UpdateOutputInformation() override;
 
-  virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-  virtual bool VerifyRequestedRegion();
+  virtual bool VerifyRequestedRegion() override;
 
-  virtual void SetRequestedRegion( const itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
-  virtual void CopyInformation(const itk::DataObject *data);
+  virtual void CopyInformation(const itk::DataObject *data) override;
 
 protected:
   GeometryData();

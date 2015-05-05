@@ -79,7 +79,7 @@ protected:
   PlanarFigureInteractor();
   virtual ~PlanarFigureInteractor();
 
-  virtual void ConnectActionsAndFunctions();
+  virtual void ConnectActionsAndFunctions() override;
 
   ////////  Conditions ////////
   bool CheckFigurePlaced( const InteractionEvent* interactionEvent );
@@ -184,7 +184,7 @@ protected:
 
   void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );
 
-  virtual void ConfigurationChanged();
+  virtual void ConfigurationChanged() override;
 
 private:
 

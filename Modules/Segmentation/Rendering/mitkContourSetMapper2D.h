@@ -45,7 +45,7 @@ public:
     /**
      * reimplemented from Baseclass
      */
-    virtual void Paint(mitk::BaseRenderer * renderer);
+    virtual void Paint(mitk::BaseRenderer * renderer) override;
 
     /**
      * return a refernce of the rendered data object

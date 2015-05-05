@@ -33,11 +33,11 @@ public:
 
     PlanarFigureCompositeWriter();
     PlanarFigureCompositeWriter(const PlanarFigureCompositeWriter & other);
-    virtual PlanarFigureCompositeWriter * Clone() const;
+    virtual PlanarFigureCompositeWriter * Clone() const override;
     virtual ~PlanarFigureCompositeWriter();
 
     using mitk::AbstractFileWriter::Write;
-    virtual void Write();
+    virtual void Write() override;
 
 };
 

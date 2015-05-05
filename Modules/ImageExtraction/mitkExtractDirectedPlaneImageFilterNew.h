@@ -85,8 +85,8 @@ public:
 protected:
     ExtractDirectedPlaneImageFilterNew();
     virtual ~ExtractDirectedPlaneImageFilterNew();
-    virtual void GenerateData();
-    virtual void GenerateOutputInformation();
+    virtual void GenerateData() override;
+    virtual void GenerateOutputInformation() override;
 
 private:
     const BaseGeometry* m_CurrentWorldPlaneGeometry;

@@ -46,7 +46,7 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual bool SetOperationEvent(UndoStackItem* stackItem);
+  virtual bool SetOperationEvent(UndoStackItem* stackItem) override;
 
   //##Documentation
   //## @brief Undoes the last changes
@@ -55,8 +55,8 @@ public:
   //##  executes the operation,
   //##  swaps the OperationEvent-Undo with the Operation
   //##  and sets it to Redo-Stack
-  virtual bool Undo();
-  virtual bool Undo(bool);
+  virtual bool Undo() override;
+  virtual bool Undo(bool) override;
 
   //##Documentation
   //## @brief Undoes all changes until ObjectEventID oeid
@@ -69,8 +69,8 @@ public:
   //## executes the operation,
   //## swaps the OperationEvent-Operation with the Undo-Operation
   //## and sets it to Undo-Stack
-  virtual bool Redo();
-  virtual bool Redo(bool);
+  virtual bool Redo() override;
+  virtual bool Redo(bool) override;
 
   //##Documentation
   //## @brief Redoes all changes until ObjectEventID oeid
@@ -78,30 +78,30 @@ public:
 
   //##Documentation
   //## @brief Clears UndoList and RedoList
-  virtual void Clear();
+  virtual void Clear() override;
 
   //##Documentation
   //## @brief Clears the RedoList
-  virtual void ClearRedoList();
+  virtual void ClearRedoList() override;
 
   //##Documentation
   //## @brief True, if RedoList is empty
-  virtual bool RedoListEmpty();
+  virtual bool RedoListEmpty() override;
 
   //##Documentation
   //## @brief Returns the ObjectEventId of the
   //## top element in the OperationHistory
-  virtual int GetLastObjectEventIdInList();
+  virtual int GetLastObjectEventIdInList() override;
 
   //##Documentation
   //## @brief Returns the GroupEventId of the
   //## top element in the OperationHistory
-  virtual int GetLastGroupEventIdInList();
+  virtual int GetLastGroupEventIdInList() override;
 
   //##Documentation
   //## @brief Returns the last specified OperationEvent in Undo-list
   //## corresponding to the given values; if nothing found, then returns NULL
-  virtual OperationEvent* GetLastOfType(OperationActor* destination, OperationType opType);
+  virtual OperationEvent* GetLastOfType(OperationActor* destination, OperationType opType) override;
 
 protected:
   //##Documentation

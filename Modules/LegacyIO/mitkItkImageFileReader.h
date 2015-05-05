@@ -49,7 +49,7 @@ public:
 
 protected:
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     ItkImageFileReader();
 

@@ -44,8 +44,8 @@ public:
                             mitk::VtkPropRenderer* renderer = NULL,
                             mitk::RenderingManager* renderingManager = NULL);
 
-    virtual vtkRenderWindow* GetVtkRenderWindow();
-    virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor();
+    virtual vtkRenderWindow* GetVtkRenderWindow() override;
+    virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor() override;
 
     void SetDataStorage(mitk::DataStorage::Pointer storage);
 
@@ -64,9 +64,9 @@ protected slots:
 
 protected:
 
-  virtual void init();
-  virtual void prepareForRender();
-  virtual void cleanupAfterRender();
+  virtual void init() override;
+  virtual void prepareForRender() override;
+  virtual void cleanupAfterRender() override;
 
   mitk::Point2D GetMousePosition(QMouseEvent* me) const;
   mitk::Point2D GetMousePosition(QWheelEvent* we) const;
@@ -74,12 +74,12 @@ protected:
   mitk::InteractionEvent::MouseButtons GetButtonState(QMouseEvent* me) const;
   mitk::InteractionEvent::ModifierKeys GetModifiers(QInputEvent* me) const;
   mitk::InteractionEvent::MouseButtons GetButtonState(QWheelEvent* we) const;
-  void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry); // !?
+  void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry) override; // !?
 
-  virtual void mousePressEvent(QMouseEvent* e);
-  virtual void mouseReleaseEvent(QMouseEvent* e);
-  virtual void mouseMoveEvent(QMouseEvent* e);
-  virtual void wheelEvent(QWheelEvent* e);
+  virtual void mousePressEvent(QMouseEvent* e) override;
+  virtual void mouseReleaseEvent(QMouseEvent* e) override;
+  virtual void mouseMoveEvent(QMouseEvent* e) override;
+  virtual void wheelEvent(QWheelEvent* e) override;
 
 private slots:
 

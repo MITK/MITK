@@ -71,7 +71,7 @@ class MITKALGORITHMSEXT_EXPORT WeightedPointTransform : public itk::Object
 
 public:
 
-  mitkClassMacro(WeightedPointTransform, itk::Object);
+  mitkClassMacroItkParent(WeightedPointTransform, itk::Object);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self)
 

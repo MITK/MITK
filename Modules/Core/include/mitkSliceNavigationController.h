@@ -314,13 +314,13 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
         virtual ~TimeGeometryEvent()
           {}
 
-        virtual const char * GetEventName() const
+        virtual const char * GetEventName() const override
           { return "TimeGeometryEvent"; }
 
-        virtual bool CheckEvent(const ::itk::EventObject* e) const
+        virtual bool CheckEvent(const ::itk::EventObject* e) const override
           { return dynamic_cast<const Self*>(e); }
 
-        virtual ::itk::EventObject* MakeObject() const
+        virtual ::itk::EventObject* MakeObject() const override
           { return new Self(m_TimeGeometry, m_Pos); }
 
         TimeGeometry* GetTimeGeometry() const
@@ -490,9 +490,9 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
 
 
     virtual bool ExecuteAction(
-      Action* action, mitk::StateEvent const* stateEvent);
+      Action* action, mitk::StateEvent const* stateEvent) override;
 
-    void ExecuteOperation(Operation* operation);
+    void ExecuteOperation(Operation* operation) override;
 
     /**
      * \brief Feature option to lock planes during mouse interaction.

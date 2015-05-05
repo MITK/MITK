@@ -81,11 +81,11 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
 
     /* icon stuff */
-    virtual const char** GetXPM() const;
-    virtual const char* GetName() const;
+    virtual const char** GetXPM() const override;
+    virtual const char* GetName() const override;
 
-    virtual us::ModuleResource GetCursorIconResource() const;
-    us::ModuleResource GetIconResource() const;
+    virtual us::ModuleResource GetCursorIconResource() const override;
+    us::ModuleResource GetIconResource() const override;
 
     /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);
@@ -122,12 +122,12 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
     FastMarchingTool();
     virtual ~FastMarchingTool();
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
     //virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
     virtual void Initialize();
 
     virtual void BuildITKPipeline();

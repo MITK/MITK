@@ -161,12 +161,12 @@ class ImageHistogramCacheElement : public SimpleHistogramCache::Element
 {
   public:
 
-    void ComputeFromBaseData(BaseData* baseData)
+    void ComputeFromBaseData(BaseData* baseData) override
     {
       histogram.ComputeFromBaseData(baseData);
     }
 
-    SimpleHistogram* GetHistogram()
+    SimpleHistogram* GetHistogram() override
     {
       return &histogram;
     }
@@ -178,12 +178,12 @@ class UnstructuredGridHistogramCacheElement : public SimpleHistogramCache::Eleme
 {
   public:
 
-    void ComputeFromBaseData(BaseData* baseData)
+    void ComputeFromBaseData(BaseData* baseData) override
     {
       histogram.ComputeFromBaseData(baseData);
     }
 
-    SimpleHistogram* GetHistogram()
+    SimpleHistogram* GetHistogram() override
     {
       return &histogram;
     }

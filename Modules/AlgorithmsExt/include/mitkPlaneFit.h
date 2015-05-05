@@ -72,9 +72,9 @@ namespace mitk {
       typedef mitk::PointSet::PointDataType PointDataType;
       typedef mitk::PointSet::PointDataIterator PointDataIterator;
 
-      virtual void GenerateOutputInformation();
+      virtual void GenerateOutputInformation() override;
 
-      virtual void GenerateData();
+      virtual void GenerateData() override;
 
       /*!Getter for point set.
        *

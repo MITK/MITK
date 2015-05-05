@@ -32,7 +32,7 @@ class BoolPropertySerializer : public BasePropertySerializer
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (const BoolProperty* prop = dynamic_cast<const BoolProperty*>(m_Property.GetPointer()))
       {
@@ -50,7 +50,7 @@ class BoolPropertySerializer : public BasePropertySerializer
       else return NULL;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return NULL;
       return BoolProperty::New( std::string(element->Attribute("value")) == "true" ).GetPointer();

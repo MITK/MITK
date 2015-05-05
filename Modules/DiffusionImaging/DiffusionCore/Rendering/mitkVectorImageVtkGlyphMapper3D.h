@@ -52,7 +52,7 @@ public:
     itkGetMacro(RandomMode, bool);
     itkBooleanMacro(RandomMode);
 
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
@@ -71,7 +71,7 @@ protected:
      * Generate a vtkPolyData by creating vectors as glyphs
      * This method is called, each time a specific renderer is updated.
      */
-    virtual void GenerateDataForRenderer( mitk::BaseRenderer* renderer );
+    virtual void GenerateDataForRenderer( mitk::BaseRenderer* renderer ) override;
 
     /**
      * Returns the input data object of the given filter. In this

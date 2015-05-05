@@ -75,9 +75,9 @@ namespace mitk {
 
     virtual ~ContourModelSubDivisionFilter();
 
-    void GenerateOutputInformation() {};
+    void GenerateOutputInformation() override {};
 
-    void GenerateData();
+    void GenerateData() override;
 
     int m_InterpolationIterations;
   };

@@ -30,17 +30,17 @@ class DICOMNullFileReader : public DICOMFileReader
     mitkCloneMacro( DICOMNullFileReader );
     itkNewMacro( DICOMNullFileReader );
 
-    virtual void AnalyzeInputFiles();
+    virtual void AnalyzeInputFiles() override;
 
     // void AllocateOutputImages();
-    virtual bool LoadImages();
+    virtual bool LoadImages() override;
 
-    virtual bool CanHandleFile(const std::string& filename);
+    virtual bool CanHandleFile(const std::string& filename) override;
 
-    bool operator==(const DICOMFileReader& other) const;
+    bool operator==(const DICOMFileReader& other) const override;
 
-    virtual DICOMTagList GetTagsOfInterest() const { return DICOMTagList(); }
-    virtual void SetTagCache( DICOMTagCache::Pointer ) {}
+    virtual DICOMTagList GetTagsOfInterest() const override { return DICOMTagList(); }
+    virtual void SetTagCache( DICOMTagCache::Pointer ) override {}
 
   protected:
 
@@ -50,7 +50,7 @@ class DICOMNullFileReader : public DICOMFileReader
     DICOMNullFileReader(const DICOMNullFileReader& other);
     DICOMNullFileReader& operator=(const DICOMNullFileReader& other);
 
-    void InternalPrintConfiguration(std::ostream& os) const;
+    void InternalPrintConfiguration(std::ostream& os) const override;
 
   private:
 };

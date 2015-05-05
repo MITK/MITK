@@ -33,7 +33,7 @@ namespace mitk
     itkCloneMacro(Self)
 
     /** read in the data */
-    virtual void Update();
+    virtual void Update() override;
 
   protected:
 

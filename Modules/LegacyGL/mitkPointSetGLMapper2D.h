@@ -69,7 +69,7 @@ public:
   /** @brief Get the PointDataList to map */
   virtual const mitk::PointSet * GetInput(void);
 
-  virtual void Paint(mitk::BaseRenderer * renderer);
+  virtual void Paint(mitk::BaseRenderer * renderer) override;
 
   virtual void ApplyAllProperties(mitk::BaseRenderer* renderer);
 

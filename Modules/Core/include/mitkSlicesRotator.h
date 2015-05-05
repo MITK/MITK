@@ -131,12 +131,12 @@ class MITKCORE_EXPORT SlicesRotator : public SlicesCoordinator
     /**
       \brief Called from SlicesCoordinator after a new controller is added (to internal list m_SliceNavigationControllers).
     */
-    virtual void OnSliceControllerAdded(SliceNavigationController* snc);
+    virtual void OnSliceControllerAdded(SliceNavigationController* snc) override;
 
     /*
       \brief Called from SlicesCoordinator after a new controller is being removed (to internal list m_SliceNavigationControllers).
     */
-    virtual void OnSliceControllerRemoved(SliceNavigationController* snc);
+    virtual void OnSliceControllerRemoved(SliceNavigationController* snc) override;
 
     /**
       \brief Check all observed SliceNavigationControllers: remember those that are rotatable in m_RotatableSNCs.

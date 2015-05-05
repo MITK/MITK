@@ -221,19 +221,19 @@ public:
 
 
   /** \brief Intherited from parent */
-  virtual void UpdateOutputInformation();
+  virtual void UpdateOutputInformation() override;
 
   /** \brief Intherited from parent */
-  virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
   /** \brief Intherited from parent */
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
   /** \brief Intherited from parent */
-  virtual bool VerifyRequestedRegion();
+  virtual bool VerifyRequestedRegion() override;
 
   /** \brief Intherited from parent */
-  virtual void SetRequestedRegion( const itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
   /** \brief  Returns the current number of polylines  */
   virtual unsigned short GetPolyLinesSize();
@@ -315,7 +315,7 @@ protected:
   /** \brief Initializes the TimeGeometry describing the (time-resolved)
    * geometry of this figure. Note that each time step holds one PlaneGeometry.
    */
-  virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 );
+  virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 ) override;
 
   /** \brief defines the number of PolyLines that will be available */
   void SetNumberOfPolyLines( unsigned int numberOfPolyLines );
@@ -336,7 +336,7 @@ protected:
   /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
   void ClearHelperPolyLines();
 
-  virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
+  virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const override;
 
   ControlPointListType m_ControlPoints;
   unsigned int m_NumberOfControlPoints;

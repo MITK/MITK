@@ -98,7 +98,7 @@ class MITKALGORITHMSEXT_EXPORT SimpleImageHistogram : public SimpleHistogram
 
   public:
 
-  double GetMin() const
+  double GetMin() const override
   {
     if(!valid)
       return 0;
@@ -106,7 +106,7 @@ class MITKALGORITHMSEXT_EXPORT SimpleImageHistogram : public SimpleHistogram
     return min;
   }
 
-  double GetMax() const
+  double GetMax() const override
   {
     if(!valid)
       return 1;
@@ -115,8 +115,8 @@ class MITKALGORITHMSEXT_EXPORT SimpleImageHistogram : public SimpleHistogram
   }
 
   /** @brief Creates a new histogram out the source which must be an image. Method does nothing if the image is invalid, NULL, etc.. */
-  void ComputeFromBaseData( BaseData* source );
-  float GetRelativeBin( double start, double end ) const;
+  void ComputeFromBaseData( BaseData* source ) override;
+  float GetRelativeBin( double start, double end ) const override;
 
 };
 

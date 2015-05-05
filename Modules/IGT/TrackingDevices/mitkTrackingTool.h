@@ -36,7 +36,7 @@ namespace mitk
   class MITKIGT_EXPORT TrackingTool : public itk::Object
   {
   public:
-    mitkClassMacro(TrackingTool, itk::Object);
+    mitkClassMacroItkParent(TrackingTool, itk::Object);
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 

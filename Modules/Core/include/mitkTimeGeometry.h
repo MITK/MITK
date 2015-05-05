@@ -63,7 +63,7 @@ namespace mitk {
     /**
     * \brief Makes a deep copy of the current object
     */
-    virtual LightObject::Pointer InternalClone() const;
+    virtual LightObject::Pointer InternalClone() const override;
 
 
   public:
@@ -297,9 +297,9 @@ namespace mitk {
     /**
     * \brief Executes the given operation on all time steps
     */
-    virtual void ExecuteOperation(Operation *op);
+    virtual void ExecuteOperation(Operation *op) override;
 
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
   }; // end class TimeGeometry
 } // end namespace MITK
 #endif // TimeGeometry_h

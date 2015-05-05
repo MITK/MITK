@@ -78,15 +78,15 @@ public:
   // Active current renderwindow
   virtual void MakeCurrent();
 
-  virtual void SetDataStorage( mitk::DataStorage* storage );  ///< set the datastorage that will be used for rendering
+  virtual void SetDataStorage( mitk::DataStorage* storage ) override;  ///< set the datastorage that will be used for rendering
 
-  virtual void InitRenderer(vtkRenderWindow* renderwindow);
+  virtual void InitRenderer(vtkRenderWindow* renderwindow) override;
   virtual void Update(mitk::DataNode* datatreenode);
-  virtual void SetMapperID(const MapperSlotId mapperId);
+  virtual void SetMapperID(const MapperSlotId mapperId) override;
 
   // Size
-  virtual void InitSize(int w, int h);
-  virtual void Resize(int w, int h);
+  virtual void InitSize(int w, int h) override;
+  virtual void Resize(int w, int h) override;
 
   // Picking
   enum PickingMode{ WorldPointPicking, PointPicking, CellPicking};
@@ -103,8 +103,8 @@ public:
   itkSetEnumMacro( PickingMode, PickingMode );
   itkGetEnumMacro( PickingMode, PickingMode );
 
-  virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
-  virtual mitk::DataNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const;
+  virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const override;
+  virtual mitk::DataNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const override;
 
   /**
   * @brief WriteSimpleText Write a text in a renderwindow.
@@ -134,7 +134,7 @@ in order to get a vtkTextProperty. This property enables the setup of font, font
    * (e.g. after loading an additional dataset), to ensure that the view is
    * aligned correctly.
    */
-  virtual bool SetWorldGeometryToDataStorageBounds();
+  virtual bool SetWorldGeometryToDataStorageBounds() override;
 
   /**
    * \brief Used by vtkPointPicker/vtkPicker.
@@ -167,7 +167,7 @@ in order to get a vtkTextProperty. This property enables the setup of font, font
 protected:
   VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard );
   virtual ~VtkPropRenderer();
-  virtual void Update();
+  virtual void Update() override;
 
   static void RenderingCallback(
     vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );

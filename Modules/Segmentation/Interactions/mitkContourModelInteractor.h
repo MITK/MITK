@@ -51,12 +51,12 @@ class MITKSEGMENTATION_EXPORT ContourModelInteractor : public Interactor
      *
      * overwritten, cause we don't look at the boundingbox, we look at each point
      */
-    virtual float CanHandleEvent(StateEvent const* stateEvent) const;
+    virtual float CanHandleEvent(StateEvent const* stateEvent) const override;
 
     /**
     *@brief If data changed then initialize according to numbers of loaded points
     **/
-    virtual void DataChanged();
+    virtual void DataChanged() override;
 
   protected:
 

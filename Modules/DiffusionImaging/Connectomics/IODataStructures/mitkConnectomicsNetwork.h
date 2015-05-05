@@ -77,11 +77,11 @@ namespace mitk {
     typedef boost::graph_traits<NetworkType>::edge_descriptor EdgeDescriptorType;
 
     // virtual methods that need to be implemented
-    virtual void UpdateOutputInformation();
-    virtual void SetRequestedRegionToLargestPossibleRegion();
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion(const itk::DataObject * );
+    virtual void UpdateOutputInformation() override;
+    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    virtual bool VerifyRequestedRegion() override;
+    virtual void SetRequestedRegion(const itk::DataObject * ) override;
 
 
     // Macros

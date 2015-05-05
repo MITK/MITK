@@ -32,7 +32,7 @@ class BoolLookupTablePropertySerializer : public BasePropertySerializer
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       const BoolLookupTableProperty* prop = dynamic_cast<const BoolLookupTableProperty*>(m_Property.GetPointer());
       if (prop == NULL)
@@ -56,7 +56,7 @@ class BoolLookupTablePropertySerializer : public BasePropertySerializer
         return element;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element)
         return NULL;

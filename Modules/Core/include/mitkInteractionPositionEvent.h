@@ -48,13 +48,13 @@ namespace mitk
     Point2D GetPointerPositionOnScreen() const;
     Point3D GetPositionInWorld() const;
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
 
   protected:
     InteractionPositionEvent(BaseRenderer* baseRenderer, const Point2D& mousePosition, const Point3D &worldPosition);
     virtual ~InteractionPositionEvent();
 
-    virtual bool IsEqual(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const override;
 
   private:
     const Point2D m_PointerPosition;

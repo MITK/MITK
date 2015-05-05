@@ -96,21 +96,21 @@ public:
     /**
     * @return possible file extensions for the data type associated with the writer
     */
-    virtual std::vector<std::string> GetPossibleFileExtensions();
+    virtual std::vector<std::string> GetPossibleFileExtensions() override;
 
-    std::string GetSupportedBaseData() const;
+    std::string GetSupportedBaseData() const override;
 
     // FileWriterWithInformation methods
-    virtual const char * GetDefaultFilename() { return "TbssRoiImage.roi"; }
-    virtual const char * GetFileDialogPattern() { return "Tbss Roi Images (*.roi)"; }
-    virtual const char * GetDefaultExtension() { return ".roi"; }
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data)
+    virtual const char * GetDefaultFilename() override { return "TbssRoiImage.roi"; }
+    virtual const char * GetFileDialogPattern() override { return "Tbss Roi Images (*.roi)"; }
+    virtual const char * GetDefaultExtension() override { return ".roi"; }
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) override
     {
       return (dynamic_cast<mitk::TbssRoiImage*>(data.GetPointer()) != NULL);
     }
 
 
-    virtual void DoWrite(BaseData::Pointer data) {
+    virtual void DoWrite(BaseData::Pointer data) override {
       if (CanWriteBaseDataType(data)) {
         this->SetInput(dynamic_cast<mitk::TbssRoiImage*>(data.GetPointer()));
         this->Update();
@@ -123,7 +123,7 @@ protected:
 
     virtual ~NrrdTbssRoiImageWriter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     std::string m_FileName;
 

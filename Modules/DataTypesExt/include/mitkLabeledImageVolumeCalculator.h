@@ -45,7 +45,7 @@ public:
   typedef std::vector< double > VolumeVector;
   typedef std::vector< Point3D > PointVector;
 
-  mitkClassMacro( LabeledImageVolumeCalculator, itk::Object );
+  mitkClassMacroItkParent( LabeledImageVolumeCalculator, itk::Object );
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

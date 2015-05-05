@@ -68,24 +68,24 @@ public:
 
   ///
   /// Overwritten from QAbstractTableModel. Returns the flags what can be done with the items (view, edit, ...)
-  Qt::ItemFlags flags(const QModelIndex& index) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
 
   ///
   /// Overwritten from QAbstractTableModel. Returns the flags what can be done with the items (view, edit, ...)
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   ///
   /// Overwritten from QAbstractTableModel. Returns the flags what can be done with the items (view, edit, ...)
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
   ///
   /// Overwritten from QAbstractTableModel. Returns the flags what can be done with the items (view, edit, ...)
-  int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
   ///
   /// Overwritten from QAbstractTableModel. Returns the number of columns. That is usually two in this model:
   /// the properties name and its value.
-  int columnCount(const QModelIndex &parent) const;
+  int columnCount(const QModelIndex &parent) const override;
 
 //# PUBLIC SETTER
 public:
@@ -118,12 +118,12 @@ public:
   /// Overridden from QAbstractTableModel. Sets data at index for given role.
   ///
   bool setData(const QModelIndex &index, const QVariant &value,
-    int role);
+    int role) override;
 
   ///
   /// \brief Reimplemented sort function from QAbstractTableModel to enable sorting on the table.
   ///
-  void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder );
+  void sort ( int column, Qt::SortOrder order = Qt::AscendingOrder ) override;
 
 //#PROTECTED INNER CLASSES
 protected:

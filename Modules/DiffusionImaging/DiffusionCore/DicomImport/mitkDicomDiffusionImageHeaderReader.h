@@ -37,7 +37,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro( DicomDiffusionImageHeaderReader, itk::Object );
+    mitkClassMacroItkParent( DicomDiffusionImageHeaderReader, itk::Object );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

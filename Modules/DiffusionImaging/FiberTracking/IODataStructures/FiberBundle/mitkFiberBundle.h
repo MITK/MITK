@@ -50,11 +50,11 @@ public:
     // fiber colorcodings
     static const char* FIBER_ID_ARRAY;
 
-    virtual void UpdateOutputInformation();
-    virtual void SetRequestedRegionToLargestPossibleRegion();
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion(const itk::DataObject*);
+    virtual void UpdateOutputInformation() override;
+    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    virtual bool VerifyRequestedRegion() override;
+    virtual void SetRequestedRegion(const itk::DataObject*) override;
 
     mitkClassMacro( FiberBundle, BaseData )
     itkFactorylessNewMacro(Self)

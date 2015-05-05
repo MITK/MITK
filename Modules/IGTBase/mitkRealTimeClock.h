@@ -38,7 +38,7 @@ namespace mitk {
   class MITKIGTBASE_EXPORT RealTimeClock : public itk::Object
   {
   public:
-    mitkClassMacro(RealTimeClock, itk::Object);
+    mitkClassMacroItkParent(RealTimeClock, itk::Object);
 
     /**
     *\brief instanciates a new, operating-system dependant, instance of mitk::RealTimeClock.

@@ -46,7 +46,7 @@ namespace mitk
     virtual ~DiffusionImageNiftiReaderService();
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
     typedef short                                                           DiffusionPixelType;
 
@@ -64,7 +64,7 @@ namespace mitk
 
   private:
 
-    DiffusionImageNiftiReaderService* Clone() const;
+    DiffusionImageNiftiReaderService* Clone() const override;
     us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
   };
 

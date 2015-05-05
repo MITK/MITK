@@ -58,8 +58,8 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const;
-  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds);
+  virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
+  virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds) override;
 
 
 protected:
@@ -67,9 +67,9 @@ protected:
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  vtkProp* GetVtkProp(BaseRenderer *renderer) const;
-  virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const;
-  void UpdateVtkOverlay2D(mitk::BaseRenderer *renderer);
+  vtkProp* GetVtkProp(BaseRenderer *renderer) const override;
+  virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const override;
+  void UpdateVtkOverlay2D(mitk::BaseRenderer *renderer) override;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit TextOverlay2D();

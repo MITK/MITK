@@ -92,13 +92,13 @@ public:
     itkSetMacro(MaskImage, ItkFloatImageType::Pointer)
     itkSetMacro(TensorImage, ItkTensorImage::Pointer)
 
-    virtual void Update(){
+    virtual void Update() override{
         this->GenerateData();
     }
 
 protected:
 
-    void GenerateData();
+    void GenerateData() override;
 
     GibbsTrackingFilter();
     virtual ~GibbsTrackingFilter();

@@ -137,17 +137,17 @@ public:
     /**
     * @brief Return the extension to be added to the filename.
     */
-    virtual std::string GetFileExtension();
+    virtual std::string GetFileExtension() override;
 
     /**
     * @brief Check if the Writer can write the Content of the DataTreenode.
     */
-    virtual bool CanWriteDataType( DataNode* );
+    virtual bool CanWriteDataType( DataNode* ) override;
 
     /**
     * @brief Return the MimeType of the saved File.
     */
-    virtual std::string GetWritenMIMEType();
+    virtual std::string GetWritenMIMEType() override;
 
     using Superclass::SetInput;
     /**
@@ -163,16 +163,16 @@ public:
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
-    virtual std::vector<std::string> GetPossibleFileExtensions();
+    virtual std::vector<std::string> GetPossibleFileExtensions() override;
 
-    virtual std::string GetSupportedBaseData() const
+    virtual std::string GetSupportedBaseData() const override
     { return Surface::GetStaticNameOfClass(); }
 
-    virtual const char *GetDefaultFilename();
-    virtual const char *GetFileDialogPattern();
-    virtual const char *GetDefaultExtension();
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data);
-    virtual void DoWrite(BaseData::Pointer data);
+    virtual const char *GetDefaultFilename() override;
+    virtual const char *GetFileDialogPattern() override;
+    virtual const char *GetDefaultExtension() override;
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) override;
+    virtual void DoWrite(BaseData::Pointer data) override;
 
 protected:
 
@@ -186,7 +186,7 @@ protected:
      */
     virtual ~SurfaceVtkWriter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     void ExecuteWrite( VtkWriterType* vtkWriter );
 

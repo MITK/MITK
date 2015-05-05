@@ -37,7 +37,7 @@ namespace mitk {
 class SurfaceModifier : public itk::Object
   {
   public:
-    mitkClassMacro(SurfaceModifier, itk::Object);
+    mitkClassMacroItkParent(SurfaceModifier, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

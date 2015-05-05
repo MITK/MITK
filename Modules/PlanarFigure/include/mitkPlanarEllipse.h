@@ -45,19 +45,19 @@ public:
    *
    * Must be implemented in sub-classes.
    */
-  virtual void PlaceFigure( const Point2D &point );
+  virtual void PlaceFigure( const Point2D &point ) override;
 
-  bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = true );
+  bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = true ) override;
 
   /** \brief Ellipse has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const
+  unsigned int GetMinimumNumberOfControlPoints() const override
   {
     return 4;
   }
 
 
   /** \brief Ellipse has 3 control points per definition. */
-  unsigned int GetMaximumNumberOfControlPoints() const
+  unsigned int GetMaximumNumberOfControlPoints() const override
   {
     return 4;
   }
@@ -102,7 +102,7 @@ public:
       m_TreatAsCircle = active;
   }
 
-  virtual bool Equals(const mitk::PlanarFigure& other) const;
+  virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
   const unsigned int FEATURE_ID_MAJOR_AXIS;
   const unsigned int FEATURE_ID_MINOR_AXIS;
@@ -114,18 +114,18 @@ protected:
   mitkCloneMacro(Self);
 
   /** \brief Generates the poly-line representation of the planar figure. */
-  virtual void GeneratePolyLine();
+  virtual void GeneratePolyLine() override;
 
   /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
+  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
   /** \brief Spatially constrain control points of second (orthogonal) line */
-  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point );
+  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point ) override;
 
   /** \brief Calculates feature quantities of the planar figure. */
-  virtual void EvaluateFeaturesInternal();
+  virtual void EvaluateFeaturesInternal() override;
 
-  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
   //Member variables:
   double m_MinRadius;

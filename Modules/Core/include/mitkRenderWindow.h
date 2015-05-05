@@ -35,7 +35,7 @@ class vtkEventProvider;
 class MITKCORE_EXPORT RenderWindow: public mitk::RenderWindowBase, public itk::Object
 {
 public:
-  mitkClassMacro(RenderWindow, itk::Object);
+  mitkClassMacroItkParent(RenderWindow, itk::Object);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
   mitkNewMacro1Param(Self, vtkRenderWindow*);
@@ -45,8 +45,8 @@ public:
 
   virtual ~RenderWindow();
 
-  virtual vtkRenderWindow* GetVtkRenderWindow();
-  virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor();
+  virtual vtkRenderWindow* GetVtkRenderWindow() override;
+  virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor() override;
 
   // Set Layout Index to define the Layout Type
   void SetLayoutIndex( unsigned int layoutIndex );

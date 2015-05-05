@@ -85,7 +85,7 @@ namespace mitk
     virtual ~TSpecificActionFunctor()
     {
     }
-    virtual bool DoAction(StateMachineAction* action, InteractionEvent* event)
+    virtual bool DoAction(StateMachineAction* action, InteractionEvent* event) override
     {
       return (*m_Object.*m_MemberFunctionPointer)(action, event);// executes member function
     }

@@ -71,7 +71,7 @@ namespace itk
 
     ShortestPathCostFunction() {};
     virtual ~ShortestPathCostFunction() {};
-    void PrintSelf(std::ostream& os, Indent indent) const;
+    void PrintSelf(std::ostream& os, Indent indent) const override;
     ImageConstPointer    m_Image;
     IndexType m_StartIndex, m_EndIndex;
 

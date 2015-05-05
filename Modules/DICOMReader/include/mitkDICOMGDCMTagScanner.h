@@ -87,7 +87,7 @@ namespace mitk
       /**
         \brief Directly retrieve the tag value for a given frame and tag.
       */
-      virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const;
+      virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const override;
 
       protected:
 

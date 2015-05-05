@@ -51,7 +51,7 @@ namespace mitk {
     std::vector<std::string> m_Presets;
     MaskType::Pointer m_BrainMask;
 
-    void Execute(itk::Object * object, const itk::EventObject & event)
+    void Execute(itk::Object * object, const itk::EventObject & event) override
     {
       if( !(itk::IterationEvent().CheckEvent( &event )) )
       {
@@ -171,7 +171,7 @@ namespace mitk {
       registration->GetTransform()->Print(std::cout,0);
     }
 
-    void Execute(const itk::Object * , const itk::EventObject & )
+    void Execute(const itk::Object * , const itk::EventObject & ) override
       { return; }
 
   };

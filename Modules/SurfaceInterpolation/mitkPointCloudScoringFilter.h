@@ -60,10 +60,10 @@ public:
 protected:
 
   /** is called by the Update() method */
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   /** Defines the output */
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
   /** Constructor */
   PointCloudScoringFilter();

@@ -76,9 +76,9 @@ namespace mitk {
 
     virtual const mitk::PointSet* GetInput();
 
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
-    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
+    virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
     static void SetDefaultProperties(mitk::DataNode* node,
       mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
@@ -96,8 +96,8 @@ namespace mitk {
     // update all vtk sources, mappers, actors with current data and properties
     void UpdateVtkObjects();
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor) override;
 
     typedef mitk::PointSet::PointIdentifier PointIdentifier;
     typedef std::map<PointIdentifier, vtkSphereSource*> SphereSourceMap;

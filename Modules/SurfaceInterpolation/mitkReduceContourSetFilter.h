@@ -100,8 +100,8 @@ namespace mitk {
     protected:
         ReduceContourSetFilter();
         virtual ~ReduceContourSetFilter();
-        virtual void GenerateData();
-        virtual void GenerateOutputInformation();
+        virtual void GenerateData() override;
+        virtual void GenerateOutputInformation() override;
 
     private:
         void ReduceNumberOfPointsByNthPoint (vtkIdType cellSize, vtkIdType* cell, vtkPoints* points, vtkPolygon* reducedPolygon, vtkPoints* reducedPoints);

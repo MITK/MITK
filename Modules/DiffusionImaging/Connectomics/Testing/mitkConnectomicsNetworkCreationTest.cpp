@@ -49,14 +49,14 @@ public:
   /**
   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
   */
-  void setUp()
+  void setUp() override
   {
     m_ReferenceNetworkPath = GetTestDataFilePath("DiffusionImaging/Connectomics/reference.cnf");
     m_ParcellationPath = GetTestDataFilePath("DiffusionImaging/Connectomics/parcellation.nrrd");
     m_FiberPath = GetTestDataFilePath("DiffusionImaging/Connectomics/fiberBundle.fib");
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_ReferenceNetworkPath = "";
     m_ParcellationPath = "";

@@ -95,7 +95,7 @@ class vtkXMLMaterialParser : public vtkXMLParser
 public:
   static vtkXMLMaterialParser *New();
   vtkTypeMacro(vtkXMLMaterialParser,vtkXMLParser);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Set/Get the vtkXMLMaterial representation of the parsed material.
@@ -105,29 +105,29 @@ public:
   // Description:
   // Overridden to initialize the internal structures before
   // the parsing begins.
-  virtual int Parse();
-  virtual int Parse(const char* inputString);
-  virtual int Parse(const char* inputString, unsigned int length);
+  virtual int Parse() override;
+  virtual int Parse(const char* inputString) override;
+  virtual int Parse(const char* inputString, unsigned int length) override;
 
   // Description:
   // Overridden to clean up internal structures before the chunk-parsing
   // begins.
-  virtual int InitializeParser();
+  virtual int InitializeParser() override;
 protected:
   vtkXMLMaterialParser();
   ~vtkXMLMaterialParser();
 
   // Description:
   // Event for handling the start of an element
-  virtual void StartElement(const char* name, const char** atts);
+  virtual void StartElement(const char* name, const char** atts) override;
 
   // Description:
   // Event for handling the end of an element
-  virtual void EndElement(const char*);
+  virtual void EndElement(const char*) override;
 
   // Description:
   // Handle character data, not yet implemented
-  virtual void CharacterDataHandler( const char* data, int length );
+  virtual void CharacterDataHandler( const char* data, int length ) override;
 
   vtkXMLMaterial* Material;
   vtkXMLMaterialParserInternals* Internals;

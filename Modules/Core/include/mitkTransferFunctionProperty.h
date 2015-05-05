@@ -52,7 +52,7 @@ public:
   itkSetMacro(Value, mitk::TransferFunction::Pointer );
   itkGetConstMacro(Value, mitk::TransferFunction::Pointer );
 
-  std::string GetValueAsString() const;
+  std::string GetValueAsString() const override;
 
   using BaseProperty::operator=;
 
@@ -69,10 +69,10 @@ private:
   // purposely not implemented
   TransferFunctionProperty& operator=(const TransferFunctionProperty&);
 
-  itk::LightObject::Pointer InternalClone() const;
+  itk::LightObject::Pointer InternalClone() const override;
 
-  virtual bool IsEqual(const BaseProperty& property) const;
-  virtual bool Assign(const BaseProperty& property);
+  virtual bool IsEqual(const BaseProperty& property) const override;
+  virtual bool Assign(const BaseProperty& property) override;
 };
 
 #ifdef _MSC_VER

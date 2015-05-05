@@ -105,7 +105,7 @@ namespace mitk {
     virtual const mitk::PointSet* GetInput() const;
 
     /** \brief returns the a prop assembly */
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
     /** \brief set the default properties for this mapper */
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
@@ -183,11 +183,11 @@ namespace mitk {
     virtual ~PointSetVtkMapper2D();
 
     /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     /* \brief Called in mitk::Mapper::Update
     * If TimeSlicedGeometry or time step is not valid of point set: reset mapper so that nothing is
     * displayed e.g. toggle visiblity of the propassembly */
-    virtual void ResetMapper( BaseRenderer* renderer );
+    virtual void ResetMapper( BaseRenderer* renderer ) override;
 
      /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.
     * This function iterates over the input point set and determines the glyphs which lie in a specific

@@ -43,7 +43,7 @@ namespace mitk {
   class MITKUS_EXPORT USImageVideoSource : public mitk::USImageSource
   {
   public:
-    mitkClassMacro(USImageVideoSource, itk::ProcessObject);
+    mitkClassMacroItkParent(USImageVideoSource, itk::ProcessObject);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

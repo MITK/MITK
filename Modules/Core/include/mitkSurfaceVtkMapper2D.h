@@ -69,7 +69,7 @@ public:
   virtual const mitk::Surface* GetInput() const;
 
   /** \brief returns the prop assembly */
-  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
   /** \brief set the default properties for this mapper */
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
@@ -163,7 +163,7 @@ public:
    * current plane geometry will point the cutter to en empty location
    * (if the surface does have a geometry, which is a rather rare case).
    */
-  void UpdateVtkTransform(mitk::BaseRenderer* /*renderer*/)
+  void UpdateVtkTransform(mitk::BaseRenderer* /*renderer*/) override
   {
   }
 
@@ -182,7 +182,7 @@ protected:
      * @brief GenerateDataForRenderer produces all the data.
      * @param renderer The respective renderer of the mitkRenderWindow.
      */
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
   /**
      * @brief ResetMapper Called in mitk::Mapper::Update to hide objects.
@@ -191,7 +191,7 @@ protected:
      *
      * @param renderer The respective renderer of the mitkRenderWindow.
      */
-  virtual void ResetMapper( BaseRenderer* renderer );
+  virtual void ResetMapper( BaseRenderer* renderer ) override;
 
   /**
      * @brief ApplyAllProperties Pass all the properties to VTK.
@@ -203,7 +203,7 @@ protected:
      * @brief Update Check if data should be generated.
      * @param renderer The respective renderer of the mitkRenderWindow.
      */
-  void Update(BaseRenderer* renderer);
+  void Update(BaseRenderer* renderer) override;
 };
 } // namespace mitk
 #endif /* mitkSurfaceVtkMapper2D_h */

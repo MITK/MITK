@@ -58,7 +58,7 @@ public:
   itkNewMacro(Self);
   mitkNewMacro1Param(Self, const Self&);
 
-  itk::LightObject::Pointer InternalClone() const
+  itk::LightObject::Pointer InternalClone() const override
   {
     Self::Pointer newGeometry = new Self(*this);
     newGeometry->UnRegister();
@@ -66,14 +66,14 @@ public:
   }
 
 protected:
-  virtual void PrintSelf(std::ostream& /*os*/, itk::Indent /*indent*/) const{};
+  virtual void PrintSelf(std::ostream& /*os*/, itk::Indent /*indent*/) const override{};
   //##Documentation
   //## @brief Pre- and Post-functions are empty in BaseGeometry
   //##
   //## These virtual functions allow for a different beahiour in subclasses.
   //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
   //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
-  virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){};
+  virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{};
 };
 
 class mitkBaseGeometryTestSuite : public mitk::TestFixture
@@ -150,7 +150,7 @@ private:
 public:
 
   // Set up for variables
-  void setUp()
+  void setUp() override
   {
     mitk::FillVector3D(aFloatSpacing, 1,1,1);
     mitk::FillVector3D(aSpacing, 1,1,1);
@@ -223,7 +223,7 @@ public:
     anotherDummyGeometry = aDummyGeometry->Clone();
   }
 
-  void tearDown()
+  void tearDown() override
   {
     aDummyGeometry = NULL;
     anotherDummyGeometry = NULL;

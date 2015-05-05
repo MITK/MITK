@@ -38,7 +38,7 @@ namespace mitk
   class MITKIGT_EXPORT NDIProtocol : public itk::Object
   {
   public:
-    mitkClassMacro(NDIProtocol, itk::Object);
+    mitkClassMacroItkParent(NDIProtocol, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

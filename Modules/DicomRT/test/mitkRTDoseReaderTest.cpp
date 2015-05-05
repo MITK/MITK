@@ -32,7 +32,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_rtDoseReader = mitk::RTDoseReader::New();
     CPPUNIT_ASSERT_MESSAGE("Failed to initialize RTDoseReader", m_rtDoseReader.IsNotNull());

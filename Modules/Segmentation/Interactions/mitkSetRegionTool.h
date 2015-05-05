@@ -55,10 +55,10 @@ class MITKSEGMENTATION_EXPORT SetRegionTool : public FeedbackContourTool
     SetRegionTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~SetRegionTool();
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );

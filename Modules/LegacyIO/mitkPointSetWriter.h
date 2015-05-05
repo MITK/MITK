@@ -114,24 +114,24 @@ public:
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
-    virtual std::vector<std::string> GetPossibleFileExtensions();
+    virtual std::vector<std::string> GetPossibleFileExtensions() override;
 
-    virtual std::string GetSupportedBaseData() const;
+    virtual std::string GetSupportedBaseData() const override;
 
     /**
     * @brief Return the extension to be added to the filename.
     */
-    virtual std::string GetFileExtension();
+    virtual std::string GetFileExtension() override;
 
     /**
     * @brief Check if the Writer can write the Content of the
     */
-    virtual bool CanWriteDataType( DataNode* );
+    virtual bool CanWriteDataType( DataNode* ) override;
 
     /**
     * @brief Return the MimeType of the saved File.
     */
-    virtual std::string GetWritenMIMEType();
+    virtual std::string GetWritenMIMEType() override;
 
     using mitk::FileWriter::SetInput;
     /**
@@ -160,7 +160,7 @@ protected:
     /**
      * Writes the XML file
      */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
 
     /**

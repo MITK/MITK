@@ -38,7 +38,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     fib1 = NULL;
     fib2 = NULL;
@@ -51,7 +51,7 @@ public:
     fib1 = dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
   }
 
-  void tearDown()
+  void tearDown() override
   {
     fib1 = NULL;
     fib2 = NULL;

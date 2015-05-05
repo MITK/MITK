@@ -48,7 +48,7 @@ namespace mitk {
 
       //##Documentation
       //## @brief Checks, if the nodes contains a property that is equal to m_ValidProperty
-      virtual bool CheckNode(const mitk::DataNode* node) const;
+      virtual bool CheckNode(const mitk::DataNode* node) const override;
 
     protected:
       //##Documentation

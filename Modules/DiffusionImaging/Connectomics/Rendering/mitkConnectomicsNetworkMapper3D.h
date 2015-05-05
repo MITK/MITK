@@ -72,12 +72,12 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer); //looks like deprecated.. should be replaced bz GetViewProp()
+    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like deprecated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
 
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
     virtual const mitk::ConnectomicsNetwork* GetInput();
 

@@ -86,11 +86,11 @@ protected:
 
   ~MaskImageFilter();
 
-  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion() override;
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   template < typename TPixel, unsigned int VImageDimension >
   void InternalComputeMask(itk::Image<TPixel, VImageDimension>* itkImage);

@@ -83,13 +83,13 @@ public:
 
 protected:
 
-  void PrintSelf(std::ostream &os, itk::Indent indent) const;
+  void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   Label(const Label& other);
 
 private:
 
-  virtual itk::LightObject::Pointer InternalClone() const;
+  virtual itk::LightObject::Pointer InternalClone() const override;
 
 };
 

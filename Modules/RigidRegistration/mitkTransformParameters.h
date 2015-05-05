@@ -44,7 +44,7 @@ namespace mitk {
   class MITKRIGIDREGISTRATION_EXPORT TransformParameters : public itk::Object
   {
   public:
-    mitkClassMacro(TransformParameters, ::itk::Object);
+    mitkClassMacroItkParent(TransformParameters, ::itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

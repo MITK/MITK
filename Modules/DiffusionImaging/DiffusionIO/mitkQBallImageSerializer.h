@@ -30,7 +30,7 @@ class QBallImageSerializer : public BaseDataSerializer
     mitkClassMacro( QBallImageSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize();
+    virtual std::string Serialize() override;
   protected:
     QBallImageSerializer();
     virtual ~QBallImageSerializer();

@@ -27,7 +27,7 @@ class MITKQMLITEMS_EXPORT QmlMitkBigRenderLock : public QObject
     QmlMitkBigRenderLock(QObject* parent = 0);
 
   protected:
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
 #endif

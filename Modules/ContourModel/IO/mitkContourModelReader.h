@@ -44,7 +44,7 @@ public:
   virtual ~ContourModelReader();
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read();
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
 protected:
 
@@ -53,7 +53,7 @@ protected:
 
 private:
 
-  ContourModelReader* Clone() const;
+  ContourModelReader* Clone() const override;
 
   us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
 };

@@ -47,11 +47,11 @@ public:
 
   void Update();
 
-  QSize sizeHint() const;
+  QSize sizeHint() const override;
 
 protected:
-  void contextMenuEvent(QContextMenuEvent* event);
-  void resizeEvent(QResizeEvent* event);
+  void contextMenuEvent(QContextMenuEvent* event) override;
+  void resizeEvent(QResizeEvent* event) override;
 
 private slots:
   void OnProcessStateChanged(QProcess::ProcessState state);

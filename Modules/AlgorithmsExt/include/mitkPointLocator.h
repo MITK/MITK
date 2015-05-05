@@ -46,7 +46,7 @@ class MITKALGORITHMSEXT_EXPORT PointLocator : public itk::Object
 {
 public:
 
-  mitkClassMacro( PointLocator, Object );
+  mitkClassMacroItkParent( PointLocator, itk::Object );
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)

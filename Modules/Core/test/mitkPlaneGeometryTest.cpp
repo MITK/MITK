@@ -65,7 +65,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     planegeometry = mitk::PlaneGeometry::New();
     width  = 100;    widthInMM  = width;
@@ -80,7 +80,7 @@ public:
     planegeometry->SetOrigin(origin);
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

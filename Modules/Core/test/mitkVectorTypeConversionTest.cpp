@@ -97,7 +97,7 @@ private:
 public:
 
 
-  void setUp(void)
+  void setUp(void) override
   {
     FillVector3D(originalValues, 1.123456789987, 2.789456321456, 3.123654789987456);
     FillVector3D(valuesToCopy,   4.654789123321, 5.987456789321, 6.321654987789546);
@@ -105,7 +105,7 @@ public:
     epsDouble2Float = vnl_math::float_eps * 10.0;
   }
 
-  void tearDown(void)
+  void tearDown(void) override
   {
 
   }

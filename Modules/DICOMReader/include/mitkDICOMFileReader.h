@@ -57,7 +57,7 @@ class MITKDICOMREADER_EXPORT DICOMFileReader : public itk::Object
 {
   public:
 
-    mitkClassMacro( DICOMFileReader, itk::Object );
+    mitkClassMacroItkParent( DICOMFileReader, itk::Object );
 
     /// Test whether a file is DICOM at all
     static bool IsDICOM(const std::string& filename);

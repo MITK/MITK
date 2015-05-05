@@ -30,12 +30,12 @@ public:
   SceneFileReader();
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read();
-  virtual DataStorage::SetOfObjects::Pointer Read(DataStorage& ds);
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+  virtual DataStorage::SetOfObjects::Pointer Read(DataStorage& ds) override;
 
 private:
 
-  SceneFileReader* Clone() const;
+  SceneFileReader* Clone() const override;
 };
 
 } // namespace mitk

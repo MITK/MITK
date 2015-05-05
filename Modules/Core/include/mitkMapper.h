@@ -56,7 +56,7 @@ namespace mitk {
   {
   public:
 
-    mitkClassMacro(Mapper, itk::Object);
+    mitkClassMacroItkParent(Mapper, itk::Object);
 
     /** \brief Set the DataNode containing the data to map */
     itkSetObjectMacro(DataNode, DataNode);

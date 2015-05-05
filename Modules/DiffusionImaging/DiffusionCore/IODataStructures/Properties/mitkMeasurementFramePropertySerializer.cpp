@@ -34,7 +34,7 @@ class MITKDIFFUSIONCORE_EXPORT MeasurementFramePropertySerializer : public BaseP
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (const MeasurementFrameProperty* prop = dynamic_cast<const MeasurementFrameProperty*>(m_Property.GetPointer()))
       {
@@ -57,7 +57,7 @@ class MITKDIFFUSIONCORE_EXPORT MeasurementFramePropertySerializer : public BaseP
       else return NULL;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return NULL;
 

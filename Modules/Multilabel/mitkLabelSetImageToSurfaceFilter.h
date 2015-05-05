@@ -152,9 +152,9 @@ protected:
 
   mitk::Vector3D m_InputImageSpacing;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
 //  mitk::ProcessObserver::Pointer m_Observer;
 

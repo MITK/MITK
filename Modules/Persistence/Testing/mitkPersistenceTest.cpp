@@ -42,13 +42,13 @@ struct PersistenceTestClass
 struct TestPropertyListReplacedObserver: public mitk::PropertyListReplacedObserver
 {
   TestPropertyListReplacedObserver(): counter(0) {}
-  virtual void BeforePropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList )
+  virtual void BeforePropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList ) override
   {
     if( id == m_Id )
       counter++;
   }
 
-  virtual void AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList )
+  virtual void AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList ) override
   {
     if( id == m_Id )
       counter++;
@@ -73,7 +73,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     testClassId = "testClass";
     param1 = 100;

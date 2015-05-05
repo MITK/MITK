@@ -39,7 +39,7 @@ class vtkPointSetSlicer : public vtkPolyDataAlgorithm
 public:
   vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);
 
-  void PrintSelf(std::ostream& os, vtkIndent indent);
+  void PrintSelf(std::ostream& os, vtkIndent indent) override;
 
   // Description:
   // Construct with user-specified implicit function; initial value of 0.0; and
@@ -49,7 +49,7 @@ public:
   // Description:
   // Override GetMTime because we delegate to vtkContourValues and refer to
   // vtkImplicitFunction.
-  unsigned long GetMTime();
+  unsigned long GetMTime() override;
 
   // Description
   // Specify the implicit function to perform the cutting.
@@ -79,9 +79,9 @@ protected:
   vtkPointSetSlicer(vtkPlane* cf = 0);
   ~vtkPointSetSlicer();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  virtual int FillInputPortInformation(int port, vtkInformation *info) override;
 
   void UnstructuredGridCutter(vtkDataSet *input, vtkPolyData *output);
 

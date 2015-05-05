@@ -41,29 +41,29 @@ namespace mitk
 
         ~PersistenceService();
 
-        std::string GetDefaultPersistenceFile();
+        std::string GetDefaultPersistenceFile() override;
 
-        mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 );
+        mitk::PropertyList::Pointer GetPropertyList( std::string& id, bool* existed=0 ) override;
 
-        bool RemovePropertyList( std::string& id );
+        bool RemovePropertyList( std::string& id ) override;
 
-        std::string GetPersistenceNodePropertyName();
+        std::string GetPersistenceNodePropertyName() override;
 
-        DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage* ds=0);
+        DataStorage::SetOfObjects::Pointer GetDataNodes(DataStorage* ds=0) override;
 
-        bool Save(const std::string& fileName="", bool appendChanges=false);
+        bool Save(const std::string& fileName="", bool appendChanges=false) override;
 
-        bool Load(const std::string& fileName="", bool enforeReload=true);
+        bool Load(const std::string& fileName="", bool enforeReload=true) override;
 
-        void SetAutoLoadAndSave(bool autoLoadAndSave);
+        void SetAutoLoadAndSave(bool autoLoadAndSave) override;
 
-        bool GetAutoLoadAndSave();
+        bool GetAutoLoadAndSave() override;
 
-        void AddPropertyListReplacedObserver( PropertyListReplacedObserver* observer );
+        void AddPropertyListReplacedObserver( PropertyListReplacedObserver* observer ) override;
 
-        void RemovePropertyListReplacedObserver( PropertyListReplacedObserver* observer );
+        void RemovePropertyListReplacedObserver( PropertyListReplacedObserver* observer ) override;
 
-        bool RestorePropertyListsFromPersistentDataNodes(const DataStorage* storage);
+        bool RestorePropertyListsFromPersistentDataNodes(const DataStorage* storage) override;
 
         void Clear();
 

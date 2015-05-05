@@ -43,7 +43,7 @@ namespace mitk
 class MITKCORE_EXPORT ImageDescriptor : public itk::Object
 {
   public:
-    mitkClassMacro(ImageDescriptor, itk::Object);
+    mitkClassMacroItkParent(ImageDescriptor, itk::Object);
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

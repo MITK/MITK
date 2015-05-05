@@ -60,15 +60,15 @@ class MITKSEGMENTATION_EXPORT ContourTool : public FeedbackContourTool
     ContourTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~ContourTool();
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     virtual bool OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent );
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
     int m_PaintingPixelValue;
 };

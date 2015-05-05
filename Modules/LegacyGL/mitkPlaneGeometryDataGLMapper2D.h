@@ -59,7 +59,7 @@ namespace mitk {
       */
       const PlaneGeometryData *GetInput();
 
-    virtual void Paint( BaseRenderer *renderer );
+    virtual void Paint( BaseRenderer *renderer ) override;
 
     virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent);
 
@@ -73,7 +73,7 @@ namespace mitk {
 
     virtual ~PlaneGeometryDataGLMapper2D();
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     /**
     * \brief Returns the thick slice mode for the given datanode.
     *

@@ -119,7 +119,7 @@ public:
    * Returns the string representation of the current enumeration value. If it
    * was not yet set, the return value is unspecified
    */
-  virtual std::string GetValueAsString() const;
+  virtual std::string GetValueAsString() const override;
 
   /**
    * Clears all possible enumeration values and the current enumeration value.
@@ -197,10 +197,10 @@ protected:
 
   EnumerationProperty(const EnumerationProperty&);
 
-  virtual bool IsEqual( const BaseProperty& property ) const;
-  virtual bool Assign( const BaseProperty& property );
+  virtual bool IsEqual( const BaseProperty& property ) const override;
+  virtual bool Assign( const BaseProperty& property ) override;
 
-  itk::LightObject::Pointer InternalClone() const;
+  itk::LightObject::Pointer InternalClone() const override;
 
 
 private:

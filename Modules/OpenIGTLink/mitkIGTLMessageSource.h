@@ -46,7 +46,7 @@ namespace mitk {
   class MITKOPENIGTLINK_EXPORT IGTLMessageSource : public itk::ProcessObject
   {
   public:
-    mitkClassMacro(IGTLMessageSource, itk::ProcessObject);
+    mitkClassMacroItkParent(IGTLMessageSource, itk::ProcessObject);
 
     /** @return Returns a human readable name of this source. There will be a
      * default name, or you can set the name with the method SetName() if you

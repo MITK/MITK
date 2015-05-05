@@ -41,11 +41,11 @@ namespace mitk{
     mitk::Message1<bool> SeedButtonToggled;
 
 
-    virtual const char* GetName() const;
-    virtual const char** GetXPM() const;
+    virtual const char* GetName() const override;
+    virtual const char** GetXPM() const override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     void RunSegmentation();
 

@@ -61,7 +61,7 @@ namespace mitk
     MaskAndCutRoiImageFilter();
     ~MaskAndCutRoiImageFilter();
 
-    void GenerateData();
+    void GenerateData() override;
 
     ROIFilterType::Pointer m_RoiFilter;
     mitk::AutoCropImageFilter::Pointer m_CropFilter;

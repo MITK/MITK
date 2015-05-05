@@ -143,7 +143,7 @@ protected:
 };
 
 #define mitkWriterMacro                                                       \
-virtual void Write()                                                          \
+virtual void Write() override                                                 \
 {                                                                             \
   if ( this->GetInput() == NULL )                                             \
 {                                                                             \
@@ -157,7 +157,7 @@ virtual void Write()                                                          \
   this->UpdateOutputData(NULL);                                               \
 }                                                                             \
                                                                               \
-virtual void Update()                                                         \
+virtual void Update() override                                                \
 {                                                                             \
   Write();                                                                    \
 }

@@ -160,10 +160,6 @@ protected:
 
 private:
 
-  itkSetMacro(Threshold, ScalarType);
-
-  itkGetConstMacro(Threshold, ScalarType);
-
   virtual void CreateSurface(int time, vtkImageData *vtkimage, mitk::Surface * surface, const ScalarType threshold);
 };
 

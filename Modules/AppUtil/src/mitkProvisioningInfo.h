@@ -28,7 +28,7 @@ namespace mitk {
 class ProvisioningInfo
 {
 public:
-    ProvisioningInfo(const QString& file);
+    ProvisioningInfo(const std::string& file);
 
     QStringList getPluginDirs() const;
     QList<QUrl> getPluginsToInstall() const;
@@ -50,7 +50,7 @@ private:
 
     static const QString intermediateOutDir;
 
-    void readProvisioningFile(const QString& file);
+    void readProvisioningFile(const std::string& file);
     QUrl addPluginToInstall(const QString& file);
     void addPluginToStart(const QString& file);
 

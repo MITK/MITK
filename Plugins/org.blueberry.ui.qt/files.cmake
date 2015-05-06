@@ -1,0 +1,513 @@
+set(SRC_CPP_FILES
+  berryAbstractSourceProvider.cpp
+  berryAbstractUICTKPlugin.cpp
+  berryConstants.cpp
+  berryDisplay.cpp
+  berryEditorPart.cpp
+  berryExtensionFactory.cpp
+  berryFileEditorInput.cpp
+  berryGeometry.cpp
+
+  berryIActionBars.h
+  berryIContextService.cpp
+  berryIContributionRoot.h
+  berryIDropTargetListener.cpp
+  berryIEditorDescriptor.cpp
+  berryIEditorInput.cpp
+  berryIEditorMatchingStrategy.cpp
+  berryIEditorPart.cpp
+  berryIEditorReference.cpp
+  berryIEditorRegistry.cpp
+  berryIEditorSite.cpp
+  berryIElementFactory.cpp
+  berryIFileEditorMapping.cpp
+  berryIFolderLayout.cpp
+  berryIMemento.cpp
+  berryINullSelectionListener.cpp
+  berryIPageLayout.cpp
+  berryIPartListener.cpp
+  berryIPageService.cpp
+  berryIPartService.cpp
+  berryIPathEditorInput.cpp
+  berryIPersistable.cpp
+  berryIPersistableElement.h
+  berryIPerspectiveDescriptor.cpp
+  berryIPerspectiveFactory.cpp
+  berryIPerspectiveListener.cpp
+  berryIPerspectiveRegistry.cpp
+  berryIPlaceholderFolderLayout.cpp
+  berryIPluginContribution.h
+  berryIPostSelectionProvider.cpp
+  berryIPreferencePage.cpp
+  berryIPropertyChangeListener.cpp
+  berryIQtPreferencePage.cpp
+  berryIQtStyleManager.cpp
+  berryIReusableEditor.cpp
+  berryISaveablePart.cpp
+  berryISaveablesLifecycleListener.cpp
+  berryISaveablesSource.cpp
+  berryISelection.cpp
+  berryISelectionChangedListener.cpp
+  berryISelectionListener.cpp
+  berryISelectionProvider.cpp
+  berryISelectionService.cpp
+  berryIShellListener.cpp
+  berryIShellProvider.cpp
+  berryIShowInSource.h
+  berryIShowInTarget.h
+  berryISizeProvider.cpp
+  berryISourceProvider.cpp
+  berryISourceProviderListener.cpp
+  berryISources.cpp
+  berryIStickyViewDescriptor.cpp
+  berryIStructuredSelection.cpp
+  berryIViewCategory.cpp
+  berryIViewDescriptor.cpp
+  berryIViewLayout.cpp
+  berryIViewPart.cpp
+  berryIViewReference.cpp
+  berryIViewRegistry.cpp
+  berryIViewSite.cpp
+  berryIWorkbenchCommandConstants.cpp
+  berryIWindowListener.cpp
+  berryIWorkbench.cpp
+  berryIWorkbenchListener.cpp
+  berryIWorkbenchPage.cpp
+  berryIWorkbenchPart.cpp
+  berryIWorkbenchPartConstants.cpp
+  berryIWorkbenchPartDescriptor.cpp
+  berryIWorkbenchPartReference.cpp
+  berryIWorkbenchPartSite.cpp
+  berryIWorkbenchSite.cpp
+  berryIWorkbenchWindow.cpp
+  berryMenuUtil.cpp
+  berryPlatformUI.cpp
+  berryPropertyChangeEvent.cpp
+  berryQModelIndexObject.cpp
+  berryQtEditorPart.cpp
+  berryQtItemSelection.cpp
+  berryQtIntroPart.cpp
+  berryQtPreferences.cpp
+  berryQtSelectionProvider.cpp
+  berryQtViewPart.cpp
+  berrySameShellProvider.cpp
+  berrySaveable.cpp
+  berrySaveablesLifecycleEvent.cpp
+  berrySelectionChangedEvent.cpp
+  berryShell.cpp
+  berryShellEvent.cpp
+  berryShowInContext.cpp
+  berryUIException.cpp
+  berryViewPart.cpp
+  berryWindow.cpp
+  berryWorkbenchActionConstants.cpp
+  berryWorkbenchPart.cpp
+  berryWorkbenchPreferenceConstants.cpp
+  berryXMLMemento.cpp
+
+  #actions
+  actions/berryAbstractContributionFactory.cpp
+  actions/berryCommandContributionItem.cpp
+  actions/berryCommandContributionItemParameter.cpp
+  actions/berryContributionItem.cpp
+  actions/berryContributionItemFactory.cpp
+  actions/berryContributionManager.cpp
+  actions/berryGroupMarker.cpp
+  actions/berryIContributionItem.h
+  actions/berryIContributionManager.h
+  actions/berryIContributionManagerOverrides.cpp
+  actions/berryIMenuManager.h
+  #actions/berryMenuBarManager.cpp
+  actions/berryMenuManager.cpp
+  actions/berryQActionContributionItem.cpp
+  actions/berryQActionProperties.cpp
+  actions/berrySeparator.cpp
+  actions/berrySubContributionItem.cpp
+
+
+  #application
+  application/berryActionBarAdvisor.cpp
+  application/berryIActionBarConfigurer.cpp
+  application/berryIWorkbenchConfigurer.cpp
+  application/berryIWorkbenchWindowConfigurer.cpp
+  application/berryWorkbenchAdvisor.cpp
+  application/berryWorkbenchWindowAdvisor.cpp
+
+  #commands
+  commands/berryICommandImageService.cpp
+  commands/berryICommandService.cpp
+  commands/berryIElementReference.h
+  commands/berryIElementUpdater.h
+  commands/berryIMenuService.h
+  commands/berryUIElement.cpp
+
+  #guitk
+  guitk/berryGuiTkControlEvent.cpp
+  guitk/berryGuiTkEvent.cpp
+  guitk/berryGuiTkIControlListener.cpp
+  guitk/berryGuiTkISelectionListener.cpp
+  guitk/berryGuiTkSelectionEvent.cpp
+
+  #handlers
+  handlers/berryHandlerUtil.cpp
+  handlers/berryIHandlerActivation.cpp
+  handlers/berryIHandlerService.cpp
+  handlers/berryRadioState.cpp
+  handlers/berryRegistryToggleState.cpp
+  handlers/berryToggleState.cpp
+
+  #intro
+  intro/berryIIntroManager.cpp
+  intro/berryIIntroPart.cpp
+  intro/berryIIntroSite.cpp
+  intro/berryIntroPart.cpp
+
+  #models
+  model/berryPerspectiveListModel.cpp
+  model/berryViewTreeModel.cpp
+
+  #tweaklets
+  tweaklets/berryGuiWidgetsTweaklet.cpp
+  tweaklets/berryWorkbenchPageTweaklet.cpp
+  tweaklets/berryWorkbenchTweaklet.cpp
+
+  #presentations
+  presentations/berryIPresentablePart.cpp
+  presentations/berryIPresentationFactory.cpp
+  presentations/berryIPresentationSerializer.cpp
+  presentations/berryIStackPresentationSite.cpp
+  presentations/berryStackDropResult.cpp
+  presentations/berryStackPresentation.cpp
+
+  #services
+  services/berryIDisposable.cpp
+  services/berryIEvaluationReference.h
+  services/berryIEvaluationService.cpp
+  services/berryINestable.cpp
+  services/berryIServiceFactory.cpp
+  services/berryIServiceLocator.cpp
+  services/berryIServiceScopes.cpp
+  services/berryIServiceWithSources.cpp
+  services/berryISourceProviderService.cpp
+
+  #testing
+  testing/berryTestableObject.cpp
+
+  #util
+  util/berryISafeRunnableRunner.cpp
+  util/berrySafeRunnable.cpp
+
+  # application
+  application/berryQtWorkbenchAdvisor.cpp
+)
+
+set(INTERNAL_CPP_FILES
+
+  defaultpresentation/berryEmptyTabFolder.cpp
+  defaultpresentation/berryEmptyTabItem.cpp
+  defaultpresentation/berryNativeTabFolder.cpp
+  defaultpresentation/berryNativeTabItem.cpp
+  defaultpresentation/berryQCTabBar.cpp
+  defaultpresentation/berryQtWorkbenchPresentationFactory.cpp
+
+  dialogs/berryPerspectivesPreferencePage.cpp
+  dialogs/berrySavePerspectiveDialog.cpp
+
+  handlers/berryCloseAllPerspectivesHandler.cpp
+  handlers/berryClosePerspectiveHandler.cpp
+  handlers/berryDynamicHelpHandler.cpp
+  handlers/berryHelpContentsHandler.cpp
+  handlers/berryIntroHandler.cpp
+  handlers/berryNewEditorHandler.cpp
+  handlers/berryOpenInNewWindowHandler.cpp
+  handlers/berryQuitHandler.cpp
+  handlers/berryResetPerspectiveHandler.cpp
+  handlers/berrySavePerspectiveHandler.cpp
+  handlers/berryShowPerspectiveHandler.cpp
+  handlers/berryShowViewHandler.cpp
+
+  util/berryAbstractTabFolder.cpp
+  util/berryAbstractTabItem.cpp
+  util/berryIPresentablePartList.cpp
+  util/berryLeftToRightTabOrder.cpp
+  util/berryPartInfo.cpp
+  util/berryPresentablePartFolder.cpp
+  util/berryReplaceDragHandler.cpp
+  util/berryTabbedStackPresentation.cpp
+  util/berryTabDragHandler.cpp
+  util/berryTabFolderEvent.cpp
+  util/berryTabOrder.cpp
+
+  #intro
+  intro/berryEditorIntroAdapterPart.cpp
+  intro/berryIIntroDescriptor.cpp
+  intro/berryIIntroRegistry.cpp
+  intro/berryIntroConstants.cpp
+  intro/berryIntroDescriptor.cpp
+  intro/berryIntroPartAdapterSite.cpp
+  intro/berryIntroRegistry.cpp
+  intro/berryViewIntroAdapterPart.cpp
+  intro/berryWorkbenchIntroManager.cpp
+
+  berryAbstractGroupMarker.cpp
+  berryAbstractMenuAdditionCacheEntry.cpp
+  berryAbstractPartSelectionTracker.cpp
+  berryAbstractSelectionService.cpp
+  berryActivePartExpression.cpp
+  berryAlwaysEnabledExpression.cpp
+  berryAndExpression.cpp
+  berryBundleUtility.cpp
+  berryChangeToPerspectiveMenu.cpp
+  berryCommandParameter.cpp
+  berryCommandPersistence.cpp
+  berryCommandService.cpp
+  berryCommandServiceFactory.cpp
+  berryCommandStateProxy.cpp
+  berryCompositeExpression.cpp
+  berryContainerPlaceholder.cpp
+  berryContributionRoot.cpp
+  berryDetachedPlaceHolder.cpp
+  berryDefaultSaveable.cpp
+  berryDefaultStackPresentationSite.cpp
+  berryDetachedWindow.cpp
+  berryDirtyPerspectiveMarker.cpp
+  berryDragUtil.cpp
+  berryEditorAreaHelper.cpp
+  berryEditorDescriptor.cpp
+  berryEditorHistory.cpp
+  berryEditorHistoryItem.cpp
+  berryEditorManager.cpp
+  berryEditorReference.cpp
+  berryEditorRegistry.cpp
+  berryEditorRegistryReader.cpp
+  berryEditorSashContainer.cpp
+  berryEditorSite.cpp
+  berryElementReference.cpp
+  berryErrorViewPart.cpp
+  berryEvaluationAuthority.cpp
+  berryEvaluationReference.cpp
+  berryEvaluationResultCache.cpp
+  berryEvaluationService.cpp
+  berryExpressionAuthority.cpp
+  berryFileEditorMapping.cpp
+  berryFolderLayout.cpp
+  berryHandlerActivation.cpp
+  berryHandlerAuthority.cpp
+  berryHandlerPersistence.cpp
+  berryHandlerProxy.cpp
+  berryHandlerService.cpp
+  berryHandlerServiceFactory.cpp
+  berryIDragOverListener.cpp
+  berryIDropTarget.cpp
+  berryIEvaluationResultCache.cpp
+  berryILayoutContainer.cpp
+  berryInternalMenuService.h
+  berryIServiceLocatorCreator.cpp
+  berryIStickyViewManager.cpp
+  berryIWorkbenchLocationService.cpp
+  berryKeywordRegistry.cpp
+  berryLayoutHelper.cpp
+  berryLayoutPart.cpp
+  berryLayoutPartSash.cpp
+  berryLayoutTree.cpp
+  berryLayoutTreeNode.cpp
+  berryMenuServiceFactory.cpp
+  berryNestableHandlerService.cpp
+  berryNullEditorInput.cpp
+  berryOpenPerspectivePropertyTester.cpp
+  berryPageLayout.cpp
+  berryPagePartSelectionTracker.cpp
+  berryPageSelectionService.cpp
+  berryParameterValueConverterProxy.cpp
+  berryPartList.cpp
+  berryPartPane.cpp
+  berryPartPlaceholder.cpp
+  berryPartSashContainer.cpp
+  berryPartService.cpp
+  berryPartSite.cpp
+  berryPartStack.cpp
+  berryPartTester.cpp
+  berryPersistentState.cpp
+  berryPerspective.cpp
+  berryPerspectiveDescriptor.cpp
+  berryPerspectiveExtensionReader.cpp
+  berryPerspectiveHelper.cpp
+  berryPerspectiveParameterValues.cpp
+  berryPerspectiveRegistry.cpp
+  berryPerspectiveRegistryReader.cpp
+  berryPlaceholderFolderLayout.cpp
+  berryPolicy.cpp
+  berryPreferenceConstants.cpp
+  berryPreferencePageParameterValues.cpp
+  berryPresentablePart.cpp
+  berryPresentationFactoryUtil.cpp
+  berryPresentationSerializer.cpp
+  berryQtControlWidget.cpp
+  berryQtDnDControlWidget.cpp
+  berryQtDisplay.cpp
+  berryQtGlobalEventFilter.cpp
+  berryQtMainWindowControl.cpp
+  berryQtOpenPerspectiveAction.cpp
+  berryQtPerspectiveSwitcher.cpp
+  berryQtSash.cpp
+  berryQtShell.cpp
+  berryQtShowPerspectiveDialog.cpp
+  berryQtShowViewAction.cpp
+  berryQtShowViewDialog.cpp
+  berryQtStyleManager.cpp
+  berryQtStylePreferencePage.cpp
+  berryQtTracker.cpp
+  berryQtWidgetController.cpp
+  berryQtWidgetsTweaklet.cpp
+  berryQtWidgetsTweakletImpl.cpp
+  berryQtWorkbenchPageTweaklet.cpp
+  berryQtWorkbenchTweaklet.cpp
+  berryRegistryPersistence.cpp
+  berryRegistryReader.cpp
+  berryReopenEditorMenu.cpp
+  berrySaveablesList.cpp
+  berryShowViewMenu.cpp
+  berryServiceLocator.cpp
+  berryServiceLocatorCreator.cpp
+  berryShellPool.cpp
+  berrySlaveCommandService.cpp
+  berrySlaveHandlerService.cpp
+  berrySlaveMenuService.cpp
+  berrySourceProviderService.cpp
+  berrySourcePriorityNameMapping.cpp
+  berryStatusUtil.cpp
+  berryStickyViewDescriptor.cpp
+  berryStickyViewManager.cpp
+  berrySwitchToWindowMenu.cpp
+  berryTweaklets.cpp
+  berryUIExtensionTracker.cpp
+  berryUtil.cpp
+  berryViewDescriptor.cpp
+  berryViewFactory.cpp
+  berryViewLayout.cpp
+  berryViewReference.cpp
+  berryViewRegistry.cpp
+  berryViewRegistryReader.cpp
+  berryViewSashContainer.cpp
+  berryViewSite.cpp
+  berryWorkbenchPage.cpp
+  berryWindowManager.cpp
+  berryWindowPartSelectionTracker.cpp
+  berryWindowSelectionService.cpp
+  berryWorkbench.cpp
+  berryWorkbenchConfigurer.cpp
+  berryWorkbenchConstants.cpp
+  berryWorkbenchLocationService.cpp
+  berryWorkbenchMenuService.cpp
+  berryWorkbenchPagePartList.cpp
+  berryWorkbenchPartReference.cpp
+  berryWorkbenchPlugin.cpp
+  berryWorkbenchRegistryConstants.cpp
+  berryWorkbenchServiceRegistry.cpp
+  berryWorkbenchSourceProvider.cpp
+  berryWorkbenchTestable.cpp
+  berryWorkbenchWindow.cpp
+  berryWorkbenchWindowConfigurer.cpp
+  berryWorkbenchWindowExpression.cpp
+  berryWWinActionBars.cpp
+  berryWWinPartService.cpp
+
+)
+
+set(MOC_H_FILES
+
+  src/berryAbstractUICTKPlugin.h
+  src/berryEditorPart.h
+  src/berryExtensionFactory.h
+  src/berryQtSelectionProvider.h
+  src/berryViewPart.h
+  src/berryWorkbenchPart.h
+
+  src/actions/berryCommandContributionItem.h
+  src/actions/berryMenuManager.h
+
+  src/intro/berryIntroPart.h
+
+  src/model/berryPerspectiveListModel.h
+  src/model/berryViewTreeModel.h
+
+  src/internal/berryChangeToPerspectiveMenu.h
+  src/internal/berryCommandServiceFactory.h
+  src/internal/berryHandlerServiceFactory.h
+  src/internal/berryMenuServiceFactory.h
+  src/internal/berryOpenPerspectivePropertyTester.h
+  src/internal/berryPerspectiveParameterValues.h
+  src/internal/berryPreferencePageParameterValues.h
+  src/internal/berryQtDisplay.h
+  src/internal/berryQtGlobalEventFilter.h
+  src/internal/berryQtMainWindowControl.h
+  src/internal/berryQtOpenPerspectiveAction.h
+  src/internal/berryQtPerspectiveSwitcher.h
+  src/internal/berryQtSash.h
+  src/internal/berryQtShowPerspectiveDialog.h
+  src/internal/berryQtShowViewAction.h
+  src/internal/berryQtShowViewDialog.h
+  src/internal/berryQtStyleManager.h
+  src/internal/berryQtStylePreferencePage.h
+  src/internal/berryQtTracker.h
+  src/internal/berryQtWidgetsTweaklet.h
+  src/internal/berryQtWidgetsTweakletImpl.h
+  src/internal/berryQtWorkbenchTweaklet.h
+  src/internal/berryQtWorkbenchPageTweaklet.h
+  src/internal/berryReopenEditorMenu.h
+  src/internal/berryShowViewMenu.h
+  src/internal/berrySwitchToWindowMenu.h
+  src/internal/berryWorkbenchPlugin.h
+  src/internal/berryWorkbenchSourceProvider.h
+
+  src/internal/defaultpresentation/berryNativeTabFolder.h
+  src/internal/defaultpresentation/berryNativeTabItem.h
+  src/internal/defaultpresentation/berryQCTabBar.h
+  src/internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h
+
+  src/internal/dialogs/berryPerspectivesPreferencePage.h
+  src/internal/dialogs/berrySavePerspectiveDialog.h
+
+  src/internal/handlers/berryCloseAllPerspectivesHandler.h
+  src/internal/handlers/berryClosePerspectiveHandler.h
+  src/internal/handlers/berryDynamicHelpHandler.h
+  src/internal/handlers/berryHelpContentsHandler.h
+  src/internal/handlers/berryIntroHandler.h
+  src/internal/handlers/berryNewEditorHandler.h
+  src/internal/handlers/berryOpenInNewWindowHandler.h
+  src/internal/handlers/berryQuitHandler.h
+  src/internal/handlers/berryResetPerspectiveHandler.h
+  src/internal/handlers/berrySavePerspectiveHandler.h
+  src/internal/handlers/berryShowPerspectiveHandler.h
+  src/internal/handlers/berryShowViewHandler.h
+
+  src/internal/intro/berryEditorIntroAdapterPart.h
+)
+
+set(UI_FILES
+  src/internal/berryQtShowPerspectiveDialog.ui
+  src/internal/berryQtShowViewDialog.ui
+  src/internal/berryQtStylePreferencePage.ui
+  src/internal/berryQtStatusPart.ui
+
+  src/internal/dialogs/berryPerspectivesPreferencePage.ui
+  src/internal/dialogs/berrySavePerspectiveDialog.ui
+)
+
+set(QRC_FILES
+  resources/org_blueberry_ui_qt.qrc
+)
+
+set(CACHED_RESOURCE_FILES
+  plugin.xml
+)
+
+set(CPP_FILES )
+
+foreach(file ${SRC_CPP_FILES})
+  set(CPP_FILES ${CPP_FILES} src/${file})
+endforeach(file ${SRC_CPP_FILES})
+
+foreach(file ${INTERNAL_CPP_FILES})
+  set(CPP_FILES ${CPP_FILES} src/internal/${file})
+endforeach(file ${INTERNAL_CPP_FILES})

@@ -36,7 +36,7 @@ public:
   ExtensionPointDefinition();
   ~ExtensionPointDefinition();
 
-  int Start();
+  QVariant Start(berry::IApplicationContext* context);
   void Stop();
 
 private:

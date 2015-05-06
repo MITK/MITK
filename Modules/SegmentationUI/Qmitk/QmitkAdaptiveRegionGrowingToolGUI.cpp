@@ -154,7 +154,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
 }
 
 template <typename TPixel>
-static void AccessPixel(mitk::PixelType ptype, const mitk::Image::Pointer im, mitk::Point3D p, int & val)
+static void AccessPixel(mitk::PixelType /*ptype*/, const mitk::Image::Pointer im, mitk::Point3D p, int & val)
 {
   mitk::ImagePixelReadAccessor<TPixel,3> access(im);
   val = access.GetPixelByWorldCoordinates(p);

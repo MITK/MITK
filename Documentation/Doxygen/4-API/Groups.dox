@@ -12,6 +12,11 @@
 */
 
 /**
+
+  \defgroup BlueBerryPlugins BlueBerry Plugins
+
+  \brief This group includes all BlueBerry Plugins.
+
   \defgroup MITKPlugins MITK Plugins
 
   \brief This group includes all MITK Plugins.

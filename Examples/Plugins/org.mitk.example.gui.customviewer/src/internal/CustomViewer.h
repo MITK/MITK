@@ -46,7 +46,7 @@ public:
   ~CustomViewer();
 
 /** Starts the application.*/
-  int Start();
+  QVariant Start(berry::IApplicationContext* context);
 
 /** Exits the application.*/
   void Stop();

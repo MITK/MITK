@@ -36,7 +36,7 @@ public:
   MinimalApplication();
   ~MinimalApplication();
 
-  int Start();
+  QVariant Start(berry::IApplicationContext* context);
   void Stop();
 };
 

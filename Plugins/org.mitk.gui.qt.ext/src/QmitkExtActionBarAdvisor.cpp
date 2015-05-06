@@ -199,7 +199,7 @@ berry::SmartPointer<berry::MenuManager> QmitkExtActionBarAdvisor::CreateHelpMenu
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator("group.main")));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_HELP_CONTENTS, "Help &Contents"));
   //menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_HELP_SEARCH, "Help Search"));
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_DYNAMIC_HELP, "Conte&xt Help"));
+  menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_DYNAMIC_HELP, "Conte&xt Help", "", QIcon(), QKeySequence::HelpContents));
   menu->Add(berry::IContributionItem::Pointer(new berry::GroupMarker(berry::WorkbenchActionConstants::HELP_END)));
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator(berry::WorkbenchActionConstants::MB_ADDITIONS)));
 
@@ -259,20 +259,21 @@ void QmitkExtActionBarAdvisor::AddPerspectiveActions(berry::MenuManager* menu)
   }
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator()));
   //menu.add(editActionSetAction);
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_SAVE_PERSPECTIVE_AS, "Save Serspective &As..."));
+  menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_SAVE_PERSPECTIVE_AS, "Save Perspective &As..."));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_RESET_PERSPECTIVE, "&Reset Perspective..."));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_CLOSE_PERSPECTIVE, "&Close Perspective"));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_CLOSE_ALL_PERSPECTIVES, "Close All Perspectives"));
 }
 
 berry::SmartPointer<berry::IContributionItem> QmitkExtActionBarAdvisor::GetItem(const QString& commandId, const QString& label,
-                                                                                const QString& tooltip, const QIcon& icon)
+                                                                                const QString& tooltip, const QIcon& icon, const QKeySequence& shortcut)
 {
   berry::CommandContributionItemParameter::Pointer param(
         new berry::CommandContributionItemParameter(window, QString(), commandId, berry::CommandContributionItem::STYLE_PUSH));
   param->icon = icon;
   param->label = label;
   param->tooltip = tooltip;
+  param->shortcut = shortcut;
   berry::IContributionItem::Pointer item(new berry::CommandContributionItem(param));
   return item;
 }

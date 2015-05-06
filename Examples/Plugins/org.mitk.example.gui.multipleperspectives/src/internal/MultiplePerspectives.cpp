@@ -65,7 +65,7 @@ MultiplePerspectives::~MultiplePerspectives()
 {
 }
 
-int MultiplePerspectives::Start()
+QVariant MultiplePerspectives::Start(berry::IApplicationContext* /*context*/)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
   wbAdvisor.reset(new MultiplePerspectivesWorkbenchAdvisor);

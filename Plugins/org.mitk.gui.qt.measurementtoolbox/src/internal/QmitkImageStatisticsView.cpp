@@ -110,7 +110,7 @@ void QmitkImageStatisticsView::OnDefaultBinSizeBoxChanged()
         m_Controls->m_BinSizeFrame->setVisible(true);
 }
 
-void QmitkImageStatisticsView::PartClosed( berry::IWorkbenchPartReference::Pointer )
+void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer& )
 {
 }
 

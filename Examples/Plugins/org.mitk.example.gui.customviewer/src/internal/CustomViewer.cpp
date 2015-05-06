@@ -28,7 +28,7 @@ CustomViewer::~CustomViewer()
 {
 }
 
-int CustomViewer::Start()
+QVariant CustomViewer::Start(berry::IApplicationContext* /*context*/)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
 

@@ -31,7 +31,7 @@ public:
 
   QmitkCoreApplication();
 
-  int Start();
+  QVariant Start(berry::IApplicationContext* context);
   void Stop();
 };
 

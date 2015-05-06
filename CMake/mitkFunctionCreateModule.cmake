@@ -431,15 +431,17 @@ function(mitk_create_module)
 
     set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
 
-    ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
-                     HEADER ${H_FILES}
-                     TXX ${TXX_FILES}
-                     DOC ${DOX_FILES}
-                     UI ${UI_FILES}
-                     QRC ${QRC_FILES}
-                     MOC ${Q${KITNAME}_GENERATED_MOC_CPP}
-                     GEN_QRC ${Q${KITNAME}_GENERATED_QRC_CPP}
-                     GEN_UI ${Q${KITNAME}_GENERATED_UI_CPP})
+    mitkFunctionOrganizeSources(
+      SOURCE ${CPP_FILES}
+      HEADER ${H_FILES}
+      TXX ${TXX_FILES}
+      DOC ${DOX_FILES}
+      UI ${UI_FILES}
+      QRC ${QRC_FILES}
+      MOC ${Q${KITNAME}_GENERATED_MOC_CPP}
+      GEN_QRC ${Q${KITNAME}_GENERATED_QRC_CPP}
+      GEN_UI ${Q${KITNAME}_GENERATED_UI_CPP}
+      )
 
     set(coverage_sources
         ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES}

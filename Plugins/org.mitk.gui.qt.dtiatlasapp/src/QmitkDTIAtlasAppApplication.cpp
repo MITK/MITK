@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDTIAtlasAppWorkbenchAdvisor.h"
 
-int QmitkDTIAtlasAppApplication::Start()
+QVariant QmitkDTIAtlasAppApplication::Start(berry::IApplicationContext* /*context*/)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
 

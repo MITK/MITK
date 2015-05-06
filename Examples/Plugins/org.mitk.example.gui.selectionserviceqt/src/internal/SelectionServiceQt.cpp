@@ -57,7 +57,7 @@ SelectionServiceQt::~SelectionServiceQt()
 {
 }
 
-int SelectionServiceQt::Start()
+QVariant SelectionServiceQt::Start(berry::IApplicationContext* /*context*/)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
   wbAdvisor.reset(new SelectionServiceQtWorkbenchAdvisor);

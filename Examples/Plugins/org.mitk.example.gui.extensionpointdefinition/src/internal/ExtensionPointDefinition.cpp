@@ -59,7 +59,7 @@ ExtensionPointDefinition::~ExtensionPointDefinition()
 {
 }
 
-int ExtensionPointDefinition::Start()
+QVariant ExtensionPointDefinition::Start(berry::IApplicationContext* /*context*/)
 {
 
   berry::Display* display = berry::PlatformUI::CreateDisplay();

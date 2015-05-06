@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 #include <berryIPerspectiveRegistry.h>
 #include <berryIPerspectiveDescriptor.h>
+#include <berryIProduct.h>
 #include <berryIWorkbenchPartConstants.h>
 #include <berryQtPreferences.h>
 
@@ -82,7 +83,7 @@ new QmitkExtWorkbenchWindowAdvisorHack();
 
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
-static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = false;
+static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = true;
 
 class PartListenerForTitle: public berry::IPartListener
 {
@@ -560,8 +561,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   // ==== Application menu ============================
 
-  if (!USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS)
-  {
     QMenuBar* menuBar = mainWindow->menuBar();
     menuBar->setContextMenuPolicy(Qt::PreventContextMenu);
 
@@ -571,41 +570,86 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     menuBar->setNativeMenuBar(false);
 #endif
 
+    QAction* fileOpenAction = new QmitkFileOpenAction(QIcon::fromTheme("document-open",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")), window);
+    fileOpenAction->setShortcut(QKeySequence::Open);
+    QAction* fileSaveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"), window);
+    fileSaveAction->setShortcut(QKeySequence::Save);
+    fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
+    fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
+    closeProjectAction = new QmitkCloseProjectAction(window);
+    closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
+
+    QActionGroup* perspGroup = new QActionGroup(menuBar);
+    std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
+
+    // sort elements (converting vector to map...)
+    QList<berry::IViewDescriptor::Pointer>::const_iterator iter;
+
+    berry::IViewRegistry* viewRegistry =
+        berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+    const QList<berry::IViewDescriptor::Pointer> viewDescriptors = viewRegistry->GetViews();
+
+    bool skip = false;
+    for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
+    {
+
+      // if viewExcludeList is set, it contains the id-strings of view, which
+      // should not appear as an menu-entry in the menu
+      if (viewExcludeList.size() > 0)
+      {
+        for (int i=0; i<viewExcludeList.size(); i++)
+        {
+          if (viewExcludeList.at(i) == (*iter)->GetId())
+          {
+            skip = true;
+            break;
+          }
+        }
+        if (skip)
+        {
+          skip = false;
+          continue;
+        }
+      }
+
+      if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
+        continue;
+      if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
+        continue;
+      if ((*iter)->GetId() == "org.mitk.views.viewnavigatorview")
+        continue;
+
+      std::pair<QString, berry::IViewDescriptor::Pointer> p(
+            (*iter)->GetLabel(), (*iter));
+      VDMap.insert(p);
+    }
+
+    std::map<QString, berry::IViewDescriptor::Pointer>::const_iterator
+        MapIter;
+    for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
+    {
+      berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
+                                                                        (*MapIter).second);
+      viewActions.push_back(viewAction);
+    }
+
+
+    if (!USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS)
+    {
 
     QMenu* fileMenu = menuBar->addMenu("&File");
     fileMenu->setObjectName("FileMenu");
-
-    QAction* fileOpenAction = new QmitkFileOpenAction(QIcon::fromTheme("document-open",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")), window);
-    fileOpenAction->setShortcut(QKeySequence::Open);
     fileMenu->addAction(fileOpenAction);
-    QAction* fileSaveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"), window);
-    fileSaveAction->setShortcut(QKeySequence::Save);
     fileMenu->addAction(fileSaveAction);
-    fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
-    fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
     fileMenu->addAction(fileSaveProjectAction);
-    closeProjectAction = new QmitkCloseProjectAction(window);
-    closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
     fileMenu->addAction(closeProjectAction);
     fileMenu->addSeparator();
+
     QAction* fileExitAction = new QmitkFileExitAction(window);
     fileExitAction->setIcon(QIcon::fromTheme("system-log-out",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/system-log-out.svg")));
     fileExitAction->setShortcut(QKeySequence::Quit);
     fileExitAction->setObjectName("QmitkFileExitAction");
     fileMenu->addAction(fileExitAction);
-
-    if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
-    {
-      openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
-    }
-    if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
-    {
-      openXnatEditorAction = new QmitkOpenXnatEditorAction(QIcon(":/org.mitk.gui.qt.ext/xnat-icon.png"),window);
-    }
-
-    berry::IViewRegistry* viewRegistry =
-        berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-    const QList<berry::IViewDescriptor::Pointer> viewDescriptors = viewRegistry->GetViews();
 
     // another bad hack to get an edit/undo menu...
     QMenu* editMenu = menuBar->addMenu("&Edit");
@@ -620,8 +664,124 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
                                      QKeySequence("CTRL+Y"));
     redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
+    // ==== Window Menu ==========================
+    QMenu* windowMenu = menuBar->addMenu("Window");
+    if (showNewWindowMenuItem)
+    {
+      windowMenu->addAction("&New Window", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
+      windowMenu->addSeparator();
+    }
+
+    QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
+
+    QMenu* viewMenu;
+    if (showViewMenuItem)
+    {
+      viewMenu = windowMenu->addMenu("Show &View");
+      viewMenu->setObjectName("Show View");
+    }
+    windowMenu->addSeparator();
+    resetPerspAction = windowMenu->addAction("&Reset Perspective",
+                                             QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
+
+    if(showClosePerspectiveMenuItem)
+      closePerspAction = windowMenu->addAction("&Close Perspective", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
+
+    windowMenu->addSeparator();
+    windowMenu->addAction("&Preferences...",
+                          QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
+                          QKeySequence("CTRL+P"));
+
+    // fill perspective menu
+    berry::IPerspectiveRegistry* perspRegistry =
+        window->GetWorkbench()->GetPerspectiveRegistry();
+
+    QList<berry::IPerspectiveDescriptor::Pointer> perspectives(
+          perspRegistry->GetPerspectives());
+
+    skip = false;
+    for (QList<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
+         perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
+    {
+
+      // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
+      // should not appear as an menu-entry in the perspective menu
+      if (perspectiveExcludeList.size() > 0)
+      {
+        for (int i=0; i<perspectiveExcludeList.size(); i++)
+        {
+          if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
+          {
+            skip = true;
+            break;
+          }
+        }
+        if (skip)
+        {
+          skip = false;
+          continue;
+        }
+      }
+
+      QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
+                                                                *perspIt, perspGroup);
+      mapPerspIdToAction.insert((*perspIt)->GetId(), perspAction);
+    }
+    perspMenu->addActions(perspGroup->actions());
+
+    if (showViewMenuItem)
+    {
+      for (auto viewAction : viewActions)
+      {
+        viewMenu->addAction(viewAction);
+      }
+    }
+
+
+    // ===== Help menu ====================================
+    QMenu* helpMenu = menuBar->addMenu("&Help");
+    helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
+    helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
+    helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
+    helpMenu->addAction("&About",this, SLOT(onAbout()));
+    // =====================================================
+
+
+    }
+    else
+    {
+      undoAction = new QAction(QIcon::fromTheme("edit-undo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-undo.svg")),
+                                       "&Undo", nullptr);
+      undoAction->setToolTip("Undo the last action (not supported by all modules)");
+      redoAction = new QAction(QIcon::fromTheme("edit-redo",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-redo.svg"))
+                                       , "&Redo", nullptr);
+      redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
+
+    }
+
+
+    // toolbar for showing file open, undo, redo and other main actions
+    QToolBar* mainActionsToolBar = new QToolBar;
+    mainActionsToolBar->setObjectName("mainActionsToolBar");
+    mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+#ifdef __APPLE__
+    mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
+#else
+    mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
+#endif
+
     imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);
     bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
+
+    if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
+    {
+      openDicomEditorAction = new QmitkOpenDicomEditorAction(QIcon(":/org.mitk.gui.qt.ext/dcm-icon.png"),window);
+    }
+    if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.xnat.browser"))
+    {
+      openXnatEditorAction = new QmitkOpenXnatEditorAction(QIcon(":/org.mitk.gui.qt.ext/xnat-icon.png"),window);
+    }
+
     if (imageNavigatorViewFound)
     {
       QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
@@ -664,16 +824,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       viewNavigatorAction->setToolTip("Toggle View Navigator");
     }
 
-    // toolbar for showing file open, undo, redo and other main actions
-    QToolBar* mainActionsToolBar = new QToolBar;
-    mainActionsToolBar->setObjectName("mainActionsToolBar");
-    mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
-#ifdef __APPLE__
-    mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
-#else
-    mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
-#endif
-
     mainActionsToolBar->addAction(fileOpenAction);
     mainActionsToolBar->addAction(fileSaveProjectAction);
     mainActionsToolBar->addAction(closeProjectAction);
@@ -692,120 +842,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       mainActionsToolBar->addAction(imageNavigatorAction);
     }
     if (viewNavigatorFound)
+    {
       mainActionsToolBar->addAction(viewNavigatorAction);
+    }
     mainWindow->addToolBar(mainActionsToolBar);
 
-#ifdef __APPLE__
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    mainWindow->setUnifiedTitleAndToolBarOnMac(true);
-    // default is false
-#endif
-#endif
-
-    // ==== Window Menu ==========================
-    QMenu* windowMenu = menuBar->addMenu("Window");
-    if (showNewWindowMenuItem)
-    {
-      windowMenu->addAction("&New Window", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
-      windowMenu->addSeparator();
-    }
-
-    QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
-
-    QMenu* viewMenu;
-    if (showViewMenuItem)
-    {
-      viewMenu = windowMenu->addMenu("Show &View");
-      viewMenu->setObjectName("Show View");
-    }
-    windowMenu->addSeparator();
-    resetPerspAction = windowMenu->addAction("&Reset Perspective",
-                                             QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
-
-    if(showClosePerspectiveMenuItem)
-      closePerspAction = windowMenu->addAction("&Close Perspective", QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
-
-    windowMenu->addSeparator();
-    windowMenu->addAction("&Preferences...",
-                          QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
-                          QKeySequence("CTRL+P"));
-
-    // fill perspective menu
-    berry::IPerspectiveRegistry* perspRegistry =
-        window->GetWorkbench()->GetPerspectiveRegistry();
-    QActionGroup* perspGroup = new QActionGroup(menuBar);
-
-    QList<berry::IPerspectiveDescriptor::Pointer> perspectives(
-          perspRegistry->GetPerspectives());
-
-    bool skip = false;
-    for (QList<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
-         perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
-    {
-
-      // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
-      // should not appear as an menu-entry in the perspective menu
-      if (perspectiveExcludeList.size() > 0)
-      {
-        for (int i=0; i<perspectiveExcludeList.size(); i++)
-        {
-          if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
-          {
-            skip = true;
-            break;
-          }
-        }
-        if (skip)
-        {
-          skip = false;
-          continue;
-        }
-      }
-
-      QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
-                                                                *perspIt, perspGroup);
-      mapPerspIdToAction.insert((*perspIt)->GetId(), perspAction);
-    }
-    perspMenu->addActions(perspGroup->actions());
-
-    // sort elements (converting vector to map...)
-    QList<berry::IViewDescriptor::Pointer>::const_iterator iter;
-    std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
-
-    skip = false;
-    for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
-    {
-
-      // if viewExcludeList is set, it contains the id-strings of view, which
-      // should not appear as an menu-entry in the menu
-      if (viewExcludeList.size() > 0)
-      {
-        for (int i=0; i<viewExcludeList.size(); i++)
-        {
-          if (viewExcludeList.at(i) == (*iter)->GetId())
-          {
-            skip = true;
-            break;
-          }
-        }
-        if (skip)
-        {
-          skip = false;
-          continue;
-        }
-      }
-
-      if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
-        continue;
-      if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
-        continue;
-      if ((*iter)->GetId() == "org.mitk.views.viewnavigatorview")
-        continue;
-
-      std::pair<QString, berry::IViewDescriptor::Pointer> p(
-            (*iter)->GetLabel(), (*iter));
-      VDMap.insert(p);
-    }
 
     // ==== Perspective Toolbar ==================================
     QToolBar* qPerspectiveToolbar = new QToolBar;
@@ -823,24 +864,15 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QToolBar* qToolbar = new QToolBar;
     qToolbar->setObjectName("viewToolBar");
 
-    std::map<QString, berry::IViewDescriptor::Pointer>::const_iterator
-        MapIter;
-    for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
-    {
-      berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
-                                                                        (*MapIter).second);
-      viewActions.push_back(viewAction);
-      if(showViewMenuItem)
-        viewMenu->addAction(viewAction);
-      if (showViewToolbar)
-      {
-        qToolbar->addAction(viewAction);
-      }
-    }
-
     if (showViewToolbar)
     {
       mainWindow->addToolBar(qToolbar);
+
+      for (auto viewAction : viewActions)
+      {
+        qToolbar->addAction(viewAction);
+      }
+
     }
     else
       delete qToolbar;
@@ -848,13 +880,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
     mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());
 
-    // ===== Help menu ====================================
-    QMenu* helpMenu = menuBar->addMenu("&Help");
-    helpMenu->addAction("&Welcome",this, SLOT(onIntro()));
-    helpMenu->addAction("&Open Help Perspective", this, SLOT(onHelpOpenHelpPerspective()));
-    helpMenu->addAction("&Context Help",this, SLOT(onHelp()),  QKeySequence("F1"));
-    helpMenu->addAction("&About",this, SLOT(onAbout()));
-    // =====================================================
+
+#ifdef __APPLE__
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    mainWindow->setUnifiedTitleAndToolBarOnMac(true);
+    // default is false
+#endif
+#endif
 
 
     QStatusBar* qStatusBar = new QStatusBar();
@@ -880,7 +912,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
       qStatusBar->addPermanentWidget(memoryIndicator, 0);
     }
-  }
+
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
@@ -1209,13 +1241,16 @@ QString QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
  }
 
  QString title;
- //TODO Product
- //    IProduct product = Platform.getProduct();
- //    if (product != null) {
- //      title = product.getName();
- //    }
- // instead of the product name, we use a custom variable for now
- title = productName;
+ berry::IProduct::Pointer product = berry::Platform::GetProduct();
+ if (product.IsNotNull())
+ {
+   title = product->GetName();
+ }
+ if (title.isEmpty())
+ {
+   // instead of the product name, we use a custom variable for now
+   title = productName;
+ }
 
  if(showMitkVersionInfo)
  {

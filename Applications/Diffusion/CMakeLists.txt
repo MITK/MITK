@@ -70,7 +70,7 @@ else()
   qt5_add_resources(_src_files splashscreen.qrc)
 endif()
 
-FunctionCreateBlueBerryApplication(
+mitkFunctionCreateBlueBerryApplication(
   NAME ${DIFFUSIONAPP_NAME}
   DESCRIPTION "MITK Diffusion"
   PLUGINS ${_plugins}
@@ -79,7 +79,7 @@ FunctionCreateBlueBerryApplication(
   ${_app_options}
 )
 
-mitk_use_modules(TARGET ${DIFFUSIONAPP_NAME} MODULES qtsingleapplication)
+mitk_use_modules(TARGET ${DIFFUSIONAPP_NAME} MODULES MitkAppUtil)
 
 # Add meta dependencies (e.g. on auto-load modules from depending modules)
 if(TARGET ${CMAKE_PROJECT_NAME}-autoload)

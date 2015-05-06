@@ -1,7 +1,23 @@
 
 # Plug-ins must be ordered according to their dependencies
 
-set(MITK_EXT_PLUGINS
+set(MITK_PLUGINS
+
+  org.blueberry.core.runtime:ON
+  org.blueberry.core.expressions:OFF
+  org.blueberry.core.commands:OFF
+  org.blueberry.core.jobs:OFF
+  org.blueberry.ui.qt:OFF
+  org.blueberry.ui.qt.help:OFF
+  org.blueberry.ui.qt.log:ON
+  org.blueberry.ui.qt.objectinspector:OFF
+
+  #org.blueberry.test:ON
+  #org.blueberry.uitest:ON
+
+  #Testing/org.blueberry.core.runtime.tests:ON
+  #Testing/org.blueberry.osgi.tests:ON
+
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
   org.mitk.planarfigure:ON

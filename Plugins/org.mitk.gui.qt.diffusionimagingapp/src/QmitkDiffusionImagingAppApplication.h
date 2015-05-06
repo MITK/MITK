@@ -29,7 +29,7 @@ public:
   QmitkDiffusionImagingAppApplication() {}
   ~QmitkDiffusionImagingAppApplication() {}
 
-  int Start();
+  QVariant Start(berry::IApplicationContext*);
   void Stop();
 };
 

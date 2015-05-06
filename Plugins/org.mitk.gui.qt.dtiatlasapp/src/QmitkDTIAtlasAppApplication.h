@@ -29,7 +29,7 @@ public:
   QmitkDTIAtlasAppApplication() {}
   ~QmitkDTIAtlasAppApplication() {}
 
-  int Start();
+  QVariant Start(berry::IApplicationContext* context);
   void Stop();
 };
 

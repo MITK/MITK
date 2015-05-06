@@ -228,6 +228,7 @@ public:
 protected:
 
   void initialize(Poco::Util::Application& self) override;
+
   void uninitialize() override;
 
   int getArgc() const;

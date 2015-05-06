@@ -73,20 +73,6 @@ if(WIN32)
     endforeach()
   endif()
 
-  #BlueBerry
-  # Since this file is also included from external projects, you
-  # can only use variables which are made available through MITKConfig.cmake
-  if(MITK_USE_BLUEBERRY)
-    if(MINGW)
-      MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/liborg_blueberry_core_runtime.dll")
-    else()
-      if(NOT APPLE)
-        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/debug/liborg_blueberry_core_runtime.dll" CONFIGURATIONS Debug)
-        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/release/liborg_blueberry_core_runtime.dll" CONFIGURATIONS Release)
-      endif(NOT APPLE)
-    endif()
-  endif()
-
   #MinGW dll
   if(MINGW)
     find_library(MINGW_RUNTIME_DLL "mingwm10.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
@@ -120,5 +106,3 @@ else()
   endif()
 
 endif()
-
-

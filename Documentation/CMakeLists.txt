@@ -2,12 +2,12 @@
 # Variables:
 #  MITK_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
 
+# Needed early on for redirecting the BlueBerry documentation output dir
+set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH
+    "Output directory for doxygen generated documentation." )
+
 # Compile source code snippets
-#add_subdirectory(Snippets)
-
-find_package(Doxygen)
-
-if(DOXYGEN_FOUND)
+add_subdirectory(Snippets)
 
 # Different doxygen versions produce significantly different behaviour in the MITK documentation
 # especially in regards to the MITK Qt assistant help files and markdown files.
@@ -175,6 +175,7 @@ add_custom_target(doc_developersguide
 if(MITK_USE_BLUEBERRY)
   # convert the extension points schema files into html
   find_package(Ant)
+  set(BLUEBERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
   if(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
 
     list(APPEND MITK_XP_GLOB_EXPRESSIONS
@@ -182,17 +183,14 @@ if(MITK_USE_BLUEBERRY)
 
     file(GLOB_RECURSE _plugin_xmls ${MITK_XP_GLOB_EXPRESSIONS})
 
-    MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls}
-                         OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html"
-                         TARGET_NAME mitkXPDoc
-                         )
+    mitkFunctionConvertXPSchema(INPUT ${_plugin_xmls}
+                                OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html"
+                                TARGET_NAME mitkXPDoc
+                               )
 
-    add_dependencies(doc mitkXPDoc BlueBerryXPDoc)
-  endif(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
-  # adding the dependency forces BlueBerryDoc to be build on all_build
-  # see bug 19024
-  if( MITK_CTEST_SCRIPT_MODE STREQUAL "nightly" )
-    add_dependencies(doc BlueBerryDoc)
+    add_dependencies(doc mitkXPDoc)
+  else()
+    message("Extension-point schema documentation generation disabled due to missing Ant and / or missing BlueBerry doc tools.")
   endif()
 endif(MITK_USE_BLUEBERRY)
 
@@ -209,19 +207,3 @@ endif(MITK_USE_BLUEBERRY)
 #                    COMMAND ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.vtk.conf)
 #  add_dependencies(doc doc-vtk)
 #endif()
-
-else(DOXYGEN_FOUND)
-
-# copy blank documentation page to prevent QtHelp from being shown
-# copy the .qhc and .qch files to $MITK_BIN/mitk/bin/ExtBundles/resources/
-
-configure_file(pregenerated/MITKBlankPage.qch
-               ${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MITKBlankPage.qch
-               COPYONLY)
-
-configure_file(pregenerated/MitkExtQtHelpCollection.qhc
-               ${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MitkExtQtHelpCollection.qhc
-               COPYONLY)
-
-endif(DOXYGEN_FOUND)
-

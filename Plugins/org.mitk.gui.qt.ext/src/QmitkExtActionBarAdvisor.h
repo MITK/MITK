@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_ext_Export.h>
 
 #include <QIcon>
+#include <QKeySequence>
 
 namespace berry {
 
@@ -75,7 +76,8 @@ private:
   void AddPerspectiveActions(berry::MenuManager* menu);
 
   berry::SmartPointer<berry::IContributionItem> GetItem(const QString& commandId, const QString& label,
-                                                        const QString& tooltip = QString(), const QIcon& icon = QIcon());
+                                                        const QString& tooltip = QString(), const QIcon& icon = QIcon(),
+                                                        const QKeySequence& shortcut = QKeySequence());
 
   berry::IWorkbenchWindow* window;
 };

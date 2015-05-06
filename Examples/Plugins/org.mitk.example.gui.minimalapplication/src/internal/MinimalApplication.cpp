@@ -59,7 +59,7 @@ MinimalApplication::~MinimalApplication()
 {
 }
 
-int MinimalApplication::Start()
+QVariant MinimalApplication::Start(berry::IApplicationContext* /*context*/)
 {
   QScopedPointer<berry::Display> display(berry::PlatformUI::CreateDisplay());
 

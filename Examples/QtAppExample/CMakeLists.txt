@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 project(QtAppExample)
 
-find_package(MITK REQUIRED)
-
 # Check that MITK has been build with Qt support
 if(NOT MITK_USE_QT)
   message(SEND_ERROR "MITK needs to be built with MITK_USE_QT set to ON")

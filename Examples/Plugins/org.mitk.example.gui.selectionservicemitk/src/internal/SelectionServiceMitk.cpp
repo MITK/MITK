@@ -57,7 +57,7 @@ SelectionServiceMitk::~SelectionServiceMitk()
 {
 }
 
-int SelectionServiceMitk::Start()
+QVariant SelectionServiceMitk::Start(berry::IApplicationContext* /*context*/)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
   wbAdvisor.reset(new SelectionServiceMITKWorkbenchAdvisor);

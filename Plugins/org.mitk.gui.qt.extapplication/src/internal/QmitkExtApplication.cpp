@@ -25,7 +25,7 @@ QmitkExtApplication::QmitkExtApplication()
 
 }
 
-int QmitkExtApplication::Start()
+QVariant QmitkExtApplication::Start(berry::IApplicationContext* /*context*/)
 {
   QScopedPointer<berry::Display> display(berry::PlatformUI::CreateDisplay());
 

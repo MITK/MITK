@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?BlueBerry version="0.1"?>
 <plugin>
-  <extension point="org.blueberry.osgi.applications">
-    <application id="org.mitk.qt.diffusionimagingapp">
+  <extension point="org.blueberry.osgi.applications" id="org.mitk.qt.diffusionimagingapp">
+    <application>
       <run class="QmitkDiffusionImagingAppApplication"/>
     </application>
   </extension>

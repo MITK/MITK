@@ -143,7 +143,7 @@ protected:
   void NodeRemoved(const mitk::DataNode *node);
 
   /** \brief Is called right before the view closes (before the destructor) */
-  virtual void PartClosed( berry::IWorkbenchPartReference::Pointer );
+  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer& );
   /** \brief Is called from the image navigator once the time step has changed */
   void OnTimeChanged( const itk::EventObject& );
   /** \brief Required for berry::IPartListener */

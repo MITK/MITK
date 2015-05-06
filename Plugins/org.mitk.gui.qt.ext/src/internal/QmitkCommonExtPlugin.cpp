@@ -31,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkIOUtil.h>
 
+#include <mitkBaseApplication.h>
+
 #include <berryPlatformUI.h>
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -132,9 +134,9 @@ void QmitkCommonExtPlugin::startNewInstance(const QStringList &args, const QStri
 {
   QStringList newArgs(args);
 #ifdef Q_OS_UNIX
-  newArgs << QString("--") +berry::Platform::ARG_NEWINSTANCE;
+  newArgs << QString("--") + mitk::BaseApplication::ARG_NEWINSTANCE;
 #else
-  newArgs << QString("/") + berry::Platform::ARG_NEWINSTANCE;
+  newArgs << QString("/") + mitk::BaseApplication::ARG_NEWINSTANCE;
 #endif
   newArgs << files;
   QProcess::startDetached(qApp->applicationFilePath(), newArgs);
@@ -172,33 +174,15 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
   QStringList fileArgs;
   QStringList sceneArgs;
 
-  Poco::Util::OptionSet os;
-  berry::Platform::GetOptionSet(os);
-  Poco::Util::OptionProcessor processor(os);
-#if !defined(POCO_OS_FAMILY_UNIX)
-  processor.setUnixStyle(false);
-#endif
-  args.pop_front();
-  QStringList::Iterator it = args.begin();
-  while (it != args.end())
+  foreach (QString arg, args)
   {
-    std::string name;
-    std::string value;
-    if (processor.process(it->toStdString(), name, value))
+    if (arg.endsWith(".mitk"))
     {
-      ++it;
+      sceneArgs << arg;
     }
     else
     {
-      if (it->endsWith(".mitk"))
-      {
-        sceneArgs << *it;
-      }
-      else
-      {
-        fileArgs << *it;
-      }
-      it = args.erase(it);
+      fileArgs << arg;
     }
   }
 

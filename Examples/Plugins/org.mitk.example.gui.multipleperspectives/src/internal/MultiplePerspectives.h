@@ -36,7 +36,7 @@ public:
   MultiplePerspectives();
   ~MultiplePerspectives();
 
-  int Start();
+  QVariant Start(berry::IApplicationContext* context);
   void Stop();
 
 private:

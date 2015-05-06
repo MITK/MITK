@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag abca3189)
+    set(revision_tag 3efe86d5)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -74,10 +74,10 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      #URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      #URL_MD5 3a3470976debc29e9c9d5aaae12eae1c
-      GIT_REPOSITORY https://github.com/commontk/CTK.git
-      GIT_TAG origin/master
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
+      URL_MD5 cbd771ea9718cb02e64085e8ddfdaa4d
+      #GIT_REPOSITORY https://github.com/commontk/CTK.git
+      #GIT_TAG origin/master
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

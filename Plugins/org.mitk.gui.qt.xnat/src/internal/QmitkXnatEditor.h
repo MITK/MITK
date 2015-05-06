@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKXNATEDITOR_h
 #define QMITKXNATEDITOR_h
 
@@ -53,7 +52,7 @@ public:
 
   berryObjectMacro(QmitkXnatEditor)
 
-  QmitkXnatEditor();
+    QmitkXnatEditor();
   ~QmitkXnatEditor();
 
   static const QString EDITOR_ID;
@@ -74,34 +73,31 @@ public:
 
   protected slots:
 
-    /**
-    \brief A resource folder will be downloaded to the chosen download path.
-    */
-    void DownloadResource();
+  /**
+  \brief Any XNAT resource (file or folder) will be downloaded to the chosen download path.
+  */
+  void DownloadResource();
 
-    /**
-    \brief A file will be downloaded to the chosen download path.
-    */
-    void DownloadFile();
+  /**
+  \brief Every time you activate a node in the list, the root item will be updated to a child of the previous parent.\
+  In exception of the node is a file. The file will be downloaded and loaded to the DataManager.
+  */
+  void OnObjectActivated(const QModelIndex& index);
 
-    /**
-    \brief Every time you activate a node in the list, the root item will be updated to a child of the previous parent.\
-    In exception of the node is a file. The file will be downloaded and loaded to the DataManager.
-    */
-    void OnObjectActivated(const QModelIndex& index);
+  // Breadcrumb button slots
+  void OnDataModelButtonClicked();
+  void OnProjectButtonClicked();
+  void OnSubjectButtonClicked();
+  void OnExperimentButtonClicked();
+  void OnKindOfDataButtonClicked();
+  void OnSessionButtonClicked();
+  void OnResourceButtonClicked();
 
-    // Breadcrumb button slots
-    void OnDataModelButtonClicked();
-    void OnProjectButtonClicked();
-    void OnSubjectButtonClicked();
-    void OnExperimentButtonClicked();
-    void OnKindOfDataButtonClicked();
-    void OnSessionButtonClicked();
-    void OnResourceButtonClicked();
+  /// \brief Updates the ctkXnatSession and the user interface
+  void UpdateSession(ctkXnatSession* session);
 
-    /// \brief Updates the ctkXnatSession and the user interface
-    void UpdateSession(ctkXnatSession* session);
-    void CleanListModel(ctkXnatSession* session);
+  void CleanListModel(ctkXnatSession* session);
+  void itemSelected(const QModelIndex &index);
 
 protected:
 
@@ -125,7 +121,7 @@ private:
 
   QScopedPointer<berry::ISelectionListener> m_SelectionListener;
   void SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
-                        const berry::ISelection::ConstPointer& selection);
+    const berry::ISelection::ConstPointer& selection);
 };
 
 #endif // QMITKXNATEDITOR_h

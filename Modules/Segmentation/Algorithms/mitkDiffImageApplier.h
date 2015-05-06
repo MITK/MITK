@@ -40,7 +40,7 @@ class MITKSEGMENTATION_EXPORT DiffImageApplier : public itk::Object, public Oper
 {
   public:
 
-    mitkClassMacro(DiffImageApplier, itk::Object);
+    mitkClassMacroItkParent(DiffImageApplier, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

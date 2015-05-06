@@ -140,7 +140,7 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
   {
 
   public:
-    mitkClassMacro(StateMachine,itk::Object);
+    mitkClassMacroItkParent(StateMachine,itk::Object);
 
     /**
     * @brief New Macro with one parameter for creating this object with static New(..) method

@@ -67,7 +67,7 @@ namespace mitk {
 
 
   public:
-    mitkClassMacro(TimeGeometry, itk::Object)
+    mitkClassMacroItkParent(TimeGeometry, itk::Object)
     itkCloneMacro(Self)
     itkCreateAnotherMacro(Self)
 

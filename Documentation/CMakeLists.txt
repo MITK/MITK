@@ -7,7 +7,11 @@ set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PA
     "Output directory for doxygen generated documentation." )
 
 # Compile source code snippets
-add_subdirectory(Snippets)
+
+# do not add snippets if building with Qt4
+if(NOT DESIRED_QT_VERSION MATCHES 4)
+  add_subdirectory(Snippets)
+endif()
 
 # Different doxygen versions produce significantly different behaviour in the MITK documentation
 # especially in regards to the MITK Qt assistant help files and markdown files.

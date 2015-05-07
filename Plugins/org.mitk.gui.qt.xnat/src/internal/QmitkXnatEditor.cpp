@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkDataStorage.h>
-#include <mitkIOUtil.h>
+#include <QmitkIOUtil.h>
 
 // Poco
 #include <Poco/Zip/Decompress.h>
@@ -352,14 +352,21 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
           }
         }
 
-        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(filePath.toStdString());
-        if ((node.IsNotNull()) && (node->GetData() != NULL))
+        mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
+        mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+        QStringList list;
+        list << filePath;
+        try
         {
-          dsService->GetDataStorage()->GetDataStorage()->Add(node);
-          mitk::BaseData::Pointer basedata = node->GetData();
-          mitk::RenderingManager::GetInstance()->InitializeViews(
-            basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+          QmitkIOUtil::Load(list, *dataStorage);
         }
+        catch (const mitk::Exception& e)
+        {
+          MITK_INFO << e;
+          return;
+        }
+        mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
+          dsService->GetDataStorage()->GetDataStorage());
       }
     }
     else

@@ -89,21 +89,19 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // world plane is parallel to and within the planar figure geometry bounds
   // (otherwise, display nothing)
 
-  if ( (planarFigurePlaneGeometry != NULL) && (rendererPlaneGeometry != NULL) )
+  if ( (planarFigurePlaneGeometry == NULL) || (rendererPlaneGeometry == NULL) )
   {
-    double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
-    if ( !planarFigurePlaneGeometry->IsParallel( rendererPlaneGeometry )
-      || !(planarFigurePlaneGeometry->DistanceFromPlane(
-      rendererPlaneGeometry ) < planeThickness / 3.0) )
-    {
-      // Planes are not parallel or renderer plane is not within PlanarFigure
-      // geometry bounds --> exit
-      return;
-    }
+    return;
   }
-  else
+
+  double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
+
+  double angle = planarFigurePlaneGeometry->Angle( rendererPlaneGeometry );
+  if ( !( ( angle < 100.0 * mitk::sqrteps ) || ( angle > ( vnl_math::pi - 100.0 * sqrteps ) ) )
+    || !(planarFigurePlaneGeometry->DistanceFromPlane( rendererPlaneGeometry ) < planeThickness / 3.0) )
   {
-    // Plane is not valid (curved reformations are not possible yet)
+    // Planes are not parallel or renderer plane is not within PlanarFigure
+    // geometry bounds --> exit
     return;
   }
 

@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QRegExp>
 #include <QModelIndex>
 #include <QDir>
+#include <QDirIterator>
 #include <QMessageBox>
 
 // MITK
@@ -52,7 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 
 // Poco
-#include <Poco\Zip\Decompress.h>
+#include <Poco/Zip/Decompress.h>
 
 const QString QmitkXnatEditor::EDITOR_ID = "org.mitk.editors.xnat.browser";
 
@@ -340,14 +341,18 @@ void QmitkXnatEditor::OnObjectActivated(const QModelIndex &index)
       if (dsService != NULL)
       {
         QString name = file->property("Name");
+        QString filePath = m_DownloadPath + name;
 
         if (file->property("collection") == "DICOM")
         {
-          ctkXnatObject* grandParent = file->parent()->parent();
-          name = grandParent->property("ID") + "-" + grandParent->property("series_description") + "/" + name;
+          QDirIterator it(m_DownloadPath, QStringList() << name, QDir::Files, QDirIterator::Subdirectories);
+          while (it.hasNext()) {
+            it.next();
+            filePath = it.filePath();
+          }
         }
 
-        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode((m_DownloadPath + name).toStdString());
+        mitk::DataNode::Pointer node = mitk::IOUtil::LoadDataNode(filePath.toStdString());
         if ((node.IsNotNull()) && (node->GetData() != NULL))
         {
           dsService->GetDataStorage()->GetDataStorage()->Add(node);
@@ -390,47 +395,19 @@ void QmitkXnatEditor::InternalFileDownload(const QModelIndex& index)
       if (file->property("collection") == QString("DICOM"))
       {
         ctkXnatObject* parent = file->parent();
-        QList<ctkXnatObject*> list = parent->children();
 
-        ctkXnatObject* grandParent = parent->parent();
-        QString gpName = grandParent->property("ID") + "-" + grandParent->property("series_description");
+        QString filePath = m_DownloadPath + parent->property("label") + ".zip";
+        parent->download(filePath);
 
-        for (int i = 0; i < list.count(); i++)
-        {
-          ctkXnatFile* child = dynamic_cast<ctkXnatFile*>(list.at(i));
-          MITK_INFO << "Download started ...";
-          MITK_INFO << "...";
+        std::ifstream in(filePath.toStdString().c_str(), std::ios::binary);
+        poco_assert(in);
 
-          if (child == NULL)
-          {
-            MITK_INFO << "Download failed! Not a file.";
-            continue;
-          }
+        // decompress to XNAT_DOWNLOAD dir
+        Poco::Zip::Decompress dec(in, Poco::Path(m_DownloadPath.toStdString()));
+        dec.decompressAllFiles();
 
-          QDir downDir(m_DownloadPath);
-          QString name = child->property("Name");
-          QString newDownDir = m_DownloadPath + gpName + "/";
-
-          if (downDir.mkpath(newDownDir))
-          {
-            QString filePath = newDownDir + name;
-            child->download(filePath);
-          }
-          else
-          {
-            MITK_INFO << "Download failed! No subdirectory created.";
-          }
-
-          // Testing if the file exists
-          if (downDir.exists(newDownDir + name))
-          {
-            MITK_INFO << "Download of " << child->name().toStdString() << " was completed!";
-          }
-          else
-          {
-            MITK_INFO << "Download of " << child->name().toStdString() << " failed!";
-          }
-        }
+        in.close();
+        QFile::remove(filePath);
       }
       else
       {

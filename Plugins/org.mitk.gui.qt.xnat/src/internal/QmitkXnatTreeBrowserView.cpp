@@ -254,6 +254,18 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
               filePath = it.filePath();
             }
           }
+
+          if (filePath.isEmpty())
+          {
+            MITK_INFO << "Decompressing failed!";
+            return;
+          }
+          else if (!QFile(filePath).exists())
+          {
+            MITK_INFO << "Decompressing failed!";
+            return;
+          }
+
           mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
           mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
           QStringList list;

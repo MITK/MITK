@@ -184,10 +184,10 @@ public:
   void ResetPreviewContolPoint();
 
   /** \brief Returns whether or not the PreviewControlPoint is visible.*/
-  bool IsPreviewControlPointVisible();
+  bool IsPreviewControlPointVisible() const;
 
   /** \brief Returns the coordinates of the PreviewControlPoint. */
-  Point2D GetPreviewControlPoint();
+  Point2D GetPreviewControlPoint() const;
 
 
 
@@ -245,10 +245,10 @@ public:
   virtual unsigned short GetPolyLinesSize();
 
   /** \brief  Returns the current number of helperpolylines  */
-  virtual unsigned short GetHelperPolyLinesSize();
+  virtual unsigned short GetHelperPolyLinesSize() const;
 
   /** \brief Returns whether a helper polyline should be painted or not */
-  virtual bool IsHelperToBePainted(unsigned int index);
+  virtual bool IsHelperToBePainted(unsigned int index) const;
 
   /** \brief Returns true if the planar figure is reset to "add points" mode
    * when a point is selected.

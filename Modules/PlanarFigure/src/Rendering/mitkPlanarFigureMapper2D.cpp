@@ -172,7 +172,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 
 void mitk::PlanarFigureMapper2D::PaintPolyLine(
-  mitk::PlanarFigure::PolyLineType vertices,
+  const mitk::PlanarFigure::PolyLineType vertices,
   bool closed,
   Point2D& anchorPoint,
   const PlaneGeometry* planarFigurePlaneGeometry,
@@ -184,7 +184,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
 
   // transform all vertices into Point2Ds in display-Coordinates and store them in vector
   std::vector<mitk::Point2D> pointlist;
-  for ( PlanarFigure::PolyLineType::iterator iter = vertices.begin(); iter!=vertices.end(); iter++ )
+  for ( PlanarFigure::PolyLineType::const_iterator iter = vertices.cbegin(); iter!=vertices.cend(); ++iter )
   {
     // Draw this 2D point as OpenGL vertex
     mitk::Point2D displayPoint;
@@ -601,11 +601,11 @@ void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mit
 }
 
 
-void mitk::PlanarFigureMapper2D::RenderControlPoints( mitk::PlanarFigure * planarFigure,
-                                                      PlanarFigureDisplayMode lineDisplayMode,
-                                                      mitk::PlaneGeometry * planarFigurePlaneGeometry,
+void mitk::PlanarFigureMapper2D::RenderControlPoints( const mitk::PlanarFigure * planarFigure,
+                                                      const PlanarFigureDisplayMode lineDisplayMode,
+                                                      const mitk::PlaneGeometry * planarFigurePlaneGeometry,
                                                       const mitk::PlaneGeometry * rendererPlaneGeometry,
-                                                      mitk::DisplayGeometry * displayGeometry )
+                                                      const mitk::DisplayGeometry * displayGeometry )
 {
   bool isEditable = true;
   m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
@@ -684,10 +684,10 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints( mitk::PlanarFigure * plana
 }
 
 void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * renderer,
-                                                    std::string name,
-                                                    mitk::Point2D anchorPoint,
-                                                    float globalOpacity,
-                                                    PlanarFigureDisplayMode lineDisplayMode,
+                                                    const std::string name,
+                                                    const mitk::Point2D anchorPoint,
+                                                    const float globalOpacity,
+                                                    const PlanarFigureDisplayMode lineDisplayMode,
                                                     double &annotationOffset )
 {
   m_AnnotationOverlay->SetText( name );
@@ -711,12 +711,12 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
 
 }
 
-void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFigure,
+void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * planarFigure,
                                                    mitk::BaseRenderer * renderer,
-                                                   mitk::Point2D anchorPoint,
+                                                   const mitk::Point2D anchorPoint,
                                                    double &annotationOffset,
                                                    float globalOpacity,
-                                                   PlanarFigureDisplayMode lineDisplayMode )
+                                                   const PlanarFigureDisplayMode lineDisplayMode )
 {
   std::stringstream quantityString;
   quantityString.setf( ios::fixed, ios::floatfield );
@@ -759,12 +759,12 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFi
   annotationOffset -= 15.0;
 }
 
-void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDisplayMode,
+void mitk::PlanarFigureMapper2D::RenderLines( const PlanarFigureDisplayMode lineDisplayMode,
                                               mitk::PlanarFigure * planarFigure,
                                               mitk::Point2D &anchorPoint,
-                                              mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                                              const mitk::PlaneGeometry * planarFigurePlaneGeometry,
                                               const mitk::PlaneGeometry * rendererPlaneGeometry,
-                                              mitk::DisplayGeometry * displayGeometry )
+                                              const mitk::DisplayGeometry * displayGeometry )
 {
   glLineStipple(1, 0x00FF);
 

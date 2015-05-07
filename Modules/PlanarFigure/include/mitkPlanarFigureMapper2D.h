@@ -151,41 +151,41 @@ protected:
   * openGL attributes to reduce unnecessary setting of these attributes.
   * (e.g. no need to set color twice if it's the same)
   */
-  void RenderLines( PlanarFigureDisplayMode lineDisplayMode,
-                    mitk::PlanarFigure * planarFigure,
+  void RenderLines( const PlanarFigureDisplayMode lineDisplayMode,
+                    mitk::PlanarFigure* planarFigure,
                     mitk::Point2D &anchorPoint,
-                    mitk::PlaneGeometry * planarFigurePlaneGeometry,
-                    const mitk::PlaneGeometry * rendererPlaneGeometry,
-                    mitk::DisplayGeometry * displayGeometry );
+                    const mitk::PlaneGeometry* planarFigurePlaneGeometry,
+                    const mitk::PlaneGeometry* rendererPlaneGeometry,
+                    const mitk::DisplayGeometry* displayGeometry );
 
   /**
   * \brief Renders the quantities of the figure below the text annotations.
   */
-  void RenderQuantities( mitk::PlanarFigure * planarFigure,
+  void RenderQuantities( const mitk::PlanarFigure * planarFigure,
                          mitk::BaseRenderer * renderer,
-                         mitk::Point2D anchorPoint,
+                         const mitk::Point2D anchorPoint,
                          double &annotationOffset,
                          float globalOpacity,
-                         PlanarFigureDisplayMode lineDisplayMode );
+                         const PlanarFigureDisplayMode lineDisplayMode );
 
   /**
   * \brief Renders the text annotations.
   */
   void RenderAnnotations( mitk::BaseRenderer * renderer,
-                          std::string name,
-                          mitk::Point2D anchorPoint,
-                          float globalOpacity,
-                          PlanarFigureDisplayMode lineDisplayMode,
+                          const std::string name,
+                          const mitk::Point2D anchorPoint,
+                          const float globalOpacity,
+                          const PlanarFigureDisplayMode lineDisplayMode,
                           double &annotationOffset );
 
   /**
   * \brief Renders the control-points.
   */
-  void RenderControlPoints( mitk::PlanarFigure * planarFigure,
-                            PlanarFigureDisplayMode lineDisplayMode,
-                            mitk::PlaneGeometry * planarFigurePlaneGeometry,
+  void RenderControlPoints( const mitk::PlanarFigure * planarFigure,
+                            const PlanarFigureDisplayMode lineDisplayMode,
+                            const mitk::PlaneGeometry * planarFigurePlaneGeometry,
                             const mitk::PlaneGeometry * rendererPlaneGeometry,
-                            mitk::DisplayGeometry * displayGeometry );
+                            const mitk::DisplayGeometry * displayGeometry );
 
 
   void TransformObjectToDisplay(
@@ -210,7 +210,7 @@ protected:
   /**
   * \brief Actually paints the polyline defined by the figure.
   */
-  void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
+  void PaintPolyLine( const mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
     Point2D& anchorPoint,
     const PlaneGeometry* planarFigurePlaneGeometry,

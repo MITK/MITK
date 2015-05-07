@@ -44,7 +44,7 @@ mitk::USImage::~USImage()
 
 }
 
-mitk::USImageMetadata::Pointer mitk::USImage::GetMetadata(){
+mitk::USImageMetadata::Pointer mitk::USImage::GetMetadata() const {
   mitk::USImageMetadata::Pointer result = mitk::USImageMetadata::New();
 
   result->SetDeviceManufacturer(this->GetProperty(mitk::USImageMetadata::PROP_DEV_MANUFACTURER)->GetValueAsString());

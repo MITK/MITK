@@ -57,6 +57,7 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
     connect( m_Controls->m_BtnCancel, SIGNAL(clicked()), this, SLOT(OnClickedCancel()) );
     connect( m_Controls->m_RadioDeviceSource, SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
     connect( m_Controls->m_RadioFileSource,   SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
+    connect( m_Controls->m_RadioOIGTLSource, SIGNAL(clicked()), this, SLOT(OnDeviceTypeSelection()) );
     connect( m_Controls->m_OpenFileButton, SIGNAL(clicked()), this, SLOT(OnOpenFileButtonClicked()) );
   }
 }
@@ -77,13 +78,23 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
       m_Controls->m_Model->text().toStdString());
     newDevice->SetComment(m_Controls->m_Comment->text().toStdString());
   }
-  else
+  else if (m_Controls->m_RadioFileSource->isChecked())
   {
     newDevice = mitk::USVideoDevice::New(
       m_Controls->m_FilePathSelector->text().toStdString(),
       m_Controls->m_Manufacturer->text().toStdString(),
       m_Controls->m_Model->text().toStdString());
     newDevice->SetComment(m_Controls->m_Comment->text().toStdString());
+  }
+  else
+  {
+      std::string host = m_Controls->m_OIGTLHost->text().toStdString();
+      int port = m_Controls->m_OIGTLPort->value();
+
+      mitk::USIGTLDevice::Pointer device = mitk::USIGTLDevice::New("OIGTL", "Testdevice", host, port);
+      device->Initialize();
+      emit Finished();
+      return;
   }
 
   // get USImageVideoSource from new device
@@ -121,6 +132,8 @@ void QmitkUSNewVideoDeviceWidget::OnClickedCancel(){
 void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection(){
   m_Controls->m_FilePathSelector->setEnabled(m_Controls->m_RadioFileSource->isChecked());
   m_Controls->m_DeviceSelector->setEnabled(m_Controls->m_RadioDeviceSource->isChecked());
+  m_Controls->m_OIGTLHost->setEnabled(m_Controls->m_RadioOIGTLSource->isChecked());
+  m_Controls->m_OIGTLPort->setEnabled(m_Controls->m_RadioOIGTLSource->isChecked());
 }
 
 void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()

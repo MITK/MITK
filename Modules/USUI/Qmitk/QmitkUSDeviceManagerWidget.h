@@ -71,6 +71,11 @@ class MITKUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     void OnClickedActivateDevice();
 
     /*
+    \brief Called, when the button "Provide via OpenIGTLink" was clicked.
+    */
+    void OnClickedOIGTL();
+
+    /*
     \brief Called, when the button "Disconnect Device" was clicked.
     */
     void OnClickedDisconnectDevice();

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkUSUIExports.h"
 #include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
 #include "mitkUSVideoDevice.h"
+#include "mitkUSIGTLDevice.h"
 
 //QT headers
 #include <QWidget>

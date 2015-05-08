@@ -240,7 +240,7 @@ void QmitkXnatEditor::UpdateList()
 }
 
 void QmitkXnatEditor::SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
-  const berry::ISelection::ConstPointer& selection)
+                                       const berry::ISelection::ConstPointer& selection)
 {
   // check for null selection
   if (selection.IsNull())

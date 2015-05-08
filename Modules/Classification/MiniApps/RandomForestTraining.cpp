@@ -124,35 +124,21 @@ int main(int argc, char* argv[])
     // only the raw vigra rf data
     mitk::IOUtil::Save(classifier, outputdir + "RandomForest.hdf5");
 
-//    Eigen::MatrixXi Y_pred = classifier->Predict(X);
+    Eigen::MatrixXi Y_pred = classifier->Predict(X);
+    Eigen::MatrixXd Probs = classifier->GetPointWiseProbabilities();
 
-//    mitk::Image::Pointer prediction = mitk::CLUtil::Transform(Y_pred,mask);
-//    mitk::IOUtil::Save(prediction, outputdir + "test.nrrd");
+    MITK_INFO << Y_pred.rows() << " " << Y_pred.cols();
+    MITK_INFO << Probs.rows() << " " << Probs.cols();
 
-//    int threshold = 0;
-//    if (parsedArgs.count("b0Threshold"))
-//        threshold = us::any_cast<int>(parsedArgs["b0Threshold"]);
+//    mitk::Image::Pointer prediction = mitk::CLUtil::Transform<int>(Y_pred,mask);
+    mitk::Image::Pointer probs_1 = mitk::CLUtil::Transform<double>(Probs.col(0),mask);
+    mitk::Image::Pointer probs_2 = mitk::CLUtil::Transform<double>(Probs.col(1),mask);
+    mitk::Image::Pointer probs_3 = mitk::CLUtil::Transform<double>(Probs.col(2),mask);
 
-//    int shOrder = 4;
-//    if (parsedArgs.count("shOrder"))
-//        shOrder = us::any_cast<int>(parsedArgs["shOrder"]);
+    mitk::IOUtil::Save(probs_1, outputdir + "probs_1.nrrd");
+    mitk::IOUtil::Save(probs_2, outputdir + "probs_2.nrrd");
+    mitk::IOUtil::Save(probs_3, outputdir + "probs_3.nrrd");
+//    mitk::IOUtil::Save(probs_2, outputdir + "test.nrrd");
 
-//    float lambda = 0.006;
-//    if (parsedArgs.count("lambda"))
-//        lambda = us::any_cast<float>(parsedArgs["lambda"]);
-
-//    int normalization = 0;
-//    if (parsedArgs.count("csa") && us::any_cast<bool>(parsedArgs["csa"]))
-//        normalization = 6;
-
-//    bool outCoeffs = false;
-//    if (parsedArgs.count("outputCoeffs"))
-//        outCoeffs = us::any_cast<bool>(parsedArgs["outputCoeffs"]);
-
-//    bool mrTrix = false;
-//    if (parsedArgs.count("mrtrix"))
-//        mrTrix = us::any_cast<bool>(parsedArgs["mrtrix"]);
-
-  // Do something
     return EXIT_SUCCESS;
 }

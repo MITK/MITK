@@ -34,6 +34,7 @@ struct NeighborhoodFirstOrderStatistics
     double sqmean = 0;
     double min = 10000000;
     double max = -10000000;
+
     for (int i = 0; i < it.Size(); ++i)
     {
       double value = it.GetPixel(i);
@@ -44,10 +45,12 @@ struct NeighborhoodFirstOrderStatistics
     }
     mean /= it.Size();
     sqmean /= it.Size();
+
     double variance = sqmean - mean * mean;
     double stdderivation = std::sqrt(variance);
     double skewness = 0;
     double kurtosis = 0;
+
     for (int i = 0; i < it.Size(); ++i)
     {
       double value = it.GetPixel(i);

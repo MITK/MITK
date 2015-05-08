@@ -202,11 +202,8 @@ public:
         end = m_offsetMap.end(); dir_it != end; dir_it ++){
 
       if(! (dir_it->first & m_DirectionFlags))
-      {
-        //std::bitset<14> x(dir_it->first);
-        //std::cout << "Direction flag " << x << " not Found";
         continue;
-      }
+
       div_num_dirs++;
 
       HistogramType::Pointer histogram = HistogramType::New();
@@ -246,7 +243,7 @@ public:
     }
 
     //std::cout << "Number of directions " << div_num_dirs << std::endl;
-    output_vector /= div_num_dirs;
+//    output_vector /= div_num_dirs;
     return output_vector;
   }
 };

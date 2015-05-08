@@ -165,6 +165,17 @@ public:
   virtual bool VerifyRequestedRegion(){return false;}
   virtual void SetRequestedRegion(const itk::DataObject */*data*/){}
 
+  // Override
+  virtual bool IsEmpty() const override
+  {
+    if(IsInitialized() == false)
+      return true;
+    const TimeGeometry* timeGeometry = const_cast<AbstractClassifier*>(this)->GetUpdatedTimeGeometry();
+    if(timeGeometry == NULL)
+      return true;
+    return false;
+  }
+
 #endif // Skip Doxygen
 
 };

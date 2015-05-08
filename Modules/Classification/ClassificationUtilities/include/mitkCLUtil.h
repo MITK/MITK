@@ -137,7 +137,7 @@ struct CLUtil
       ++oit;
     }
 
-    mitk::Image::Pointer out_img;
+    mitk::Image::Pointer out_img = mitk::Image::New();
     mitk::GrabItkImageMemory(itk_img,out_img);
     return out_img;
   }
@@ -159,7 +159,7 @@ struct CLUtil
     mitk::CLUtil::CountLabledVoxels(current_mask.GetPointer(),n_numSamples);
 
     typename itk::Image<TMatrixElementType, 3>::Pointer current_img;
-    mitk::CastToItkImage(mask,current_img);
+    mitk::CastToItkImage(img,current_img);
 
     Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> out_matrix(n_numSamples,1);
 

@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 
 //#include <vigra/random_forest_hdf5_impex.hxx>
-#include <mitkImageToEigenTransform.h>
-#include <mitkEigenToImageTransform.h>
 #include <mitkLibSVMClassifier.h>
 #include <itkLabelSampler.h>
 #include <mitkImageCast.h>

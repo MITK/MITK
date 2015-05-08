@@ -396,6 +396,13 @@ QString BaseApplication::getProvisioningFilePath() const
   {
     QFileInfo appFilePath(QCoreApplication::applicationFilePath());
     QDir basePath(QCoreApplication::applicationDirPath());
+    #ifdef Q_OS_MAC
+      // for MAC applicationDirPath() points to the actual executable within
+      // the bundle instead of the bundle, we need it to point to the bundle
+      basePath.cdUp();
+      basePath.cdUp();
+      basePath.cdUp();
+    #endif
     QString provFileName = appFilePath.baseName() + ".provisioning";
     QFileInfo provFile(basePath.absoluteFilePath(provFileName));
 

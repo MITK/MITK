@@ -33,6 +33,7 @@ const char* const mitk::LookupTable::typenameList[] =
   "Inverse Grayscale",
   "Hot Iron",
   "Jet",
+  "Jet Transparent",
   "Legacy Binary",
   "Legacy Rainbow Color",
   "Multilabel",
@@ -91,6 +92,9 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
     break;
   case (mitk::LookupTable::JET):
     this->BuildJetLookupTable();
+    break;
+  case (mitk::LookupTable::JET_TRANSPARENT):
+    this->BuildJetLookupTable(true);
     break;
   case (mitk::LookupTable::LEGACY_BINARY):
     this->BuildLegacyBinaryLookupTable();
@@ -441,13 +445,21 @@ void mitk::LookupTable::BuildHotIronLookupTable()
   this->Modified();
 }
 
-void mitk::LookupTable::BuildJetLookupTable()
+void mitk::LookupTable::BuildJetLookupTable(bool transparent)
 {
   vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
   lut->SetNumberOfTableValues(256);
   lut->Build();
+  int i = 0;
 
-  for (int i = 0; i < 256; i++)
+  if (transparent)
+  {
+    // Lowest intensity is transparent
+    lut->SetTableValue(0, (double)Jet[0][0] / 255.0, (double)Jet[0][1] / 255.0, (double)Jet[0][2] / 255.0, 0.0);
+    i = 1;
+  }
+
+  for (; i < 256; i++)
   {
     lut->SetTableValue(i, (double)Jet[i][0] / 255.0, (double)Jet[i][1] / 255.0, (double)Jet[i][2] / 255.0, 1.0);
   }

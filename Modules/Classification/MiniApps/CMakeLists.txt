@@ -12,7 +12,8 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( classificationminiapps
-        RandomForest^^MitkClassifierVigraRandomForest
+        RandomForestTraining^^MitkClassifierVigraRandomForest
+        RandomForestPrediction^^MitkClassifierVigraRandomForest
     )
 
     foreach(classificationminiapps ${classificationminiapps})

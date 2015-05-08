@@ -100,7 +100,7 @@ namespace mitk {
   class MITKCORE_EXPORT BaseGeometry : public itk::Object, public OperationActor
   {
   public:
-    mitkClassMacro(BaseGeometry, itk::Object);
+    mitkClassMacroItkParent(BaseGeometry, itk::Object);
     itkCloneMacro(Self)
 
       // ********************************** TypeDef **********************************

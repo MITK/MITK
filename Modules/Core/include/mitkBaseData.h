@@ -40,7 +40,7 @@ namespace mitk {
 class MITKCORE_EXPORT BaseData : public itk::DataObject, public OperationActor
 {
 public:
-  mitkClassMacro(BaseData,itk::DataObject)
+  mitkClassMacroItkParent(BaseData,itk::DataObject)
 
   /**
   * \brief Return the TimeGeometry of the data as const pointer.

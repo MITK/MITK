@@ -44,7 +44,7 @@ class OperationEvent;
 class MITKCORE_EXPORT OperationActor
 {
 public:
-  mitkClassMacroNoParent(OperationActor)
+  itkTypeMacroNoParent(OperationActor)
 
   virtual ~OperationActor() {}
   virtual void ExecuteOperation(Operation* operation) = 0;

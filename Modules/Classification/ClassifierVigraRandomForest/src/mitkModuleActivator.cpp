@@ -16,9 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <mitkRandomForestIO.h>
-//#include <mitkDummyLsetReader.h>
-//#include "QmitkNodeDescriptorManager.h"
-//#include "mitkVigraRandomForestClassifier.h"
 #include "mitkNodePredicateDataType.h"
 
 namespace mitk
@@ -39,7 +36,6 @@ namespace mitk
       // *-----------------*
 
       m_DecisionForestIO = new mitk::RandomForestFileIO();
-//      m_DummyLsetFileReader = new mitk::DummyLsetFileReader();
     }
 
     void Unload(us::ModuleContext*)
@@ -49,7 +45,6 @@ namespace mitk
 
   private:
     mitk::RandomForestFileIO * m_DecisionForestIO;
-//    mitk::DummyLsetFileReader * m_DummyLsetFileReader;
   };
 }
 

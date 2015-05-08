@@ -70,7 +70,7 @@ public:
   void UseSampleWithReplacement(bool);
   void SetTreeCount(int);
   void SetWeightLambda(double);
-  void PrintParameter();
+  void PrintParameter(std::ostream &str);
 
 
 private:

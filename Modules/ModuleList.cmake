@@ -63,6 +63,7 @@ set(mitk_modules
   DicomRT
   IOExt
   XNAT
+  XNATUI
   TubeGraph
 )
 

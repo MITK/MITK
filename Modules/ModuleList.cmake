@@ -64,6 +64,7 @@ set(mitk_modules
   IOExt
   XNAT
   TubeGraph
+  Classification
 )
 
 if(MITK_ENABLE_PIC_READER)

@@ -107,6 +107,8 @@ http://www.vtk.org/
 
 https://github.com/commontk/zlib
 
+\par libSVM
+http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 
 
 For copyright information on any of the above toolkits see the corresponding home page or the corresponding source folder.

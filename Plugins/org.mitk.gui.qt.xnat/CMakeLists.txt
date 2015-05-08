@@ -1,6 +1,6 @@
 project(org_mitk_gui_qt_xnat)
 
-MACRO_CREATE_MITK_CTK_PLUGIN(
+mitk_create_plugin(
   PACKAGE_DEPENDS Poco|Zip
   MODULE_DEPENDS MitkXNAT
   EXPORT_DIRECTIVE XNAT_EXPORT

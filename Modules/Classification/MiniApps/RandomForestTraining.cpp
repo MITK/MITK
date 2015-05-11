@@ -52,6 +52,7 @@ int main(int argc, char* argv[])
     parser.addArgument("classmask", "m", mitkCommandLineParser::InputFile, "Class mask image", "Contains several classes.", us::Any(), false);
 
     // optional params
+    parser.addArgument("select", "s", mitkCommandLineParser::String, "Item selection", "Using Regular expression, seperated by space e.g.: '*.nrrd *.vtk *test*'","*.nrrd",true);
     parser.addArgument("treecount", "tc", mitkCommandLineParser::Int, "Treecount", "Number of trees.",50,true);
     parser.addArgument("treedepth", "td", mitkCommandLineParser::Int, "Treedepth", "Maximal tree depth.",50,true);
     parser.addArgument("minsplitnodesize", "min", mitkCommandLineParser::Int, "Minimum split node size.", "Minimum split node size.",2,true);
@@ -80,9 +81,9 @@ int main(int argc, char* argv[])
     float precision = parsedArgs.count("precision") ? us::any_cast<float>(parsedArgs["precision"]) : mitk::eps;
     float fraction = parsedArgs.count("fraction") ? us::any_cast<float>(parsedArgs["fraction"]) : 0.6;
     bool withreplacement = parsedArgs.count("replacment") ? us::any_cast<float>(parsedArgs["replacment"]) : true;
+    QString filter = parsedArgs.count("select") ? us::any_cast<std::string>(parsedArgs["select"]).c_str(): "*.nrrd";
 
     // Get nrrd filepath
-    QString filter = "*.nrrd";
     QDir dir(inputdir.c_str());
     auto strl = dir.entryList(filter.split(" "),QDir::Files);
 
@@ -115,7 +116,7 @@ int main(int argc, char* argv[])
     classifier->SetSamplesPerTree(fraction);
     classifier->UseSampleWithReplacement(withreplacement);
 
-    classifier->PrintParameter(std::cout);
+    classifier->PrintParameter();
     classifier->Train(X,Y);
 
     MITK_INFO << classifier->IsEmpty();

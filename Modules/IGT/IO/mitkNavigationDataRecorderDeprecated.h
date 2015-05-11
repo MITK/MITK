@@ -174,7 +174,7 @@ namespace mitk
     * \brief filter execute method here it is not used
     *
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     NavigationDataRecorderDeprecated();
 

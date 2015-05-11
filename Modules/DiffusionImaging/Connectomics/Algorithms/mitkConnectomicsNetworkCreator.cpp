@@ -106,7 +106,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   for( int fiberID( 0 ); fiberID < numFibers; fiberID++ )
   {
     vtkIdType   numPointsInCell(0);
-    vtkIdType*  pointsInCell(NULL);
+    vtkIdType*  pointsInCell(nullptr);
     vLines->GetNextCell ( numPointsInCell, pointsInCell );
 
     TractType::Pointer singleTract = TractType::New();

@@ -32,10 +32,10 @@ namespace mitk
     vtkTypeMacro(vtkSimulationPolyDataMapper3D, vtkPolyDataMapper);
 
     using vtkPolyDataMapper::GetBounds;
-    double* GetBounds();
+    double* GetBounds() override;
 
-    void Render(vtkRenderer* renderer, vtkActor* actor);
-    void RenderPiece(vtkRenderer*, vtkActor*);
+    void Render(vtkRenderer* renderer, vtkActor* actor) override;
+    void RenderPiece(vtkRenderer*, vtkActor*) override;
     void SetSimulation(mitk::Simulation::Pointer simulation);
 
   private:

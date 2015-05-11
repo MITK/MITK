@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileInfo>
 #include <QDateTime>
 
-QmitkDTIAtlasAppApplicationPlugin* QmitkDTIAtlasAppApplicationPlugin::inst = 0;
+QmitkDTIAtlasAppApplicationPlugin* QmitkDTIAtlasAppApplicationPlugin::inst = nullptr;
 
 QmitkDTIAtlasAppApplicationPlugin::QmitkDTIAtlasAppApplicationPlugin()
 {

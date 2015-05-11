@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <limits>
 
 mitk::GeometryClipImageFilter::GeometryClipImageFilter()
-  : m_ClippingGeometry(NULL),
+  : m_ClippingGeometry(nullptr),
     m_ClipPartAboveGeometry(true),
     m_OutsideValue(0),
     m_AutoOutsideValue(false),
@@ -102,7 +102,7 @@ void mitk::GeometryClipImageFilter::GenerateOutputInformation()
   itkDebugMacro(<<"GenerateOutputInformation()");
 
   unsigned int i;
-  unsigned int *tmpDimensions = new unsigned int[input->GetDimension()];
+  auto tmpDimensions = new unsigned int[input->GetDimension()];
 
   for(i=0;i<input->GetDimension();++i)
     tmpDimensions[i]=input->GetDimension(i);
@@ -210,7 +210,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
   if((output->IsInitialized()==false) || (m_ClippingGeometry.IsNull()))
     return;
 
-  const PlaneGeometry * clippingGeometryOfCurrentTimeStep = NULL;
+  const PlaneGeometry * clippingGeometryOfCurrentTimeStep = nullptr;
 
   if(m_TimeClippingGeometry.IsNull())
   {
@@ -221,7 +221,7 @@ void mitk::GeometryClipImageFilter::GenerateData()
     clippingGeometryOfCurrentTimeStep = dynamic_cast<const PlaneGeometry*>(m_TimeClippingGeometry->GetGeometryForTimeStep(0).GetPointer());
   }
 
-  if(clippingGeometryOfCurrentTimeStep == NULL)
+  if(clippingGeometryOfCurrentTimeStep == nullptr)
     return;
 
   m_InputTimeSelector->SetInput(input);

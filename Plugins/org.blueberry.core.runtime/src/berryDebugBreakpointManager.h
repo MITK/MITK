@@ -33,7 +33,7 @@ public:
 
   static const std::string BREAKPOINTS_XML;
 
-  void AddSmartpointerBreakpoint(int smartPointerId, const Object* obj = 0);
+  void AddSmartpointerBreakpoint(int smartPointerId, const Object* obj = nullptr);
   void AddObjectBreakpoint(unsigned long objectTraceId);
 
   void RemoveSmartpointerBreakpoint(int smartPointerId);

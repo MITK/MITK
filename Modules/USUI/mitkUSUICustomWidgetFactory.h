@@ -38,8 +38,8 @@ public:
     */
   us::ServiceRegistration<QmitkUSAbstractCustomWidget> RegisterService(us::ModuleContext* context);
 
-  us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/);
-  void UngetService(us::Module*, const us::ServiceRegistrationBase&, const us::InterfaceMap& service);
+  us::InterfaceMap GetService(us::Module* /*module*/, const us::ServiceRegistrationBase& /*registration*/) override;
+  void UngetService(us::Module*, const us::ServiceRegistrationBase&, const us::InterfaceMap& service) override;
 
 private:
     QmitkUSAbstractCustomWidget* const m_Prototype;

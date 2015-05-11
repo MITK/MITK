@@ -58,7 +58,7 @@ void mitk::MultiStepper::Last() {
 
 void mitk::MultiStepper::SetPos(unsigned int pos) {
   Stepper::SetPos(pos);
-  for (StepperSet::iterator it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
+  for (auto it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
     unsigned int count = (*it)->GetSteps() * m_ScaleFactors[(*it)];
   if ((this->GetSteps() != 0 ) && ((*it)->GetSteps() != 0)) {
     (*it)->SetPos((pos * count / this->GetSteps() ) % (*it)->GetSteps()) ;
@@ -72,8 +72,8 @@ void mitk::MultiStepper::SetSteps(unsigned int /*steps*/) {
 
 void mitk::MultiStepper::UpdateStepCount() {
   m_Steps=0;
-  m_LargestRangeStepper = NULL;
-  for (StepperSet::iterator it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
+  m_LargestRangeStepper = nullptr;
+  for (auto it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
     unsigned int count = (*it)->GetSteps() * m_ScaleFactors[(*it)];
     if (count > m_Steps) {
        m_Steps = count;

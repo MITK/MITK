@@ -31,9 +31,9 @@ class StandardElementHandler : public ElementHandler
 {
 
 public:
-  SmartPointer<Expression> Create(ExpressionConverter* converter, SmartPointer<IConfigurationElement> element);
+  SmartPointer<Expression> Create(ExpressionConverter* converter, SmartPointer<IConfigurationElement> element) override;
 
-  SmartPointer<Expression> Create(ExpressionConverter* converter, Poco::XML::Element* element);
+  SmartPointer<Expression> Create(ExpressionConverter* converter, Poco::XML::Element* element) override;
 };
 
 }  // namespace berry

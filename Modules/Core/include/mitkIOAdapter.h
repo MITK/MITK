@@ -79,7 +79,7 @@ public:
     return ioProcessObject.GetPointer();
   }
 
-  virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
+  virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) override
   {
     return T::CanReadFile(filename, filePrefix, filePattern);
   }

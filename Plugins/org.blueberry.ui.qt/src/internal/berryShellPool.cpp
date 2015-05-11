@@ -31,9 +31,9 @@ void ShellPool::ShellClosed(const ShellEvent::Pointer& e)
     Shell::Pointer s = e->GetSource();
     IShellListener* l =  s->GetExtraShellListener();
 
-    if (l != 0)
+    if (l != nullptr)
     {
-      s->SetExtraShellListener(NULL);
+      s->SetExtraShellListener(nullptr);
       l->ShellClosed(e);
 
       // The shell can 'cancel' the close by setting

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  PyramidalRegistrationMethod::PyramidalRegistrationMethod() : m_Observer(NULL), m_Interpolator(0)
+  PyramidalRegistrationMethod::PyramidalRegistrationMethod() : m_Observer(nullptr), m_Interpolator(0)
   {
     m_OptimizerParameters = OptimizerParameters::New();
     m_TransformParameters = TransformParameters::New();

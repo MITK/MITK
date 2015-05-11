@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkKappaStatisticMetricView : public Qmit
 
 public:
 
-  QmitkKappaStatisticMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkKappaStatisticMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkKappaStatisticMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

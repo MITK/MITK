@@ -211,10 +211,10 @@ public:
   void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider);
 
   void SourceChanged(int sourcePriority,
-                     const QHash<QString, Object::ConstPointer>& sourceValuesByName);
+                     const QHash<QString, Object::ConstPointer>& sourceValuesByName) override;
 
   void SourceChanged(int sourcePriority, const QString& sourceName,
-                     Object::ConstPointer sourceValue);
+                     Object::ConstPointer sourceValue) override;
 
 };
 

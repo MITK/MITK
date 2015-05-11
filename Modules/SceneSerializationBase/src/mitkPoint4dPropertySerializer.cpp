@@ -36,7 +36,7 @@ class Point4dPropertySerializer : public BasePropertySerializer
     {
       if (const Point4dProperty* prop = dynamic_cast<const Point4dProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("point");
+        auto  element = new TiXmlElement("point");
         Point4D point = prop->GetValue();
         element->SetDoubleAttribute("x", point[0]);
         element->SetDoubleAttribute("y", point[1]);
@@ -44,18 +44,18 @@ class Point4dPropertySerializer : public BasePropertySerializer
         element->SetDoubleAttribute("t", point[3]);
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       Point4D v;
-      if ( element->QueryDoubleAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryDoubleAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryDoubleAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryDoubleAttribute( "t", &v[3] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryDoubleAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryDoubleAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryDoubleAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryDoubleAttribute( "t", &v[3] ) != TIXML_SUCCESS ) return nullptr;
 
      return Point4dProperty::New( v ).GetPointer();
     }

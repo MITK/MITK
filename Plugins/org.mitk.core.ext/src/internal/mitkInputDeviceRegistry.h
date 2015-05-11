@@ -46,12 +46,12 @@ namespace mitk
     /**
     * @see mitk::IInputDeviceRegistry::Find(const std::string& id)
     */
-    InputDeviceDescriptorPtr Find(const QString& id) const;
+    InputDeviceDescriptorPtr Find(const QString& id) const override;
 
     /**
     * @see mitk::IInputDeviceRegistry´::GetInputDevices()
     */
-    QList<InputDeviceDescriptorPtr> GetInputDevices() const;
+    QList<InputDeviceDescriptorPtr> GetInputDevices() const override;
 
   protected:
 

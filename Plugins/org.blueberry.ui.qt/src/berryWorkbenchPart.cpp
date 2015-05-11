@@ -41,7 +41,7 @@ public:
   : event(event)
   {}
 
-  void Run()
+  void Run() override
   {
     delegate->Execute(event);
   }
@@ -170,7 +170,7 @@ void WorkbenchPart::FirePropertyChanged(const QString& key,
 
   const ListenerList& listeners =
       partChangeEvents.propertyChange.GetListeners();
-  for (ListenerList::const_iterator iter = listeners.begin(); iter
+  for (auto iter = listeners.begin(); iter
       != listeners.end(); ++iter)
   {
     runnable->delegate = *iter;
@@ -190,7 +190,7 @@ void WorkbenchPart::FirePropertyChange(int propertyId)
 
   const ListenerList& listeners =
       partChangeEvents.propertyChange.GetListeners();
-  for (ListenerList::const_iterator iter = listeners.begin(); iter
+  for (auto iter = listeners.begin(); iter
       != listeners.end(); ++iter)
   {
     runnable->delegate = *iter;

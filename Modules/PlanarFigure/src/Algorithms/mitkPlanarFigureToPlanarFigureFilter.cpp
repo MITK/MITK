@@ -47,7 +47,7 @@ void mitk::PlanarFigureToPlanarFigureFilter::SetInput( unsigned int idx, const I
 const mitk::PlanarFigureToPlanarFigureFilter::InputType* mitk::PlanarFigureToPlanarFigureFilter::GetInput()
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const InputType*>(this->ProcessObject::GetInput(0));
 }
@@ -55,7 +55,7 @@ const mitk::PlanarFigureToPlanarFigureFilter::InputType* mitk::PlanarFigureToPla
 const mitk::PlanarFigureToPlanarFigureFilter::InputType* mitk::PlanarFigureToPlanarFigureFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < idx)
-    return NULL;
+    return nullptr;
 
   return static_cast<const InputType*>(this->ProcessObject::GetInput(idx));
 }
@@ -65,7 +65,7 @@ void mitk::PlanarFigureToPlanarFigureFilter::CreateOutputsForAllInputs()
   this->SetNumberOfIndexedOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);

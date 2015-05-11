@@ -29,7 +29,7 @@ static inline T* as(QmitkSceneTreeWidget::Base* base)
 template <class T>
 static inline bool is(QmitkSceneTreeWidget::Base* base)
 {
-  return dynamic_cast<T*>(base) != NULL;
+  return dynamic_cast<T*>(base) != nullptr;
 }
 
 template <class T1, class T2>
@@ -47,13 +47,13 @@ static inline bool is(QmitkSceneTreeWidget::Base* base)
 static inline bool isBaseInteractionForceField(QmitkSceneTreeWidget::Base* base)
 {
   sofa::core::behavior::BaseInteractionForceField* iff = dynamic_cast<sofa::core::behavior::BaseInteractionForceField*>(base);
-  return iff != NULL && iff->getMechModel1() != iff->getMechModel2();
+  return iff != nullptr && iff->getMechModel1() != iff->getMechModel2();
 }
 
 static inline bool isMechanicalMapping(QmitkSceneTreeWidget::Base* base)
 {
   sofa::core::BaseMapping* mm = dynamic_cast<sofa::core::BaseMapping*>(base);
-  return mm != NULL && mm->isMechanical();
+  return mm != nullptr && mm->isMechanical();
 }
 
 static QRgb GetColor(QmitkSceneTreeWidget::Base* base)
@@ -181,8 +181,8 @@ void QmitkSceneTreeWidget::clear()
 {
   QTreeWidgetItem* rootItem = this->topLevelItem(0);
 
-  if (rootItem != NULL)
-    this->removeChild(NULL, as<Node>(m_ItemBaseMap[rootItem]));
+  if (rootItem != nullptr)
+    this->removeChild(nullptr, as<Node>(m_ItemBaseMap[rootItem]));
 
   this->ClearMaps();
 
@@ -191,12 +191,12 @@ void QmitkSceneTreeWidget::clear()
 
 void QmitkSceneTreeWidget::addChild(Node* parent, Node* child)
 {
-  assert(child != NULL && "Child node is NULL!");
+  assert(child != nullptr && "Child node is NULL!");
   assert(!m_BaseItemMap.contains(child) && "TODO: Support nodes with multiple parents!");
 
   QTreeWidgetItem* item;
 
-  if (parent == NULL)
+  if (parent == nullptr)
   {
     item = new QTreeWidgetItem(QStringList() << GetName(child));
     this->addTopLevelItem(item);
@@ -215,12 +215,12 @@ void QmitkSceneTreeWidget::addChild(Node* parent, Node* child)
 
 void QmitkSceneTreeWidget::removeChild(Node* parent, Node* child)
 {
-  assert(child != NULL && "Child node is NULL!");
+  assert(child != nullptr && "Child node is NULL!");
   assert(m_BaseItemMap.contains(child) && "Child node has already been removed!");
 
   MutationListener::removeChild(parent, child);
 
-  if (parent == NULL)
+  if (parent == nullptr)
   {
     delete m_BaseItemMap[child];
   }
@@ -230,22 +230,22 @@ void QmitkSceneTreeWidget::removeChild(Node* parent, Node* child)
     m_BaseItemMap[parent]->removeChild(m_BaseItemMap[child]);
   }
 
-  this->RemoveFromMaps(child); 
+  this->RemoveFromMaps(child);
 }
 
 void QmitkSceneTreeWidget::moveChild(Node* previous, Node* parent, Node* child)
 {
-  if (previous == NULL)
+  if (previous == nullptr)
   {
     this->addChild(parent, child);
   }
-  else if (parent == NULL)
+  else if (parent == nullptr)
   {
     this->removeChild(previous, child);
   }
   else
   {
-    assert(child != NULL && "Child node is NULL!");
+    assert(child != nullptr && "Child node is NULL!");
     assert(m_BaseItemMap.contains(previous) && "Unknown previous parent node!");
     assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
     assert(m_BaseItemMap.contains(child) && "Unknown child node!");
@@ -257,8 +257,8 @@ void QmitkSceneTreeWidget::moveChild(Node* previous, Node* parent, Node* child)
 
 void QmitkSceneTreeWidget::addObject(Node* parent, BaseObject* object)
 {
-  assert(parent != NULL && "Parent node is NULL!");
-  assert(object != NULL && "Object is NULL!");
+  assert(parent != nullptr && "Parent node is NULL!");
+  assert(object != nullptr && "Object is NULL!");
   assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
   // assert(!m_BaseItemMap.contains(object) && "Object has already been added!");
 
@@ -275,30 +275,30 @@ void QmitkSceneTreeWidget::addObject(Node* parent, BaseObject* object)
 
 void QmitkSceneTreeWidget::removeObject(Node* parent, BaseObject* object)
 {
-  assert(parent != NULL && "Parent node is NULL!");
-  assert(object != NULL && "Object is NULL!");
+  assert(parent != nullptr && "Parent node is NULL!");
+  assert(object != nullptr && "Object is NULL!");
   assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
   assert(m_BaseItemMap.contains(object) && "Object has already been removed!");
 
   MutationListener::removeObject(parent, object);
 
   m_BaseItemMap[parent]->removeChild(m_BaseItemMap[object]);
-  this->RemoveFromMaps(object);  
+  this->RemoveFromMaps(object);
 }
 
 void QmitkSceneTreeWidget::moveObject(Node* previous, Node* parent, BaseObject* object)
 {
-  if (previous == NULL)
+  if (previous == nullptr)
   {
     this->addObject(parent, object);
   }
-  else if (parent == NULL)
+  else if (parent == nullptr)
   {
     this->removeObject(previous, object);
   }
   else
   {
-    assert(object != NULL && "Object is NULL!");
+    assert(object != nullptr && "Object is NULL!");
     assert(m_BaseItemMap.contains(previous) && "Unknown previous parent node!");
     assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
     assert(m_BaseItemMap.contains(object) && "Unknown object!");
@@ -310,8 +310,8 @@ void QmitkSceneTreeWidget::moveObject(Node* previous, Node* parent, BaseObject* 
 
 void QmitkSceneTreeWidget::addSlave(BaseObject* master, BaseObject* slave)
 {
-  assert(master != NULL && "Master object is NULL!");
-  assert(slave != NULL && "Slave object is NULL!");
+  assert(master != nullptr && "Master object is NULL!");
+  assert(slave != nullptr && "Slave object is NULL!");
   assert(m_BaseItemMap.contains(master) && "Unknown master object!");
   assert(!m_BaseItemMap.contains(slave) && "Slave object has already been added!");
 
@@ -325,30 +325,30 @@ void QmitkSceneTreeWidget::addSlave(BaseObject* master, BaseObject* slave)
 
 void QmitkSceneTreeWidget::removeSlave(BaseObject* master, BaseObject* slave)
 {
-  assert(master != NULL && "Master object is NULL!");
-  assert(slave != NULL && "Slave object is NULL!");
+  assert(master != nullptr && "Master object is NULL!");
+  assert(slave != nullptr && "Slave object is NULL!");
   assert(m_BaseItemMap.contains(master) && "Unknown master object!");
   assert(m_BaseItemMap.contains(slave) && "Slave object has already been removed!");
 
   MutationListener::removeSlave(master, slave);
 
   m_BaseItemMap[master]->removeChild(m_BaseItemMap[slave]);
-  this->RemoveFromMaps(slave);  
+  this->RemoveFromMaps(slave);
 }
 
 void QmitkSceneTreeWidget::moveSlave(BaseObject* previousMaster, BaseObject* master, BaseObject* slave)
 {
-  if (previousMaster == NULL)
+  if (previousMaster == nullptr)
   {
     this->addSlave(master, slave);
   }
-  else if (master == NULL)
+  else if (master == nullptr)
   {
     this->removeSlave(previousMaster, slave);
   }
   else
   {
-    assert(slave != NULL && "Slave object is NULL!");
+    assert(slave != nullptr && "Slave object is NULL!");
     assert(m_BaseItemMap.contains(previousMaster) && "Unknown previous master object!");
     assert(m_BaseItemMap.contains(master) && "Unknown master object!");
     assert(m_BaseItemMap.contains(slave) && "Unknown slave object!");
@@ -362,7 +362,7 @@ QmitkSceneTreeWidget::Base* QmitkSceneTreeWidget::GetBaseFromItem(QTreeWidgetIte
 {
   return m_ItemBaseMap.contains(item)
     ? m_ItemBaseMap[item]
-    : NULL;
+    : nullptr;
 }
 
 void QmitkSceneTreeWidget::ClearMaps()

@@ -22,13 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdlib.h>
 
 mitk::CompressedImageContainer::CompressedImageContainer()
-    : m_PixelType(NULL)
+    : m_PixelType(nullptr)
 {
 }
 
 mitk::CompressedImageContainer::~CompressedImageContainer()
 {
-  for (std::vector< std::pair<unsigned char*, unsigned long> >::iterator iter = m_ByteBuffers.begin();
+  for (auto iter = m_ByteBuffers.begin();
        iter != m_ByteBuffers.end();
        ++iter)
   {
@@ -38,7 +38,7 @@ mitk::CompressedImageContainer::~CompressedImageContainer()
 
 void mitk::CompressedImageContainer::SetImage( Image* image )
 {
-  for (std::vector< std::pair<unsigned char*, unsigned long> >::iterator iter = m_ByteBuffers.begin();
+  for (auto iter = m_ByteBuffers.begin();
        iter != m_ByteBuffers.end();
        ++iter)
   {
@@ -126,7 +126,7 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
 
 mitk::Image::Pointer mitk::CompressedImageContainer::GetImage()
 {
-  if (m_ByteBuffers.empty()) return NULL;
+  if (m_ByteBuffers.empty()) return nullptr;
 
   // uncompress image data, create an Image
   Image::Pointer image = Image::New();
@@ -137,7 +137,7 @@ mitk::Image::Pointer mitk::CompressedImageContainer::GetImage()
   image->Initialize( *m_PixelType, m_ImageDimension, dims ); // this IS needed, right ?? But it does allocate memory -> does create one big lump of memory (also in windows)
 
   unsigned int timeStep(0);
-  for (std::vector< std::pair<unsigned char*, unsigned long> >::iterator iter = m_ByteBuffers.begin();
+  for (auto iter = m_ByteBuffers.begin();
        iter != m_ByteBuffers.end();
        ++iter, ++timeStep)
   {

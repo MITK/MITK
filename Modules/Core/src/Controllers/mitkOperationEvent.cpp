@@ -142,7 +142,7 @@ mitk::OperationEvent::~OperationEvent()
 //##  swaps the Undo and Redo- operation and changes m_Reversed
 void mitk::OperationEvent::ReverseOperations()
 {
-  if (m_Operation == NULL)
+  if (m_Operation == nullptr)
     return;
 
   Operation *tempOperation = m_Operation;

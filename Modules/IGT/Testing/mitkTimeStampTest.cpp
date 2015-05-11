@@ -45,7 +45,7 @@ int mitkTimeStampTest(int /* argc */, char* /*argv*/[])
   mitk::IGTTimeStamp::GetInstance()->Stop(tester2);
 
   //create instance of singleton time stamp class
-  MITK_TEST_CONDITION_REQUIRED(mitk::IGTTimeStamp::CreateInstance() != (0), "Testing GetInstance() of Singleton" );
+  MITK_TEST_CONDITION_REQUIRED(mitk::IGTTimeStamp::CreateInstance() != (nullptr), "Testing GetInstance() of Singleton" );
 
   double timestampX = mitk::IGTTimeStamp::GetInstance()->GetElapsed();
   MITK_TEST_CONDITION_REQUIRED(timestampX==-1,"..Testing method GetCurrentTimeStamp().");

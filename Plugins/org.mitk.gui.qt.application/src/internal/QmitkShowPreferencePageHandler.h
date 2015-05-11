@@ -30,7 +30,7 @@ class QmitkShowPreferencePageHandler : public berry::AbstractHandler
 
 public:
 
-  berry::Object::Pointer Execute(const berry::SmartPointer<const berry::ExecutionEvent> &event);
+  berry::Object::Pointer Execute(const berry::SmartPointer<const berry::ExecutionEvent> &event) override;
 
 };
 

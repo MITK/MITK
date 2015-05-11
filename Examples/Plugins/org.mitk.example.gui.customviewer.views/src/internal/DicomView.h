@@ -58,7 +58,7 @@ public:
    * Widgets associated with unused functionality are being removed and DICOM import and data
    * storage transfer funcionality being connected to the appropriate slots.
    */
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
 protected Q_SLOTS:
 
@@ -71,7 +71,7 @@ protected Q_SLOTS:
 
 protected:
 
-  void SetFocus();
+  void SetFocus() override;
 
   Ui::QmitkDicomViewControls m_Controls;
 

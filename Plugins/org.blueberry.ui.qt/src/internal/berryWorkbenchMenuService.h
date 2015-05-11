@@ -131,38 +131,38 @@ public:
 
   ~WorkbenchMenuService();
 
-  void Dispose();
+  void Dispose() override;
 
-  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider);
+  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider) override;
 
   void ReadRegistry();
 
-  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider);
+  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider) override;
 
   void UpdateManagers();
 
-  FactoryListType GetAdditionsForURI(const QUrl& uri);
+  FactoryListType GetAdditionsForURI(const QUrl& uri) override;
 
   /*
    * @see IMenuService#AddContributionFactory(AbstractContributionFactory)
    */
-  void AddContributionFactory(const SmartPointer<AbstractContributionFactory>& factory);
+  void AddContributionFactory(const SmartPointer<AbstractContributionFactory>& factory) override;
 
   /*
    * @see IMenuService#RemoveContributionFactory(AbstractContributionFactory*)
    */
-  void RemoveContributionFactory(const SmartPointer<AbstractContributionFactory> &factory);
+  void RemoveContributionFactory(const SmartPointer<AbstractContributionFactory> &factory) override;
 
   /*
    * @see org.eclipse.ui.internal.menus.IMenuService#populateMenu(org.eclipse.jface.action.ContributionManager,
    *      org.eclipse.ui.internal.menus.MenuLocationURI)
    */
-  void PopulateContributionManager(ContributionManager* mgr, const QString& uri);
+  void PopulateContributionManager(ContributionManager* mgr, const QString& uri) override;
 
   void PopulateContributionManager(IServiceLocator* serviceLocatorToUse,
                                    const QSet<SmartPointer<IEvaluationReference> >& restriction,
                                    ContributionManager* mgr,
-                                   const QString& uri, bool recurse);
+                                   const QString& uri, bool recurse) override;
 
   void AddContributionsToManager(IServiceLocator* serviceLocatorToUse,
                                  const QSet<SmartPointer<IEvaluationReference> >& restriction,
@@ -173,7 +173,7 @@ public:
   /*
    * @see IMenuService#GetCurrentState()
    */
-  SmartPointer<IEvaluationContext> GetCurrentState() const;
+  SmartPointer<IEvaluationContext> GetCurrentState() const override;
 
   /*
    * @see IMenuService#RegisterVisibleWhen(IContributionItem, Expression)
@@ -181,18 +181,18 @@ public:
   void RegisterVisibleWhen(const SmartPointer<IContributionItem>& item,
                            const SmartPointer<Expression>& visibleWhen,
                            QSet<SmartPointer<IEvaluationReference> >& restriction,
-                           const QString& identifierID);
+                           const QString& identifierID) override;
 
   /*
    * @see IMenuService#UnregisterVisibleWhen(IContributionItem)
    */
   void UnregisterVisibleWhen(const SmartPointer<IContributionItem>& item,
-                             QSet<SmartPointer<IEvaluationReference> >& restriction);
+                             QSet<SmartPointer<IEvaluationReference> >& restriction) override;
 
   /*
    * @see IMenuService#ReleaseMenu(ContributionManager)
    */
-  void ReleaseContributions(ContributionManager* mgr);
+  void ReleaseContributions(ContributionManager* mgr) override;
 
   /**
    * Process additions to the menus that occur through ExtensionRegistry changes
@@ -220,7 +220,7 @@ public:
    * @see InternalMenuService#PopulateContributionManager(ContributionManager, QString, bool)
    */
   void PopulateContributionManager(ContributionManager* mgr,
-                                   const QString& uri, bool recurse);
+                                   const QString& uri, bool recurse) override;
 
 protected:
 
@@ -244,7 +244,7 @@ private:
   //SmartPointer<IActivityManagerListener> GetActivityManagerListener();
 
   using IPropertyChangeListener::PropertyChange;
-  void PropertyChange(const PropertyChangeEvent::Pointer& event);
+  void PropertyChange(const PropertyChangeEvent::Pointer& event) override;
 
   IPropertyChangeListener* GetServiceListener();
 

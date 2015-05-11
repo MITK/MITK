@@ -31,7 +31,7 @@ SlaveHandlerService::SlaveHandlerService(IHandlerService* parentHandlerService,
   : defaultExpression(defaultExpression)
   , parent(parentHandlerService)
 {
-  if (parentHandlerService == NULL)
+  if (parentHandlerService == nullptr)
   {
     throw ctkInvalidArgumentException("The parent handler service cannot be null");
   }

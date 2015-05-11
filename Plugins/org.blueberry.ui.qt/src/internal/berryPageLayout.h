@@ -224,14 +224,14 @@ private:
    * @param id the perspective id
    */
 public:
-  void AddPerspectiveShortcut(const QString& id);
+  void AddPerspectiveShortcut(const QString& id) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addPlaceholder(java.lang.String, int, float, java.lang.String)
    */
 public:
   void AddPlaceholder(const QString& viewId, int relationship, float ratio,
-      const QString& refId);
+      const QString& refId) override;
 
   /**
    * Checks whether the given id is a valid placeholder id.
@@ -246,7 +246,7 @@ public:
    * @see org.blueberry.ui.IPageLayout#addShowInPart(java.lang.String)
    */
 public:
-  void AddShowInPart(const QString& id);
+  void AddShowInPart(const QString& id) override;
 
   /**
    * Adds a view to the Show View menu. The id must name a view extension
@@ -255,14 +255,14 @@ public:
    * @param id the view id
    */
 public:
-  void AddShowViewShortcut(const QString& id);
+  void AddShowViewShortcut(const QString& id) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addView(java.lang.String, int, float, java.lang.String)
    */
 public:
   void AddView(const QString& viewId, int relationship, float ratio,
-      const QString& refId);
+      const QString& refId) override;
 
   /**
    * Convenience method to allow setting the initial minimized
@@ -300,7 +300,7 @@ public:
    */
 public:
   IFolderLayout::Pointer CreateFolder(const QString& folderId,
-      int relationship, float ratio, const QString& refId);
+      int relationship, float ratio, const QString& refId) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#createPlaceholderFolder(java.lang.String, int, float, java.lang.String)
@@ -308,7 +308,7 @@ public:
 public:
   IPlaceholderFolderLayout::Pointer CreatePlaceholderFolder(
       const QString& folderId, int relationship, float ratio,
-      const QString& refId);
+      const QString& refId) override;
 
   /**
    * Create a new <code>LayoutPart</code>.
@@ -333,7 +333,7 @@ private:
    * @see org.blueberry.ui.IPageLayout#getDescriptor()
    */
 public:
-  IPerspectiveDescriptor::Pointer GetDescriptor();
+  IPerspectiveDescriptor::Pointer GetDescriptor() override;
 
   /**
    * @return an identifier for the editor area. The editor area is
@@ -341,7 +341,7 @@ public:
    * used as a reference part for other views.
    */
 public:
-  QString GetEditorArea();
+  QString GetEditorArea() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#getEditorReuseThreshold()
@@ -422,7 +422,7 @@ public:
    * @see org.blueberry.ui.IPageLayout#isEditorAreaVisible()
    */
 public:
-  bool IsEditorAreaVisible();
+  bool IsEditorAreaVisible() override;
 
   /**
    * Trim the ratio so that direct manipulation of parts is easy.
@@ -443,7 +443,7 @@ private:
    * @see org.blueberry.ui.IPageLayout#setEditorAreaVisible(boolean)
    */
 public:
-  void SetEditorAreaVisible(bool showEditorArea);
+  void SetEditorAreaVisible(bool showEditorArea) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#setEditorReuseThreshold(int)
@@ -456,13 +456,13 @@ public:
    * @see org.blueberry.ui.IPageLayout#setFixed(boolean)
    */
 public:
-  void SetFixed(bool fixed);
+  void SetFixed(bool fixed) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#getFixed()
    */
 public:
-  bool IsFixed();
+  bool IsFixed() override;
 
   /**
    * Map the folder part containing the given view ID.
@@ -541,14 +541,14 @@ public:
    */
 public:
   void AddStandaloneView(const QString& viewId, bool showTitle,
-      int relationship, float ratio, const QString& refId);
+      int relationship, float ratio, const QString& refId) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPageLayout#addStandaloneViewPlaceholder(java.lang.String, int, float, java.lang.String, boolean)
    */
 public:
   void AddStandaloneViewPlaceholder(const QString& viewId,
-      int relationship, float ratio, const QString& refId, bool showTitle);
+      int relationship, float ratio, const QString& refId, bool showTitle) override;
 
   /*
    * (non-Javadoc)
@@ -557,7 +557,7 @@ public:
    * @since 3.0
    */
 public:
-  IViewLayout::Pointer GetViewLayout(const QString& viewId);
+  IViewLayout::Pointer GetViewLayout(const QString& viewId) override;
 
   /**
    * @since 3.0
@@ -578,7 +578,7 @@ public:
    * @see org.blueberry.ui.IPageLayout#getFolderForView(java.lang.String)
    */
 public:
-  IPlaceholderFolderLayout::Pointer GetFolderForView(const QString& viewId);
+  IPlaceholderFolderLayout::Pointer GetFolderForView(const QString& viewId) override;
 };
 
 }

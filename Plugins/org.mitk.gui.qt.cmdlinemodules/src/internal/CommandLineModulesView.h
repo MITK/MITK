@@ -58,13 +58,13 @@ public:
    * \brief Main method, called by framework to create the GUI at the right time.
    * \param parent The parent QWidget, as this class itself is not a QWidget subclass.
    */
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /**
    * \brief Called by the framework to indicate that the preferences have changed.
    * \param prefs not used, as we call RetrievePreferenceValues().
    */
-  void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
+  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
 
 protected Q_SLOTS:
 
@@ -96,7 +96,7 @@ protected:
    * \brief Called by framework to set the focus on the right widget
    * when this view has focus, so currently, thats the ctkMenuCombo box.
    */
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
 private slots:
 

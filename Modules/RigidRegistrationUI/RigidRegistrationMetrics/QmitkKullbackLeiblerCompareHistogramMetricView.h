@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkKullbackLeiblerCompareHistogramMetricV
 
 public:
 
-  QmitkKullbackLeiblerCompareHistogramMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkKullbackLeiblerCompareHistogramMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkKullbackLeiblerCompareHistogramMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

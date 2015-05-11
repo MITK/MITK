@@ -49,22 +49,22 @@ public:
    */
   ExtensionTracker(IExtensionRegistry* theRegistry);
 
-  void RegisterHandler(IExtensionChangeHandler* handler, const IExtensionPointFilter& filter);
+  void RegisterHandler(IExtensionChangeHandler* handler, const IExtensionPointFilter& filter) override;
 
-  void RegisterHandler(IExtensionChangeHandler* handler, const QString& extensionPointId);
+  void RegisterHandler(IExtensionChangeHandler* handler, const QString& extensionPointId) override;
 
-  void UnregisterHandler(IExtensionChangeHandler* handler);
+  void UnregisterHandler(IExtensionChangeHandler* handler) override;
 
   void RegisterObject(const SmartPointer<IExtension>& element,
-                      const SmartPointer<Object>& object, ReferenceType referenceType);
+                      const SmartPointer<Object>& object, ReferenceType referenceType) override;
 
-  QList<SmartPointer<Object> > GetObjects(const SmartPointer<IExtension>& element) const;
+  QList<SmartPointer<Object> > GetObjects(const SmartPointer<IExtension>& element) const override;
 
-  void Close();
+  void Close() override;
 
-  void UnregisterObject(const SmartPointer<IExtension>& extension, const SmartPointer<Object>& object);
+  void UnregisterObject(const SmartPointer<IExtension>& extension, const SmartPointer<Object>& object) override;
 
-  QList<SmartPointer<Object> > UnregisterObject(const SmartPointer<IExtension>& extension);
+  QList<SmartPointer<Object> > UnregisterObject(const SmartPointer<IExtension>& extension) override;
 
   /**
    * Return an instance of filter matching all changes for the given extension point.

@@ -59,7 +59,7 @@ EditorReference::EditorReference(EditorManager* man, IMemento::Pointer memento) 
   }
   else
   {
-    editorState = 0;
+    editorState = nullptr;
   }
   //  String id = memento.getString(IWorkbenchConstants.TAG_ID);
   //  String title = memento.getString(IWorkbenchConstants.TAG_TITLE);
@@ -345,7 +345,7 @@ IWorkbenchPart::Pointer EditorReference::CreatePart()
         //StatusUtil.handleStatus(e, StatusManager.SHOW
         //    | StatusManager.LOG);
         WorkbenchPlugin::Log("Error creating editor");
-        return IWorkbenchPart::Pointer(0);
+        return IWorkbenchPart::Pointer(nullptr);
       }
 
       result = part.Cast<IWorkbenchPart> ();
@@ -549,7 +549,7 @@ IEditorPart::Pointer EditorReference::GetEmptyEditor(
     //StatusManager.getManager().handle(
     //    StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
     BERRY_ERROR << e.what() << std::endl;
-    return IEditorPart::Pointer(0);
+    return IEditorPart::Pointer(nullptr);
   }
 
   this->part = part.Cast<IWorkbenchPart> ();

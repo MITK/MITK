@@ -104,7 +104,7 @@ void PartService::FirePartOpened(IWorkbenchPartReference::Pointer ref)
 
 IWorkbenchPart::Pointer PartService::GetActivePart()
 {
-  return activePart.Expired() ? IWorkbenchPart::Pointer(0) : activePart.Lock()->GetPart(false);
+  return activePart.Expired() ? IWorkbenchPart::Pointer(nullptr) : activePart.Lock()->GetPart(false);
 }
 
 IWorkbenchPartReference::Pointer PartService::GetActivePartReference()

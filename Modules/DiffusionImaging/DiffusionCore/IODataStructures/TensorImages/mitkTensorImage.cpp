@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::TensorImage::TensorImage() : Image()
 {
-  m_RgbImage = 0;
+  m_RgbImage = nullptr;
 }
 
 mitk::TensorImage::~TensorImage()

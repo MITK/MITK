@@ -53,9 +53,9 @@ public:
   /* (non-Javadoc)
    * @see AbstractTabItem#getBounds()
    */
-  QRect GetBounds();
+  QRect GetBounds() override;
 
-  void SetInfo(const PartInfo& info);
+  void SetInfo(const PartInfo& info) override;
 
   bool GetShowClose() const;
 
@@ -63,17 +63,17 @@ public:
 
   QWidget* GetCloseButton();
 
-  void Dispose();
+  void Dispose() override;
 
   /* (non-Javadoc)
    * @see AbstractTabItem#getData()
    */
-  Object::Pointer GetData();
+  Object::Pointer GetData() override;
 
   /* (non-Javadoc)
    * @see AbstractTabItem#setData(java.lang.Object)
    */
-  void SetData(Object::Pointer d);
+  void SetData(Object::Pointer d) override;
 
 };
 

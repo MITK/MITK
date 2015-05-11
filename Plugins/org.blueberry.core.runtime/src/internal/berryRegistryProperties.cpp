@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 QHash<QString,QString> RegistryProperties::registryProperties;
-ctkPluginContext* RegistryProperties::context = NULL;
+ctkPluginContext* RegistryProperties::context = nullptr;
 
 void RegistryProperties::SetContext(ctkPluginContext* context)
 {

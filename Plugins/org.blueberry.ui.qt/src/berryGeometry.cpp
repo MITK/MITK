@@ -93,9 +93,9 @@ int Geometry::GetClosestSide(const QRect& boundary, const QPoint& toTest)
   int closestSide = Constants::LEFT;
   int closestDistance = std::numeric_limits<int>::max();
 
-  for (unsigned int idx = 0; idx < 4; idx++)
+  for (auto side : sides)
   {
-    int side = sides[idx];
+
 
     int distance = GetDistanceFromEdge(boundary, toTest, side);
 

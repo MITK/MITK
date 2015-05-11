@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRealTimeClock.h"
 
-mitk::IGTTimeStamp::Pointer mitk::IGTTimeStamp::s_Instance = NULL;
+mitk::IGTTimeStamp::Pointer mitk::IGTTimeStamp::s_Instance = nullptr;
 
 mitk::IGTTimeStamp::IGTTimeStamp() : itk::Object()
 , m_Time(-1.0), m_ReferenceTime(0.0)

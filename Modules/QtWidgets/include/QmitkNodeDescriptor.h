@@ -89,7 +89,7 @@ public:
 
 public slots:
   /// Called when an action was destroyed
-  void ActionDestroyed ( QObject * obj = 0 );
+  void ActionDestroyed ( QObject * obj = nullptr );
 protected:
   QString m_ClassName;
   QString m_PathToIcon;

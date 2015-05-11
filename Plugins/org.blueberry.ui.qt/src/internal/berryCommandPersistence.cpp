@@ -261,7 +261,7 @@ void CommandPersistence::ReadParameterTypesFromRegistry(
      * null indicates there is no converter
      */
     const QSharedPointer<IParameterValueConverter> parameterValueConverter(
-        (converter.isNull()) ? NULL : new ParameterValueConverterProxy(configurationElement));
+        (converter.isNull()) ? nullptr : new ParameterValueConverterProxy(configurationElement));
 
     const ParameterType::Pointer parameterType = commandService->GetParameterType(parameterTypeId);
     parameterType->Define(type, parameterValueConverter);
@@ -327,7 +327,7 @@ void CommandPersistence::Read()
 CommandPersistence::CommandPersistence(ICommandService* const commandService)
   : commandService(commandService)
 {
-  if (commandService == NULL)
+  if (commandService == nullptr)
   {
     throw ctkInvalidArgumentException("The command service cannot be null");
   }

@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkVersorRigid3DTransformView : public Qm
 
 public:
 
-  QmitkVersorRigid3DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkVersorRigid3DTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkVersorRigid3DTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

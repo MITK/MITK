@@ -80,13 +80,13 @@ namespace mitk
       try
       {
         const std::string& locale = "C";
-        const std::string& currLocale = setlocale( LC_ALL, NULL );
+        const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
         if ( locale.compare(currLocale)!=0 )
         {
           try
           {
-            MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+            MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, nullptr) << " to '" << locale << "'";
             setlocale(LC_ALL, locale.c_str());
           }
           catch(...)
@@ -189,7 +189,7 @@ namespace mitk
 
         try
         {
-          MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+          MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, nullptr) << " to '" << currLocale << "'";
           setlocale(LC_ALL, currLocale.c_str());
         }
         catch(...)

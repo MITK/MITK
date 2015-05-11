@@ -50,7 +50,7 @@ Display* PlatformUI::CreateDisplay()
 IWorkbench*
 PlatformUI::GetWorkbench()
 {
-  if (Workbench::GetInstance() == 0)
+  if (Workbench::GetInstance() == nullptr)
   {
     // app forgot to call createAndRunWorkbench beforehand
     throw Poco::IllegalStateException("Workbench has not been created yet.");
@@ -61,7 +61,7 @@ PlatformUI::GetWorkbench()
 bool
 PlatformUI::IsWorkbenchRunning()
 {
-  return Workbench::GetInstance() != 0
+  return Workbench::GetInstance() != nullptr
          && Workbench::GetInstance()->IsRunning();
 }
 

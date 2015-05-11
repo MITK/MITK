@@ -86,7 +86,7 @@ namespace mitk {
     //## otherwise the method will retrieve the default (singleton) instance.
     //## the optional parameter should be used in a conference to avoid a
     //## feedback
-    static bool MapEvent(Event* event, GlobalInteraction* globalInteraction = NULL, int mitkPostedEventID=0 );
+    static bool MapEvent(Event* event, GlobalInteraction* globalInteraction = nullptr, int mitkPostedEventID=0 );
 
     //##Documentation
     //## Searches for the event within stateEvent in the internal map of event descriptions

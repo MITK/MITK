@@ -41,13 +41,13 @@ public:
 
   QtDisplay();
 
-  bool InDisplayThread();
+  bool InDisplayThread() override;
 
-  void AsyncExec(Poco::Runnable*);
-  void SyncExec(Poco::Runnable*);
+  void AsyncExec(Poco::Runnable*) override;
+  void SyncExec(Poco::Runnable*) override;
 
-  int RunEventLoop();
-  void ExitEventLoop(int code);
+  int RunEventLoop() override;
+  void ExitEventLoop(int code) override;
 
 signals:
 
@@ -61,7 +61,7 @@ protected:
    * and should create the Display instance and initialize
    * variables holding implementation specific thread data.
    */
-  void CreateDisplay();
+  void CreateDisplay() override;
 
 protected slots:
 

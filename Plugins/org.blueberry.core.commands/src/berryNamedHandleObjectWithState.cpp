@@ -74,7 +74,7 @@ State::Pointer NamedHandleObjectWithState::GetState(
 {
   if (states.empty())
   {
-    return State::Pointer(0);
+    return State::Pointer(nullptr);
   }
 
   QHash<QString, State::Pointer>::const_iterator iter = states.find(stateId);

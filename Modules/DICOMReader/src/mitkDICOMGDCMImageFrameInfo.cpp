@@ -49,11 +49,11 @@ std::string
 mitk::DICOMGDCMImageFrameInfo
 ::GetTagValueAsString(const DICOMTag& tag) const
 {
-  gdcm::Scanner::TagToValue::const_iterator mappedValue = m_TagForValue.find( gdcm::Tag(tag.GetGroup(), tag.GetElement()) );
+  auto mappedValue = m_TagForValue.find( gdcm::Tag(tag.GetGroup(), tag.GetElement()) );
 
   if (mappedValue != m_TagForValue.end())
   {
-    if (mappedValue->second != NULL)
+    if (mappedValue->second != nullptr)
     {
       std::string s(mappedValue->second);
       try

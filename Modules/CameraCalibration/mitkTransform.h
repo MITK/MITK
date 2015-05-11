@@ -121,7 +121,7 @@ namespace mitk {
     ///
     /// read from xml
     ///
-    void FromXML(TiXmlElement* elem);
+    void FromXML(TiXmlElement* elem) override;
     ///
     /// read csv file
     ///
@@ -243,7 +243,7 @@ namespace mitk {
     ///
     /// create xml representation
     ///
-    void ToXML(TiXmlElement* elem) const;
+    void ToXML(TiXmlElement* elem) const override;
     ///
     /// create string representation
     ///

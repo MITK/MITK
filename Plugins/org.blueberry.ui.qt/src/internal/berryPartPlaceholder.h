@@ -44,12 +44,12 @@ public:
     /**
      * Creates the SWT control
      */
-    void CreateControl(QWidget* parent);
+    void CreateControl(QWidget* parent) override;
 
     /**
      * Get the part control.  This method may return null.
      */
-    QWidget* GetControl();
+    QWidget* GetControl() override;
 
     /**
      * Returns whether this placeholder has a wildcard.
@@ -58,7 +58,7 @@ public:
      */
     bool HasWildCard();
 
-    bool IsPlaceHolder() const;
+    bool IsPlaceHolder() const override;
 };
 
 }

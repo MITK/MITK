@@ -35,7 +35,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigidRegistrationMetricsGUIBase : publ
 
 public:
 
-  QmitkRigidRegistrationMetricsGUIBase(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkRigidRegistrationMetricsGUIBase(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkRigidRegistrationMetricsGUIBase();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() = 0;

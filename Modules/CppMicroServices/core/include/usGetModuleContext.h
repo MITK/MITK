@@ -57,7 +57,7 @@ static inline ModuleContext* GetModuleContext()
   US_WARN << "Module '" << US_STR(US_MODULE_NAME) << "' unknown. "
              "The calling module probably misses a US_MODULE_NAME compile definition "
              "and/or a call to US_INITIALIZE_MODULE in one of its source files.";
-  return 0;
+  return nullptr;
 }
 
 US_END_NAMESPACE

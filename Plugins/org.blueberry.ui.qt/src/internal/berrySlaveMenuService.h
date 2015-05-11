@@ -61,38 +61,38 @@ public:
                    IServiceLocator* serviceLocator,
                    const QSet<SmartPointer<IEvaluationReference> >& restrictions);
 
-  void PopulateContributionManager(ContributionManager* mgr, const QString& uri);
+  void PopulateContributionManager(ContributionManager* mgr, const QString& uri) override;
 
   void PopulateContributionManager(ContributionManager* mgr,
-                                   const QString& uri, bool recurse);
+                                   const QString& uri, bool recurse) override;
 
-  SmartPointer<IEvaluationContext> GetCurrentState() const;
+  SmartPointer<IEvaluationContext> GetCurrentState() const override;
 
-  void AddContributionFactory(const SmartPointer<AbstractContributionFactory>& cache);
+  void AddContributionFactory(const SmartPointer<AbstractContributionFactory>& cache) override;
 
-  void ReleaseContributions(ContributionManager* mgr);
+  void ReleaseContributions(ContributionManager* mgr) override;
 
-  void RemoveContributionFactory(const SmartPointer<AbstractContributionFactory>& factory);
+  void RemoveContributionFactory(const SmartPointer<AbstractContributionFactory>& factory) override;
 
-  void Dispose();
+  void Dispose() override;
 
-  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider);
+  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider) override;
 
-  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider);
+  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider) override;
 
-  QList<SmartPointer<AbstractContributionFactory> > GetAdditionsForURI(const QUrl& uri);
+  QList<SmartPointer<AbstractContributionFactory> > GetAdditionsForURI(const QUrl& uri) override;
 
   void RegisterVisibleWhen(const SmartPointer<IContributionItem>& item,
                            const SmartPointer<Expression>& visibleWhen,
                            QSet<SmartPointer<IEvaluationReference> >& restriction,
-                           const QString& identifierID);
+                           const QString& identifierID) override;
 
   void UnregisterVisibleWhen(const SmartPointer<IContributionItem>& item,
-                             QSet<SmartPointer<IEvaluationReference> >& restriction);
+                             QSet<SmartPointer<IEvaluationReference> >& restriction) override;
 
   void PopulateContributionManager(
       IServiceLocator* serviceLocatorToUse, const QSet<SmartPointer<IEvaluationReference> >& restriction,
-      ContributionManager* mgr, const QString& uri, bool recurse);
+      ContributionManager* mgr, const QString& uri, bool recurse) override;
 };
 
 }

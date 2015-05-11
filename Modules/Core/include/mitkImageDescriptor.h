@@ -53,7 +53,7 @@ class MITKCORE_EXPORT ImageDescriptor : public itk::Object
        @param ptype Pixel Type
        @param name channel's name
     */
-    void AddNewChannel( mitk::PixelType ptype, const char* name = 0);
+    void AddNewChannel( mitk::PixelType ptype, const char* name = nullptr);
 
     /** \brief Initialize the image descriptor by the dimensions */
     void Initialize( const unsigned int* dims, const unsigned int dim);

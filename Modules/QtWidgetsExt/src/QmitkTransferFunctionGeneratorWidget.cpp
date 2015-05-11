@@ -32,7 +32,7 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
     Qt::WindowFlags f) :
   QWidget(parent, f), deltaScale(1.0), deltaMax(1024), deltaMin(1)
 {
-  histoGramm = NULL;
+  histoGramm = nullptr;
 
   this->setupUi(this);
 
@@ -367,7 +367,7 @@ QmitkTransferFunctionGeneratorWidget::~QmitkTransferFunctionGeneratorWidget()
 
 void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
 {
-  histoGramm = NULL;
+  histoGramm = nullptr;
 
   if (node)
   {
@@ -404,7 +404,7 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
   }
   else
   {
-    tfpToChange = 0;
+    tfpToChange = nullptr;
     m_InfoPreset->setText( QString( "" ) );
 
   }

@@ -92,7 +92,7 @@ public:
   bool GetStatisticsUpdateSuccessFlag();
   /*!
   /brief Method called once the thread is executed. */
-  void run();
+  void run() override;
 
   std::string GetLastErrorMessage();
 

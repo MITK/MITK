@@ -36,7 +36,7 @@ namespace berry
       , m_Storage(_Storage)
   {
     // root node if parent is 0
-    if (_Parent != 0)
+    if (_Parent != nullptr)
     {
       // save as child in parent
       _Parent->m_Children.push_back(Preferences::Pointer(this));
@@ -79,7 +79,7 @@ namespace berry
 
   bool Preferences::Equals(const Preferences* rhs)  const
   {
-    if(rhs == 0)
+    if(rhs == nullptr)
       return false;
 
     return (this->m_Path == rhs->m_Path);

@@ -41,7 +41,7 @@ class QmitkImageMaskingWidget : public QmitkSegmentationUtilityWidget
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
+  explicit QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkImageMaskingWidget();
@@ -76,7 +76,7 @@ private:
 
   /** @brief Adds a new data object to the DataStorage.*/
   void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::Image> segmentation,
-                        const std::string& name, mitk::DataNode::Pointer parent = NULL);
+                        const std::string& name, mitk::DataNode::Pointer parent = nullptr);
 
   Ui::QmitkImageMaskingWidgetControls m_Controls;
 };

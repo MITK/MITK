@@ -112,7 +112,7 @@ namespace mitk {
     NodeDisplacementFilter();
     virtual ~NodeDisplacementFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /**
      * \brief Creates an Geometry 3D Object from an AffineTransformation.

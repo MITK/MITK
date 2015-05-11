@@ -51,7 +51,7 @@ berry::PreferencesService::PreferencesService(const QString& _PreferencesDir)
     int pos = prefFile.lastIndexOf(defaultName);
     QString userName = prefFile.left(pos);
     // set the storage to 0 (will be loaded later)
-    m_PreferencesStorages[userName] = AbstractPreferencesStorage::Pointer(0);
+    m_PreferencesStorages[userName] = AbstractPreferencesStorage::Pointer(nullptr);
   }
 }
 
@@ -75,7 +75,7 @@ berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences(const
 
 berry::IPreferences::Pointer berry::PreferencesService::GetUserPreferences_unlocked(const QString& name)
 {
-  IPreferences::Pointer userPrefs(0);
+  IPreferences::Pointer userPrefs(nullptr);
 
   QHash<QString, AbstractPreferencesStorage::Pointer>::const_iterator it
       = m_PreferencesStorages.find(name);

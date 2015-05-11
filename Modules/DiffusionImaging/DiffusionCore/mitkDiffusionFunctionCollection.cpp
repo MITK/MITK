@@ -99,7 +99,7 @@ std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const BValueMa
 {
 
   IndiciesVector directioncontainer;
-  BValueMap::const_iterator mapIterator = refBValueMap.begin();
+  auto mapIterator = refBValueMap.begin();
 
   if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
     mapIterator++; //skip bzero Values
@@ -113,7 +113,7 @@ std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const BValueMa
       unsigned int wntIndex = currentShell.back();
       currentShell.pop_back();
 
-      IndiciesVector::iterator containerIt = directioncontainer.begin();
+      auto containerIt = directioncontainer.begin();
       bool directionExist = false;
       while(containerIt != directioncontainer.end())
       {
@@ -137,14 +137,14 @@ std::vector<unsigned int> mitk::gradients::GetAllUniqueDirections(const BValueMa
 
 bool mitk::gradients::CheckForDifferingShellDirections(const BValueMap & refBValueMap, GradientDirectionContainerType::ConstPointer refGradientsContainer)
 {
-  BValueMap::const_iterator mapIterator = refBValueMap.begin();
+  auto mapIterator = refBValueMap.begin();
 
   if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
     mapIterator++; //skip bzero Values
 
   for( ; mapIterator != refBValueMap.end(); mapIterator++){
 
-    BValueMap::const_iterator mapIterator_2 = refBValueMap.begin();
+    auto mapIterator_2 = refBValueMap.begin();
     if(refBValueMap.find(0) != refBValueMap.end() && refBValueMap.size() > 1)
       mapIterator_2++; //skip bzero Values
 
@@ -212,7 +212,7 @@ mitk::gradients::GradientDirectionContainerType::Pointer mitk::gradients::Create
     const GradientDirectionContainerType *origninalGradentcontainer)
 {
   mitk::gradients::GradientDirectionContainerType::Pointer directioncontainer = mitk::gradients::GradientDirectionContainerType::New();
-  BValueMap::const_iterator mapIterator = bValueMap.begin();
+  auto mapIterator = bValueMap.begin();
 
   if(bValueMap.find(0) != bValueMap.end() && bValueMap.size() > 1){
     mapIterator++; //skip bzero Values

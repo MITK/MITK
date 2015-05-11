@@ -54,7 +54,7 @@ private:
 };
 
 mitk::ConnectomicsStatisticsCalculator::ConnectomicsStatisticsCalculator()
-  : m_Network( 0 )
+  : m_Network( nullptr )
   , m_NumberOfVertices( 0 )
   , m_NumberOfEdges( 0 )
   , m_AverageDegree( 0.0 )

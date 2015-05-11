@@ -67,7 +67,7 @@ namespace berry
     /**
      * Prints out the absolute path of the preference node.
      */
-    QString ToString() const;
+    QString ToString() const override;
 
     /**
      * Returns if this node and his silblings have to be rewritten persistently
@@ -107,12 +107,12 @@ namespace berry
     /**
      * \see IPreferences::AbsolutePath()
      */
-    virtual QString AbsolutePath() const;
+    virtual QString AbsolutePath() const override;
 
     /**
      * \see IPreferences::ChildrenNames()
      */
-    virtual QStringList ChildrenNames() const;
+    virtual QStringList ChildrenNames() const override;
 
     /**
      * \see IPreferences::ChildrenNames()
@@ -122,122 +122,122 @@ namespace berry
     /**
      * \see IPreferences::Clear()
      */
-    virtual void Clear();
+    virtual void Clear() override;
 
     /**
      * \see IPreferences::Flush()
      */
-    virtual void Flush();
+    virtual void Flush() override;
 
     /**
      * \see IPreferences::Get()
      */
-    virtual QString Get(const QString& key, const QString& def) const;
+    virtual QString Get(const QString& key, const QString& def) const override;
 
     /**
      * \see IPreferences::GetBool()
      */
-    virtual bool GetBool(const QString& key, bool def) const;
+    virtual bool GetBool(const QString& key, bool def) const override;
 
     /**
      * \see IPreferences::GetByteArray()
      */
-    virtual QByteArray GetByteArray(const QString& key, const QByteArray& def) const;
+    virtual QByteArray GetByteArray(const QString& key, const QByteArray& def) const override;
 
     /**
      * \see IPreferences::GetDouble()
      */
-    virtual double GetDouble(const QString& key, double def) const;
+    virtual double GetDouble(const QString& key, double def) const override;
 
     /**
      * \see IPreferences::GetFloat()
      */
-    virtual float GetFloat(const QString& key, float def) const;
+    virtual float GetFloat(const QString& key, float def) const override;
 
     /**
      * \see IPreferences::GetInt()
      */
-    virtual int GetInt(const QString& key, int def) const;
+    virtual int GetInt(const QString& key, int def) const override;
 
     /**
      * \see IPreferences::GetLong()
      */
-    virtual long GetLong(const QString& key, long def) const;
+    virtual long GetLong(const QString& key, long def) const override;
 
     /**
      * \see IPreferences::Keys()
      */
-    QStringList Keys() const;
+    QStringList Keys() const override;
 
     /**
      * \see IPreferences::Name()
      */
-    virtual QString Name() const;
+    virtual QString Name() const override;
 
     /**
      * \see IPreferences::Node()
      */
-    virtual IPreferences::Pointer Node(const QString& pathName);
+    virtual IPreferences::Pointer Node(const QString& pathName) override;
 
     /**
      * \see IPreferences::NodeExists()
      */
-    virtual bool NodeExists(const QString& pathName) const;
+    virtual bool NodeExists(const QString& pathName) const override;
 
     /**
      * \see IPreferences::Parent()
      */
-    virtual IPreferences::Pointer Parent() const;
+    virtual IPreferences::Pointer Parent() const override;
 
     /**
      * \see IPreferences::Put()
      */
-    virtual void Put(const QString& key, const QString& value);
+    virtual void Put(const QString& key, const QString& value) override;
 
     /**
      * \see IPreferences::PutByteArray()
      */
-    virtual void PutByteArray(const QString& key, const QByteArray& value);
+    virtual void PutByteArray(const QString& key, const QByteArray& value) override;
 
     /**
      * \see IPreferences::PutBool()
      */
-    virtual void PutBool(const QString& key, bool value);
+    virtual void PutBool(const QString& key, bool value) override;
 
     /**
      * \see IPreferences::PutDouble()
      */
-    virtual void PutDouble(const QString& key, double value);
+    virtual void PutDouble(const QString& key, double value) override;
 
     /**
      * \see IPreferences::Sync()
      */
-    virtual void PutFloat(const QString& key, float value);
+    virtual void PutFloat(const QString& key, float value) override;
 
     /**
      * \see IPreferences::PutInt()
      */
-    virtual void PutInt(const QString& key, int value);
+    virtual void PutInt(const QString& key, int value) override;
 
     /**
      * \see IPreferences::PutLong()
      */
-    virtual void PutLong(const QString& key, long value);
+    virtual void PutLong(const QString& key, long value) override;
 
     /**
      * \see IPreferences::Remove()
      */
-    virtual void Remove(const QString& key);
+    virtual void Remove(const QString& key) override;
 
     /**
      * \see IPreferences::RemoveNode()
      */
-    virtual void RemoveNode();
+    virtual void RemoveNode() override;
 
     /**
      * \see IPreferences::Sync()
      */
-    virtual void Sync();
+    virtual void Sync() override;
 
     //# End of IPreferences methods
 

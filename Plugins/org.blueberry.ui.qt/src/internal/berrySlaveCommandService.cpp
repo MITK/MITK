@@ -34,7 +34,7 @@ SlaveCommandService::SlaveCommandService(ICommandService* parent, const QString&
   , fScopingName(scopeName)
   , fScopingValue(scopeValue)
 {
-  if (parent == NULL)
+  if (parent == nullptr)
   {
     throw ctkInvalidArgumentException("The parent command service must not be null");
   }

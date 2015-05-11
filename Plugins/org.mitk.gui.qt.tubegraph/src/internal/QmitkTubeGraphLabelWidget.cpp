@@ -46,7 +46,7 @@ void QmitkTubeGraphLabelWidget::InitWidget()
   m_ColoringPushButton->setStyleSheet( QString("* { background-color: rgb(0,0,0)}"));
   m_ColoringPushButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  QHBoxLayout* layout =  new QHBoxLayout;
+  auto   layout =  new QHBoxLayout;
 
   layout->addWidget(m_VisibilityCheckBox);
   layout->addWidget(m_LabelPushButton);
@@ -80,7 +80,7 @@ mitk::Color* QmitkTubeGraphLabelWidget::GetLabelColor()
 {
   //return the background color of the button
   const QColor color = m_ColoringPushButton->palette().color(QPalette::Button);
-  mitk::Color* rgb = new mitk::Color();
+  auto   rgb = new mitk::Color();
   rgb[0] = color.red(); rgb[1] = color.green(); rgb[2] = color.blue();
   return rgb;
 }

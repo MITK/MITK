@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkScaleTransformView : public QmitkRigid
 
 public:
 
-  QmitkScaleTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkScaleTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkScaleTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

@@ -34,11 +34,11 @@ public:
   HelpSearchView();
   ~HelpSearchView();
 
-  void SetFocus();
+  void SetFocus() override;
 
 protected:
 
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 
@@ -55,7 +55,7 @@ private Q_SLOTS:
 
 private:
 
-  bool eventFilter(QObject* o, QEvent *e);
+  bool eventFilter(QObject* o, QEvent *e) override;
   void keyPressEvent(QKeyEvent *keyEvent);
 
 private:

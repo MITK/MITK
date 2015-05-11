@@ -113,7 +113,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
    */
-  void CreatePartControl(QWidget* parent);
+  void CreatePartControl(QWidget* parent) override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#dispose()
@@ -123,29 +123,29 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#getTitleImage()
    */
-  QIcon GetTitleImage() const;
+  QIcon GetTitleImage() const override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.WorkbenchPart#GetPartName()
    */
-  QString GetPartName() const;
+  QString GetPartName() const override;
 
-  void Init(IEditorSite::Pointer site, IEditorInput::Pointer input);
+  void Init(IEditorSite::Pointer site, IEditorInput::Pointer input) override;
 
-  void DoSave(/*IProgressMonitor monitor*/);
+  void DoSave(/*IProgressMonitor monitor*/) override;
 
-  void DoSaveAs();
+  void DoSaveAs() override;
 
-  bool IsDirty() const;
+  bool IsDirty() const override;
 
-  bool IsSaveAsAllowed() const;
+  bool IsSaveAsAllowed() const override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.IWorkbenchPart#setFocus()
    */
-  void SetFocus();
+  void SetFocus() override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IViewPart#saveState(org.eclipse.ui.IMemento)

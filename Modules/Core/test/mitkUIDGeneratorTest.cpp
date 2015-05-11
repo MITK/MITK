@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void newGeneratorInstancesHeapTest()
 {
-    mitk::UIDGenerator* uidGen1 = new mitk::UIDGenerator("UID_",8);
+    auto  uidGen1 = new mitk::UIDGenerator("UID_",8);
     mitk::UIDGenerator* uidGen2 = uidGen1;
     std::string uid1_1, uid2_1;
 
@@ -39,7 +39,7 @@ void newGeneratorInstancesHeapTest()
 
 void multipleUIDsFromSameGeneratorTest(int /*UIDlength*/)
 {
-    mitk::UIDGenerator* uidGen = new mitk::UIDGenerator("UID_",8);
+    auto  uidGen = new mitk::UIDGenerator("UID_",8);
     std::string uid1, uid2;
     uid1 = uidGen->GetUID();
     uid2 = uidGen->GetUID();

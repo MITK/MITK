@@ -142,7 +142,7 @@ namespace mitk {
     * The function is called by the individual mapper (mostly in the ApplyProperties() or ApplyAllProperties()
     * method).
     */
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor = NULL) = 0;
+    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor = nullptr) = 0;
 
 
     /** \brief Set default values of properties used by this mapper
@@ -153,7 +153,7 @@ namespace mitk {
     * \param renderer defines which property list of node is used
     * (default: \a NULL, i.e. default property list)
     */
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false);
 
     /** \brief Returns the current time step as calculated from the renderer */
     int GetTimestep() const { return m_TimeStep; }

@@ -33,11 +33,11 @@ public:
   ~MyApplicationPlugin();
 
   //! [0]
-  void start(ctkPluginContext* context)
+  void start(ctkPluginContext* context) override
   {
     // Get a service reference for the Config Admin service
     ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
-    ctkConfigurationAdmin* configAdmin = 0;
+    ctkConfigurationAdmin* configAdmin = nullptr;
     if (cmRef)
     {
       configAdmin = context->getService<ctkConfigurationAdmin>(cmRef);
@@ -67,12 +67,12 @@ public:
   }
   //! [0]
 
-  void stop(ctkPluginContext *context);
+  void stop(ctkPluginContext *context) override;
 
   //! [1]
   void requestHelp(ctkPluginContext* context)
   {
-    if (context == 0)
+    if (context == nullptr)
     {
       // Warn that the plugin context is zero
       return;
@@ -101,13 +101,13 @@ public:
     }
 
     ctkServiceReference eventAdminRef = context->getServiceReference<ctkEventAdmin>();
-    ctkEventAdmin* eventAdmin = 0;
+    ctkEventAdmin* eventAdmin = nullptr;
     if (eventAdminRef)
     {
       eventAdmin = context->getService<ctkEventAdmin>(eventAdminRef);
     }
 
-    if (eventAdmin == 0)
+    if (eventAdmin == nullptr)
     {
       // Warn that the ctkEventAdmin service was not found
     }

@@ -49,7 +49,7 @@ public:
   // works as if the micro service class had used the Q_INTERFACES macro in
   // its declaration. Now we can successfully do a
   // qobject_cast<mitk::SomeMicroServiceInterface>(lightObjectToQObjectAdapter)
-  void* qt_metacast(const char *_clname)
+  void* qt_metacast(const char *_clname) override
   {
     if (!_clname) return 0;
     if (!strcmp(_clname, "InterfaceMapToQObjectAdapter"))

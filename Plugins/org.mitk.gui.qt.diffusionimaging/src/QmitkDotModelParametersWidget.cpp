@@ -23,7 +23,7 @@ const std::string QmitkDotModelParametersWidget::VIEW_ID = "org.mitk.views.DotMo
 QmitkDotModelParametersWidget::QmitkDotModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
-    m_Controls = NULL;
+    m_Controls = nullptr;
     this->CreateQtPartControl(this);
 }
 

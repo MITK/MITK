@@ -83,7 +83,7 @@ mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<mitk::Image*>(itk::ProcessObject::GetInput(0));
@@ -94,7 +94,7 @@ const mitk::Image *mitk::ImageToItk<TOutputImage>::GetInput() const
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::Image*>(itk::ProcessObject::GetInput(0));
@@ -125,15 +125,15 @@ template<class TOutputImage>
   mitk::ImageAccessorBase* imageAccess;
   if (m_ConstInput)
   {
-    imageAccess = new mitk::ImageReadAccessor(input, static_cast<const ImageDataItem*>(NULL), m_Options);
+    imageAccess = new mitk::ImageReadAccessor(input, static_cast<const ImageDataItem*>(nullptr), m_Options);
   }
   else
   {
-    imageAccess = new mitk::ImageWriteAccessor(input, static_cast<const ImageDataItem*>(NULL), m_Options);
+    imageAccess = new mitk::ImageWriteAccessor(input, static_cast<const ImageDataItem*>(nullptr), m_Options);
   }
 
   // hier wird momentan wohl nur der erste Channel verwendet??!!
-  if(imageAccess->GetData() == NULL)
+  if(imageAccess->GetData() == nullptr)
   {
     itkWarningMacro(<< "no image data to import in ITK image");
 
@@ -287,7 +287,7 @@ template<class TOutputImage>
 template<class TOutputImage>
 void mitk::ImageToItk<TOutputImage>::CheckInput(const mitk::Image* input) const
 {
-  if(input == NULL)
+  if(input == nullptr)
   {
     itkExceptionMacro( << "image is null" );
   }

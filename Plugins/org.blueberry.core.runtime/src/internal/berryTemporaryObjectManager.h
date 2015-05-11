@@ -38,15 +38,15 @@ public:
   TemporaryObjectManager(const QHash<int, SmartPointer<RegistryObject> >& actualObjects,
                          RegistryObjectManager* parent);
 
-  SmartPointer<Handle> GetHandle(int id, short type) const;
+  SmartPointer<Handle> GetHandle(int id, short type) const override;
 
-  QList<SmartPointer<Handle> > GetHandles(const QList<int>& ids, short type) const;
+  QList<SmartPointer<Handle> > GetHandles(const QList<int>& ids, short type) const override;
 
-  SmartPointer<RegistryObject> GetObject(int id, short type) const;
+  SmartPointer<RegistryObject> GetObject(int id, short type) const override;
 
-  QList<SmartPointer<RegistryObject> > GetObjects(const QList<int>& values, short type) const;
+  QList<SmartPointer<RegistryObject> > GetObjects(const QList<int>& values, short type) const override;
 
-  void Close();
+  void Close() override;
 };
 
 }

@@ -33,7 +33,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionCanvas : public QWidget
 
 public:
 
-  QmitkTransferFunctionCanvas( QWidget * parent=0, Qt::WindowFlags f = 0 );
+  QmitkTransferFunctionCanvas( QWidget * parent=nullptr, Qt::WindowFlags f = nullptr );
 
   mitk::SimpleHistogram* GetHistogram()
   {

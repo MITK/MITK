@@ -33,7 +33,7 @@ public:
   /**
   * @brief Constructor
   */
-  QmitkJSWebPage(QObject *parent=0);
+  QmitkJSWebPage(QObject *parent=nullptr);
 
   /**
   * @brief Destructor

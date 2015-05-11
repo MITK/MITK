@@ -22,7 +22,7 @@ void
 IPartListener::Events
 ::AddListener(IPartListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   Types t = l->GetPartEventTypes();
 
@@ -48,7 +48,7 @@ void
 IPartListener::Events
 ::RemoveListener(IPartListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   partActivated -= Delegate(l, &IPartListener::PartActivated);
   partBroughtToTop -= Delegate(l, &IPartListener::PartBroughtToTop);

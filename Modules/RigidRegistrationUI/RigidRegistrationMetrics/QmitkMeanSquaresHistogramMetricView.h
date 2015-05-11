@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkMeanSquaresHistogramMetricView : publi
 
 public:
 
-  QmitkMeanSquaresHistogramMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkMeanSquaresHistogramMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkMeanSquaresHistogramMetricView();
 
  virtual mitk::MetricParameters::MetricType GetMetricType() override;

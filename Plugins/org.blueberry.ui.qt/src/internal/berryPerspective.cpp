@@ -65,7 +65,7 @@ void Perspective::Init(WorkbenchPage::Pointer page)
   editorHidden = false;
   editorAreaState = IStackPresentationSite::STATE_RESTORED;
   fixed = false;
-  presentation = 0;
+  presentation = nullptr;
   shouldHideEditorsOnActivate = false;
   this->page = page.GetPointer();
   this->editorArea = page->GetEditorPresentation()->GetLayoutPart();
@@ -108,7 +108,7 @@ void Perspective::CreatePresentation(PerspectiveDescriptor::Pointer persp)
 Perspective::~Perspective()
 {
   // Get rid of presentation.
-  if (presentation == 0)
+  if (presentation == nullptr)
   {
     DisposeViewRefs();
     return;
@@ -118,9 +118,9 @@ Perspective::~Perspective()
 
   // Release each view.
   QList<IViewReference::Pointer> refs(this->GetViewReferences());
-  for (QList<IViewReference::Pointer>::size_type i = 0, length = refs.size(); i < length; i++)
+  for (auto & ref : refs)
   {
-    this->GetViewFactory()->ReleaseView(refs[i]);
+    this->GetViewFactory()->ReleaseView(ref);
   }
 
   mapIDtoViewLayoutRec.clear();
@@ -181,7 +181,7 @@ IViewReference::Pointer Perspective::FindView(const QString& id, const QString& 
       return ref;
     }
   }
-  return IViewReference::Pointer(0);
+  return IViewReference::Pointer(nullptr);
 }
 
 QWidget* Perspective::GetClientComposite()
@@ -222,7 +222,7 @@ ViewFactory* Perspective::GetViewFactory()
 QList<IViewReference::Pointer> Perspective::GetViewReferences()
 {
   // Get normal views.
-  if (presentation == 0)
+  if (presentation == nullptr)
   {
     return QList<IViewReference::Pointer>();
   }
@@ -408,13 +408,13 @@ void Perspective::UnableToOpenPerspective(PerspectiveDescriptor::Pointer persp,
   QString msg = "Unable to read workbench state.";
   if (status == "")
   {
-    QMessageBox::critical(NULL, title, msg);
+    QMessageBox::critical(nullptr, title, msg);
   }
   else
   {
     //TODO error dialog
     //ErrorDialog.openError((Shell) 0, title, msg, status);
-    QMessageBox::critical(NULL, title, msg + "\n" + status);
+    QMessageBox::critical(nullptr, title, msg + "\n" + status);
   }
 }
 
@@ -579,7 +579,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
 void Perspective::OnActivate()
 {
   // Update editor area state.
-  if (editorArea->GetControl() != 0)
+  if (editorArea->GetControl() != nullptr)
   {
     bool visible = this->IsEditorAreaVisible();
     bool inTrim = editorAreaState == IStackPresentationSite::STATE_MINIMIZED;
@@ -787,7 +787,7 @@ bool Perspective::RestoreState(IMemento::Pointer memento)
   bool result = true;
 
   // Create persp descriptor.
-  descriptor = new PerspectiveDescriptor("", "", PerspectiveDescriptor::Pointer(0));
+  descriptor = new PerspectiveDescriptor("", "", PerspectiveDescriptor::Pointer(nullptr));
   //result.add(descriptor.restoreState(memento));
   result &= descriptor->RestoreState(memento);
   PerspectiveDescriptor::Pointer desc = WorkbenchPlugin::GetDefault()->
@@ -872,7 +872,7 @@ bool Perspective::RestoreState()
   bool result = true;
 
   IMemento::Pointer memento = this->memento;
-  this->memento = 0;
+  this->memento = nullptr;
 
   const IMemento::Pointer boundsMem(memento->GetChild(WorkbenchConstants::TAG_WINDOW));
   if (boundsMem)
@@ -1510,7 +1510,7 @@ void Perspective::ShowEditorAreaLocal()
 
   // Replace the part holder with the editor area.
   presentation->GetLayout()->Replace(editorHolder, editorArea);
-  editorHolder = 0;
+  editorHolder = nullptr;
 }
 
 void Perspective::SetEditorAreaState(int newState)
@@ -1715,7 +1715,7 @@ IViewPart::Pointer Perspective::ShowView(const QString& viewId, const QString& s
   //}
 
   // Ensure that the newly showing part is enabled
-  if (pane != 0 && pane->GetControl() != 0)
+  if (pane != 0 && pane->GetControl() != nullptr)
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetEnabled(pane->GetControl(), true);
 
   return part;
@@ -1801,7 +1801,7 @@ bool Perspective::UseNewMinMax(Perspective::Pointer activePerspective)
 //  return false;
 
   IPresentationFactory* factory = WorkbenchPlugin::GetDefault()->GetPresentationFactory();
-  if (factory == 0)
+  if (factory == nullptr)
   return false;
 
   // Ok, we should be good to go, return the pref

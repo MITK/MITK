@@ -99,7 +99,7 @@ IEditorDescriptor::Pointer FileEditorMapping::GetDefaultEditor()
 
   if (editors.size() == 0) // || WorkbenchActivityHelper.restrictUseOf(editors.get(0)))
   {
-    return IEditorDescriptor::Pointer(0);
+    return IEditorDescriptor::Pointer(nullptr);
   }
 
   return editors.front();

@@ -134,7 +134,7 @@ public:
    *
    * @return name of the registry contributor
    */
-  QString GetName() const;
+  QString GetName() const override;
 
 };
 

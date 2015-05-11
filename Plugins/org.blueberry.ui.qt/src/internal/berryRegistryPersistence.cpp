@@ -38,9 +38,9 @@ namespace {
 class ErrorExpression : public berry::Expression
 {
 public:
-  berry::EvaluationResult::ConstPointer Evaluate(berry::IEvaluationContext* /*context*/) const
+  berry::EvaluationResult::ConstPointer Evaluate(berry::IEvaluationContext* /*context*/) const override
   {
-    return berry::EvaluationResult::ConstPointer(0);
+    return berry::EvaluationResult::ConstPointer(nullptr);
   }
 };
 
@@ -57,7 +57,7 @@ public:
     : registryPersistence(registryPersistence)
   {}
 
-  void run()
+  void run() override
   {
     registryPersistence->Read();
   }
@@ -198,7 +198,7 @@ SmartPointer<ParameterizedCommand> RegistryPersistence::ReadParameterizedCommand
                                          ATT_COMMAND_ID, warningsToLog, message, id);
   if (commandId.isNull())
   {
-    return ParameterizedCommand::Pointer(0);
+    return ParameterizedCommand::Pointer(nullptr);
   }
 
   const Command::Pointer command = commandService->GetCommand(commandId);

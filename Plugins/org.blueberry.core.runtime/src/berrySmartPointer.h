@@ -54,7 +54,7 @@ public:
 
   /** Constructor  */
   SmartPointer() :
-    m_Pointer(0)
+    m_Pointer(nullptr)
   {
 #if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
@@ -108,7 +108,7 @@ public:
 #endif
 
     this->UnRegister();
-    m_Pointer = 0;
+    m_Pointer = nullptr;
   }
 
   template<class Other>
@@ -132,45 +132,45 @@ public:
 
   ObjectType & operator*() const
   {
-    poco_assert( m_Pointer != 0 );
+    poco_assert( m_Pointer != nullptr );
     return *m_Pointer;
   }
 
   /** Test if the pointer has been initialized */
   bool IsNotNull() const
   {
-    return m_Pointer != 0;
+    return m_Pointer != nullptr;
   }
   bool IsNull() const
   {
-    return m_Pointer == 0;
+    return m_Pointer == nullptr;
   }
 
   typedef ObjectType * Self::*unspecified_bool_type;
 
   operator unspecified_bool_type () const
   {
-    return m_Pointer == 0 ? 0: &Self::m_Pointer;
+    return m_Pointer == nullptr ? nullptr: &Self::m_Pointer;
   }
 
   /** Template comparison operators. */
   template<typename R>
   bool operator ==(const R* o) const
   {
-    return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
+    return (m_Pointer == nullptr ? o == nullptr : (o && m_Pointer->operator==(o)));
   }
 
   template<typename R>
   bool operator ==(const SmartPointer<R>& r) const
   {
     const R* o = r.GetPointer();
-    return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
+    return (m_Pointer == nullptr ? o == nullptr : (o && m_Pointer->operator==(o)));
   }
 
   bool operator ==(int r) const
   {
     if (r == 0)
-      return m_Pointer == 0;
+      return m_Pointer == nullptr;
 
     throw std::invalid_argument("Can only compare to 0");
   }
@@ -190,7 +190,7 @@ public:
   bool operator !=(int r) const
   {
     if (r == 0)
-      return m_Pointer != 0;
+      return m_Pointer != nullptr;
 
     throw std::invalid_argument("Can only compare to 0");
   }
@@ -220,7 +220,7 @@ public:
   bool operator <(const SmartPointer<R>& r) const
   {
     const R* o = r.GetPointer();
-    return m_Pointer == 0 ? o == 0 : o && m_Pointer->operator<(o);
+    return m_Pointer == nullptr ? o == nullptr : o && m_Pointer->operator<(o);
   }
 
   /** Comparison of pointers. Greater than comparison.  */

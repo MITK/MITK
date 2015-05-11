@@ -58,7 +58,7 @@ static void TestBasicFunctionality()
   internalTrackingTool->Enable();
   MITK_TEST_CONDITION((internalTrackingTool->IsEnabled()==true),"Testing of Enable()");
 
-  srand(time(NULL));
+  srand(time(nullptr));
   // generate a random position to test Set/GetPosition()
   mitk::Point3D position;
   position[0] = rand()%1000;

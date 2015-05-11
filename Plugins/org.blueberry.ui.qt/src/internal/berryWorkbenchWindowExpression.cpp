@@ -30,7 +30,7 @@ WorkbenchWindowExpression::WorkbenchWindowExpression(IWorkbenchWindow* window)
 
 void WorkbenchWindowExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
-  if (window != NULL)
+  if (window != nullptr)
   {
     info->AddVariableNameAccess(ISources::ACTIVE_WORKBENCH_WINDOW_NAME());
   }
@@ -48,7 +48,7 @@ bool WorkbenchWindowExpression::operator==(const Object* object) const
 
 SmartPointer<const EvaluationResult> WorkbenchWindowExpression::Evaluate(IEvaluationContext* context) const
 {
-  if (window != NULL)
+  if (window != nullptr)
   {
     Object::ConstPointer value = context->GetVariable(ISources::ACTIVE_WORKBENCH_WINDOW_NAME());
     if (value == window)

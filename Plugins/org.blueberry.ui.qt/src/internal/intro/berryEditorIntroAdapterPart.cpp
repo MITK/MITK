@@ -91,7 +91,7 @@ void EditorIntroAdapterPart::Init(IEditorSite::Pointer site,
     introPart->AddPropertyListener(propChangeListener.data());
     introSite
         = IIntroSite::Pointer(new IntroPartAdapterSite(site, workbench->GetIntroDescriptor()));
-    introPart->Init(introSite, IMemento::Pointer(0));
+    introPart->Init(introSite, IMemento::Pointer(nullptr));
   }
   catch (CoreException& e)
   {

@@ -46,11 +46,11 @@ class UltrasoundSupport : public QmitkAbstractView
 
 public:
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   UltrasoundSupport();
   virtual ~UltrasoundSupport();

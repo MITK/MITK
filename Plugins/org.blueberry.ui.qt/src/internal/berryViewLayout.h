@@ -45,32 +45,32 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.IViewLayout#getShowTitle()
    */
-  bool GetShowTitle();
+  bool GetShowTitle() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IViewLayout#isCloseable()
    */
-  bool IsCloseable();
+  bool IsCloseable() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IViewLayout#isMoveable()
    */
-  bool IsMoveable();
+  bool IsMoveable() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IViewLayout#isStandalone()
    */
-  bool IsStandalone();
+  bool IsStandalone() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IViewLayout#setCloseable(boolean)
    */
-  void SetCloseable(bool closeable);
+  void SetCloseable(bool closeable) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IViewLayout#setMoveable(boolean)
    */
-  void SetMoveable(bool moveable);
+  void SetMoveable(bool moveable) override;
 
 };
 

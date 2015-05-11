@@ -40,10 +40,10 @@ protected:
 
   void ApplyRemove(IExtensionChangeHandler* handler,
                    const SmartPointer<IExtension>& removedExtension,
-                   const QList<SmartPointer<Object> >& objects);
+                   const QList<SmartPointer<Object> >& objects) override;
 
   void ApplyAdd(IExtensionChangeHandler* handler,
-                const SmartPointer<IExtension>& addedExtension);
+                const SmartPointer<IExtension>& addedExtension) override;
 };
 
 }

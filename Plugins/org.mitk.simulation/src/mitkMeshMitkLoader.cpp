@@ -30,7 +30,7 @@ static mitk::DataStorage::Pointer GetDataStorage()
 {
   mitk::IDataStorageService* dataStorageService = mitk::org_mitk_simulation_Activator::GetService<mitk::IDataStorageService>();
 
-  if (dataStorageService != NULL)
+  if (dataStorageService != nullptr)
   {
     mitk::IDataStorageReference::Pointer dataStorageReference = dataStorageService->GetDefaultDataStorage();
 
@@ -38,7 +38,7 @@ static mitk::DataStorage::Pointer GetDataStorage()
       return dataStorageReference->GetDataStorage();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 template <class T>
@@ -47,7 +47,7 @@ typename T::Pointer GetData(const std::string& name)
   mitk::DataStorage::Pointer dataStorage = GetDataStorage();
 
   if (dataStorage.IsNull())
-    return NULL;
+    return nullptr;
 
   typename mitk::TNodePredicateDataType<T>::Pointer predicate = mitk::TNodePredicateDataType<T>::New();
   mitk::DataStorage::SetOfObjects::ConstPointer subset = dataStorage->GetSubset(predicate);
@@ -65,7 +65,7 @@ typename T::Pointer GetData(const std::string& name)
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 mitk::MeshMitkLoader::MeshMitkLoader()
@@ -87,7 +87,7 @@ bool mitk::MeshMitkLoader::canLoad()
 
   vtkPolyData* polyData = surface->GetVtkPolyData();
 
-  if (polyData == NULL || polyData->GetNumberOfCells() == 0)
+  if (polyData == nullptr || polyData->GetNumberOfCells() == 0)
     return false;
 
   return true;

@@ -53,7 +53,7 @@ private:
 
 protected:
 
-  QString GetInitialScopeId();
+  QString GetInitialScopeId() override;
 
 public:
 

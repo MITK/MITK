@@ -25,7 +25,7 @@ IDropTargetListener::~IDropTargetListener()
 
 void IDropTargetListener::Events::AddListener(IDropTargetListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   Types t = l->GetDropTargetEventTypes();
 
@@ -41,7 +41,7 @@ void IDropTargetListener::Events::AddListener(IDropTargetListener* l)
 
 void IDropTargetListener::Events::RemoveListener(IDropTargetListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   dragEnter -= DragEnterDelegate(l, &IDropTargetListener::DragEnterEvent);
   dragLeave -= DragLeaveDelegate(l, &IDropTargetListener::DragLeaveEvent);

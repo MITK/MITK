@@ -75,7 +75,7 @@ public:
     * If a null pointer is given for 'controlInterface' all gui control elements
     * will be disabled.
     */
-  explicit QmitkUSControlsBModeWidget(mitk::USControlInterfaceBMode::Pointer controlInterface, QWidget *parent = 0);
+  explicit QmitkUSControlsBModeWidget(mitk::USControlInterfaceBMode::Pointer controlInterface, QWidget *parent = nullptr);
   ~QmitkUSControlsBModeWidget();
 
 private:

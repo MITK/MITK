@@ -34,11 +34,11 @@ public:
 
   QtWorkbenchPageTweaklet();
 
-  QWidget* CreateClientComposite(QWidget* pageControl);
-  QWidget* CreatePaneControl(QWidget* parent);
+  QWidget* CreateClientComposite(QWidget* pageControl) override;
+  QWidget* CreatePaneControl(QWidget* parent) override;
 
-  Object::Pointer CreateStatusPart(QWidget* parent, const QString& title, const QString& msg);
-  IEditorPart::Pointer CreateErrorEditorPart(const QString& partName, const QString& msg);
+  Object::Pointer CreateStatusPart(QWidget* parent, const QString& title, const QString& msg) override;
+  IEditorPart::Pointer CreateErrorEditorPart(const QString& partName, const QString& msg) override;
 
 };
 

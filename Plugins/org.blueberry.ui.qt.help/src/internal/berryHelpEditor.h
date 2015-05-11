@@ -42,33 +42,33 @@ public:
   HelpEditor();
   ~HelpEditor();
 
-  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
+  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input) override;
 
-  void SetFocus();
+  void SetFocus() override;
 
-  void DoSave() {}
-  void DoSaveAs() {}
-  bool IsDirty() const { return false; }
-  bool IsSaveAsAllowed() const { return false; }
+  void DoSave() override {}
+  void DoSaveAs() override {}
+  bool IsDirty() const override { return false; }
+  bool IsSaveAsAllowed() const override { return false; }
 
   QWebPage* GetQWebPage() const;
 
-  IPartListener::Events::Types GetPartEventTypes() const;
-  void PartDeactivated(const IWorkbenchPartReference::Pointer& /*partRef*/);
+  IPartListener::Events::Types GetPartEventTypes() const override;
+  void PartDeactivated(const IWorkbenchPartReference::Pointer& /*partRef*/) override;
 
-  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const;
+  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const override;
   void PerspectiveActivated(const SmartPointer<IWorkbenchPage>& page,
-                            const IPerspectiveDescriptor::Pointer& perspective);
+                            const IPerspectiveDescriptor::Pointer& perspective) override;
   void PerspectiveDeactivated(const SmartPointer<IWorkbenchPage>& page,
-                              const IPerspectiveDescriptor::Pointer& perspective);
+                              const IPerspectiveDescriptor::Pointer& perspective) override;
 
 protected:
 
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
   void DoSetInput(IEditorInput::Pointer input);
-  void SetInputWithNotify(IEditorInput::Pointer input);
-  void SetInput(IEditorInput::Pointer input);
+  void SetInputWithNotify(IEditorInput::Pointer input) override;
+  void SetInput(IEditorInput::Pointer input) override;
 
 private Q_SLOTS:
 

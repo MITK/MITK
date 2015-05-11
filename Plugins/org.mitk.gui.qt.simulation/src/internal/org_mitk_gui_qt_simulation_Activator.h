@@ -32,8 +32,8 @@ namespace mitk
   public:
     static ctkPluginContext* GetContext();
 
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext*);
+    void start(ctkPluginContext* context) override;
+    void stop(ctkPluginContext*) override;
 
   private:
     static ctkPluginContext* Context;

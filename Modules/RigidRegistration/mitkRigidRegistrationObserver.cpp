@@ -40,7 +40,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     ConjugateGradientOptimizerPointer ConjugateGradientOptimizer = dynamic_cast<ConjugateGradientOptimizerPointer>(optimizer);
     LBFGSOptimizerPointer LBFGSOptimizer = dynamic_cast<LBFGSOptimizerPointer>(optimizer);
     SPSAOptimizerPointer SPSAOptimizer = dynamic_cast<SPSAOptimizerPointer>(optimizer);
-    if (ExhaustiveOptimizer != NULL)
+    if (ExhaustiveOptimizer != nullptr)
     {
       m_OptimizerValue = ExhaustiveOptimizer->GetValue(ExhaustiveOptimizer->GetCurrentPosition());
       MITK_INFO << ExhaustiveOptimizer->GetValue(ExhaustiveOptimizer->GetCurrentPosition()) << "   "
@@ -53,7 +53,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (GradientDescentOptimizer != NULL)
+    else if (GradientDescentOptimizer != nullptr)
     {
       m_OptimizerValue = GradientDescentOptimizer->GetValue();
       MITK_INFO << GradientDescentOptimizer->GetCurrentIteration() << "   "
@@ -67,7 +67,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (QuaternionRigidTransformGradientDescentOptimizer != NULL)
+    else if (QuaternionRigidTransformGradientDescentOptimizer != nullptr)
     {
       m_OptimizerValue = QuaternionRigidTransformGradientDescentOptimizer->GetValue();
       MITK_INFO << QuaternionRigidTransformGradientDescentOptimizer->GetCurrentIteration() << "   "
@@ -81,7 +81,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (LBFGSBOptimizer != NULL)
+    else if (LBFGSBOptimizer != nullptr)
     {
       m_OptimizerValue = LBFGSBOptimizer->GetValue();
       MITK_INFO << LBFGSBOptimizer->GetCurrentIteration() << "   "
@@ -95,7 +95,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (OnePlusOneEvolutionaryOptimizer != NULL)
+    else if (OnePlusOneEvolutionaryOptimizer != nullptr)
     {
       m_OptimizerValue = OnePlusOneEvolutionaryOptimizer->GetValue();
       MITK_INFO << OnePlusOneEvolutionaryOptimizer->GetCurrentIteration() << "   "
@@ -109,7 +109,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (PowellOptimizer != NULL)
+    else if (PowellOptimizer != nullptr)
     {
       m_OptimizerValue = PowellOptimizer->GetValue();
       MITK_INFO << PowellOptimizer->GetCurrentIteration() << "   "
@@ -123,7 +123,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (FRPROptimizer != NULL)
+    else if (FRPROptimizer != nullptr)
     {
       m_OptimizerValue = FRPROptimizer->GetValue();
       MITK_INFO << FRPROptimizer->GetCurrentIteration() << "   "
@@ -137,7 +137,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (RegularStepGradientDescentOptimizer != NULL)
+    else if (RegularStepGradientDescentOptimizer != nullptr)
     {
       m_OptimizerValue = RegularStepGradientDescentOptimizer->GetValue();
       MITK_INFO << RegularStepGradientDescentOptimizer->GetCurrentIteration() << "   "
@@ -151,7 +151,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (VersorRigid3DTransformOptimizer != NULL)
+    else if (VersorRigid3DTransformOptimizer != nullptr)
     {
       m_OptimizerValue = VersorRigid3DTransformOptimizer->GetValue();
       MITK_INFO << VersorRigid3DTransformOptimizer->GetCurrentIteration() << "   "
@@ -165,7 +165,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (VersorTransformOptimizer != NULL)
+    else if (VersorTransformOptimizer != nullptr)
     {
       m_OptimizerValue = VersorTransformOptimizer->GetValue();
       MITK_INFO << VersorTransformOptimizer->GetCurrentIteration() << "   "
@@ -179,7 +179,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (AmoebaOptimizer != NULL)
+    else if (AmoebaOptimizer != nullptr)
     {
       m_OptimizerValue = AmoebaOptimizer->GetCachedValue();
       MITK_INFO << AmoebaOptimizer->GetCachedValue() << "   "
@@ -192,7 +192,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (ConjugateGradientOptimizer != NULL)
+    else if (ConjugateGradientOptimizer != nullptr)
     {
       m_OptimizerValue = ConjugateGradientOptimizer->GetValue();
       MITK_INFO << ConjugateGradientOptimizer->GetCurrentIteration() << "   "
@@ -206,7 +206,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       }
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (LBFGSOptimizer != NULL)
+    else if (LBFGSOptimizer != nullptr)
     {
       if(m_StopOptimization)
       {
@@ -219,7 +219,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
       MITK_INFO << LBFGSOptimizer->GetInfinityNormOfProjectedGradient() << std::endl;*/
       InvokeEvent(itk::ModifiedEvent());
     }
-    else if (SPSAOptimizer != NULL)
+    else if (SPSAOptimizer != nullptr)
     {
       m_OptimizerValue = SPSAOptimizer->GetValue();
       MITK_INFO << SPSAOptimizer->GetCurrentIteration() << "   "
@@ -238,7 +238,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
   {
     OptimizerPointer optimizer = dynamic_cast<OptimizerPointer>(caller);
     AmoebaOptimizerPointer AmoebaOptimizer = dynamic_cast<AmoebaOptimizerPointer>(optimizer);
-    if (AmoebaOptimizer != NULL)
+    if (AmoebaOptimizer != nullptr)
     {
       m_OptimizerValue = AmoebaOptimizer->GetCachedValue();
       MITK_INFO << AmoebaOptimizer->GetCachedValue() << "   "

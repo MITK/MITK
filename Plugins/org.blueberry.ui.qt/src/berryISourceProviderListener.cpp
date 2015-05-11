@@ -20,7 +20,7 @@ namespace berry {
 
 void ISourceProviderListener::Events::AddListener(ISourceProviderListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   multipleSourcesChanged += Delegate2(l, &ISourceProviderListener::SourceChanged);
   singleSourceChanged += Delegate3(l, &ISourceProviderListener::SourceChanged);
@@ -28,7 +28,7 @@ void ISourceProviderListener::Events::AddListener(ISourceProviderListener* l)
 
 void ISourceProviderListener::Events::RemoveListener(ISourceProviderListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   multipleSourcesChanged -= Delegate2(l, &ISourceProviderListener::SourceChanged);
   singleSourceChanged -= Delegate3(l, &ISourceProviderListener::SourceChanged);

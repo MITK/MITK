@@ -69,7 +69,7 @@ Object*NullEditorInput::GetAdapter(const QString& /*adapterType*/) const
 bool NullEditorInput::operator==(const Object* o) const
 {
   const NullEditorInput* input = dynamic_cast<const NullEditorInput*>(o);
-  if (input == 0) return false;
+  if (input == nullptr) return false;
 
   return true;
 }

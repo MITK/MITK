@@ -240,12 +240,12 @@ template<class MutexHost>
 bool WaitCondition<MutexHost>::Wait(Mutex& mutex, unsigned long timeoutMillis)
 {
   #ifdef US_PLATFORM_POSIX
-    struct timespec ts, * pts = 0;
+    struct timespec ts, * pts = nullptr;
     if (timeoutMillis)
     {
       pts = &ts;
       struct timeval tv;
-      int error = gettimeofday(&tv, NULL);
+      int error = gettimeofday(&tv, nullptr);
       if (error)
       {
         US_ERROR << "gettimeofday error: " << GetLastErrorStr();

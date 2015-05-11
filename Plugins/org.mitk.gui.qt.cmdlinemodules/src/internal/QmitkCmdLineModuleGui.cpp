@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 struct QmitkCmdLineModuleGuiPrivate
 {
   QmitkCmdLineModuleGuiPrivate(const mitk::DataStorage* dataStorage)
-    : m_DataStorage(dataStorage), m_Loader(NULL), m_Transform(NULL), m_TopLevelWidget(NULL)
+    : m_DataStorage(dataStorage), m_Loader(nullptr), m_Transform(nullptr), m_TopLevelWidget(nullptr)
   {
   }
   const mitk::DataStorage* m_DataStorage;
@@ -67,7 +67,7 @@ QUiLoader* QmitkCmdLineModuleGui::uiLoader() const
   // is called, it overrides the one in the base class, so the base
   // class one is never constructed, and this one is constructed as
   // a replacement.
-  if (d->m_Loader == NULL)
+  if (d->m_Loader == nullptr)
   {
     d->m_Loader.reset(new QmitkUiLoader(d->m_DataStorage));
   }
@@ -83,7 +83,7 @@ ctkCmdLineModuleXslTransform* QmitkCmdLineModuleGui::xslTransform() const
   // So we call the base class one, modify it by adding some stuff, and then return
   // the pointer to the one in the base class.
   ctkCmdLineModuleXslTransform *transform = ctkCmdLineModuleFrontendQtGui::xslTransform();
-  if (transform != NULL)
+  if (transform != nullptr)
   {
     transform->bindVariable("imageInputWidget", QVariant(QString("QmitkDataStorageComboBoxWithSelectNone")));
     transform->bindVariable("imageInputValueProperty", "currentValue");
@@ -136,46 +136,46 @@ QWidget* QmitkCmdLineModuleGui::getGui()
   if (!d->m_TopLevelWidget)
   {
     // Construct additional widgets to contain full GUI.
-    QWidget *aboutBoxContainerWidget = new QWidget();
+    auto  aboutBoxContainerWidget = new QWidget();
 
-    ctkCollapsibleGroupBox *aboutBox = new ctkCollapsibleGroupBox(aboutBoxContainerWidget);
+    auto  aboutBox = new ctkCollapsibleGroupBox(aboutBoxContainerWidget);
     aboutBox->setTitle("About");
 
-    QTextBrowser *aboutBrowser = new QTextBrowser(aboutBox);
+    auto  aboutBrowser = new QTextBrowser(aboutBox);
     aboutBrowser->setReadOnly(true);
     aboutBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     aboutBrowser->setOpenExternalLinks(true);
     aboutBrowser->setOpenLinks(true);
 
-    QVBoxLayout *aboutLayout = new QVBoxLayout(aboutBox);
+    auto  aboutLayout = new QVBoxLayout(aboutBox);
     aboutLayout->addWidget(aboutBrowser);
 
-    QVBoxLayout *aboutBoxContainerWidgetLayout = new QVBoxLayout(aboutBoxContainerWidget);
+    auto  aboutBoxContainerWidgetLayout = new QVBoxLayout(aboutBoxContainerWidget);
     aboutBoxContainerWidgetLayout->addWidget(aboutBox);
 
-    QWidget *helpBoxContainerWidget = new QWidget();
+    auto  helpBoxContainerWidget = new QWidget();
 
-    ctkCollapsibleGroupBox *helpBox = new ctkCollapsibleGroupBox();
+    auto  helpBox = new ctkCollapsibleGroupBox();
     helpBox->setTitle("Help");
 
-    QTextBrowser *helpBrowser = new QTextBrowser(helpBox);
+    auto  helpBrowser = new QTextBrowser(helpBox);
     helpBrowser->setReadOnly(true);
     helpBrowser->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     helpBrowser->setOpenExternalLinks(true);
     helpBrowser->setOpenLinks(true);
 
-    QVBoxLayout *helpLayout = new QVBoxLayout(helpBox);
+    auto  helpLayout = new QVBoxLayout(helpBox);
     helpLayout->addWidget(helpBrowser);
 
-    QVBoxLayout *helpBoxContainerWidgetLayout = new QVBoxLayout(helpBoxContainerWidget);
+    auto  helpBoxContainerWidgetLayout = new QVBoxLayout(helpBoxContainerWidget);
     helpBoxContainerWidgetLayout->addWidget(helpBox);
 
     QObject* guiHandle = this->guiHandle();
     QWidget* generatedGuiWidgets = qobject_cast<QWidget*>(guiHandle);
 
-    QWidget *topLevelWidget = new QWidget();
+    auto  topLevelWidget = new QWidget();
 
-    QGridLayout *topLevelLayout = new QGridLayout(topLevelWidget);
+    auto  topLevelLayout = new QGridLayout(topLevelWidget);
     topLevelLayout->setContentsMargins(0,0,0,0);
     topLevelLayout->setSpacing(0);
     topLevelLayout->addWidget(aboutBoxContainerWidget, 0, 0);
@@ -267,7 +267,7 @@ void QmitkCmdLineModuleGui::copyParameters(QmitkCmdLineModuleGui& another)
     if (node.IsNotNull())
     {
       mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
-      if (image != NULL)
+      if (image != nullptr)
       {
         this->setValue(parameterName, tmp, ctkCmdLineModuleFrontend::UserRole);
       }

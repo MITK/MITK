@@ -44,12 +44,12 @@ private:
      * @see org.eclipse.ui.internal.presentations.util.TabDragHandler#dragOver(org.eclipse.swt.widgets.Control, org.eclipse.swt.graphics.Point)
      */
     StackDropResult::Pointer DragOver(QWidget*, const QPoint& location,
-            int dragStart);
+            int dragStart) override;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.presentations.util.TabDragHandler#getInsertionPosition(java.lang.Object)
      */
-    int GetInsertionPosition(Object::Pointer cookie);
+    int GetInsertionPosition(Object::Pointer cookie) override;
 
 };
 

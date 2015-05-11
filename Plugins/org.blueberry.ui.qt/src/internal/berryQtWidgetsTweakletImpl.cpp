@@ -41,7 +41,7 @@ QtSelectionListenerWrapper::QtSelectionListenerWrapper(QWidget* w)
 void QtSelectionListenerWrapper::AddListener(GuiTk::ISelectionListener::Pointer listener)
 {
   QAbstractButton* button = qobject_cast<QAbstractButton*>(widget);
-  if (button != 0)
+  if (button != nullptr)
   {
     this->connect(button, "clicked(bool)", this, "QAbstractButtonClicked(bool)");
     selectionEvents.AddListener(listener);
@@ -68,11 +68,11 @@ void QtSelectionListenerWrapper::QAbstractButtonClicked(bool /*checked*/)
 void QtWidgetsTweakletImpl::AddSelectionListener(QWidget* widget,
     GuiTk::ISelectionListener::Pointer listener)
 {
-  if (widget == 0) return;
+  if (widget == nullptr) return;
 
   // special handling for berry::QtSash
   QtSash* sash = qobject_cast<QtSash*>(widget);
-  if (sash != 0)
+  if (sash != nullptr)
   {
     sash->AddSelectionListener(listener);
     return;
@@ -81,7 +81,7 @@ void QtWidgetsTweakletImpl::AddSelectionListener(QWidget* widget,
 
   // "normal" Qt widgets get wrapped
   QtSelectionListenerWrapper* wrapper = selectionListenerMap[widget];
-  if (wrapper == 0)
+  if (wrapper == nullptr)
   {
     wrapper = new QtSelectionListenerWrapper(widget);
     selectionListenerMap[widget] = wrapper;
@@ -93,11 +93,11 @@ void QtWidgetsTweakletImpl::AddSelectionListener(QWidget* widget,
 void QtWidgetsTweakletImpl::RemoveSelectionListener(QWidget* widget,
     GuiTk::ISelectionListener::Pointer listener)
 {
-  if (widget == 0) return;
+  if (widget == nullptr) return;
 
   // special handling for berry::QtSash
   QtSash* sash = qobject_cast<QtSash*>(widget);
-  if (sash != 0)
+  if (sash != nullptr)
   {
     sash->RemoveSelectionListener(listener);
     return;
@@ -105,7 +105,7 @@ void QtWidgetsTweakletImpl::RemoveSelectionListener(QWidget* widget,
 
 
   QtSelectionListenerWrapper* wrapper = selectionListenerMap[widget];
-  if (wrapper == 0) return;
+  if (wrapper == nullptr) return;
 
   if (wrapper->RemoveListener(listener) == 0)
   {
@@ -221,7 +221,7 @@ bool QtWidgetsTweakletImpl::SetParent(QWidget* widget, QWidget* parent)
 
 void QtWidgetsTweakletImpl::SetData(QWidget* object, const QString& id, Object::Pointer data)
 {
-  if (object == 0) return;
+  if (object == nullptr) return;
 
   QVariant variant;
   if (data != 0)
@@ -232,14 +232,14 @@ void QtWidgetsTweakletImpl::SetData(QWidget* object, const QString& id, Object::
 
 Object::Pointer QtWidgetsTweakletImpl::GetData(QWidget* object, const QString& id)
 {
-  if (object == 0) return Object::Pointer(0);
+  if (object == nullptr) return Object::Pointer(nullptr);
 
   QVariant variant = object->property(qPrintable(id));
   if (variant.isValid())
   {
     return variant.value<Object::Pointer>();
   }
-  return Object::Pointer(0);
+  return Object::Pointer(nullptr);
 }
 
 QPoint QtWidgetsTweakletImpl::GetCursorLocation()
@@ -263,14 +263,14 @@ QWidget* QtWidgetsTweakletImpl::FindControl(const QList<Shell::Pointer>& shells,
     if (control) return control;
   }
 
-  return 0;
+  return nullptr;
 }
 
 bool QtWidgetsTweakletImpl::IsChild(QObject* parentToTest, QObject* childToTest)
 {
   bool found = false;
   QObject* parent = childToTest->parent();
-  while (!found && parent != 0)
+  while (!found && parent != nullptr)
   {
     if (parent == parentToTest) found = true;
     parent = parent->parent();
@@ -302,7 +302,7 @@ void QtWidgetsTweakletImpl::MoveBelow(QWidget* widgetToMove, QWidget*  /*widget*
 void QtWidgetsTweakletImpl::Dispose(QWidget* widget)
 {
   delete widget;
-  widget = 0;
+  widget = nullptr;
 }
 
 Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int style)
@@ -331,11 +331,11 @@ Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int sty
   if (style & Constants::TOOL)
     qtFlags |= Qt::Tool;
 
-  QWidget* parentWidget = 0;
+  QWidget* parentWidget = nullptr;
   if (parent != 0)
     parentWidget = static_cast<QWidget*>(parent->GetControl());
 
-  QtShell* qtshell = new QtShell(parentWidget, qtFlags);
+  auto   qtshell = new QtShell(parentWidget, qtFlags);
   Shell::Pointer shell(qtshell);
   shellList.push_back(shell);
 
@@ -348,7 +348,7 @@ Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int sty
 
 QWidget* QtWidgetsTweakletImpl::CreateComposite(QWidget* parent)
 {
-  QWidget* composite = new QtControlWidget(parent, 0);
+  QWidget* composite = new QtControlWidget(parent, nullptr);
   composite->setObjectName("created composite");
   return composite;
 }
@@ -375,14 +375,14 @@ Shell::Pointer QtWidgetsTweakletImpl::GetShell(QWidget* widget)
     return controller->GetShell();
   }
 
-  return Shell::Pointer(0);
+  return Shell::Pointer(nullptr);
 }
 
 Shell::Pointer QtWidgetsTweakletImpl::GetActiveShell()
 {
   QWidget* qwidget = QApplication::activeWindow();
 
-  if (qwidget == 0) return Shell::Pointer(0);
+  if (qwidget == nullptr) return Shell::Pointer(nullptr);
 
   QVariant variant = qwidget->property(QtWidgetController::PROPERTY_ID);
   if (variant.isValid())
@@ -390,7 +390,7 @@ Shell::Pointer QtWidgetsTweakletImpl::GetActiveShell()
     return variant.value<QtWidgetController::Pointer>()->GetShell();
   }
 
-  return Shell::Pointer(0);
+  return Shell::Pointer(nullptr);
 }
 
 QRect QtWidgetsTweakletImpl::ToControl(QWidget* coordinateSystem,

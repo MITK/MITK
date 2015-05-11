@@ -29,7 +29,7 @@ struct SimpleExtensionPointFilter : IExtensionPointFilter::Concept
 
   SimpleExtensionPointFilter(const QString& id);
 
-  bool Matches(const IExtensionPoint* target) const;
+  bool Matches(const IExtensionPoint* target) const override;
 };
 
 }

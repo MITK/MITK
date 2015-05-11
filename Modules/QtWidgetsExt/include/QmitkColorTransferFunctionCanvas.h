@@ -28,7 +28,7 @@ Q_OBJECT
 
 public:
 
-  QmitkColorTransferFunctionCanvas( QWidget* parent = 0, Qt::WindowFlags f = 0 )  ;
+  QmitkColorTransferFunctionCanvas( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr )  ;
   virtual void paintEvent( QPaintEvent* e ) override;
   int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) override;
   void SetTitle(const QString& title);

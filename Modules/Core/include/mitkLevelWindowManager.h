@@ -63,7 +63,7 @@ namespace mitk
      *         Use the removedNode parameter if a node was removed...
      *  @param autoTopMost true: sets the topmost layer image to be affected by changes
      *  @param removedNode != NULL a node was removed from DataStorage */
-    void SetAutoTopMostImage(bool autoTopMost, const DataNode* removedNode = NULL);
+    void SetAutoTopMostImage(bool autoTopMost, const DataNode* removedNode = nullptr);
 
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
@@ -87,13 +87,13 @@ namespace mitk
       *        A listener on the data storage is used to call this method automatically after a node was added.
       * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from the number of nodes.
       */
-    void DataStorageAddedNode(const DataNode* n = NULL);
+    void DataStorageAddedNode(const DataNode* n = nullptr);
 
     /** @brief This method is called when a node is removed to the data storage.
       *        A listener on the data storage is used to call this method automatically directly before a node will be removed.
       * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from the number of nodes.
       */
-    void DataStorageRemovedNode(const DataNode* removedNode = NULL);
+    void DataStorageRemovedNode(const DataNode* removedNode = nullptr);
 
     /** @brief change notifications from mitkLevelWindowProperty */
     void OnPropertyModified(const itk::EventObject& e);

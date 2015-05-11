@@ -44,7 +44,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     us::ModuleContext* context = us::GetModuleContext();
 
@@ -63,7 +63,7 @@ public:
     m_DistanceArray = new float[numberOfPixels];
   }
 
-  void tearDown()
+  void tearDown() override
   {
     //Wait some time to avoid threading issues.
     itksys::SystemTools::Delay(10);

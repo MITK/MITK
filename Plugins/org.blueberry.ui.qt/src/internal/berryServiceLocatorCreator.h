@@ -37,7 +37,7 @@ public:
   SmartPointer<IServiceLocator> CreateServiceLocator(
       IServiceLocator* parent,
       const IServiceFactory* factory,
-      WeakPointer<IDisposable> owner);
+      WeakPointer<IDisposable> owner) override;
 };
 
 }

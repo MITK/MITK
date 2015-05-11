@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::VideoSource::VideoSource()
 :
-  m_CurrentVideoTexture(NULL),
+  m_CurrentVideoTexture(nullptr),
   m_CaptureWidth(0),
   m_CaptureHeight(0),
   m_CapturingInProcess(false),

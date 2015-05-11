@@ -32,7 +32,7 @@ const QString LayoutPart::PROP_VISIBILITY = "PROP_VISIBILITY";
 
 
 LayoutPart::LayoutPart(const QString& id_)
-  : container(0), id(id_), deferCount(0)
+  : container(nullptr), id(id_), deferCount(0)
 {
 
 }
@@ -43,7 +43,7 @@ LayoutPart::~LayoutPart()
 
 bool LayoutPart::AllowsAutoFocus()
 {
-  if (container != 0)
+  if (container != nullptr)
   {
     return container->AllowsAutoFocus();
   }
@@ -57,7 +57,7 @@ void LayoutPart::Dispose()
 
 QRect LayoutPart::GetBounds()
 {
-  if (this->GetControl() == 0)
+  if (this->GetControl() == nullptr)
     return QRect();
 
   return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(this->GetControl());
@@ -101,7 +101,7 @@ int LayoutPart::ComputePreferredSize(bool /*width*/, int /*availableParallel*/,
 
 IDropTarget::Pointer LayoutPart::GetDropTarget(Object::Pointer  /*draggedObject*/, const QPoint&  /*displayCoordinates*/)
 {
-  return IDropTarget::Pointer(0);
+  return IDropTarget::Pointer(nullptr);
 }
 
 bool LayoutPart::IsDocked()
@@ -121,7 +121,7 @@ Shell::Pointer LayoutPart::GetShell()
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(ctrl);
   }
-  return Shell::Pointer(0);
+  return Shell::Pointer(nullptr);
 }
 
 IWorkbenchWindow::Pointer LayoutPart::GetWorkbenchWindow()
@@ -129,7 +129,7 @@ IWorkbenchWindow::Pointer LayoutPart::GetWorkbenchWindow()
   Shell::Pointer s = this->GetShell();
   if (s == 0)
   {
-    return IWorkbenchWindow::Pointer(0);
+    return IWorkbenchWindow::Pointer(nullptr);
   }
   Object::Pointer data = s->GetData();
   if (data.Cast<IWorkbenchWindow>() != 0)
@@ -141,7 +141,7 @@ IWorkbenchWindow::Pointer LayoutPart::GetWorkbenchWindow()
     return data.Cast<DetachedWindow>()->GetWorkbenchPage()->GetWorkbenchWindow();
   }
 
-  return IWorkbenchWindow::Pointer(0);
+  return IWorkbenchWindow::Pointer(nullptr);
 
 }
 
@@ -154,7 +154,7 @@ void LayoutPart::Reparent(QWidget* newParent)
   QWidget* control = this->GetControl();
 
   GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
-  if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
+  if ((control == nullptr) || (guiTweaklet->GetParent(control) == newParent))
   {
     return;
   }
@@ -170,7 +170,7 @@ void LayoutPart::Reparent(QWidget* newParent)
     guiTweaklet->SetEnabled(control, false);
     guiTweaklet->SetParent(control, newParent);
     guiTweaklet->SetEnabled(control, enabled);
-    guiTweaklet->MoveAbove(control, 0);
+    guiTweaklet->MoveAbove(control, nullptr);
   }
 }
 
@@ -199,7 +199,7 @@ bool LayoutPart::IsVisible()
 void LayoutPart::SetVisible(bool makeVisible)
 {
   QWidget* ctrl = this->GetControl();
-  if (ctrl != 0)
+  if (ctrl != nullptr)
   {
     if (makeVisible == Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetVisible(ctrl))
     {

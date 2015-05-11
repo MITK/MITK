@@ -28,13 +28,13 @@ namespace mitk
     mitkClassMacro(SimulationObjectFactory, CoreObjectFactoryBase);
     itkFactorylessNewMacro(Self);
 
-    Mapper::Pointer CreateMapper(DataNode* node, MapperSlotId slotId);
-    const char* GetDescription() const;
-    const char* GetFileExtensions();
-    MultimapType GetFileExtensionsMap();
-    const char* GetSaveFileExtensions();
-    MultimapType GetSaveFileExtensionsMap();
-    void SetDefaultProperties(DataNode* node);
+    Mapper::Pointer CreateMapper(DataNode* node, MapperSlotId slotId) override;
+    const char* GetDescription() const override;
+    const char* GetFileExtensions() override;
+    MultimapType GetFileExtensionsMap() override;
+    const char* GetSaveFileExtensions() override;
+    MultimapType GetSaveFileExtensionsMap() override;
+    void SetDefaultProperties(DataNode* node) override;
 
   private:
     SimulationObjectFactory();

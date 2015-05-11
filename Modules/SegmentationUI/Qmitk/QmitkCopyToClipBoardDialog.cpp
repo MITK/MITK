@@ -26,7 +26,7 @@ QmitkCopyToClipBoardDialog::QmitkCopyToClipBoardDialog(const QString& text, QWid
   //!mmueller
   //QTextEdit* textedit = new QTextEdit(text, "", this);
   //#changed to:
-  QTextEdit* textedit = new QTextEdit(this);
+  auto  textedit = new QTextEdit(this);
   // with setPlainText() line breaks are displayed correctly
   textedit->setPlainText(text);
   //!

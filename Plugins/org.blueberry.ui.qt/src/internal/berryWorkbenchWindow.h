@@ -81,38 +81,38 @@ public:
 
   ~WorkbenchWindow();
 
-  Object* GetService(const QString& key);
+  Object* GetService(const QString& key) override;
 
-  bool HasService(const QString& key) const;
+  bool HasService(const QString& key) const override;
 
   int Open();
-  bool Close();
+  bool Close() override;
 
-  Shell::Pointer GetShell() const;
-
-  /**
-   * @see org.blueberry.ui.IPageService
-   */
-  void AddPerspectiveListener(IPerspectiveListener* l);
+  Shell::Pointer GetShell() const override;
 
   /**
    * @see org.blueberry.ui.IPageService
    */
-  void RemovePerspectiveListener(IPerspectiveListener* l);
+  void AddPerspectiveListener(IPerspectiveListener* l) override;
 
   /**
    * @see org.blueberry.ui.IPageService
    */
-  IPerspectiveListener::Events& GetPerspectiveEvents();
+  void RemovePerspectiveListener(IPerspectiveListener* l) override;
+
+  /**
+   * @see org.blueberry.ui.IPageService
+   */
+  IPerspectiveListener::Events& GetPerspectiveEvents() override;
 
   /**
    * Returns the action bars for this window.
    */
   WWinActionBars* GetActionBars();
 
-  SmartPointer<IWorkbenchPage> GetActivePage() const;
+  SmartPointer<IWorkbenchPage> GetActivePage() const override;
 
-  QList<SmartPointer<IWorkbenchPage> >  GetPages() const;
+  QList<SmartPointer<IWorkbenchPage> >  GetPages() const override;
 
   void SetPerspectiveExcludeList(const QStringList& v);
   QStringList GetPerspectiveExcludeList() const;
@@ -127,18 +127,18 @@ public:
    *            identifies the new active page, or <code>null</code> for no
    *            active page
    */
-  void SetActivePage(SmartPointer<IWorkbenchPage> in);
+  void SetActivePage(SmartPointer<IWorkbenchPage> in) override;
 
   /**
    * Answer the menu manager for this window.
    */
   MenuManager* GetMenuManager() const;
 
-  IWorkbench* GetWorkbench() const;
+  IWorkbench* GetWorkbench() const override;
 
-  IPartService* GetPartService();
+  IPartService* GetPartService() override;
 
-  ISelectionService* GetSelectionService() const;
+  ISelectionService* GetSelectionService() const override;
 
   /**
    * @return whether the tool bar should be shown. This is only applicable if
@@ -174,9 +174,9 @@ public:
   void RemovePropertyChangeListener(IPropertyChangeListener* listener);
 
   SmartPointer<IWorkbenchPage> OpenPage(const QString& perspectiveId,
-      IAdaptable* input);
+      IAdaptable* input) override;
 
-  SmartPointer<IWorkbenchPage> OpenPage(IAdaptable* input);
+  SmartPointer<IWorkbenchPage> OpenPage(IAdaptable* input) override;
 
   //TODO menu manager
   //virtual QWidget* GetMenuManager() = 0;
@@ -269,7 +269,7 @@ protected:
    *
    * @since 3.0
    */
-  QWidget* CreateContents(Shell::Pointer parent);
+  QWidget* CreateContents(Shell::Pointer parent) override;
 
   /**
    * Creates the default contents and layout of the shell.
@@ -279,7 +279,7 @@ protected:
    */
   virtual void CreateDefaultContents(Shell::Pointer shell);
 
-  void CreateTrimWidgets(SmartPointer<Shell> shell);
+  void CreateTrimWidgets(SmartPointer<Shell> shell) override;
 
   /**
    * Returns the unique object that applications use to configure this window.
@@ -293,12 +293,12 @@ protected:
    */
   WorkbenchWindowConfigurer::Pointer GetWindowConfigurer() const;
 
-  bool CanHandleShellCloseEvent();
+  bool CanHandleShellCloseEvent() override;
 
   /*
    * @see berry::Window#configureShell(Shell::Pointer)
    */
-  void ConfigureShell(Shell::Pointer shell);
+  void ConfigureShell(Shell::Pointer shell) override;
 
   ShellPool::Pointer GetDetachedWindowPool();
 
@@ -316,7 +316,7 @@ protected:
    *
    * @since 3.0
    */
-  QPoint GetInitialSize();
+  QPoint GetInitialSize() override;
 
   /**
    * Returns the default page input for workbench pages opened in this window.
@@ -421,7 +421,7 @@ private:
 
     WorkbenchWindow* window;
 
-    void Dispose();
+    void Dispose() override;
   };
 
   IDisposable::Pointer serviceLocatorOwner;
@@ -666,7 +666,7 @@ private:
   struct ShellEventFilter : public QObject
   {
     ShellEventFilter(WorkbenchWindow* window);
-    bool eventFilter(QObject* watched, QEvent* event);
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
   private:
     void SaveBounds(const QRect& newBounds);

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-Display* Display::instance = 0;
+Display* Display::instance = nullptr;
 
 Display::~Display()
 {

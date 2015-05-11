@@ -73,7 +73,7 @@ public:
   void tearDown() override
   {
     // Reset label set
-    m_LabelSet = 0;
+    m_LabelSet = nullptr;
   }
 
   void TestSetLayer()

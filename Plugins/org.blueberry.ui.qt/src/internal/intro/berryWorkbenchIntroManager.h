@@ -66,13 +66,13 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbench#closeIntro(org.eclipse.ui.intro.IIntroPart)
    */
-  bool CloseIntro(IIntroPart::Pointer part);
+  bool CloseIntro(IIntroPart::Pointer part) override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbench#showIntro(org.eclipse.ui.IWorkbenchWindow)
    */
   IIntroPart::Pointer ShowIntro(SmartPointer<IWorkbenchWindow> preferredWindow,
-      bool standby);
+      bool standby) override;
 
   /**
    * @param testWindow the window to test
@@ -83,19 +83,19 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbench#setIntroStandby(org.eclipse.ui.intro.IIntroPart, boolean)
    */
-  void SetIntroStandby(IIntroPart::Pointer part, bool standby);
+  void SetIntroStandby(IIntroPart::Pointer part, bool standby) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.IWorkbench#isIntroStandby(org.eclipse.ui.intro.IIntroPart)
    */
-  bool IsIntroStandby(IIntroPart::Pointer part) const;
+  bool IsIntroStandby(IIntroPart::Pointer part) const override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbench#findIntro()
    */
-  IIntroPart::Pointer GetIntro() const;
+  IIntroPart::Pointer GetIntro() const override;
 
   /**
    * @return the <code>ViewIntroAdapterPart</code> for this workbench, <code>null</code> if it
@@ -112,9 +112,9 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbench#hasIntro()
    */
-  bool HasIntro() const;
+  bool HasIntro() const override;
 
-  bool IsNewContentAvailable();
+  bool IsNewContentAvailable() override;
 
 };
 

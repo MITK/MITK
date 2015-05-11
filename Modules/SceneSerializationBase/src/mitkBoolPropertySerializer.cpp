@@ -36,7 +36,7 @@ class BoolPropertySerializer : public BasePropertySerializer
     {
       if (const BoolProperty* prop = dynamic_cast<const BoolProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("bool");
+        auto  element = new TiXmlElement("bool");
         if (prop->GetValue() == true)
         {
           element->SetAttribute("value", "true");
@@ -47,12 +47,12 @@ class BoolPropertySerializer : public BasePropertySerializer
         }
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
       return BoolProperty::New( std::string(element->Attribute("value")) == "true" ).GetPointer();
     }
 

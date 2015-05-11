@@ -35,7 +35,7 @@ mitk::DataStorageAccessRule
    // checks if the DataNode does exists within the specified DataTree, if not an
    // Poco NotFoundException is thrown since the rule is useless
    bool exsists = false ;
-   for(mitk::DataStorage::SetOfObjects::const_iterator it =
+   for(auto it =
         sptr_parentsNodesFirstRule->begin(); it != sptr_parentsNodesFirstRule->end(); ++ it)
       {
         if (*it == m_sptrMyDataNode ) exsists = true ;
@@ -106,7 +106,7 @@ bool
         sptr_parentsNodesFirstRule = m_sptrMyDataStorage->GetSources(m_sptrMyDataNode);
      // checks if the DataStorageNode of to be compared DataStorageAccessRule is a parent node
      // if so the job holding this DataStorageAccessRule need to wait until the operation on the parent node is performed
-      for(mitk::DataStorage::SetOfObjects::const_iterator it =
+      for(auto it =
         sptr_parentsNodesFirstRule->begin(); it != sptr_parentsNodesFirstRule->end(); ++ it)
       {
       if (*it == sptr_otherDataStorageAccessRule->GetDataNode()) return true ;
@@ -115,7 +115,7 @@ bool
         sptr_derivedNodesRule = m_sptrMyDataStorage->GetDerivations(m_sptrMyDataNode);
       // checks if the DataStorage node of to be compared DataStorageAccessRule is a child node
       // if so the job holding this DataStorageAccessRule needs to wait until the operation on the parent node is performed
-      for(mitk::DataStorage::SetOfObjects::const_iterator it =
+      for(auto it =
         sptr_derivedNodesRule->begin(); it != sptr_derivedNodesRule->end(); ++it)
       {
       if(*it == sptr_otherDataStorageAccessRule->GetDataNode()) return true ;
@@ -152,7 +152,7 @@ bool
    ::TestDataNode(mitk::DataNode::Pointer  /*dataTreeToBeStored*/) const
   {
    mitk::DataStorage::SetOfObjects::ConstPointer tempAllNodes = m_sptrMyDataStorage->GetAll();
-   for(mitk::DataStorage::SetOfObjects::const_iterator it = tempAllNodes->begin(); it !=tempAllNodes->end(); ++ it){
+   for(auto it = tempAllNodes->begin(); it !=tempAllNodes->end(); ++ it){
      if (m_sptrMyDataNode == *it ) return true ;
 
      }

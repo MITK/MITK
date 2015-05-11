@@ -34,7 +34,7 @@ namespace berry
 QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
  : updatesDisabled(false)
 {
-  if (parent == 0 || flags.testFlag(Qt::Window))
+  if (parent == nullptr || flags.testFlag(Qt::Window))
   {
     widget = new QtMainWindowControl(this, parent, flags);
     widget->setUpdatesEnabled(false);

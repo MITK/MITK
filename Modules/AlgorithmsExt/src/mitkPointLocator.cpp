@@ -21,12 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::PointLocator::PointLocator() :
   m_SearchTreeInitialized(false),
-  m_VtkPoints(NULL), m_MitkPoints(NULL),
-  m_ItkPoints(NULL),
+  m_VtkPoints(nullptr), m_MitkPoints(nullptr),
+  m_ItkPoints(nullptr),
   m_ANNK(1), m_ANNDimension(3),
-  m_ANNEpsilon(0), m_ANNDataPoints(NULL),
-  m_ANNQueryPoint(NULL), m_ANNPointIndexes(NULL),
-  m_ANNDistances(NULL), m_ANNTree(NULL)
+  m_ANNEpsilon(0), m_ANNDataPoints(nullptr),
+  m_ANNQueryPoint(nullptr), m_ANNPointIndexes(nullptr),
+  m_ANNDistances(nullptr), m_ANNTree(nullptr)
 {
 
 }
@@ -43,7 +43,7 @@ mitk::PointLocator::~PointLocator()
 
 void mitk::PointLocator::SetPoints( vtkPointSet* pointSet )
 {
-  if ( pointSet == NULL )
+  if ( pointSet == nullptr )
   {
      itkWarningMacro("Points are NULL!");
      return;
@@ -60,7 +60,7 @@ void mitk::PointLocator::SetPoints( vtkPointSet* pointSet )
   m_VtkPoints = points;
 
   size_t size = points->GetNumberOfPoints();
-  if ( m_ANNDataPoints != NULL )
+  if ( m_ANNDataPoints != nullptr )
     delete[] m_ANNDataPoints;
   m_ANNDataPoints = annAllocPts( size, m_ANNDimension );
   m_IndexToPointIdContainer.clear();
@@ -80,7 +80,7 @@ void mitk::PointLocator::SetPoints( vtkPointSet* pointSet )
 
 void mitk::PointLocator::SetPoints( mitk::PointSet* points )
 {
-  if ( points == NULL )
+  if ( points == nullptr )
   {
      itkWarningMacro("Points are NULL!");
      return;
@@ -96,7 +96,7 @@ void mitk::PointLocator::SetPoints( mitk::PointSet* points )
   m_MitkPoints = points;
 
   size_t size = points->GetSize();
-  if ( m_ANNDataPoints != NULL )
+  if ( m_ANNDataPoints != nullptr )
     delete[] m_ANNDataPoints;
   m_ANNDataPoints = annAllocPts( size, m_ANNDimension );
   m_IndexToPointIdContainer.clear();
@@ -121,7 +121,7 @@ void mitk::PointLocator::SetPoints( mitk::PointSet* points )
 
 void mitk::PointLocator::SetPoints( ITKPointSet* pointSet )
 {
-  if ( pointSet == NULL )
+  if ( pointSet == nullptr )
   {
     itkWarningMacro("Points are NULL!");
     return;
@@ -137,7 +137,7 @@ void mitk::PointLocator::SetPoints( ITKPointSet* pointSet )
   m_ItkPoints = pointSet;
 
   size_t size = pointSet->GetNumberOfPoints();
-  if ( m_ANNDataPoints != NULL )
+  if ( m_ANNDataPoints != nullptr )
     delete[] m_ANNDataPoints;
   m_ANNDataPoints = annAllocPts( size, m_ANNDimension );
   m_IndexToPointIdContainer.clear();
@@ -232,15 +232,15 @@ void mitk::PointLocator::InitANN()
 void mitk::PointLocator::DestroyANN()
 {
   m_SearchTreeInitialized = false;
-  if ( m_ANNQueryPoint != NULL )
+  if ( m_ANNQueryPoint != nullptr )
     annDeallocPt( m_ANNQueryPoint );
-  if ( m_ANNDataPoints != NULL )
+  if ( m_ANNDataPoints != nullptr )
     annDeallocPts( m_ANNDataPoints );
-  if ( m_ANNPointIndexes != NULL )
+  if ( m_ANNPointIndexes != nullptr )
     delete[] m_ANNPointIndexes;
-  if ( m_ANNDistances != NULL )
+  if ( m_ANNDistances != nullptr )
     delete[] m_ANNDistances;
-  if ( m_ANNTree != NULL )
+  if ( m_ANNTree != nullptr )
     delete m_ANNTree;
 }
 

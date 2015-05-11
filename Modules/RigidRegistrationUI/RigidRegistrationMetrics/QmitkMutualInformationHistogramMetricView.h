@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkMutualInformationHistogramMetricView :
 
 public:
 
-  QmitkMutualInformationHistogramMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkMutualInformationHistogramMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkMutualInformationHistogramMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

@@ -86,7 +86,7 @@ QString RegistryStrategy::Translate(const QString& key, QTranslator* resources)
 void RegistryStrategy::OnStart(IExtensionRegistry* reg, bool loadedFromCache)
 {
   ExtensionRegistry* registry = dynamic_cast<ExtensionRegistry*>(reg);
-  if (registry == NULL)
+  if (registry == nullptr)
     return;
 
   // register a listener to catch new plugin installations/resolutions.
@@ -115,7 +115,7 @@ void RegistryStrategy::OnStop(IExtensionRegistry* /*registry*/)
 QObject* RegistryStrategy::CreateExecutableExtension(const SmartPointer<RegistryContributor>& contributor,
                                            const QString& className, const QString& /*overridenContributorName*/)
 {
-  QObject* result = NULL;
+  QObject* result = nullptr;
 
   QSharedPointer<ctkPlugin> plugin = CTKPluginUtils::GetDefault()->GetPlugin(contributor->GetName());
   if (!plugin.isNull())

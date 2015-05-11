@@ -56,7 +56,7 @@ protected:
     /*
      * @see AbstractSelectionService#CreatePartTracker(const QString&)
      */
-    AbstractPartSelectionTracker::Pointer CreatePartTracker(const QString& partId) const;
+    AbstractPartSelectionTracker::Pointer CreatePartTracker(const QString& partId) const override;
 };
 
 }

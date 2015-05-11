@@ -36,14 +36,14 @@ void QmitkStringPropertyEditor::PropertyChanged()
 
 void QmitkStringPropertyEditor::PropertyRemoved()
 {
-  m_Property = NULL;
-  m_StringProperty = NULL;
+  m_Property = nullptr;
+  m_StringProperty = nullptr;
   setText("n/a");
 }
 
 void QmitkStringPropertyEditor::onTextChanged(const QString& text)
 {
-  if( m_StringProperty == 0 )
+  if( m_StringProperty == nullptr )
     return;
 
   BeginModifyProperty();  // deregister from events

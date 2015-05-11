@@ -578,7 +578,7 @@ QCoreApplication* BaseApplication::getQApplication() const
     }
     else
     {
-      QmitkSafeApplication* safeApp = new QmitkSafeApplication(d->m_Argc, d->m_Argv);
+      auto  safeApp = new QmitkSafeApplication(d->m_Argc, d->m_Argv);
       safeApp->setSafeMode(d->m_SafeMode);
       qCoreApp = safeApp;
     }

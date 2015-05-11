@@ -57,7 +57,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     std::string dirName = MITK_TOF_DATA_DIR;
 
@@ -80,7 +80,7 @@ public:
     m_ToFImageGrabber->SetCameraDevice(tofCameraMITKPlayerDevice);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     if(m_ToFImageGrabber->IsCameraActive())
     {

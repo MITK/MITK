@@ -114,34 +114,34 @@ public:
 
           void Close(IPresentablePart::Pointer part);
 
-         void Close(const QList<IPresentablePart::Pointer>& parts);
+         void Close(const QList<IPresentablePart::Pointer>& parts) override;
 
          void DragStart(IPresentablePart::Pointer beingDragged,
-                QPoint& initialLocation, bool keyboard);
+                QPoint& initialLocation, bool keyboard) override;
 
-         void DragStart(QPoint& initialLocation, bool keyboard);
+         void DragStart(QPoint& initialLocation, bool keyboard) override;
 
-         bool IsPartMoveable(IPresentablePart::Pointer part);
+         bool IsPartMoveable(IPresentablePart::Pointer part) override;
 
-         void SelectPart(IPresentablePart::Pointer toSelect);
+         void SelectPart(IPresentablePart::Pointer toSelect) override;
 
-         bool SupportsState(int state);
+         bool SupportsState(int state) override;
 
-         void SetState(int newState);
+         void SetState(int newState) override;
 
-         IPresentablePart::Pointer GetSelectedPart();
+         IPresentablePart::Pointer GetSelectedPart() override;
 
 //         void AddSystemActions(IMenuManager menuManager) {
 //            PartStack.this.addSystemActions(menuManager);
 //        }
 
-         bool IsStackMoveable();
+         bool IsStackMoveable() override;
 
-         void FlushLayout();
+         void FlushLayout() override;
 
-         PresentableVector GetPartList();
+         PresentableVector GetPartList() override;
 
-         QString GetProperty(const QString& id);
+         QString GetProperty(const QString& id) override;
     };
 
       DefaultStackPresentationSite::Pointer presentationSite;
@@ -175,11 +175,11 @@ public:
          */
         void SetTarget(PartStack::Pointer stack, PartPane::Pointer pane, StackDropResult::Pointer result);
 
-        void Drop();
+        void Drop() override;
 
-        CursorType GetCursor();
+        CursorType GetCursor() override;
 
-        QRect GetSnapRectangle();
+        QRect GetSnapRectangle() override;
     };
 
     private: static PartStackDropResult::Pointer dropResult;
@@ -226,7 +226,7 @@ public:
     public: PartStack(WorkbenchPage* page,
                       bool allowsStateChanges = true,
                       int appearance = PresentationFactoryUtil::ROLE_VIEW,
-                      IPresentationFactory* factory = 0);
+                      IPresentationFactory* factory = nullptr);
 
     /**
      * Adds a property listener to this stack. The listener will receive a PROP_SELECTION
@@ -240,7 +240,7 @@ public:
 
     public: int GetAppearance() const;
 
-    public: QString GetID() const;
+    public: QString GetID() const override;
 
     protected: bool IsStandalone();
 
@@ -257,31 +257,31 @@ public:
      * Tests the integrity of this object. Throws an exception if the object's state
      * is invalid. For use in test suites.
      */
-    public: void TestInvariants();
+    public: void TestInvariants() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutPart#describeLayout(java.lang.StringBuffer)
      */
-    public: void DescribeLayout(QString& buf) const;
+    public: void DescribeLayout(QString& buf) const override;
 
     /**
      * See IVisualContainer#add
      */
-    public: void Add(LayoutPart::Pointer child);
+    public: void Add(LayoutPart::Pointer child) override;
 
     /**
      * Add a part at a particular position
      */
     protected: void Add(LayoutPart::Pointer newChild, Object::Pointer cookie);
 
-    public: bool AllowsAdd(LayoutPart::Pointer toAdd);
+    public: bool AllowsAdd(LayoutPart::Pointer toAdd) override;
 
     /*
      * (non-Javadoc)
      *
      * @see org.blueberry.ui.internal.ILayoutContainer#allowsAutoFocus()
      */
-    public: bool AllowsAutoFocus();
+    public: bool AllowsAutoFocus() override;
 
     /**
      * @param parts
@@ -295,12 +295,12 @@ public:
 
     protected: IPresentationFactory* GetFactory();
 
-    public: void CreateControl(QWidget* parent);
+    public: void CreateControl(QWidget* parent) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutPart#getDropTarget(java.lang.Object, org.blueberry.swt.graphics.QPoint)
      */
-    public: IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const QPoint& position);
+    public: IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const QPoint& position) override;
 
     public: void SetActive(bool isActive);
 
@@ -317,9 +317,9 @@ public:
     /**
      * See LayoutPart#Dispose
      */
-    public: void Dispose();
+    public: void Dispose() override;
 
-    public: void FindSashes(LayoutPart::Pointer toFind, PartPane::Sashes& sashes);
+    public: void FindSashes(LayoutPart::Pointer toFind, PartPane::Sashes& sashes) override;
 
     /**
      * Gets the presentation bounds.
@@ -329,9 +329,9 @@ public:
     /**
      * See IVisualContainer#getChildren
      */
-    public: ChildVector GetChildren() const;
+    public: ChildVector GetChildren() const override;
 
-    public: QWidget* GetControl();
+    public: QWidget* GetControl() override;
 
     /**
      * Answer the number of children.
@@ -374,28 +374,28 @@ public:
     /**
      * See IVisualContainer#remove
      */
-    public: void Remove(LayoutPart::Pointer child);
+    public: void Remove(LayoutPart::Pointer child) override;
 
     /**
      * Reparent a part. Also reparent visible children...
      */
-    public: void Reparent(QWidget* newParent);
+    public: void Reparent(QWidget* newParent) override;
 
     /**
      * See IVisualContainer#replace
      */
-    public: void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
+    public: void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#computePreferredSize(boolean, int, int, int)
    */
   public: int ComputePreferredSize(bool width, int availableParallel,
-      int availablePerpendicular, int preferredParallel);
+      int availablePerpendicular, int preferredParallel) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutPart#getSizeFlags(boolean)
      */
-    public: int GetSizeFlags(bool horizontal);
+    public: int GetSizeFlags(bool horizontal) override;
 
     /**
      * @see IPersistable
@@ -405,7 +405,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutPart#setVisible(boolean)
      */
-    public: void SetVisible(bool makeVisible);
+    public: void SetVisible(bool makeVisible) override;
 
     /**
      * @see IPersistable
@@ -428,7 +428,7 @@ public:
     /**
      * Sets the presentation bounds.
      */
-    public: void SetBounds(const QRect& r);
+    public: void SetBounds(const QRect& r) override;
 
     public: void SetSelection(LayoutPart::Pointer part);
 
@@ -440,7 +440,7 @@ public:
     /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#handleDeferredEvents()
    */
-  protected: void HandleDeferredEvents();
+  protected: void HandleDeferredEvents() override;
 
     private: void RefreshPresentationSelection();
 
@@ -752,7 +752,7 @@ public:
      */
     public: void CopyAppearanceProperties(PartStack::Pointer copyTo);
 
-    public: void ResizeChild(LayoutPart::Pointer childThatChanged);
+    public: void ResizeChild(LayoutPart::Pointer childThatChanged) override;
 };
 
 }

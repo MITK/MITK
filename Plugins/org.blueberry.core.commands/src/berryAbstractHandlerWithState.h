@@ -72,11 +72,11 @@ public:
    * @param state
    *            The state to add; must not be <code>null</code>.
    */
-  void AddState(const QString& stateId, const SmartPointer<State>& state);
+  void AddState(const QString& stateId, const SmartPointer<State>& state) override;
 
-  SmartPointer<State> GetState(const QString& stateId) const;
+  SmartPointer<State> GetState(const QString& stateId) const override;
 
-  QList<QString> GetStateIds() const;
+  QList<QString> GetStateIds() const override;
 
   /**
    * <p>
@@ -93,7 +93,7 @@ public:
    *            The identifier of the state to remove; must not be
    *            <code>null</code>.
    */
-  void RemoveState(const QString& stateId);
+  void RemoveState(const QString& stateId) override;
 };
 
 }

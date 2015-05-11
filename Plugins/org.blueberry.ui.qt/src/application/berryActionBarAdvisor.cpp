@@ -76,7 +76,7 @@ void ActionBarAdvisor::Register(QAction* action, const QString& id)
 QAction* ActionBarAdvisor::GetAction(const QString& id) const
 {
   auto iter = actions.find(id);
-  return iter == actions.end() ? NULL : iter.value();
+  return iter == actions.end() ? nullptr : iter.value();
 }
 
 void ActionBarAdvisor::FillMenuBar(IMenuManager*  /*menuBar*/)

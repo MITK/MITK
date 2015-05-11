@@ -53,7 +53,7 @@ StackPresentation::Pointer PresentationFactoryUtil::CreatePresentation(
   }
 
   //don't initialize editors at creation time - it will not contain any parts
-  if (role != ROLE_EDITOR && memento != 0 && serializer != 0)
+  if (role != ROLE_EDITOR && memento != 0 && serializer != nullptr)
   {
     presentation->RestoreState(serializer, memento);
   }

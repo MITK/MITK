@@ -36,16 +36,16 @@ class UIntPropertySerializer : public BasePropertySerializer
     {
       if (const UIntProperty* prop = dynamic_cast<const UIntProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("unsigned");
+        auto  element = new TiXmlElement("unsigned");
         element->SetAttribute("value", static_cast<unsigned int>(prop->GetValue()));
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       unsigned int integer;
       if ( element->QueryUnsignedAttribute( "value", &integer ) == TIXML_SUCCESS )
@@ -54,7 +54,7 @@ class UIntPropertySerializer : public BasePropertySerializer
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

@@ -65,7 +65,7 @@ public:
   itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer)   ///< container for output peaks
   itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                    ///< number of peaks per voxel
 
-  void GenerateData();
+  void GenerateData() override;
 
 protected:
   MrtrixPeakImageConverter();

@@ -52,7 +52,7 @@ public:
     /**
      * Returns the secondary id or <code>null</code>.
      */
-    QString GetSecondaryId();
+    QString GetSecondaryId() override;
 
     /**
      * Returns the view.

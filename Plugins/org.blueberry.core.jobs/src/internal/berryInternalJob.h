@@ -56,7 +56,7 @@ struct BERRY_JOBS InternalJob : public Object
 
   berryObjectMacro(InternalJob);
 
-  bool operator==(const Object* otherJob) const;
+  bool operator==(const Object* otherJob) const override;
 
   /**
    * Adds an entry at the end of the list of which this item is the head.
@@ -204,7 +204,7 @@ struct BERRY_JOBS InternalJob : public Object
    * Prints a string-based representation of this job instance.
    * For debugging purposes only.
    */
-  QString ToString() const;
+  QString ToString() const override;
 
   /**
    * @param waitQueueStamp The waitQueueStamp to set.

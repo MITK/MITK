@@ -135,7 +135,7 @@ public:
    */
   bool doit;
 
-  QString ToString() const;
+  QString ToString() const override;
 
 };
 

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string SelectionViewMitk::VIEW_ID = "org.mitk.views.selectionviewmitk";
 
-SelectionViewMitk::SelectionViewMitk() : m_Parent(0)
+SelectionViewMitk::SelectionViewMitk() : m_Parent(nullptr)
 {
 }
 

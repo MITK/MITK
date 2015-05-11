@@ -64,7 +64,7 @@ const char * SurfaceVtkWriter<vtkSTLWriter>::GetDefaultExtension()
 template<>
 bool SurfaceVtkWriter<vtkSTLWriter>::CanWriteBaseDataType(BaseData::Pointer data)
 {
-  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != NULL;
+  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != nullptr;
 }
 
 template<>
@@ -98,7 +98,7 @@ const char * SurfaceVtkWriter<vtkPolyDataWriter>::GetDefaultExtension()
 template<>
 bool SurfaceVtkWriter<vtkPolyDataWriter>::CanWriteBaseDataType(BaseData::Pointer data)
 {
-  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != NULL;
+  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != nullptr;
 }
 
 template<>
@@ -132,7 +132,7 @@ const char * SurfaceVtkWriter<vtkXMLPolyDataWriter>::GetDefaultExtension()
 template<>
 bool SurfaceVtkWriter<vtkXMLPolyDataWriter>::CanWriteBaseDataType(BaseData::Pointer data)
 {
-  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != NULL;
+  return dynamic_cast<mitk::Surface*>(data.GetPointer()) != nullptr;
 }
 
 template<>

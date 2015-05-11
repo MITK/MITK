@@ -55,13 +55,13 @@ void mitk::PointSetReader::GenerateData()
       TiXmlHandle docHandle( &doc );
       unsigned int pointSetCounter(0);
       for( TiXmlElement* currentPointSetElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
-        currentPointSetElement != NULL; currentPointSetElement = currentPointSetElement->NextSiblingElement())
+        currentPointSetElement != nullptr; currentPointSetElement = currentPointSetElement->NextSiblingElement())
       {
         mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
-        if(currentPointSetElement->FirstChildElement("time_series") != NULL)
+        if(currentPointSetElement->FirstChildElement("time_series") != nullptr)
         {
           for( TiXmlElement* currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
-            currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
+            currentTimeSeries != nullptr; currentTimeSeries = currentTimeSeries->NextSiblingElement())
           {
             unsigned int currentTimeStep(0);
             TiXmlElement* currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
@@ -94,10 +94,10 @@ void mitk::PointSetReader::GenerateData()
 mitk::PointSet::Pointer mitk::PointSetReader::ReadPoint(mitk::PointSet::Pointer newPointSet,
         TiXmlElement* currentTimeSeries, unsigned int currentTimeStep)
 {
-  if(currentTimeSeries->FirstChildElement("point") != NULL)
+  if(currentTimeSeries->FirstChildElement("point") != nullptr)
   {
     for( TiXmlElement* currentPoint = currentTimeSeries->FirstChildElement("point")->ToElement();
-              currentPoint != NULL; currentPoint = currentPoint->NextSiblingElement())
+              currentPoint != nullptr; currentPoint = currentPoint->NextSiblingElement())
       {
         unsigned int id(0);
         mitk::PointSpecificationType spec((mitk::PointSpecificationType) 0);
@@ -106,7 +106,7 @@ mitk::PointSet::Pointer mitk::PointSetReader::ReadPoint(mitk::PointSet::Pointer 
         double z(0.0);
 
        id = atoi(currentPoint->FirstChildElement("id")->GetText());
-        if(currentPoint->FirstChildElement("specification") != NULL)
+        if(currentPoint->FirstChildElement("specification") != nullptr)
         {
           spec = (mitk::PointSpecificationType) atoi(currentPoint->FirstChildElement("specification")->GetText());
         }

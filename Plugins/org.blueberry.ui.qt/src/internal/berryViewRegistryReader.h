@@ -60,7 +60,7 @@ protected:
   /**
    * readElement method comment.
    */
-  bool ReadElement(const SmartPointer<IConfigurationElement>& element);
+  bool ReadElement(const SmartPointer<IConfigurationElement>& element) override;
 
   /**
    * Reads the sticky view element.

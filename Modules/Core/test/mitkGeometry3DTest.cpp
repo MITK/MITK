@@ -364,7 +364,7 @@ int testGeometry3D(bool imageGeometry)
   double angle = 35.0;
   mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
   mitk::Point3D center = geometry3d->GetCenter();
-  mitk::RotationOperation* op = new mitk::RotationOperation( mitk::OpROTATE, center, rotationVector, angle );
+  auto  op = new mitk::RotationOperation( mitk::OpROTATE, center, rotationVector, angle );
   geometry3d->ExecuteOperation(op);
 
   MITK_TEST_OUTPUT( << "Testing mitk::GetRotation() and success of rotation");

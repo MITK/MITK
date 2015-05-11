@@ -169,14 +169,14 @@ IDropTarget::Pointer DetachedWindow::Drag(QWidget* /*currentControl*/,
 
   if (draggedObject.Cast<PartPane> () == 0)
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   PartPane::Pointer sourcePart = draggedObject.Cast<PartPane> ();
 
   if (sourcePart->GetWorkbenchWindow() != page->GetWorkbenchWindow())
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   // Only handle the event if the source part is acceptable to the particular PartStack
@@ -192,12 +192,12 @@ IDropTarget::Pointer DetachedWindow::Drag(QWidget* /*currentControl*/,
       if (displayBounds.contains(position))
       {
         StackDropResult::Pointer stackDropResult(new StackDropResult(
-            displayBounds, Object::Pointer(0)));
+            displayBounds, Object::Pointer(nullptr)));
         target = folder->CreateDropTarget(sourcePart, stackDropResult);
       }
       else
       {
-        return IDropTarget::Pointer(0);
+        return IDropTarget::Pointer(nullptr);
       }
     }
   }
@@ -417,7 +417,7 @@ IWorkbenchPartReference::Pointer DetachedWindow::GetPartReference(
 
   if (pane == 0 || pane.Cast<PartPane> () == 0)
   {
-    return IWorkbenchPartReference::Pointer(0);
+    return IWorkbenchPartReference::Pointer(nullptr);
   }
 
   return pane.Cast<PartPane> ()->GetPartReference();
@@ -479,8 +479,8 @@ bool DetachedWindow::HandleClose()
     //                                  GetWorkbench()->GetService<IContextService>();
     //contextService->UnregisterShell(windowShell);
 
-    windowShell->SetData(Object::Pointer(0));
-    windowShell = 0;
+    windowShell->SetData(Object::Pointer(nullptr));
+    windowShell = nullptr;
   }
 
   return true;

@@ -78,7 +78,7 @@ void PresentablePartFolder::LayoutContent()
 void PresentablePartFolder::InternalRemove(IPresentablePart::Pointer toRemove)
 {
   AbstractTabItem* item = this->GetTab(toRemove);
-  if (item != 0) {
+  if (item != nullptr) {
       item->Dispose();
   }
   // do not use item anymore!
@@ -97,7 +97,7 @@ void PresentablePartFolder::ChildPropertyChanged(
 
   if (property == IPresentablePart::PROP_HIGHLIGHT_IF_BACK)
   {
-    if (tab != 0 && this->GetCurrent() != part)
+    if (tab != nullptr && this->GetCurrent() != part)
     {//Set bold if it doesn't currently have focus
       tab->SetBold(true);
       this->InitTab(tab, part);
@@ -122,7 +122,7 @@ void PresentablePartFolder::ChildPropertyChanged(
       == IPresentablePart::PROP_PANE_MENU || property
       == IPresentablePart::PROP_TITLE)
   {
-    if (tab != 0)
+    if (tab != nullptr)
     {
       this->InitTab(tab, part);
       if (this->GetCurrent() == part)
@@ -139,7 +139,7 @@ void PresentablePartFolder::ChildPropertyChanged(
   }
   else
   {
-    if (tab != 0)
+    if (tab != nullptr)
       this->InitTab(tab, part);
   }
 }
@@ -211,9 +211,9 @@ QList<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()
 
 void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
 {
-  poco_assert(folder->GetControl() != 0);
+  poco_assert(folder->GetControl() != nullptr);
 
-  if (this->GetTab(part) != 0)
+  if (this->GetTab(part) != nullptr)
   {
     if (this->IndexOf(part) != idx)
     this->Move(part, idx);
@@ -222,7 +222,7 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
 
   idx = std::min<int>(idx, static_cast<int>(folder->GetItemCount()));
 
-  AbstractTabItem* item = 0;
+  AbstractTabItem* item = nullptr;
 
   int style = 0;
 
@@ -245,7 +245,7 @@ void PresentablePartFolder::Remove(IPresentablePart::Pointer toRemove)
 {
   if (toRemove == current)
   {
-    this->Select(IPresentablePart::Pointer(0));
+    this->Select(IPresentablePart::Pointer(nullptr));
   }
 
   this->InternalRemove(toRemove);
@@ -318,7 +318,7 @@ void PresentablePartFolder::Select(IPresentablePart::Pointer toSelect)
 
   folder->SetSelection(selectedItem);
 
-  if (selectedItem != 0)
+  if (selectedItem != nullptr)
   {
     // Determine if we need to un-bold this tab
     selectedItem->SetBold(false);
@@ -335,9 +335,9 @@ void PresentablePartFolder::Select(IPresentablePart::Pointer toSelect)
 IPresentablePart::Pointer PresentablePartFolder::GetPartForTab(
     AbstractTabItem* tab)
 {
-  if (tab == 0)
+  if (tab == nullptr)
   {
-    return IPresentablePart::Pointer(0);
+    return IPresentablePart::Pointer(nullptr);
   }
 
   IPresentablePart::Pointer part = tab->GetData().Cast<IPresentablePart> ();
@@ -354,7 +354,7 @@ int PresentablePartFolder::IndexOf(IPresentablePart::Pointer part)
 {
   AbstractTabItem* item = this->GetTab(part);
 
-  if (item == 0)
+  if (item == nullptr)
   {
     return -1;
   }

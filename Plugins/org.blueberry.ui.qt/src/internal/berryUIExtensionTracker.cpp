@@ -44,7 +44,7 @@ void UIExtensionTracker::ApplyRemove(IExtensionChangeHandler* handler, const Sma
       , objs(objs)
     {}
 
-    void run()
+    void run() override
     {
       try
       {
@@ -77,7 +77,7 @@ void UIExtensionTracker::ApplyAdd(IExtensionChangeHandler* handler, const SmartP
       , extension(extension)
     {}
 
-    void run()
+    void run() override
     {
       try
       {

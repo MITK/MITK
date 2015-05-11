@@ -27,7 +27,7 @@ namespace berry
 
 QtOpenPerspectiveAction::QtOpenPerspectiveAction(
     IWorkbenchWindow::Pointer window, IPerspectiveDescriptor::Pointer descr, QActionGroup* group) :
-  QAction(0),
+  QAction(nullptr),
   window(window.GetPointer())
 {
   this->setParent(group);
@@ -54,7 +54,7 @@ void QtOpenPerspectiveAction::Run()
   }
   catch (...)
   {
-    QMessageBox::critical(0, "Opening Perspective Failed", QString("The perspective \"") + this->text() + "\" could not be opened.\nSee the log for details.");
+    QMessageBox::critical(nullptr, "Opening Perspective Failed", QString("The perspective \"") + this->text() + "\" could not be opened.\nSee the log for details.");
   }
 }
 

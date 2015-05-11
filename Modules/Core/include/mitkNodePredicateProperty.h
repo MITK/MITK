@@ -53,7 +53,7 @@ namespace mitk {
     protected:
       //##Documentation
       //## @brief Constructor to check for a named property
-      NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p=0, const mitk::BaseRenderer *renderer=0);
+      NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p=nullptr, const mitk::BaseRenderer *renderer=nullptr);
 
       //mitk::WeakPointer<mitk::BaseProperty> m_ValidProperty;
       mitk::BaseProperty::Pointer m_ValidProperty;

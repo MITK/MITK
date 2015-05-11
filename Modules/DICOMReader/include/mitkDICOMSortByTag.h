@@ -53,7 +53,7 @@ class MITKDICOMREADER_EXPORT DICOMSortByTag : public DICOMSortCriterion
 
   protected:
 
-    DICOMSortByTag( const DICOMTag& tag, DICOMSortCriterion::Pointer secondaryCriterion = NULL );
+    DICOMSortByTag( const DICOMTag& tag, DICOMSortCriterion::Pointer secondaryCriterion = nullptr );
     virtual ~DICOMSortByTag();
 
     DICOMSortByTag(const DICOMSortByTag& other);

@@ -65,7 +65,7 @@ QDebug CoreException::PrintChildren(IStatus *status, QDebug dbg) const
   {
     dbg << "Contains: " << qPrintable(children[i]->GetMessage()) << '\n';
     const ctkException* exc = children[i]->GetException();
-    if (exc != NULL)
+    if (exc != nullptr)
     {
       dbg << exc->printStackTrace();
     }

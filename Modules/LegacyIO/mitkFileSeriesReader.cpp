@@ -151,7 +151,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     // the result should be only the files that should be read
     //
     StringContainer matchedFiles;
-    for ( StringContainer::iterator it = unmatchedFiles.begin() ; it != unmatchedFiles.end() ; ++it )
+    for ( auto it = unmatchedFiles.begin() ; it != unmatchedFiles.end() ; ++it )
     {
         bool prefixMatch = false;
         bool extensionMatch = false;
@@ -185,7 +185,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     // in a SortedStringContainer
     //
     SortedStringContainer sortedFiles;
-    for ( StringContainer::iterator it = matchedFiles.begin() ; it != matchedFiles.end() ; ++it )
+    for ( auto it = matchedFiles.begin() ; it != matchedFiles.end() ; ++it )
     {
       // parse the filename starting from pos digitBegin until we reach a non-digit
       // or the end of filename
@@ -233,7 +233,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     m_MatchedFileNames.clear();
     m_MatchedFileNames.resize( sortedFiles.size() );
     unsigned long index = 0;
-    for ( SortedStringContainer::iterator it = sortedFiles.begin() ; it != sortedFiles.end() ; ++it, ++index )
+    for ( auto it = sortedFiles.begin() ; it != sortedFiles.end() ; ++it, ++index )
     {
         m_MatchedFileNames[ index ] = it->second ;
         MITK_INFO << "Added " << it->second << " to the set of matched files!" << std::endl;

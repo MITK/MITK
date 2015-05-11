@@ -85,7 +85,7 @@ struct NullSelectionChangedAdapter: public INullSelectionListener
   }
 
   void SelectionChanged(const IWorkbenchPart::Pointer& part,
-                        const ISelection::ConstPointer& selection)
+                        const ISelection::ConstPointer& selection) override
   {
     (listener->*callback)(part, selection);
   }

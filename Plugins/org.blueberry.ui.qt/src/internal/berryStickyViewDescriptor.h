@@ -73,22 +73,22 @@ public:
   /*
    * @see IStickyViewDescriptor#GetLocation()
    */
-  int GetLocation() const;
+  int GetLocation() const override;
 
   /*
    * @see IStickyViewDescriptor#GetId()
    */
-  QString GetId() const;
+  QString GetId() const override;
 
   /*
    * @see IStickyViewDescriptor#IsFixed()
    */
-  bool IsCloseable() const;
+  bool IsCloseable() const override;
 
   /*
    * @see IStickyViewDescriptor#IsMoveable()
    */
-  bool IsMoveable() const;
+  bool IsMoveable() const override;
 };
 
 }

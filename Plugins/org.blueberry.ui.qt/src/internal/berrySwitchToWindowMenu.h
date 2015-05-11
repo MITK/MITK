@@ -68,19 +68,19 @@ public:
    * Fills the given menu with menu items for all
    * opened workbench windows.
    */
-  void Fill(QMenu* menu, QAction* before);
+  void Fill(QMenu* menu, QAction* before) override;
 
   using ContributionItem::Fill;
 
   /**
    * Overridden to always return true and force dynamic menu building.
    */
-  bool IsDirty() const;
+  bool IsDirty() const override;
 
   /**
    * Overridden to always return true and force dynamic menu building.
    */
-  bool IsDynamic() const;
+  bool IsDynamic() const override;
 
 };
 

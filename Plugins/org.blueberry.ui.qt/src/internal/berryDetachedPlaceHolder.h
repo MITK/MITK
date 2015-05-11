@@ -52,7 +52,7 @@ public:
     /**
      * Add a child to the container.
      */
-    void Add(LayoutPart::Pointer newPart);
+    void Add(LayoutPart::Pointer newPart) override;
 
     /**
      * Return true if the container allows its
@@ -63,9 +63,9 @@ public:
      */
     bool AllowsBorder();
 
-    bool AllowsAdd(LayoutPart::Pointer toAdd);
+    bool AllowsAdd(LayoutPart::Pointer toAdd) override;
 
-    bool AllowsAutoFocus();
+    bool AllowsAutoFocus() override;
 
     QRect GetBounds();
 
@@ -76,12 +76,12 @@ public:
     /**
      * Remove a child from the container.
      */
-    void Remove(LayoutPart::Pointer part);
+    void Remove(LayoutPart::Pointer part) override;
 
     /**
      * Replace one child with another
      */
-    void Replace(LayoutPart::Pointer oldPart, LayoutPart::Pointer newPart);
+    void Replace(LayoutPart::Pointer oldPart, LayoutPart::Pointer newPart) override;
 
 
     /**
@@ -96,11 +96,11 @@ public:
      */
     void SaveState(IMemento::Pointer memento);
 
-    void FindSashes(LayoutPart::Pointer part, PartPane::Sashes& sashes);
+    void FindSashes(LayoutPart::Pointer part, PartPane::Sashes& sashes) override;
 
-    ILayoutContainer::ChildrenType GetChildren() const;
+    ILayoutContainer::ChildrenType GetChildren() const override;
 
-    void ResizeChild(LayoutPart::Pointer childThatChanged);
+    void ResizeChild(LayoutPart::Pointer childThatChanged) override;
 
 };
 

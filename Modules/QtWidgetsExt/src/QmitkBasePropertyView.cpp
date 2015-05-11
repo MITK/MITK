@@ -34,7 +34,7 @@ void QmitkBasePropertyView::PropertyChanged()
 
 void QmitkBasePropertyView::PropertyRemoved()
 {
-  m_Property = NULL;
+  m_Property = nullptr;
   setText("n/a");
 }
 

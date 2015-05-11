@@ -87,7 +87,7 @@ PerspectiveDescriptor::PerspectiveDescriptor(const QString& id,
     IStatus::Pointer status(new Status(
                               IStatus::ERROR_TYPE,
                               PlatformUI::PLUGIN_ID(),
-                              0,
+                              nullptr,
                               QString("Invalid extension (missing label, id or class name): ") + GetId()));
     throw CoreException(status);
   }
@@ -105,7 +105,7 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
             dynamic_cast<PerspectiveRegistry*> (WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()) ->FindPerspectiveWithId(
                 originalId);
 
-    return target == 0 ? IPerspectiveFactory::Pointer(0) : target.Cast<
+    return target == 0 ? IPerspectiveFactory::Pointer(nullptr) : target.Cast<
         PerspectiveDescriptor> ()->CreateFactory();
   }
 
@@ -125,7 +125,7 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
     }
   }
 
-  return IPerspectiveFactory::Pointer(0);
+  return IPerspectiveFactory::Pointer(nullptr);
 }
 
 void PerspectiveDescriptor::DeleteCustomDefinition()

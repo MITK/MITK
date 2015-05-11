@@ -61,7 +61,7 @@ public:
      * The <code>AbstractGroupMarker</code> implementation of this <code>IContributionItem</code>
      * method returns <code>true</code> iff the id is not <code>null</code>. Subclasses may override.
      */
-    bool IsGroupMarker() const;
+    bool IsGroupMarker() const override;
 };
 
 }

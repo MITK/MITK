@@ -125,12 +125,12 @@ struct ControlMovedAdapter: public IControlListener
     poco_assert(callback);
   }
 
-  Events::Types GetEventTypes() const
+  Events::Types GetEventTypes() const override
   {
     return Events::MOVED;
   }
 
-  void ControlMoved(ControlEvent::Pointer e)
+  void ControlMoved(ControlEvent::Pointer e) override
   {
     (listener->*callback)(e);
   }
@@ -155,12 +155,12 @@ struct ControlResizedAdapter: public IControlListener
     poco_assert(callback);
   }
 
-  Events::Types GetEventTypes() const
+  Events::Types GetEventTypes() const override
   {
     return Events::RESIZED;
   }
 
-  void ControlResized(ControlEvent::Pointer e)
+  void ControlResized(ControlEvent::Pointer e) override
   {
     (listener->*callback)(e);
   }
@@ -185,12 +185,12 @@ struct ControlActivatedAdapter: public IControlListener
     poco_assert(callback);
   }
 
-  Events::Types GetEventTypes() const
+  Events::Types GetEventTypes() const override
   {
     return Events::ACTIVATED;
   }
 
-  void ControlActivated(ControlEvent::Pointer e)
+  void ControlActivated(ControlEvent::Pointer e) override
   {
     (listener->*callback)(e);
   }
@@ -215,12 +215,12 @@ struct ControlDestroyedAdapter: public IControlListener
     poco_assert(callback);
   }
 
-  Events::Types GetEventTypes() const
+  Events::Types GetEventTypes() const override
   {
     return Events::DESTROYED;
   }
 
-  void ControlDestroyed(ControlEvent::Pointer e)
+  void ControlDestroyed(ControlEvent::Pointer e) override
   {
     (listener->*callback)(e);
   }

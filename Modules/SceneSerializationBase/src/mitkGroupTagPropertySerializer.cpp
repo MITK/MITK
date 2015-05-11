@@ -34,12 +34,12 @@ class GroupTagPropertySerializer : public BasePropertySerializer
 
     virtual TiXmlElement* Serialize() override
     {
-      if (dynamic_cast<const GroupTagProperty*>(m_Property.GetPointer()) != NULL)
+      if (dynamic_cast<const GroupTagProperty*>(m_Property.GetPointer()) != nullptr)
       {
-        TiXmlElement* element = new TiXmlElement("GroupTag");
+        auto  element = new TiXmlElement("GroupTag");
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement*) override

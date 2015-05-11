@@ -114,7 +114,7 @@ const mitk::BaseGeometry* mitk::BaseData::GetUpdatedGeometry(int t)
 void mitk::BaseData::SetGeometry(BaseGeometry* geometry)
 {
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  if(geometry!=NULL)
+  if(geometry!=nullptr)
   {
     timeGeometry->Initialize(geometry, 1);
   }
@@ -158,7 +158,7 @@ bool mitk::BaseData::IsEmpty() const
   if(IsInitialized() == false)
     return true;
   const TimeGeometry* timeGeometry = const_cast<BaseData*>(this)->GetUpdatedTimeGeometry();
-  if(timeGeometry == NULL)
+  if(timeGeometry == nullptr)
     return true;
   unsigned int timeSteps = timeGeometry->CountTimeSteps();
   for ( unsigned int t = 0 ; t < timeSteps ; ++t )
@@ -200,14 +200,14 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
 {
   TimeGeometry* timeGeom = GetTimeGeometry();
 
-  assert (timeGeom != NULL);
+  assert (timeGeom != nullptr);
   BaseGeometry* geometry;
 
   TimeStepType steps = timeGeom->CountTimeSteps();
   for (TimeStepType timestep = 0; timestep < steps; ++timestep)
   {
     geometry = GetGeometry(timestep);
-    if (geometry != NULL)
+    if (geometry != nullptr)
     {
       geometry->SetOrigin(origin);
     }
@@ -236,10 +236,10 @@ void mitk::BaseData::Graft(const itk::DataObject*)
 void mitk::BaseData::CopyInformation( const itk::DataObject* data )
 {
   const Self* bd = dynamic_cast<const Self*>(data);
-  if (bd != NULL)
+  if (bd != nullptr)
   {
     m_PropertyList = bd->GetPropertyList()->Clone();
-    if (bd->GetTimeGeometry()!=NULL)
+    if (bd->GetTimeGeometry()!=nullptr)
     {
       m_TimeGeometry = bd->GetTimeGeometry()->Clone();
     }
@@ -283,7 +283,7 @@ void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
   os << std::endl;
   os << indent << " TimeGeometry: ";
-  if(GetTimeGeometry() == NULL)
+  if(GetTimeGeometry() == nullptr)
     os << "NULL" << std::endl;
   else
     GetTimeGeometry()->Print(os, indent);

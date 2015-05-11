@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::PlaneFit::PlaneFit()
-: m_PointSet( NULL )
+: m_PointSet( nullptr )
 {
   m_TimeGeometry = mitk::ProportionalTimeGeometry::New();
 }
@@ -44,13 +44,13 @@ void mitk::PlaneFit::GenerateOutputInformation()
 
   if (input.IsNull()) return;
 
-  if ( m_PointSet == NULL )
+  if ( m_PointSet == nullptr )
   {
     return;
   }
 
   bool update = false;
-  if ( output->GetGeometry() == NULL || output->GetTimeGeometry() == NULL )
+  if ( output->GetGeometry() == nullptr || output->GetTimeGeometry() == nullptr )
     update = true;
   if ( ( ! update ) && ( output->GetTimeGeometry()->CountTimeSteps() != input->GetTimeGeometry()->CountTimeSteps() ) )
     update = true;
@@ -117,7 +117,7 @@ const mitk::PointSet* mitk::PlaneFit::GetInput()
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::PointSet * > (this->ProcessObject::GetInput(0) );
@@ -126,7 +126,7 @@ const mitk::PointSet* mitk::PlaneFit::GetInput()
 
 void mitk::PlaneFit::CalculateCentroid( int t )
 {
-  if ( m_PointSet == NULL ) return;
+  if ( m_PointSet == nullptr ) return;
 
   int ps_total = m_PointSet->GetSize( t );
 
@@ -149,7 +149,7 @@ void mitk::PlaneFit::CalculateCentroid( int t )
 
 void mitk::PlaneFit::ProcessPointSet( int t )
 {
-  if (m_PointSet == NULL ) return;
+  if (m_PointSet == nullptr ) return;
 
   // int matrix with POINTS x (X,Y,Z)
   vnl_matrix<mitk::ScalarType> dataM( m_PointSet->GetSize( t ), 3);

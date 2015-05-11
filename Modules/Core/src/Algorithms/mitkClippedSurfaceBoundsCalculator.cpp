@@ -21,9 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
     const mitk::PlaneGeometry* geometry,
     mitk::Image::Pointer image)
-: m_PlaneGeometry(NULL)
-, m_Geometry3D(NULL)
-, m_Image(NULL)
+: m_PlaneGeometry(nullptr)
+, m_Geometry3D(nullptr)
+, m_Image(nullptr)
 {
   this->InitializeOutput();
 
@@ -33,9 +33,9 @@ mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
     const mitk::BaseGeometry* geometry,
     mitk::Image::Pointer image)
-: m_PlaneGeometry(NULL)
-, m_Geometry3D(NULL)
-, m_Image(NULL)
+: m_PlaneGeometry(nullptr)
+, m_Geometry3D(nullptr)
+, m_Image(nullptr)
 {
   this->InitializeOutput();
 
@@ -43,8 +43,8 @@ mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator(
 }
 
 mitk::ClippedSurfaceBoundsCalculator::ClippedSurfaceBoundsCalculator( const PointListType pointlist, mitk::Image::Pointer image )
-: m_PlaneGeometry(NULL)
-, m_Geometry3D(NULL)
+: m_PlaneGeometry(nullptr)
+, m_Geometry3D(nullptr)
 , m_Image(image)
 {
   this->InitializeOutput();
@@ -77,7 +77,7 @@ mitk::ClippedSurfaceBoundsCalculator::SetInput(
   {
     this->m_PlaneGeometry = geometry;
     this->m_Image = image;
-    this->m_Geometry3D = NULL;        //Not possible to set both
+    this->m_Geometry3D = nullptr;        //Not possible to set both
     m_ObjectPointsInWorldCoordinates.clear();
   }
 }
@@ -91,7 +91,7 @@ mitk::ClippedSurfaceBoundsCalculator::SetInput(
   {
     this->m_Geometry3D = geometry;
     this->m_Image = image;
-    this->m_PlaneGeometry = NULL;     //Not possible to set both
+    this->m_PlaneGeometry = nullptr;     //Not possible to set both
     m_ObjectPointsInWorldCoordinates.clear();
   }
 }
@@ -100,8 +100,8 @@ void mitk::ClippedSurfaceBoundsCalculator::SetInput( const std::vector<mitk::Poi
 {
   if ( !pointlist.empty() && image )
   {
-    m_Geometry3D = NULL;
-    m_PlaneGeometry = NULL;
+    m_Geometry3D = nullptr;
+    m_PlaneGeometry = nullptr;
     m_Image = image;
     m_ObjectPointsInWorldCoordinates = pointlist;
   }
@@ -256,7 +256,7 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
 
 
 
-  for (EdgesVector::iterator iterator = edgesOf3DBox.begin(); iterator != edgesOf3DBox.end();iterator++)
+  for (auto iterator = edgesOf3DBox.begin(); iterator != edgesOf3DBox.end();iterator++)
   {
     Point3D startPoint = (*iterator).first;   // start point of the line
     Point3D endPoint   = (*iterator).second;  // end point of the line

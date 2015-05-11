@@ -30,7 +30,7 @@ class ClosePerspectiveHandler : public AbstractHandler
 
 public:
 
-  Object::Pointer Execute(const SmartPointer<const ExecutionEvent>& event);
+  Object::Pointer Execute(const SmartPointer<const ExecutionEvent>& event) override;
 
   /**
    * Closes the specified perspective. Nothing will happen if the given page

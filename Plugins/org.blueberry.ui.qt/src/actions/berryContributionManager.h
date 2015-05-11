@@ -60,32 +60,32 @@ public:
   /*
    * Method declared on IContributionManager.
    */
-  void Add(QAction* action, const QString& id);
+  void Add(QAction* action, const QString& id) override;
 
   /*
    * Method declared on IContributionManager.
    */
-  void Add(const SmartPointer<IContributionItem>& item);
+  void Add(const SmartPointer<IContributionItem>& item) override;
 
   /*
    * Method declared on IContributionManager.
    */
-  void AppendToGroup(const QString& groupName, QAction* action, const QString& id);
+  void AppendToGroup(const QString& groupName, QAction* action, const QString& id) override;
 
   /*
    * Method declared on IContributionManager.
    */
-  void AppendToGroup(const QString& groupName, const SmartPointer<IContributionItem>& item);
+  void AppendToGroup(const QString& groupName, const SmartPointer<IContributionItem>& item) override;
 
   /*
    * Method declared on IContributionManager.
    */
-  SmartPointer<IContributionItem> Find(const QString& id) const;
+  SmartPointer<IContributionItem> Find(const QString& id) const override;
 
   /*
    * Method declared on IContributionManager.
    */
-  QList<SmartPointer<IContributionItem> > GetItems() const;
+  QList<SmartPointer<IContributionItem> > GetItems() const override;
 
   /**
    * Return the number of contributions in this manager.
@@ -100,7 +100,7 @@ public:
    * overrides. If there is no overrides it lazily creates one which overrides
    * no item state.
    */
-  SmartPointer<IContributionManagerOverrides> GetOverrides();
+  SmartPointer<IContributionManagerOverrides> GetOverrides() override;
 
   /**
    * Returns the index of the item with the given id.
@@ -130,7 +130,7 @@ public:
   /*
    * (non-Javadoc) Method declared on IContributionManager.
    */
-  void InsertAfter(const QString& ID, const SmartPointer<IContributionItem>& item);
+  void InsertAfter(const QString& ID, const SmartPointer<IContributionItem>& item) override;
 
   /*
    * (non-Javadoc) Method declared on IContributionManager.
@@ -140,22 +140,22 @@ public:
   /*
    * Method declared on IContributionManager.
    */
-  void InsertBefore(const QString& ID, const SmartPointer<IContributionItem>& item);
+  void InsertBefore(const QString& ID, const SmartPointer<IContributionItem>& item) override;
 
   /*
    * Method declared on IContributionManager.
    */
-  bool IsDirty() const;
+  bool IsDirty() const override;
 
   /*
    * Method declared on IContributionManager.
    */
-  bool IsEmpty() const;
+  bool IsEmpty() const override;
 
   /*
    * Method declared on IContributionManager.
    */
-  void MarkDirty();
+  void MarkDirty() override;
 
   /*
    * Method declared on IContributionManager.
@@ -165,22 +165,22 @@ public:
   /*
    * Method declared on IContributionManager.
    */
-  void PrependToGroup(const QString& groupName, const SmartPointer<IContributionItem>& item);
+  void PrependToGroup(const QString& groupName, const SmartPointer<IContributionItem>& item) override;
 
   /*
    * Method declared on IContributionManager.
    */
-  SmartPointer<IContributionItem> Remove(const QString& ID);
+  SmartPointer<IContributionItem> Remove(const QString& ID) override;
 
   /*
    * Method declared on IContributionManager.
    */
-  SmartPointer<IContributionItem> Remove(const SmartPointer<IContributionItem> &item);
+  SmartPointer<IContributionItem> Remove(const SmartPointer<IContributionItem> &item) override;
 
   /*
    * (non-Javadoc) Method declared on IContributionManager.
    */
-  void RemoveAll();
+  void RemoveAll() override;
 
   /**
    * Replaces the item of the given identifier with another contribution item.

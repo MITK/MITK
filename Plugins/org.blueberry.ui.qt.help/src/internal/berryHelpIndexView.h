@@ -81,11 +81,11 @@ public:
   HelpIndexView();
   ~HelpIndexView();
 
-  void SetFocus();
+  void SetFocus() override;
 
 protected:
 
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
   void setSearchLineEditText(const QString &text);
   QString searchLineEditText() const;
@@ -106,7 +106,7 @@ private Q_SLOTS:
 
 private:
 
-  bool eventFilter(QObject *obj, QEvent *e);
+  bool eventFilter(QObject *obj, QEvent *e) override;
   void focusInEvent(QFocusEvent *e);
   void open(HelpIndexWidget *indexWidget, const QModelIndex &index);
 

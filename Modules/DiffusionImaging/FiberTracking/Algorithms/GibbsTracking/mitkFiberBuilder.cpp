@@ -70,13 +70,13 @@ vtkSmartPointer<vtkPolyData> FiberBuilder::iterate(int minFiberLength)
 
 void FiberBuilder::LabelPredecessors(Particle* p, int ep, vtkPolyLine* container)
 {
-    Particle* p2 = NULL;
+    Particle* p2 = nullptr;
     if (ep==1)
         p2 = m_Grid->GetParticle(p->pID);
     else
         p2 = m_Grid->GetParticle(p->mID);
 
-    if (p2!=NULL && p2->label==0)
+    if (p2!=nullptr && p2->label==0)
     {
         p2->label = 1;    // assign particle to current fiber
 
@@ -96,13 +96,13 @@ void FiberBuilder::LabelSuccessors(Particle* p, int ep, vtkPolyLine* container)
 {
     AddPoint(p, container);
 
-    Particle* p2 = NULL;
+    Particle* p2 = nullptr;
     if (ep==1)
         p2 = m_Grid->GetParticle(p->pID);
     else
         p2 = m_Grid->GetParticle(p->mID);
 
-    if (p2!=NULL && p2->label==0)
+    if (p2!=nullptr && p2->label==0)
     {
         p2->label = 1;    // assign particle to current fiber
 

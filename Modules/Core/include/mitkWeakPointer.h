@@ -55,7 +55,7 @@ public:
   WeakPointer ()
     : m_DeleteObserverTag(-1)
     , m_ModifiedObserverTag(-1)
-    , m_Pointer(0)
+    , m_Pointer(nullptr)
   {
   }
 
@@ -82,7 +82,7 @@ public:
   {
     this->RemoveDeleteAndModifiedObserver();
 
-    m_Pointer = 0;
+    m_Pointer = nullptr;
   }
 
   /** Overload operator ->.  */
@@ -127,9 +127,9 @@ public:
 
   /** Test if the pointer has been initialized */
   bool IsNotNull() const
-  { return m_Pointer != 0; }
+  { return m_Pointer != nullptr; }
   bool IsNull() const
-  { return m_Pointer == 0; }
+  { return m_Pointer == nullptr; }
 
   /** Overload operator assignment.  */
   WeakPointer &operator = (const WeakPointer &r)
@@ -161,7 +161,7 @@ public:
     // event listener vector (in itk::Object) and would lead to a crash
     // instead: do nothing->object is going to be dead soon...
     //this->RemoveDeleteAndModifiedObserver();
-    m_Pointer = 0;
+    m_Pointer = nullptr;
     m_DeleteObserverTag = -1;
     m_ModifiedObserverTag = -1;
     ObjectDelete.Send(caller);
@@ -176,7 +176,7 @@ public:
 private:
   void AddDeleteAndModifiedObserver()
   {
-    if(m_DeleteObserverTag == -1 && m_ModifiedObserverTag == -1 && m_Pointer != 0)
+    if(m_DeleteObserverTag == -1 && m_ModifiedObserverTag == -1 && m_Pointer != nullptr)
     {
       // add observer for delete event
       typename itk::MemberCommand<WeakPointer<TObjectType> >::Pointer onObjectDelete =
@@ -196,7 +196,7 @@ private:
 
   void RemoveDeleteAndModifiedObserver()
   {
-    if(m_DeleteObserverTag >= 0 && m_ModifiedObserverTag >= 0 && m_Pointer != 0)
+    if(m_DeleteObserverTag >= 0 && m_ModifiedObserverTag >= 0 && m_Pointer != nullptr)
     {
       m_Pointer->RemoveObserver(m_DeleteObserverTag);
       m_Pointer->RemoveObserver(m_ModifiedObserverTag);

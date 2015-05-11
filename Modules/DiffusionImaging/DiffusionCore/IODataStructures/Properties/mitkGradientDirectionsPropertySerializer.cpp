@@ -42,16 +42,16 @@ class MITKDIFFUSIONCORE_EXPORT GradientDirectionsPropertySerializer : public Bas
         typedef mitk::GradientDirectionsProperty::GradientDirectionsContainerType GradientDirectionsContainerType;
         GradientDirectionsContainerType::Pointer gdc = prop->GetGradientDirectionsContainer().GetPointer();
 
-        if(gdc.IsNull() || gdc->Size() == 0) return NULL;
+        if(gdc.IsNull() || gdc->Size() == 0) return nullptr;
 
 
         GradientDirectionsContainerType::Iterator it = gdc->Begin();
         GradientDirectionsContainerType::Iterator end = gdc->End();
 
-        TiXmlElement* element = new TiXmlElement("gradientdirections");
+        auto  element = new TiXmlElement("gradientdirections");
 
         while (it != end) {
-          TiXmlElement* child = new TiXmlElement("entry");
+          auto  child = new TiXmlElement("entry");
           std::stringstream ss;
           ss << it.Value();
           child->SetAttribute("value", ss.str());
@@ -62,18 +62,18 @@ class MITKDIFFUSIONCORE_EXPORT GradientDirectionsPropertySerializer : public Bas
 
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer gdc;
       gdc = mitk::GradientDirectionsProperty::GradientDirectionsContainerType::New();
 
       TiXmlElement* entry = element->FirstChildElement( "entry" )->ToElement();
-      while(entry != NULL){
+      while(entry != nullptr){
 
         std::stringstream ss;
         std::string value;

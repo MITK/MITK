@@ -37,7 +37,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkFileChooser : public QWidget
     ///
     /// standard ctor, init values to defaults (see methods for values)
     ///
-    explicit QmitkFileChooser( QWidget* parent = 0, Qt::WindowFlags f = 0);
+    explicit QmitkFileChooser( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
     ///
     /// determines whether the button "Select file" is shown on the left

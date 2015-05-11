@@ -61,17 +61,17 @@ public:
    */
   ActivePartExpression(IWorkbenchPart* activePart);
 
-  void CollectExpressionInfo(ExpressionInfo* info) const;
+  void CollectExpressionInfo(ExpressionInfo* info) const override;
 
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 
-  SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* context) const;
+  SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* context) const override;
 
-  QString ToString() const;
+  QString ToString() const override;
 
 protected:
 
-  uint ComputeHashCode() const;
+  uint ComputeHashCode() const override;
 
 };
 

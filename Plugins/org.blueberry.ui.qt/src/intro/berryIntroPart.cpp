@@ -41,7 +41,7 @@ public:
   {
   }
 
-  void Run()
+  void Run() override
   {
     delegate->Execute(event);
   }
@@ -68,7 +68,7 @@ void IntroPart::FirePropertyChange(int propertyId)
 
   const ListenerList& listeners =
       propChangeEvents.propertyChange.GetListeners();
-  for (ListenerList::const_iterator iter = listeners.begin(); iter
+  for (auto iter = listeners.begin(); iter
       != listeners.end(); ++iter)
   {
     runnable->delegate = *iter;

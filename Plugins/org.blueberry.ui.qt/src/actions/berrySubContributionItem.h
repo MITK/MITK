@@ -65,22 +65,22 @@ public:
     /*
      * Method declared on IContributionItem.
      */
-    void Fill(QStatusBar* parent);
+    void Fill(QStatusBar* parent) override;
 
     /*
      * Method declared on IContributionItem.
      */
-    void Fill(QMenu* parent, QAction* before);
+    void Fill(QMenu* parent, QAction* before) override;
 
     /*
      * Method declared on IContributionItem.
      */
-    void Fill(QToolBar* parent, QAction* before);
+    void Fill(QToolBar* parent, QAction* before) override;
 
     /*
      * Method declared on IContributionItem.
      */
-    QString GetId() const;
+    QString GetId() const override;
 
     /**
      * Returns the inner contribution item.
@@ -92,57 +92,57 @@ public:
     /*
      * Method declared on IContributionItem.
      */
-    bool IsEnabled() const;
+    bool IsEnabled() const override;
 
     /*
      * Method declared on IContributionItem.
      */
-    bool IsDirty() const;
+    bool IsDirty() const override;
 
     /*
      * Method declared on IContributionItem.
      */
-    bool IsDynamic() const;
+    bool IsDynamic() const override;
 
     /*
      * Method declared on IContributionItem.
      */
-    bool IsGroupMarker() const;
+    bool IsGroupMarker() const override;
 
     /*
      * Method declared on IContributionItem.
      */
-    bool IsSeparator() const;
+    bool IsSeparator() const override;
 
     /*
      * Method declared on IContributionItem.
      */
-    bool IsVisible() const;
+    bool IsVisible() const override;
 
     /*
      * Method declared on IContributionItem.
      */
-    void SetParent(IContributionManager* parent);
+    void SetParent(IContributionManager* parent) override;
 
     /*
      * Method declared on IContributionItem.
      */
-    void SetVisible(bool visible);
+    void SetVisible(bool visible) override;
 
     /*
      * Method declared on IContributionItem.
      */
-    void Update();
+    void Update() override;
 
     /*
      * Method declared on IContributionItem.
      */
-    void Update(const QString& id);
+    void Update(const QString& id) override;
 
     /*
      * @see IContributionItem#SaveWidgetState()
      */
-    void SaveWidgetState();
+    void SaveWidgetState() override;
 
 };
 

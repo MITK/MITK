@@ -60,7 +60,7 @@ class MITKSEGMENTATION_EXPORT SegmentationInterpolationAlgorithm : public itk::O
                                        unsigned int sliceDimension,
                                        Image::Pointer resultImage,
                                        unsigned int timeStep = 0,
-                                       Image::ConstPointer referenceImage = NULL) = 0;
+                                       Image::ConstPointer referenceImage = nullptr) = 0;
 };
 
 } // namespace

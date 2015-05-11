@@ -83,7 +83,7 @@ void  AddListener(IParameterTypeListener* listener);
    * @return A negative integer, zero or a positive integer, if the object is
    *         greater than, equal to or less than this parameter type.
    */
-  bool operator<(const Object* object) const;
+  bool operator<(const Object* object) const override;
 
   /**
    * <p>
@@ -148,13 +148,13 @@ void  AddListener(IParameterTypeListener* listener);
    *
    * @return The string representation; never <code>null</code>.
    */
-  QString ToString() const;
+  QString ToString() const override;
 
   /**
    * Makes this parameter type become undefined. Notification is sent to all
    * listeners.
    */
-  void Undefine();
+  void Undefine() override;
 
 protected:
 

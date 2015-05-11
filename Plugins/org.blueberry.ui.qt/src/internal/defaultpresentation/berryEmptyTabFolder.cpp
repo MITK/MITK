@@ -26,11 +26,11 @@ namespace berry
 {
 
 EmptyTabFolder::EmptyTabFolder(QWidget* parent, bool  /*showborder*/) :
-  control(0), childControl(0)
+  control(nullptr), childControl(nullptr)
 {
   control = new QFrame(parent);
   control->setObjectName("StandaloneViewForm");
-  QHBoxLayout* layout = new QHBoxLayout(control);
+  auto   layout = new QHBoxLayout(control);
   layout->setContentsMargins(0,0,0,0);
   control->setLayout(layout);
 
@@ -75,7 +75,7 @@ void EmptyTabFolder::SetContent(QWidget* newContent)
 {
   if (childControl)
   {
-    childControl->setParent(0);
+    childControl->setParent(nullptr);
   }
 
   childControl = newContent;
@@ -89,7 +89,7 @@ QList<AbstractTabItem*> EmptyTabFolder::GetItems()
 
 AbstractTabItem* EmptyTabFolder::GetSelection()
 {
-  return 0;
+  return nullptr;
 }
 
 void EmptyTabFolder::SetSelection(AbstractTabItem*  /*toSelect*/)

@@ -62,14 +62,14 @@ public:
   NestableHandlerService(IHandlerService* parentHandlerService,
                          const SmartPointer<Expression>& defaultExpression);
 
-  void Activate();
+  void Activate() override;
 
-  void Deactivate();
+  void Deactivate() override;
 
 protected:
 
   SmartPointer<IHandlerActivation> DoActivation(
-      const SmartPointer<IHandlerActivation>& localActivation);
+      const SmartPointer<IHandlerActivation>& localActivation) override;
 
 };
 

@@ -70,7 +70,7 @@ private:
     {
       SelectionListener(AbstractSelectionService* tracker);
 
-      void SelectionChanged(const SelectionChangedEvent::Pointer& event);
+      void SelectionChanged(const SelectionChangedEvent::Pointer& event) override;
 
       AbstractSelectionService* m_SelectionService;
     };
@@ -82,7 +82,7 @@ private:
     {
       PostSelectionListener(AbstractSelectionService* tracker);
 
-      void SelectionChanged(const SelectionChangedEvent::Pointer& event);
+      void SelectionChanged(const SelectionChangedEvent::Pointer& event) override;
 
       AbstractSelectionService* m_SelectionService;
     };
@@ -106,47 +106,47 @@ public:
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void AddSelectionListener(ISelectionListener* l);
+    void AddSelectionListener(ISelectionListener* l) override;
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void AddSelectionListener(const QString& partId, ISelectionListener* listener);
+    void AddSelectionListener(const QString& partId, ISelectionListener* listener) override;
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void AddPostSelectionListener(ISelectionListener* l);
+    void AddPostSelectionListener(ISelectionListener* l) override;
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
     void AddPostSelectionListener(const QString& partId,
-            ISelectionListener* listener);
+            ISelectionListener* listener) override;
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void RemoveSelectionListener(ISelectionListener* l);
+    void RemoveSelectionListener(ISelectionListener* l) override;
 
     /*
      * (non-Javadoc)
      * Method declared on ISelectionListener.
      */
     void RemovePostSelectionListener(const QString& partId,
-            ISelectionListener* listener);
+            ISelectionListener* listener) override;
 
     /* (non-Javadoc)
      * Method declared on ISelectionService.
      */
-    void RemovePostSelectionListener(ISelectionListener* l);
+    void RemovePostSelectionListener(ISelectionListener* l) override;
 
     /*
      * (non-Javadoc)
      * Method declared on ISelectionListener.
      */
     void RemoveSelectionListener(const QString& partId,
-            ISelectionListener* listener);
+            ISelectionListener* listener) override;
 
 
 protected:
@@ -194,12 +194,12 @@ public:
     /**
      * Returns the selection.
      */
-    ISelection::ConstPointer GetSelection() const;
+    ISelection::ConstPointer GetSelection() const override;
 
     /*
      * @see ISelectionService#getSelection(String)
      */
-    ISelection::ConstPointer GetSelection(const QString& partId);
+    ISelection::ConstPointer GetSelection(const QString& partId) override;
 
     /**
      * Sets the current-active part (or null if none)

@@ -39,7 +39,7 @@ class MITKQTWIDGETS_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
 public:
 
   /// constructor
-  QmitkLineEditLevelWindowWidget( QWidget * parent = 0, Qt::WindowFlags f = 0 );
+  QmitkLineEditLevelWindowWidget( QWidget * parent = nullptr, Qt::WindowFlags f = nullptr );
 
   /// destructor
   ~QmitkLineEditLevelWindowWidget();

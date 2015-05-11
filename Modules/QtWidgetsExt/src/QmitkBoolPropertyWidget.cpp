@@ -35,8 +35,8 @@ public:
 
   virtual void PropertyRemoved() override
   {
-    m_Property = NULL;
-    m_BoolProperty = NULL;
+    m_Property = nullptr;
+    m_BoolProperty = nullptr;
     // display "no certain value"
     m_CheckBox->blockSignals(true);
     m_CheckBox->setTristate(true);
@@ -60,7 +60,7 @@ protected:
 };
 
 QmitkBoolPropertyWidget::QmitkBoolPropertyWidget(QWidget* parent )
-  : QCheckBox(parent), m_PropEditorImpl(0)
+  : QCheckBox(parent), m_PropEditorImpl(nullptr)
 {
   setEnabled(false);
 
@@ -68,7 +68,7 @@ QmitkBoolPropertyWidget::QmitkBoolPropertyWidget(QWidget* parent )
 }
 
 QmitkBoolPropertyWidget::QmitkBoolPropertyWidget(const QString& text, QWidget* parent )
-: QCheckBox(text, parent ), m_PropEditorImpl(0)
+: QCheckBox(text, parent ), m_PropEditorImpl(nullptr)
 {
   setEnabled( false );
 
@@ -85,7 +85,7 @@ void QmitkBoolPropertyWidget::SetProperty(mitk::BoolProperty* property)
   if (m_PropEditorImpl)
   {
     delete m_PropEditorImpl;
-    m_PropEditorImpl = 0;
+    m_PropEditorImpl = nullptr;
   }
 
   if (!property)

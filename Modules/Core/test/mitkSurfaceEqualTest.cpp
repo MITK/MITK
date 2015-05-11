@@ -111,12 +111,12 @@ public:
 
   void tearDown() override
   {
-    m_Surface3D = NULL;
-    m_Surface3DTwoTimeSteps = NULL;
-    m_PolyDataOne = NULL;
-    m_PolygonArrayTwo = NULL;
-    m_PointsOne = NULL;
-    m_PointsTwo = NULL;
+    m_Surface3D = nullptr;
+    m_Surface3DTwoTimeSteps = nullptr;
+    m_PolyDataOne = nullptr;
+    m_PolygonArrayTwo = nullptr;
+    m_PointsOne = nullptr;
+    m_PointsTwo = nullptr;
   }
 
   void Equal_CloneAndOriginalOneTimestep_ReturnsTrue()

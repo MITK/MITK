@@ -40,7 +40,7 @@ void mitk::ImageToUnstructuredGridFilter::GenerateData()
   mitk::UnstructuredGrid::Pointer unstructGrid = this->GetOutput();
   const mitk::Image* image = this->GetInput();
 
-  if(image == NULL || !image->IsInitialized())
+  if(image == nullptr || !image->IsInitialized())
   {
     MITK_ERROR << "Wrong input image set" << std::endl;
     return;
@@ -64,7 +64,7 @@ const mitk::Image* mitk::ImageToUnstructuredGridFilter::GetInput(void)
   if (this->GetNumberOfInputs() < 1)
   {
     MITK_ERROR << "No input set" << std::endl;
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::Image* >( this->ProcessObject::GetInput(0) );

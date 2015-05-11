@@ -71,9 +71,9 @@ public:
   ParameterValueConverterProxy(
       const SmartPointer<IConfigurationElement>& converterConfigurationElement);
 
-  Object::Pointer ConvertToObject(const QString& parameterValue);
+  Object::Pointer ConvertToObject(const QString& parameterValue) override;
 
-  QString ConvertToString(const Object::Pointer& parameterValue);
+  QString ConvertToString(const Object::Pointer& parameterValue) override;
 
 };
 

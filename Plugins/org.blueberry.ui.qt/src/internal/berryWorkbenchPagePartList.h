@@ -42,24 +42,24 @@ private:
 
 protected:
 
-  void FirePartOpened(IWorkbenchPartReference::Pointer part);
+  void FirePartOpened(IWorkbenchPartReference::Pointer part) override;
 
-  void FirePartClosed(IWorkbenchPartReference::Pointer part);
+  void FirePartClosed(IWorkbenchPartReference::Pointer part) override;
 
-  void FirePartAdded(IWorkbenchPartReference::Pointer part);
+  void FirePartAdded(IWorkbenchPartReference::Pointer part) override;
 
-  void FirePartRemoved(IWorkbenchPartReference::Pointer part);
+  void FirePartRemoved(IWorkbenchPartReference::Pointer part) override;
 
-  void FireActiveEditorChanged(IWorkbenchPartReference::Pointer ref);
+  void FireActiveEditorChanged(IWorkbenchPartReference::Pointer ref) override;
 
   void FireActivePartChanged(IWorkbenchPartReference::Pointer oldRef,
-      IWorkbenchPartReference::Pointer newRef);
+      IWorkbenchPartReference::Pointer newRef) override;
 
-  void FirePartHidden(IWorkbenchPartReference::Pointer ref);
+  void FirePartHidden(IWorkbenchPartReference::Pointer ref) override;
 
-  void FirePartVisible(IWorkbenchPartReference::Pointer ref);
+  void FirePartVisible(IWorkbenchPartReference::Pointer ref) override;
 
-  void FirePartInputChanged(IWorkbenchPartReference::Pointer ref);
+  void FirePartInputChanged(IWorkbenchPartReference::Pointer ref) override;
 
 public:
 
@@ -67,7 +67,7 @@ public:
 
   IPartService* GetPartService();
 
-  void FirePartBroughtToTop(IWorkbenchPartReference::Pointer ref);
+  void FirePartBroughtToTop(IWorkbenchPartReference::Pointer ref) override;
 
 };
 

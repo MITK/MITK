@@ -165,7 +165,7 @@ public:
    * The string representation of this execution event -- for debugging
    * purposes only. This string should not be shown to an end user.
    */
-  QString ToString() const;
+  QString ToString() const override;
 };
 
 }

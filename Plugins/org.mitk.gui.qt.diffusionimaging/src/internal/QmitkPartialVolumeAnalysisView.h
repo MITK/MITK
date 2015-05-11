@@ -86,7 +86,7 @@ public:
   /*!
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
   */
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /*!
   \brief method for creating the connections of main and control widget
@@ -95,27 +95,27 @@ public:
 
   bool IsExclusiveFunctionality() const;
 
-  virtual bool event( QEvent *event );
+  virtual bool event( QEvent *event ) override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  virtual void Activated();
+  virtual void Activated() override;
 
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
-  virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer reference);
+  virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer reference) override;
 
-  virtual void Hidden();
+  virtual void Hidden() override;
 
-  virtual void Visible();
+  virtual void Visible() override;
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   bool AssertDrawingIsPossible(bool checked);
 
-  virtual void NodeChanged(const mitk::DataNode* node);
+  virtual void NodeChanged(const mitk::DataNode* node) override;
   virtual void PropertyChanged(const mitk::DataNode* node, const mitk::BaseProperty* prop);
-  virtual void NodeRemoved(const mitk::DataNode* node);
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
   virtual void NodeAddedInDataStorage(const mitk::DataNode* node);
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,

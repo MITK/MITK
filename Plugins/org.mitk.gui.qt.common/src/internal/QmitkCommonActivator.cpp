@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <mitkLogMacros.h>
 
-QmitkCommonActivator* QmitkCommonActivator::m_Instance = 0;
-ctkPluginContext* QmitkCommonActivator::m_Context = 0;
+QmitkCommonActivator* QmitkCommonActivator::m_Instance = nullptr;
+ctkPluginContext* QmitkCommonActivator::m_Context = nullptr;
 
 ctkPluginContext* QmitkCommonActivator::GetContext()
 {
@@ -65,8 +65,8 @@ QmitkCommonActivator::stop(ctkPluginContext* context)
 
   this->m_PrefServiceTracker.reset();
 
-  this->m_Context = 0;
-  this->m_Instance = 0;
+  this->m_Context = nullptr;
+  this->m_Instance = nullptr;
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

@@ -178,7 +178,7 @@ public:
 
   berryObjectMacro(berry::EvaluationResult)
 
-  bool operator==(const Object*) const;
+  bool operator==(const Object*) const override;
 
   bool operator!=(const Object*) const;
 
@@ -227,7 +227,7 @@ public:
    * @return a string representing this object. The result is not
    *  human readable
    */
-  QString ToString() const;
+  QString ToString() const override;
 };
 
 }  // namespace berry

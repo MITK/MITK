@@ -28,8 +28,8 @@
 namespace mitk
 {
 
-  org_mitk_gui_qt_application_Activator* org_mitk_gui_qt_application_Activator::m_Instance = 0;
-  ctkPluginContext* org_mitk_gui_qt_application_Activator::m_Context = 0;
+  org_mitk_gui_qt_application_Activator* org_mitk_gui_qt_application_Activator::m_Instance = nullptr;
+  ctkPluginContext* org_mitk_gui_qt_application_Activator::m_Context = nullptr;
 
   void org_mitk_gui_qt_application_Activator::start(ctkPluginContext* context)
   {
@@ -52,8 +52,8 @@ namespace mitk
 
     this->m_PrefServiceTracker.reset();
 
-    this->m_Context = 0;
-    this->m_Instance = 0;
+    this->m_Context = nullptr;
+    this->m_Instance = nullptr;
   }
 
   ctkPluginContext* org_mitk_gui_qt_application_Activator::GetContext()

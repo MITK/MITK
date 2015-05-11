@@ -136,12 +136,12 @@ protected:
     /* (non-Javadoc)
      * @see org.blueberry.ui.part.WorkbenchPart#setContentDescription(java.lang.String)
      */
-    virtual void SetContentDescription(const QString& description);
+    virtual void SetContentDescription(const QString& description) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.part.WorkbenchPart#setPartName(java.lang.String)
      */
-    virtual void SetPartName(const QString& partName);
+    virtual void SetPartName(const QString& partName) override;
 
     /**
      * Checks that the given site is valid for this type of part.
@@ -150,7 +150,7 @@ protected:
      * @param site the site to check
      * @since 3.1
      */
-    void CheckSite(IWorkbenchPartSite::Pointer site);
+    void CheckSite(IWorkbenchPartSite::Pointer site) override;
 
 public:
 
@@ -163,7 +163,7 @@ public:
      *
      * @see IEditorPart
      */
-  virtual void DoSave(/*IProgressMonitor monitor*/) = 0;
+  virtual void DoSave(/*IProgressMonitor monitor*/) override = 0;
 
     /* (non-Javadoc)
      * Saves the contents of this editor to another object.
@@ -174,24 +174,24 @@ public:
      *
      * @see IEditorPart
      */
-  virtual void DoSaveAs() = 0;
+  virtual void DoSaveAs() override = 0;
 
     /* (non-Javadoc)
      * Method declared on IEditorPart.
      */
-  IEditorInput::Pointer GetEditorInput() const;
+  IEditorInput::Pointer GetEditorInput() const override;
 
     /* (non-Javadoc)
      * Method declared on IEditorPart.
      */
-  IEditorSite::Pointer GetEditorSite() const;
+  IEditorSite::Pointer GetEditorSite() const override;
 
     /* (non-Javadoc)
      * Gets the title tool tip text of this part.
      *
      * @return the tool tip text
      */
-  QString GetTitleToolTip() const;
+  QString GetTitleToolTip() const override;
 
     /* (non-Javadoc)
      * Initializes the editor part with a site and input.
@@ -207,7 +207,7 @@ public:
      *    setInput(input);
      * </pre>
      */
-  virtual void Init(IEditorSite::Pointer site, IEditorInput::Pointer input) = 0;
+  virtual void Init(IEditorSite::Pointer site, IEditorInput::Pointer input) override = 0;
 
 
     /* (non-Javadoc)
@@ -220,7 +220,7 @@ public:
      *
      * @see IEditorPart
      */
-  virtual bool IsDirty() const = 0;
+  virtual bool IsDirty() const override = 0;
 
     /* (non-Javadoc)
      * Returns whether the "save as" operation is supported by this editor.
@@ -231,7 +231,7 @@ public:
      *
      * @see IEditorPart
      */
-  virtual bool IsSaveAsAllowed() const = 0;
+  virtual bool IsSaveAsAllowed() const override = 0;
 
     /* (non-Javadoc)
      * Returns whether the contents of this editor should be saved when the editor
@@ -241,7 +241,7 @@ public:
      * (<code>isDirty</code>).
      * </p>
      */
-  virtual bool IsSaveOnCloseNeeded() const;
+  virtual bool IsSaveOnCloseNeeded() const override;
 
 };
 

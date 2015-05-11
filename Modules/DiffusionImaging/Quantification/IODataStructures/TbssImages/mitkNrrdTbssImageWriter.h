@@ -103,7 +103,7 @@ public:
     virtual const char * GetDefaultExtension() override { return ".tbss"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) override
     {
-      return (dynamic_cast<mitk::TbssImage*>(data.GetPointer()) != NULL);
+      return (dynamic_cast<mitk::TbssImage*>(data.GetPointer()) != nullptr);
     }
 
 

@@ -85,7 +85,7 @@ class MITKQTWIDGETS_EXPORT QmitkSliderLevelWindowWidget : public QWidget {
 public:
 
   /// constructor
-  QmitkSliderLevelWindowWidget( QWidget * parent=0, Qt::WindowFlags f = 0 );
+  QmitkSliderLevelWindowWidget( QWidget * parent=nullptr, Qt::WindowFlags f = nullptr );
 
   /// destructor
   ~QmitkSliderLevelWindowWidget();

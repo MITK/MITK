@@ -82,7 +82,7 @@ void mitk::SlicedData::PrepareForNewData()
 void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 {
   m_UseLargestPossibleRegion = true;
-  if(GetGeometry()==NULL)
+  if(GetGeometry()==nullptr)
     return;
   unsigned int i;
   const RegionType::IndexType & index = GetLargestPossibleRegion().GetIndex();
@@ -144,7 +144,7 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
 
 bool mitk::SlicedData::VerifyRequestedRegion()
 {
-  if(GetTimeGeometry() == NULL) return false;
+  if(GetTimeGeometry() == nullptr) return false;
 
   unsigned int i;
 
@@ -194,7 +194,7 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
 {
   m_UseLargestPossibleRegion=false;
 
-  if(region!=NULL)
+  if(region!=nullptr)
   {
     m_RequestedRegion = *region;
     m_RequestedRegionInitialized = true;
@@ -209,7 +209,7 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
 void mitk::SlicedData::SetLargestPossibleRegion(SlicedData::RegionType *region)
 {
 
-  if(region!=NULL)
+  if(region!=nullptr)
   {
     m_LargestPossibleRegion = *region;
     m_UseLargestPossibleRegion=true;
@@ -252,8 +252,8 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 //
 mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry(unsigned int t) const
 {
-  if (GetTimeGeometry() == NULL)
-    return NULL;
+  if (GetTimeGeometry() == nullptr)
+    return nullptr;
   return dynamic_cast<SlicedGeometry3D*>(GetTimeGeometry()->GetGeometryForTimeStep(t).GetPointer());
 }
 
@@ -268,14 +268,14 @@ const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigne
 
 void mitk::SlicedData::SetGeometry(BaseGeometry* aGeometry3D)
 {
-  if(aGeometry3D!=NULL)
+  if(aGeometry3D!=nullptr)
   {
     ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
     SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
     if(slicedGeometry.IsNull())
     {
       PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(aGeometry3D);
-      if(geometry2d!=NULL && dynamic_cast<mitk::AbstractTransformGeometry*>(aGeometry3D) == NULL)
+      if(geometry2d!=nullptr && dynamic_cast<mitk::AbstractTransformGeometry*>(aGeometry3D) == nullptr)
       {
         if((GetSlicedGeometry()->GetPlaneGeometry(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
           return;
@@ -297,9 +297,9 @@ void mitk::SlicedData::SetGeometry(BaseGeometry* aGeometry3D)
   }
   else
   {
-    if(GetGeometry()==NULL)
+    if(GetGeometry()==nullptr)
       return;
-    Superclass::SetGeometry(NULL);
+    Superclass::SetGeometry(nullptr);
   }
 }
 
@@ -312,7 +312,7 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 {
   TimeGeometry* timeGeometry = GetTimeGeometry();
 
-  assert(timeGeometry!=NULL);
+  assert(timeGeometry!=nullptr);
 
   mitk::SlicedGeometry3D* slicedGeometry;
 
@@ -321,7 +321,7 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {
     slicedGeometry = GetSlicedGeometry(timestep);
-    if(slicedGeometry != NULL)
+    if(slicedGeometry != nullptr)
     {
       slicedGeometry->SetOrigin(origin);
       if(slicedGeometry->GetEvenlySpaced())
@@ -344,7 +344,7 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
 {
   TimeGeometry* timeGeometry = GetTimeGeometry();
 
-  assert(timeGeometry!=NULL);
+  assert(timeGeometry!=nullptr);
 
   mitk::SlicedGeometry3D* slicedGeometry;
 
@@ -353,7 +353,7 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {
     slicedGeometry = GetSlicedGeometry(timestep);
-    if(slicedGeometry != NULL)
+    if(slicedGeometry != nullptr)
     {
       slicedGeometry->SetSpacing(aSpacing);
     }

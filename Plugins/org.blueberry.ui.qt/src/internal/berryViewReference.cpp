@@ -144,7 +144,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
   // Check the status of this part
 
   IWorkbenchPart::Pointer result;
-  PartInitException* exception = 0;
+  PartInitException* exception = nullptr;
 
   // Try to restore the view -- this does the real work of restoring the
   // view
@@ -160,7 +160,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
 
   // If unable to create the part, create an error part instead
   // and pass the error to the status handling facility
-  if (exception != 0)
+  if (exception != nullptr)
   {
     //      IStatus partStatus = exception.getStatus();
     //      IStatus displayStatus = StatusUtil.newStatus(partStatus,
@@ -211,7 +211,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
       BERRY_ERROR << e.what();
       //StatusUtil.handleStatus(e, StatusManager.SHOW
       //    | StatusManager.LOG);
-      return IWorkbenchPart::Pointer(0);
+      return IWorkbenchPart::Pointer(nullptr);
     }
     part->SetPartName(label);
 
@@ -226,7 +226,7 @@ IWorkbenchPart::Pointer ViewReference::CreatePart()
       BERRY_ERROR << "Error creating view: " << e.what() << std::endl;
       //          StatusUtil.handleStatus(e, StatusManager.SHOW
       //              | StatusManager.LOG);
-      return IWorkbenchPart::Pointer(0);
+      return IWorkbenchPart::Pointer(nullptr);
     }
 
     result = part.Cast<IWorkbenchPart> ();

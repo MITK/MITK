@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkExhaustiveOptimizerView : public Qmitk
 
 public:
 
-  QmitkExhaustiveOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkExhaustiveOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkExhaustiveOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

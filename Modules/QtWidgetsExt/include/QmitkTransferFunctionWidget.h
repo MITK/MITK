@@ -43,10 +43,10 @@ class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, publ
 
   public:
 
-    QmitkTransferFunctionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkTransferFunctionWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     ~QmitkTransferFunctionWidget () ;
 
-    void SetDataNode(mitk::DataNode* node, const mitk::BaseRenderer* renderer = NULL);
+    void SetDataNode(mitk::DataNode* node, const mitk::BaseRenderer* renderer = nullptr);
 
    void SetScalarLabel(const QString& scalarLabel);
 

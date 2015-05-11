@@ -50,7 +50,7 @@ class org_blueberry_core_runtime_EXPORT ObjectGeneric : public Object
       return m_Value;
     }
 
-    bool operator==(const Object* o) const
+    bool operator==(const Object* o) const override
     {
       if(const Self* other = dynamic_cast<const Self*>(o))
         return (this->m_Value == other->m_Value);

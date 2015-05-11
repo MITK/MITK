@@ -490,7 +490,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
   case OpMOVE:
   {
     mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
-    if (pointOp == NULL)
+    if (pointOp == nullptr)
     {
       //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
       return;
@@ -506,7 +506,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
   case OpSCALE:
   {
     mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
-    if (pointOp == NULL)
+    if (pointOp == nullptr)
     {
       //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
       return;
@@ -535,7 +535,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
   case OpROTATE:
   {
     mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
-    if (rotateOp == NULL)
+    if (rotateOp == nullptr)
     {
       //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
       return;
@@ -586,7 +586,7 @@ mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTra
   mitk::BoundingBox::PointIdentifier pointid = 0;
 
   unsigned char i;
-  if (transform != NULL)
+  if (transform != nullptr)
   {
     mitk::AffineTransform3D::Pointer inverse = mitk::AffineTransform3D::New();
     transform->GetInverse(inverse);
@@ -786,7 +786,7 @@ mitk::BaseGeometry::GetGeometryTransformHolder() const
 
 bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose)
 {
-  if ((leftHandSide == NULL) || (rightHandSide == NULL))
+  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with NULL pointer input.";
     return false;
@@ -819,7 +819,7 @@ bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType& leftHandSide, const 
 
 bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometry *rightHandSide, ScalarType eps, bool verbose)
 {
-  if ((leftHandSide == NULL) || (rightHandSide == NULL))
+  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType eps, bool verbose) does not with NULL pointer input.";
     return false;
@@ -904,7 +904,7 @@ bool mitk::Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometr
 
 bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mitk::BaseGeometry::TransformType *rightHandSide, ScalarType eps, bool verbose)
 {
-  if ((leftHandSide == NULL) || (rightHandSide == NULL))
+  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType *rightHandSide, ScalarType eps, bool verbose ) does not with NULL pointer input.";
     return false;

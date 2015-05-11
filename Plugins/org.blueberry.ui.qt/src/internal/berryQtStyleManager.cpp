@@ -119,7 +119,7 @@ QString QtStyleManager::GetTabStylesheet() const
 void QtStyleManager::AddStyle(const QString& styleFileName,
     const QString& styleName)
 {
-  ExtStyle* newStyle = new ExtStyle();
+  auto   newStyle = new ExtStyle();
 
   if (styleName.isEmpty())
   {
@@ -285,7 +285,7 @@ void QtStyleManager::SetStyle(const QString& fileName, bool update)
 
   FileNameToStyleMap::const_iterator i = styles.find(fileName);
 
-  ExtStyle* style = 0;
+  ExtStyle* style = nullptr;
   if (i == styles.end())
   {
     BERRY_WARN << "Style " + fileName.toStdString() << " does not exist";

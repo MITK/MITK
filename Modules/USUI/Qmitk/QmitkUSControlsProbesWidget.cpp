@@ -33,7 +33,7 @@ QmitkUSControlsProbesWidget::QmitkUSControlsProbesWidget(mitk::USControlInterfac
 
   // get all probes an put their names into a combo box
   std::vector<mitk::USProbe::Pointer> probes = m_ControlInterface->GetProbeSet();
-  for ( std::vector<mitk::USProbe::Pointer>::iterator it = probes.begin();
+  for ( auto it = probes.begin();
     it != probes.end(); ++it )
   {
     std::string probeIdentifier = (*it)->GetName();

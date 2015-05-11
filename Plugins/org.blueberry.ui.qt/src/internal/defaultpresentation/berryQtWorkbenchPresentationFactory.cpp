@@ -45,7 +45,7 @@ QtWorkbenchPresentationFactory::QtWorkbenchPresentationFactory(
 StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentation(
     QWidget* parent, IStackPresentationSite::Pointer site)
 {
-  NativeTabFolder* folder = new NativeTabFolder(parent);
+  auto   folder = new NativeTabFolder(parent);
 
   //    /*
   //     * Set the minimum characters to display, if the preference is something
@@ -64,7 +64,7 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentat
   //      }
   //    }
 
-  PresentablePartFolder* partFolder = new PresentablePartFolder(folder);
+  auto   partFolder = new PresentablePartFolder(folder);
 
   StackPresentation::Pointer result(new TabbedStackPresentation(site,
       partFolder)); //, new StandardEditorSystemMenu(site));
@@ -84,7 +84,7 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateViewPresentatio
     QWidget* parent, IStackPresentationSite::Pointer site)
 {
 
-  NativeTabFolder* folder = new NativeTabFolder(static_cast<QWidget*> (parent));
+  auto   folder = new NativeTabFolder(static_cast<QWidget*> (parent));
 
   //    final IPreferenceStore store = PlatformUI.getPreferenceStore();
   //    final int minimumCharacters = store
@@ -93,7 +93,7 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateViewPresentatio
   //      folder.setMinimumCharacters(minimumCharacters);
   //    }
 
-  PresentablePartFolder* partFolder = new PresentablePartFolder(folder);
+  auto   partFolder = new PresentablePartFolder(folder);
 
   //folder->SetUnselectedCloseVisible(false);
   //folder->SetUnselectedImageVisible(true);
@@ -118,7 +118,7 @@ StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateStandaloneViewP
   {
     return this->CreateViewPresentation(parent, site);
   }
-  EmptyTabFolder* folder = new EmptyTabFolder(static_cast<QWidget*> (parent),
+  auto   folder = new EmptyTabFolder(static_cast<QWidget*> (parent),
       true);
   StackPresentation::Pointer presentation(new TabbedStackPresentation(site,
       folder)); //, new StandardViewSystemMenu(site));

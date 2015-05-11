@@ -29,7 +29,7 @@ void
 IPropertyChangeListener::Events
 ::AddListener(IPropertyChangeListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   this->propertyChange += Delegate(listener, &IPropertyChangeListener::PropertyChange);
 }
@@ -38,7 +38,7 @@ void
 IPropertyChangeListener::Events
 ::RemoveListener(IPropertyChangeListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   this->propertyChange -= Delegate(listener, &IPropertyChangeListener::PropertyChange);
 }

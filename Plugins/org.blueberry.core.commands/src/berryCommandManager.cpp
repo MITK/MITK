@@ -180,7 +180,7 @@ void CommandManager::AddCommandManagerListener(ICommandManagerListener* listener
 
 void CommandManager::AddExecutionListener(IExecutionListener *listener)
 {
-  if (listener == 0)
+  if (listener == nullptr)
   {
     throw ctkInvalidArgumentException(
           "Cannot add a null execution listener");
@@ -449,7 +449,7 @@ void CommandManager::SetHandlersByCommandId(const QHash<QString, SmartPointer<IH
     }
     else
     {
-      command->SetHandler(IHandler::Pointer(0));
+      command->SetHandler(IHandler::Pointer(nullptr));
     }
   }
 }

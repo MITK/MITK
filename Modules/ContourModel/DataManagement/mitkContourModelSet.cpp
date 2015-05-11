@@ -71,7 +71,7 @@ mitk::ContourModel* mitk::ContourModelSet::GetContourModelAt(int index) const
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -89,9 +89,9 @@ mitk::ContourModelSet::ContourModelListType* mitk::ContourModelSet::GetContourMo
 
 bool mitk::ContourModelSet::RemoveContourModel(mitk::ContourModel* contourModel)
 {
-  ContourModelSetIterator it = this->m_Contours.begin();
+  auto it = this->m_Contours.begin();
 
-  ContourModelSetIterator end = this->m_Contours.end();
+  auto end = this->m_Contours.end();
 
   //search for ContourModel and remove it if exists
   while(it != end)
@@ -168,14 +168,14 @@ void mitk::ContourModelSet::UpdateOutputInformation()
 
         PointsContainer::Pointer points = PointsContainer::New();
 
-        mitk::ContourModelSet::ContourModelSetIterator contoursIt = this->Begin();
-        mitk::ContourModelSet::ContourModelSetIterator contoursEnd = this->End();
+        auto contoursIt = this->Begin();
+        auto contoursEnd = this->End();
 
         while(contoursIt!=contoursEnd)
         {
 
-          mitk::ContourModel::VertexIterator it = contoursIt->GetPointer()->Begin(currenTimeStep);
-          mitk::ContourModel::VertexIterator end = contoursIt->GetPointer()->End(currenTimeStep);
+          auto it = contoursIt->GetPointer()->Begin(currenTimeStep);
+          auto end = contoursIt->GetPointer()->End(currenTimeStep);
 
           //fill the boundingbox with the points
           while(it != end)

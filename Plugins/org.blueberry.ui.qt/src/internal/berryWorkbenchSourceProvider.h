@@ -65,18 +65,18 @@ public:
 
   WorkbenchSourceProvider();
 
-  void Initialize(IServiceLocator* locator);
+  void Initialize(IServiceLocator* locator) override;
 
   ~WorkbenchSourceProvider();
 
-  QList<QString> GetProvidedSourceNames() const;
+  QList<QString> GetProvidedSourceNames() const override;
 
-  ISourceProvider::StateMapType GetCurrentState() const;
+  ISourceProvider::StateMapType GetCurrentState() const override;
 
 private:
 
   void SelectionChanged(const SmartPointer<IWorkbenchPart>& part,
-                        const SmartPointer<const ISelection>& newSelection);
+                        const SmartPointer<const ISelection>& newSelection) override;
 
   int UpdateSelection(ISourceProvider::StateMapType& currentState) const;
 
@@ -116,16 +116,16 @@ private:
 
   const Object* lastShowInInput;
 
-  void PartActivated(const SmartPointer<IWorkbenchPartReference>& part);
-  void PartBroughtToTop(const SmartPointer<IWorkbenchPartReference>& part);
-  void PartClosed(const SmartPointer<IWorkbenchPartReference>& part);
-  void PartDeactivated(const SmartPointer<IWorkbenchPartReference>& part);
-  void PartOpened(const SmartPointer<IWorkbenchPartReference>& part);
+  void PartActivated(const SmartPointer<IWorkbenchPartReference>& part) override;
+  void PartBroughtToTop(const SmartPointer<IWorkbenchPartReference>& part) override;
+  void PartClosed(const SmartPointer<IWorkbenchPartReference>& part) override;
+  void PartDeactivated(const SmartPointer<IWorkbenchPartReference>& part) override;
+  void PartOpened(const SmartPointer<IWorkbenchPartReference>& part) override;
 
-  void WindowActivated(const SmartPointer<IWorkbenchWindow>& window);
-  void WindowClosed(const SmartPointer<IWorkbenchWindow>& window);
-  void WindowDeactivated(const SmartPointer<IWorkbenchWindow>& window);
-  void WindowOpened(const SmartPointer<IWorkbenchWindow>& window);
+  void WindowActivated(const SmartPointer<IWorkbenchWindow>& window) override;
+  void WindowClosed(const SmartPointer<IWorkbenchWindow>& window) override;
+  void WindowDeactivated(const SmartPointer<IWorkbenchWindow>& window) override;
+  void WindowOpened(const SmartPointer<IWorkbenchWindow>& window) override;
 
   const IEditorInput* lastEditorInput;
 
@@ -201,18 +201,18 @@ private:
   /**
    * The listener to individual window properties.
    */
-  void PropertyChange(const SmartPointer<PropertyChangeEvent>& event);
-  void PropertyChange(const Object::Pointer& source, int propId);
+  void PropertyChange(const SmartPointer<PropertyChangeEvent>& event) override;
+  void PropertyChange(const Object::Pointer& source, int propId) override;
 
   void PerspectiveActivated(const SmartPointer<IWorkbenchPage>& page,
-                            const SmartPointer<IPerspectiveDescriptor>& perspective);
+                            const SmartPointer<IPerspectiveDescriptor>& perspective) override;
 
   using IPerspectiveListener::PerspectiveChanged;
   void PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page,
                           const SmartPointer<IPerspectiveDescriptor>& perspective,
-                          const QString& changeId);
+                          const QString& changeId) override;
 
-  bool eventFilter(QObject *obj, QEvent *event);
+  bool eventFilter(QObject *obj, QEvent *event) override;
 
   /**
    * The listener to shell activations on the display.
@@ -232,9 +232,9 @@ private:
 
   void UpdateActiveShell(ISourceProvider::StateMapType& currentState) const;
 
-  IPartListener::Events::Types GetPartEventTypes() const;
+  IPartListener::Events::Types GetPartEventTypes() const override;
 
-  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const;
+  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const override;
 
 };
 

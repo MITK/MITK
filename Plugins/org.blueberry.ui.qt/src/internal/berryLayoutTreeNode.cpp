@@ -34,8 +34,8 @@ LayoutTreeNode::ChildSizes::ChildSizes (int l, int r, bool resize)
 LayoutTreeNode::LayoutTreeNode(LayoutPartSash::Pointer sash)
  : LayoutTree(sash)
 {
-  children[0] = 0;
-  children[1] = 0;
+  children[0] = nullptr;
+  children[1] = nullptr;
 }
 
 LayoutTreeNode::~LayoutTreeNode()
@@ -57,7 +57,7 @@ LayoutPart::Pointer LayoutTreeNode::FindPart(const QPoint& toFind)
   {
     if (!children[1]->IsVisible())
     {
-      return LayoutPart::Pointer(0);
+      return LayoutPart::Pointer(nullptr);
     }
 
     return children[1]->FindPart(toFind);
@@ -149,9 +149,9 @@ LayoutTreeNode* LayoutTreeNode::FindCommonParent(LayoutPart::Pointer child1,
   {
     return this;
   }
-  if (parent == 0)
+  if (parent == nullptr)
   {
-    return 0;
+    return nullptr;
   }
   return parent
   ->FindCommonParent(child1, child2, foundChild1, foundChild2);
@@ -173,14 +173,14 @@ LayoutTreeNode::Pointer LayoutTreeNode::FindSash(LayoutPartSash::Pointer sash)
   {
     return node;
   }
-  return LayoutTreeNode::Pointer(0);
+  return LayoutTreeNode::Pointer(nullptr);
 }
 
 void LayoutTreeNode::FindSashes(LayoutTree::Pointer child, PartPane::Sashes sashes)
 {
   QWidget* sash = this->GetSash()->GetControl();
   bool leftOrTop = children[0] == child;
-  if (sash != 0)
+  if (sash != nullptr)
   {
     LayoutPartSash::Pointer partSash = this->GetSash();
     //If the child is in the left, the sash
@@ -189,14 +189,14 @@ void LayoutTreeNode::FindSashes(LayoutTree::Pointer child, PartPane::Sashes sash
     {
       if (partSash->IsVertical())
       {
-        if (sashes.right == 0)
+        if (sashes.right == nullptr)
         {
           sashes.right = sash;
         }
       }
       else
       {
-        if (sashes.bottom == 0)
+        if (sashes.bottom == nullptr)
         {
           sashes.bottom = sash;
         }
@@ -206,21 +206,21 @@ void LayoutTreeNode::FindSashes(LayoutTree::Pointer child, PartPane::Sashes sash
     {
       if (partSash->IsVertical())
       {
-        if (sashes.left == 0)
+        if (sashes.left == nullptr)
         {
           sashes.left = sash;
         }
       }
       else
       {
-        if (sashes.top == 0)
+        if (sashes.top == nullptr)
         {
           sashes.top = sash;
         }
       }
     }
   }
-  if (this->GetParent() != 0)
+  if (this->GetParent() != nullptr)
   {
     this->GetParent()->FindSashes(LayoutTree::Pointer(this), sashes);
   }
@@ -244,15 +244,15 @@ bool LayoutTreeNode::IsVisible()
 LayoutTree::Pointer LayoutTreeNode::Remove(LayoutTree::Pointer child)
 {
   this->GetSash()->Dispose();
-  if (parent == 0)
+  if (parent == nullptr)
   {
     //This is the root. Return the other child to be the new root.
     if (children[0] == child)
     {
-      children[1]->SetParent(0);
+      children[1]->SetParent(nullptr);
       return children[1];
     }
-    children[0]->SetParent(0);
+    children[0]->SetParent(nullptr);
     return children[0];
   }
 
@@ -649,7 +649,7 @@ QString LayoutTreeNode::ToString() const
   QString str;
   QTextStream s(&str);
   s << "<null>\n";
-  if (part->GetControl() != 0)
+  if (part->GetControl() != nullptr)
   {
     s << "<@" << part->GetControl() << ">\n";
   }

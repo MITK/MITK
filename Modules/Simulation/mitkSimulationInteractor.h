@@ -32,8 +32,8 @@ namespace mitk
     itkCloneMacro(Self);
 
   protected:
-    void ConnectActionsAndFunctions();
-    void DataNodeChanged();
+    void ConnectActionsAndFunctions() override;
+    void DataNodeChanged() override;
 
   private:
     SimulationInteractor();

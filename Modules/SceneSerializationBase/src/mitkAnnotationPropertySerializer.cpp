@@ -36,7 +36,7 @@ class AnnotationPropertySerializer : public BasePropertySerializer
     {
       if (const AnnotationProperty* prop = dynamic_cast<const AnnotationProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("annotation");
+        auto  element = new TiXmlElement("annotation");
         element->SetAttribute("label", prop->GetLabel());
         Point3D point = prop->GetPosition();
         element->SetDoubleAttribute("x", point[0]);
@@ -44,20 +44,20 @@ class AnnotationPropertySerializer : public BasePropertySerializer
         element->SetDoubleAttribute("z", point[2]);
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
       const char* label( element->Attribute("label") );
       Point3D p;
       if ( element->QueryDoubleAttribute( "x", &p[0] ) != TIXML_SUCCESS )
-        return NULL;
+        return nullptr;
       if ( element->QueryDoubleAttribute( "y", &p[1] ) != TIXML_SUCCESS )
-        return NULL;
+        return nullptr;
       if ( element->QueryDoubleAttribute( "z", &p[2] ) != TIXML_SUCCESS )
-        return NULL;
+        return nullptr;
       return AnnotationProperty::New(label, p).GetPointer();
     }
 

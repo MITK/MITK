@@ -24,7 +24,7 @@ void
 IPerspectiveListener::Events
 ::AddListener(IPerspectiveListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   Types types = listener->GetPerspectiveEventTypes();
 
@@ -50,7 +50,7 @@ void
 IPerspectiveListener::Events
 ::RemoveListener(IPerspectiveListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   this->perspectiveActivated -= Delegate2(listener, &IPerspectiveListener::PerspectiveActivated);
   this->perspectiveChanged -= PerspChangedDelegate(listener, &IPerspectiveListener::PerspectiveChanged);

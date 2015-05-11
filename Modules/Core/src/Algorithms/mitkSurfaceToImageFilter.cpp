@@ -62,9 +62,9 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  if((inputImage == NULL) ||
+  if((inputImage == nullptr) ||
      (inputImage->IsInitialized() == false) ||
-     (inputImage->GetTimeGeometry() == NULL)) return;
+     (inputImage->GetTimeGeometry() == nullptr)) return;
 
   if (m_MakeOutputBinary)
     output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry());
@@ -196,7 +196,7 @@ const mitk::Surface *mitk::SurfaceToImageFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::Surface * >

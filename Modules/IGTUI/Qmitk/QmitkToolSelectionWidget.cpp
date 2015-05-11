@@ -19,14 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkToolSelectionWidget::QmitkToolSelectionWidget(QWidget* parent)
-: QWidget(parent), m_Controls(NULL)
+: QWidget(parent), m_Controls(nullptr)
 {
   this->CreateQtPartControl( this );
 }
 
 QmitkToolSelectionWidget::~QmitkToolSelectionWidget()
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
 }
 
 

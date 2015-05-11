@@ -296,12 +296,12 @@ public:
   ///
   /// Creates a scroll area for this view and calls CreateQtPartControl then
   ///
-  void CreatePartControl(QWidget* parent);
+  void CreatePartControl(QWidget* parent) override;
   ///
   /// Called when this view receives the focus. Same as Activated()
   /// \see Activated()
   ///
-  void SetFocus();
+  void SetFocus() override;
   ///
   /// Called when a DataStorage Add Event was thrown. Sets
   /// m_InDataStorageChanged to true and calls NodeAdded afterwards.

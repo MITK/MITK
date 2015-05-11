@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 
-mitk::ApplicationCursorImplementation* mitk::ApplicationCursor::m_Implementation = NULL;
+mitk::ApplicationCursorImplementation* mitk::ApplicationCursor::m_Implementation = nullptr;
 
 namespace mitk {
 
@@ -29,7 +29,7 @@ ApplicationCursor::ApplicationCursor()
 
 ApplicationCursor* ApplicationCursor::GetInstance()
 {
-  static ApplicationCursor* m_Instance = NULL;
+  static ApplicationCursor* m_Instance = nullptr;
   if (!m_Instance)
   {
     m_Instance = new ApplicationCursor();

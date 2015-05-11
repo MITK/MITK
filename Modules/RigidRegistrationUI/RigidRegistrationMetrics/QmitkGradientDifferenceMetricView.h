@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkGradientDifferenceMetricView : public 
 
 public:
 
-  QmitkGradientDifferenceMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkGradientDifferenceMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkGradientDifferenceMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

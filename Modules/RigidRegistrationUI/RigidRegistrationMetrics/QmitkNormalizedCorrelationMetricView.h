@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkNormalizedCorrelationMetricView : publ
 
 public:
 
-  QmitkNormalizedCorrelationMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkNormalizedCorrelationMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkNormalizedCorrelationMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

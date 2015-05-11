@@ -43,7 +43,7 @@ void mitk::ContourSetToPointSetFilter::GenerateData()
   mitk::PointSet::Pointer output = this->GetOutput();
 
   mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
-  mitk::ContourSet::ContourIterator contourIt = contourVec.begin();
+  auto contourIt = contourVec.begin();
   unsigned int pointId = 0;
 
   while ( contourIt != contourVec.end() )
@@ -76,7 +76,7 @@ const mitk::ContourSet* mitk::ContourSetToPointSetFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::ContourSet * >

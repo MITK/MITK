@@ -97,7 +97,7 @@ void mitk::NavigationData::CopyInformation( const DataObject* data )
 {
   this->Superclass::CopyInformation( data );
 
-  const Self * nd = NULL;
+  const Self * nd = nullptr;
   try
   {
     nd = dynamic_cast<const Self*>(data);

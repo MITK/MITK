@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkCenteredEuler3DTransformView : public 
 
 public:
 
-  QmitkCenteredEuler3DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkCenteredEuler3DTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkCenteredEuler3DTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

@@ -34,7 +34,7 @@ public:
 
   ~_EnumPropEditorImpl()
   {
-    m_EnumerationProperty = 0;
+    m_EnumerationProperty = nullptr;
   }
 
   void IndexChanged(int enumId)
@@ -54,8 +54,8 @@ public:
 
   virtual void PropertyRemoved() override
   {
-    m_Property = 0;
-    m_EnumerationProperty = 0;
+    m_Property = nullptr;
+    m_EnumerationProperty = nullptr;
     m_ComboBox->setEnabled(false);
   }
 
@@ -68,7 +68,7 @@ protected:
 
 
 QmitkEnumerationPropertyWidget::QmitkEnumerationPropertyWidget(QWidget* parent)
-: QComboBox(parent), propView(0)
+: QComboBox(parent), propView(nullptr)
 {
   connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnIndexChanged(int)));
 }
@@ -83,7 +83,7 @@ void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* prop
   if(propView)
   {
     delete propView;
-    propView = 0;
+    propView = nullptr;
   }
 
   this->clear();
@@ -99,7 +99,7 @@ void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* prop
 
   const mitk::EnumerationProperty::EnumStringsContainerType& strings = property->GetEnumStrings();
   int index = 0;
-  for (mitk::EnumerationProperty::EnumStringsContainerType::const_iterator it = strings.begin();
+  for (auto it = strings.begin();
        it != strings.end(); ++it, ++index)
   {
     enumIdToItemIndex.insert(it->second, index);

@@ -65,8 +65,8 @@ WorkbenchPartReference::WorkbenchPartReference()
 WorkbenchPartReference::~WorkbenchPartReference()
 {
   this->Register();
-  part = 0;
-  pane = 0;
+  part = nullptr;
+  pane = nullptr;
   this->UnRegister(false);
 }
 
@@ -410,7 +410,7 @@ IWorkbenchPart::Pointer WorkbenchPartReference::GetPart(bool restore)
 {
   if (this->IsDisposed())
   {
-    return IWorkbenchPart::Pointer(0);
+    return IWorkbenchPart::Pointer(nullptr);
   }
 
   if (part.IsNull() && restore)
@@ -424,7 +424,7 @@ IWorkbenchPart::Pointer WorkbenchPartReference::GetPart(bool restore)
       WorkbenchPlugin::Log("Warning: Detected recursive attempt by part "
           + GetId()
           + " to create itself (this is probably, but not necessarily, a bug)");
-      return IWorkbenchPart::Pointer(0);
+      return IWorkbenchPart::Pointer(nullptr);
     }
 
     try
@@ -542,7 +542,7 @@ void WorkbenchPartReference::Dispose()
   this->ImmediateFirePropertyChange(IWorkbenchPartConstants::PROP_TITLE);
   //clearListenerList(propChangeListeners);
 
-  pane = 0;
+  pane = nullptr;
 }
 
 void WorkbenchPartReference::DoDisposePart()
@@ -561,7 +561,7 @@ void WorkbenchPartReference::DoDisposePart()
 //            partPropertyChangeListener);
 //      }
 //      part->Dispose();
-      part = 0;
+      part = nullptr;
     }
     catch (const ctkRuntimeException& e)
     {
@@ -573,7 +573,7 @@ void WorkbenchPartReference::DoDisposePart()
       msg.append(e.what());
       WorkbenchPlugin::Log(msg);
     }
-    part = 0;
+    part = nullptr;
   }
 }
 

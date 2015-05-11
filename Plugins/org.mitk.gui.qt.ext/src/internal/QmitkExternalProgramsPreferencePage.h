@@ -36,12 +36,12 @@ public:
   QmitkExternalProgramsPreferencePage();
   ~QmitkExternalProgramsPreferencePage();
 
-  void CreateQtControl(QWidget* parent);
-  QWidget* GetQtControl() const;
-  void Init(berry::IWorkbench::Pointer);
-  void PerformCancel();
-  bool PerformOk();
-  void Update();
+  void CreateQtControl(QWidget* parent) override;
+  QWidget* GetQtControl() const override;
+  void Init(berry::IWorkbench::Pointer) override;
+  void PerformCancel() override;
+  bool PerformOk() override;
+  void Update() override;
 
 private slots:
   void OnFFmpegButtonClicked();

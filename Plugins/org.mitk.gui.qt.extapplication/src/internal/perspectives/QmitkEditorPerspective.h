@@ -30,7 +30,7 @@ public:
   QmitkEditorPerspective() {}
   ~QmitkEditorPerspective() {}
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/);
+  void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/) override;
 };
 
 #endif /* QMITKEDITORPERSPECTIVE_H_ */

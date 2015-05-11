@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkScaleSkewVersor3DTransformView : publi
 
 public:
 
-  QmitkScaleSkewVersor3DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkScaleSkewVersor3DTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkScaleSkewVersor3DTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

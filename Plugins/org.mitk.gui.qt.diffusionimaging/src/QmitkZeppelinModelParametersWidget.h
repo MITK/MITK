@@ -35,7 +35,7 @@ public:
 
     static const std::string VIEW_ID;
 
-    QmitkZeppelinModelParametersWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkZeppelinModelParametersWidget (QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     virtual ~QmitkZeppelinModelParametersWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);

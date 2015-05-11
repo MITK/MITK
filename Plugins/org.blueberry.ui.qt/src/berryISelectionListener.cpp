@@ -22,7 +22,7 @@ void
 ISelectionListener::Events
 ::AddListener(ISelectionListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   this->selectionChanged += Delegate(listener, &ISelectionListener::SelectionChanged);
 }
@@ -31,7 +31,7 @@ void
 ISelectionListener::Events
 ::RemoveListener(ISelectionListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   this->selectionChanged -= Delegate(listener, &ISelectionListener::SelectionChanged);
 }

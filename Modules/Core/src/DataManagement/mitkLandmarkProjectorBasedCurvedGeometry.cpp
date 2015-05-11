@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry()
-  : AbstractTransformGeometry(), m_LandmarkProjector(NULL), m_InterpolatingAbstractTransform(NULL), m_TargetLandmarks(NULL)
+  : AbstractTransformGeometry(), m_LandmarkProjector(nullptr), m_InterpolatingAbstractTransform(nullptr), m_TargetLandmarks(nullptr)
 {
 }
 
@@ -32,7 +32,7 @@ mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry
 
 mitk::LandmarkProjectorBasedCurvedGeometry::~LandmarkProjectorBasedCurvedGeometry()
 {
-  if(m_InterpolatingAbstractTransform!=NULL)
+  if(m_InterpolatingAbstractTransform!=nullptr)
     m_InterpolatingAbstractTransform->Delete();
 }
 
@@ -47,7 +47,7 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::Land
       if(m_FrameGeometry.IsNotNull())
         m_LandmarkProjector->SetFrameGeometry(m_FrameGeometry);
 
-      if(m_InterpolatingAbstractTransform == NULL)
+      if(m_InterpolatingAbstractTransform == nullptr)
       {
         itkWarningMacro(<<"m_InterpolatingAbstractTransform not set.");
       }

@@ -54,15 +54,15 @@ public:
 
   using AbstractGroupMarker::Fill;
 
-  void Fill(QMenu* menu, QAction* before);
+  void Fill(QMenu* menu, QAction* before) override;
 
-  void Fill(QToolBar* toolbar, QAction* before);
+  void Fill(QToolBar* toolbar, QAction* before) override;
 
   /**
    * The <code>Separator</code> implementation of this <code>IContributionItem</code>
    * method returns <code>true</code>
    */
-  bool IsSeparator() const;
+  bool IsSeparator() const override;
 };
 
 }

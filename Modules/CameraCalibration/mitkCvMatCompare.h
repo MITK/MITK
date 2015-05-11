@@ -36,8 +36,8 @@ namespace mitk
     CvMatCompare(
       const Epsilon* _Epsilon,
       bool* _Equals):
-        m_CvMat1(0),
-        m_CvMat2(0),
+        m_CvMat1(nullptr),
+        m_CvMat2(nullptr),
         m_Epsilon(_Epsilon),
         m_Equals(_Equals)
     {
@@ -75,13 +75,13 @@ namespace mitk
     ///
     /// executes the Algorithm
     ///
-    void Update()
+    void Update() override
     {
       assert( m_CvMat1 && m_CvMat2 );
       cv::Mat dst;
       cv::absdiff( (*m_CvMat1), (*m_CvMat2), dst);
       double max = 0;
-      cv::minMaxLoc( dst, 0, &max );
+      cv::minMaxLoc( dst, nullptr, &max );
 
       endodebugvar( max )
 

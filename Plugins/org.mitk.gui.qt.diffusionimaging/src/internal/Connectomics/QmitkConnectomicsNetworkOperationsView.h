@@ -49,10 +49,10 @@ public:
   QmitkConnectomicsNetworkOperationsView();
   virtual ~QmitkConnectomicsNetworkOperationsView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
   protected slots:
 
@@ -75,7 +75,7 @@ protected:
 
   // ####### Functions #######
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   /// \brief Converts an image into a RGBA image
   template < typename TPixel, unsigned int VImageDimension >

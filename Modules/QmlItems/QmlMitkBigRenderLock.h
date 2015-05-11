@@ -24,7 +24,7 @@ class MITKQMLITEMS_EXPORT QmlMitkBigRenderLock : public QObject
 
     static QMutex& GetMutex();
 
-    QmlMitkBigRenderLock(QObject* parent = 0);
+    QmlMitkBigRenderLock(QObject* parent = nullptr);
 
   protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

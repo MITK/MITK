@@ -111,7 +111,7 @@ QmitkNumberPropertySlider::~QmitkNumberPropertySlider()
 
 void QmitkNumberPropertySlider::SetProperty(mitk::IntProperty* property)
 {
-  if (property == NULL)
+  if (property == nullptr)
   {
     d->m_PropEditor.reset();
     this->setEnabled(false);
@@ -126,7 +126,7 @@ void QmitkNumberPropertySlider::SetProperty(mitk::IntProperty* property)
 
 void QmitkNumberPropertySlider::SetProperty(mitk::FloatProperty* property)
 {
-  if (property == NULL)
+  if (property == nullptr)
   {
     d->m_PropEditor.reset();
     this->setEnabled(false);
@@ -141,7 +141,7 @@ void QmitkNumberPropertySlider::SetProperty(mitk::FloatProperty* property)
 
 void QmitkNumberPropertySlider::SetProperty(mitk::DoubleProperty* property)
 {
-  if (property == NULL)
+  if (property == nullptr)
   {
     d->m_PropEditor.reset();
     this->setEnabled(false);
@@ -197,7 +197,7 @@ short QmitkNumberPropertySlider::getDecimalPlaces() const
 
 void QmitkNumberPropertySlider::setDecimalPlaces(short places)
 {
-  if (d->m_PropEditor.get() == NULL) return;
+  if (d->m_PropEditor.get() == nullptr) return;
 
   switch (d->m_PropEditor->m_DataType)
   {
@@ -222,7 +222,7 @@ void QmitkNumberPropertySlider::setShowPercent(bool showPercent)
 {
   if ( showPercent == d->m_ShowPercents ) return; // nothing to change
 
-  if (d->m_PropEditor.get() == NULL) return;
+  if (d->m_PropEditor.get() == nullptr) return;
 
   switch (d->m_PropEditor->m_DataType)
   {
@@ -273,7 +273,7 @@ void QmitkNumberPropertySlider::setDoubleValue(double value)
 
 void QmitkNumberPropertySlider::onValueChanged(int value)
 {
-  if (d->m_PropEditor.get() == NULL) return;
+  if (d->m_PropEditor.get() == nullptr) return;
 
   if (d->m_SelfChangeLock) return; // valueChanged is even emitted, when this widget initiates a change to its value
                                 // this may be useful some times, but in this use, it would be wrong:
@@ -320,12 +320,12 @@ void QmitkNumberPropertySlider::Impl::Editor::PropertyChanged()
 
 void QmitkNumberPropertySlider::Impl::Editor::PropertyRemoved()
 {
-  this->m_Property = NULL;
+  this->m_Property = nullptr;
 }
 
 void QmitkNumberPropertySlider::Impl::DisplayNumber()
 {
-  if (m_PropEditor.get() == NULL) return;
+  if (m_PropEditor.get() == nullptr) return;
 
   m_SelfChangeLock = true;
   switch (m_PropEditor->m_DataType)

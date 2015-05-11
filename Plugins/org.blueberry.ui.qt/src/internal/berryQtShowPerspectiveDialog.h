@@ -34,7 +34,7 @@ class QtShowPerspectiveDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit QtShowPerspectiveDialog(IPerspectiveRegistry* perspReg, QWidget *parent = 0);
+  explicit QtShowPerspectiveDialog(IPerspectiveRegistry* perspReg, QWidget *parent = nullptr);
   ~QtShowPerspectiveDialog();
 
   QString GetSelection() const;

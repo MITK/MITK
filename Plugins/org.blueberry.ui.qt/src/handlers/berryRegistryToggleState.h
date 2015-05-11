@@ -52,7 +52,7 @@ public:
   static const QString STATE_ID; // = "org.blueberry.ui.commands.toggleState";
 
   void SetInitializationData(const SmartPointer<IConfigurationElement>& configurationElement,
-                             const QString& propertyName, const Object::Pointer& data);
+                             const QString& propertyName, const Object::Pointer& data) override;
 
 private:
 

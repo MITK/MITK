@@ -51,7 +51,7 @@ void QmitkOrbitAnimationWidget::SetAnimationItem(QmitkAnimationItem* orbitAnimat
 {
   m_AnimationItem = dynamic_cast<QmitkOrbitAnimationItem*>(orbitAnimationItem);
 
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   m_Ui->startAngleSlider->setValue(m_AnimationItem->GetStartAngle());
@@ -61,7 +61,7 @@ void QmitkOrbitAnimationWidget::SetAnimationItem(QmitkAnimationItem* orbitAnimat
 
 void QmitkOrbitAnimationWidget::OnStartAngleChanged(int angle)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   if (m_AnimationItem->GetStartAngle() != angle)
@@ -70,7 +70,7 @@ void QmitkOrbitAnimationWidget::OnStartAngleChanged(int angle)
 
 void QmitkOrbitAnimationWidget::OnOrbitEditingFinished()
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   int angle = m_Ui->orbitLineEdit->text().toInt();
@@ -81,7 +81,7 @@ void QmitkOrbitAnimationWidget::OnOrbitEditingFinished()
 
 void QmitkOrbitAnimationWidget::OnReverseChanged(bool reverse)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   if (m_AnimationItem->GetReverse() != reverse)

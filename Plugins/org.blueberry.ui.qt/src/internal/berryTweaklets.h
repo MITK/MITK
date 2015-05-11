@@ -83,11 +83,11 @@ public:
     if (iter == tweaklets.end())
     {
       result = CreateTweaklet(definition);
-      if (result == 0)
+      if (result == nullptr)
       {
         result = GetDefault(definition);
       }
-      Q_ASSERT(result != 0);
+      Q_ASSERT(result != nullptr);
       tweaklets.insert(definition, result);
       return qobject_cast<I*>(result);
     }
@@ -111,7 +111,7 @@ private:
   {
     TweakletMap::const_iterator iter = defaults.find(definition);
     if (iter == defaults.end())
-      return 0;
+      return nullptr;
 
     return iter.value();
   }
@@ -146,7 +146,7 @@ private:
         }
       }
     }
-    return 0;
+    return nullptr;
   }
 
 };

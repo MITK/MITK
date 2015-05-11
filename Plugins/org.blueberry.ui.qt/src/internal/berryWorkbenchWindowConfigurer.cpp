@@ -60,17 +60,17 @@ IToolBarManager* WorkbenchWindowConfigurer::WindowActionBarConfigurer::GetToolBa
     return proxy->GetToolBarManager();
   }
   //return window.Lock()->GetToolBarManager();
-  return 0;
+  return nullptr;
 }
 
 WorkbenchWindowConfigurer::WorkbenchWindowConfigurer(const WorkbenchWindow::Pointer& window)
- : shellStyle(0)
+ : shellStyle(nullptr)
  , showPerspectiveBar(false)
  , showStatusLine(true)
  , showToolBar(true)
  , showMenuBar(true)
  , showProgressIndicator(false)
- , dropTargetListener(NULL)
+ , dropTargetListener(nullptr)
  , initialSize(1024,768)
 {
   if (window.IsNull())
@@ -210,7 +210,7 @@ void WorkbenchWindowConfigurer::AddEditorAreaTransfer(const QStringList& transfe
 
 void WorkbenchWindowConfigurer::ConfigureEditorAreaDropListener(IDropTargetListener* listener)
 {
-  if (listener == 0) return;
+  if (listener == nullptr) return;
   dropTargetListener = listener;
 
   WorkbenchPage::Pointer page = window.Lock()->GetActivePage().Cast<WorkbenchPage>();
@@ -279,7 +279,7 @@ QWidget* WorkbenchWindowConfigurer::CreateToolBar(QWidget* /*parent*/)
 //  {
 //    return toolBarManager->CreateControl(parent);
 //  }
-  return 0;
+  return nullptr;
 }
 
 QWidget *WorkbenchWindowConfigurer::CreatePageComposite(QWidget *parent)

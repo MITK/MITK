@@ -54,7 +54,7 @@ private:
   {
     ShellListener(DetachedWindow* wnd);
 
-    void ShellClosed(const ShellEvent::Pointer& e);
+    void ShellClosed(const ShellEvent::Pointer& e) override;
 
   private:
     DetachedWindow* window;
@@ -67,9 +67,9 @@ private:
 
     ShellControlListener(DetachedWindow* wnd);
 
-    Events::Types GetEventTypes() const;
+    Events::Types GetEventTypes() const override;
 
-    void ControlResized(GuiTk::ControlEvent::Pointer e);
+    void ControlResized(GuiTk::ControlEvent::Pointer e) override;
 
   private:
     DetachedWindow* window;
@@ -100,7 +100,7 @@ public:
   DetachedWindow(WorkbenchPage* workbenchPage);
   using IPropertyChangeListener::PropertyChange;
 
-  void PropertyChange(const Object::Pointer& source, int propId);
+  void PropertyChange(const Object::Pointer& source, int propId) override;
 
   Shell::Pointer GetShell();
 
@@ -121,7 +121,7 @@ public:
    */
   IDropTarget::Pointer Drag(QWidget* currentControl,
       const Object::Pointer& draggedObject, const QPoint& position,
-      const QRect& dragRectangle);
+      const QRect& dragRectangle) override;
 
   ILayoutContainer::ChildrenType GetChildren() const;
 

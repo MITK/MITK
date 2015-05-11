@@ -51,9 +51,9 @@ public:
 
   int GetId() const;
 
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 
-  uint HashCode() const;
+  uint HashCode() const override;
 
 protected:
 

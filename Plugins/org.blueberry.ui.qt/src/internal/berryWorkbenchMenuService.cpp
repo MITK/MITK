@@ -70,7 +70,7 @@ private:
     bool visible = lastExpressionResult;
     item->SetVisible(visible);
 
-    IContributionManager* parent = 0;
+    IContributionManager* parent = nullptr;
     if (ContributionItem::Pointer ci = item.Cast<ContributionItem>())
     {
       parent = ci->GetParent();
@@ -79,7 +79,7 @@ private:
     {
       parent = mm->GetParent();
     }
-    if (parent != 0)
+    if (parent != nullptr)
     {
       parent->MarkDirty();
       wms->managersAwaitingUpdates.insert(parent);
@@ -114,7 +114,7 @@ public:
   /*
    * @see IPropertyChangeListener#PropertyChange(PropertyChangeEvent)
    */
-  void PropertyChange(const PropertyChangeEvent::Pointer& event)
+  void PropertyChange(const PropertyChangeEvent::Pointer& event) override
   {
     if (event->GetProperty() == WorkbenchMenuService::PROP_VISIBLE)
     {
@@ -141,7 +141,7 @@ public:
 };
 
 WorkbenchMenuService::ManagerPopulationRecord::ManagerPopulationRecord()
-  : wms(0), serviceLocatorToUse(0), recurse(false)
+  : wms(nullptr), serviceLocatorToUse(nullptr), recurse(false)
 {
 }
 
@@ -178,7 +178,7 @@ GetContributions(const SmartPointer<AbstractContributionFactory>& factory) const
 {
   if (factoryToItems.contains(factory))
     return factoryToItems[factory];
-  return ContributionRoot::Pointer(0);
+  return ContributionRoot::Pointer(nullptr);
 }
 
 void WorkbenchMenuService::ManagerPopulationRecord::
@@ -192,7 +192,7 @@ ReleaseContributions()
 }
 
 WorkbenchMenuService::WorkbenchMenuService(IServiceLocator* serviceLocator)
-  : evaluationService(0), serviceLocator(serviceLocator)
+  : evaluationService(nullptr), serviceLocator(serviceLocator)
 {
   //this.menuPersistence = new MenuPersistence(this);
   evaluationService = serviceLocator->GetService<IEvaluationService>();
@@ -289,7 +289,7 @@ void WorkbenchMenuService::UpdateManagers()
     if (MenuManager* mMgr = dynamic_cast<MenuManager*>(mgr))
     {
       IContributionManager* parent = mMgr->GetParent();
-      if (parent != 0)
+      if (parent != nullptr)
       {
         parent->Update(true);
       }
@@ -531,7 +531,7 @@ void WorkbenchMenuService::UnregisterVisibleWhen(const SmartPointer<IContributio
 
 void WorkbenchMenuService::ReleaseContributions(ContributionManager* mgr)
 {
-  if (mgr == 0)
+  if (mgr == nullptr)
     return;
 
   // Recursively remove any contributions from sub-menus
@@ -822,10 +822,10 @@ bool WorkbenchMenuService::ProcessAdditions(IServiceLocator* serviceLocatorToUse
         restriction(restriction), mgr(mgr), cache(cache), itemsAdded(itemsAdded)
     {}
 
-    void HandleException(const ctkException&)
+    void HandleException(const ctkException&) override
     {}
 
-    void Run()
+    void Run() override
     {
       // Get the additions
       ContributionRoot::Pointer ciList(new ContributionRoot(wms, restriction,
@@ -1035,7 +1035,7 @@ SmartPointer<AbstractMenuAdditionCacheEntry> WorkbenchMenuService::FindFactory(c
         return mace;
     }
   }
-  return AbstractMenuAdditionCacheEntry::Pointer(0);
+  return AbstractMenuAdditionCacheEntry::Pointer(nullptr);
 }
 
 //void WorkbenchMenuService::HandleMenuChanges(const SmartPointer<IRegistryChangeEvent>& event)

@@ -82,13 +82,13 @@ bool QmitkCallbackFromGUIThread::event( QEvent* e )
   {
     if (event->itkevent())
     {
-      cmd->Execute( (const itk::Object*) NULL, // no itk::Object here
+      cmd->Execute( (const itk::Object*) nullptr, // no itk::Object here
                     *(event->itkevent()) );
     }
     else
     {
       const itk::NoEvent dummyEvent;
-      cmd->Execute( (const itk::Object*) NULL, // no itk::Object here
+      cmd->Execute( (const itk::Object*) nullptr, // no itk::Object here
                     dummyEvent );
     }
   }

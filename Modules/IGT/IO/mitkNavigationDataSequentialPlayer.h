@@ -61,7 +61,7 @@ namespace mitk
     * \brief Used for pipeline update just to tell the pipeline
     * that we always have to update
     */
-    virtual void UpdateOutputInformation();
+    virtual void UpdateOutputInformation() override;
 
   protected:
     NavigationDataSequentialPlayer();
@@ -72,7 +72,7 @@ namespace mitk
     * mitk::NavigationDataSequentialPlayer::GoToNextSnapshot() should be called
     * for generating next data.
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
   };
 } // namespace mitk
 

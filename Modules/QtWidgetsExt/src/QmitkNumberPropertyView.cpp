@@ -112,7 +112,7 @@ void QmitkNumberPropertyView::PropertyChanged()
 
 void QmitkNumberPropertyView::PropertyRemoved()
 {
-  m_Property = NULL;
+  m_Property = nullptr;
   setText("n/a");
 }
 

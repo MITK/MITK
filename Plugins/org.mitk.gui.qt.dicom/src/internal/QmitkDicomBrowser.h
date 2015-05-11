@@ -70,13 +70,13 @@ public:
    /**
     * \brief Init initialize the editor.
     */
-    void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
+    void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input) override;
 
-    void SetFocus();
-    void DoSave() {}
-    void DoSaveAs() {}
-    bool IsDirty() const { return false; }
-    bool IsSaveAsAllowed() const { return false; }
+    void SetFocus() override;
+    void DoSave() override {}
+    void DoSaveAs() override {}
+    bool IsDirty() const override { return false; }
+    bool IsSaveAsAllowed() const override { return false; }
 
     virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
 
@@ -127,12 +127,12 @@ protected:
     *
     * \param parent is a pointer to the parent widget
     */
-    void CreateQtPartControl(QWidget *parent);
+    void CreateQtPartControl(QWidget *parent) override;
 
     /// \brief SetPluginDirectory Sets plugin directory.
     void SetPluginDirectory();
 
-    Events::Types GetPartEventTypes() const;
+    Events::Types GetPartEventTypes() const override;
 
     ctkFileDialog* m_ImportDialog;
     Ui::QmitkDicomBrowserControls m_Controls;

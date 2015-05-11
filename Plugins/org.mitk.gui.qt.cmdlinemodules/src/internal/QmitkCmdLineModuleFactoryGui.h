@@ -43,7 +43,7 @@ public:
   /**
    * \brief Simply creates QmitkCmdLineModuleGui which is an MITK specific Qt front end.
    */
-  ctkCmdLineModuleFrontendQtGui* create(const ctkCmdLineModuleReference& moduleRef);
+  ctkCmdLineModuleFrontendQtGui* create(const ctkCmdLineModuleReference& moduleRef) override;
 
 private:
 

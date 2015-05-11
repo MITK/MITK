@@ -535,8 +535,8 @@ public:
                                            bool sort = true,
                                            bool load4D = true,
                                            bool correctGantryTilt = true,
-                                           UpdateCallBackMethod callback = 0,
-                                           itk::SmartPointer<Image> preLoadedImageBlock = 0);
+                                           UpdateCallBackMethod callback = nullptr,
+                                           itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
   /**
     \brief See LoadDicomSeries! Just a slightly different interface.
@@ -549,8 +549,8 @@ public:
                               bool sort = true,
                               bool load4D = true,
                               bool correctGantryTilt = true,
-                              UpdateCallBackMethod callback = 0,
-                              itk::SmartPointer<Image> preLoadedImageBlock = 0);
+                              UpdateCallBackMethod callback = nullptr,
+                              itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
 protected:
 

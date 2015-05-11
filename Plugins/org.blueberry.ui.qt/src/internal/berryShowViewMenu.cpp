@@ -99,7 +99,7 @@ void ShowViewMenu::Fill(QMenu* menu, QAction* before)
   QList<IContributionItem::Pointer> items = manager->GetItems();
   if (items.isEmpty())
   {
-    QAction* action = new QAction(NO_TARGETS_MSG, menu);
+    auto   action = new QAction(NO_TARGETS_MSG, menu);
     action->setEnabled(false);
     menu->insertAction(before, action);
   }
@@ -200,7 +200,7 @@ CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& v
   IViewDescriptor::Pointer desc = reg->Find(viewId);
   if (desc.IsNull())
   {
-    return CommandContributionItemParameter::Pointer(0);
+    return CommandContributionItemParameter::Pointer(nullptr);
   }
   QString label = desc->GetLabel();
 
@@ -222,12 +222,12 @@ CommandContributionItemParameter::Pointer ShowViewMenu::GetItem(const QString& v
       pluginId = vd->GetPluginId();
     }
 
-    QString GetLocalId() const
+    QString GetLocalId() const override
     {
       return localId;
     }
 
-    QString GetPluginId() const
+    QString GetPluginId() const override
     {
       return pluginId;
     }

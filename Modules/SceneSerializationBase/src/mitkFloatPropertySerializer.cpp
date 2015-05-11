@@ -36,16 +36,16 @@ class FloatPropertySerializer : public BasePropertySerializer
     {
       if (const FloatProperty* prop = dynamic_cast<const FloatProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("float");
+        auto  element = new TiXmlElement("float");
         element->SetDoubleAttribute("value", static_cast<double>(prop->GetValue()));
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       float f;
       if ( element->QueryFloatAttribute( "value", &f ) == TIXML_SUCCESS )
@@ -54,7 +54,7 @@ class FloatPropertySerializer : public BasePropertySerializer
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

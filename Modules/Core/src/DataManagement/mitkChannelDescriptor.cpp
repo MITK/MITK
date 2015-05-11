@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMemoryUtilities.h"
 
 mitk::ChannelDescriptor::ChannelDescriptor( mitk::PixelType type, size_t numOfElements, bool /*allocate*/)
-  : m_PixelType(type), m_Size(numOfElements), m_Data(NULL)
+  : m_PixelType(type), m_Size(numOfElements), m_Data(nullptr)
 {
   //MITK_INFO << "Entering ChannelDescriptor constructor.";
 }
@@ -53,7 +53,7 @@ void mitk::ChannelDescriptor::Initialize(mitk::PixelType &type, size_t numOfElem
 
 void mitk::ChannelDescriptor::AllocateData()
 {
-  if( m_Data == NULL)
+  if( m_Data == nullptr)
   {
     m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( m_Size );
   }

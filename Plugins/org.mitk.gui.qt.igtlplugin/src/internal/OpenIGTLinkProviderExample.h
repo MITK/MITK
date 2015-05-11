@@ -60,9 +60,9 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus();
+    virtual void SetFocus() override;
 
     void CreatePipeline();
     void DestroyPipeline();

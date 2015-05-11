@@ -68,7 +68,7 @@ int mitkStateTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED( ! state->IsValidEvent(count+1),"Check if a non existent EventId is valid");
 
   //deleting state and checking if transitions are deleted
-  state = NULL;
+  state = nullptr;
   MITK_TEST_CONDITION_REQUIRED(state.IsNull(),"Testing setting state to null and deleting it with it");
 
 
@@ -93,7 +93,7 @@ int mitkStateTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(state->GetReferenceCount() == 1,"Testing ReferenceCount still one");
 
   //destroying it again.
-  state = NULL;
+  state = nullptr;
   MITK_TEST_CONDITION_REQUIRED(state.IsNull(),"Testing setting state to null and deleting it with it");
 
   //doesn't have to be done because the memory is freed in ~State destructor

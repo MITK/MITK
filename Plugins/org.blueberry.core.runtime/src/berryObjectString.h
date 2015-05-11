@@ -38,13 +38,13 @@ public:
 
   ~ObjectString();
 
-  bool operator==(const Object* other) const;
+  bool operator==(const Object* other) const override;
 
   bool operator==(const QString& other) const;
 
   ObjectString& operator=(const QString& other);
 
-  QString ToString() const;
+  QString ToString() const override;
 
 };
 

@@ -38,9 +38,9 @@ public:
   IntroHandler();
   ~IntroHandler();
 
-  SmartPointer<Object> Execute(const SmartPointer<const ExecutionEvent>& event);
+  SmartPointer<Object> Execute(const SmartPointer<const ExecutionEvent>& event) override;
 
-  bool IsEnabled() const;
+  bool IsEnabled() const override;
 
 };
 

@@ -30,12 +30,12 @@ mitk::PlaneGeometryData::~PlaneGeometryData()
 
 void mitk::PlaneGeometryData::SetGeometry(mitk::BaseGeometry *geometry)
 {
-  if(geometry==NULL)
-    SetPlaneGeometry(NULL);
+  if(geometry==nullptr)
+    SetPlaneGeometry(nullptr);
   else
   {
     PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(geometry);
-    if(geometry2d==NULL || dynamic_cast<AbstractTransformGeometry*>(geometry)!=NULL)
+    if(geometry2d==nullptr || dynamic_cast<AbstractTransformGeometry*>(geometry)!=nullptr)
       itkExceptionMacro(<<"Trying to set a geometry which is not a PlaneGeometry into PlaneGeometryData.");
     SetPlaneGeometry(geometry2d);
   }
@@ -43,7 +43,7 @@ void mitk::PlaneGeometryData::SetGeometry(mitk::BaseGeometry *geometry)
 
 void mitk::PlaneGeometryData::SetPlaneGeometry(mitk::PlaneGeometry *geometry2d)
 {
-  if(geometry2d != NULL)
+  if(geometry2d != nullptr)
   {
     ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
     timeGeometry->Initialize(geometry2d, 1);
@@ -66,14 +66,14 @@ void mitk::PlaneGeometryData::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::PlaneGeometryData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if(GetPlaneGeometry()==NULL) return true;
+  if(GetPlaneGeometry()==nullptr) return true;
 
   return false;
 }
 
 bool mitk::PlaneGeometryData::VerifyRequestedRegion()
 {
-  if(GetPlaneGeometry()==NULL) return false;
+  if(GetPlaneGeometry()==nullptr) return false;
 
   return true;
 }

@@ -115,7 +115,7 @@ struct SelectionChangedAdapter: public ISelectionListener
     poco_assert(callback);
   }
 
-  void SelectionChanged(const IWorkbenchPart::Pointer& part, const ISelection::ConstPointer& selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part, const ISelection::ConstPointer& selection) override
   {
     (listener->*callback)(part, selection);
   }

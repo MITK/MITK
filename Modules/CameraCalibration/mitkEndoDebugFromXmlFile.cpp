@@ -92,7 +92,7 @@ namespace mitk
     TiXmlHandle docHandle( &doc );
     TiXmlElement* elem = docHandle.FirstChildElement().FirstChildElement( "EndoDebug" ).ToElement();
 
-    if(elem == 0)
+    if(elem == nullptr)
     {
       endodebug("EndoDebug element not found");
       return;

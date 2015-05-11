@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent, bool _AutoSelectNewNodes )
 : QComboBox(parent)
-, m_DataStorage(0)
-, m_Predicate(0)
+, m_DataStorage(nullptr)
+, m_Predicate(nullptr)
 , m_BlockEvents(false)
 , m_AutoSelectNewNodes(_AutoSelectNewNodes)
 {
@@ -33,7 +33,7 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox( QWidget* parent, bool _AutoS
 QmitkDataStorageComboBox::QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate,
                                                    QWidget* parent, bool _AutoSelectNewNodes )
 : QComboBox(parent)
-, m_DataStorage(0)
+, m_DataStorage(nullptr)
 , m_Predicate(_Predicate)
 , m_BlockEvents(false)
 , m_AutoSelectNewNodes(_AutoSelectNewNodes)
@@ -72,26 +72,26 @@ const mitk::NodePredicateBase::ConstPointer QmitkDataStorageComboBox::GetPredica
 
 mitk::DataNode::Pointer QmitkDataStorageComboBox::GetNode( int index ) const
 {
-  return (this->HasIndex(index))? m_Nodes.at(index): 0;
+  return (this->HasIndex(index))? m_Nodes.at(index): nullptr;
 }
 
 mitk::DataNode::Pointer QmitkDataStorageComboBox::GetSelectedNode() const
 {
   if (this->count() == 0)
-    return NULL;
+    return nullptr;
 
   int currentIndex = this->currentIndex();
 
   return currentIndex >= 0
     ? this->GetNode(currentIndex)
-    : NULL;
+    : nullptr;
 }
 
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkDataStorageComboBox::GetNodes() const
 {
   mitk::DataStorage::SetOfObjects::Pointer _SetOfObjects = mitk::DataStorage::SetOfObjects::New();
 
-  for (std::vector<mitk::DataNode*>::const_iterator it = m_Nodes.begin(); it != m_Nodes.end(); ++it)
+  for (auto it = m_Nodes.begin(); it != m_Nodes.end(); ++it)
   {
     _SetOfObjects->push_back(*it);
   }
@@ -230,7 +230,7 @@ void QmitkDataStorageComboBox::OnDataNodeDeleteOrModified(const itk::Object *cal
 
       // node name changed, set it
       // but first of all find associated node
-      for(std::map<mitk::DataNode*, const mitk::BaseProperty*>::iterator it=m_PropertyToNode.begin()
+      for(auto it=m_PropertyToNode.begin()
         ; it!=m_PropertyToNode.end()
         ; ++it)
       {
@@ -279,7 +279,7 @@ int QmitkDataStorageComboBox::Find( const mitk::DataNode* _DataNode ) const
 {
   int index = -1;
 
-  std::vector<mitk::DataNode*>::const_iterator nodeIt =
+  auto nodeIt =
     std::find(m_Nodes.begin(), m_Nodes.end(), _DataNode);
 
   if(nodeIt != m_Nodes.end())
@@ -294,7 +294,7 @@ void QmitkDataStorageComboBox::OnCurrentIndexChanged(int index)
   if(index >= 0 && index < this->count())
     emit OnSelectionChanged(this->GetSelectedNode());
   if(index == -1)
-    emit OnSelectionChanged(NULL);
+    emit OnSelectionChanged(nullptr);
 }
 
 void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _DataNode)

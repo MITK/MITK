@@ -30,7 +30,7 @@ class QuitHandler : public AbstractHandler
 
 public:
 
-  Object::Pointer Execute(const SmartPointer<const ExecutionEvent>& event);
+  Object::Pointer Execute(const SmartPointer<const ExecutionEvent>& event) override;
 
 };
 

@@ -195,7 +195,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
   }
 
   void SelectionChanged(const IWorkbenchPart::Pointer& part,
-                        const ISelection::ConstPointer& selection)
+                        const ISelection::ConstPointer& selection) override
   {
     // check, if selection comes from datamanager
     if (part)

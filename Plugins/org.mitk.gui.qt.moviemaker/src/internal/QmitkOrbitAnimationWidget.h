@@ -31,10 +31,10 @@ class QmitkOrbitAnimationWidget : public QmitkAnimationWidget
   Q_OBJECT
 
 public:
-  explicit QmitkOrbitAnimationWidget(QWidget* parent = NULL);
+  explicit QmitkOrbitAnimationWidget(QWidget* parent = nullptr);
   ~QmitkOrbitAnimationWidget();
 
-  void SetAnimationItem(QmitkAnimationItem* orbitAnimationItem);
+  void SetAnimationItem(QmitkAnimationItem* orbitAnimationItem) override;
 
 private slots:
   void OnStartAngleChanged(int angle);

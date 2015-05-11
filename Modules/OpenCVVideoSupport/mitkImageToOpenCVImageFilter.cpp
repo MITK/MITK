@@ -23,14 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk{
 
   ImageToOpenCVImageFilter::ImageToOpenCVImageFilter()
-    : m_OpenCVImage(0)
+    : m_OpenCVImage(nullptr)
   {
     m_sliceSelector = ImageSliceSelector::New();
   }
 
   ImageToOpenCVImageFilter::~ImageToOpenCVImageFilter()
   {
-    m_OpenCVImage = 0;
+    m_OpenCVImage = nullptr;
   }
 
 
@@ -42,7 +42,7 @@ namespace mitk{
 
   bool ImageToOpenCVImageFilter::CheckImage( Image* image )
   {
-    if(image == 0)
+    if(image == nullptr)
     {
       MITK_WARN << "MITK Image is 0";
       return false;
@@ -59,9 +59,9 @@ namespace mitk{
   {
 
     if(!this->CheckImage( m_Image ))
-      return 0;
+      return nullptr;
 
-    m_OpenCVImage = (0);
+    m_OpenCVImage = (nullptr);
 
     try
     {
@@ -73,7 +73,7 @@ namespace mitk{
     }
     catch (const AccessByItkException& e) {
       std::cout << "Caught exception [from AccessFixedTypeByItk]: \n" << e.what() << "\n";
-      return 0;
+      return nullptr;
     }
     return m_OpenCVImage;
   }

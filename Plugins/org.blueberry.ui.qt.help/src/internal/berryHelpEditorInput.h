@@ -34,19 +34,19 @@ public:
 
   HelpEditorInput(const QUrl& url = QUrl());
 
-  bool Exists() const;
-  QString GetName() const;
-  QString GetToolTipText() const;
+  bool Exists() const override;
+  QString GetName() const override;
+  QString GetToolTipText() const override;
 
-  QIcon GetIcon() const;
+  QIcon GetIcon() const override;
 
-  const IPersistableElement* GetPersistable() const;
-  Object* GetAdapter(const QString &adapterType) const;
+  const IPersistableElement* GetPersistable() const override;
+  Object* GetAdapter(const QString &adapterType) const override;
 
-  QString GetFactoryId() const;
-  void SaveState(const SmartPointer<IMemento>& memento) const;
+  QString GetFactoryId() const override;
+  void SaveState(const SmartPointer<IMemento>& memento) const override;
 
-  bool operator==(const berry::Object*) const;
+  bool operator==(const berry::Object*) const override;
 
   QUrl GetUrl() const;
 

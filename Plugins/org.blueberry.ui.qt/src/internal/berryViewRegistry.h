@@ -71,42 +71,42 @@ private:
     /*
      * @see IViewCategory#GetViews()
      */
-    QList<IViewDescriptor::Pointer> GetViews() const;
+    QList<IViewDescriptor::Pointer> GetViews() const override;
 
     /*
      * @see IViewCategory#GetId()
      */
-    QString GetId() const;
+    QString GetId() const override;
 
     /*
      * @see IViewCategory#GetPath()
      */
-    QStringList GetPath() const;
+    QStringList GetPath() const override;
 
     /*
      * @see IViewCategory#GetLabel()
      */
-    QString GetLabel() const;
+    QString GetLabel() const override;
 
     /*
      * @see IPluginContribution#GetLocalId()
      */
-    QString GetLocalId() const;
+    QString GetLocalId() const override;
 
     /*
      * @see IPluginContribution#GetPluginId()
      */
-    QString GetPluginId() const;
+    QString GetPluginId() const override;
 
     /*
      * @see Object#operator==(Object*)
      */
-    bool operator==(const Object* o) const;
+    bool operator==(const Object* o) const override;
 
     /*
      * @see Object#HashCode()
      */
-    uint HashCode() const;
+    uint HashCode() const override;
   };
 
 private:
@@ -178,7 +178,7 @@ public:
   /**
    * Find a descriptor in the registry.
    */
-  IViewDescriptor::Pointer Find(const QString& id) const;
+  IViewDescriptor::Pointer Find(const QString& id) const override;
 
   /**
    * Find a category with a given name.
@@ -191,13 +191,13 @@ public:
   /**
    * Get the list of view categories.
    */
-  QList<IViewCategory::Pointer> GetCategories();
+  QList<IViewCategory::Pointer> GetCategories() override;
 
   /**
    * Get the list of sticky views minus the sticky views which failed the
    * Expressions check.
    */
-  QList<IStickyViewDescriptor::Pointer> GetStickyViews() const;
+  QList<IStickyViewDescriptor::Pointer> GetStickyViews() const override;
 
   /**
    * Returns the Misc category. This may be <code>null</code> if there are
@@ -210,7 +210,7 @@ public:
   /**
    * Get an enumeration of view descriptors.
    */
-  QList<IViewDescriptor::Pointer> GetViews() const;
+  QList<IViewDescriptor::Pointer> GetViews() const override;
 
   /**
    * Adds each view in the registry to a particular category.

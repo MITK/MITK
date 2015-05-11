@@ -48,7 +48,7 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
 
   // Test for number of polylines
   const mitk::PlanarFigure::PolyLineType polyLine0 = PlanarArrow->GetPolyLine( 0 );
-  mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
+  auto iter = polyLine0.begin();
   MITK_TEST_CONDITION( PlanarArrow->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
 

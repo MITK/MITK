@@ -48,8 +48,8 @@ public:
   org_blueberry_core_runtime_Activator();
   ~org_blueberry_core_runtime_Activator();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
   static ctkPluginContext* getPluginContext();
 

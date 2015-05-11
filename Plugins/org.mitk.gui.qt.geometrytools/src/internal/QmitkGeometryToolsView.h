@@ -70,13 +70,13 @@ protected slots:
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus();
+    virtual void SetFocus() override;
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes );
+                                     const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::QmitkGeometryToolsViewControls m_Controls;
 };

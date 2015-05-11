@@ -20,7 +20,7 @@ namespace berry {
 
 void IDragOverListener::Events::AddListener(IDragOverListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   drag += DragDelegate(l, &IDragOverListener::Drag);
 
@@ -28,7 +28,7 @@ void IDragOverListener::Events::AddListener(IDragOverListener* l)
 
 void IDragOverListener::Events::RemoveListener(IDragOverListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   drag -= DragDelegate(l, &IDragOverListener::Drag);
 

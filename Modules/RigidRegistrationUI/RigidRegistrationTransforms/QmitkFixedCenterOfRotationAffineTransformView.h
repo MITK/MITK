@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkFixedCenterOfRotationAffineTransformVi
 
 public:
 
-  QmitkFixedCenterOfRotationAffineTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkFixedCenterOfRotationAffineTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkFixedCenterOfRotationAffineTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

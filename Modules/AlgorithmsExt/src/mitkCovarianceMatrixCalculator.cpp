@@ -54,8 +54,8 @@ struct CovarianceMatrixCalculatorData
 
   CovarianceMatrixCalculatorData()
     : m_PolyDataNormals(vtkPolyDataNormals::New()),
-      m_PolyData(NULL),
-      m_Input(NULL),
+      m_PolyData(nullptr),
+      m_Input(nullptr),
       m_VoronoiScalingFactor(1.0),
       m_EnableNormalization(false),
       m_MeanVariance(0.0)
@@ -111,7 +111,7 @@ void mitk::CovarianceMatrixCalculator::SetInputSurface(Surface *input)
 void mitk::CovarianceMatrixCalculator::ComputeCovarianceMatrices()
 {
   double normalizationValue = -1.0;
-  vtkDataArray* normals = NULL;
+  vtkDataArray* normals = nullptr;
   d->m_MeanVariance = 0.0;
 
   if ( !d->m_Input )
@@ -168,8 +168,8 @@ void mitk::CovarianceMatrixCalculator::ComputeCovarianceMatrices()
     d->m_MeanVariance /= (3.0 * (double) d->m_PolyData->GetNumberOfPoints());
 
   // reset input
-  d->m_PolyData = NULL;
-  d->m_Input = NULL;
+  d->m_PolyData = nullptr;
+  d->m_Input = nullptr;
 }
 
 // Get a list with the id's of all surrounding conected vertices

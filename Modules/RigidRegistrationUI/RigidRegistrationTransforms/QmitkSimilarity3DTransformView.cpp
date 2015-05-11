@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkSimilarity3DTransformView::GetTransform()
     AccessFixedDimensionByItk(m_FixedImage, GetTransform2, 3);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 template < class TPixelType, unsigned int VImageDimension >
@@ -88,7 +88,7 @@ itk::Object::Pointer QmitkSimilarity3DTransformView::GetTransform2(itk::Image<TP
     m_TransformObject = transformPointer.GetPointer();
     return transformPointer.GetPointer();
   }
-  return NULL;
+  return nullptr;
 }
 
 itk::Array<double> QmitkSimilarity3DTransformView::GetTransformParameters()

@@ -258,37 +258,37 @@ void mitk::CameraIntrinsics::FromGMLCalibrationXML(TiXmlElement* elem)
   cv::Mat DistorsionCoeffs = cv::Mat::zeros(1, 5, cv::DataType<double>::type);
 
   TiXmlElement* focus_lenXElem = elem->FirstChildElement("focus_lenX");
-  endoAssert( focus_lenXElem != 0 );
+  endoAssert( focus_lenXElem != nullptr );
   CameraMatrix.at<double>(0,0) = atof( focus_lenXElem->GetText() );
 
   TiXmlElement* focus_lenYElem = elem->FirstChildElement("focus_lenY");
-  endoAssert( focus_lenYElem != 0 );
+  endoAssert( focus_lenYElem != nullptr );
   CameraMatrix.at<double>(1,1) = atof( focus_lenYElem->GetText() );
 
   TiXmlElement* PrincipalXElem = elem->FirstChildElement("PrincipalX");
-  endoAssert( PrincipalXElem != 0 );
+  endoAssert( PrincipalXElem != nullptr );
   CameraMatrix.at<double>(0,2) = atof( PrincipalXElem->GetText() );
 
   TiXmlElement* PrincipalYElem = elem->FirstChildElement("PrincipalY");
-  endoAssert( PrincipalYElem != 0 );
+  endoAssert( PrincipalYElem != nullptr );
   CameraMatrix.at<double>(1,2) = atof( PrincipalYElem->GetText() );
 
   // DISTORSION COEFFS
 
   TiXmlElement* Dist1Elem = elem->FirstChildElement("Dist1");
-  endoAssert( Dist1Elem != 0 );
+  endoAssert( Dist1Elem != nullptr );
   DistorsionCoeffs.at<double>(0,0) = atof( Dist1Elem->GetText() );
 
   TiXmlElement* Dist2Elem = elem->FirstChildElement("Dist2");
-  endoAssert( Dist2Elem != 0 );
+  endoAssert( Dist2Elem != nullptr );
   DistorsionCoeffs.at<double>(0,1) = atof( Dist2Elem->GetText() );
 
   TiXmlElement* Dist3Elem = elem->FirstChildElement("Dist3");
-  endoAssert( Dist3Elem != 0 );
+  endoAssert( Dist3Elem != nullptr );
   DistorsionCoeffs.at<double>(0,2) = atof( Dist3Elem->GetText() );
 
   TiXmlElement* Dist4Elem = elem->FirstChildElement("Dist4");
-  endoAssert( Dist4Elem != 0 );
+  endoAssert( Dist4Elem != nullptr );
   DistorsionCoeffs.at<double>(0,3) = atof( Dist4Elem->GetText() );
 
   int valid = 0;

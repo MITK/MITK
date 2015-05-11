@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 
 QmitkFileExitAction::QmitkFileExitAction(berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+: QAction(nullptr)
 {
   m_Window = window.GetPointer();
 

@@ -45,10 +45,10 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   //test method GetTimeGeometry()
   MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry(), "Testing creation of TimeGeometry");
 
-  mitk::TimeGeometry* geo = NULL;
+  mitk::TimeGeometry* geo = nullptr;
   baseDataImpl->SetTimeGeometry(geo);
 
-  MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry() == NULL, "Reset Geometry");
+  MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry() == nullptr, "Reset Geometry");
 
   mitk::ProportionalTimeGeometry::Pointer geo2 = mitk::ProportionalTimeGeometry::New();
   baseDataImpl->SetTimeGeometry(geo2);
@@ -56,7 +56,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry() == geo2.GetPointer(), "Correct Reinit of TimeGeometry");
 
   //test method GetGeometry(int timeStep)
-  MITK_TEST_CONDITION(baseDataImpl->GetGeometry(1) != NULL, "... and single Geometries");
+  MITK_TEST_CONDITION(baseDataImpl->GetGeometry(1) != nullptr, "... and single Geometries");
 
   //test method Expand(unsigned int timeSteps)
   baseDataImpl->Expand(5);

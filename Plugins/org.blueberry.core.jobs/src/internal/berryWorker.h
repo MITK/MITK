@@ -58,7 +58,7 @@ private:
 
     JobRunnable(Worker* currentWorker);
 
-    void run();
+    void run() override;
 
     // code that would be executed in java within a finally statement
     void RunMethodFinallyExecution(IStatus::Pointer sptr_result);

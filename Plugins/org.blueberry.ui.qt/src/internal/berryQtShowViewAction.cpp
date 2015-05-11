@@ -24,7 +24,7 @@ namespace berry
 
 QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
     IViewDescriptor::Pointer desc) :
-  QAction(0)
+  QAction(nullptr)
 {
   this->setParent(static_cast<QWidget*>(window->GetShell()->GetControl()));
   this->setText(desc->GetLabel());

@@ -92,39 +92,39 @@ public:
      * @param savedState (not null)
      */
     void RestoreState(IPresentationSerializer* serializer,
-            IMemento::Pointer savedState);
+            IMemento::Pointer savedState) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#saveState(org.blueberry.ui.presentations.IPresentationSerializer, org.blueberry.ui.IMemento)
      */
-    void SaveState(IPresentationSerializer* context, IMemento::Pointer memento);
+    void SaveState(IPresentationSerializer* context, IMemento::Pointer memento) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#setBounds(org.blueberry.swt.graphics.QRect)
      */
-    void SetBounds(const QRect& bounds);
+    void SetBounds(const QRect& bounds) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#computeMinimumSize()
      */
-    QSize ComputeMinimumSize();
+    QSize ComputeMinimumSize() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.ISizeProvider#computePreferredSize(boolean, int, int, int)
      */
     int ComputePreferredSize(bool width, int availableParallel,
-            int availablePerpendicular, int preferredResult);
+            int availablePerpendicular, int preferredResult) override;
 
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#getSizeFlags(boolean)
      */
-    int GetSizeFlags(bool width);
+    int GetSizeFlags(bool width) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#showPartList()
      */
-    void ShowPartList();
+    void ShowPartList() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#dispose()
@@ -134,22 +134,22 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#setActive(int)
      */
-    void SetActive(int newState);
+    void SetActive(int newState) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#setVisible(boolean)
      */
-    void SetVisible(bool isVisible);
+    void SetVisible(bool isVisible) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#setState(int)
      */
-    void SetState(int state);
+    void SetState(int state) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#getControl()
      */
-    QWidget* GetControl();
+    QWidget* GetControl() override;
 
     /**
      * @return AbstractTabFolder the presentation's tab folder
@@ -159,27 +159,27 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#addPart(org.blueberry.ui.presentations.IPresentablePart, java.lang.Object)
      */
-    void AddPart(IPresentablePart::Pointer newPart, Object::Pointer cookie);
+    void AddPart(IPresentablePart::Pointer newPart, Object::Pointer cookie) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#movePart(org.blueberry.ui.presentations.IPresentablePart, java.lang.Object)
      */
-    void MovePart(IPresentablePart::Pointer toMove, Object::Pointer cookie);
+    void MovePart(IPresentablePart::Pointer toMove, Object::Pointer cookie) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#removePart(org.blueberry.ui.presentations.IPresentablePart)
      */
-    void RemovePart(IPresentablePart::Pointer oldPart);
+    void RemovePart(IPresentablePart::Pointer oldPart) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#selectPart(org.blueberry.ui.presentations.IPresentablePart)
      */
-    void SelectPart(IPresentablePart::Pointer toSelect);
+    void SelectPart(IPresentablePart::Pointer toSelect) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#DragOver(QWidget*, const Point&)
      */
-    StackDropResult::Pointer DragOver(QWidget* currentControl, const QPoint& location);
+    StackDropResult::Pointer DragOver(QWidget* currentControl, const QPoint& location) override;
 
 //    void showSystemMenu() {
 //        showSystemMenu(folder.getTabFolder().getSystemMenuLocation(), getSite().getSelectedPart());
@@ -216,7 +216,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.presentations.StackPresentation#getTabList(org.blueberry.ui.presentations.IPresentablePart)
      */
-    QList<QWidget*> GetTabList(IPresentablePart::Pointer part);
+    QList<QWidget*> GetTabList(IPresentablePart::Pointer part) override;
 
 //    void SetPartList(ISystemMenu menu) {
 //        this.partList = menu;

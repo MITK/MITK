@@ -34,7 +34,7 @@ itk::Object::Pointer QmitkTranslationTransformView::GetTransform()
     AccessByItk(m_FixedImage, GetTransform2);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 mitk::TransformParameters::TransformType QmitkTranslationTransformView::GetTransformType()

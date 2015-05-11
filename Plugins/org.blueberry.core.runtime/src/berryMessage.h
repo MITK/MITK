@@ -375,14 +375,14 @@ struct MessageExceptionHandler: public AbstractExceptionHandler
   {
   }
 
-  void HandleException(const std::exception& exc)
+  void HandleException(const std::exception& exc) override
   {
     (m_Object->*m_ExceptionCallback)(exc);
   }
 
-  AbstractExceptionHandler* Clone() const
+  AbstractExceptionHandler* Clone() const override
   {
-    if (!m_Object) return 0;
+    if (!m_Object) return nullptr;
     return new MessageExceptionHandler(m_Object, m_ExceptionCallback);
   }
 
@@ -402,14 +402,14 @@ public:
   typedef std::vector<Delegate*> ListType;
 
   DelegateList() :
-    m_ExcHandler(0)
+    m_ExcHandler(nullptr)
   {
 
   }
 
   ~DelegateList()
   {
-    for (typename ListType::iterator iter = m_Delegates.begin(); iter
+    for (auto iter = m_Delegates.begin(); iter
         != m_Delegates.end(); ++iter)
     {
       delete *iter;
@@ -423,7 +423,7 @@ public:
     Delegate* copy = d.Clone();
 
     Poco::FastMutex::ScopedLock lock(m_Mutex);
-    for (typename ListType::iterator iter = m_Delegates.begin(); iter
+    for (auto iter = m_Delegates.begin(); iter
         != m_Delegates.end(); ++iter)
     {
       if ((*iter)->operator==(copy))
@@ -438,7 +438,7 @@ public:
   void Remove(const Delegate& d) const
   {
     Poco::FastMutex::ScopedLock lock(m_Mutex);
-    for (typename ListType::iterator iter = m_Delegates.begin(); iter
+    for (auto iter = m_Delegates.begin(); iter
         != m_Delegates.end(); ++iter)
     {
       if ((*iter)->operator==(&d))
@@ -465,7 +465,7 @@ public:
       delegates.assign(m_Delegates.begin(), m_Delegates.end());
     }
 
-    for (typename ListType::iterator iter = delegates.begin(); iter
+    for (auto iter = delegates.begin(); iter
         != delegates.end(); ++iter)
     {
       try
@@ -506,7 +506,7 @@ public:
         delegates.assign(m_Delegates.begin(), m_Delegates.end());
       }
 
-      for (typename ListType::iterator iter = delegates.begin(); iter
+      for (auto iter = delegates.begin(); iter
           != delegates.end(); ++iter)
       {
         try
@@ -546,7 +546,7 @@ public:
         delegates.assign(m_Delegates.begin(), m_Delegates.end());
       }
 
-      for (typename ListType::iterator iter = delegates.begin(); iter
+      for (auto iter = delegates.begin(); iter
           != delegates.end(); ++iter)
       {
         try
@@ -586,7 +586,7 @@ public:
         delegates.assign(m_Delegates.begin(), m_Delegates.end());
       }
 
-      for (typename ListType::iterator iter = delegates.begin(); iter
+      for (auto iter = delegates.begin(); iter
           != delegates.end(); ++iter)
       {
         try
@@ -626,7 +626,7 @@ public:
         delegates.assign(m_Delegates.begin(), m_Delegates.end());
       }
 
-      for (typename ListType::iterator iter = delegates.begin(); iter
+      for (auto iter = delegates.begin(); iter
           != delegates.end(); ++iter)
       {
         try
@@ -667,7 +667,7 @@ public:
     {
       Poco::FastMutex::ScopedLock lock(m_Mutex);
       if (m_ExcHandler) return m_ExcHandler->Clone();
-      return 0;
+      return nullptr;
     }
 
     ListType GetDelegates() const

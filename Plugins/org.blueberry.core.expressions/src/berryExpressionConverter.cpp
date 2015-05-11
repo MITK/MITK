@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-ExpressionConverter* ExpressionConverter::INSTANCE = 0;
+ExpressionConverter* ExpressionConverter::INSTANCE = nullptr;
 
 ExpressionConverter*
 ExpressionConverter::GetDefault()
@@ -125,11 +125,11 @@ ExpressionConverter::GetDebugPath(const IConfigurationElement::Pointer& configur
       buf.append(parent2->GetExtensionPointUniqueIdentifier());
       buf.append(" @ ");
       buf.append(parent2->GetContributor()->GetName());
-      parent = 0;
+      parent = nullptr;
     }
     else
     {
-      parent = 0;
+      parent = nullptr;
     }
   }
   return buf;
@@ -140,7 +140,7 @@ ExpressionConverter::ProcessChildren(Poco::XML::Element* element,
                                      const CompositeExpression::Pointer& result)
 {
   Poco::XML::Node* child = element->firstChild();
-  while (child != 0) {
+  while (child != nullptr) {
     if (child->nodeType() == Poco::XML::Node::ELEMENT_NODE) {
       Poco::XML::Element* elem = static_cast<Poco::XML::Element*>(child);
       Expression::Pointer exp = this->Perform(elem);

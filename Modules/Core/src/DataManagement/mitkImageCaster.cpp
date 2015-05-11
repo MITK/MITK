@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 
 
-vtkRenderer* mitk::RendererAccess::m_3DRenderer = 0;
+vtkRenderer* mitk::RendererAccess::m_3DRenderer = nullptr;
 
 void mitk::RendererAccess::Set3DRenderer(vtkRenderer* renwin4)
 {

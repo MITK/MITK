@@ -30,9 +30,9 @@ class QtGlobalEventFilter : public QObject
 
 public:
 
-  QtGlobalEventFilter(QObject* parent = 0);
+  QtGlobalEventFilter(QObject* parent = nullptr);
 
-  bool eventFilter(QObject* obj, QEvent* event);
+  bool eventFilter(QObject* obj, QEvent* event) override;
 };
 
 }

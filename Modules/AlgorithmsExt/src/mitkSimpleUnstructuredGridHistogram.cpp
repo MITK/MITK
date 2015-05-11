@@ -64,7 +64,7 @@ void SimpleUnstructuredGridHistogram::ComputeFromBaseData( BaseData* source )
   /*if (m_UsePointData)*/ data = vtkUGrid->GetPointData()->GetScalars();
   //else data = vtkUGrid->GetCellData()->GetScalars();
 
-  if (data == 0)
+  if (data == nullptr)
   {
     listSample->Resize(1);
     v[0] = 0;

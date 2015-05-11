@@ -525,18 +525,18 @@ void mitk::ConnectomicsNetwork::UpdateBounds( )
   }
 
   // for each direction, make certain the point is in between
-  for( int index(0), end(nodeVector.size()) ; index < end; index++ )
+  for(auto & elem : nodeVector)
   {
-    for( unsigned int direction(0); direction < nodeVector.at( index ).coordinates.size(); direction++ )
+    for( unsigned int direction(0); direction < elem.coordinates.size(); direction++ )
     {
-      if( nodeVector.at( index ).coordinates.at(direction) < bounds[ 2 * direction ]  )
+      if( elem.coordinates.at(direction) < bounds[ 2 * direction ]  )
       {
-        bounds[ 2 * direction ] = nodeVector.at( index ).coordinates.at(direction);
+        bounds[ 2 * direction ] = elem.coordinates.at(direction);
       }
 
-      if( nodeVector.at( index ).coordinates.at(direction) > bounds[ 2 * direction + 1]  )
+      if( elem.coordinates.at(direction) > bounds[ 2 * direction + 1]  )
       {
-        bounds[ 2 * direction + 1] = nodeVector.at( index ).coordinates.at(direction);
+        bounds[ 2 * direction + 1] = elem.coordinates.at(direction);
       }
     }
   }
@@ -715,7 +715,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
 {
   bool noDifferenceFound = true;
 
-    if( rightHandSide == NULL )
+    if( rightHandSide == nullptr )
   {
     if(verbose)
     {
@@ -724,7 +724,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
     return false;
   }
 
-  if( leftHandSide == NULL )
+  if( leftHandSide == nullptr )
   {
     if(verbose)
     {

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <limits>
 
-mitk::MaskImageFilter::MaskImageFilter() : m_Mask(NULL)
+mitk::MaskImageFilter::MaskImageFilter() : m_Mask(nullptr)
 {
   this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfRequiredInputs(2);
@@ -63,7 +63,7 @@ void mitk::MaskImageFilter::GenerateInputRequestedRegion()
   mitk::Image* output = this->GetOutput();
   mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
   mitk::Image* mask  = m_Mask ;
-  if((output->IsInitialized()==false) || (mask == NULL) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
+  if((output->IsInitialized()==false) || (mask == nullptr) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
     return;
 
   input->SetRequestedRegionToLargestPossibleRegion();

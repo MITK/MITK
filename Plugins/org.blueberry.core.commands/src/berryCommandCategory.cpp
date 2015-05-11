@@ -24,7 +24,7 @@ namespace berry {
 
 void CommandCategory::AddCategoryListener(ICommandCategoryListener* categoryListener)
 {
-  if (categoryListener == 0)
+  if (categoryListener == nullptr)
   {
     throw ctkInvalidArgumentException("Category listener cannot be null");
   }
@@ -56,7 +56,7 @@ void CommandCategory::Define(const QString& name, const QString& description)
 
 void CommandCategory::RemoveCategoryListener(ICommandCategoryListener* categoryListener)
 {
-  if (categoryListener == 0)
+  if (categoryListener == nullptr)
   {
     throw ctkInvalidArgumentException("CommandCategory listener cannot be null");
   }

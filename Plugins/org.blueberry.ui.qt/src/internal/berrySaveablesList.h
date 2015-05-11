@@ -252,7 +252,7 @@ public:
    * This method must be called on the UI thread.
    * </p>
    */
-  void HandleLifecycleEvent(const SaveablesLifecycleEvent::Pointer& event);
+  void HandleLifecycleEvent(const SaveablesLifecycleEvent::Pointer& event) override;
 
   /**
    * Adds the given listener to the list of listeners. Has no effect if the

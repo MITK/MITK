@@ -46,7 +46,7 @@ int mitkUnstructuredGridTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(testObject->GetVtkUnstructuredGrid()== grid, "Testing Set/Get vtkUnstructuredGrid");
 
   // specify a region and set it to the test object
-  mitk::UnstructuredGrid::RegionType* ugRegion = new mitk::UnstructuredGrid::RegionType;
+  auto   ugRegion = new mitk::UnstructuredGrid::RegionType;
   mitk::UnstructuredGrid::RegionType::SizeType size;
   size.Fill(100);
 

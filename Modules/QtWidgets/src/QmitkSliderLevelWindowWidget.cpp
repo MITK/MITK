@@ -487,7 +487,7 @@ void QmitkSliderLevelWindowWidget::update() {
 void QmitkSliderLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 {
   m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
-  QMenu *contextMenu = new QMenu( this );
+  auto contextMenu = new QMenu( this );
   Q_CHECK_PTR( contextMenu );
   if (m_ScaleVisible)
     contextMenu->addAction(tr("Hide Scale"), this, SLOT(hideScale()));

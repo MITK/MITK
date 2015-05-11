@@ -85,7 +85,7 @@ public:
     /* (non-javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#getWorkbench
      */
-    IWorkbench* GetWorkbench();
+    IWorkbench* GetWorkbench() override;
 
 
     /* (non-javadoc)
@@ -102,62 +102,62 @@ public:
     /* (non-javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#getWindowConfigurer
      */
-    IWorkbenchWindowConfigurer::Pointer GetWindowConfigurer(IWorkbenchWindow::Pointer window);
+    IWorkbenchWindowConfigurer::Pointer GetWindowConfigurer(IWorkbenchWindow::Pointer window) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#getSaveAndRestore()
      */
-    bool GetSaveAndRestore();
+    bool GetSaveAndRestore() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#setSaveAndRestore(boolean)
      */
-    void SetSaveAndRestore(bool enabled);
+    void SetSaveAndRestore(bool enabled) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#getData
      */
-    Object::Pointer GetData(const QString& key) const;
+    Object::Pointer GetData(const QString& key) const override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#setData(String, Object)
      */
-    void SetData(const QString& key, Object::Pointer data);
+    void SetData(const QString& key, Object::Pointer data) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#emergencyClose()
      */
-    void EmergencyClose();
+    void EmergencyClose() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#emergencyClosing()
      */
-    bool EmergencyClosing();
+    bool EmergencyClosing() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#restoreState()
      */
-    bool RestoreState();
+    bool RestoreState() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.application.IWorkbenchConfigurer#openFirstTimeWindow()
      */
-    void OpenFirstTimeWindow();
+    void OpenFirstTimeWindow() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.application.IWorkbenchConfigurer#restoreWorkbenchWindow(org.blueberry.ui.IMemento)
    */
-  IWorkbenchWindowConfigurer::Pointer RestoreWorkbenchWindow(IMemento::Pointer memento);
+  IWorkbenchWindowConfigurer::Pointer RestoreWorkbenchWindow(IMemento::Pointer memento) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.application.IWorkbenchConfigurer#getExitOnLastWindowClose()
    */
-  bool GetExitOnLastWindowClose();
+  bool GetExitOnLastWindowClose() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.application.IWorkbenchConfigurer#setExitOnLastWindowClose(boolean)
    */
-  void SetExitOnLastWindowClose(bool enabled);
+  void SetExitOnLastWindowClose(bool enabled) override;
 };
 
 }

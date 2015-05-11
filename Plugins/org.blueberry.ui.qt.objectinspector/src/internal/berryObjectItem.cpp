@@ -22,11 +22,11 @@ namespace berry
 ObjectItem::ObjectItem()
 {
   type = CLASS;
-  parent = 0;
+  parent = nullptr;
 }
 
 ObjectItem::ObjectItem(const QString& className) :
-  className(className), type(CLASS), parent(0)
+  className(className), type(CLASS), parent(nullptr)
 {
 }
 

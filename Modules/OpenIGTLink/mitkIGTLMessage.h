@@ -89,21 +89,21 @@ namespace mitk {
       * SmartPointers to the same IGTLMessage object since separate DataObjects
       * are still maintained.
       */
-      virtual void Graft(const DataObject *data);
+      virtual void Graft(const DataObject *data) override;
 
       /**
       * \brief copy meta data of a IGTLMessage object
       *
       * copies all meta data from IGTLMessage data to this object
       */
-      virtual void CopyInformation(const DataObject* data);
+      virtual void CopyInformation(const DataObject* data) override;
 
       /**
       * \brief Prints the object information to the given stream os.
       * \param os The stream which is used to print the output.
       * \param indent Defines the indentation of the output.
       */
-      void PrintSelf(std::ostream& os, itk::Indent indent) const;
+      void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
       /** Compose with another IGTLMessage
        *

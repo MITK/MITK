@@ -24,10 +24,10 @@ class QmitkDataManagerItemDelegate : public QStyledItemDelegate
   Q_OBJECT
 
 public:
-  explicit QmitkDataManagerItemDelegate(QObject* parent = NULL);
+  explicit QmitkDataManagerItemDelegate(QObject* parent = nullptr);
   ~QmitkDataManagerItemDelegate();
 
-  void setEditorData(QWidget* editor, const QModelIndex& index) const;
+  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
 };
 
 #endif

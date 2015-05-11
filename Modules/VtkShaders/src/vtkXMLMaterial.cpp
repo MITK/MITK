@@ -65,14 +65,14 @@ vtkStandardNewMacro(vtkXMLMaterial);
 //-----------------------------------------------------------------------------
 vtkXMLMaterial::vtkXMLMaterial()
 {
-  this->RootElement = 0;
+  this->RootElement = nullptr;
   this->Internals = new vtkXMLMaterialInternals;
 }
 
 //-----------------------------------------------------------------------------
 vtkXMLMaterial::~vtkXMLMaterial()
 {
-  this->SetRootElement(0);
+  this->SetRootElement(nullptr);
   delete this->Internals;
 }
 
@@ -80,7 +80,7 @@ vtkXMLMaterial* vtkXMLMaterial::CreateInstance(const char* name)
 {
   if (!name)
     {
-    return 0;
+    return nullptr;
     }
 
   vtkXMLMaterialParser* parser = vtkXMLMaterialParser::New();
@@ -102,7 +102,7 @@ vtkXMLMaterial* vtkXMLMaterial::CreateInstance(const char* name)
 
   parser->Delete();
   material->Delete();
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -194,7 +194,7 @@ vtkXMLDataElement* vtkXMLMaterial::GetProperty(int id)
     {
     return this->Internals->Properties[id];
     }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -204,7 +204,7 @@ vtkXMLDataElement* vtkXMLMaterial::GetTexture(int index)
     {
     return this->Internals->Textures[index];
     }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ vtkXMLShader* vtkXMLMaterial::GetVertexShader(int id)
     {
     return this->Internals->VertexShaders[id].GetPointer();
     }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -224,7 +224,7 @@ vtkXMLShader* vtkXMLMaterial::GetFragmentShader(int id)
     {
     return this->Internals->FragmentShaders[id].GetPointer();
     }
-  return NULL;
+  return nullptr;
 }
 
 
@@ -234,7 +234,7 @@ vtkXMLShader* vtkXMLMaterial::GetGeometryShader(int id)
     {
     return this->Internals->GeometryShaders[id].GetPointer();
     }
-  return NULL;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------

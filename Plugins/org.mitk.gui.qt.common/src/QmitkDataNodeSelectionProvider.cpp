@@ -44,7 +44,7 @@ void QmitkDataNodeSelectionProvider::SetSelection(berry::ISelection::ConstPointe
 
     QItemSelection newSelection;
     const std::list<mitk::DataNode::Pointer> selectedNodes = dataNodeSelection->GetSelectedDataNodes();
-    for (std::list<mitk::DataNode::Pointer>::const_iterator i = selectedNodes.begin();
+    for (auto i = selectedNodes.begin();
          i != selectedNodes.end(); ++i)
     {
       QModelIndexList matched = model->match(model->index(0, 0), QmitkDataNodeRawPointerRole,
@@ -72,7 +72,7 @@ QmitkDataNodeSelectionProvider::GetDataNodeSelection() const
     return sel;
   }
 
-  return mitk::DataNodeSelection::ConstPointer(0);
+  return mitk::DataNodeSelection::ConstPointer(nullptr);
 }
 
 void QmitkDataNodeSelectionProvider::FireSelectionChanged(

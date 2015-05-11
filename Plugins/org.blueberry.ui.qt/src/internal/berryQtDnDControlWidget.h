@@ -29,7 +29,7 @@ namespace berry {
 class QtDnDControlWidget : public QtControlWidget
 {
 public:
-  QtDnDControlWidget(QWidget *parent = 0);
+  QtDnDControlWidget(QWidget *parent = nullptr);
 
   void SetTransferTypes(const QStringList& types);
 
@@ -38,10 +38,10 @@ public:
 
 protected:
 
-  void dragEnterEvent(QDragEnterEvent* event);
-  void dragMoveEvent(QDragMoveEvent* event);
-  void dragLeaveEvent(QDragLeaveEvent* event);
-  void dropEvent(QDropEvent* event);
+  void dragEnterEvent(QDragEnterEvent* event) override;
+  void dragMoveEvent(QDragMoveEvent* event) override;
+  void dragLeaveEvent(QDragLeaveEvent* event) override;
+  void dropEvent(QDropEvent* event) override;
 
 private:
 

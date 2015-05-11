@@ -92,9 +92,9 @@ public:
   ParameterizedCommand(const SmartPointer<Command>& command,
                        const QList<Parameterization>& parameterizations);
 
-  bool operator<(const Object* object) const;
+  bool operator<(const Object* object) const override;
 
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 
   /**
    * Executes this command with its parameters. This does extra checking to
@@ -158,7 +158,7 @@ public:
    */
   QHash<QString, QString> GetParameterMap() const;
 
-  uint HashCode() const;
+  uint HashCode() const override;
 
   /**
    * Returns a {@link String} containing the command id, parameter ids and
@@ -218,7 +218,7 @@ public:
    */
   QString Serialize();
 
-  QString ToString() const;
+  QString ToString() const override;
 
   /**
    * <p>

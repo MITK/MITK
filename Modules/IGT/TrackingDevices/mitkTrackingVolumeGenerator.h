@@ -99,7 +99,7 @@ class MITKIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
       /** \brief Holds the current tracking device data object, which is used to generate the volume. */
       mitk::TrackingDeviceData m_Data;
 
-      void GenerateData();
+      void GenerateData() override;
   };
 }
 #endif // MITKTRACKINGVOLUMEGENERATOR_H

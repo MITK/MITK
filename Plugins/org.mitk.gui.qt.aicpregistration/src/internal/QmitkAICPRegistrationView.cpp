@@ -79,8 +79,8 @@ public:
      m_AICP(mitk::AnisotropicIterativeClosestPointRegistration::New()),
      m_MatrixCalculator(mitk::CovarianceMatrixCalculator::New()),
      m_CleanPolyData(vtkSmartPointer<vtkCleanPolyData>::New()),
-     m_MovingSurface(NULL),
-     m_FixedSurface(NULL)
+     m_MovingSurface(nullptr),
+     m_FixedSurface(nullptr)
   {
   }
 
@@ -92,11 +92,11 @@ public:
     if ( m_Worker )
       delete m_Worker;
 
-    m_AICP = NULL;
-    m_MatrixCalculator = NULL;
-    m_CleanPolyData = NULL;
-    m_MovingSurface = NULL;
-    m_FixedSurface = NULL;
+    m_AICP = nullptr;
+    m_MatrixCalculator = nullptr;
+    m_CleanPolyData = nullptr;
+    m_MovingSurface = nullptr;
+    m_FixedSurface = nullptr;
   }
 };
 

@@ -301,7 +301,7 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
       // if the parameter is defined add it to the parameter list
       if (!parameter)
       {
-        return ParameterizedCommand::Pointer(0);
+        return ParameterizedCommand::Pointer(nullptr);
       }
       ParameterType::Pointer parameterType(command->GetParameterType(key));
       if (!parameterType)
@@ -336,7 +336,7 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
   catch (const ParameterValueConversionException* /*e*/)
   {
   }
-  return ParameterizedCommand::Pointer(0);
+  return ParameterizedCommand::Pointer(nullptr);
 }
 
 QString ParameterizedCommand::Escape(const QString& rawText)
@@ -384,7 +384,7 @@ QList<QList<Parameterization> > ParameterizedCommand::ExpandParameters(
     parameterizations.push_back(QList<Parameterization>());
   }
 
-  IParameterValues* values = NULL;
+  IParameterValues* values = nullptr;
   try
   {
     values = parameter->GetValues();

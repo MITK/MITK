@@ -204,7 +204,7 @@ void EvaluationAuthority::AddEvaluationListener(const SmartPointer<IEvaluationRe
   }
 
   bool result = Evaluate(ref);
-  FirePropertyChange(ref, Object::Pointer(0), ValueOf(result));
+  FirePropertyChange(ref, Object::Pointer(nullptr), ValueOf(result));
 }
 
 void EvaluationAuthority::RemoveEvaluationListener(const SmartPointer<IEvaluationReference>& ref)
@@ -232,7 +232,7 @@ void EvaluationAuthority::RemoveEvaluationListener(const SmartPointer<IEvaluatio
     }
   }
   bool result = Evaluate(ref);
-  FirePropertyChange(ref, ValueOf(result), Object::Pointer(0));
+  FirePropertyChange(ref, ValueOf(result), Object::Pointer(nullptr));
 }
 
 void EvaluationAuthority::AddServiceListener(IPropertyChangeListener* listener)

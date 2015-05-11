@@ -55,7 +55,7 @@ protected:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#addChild(org.blueberry.ui.internal.PartSashContainer.RelationshipInfo)
    */
-  void AddChild(const RelationshipInfo& info);
+  void AddChild(const RelationshipInfo& info) override;
 
   /**
    * Notification that a child layout part has been
@@ -63,7 +63,7 @@ protected:
    * this method to perform any container specific
    * work.
    */
-  void ChildAdded(LayoutPart::Pointer child);
+  void ChildAdded(LayoutPart::Pointer child) override;
 
   /**
    * Notification that a child layout part has been
@@ -71,7 +71,7 @@ protected:
    * this method to perform any container specific
    * work.
    */
-  void ChildRemoved(LayoutPart::Pointer child);
+  void ChildRemoved(LayoutPart::Pointer child) override;
 
   PartStack::Pointer CreateDefaultWorkbook();
 
@@ -80,13 +80,13 @@ protected:
    * the composite to use to parent all children
    * layout parts it contains.
    */
-  QWidget* CreateParent(QWidget* parentWidget);
+  QWidget* CreateParent(QWidget* parentWidget) override;
 
   /**
    * Subclasses override this method to dispose
    * of any swt resources created during createParent.
    */
-  void DisposeParent();
+  void DisposeParent() override;
 
   /**
    * Return true is the workbook specified
@@ -102,18 +102,18 @@ protected:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#createStack(org.blueberry.ui.internal.LayoutPart)
    */
-  PartStack::Pointer CreateStack();
+  PartStack::Pointer CreateStack() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#setVisiblePart(org.blueberry.ui.internal.ILayoutContainer, org.blueberry.ui.internal.LayoutPart)
    */
   void SetVisiblePart(ILayoutContainer::Pointer container,
-      PartPane::Pointer visiblePart);
+      PartPane::Pointer visiblePart) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#getVisiblePart(org.blueberry.ui.internal.ILayoutContainer)
    */
-  LayoutPart::Pointer GetVisiblePart(ILayoutContainer::Pointer container);
+  LayoutPart::Pointer GetVisiblePart(ILayoutContainer::Pointer container) override;
 
 public:
 
@@ -122,7 +122,7 @@ public:
   EditorSashContainer(const QString& editorId, WorkbenchPage* page,
       QWidget* parent);
 
-  bool AllowsAdd(LayoutPart::Pointer layoutPart);
+  bool AllowsAdd(LayoutPart::Pointer layoutPart) override;
 
   /**
    * Add an editor to the active workbook.
@@ -171,7 +171,7 @@ public:
   /**
    * Find the sashes around the specified part.
    */
-  void FindSashes(LayoutPart::Pointer pane, PartPane::Sashes& sashes);
+  void FindSashes(LayoutPart::Pointer pane, PartPane::Sashes& sashes) override;
 
   /**
    * Remove all the editors
@@ -214,22 +214,22 @@ public:
   /**
    * @see org.blueberry.ui.internal.LayoutPart#createControl(org.blueberry.swt.widgets.Composite)
    */
-  void CreateControl(QWidget* parent);
+  void CreateControl(QWidget* parent) override;
 
   /**
    * @see org.blueberry.ui.internal.LayoutPart#getImportance()
    */
-  bool IsCompressible();
+  bool IsCompressible() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#isStackType(org.blueberry.ui.internal.LayoutPart)
    */
-  bool IsStackType(ILayoutContainer::Pointer toTest);
+  bool IsStackType(ILayoutContainer::Pointer toTest) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#isPaneType(org.blueberry.ui.internal.LayoutPart)
    */
-  bool IsPaneType(LayoutPart::Pointer toTest);
+  bool IsPaneType(LayoutPart::Pointer toTest) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.PartSashContainer#pickPartToZoom()

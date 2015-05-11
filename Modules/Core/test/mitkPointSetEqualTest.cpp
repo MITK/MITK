@@ -52,8 +52,8 @@ public:
 
   void tearDown() override
   {
-    m_PointSet = NULL;
-    m_AnotherPointSet = NULL;
+    m_PointSet = nullptr;
+    m_AnotherPointSet = nullptr;
   }
 
   void Equal_CloneAndOriginal_ReturnsTrue()

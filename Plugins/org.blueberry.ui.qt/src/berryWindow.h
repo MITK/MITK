@@ -136,7 +136,7 @@ private:
   {
     WindowShellListener(Window* wnd);
 
-    void ShellClosed(const ShellEvent::Pointer& event);
+    void ShellClosed(const ShellEvent::Pointer& event) override;
 
   private:
     Window* window;
@@ -154,7 +154,7 @@ private:
      *
      * @see org.blueberry.jface.window.Window.IExceptionHandler#handleException(java.lang.Throwable)
      */
-    void HandleException(const std::exception& t);
+    void HandleException(const std::exception& t) override;
   };
 
   /**
@@ -188,7 +188,7 @@ private:
    */
   struct DefaultModalParent: public IShellProvider
   {
-    Shell::Pointer GetShell() const;
+    Shell::Pointer GetShell() const override;
   };
 
   friend struct DefaultModalParent;
@@ -620,7 +620,7 @@ public:
    * @return this window's shell, or <code>null</code> if this window's
    *         shell has not been created yet
    */
-  Shell::Pointer GetShell() const;
+  Shell::Pointer GetShell() const override;
 
   /**
    * Returns the window manager of this window.

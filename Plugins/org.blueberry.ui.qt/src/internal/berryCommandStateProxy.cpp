@@ -80,7 +80,7 @@ Object::Pointer CommandStateProxy::GetValue() const
     return state->GetValue();
   }
 
-  return Object::Pointer(0);
+  return Object::Pointer(nullptr);
 }
 
 void CommandStateProxy::Load(const SmartPointer<IPreferences>& /*store*/,
@@ -192,7 +192,7 @@ bool CommandStateProxy::LoadState(bool readPersistence)
       }
 
       state->SetId(GetId());
-      configurationElement = 0;
+      configurationElement = nullptr;
 
       // Try to load the persistent state, if possible.
       if (readPersistence)
@@ -207,7 +207,7 @@ bool CommandStateProxy::LoadState(bool readPersistence)
       // Transfer the local listeners to the real state.
       typedef IStateListener::Events::StateEvent::ListenerList ListenerListType;
       const ListenerListType listenerArray = this->stateEvents.stateChanged.GetListeners();
-      for (ListenerListType::const_iterator i = listenerArray.begin();
+      for (auto i = listenerArray.begin();
            i != listenerArray.end(); ++i)
       {
         state->AddListener(*(*i));

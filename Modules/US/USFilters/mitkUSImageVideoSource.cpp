@@ -217,7 +217,7 @@ void mitk::USImageVideoSource::OverrideResolution(int width, int height)
   this->m_ResolutionOverrideHeight = height;
   this->m_ResolutionOverrideWidth = width;
 
-  if (m_VideoCapture != 0)
+  if (m_VideoCapture != nullptr)
   {
     m_VideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, width);
     m_VideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, height);

@@ -93,9 +93,9 @@ bool mitk::DiffusionDICOMFileReader
   {
     std::vector< std::string > FileNamesPerVolume;
 
-    DICOMImageFrameList::const_iterator timeStepStart = frames.begin() + idx * numberOfFramesPerDWImage;
-    DICOMImageFrameList::const_iterator timeStepEnd   = frames.begin() + (idx+1) * numberOfFramesPerDWImage;
-    for (DICOMImageFrameList::const_iterator frameIter = timeStepStart;
+    auto timeStepStart = frames.begin() + idx * numberOfFramesPerDWImage;
+    auto timeStepEnd   = frames.begin() + (idx+1) * numberOfFramesPerDWImage;
+    for (auto frameIter = timeStepStart;
          frameIter != timeStepEnd;
          ++frameIter)
     {

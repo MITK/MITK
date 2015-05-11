@@ -43,7 +43,7 @@ public:
   itkSetMacro(Value, mitk::CameraIntrinsics::Pointer );
   itkGetConstMacro(Value, mitk::CameraIntrinsics::Pointer );
 
-  std::string GetValueAsString() const;
+  std::string GetValueAsString() const override;
 
   using BaseProperty::operator=;
 
@@ -61,10 +61,10 @@ private:
   // purposely not implemented
   CameraIntrinsicsProperty& operator=(const CameraIntrinsicsProperty&);
 
-  virtual itk::LightObject::Pointer InternalClone() const;
+  virtual itk::LightObject::Pointer InternalClone() const override;
 
-  virtual bool IsEqual(const BaseProperty& property) const;
-  virtual bool Assign(const BaseProperty& property);
+  virtual bool IsEqual(const BaseProperty& property) const override;
+  virtual bool Assign(const BaseProperty& property) override;
 };
 
 #ifdef _MSC_VER

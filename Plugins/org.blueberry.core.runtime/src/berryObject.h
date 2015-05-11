@@ -220,7 +220,7 @@ struct QScopedPointerObjectDeleter
 {
   static inline void cleanup(Object* obj)
   {
-    if (obj == NULL) return;
+    if (obj == nullptr) return;
     obj->UnRegister(false);
     delete obj;
   }

@@ -31,7 +31,7 @@ mitk::NavigationDataRecorderDeprecated::NavigationDataRecorderDeprecated()
   m_RecordingMode = NormalFile;
   m_Recording = false;
   m_NumberOfRecordedFiles = 0;
-  m_Stream = NULL;
+  m_Stream = nullptr;
   m_FileName = "";
   m_SystemTimeClock = RealTimeClock::New();
   m_OutputFormat = mitk::NavigationDataRecorderDeprecated::xml;
@@ -144,7 +144,7 @@ void mitk::NavigationDataRecorderDeprecated::Update()
       {
         if (this->m_OutputFormat == mitk::NavigationDataRecorderDeprecated::xml)
           {
-          TiXmlElement* elem = new TiXmlElement("NavigationData");
+          auto  elem = new TiXmlElement("NavigationData");
 
           elem->SetDoubleAttribute("Time", timestamp);
           elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time
@@ -187,7 +187,7 @@ void mitk::NavigationDataRecorderDeprecated::Update()
             elem->SetAttribute("hP",0);
 
           // set additional attribute?
-          std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+          auto
               it = m_AdditionalAttributes.find( nd );
           if( it != m_AdditionalAttributes.end() )
           {
@@ -217,7 +217,7 @@ void mitk::NavigationDataRecorderDeprecated::SetAdditionalAttribute(const Naviga
                                                           const std::string& attributeName
                              , const std::string& attributeValue )
 {
-   std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+   auto
        it = m_AdditionalAttributes.find( nd );
   if( it == m_AdditionalAttributes.end() )
     m_AdditionalAttributes[nd] = std::pair<std::string, std::string>(attributeName, attributeValue);
@@ -231,7 +231,7 @@ void mitk::NavigationDataRecorderDeprecated::SetAdditionalAttribute(const Naviga
 
 void mitk::NavigationDataRecorderDeprecated::RemoveAdditionalAttribute( const NavigationData* nd )
 {
-  std::map<const mitk::NavigationData*, std::pair<std::string, std::string> >::iterator
+  auto
       it = m_AdditionalAttributes.find( nd );
  if( it != m_AdditionalAttributes.end() )
    m_AdditionalAttributes.erase(it);
@@ -242,7 +242,7 @@ void mitk::NavigationDataRecorderDeprecated::StartRecording()
 
   if(!m_Recording)
   {
-    if (m_Stream == NULL)
+    if (m_Stream == nullptr)
     {
       std::stringstream ss;
       std::ostream* stream;
@@ -362,5 +362,5 @@ void mitk::NavigationDataRecorderDeprecated::StopRecording()
     m_StreamMustBeDeleted = false;
     delete m_Stream;
     }
-  m_Stream = NULL;
+  m_Stream = nullptr;
 }

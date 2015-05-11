@@ -33,17 +33,17 @@ bool RdfNode::dummy()
   librdf_statement* statement;
   raptor_world *raptor_world_ptr;
   raptor_iostream* iostr;
-  
+
   world=librdf_new_world();
   librdf_world_open(world);
   raptor_world_ptr = librdf_world_get_raptor(world);
 
-  model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", NULL, "hash-type='memory'"), NULL);
+  model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", nullptr, "hash-type='memory'"), nullptr);
 
-  librdf_model_add_statement(model, 
+  librdf_model_add_statement(model,
                              statement=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.dajobe.org/"),
                                                              librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"),
-                                                             librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0)
+                                                             librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", nullptr, 0)
                                                              )
                              );
 
@@ -52,7 +52,7 @@ bool RdfNode::dummy()
   iostr = raptor_new_iostream_to_file_handle(raptor_world_ptr, stdout);
   librdf_model_write(model, iostr);
   raptor_free_iostream(iostr);
-  
+
   librdf_free_model(model);
   librdf_free_storage(storage);
 

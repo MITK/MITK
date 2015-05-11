@@ -57,7 +57,7 @@ public:
   /** \brief Method for creating the widget containing the application
    * controls, like sliders, buttons etc.
    */
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
   //  virtual QWidget * CreateControlWidget(QWidget *parent);
 
   /** \brief Method for creating the connections of main and control widget.
@@ -69,18 +69,18 @@ public:
    */
   //  virtual QAction * CreateAction(QActionGroup *parent);
 
-  virtual void Activated();
+  virtual void Activated() override;
 
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
   ///
   /// Called when a StdMultiWidget is available.
   ///
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
+  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget) override;
   ///
   /// Called when no StdMultiWidget is available.
   ///
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetNotAvailable() override;
 
   signals:
 
@@ -108,7 +108,7 @@ protected:
 
 private:
 
-  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   vtkCamera* GetCam();
   void GenerateHR3DAtlasScreenshots(QString fileName);

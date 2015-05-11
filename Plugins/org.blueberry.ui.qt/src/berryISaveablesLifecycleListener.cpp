@@ -22,7 +22,7 @@ void
 ISaveablesLifecycleListener::Events
 ::AddListener(ISaveablesLifecycleListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   this->lifecycleChange += Delegate(listener, &ISaveablesLifecycleListener::HandleLifecycleEvent);
 }
@@ -31,7 +31,7 @@ void
 ISaveablesLifecycleListener::Events
 ::RemoveListener(ISaveablesLifecycleListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   this->lifecycleChange -= Delegate(listener, &ISaveablesLifecycleListener::HandleLifecycleEvent);
 }

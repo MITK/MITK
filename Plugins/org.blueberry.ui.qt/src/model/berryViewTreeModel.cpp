@@ -164,7 +164,7 @@ struct CategoryTreeItem : ViewTreeItem
 
 protected:
 
-  QSet<QString> keywordLabels() const;
+  QSet<QString> keywordLabels() const override;
 
   /**
    * Removes the temporary intro view from the list so that it cannot be activated except through
@@ -254,7 +254,7 @@ QVariant ViewTreeModel::data(const QModelIndex& index, int role) const
 
 Qt::ItemFlags ViewTreeModel::flags(const QModelIndex& index) const
 {
-  if (!index.isValid()) return 0;
+  if (!index.isValid()) return nullptr;
 
   return static_cast<ViewTreeItem*>(index.internalPointer())->flags();
 }

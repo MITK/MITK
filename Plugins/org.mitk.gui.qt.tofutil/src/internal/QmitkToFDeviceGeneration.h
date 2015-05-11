@@ -45,9 +45,9 @@ class QmitkToFDeviceGeneration : public QmitkAbstractView
     QmitkToFDeviceGeneration();
     ~QmitkToFDeviceGeneration();
 
-    void SetFocus();
+    void SetFocus() override;
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
 
   protected slots:

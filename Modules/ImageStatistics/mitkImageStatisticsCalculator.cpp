@@ -104,13 +104,13 @@ void ImageStatisticsCalculator::SetUseDefaultBinSize(bool useDefault)
 }
 
 ImageStatisticsCalculator::Statistics::Statistics(bool withHotspotStatistics)
-:m_HotspotStatistics(withHotspotStatistics ? new Statistics(false) : NULL)
+:m_HotspotStatistics(withHotspotStatistics ? new Statistics(false) : nullptr)
 {
   Reset();
 }
 
 ImageStatisticsCalculator::Statistics::Statistics(const Statistics& other)
-:m_HotspotStatistics( NULL)
+:m_HotspotStatistics( nullptr)
 {
   this->SetLabel( other.GetLabel() );
   this->SetN( other.GetN() );
@@ -134,7 +134,7 @@ ImageStatisticsCalculator::Statistics::Statistics(const Statistics& other)
 
 bool ImageStatisticsCalculator::Statistics::HasHotspotStatistics() const
 {
-  return m_HotspotStatistics != NULL;
+  return m_HotspotStatistics != nullptr;
 }
 
 void ImageStatisticsCalculator::Statistics::SetHasHotspotStatistics(bool hasHotspotStatistics)
@@ -214,7 +214,7 @@ void ImageStatisticsCalculator::Statistics::Reset(unsigned int dimension)
   SetMinIndex(zero);
   SetHotspotIndex(zero);
 
-  if (m_HotspotStatistics != NULL)
+  if (m_HotspotStatistics != nullptr)
   {
     m_HotspotStatistics->Reset(dimension);
   }
@@ -266,7 +266,7 @@ ImageStatisticsCalculator::Statistics::operator=(ImageStatisticsCalculator::Stat
   this->SetHotspotIndex( other.GetHotspotIndex() );
 
   delete this->m_HotspotStatistics;
-  this->m_HotspotStatistics = NULL;
+  this->m_HotspotStatistics = nullptr;
 
   if (other.m_HotspotStatistics)
   {
@@ -518,7 +518,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   // it, delete it.
   if ( m_ImageMask.IsNotNull() && (m_ImageMask->GetReferenceCount() == 1) )
   {
-    m_ImageMask = NULL;
+    m_ImageMask = nullptr;
   }
 
   // Check if statistics is already up-to-date
@@ -661,7 +661,7 @@ ImageStatisticsCalculator::GetHistogram( unsigned int timeStep, unsigned int lab
 {
   if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
   {
-    return NULL;
+    return nullptr;
   }
 
   switch ( m_MaskingMode )
@@ -789,8 +789,8 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
   case MASKING_MODE_NONE:
     {
       m_InternalImage = timeSliceImage;
-      m_InternalImageMask2D = NULL;
-      m_InternalImageMask3D = NULL;
+      m_InternalImageMask2D = nullptr;
+      m_InternalImageMask3D = nullptr;
 
       if(m_DoIgnorePixelValue)
       {
@@ -849,7 +849,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
   case MASKING_MODE_PLANARFIGURE:
     {
-      m_InternalImageMask2D = NULL;
+      m_InternalImageMask2D = nullptr;
 
       if ( m_PlanarFigure.IsNull() )
       {
@@ -861,20 +861,20 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       }
 
       const BaseGeometry *imageGeometry = timeSliceImage->GetGeometry();
-      if ( imageGeometry == NULL )
+      if ( imageGeometry == nullptr )
       {
         throw std::runtime_error( "Image geometry invalid!" );
       }
 
       const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
-      if ( planarFigurePlaneGeometry == NULL )
+      if ( planarFigurePlaneGeometry == nullptr )
       {
         throw std::runtime_error( "Planar-Figure not yet initialized!" );
       }
 
       const PlaneGeometry *planarFigureGeometry =
         dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
-      if ( planarFigureGeometry == NULL )
+      if ( planarFigureGeometry == nullptr )
       {
         throw std::runtime_error( "Non-planar planar figures not supported!" );
       }
@@ -1154,7 +1154,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   histogramContainer->clear();
 
   // Make sure that mask is set
-  if ( maskImage == NULL  )
+  if ( maskImage == nullptr  )
   {
     itkExceptionMacro( << "Mask image needs to be set!" );
   }
@@ -1471,7 +1471,7 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
     minIndex[i] = 0;
   }
 
-  if (maskImage != NULL)
+  if (maskImage != nullptr)
   {
     MaskImageIteratorType maskIt(maskImage, maskImage->GetLargestPossibleRegion());
     typename ImageType::IndexType imageIndex;
@@ -1909,7 +1909,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     points->InsertNextPoint( point3D[i0], point3D[i1], 0 );
   }
 
-  vtkSmartPointer<vtkPoints> holePoints = NULL;
+  vtkSmartPointer<vtkPoints> holePoints = nullptr;
 
   if (!planarFigureHolePolyline.empty())
   {
@@ -1951,9 +1951,9 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   lassoStencil->SetShapeToPolygon();
   lassoStencil->SetPoints( points );
 
-  vtkSmartPointer<vtkLassoStencilSource> holeLassoStencil = NULL;
+  vtkSmartPointer<vtkLassoStencilSource> holeLassoStencil = nullptr;
 
-  if (holePoints.GetPointer() != NULL)
+  if (holePoints.GetPointer() != nullptr)
   {
     holeLassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
     holeLassoStencil->SetShapeToPolygon();
@@ -1978,9 +1978,9 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();
 
-  vtkSmartPointer<vtkImageStencil> holeStencilFilter = NULL;
+  vtkSmartPointer<vtkImageStencil> holeStencilFilter = nullptr;
 
-  if (holeLassoStencil.GetPointer() != NULL)
+  if (holeLassoStencil.GetPointer() != nullptr)
   {
     holeStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
     holeStencilFilter->SetInputConnection(imageStencilFilter->GetOutputPort());
@@ -1992,7 +1992,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
   // Export from VTK back to ITK
   vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
-  vtkExporter->SetInputConnection( holeStencilFilter.GetPointer() == NULL
+  vtkExporter->SetInputConnection( holeStencilFilter.GetPointer() == nullptr
     ? imageStencilFilter->GetOutputPort()
     : holeStencilFilter->GetOutputPort());
   vtkExporter->Update();

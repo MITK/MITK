@@ -37,7 +37,7 @@ public:
   RegistryObject();
 
   //Implementation of the KeyedElement interface
-  QString GetKey() const;
+  QString GetKey() const override;
 
   int GetObjectId() const;
 
@@ -94,7 +94,7 @@ private:
 
   void SetPersist(bool persist);
 
-  bool IsEqual(const KeyedElement& other) const;
+  bool IsEqual(const KeyedElement& other) const override;
 };
 
 }

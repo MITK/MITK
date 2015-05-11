@@ -39,17 +39,17 @@ public:
 
   berryObjectMacro(berry::NamedHandleObjectWithState)
 
-  void AddState(const QString& stateId, const SmartPointer<State>& state);
+  void AddState(const QString& stateId, const SmartPointer<State>& state) override;
 
-  QString GetDescription() const;
+  QString GetDescription() const override;
 
-  QString GetName() const;
+  QString GetName() const override;
 
-  SmartPointer<State> GetState(const QString& stateId) const;
+  SmartPointer<State> GetState(const QString& stateId) const override;
 
-  QList<QString> GetStateIds() const;
+  QList<QString> GetStateIds() const override;
 
-  void RemoveState(const QString& id);
+  void RemoveState(const QString& id) override;
 
 private:
 

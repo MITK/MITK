@@ -118,21 +118,21 @@ bool WorkbenchIntroManager::CloseIntro(IIntroPart::Pointer part)
       page->HideView(introView.Cast<IViewPart>());
       if (!reference || reference->GetPart(false) == 0)
       {
-        introPart = 0;
+        introPart = nullptr;
         return true;
       }
       return false;
     }
     else
     {
-      QList<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
+      QList<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(nullptr), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
       Q_ASSERT(references.size() < 2);
       if (references.empty())
         return false;
 
       if (page->CloseEditors(references, false))
       {
-        introPart = 0;
+        introPart = nullptr;
         return true;
       }
       return false;
@@ -140,7 +140,7 @@ bool WorkbenchIntroManager::CloseIntro(IIntroPart::Pointer part)
   }
 
   // if there is no part then null our reference
-  introPart = 0;
+  introPart = nullptr;
 
   return true;
 }
@@ -155,7 +155,7 @@ IIntroPart::Pointer WorkbenchIntroManager::ShowIntro(SmartPointer<
 
   if (!preferredWindow)
   {
-    return IIntroPart::Pointer(0);
+    return IIntroPart::Pointer(nullptr);
   }
 
   IWorkbenchPart::Pointer part = GetIntroAdapterPart();
@@ -289,19 +289,19 @@ IWorkbenchPart::Pointer WorkbenchIntroManager::GetIntroAdapterPart() const
     }
     else
     {
-      QList<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
+      QList<IEditorReference::Pointer> references(page->FindEditors(IEditorInput::Pointer(nullptr), IntroConstants::INTRO_EDITOR_ID, IWorkbenchPage::MATCH_ID));
       Q_ASSERT(references.size() < 2);
       if (references.size() == 1)
         return references.front()->GetEditor(false);
     }
   }
-  return IWorkbenchPart::Pointer(0);
+  return IWorkbenchPart::Pointer(nullptr);
 }
 
 IIntroPart::Pointer WorkbenchIntroManager::CreateNewIntroPart()
 {
   IntroDescriptor::Pointer introDescriptor(workbench->GetIntroDescriptor());
-  introPart = (introDescriptor == 0 ? IIntroPart::Pointer(0) : introDescriptor->CreateIntro());
+  introPart = (introDescriptor == 0 ? IIntroPart::Pointer(nullptr) : introDescriptor->CreateIntro());
 //  if (introPart)
 //  {
 //    workbench.getExtensionTracker().registerObject(

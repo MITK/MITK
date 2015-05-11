@@ -33,12 +33,12 @@ public:
 
   static const QString DEFAULT_PERSPECTIVE_ID; // = org.mitk.coreapp.defaultperspective
 
-  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer);
+  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer) override;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-        berry::IWorkbenchWindowConfigurer::Pointer configurer);
+        berry::IWorkbenchWindowConfigurer::Pointer configurer) override;
 
-  QString GetInitialWindowPerspectiveId();
+  QString GetInitialWindowPerspectiveId() override;
 
 };
 

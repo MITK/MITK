@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkOnePlusOneEvolutionaryOptimizerView : 
 
 public:
 
-  QmitkOnePlusOneEvolutionaryOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkOnePlusOneEvolutionaryOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkOnePlusOneEvolutionaryOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

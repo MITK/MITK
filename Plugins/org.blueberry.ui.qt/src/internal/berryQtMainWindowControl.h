@@ -32,17 +32,17 @@ class QtMainWindowControl : public QMainWindow
 
 public:
 
-  QtMainWindowControl(Shell* shell, QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  QtMainWindowControl(Shell* shell, QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
 
 protected:
 
   // used for shell listeners
-  void changeEvent(QEvent* event);
-  void closeEvent(QCloseEvent* closeEvent);
+  void changeEvent(QEvent* event) override;
+  void closeEvent(QCloseEvent* closeEvent) override;
 
   // used for control listeners
-  void moveEvent(QMoveEvent* event);
-  void resizeEvent(QResizeEvent* event);
+  void moveEvent(QMoveEvent* event) override;
+  void resizeEvent(QResizeEvent* event) override;
   void inFocusEvent(QFocusEvent* event);
 
 private:

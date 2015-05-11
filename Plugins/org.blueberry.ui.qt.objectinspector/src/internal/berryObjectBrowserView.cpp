@@ -71,7 +71,7 @@ void ObjectBrowserView::CreateQtPartControl(QWidget* parent)
     m_ActionToggleBreakpoint.setCheckable(true);
     m_ContextMenu.addAction(&m_ActionToggleBreakpoint);
 
-    QToolBar* toolbar = new QToolBar(parent);
+    auto   toolbar = new QToolBar(parent);
     QAction* resetAction = toolbar->addAction("Reset");
     toolbar->addAction("Show Breakpoints Only");
 
@@ -87,12 +87,12 @@ void ObjectBrowserView::CreateQtPartControl(QWidget* parent)
     parent->layout()->setMenuBar(toolbar);
 
     RestoreGuiState(m_StateMemento);
-    m_StateMemento = 0;
+    m_StateMemento = nullptr;
   }
   else
   {
-    QVBoxLayout* layout = new QVBoxLayout(parent);
-    QLabel* label = new QLabel(parent);
+    auto   layout = new QVBoxLayout(parent);
+    auto   label = new QLabel(parent);
     label->setText(
         "Set the CMake variable BLUEBERRY_DEBUG_SMARTPOINTER to ON for a useful object browser.");
     label->setWordWrap(true);
@@ -161,7 +161,7 @@ void ObjectBrowserView::SelectionChanged(const QItemSelection& selected,
         static_cast<const ObjectItem*> (data.value<void*> ());
     if (item)
     {
-      const Object* obj = 0;
+      const Object* obj = nullptr;
       if (item->type == ObjectItem::INSTANCE)
         obj = item->obj;
       else if (item->type == ObjectItem::SMARTPOINTER)

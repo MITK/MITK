@@ -25,7 +25,7 @@ bool BasicCombinationOpenCVImageFilter::OnFilterImage( cv::Mat& image )
   int imageId = this->GetCurrentImageId();
 
   // go through the list of all filters
-  for ( std::vector<AbstractOpenCVImageFilter::Pointer>::iterator it
+  for ( auto it
         = m_FilterList.begin(); it != m_FilterList.end(); ++it )
   {
     // apply current filter and return false if the filter returned false
@@ -49,7 +49,7 @@ AbstractOpenCVImageFilter::Pointer BasicCombinationOpenCVImageFilter::PopFilter(
 
 bool BasicCombinationOpenCVImageFilter::RemoveFilter( AbstractOpenCVImageFilter::Pointer filter )
 {
-  for ( std::vector<AbstractOpenCVImageFilter::Pointer>::iterator it
+  for ( auto it
         = m_FilterList.begin(); it != m_FilterList.end(); it++ )
   {
     if (*it == filter) {

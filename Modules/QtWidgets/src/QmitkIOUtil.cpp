@@ -144,10 +144,9 @@ QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList& paths, QWidg
   for(std::vector<LoadInfo>::const_iterator iter = loadInfos.begin(), iterEnd = loadInfos.end();
       iter != iterEnd; ++iter)
   {
-    for (std::vector<mitk::BaseData::Pointer>::const_iterator dataIter = iter->m_Output.begin(),
-         dataIterEnd = iter->m_Output.end(); dataIter != dataIterEnd; ++dataIter)
+    for (const auto & elem : iter->m_Output)
     {
-      qResult << *dataIter;
+      qResult << elem;
     }
   }
   return qResult;
@@ -417,10 +416,9 @@ struct QmitkIOUtil::SaveFilter::Impl
       QList<QString> filterExtensions;
       mitk::MimeType mimeType = *iter;
       std::vector<std::string> extensions = mimeType.GetExtensions();
-      for (std::vector<std::string>::iterator extIter = extensions.begin(), extIterEnd = extensions.end();
-           extIter != extIterEnd; ++extIter)
+      for (auto & extension : extensions)
       {
-        filterExtensions << QString::fromStdString(*extIter);
+        filterExtensions << QString::fromStdString(extension);
       }
       if (m_DefaultExtension.isEmpty())
       {

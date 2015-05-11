@@ -30,7 +30,7 @@ mitk::SchedulableProcess* mitk::RoundRobinSchedulingAlgorithm::GetNextProcess(st
   size_t numProcesses = processQueue.size();
 
   if (numProcesses == 0)
-    return NULL;
+    return nullptr;
 
   mitk::SchedulableProcess* process = processQueue[0];
 

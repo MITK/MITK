@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkVolumetryView::VIEW_ID = "org.mitk.views.volumetry";
 
 QmitkVolumetryView::QmitkVolumetryView()
-  : m_Controls(NULL)
-  , m_ParentWidget(NULL)
+  : m_Controls(nullptr)
+  , m_ParentWidget(nullptr)
 {
 }
 
@@ -64,7 +64,7 @@ void QmitkVolumetryView::CreateConnections()
 
 void QmitkVolumetryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer> &nodes)
 {
-  m_SelectedDataNode = NULL;
+  m_SelectedDataNode = nullptr;
   if (!nodes.isEmpty() && dynamic_cast<mitk::Image*>(nodes.front()->GetData()))
   {
     m_SelectedDataNode = nodes.front();
@@ -73,7 +73,7 @@ void QmitkVolumetryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*par
 
   if (m_SelectedDataNode.IsNull() || m_SelectedDataNode.GetPointer() == m_OverlayNode.GetPointer())
   {
-    m_SelectedDataNode = NULL;
+    m_SelectedDataNode = nullptr;
     m_ParentWidget->setEnabled(false);
     return;
   }
@@ -81,7 +81,7 @@ void QmitkVolumetryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*par
   if (m_OverlayNode)
   {
     this->GetDataStorage()->Remove(m_OverlayNode);
-    m_OverlayNode = NULL;
+    m_OverlayNode = nullptr;
   }
 
   this->CreateOverlayChild();
@@ -144,7 +144,7 @@ void QmitkVolumetryView::OnTimeSeriesButtonClicked()
     std::vector<float> volumes = volCalc->GetVolumes();
     std::stringstream vs;
     int timeStep = 0;
-    for (std::vector<float>::iterator it = volumes.begin(); it != volumes.end(); it++)
+    for (auto it = volumes.begin(); it != volumes.end(); it++)
     {
       vs << timeStep++ << "\t" << *it << std::endl;
     }

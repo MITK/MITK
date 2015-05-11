@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkMeanSquaresMetricView : public QmitkRi
 
 public:
 
-  QmitkMeanSquaresMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkMeanSquaresMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkMeanSquaresMetricView();
 
  virtual mitk::MetricParameters::MetricType GetMetricType() override;

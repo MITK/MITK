@@ -45,8 +45,8 @@ void LayoutPartSash::SelectionListener::WidgetSelected(GuiTk::SelectionEvent::Po
 }
 
 LayoutPartSash::LayoutPartSash(PartSashContainer* rootContainer, int style)
- : LayoutPart(""), sash(0), enabled(false), rootContainer(rootContainer),
-   style(style), left(300), right(300), presFactory(0), isVisible(false)
+ : LayoutPart(""), sash(nullptr), enabled(false), rootContainer(rootContainer),
+   style(style), left(300), right(300), presFactory(nullptr), isVisible(false)
 {
   selectionListener = new SelectionListener(this);
 }
@@ -103,7 +103,7 @@ void LayoutPartSash::CreateControl(QWidget* /*parent*/)
 
 void LayoutPartSash::DoCreateControl()
 {
-  if (sash == 0)
+  if (sash == nullptr)
   {
     // ask the presentation factory to create the sash
     IPresentationFactory* factory = WorkbenchPlugin::GetDefault()->GetPresentationFactory();
@@ -154,17 +154,17 @@ bool LayoutPartSash::IsVisible()
 void LayoutPartSash::Dispose()
 {
 
-  if (sash != 0)
+  if (sash != nullptr)
   {
     bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(sash);
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->Dispose(sash);
   }
-  sash = 0;
+  sash = nullptr;
 }
 
 QRect LayoutPartSash::GetBounds()
 {
-  if (sash == 0)
+  if (sash == nullptr)
   {
     return bounds;
   }
@@ -289,7 +289,7 @@ void LayoutPartSash::WidgetSelected(int x, int y, int  /*width*/, int  /*height*
 void LayoutPartSash::SetEnabled(bool resizable)
 {
   this->enabled = resizable;
-  if (sash != 0)
+  if (sash != nullptr)
   {
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetEnabled(sash, enabled);
   }

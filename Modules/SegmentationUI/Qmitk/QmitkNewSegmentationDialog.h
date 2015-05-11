@@ -49,7 +49,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 
   public:
 
-    QmitkNewSegmentationDialog(QWidget* parent = 0);
+    QmitkNewSegmentationDialog(QWidget* parent = nullptr);
 
     virtual ~QmitkNewSegmentationDialog();
 

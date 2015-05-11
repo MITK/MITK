@@ -28,7 +28,7 @@ SameShellProvider::SameShellProvider(QWidget* target) :
 }
 
 SameShellProvider::SameShellProvider(Shell::Pointer sh) :
-  targetControl(0), shell(sh)
+  targetControl(nullptr), shell(sh)
 {
 
 }
@@ -40,7 +40,7 @@ Shell::Pointer SameShellProvider::GetShell() const
     return shell;
   }
 
-  return targetControl == 0 ? Shell::Pointer(0)
+  return targetControl == nullptr ? Shell::Pointer(nullptr)
       : Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(targetControl);
 }
 

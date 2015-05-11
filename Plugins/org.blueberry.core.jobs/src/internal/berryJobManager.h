@@ -109,7 +109,7 @@ public:
 
   //   void Cancel(Object family) ;
 
-  IProgressMonitor::Pointer CreateProgressGroup();
+  IProgressMonitor::Pointer CreateProgressGroup() override;
 
   Job* CurrentJob();
 
@@ -120,9 +120,9 @@ public:
   //    return lockManager;
   //  }
 
-  bool IsIdle();
+  bool IsIdle() override;
 
-  bool IsSuspended();
+  bool IsSuspended() override;
 
   //  void Join(final Object family, IProgressMonitor monitor) throws InterruptedException, OperationCanceledException );
 
@@ -132,7 +132,7 @@ public:
   /**
    *  @see IJobManager#RemoveChangeListener(IJobChangeListener*)
    */
-  void RemoveJobChangeListener(IJobChangeListener* listener);
+  void RemoveJobChangeListener(IJobChangeListener* listener) override;
 
   // /**
   //* report to the progress monitor that this thread is blocked, supplying
@@ -166,7 +166,7 @@ public:
   /**
    *  @have a look at IJobManager SetProgressProvider
    */
-  void SetProgressProvider(ProgressProvider::Pointer provider);
+  void SetProgressProvider(ProgressProvider::Pointer provider) override;
 
   void SetRule(InternalJob::Pointer job, ISchedulingRule::Pointer rule);
 
@@ -197,7 +197,7 @@ public:
   //  void WakeUp(Object family) ;
 
 
-  void AddJobChangeListener(IJobChangeListener* listener);
+  void AddJobChangeListener(IJobChangeListener* listener) override;
 
   //  void beginRule(ISchedulingRule rule, IProgressMonitor monitor) ;
 

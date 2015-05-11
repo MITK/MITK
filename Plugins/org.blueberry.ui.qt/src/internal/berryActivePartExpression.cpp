@@ -26,7 +26,7 @@ const int ActivePartExpression::HASH_INITIAL = qHash(ActivePartExpression::GetSt
 ActivePartExpression::ActivePartExpression(IWorkbenchPart* activePart)
   : activePart(activePart)
 {
-  if (activePart == NULL)
+  if (activePart == nullptr)
   {
     throw ctkInvalidArgumentException("The active part must not be null");
   }

@@ -54,25 +54,25 @@ public:
    * (non-Javadoc)
    * Method declared on IPartService
    */
-  void AddPartListener(IPartListener* l);
+  void AddPartListener(IPartListener* l) override;
 
   /*
    * (non-Javadoc)
    * Method declared on IPartService
    */
-  void RemovePartListener(IPartListener* l);
+  void RemovePartListener(IPartListener* l) override;
 
   /*
    * (non-Javadoc)
    * Method declared on IPartService
    */
-  IWorkbenchPart::Pointer GetActivePart();
+  IWorkbenchPart::Pointer GetActivePart() override;
 
   /*
    * (non-Javadoc)
    * Method declared on IPartService
    */
-  IWorkbenchPartReference::Pointer GetActivePartReference();
+  IWorkbenchPartReference::Pointer GetActivePartReference() override;
 
   /*
    * Returns the selection service.

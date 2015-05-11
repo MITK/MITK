@@ -44,7 +44,7 @@ public:
 
   StackPresentation::Pointer GetPresentation();
 
-  int GetState();
+  int GetState() override;
 
   void SetActive(int activeState);
 
@@ -53,25 +53,25 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.skins.IStackPresentationSite#selectPart(org.blueberry.ui.internal.skins.IPresentablePart)
    */
-  void SelectPart(IPresentablePart::Pointer toSelect);
+  void SelectPart(IPresentablePart::Pointer toSelect) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.skins.IPresentationSite#setState(int)
    */
-  void SetState(int newState);
+  void SetState(int newState) override;
 
   void SetPresentationState(int newState);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.skins.IPresentablePart#isClosable()
    */
-  bool IsCloseable(IPresentablePart::Pointer part);
+  bool IsCloseable(IPresentablePart::Pointer part) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.skins.IPresentationSite#dragStart(org.blueberry.ui.internal.skins.IPresentablePart, boolean)
    */
   void DragStart(IPresentablePart::Pointer beingDragged,
-      QPoint& initialPosition, bool keyboard);
+      QPoint& initialPosition, bool keyboard) override;
 
   using IStackPresentationSite::Close;
 
@@ -83,12 +83,12 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.skins.IPresentationSite#dragStart(boolean)
    */
-  void DragStart(QPoint& initialPosition, bool keyboard);
+  void DragStart(QPoint& initialPosition, bool keyboard) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IStackPresentationSite#supportsState(int)
    */
-  bool SupportsState(int state);
+  bool SupportsState(int state) override;
 
   //    void AddSystemActions(IMenuManager menuManager) {
   //

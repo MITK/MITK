@@ -77,7 +77,7 @@ void QmitkResidualAnalysisWidget::DrawMeans()
   this->m_Plot->setAxisTitle(3, "DWI Volume");
 
 
-  QwtLegend *legend = new QwtLegend;
+  auto  legend = new QwtLegend;
   this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
 
   this->Replot();
@@ -110,7 +110,7 @@ void QmitkResidualAnalysisWidget::DrawPercentagesOfOutliers()
   this->m_Plot->setAxisTitle(0, "Percentage of outliers");
   this->m_Plot->setAxisTitle(3, "DWI Volume");
 
-  QwtLegend *legend = new QwtLegend;
+  auto  legend = new QwtLegend;
   this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
 
   this->Replot();

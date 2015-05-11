@@ -37,7 +37,7 @@ mitk::TubeGraphProperty::~TubeGraphProperty()
   m_ActiveTubes.clear();
   m_TubeToLabelsMap.clear();
 
-  for (LabelGroupSetType::iterator it = m_LabelGroups.begin(); it != m_LabelGroups.end(); it++)
+  for (auto it = m_LabelGroups.begin(); it != m_LabelGroups.end(); it++)
     delete *it;
   m_LabelGroups.clear();
 }
@@ -47,7 +47,7 @@ bool mitk::TubeGraphProperty::IsTubeVisible(const TubeDescriptorType& tube)
   //search for any label settings for the tube
   if(m_LabelGroups.size()>0)
   {
-    for(std::map< TubeToLabelGroupType, std::string >::iterator it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
+    for(auto it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
     {
       if (this->TubeDescriptorsCompare(tube, (*it).first.first))
       {
@@ -85,7 +85,7 @@ void mitk::TubeGraphProperty::SetTubeActive(const TubeDescriptorType& tube, cons
   //set deactive
   else
   {
-    for(std::vector<TubeDescriptorType>::iterator it = m_ActiveTubes.begin(); it != m_ActiveTubes.end(); it++)
+    for(auto it = m_ActiveTubes.begin(); it != m_ActiveTubes.end(); it++)
     {
       if (this->TubeDescriptorsCompare(tube, (*it)))
       { //if found, delete it
@@ -101,7 +101,7 @@ void mitk::TubeGraphProperty::SetTubeActive(const TubeDescriptorType& tube, cons
 
 void mitk::TubeGraphProperty::SetTubesActive(std::vector<TubeDescriptorType>& tubes)
 {
-  for(std::vector<TubeDescriptorType>::iterator it =  tubes.begin(); it != tubes.end(); it++)
+  for(auto it =  tubes.begin(); it != tubes.end(); it++)
     this->SetTubeActive(*it, true);
 }
 
@@ -129,7 +129,7 @@ void mitk::TubeGraphProperty::DeactivateAllTubes()
 
 void mitk::TubeGraphProperty::AddAnnotation(mitk::TubeGraphProperty::Annotation* annotation)
 {
-  for(std::vector<TubeGraphProperty::Annotation*>::iterator it = m_Annotations.begin(); it != m_Annotations.end(); it++)
+  for(auto it = m_Annotations.begin(); it != m_Annotations.end(); it++)
   {
     if((*it)->name == annotation->name)
     {
@@ -141,12 +141,12 @@ void mitk::TubeGraphProperty::AddAnnotation(mitk::TubeGraphProperty::Annotation*
 }
 mitk::TubeGraphProperty::Annotation* mitk::TubeGraphProperty::GetAnnotationByName(std::string annotation)
 {
-  for(std::vector<TubeGraphProperty::Annotation*>::iterator it = m_Annotations.begin(); it != m_Annotations.end(); it++)
+  for(auto it = m_Annotations.begin(); it != m_Annotations.end(); it++)
   {
     if((*it)->name == annotation)
       return *it;
   }
-  return 0;
+  return nullptr;
 }
 std::vector<mitk::TubeGraphProperty::Annotation*> mitk::TubeGraphProperty::GetAnnotations()
 {
@@ -154,7 +154,7 @@ std::vector<mitk::TubeGraphProperty::Annotation*> mitk::TubeGraphProperty::GetAn
 }
 void mitk::TubeGraphProperty::RemoveAnnotation(mitk::TubeGraphProperty::Annotation* annotation)
 {
-  for(std::vector<TubeGraphProperty::Annotation*>::iterator it = m_Annotations.begin(); it != m_Annotations.end(); it++)
+  for(auto it = m_Annotations.begin(); it != m_Annotations.end(); it++)
   {
     if((*it)->name == annotation->name)
     {
@@ -189,7 +189,7 @@ mitk::Color mitk::TubeGraphProperty::GetColorOfTube(const TubeDescriptorType& tu
     // So let see which label is activ on this tube and which color is set.
     if(m_LabelGroups.size() > 0)
     {
-      for(std::map< TubeToLabelGroupType, std::string >::iterator it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
+      for(auto it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
       {
         if (this->TubeDescriptorsCompare(tube, (*it).first.first))
         {// At the moment only the first entry is considered
@@ -217,7 +217,7 @@ void mitk::TubeGraphProperty::SetLabelForActivatedTubes(LabelGroup* labelGroup, 
   for(unsigned int i = 0; i < m_ActiveTubes.size(); i++)
   {
     bool isInList(false);
-    for(std::map< TubeToLabelGroupType, std::string >::iterator it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
+    for(auto it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
     {
       if ((this->TubeDescriptorsCompare(it->first.first ,m_ActiveTubes[i])) && (labelGroup->labelGroupName.compare(it->first.second) == 0))
       {
@@ -258,7 +258,7 @@ void mitk::TubeGraphProperty::AddLabelGroup(LabelGroup* labelGroup, unsigned int
 {
 
   //Check if the name is unique
-  for (LabelGroupSetType::iterator it = m_LabelGroups.begin(); it != m_LabelGroups.end(); it++)
+  for (auto it = m_LabelGroups.begin(); it != m_LabelGroups.end(); it++)
   {
     if (labelGroup->labelGroupName.compare((*it)->labelGroupName) == 0)
     {
@@ -270,7 +270,7 @@ void mitk::TubeGraphProperty::AddLabelGroup(LabelGroup* labelGroup, unsigned int
   // Add the label group at position, if you can, otherwise put it at the end of the vector
   if (position < m_LabelGroups.size()-1)
   {
-    LabelGroupSetType::iterator it = m_LabelGroups.begin() + position;
+    auto it = m_LabelGroups.begin() + position;
     m_LabelGroups.insert(it, labelGroup);
   }
   else
@@ -286,14 +286,14 @@ void mitk::TubeGraphProperty::AddLabelGroup(LabelGroup* labelGroup, unsigned int
 void mitk::TubeGraphProperty::RemoveLabelGroup(LabelGroup* labelGroup)
 {
   //find labelGroup in vector
-  LabelGroupSetType::iterator foundElement = std::find(m_LabelGroups.begin(), m_LabelGroups.end(), labelGroup);
+  auto foundElement = std::find(m_LabelGroups.begin(), m_LabelGroups.end(), labelGroup);
   unsigned int pos = foundElement - m_LabelGroups.begin();
 
   //found it? delete it!
   if (pos < m_LabelGroups.size())
   {
     //delete every assignment to a tube
-    for(std::map< TubeToLabelGroupType, std::string >::iterator it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
+    for(auto it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
     {
       if (labelGroup->labelGroupName.compare((*it).first.second) == 0)
         m_TubeToLabelsMap.erase(it);
@@ -334,7 +334,7 @@ void mitk::TubeGraphProperty::RenameLabel (LabelGroup* labelGroup, LabelGroup::L
   if(label)
   {
     //rename the label in the assignement vector for tubes
-    for(std::map< TubeToLabelGroupType, std::string >::iterator it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
+    for(auto it = m_TubeToLabelsMap.begin(); it != m_TubeToLabelsMap.end(); it++)
     {
       //Label group fit?
       if (labelGroup->labelGroupName.compare((*it).first.second) == 0)
@@ -375,26 +375,26 @@ unsigned int mitk::TubeGraphProperty::GetIndexOfLabelGroup(mitk::TubeGraphProper
 
 mitk::TubeGraphProperty::LabelGroup* mitk::TubeGraphProperty::GetLabelGroupByName(std::string labelGroup)
 {
-  for(LabelGroupSetType::iterator it = m_LabelGroups.begin(); it != m_LabelGroups.end(); it++)
+  for(auto it = m_LabelGroups.begin(); it != m_LabelGroups.end(); it++)
   {
     if(labelGroup.compare((*it)->labelGroupName) == 0)
       return (*it);
   }
 
   MITK_ERROR << "Could not find such a label group!";
-  return 0;
+  return nullptr;
 }
 
 mitk::TubeGraphProperty::LabelGroup::Label* mitk::TubeGraphProperty::GetLabelByName(LabelGroup* labelGroup, std::string labelName)
 {
-  for(std::vector<LabelGroup::Label*>::iterator it = labelGroup->labels.begin(); it != labelGroup->labels.end(); it++)
+  for(auto it = labelGroup->labels.begin(); it != labelGroup->labels.end(); it++)
   {
     if(labelName.compare((*it)->labelName) == 0)
       return (*it);
   }
 
   MITK_ERROR << "Could not find such a label!";
-  return 0;
+  return nullptr;
 }
 
 bool mitk::TubeGraphProperty::TubeDescriptorsCompare(const TubeDescriptorType& tube1, const TubeDescriptorType& tube2 )

@@ -61,7 +61,7 @@ mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInput(voi
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<mitk::ImageToImageFilter::InputImageType * >
@@ -81,7 +81,7 @@ const mitk::ImageToImageFilter::InputImageType *mitk::ImageToImageFilter::GetInp
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::ImageToImageFilter::InputImageType * >

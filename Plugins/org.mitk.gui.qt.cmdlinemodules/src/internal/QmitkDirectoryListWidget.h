@@ -31,7 +31,7 @@ class QmitkDirectoryListWidget : public QWidget, public Ui::QmitkPathListWidget
   Q_OBJECT
 
 public:
-  QmitkDirectoryListWidget(QWidget* parent=0);
+  QmitkDirectoryListWidget(QWidget* parent=nullptr);
 
   /**
    * \brief Get all directory entries.

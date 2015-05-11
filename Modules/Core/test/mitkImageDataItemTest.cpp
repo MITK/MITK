@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 int mitkImageDataItemTest(int /*argc*/, char* /*argv*/[])
 {
-  unsigned long *pixels = new unsigned long [100];
+  auto pixels = new unsigned long [100];
   void * data = pixels;
 
   std::cout << "Testing pseudo-type independent deleting: ";

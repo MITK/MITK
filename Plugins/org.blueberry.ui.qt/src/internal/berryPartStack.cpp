@@ -148,7 +148,7 @@ void PartStack::MyStackPresentationSite::DragStart(
 void PartStack::MyStackPresentationSite::DragStart(QPoint& initialLocation,
     bool keyboard)
 {
-  partStack->DragStart(IPresentablePart::Pointer(0), initialLocation, keyboard);
+  partStack->DragStart(IPresentablePart::Pointer(nullptr), initialLocation, keyboard);
 }
 
 bool PartStack::MyStackPresentationSite::IsPartMoveable(
@@ -460,7 +460,7 @@ void PartStack::DescribeLayout(QString& buf) const
 
 void PartStack::Add(LayoutPart::Pointer child)
 {
-  this->Add(child, Object::Pointer(0));
+  this->Add(child, Object::Pointer(nullptr));
 }
 
 void PartStack::Add(LayoutPart::Pointer newChild, Object::Pointer cookie)
@@ -519,7 +519,7 @@ void PartStack::Close(IPresentablePart::Pointer part)
 IPresentationFactory* PartStack::GetFactory()
 {
 
-  if (factory != 0)
+  if (factory != nullptr)
   {
     return factory;
   }
@@ -544,7 +544,7 @@ void PartStack::CreateControl(QWidget* parent)
       presentationSite, &serializer, savedPresentationState);
 
   this->CreateControl(parent, presentation);
-  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveBelow(this->GetControl(), 0);
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveBelow(this->GetControl(), nullptr);
 }
 
 IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, const QPoint& position)
@@ -552,14 +552,14 @@ IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, con
 
   if (draggedObject.Cast<PartPane>() == 0)
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   PartPane::Pointer pane = draggedObject.Cast<PartPane>();
   if (this->IsStandalone()
       || !this->AllowsDrop(pane))
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   // Don't allow views to be dragged between windows
@@ -569,7 +569,7 @@ IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, con
       this->GetWorkbenchWindow()->GetWorkbench());
   if (differentWindows && !editorDropOK)
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   StackDropResult::Pointer dropResult = this->GetPresentation()->DragOver(
@@ -577,7 +577,7 @@ IDropTarget::Pointer PartStack::GetDropTarget(Object::Pointer draggedObject, con
 
   if (dropResult == 0)
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   return this->CreateDropTarget(pane, dropResult);
@@ -604,7 +604,7 @@ void PartStack::SetActive(bool isActive)
   // Add all visible children to the presentation
   for(ChildVector::iterator iter = children.begin(); iter != children.end(); ++iter)
   {
-    (*iter)->SetContainer(isActive ? ILayoutContainer::Pointer(this) : ILayoutContainer::Pointer(0));
+    (*iter)->SetContainer(isActive ? ILayoutContainer::Pointer(this) : ILayoutContainer::Pointer(nullptr));
   }
 
   for (PresentableVector::iterator iter = presentableParts.begin();
@@ -635,7 +635,7 @@ void PartStack::CreateControl(QWidget*  /*parent*/, StackPresentation::Pointer p
   ChildVector childParts(children);
   for (ChildVector::iterator iter = childParts.begin(); iter != childParts.end(); ++iter)
   {
-    this->ShowPart(*iter, Object::Pointer(0));
+    this->ShowPart(*iter, Object::Pointer(nullptr));
   }
 
   if (savedPresentationState != 0)
@@ -653,7 +653,7 @@ void PartStack::CreateControl(QWidget*  /*parent*/, StackPresentation::Pointer p
   // We should not have a placeholder selected once we've created the widgetry
   if (requestedCurrent != 0 && requestedCurrent->IsPlaceHolder())
   {
-    requestedCurrent = 0;
+    requestedCurrent = nullptr;
     this->UpdateContainerVisibleTab();
   }
 
@@ -703,8 +703,8 @@ void PartStack::Dispose()
   //  }
   presentableParts.clear();
 
-  presentationCurrent = 0;
-  current = 0;
+  presentationCurrent = nullptr;
+  current = nullptr;
 
   this->FireInternalPropertyChange(PROP_SELECTION);
 }
@@ -739,7 +739,7 @@ QWidget* PartStack::GetControl()
 
   if (presentation == 0)
   {
-    return 0;
+    return nullptr;
   }
 
   return presentation->GetControl();
@@ -761,7 +761,7 @@ PartPane::Pointer PartStack::GetPaneFor(IPresentablePart::Pointer part)
 {
   if (part == 0 || part.Cast<PresentablePart>() == 0)
   {
-    return PartPane::Pointer(0);
+    return PartPane::Pointer(nullptr);
   }
 
   return part.Cast<PresentablePart>()->GetPane();
@@ -789,7 +789,7 @@ PresentablePart::Pointer PartStack::GetPresentablePart(LayoutPart::Pointer pane)
     }
   }
 
-  return PresentablePart::Pointer(0);
+  return PresentablePart::Pointer(nullptr);
 }
 
 StackPresentation::Pointer PartStack::GetPresentation()
@@ -803,7 +803,7 @@ PartPane::Pointer PartStack::GetSelection()
   {
     return partPane;
   }
-  return PartPane::Pointer(0);
+  return PartPane::Pointer(nullptr);
 }
 
 void PartStack::PresentationSelectionChanged(IPresentablePart::Pointer newSelection)
@@ -848,13 +848,13 @@ void PartStack::Remove(LayoutPart::Pointer child)
     ignoreSelectionChanges = true;
     presentableParts.removeAll(presentablePart);
     presentation->RemovePart(presentablePart);
-    presentablePart = 0;
+    presentablePart = nullptr;
     ignoreSelectionChanges = false;
   }
 
   if (this->GetPresentation() != 0)
   {
-    child->SetContainer(ILayoutContainer::Pointer(0));
+    child->SetContainer(ILayoutContainer::Pointer(nullptr));
   }
 
   if (child == requestedCurrent)
@@ -868,7 +868,7 @@ void PartStack::Reparent(QWidget* newParent)
 
   QWidget* control = this->GetControl();
   GuiWidgetsTweaklet* tweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
-  if ((control == 0) || (tweaklet->GetParent(control) == newParent)
+  if ((control == nullptr) || (tweaklet->GetParent(control) == newParent)
       || !tweaklet->IsReparentable(control))
   {
     return;
@@ -984,7 +984,7 @@ bool PartStack::RestoreState(IMemento::Pointer memento)
   }
 
   // Determine if the presentation has saved any info here
-  savedPresentationState = 0;
+  savedPresentationState = nullptr;
   QList<IMemento::Pointer> presentationMementos(memento
       ->GetChildren(WorkbenchConstants::TAG_PRESENTATION));
 
@@ -1022,7 +1022,7 @@ void PartStack::SetVisible(bool makeVisible)
 
   bool useShortcut = makeVisible || !isActive;
 
-  if (ctrl != 0 && useShortcut)
+  if (ctrl != nullptr && useShortcut)
   {
     if (makeVisible == Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetVisible(ctrl))
     {
@@ -1380,7 +1380,7 @@ void PartStack::ShowPart(LayoutPart::Pointer part, Object::Pointer cookie)
     part->SetContainer(ILayoutContainer::Pointer(this));
 
     // The active part should always be enabled
-    if (part->GetControl() != 0)
+    if (part->GetControl() != nullptr)
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetEnabled(part->GetControl(), true);
   }
 
@@ -1403,7 +1403,7 @@ void PartStack::UpdateContainerVisibleTab()
 
   if (parts.size() < 1)
   {
-    this->SetSelection(LayoutPart::Pointer(0));
+    this->SetSelection(LayoutPart::Pointer(nullptr));
     return;
   }
 
@@ -1482,7 +1482,7 @@ void PartStack::DragStart(IPresentablePart::Pointer beingDragged, QPoint& initia
 {
   if (beingDragged == 0)
   {
-    this->PaneDragStart(PartPane::Pointer(0), initialLocation, keyboard);
+    this->PaneDragStart(PartPane::Pointer(nullptr), initialLocation, keyboard);
   }
   else
   {

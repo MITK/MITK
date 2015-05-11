@@ -27,27 +27,27 @@ struct EmptyTabItem : public AbstractTabItem {
     /* (non-Javadoc)
      * @see AbstractTabItem#getBounds()
      */
-    QRect GetBounds();
+    QRect GetBounds() override;
 
     /* (non-Javadoc)
      * @see AbstractTabItem#setInfo(org.blueberry.ui.internal.presentations.util.PartInfo)
      */
-    void SetInfo(const PartInfo& info);
+    void SetInfo(const PartInfo& info) override;
 
     /* (non-Javadoc)
      * @see AbstractTabItem#Dispose()
      */
-    void Dispose();
+    void Dispose() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.presentations.util.AbstractTabItem#getData()
      */
-    Object::Pointer GetData();
+    Object::Pointer GetData() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.presentations.util.AbstractTabItem#setData(java.lang.Object)
      */
-    void SetData(Object::Pointer data);
+    void SetData(Object::Pointer data) override;
 };
 
 }

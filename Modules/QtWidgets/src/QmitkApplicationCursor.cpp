@@ -35,7 +35,7 @@ void QmitkApplicationCursor::PushCursor(std::istream& cursorStream, int hotspotX
     std::ios::pos_type length = cursorStream.tellg();
     cursorStream.seekg(0, std::ios::beg);
 
-    char* data = new char[length];
+    auto  data = new char[length];
     cursorStream.read(data, length);
     QPixmap pixmap;
     pixmap.loadFromData(QByteArray::fromRawData(data, length));

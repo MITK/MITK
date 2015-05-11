@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkFRPROptimizerView : public QmitkRigidR
 
 public:
 
-  QmitkFRPROptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkFRPROptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkFRPROptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

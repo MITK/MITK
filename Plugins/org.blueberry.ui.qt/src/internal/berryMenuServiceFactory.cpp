@@ -30,21 +30,21 @@ Object* MenuServiceFactory::Create(const QString& serviceInterface, IServiceLoca
 {
   if (serviceInterface != qobject_interface_iid<IMenuService*>())
   {
-    return NULL;
+    return nullptr;
   }
 
   IWorkbenchLocationService* wls = locator->GetService<IWorkbenchLocationService>();
   IWorkbench* const wb = wls->GetWorkbench();
-  if (wb == NULL)
+  if (wb == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
 
   Object* parent = parentLocator->GetService(serviceInterface);
-  if (parent == NULL)
+  if (parent == nullptr)
   {
     // we are registering the global services in the Workbench
-    return NULL;
+    return nullptr;
   }
   IWorkbenchWindow* const window = wls->GetWorkbenchWindow();
   return new SlaveMenuService(dynamic_cast<InternalMenuService*>(parent), locator,

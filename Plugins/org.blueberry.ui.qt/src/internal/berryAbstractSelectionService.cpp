@@ -179,7 +179,7 @@ ISelection::ConstPointer AbstractSelectionService::GetSelection() const
   }
   else
   {
-    return ISelection::ConstPointer(0);
+    return ISelection::ConstPointer(nullptr);
   }
 }
 
@@ -204,7 +204,7 @@ void AbstractSelectionService::SetActivePart(IWorkbenchPart::Pointer newPart)
 
     if (selectionProvider.IsNull())
     {
-      newPart = 0;
+      newPart = nullptr;
     }
   }
 
@@ -228,9 +228,9 @@ void AbstractSelectionService::SetActivePart(IWorkbenchPart::Pointer newPart)
         activeProvider
         ->RemoveSelectionChangedListener(postSelListener.data());
       }
-      activeProvider = 0;
+      activeProvider = nullptr;
     }
-    activePart = 0;
+    activePart = nullptr;
   }
 
   activePart = newPart;
@@ -255,8 +255,8 @@ void AbstractSelectionService::SetActivePart(IWorkbenchPart::Pointer newPart)
   }
   else
   {
-    this->FireSelection(IWorkbenchPart::Pointer(0), ISelection::ConstPointer(0));
-    this->FirePostSelection(IWorkbenchPart::Pointer(0), ISelection::ConstPointer(0));
+    this->FireSelection(IWorkbenchPart::Pointer(nullptr), ISelection::ConstPointer(nullptr));
+    this->FirePostSelection(IWorkbenchPart::Pointer(nullptr), ISelection::ConstPointer(nullptr));
   }
 }
 

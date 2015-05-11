@@ -24,7 +24,7 @@ namespace itk
 
 template <typename TElementIdentifier, typename TElement>
 ImportMitkImageContainer<TElementIdentifier , TElement>
-::ImportMitkImageContainer() : m_imageAccess(NULL)
+::ImportMitkImageContainer() : m_imageAccess(nullptr)
 {
 
 }
@@ -34,9 +34,9 @@ template <typename TElementIdentifier, typename TElement>
 ImportMitkImageContainer< TElementIdentifier , TElement >
 ::~ImportMitkImageContainer()
 {
-  if(m_imageAccess != NULL)
+  if(m_imageAccess != nullptr)
     delete m_imageAccess;
-  m_imageAccess = NULL;
+  m_imageAccess = nullptr;
 }
 
 /*

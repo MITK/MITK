@@ -37,13 +37,13 @@ private:
 
 protected:
 
-  void tabRemoved(int index);
-  void mousePressEvent(QMouseEvent* event);
-  void mouseMoveEvent(QMouseEvent* event);
+  void tabRemoved(int index) override;
+  void mousePressEvent(QMouseEvent* event) override;
+  void mouseMoveEvent(QMouseEvent* event) override;
 
 public:
 
-  QCTabBar(QWidget* parent = 0);
+  QCTabBar(QWidget* parent = nullptr);
   ~QCTabBar();
 
   AbstractTabItem* getTab(int index) const;

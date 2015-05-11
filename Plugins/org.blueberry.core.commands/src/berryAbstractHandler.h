@@ -59,7 +59,7 @@ public:
   /**
    * @see IHandler#addHandlerListener(IHandlerListener)
    */
-  void AddHandlerListener(IHandlerListener* handlerListener);
+  void AddHandlerListener(IHandlerListener* handlerListener) override;
 
   /**
    * The default implementation does nothing. Subclasses who attach listeners
@@ -67,7 +67,7 @@ public:
    *
    * @see IHandler#Dispose()
    */
-  void Dispose();
+  void Dispose() override;
 
   /**
    * Whether this handler is capable of executing at this time. Subclasses may
@@ -79,7 +79,7 @@ public:
    * @see #setEnabled(Object)
    * @see #setBaseEnabled(boolean)
    */
-  bool IsEnabled() const;
+  bool IsEnabled() const override;
 
   /**
    * Called by the framework to allow the handler to update its enabled state
@@ -91,7 +91,7 @@ public:
    *            the application context. May be <code>null</code>
    * @see #SetBaseEnabled(bool)
    */
-  void SetEnabled(const Object::Pointer& evaluationContext);
+  void SetEnabled(const Object::Pointer& evaluationContext) override;
 
   /**
    * Whether this handler is capable of handling delegated responsibilities at
@@ -99,12 +99,12 @@ public:
    *
    * @return <code>true</code>
    */
-  bool IsHandled() const;
+  bool IsHandled() const override;
 
   /**
    * @see IHandler#removeHandlerListener(IHandlerListener)
    */
-  void RemoveHandlerListener(IHandlerListener* handlerListener);
+  void RemoveHandlerListener(IHandlerListener* handlerListener) override;
 
 protected:
 

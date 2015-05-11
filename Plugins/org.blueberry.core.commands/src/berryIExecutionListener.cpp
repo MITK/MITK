@@ -32,7 +32,7 @@ void
 IExecutionListener::Events
 ::AddListener(IExecutionListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   notHandled += NotHandledDelegate(l, &IExecutionListener::NotHandled);
   postExecuteFailure += PostExecuteFailureDelegate(l, &IExecutionListener::PostExecuteFailure);
@@ -44,7 +44,7 @@ void
 IExecutionListener::Events
 ::RemoveListener(IExecutionListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   notHandled -= NotHandledDelegate(l, &IExecutionListener::NotHandled);
   postExecuteFailure -= PostExecuteFailureDelegate(l, &IExecutionListener::PostExecuteFailure);

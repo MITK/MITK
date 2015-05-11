@@ -69,7 +69,7 @@ namespace mitk
      * @param filename The resource name relative to the Interactions resource folder.
      * @param module
      */
-    EventConfig(const std::string& filename, const us::Module* module = NULL);
+    EventConfig(const std::string& filename, const us::Module* module = nullptr);
 
     /**
      * @brief Construct an EventConfig object based on a XML configuration file.
@@ -140,7 +140,7 @@ namespace mitk
      * @param module The module containing the resource. Defaults to the Mitk module.
      * @return \c true if the configuration was successfully added, \c false otherwise.
      */
-    bool AddConfig(const std::string& filename, const us::Module* module = NULL);
+    bool AddConfig(const std::string& filename, const us::Module* module = nullptr);
 
     /**
      * @brief This method \e extends this configuration.

@@ -74,8 +74,8 @@ LookupTable::Pointer FreeSurferParcellationTranslator::GetLookupTable() const
 // Get the name assigned to the given label
 const string FreeSurferParcellationTranslator::GetName(const string & label) const
 {
-  NameTable::const_iterator endIter = this->m_NameTable.end();
-  NameTable::const_iterator iter = this->m_NameTable.find( label );
+  auto endIter = this->m_NameTable.end();
+  auto iter = this->m_NameTable.find( label );
   if( iter != endIter )
   {
     return iter->second;

@@ -46,8 +46,8 @@ public:
   /**
    * Registers sandbox core object factories.
    */
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
 };
 

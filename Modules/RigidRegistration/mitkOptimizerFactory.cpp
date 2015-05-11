@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  OptimizerFactory::OptimizerFactory() : m_OptimizerParameters(NULL), m_NumberTransformParameters(16)
+  OptimizerFactory::OptimizerFactory() : m_OptimizerParameters(nullptr), m_NumberTransformParameters(16)
   {
   }
 
@@ -53,7 +53,7 @@ namespace mitk {
     if( m_OptimizerParameters.IsNull() )
     {
       MITK_ERROR << "No parameters set! Returning\n";
-      return NULL;
+      return nullptr;
     }
     int optimizer = m_OptimizerParameters->GetOptimizer();
     if (optimizer == OptimizerParameters::EXHAUSTIVEOPTIMIZER)
@@ -238,6 +238,6 @@ namespace mitk {
       OptimizerPointer->SetMaximumNumberOfIterations(m_OptimizerParameters->GetNumberOfIterationsSPSA());
       return OptimizerPointer.GetPointer();
     }
-    return NULL;
+    return nullptr;
   }
 } // end namespace

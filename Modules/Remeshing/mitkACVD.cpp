@@ -66,7 +66,7 @@ static void ValidateSurface(mitk::Surface::ConstPointer surface, unsigned int t)
 
   vtkPolyData* polyData = const_cast<mitk::Surface*>(surface.GetPointer())->GetVtkPolyData(t);
 
-  if (polyData == NULL)
+  if (polyData == nullptr)
     mitkThrow() << "PolyData of input surface at time step " << t << " is NULL!";
 
   if (polyData->GetNumberOfPolys() == 0)

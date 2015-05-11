@@ -37,7 +37,7 @@ mitk::PlanarFigureSerializer::~PlanarFigureSerializer()
 std::string mitk::PlanarFigureSerializer::Serialize()
 {
   const PlanarFigure* pf = dynamic_cast<const PlanarFigure*>( m_Data.GetPointer() );
-  if (pf == NULL)
+  if (pf == nullptr)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::PlanarFigure. Cannot serialize as PlanarFigure.";

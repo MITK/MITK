@@ -27,8 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-QObject* ExpressionPlugin::m_PluginListener = NULL;
-ExpressionPlugin* ExpressionPlugin::m_Default = NULL;
+QObject* ExpressionPlugin::m_PluginListener = nullptr;
+ExpressionPlugin* ExpressionPlugin::m_Default = nullptr;
 
 ExpressionPlugin::ExpressionPlugin()
 {
@@ -55,11 +55,11 @@ void ExpressionPlugin::start(ctkPluginContext* context)
 
 void ExpressionPlugin::stop(ctkPluginContext* context)
 {
-  if (m_PluginListener != NULL)
+  if (m_PluginListener != nullptr)
   {
     context->disconnectPluginListener(m_PluginListener);
   }
-  m_PluginListener = NULL;
+  m_PluginListener = nullptr;
   Plugin::stop(context);
 }
 

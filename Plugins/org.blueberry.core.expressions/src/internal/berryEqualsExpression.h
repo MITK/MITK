@@ -45,15 +45,15 @@ public:
 
   EqualsExpression(Poco::XML::Element* element);
 
-  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const override;
 
-  void CollectExpressionInfo(ExpressionInfo* info) const;
+  void CollectExpressionInfo(ExpressionInfo* info) const override;
 
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 
 protected:
 
-  uint ComputeHashCode() const;
+  uint ComputeHashCode() const override;
 };
 
 } // namespace berry

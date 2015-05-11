@@ -315,7 +315,7 @@ public:
   //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
   template <typename itkImageType> void InitializeByItk(const itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
   {
-    if(itkimage==NULL) return;
+    if(itkimage==nullptr) return;
 
     MITK_DEBUG << "Initializing MITK image from ITK image.";
     // build array with dimensions in each direction with at least 4 entries
@@ -486,17 +486,17 @@ public:
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   \brief (DEPRECATED) Get the minimum for scalar images
@@ -609,11 +609,11 @@ protected:
 
   virtual void Expand( unsigned int timeSteps ) override;
 
-  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
-  virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
-  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   Image();
 

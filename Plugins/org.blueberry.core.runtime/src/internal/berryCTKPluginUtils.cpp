@@ -37,7 +37,7 @@ CTKPluginUtils::CTKPluginUtils()
 void CTKPluginUtils::InitServices()
 {
   ctkPluginContext* context = org_blueberry_core_runtime_Activator::getPluginContext();
-  if (context == NULL)
+  if (context == nullptr)
   {
     //RuntimeLog.log(new Status(IStatus.ERROR, RegistryMessages.OWNER_NAME, 0, RegistryMessages.bundle_not_activated, null));
     BERRY_ERROR << "The plugin " << IRuntimeConstants::PI_RUNTIME() << " was not activated.";

@@ -25,7 +25,7 @@ void
 IHandlerListener::Events
 ::AddListener(IHandlerListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   handlerChanged += Delegate(l, &IHandlerListener::HandlerChanged);
 }
@@ -34,7 +34,7 @@ void
 IHandlerListener::Events
 ::RemoveListener(IHandlerListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   handlerChanged -= Delegate(l, &IHandlerListener::HandlerChanged);
 }

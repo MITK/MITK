@@ -61,7 +61,7 @@ class MITKALGORITHMSEXT_EXPORT SimpleImageHistogram : public SimpleHistogram
   SimpleImageHistogram()
   {
     valid=false;
-    histogram=0;
+    histogram=nullptr;
   }
 
   ~SimpleImageHistogram()

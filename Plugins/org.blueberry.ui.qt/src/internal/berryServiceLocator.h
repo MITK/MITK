@@ -52,14 +52,14 @@ private:
      *
      * @see org.blueberry.ui.services.IServiceLocator#getService(java.lang.Class)
      */
-    Object* GetService(const QString& api);
+    Object* GetService(const QString& api) override;
 
     /*
      * (non-Javadoc)
      *
      * @see org.blueberry.ui.services.IServiceLocator#hasService(java.lang.Class)
      */
-    bool HasService(const QString& api) const;
+    bool HasService(const QString& api) const override;
   };
 
   const IServiceFactory* const factory;
@@ -106,16 +106,16 @@ public:
   ServiceLocator(IServiceLocator* parent, const IServiceFactory* factory,
       IDisposable::WeakPtr owner);
 
-  void Activate();
+  void Activate() override;
 
-  void Deactivate();
+  void Deactivate() override;
 
-  void Dispose();
+  void Dispose() override;
 
   using IServiceLocator::GetService;
-  Object* GetService(const QString& key);
+  Object* GetService(const QString& key) override;
 
-  bool HasService(const QString& key) const;
+  bool HasService(const QString& key) const override;
 
   /**
    * Registers a service with this locator. If there is an existing service

@@ -59,17 +59,17 @@ class QmitkRegionGrowingView : public QmitkAbstractView, public mitk::IRenderWin
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus();
+    virtual void SetFocus() override;
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes );
+                                     const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     //! [render-window-part-listener]
-    void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-    void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+    void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+    void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
     //! [render-window-part-listener]
 
     Ui::QmitkRegionGrowingViewControls m_Controls;

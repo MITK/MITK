@@ -26,7 +26,7 @@ QmitkOverlay::QmitkOverlay( const char* id )
 , m_Id(id)
 , m_Position(top_Left)
 , m_Layer(-1)
-, m_Widget(NULL)
+, m_Widget(nullptr)
 , m_WidgetIsCustom(false)
 {
 }
@@ -36,7 +36,7 @@ QmitkOverlay::~QmitkOverlay()
   if ( m_Widget && !m_WidgetIsCustom )
   {
     m_Widget->deleteLater();
-    m_Widget = NULL;
+    m_Widget = nullptr;
   }
 }
 
@@ -69,7 +69,7 @@ void QmitkOverlay::AddDropShadow( QWidget* widget )
 {
   if (m_Widget)
   {
-    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect(widget);
+    auto  effect = new QGraphicsDropShadowEffect(widget);
     effect->setOffset( QPointF( 1.0, 1.0 ) );
     effect->setBlurRadius( 0 );
     effect->setColor( Qt::black );

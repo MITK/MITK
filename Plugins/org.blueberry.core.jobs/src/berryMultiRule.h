@@ -37,9 +37,9 @@ namespace berry
 class MultiRule: public ISchedulingRule
 {
 
-  bool IsConflicting(ISchedulingRule::Pointer myRule) const;
+  bool IsConflicting(ISchedulingRule::Pointer myRule) const override;
 
-  bool Contains(ISchedulingRule::Pointer rule) const;
+  bool Contains(ISchedulingRule::Pointer rule) const override;
 
 };
 

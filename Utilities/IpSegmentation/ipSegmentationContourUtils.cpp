@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * Input: one contour (start and end point identical). array of floats. [x1 y1 x2 y2 ...]
  * Output: two contours (start and end point not neccessarily identical)
  * cutCoords: two points that define the cut (must not [should not be] be identical)
- *                                                                     
+ *
  *              S.....O
  *            .        .
  *           .           .
@@ -55,7 +55,7 @@ void ipMITKSegmentationSplitContour( float *contour, int sizeContour, float *cut
   part1[2*size1] = contour[2*i];
   part1[2*size1+1] = contour[2*i+1];
   size1++;
-  
+
   do {
     part2[2*size2] = contour[2*i];
     part2[2*size2+1] = contour[2*i+1];
@@ -96,12 +96,12 @@ bool ipMITKSegmentationIsInsideContour( float *contour, int sizeContour, float x
   int i, j;
   bool res = false;
   for ( i=0, j=sizeContour-1;
-        i<sizeContour; 
-        j=i++) 
+        i<sizeContour;
+        j=i++)
   {
     if (
-            (     ((contour[2*i+1]<=y) && (y<contour[2*j+1])) 
-               || ((contour[2*j+1]<=y) && (y<contour[2*i+1]))  ) 
+            (     ((contour[2*i+1]<=y) && (y<contour[2*j+1]))
+               || ((contour[2*j+1]<=y) && (y<contour[2*i+1]))  )
          &&
             (  x < (contour[2*j] - contour[2*i]) * (y - contour[2*i+1]) / (contour[2*j+1] - contour[2*i+1]) + contour[2*i])
        )

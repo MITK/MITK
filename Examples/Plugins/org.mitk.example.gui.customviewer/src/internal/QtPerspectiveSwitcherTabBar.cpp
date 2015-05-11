@@ -38,7 +38,7 @@ struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener
   /**
    * Only listens to perspective activation events.
    */
-  Events::Types GetPerspectiveEventTypes() const
+  Events::Types GetPerspectiveEventTypes() const override
   {
     return Events::ACTIVATED;
   }
@@ -48,7 +48,7 @@ struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener
    */
 // //! [SwitchPerspectiveListenerPerspectiveActivated]
   void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                            const berry::IPerspectiveDescriptor::Pointer& perspective)
+                            const berry::IPerspectiveDescriptor::Pointer& perspective) override
   {
     int index = perspective->GetId() == "org.mitk.example.viewerperspective" ? 0 : 1;
     switcher->setCurrentIndex(index);

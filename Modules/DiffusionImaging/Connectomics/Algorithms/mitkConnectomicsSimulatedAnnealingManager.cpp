@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_math.h"
 
 mitk::ConnectomicsSimulatedAnnealingManager::ConnectomicsSimulatedAnnealingManager()
-: m_Permutation( 0 )
+: m_Permutation( nullptr )
 {
 }
 

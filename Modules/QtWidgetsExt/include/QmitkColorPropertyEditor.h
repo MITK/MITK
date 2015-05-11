@@ -30,12 +30,12 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPopupColorChooser : public QFrame
 
   public:
 
-    QmitkPopupColorChooser(QWidget* parent = 0, unsigned int steps = 16, unsigned int size = 150);
+    QmitkPopupColorChooser(QWidget* parent = nullptr, unsigned int steps = 16, unsigned int size = 150);
     virtual ~QmitkPopupColorChooser();
 
     void setSteps(int);
 
-    virtual void popup(QWidget* parent, const QPoint& point, const mitk::Color* = 0);  /// Call to popup this widget. parent determines popup position
+    virtual void popup(QWidget* parent, const QPoint& point, const mitk::Color* = nullptr);  /// Call to popup this widget. parent determines popup position
 
   signals:
 

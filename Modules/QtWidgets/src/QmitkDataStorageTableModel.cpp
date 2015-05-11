@@ -34,8 +34,8 @@ QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointe
                                                        , mitk::NodePredicateBase* _Predicate
                                                        , QObject* parent )
 : QAbstractTableModel(parent)
-, m_DataStorage(0)
-, m_Predicate(0)
+, m_DataStorage(nullptr)
+, m_Predicate(nullptr)
 , m_BlockEvents(false)
 , m_SortDescending(false)
 {
@@ -46,7 +46,7 @@ QmitkDataStorageTableModel::QmitkDataStorageTableModel(mitk::DataStorage::Pointe
 QmitkDataStorageTableModel::~QmitkDataStorageTableModel()
 {
   // set data storage 0 to remove event listeners
-  this->SetDataStorage(0);
+  this->SetDataStorage(nullptr);
 }
 
 //# Public GETTER
@@ -178,7 +178,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
       // get visible property of mitk::BaseData
       bool visibility = false;
 
-      if(node->GetVisibility(visibility, 0) && role == Qt::CheckStateRole)
+      if(node->GetVisibility(visibility, nullptr) && role == Qt::CheckStateRole)
       {
         data = (visibility ? Qt::Checked : Qt::Unchecked);
       } // node->GetVisibility(visibility, 0) && role == Qt::CheckStateRole
@@ -245,7 +245,7 @@ void QmitkDataStorageTableModel::AddNode( const mitk::DataNode* node )
       return;
 
     // dont add nodes without data (formerly known as helper objects)
-    if(node->GetData() == 0)
+    if(node->GetData() == nullptr)
       return;
 
     // create listener commands to listen to changes in the name or the visibility of the node
@@ -253,7 +253,7 @@ void QmitkDataStorageTableModel::AddNode( const mitk::DataNode* node )
       = itk::MemberCommand<QmitkDataStorageTableModel>::New();
     propertyModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageTableModel::PropertyModified);
 
-    mitk::BaseProperty* tempProperty = 0;
+    mitk::BaseProperty* tempProperty = nullptr;
 
     // add listener for properties
     tempProperty = node->GetProperty("visible");
@@ -283,13 +283,13 @@ void QmitkDataStorageTableModel::RemoveNode( const mitk::DataNode* node )
   if(!m_BlockEvents)
   {
     // find corresponding node
-    std::vector<mitk::DataNode*>::iterator nodeIt
+    auto nodeIt
       = std::find(m_NodeSet.begin(), m_NodeSet.end(), node);
 
     if(nodeIt != m_NodeSet.end())
     {
       // now: remove listeners for name property ...
-      mitk::BaseProperty* tempProperty = 0;
+      mitk::BaseProperty* tempProperty = nullptr;
 
       tempProperty = (*nodeIt)->GetProperty("visible");
       if(tempProperty)
@@ -331,8 +331,8 @@ void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, co
       int column = -1;
 
       std::vector<mitk::DataNode*>::iterator it;
-      mitk::BaseProperty* visibilityProperty = 0;
-      mitk::BaseProperty* nameProperty = 0;
+      mitk::BaseProperty* visibilityProperty = nullptr;
+      mitk::BaseProperty* nameProperty = nullptr;
 
       // search for property that changed and emit datachanged on the corresponding ModelIndex
       for(it=m_NodeSet.begin(); it!=m_NodeSet.end(); it++)
@@ -432,7 +432,7 @@ void QmitkDataStorageTableModel::Reset()
     }
 
     // finally add all nodes to the model
-    for(mitk::DataStorage::SetOfObjects::const_iterator it=_NodeSet->begin(); it!=_NodeSet->end()
+    for(auto it=_NodeSet->begin(); it!=_NodeSet->end()
       ; it++)
     {
       // save node
@@ -504,8 +504,8 @@ bool QmitkDataStorageTableModel::DataNodeCompareFunction::operator()
 
       bool _LeftVisibility = false;
       bool _RightVisibility = false;
-      _Left->GetVisibility(_LeftVisibility, 0);
-      _Right->GetVisibility(_RightVisibility, 0);
+      _Left->GetVisibility(_LeftVisibility, nullptr);
+      _Right->GetVisibility(_RightVisibility, nullptr);
 
       if(m_CompareOperator == Less)
         return (_LeftVisibility < _RightVisibility);

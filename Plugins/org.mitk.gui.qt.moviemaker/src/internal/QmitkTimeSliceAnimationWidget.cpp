@@ -25,7 +25,7 @@ static int GetNumberOfSlices()
 {
   mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
 
-  if (stepper != NULL)
+  if (stepper != nullptr)
     return std::max(1, static_cast<int>(stepper->GetSteps()));
 
   return 1;
@@ -55,7 +55,7 @@ void QmitkTimeSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAn
 {
   m_AnimationItem = dynamic_cast<QmitkTimeSliceAnimationItem*>(sliceAnimationItem);
 
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   const int maximum = GetNumberOfSlices() - 1;
@@ -72,7 +72,7 @@ void QmitkTimeSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAn
 
 void QmitkTimeSliceAnimationWidget::OnFromChanged(double from)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   int intFrom = static_cast<int>(from);
@@ -83,7 +83,7 @@ void QmitkTimeSliceAnimationWidget::OnFromChanged(double from)
 
 void QmitkTimeSliceAnimationWidget::OnToChanged(double to)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   int intTo = static_cast<int>(to);
@@ -94,7 +94,7 @@ void QmitkTimeSliceAnimationWidget::OnToChanged(double to)
 
 void QmitkTimeSliceAnimationWidget::OnReverseChanged(bool reverse)
 {
-  if (m_AnimationItem == NULL)
+  if (m_AnimationItem == nullptr)
     return;
 
   if (m_AnimationItem->GetReverse() != reverse)

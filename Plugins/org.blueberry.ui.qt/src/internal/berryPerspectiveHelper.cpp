@@ -49,14 +49,14 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
   {
     PartPane::Pointer part = draggedObject.Cast<PartPane>();
     if (part->GetContainer().Cast<PartStack>()->GetAppearance() == PresentationFactoryUtil::ROLE_EDITOR)
-      return IDropTarget::Pointer(0);
+      return IDropTarget::Pointer(nullptr);
 
     // Views that haven't been shown yet have no 'control' which causes
     // 'GetWorkbenchWindow' to return 'null' so check explicitly
     if (part->GetPage() != perspHelper->page)
-      return IDropTarget::Pointer(0);
+      return IDropTarget::Pointer(nullptr);
     else if (part->GetWorkbenchWindow() != perspHelper->page->GetWorkbenchWindow())
-      return IDropTarget::Pointer(0);
+      return IDropTarget::Pointer(nullptr);
 
     if (perspHelper->dropTarget == 0)
       perspHelper->dropTarget = new ActualDropTarget(perspHelper, part, dragRectangle);
@@ -67,10 +67,10 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
   {
     PartStack::Pointer stack = draggedObject.Cast<PartStack>();
     if (stack->GetAppearance() == PresentationFactoryUtil::ROLE_EDITOR)
-      return IDropTarget::Pointer(0);
+      return IDropTarget::Pointer(nullptr);
 
     if (stack->GetWorkbenchWindow() != perspHelper->page->GetWorkbenchWindow())
-      return IDropTarget::Pointer(0);
+      return IDropTarget::Pointer(nullptr);
 
     if (perspHelper->dropTarget == 0)
       perspHelper->dropTarget = new ActualDropTarget(perspHelper, stack, dragRectangle);
@@ -84,7 +84,7 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
 void PerspectiveHelper::ActualDropTarget::SetTarget(PartPane::Pointer part,
     const QRect& dragRectangle)
 {
-  this->stack = 0;
+  this->stack = nullptr;
   this->part = part;
   this->dragRectangle = dragRectangle;
 }
@@ -93,7 +93,7 @@ void PerspectiveHelper::ActualDropTarget::SetTarget(PartStack::Pointer stack,
     const QRect& dragRectangle)
 {
   this->stack = stack;
-  this->part = 0;
+  this->part = nullptr;
   this->dragRectangle = dragRectangle;
 }
 
@@ -216,7 +216,7 @@ detachable(false), active(false)
     // doesn't, views cannot be detached.
 
     QWidget* client = workbenchPage->GetClientComposite();
-    if (client == 0)
+    if (client == nullptr)
     {
       // The workbench page is not initialized. I don't think this can happen,
       // but if it does, silently set detachable to false.
@@ -408,7 +408,7 @@ void PerspectiveHelper::AddPart(LayoutPart::Pointer part)
             parentContainer->Replace(containerPlaceholder,
                 container.Cast<LayoutPart>());
           }
-          containerPlaceholder->SetRealContainer(ILayoutContainer::Pointer(0));
+          containerPlaceholder->SetRealContainer(ILayoutContainer::Pointer(nullptr));
         }
 
 //        // reparent part.
@@ -521,7 +521,7 @@ bool PerspectiveHelper::IsPartVisible(IWorkbenchPartReference::Pointer partRef)
 
 bool PerspectiveHelper::WillPartBeVisible(const QString& partId)
 {
-  return this->WillPartBeVisible(partId, 0);
+  return this->WillPartBeVisible(partId, nullptr);
 }
 
 bool PerspectiveHelper::WillPartBeVisible(const QString& partId,
@@ -791,7 +791,7 @@ void PerspectiveHelper::DerefPart(LayoutPart::Pointer part)
       for (ILayoutContainer::ChildrenType::iterator iter = children.begin();
           iter != children.end(); ++iter)
       {
-        if ((*iter)->GetControl() != 0)
+        if ((*iter)->GetControl() != nullptr)
         {
           childVisible++;
         }
@@ -1056,12 +1056,12 @@ void PerspectiveHelper::AddDetachedPart(LayoutPart::Pointer part,
 
 void PerspectiveHelper::DisableAllDrag()
 {
-  DragUtil::RemoveDragTarget(0, dragTarget.data());
+  DragUtil::RemoveDragTarget(nullptr, dragTarget.data());
 }
 
 void PerspectiveHelper::EnableAllDrag()
 {
-  DragUtil::AddDragTarget(0, dragTarget.data());
+  DragUtil::AddDragTarget(nullptr, dragTarget.data());
 }
 
 LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& id)
@@ -1123,7 +1123,7 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& primaryId,
   }
 
   // Not found.
-  return LayoutPart::Pointer(0);
+  return LayoutPart::Pointer(nullptr);
 }
 
 LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& id,
@@ -1176,7 +1176,7 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& id,
   }
 
   //BERRY_INFO << "Returning 0\n";
-  return LayoutPart::Pointer(0);
+  return LayoutPart::Pointer(nullptr);
 }
 
 LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& primaryId,
@@ -1244,12 +1244,12 @@ LayoutPart::Pointer PerspectiveHelper::FindPart(const QString& primaryId,
       }
     }
   }
-  return LayoutPart::Pointer(0);
+  return LayoutPart::Pointer(nullptr);
 }
 
 bool PerspectiveHelper::HasPlaceholder(const QString& id)
 {
-  return this->HasPlaceholder(id, 0);
+  return this->HasPlaceholder(id, nullptr);
 }
 
 bool PerspectiveHelper::HasPlaceholder(const QString& primaryId,
@@ -1395,7 +1395,7 @@ void PerspectiveHelper::ReplacePlaceholderWithPart(LayoutPart::Pointer part)
           {
             parentContainer->Replace(containerPlaceholder, layoutPart);
           }
-          containerPlaceholder->SetRealContainer(ILayoutContainer::Pointer(0));
+          containerPlaceholder->SetRealContainer(ILayoutContainer::Pointer(nullptr));
         }
         container->Replace(placeholders[i], part);
         return;

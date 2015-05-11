@@ -53,9 +53,9 @@ public:
   template<class A>
   static A* GetAdapter(Object* sourceObject)
   {
-    if (sourceObject == NULL)
+    if (sourceObject == nullptr)
     {
-      return NULL;
+      return nullptr;
     }
     if (A* adapter = dynamic_cast<A*>(sourceObject))
     {
@@ -65,27 +65,27 @@ public:
     if (IAdaptable* adaptable = dynamic_cast<IAdaptable*>(sourceObject))
     {
       A* result = adaptable->GetAdapter<A>();
-      if (result != NULL)
+      if (result != nullptr)
       {
         return result;
       }
     }
 
-    if (dynamic_cast<PlatformObject*>(sourceObject) == NULL)
+    if (dynamic_cast<PlatformObject*>(sourceObject) == nullptr)
     {
-      A* result = NULL;
+      A* result = nullptr;
       IAdapterManager* adapterManager = Platform::GetAdapterManager();
       if (adapterManager)
       {
         result = adapterManager->GetAdapter<A>(sourceObject);
       }
-      if (result != NULL)
+      if (result != nullptr)
       {
         return result;
       }
     }
 
-    return NULL;
+    return nullptr;
   }
 
 };

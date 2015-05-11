@@ -139,7 +139,7 @@ mitk::PointSet::DataType::Pointer mitk::PointSet::GetPointSet( int t ) const
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -336,7 +336,7 @@ void mitk::PointSet::InsertPoint( PointIdentifier id, PointType point, PointSpec
   {
     mitk::Point3D indexPoint;
     mitk::BaseGeometry* tempGeometry = this->GetGeometry( t );
-    if (tempGeometry == NULL)
+    if (tempGeometry == nullptr)
     {
       MITK_INFO<< __FILE__ << ", l." << __LINE__ << ": GetGeometry of "<< t <<" returned NULL!" << std::endl;
       return;
@@ -524,7 +524,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
 
       //transfer from world to index coordinates
       mitk::BaseGeometry* geometry = this->GetGeometry( timeStep );
-      if (geometry == NULL)
+      if (geometry == nullptr)
       {
         MITK_INFO<<"GetGeometry returned NULL!\n";
         return;
@@ -633,7 +633,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       PointIdentifier currentID = pointOp->GetIndex();
       /* search for point with this id and point that precedes this one in the data container */
       PointsContainer::STLContainerType points = m_PointSetSeries[timeStep]->GetPoints()->CastToSTLContainer();
-      PointsContainer::STLContainerType::iterator it = points.find(currentID);
+      auto it = points.find(currentID);
       if (it == points.end()) // ID not found
         break;
       if (it == points.begin()) // we are at the first element, there is no previous element
@@ -651,7 +651,7 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       PointIdentifier currentID = pointOp->GetIndex();
       /* search for point with this id and point that succeeds this one in the data container */
       PointsContainer::STLContainerType points = m_PointSetSeries[timeStep]->GetPoints()->CastToSTLContainer();
-      PointsContainer::STLContainerType::iterator it = points.find(currentID);
+      auto it = points.find(currentID);
       if (it == points.end()) // ID not found
         break;
       ++it;
@@ -765,7 +765,7 @@ void mitk::PointSet::PrintSelf( std::ostream& os, itk::Indent indent ) const
 
   os << indent << "Number timesteps: " << m_PointSetSeries.size() << "\n";
   unsigned int i = 0;
-  for (PointSetSeries::const_iterator it = m_PointSetSeries.begin(); it != m_PointSetSeries.end(); ++it)
+  for (auto it = m_PointSetSeries.begin(); it != m_PointSetSeries.end(); ++it)
   {
     os << indent << "Timestep " << i++ << ": \n";
     MeshType::Pointer ps = *it;
@@ -820,7 +820,7 @@ bool mitk::PointSet::PointDataType::operator ==(const mitk::PointSet::PointDataT
 
 bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose )
 {
-  if((leftHandSide == NULL) || (rightHandSide == NULL))
+  if((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ) does not work with NULL pointer input.";
     return false;

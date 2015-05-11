@@ -89,9 +89,9 @@ Q_SIGNALS:
   void printRequested();
 
 protected:
-  virtual void wheelEvent(QWheelEvent *);
-  void mouseReleaseEvent(QMouseEvent *e);
-  void mousePressEvent(QMouseEvent *event);
+  virtual void wheelEvent(QWheelEvent *) override;
+  void mouseReleaseEvent(QMouseEvent *e) override;
+  void mousePressEvent(QMouseEvent *event) override;
 
 private Q_SLOTS:
   void actionChanged();

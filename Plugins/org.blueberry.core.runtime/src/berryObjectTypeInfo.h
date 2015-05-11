@@ -32,7 +32,7 @@ public:
   ObjectTypeInfo();
   ObjectTypeInfo(const Reflection::TypeInfo& typeInfo);
 
-  bool operator==(const Object* other) const;
+  bool operator==(const Object* other) const override;
   bool operator==(const Reflection::TypeInfo& other) const;
 
 };

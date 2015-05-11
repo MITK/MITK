@@ -62,7 +62,7 @@ void EditorSashContainer::ChildRemoved(LayoutPart::Pointer child)
     editorWorkbooks.removeAll(child.Cast<PartStack>());
     if (activeEditorWorkbook == child)
     {
-      this->SetActiveWorkbook(PartStack::Pointer(0), false);
+      this->SetActiveWorkbook(PartStack::Pointer(nullptr), false);
     }
 
     this->UpdateStackButtons();
@@ -105,7 +105,7 @@ QWidget* EditorSashContainer::CreateParent(QWidget* parentWidget)
 
 void EditorSashContainer::DisposeParent()
 {
-  this->parent = 0;
+  this->parent = nullptr;
 }
 
 bool EditorSashContainer::IsActiveWorkbook(PartStack::Pointer workbook)
@@ -339,7 +339,7 @@ bool EditorSashContainer::RestoreState(IMemento::Pointer memento)
                 defaultWorkbook = child.Cast<PartStack>();
                 if (defaultWorkbook->GetItemCount() > 0)
                 {
-                  defaultWorkbook = 0;
+                  defaultWorkbook = nullptr;
                 }
               }
             }
@@ -525,13 +525,13 @@ PartStack::Pointer EditorSashContainer::GetWorkbookFromID(const QString& id)
     }
   }
 
-  return PartStack::Pointer(0);
+  return PartStack::Pointer(nullptr);
 }
 
 void EditorSashContainer::UpdateTabList()
 {
   QWidget* parent = this->GetParent();
-  if (parent != 0)
+  if (parent != nullptr)
   { // parent may be 0 on startup
     PartStack::Pointer wb(this->GetActiveWorkbook());
 //TODO EditorSashContainer update tab list

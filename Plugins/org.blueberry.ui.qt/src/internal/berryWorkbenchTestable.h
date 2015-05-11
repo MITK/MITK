@@ -53,7 +53,7 @@ private:
 
     WorkbenchTestRunnable(TestableObject* testable);
 
-    void run();
+    void run() override;
 
   private:
 
@@ -86,7 +86,7 @@ public:
    * <code>TestableObject</code> method ensures that the workbench
    * has been set.
    */
-  void TestingStarting();
+  void TestingStarting() override;
 
   /**
    * The <code>WorkbenchTestable</code> implementation of this
@@ -94,14 +94,14 @@ public:
    * runs the test in a <code>syncExec</code>, then flushes the
    * event queue again.
    */
-  void RunTest(Poco::Runnable* testRunnable);
+  void RunTest(Poco::Runnable* testRunnable) override;
 
   /**
    * The <code>WorkbenchTestable</code> implementation of this
    * <code>TestableObject</code> method flushes the event queue,
    * then closes the workbench.
    */
-  void TestingFinished();
+  void TestingFinished() override;
 
 private:
 

@@ -41,7 +41,7 @@ class MITKQTWIDGETS_EXPORT QmitkPropertyDelegate : public QStyledItemDelegate
     ///
     /// Creates a new PropertyDelegate.
     ///
-    QmitkPropertyDelegate(QObject *parent = 0);
+    QmitkPropertyDelegate(QObject *parent = nullptr);
 
     ///
     /// Renders a specific property  (overwritten from QItemDelegate)

@@ -47,7 +47,7 @@ DicomSeriesReader
       return LoadDICOMByITK4D<itk::RGBPixel<double> >(imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command ,preLoadedImageBlock);
     default:
       MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();
-      return NULL;
+      return nullptr;
   }
 }
 

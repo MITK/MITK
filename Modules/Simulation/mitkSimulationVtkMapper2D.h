@@ -48,11 +48,11 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    void ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*);
-    vtkProp* GetVtkProp(BaseRenderer* renderer);
+    void ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*) override;
+    vtkProp* GetVtkProp(BaseRenderer* renderer) override;
 
   protected:
-    void GenerateDataForRenderer(BaseRenderer* renderer);
+    void GenerateDataForRenderer(BaseRenderer* renderer) override;
 
   private:
     SimulationVtkMapper2D();

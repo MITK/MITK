@@ -35,9 +35,9 @@ public:
   QmitkDefaultDropTargetListener();
   virtual ~QmitkDefaultDropTargetListener();
 
-  Events::Types GetDropTargetEventTypes() const;
+  Events::Types GetDropTargetEventTypes() const override;
 
-  void DropEvent(QDropEvent* event);
+  void DropEvent(QDropEvent* event) override;
 
 private:
 

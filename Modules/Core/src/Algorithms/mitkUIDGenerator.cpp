@@ -46,7 +46,7 @@ std::string mitk::UIDGenerator::GetUID()
 {
   std::ostringstream s;
   s << m_Prefix;
-  time_t tt = time(0);
+  time_t tt = time(nullptr);
   tm* t = gmtime(&tt);
 
   if (t)

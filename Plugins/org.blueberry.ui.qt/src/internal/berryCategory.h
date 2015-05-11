@@ -168,12 +168,12 @@ public:
   /*
    * @see IPluginContribution#GetLocalId()
    */
-  QString GetLocalId() const;
+  QString GetLocalId() const override;
 
   /*
    * @see IPluginContribution#GetPluginId()
    */
-  QString GetPluginId() const;
+  QString GetPluginId() const override;
 
   /**
    * Clear all elements from this category.
@@ -186,7 +186,7 @@ protected:
   /* (non-Javadoc)
    * Method declared on IAdaptable.
    */
-  Object* GetAdapter(const QString& adapter) const;
+  Object* GetAdapter(const QString& adapter) const override;
 };
 
 } // namespace berry

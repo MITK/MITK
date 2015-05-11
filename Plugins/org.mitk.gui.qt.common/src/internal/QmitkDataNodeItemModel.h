@@ -27,7 +27,7 @@ class QmitkDataNodeItemModel : public QStandardItemModel
 
 public:
 
-  QmitkDataNodeItemModel(QObject* parent = 0);
+  QmitkDataNodeItemModel(QObject* parent = nullptr);
 
   void AddDataNode(mitk::DataNode::Pointer node);
   void AddDataNodes(const QList<mitk::DataNode::Pointer>& nodes);

@@ -41,11 +41,11 @@ bool mitk::NodePredicateOr::CheckNode(const DataNode* node) const
   if (m_ChildPredicates.empty())
     throw std::invalid_argument("NodePredicateOr: no child predicates available");
 
-  if (node == NULL)
+  if (node == nullptr)
     throw std::invalid_argument("NodePredicateOr: invalid node");
 
   /* return the disjunction of the child predicate. If any predicate returns true, we return true too. Return false only if all child predicates return false */
-  for (ChildPredicates::const_iterator it = m_ChildPredicates.begin(); it != m_ChildPredicates.end(); ++it)
+  for (auto it = m_ChildPredicates.begin(); it != m_ChildPredicates.end(); ++it)
     if ((*it)->CheckNode(node) == true)
       return true;
   return false; // none of the childs was true, so return false

@@ -27,7 +27,7 @@ namespace mitk
   template <class TTransformType>
   void TransferVtkMatrixToItkTransform(const vtkMatrix4x4* vtkmatrix, TTransformType * itkTransform)
   {
-  if(itkTransform==NULL)
+  if(itkTransform==nullptr)
     return;
 
   typename TTransformType::MatrixType::InternalMatrixType& vnlMatrix =
@@ -111,7 +111,7 @@ namespace mitk
   template <class TTransformType>
   void GetWorldToItkPhysicalTransform(const mitk::BaseGeometry * geometry, TTransformType* itkTransform)
   {
-    if(itkTransform==NULL)
+    if(itkTransform==nullptr)
       return;
 
     // get rotation matrix and offset from Geometry and transfer in TTransformType types

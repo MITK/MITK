@@ -126,7 +126,7 @@ void WorkbenchWindowAdvisor::CreateWindowContents(Shell::Pointer shell)
 
 QWidget* WorkbenchWindowAdvisor::CreateEmptyWindowContents(QWidget*  /*parent*/)
 {
-  return 0;
+  return nullptr;
 }
 
 bool WorkbenchWindowAdvisor::SaveState(IMemento::Pointer  /*memento*/)

@@ -30,7 +30,7 @@ class HelpEditorInputFactory : public QObject, public IElementFactory
 
 public:
 
-  IAdaptable* CreateElement(const SmartPointer<IMemento>& memento);
+  IAdaptable* CreateElement(const SmartPointer<IMemento>& memento) override;
 
   static QString GetFactoryId();
 

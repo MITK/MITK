@@ -31,7 +31,7 @@ int LayoutTree::maxCacheHits = 0;
 int LayoutTree::maxCacheMisses = 0;
 
 LayoutTree::LayoutTree(LayoutPart::Pointer part)
- : parent(0),
+ : parent(nullptr),
  cachedMinimumWidthHint(Constants::DEFAULT),
  cachedMinimumWidth(Constants::DEFAULT),
  cachedMinimumHeightHint(Constants::DEFAULT),
@@ -68,14 +68,14 @@ LayoutTree::Pointer LayoutTree::Find(LayoutPart::Pointer child)
 {
   if (part != child)
   {
-    return LayoutTree::Pointer(0);
+    return LayoutTree::Pointer(nullptr);
   }
   return LayoutTree::Pointer(this);
 }
 
 void LayoutTree::FindSashes(PartPane::Sashes sashes)
 {
-  if (this->GetParent() == 0)
+  if (this->GetParent() == nullptr)
   {
     return;
   }
@@ -89,7 +89,7 @@ LayoutPart::Pointer LayoutTree::FindBottomRight()
 
 LayoutTreeNode::Pointer LayoutTree::FindSash(LayoutPartSash::Pointer  /*sash*/)
 {
-  return LayoutTreeNode::Pointer(0);
+  return LayoutTreeNode::Pointer(nullptr);
 }
 
 QRect LayoutTree::GetBounds()
@@ -345,7 +345,7 @@ void LayoutTree::FlushCache()
 {
   this->FlushNode();
 
-  if (parent != 0)
+  if (parent != nullptr)
   {
     parent->FlushCache();
   }
@@ -385,7 +385,7 @@ LayoutTree::Pointer LayoutTree::Insert(LayoutPart::Pointer child, bool left,
     LayoutTreeNode* oldParent = relativeChild->GetParent();
     node->SetChild(left, child);
     node->SetChild(!left, relativeChild);
-    if (oldParent == 0)
+    if (oldParent == nullptr)
     {
       //It was the root. Return a new root.
       return node;
@@ -421,9 +421,9 @@ LayoutTree::Pointer LayoutTree::Remove(LayoutPart::Pointer child)
   if (oldParent == 0)
   {
     //It was the root and the only child of this tree
-    return LayoutTree::Pointer(0);
+    return LayoutTree::Pointer(nullptr);
   }
-  if (oldParent->GetParent() == 0)
+  if (oldParent->GetParent() == nullptr)
   {
     return oldParent->Remove(tree);
   }

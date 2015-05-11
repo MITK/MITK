@@ -50,15 +50,15 @@ public:
 
   ObjectBrowserView();
 
-  void Init(IViewSite::Pointer site, IMemento::Pointer memento);
+  void Init(IViewSite::Pointer site, IMemento::Pointer memento) override;
 
   /*!
    * \brief Gives focus to a specific control in the view
    * This method is called from the framework when the view is activated.
    */
-  void SetFocus();
+  void SetFocus() override;
 
-  void SaveState(IMemento::Pointer memento);
+  void SaveState(IMemento::Pointer memento) override;
 
 protected slots:
 
@@ -74,7 +74,7 @@ protected:
    * This method is called from the framework. The parent widget has no layout, so
    * you should set one adapted to your needs.
    */
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
   void RestoreGuiState(IMemento::Pointer memento);
 

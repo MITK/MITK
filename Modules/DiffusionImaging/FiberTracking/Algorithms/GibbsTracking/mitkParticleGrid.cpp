@@ -46,7 +46,7 @@ ParticleGrid::ParticleGrid(ItkFloatImageType* image, float particleLength, int c
         throw std::bad_alloc();
 
     m_Particles.resize(m_ContainerCapacity);        // allocate and initialize particles
-    m_Grid.resize(gridSize, NULL);   // allocate and initialize particle grid
+    m_Grid.resize(gridSize, nullptr);   // allocate and initialize particle grid
     m_OccupationCount.resize(numCells, 0);          // allocate and initialize occupation counter array
     m_NeighbourTracker.cellidx.resize(8, 0);        // allocate and initialize neighbour tracker
     m_NeighbourTracker.cellidx_c.resize(8, 0);
@@ -78,7 +78,7 @@ void ParticleGrid::ResetGrid()
     int numCells = m_GridSize[0]*m_GridSize[1]*m_GridSize[2];   // number of grid cells
 
     m_Particles.resize(m_ContainerCapacity);        // allocate and initialize particles
-    m_Grid.resize(numCells*m_CellCapacity, NULL);   // allocate and initialize particle grid
+    m_Grid.resize(numCells*m_CellCapacity, nullptr);   // allocate and initialize particle grid
     m_OccupationCount.resize(numCells, 0);          // allocate and initialize occupation counter array
     m_NeighbourTracker.cellidx.resize(8, 0);        // allocate and initialize neighbour tracker
     m_NeighbourTracker.cellidx_c.resize(8, 0);
@@ -115,7 +115,7 @@ Particle* ParticleGrid::GetParticle(int ID)
 {
     if (ID!=-1)
         return &m_Particles[ID];
-    return NULL;
+    return nullptr;
 }
 
 
@@ -124,24 +124,24 @@ Particle* ParticleGrid::NewParticle(vnl_vector_fixed<float, 3> R)
     if (m_NumParticles >= m_ContainerCapacity)
     {
         if (!ReallocateGrid())
-            return NULL;
+            return nullptr;
     }
 
     int xint = int(R[0]*m_GridScale[0]);
     if (xint < 0)
-        return NULL;
+        return nullptr;
     if (xint >= m_GridSize[0])
-        return NULL;
+        return nullptr;
     int yint = int(R[1]*m_GridScale[1]);
     if (yint < 0)
-        return NULL;
+        return nullptr;
     if (yint >= m_GridSize[1])
-        return NULL;
+        return nullptr;
     int zint = int(R[2]*m_GridScale[2]);
     if (zint < 0)
-        return NULL;
+        return nullptr;
     if (zint >= m_GridSize[2])
-        return NULL;
+        return nullptr;
 
     int idx = xint + m_GridSize[0]*(yint + m_GridSize[1]*zint);
     if (m_OccupationCount[idx] < m_CellCapacity)
@@ -159,7 +159,7 @@ Particle* ParticleGrid::NewParticle(vnl_vector_fixed<float, 3> R)
     else
     {
         m_NumCellOverflows++;
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -228,7 +228,7 @@ void ParticleGrid::RemoveParticle(int k)
     if (idx < m_OccupationCount[cellIdx]-1)
     {
         m_Grid[gridIndex] = m_Grid[cellIdx*m_CellCapacity+m_OccupationCount[cellIdx]-1];
-        m_Grid[cellIdx*m_CellCapacity+m_OccupationCount[cellIdx]-1] = NULL;
+        m_Grid[cellIdx*m_CellCapacity+m_OccupationCount[cellIdx]-1] = nullptr;
         m_Grid[gridIndex]->gridindex = gridIndex;
     }
     m_OccupationCount[cellIdx]--;
@@ -325,7 +325,7 @@ Particle* ParticleGrid::GetNextNeighbor()
         {
             m_NeighbourTracker.cellcnt++;
             if (m_NeighbourTracker.cellcnt >= 8)
-                return 0;
+                return nullptr;
             if (m_OccupationCount[m_NeighbourTracker.cellidx[m_NeighbourTracker.cellcnt]] > 0)
                 break;
         }
@@ -366,7 +366,7 @@ void ParticleGrid::DestroyConnection(Particle *P1,int ep1, Particle *P2, int ep2
 void ParticleGrid::DestroyConnection(Particle *P1,int ep1)
 {
 
-    Particle *P2 = 0;
+    Particle *P2 = nullptr;
     if (ep1 == 1)
     {
         P2 = &m_Particles[P1->pID];

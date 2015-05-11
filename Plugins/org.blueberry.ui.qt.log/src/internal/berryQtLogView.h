@@ -31,7 +31,7 @@ class QtLogView : public QWidget
     Q_OBJECT
 
 public:
-    QtLogView(QWidget *parent = 0);
+    QtLogView(QWidget *parent = nullptr);
     ~QtLogView();
     QtPlatformLogModel *model;
     QSortFilterProxyModel *filterModel;
@@ -39,7 +39,7 @@ public:
 private:
     Ui::QtLogViewClass ui;
 
-    void showEvent ( QShowEvent * event );
+    void showEvent ( QShowEvent * event ) override;
 
 protected slots:
     void slotFilterChange( const QString& );

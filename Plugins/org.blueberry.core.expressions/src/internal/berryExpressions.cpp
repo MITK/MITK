@@ -44,7 +44,7 @@ namespace berry
   Expressions::IsInstanceOf(const Object* element, const QString& type)
   {
     // null isn't an instanceof of anything.
-    if (element == 0)
+    if (element == nullptr)
       return false;
 
     return IsSubtype(element->GetTypeInfo(), type);

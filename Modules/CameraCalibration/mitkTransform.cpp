@@ -305,7 +305,7 @@ namespace mitk
 
   void Transform::SetNavigationData( const mitk::NavigationData* naviData )
   {
-    endoAssert( naviData != 0 );
+    endoAssert( naviData != nullptr );
     m_NavData->Graft( naviData );
     this->Modified();
   }

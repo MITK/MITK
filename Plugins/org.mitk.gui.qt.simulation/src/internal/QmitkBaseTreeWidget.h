@@ -40,7 +40,7 @@ class QmitkBaseTreeWidget : public QTreeWidget
 public:
   typedef sofa::core::objectmodel::Base Base;
 
-  explicit QmitkBaseTreeWidget(QWidget* parent = NULL);
+  explicit QmitkBaseTreeWidget(QWidget* parent = nullptr);
   ~QmitkBaseTreeWidget();
 
   // QTreeWidget, QTreeView, and QAbstractItemView Interfaces /////////////////

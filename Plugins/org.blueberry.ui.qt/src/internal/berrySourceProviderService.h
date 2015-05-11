@@ -59,11 +59,11 @@ public:
 
   SourceProviderService(IServiceLocator* locator);
 
-  void Dispose();
+  void Dispose() override;
 
-  SmartPointer<ISourceProvider> GetSourceProvider(const QString& sourceName) const;
+  SmartPointer<ISourceProvider> GetSourceProvider(const QString& sourceName) const override;
 
-  QList<SmartPointer<ISourceProvider> > GetSourceProviders() const;
+  QList<SmartPointer<ISourceProvider> > GetSourceProviders() const override;
 
   void RegisterProvider(const SmartPointer<ISourceProvider>& sourceProvider);
 

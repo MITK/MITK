@@ -225,8 +225,8 @@ public:
 
   void tearDown() override
   {
-    aDummyGeometry = NULL;
-    anotherDummyGeometry = NULL;
+    aDummyGeometry = nullptr;
+    anotherDummyGeometry = nullptr;
   }
 
   // Test functions
@@ -497,7 +497,7 @@ public:
 
   void Equal_InputIsNull_ReturnsFalse()
   {
-    DummyTestClass::Pointer geometryNull = NULL;
+    DummyTestClass::Pointer geometryNull = nullptr;
     CPPUNIT_ASSERT_THROW( MITK_ASSERT_EQUAL(geometryNull,anotherDummyGeometry,"Input is null") , mitk::Exception );
   }
 
@@ -860,12 +860,12 @@ public:
     DummyTestClass::Pointer newDummy = DummyTestClass::New();
 
     //Test operation Nothing
-    mitk::Operation* opN = new mitk::Operation(mitk::OpNOTHING);
+    auto  opN = new mitk::Operation(mitk::OpNOTHING);
     dummy->ExecuteOperation(opN);
     MITK_ASSERT_EQUAL(dummy,newDummy,"Dummy execute operation 1");
 
     //Test operation Move
-    mitk::PointOperation* opP = new mitk::PointOperation(mitk::OpMOVE,anotherPoint);
+    auto  opP = new mitk::PointOperation(mitk::OpMOVE,anotherPoint);
     dummy->ExecuteOperation(opP);
     CPPUNIT_ASSERT(mitk::Equal(anotherPoint,dummy->GetOrigin()));
     newDummy->SetOrigin(anotherPoint);
@@ -877,7 +877,7 @@ public:
     spacing[1]=anotherSpacing[1]-1.;
     spacing[2]=anotherSpacing[2]-1.;
 
-    mitk::PointOperation* opS = new mitk::PointOperation(mitk::OpSCALE,spacing);
+    auto  opS = new mitk::PointOperation(mitk::OpSCALE,spacing);
     dummy->ExecuteOperation(opS);
     CPPUNIT_ASSERT(mitk::Equal(anotherSpacing,dummy->GetSpacing()));
     newDummy->SetSpacing(anotherSpacing);
@@ -891,7 +891,7 @@ public:
     double angle = 35.0;
     mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
     mitk::Point3D center = dummy->GetCenter();
-    mitk::RotationOperation* opR = new mitk::RotationOperation( mitk::OpROTATE, center, rotationVector, angle );
+    auto  opR = new mitk::RotationOperation( mitk::OpROTATE, center, rotationVector, angle );
     dummy->ExecuteOperation(opR);
 
     mitk::Matrix3D rotation;

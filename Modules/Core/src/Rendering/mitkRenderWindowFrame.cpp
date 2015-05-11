@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::RenderWindowFrame::RenderWindowFrame()
 {
-  m_RenderWindow           = NULL;
+  m_RenderWindow           = nullptr;
   m_RectangleRenderer      = vtkSmartPointer<vtkRenderer>::New();
 
   m_IsEnabled         = false;
@@ -31,7 +31,7 @@ mitk::RenderWindowFrame::RenderWindowFrame()
 
 mitk::RenderWindowFrame::~RenderWindowFrame()
 {
-  if ( m_RenderWindow != NULL )
+  if ( m_RenderWindow != nullptr )
     if ( this->IsEnabled() )
       this->Disable();
 }

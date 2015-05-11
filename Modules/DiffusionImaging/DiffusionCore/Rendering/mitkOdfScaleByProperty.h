@@ -96,7 +96,7 @@ class MITKDIFFUSIONCORE_EXPORT OdfScaleByPropertySerializer : public Enumeration
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
       const char* sa( element->Attribute("value") );
       std::string s(sa?sa:"");
       OdfScaleByProperty::Pointer property = OdfScaleByProperty::New();

@@ -40,10 +40,10 @@ vtkStandardNewMacro(vtkXMLShader);
 vtkCxxSetObjectMacro(vtkXMLShader, SourceLibraryElement, vtkXMLDataElement);
 //-----------------------------------------------------------------------------
 vtkXMLShader::vtkXMLShader()
-  : Code(NULL),
-    RootElement(NULL),
-    SourceLibraryElement(NULL),
-    Args(NULL)
+  : Code(nullptr),
+    RootElement(nullptr),
+    SourceLibraryElement(nullptr),
+    Args(nullptr)
 {
 }
 
@@ -53,10 +53,10 @@ vtkXMLShader::~vtkXMLShader()
   if (this->RootElement)
     {
     this->RootElement->UnRegister(this);
-    this->RootElement = 0;
+    this->RootElement = nullptr;
     }
-  this->SetSourceLibraryElement(0);
-  this->SetCode(0);
+  this->SetSourceLibraryElement(nullptr);
+  this->SetCode(nullptr);
   this->CleanupArgs();
 }
 
@@ -64,8 +64,8 @@ vtkXMLShader::~vtkXMLShader()
 void vtkXMLShader::SetRootElement(vtkXMLDataElement* root)
 {
   vtkSetObjectBodyMacro(RootElement, vtkXMLDataElement, root);
-  this->SetCode(0);
-  this->SetSourceLibraryElement(0); // release the SourceLibrary element.
+  this->SetCode(nullptr);
+  this->SetSourceLibraryElement(nullptr); // release the SourceLibrary element.
 }
 
 //-----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ char* vtkXMLShader::LocateFile(const char* filename)
 {
   if(!filename)
     {
-    return NULL;
+    return nullptr;
     }
 
   // if filename is absolute path, return the same.
@@ -115,7 +115,7 @@ char* vtkXMLShader::LocateFile(const char* filename)
       return vtksys::SystemTools::DuplicateString(path.c_str());
       }
     }
-  return NULL;
+  return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -152,7 +152,7 @@ int vtkXMLShader::GetStyle()
   if(this->RootElement)
     {
     const char *loc=this->RootElement->GetAttribute("style");
-    if(loc==0)
+    if(loc==nullptr)
       {
       // fine. this attribute is optional.
       }
@@ -183,13 +183,13 @@ int vtkXMLShader::GetStyle()
 //-----------------------------------------------------------------------------
 const char* vtkXMLShader::GetName()
 {
-  return (this->RootElement)? this->RootElement->GetAttribute("name") : 0;
+  return (this->RootElement)? this->RootElement->GetAttribute("name") : nullptr;
 }
 
 //-----------------------------------------------------------------------------
 const char* vtkXMLShader::GetEntry()
 {
-  return (this->RootElement)? this->RootElement->GetAttribute("entry") : 0;
+  return (this->RootElement)? this->RootElement->GetAttribute("entry") : nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -198,7 +198,7 @@ const char** vtkXMLShader::GetArgs()
   this->CleanupArgs();
   if (!this->RootElement || !this->RootElement->GetAttribute("args"))
     {
-    return 0;
+    return nullptr;
     }
 
   std::vector<std::string> args;
@@ -208,14 +208,14 @@ const char** vtkXMLShader::GetArgs()
   int size = static_cast<int>(args.size());
   if (size == 0)
     {
-    return 0;
+    return nullptr;
     }
   this->Args = new char*[size+1];
   for (i=0; i < size; i++)
     {
     this->Args[i] = vtksys::SystemTools::DuplicateString(args[i].c_str());
     }
-  this->Args[size] = 0;
+  this->Args[size] = nullptr;
   return const_cast<const char**>(this->Args);
 }
 
@@ -238,7 +238,7 @@ void vtkXMLShader::CleanupArgs()
       a++;
       }
     delete [] this->Args;
-    this->Args = 0;
+    this->Args = nullptr;
     }
 }
 

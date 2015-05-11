@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 
 QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage()
-: m_MainControl(0)
+: m_MainControl(nullptr)
 {
 
 }
@@ -51,7 +51,7 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
   m_GlobalReinitOnNodeAdded = new QCheckBox;
   m_UseSurfaceDecimation = new QCheckBox;
 
-  QFormLayout *formLayout = new QFormLayout;
+  auto  formLayout = new QFormLayout;
   formLayout->addRow("&Single click property editing:", m_EnableSingleEditing);
   formLayout->addRow("&Place new nodes on top:", m_PlaceNewNodesOnTop);
   formLayout->addRow("&Show helper objects:", m_ShowHelperObjects);

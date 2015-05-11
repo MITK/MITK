@@ -51,7 +51,7 @@ public:
     itkCloneMacro(Self)
     itkTypeMacro( FiberCurvatureFilter, ProcessObject )
 
-    virtual void Update(){
+    virtual void Update() override{
         this->GenerateData();
     }
 
@@ -63,7 +63,7 @@ public:
 
 protected:
 
-    void GenerateData();
+    void GenerateData() override;
 
     FiberCurvatureFilter();
     virtual ~FiberCurvatureFilter();

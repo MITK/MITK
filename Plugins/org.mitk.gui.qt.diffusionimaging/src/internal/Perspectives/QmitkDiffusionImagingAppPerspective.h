@@ -30,7 +30,7 @@ public:
   QmitkDiffusionImagingAppPerspective() {}
   ~QmitkDiffusionImagingAppPerspective() {}
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
 #endif /* QMITKDIFFUSIONIMAGINGAPPPERSPECTIVE_H_ */

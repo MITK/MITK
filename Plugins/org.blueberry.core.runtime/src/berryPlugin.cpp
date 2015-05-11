@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 Plugin::Plugin()
-  : m_Context(NULL)
+  : m_Context(nullptr)
 {
 }
 
@@ -31,7 +31,7 @@ void Plugin::start(ctkPluginContext* context)
 
 void Plugin::stop(ctkPluginContext* /*context*/)
 {
-  m_Context = NULL;
+  m_Context = nullptr;
 }
 
 QSharedPointer<ctkPlugin> Plugin::GetPlugin() const

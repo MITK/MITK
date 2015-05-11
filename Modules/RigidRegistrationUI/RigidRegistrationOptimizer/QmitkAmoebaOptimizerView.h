@@ -36,7 +36,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkAmoebaOptimizerView : public QmitkRigi
 
 public:
 
-  QmitkAmoebaOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkAmoebaOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkAmoebaOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

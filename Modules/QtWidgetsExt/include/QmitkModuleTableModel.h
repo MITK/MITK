@@ -34,7 +34,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkModuleTableModel : public QAbstractTableModel
 {
 public:
 
-  QmitkModuleTableModel(QObject* parent = 0, us::ModuleContext* mc = 0);
+  QmitkModuleTableModel(QObject* parent = nullptr, us::ModuleContext* mc = nullptr);
   ~QmitkModuleTableModel();
 
 protected:

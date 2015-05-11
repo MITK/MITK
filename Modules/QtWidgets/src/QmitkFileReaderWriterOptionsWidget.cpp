@@ -95,10 +95,9 @@ QmitkFileReaderWriterOptionsWidget::QmitkFileReaderWriterOptionsWidget(const Opt
 {
   Options filteredOptions = options;
   std::map<std::string, std::string> optionToDefaultValue;
-  for(Options::const_iterator iter = options.begin(), iterEnd = options.end();
-      iter != iterEnd; ++iter)
+  for(const auto & option : options)
   {
-    const std::string& name = iter->first;
+    const std::string& name = option.first;
     if (name.size() > 4 && name.substr(name.size() - 4) == "enum")
     {
       filteredOptions.erase(name);
@@ -109,11 +108,11 @@ QmitkFileReaderWriterOptionsWidget::QmitkFileReaderWriterOptionsWidget(const Opt
       {
         optionToDefaultValue[nameWithoutEnum] = value.ToString();
       }
-      filteredOptions[nameWithoutEnum] = iter->second;
+      filteredOptions[nameWithoutEnum] = option.second;
     }
   }
 
-  QFormLayout* formLayout = new QFormLayout();
+  auto  formLayout = new QFormLayout();
   for(Options::const_iterator iter = filteredOptions.begin(), iterEnd = filteredOptions.end();
       iter != iterEnd; ++iter)
   {
@@ -271,7 +270,7 @@ QmitkAnyVectorWidget::QmitkAnyVectorWidget(const std::string& name, const us::An
   const std::vector<std::string>& entries = us::ref_any_cast<std::vector<std::string> >(any);
   int index = 0;
   int defaultIndex = 0;
-  for (std::vector<std::string>::const_iterator iter = entries.begin(), iterEnd = entries.end();
+  for (auto iter = entries.begin(), iterEnd = entries.end();
        iter != iterEnd; ++iter, ++index)
   {
     QString item = QString::fromStdString(*iter);

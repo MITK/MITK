@@ -36,7 +36,7 @@ void PartPlaceholder::CreateControl(QWidget*  /*parent*/)
 
 QWidget* PartPlaceholder::GetControl()
 {
-  return 0;
+  return nullptr;
 }
 
 bool PartPlaceholder::HasWildCard()

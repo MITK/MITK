@@ -43,26 +43,26 @@ namespace berry {
 
 HelpSearchView::HelpSearchView()
   : m_ZoomCount(0)
-  , m_Parent(0)
+  , m_Parent(nullptr)
   , m_SearchEngine(HelpPluginActivator::getInstance()->getQHelpEngine().searchEngine())
-  , m_ResultWidget(0)
-  , m_QueryWidget(0)
+  , m_ResultWidget(nullptr)
+  , m_QueryWidget(nullptr)
 {
 }
 
 HelpSearchView::~HelpSearchView()
 {
   // prevent deletion of the widget
-  m_ResultWidget->setParent(0);
+  m_ResultWidget->setParent(nullptr);
 }
 
 void HelpSearchView::CreateQtPartControl(QWidget* parent)
 {
-  if (m_ResultWidget == 0)
+  if (m_ResultWidget == nullptr)
   {
     m_Parent = parent;
 
-    QVBoxLayout* vLayout = new QVBoxLayout(parent);
+    auto   vLayout = new QVBoxLayout(parent);
 
     // This will be lead to strange behavior when using multiple instances of this view
     // because the QHelpSearchResultWidget instance is shared. The new view will
@@ -220,7 +220,7 @@ void HelpSearchView::showContextMenu(const QPoint& point)
     if (!cursor.isNull() && cursor.hasSelection())
     {
       QString selectedText = cursor.selectedText();
-      QMimeData *data = new QMimeData();
+      auto  data = new QMimeData();
       data->setText(selectedText);
       QApplication::clipboard()->setMimeData(data);
     }

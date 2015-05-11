@@ -52,28 +52,28 @@ public:
    *
    * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntroCount()
    */
-  int GetIntroCount() const;
+  int GetIntroCount() const override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntros()
    */
-  QList<IIntroDescriptor::Pointer> GetIntros() const;
+  QList<IIntroDescriptor::Pointer> GetIntros() const override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntroForProduct(java.lang.String)
    */
-  IIntroDescriptor::Pointer GetIntroForProduct(const QString& targetProductId) const;
+  IIntroDescriptor::Pointer GetIntroForProduct(const QString& targetProductId) const override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntro(java.lang.String)
    */
-  IIntroDescriptor::Pointer GetIntro(const QString& id) const;
+  IIntroDescriptor::Pointer GetIntro(const QString& id) const override;
 
 };
 

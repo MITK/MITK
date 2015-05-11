@@ -46,7 +46,7 @@ int testExpectedIndexBoundingBox(mitk::BaseGeometry* geometry, TScalarType expec
 template <typename TScalarType>
 int testExpectedAxisParallelBoundingBox(mitk::BaseGeometry* geometry, TScalarType expectedAxisParallelBounds[6])
 {
-  mitk::BoundingBox::Pointer bb = geometry->CalculateBoundingBoxRelativeToTransform(NULL);
+  mitk::BoundingBox::Pointer bb = geometry->CalculateBoundingBoxRelativeToTransform(nullptr);
   mitk::BoundingBox::BoundsArrayType bounds = bb->GetBounds();
 
   int i;
@@ -66,8 +66,8 @@ int testSurfaceBoundingBoxConsistency(mitk::Surface* surface, bool expectIdentit
 {
   int result;
   std::cout << "  Testing surface contents: ";
-  if ((surface ==  NULL )
-    || (surface->GetVtkPolyData() == NULL)
+  if ((surface ==  nullptr )
+    || (surface->GetVtkPolyData() == nullptr)
     || (surface->GetVtkPolyData()->GetNumberOfPoints() == 0 )) {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

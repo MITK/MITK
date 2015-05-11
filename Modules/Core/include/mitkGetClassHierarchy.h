@@ -34,7 +34,7 @@ class HasMethodGetStaticNameOfClass
   template<typename U> static Small Test(SFINAE<&U::GetStaticNameOfClass>*);
   template<typename U> static Big Test(...);
 public:
-  enum { value = sizeof(Test<T>(NULL)) == sizeof(Small) };
+  enum { value = sizeof(Test<T>(nullptr)) == sizeof(Small) };
 };
 
 template<typename T, bool>
@@ -61,7 +61,7 @@ class HasTypeSuperclass
   template<typename U> static Small Test(typename U::Superclass*);
   template<typename U> static Big Test(...);
 public:
-  enum { value = sizeof(Test<T>(NULL)) == sizeof(Small) };
+  enum { value = sizeof(Test<T>(nullptr)) == sizeof(Small) };
 };
 
 template<typename T, bool>

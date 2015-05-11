@@ -61,7 +61,7 @@ HandlerProxy::HandlerProxy(const QString commandId,
   , evaluationService(evaluationService)
   , proxyEnabled(false)
   , commandId(commandId)
-  , loadException(NULL)
+  , loadException(nullptr)
 {
   this->Register();
   if (configurationElement.IsNull())
@@ -76,7 +76,7 @@ HandlerProxy::HandlerProxy(const QString commandId,
         "The attribute containing the handler class must be known");
   }
 
-  if (enabledWhenExpression.IsNotNull() && evaluationService == NULL)
+  if (enabledWhenExpression.IsNotNull() && evaluationService == nullptr)
   {
     throw ctkInvalidArgumentException(
         "We must have a handler service and evaluation service to support the enabledWhen expression");
@@ -111,7 +111,7 @@ void HandlerProxy::UpdateStaleCEs(const QList<SmartPointer<IConfigurationElement
 void HandlerProxy::SetEnabled(const Object::Pointer& evaluationContext)
 {
   IEvaluationContext* const context = dynamic_cast<IEvaluationContext*>(evaluationContext.GetPointer());
-  if (context == NULL)
+  if (context == nullptr)
   {
     return;
   }
@@ -139,15 +139,15 @@ void HandlerProxy::Dispose()
   {
     handler->RemoveHandlerListener(GetHandlerListener());
     handler->Dispose();
-    handler = 0;
+    handler = nullptr;
   }
   if (evaluationService && enablementRef)
   {
     evaluationService->RemoveEvaluationListener(enablementRef);
   }
-  enablementRef = 0;
+  enablementRef = nullptr;
   delete loadException;
-  loadException = NULL;
+  loadException = nullptr;
 }
 
 Object::Pointer HandlerProxy::Execute(const SmartPointer<const ExecutionEvent>& event)
@@ -157,18 +157,18 @@ Object::Pointer HandlerProxy::Execute(const SmartPointer<const ExecutionEvent>& 
     if (!IsEnabled())
     {
       Shell::Pointer shell = Util::GetShellToParentOn();
-      QWidget* parent = NULL;
+      QWidget* parent = nullptr;
       if (shell.IsNotNull()) parent = shell->GetControl();
       QMessageBox::information(parent, "Information", "The chosen operation is not enabled.");
-      return Object::Pointer(0);
+      return Object::Pointer(nullptr);
     }
     return handler->Execute(event);
   }
 
-  if(loadException != NULL)
+  if(loadException != nullptr)
     throw ExecutionException("Exception occured when loading the handler", *loadException);
 
-  return Object::Pointer(0);
+  return Object::Pointer(nullptr);
 }
 
 bool HandlerProxy::IsEnabled() const
@@ -333,7 +333,7 @@ bool HandlerProxy::LoadHandler() const
         if (handler.IsNotNull())
         {
           handler->AddHandlerListener(GetHandlerListener());
-          self->SetEnabled(evaluationService == NULL ? IEvaluationContext::Pointer(0) : evaluationService->GetCurrentState());
+          self->SetEnabled(evaluationService == nullptr ? IEvaluationContext::Pointer(nullptr) : evaluationService->GetCurrentState());
           self->RefreshElements();
           return true;
         }
@@ -343,7 +343,7 @@ bool HandlerProxy::LoadHandler() const
           IStatus::Pointer status(
                 new Status(IStatus::ERROR_TYPE, PlatformUI::PLUGIN_ID(), 0, message, BERRY_STATUS_LOC));
           WorkbenchPlugin::Log(message, status);
-          configurationElement = 0;
+          configurationElement = nullptr;
           loadException = new ctkException("Class cast exception");
         }
       }
@@ -355,7 +355,7 @@ bool HandlerProxy::LoadHandler() const
       IStatus::Pointer status(
             new Status(IStatus::ERROR_TYPE, PlatformUI::PLUGIN_ID(), 0, message, e, BERRY_STATUS_LOC));
       WorkbenchPlugin::Log(message, status);
-      configurationElement = 0;
+      configurationElement = nullptr;
       loadException = e.clone();
     }
     return false;

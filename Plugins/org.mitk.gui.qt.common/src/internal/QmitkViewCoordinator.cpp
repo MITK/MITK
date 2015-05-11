@@ -25,9 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 
 QmitkViewCoordinator::QmitkViewCoordinator()
-  : m_ActiveZombieView(0)
-  , m_ActiveRenderWindowPart(0)
-  , m_VisibleRenderWindowPart(0)
+  : m_ActiveZombieView(nullptr)
+  , m_ActiveRenderWindowPart(nullptr)
+  , m_VisibleRenderWindowPart(nullptr)
 {
 }
 
@@ -146,7 +146,7 @@ void QmitkViewCoordinator::PartHidden(const berry::IWorkbenchPartReference::Poin
     if (!m_ActiveRenderWindowPart && m_VisibleRenderWindowPart == renderPart)
     {
       RenderWindowPartDeactivated(renderPart);
-      m_VisibleRenderWindowPart = 0;
+      m_VisibleRenderWindowPart = nullptr;
     }
   }
 

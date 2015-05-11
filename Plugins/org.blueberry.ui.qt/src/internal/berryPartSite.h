@@ -110,7 +110,7 @@ private:
 
     PartSite* site;
 
-    void Dispose();
+    void Dispose() override;
   };
 
   ServiceLocatorOwner::Pointer serviceLocatorOwner;
@@ -156,14 +156,14 @@ public: ~PartSite();
    *
    * @return the registry extension ID
    */
-public: virtual QString GetId() const;
+public: virtual QString GetId() const override;
 
   /**
    * Returns the page containing this workbench site's part.
    *
    * @return the page containing this part
    */
-public: virtual SmartPointer<IWorkbenchPage> GetPage();
+public: virtual SmartPointer<IWorkbenchPage> GetPage() override;
 
   /**
    * Gets the part pane.
@@ -173,7 +173,7 @@ public: SmartPointer<PartPane> GetPane();
   /**
    * Returns the part.
    */
-public: virtual SmartPointer<IWorkbenchPart> GetPart();
+public: virtual SmartPointer<IWorkbenchPart> GetPart() override;
 
   /**
    * Returns the part reference.
@@ -185,31 +185,31 @@ public: virtual IWorkbenchPartReference::Pointer GetPartReference();
    *
    * @return the registry plugin ID
    */
-public: virtual QString GetPluginId() const;
+public: virtual QString GetPluginId() const override;
 
   /**
    * Returns the registered name for this part.
    */
-public: virtual QString GetRegisteredName() const;
+public: virtual QString GetRegisteredName() const override;
 
   /**
    * Returns the selection provider for a part.
    */
-public: virtual ISelectionProvider::Pointer GetSelectionProvider();
+public: virtual ISelectionProvider::Pointer GetSelectionProvider() override;
 
   /**
    * Returns the shell containing this part.
    *
    * @return the shell containing this part
    */
-public: SmartPointer<Shell> GetShell();
+public: SmartPointer<Shell> GetShell() override;
 
   /**
    * Returns the workbench window containing this part.
    *
    * @return the workbench window containing this part
    */
-public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
+public: virtual SmartPointer<IWorkbenchWindow> GetWorkbenchWindow() override;
 
   /**
    * Register a popup menu for extension.
@@ -266,7 +266,7 @@ protected: virtual void SetRegisteredName(const QString& name);
   /**
    * Set the selection provider for a part.
    */
-public: virtual void SetSelectionProvider(ISelectionProvider::Pointer provider);
+public: virtual void SetSelectionProvider(ISelectionProvider::Pointer provider) override;
 
   /*
    * @see IWorkbenchPartSite#getKeyBindingService()
@@ -296,9 +296,9 @@ protected: void* GetAdapterImpl(const std::type_info& adapter) const;
    */
 //public: virtual WorkbenchSiteProgressService GetSiteProgressService();
 
-public: Object* GetService(const QString& api);
+public: Object* GetService(const QString& api) override;
 
-public: bool HasService(const QString& api) const;
+public: bool HasService(const QString& api) const override;
 
   /**
    * Prints out the identifier, the plug-in identifier and the registered
@@ -306,7 +306,7 @@ public: bool HasService(const QString& api) const;
    *
    * @since 3.2
    */
-public: virtual QString ToString() const;
+public: virtual QString ToString() const override;
 };
 
 }  // namespace berry

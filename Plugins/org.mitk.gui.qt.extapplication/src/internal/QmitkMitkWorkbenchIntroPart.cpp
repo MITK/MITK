@@ -57,7 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
-  : m_Controls(NULL)
+  : m_Controls(nullptr)
 {
   berry::IPreferences::Pointer workbenchPrefs = QmitkExtApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
@@ -162,7 +162,7 @@ void QmitkMitkWorkbenchIntroPart::DelegateMeTo(const QUrl& showMeNext)
       // search the Workbench for opened StdMultiWidgets to ensure the focus does not stay on the welcome screen and is switched to
       // a render window editor if one available
       ctkPluginContext* context = QmitkExtApplicationPlugin::GetDefault()->GetPluginContext();
-      mitk::IDataStorageService* service = NULL;
+      mitk::IDataStorageService* service = nullptr;
       ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
       if (serviceRef) service = context->getService<mitk::IDataStorageService>(serviceRef);
       if (service)

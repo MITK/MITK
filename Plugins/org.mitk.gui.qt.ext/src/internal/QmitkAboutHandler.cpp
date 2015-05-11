@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 berry::Object::Pointer QmitkAboutHandler::Execute(const berry::SmartPointer<const berry::ExecutionEvent>& /*event*/)
 {
-  QmitkAboutDialog* aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), NULL);
+  auto   aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(), nullptr);
   aboutDialog->open();
   return berry::Object::Pointer();
 }

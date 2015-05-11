@@ -132,7 +132,7 @@ std::vector<std::string> readData = std::vector<std::string>();
 
 //save old locale
 char * oldLocale;
-oldLocale = setlocale( LC_ALL, 0 );
+oldLocale = setlocale( LC_ALL, nullptr );
 
 //define own locale
 std::locale C("C");

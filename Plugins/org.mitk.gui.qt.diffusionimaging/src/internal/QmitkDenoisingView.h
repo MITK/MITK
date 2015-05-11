@@ -84,12 +84,12 @@ public:
   typedef itk::VectorImage<DiffusionPixelType, 3>
     ITKDiffusionImageType;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
   /// \brief Creation of the connections of the FilterComboBox
-  virtual void Activated();
+  virtual void Activated() override;
 
 private slots:
 
@@ -102,7 +102,7 @@ private slots:
 private:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
   void ResetParameterPanel();
 
   Ui::QmitkDenoisingViewControls*  m_Controls;

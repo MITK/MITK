@@ -45,18 +45,18 @@ public:
   ///
   /// add the node to the list ...
   ///
-  virtual void NodeAdded(const mitk::DataNode* node);
+  virtual void NodeAdded(const mitk::DataNode* node) override;
 
   ///
   /// remove the node
   ///
-  virtual void NodeRemoved(const mitk::DataNode* node);
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
 
   /**
    * Called when a DataStorage Changed event was thrown. May be reimplemented
    * by deriving classes.
    */
-  virtual void NodeChanged(const mitk::DataNode* node);
+  virtual void NodeChanged(const mitk::DataNode* node) override;
 
 protected slots:
   void on_DataItemList_currentRowChanged ( int currentRow );
@@ -68,7 +68,7 @@ protected:
   ///
   /// \brief Create the view here.
   ///
-  virtual void CreateQtPartControl(QWidget* parent);
+  virtual void CreateQtPartControl(QWidget* parent) override;
 
   ///
   /// evaluate the new label string
@@ -82,7 +82,7 @@ protected:
   ///
   /// focus on load image
   ///
-  void SetFocus();
+  void SetFocus() override;
 
 private:
   QmitkDataManagerLightViewData* d;

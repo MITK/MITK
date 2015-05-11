@@ -116,6 +116,6 @@ mitk::TrackingTool* mitk::TrackingDevice::GetToolByName( std::string name ) cons
   for (unsigned int i = 0; i < toolCount; ++i)
     if (name == this->GetTool(i)->GetToolName())
       return this->GetTool(i);
-  return NULL;
+  return nullptr;
 }
 

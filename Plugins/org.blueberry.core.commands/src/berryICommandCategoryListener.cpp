@@ -25,7 +25,7 @@ void
 ICommandCategoryListener::Events
 ::AddListener(ICommandCategoryListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   categoryChanged += Delegate(l, &ICommandCategoryListener::CategoryChanged);
 }
@@ -34,7 +34,7 @@ void
 ICommandCategoryListener::Events
 ::RemoveListener(ICommandCategoryListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   categoryChanged -= Delegate(l, &ICommandCategoryListener::CategoryChanged);
 }

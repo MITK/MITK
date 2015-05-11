@@ -40,7 +40,7 @@ mitk::IGTLDevice::IGTLDevice() :
   m_Name("Unspecified Device"),
   m_StopCommunication(false),
   m_PortNumber(-1),
-  m_MultiThreader(NULL), m_ThreadID(0)
+  m_MultiThreader(nullptr), m_ThreadID(0)
 {
   m_StopCommunicationMutex = itk::FastMutexLock::New();
   m_StateMutex = itk::FastMutexLock::New();
@@ -75,7 +75,7 @@ mitk::IGTLDevice::~IGTLDevice()
   {
     m_MultiThreader->TerminateThread(m_ThreadID);
   }
-  m_MultiThreader = NULL;
+  m_MultiThreader = nullptr;
 }
 
 mitk::IGTLDevice::IGTLDeviceState mitk::IGTLDevice::GetState() const
@@ -163,9 +163,9 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       //if it is a GET_, STP_ or RTS_ command push it into the command queue
       //otherwise continue reading the whole message from the socket
       const char* curDevType = headerMsg->GetDeviceType();
-      if ( std::strstr( curDevType, "GET_" ) != NULL ||
-           std::strstr( curDevType, "STP_" ) != NULL ||
-           std::strstr( curDevType, "RTS_" ) != NULL)
+      if ( std::strstr( curDevType, "GET_" ) != nullptr ||
+           std::strstr( curDevType, "STP_" ) != nullptr ||
+           std::strstr( curDevType, "RTS_" ) != nullptr)
       {
         this->m_CommandQueue->PushMessage(headerMsg);
         this->InvokeEvent(CommandReceivedEvent());
@@ -209,7 +209,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         //otherwise into the normal receive queue
         //STP_ commands are handled here because they implemented additional
         //member variables that are not stored in the header message
-        if ( std::strstr( curDevType, "STT_" ) != NULL )
+        if ( std::strstr( curDevType, "STT_" ) != nullptr )
         {
           this->m_CommandQueue->PushMessage(curMessage);
           this->InvokeEvent(CommandReceivedEvent());
@@ -467,16 +467,16 @@ ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartCommunication(void* pInfoStr
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo =
     (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
   IGTLDevice *igtlDevice = (IGTLDevice*)pInfo->UserData;
-  if (igtlDevice != NULL)
+  if (igtlDevice != nullptr)
   {
     igtlDevice->RunCommunication();
   }

@@ -44,7 +44,7 @@ public:
     : ContributionItemFactory("openWindows")
   {}
 
-  IContributionItem::Pointer Create(IWorkbenchWindow *window)
+  IContributionItem::Pointer Create(IWorkbenchWindow *window) override
   {
     if (window == nullptr)
     {
@@ -66,9 +66,9 @@ public:
     : ContributionItemFactory("viewsShortlist")
   {}
 
-  IContributionItem::Pointer Create(IWorkbenchWindow* window)
+  IContributionItem::Pointer Create(IWorkbenchWindow* window) override
   {
-    if (window == 0)
+    if (window == nullptr)
     {
       throw ctkInvalidArgumentException("window must not be null");
     }
@@ -88,7 +88,7 @@ public:
     : ContributionItemFactory("reopenEditors")
   {}
 
-  IContributionItem::Pointer Create(IWorkbenchWindow* window)
+  IContributionItem::Pointer Create(IWorkbenchWindow* window) override
   {
     if (window == nullptr)
     {
@@ -110,7 +110,7 @@ public:
     : ContributionItemFactory("perspectivesShortlist")
   {}
 
-  IContributionItem::Pointer Create(IWorkbenchWindow* window)
+  IContributionItem::Pointer Create(IWorkbenchWindow* window) override
   {
     if (window == nullptr)
     {

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkColorTransferFunctionCanvas::QmitkColorTransferFunctionCanvas(
     QWidget * parent, Qt::WindowFlags f) :
-  QmitkTransferFunctionCanvas(parent, f), m_ColorTransferFunction(0)
+  QmitkTransferFunctionCanvas(parent, f), m_ColorTransferFunction(nullptr)
 {
   // used for drawing a border
   setContentsMargins(1,1,1,1);

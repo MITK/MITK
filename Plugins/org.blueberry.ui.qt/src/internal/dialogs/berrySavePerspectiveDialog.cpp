@@ -35,7 +35,7 @@ SavePerspectiveDialog::SavePerspectiveDialog(PerspectiveRegistry& perspReg, QWid
 {
   ui->setupUi(this);
 
-  QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(this);
+  auto   proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(model);
   proxyModel->sort(0);
   ui->listView->setModel(proxyModel);
@@ -128,7 +128,7 @@ void SavePerspectiveDialog::PerspectiveNameChanged(const QString& text)
 
 void SavePerspectiveDialog::PerspectiveSelected(const QItemSelection& selected, const QItemSelection& /*deselected*/)
 {
-  persp = 0;
+  persp = nullptr;
   if (!selected.isEmpty())
   {
     persp = model->perspectiveDescriptor(selected.indexes().front());

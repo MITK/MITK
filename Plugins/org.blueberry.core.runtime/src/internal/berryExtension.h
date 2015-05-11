@@ -93,7 +93,7 @@ public:
 
   QString GetNamespaceIdentifier() const;
 
-  QString ToString() const;
+  QString ToString() const override;
 
 };
 

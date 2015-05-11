@@ -94,13 +94,13 @@ public:
    {
    }
 
-   Events::Types GetPartEventTypes() const
+   Events::Types GetPartEventTypes() const override
    {
     return Events::ACTIVATED | Events::BROUGHT_TO_TOP | Events::CLOSED
      | Events::HIDDEN | Events::VISIBLE;
    }
 
-   void PartActivated(const berry::IWorkbenchPartReference::Pointer& ref)
+   void PartActivated(const berry::IWorkbenchPartReference::Pointer& ref) override
    {
     if (ref.Cast<berry::IEditorReference> ())
     {
@@ -108,7 +108,7 @@ public:
     }
    }
 
-   void PartBroughtToTop(const berry::IWorkbenchPartReference::Pointer& ref)
+   void PartBroughtToTop(const berry::IWorkbenchPartReference::Pointer& ref) override
    {
     if (ref.Cast<berry::IEditorReference> ())
     {
@@ -116,12 +116,12 @@ public:
     }
    }
 
-   void PartClosed(const berry::IWorkbenchPartReference::Pointer& /*ref*/)
+   void PartClosed(const berry::IWorkbenchPartReference::Pointer& /*ref*/) override
    {
     windowAdvisor->UpdateTitle(false);
    }
 
-   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
+   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref) override
    {
     if (!windowAdvisor->lastActiveEditor.Expired() &&
      ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
@@ -130,7 +130,7 @@ public:
     }
    }
 
-   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
+   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref) override
    {
     if (!windowAdvisor->lastActiveEditor.Expired() &&
      ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
@@ -152,13 +152,13 @@ public:
     {
     }
 
-    Events::Types GetPartEventTypes() const
+    Events::Types GetPartEventTypes() const override
     {
         return Events::OPENED | Events::CLOSED | Events::HIDDEN |
                 Events::VISIBLE;
     }
 
-    void PartOpened(const berry::IWorkbenchPartReference::Pointer& ref)
+    void PartOpened(const berry::IWorkbenchPartReference::Pointer& ref) override
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -166,7 +166,7 @@ public:
         }
     }
 
-    void PartClosed(const berry::IWorkbenchPartReference::Pointer& ref)
+    void PartClosed(const berry::IWorkbenchPartReference::Pointer& ref) override
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -174,7 +174,7 @@ public:
         }
     }
 
-    void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
+    void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref) override
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -182,7 +182,7 @@ public:
         }
     }
 
-    void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
+    void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref) override
     {
         if (ref->GetId()=="org.mitk.views.viewnavigatorview")
         {
@@ -204,13 +204,13 @@ public:
    {
    }
 
-   Events::Types GetPartEventTypes() const
+   Events::Types GetPartEventTypes() const override
    {
     return Events::OPENED | Events::CLOSED | Events::HIDDEN |
      Events::VISIBLE;
    }
 
-   void PartOpened(const berry::IWorkbenchPartReference::Pointer& ref)
+   void PartOpened(const berry::IWorkbenchPartReference::Pointer& ref) override
    {
     if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
@@ -218,7 +218,7 @@ public:
     }
    }
 
-   void PartClosed(const berry::IWorkbenchPartReference::Pointer& ref)
+   void PartClosed(const berry::IWorkbenchPartReference::Pointer& ref) override
    {
     if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
@@ -226,7 +226,7 @@ public:
     }
    }
 
-   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref)
+   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref) override
    {
     if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
@@ -234,7 +234,7 @@ public:
     }
    }
 
-   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref)
+   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref) override
    {
     if (ref->GetId()=="org.mitk.views.imagenavigator")
     {
@@ -256,7 +256,7 @@ public:
    {
    }
 
-   Events::Types GetPerspectiveEventTypes() const
+   Events::Types GetPerspectiveEventTypes() const override
    {
      if (USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS)
      {
@@ -270,26 +270,26 @@ public:
    }
 
    void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                             const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                             const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
    {
     windowAdvisor->UpdateTitle(false);
    }
 
    void PerspectiveSavedAs(const berry::IWorkbenchPage::Pointer& /*page*/,
                            const berry::IPerspectiveDescriptor::Pointer& /*oldPerspective*/,
-                           const berry::IPerspectiveDescriptor::Pointer& /*newPerspective*/)
+                           const berry::IPerspectiveDescriptor::Pointer& /*newPerspective*/) override
    {
     windowAdvisor->UpdateTitle(false);
    }
 
    void PerspectiveDeactivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                               const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                               const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
    {
     windowAdvisor->UpdateTitle(false);
    }
 
    void PerspectiveOpened(const berry::IWorkbenchPage::Pointer& /*page*/,
-                          const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                          const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
    {
     if (perspectivesClosed)
     {
@@ -325,7 +325,7 @@ public:
    }
 
    void PerspectiveClosed(const berry::IWorkbenchPage::Pointer& /*page*/,
-                          const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                          const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
    {
     berry::IWorkbenchWindow::Pointer wnd = windowAdvisor->GetWindowConfigurer()->GetWindow();
     bool allClosed = true;
@@ -381,13 +381,13 @@ public:
    {
    }
 
-   Events::Types GetPerspectiveEventTypes() const
+   Events::Types GetPerspectiveEventTypes() const override
    {
     return Events::ACTIVATED | Events::DEACTIVATED;
    }
 
    void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                             const berry::IPerspectiveDescriptor::Pointer& perspective)
+                             const berry::IPerspectiveDescriptor::Pointer& perspective) override
    {
      QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
      if (action)
@@ -397,7 +397,7 @@ public:
    }
 
    void PerspectiveDeactivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                               const berry::IPerspectiveDescriptor::Pointer& perspective)
+                               const berry::IPerspectiveDescriptor::Pointer& perspective) override
    {
      QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
      if (action)
@@ -415,7 +415,7 @@ private:
 QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
                   berry::IWorkbenchWindowConfigurer::Pointer configurer) :
 berry::WorkbenchWindowAdvisor(configurer),
-lastInput(0),
+lastInput(nullptr),
 wbAdvisor(wbAdvisor),
 showViewToolbar(true),
 showPerspectiveToolbar(false),
@@ -454,7 +454,7 @@ berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBar
 QWidget* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(QWidget* parent)
 {
  QWidget* parentWidget = static_cast<QWidget*>(parent);
- QLabel* label = new QLabel(parentWidget);
+ auto   label = new QLabel(parentWidget);
  label->setText("<b>No perspectives are open. Open a perspective in the <i>Window->Open Perspective</i> menu.</b>");
  label->setContentsMargins(10,10,10,10);
  label->setAlignment(Qt::AlignTop);
@@ -579,7 +579,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     closeProjectAction = new QmitkCloseProjectAction(window);
     closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
 
-    QActionGroup* perspGroup = new QActionGroup(menuBar);
+    auto   perspGroup = new QActionGroup(menuBar);
     std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
 
     // sort elements (converting vector to map...)
@@ -761,7 +761,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 
     // toolbar for showing file open, undo, redo and other main actions
-    QToolBar* mainActionsToolBar = new QToolBar;
+    auto   mainActionsToolBar = new QToolBar;
     mainActionsToolBar->setObjectName("mainActionsToolBar");
     mainActionsToolBar->setContextMenuPolicy(Qt::PreventContextMenu);
 #ifdef __APPLE__
@@ -770,7 +770,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
 #endif
 
-    imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);
+    imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", nullptr);
     bool imageNavigatorViewFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.imagenavigator");
 
     if(this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.dicomeditor"))
@@ -802,7 +802,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       imageNavigatorAction->setToolTip("Toggle image navigator for navigating through image");
     }
 
-    viewNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/view-manager_48.png"),"&View Navigator", NULL);
+    viewNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/view-manager_48.png"),"&View Navigator", nullptr);
     viewNavigatorFound = window->GetWorkbench()->GetViewRegistry()->Find("org.mitk.views.viewnavigatorview");
     if (viewNavigatorFound)
     {
@@ -849,7 +849,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 
     // ==== Perspective Toolbar ==================================
-    QToolBar* qPerspectiveToolbar = new QToolBar;
+    auto   qPerspectiveToolbar = new QToolBar;
     qPerspectiveToolbar->setObjectName("perspectiveToolBar");
 
     if (showPerspectiveToolbar)
@@ -861,7 +861,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       delete qPerspectiveToolbar;
 
     // ==== View Toolbar ==================================
-    QToolBar* qToolbar = new QToolBar;
+    auto   qToolbar = new QToolBar;
     qToolbar->setObjectName("viewToolBar");
 
     if (showViewToolbar)
@@ -889,16 +889,16 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 #endif
 
 
-    QStatusBar* qStatusBar = new QStatusBar();
+    auto   qStatusBar = new QStatusBar();
 
     //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
-    QmitkStatusBar *statusBar = new QmitkStatusBar(qStatusBar);
+    auto  statusBar = new QmitkStatusBar(qStatusBar);
     //disabling the SizeGrip in the lower right corner
     statusBar->SetSizeGripEnabled(false);
 
 
 
-    QmitkProgressBar *progBar = new QmitkProgressBar();
+    auto  progBar = new QmitkProgressBar();
 
     qStatusBar->addPermanentWidget(progBar, 0);
     progBar->hide();
@@ -909,7 +909,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     if (showMemoryIndicator)
     {
-      QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
+      auto   memoryIndicator = new QmitkMemoryUsageIndicatorView();
       qStatusBar->addPermanentWidget(memoryIndicator, 0);
     }
 
@@ -1104,7 +1104,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onClosePerspective()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onNewWindow()
 {
- berry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(0);
+ berry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(nullptr);
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
@@ -1129,7 +1129,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 
   std::cout << title.toStdString() << std::endl;
 
-  QMessageBox::information(NULL, title,
+  QMessageBox::information(nullptr, title,
    text, "Close");
 
  }
@@ -1143,7 +1143,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 {
   ctkPluginContext* context = QmitkCommonExtPlugin::getContext();
-  if (context == 0)
+  if (context == nullptr)
   {
     MITK_WARN << "Plugin context not set, unable to open context help";
     return;
@@ -1172,12 +1172,12 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
   }
 
   ctkServiceReference eventAdminRef = context->getServiceReference<ctkEventAdmin>();
-  ctkEventAdmin* eventAdmin = 0;
+  ctkEventAdmin* eventAdmin = nullptr;
   if (eventAdminRef)
   {
     eventAdmin = context->getService<ctkEventAdmin>(eventAdminRef);
   }
-  if (eventAdmin == 0)
+  if (eventAdmin == nullptr)
   {
     MITK_WARN << "ctkEventAdmin service not found. Unable to open context help";
   }
@@ -1196,7 +1196,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelpOpenHelpPerspective()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
 {
- QmitkAboutDialog* aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(),NULL);
+ auto   aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(),nullptr);
  aboutDialog->open();
 }
 
@@ -1320,7 +1320,7 @@ void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
  berry::IEditorPart::Pointer activeEditor;
  berry::IWorkbenchPage::Pointer currentPage = window->GetActivePage();
  berry::IPerspectiveDescriptor::Pointer persp;
- berry::IAdaptable* input = 0;
+ berry::IAdaptable* input = nullptr;
 
  if (currentPage)
  {
@@ -1331,7 +1331,7 @@ void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
 
  if (editorHidden)
  {
-  activeEditor = 0;
+  activeEditor = nullptr;
  }
 
  // Nothing to do if the editor hasn't changed

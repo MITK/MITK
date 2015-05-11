@@ -123,19 +123,19 @@ public:
    *
    * @see org.blueberry.ui.services.IServiceLocator#getService(java.lang.Object)
    */
-  Object* GetService(const QString& key);
+  Object* GetService(const QString& key) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.services.IServiceLocator#hasService(java.lang.Object)
    */
-  bool HasService(const QString& key) const;
+  bool HasService(const QString& key) const override;
 
   /*
    * Method declared on IWorkbench.
    */
-  bool Close();
+  bool Close() override;
 
   /**
    * Returns the testable object facade, for use by the test harness.
@@ -148,55 +148,55 @@ public:
   /*
    *  Method declared on IWorkbench.
    */
-  void AddWorkbenchListener(IWorkbenchListener* listener);
+  void AddWorkbenchListener(IWorkbenchListener* listener) override;
 
   /*
    * Method declared on IWorkbench.
    */
-  void RemoveWorkbenchListener(IWorkbenchListener* listener);
+  void RemoveWorkbenchListener(IWorkbenchListener* listener) override;
 
   /*
    * Method declared on IWorkbench.
    */
-  IWorkbenchListener::Events& GetWorkbenchEvents();
+  IWorkbenchListener::Events& GetWorkbenchEvents() override;
 
   /*
    * Method declared on IWorkbench.
    */
-  void AddWindowListener(IWindowListener* l);
+  void AddWindowListener(IWindowListener* l) override;
 
   /*
    * Method declared on IWorkbench.
    */
-  void RemoveWindowListener(IWindowListener* l);
+  void RemoveWindowListener(IWindowListener* l) override;
 
   /*
    * Method declared on IWorkbench.
    */
-  IWindowListener::Events& GetWindowEvents();
+  IWindowListener::Events& GetWindowEvents() override;
 
-  IWorkbenchWindow::Pointer GetActiveWorkbenchWindow() const;
+  IWorkbenchWindow::Pointer GetActiveWorkbenchWindow() const override;
 
-  IViewRegistry* GetViewRegistry() const;
-  IEditorRegistry* GetEditorRegistry() const;
+  IViewRegistry* GetViewRegistry() const override;
+  IEditorRegistry* GetEditorRegistry() const override;
   EditorHistory* GetEditorHistory() const;
-  IPerspectiveRegistry* GetPerspectiveRegistry() const;
+  IPerspectiveRegistry* GetPerspectiveRegistry() const override;
 
-  std::size_t GetWorkbenchWindowCount() const;
-  QList<IWorkbenchWindow::Pointer> GetWorkbenchWindows() const;
+  std::size_t GetWorkbenchWindowCount() const override;
+  QList<IWorkbenchWindow::Pointer> GetWorkbenchWindows() const override;
   IWorkbenchWindow::Pointer OpenWorkbenchWindow(const QString& perspectiveId,
-        IAdaptable* input);
-  IWorkbenchWindow::Pointer OpenWorkbenchWindow(IAdaptable* input);
+        IAdaptable* input) override;
+  IWorkbenchWindow::Pointer OpenWorkbenchWindow(IAdaptable* input) override;
 
   IWorkbenchPage::Pointer ShowPerspective(const QString& perspectiveId,
-      IWorkbenchWindow::Pointer window);
+      IWorkbenchWindow::Pointer window) override;
 
   IWorkbenchPage::Pointer ShowPerspective(const QString& perspectiveId,
-        IWorkbenchWindow::Pointer window, IAdaptable* input);
+        IWorkbenchWindow::Pointer window, IAdaptable* input) override;
 
-  bool SaveAllEditors(bool confirm);
+  bool SaveAllEditors(bool confirm) override;
 
-  IIntroManager* GetIntroManager() const;
+  IIntroManager* GetIntroManager() const override;
 
   /**
    * @return the workbench intro manager
@@ -234,7 +234,7 @@ public:
    */
   bool IsStarting() const;
 
-  bool IsClosing() const;
+  bool IsClosing() const override;
 
   /**
    * Returns the default perspective id, which may be <code>null</code>.
@@ -259,9 +259,9 @@ public:
    */
   QString GetPresentationId() const;
 
-  IElementFactory* GetElementFactory(const QString& factoryId) const;
+  IElementFactory* GetElementFactory(const QString& factoryId) const override;
 
-  void UpdateTheme();
+  void UpdateTheme() override;
 
   /**
    * <p>
@@ -291,7 +291,7 @@ public:
    */
   void LargeUpdateEnd();
 
-  IExtensionTracker* GetExtensionTracker() const;
+  IExtensionTracker* GetExtensionTracker() const override;
 
 protected:
 
@@ -494,7 +494,7 @@ private:
   {
     ServiceLocatorOwner(Workbench* workbench);
 
-    void Dispose();
+    void Dispose() override;
 
   private:
     Workbench* workbench;
@@ -562,7 +562,7 @@ private:
   /**
    * see IWorkbench#GetDisplay
    */
-  Display* GetDisplay() const;
+  Display* GetDisplay() const override;
 
   /*
    * Creates a new workbench window.

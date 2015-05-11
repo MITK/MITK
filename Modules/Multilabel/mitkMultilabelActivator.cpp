@@ -40,10 +40,9 @@ namespace mitk
 
     void Unload(us::ModuleContext*) override
     {
-      for(std::vector<mitk::AbstractFileIO*>::iterator iter = m_FileIOs.begin(),
-          endIter = m_FileIOs.end(); iter != endIter; ++iter)
+      for(auto & elem : m_FileIOs)
       {
-        delete *iter;
+        delete elem;
       }
     }
   };

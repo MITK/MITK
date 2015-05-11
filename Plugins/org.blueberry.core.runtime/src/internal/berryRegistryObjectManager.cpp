@@ -44,7 +44,7 @@ const int RegistryObjectManager::CACHE_INITIAL_SIZE = 512;
 int RegistryObjectManager::UNKNOWN = std::numeric_limits<int>::max();
 
 RegistryObjectManager::RegistryObjectManager(ExtensionRegistry* registry)
-  : cache(NULL), nextId(1), orphanExtensionsLoaded(false), formerContributionsLoaded(false),
+  : cache(nullptr), nextId(1), orphanExtensionsLoaded(false), formerContributionsLoaded(false),
     contributorsLoaded(false), namespacesIndexLoaded(false),
     isDirty(false), fromCache(false), registry(registry)
 {

@@ -77,7 +77,7 @@ public:
    *           the object for the equation
    * @return true, if the objects are equal :: false, if they differ in any way
    */
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 
 private:
 

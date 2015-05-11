@@ -36,7 +36,7 @@ class MITKALGORITHMSEXT_EXPORT SegmentationSink : public NonBlockingAlgorithm
     virtual ~SegmentationSink();
 
 
-    virtual void Initialize(const NonBlockingAlgorithm* other = NULL) override;
+    virtual void Initialize(const NonBlockingAlgorithm* other = nullptr) override;
     virtual bool ReadyToRun() override;
 
     virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm

@@ -280,11 +280,11 @@ private:
     {
       WorkbenchPlugin::Log("Unable to find extension. Extension point: " +
                            extensionPointId + " not found");
-      return 0;
+      return nullptr;
     }
 
     // Loop through the config elements.
-    IConfigurationElement::Pointer targetElement(0);
+    IConfigurationElement::Pointer targetElement(nullptr);
     QList<IConfigurationElement::Pointer> elements(
           Platform::GetExtensionRegistry()->GetConfigurationElementsFor(PlatformUI::PLUGIN_ID() + "." + extensionPointId));
     for (int j = 0; j < elements.size(); j++)
@@ -304,7 +304,7 @@ private:
       // log it since we cannot safely display a dialog.
       WorkbenchPlugin::Log("Unable to find extension: " + targetID
                            + " in extension point: " + extensionPointId);
-      return 0;
+      return nullptr;
     }
 
     // Create the extension.
@@ -318,7 +318,7 @@ private:
       WorkbenchPlugin::Log("Unable to create extension: " + targetID
                            + " in extension point: " + extensionPointId);
     }
-    return 0;
+    return nullptr;
   }
 
 
@@ -431,7 +431,7 @@ public:
    *  (non-Javadoc)
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
-  void start(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
 
 
   /*
@@ -452,7 +452,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.plugin.AbstractUICTKPlugin#stop(org.osgi.framework.BundleContext)
    */
-  void stop(ctkPluginContext* context);
+  void stop(ctkPluginContext* context) override;
 
 
   /**

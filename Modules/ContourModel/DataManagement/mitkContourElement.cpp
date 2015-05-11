@@ -73,7 +73,7 @@ void mitk::ContourElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isCon
 {
   if(index >= 0 && this->GetSize() > index)
   {
-    VertexIterator _where = this->m_Vertices->begin();
+    auto _where = this->m_Vertices->begin();
     _where += index;
     this->m_Vertices->insert(_where, new VertexType(vertex, isControlPoint));
   }
@@ -122,7 +122,7 @@ mitk::ContourElement::VertexType* mitk::ContourElement::GetVertexAt(const mitk::
     //currently no method with better performance is available
     return BruteForceGetVertexAt(point, eps);
   }//if eps < 0
-  return NULL;
+  return nullptr;
 }
 
 
@@ -162,8 +162,8 @@ mitk::ContourElement::VertexType* mitk::ContourElement::BruteForceGetVertexAt(co
     if(nearestlist.size() > 0)
     {
       /*++++++++++++++++++++ return the nearest active point if one was found++++++++++++++++++*/
-      std::deque< std::pair<double, VertexType*> >::iterator it = nearestlist.begin();
-      std::deque< std::pair<double, VertexType*> >::iterator end = nearestlist.end();
+      auto it = nearestlist.begin();
+      auto end = nearestlist.end();
       while(it != end)
       {
         if( (*it).second->IsControlPoint )
@@ -178,7 +178,7 @@ mitk::ContourElement::VertexType* mitk::ContourElement::BruteForceGetVertexAt(co
       return nearestlist.front().second;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 
@@ -327,10 +327,10 @@ void mitk::ContourElement::SetClosed( bool isClosed)
 mitk::ContourElement::VertexListType*
 mitk::ContourElement::GetControlVertices()
 {
-    VertexListType* newVertices = new VertexListType();
+    auto   newVertices = new VertexListType();
 
-    VertexIterator it = this->m_Vertices->begin();
-    VertexIterator end = this->m_Vertices->end();
+    auto it = this->m_Vertices->begin();
+    auto end = this->m_Vertices->end();
 
     while(it != end)
     {
@@ -382,9 +382,9 @@ void mitk::ContourElement::Concatenate(mitk::ContourElement* other, bool check)
 
 bool mitk::ContourElement::RemoveVertex(const VertexType *vertex)
 {
-  VertexIterator it = this->m_Vertices->begin();
+  auto it = this->m_Vertices->begin();
 
-  VertexIterator end = this->m_Vertices->end();
+  auto end = this->m_Vertices->end();
 
   //search for vertex and remove it if exists
   while(it != end)
@@ -405,9 +405,9 @@ bool mitk::ContourElement::RemoveVertex(const VertexType *vertex)
 
 int mitk::ContourElement::GetIndex(const VertexType *vertex)
 {
-  VertexIterator it = this->m_Vertices->begin();
+  auto it = this->m_Vertices->begin();
 
-  VertexIterator end = this->m_Vertices->end();
+  auto end = this->m_Vertices->end();
 
   int index = 0;
 
@@ -448,9 +448,9 @@ bool mitk::ContourElement::RemoveVertexAt(mitk::Point3D &point, float eps)
   /* current version iterates over the whole deque - should be some kind of an octree with spatial query*/
 
   if(eps > 0){
-    VertexIterator it = this->m_Vertices->begin();
+    auto it = this->m_Vertices->begin();
 
-    VertexIterator end = this->m_Vertices->end();
+    auto end = this->m_Vertices->end();
 
     while(it != end)
     {
@@ -480,9 +480,9 @@ void mitk::ContourElement::Clear()
 void mitk::ContourElement::RedistributeControlVertices(const VertexType* selected, int period)
 {
     int counter = 0;
-    VertexIterator _where = this->m_Vertices->begin();
+    auto _where = this->m_Vertices->begin();
 
-    if (selected != NULL)
+    if (selected != nullptr)
     {
         while (_where != this->m_Vertices->end())
         {
@@ -494,7 +494,7 @@ void mitk::ContourElement::RedistributeControlVertices(const VertexType* selecte
         }
     }
 
-    VertexIterator _iter = _where;
+    auto _iter = _where;
     while (_iter != this->m_Vertices->end())
     {
         div_t divresult;

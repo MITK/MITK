@@ -103,9 +103,9 @@ class QmitkAICPRegistrationView : public QmitkAbstractView
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus();
+    virtual void SetFocus() override;
 
     Ui::QmitkAICPRegistrationViewControls m_Controls;
 

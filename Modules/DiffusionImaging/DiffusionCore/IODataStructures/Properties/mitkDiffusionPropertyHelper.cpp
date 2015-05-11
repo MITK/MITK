@@ -309,7 +309,7 @@ bool mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(const mitk::Image *
 {
   bool isDiffusionWeightedImage( true );
 
-  if( image == NULL )
+  if( image == nullptr )
   {
     isDiffusionWeightedImage = false;
   }

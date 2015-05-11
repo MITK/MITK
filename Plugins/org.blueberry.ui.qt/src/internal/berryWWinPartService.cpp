@@ -30,47 +30,47 @@ struct WWinListener: public IPartListener
   {
   }
 
-  Events::Types GetPartEventTypes() const
+  Events::Types GetPartEventTypes() const override
   {
     return Events::ALL;
   }
 
-  void PartActivated(const IWorkbenchPartReference::Pointer&  /*ref*/)
+  void PartActivated(const IWorkbenchPartReference::Pointer&  /*ref*/) override
   {
     wwps->UpdateActivePart();
   }
 
-  void PartBroughtToTop(const IWorkbenchPartReference::Pointer& ref)
+  void PartBroughtToTop(const IWorkbenchPartReference::Pointer& ref) override
   {
     wwps->partService.FirePartBroughtToTop(ref);
   }
 
-  void PartClosed(const IWorkbenchPartReference::Pointer& ref)
+  void PartClosed(const IWorkbenchPartReference::Pointer& ref) override
   {
     wwps->partService.FirePartClosed(ref);
   }
 
-  void PartDeactivated(const IWorkbenchPartReference::Pointer& /*ref*/)
+  void PartDeactivated(const IWorkbenchPartReference::Pointer& /*ref*/) override
   {
     wwps->UpdateActivePart();
   }
 
-  void PartOpened(const IWorkbenchPartReference::Pointer& ref)
+  void PartOpened(const IWorkbenchPartReference::Pointer& ref) override
   {
     wwps->partService.FirePartOpened(ref);
   }
 
-  void PartHidden(const IWorkbenchPartReference::Pointer& ref)
+  void PartHidden(const IWorkbenchPartReference::Pointer& ref) override
   {
     wwps->partService.FirePartHidden(ref);
   }
 
-  void PartVisible(const IWorkbenchPartReference::Pointer& ref)
+  void PartVisible(const IWorkbenchPartReference::Pointer& ref) override
   {
     wwps->partService.FirePartVisible(ref);
   }
 
-  void PartInputChanged(const IWorkbenchPartReference::Pointer& ref)
+  void PartInputChanged(const IWorkbenchPartReference::Pointer& ref) override
   {
     wwps->partService.FirePartInputChanged(ref);
   }
@@ -84,7 +84,7 @@ private:
 };
 
 WWinPartService::WWinPartService(IWorkbenchWindow* window) :
-  partService("", ""), selectionService(window), activePage(0),
+  partService("", ""), selectionService(window), activePage(nullptr),
   partListener(new WWinListener(
       this))
 {
@@ -170,8 +170,8 @@ void WWinPartService::PageActivated(SmartPointer<IWorkbenchPage> newPage)
   }
   else
   {
-    partService.SetActivePart(IWorkbenchPartReference::Pointer(0));
-    selectionService.SetActivePart(IWorkbenchPart::Pointer(0));
+    partService.SetActivePart(IWorkbenchPartReference::Pointer(nullptr));
+    selectionService.SetActivePart(IWorkbenchPart::Pointer(nullptr));
   }
 
   // Unhook listener from the old page.
@@ -204,7 +204,7 @@ void WWinPartService::PageOpened(SmartPointer<IWorkbenchPage> page)
 void WWinPartService::Reset()
 {
   IWorkbenchPage* tempPage = activePage;
-  activePage = 0;
+  activePage = nullptr;
   if (tempPage)
   {
     WorkbenchPage* page = dynamic_cast<WorkbenchPage*>(tempPage);

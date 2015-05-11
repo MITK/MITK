@@ -28,7 +28,7 @@ void
 IExecutionListenerWithChecks::Events
 ::AddListener(IExecutionListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   IExecutionListener::Events::AddListener(l);
 
@@ -43,7 +43,7 @@ void
 IExecutionListenerWithChecks::Events
 ::RemoveListener(IExecutionListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   IExecutionListener::Events::RemoveListener(l);
 

@@ -204,9 +204,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
 
     double textureClippingBounds[6];
-    for (int i=0; i<6; ++i)
+    for (auto & textureClippingBound : textureClippingBounds)
     {
-      textureClippingBounds[i] = 0.0;
+      textureClippingBound = 0.0;
     }
 
     // Calculate the actual bounds of the transformed plane clipped by the

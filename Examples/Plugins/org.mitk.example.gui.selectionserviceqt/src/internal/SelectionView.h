@@ -50,9 +50,9 @@ public:
 
 protected:
 
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
-  void SetFocus();
+  void SetFocus() override;
 
 private:
 

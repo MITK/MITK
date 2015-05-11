@@ -66,12 +66,12 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     : d(dd)
   {}
 
-  Events::Types GetPartEventTypes() const
+  Events::Types GetPartEventTypes() const override
   {
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
   }
 
-  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -85,7 +85,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     }
   }
 
-  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef)
+  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -99,7 +99,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     }
   }
 
-  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef)
+  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {

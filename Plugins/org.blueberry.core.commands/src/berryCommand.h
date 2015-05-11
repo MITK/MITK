@@ -184,7 +184,7 @@ public:
    * @param state
    *            The state to add; must not be <code>null</code>.
    */
-  void AddState(const QString& id, const SmartPointer<State>& state);
+  void AddState(const QString& id, const SmartPointer<State>& state) override;
 
   /**
    * Compares this command with another command by comparing each of its
@@ -196,7 +196,7 @@ public:
    * @return false if the object is
    *         equal to or greater than this command.
    */
-  bool operator<(const Object* object) const;
+  bool operator<(const Object* object) const override;
 
   /**
    * <p>
@@ -229,7 +229,7 @@ public:
   void Define(const QString& name, const QString& description,
               const SmartPointer<CommandCategory> category,
               const QList<SmartPointer<IParameter> >& parameters = QList<SmartPointer<IParameter> >(),
-              const SmartPointer<ParameterType>& returnType = SmartPointer<ParameterType>(0),
+              const SmartPointer<ParameterType>& returnType = SmartPointer<ParameterType>(nullptr),
               const QString& helpContextId = "");
 
   /**
@@ -462,7 +462,7 @@ public:
    *            The identifier of the state to remove; must not be
    *            <code>null</code>.
    */
-  void RemoveState(const QString& stateId);
+  void RemoveState(const QString& stateId) override;
 
   /**
    * Changes the handler for this command. This will remove all the state from
@@ -488,7 +488,7 @@ private:
    * Our command will listen to the active handler for enablement changes so
    * that they can be fired from the command itself.
    */
-  void HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent);
+  void HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent) override;
 
 
 public:
@@ -499,14 +499,14 @@ public:
    *
    * @return The string representation; never <code>null</code>.
    */
-  QString ToString() const;
+  QString ToString() const override;
 
   /**
    * Makes this command become undefined. This has the side effect of changing
    * the name and description to <code>null</code>. This also removes all
    * state and disposes of it. Notification is sent to all listeners.
    */
-  void Undefine();
+  void Undefine() override;
 };
 
 }

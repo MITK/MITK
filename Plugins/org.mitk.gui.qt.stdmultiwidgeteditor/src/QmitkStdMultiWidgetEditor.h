@@ -55,53 +55,53 @@ public:
   /**
    * \see mitk::IRenderWindowPart::GetActiveQmitkRenderWindow()
    */
-  QmitkRenderWindow* GetActiveQmitkRenderWindow() const;
+  QmitkRenderWindow* GetActiveQmitkRenderWindow() const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetQmitkRenderWindows()
    */
-  QHash<QString,QmitkRenderWindow*> GetQmitkRenderWindows() const;
+  QHash<QString,QmitkRenderWindow*> GetQmitkRenderWindows() const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(QString)
    */
-  QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const;
+  QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetSelectionPosition()
    */
-  mitk::Point3D GetSelectedPosition(const QString& id = QString()) const;
+  mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
 
   /**
    * \see mitk::IRenderWindowPart::SetSelectedPosition()
    */
-  void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString());
+  void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) override;
 
   /**
    * \see mitk::IRenderWindowPart::EnableDecorations()
    */
-  void EnableDecorations(bool enable, const QStringList& decorations = QStringList());
+  void EnableDecorations(bool enable, const QStringList& decorations = QStringList()) override;
 
   /**
    * \see mitk::IRenderWindowPart::IsDecorationEnabled()
    */
-  bool IsDecorationEnabled(const QString& decoration) const;
+  bool IsDecorationEnabled(const QString& decoration) const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetDecorations()
    */
-  QStringList GetDecorations() const;
+  QStringList GetDecorations() const override;
 
   // -------------------  mitk::ILinkedRenderWindowPart  ----------------------
 
-  mitk::SlicesRotator* GetSlicesRotator() const;
-  mitk::SlicesSwiveller* GetSlicesSwiveller() const;
+  mitk::SlicesRotator* GetSlicesRotator() const override;
+  mitk::SlicesSwiveller* GetSlicesSwiveller() const override;
 
-  void EnableSlicingPlanes(bool enable);
-  bool IsSlicingPlanesEnabled() const;
+  void EnableSlicingPlanes(bool enable) override;
+  bool IsSlicingPlanesEnabled() const override;
 
-  void EnableLinkedNavigation(bool enable);
-  bool IsLinkedNavigationEnabled() const;
+  void EnableLinkedNavigation(bool enable) override;
+  bool IsLinkedNavigationEnabled() const override;
 
 protected:
 
@@ -120,11 +120,11 @@ protected:
    */
   void GetPreferenceDecorations(const berry::IBerryPreferences *preferences);
 
-  void SetFocus();
+  void SetFocus() override;
 
-  void OnPreferencesChanged(const berry::IBerryPreferences*);
+  void OnPreferencesChanged(const berry::IBerryPreferences*) override;
 
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
   /**
    * @brief GetColorForWidget helper method to convert a saved color string to mitk::Color.

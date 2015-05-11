@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkLBFGSBOptimizerView : public QmitkRigi
 
 public:
 
-  QmitkLBFGSBOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkLBFGSBOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkLBFGSBOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

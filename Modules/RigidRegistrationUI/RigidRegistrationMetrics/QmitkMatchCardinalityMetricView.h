@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkMatchCardinalityMetricView : public Qm
 
 public:
 
-  QmitkMatchCardinalityMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkMatchCardinalityMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkMatchCardinalityMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

@@ -94,20 +94,18 @@ mitk::CoreObjectFactory::~CoreObjectFactory()
   for (std::map<mitk::CoreObjectFactoryBase*, std::list< mitk::LegacyFileReaderService* > >::iterator iter = m_LegacyReaders.begin();
        iter != m_LegacyReaders.end(); ++iter)
   {
-    for (std::list<mitk::LegacyFileReaderService*>::iterator readerIter = iter->second.begin(),
-      readerIterEnd = iter->second.end(); readerIter != readerIterEnd; ++readerIter)
+    for (auto & elem : iter->second)
     {
-      delete *readerIter;
+      delete elem;
     }
   }
 
   for (std::map<mitk::CoreObjectFactoryBase*, std::list< mitk::LegacyFileWriterService* > >::iterator iter = m_LegacyWriters.begin();
        iter != m_LegacyWriters.end(); ++iter)
   {
-    for (std::list<mitk::LegacyFileWriterService*>::iterator writerIter = iter->second.begin(),
-      writerIterEnd = iter->second.end(); writerIter != writerIterEnd; ++writerIter)
+    for (auto & elem : iter->second)
     {
-      delete *writerIter;
+      delete elem;
     }
   }
 }
@@ -364,10 +362,9 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase*
     extensionsByCategories[it->second].push_back(extension);
   }
 
-  for(std::map<std::string, std::vector<std::string> >::iterator iter = extensionsByCategories.begin(),
-      endIter = extensionsByCategories.end(); iter != endIter; ++iter)
+  for(auto & extensionsByCategorie : extensionsByCategories)
   {
-    m_LegacyReaders[factory].push_back(new mitk::LegacyFileReaderService(iter->second, iter->first));
+    m_LegacyReaders[factory].push_back(new mitk::LegacyFileReaderService(extensionsByCategorie.second, extensionsByCategorie.first));
   }
 }
 
@@ -376,10 +373,9 @@ void mitk::CoreObjectFactory::UnRegisterLegacyReaders(mitk::CoreObjectFactoryBas
   std::map<mitk::CoreObjectFactoryBase*, std::list<mitk::LegacyFileReaderService*> >::iterator iter = m_LegacyReaders.find(factory);
   if (iter != m_LegacyReaders.end())
   {
-    for (std::list<mitk::LegacyFileReaderService*>::iterator readerIter = iter->second.begin(),
-      readerIterEnd = iter->second.end(); readerIter != readerIterEnd; ++readerIter)
+    for (auto & elem : iter->second)
     {
-      delete *readerIter;
+      delete elem;
     }
 
     m_LegacyReaders.erase(iter);
@@ -447,10 +443,9 @@ void mitk::CoreObjectFactory::UnRegisterLegacyWriters(mitk::CoreObjectFactoryBas
   std::map<mitk::CoreObjectFactoryBase*, std::list<mitk::LegacyFileWriterService*> >::iterator iter = m_LegacyWriters.find(factory);
   if (iter != m_LegacyWriters.end())
   {
-    for (std::list<mitk::LegacyFileWriterService*>::iterator writerIter = iter->second.begin(),
-      writerIterEnd = iter->second.end(); writerIter != writerIterEnd; ++writerIter)
+    for (auto & elem : iter->second)
     {
-      delete *writerIter;
+      delete elem;
     }
 
     m_LegacyWriters.erase(iter);

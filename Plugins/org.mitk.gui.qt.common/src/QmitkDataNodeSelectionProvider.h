@@ -45,7 +45,7 @@ public:
   /**
    * This method will always return a mitk::DataNodeSelection object.
    */
-  berry::ISelection::ConstPointer GetSelection() const;
+  berry::ISelection::ConstPointer GetSelection() const override;
 
   using QtSelectionProvider::SetSelection;
 
@@ -55,7 +55,7 @@ protected:
 
   mitk::DataNodeSelection::ConstPointer GetDataNodeSelection() const;
 
-  virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
 };
 
 #endif /* QMITKDATATREENODESELECTIONPROVIDER_H_ */

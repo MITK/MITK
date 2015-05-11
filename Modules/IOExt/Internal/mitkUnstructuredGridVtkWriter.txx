@@ -150,7 +150,7 @@ const UnstructuredGrid* UnstructuredGridVtkWriter<VTKWRITER>::GetInput()
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
   else
   {
@@ -161,7 +161,7 @@ const UnstructuredGrid* UnstructuredGridVtkWriter<VTKWRITER>::GetInput()
 template<class VTKWRITER>
 bool UnstructuredGridVtkWriter<VTKWRITER>::CanWriteBaseDataType(BaseData::Pointer data)
 {
-  return (dynamic_cast<mitk::UnstructuredGrid*>(data.GetPointer()) != 0);
+  return (dynamic_cast<mitk::UnstructuredGrid*>(data.GetPointer()) != nullptr);
 }
 
 template<class VTKWRITER>

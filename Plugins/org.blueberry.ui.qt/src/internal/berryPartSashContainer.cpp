@@ -216,7 +216,7 @@ QRect PartSashContainer::SashContainerDropTarget::GetSnapRectangle()
 
 PartSashContainer::PartSashContainer(const QString& id,
     WorkbenchPage* _page, QWidget* _parentWidget) :
-  LayoutPart(id), parentWidget(_parentWidget), parent(0), page(_page), active(
+  LayoutPart(id), parentWidget(_parentWidget), parent(nullptr), page(_page), active(
       false), layoutDirty(false)
 {
   resizeListener = new ControlListener(this);
@@ -331,10 +331,10 @@ void PartSashContainer::Add(LayoutPart::Pointer child, int relationship,
   }
 
   QRect bounds;
-  if (this->GetParent() == 0)
+  if (this->GetParent() == nullptr)
   {
     QWidget* control = this->GetPage()->GetClientComposite();
-    if (control != 0)
+    if (control != nullptr)
     {
       bounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(control);
     }
@@ -367,7 +367,7 @@ int PartSashContainer::MeasureTree(const QRect& outerBounds,
   }
 
   LayoutTreeNode* parent = toMeasure->GetParent();
-  if (parent == 0)
+  if (parent == nullptr)
   {
     return Geometry::GetDimension(outerBounds, horizontal);
   }
@@ -435,7 +435,7 @@ void PartSashContainer::AddChild(const RelationshipInfo& info)
         == IPageLayout::TOP;
     LayoutPartSash::Pointer sash(new LayoutPartSash(this, vertical));
     sash->SetSizes(info.left, info.right);
-    if ((parent != 0) && child.Cast<PartPlaceholder> ().IsNull())
+    if ((parent != nullptr) && child.Cast<PartPlaceholder> ().IsNull())
     {
       sash->CreateControl(parent);
     }
@@ -590,7 +590,7 @@ void PartSashContainer::SetActive(bool isActive)
     DragUtil::RemoveDragTarget(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetShell(parent)->GetControl(), this);
 
     // remove all Listeners
-    if (resizeListener != 0 && parent != 0)
+    if (resizeListener != 0 && parent != nullptr)
     {
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(parent,
           resizeListener);
@@ -600,7 +600,7 @@ void PartSashContainer::SetActive(bool isActive)
         != children.end(); ++iter)
     {
       LayoutPart::Pointer child = *iter;
-      child->SetContainer(ILayoutContainer::Pointer(0));
+      child->SetContainer(ILayoutContainer::Pointer(nullptr));
       if (child.Cast<PartStack> ().IsNotNull())
       {
         child->SetVisible(false);
@@ -615,7 +615,7 @@ void PartSashContainer::SetActive(bool isActive)
 
 void PartSashContainer::CreateControl(QWidget* parentWidget)
 {
-  if (this->parent != 0)
+  if (this->parent != nullptr)
   {
     return;
   }
@@ -633,7 +633,7 @@ void PartSashContainer::CreateControl(QWidget* parentWidget)
 
 void PartSashContainer::Dispose()
 {
-  if (parent == 0)
+  if (parent == nullptr)
   {
     return;
   }
@@ -650,7 +650,7 @@ void PartSashContainer::Dispose()
   }
 
   this->DisposeParent();
-  this->parent = 0;
+  this->parent = nullptr;
 }
 
 void PartSashContainer::DisposeSashes()
@@ -687,7 +687,7 @@ LayoutPart::Pointer PartSashContainer::FindBottomRight()
 {
   if (root == 0)
   {
-    return LayoutPart::Pointer(0);
+    return LayoutPart::Pointer(nullptr);
   }
   return root->FindBottomRight();
 }
@@ -764,7 +764,7 @@ void PartSashContainer::Remove(LayoutPart::Pointer child)
   if (active)
   {
     child->SetVisible(false);
-    child->SetContainer(ILayoutContainer::Pointer(0));
+    child->SetContainer(ILayoutContainer::Pointer(nullptr));
     this->FlushLayout();
   }
 }
@@ -823,7 +823,7 @@ void PartSashContainer::Replace(LayoutPart::Pointer oldChild,
   if (active)
   {
     oldChild->SetVisible(false);
-    oldChild->SetContainer(ILayoutContainer::Pointer(0));
+    oldChild->SetContainer(ILayoutContainer::Pointer(nullptr));
     newChild->CreateControl(parent);
     newChild->SetContainer(ILayoutContainer::Pointer(this));
     newChild->SetVisible(true); //zoomedPart == null || zoomedPart == newChild);
@@ -898,7 +898,7 @@ IDropTarget::Pointer PartSashContainer::Drag(QWidget* /*currentControl*/,
   if (!(draggedObject.Cast<PartStack> () != 0
       || draggedObject.Cast<PartPane> () != 0))
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   PartPane::Pointer sourcePart = draggedObject.Cast<PartPane> ();
@@ -910,7 +910,7 @@ IDropTarget::Pointer PartSashContainer::Drag(QWidget* /*currentControl*/,
 
   if (!this->IsStackType(sourceContainer) && !this->IsPaneType(sourcePart))
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   IWorkbenchWindow::Pointer window = sourcePart ? sourcePart->GetWorkbenchWindow() : sourceContainer->GetWorkbenchWindow();
@@ -922,7 +922,7 @@ IDropTarget::Pointer PartSashContainer::Drag(QWidget* /*currentControl*/,
           == this->GetWorkbenchWindow()->GetWorkbench());
   if (differentWindows && !editorDropOK)
   {
-    return IDropTarget::Pointer(0);
+    return IDropTarget::Pointer(nullptr);
   }
 
   QRect containerBounds = DragUtil::GetDisplayBounds(parent);
@@ -932,7 +932,7 @@ IDropTarget::Pointer PartSashContainer::Drag(QWidget* /*currentControl*/,
   if (this->GetVisibleChildrenCount(ILayoutContainer::Pointer(this)) == 0)
   {
     return this->CreateDropTarget(draggedObject, Constants::CENTER,
-        Constants::CENTER, Object::Pointer(0));
+        Constants::CENTER, Object::Pointer(nullptr));
   }
 
   if (containerBounds.contains(position))
@@ -1033,7 +1033,7 @@ IDropTarget::Pointer PartSashContainer::Drag(QWidget* /*currentControl*/,
   {
     // We only allow dropping into a stack, not creating one
     if (differentWindows)
-      return IDropTarget::Pointer(0);
+      return IDropTarget::Pointer(nullptr);
 
     int side = Geometry::GetClosestSide(containerBounds, position);
 
@@ -1057,12 +1057,12 @@ IDropTarget::Pointer PartSashContainer::Drag(QWidget* /*currentControl*/,
     }
 
     if (sourcePart)
-      return this->CreateDropTarget(sourcePart, side, cursor, Object::Pointer(0));
+      return this->CreateDropTarget(sourcePart, side, cursor, Object::Pointer(nullptr));
     else
-      return this->CreateDropTarget(sourceContainer, side, cursor, Object::Pointer(0));
+      return this->CreateDropTarget(sourceContainer, side, cursor, Object::Pointer(nullptr));
   }
 
-  return IDropTarget::Pointer(0);
+  return IDropTarget::Pointer(nullptr);
 }
 
 PartSashContainer::SashContainerDropTarget::Pointer
@@ -1089,8 +1089,8 @@ void PartSashContainer::Stack(LayoutPart::Pointer newPart,
 
   // Only deref the part if it is being referenced in -this- perspective
   Perspective::Pointer persp = page->GetActivePerspective();
-  PerspectiveHelper* pres = (persp != 0) ? persp->GetPresentation() : 0;
-  if (pres != 0 && container.Cast<PartStack>()->GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
+  PerspectiveHelper* pres = (persp != 0) ? persp->GetPresentation() : nullptr;
+  if (pres != nullptr && container.Cast<PartStack>()->GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
   {
     IWorkbenchPartReference::Pointer newPartRef =
         newPart.Cast<PartPane> ()->GetPartReference();

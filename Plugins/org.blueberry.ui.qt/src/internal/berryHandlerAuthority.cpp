@@ -72,7 +72,7 @@ public:
 
   using IPropertyChangeListener::PropertyChange;
 
-  void PropertyChange(const PropertyChangeEvent::Pointer& event)
+  void PropertyChange(const PropertyChangeEvent::Pointer& event) override
   {
     if (handler->GetCommandId() == event->GetProperty())
     {
@@ -89,7 +89,7 @@ public:
 
 IEvaluationService* HandlerAuthority::GetEvaluationService() const
 {
-  if (evalService == NULL)
+  if (evalService == nullptr)
   {
     evalService = locator->GetService<IEvaluationService>();
     evalService->AddServiceListener(GetServiceListener());
@@ -125,9 +125,9 @@ HandlerAuthority::HandlerAuthority(ICommandService* commandService,
                  IServiceLocator* locator)
   : commandService(commandService)
   , locator(locator)
-  , evalService(NULL)
+  , evalService(nullptr)
 {
-  if (commandService == NULL)
+  if (commandService == nullptr)
   {
     throw ctkInvalidArgumentException("The handler authority needs a command service");
   }
@@ -153,7 +153,7 @@ void HandlerAuthority::ActivateHandler(const SmartPointer<IHandlerActivation>& a
   handlerActivations.insert(handler, Empty());
   if (handler->GetExpression().IsNotNull())
   {
-    HandlerPropertyListener* l = new HandlerPropertyListener(this, handler);
+    auto   l = new HandlerPropertyListener(this, handler);
     handler->SetReference(GetEvaluationService()->AddEvaluationListener(
                             handler->GetExpression(), l,
                             handler->GetCommandId()));
@@ -164,7 +164,7 @@ void HandlerAuthority::ActivateHandler(const SmartPointer<IHandlerActivation>& a
   }
   else
   {
-    UpdateCommand(commandId, (Evaluate(handler) ? handler : HandlerActivation::Pointer(0)));
+    UpdateCommand(commandId, (Evaluate(handler) ? handler : HandlerActivation::Pointer(nullptr)));
   }
 
   if (conflicts->GetSeverity() != IStatus::OK_TYPE)
@@ -190,18 +190,18 @@ void HandlerAuthority::DeactivateHandler(const SmartPointer<IHandlerActivation>&
       if (handler->GetReference().IsNotNull())
       {
         GetEvaluationService()->RemoveEvaluationListener(handler->GetReference());
-        handler->SetReference(IEvaluationReference::Pointer(0));
-        handler->SetListener(NULL);
+        handler->SetReference(IEvaluationReference::Pointer(nullptr));
+        handler->SetListener(nullptr);
       }
       if (handlerActivations.isEmpty())
       {
         handlerActivationsByCommandId.remove(commandId);
-        UpdateCommand(commandId, IHandlerActivation::Pointer(0));
+        UpdateCommand(commandId, IHandlerActivation::Pointer(nullptr));
       }
       else if (handlerActivations.size() == 1)
       {
         IHandlerActivation::Pointer remainingActivation = handlerActivations.begin().key();
-        UpdateCommand(commandId, (Evaluate(remainingActivation) ? remainingActivation : IHandlerActivation::Pointer(0)));
+        UpdateCommand(commandId, (Evaluate(remainingActivation) ? remainingActivation : IHandlerActivation::Pointer(nullptr)));
       }
       else
       {
@@ -224,7 +224,7 @@ SmartPointer<IHandlerActivation> HandlerAuthority::ResolveConflicts(
   // If we don't have any, then there is no match.
   if (activations.isEmpty())
   {
-    return IHandlerActivation::Pointer(0);
+    return IHandlerActivation::Pointer(nullptr);
   }
 
   // Cycle over the activations, remembered the current best.
@@ -307,7 +307,7 @@ SmartPointer<IHandlerActivation> HandlerAuthority::ResolveConflicts(
       IStatus::Pointer s(new Status(IStatus::WARNING_TYPE, "org.blueberry.ui", str, BERRY_STATUS_LOC));
       conflicts->Add(s);
     }
-    return IHandlerActivation::Pointer(0);
+    return IHandlerActivation::Pointer(nullptr);
   }
   return bestActivation;
 }
@@ -318,7 +318,7 @@ void HandlerAuthority::UpdateCommand(const QString& commandId,
   const Command::Pointer command = commandService->GetCommand(commandId);
   if (activation.IsNull())
   {
-    command->SetHandler(IHandler::Pointer(0));
+    command->SetHandler(IHandler::Pointer(nullptr));
   }
   else
   {
@@ -363,7 +363,7 @@ SmartPointer<IHandler> HandlerAuthority::FindHandler(const QString& commandId,
     }
   }
 
-  return IHandler::Pointer(0);
+  return IHandler::Pointer(nullptr);
 }
 
 IEvaluationContext::Pointer HandlerAuthority::CreateContextSnapshot(bool includeSelection)
@@ -373,7 +373,7 @@ IEvaluationContext::Pointer HandlerAuthority::CreateContextSnapshot(bool include
   EvaluationContext::Pointer context;
   if (includeSelection)
   {
-    context = new EvaluationContext(NULL, tmpContext->GetDefaultVariable());
+    context = new EvaluationContext(nullptr, tmpContext->GetDefaultVariable());
     for (int i = 0; i < SELECTION_VARIABLES.size(); i++)
     {
       CopyVariable(context.GetPointer(), tmpContext.GetPointer(), SELECTION_VARIABLES[i]);
@@ -381,7 +381,7 @@ IEvaluationContext::Pointer HandlerAuthority::CreateContextSnapshot(bool include
   }
   else
   {
-    context = new EvaluationContext(NULL, Object::Pointer(0));
+    context = new EvaluationContext(nullptr, Object::Pointer(nullptr));
   }
 
   ISourceProviderService* sp = locator->GetService<ISourceProviderService>();
@@ -459,7 +459,7 @@ void HandlerAuthority::ProcessChangedCommands()
     if (activations.size() == 1)
     {
       const IHandlerActivation::Pointer activation = activations.begin().key();
-      UpdateCommand(commandId, (Evaluate(activation) ? activation : IHandlerActivation::Pointer(0)));
+      UpdateCommand(commandId, (Evaluate(activation) ? activation : IHandlerActivation::Pointer(nullptr)));
     }
     else
     {

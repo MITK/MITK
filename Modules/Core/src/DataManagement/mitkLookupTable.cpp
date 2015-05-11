@@ -208,7 +208,7 @@ bool mitk::LookupTable::operator==( const mitk::LookupTable& other ) const
   if ( m_LookupTable == other.GetVtkLookupTable())
     return true;
   vtkLookupTable* olut = other.GetVtkLookupTable();
-  if (olut == NULL)
+  if (olut == nullptr)
     return false;
 
   bool equal = (m_LookupTable->GetNumberOfColors() == olut->GetNumberOfColors())
@@ -306,7 +306,7 @@ vtkSmartPointer<vtkColorTransferFunction> mitk::LookupTable::CreateColorTransfer
   mitk::LookupTable::RawLookupTableType *rawLookupTable = this->GetRawLookupTable();
   int num_of_values = m_LookupTable->GetNumberOfTableValues();
 
-  double* cols = new double[3*num_of_values];
+  auto  cols = new double[3*num_of_values];
   double* colsHead = cols;
 
   for (int i = 0; i<num_of_values; ++i)
@@ -332,7 +332,7 @@ vtkSmartPointer<vtkPiecewiseFunction> mitk::LookupTable::CreateOpacityTransferFu
   mitk::LookupTable::RawLookupTableType *rgba = this->GetRawLookupTable();
   int num_of_values=m_LookupTable->GetNumberOfTableValues();
 
-  double *alphas = new double [num_of_values];
+  auto alphas = new double [num_of_values];
   double *alphasHead = alphas;
 
   rgba+=3;
@@ -357,7 +357,7 @@ vtkSmartPointer<vtkPiecewiseFunction> mitk::LookupTable::CreateGradientTransferF
   mitk::LookupTable::RawLookupTableType *rgba = this->GetRawLookupTable();
   int num_of_values=m_LookupTable->GetNumberOfTableValues();
 
-  double *alphas = new double [num_of_values];
+  auto alphas = new double [num_of_values];
   double *alphasHead = alphas;
 
   rgba+=3;

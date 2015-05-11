@@ -93,7 +93,7 @@ Category<IViewDescriptor::Pointer>::Pointer ViewRegistry::InternalFindCategory(c
       return *itr;
     }
   }
-  return IViewDescriptorCategoryPtr(0);
+  return IViewDescriptorCategoryPtr(nullptr);
 }
 
 IExtensionPoint::Pointer ViewRegistry::GetExtensionPointFilter()
@@ -170,7 +170,7 @@ IViewDescriptor::Pointer ViewRegistry::Find(const QString& id) const
       return *itr;
     }
   }
-  return IViewDescriptor::Pointer(0);
+  return IViewDescriptor::Pointer(nullptr);
 }
 
 IViewCategory::Pointer ViewRegistry::FindCategory(const QString& id)
@@ -179,7 +179,7 @@ IViewCategory::Pointer ViewRegistry::FindCategory(const QString& id)
   IViewDescriptorCategoryPtr category(this->InternalFindCategory(id));
   if (category.IsNull())
   {
-    return IViewCategory::Pointer(0);
+    return IViewCategory::Pointer(nullptr);
   }
   IViewCategory::Pointer cat(new ViewCategoryProxy(category));
   return cat;
@@ -230,7 +230,7 @@ void ViewRegistry::MapViewsToCategories()
          i != views.end(); ++i)
     {
       IViewDescriptor::Pointer desc(*i);
-      IViewDescriptorCategoryPtr cat(0);
+      IViewDescriptorCategoryPtr cat(nullptr);
       const QList<QString>& catPath = desc->GetCategoryPath();
       if (catPath.size() > 0)
       {

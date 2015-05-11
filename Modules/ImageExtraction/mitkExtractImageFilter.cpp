@@ -149,7 +149,7 @@ void mitk::ExtractImageFilter::ItkImageProcessing( const itk::Image<TPixel,VImag
 
   // re-import to MITK
   Image::Pointer resultImage = ImageToImageFilter::GetOutput();
-  GrabItkImageMemory(slice, resultImage, NULL, false);
+  GrabItkImageMemory(slice, resultImage, nullptr, false);
 }
 
 /*

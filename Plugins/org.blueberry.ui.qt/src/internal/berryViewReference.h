@@ -59,7 +59,7 @@ protected: virtual void DoDisposePart();
    *
    * @see org.blueberry.ui.IWorkbenchPartReference#getPage()
    */
-public: virtual SmartPointer<IWorkbenchPage> GetPage() const;
+public: virtual SmartPointer<IWorkbenchPage> GetPage() const override;
 
   /*
    * (non-Javadoc)
@@ -73,14 +73,14 @@ public: virtual QString GetRegisteredName();
    *
    * @see org.blueberry.ui.IViewReference
    */
-public: virtual QString GetSecondaryId();
+public: virtual QString GetSecondaryId() override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.IViewReference#getView(boolean)
    */
-public: virtual IViewPart::Pointer GetView(bool restore);
+public: virtual IViewPart::Pointer GetView(bool restore) override;
 
 
   /**
@@ -91,9 +91,9 @@ public: virtual IViewPart::Pointer GetView(bool restore);
    *
    * @return the created part
    */
-protected: IWorkbenchPart::Pointer CreatePart();
+protected: IWorkbenchPart::Pointer CreatePart() override;
 
-protected: PartPane::Pointer CreatePane();
+protected: PartPane::Pointer CreatePane() override;
 
 private: IWorkbenchPart::Pointer CreatePartHelper();
 

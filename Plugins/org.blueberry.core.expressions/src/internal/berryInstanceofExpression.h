@@ -48,22 +48,22 @@ public:
   /*
    * @see org.blueberry.jdt.internal.corext.refactoring.participants.Expression#evaluate(java.lang.Object)
    */
-  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const override;
 
-  void CollectExpressionInfo(ExpressionInfo* info) const;
+  void CollectExpressionInfo(ExpressionInfo* info) const override;
 
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 
   //---- Debugging ---------------------------------------------------
 
     /*
      * @see java.lang.Object#toString()
      */
-  QString ToString() const;
+  QString ToString() const override;
 
 protected:
 
-  uint ComputeHashCode() const;
+  uint ComputeHashCode() const override;
 
 
 };

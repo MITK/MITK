@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../QmitkStdMultiWidgetEditor.h"
 #include "QmitkStdMultiWidgetEditorPreferencePage.h"
 
-ctkPluginContext* org_mitk_gui_qt_stdmultiwidgeteditor_Activator::m_Context = 0;
+ctkPluginContext* org_mitk_gui_qt_stdmultiwidgeteditor_Activator::m_Context = nullptr;
 
 void
 org_mitk_gui_qt_stdmultiwidgeteditor_Activator::start(ctkPluginContext* context)
@@ -35,7 +35,7 @@ org_mitk_gui_qt_stdmultiwidgeteditor_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 
-  m_Context = 0;
+  m_Context = nullptr;
 }
 
 ctkPluginContext *org_mitk_gui_qt_stdmultiwidgeteditor_Activator::GetContext()

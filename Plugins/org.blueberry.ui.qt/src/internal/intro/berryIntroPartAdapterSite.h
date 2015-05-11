@@ -57,41 +57,41 @@ public:
 //        return viewSite.getAdapter(adapter);
 //    }
 
-    Object* GetService(const QString& key);
+    Object* GetService(const QString& key) override;
 
-    bool HasService(const QString& key) const;
+    bool HasService(const QString& key) const override;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartSite#getId()
      */
-    QString GetId() const;
+    QString GetId() const override;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getPage()
      */
-    SmartPointer<IWorkbenchPage> GetPage();
+    SmartPointer<IWorkbenchPage> GetPage() override;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchPartSite#getPluginId()
      */
-    QString GetPluginId() const;
+    QString GetPluginId() const override;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getSelectionProvider()
      */
-    SmartPointer<ISelectionProvider> GetSelectionProvider();
+    SmartPointer<ISelectionProvider> GetSelectionProvider() override;
 
-    SmartPointer<Shell> GetShell();
+    SmartPointer<Shell> GetShell() override;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getWorkbenchWindow()
      */
-    SmartPointer<IWorkbenchWindow> GetWorkbenchWindow();
+    SmartPointer<IWorkbenchWindow> GetWorkbenchWindow() override;
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#setSelectionProvider(org.eclipse.jface.viewers.ISelectionProvider)
      */
-    void SetSelectionProvider(SmartPointer<ISelectionProvider> provider);
+    void SetSelectionProvider(SmartPointer<ISelectionProvider> provider) override;
 
 };
 

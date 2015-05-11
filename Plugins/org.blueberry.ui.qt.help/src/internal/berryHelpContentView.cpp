@@ -41,9 +41,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 HelpContentWidget::HelpContentWidget()
-  : QTreeView(0)
+  : QTreeView(nullptr)
   , m_SortModel(new QSortFilterProxyModel(this))
-  , m_SourceModel(0)
+  , m_SourceModel(nullptr)
 {
   header()->hide();
   setUniformRowHeights(true);
@@ -139,7 +139,7 @@ void HelpContentWidget::showLink(const QModelIndex &index)
 }
 
 HelpContentView::HelpContentView()
-  : m_ContentWidget(0)
+  : m_ContentWidget(nullptr)
 {
 }
 
@@ -149,9 +149,9 @@ HelpContentView::~HelpContentView()
 
 void HelpContentView::CreateQtPartControl(QWidget* parent)
 {
-  if (m_ContentWidget == 0)
+  if (m_ContentWidget == nullptr)
   {
-    QVBoxLayout* verticalLayout = new QVBoxLayout(parent);
+    auto   verticalLayout = new QVBoxLayout(parent);
     verticalLayout->setSpacing(0);
     verticalLayout->setContentsMargins(0, 0, 0, 0);
 

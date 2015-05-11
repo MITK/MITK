@@ -45,7 +45,7 @@ namespace mitk
     itkCloneMacro(Self);
 
   public:
-    virtual igtl::MessageBase::Pointer Clone(igtl::MessageBase*) { return 0; }
+    virtual igtl::MessageBase::Pointer Clone(igtl::MessageBase*) { return nullptr; }
 
   protected:
     IGTLMessageCloneHandler() {}

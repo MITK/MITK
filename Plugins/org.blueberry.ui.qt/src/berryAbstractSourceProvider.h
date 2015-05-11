@@ -93,9 +93,9 @@ public:
 
   berryObjectMacro(berry::AbstractSourceProvider)
 
-  void AddSourceProviderListener(ISourceProviderListener* listener);
+  void AddSourceProviderListener(ISourceProviderListener* listener) override;
 
-  void RemoveSourceProviderListener(ISourceProviderListener *listener);
+  void RemoveSourceProviderListener(ISourceProviderListener *listener) override;
 
   /**
    * This method is called when the source provider is instantiated by

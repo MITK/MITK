@@ -35,7 +35,7 @@ Display* QtWorkbenchTweaklet::CreateDisplay()
 
 bool QtWorkbenchTweaklet::IsRunning()
 {
-  return QApplication::instance() != 0;
+  return QApplication::instance() != nullptr;
 }
 
 }  // namespace berry

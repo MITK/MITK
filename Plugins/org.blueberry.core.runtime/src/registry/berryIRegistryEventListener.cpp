@@ -20,7 +20,7 @@ namespace berry {
 
 void IRegistryEventListener::Events::AddListener(IRegistryEventListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   extensionsAdded += ExtensionsAddedDelegate(l, &IRegistryEventListener::Added);
   extensionsRemoved += ExtensionsRemovedDelegate(l, &IRegistryEventListener::Removed);
@@ -30,7 +30,7 @@ void IRegistryEventListener::Events::AddListener(IRegistryEventListener* l)
 
 void IRegistryEventListener::Events::RemoveListener(IRegistryEventListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   extensionsAdded -= ExtensionsAddedDelegate(l, &IRegistryEventListener::Added);
   extensionsRemoved -= ExtensionsRemovedDelegate(l, &IRegistryEventListener::Removed);

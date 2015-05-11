@@ -62,7 +62,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
     MITK_WARN << "Multiple property list readers found for file version " << fileVersion << ". Using arbitrary first one.";
   }
 
-  for ( std::list<itk::LightObject::Pointer>::iterator iter = readers.begin();
+  for ( auto iter = readers.begin();
         iter != readers.end();
         ++iter )
   {

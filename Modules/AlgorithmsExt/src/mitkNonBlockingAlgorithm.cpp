@@ -81,7 +81,7 @@ void NonBlockingAlgorithm::DefineTriggerParameter(const char* parameter)
 
 void NonBlockingAlgorithm::UnDefineTriggerParameter(const char* parameter)
 {
-  MapTypeStringUInt::iterator iter = m_TriggerPropertyConnections.find( parameter );
+  auto iter = m_TriggerPropertyConnections.find( parameter );
 
   if ( iter != m_TriggerPropertyConnections.end() )
   {
@@ -203,7 +203,7 @@ void NonBlockingAlgorithm::ThreadedUpdateSuccessful(const itk::EventObject&)
   m_ParameterListMutex->Lock();
   m_ThreadID = -1; // tested before starting
   m_ParameterListMutex->Unlock();
-  m_ThreadParameters.m_Algorithm = NULL;
+  m_ThreadParameters.m_Algorithm = nullptr;
 }
 
 void NonBlockingAlgorithm::ThreadedUpdateSuccessful()
@@ -220,7 +220,7 @@ void NonBlockingAlgorithm::ThreadedUpdateFailed(const itk::EventObject&)
   m_ParameterListMutex->Lock();
   m_ThreadID = -1; // tested before starting
   m_ParameterListMutex->Unlock();
-  m_ThreadParameters.m_Algorithm = NULL; //delete
+  m_ThreadParameters.m_Algorithm = nullptr; //delete
 }
 
 void NonBlockingAlgorithm::ThreadedUpdateFailed()

@@ -50,7 +50,7 @@ bool
 mitk::DICOMFilenameSorter
 ::operator==(const DICOMDatasetSorter& other) const
 {
-  return dynamic_cast<const DICOMFilenameSorter*>(&other) != NULL;
+  return dynamic_cast<const DICOMFilenameSorter*>(&other) != nullptr;
 }
 
 mitk::DICOMTagList

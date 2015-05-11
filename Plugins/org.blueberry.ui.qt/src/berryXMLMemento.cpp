@@ -96,7 +96,7 @@ berry::XMLMemento::Pointer berry::XMLMemento::CreateWriteRoot(
 {
   // TODO
   //  try{
-  Poco::XML::Document* doc = new Poco::XML::Document();
+  auto   doc = new Poco::XML::Document();
   Poco::XML::Element* elem = doc->createElement(type.toStdString());
   doc->appendChild(elem)->release();
 
@@ -265,7 +265,7 @@ QString berry::XMLMemento::GetTextData() const
 {
   Poco::XML::Text* textNode = GetTextNode();
 
-  if (textNode != NULL)
+  if (textNode != nullptr)
   {
     return QString::fromStdString(textNode->getData());
   }
@@ -297,7 +297,7 @@ Poco::XML::Text* berry::XMLMemento::GetTextNode() const
   unsigned long size = nodes->length();
 
   if (size == 0)
-    return NULL;
+    return nullptr;
 
   //Search for the text node
   for (unsigned long index = 0; index < size; index++)
@@ -309,7 +309,7 @@ Poco::XML::Text* berry::XMLMemento::GetTextNode() const
   }
 
   // a Text node was not found
-  return NULL;
+  return nullptr;
 
 }
 
@@ -403,7 +403,7 @@ void berry::XMLMemento::PutBoolean(const QString& key, bool value)
 void berry::XMLMemento::PutTextData(const QString& data)
 {
   Poco::XML::Text* textNode = GetTextNode();
-  if (textNode == NULL)
+  if (textNode == nullptr)
   {
     textNode = factory->createTextNode(data.toStdString());
     element->insertBefore(textNode, element->firstChild())->release();

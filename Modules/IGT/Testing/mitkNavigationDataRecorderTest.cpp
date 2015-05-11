@@ -44,7 +44,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
     std::string path = GetTestDataFilePath("IGT-Data/RecordedNavigationData.xml");
@@ -60,7 +60,7 @@ public:
     m_Recorder->ConnectTo(m_Player);
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

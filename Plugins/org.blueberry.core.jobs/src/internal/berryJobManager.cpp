@@ -33,8 +33,8 @@ namespace berry
  */
 struct NullRule: public ISchedulingRule
 {
-  bool Contains(ISchedulingRule::Pointer myRule) const;
-  bool IsConflicting(ISchedulingRule::Pointer myRule) const;
+  bool Contains(ISchedulingRule::Pointer myRule) const override;
+  bool IsConflicting(ISchedulingRule::Pointer myRule) const override;
 };
 
 bool NullRule::IsConflicting(ISchedulingRule::Pointer dummyRule) const
@@ -49,7 +49,7 @@ bool NullRule::Contains(ISchedulingRule::Pointer dummyRule) const
 
 
 JobManager::JobManager() :
-  sptr_testRule(new NullRule()),m_active(true), m_Pool(new WorkerPool(this)), m_sptr_progressProvider(0),
+  sptr_testRule(new NullRule()),m_active(true), m_Pool(new WorkerPool(this)), m_sptr_progressProvider(nullptr),
       m_JobQueueSleeping(true), m_JobQueueWaiting(false),m_suspended(false), m_waitQueueCounter(0)
 
 {
@@ -115,7 +115,7 @@ std::string JobManager::PrintState(int state)
 void JobManager::Shutdown()
 {
   JobManager* ptr_instance(GetInstance());
-  if (ptr_instance != 0)
+  if (ptr_instance != nullptr)
   {
     ptr_instance->DoShutdown();
     // ptr_instance = 0; // need to call the destructor of the static object  ..
@@ -155,7 +155,7 @@ JobManager::CurrentJob()
   //      return job;
   //  }
   //}
-  return 0;
+  return nullptr;
 }
 
 //void
@@ -655,7 +655,7 @@ Job::Pointer JobManager::NextJob()
 
     //do nothing if the job manager is suspended
     if (m_suspended)
-      return Job::Pointer(0);
+      return Job::Pointer(nullptr);
 
     // tickle the sleep queue to see if anyone wakes up
 
@@ -757,7 +757,7 @@ void JobManager::ValidateRule(ISchedulingRule::Pointer sptr_rule)
 
 bool JobManager::Cancel(InternalJob::Pointer sptr_job)
 {
-  IProgressMonitor::Pointer sptr_progressMonitor(0);
+  IProgressMonitor::Pointer sptr_progressMonitor(nullptr);
   bool runCanceling = false;
   {
     Poco::ScopedLock<Poco::Mutex> mangerMutex (m_mutex);
@@ -804,7 +804,7 @@ bool JobManager::Cancel(InternalJob::Pointer sptr_job)
 IProgressMonitor::Pointer JobManager::CreateMonitor(
     Job::Pointer sptr_jobToMonitor)
 {
-  IProgressMonitor::Pointer sptr_monitor(0);
+  IProgressMonitor::Pointer sptr_monitor(nullptr);
   if (m_sptr_progressProvider != 0)
     sptr_monitor = m_sptr_progressProvider->CreateMonitor(sptr_jobToMonitor);
   if (sptr_monitor == 0)
@@ -826,10 +826,10 @@ IProgressMonitor::Pointer JobManager::CreateMonitor(InternalJob::Pointer sptr_jo
     //valid to set the progress monitor
     if (sptr_job->GetState() != Job::NONE)
     {
-      IProgressMonitor::Pointer dummy(0);
+      IProgressMonitor::Pointer dummy(nullptr);
       return dummy;
     }
-    IProgressMonitor::Pointer sptr_monitor(0);
+    IProgressMonitor::Pointer sptr_monitor(nullptr);
     if (m_sptr_progressProvider != 0)
       sptr_monitor = m_sptr_progressProvider->CreateMonitor(sptr_job.Cast<Job>() , group, ticks);
     if (sptr_monitor == 0)
@@ -858,8 +858,8 @@ void JobManager::EndJob(InternalJob::Pointer ptr_job, IStatus::Pointer result, b
     if (ptr_job->GetState() == Job::NONE)
        return;
     ptr_job->SetResult(result);
-    ptr_job->SetProgressMonitor(IProgressMonitor::Pointer(0));
-    ptr_job->SetThread(0);
+    ptr_job->SetProgressMonitor(IProgressMonitor::Pointer(nullptr));
+    ptr_job->SetThread(nullptr);
     rescheduleDelay = ptr_job->GetStartTime().epochMicroseconds();
     InternalJob::Pointer sptr_job(ptr_job);
     ChangeState(sptr_job, Job::NONE);
@@ -878,7 +878,7 @@ void JobManager::EndJob(InternalJob::Pointer ptr_job, IStatus::Pointer result, b
 InternalJob::Pointer JobManager::FindBlockingJob(InternalJob::Pointer waitingJob)
 {
   if (waitingJob->GetRule() == 0)
-  return InternalJob::Pointer(0);
+  return InternalJob::Pointer(nullptr);
 
   {
     Poco::ScopedLock<Poco::Mutex> managerLock (m_mutex);
@@ -1013,7 +1013,7 @@ bool JobManager::RunNow(InternalJob::Pointer sptr_job)
     return false;
     ChangeState(sptr_job, Job::RUNNING);
     sptr_job->SetProgressMonitor(IProgressMonitor::Pointer(new NullProgressMonitor()));
-    sptr_job->Run(IProgressMonitor::Pointer(0));
+    sptr_job->Run(IProgressMonitor::Pointer(nullptr));
   }
   return true;
 }
@@ -1113,7 +1113,7 @@ Poco::Timespan::TimeDiff JobManager::SleepHint()
   if (!m_JobQueueWaiting.IsEmpty())
   return 0;
   // return the anticipated time that the next sleeping job will wake
-  InternalJob::Pointer ptr_next(0);
+  InternalJob::Pointer ptr_next(nullptr);
   ptr_next = m_JobQueueSleeping.Peek();
   if (ptr_next == 0)
   return InternalJob::T_INFINITE;
@@ -1127,12 +1127,12 @@ Poco::Timespan::TimeDiff JobManager::SleepHint()
 
 Job::Pointer JobManager::StartJob()
 {
-  Job::Pointer job(0);
+  Job::Pointer job(nullptr);
   while (true)
   {
     job = NextJob();
     if (!job)
-    return Job::Pointer(0);
+    return Job::Pointer(nullptr);
     //must perform this outside sync block because it is third party code
     bool shouldRun = job->ShouldRun();
     //check for listener veto

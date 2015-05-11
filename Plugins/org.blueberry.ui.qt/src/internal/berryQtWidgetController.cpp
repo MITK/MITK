@@ -50,7 +50,7 @@ Shell::Pointer QtWidgetController::GetShell()
 
 void QtWidgetController::ShellDestroyed()
 {
-  shell = 0;
+  shell = nullptr;
 }
 
 void QtWidgetController::AddControlListener(GuiTk::IControlListener::Pointer listener)

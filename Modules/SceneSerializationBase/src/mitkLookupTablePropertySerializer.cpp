@@ -37,12 +37,12 @@ class LookupTablePropertySerializer : public BasePropertySerializer
       if (const LookupTableProperty* prop = dynamic_cast<const LookupTableProperty*>(m_Property.GetPointer()))
       {
         LookupTable::Pointer mitkLut = const_cast<LookupTableProperty*>(prop)->GetLookupTable();
-        if (mitkLut.IsNull()) return NULL; // really?
+        if (mitkLut.IsNull()) return nullptr; // really?
 
         vtkLookupTable* lut = mitkLut->GetVtkLookupTable();
-        if (!lut) return NULL;
+        if (!lut) return nullptr;
 
-        TiXmlElement* element = new TiXmlElement("LookupTable");
+        auto  element = new TiXmlElement("LookupTable");
 
         double*  range;
         double*  rgba;
@@ -52,7 +52,7 @@ class LookupTablePropertySerializer : public BasePropertySerializer
         element->SetAttribute("Ramp", lut->GetRamp());
 
         range = lut->GetHueRange();
-        TiXmlElement* child = new TiXmlElement("HueRange");
+        auto  child = new TiXmlElement("HueRange");
         element->LinkEndChild( child );
           child->SetDoubleAttribute("min", range[0]);
           child->SetDoubleAttribute("max", range[1]);
@@ -85,7 +85,7 @@ class LookupTablePropertySerializer : public BasePropertySerializer
         element->LinkEndChild( child );
         for ( int index = 0; index < lut->GetNumberOfTableValues(); ++index)
         {
-          TiXmlElement* grandChildNinife = new TiXmlElement("RgbaColor");
+          auto  grandChildNinife = new TiXmlElement("RgbaColor");
           rgba = lut->GetTableValue(index);
           grandChildNinife->SetDoubleAttribute("R", rgba[0]);
           grandChildNinife->SetDoubleAttribute("G", rgba[1]);
@@ -95,12 +95,12 @@ class LookupTablePropertySerializer : public BasePropertySerializer
         }
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       typedef double OUR_VTK_FLOAT_TYPE;
       double range[2];
@@ -118,28 +118,28 @@ class LookupTablePropertySerializer : public BasePropertySerializer
         lut->SetNumberOfTableValues( numberOfColors );
       }
       else
-        return NULL;
+        return nullptr;
       if ( element->QueryIntAttribute( "Scale", &scale ) == TIXML_SUCCESS )
       {
         lut->SetScale( scale );
       }
       else
-        return NULL;
+        return nullptr;
       if ( element->QueryIntAttribute( "Ramp", &ramp ) == TIXML_SUCCESS )
       {
         lut->SetRamp( ramp );
       }
       else
-        return NULL;
+        return nullptr;
 
       TiXmlElement* child = element->FirstChildElement("HueRange");
       if (child)
       {
         if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS )
-          return NULL;
+          return nullptr;
         range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS )
-          return NULL;
+          return nullptr;
         range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         lut->SetHueRange( range );
       }
@@ -147,32 +147,32 @@ class LookupTablePropertySerializer : public BasePropertySerializer
                     child = element->FirstChildElement("ValueRange");
       if (child)
       {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return NULL; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return NULL; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return nullptr; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return nullptr; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         lut->SetValueRange( range );
       }
 
                     child = element->FirstChildElement("SaturationRange");
       if (child)
       {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return NULL; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return NULL; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return nullptr; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return nullptr; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         lut->SetSaturationRange( range );
       }
 
                     child = element->FirstChildElement("AlphaRange");
       if (child)
       {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return NULL; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return NULL; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return nullptr; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return nullptr; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         lut->SetAlphaRange( range );
       }
 
                     child = element->FirstChildElement("TableRange");
       if (child)
       {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return NULL; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return NULL; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return nullptr; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return nullptr; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
         lut->SetTableRange( range );
       }
 
@@ -182,10 +182,10 @@ class LookupTablePropertySerializer : public BasePropertySerializer
         unsigned int index(0);
         for( TiXmlElement* grandChild = child->FirstChildElement("RgbaColor"); grandChild; grandChild = grandChild->NextSiblingElement("RgbaColor"))
         {
-          if ( grandChild->QueryDoubleAttribute("R", &d) != TIXML_SUCCESS ) return NULL; rgba[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-          if ( grandChild->QueryDoubleAttribute("G", &d) != TIXML_SUCCESS ) return NULL; rgba[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-          if ( grandChild->QueryDoubleAttribute("B", &d) != TIXML_SUCCESS ) return NULL; rgba[2] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-          if ( grandChild->QueryDoubleAttribute("A", &d) != TIXML_SUCCESS ) return NULL; rgba[3] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+          if ( grandChild->QueryDoubleAttribute("R", &d) != TIXML_SUCCESS ) return nullptr; rgba[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+          if ( grandChild->QueryDoubleAttribute("G", &d) != TIXML_SUCCESS ) return nullptr; rgba[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+          if ( grandChild->QueryDoubleAttribute("B", &d) != TIXML_SUCCESS ) return nullptr; rgba[2] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
+          if ( grandChild->QueryDoubleAttribute("A", &d) != TIXML_SUCCESS ) return nullptr; rgba[3] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
 
           lut->SetTableValue( index, rgba );
           ++index;

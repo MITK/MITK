@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 QmitkInputDevicesPrefPage::QmitkInputDevicesPrefPage()
-: m_MainControl(0)
+: m_MainControl(nullptr)
 {
   // gets the old setting of the preferences and loads them into the preference node
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
@@ -48,14 +48,14 @@ void QmitkInputDevicesPrefPage::Init(berry::IWorkbench::Pointer )
 void QmitkInputDevicesPrefPage::CreateQtControl(QWidget* parent)
 {
   m_MainControl = new QWidget(parent);
-  QVBoxLayout *layout = new QVBoxLayout;
+  auto  layout = new QVBoxLayout;
 
   QList<mitk::IInputDeviceDescriptor::Pointer> temp(GetInputDeviceRegistry()->GetInputDevices());
 
   for(QList<mitk::IInputDeviceDescriptor::Pointer>::const_iterator it = temp.begin(); it != temp.end();++it)
   {
     QString inputDeviceName((*it)->GetName());
-    QCheckBox* checkBox = new QCheckBox((inputDeviceName),m_MainControl);
+    auto   checkBox = new QCheckBox((inputDeviceName),m_MainControl);
     layout->addWidget(checkBox);
     m_InputDevices.insert(checkBox,(*it)->GetID());
 
@@ -67,7 +67,7 @@ void QmitkInputDevicesPrefPage::CreateQtControl(QWidget* parent)
       m_WiiMoteSurfaceInteraction = new QRadioButton(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION);
       m_WiiMoteHeadTracking->setChecked(true);
 
-      QVBoxLayout* vBoxLayout = new QVBoxLayout;
+      auto   vBoxLayout = new QVBoxLayout;
 
       vBoxLayout->addWidget(m_WiiMoteHeadTracking);
       vBoxLayout->addWidget(m_WiiMoteSurfaceInteraction);
@@ -142,7 +142,7 @@ bool QmitkInputDevicesPrefPage::PerformOk()
         // It was suggested that it might have something to do
         // with the type of stack, that is used for the pairing.
         // MS-Stack for example does not work properly.
-        QMessageBox::information(NULL,"WiiMote supportproblem",
+        QMessageBox::information(nullptr,"WiiMote supportproblem",
           "A reconnect of the WiiMote is not yet supported! "
           "Please restart the application, if you want to "
           "activate the Wii remote/s again.");
@@ -182,7 +182,7 @@ void QmitkInputDevicesPrefPage::Update()
 mitk::IInputDeviceRegistry *QmitkInputDevicesPrefPage::GetInputDeviceRegistry() const
 {
   ctkServiceReference serviceRef = QmitkCommonExtPlugin::getContext()->getServiceReference<mitk::IInputDeviceRegistry>();
-  if (!serviceRef) return 0;
+  if (!serviceRef) return nullptr;
 
   return QmitkCommonExtPlugin::getContext()->getService<mitk::IInputDeviceRegistry>(serviceRef);
 }

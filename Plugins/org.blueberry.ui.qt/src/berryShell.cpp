@@ -21,14 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 Shell::Shell()
-  : extraShellListener(NULL)
+  : extraShellListener(nullptr)
 {
 }
 
 Object::Pointer Shell::GetData(const QString& id) const
 {
   QHash<QString, Object::Pointer>::const_iterator iter = data.find(id);
-  if (iter == data.end()) return Object::Pointer(0);
+  if (iter == data.end()) return Object::Pointer(nullptr);
   return iter.value();
 }
 

@@ -73,12 +73,12 @@ void Worker::JobRunnable::run()
 
   } catch (FinallyThrowException&)
   {
-    ptr_currentWorker->ptr_currentJob = 0;
+    ptr_currentWorker->ptr_currentJob = nullptr;
     Worker::Pointer sptr_currentWorker(ptr_currentWorker);
     ptr_currentWorker->m_wpPool.Lock()->EndWorker(sptr_currentWorker);
   } catch (...)
   {
-    ptr_currentWorker->ptr_currentJob = 0;
+    ptr_currentWorker->ptr_currentJob = nullptr;
     Worker::Pointer sptr_currentWorker(ptr_currentWorker);
     ptr_currentWorker->m_wpPool.Lock()->EndWorker(sptr_currentWorker);
 
@@ -102,7 +102,7 @@ void Worker::JobRunnable::RunMethodFinallyExecution(IStatus::Pointer sptr_result
   if ((sptr_result->GetSeverity() & (IStatus::ERROR_TYPE | IStatus::WARNING_TYPE)) != 0)
     // TODO Logging  RuntimeLog.log(result);
     BERRY_ERROR << " Status after executing the job : " << sptr_result->ToString();
-  ptr_currentWorker->ptr_currentJob = 0;
+  ptr_currentWorker->ptr_currentJob = nullptr;
   //reset thread priority in case job changed it
   ptr_currentWorker->setPriority(PRIO_NORMAL);
 }
@@ -122,7 +122,7 @@ IStatus::Pointer Worker::JobRunnable::HandleException(InternalJob::Pointer sptr_
 
 Worker::Worker(WeakPointer<WorkerPool> myPool) :
   Poco::Thread("Worker-" + std::to_string(m_nextWorkerNumber++)), m_Runnable(this), m_wpPool(
-      myPool), ptr_currentJob(0)
+      myPool), ptr_currentJob(nullptr)
 {
 }
 

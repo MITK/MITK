@@ -51,7 +51,7 @@ CommandService::CommandService( CommandManager* commandManager)
   : commandManager(commandManager)
   , commandPersistence(this)
 {
-  if (commandManager == 0)
+  if (commandManager == nullptr)
   {
     throw std::invalid_argument("Cannot create a command service with a null manager");
   }
@@ -208,13 +208,13 @@ void CommandService::RefreshElements(const QString& commandId,
         : updater(updater), callbackRef(callbackRef)
       {}
 
-      void HandleException(const ctkException& exc)
+      void HandleException(const ctkException& exc) override
       {
         WorkbenchPlugin::Log(QString("Failed to update callback: ") +
                              callbackRef->GetCommandId() + exc.what());
       }
 
-      void Run()
+      void Run() override
       {
         updater->UpdateElement(callbackRef->GetElement().GetPointer(), callbackRef->GetParameters());
       }

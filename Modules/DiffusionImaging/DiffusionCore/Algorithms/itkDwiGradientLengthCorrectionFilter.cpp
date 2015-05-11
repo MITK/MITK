@@ -35,8 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 itk::DwiGradientLengthCorrectionFilter::DwiGradientLengthCorrectionFilter()
     : m_ReferenceBValue(0)
     , m_RoundingValue(0)
-    , m_ReferenceGradientDirectionContainer(0)
-    , m_OutputGradientDirectionContainer(0)
+    , m_ReferenceGradientDirectionContainer(nullptr)
+    , m_OutputGradientDirectionContainer(nullptr)
 {
 }
 

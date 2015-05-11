@@ -42,12 +42,12 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentationSerializer#getId(org.blueberry.ui.presentations.IPresentablePart)
    */
-  QString GetId(IPresentablePart::Pointer part);
+  QString GetId(IPresentablePart::Pointer part) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentationSerializer#getPart(java.lang.String)
    */
-  IPresentablePart::Pointer GetPart(const QString& id);
+  IPresentablePart::Pointer GetPart(const QString& id) override;
 
 };
 

@@ -52,7 +52,7 @@ public:
     : q(qq)
     , m_PrefServiceTracker(QmitkCommonActivator::GetContext())
     , m_DataStorageServiceTracker(QmitkCommonActivator::GetContext())
-    , m_Parent(0)
+    , m_Parent(nullptr)
     , m_DataNodeItemModel(new QmitkDataNodeItemModel)
     , m_DataNodeSelectionModel(new QItemSelectionModel(m_DataNodeItemModel))
     , m_InDataStorageChanged(false)
@@ -195,7 +195,7 @@ void QmitkAbstractView::CreatePartControl(QWidget* parent)
 {
 
   // scrollArea
-  QScrollArea* scrollArea = new QScrollArea;
+  auto   scrollArea = new QScrollArea;
   //QVBoxLayout* scrollAreaLayout = new QVBoxLayout(scrollArea);
   scrollArea->setFrameShadow(QFrame::Plain);
   scrollArea->setFrameShape(QFrame::NoFrame);
@@ -216,7 +216,7 @@ void QmitkAbstractView::CreatePartControl(QWidget* parent)
 
   // add the scroll area to the real parent (the view tabbar)
   QWidget* parentQWidget = static_cast<QWidget*>(parent);
-  QVBoxLayout* parentLayout = new QVBoxLayout(parentQWidget);
+  auto   parentLayout = new QVBoxLayout(parentQWidget);
   parentLayout->setMargin(0);
   parentLayout->setSpacing(0);
   parentLayout->addWidget(scrollArea);
@@ -286,7 +286,7 @@ QmitkAbstractView::~QmitkAbstractView()
   }
 
   // REMOVE SELECTION PROVIDER
-  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(NULL));
+  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(nullptr));
 
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
@@ -307,7 +307,7 @@ void QmitkAbstractView::SetSelectionProvider()
 
 QItemSelectionModel *QmitkAbstractView::GetDataNodeSelectionModel() const
 {
-  return 0;
+  return nullptr;
 }
 
 void QmitkAbstractView::OnPreferencesChanged( const berry::IBerryPreferences* )
@@ -358,7 +358,7 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
   }
 
   // No strategies given
-  if (strategies == NONE) return 0;
+  if (strategies == NONE) return nullptr;
 
   mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(GetDataStorageReference()));
 
@@ -406,7 +406,7 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
 void QmitkAbstractView::RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType)
 {
   mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
-  if (renderPart == 0) return;
+  if (renderPart == nullptr) return;
 
   if (mitk::IRenderingManager* renderingManager = renderPart->GetRenderingManager())
   {
@@ -463,7 +463,7 @@ berry::IPreferences::Pointer QmitkAbstractView::GetPreferences() const
   berry::IPreferencesService* prefService = d->m_PrefServiceTracker.getService();
   // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
   QString id = "/" + (const_cast<QmitkAbstractView*>(this))->GetViewSite()->GetId();
-  return prefService ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(0);
+  return prefService ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(nullptr);
 }
 
 mitk::DataStorage::Pointer
@@ -471,24 +471,24 @@ QmitkAbstractView::GetDataStorage() const
 {
   mitk::IDataStorageService* dsService = d->m_DataStorageServiceTracker.getService();
 
-  if (dsService != 0)
+  if (dsService != nullptr)
   {
     return dsService->GetDataStorage()->GetDataStorage();
   }
 
-  return 0;
+  return nullptr;
 }
 
 mitk::IDataStorageReference::Pointer QmitkAbstractView::GetDataStorageReference() const
 {
   mitk::IDataStorageService* dsService = d->m_DataStorageServiceTracker.getService();
 
-  if (dsService != 0)
+  if (dsService != nullptr)
   {
     return dsService->GetDataStorage();
   }
 
-  return mitk::IDataStorageReference::Pointer(0);
+  return mitk::IDataStorageReference::Pointer(nullptr);
 }
 
 QList<mitk::DataNode::Pointer> QmitkAbstractView::GetCurrentSelection() const
@@ -570,7 +570,7 @@ void QmitkAbstractView::FireNodesSelected( const QList<mitk::DataNode::Pointer>&
 {
   // if this is the first call to FireNodesSelected and the selection provider has no QItemSelectiomMode
   // yet, set our helper model
-  if (d->m_SelectionProvider->GetItemSelectionModel() == 0)
+  if (d->m_SelectionProvider->GetItemSelectionModel() == nullptr)
   {
     d->m_SelectionProvider->SetItemSelectionModel(d->m_DataNodeSelectionModel);
   }

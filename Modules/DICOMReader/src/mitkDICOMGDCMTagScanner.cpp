@@ -38,7 +38,7 @@ mitk::DICOMGDCMTagScanner
 {
   assert(frame);
 
-  for(DICOMGDCMImageFrameList::const_iterator frameIter = m_ScanResult.begin();
+  for(auto frameIter = m_ScanResult.begin();
       frameIter != m_ScanResult.end();
       ++frameIter)
   {
@@ -95,7 +95,7 @@ void
 mitk::DICOMGDCMTagScanner
 ::AddTags(const DICOMTagList& tags)
 {
-  for(DICOMTagList::const_iterator tagIter = tags.begin();
+  for(auto tagIter = tags.begin();
       tagIter != tags.end();
       ++tagIter)
   {

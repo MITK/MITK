@@ -225,7 +225,7 @@ namespace mitk
     // it, delete it.
     if ( m_ImageMask.IsNotNull() && (m_ImageMask->GetReferenceCount() == 1) )
     {
-      m_ImageMask = NULL;
+      m_ImageMask = nullptr;
     }
 
 
@@ -358,7 +358,7 @@ namespace mitk
   {
     if ( m_Image.IsNull() )
     {
-      return NULL;
+      return nullptr;
     }
 
     switch ( m_MaskingMode )
@@ -422,8 +422,8 @@ namespace mitk
         {
           m_InternalAdditionalResamplingImages[i] = const_cast<mitk::Image*>(m_AdditionalResamplingImages[i].GetPointer());
         }
-        m_InternalImageMask2D = NULL;
-        m_InternalImageMask3D = NULL;
+        m_InternalImageMask2D = nullptr;
+        m_InternalImageMask3D = nullptr;
         break;
       }
 
@@ -467,7 +467,7 @@ namespace mitk
 
     case MASKING_MODE_PLANARFIGURE:
       {
-        m_InternalImageMask2D = NULL;
+        m_InternalImageMask2D = nullptr;
 
         if ( m_PlanarFigure.IsNull() )
         {
@@ -479,13 +479,13 @@ namespace mitk
         }
 
         const BaseGeometry *imageGeometry = timeSliceImage->GetUpdatedGeometry();
-        if ( imageGeometry == NULL )
+        if ( imageGeometry == nullptr )
         {
           throw std::runtime_error( "Image geometry invalid!" );
         }
 
         const PlaneGeometry *planarFigureGeometry2D = m_PlanarFigure->GetPlaneGeometry();
-        if ( planarFigureGeometry2D == NULL )
+        if ( planarFigureGeometry2D == nullptr )
         {
           throw std::runtime_error( "Planar-Figure not yet initialized!" );
         }
@@ -1102,7 +1102,7 @@ namespace mitk
     }
 
     std::size_t numberOfPoints = planarFigurePolyline.size();
-    vtkIdType *ptIds = new vtkIdType[numberOfPoints];
+    auto ptIds = new vtkIdType[numberOfPoints];
     for ( std::size_t i = 0; i < numberOfPoints; ++i )
     {
       ptIds[i] = i;

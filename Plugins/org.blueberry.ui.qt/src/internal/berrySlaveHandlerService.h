@@ -88,57 +88,57 @@ public:
   SlaveHandlerService(IHandlerService* parentHandlerService,
                       const SmartPointer<Expression>& defaultExpression);
 
-  SmartPointer<IHandlerActivation> ActivateHandler(const SmartPointer<IHandlerActivation>& childActivation);
+  SmartPointer<IHandlerActivation> ActivateHandler(const SmartPointer<IHandlerActivation>& childActivation) override;
 
   SmartPointer<IHandlerActivation> ActivateHandler(const QString& commandId,
-                                                   const SmartPointer<IHandler>& handler);
+                                                   const SmartPointer<IHandler>& handler) override;
 
   SmartPointer<IHandlerActivation> ActivateHandler(const QString& commandId,
                                                    const SmartPointer<IHandler>& handler,
-                                                   const SmartPointer<Expression>& expression);
+                                                   const SmartPointer<Expression>& expression) override;
 
   SmartPointer<IHandlerActivation> ActivateHandler(const QString& commandId,
                                                    const SmartPointer<IHandler>& handler,
                                                    const SmartPointer<Expression>& expression,
-                                                   bool global);
+                                                   bool global) override;
 
-  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider);
+  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider) override;
 
   SmartPointer<const ExecutionEvent> CreateExecutionEvent(const SmartPointer<const Command>& command,
-                                                          const SmartPointer<const UIElement>& event);
+                                                          const SmartPointer<const UIElement>& event) override;
 
   SmartPointer<const ExecutionEvent> CreateExecutionEvent(
       const SmartPointer<const ParameterizedCommand>& command,
-      const SmartPointer<const UIElement>& event);
+      const SmartPointer<const UIElement>& event) override;
 
-  void DeactivateHandler(const SmartPointer<IHandlerActivation>& activation);
+  void DeactivateHandler(const SmartPointer<IHandlerActivation>& activation) override;
 
-  void DeactivateHandlers(const QList<SmartPointer<IHandlerActivation> >& activations);
+  void DeactivateHandlers(const QList<SmartPointer<IHandlerActivation> >& activations) override;
 
-  void Dispose();
+  void Dispose() override;
 
   Object::Pointer ExecuteCommand(const SmartPointer<ParameterizedCommand>& command,
-                                 const SmartPointer<const UIElement>& event);
+                                 const SmartPointer<const UIElement>& event) override;
 
   Object::Pointer ExecuteCommand(const QString& commandId,
-                                 const SmartPointer<const UIElement>& event);
+                                 const SmartPointer<const UIElement>& event) override;
 
-  SmartPointer<IEvaluationContext> GetCurrentState() const;
+  SmartPointer<IEvaluationContext> GetCurrentState() const override;
 
-  void ReadRegistry();
+  void ReadRegistry() override;
 
-  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider);
+  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider) override;
 
   void SetHelpContextId(const SmartPointer<IHandler>& handler,
-                        const QString& helpContextId);
+                        const QString& helpContextId) override;
 
   SmartPointer<Expression> GetDefaultExpression() const;
 
-  SmartPointer<IEvaluationContext> CreateContextSnapshot(bool includeSelection);
+  SmartPointer<IEvaluationContext> CreateContextSnapshot(bool includeSelection) override;
 
   Object::Pointer ExecuteCommandInContext(const SmartPointer<ParameterizedCommand>& command,
                                           const SmartPointer<const UIElement>& event,
-                                          const SmartPointer<IEvaluationContext>& context);
+                                          const SmartPointer<IEvaluationContext>& context) override;
 
 protected:
 

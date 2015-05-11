@@ -23,7 +23,7 @@ const std::string QmitkZeppelinModelParametersWidget::VIEW_ID = "org.mitk.views.
 QmitkZeppelinModelParametersWidget::QmitkZeppelinModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
-    m_Controls = NULL;
+    m_Controls = nullptr;
     this->CreateQtPartControl(this);
 }
 

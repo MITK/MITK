@@ -78,7 +78,7 @@ Object::ConstPointer HandlerUtil::GetVariable(
     Object::ConstPointer var = eval->GetVariable(name);
     return var == IEvaluationContext::UNDEFINED_VARIABLE ? Object::ConstPointer() : var;
   }
-  return Object::ConstPointer(0);
+  return Object::ConstPointer(nullptr);
 }
 
 HandlerUtil::StringVectorType::ConstPointer HandlerUtil::GetActiveContexts(

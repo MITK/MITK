@@ -171,13 +171,13 @@ public:
    *         to a us::Any containing the value.
    */
 
-    map<string, us::Any> parseArguments(const StringContainerType &arguments, bool* ok = 0);
+    map<string, us::Any> parseArguments(const StringContainerType &arguments, bool* ok = nullptr);
 
     /**
     * Convenient method allowing to parse a given list of command line arguments.
     * @see parseArguments(const StringContainerType &, bool*)
     */
-    map<string, us::Any> parseArguments(int argc, char** argv, bool* ok = 0);
+    map<string, us::Any> parseArguments(int argc, char** argv, bool* ok = nullptr);
 
     /**
    * Returns a detailed error description if a call to <code>parseArguments()</code>

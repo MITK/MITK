@@ -28,7 +28,7 @@ Property::Property(const Reflection::TypeInfo& typeInfo,
 
 void Property::SetPropertyTester(IPropertyTester::Pointer tester)
 {
-  assert(tester.GetPointer() != 0);
+  assert(tester.GetPointer() != nullptr);
   fTester = tester;
 }
 

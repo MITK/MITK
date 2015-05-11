@@ -206,7 +206,7 @@ struct SaveViewRunnable: public SafeRunnable
   {
   }
 
-  void Run()
+  void Run() override
   {
 
     const QHash<QString, QString>& properties =
@@ -228,7 +228,7 @@ struct SaveViewRunnable: public SafeRunnable
         WorkbenchConstants::TAG_VIEW_STATE));
   }
 
-  void HandleException(const ctkException& /*e*/)
+  void HandleException(const ctkException& /*e*/) override
   {
     //            result
     //            .add(new Status(
@@ -315,7 +315,7 @@ IMemento::Pointer ViewFactory::GetViewState(const QString& key)
   IMemento::Pointer memento = mementoTable[key];
 
   if (!memento)
-    return IMemento::Pointer(0);
+    return IMemento::Pointer(nullptr);
 
   return memento->GetChild(WorkbenchConstants::TAG_VIEW_STATE);
 }

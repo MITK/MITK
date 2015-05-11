@@ -69,9 +69,9 @@ namespace mitk
 
     if (!m_Lists[Whitelist].empty())
     {
-      std::map<std::string, BaseProperty::Pointer>::const_iterator end = propertyMap.end();
+      auto end = propertyMap.end();
 
-      for (std::map<std::string, BaseProperty::Pointer>::const_iterator iter = propertyMap.begin(); iter != end; ++iter)
+      for (auto iter = propertyMap.begin(); iter != end; ++iter)
       {
         if(std::find(m_Lists[Whitelist].begin(), m_Lists[Whitelist].end(), iter->first) != m_Lists[Whitelist].end())
           ret.insert(*iter);
@@ -80,9 +80,9 @@ namespace mitk
 
     if (!m_Lists[Blacklist].empty())
     {
-      std::vector<std::string>::const_iterator end = m_Lists[Blacklist].end();
+      auto end = m_Lists[Blacklist].end();
 
-      for (std::vector<std::string>::const_iterator iter = m_Lists[Blacklist].begin(); iter != end; ++iter)
+      for (auto iter = m_Lists[Blacklist].begin(); iter != end; ++iter)
         ret.erase(*iter);
     }
 
@@ -101,9 +101,9 @@ namespace mitk
 
   bool PropertyFilter::Impl::IsEmpty() const
   {
-    std::vector<std::vector<std::string> >::const_iterator end = m_Lists.end();
+    auto end = m_Lists.end();
 
-    for (std::vector<std::vector<std::string> >::const_iterator iter = m_Lists.begin(); iter != end; ++iter)
+    for (auto iter = m_Lists.begin(); iter != end; ++iter)
     {
       if (!iter->empty())
         return false;
@@ -129,7 +129,7 @@ namespace mitk
 
   void PropertyFilter::Impl::RemoveEntry(const std::string& propertyName, std::vector<std::string>& list)
   {
-    std::vector<std::string>::iterator iter = std::find(list.begin(), list.end(), propertyName);
+    auto iter = std::find(list.begin(), list.end(), propertyName);
 
     if (iter != list.end())
       list.erase(iter);

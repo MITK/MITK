@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkQuaternionRigidTransformView : public 
 
 public:
 
-  QmitkQuaternionRigidTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkQuaternionRigidTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkQuaternionRigidTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

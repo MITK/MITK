@@ -137,27 +137,27 @@ public:
   /*
    * @see QXmlDefaultHandler#setDocumentLocator(QXmlLocator*)
    */
-  void setDocumentLocator(QXmlLocator* locator);
+  void setDocumentLocator(QXmlLocator* locator) override;
 
   /*
    * @see QXmlDefaultHandler#characters(const QString&)
    */
-  bool characters(const QString& ch);
+  bool characters(const QString& ch) override;
 
   /*
    * @see QXmlDefaultHandler#endElement(const QString&, const QString&, const QString&)
    */
-  bool endElement(const QString& uri, const QString& elementName, const QString& qName);
+  bool endElement(const QString& uri, const QString& elementName, const QString& qName) override;
 
   /*
    * @see QXmlDefaultHandler#error(const QXmlParseException&)
    */
-  bool error(const QXmlParseException& ex);
+  bool error(const QXmlParseException& ex) override;
 
   /*
    * @see QXmlDefaultHandler#fatalError(const QXmlParseException&)
    */
-  bool fatalError(const QXmlParseException& ex);
+  bool fatalError(const QXmlParseException& ex) override;
 
   bool parseManifest(QXmlReader* reader, QXmlInputSource* in,
                      const QString& manifestName,
@@ -168,18 +168,18 @@ public:
   /*
    * @see QXmlDefaultHandler#startDocument()
    */
-  bool startDocument();
+  bool startDocument() override;
 
   /*
    * @see QXmlDefaultHandler#startElement(const QString&, const QString&, const QString&, const QXmlAttributes&)
    */
   bool startElement(const QString& uri, const QString& elementName,
-                    const QString& qName, const QXmlAttributes& attributes);
+                    const QString& qName, const QXmlAttributes& attributes) override;
 
   /*
    * @see QXmlDefaultHandler#warning(const QXmlParseException&)
    */
-  bool warning(const QXmlParseException& ex);
+  bool warning(const QXmlParseException& ex) override;
 
   /**
    * Handles an error state specified by the status.  The collection of all logged status

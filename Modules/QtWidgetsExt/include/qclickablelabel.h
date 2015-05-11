@@ -41,8 +41,8 @@ class MITKQTWIDGETSEXT_EXPORT QClickableLabel : public QLabel
     QClickableLabel( QWidget* parent, Qt::WFlags f = 0 );
     QClickableLabel( const QString& text, QWidget* parent, Qt::WFlags f = 0 );
 #else
-    QClickableLabel( QWidget* parent, Qt::WindowFlags f = 0 );
-    QClickableLabel( const QString& text, QWidget* parent, Qt::WindowFlags f = 0 );
+    QClickableLabel( QWidget* parent, Qt::WindowFlags f = nullptr );
+    QClickableLabel( const QString& text, QWidget* parent, Qt::WindowFlags f = nullptr );
 #endif
     virtual ~QClickableLabel();
 

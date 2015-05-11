@@ -74,11 +74,11 @@ bool DefaultSaveable::operator<(const Object* obj) const
 {
   if (this == obj)
     return false;
-  if (obj == 0)
+  if (obj == nullptr)
     return true;
 
   const DefaultSaveable* other = dynamic_cast<const DefaultSaveable*> (obj);
-  if (other == NULL) return true;
+  if (other == nullptr) return true;
 
   if (part.Expired())
   {

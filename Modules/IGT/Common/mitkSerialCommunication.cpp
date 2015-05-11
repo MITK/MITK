@@ -184,7 +184,7 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
 
   unsigned long bytesRead = 0;
   unsigned long bytesLeft = numberOfBytes;
-  char* buffer = new char[numberOfBytes];
+  auto  buffer = new char[numberOfBytes];
 
   while ((bytesLeft > 0) && (bytesRead < numberOfBytes))
   {

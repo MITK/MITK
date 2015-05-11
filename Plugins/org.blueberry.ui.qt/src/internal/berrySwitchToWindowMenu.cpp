@@ -119,9 +119,9 @@ void SwitchToWindowMenu::Fill(QMenu* menu, QAction* before)
   }
 
   // Add one item for each window.
-  QActionGroup* actionGroup = new QActionGroup(menu);
+  auto   actionGroup = new QActionGroup(menu);
   actionGroup->setExclusive(true);
-  QSignalMapper* signalMapper = new QSignalMapper(menu);
+  auto   signalMapper = new QSignalMapper(menu);
   connect(signalMapper, SIGNAL(mapped(int)), SLOT(MenuItemTriggered(int)));
   int count = 0;
   for (auto window : windows)
@@ -132,7 +132,7 @@ void SwitchToWindowMenu::Fill(QMenu* menu, QAction* before)
       QString name = CalcText(count, window);
       if (!name.isEmpty())
       {
-        QAction* mi = new QAction(name, menu);
+        auto   mi = new QAction(name, menu);
         mi->setCheckable(true);
         mi->setChecked(window == workbenchWindow);
         actionGroup->addAction(mi);

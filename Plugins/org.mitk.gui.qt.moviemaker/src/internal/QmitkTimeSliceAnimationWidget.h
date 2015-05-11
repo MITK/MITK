@@ -31,10 +31,10 @@ class QmitkTimeSliceAnimationWidget : public QmitkAnimationWidget
   Q_OBJECT
 
 public:
-  explicit QmitkTimeSliceAnimationWidget(QWidget* parent = NULL);
+  explicit QmitkTimeSliceAnimationWidget(QWidget* parent = nullptr);
   ~QmitkTimeSliceAnimationWidget();
 
-  void SetAnimationItem(QmitkAnimationItem* sliceAnimationItem);
+  void SetAnimationItem(QmitkAnimationItem* sliceAnimationItem) override;
 
 private slots:
   void OnFromChanged(double from);

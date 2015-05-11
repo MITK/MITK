@@ -20,7 +20,7 @@ namespace berry {
 
 void IDebugObjectListener::Events::AddListener(IDebugObjectListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   Types t = l->GetEventTypes();
 
@@ -33,7 +33,7 @@ void IDebugObjectListener::Events::AddListener(IDebugObjectListener* l)
 
 void IDebugObjectListener::Events::RemoveListener(IDebugObjectListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   objCreatedEvent -= ObjDelegate(l, &IDebugObjectListener::ObjectCreated);
   objDestroyedEvent -= ObjDelegate(l, &IDebugObjectListener::ObjectDestroyed);

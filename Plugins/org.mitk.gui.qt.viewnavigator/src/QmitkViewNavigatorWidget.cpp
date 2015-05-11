@@ -80,8 +80,8 @@ private :
     bool hasToBeDisplayed(const QModelIndex index) const;
     bool displayElement(const QModelIndex index) const;
 public:
-    ClassFilterProxyModel(QObject *parent = NULL);
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    ClassFilterProxyModel(QObject *parent = nullptr);
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
 ClassFilterProxyModel::ClassFilterProxyModel(QObject *parent):
     QSortFilterProxyModel(parent)
@@ -178,7 +178,7 @@ public:
     {
     }
 
-    Events::Types GetPerspectiveEventTypes() const
+    Events::Types GetPerspectiveEventTypes() const override
     {
         return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED
                 // remove the following line when command framework is finished
@@ -186,7 +186,7 @@ public:
     }
 
     void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                              const berry::IPerspectiveDescriptor::Pointer& perspective)
+                              const berry::IPerspectiveDescriptor::Pointer& perspective) override
     {
         parentWidget->m_ActivePerspective = perspective;
         parentWidget->UpdateTreeList();
@@ -194,29 +194,29 @@ public:
 
     void PerspectiveSavedAs(const berry::IWorkbenchPage::Pointer& /*page*/,
                             const berry::IPerspectiveDescriptor::Pointer& /*oldPerspective*/,
-                            const berry::IPerspectiveDescriptor::Pointer& newPerspective)
+                            const berry::IPerspectiveDescriptor::Pointer& newPerspective) override
     {
       parentWidget->m_ActivePerspective = newPerspective;
       parentWidget->UpdateTreeList();
     }
 
     void PerspectiveDeactivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                                const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                                const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
     {
-      parentWidget->m_ActivePerspective = 0;
+      parentWidget->m_ActivePerspective = nullptr;
       parentWidget->UpdateTreeList();
     }
 
     void PerspectiveOpened(const berry::IWorkbenchPage::Pointer& /*page*/,
-                           const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                           const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
     {
         parentWidget->UpdateTreeList();
     }
 
     void PerspectiveClosed(const berry::IWorkbenchPage::Pointer& /*page*/,
-                           const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                           const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
     {
-      parentWidget->m_ActivePerspective = 0;
+      parentWidget->m_ActivePerspective = nullptr;
       parentWidget->UpdateTreeList();
     }
 
@@ -229,7 +229,7 @@ public:
         if (changeId=="viewHide" && partRef->GetId()=="org.mitk.views.viewnavigatorview")
             berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->RemovePerspectiveListener(parentWidget->m_PerspectiveListener.data());
         else
-            parentWidget->UpdateTreeList(NULL, partRef.GetPointer(), changeId);
+            parentWidget->UpdateTreeList(nullptr, partRef.GetPointer(), changeId);
     }
 
 private:
@@ -252,7 +252,7 @@ bool comparePerspectives(const berry::IPerspectiveDescriptor::Pointer& a, const 
 
 bool compareQStandardItems(const QStandardItem* a, const QStandardItem* b)
 {
-    if (a==NULL || b==NULL)
+    if (a==nullptr || b==nullptr)
         return false;
     return a->text().compare(b->text()) < 0;
 }
@@ -312,7 +312,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkb
       m_Generated = FillTreeList();
     }
 
-    if (root==NULL)
+    if (root==nullptr)
         root = m_TreeModel->invisibleRootItem();
     for (int i=0; i<root->rowCount(); i++)
     {
@@ -338,7 +338,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkb
                     break;
                 }
 
-            if( partRef!=NULL && partRef->GetId()==vItem->m_View->GetId() && changeId=="viewHide")
+            if( partRef!=nullptr && partRef->GetId()==vItem->m_View->GetId() && changeId=="viewHide")
                 font.setBold(false);
 
             vItem->setFont(font);
@@ -416,7 +416,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
         }
         else
         {
-            QStandardItem* categoryItem = NULL;
+            QStandardItem* categoryItem = nullptr;
 
             for (unsigned int c=0; c<categoryItems.size(); c++)
             {
@@ -427,7 +427,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
                 }
             }
 
-            if (categoryItem==NULL)
+            if (categoryItem==nullptr)
             {
                 categoryItem  = new QStandardItem(QIcon(),catPath.front());
                 categoryItems.push_back(categoryItem);
@@ -446,7 +446,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     QList<berry::IViewDescriptor::Pointer> viewDescriptors(viewRegistry->GetViews());
     QList<berry::IViewPart::Pointer> viewParts(page->GetViews());
     qSort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
-    QStandardItem* emptyItem = new QStandardItem();
+    auto   emptyItem = new QStandardItem();
     emptyItem->setFlags(Qt::ItemIsEnabled);
     treeRootItem->appendRow(emptyItem);
     //QStringList viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
@@ -498,7 +498,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
             noCategoryItem->appendRow(vItem);
         else
         {
-            QStandardItem* categoryItem = NULL;
+            QStandardItem* categoryItem = nullptr;
 
             for (unsigned int c=0; c<categoryItems.size(); c++)
                 if (categoryItems.at(c)->text() == catPath.front())
@@ -507,7 +507,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
                     break;
                 }
 
-            if (categoryItem==NULL)
+            if (categoryItem==nullptr)
             {
                 categoryItem  = new QStandardItem(QIcon(),catPath.front());
                 categoryItems.push_back(categoryItem);
@@ -558,7 +558,7 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
         }
         catch (...)
         {
-            QMessageBox::critical(0, "Opening Perspective Failed", QString("The requested perspective could not be opened.\nSee the log for details."));
+            QMessageBox::critical(nullptr, "Opening Perspective Failed", QString("The requested perspective could not be opened.\nSee the log for details."));
         }
     }
     else if ( dynamic_cast< mitk::QtViewItem* >(item) )
@@ -645,7 +645,7 @@ void QmitkViewNavigatorWidget::CustomMenuRequested(QPoint pos)
     QModelIndex index = m_Controls.m_PluginTreeView->indexAt(pos);
     QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
 
-    if (m_ContextMenu==NULL)
+    if (m_ContextMenu==nullptr)
         return;
 
     m_ContextMenu->clear();
@@ -661,7 +661,7 @@ void QmitkViewNavigatorWidget::CustomMenuRequested(QPoint pos)
     m_ContextMenu->addSeparator();
 
 
-    if ( item!=NULL && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
+    if ( item!=nullptr && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
     {
         berry::IPerspectiveDescriptor::Pointer persp = dynamic_cast< mitk::QtPerspectiveItem* >(item)->m_Perspective;
         if (this->m_ActivePerspective.IsNotNull() && this->m_ActivePerspective == persp)

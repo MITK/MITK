@@ -106,7 +106,7 @@ public:
     virtual const char * GetDefaultExtension() override { return ".roi"; }
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) override
     {
-      return (dynamic_cast<mitk::TbssRoiImage*>(data.GetPointer()) != NULL);
+      return (dynamic_cast<mitk::TbssRoiImage*>(data.GetPointer()) != nullptr);
     }
 
 

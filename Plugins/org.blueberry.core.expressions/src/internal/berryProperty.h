@@ -58,11 +58,11 @@ public:
   bool Test(Object::ConstPointer receiver, const QList<Object::Pointer>& args,
             Object::Pointer expectedValue);
 
-  bool operator==(const Object* obj) const;
+  bool operator==(const Object* obj) const override;
 
-  bool operator<(const Object* obj) const;
+  bool operator<(const Object* obj) const override;
 
-  uint HashCode() const;
+  uint HashCode() const override;
 };
 
 }  // namespace berry

@@ -69,22 +69,22 @@ private:
     ExecutionListener(CommandManager* commandManager);
 
     void NotDefined(const QString& commandId,
-        const NotDefinedException* exception);
+        const NotDefinedException* exception) override;
 
     void NotEnabled(const QString& commandId,
-        const NotEnabledException* exception);
+        const NotEnabledException* exception) override;
 
     void NotHandled(const QString& commandId,
-        const NotHandledException* exception);
+        const NotHandledException* exception) override;
 
     void PostExecuteFailure(const QString& commandId,
-        const ExecutionException* exception);
+        const ExecutionException* exception) override;
 
     void PostExecuteSuccess(const QString& commandId,
-        const Object::Pointer& returnValue);
+        const Object::Pointer& returnValue) override;
 
     void PreExecute(const QString& commandId, const SmartPointer<
-        const ExecutionEvent>& event);
+        const ExecutionEvent>& event) override;
 
   private:
 
@@ -97,7 +97,7 @@ private:
     CommandCategoryListener(CommandManager* commandManager);
 
     void CategoryChanged(
-        const SmartPointer<const CommandCategoryEvent>& categoryEvent);
+        const SmartPointer<const CommandCategoryEvent>& categoryEvent) override;
 
   private:
 
@@ -111,7 +111,7 @@ private:
 
     CommandListener(CommandManager* commandManager);
 
-    void CommandChanged(const SmartPointer<const CommandEvent>& commandEvent);
+    void CommandChanged(const SmartPointer<const CommandEvent>& commandEvent) override;
 
   private:
 
@@ -127,7 +127,7 @@ private:
     ParameterTypeListener(CommandManager* commandManager);
 
     void ParameterTypeChanged(
-        const SmartPointer<const ParameterTypeEvent>& parameterTypeEvent);
+        const SmartPointer<const ParameterTypeEvent>& parameterTypeEvent) override;
 
   private:
 

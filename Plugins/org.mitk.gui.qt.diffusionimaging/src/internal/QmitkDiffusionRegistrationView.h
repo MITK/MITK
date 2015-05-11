@@ -75,8 +75,8 @@ public:
   QmitkDiffusionRegistrationView();
   virtual ~QmitkDiffusionRegistrationView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
-  void SetFocus();
+  virtual void CreateQtPartControl(QWidget *parent) override;
+  void SetFocus() override;
 
   typedef mitk::DWIHeadMotionCorrectionFilter       DWIHeadMotionCorrectionFilterType;
 
@@ -99,7 +99,7 @@ protected slots:
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&) override;
 
   Ui::QmitkDiffusionRegistrationViewControls* m_Controls;
 

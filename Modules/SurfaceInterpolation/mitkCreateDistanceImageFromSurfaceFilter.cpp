@@ -190,7 +190,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::PreprocessContourPoints()
 
     existingPolys->InitTraversal();
 
-    vtkIdType* cell (NULL);
+    vtkIdType* cell (nullptr);
     vtkIdType cellSize (0);
 
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
@@ -492,7 +492,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::SetInput( unsigned int idx, con
 const mitk::Surface* mitk::CreateDistanceImageFromSurfaceFilter::GetInput()
 {
     if (this->GetNumberOfIndexedInputs() < 1)
-        return NULL;
+        return nullptr;
 
     return static_cast<const mitk::Surface*>(this->ProcessObject::GetInput(0));
 }
@@ -501,7 +501,7 @@ const mitk::Surface* mitk::CreateDistanceImageFromSurfaceFilter::GetInput()
 const mitk::Surface* mitk::CreateDistanceImageFromSurfaceFilter::GetInput( unsigned int idx)
 {
     if (this->GetNumberOfIndexedInputs() < 1)
-        return NULL;
+        return nullptr;
 
     return static_cast<const mitk::Surface*>(this->ProcessObject::GetInput(idx));
 }
@@ -572,7 +572,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::DetermineBounds( DistanceImageT
   DistanceImageType::IndexValueType zmax = tmpIndex[2];
 
   // iterate over the rest of the points
-  CenterList::iterator centerIter = m_Centers.begin();
+  auto centerIter = m_Centers.begin();
   for ( ++centerIter; centerIter!=m_Centers.end(); centerIter++)
   {
     tmpPoint[0] = (*centerIter)[0];

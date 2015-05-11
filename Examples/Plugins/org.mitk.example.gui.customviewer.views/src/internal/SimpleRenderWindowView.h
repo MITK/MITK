@@ -60,7 +60,7 @@ public:
   /**
    * \see mitk::IRenderWindowPart::GetActiveQmitkRenderWindow()
    */
-  QmitkRenderWindow* GetActiveQmitkRenderWindow() const;
+  QmitkRenderWindow* GetActiveQmitkRenderWindow() const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetRenderWindows()
@@ -70,7 +70,7 @@ public:
   /**
    * \see mitk::IRenderWindowPart::GetQmitkRenderWindows()
    */
-  QHash<QString,QmitkRenderWindow*> GetQmitkRenderWindows() const;
+  QHash<QString,QmitkRenderWindow*> GetQmitkRenderWindows() const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetRenderWindow(QString)
@@ -80,61 +80,61 @@ public:
   /**
    * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(QString)
    */
-  QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const;
+  QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetSelectionPosition()
    */
-  mitk::Point3D GetSelectedPosition(const QString& id = QString()) const;
+  mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
 
   /**
    * \see mitk::IRenderWindowPart::SetSelectedPosition()
    */
-  void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString());
+  void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) override;
 
   /**
    * \see mitk::IRenderWindowPart::EnableDecorations()
    */
-  void EnableDecorations(bool enable, const QStringList& decorations = QStringList());
+  void EnableDecorations(bool enable, const QStringList& decorations = QStringList()) override;
 
   /**
    * \see mitk::IRenderWindowPart::IsDecorationEnabled()
    */
-  bool IsDecorationEnabled(const QString& decoration) const;
+  bool IsDecorationEnabled(const QString& decoration) const override;
 
   /**
    * \see mitk::IRenderWindowPart::GetDecorations()
    */
-  QStringList GetDecorations() const;
+  QStringList GetDecorations() const override;
 
   /**
    * \see mitk::QmitkAbstractRenderEditor::GetRenderingManager()
    */
-  mitk::IRenderingManager* GetRenderingManager() const;
+  mitk::IRenderingManager* GetRenderingManager() const override;
 
   /**
    * \see mitk::QmitkAbstractRenderEditor::RequestUpdate()
    */
-  void RequestUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL);
+  void RequestUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL) override;
 
   /**
    * \see mitk::QmitkAbstractRenderEditor::ForceImmediateUpdate()
    */
-  void ForceImmediateUpdate(mitk::RenderingManager::RequestType);
+  void ForceImmediateUpdate(mitk::RenderingManager::RequestType) override;
 
   /**
    * \see mitk::QmitkAbstractRenderEditor::GetTimeNavigationController()
    */
-  mitk::SliceNavigationController *GetTimeNavigationController() const;
+  mitk::SliceNavigationController *GetTimeNavigationController() const override;
 
 protected:
 
-  void SetFocus();
+  void SetFocus() override;
 
   /**
    * Creates the QmitkRenderWindow whose renderer is being connected to the view's data storage.
    */
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
 private:
 

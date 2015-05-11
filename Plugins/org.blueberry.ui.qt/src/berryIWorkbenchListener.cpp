@@ -22,7 +22,7 @@ void
 IWorkbenchListener::Events
 ::AddListener(IWorkbenchListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   preShutdown += Delegate2(listener, &IWorkbenchListener::PreShutdown);
   postShutdown += Delegate1(listener, &IWorkbenchListener::PostShutdown);
@@ -32,7 +32,7 @@ void
 IWorkbenchListener::Events
 ::RemoveListener(IWorkbenchListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   preShutdown -= Delegate2(listener, &IWorkbenchListener::PreShutdown);
   postShutdown -= Delegate1(listener, &IWorkbenchListener::PostShutdown);

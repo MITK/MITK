@@ -230,7 +230,7 @@ void PageLayout::AddView(const QString& viewId, int relationship,
 
       // PartStack for views
       PartStack::Pointer newFolder(new PartStack(rootLayoutContainer->page,
-          true, appearance, 0));
+          true, appearance, nullptr));
       newFolder->Add(newPart);
       this->SetFolderPart(viewId, newFolder);
       this->AddPart(newFolder, viewId, relationship, ratio, refId);
@@ -598,7 +598,7 @@ void PageLayout::AddStandaloneViewPlaceholder(const QString& viewId,
     appearance = PresentationFactoryUtil::ROLE_STANDALONE_NOTITLE;
   }
   folder->SetRealContainer(ILayoutContainer::Pointer(new PartStack(rootLayoutContainer->page, true,
-      appearance, 0)));
+      appearance, nullptr)));
   folder->SetID(stackId);
   this->AddPart(folder, stackId, relationship, ratio, refId);
 
@@ -618,7 +618,7 @@ IViewLayout::Pointer PageLayout::GetViewLayout(const QString& viewId)
   ViewLayoutRec::Pointer rec = this->GetViewLayoutRec(viewId, true);
   if (rec == 0)
   {
-    return IViewLayout::Pointer(0);
+    return IViewLayout::Pointer(nullptr);
   }
   return IViewLayout::Pointer(new ViewLayout(PageLayout::Pointer(this), rec));
 }
@@ -653,7 +653,7 @@ IPlaceholderFolderLayout::Pointer PageLayout::GetFolderForView(
     const QString& viewId)
 {
   if (mapIDtoFolder[viewId] == 0)
-    return IPlaceholderFolderLayout::Pointer(0);
+    return IPlaceholderFolderLayout::Pointer(nullptr);
 
   ILayoutContainer::Pointer folder = mapIDtoFolder[viewId];
   IPlaceholderFolderLayout::Pointer layout;

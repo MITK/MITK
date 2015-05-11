@@ -39,7 +39,7 @@ namespace mitk
       m_ImageCropper = imageCropper;
     }
 
-    virtual void  ExecuteOperation(mitk::Operation* op);
+    virtual void  ExecuteOperation(mitk::Operation* op) override;
 
   private:
 

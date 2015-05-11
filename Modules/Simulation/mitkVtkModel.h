@@ -46,10 +46,10 @@ namespace mitk
 
     SOFA_CLASS(VtkModel, sofa::component::visualmodel::VisualModelImpl);
 
-    void internalDraw(const sofa::core::visual::VisualParams* vparams, bool transparent);
-    bool loadTextures();
+    void internalDraw(const sofa::core::visual::VisualParams* vparams, bool transparent) override;
+    bool loadTextures() override;
     void SetVtkRenderer(vtkRenderer* renderer);
-    void updateBuffers();
+    void updateBuffers() override;
 
     DataNode::Pointer GetDataNode() const;
 

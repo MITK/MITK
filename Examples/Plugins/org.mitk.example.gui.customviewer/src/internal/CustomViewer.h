@@ -46,10 +46,10 @@ public:
   ~CustomViewer();
 
 /** Starts the application.*/
-  QVariant Start(berry::IApplicationContext* context);
+  QVariant Start(berry::IApplicationContext* context) override;
 
 /** Exits the application.*/
-  void Stop();
+  void Stop() override;
 };
 
 #endif /*CUSTOMVIEWER_H_*/

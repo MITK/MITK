@@ -108,7 +108,7 @@ public:
                     const SmartPointer<Expression>& expression, int depth,
                     IHandlerService* handlerService);
 
-  void ClearActive();
+  void ClearActive() override;
 
   /**
    * Implement {@link Object#operator<(const Object*)}.
@@ -117,19 +117,19 @@ public:
    * equals.
    * </p>
    */
-  bool operator<(const Object* object) const;
+  bool operator<(const Object* object) const override;
 
   int CompareTo(const HandlerActivation* other) const;
 
-  QString GetCommandId() const;
+  QString GetCommandId() const override;
 
-  int GetDepth() const;
+  int GetDepth() const override;
 
-  SmartPointer<IHandler> GetHandler() const;
+  SmartPointer<IHandler> GetHandler() const override;
 
-  IHandlerService* GetHandlerService() const;
+  IHandlerService* GetHandlerService() const override;
 
-  QString ToString() const;
+  QString ToString() const override;
 
   /**
    * @return Returns the reference.

@@ -30,7 +30,7 @@ mitk::BaseProperty* mitk::PropertyList::GetProperty(const std::string& propertyK
     if(it!=m_Properties.end())
       return it->second;
     else
-        return NULL;
+        return nullptr;
 }
 
 
@@ -43,7 +43,7 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
   //b) possibly deleted when temporarily added to a smartpointer somewhere below.
   BaseProperty::Pointer tmpSmartPointerToProperty = property;
 
-  PropertyMap::iterator it( m_Properties.find( propertyKey ) );
+  auto it( m_Properties.find( propertyKey ) );
 
   // Is a property with key @a propertyKey contained in the list?
   if( it != m_Properties.end() )
@@ -82,12 +82,12 @@ void mitk::PropertyList::ReplaceProperty(const std::string& propertyKey, BasePro
 {
   if (!property) return;
 
-  PropertyMap::iterator it( m_Properties.find( propertyKey ) );
+  auto it( m_Properties.find( propertyKey ) );
 
   // Is a property with key @a propertyKey contained in the list?
   if( it != m_Properties.end() )
   {
-    it->second=NULL;
+    it->second=nullptr;
     m_Properties.erase(it);
   }
 
@@ -104,7 +104,7 @@ mitk::PropertyList::PropertyList()
 mitk::PropertyList::PropertyList(const mitk::PropertyList& other)
   : itk::Object()
 {
-  for (PropertyMap::const_iterator i = other.m_Properties.begin();
+  for (auto i = other.m_Properties.begin();
        i != other.m_Properties.end(); ++i)
   {
     m_Properties.insert(std::make_pair(i->first, i->second->Clone()));
@@ -123,7 +123,7 @@ mitk::PropertyList::~PropertyList()
  */
 unsigned long mitk::PropertyList::GetMTime() const
 {
-  for ( PropertyMap::const_iterator it = m_Properties.begin() ;
+  for ( auto it = m_Properties.begin() ;
         it != m_Properties.end();
         ++it )
   {
@@ -150,7 +150,7 @@ bool mitk::PropertyList::DeleteProperty(const std::string& propertyKey)
 
   if(it!=m_Properties.end())
   {
-    it->second=NULL;
+    it->second=nullptr;
     m_Properties.erase(it);
     Modified();
     return true;
@@ -161,10 +161,10 @@ bool mitk::PropertyList::DeleteProperty(const std::string& propertyKey)
 
 void mitk::PropertyList::Clear()
 {
-  PropertyMap::iterator it = m_Properties.begin(), end = m_Properties.end();
+  auto it = m_Properties.begin(), end = m_Properties.end();
   while(it!=end)
   {
-    it->second = NULL;
+    it->second = nullptr;
     ++it;
   }
   m_Properties.clear();
@@ -183,7 +183,7 @@ void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool repla
   {
     const PropertyMap* propertyMap = pList->GetMap();
 
-    for ( PropertyMap::const_iterator iter = propertyMap->begin(); // m_PropertyList is created in the constructor, so we don't check it here
+    for ( auto iter = propertyMap->begin(); // m_PropertyList is created in the constructor, so we don't check it here
           iter != propertyMap->end();
           ++iter )
     {
@@ -204,7 +204,7 @@ void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool repla
 bool mitk::PropertyList::GetBoolProperty(const char* propertyKey, bool& boolValue) const
 {
   BoolProperty *gp = dynamic_cast<BoolProperty*>( GetProperty(propertyKey) );
-  if ( gp != NULL )
+  if ( gp != nullptr )
   {
     boolValue = gp->GetValue();
     return true;
@@ -218,7 +218,7 @@ bool mitk::PropertyList::GetBoolProperty(const char* propertyKey, bool& boolValu
 bool mitk::PropertyList::GetIntProperty(const char* propertyKey, int &intValue) const
 {
   IntProperty *gp = dynamic_cast<IntProperty*>( GetProperty(propertyKey) );
-  if ( gp != NULL )
+  if ( gp != nullptr )
   {
     intValue = gp->GetValue();
     return true;
@@ -232,7 +232,7 @@ bool mitk::PropertyList::GetIntProperty(const char* propertyKey, int &intValue) 
 bool mitk::PropertyList::GetFloatProperty(const char* propertyKey, float &floatValue) const
 {
   FloatProperty *gp = dynamic_cast<FloatProperty*>( GetProperty(propertyKey) );
-  if ( gp != NULL )
+  if ( gp != nullptr )
   {
     floatValue = gp->GetValue();
     return true;
@@ -246,7 +246,7 @@ bool mitk::PropertyList::GetFloatProperty(const char* propertyKey, float &floatV
 bool mitk::PropertyList::GetStringProperty(const char* propertyKey, std::string& stringValue) const
 {
   StringProperty* sp= dynamic_cast<StringProperty*>(GetProperty(propertyKey));
-  if ( sp != NULL )
+  if ( sp != nullptr )
   {
     stringValue = sp->GetValue();
     return true;
@@ -337,7 +337,7 @@ bool mitk::PropertyList::Get( const char* propertyKey, std::string& stringValue 
 bool mitk::PropertyList::GetDoubleProperty( const char* propertyKey, double &doubleValue ) const
 {
     DoubleProperty *gp = dynamic_cast<DoubleProperty*>( GetProperty(propertyKey) );
-    if ( gp != NULL )
+    if ( gp != nullptr )
     {
         doubleValue = gp->GetValue();
         return true;

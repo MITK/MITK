@@ -173,7 +173,7 @@ std::vector<mitk::GrabCutOpenCVImageFilter::ModelPointsList> mitk::GrabCutOpenCV
   {
     mitk::GrabCutOpenCVImageFilter::ModelPointsList curContourPoints;
 
-    for ( std::vector<cv::Point>::iterator it = cvContours[i].begin();
+    for ( auto it = cvContours[i].begin();
           it != cvContours[i].end(); ++it)
     {
       itk::Index<2> index;
@@ -219,7 +219,7 @@ mitk::GrabCutOpenCVImageFilter::ModelPointsList mitk::GrabCutOpenCVImageFilter::
   ModelPointsList contourPoints;
 
   // convert cvContours to ModelPointsList
-  for ( std::vector<cv::Point>::iterator it = cvContours[0].begin();
+  for ( auto it = cvContours[0].begin();
         it != cvContours[0].end(); ++it)
   {
     itk::Index<2> index;
@@ -246,7 +246,7 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
 
   for (unsigned int n = 0; n < 2; ++n)
   {
-    for (ModelPointsList::iterator it = pointsLists[n].begin();
+    for (auto it = pointsLists[n].begin();
          it != pointsLists[n].end(); ++it)
     {
       // set pixels around current pixel to the same value (size of this

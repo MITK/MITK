@@ -40,7 +40,7 @@ public:
   ///
   /// The NodePredicate is owned by the model
   ///
-  QmitkDataStorageListModel(mitk::DataStorage::Pointer dataStorage = 0, mitk::NodePredicateBase* pred = 0, QObject* parent = 0);
+  QmitkDataStorageListModel(mitk::DataStorage::Pointer dataStorage = nullptr, mitk::NodePredicateBase* pred = nullptr, QObject* parent = nullptr);
   ~QmitkDataStorageListModel();
 
 

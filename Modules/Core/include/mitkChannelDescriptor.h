@@ -61,7 +61,7 @@ protected:
 
     void SetData( void* dataPtr )
     {
-      if(dataPtr == NULL)
+      if(dataPtr == nullptr)
       {
         m_Data = (unsigned char*) dataPtr;
       }

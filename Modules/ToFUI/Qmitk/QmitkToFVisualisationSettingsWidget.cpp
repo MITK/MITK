@@ -28,15 +28,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkToFVisualisationSettingsWidget::VIEW_ID = "org.mitk.views.qmitktofvisualisationsettingswidget";
 
 QmitkToFVisualisationSettingsWidget::QmitkToFVisualisationSettingsWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
-, m_Controls(NULL)
+, m_Controls(nullptr)
 , m_RangeSliderMin(0)
 , m_RangeSliderMax(0)
-, m_MitkDistanceImageNode(NULL)
-, m_MitkAmplitudeImageNode(NULL)
-, m_MitkIntensityImageNode(NULL)
-, m_Widget1ColorTransferFunction(NULL)
-, m_Widget2ColorTransferFunction(NULL)
-, m_Widget3ColorTransferFunction(NULL)
+, m_MitkDistanceImageNode(nullptr)
+, m_MitkAmplitudeImageNode(nullptr)
+, m_MitkIntensityImageNode(nullptr)
+, m_Widget1ColorTransferFunction(nullptr)
+, m_Widget2ColorTransferFunction(nullptr)
+, m_Widget3ColorTransferFunction(nullptr)
 , m_Widget1TransferFunctionType(1)
 , m_Widget2TransferFunctionType(0)
 , m_Widget3TransferFunctionType(0)
@@ -76,7 +76,7 @@ void QmitkToFVisualisationSettingsWidget::CreateConnections()
     m_Controls->m_RangeSlider->setMaximum(2048);
     m_Controls->m_RangeSlider->setMinimum(-2048);
 
-    m_Controls->m_ColorTransferFunctionCanvas->SetQLineEdits(m_Controls->m_XEditColor, 0);
+    m_Controls->m_ColorTransferFunctionCanvas->SetQLineEdits(m_Controls->m_XEditColor, nullptr);
     m_Controls->m_ColorTransferFunctionCanvas->SetTitle(""/*"Value -> Grayscale/Color"*/);
 
     this->OnShowAdvancedOptionsCheckboxChecked(false);

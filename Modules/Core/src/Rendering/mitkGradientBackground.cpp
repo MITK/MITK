@@ -22,14 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::GradientBackground::GradientBackground()
 {
-  m_RenderWindow = NULL;
+  m_RenderWindow = nullptr;
   m_Renderer = vtkSmartPointer<vtkRenderer>::New();
   m_Renderer->InteractiveOff();
 }
 
 mitk::GradientBackground::~GradientBackground()
 {
-  if ( m_RenderWindow != NULL )
+  if ( m_RenderWindow != nullptr )
     if ( this->IsEnabled() )
       this->Disable();
 }
@@ -127,7 +127,7 @@ void mitk::GradientBackground::Disable()
  */
 bool mitk::GradientBackground::IsEnabled()
 {
-  if ( m_RenderWindow == NULL )
+  if ( m_RenderWindow == nullptr )
     return false;
   else
     return ( mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted(m_Renderer));

@@ -30,7 +30,7 @@ public:
   QmitkDIAppSyntheticDataGenerationPerspective() {}
   ~QmitkDIAppSyntheticDataGenerationPerspective() {}
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
 #endif /* QmitkDIAppSyntheticDataGenerationPerspective_H_ */

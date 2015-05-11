@@ -64,12 +64,12 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#createView()
    */
-  IViewPart::Pointer CreateView();
+  IViewPart::Pointer CreateView() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getCategoryPath()
    */
-  QStringList GetCategoryPath() const;
+  QStringList GetCategoryPath() const override;
 
   /**
    * Return the configuration element for this descriptor.
@@ -81,24 +81,24 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getDescription()
    */
-  QString GetDescription() const;
+  QString GetDescription() const override;
 
-  QStringList GetKeywordReferences() const;
+  QStringList GetKeywordReferences() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getId()
    */
-  QString GetId() const;
+  QString GetId() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getImageDescriptor()
    */
-  QIcon GetImageDescriptor() const;
+  QIcon GetImageDescriptor() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getLabel()
    */
-  QString GetLabel() const;
+  QString GetLabel() const override;
 
   /**
    * Return the accelerator attribute.
@@ -110,14 +110,14 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.registry.IViewDescriptor#getAllowMultiple()
    */
-  bool GetAllowMultiple() const;
+  bool GetAllowMultiple() const override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.views.IViewDescriptor#getRestorable()
    */
-  bool IsRestorable() const;
+  bool IsRestorable() const override;
 
-  bool operator==(const Object*) const;
+  bool operator==(const Object*) const override;
 
   /**
    * Activates a show view handler for this descriptor. This handler can later
@@ -138,19 +138,19 @@ public:
   /*
    * @see IPluginContribution#GetPluginId()
    */
-   QString GetPluginId() const;
+   QString GetPluginId() const override;
 
    /*
     * @see IPluginContribution#GetLocalId()
     */
-   QString GetLocalId() const;
+   QString GetLocalId() const override;
 
 protected:
 
   /* (non-Javadoc)
    * @see IAdaptable#GetAdapterImpl(const std::type_info&)
    */
-  Object* GetAdapter(const QString& adapter) const;
+  Object* GetAdapter(const QString& adapter) const override;
 
 private:
   /**

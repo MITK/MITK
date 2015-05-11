@@ -45,7 +45,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public Qmitk
      * \brief Calls base class constructor.
      * \see QmitkDataStorageComboBox
      */
-    QmitkDataStorageComboBoxWithSelectNone(QWidget* parent = 0, bool autoSelectNewNodes=false);
+    QmitkDataStorageComboBoxWithSelectNone(QWidget* parent = nullptr, bool autoSelectNewNodes=false);
 
     /**
      * \brief Calls base class constructor.
@@ -53,7 +53,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public Qmitk
      */
     QmitkDataStorageComboBoxWithSelectNone( mitk::DataStorage* _DataStorage,
                                             const mitk::NodePredicateBase* predicate,
-                                            QWidget* parent = 0,
+                                            QWidget* parent = nullptr,
                                             bool autoSelectNewNodes=false);
 
     /**

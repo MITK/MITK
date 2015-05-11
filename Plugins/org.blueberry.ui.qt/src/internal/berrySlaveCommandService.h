@@ -66,52 +66,52 @@ public:
   SlaveCommandService(ICommandService* parent, const QString& scopeName,
                       const Object::Pointer& scopeValue);
 
-  void AddExecutionListener(IExecutionListener* listener);
+  void AddExecutionListener(IExecutionListener* listener) override;
 
-  void DefineUncategorizedCategory(const QString& name, const QString& description);
+  void DefineUncategorizedCategory(const QString& name, const QString& description) override;
 
-  SmartPointer<ParameterizedCommand> Deserialize(const QString& serializedParameterizedCommand) const;
+  SmartPointer<ParameterizedCommand> Deserialize(const QString& serializedParameterizedCommand) const override;
 
-  void Dispose();
+  void Dispose() override;
 
-  SmartPointer<CommandCategory> GetCategory(const QString& categoryId) const;
+  SmartPointer<CommandCategory> GetCategory(const QString& categoryId) const override;
 
-  SmartPointer<Command> GetCommand(const QString& commandId) const;
+  SmartPointer<Command> GetCommand(const QString& commandId) const override;
 
-  QList<SmartPointer<CommandCategory> > GetDefinedCategories() const;
+  QList<SmartPointer<CommandCategory> > GetDefinedCategories() const override;
 
-  QStringList GetDefinedCategoryIds() const;
+  QStringList GetDefinedCategoryIds() const override;
 
-  QStringList GetDefinedCommandIds() const;
+  QStringList GetDefinedCommandIds() const override;
 
-  QList<SmartPointer<Command> > GetDefinedCommands() const;
+  QList<SmartPointer<Command> > GetDefinedCommands() const override;
 
-  QStringList GetDefinedParameterTypeIds() const;
+  QStringList GetDefinedParameterTypeIds() const override;
 
-  QList<SmartPointer<ParameterType> > GetDefinedParameterTypes() const;
+  QList<SmartPointer<ParameterType> > GetDefinedParameterTypes() const override;
 
-  QString GetHelpContextId(const SmartPointer<const Command>& command) const;
+  QString GetHelpContextId(const SmartPointer<const Command>& command) const override;
 
-  QString GetHelpContextId(const QString& commandId) const;
+  QString GetHelpContextId(const QString& commandId) const override;
 
-  SmartPointer<ParameterType> GetParameterType(const QString& parameterTypeId) const;
+  SmartPointer<ParameterType> GetParameterType(const QString& parameterTypeId) const override;
 
-  void ReadRegistry();
+  void ReadRegistry() override;
 
-  void RemoveExecutionListener(IExecutionListener* listener);
+  void RemoveExecutionListener(IExecutionListener* listener) override;
 
   void SetHelpContextId(const SmartPointer<IHandler>& handler,
-                        const QString& helpContextId);
+                        const QString& helpContextId) override;
 
-  void RefreshElements(const QString& commandId, const QHash<QString, Object::Pointer>& filter);
+  void RefreshElements(const QString& commandId, const QHash<QString, Object::Pointer>& filter) override;
 
   SmartPointer<IElementReference> RegisterElementForCommand(
       const SmartPointer<ParameterizedCommand>& command,
-      const SmartPointer<UIElement>& element);
+      const SmartPointer<UIElement>& element) override;
 
-  void RegisterElement(const SmartPointer<IElementReference>& elementReference);
+  void RegisterElement(const SmartPointer<IElementReference>& elementReference) override;
 
-  void UnregisterElement(const SmartPointer<IElementReference>& elementReference);
+  void UnregisterElement(const SmartPointer<IElementReference>& elementReference) override;
 };
 
 }

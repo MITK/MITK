@@ -75,7 +75,7 @@ protected:
     /**
     * @brief Default Constructor
     **/
-    CameraController(const char * type = NULL);
+    CameraController(const char * type = nullptr);
 
     /**
     * @brief Default Destructor

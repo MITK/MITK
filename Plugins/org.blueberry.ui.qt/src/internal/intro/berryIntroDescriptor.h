@@ -53,23 +53,23 @@ public:
   /*
    * @see IIntroDescriptor#CreateIntro()
    */
-  IIntroPart::Pointer CreateIntro();
+  IIntroPart::Pointer CreateIntro() override;
 
   IntroContentDetector::Pointer GetIntroContentDetector();
 
-  int GetRole() const;
+  int GetRole() const override;
 
   /*
    * @see IIntroDescriptor#GetId()
    */
-  QString GetId() const;
+  QString GetId() const override;
 
   QString GetPluginId() const;
 
   /*
    * @see IIntroDescriptor#GetImageDescriptor()
    */
-  QIcon GetImageDescriptor() const;
+  QIcon GetImageDescriptor() const override;
 
   /**
    * Returns the configuration element.
@@ -81,7 +81,7 @@ public:
   /*
    * @see IIntroDescriptor#GetLabelOverride()
    */
-  QString GetLabelOverride() const;
+  QString GetLabelOverride() const override;
 
 };
 

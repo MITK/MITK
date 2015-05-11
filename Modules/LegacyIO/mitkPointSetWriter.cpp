@@ -222,7 +222,7 @@ mitk::PointSet* mitk::PointSetWriter::GetInput()
 {
     if ( this->GetNumberOfInputs() < 1 )
     {
-        return 0;
+        return nullptr;
     }
     else
     {

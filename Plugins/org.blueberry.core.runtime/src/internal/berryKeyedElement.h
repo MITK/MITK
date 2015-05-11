@@ -31,11 +31,11 @@ public:
 
   bool operator==(const KeyedElement& other) const;
 
-  bool operator==(const Object* other) const;
+  bool operator==(const Object* other) const override;
 
   virtual QString GetKey() const = 0;
 
-  uint HashCode() const;
+  uint HashCode() const override;
 
 private:
 

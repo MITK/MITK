@@ -159,21 +159,21 @@ public:
   /* (non-Javadoc)
    * Method declared on IWorkbenchPart.
    */
-  void AddPropertyListener(IPropertyChangeListener* l);
+  void AddPropertyListener(IPropertyChangeListener* l) override;
 
-  void RemovePropertyListener(IPropertyChangeListener* l);
+  void RemovePropertyListener(IPropertyChangeListener* l) override;
 
-  void SetPartProperty(const QString& key, const QString& value);
+  void SetPartProperty(const QString& key, const QString& value) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPart3#getPartProperty(java.lang.String)
    */
-  QString GetPartProperty(const QString& key) const;
+  QString GetPartProperty(const QString& key) const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPart3#getPartProperties()
    */
-  const QHash<QString, QString>& GetPartProperties() const;
+  const QHash<QString, QString>& GetPartProperties() const override;
 
   /**
    * {@inheritDoc}
@@ -187,7 +187,7 @@ public:
    * this executable extension.
    */
   void SetInitializationData(const IConfigurationElement::Pointer& cfig,
-                             const QString& propertyName, const Object::Pointer& data);
+                             const QString& propertyName, const Object::Pointer& data) override;
 
   /*
    * Creates the controls for this workbench part.
@@ -199,7 +199,7 @@ public:
    * @param parent the parent control
    * @see IWorkbenchPart
    */
-  virtual void CreatePartControl(QWidget* parent) = 0;
+  virtual void CreatePartControl(QWidget* parent) override = 0;
 
   /* (non-Javadoc)
      * Asks this part to take focus within the workbench.
@@ -210,12 +210,12 @@ public:
      *
      * @see IWorkbenchPart
      */
-  virtual void SetFocus() = 0;
+  virtual void SetFocus() override = 0;
 
   /*
    * Method declared on IWorkbenchPart.
    */
-  IWorkbenchPartSite::Pointer GetSite() const;
+  IWorkbenchPartSite::Pointer GetSite() const override;
 
   /**
    * {@inheritDoc}
@@ -224,7 +224,7 @@ public:
    * Parts should call setPartName to change their part name.
    * </p>
    */
-  QString GetPartName() const;
+  QString GetPartName() const override;
 
   /**
    * {@inheritDoc}
@@ -233,20 +233,20 @@ public:
    * Parts should call setContentDescription to change their content description.
    * </p>
    */
-  QString GetContentDescription() const;
+  QString GetContentDescription() const override;
 
 
   /* (non-Javadoc)
    * Method declared on IWorkbenchPart.
    */
-  QIcon GetTitleImage() const;
+  QIcon GetTitleImage() const override;
 
   /* (non-Javadoc)
    * Gets the title tool tip text of this part.
    *
    * @return the tool tip text
    */
-  QString GetTitleToolTip() const;
+  QString GetTitleToolTip() const override;
 
 };
 

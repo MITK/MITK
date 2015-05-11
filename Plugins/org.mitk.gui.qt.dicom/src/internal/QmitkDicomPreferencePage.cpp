@@ -40,7 +40,7 @@ static QString CreateDefaultPath()
 }
 
 QmitkDicomPreferencePage::QmitkDicomPreferencePage()
-  : m_MainControl(0)
+  : m_MainControl(nullptr)
 {
 }
 
@@ -60,11 +60,11 @@ void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
 
   m_MainControl = new QWidget(parent);
 
-  QFormLayout *formLayout = new QFormLayout;
+  auto  formLayout = new QFormLayout;
   formLayout->setHorizontalSpacing(8);
   formLayout->setVerticalSpacing(24);
 
-  QHBoxLayout* displayOptionsLayout = new QHBoxLayout;
+  auto   displayOptionsLayout = new QHBoxLayout;
   m_PathEdit = new QLineEdit(m_MainControl);
   displayOptionsLayout->addWidget(m_PathEdit);
 

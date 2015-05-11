@@ -69,7 +69,7 @@ PropertyView::~PropertyView()
     mitk::BaseProperty* prop = const_cast<mitk::BaseProperty*>(m_Property);
     prop->RemoveObserver(m_ModifiedTag);
     prop->RemoveObserver(m_DeleteTag);
-    m_Property = NULL;
+    m_Property = nullptr;
   }
 }
 
@@ -92,7 +92,7 @@ void PropertyView::OnDelete(const itk::EventObject& /*e*/)
     mitk::BaseProperty* prop = const_cast<mitk::BaseProperty*>(m_Property);
     prop->RemoveObserver(m_ModifiedTag);
     prop->RemoveObserver(m_DeleteTag);
-    m_Property = NULL;
+    m_Property = nullptr;
   }
 }
 
@@ -122,7 +122,7 @@ PropertyEditor::~PropertyEditor()
   {
     m_Property->RemoveObserver(m_ModifiedTag);
     m_Property->RemoveObserver(m_DeleteTag);
-    m_Property = NULL;
+    m_Property = nullptr;
   }
 }
 
@@ -144,7 +144,7 @@ void PropertyEditor::OnDelete(const itk::EventObject& /*e*/)
   {
     m_Property->RemoveObserver(m_ModifiedTag);
     m_Property->RemoveObserver(m_DeleteTag);
-    m_Property = NULL;
+    m_Property = nullptr;
   }
 }
 

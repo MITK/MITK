@@ -26,7 +26,7 @@ QString RegistrySupport::Translate(const QString& key, QTranslator* resources)
 {
   if (key.isEmpty())
     return QString();
-  if (resources == NULL)
+  if (resources == nullptr)
     return key;
   QString trimmedKey = key.trimmed();
   if (trimmedKey.isEmpty())

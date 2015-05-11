@@ -31,45 +31,45 @@ class QtShell : public Shell
 
 public:
 
-  QtShell(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+  QtShell(QWidget* parent = nullptr, Qt::WindowFlags flags = nullptr);
 
   ~QtShell();
 
   // berry::Shell
-  void SetBounds(const QRect& bounds);
-  QRect GetBounds() const;
+  void SetBounds(const QRect& bounds) override;
+  QRect GetBounds() const override;
 
-  void SetLocation(int x, int y);
+  void SetLocation(int x, int y) override;
 
-  QPoint ComputeSize(int wHint, int hHint, bool changed);
+  QPoint ComputeSize(int wHint, int hHint, bool changed) override;
 
-  QString GetText() const;
-  void SetText(const QString& text);
+  QString GetText() const override;
+  void SetText(const QString& text) override;
 
-  bool IsVisible() const;
-  void SetVisible(bool visible);
+  bool IsVisible() const override;
+  void SetVisible(bool visible) override;
 
-  void SetActive();
+  void SetActive() override;
 
-  QWidget* GetControl() const;
+  QWidget* GetControl() const override;
 
-  void SetImages(const QList<QIcon>& images);
+  void SetImages(const QList<QIcon>& images) override;
 
-  bool GetMaximized() const;
-  bool GetMinimized() const;
-  void SetMaximized(bool maximized);
-  void SetMinimized(bool minimized);
+  bool GetMaximized() const override;
+  bool GetMinimized() const override;
+  void SetMaximized(bool maximized) override;
+  void SetMinimized(bool minimized) override;
 
-  void AddShellListener(IShellListener* listener);
-  void RemoveShellListener(IShellListener* listener);
+  void AddShellListener(IShellListener* listener) override;
+  void RemoveShellListener(IShellListener* listener) override;
 
-  void Open(bool block = false);
+  void Open(bool block = false) override;
 
-  void Close();
+  void Close() override;
 
-  QList<Shell::Pointer> GetShells();
+  QList<Shell::Pointer> GetShells() override;
 
-  Qt::WindowFlags GetStyle () const;
+  Qt::WindowFlags GetStyle () const override;
 
   QWidget* GetWidget();
 

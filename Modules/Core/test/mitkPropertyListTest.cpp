@@ -108,7 +108,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   propList->SetProperty("test",boolProp2);
   mitk::BaseProperty* bpAfter = propList->GetProperty("test");
 
-  if (bpBefore != bpAfter || bpAfter == NULL) {
+  if (bpBefore != bpAfter || bpAfter == nullptr) {
     std::cout << std::endl;
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
@@ -121,7 +121,7 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   propList->ReplaceProperty("test",boolProp2);
   bpAfter = propList->GetProperty("test");
 
-  if (bpBefore == bpAfter || bpAfter == NULL) {
+  if (bpBefore == bpAfter || bpAfter == nullptr) {
     std::cout << std::endl;
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;

@@ -84,7 +84,7 @@ private:
     PropertyListenerProxy(PresentablePart* part);
 
     using IPropertyChangeListener::PropertyChange;
-    void PropertyChange(const PropertyChangeEvent::Pointer& e);
+    void PropertyChange(const PropertyChangeEvent::Pointer& e) override;
 
   private:
     PresentablePart* part;
@@ -125,9 +125,9 @@ public:
   //        }
   //    }
 
-  void AddPropertyListener(IPropertyChangeListener* listener);
+  void AddPropertyListener(IPropertyChangeListener* listener) override;
 
-  void RemovePropertyListener(IPropertyChangeListener* listener);
+  void RemovePropertyListener(IPropertyChangeListener* listener) override;
 
   //    void addPartPropertyListener(IPropertyChangeListener listener) {
   //      partPropertyChangeListeners.add(listener);
@@ -140,65 +140,65 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#setBounds(org.blueberry.swt.graphics.QRect)
    */
-  void SetBounds(const QRect& bounds);
+  void SetBounds(const QRect& bounds) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#setVisible(boolean)
    */
-  void SetVisible(bool isVisible);
+  void SetVisible(bool isVisible) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#setFocus()
    */
-  void SetFocus();
+  void SetFocus() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getName()
    */
-  QString GetName() const;
+  QString GetName() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitle()
    */
-  QString GetTitle() const;
+  QString GetTitle() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitleStatus()
    */
-  QString GetTitleStatus() const;
+  QString GetTitleStatus() const override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitleImage()
    */
-  QIcon GetTitleImage();
+  QIcon GetTitleImage() override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.presentations.IPresentablePart#getTitleToolTip()
    */
-  QString GetTitleToolTip() const;
+  QString GetTitleToolTip() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#isDirty()
    */
-  bool IsDirty() const;
+  bool IsDirty() const override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.presentations.IPresentablePart#isBusy()
    */
-  bool IsBusy() const;
+  bool IsBusy() const override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.presentations.IPresentablePart#getToolBar()
    */
-  QToolBar* GetToolBar();
+  QToolBar* GetToolBar() override;
 
   /*
    * (non-Javadoc)
@@ -232,12 +232,12 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#isCloseable()
    */
-  bool IsCloseable() const;
+  bool IsCloseable() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getControl()
    */
-  QWidget* GetControl();
+  QWidget* GetControl() override;
 
   void EnableOutputs(bool isActive);
 
@@ -246,18 +246,18 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.presentations.IPresentablePart#getPartProperty(java.lang.String)
    */
-  QString GetPartProperty(const QString& key) const;
+  QString GetPartProperty(const QString& key) const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.ISizeProvider#computePreferredSize(boolean, int, int, int)
    */
   int ComputePreferredSize(bool width, int availableParallel,
-      int availablePerpendicular, int preferredResult);
+      int availablePerpendicular, int preferredResult) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.ISizeProvider#getSizeFlags(boolean)
    */
-  int GetSizeFlags(bool width);
+  int GetSizeFlags(bool width) override;
 
 };
 

@@ -35,7 +35,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigidRegistrationOptimizerGUIBase : pu
 
 public:
 
-  QmitkRigidRegistrationOptimizerGUIBase(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkRigidRegistrationOptimizerGUIBase(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkRigidRegistrationOptimizerGUIBase();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() = 0;

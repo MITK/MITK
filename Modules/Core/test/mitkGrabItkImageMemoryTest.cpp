@@ -70,10 +70,10 @@ bool Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue()
 {
   // data for 3x3x3 image
   const unsigned int dimensions[3] = {3,3,3};
-  TPixel* image_data = new TPixel[27];
+  auto  image_data = new TPixel[27];
 
   // ground truth for result check
-  TPixel* ground_truth = new TPixel[27];
+  auto  ground_truth = new TPixel[27];
   double threshold[2] = { 90.0, 180.0 };
 
   // fill image

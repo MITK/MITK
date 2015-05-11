@@ -48,8 +48,8 @@ class MITKCORE_EXPORT ClippedSurfaceBoundsCalculator
 
     typedef std::vector<mitk::Point3D> PointListType;
 
-    ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry* geometry = NULL,
-                                   mitk::Image::Pointer image = NULL);
+    ClippedSurfaceBoundsCalculator(const mitk::PlaneGeometry* geometry = nullptr,
+                                   mitk::Image::Pointer image = nullptr);
     ClippedSurfaceBoundsCalculator(const mitk::BaseGeometry* geometry,
                                    mitk::Image::Pointer image);
     ClippedSurfaceBoundsCalculator(const PointListType pointlist,

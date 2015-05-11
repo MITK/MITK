@@ -77,7 +77,7 @@ bool WorkerPool::Remove(Worker::Pointer worker)
 {
   Poco::ScopedLock<Poco::Mutex> lockOne(m_mutexOne);
 
-  std::vector<Worker::Pointer>::iterator end = std::remove(m_threads.begin(),
+  auto end = std::remove(m_threads.begin(),
       m_threads.end(), worker);
   bool removed = end != m_threads.end();
   m_threads.erase(end);
@@ -122,12 +122,12 @@ InternalJob::Pointer WorkerPool::StartJob(Worker* worker)
       //  must remove the worker immediately to prevent all threads from expiring
       Worker::Pointer sptr_worker(worker);
       EndWorker(sptr_worker);
-      return InternalJob::Pointer(0);
+      return InternalJob::Pointer(nullptr);
     }
     //set the thread to be busy now in case of reentrant scheduling
     IncrementBusyThreads();
   }
-  Job::Pointer ptr_job(0);
+  Job::Pointer ptr_job(nullptr);
   try
   {
     ptr_job = m_ptrManager->StartJob();
@@ -150,7 +150,7 @@ InternalJob::Pointer WorkerPool::StartJob(Worker* worker)
           //must remove the worker immediately to prevent all threads from expiring
           Worker::Pointer sptr_worker(worker);
           EndWorker(sptr_worker);
-          return InternalJob::Pointer(0);
+          return InternalJob::Pointer(nullptr);
         }
       }
     }

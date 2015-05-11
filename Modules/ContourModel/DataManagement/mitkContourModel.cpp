@@ -30,14 +30,14 @@ mitk::ContourModel::ContourModel(const mitk::ContourModel &other) :
   m_ContourSeries(other.m_ContourSeries),
   m_lineInterpolation(other.m_lineInterpolation)
 {
-  m_SelectedVertex = NULL;
+  m_SelectedVertex = nullptr;
 }
 
 
 
 mitk::ContourModel::~ContourModel()
 {
-  m_SelectedVertex = NULL;
+  m_SelectedVertex = nullptr;
   this->m_ContourSeries.clear();//TODO check destruction
 }
 
@@ -78,7 +78,7 @@ void mitk::ContourModel::AddVertex(VertexType &vertex, int timestep)
 
 void mitk::ContourModel::AddVertex(const VertexType* vertex, int timestep)
 {
-  if(vertex != NULL)
+  if(vertex != nullptr)
   {
     this->m_ContourSeries[timestep]->AddVertex(*const_cast<VertexType*>(vertex));
   }
@@ -142,7 +142,7 @@ bool mitk::ContourModel::SetVertexAt(int pointId, const Point3D &point, unsigned
 
 bool mitk::ContourModel::SetVertexAt(int pointId, const VertexType *vertex, unsigned int timestep)
 {
-  if(vertex==NULL) return false;
+  if(vertex==nullptr) return false;
 
   if(!this->IsEmptyTimeStep(timestep))
   {
@@ -210,7 +210,7 @@ const mitk::ContourModel::VertexType* mitk::ContourModel::GetVertexAt(int index,
   {
     return this->m_ContourSeries[timestep]->GetVertexAt(index);
   }
-  return NULL;
+  return nullptr;
 }
 
 
@@ -347,7 +347,7 @@ bool mitk::ContourModel::SelectVertexAt(mitk::Point3D &point, float eps, int tim
   {
     this->m_SelectedVertex = this->m_ContourSeries[timestep]->GetVertexAt(point, eps);
   }
-  return this->m_SelectedVertex != NULL;
+  return this->m_SelectedVertex != nullptr;
 }
 
 
@@ -365,7 +365,7 @@ bool mitk::ContourModel::SetControlVertexAt(mitk::Point3D &point, float eps, int
   if(!this->IsEmptyTimeStep(timestep))
   {
     VertexType* vertex = this->m_ContourSeries[timestep]->GetVertexAt(point, eps);
-    if (vertex != NULL)
+    if (vertex != nullptr)
     {
         vertex->IsControlPoint = true;
         return true;
@@ -379,7 +379,7 @@ bool mitk::ContourModel::SetControlVertexAt(int index, int timestep)
   if(!this->IsEmptyTimeStep(timestep) && index >= 0)
   {
       VertexType* vertex = this->m_ContourSeries[timestep]->GetVertexAt(index);
-      if (vertex != NULL)
+      if (vertex != nullptr)
       {
         vertex->IsControlPoint = true;
         return true;
@@ -452,8 +452,8 @@ void mitk::ContourModel::ShiftContour(mitk::Vector3D &translate, int timestep)
   if(!this->IsEmptyTimeStep(timestep))
   {
     VertexListType* vList = this->m_ContourSeries[timestep]->GetVertexList();
-    VertexIterator it = vList->begin();
-    VertexIterator end = vList->end();
+    auto it = vList->begin();
+    auto end = vList->end();
 
     //shift all vertices
     while(it != end)
@@ -603,7 +603,7 @@ void mitk::ContourModel::Initialize(mitk::ContourModel &other)
     this->SetClosed(other.IsClosed(currentTimestep),currentTimestep);
   }
 
-  m_SelectedVertex = NULL;
+  m_SelectedVertex = nullptr;
   this->m_lineInterpolation = other.m_lineInterpolation;
   this->Modified();this->m_UpdateBoundingBox = true;
 }
@@ -619,7 +619,7 @@ void mitk::ContourModel::InitializeEmpty()
   //set number of timesteps to one
   this->InitializeTimeGeometry(1);
 
-  m_SelectedVertex = NULL;
+  m_SelectedVertex = nullptr;
   this->m_lineInterpolation = ContourModel::LINEAR;
 }
 
@@ -666,8 +666,8 @@ void mitk::ContourModel::UpdateOutputInformation()
 
           PointsContainer::Pointer points = PointsContainer::New();
 
-          VertexIterator it = this->IteratorBegin(currenTimeStep);
-          VertexIterator end = this->IteratorEnd(currenTimeStep);
+          auto it = this->IteratorBegin(currenTimeStep);
+          auto end = this->IteratorEnd(currenTimeStep);
 
           //fill the boundingbox with the points
           while(it != end)

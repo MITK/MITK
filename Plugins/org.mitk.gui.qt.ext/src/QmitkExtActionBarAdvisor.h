@@ -41,7 +41,7 @@ public:
 
 protected:
 
-  void MakeActions(berry::IWorkbenchWindow* window);
+  void MakeActions(berry::IWorkbenchWindow* window) override;
 
   void FillMenuBar(berry::IMenuManager* menuBar) override;
 

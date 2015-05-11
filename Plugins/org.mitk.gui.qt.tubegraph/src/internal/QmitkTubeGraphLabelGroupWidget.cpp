@@ -33,7 +33,7 @@ QmitkTubeGraphLabelGroupWidget::~QmitkTubeGraphLabelGroupWidget()
 
 void QmitkTubeGraphLabelGroupWidget::AddLabel(QString name, mitk::Color color)
 {
-  QmitkTubeGraphLabelWidget* label = new QmitkTubeGraphLabelWidget(this);
+  auto   label = new QmitkTubeGraphLabelWidget(this);
   label->SetLabelName(name);
   label->SetLabelColor(&color);
 

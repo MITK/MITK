@@ -42,11 +42,11 @@ class MITKDIFFUSIONCORE_EXPORT MeasurementFramePropertySerializer : public BaseP
         typedef mitk::MeasurementFrameProperty::MeasurementFrameType MeasurementFrameType;
         const MeasurementFrameType & mft = prop->GetMeasurementFrame();
 
-        if(mft.is_zero()) return NULL;
+        if(mft.is_zero()) return nullptr;
 
-        TiXmlElement* element = new TiXmlElement("measurementframe");
+        auto  element = new TiXmlElement("measurementframe");
 
-        TiXmlElement* child = new TiXmlElement("entry");
+        auto  child = new TiXmlElement("entry");
         std::stringstream ss;
         ss << mft;
         child->SetAttribute("value", ss.str());
@@ -54,12 +54,12 @@ class MITKDIFFUSIONCORE_EXPORT MeasurementFramePropertySerializer : public BaseP
 
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       TiXmlElement* entry = element->FirstChildElement( "entry" )->ToElement();
 

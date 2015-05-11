@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkScalarImageToHistogramGenerator.h"
 #endif
 
-mitk::HistogramGenerator::HistogramGenerator() : m_Image(NULL), m_Size(256), m_Histogram(NULL)
+mitk::HistogramGenerator::HistogramGenerator() : m_Image(nullptr), m_Size(256), m_Histogram(nullptr)
 {
 
 }

@@ -64,8 +64,8 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundle *f
     mitk::Point3D startCenter = dynamic_cast<mitk::PlanarFigure*>(startRoi->GetData())->GetWorldControlPoint(0); //center Point of start roi
     mitk::Point3D endCenter = dynamic_cast<mitk::PlanarFigure*>(startRoi->GetData())->GetWorldControlPoint(0); //center Point of end roi
 
-    mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(startRoi, NULL);
-    mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(endRoi, NULL);
+    mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(startRoi, nullptr);
+    mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(endRoi, nullptr);
 
 
 
@@ -86,7 +86,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundle *f
     for( int fiberID( 0 ); fiberID < num; fiberID++ )
     {
       vtkIdType   numPointsInCell(0);
-      vtkIdType*  pointsInCell(NULL);
+      vtkIdType*  pointsInCell(nullptr);
       lines->GetNextCell ( numPointsInCell, pointsInCell );
 
       int startId = 0;
@@ -388,7 +388,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundle *fib, mi
                                 mitk::DataNode* startRoi, mitk::DataNode* endRoi, bool avg, int number)
 {
 
-  if(fib == NULL || img == NULL || startRoi == NULL || endRoi == NULL)
+  if(fib == nullptr || img == nullptr || startRoi == nullptr || endRoi == nullptr)
     return;
 
 
@@ -405,7 +405,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundle *fib, mi
 
 void QmitkTbssRoiAnalysisWidget::ModifyPlot(int number, bool avg)
 {
-  if(m_Fib == NULL || m_CurrentTbssImage == NULL || m_CurrentStartRoi == NULL || m_CurrentEndRoi == NULL)
+  if(m_Fib == nullptr || m_CurrentTbssImage == nullptr || m_CurrentStartRoi == nullptr || m_CurrentEndRoi == nullptr)
     return;
 
   if(m_PlottingFiberBundle)
@@ -426,7 +426,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
 
 
 
-  for(TractContainerType::iterator it = tracts.begin(); it != tracts.end(); ++it)
+  for(auto it = tracts.begin(); it != tracts.end(); ++it)
   {
     TractType resampledTract;
     TractType tract = *it;
@@ -507,7 +507,7 @@ mitk::Point3D QmitkTbssRoiAnalysisWidget::GetPositionInWorld(int index)
   mitk::ScalarType xSum = 0.0;
   mitk::ScalarType ySum = 0.0;
   mitk::ScalarType zSum = 0.0;
-  for(TractContainerType::iterator it = m_CurrentTracts.begin();
+  for(auto it = m_CurrentTracts.begin();
       it!=m_CurrentTracts.end(); ++it)
   {
     TractType tract = *it;
@@ -679,7 +679,7 @@ void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<mitk::ScalarType>
     }
 
 
-    QwtLegend *legend = new QwtLegend;
+    auto  legend = new QwtLegend;
     this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
 
 
@@ -721,7 +721,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
       {
         // Iterate trough the tract
         std::vector<mitk::ScalarType> profile;
-        TractType::iterator it = resampledTracts[t].begin();
+        auto it = resampledTracts[t].begin();
         while(it != resampledTracts[t].end())
         {
           PointType p = *it;
@@ -817,7 +817,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, T
   m_PlottingFiberBundle = true;
 
   this->Clear();
-  std::vector<TractType>::iterator it = tracts.begin();
+  auto it = tracts.begin();
 
 
   std::vector< std::vector <mitk::ScalarType > > profiles;
@@ -829,7 +829,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, T
   {
 
     TractType tract = *it;
-    TractType::iterator tractIt = tract.begin();
+    auto tractIt = tract.begin();
 
     std::vector<mitk::ScalarType> profile;
 
@@ -869,7 +869,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, T
   }
 
 
-  std::vector< std::vector<mitk::ScalarType> >::iterator profit = profiles.begin();
+  auto profit = profiles.begin();
 
   int id=0;
   while(profit != profiles.end())

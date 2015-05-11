@@ -55,7 +55,7 @@ void ShowSegmentationAsSmoothedSurface::Initialize(const NonBlockingAlgorithm *o
 
   bool syncVisibility = false;
 
-  if (other != NULL)
+  if (other != nullptr)
     other->GetParameter("Sync visibility", syncVisibility);
 
   SetParameter("Sync visibility", syncVisibility);
@@ -233,8 +233,8 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   CharImageType::Pointer roiImage = padFilter->GetOutput();
 
   roiImage->DisconnectPipeline();
-  roiFilter = 0;
-  padFilter = 0;
+  roiFilter = nullptr;
+  padFilter = nullptr;
 
   // Correct origin of real geometry (changed by cropping and padding)
 
@@ -290,9 +290,9 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   ShortImageType::Pointer closedImage = closingFilter->GetOutput();
 
   closedImage->DisconnectPipeline();
-  roiImage = 0;
-  medianFilter = 0;
-  closingFilter = 0;
+  roiImage = nullptr;
+  medianFilter = nullptr;
+  closingFilter = nullptr;
 
   ProgressBar::GetInstance()->Progress(1);
 
@@ -339,9 +339,9 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   CharImageType::Pointer blurredImage = binThresFromFloatFilter->GetOutput();
 
   blurredImage->DisconnectPipeline();
-  closedImage = 0;
-  binThresToFloatFilter = 0;
-  gaussFilter = 0;
+  closedImage = nullptr;
+  binThresToFloatFilter = nullptr;
+  gaussFilter = nullptr;
 
   ProgressBar::GetInstance()->Progress(1);
 
@@ -462,7 +462,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
     VtkRepresentationProperty *representation = dynamic_cast<VtkRepresentationProperty *>(
       node->GetProperty("material.representation"));
 
-    if (representation != NULL)
+    if (representation != nullptr)
       representation->SetRepresentationToWireframe();
   }
 
@@ -473,7 +473,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
   std::string groupNodeName = "surface";
   DataNode *groupNode = GetGroupNode();
 
-  if (groupNode != NULL)
+  if (groupNode != nullptr)
     groupNode->GetName(groupNodeName);
 
   node->SetProperty("name", StringProperty::New(groupNodeName));
@@ -481,7 +481,7 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
 
   BaseProperty *colorProperty = groupNode->GetProperty("color");
 
-  if (colorProperty != NULL)
+  if (colorProperty != nullptr)
     node->ReplaceProperty("color", colorProperty->Clone());
   else
     node->SetProperty("color", ColorProperty::New(1.0f, 0.0f, 0.0f));
@@ -497,12 +497,12 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
 
   BaseProperty *organTypeProperty = image->GetProperty("organ type");
 
-  if (organTypeProperty != NULL)
+  if (organTypeProperty != nullptr)
     m_Surface->SetProperty("organ type", organTypeProperty);
 
   BaseProperty *visibleProperty = groupNode->GetProperty("visible");
 
-  if (visibleProperty != NULL && syncVisibility)
+  if (visibleProperty != nullptr && syncVisibility)
     node->ReplaceProperty("visible", visibleProperty->Clone());
   else
     node->SetProperty("visible", BoolProperty::New(showResult));

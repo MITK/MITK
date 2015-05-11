@@ -64,7 +64,7 @@ namespace mitk {
     //## the addition of a new object will fire the notification mechanism.
     //## If the node parameter is NULL or if the DataNode has already been added,
     //## an exception will be thrown.
-    virtual void Add(mitk::DataNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL) = 0;
+    virtual void Add(mitk::DataNode* node, const mitk::DataStorage::SetOfObjects* parents = nullptr) = 0;
 
     //##Documentation
     //## @brief Convenience method to add a node that has one parent
@@ -106,7 +106,7 @@ namespace mitk {
     //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
     //##
-    virtual SetOfObjects::ConstPointer GetSources(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const = 0;
+    virtual SetOfObjects::ConstPointer GetSources(const mitk::DataNode* node, const NodePredicateBase* condition = nullptr, bool onlyDirectSources = true) const = 0;
 
     //##Documentation
     //## @brief returns a set of derived objects for a given node.
@@ -118,7 +118,7 @@ namespace mitk {
     //## derived from derivations of node are returned too.
     //## The derived objects can be filtered with a predicate object as described in the GetSubset()
     //## method by providing a predicate as the condition parameter.
-    virtual SetOfObjects::ConstPointer GetDerivations(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const = 0;
+    virtual SetOfObjects::ConstPointer GetDerivations(const mitk::DataNode* node, const NodePredicateBase* condition = nullptr, bool onlyDirectDerivations = true) const = 0;
 
     //##Documentation
     //## @brief returns a set of all data objects that are stored in the data storage
@@ -128,7 +128,7 @@ namespace mitk {
     //##Documentation
     //## @brief Convenience method to get the first node that matches the predicate condition
     //##
-    mitk::DataNode* GetNode(const NodePredicateBase* condition = NULL) const;
+    mitk::DataNode* GetNode(const NodePredicateBase* condition = nullptr) const;
 
 
     //##Documentation
@@ -155,10 +155,10 @@ namespace mitk {
     template <class DataType>
     DataType* GetNamedObject(const char* name) const
     {
-      if (name == NULL)
+      if (name == nullptr)
         return NULL;
       mitk::DataNode* n = this->GetNamedNode(name);
-      if (n == NULL)
+      if (n == nullptr)
         return NULL;
       else
         return dynamic_cast<DataType*>(n->GetData());
@@ -178,10 +178,10 @@ namespace mitk {
     template <class DataType>
     DataType* GetNamedDerivedObject(const char* name, const mitk::DataNode* sourceNode, bool onlyDirectDerivations = true) const
     {
-      if (name == NULL)
+      if (name == nullptr)
         return NULL;
       mitk::DataNode* n = this->GetNamedDerivedNode(name, sourceNode, onlyDirectDerivations);
-      if (n == NULL)
+      if (n == nullptr)
         return NULL;
       else
         return dynamic_cast<DataType*>(n->GetData());
@@ -259,7 +259,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey = NULL, const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL) const;
+    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const SetOfObjects* input, const char* boolPropertyKey = nullptr, const mitk::BaseRenderer* renderer = nullptr, const char* boolPropertyKey2 = nullptr) const;
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of the data tree
@@ -270,7 +270,7 @@ namespace mitk {
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = NULL, const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL) const;
+    mitk::TimeGeometry::Pointer ComputeBoundingGeometry3D( const char* boolPropertyKey = nullptr, const mitk::BaseRenderer* renderer = nullptr, const char* boolPropertyKey2 = nullptr) const;
 
     //##Documentation
     //## @brief Compute the axis-parallel bounding geometry of all visible parts of the
@@ -281,7 +281,7 @@ namespace mitk {
     //## @param renderer the reference to the renderer
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
-    mitk::TimeGeometry::Pointer ComputeVisibleBoundingGeometry3D( const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL);
+    mitk::TimeGeometry::Pointer ComputeVisibleBoundingGeometry3D( const mitk::BaseRenderer* renderer = nullptr, const char* boolPropertyKey = nullptr);
 
     //##Documentation
     //## @brief Compute the bounding box of data tree structure
@@ -290,7 +290,7 @@ namespace mitk {
      //## and is set to @a false, the node is ignored for the bounding-box calculation.
     //## @param renderer see @a boolPropertyKey
     //## @param boolPropertyKey2 a second condition that is applied additionally to @a boolPropertyKey
-    mitk::BoundingBox::Pointer ComputeBoundingBox( const char* boolPropertyKey = NULL, const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey2 = NULL);
+    mitk::BoundingBox::Pointer ComputeBoundingBox( const char* boolPropertyKey = nullptr, const mitk::BaseRenderer* renderer = nullptr, const char* boolPropertyKey2 = nullptr);
 
     //##Documentation
     //## \brief Compute the bounding box of all visible parts of the data tree structure, for general
@@ -301,7 +301,7 @@ namespace mitk {
     //## @param renderer the reference to the renderer
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the bounding-box calculation.
-    mitk::BoundingBox::Pointer ComputeVisibleBoundingBox( const mitk::BaseRenderer* renderer = NULL, const char* boolPropertyKey = NULL)
+    mitk::BoundingBox::Pointer ComputeVisibleBoundingBox( const mitk::BaseRenderer* renderer = nullptr, const char* boolPropertyKey = nullptr)
     {
       return ComputeBoundingBox( "visible", renderer, boolPropertyKey);
     }

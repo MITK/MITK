@@ -712,7 +712,7 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
 ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* pInfoStruct)
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
-  return nullptr;
+  return NULL;
 }
 
 //=======================================================

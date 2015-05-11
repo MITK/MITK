@@ -42,8 +42,11 @@ QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWi
   connect( ui->combinedModalityEditWidget, SIGNAL(SignalAborted()), this, SLOT(OnCombinedModalityEditExit()) );
   connect( ui->combinedModalityEditWidget, SIGNAL(SignalSaved()), this, SLOT(OnCombinedModalityEditExit()) );
 
-  std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
-  ui->combinedModalityListWidget->Initialize<mitk::USCombinedModality>(mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_LABEL, filterOnlyCombinedModalities);
+
+
+  //std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
+  std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice))";
+  ui->combinedModalityListWidget->Initialize<mitk::USCombinedModality>(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, filter);
   ui->combinedModalityListWidget->SetAutomaticallySelectFirstEntry(true);
 }
 

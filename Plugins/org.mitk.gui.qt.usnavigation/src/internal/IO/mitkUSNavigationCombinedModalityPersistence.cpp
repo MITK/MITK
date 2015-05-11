@@ -51,14 +51,14 @@ mitk::USNavigationCombinedModalityPersistence::USNavigationCombinedModalityPersi
 
 mitk::USNavigationCombinedModalityPersistence::~USNavigationCombinedModalityPersistence()
 {
-  this->StoreCurrentDevices();
+  //this->StoreCurrentDevices(); //disabled because persistence is buggy
 }
 
 void mitk::USNavigationCombinedModalityPersistence::OnServiceEvent(const us::ServiceEvent event)
 {
   if ( event.GetType() == event.REGISTERED )
   {
-    this->LoadStoredDevices();
+    //this->LoadStoredDevices(); //disabled because persistence is buggy
   }
 }
 

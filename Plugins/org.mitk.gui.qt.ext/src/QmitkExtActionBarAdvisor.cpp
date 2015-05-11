@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFileSaveAction.h"
 #include "QmitkExtFileSaveProjectAction.h"
 #include "QmitkCloseProjectAction.h"
+#include <QmitkFileExitAction.h>
 
 #include <mitkWorkbenchCommandConstants.h>
 
@@ -69,6 +70,10 @@ void QmitkExtActionBarAdvisor::MakeActions(berry::IWorkbenchWindow* window)
                                                QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
   this->Register(closeProjectAction, mitk::WorkbenchCommandConstants::PROJECT_CLOSE);
 
+  QAction* fileExitAction = new QmitkFileExitAction(window);
+  fileExitAction->setIcon(QIcon::fromTheme("system-log-out", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/system-log-out.svg")));
+  fileExitAction->setShortcut(QKeySequence::Quit);
+  this->Register(fileExitAction, mitk::WorkbenchCommandConstants::FILE_EXIT);
 }
 
 void QmitkExtActionBarAdvisor::FillMenuBar(berry::IMenuManager* menuBar)
@@ -140,7 +145,8 @@ berry::SmartPointer<berry::MenuManager> QmitkExtActionBarAdvisor::CreateFileMenu
   //ActionContributionItem quitItem = new ActionContributionItem(quitAction);
   //quitItem.setVisible(!Util.isMac());
   //menu.add(quitItem);
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::FILE_EXIT, "Exit"));
+  menu->Add(this->GetAction(berry::IWorkbenchCommandConstants::FILE_EXIT),
+    berry::IWorkbenchCommandConstants::FILE_EXIT);
   menu->Add(berry::IContributionItem::Pointer(new berry::GroupMarker(berry::WorkbenchActionConstants::FILE_END)));
 
   return menu;

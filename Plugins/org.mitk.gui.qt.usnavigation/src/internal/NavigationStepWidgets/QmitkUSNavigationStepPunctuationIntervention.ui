@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+  <class>QmitkUSNavigationStepPunctuationIntervention</class>
+  <widget class="QWidget" name="QmitkUSNavigationStepPunctuationIntervention">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>400</width>
+        <height>80</height>
+      </rect>
+    </property>
+    <property name="windowTitle">
+      <string>Form</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+        <widget class="QLabel" name="bodyMarkerTrackingStatusLabel">
+          <property name="styleSheet">
+            <string notr="true">
+              background-color: #ff7878; margin-right: 1em; margin-left: 1em;
+              border: 1px solid grey
+            </string>
+          </property>
+          <property name="text">
+            <string>Body marker is not inside the tracking volume.</string>
+          </property>
+          <property name="alignment">
+            <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
+      <item>
+        <widget class="QGroupBox" name="riskStructuresRangeGroupBox">
+          <property name="title">
+            <string>Distances to Risk Structures</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+            <item>
+              <widget class="QmitkUSNavigationZoneDistancesWidget" name="riskStructuresRangeWidget" native="true"/>
+            </item>
+          </layout>
+        </widget>
+      </item>
+      <item>
+        <spacer name="verticalSpacer">
+          <property name="orientation">
+            <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+            <size>
+              <width>20</width>
+              <height>40</height>
+            </size>
+          </property>
+        </spacer>
+      </item>
+    </layout>
+  </widget>
+  <customwidgets>
+    <customwidget>
+      <class>QmitkUSNavigationZoneDistancesWidget</class>
+      <extends>QWidget</extends>
+      <header>src/internal/Widgets/QmitkUSNavigationZoneDistancesWidget.h</header>
+      <container>1</container>
+    </customwidget>
+  </customwidgets>
+  <resources/>
+  <connections/>
+</ui>

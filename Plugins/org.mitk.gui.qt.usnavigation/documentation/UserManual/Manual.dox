@@ -1,0 +1,16 @@
+/**
+\page org_mbi_gui_qt_usnavigation Usnavigation Plugin
+
+Available sections:
+  - \ref org_mbi_gui_qt_usnavigationOverview
+
+\section org_mbi_gui_qt_usnavigationOverview Overview
+Describe the features of your awesome plugin here
+<ul>
+<li>Increases productivity
+<li>Creates beautiful images
+<li>Generates PhD thesis
+<li>Brings world peace
+</ul>
+
+*/

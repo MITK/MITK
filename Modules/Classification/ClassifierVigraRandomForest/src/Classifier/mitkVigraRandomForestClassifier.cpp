@@ -389,3 +389,33 @@ void mitk::VigraRandomForestClassifier::SetWeightLambda(double val)
   this->ConvertParameter();
 }
 
+void mitk::VigraRandomForestClassifier::SetNthItems(const char * val, unsigned int idx)
+{
+  std::stringstream ss;
+  ss << "classifier.vigra-rf.item." << idx;
+  this->GetPropertyList()->SetStringProperty(ss.str().c_str(),val);
+}
+
+void mitk::VigraRandomForestClassifier::SetItemList(std::vector<std::string> list)
+{
+  for(unsigned int i = 0 ; i < list.size(); ++i)
+    this->SetNthItems(list[i].c_str(),i);
+}
+
+std::vector<std::string> mitk::VigraRandomForestClassifier::GetItemList()
+{
+  std::vector<std::string> result;
+  for(unsigned int idx = 0 ; idx < 100; idx++)
+  {
+    std::stringstream ss;
+    ss << "classifier.vigra-rf.item." << idx;
+    if(this->GetPropertyList()->GetProperty(ss.str().c_str()))
+    {
+      std::string s;
+      this->GetPropertyList()->GetStringProperty(ss.str().c_str(),s);
+      result.push_back(s);
+    }
+  }
+  return result;
+}
+

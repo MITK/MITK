@@ -70,7 +70,14 @@ public:
   void UseSampleWithReplacement(bool);
   void SetTreeCount(int);
   void SetWeightLambda(double);
-  void PrintParameter(std::ostream &str);
+
+  void SetNthItems(const char *val, unsigned int idx);
+  std::string GetNthItem(unsigned int idx);
+
+  void SetItemList(std::vector<std::string>);
+  std::vector<std::string> GetItemList();
+
+  void PrintParameter(std::ostream &str = std::cout);
 
 
 private:

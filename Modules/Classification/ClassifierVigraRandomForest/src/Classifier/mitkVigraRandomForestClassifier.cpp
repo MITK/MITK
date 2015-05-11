@@ -118,6 +118,14 @@ vigra::MultiArrayView<2, double> mitk::VigraRandomForestClassifier::GetPointWise
   return eigenview;
 }
 
+void mitk::VigraRandomForestClassifier::OnlineTrain(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in)
+{
+  vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
+  vigra::MultiArrayView<2, int> Y(vigra::Shape2(Y_in.rows(),Y_in.cols()),Y_in.data());
+  m_RandomForest.onlineLearn(X,Y,0,true);
+}
+
+
 void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in)
 {
   DefaultSplitType splitter;

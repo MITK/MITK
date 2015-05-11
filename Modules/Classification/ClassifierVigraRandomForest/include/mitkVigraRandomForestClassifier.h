@@ -44,6 +44,7 @@ public:
   ~VigraRandomForestClassifier();
 
   void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
+  void OnlineTrain(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
   Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
 
   bool SupportsPointWiseWeight();

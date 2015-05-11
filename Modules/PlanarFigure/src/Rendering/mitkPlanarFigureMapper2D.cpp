@@ -98,7 +98,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   double angle = planarFigurePlaneGeometry->Angle( rendererPlaneGeometry );
   if ( !( ( angle < 100.0 * mitk::sqrteps ) || ( angle > ( vnl_math::pi - 100.0 * sqrteps ) ) )
-    || !(planarFigurePlaneGeometry->DistanceFromPlane( rendererPlaneGeometry ) < planeThickness / 3.0) )
+    || !(planarFigurePlaneGeometry->DistanceFromPlane( rendererPlaneGeometry->GetOrigin() ) < planeThickness / 3.0) )
   {
     // Planes are not parallel or renderer plane is not within PlanarFigure
     // geometry bounds --> exit

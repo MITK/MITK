@@ -292,7 +292,10 @@ void BaseApplication::printHelp(const std::string& /*name*/, const std::string& 
 
 void BaseApplication::setApplicationName(const QString& name)
 {
-  if (qApp) qApp->setApplicationName(name);
+  if (qApp)
+  {
+    qApp->setApplicationName(name);
+  }
   d->m_AppName = name;
 }
 
@@ -307,7 +310,10 @@ QString BaseApplication::getApplicationName() const
 
 void BaseApplication::setOrganizationName(const QString& name)
 {
-  if (qApp) qApp->setOrganizationName(name);
+  if (qApp)
+  {
+    qApp->setOrganizationName(name);
+  }
   d->m_OrgaName = name;
 }
 
@@ -319,7 +325,10 @@ QString BaseApplication::getOrganizationName() const
 
 void BaseApplication::setOrganizationDomain(const QString& domain)
 {
-  if (qApp) qApp->setOrganizationDomain(domain);
+  if (qApp)
+  {
+    qApp->setOrganizationDomain(domain);
+  }
   d->m_OrgaDomain = domain;
 }
 
@@ -387,6 +396,13 @@ QString BaseApplication::getProvisioningFilePath() const
   {
     QFileInfo appFilePath(QCoreApplication::applicationFilePath());
     QDir basePath(QCoreApplication::applicationDirPath());
+    #ifdef Q_OS_MAC
+      // for MAC applicationDirPath() points to the actual executable within
+      // the bundle instead of the bundle, we need it to point to the bundle
+      basePath.cdUp();
+      basePath.cdUp();
+      basePath.cdUp();
+    #endif
     QString provFileName = appFilePath.baseName() + ".provisioning";
     QFileInfo provFile(basePath.absoluteFilePath(provFileName));
 
@@ -413,8 +429,19 @@ void BaseApplication::initializeQt()
 {
   if (qApp) return;
 
+  // If previously parameters have been set we have to store them
+  // to hand them through to the application
+  QString appName = this->getApplicationName();
+  QString orgName = this->getOrganizationName();
+  QString orgDomain = this->getOrganizationDomain();
+
   // Create a QCoreApplication instance
   this->getQApplication();
+
+  // provide parameters to QCoreApplication
+  this->setApplicationName(appName);
+  this->setOrganizationName(orgName);
+  this->setOrganizationDomain(orgDomain);
 }
 
 void BaseApplication::initialize(Poco::Util::Application& self)
@@ -519,7 +546,7 @@ QString BaseApplication::getCTKFrameworkStorageDir() const
     // Append a hash value of the absolute path of the executable to the data location.
     // This allows to start the same application from different build or install trees.
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    storageDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + '_';
+    storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + this->getOrganizationName() + "/" + this->getApplicationName() + '_';
 #else
     storageDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
 #endif

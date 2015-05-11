@@ -80,7 +80,7 @@ class PointSetInteractionMultispectrum : public QmitkAbstractView
 
   private:
 
-    void PlotReflectance(mitk::PointSet::Pointer m_PointSet, mitk::Image* image);
+    void PlotReflectance(mitk::PointSet::Pointer m_PointSet, QList<mitk::DataNode::Pointer> dataManagerNodes);
 
     mitk::PointSet::Pointer m_PointSet;
     QmitkPointListWidget* m_PointListWidget;

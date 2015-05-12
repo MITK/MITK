@@ -51,6 +51,38 @@ struct CLUtil
     }
   }
 
+  template <class TImageType>
+  static void SumVoxelForLabel(TImageType* image, const mitk::Image::Pointer & source , typename TImageType::PixelType label, double & val )
+  {
+    itk::Image<double,3>::Pointer itk_source;
+    mitk::CastToItkImage(source,itk_source);
+
+    itk::ImageRegionConstIterator<TImageType> inputIter(image, image->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator< itk::Image<double,3> > sourceIter(itk_source, itk_source->GetLargestPossibleRegion());
+    while(!inputIter.IsAtEnd())
+    {
+      if(inputIter.Value() == label) val += sourceIter.Value();
+      ++inputIter;
+      ++sourceIter;
+    }
+  }
+
+  template <class TImageType>
+  static void SqSumVoxelForLabel(TImageType* image, const mitk::Image::Pointer & source, typename TImageType::PixelType label, double & val )
+  {
+    itk::Image<double,3>::Pointer itk_source;
+    mitk::CastToItkImage(source,itk_source);
+
+    itk::ImageRegionConstIterator<TImageType> inputIter(image, image->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator< itk::Image<double,3> > sourceIter(itk_source, itk_source->GetLargestPossibleRegion());
+    while(!inputIter.IsAtEnd())
+    {
+      if(inputIter.Value() == label) val += sourceIter.Value() * sourceIter.Value();
+      ++inputIter;
+      ++sourceIter;
+    }
+  }
+
   ///
   /// \brief SampleLabel
   /// \param image

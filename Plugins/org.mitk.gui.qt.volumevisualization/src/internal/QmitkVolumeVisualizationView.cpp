@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QComboBox>
 
+#include <vtkVersionMacros.h>
+
 #include <berryISelectionProvider.h>
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>

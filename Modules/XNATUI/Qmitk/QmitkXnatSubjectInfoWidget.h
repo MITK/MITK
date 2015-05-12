@@ -14,34 +14,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKXNATPROJECTINFOWIDGET_H
-#define QMITKXNATPROJECTINFOWIDGET_H
+#ifndef QMITKXNATSUBJECTINFOWIDGET_H
+#define QMITKXNATSUBJECTINFOWIDGET_H
 
 // XNATUI
-#include "ui_QmitkXnatProjectInfoWidgetControls.h"
+#include "ui_QmitkXnatSubjectInfoWidgetControls.h"
 #include "MitkXNATUIExports.h"
 
 // Qt
 #include <QWidget>
 
 // CTK XNAT Core
-class ctkXnatProject;
+class ctkXnatSubject;
 
-class MITKXNATUI_EXPORT QmitkXnatProjectInfoWidget : public QWidget
+class MITKXNATUI_EXPORT QmitkXnatSubjectInfoWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  QmitkXnatProjectInfoWidget(ctkXnatProject* project, QWidget* parent = 0);
-  ~QmitkXnatProjectInfoWidget();
+  QmitkXnatSubjectInfoWidget(ctkXnatSubject* subject, QWidget* parent = 0);
+  ~QmitkXnatSubjectInfoWidget();
 
-  ctkXnatProject* GetProject() const;
+  void SetSubject(ctkXnatSubject* subject);
+  ctkXnatSubject* GetSubject() const;
 
 protected:
-  Ui::QmitkXnatProjectInfoWidgetControls m_Controls;
+  Ui::QmitkXnatSubjectInfoWidgetControls m_Controls;
 
 private:
-  ctkXnatProject* m_Project;
+  ctkXnatSubject* m_Subject;
 };
 
-#endif // QMITKXNATPROJECTINFOWIDGET_H
+#endif // QMITKXNATSUBJECTINFOWIDGET_H

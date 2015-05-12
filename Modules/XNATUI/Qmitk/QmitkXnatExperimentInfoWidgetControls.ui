@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkXnatProjectInfoWidgetControls</class>
- <widget class="QWidget" name="QmitkXnatProjectInfoWidgetControls">
+ <class>QmitkXnatExperimentInfoWidgetControls</class>
+ <widget class="QWidget" name="QmitkXnatExperimentInfoWidgetControls">
   <property name="enabled">
    <bool>true</bool>
   </property>
@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>350</width>
-    <height>88</height>
+    <height>107</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="1">
-    <widget class="QLabel" name="idLabel">
+    <widget class="QLabel" name="dateLabel">
      <property name="text">
       <string/>
      </property>
@@ -27,33 +27,47 @@
    <item row="2" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Description:</string>
+      <string>Time:</string>
      </property>
     </widget>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>ID:</string>
+      <string>Date:</string>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QLabel" name="descriptionLabel">
+    <widget class="QLabel" name="timeLabel">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
    <item row="3" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Scanner:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
     <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>PI:</string>
+      <string>Acquisition Site:</string>
      </property>
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QLabel" name="piLabel">
+    <widget class="QLabel" name="scannerLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="acquisitionSiteLabel">
      <property name="text">
       <string/>
      </property>
@@ -64,11 +78,12 @@
      <property name="font">
       <font>
        <weight>75</weight>
+       <italic>false</italic>
        <bold>true</bold>
       </font>
      </property>
      <property name="text">
-      <string>Project Information</string>
+      <string>Experiment Information</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

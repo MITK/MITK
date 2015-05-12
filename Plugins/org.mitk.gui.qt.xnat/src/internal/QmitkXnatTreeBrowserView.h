@@ -71,6 +71,7 @@ public:
   /// \brief Cleans the tree model
   void CleanTreeModel(ctkXnatSession* session);
 
+  void itemSelected(const QModelIndex& index);
   void NodeTableViewContextMenuRequested(const QPoint & pos);
 
   void OnContextMenuDownloadAndOpenFile();

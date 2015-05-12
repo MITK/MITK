@@ -18,22 +18,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkXnatProject.h>
 
-QmitkXnatProjectInfoWidget::QmitkXnatProjectInfoWidget(QWidget* parent, ctkXnatProject* project)
-  : QWidget(parent)
-  , m_Project(project)
+QmitkXnatProjectInfoWidget::QmitkXnatProjectInfoWidget(ctkXnatProject* project, QWidget* parent)
+  : m_Project(project)
+  , QWidget(parent)
 {
   // Create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(parent);
+  m_Controls.setupUi(this);
+
+  // Set the UI labels
+  m_Controls.idLabel->setText(m_Project->property("ID"));
+  m_Controls.descriptionLabel->setText(m_Project->property("description"));
+  if (!m_Project->property("pi_lastname").isEmpty())
+  {
+    m_Controls.piLabel->setText(m_Project->property("pi_lastname") + ", " + m_Project->property("pi_firstname"));
+  }
 }
 
 QmitkXnatProjectInfoWidget::~QmitkXnatProjectInfoWidget()
 {
-  delete m_Project;
-}
-
-void QmitkXnatProjectInfoWidget::SetProject(ctkXnatProject* project)
-{
-  m_Project = project;
 }
 
 ctkXnatProject* QmitkXnatProjectInfoWidget::GetProject() const

@@ -14,34 +14,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKXNATPROJECTINFOWIDGET_H
-#define QMITKXNATPROJECTINFOWIDGET_H
+#ifndef QMITKXNATEXPERIMENTINFOWIDGET_H
+#define QMITKXNATEXPERIMENTINFOWIDGET_H
 
 // XNATUI
-#include "ui_QmitkXnatProjectInfoWidgetControls.h"
+#include "ui_QmitkXnatExperimentInfoWidgetControls.h"
 #include "MitkXNATUIExports.h"
 
 // Qt
 #include <QWidget>
 
 // CTK XNAT Core
-class ctkXnatProject;
+class ctkXnatExperiment;
 
-class MITKXNATUI_EXPORT QmitkXnatProjectInfoWidget : public QWidget
+class MITKXNATUI_EXPORT QmitkXnatExperimentInfoWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  QmitkXnatProjectInfoWidget(ctkXnatProject* project, QWidget* parent = 0);
-  ~QmitkXnatProjectInfoWidget();
+  QmitkXnatExperimentInfoWidget(ctkXnatExperiment* experiment = 0, QWidget* parent = 0);
+  ~QmitkXnatExperimentInfoWidget();
 
-  ctkXnatProject* GetProject() const;
+  void SetExperiment(ctkXnatExperiment* experiment);
+  ctkXnatExperiment* GetExperiment() const;
 
 protected:
-  Ui::QmitkXnatProjectInfoWidgetControls m_Controls;
+  Ui::QmitkXnatExperimentInfoWidgetControls m_Controls;
 
 private:
-  ctkXnatProject* m_Project;
+  ctkXnatExperiment* m_Experiment;
 };
 
-#endif // QMITKXNATPROJECTINFOWIDGET_H
+#endif // QMITKXNATEXPERIMENTINFOWIDGET_H

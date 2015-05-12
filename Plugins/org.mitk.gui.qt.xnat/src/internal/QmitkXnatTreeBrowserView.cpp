@@ -26,7 +26,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 
 // CTK XNAT Core
-#include "ctkXnatFile.h"
+#include <ctkXnatFile.h>
+#include <ctkXnatProject.h>
+#include <ctkXnatSubject.h>
+#include <ctkXnatExperiment.h>
+
+// MITK XNAT UI
+#include <QmitkXnatProjectInfoWidget.h>
+#include <QmitkXnatSubjectInfoWidget.h>
+#include <QmitkXnatExperimentInfoWidget.h>
 
 // Qt
 #include <QDir>
@@ -64,6 +72,7 @@ m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetCo
 
 QmitkXnatTreeBrowserView::~QmitkXnatTreeBrowserView()
 {
+  m_DataStorageServiceTracker.close();
   delete m_TreeModel;
   delete m_Tracker;
 }
@@ -89,6 +98,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   m_Tracker = new mitk::XnatSessionTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext());
   m_NodeMenu = new QMenu(m_Controls.treeView);
 
+  connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), SLOT(itemSelected(const QModelIndex&)));
   connect(m_Controls.treeView, SIGNAL(customContextMenuRequested(const QPoint&)),
     this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)));
   connect(m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanTreeModel(ctkXnatSession*)));
@@ -320,6 +330,40 @@ void QmitkXnatTreeBrowserView::NodeTableViewContextMenuRequested(const QPoint & 
       connect(actShow, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadAndOpenFile()));
       connect(actDownload, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadFile()));
       m_NodeMenu->popup(QCursor::pos());
+    }
+  }
+}
+
+void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
+{
+  QLayout* layout = m_Controls.infoVerticalLayout;
+  QLayoutItem *child;
+  while ((child = layout->takeAt(0)) != 0) {
+    delete child->widget();
+  }
+
+  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
+  if (variant.isValid())
+  {
+    ctkXnatObject* object = variant.value<ctkXnatObject*>();
+    ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(object);
+    ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(object);
+    ctkXnatExperiment* experiment = dynamic_cast<ctkXnatExperiment*>(object);
+
+    if (project != NULL)
+    {
+      QmitkXnatProjectInfoWidget* widget = new QmitkXnatProjectInfoWidget(project);
+      layout->addWidget(widget);
+    }
+    else if (subject != NULL)
+    {
+      QmitkXnatSubjectInfoWidget* widget = new QmitkXnatSubjectInfoWidget(subject);
+      layout->addWidget(widget);
+    }
+    else if (experiment != NULL)
+    {
+      QmitkXnatExperimentInfoWidget* widget = new QmitkXnatExperimentInfoWidget(experiment);
+      layout->addWidget(widget);
     }
   }
 }

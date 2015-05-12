@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRdfUri.h"
 
-#include <string>
-
 namespace mitk {
   RdfUri::RdfUri()
   {

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKRDFURI_H
 
 #include <MitkRDFExports.h>
+
 #include <string>
 
 namespace mitk {

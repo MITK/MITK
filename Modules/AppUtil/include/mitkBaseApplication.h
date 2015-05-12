@@ -88,6 +88,7 @@ public:
   static QString ARG_NEWINSTANCE;
   static QString ARG_CLEAN;
   static QString ARG_APPLICATION;
+  static QString ARG_PRODUCT;
   static QString ARG_HOME;
   static QString ARG_STORAGE_DIR;
   static QString ARG_PLUGIN_CACHE;
@@ -115,6 +116,7 @@ public:
   static QString PROP_NO_LAZY_REGISTRY_CACHE_LOADING;
   static QString PROP_REGISTRY_MULTI_LANGUAGE;
 
+  static QString PROP_PRODUCT;
   static QString PROP_APPLICATION;
   static QString PROP_TESTPLUGIN;
   static QString PROP_TESTAPPLICATION;

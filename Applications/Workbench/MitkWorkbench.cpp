@@ -35,7 +35,7 @@ int main(int argc, char** argv)
   preloadLibs << "liborg_mitk_gui_qt_ext";
   app.setPreloadLibraries(preloadLibs);
 
-  app.setProperty(mitk::BaseApplication::PROP_APPLICATION, "org.mitk.qt.extapplication");
+  app.setProperty(mitk::BaseApplication::PROP_PRODUCT, "org.mitk.gui.qt.extapplication.workbench");
 
   // Run the workbench.
   return app.run();

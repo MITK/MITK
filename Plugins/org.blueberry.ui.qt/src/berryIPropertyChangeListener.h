@@ -94,7 +94,7 @@ struct PropertyChangeAdapter : public IPropertyChangeListener
 
   using IPropertyChangeListener::PropertyChange;
 
-  void PropertyChange(const PropertyChangeEvent::Pointer& event)
+  void PropertyChange(const PropertyChangeEvent::Pointer& event) override
   {
     (listener->*callback)(event);
   }
@@ -122,7 +122,7 @@ struct PropertyChangeIntAdapter: public IPropertyChangeListener
 
   using IPropertyChangeListener::PropertyChange;
 
-  void PropertyChange(const Object::Pointer& source, int propId)
+  void PropertyChange(const Object::Pointer& source, int propId) override
   {
     (listener->*callback)(source, propId);
   }

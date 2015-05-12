@@ -59,7 +59,7 @@ void QmitkStatusBar::DisplayGreyValueText(const char* t)
  */
 void QmitkStatusBar::Clear()
 {
-  if (m_StatusBar != NULL)
+  if (m_StatusBar != nullptr)
     m_StatusBar->clearMessage();
   // TODO bug #1357
   //qApp->processEvents(); // produces crashes!
@@ -70,7 +70,7 @@ void QmitkStatusBar::Clear()
  */
 void QmitkStatusBar::SetSizeGripEnabled(bool enable)
 {
-  if (m_StatusBar != NULL)
+  if (m_StatusBar != nullptr)
     m_StatusBar->setSizeGripEnabled(enable);
 }
 
@@ -79,7 +79,7 @@ QmitkStatusBar::QmitkStatusBar(QStatusBar* instance)
 :StatusBarImplementation()
 {
     m_StatusBar = instance;
-    m_GreyValueLabel = new QLabel(m_StatusBar,0);
+    m_GreyValueLabel = new QLabel(m_StatusBar,nullptr);
     int xResolution = QApplication::desktop()->screenGeometry(0).width()-100;
     m_GreyValueLabel->setMaximumSize(QSize(xResolution,50));
     m_GreyValueLabel->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Fixed);

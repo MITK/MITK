@@ -112,7 +112,7 @@ mitk::ThreeDnTDICOMSeriesReader
     remainingBlocks.pop_front();
 
     // compare all other blocks against the first one
-    for (SortingBlockList::iterator otherBlockIter = remainingBlocks.begin();
+    for (auto otherBlockIter = remainingBlocks.begin();
          otherBlockIter != remainingBlocks.end();
          /*++otherBlockIter*/) // <-- inside loop
     {
@@ -158,7 +158,7 @@ mitk::ThreeDnTDICOMSeriesReader
   // set 3D+t flag on output block
   this->SetNumberOfOutputs( true3DnTBlocks.size() );
   unsigned int o = 0;
-  for (SortingBlockList::iterator blockIter = true3DnTBlocks.begin();
+  for (auto blockIter = true3DnTBlocks.begin();
        blockIter != true3DnTBlocks.end();
        ++o, ++blockIter)
   {
@@ -242,9 +242,9 @@ mitk::ThreeDnTDICOMSeriesReader
   {
     // use numberOfFramesPerTimestep frames for a new item in filenamesPerTimestep
     ITKDICOMSeriesReaderHelper::StringContainer filenamesOfThisTimeStep;
-    DICOMImageFrameList::const_iterator timeStepStart = frames.begin() + timeStep * numberOfFramesPerTimestep;
-    DICOMImageFrameList::const_iterator timeStepEnd   = frames.begin() + (timeStep+1) * numberOfFramesPerTimestep;
-    for (DICOMImageFrameList::const_iterator frameIter = timeStepStart;
+    auto timeStepStart = frames.begin() + timeStep * numberOfFramesPerTimestep;
+    auto timeStepEnd   = frames.begin() + (timeStep+1) * numberOfFramesPerTimestep;
+    for (auto frameIter = timeStepStart;
         frameIter != timeStepEnd;
         ++frameIter)
     {

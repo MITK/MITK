@@ -63,7 +63,7 @@ Object::Pointer WorkbenchConfigurer::GetData(const QString& key) const
   QHash<QString, Object::Pointer>::ConstIterator i = extraData.find(key);
   if (i != extraData.end())
     return i.value();
-  return Object::Pointer(0);
+  return Object::Pointer(nullptr);
 }
 
 void WorkbenchConfigurer::SetData(const QString& key, Object::Pointer data)
@@ -87,7 +87,7 @@ void WorkbenchConfigurer::EmergencyClose()
   if (!isEmergencyClosing)
   {
     isEmergencyClosing = true;
-    if (Workbench::GetInstance() != 0 && !Workbench::GetInstance()->IsClosing())
+    if (Workbench::GetInstance() != nullptr && !Workbench::GetInstance()->IsClosing())
     {
       Workbench::GetInstance()->Close(PlatformUI::RETURN_EMERGENCY_CLOSE, true);
     }

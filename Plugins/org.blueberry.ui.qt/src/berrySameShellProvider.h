@@ -65,7 +65,7 @@ public:
   /* (non-javadoc)
    * @see IShellProvider#getShell()
    */
-  Shell::Pointer GetShell() const;
+  Shell::Pointer GetShell() const override;
 
 };
 

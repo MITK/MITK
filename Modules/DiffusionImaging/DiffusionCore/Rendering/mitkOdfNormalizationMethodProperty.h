@@ -115,7 +115,7 @@ class MITKDIFFUSIONCORE_EXPORT OdfNormalizationMethodPropertySerializer : public
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
       const char* sa( element->Attribute("value") );
       std::string s(sa?sa:"");
       OdfNormalizationMethodProperty::Pointer property = OdfNormalizationMethodProperty::New();

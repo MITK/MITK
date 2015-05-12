@@ -42,7 +42,7 @@ public:
     /**
      * Get the part control.  This method may return null.
      */
-    QWidget* GetControl();
+    QWidget* GetControl() override;
 
     /**
      * @see IPersistablePart
@@ -57,21 +57,21 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#isStackType(org.blueberry.ui.internal.LayoutPart)
      */
-    bool IsStackType(ILayoutContainer::Pointer toTest);
+    bool IsStackType(ILayoutContainer::Pointer toTest) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#isPaneType(org.blueberry.ui.internal.LayoutPart)
      */
-    bool IsPaneType(LayoutPart::Pointer toTest);
+    bool IsPaneType(LayoutPart::Pointer toTest) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.ILayoutContainer#replace(org.blueberry.ui.internal.LayoutPart, org.blueberry.ui.internal.LayoutPart)
      */
     //void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
 
-    bool AllowsAdd(LayoutPart::Pointer layoutPart);
+    bool AllowsAdd(LayoutPart::Pointer layoutPart) override;
 
-    void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
+    void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild) override;
 
 
 protected:
@@ -81,39 +81,39 @@ protected:
      * the composite to use to parent all children
      * layout parts it contains.
      */
-    QWidget* CreateParent(QWidget* parentWidget);
+    QWidget* CreateParent(QWidget* parentWidget) override;
 
     /**
      * Subclasses override this method to dispose
      * of any swt resources created during createParent.
      */
-    void DisposeParent();
+    void DisposeParent() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#getDockingRatio(org.blueberry.ui.internal.LayoutPart, org.blueberry.ui.internal.LayoutPart)
      */
-    float GetDockingRatio(Object::Pointer dragged, ILayoutContainer::Pointer target);
+    float GetDockingRatio(Object::Pointer dragged, ILayoutContainer::Pointer target) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#createStack(org.blueberry.ui.internal.LayoutPart)
      */
-    PartStack::Pointer CreateStack();
+    PartStack::Pointer CreateStack() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#setVisiblePart(org.blueberry.ui.internal.ILayoutContainer, org.blueberry.ui.internal.LayoutPart)
      */
     void SetVisiblePart(ILayoutContainer::Pointer container,
-            PartPane::Pointer visiblePart);
+            PartPane::Pointer visiblePart) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#getVisiblePart(org.blueberry.ui.internal.ILayoutContainer)
      */
-    LayoutPart::Pointer GetVisiblePart(ILayoutContainer::Pointer container);
+    LayoutPart::Pointer GetVisiblePart(ILayoutContainer::Pointer container) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#derefPart(org.blueberry.ui.internal.LayoutPart)
      */
-    void DerefPart(LayoutPart::Pointer sourcePart);
+    void DerefPart(LayoutPart::Pointer sourcePart) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.PartSashContainer#addChild(org.blueberry.ui.internal.PartSashContainer.RelationshipInfo)

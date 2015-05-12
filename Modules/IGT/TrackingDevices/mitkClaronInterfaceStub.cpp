@@ -89,7 +89,7 @@ std::vector<double> mitk::ClaronInterface::GetQuaternions(claronToolHandle itkNo
 const char* mitk::ClaronInterface::GetName(claronToolHandle itkNotUsed(c))
 {
   MITK_WARN("IGT") << "Error: MicronTracker is not included in this project";
-  return NULL;
+  return nullptr;
 }
 
 bool mitk::ClaronInterface::IsMicronTrackerInstalled()

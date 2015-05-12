@@ -61,7 +61,7 @@ namespace mitk
      * @param module The module containing the resource. Defaults to the Mitk module.
      * @return \c true if the resource was successfully loaded, \c false otherwise.
      */
-    bool SetEventConfig(const std::string& filename, const us::Module* module = NULL);
+    bool SetEventConfig(const std::string& filename, const us::Module* module = nullptr);
 
     /**
      * @brief Loads a configuration from an EventConfig object.
@@ -94,7 +94,7 @@ namespace mitk
      * @param module The module containing the resource. Defaults to the Mitk module.
      * @return \c true if the configuration was successfully added, \c false otherwise.
      */
-    bool AddEventConfig(const std::string& filename, const us::Module* module = NULL);
+    bool AddEventConfig(const std::string& filename, const us::Module* module = nullptr);
 
     /**
      * @brief This method \e extends the configuration.

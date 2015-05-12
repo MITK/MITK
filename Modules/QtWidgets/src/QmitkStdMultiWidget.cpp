@@ -356,10 +356,10 @@ void QmitkStdMultiWidget::InitializeWidget()
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
 {
   //We have 4 widgets and ...
-  for(unsigned int i = 0; i < 4; ++i)
+  for(auto & elem : m_GradientBackgroundColors)
   {
     float black[3] = {0.0f, 0.0f, 0.0f};
-    m_GradientBackgroundColors[i] = std::make_pair(mitk::Color(black), mitk::Color(black));
+    elem = std::make_pair(mitk::Color(black), mitk::Color(black));
   }
 }
 
@@ -662,9 +662,9 @@ void QmitkStdMultiWidget::SetCornerAnnotation( std::string text,
 
 void QmitkStdMultiWidget::SetCornerAnnotationVisibility(bool visibility)
 {
-  for(int i = 0 ; i<4 ; ++i)
+  for(auto ca : m_CornerAnnotations)
   {
-    CornerAnnotation ca = m_CornerAnnotations[i];
+
     if(ca.ren) ca.ren->SetDraw(visibility);
   }
 }
@@ -1800,18 +1800,18 @@ void QmitkStdMultiWidget::EnableGradientBackground()
 {
   // gradient background is by default only in widget 4, otherwise
   // interferences between 2D rendering and VTK rendering may occur.
-  for(unsigned int i = 0; i < 4; ++i)
+  for(auto & elem : m_GradientBackground)
   {
-    m_GradientBackground[i]->Enable();
+    elem->Enable();
   }
   m_GradientBackgroundFlag = true;
 }
 
 void QmitkStdMultiWidget::DisableGradientBackground()
 {
-  for(unsigned int i = 0; i < 4; ++i)
+  for(auto & elem : m_GradientBackground)
   {
-    m_GradientBackground[i]->Disable();
+    elem->Disable();
   }
   m_GradientBackgroundFlag = false;
 }
@@ -2033,9 +2033,9 @@ void QmitkStdMultiWidget::SetGradientBackgroundColorForRenderWindow( const mitk:
 
 void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower )
 {
-  for(unsigned int i = 0; i < 4; ++i)
+  for(auto & elem : m_GradientBackground)
   {
-    m_GradientBackground[i]->SetGradientColors(upper, lower);
+    elem->SetGradientColors(upper, lower);
   }
   m_GradientBackgroundFlag = true;
 }

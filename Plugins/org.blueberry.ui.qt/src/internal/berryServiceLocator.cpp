@@ -44,7 +44,7 @@ Object* ServiceLocator::ParentLocator::GetService(const QString& api)
 
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 bool ServiceLocator::ParentLocator::HasService(const QString& api) const
@@ -58,8 +58,8 @@ bool ServiceLocator::ParentLocator::HasService(const QString& api) const
 
 ServiceLocator::ServiceLocator()
   : activated(false)
-  , factory(NULL)
-  , parent(NULL)
+  , factory(nullptr)
+  , parent(nullptr)
   , disposed(false)
 {
 
@@ -116,7 +116,7 @@ void ServiceLocator::Dispose()
   }
   services.clear();
 
-  parent = 0;
+  parent = nullptr;
   disposed = true;
 }
 
@@ -124,11 +124,11 @@ Object* ServiceLocator::GetService(const QString& key)
 {
   if (disposed)
   {
-    return NULL;
+    return nullptr;
   }
 
   KeyToServiceMapType::const_iterator iter = services.find(key);
-  Object* service = NULL;
+  Object* service = nullptr;
 
   if (iter != services.end())
   {

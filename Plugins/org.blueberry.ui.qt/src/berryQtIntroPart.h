@@ -34,7 +34,7 @@ public:
 
   berryObjectMacro(QtIntroPart);
 
-  void CreatePartControl(void* parent);
+  void CreatePartControl(void* parent) override;
 
 protected:
 

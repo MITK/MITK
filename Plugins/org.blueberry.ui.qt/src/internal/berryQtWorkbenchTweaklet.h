@@ -32,9 +32,9 @@ public:
 
   QtWorkbenchTweaklet();
 
-  Display* CreateDisplay();
+  Display* CreateDisplay() override;
 
-  bool IsRunning();
+  bool IsRunning() override;
 
 };
 

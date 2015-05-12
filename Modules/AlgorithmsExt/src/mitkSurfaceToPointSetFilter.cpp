@@ -41,7 +41,7 @@ void mitk::SurfaceToPointSetFilter::GenerateData()
   {
   if (m_InputSurface.IsNull())
     {
-    this->SetNthOutput(0,NULL);
+    this->SetNthOutput(0,nullptr);
     m_ErrorMessage = "Error in SurfaceToPointSetFilter: Input is not set correctly.";
     return;
     }

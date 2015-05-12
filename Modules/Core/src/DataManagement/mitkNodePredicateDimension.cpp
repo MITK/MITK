@@ -39,11 +39,11 @@ mitk::NodePredicateDimension::~NodePredicateDimension()
 
 bool mitk::NodePredicateDimension::CheckNode(const mitk::DataNode* node) const
 {
-  if (node == NULL)
+  if (node == nullptr)
     throw std::invalid_argument("NodePredicateDimension: invalid node");
 
   mitk::Image *image = dynamic_cast<mitk::Image *>( node->GetData() );
-  if (image != NULL)
+  if (image != nullptr)
   {
     return (image->GetDimension() == m_Dimension && image->GetPixelType().GetNumberOfComponents() == m_PixelComponents);
   }

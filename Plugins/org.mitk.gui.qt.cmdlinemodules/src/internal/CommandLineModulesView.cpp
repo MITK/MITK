@@ -53,12 +53,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //-----------------------------------------------------------------------------
 CommandLineModulesView::CommandLineModulesView()
-: m_Controls(NULL)
-, m_Parent(NULL)
-, m_Layout(NULL)
-, m_ModuleManager(NULL)
-, m_ModuleBackend(NULL)
-, m_DirectoryWatcher(NULL)
+: m_Controls(nullptr)
+, m_Parent(nullptr)
+, m_Layout(nullptr)
+, m_ModuleManager(nullptr)
+, m_ModuleBackend(nullptr)
+, m_DirectoryWatcher(nullptr)
 , m_TemporaryDirectoryName("")
 , m_MaximumConcurrentProcesses(4)
 , m_CurrentlyRunningProcesses(0)
@@ -71,22 +71,22 @@ CommandLineModulesView::CommandLineModulesView()
 //-----------------------------------------------------------------------------
 CommandLineModulesView::~CommandLineModulesView()
 {
-  if (m_ModuleManager != NULL)
+  if (m_ModuleManager != nullptr)
   {
     delete m_ModuleManager;
   }
 
-  if (m_ModuleBackend != NULL)
+  if (m_ModuleBackend != nullptr)
   {
     delete m_ModuleBackend;
   }
 
-  if (m_DirectoryWatcher != NULL)
+  if (m_DirectoryWatcher != nullptr)
   {
     delete m_DirectoryWatcher;
   }
 
-  if (m_Layout != NULL)
+  if (m_Layout != nullptr)
   {
     delete m_Layout;
   }
@@ -420,7 +420,7 @@ void CommandLineModulesView::OnRunButtonPressed()
   if (tabNumber >= 0)
   {
     // 1. Create a new QmitkCmdLineModuleRunner to represent the running widget.
-    QmitkCmdLineModuleRunner *widget = new QmitkCmdLineModuleRunner(m_Controls->m_RunningWidgets);
+    auto  widget = new QmitkCmdLineModuleRunner(m_Controls->m_RunningWidgets);
     widget->SetDataStorage(this->GetDataStorage());
     widget->SetManager(m_ModuleManager);
     widget->SetOutputDirectory(m_OutputDirectoryName);

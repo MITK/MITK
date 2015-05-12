@@ -39,7 +39,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertySlider : public QSlider
 
 public:
 
-  QmitkNumberPropertySlider(QWidget* parent = 0);
+  QmitkNumberPropertySlider(QWidget* parent = nullptr);
   virtual ~QmitkNumberPropertySlider();
 
   void SetProperty(mitk::IntProperty* property);

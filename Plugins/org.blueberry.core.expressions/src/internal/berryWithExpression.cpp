@@ -80,7 +80,7 @@ WithExpression::Evaluate(IEvaluationContext* context) const
 void
 WithExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
-  ExpressionInfo* other = new ExpressionInfo();
+  auto  other = new ExpressionInfo();
   CompositeExpression::CollectExpressionInfo(other);
   if (other->HasDefaultVariableAccess())
   {

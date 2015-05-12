@@ -46,7 +46,7 @@ public:
 
   /** Default Constructor */
   WeakPointer() :
-    m_Pointer(0)
+    m_Pointer(nullptr)
   {
 
   }
@@ -130,14 +130,14 @@ public:
   template<typename R>
   bool operator ==(const R* o) const
   {
-    return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
+    return (m_Pointer == nullptr ? o == nullptr : (o && m_Pointer->operator==(o)));
   }
 
   template<typename R>
   bool operator ==(const WeakPointer<R>& r) const
   {
     const R* o = r.m_Pointer;
-    return (m_Pointer == 0 ? o == 0 : (o && m_Pointer->operator==(o)));
+    return (m_Pointer == nullptr ? o == nullptr : (o && m_Pointer->operator==(o)));
   }
 
   /** Comparison of pointers. Less than comparison.  */
@@ -159,12 +159,12 @@ public:
       m_Pointer->RemoveDestroyListener(MessageDelegate<WeakPointer> (this,
           &WeakPointer::ObjectDestroyed));
 
-    m_Pointer = 0;
+    m_Pointer = nullptr;
   }
 
   bool Expired() const
   {
-    return m_Pointer == 0;
+    return m_Pointer == nullptr;
   }
 
   /** Destructor */
@@ -184,7 +184,7 @@ private:
 
   void ObjectDestroyed()
   {
-    m_Pointer = 0;
+    m_Pointer = nullptr;
   }
 
 };

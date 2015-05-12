@@ -36,7 +36,7 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
     {
       if (const LevelWindowProperty* prop = dynamic_cast<const LevelWindowProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("LevelWindow");
+        auto  element = new TiXmlElement("LevelWindow");
 
         LevelWindow lw = prop->GetLevelWindow();
         std::string boolString("false");
@@ -44,7 +44,7 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
           boolString = "true";
         element->SetAttribute("fixed", boolString.c_str());
 
-        TiXmlElement* child = new TiXmlElement("CurrentSettings");
+        auto  child = new TiXmlElement("CurrentSettings");
         element->LinkEndChild( child );
           child->SetDoubleAttribute("level", lw.GetLevel());
           child->SetDoubleAttribute("window", lw.GetWindow());
@@ -62,12 +62,12 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
 
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       bool isFixed(false);
       if (element->Attribute("fixed"))
@@ -76,20 +76,20 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
       float level;
       float window;
       TiXmlElement* child = element->FirstChildElement("CurrentSettings");
-        if ( child->QueryFloatAttribute( "level", &level ) != TIXML_SUCCESS ) return NULL;
-        if ( child->QueryFloatAttribute( "window", &window ) != TIXML_SUCCESS ) return NULL;
+        if ( child->QueryFloatAttribute( "level", &level ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryFloatAttribute( "window", &window ) != TIXML_SUCCESS ) return nullptr;
 
       float defaultLevel;
       float defaultWindow;
                     child = element->FirstChildElement("DefaultSettings");
-        if ( child->QueryFloatAttribute( "level", &defaultLevel ) != TIXML_SUCCESS ) return NULL;
-        if ( child->QueryFloatAttribute( "window", &defaultWindow ) != TIXML_SUCCESS ) return NULL;
+        if ( child->QueryFloatAttribute( "level", &defaultLevel ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryFloatAttribute( "window", &defaultWindow ) != TIXML_SUCCESS ) return nullptr;
 
       float minRange;
       float maxRange;
                     child = element->FirstChildElement("CurrentRange");
-        if ( child->QueryFloatAttribute( "min", &minRange ) != TIXML_SUCCESS ) return NULL;
-        if ( child->QueryFloatAttribute( "max", &maxRange ) != TIXML_SUCCESS ) return NULL;
+        if ( child->QueryFloatAttribute( "min", &minRange ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryFloatAttribute( "max", &maxRange ) != TIXML_SUCCESS ) return nullptr;
 
 
 

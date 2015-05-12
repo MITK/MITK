@@ -124,12 +124,12 @@ public:
     /*
      * @see ISizeProvider#getSizeFlags(boolean)
      */
-    virtual int GetSizeFlags(bool width);
+    virtual int GetSizeFlags(bool width) override;
 
     /*
      * @see ISizeProvider#computePreferredSize(boolean, int, int, int)
      */
-    virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredResult);
+    virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredResult) override;
 
     /**
      * This is invoked to notify the presentation that its activation

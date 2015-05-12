@@ -46,12 +46,12 @@ public:
   ToggleState();
 
   void Load(const SmartPointer<IPreferences>& store,
-            const QString& preferenceKey);
+            const QString& preferenceKey) override;
 
   void Save(const SmartPointer<IPreferences>& store,
-            const QString& preferenceKey);
+            const QString& preferenceKey) override;
 
-  void SetValue(const Object::Pointer& value);
+  void SetValue(const Object::Pointer& value) override;
 };
 
 }

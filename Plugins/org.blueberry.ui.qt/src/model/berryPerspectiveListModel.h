@@ -43,9 +43,9 @@ public:
   PerspectiveListModel(IPerspectiveRegistry& perspReg, bool markDefault = true, QObject* parent = nullptr);
   ~PerspectiveListModel();
 
-  int rowCount(const QModelIndex &parent = QModelIndex()) const;
-  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
   QString perspectiveName(const QModelIndex& index) const;
   SmartPointer<IPerspectiveDescriptor> perspectiveDescriptor(const QModelIndex& index) const;

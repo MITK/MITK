@@ -33,7 +33,7 @@ namespace itk
   template <class TInputImageType, class TOutputImageType>
   ShortestPathImageFilter<TInputImageType, TOutputImageType>
     ::ShortestPathImageFilter() :
-    m_Nodes(0),
+    m_Nodes(nullptr),
     m_Graph_NumberOfNodes(0),
     m_FullNeighborsMode(false),
     m_MakeOutputImage(true),

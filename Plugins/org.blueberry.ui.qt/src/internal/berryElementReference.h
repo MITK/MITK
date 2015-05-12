@@ -53,17 +53,17 @@ public:
   /*
    * @see IElementReference#GetElement()
    */
-  SmartPointer<UIElement> GetElement() const;
+  SmartPointer<UIElement> GetElement() const override;
 
   /*
    * @see IElementReference#GetCommandId()
    */
-  QString GetCommandId() const;
+  QString GetCommandId() const override;
 
   /*
    * @see IElementReference#GetParameters()
    */
-  QHash<QString, Object::Pointer> GetParameters() const;
+  QHash<QString, Object::Pointer> GetParameters() const override;
 
   void AddParameter(const QString& name, const Object::Pointer& value);
 };

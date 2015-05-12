@@ -30,7 +30,7 @@ class DataStorageEditorInputFactory : public QObject, public berry::IElementFact
 
 public:
 
-  berry::IAdaptable* CreateElement(const berry::IMemento::Pointer& memento);
+  berry::IAdaptable* CreateElement(const berry::IMemento::Pointer& memento) override;
 
   static QString GetFactoryId();
 

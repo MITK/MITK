@@ -207,6 +207,7 @@ public:
     INVERSE_GRAYSCALE,
     HOT_IRON,
     JET,
+    JET_TRANSPARENT,
     LEGACY_BINARY,
     LEGACY_RAINBOW_COLOR,
     MULTILABEL,
@@ -245,7 +246,7 @@ protected:
   virtual void BuildLegacyRainbowColorLookupTable();
   virtual void BuildInverseGrayScaleLookupTable();
   virtual void BuildHotIronLookupTable();
-  virtual void BuildJetLookupTable();
+  virtual void BuildJetLookupTable(bool transparent = false);
   virtual void BuildPETColorLookupTable();
   virtual void BuildPET20LookupTable();
   virtual void BuildMultiLabelLookupTable();

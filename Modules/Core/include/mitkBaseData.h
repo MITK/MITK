@@ -140,7 +140,7 @@ public:
   mitk::BaseGeometry* GetGeometry(int t=0) const
   {
     if(m_TimeGeometry.IsNull())
-      return NULL;
+      return nullptr;
     return m_TimeGeometry->GetGeometryForTimeStep(t);
   }
 

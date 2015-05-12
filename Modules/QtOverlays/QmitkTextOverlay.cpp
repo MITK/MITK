@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkTextOverlay::QmitkTextOverlay( const char* id )
 : QmitkOverlay(id)
-, m_ObservedProperty( NULL )
+, m_ObservedProperty( nullptr )
 , m_ObserverTag(0)
 {
   m_Widget = m_Label = new QLabel();

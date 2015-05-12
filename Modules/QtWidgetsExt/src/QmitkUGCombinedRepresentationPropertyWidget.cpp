@@ -65,8 +65,8 @@ class _UGCombinedBoolPropEditor : public mitk::PropertyEditor
 
     virtual void PropertyRemoved() override
     {
-      m_Property = 0;
-      m_BoolProperty = 0;
+      m_Property = nullptr;
+      m_BoolProperty = nullptr;
       enabled = false;
     }
 
@@ -92,7 +92,7 @@ public:
 
   ~_UGCombinedEnumPropEditor()
   {
-    m_EnumerationProperty = 0;
+    m_EnumerationProperty = nullptr;
   }
 
   void IndexChanged(int enumId)
@@ -119,8 +119,8 @@ public:
 
   virtual void PropertyRemoved() override
   {
-    m_Property = 0;
-    m_EnumerationProperty = 0;
+    m_Property = nullptr;
+    m_EnumerationProperty = nullptr;
   }
 
 protected:
@@ -134,7 +134,7 @@ protected:
 
 
 QmitkUGCombinedRepresentationPropertyWidget::QmitkUGCombinedRepresentationPropertyWidget(QWidget *parent) :
-    QComboBox(parent), gridRepPropEditor(0), volumeMapperPropEditor(0), volumePropEditor(0),
+    QComboBox(parent), gridRepPropEditor(nullptr), volumeMapperPropEditor(nullptr), volumePropEditor(nullptr),
     m_GridRepIndex(0), m_GridVolIndex(0), m_FirstVolumeRepId(0)
 {
   connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnIndexChanged(int)));
@@ -155,19 +155,19 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
   if (gridRepPropEditor)
   {
     delete gridRepPropEditor;
-    gridRepPropEditor = 0;
+    gridRepPropEditor = nullptr;
   }
 
   if (volumeMapperPropEditor)
   {
     delete volumeMapperPropEditor;
-    volumeMapperPropEditor = 0;
+    volumeMapperPropEditor = nullptr;
   }
 
   if (volumePropEditor)
   {
     delete volumePropEditor;
-    volumePropEditor = 0;
+    volumePropEditor = nullptr;
   }
 
   this->clear();
@@ -184,7 +184,7 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
   {
     const mitk::EnumerationProperty::EnumStringsContainerType& repStrings = gridRepProp->GetEnumStrings();
 
-    for (mitk::EnumerationProperty::EnumStringsContainerType::const_iterator it = repStrings.begin();
+    for (auto it = repStrings.begin();
       it != repStrings.end(); ++it, ++i)
     {
       m_MapRepEnumToIndex.insert(it->second, i);
@@ -196,7 +196,7 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
   {
     const mitk::EnumerationProperty::EnumStringsContainerType& volStrings = gridVolProp->GetEnumStrings();
 
-    for (mitk::EnumerationProperty::EnumStringsContainerType::const_iterator it = volStrings.begin();
+    for (auto it = volStrings.begin();
       it != volStrings.end(); ++it, ++i)
     {
       m_MapVolEnumToIndex.insert(it->second, i);

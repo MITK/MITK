@@ -184,7 +184,7 @@ class MITKCORE_EXPORT CallbackFromGUIThread
     static void RegisterImplementation(CallbackFromGUIThreadImplementation* implementation);
 
     /// Change the current application cursor
-    void CallThisFromGUIThread(itk::Command*, itk::EventObject* e = NULL);
+    void CallThisFromGUIThread(itk::Command*, itk::EventObject* e = nullptr);
 
   protected:
 

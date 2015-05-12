@@ -63,7 +63,7 @@ void mitk::ImageToLiveWireContourFilter::SetInput ( unsigned int idx, const mitk
 const mitk::ImageToLiveWireContourFilter::InputType* mitk::ImageToLiveWireContourFilter::GetInput( void )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ImageToLiveWireContourFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
 
@@ -71,7 +71,7 @@ const mitk::ImageToLiveWireContourFilter::InputType* mitk::ImageToLiveWireContou
 const mitk::ImageToLiveWireContourFilter::InputType* mitk::ImageToLiveWireContourFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ImageToLiveWireContourFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
 

@@ -67,10 +67,10 @@ std::string mitk::PropertyListSerializer::Serialize()
     fullname = fullname.substr(1, length - 2);
 
   TiXmlDocument document;
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
+  auto  decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
   document.LinkEndChild( decl );
 
-  TiXmlElement* version = new TiXmlElement("Version");
+  auto  version = new TiXmlElement("Version");
   version->SetAttribute("Writer",  __FILE__ );
   version->SetAttribute("Revision",  "$Revision: 17055 $" );
   version->SetAttribute("FileVersion",  1 );
@@ -78,7 +78,7 @@ std::string mitk::PropertyListSerializer::Serialize()
 
   // add XML contents
   const PropertyList::PropertyMap* propmap = m_PropertyList->GetMap();
-  for ( PropertyList::PropertyMap::const_iterator iter = propmap->begin();
+  for ( auto iter = propmap->begin();
         iter != propmap->end();
         ++iter )
   {
@@ -108,7 +108,7 @@ std::string mitk::PropertyListSerializer::Serialize()
 
 TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::string& key, const BaseProperty* property )
 {
-  TiXmlElement* keyelement = new TiXmlElement("property");
+  auto  keyelement = new TiXmlElement("property");
   keyelement->SetAttribute("key", key);
   keyelement->SetAttribute("type", property->GetNameOfClass());
 
@@ -127,7 +127,7 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
     MITK_WARN << "Multiple serializers found for " << property->GetNameOfClass() << "Using arbitrarily the first one.";
   }
 
-  for ( std::list<itk::LightObject::Pointer>::iterator iter = allSerializers.begin();
+  for ( auto iter = allSerializers.begin();
         iter != allSerializers.end();
         ++iter )
   {
@@ -167,6 +167,6 @@ mitk::PropertyList* mitk::PropertyListSerializer::GetFailedProperties()
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }

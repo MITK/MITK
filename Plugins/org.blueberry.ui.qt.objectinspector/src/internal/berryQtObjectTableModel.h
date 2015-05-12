@@ -34,21 +34,21 @@ class QtObjectTableModel: public QAbstractItemModel
 
 public:
 
-  QtObjectTableModel(QObject* parent = 0);
+  QtObjectTableModel(QObject* parent = nullptr);
   ~QtObjectTableModel();
 
   QModelIndex index(int row, int column, const QModelIndex& parent =
-      QModelIndex()) const;
-  QModelIndex parent(const QModelIndex& index) const;
+      QModelIndex()) const override;
+  QModelIndex parent(const QModelIndex& index) const override;
 
-  int rowCount(const QModelIndex&) const;
-  int columnCount(const QModelIndex&) const;
-  QVariant data(const QModelIndex& index, int) const;
+  int rowCount(const QModelIndex&) const override;
+  int columnCount(const QModelIndex&) const override;
+  QVariant data(const QModelIndex& index, int) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int) const;
+  QVariant headerData(int section, Qt::Orientation orientation, int) const override;
 
-  Qt::ItemFlags flags(const QModelIndex& index) const;
-  bool setData(const QModelIndex &index, const QVariant &value, int role);
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
   void ResetData();
 

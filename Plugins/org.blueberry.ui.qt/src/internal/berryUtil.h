@@ -55,7 +55,7 @@ public:
   {
     if (sourceObject == 0)
     {
-      return 0;
+      return nullptr;
     }
     if (A* adapter = dynamic_cast<A*>(sourceObject.GetPointer()))
     {
@@ -73,7 +73,7 @@ public:
       //                Assert.isTrue(adapterType.isInstance(result));
       //                return result;
       //            }
-      return 0;
+      return nullptr;
     }
 
     //        if (!(sourceObject instanceof PlatformObject)) {
@@ -83,7 +83,7 @@ public:
     //            }
     //        }
 
-    return 0;
+    return nullptr;
   }
 
   /**

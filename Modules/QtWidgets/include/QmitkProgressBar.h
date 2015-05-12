@@ -40,7 +40,7 @@ public:
   //##Documentation
   //##@brief Constructor;
   //## holds param instance internally and connects this to the mitkProgressBar
-  QmitkProgressBar(QWidget * parent = 0, const char * name = 0);
+  QmitkProgressBar(QWidget * parent = nullptr, const char * name = nullptr);
 
   //##Documentation
   //##@brief Destructor

@@ -106,7 +106,7 @@ private:
 
 protected:
 
-  bool ReadElement(const IConfigurationElement::Pointer& element);
+  bool ReadElement(const IConfigurationElement::Pointer& element) override;
 
 public:
 

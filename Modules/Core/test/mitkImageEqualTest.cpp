@@ -52,8 +52,8 @@ public:
 
   void tearDown() override
   {
-    m_Image = NULL;
-    m_AnotherImage = NULL;
+    m_Image = nullptr;
+    m_AnotherImage = nullptr;
   }
 
   void Equal_CloneAndOriginal_ReturnsTrue()

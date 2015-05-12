@@ -43,7 +43,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
     return false;
   }
 
-  for( TiXmlElement* propertyElement = document.FirstChildElement("property"); propertyElement != NULL; propertyElement = propertyElement->NextSiblingElement("property") )
+  for( TiXmlElement* propertyElement = document.FirstChildElement("property"); propertyElement != nullptr; propertyElement = propertyElement->NextSiblingElement("property") )
   {
     const char* keya = propertyElement->Attribute("key");
     std::string key( keya ? keya : "");
@@ -66,7 +66,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
       MITK_WARN << "Multiple property readers found for " << type << ". Using arbitrary first one.";
     }
 
-    for ( std::list<itk::LightObject::Pointer>::iterator iter = readers.begin();
+    for ( auto iter = readers.begin();
           iter != readers.end();
           ++iter )
     {

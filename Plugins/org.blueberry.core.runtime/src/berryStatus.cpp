@@ -41,7 +41,7 @@ const IStatus::Pointer Status::CANCEL_STATUS(const SourceLocation &sl)
 
 Status::Status(const Severity& severity, const QString& pluginId, int code,
                const QString& message, const SourceLocation& sl)
-  : exception(0), sourceLocation(sl)
+  : exception(nullptr), sourceLocation(sl)
 {
   SetSeverity(severity);
   SetPlugin(pluginId);
@@ -52,7 +52,7 @@ Status::Status(const Severity& severity, const QString& pluginId, int code,
 Status::Status(const Severity& severity, const QString& pluginId, int code,
                const QString& message, const ctkException& exception,
                const SourceLocation& sl)
-  : exception(0), sourceLocation(sl)
+  : exception(nullptr), sourceLocation(sl)
 {
   SetSeverity(severity);
   SetPlugin(pluginId);
@@ -63,7 +63,7 @@ Status::Status(const Severity& severity, const QString& pluginId, int code,
 
 Status::Status(const Severity& severity, const QString& pluginId,
                const QString& message, const SourceLocation& sl)
-  : exception(0), sourceLocation(sl)
+  : exception(nullptr), sourceLocation(sl)
 {
   SetSeverity(severity);
   SetPlugin(pluginId);
@@ -74,7 +74,7 @@ Status::Status(const Severity& severity, const QString& pluginId,
 Status::Status(const Severity& severity, const QString& pluginId,
                const QString& message, const ctkException& exception,
                const SourceLocation& sl)
-  : exception(0), sourceLocation(sl)
+  : exception(nullptr), sourceLocation(sl)
 {
   SetSeverity(severity);
   SetPlugin(pluginId);

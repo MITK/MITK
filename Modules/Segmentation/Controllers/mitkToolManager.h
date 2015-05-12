@@ -135,7 +135,7 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
     int GetToolIdByToolType()
     {
       int id = 0;
-      for ( ToolVectorType::iterator iter = m_Tools.begin();
+      for ( auto iter = m_Tools.begin();
             iter != m_Tools.end();
             ++iter, ++id )
       {

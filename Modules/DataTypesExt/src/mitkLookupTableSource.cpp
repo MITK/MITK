@@ -84,7 +84,7 @@ const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput() 
 mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx)
 {
   OutputType* out = dynamic_cast<OutputType*>( this->ProcessObject::GetOutput(idx) );
-  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  if ( out == nullptr && this->ProcessObject::GetOutput(idx) != nullptr )
   {
     itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () );
   }
@@ -94,7 +94,7 @@ mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::Pro
 const mitk::LookupTableSource::OutputType* mitk::LookupTableSource::GetOutput(itk::ProcessObject::DataObjectPointerArraySizeType idx) const
 {
   const OutputType* out = dynamic_cast<const OutputType*>( this->ProcessObject::GetOutput(idx) );
-  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  if ( out == nullptr && this->ProcessObject::GetOutput(idx) != nullptr )
   {
     itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () );
   }

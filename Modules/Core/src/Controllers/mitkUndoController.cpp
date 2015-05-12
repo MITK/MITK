@@ -121,7 +121,7 @@ bool mitk::UndoController::SwitchUndoModel(UndoType undoType)
     return true;//already switched, don't need to be switched!
   }
 
-  UndoModelMapIter undoModelIter = m_UndoModelList.find(undoType);
+  auto undoModelIter = m_UndoModelList.find(undoType);
   if (undoModelIter == m_UndoModelList.end())
   {//undoType not found in List
     return false;
@@ -186,7 +186,7 @@ bool mitk::UndoController::RemoveUndoModel(UndoType undoType)
   {//we have to change m_CurUndoModel and m_CurUndoType to an existing Model
 
     //if defaultUndoModel exists, then set to default
-    UndoModelMapIter undoModelIter = m_UndoModelList.find(DEFAULTUNDOMODEL);
+    auto undoModelIter = m_UndoModelList.find(DEFAULTUNDOMODEL);
     if (undoModelIter == m_UndoModelList.end())
     {//DefaultUndoModel does not exists in m_CurUndoModelList
       undoModelIter = m_UndoModelList.begin();

@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string DicomView::VIEW_ID = "org.mitk.customviewer.views.dicomview";
 
 DicomView::DicomView()
-  : m_Parent(0)
+  : m_Parent(nullptr)
 {
 }
 

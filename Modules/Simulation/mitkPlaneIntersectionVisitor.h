@@ -45,7 +45,7 @@ namespace mitk
     const std::vector<Intersection>& GetIntersections() const;
 
     using sofa::simulation::Visitor::processNodeTopDown;
-    Result processNodeTopDown(sofa::simulation::Node* node);
+    Result processNodeTopDown(sofa::simulation::Node* node) override;
 
   private:
     PlaneIntersectionVisitor(const PlaneIntersectionVisitor&);

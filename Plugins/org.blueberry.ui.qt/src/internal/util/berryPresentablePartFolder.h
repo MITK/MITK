@@ -47,9 +47,9 @@ private:
 
     ShellListener(AbstractTabFolder* folder);
 
-    void ShellActivated(const ShellEvent::Pointer& e);
+    void ShellActivated(const ShellEvent::Pointer& e) override;
 
-    void ShellDeactivated(const ShellEvent::Pointer& e);
+    void ShellDeactivated(const ShellEvent::Pointer& e) override;
 
   private:
 
@@ -66,7 +66,7 @@ private:
     ChildPropertyChangeListener(PresentablePartFolder* folder);
 
     using IPropertyChangeListener::PropertyChange;
-    void PropertyChange(const Object::Pointer& source, int property);
+    void PropertyChange(const Object::Pointer& source, int property) override;
 
   private:
 
@@ -117,7 +117,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.IPresentablePartList#getPartList()
    */
-  QList<IPresentablePart::Pointer> GetPartList();
+  QList<IPresentablePart::Pointer> GetPartList() override;
 
   /**
    * Adds the given presentable part directly into this presentation at the
@@ -127,9 +127,9 @@ public:
    * @param part part to add
    * @param idx index to insert at
    */
-  void Insert(IPresentablePart::Pointer part, int idx);
+  void Insert(IPresentablePart::Pointer part, int idx) override;
 
-  void Remove(IPresentablePart::Pointer toRemove);
+  void Remove(IPresentablePart::Pointer toRemove) override;
 
   /**
    * Moves the given part to the given index. When this method returns,
@@ -138,16 +138,16 @@ public:
    * @param part
    * @param newIndex
    */
-  void Move(IPresentablePart::Pointer part, int newIndex);
+  void Move(IPresentablePart::Pointer part, int newIndex) override;
 
   /**
    * Returns the number of parts in this folder
    */
-  int Size();
+  int Size() override;
 
   void SetBounds(const QRect& bounds);
 
-  void Select(IPresentablePart::Pointer toSelect);
+  void Select(IPresentablePart::Pointer toSelect) override;
 
   IPresentablePart::Pointer GetPartForTab(AbstractTabItem* tab);
 

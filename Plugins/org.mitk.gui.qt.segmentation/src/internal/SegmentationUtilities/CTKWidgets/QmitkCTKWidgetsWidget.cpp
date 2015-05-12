@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkCTKWidgetsWidget::QmitkCTKWidgetsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
-  QVBoxLayout* layout = new QVBoxLayout(this);
+  auto   layout = new QVBoxLayout(this);
   this->setLayout(layout);
 
   layout->addWidget(new QLabel("ctkDoubleSlider", this));
@@ -40,7 +40,7 @@ QmitkCTKWidgetsWidget::QmitkCTKWidgetsWidget(mitk::SliceNavigationController* ti
 
   QIcon icon(":/SegmentationUtilities/CTKWidgets_48x48.png");
 
-  QMenu* menu = new QMenu(this);
+  auto   menu = new QMenu(this);
   menu->addAction(icon, "Axial");
   menu->addAction(icon, "Sagittal");
   menu->addAction(icon, "Coronal");

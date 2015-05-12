@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkQuaternionRigidTransformGradientDescen
 
 public:
 
-  QmitkQuaternionRigidTransformGradientDescentOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkQuaternionRigidTransformGradientDescentOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkQuaternionRigidTransformGradientDescentOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

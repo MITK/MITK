@@ -43,7 +43,7 @@ protected:
    * Implementation of the abstract method that
    * processes one configuration element.
    */
-  bool ReadElement(const SmartPointer<IConfigurationElement>& element);
+  bool ReadElement(const SmartPointer<IConfigurationElement>& element) override;
 
 
 public:

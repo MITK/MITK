@@ -25,7 +25,7 @@ void
 IParameterTypeListener::Events
 ::AddListener(IParameterTypeListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   parameterTypeChanged += Delegate(l, &IParameterTypeListener::ParameterTypeChanged);
 }
@@ -34,7 +34,7 @@ void
 IParameterTypeListener::Events
 ::RemoveListener(IParameterTypeListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   parameterTypeChanged -= Delegate(l, &IParameterTypeListener::ParameterTypeChanged);
 }

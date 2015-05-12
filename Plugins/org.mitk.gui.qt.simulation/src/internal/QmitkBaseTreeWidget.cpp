@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkBaseTreeWidget::QmitkBaseTreeWidget(QWidget* parent)
   : QTreeWidget(parent),
-    m_Base(NULL)
+    m_Base(nullptr)
 {
   this->setItemDelegateForColumn(0, new QmitkNoEditItemDelegate);
   this->setItemDelegateForColumn(1, new QmitkBaseItemDelegate);
@@ -37,7 +37,7 @@ QmitkBaseTreeWidget::~QmitkBaseTreeWidget()
 
 void QmitkBaseTreeWidget::clear()
 {
-  m_Base = NULL;
+  m_Base = nullptr;
   m_GroupItemMap.clear();
 
   QTreeWidget::clear();
@@ -49,7 +49,7 @@ void QmitkBaseTreeWidget::OnSelectedBaseChanged(Base* base)
 
   m_Base = base;
 
-  if (base != NULL)
+  if (base != nullptr)
     this->FillTreeWidget();
 }
 
@@ -57,7 +57,7 @@ void QmitkBaseTreeWidget::FillTreeWidget()
 {
   const Base::VecData& dataFields = m_Base->getDataFields();
 
-  for (Base::VecData::const_iterator dataField = dataFields.begin(); dataField != dataFields.end(); ++dataField)
+  for (auto dataField = dataFields.begin(); dataField != dataFields.end(); ++dataField)
   {
     if (!(*dataField)->isDisplayed())
       continue;

@@ -136,7 +136,7 @@ IEditorReference::Pointer EditorAreaHelper::GetVisibleEditor()
     IEditorReference::Pointer result = pane->GetPartReference().Cast<IEditorReference>();
     return result;
   }
-  return IEditorReference::Pointer(0);
+  return IEditorReference::Pointer(nullptr);
 }
 
 void EditorAreaHelper::MoveEditor(IEditorPart::Pointer  /*part*/, int  /*position*/)

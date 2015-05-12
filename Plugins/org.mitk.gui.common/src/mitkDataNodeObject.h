@@ -43,7 +43,7 @@ public:
 
   DataNode::Pointer GetDataNode() const;
 
-  bool operator==(const berry::Object* obj) const;
+  bool operator==(const berry::Object* obj) const override;
 
 private:
 

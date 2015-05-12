@@ -36,7 +36,7 @@ class MITKMULTILABEL_EXPORT LabelSetImageToSurfaceThreadedFilter : public Segmen
     LabelSetImageToSurfaceThreadedFilter();  // use smart pointers
     virtual ~LabelSetImageToSurfaceThreadedFilter();
 
-    virtual void Initialize(const NonBlockingAlgorithm* other = NULL) override;
+    virtual void Initialize(const NonBlockingAlgorithm* other = nullptr) override;
     virtual bool ReadyToRun() override;
 
     virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm

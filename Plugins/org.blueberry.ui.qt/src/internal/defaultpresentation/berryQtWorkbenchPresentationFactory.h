@@ -52,7 +52,7 @@ public:
    *      org.blueberry.ui.presentations.IStackPresentationSite)
    */
   StackPresentation::Pointer CreateEditorPresentation(QWidget* parent,
-      IStackPresentationSite::Pointer site);
+      IStackPresentationSite::Pointer site) override;
 
   /*
    * (non-Javadoc)
@@ -61,7 +61,7 @@ public:
    *      org.blueberry.ui.presentations.IStackPresentationSite)
    */
   StackPresentation::Pointer CreateViewPresentation(QWidget* parent,
-      IStackPresentationSite::Pointer site);
+      IStackPresentationSite::Pointer site) override;
 
   /*
    * (non-Javadoc)
@@ -70,15 +70,15 @@ public:
    *      org.blueberry.ui.presentations.IStackPresentationSite, boolean)
    */
   StackPresentation::Pointer CreateStandaloneViewPresentation(QWidget* parent,
-      IStackPresentationSite::Pointer site, bool showTitle);
+      IStackPresentationSite::Pointer site, bool showTitle) override;
 
-  QString GetId();
+  QString GetId() override;
 
-  QWidget* CreateSash(QWidget* parent, int style);
+  QWidget* CreateSash(QWidget* parent, int style) override;
 
-  int GetSashSize(int style);
+  int GetSashSize(int style) override;
 
-  void UpdateTheme();
+  void UpdateTheme() override;
 
 };
 

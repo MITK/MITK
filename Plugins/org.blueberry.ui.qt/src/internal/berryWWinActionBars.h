@@ -58,9 +58,9 @@ public:
    *
    * @return the menu manager
    */
-  IMenuManager* GetMenuManager();
+  IMenuManager* GetMenuManager() override;
 
-  IServiceLocator* GetServiceLocator();
+  IServiceLocator* GetServiceLocator() override;
 
   /**
    * Returns the status line manager.  If items are added or
@@ -68,13 +68,13 @@ public:
    *
    * @return the status line manager
    */
-  IStatusLineManager* GetStatusLineManager();
+  IStatusLineManager* GetStatusLineManager() override;
 
   /**
    * Returns the tool bar manager.
    *
    */
-  IToolBarManager* GetToolBarManager();
+  IToolBarManager* GetToolBarManager() override;
 
   /**
    * Add a handler for a window action.
@@ -95,7 +95,7 @@ public:
    * after additions or subtractions have been made to a
    * menu, status line, or toolbar.
    */
-  void UpdateActionBars();
+  void UpdateActionBars() override;
 };
 
 }

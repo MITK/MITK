@@ -26,7 +26,7 @@ namespace berry {
 class CustomTypeInfo
 {
 public:
-  CustomTypeInfo() : typeName(), constr(0), destr(0)
+  CustomTypeInfo() : typeName(), constr(nullptr), destr(nullptr)
   {}
 
   QByteArray typeName;
@@ -47,7 +47,7 @@ const char* ExtensionType::typeName(int type)
   QReadLocker locker(customTypesLock());
   return ct && ct->count() > type && !ct->at(type).typeName.isEmpty()
       ? ct->at(type).typeName.constData()
-      : static_cast<const char *>(0);
+      : static_cast<const char *>(nullptr);
 }
 
 
@@ -115,8 +115,8 @@ int ExtensionType::registerTypedef(const char* typeName, int aliasId)
   CustomTypeInfo inf;
   inf.typeName = normalizedTypeName;
   inf.alias = aliasId;
-  inf.constr = 0;
-  inf.destr = 0;
+  inf.constr = nullptr;
+  inf.destr = nullptr;
   ct->append(inf);
   return aliasId;
 }
@@ -135,8 +135,8 @@ void ExtensionType::unregisterType(const char* typeName)
     {
       CustomTypeInfo &inf = (*ct)[v];
       inf.typeName.clear();
-      inf.constr = 0;
-      inf.destr = 0;
+      inf.constr = nullptr;
+      inf.destr = nullptr;
       inf.alias = -1;
     }
   }
@@ -171,13 +171,13 @@ QObject* ExtensionType::construct(int type)
 {
   const QVector<CustomTypeInfo> * const ct = customTypes();
 
-  Constructor constr = 0;
+  Constructor constr = nullptr;
 
   QReadLocker locker(customTypesLock());
   if (!ct || ct->count() <= type - 1)
-    return 0;
+    return nullptr;
   if (ct->at(type - 1).typeName.isEmpty())
-    return 0;
+    return nullptr;
   constr = ct->at(type - 1).constr;
   return constr();
 }
@@ -189,7 +189,7 @@ void ExtensionType::destroy(int type, QObject* data)
   const QVector<CustomTypeInfo> * const ct = customTypes();
   if (!ct || ct->count() <= type - 1) return;
 
-  Destructor destr = 0;
+  Destructor destr = nullptr;
 
   QReadLocker locker(customTypesLock());
   if (ct->at(type - 1).typeName.isEmpty())

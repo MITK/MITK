@@ -55,7 +55,7 @@ public:
    */
   ImagePixelReadAccessor(
       ImageConstPointer iP,
-      const ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = nullptr,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)
@@ -65,7 +65,7 @@ public:
 
   ImagePixelReadAccessor(
       ImagePointer iP,
-      const ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = nullptr,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP.GetPointer(),iDI)
@@ -75,7 +75,7 @@ public:
 
   ImagePixelReadAccessor(
       Image* iP,
-      const ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = nullptr,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)
@@ -85,7 +85,7 @@ public:
 
   ImagePixelReadAccessor(
       const Image* iP,
-      const ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = nullptr,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP,iDI)

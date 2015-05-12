@@ -30,7 +30,7 @@ const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.Qm
 
 QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
   : QWidget(parent)
-  , m_Controls (0)
+  , m_Controls (nullptr)
 {
     Initialize();
     CreateQtPartControl(this);

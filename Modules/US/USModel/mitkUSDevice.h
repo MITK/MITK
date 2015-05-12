@@ -398,7 +398,7 @@ class USControlInterfaceDoppler;
     * \brief Grabs the next frame from the Video input.
     * This method is called internally, whenever Update() is invoked by an Output.
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     std::string GetServicePropertyLabel();
 

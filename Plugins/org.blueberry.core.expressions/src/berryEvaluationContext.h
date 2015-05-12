@@ -77,47 +77,47 @@ public:
   /**
    * {@inheritDoc}
    */
-  IEvaluationContext* GetParent() const;
+  IEvaluationContext* GetParent() const override;
 
   /**
    * {@inheritDoc}
    */
-  IEvaluationContext* GetRoot() const;
+  IEvaluationContext* GetRoot() const override;
 
   /**
    * {@inheritDoc}
    */
-  Object::ConstPointer GetDefaultVariable() const;
+  Object::ConstPointer GetDefaultVariable() const override;
 
   /**
    * {@inheritDoc}
    */
-  void SetAllowPluginActivation(bool value);
+  void SetAllowPluginActivation(bool value) override;
 
   /**
    * {@inheritDoc}
    */
-  bool GetAllowPluginActivation() const;
+  bool GetAllowPluginActivation() const override;
 
   /**
    * {@inheritDoc}
    */
-  void AddVariable(const QString& name, const Object::ConstPointer& value);
+  void AddVariable(const QString& name, const Object::ConstPointer& value) override;
 
   /**
    * {@inheritDoc}
    */
-  Object::ConstPointer RemoveVariable(const QString& name);
+  Object::ConstPointer RemoveVariable(const QString& name) override;
 
   /**
    * {@inheritDoc}
    */
-  Object::ConstPointer GetVariable(const QString &name) const;
+  Object::ConstPointer GetVariable(const QString &name) const override;
 
   /**
    * {@inheritDoc}
    */
-  Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const;
+  Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const override;
 };
 
 }  // namespace berry

@@ -33,14 +33,14 @@ InternalJob::InternalJob(const QString& name)
   : jobNumber(nextJobNumber++)
   , flags(Job::NONE)
   , name(name)
-  , next(0)
-  , previous(0)
+  , next(nullptr)
+  , previous(nullptr)
   , priority(Job::LONG)
-  , sptr_schedulingRule(0)
-  , sptr_monitor(0)
+  , sptr_schedulingRule(nullptr)
+  , sptr_monitor(nullptr)
   , m_startTime()
   , waitQueueStamp(T_NONE)
-  , ptr_thread(0)
+  , ptr_thread(nullptr)
 {
   jobEvents.SetExceptionHandler(MessageExceptionHandler<JobListeners>(&ptr_manager->m_JobListeners, &JobListeners::HandleException));
 }
@@ -67,7 +67,7 @@ void InternalJob::AddLast(InternalJob::Pointer entry)
   //add the new entry to the end of the queue
   last->previous = entry.GetPointer();
   entry->next = last;
-  entry->previous = 0;
+  entry->previous = nullptr;
 }
 
 bool InternalJob::operator==(const Object* otherJob) const
@@ -137,7 +137,7 @@ bool InternalJob::IsRunCanceled() const
 bool InternalJob::IsConflicting(InternalJob::Pointer otherJob) const
 {
   ISchedulingRule::Pointer otherRule = otherJob->GetRule();
-  if (sptr_schedulingRule.GetPointer() == 0 || otherRule.GetPointer() == 0)
+  if (sptr_schedulingRule.GetPointer() == nullptr || otherRule.GetPointer() == nullptr)
     return false;
   // TODO MultiRule: extend the IsConflicting (...) method with MultiRule
   // if one of the rules is a compound rule, it must be asked the question.
@@ -163,9 +163,9 @@ InternalJob::Pointer InternalJob::Remove()
 {
   if (next != 0)
     next->SetPrevious(InternalJob::Pointer(previous));
-  if (previous != 0)
+  if (previous != nullptr)
     previous->SetNext(next);
-  next = previous = 0;
+  next = previous = nullptr;
   return InternalJob::Pointer(this);
 }
 
@@ -371,7 +371,7 @@ void InternalJob::SetPriority(int newPriority)
 
 void InternalJob::SetProgressGroup(IProgressMonitor::Pointer group, int ticks)
 {
-  assert(group.GetPointer() != 0);
+  assert(group.GetPointer() != nullptr);
   InternalJob::Pointer sptr_temp(this);
   IProgressMonitor::Pointer sptr_pm = ptr_manager->CreateMonitor(sptr_temp,
       group, ticks);

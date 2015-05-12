@@ -55,11 +55,11 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
     QmitkMITKIGTTrackingToolboxView();
     virtual ~QmitkMITKIGTTrackingToolboxView();
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
+    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
 
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void StdMultiWidgetNotAvailable() override;
 
   protected slots:
 

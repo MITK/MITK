@@ -37,7 +37,7 @@ IPresentablePart::Pointer PresentationSerializer::GetPart(const QString& id)
 {
   bool okay = false;
   int index = id.toInt(&okay);
-  if (!okay) return IPresentablePart::Pointer(0);
+  if (!okay) return IPresentablePart::Pointer(nullptr);
 
   IPresentablePart::Pointer result;
   if (index < parts.size())

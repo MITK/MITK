@@ -56,17 +56,17 @@ public:
   /**
    * @see IPlaceholderFolderLayout
    */
-  void AddPlaceholder(const QString& viewId);
+  void AddPlaceholder(const QString& viewId) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPlaceholderFolderLayout#getProperty(java.lang.String)
    */
-  QString GetProperty(const QString& id);
+  QString GetProperty(const QString& id) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IPlaceholderFolderLayout#setProperty(java.lang.String, java.lang.String)
    */
-  void SetProperty(const QString& id, const QString& value);
+  void SetProperty(const QString& id, const QString& value) override;
 
 private:
 

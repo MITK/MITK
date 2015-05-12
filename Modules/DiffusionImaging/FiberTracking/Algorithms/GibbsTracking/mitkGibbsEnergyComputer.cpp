@@ -134,7 +134,7 @@ float GibbsEnergyComputer::ComputeExternalEnergy(vnl_vector_fixed<float, 3> &R, 
     float modelVal = 0;
     m_ParticleGrid->ComputeNeighbors(R);    // retrieve neighbouring particles from particle grid
     Particle* neighbour =  m_ParticleGrid->GetNextNeighbor();
-    while (neighbour!=NULL)                         // iterate over nieghbouring particles
+    while (neighbour!=nullptr)                         // iterate over nieghbouring particles
     {
         if (dp != neighbour)                        // don't evaluate against itself
         {
@@ -167,7 +167,7 @@ float GibbsEnergyComputer::ComputeInternalEnergy(Particle *dp)
 
 float GibbsEnergyComputer::ComputeInternalEnergyConnection(Particle *p1,int ep1)
 {
-    Particle *p2 = 0;
+    Particle *p2 = nullptr;
     int ep2 = 0;
 
     if (ep1 == 1)

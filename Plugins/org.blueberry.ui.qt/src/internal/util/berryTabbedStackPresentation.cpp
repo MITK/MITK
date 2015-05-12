@@ -98,7 +98,7 @@ void TabbedStackPresentation::HandleTabFolderEvent(TabFolderEvent::Pointer e)
     AbstractTabItem* beingDragged = e->tab;
     QPoint initialLocation(e->x, e->y);
 
-    if (beingDragged == 0)
+    if (beingDragged == nullptr)
     {
       this->GetSite()->DragStart(initialLocation, false);
     }
@@ -174,7 +174,7 @@ TabbedStackPresentation::TabbedStackPresentation(
     IStackPresentationSite::Pointer site, AbstractTabFolder* widget/*, ISystemMenu systemMenu*/)
  : StackPresentation(site)
 {
-  PresentablePartFolder* folder = new PresentablePartFolder(widget);
+  auto   folder = new PresentablePartFolder(widget);
   this->Init(site, folder, new LeftToRightTabOrder(folder),
       new ReplaceDragHandler(widget)); // systemMenu);
 }
@@ -461,7 +461,7 @@ QList<QWidget*> TabbedStackPresentation::GetTabList(
   QList<QWidget*> list;
   if (folder->GetTabFolder()->GetTabPosition() == Constants::BOTTOM)
   {
-    if (part->GetControl() != 0)
+    if (part->GetControl() != nullptr)
     {
       list.push_back(part->GetControl());
     }
@@ -476,7 +476,7 @@ QList<QWidget*> TabbedStackPresentation::GetTabList(
 
   if (folder->GetTabFolder()->GetTabPosition() == Constants::TOP)
   {
-    if (part->GetControl() != 0)
+    if (part->GetControl() != nullptr)
     {
       list.push_back(part->GetControl());
     }

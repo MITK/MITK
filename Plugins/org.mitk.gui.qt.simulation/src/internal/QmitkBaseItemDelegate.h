@@ -25,13 +25,13 @@ class QmitkBaseItemDelegate : public QStyledItemDelegate
   Q_OBJECT
 
 public:
-  explicit QmitkBaseItemDelegate(QObject* parent = NULL);
+  explicit QmitkBaseItemDelegate(QObject* parent = nullptr);
   ~QmitkBaseItemDelegate();
 
-  QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-  void setEditorData(QWidget* editor, const QModelIndex& index) const;
-  void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
+  QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+  void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
 };
 
 Q_DECLARE_METATYPE(sofa::core::objectmodel::BaseData*)

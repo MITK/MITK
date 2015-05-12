@@ -54,13 +54,13 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
   if ( index >= m_NavigationDataVectors.size() )
   {
     MITK_WARN("NavigationDataSet") << "There is no NavigationData available at index " << index << ".";
-    return NULL;
+    return nullptr;
   }
 
   if ( toolIndex >= m_NavigationDataVectors.at(index).size() )
   {
     MITK_WARN("NavigationDataSet") << "There is NavigatitionData available at index " << index << " for tool " << toolIndex << ".";
-    return NULL;
+    return nullptr;
   }
 
   return m_NavigationDataVectors.at(index).at(toolIndex);

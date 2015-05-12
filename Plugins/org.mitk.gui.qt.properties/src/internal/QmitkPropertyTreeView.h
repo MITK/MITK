@@ -44,19 +44,19 @@ public:
   QmitkPropertyTreeView();
   ~QmitkPropertyTreeView();
 
-  void SetFocus();
+  void SetFocus() override;
 
-  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart*);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart*) override;
 
 protected:
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
 private:
   QString GetPropertyNameOrAlias(const QModelIndex& index);
-  void OnPreferencesChanged(const berry::IBerryPreferences* preferences);
+  void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
   void OnPropertyNameChanged(const itk::EventObject& event);
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 private slots:
   void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);

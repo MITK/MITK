@@ -180,7 +180,7 @@ void WorkbenchServiceRegistry::ProcessVariables(
 Object* WorkbenchServiceRegistry::GlobalParentLocator::GetService(
     const QString& /*api*/)
 {
-  return NULL;
+  return nullptr;
 }
 
 bool WorkbenchServiceRegistry::GlobalParentLocator::HasService(
@@ -212,7 +212,7 @@ Object::Pointer WorkbenchServiceRegistry::GetService(const QString& key,
       return result;
     }
   }
-  return Object::Pointer(0);
+  return Object::Pointer(nullptr);
 }
 
 QList<AbstractSourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProviders() const

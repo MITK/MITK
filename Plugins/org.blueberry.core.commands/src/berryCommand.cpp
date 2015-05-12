@@ -308,7 +308,7 @@ IParameter::Pointer Command::GetParameter(const QString& parameterId) const
     }
   }
 
-  return IParameter::Pointer(0);
+  return IParameter::Pointer(nullptr);
 }
 
 QList<SmartPointer<IParameter> > Command::GetParameters() const
@@ -329,7 +329,7 @@ ParameterType::Pointer Command::GetParameterType(const QString& parameterId) con
   {
     return parameterWithType->GetParameterType();
   }
-  return ParameterType::Pointer(0);
+  return ParameterType::Pointer(nullptr);
 }
 
 ParameterType::Pointer Command::GetReturnType() const
@@ -518,13 +518,13 @@ void Command::Undefine()
   description = "";
 
   const bool categoryChanged = category;
-  category = 0;
+  category = nullptr;
 
   const bool parametersChanged = !parameters.empty();
   parameters.clear();
 
   const bool returnTypeChanged = returnType;
-  returnType = 0;
+  returnType = nullptr;
 
   const QList<QString> stateIds(this->GetStateIds());
   if (IObjectWithState::Pointer handlerWithState = handler.Cast<IObjectWithState>())

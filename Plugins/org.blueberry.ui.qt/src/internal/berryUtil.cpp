@@ -27,9 +27,9 @@ SmartPointer<Shell> Util::GetShellToParentOn()
   IWorkbenchWindow::Pointer activeWindow = workbench->GetActiveWorkbenchWindow();
   IWorkbenchWindow::Pointer windowToParentOn = activeWindow.IsNull() ?
         (workbench->GetWorkbenchWindowCount() > 0 ?
-           workbench->GetWorkbenchWindows()[0] : IWorkbenchWindow::Pointer(0))
+           workbench->GetWorkbenchWindows()[0] : IWorkbenchWindow::Pointer(nullptr))
       : activeWindow;
-  return windowToParentOn.IsNull() ? Shell::Pointer(0) : activeWindow->GetShell();
+  return windowToParentOn.IsNull() ? Shell::Pointer(nullptr) : activeWindow->GetShell();
 }
 
 }

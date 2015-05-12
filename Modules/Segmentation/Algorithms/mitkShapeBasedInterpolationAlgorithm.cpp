@@ -60,7 +60,7 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   float ratio = (float)(requestedIndex - lowerSliceIndex) / (float)(upperSliceIndex - lowerSliceIndex);
 
   mitkIpPicDescriptor* ipPicResult = ipMITKSegmentationInterpolate( lowerPICSlice, upperPICSlice, ratio ); // magic
-  if (!ipPicResult) return NULL;
+  if (!ipPicResult) return nullptr;
 
   BaseGeometry::Pointer originalGeometry = resultImage->GetGeometry();
   resultImage->Initialize( CastToImageDescriptor( ipPicResult ) );

@@ -82,20 +82,20 @@ protected:
    * @param site the site to check
    * @since 3.1
    */
-  void CheckSite(IWorkbenchPartSite::Pointer site);
+  void CheckSite(IWorkbenchPartSite::Pointer site) override;
 
 public:
 
   berryObjectMacro(ViewPart, WorkbenchPart, IViewPart)
 
-  void Init(IViewSite::Pointer site, IMemento::Pointer memento = IMemento::Pointer(0));
+  void Init(IViewSite::Pointer site, IMemento::Pointer memento = IMemento::Pointer(nullptr)) override;
 
-  void SaveState(IMemento::Pointer memento);
+  void SaveState(IMemento::Pointer memento) override;
 
   /*
    * Method declared on IViewPart.
    */
-  IViewSite::Pointer GetViewSite();
+  IViewSite::Pointer GetViewSite() override;
 
 };
 

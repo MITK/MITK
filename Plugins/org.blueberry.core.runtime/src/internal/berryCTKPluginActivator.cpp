@@ -44,7 +44,7 @@ namespace berry {
 
 static const QString XP_APPLICATIONS = "org.blueberry.osgi.applications";
 
-ctkPluginContext* org_blueberry_core_runtime_Activator::context = 0;
+ctkPluginContext* org_blueberry_core_runtime_Activator::context = nullptr;
 QScopedPointer<ApplicationContainer> org_blueberry_core_runtime_Activator::appContainer;
 
 const bool org_blueberry_core_runtime_Activator::DEBUG = false;
@@ -94,11 +94,11 @@ void org_blueberry_core_runtime_Activator::stop(ctkPluginContext* context)
   prefServiceReg = 0;
 
   this->stopRegistry();
-  RegistryProperties::SetContext(NULL);
+  RegistryProperties::SetContext(nullptr);
 
   stopAppContainer();
 
-  this->context = 0;
+  this->context = nullptr;
 }
 
 ctkPluginContext* org_blueberry_core_runtime_Activator::getPluginContext()
@@ -116,9 +116,9 @@ ApplicationContainer* org_blueberry_core_runtime_Activator::GetContainer()
 #include <dlfcn.h>
 QString org_blueberry_core_runtime_Activator::getPluginId(void *symbol)
 {
-  if (symbol == NULL) return QString();
+  if (symbol == nullptr) return QString();
 
-  Dl_info info = {0,0,0,0};
+  Dl_info info = {nullptr,nullptr,nullptr,nullptr};
   if(dladdr(symbol, &info) == 0)
   {
     return QString();
@@ -212,7 +212,7 @@ void org_blueberry_core_runtime_Activator::startRegistry()
   // check to see if we need to use null as a userToken
   if (context->getProperty(RegistryConstants::PROP_REGISTRY_NULL_USER_TOKEN).toString().compare("true", Qt::CaseInsensitive) == 0)
   {
-    userRegistryKey.reset(0);
+    userRegistryKey.reset(nullptr);
   }
 
   // Determine primary and alternative registry locations. BlueBerry extension registry cache
@@ -222,7 +222,7 @@ void org_blueberry_core_runtime_Activator::startRegistry()
   QList<QString> registryLocations;
   QList<bool> readOnlyLocations;
 
-  RegistryStrategy* strategy = NULL;
+  RegistryStrategy* strategy = nullptr;
   //Location configuration = OSGIUtils.getDefault().getConfigurationLocation();
   QString configuration = context->getDataFile("").absoluteFilePath();
   if (configuration.isEmpty())
@@ -254,7 +254,7 @@ void org_blueberry_core_runtime_Activator::startRegistry()
     strategy = new RegistryStrategy(registryLocations, readOnlyLocations, masterRegistryKey.data());
   }
 
-  ExtensionRegistry* registry = new ExtensionRegistry(strategy, masterRegistryKey.data(), userRegistryKey.data());
+  auto   registry = new ExtensionRegistry(strategy, masterRegistryKey.data(), userRegistryKey.data());
   defaultRegistry.reset(registry);
 
   registryServiceReg = context->registerService<IExtensionRegistry>(registry);

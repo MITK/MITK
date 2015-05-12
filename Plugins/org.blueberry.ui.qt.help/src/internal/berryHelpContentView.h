@@ -34,7 +34,7 @@ public:
   HelpContentWidget();
   QModelIndex indexOf(const QUrl &link);
 
-  void setModel(QAbstractItemModel *model);
+  void setModel(QAbstractItemModel *model) override;
   QUrl GetUrl(const QModelIndex &index);
 Q_SIGNALS:
 
@@ -69,11 +69,11 @@ public:
   HelpContentView();
   ~HelpContentView();
 
-  void SetFocus();
+  void SetFocus() override;
 
 protected:
 
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
 protected Q_SLOTS:
 

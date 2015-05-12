@@ -148,7 +148,7 @@ namespace mitk
     * \param[in] eol  Pointer to an End-of-Line character. If this is NULL
     *                 (the default) then no End-of-Line character is used.
     */
-    int Receive(std::string& answer, unsigned int numberOfBytes, const char *eol=0);
+    int Receive(std::string& answer, unsigned int numberOfBytes, const char *eol=nullptr);
 
     /**
     * \brief Send the string input

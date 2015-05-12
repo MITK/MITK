@@ -97,7 +97,7 @@ QVariant InternalPlatform::GetOption(const QString& option, const QVariant& defa
 IAdapterManager* InternalPlatform::GetAdapterManager() const
 {
   AssertInitialized();
-  return NULL;
+  return nullptr;
 }
 
 SmartPointer<IProduct> InternalPlatform::GetProduct() const
@@ -386,7 +386,7 @@ ctkLocation* InternalPlatform::GetUserLocation()
 ILog *InternalPlatform::GetLog(const QSharedPointer<ctkPlugin> &plugin) const
 {
   LogImpl* result = m_Logs.value(plugin->getPluginId());
-  if (result != NULL)
+  if (result != nullptr)
     return result;
 
 //  ExtendedLogService logService = (ExtendedLogService) extendedLogTracker.getService();
@@ -419,7 +419,7 @@ QSharedPointer<ctkPlugin> InternalPlatform::GetPlugin(const QString &symbolicNam
 {
   QList<QSharedPointer<ctkPlugin> > plugins = m_Context->getPlugins();
 
-  QSharedPointer<ctkPlugin> res(0);
+  QSharedPointer<ctkPlugin> res(nullptr);
   foreach(QSharedPointer<ctkPlugin> plugin, plugins)
   {
     if ((plugin->getState() & (ctkPlugin::INSTALLED | ctkPlugin::UNINSTALLED)) == 0 &&

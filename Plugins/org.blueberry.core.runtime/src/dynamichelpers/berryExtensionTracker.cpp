@@ -69,7 +69,7 @@ struct ExtensionTracker::Impl::HandlerWrapper : public IRegistryEventListener
     return handler == target.handler;
   }
 
-  virtual void Added(const QList<IExtension::Pointer>& extensions)
+  virtual void Added(const QList<IExtension::Pointer>& extensions) override
   {
     for (int i = 0; i < extensions.size(); ++i)
     {
@@ -77,7 +77,7 @@ struct ExtensionTracker::Impl::HandlerWrapper : public IRegistryEventListener
     }
   }
 
-  virtual void Removed(const QList<IExtension::Pointer>& extensions)
+  virtual void Removed(const QList<IExtension::Pointer>& extensions) override
   {
     QList<QList<Object::Pointer> > removedObjects;
     {
@@ -101,12 +101,12 @@ struct ExtensionTracker::Impl::HandlerWrapper : public IRegistryEventListener
     }
   }
 
-  virtual void Added(const QList<IExtensionPoint::Pointer>& /*extensionPoints*/)
+  virtual void Added(const QList<IExtensionPoint::Pointer>& /*extensionPoints*/) override
   {
     // do nothing
   }
 
-  virtual void Removed(const QList<IExtensionPoint::Pointer>& /*extensionPoints*/)
+  virtual void Removed(const QList<IExtensionPoint::Pointer>& /*extensionPoints*/) override
   {
     // do nothing
   }
@@ -269,7 +269,7 @@ IExtensionPointFilter ExtensionTracker::CreateExtensionPointFilter(const SmartPo
       : m_Xpt(xp)
     {}
 
-    bool Matches(const IExtensionPoint* target) const
+    bool Matches(const IExtensionPoint* target) const override
     {
       return m_Xpt == target;
     }
@@ -287,7 +287,7 @@ IExtensionPointFilter ExtensionTracker::CreateExtensionPointFilter(const QList<S
       : m_Xpts(xps)
     {}
 
-    bool Matches(const IExtensionPoint* target) const
+    bool Matches(const IExtensionPoint* target) const override
     {
       for (int i = 0; i < m_Xpts.size(); i++)
       {
@@ -312,7 +312,7 @@ IExtensionPointFilter ExtensionTracker::CreateNamespaceFilter(const QString& id)
       : m_Id(id)
     {}
 
-    bool Matches(const IExtensionPoint* target) const
+    bool Matches(const IExtensionPoint* target) const override
     {
       return m_Id == target->GetNamespaceIdentifier();
     }

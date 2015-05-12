@@ -206,7 +206,7 @@ class MITKALGORITHMSEXT_EXPORT NonBlockingAlgorithm : public itk::Object
     void DefineTriggerParameter(const char*);
     void UnDefineTriggerParameter(const char*);
 
-    virtual void Initialize(const NonBlockingAlgorithm* other = NULL);
+    virtual void Initialize(const NonBlockingAlgorithm* other = nullptr);
     virtual bool ReadyToRun();
 
     virtual bool ThreadedUpdateFunction(); // will be called from a thread after calling StartAlgorithm

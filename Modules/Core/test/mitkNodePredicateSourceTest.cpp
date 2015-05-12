@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
     MITK_TEST_CONDITION_REQUIRED(!testPredicate->CheckNode(godfather), "Node is not derivative");
     MITK_TEST_CONDITION_REQUIRED(!testPredicate->CheckNode(daughter), "Node is derivative but only direct derivatives are wanted");
 
-    testPredicate = NULL;
+    testPredicate = nullptr;
     testPredicate = mitk::NodePredicateSource::New(grandMother, true, myDataStorage);
     MITK_TEST_CONDITION_REQUIRED(testPredicate->CheckNode(daughter), "Node is not direct derivative and all derivatives are wanted ");
     MITK_TEST_CONDITION_REQUIRED(!testPredicate->CheckNode(grandMother), "Self is not a derivative!");

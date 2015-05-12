@@ -43,7 +43,7 @@ class HelpContextHandler : public QObject, public ctkEventHandler
 
 public:
 
-  void handleEvent(const ctkEvent& event);
+  void handleEvent(const ctkEvent& event) override;
 };
 
 class HelpPluginActivator : public QObject, public ctkPluginActivator
@@ -59,8 +59,8 @@ public:
   HelpPluginActivator();
   ~HelpPluginActivator();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
   static HelpPluginActivator* getInstance();
 

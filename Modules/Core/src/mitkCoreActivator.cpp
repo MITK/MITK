@@ -190,13 +190,12 @@ private:
       if (*i)
       {
         us::ModuleResourceStream rs(*i);
-        for (std::vector<mitk::IShaderRepository*>::const_iterator shaderRepoIter = shaderRepos.begin(),
-             shaderRepoEndIter = shaderRepos.end(); shaderRepoIter != shaderRepoEndIter; ++shaderRepoIter)
+        for (const auto & shaderRepo : shaderRepos)
         {
-          int id = (*shaderRepoIter)->LoadShader(rs, i->GetBaseName());
+          int id = (shaderRepo)->LoadShader(rs, i->GetBaseName());
           if (id >= 0)
           {
-            m_ModuleIdToShaderIds[*shaderRepoIter][module->GetModuleId()].push_back(id);
+            m_ModuleIdToShaderIds[shaderRepo][module->GetModuleId()].push_back(id);
           }
         }
         rs.seekg(0, std::ios_base::beg);
@@ -214,10 +213,9 @@ private:
   void RemoveModuleShadersFromRepositories(us::Module* module,
                                            const std::vector<mitk::IShaderRepository*>& shaderRepos)
   {
-    for (std::vector<mitk::IShaderRepository*>::const_iterator shaderRepoIter = shaderRepos.begin(),
-         shaderRepoEndIter = shaderRepos.end(); shaderRepoIter != shaderRepoEndIter; ++shaderRepoIter)
+    for (const auto & shaderRepo : shaderRepos)
     {
-      std::map<long, std::vector<int> >& moduleIdToShaderIds = m_ModuleIdToShaderIds[*shaderRepoIter];
+      std::map<long, std::vector<int> >& moduleIdToShaderIds = m_ModuleIdToShaderIds[shaderRepo];
       std::map<long, std::vector<int> >::iterator shaderIdsIter =
         moduleIdToShaderIds.find(module->GetModuleId());
       if (shaderIdsIter != moduleIdToShaderIds.end())
@@ -225,7 +223,7 @@ private:
         for (std::vector<int>::iterator idIter = shaderIdsIter->second.begin();
              idIter != shaderIdsIter->second.end(); ++idIter)
         {
-          (*shaderRepoIter)->UnloadShader(*idIter);
+          (shaderRepo)->UnloadShader(*idIter);
         }
         moduleIdToShaderIds.erase(shaderIdsIter);
       }
@@ -330,28 +328,24 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
 
 void MitkCoreActivator::Unload(us::ModuleContext* )
 {
-  for(std::vector<mitk::IFileReader*>::iterator iter = m_FileReaders.begin(),
-      endIter = m_FileReaders.end(); iter != endIter; ++iter)
+  for(auto & elem : m_FileReaders)
   {
-    delete *iter;
+    delete elem;
   }
 
-  for(std::vector<mitk::IFileWriter*>::iterator iter = m_FileWriters.begin(),
-      endIter = m_FileWriters.end(); iter != endIter; ++iter)
+  for(auto & elem : m_FileWriters)
   {
-    delete *iter;
+    delete elem;
   }
 
-  for(std::vector<mitk::AbstractFileIO*>::iterator iter = m_FileIOs.begin(),
-      endIter = m_FileIOs.end(); iter != endIter; ++iter)
+  for(auto & elem : m_FileIOs)
   {
-    delete *iter;
+    delete elem;
   }
 
-  for(std::vector<mitk::IFileWriter*>::iterator iter = m_LegacyWriters.begin(),
-      endIter = m_LegacyWriters.end(); iter != endIter; ++iter)
+  for(auto & elem : m_LegacyWriters)
   {
-    delete *iter;
+    delete elem;
   }
 
   // The mitk::ModuleContext* argument of the Unload() method
@@ -393,17 +387,16 @@ void MitkCoreActivator::RegisterItkReaderWriter()
   std::list<itk::LightObject::Pointer> allobjects =
     itk::ObjectFactoryBase::CreateAllInstance("itkImageIOBase");
 
-  for (std::list<itk::LightObject::Pointer >::iterator i = allobjects.begin(),
-       endIter = allobjects.end(); i != endIter; ++i)
+  for (auto & allobject : allobjects)
   {
-    itk::ImageIOBase* io = dynamic_cast<itk::ImageIOBase*>(i->GetPointer());
+    itk::ImageIOBase* io = dynamic_cast<itk::ImageIOBase*>(allobject.GetPointer());
 
     // NiftiImageIO does not provide a correct "SupportsDimension()" methods
     // and the supported read/write extensions are not ordered correctly
     if (dynamic_cast<itk::NiftiImageIO*>(io)) continue;
 
     // Use a custom mime-type for GDCMImageIO below
-    if (dynamic_cast<itk::GDCMImageIO*>(i->GetPointer()))
+    if (dynamic_cast<itk::GDCMImageIO*>(allobject.GetPointer()))
     {
       // MITK provides its own DICOM reader (which internally uses GDCMImageIO).
       continue;
@@ -416,7 +409,7 @@ void MitkCoreActivator::RegisterItkReaderWriter()
     else
     {
       MITK_WARN << "Error ImageIO factory did not return an ImageIOBase: "
-                << ( *i )->GetNameOfClass();
+                << ( allobject )->GetNameOfClass();
     }
   }
 

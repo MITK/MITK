@@ -138,14 +138,14 @@ protected: ILayoutContainer* container;
      *
      * @since 3.1
      */
-    public: virtual int GetSizeFlags(bool horizontal);
+    public: virtual int GetSizeFlags(bool horizontal) override;
 
     /**
      * @see org.blueberry.ui.presentations.StackPresentation#computePreferredSize(boolean, int, int, int)
      *
      * @since 3.1
      */
-    public: virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel);
+    public: virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel) override;
 
     public: virtual IDropTarget::Pointer GetDropTarget(Object::Pointer draggedObject, const QPoint& displayCoordinates);
 
@@ -295,7 +295,7 @@ protected: ILayoutContainer* container;
      */
     public: virtual void TestInvariants();
 
-    public: virtual QString ToString() const;
+    public: virtual QString ToString() const override;
 };
 
 }

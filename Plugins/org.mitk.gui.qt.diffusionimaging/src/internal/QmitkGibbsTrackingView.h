@@ -85,10 +85,10 @@ public:
   QmitkGibbsTrackingView();
   virtual ~QmitkGibbsTrackingView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
 signals:
 
@@ -125,9 +125,9 @@ private:
   void UpdateTrackingStatus();  ///< update textual status display of the tracking process
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
   /// \brief called when DataNode is removed to stop gibbs tracking after node is removed
-  virtual void NodeRemoved(const mitk::DataNode * node);
+  virtual void NodeRemoved(const mitk::DataNode * node) override;
 
   void UpdateIteraionsGUI(unsigned long iterations);    ///< update iterations label text
 

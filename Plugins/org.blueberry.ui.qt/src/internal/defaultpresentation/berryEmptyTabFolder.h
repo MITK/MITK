@@ -44,42 +44,42 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#computeSize(int, int)
    */
-  QSize ComputeSize(int widthHint, int heightHint);
+  QSize ComputeSize(int widthHint, int heightHint) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#add(int, int)
    */
-  AbstractTabItem* Add(int index, int flags);
+  AbstractTabItem* Add(int index, int flags) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#move(int, int)
    */
-  void Move(int from, int to);
+  void Move(int from, int to) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getContentParent()
    */
-  QWidget* GetContentParent();
+  QWidget* GetContentParent() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setContent(org.blueberry.swt.widgets.Control)
    */
-  void SetContent(QWidget* newContent);
+  void SetContent(QWidget* newContent) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getItems()
    */
-  QList<AbstractTabItem*> GetItems();
+  QList<AbstractTabItem*> GetItems() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getSelection()
    */
-  AbstractTabItem* GetSelection();
+  AbstractTabItem* GetSelection() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setSelection(org.blueberry.ui.internal.presentations.util.AbstractTabItem)
    */
-  void SetSelection(AbstractTabItem* toSelect);
+  void SetSelection(AbstractTabItem* toSelect) override;
 
   //    void SetToolbar(Control toolbar) {
   //        if (toolbar != null) {
@@ -87,17 +87,17 @@ public:
   //        }
   //    }
 
-  void Layout(bool flushCache);
+  void Layout(bool flushCache) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setSelectedInfo(org.blueberry.ui.internal.presentations.util.PartInfo)
    */
-  void SetSelectedInfo(const PartInfo& info);
+  void SetSelectedInfo(const PartInfo& info) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#enablePaneMenu(boolean)
    */
-  void EnablePaneMenu(bool enabled);
+  void EnablePaneMenu(bool enabled) override;
 
   //    /* (non-Javadoc)
   //     * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getToolbarParent()
@@ -109,12 +109,12 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getControl()
    */
-  QWidget* GetControl();
+  QWidget* GetControl() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getTabArea()
    */
-  QRect GetTabArea();
+  QRect GetTabArea() override;
 };
 
 }

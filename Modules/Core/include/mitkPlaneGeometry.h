@@ -161,7 +161,7 @@ namespace mitk {
     *
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-      const AffineTransform3D* transform = NULL,
+      const AffineTransform3D* transform = nullptr,
       PlaneOrientation planeorientation = Axial,
       ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
 
@@ -184,7 +184,7 @@ namespace mitk {
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const Vector3D& rightVector, const Vector3D& downVector,
-      const Vector3D *spacing = NULL);
+      const Vector3D *spacing = nullptr);
 
     /**
     * \brief Initialize plane by width and height in pixels,
@@ -196,7 +196,7 @@ namespace mitk {
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const VnlVector& rightVector, const VnlVector& downVector,
-      const Vector3D * spacing = NULL);
+      const Vector3D * spacing = nullptr);
 
     /**
     * \brief Initialize plane by right-/down-vector (itk) and spacing
@@ -207,7 +207,7 @@ namespace mitk {
     * respective spacing before they are set in the matrix.
     */
     virtual void InitializeStandardPlane(const Vector3D& rightVector,
-      const Vector3D& downVector, const Vector3D * spacing = NULL);
+      const Vector3D& downVector, const Vector3D * spacing = nullptr);
 
     /**
     * \brief Initialize plane by right-/down-vector (vnl) and spacing
@@ -218,7 +218,7 @@ namespace mitk {
     * respective spacing before they are set in the matrix.
     */
     virtual void InitializeStandardPlane(const VnlVector& rightVector,
-      const VnlVector& downVector, const Vector3D * spacing = NULL);
+      const VnlVector& downVector, const Vector3D * spacing = nullptr);
 
     /**
     * \brief Initialize plane by origin and normal (size is 1.0 mm in

@@ -44,7 +44,7 @@ namespace mitk
     ///
     /// executes the Algorithm
     ///
-    void Update()
+    void Update() override
     {
       for( size_t i=0; i<m_InputVector->size(); ++i )
         (*m_OutputVector)[i] = static_cast<R>( (*m_InputVector)[i] );

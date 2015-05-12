@@ -64,7 +64,7 @@ namespace berry
         InputSource src(_File.path());
         DOMParser parser;
         AutoPtr<Document> pDoc = parser.parse(&src);
-        this->ToPreferencesTree(pDoc->documentElement(), 0);
+        this->ToPreferencesTree(pDoc->documentElement(), nullptr);
       }
     }
     catch (Poco::XML::SAXParseException& exc)
@@ -75,13 +75,13 @@ namespace berry
       BERRY_INFO << "Creating " << tempString;
       BERRY_INFO << "and resetting to default values.";
       _File.copyTo(tempString);
-      this->m_Root = NULL;
+      this->m_Root = nullptr;
     }
 
     // if root is null make new one
     if(this->m_Root.IsNull())
     {
-      this->m_Root = Preferences::Pointer(new Preferences(Preferences::PropertyMap(), "", 0, this));
+      this->m_Root = Preferences::Pointer(new Preferences(Preferences::PropertyMap(), "", nullptr, this));
     }
   }
 
@@ -96,7 +96,7 @@ namespace berry
                                           // library), i.e., it is already partly deconstructed.
     try
     {
-      this->ToDOMTree(dynamic_cast<Preferences*>(this->m_Root.GetPointer()), 0);
+      this->ToDOMTree(dynamic_cast<Preferences*>(this->m_Root.GetPointer()), nullptr);
       // flush dom to file
       Poco::XML::DOMWriter writer;
       //writer.setNewLine("\n");
@@ -134,13 +134,13 @@ namespace berry
     // create a new Preferences node
     Preferences::Pointer newNode(new Preferences(properties, QString::fromStdString(name), prefParentNode, this));
     // save the new Preferences node as root node if needed
-    if(prefParentNode == 0)
+    if(prefParentNode == nullptr)
       m_Root = newNode;
 
     // recursion: now go on for all child nodes of DOMNode
     Poco::XML::NodeList* childNodes = elem->childNodes();
-    Poco::XML::Node* currentNode = 0;
-    Poco::XML::Element* prop = 0;
+    Poco::XML::Node* currentNode = nullptr;
+    Poco::XML::Element* prop = nullptr;
     std::string key;
     std::string value;
 
@@ -164,7 +164,7 @@ namespace berry
 
   void XMLPreferencesStorage::ToDOMTree( Preferences* prefNode, Poco::XML::Node* parentDOMNode )
   {
-    if(parentDOMNode == 0)
+    if(parentDOMNode == nullptr)
     {
       m_Document = new Poco::XML::Document;
       parentDOMNode = m_Document;

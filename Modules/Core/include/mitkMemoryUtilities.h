@@ -55,16 +55,16 @@ public:
     // Encapsulate all image memory allocation here to throw an
     // exception when memory allocation fails even when the compiler
     // does not do this by default.
-    ElementType* data = NULL;
+    ElementType* data = nullptr;
     try
     {
       data = new ElementType[numberOfElements];
     }
     catch(...)
     {
-      data = NULL;
+      data = nullptr;
     }
-    if( ( data == NULL ) && ( noThrow == false ) )
+    if( ( data == nullptr ) && ( noThrow == false ) )
     {
       throw itk::MemoryAllocationError(__FILE__, __LINE__, "Failed to allocate memory.", ITK_LOCATION);
     }

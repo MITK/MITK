@@ -56,14 +56,14 @@ public:
   /*!
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
   */
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /*!
   \brief method for creating the connections of main and control widget
   */
   virtual void CreateConnections();
 
-  virtual void Activated();
+  virtual void Activated() override;
 
   void SetDwiNodeProperties(mitk::DataNode::Pointer node, std::string name);
 

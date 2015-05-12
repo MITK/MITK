@@ -53,7 +53,7 @@ public:
   ///
   /// Constructs a new QmitkDataStorageTableModel
   /// and sets the DataNode for this TableModel.
-  QmitkPropertiesTableModel(QObject* parent = 0, mitk::PropertyList::Pointer _PropertyList=0);
+  QmitkPropertiesTableModel(QObject* parent = nullptr, mitk::PropertyList::Pointer _PropertyList=nullptr);
 
   ///
   /// Standard dtor. Nothing to do here.

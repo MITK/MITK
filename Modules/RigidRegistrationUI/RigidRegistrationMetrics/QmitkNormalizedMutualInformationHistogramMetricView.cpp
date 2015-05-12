@@ -40,7 +40,7 @@ itk::Object::Pointer QmitkNormalizedMutualInformationHistogramMetricView::GetMet
     AccessByItk(m_MovingImage, GetMetric2);
     return m_MetricObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 template < class TPixelType, unsigned int VImageDimension >

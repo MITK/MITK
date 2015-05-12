@@ -32,7 +32,7 @@ class MITKOPENVIEWCORE_EXPORT QVTKQuickItem : public QQuickItem
 {
   Q_OBJECT
 public:
-  QVTKQuickItem(QQuickItem* parent = 0);
+  QVTKQuickItem(QQuickItem* parent = nullptr);
 
   // Description:
   // destructor

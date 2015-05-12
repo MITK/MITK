@@ -42,7 +42,7 @@ public:
 
   Property::Pointer Get(Property::Pointer key) {
     Poco::SharedPtr<PropertyHandle> value = fCache.get(key);
-    return value.isNull() ? Property::Pointer(0) : Property::Pointer(value->m_Property);
+    return value.isNull() ? Property::Pointer(nullptr) : Property::Pointer(value->m_Property);
   }
 
   void Put(Property::Pointer method) {

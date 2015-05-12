@@ -89,7 +89,7 @@ namespace mitk
     */
     void Deselect()
     {
-      this->m_SelectedVertex = NULL;
+      this->m_SelectedVertex = nullptr;
     }
 
     /** \brief Set selected vertex as control point

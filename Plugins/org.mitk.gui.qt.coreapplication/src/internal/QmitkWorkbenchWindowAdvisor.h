@@ -28,11 +28,11 @@ public:
     QmitkWorkbenchWindowAdvisor(berry::SmartPointer<berry::IWorkbenchWindowConfigurer> configurer);
 
     berry::SmartPointer<berry::ActionBarAdvisor> CreateActionBarAdvisor(
-        berry::SmartPointer<berry::IActionBarConfigurer> configurer);
+        berry::SmartPointer<berry::IActionBarConfigurer> configurer) override;
 
-    void PostWindowCreate();
+    void PostWindowCreate() override;
 
-    void PreWindowOpen();
+    void PreWindowOpen() override;
 
 private:
 

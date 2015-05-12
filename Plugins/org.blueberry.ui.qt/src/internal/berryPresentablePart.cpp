@@ -50,7 +50,7 @@ PropertyListenerProxy::PropertyChange(const PropertyChangeEvent::Pointer& e)
 
 IPropertyChangeListener* PresentablePart::GetPropertyListenerProxy()
 {
-  if (lazyPropertyListenerProxy == 0)
+  if (lazyPropertyListenerProxy == nullptr)
   {
     lazyPropertyListenerProxy.reset(new PropertyListenerProxy(this));
   }
@@ -209,7 +209,7 @@ QToolBar* PresentablePart::GetToolBar()
   {
     return this->GetPane()->GetToolBar();
   }
-  return 0;
+  return nullptr;
 }
 
 bool PresentablePart::IsCloseable() const

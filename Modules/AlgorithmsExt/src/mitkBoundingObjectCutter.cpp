@@ -40,7 +40,7 @@ const mitk::BoundingObject* BoundingObjectCutter::GetBoundingObject() const
 }
 
 BoundingObjectCutter::BoundingObjectCutter()
-  : m_BoundingObject(NULL), m_InsideValue(1), m_OutsideValue(0), m_AutoOutsideValue(false),
+  : m_BoundingObject(nullptr), m_InsideValue(1), m_OutsideValue(0), m_AutoOutsideValue(false),
     m_UseInsideValue(false), m_OutsidePixelCount(0), m_InsidePixelCount(0), m_UseWholeInputRegion(false)
 {
   this->SetNumberOfIndexedInputs(2);
@@ -145,7 +145,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   // PART II: initialize output image
 
-  unsigned int *dimensions = new unsigned int [dimension];
+  auto dimensions = new unsigned int [dimension];
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
   if(dimension>3)
     memcpy(dimensions+3, input->GetDimensions()+3, (dimension-3)*sizeof(unsigned int));
@@ -222,8 +222,8 @@ void BoundingObjectCutter::GenerateData()
     ComputeData(m_InputTimeSelector->GetOutput(), timestep);
   }
 
-  m_InputTimeSelector->SetInput(NULL);
-  m_OutputTimeSelector->SetInput(NULL);
+  m_InputTimeSelector->SetInput(nullptr);
+  m_OutputTimeSelector->SetInput(nullptr);
 
   m_TimeOfHeaderInitialization.Modified();
 }

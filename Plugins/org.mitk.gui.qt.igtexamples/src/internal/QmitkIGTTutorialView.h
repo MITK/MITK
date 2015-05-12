@@ -53,12 +53,12 @@ class QmitkIGTTutorialView : public QmitkAbstractView
   QmitkIGTTutorialView();
   virtual ~QmitkIGTTutorialView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
 protected slots:
 

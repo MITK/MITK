@@ -69,7 +69,7 @@ namespace mitk
     ///
     /// executes the Algorithm
     ///
-    void Update()
+    void Update() override
     {
       Cast<T, T>( *m_VnlMatrix, *m_CvMat );
     }

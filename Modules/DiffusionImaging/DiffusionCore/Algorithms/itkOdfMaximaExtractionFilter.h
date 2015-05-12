@@ -79,7 +79,7 @@ public:
   itkSetMacro( MaxNumPeaks, unsigned int)                           ///< if more peaks are found, only the largest are kept
   itkSetMacro( PeakThreshold, double)                               ///< threshold on peak length relative to the largest peak in the current voxel
 
-  void GenerateData();
+  void GenerateData() override;
 
 protected:
   OdfMaximaExtractionFilter();

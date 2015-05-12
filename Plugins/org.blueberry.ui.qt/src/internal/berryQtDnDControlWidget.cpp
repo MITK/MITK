@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry {
 
 QtDnDControlWidget::QtDnDControlWidget(QWidget* parent)
-  : QtControlWidget(parent, 0)
+  : QtControlWidget(parent, nullptr)
 {
 }
 

@@ -115,8 +115,8 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
 
     mitk::StringLookupTableProperty* files = dynamic_cast<mitk::StringLookupTableProperty*>(image->GetProperty("files").GetPointer());
 
-    MITK_TEST_CONDITION(sliceLocation != NULL, "Test if tag for slice location has been set to mitk image");
-    if(sliceLocation != NULL)
+    MITK_TEST_CONDITION(sliceLocation != nullptr, "Test if tag for slice location has been set to mitk image");
+    if(sliceLocation != nullptr)
     {
       for(int i = 0; i < (int)sliceLocation->GetValue().GetLookupTable().size(); i++)
       {
@@ -129,8 +129,8 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
       }
     }
 
-    MITK_TEST_CONDITION(instanceNumber != NULL, "Test if tag for image instance number has been set to mitk image");
-    if(instanceNumber != NULL)
+    MITK_TEST_CONDITION(instanceNumber != nullptr, "Test if tag for image instance number has been set to mitk image");
+    if(instanceNumber != nullptr)
     {
       for(int i = 0; i < (int)instanceNumber->GetValue().GetLookupTable().size(); i++)
       {
@@ -143,8 +143,8 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
       }
     }
 
-    MITK_TEST_CONDITION(SOPInstnaceNumber != NULL, "Test if tag for SOP instance number has been set to mitk image");
-    if(SOPInstnaceNumber != NULL)
+    MITK_TEST_CONDITION(SOPInstnaceNumber != nullptr, "Test if tag for SOP instance number has been set to mitk image");
+    if(SOPInstnaceNumber != nullptr)
     {
       for(int i = 0; i < (int)SOPInstnaceNumber->GetValue().GetLookupTable().size(); i++)
       {

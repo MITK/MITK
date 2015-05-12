@@ -77,8 +77,8 @@ private:
 
   struct GlobalParentLocator: public IServiceLocator
   {
-    Object* GetService(const QString& api);
-    bool HasService(const QString& api) const;
+    Object* GetService(const QString& api) override;
+    bool HasService(const QString& api) const override;
   };
 
 public:

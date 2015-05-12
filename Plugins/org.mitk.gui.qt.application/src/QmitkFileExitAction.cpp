@@ -20,14 +20,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 
 QmitkFileExitAction::QmitkFileExitAction(berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->init(window.GetPointer());
 }
 
 QmitkFileExitAction::QmitkFileExitAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->setIcon(icon);
@@ -35,14 +35,14 @@ QmitkFileExitAction::QmitkFileExitAction(const QIcon & icon, berry::IWorkbenchWi
 }
 
 QmitkFileExitAction::QmitkFileExitAction(berry::IWorkbenchWindow* window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->init(window);
 }
 
 QmitkFileExitAction::QmitkFileExitAction(const QIcon& icon, berry::IWorkbenchWindow* window)
-  : QAction(0)
+  : QAction(nullptr)
   , m_Window(nullptr)
 {
   this->setIcon(icon);

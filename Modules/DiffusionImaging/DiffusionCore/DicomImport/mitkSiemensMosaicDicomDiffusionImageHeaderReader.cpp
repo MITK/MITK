@@ -106,7 +106,7 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
     const gdcm::DataSet &ds = f.GetDataSet();
 
     //    gdcm::DataSet ds = header0->GetDataSet();
-    gdcm::DataSet::ConstIterator it = ds.Begin();
+    auto it = ds.Begin();
 
     // Copy of the header->content
     // copy information stored in 0029,1010 into a string for parsing
@@ -178,7 +178,7 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
       const gdcm::DataSet &ds = f.GetDataSet();
 
       //    gdcm::DataSet ds = header0->GetDataSet();
-      gdcm::DataSet::ConstIterator it = ds.Begin();
+      auto it = ds.Begin();
 
       // Copy of the header->content
       // copy information stored in 0029,1010 into a string for parsing

@@ -68,7 +68,7 @@ const mitk::IsoDoseLevel& mitk::IsoDoseLevelSet::GetIsoDoseLevel(IsoLevelIndexTy
 
 const mitk::IsoDoseLevel& mitk::IsoDoseLevelSet::GetIsoDoseLevel(DoseValueType value) const
 {
-  InternalVectorType::const_iterator pos = std::find_if(this->m_IsoLevels.begin(), this->m_IsoLevels.end(), EqualDoseFunctor(value));
+  auto pos = std::find_if(this->m_IsoLevels.begin(), this->m_IsoLevels.end(), EqualDoseFunctor(value));
 
   if (pos != this->m_IsoLevels.end())
   {
@@ -102,13 +102,13 @@ bool mitk::IsoDoseLevelSet::DoseLevelExists(IsoLevelIndexType index) const
 
 bool mitk::IsoDoseLevelSet::DoseLevelExists(DoseValueType value) const
 {
-  InternalVectorType::const_iterator pos = std::find_if(this->m_IsoLevels.begin(), this->m_IsoLevels.end(), EqualDoseFunctor(value));
+  auto pos = std::find_if(this->m_IsoLevels.begin(), this->m_IsoLevels.end(), EqualDoseFunctor(value));
   return pos != this->m_IsoLevels.end();
 };
 
 void mitk::IsoDoseLevelSet::DeleteIsoDoseLevel(DoseValueType value)
 {
-  InternalVectorType::iterator pos = std::find_if(this->m_IsoLevels.begin(), this->m_IsoLevels.end(), EqualDoseFunctor(value));
+  auto pos = std::find_if(this->m_IsoLevels.begin(), this->m_IsoLevels.end(), EqualDoseFunctor(value));
 
   if (pos != this->m_IsoLevels.end())
   {

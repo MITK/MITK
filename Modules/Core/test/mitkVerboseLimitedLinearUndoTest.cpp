@@ -72,16 +72,16 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("VerboseLimitedLinearUndo")
 
   // an UndoController for the management
-  mitk::UndoController* myUndoController = new mitk::UndoController();
+  auto  myUndoController = new mitk::UndoController();
 
   //set model, even if it is verboseLimitedLinearUndo by default; this already is tested by UndoControllerTest!
   myUndoController->SwitchUndoModel(mitk::UndoController::VERBOSE_LIMITEDLINEARUNDO);
 
   for (int i = 0; i<2; i++)
   {
-    mitk::TestOperation* doOp = new mitk::TestOperation(mitk::OpTEST);
-    mitk::TestOperation *undoOp = new mitk::TestOperation(mitk::OpTEST);
-    mitk::OperationEvent *operationEvent = new mitk::OperationEvent(NULL, doOp, undoOp, "Test");
+    auto  doOp = new mitk::TestOperation(mitk::OpTEST);
+    auto undoOp = new mitk::TestOperation(mitk::OpTEST);
+    mitk::OperationEvent *operationEvent = new mitk::OperationEvent(nullptr, doOp, undoOp, "Test");
     myUndoController->SetOperationEvent(operationEvent);
     //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
     mitk::OperationEvent::IncCurrObjectEventId();
@@ -97,9 +97,9 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
   //sending two new OperationEvents: RedoList should be deleted and memory of operations freed
   for (int i = 0; i<2; i++)
   {
-    mitk::TestOperation* doOp = new mitk::TestOperation(mitk::OpTEST);
-    mitk::TestOperation *undoOp = new mitk::TestOperation(mitk::OpTEST);
-    mitk::OperationEvent *operationEvent = new mitk::OperationEvent(NULL, doOp, undoOp, "Test");
+    auto  doOp = new mitk::TestOperation(mitk::OpTEST);
+    auto undoOp = new mitk::TestOperation(mitk::OpTEST);
+    mitk::OperationEvent *operationEvent = new mitk::OperationEvent(nullptr, doOp, undoOp, "Test");
     myUndoController->SetOperationEvent(operationEvent);
     //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
     mitk::OperationEvent::IncCurrObjectEventId();
@@ -123,9 +123,9 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
   //sending two new OperationEvents
   for (int i = 0; i<2; i++)
   {
-    mitk::TestOperation* doOp = new mitk::TestOperation(mitk::OpTEST);
-    mitk::TestOperation *undoOp = new mitk::TestOperation(mitk::OpTEST);
-    mitk::OperationEvent *operationEvent = new mitk::OperationEvent(NULL, doOp, undoOp, "Test");
+    auto  doOp = new mitk::TestOperation(mitk::OpTEST);
+    auto undoOp = new mitk::TestOperation(mitk::OpTEST);
+    mitk::OperationEvent *operationEvent = new mitk::OperationEvent(nullptr, doOp, undoOp, "Test");
     myUndoController->SetOperationEvent(operationEvent);
     //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
     mitk::OperationEvent::IncCurrObjectEventId();

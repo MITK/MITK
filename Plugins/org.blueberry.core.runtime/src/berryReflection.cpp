@@ -47,7 +47,7 @@ QString DemangleName(const char* mangledName)
   QString name(mangledName);
 #ifdef GCC_USEDEMANGLE
   int status;
-  char* unmangled = abi::__cxa_demangle(mangledName, 0, 0, &status);
+  char* unmangled = abi::__cxa_demangle(mangledName, nullptr, nullptr, &status);
 
   if(status == 0)
   {
@@ -82,8 +82,8 @@ TypeInfo::Concept::~Concept(){}
 
 template<>
 struct TypeInfo::Model<EmptyType> : Concept {
-  QString GetName() const { return QString(); }
-  QList<TypeInfo> GetSuperclasses() const { return QList<TypeInfo>(); }
+  QString GetName() const override { return QString(); }
+  QList<TypeInfo> GetSuperclasses() const override { return QList<TypeInfo>(); }
 };
 
 TypeInfo::TypeInfo()

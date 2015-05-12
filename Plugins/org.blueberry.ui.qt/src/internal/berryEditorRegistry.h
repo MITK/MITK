@@ -246,7 +246,7 @@ private: void AddExternalEditorsToEditorMap();
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: IEditorDescriptor::Pointer FindEditor(const QString& id);
+public: IEditorDescriptor::Pointer FindEditor(const QString& id) override;
 
   /**
    * Fires a property changed event to all registered listeners.
@@ -271,12 +271,12 @@ public: IEditorDescriptor::Pointer FindEditor(const QString& id);
    *
    * @deprecated
    */
-public: IEditorDescriptor::Pointer GetDefaultEditor();
+public: IEditorDescriptor::Pointer GetDefaultEditor() override;
 
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: IEditorDescriptor::Pointer GetDefaultEditor(const QString& filename);
+public: IEditorDescriptor::Pointer GetDefaultEditor(const QString& filename) override;
 
   /**
    * Return the (approximated) content type for a file with the given name.
@@ -302,12 +302,12 @@ public: IEditorDescriptor::Pointer GetDefaultEditor(const QString& filename);
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: QList<IEditorDescriptor::Pointer> GetEditors(const QString& filename);
+public: QList<IEditorDescriptor::Pointer> GetEditors(const QString& filename) override;
 
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: QList<IFileEditorMapping::Pointer> GetFileEditorMappings();
+public: QList<IFileEditorMapping::Pointer> GetFileEditorMappings() override;
 
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
@@ -496,7 +496,7 @@ public: void SetFileEditorMappings(const QList<FileEditorMapping::Pointer>& newR
   /*
    * (non-Javadoc) Method declared on IEditorRegistry.
    */
-public: void SetDefaultEditor(const QString& fileName, const QString& editorId);
+public: void SetDefaultEditor(const QString& fileName, const QString& editorId) override;
 
   /**
    * Alphabetically sort the internal editors.
@@ -517,14 +517,14 @@ private: void SortInternalEditors();
    *
    * @see org.blueberry.ui.IEditorRegistry#isSystemInPlaceEditorAvailable(String)
    */
-public: bool IsSystemInPlaceEditorAvailable(const QString& filename);
+public: bool IsSystemInPlaceEditorAvailable(const QString& filename) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.IEditorRegistry#isSystemExternalEditorAvailable(String)
    */
-public: bool IsSystemExternalEditorAvailable(const QString& filename);
+public: bool IsSystemExternalEditorAvailable(const QString& filename) override;
 
   /*
    * (non-Javadoc)
@@ -725,16 +725,16 @@ private:
       const QString& ext);
 
 public:
-  IEditorDescriptor::Pointer GetDefaultEditor();
+  IEditorDescriptor::Pointer GetDefaultEditor() override;
 
 public:
-  QList<IEditorDescriptor::Pointer> GetEditors() const;
+  QList<IEditorDescriptor::Pointer> GetEditors() const override;
 
 public:
-  QList<IEditorDescriptor::Pointer> GetDeletedEditors() const;
+  QList<IEditorDescriptor::Pointer> GetDeletedEditors() const override;
 
 public:
-  QString GetExtension() const;
+  QString GetExtension() const override;
 
   //  public: ImageDescriptor GetImageDescriptor() {
   //    IEditorDescriptor editor = getDefaultEditor();
@@ -747,16 +747,16 @@ public:
   //  }
 
 public:
-  QString GetLabel() const;
+  QString GetLabel() const override;
 
 public:
-  QString GetName() const;
+  QString GetName() const override;
 
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
 public:
-  bool operator==(const Object* obj) const;
+  bool operator==(const Object* obj) const override;
 };
 
 }

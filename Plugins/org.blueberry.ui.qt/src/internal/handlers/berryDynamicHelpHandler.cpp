@@ -26,7 +26,7 @@ namespace berry {
 Object::Pointer DynamicHelpHandler::Execute(const SmartPointer<const ExecutionEvent>& /*event*/)
 {
   ctkPluginContext* context = WorkbenchPlugin::GetDefault()->GetPluginContext();
-  if (context == 0)
+  if (context == nullptr)
   {
     BERRY_WARN << "Plugin context not set, unable to open context help";
     return Object::Pointer();
@@ -55,12 +55,12 @@ Object::Pointer DynamicHelpHandler::Execute(const SmartPointer<const ExecutionEv
   }
 
   ctkServiceReference eventAdminRef = context->getServiceReference<ctkEventAdmin>();
-  ctkEventAdmin* eventAdmin = 0;
+  ctkEventAdmin* eventAdmin = nullptr;
   if (eventAdminRef)
   {
     eventAdmin = context->getService<ctkEventAdmin>(eventAdminRef);
   }
-  if (eventAdmin == 0)
+  if (eventAdmin == nullptr)
   {
     BERRY_WARN << "ctkEventAdmin service not found. Unable to open context help";
   }

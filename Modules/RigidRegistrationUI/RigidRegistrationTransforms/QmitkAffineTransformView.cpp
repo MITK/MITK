@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkAffineTransformView::GetTransform()
     AccessTwoImagesFixedDimensionByItk(m_FixedImage, m_MovingImage, GetTransform2, 3);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 template < class TPixelType, class MovingPixelType, unsigned int VImageDimension >

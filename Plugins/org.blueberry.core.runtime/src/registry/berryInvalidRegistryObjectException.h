@@ -41,9 +41,9 @@ public:
   InvalidRegistryObjectException();
   ~InvalidRegistryObjectException() throw();
 
-  const char* name() const throw();
-  InvalidRegistryObjectException* clone() const;
-  void rethrow() const;
+  const char* name() const throw() override;
+  InvalidRegistryObjectException* clone() const override;
+  void rethrow() const override;
 };
 
 }

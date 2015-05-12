@@ -46,9 +46,9 @@ public:
   /*
    * @see IEvaluationReference#GetListener()
    */
-  IPropertyChangeListener* GetListener() const;
+  IPropertyChangeListener* GetListener() const override;
 
-  QString GetProperty() const;
+  QString GetProperty() const override;
 
   /*
    * @see IEvaluationReference#SetFlopping(bool)

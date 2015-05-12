@@ -58,10 +58,10 @@ private:
   class PreferenceChangeListener;
   QScopedPointer<PreferenceChangeListener> preferenceListener;
 
-  virtual void AddExtension(IExtensionTracker* tracker, const SmartPointer<IExtension>& extension);
+  virtual void AddExtension(IExtensionTracker* tracker, const SmartPointer<IExtension>& extension) override;
 
   virtual void RemoveExtension(const SmartPointer<IExtension>& extension,
-                               const QList<SmartPointer<Object> >& objects);
+                               const QList<SmartPointer<Object> >& objects) override;
 
 public:
 
@@ -110,7 +110,7 @@ public:
    *
    * @param in
    */
-  void DeletePerspective(IPerspectiveDescriptor::Pointer in);
+  void DeletePerspective(IPerspectiveDescriptor::Pointer in) override;
 
   /**
    * Loads the registry.
@@ -158,19 +158,19 @@ public:
 
   // ---------- IPerspectiveRegistry methods ------------
 
-  virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const QString& id);
-  virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const QString& label);
+  virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithId(const QString& id) override;
+  virtual IPerspectiveDescriptor::Pointer FindPerspectiveWithLabel(const QString& label) override;
 
-  virtual QString GetDefaultPerspective();
+  virtual QString GetDefaultPerspective() override;
 
-  virtual QList<IPerspectiveDescriptor::Pointer> GetPerspectives();
+  virtual QList<IPerspectiveDescriptor::Pointer> GetPerspectives() override;
 
-  virtual void SetDefaultPerspective(const QString& id);
+  virtual void SetDefaultPerspective(const QString& id) override;
 
   virtual IPerspectiveDescriptor::Pointer ClonePerspective(const QString& id, const QString& label,
-      IPerspectiveDescriptor::Pointer originalDescriptor);
+      IPerspectiveDescriptor::Pointer originalDescriptor) override;
 
-  virtual void RevertPerspective(IPerspectiveDescriptor::Pointer perspToRevert);
+  virtual void RevertPerspective(IPerspectiveDescriptor::Pointer perspToRevert) override;
 
 protected:
 

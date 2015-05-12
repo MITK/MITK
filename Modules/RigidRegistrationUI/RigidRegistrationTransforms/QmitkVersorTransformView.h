@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkVersorTransformView : public QmitkRigi
 
 public:
 
-  QmitkVersorTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkVersorTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkVersorTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

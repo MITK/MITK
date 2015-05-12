@@ -33,7 +33,7 @@ void WWinActionBars::ClearGlobalActionHandlers()
 
 Action* WWinActionBars::GetGlobalActionHandler(const QString& /*actionID*/) const
 {
-  return 0;
+  return nullptr;
 }
 
 IMenuManager* WWinActionBars::GetMenuManager()
@@ -50,14 +50,14 @@ IStatusLineManager* WWinActionBars::GetStatusLineManager()
 {
   //TODO StatusLineManager
   //return window->GetStatusLineManager();
-  return 0;
+  return nullptr;
 }
 
 IToolBarManager* WWinActionBars::GetToolBarManager()
 {
   //return window->GetToolBarManager();
   //TODO ToolBarManager
-  return 0;
+  return nullptr;
 }
 
 void WWinActionBars::SetGlobalActionHandler(const QString& /*actionID*/, Action* /*handler*/)

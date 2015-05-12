@@ -31,7 +31,7 @@ namespace mitk {
     mitkClassMacro(NavigationDataReaderXML, NavigationDataReaderInterface);
     itkNewMacro(Self);
 
-    virtual mitk::NavigationDataSet::Pointer Read(std::string fileName);
+    virtual mitk::NavigationDataSet::Pointer Read(std::string fileName) override;
     virtual mitk::NavigationDataSet::Pointer Read(std::istream* stream);
 
     // -- deprecated | begin

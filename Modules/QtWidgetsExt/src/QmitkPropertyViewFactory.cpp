@@ -59,7 +59,7 @@ QWidget* QmitkPropertyViewFactory::CreateView(const mitk::BaseProperty* property
   {
     // a bool property
     // TODO fix after refactoring
-    QmitkBoolPropertyWidget* widget = new QmitkBoolPropertyWidget(parent);
+    auto  widget = new QmitkBoolPropertyWidget(parent);
     widget->SetProperty(const_cast<mitk::BoolProperty*>(prop));
     return widget;
   }
@@ -78,18 +78,18 @@ QWidget* QmitkPropertyViewFactory::CreateView(const mitk::BaseProperty* property
     // a number property
     return new QmitkNumberPropertyView(prop, parent);
   }
-  else if ( property != NULL )
+  else if ( property != nullptr )
   {
     // some unknown property --> use the GetValueAsString() method to
     return new QmitkBasePropertyView(prop, parent);
   }
 
-  return NULL;
+  return nullptr;
 }
 
 QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, unsigned int type, QWidget* parent)
 {
-  if (!property) return NULL;
+  if (!property) return nullptr;
 
   if ( mitk::StringProperty* prop = dynamic_cast<mitk::StringProperty*>(property) )
   {
@@ -112,7 +112,7 @@ QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, un
   {
     // a bool property
     // TODO fix after refactoring
-    QmitkBoolPropertyWidget* widget = new QmitkBoolPropertyWidget(parent);
+    auto  widget = new QmitkBoolPropertyWidget(parent);
     widget->SetProperty(prop);
     return widget;
   }
@@ -124,28 +124,28 @@ QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, un
   else if ( mitk::FloatProperty* prop = dynamic_cast<mitk::FloatProperty*>(property) )
   {
     // a number property
-    QmitkNumberPropertyEditor* pe = new QmitkNumberPropertyEditor(prop, parent);
+    auto  pe = new QmitkNumberPropertyEditor(prop, parent);
     pe->setDecimalPlaces(2);
     return pe;
   }
   else if ( mitk::DoubleProperty* prop = dynamic_cast<mitk::DoubleProperty*>(property) )
   {
     // a number property
-    QmitkNumberPropertyEditor* pe = new QmitkNumberPropertyEditor(prop, parent);
+    auto  pe = new QmitkNumberPropertyEditor(prop, parent);
     pe->setDecimalPlaces(2);
     return pe;
   }
   else if ( mitk::EnumerationProperty* prop = dynamic_cast<mitk::EnumerationProperty*>(property) )
   {
     // a enumeration property
-    QmitkEnumerationPropertyWidget* pe = new QmitkEnumerationPropertyWidget(parent);
+    auto  pe = new QmitkEnumerationPropertyWidget(parent);
     pe->SetProperty(prop);
     return pe;
   }
   else
   {
     // some unknown property --> no editor possible
-    return NULL;
+    return nullptr;
   }
 }
 

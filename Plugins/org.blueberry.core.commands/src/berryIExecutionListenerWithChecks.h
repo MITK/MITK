@@ -42,10 +42,10 @@ struct BERRY_COMMANDS IExecutionListenerWithChecks : public IExecutionListener {
     Message2<const QString&, const NotDefinedException*> notDefined;
     Message2<const QString&, const NotEnabledException*> notEnabled;
 
-    void AddListener(IExecutionListener* listener);
-    void RemoveListener(IExecutionListener* listener);
-    bool HasListeners() const;
-    bool IsEmpty() const;
+    void AddListener(IExecutionListener* listener) override;
+    void RemoveListener(IExecutionListener* listener) override;
+    bool HasListeners() const override;
+    bool IsEmpty() const override;
 
     private:
 

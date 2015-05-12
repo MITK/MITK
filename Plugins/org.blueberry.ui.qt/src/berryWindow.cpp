@@ -103,7 +103,7 @@ Shell::Pointer Window::GetModalChild(const QList<Shell::Pointer>& toSearch)
     }
   }
 
-  return Shell::Pointer(0);
+  return Shell::Pointer(nullptr);
 }
 
 //void Window::RunEventLoop()
@@ -273,7 +273,7 @@ QPoint Window::GetInitialLocation(const QPoint& initialSize)
 
   QPoint centerPoint(0,0);
   QRect parentBounds(0,0,0,0);
-  if (parent != 0)
+  if (parent != nullptr)
   {
     parentBounds = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(parent);
     centerPoint.setX(parentBounds.x() + parentBounds.width()/2);
@@ -439,10 +439,10 @@ bool Window::Close()
 //  }
 
   // remove this window from a window manager if it has one
-  if (windowManager != 0)
+  if (windowManager != nullptr)
   {
     windowManager->Remove(Window::Pointer(this));
-    windowManager = 0;
+    windowManager = nullptr;
   }
 
   if (shell == 0)
@@ -451,14 +451,14 @@ bool Window::Close()
   }
 
   shell->RemoveShellListener(this->GetShellListener());
-  shell->SetData(Object::Pointer(0));
+  shell->SetData(Object::Pointer(nullptr));
 
   // If we "close" the shell recursion will occur.
   // Instead, we need to "dispose" the shell to remove it from the
   // display.
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->DisposeShell(shell);
-  shell = 0;
-  contents = 0;
+  shell = nullptr;
+  contents = nullptr;
 
   return true;
 }
@@ -549,7 +549,7 @@ void Window::SetWindowManager(WindowManager* manager)
 
   // Code to detect invalid usage
 
-  if (manager != 0)
+  if (manager != nullptr)
   {
     QList<Window::Pointer> windows = manager->GetWindows();
     for (int i = 0; i < windows.size(); i++)

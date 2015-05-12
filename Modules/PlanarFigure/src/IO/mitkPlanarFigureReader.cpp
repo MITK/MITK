@@ -60,7 +60,7 @@ mitk::PlanarFigureReader::~PlanarFigureReader()
 void mitk::PlanarFigureReader::GenerateData()
 {
     const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
     if ( locale.compare(currLocale)!=0 )
     {
@@ -81,7 +81,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
   if(m_ReadFromMemory)
   {
-    if(m_MemoryBuffer == NULL || m_MemorySize == 0)
+    if(m_MemoryBuffer == nullptr || m_MemorySize == 0)
     {
       //check
       itkWarningMacro( << "Sorry, memory buffer has not been set!" );
@@ -93,7 +93,7 @@ void mitk::PlanarFigureReader::GenerateData()
     }
     else
     {
-      char * tmpArray = new char[(int)m_MemorySize+1];
+      auto  tmpArray = new char[(int)m_MemorySize+1];
       tmpArray[m_MemorySize] = '\0';
       memcpy(tmpArray,m_MemoryBuffer,m_MemorySize);
 
@@ -124,7 +124,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
   int fileVersion = 1;
   TiXmlElement* versionObject = document.FirstChildElement("Version");
-  if (versionObject != NULL)
+  if (versionObject != nullptr)
   {
     if ( versionObject->QueryIntAttribute( "FileVersion", &fileVersion ) != TIXML_SUCCESS )
     {
@@ -143,15 +143,15 @@ void mitk::PlanarFigureReader::GenerateData()
 
   /* file version 1 reader code */
   for( TiXmlElement* pfElement = document.FirstChildElement("PlanarFigure");
-       pfElement != NULL;
+       pfElement != nullptr;
        pfElement = pfElement->NextSiblingElement("PlanarFigure") )
   {
-    if (pfElement == NULL)
+    if (pfElement == nullptr)
       continue;
 
     std::string type = pfElement->Attribute("type");
 
-    mitk::PlanarFigure::Pointer planarFigure = NULL;
+    mitk::PlanarFigure::Pointer planarFigure = nullptr;
     if (type == "PlanarAngle")
     {
       planarFigure = mitk::PlanarAngle::New();
@@ -210,7 +210,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
     // Read properties of the planar figure
     for( TiXmlElement* propertyElement = pfElement->FirstChildElement("property");
-         propertyElement != NULL;
+         propertyElement != nullptr;
          propertyElement = propertyElement->NextSiblingElement("property") )
     {
       const char* keya = propertyElement->Attribute("key");
@@ -234,7 +234,7 @@ void mitk::PlanarFigureReader::GenerateData()
         MITK_WARN << "Multiple property readers found for " << type << ". Using arbitrary first one.";
       }
 
-      for ( std::list<itk::LightObject::Pointer>::iterator iter = readers.begin();
+      for ( auto iter = readers.begin();
         iter != readers.end();
         ++iter )
       {
@@ -262,7 +262,7 @@ void mitk::PlanarFigureReader::GenerateData()
     // Which features (length or circumference etc) a figure has is decided by whether it is closed or not
     // the function SetClosed has to be called in case of PlanarPolygons to ensure they hold the correct feature
     PlanarPolygon* planarPolygon = dynamic_cast<PlanarPolygon*> (planarFigure.GetPointer());
-    if (planarPolygon != NULL)
+    if (planarPolygon != nullptr)
     {
       bool isClosed = false;
       planarFigure->GetPropertyList()->GetBoolProperty( "closed", isClosed);
@@ -272,7 +272,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
     // Read geometry of containing plane
     TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
-    if (geoElement != NULL)
+    if (geoElement != nullptr)
     {
       try
       {
@@ -331,10 +331,10 @@ void mitk::PlanarFigureReader::GenerateData()
     }
     TiXmlElement* cpElement = pfElement->FirstChildElement("ControlPoints");
     bool first = true;
-    if (cpElement != NULL)
-      for( TiXmlElement* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != NULL; vertElement = vertElement->NextSiblingElement("Vertex"))
+    if (cpElement != nullptr)
+      for( TiXmlElement* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != nullptr; vertElement = vertElement->NextSiblingElement("Vertex"))
       {
-        if (vertElement == NULL)
+        if (vertElement == nullptr)
           continue;
         int id = 0;
         mitk::Point2D::ValueType x = 0.0;
@@ -380,7 +380,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
 mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
 {
-  if (e == NULL)
+  if (e == nullptr)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Point3D point;
   mitk::ScalarType p(-1.0);
@@ -399,7 +399,7 @@ mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
 
 mitk::Vector3D mitk::PlanarFigureReader::GetVectorFromXMLNode(TiXmlElement* e)
 {
-  if (e == NULL)
+  if (e == nullptr)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Vector3D vector;
   mitk::ScalarType p(-1.0);
@@ -420,7 +420,7 @@ mitk::PlanarFigureReader::GetDoubleAttributeListFromXMLNode(TiXmlElement* e, con
 {
   DoubleList list;
 
-  if (e == NULL)
+  if (e == nullptr)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
 
   for ( unsigned int i = 0; i < count; ++i )

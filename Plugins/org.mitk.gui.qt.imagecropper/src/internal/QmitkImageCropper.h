@@ -94,7 +94,7 @@ public:
   /*!
   \brief Creates the Qt widget containing the functionality controls, like sliders, buttons etc.
   */
-  virtual void CreateQtPartControl(QWidget* parent);
+  virtual void CreateQtPartControl(QWidget* parent) override;
 
   /*!
   \brief Creates the Qt connections needed
@@ -104,27 +104,27 @@ public:
   /*!
   \brief Invoked when this functionality is selected by the application
   */
-  virtual void Activated();
+  virtual void Activated() override;
 
   /*!
   \brief Invoked when the user leaves this functionality
   */
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
   ///
   /// Called when a StdMultiWidget is available.
   ///
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
+  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget) override;
   ///
   /// Called when no StdMultiWidget is available.
   ///
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetNotAvailable() override;
 
 
   /*
   \brief Interface of a mitk::StateMachine (for undo/redo)
   */
-  virtual void  ExecuteOperation (mitk::Operation*);
+  virtual void  ExecuteOperation (mitk::Operation*) override;
 
   QWidget* GetControls();
 
@@ -187,7 +187,7 @@ protected:
   /*!
   * \brief Called from superclass, handles selection changes.
   */
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
 
   /*!
   * \brief Finds the given node in the data tree and optionally fits the cuboid to it
@@ -199,7 +199,7 @@ protected:
   */
   virtual void RemoveBoundingObjectFromNode();
 
-  virtual void NodeRemoved(const mitk::DataNode* node);
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
 
 private:
 

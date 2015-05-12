@@ -80,7 +80,7 @@ public:
    * \param OpenCV image to be segmentated
    * \return false if an empty image was set, true otherwise
    */
-  bool OnFilterImage( cv::Mat& image );
+  bool OnFilterImage( cv::Mat& image ) override;
 
   /**
    * \brief Sets a list of image indices as foreground model points.

@@ -143,7 +143,7 @@ void CTKPluginListener::AddPlugin(QSharedPointer<ctkPlugin> plugin)
   }
 
   QBuffer buffer(&ba);
-  registry->AddContribution(&buffer, contributor, true, pluginManifest, NULL, token, timestamp);
+  registry->AddContribution(&buffer, contributor, true, pluginManifest, nullptr, token, timestamp);
 }
 
 }

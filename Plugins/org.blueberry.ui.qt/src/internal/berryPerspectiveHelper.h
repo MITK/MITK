@@ -109,7 +109,7 @@ private:
 
     IDropTarget::Pointer Drag(QWidget* currentControl,
         const Object::Pointer& draggedObject, const QPoint& position,
-        const QRect& dragRectangle);
+        const QRect& dragRectangle) override;
 
   private:
     PerspectiveHelper* perspHelper;
@@ -141,9 +141,9 @@ private:
 
     ActualDropTarget(PerspectiveHelper* perspHelper, PartStack::Pointer part, const QRect& dragRectangle);
 
-    void Drop();
+    void Drop() override;
 
-    CursorType GetCursor();
+    CursorType GetCursor() override;
 
   private:
 

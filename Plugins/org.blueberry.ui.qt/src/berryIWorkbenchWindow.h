@@ -100,7 +100,7 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    *
    * @return the active page, or <code>null</code> if none
    */
-  virtual SmartPointer<IWorkbenchPage> GetActivePage() const = 0;
+  virtual SmartPointer<IWorkbenchPage> GetActivePage() const override = 0;
 
   /**
    * Sets or clears the currently active page for this workbench window.

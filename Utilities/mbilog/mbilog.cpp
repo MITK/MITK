@@ -46,20 +46,20 @@ void mbilog::DistributeToBackends(mbilog::LogMessage &l)
   }
 
   //create dummy backend if there is no backend registered (so we have an output anyway)
-  static mbilog::BackendCout* dummyBackend = NULL;
+  static mbilog::BackendCout* dummyBackend = nullptr;
 
-  if(backends.empty() && (dummyBackend == NULL))
+  if(backends.empty() && (dummyBackend == nullptr))
   {
     dummyBackend = new mbilog::BackendCout();
     dummyBackend->SetFull(false);
     RegisterBackend(dummyBackend);
   }
-  else if((backends.size()>1) && (dummyBackend != NULL))
+  else if((backends.size()>1) && (dummyBackend != nullptr))
   {
     //if there was added another backend remove the dummy backend and delete it
     UnregisterBackend(dummyBackend);
     delete dummyBackend;
-    dummyBackend = NULL;
+    dummyBackend = nullptr;
   }
 
   //iterate through all registered images and call the ProcessMessage() methods of the backends

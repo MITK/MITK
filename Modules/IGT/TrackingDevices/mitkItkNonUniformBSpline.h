@@ -161,7 +161,7 @@ protected:
   /**
    * Method to print the object.
    */
-  virtual void PrintSelf( std::ostream& os, Indent indent ) const;
+  virtual void PrintSelf( std::ostream& os, Indent indent ) const override;
 
   /**
    * Points that the spline attempts to intepolate.

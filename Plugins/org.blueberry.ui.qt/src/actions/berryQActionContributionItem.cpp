@@ -85,7 +85,7 @@ void QActionContributionItem::Fill(QStatusBar* /*parent*/)
 
 void QActionContributionItem::Fill(QMenu* parent, QAction* before)
 {
-  if (parent != 0)
+  if (parent != nullptr)
   {
     if (before)
     {
@@ -210,7 +210,7 @@ bool QActionContributionItem::IsDynamic() const
 
 bool QActionContributionItem::IsEnabled() const
 {
-  return action != 0 && action->isEnabled();
+  return action != nullptr && action->isEnabled();
 }
 
 bool QActionContributionItem::IsVisible() const
@@ -506,7 +506,7 @@ void QActionContributionItem::Update(const QString& /*propertyName*/)
 
 bool QActionContributionItem::IsEnabledAllowed() const
 {
-  if (this->GetParent() == 0)
+  if (this->GetParent() == nullptr)
   {
     return true;
   }

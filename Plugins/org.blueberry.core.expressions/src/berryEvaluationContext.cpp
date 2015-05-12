@@ -42,7 +42,7 @@ IEvaluationContext* EvaluationContext::GetParent() const
 
 IEvaluationContext* EvaluationContext::GetRoot() const
 {
-  if (fParent == 0)
+  if (fParent == nullptr)
     return const_cast<EvaluationContext*>(this);
   return fParent->GetRoot();
 }
@@ -105,7 +105,7 @@ EvaluationContext::GetVariable(const QString& name) const
   if (!result.IsNull())
     return result;
 
-  if (fParent != 0)
+  if (fParent != nullptr)
     return fParent->GetVariable(name);
 
   return result;
@@ -123,7 +123,7 @@ EvaluationContext::ResolveVariable(const QString &name, const QList<Object::Poin
     }
   }
 
-  if (fParent != 0)
+  if (fParent != nullptr)
     return fParent->ResolveVariable(name, args);
 
   return Object::Pointer();

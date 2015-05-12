@@ -81,11 +81,11 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
   if(data.isValid())
   {
 
-    QWidget* editorWidget = NULL;
+    QWidget* editorWidget = nullptr;
 
     if(data.type() == QVariant::Color)
     {
-      QPushButton* colorBtn = new QPushButton(parent);
+      auto  colorBtn = new QPushButton(parent);
       QColor color = data.value<QColor>();
 
       QColor result = QColorDialog::getColor(color);
@@ -113,7 +113,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
 
     else if(data.type() == QVariant::Int)
     {
-      QSpinBox* spinBox = new QSpinBox(parent);
+      auto  spinBox = new QSpinBox(parent);
       spinBox->setSingleStep(1);
       spinBox->setMinimum(std::numeric_limits<int>::min());
       spinBox->setMaximum(std::numeric_limits<int>::max());
@@ -123,7 +123,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
     // store doubles
     else if(static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
     {
-      QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
+      auto  spinBox = new QDoubleSpinBox(parent);
       spinBox->setDecimals(2);
       spinBox->setSingleStep(0.1);
       if(name == "opacity")
@@ -143,7 +143,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
     else if(data.type() == QVariant::StringList)
     {
       QStringList entries = data.value<QStringList>();
-      QComboBox* comboBox = new QComboBox(parent);
+      auto  comboBox = new QComboBox(parent);
       comboBox->setEditable(false);
       comboBox->addItems(entries);
 
@@ -260,7 +260,7 @@ void QmitkPropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel* mo
 
 void QmitkPropertyDelegate::commitAndCloseEditor()
 {
-  QWidget* editor = 0;
+  QWidget* editor = nullptr;
   if(QPushButton *pushBtn = qobject_cast<QPushButton *>(sender()))
   {
     editor = pushBtn;
@@ -292,7 +292,7 @@ void QmitkPropertyDelegate::ComboBoxCurrentIndexChanged( int  /*index*/ )
 
 void QmitkPropertyDelegate::SpinBoxValueChanged( const QString&  /*value*/ )
 {
-  QAbstractSpinBox *spinBox = 0;
+  QAbstractSpinBox *spinBox = nullptr;
   if((spinBox = qobject_cast<QSpinBox *>(sender()))
     || (spinBox = qobject_cast<QDoubleSpinBox *>(sender())))
   {

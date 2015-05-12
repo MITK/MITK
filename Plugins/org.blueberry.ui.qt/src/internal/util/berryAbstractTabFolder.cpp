@@ -79,7 +79,7 @@ AbstractTabItem* AbstractTabFolder::GetItem(const QPoint& toFind)
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 AbstractTabItem* AbstractTabFolder::FindItem(Object::Pointer dataToFind)
@@ -96,7 +96,7 @@ AbstractTabItem* AbstractTabFolder::FindItem(Object::Pointer dataToFind)
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 int AbstractTabFolder::IndexOf(AbstractTabItem* item)

@@ -38,32 +38,32 @@ public:
 
   }
 
-  Events::Types GetEventTypes() const
+  Events::Types GetEventTypes() const override
   {
     return Events::ALL;
   }
 
-  void ObjectCreated(const Object* obj)
+  void ObjectCreated(const Object* obj) override
   {
     model->ObjectCreated(obj);
   }
 
-  void ObjectDestroyed(const Object* obj)
+  void ObjectDestroyed(const Object* obj) override
   {
     model->ObjectDestroyed(obj);
   }
 
   void ObjectTracingChanged(unsigned int /*traceId*/, bool /*enabled = true*/,
-      const Object*  /*obj*/ = 0)
+      const Object*  /*obj*/ = nullptr) override
   {
   }
 
-  void SmartPointerCreated(unsigned int id, const Object* obj)
+  void SmartPointerCreated(unsigned int id, const Object* obj) override
   {
     model->SmartPointerCreated(id, obj);
   }
 
-  void SmartPointerDestroyed(unsigned int id, const Object* obj)
+  void SmartPointerDestroyed(unsigned int id, const Object* obj) override
   {
     model->SmartPointerDestroyed(id, obj);
   }
@@ -81,7 +81,7 @@ QtObjectTableModel::QtObjectTableModel(QObject* parent) :
       != objects.end(); ++i)
   {
     QString name = (*i)->GetClassName();
-    ObjectItem* classItem = 0;
+    ObjectItem* classItem = nullptr;
     QListIterator<ObjectItem*> iter(indexData);
     bool classFound = false;
     while (iter.hasNext())
@@ -94,13 +94,13 @@ QtObjectTableModel::QtObjectTableModel(QObject* parent) :
       }
     }
 
-    ObjectItem* instanceItem = new ObjectItem(*i, 0);
+    auto   instanceItem = new ObjectItem(*i, nullptr);
     // get smartpointer ids
     QList<unsigned int> spIds(DebugUtil::GetSmartPointerIDs(*i));
     for (QList<unsigned int>::const_iterator spIdIter = spIds.begin(); spIdIter
         != spIds.end(); ++spIdIter)
     {
-      ObjectItem* spItem = new ObjectItem((unsigned int) (*spIdIter), instanceItem);
+      auto   spItem = new ObjectItem((unsigned int) (*spIdIter), instanceItem);
       instanceItem->children.push_back(spItem);
     }
 
@@ -120,7 +120,7 @@ QtObjectTableModel::QtObjectTableModel(QObject* parent) :
 
   }
 
-  QTimer* timer = new QTimer(this);
+  auto   timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(UpdatePendingData()));
   timer->start(500);
 
@@ -374,7 +374,7 @@ void QtObjectTableModel::ObjectCreated(const Object* obj)
   // object under the right "class" parent. So add it to
   // a list of pending objects.
 
-  ObjectItem* item = new ObjectItem(obj, 0);
+  auto   item = new ObjectItem(obj, nullptr);
   pendingData.push_back(item);
 }
 
@@ -387,7 +387,7 @@ void QtObjectTableModel::UpdatePendingData()
   while (instanceIter.hasNext())
   {
     ObjectItem* instanceItem = instanceIter.next();
-    ObjectItem* classItem = 0;
+    ObjectItem* classItem = nullptr;
     ObjectItem classSearchItem(instanceItem->obj->GetClassName());
     int classIndex = 0;
     classItem = FindObjectItem(classSearchItem, classIndex);
@@ -419,7 +419,7 @@ void QtObjectTableModel::UpdatePendingData()
 
 void QtObjectTableModel::ObjectDestroyed(const Object* obj)
 {
-  ObjectItem searchItem(obj, 0);
+  ObjectItem searchItem(obj, nullptr);
   int index = 0;
   ObjectItem* item = FindObjectItem(searchItem, index);
   if (!item)
@@ -459,7 +459,7 @@ void QtObjectTableModel::ObjectDestroyed(const Object* obj)
 
 void QtObjectTableModel::SmartPointerCreated(unsigned int id, const Object* obj)
 {
-  ObjectItem searchInstance(obj, 0);
+  ObjectItem searchInstance(obj, nullptr);
   int instanceIndex = 0;
   ObjectItem* instanceItem = FindObjectItem(searchInstance, instanceIndex);
   if (!instanceItem)
@@ -486,7 +486,7 @@ void QtObjectTableModel::SmartPointerCreated(unsigned int id, const Object* obj)
 
 void QtObjectTableModel::SmartPointerDestroyed(unsigned int id, const Object* obj)
 {
-  ObjectItem searchSP(id, 0);
+  ObjectItem searchSP(id, nullptr);
   int spIndex = 0;
   ObjectItem* spItem = FindObjectItem(searchSP, spIndex);
   if (!spItem)
@@ -515,7 +515,7 @@ void QtObjectTableModel::SmartPointerDestroyed(unsigned int id, const Object* ob
   }
 
   int parentIndex = 0;
-  ObjectItem searchInstance(obj, 0);
+  ObjectItem searchInstance(obj, nullptr);
   ObjectItem* instanceItem = FindObjectItem(searchInstance, parentIndex);
   beginRemoveRows(createIndex(parentIndex, 0, instanceItem), spIndex, spIndex);
   instanceItem->children.removeAt(spIndex);
@@ -539,7 +539,7 @@ ObjectItem* QtObjectTableModel::FindObjectItem(
           return next;
         ++index;
       }
-      return 0;
+      return nullptr;
     }
     case ObjectItem::INSTANCE:
     {
@@ -557,7 +557,7 @@ ObjectItem* QtObjectTableModel::FindObjectItem(
           ++index;
         }
       }
-      return 0;
+      return nullptr;
     }
     case ObjectItem::SMARTPOINTER:
     {
@@ -581,10 +581,10 @@ ObjectItem* QtObjectTableModel::FindObjectItem(
         }
 
       }
-      return 0;
+      return nullptr;
     }
   }
-  return 0;
+  return nullptr;
 }
 
 }

@@ -58,12 +58,12 @@ protected:
 
     berryObjectMacro(CONTINUE_)
 
-    bool Handles(const QString&  /*namespaze*/, const QString&  /*method*/);
-    bool IsInstantiated();
-    bool IsDeclaringPluginActive();
-    IPropertyTester* Instantiate();
+    bool Handles(const QString&  /*namespaze*/, const QString&  /*method*/) override;
+    bool IsInstantiated() override;
+    bool IsDeclaringPluginActive() override;
+    IPropertyTester* Instantiate() override;
     bool Test(Object::ConstPointer /*receiver*/, const QString& /*method*/,
-              const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/);
+              const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/) override;
   };
 
   static const CONTINUE_ CONTINUE;

@@ -32,10 +32,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDir>
 #include <QMenu>
 #include <QAction>
+#include <QDirIterator>
 
 // MITK
 #include <mitkDataStorage.h>
 #include <QmitkIOUtil.h>
+
+// Poco
+#include <Poco/Zip/Decompress.h>
 
 const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
@@ -203,28 +207,69 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       }
       else
       {
-        MITK_INFO << "Download started ...";
-        MITK_INFO << "...";
-        file->download(filePath);
-
-        // Testing if the file exists now
-        if (downDir.exists(file->name()))
+        if (file->property("collection") == QString("DICOM"))
         {
-          MITK_INFO << "Download of " << file->name().toStdString() << " was completed!";
+          ctkXnatObject* parent = file->parent();
+
+          filePath = m_DownloadPath + parent->property("label") + ".zip";
+          parent->download(filePath);
+
+          std::ifstream in(filePath.toStdString().c_str(), std::ios::binary);
+          poco_assert(in);
+
+          // decompress to XNAT_DOWNLOAD dir
+          Poco::Zip::Decompress dec(in, Poco::Path(m_DownloadPath.toStdString()));
+          dec.decompressAllFiles();
+
+          in.close();
+          QFile::remove(filePath);
         }
         else
         {
-          MITK_INFO << "Download of " << file->name().toStdString() << " failed!";
+          MITK_INFO << "Download started ...";
+          MITK_INFO << "...";
+          file->download(filePath);
+
+          // Testing if the file exists now
+          if (downDir.exists(file->name()))
+          {
+            MITK_INFO << "Download of " << file->name().toStdString() << " was completed!";
+          }
+          else
+          {
+            MITK_INFO << "Download of " << file->name().toStdString() << " failed!";
+          }
         }
       }
-      if (downDir.exists(file->name()))
+      if (downDir.exists(file->name()) || file->property("collection") == "DICOM")
       {
         if (loadData)
         {
+          if (file->property("collection") == "DICOM")
+          {
+            // Search for the downloaded file an its file path
+            QDirIterator it(m_DownloadPath, QStringList() << file->name(), QDir::Files, QDirIterator::Subdirectories);
+            while (it.hasNext()) {
+              it.next();
+              filePath = it.filePath();
+            }
+          }
+
+          if (filePath.isEmpty())
+          {
+            MITK_INFO << "Decompressing failed!";
+            return;
+          }
+          else if (!QFile(filePath).exists())
+          {
+            MITK_INFO << "Decompressing failed!";
+            return;
+          }
+
           mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
           mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
           QStringList list;
-          list << (m_DownloadPath + file->name());
+          list << filePath;
           try
           {
             QmitkIOUtil::Load(list, *dataStorage);

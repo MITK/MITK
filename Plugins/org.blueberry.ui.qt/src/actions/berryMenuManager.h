@@ -140,7 +140,7 @@ public:
   MenuManager(const QString& text, const QIcon& image,
               const QString& id);
 
-  bool IsDirty() const;
+  bool IsDirty() const override;
 
   /**
    * Creates and returns a Qt menu control for this menu,
@@ -166,38 +166,38 @@ public:
    */
   QMenuBar* CreateMenuBar(QWidget* parent);
 
-  void AddMenuListener(QObject* listener);
-  void RemoveMenuListener(QObject *listener);
+  void AddMenuListener(QObject* listener) override;
+  void RemoveMenuListener(QObject *listener) override;
 
   /*
    * @see IContributionItem#Fill(QStatusBar*)
    */
-  void Fill(QStatusBar* parent);
+  void Fill(QStatusBar* parent) override;
 
   /*
    * @see IContributionItem#Fill(QToolBar*, int)
    */
-  void Fill(QToolBar* parent, QAction *index);
+  void Fill(QToolBar* parent, QAction *index) override;
 
   /*
    * @see IContributionItem#Fill(QMenu*, int)
    */
-  void Fill(QMenu* parent, QAction *before);
+  void Fill(QMenu* parent, QAction *before) override;
 
   /*
    * @see IContributionItem#Fill(QMenuBar*, int)
    */
-  void Fill(QMenuBar* parent, QAction *before);
+  void Fill(QMenuBar* parent, QAction *before) override;
 
   /*
    * @see IMenuManager#FindMenuUsingPath(const QString&)
    */
-  IMenuManager::Pointer FindMenuUsingPath(const QString& path) const;
+  IMenuManager::Pointer FindMenuUsingPath(const QString& path) const override;
 
   /*
    * @see IMenuManager#FindUsingPath(const QString&)
    */
-  IContributionItem::Pointer FindUsingPath(const QString& path) const;
+  IContributionItem::Pointer FindUsingPath(const QString& path) const override;
 
   /**
    * Returns the menu id. The menu id is used when creating a contribution
@@ -205,7 +205,7 @@ public:
    *
    * @return the menu id
    */
-  QString GetId() const;
+  QString GetId() const override;
 
   /**
    * Returns the SWT menu control for this menu manager.
@@ -232,7 +232,7 @@ public:
   /*
    * @see IContributionManager#GetOverrides()
    */
-  SmartPointer<IContributionManagerOverrides> GetOverrides();
+  SmartPointer<IContributionManagerOverrides> GetOverrides() override;
 
   /**
    * Returns the parent contribution manager of this manger.
@@ -244,12 +244,12 @@ public:
   /*
    * @see IMenuManager#GetRemoveAllWhenShown()
    */
-  bool GetRemoveAllWhenShown() const;
+  bool GetRemoveAllWhenShown() const override;
 
   /*
    * @see IContributionItem#IsDynamic()
    */
-  bool IsDynamic() const;
+  bool IsDynamic() const override;
 
   /**
    * Returns whether this menu should be enabled or not.
@@ -262,28 +262,28 @@ public:
    * @return <code>true</code> if enabled, and
    *   <code>false</code> if disabled
    */
-  bool IsEnabled() const;
+  bool IsEnabled() const override;
 
   /*
    * @see IContributionItem#IsGroupMarker()
    */
-  bool IsGroupMarker() const;
+  bool IsGroupMarker() const override;
 
   /*
    * @see IContributionItem#IsSeparator()
    */
-  bool IsSeparator() const;
+  bool IsSeparator() const override;
 
   /*
    * @see IContributionItem#IsVisible()
    */
-  bool IsVisible() const;
+  bool IsVisible() const override;
 
   /**
    * The <code>MenuManager</code> implementation of this <code>ContributionManager</code> method
    * also propagates the dirty flag up the parent chain.
    */
-  void MarkDirty();
+  void MarkDirty() override;
 
   /*
    * @see IMenuManager#removeMenuListener(IMenuListener)
@@ -293,7 +293,7 @@ public:
   /*
    * @IContributionItem#SaveWidgetState()
    */
-  void SaveWidgetState();
+  void SaveWidgetState() override;
 
   /**
    * Sets the overrides for this contribution manager
@@ -305,17 +305,17 @@ public:
   /*
    * @see IContributionItem#SetParent(IContributionManager)
    */
-  void SetParent(IContributionManager* manager);
+  void SetParent(IContributionManager* manager) override;
 
   /*
    * @see IMenuManager#SetRemoveAllWhenShown(boolean)
    */
-  void SetRemoveAllWhenShown(bool removeAll);
+  void SetRemoveAllWhenShown(bool removeAll) override;
 
   /*
    * @see IContributionItem#SetVisible(bool)
    */
-  void SetVisible(bool visible);
+  void SetVisible(bool visible) override;
 
   /**
    * Sets the command id of this action. This simply allows the menu
@@ -330,9 +330,9 @@ public:
   /*
    * @see IContributionItem#Update()
    */
-  void Update();
+  void Update() override;
 
-  void Update(const QString& property);
+  void Update(const QString& property) override;
 
   /**
    * The <code>MenuManager</code> implementation of this <code>IContributionManager</code>
@@ -340,12 +340,12 @@ public:
    *
    * @see #updateAll
    */
-  void Update(bool force);
+  void Update(bool force) override;
 
   /*
    * @see IMenuManager#UpdateAll(bool)
    */
-  void UpdateAll(bool force);
+  void UpdateAll(bool force) override;
 
 private:
 

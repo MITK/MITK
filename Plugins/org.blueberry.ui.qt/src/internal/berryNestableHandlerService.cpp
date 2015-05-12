@@ -64,7 +64,7 @@ void NestableHandlerService::Deactivate()
   {
     if (localActivationsToParentActivations.contains(localActivations[i]))
     {
-      localActivationsToParentActivations.insert(localActivations[i], NULL);
+      localActivationsToParentActivations.insert(localActivations[i], nullptr);
     }
   }
 
@@ -78,7 +78,7 @@ SmartPointer<IHandlerActivation> NestableHandlerService::DoActivation(
   {
     return SlaveHandlerService::DoActivation(localActivation);
   }
-  localActivationsToParentActivations.insert(localActivation, NULL);
+  localActivationsToParentActivations.insert(localActivation, nullptr);
   return localActivation;
 }
 

@@ -100,9 +100,9 @@ DataStorageEditorInput::GetDataStorageReference()
   {
     ctkPluginContext* context = PluginActivator::GetContext();
     ctkServiceReference serviceRef = context->getServiceReference<IDataStorageService>();
-    if (!serviceRef) return IDataStorageReference::Pointer(0);
+    if (!serviceRef) return IDataStorageReference::Pointer(nullptr);
     IDataStorageService* dataService = context->getService<IDataStorageService>(serviceRef);
-    if (!dataService) return IDataStorageReference::Pointer(0);
+    if (!dataService) return IDataStorageReference::Pointer(nullptr);
     m_DataStorageRef = dataService->GetDefaultDataStorage();
   }
 

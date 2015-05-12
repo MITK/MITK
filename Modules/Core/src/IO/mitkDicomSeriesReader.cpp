@@ -144,14 +144,14 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, 
   {
     if( filenames.empty() )
     {
-      return NULL;
+      return nullptr;
     }
 
     return node;
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -167,7 +167,7 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames,
   if( filenames.empty() )
   {
     MITK_DEBUG << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic.";
-    node.SetData(NULL);
+    node.SetData(nullptr);
     return true; // this is not actually an error but the result is very simple
   }
 
@@ -504,7 +504,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   MITK_DEBUG << "--------------------------------------------------------------------------------";
   MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
   unsigned int fileIndex(0);
-  for (StringContainer::const_iterator fileIter = files.begin();
+  for (auto fileIter = files.begin();
        fileIter != files.end();
        ++fileIter, ++fileIndex)
   {
@@ -774,7 +774,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   }
 
   // assign files IDs that will separate them for loading into image blocks
-  for (gdcm::Scanner::ConstIterator fileIter = scanner.Begin();
+  for (auto fileIter = scanner.Begin();
        fileIter != scanner.End();
        ++fileIter)
   {
@@ -1348,11 +1348,11 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
   std::string propertyKeySOPInstanceNumber = "dicom.image.0008.0018";
 
   // tags for each image
-  for ( std::list<StringContainer>::iterator i = imageBlock.begin(); i != imageBlock.end(); i++, timeStep++ )
+  for ( auto i = imageBlock.begin(); i != imageBlock.end(); i++, timeStep++ )
   {
     const StringContainer& files = (*i);
     unsigned int slice(0);
-    for ( StringContainer::const_iterator fIter = files.begin();
+    for ( auto fIter = files.begin();
           fIter != files.end();
           ++fIter, ++slice )
     {
@@ -1390,7 +1390,7 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
   const itk::MetaDataDictionary& dict = io->GetMetaDataDictionary();
   const TagToPropertyMapType& propertyLookup = DicomSeriesReader::GetDICOMTagsToMITKPropertyMap();
 
-  itk::MetaDataDictionary::ConstIterator dictIter = dict.Begin();
+  auto dictIter = dict.Begin();
   while ( dictIter != dict.End() )
   {
     //MITK_DEBUG << "Key " << dictIter->first;
@@ -1399,7 +1399,7 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
     {
       //MITK_DEBUG << "Value " << value;
 
-      TagToPropertyMapType::const_iterator valuePosition = propertyLookup.find( dictIter->first );
+      auto valuePosition = propertyLookup.find( dictIter->first );
       if ( valuePosition != propertyLookup.end() )
       {
         std::string propertyKey = valuePosition->second;
@@ -1448,7 +1448,7 @@ void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBl
 
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
 {
-  const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
+  const char* previousCLocale = setlocale(LC_NUMERIC, nullptr);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
   std::locale l( "C" );
@@ -1468,7 +1468,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   try
   {
     Image::Pointer image = preLoadedImageBlock.IsNull() ? Image::New() : preLoadedImageBlock;
-    CallbackCommand *command = callback ? new CallbackCommand(callback) : 0;
+    CallbackCommand *command = callback ? new CallbackCommand(callback) : nullptr;
     bool initialize_node = false;
 
     /* special case for Philips 3D+t ultrasound images */
@@ -1760,7 +1760,7 @@ DicomSeriesReader
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -1782,7 +1782,7 @@ DicomSeriesReader
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 } // end namespace mitk

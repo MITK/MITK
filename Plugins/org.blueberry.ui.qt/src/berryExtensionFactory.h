@@ -62,13 +62,13 @@ public:
    * Creates the object referenced by the factory id obtained from the
    * extension data.
    */
-  QObject* Create();
+  QObject* Create() override;
 
   /*
    * @see IExecutableExtension#SetInitializationData
    */
   void SetInitializationData(const SmartPointer<IConfigurationElement>& config,
-                             const QString& propertyName, const Object::Pointer& data);
+                             const QString& propertyName, const Object::Pointer& data) override;
 
 private:
 

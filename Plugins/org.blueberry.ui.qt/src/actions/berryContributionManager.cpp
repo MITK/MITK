@@ -67,7 +67,7 @@ SmartPointer<IContributionItem> ContributionManager::Find(const QString& id) con
       return item;
     }
   }
-  return IContributionItem::Pointer(0);
+  return IContributionItem::Pointer(nullptr);
 }
 
 QList<SmartPointer<IContributionItem> > ContributionManager::GetItems() const
@@ -85,11 +85,11 @@ SmartPointer<IContributionManagerOverrides> ContributionManager::GetOverrides()
   if (overrides.IsNull())
   {
     struct _DefaultOverride : public IContributionManagerOverrides {
-      int GetEnabled(const IContributionItem* /*item*/) const {
+      int GetEnabled(const IContributionItem* /*item*/) const override {
         return -1;
       }
 
-      int GetVisible(const IContributionItem* /*item*/) const {
+      int GetVisible(const IContributionItem* /*item*/) const override {
         return -1;
       }
     };
@@ -216,7 +216,7 @@ SmartPointer<IContributionItem> ContributionManager::Remove(const SmartPointer<I
     ItemRemoved(item);
     return item;
   }
-  return IContributionItem::Pointer(0);
+  return IContributionItem::Pointer(nullptr);
 }
 
 void ContributionManager::RemoveAll()
@@ -329,7 +329,7 @@ void ContributionManager::ItemAdded(const SmartPointer<IContributionItem>& item)
 
 void ContributionManager::ItemRemoved(const SmartPointer<IContributionItem>& item)
 {
-  item->SetParent(0);
+  item->SetParent(nullptr);
   MarkDirty();
   if (item->IsDynamic())
   {

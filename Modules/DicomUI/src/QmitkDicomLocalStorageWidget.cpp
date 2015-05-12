@@ -28,7 +28,7 @@ const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.Qm
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
   : QWidget(parent)
-  , m_Controls(0)
+  , m_Controls(nullptr)
   , m_LocalIndexer(new ctkDICOMIndexer(parent))
 {
     CreateQtPartControl(this);

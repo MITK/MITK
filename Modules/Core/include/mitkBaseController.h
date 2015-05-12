@@ -61,7 +61,7 @@ protected:
   /**
   * @brief Default Constructor
   **/
-  BaseController(const char * type = NULL);
+  BaseController(const char * type = nullptr);
 
   /**
   * @brief Default Destructor

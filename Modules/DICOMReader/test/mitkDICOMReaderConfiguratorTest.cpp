@@ -31,7 +31,7 @@ int mitkDICOMReaderConfiguratorTest(int /*argc*/, char* /*argv*/[])
   readerSource->LoadBuiltIn3DnTConfigs();
 
   mitk::DICOMFileReaderSelector::ReaderList allReaders = readerSource->GetAllConfiguredReaders(); // this already parses XML config for this reader
-  for (mitk::DICOMFileReaderSelector::ReaderList::iterator rIter = allReaders.begin();
+  for (auto rIter = allReaders.begin();
        rIter != allReaders.end();
        ++rIter)
   {

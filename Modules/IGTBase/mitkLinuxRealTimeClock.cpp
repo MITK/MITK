@@ -45,7 +45,7 @@ double mitk::LinuxRealTimeClock::GetCurrentStamp()
 {
   struct timeval tval;
 
-  if ( ::gettimeofday( &tval, 0 )!= 0 )
+  if ( ::gettimeofday( &tval, nullptr )!= 0 )
   {
     itkGenericOutputMacro("gettimeofday-method could not successfully acquire the current time");
     return -1;

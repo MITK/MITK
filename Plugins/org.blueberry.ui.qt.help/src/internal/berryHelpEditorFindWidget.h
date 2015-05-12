@@ -33,7 +33,7 @@ class HelpEditorFindWidget : public QWidget
 
 public:
 
-  HelpEditorFindWidget(QWidget *parent = 0);
+  HelpEditorFindWidget(QWidget *parent = nullptr);
   ~HelpEditorFindWidget();
 
   void show();
@@ -54,8 +54,8 @@ Q_SIGNALS:
 
 protected:
 
-  void hideEvent(QHideEvent* event);
-  void showEvent(QShowEvent * event);
+  void hideEvent(QHideEvent* event) override;
+  void showEvent(QShowEvent * event) override;
 
 private Q_SLOTS:
 
@@ -64,7 +64,7 @@ private Q_SLOTS:
 
 private:
 
-  bool eventFilter(QObject *object, QEvent *e);
+  bool eventFilter(QObject *object, QEvent *e) override;
   QToolButton* setupToolButton(const QString &text, const QString &icon);
 
 private:

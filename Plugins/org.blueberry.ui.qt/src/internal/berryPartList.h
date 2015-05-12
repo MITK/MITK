@@ -40,7 +40,7 @@ private:
 public:
 
   using IPropertyChangeListener::PropertyChange;
-  void PropertyChange(const Object::Pointer& source, int propId);
+  void PropertyChange(const Object::Pointer& source, int propId) override;
 
   IWorkbenchPartReference::Pointer GetActivePartReference();
 

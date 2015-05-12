@@ -33,10 +33,9 @@ mitk::FileReaderRegistry::FileReaderRegistry()
 
 mitk::FileReaderRegistry::~FileReaderRegistry()
 {
-  for (std::map<mitk::IFileReader*, us::ServiceObjects<mitk::IFileReader> >::iterator iter = m_ServiceObjects.begin(),
-    end = m_ServiceObjects.end(); iter != end; ++iter)
+  for (auto & elem : m_ServiceObjects)
   {
-    iter->second.UngetService(iter->first);
+    elem.second.UngetService(elem.first);
   }
 }
 
@@ -116,9 +115,8 @@ void mitk::FileReaderRegistry::UngetReader(mitk::IFileReader* reader)
 
 void mitk::FileReaderRegistry::UngetReaders(const std::vector<mitk::IFileReader*>& readers)
 {
-  for (std::vector<mitk::IFileReader*>::const_iterator iter = readers.begin(), end = readers.end();
-    iter != end; ++iter)
+  for (const auto & reader : readers)
   {
-    this->UngetReader(*iter);
+    this->UngetReader(reader);
   }
 }

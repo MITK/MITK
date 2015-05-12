@@ -33,14 +33,14 @@ class QmitkInfoDialog : public QDialog
   Q_OBJECT
 
   public:
-    QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& _Nodes, QWidget * parent = 0, Qt::WindowFlags f = 0 );
+    QmitkInfoDialog(const QList<mitk::DataNode::Pointer>& _Nodes, QWidget * parent = nullptr, Qt::WindowFlags f = nullptr );
   public slots:
     void OnSelectionChanged(const mitk::DataNode*);
     void OnSearchButtonClicked ( bool checked = false );
     void OnCancelButtonClicked ( bool checked = false );
     void KeyWordTextChanged(const QString & text);
   protected:
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
   protected:
     QLineEdit* m_KeyWord;
     QPushButton* m_SearchButton;

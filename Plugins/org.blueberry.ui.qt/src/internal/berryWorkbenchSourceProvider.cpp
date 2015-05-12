@@ -59,15 +59,15 @@ const QList<QString> WorkbenchSourceProvider::PROVIDED_SOURCE_NAMES = QList<QStr
     << ISources::ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME();
 
 WorkbenchSourceProvider::WorkbenchSourceProvider()
-  : workbench(NULL)
-  , lastActiveEditor(NULL)
-  , lastActivePart(NULL)
-  , lastActivePartSite(NULL)
-  , lastShowInInput(NULL)
-  , lastEditorInput(NULL)
-  , display(NULL)
-  , lastActiveShell(NULL)
-  , lastActiveWorkbenchWindowShell(NULL)
+  : workbench(nullptr)
+  , lastActiveEditor(nullptr)
+  , lastActivePart(nullptr)
+  , lastActivePartSite(nullptr)
+  , lastShowInInput(nullptr)
+  , lastEditorInput(nullptr)
+  , display(nullptr)
+  , lastActiveShell(nullptr)
+  , lastActiveWorkbenchWindowShell(nullptr)
 {
 }
 
@@ -92,10 +92,10 @@ WorkbenchSourceProvider::~WorkbenchSourceProvider()
   }
   workbench->RemoveWindowListener(this);
   qApp->removeEventFilter(this);
-  HookListener(const_cast<WorkbenchWindow*>(lastActiveWorkbenchWindow.Lock().GetPointer()), NULL);
+  HookListener(const_cast<WorkbenchWindow*>(lastActiveWorkbenchWindow.Lock().GetPointer()), nullptr);
   lastActiveWorkbenchWindow.Reset();
-  lastActiveWorkbenchWindowShell = NULL;
-  lastActiveShell = NULL;
+  lastActiveWorkbenchWindowShell = nullptr;
+  lastActiveShell = nullptr;
   lastWindow.Reset();
 }
 
@@ -161,12 +161,12 @@ void WorkbenchSourceProvider::UpdateWindows(IWorkbenchWindow* newWindow)
   {
     lastWindow.Lock()->GetSelectionService()->RemoveSelectionListener(this);
   }
-  if (newWindow != NULL)
+  if (newWindow != nullptr)
   {
     newWindow->GetSelectionService()->AddSelectionListener(this);
     selection = newWindow->GetSelectionService()->GetSelection();
   }
-  SelectionChanged(IWorkbenchPart::Pointer(0), selection);
+  SelectionChanged(IWorkbenchPart::Pointer(nullptr), selection);
   lastWindow = IWorkbenchWindow::Pointer(newWindow);
 }
 
@@ -228,7 +228,7 @@ void WorkbenchSourceProvider::HandleCheck(const SmartPointer<const Shell>& s)
   {
     lastActiveShell = s.GetPointer();
     CheckActivePart();
-    IWorkbenchWindow* window = NULL;
+    IWorkbenchWindow* window = nullptr;
     if (s.IsNotNull())
     {
       if (s->GetData().Cast<WorkbenchWindow>())
@@ -267,7 +267,7 @@ void WorkbenchSourceProvider::CheckActivePart(bool updateShowInSelection)
     }
     else
     {
-      lastActivePart = NULL;
+      lastActivePart = nullptr;
     }
   }
   const Object::ConstPointer newActivePartId = currentState.value(ISources::ACTIVE_PART_ID_NAME());
@@ -280,7 +280,7 @@ void WorkbenchSourceProvider::CheckActivePart(bool updateShowInSelection)
     }
     else
     {
-      lastActivePartId = NULL;
+      lastActivePartId = nullptr;
     }
   }
   const Object::ConstPointer newActivePartSite = currentState.value(ISources::ACTIVE_SITE_NAME());
@@ -293,7 +293,7 @@ void WorkbenchSourceProvider::CheckActivePart(bool updateShowInSelection)
     }
     else
     {
-      lastActivePartSite = NULL;
+      lastActivePartSite = nullptr;
     }
   }
   const Object::ConstPointer newShowInInput = currentState.value(ISources::SHOW_IN_INPUT());
@@ -310,7 +310,7 @@ void WorkbenchSourceProvider::CheckActivePart(bool updateShowInSelection)
   if (newActiveEditor != lastActiveEditor)
   {
     sources |= ISources::ACTIVE_EDITOR();
-    newActiveEditor = (newActiveEditor == IEvaluationContext::UNDEFINED_VARIABLE ? Object::ConstPointer(0)
+    newActiveEditor = (newActiveEditor == IEvaluationContext::UNDEFINED_VARIABLE ? Object::ConstPointer(nullptr)
                                                                                  : newActiveEditor);
     HookListener(const_cast<IEditorPart*>(lastActiveEditor), const_cast<IEditorPart*>(newActiveEditor.Cast<const IEditorPart>().GetPointer()));
     lastActiveEditor = newActiveEditor.Cast<const IEditorPart>().GetPointer();
@@ -325,7 +325,7 @@ void WorkbenchSourceProvider::CheckActivePart(bool updateShowInSelection)
     }
     else
     {
-      lastEditorInput = NULL;
+      lastEditorInput = nullptr;
     }
   }
   const Object::ConstPointer newActiveEditorId = currentState.value(ISources::ACTIVE_EDITOR_ID_NAME());
@@ -338,7 +338,7 @@ void WorkbenchSourceProvider::CheckActivePart(bool updateShowInSelection)
     }
     else
     {
-      lastActiveEditorId = NULL;
+      lastActiveEditorId = nullptr;
     }
   }
 
@@ -394,11 +394,11 @@ SmartPointer<ShowInContext> WorkbenchSourceProvider::GetContext(const SmartPoint
   {
     Object::Pointer input = editorPart->GetEditorInput();
     ISelectionProvider::Pointer sp = sourcePart->GetSite()->GetSelectionProvider();
-    ISelection::ConstPointer sel = sp.IsNull() ? ISelection::ConstPointer(0) : sp->GetSelection();
+    ISelection::ConstPointer sel = sp.IsNull() ? ISelection::ConstPointer(nullptr) : sp->GetSelection();
     ShowInContext::Pointer context(new ShowInContext(input, sel));
     return context;
   }
-  return ShowInContext::Pointer(0);
+  return ShowInContext::Pointer(nullptr);
 }
 
 IWorkbenchWindow* WorkbenchSourceProvider::GetActiveWindow() const
@@ -416,7 +416,7 @@ IWorkbenchWindow* WorkbenchSourceProvider::GetActiveWindow() const
   {
     return workbench->GetActiveWorkbenchWindow().GetPointer();
   }
-  return NULL;
+  return nullptr;
 }
 
 void WorkbenchSourceProvider::UpdateActivePart(ISourceProvider::StateMapType& currentState) const
@@ -435,7 +435,7 @@ void WorkbenchSourceProvider::UpdateActivePart(ISourceProvider::StateMapType& cu
   currentState.insert(ISources::SHOW_IN_SELECTION(), IEvaluationContext::UNDEFINED_VARIABLE);
 
   IWorkbenchWindow* const activeWorkbenchWindow = GetActiveWindow();
-  if (activeWorkbenchWindow != NULL)
+  if (activeWorkbenchWindow != nullptr)
   {
     const IWorkbenchPage::Pointer activeWorkbenchPage = activeWorkbenchWindow->GetActivePage();
     if (activeWorkbenchPage.IsNotNull())
@@ -777,13 +777,13 @@ void WorkbenchSourceProvider::HandleInputChanged(const SmartPointer<IEditorPart>
 void WorkbenchSourceProvider::HookListener(WorkbenchWindow* lastActiveWorkbenchWindow,
                   WorkbenchWindow* newActiveWorkbenchWindow)
 {
-  if (lastActiveWorkbenchWindow != NULL)
+  if (lastActiveWorkbenchWindow != nullptr)
   {
     lastActiveWorkbenchWindow->RemovePropertyChangeListener(this);
     lastActiveWorkbenchWindow->RemovePerspectiveListener(this);
   }
 
-  if (newActiveWorkbenchWindow != NULL)
+  if (newActiveWorkbenchWindow != nullptr)
   {
     newActiveWorkbenchWindow->AddPropertyChangeListener(this);
     newActiveWorkbenchWindow->AddPerspectiveListener(this);
@@ -793,11 +793,11 @@ void WorkbenchSourceProvider::HookListener(WorkbenchWindow* lastActiveWorkbenchW
 void WorkbenchSourceProvider::HookListener(IEditorPart* lastActiveEditor,
                                            IEditorPart* newActiveEditor)
 {
-  if (lastActiveEditor != NULL)
+  if (lastActiveEditor != nullptr)
   {
     lastActiveEditor->RemovePropertyListener(this);
   }
-  if (newActiveEditor != NULL)
+  if (newActiveEditor != nullptr)
   {
     newActiveEditor->AddPropertyListener(this);
   }
@@ -811,7 +811,7 @@ void WorkbenchSourceProvider::UpdateActiveShell(ISourceProvider::StateMapType& c
   {
     windowShell = activeWindow->property("shell");
   }
-  Shell::Pointer newActiveShell(windowShell.isValid() ? windowShell.value<Shell*>() : NULL);
+  Shell::Pointer newActiveShell(windowShell.isValid() ? windowShell.value<Shell*>() : nullptr);
   currentState.insert(ISources::ACTIVE_SHELL_NAME(), newActiveShell);
 
   /*

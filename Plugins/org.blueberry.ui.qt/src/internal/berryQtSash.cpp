@@ -31,7 +31,7 @@ namespace berry
  Creates a QtSash with the given orientation, parent, and smoothness.
  */
 QtSash::QtSash(Qt::Orientation orientation, QWidget *parent, bool smooth) :
-  QWidget(parent), smooth(smooth), orientation(orientation), rubberBand(0),
+  QWidget(parent), smooth(smooth), orientation(orientation), rubberBand(nullptr),
       lastX(0), lastY(0)
 {
   if (orientation == Qt::Horizontal)

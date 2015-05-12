@@ -20,16 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stack>
 
 mitk::TestDICOMLoading::TestDICOMLoading()
-:m_PreviousCLocale(NULL)
+:m_PreviousCLocale(nullptr)
 {
 }
 
 void mitk::TestDICOMLoading::SetDefaultLocale()
 {
   // remember old locale only once
-  if (m_PreviousCLocale == NULL)
+  if (m_PreviousCLocale == nullptr)
   {
-    m_PreviousCLocale = setlocale(LC_NUMERIC, NULL);
+    m_PreviousCLocale = setlocale(LC_NUMERIC, nullptr);
 
     // set to "C"
     setlocale(LC_NUMERIC, "C");
@@ -51,7 +51,7 @@ void mitk::TestDICOMLoading::ResetUserLocale()
     std::cin.imbue(m_PreviousCppLocale);
     std::cout.imbue(m_PreviousCppLocale);
 
-    m_PreviousCLocale = NULL;
+    m_PreviousCLocale = nullptr;
   }
 }
 
@@ -61,7 +61,7 @@ mitk::TestDICOMLoading::ImageList
 mitk::TestDICOMLoading
 ::LoadFiles( const StringList& files )
 {
-  for (StringList::const_iterator iter = files.begin();
+  for (auto iter = files.begin();
        iter != files.end();
        ++iter)
   {
@@ -102,7 +102,7 @@ mitk::TestDICOMLoading
   DICOMImageBlockDescriptor block;
 
   DICOMImageFrameList framelist;
-  for (StringList::const_iterator iter = files.begin();
+  for (auto iter = files.begin();
        iter != files.end();
        ++iter)
   {
@@ -132,7 +132,7 @@ mitk::TestDICOMLoading
   if  ( reader->GetNumberOfOutputs() != 1 )
   {
     MITK_ERROR << "Reader produce " << reader->GetNumberOfOutputs() << " images instead of 1 expected..";
-    return NULL;
+    return nullptr;
   }
 
   DICOMImageBlockDescriptor block = reader->GetOutput(0); // creates a block copy
@@ -183,7 +183,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
 {
   std::stringstream result;
 
-  if (image == NULL) return result.str();
+  if (image == nullptr) return result.str();
 
   SetDefaultLocale();
 

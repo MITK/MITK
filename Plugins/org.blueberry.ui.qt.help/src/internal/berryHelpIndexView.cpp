@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 HelpIndexWidget::HelpIndexWidget()
-  : QListView(0)
+  : QListView(nullptr)
 {
   setEditTriggers(QAbstractItemView::NoEditTriggers);
   setUniformItemSizes(true);
@@ -90,7 +90,7 @@ void HelpIndexWidget::filterIndices(const QString &filter, const QString &wildca
 }
 
 HelpIndexView::HelpIndexView()
-  : m_IndexWidget(0)
+  : m_IndexWidget(nullptr)
 {
 }
 
@@ -100,9 +100,9 @@ HelpIndexView::~HelpIndexView()
 
 void HelpIndexView::CreateQtPartControl(QWidget* parent)
 {
-  if (m_IndexWidget == 0)
+  if (m_IndexWidget == nullptr)
   {
-    QVBoxLayout *layout = new QVBoxLayout(parent);
+    auto  layout = new QVBoxLayout(parent);
     //QLabel *l = new QLabel(tr("&Look for:"));
     //layout->addWidget(l);
 

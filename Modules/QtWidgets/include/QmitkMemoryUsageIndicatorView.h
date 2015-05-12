@@ -32,7 +32,7 @@ class MITKQTWIDGETS_EXPORT QmitkMemoryUsageIndicatorView : public QWidget, publi
 public:
 
   /// constructor
-  QmitkMemoryUsageIndicatorView( QWidget * parent=0, Qt::WindowFlags f = 0 );
+  QmitkMemoryUsageIndicatorView( QWidget * parent=nullptr, Qt::WindowFlags f = nullptr );
 
   /// destructor
   ~QmitkMemoryUsageIndicatorView();

@@ -47,10 +47,10 @@ void mitk::PlanarFigureWriter::GenerateData()
   }
 
   TiXmlDocument document;
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
+  auto  decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
   document.LinkEndChild( decl );
 
-  TiXmlElement* version = new TiXmlElement("Version");
+  auto  version = new TiXmlElement("Version");
   version->SetAttribute("Writer",  __FILE__ );
   version->SetAttribute("CVSRevision",  "$Revision: 17055 $" );
   version->SetAttribute("FileVersion",  1 );
@@ -64,7 +64,7 @@ void mitk::PlanarFigureWriter::GenerateData()
     InputType::Pointer pf = this->GetInput( i );
     if (pf.IsNull())
       continue;
-    TiXmlElement* pfElement = new TiXmlElement("PlanarFigure");
+    auto  pfElement = new TiXmlElement("PlanarFigure");
     pfElement->SetAttribute("type", pf->GetNameOfClass());
     document.LinkEndChild(pfElement);
 
@@ -94,17 +94,17 @@ void mitk::PlanarFigureWriter::GenerateData()
 
       mitk::BasePropertySerializer* serializer = dynamic_cast< mitk::BasePropertySerializer* >(
         allSerializers.begin()->GetPointer() );
-      if ( serializer == NULL )
+      if ( serializer == nullptr )
       {
         // Serializer not valid; skip this property
       }
 
-      TiXmlElement* keyElement = new TiXmlElement( "property" );
+      auto  keyElement = new TiXmlElement( "property" );
       keyElement->SetAttribute( "key", it->first );
       keyElement->SetAttribute( "type", prop->GetNameOfClass() );
 
         serializer->SetProperty( prop );
-      TiXmlElement* valueElement = NULL;
+      TiXmlElement* valueElement = nullptr;
       try
       {
         valueElement = serializer->Serialize();
@@ -113,7 +113,7 @@ void mitk::PlanarFigureWriter::GenerateData()
       {
       }
 
-      if ( valueElement == NULL )
+      if ( valueElement == nullptr )
       {
         // Serialization failed; skip this property
         continue;
@@ -127,25 +127,25 @@ void mitk::PlanarFigureWriter::GenerateData()
     }
 
     // Serialize control points of PlanarFigure
-    TiXmlElement* controlPointsElement = new TiXmlElement("ControlPoints");
+    auto  controlPointsElement = new TiXmlElement("ControlPoints");
     pfElement->LinkEndChild(controlPointsElement);
     for (unsigned int i = 0; i < pf->GetNumberOfControlPoints(); i++)
     {
-      TiXmlElement* vElement = new TiXmlElement("Vertex");
+      auto  vElement = new TiXmlElement("Vertex");
       vElement->SetAttribute("id", i);
       vElement->SetDoubleAttribute("x", pf->GetControlPoint(i)[0]);
       vElement->SetDoubleAttribute("y", pf->GetControlPoint(i)[1]);
       controlPointsElement->LinkEndChild(vElement);
     }
-    TiXmlElement* geoElement = new TiXmlElement("Geometry");
+    auto  geoElement = new TiXmlElement("Geometry");
     const PlaneGeometry* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetPlaneGeometry());
-    if (planeGeo != NULL)
+    if (planeGeo != nullptr)
     {
       // Write parameters of IndexToWorldTransform of the PlaneGeometry
       typedef mitk::Geometry3D::TransformType TransformType;
       const TransformType* affineGeometry = planeGeo->GetIndexToWorldTransform();
       const TransformType::ParametersType& parameters = affineGeometry->GetParameters();
-      TiXmlElement* vElement = new TiXmlElement( "transformParam" );
+      auto  vElement = new TiXmlElement( "transformParam" );
       for ( unsigned int i = 0; i < affineGeometry->GetNumberOfParameters(); ++i )
       {
         std::stringstream paramName;
@@ -202,7 +202,7 @@ void mitk::PlanarFigureWriter::GenerateData()
 
 void mitk::PlanarFigureWriter::ReleaseMemory()
 {
-  if(m_MemoryBuffer != NULL)
+  if(m_MemoryBuffer != nullptr)
   {
     delete [] m_MemoryBuffer;
   }
@@ -211,7 +211,7 @@ void mitk::PlanarFigureWriter::ReleaseMemory()
 
 TiXmlElement* mitk::PlanarFigureWriter::CreateXMLVectorElement(const char* name, itk::FixedArray<mitk::ScalarType, 3> v)
 {
-  TiXmlElement* vElement = new TiXmlElement(name);
+  auto  vElement = new TiXmlElement(name);
   vElement->SetDoubleAttribute("x", v.GetElement(0));
   vElement->SetDoubleAttribute("y", v.GetElement(1));
   vElement->SetDoubleAttribute("z", v.GetElement(2));
@@ -247,7 +247,7 @@ void mitk::PlanarFigureWriter::SetInput( const unsigned int& id, InputType* Plan
 mitk::PlanarFigure* mitk::PlanarFigureWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
-    return NULL;
+    return nullptr;
   else
     return dynamic_cast<InputType*> ( this->GetInput( 0 ) );
 }
@@ -261,11 +261,11 @@ mitk::PlanarFigure* mitk::PlanarFigureWriter::GetInput( const unsigned int& num 
 
 bool mitk::PlanarFigureWriter::CanWriteDataType( DataNode* input )
 {
-  if ( input == NULL )
+  if ( input == nullptr )
     return false;
 
   mitk::BaseData* data = input->GetData();
-  if ( data  == NULL)
+  if ( data  == nullptr)
     return false;
 
   mitk::PlanarFigure::Pointer PlanarFigure = dynamic_cast<mitk::PlanarFigure*>( data );

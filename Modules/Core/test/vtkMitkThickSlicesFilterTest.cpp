@@ -35,7 +35,7 @@ public:
   {
     mitk::PixelType pixelType( mitk::MakeScalarPixelType<unsigned char>() );
     mitk::Image::Pointer testImage = mitk::Image::New();
-    unsigned int* dim = new unsigned int[3];
+    auto  dim = new unsigned int[3];
     dim[0] = 10;
     dim[1] = 10;
     dim[2] = max+1-min;

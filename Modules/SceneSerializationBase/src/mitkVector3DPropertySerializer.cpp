@@ -36,24 +36,24 @@ class Vector3DPropertySerializer : public BasePropertySerializer
     {
       if (const Vector3DProperty* prop = dynamic_cast<const Vector3DProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("vector");
+        auto  element = new TiXmlElement("vector");
         Vector3D point = prop->GetValue();
         element->SetDoubleAttribute("x", point[0]);
         element->SetDoubleAttribute("y", point[1]);
         element->SetDoubleAttribute("z", point[2]);
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       Vector3D v;
-      if ( element->QueryDoubleAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryDoubleAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryDoubleAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryDoubleAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryDoubleAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryDoubleAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return nullptr;
 
      return Vector3DProperty::New( v ).GetPointer();
     }

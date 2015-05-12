@@ -28,7 +28,7 @@ Q_OBJECT
 
 public:
 
-  QmitkPiecewiseFunctionCanvas( QWidget * parent=0,  Qt::WindowFlags f = 0 );
+  QmitkPiecewiseFunctionCanvas( QWidget * parent=nullptr,  Qt::WindowFlags f = nullptr );
   virtual void paintEvent( QPaintEvent* e ) override;
   void SetTitle(const QString& title);
   int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) override;

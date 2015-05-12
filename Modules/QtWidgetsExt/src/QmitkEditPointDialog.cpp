@@ -36,7 +36,7 @@ QmitkEditPointDialog::QmitkEditPointDialog( QWidget * parent, Qt::WindowFlags f)
 , d(new QmitkEditPointDialogData)
 {
   this->setWindowTitle("Edit Point Dialog");
-  d->m_PointSet = 0;
+  d->m_PointSet = nullptr;
   d->m_Timestep = 0;
   d->m_XCoord = new QLineEdit;
   d->m_YCoord = new QLineEdit;
@@ -44,7 +44,7 @@ QmitkEditPointDialog::QmitkEditPointDialog( QWidget * parent, Qt::WindowFlags f)
   QPushButton* _OKButton = new QPushButton("OK");
   connect( _OKButton, SIGNAL(clicked(bool)), this, SLOT(OnOkButtonClicked(bool)) );
 
-  QGridLayout* layout = new QGridLayout;
+  auto  layout = new QGridLayout;
   layout->addWidget(new QLabel("X: "), 0,0,1,1);
   layout->addWidget(d->m_XCoord, 0,1,1,1);
   layout->addWidget(new QLabel("Y: "), 1,0,1,1);
@@ -76,7 +76,7 @@ void QmitkEditPointDialog::SetPoint( mitk::PointSet* _PointSet, mitk::PointSet::
 
 void QmitkEditPointDialog::OnOkButtonClicked(bool)
 {
-  if(d->m_PointSet == 0)
+  if(d->m_PointSet == nullptr)
   {
     MITK_WARN << "Pointset is 0.";
     this->reject();

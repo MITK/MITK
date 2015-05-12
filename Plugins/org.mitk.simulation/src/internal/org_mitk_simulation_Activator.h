@@ -33,18 +33,18 @@ namespace mitk
     template <class T>
     static T* GetService()
     {
-      if (Context == NULL)
-        return NULL;
+      if (Context == nullptr)
+        return nullptr;
 
       ctkServiceReference serviceReference = Context->getServiceReference<T>();
 
       return serviceReference
         ? Context->getService<T>(serviceReference)
-        : NULL;
+        : nullptr;
     }
 
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext*);
+    void start(ctkPluginContext* context) override;
+    void stop(ctkPluginContext*) override;
 
   private:
     static ctkPluginContext* Context;

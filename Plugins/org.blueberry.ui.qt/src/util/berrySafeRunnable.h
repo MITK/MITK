@@ -62,7 +62,7 @@ public:
   /*
    * @see ISafeRunnable#HandleException(const ctkException&)
    */
-  void HandleException(const ctkException& e);
+  void HandleException(const ctkException& e) override;
 
   /**
    * Flag to avoid interactive error dialogs during automated testing.

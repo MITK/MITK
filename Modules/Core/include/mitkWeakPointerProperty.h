@@ -61,7 +61,7 @@ namespace mitk {
 
     WeakPointerProperty(const WeakPointerProperty&);
 
-    WeakPointerProperty(itk::Object* pointer = 0);
+    WeakPointerProperty(itk::Object* pointer = nullptr);
 
   private:
     // purposely not implemented

@@ -30,19 +30,19 @@ public:
   QmitkDataNodeSelection();
   QmitkDataNodeSelection(const QItemSelection& sel);
 
-  virtual berry::Object::Pointer GetFirstElement() const;
-  virtual iterator Begin() const;
-  virtual iterator End() const;
+  virtual berry::Object::Pointer GetFirstElement() const override;
+  virtual iterator Begin() const override;
+  virtual iterator End() const override;
 
-  virtual int Size() const;
+  virtual int Size() const override;
 
-  virtual ContainerType::Pointer ToVector() const;
+  virtual ContainerType::Pointer ToVector() const override;
 
   /**
    * @see berry::ISelection::IsEmpty()
    */
-  bool IsEmpty() const;
+  bool IsEmpty() const override;
 
-  bool operator==(const berry::Object* obj) const;
+  bool operator==(const berry::Object* obj) const override;
 
 };

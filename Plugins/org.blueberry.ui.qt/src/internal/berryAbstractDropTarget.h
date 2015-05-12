@@ -28,12 +28,12 @@ struct AbstractDropTarget : public IDropTarget
     /*
      * @see IDropTarget#GetSnapRectangle()
      */
-    QRect GetSnapRectangle()
+    QRect GetSnapRectangle() override
     {
         return QRect();
     }
 
-    void DragFinished(bool  /*dropPerformed*/)
+    void DragFinished(bool  /*dropPerformed*/) override
     {
 
     }

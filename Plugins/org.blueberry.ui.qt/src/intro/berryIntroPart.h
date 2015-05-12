@@ -135,7 +135,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#addPropertyListener(org.eclipse.ui.IPropertyListener)
    */
-  void AddPropertyListener(IPropertyChangeListener* l);
+  void AddPropertyListener(IPropertyChangeListener* l) override;
 
   /**
    * The <code>IntroPart</code> implementation of this
@@ -162,17 +162,17 @@ public:
    *
    * @see org.eclipse.ui.intro.IIntroPart#getIntroSite()
    */
-  IIntroSite::Pointer GetIntroSite() const;
+  IIntroSite::Pointer GetIntroSite() const override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#getTitleImage()
    */
-  QIcon GetTitleImage() const;
+  QIcon GetTitleImage() const override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#getTitle()
    */
-  QString GetPartName() const;
+  QString GetPartName() const override;
 
   /**
    * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart}method ignores the
@@ -188,12 +188,12 @@ public:
    *                if this part was not initialized successfully
    */
   void Init(IIntroSite::Pointer site, IMemento::Pointer memento)
-      throw (PartInitException);
+      throw (PartInitException) override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.intro.IIntroPart#removePropertyListener(org.eclipse.ui.IPropertyListener)
    */
-  void RemovePropertyListener(IPropertyChangeListener* l);
+  void RemovePropertyListener(IPropertyChangeListener* l) override;
 
   /**
    * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart} method does nothing.
@@ -202,7 +202,7 @@ public:
    * @param memento
    *            a memento to receive the object state
    */
-  void SaveState(IMemento::Pointer memento);
+  void SaveState(IMemento::Pointer memento) override;
 
   /**
    * The <code>IntroPart</code> implementation of this
@@ -215,7 +215,7 @@ public:
    * creating this executable extension.
    */
   void SetInitializationData(const IConfigurationElement::Pointer& cfig,
-                             const QString& propertyName, const Object::Pointer& data);
+                             const QString& propertyName, const Object::Pointer& data) override;
 
 };
 

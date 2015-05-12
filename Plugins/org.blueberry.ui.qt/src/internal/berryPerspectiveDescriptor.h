@@ -120,11 +120,11 @@ public:
   /*
    * @see IPerspectiveDescriptor#getDescription()
    */
-  QString GetDescription() const;
+  QString GetDescription() const override;
 
   void SetDescription(const QString& desc);
 
-  QStringList GetKeywordReferences() const;
+  QStringList GetKeywordReferences() const override;
 
   /**
    * Returns whether or not this perspective is fixed.
@@ -136,21 +136,21 @@ public:
   /*
    * @see IPerspectiveDescriptor#GetId()
    */
-  QString GetId() const;
+  QString GetId() const override;
 
-  QString GetLocalId() const;
+  QString GetLocalId() const override;
 
-  QString GetPluginId() const;
+  QString GetPluginId() const override;
 
   /*
    * @see IPerspectiveDescriptor#GetImageDescriptor()
    */
-  QIcon GetImageDescriptor() const;
+  QIcon GetImageDescriptor() const override;
 
   /*
    * @see IPerspectiveDescriptor#GetLabel()
    */
-  QString GetLabel() const;
+  QString GetLabel() const override;
 
   /**
    * Return the original id of this descriptor.
@@ -234,7 +234,7 @@ public:
    *
    * @return the category path of this descriptor
    */
-  QStringList GetCategoryPath() const;
+  QStringList GetCategoryPath() const override;
 };
 
 }

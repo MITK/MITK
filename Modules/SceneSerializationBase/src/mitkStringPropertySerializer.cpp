@@ -36,16 +36,16 @@ class StringPropertySerializer : public BasePropertySerializer
     {
       if (const StringProperty* prop = dynamic_cast<const StringProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("string");
+        auto  element = new TiXmlElement("string");
         element->SetAttribute("value", prop->GetValue());
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
       const char* s( element->Attribute("value") );
       return StringProperty::New( std::string(s?s:"") ).GetPointer();
     }

@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCallbackFromGUIThread.h"
 #include <mitkLogMacros.h>
 
-mitk::CallbackFromGUIThread* mitk::CallbackFromGUIThread::m_Instance = NULL;
-mitk::CallbackFromGUIThreadImplementation* mitk::CallbackFromGUIThread::m_Implementation = NULL;
+mitk::CallbackFromGUIThread* mitk::CallbackFromGUIThread::m_Instance = nullptr;
+mitk::CallbackFromGUIThreadImplementation* mitk::CallbackFromGUIThread::m_Implementation = nullptr;
 
 namespace mitk {
 

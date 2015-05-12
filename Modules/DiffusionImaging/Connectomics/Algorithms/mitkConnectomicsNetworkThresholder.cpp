@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vnl/vnl_random.h"
 
 mitk::ConnectomicsNetworkThresholder::ConnectomicsNetworkThresholder()
-  : m_Network( 0 )
+  : m_Network( nullptr )
   , m_ThresholdingScheme( mitk::ConnectomicsNetworkThresholder::ThresholdBased )
   , m_TargetThreshold( 0.0 )
   , m_TargetDensity( 1.0 )

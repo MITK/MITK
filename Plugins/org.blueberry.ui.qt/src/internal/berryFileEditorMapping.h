@@ -92,27 +92,27 @@ public:
   /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
-  bool operator==(const Object* obj) const;
+  bool operator==(const Object* obj) const override;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  IEditorDescriptor::Pointer GetDefaultEditor();
+  IEditorDescriptor::Pointer GetDefaultEditor() override;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  QList<IEditorDescriptor::Pointer> GetEditors() const;
+  QList<IEditorDescriptor::Pointer> GetEditors() const override;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  QList<IEditorDescriptor::Pointer> GetDeletedEditors() const;
+  QList<IEditorDescriptor::Pointer> GetDeletedEditors() const override;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  QString GetExtension() const;
+  QString GetExtension() const override;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
@@ -129,12 +129,12 @@ public:
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  QString GetLabel() const;
+  QString GetLabel() const override;
 
   /* (non-Javadoc)
    * Method declared on IFileEditorMapping.
    */
-  QString GetName() const;
+  QString GetName() const override;
 
   /**
    * Remove the given editor from the set of editors registered.

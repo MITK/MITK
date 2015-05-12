@@ -64,15 +64,15 @@ struct BERRY_UI_QT IServiceLocator : public virtual Object
   S* GetService()
   {
     const char* typeName = qobject_interface_iid<S*>();
-    if (typeName == NULL)
+    if (typeName == nullptr)
     {
       BERRY_WARN << "Error getting service: Cannot get the interface id for type '" << Reflection::GetClassName<S>()
                  << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
-      return NULL;
+      return nullptr;
     }
     Object* obj = this->GetService(typeName);
     S* service = dynamic_cast<S*>(obj);
-    if (obj != NULL && service == NULL)
+    if (obj != nullptr && service == nullptr)
     {
       BERRY_WARN << "Error getting service: Class '" << obj->GetClassName() << "' cannot be cast to service interface "
                  << "'" << Reflection::GetClassName<S>() << "'";

@@ -47,8 +47,8 @@ struct BERRY_UI_QT IQtPreferencePage : public IPreferencePage
 
 protected:
 
-  void CreateControl(void* parent);
-  void* GetControl() const;
+  void CreateControl(void* parent) override;
+  void* GetControl() const override;
 
 };
 

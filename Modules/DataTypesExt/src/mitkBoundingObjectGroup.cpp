@@ -29,7 +29,7 @@ m_CSGMode(Union)// m_CSGMode(Difference) //m_CSGMode(Intersection)
   timeGeometry->Initialize(1);
   SetTimeGeometry(timeGeometry);
 
-  SetVtkPolyData(NULL);
+  SetVtkPolyData(nullptr);
 }
 
 mitk::BoundingObjectGroup::~BoundingObjectGroup()
@@ -112,7 +112,7 @@ void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer 
 
 void mitk::BoundingObjectGroup::RemoveBoundingObject(mitk::BoundingObject::Pointer boundingObject)
 {
-  std::deque<mitk::BoundingObject::Pointer>::iterator it = m_BoundingObjects.begin();
+  auto it = m_BoundingObjects.begin();
   for (unsigned int i=0 ; i<m_BoundingObjects.size();i++)
   {
     if (m_BoundingObjects.at(i) == boundingObject)

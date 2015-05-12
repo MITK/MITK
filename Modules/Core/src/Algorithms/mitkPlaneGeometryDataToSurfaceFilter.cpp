@@ -94,7 +94,7 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
   mitk::PlaneGeometryData::ConstPointer input = this->GetInput();
   mitk::Surface::Pointer output = this->GetOutput();
 
-  if ( input.IsNull() || (input->GetPlaneGeometry() == NULL)
+  if ( input.IsNull() || (input->GetPlaneGeometry() == nullptr)
     || (input->GetPlaneGeometry()->IsValid() == false)
     || (m_UseBoundingBox && (m_BoundingBox.IsNull() || (m_BoundingBox->GetDiagonalLength2() < mitk::eps))) )
   {
@@ -104,7 +104,7 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
   Point3D origin;
   Point3D right, bottom;
 
-  vtkPolyData *planeSurface = NULL;
+  vtkPolyData *planeSurface = nullptr;
 
 
 
@@ -207,7 +207,7 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
     planeSurface = m_PlaneClipper->GetOutput();
   }
     // Does the PlaneGeometryData contain a PlaneGeometry?
-  else if ( dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() ) != NULL )
+  else if ( dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() ) != nullptr )
   {
     mitk::PlaneGeometry *planeGeometry =
       dynamic_cast< PlaneGeometry * >( input->GetPlaneGeometry() );
@@ -379,7 +379,7 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateData()
   mitk::Surface::Pointer output = this->GetOutput();
 
   if (output.IsNull()) return;
-  if (output->GetVtkPolyData()==NULL) return;
+  if (output->GetVtkPolyData()==nullptr) return;
 
 //  output->GetVtkPolyData()->Update(); //VTK6_TODO vtk pipeline
 }
@@ -388,7 +388,7 @@ const mitk::PlaneGeometryData *mitk::PlaneGeometryDataToSurfaceFilter::GetInput(
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::PlaneGeometryData * >

@@ -48,9 +48,9 @@ public:
    * Compares this action contribution item with another object. Two action
    * contribution items are equal if they refer to the identical QAction.
    */
-  bool operator==(const Object* o) const;
+  bool operator==(const Object* o) const override;
 
-  uint HashCode() const;
+  uint HashCode() const override;
 
   /**
    * The <code>QActionContributionItem</code> implementation of this
@@ -59,7 +59,7 @@ public:
    * action's checked property has been set, the button is created and primed
    * to the value of the checked property.
    */
-  void Fill(QStatusBar* parent);
+  void Fill(QStatusBar* parent) override;
 
   /**
    * The <code>ActionContributionItem</code> implementation of this
@@ -69,7 +69,7 @@ public:
    * the value of the checked property. If the action's menu creator property
    * has been set, a cascading submenu is created.
    */
-  void Fill(QMenu* parent, QAction *before);
+  void Fill(QMenu* parent, QAction *before) override;
 
   /**
    * The <code>ActionContributionItem</code> implementation of this ,
@@ -79,7 +79,7 @@ public:
    * the value of the checked property. If the action's menu creator property
    * has been set, a drop-down tool item is created.
    */
-  void Fill(QToolBar* parent, QAction* before);
+  void Fill(QToolBar* parent, QAction* before) override;
 
   using ContributionItem::Fill;
 
@@ -105,12 +105,12 @@ public:
    * method returns <code>true</code> for menu items and <code>false</code>
    * for everything else.
    */
-  bool IsDynamic() const;
+  bool IsDynamic() const override;
 
   /*
    * Method declared on IContributionItem.
    */
-  bool IsEnabled() const;
+  bool IsEnabled() const override;
 
   /**
    * The <code>ActionContributionItem</code> implementation of this
@@ -118,7 +118,7 @@ public:
    * by also checking whether the command corresponding to this action is
    * active.
    */
-  bool IsVisible() const;
+  bool IsVisible() const override;
 
   /**
    * Sets the presentation mode, which is the bitwise-or of the
@@ -133,7 +133,7 @@ public:
    * The action item implementation of this <code>IContributionItem</code>
    * method calls <code>update(null)</code>.
    */
-  void Update();
+  void Update() override;
 
   /**
    * Synchronizes the UI with the given property.
@@ -142,7 +142,7 @@ public:
    *            the name of the property, or <code>null</code> meaning all
    *            applicable properties
    */
-  void Update(const QString& propertyName);
+  void Update(const QString& propertyName) override;
 
 protected:
 

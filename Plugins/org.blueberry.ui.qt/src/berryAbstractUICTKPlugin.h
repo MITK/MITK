@@ -251,7 +251,7 @@ public:
      * method refreshes the plug-in actions.  Subclasses may extend this method,
      * but must send super <b>first</b>.
      */
-    void start(ctkPluginContext* context);
+    void start(ctkPluginContext* context) override;
 
     /**
      * The <code>AbstractUIPlugin</code> implementation of this <code>Plugin</code>
@@ -261,7 +261,7 @@ public:
      * be used where necessary to ensure that <code>super.shutdown()</code> is
      * always done.
      */
-    void stop(ctkPluginContext* context);
+    void stop(ctkPluginContext* context) override;
 
     /**
      * Creates and returns a new image descriptor for an image file located

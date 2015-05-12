@@ -156,7 +156,7 @@ namespace mitk {
       * SmartPointers to the same NavigationTool object since separate DataObjects are
       * still maintained.
       */
-    virtual void Graft(const DataObject *data);
+    virtual void Graft(const DataObject *data) override;
     //#######################
 
   protected:

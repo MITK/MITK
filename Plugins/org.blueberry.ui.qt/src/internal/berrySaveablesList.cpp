@@ -372,7 +372,7 @@ SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
         postCloseInfo->modelsClosing, postCloseInfo->modelsDecrementing, true);
     if (canceled)
     {
-      return PostCloseInfo::Pointer(0);
+      return PostCloseInfo::Pointer(nullptr);
     }
   }
   return postCloseInfo;

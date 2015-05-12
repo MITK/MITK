@@ -56,7 +56,7 @@ void QtControlWidget::changeEvent(QEvent* event)
   {
       ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
     ListenerList activatedListeners(controller->shellEvents.shellActivated.GetListeners());
-    for (ListenerList::iterator listener = activatedListeners.begin();
+    for (auto listener = activatedListeners.begin();
          listener != activatedListeners.end(); ++listener)
     {
       (*listener)->Execute(shellEvent);
@@ -71,7 +71,7 @@ void QtControlWidget::changeEvent(QEvent* event)
   {
       ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
     ListenerList deactivatedListeners(controller->shellEvents.shellDeactivated.GetListeners());
-    for (ListenerList::iterator listener = deactivatedListeners.begin();
+    for (auto listener = deactivatedListeners.begin();
          listener != deactivatedListeners.end(); ++listener)
     {
       (*listener)->Execute(shellEvent);
@@ -90,7 +90,7 @@ void QtControlWidget::changeEvent(QEvent* event)
     if (this->isMinimized() && !(oldState & Qt::WindowMinimized))
     {
       ListenerList iconifiedListeners(controller->shellEvents.shellIconified.GetListeners());
-      for (ListenerList::iterator listener = iconifiedListeners.begin();
+      for (auto listener = iconifiedListeners.begin();
          listener != iconifiedListeners.end(); ++listener)
       {
         (*listener)->Execute(shellEvent);
@@ -103,7 +103,7 @@ void QtControlWidget::changeEvent(QEvent* event)
     else if (oldState & Qt::WindowMinimized && !this->isMinimized())
     {
       ListenerList deiconifiedListeners(controller->shellEvents.shellDeiconified.GetListeners());
-      for (ListenerList::iterator listener = deiconifiedListeners.begin();
+      for (auto listener = deiconifiedListeners.begin();
          listener != deiconifiedListeners.end(); ++listener)
       {
         (*listener)->Execute(shellEvent);
@@ -126,7 +126,7 @@ void QtControlWidget::closeEvent(QCloseEvent* event)
   ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
 
   ListenerList closedListeners(controller->shellEvents.shellClosed.GetListeners());
-  for (ListenerList::iterator listener = closedListeners.begin();
+  for (auto listener = closedListeners.begin();
        listener != closedListeners.end(); ++listener)
   {
     (*listener)->Execute(shellEvent);

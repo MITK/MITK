@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkGradientDescentOptimizerView : public 
 
 public:
 
-  QmitkGradientDescentOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkGradientDescentOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkGradientDescentOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

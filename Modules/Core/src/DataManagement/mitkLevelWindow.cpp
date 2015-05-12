@@ -248,7 +248,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   if ( IsFixed() )
     return;
 
-  if ( image == NULL || !image->IsInitialized() ) return;
+  if ( image == nullptr || !image->IsInitialized() ) return;
 
   const mitk::Image* wholeImage = image;
   ScalarType minValue = 0.0;
@@ -264,7 +264,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
     sliceSelector->SetChannelNr(image->GetDimension(4)/2);
     sliceSelector->Update();
     image = sliceSelector->GetOutput();
-    if ( image == NULL || !image->IsInitialized() ) return;
+    if ( image == nullptr || !image->IsInitialized() ) return;
 
     minValue    = image->GetStatistics()->GetScalarValueMin();
     maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();

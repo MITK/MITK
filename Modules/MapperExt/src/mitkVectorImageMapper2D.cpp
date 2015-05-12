@@ -400,9 +400,9 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const PlaneGeom
   vtkCell* cell;
 
   double offset[3];
-  for (unsigned int i = 0; i < 3; ++i)
+  for (auto & elem : offset)
   {
-    offset[i] = 0;
+    elem = 0;
   }
 
   vtkIdType numCells = glyphs->GetNumberOfCells();

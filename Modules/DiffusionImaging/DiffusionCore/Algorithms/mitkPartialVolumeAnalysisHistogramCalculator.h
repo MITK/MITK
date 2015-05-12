@@ -220,7 +220,7 @@ namespace mitk
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

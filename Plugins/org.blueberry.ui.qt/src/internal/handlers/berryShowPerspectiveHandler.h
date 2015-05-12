@@ -36,7 +36,7 @@ public:
 
   berryObjectMacro(ShowPerspectiveHandler)
 
-  Object::Pointer Execute(const ExecutionEvent::ConstPointer& event);
+  Object::Pointer Execute(const ExecutionEvent::ConstPointer& event) override;
 
 private:
 

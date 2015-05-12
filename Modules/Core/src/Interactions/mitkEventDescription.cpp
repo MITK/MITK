@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkEventDescription.h"
 
 mitk::EventDescription::EventDescription(int type, int button, int buttonState, int key, std::string name, int id)
-: Event(NULL, type, button, buttonState, key), m_Name(name), m_Id(id)
+: Event(nullptr, type, button, buttonState, key), m_Name(name), m_Id(id)
 {}
 
 std::string mitk::EventDescription::GetName() const

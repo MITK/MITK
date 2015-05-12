@@ -46,7 +46,7 @@ bool mitk::State::AddTransition( Transition* transition )
 
 const mitk::Transition* mitk::State::GetTransition(int eventId) const
 {
-  TransitionMap::const_iterator tempTrans = m_Transitions.find(eventId);
+  auto tempTrans = m_Transitions.find(eventId);
   if( tempTrans != m_Transitions.end() )
     return (*tempTrans).second;
   else //can a Transition with ID 0 be found?
@@ -57,7 +57,7 @@ const mitk::Transition* mitk::State::GetTransition(int eventId) const
       return (*tempTrans).second.GetPointer();
     }
     else
-      return NULL;
+      return nullptr;
   }
 }
 
@@ -79,7 +79,7 @@ std::set<int> mitk::State::GetAllNextStates() const
 {
   std::set<int> tempset;
 
-  for (TransMapConstIter i= m_Transitions.begin(); i != m_Transitions.end(); i++)
+  for (auto i= m_Transitions.begin(); i != m_Transitions.end(); i++)
   {
     tempset.insert( (i->second)->GetNextStateId() );
   }
@@ -103,9 +103,9 @@ bool mitk::State::IsValidEvent(int eventId) const
 //## allStates is a List of all build States of that StateMachine
 bool mitk::State::ConnectTransitions(StateMap *allStates)
 {
-  for (TransMapIter i= m_Transitions.begin(); i != m_Transitions.end(); i++)
+  for (auto i= m_Transitions.begin(); i != m_Transitions.end(); i++)
   {
-    StateMapIter sIter = allStates->find(((*i).second)->GetNextStateId());
+    auto sIter = allStates->find(((*i).second)->GetNextStateId());
     if( sIter != allStates->end() )
       ((*i).second)->SetNextState((*sIter).second);
     else

@@ -61,11 +61,11 @@ public:
   bool UpdateExtensionPoints(const QList<int>& IDs, bool add);
 
   //Implements the KeyedElement interface
-  QString GetKey() const;
+  QString GetKey() const override;
 
 private:
 
-  bool IsEqual(const KeyedElement& other) const;
+  bool IsEqual(const KeyedElement& other) const override;
 };
 
 }

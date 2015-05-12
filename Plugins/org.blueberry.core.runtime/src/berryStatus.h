@@ -151,53 +151,53 @@ public:
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  QList<IStatus::Pointer> GetChildren() const;
+  QList<IStatus::Pointer> GetChildren() const override;
 
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  int GetCode() const;
+  int GetCode() const override;
 
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  const ctkException* GetException() const;
+  const ctkException* GetException() const override;
 
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  QString GetMessage() const;
+  QString GetMessage() const override;
 
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  QString GetPlugin() const;
+  QString GetPlugin() const override;
 
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  Severity GetSeverity() const;
+  Severity GetSeverity() const override;
 
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  bool IsMultiStatus() const;
+  bool IsMultiStatus() const override;
 
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  bool IsOK() const;
+  bool IsOK() const override;
 
   /*
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  bool Matches(const Severities& severityMask) const;
+  bool Matches(const Severities& severityMask) const override;
 
-  QString GetFileName() const;
+  QString GetFileName() const override;
 
-  QString GetMethodName() const;
+  QString GetMethodName() const override;
 
-  int GetLineNumber() const;
+  int GetLineNumber() const override;
 
 
 protected:
@@ -248,7 +248,7 @@ public:
    * Returns a string representation of the status, suitable
    * for debugging purposes only.
    */
-  QString ToString() const;
+  QString ToString() const override;
 
 };
 

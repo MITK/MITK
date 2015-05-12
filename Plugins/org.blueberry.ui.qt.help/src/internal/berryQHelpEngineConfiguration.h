@@ -37,7 +37,7 @@ public:
 
   QHelpEngineConfiguration(ctkPluginContext* context, QHelpEngineWrapper& helpEngine);
 
-  void updated(const ctkDictionary &properties);
+  void updated(const ctkDictionary &properties) override;
 
 public Q_SLOTS:
 

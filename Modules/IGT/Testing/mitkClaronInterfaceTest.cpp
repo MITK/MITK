@@ -42,7 +42,7 @@ int mitkClaronInterfaceTest(int /* argc */, char* /*argv*/[])
     {
     MITK_TEST_OUTPUT(<< "In the following stubs are tested, errors are expected and should occur.")
     MITK_TEST_CONDITION_REQUIRED((myClaronInterface->GetAllActiveTools().empty()),"Testing stub of GetAllActiveTools() ");
-    MITK_TEST_CONDITION_REQUIRED((myClaronInterface->GetName(0)==NULL),"Testing stub of GetName() ");
+    MITK_TEST_CONDITION_REQUIRED((myClaronInterface->GetName(0)==nullptr),"Testing stub of GetName() ");
     MITK_TEST_CONDITION_REQUIRED((myClaronInterface->GetPosition(0).empty()),"Testing stub of GetPosition() ");
     MITK_TEST_CONDITION_REQUIRED((myClaronInterface->GetQuaternions(0).empty()),"Testing stub of GetQuaternions() ");
     MITK_TEST_CONDITION_REQUIRED((myClaronInterface->GetTipPosition(0).empty()),"Testing stub of GetTipPosition() ");

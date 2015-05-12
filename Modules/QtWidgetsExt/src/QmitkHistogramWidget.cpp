@@ -38,12 +38,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
   : QDialog(parent)
-  , m_Plot(NULL)
-  , m_Textedit(NULL)
-  , m_Marker(NULL)
-  , m_Picker(NULL)
-  , m_Zoomer(NULL)
-  , m_Histogram(NULL)
+  , m_Plot(nullptr)
+  , m_Textedit(nullptr)
+  , m_Marker(nullptr)
+  , m_Picker(nullptr)
+  , m_Zoomer(nullptr)
+  , m_Histogram(nullptr)
 {
   QBoxLayout *layout = new QVBoxLayout(this);
 
@@ -59,7 +59,7 @@ QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
   QwtText text = m_Plot->titleLabel()->text();
   text.setFont(QFont("Helvetica", 12, QFont::Normal));
 
-  QwtPlotGrid *grid = new QwtPlotGrid;
+  auto grid = new QwtPlotGrid;
   grid->enableXMin(true);
   grid->enableYMin(true);
   grid->setMajorPen(QPen(Qt::black, 0, Qt::DotLine));

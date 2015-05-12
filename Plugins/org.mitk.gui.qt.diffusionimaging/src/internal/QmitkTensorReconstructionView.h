@@ -61,18 +61,18 @@ class QmitkTensorReconstructionView : public QmitkFunctionality
   QmitkTensorReconstructionView();
   virtual ~QmitkTensorReconstructionView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
   /// \brief Called when the functionality is activated
-  virtual void Activated();
+  virtual void Activated() override;
 
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
   static const int nrconvkernels;
 
@@ -97,7 +97,7 @@ protected:
   void TeemTensorReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages);
   void TensorReconstructionWithCorr(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
-  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkTensorReconstructionViewControls* m_Controls;
 

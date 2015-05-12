@@ -45,8 +45,8 @@ void mitk::ContourSet::RemoveContour(unsigned long index)
 void mitk::ContourSet::UpdateOutputInformation()
 {
   mitk::ContourSet::ContourVectorType contourVec = GetContours();
-  mitk::ContourSet::ContourIterator contoursIterator = contourVec.begin();
-  mitk::ContourSet::ContourIterator contoursIteratorEnd = contourVec.end();
+  auto contoursIterator = contourVec.begin();
+  auto contoursIteratorEnd = contourVec.end();
 
   // initialize container
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();

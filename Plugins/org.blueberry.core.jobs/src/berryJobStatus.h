@@ -42,7 +42,7 @@ public:
   /**
    * @see IJobStatus#GetJob()
    */
-  Job::Pointer GetJob();
+  Job::Pointer GetJob() override;
 
 private:
 

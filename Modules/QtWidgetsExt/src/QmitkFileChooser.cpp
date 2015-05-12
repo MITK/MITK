@@ -39,7 +39,7 @@ QmitkFileChooser::QmitkFileChooser(QWidget* parent, Qt::WindowFlags f )
 
 void QmitkFileChooser::SetHorizotalLayout(bool horizontalLayout)
 {
-  QBoxLayout* layout = 0;
+  QBoxLayout* layout = nullptr;
   if(horizontalLayout)
     layout = new QHBoxLayout;
    else

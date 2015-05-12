@@ -69,7 +69,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
 
     FILE *f;
     f=fopen(m_FileName.c_str(), "r");
-    if(f!=NULL)
+    if(f!=nullptr)
     {
       while(!feof(f))
       {
@@ -114,7 +114,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         if(strstr(s,"FOV (ap,fh,rl) [mm]"))
         {
           p=s+strcspn(s,"0123456789");
-          char *oldLocale = setlocale(LC_ALL, 0);
+          char *oldLocale = setlocale(LC_ALL, nullptr);
           sscanf(p,"%lf %lf %lf", &thickness[0], &thickness[1], &thickness[2]);
           setlocale(LC_ALL, oldLocale);
         }
@@ -122,7 +122,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         if(strstr(s,"Slice thickness [mm]"))
         {
           p=s+strcspn(s,"0123456789");
-          char *oldLocale = setlocale(LC_ALL, 0);
+          char *oldLocale = setlocale(LC_ALL, nullptr);
           sscanf(p,"%f", &sliceThickness);
           setlocale(LC_ALL, oldLocale);
         }
@@ -130,7 +130,7 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         if(strstr(s,"Slice gap [mm]"))
         {
           p=s+strcspn(s,"-0123456789");
-          char *oldLocale = setlocale(LC_ALL, 0);
+          char *oldLocale = setlocale(LC_ALL, nullptr);
           sscanf(p,"%f", &sliceGap);
           setlocale(LC_ALL, oldLocale);
         }
@@ -198,7 +198,7 @@ void mitk::ParRecFileReader::GenerateData()
   if( m_RecFileName != "")
   {
     FILE *f = fopen(m_RecFileName.c_str(), "r");
-    if(f==NULL)
+    if(f==nullptr)
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Could not open rec-file.");
     }

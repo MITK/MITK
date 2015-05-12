@@ -275,14 +275,14 @@ CommandLineParserArgumentDescription*
     }
   else if (!LongPrefix.isEmpty() && !ShortPrefix.isEmpty())
     {
-    return 0;
+    return nullptr;
     }
 
   if (this->ArgNameToArgumentDescriptionMap.contains(unprefixedArg))
     {
     return this->ArgNameToArgumentDescriptionMap[unprefixedArg];
     }
-  return 0;
+  return nullptr;
 }
 
 // --------------------------------------------------------------------------
@@ -291,7 +291,7 @@ CommandLineParserArgumentDescription*
 // --------------------------------------------------------------------------
 ctkCommandLineParser::ctkCommandLineParser(QObject* newParent) : Superclass(newParent)
 {
-  this->Internal = new ctkInternal(0);
+  this->Internal = new ctkInternal(nullptr);
 }
 
 // --------------------------------------------------------------------------
@@ -328,7 +328,7 @@ QHash<QString, QVariant> ctkCommandLineParser::parseArguments(const QStringList&
   bool error = false;
   bool ignoreRest = false;
   bool useSettings = this->Internal->UseQSettings;
-  CommandLineParserArgumentDescription * currentArgDesc = 0;
+  CommandLineParserArgumentDescription * currentArgDesc = nullptr;
   QList<CommandLineParserArgumentDescription*> parsedArgDescriptions;
   for(int i = 1; i < arguments.size(); ++i)
     {
@@ -516,7 +516,7 @@ QHash<QString, QVariant> ctkCommandLineParser::parseArguments(const QStringList&
     *ok = !error;
     }
 
-  QSettings* settings = 0;
+  QSettings* settings = nullptr;
   if (this->Internal->UseQSettings && useSettings)
     {
     if (this->Internal->Settings)
@@ -654,7 +654,7 @@ void ctkCommandLineParser::addArgument(const QString& longarg, const QString& sh
   Q_ASSERT_X(!added, "addArgument", "short argument already added");
   if (added) { return; }
 
-  CommandLineParserArgumentDescription* argDesc =
+  auto  argDesc =
     new CommandLineParserArgumentDescription(longarg, this->Internal->LongPrefix,
                                              shortarg, this->Internal->ShortPrefix, type,
                                              argHelp, defaultValue, ignoreRest, deprecated);

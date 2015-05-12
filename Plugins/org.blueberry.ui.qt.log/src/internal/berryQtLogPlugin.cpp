@@ -22,11 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-QtLogPlugin* QtLogPlugin::instance = 0;
+QtLogPlugin* QtLogPlugin::instance = nullptr;
 
 QtLogPlugin::QtLogPlugin()
-  : m_LogModel(0)
-  , m_Context(0)
+  : m_LogModel(nullptr)
+  , m_Context(nullptr)
 {
   this->instance = this;
 }
@@ -45,8 +45,8 @@ void
 QtLogPlugin::stop(ctkPluginContext* /*context*/)
 {
   delete m_LogModel;
-  m_LogModel = 0;
-  m_Context = 0;
+  m_LogModel = nullptr;
+  m_Context = nullptr;
 }
 
 QtLogPlugin*

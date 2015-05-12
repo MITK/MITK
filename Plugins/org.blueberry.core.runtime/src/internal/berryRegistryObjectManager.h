@@ -60,7 +60,7 @@ public:
 
   void Add(const SmartPointer<RegistryObject>& registryObject, bool hold);
 
-  SmartPointer<RegistryObject> GetObject(int id, short type) const;
+  SmartPointer<RegistryObject> GetObject(int id, short type) const override;
 
   // The current impementation of this method assumes that we don't cache dynamic
   // extension. In this case all extensions not yet loaded (i.e. not in the memory cache)
@@ -72,17 +72,17 @@ public:
   // from the disk; object type is needed as well.
   bool ShouldPersist(int id) const;
 
-  QList<SmartPointer<RegistryObject> > GetObjects(const QList<int>& values, short type) const;
+  QList<SmartPointer<RegistryObject> > GetObjects(const QList<int>& values, short type) const override;
 
-  SmartPointer<Handle> GetHandle(int id, short type) const;
+  SmartPointer<Handle> GetHandle(int id, short type) const override;
 
-  QList<SmartPointer<Handle> > GetHandles(const QList<int>& ids, short type) const;
+  QList<SmartPointer<Handle> > GetHandles(const QList<int>& ids, short type) const override;
 
   bool IsDirty() const;
 
   void MarkDirty();
 
-  void Close();
+  void Close() override;
 
   ExtensionRegistry* GetRegistry() const;
 

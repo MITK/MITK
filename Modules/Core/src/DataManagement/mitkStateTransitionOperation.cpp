@@ -23,7 +23,7 @@ mitk::StateTransitionOperation::StateTransitionOperation(OperationType operation
 
 mitk::StateTransitionOperation::~StateTransitionOperation()
 {
-  m_State = NULL;
+  m_State = nullptr;
 }
 
 

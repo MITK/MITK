@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkMattesMutualInformationMetricView : pu
 
 public:
 
-  QmitkMattesMutualInformationMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkMattesMutualInformationMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkMattesMutualInformationMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

@@ -59,7 +59,7 @@ int QmitkDataStorageComboBoxWithSelectNone::Find( const mitk::DataNode* dataNode
 //-----------------------------------------------------------------------------
 mitk::DataNode::Pointer QmitkDataStorageComboBoxWithSelectNone::GetNode( int index ) const
 {
-  mitk::DataNode::Pointer result = NULL;
+  mitk::DataNode::Pointer result = nullptr;
 
   if (this->HasIndex(index))
   {

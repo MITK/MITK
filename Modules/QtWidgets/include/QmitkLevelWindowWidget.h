@@ -28,7 +28,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidget : public QWidget, public Ui::Q
 {
   Q_OBJECT
 public:
-  QmitkLevelWindowWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkLevelWindowWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   mitk::LevelWindowManager* GetManager();
 
 public slots:

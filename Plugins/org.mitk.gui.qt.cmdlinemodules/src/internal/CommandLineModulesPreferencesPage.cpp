@@ -34,24 +34,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //-----------------------------------------------------------------------------
 CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
-: m_MainControl(0)
-, m_DebugOutput(0)
-, m_ShowAdvancedWidgets(0)
-, m_OutputDirectory(0)
-, m_TemporaryDirectory(0)
-, m_ModulesDirectories(0)
-, m_ModulesFiles(0)
-, m_GridLayoutForLoadCheckboxes(0)
-, m_LoadFromHomeDir(0)
-, m_LoadFromHomeDirCliModules(0)
-, m_LoadFromCurrentDir(0)
-, m_LoadFromCurrentDirCliModules(0)
-, m_LoadFromApplicationDir(0)
-, m_LoadFromApplicationDirCliModules(0)
-, m_LoadFromAutoLoadPathDir(0)
-, m_ValidationMode(0)
-, m_MaximumNumberProcesses(0)
-, m_CLIPreferencesNode(0)
+: m_MainControl(nullptr)
+, m_DebugOutput(nullptr)
+, m_ShowAdvancedWidgets(nullptr)
+, m_OutputDirectory(nullptr)
+, m_TemporaryDirectory(nullptr)
+, m_ModulesDirectories(nullptr)
+, m_ModulesFiles(nullptr)
+, m_GridLayoutForLoadCheckboxes(nullptr)
+, m_LoadFromHomeDir(nullptr)
+, m_LoadFromHomeDirCliModules(nullptr)
+, m_LoadFromCurrentDir(nullptr)
+, m_LoadFromCurrentDirCliModules(nullptr)
+, m_LoadFromApplicationDir(nullptr)
+, m_LoadFromApplicationDirCliModules(nullptr)
+, m_LoadFromAutoLoadPathDir(nullptr)
+, m_ValidationMode(nullptr)
+, m_MaximumNumberProcesses(nullptr)
+, m_CLIPreferencesNode(nullptr)
 {
 
 }
@@ -148,7 +148,7 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_XmlTimeoutInSeconds->setMinimum(1);
   m_XmlTimeoutInSeconds->setMaximum(3600);
 
-  QFormLayout *formLayout = new QFormLayout;
+  auto  formLayout = new QFormLayout;
   formLayout->addRow("show debug output:", m_DebugOutput);
   formLayout->addRow("show advanced widgets:", m_ShowAdvancedWidgets);
   formLayout->addRow("XML time-out (secs):", m_XmlTimeoutInSeconds);

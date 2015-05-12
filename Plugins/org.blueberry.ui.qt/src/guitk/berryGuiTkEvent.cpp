@@ -23,7 +23,7 @@ namespace berry {
 namespace GuiTk {
 
 Event::Event() :
-item(0), detail(0), x(0), y(0),
+item(nullptr), detail(0), x(0), y(0),
 width(0), height(0), button(0),
 character(0), keyCode(0), stateMask(0),
 text(""), doit(true)

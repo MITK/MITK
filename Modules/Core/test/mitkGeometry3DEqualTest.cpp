@@ -50,8 +50,8 @@ public:
 
   void tearDown() override
   {
-    m_Geometry3D = NULL;
-    m_AnotherGeometry3D = NULL;
+    m_Geometry3D = nullptr;
+    m_AnotherGeometry3D = nullptr;
   }
 
   void Equal_CloneAndOriginal_ReturnsTrue()

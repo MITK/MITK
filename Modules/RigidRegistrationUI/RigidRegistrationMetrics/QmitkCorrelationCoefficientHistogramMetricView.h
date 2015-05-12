@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkCorrelationCoefficientHistogramMetricV
 
 public:
 
-  QmitkCorrelationCoefficientHistogramMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkCorrelationCoefficientHistogramMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkCorrelationCoefficientHistogramMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

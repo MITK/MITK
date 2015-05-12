@@ -73,7 +73,7 @@ PartSite::PartSite(IWorkbenchPartReference::Pointer ref,
   // Initialize the service locator.
   IServiceLocator* parentServiceLocator = page->GetWorkbenchWindow().GetPointer();
   IServiceLocatorCreator* slc = parentServiceLocator->GetService<IServiceLocatorCreator>();
-  this->serviceLocator = slc->CreateServiceLocator(parentServiceLocator, NULL,
+  this->serviceLocator = slc->CreateServiceLocator(parentServiceLocator, nullptr,
                                                    IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
 
   InitializeDefaultServices();
@@ -129,7 +129,7 @@ PartSite::ServiceLocatorOwner::ServiceLocatorOwner(PartSite* s)
 void PartSite::ServiceLocatorOwner::Dispose()
 {
   void* control = site->GetPane()->GetControl();
-  if (control != 0) {
+  if (control != nullptr) {
     site->GetPane()->DoHide();
   }
 }
@@ -343,7 +343,7 @@ void* PartSite::GetAdapterImpl(const std::type_info& /*adapter*/) const
   //    }
   //
   //    return Platform.getAdapterManager().getAdapter(this, adapter);
-  return 0;
+  return nullptr;
 }
 
 //void

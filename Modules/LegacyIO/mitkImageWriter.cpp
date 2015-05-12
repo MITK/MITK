@@ -233,7 +233,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 void mitk::ImageWriter::GenerateData()
 {
    const std::string& locale = "C";
-   const std::string& currLocale = setlocale( LC_ALL, NULL );
+   const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
    if ( locale.compare(currLocale)!=0 )
    {
@@ -254,7 +254,7 @@ void mitk::ImageWriter::GenerateData()
    }
 
    FILE* tempFile = fopen(m_FileName.c_str(),"w");
-   if (tempFile==NULL)
+   if (tempFile==nullptr)
    {
       itkExceptionMacro(<<"File location not writeable");
       return;
@@ -449,7 +449,7 @@ const mitk::Image* mitk::ImageWriter::GetInput()
 {
    if ( this->GetNumberOfInputs() < 1 )
    {
-      return NULL;
+      return nullptr;
    }
    else
    {

@@ -39,7 +39,7 @@ mitk::LabelSet::LabelSet(const LabelSet & other):
 {
 
   // clone Labels
-  LabelContainerConstIteratorType otherIt = other.IteratorConstBegin();
+  auto otherIt = other.IteratorConstBegin();
   for(; otherIt != other.IteratorConstEnd(); ++otherIt)
   {
     m_LabelContainer[otherIt->first] = otherIt->second->Clone();
@@ -177,7 +177,7 @@ void mitk::LabelSet::PrintSelf(std::ostream &/*os*/, itk::Indent /*indent*/) con
 
 void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
 {
-  LabelContainerType::reverse_iterator it = m_LabelContainer.rbegin();
+  auto it = m_LabelContainer.rbegin();
   PixelType nextActivePixelValue = it->first;
 
   for(; it != m_LabelContainer.rend(); it++){
@@ -205,7 +205,7 @@ void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
 
 void mitk::LabelSet::RemoveAllLabels()
 {
-  LabelContainerIteratorType _it = IteratorBegin();
+  auto _it = IteratorBegin();
   for(;_it!=IteratorConstEnd();)
   {
     RemoveLabelEvent.Send();
@@ -216,8 +216,8 @@ void mitk::LabelSet::RemoveAllLabels()
 
 void mitk::LabelSet::SetAllLabelsLocked(bool value)
 {
-  LabelContainerType::iterator _end = m_LabelContainer.end();
-  LabelContainerType::iterator _it = m_LabelContainer.begin();
+  auto _end = m_LabelContainer.end();
+  auto _it = m_LabelContainer.begin();
   for(; _it!=_end; ++_it)
     _it->second->SetLocked(value);
   AllLabelsModifiedEvent.Send();
@@ -226,8 +226,8 @@ void mitk::LabelSet::SetAllLabelsLocked(bool value)
 
 void mitk::LabelSet::SetAllLabelsVisible(bool value)
 {
-  LabelContainerType::iterator _end = m_LabelContainer.end();
-  LabelContainerType::iterator _it = m_LabelContainer.begin();
+  auto _end = m_LabelContainer.end();
+  auto _it = m_LabelContainer.begin();
   for(; _it!=_end; ++_it)
   {
     _it->second->SetVisible(value);
@@ -255,14 +255,14 @@ void mitk::LabelSet::UpdateLookupTable(PixelType pixelValue)
 
 mitk::Label* mitk::LabelSet::GetLabel(PixelType pixelValue)
 {
-  if(m_LabelContainer.find(pixelValue) == m_LabelContainer.end()) return NULL;
+  if(m_LabelContainer.find(pixelValue) == m_LabelContainer.end()) return nullptr;
   return m_LabelContainer[pixelValue];
 }
 
 const mitk::Label * mitk::LabelSet::GetLabel(PixelType pixelValue) const
 {
-  LabelContainerConstIteratorType it = m_LabelContainer.find(pixelValue);
-  if(it == m_LabelContainer.end()) return NULL;
+  auto it = m_LabelContainer.find(pixelValue);
+  if(it == m_LabelContainer.end()) return nullptr;
   return it->second.GetPointer();
 }
 
@@ -311,8 +311,8 @@ bool mitk::Equal( const mitk::LabelSet& leftHandSide, const mitk::LabelSet& righ
   // Label container (map)
 
   //m_LabelContainer;
-  mitk::LabelSet::LabelContainerConstIteratorType lhsit = leftHandSide.IteratorConstBegin();
-  mitk::LabelSet::LabelContainerConstIteratorType rhsit = rightHandSide.IteratorConstBegin();
+  auto lhsit = leftHandSide.IteratorConstBegin();
+  auto rhsit = rightHandSide.IteratorConstBegin();
   for(; lhsit != leftHandSide.IteratorConstEnd(); ++lhsit , ++rhsit)
   {
     returnValue = rhsit->first == lhsit->first;

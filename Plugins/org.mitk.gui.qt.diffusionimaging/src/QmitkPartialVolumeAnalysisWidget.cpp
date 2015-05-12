@@ -55,7 +55,7 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
 {
   this->Clear();
 
-  if(params != 0 && results != 0)
+  if(params != nullptr && results != nullptr)
   {
 //    hist->Print();
 //    params->Print();

@@ -54,17 +54,17 @@ public:
    * Customizes the workbench window, i.e. arrange a perspectives tab-bar according to the
    * PageComposite. The PageComposite is given to the WindowConfigurer for perspective related layout.
    */
-  void CreateWindowContents(berry::Shell::Pointer shell);
+  void CreateWindowContents(berry::Shell::Pointer shell) override;
 
   /**
    * For arbitrary actions after the window has been created but not yet opened.
    */
-  void PostWindowCreate();
+  void PostWindowCreate() override;
 
   /**
    * Menu bar, tool bar and status bar are made invisible, and the window title is being set.
    */
-  void PreWindowOpen();
+  void PreWindowOpen() override;
 
 private Q_SLOTS:
 

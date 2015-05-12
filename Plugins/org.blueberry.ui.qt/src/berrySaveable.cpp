@@ -73,7 +73,7 @@ void Saveable::EnableUI(QList<IWorkbenchPart::Pointer>&  /*parts*/)
 
 Object* Saveable::GetAdapter(const QString&  /*adapter*/) const
 {
-  return NULL;
+  return nullptr;
 }
 
 }

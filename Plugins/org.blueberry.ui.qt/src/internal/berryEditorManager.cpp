@@ -46,8 +46,8 @@ EditorManager::EditorManager(WorkbenchWindow::Pointer wind,
     EditorAreaHelper* pres)
  : editorPresentation(pres), window(wind.GetPointer()), page(workbenchPage.GetPointer()) {
   poco_check_ptr(editorPresentation);
-  poco_assert(window != 0);
-  poco_assert(page != 0);
+  poco_assert(window != nullptr);
+  poco_assert(page != nullptr);
 
   //page.getExtensionTracker().registerHandler(this, null);
 }
@@ -418,7 +418,7 @@ IEditorPart::Pointer EditorManager::GetVisibleEditor()
   IEditorReference::Pointer ref = editorPresentation->GetVisibleEditor();
   if (ref.IsNull())
   {
-    return IEditorPart::Pointer(0);
+    return IEditorPart::Pointer(nullptr);
   }
   return ref->GetPart(true).Cast<IEditorPart>();
 }
@@ -441,7 +441,7 @@ IEditorReference::Pointer EditorManager::FindReusableEditor(
     EditorDescriptor::Pointer  /*desc*/)
 {
   //return ((TabBehaviour)Tweaklets.get(TabBehaviour.KEY)).findReusableEditor(page);
-  return IEditorReference::Pointer(0);
+  return IEditorReference::Pointer(nullptr);
 }
 
 IEditorReference::Pointer EditorManager::OpenEditor(
@@ -627,7 +627,7 @@ IEditorReference::Pointer EditorManager::ReuseInternalEditor(
 //    return this->ReuseInternalEditor(page, this, editorPresentation, desc, input,
 //        reusableEditorRef);
 //  }
-  return IEditorReference::Pointer(0);
+  return IEditorReference::Pointer(nullptr);
 }
 
 IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) const
@@ -1078,7 +1078,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 
 //      return (IPathEditorInput)
 //      Util.getAdapter(input, IPathEditorInput.class);
-      return IPathEditorInput::Pointer(0);
+      return IPathEditorInput::Pointer(nullptr);
     }
 
     void EditorManager::RestoreEditorState(IMemento::Pointer /*editorMem*/,
@@ -1261,7 +1261,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       {
         return e.Cast<EditorReference>()->GetMemento();
       }
-      return IMemento::Pointer(0);
+      return IMemento::Pointer(nullptr);
     }
 
     IEditorReference::Pointer EditorManager::OpenEmptyTab()
@@ -1281,7 +1281,7 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
 //            StatusUtil.newStatus(WorkbenchPlugin.PI_WORKBENCH, e));
         BERRY_ERROR << e.what() << std::endl;
       }
-      return IEditorReference::Pointer(0);
+      return IEditorReference::Pointer(nullptr);
     }
 
     bool EditorManager::UseIPersistableEditor()

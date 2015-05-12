@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkCenteredRigid2DTransformView : public 
 
 public:
 
-  QmitkCenteredRigid2DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkCenteredRigid2DTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkCenteredRigid2DTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

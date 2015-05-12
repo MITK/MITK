@@ -37,7 +37,7 @@ HandlerActivation::HandlerActivation(const QString& commandId, const SmartPointe
         "The command identifier for a handler activation cannot be null");
   }
 
-  if (handlerService == NULL)
+  if (handlerService == nullptr)
   {
     throw ctkInvalidArgumentException("The handler service for an activation cannot be null");
   }

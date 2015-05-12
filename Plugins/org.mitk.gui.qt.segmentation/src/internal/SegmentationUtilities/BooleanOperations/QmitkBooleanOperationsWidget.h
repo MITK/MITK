@@ -26,7 +26,7 @@ class QmitkBooleanOperationsWidget : public QmitkSegmentationUtilityWidget
   Q_OBJECT
 
 public:
-  explicit QmitkBooleanOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
+  explicit QmitkBooleanOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
   ~QmitkBooleanOperationsWidget();
 
 private slots:

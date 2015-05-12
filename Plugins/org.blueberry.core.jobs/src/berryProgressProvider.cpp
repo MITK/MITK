@@ -41,7 +41,7 @@ IProgressMonitor::Pointer ProgressProvider::CreateMonitor(Job::Pointer /*job*/,
   // not implemented yet ( because the subProgressMonitor class is not implemented )returns a dummy null IProgressMonitor
   //Pointer
   //return IProgressMonitor::Pointer sptr_subProgressMonitor (new SubProgressMonitor()) ;
-  IProgressMonitor::Pointer dummy(0);
+  IProgressMonitor::Pointer dummy(nullptr);
   return dummy;
 }
 

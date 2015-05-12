@@ -110,7 +110,7 @@ public:
     vectorOfRotation[1] = 0.5;
     vectorOfRotation[2] = 0.2;
     mitk::ScalarType angleOfRotation = 73.0;
-    mitk::RotationOperation* rotation = new mitk::RotationOperation(mitk::OpROTATE,pointOfRotation, vectorOfRotation, angleOfRotation);
+    auto  rotation = new mitk::RotationOperation(mitk::OpROTATE,pointOfRotation, vectorOfRotation, angleOfRotation);
 
     baseData->GetTimeGeometry()->ExecuteOperation(rotation);
     delete rotation;

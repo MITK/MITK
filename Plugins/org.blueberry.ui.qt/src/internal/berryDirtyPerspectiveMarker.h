@@ -36,9 +36,9 @@ public:
    */
   DirtyPerspectiveMarker(const QString& id);
 
-  uint HashCode() const;
+  uint HashCode() const override;
 
-  bool operator==(const Object* o) const;
+  bool operator==(const Object* o) const override;
 };
 
 }

@@ -89,7 +89,7 @@ public:
   berryObjectMacro(EditorReference);
 
   EditorReference(EditorManager* manager, IEditorInput::Pointer input,
-      SmartPointer<EditorDescriptor> desc, IMemento::Pointer editorState = IMemento::Pointer(0));
+      SmartPointer<EditorDescriptor> desc, IMemento::Pointer editorState = IMemento::Pointer(nullptr));
 
   /**
    * Constructs a new editor reference for use by editors being restored from
@@ -114,7 +114,7 @@ private:
   void InitListenersAndHandlers();
 
 protected:
-  SmartPointer<PartPane> CreatePane();
+  SmartPointer<PartPane> CreatePane() override;
 
   /**
    * This method is called when there should be a change in the editor pin
@@ -126,16 +126,16 @@ public:
   void PinStatusUpdated();
 
 public:
-  QString GetFactoryId();
+  QString GetFactoryId() override;
 
 protected:
-  QString ComputePartName() const;
+  QString ComputePartName() const override;
 
 public:
-  QString GetName();
+  QString GetName() override;
 
 public:
-  IEditorPart::Pointer GetEditor(bool restore);
+  IEditorPart::Pointer GetEditor(bool restore) override;
 
 public:
   void SetName(const QString& name);
@@ -144,10 +144,10 @@ public:
   IMemento::Pointer GetMemento();
 
 public:
-  SmartPointer<IWorkbenchPage> GetPage() const;
+  SmartPointer<IWorkbenchPage> GetPage() const override;
 
 public:
-  IEditorInput::Pointer GetEditorInput();
+  IEditorInput::Pointer GetEditorInput() override;
 
 private:
   IEditorInput::Pointer GetRestoredInput();
@@ -192,7 +192,7 @@ protected:
    *
    * @return the created part
    */
-  IWorkbenchPart::Pointer CreatePart();
+  IWorkbenchPart::Pointer CreatePart() override;
 
   using WorkbenchPartReference::PropertyChanged;
   void PropertyChanged(Object::Pointer source, int propId);

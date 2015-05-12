@@ -105,30 +105,30 @@ public:
                     const SmartPointer<IPreferences>& preferenceStore,
                     const QString& preferenceKey);
 
-  void AddListener(IStateListener* listener);
+  void AddListener(IStateListener* listener) override;
 
   ~CommandStateProxy();
 
-  Object::Pointer GetValue() const;
+  Object::Pointer GetValue() const override;
 
   void Load(const SmartPointer<IPreferences>& store,
-            const QString& preferenceKey);
+            const QString& preferenceKey) override;
 
   using State::RemoveListener;
-  void RemoveListener(IStateListener* listener);
+  void RemoveListener(IStateListener* listener) override;
 
   void Save(const SmartPointer<IPreferences>& store,
-            const QString& preferenceKey);
+            const QString& preferenceKey) override;
 
-  void SetId(const QString& id);
+  void SetId(const QString& id) override;
 
-  void SetShouldPersist(bool persisted);
+  void SetShouldPersist(bool persisted) override;
 
-  void SetValue(const Object::Pointer& value);
+  void SetValue(const Object::Pointer& value) override;
 
-  bool ShouldPersist();
+  bool ShouldPersist() override;
 
-  QString ToString() const;
+  QString ToString() const override;
 
 private:
 

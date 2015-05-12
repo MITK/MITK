@@ -32,7 +32,7 @@ void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::Naviga
 {
   //save old locale
   char * oldLocale;
-  oldLocale = setlocale( LC_ALL, 0 );
+  oldLocale = setlocale( LC_ALL, nullptr );
 
   //define own locale
   std::locale C("C");

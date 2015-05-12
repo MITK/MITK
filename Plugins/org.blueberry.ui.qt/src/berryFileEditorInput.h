@@ -35,21 +35,21 @@ public:
 
   FileEditorInput(const QString& path);
 
-  QString GetPath() const;
+  QString GetPath() const override;
 
-  bool Exists() const;
+  bool Exists() const override;
 
-  QString GetName() const ;
+  QString GetName() const override ;
 
-  QString GetToolTipText() const;
+  QString GetToolTipText() const override;
 
-  QIcon GetIcon() const;
+  QIcon GetIcon() const override;
 
-  const IPersistableElement* GetPersistable() const;
+  const IPersistableElement* GetPersistable() const override;
 
-  Object* GetAdapter(const QString &adapterType) const;
+  Object* GetAdapter(const QString &adapterType) const override;
 
-  bool operator==(const Object* o) const;
+  bool operator==(const Object* o) const override;
 
 private:
 

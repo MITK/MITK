@@ -37,7 +37,7 @@ void ExpressionAuthority::SourceChanged(int sourcePriority, const QStringList& s
 }
 
 ExpressionAuthority::ExpressionAuthority()
-  : context(new EvaluationContext(0, Object::Pointer(this)))
+  : context(new EvaluationContext(nullptr, Object::Pointer(this)))
 {
   // break smart-pointer self-cycle
   this->UnRegister(false);
@@ -165,7 +165,7 @@ void ExpressionAuthority::Dispose()
   {
     // prevent double delete
     this->Register();
-    context = 0;
+    context = nullptr;
     //this->UnRegister(false);
   }
 }
@@ -212,7 +212,7 @@ void ExpressionAuthority::RemoveSourceProvider(const SmartPointer<ISourceProvide
   {
     variableItr.next();
     const QString variableName = variableItr.key();
-    ChangeVariable(variableName, Object::Pointer(0));
+    ChangeVariable(variableName, Object::Pointer(nullptr));
   }
 }
 
@@ -222,7 +222,7 @@ void ExpressionAuthority::SourceChanged(int sourcePriority,
   // If the selection has changed, invalidate the current state.
   if (sourceValuesByName.contains(ISources::ACTIVE_CURRENT_SELECTION_NAME()))
   {
-    currentState = 0;
+    currentState = nullptr;
   }
 
   QHashIterator<QString, Object::ConstPointer> entryItr(sourceValuesByName);
@@ -242,7 +242,7 @@ void ExpressionAuthority::SourceChanged(int sourcePriority, const QString &sourc
   // If the selection has changed, invalidate the current state.
   if (ISources::ACTIVE_CURRENT_SELECTION_NAME() == sourceName)
   {
-    currentState = 0;
+    currentState = nullptr;
   }
 
   UpdateEvaluationContext(sourceName, sourceValue);

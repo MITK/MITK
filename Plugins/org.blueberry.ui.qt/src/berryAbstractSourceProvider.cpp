@@ -49,7 +49,7 @@ void AbstractSourceProvider::LogDebuggingInfo(const QString& message)
 void AbstractSourceProvider::AddSourceProviderListener(
     ISourceProviderListener* listener)
 {
-  if (listener == 0)
+  if (listener == nullptr)
   {
     throw Poco::NullPointerException("The listener cannot be null");
   }
@@ -60,7 +60,7 @@ void AbstractSourceProvider::AddSourceProviderListener(
 void AbstractSourceProvider::RemoveSourceProviderListener(
     ISourceProviderListener* listener)
 {
-  if (listener == 0)
+  if (listener == nullptr)
   {
     throw Poco::NullPointerException("The listener cannot be null");
   }

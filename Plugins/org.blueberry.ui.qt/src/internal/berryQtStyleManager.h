@@ -34,27 +34,27 @@ public:
   QtStyleManager();
   ~QtStyleManager();
 
-  Style GetStyle() const;
-  QString GetStylesheet() const;
-  QString GetActiveTabStylesheet() const;
-  QString GetTabStylesheet() const;
+  Style GetStyle() const override;
+  QString GetStylesheet() const override;
+  QString GetActiveTabStylesheet() const override;
+  QString GetTabStylesheet() const override;
 
-  void AddStyle(const QString& styleFileName, const QString& styleName = QString());
-  void AddStyles(const QString& path);
-  void RemoveStyle(const QString& styleFileName);
-  void RemoveStyles(const QString& path = QString());
+  void AddStyle(const QString& styleFileName, const QString& styleName = QString()) override;
+  void AddStyles(const QString& path) override;
+  void RemoveStyle(const QString& styleFileName) override;
+  void RemoveStyles(const QString& path = QString()) override;
 
-  void GetStyles(StyleList& styles) const;
-  void SetStyle(const QString& fileName);
+  void GetStyles(StyleList& styles) const override;
+  void SetStyle(const QString& fileName) override;
 
-  Style GetDefaultStyle() const;
-  void SetDefaultStyle();
+  Style GetDefaultStyle() const override;
+  void SetDefaultStyle() override;
 
-  void GetIconThemes(IconThemeList& iconThemes) const;
+  void GetIconThemes(IconThemeList& iconThemes) const override;
 
-  void SetIconTheme(const QString& themeName);
+  void SetIconTheme(const QString& themeName) override;
 
-  bool Contains(const QString& fileName) const;
+  bool Contains(const QString& fileName) const override;
 
   bool IsA( const std::type_info& type ) const;
   const std::type_info& GetType() const;

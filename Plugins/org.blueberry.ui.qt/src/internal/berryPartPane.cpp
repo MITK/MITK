@@ -31,14 +31,14 @@ namespace berry
 {
 
 PartPane::Sashes::Sashes() :
-  left(0), right(0), top(0), bottom(0)
+  left(nullptr), right(nullptr), top(nullptr), bottom(nullptr)
 {
 }
 
 PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
     WorkbenchPage* workbenchPage)
  : LayoutPart(partReference->GetId()),
-   control(0), inLayout(true), busy(false), hasFocus(false)
+   control(nullptr), inLayout(true), busy(false), hasFocus(false)
 {
   //super(partReference.getId());
   this->partReference = partReference;
@@ -46,7 +46,7 @@ PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
 }
 
 void PartPane::CreateControl(QWidget* parent) {
-  if (this->GetControl() != 0)
+  if (this->GetControl() != nullptr)
   {
     return;
   }
@@ -60,7 +60,7 @@ void PartPane::CreateControl(QWidget* parent) {
   // by activation.  This allows us to have views appear in tabs without
   // becoming active by default.
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetVisible(control, false);
-  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveAbove(control, 0);
+  Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveAbove(control, nullptr);
 
   // Create a title bar.
   //this->CreateTitleBar();
@@ -78,13 +78,13 @@ PartPane::~PartPane()
 //
   this->Register();
 
-  if (control != 0)
+  if (control != nullptr)
   {
     BERRY_DEBUG << "Deleting PartPane control";
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(control, GuiTk::IControlListener::Pointer(this));
 //    control.removeTraverseListener(traverseListener);
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->Dispose(control);
-    control = 0;
+    control = nullptr;
   }
 //  if ((paneMenuManager != null))
 //  {
@@ -121,7 +121,7 @@ QRect PartPane::GetParentBounds()
   {
     LayoutPart::Pointer part = this->GetContainer().Cast<LayoutPart>();
 
-    if (part->GetControl() != 0)
+    if (part->GetControl() != nullptr)
     {
       ctrl = part->GetControl();
     }
@@ -155,7 +155,7 @@ GuiTk::IControlListener::Events::Types PartPane::GetEventTypes() const
 
 void PartPane::MoveAbove(QWidget* refControl)
 {
-  if (this->GetControl() != 0)
+  if (this->GetControl() != nullptr)
   {
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->MoveAbove(this->GetControl(), refControl);
   }
@@ -208,13 +208,13 @@ void PartPane::SetContainer(ILayoutContainer::Pointer container)
     }
   }
 
-  QWidget* containerControl = container == 0 ? 0 : container.Cast<LayoutPart>()->GetControl();
+  QWidget* containerControl = container == 0 ? nullptr : container.Cast<LayoutPart>()->GetControl();
 
-  if (containerControl != 0)
+  if (containerControl != nullptr)
   {
     QWidget* control = this->GetControl();
     QWidget* newParent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(containerControl);
-    if (control != 0 && newParent != Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(control))
+    if (control != nullptr && newParent != Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(control))
     {
       this->Reparent(newParent);
     }
@@ -228,7 +228,7 @@ void PartPane::Reparent(QWidget* newParent)
   QWidget* control = this->GetControl();
 
   GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
-  if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
+  if ((control == nullptr) || (guiTweaklet->GetParent(control) == newParent))
   {
     return;
   }
@@ -244,7 +244,7 @@ void PartPane::Reparent(QWidget* newParent)
     guiTweaklet->SetEnabled(control, false);
     guiTweaklet->SetParent(control, newParent);
     guiTweaklet->SetEnabled(control, enabled);
-    guiTweaklet->MoveAbove(control, 0);
+    guiTweaklet->MoveAbove(control, nullptr);
   }
 }
 
@@ -296,7 +296,7 @@ void PartPane::SetVisible(bool makeVisible)
     partReference.Lock()->GetPart(true);
   }
 
-  if (this->GetControl() != 0)
+  if (this->GetControl() != nullptr)
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetVisible(this->GetControl(), makeVisible);
 
   partReference.Lock().Cast<WorkbenchPartReference>()->FireVisibilityChange();
@@ -304,7 +304,7 @@ void PartPane::SetVisible(bool makeVisible)
 
 bool PartPane::GetVisible()
 {
-  if (this->GetControl() != 0)
+  if (this->GetControl() != nullptr)
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetVisible(this->GetControl());
   return false;
 }
@@ -351,7 +351,7 @@ void PartPane::ShowHighlight()
 
 QToolBar* PartPane::GetToolBar()
 {
-  return 0;
+  return nullptr;
 }
 
 bool PartPane::HasViewMenu()

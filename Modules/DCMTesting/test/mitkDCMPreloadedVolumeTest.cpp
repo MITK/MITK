@@ -27,14 +27,14 @@ bool CheckAllPropertiesAreInOtherList(const mitk::PropertyList* list, const mitk
   const mitk::PropertyList::PropertyMap* otherListM = otherList->GetMap();
 
   bool equal = true;
-  for ( mitk::PropertyList::PropertyMap::const_iterator iter = listM->begin();
+  for ( auto iter = listM->begin();
         iter != listM->end();
         ++iter )
   {
     std::string key = iter->first;
     mitk::BaseProperty* property = iter->second;
 
-    mitk::PropertyList::PropertyMap::const_iterator otherEntry = otherListM->find( key );
+    auto otherEntry = otherListM->find( key );
     MITK_TEST_CONDITION( otherEntry != otherListM->end(), "  Property '" << key << "' is contained in other list" )
 
     mitk::BaseProperty* otherProperty = otherEntry->second;

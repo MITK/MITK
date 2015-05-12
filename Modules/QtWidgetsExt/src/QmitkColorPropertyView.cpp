@@ -43,8 +43,8 @@ void QmitkColorPropertyView::PropertyChanged()
 
 void QmitkColorPropertyView::PropertyRemoved()
 {
-  m_Property = NULL;
-  m_ColorProperty = NULL;
+  m_Property = nullptr;
+  m_ColorProperty = nullptr;
 }
 
 void QmitkColorPropertyView::DisplayColor()

@@ -70,13 +70,13 @@ class GenericLookupTable
 
     bool ValueExists(IdentifierType id) const
     {
-      typename LookupTableType::const_iterator it = m_LookupTable.find(id);
+      auto it = m_LookupTable.find(id);
       return (it != m_LookupTable.end());
     }
 
     ValueType GetTableValue( IdentifierType id ) const
     {
-      typename LookupTableType::const_iterator it = m_LookupTable.find(id);
+      auto it = m_LookupTable.find(id);
       if (it != m_LookupTable.end())
         return it->second;
       else

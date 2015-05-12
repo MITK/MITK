@@ -336,7 +336,7 @@ public:
     stop.fetchAndStoreOrdered(1);
   }
 
-  void run()
+  void run() override
   {
     while (!stop.fetchAndAddOrdered(0))
     {
@@ -385,7 +385,7 @@ void ExtensionRegistry::CreateExtensionData(const QString& contributorId,
     for (int i = 0; i < descriptionProperties.size(); i++)
     {
       properties.push_back(descriptionProperties[i].GetName());
-      properties.push_back(Translate(descriptionProperties[i].GetValue(), NULL));
+      properties.push_back(Translate(descriptionProperties[i].GetValue(), nullptr));
     }
   }
   currentConfigurationElement->SetProperties(properties);
@@ -781,14 +781,14 @@ void ExtensionRegistry::RemoveListener(IRegistryEventListener* listener)
 }
 
 ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject* masterToken, QObject* userToken)
-  : registryObjects(NULL), isMultiLanguage(false), mlErrorLogged(false), eventThread(NULL)
+  : registryObjects(nullptr), isMultiLanguage(false), mlErrorLogged(false), eventThread(nullptr)
 {
   isMultiLanguage = RegistryProperties::GetProperty(RegistryConstants::PROP_REGISTRY_MULTI_LANGUAGE) == "true";
 
-  if (registryStrategy != NULL)
+  if (registryStrategy != nullptr)
     strategy.reset(registryStrategy);
   else
-    strategy.reset(new RegistryStrategy(QList<QString>(), QList<bool>(), NULL));
+    strategy.reset(new RegistryStrategy(QList<QString>(), QList<bool>(), nullptr));
 
   this->masterToken = masterToken;
   this->userToken = userToken;
@@ -855,7 +855,7 @@ ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject
   {
     struct DebugRegistryListener : public IRegistryEventListener
     {
-      void Added(const QList<IExtension::Pointer>& extensions)
+      void Added(const QList<IExtension::Pointer>& extensions) override
       {
         BERRY_INFO << "Registry extensions ADDED:";
         foreach(IExtension::Pointer extension, extensions)
@@ -865,7 +865,7 @@ ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject
         }
       }
 
-      void Removed(const QList<IExtension::Pointer>& extensions)
+      void Removed(const QList<IExtension::Pointer>& extensions) override
       {
         BERRY_INFO << "Registry extensions REMOVED:";
         foreach(IExtension::Pointer extension, extensions)
@@ -875,7 +875,7 @@ ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject
         }
       }
 
-      void Added(const QList<IExtensionPoint::Pointer>& extensionPoints)
+      void Added(const QList<IExtensionPoint::Pointer>& extensionPoints) override
       {
         BERRY_INFO << "Registry extension-points ADDED:";
         foreach(IExtensionPoint::Pointer extensionPoint, extensionPoints)
@@ -884,7 +884,7 @@ ExtensionRegistry::ExtensionRegistry(RegistryStrategy* registryStrategy, QObject
         }
       }
 
-      void Removed(const QList<IExtensionPoint::Pointer>& extensionPoints)
+      void Removed(const QList<IExtensionPoint::Pointer>& extensionPoints) override
       {
         BERRY_INFO << "Registry extension-points REMOVED:";
         foreach(IExtensionPoint::Pointer extensionPoint, extensionPoints)
@@ -910,7 +910,7 @@ void ExtensionRegistry::Stop(QObject* /*key*/)
 {
   // If the registry creator specified a key token, check that the key mathches it
   // (it is assumed that registry owner keeps the key to prevent unautorized accesss).
-  if (masterToken != NULL && masterToken != NULL)
+  if (masterToken != nullptr && masterToken != nullptr)
   {
     throw ctkInvalidArgumentException("Unauthorized access to the ExtensionRegistry.stop() method. Check if proper access token is supplied."); //$NON-NLS-1$
   }
@@ -1179,7 +1179,7 @@ bool ExtensionRegistry::AddExtensionPoint(const QString& identifier, const Smart
   }
   currentExtPoint->SetUniqueIdentifier(uniqueId);
   currentExtPoint->SetNamespace(namespaceName);
-  QString labelNLS = Translate(label, NULL);
+  QString labelNLS = Translate(label, nullptr);
   currentExtPoint->SetLabel(labelNLS);
   currentExtPoint->SetSchema(schemaReference);
 
@@ -1241,7 +1241,7 @@ bool ExtensionRegistry::AddExtension(const QString& identifier, const SmartPoint
   currentExtension->SetSimpleIdentifier(simpleId);
   currentExtension->SetNamespaceIdentifier(namespaceName);
 
-  QString extensionLabelNLS = Translate(label, NULL);
+  QString extensionLabelNLS = Translate(label, nullptr);
   currentExtension->SetLabel(extensionLabelNLS);
 
     QString targetExtensionPointId;

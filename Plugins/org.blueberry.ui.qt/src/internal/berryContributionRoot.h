@@ -57,7 +57,7 @@ public:
    * @see IContributionRoot#AddContributionItem(IContributionItem, Expression)
    */
   void AddContributionItem(const SmartPointer<IContributionItem>& item,
-                           const SmartPointer<Expression>& visibleWhen);
+                           const SmartPointer<Expression>& visibleWhen) override;
 
   QList<SmartPointer<IContributionItem> > GetItems() const;
 
@@ -70,7 +70,7 @@ public:
    * @see IContributionRoot#RegisterVisibilityForChild(IContributionItem, Expression)
    */
   void RegisterVisibilityForChild(const SmartPointer<IContributionItem>& item,
-                                  const SmartPointer<Expression>& visibleWhen);
+                                  const SmartPointer<Expression>& visibleWhen) override;
 
   /**
    * @return Returns the mgr.

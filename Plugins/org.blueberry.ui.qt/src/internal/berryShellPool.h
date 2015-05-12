@@ -61,7 +61,7 @@ public:
 
   berryObjectMacro(ShellPool)
 
-  void ShellClosed(const ShellEvent::Pointer& e);
+  void ShellClosed(const ShellEvent::Pointer& e) override;
 
   /**
    * Creates a shell pool that allocates shells that are children of the

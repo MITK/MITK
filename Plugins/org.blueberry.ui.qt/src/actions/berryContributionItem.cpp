@@ -111,12 +111,12 @@ void ContributionItem::SetId(const QString& itemId)
 }
 
 ContributionItem::ContributionItem()
-  : visible(true), parent(0)
+  : visible(true), parent(nullptr)
 {
 }
 
 ContributionItem::ContributionItem(const QString& id)
-  : id(id), visible(true), parent(0)
+  : id(id), visible(true), parent(nullptr)
 {
 }
 

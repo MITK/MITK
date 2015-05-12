@@ -105,7 +105,7 @@ public:
 
         //initialize the MITK image with given dimenion and data type
         mitk::Image::Pointer output = mitk::Image::New();
-        unsigned int* dimensions = new unsigned int[4];
+        auto    dimensions = new unsigned int[4];
         unsigned int numberOfDimensions = 0;
         unsigned int bufferSize = 0;
 
@@ -145,7 +145,7 @@ public:
         output->SetSpacing(spacing);
 
         //get a pointer to the image buffer to write into
-        TPixelType* imageBuffer = NULL;
+        TPixelType* imageBuffer = nullptr;
         try
         {
           mitk::ImageWriteAccessor writeAccess( output );

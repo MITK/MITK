@@ -27,7 +27,7 @@ namespace mitk
     WeightedRoundRobinSchedulingAlgorithm();
     ~WeightedRoundRobinSchedulingAlgorithm();
 
-    SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue);
+    SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue) override;
   };
 }
 

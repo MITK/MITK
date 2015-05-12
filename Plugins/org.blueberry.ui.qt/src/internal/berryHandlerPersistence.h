@@ -99,10 +99,10 @@ protected:
   friend class HandlerService;
 
   bool IsChangeImportant(const QList<SmartPointer<IExtension> >& extensions,
-                         RegistryChangeType changeType);
+                         RegistryChangeType changeType) override;
 
   bool IsChangeImportant(const QList<SmartPointer<IExtensionPoint> >& extensionPoints,
-                         RegistryChangeType changeType);
+                         RegistryChangeType changeType) override;
 
   /**
    * Reads all of the handlers from the registry
@@ -111,7 +111,7 @@ protected:
    *            The handler service which should be populated with the values
    *            from the registry; must not be <code>null</code>.
    */
-  void Read();
+  void Read() override;
 
 private:
 

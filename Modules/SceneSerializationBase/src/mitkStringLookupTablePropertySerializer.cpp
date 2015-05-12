@@ -35,17 +35,17 @@ class StringLookupTablePropertySerializer : public BasePropertySerializer
     virtual TiXmlElement* Serialize() override
     {
       const StringLookupTableProperty* prop = dynamic_cast<const StringLookupTableProperty*>(m_Property.GetPointer());
-      if (prop == NULL)
-        return NULL;
+      if (prop == nullptr)
+        return nullptr;
       StringLookupTable lut = prop->GetValue();
       //if (lut.IsNull())
       //  return NULL; // really?
       const StringLookupTable::LookupTableType& map = lut.GetLookupTable();
 
-      TiXmlElement* element = new TiXmlElement("StringLookupTable");
-      for (StringLookupTable::LookupTableType::const_iterator it = map.begin(); it != map.end(); ++it)
+      auto  element = new TiXmlElement("StringLookupTable");
+      for (auto it = map.begin(); it != map.end(); ++it)
         {
-          TiXmlElement* tableEntry = new TiXmlElement("LUTValue");
+          auto  tableEntry = new TiXmlElement("LUTValue");
           tableEntry->SetAttribute("id", it->first);
           tableEntry->SetAttribute("value", it->second);
           element->LinkEndChild( tableEntry );
@@ -56,19 +56,19 @@ class StringLookupTablePropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element)
-        return NULL;
+        return nullptr;
 
       StringLookupTable lut;
-      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != NULL; child = child->NextSiblingElement("LUTValue"))
+      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != nullptr; child = child->NextSiblingElement("LUTValue"))
       {
 
         int temp;
         if (child->QueryIntAttribute("id", &temp) == TIXML_WRONG_TYPE)
-          return NULL; // TODO: can we do a better error handling?
+          return nullptr; // TODO: can we do a better error handling?
         StringLookupTable::IdentifierType id = static_cast<StringLookupTable::IdentifierType>(temp);
 
-        if (child->Attribute("value") == NULL)
-          return NULL; // TODO: can we do a better error handling?
+        if (child->Attribute("value") == nullptr)
+          return nullptr; // TODO: can we do a better error handling?
         StringLookupTable::ValueType val = child->Attribute("value");
         lut.SetTableValue(id, val);
       }

@@ -29,7 +29,7 @@ void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::loader::M
 {
   using sofa::defaulttype::Vec4f;
 
-  if (dataNode.IsNull() || dynamic_cast<mitk::Surface*>(dataNode->GetData()) == NULL)
+  if (dataNode.IsNull() || dynamic_cast<mitk::Surface*>(dataNode->GetData()) == nullptr)
     return;
 
   if (material.useDiffuse)
@@ -60,10 +60,10 @@ void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::loader::M
 static mitk::DataNode::Pointer GetSimulationDataNode(mitk::DataStorage::Pointer dataStorage, sofa::core::objectmodel::BaseNode::SPtr rootNode)
 {
   if (dataStorage.IsNull())
-    return NULL;
+    return nullptr;
 
   if (!rootNode)
-    return NULL;
+    return nullptr;
 
   mitk::TNodePredicateDataType<mitk::Simulation>::Pointer predicate = mitk::TNodePredicateDataType<mitk::Simulation>::New();
   mitk::DataStorage::SetOfObjects::ConstPointer subset = dataStorage->GetSubset(predicate);
@@ -77,7 +77,7 @@ static mitk::DataNode::Pointer GetSimulationDataNode(mitk::DataStorage::Pointer 
       return dataNode;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 
@@ -120,7 +120,7 @@ void mitk::ExportMitkVisitor::processVisualModel(sofa::simulation::Node* node, s
 
   sofa::component::visualmodel::VisualModelImpl* visualModelImpl = dynamic_cast<sofa::component::visualmodel::VisualModelImpl*>(visualModel);
 
-  if (visualModelImpl == NULL)
+  if (visualModelImpl == nullptr)
     return;
 
   if (!m_VisualModelName.empty() && m_VisualModelName != visualModelImpl->name.getValue())

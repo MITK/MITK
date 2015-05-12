@@ -40,7 +40,7 @@ void mitk::VtkVolumeTimeSeriesReader::GenerateData()
     vtkReader->SetFileName( fileName.c_str() );
     vtkReader->Update();
 
-    if ( vtkReader->GetOutput() != NULL )
+    if ( vtkReader->GetOutput() != nullptr )
     {
       output->SetVtkPolyData( vtkReader->GetOutput()->GetVtkPolyData(), i );
     }

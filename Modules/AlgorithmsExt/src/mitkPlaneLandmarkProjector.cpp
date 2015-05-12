@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlaneLandmarkProjector.h"
 
-mitk::PlaneLandmarkProjector::PlaneLandmarkProjector() : m_ProjectionPlane(NULL)
+mitk::PlaneLandmarkProjector::PlaneLandmarkProjector() : m_ProjectionPlane(nullptr)
 {
 }
 

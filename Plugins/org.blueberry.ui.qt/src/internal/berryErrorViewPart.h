@@ -50,21 +50,21 @@ public:
    *
    * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
    */
-  void CreatePartControl(QWidget* parent);
+  void CreatePartControl(QWidget* parent) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.part.ViewPart#setPartName(java.lang.String)
    */
-  void SetPartName(const QString& newName);
+  void SetPartName(const QString& newName) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
    */
-  void SetFocus();
+  void SetFocus() override;
 
   private:
 

@@ -74,34 +74,34 @@ public:
   /**
    * @see IWorkbenchPart
    */
-  virtual void AddPropertyListener(IPropertyChangeListener* listener);
+  virtual void AddPropertyListener(IPropertyChangeListener* listener) override;
 
   /**
    * @see IWorkbenchPart
    */
-  virtual void RemovePropertyListener(IPropertyChangeListener* listener);
+  virtual void RemovePropertyListener(IPropertyChangeListener* listener) override;
 
-  QString GetId() const;
+  QString GetId() const override;
 
-  virtual QString GetTitleToolTip() const;
+  virtual QString GetTitleToolTip() const override;
 
   /**
    * Returns the pane name for the part
    *
    * @return the pane name for the part
    */
-  virtual QString GetPartName() const;
+  virtual QString GetPartName() const override;
 
   /**
    * Returns the content description for this part.
    *
    * @return the pane name for the part
    */
-  virtual QString GetContentDescription() const;
+  virtual QString GetContentDescription() const override;
 
-  virtual bool IsDirty() const;
+  virtual bool IsDirty() const override;
 
-  virtual QIcon GetTitleImage() const;
+  virtual QIcon GetTitleImage() const override;
 
   virtual void FireVisibilityChange();
 
@@ -109,7 +109,7 @@ public:
 
   virtual void SetVisible(bool isVisible);
 
-  IWorkbenchPart::Pointer GetPart(bool restore);
+  IWorkbenchPart::Pointer GetPart(bool restore) override;
 
   /**
    * Returns the part pane for this part reference. Does not return null.
@@ -122,17 +122,17 @@ public:
 
   virtual void SetPinned(bool newPinned);
 
-  virtual bool IsPinned() const;
+  virtual bool IsPinned() const override;
 
   /*
    * @see org.blueberry.ui.IWorkbenchPartReference#getPartProperty(java.lang.String)
    */
-  virtual QString GetPartProperty(const QString& key) const;
+  virtual QString GetPartProperty(const QString& key) const override;
 
   int ComputePreferredSize(bool width, int availableParallel,
-                           int availablePerpendicular, int preferredResult);
+                           int availablePerpendicular, int preferredResult) override;
 
-  int GetSizeFlags(bool width);
+  int GetSizeFlags(bool width) override;
 
 protected:
 
@@ -253,7 +253,7 @@ private:
   {
     PropertyChangeListener(WorkbenchPartReference* ref);
     using IPropertyChangeListener::PropertyChange;
-    void PropertyChange(const PropertyChangeEvent::Pointer& event);
+    void PropertyChange(const PropertyChangeEvent::Pointer& event) override;
 
   private:
     WorkbenchPartReference* partRef;

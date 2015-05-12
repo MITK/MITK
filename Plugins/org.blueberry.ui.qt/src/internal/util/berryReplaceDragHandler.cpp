@@ -45,7 +45,7 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
 
   // This drop target only deals with tabs... if we're not dragging over
   // a tab, exit.
-  if (tabUnderPointer == 0)
+  if (tabUnderPointer == nullptr)
   {
     QRect titleArea = tabFolder->GetTabArea();
 
@@ -59,14 +59,14 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
       // Can't drag to end unless you can see the end
       if (!lastTab->IsShowing())
       {
-        return StackDropResult::Pointer(0);
+        return StackDropResult::Pointer(nullptr);
       }
 
       // If we are unable to compute the bounds for this tab, then ignore the drop
       QRect lastTabBounds = lastTab->GetBounds();
       if (lastTabBounds.isEmpty())
       {
-        return StackDropResult::Pointer(0);
+        return StackDropResult::Pointer(nullptr);
       }
 
       if (dragStart >= 0)
@@ -97,17 +97,17 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
       int closestSide = Geometry::GetClosestSide(displayBounds, location);
       if (closestSide == tabFolder->GetTabPosition())
       {
-        StackDropResult::Pointer result(new StackDropResult(displayBounds, Object::Pointer(0)));
+        StackDropResult::Pointer result(new StackDropResult(displayBounds, Object::Pointer(nullptr)));
         return result;
       }
 
-      return StackDropResult::Pointer(0);
+      return StackDropResult::Pointer(nullptr);
     }
   }
 
   if (!tabUnderPointer->IsShowing())
   {
-    return StackDropResult::Pointer(0);
+    return StackDropResult::Pointer(nullptr);
   }
 
   QRect qtabBounds = tabUnderPointer->GetBounds();
@@ -115,7 +115,7 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
 
   if (qtabBounds.isEmpty())
   {
-    return StackDropResult::Pointer(0);
+    return StackDropResult::Pointer(nullptr);
   }
 
   Object::Pointer cookie(new DragCookie(tabFolder->IndexOf(tabUnderPointer)));

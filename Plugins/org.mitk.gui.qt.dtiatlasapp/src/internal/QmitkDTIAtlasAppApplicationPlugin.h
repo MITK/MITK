@@ -37,7 +37,7 @@ public:
 
       ctkPluginContext* GetPluginContext() const;
 
-      void start(ctkPluginContext*);
+      void start(ctkPluginContext*) override;
 
       QString GetQtHelpCollectionFile() const;
 

@@ -30,7 +30,7 @@ namespace mitk
     mitkAlgorithmNewMacro(ShowSegmentationAsSmoothedSurface);
 
   protected:
-    void Initialize(const NonBlockingAlgorithm *other = NULL) override;
+    void Initialize(const NonBlockingAlgorithm *other = nullptr) override;
     bool ReadyToRun() override;
     bool ThreadedUpdateFunction() override;
     void ThreadedUpdateSuccessful() override;

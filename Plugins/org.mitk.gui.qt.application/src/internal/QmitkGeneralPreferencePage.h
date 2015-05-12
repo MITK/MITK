@@ -39,32 +39,32 @@ public:
   /**
   * @see berry::IPreferencePage::Init(berry::IWorkbench::Pointer workbench)
   */
-  void Init(berry::IWorkbench::Pointer workbench);
+  void Init(berry::IWorkbench::Pointer workbench) override;
 
   /**
   * @see berry::IPreferencePage::CreateQtControl(void* parent)
   */
-  void CreateQtControl(QWidget* widget);
+  void CreateQtControl(QWidget* widget) override;
 
   /**
   * @see berry::IPreferencePage::CreateQtControl()
   */
-  QWidget* GetQtControl() const;
+  QWidget* GetQtControl() const override;
 
   /**
   * @see berry::IPreferencePage::PerformOk()
   */
-  virtual bool PerformOk();
+  virtual bool PerformOk() override;
 
   /**
   * @see berry::IPreferencePage::PerformCancel()
   */
-  virtual void PerformCancel();
+  virtual void PerformCancel() override;
 
    /**
   * @see berry::IPreferencePage::Update()
   */
-  virtual void Update();
+  virtual void Update() override;
 
 protected:
 

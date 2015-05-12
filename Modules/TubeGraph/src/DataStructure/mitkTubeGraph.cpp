@@ -192,7 +192,7 @@ mitk::TubeGraph::Pointer mitk::TubeGraph::CreateSubGraph(std::vector<TubeDescrip
   std::map<VertexDescriptorType, VertexDescriptorType> vertexDescriptorOldToNewMap;
 
   //add a new edge and if necessary also the vertices of each tube to the new sub graph
-  for (std::vector<TubeDescriptorType>::iterator it = subGraphTubes.begin(); it != subGraphTubes.end(); it++)
+  for (auto it = subGraphTubes.begin(); it != subGraphTubes.end(); it++)
   {
     //search for the source vertex in the subgraph; if it is already added continue, otherwise add it
     if(vertexDescriptorOldToNewMap.find(it->first) == vertexDescriptorOldToNewMap.end())
@@ -234,7 +234,7 @@ mitk::TubeGraph::Pointer mitk::TubeGraph::CreateSubGraph(std::vector<TubeDescrip
 
 void mitk::TubeGraph::RemoveSubGraph(std::vector<TubeDescriptorType> deletedTubes)
 {
-  for (std::vector<TubeDescriptorType>::iterator it = deletedTubes.begin(); it != deletedTubes.end(); it++)
+  for (auto it = deletedTubes.begin(); it != deletedTubes.end(); it++)
   {
     VertexDescriptorType source = it->first;
     VertexDescriptorType target = it->second;

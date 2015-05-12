@@ -70,15 +70,15 @@ public:
 
   ~EvaluationResultCache();
 
-  void ClearResult();
+  void ClearResult() override;
 
-  bool Evaluate(IEvaluationContext* context) const;
+  bool Evaluate(IEvaluationContext* context) const override;
 
-  SmartPointer<Expression> GetExpression() const;
+  SmartPointer<Expression> GetExpression() const override;
 
-  int GetSourcePriority() const;
+  int GetSourcePriority() const override;
 
-  void SetResult(bool result);
+  void SetResult(bool result) override;
 };
 
 }

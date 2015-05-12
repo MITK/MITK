@@ -75,7 +75,7 @@ struct org_blueberry_core_runtime_EXPORT IDebugObjectListener
   {
   }
 
-  virtual void ObjectTracingChanged(unsigned int  /*traceId*/, bool  /*enabled*/ = true, const Object*  /*obj*/ = 0)
+  virtual void ObjectTracingChanged(unsigned int  /*traceId*/, bool  /*enabled*/ = true, const Object*  /*obj*/ = nullptr)
   {
   }
 

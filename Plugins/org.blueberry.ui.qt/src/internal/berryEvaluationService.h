@@ -44,52 +44,52 @@ public:
    */
   SmartPointer<IEvaluationReference> AddEvaluationListener(const SmartPointer<Expression>& expression,
                                                            IPropertyChangeListener* listener,
-                                                           const QString& property);
+                                                           const QString& property) override;
 
   /*
    * @see IEvaluationService#AddEvaluationReference(IEvaluationReference)
    */
-  void AddEvaluationReference(const SmartPointer<IEvaluationReference>& ref);
+  void AddEvaluationReference(const SmartPointer<IEvaluationReference>& ref) override;
 
   /*
    * @see IEvaluationService#RemoveEvaluationListener(IEvaluationReference)
    */
-  void RemoveEvaluationListener(const SmartPointer<IEvaluationReference>& ref);
+  void RemoveEvaluationListener(const SmartPointer<IEvaluationReference>& ref) override;
 
   /*
    * @see IServiceWithSources#AddSourceProvider(ISourceProvider)
    */
-  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider);
+  void AddSourceProvider(const SmartPointer<ISourceProvider>& provider) override;
 
   /*
    * @see IServiceWithSources#RemoveSourceProvider(ISourceProvider)
    */
-  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider);
+  void RemoveSourceProvider(const SmartPointer<ISourceProvider>& provider) override;
 
   /*
    * @see IDisposable#Dispose()
    */
-  void Dispose();
+  void Dispose() override;
 
   /*
    * @see IEvaluationService#GetCurrentState()
    */
-  SmartPointer<IEvaluationContext> GetCurrentState() const;
+  SmartPointer<IEvaluationContext> GetCurrentState() const override;
 
   /*
    * @see IEvaluationService#AddServiceListener(IPropertyChangeListener)
    */
-  void AddServiceListener(IPropertyChangeListener *listener);
+  void AddServiceListener(IPropertyChangeListener *listener) override;
 
   /*
    * @see IEvaluationService#removeServiceListener(IPropertyChangeListener)
    */
-  void RemoveServiceListener(IPropertyChangeListener* listener);
+  void RemoveServiceListener(IPropertyChangeListener* listener) override;
 
   /*
    * @see IEvaluationService#RequestEvaluation(QString)
    */
-  void RequestEvaluation(const QString& propertyName);
+  void RequestEvaluation(const QString& propertyName) override;
 
   //void UpdateShellKludge();
 

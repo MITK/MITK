@@ -22,10 +22,10 @@ mitk::TubeGraphDefaultLabelGroups::TubeGraphDefaultLabelGroups()
 {
   mitk::Color color;
 
-  LabelGroupType* newLabelGroup = new LabelGroupType();
+  auto   newLabelGroup = new LabelGroupType();
   newLabelGroup->labelGroupName = "Vessel Type";
 
-  LabelType* label = new LabelType();
+  auto   label = new LabelType();
   label->labelName = "Undefined";
   color[0] = 170; color[1] = 170; color[2] = 169;
   label->labelColor = color;

@@ -52,7 +52,7 @@ void mitk::STLFileReader::GenerateData()
     cleanPolyDataFilter->PointMergingOn();
     cleanPolyDataFilter->Update();
 
-    if ( ( stlReader->GetOutput() != NULL ) && ( cleanPolyDataFilter->GetOutput() != NULL ) )
+    if ( ( stlReader->GetOutput() != nullptr ) && ( cleanPolyDataFilter->GetOutput() != nullptr ) )
     {
       vtkSmartPointer<vtkPolyData> surfaceWithNormals = cleanPolyDataFilter->GetOutput();
       output->SetVtkPolyData( surfaceWithNormals );

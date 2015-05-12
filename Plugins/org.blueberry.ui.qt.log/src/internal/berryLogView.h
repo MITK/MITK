@@ -31,11 +31,11 @@ public:
 
   LogView();
 
-  void SetFocus();
+  void SetFocus() override;
 
 protected:
 
-  void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
 };
 

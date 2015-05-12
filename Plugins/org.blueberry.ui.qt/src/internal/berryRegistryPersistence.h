@@ -379,13 +379,13 @@ private:
 
   friend class ReadRunnable;
 
-  void Added(const QList<SmartPointer<IExtension> >& extensions);
+  void Added(const QList<SmartPointer<IExtension> >& extensions) override;
 
-  void Removed(const QList<SmartPointer<IExtension> >& extensions);
+  void Removed(const QList<SmartPointer<IExtension> >& extensions) override;
 
-  void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints);
+  void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
 
-  void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints);
+  void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
 };
 
 }

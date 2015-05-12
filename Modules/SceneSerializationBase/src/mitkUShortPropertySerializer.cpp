@@ -36,16 +36,16 @@ class UShortPropertySerializer : public BasePropertySerializer
     {
       if (const UShortProperty* prop = dynamic_cast<const UShortProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("unsigned");
+        auto  element = new TiXmlElement("unsigned");
         element->SetAttribute("value", static_cast<unsigned short>(prop->GetValue()));
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       unsigned int value;
       if ( element->QueryUnsignedAttribute( "value", &value ) == TIXML_SUCCESS )
@@ -54,7 +54,7 @@ class UShortPropertySerializer : public BasePropertySerializer
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

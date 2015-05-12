@@ -39,33 +39,33 @@ Object* HandlerServiceFactory::Create(
 {
   if (serviceInterface != qobject_interface_iid<IHandlerService*>())
   {
-    return NULL;
+    return nullptr;
   }
 
   IWorkbenchLocationService* wls = locator->GetService<IWorkbenchLocationService>();
   IWorkbench* const wb = wls->GetWorkbench();
-  if (wb == NULL)
+  if (wb == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
 
   Object* parent = parentLocator->GetService(serviceInterface);
-  if (parent == NULL)
+  if (parent == nullptr)
   {
     ICommandService* commands = locator->GetService<ICommandService>();
     IEvaluationService* evals = locator->GetService<IEvaluationService>();
-    HandlerService* handlerService = new HandlerService(commands, evals, locator);
+    auto   handlerService = new HandlerService(commands, evals, locator);
     handlerService->Register();
     handlerService->ReadRegistry();
     handlerService->UnRegister(false);
     return handlerService;
   }
 
-  return NULL;
+  return nullptr;
 
   IWorkbenchWindow* const window = wls->GetWorkbenchWindow();
   IWorkbenchPartSite* const site = wls->GetPartSite();
-  if (site == NULL)
+  if (site == nullptr)
   {
     Expression::Pointer exp(new WorkbenchWindowExpression(window));
     return new SlaveHandlerService(dynamic_cast<IHandlerService*>(parent), exp);

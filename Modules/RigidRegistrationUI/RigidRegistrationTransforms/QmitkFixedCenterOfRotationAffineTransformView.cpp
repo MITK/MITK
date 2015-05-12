@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform
     AccessByItk(m_FixedImage, GetTransform2);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 template < class TPixelType, unsigned int VImageDimension >

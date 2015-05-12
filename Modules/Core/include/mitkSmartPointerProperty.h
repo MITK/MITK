@@ -67,7 +67,7 @@ class MITKCORE_EXPORT SmartPointerProperty : public BaseProperty
 
   protected:
 
-    SmartPointerProperty(itk::Object* = NULL);
+    SmartPointerProperty(itk::Object* = nullptr);
     SmartPointerProperty(const SmartPointerProperty&);
 
     itk::Object::Pointer m_SmartPointer;

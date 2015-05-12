@@ -44,17 +44,17 @@ static bool Setup(double valueToWrite)
 {
   // 1. create simple document
   TiXmlDocument document;
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
+  auto  decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
   document.LinkEndChild( decl );
 
-  TiXmlElement* version = new TiXmlElement("Version");
+  auto  version = new TiXmlElement("Version");
   version->SetAttribute("Writer",  __FILE__ );
   version->SetAttribute("CVSRevision",  "$Revision: 17055 $" );
   version->SetAttribute("FileVersion",  1 );
   document.LinkEndChild(version);
 
   // 2. store one element containing a double value with potentially many after comma digits.
-  TiXmlElement* vElement = new TiXmlElement( elementToStoreAttributeName );
+  auto  vElement = new TiXmlElement( elementToStoreAttributeName );
   vElement->SetDoubleAttribute( attributeToStoreName, valueToWrite );
   document.LinkEndChild(vElement);
 

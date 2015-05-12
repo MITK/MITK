@@ -37,7 +37,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkEnumerationPropertyWidget : public QComboBox
 
   public:
 
-    QmitkEnumerationPropertyWidget(QWidget* parent = 0);
+    QmitkEnumerationPropertyWidget(QWidget* parent = nullptr);
     ~QmitkEnumerationPropertyWidget();
 
     void SetProperty(mitk::EnumerationProperty* property);

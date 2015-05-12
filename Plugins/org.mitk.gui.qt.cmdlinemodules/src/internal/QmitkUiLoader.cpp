@@ -47,10 +47,10 @@ QStringList QmitkUiLoader::availableWidgets () const
 //-----------------------------------------------------------------------------
 QWidget* QmitkUiLoader::createWidget(const QString& className, QWidget* parent, const QString& name)
 {
-  QWidget* widget = NULL;
+  QWidget* widget = nullptr;
   if (className == "QmitkDataStorageComboBoxWithSelectNone")
   {
-    QmitkDataStorageComboBoxWithSelectNone* comboBox = new QmitkDataStorageComboBoxWithSelectNone(parent);
+    auto   comboBox = new QmitkDataStorageComboBoxWithSelectNone(parent);
     comboBox->setObjectName(name);
     comboBox->SetAutoSelectNewItems(false);
     comboBox->SetPredicate(mitk::TNodePredicateDataType< mitk::Image >::New());

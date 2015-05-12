@@ -50,7 +50,7 @@ mitk::DICOMReaderConfigurator
 ::CreateFromUTF8ConfigString(const std::string& xmlContents) const
 {
   TiXmlDocument doc;
-  doc.Parse(xmlContents.c_str(), 0, TIXML_ENCODING_UTF8);
+  doc.Parse(xmlContents.c_str(), nullptr, TIXML_ENCODING_UTF8);
 
   return this->CreateFromTiXmlDocument( doc );
 }
@@ -67,14 +67,14 @@ mitk::DICOMReaderConfigurator
     {
       MITK_ERROR << "File should contain a <DICOMFileReader> tag at top-level! Found '"
                  << (rootElement->Value() ? std::string(rootElement->Value()) : std::string("!nothing!")) << "' instead";
-      return NULL;
+      return nullptr;
     }
 
     const char* classnameC = rootElement->Attribute("class");
     if (!classnameC)
     {
       MITK_ERROR << "File should name a reader class in the class attribute: <DICOMFileReader class=\"...\">. Found nothing instead";
-      return NULL;
+      return nullptr;
     }
 
     int version(1);
@@ -84,7 +84,7 @@ mitk::DICOMReaderConfigurator
       {
         MITK_WARN << "This reader is only capable of creating DICOMFileReaders of version 1. "
                   << "Will not continue, because given configuration is meant for version " << version << ".";
-        return NULL;
+        return nullptr;
       }
     }
     else
@@ -132,13 +132,13 @@ mitk::DICOMReaderConfigurator
     else
     {
       MITK_ERROR << "DICOMFileReader tag names unknown class '" << classname << "'";
-      return NULL;
+      return nullptr;
     }
   }
   else
   {
     MITK_ERROR << "Great confusion: no root element in XML document. Expecting a DICOMFileReader tag at top-level.";
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -171,7 +171,7 @@ mitk::DICOMReaderConfigurator
   // use all the base class configuration
   if (this->ConfigureDICOMITKSeriesGDCMReader( reader.GetPointer(), element ).IsNull())
   {
-    return NULL;
+    return nullptr;
   }
 
   this->ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(reader,element);
@@ -261,7 +261,7 @@ mitk::DICOMReaderConfigurator
     if (!classnameC)
     {
       MITK_ERROR << "File should name a DICOMDatasetSorter class in the class attribute of <DICOMDatasetSorter class=\"...\">. Found nothing instead";
-      return NULL;
+      return nullptr;
     }
 
     std::string classname(classnameC);
@@ -277,7 +277,7 @@ mitk::DICOMReaderConfigurator
     else
     {
       MITK_ERROR << "DICOMDatasetSorter tag names unknown class '" << classname << "'";
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -314,7 +314,7 @@ mitk::DICOMReaderConfigurator
   if (dElement)
   {
     for ( TiXmlElement* tChild = dElement->FirstChildElement();
-          tChild != NULL;
+          tChild != nullptr;
           tChild = tChild->NextSiblingElement() )
     {
       try
@@ -332,7 +332,7 @@ mitk::DICOMReaderConfigurator
       }
       catch(...)
       {
-        return NULL;
+        return nullptr;
       }
     }
   }
@@ -345,7 +345,7 @@ mitk::DICOMReaderConfigurator
     DICOMSortCriterion::Pointer currentCriterion;
 
     for ( TiXmlNode* tChildNode = sElement->LastChild();
-        tChildNode != NULL;
+        tChildNode != nullptr;
         tChildNode = tChildNode->PreviousSibling() )
     {
       TiXmlElement* tChild = tChildNode->ToElement();
@@ -362,7 +362,7 @@ mitk::DICOMReaderConfigurator
           std::stringstream ss;
           ss << "Could not parse <Tag> element at (input line " << tChild->Row() << ", col. " << tChild->Column() << ")!";
           MITK_ERROR << ss.str();
-          return NULL;
+          return nullptr;
         }
       }
       else
@@ -377,7 +377,7 @@ mitk::DICOMReaderConfigurator
           std::stringstream ss;
           ss << "Could not parse <ImagePositionPatient> element at (input line " << tChild->Row() << ", col. " << tChild->Column() << ")!";
           MITK_ERROR << ss.str();
-          return NULL;
+          return nullptr;
         }
       }
       else
@@ -541,7 +541,7 @@ mitk::DICOMReaderConfigurator
 
   // iterate DICOMDatasetSorter objects
   DICOMITKSeriesGDCMReader::ConstSorterList sorterList = reader->GetFreelyConfiguredSortingElements();
-  for(DICOMITKSeriesGDCMReader::ConstSorterList::const_iterator sorterIter = sorterList.begin();
+  for(auto sorterIter = sorterList.begin();
       sorterIter != sorterList.end();
       ++sorterIter)
   {
@@ -554,7 +554,7 @@ mitk::DICOMReaderConfigurator
     else
     {
       MITK_WARN << "Unknown DICOMDatasetSorter class passed to DICOMReaderConfigurator::CreateConfigStringFromReader(). Cannot serialize.";
-      return NULL;
+      return nullptr;
     }
   }
 
@@ -567,15 +567,15 @@ mitk::DICOMReaderConfigurator
 {
   assert(sorter);
 
-  TiXmlElement* sorterTag = new TiXmlElement("DICOMDatasetSorter");
+  auto  sorterTag = new TiXmlElement("DICOMDatasetSorter");
   sorterTag->SetAttribute("class", sorter->GetNameOfClass());
   sorterTag->SetAttribute("strictSorting", toString(sorter->GetStrictSorting()));
   sorterTag->SetAttribute("expectDistanceOne", toString(sorter->GetExpectDistanceOne()));
 
-  TiXmlElement* distinguishingTagsElement = new TiXmlElement("Distinguishing");
+  auto  distinguishingTagsElement = new TiXmlElement("Distinguishing");
   sorterTag->LinkEndChild(distinguishingTagsElement);
   mitk::DICOMTagList distinguishingTags = sorter->GetDistinguishingTags();
-  for (DICOMTagList::iterator tagIter = distinguishingTags.begin();
+  for (auto tagIter = distinguishingTags.begin();
        tagIter != distinguishingTags.end();
        ++tagIter)
   {
@@ -589,7 +589,7 @@ mitk::DICOMReaderConfigurator
     }
   }
 
-  TiXmlElement* sortingElement = new TiXmlElement("Sorting");
+  auto  sortingElement = new TiXmlElement("Sorting");
   sorterTag->LinkEndChild(sortingElement);
   mitk::DICOMSortCriterion::ConstPointer sortCriterion = sorter->GetSortCriterion();
   while (sortCriterion.IsNotNull())
@@ -614,13 +614,13 @@ mitk::DICOMReaderConfigurator
       else
       {
         MITK_ERROR << "Encountered SortByTag class with MULTIPLE tag in CreateConfigStringFromDICOMDatasetSorter. Cannot serialize.";
-        return NULL;
+        return nullptr;
       }
     }
     else
     {
       MITK_ERROR << "Encountered unknown class '" << classname << "' in CreateConfigStringFromDICOMDatasetSorter. Cannot serialize.";
-      return NULL;
+      return nullptr;
     }
 
     sortCriterion = sortCriterion->GetSecondaryCriterion();
@@ -633,7 +633,7 @@ TiXmlElement*
 mitk::DICOMReaderConfigurator
 ::CreateConfigStringFromDICOMTag(const DICOMTag& tag) const
 {
-  TiXmlElement* tagElement = new TiXmlElement("Tag"); // name group element
+  auto  tagElement = new TiXmlElement("Tag"); // name group element
   tagElement->SetAttribute("name", tag.GetName().c_str());
   tagElement->SetAttribute("group", toHexString(tag.GetGroup()));
   tagElement->SetAttribute("element", toHexString(tag.GetElement()));
@@ -680,7 +680,7 @@ TiXmlElement*
 mitk::DICOMReaderConfigurator
 ::CreateDICOMFileReaderTag(const DICOMFileReader* reader) const
 {
-  TiXmlElement* readerTag = new TiXmlElement("DICOMFileReader");
+  auto  readerTag = new TiXmlElement("DICOMFileReader");
   readerTag->SetAttribute("class", reader->GetNameOfClass());
   readerTag->SetAttribute("label", reader->GetConfigurationLabel().c_str());
   readerTag->SetAttribute("description", reader->GetConfigurationDescription().c_str());

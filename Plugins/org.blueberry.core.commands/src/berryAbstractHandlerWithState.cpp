@@ -29,14 +29,14 @@ void AbstractHandlerWithState::AddState(const QString& stateId, const SmartPoint
 
   states.insert(stateId, state);
   state->AddListener(this);
-  HandleStateChange(state, Object::Pointer(0));
+  HandleStateChange(state, Object::Pointer(nullptr));
 }
 
 SmartPointer<State> AbstractHandlerWithState::GetState(const QString& stateId) const
 {
   QHash<QString,State::Pointer>::const_iterator i = states.find(stateId);
   if (i != states.end()) return *i;
-  return State::Pointer(0);
+  return State::Pointer(nullptr);
 }
 
 QList<QString> AbstractHandlerWithState::GetStateIds() const

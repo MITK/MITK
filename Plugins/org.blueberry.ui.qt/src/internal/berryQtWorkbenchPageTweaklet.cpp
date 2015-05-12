@@ -34,7 +34,7 @@ QtWorkbenchPageTweaklet::QtWorkbenchPageTweaklet()
 QWidget* QtWorkbenchPageTweaklet::CreateClientComposite(QWidget* pageControl)
 {
   QWidget* parent = static_cast<QWidget*>(pageControl);
-  QtControlWidget* client = new QtControlWidget(parent, 0);
+  auto   client = new QtControlWidget(parent, nullptr);
   client->setObjectName("ClientComposite");
   parent->layout()->addWidget(client);
 
@@ -47,7 +47,7 @@ QWidget* QtWorkbenchPageTweaklet::CreateClientComposite(QWidget* pageControl)
 QWidget* QtWorkbenchPageTweaklet::CreatePaneControl(QWidget* parent)
 {
   QWidget* qParent = static_cast<QWidget*>(parent);
-  QtControlWidget* control = new QtControlWidget(qParent, 0);
+  auto   control = new QtControlWidget(qParent, nullptr);
   // the object name is used in the global event filter to find
   // the pane control over which a mouse pressed event occured
   // --> do not change the object name
@@ -63,12 +63,12 @@ Object::Pointer QtWorkbenchPageTweaklet::CreateStatusPart(QWidget* parent, const
   statusPart.m_TitleLabel->setText(title);
   statusPart.m_DetailsLabel->setText(msg);
 
-  return Object::Pointer(0);
+  return Object::Pointer(nullptr);
 }
 
 IEditorPart::Pointer QtWorkbenchPageTweaklet::CreateErrorEditorPart(const QString&  /*partName*/, const QString&  /*msg*/)
 {
-  return IEditorPart::Pointer(0);
+  return IEditorPart::Pointer(nullptr);
 }
 
 }

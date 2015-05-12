@@ -58,7 +58,7 @@ mitk::FiberBundle::FiberBundle( vtkPolyData* fiberPolyData )
     m_FiberWeights->SetName("FIBER_WEIGHTS");
 
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
-    if (fiberPolyData != NULL)
+    if (fiberPolyData != nullptr)
     {
         m_FiberPolyData = fiberPolyData;
         this->ColorFibersByOrientation();
@@ -87,7 +87,7 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundle::GeneratePolyDataByIds(std::vecto
     vtkSmartPointer<vtkCellArray> newLineSet = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints> newPointSet = vtkSmartPointer<vtkPoints>::New();
 
-    std::vector<long>::iterator finIt = fiberIds.begin();
+    auto finIt = fiberIds.begin();
     while ( finIt != fiberIds.end() )
     {
         if (*finIt < 0 || *finIt>GetNumFibers()){
@@ -118,10 +118,10 @@ vtkSmartPointer<vtkPolyData> mitk::FiberBundle::GeneratePolyDataByIds(std::vecto
 // merge two fiber bundles
 mitk::FiberBundle::Pointer mitk::FiberBundle::AddBundle(mitk::FiberBundle* fib)
 {
-    if (fib==NULL)
+    if (fib==nullptr)
     {
         MITK_WARN << "trying to call AddBundle with NULL argument";
-        return NULL;
+        return nullptr;
     }
     MITK_INFO << "Adding fibers";
 
@@ -203,7 +203,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
         int numPoints = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();
 
-        if (points==NULL || numPoints<=0)
+        if (points==nullptr || numPoints<=0)
             continue;
 
         int numFibers2 = fib->GetNumFibers();
@@ -214,7 +214,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
             int numPoints2 = cell2->GetNumberOfPoints();
             vtkPoints* points2 = cell2->GetPoints();
 
-            if (points2==NULL)// || numPoints2<=0)
+            if (points2==nullptr)// || numPoints2<=0)
                 continue;
 
             // check endpoints
@@ -248,7 +248,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
         }
     }
     if(vNewLines->GetNumberOfCells()==0)
-        return NULL;
+        return nullptr;
     // initialize polydata
     vNewPolyData->SetPoints(vNewPoints);
     vNewPolyData->SetLines(vNewLines);
@@ -271,7 +271,7 @@ itk::Point<float, 3> mitk::FiberBundle::GetItkPoint(double point[3])
  */
 void mitk::FiberBundle::SetFiberPolyData(vtkSmartPointer<vtkPolyData> fiberPD, bool updateGeometry)
 {
-    if (fiberPD == NULL)
+    if (fiberPD == nullptr)
         this->m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
     else
     {
@@ -304,10 +304,10 @@ void mitk::FiberBundle::ColorFibersByOrientation()
     //  + one fiber with 0 points
     //=================================================
 
-    vtkPoints* extrPoints = NULL;
+    vtkPoints* extrPoints = nullptr;
     extrPoints = m_FiberPolyData->GetPoints();
     int numOfPoints = 0;
-    if (extrPoints!=NULL)
+    if (extrPoints!=nullptr)
         numOfPoints = extrPoints->GetNumberOfPoints();
 
     //colors and alpha value for each single point, RGBA = 4 components
@@ -626,7 +626,7 @@ void mitk::FiberBundle::SetFiberColors(float r, float g, float b, float alpha)
 
 void mitk::FiberBundle::GenerateFiberIds()
 {
-    if (m_FiberPolyData == NULL)
+    if (m_FiberPolyData == nullptr)
         return;
 
     vtkSmartPointer<vtkIdFilter> idFiberFilter = vtkSmartPointer<vtkIdFilter>::New();
@@ -764,7 +764,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
     }
 
     if (vtkNewCells->GetNumberOfCells()<=0)
-        return NULL;
+        return nullptr;
 
     vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
     newPolyData->SetPoints(vtkNewPoints);
@@ -840,7 +840,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
     }
 
     if (vtkNewCells->GetNumberOfCells()<=0)
-        return NULL;
+        return nullptr;
 
     vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
     newPolyData->SetPoints(vtkNewPoints);
@@ -852,8 +852,8 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
 
 mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(DataNode* roi, DataStorage* storage)
 {
-    if (roi==NULL || !(dynamic_cast<PlanarFigure*>(roi->GetData()) || dynamic_cast<PlanarFigureComposite*>(roi->GetData())) )
-        return NULL;
+    if (roi==nullptr || !(dynamic_cast<PlanarFigure*>(roi->GetData()) || dynamic_cast<PlanarFigureComposite*>(roi->GetData())) )
+        return nullptr;
 
     std::vector<long> tmp = ExtractFiberIdSubset(roi, storage);
 
@@ -866,7 +866,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(DataNode* roi, 
 std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataStorage* storage)
 {
     std::vector<long> result;
-    if (roi==NULL || roi->GetData()==NULL)
+    if (roi==nullptr || roi->GetData()==nullptr)
         return result;
 
     mitk::PlanarFigureComposite::Pointer pfc = dynamic_cast<mitk::PlanarFigureComposite*>(roi->GetData());
@@ -1048,7 +1048,7 @@ void mitk::FiberBundle::UpdateFiberGeometry()
     m_LengthStDev = 0;
     m_NumFibers = m_FiberPolyData->GetNumberOfCells();
 
-    if (m_FiberColors==NULL || m_FiberColors->GetNumberOfTuples()!=m_FiberPolyData->GetNumberOfPoints())
+    if (m_FiberColors==nullptr || m_FiberColors->GetNumberOfTuples()!=m_FiberPolyData->GetNumberOfPoints())
         this->ColorFibersByOrientation();
 
     if (m_FiberWeights->GetSize()!=m_NumFibers)
@@ -1910,7 +1910,7 @@ void mitk::FiberBundle::Compress(float error)
 // reapply selected colorcoding in case polydata structure has changed
 bool mitk::FiberBundle::Equals(mitk::FiberBundle* fib, double eps)
 {
-    if (fib==NULL)
+    if (fib==nullptr)
     {
         MITK_INFO << "Reference bundle is NULL!";
         return false;

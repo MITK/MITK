@@ -34,39 +34,39 @@ public:
   explicit ConfigurationElementHandle(const SmartPointer<const IObjectManager> &objectManager, int id);
   explicit ConfigurationElementHandle(const IObjectManager* objectManager, int id);
 
-  QString GetAttribute(const QString& propertyName) const;
+  QString GetAttribute(const QString& propertyName) const override;
 
   QString GetAttribute(const QString& attrName, const QLocale& locale) const;
 
-  QList<QString> GetAttributeNames() const;
+  QList<QString> GetAttributeNames() const override;
 
-  QList<IConfigurationElement::Pointer> GetChildren() const;
+  QList<IConfigurationElement::Pointer> GetChildren() const override;
 
-  QObject* CreateExecutableExtension(const QString& propertyName) const;
+  QObject* CreateExecutableExtension(const QString& propertyName) const override;
 
   QString GetAttributeAsIs(const QString& name) const;
 
-  QList<IConfigurationElement::Pointer> GetChildren(const QString& name) const;
+  QList<IConfigurationElement::Pointer> GetChildren(const QString& name) const override;
 
-  SmartPointer<IExtension> GetDeclaringExtension() const;
+  SmartPointer<IExtension> GetDeclaringExtension() const override;
 
-  QString GetName() const;
+  QString GetName() const override;
 
-  SmartPointer<Object> GetParent() const;
+  SmartPointer<Object> GetParent() const override;
 
-  QString GetValue() const;
+  QString GetValue() const override;
 
-  QString GetValue(const QLocale& locale) const;
+  QString GetValue(const QLocale& locale) const override;
 
   QString GetValueAsIs() const;
 
-  SmartPointer<RegistryObject> GetObject() const;
+  SmartPointer<RegistryObject> GetObject() const override;
 
-  QString GetNamespaceIdentifier() const;
+  QString GetNamespaceIdentifier() const override;
 
-  SmartPointer<IContributor> GetContributor() const;
+  SmartPointer<IContributor> GetContributor() const override;
 
-  bool IsValid() const;
+  bool IsValid() const override;
 
 protected:
 

@@ -290,9 +290,9 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // is present)
   //this used for generating a vtkPLaneSource with the right size
   double sliceBounds[6];
-  for ( int i = 0; i < 6; ++i )
+  for (auto & sliceBound : sliceBounds)
   {
-    sliceBounds[i] = 0.0;
+    sliceBound = 0.0;
   }
   localStorage->m_Reslicer->GetClippedPlaneBounds(sliceBounds);
 
@@ -302,9 +302,9 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
   // calculate minimum bounding rect of IMAGE in texture
   {
     double textureClippingBounds[6];
-    for ( int i = 0; i < 6; ++i )
+    for (auto & textureClippingBound : textureClippingBounds)
     {
-      textureClippingBounds[i] = 0.0;
+      textureClippingBound = 0.0;
     }
     // Calculate the actual bounds of the transformed plane clipped by the
     // dataset bounding box; this is required for drawing the texture at the

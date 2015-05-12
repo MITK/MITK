@@ -39,9 +39,9 @@ class QmitkSurfaceUtilities : public QmitkAbstractView
     QmitkSurfaceUtilities();
     ~QmitkSurfaceUtilities();
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
-    void SetFocus();
+    void SetFocus() override;
 
   protected slots:
 

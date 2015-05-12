@@ -57,8 +57,8 @@ void QmitkStringPropertyOnDemandEdit::PropertyChanged()
 
 void QmitkStringPropertyOnDemandEdit::PropertyRemoved()
 {
-  m_Property = NULL;
-  m_StringProperty = NULL;
+  m_Property = nullptr;
+  m_StringProperty = nullptr;
   m_label->setText("n/a");
 }
 

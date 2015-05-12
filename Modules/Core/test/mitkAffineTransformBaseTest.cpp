@@ -30,10 +30,10 @@ static Matrix3D rotation;
 static Point3D  originalPoint;
 static double   originalPointDouble[4];
 
-static vtkMatrix4x4* homogenMatrix = 0;
+static vtkMatrix4x4* homogenMatrix = nullptr;
 
 
-static vtkMatrix4x4* expectedHomogenousMatrix = 0;
+static vtkMatrix4x4* expectedHomogenousMatrix = nullptr;
 static const double  expectedPointAfterTransformation[] = {2, 4, 4, 1};
 
 static void Setup()

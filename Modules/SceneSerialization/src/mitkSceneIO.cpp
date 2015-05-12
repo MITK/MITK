@@ -146,15 +146,16 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
   // test if index.xml exists
   // parse index.xml with TinyXML
-  TiXmlDocument document( m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml" );
+  std::string defaultLocale_WorkingDirectory = Poco::Path::transcode ( m_WorkingDirectory );
+  TiXmlDocument document( defaultLocale_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml" );
   if (!document.LoadFile())
   {
-    MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << mitk::IOUtil::GetDirectorySeparator() << "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << defaultLocale_WorkingDirectory << mitk::IOUtil::GetDirectorySeparator() << "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return storage;
   }
 
   SceneReader::Pointer reader = SceneReader::New();
-  if ( !reader->LoadScene( document, m_WorkingDirectory, storage ) )
+  if ( !reader->LoadScene( document, defaultLocale_WorkingDirectory, storage ) )
   {
     MITK_ERROR << "There were errors while loading scene file " << filename << ". Your data may be corrupted";
   }
@@ -374,9 +375,10 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       } // end for all nodes
     } // end if sceneNodes
 
-    if ( !document.SaveFile( m_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
+    std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+    if ( !document.SaveFile( defaultLocale_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
     {
-      MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+      MITK_ERROR << "Could not write scene to " << defaultLocale_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
       return false;
     }
     else
@@ -390,10 +392,11 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         }
 
         // create zip at filename
-        std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out);
+        std::string defaultLocaleFilename = Poco::Path::transcode( filename );
+        std::ofstream file( defaultLocaleFilename.c_str(), std::ios::binary | std::ios::out);
         if (!file.good())
         {
-          MITK_ERROR << "Could not open a zip file for writing: '" << filename << "'";
+          MITK_ERROR << "Could not open a zip file for writing: '" << defaultLocaleFilename << "'";
           return false;
         }
         else
@@ -459,7 +462,8 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
     {
       serializer->SetData(data);
       serializer->SetFilenameHint(filenamehint);
-      serializer->SetWorkingDirectory( m_WorkingDirectory );
+      std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+      serializer->SetWorkingDirectory( defaultLocale_WorkingDirectory );
       try
       {
         std::string writtenfilename = serializer->Serialize();
@@ -489,7 +493,8 @@ TiXmlElement* mitk::SceneIO::SavePropertyList( PropertyList* propertyList, const
 
   serializer->SetPropertyList(propertyList);
   serializer->SetFilenameHint(filenamehint);
-  serializer->SetWorkingDirectory( m_WorkingDirectory );
+  std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
+  serializer->SetWorkingDirectory( defaultLocale_WorkingDirectory );
   try
   {
     std::string writtenfilename = serializer->Serialize();

@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QInputDialog>
 #include <QDir>
 #include <QMessageBox>
+#include <QDateTime>
 
 #include "QmitkRenderWindow.h"
 #include "QmitkStdMultiWidgetEditor.h"
@@ -48,6 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // scene serialization
 #include <mitkSceneIO.h>
+#include <mitkSurface.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkConvert2Dto3DImageFilter.h>
@@ -69,6 +71,7 @@ m_ReinitAlreadyDone(false),
 m_IsExperimentRunning(false),
 m_NavigationStepTimer(mitk::USNavigationStepTimer::New()),
 m_ExperimentLogging(mitk::USNavigationExperimentLogging::New()),
+m_AblationZonesDisplacementFilter(mitk::NodeDisplacementFilter::New()),
 m_IconRunning(QPixmap(":/USNavigation/record.png")),
 m_IconNotRunning(QPixmap(":/USNavigation/record-gray.png")),
 m_USImageLoggingFilter(mitk::USImageLoggingFilter::New()),
@@ -76,6 +79,8 @@ m_NavigationDataRecorder(mitk::NavigationDataRecorder::New()),
 m_SceneNumber(1),
 m_WarnOverlay(mitk::TextOverlay2D::New()),
 m_ListenerDeviceChanged(this, &USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged),
+m_NeedleIndex(0),
+m_MarkerIndex(1),
 ui(new Ui::USNavigationMarkerPlacement)
 {
   connect(m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
@@ -89,7 +94,7 @@ ui(new Ui::USNavigationMarkerPlacement)
   // into consideration
   m_ExperimentLogging->SetKeyPrefix("USNavigation::");
 
-  m_UpdateTimer->start(15);
+  m_UpdateTimer->start(33); //every 33 Milliseconds = 30 Frames/Second
 }
 
 USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
@@ -104,6 +109,49 @@ USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
   }
 
   delete ui;
+}
+
+void USNavigationMarkerPlacement::OnAddAblationZone(int size)
+{
+
+m_AblationZonesDisplacementFilter->SetInitialReferencePose(m_CombinedModality->GetNavigationDataSource()->GetOutput(m_MarkerIndex));
+mitk::DataNode::Pointer NewAblationZone = mitk::DataNode::New();
+
+mitk::Point3D origin = m_CombinedModality->GetNavigationDataSource()->GetOutput(m_NeedleIndex)->GetPosition();
+
+mitk::Surface::Pointer zone = mitk::Surface::New();
+
+// create a vtk sphere with given radius
+vtkSphereSource *vtkData = vtkSphereSource::New();
+vtkData->SetRadius( size/2 );
+vtkData->SetCenter(0,0,0);
+vtkData->SetPhiResolution(20);
+vtkData->SetThetaResolution(20);
+vtkData->Update();
+zone->SetVtkPolyData(vtkData->GetOutput());
+vtkData->Delete();
+
+// set vtk sphere and origin to data node (origin must be set
+// again, because of the new sphere set as data)
+NewAblationZone->SetData(zone);
+NewAblationZone->GetData()->GetGeometry()->SetOrigin(origin);
+mitk::Color SphereColor = mitk::Color();
+//default color
+SphereColor[0] = 102;
+SphereColor[1] = 0;
+SphereColor[2] = 204;
+NewAblationZone->SetColor(SphereColor);
+NewAblationZone->SetOpacity(0.3);
+
+// set name of zone
+std::stringstream name;
+name << "Ablation Zone" << m_AblationZonesVector.size();
+NewAblationZone->SetName(name.str());
+
+// add zone to filter
+m_AblationZonesDisplacementFilter->AddNode(NewAblationZone);
+m_AblationZonesVector.push_back(NewAblationZone);
+this->GetDataStorage()->Add(NewAblationZone);
 }
 
 void USNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
@@ -187,10 +235,17 @@ void USNavigationMarkerPlacement::OnTimeout()
     if ( m_OverlayManager.IsNull() ) { this->CreateOverlays(); }
   }
 
-  this->RequestRenderWindowUpdate();
+  if (m_CombinedModality.IsNotNull() && !this->m_CombinedModality->GetIsFreezed()) //if the combined modality is freezed: do nothing
+    {
+    ui->navigationProcessWidget->UpdateNavigationProgress();
+    m_AblationZonesDisplacementFilter->Update();
 
-  // make sure that a reinit was performed on the image
-  this->ReinitOnImage();
+    //update the 3D window only every fourth time to speed up the rendering (at least in 2D)
+    this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+
+    // make sure that a reinit was performed on the image
+    this->ReinitOnImage();
+    }
 }
 
 void USNavigationMarkerPlacement::OnImageAndNavigationDataLoggingTimeout()
@@ -214,6 +269,14 @@ void USNavigationMarkerPlacement::OnStartExperiment()
 {
   // get name for the experiment by a QInputDialog
   bool ok;
+  if (m_ExperimentName.isEmpty())
+    { //default: current date
+      m_ExperimentName = QString::number(QDateTime::currentDateTime().date().year()) + "_"
+                       + QString::number(QDateTime::currentDateTime().date().month()) + "_"
+                       + QString::number(QDateTime::currentDateTime().date().day()) + "_experiment_"
+                       + QString::number(QDateTime::currentDateTime().time().hour()) + "."
+                       + QString::number(QDateTime::currentDateTime().time().minute());
+    }
   m_ExperimentName = QInputDialog::getText(m_Parent, QString("Experiment Name"), QString("Name of the Experiment"), QLineEdit::Normal, m_ExperimentName, &ok);
   MITK_INFO("USNavigationLogging") << "Experiment started: " << m_ExperimentName.toStdString();
   if ( ok && ! m_ExperimentName.isEmpty() )
@@ -359,6 +422,13 @@ void USNavigationMarkerPlacement::OnCombinedModalityChanged(itk::SmartPointer<mi
     m_USImageLoggingFilter->SetInput(n, ultrasoundImageSource->GetOutput(n));
   }
 
+  // update ablation zone filter for using the new combined modality
+  for (unsigned int n = 0; n < navigationDataSource->GetNumberOfIndexedOutputs(); ++n)
+  {
+    m_AblationZonesDisplacementFilter->SetInput(n, navigationDataSource->GetOutput(n));
+  }
+  m_AblationZonesDisplacementFilter->SelectInput(m_MarkerIndex);
+
   // make sure that a reinit is done for the new images
   this->ReinitOnImage();
 }
@@ -384,11 +454,14 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
           new QmitkUSNavigationStepCombinedModality(m_Parent);
       QmitkUSNavigationStepTumourSelection* stepTumourSelection =
           new QmitkUSNavigationStepTumourSelection(m_Parent);
+      stepTumourSelection->SetTargetSelectionOptional(true);
       m_TargetNodeDisplacementFilter = stepTumourSelection->GetTumourNodeDisplacementFilter();
       QmitkUSNavigationStepZoneMarking* stepZoneMarking =
           new QmitkUSNavigationStepZoneMarking(m_Parent);
       QmitkUSNavigationStepPunctuationIntervention* stepIntervention =
           new QmitkUSNavigationStepPunctuationIntervention(m_Parent);
+
+      connect(stepIntervention, SIGNAL(AddAblationZoneClicked(int)), this, SLOT(OnAddAblationZone(int)));
 
       m_NavigationStepNames = std::vector<QString>();
       navigationSteps.push_back(stepCombinedModality);

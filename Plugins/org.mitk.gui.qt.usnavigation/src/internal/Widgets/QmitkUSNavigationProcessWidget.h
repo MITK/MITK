@@ -81,8 +81,6 @@ signals:
   void SignalIntermediateResult(const itk::SmartPointer<mitk::DataNode>);
 
 protected slots:
-  void OnTimeout();
-
   void OnNextButtonClicked();
   void OnPreviousButtonClicked();
   void OnRestartStepButtonClicked();
@@ -132,6 +130,12 @@ public:
   /** Finishes the current navigation step. */
   void FinishCurrentNavigationStep();
 
+    /** Updates the navigation process widget, which includes updating the
+   *  navigation pipeline. Has to be called from outside this class with
+   *  a given update rate. So no additional internal timer is needed.
+   */
+  void UpdateNavigationProgress();
+
 protected:
   void InitializeNavigationStepWidgets();
   void UpdatePrevNextButtons();
@@ -156,7 +160,6 @@ protected:
   itk::SmartPointer<mitk::NavigationDataSource>   m_LastNavigationDataFilter;
 
   QWidget* m_Parent;
-  QTimer* m_UpdateTimer;
   QSignalMapper* m_ReadySignalMapper;
   QSignalMapper* m_NoLongerReadySignalMapper;
 

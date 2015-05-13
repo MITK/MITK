@@ -15,14 +15,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkUSNavigationFreezeButton.h"
+#include <QShortcut>
 
 QmitkUSNavigationFreezeButton::QmitkUSNavigationFreezeButton(QWidget* parent) :
   QPushButton(parent),
-  m_OutputIndex(-1)
+  m_OutputIndex(-1),
+  m_FreezeButtonToggle(true)
 {
   this->setText("Freeze Imaging");
   this->setIcon(QIcon(":/USNavigation/system-lock-screen.png"));
   this->setCheckable(true);
+
+  //set shortcuts
+  QShortcut *shortcut = new QShortcut(QKeySequence("F12"), parent);
+  connect(shortcut, SIGNAL(activated()), this, SLOT(OnFreezeButtonToggle()));
 
   connect(this, SIGNAL(clicked(bool)), this, SLOT(OnButtonClicked(bool)));
 }
@@ -54,6 +60,14 @@ void QmitkUSNavigationFreezeButton::Unfreeze()
     this->OnButtonClicked(false);
   }
 }
+void QmitkUSNavigationFreezeButton::OnFreezeButtonToggle()
+{
+if(this->isVisible())
+  {
+  this->setChecked(m_FreezeButtonToggle);
+  OnButtonClicked(m_FreezeButtonToggle);
+  }
+}
 
 void QmitkUSNavigationFreezeButton::OnButtonClicked(bool checked)
 {
@@ -63,13 +77,12 @@ void QmitkUSNavigationFreezeButton::OnButtonClicked(bool checked)
     MITK_WARN("QmitkUSNavigationFreezeButton")
       << "Cannot freeze the device as the device is null.";
     this->setChecked(false);
+    m_FreezeButtonToggle = true;
     return;
   }
+  m_FreezeButtonToggle = !checked;
 
-  // freeze the imaging and the tracking
-  m_CombinedModality->SetIsFreezed(checked);
-
-  // cannot do anything more without a navigation data source
+  // cannot do anything without a navigation data source
   mitk::NavigationDataSource::Pointer navigationDataSource = m_CombinedModality->GetNavigationDataSource();
   if ( navigationDataSource.IsNull() )
   {
@@ -78,6 +91,12 @@ void QmitkUSNavigationFreezeButton::OnButtonClicked(bool checked)
     this->setChecked(false);
     return;
   }
+
+  if (checked) //freezing
+  {
+  MITK_INFO << "Freezing";
+  // freeze the imaging and the tracking
+  m_CombinedModality->SetIsFreezed(true);
 
   if ( m_OutputIndex >= 0 )
   {
@@ -97,6 +116,21 @@ void QmitkUSNavigationFreezeButton::OnButtonClicked(bool checked)
       return;
     }
   }
+  emit SignalFreezed(true);
+  }
 
-  emit SignalFreezed(checked);
+  else //unfreezing
+  {
+  MITK_INFO << "Unfreezing";
+  emit SignalFreezed(false);
+  //m_CombinedModality->SetIsFreezed(false);//commented out to workaround bug: may only be unfreezed after critical structure was added
+  }
+
+
+
+
+
+
+
+
 }

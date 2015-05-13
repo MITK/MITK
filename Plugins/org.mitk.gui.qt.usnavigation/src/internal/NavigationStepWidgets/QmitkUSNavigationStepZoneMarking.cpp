@@ -155,6 +155,8 @@ void QmitkUSNavigationStepZoneMarking::OnFreeze(bool freezed)
   {
     m_CurrentlyAddingZone = true;
     ui->zonesWidget->OnStartAddingZone();
+    // feed reference pose to node displacement filter
+      m_ZoneDisplacementFilter->SetInitialReferencePose(this->GetCombinedModality()->GetNavigationDataSource()->GetOutput(m_ReferenceSensorIndex)->Clone());
   }
   else if ( m_CurrentlyAddingZone )
   {

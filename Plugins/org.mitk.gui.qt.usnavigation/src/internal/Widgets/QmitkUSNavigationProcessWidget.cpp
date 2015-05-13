@@ -25,16 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QTimer>
 #include <QSignalMapper>
+#include <QShortcut>
 
 QmitkUSNavigationProcessWidget::QmitkUSNavigationProcessWidget(QWidget* parent) :
   QWidget(parent),
   m_SettingsWidget(0),
-  m_BaseNode(mitk::DataNode::New()),
-  m_SettingsNode(mitk::DataNode::New()),
-  m_CurrentTabIndex(0),
-  m_CurrentMaxStep(0),
+  m_BaseNode(mitk::DataNode::New()), m_CurrentTabIndex(0), m_CurrentMaxStep(0),
   m_ImageAlreadySetToNode(false),
-  m_UpdateTimer(new QTimer(this)),
   m_ReadySignalMapper(new QSignalMapper(this)), m_NoLongerReadySignalMapper(new QSignalMapper(this)),
   m_StdMultiWidget(0),
   m_UsePlanningStepWidget(false),
@@ -47,26 +44,26 @@ QmitkUSNavigationProcessWidget::QmitkUSNavigationProcessWidget(QWidget* parent) 
   // remove the default page
   ui->stepsToolBox->removeItem(0);
 
+  //set shortcuts
+  QShortcut *nextShortcut = new QShortcut(QKeySequence("F10"), parent);
+  QShortcut *prevShortcut = new QShortcut(QKeySequence("F11"), parent);
+  connect(nextShortcut, SIGNAL(activated()), this, SLOT(OnNextButtonClicked()));
+  connect(prevShortcut, SIGNAL(activated()), this, SLOT(OnPreviousButtonClicked()));
+
+  //connect other slots
   connect( ui->restartStepButton, SIGNAL(clicked()), this, SLOT(OnRestartStepButtonClicked()) );
   connect( ui->previousButton, SIGNAL(clicked()), this, SLOT(OnPreviousButtonClicked()) );
   connect( ui->nextButton, SIGNAL(clicked()), this, SLOT(OnNextButtonClicked()) );
   connect( ui->stepsToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnTabChanged(int)) );
-
   connect (ui->settingsButton, SIGNAL(clicked()), this, SLOT(OnSettingsButtonClicked()) );
-
-  connect(m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
-
   connect( m_ReadySignalMapper, SIGNAL(mapped(int)), this, SLOT(OnStepReady(int)) );
   connect( m_NoLongerReadySignalMapper, SIGNAL(mapped(int)), this, SLOT(OnStepNoLongerReady(int)) );
 
   ui->settingsFrameWidget->setHidden(true);
-
-  m_UpdateTimer->start(15);
 }
 
 QmitkUSNavigationProcessWidget::~QmitkUSNavigationProcessWidget()
 {
-  m_UpdateTimer->stop();
   ui->stepsToolBox->blockSignals(true);
 
   for ( NavigationStepVector::iterator it = m_NavigationSteps.begin();
@@ -235,9 +232,9 @@ void QmitkUSNavigationProcessWidget::ResetNavigationProcess()
   this->UpdatePrevNextButtons();
 }
 
-void QmitkUSNavigationProcessWidget::OnTimeout()
+void QmitkUSNavigationProcessWidget::UpdateNavigationProgress()
 {
-  if ( m_CombinedModality.IsNotNull() )
+  if ( m_CombinedModality.IsNotNull() && !m_CombinedModality->GetIsFreezed() )
   {
     m_CombinedModality->Modified();
     m_CombinedModality->Update();
@@ -261,6 +258,8 @@ void QmitkUSNavigationProcessWidget::OnTimeout()
 
 void QmitkUSNavigationProcessWidget::OnNextButtonClicked()
 {
+  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetIsFreezed()) {return;} //no moving through steps when the modality is NULL or frozen
+
   int currentIndex = ui->stepsToolBox->currentIndex();
   if (currentIndex >= m_CurrentMaxStep)
   {
@@ -275,6 +274,8 @@ void QmitkUSNavigationProcessWidget::OnNextButtonClicked()
 
 void QmitkUSNavigationProcessWidget::OnPreviousButtonClicked()
 {
+  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetIsFreezed()) {return;} //no moving through steps when the modality is NULL or frozen
+
   int currentIndex = ui->stepsToolBox->currentIndex();
   if (currentIndex <= 0)
   {

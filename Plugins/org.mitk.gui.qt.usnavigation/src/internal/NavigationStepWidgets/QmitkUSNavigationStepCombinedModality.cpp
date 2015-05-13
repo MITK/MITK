@@ -22,11 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 #include <QTextStream>
+#include <QSettings>
 
 QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWidget *parent) :
   QmitkUSAbstractNavigationStep(parent), m_CalibrationLoadedNecessary(true),
   m_ListenerDeviceChanged(this, &QmitkUSNavigationStepCombinedModality::OnDevicePropertyChanged),
-  ui(new Ui::QmitkUSNavigationStepCombinedModality)
+  ui(new Ui::QmitkUSNavigationStepCombinedModality),
+  m_LastCalibrationFilename("")
 {
   ui->setupUi(this);
 
@@ -48,10 +50,24 @@ QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWi
   std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice))";
   ui->combinedModalityListWidget->Initialize<mitk::USCombinedModality>(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, filter);
   ui->combinedModalityListWidget->SetAutomaticallySelectFirstEntry(true);
+
+  //try to load UI settings
+  QSettings settings;
+  settings.beginGroup(QString::fromStdString("QmitkUSNavigationStepCombinedModality"));
+  m_LastCalibrationFilename = settings.value("LastCalibrationFilename", QVariant("")).toString().toStdString();
+  MITK_DEBUG << "PERSISTENCE load: " << m_LastCalibrationFilename;
+  settings.endGroup();
 }
 
 QmitkUSNavigationStepCombinedModality::~QmitkUSNavigationStepCombinedModality()
 {
+  //save UI settings
+  QSettings settings;
+  settings.beginGroup(QString::fromStdString("QmitkUSNavigationStepCombinedModality"));
+  settings.setValue("LastCalibrationFilename", QVariant(m_LastCalibrationFilename.c_str()));
+  settings.endGroup();
+  MITK_DEBUG << "PERSISTENCE save: " << m_LastCalibrationFilename;
+  //delete UI
   delete ui;
 }
 
@@ -108,8 +124,9 @@ void QmitkUSNavigationStepCombinedModality::OnLoadCalibration()
 {
   QString filename = QFileDialog::getOpenFileName( QApplication::activeWindow(),
                                                    "Load Calibration",
-                                                   "",
+                                                   m_LastCalibrationFilename.c_str(),
                                                    "Calibration files *.cal" );
+  m_LastCalibrationFilename = filename.toStdString();
 
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNull())

@@ -68,6 +68,8 @@ public:
   explicit QmitkUSNavigationStepTumourSelection(QWidget* parent = 0);
   ~QmitkUSNavigationStepTumourSelection();
 
+  void SetTargetSelectionOptional (bool t);
+
   /**
    * \brief Initializes tumour and target surface.
    * \return always true
@@ -140,6 +142,8 @@ protected:
   void UpdateReferenceSensorName();
 
   itk::SmartPointer<mitk::NavigationDataSource>   m_NavigationDataSource;
+
+  bool m_targetSelectionOptional;
 
   float                                           m_SecurityDistance;
 

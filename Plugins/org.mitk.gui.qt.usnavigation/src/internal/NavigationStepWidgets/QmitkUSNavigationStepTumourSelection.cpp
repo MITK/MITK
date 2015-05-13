@@ -43,6 +43,7 @@ QmitkUSNavigationStepTumourSelection::QmitkUSNavigationStepTumourSelection(QWidg
   m_StateMachineFilename("USZoneInteractions.xml"),
   m_ReferenceSensorIndex(1),
   m_ListenerChangeNode(this, &QmitkUSNavigationStepTumourSelection::TumourNodeChanged),
+  m_targetSelectionOptional(false),
   ui(new Ui::QmitkUSNavigationStepTumourSelection)
 {
   ui->setupUi(this);
@@ -60,6 +61,11 @@ QmitkUSNavigationStepTumourSelection::QmitkUSNavigationStepTumourSelection(QWidg
 void QmitkUSNavigationStepTumourSelection::SetTumorColor(mitk::Color c)
 {
 m_SphereColor = c;
+}
+
+void QmitkUSNavigationStepTumourSelection::SetTargetSelectionOptional (bool t)
+{
+m_targetSelectionOptional = t;
 }
 
 QmitkUSNavigationStepTumourSelection::~QmitkUSNavigationStepTumourSelection()
@@ -151,6 +157,9 @@ bool QmitkUSNavigationStepTumourSelection::OnActivateStep()
   m_Interactor->SetEventConfig("globalConfig.xml");
 
   m_NodeDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
+
+  //target selection is optional
+  if (m_targetSelectionOptional) {emit SignalReadyForNextStep();}
 
   return true;
 }
@@ -272,6 +281,8 @@ void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
       m_Interactor->SetEventConfig("globalConfig.xml");
 
       m_Interactor->SetDataNode(m_TumourNode);
+      // feed reference pose to node displacement filter
+      m_NodeDisplacementFilter->SetInitialReferencePose(this->GetCombinedModality()->GetNavigationDataSource()->GetOutput(m_ReferenceSensorIndex)->Clone());
     }
   }
   else
@@ -333,8 +344,6 @@ void QmitkUSNavigationStepTumourSelection::TumourNodeChanged(const mitk::DataNod
   {
     if ( ui->freezeImageButton->isChecked() )
     {
-      ui->freezeImageButton->Unfreeze();
-
       m_NodeDisplacementFilter->AddNode(const_cast<mitk::DataNode*>(dataNode));
 
       m_TargetSurfaceNode->SetData(this->CreateTargetSurface());
@@ -351,6 +360,8 @@ void QmitkUSNavigationStepTumourSelection::TumourNodeChanged(const mitk::DataNod
       tumourResultNode->SetProperty("USNavigation::TumourRadius", mitk::DoubleProperty::New(size));
 
       emit SignalIntermediateResult(tumourResultNode);
+
+      ui->freezeImageButton->Unfreeze();
     }
 
     ui->tumourSearchExplanationLabel->setEnabled(false);
@@ -366,6 +377,12 @@ void QmitkUSNavigationStepTumourSelection::TumourNodeChanged(const mitk::DataNod
 mitk::Surface::Pointer QmitkUSNavigationStepTumourSelection::CreateTargetSurface()
 {
   mitk::Surface::Pointer tumourSurface = dynamic_cast<mitk::Surface*>(m_TumourNode->GetData());
+
+  if (tumourSurface.IsNull())
+    {
+    MITK_WARN << "No target selected, cannot create surface!";
+    return mitk::Surface::New(); //return a empty surface in this case...
+    }
 
   // make a deep copy of the tumour surface polydata
   vtkSmartPointer<vtkPolyData> tumourSurfaceVtk = vtkSmartPointer<vtkPolyData>::New();

@@ -35,6 +35,23 @@ QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIn
   m_IntersectPoints(vtkSmartPointer<vtkPoints>::New())
 {
   ui->setupUi(this);
+  connect(ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
+  connect(ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
+}
+
+void QmitkUSNavigationStepPunctuationIntervention::OnEnableAblationZoneMarkingClicked()
+{
+  if(ui->m_EnableAblationMarking->isChecked())
+    ui->m_AblationZonesBox->setEnabled(true);
+  else
+    ui->m_AblationZonesBox->setEnabled(false);
+}
+
+void QmitkUSNavigationStepPunctuationIntervention::OnAddAblationZoneClicked()
+{
+  MITK_INFO("USNavigationLogging") << "Ablation Zone Added, size: " << ui->m_AblationZoneSizeSlider->value();
+  new QListWidgetItem("Ablation Zone (size: " + QString::number(ui->m_AblationZoneSizeSlider->value()) + " mm)", ui->m_AblationZonesList);
+  emit AddAblationZoneClicked(ui->m_AblationZoneSizeSlider->value());
 }
 
 QmitkUSNavigationStepPunctuationIntervention::~QmitkUSNavigationStepPunctuationIntervention()
@@ -123,6 +140,12 @@ void QmitkUSNavigationStepPunctuationIntervention::OnUpdate()
   this->UpdateBodyMarkerStatus(navigationDataSource->GetOutput(1));
   // update critical structures
   this->UpdateCriticalStructures(navigationDataSource->GetOutput(0),m_NeedleProjectionFilter->GetProjection());
+
+  //Update Distance to US image
+  mitk::Point3D point1 = m_NeedleProjectionFilter->GetProjection()->GetPoint(0);
+  mitk::Point3D point2 = m_NeedleProjectionFilter->GetProjection()->GetPoint(1);
+  double distance = point1.EuclideanDistanceTo(point2);
+  ui->m_DistanceToUSPlane->setText(QString::number(distance) + " mm");
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode)

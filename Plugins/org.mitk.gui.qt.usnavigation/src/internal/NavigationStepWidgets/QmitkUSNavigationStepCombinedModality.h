@@ -108,10 +108,8 @@ protected:
    */
   itk::SmartPointer<mitk::USCombinedModality> m_CombinedModality;
 
-  /**
-   * \brief Temporary saving point for loaded calibration data.
-   */
-  std::string m_LoadedCalibration;
+  std::string m_LoadedCalibration; //<<< Temporary saving point for loaded calibration data.
+  std::string m_LastCalibrationFilename; //<<< saves the filename last loaded calibration
 
   bool m_CalibrationLoadedNecessary;
 

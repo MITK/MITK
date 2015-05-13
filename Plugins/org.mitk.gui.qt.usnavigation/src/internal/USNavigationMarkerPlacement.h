@@ -103,6 +103,8 @@ protected slots:
    */
   void OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode>);
 
+  void OnAddAblationZone(int size);
+
 public:
   static const char* DATANAME_TUMOUR;
   static const char* DATANAME_TARGETSURFACE;
@@ -163,6 +165,11 @@ protected:
   mitk::USImageLoggingFilter::Pointer                  m_USImageLoggingFilter;
   mitk::NavigationDataRecorder::Pointer                m_NavigationDataRecorder; //records navigation data files
   mitk::NodeDisplacementFilter::Pointer                m_TargetNodeDisplacementFilter;
+  mitk::NodeDisplacementFilter::Pointer                m_AblationZonesDisplacementFilter;
+  std::vector<mitk::DataNode::Pointer>                 m_AblationZonesVector;
+
+  int m_NeedleIndex;
+  int m_MarkerIndex;
 
   int                                                  m_SceneNumber;
 

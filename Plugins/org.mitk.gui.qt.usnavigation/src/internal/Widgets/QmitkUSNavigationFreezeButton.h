@@ -42,6 +42,7 @@ signals:
 
 protected slots:
   void OnButtonClicked(bool checked);
+  void OnFreezeButtonToggle();
 
 public:
   explicit QmitkUSNavigationFreezeButton(QWidget* parent = 0);
@@ -74,6 +75,7 @@ public:
 private:
   mitk::USCombinedModality::Pointer m_CombinedModality;
   int                               m_OutputIndex;
+  bool m_FreezeButtonToggle;
 };
 
 #endif // QMITKUSNAVIGATIONFREEZEBUTTON_H

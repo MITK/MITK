@@ -73,6 +73,15 @@ public:
 
   virtual FilterVector GetFilter();
 
+signals:
+
+  void AddAblationZoneClicked(int);
+
+protected slots:
+
+  void OnAddAblationZoneClicked();
+  void OnEnableAblationZoneMarkingClicked();
+
 protected:
   virtual void OnSetCombinedModality();
 

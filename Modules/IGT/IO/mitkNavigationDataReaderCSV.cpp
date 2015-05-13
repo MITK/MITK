@@ -93,16 +93,16 @@ double mitk::NavigationDataReaderCSV::StringToDouble( const std::string& s )
 
 std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataReaderCSV::parseLine(std::string line, int NumOfTools)
 {
-  std::vector<std::string> parts= splitLine(line);
+  std::vector<std::string> parts = splitLine(line);
   std::vector<mitk::NavigationData::Pointer> result;
-  std::string time=  parts[0];
 
 
 
   for (int n = 0; n < NumOfTools; n++)
   {
     mitk::NavigationData::Pointer nd;
-    nd = CreateNd(time, parts[n+1],parts[n+2],parts[n+3], parts[n+4], parts[n+5], parts[n+6], parts[n+7], parts[n+8]);
+    int offset = n * 8;
+    nd = CreateNd(parts[0], parts[offset + 1], parts[offset + 2], parts[offset + 3], parts[offset + 4], parts[offset + 5], parts[offset + 6], parts[offset + 7], parts[offset + 8]);
     result.push_back(nd);
   }
   return result;
@@ -116,6 +116,7 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderCSV::Read(std::string
 
   mitk::NavigationDataSet::Pointer returnValue = mitk::NavigationDataSet::New(NumOfTools);
 
+  // start from line 1 to leave out header
   for (int i = 1; i<fileContent.size(); i++ )
     {
       returnValue->AddNavigationDatas( parseLine( fileContent[i], NumOfTools) );

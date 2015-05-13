@@ -110,6 +110,7 @@ set(MODULE_TESTS
   mitkEqualTest.cpp
   mitkLineTest.cpp
   mitkItkImageIOTest.cpp
+  mitkRotatedSlice4DTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

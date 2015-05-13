@@ -34,6 +34,7 @@ EvaluateDirectionImagesFilter< PixelType >
     m_ImageSet(NULL),
     m_ReferenceImageSet(NULL),
     m_IgnoreMissingDirections(false),
+    m_IgnoreEmptyVoxels(false),
     m_Eps(0.0001)
 {
     this->SetNumberOfIndexedOutputs(2);
@@ -169,6 +170,14 @@ void EvaluateDirectionImagesFilter< PixelType >::GenerateData()
                 testDirs.push_back(testDir);
                 numTestDirs++;
             }
+        }
+
+        if (m_IgnoreEmptyVoxels && (numRefDirs==0 || numTestDirs==0) )
+        {
+            ++oit;
+            ++oit2;
+            ++mit;
+            continue;
         }
 
         // i: index of reference direction

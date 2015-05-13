@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("images", "i", mitkCommandLineParser::StringList, "DWIs:", "input diffusion-weighted images", us::Any(), false);
-    parser.addArgument("wmmasks", "w", mitkCommandLineParser::StringList, "WM-Masks:", "white matter mask images", us::Any(), false);
+    parser.addArgument("wmmasks", "w", mitkCommandLineParser::StringList, "WM-Masks:", "white matter mask images", us::Any());
     parser.addArgument("tractograms", "t", mitkCommandLineParser::StringList, "Tractograms:", "input tractograms (.fib, vtk ascii file format)", us::Any(), false);
     parser.addArgument("masks", "m", mitkCommandLineParser::StringList, "Masks:", "mask images", us::Any());
     parser.addArgument("forest", "f", mitkCommandLineParser::OutputFile, "Forest:", "output forest", us::Any(), false);
@@ -61,7 +61,9 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
 
     mitkCommandLineParser::StringContainerType imageFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["images"]);
-    mitkCommandLineParser::StringContainerType wmMaskFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["wmmasks"]);
+    mitkCommandLineParser::StringContainerType wmMaskFiles;
+    if (parsedArgs.count("wmmasks"))
+        wmMaskFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["wmmasks"]);
 
     mitkCommandLineParser::StringContainerType maskFiles;
     if (parsedArgs.count("masks"))

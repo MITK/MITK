@@ -38,7 +38,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.properties:ON
   org.mitk.gui.qt.basicimageprocessing:OFF
-  org.mitk.gui.qt.dicom:OFF
+  org.mitk.gui.qt.dicom:ON
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF
   org.mitk.gui.qt.geometrytools:OFF

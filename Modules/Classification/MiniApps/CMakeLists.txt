@@ -13,7 +13,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     # they are added after a "^^" and separated by "_"
     set( classificationminiapps
         RandomForestTraining^^MitkClassifierVigraRandomForest
-        RandomForestPrediction^^MitkClassifierVigraRandomForest
+    #    RandomForestPrediction^^MitkClassifierVigraRandomForest
     )
 
     foreach(classificationminiapps ${classificationminiapps})

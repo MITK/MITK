@@ -54,9 +54,9 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   // modified geometry is saved the surface representation is moved by this offset. To avoid
   // this bug, the geometry is set to identity for the saving progress and restored later.
   mitk::BaseGeometry::Pointer geometryBackup;
-  if (  Tool->GetDataNode().IsNull()
-        || (Tool->GetDataNode()->GetData()==NULL)
-        || (Tool->GetDataNode()->GetData()->GetGeometry()==NULL)
+  if (  Tool->GetDataNode().IsNotNull()
+        && (Tool->GetDataNode()->GetData()!=NULL)
+        && (Tool->GetDataNode()->GetData()->GetGeometry()!=NULL)
         )
       {
       geometryBackup = Tool->GetDataNode()->GetData()->GetGeometry()->Clone();

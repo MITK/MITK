@@ -513,7 +513,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   else
     ls->m_UnselectedGlyphSource2D->FilledOff();
 
-  ls->m_UnselectedGlyphSource2D->SetScale((double)m_Point2DSize/100);
+//  ls->m_UnselectedGlyphSource2D->SetScale((double)m_Point2DSize/100);
 
   // apply transform
   vtkSmartPointer<vtkTransformFilter> transformFilterU = vtkSmartPointer<vtkTransformFilter>::New();

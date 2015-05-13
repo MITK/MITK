@@ -458,7 +458,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
   if ( freezed )
   {
     // load state machine and event config for data interactor
-    m_PointMarkInteractor->LoadStateMachine("D:/prg/MITK-02-src/MITK/Plugins/org.mitk.gui.qt.usnavigation/resources/Interactions/USPointMarkInteractions.xml", us::ModuleRegistry::GetModule("USNavigationPlugin"));
+    m_PointMarkInteractor->LoadStateMachine("USPointMarkInteractions.xml", us::ModuleRegistry::GetModule("USNavigationPlugin"));
     m_PointMarkInteractor->SetEventConfig("globalConfig.xml");
 
     if ( m_CurrentTargetIndex < 1)

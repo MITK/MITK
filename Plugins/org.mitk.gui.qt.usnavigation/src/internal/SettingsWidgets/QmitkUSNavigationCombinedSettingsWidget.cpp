@@ -238,11 +238,11 @@ QString QmitkUSNavigationCombinedSettingsWidget::InteractionNameToFile(const QSt
 {
   if (name == tr("Click, Move and Click"))
   {
-    return QString("D:/prg/MITK-02-src/MITK/Plugins/org.mitk.gui.qt.usnavigation/resources/Interactions/USZoneInteractions.xml");
+    return QString("USZoneInteractions.xml");
   }
   else if (name == tr("Hold, Move and Release"))
   {
-    return QString("D:/prg/MITK-02-src/MITK/Plugins/org.mitk.gui.qt.usnavigation/resources/Interactions/USZoneInteractionsHold.xml");
+    return QString("USZoneInteractionsHold.xml");
   }
   else
   {

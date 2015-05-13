@@ -351,7 +351,7 @@ void QmitkUSNavigationStepPlacementPlanning::OnFreeze(bool freeze)
   if ( freeze )
   {
     // load state machine and event config for data interactor
-    m_PointMarkInteractor->LoadStateMachine("D:/prg/MITK-02-src/MITK/Plugins/org.mitk.gui.qt.usnavigation/resources/Interactions/USPointMarkInteractions.xml", us::ModuleRegistry::GetModule("USNavigationPlugin"));
+    m_PointMarkInteractor->LoadStateMachine("USPointMarkInteractions.xml", us::ModuleRegistry::GetModule("MitkUS"));
     m_PointMarkInteractor->SetEventConfig("globalConfig.xml");
 
     this->CreateTargetNodesIfNecessary();

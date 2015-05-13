@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
     QWidget(parent), m_ZonesDataModel(new QmitkUSZonesDataModel(this)),
     m_Interactor(mitk::USZonesInteractor::New()),
-    m_StateMachineFileName("D:/prg/MITK-02-src/MITK/Plugins/org.mitk.gui.qt.usnavigation/resources/Interactions/USZoneInteractions.xml"),
+    m_StateMachineFileName("USZoneInteractions.xml"),
     ui(new Ui::QmitkUSZoneManagementWidget), m_CurMaxNumOfZones(0)
 {
   ui->setupUi(this);
@@ -46,7 +46,7 @@ QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
            this, SLOT(OnDataChanged(const QModelIndex&, const QModelIndex&)));
 
   // load state machine and event config for data interactor
-  m_Interactor->LoadStateMachine(m_StateMachineFileName, us::ModuleRegistry::GetModule("USNavigationPlugin"));
+  m_Interactor->LoadStateMachine(m_StateMachineFileName, us::ModuleRegistry::GetModule("MitkUS"));
   m_Interactor->SetEventConfig("globalConfig.xml");
 }
 
@@ -60,7 +60,7 @@ QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
 void QmitkUSZoneManagementWidget::SetStateMachineFilename(const std::string& filename)
 {
   m_StateMachineFileName = filename;
-  m_Interactor->LoadStateMachine(filename, us::ModuleRegistry::GetModule("USNavigationPlugin"));
+  m_Interactor->LoadStateMachine(filename, us::ModuleRegistry::GetModule("MitkUS"));
 }
 
 void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage, const char* baseNodeName)

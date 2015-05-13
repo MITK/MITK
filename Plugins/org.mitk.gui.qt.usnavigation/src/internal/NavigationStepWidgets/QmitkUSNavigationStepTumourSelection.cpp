@@ -40,7 +40,7 @@ QmitkUSNavigationStepTumourSelection::QmitkUSNavigationStepTumourSelection(QWidg
   m_SecurityDistance(0),
   m_Interactor(mitk::USZonesInteractor::New()),
   m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
-  m_StateMachineFilename("D:/prg/MITK-02-src/MITK/Plugins/org.mitk.gui.qt.usnavigation/resources/Interactions/USZoneInteractions.xml"),
+  m_StateMachineFilename("USZoneInteractions.xml"),
   m_ReferenceSensorIndex(1),
   m_ListenerChangeNode(this, &QmitkUSNavigationStepTumourSelection::TumourNodeChanged),
   ui(new Ui::QmitkUSNavigationStepTumourSelection)
@@ -75,7 +75,7 @@ bool QmitkUSNavigationStepTumourSelection::OnStartStep()
   m_TumourNode->SetColor(m_SphereColor[0],m_SphereColor[1],m_SphereColor[2]);
 
   // load state machine and event config for data interactor
-  m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("USNavigationPlugin"));
+  m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("MitkUS"));
   m_Interactor->SetEventConfig("globalConfig.xml");
 
   this->GetDataStorage()->ChangedNodeEvent.AddListener(m_ListenerChangeNode);
@@ -147,7 +147,7 @@ bool QmitkUSNavigationStepTumourSelection::OnFinishStep()
 bool QmitkUSNavigationStepTumourSelection::OnActivateStep()
 {
   m_Interactor = mitk::USZonesInteractor::New();
-  m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("USNavigationPlugin"));
+  m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("MitkUS"));
   m_Interactor->SetEventConfig("globalConfig.xml");
 
   m_NodeDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
@@ -234,7 +234,7 @@ void QmitkUSNavigationStepTumourSelection::OnSettingsChanged(const itk::SmartPoi
   if ( settingsNode->GetStringProperty("settings.interaction-concept", stateMachineFilename) && stateMachineFilename != m_StateMachineFilename )
   {
     m_StateMachineFilename = stateMachineFilename;
-    m_Interactor->LoadStateMachine(stateMachineFilename, us::ModuleRegistry::GetModule("USNavigationPlugin"));
+    m_Interactor->LoadStateMachine(stateMachineFilename, us::ModuleRegistry::GetModule("MitkUS"));
   }
 
   std::string referenceSensorName;
@@ -268,7 +268,7 @@ void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
     if ( ! m_TumourNode->GetData() )
     {
       // load state machine and event config for data interactor
-      m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("USNavigationPlugin"));
+      m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("MitkUS"));
       m_Interactor->SetEventConfig("globalConfig.xml");
 
       m_Interactor->SetDataNode(m_TumourNode);

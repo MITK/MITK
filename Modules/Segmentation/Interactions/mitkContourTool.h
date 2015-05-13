@@ -71,6 +71,7 @@ class MitkSegmentation_EXPORT ContourTool : public FeedbackContourTool
     void ConnectActionsAndFunctions();
 
     int m_PaintingPixelValue;
+    int m_CurrentLabelID;
 };
 
 } // namespace

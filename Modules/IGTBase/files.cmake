@@ -1,5 +1,6 @@
 set(CPP_FILES
  mitkRealTimeClock.cpp
+ mitkQuaternionAveraging.cpp
 )
 
 if(WIN32)

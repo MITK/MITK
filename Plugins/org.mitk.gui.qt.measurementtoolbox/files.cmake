@@ -6,18 +6,21 @@ set(INTERNAL_CPP_FILES
   QmitkMeasurementView.cpp
   QmitkPlanarFiguresTableModel.cpp
   QmitkImageStatisticsView.cpp
+  QmitkCommentTextView.cpp
   QmitkImageStatisticsCalculationThread.cpp
   mitkPluginActivator.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkImageStatisticsViewControls.ui
+  src/internal/QmitkCommentTextView.ui
 )
 
 set(MOC_H_FILES
   src/internal/QmitkMeasurementView.h
   src/internal/QmitkPlanarFiguresTableModel.h
   src/internal/QmitkImageStatisticsView.h
+  src/internal/QmitkCommentTextView.h
   src/internal/QmitkImageStatisticsCalculationThread.h
   src/internal/mitkPluginActivator.h
 

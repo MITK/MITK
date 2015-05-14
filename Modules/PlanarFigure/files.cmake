@@ -14,6 +14,7 @@ set(CPP_FILES
   DataManagement/mitkPlanarCross.cpp
   DataManagement/mitkPlanarFigure.cpp
   DataManagement/mitkPlanarFourPointAngle.cpp
+  DataManagement/mitkPlanarComment.cpp
   DataManagement/mitkPlanarLine.cpp
   DataManagement/mitkPlanarArrow.cpp
   DataManagement/mitkPlanarPolygon.cpp

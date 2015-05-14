@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include <mitkILifecycleAwarePart.h>
 
+#include "QmitkCommentTextView.h"
+
 /// forward declarations
 struct QmitkMeasurementViewData;
 namespace mitk
@@ -58,6 +60,7 @@ class QmitkMeasurementView : public QmitkAbstractView
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
   protected slots:
     ///# draw actions
+    void ActionDrawCommentTriggered(bool checked = false);
     void ActionDrawLineTriggered( bool checked = false );
     void ActionDrawPathTriggered( bool checked = false );
     void ActionDrawAngleTriggered( bool checked = false );
@@ -90,6 +93,8 @@ class QmitkMeasurementView : public QmitkAbstractView
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
 
     QmitkMeasurementViewData* d;
+
+    QmitkCommentTextView m_commentTextView;
 };
 
 #endif // QMITK_MEASUREMENT_H__INCLUDED

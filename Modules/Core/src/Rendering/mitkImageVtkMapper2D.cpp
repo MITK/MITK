@@ -740,9 +740,9 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       max2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMax();
     }
 
-    bool needCheck = false;
-    node->GetBoolProperty("need check is binary", needCheck);
-    if (needCheck) {
+    bool skipCheck = false;
+    node->GetBoolProperty("skip check is binary", skipCheck);
+    if (!skipCheck) {
       if ((maxValue == min2ndValue && minValue == max2ndValue) || minValue == maxValue)
       {
         // centralSlice is strange, lets look at all data

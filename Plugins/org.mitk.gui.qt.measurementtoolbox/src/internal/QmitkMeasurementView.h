@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkILifecycleAwarePart.h>
 #include "usServiceRegistration.h"
 
+#include "QmitkCommentTextView.h"
+
 /// forward declarations
 struct QmitkMeasurementViewData;
 namespace mitk
@@ -59,6 +61,8 @@ class QmitkMeasurementView : public QmitkAbstractView
 
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
   protected slots:
+
+    void OnDrawCommentTriggered(bool checked = false);
     void OnDrawLineTriggered( bool checked = false );
     void OnDrawPathTriggered( bool checked = false );
     void OnDrawAngleTriggered( bool checked = false );
@@ -93,6 +97,8 @@ class QmitkMeasurementView : public QmitkAbstractView
 
     // holds configuration objects that have been deactivated
     std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;
+
+    QmitkCommentTextView m_commentTextView;
 };
 
 #endif // QMITK_MEASUREMENT_H__INCLUDED

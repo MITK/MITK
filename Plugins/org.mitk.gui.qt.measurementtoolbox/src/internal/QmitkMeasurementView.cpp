@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarAngle.h>
 #include <mitkPlanarRectangle.h>
+#include <mitkPlanarComment.h>
 #include <mitkPlanarLine.h>
 #include <mitkPlanarCross.h>
 #include <mitkPlanarFourPointAngle.h>
@@ -84,6 +85,7 @@ struct QmitkMeasurementViewData
       m_AngleCounter(0),
       m_FourPointAngleCounter(0),
       m_CircleCounter(0),
+      m_CommentCounter(0),
       m_EllipseCounter(0),
       m_DoubleEllipseCounter(0),
       m_RectangleCounter(0),
@@ -113,6 +115,7 @@ struct QmitkMeasurementViewData
   {
   }
 
+  unsigned int m_CommentCounter;
   unsigned int m_LineCounter;
   unsigned int m_PathCounter;
   unsigned int m_AngleCounter;
@@ -132,6 +135,7 @@ struct QmitkMeasurementViewData
 
   QWidget* m_Parent;
   QLabel* m_SelectedImageLabel;
+  QAction* m_DrawComment;
   QAction* m_DrawLine;
   QAction* m_DrawPath;
   QAction* m_DrawAngle;
@@ -189,6 +193,12 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   auto* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/line.png"), "Draw Line");
   currentAction->setCheckable(true);
   d->m_DrawLine = currentAction;
+
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(""), "Draw Comment");
+  currentAction->setCheckable(true);
+  d->m_DrawComment = currentAction;
+  d->m_DrawActionsToolBar->addAction(currentAction);
+  d->m_DrawActionsGroup->addAction(currentAction);
 
   currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/path.png"), "Draw Path");
   currentAction->setCheckable(true);
@@ -250,6 +260,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 }
 void QmitkMeasurementView::CreateConnections()
 {
+  connect(d->m_DrawComment, SIGNAL(triggered(bool)), this, SLOT(OnDrawCommentTriggered(bool)));
   connect(d->m_DrawLine, SIGNAL(triggered(bool)), this, SLOT(OnDrawLineTriggered(bool)));
   connect(d->m_DrawPath, SIGNAL(triggered(bool)), this, SLOT(OnDrawPathTriggered(bool)));
   connect(d->m_DrawAngle, SIGNAL(triggered(bool)), this, SLOT(OnDrawAngleTriggered(bool)));
@@ -470,6 +481,7 @@ void QmitkMeasurementView::PlanarFigureInitialized()
 
   d->m_DrawActionsToolBar->setEnabled(true);
 
+  d->m_DrawComment->setChecked(false);
   d->m_DrawLine->setChecked(false);
   d->m_DrawPath->setChecked(false);
   d->m_DrawAngle->setChecked(false);
@@ -623,7 +635,23 @@ void QmitkMeasurementView::OnDrawLineTriggered(bool)
      QString("Line%1").arg(++d->m_LineCounter));
 }
 
-void QmitkMeasurementView::OnDrawPathTriggered(bool)
+void QmitkMeasurementView::OnDrawCommentTriggered(bool checked)
+{
+  Q_UNUSED(checked)
+
+  m_commentTextView.show();
+
+  mitk::PlanarComment::Pointer figure = mitk::PlanarComment::New();
+  QString qString = QString("Comment%1").arg(++d->m_CommentCounter);
+  this->AddFigureToDataStorage(figure, qString);
+
+  std::string comment = m_commentTextView.getText().toStdString();
+  figure->setText(comment);
+
+  MEASUREMENT_DEBUG << "PlanarComment initialized...";
+}
+
+void QmitkMeasurementView::OnDrawPathTriggered(bool checked)
 {
 
   auto propertyFilters = mitk::CoreServices::GetPropertyFilters();

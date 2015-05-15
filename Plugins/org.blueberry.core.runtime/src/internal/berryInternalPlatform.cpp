@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryCTKPluginActivator.h"
 #include "berryPlatformException.h"
 #include "berryApplicationContainer.h"
+#include "berryProduct.h"
 
 #include "berryIBranding.h"
 
@@ -106,7 +107,13 @@ SmartPointer<IProduct> InternalPlatform::GetProduct() const
   ApplicationContainer* container = org_blueberry_core_runtime_Activator::GetContainer();
   IBranding* branding = container == nullptr ? nullptr : container->GetBranding();
   if (branding == nullptr) return IProduct::Pointer();
-  return branding->GetProduct();
+  IProduct::Pointer brandingProduct = branding->GetProduct();
+  if (!brandingProduct)
+  {
+    brandingProduct = new Product(branding);
+  }
+  product = brandingProduct;
+  return product;
 }
 
 void InternalPlatform::InitializePluginPaths()

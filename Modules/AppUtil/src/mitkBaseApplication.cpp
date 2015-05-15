@@ -44,6 +44,7 @@ namespace mitk {
 QString BaseApplication::ARG_NEWINSTANCE = "BlueBerry.newInstance";
 QString BaseApplication::ARG_CLEAN = "BlueBerry.clean";
 QString BaseApplication::ARG_APPLICATION = "BlueBerry.application";
+QString BaseApplication::ARG_PRODUCT = "BlueBerry.product";
 QString BaseApplication::ARG_HOME = "BlueBerry.home";
 QString BaseApplication::ARG_STORAGE_DIR = "BlueBerry.storageDir";
 QString BaseApplication::ARG_PLUGIN_CACHE = "BlueBerry.plugin_cache_dir";
@@ -69,6 +70,7 @@ QString BaseApplication::PROP_NO_REGISTRY_CACHE = BaseApplication::ARG_NO_REGIST
 QString BaseApplication::PROP_NO_LAZY_REGISTRY_CACHE_LOADING = BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
 QString BaseApplication::PROP_REGISTRY_MULTI_LANGUAGE = BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE;
 
+QString BaseApplication::PROP_PRODUCT = "blueberry.product";
 QString BaseApplication::PROP_APPLICATION = "blueberry.application";
 QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
 QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
@@ -174,8 +176,9 @@ struct BaseApplication::Impl
     for (auto key : keys)
     {
       QString qKey = QString::fromStdString(key);
-      if (!m_FWProps.contains(qKey) && configuration.hasProperty(key))
+      if (configuration.hasProperty(key))
       {
+        // ini and command line options overwrite already inserted keys
         m_FWProps[qKey] = QString::fromStdString(configuration.getString(key));
       }
     }
@@ -640,6 +643,10 @@ void BaseApplication::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Option cleanOption(ARG_CLEAN.toStdString(), "", "cleans the plugin cache");
   cleanOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleClean));
   options.addOption(cleanOption);
+
+  Poco::Util::Option productOption(ARG_PRODUCT.toStdString(), "", "the id of the product to be launched");
+  productOption.argument("<id>").binding(PROP_PRODUCT.toStdString());
+  options.addOption(productOption);
 
   Poco::Util::Option appOption(ARG_APPLICATION.toStdString(), "", "the id of the application extension to be executed");
   appOption.argument("<id>").binding(PROP_APPLICATION.toStdString());

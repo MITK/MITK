@@ -104,8 +104,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   //Get mouse position in vtk display coordinate system. me contains qt display infos...
   mitk::Point2D displayPos = GetMousePosition(me);
   //Transform 2D coordinates in 3D world position. Used transform comes from TODO 18735
-  //TODO 18735: replace this method call by displayPos (see above)
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(displayPos);
   //worldPos is the 3D vector from the origin of the world to the requested point.
 
   mitk::MousePressEvent::Pointer mPressEvent = mitk::MousePressEvent::New(m_Renderer,
@@ -128,7 +127,7 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 {
   mitk::Point2D displayPos = GetMousePosition(me);
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(displayPos);
 
   mitk::MouseDoubleClickEvent::Pointer mPressEvent = mitk::MouseDoubleClickEvent::New(m_Renderer,displayPos, worldPos, GetButtonState(me),
     GetModifiers(me), GetEventButton(me));
@@ -147,7 +146,7 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 {
   mitk::Point2D displayPos = GetMousePosition(me);
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(displayPos);
 
   mitk::MouseReleaseEvent::Pointer mReleaseEvent = mitk::MouseReleaseEvent::New(m_Renderer, displayPos,worldPos, GetButtonState(me),
       GetModifiers(me), GetEventButton(me));
@@ -166,7 +165,7 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   mitk::Point2D displayPos = GetMousePosition(me);
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(displayPos);
 
   this->AdjustRenderWindowMenuVisibility(me->pos());
 
@@ -184,7 +183,7 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
   mitk::Point2D displayPos = GetMousePosition(we);
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(we));
+  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(displayPos);
 
   mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, displayPos,worldPos, GetButtonState(we),
       GetModifiers(we), GetDelta(we));

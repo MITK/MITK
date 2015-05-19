@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandardFileLocations.h>
 #include <mitkTestingMacros.h>
 #include <mitkNavigationDataReaderCSV.h>
-#include <mitkNavigationDataSetWriterCSV.h>
+#include <mitkIOUtil.h>
 
 #include <mitkNavigationDataReaderXML.h>
 
@@ -51,7 +51,6 @@ private:
   std::string pathRead;
   std::string pathWrite;
   std::string pathWrong;
-  mitk::NavigationDataSetWriterCSV writer;
   mitk::NavigationDataReaderCSV::Pointer reader;
 
   mitk::NavigationDataReaderXML::Pointer xmlReader;
@@ -82,7 +81,7 @@ public:
 
     set = xmlReader->Read(pathRead);
 
-    writer.Write(pathWrite, set);
+    mitk::IOUtil::SaveBaseData(set, pathWrite);
 
     //FIXME: Commented out, because test fails under linux. binary comparison of files is probably not the wa to go
     // See Bug 17775

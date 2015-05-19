@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 
 #include <mitkNavigationDataReaderXML.h>
-#include <mitkNavigationDataSetWriterXML.h>
 
 //for exceptions
 #include "mitkIGTException.h"

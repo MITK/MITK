@@ -112,12 +112,6 @@ bool mitk::VigraRandomForestClassifier::SupportsPointWiseProbability()
   return true;
 }
 
-vigra::MultiArrayView<2, double> mitk::VigraRandomForestClassifier::GetPointWiseWeight()
-{
-  vigra::MultiArrayView<2, double> eigenview;
-  return eigenview;
-}
-
 void mitk::VigraRandomForestClassifier::OnlineTrain(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in)
 {
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
@@ -362,8 +356,9 @@ void mitk::VigraRandomForestClassifier::PrintParameter(std::ostream & str)
   //  this->m_Parameter->Stratification = vigra:RF_NONE; // no Property given
 }
 
-void mitk::VigraRandomForestClassifier::UsePointBasedWeights(bool val)
+void mitk::VigraRandomForestClassifier::UsePointWiseWeight(bool val)
 {
+  mitk::AbstractClassifier::UsePointWiseWeight(val);
   this->GetPropertyList()->SetBoolProperty("classifier.vigra-rf.usepointbasedweight",val);
   this->ConvertParameter();
 }

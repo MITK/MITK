@@ -113,7 +113,7 @@ std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetDataStr
   return result;
 }
 
-std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTimeStep(unsigned int index)
+std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTimeStep(unsigned int index) const
 {
   return m_NavigationDataVectors[index];
 }

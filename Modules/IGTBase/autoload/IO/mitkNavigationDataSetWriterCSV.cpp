@@ -38,7 +38,7 @@ void mitk::NavigationDataSetWriterCSV::Write()
 
   //write header
   unsigned int numberOfTools = data->GetNumberOfTools();
-  for (unsigned int index = 0; index < numberOfTools; index++){ *stream << "TimeStamp_Tool" << index <<
+  for (unsigned int index = 0; index < numberOfTools; index++){ *out << "TimeStamp_Tool" << index <<
                                                                            ";Valid_Tool" << index <<
                                                                            ";X_Tool" << index <<
                                                                            ";Y_Tool" << index <<
@@ -47,9 +47,9 @@ void mitk::NavigationDataSetWriterCSV::Write()
                                                                            ";QY_Tool" << index <<
                                                                            ";QZ_Tool" << index <<
                                                                            ";QR_Tool" << index << ";";}
-  *stream << "\n";
+  *out << "\n";
 
-  stream->precision(15); // rounding precision because we don't want to loose data.
+  out->precision(15); // rounding precision because we don't want to loose data.
 
   //write data
   MITK_INFO << "Number of timesteps: " << data->Size();
@@ -59,7 +59,7 @@ void mitk::NavigationDataSetWriterCSV::Write()
     for (unsigned int toolIndex = 0; toolIndex < numberOfTools; toolIndex++)
     {
       mitk::NavigationData::Pointer nd = NavigationDatasOfCurrentStep.at(toolIndex);
-      *stream          << nd->GetTimeStamp() << ";"
+      *out             << nd->GetTimeStamp() << ";"
                        << nd->IsDataValid() << ";"
                        << nd->GetPosition()[0] << ";"
                        << nd->GetPosition()[1] << ";"
@@ -69,7 +69,7 @@ void mitk::NavigationDataSetWriterCSV::Write()
                        << nd->GetOrientation()[2] << ";"
                        << nd->GetOrientation()[3] << ";";
     }
-    *stream << "\n";
+    *out << "\n";
   }
 
   //switch back to old locale

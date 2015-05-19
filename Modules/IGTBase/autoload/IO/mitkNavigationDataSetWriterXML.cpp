@@ -45,13 +45,13 @@ void mitk::NavigationDataSetWriterXML::Write()
   char * oldLocale;
   oldLocale = setlocale( LC_ALL, nullptr );
 
-  StreamHeader(stream, data);
-  StreamData(stream, data);
-  StreamFooter(stream);
+  StreamHeader(out, data);
+  StreamData(out, data);
+  StreamFooter(out);
 
   // Cleanup
 
-  stream->flush();
+  out->flush();
 
   //switch back to old locale
   setlocale( LC_ALL, oldLocale );

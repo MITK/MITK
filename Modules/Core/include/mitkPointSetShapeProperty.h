@@ -103,7 +103,7 @@ public:
    * this function is overridden as protected, so that the user may not add
    * additional invalid rendering types.
    */
-  virtual bool AddEnum( const std::string& name, const IdType& id );
+  virtual bool AddEnum( const std::string& name, const IdType& id ) override;
 
   /**
    * Adds the default enumeration types.
@@ -115,7 +115,7 @@ private:
   // purposely not implemented
   PointSetShapeProperty& operator=(const PointSetShapeProperty&);
 
-  virtual itk::LightObject::Pointer InternalClone() const;
+  virtual itk::LightObject::Pointer InternalClone() const override;
 };
 
 #ifdef _MSC_VER

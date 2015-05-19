@@ -176,7 +176,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
     m_PresetAction = m_PresetSubmenu->addAction(tr("Preset Definition"), this, SLOT(addPreset()));
     m_PresetSubmenu->addSeparator();
     std::map<std::string, double> preset = m_LevelWindowPreset->getLevelPresets();
-    for( std::map<std::string, double>::iterator iter = preset.begin(); iter != preset.end(); iter++ ) {
+    for( auto iter = preset.begin(); iter != preset.end(); iter++ ) {
       QString item = ((*iter).first.c_str());
       m_PresetSubmenu->addAction(item);
     }
@@ -199,7 +199,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
       mitk::DataNode* node = objectIter->Value();
       if (node)
       {
-        if (node->IsVisible(NULL) == false)
+        if (node->IsVisible(nullptr) == false)
           continue;
         mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
         bool isHelperObject = false;
@@ -235,7 +235,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
 
-    QMenu* contextMenu = new QMenu( this );
+    auto  contextMenu = new QMenu( this );
     Q_CHECK_PTR( contextMenu );
     //contextMenu->setCheckable(true);
     QAction* sliderFixed = contextMenu->addAction(tr("Set Slider Fixed"), this, SLOT(setFixed()));
@@ -257,7 +257,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
     m_PresetAction = m_PresetSubmenu->addAction(tr("Preset Definition"), this, SLOT(addPreset()));
     m_PresetSubmenu->addSeparator();
     std::map<std::string, double> preset = m_LevelWindowPreset->getLevelPresets();
-    for( std::map<std::string, double>::iterator iter = preset.begin(); iter != preset.end(); iter++ ) {
+    for( auto iter = preset.begin(); iter != preset.end(); iter++ ) {
       QString item = ((*iter).first.c_str());
       m_PresetSubmenu->addAction(item);
     }

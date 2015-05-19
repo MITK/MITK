@@ -154,7 +154,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::SetInputImageNode(mitk::DataNode* node)
 }
 
 template <typename TPixel>
-static void AccessPixel(mitk::PixelType ptype, const mitk::Image::Pointer im, mitk::Point3D p, int & val)
+static void AccessPixel(mitk::PixelType /*ptype*/, const mitk::Image::Pointer im, mitk::Point3D p, int & val)
 {
   mitk::ImagePixelReadAccessor<TPixel,3> access(im);
   val = access.GetPixelByWorldCoordinates(p);
@@ -237,11 +237,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       //Now calculation mean of the pixelValues
       unsigned int numberOfValues(0);
-      for (unsigned int i = 0; i < 125; i++)
+      for (auto & pixelValue : pixelValues)
       {
-        if(pixelValues[i] > -10000000)
+        if(pixelValue > -10000000)
         {
-          m_SeedPointValueMean += pixelValues[i];
+          m_SeedPointValueMean += pixelValue;
           numberOfValues++;
         }
       }
@@ -693,7 +693,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
     while( !itOutput.IsAtEnd() && !itInput.IsAtEnd() )
     {
       //Use threshold slider to determine if pixel is set to 1
-      if( itInput.Value() != 0 && itInput.Value() > currentTreshold )
+      if( itInput.Value() != 0 && itInput.Value() >= currentTreshold )
       {
         itOutput.Set( 1 );
       }

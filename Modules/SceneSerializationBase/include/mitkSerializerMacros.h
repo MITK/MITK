@@ -33,12 +33,12 @@ class classname ## Factory : public ::itk::ObjectFactoryBase \
     typedef itk::SmartPointer<const Self>  ConstPointer; \
       \
     /* Methods from ObjectFactoryBase */ \
-    virtual const char* GetITKSourceVersion() const \
+    virtual const char* GetITKSourceVersion() const override \
     { \
       return ITK_SOURCE_VERSION; \
     } \
      \
-    virtual const char* GetDescription() const \
+    virtual const char* GetDescription() const override \
     { \
       return "Generated factory for " #classname; \
     } \

@@ -43,7 +43,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(ClaronInterface, itk::Object);
+    mitkClassMacroItkParent(ClaronInterface, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     /**

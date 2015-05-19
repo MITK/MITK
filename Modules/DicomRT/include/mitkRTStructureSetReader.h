@@ -55,7 +55,7 @@ namespace mitk
     };
 
   public:
-    mitkClassMacro( RTStructureSetReader, itk::Object )
+    mitkClassMacroItkParent( RTStructureSetReader, itk::Object )
     itkNewMacro( Self )
 
     /**

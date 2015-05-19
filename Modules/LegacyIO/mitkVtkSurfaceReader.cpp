@@ -52,7 +52,7 @@ void mitk::VtkSurfaceReader::GenerateData()
         reader->SetFileName( m_FileName.c_str() );
         reader->Update();
 
-        if ( reader->GetOutput() != NULL )
+        if ( reader->GetOutput() != nullptr )
         {
           mitk::Surface::Pointer output = this->GetOutput();
           output->SetVtkPolyData( reader->GetOutput() );
@@ -73,7 +73,7 @@ void mitk::VtkSurfaceReader::GenerateData()
         reader->SetFileName( m_FileName.c_str() );
         reader->Update();
 
-        if ( reader->GetOutput() != NULL )
+        if ( reader->GetOutput() != nullptr )
         {
           mitk::Surface::Pointer output = this->GetOutput();
           output->SetVtkPolyData( reader->GetOutput() );

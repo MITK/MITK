@@ -109,60 +109,60 @@ namespace mitk
     * \brief Get the position of the tool
     * @throw mitk::IGTException Throws an exception if
     */
-    void GetPosition(mitk::Point3D& position) const;
+    void GetPosition(mitk::Point3D& position) const override;
 
     /**
     * \brief Get the orientation of the tool using quaternion nomenclature
     * @throw mitk::IGTException Throws an exception if
     */
-    void GetOrientation(mitk::Quaternion& orientation) const;
+    void GetOrientation(mitk::Quaternion& orientation) const override;
 
     /**
     * \brief Set the tool enabled for tracking.
   * \return Return true if the enabling was successfull
     * @throw mitk::IGTException Throws an exception if
     */
-    bool Enable();
+    bool Enable() override;
 
     /**
     * \brief Set the tool disabled for tracking.
   * \return Return true if the disabling was successfull
     * @throw mitk::IGTException Throws an exception if
     */
-    bool Disable();
+    bool Disable() override;
 
     /**
     * \brief Check if the tool is enabled (true) or not.
   * \return Return true if the tool is enabled for tracking
     * @throw mitk::IGTException Throws an exception if
     */
-    bool IsEnabled() const;
+    bool IsEnabled() const override;
 
     /**
     * \brief Check if the data of the tool is valid.
   * \return Return true if location data is valid
     * @throw mitk::IGTException Throws an exception if
     */
-    bool IsDataValid() const;
+    bool IsDataValid() const override;
 
     /**
     * \brief Get the expectated error in the tracked tool
   * \return Return the error location
     * @throw mitk::IGTException Throws an exception if
     */
-    float GetTrackingError() const;
+    float GetTrackingError() const override;
 
     /**
     * \brief Set the FLE (Fiducial Localization Error) for the tool
     * @throw mitk::IGTException Throws an exception if
     */
-    void SetTrackingError(float FLEerror);
+    void SetTrackingError(float FLEerror) override;
 
     /**
     * \brief Set the valid flag for tracking data to true
     * @throw mitk::IGTException Throws an exception if
     */
-    void SetDataValid(bool _arg);
+    void SetDataValid(bool _arg) override;
 
     /**
     * \brief Update location and orientation of the tool

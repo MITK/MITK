@@ -251,7 +251,7 @@ void QmitkNumberPropertyEditor::PropertyChanged()
 
 void QmitkNumberPropertyEditor::PropertyRemoved()
 {
-  m_Property = NULL;
+  m_Property = nullptr;
 }
 
 void QmitkNumberPropertyEditor::DisplayNumber()

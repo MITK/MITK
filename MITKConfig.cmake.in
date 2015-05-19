@@ -14,24 +14,6 @@ set(MITK_VERSION_STRING "@MITK_VERSION_STRING@")
 
 set(MITK_CXX_STANDARD @MITK_CXX_STANDARD@)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-  # CMake 3.1 does not know yet how to enable C++11 for AppleClang
-  # See http://public.kitware.com/Bug/view.php?id=15355
-  set(MITK_NO_CXX_STANDARD_ERROR 1)
-endif()
-
-# We use target_compile_features for GNU and Clang to ensure
-# external projects are compiled with e.g. -std=c++11. For
-# msvc, C++11 support is always enabled by the compiler itself.
-if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND
-   NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND
-   NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  if(NOT CMAKE_CXX_STANDARD STREQUAL MITK_CXX_STANDARD AND
-     NOT MITK_NO_CXX_STANDARD_ERROR)
-    message(FATAL_ERROR "MITK was compiled with C++11 enabled and we can't figure out if your project is compiled with C++11 enable as well. To silence this error set CMAKE_CXX_STANDARD to \"11\" at the top of your CMakeLists.txt file or set MITK_NO_CXX_STANDARD_ERROR to TRUE.")
-  endif()
-endif()
-
 #-----------------------------------------------------------------------------
 # Include required CMake scripts
 #-----------------------------------------------------------------------------
@@ -43,31 +25,35 @@ list(APPEND CMAKE_MODULE_PATH ${MITK_CMAKE_MODULE_PATH})
 # Standard CMake macros
 include(CMakeParseArguments)
 include(FeatureSummary)
-include(GenerateExportHeader)
 include(FindPackageHandleStandardArgs)
+include(GenerateExportHeader)
 
 # Include MITK macros
 include(MacroParseArguments)
+include(mitkFunctionAddCustomModuleTest)
 include(mitkFunctionCheckMitkCompatibility)
-include(mitkFunctionOrganizeSources)
-include(mitkFunctionCreateWindowsBatchScript)
-include(mitkFunctionInstallProvisioningFiles)
-include(mitkFunctionInstallAutoLoadModules)
-include(mitkFunctionGetLibrarySearchPaths)
-include(mitkFunctionUseModules)
 include(mitkFunctionCheckModuleDependencies)
+include(mitkFunctionCreateBlueBerryApplication)
 include(mitkFunctionCreateModule)
+include(mitkFunctionCreatePlugin)
+include(mitkFunctionCreateProvisioningFile)
+include(mitkFunctionCreateWindowsBatchScript)
+include(mitkFunctionGetLibrarySearchPaths)
+include(mitkFunctionInstallAutoLoadModules)
+include(mitkFunctionInstallCTKPlugin)
+include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionInstallThirdPartyCTKPlugins)
+include(mitkFunctionOrganizeSources)
+include(mitkFunctionUseModules)
 include(mitkMacroCreateExecutable)
 include(mitkMacroCreateModuleTests)
-include(mitkFunctionAddCustomModuleTest)
-include(mitkMacroMultiplexPicType)
+include(mitkMacroFindDependency)
+include(mitkMacroGenerateToolsLibrary)
+include(mitkMacroGetPMDPlatformString)
 include(mitkMacroInstall)
 include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
-include(mitkMacroGenerateToolsLibrary)
-include(mitkMacroCreateCTKPlugin)
-include(mitkMacroGetPMDPlatformString)
-include(mitkMacroFindDependency)
+include(mitkMacroMultiplexPicType)
 
 #-----------------------------------------------------------------------------
 # MITK flags and directories
@@ -241,17 +227,6 @@ mitkMacroFindDependency(CppMicroServices)
 set(MITK_USE_BLUEBERRY @MITK_USE_BLUEBERRY@)
 if(MITK_USE_BLUEBERRY)
 
-  set(BlueBerry_DIR "@MITK_BINARY_DIR@/BlueBerry")
-
-  # Don't include the BlueBerry exports file, since the targets are
-  # also exported in the MITK exports file
-  set(BB_PLUGIN_EXPORTS_FILE_INCLUDED 1)
-  find_package(BlueBerry)
-
-  if(NOT BlueBerry_FOUND)
-    message(SEND_ERROR "MITK does not seem to be configured with BlueBerry support. Set MITK_USE_BLUEBERRY to ON in your MITK build configuration.")
-  endif()
-
   set(MITK_PLUGIN_USE_FILE "@MITK_PLUGIN_USE_FILE@")
   if(MITK_PLUGIN_USE_FILE)
     if(EXISTS "${MITK_PLUGIN_USE_FILE}")
@@ -265,6 +240,20 @@ if(MITK_USE_BLUEBERRY)
       "${MITK_PLUGIN_PROVISIONING_FILE}")
 
 endif()
+
+set(BLUEBERRY_USE_QT_HELP @BLUEBERRY_USE_QT_HELP@)
+if(BLUEBERRY_USE_QT_HELP AND DOXYGEN_VERSION VERSION_LESS "1.8.7")
+  message("Setting BLUEBERRY_USE_QT_HELP to OFF because Doxygen version 1.8.7 or newer not found.")
+  set(BLUEBERRY_USE_QT_HELP OFF)
+endif()
+
+set(BLUEBERRY_QTPLUGIN_PATH "@BLUEBERRY_QTPLUGIN_PATH@")
+
+set(QT_HELPGENERATOR_EXECUTABLE "@QT_HELPGENERATOR_EXECUTABLE@")
+set(QT_COLLECTIONGENERATOR_EXECUTABLE "@QT_COLLECTIONGENERATOR_EXECUTABLE@")
+set(QT_ASSISTANT_EXECUTABLE "@QT_ASSISTANT_EXECUTABLE@")
+set(QT_XMLPATTERNS_EXECUTABLE "@QT_XMLPATTERNS_EXECUTABLE@")
+
 
 #-----------------------------------------------------------------------------
 # MITK sub-project variables

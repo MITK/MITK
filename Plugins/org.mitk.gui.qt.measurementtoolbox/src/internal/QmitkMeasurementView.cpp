@@ -103,7 +103,7 @@ struct QmitkMeasurementViewData
   unsigned int m_SubdivisionPolygonCounter;
   QList<mitk::DataNode::Pointer> m_CurrentSelection;
   std::map<mitk::DataNode*, QmitkPlanarFigureData> m_DataNodeToPlanarFigureData;
-  mitk::WeakPointer<mitk::DataNode> m_SelectedImageNode;
+  mitk::DataNode::Pointer m_SelectedImageNode;
   bool m_UnintializedPlanarFigure;
 
   // WIDGETS

@@ -38,7 +38,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigidRegistrationTransformsGUIBase : p
 
 public:
 
-  QmitkRigidRegistrationTransformsGUIBase(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkRigidRegistrationTransformsGUIBase(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkRigidRegistrationTransformsGUIBase();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() = 0;

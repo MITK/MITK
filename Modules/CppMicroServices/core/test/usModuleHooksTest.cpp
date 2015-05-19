@@ -56,7 +56,7 @@ class TestModuleFindHook : public ModuleFindHook
 {
 public:
 
-  void Find(const ModuleContext* /*context*/, ShrinkableVector<Module*>& modules)
+  void Find(const ModuleContext* /*context*/, ShrinkableVector<Module*>& modules) override
   {
     for (ShrinkableVector<Module*>::iterator i = modules.begin();
          i != modules.end();)
@@ -77,7 +77,7 @@ class TestModuleEventHook : public ModuleEventHook
 {
 public:
 
-  void Event(const ModuleEvent& event, ShrinkableVector<ModuleContext*>& contexts)
+  void Event(const ModuleEvent& event, ShrinkableVector<ModuleContext*>& contexts) override
   {
     if (event.GetType() == ModuleEvent::LOADING || event.GetType() == ModuleEvent::UNLOADING)
     {

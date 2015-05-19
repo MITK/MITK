@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace berry;
 
 QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage()
-: m_MainControl(0)
+: m_MainControl(nullptr)
 {
 
 }
@@ -62,9 +62,9 @@ void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 
   m_MainControl = new QWidget(parent);
 
-  QGridLayout* layout = new QGridLayout;
+  auto   layout = new QGridLayout;
   int i = 0;
-  for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
+  for (auto it = m_HotkeyEditors.begin()
     ; it != m_HotkeyEditors.end(); ++it)
   {
     layout->addWidget(new QLabel(it->first), i,0);
@@ -91,7 +91,7 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
     bool duplicate = false;
     QString keyString;
     QString errString;
-    for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
+    for (auto it = m_HotkeyEditors.begin()
       ; it != m_HotkeyEditors.end(); ++it)
     {
       keyString = it->second->GetKeySequenceAsString();
@@ -123,7 +123,7 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
     }
 
   //# no errors -> save all values and flush to file
-    for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
+    for (auto it = m_HotkeyEditors.begin()
       ; it != m_HotkeyEditors.end(); ++it)
       _DataManagerHotkeysPreferencesNode->Put(it->first
         , it->second->GetKeySequenceAsString());
@@ -145,7 +145,7 @@ void QmitkDataManagerHotkeysPrefPage::Update()
   IPreferences::Pointer _DataManagerHotkeysPreferencesNode = m_DataManagerHotkeysPreferencesNode.Lock();
   if(_DataManagerHotkeysPreferencesNode.IsNotNull())
   {
-    for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
+    for (auto it = m_HotkeyEditors.begin()
       ; it != m_HotkeyEditors.end(); ++it)
     {
       it->second->setText(_DataManagerHotkeysPreferencesNode->Get(it->first, it->second->text()));

@@ -22,12 +22,12 @@ class US_ABI_LOCAL mitkIpPicSupportIOActivator : public us::ModuleActivator
 {
 public:
 
-  void Load(us::ModuleContext*)
+  void Load(us::ModuleContext*) override
   {
     m_Reader = new mitk::PicFileReader();
   }
 
-  void Unload(us::ModuleContext* )
+  void Unload(us::ModuleContext* ) override
   {
     delete m_Reader;
   }

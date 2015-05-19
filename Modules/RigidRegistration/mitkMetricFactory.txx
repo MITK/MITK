@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   template < class TPixelType, unsigned int VImageDimension >
-  MetricFactory<TPixelType, VImageDimension>::MetricFactory() : m_MetricParameters(NULL)
+  MetricFactory<TPixelType, VImageDimension>::MetricFactory() : m_MetricParameters(nullptr)
   {
   }
 

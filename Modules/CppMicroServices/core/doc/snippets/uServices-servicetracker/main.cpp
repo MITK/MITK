@@ -31,16 +31,16 @@ struct MyTrackedClassTraits : public TrackedTypeTraitsBase<MyTrackedClass, MyTra
 //! [customizer]
 struct MyTrackingCustomizer : public ServiceTrackerCustomizer<IFooService, MyTrackedClass>
 {
-  virtual MyTrackedClass AddingService(const ServiceReferenceType&)
+  virtual MyTrackedClass AddingService(const ServiceReferenceType&) override
   {
     return MyTrackedClass();
   }
 
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass)
+  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass) override
   {
   }
 
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass)
+  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass) override
   {
   }
 };
@@ -48,16 +48,16 @@ struct MyTrackingCustomizer : public ServiceTrackerCustomizer<IFooService, MyTra
 
 struct MyTrackingPointerCustomizer : public ServiceTrackerCustomizer<IFooService, MyTrackedClass*>
 {
-  virtual MyTrackedClass* AddingService(const ServiceReferenceType&)
+  virtual MyTrackedClass* AddingService(const ServiceReferenceType&) override
   {
     return new MyTrackedClass();
   }
 
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass*)
+  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass*) override
   {
   }
 
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass*)
+  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass*) override
   {
   }
 };
@@ -65,16 +65,16 @@ struct MyTrackingPointerCustomizer : public ServiceTrackerCustomizer<IFooService
 // For compilation test purposes only
 struct MyTrackingCustomizerVoid : public ServiceTrackerCustomizer<void, MyTrackedClass>
 {
-  virtual MyTrackedClass AddingService(const ServiceReferenceType&)
+  virtual MyTrackedClass AddingService(const ServiceReferenceType&) override
   {
     return MyTrackedClass();
   }
 
-  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass)
+  virtual void ModifiedService(const ServiceReferenceType&, MyTrackedClass) override
   {
   }
 
-  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass)
+  virtual void RemovedService(const ServiceReferenceType&, MyTrackedClass) override
   {
   }
 };

@@ -37,7 +37,7 @@ class PropertyListDeserializerV1 : public PropertyListDeserializer
       \brief Reads a propertylist from file. Get result via GetOutput()
       \return success of deserialization
       */
-    virtual bool Deserialize();
+    virtual bool Deserialize() override;
 
   protected:
 

@@ -89,7 +89,7 @@ class MITKMAPPEREXT_EXPORT vtkMitkVolumeTextureMapper3D : public vtkVolumeMapper
 {
 public:
   vtkTypeMacro(vtkMitkVolumeTextureMapper3D,vtkVolumeMapper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
 //  static vtkMitkVolumeTextureMapper3D *New(); //VTK6_TODO
 
@@ -132,7 +132,7 @@ public:
   // WARNING: INTERNAL METHOD - NOT INTENDED FOR GENERAL USE
   // DO NOT USE THIS METHOD OUTSIDE OF THE RENDERING PROCESS
   // Render the volume
-  virtual void Render(vtkRenderer *, vtkVolume *) {};
+  virtual void Render(vtkRenderer *, vtkVolume *) override {};
 
 
   // Description:

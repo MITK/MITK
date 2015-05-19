@@ -45,7 +45,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
     m_SurfacePath = GetTestDataFilePath("binary.stl");

@@ -72,7 +72,7 @@ public:
    * @param image the image which is used for initializing the mitk::LabelSetImage
    */
   using mitk::Image::Initialize;
-  virtual void Initialize(const mitk::Image* image);
+  virtual void Initialize(const mitk::Image* image) override;
 
   /**
     * \brief  */
@@ -233,7 +233,7 @@ public:
    * @param layer a mitk::LabelSet which will be set as new layer.
    * @return the layer ID of the new layer
    */
-  unsigned int AddLayer(mitk::LabelSet::Pointer layer =0);
+  unsigned int AddLayer(mitk::LabelSet::Pointer layer =nullptr);
 
   /**
    * @brief Removes the active layer and the respective mitk::LabelSet and image information.

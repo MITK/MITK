@@ -92,7 +92,7 @@ mitk::GPGPU::Texture::Texture(mitk::GPGPU::TextureFormat format,int width,int he
 
   if(glTarget==GL_TEXTURE_2D)
   {
-    glTexImage2D(GL_TEXTURE_2D,0,convertTextureFormatToInternalFormatGL(myFormat),width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,0);
+    glTexImage2D(GL_TEXTURE_2D,0,convertTextureFormatToInternalFormatGL(myFormat),width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);
 //    glGenerateMipmap(GL_TEXTURE_2D);
 
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
@@ -105,7 +105,7 @@ mitk::GPGPU::Texture::Texture(mitk::GPGPU::TextureFormat format,int width,int he
   }
   else
   {
-    glTexImage3D(GL_TEXTURE_3D,0,convertTextureFormatToInternalFormatGL(myFormat),width,height,depth,0,GL_RGBA,GL_UNSIGNED_BYTE,0);
+    glTexImage3D(GL_TEXTURE_3D,0,convertTextureFormatToInternalFormatGL(myFormat),width,height,depth,0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);
 //  glGenerateMipmap(GL_TEXTURE_3D);
 
   glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_R,GL_CLAMP_TO_EDGE);
@@ -242,14 +242,14 @@ mitk::GPGPU::Shader::Shader(char *source)
   GLchar *src[2];
 
   src[0] = stubVertexShader;
-  src[1] = 0;
+  src[1] = nullptr;
 
-  glShaderSource(glHandleVertex,1,(const GLchar **)src,0);
+  glShaderSource(glHandleVertex,1,(const GLchar **)src,nullptr);
 
   src[0] = source;
-  src[1] = 0;
+  src[1] = nullptr;
 
-  glShaderSource(glHandleFragment,1,(const GLchar **)src,0);
+  glShaderSource(glHandleFragment,1,(const GLchar **)src,nullptr);
 
   bool failed=false;
 
@@ -507,7 +507,7 @@ mitk::GPGPU::GPGPU()
 
 #else
 
-  X_display = XOpenDisplay(NULL);
+  X_display = XOpenDisplay(nullptr);
 
   GPGPU_ERROR( !X_display ) << "cant open X display";
 
@@ -528,7 +528,7 @@ mitk::GPGPU::GPGPU()
 
   GPGPU_ERROR(!visinfo) << "Unable to choose specified visual!";
 
-  openGLContext = glXCreateContext(X_display, visinfo, 0, true);
+  openGLContext = glXCreateContext(X_display, visinfo, nullptr, true);
 
   if(visinfo)
      XFree(visinfo);

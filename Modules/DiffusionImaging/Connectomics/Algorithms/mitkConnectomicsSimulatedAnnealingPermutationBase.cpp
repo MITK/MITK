@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsSimulatedAnnealingPermutationBase.h"
 
 mitk::ConnectomicsSimulatedAnnealingPermutationBase::ConnectomicsSimulatedAnnealingPermutationBase()
-: m_CostFunction( 0 )
+: m_CostFunction( nullptr )
 {
 }
 

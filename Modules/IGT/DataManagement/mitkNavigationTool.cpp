@@ -122,7 +122,7 @@ std::string mitk::NavigationTool::GetToolName()
 
 mitk::Surface::Pointer mitk::NavigationTool::GetToolSurface()
   {
-  if (this->m_DataNode.IsNull()) {return NULL;}
-  else if (this->m_DataNode->GetData() == NULL) {return NULL;}
+  if (this->m_DataNode.IsNull()) {return nullptr;}
+  else if (this->m_DataNode->GetData() == nullptr) {return nullptr;}
   else {return dynamic_cast<mitk::Surface*>(m_DataNode->GetData());}
   }

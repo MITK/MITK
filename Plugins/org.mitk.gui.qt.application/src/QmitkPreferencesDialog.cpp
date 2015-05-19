@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPreferencesDialog.h"
 
 #include "berryPlatform.h"
+#include "berryPlatformUI.h"
+#include "berryIWorkbench.h"
 #include "berryIConfigurationElement.h"
 #include "berryIExtensionRegistry.h"
 #include "berryIExtension.h"
@@ -49,7 +51,7 @@ public:
     PrefPage(QString _id, QString _name, QString _category
       , QString _className, QString _keywords, berry::IConfigurationElement::Pointer _confElem)
       : id(_id), name(_name), category(_category), className(_className), keywords(_keywords),
-        prefPage(0), confElem(_confElem), treeWidgetItem(0)
+        prefPage(nullptr), confElem(_confElem), treeWidgetItem(nullptr)
     {}
 
     bool operator==(const PrefPage& other)
@@ -80,8 +82,6 @@ public:
 
     QList<berry::IConfigurationElement::Pointer>::iterator keywordRefsIt;
 
-    QString keywordLabels;
-
     for (prefPagesIt = prefPages.begin(); prefPagesIt != prefPages.end(); ++prefPagesIt)
     {
       QString id = (*prefPagesIt)->GetAttribute("id");
@@ -89,6 +89,8 @@ public:
       QString className = (*prefPagesIt)->GetAttribute("class");
       if(!id.isEmpty() && !name.isEmpty() && !className.isEmpty())
       {
+        QString keywordLabels;
+
         QString category = (*prefPagesIt)->GetAttribute("category");
         //# collect keywords
         QList<berry::IConfigurationElement::Pointer> keywordRefs = (*prefPagesIt)->GetChildren("keywordreference"); // get all keyword references
@@ -179,7 +181,7 @@ void QmitkPreferencesDialog::OnImportButtonClicked()
   {
     berry::IBerryPreferencesService* berryPrefService =
         dynamic_cast<berry::IBerryPreferencesService*>(berry::Platform::GetPreferencesService());
-    if(berryPrefService != 0)
+    if(berryPrefService != nullptr)
     {
       static QString importDir = "";
       QString fileName = QFileDialog::getOpenFileName(this, tr("Choose file to import preferences"),
@@ -215,7 +217,7 @@ void QmitkPreferencesDialog::OnExportButtonClicked()
   {
     berry::IBerryPreferencesService* berryPrefService =
         dynamic_cast<berry::IBerryPreferencesService*>(berry::Platform::GetPreferencesService());
-    if(berryPrefService != 0)
+    if(berryPrefService != nullptr)
     {
       SavePreferences();
       static QString exportDir = "";
@@ -248,7 +250,7 @@ void QmitkPreferencesDialog::OnExportButtonClicked()
 
 void QmitkPreferencesDialog::SavePreferences()
 {
-  berry::IQtPreferencePage* prefPage = 0;
+  berry::IQtPreferencePage* prefPage = nullptr;
 
   for(QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it)
   {
@@ -309,7 +311,7 @@ void QmitkPreferencesDialog::OnKeywordEditingFinished()
 
 void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
 {
-  if(d->m_PreferencesTree == 0)
+  if(d->m_PreferencesTree == nullptr)
     return;
 
   // TODO: create page and show it
@@ -318,20 +320,17 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
   {
 
     d->m_CurrentPage = 0;
+    berry::IWorkbench* workbench = berry::PlatformUI::GetWorkbench();
     for(QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it, ++d->m_CurrentPage)
     {
       if(it->treeWidgetItem == selectedItems.at(0))
       {
         d->m_Headline->setText(it->name);
-        if(it->prefPage == 0)
+        if(it->prefPage == nullptr)
         {
           berry::IPreferencePage* page = it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class");
-          if (page == 0)
-          {
-            // support legacy BlueBerry extensions
-            page = it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class");
-          }
           it->prefPage = dynamic_cast<berry::IQtPreferencePage*>(page);
+          it->prefPage->Init(berry::IWorkbench::Pointer(workbench));
           it->prefPage->CreateQtControl(d->m_PreferencesPanel);
           d->m_PreferencesPanel->addWidget(it->prefPage->GetQtControl());
         }
@@ -345,7 +344,7 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
 
 void QmitkPreferencesDialog::UpdateTree()
 {
-  if(d->m_PreferencesTree == 0)
+  if(d->m_PreferencesTree == nullptr)
     return;
 
   //m_PreferencesTree->clear();
@@ -356,7 +355,7 @@ void QmitkPreferencesDialog::UpdateTree()
   for(QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin();
       it != d->m_PrefPages.end(); ++it)
   {
-    if(it->treeWidgetItem == 0)
+    if(it->treeWidgetItem == nullptr)
     {
 
       if(it->category.isEmpty())
@@ -380,7 +379,7 @@ void QmitkPreferencesDialog::UpdateTree()
       {
         //#make the whole branch visible
         QTreeWidgetItem* treeWidgetParent = it->treeWidgetItem->parent();
-        while(treeWidgetParent!=0)
+        while(treeWidgetParent!=nullptr)
         {
           treeWidgetParent->setHidden(false);
           treeWidgetParent->setExpanded(true);
@@ -404,7 +403,7 @@ void QmitkPreferencesDialog::UpdateTree()
 
   if(d->m_PrefPages.size()>0)
   {
-    if(d->m_PrefPages.front().treeWidgetItem != 0)
+    if(d->m_PrefPages.front().treeWidgetItem != nullptr)
       d->m_PrefPages.front().treeWidgetItem->setSelected(true);
   }
 

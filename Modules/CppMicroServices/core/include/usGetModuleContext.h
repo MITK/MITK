@@ -30,6 +30,7 @@
 #include <usGlobalConfig.h>
 #include <usModuleRegistry.h>
 #include <usModule.h>
+#include <usLog_p.h>
 #include <usModuleUtils_p.h>
 
 US_BEGIN_NAMESPACE
@@ -48,7 +49,15 @@ class ModuleContext;
  */
 static inline ModuleContext* GetModuleContext()
 {
-  return ModuleRegistry::GetModule(US_STR(US_MODULE_NAME))->GetModuleContext();
+  Module* module = ModuleRegistry::GetModule(US_STR(US_MODULE_NAME));
+  if (module)
+  {
+    return module->GetModuleContext();
+  }
+  US_WARN << "Module '" << US_STR(US_MODULE_NAME) << "' unknown. "
+             "The calling module probably misses a US_MODULE_NAME compile definition "
+             "and/or a call to US_INITIALIZE_MODULE in one of its source files.";
+  return nullptr;
 }
 
 US_END_NAMESPACE

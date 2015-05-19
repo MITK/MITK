@@ -33,7 +33,7 @@ namespace mitk
 
      /** \brief overloaded method for receiving log message from mbilog
       */
-      void ProcessMessage(const mbilog::LogMessage& );
+      void ProcessMessage(const mbilog::LogMessage& ) override;
 
      /** \brief registers MITK logging backend at mbilog
       */
@@ -93,7 +93,7 @@ namespace mitk
       */
       static void CatchLogFileCommandLineParameter(int &argc,char **argv);
 
-      virtual mbilog::OutputType GetOutputType() const;
+      virtual mbilog::OutputType GetOutputType() const override;
 
     protected:
       /** Checks if a file exists.

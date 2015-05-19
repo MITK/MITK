@@ -32,17 +32,17 @@ public:
   QmitkPointListModel( mitk::DataNode* = NULL, int t = 0, QObject* parent = 0 );
   ~QmitkPointListModel();
 
-  Qt::ItemFlags flags(const QModelIndex&) const;
+  Qt::ItemFlags flags(const QModelIndex&) const override;
 
   /// interface of QAbstractListModel
-  int rowCount( const QModelIndex& parent = QModelIndex() ) const;
+  int rowCount( const QModelIndex& parent = QModelIndex() ) const override;
 
   /// interface of QAbstractListModel
-  QVariant data(const QModelIndex& index, int role) const;
+  QVariant data(const QModelIndex& index, int role) const override;
 
   /// interface of QAbstractListModel
   QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const;
+                      int role = Qt::DisplayRole) const override;
 
   /// which point set to work on
   void SetPointSetNode( mitk::DataNode* pointSetNode );

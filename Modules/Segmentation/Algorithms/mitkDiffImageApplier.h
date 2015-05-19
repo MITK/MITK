@@ -40,11 +40,11 @@ class MITKSEGMENTATION_EXPORT DiffImageApplier : public itk::Object, public Oper
 {
   public:
 
-    mitkClassMacro(DiffImageApplier, Object);
+    mitkClassMacroItkParent(DiffImageApplier, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void ExecuteOperation( Operation* operation );
+    virtual void ExecuteOperation( Operation* operation ) override;
 
     static DiffImageApplier* GetInstanceForUndo();
 

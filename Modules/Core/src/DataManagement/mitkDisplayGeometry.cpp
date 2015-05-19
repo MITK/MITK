@@ -407,7 +407,7 @@ void mitk::DisplayGeometry::Map(const Point2D & atPt2d_mm, const Vector2D &vec2d
 mitk::DisplayGeometry::DisplayGeometry()
   : PlaneGeometry()
   ,m_ScaleFactorMMPerDisplayUnit(1.0)
-  ,m_WorldGeometry(NULL)
+  ,m_WorldGeometry(nullptr)
   ,m_ConstrainZoomingAndPanning(true)
   ,m_MaxWorldViewPercentage(1.0)
   ,m_MinWorldViewPercentage(0.1)

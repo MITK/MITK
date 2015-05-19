@@ -45,7 +45,7 @@ namespace mitk {
 
     typedef mitk::ContourModel InputType;
 
-    void GenerateOutputInformation();
+    void GenerateOutputInformation() override;
 
     /** Set/Get the image input of this process object.  */
     using Superclass::SetInput;
@@ -58,7 +58,7 @@ namespace mitk {
     ContourModelToSurfaceFilter();
     ~ContourModelToSurfaceFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
   };
 }

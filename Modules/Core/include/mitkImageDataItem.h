@@ -70,10 +70,10 @@ namespace mitk {
   typedef itk::SmartPointer<mitk::Image> ImagePointer;
   typedef itk::SmartPointer<const mitk::Image> ImageConstPointer;
 
-    mitkClassMacro(ImageDataItem, itk::LightObject);
+    mitkClassMacroItkParent(ImageDataItem, itk::LightObject);
 
     ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc,
-                  int timestep, unsigned int dimension, void *data = NULL,
+                  int timestep, unsigned int dimension, void *data = nullptr,
                   bool manageMemory = false, size_t offset = 0);
 
     ~ImageDataItem();

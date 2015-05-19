@@ -24,7 +24,7 @@ namespace mitk
 
 LabelSetImageToSurfaceThreadedFilter::LabelSetImageToSurfaceThreadedFilter():
 m_RequestedLabel(1),
-m_Result(NULL)
+m_Result(nullptr)
 {
 }
 

@@ -61,14 +61,14 @@ class MITKDICOMREADER_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     mitkClassMacro( EquiDistantBlocksSorter, DICOMDatasetSorter )
     itkNewMacro( EquiDistantBlocksSorter )
 
-    virtual DICOMTagList GetTagsOfInterest();
+    virtual DICOMTagList GetTagsOfInterest() override;
 
     /**
       \brief Delegates work to AnalyzeFileForITKImageSeriesReaderSpacingAssumption().
       AnalyzeFileForITKImageSeriesReaderSpacingAssumption() is called until it does not
       create multiple blocks anymore.
     */
-    virtual void Sort();
+    virtual void Sort() override;
 
     /**
       \brief Whether or not to accept images from a tilted acquisition in a single output group.
@@ -94,9 +94,9 @@ class MITKDICOMREADER_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
     void SetAcceptTwoSlicesGroups(bool accept);
     bool GetAcceptTwoSlicesGroups() const;
 
-    virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const;
+    virtual void PrintConfiguration(std::ostream& os, const std::string& indent = "") const override;
 
-    virtual bool operator==(const DICOMDatasetSorter& other) const;
+    virtual bool operator==(const DICOMDatasetSorter& other) const override;
 
   protected:
 

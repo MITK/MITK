@@ -27,7 +27,7 @@ class QmitkTubeGraphLabelWidget : public QWidget
 
 public:
 
-  QmitkTubeGraphLabelWidget(QWidget* parent = 0);
+  QmitkTubeGraphLabelWidget(QWidget* parent = nullptr);
   //QmitkTubeGraphLabelWidget(QWidget* parent = 0, const char* name = 0, mitk::Color* color = 0 /*TODO*/);
   virtual ~QmitkTubeGraphLabelWidget();
 

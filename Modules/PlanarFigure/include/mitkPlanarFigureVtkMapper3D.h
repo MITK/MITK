@@ -46,10 +46,10 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    void ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor);
+    void ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor) override;
     void ApplyPlanarFigureProperties(BaseRenderer* renderer, vtkActor* actor);
-    vtkProp* GetVtkProp(BaseRenderer* renderer);
-    void UpdateVtkTransform(BaseRenderer*);
+    vtkProp* GetVtkProp(BaseRenderer* renderer) override;
+    void UpdateVtkTransform(BaseRenderer*) override;
 
   private:
     PlanarFigureVtkMapper3D();
@@ -58,7 +58,7 @@ namespace mitk
     PlanarFigureVtkMapper3D(const Self&);
     Self& operator=(const Self&);
 
-    void GenerateDataForRenderer(BaseRenderer* renderer);
+    void GenerateDataForRenderer(BaseRenderer* renderer) override;
 
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
   };

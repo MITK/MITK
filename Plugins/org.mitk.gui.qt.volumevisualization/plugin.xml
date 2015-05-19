@@ -23,4 +23,18 @@
     <keyword id="org.mitk.views.volumevisualization.ViewKeyword"  label="Look-up-table" />
     <keyword id="org.mitk.views.volumevisualization.ViewKeyword"  label="Color Colour" />
   </extension>
+
+  <!--This extension points adds the volume visualization view to the
+  "Window->Show Views" menu if the visualization perspective is opened-->
+  <extension point="org.blueberry.ui.perspectiveExtensions">
+            <perspectiveExtension
+                 targetID="org.mitk.mitkworkbench.perspectives.visualization">
+                 <viewShortcut id="org.mitk.views.volumevisualization"/>
+                 <view id="org.mitk.views.volumevisualization"
+                             relative="org.mitk.views.datamanager"
+                             relationship="bottom"
+                             ratio="0.80"
+                             visible="false"/>
+            </perspectiveExtension>
+  </extension>
 </plugin>

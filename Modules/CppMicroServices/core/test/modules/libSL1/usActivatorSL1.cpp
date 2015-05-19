@@ -48,7 +48,7 @@ public:
     delete tracker;
   }
 
-  void Load(ModuleContext* context)
+  void Load(ModuleContext* context) override
   {
     this->context = context;
 
@@ -61,17 +61,17 @@ public:
     tracker->Open();
   }
 
-  void Unload(ModuleContext* /*context*/)
+  void Unload(ModuleContext* /*context*/) override
   {
     tracker->Close();
   }
 
-  const Properties& GetProperties() const
+  const Properties& GetProperties() const override
   {
     return props;
   }
 
-  FooService* AddingService(const ServiceReferenceType& reference)
+  FooService* AddingService(const ServiceReferenceType& reference) override
   {
     props["serviceAdded"] = true;
 
@@ -80,10 +80,10 @@ public:
     return fooService;
   }
 
-  void ModifiedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/)
+  void ModifiedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/) override
   {}
 
-  void RemovedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/)
+  void RemovedService(const ServiceReferenceType& /*reference*/, FooService* /*service*/) override
   {
     props["serviceRemoved"] = true;
   }

@@ -19,11 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "ui_QmitkDeformableClippingPlaneViewControls.h"
-
-#include <QmitkFunctionality.h>
-
-
 #include "mitkImage.h"
+#include <QmitkFunctionality.h>
 
 typedef itk::RGBPixel< float > Color;
 
@@ -49,19 +46,19 @@ public:
   QmitkDeformableClippingPlaneView();
   virtual ~QmitkDeformableClippingPlaneView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
   /// \brief Called when the functionality is activated
-  virtual void Activated();
+  virtual void Activated() override;
 
   /// \brief Called when the functionality is deactivated
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
 protected slots:
 
@@ -80,9 +77,9 @@ protected:
   \brief Invoked when the DataManager selection changed
   */
   virtual void OnSelectionChanged(mitk::DataNode* node);
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
-  virtual void NodeRemoved(const mitk::DataNode* node);
-  virtual void NodeChanged(const mitk::DataNode* node);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  virtual void NodeChanged(const mitk::DataNode* node) override;
 
   void UpdateView();
 

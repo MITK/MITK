@@ -48,13 +48,13 @@ namespace mitk {
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void MitkRenderOverlay(BaseRenderer* renderer)
+    virtual void MitkRenderOverlay(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderOverlay(renderer);
       m_OdfMapper->MitkRenderOverlay(renderer);
     }
 
-    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer)
+    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderOpaqueGeometry(renderer);
       m_OdfMapper->MitkRenderOpaqueGeometry(renderer);
@@ -64,19 +64,19 @@ namespace mitk {
       }
     }
 
-    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer)
+    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderTranslucentGeometry(renderer);
       m_OdfMapper->MitkRenderTranslucentGeometry(renderer);
     }
 
-    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer)
+    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) override
     {
       m_ImgMapper->MitkRenderVolumetricGeometry(renderer);
       m_OdfMapper->MitkRenderVolumetricGeometry(renderer);
     }
 
-    void SetDataNode(DataNode* node)
+    void SetDataNode(DataNode* node) override
     {
       m_DataNode = node;
       m_ImgMapper->SetDataNode(node);
@@ -89,12 +89,12 @@ namespace mitk {
       return retval;
     }
 
-    bool HasVtkProp( const vtkProp* prop, BaseRenderer* renderer )
+    bool HasVtkProp( const vtkProp* prop, BaseRenderer* renderer ) override
     {
       return m_OdfMapper->HasVtkProp(prop, renderer);
     }
 
-    void ReleaseGraphicsResources(mitk::BaseRenderer* renderer)
+    void ReleaseGraphicsResources(mitk::BaseRenderer* renderer) override
     {
       m_ImgMapper->ReleaseGraphicsResources(renderer);
       m_OdfMapper->ReleaseGraphicsResources(renderer);
@@ -112,12 +112,12 @@ namespace mitk {
       node->AddProperty( "opaclevelwindow", prop );
     }
 
-    bool IsLODEnabled( BaseRenderer * renderer ) const
+    bool IsLODEnabled( BaseRenderer * renderer ) const override
     {
       return m_ImgMapper->IsLODEnabled(renderer) || m_OdfMapper->IsLODEnabled(renderer);
     }
 
-    vtkProp* GetVtkProp(mitk::BaseRenderer* renderer)
+    vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override
     {
       vtkPropAssembly* assembly = vtkPropAssembly::New();
       assembly->AddPart( m_OdfMapper->GetVtkProp(renderer));
@@ -127,13 +127,13 @@ namespace mitk {
 
   protected:
 
-    virtual void Update(mitk::BaseRenderer* renderer)
+    virtual void Update(mitk::BaseRenderer* renderer) override
     {
       m_OdfMapper->Update(renderer);
       GenerateDataForRenderer(renderer);
     }
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer)
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override
     {
       m_ImgMapper->GenerateDataForRenderer(renderer);
 //      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )

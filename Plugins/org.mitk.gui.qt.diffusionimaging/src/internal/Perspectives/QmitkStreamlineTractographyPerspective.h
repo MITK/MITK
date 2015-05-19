@@ -30,7 +30,7 @@ public:
   QmitkStreamlineTractographyPerspective() {}
   ~QmitkStreamlineTractographyPerspective() {}
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
 #endif /* QmitkStreamlineTractographyPerspective_H_ */

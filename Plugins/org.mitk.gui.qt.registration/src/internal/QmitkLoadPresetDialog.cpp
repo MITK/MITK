@@ -44,7 +44,7 @@ QmitkLoadPresetDialog::QmitkLoadPresetDialog(QWidget* parent, Qt::WindowFlags f,
     new QListWidgetItem(preset.c_str(), lstPresets);
   }
 
-  lstPresets->setCurrentItem(0); // select first Item by default (might turn out to be a stupid descision)
+  lstPresets->setCurrentItem(nullptr); // select first Item by default (might turn out to be a stupid descision)
 
   connect( lstPresets, SIGNAL(itemDoubleClicked (QListWidgetItem *)), this, SLOT(onPresetImmediatelySelected(QListWidgetItem *)) );
 
@@ -58,7 +58,7 @@ QmitkLoadPresetDialog::QmitkLoadPresetDialog(QWidget* parent, Qt::WindowFlags f,
   btnCancel->setObjectName("btnCancel" );
   connect( btnCancel, SIGNAL(clicked()), this, SLOT(reject()) );
 
-  QWidget* buttonWidget = new QWidget(this);
+  auto   buttonWidget = new QWidget(this);
   QBoxLayout * horizontalLayout = new QHBoxLayout( buttonWidget );
   horizontalLayout->setSpacing(5);
   horizontalLayout->addStretch();

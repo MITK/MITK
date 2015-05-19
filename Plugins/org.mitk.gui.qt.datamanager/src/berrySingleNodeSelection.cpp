@@ -33,7 +33,7 @@ namespace berry
 
   bool SingleNodeSelection::IsEmpty() const
   {
-    return ( m_Node == 0 );
+    return ( m_Node == nullptr );
   }
 
 }

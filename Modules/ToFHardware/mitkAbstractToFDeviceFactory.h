@@ -57,7 +57,7 @@ struct MITKTOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFactor
     */
   size_t GetNumberOfDevices();
 
-  std::string GetCurrentDeviceName()
+  std::string GetCurrentDeviceName() override
   {
     std::stringstream name;
     if(this->GetNumberOfDevices()>1)

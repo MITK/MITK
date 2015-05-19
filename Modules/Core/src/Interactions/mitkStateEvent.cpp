@@ -24,7 +24,7 @@ mitk::StateEvent::StateEvent(int id, Event const* event)
 }
 
 mitk::StateEvent::StateEvent()
-:m_Id(0), m_Event(0)
+:m_Id(0), m_Event(nullptr)
 {
 }
 

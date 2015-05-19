@@ -92,7 +92,7 @@ namespace mitk {
     * \warning Will raise a std::out_of_range exception, if tools were added to
     * the OpenIGTLink device after it was set as input for this filter
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /**
     * \brief Create the necessary outputs for the m_IGTLDevice
@@ -106,13 +106,13 @@ namespace mitk {
     * \brief This method is called when the IGTL device hold by this class
     * receives a new message
     **/
-    virtual void OnIncomingMessage();
+    virtual void OnIncomingMessage() override;
 
     /**
     * \brief This method is called when the IGTL device hold by this class
     * receives a new command
     **/
-    virtual void OnIncomingCommand();
+    virtual void OnIncomingCommand() override;
 
     /**
     *\brief Connects the input of this filter to the outputs of the given

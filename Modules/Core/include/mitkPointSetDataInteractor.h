@@ -91,14 +91,14 @@ namespace mitk
      * Here actions strings from the loaded state machine pattern are mapped to functions of
      * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
      */
-    virtual void ConnectActionsAndFunctions();
+    virtual void ConnectActionsAndFunctions() override;
 
     /**
      * This function is called when a DataNode has been set/changed.
      * It is used to initialize the DataNode, e.g. if no PointSet exists yet it is created
      * and added to the DataNode.
      */
-    virtual void DataNodeChanged();
+    virtual void DataNodeChanged() override;
 
     /**
      * \brief Return index in PointSet of the point that is within given accuracy to the provided position.
@@ -107,7 +107,7 @@ namespace mitk
      * in the DataNode to check if it contains a point near the pointer position.
      * If a point is found its index-position is returned, else -1 is returned.
      */
-    virtual int GetPointIndexByPosition(Point3D position, int time = 0, float accuracy = -1);
+    virtual int GetPointIndexByPosition(Point3D position, unsigned int time = 0, float accuracy = -1);
 
 
 

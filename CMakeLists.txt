@@ -1,8 +1,8 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.1)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
+# See http://www.cmake.org/cmake/help/v3.2/manual/cmake-policies.7.html for details
 #-----------------------------------------------------------------------------
 
 set(project_policies )
@@ -91,14 +91,22 @@ endif()
 #-----------------------------------------------------------------------------
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  # require at least gcc 4.6 as provided by Ubuntu 12.04
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.6)
-    message(FATAL_ERROR "GCC version must be at least 4.6")
+  # require at least gcc 4.7.3 as provided by ppa:ubuntu-toolchain-r/test for Ubuntu 12.04
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7.3)
+    message(FATAL_ERROR "GCC version must be at least 4.7.3
+If you are using Ubuntu 12.04, you can easily install gcc and g++ 4.7.3 (or any later version available) in addition to your version ${CMAKE_CXX_COMPILER_VERSION}:
+  sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  sudo apt-get update
+  sudo apt-get install gcc-4.7 g++-4.7
+Make sure to explicitly specify these compilers when configuring MITK:
+  CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc-4.7
+  CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-4.7
+For more information on the proposed PPA see the Toolchain Updates section of https://wiki.ubuntu.com/ToolChain.")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # require at least clang 3.2 for correct RTTI handling and C++11 support
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.2)
-    message(FATAL_ERROR "Clang version must be at least 3.2")
+  # require at least clang 3.4 as provided by Ubuntu 12.04
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
+    message(FATAL_ERROR "Clang version must be at least 3.4")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
   # require at least clang 5.0
@@ -106,9 +114,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     message(FATAL_ERROR "Apple Clang version must be at least 5.0")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # require at least Visual Studio 2010 (msvc ...)
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16)
-    message(FATAL_ERROR "Micorsoft Visual Studio 2010 or newer required (MSVC 16.0)")
+  # require at least Visual Studio 2012
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0.61030.0)
+    message(FATAL_ERROR "Microsoft Visual Studio 2012 Update 4 or newer required (MSVC 17.0.61030.0)")
   endif()
 else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
@@ -122,16 +130,9 @@ endif()
 
 set(MITK_CXX_STANDARD 11)
 
-# help keeping cross-platform compatibility
-# CMake 3.1 does not yet know how to handle AppleClang...
-# See http://public.kitware.com/Bug/view.php?id=15355
-if(NOT MSVC AND
-   NOT CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
-   GCC_VERSION VERSION_GREATER 4.6)
-  set(CMAKE_CXX_EXTENSIONS 0)
-  set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
-  set(CMAKE_CXX_STANDARD_REQUIRED 1)
-endif()
+set(CMAKE_CXX_EXTENSIONS 0)
+set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
 # This is necessary to avoid problems with compile feature checks.
 # CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
@@ -221,8 +222,15 @@ if(MITK_USE_QT)
     set(MITK_USE_Qt4 FALSE)
     set(MITK_USE_Qt5 TRUE)
     set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
-    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools)
+    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools Help)
     find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
+    if(Qt5_DIR)
+      get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
+      list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
+      if(_result LESS 0)
+        set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
+      endif()
+    endif()
   endif()
 else()
   set(MITK_USE_Qt4 FALSE)
@@ -327,17 +335,6 @@ if(MITK_USE_Boost)
 endif()
 
 if(MITK_USE_SOFA)
-  # SOFA requires at least CMake 2.8.8
-  set(SOFA_CMAKE_VERSION 2.8.8)
-  if(${CMAKE_VERSION} VERSION_LESS ${SOFA_CMAKE_VERSION})
-    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
-    message(WARNING "Switched off MITK_USE_SOFA\n  Minimum required CMake version: ${SOFA_CMAKE_VERSION}\n  Installed CMake version: ${CMAKE_VERSION}")
-  endif()
-  # SOFA/ITK combination requires at least MSVC 2010
-  if(MSVC_VERSION AND MSVC_VERSION LESS 1600)
-    set(MITK_USE_SOFA OFF CACHE BOOL "" FORCE)
-    message(WARNING "Switched off MITK_USE_SOFA\n  MSVC versions less than 2010 are not supported.")
-  endif()
   # SOFA requires boost library
   if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
     message("> Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
@@ -367,7 +364,7 @@ if(MITK_USE_SOFA)
   set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
 endif()
 
-if(MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON)
+if(MITK_USE_Python)
   set(MITK_USE_ZLIB ON)
   if(NOT MITK_USE_Numpy)
     message("> Forcing MITK_USE_Numpy to ON because of MITK_USE_Python")
@@ -375,33 +372,20 @@ if(MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON)
   endif()
   if(NOT MITK_USE_SimpleITK)
     message("> Forcing MITK_USE_SimpleITK to ON because of MITK_USE_Python")
-    set(MITK_USE_Numpy ON CACHE BOOL "Use Numpy" FORCE)
+    set(MITK_USE_SimpleITK ON CACHE BOOL "Use Numpy" FORCE)
   endif()
 
-  if(APPLE)
-    message(WARNING "Python wrapping is unsuported on mac OSX!")
-    set(MITK_USE_Python OFF CACHE BOOL "Use Python wrapping in MITK" FORCE)
-  else()
-    option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
-    if(MITK_USE_SYSTEM_PYTHON)
-      find_package(PythonLibs REQUIRED)
-      find_package(PythonInterp REQUIRED)
+  option(MITK_USE_SYSTEM_PYTHON "Use the system python runtime" OFF)
+  if(MITK_USE_SYSTEM_PYTHON)
+    find_package(PythonLibs REQUIRED)
+    find_package(PythonInterp REQUIRED)
     endif()
-  endif()
 endif()
 
 if(BUILD_TESTING AND NOT MITK_USE_CppUnit)
   message("> Forcing MITK_USE_CppUnit to ON because BUILD_TESTING=ON")
   set(MITK_USE_CppUnit ON CACHE BOOL "Use CppUnit for unit tests" FORCE)
 endif()
-
-# -----------------------------------------
-# Other MITK_USE_* options not related to
-# external projects build via the
-# MITK superbuild
-
-env_option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-env_option(MITK_USE_OpenCL "Use OpenCL GPU-Computing library" OFF)
 
 if(MITK_USE_BLUEBERRY)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
@@ -487,9 +471,6 @@ endif()
 
 # A list of topologically ordered targets
 set(CTEST_PROJECT_SUBPROJECTS)
-if(MITK_USE_BLUEBERRY)
-  list(APPEND CTEST_PROJECT_SUBPROJECTS BlueBerry)
-endif()
 
 list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-Core
@@ -545,28 +526,39 @@ endif()
 include(WriteBasicConfigVersionFile)
 include(CheckCXXSourceCompiles)
 include(GenerateExportHeader)
-include(mitkFunctionOrganizeSources)
+
+include(mitkFunctionAddCustomModuleTest)
+include(mitkFunctionCheckModuleDependencies)
+include(mitkFunctionCompileSnippets)
+include(mitkFunctionConvertXPSchema)
+include(mitkFunctionCreateBlueBerryApplication)
+include(mitkFunctionCreateModule)
+include(mitkFunctionCreatePlugin)
+include(mitkFunctionCreateProvisioningFile)
+include(mitkFunctionCreateWindowsBatchScript)
+include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
-include(mitkFunctionCreateWindowsBatchScript)
-include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallAutoLoadModules)
-include(mitkFunctionGetLibrarySearchPaths)
-include(mitkFunctionCompileSnippets)
+include(mitkFunctionInstallCTKPlugin)
+include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionInstallThirdPartyCTKPlugins)
+include(mitkFunctionOrganizeSources)
+include(mitkFunctionTestPlugin)
 include(mitkFunctionUseModules)
-include(mitkFunctionCheckModuleDependencies)
-include(mitkFunctionCreateModule)
+include(mitkMacroConfigureItkPixelTypes)
 include(mitkMacroCreateExecutable)
 include(mitkMacroCreateModuleTests)
-include(mitkFunctionAddCustomModuleTest)
-include(mitkMacroMultiplexPicType)
-include(mitkMacroInstall)
-include(mitkMacroInstallHelperApp)
-include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
-include(mitkMacroConfigureItkPixelTypes)
+include(mitkMacroInstall)
+include(mitkMacroInstallHelperApp)
+include(mitkMacroInstallTargets)
+include(mitkMacroMultiplexPicType)
+
+# Deprecated
+include(mitkMacroCreateCTKPlugin)
 
 #-----------------------------------------------------------------------------
 # Global CMake variables
@@ -574,7 +566,27 @@ include(mitkMacroConfigureItkPixelTypes)
 
 # Required and enabled C++11 features for all MITK code.
 # These are added as PUBLIC compile features to all MITK modules.
-set(MITK_CXX_FEATURES cxx_auto_type cxx_nullptr cxx_override)
+set(MITK_CXX_FEATURES
+  cxx_auto_type
+  cxx_decltype
+  cxx_enum_forward_declarations
+  cxx_extended_friend_declarations
+  cxx_extern_templates
+  cxx_final
+  cxx_lambdas
+  cxx_local_type_template_args
+  cxx_long_long_type
+  cxx_nullptr
+  cxx_override
+  cxx_range_for
+  cxx_right_angle_brackets
+  cxx_rvalue_references
+  cxx_static_assert
+  cxx_strong_enums
+  cxx_template_template_parameters
+  cxx_trailing_return_types
+  cxx_variadic_macros
+)
 
 if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
   # We can't do this yet because the CTK Plugin Framework
@@ -613,6 +625,12 @@ endforeach()
 # Set MITK specific options and variables (NOT available during superbuild)
 #-----------------------------------------------------------------------------
 
+# Look for optional Doxygen package
+find_package(Doxygen)
+
+option(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
+mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
+
 # ASK THE USER TO SHOW THE CONSOLE WINDOW FOR CoreApp and mitkWorkbench
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
@@ -633,10 +651,6 @@ set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERS
 if(MITK_VERSION_PATCH STREQUAL "99")
   set(MITK_VERSION_STRING "${MITK_VERSION_STRING}-${MITK_REVISION_SHORTID}")
 endif()
-
-# Needed early on for redirecting the BlueBerry documentation output dir
-set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH
-    "Output directory for doxygen generated documentation." )
 
 if(NOT UNIX AND NOT MINGW)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
@@ -756,12 +770,8 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
-  # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
-  # Doing so should allow to build package made for distribution using older linux distro.
-  if(${GCC_VERSION} VERSION_GREATER "4.4.0" OR (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ${GCC_VERSION} VERSION_LESS "4.4.0"))
-    mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
-  endif()
+  mitkFunctionCheckCAndCXXCompilerFlags("-fstack-protector-all" MITK_C_FLAGS MITK_CXX_FLAGS)
+
   if(MINGW)
     # suppress warnings about auto imported symbols
     set(MITK_SHARED_LINKER_FLAGS "-Wl,--enable-auto-import ${MITK_SHARED_LINKER_FLAGS}")
@@ -837,6 +847,9 @@ endif()
 if(MITK_USE_Python)
   find_package(PythonLibs REQUIRED)
   find_package(PythonInterp REQUIRED)
+  if(MITK_USE_Numpy)
+    find_package(Numpy REQUIRED)
+  endif()
 endif()
 
 if(MITK_USE_SOFA)
@@ -862,6 +875,10 @@ if(MITK_USE_SimpleITK)
   link_directories(${SimpleITK_LIBRARY_DIRS})
 endif()
 
+if(MITK_USE_OpenCL)
+  find_package(OpenCL REQUIRED)
+endif()
+
 # Qt support
 if(MITK_USE_QT)
   if(DESIRED_QT_VERSION MATCHES 4)
@@ -879,6 +896,73 @@ if(MITK_USE_QT)
       message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
     endif()
   endif()
+
+  find_program(QT_HELPGENERATOR_EXECUTABLE
+    NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
+  find_program(QT_COLLECTIONGENERATOR_EXECUTABLE
+    NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
+  find_program(QT_ASSISTANT_EXECUTABLE
+    NAMES assistant-qt4 assistant4 assistant
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
+  find_program(QT_XMLPATTERNS_EXECUTABLE
+    NAMES xmlpatterns
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
+  mark_as_advanced(QT_HELPGENERATOR_EXECUTABLE
+                   QT_COLLECTIONGENERATOR_EXECUTABLE
+                   QT_ASSISTANT_EXECUTABLE
+                   QT_XMLPATTERNS_EXECUTABLE
+                  )
+
+  if(MITK_USE_BLUEBERRY)
+    option(BLUEBERRY_USE_QT_HELP "Enable support for integrating plugin documentation into Qt Help" ${DOXYGEN_FOUND})
+    mark_as_advanced(BLUEBERRY_USE_QT_HELP)
+
+    # Sanity checks for in-application BlueBerry plug-in help generation
+    if(BLUEBERRY_USE_QT_HELP)
+      set(_force_blueberry_use_qt_help_to_off 0)
+      if(NOT DOXYGEN_FOUND)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because Doxygen was not found.")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+      if(DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_LESS 1.8.7)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because Doxygen version 1.8.7 or newer not found.")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+
+      if(NOT QT_HELPGENERATOR_EXECUTABLE)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because QT_HELPGENERATOR_EXECUTABLE is empty.")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+
+      if(NOT QT_XMLPATTERNS_EXECUTABLE)
+        message("You have enabled Qt Help support, but QT_XMLPATTERNS_EXECUTABLE is empty")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+
+      if(_force_blueberry_use_qt_help_to_off)
+        set(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating plugin documentation into Qt Help" FORCE)
+      endif()
+    endif()
+
+    if(BLUEBERRY_QT_HELP_REQUIRED AND NOT BLUEBERRY_USE_QT_HELP)
+      message(FATAL_ERROR "BLUEBERRY_USE_QT_HELP is required to be set to ON")
+    endif()
+  endif()
+
 endif()
 
 #-----------------------------------------------------------------------------
@@ -905,6 +989,13 @@ if(BUILD_TESTING)
     @ONLY
     )
 
+  # Initial cache for ProjectTemplate and PluginGenerator tests
+  configure_file(
+     CMake/mitkTestInitialCache.txt.in
+     ${MITK_BINARY_DIR}/mitkTestInitialCache.txt
+     @ONLY
+  )
+
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
@@ -930,7 +1021,7 @@ if(BUILD_TESTING)
 
   # Test the external project template
   if(MITK_USE_BLUEBERRY)
-    #include(mitkTestProjectTemplate)
+    include(mitkTestProjectTemplate)
   endif()
 
   # Test the package target
@@ -965,64 +1056,6 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
 
 #-----------------------------------------------------------------------------
-# Compile Utilities and set-up MITK variables
-#-----------------------------------------------------------------------------
-
-add_subdirectory(Utilities)
-
-if(MITK_USE_BLUEBERRY)
-
-  # We need to hack a little bit because MITK applications may need
-  # to enable certain BlueBerry plug-ins. However, these plug-ins
-  # are validated separately from the MITK plug-ins and know nothing
-  # about potential MITK plug-in dependencies of the applications. Hence
-  # we cannot pass the MITK application list to the BlueBerry
-  # ctkMacroSetupPlugins call but need to extract the BlueBerry dependencies
-  # from the applications and set them explicitly.
-
-  include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
-
-  foreach(mitk_app ${MITK_APPS})
-    # extract target_dir and option_name
-    string(REPLACE "^^" "\\;" target_info ${mitk_app})
-    set(target_info_list ${target_info})
-    list(GET target_info_list 0 target_dir)
-    list(GET target_info_list 1 option_name)
-    # check if the application is enabled and if target_libraries.cmake exists
-    if((${option_name} OR MITK_BUILD_ALL_APPS) AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
-      include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
-      foreach(_target_dep ${target_libraries})
-        if(_target_dep MATCHES org_blueberry_)
-          string(REPLACE _ . _app_bb_dep ${_target_dep})
-          # explicitly set the build option for the BlueBerry plug-in
-          set(BLUEBERRY_BUILD_${_app_bb_dep} ON CACHE BOOL "Build the ${_app_bb_dep} plug-in")
-        endif()
-      endforeach()
-    endif()
-  endforeach()
-
-  set(mbilog_DIR "${mbilog_BINARY_DIR}")
-
-  if(MITK_BUILD_ALL_PLUGINS)
-    set(BLUEBERRY_BUILD_ALL_PLUGINS ON)
-  endif()
-
-  set(BLUEBERRY_CXX_FLAGS "${MITK_CXX_FLAGS}")
-  set(BLUEBERRY_CXX_FLAGS_RELEASE "${MITK_CXX_FLAGS_RELEASE}")
-  set(BLUEBERRY_C_FLAGS "${MITK_C_FLAGS}")
-
-  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
-
-  add_subdirectory(BlueBerry)
-
-  set(BlueBerry_DIR ${CMAKE_CURRENT_BINARY_DIR}/BlueBerry
-      CACHE PATH "The directory containing a CMake configuration file for BlueBerry" FORCE)
-
-  include(mitkMacroCreateCTKPlugin)
-
-endif()
-
-#-----------------------------------------------------------------------------
 # Add custom targets representing CDash subprojects
 #-----------------------------------------------------------------------------
 
@@ -1036,18 +1069,18 @@ endforeach()
 # Add subdirectories
 #-----------------------------------------------------------------------------
 
+add_subdirectory(Utilities)
+
 add_subdirectory(Modules)
 
 if(MITK_USE_BLUEBERRY)
 
-  find_package(BlueBerry REQUIRED)
+  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
 
   set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
 
   # Plug-in testing (needs some work to be enabled again)
   if(BUILD_TESTING)
-    include(berryTestingHelpers)
-
     set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")
     if(TARGET CoreApp)
       get_target_property(_is_macosx_bundle CoreApp MACOSX_BUNDLE)
@@ -1059,10 +1092,10 @@ if(MITK_USE_BLUEBERRY)
   endif()
 
   include("${CMAKE_CURRENT_SOURCE_DIR}/Plugins/PluginList.cmake")
-  mitkFunctionWhitelistPlugins(MITK MITK_EXT_PLUGINS)
+  mitkFunctionWhitelistPlugins(MITK MITK_PLUGINS)
 
   set(mitk_plugins_fullpath "")
-  foreach(mitk_plugin ${MITK_EXT_PLUGINS})
+  foreach(mitk_plugin ${MITK_PLUGINS})
     list(APPEND mitk_plugins_fullpath Plugins/${mitk_plugin})
   endforeach()
 
@@ -1124,7 +1157,9 @@ endif()
 # Documentation
 #-----------------------------------------------------------------------------
 
-add_subdirectory(Documentation)
+if(DOXYGEN_FOUND)
+  add_subdirectory(Documentation)
+endif()
 
 #-----------------------------------------------------------------------------
 # Installation

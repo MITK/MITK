@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHeaderView>
 
 QmitkLevelWindowPresetDefinitionDialog::QmitkLevelWindowPresetDefinitionDialog(QWidget* parent, Qt::WindowFlags f)
- : QDialog(parent, f), m_TableModel(0), m_SortModel(this)
+ : QDialog(parent, f), m_TableModel(nullptr), m_SortModel(this)
 {
   this->setupUi(this);
 
@@ -195,7 +195,7 @@ PresetTableModel::PresetTableModel(std::map<std::string, double>& levels,
     std::map<std::string, double>& windows, QObject* parent)
  : QAbstractTableModel(parent)
 {
-  for(std::map<std::string, double>::iterator iter = levels.begin(); iter != levels.end(); ++iter )
+  for(auto iter = levels.begin(); iter != levels.end(); ++iter )
   {
     m_Entries.push_back(Entry(iter->first, iter->second, windows[iter->first]));
   }
@@ -205,7 +205,7 @@ void
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::getLevels(std::map<std::string, double>& levels)
 {
-  for (std::vector<Entry>::iterator iter = m_Entries.begin(); iter != m_Entries.end(); ++iter)
+  for (auto iter = m_Entries.begin(); iter != m_Entries.end(); ++iter)
   {
     levels[iter->name] = iter->level;
   }
@@ -215,7 +215,7 @@ void
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::getWindows(std::map<std::string, double>& windows)
 {
-  for (std::vector<Entry>::iterator iter = m_Entries.begin(); iter != m_Entries.end(); ++iter)
+  for (auto iter = m_Entries.begin(); iter != m_Entries.end(); ++iter)
   {
     windows[iter->name] = iter->window;
   }
@@ -238,7 +238,7 @@ QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::contains(std::string& name)
 {
 
-  for (std::vector<Entry>::iterator iter = m_Entries.begin(); iter != m_Entries.end(); ++iter)
+  for (auto iter = m_Entries.begin(); iter != m_Entries.end(); ++iter)
   {
     if (iter->name == name) return true;
   }

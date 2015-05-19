@@ -1702,7 +1702,7 @@ namespace Json {
       void enableYAMLCompatibility();
 
    public: // overridden from Writer
-      virtual std::string write( const Value &root );
+      virtual std::string write( const Value &root ) override;
 
    private:
       void writeValue( const Value &value );
@@ -1740,7 +1740,7 @@ namespace Json {
        * \param root Value to serialize.
        * \return String containing the JSON document that represents the root value.
        */
-      virtual std::string write( const Value &root );
+      virtual std::string write( const Value &root ) override;
 
    private:
       void writeValue( const Value &value );

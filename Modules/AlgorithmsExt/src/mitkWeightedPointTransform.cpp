@@ -63,9 +63,9 @@ mitk::WeightedPointTransform::WeightedPointTransform()
 
 mitk::WeightedPointTransform::~WeightedPointTransform()
 {
-  m_FixedPointSet = NULL;
-  m_MovingPointSet = NULL;
-  m_LandmarkTransform = NULL;
+  m_FixedPointSet = nullptr;
+  m_MovingPointSet = nullptr;
+  m_LandmarkTransform = nullptr;
 }
 
 void mitk::WeightedPointTransform::ComputeTransformation()

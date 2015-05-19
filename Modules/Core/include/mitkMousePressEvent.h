@@ -44,14 +44,14 @@ namespace mitk
     MouseButtons GetEventButton() const;
     void SetEventButton(MouseButtons buttons);
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
 
   protected:
     MousePressEvent(BaseRenderer*, const Point2D& = Point2D(), const Point3D& = Point3D(), MouseButtons buttonStates = NoButton,
                     ModifierKeys modifiers = NoKey, MouseButtons eventButton = NoButton);
     virtual ~MousePressEvent();
 
-    virtual bool IsEqual(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const override;
 
   private:
     MouseButtons m_EventButton;

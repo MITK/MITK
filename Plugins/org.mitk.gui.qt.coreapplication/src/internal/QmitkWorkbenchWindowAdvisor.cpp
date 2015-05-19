@@ -84,7 +84,7 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
     VDMap.insert(p);
   }
 
-  QToolBar* qToolbar = new QToolBar;
+  auto   qToolbar = new QToolBar;
 
   for (auto MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
   {
@@ -96,19 +96,19 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
 
   mainWindow->addToolBar(qToolbar);
 
-  QStatusBar* qStatusBar = new QStatusBar();
+  auto   qStatusBar = new QStatusBar();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
-  QmitkStatusBar *statusBar = new QmitkStatusBar(qStatusBar);
+  auto  statusBar = new QmitkStatusBar(qStatusBar);
   //disabling the SizeGrip in the lower right corner
   statusBar->SetSizeGripEnabled(false);
 
-  QmitkProgressBar *progBar = new QmitkProgressBar();
+  auto  progBar = new QmitkProgressBar();
   qStatusBar->addPermanentWidget(progBar, 0);
   progBar->hide();
   mainWindow->setStatusBar(qStatusBar);
 
-  QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
+  auto   memoryIndicator = new QmitkMemoryUsageIndicatorView();
   qStatusBar->addPermanentWidget(memoryIndicator, 0);
 }
 

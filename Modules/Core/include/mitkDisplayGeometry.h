@@ -72,10 +72,10 @@ namespace mitk
       itkCloneMacro(Self)
 
       /// \brief duplicates the geometry, NOT useful for this sub-class
-      virtual itk::LightObject::Pointer InternalClone() const;
+      virtual itk::LightObject::Pointer InternalClone() const override;
 
     /// \return this objects modified time.
-    virtual unsigned long GetMTime() const;
+    virtual unsigned long GetMTime() const override;
 
     //virtual const TimeBounds& GetTimeBounds() const;
 
@@ -168,27 +168,27 @@ namespace mitk
     /**
     * \brief projects the given point onto current 2D world geometry plane
     */
-    virtual bool Project(const Point3D &pt3d_mm, Point3D &projectedPt3d_mm) const;
+    virtual bool Project(const Point3D &pt3d_mm, Point3D &projectedPt3d_mm) const override;
 
     /**
     * \brief projects the given vector onto current 2D world geometry plane.
     * \warning DEPRECATED, please use Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) instead
     */
-    virtual bool Project(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const;
+    virtual bool Project(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const override;
 
     /**
     * \brief projects the given vector onto current 2D world geometry plane
     */
-    virtual bool Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const;
+    virtual bool Project(const Vector3D &vec3d_mm, Vector3D &projectedVec3d_mm) const override;
 
-    virtual bool Map(const Point3D &pt3d_mm, Point2D &pt2d_mm) const;
-    virtual void Map(const Point2D &pt2d_mm, Point3D &pt3d_mm) const;
-    virtual bool Map(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector2D &vec2d_mm) const;
-    virtual void Map(const Point2D & atPt2d_mm, const Vector2D &vec2d_mm, Vector3D &vec3d_mm) const;
+    virtual bool Map(const Point3D &pt3d_mm, Point2D &pt2d_mm) const override;
+    virtual void Map(const Point2D &pt2d_mm, Point3D &pt3d_mm) const override;
+    virtual bool Map(const Point3D & atPt3d_mm, const Vector3D &vec3d_mm, Vector2D &vec2d_mm) const override;
+    virtual void Map(const Point2D & atPt2d_mm, const Vector2D &vec2d_mm, Vector3D &vec3d_mm) const override;
 
-    virtual bool IsValid() const;
+    virtual bool IsValid() const override;
 
-    virtual bool IsAbove(const Point3D &pt3d_mm, bool /*considerBoundingBox=false*/) const { return Superclass::IsAbove(pt3d_mm, true); };
+    virtual bool IsAbove(const Point3D &pt3d_mm, bool /*considerBoundingBox=false*/) const override { return Superclass::IsAbove(pt3d_mm, true); };
 
   protected:
 
@@ -212,7 +212,7 @@ namespace mitk
       */
     virtual bool RefitVisibleRect();
 
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     Vector2D m_OriginInMM;
     Vector2D m_OriginInDisplayUnits;
@@ -231,7 +231,7 @@ namespace mitk
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){ Superclass::PreSetSpacing(aSpacing); };
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{ Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace
 

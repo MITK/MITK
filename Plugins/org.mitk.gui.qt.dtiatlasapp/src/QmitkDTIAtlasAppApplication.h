@@ -29,8 +29,8 @@ public:
   QmitkDTIAtlasAppApplication() {}
   ~QmitkDTIAtlasAppApplication() {}
 
-  int Start();
-  void Stop();
+  QVariant Start(berry::IApplicationContext* context) override;
+  void Stop() override;
 };
 
 #endif /*QMITKDTIAtlasAppAPPLICATION_H_*/

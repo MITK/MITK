@@ -56,7 +56,7 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
   bool niceDescriptionFound(false);                  // have we yet seen a plain descriptive entry (not OperationEvent)?
   std::string lastDescription;                       // stores the last description to inhibit entries like "name AND name AND name..." if name is always the same
 
-  for ( std::vector<UndoStackItem*>::reverse_iterator iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter )
+  for ( auto iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter )
   {
     if ( oeid != (*iter)->GetObjectEventId() )
     {
@@ -122,7 +122,7 @@ mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo:
   bool niceDescriptionFound(false);                  // have we yet seen a plain descriptive entry (not OperationEvent)?
   std::string lastDescription;                       // stores the last description to inhibit entries like "name AND name AND name..." if name is always the same
 
-  for ( std::vector<UndoStackItem*>::reverse_iterator iter = m_RedoList.rbegin(); iter != m_RedoList.rend(); ++iter )
+  for ( auto iter = m_RedoList.rbegin(); iter != m_RedoList.rend(); ++iter )
   {
     if ( oeid != (*iter)->GetObjectEventId() )
     {

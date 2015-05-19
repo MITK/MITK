@@ -46,14 +46,14 @@ protected:
   {
     public:
 
-    mitkClassMacro( Shader, itk::Object )
+    mitkClassMacro( Shader, IShaderRepository::Shader )
     itkFactorylessNewMacro( Self )
 
     class Uniform : public itk::Object
     {
       public:
 
-      mitkClassMacro( Uniform, itk::Object )
+      mitkClassMacroItkParent( Uniform, itk::Object )
       itkFactorylessNewMacro( Self )
 
       enum Type
@@ -146,29 +146,29 @@ private:
    */
   ~VtkShaderRepository();
 
-  ShaderProgram::Pointer CreateShaderProgram();
+  ShaderProgram::Pointer CreateShaderProgram() override;
 
-  std::list<IShaderRepository::Shader::Pointer> GetShaders() const;
+  std::list<IShaderRepository::Shader::Pointer> GetShaders() const override;
 
-  IShaderRepository::Shader::Pointer GetShader(const std::string& name) const;
+  IShaderRepository::Shader::Pointer GetShader(const std::string& name) const override;
 
-  IShaderRepository::Shader::Pointer GetShader(int id) const;
+  IShaderRepository::Shader::Pointer GetShader(int id) const override;
 
   /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
    * used by mappers.
    */
-  void AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite) const;
+  void AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite) const override;
 
   /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
 
-  int LoadShader(std::istream& stream, const std::string& name);
+  int LoadShader(std::istream& stream, const std::string& name) override;
 
-  bool UnloadShader(int id);
+  bool UnloadShader(int id) override;
 
   void UpdateShaderProgram(mitk::IShaderRepository::ShaderProgram* shaderProgram,
-                           DataNode* node, BaseRenderer* renderer) const;
+                           DataNode* node, BaseRenderer* renderer) const override;
 };
 
 } //end of namespace mitk

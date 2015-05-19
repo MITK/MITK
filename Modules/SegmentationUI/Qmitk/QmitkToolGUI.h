@@ -38,14 +38,14 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolGUI : public QWidget, public itk::Objec
   Q_OBJECT
 
   public:
-    mitkClassMacro(QmitkToolGUI, itk::Object);
+    mitkClassMacroItkParent(QmitkToolGUI, itk::Object);
 
     void SetTool( mitk::Tool* tool );
 
     // just make sure ITK won't take care of anything (especially not destruction)
-    virtual void Register() const;
+    virtual void Register() const override;
     virtual void UnRegister() const ITK_NOEXCEPT ITK_OVERRIDE;
-    virtual void SetReferenceCount(int);
+    virtual void SetReferenceCount(int) override;
 
     virtual ~QmitkToolGUI();
 

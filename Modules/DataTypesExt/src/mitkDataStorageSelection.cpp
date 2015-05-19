@@ -23,7 +23,7 @@ namespace mitk
 {
 
   DataStorageSelection::DataStorageSelection(mitk::DataStorage* _DataStorage, bool _AutoAddNodes)
-    : m_DataStorage(0), m_Predicate(0), m_SelfCall(false), m_AutoAddNodes(_AutoAddNodes)
+    : m_DataStorage(nullptr), m_Predicate(nullptr), m_SelfCall(false), m_AutoAddNodes(_AutoAddNodes)
   {
     this->SetDataStorage(_DataStorage);
   }
@@ -31,7 +31,7 @@ namespace mitk
   DataStorageSelection::DataStorageSelection(mitk::DataStorage* _DataStorage
                                                            , mitk::NodePredicateBase* _Predicate
                                                            , bool _AutoAddNodes)
-    : m_DataStorage(0), m_Predicate(_Predicate), m_SelfCall(false), m_AutoAddNodes(_AutoAddNodes)
+    : m_DataStorage(nullptr), m_Predicate(_Predicate), m_SelfCall(false), m_AutoAddNodes(_AutoAddNodes)
   {
     this->SetDataStorage(_DataStorage);
   }
@@ -39,7 +39,7 @@ namespace mitk
   DataStorageSelection::~DataStorageSelection()
   {
     // kick datastorage and all nodes and all listeners
-    this->SetDataStorage(0);
+    this->SetDataStorage(nullptr);
   }
 
   mitk::DataStorage::Pointer DataStorageSelection::GetDataStorage() const
@@ -64,7 +64,7 @@ namespace mitk
 
   mitk::DataNode::Pointer DataStorageSelection::GetNode(unsigned int index) const
   {
-    return (index < m_Nodes.size())? m_Nodes.at(index): 0;
+    return (index < m_Nodes.size())? m_Nodes.at(index): nullptr;
   }
 
   std::vector<mitk::DataNode*> DataStorageSelection::GetNodes() const
@@ -97,7 +97,7 @@ namespace mitk
     if(m_DataStorage != _DataStorage)
     {
       // if a data storage was set before remove old event listeners
-      if(m_DataStorage != 0)
+      if(m_DataStorage != nullptr)
       {
         if(m_AutoAddNodes)
           this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<DataStorageSelection
@@ -114,7 +114,7 @@ namespace mitk
       m_DataStorage = _DataStorage;
 
       // if new storage is not 0 subscribe for events
-      if(m_DataStorage != 0)
+      if(m_DataStorage != nullptr)
       {
         // subscribe for node added/removed events
         if(m_AutoAddNodes)
@@ -177,7 +177,7 @@ namespace mitk
       return;
 
     // find corresponding node
-    std::vector<mitk::DataNode*>::iterator nodeIt
+    auto nodeIt
       = std::find(m_Nodes.begin(), m_Nodes.end(), node);
 
     if(nodeIt == m_Nodes.end())
@@ -218,8 +218,8 @@ namespace mitk
     if(!modifiedEvent)
       delEvent = dynamic_cast<const itk::DeleteEvent*>(&event);
     */
-    const mitk::BaseProperty* prop = 0;
-    const mitk::PropertyList* propList = 0;
+    const mitk::BaseProperty* prop = nullptr;
+    const mitk::PropertyList* propList = nullptr;
     const mitk::DataNode* node = dynamic_cast<const mitk::DataNode*>(caller);
     if(!node)
     {
@@ -233,7 +233,7 @@ namespace mitk
       }
       else if(dynamic_cast<const mitk::DataStorage*>(caller))
       {
-        this->SetDataStorage(0);
+        this->SetDataStorage(nullptr);
       }
     }
 
@@ -250,10 +250,10 @@ namespace mitk
   //# protected
   mitk::DataNode::Pointer DataStorageSelection::FindNode(const mitk::BaseProperty* prop) const
   {
-    mitk::DataNode* node = 0;
-    for(Nodes::const_iterator it=m_Nodes.begin(); it!=m_Nodes.end(); ++it)
+    mitk::DataNode* node = nullptr;
+    for(auto it=m_Nodes.begin(); it!=m_Nodes.end(); ++it)
     {
-      for(mitk::PropertyList::PropertyMap::const_iterator it2
+      for(auto it2
         = (*it)->GetPropertyList()->GetMap()->begin()
         ; it2 != (*it)->GetPropertyList()->GetMap()->end(); ++it2)
       {
@@ -269,8 +269,8 @@ namespace mitk
 
   mitk::DataNode::Pointer DataStorageSelection::FindNode(const mitk::PropertyList* propList) const
   {
-    mitk::DataNode* node = 0;
-    for(Nodes::const_iterator it=m_Nodes.begin(); it!=m_Nodes.end(); ++it)
+    mitk::DataNode* node = nullptr;
+    for(auto it=m_Nodes.begin(); it!=m_Nodes.end(); ++it)
     {
       if((*it)->GetPropertyList() == propList)
       {
@@ -287,7 +287,7 @@ namespace mitk
     // the whole reset depends on the fact if a data storage is set or not
     if(m_DataStorage)
     {
-      mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = 0;
+      mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = nullptr;
       if(m_AutoAddNodes && m_Predicate.IsNotNull())
         // get subset
         _NodeSet = m_DataStorage->GetSubset(m_Predicate);
@@ -299,7 +299,7 @@ namespace mitk
       else
         return;
       // finally add all nodes to the model
-      for(mitk::DataStorage::SetOfObjects::const_iterator it=_NodeSet->begin(); it!=_NodeSet->end()
+      for(auto it=_NodeSet->begin(); it!=_NodeSet->end()
         ; it++)
       {
         // save node
@@ -321,9 +321,9 @@ namespace mitk
     propList->RemoveObserver(m_PropertyListDeletedObserverTags[propList]);
     m_PropertyListDeletedObserverTags.erase(propList);
 
-    mitk::BaseProperty* prop = 0;
+    mitk::BaseProperty* prop = nullptr;
     // do the same for each property
-    for(mitk::PropertyList::PropertyMap::const_iterator it=propList->GetMap()->begin()
+    for(auto it=propList->GetMap()->begin()
       ; it!=propList->GetMap()->end()
       ; ++it)
     {
@@ -352,9 +352,9 @@ namespace mitk
     m_PropertyListDeletedObserverTags[propList] = propList
       ->AddObserver(itk::DeleteEvent(), ObjectChangedCommand);
 
-    mitk::BaseProperty* prop = 0;
+    mitk::BaseProperty* prop = nullptr;
     // do the same for each property
-    for(mitk::PropertyList::PropertyMap::const_iterator it=propList->GetMap()->begin()
+    for(auto it=propList->GetMap()->begin()
       ; it!=propList->GetMap()->end()
       ; ++it)
     {

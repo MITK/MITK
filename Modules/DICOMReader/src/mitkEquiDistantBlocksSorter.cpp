@@ -270,7 +270,7 @@ mitk::EquiDistantBlocksSorter
   this->SetNumberOfOutputs(numberOfOutputs);
 
   unsigned int outputIndex(0);
-  for (OutputListType::iterator oIter = outputs.begin();
+  for (auto oIter = outputs.begin();
        oIter != outputs.end();
        ++outputIndex, ++oIter)
   {
@@ -359,7 +359,7 @@ mitk::EquiDistantBlocksSorter
   MITK_DEBUG << "Analyzing " << datasets.size() << " files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
   unsigned int fileIndex(0);
   double toleratedOriginError(0.005); // default: max. 1/10mm error when measurement crosses 20 slices in z direction (too strict? we don't know better)
-  for (DICOMDatasetList::const_iterator dsIter = datasets.begin();
+  for (auto dsIter = datasets.begin();
        dsIter != datasets.end();
        ++dsIter, ++fileIndex)
   {

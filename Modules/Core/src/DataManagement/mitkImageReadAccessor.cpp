@@ -76,7 +76,7 @@ mitk::ImageReadAccessor::~ImageReadAccessor()
     m_Image->m_ReadWriteLock.Lock();
 
     // delete self from list of ImageReadAccessors in Image
-    std::vector<ImageAccessorBase*>::iterator it = std::find(m_Image->m_Readers.begin(),m_Image->m_Readers.end(),this);
+    auto it = std::find(m_Image->m_Readers.begin(),m_Image->m_Readers.end(),this);
     m_Image->m_Readers.erase(it);
 
     // delete lock, if there are no waiting ImageAccessors
@@ -112,7 +112,7 @@ void mitk::ImageReadAccessor::OrganizeReadAccess()
   {
     // Check for every WriteAccessors, if the Region of this ImageAccessors overlaps
     // make sure this iterator is not used, when m_ReadWriteLock is Unlocked!
-    std::vector<ImageAccessorBase*>::iterator it = m_Image->m_Writers.begin();
+    auto it = m_Image->m_Writers.begin();
 
     for(; it!=m_Image->m_Writers.end(); ++it)
     {

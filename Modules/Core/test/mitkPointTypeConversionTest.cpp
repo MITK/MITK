@@ -74,7 +74,7 @@ private:
 public:
 
 
-  void setUp(void)
+  void setUp(void) override
   {
     FillVector3D(originalValues, 1.0, 2.0, 3.0);
     FillVector3D(valuesToCopy,   4.0, 5.0, 6.0);
@@ -83,7 +83,7 @@ public:
     a_vtkPoints->Initialize();
   }
 
-  void tearDown(void)
+  void tearDown(void) override
   {
  //   a_vtkPoints = NULL;
   }

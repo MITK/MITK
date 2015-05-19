@@ -36,7 +36,7 @@ class MITKSEGMENTATION_EXPORT ContourUtils : public itk::Object
 {
   public:
 
-    mitkClassMacro(ContourUtils, itk::Object);
+    mitkClassMacroItkParent(ContourUtils, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

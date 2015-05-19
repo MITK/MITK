@@ -79,7 +79,7 @@ void IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::GenerateData()
 
   // set up structuring element for border voxel detection
   StructuringElementType seBorder;
-  for (unsigned int d=0; d<ImageDimension; d++) { radius[d] = 1; }
+  for (auto & radiu : radius) { radiu = 1; }
   seBorder.SetRadius( radius );
   seBorder.CreateStructuringElement();
 

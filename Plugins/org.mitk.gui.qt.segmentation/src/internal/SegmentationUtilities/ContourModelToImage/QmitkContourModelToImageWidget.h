@@ -43,7 +43,7 @@ class QmitkContourModelToImageWidget : public QmitkSegmentationUtilityWidget
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
+  explicit QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkContourModelToImageWidget();
@@ -56,6 +56,9 @@ private slots:
   /** @brief This slot is called if user activates the button to mask an image. */
   void OnProcessPressed();
 
+  /** @brief This slot is called after processing is finished */
+  void OnProcessingFinished();
+
 private:
 
   /** @brief Check if selections is valid. */
@@ -63,6 +66,9 @@ private:
 
   /** @brief Enable buttons if data selction is valid. */
   void EnableButtons(bool enable = true);
+
+  /** @brief Does the actual contour filling */
+  void FillContourModelSetIntoImage();
 
   /** @brief Fills a mitk::ContourModel into a given segmentation image */
   itk::SmartPointer<mitk::Image> ContourModelToImage(itk::SmartPointer<mitk::Image> segmenationImage, itk::SmartPointer<mitk::ContourModel> contour );

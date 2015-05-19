@@ -25,7 +25,7 @@ mitk::UIDGenerator                                         mitk::SmartPointerPro
 
 void mitk::SmartPointerProperty::PostProcessXMLReading()
 {
-  for (ReadInSmartPointersMapType::iterator iter = m_ReadInInstances.begin();
+  for (auto iter = m_ReadInInstances.begin();
        iter != m_ReadInInstances.end();
        ++iter)
   {

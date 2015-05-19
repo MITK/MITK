@@ -101,12 +101,12 @@ protected:
     /**
      * Actually reads the point sets from the given file
      */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /**
      * Does nothing in the current implementation
      */
-    virtual void GenerateOutputInformation();
+    virtual void GenerateOutputInformation() override;
 
     /**
      * Resizes the output-objects according to the given number.

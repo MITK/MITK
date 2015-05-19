@@ -363,6 +363,7 @@ function(mitk_create_module)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=static-member-init" module_c_flags module_cxx_flags)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=unknown-warning" module_c_flags module_cxx_flags)
         mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=gnu" module_c_flags module_cxx_flags)
+        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-error=inconsistent-missing-override" module_c_flags module_cxx_flags)
       endif()
     endif(MODULE_WARNINGS_AS_ERRORS)
 
@@ -431,15 +432,17 @@ function(mitk_create_module)
 
     set(Q${KITNAME}_GENERATED_CPP ${Q${KITNAME}_GENERATED_CPP} ${Q${KITNAME}_GENERATED_UI_CPP} ${Q${KITNAME}_GENERATED_MOC_CPP} ${Q${KITNAME}_GENERATED_QRC_CPP})
 
-    ORGANIZE_SOURCES(SOURCE ${CPP_FILES}
-                     HEADER ${H_FILES}
-                     TXX ${TXX_FILES}
-                     DOC ${DOX_FILES}
-                     UI ${UI_FILES}
-                     QRC ${QRC_FILES}
-                     MOC ${Q${KITNAME}_GENERATED_MOC_CPP}
-                     GEN_QRC ${Q${KITNAME}_GENERATED_QRC_CPP}
-                     GEN_UI ${Q${KITNAME}_GENERATED_UI_CPP})
+    mitkFunctionOrganizeSources(
+      SOURCE ${CPP_FILES}
+      HEADER ${H_FILES}
+      TXX ${TXX_FILES}
+      DOC ${DOX_FILES}
+      UI ${UI_FILES}
+      QRC ${QRC_FILES}
+      MOC ${Q${KITNAME}_GENERATED_MOC_CPP}
+      GEN_QRC ${Q${KITNAME}_GENERATED_QRC_CPP}
+      GEN_UI ${Q${KITNAME}_GENERATED_UI_CPP}
+      )
 
     set(coverage_sources
         ${CPP_FILES} ${H_FILES} ${GLOBBED__H_FILES} ${CORRESPONDING__H_FILES} ${TXX_FILES}
@@ -623,12 +626,7 @@ function(mitk_create_module)
     endif()
 
     if(NOT MODULE_C_MODULE)
-      # Add required compile features, currently works only for GNU (gcc) and Clang (not AppleClang).
-      # For all other cases, MITKConfig.cmake prints an error if CMAKE_CXX_STANDARD is not set to C++11
-      if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND GCC_VERSION VERSION_GREATER 4.6) OR
-         CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        target_compile_features(${MODULE_TARGET} ${_module_property_type} ${MITK_CXX_FEATURES})
-      endif()
+      target_compile_features(${MODULE_TARGET} ${_module_property_type} ${MITK_CXX_FEATURES})
     endif()
 
     # add include directories

@@ -51,7 +51,11 @@ if(NOT DEFINED VTK_DIR)
   if(MITK_USE_Python)
     if(NOT MITK_USE_SYSTEM_PYTHON)
      list(APPEND proj_DEPENDENCIES Python)
+     set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:FILEPATH=${MITK_PYTHON_SITE_DIR})
+    else()
+      set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:FILEPATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
     endif()
+
     list(APPEND additional_cmake_args
          -DVTK_WRAP_PYTHON:BOOL=ON
          -DVTK_USE_TK:BOOL=OFF
@@ -60,6 +64,7 @@ if(NOT DEFINED VTK_DIR)
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
          -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
          -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+         ${_vtk_install_python_dir}
         )
   else()
     list(APPEND additional_cmake_args
@@ -86,14 +91,14 @@ if(NOT DEFINED VTK_DIR)
     )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0+74f4888.tar.gz)
-  set(VTK_URL_MD5 1f19dae22c42c032109bd3cf91c4e8c9)
+  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.2.0.tar.gz)
+  set(VTK_URL_MD5 4790f8b3acdbc376997fbdc9d203f0b7)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
-    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-6.1.0+74f4888.patch
+    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-6.2.0.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
@@ -105,8 +110,12 @@ if(NOT DEFINED VTK_DIR)
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         ${additional_cmake_args}
-     DEPENDS ${proj_DEPENDENCIES}
-    )
+    CMAKE_CACHE_ARGS
+      ${ep_common_cache_args}
+    CMAKE_CACHE_DEFAULT_ARGS
+      ${ep_common_cache_default_args}
+    DEPENDS ${proj_DEPENDENCIES}
+  )
 
   set(VTK_DIR ${ep_prefix})
   mitkFunctionInstallExternalCMakeProject(${proj})

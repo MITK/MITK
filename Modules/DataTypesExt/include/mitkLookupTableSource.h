@@ -41,7 +41,7 @@ class MITKDATATYPESEXT_EXPORT LookupTableSource : public itk::ProcessObject
 {
 public:
 
-    mitkClassMacro( LookupTableSource, itk::ProcessObject )
+    mitkClassMacroItkParent( LookupTableSource, itk::ProcessObject )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -57,7 +57,7 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
 
     /**
      * This is a default implementation to make sure we have something.
@@ -65,13 +65,13 @@ public:
      * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
      * virtual.
      */
-    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
+    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
     /**
      * Generates the input requested region simply by calling the equivalent
      * method of the superclass.
      */
-    void GenerateInputRequestedRegion();
+    void GenerateInputRequestedRegion() override;
 
     /**
      * Replacement of the SetOutput method. I think it is not yet correcly

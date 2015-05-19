@@ -77,14 +77,14 @@ public:
   bool SetMask(const Image* mask);
   virtual void UpdateMask();
 
-  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = nullptr, bool overwrite = false);
 
   /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
    * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
    * ProgressEvent on BaseRenderer. */
-  virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
+  virtual bool IsLODEnabled( BaseRenderer *renderer = nullptr ) const override;
 
-  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
+  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
 protected:
 
@@ -94,7 +94,7 @@ protected:
 
   virtual ~VolumeDataVtkMapper3D();
 
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
   void CreateDefaultTransferFunctions();
 

@@ -79,7 +79,7 @@ class MITKSEGMENTATION_EXPORT OtsuSegmentationFilter : public ImageToImageFilter
  protected:
   OtsuSegmentationFilter();
   virtual ~OtsuSegmentationFilter();
-  virtual void GenerateData();
+  virtual void GenerateData() override;
   //virtual void GenerateOutputInformation();
 
  private:

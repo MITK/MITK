@@ -43,7 +43,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type
-    virtual bool CheckNode(const mitk::DataNode* node) const;
+    virtual bool CheckNode(const mitk::DataNode* node) const override;
 
   protected:
     //##Documentation
@@ -74,7 +74,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type (casts)
-    virtual bool CheckNode(const mitk::DataNode* node) const
+    virtual bool CheckNode(const mitk::DataNode* node) const override
     {
       return node && node->GetData() && dynamic_cast<T*>(node->GetData());
     }

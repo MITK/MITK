@@ -35,7 +35,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro( ToFDeviceFactoryManager, itk::Object );
+    mitkClassMacroItkParent( ToFDeviceFactoryManager, itk::Object );
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

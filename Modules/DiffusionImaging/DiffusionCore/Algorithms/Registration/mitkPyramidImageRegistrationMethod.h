@@ -61,7 +61,7 @@ class MITKDIFFUSIONCORE_EXPORT PyramidImageRegistrationMethod :
 public:
 
   /** Typedefs */
-  mitkClassMacro(PyramidImageRegistrationMethod, itk::Object)
+  mitkClassMacroItkParent(PyramidImageRegistrationMethod, itk::Object)
 
   /** Smart pointer support */
   itkFactorylessNewMacro(Self)

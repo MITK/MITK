@@ -44,7 +44,7 @@ public:
 
   static vtkMitkLevelWindowFilter *New();
 
-  virtual unsigned long int GetMTime();
+  virtual unsigned long int GetMTime() override;
   /** \brief Get the lookup table for the RGB level window */
   vtkScalarsToColors* GetLookupTable();
   /** \brief Set the lookup table for the RGB level window */
@@ -82,10 +82,10 @@ protected:
    * It is a six-component array of the form (xmin, xmax, ymin, ymax, zmin, zmax).
    * \param id: The thread id.
    */
-  void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,int extent[6], int id);
+  void ThreadedExecute(vtkImageData *inData, vtkImageData *outData,int extent[6], int id) override;
 
 //  /** Standard VTK filter method to apply the filter. See VTK documentation.*/
-  int RequestInformation(vtkInformation* request,vtkInformationVector** inputVector, vtkInformationVector* outputVector);
+  int RequestInformation(vtkInformation* request,vtkInformationVector** inputVector, vtkInformationVector* outputVector) override;
 //  /** Standard VTK filter method to apply the filter. See VTK documentation. Not used at the moment.*/
 //  void ExecuteInformation(vtkImageData *vtkNotUsed(inData), vtkImageData *vtkNotUsed(outData));
 

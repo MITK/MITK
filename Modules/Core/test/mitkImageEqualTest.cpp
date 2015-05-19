@@ -43,17 +43,17 @@ public:
   /**
 * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
 */
-  void setUp()
+  void setUp() override
   {
     //generate a gradient test image
     m_Image = mitk::ImageGenerator::GenerateGradientImage<unsigned char>(3u, 3u, 1u);
     m_AnotherImage = m_Image->Clone();
   }
 
-  void tearDown()
+  void tearDown() override
   {
-    m_Image = NULL;
-    m_AnotherImage = NULL;
+    m_Image = nullptr;
+    m_AnotherImage = nullptr;
   }
 
   void Equal_CloneAndOriginal_ReturnsTrue()

@@ -57,10 +57,9 @@ void MimeTypeProvider::Stop()
 std::vector<MimeType> MimeTypeProvider::GetMimeTypes() const
 {
   std::vector<MimeType> result;
-  for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
-       end = m_NameToMimeType.end(); iter != end; ++iter)
+  for (const auto & elem : m_NameToMimeType)
   {
-    result.push_back(iter->second);
+    result.push_back(elem.second);
   }
   return result;
 }
@@ -68,12 +67,11 @@ std::vector<MimeType> MimeTypeProvider::GetMimeTypes() const
 std::vector<MimeType> MimeTypeProvider::GetMimeTypesForFile(const std::string& filePath) const
 {
   std::vector<MimeType> result;
-  for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
-       iterEnd = m_NameToMimeType.end(); iter != iterEnd; ++iter)
+  for (const auto & elem : m_NameToMimeType)
   {
-    if (iter->second.AppliesTo(filePath))
+    if (elem.second.AppliesTo(filePath))
     {
-      result.push_back(iter->second);
+      result.push_back(elem.second);
     }
   }
   std::sort(result.begin(), result.end());
@@ -84,12 +82,11 @@ std::vector<MimeType> MimeTypeProvider::GetMimeTypesForFile(const std::string& f
 std::vector<MimeType> MimeTypeProvider::GetMimeTypesForCategory(const std::string& category) const
 {
   std::vector<MimeType> result;
-  for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
-       end = m_NameToMimeType.end(); iter != end; ++iter)
+  for (const auto & elem : m_NameToMimeType)
   {
-    if (iter->second.GetCategory() == category)
+    if (elem.second.GetCategory() == category)
     {
-      result.push_back(iter->second);
+      result.push_back(elem.second);
     }
   }
   return result;
@@ -105,10 +102,9 @@ MimeType MimeTypeProvider::GetMimeTypeForName(const std::string& name) const
 std::vector<std::string> MimeTypeProvider::GetCategories() const
 {
   std::vector<std::string> result;
-  for (std::map<std::string, MimeType>::const_iterator iter = m_NameToMimeType.begin(),
-       end = m_NameToMimeType.end(); iter != end; ++iter)
+  for (const auto & elem : m_NameToMimeType)
   {
-    std::string category = iter->second.GetCategory();
+    std::string category = elem.second.GetCategory();
     if (!category.empty())
     {
       result.push_back(category);

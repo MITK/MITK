@@ -34,7 +34,7 @@ namespace mitk {
 class MITKUS_EXPORT USAbstractControlInterface : public itk::Object
 {
 public:
-  mitkClassMacro(USAbstractControlInterface, itk::Object);
+  mitkClassMacroItkParent(USAbstractControlInterface, itk::Object);
 
   /**
     * Method must be implemented in every control interface to handle all

@@ -34,7 +34,7 @@ namespace mitk{
     BoundingObjectToSegmentationFilter();
     virtual ~BoundingObjectToSegmentationFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     mitk::BoundingObjectGroup::Pointer m_boundingObjectGroup;
 

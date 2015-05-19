@@ -41,15 +41,15 @@ class MITKSEGMENTATION_EXPORT CalculateVolumetryTool : public SegmentationsProce
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual const char* GetName() const;
+    virtual const char** GetXPM() const override;
+    virtual const char* GetName() const override;
 
   protected:
 
-    virtual bool ProcessOneWorkingData( DataNode* node );
-    virtual std::string GetErrorMessage();
+    virtual bool ProcessOneWorkingData( DataNode* node ) override;
+    virtual std::string GetErrorMessage() override;
 
-    virtual void FinishProcessingAllData();
+    virtual void FinishProcessingAllData() override;
 
     CalculateVolumetryTool(); // purposely hidden
     virtual ~CalculateVolumetryTool();

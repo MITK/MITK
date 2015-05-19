@@ -38,7 +38,7 @@ class QmitkNetworkHistogramCanvas : public QmitkPlotWidget
 
 public:
 
-  QmitkNetworkHistogramCanvas( QWidget * parent=0, Qt::WindowFlags f = 0 );
+  QmitkNetworkHistogramCanvas( QWidget * parent=nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkNetworkHistogramCanvas();
 
    /** @brief Returns the histogram the canvas is using  */

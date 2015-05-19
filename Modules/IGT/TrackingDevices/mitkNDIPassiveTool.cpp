@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NDIPassiveTool::NDIPassiveTool()
 : InternalTrackingTool(),
-m_SROMData(NULL),
+m_SROMData(nullptr),
 m_SROMDataLength(0),
 m_TrackingPriority(Dynamic),
 m_PortHandle()
@@ -31,17 +31,17 @@ m_PortHandle()
 
 mitk::NDIPassiveTool::~NDIPassiveTool()
 {
-  if (m_SROMData != NULL)
+  if (m_SROMData != nullptr)
   {
     delete[] m_SROMData;
-    m_SROMData = NULL;
+    m_SROMData = nullptr;
   }
 }
 
 
 bool mitk::NDIPassiveTool::LoadSROMFile(const char* filename)
 {
-  if (filename == NULL)
+  if (filename == nullptr)
     return false;
   if (filename[0] == '\0')
     return false;
@@ -55,7 +55,7 @@ bool mitk::NDIPassiveTool::LoadSROMFile(const char* filename)
   file.seekg (0, std::ios::end);                // get the length of the file
   unsigned int newLength = file.tellg();
   file.seekg (0, std::ios::beg);
-  char* newData = new char [newLength];         // create a buffer to store the srom file
+  auto  newData = new char [newLength];         // create a buffer to store the srom file
   file.read(newData, newLength);                // read the file into the buffer
   file.close();
   if (file.fail() == true)                      // reading of data unsuccessful?
@@ -63,7 +63,7 @@ bool mitk::NDIPassiveTool::LoadSROMFile(const char* filename)
     delete[] newData;
     return false;
   }
-  if (m_SROMData != NULL)                       // reading was successful, delete old data
+  if (m_SROMData != nullptr)                       // reading was successful, delete old data
     delete[] m_SROMData;
   m_SROMDataLength = newLength;                 // set member variables to new values
   m_SROMData = (unsigned char*) newData;

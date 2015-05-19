@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSimulationView.h"
 #include <QtPlugin>
 
-ctkPluginContext* mitk::org_mitk_gui_qt_simulation_Activator::Context = NULL;
+ctkPluginContext* mitk::org_mitk_gui_qt_simulation_Activator::Context = nullptr;
 
 ctkPluginContext* mitk::org_mitk_gui_qt_simulation_Activator::GetContext()
 {
@@ -35,7 +35,7 @@ void mitk::org_mitk_gui_qt_simulation_Activator::start(ctkPluginContext* context
 
 void mitk::org_mitk_gui_qt_simulation_Activator::stop(ctkPluginContext*)
 {
-  Context = NULL;
+  Context = nullptr;
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

@@ -26,7 +26,7 @@ namespace mitk
 {
 
   MultiComponentImageDataComparisonFilter::MultiComponentImageDataComparisonFilter(): ImageToImageFilter(),
-    m_Tolerance(0.0f), m_CompareResult(false), m_CompareDetails(NULL)
+    m_Tolerance(0.0f), m_CompareResult(false), m_CompareDetails(nullptr)
   {
     this->SetNumberOfRequiredInputs(2);
   }

@@ -92,7 +92,7 @@ protected:
    * this function is overridden as protected, so that the user may not add
    * additional invalid scalar mode types.
    */
-  virtual bool AddEnum( const std::string& name, const IdType& id );
+  virtual bool AddEnum( const std::string& name, const IdType& id ) override;
 
   /**
    * Adds the enumeration types as defined by vtk to the list of known
@@ -105,7 +105,7 @@ private:
   // purposely not implemented
   VtkScalarModeProperty& operator=(const VtkScalarModeProperty&);
 
-  virtual itk::LightObject::Pointer InternalClone() const;
+  virtual itk::LightObject::Pointer InternalClone() const override;
 };
 
 #ifdef _MSC_VER

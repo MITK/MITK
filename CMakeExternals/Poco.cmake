@@ -51,6 +51,10 @@ if(MITK_USE_Poco)
         -DENABLE_POCODOC:BOOL=OFF
         -DENABLE_PAGECOMPILER:BOOL=OFF
         -DENABLE_PAGECOMPILER_FILE2PAGE:BOOL=OFF
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
      )
 

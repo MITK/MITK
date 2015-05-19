@@ -44,7 +44,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     std::vector<std::string> parameter = GetTestParameter();
     m_Filter = mitk::ManualSegmentationToSurfaceFilter::New();
@@ -60,7 +60,7 @@ public:
     }
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_Filter = NULL;
     m_ReferenceSurface = NULL;

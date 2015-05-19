@@ -43,12 +43,12 @@ public:
   /**
   * \brief Called when scrolling forwards with the mouse-wheel.
   */
-  virtual void OnMouseWheelForward();
+  virtual void OnMouseWheelForward() override;
 
   /**
   * \brief Called when scrolling backwards with the mouse-wheel.
   */
-  virtual void OnMouseWheelBackward();
+  virtual void OnMouseWheelBackward() override;
 
 protected:
 

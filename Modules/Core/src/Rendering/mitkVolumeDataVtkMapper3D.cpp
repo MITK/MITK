@@ -67,7 +67,7 @@ const mitk::Image* mitk::VolumeDataVtkMapper3D::GetInput()
 }
 
 mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
-: m_Mask( NULL )
+: m_Mask( nullptr )
 {
   m_PlaneSet = false;
 
@@ -216,8 +216,8 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
   if ( !visible ||
-      this->GetDataNode() == NULL ||
-      dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))==NULL ||
+      this->GetDataNode() == nullptr ||
+      dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))==nullptr ||
       dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))->GetValue() == false
     )
   {
@@ -319,14 +319,14 @@ void mitk::VolumeDataVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *r
   assert(input->GetTimeGeometry());
 
   const BaseGeometry* worldgeometry = renderer->GetCurrentWorldGeometry();
-  if(worldgeometry==NULL)
+  if(worldgeometry==nullptr)
   {
     GetDataNode()->SetProperty("volumerendering",mitk::BoolProperty::New(false));
     return;
   }
 
   vtkImageData *inputData = input->GetVtkImageData( this->GetTimestep() );
-  if(inputData==NULL)
+  if(inputData==nullptr)
     return;
 
 
@@ -581,7 +581,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())
   {
-    if((overwrite) || (node->GetProperty("levelwindow", renderer)==NULL))
+    if((overwrite) || (node->GetProperty("levelwindow", renderer)==nullptr))
     {
       mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelwindow;
@@ -604,7 +604,7 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
       mitkLutProp->SetLookupTable(mitkLut);
       node->SetProperty( "Volume.LookupTable", mitkLutProp );
     }*/
-    if((overwrite) || (node->GetProperty("TransferFunction", renderer)==NULL))
+    if((overwrite) || (node->GetProperty("TransferFunction", renderer)==nullptr))
     {
       // add a default transfer function
       mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
@@ -660,7 +660,7 @@ void mitk::VolumeDataVtkMapper3D::DisableMask()
   if (this->m_Mask)
   {
     this->m_Mask->Delete();
-    this->m_Mask = 0;
+    this->m_Mask = nullptr;
   }
 }
 
@@ -676,7 +676,7 @@ mitk::Image::Pointer mitk::VolumeDataVtkMapper3D::GetMask()
     return mask;
   }
 
-  return 0;
+  return nullptr;
 }
 
 void mitk::VolumeDataVtkMapper3D::UpdateMask()

@@ -30,7 +30,7 @@ class PlanarFigureSerializer : public BaseDataSerializer
     mitkClassMacro( PlanarFigureSerializer, BaseDataSerializer )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize();
+    virtual std::string Serialize() override;
   protected:
     PlanarFigureSerializer();
     virtual ~PlanarFigureSerializer();

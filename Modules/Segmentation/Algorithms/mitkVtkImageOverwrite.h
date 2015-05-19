@@ -81,7 +81,7 @@ See LICENSE.txt or http://www.mitk.org for details.
                                       vtkInformationVector *vtkNotUsed(outputVector),
                                       vtkImageData ***inData,
                                       vtkImageData **outData,
-                                      int outExt[6], int id);
+                                      int outExt[6], int id) override;
   };
 
 

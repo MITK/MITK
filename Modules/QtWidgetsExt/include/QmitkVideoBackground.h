@@ -51,7 +51,7 @@ public:
   /// default ctor, TimerDelay is 40 by default
   /// you must SetVideoSource() and AddRenderWindow() afterwards
   ///
-  explicit QmitkVideoBackground(QObject *parent=0);
+  explicit QmitkVideoBackground(QObject *parent=nullptr);
   ///
   /// constructs a video background with the given video source
   /// no parent is set here, dont forget to delete the object or

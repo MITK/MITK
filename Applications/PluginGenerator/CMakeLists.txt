@@ -80,7 +80,7 @@ endif()
 
 if(NOT standalone_build)
   # Test the plugin generator
-  # include(mitkTestPluginGenerator)
+  include(mitkTestPluginGenerator)
 endif()
 
 #-----------------------------------------------------------------------------

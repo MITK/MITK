@@ -32,6 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MitkXNAT Module
 #include "mitkXnatSessionTracker.h"
 
+#include <mitkIDataStorageService.h>
+#include <ctkServiceTracker.h>
+
+class QMenu;
+
 /*!
 \brief QmitkXnatTreeBrowserView
 
@@ -53,32 +58,42 @@ public:
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   protected slots:
 
-    /// \brief Opens or reuses the xnat editor with the activated node as root item.
-    void OnActivatedNode(const QModelIndex& index);
+  /// \brief Opens or reuses the xnat editor with the activated node as root item.
+  void OnActivatedNode(const QModelIndex& index);
 
-    /// \brief Updates the ctkXnatSession and the user interface
-    void UpdateSession(ctkXnatSession* session);
+  /// \brief Updates the ctkXnatSession and the user interface
+  void UpdateSession(ctkXnatSession* session);
 
-    /// \brief Cleans the tree model
-    void CleanTreeModel(ctkXnatSession* session);
+  /// \brief Cleans the tree model
+  void CleanTreeModel(ctkXnatSession* session);
+
+  void NodeTableViewContextMenuRequested(const QPoint & pos);
+
+  void OnContextMenuDownloadAndOpenFile();
+  void OnContextMenuDownloadFile();
 
 protected:
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   Ui::QmitkXnatTreeBrowserViewControls m_Controls;
 
 private:
 
+  void InternalFileDownload(const QModelIndex& index, bool loadData);
   berry::QtSelectionProvider::Pointer m_SelectionProvider;
-  void SetSelectionProvider();
+  void SetSelectionProvider() override;
 
+  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
   ctkXnatTreeModel* m_TreeModel;
   mitk::XnatSessionTracker* m_Tracker;
+  QString m_DownloadPath;
+
+  QMenu* m_NodeMenu;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

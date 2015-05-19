@@ -124,14 +124,14 @@ void MetropolisHastingsSampler::MakeProposal()
 
         float prob =  m_Density * m_DeathProb /((m_BirthProb)*(m_ParticleGrid->m_NumParticles+1));
 
-        float ex_energy = m_EnergyComputer->ComputeExternalEnergy(R,N,0);
+        float ex_energy = m_EnergyComputer->ComputeExternalEnergy(R,N,nullptr);
         float in_energy = m_EnergyComputer->ComputeInternalEnergy(&prop);
         prob *= exp((in_energy/m_InTemp+ex_energy/m_ExTemp)) ;
 
         if (prob > 1 || m_RandGen->GetVariate() < prob)
         {
             Particle *p = m_ParticleGrid->NewParticle(R);
-            if (p!=0)
+            if (p!=nullptr)
             {
                 p->GetPos() = R;
                 p->GetDir() = N;
@@ -325,7 +325,7 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
 
     for (;;)
     {
-        Next.p = 0;
+        Next.p = nullptr;
         if (Current.ep == 1)
         {
             if (Current.p->pID != -1)
@@ -347,7 +347,7 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
         else
         { fprintf(stderr,"MetropolisHastingsSampler_randshift: Connection inconsistent 3\n"); break; }
 
-        if (Next.p == 0) // no successor
+        if (Next.p == nullptr) // no successor
         {
             Next.ep = 0; // mark as empty successor
             break;
@@ -371,7 +371,7 @@ void MetropolisHastingsSampler::RemoveAndSaveTrack(EndPoint P)
         ComputeEndPointProposalDistribution(Current);
         AccumProb *= (m_SimpSamp.probFor(Next));
 
-        if (Next.p == 0) // no successor -> break
+        if (Next.p == nullptr) // no successor -> break
             break;
 
         energy += m_EnergyComputer->ComputeInternalEnergyConnection(Current.p,Current.ep,Next.p,Next.ep);
@@ -452,12 +452,12 @@ void MetropolisHastingsSampler::ComputeEndPointProposalDistribution(EndPoint P)
     m_ParticleGrid->ComputeNeighbors(R);
     m_SimpSamp.clear();
 
-    m_SimpSamp.add(m_StopProb,EndPoint(0,0));
+    m_SimpSamp.add(m_StopProb,EndPoint(nullptr,0));
 
     for (;;)
     {
         Particle *p2 =  m_ParticleGrid->GetNextNeighbor();
-        if (p2 == 0) break;
+        if (p2 == nullptr) break;
         if (p!=p2 && p2->label == 0)
         {
             if (p2->mID == -1)

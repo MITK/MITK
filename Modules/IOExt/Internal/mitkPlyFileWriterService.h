@@ -39,13 +39,13 @@ public:
   virtual ~PlyFileWriterService();
 
   using AbstractFileWriter::Write;
-  virtual void Write();
+  virtual void Write() override;
 
 private:
 
   PlyFileWriterService(const PlyFileWriterService& other);
 
-  virtual mitk::PlyFileWriterService* Clone() const;
+  virtual mitk::PlyFileWriterService* Clone() const override;
 
 };
 

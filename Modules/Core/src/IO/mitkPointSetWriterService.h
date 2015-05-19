@@ -42,13 +42,13 @@ public:
   virtual ~PointSetWriterService();
 
   using AbstractFileWriter::Write;
-  virtual void Write();
+  virtual void Write() override;
 
 private:
 
   PointSetWriterService(const PointSetWriterService& other);
 
-  virtual mitk::PointSetWriterService* Clone() const;
+  virtual mitk::PointSetWriterService* Clone() const override;
 
   /**
    * Converts an arbitrary type to a string. The type has to

@@ -30,7 +30,7 @@ public:
   static const QString DEFAULT_PERSPECTIVE_ID;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-      berry::IWorkbenchWindowConfigurer::Pointer configurer)
+      berry::IWorkbenchWindowConfigurer::Pointer configurer) override
   {
     // Set an individual initial size
     configurer->SetInitialSize(QPoint(600,400));
@@ -39,18 +39,13 @@ public:
     // Enable or disable the perspective bar
     configurer->SetShowPerspectiveBar(false);
 
-    wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
-    return wwAdvisor.data();
+    return new berry::WorkbenchWindowAdvisor(configurer);
   }
 
-  QString GetInitialWindowPerspectiveId()
+  QString GetInitialWindowPerspectiveId() override
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
-
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
 
 };
 
@@ -64,7 +59,7 @@ ExtensionPointDefinition::~ExtensionPointDefinition()
 {
 }
 
-int ExtensionPointDefinition::Start()
+QVariant ExtensionPointDefinition::Start(berry::IApplicationContext* /*context*/)
 {
 
   berry::Display* display = berry::PlatformUI::CreateDisplay();

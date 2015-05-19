@@ -535,8 +535,8 @@ public:
                                            bool sort = true,
                                            bool load4D = true,
                                            bool correctGantryTilt = true,
-                                           UpdateCallBackMethod callback = 0,
-                                           itk::SmartPointer<Image> preLoadedImageBlock = 0);
+                                           UpdateCallBackMethod callback = nullptr,
+                                           itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
   /**
     \brief See LoadDicomSeries! Just a slightly different interface.
@@ -549,8 +549,8 @@ public:
                               bool sort = true,
                               bool load4D = true,
                               bool correctGantryTilt = true,
-                              UpdateCallBackMethod callback = 0,
-                              itk::SmartPointer<Image> preLoadedImageBlock = 0);
+                              UpdateCallBackMethod callback = nullptr,
+                              itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
 protected:
 
@@ -849,12 +849,12 @@ protected:
     {
     }
 
-    void Execute(const itk::Object *caller, const itk::EventObject&)
+    void Execute(const itk::Object *caller, const itk::EventObject&) override
     {
       (*this->m_Callback)(static_cast<const itk::ProcessObject*>(caller)->GetProgress());
     }
 
-    void Execute(itk::Object *caller, const itk::EventObject&)
+    void Execute(itk::Object *caller, const itk::EventObject&) override
     {
       (*this->m_Callback)(static_cast<itk::ProcessObject*>(caller)->GetProgress());
     }

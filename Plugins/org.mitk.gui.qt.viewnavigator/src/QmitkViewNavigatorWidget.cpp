@@ -25,6 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIExtensionRegistry.h>
+#include <berryIHandlerService.h>
+#include <berryIWorkbenchCommandConstants.h>
+#include <berryUIElement.h>
+
+// MITK
+#include <mitkLogMacros.h>
 
 // Qt
 #include <QHash>
@@ -74,8 +80,8 @@ private :
     bool hasToBeDisplayed(const QModelIndex index) const;
     bool displayElement(const QModelIndex index) const;
 public:
-    ClassFilterProxyModel(QObject *parent = NULL);
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    ClassFilterProxyModel(QObject *parent = nullptr);
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 };
 ClassFilterProxyModel::ClassFilterProxyModel(QObject *parent):
     QSortFilterProxyModel(parent)
@@ -172,7 +178,7 @@ public:
     {
     }
 
-    Events::Types GetPerspectiveEventTypes() const
+    Events::Types GetPerspectiveEventTypes() const override
     {
         return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED
                 // remove the following line when command framework is finished
@@ -180,34 +186,38 @@ public:
     }
 
     void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                              const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                              const berry::IPerspectiveDescriptor::Pointer& perspective) override
     {
+        parentWidget->m_ActivePerspective = perspective;
         parentWidget->UpdateTreeList();
     }
 
     void PerspectiveSavedAs(const berry::IWorkbenchPage::Pointer& /*page*/,
                             const berry::IPerspectiveDescriptor::Pointer& /*oldPerspective*/,
-                            const berry::IPerspectiveDescriptor::Pointer& /*newPerspective*/)
+                            const berry::IPerspectiveDescriptor::Pointer& newPerspective) override
     {
-
+      parentWidget->m_ActivePerspective = newPerspective;
+      parentWidget->UpdateTreeList();
     }
 
     void PerspectiveDeactivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                                const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                                const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
     {
-        parentWidget->UpdateTreeList();
+      parentWidget->m_ActivePerspective = nullptr;
+      parentWidget->UpdateTreeList();
     }
 
     void PerspectiveOpened(const berry::IWorkbenchPage::Pointer& /*page*/,
-                           const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                           const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
     {
         parentWidget->UpdateTreeList();
     }
 
     void PerspectiveClosed(const berry::IWorkbenchPage::Pointer& /*page*/,
-                           const berry::IPerspectiveDescriptor::Pointer& /*perspective*/)
+                           const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
     {
-        parentWidget->UpdateTreeList();
+      parentWidget->m_ActivePerspective = nullptr;
+      parentWidget->UpdateTreeList();
     }
 
     using IPerspectiveListener::PerspectiveChanged;
@@ -219,47 +229,11 @@ public:
         if (changeId=="viewHide" && partRef->GetId()=="org.mitk.views.viewnavigatorview")
             berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->RemovePerspectiveListener(parentWidget->m_PerspectiveListener.data());
         else
-            parentWidget->UpdateTreeList(NULL, partRef.GetPointer(), changeId);
+            parentWidget->UpdateTreeList(nullptr, partRef.GetPointer(), changeId);
     }
 
 private:
     QmitkViewNavigatorWidget* parentWidget;
-};
-
-struct ViewNavigatorWindowListener : public berry::IWindowListener
-{
-    ViewNavigatorWindowListener(QmitkViewNavigatorWidget* switcher)
-        : switcher(switcher)
-        , m_Done(false)
-    {}
-
-    virtual void WindowOpened(const berry::IWorkbenchWindow::Pointer& window)
-    {
-        if (m_Done)
-            return;
-        if ( switcher->FillTreeList() )
-        {
-            m_Done = true;
-            switcher->m_PerspectiveListener.reset(new ViewNavigatorPerspectiveListener(switcher));
-            window->AddPerspectiveListener(switcher->m_PerspectiveListener.data());
-        }
-    }
-
-    virtual void WindowActivated(const berry::IWorkbenchWindow::Pointer& window)
-    {
-        if (m_Done)
-            return;
-        if ( switcher->FillTreeList() )
-        {
-            m_Done = true;
-            switcher->m_PerspectiveListener.reset(new ViewNavigatorPerspectiveListener(switcher));
-            window->AddPerspectiveListener(switcher->m_PerspectiveListener.data());
-        }
-    }
-
-private:
-    QmitkViewNavigatorWidget* switcher;
-    bool m_Done;
 };
 
 bool compareViews(const berry::IViewDescriptor::Pointer& a, const berry::IViewDescriptor::Pointer& b)
@@ -278,13 +252,15 @@ bool comparePerspectives(const berry::IPerspectiveDescriptor::Pointer& a, const 
 
 bool compareQStandardItems(const QStandardItem* a, const QStandardItem* b)
 {
-    if (a==NULL || b==NULL)
+    if (a==nullptr || b==nullptr)
         return false;
     return a->text().compare(b->text()) < 0;
 }
 
-QmitkViewNavigatorWidget::QmitkViewNavigatorWidget( QWidget * parent, Qt::WindowFlags )
+QmitkViewNavigatorWidget::QmitkViewNavigatorWidget(berry::IWorkbenchWindow::Pointer window,
+                                                   QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
+    , m_Window(window)
 {
     m_Generated = false;
     this->CreateQtPartControl(this);
@@ -292,7 +268,7 @@ QmitkViewNavigatorWidget::QmitkViewNavigatorWidget( QWidget * parent, Qt::Window
 
 QmitkViewNavigatorWidget::~QmitkViewNavigatorWidget()
 {
-
+  m_Window->RemovePerspectiveListener(m_PerspectiveListener.data());
 }
 
 void QmitkViewNavigatorWidget::setFocus()
@@ -303,16 +279,8 @@ void QmitkViewNavigatorWidget::setFocus()
 void QmitkViewNavigatorWidget::CreateQtPartControl( QWidget *parent )
 {
     // create GUI widgets from the Qt Designer's .ui file
-    if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNotNull())
-    {
-        m_PerspectiveListener.reset(new ViewNavigatorPerspectiveListener(this));
-        berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->AddPerspectiveListener(m_PerspectiveListener.data());
-    }
-    else
-    {
-        m_WindowListener.reset(new ViewNavigatorWindowListener(this));
-        berry::PlatformUI::GetWorkbench()->AddWindowListener(m_WindowListener.data());
-    }
+    m_PerspectiveListener.reset(new ViewNavigatorPerspectiveListener(this));
+    m_Window->AddPerspectiveListener(m_PerspectiveListener.data());
 
     m_Parent = parent;
     m_Controls.setupUi( parent );
@@ -329,11 +297,13 @@ void QmitkViewNavigatorWidget::CreateQtPartControl( QWidget *parent )
     m_FilterProxyModel->setSourceModel(m_TreeModel);
     //proxyModel->setFilterFixedString("Diff");
     m_Controls.m_PluginTreeView->setModel(m_FilterProxyModel);
+
+    this->UpdateTreeList();
 }
 
 void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkbenchPartReference *partRef, const std::string &changeId)
 {
-    berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+    berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();
     if (page.IsNull())
         return;
 
@@ -342,7 +312,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkb
       m_Generated = FillTreeList();
     }
 
-    if (root==NULL)
+    if (root==nullptr)
         root = m_TreeModel->invisibleRootItem();
     for (int i=0; i<root->rowCount(); i++)
     {
@@ -368,7 +338,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkb
                     break;
                 }
 
-            if( partRef!=NULL && partRef->GetId()==vItem->m_View->GetId() && changeId=="viewHide")
+            if( partRef!=nullptr && partRef->GetId()==vItem->m_View->GetId() && changeId=="viewHide")
                 font.setBold(false);
 
             vItem->setFont(font);
@@ -380,11 +350,11 @@ void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkb
 bool QmitkViewNavigatorWidget::FillTreeList()
 {
     // active workbench window available?
-    if (berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow().IsNull())
+    if (m_Window.IsNull())
         return false;
 
     // active page available?
-    berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+    berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();
     if (page.IsNull())
         return false;
 
@@ -405,7 +375,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     KeywordRegistry keywordRegistry;
 
     berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
-    QStringList perspectiveExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetPerspectiveExcludeList();
+    //QStringList perspectiveExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetPerspectiveExcludeList();
 
     std::vector< QStandardItem* > categoryItems;
     QStandardItem *perspectiveRootItem = new QStandardItem("Workflows");
@@ -416,7 +386,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     for (int i=0; i<perspectiveDescriptors.size(); i++)
     {
         berry::IPerspectiveDescriptor::Pointer p = perspectiveDescriptors.at(i);
-
+/*
         bool skipPerspective = false;
         for(int e=0; e<perspectiveExcludeList.size(); e++)
             if(perspectiveExcludeList.at(e)==p->GetId())
@@ -426,7 +396,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
             }
         if (skipPerspective)
             continue;
-
+*/
         //QIcon* pIcon = static_cast<QIcon*>(p->GetImageDescriptor()->CreateImage());
         mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(p->GetLabel());
         pItem->m_Perspective = p;
@@ -446,7 +416,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
         }
         else
         {
-            QStandardItem* categoryItem = NULL;
+            QStandardItem* categoryItem = nullptr;
 
             for (unsigned int c=0; c<categoryItems.size(); c++)
             {
@@ -457,7 +427,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
                 }
             }
 
-            if (categoryItem==NULL)
+            if (categoryItem==nullptr)
             {
                 categoryItem  = new QStandardItem(QIcon(),catPath.front());
                 categoryItems.push_back(categoryItem);
@@ -476,10 +446,10 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     QList<berry::IViewDescriptor::Pointer> viewDescriptors(viewRegistry->GetViews());
     QList<berry::IViewPart::Pointer> viewParts(page->GetViews());
     qSort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
-    QStandardItem* emptyItem = new QStandardItem();
+    auto   emptyItem = new QStandardItem();
     emptyItem->setFlags(Qt::ItemIsEnabled);
     treeRootItem->appendRow(emptyItem);
-    QStringList viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
+    //QStringList viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
     QStandardItem* viewRootItem = new QStandardItem(QIcon(),"Views");
     viewRootItem->setFont(QFont("", 12, QFont::Normal));
     viewRootItem->setEditable(false);
@@ -493,6 +463,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     for (int i = 0; i < viewDescriptors.size(); ++i)
     {
         berry::IViewDescriptor::Pointer v = viewDescriptors[i];
+        /*
         bool skipView = false;
         for(int e=0; e<viewExcludeList.size(); e++)
             if(viewExcludeList.at(e)==v->GetId())
@@ -502,7 +473,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
             }
         if (skipView)
             continue;
-
+*/
         QStringList catPath = v->GetCategoryPath();
 
         QIcon icon = v->GetImageDescriptor();
@@ -527,7 +498,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
             noCategoryItem->appendRow(vItem);
         else
         {
-            QStandardItem* categoryItem = NULL;
+            QStandardItem* categoryItem = nullptr;
 
             for (unsigned int c=0; c<categoryItems.size(); c++)
                 if (categoryItems.at(c)->text() == catPath.front())
@@ -536,7 +507,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
                     break;
                 }
 
-            if (categoryItem==NULL)
+            if (categoryItem==nullptr)
             {
                 categoryItem  = new QStandardItem(QIcon(),catPath.front());
                 categoryItems.push_back(categoryItem);
@@ -587,7 +558,7 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
         }
         catch (...)
         {
-            QMessageBox::critical(0, "Opening Perspective Failed", QString("The requested perspective could not be opened.\nSee the log for details."));
+            QMessageBox::critical(nullptr, "Opening Perspective Failed", QString("The requested perspective could not be opened.\nSee the log for details."));
         }
     }
     else if ( dynamic_cast< mitk::QtViewItem* >(item) )
@@ -609,92 +580,35 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
     }
 }
 
-void QmitkViewNavigatorWidget::AddPerspective()
+void QmitkViewNavigatorWidget::SaveCurrentPerspectiveAs()
 {
-    QmitkNewPerspectiveDialog* dialog = new QmitkNewPerspectiveDialog( m_Parent );
-
-    int dialogReturnValue = dialog->exec();
-    if ( dialogReturnValue == QDialog::Rejected )
-        return;
-
-    berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-    try
-    {
-        berry::IPerspectiveDescriptor::Pointer perspDesc;
-        perspDesc = perspRegistry->CreatePerspective(dialog->GetPerspectiveName(), perspRegistry->FindPerspectiveWithId(perspRegistry->GetDefaultPerspective()));
-        berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->SetPerspective(perspDesc);
-    }
-    catch(...)
-    {
-        QMessageBox::warning(m_Parent, "Error", "Duplication of selected perspective failed. Please make sure the specified perspective name is not already in use!");
-    }
+  berry::IHandlerService* handlerService = m_Window->GetService<berry::IHandlerService>();
+  try
+  {
+    handlerService->ExecuteCommand(berry::IWorkbenchCommandConstants::WINDOW_SAVE_PERSPECTIVE_AS,
+                                   berry::UIElement::Pointer());
     FillTreeList();
+  }
+  catch(const berry::NotHandledException)
+  {}
+  catch(const berry::CommandException& e)
+  {
+    MITK_ERROR << e.what();
+  }
 }
 
-void QmitkViewNavigatorWidget::ClonePerspective()
-{
-    if (m_RegisteredPerspective.IsNotNull())
-    {
-        QmitkNewPerspectiveDialog* dialog = new QmitkNewPerspectiveDialog( m_Parent );
-        QString defaultName = m_RegisteredPerspective->GetLabel();
-        defaultName.append(" Copy");
-        dialog->SetPerspectiveName(defaultName);
-
-        int dialogReturnValue = dialog->exec();
-        if ( dialogReturnValue == QDialog::Rejected )
-            return;
-
-        berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-        try
-        {
-            berry::IPerspectiveDescriptor::Pointer perspDesc = perspRegistry->ClonePerspective(dialog->GetPerspectiveName(), dialog->GetPerspectiveName(), m_RegisteredPerspective);
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->SetPerspective(perspDesc);
-        }
-        catch(...)
-        {
-            QMessageBox::warning(m_Parent, "Error", "Duplication of selected perspective failed. Please make sure the specified perspective name is not already in use!");
-        }
-        FillTreeList();
-    }
-}
-
-void QmitkViewNavigatorWidget::ResetPerspective()
+void QmitkViewNavigatorWidget::ResetCurrentPerspective()
 {
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to reset the current perspective?", QMessageBox::Yes|QMessageBox::No).exec())
         berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
-}
-
-void QmitkViewNavigatorWidget::DeletePerspective()
-{
-    if (m_RegisteredPerspective.IsNotNull())
-    {
-        QString question = "Do you really want to remove the perspective '";
-        question.append(m_RegisteredPerspective->GetLabel());
-        question.append("'?");
-        if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", question, QMessageBox::Yes|QMessageBox::No).exec())
-        {
-          if( m_RegisteredPerspective == berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->GetPerspective() )
-          {
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->CloseCurrentPerspective(true, true);
-          }
-            berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-            perspRegistry->DeletePerspective(m_RegisteredPerspective);
-            berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->RemovePerspective(m_RegisteredPerspective);
-            FillTreeList();
-            if (! berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->GetPerspective())
-            {
-                berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->Close();
-            }
-        }
-    }
 }
 
 void QmitkViewNavigatorWidget::ClosePerspective()
 {
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Question, "Please confirm", "Do you really want to close the current perspective?", QMessageBox::Yes|QMessageBox::No).exec())
     {
-        berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
-        page->CloseCurrentPerspective(true, true);
+        berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();
+        page->ClosePerspective(page->GetPerspective(), true, true);
 
         //        if ( page->GetPerspective().IsNull() )
         //        {
@@ -731,11 +645,10 @@ void QmitkViewNavigatorWidget::CustomMenuRequested(QPoint pos)
     QModelIndex index = m_Controls.m_PluginTreeView->indexAt(pos);
     QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
 
-    if (m_ContextMenu==NULL)
+    if (m_ContextMenu==nullptr)
         return;
 
     m_ContextMenu->clear();
-    m_RegisteredPerspective = NULL;
 
     QAction* expandAction = new QAction("Expand tree", this);
     m_ContextMenu->addAction(expandAction);
@@ -747,31 +660,26 @@ void QmitkViewNavigatorWidget::CustomMenuRequested(QPoint pos)
 
     m_ContextMenu->addSeparator();
 
-    if ( item!=NULL && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
+
+    if ( item!=nullptr && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
     {
-        m_RegisteredPerspective = dynamic_cast< mitk::QtPerspectiveItem* >(item)->m_Perspective;
-
-        //m_ContextMenu->addSeparator();
-
-        QAction* cloneAction = new QAction("Duplicate perspective", this);
-        m_ContextMenu->addAction(cloneAction);
-        connect(cloneAction, SIGNAL(triggered()), SLOT(ClonePerspective()));
-
-        if (!m_RegisteredPerspective->IsPredefined())
+        berry::IPerspectiveDescriptor::Pointer persp = dynamic_cast< mitk::QtPerspectiveItem* >(item)->m_Perspective;
+        if (this->m_ActivePerspective.IsNotNull() && this->m_ActivePerspective == persp)
         {
-            QAction* deleteAction = new QAction("Remove perspective", this);
-            m_ContextMenu->addAction(deleteAction);
-            connect(deleteAction, SIGNAL(triggered()), SLOT(DeletePerspective()));
-        }
+          //m_ContextMenu->addSeparator();
 
-        m_ContextMenu->addSeparator();
+          QAction* saveAsAction = new QAction("Save As...", this);
+          m_ContextMenu->addAction(saveAsAction);
+          connect(saveAsAction, SIGNAL(triggered()), SLOT(SaveCurrentPerspectiveAs()));
+          m_ContextMenu->addSeparator();
+        }
     }
 
     QAction* resetAction = new QAction("Reset current perspective", this);
     m_ContextMenu->addAction(resetAction);
-    connect(resetAction, SIGNAL(triggered()), SLOT(ResetPerspective()));
+    connect(resetAction, SIGNAL(triggered()), SLOT(ResetCurrentPerspective()));
 
-    QAction* closeAction = new QAction("Close current perspective", this);
+    QAction* closeAction = new QAction("Close perspective", this);
     m_ContextMenu->addAction(closeAction);
     connect(closeAction, SIGNAL(triggered()), SLOT(ClosePerspective()));
 

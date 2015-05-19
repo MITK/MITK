@@ -43,7 +43,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks if the nodes data object is of the specified dimension
-    virtual bool CheckNode(const mitk::DataNode* node) const;
+    virtual bool CheckNode(const mitk::DataNode* node) const override;
 
   protected:
 

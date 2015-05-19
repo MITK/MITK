@@ -72,11 +72,11 @@ mitk::TrackingTool* mitk::ClaronTrackingDevice::AddTool( const char* toolName, c
   mitk::ClaronTool::Pointer t = mitk::ClaronTool::New();
   if (t->LoadFile(fileName) == false)
   {
-    return NULL;
+    return nullptr;
   }
   t->SetToolName(toolName);
   if (this->InternalAddTool(t) == false)
-    return NULL;
+    return nullptr;
   return t.GetPointer();
 }
 
@@ -92,7 +92,7 @@ std::vector<mitk::ClaronTool::Pointer> mitk::ClaronTrackingDevice::DetectTools()
 {
   std::vector<mitk::ClaronTool::Pointer> returnValue;
   std::vector<claronToolHandle> allHandles = m_Device->GetAllActiveTools();
-  for (std::vector<claronToolHandle>::iterator iter = allHandles.begin(); iter != allHandles.end(); ++iter)
+  for (auto iter = allHandles.begin(); iter != allHandles.end(); ++iter)
   {
     ClaronTool::Pointer newTool = ClaronTool::New();
     newTool->SetToolName(m_Device->GetName(*iter));
@@ -161,7 +161,7 @@ unsigned int mitk::ClaronTrackingDevice::GetToolCount() const
 mitk::TrackingTool* mitk::ClaronTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   if ( toolNumber >= this->GetToolCount())
-    return NULL;
+    return nullptr;
   else
     return this->m_AllTools[toolNumber];
 }
@@ -317,17 +317,17 @@ ITK_THREAD_RETURN_TYPE mitk::ClaronTrackingDevice::ThreadStartTracking(void* pIn
 {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
   ClaronTrackingDevice *trackingDevice = (ClaronTrackingDevice*)pInfo->UserData;
 
-  if (trackingDevice != NULL)
+  if (trackingDevice != nullptr)
     trackingDevice->TrackTools();
 
   return ITK_THREAD_RETURN_VALUE;

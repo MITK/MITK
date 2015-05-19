@@ -73,7 +73,7 @@ namespace mitk
     ///
     /// executes the Algorithm
     ///
-    void Update()
+    void Update() override
     {
       endoAccessCvMat( ToString, '\n', (*m_String), (*m_CvMat) );
     }

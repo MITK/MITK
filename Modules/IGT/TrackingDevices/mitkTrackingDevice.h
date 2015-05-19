@@ -38,7 +38,7 @@ namespace mitk {
     class MITKIGT_EXPORT TrackingDevice : public itk::Object
     {
     public:
-      mitkClassMacro(TrackingDevice, itk::Object);
+      mitkClassMacroItkParent(TrackingDevice, itk::Object);
 
       /** Defines the rotation modes of this tracking device which results in different representations
        *  of quaternions.

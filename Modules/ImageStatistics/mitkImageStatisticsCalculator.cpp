@@ -104,13 +104,13 @@ void ImageStatisticsCalculator::SetUseDefaultBinSize(bool useDefault)
 }
 
 ImageStatisticsCalculator::Statistics::Statistics(bool withHotspotStatistics)
-:m_HotspotStatistics(withHotspotStatistics ? new Statistics(false) : NULL)
+:m_HotspotStatistics(withHotspotStatistics ? new Statistics(false) : nullptr)
 {
   Reset();
 }
 
 ImageStatisticsCalculator::Statistics::Statistics(const Statistics& other)
-:m_HotspotStatistics( NULL)
+:m_HotspotStatistics( nullptr)
 {
   this->SetLabel( other.GetLabel() );
   this->SetN( other.GetN() );
@@ -134,7 +134,7 @@ ImageStatisticsCalculator::Statistics::Statistics(const Statistics& other)
 
 bool ImageStatisticsCalculator::Statistics::HasHotspotStatistics() const
 {
-  return m_HotspotStatistics != NULL;
+  return m_HotspotStatistics != nullptr;
 }
 
 void ImageStatisticsCalculator::Statistics::SetHasHotspotStatistics(bool hasHotspotStatistics)
@@ -214,7 +214,7 @@ void ImageStatisticsCalculator::Statistics::Reset(unsigned int dimension)
   SetMinIndex(zero);
   SetHotspotIndex(zero);
 
-  if (m_HotspotStatistics != NULL)
+  if (m_HotspotStatistics != nullptr)
   {
     m_HotspotStatistics->Reset(dimension);
   }
@@ -266,7 +266,7 @@ ImageStatisticsCalculator::Statistics::operator=(ImageStatisticsCalculator::Stat
   this->SetHotspotIndex( other.GetHotspotIndex() );
 
   delete this->m_HotspotStatistics;
-  this->m_HotspotStatistics = NULL;
+  this->m_HotspotStatistics = nullptr;
 
   if (other.m_HotspotStatistics)
   {
@@ -518,7 +518,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   // it, delete it.
   if ( m_ImageMask.IsNotNull() && (m_ImageMask->GetReferenceCount() == 1) )
   {
-    m_ImageMask = NULL;
+    m_ImageMask = nullptr;
   }
 
   // Check if statistics is already up-to-date
@@ -661,7 +661,7 @@ ImageStatisticsCalculator::GetHistogram( unsigned int timeStep, unsigned int lab
 {
   if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
   {
-    return NULL;
+    return nullptr;
   }
 
   switch ( m_MaskingMode )
@@ -789,8 +789,8 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
   case MASKING_MODE_NONE:
     {
       m_InternalImage = timeSliceImage;
-      m_InternalImageMask2D = NULL;
-      m_InternalImageMask3D = NULL;
+      m_InternalImageMask2D = nullptr;
+      m_InternalImageMask3D = nullptr;
 
       if(m_DoIgnorePixelValue)
       {
@@ -849,7 +849,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
   case MASKING_MODE_PLANARFIGURE:
     {
-      m_InternalImageMask2D = NULL;
+      m_InternalImageMask2D = nullptr;
 
       if ( m_PlanarFigure.IsNull() )
       {
@@ -861,20 +861,20 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       }
 
       const BaseGeometry *imageGeometry = timeSliceImage->GetGeometry();
-      if ( imageGeometry == NULL )
+      if ( imageGeometry == nullptr )
       {
         throw std::runtime_error( "Image geometry invalid!" );
       }
 
       const PlaneGeometry *planarFigurePlaneGeometry = m_PlanarFigure->GetPlaneGeometry();
-      if ( planarFigurePlaneGeometry == NULL )
+      if ( planarFigurePlaneGeometry == nullptr )
       {
         throw std::runtime_error( "Planar-Figure not yet initialized!" );
       }
 
       const PlaneGeometry *planarFigureGeometry =
         dynamic_cast< const PlaneGeometry * >( planarFigurePlaneGeometry );
-      if ( planarFigureGeometry == NULL )
+      if ( planarFigureGeometry == nullptr )
       {
         throw std::runtime_error( "Non-planar planar figures not supported!" );
       }
@@ -1080,11 +1080,16 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   statisticsContainer->push_back( statistics );
 
   // Calculate histogram
-  unsigned int numberOfBins = 200;
+  // calculate bin size or number of bins
+  unsigned int numberOfBins = 200; // default number of bins
   if (m_UseDefaultBinSize)
+  {
     m_HistogramBinSize = std::ceil( (statistics.GetMax() - statistics.GetMin() + 1)/numberOfBins );
+  }
   else
-    numberOfBins = calcNumberOfBins(statistics.GetMin(), statistics.GetMax());
+  {
+     numberOfBins = calcNumberOfBins(statistics.GetMin(), statistics.GetMax());
+  }
 
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
@@ -1149,35 +1154,9 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   histogramContainer->clear();
 
   // Make sure that mask is set
-  if ( maskImage == NULL  )
+  if ( maskImage == nullptr  )
   {
     itkExceptionMacro( << "Mask image needs to be set!" );
-  }
-
-
-  // Make sure that spacing of mask and image are the same
-  SpacingType imageSpacing = image->GetSpacing();
-  SpacingType maskSpacing = maskImage->GetSpacing();
-  PointType zeroPoint; zeroPoint.Fill( 0.0 );
-  if ( (zeroPoint + imageSpacing).SquaredEuclideanDistanceTo( (zeroPoint + maskSpacing) ) > mitk::eps )
-  {
-    itkExceptionMacro( << "Mask needs to have same spacing as image! (Image spacing: " << imageSpacing << "; Mask spacing: " << maskSpacing << ")" );
-  }
-
-  // Make sure that orientation of mask and image are the same
-  typedef typename ImageType::DirectionType DirectionType;
-  DirectionType imageDirection = image->GetDirection();
-  DirectionType maskDirection = maskImage->GetDirection();
-  for( int i = 0; i < imageDirection.ColumnDimensions; ++i )
-  {
-    for( int j = 0; j < imageDirection.ColumnDimensions; ++j )
-    {
-      double differenceDirection = imageDirection[i][j] - maskDirection[i][j];
-      if ( fabs( differenceDirection ) > mitk::eps )
-      {
-        itkExceptionMacro( << "Mask needs to have same direction as image! (Image direction: " << imageDirection << "; Mask direction: " << maskDirection << ")" );
-      }
-    }
   }
 
   // Make sure that the voxels of mask and image are correctly "aligned", i.e., voxel boundaries are the same in both images
@@ -1196,7 +1175,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     double misalignment = maskOriginContinousIndex[i] - floor( maskOriginContinousIndex[i] + 0.5 );
     if ( fabs( misalignment ) > mitk::eps )
     {
-      itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
+      itkWarningMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
     }
 
     double indexCoordDistance = maskOriginContinousIndex[i] - imageOriginContinousIndex[i];
@@ -1211,13 +1190,23 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   adaptMaskFilter->SetInput( maskImage );
   adaptMaskFilter->SetOutputOrigin( image->GetOrigin() );
   adaptMaskFilter->SetOutputOffset( offset );
-  adaptMaskFilter->Update();
-  typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
+
+  typename MaskImageType::Pointer adaptedMaskImage;
+  try
+  {
+    adaptMaskFilter->Update();
+    adaptedMaskImage = adaptMaskFilter->GetOutput();
+  }
+  catch( const itk::ExceptionObject &e)
+  {
+    mitkThrow() << "Attempt to adapt shifted origin of the mask image failed due to ITK Exception: \n" << e.what();
+  }
 
   // Make sure that mask region is contained within image region
-  if ( !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
+  if ( adaptedMaskImage.IsNotNull() &&
+       !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
   {
-    itkExceptionMacro( << "Mask region needs to be inside of image region! (Image region: "
+    itkWarningMacro( << "Mask region needs to be inside of image region! (Image region: "
       << image->GetLargestPossibleRegion() << "; Mask region: " << adaptedMaskImage->GetLargestPossibleRegion() << ")" );
   }
 
@@ -1253,9 +1242,25 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( adaptedImage );
 
-  statisticsFilter->Update();
+  try
+  {
+   statisticsFilter->Update();
+  }
+  catch( const itk::ExceptionObject& e)
+  {
+    mitkThrow() << "Image statistics initialization computation failed with ITK Exception: \n " << e.what();
+  }
 
-  int numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
+  // Calculate bin size or number of bins
+  unsigned int numberOfBins = 200; // default number of bins
+  if (m_UseDefaultBinSize)
+  {
+    m_HistogramBinSize = std::ceil( static_cast<double>((statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1)/numberOfBins) );
+  }
+  else
+  {
+    numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
+  }
 
   typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
   labelStatisticsFilter = LabelStatisticsFilterType::New();
@@ -1283,9 +1288,19 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
 
   // Execute the filter
-  labelStatisticsFilter->Update();
+  try
+  {
+    labelStatisticsFilter->Update();
+  }
+  catch( const itk::ExceptionObject& e)
+  {
+    mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
+  }
+
   this->InvokeEvent( itk::EndEvent() );
-  labelStatisticsFilter->RemoveObserver( observerTag );
+
+  if( observerTag )
+    labelStatisticsFilter->RemoveObserver( observerTag );
 
   // Find all relevant labels of mask (other than 0)
   std::list< int > relevantLabels;
@@ -1456,7 +1471,7 @@ ImageStatisticsCalculator::CalculateExtremaWorld(
     minIndex[i] = 0;
   }
 
-  if (maskImage != NULL)
+  if (maskImage != nullptr)
   {
     MaskImageIteratorType maskIt(maskImage, maskImage->GetLargestPossibleRegion());
     typename ImageType::IndexType imageIndex;
@@ -1894,7 +1909,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     points->InsertNextPoint( point3D[i0], point3D[i1], 0 );
   }
 
-  vtkSmartPointer<vtkPoints> holePoints = NULL;
+  vtkSmartPointer<vtkPoints> holePoints = nullptr;
 
   if (!planarFigureHolePolyline.empty())
   {
@@ -1936,9 +1951,9 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   lassoStencil->SetShapeToPolygon();
   lassoStencil->SetPoints( points );
 
-  vtkSmartPointer<vtkLassoStencilSource> holeLassoStencil = NULL;
+  vtkSmartPointer<vtkLassoStencilSource> holeLassoStencil = nullptr;
 
-  if (holePoints.GetPointer() != NULL)
+  if (holePoints.GetPointer() != nullptr)
   {
     holeLassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
     holeLassoStencil->SetShapeToPolygon();
@@ -1963,9 +1978,9 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();
 
-  vtkSmartPointer<vtkImageStencil> holeStencilFilter = NULL;
+  vtkSmartPointer<vtkImageStencil> holeStencilFilter = nullptr;
 
-  if (holeLassoStencil.GetPointer() != NULL)
+  if (holeLassoStencil.GetPointer() != nullptr)
   {
     holeStencilFilter = vtkSmartPointer<vtkImageStencil>::New();
     holeStencilFilter->SetInputConnection(imageStencilFilter->GetOutputPort());
@@ -1977,7 +1992,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
   // Export from VTK back to ITK
   vtkSmartPointer<vtkImageExport> vtkExporter = vtkSmartPointer<vtkImageExport>::New();
-  vtkExporter->SetInputConnection( holeStencilFilter.GetPointer() == NULL
+  vtkExporter->SetInputConnection( holeStencilFilter.GetPointer() == nullptr
     ? imageStencilFilter->GetOutputPort()
     : holeStencilFilter->GetOutputPort());
   vtkExporter->Update();

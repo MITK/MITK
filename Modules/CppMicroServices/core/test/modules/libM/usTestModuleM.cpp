@@ -28,11 +28,11 @@ class TestModuleMActivator : public ModuleActivator
 {
 public:
 
-  void Load(ModuleContext*)
+  void Load(ModuleContext*) override
   {
   }
 
-  void Unload(ModuleContext*)
+  void Unload(ModuleContext*) override
   {
   }
 

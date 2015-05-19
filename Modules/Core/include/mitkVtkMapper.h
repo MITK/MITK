@@ -67,7 +67,7 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
      * \brief Returns whether this is an vtk-based mapper
      * \deprecatedSince{2013_03} All mappers of superclass VTKMapper are vtk based, use a dynamic_cast instead
      */
-    DEPRECATED( virtual bool IsVtkBased() const );
+    DEPRECATED( virtual bool IsVtkBased() const override );
 
 
     /** \brief Determines which geometry should be rendered
@@ -76,7 +76,7 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
     *
     * Called by mitk::VtkPropRenderer::Render
     */
-    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type);
+    void MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type) override;
 
     /** \brief Checks visibility and renders the overlay */
     virtual void MitkRenderOverlay(BaseRenderer* renderer);
@@ -129,7 +129,7 @@ class MITKCORE_EXPORT VtkMapper : public Mapper
     * \brief Apply color and opacity properties read from the PropertyList.
     * Called by mapper subclasses.
     */
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor);
+    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor * actor) override;
 
     /**
     * \brief  Release vtk-based graphics resources that are being consumed by this mapper.

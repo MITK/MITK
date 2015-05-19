@@ -28,12 +28,12 @@ CustomViewer::~CustomViewer()
 {
 }
 
-int CustomViewer::Start()
+QVariant CustomViewer::Start(berry::IApplicationContext* /*context*/)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
 
-  wbAdvisor.reset(new CustomViewerWorkbenchAdvisor);
-  int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor.data());
+  auto  wbAdvisor = new CustomViewerWorkbenchAdvisor;
+  int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor);
 
   // exit the application with an appropriate return code
   return code == berry::PlatformUI::RETURN_RESTART

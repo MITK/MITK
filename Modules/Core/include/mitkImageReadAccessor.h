@@ -49,24 +49,24 @@ public:
    */
   ImageReadAccessor(
       ImageConstPointer image,
-      const ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = nullptr,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       );
 
   ImageReadAccessor(
       ImagePointer image,
-      const ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = nullptr,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       );
 
-  ImageReadAccessor(const Image* image, const ImageDataItem* iDI = NULL);
+  ImageReadAccessor(const Image* image, const ImageDataItem* iDI = nullptr);
 
   /** Destructor informs Image to unlock memory. */
   virtual ~ImageReadAccessor();
 
 protected:
 
-  virtual const Image* GetImage() const;
+  virtual const Image* GetImage() const override;
 
 private:
 

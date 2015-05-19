@@ -78,7 +78,7 @@ us::ModuleResource mitk::WatershedTool::GetIconResource() const
 
 const char** mitk::WatershedTool::GetXPM() const
 {
-  return NULL;
+  return nullptr;
 }
 
 const char* mitk::WatershedTool::GetName() const

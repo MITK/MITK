@@ -25,7 +25,7 @@ const QString QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION = "show
 const QString QmitkPropertiesPreferencePage::DEVELOPER_MODE = "enable developer mode";
 
 QmitkPropertiesPreferencePage::QmitkPropertiesPreferencePage()
-  : m_Control(NULL),
+  : m_Control(nullptr),
     m_Preferences(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.properties"))
 {
 }

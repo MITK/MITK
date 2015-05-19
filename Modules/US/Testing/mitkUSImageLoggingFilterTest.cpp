@@ -54,7 +54,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_TestFilter = mitk::USImageLoggingFilter::New();
     m_TemporaryTestDirectory = mitk::IOUtil::GetTempPath();
@@ -64,7 +64,7 @@ public:
     m_RealTestImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_TestFilter = NULL;
     m_RandomRestImage1 = NULL;

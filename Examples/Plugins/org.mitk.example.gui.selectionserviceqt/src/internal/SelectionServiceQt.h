@@ -43,8 +43,8 @@ public:
   SelectionServiceQt();
   ~SelectionServiceQt();
 
-  int Start();
-  void Stop();
+  QVariant Start(berry::IApplicationContext* context) override;
+  void Stop() override;
 
 private:
 

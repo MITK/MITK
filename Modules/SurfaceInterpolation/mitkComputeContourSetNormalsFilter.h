@@ -92,13 +92,13 @@ public:
 protected:
   ComputeContourSetNormalsFilter();
   virtual ~ComputeContourSetNormalsFilter();
-  virtual void GenerateData();
-  virtual void GenerateOutputInformation();
+  virtual void GenerateData() override;
+  virtual void GenerateOutputInformation() override;
 
 private:
 
   //The segmentation out of which the contours were extracted. Can be used to determine the direction of the normals
-  mitk::Image* m_SegmentationBinaryImage;
+  mitk::Image::Pointer m_SegmentationBinaryImage;
   double m_MaxSpacing;
 
   unsigned int m_NegativeNormalCounter;

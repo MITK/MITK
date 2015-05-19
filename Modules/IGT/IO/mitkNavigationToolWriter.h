@@ -41,7 +41,7 @@ namespace mitk
   friend class mitk::NavigationToolStorageSerializer;
 
   public:
-    mitkClassMacro(NavigationToolWriter,itk::Object);
+    mitkClassMacroItkParent(NavigationToolWriter,itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

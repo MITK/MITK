@@ -43,14 +43,14 @@ namespace mitk
     virtual ~NrrdQBallImageReader();
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   protected:
 
 
   private:
   private:
-    NrrdQBallImageReader* Clone() const;
+    NrrdQBallImageReader* Clone() const override;
 
     us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
   };

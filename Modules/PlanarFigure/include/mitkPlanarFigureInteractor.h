@@ -79,7 +79,7 @@ protected:
   PlanarFigureInteractor();
   virtual ~PlanarFigureInteractor();
 
-  virtual void ConnectActionsAndFunctions();
+  virtual void ConnectActionsAndFunctions() override;
 
   ////////  Conditions ////////
   bool CheckFigurePlaced( const InteractionEvent* interactionEvent );
@@ -118,6 +118,8 @@ protected:
   bool StartHovering( StateMachineAction*, InteractionEvent* interactionEvent );
 
   bool EndHovering( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  bool DeleteFigure( StateMachineAction*, InteractionEvent* interactionEvent );
 
   bool SetPreviewPointPosition( StateMachineAction*, InteractionEvent* interactionEvent );
 
@@ -182,7 +184,7 @@ protected:
 
   void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );
 
-  virtual void ConfigurationChanged();
+  virtual void ConfigurationChanged() override;
 
 private:
 

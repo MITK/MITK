@@ -62,11 +62,11 @@ public:
   QmitkFiberQuantificationView();
   virtual ~QmitkFiberQuantificationView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
-  virtual void Activated();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
+  virtual void Activated() override;
 
 protected slots:
 
@@ -76,7 +76,7 @@ protected slots:
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkFiberQuantificationViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;

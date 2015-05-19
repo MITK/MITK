@@ -54,14 +54,14 @@ class MITKCORE_EXPORT AbstractFileWriter : public mitk::IFileWriter
 {
 public:
 
-  virtual void SetInput(const BaseData* data);
-  virtual const BaseData* GetInput() const;
+  virtual void SetInput(const BaseData* data) override;
+  virtual const BaseData* GetInput() const override;
 
-  virtual void SetOutputLocation(const std::string& location);
-  virtual std::string GetOutputLocation() const;
+  virtual void SetOutputLocation(const std::string& location) override;
+  virtual std::string GetOutputLocation() const override;
 
-  virtual void SetOutputStream(const std::string& location, std::ostream* os);
-  virtual std::ostream* GetOutputStream() const;
+  virtual void SetOutputStream(const std::string& location, std::ostream* os) override;
+  virtual std::ostream* GetOutputStream() const override;
 
   /**
    * \brief Write the base data to the specified location or output stream.
@@ -79,21 +79,21 @@ public:
    * \see GetLocalFile()
    * \see IFileWriter::Write()
    */
-  virtual void Write() = 0;
+  virtual void Write() override = 0;
 
-  virtual ConfidenceLevel GetConfidenceLevel() const;
+  virtual ConfidenceLevel GetConfidenceLevel() const override;
 
   MimeType GetRegisteredMimeType() const;
 
-  virtual Options GetOptions() const;
-  virtual us::Any GetOption(const std::string &name) const;
+  virtual Options GetOptions() const override;
+  virtual us::Any GetOption(const std::string &name) const override;
 
-  virtual void SetOptions(const Options& options);
-  virtual void SetOption(const std::string& name, const us::Any& value);
+  virtual void SetOptions(const Options& options) override;
+  virtual void SetOption(const std::string& name, const us::Any& value) override;
 
-  virtual void AddProgressCallback(const ProgressCallback& callback);
+  virtual void AddProgressCallback(const ProgressCallback& callback) override;
 
-  virtual void RemoveProgressCallback(const ProgressCallback& callback);
+  virtual void RemoveProgressCallback(const ProgressCallback& callback) override;
 
   us::ServiceRegistration<IFileWriter> RegisterService(us::ModuleContext* context = us::GetModuleContext());
   void UnregisterService();

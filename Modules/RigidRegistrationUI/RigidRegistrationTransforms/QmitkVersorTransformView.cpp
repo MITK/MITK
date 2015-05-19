@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkVersorTransformView::GetTransform()
     AccessFixedDimensionByItk(m_FixedImage, GetTransform2, 3);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 template < class TPixelType, unsigned int VImageDimension >
@@ -88,7 +88,7 @@ itk::Object::Pointer QmitkVersorTransformView::GetTransform2(itk::Image<TPixelTy
     m_TransformObject = transformPointer.GetPointer();
     return transformPointer.GetPointer();
   }
-  return NULL;
+  return nullptr;
 }
 
 itk::Array<double> QmitkVersorTransformView::GetTransformParameters()

@@ -21,7 +21,7 @@ const char* mitk::USImageSource::IMAGE_PROPERTY_IDENTIFIER = "id_nummer";
 
 mitk::USImageSource::USImageSource()
 : m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
-  m_MitkToOpenCVFilter(0),
+  m_MitkToOpenCVFilter(nullptr),
   m_ImageFilter(mitk::BasicCombinationOpenCVImageFilter::New()),
   m_CurrentImageId(0)
 {

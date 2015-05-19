@@ -57,7 +57,7 @@ namespace mitk
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the smoothed output image.
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /*!
     \brief Make a 2D image to a 3D image

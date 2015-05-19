@@ -88,7 +88,7 @@ protected:
    * this function is overridden as protected, so that the user may not add
    * additional invalid scalar mode types.
    */
-  bool AddEnum( const std::string& name, const IdType& id = 0);
+  bool AddEnum( const std::string& name, const IdType& id = 0) override;
 
   /**
    * Adds the enumeration types as defined by vtk to the list of known
@@ -101,9 +101,9 @@ private:
   // purposely not implemented
   ShaderProperty& operator=(const ShaderProperty&);
 
-  virtual itk::LightObject::Pointer InternalClone() const;
+  virtual itk::LightObject::Pointer InternalClone() const override;
 
-  virtual bool Assign(const BaseProperty &property);
+  virtual bool Assign(const BaseProperty &property) override;
 
 };
 

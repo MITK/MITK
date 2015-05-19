@@ -75,15 +75,15 @@ namespace mitk {
     itkNewMacro( Self );
 
     // virtual methods that need to be implemented
-    virtual void UpdateOutputInformation()
+    virtual void UpdateOutputInformation() override
     {
       if ( this->GetSource() )
         this->GetSource()->UpdateOutputInformation();
     }
-    virtual void SetRequestedRegionToLargestPossibleRegion(){}
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){ return false; }
-    virtual bool VerifyRequestedRegion(){ return true; }
-    virtual void SetRequestedRegion(const itk::DataObject *data ){}
+    virtual void SetRequestedRegionToLargestPossibleRegion() override{}
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override{ return false; }
+    virtual bool VerifyRequestedRegion() override{ return true; }
+    virtual void SetRequestedRegion(const itk::DataObject *data ) override{}
 
     /** Add a new vertex to the graph */
     VertexDescriptorType AddVertex(const VertexType& vertexData);
@@ -137,7 +137,7 @@ namespace mitk {
     std::vector< EdgeType > GetVectorOfAllEdges() const;
 
     /** clear the graph */
-    void Clear();
+    void Clear() override;
 
     /** get the graph */
     const GraphType& GetGraph() const;

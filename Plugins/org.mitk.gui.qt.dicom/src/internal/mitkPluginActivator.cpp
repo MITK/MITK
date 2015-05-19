@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDicomPreferencePage.h"
 
 namespace mitk {
-ctkPluginContext* PluginActivator::pluginContext = 0;
+ctkPluginContext* PluginActivator::pluginContext = nullptr;
 
 void PluginActivator::start(ctkPluginContext* context)
 {
@@ -34,7 +34,7 @@ void PluginActivator::start(ctkPluginContext* context)
 void PluginActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
-  pluginContext = NULL;
+  pluginContext = nullptr;
 }
 ctkPluginContext* PluginActivator::getContext()
 {

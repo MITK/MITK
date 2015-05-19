@@ -45,13 +45,13 @@ namespace mitk
     virtual ~NrrdTensorImageReader();
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   protected:
 
 
   private:
-    NrrdTensorImageReader* Clone() const;
+    NrrdTensorImageReader* Clone() const override;
 
     us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
 

@@ -78,7 +78,7 @@ protected:
 
     ~RawImageFileReader();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     template < typename TPixel, unsigned int VImageDimensions > void TypedGenerateData();
 

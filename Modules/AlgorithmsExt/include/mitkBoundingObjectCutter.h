@@ -76,14 +76,18 @@ protected:
 
   virtual const PixelType GetOutputPixelType();
 
-  virtual void GenerateInputRequestedRegion();
-  virtual void GenerateOutputInformation();
-  virtual void GenerateData();
+  virtual void GenerateInputRequestedRegion() override;
+  virtual void GenerateOutputInformation() override;
+  virtual void GenerateData() override;
 
   template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel >
     friend void CutImageWithOutputTypeSelect( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep, TOutputPixel* dummy );
+  template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel >
+    friend void CutImageWithOutputTypeSelect( itk::VectorImage< TPixel, VImageDimension >* inputItkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep, TOutputPixel* dummy );
   template < typename TPixel, unsigned int VImageDimension >
     friend void CutImage( itk::Image< TPixel, VImageDimension >* itkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep );
+  template < typename TPixel, unsigned int VImageDimension >
+    friend void CutImage( itk::VectorImage< TPixel, VImageDimension >* itkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep );
   virtual void ComputeData(mitk::Image* input3D, int boTimeStep);
 
   //##Description

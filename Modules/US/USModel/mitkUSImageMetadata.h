@@ -32,7 +32,7 @@ namespace mitk {
   class MITKUS_EXPORT USImageMetadata : public itk::Object
   {
   public:
-    mitkClassMacro(USImageMetadata, itk::Object);
+    mitkClassMacroItkParent(USImageMetadata, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

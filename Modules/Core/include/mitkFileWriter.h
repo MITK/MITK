@@ -31,7 +31,7 @@ namespace mitk {
 class MITKCORE_EXPORT FileWriter : public itk::ProcessObject
 {
   public:
-    mitkClassMacro(FileWriter,itk::ProcessObject);
+    mitkClassMacroItkParent(FileWriter,itk::ProcessObject);
     //##Documentation
     //## @brief Get the specified the file to write
     //##
@@ -143,7 +143,7 @@ protected:
 };
 
 #define mitkWriterMacro                                                       \
-virtual void Write()                                                          \
+virtual void Write() override                                                 \
 {                                                                             \
   if ( this->GetInput() == NULL )                                             \
 {                                                                             \
@@ -157,7 +157,7 @@ virtual void Write()                                                          \
   this->UpdateOutputData(NULL);                                               \
 }                                                                             \
                                                                               \
-virtual void Update()                                                         \
+virtual void Update() override                                                \
 {                                                                             \
   Write();                                                                    \
 }

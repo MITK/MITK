@@ -30,7 +30,7 @@ QmitkCustomWidgetOverlay::~QmitkCustomWidgetOverlay()
 
 void QmitkCustomWidgetOverlay::SetWidget( QWidget* widget )
 {
-  if ( widget != NULL )
+  if ( widget != nullptr )
   {
     m_Widget = widget;
     m_WidgetIsCustom = true;

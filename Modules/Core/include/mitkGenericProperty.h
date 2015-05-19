@@ -60,7 +60,7 @@ class MITK_EXPORT GenericProperty : public BaseProperty
     itkSetMacro(Value,T);
     itkGetConstMacro(Value,T);
 
-    virtual std::string GetValueAsString() const
+    virtual std::string GetValueAsString() const override
     {
       std::stringstream myStr;
       myStr << GetValue() ;
@@ -85,19 +85,19 @@ class MITK_EXPORT GenericProperty : public BaseProperty
     // purposely not implemented
     GenericProperty& operator=(const GenericProperty&);
 
-    virtual itk::LightObject::Pointer InternalClone() const
+    virtual itk::LightObject::Pointer InternalClone() const override
     {
       itk::LightObject::Pointer result(new Self(*this));
       result->UnRegister();
       return result;
     }
 
-    virtual bool IsEqual(const BaseProperty& other) const
+    virtual bool IsEqual(const BaseProperty& other) const override
     {
       return (this->m_Value == static_cast<const Self&>(other).m_Value);
     }
 
-    virtual bool Assign(const BaseProperty& other)
+    virtual bool Assign(const BaseProperty& other) override
     {
       this->m_Value = static_cast<const Self&>(other).m_Value;
       return true;
@@ -132,14 +132,14 @@ protected:                                                    \
   PropertyName(const PropertyName&);                          \
   PropertyName(Type x);                                       \
 private:                                                      \
-  itk::LightObject::Pointer InternalClone() const;            \
+  itk::LightObject::Pointer InternalClone() const override;   \
 };
 
 #define mitkDefineGenericProperty(PropertyName,Type,DefaultValue)            \
   mitk::PropertyName::PropertyName()  : Superclass(DefaultValue) { }         \
   mitk::PropertyName::PropertyName(const PropertyName& other) : GenericProperty< Type >(other) {} \
   mitk::PropertyName::PropertyName(Type x) : Superclass(x) {}                \
-  itk::LightObject::Pointer mitk::PropertyName::InternalClone() const {      \
+  itk::LightObject::Pointer mitk::PropertyName::InternalClone() const { \
     itk::LightObject::Pointer result(new Self(*this));                       \
     result->UnRegister();                                                    \
     return result;                                                           \

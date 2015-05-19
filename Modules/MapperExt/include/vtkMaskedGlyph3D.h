@@ -36,7 +36,7 @@ class MITKMAPPEREXT_EXPORT vtkMaskedGlyph3D : public vtkGlyph3D
 {
 public:
   vtkTypeMacro(vtkMaskedGlyph3D,vtkGlyph3D);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Constructor
@@ -66,7 +66,7 @@ public:
   void SetRandomMode(int mode);
   int GetRandomMode();
 
-  virtual void SetInputConnection(vtkAlgorithmOutput* input);
+  virtual void SetInputConnection(vtkAlgorithmOutput* input) override;
 
   using vtkGlyph3D::SetInputConnection;
 
@@ -74,7 +74,7 @@ protected:
   vtkMaskedGlyph3D();
   ~vtkMaskedGlyph3D();
 
-  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;

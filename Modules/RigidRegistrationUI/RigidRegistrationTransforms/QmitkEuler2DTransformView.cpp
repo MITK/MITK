@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkEuler2DTransformView::GetTransform()
     AccessFixedDimensionByItk(m_FixedImage, GetTransform2, 2);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 template < class TPixelType, unsigned int VImageDimension >
@@ -86,7 +86,7 @@ itk::Object::Pointer QmitkEuler2DTransformView::GetTransform2(itk::Image<TPixelT
     m_TransformObject = transformPointer.GetPointer();
     return transformPointer.GetPointer();
   }
-  return NULL;
+  return nullptr;
 }
 
 itk::Array<double> QmitkEuler2DTransformView::GetTransformParameters()

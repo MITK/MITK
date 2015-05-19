@@ -46,7 +46,7 @@ class MITKDICOMRT_EXPORT IsoDoseLevelSet:
   public itk::Object
 {
 public:
-  mitkClassMacro(IsoDoseLevelSet, itk::Object);
+  mitkClassMacroItkParent(IsoDoseLevelSet, itk::Object);
   itkNewMacro(Self);
 
 private:

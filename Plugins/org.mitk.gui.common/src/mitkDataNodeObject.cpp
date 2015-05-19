@@ -20,7 +20,7 @@ namespace mitk
 {
 
 DataNodeObject::DataNodeObject() :
-  m_Node(0)
+  m_Node(nullptr)
 {
 
 }

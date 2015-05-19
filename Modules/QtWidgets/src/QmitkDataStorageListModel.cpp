@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage::Pointer dataStorage
                                                      , mitk::NodePredicateBase* pred, QObject* parent)
- : QAbstractListModel(parent), m_NodePredicate(0), m_DataStorage(0), m_BlockEvents(false)
+ : QAbstractListModel(parent), m_NodePredicate(nullptr), m_DataStorage(nullptr), m_BlockEvents(false)
 {
   this->SetPredicate(pred);
   this->SetDataStorage(dataStorage);
@@ -35,7 +35,7 @@ QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage::Pointer 
 QmitkDataStorageListModel::~QmitkDataStorageListModel()
 {
   // set data storage to 0 so that event listener get removed
-  this->SetDataStorage(0);
+  this->SetDataStorage(nullptr);
 
   if (m_NodePredicate) delete m_NodePredicate;
 }
@@ -45,7 +45,7 @@ void QmitkDataStorageListModel::SetDataStorage(mitk::DataStorage::Pointer dataSt
   if( m_DataStorage != dataStorage)
   {
     // remove old listeners
-    if(m_DataStorage != 0)
+    if(m_DataStorage != nullptr)
     {
       this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageListModel
         , const mitk::DataNode*>( this, &QmitkDataStorageListModel::NodeAdded ) );
@@ -62,7 +62,7 @@ void QmitkDataStorageListModel::SetDataStorage(mitk::DataStorage::Pointer dataSt
     m_DataStorage = dataStorage;
 
     // remove event listeners
-    if(m_DataStorage != 0)
+    if(m_DataStorage != nullptr)
     {
       // subscribe for node added/removed events
       this->m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageListModel
@@ -145,7 +145,7 @@ mitk::NodePredicateBase* QmitkDataStorageListModel::GetPredicate() const
 
 void QmitkDataStorageListModel::reset()
 {
-  if(m_DataStorage != 0)
+  if(m_DataStorage != nullptr)
   {
     mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects;
 
@@ -156,7 +156,7 @@ void QmitkDataStorageListModel::reset()
 
     // remove all observes
     unsigned int i = 0;
-    for(std::vector<mitk::DataNode*>::iterator it=m_DataNodes.begin()
+    for(auto it=m_DataNodes.begin()
       ; it!=m_DataNodes.end()
       ; ++it, ++i)
     {
@@ -257,7 +257,7 @@ void QmitkDataStorageListModel::OnDelete( const itk::Object *caller, const itk::
   if(dataStorage)
   {
     // set datastorage to 0 -> empty model
-    this->SetDataStorage(0);
+    this->SetDataStorage(nullptr);
   }
 }
 

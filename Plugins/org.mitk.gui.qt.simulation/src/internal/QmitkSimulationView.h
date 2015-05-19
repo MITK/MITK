@@ -37,8 +37,8 @@ public:
   QmitkSimulationView();
   ~QmitkSimulationView();
 
-  void CreateQtPartControl(QWidget* parent);
-  void SetFocus();
+  void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
 
 private slots:
   void OnAnimateButtonToggled(bool toggled);

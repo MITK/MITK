@@ -35,7 +35,7 @@ public:
 
     static const std::string VIEW_ID;
 
-    QmitkAstrosticksModelParametersWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkAstrosticksModelParametersWidget (QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     virtual ~QmitkAstrosticksModelParametersWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);

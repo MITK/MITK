@@ -33,10 +33,9 @@ mitk::FileReaderRegistry::FileReaderRegistry()
 
 mitk::FileReaderRegistry::~FileReaderRegistry()
 {
-  for (std::map<mitk::IFileReader*, us::ServiceObjects<mitk::IFileReader> >::iterator iter = m_ServiceObjects.begin(),
-    end = m_ServiceObjects.end(); iter != end; ++iter)
+  for (auto & elem : m_ServiceObjects)
   {
-    iter->second.UngetService(iter->first);
+    elem.second.UngetService(elem.first);
   }
 }
 
@@ -60,6 +59,8 @@ mitk::MimeType mitk::FileReaderRegistry::GetMimeTypeForFile(const std::string& p
 
 std::vector<mitk::FileReaderRegistry::ReaderReference> mitk::FileReaderRegistry::GetReferences(const MimeType& mimeType, us::ModuleContext* context)
 {
+  if (context == NULL) context = us::GetModuleContext();
+
   std::string filter = us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileReader>() &&
                        us::LDAPProp(IFileReader::PROP_MIMETYPE()) == mimeType.GetName();
   return context->GetServiceReferences<IFileReader>(filter);
@@ -67,6 +68,8 @@ std::vector<mitk::FileReaderRegistry::ReaderReference> mitk::FileReaderRegistry:
 
 mitk::IFileReader* mitk::FileReaderRegistry::GetReader(const mitk::FileReaderRegistry::ReaderReference& ref, us::ModuleContext* context)
 {
+  if (context == NULL) context = us::GetModuleContext();
+
   us::ServiceObjects<mitk::IFileReader> serviceObjects = context->GetServiceObjects(ref);
   mitk::IFileReader* reader = serviceObjects.GetService();
   m_ServiceObjects.insert(std::make_pair(reader, serviceObjects));
@@ -75,6 +78,8 @@ mitk::IFileReader* mitk::FileReaderRegistry::GetReader(const mitk::FileReaderReg
 
 std::vector <mitk::IFileReader*> mitk::FileReaderRegistry::GetReaders(const MimeType& mimeType, us::ModuleContext* context )
 {
+  if (context == NULL) context = us::GetModuleContext();
+
   std::vector <mitk::IFileReader*> result;
 
   if (!mimeType.IsValid()) return result;
@@ -110,9 +115,8 @@ void mitk::FileReaderRegistry::UngetReader(mitk::IFileReader* reader)
 
 void mitk::FileReaderRegistry::UngetReaders(const std::vector<mitk::IFileReader*>& readers)
 {
-  for (std::vector<mitk::IFileReader*>::const_iterator iter = readers.begin(), end = readers.end();
-    iter != end; ++iter)
+  for (const auto & reader : readers)
   {
-    this->UngetReader(*iter);
+    this->UngetReader(reader);
   }
 }

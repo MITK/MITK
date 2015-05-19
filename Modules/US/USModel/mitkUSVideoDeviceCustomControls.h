@@ -41,12 +41,12 @@ public:
     * mitk::USVideoDeviceCustomControls::SetCropArea() with an empty are
     * instead.
     */
-  virtual void SetIsActive( bool isActive );
+  virtual void SetIsActive( bool isActive ) override;
 
   /**
     * \return if this custom controls are currently activated
     */
-  virtual bool GetIsActive( );
+  virtual bool GetIsActive( ) override;
 
   /**
     * \brief Sets the area that will be cropped from the US image.

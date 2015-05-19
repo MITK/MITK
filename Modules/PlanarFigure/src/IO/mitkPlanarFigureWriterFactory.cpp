@@ -35,7 +35,7 @@ public:
 
   /** Methods from itk:LightObject. */
   itkFactorylessNewMacro(Self)
-  LightObject::Pointer CreateObject()
+  LightObject::Pointer CreateObject() override
   {
     typename T::Pointer p = T::New();
     p->Register();

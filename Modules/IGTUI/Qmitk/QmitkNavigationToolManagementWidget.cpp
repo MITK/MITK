@@ -152,7 +152,8 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
       return;
     }
     QString defaultIdentifier = "NavigationTool#"+QString::number(m_NavigationToolStorage->GetToolCount());
-    m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,defaultIdentifier.toStdString());
+    QString defaultName = "NavigationTool"+QString::number(m_NavigationToolStorage->GetToolCount());
+    m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,defaultIdentifier.toStdString(),defaultName.toStdString());
     m_edit = false;
     m_Controls->m_MainWidgets->setCurrentIndex(1);
   }

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTIOException.h"
 
 mitk::NavigationDataReaderXML::NavigationDataReaderXML()
-  : m_parentElement(0), m_currentNode(0)
+  : m_parentElement(nullptr), m_currentNode(nullptr)
 {
 }
 
@@ -37,7 +37,7 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string
 {
   //save old locale
   char * oldLocale;
-  oldLocale = setlocale( LC_ALL, 0 );
+  oldLocale = setlocale( LC_ALL, nullptr );
 
   //define own locale
   std::locale C("C");
@@ -96,7 +96,7 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::istrea
 {
   //save old locale
   char * oldLocale;
-  oldLocale = setlocale( LC_ALL, 0 );
+  oldLocale = setlocale( LC_ALL, nullptr );
 
   //define own locale
   std::locale C("C");
@@ -109,11 +109,11 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::istrea
   if (m_FileVersion < 1)
   {
     StreamInvalid("Playing not possible. Invalid file version!");
-    return 0;
+    return nullptr;
   }
 
   m_NumberOfOutputs = this->GetNumberOfNavigationDatas(stream);
-  if (m_NumberOfOutputs == 0) { return 0; }
+  if (m_NumberOfOutputs == 0) { return nullptr; }
 
   mitk::NavigationDataSet::Pointer dataSet = this->ReadNavigationDataSet();
 
@@ -173,7 +173,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadVersion1()
   if(m_currentNode)
   {
     elem = m_currentNode->ToElement();
-    if(elem==NULL)
+    if(elem==nullptr)
     {
       mitkThrowException(mitk::IGTException) << "Cannot find element: Is this file damaged?";
     }
@@ -196,7 +196,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadVersion1()
 
 mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadNavigationData(TiXmlElement* elem)
 {
-  if (elem == NULL) {mitkThrow() << "Error: Element is NULL!";}
+  if (elem == nullptr) {mitkThrow() << "Error: Element is NULL!";}
 
   mitk::NavigationData::Pointer nd = mitk::NavigationData::New();
 
@@ -215,7 +215,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadNavigationData(
   elem->QueryDoubleAttribute("Time",&timestamp);
   if (timestamp == -1)
   {
-    return NULL;  //the calling method should check the return value if it is valid/not NULL
+    return nullptr;  //the calling method should check the return value if it is valid/not NULL
   }
 
   elem->QueryDoubleAttribute("X", &position[0]);
@@ -276,7 +276,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadNavigationData(
 // -- deprecated | begin
 unsigned int mitk::NavigationDataReaderXML::GetFileVersion(std::istream* stream)
 {
-  if (stream==NULL)
+  if (stream==nullptr)
   {
     MITK_ERROR << "No input stream set!";
     mitkThrowException(mitk::IGTIOException)<<"No input stream set!";
@@ -288,7 +288,7 @@ unsigned int mitk::NavigationDataReaderXML::GetFileVersion(std::istream* stream)
   }
   int version = 1;
 
-  TiXmlDeclaration* dec = new TiXmlDeclaration();
+  auto  dec = new TiXmlDeclaration();
   *stream >> *dec;
   if(strcmp(dec->Version(),"") == 0)
   {
@@ -317,7 +317,7 @@ unsigned int mitk::NavigationDataReaderXML::GetFileVersion(std::istream* stream)
 
 unsigned int mitk::NavigationDataReaderXML::GetNumberOfNavigationDatas(std::istream* stream)
 {
-  if (stream == NULL)
+  if (stream == nullptr)
   {
     MITK_ERROR << "No input stream set!";
     mitkThrowException(mitk::IGTException)<<"No input stream set!";

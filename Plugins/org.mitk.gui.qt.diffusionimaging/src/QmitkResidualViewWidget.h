@@ -38,9 +38,9 @@ Q_OBJECT
 public:
 
 
-  QmitkResidualViewWidget(QWidget *parent = 0);
+  QmitkResidualViewWidget(QWidget *parent = nullptr);
 
-  QmitkResidualViewWidget(QGraphicsScene *scene, QWidget *parent = 0);
+  QmitkResidualViewWidget(QGraphicsScene *scene, QWidget *parent = nullptr);
 
 
  // ~QmitkResidualViewWidget();
@@ -57,13 +57,13 @@ signals:
 
 protected:
 
-  void wheelEvent(QWheelEvent *event);
+  void wheelEvent(QWheelEvent *event) override;
 
-  void mouseMoveEvent(QMouseEvent* event);
+  void mouseMoveEvent(QMouseEvent* event) override;
 
-  void mousePressEvent(QMouseEvent* event);
+  void mousePressEvent(QMouseEvent* event) override;
 
-  void mouseReleaseEvent(QMouseEvent* event);
+  void mouseReleaseEvent(QMouseEvent* event) override;
 
   QPointF m_CurrentCenterPoint;
 

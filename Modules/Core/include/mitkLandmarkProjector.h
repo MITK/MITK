@@ -36,7 +36,7 @@ namespace mitk {
 class MITKCORE_EXPORT LandmarkProjector : public itk::Object
 {
 public:
-  mitkClassMacro(LandmarkProjector, itk::Object);
+  mitkClassMacroItkParent(LandmarkProjector, itk::Object);
 
   //##Documentation
   //## @brief Set the interpolating (world-space-to-world-space) transform,

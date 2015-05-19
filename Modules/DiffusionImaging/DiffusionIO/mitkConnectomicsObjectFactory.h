@@ -31,17 +31,17 @@ class ConnectomicsObjectFactory : public CoreObjectFactoryBase
 
     ~ConnectomicsObjectFactory();
 
-    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
 
-    virtual void SetDefaultProperties(mitk::DataNode* node);
+    virtual void SetDefaultProperties(mitk::DataNode* node) override;
 
-    virtual const char* GetFileExtensions();
+    virtual const char* GetFileExtensions() override;
 
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
 
-    virtual const char* GetSaveFileExtensions();
+    virtual const char* GetSaveFileExtensions() override;
 
-    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
   protected:
     ConnectomicsObjectFactory();

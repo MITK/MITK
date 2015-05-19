@@ -46,12 +46,12 @@ class MITKDATATYPESEXT_EXPORT ColorSequenceCycleH : public ColorSequence
     /*!
     \brief Return another color
     */
-    virtual Color GetNextColor();
+    virtual Color GetNextColor() override;
 
     /*!
     \brief Rewind to first color
     */
-    virtual void GoToBegin();
+    virtual void GoToBegin() override;
 
     /*!
     \brief Increase the used Hue value.

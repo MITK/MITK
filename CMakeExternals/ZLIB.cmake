@@ -24,9 +24,12 @@ if(MITK_USE_ZLIB)
         ${ep_common_args}
         ${additional_cmake_args}
       CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
         -DBUILD_SHARED_LIBS:BOOL=OFF
         -DZLIB_MANGLE_PREFIX:STRING=mitk_zlib_
         -DZLIB_INSTALL_INCLUDE_DIR:STRING=include/mitk_zlib
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${ZLIB_DEPENDENCIES}
       )
     set(ZLIB_DIR ${ep_prefix})

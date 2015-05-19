@@ -36,6 +36,10 @@ if(NOT DEFINED Rasqal_DIR)
        -DRASQAL_REGEX:STRING=pcre
        -DCMAKE_PREFIX_PATH:STRING=${PCRE_DIR}^^${REDLAND_INSTALL_DIR}
        -DPCRE_INCLUDE_DIR:PATH=${PCRE_DIR}/include
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

@@ -33,8 +33,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyEditor : public QLineEdit, publ
 
   protected:
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+    virtual void PropertyChanged() override;
+    virtual void PropertyRemoved() override;
 
     mitk::StringProperty* m_StringProperty;
 

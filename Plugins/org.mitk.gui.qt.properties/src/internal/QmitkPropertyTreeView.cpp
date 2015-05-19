@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyDescriptions.h>
 #include <QmitkRenderWindow.h>
 #include <QPainter>
+#include <memory>
 
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
@@ -85,6 +86,10 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   m_ProxyModel->setDynamicSortFilter(true);
 
   m_Delegate = new QmitkPropertyItemDelegate(m_Controls.treeView);
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+  m_Controls.filterLineEdit->setClearButtonEnabled(true);
+#endif
 
   m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
   m_Controls.treeView->setModel(m_ProxyModel);
@@ -353,7 +358,7 @@ void QmitkPropertyTreeView::SetFocus()
   m_Controls.filterLineEdit->setFocus();
 }
 
-void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
   if (m_Controls.propertyListComboBox->count() == 2)
   {
@@ -402,8 +407,10 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
 
 void QmitkPropertyTreeView::OnAddNewProperty()
 {
-  QmitkAddNewPropertyDialog dialog(m_SelectedNode, m_Renderer, m_Parent);
+  std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls.propertyListComboBox->currentText() != "Base data"
+      ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer, m_Parent)
+      : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
 
-  if (dialog.exec() == QDialog::Accepted)
+  if (dialog->exec() == QDialog::Accepted)
     this->m_Model->Update();
 }

@@ -3,22 +3,22 @@
 \page Architecture The Architecture of MITK
 
 MITK is an open source software toolkit for medical image processing, subsequent data analysis and integration of medical hardware.
-It is designed with the aim of providing a modular and heavily reusable code base to enable rapid development of new features. Following
-this design philosophy MITK includes many different specialized modules e.g. the Segmentation Module.
+It is designed with the aim of providing a modular and reusable code base to enable rapid development of new features. Following
+this design philosophy, MITK includes many specialized modules.
 
-This document is aimed at giving an overview of the general structure of MITK. Furthermore it will give an introduction into the coding
-and design concepts behind this toolkit.
+This document is aimed at giving an overview of the general structure of MITK. It will give you an introduction to the coding
+and design concepts behind the toolkit.
 
 \section OverviewPage_DesignOverview Design Overview
 
-MITK is designed to be used as a <B>pure software library</B> or as a <B>complete application framework</B>. Thus, a user
-of MITK can decide if he simply wants to add a new plug-in to the existing application framework or if he needs to implement his
-own application and wants to use MITK as a software library. Depending on the type of use MITK uses different software libraries, which is
+MITK is designed to be used either as a <B>pure software library</B> or as a <B>complete application framework</B>. Thus, a user
+of MITK can decide if he or she simply wants to add a new plug-in to the existing application framework or to implement an
+own application by using MITK as a software library. Depending on the type of use MITK uses different software libraries, which is
 shown in the next figure for overview.
 
 \imageMacro{MitkOverview.png,"Overview of MITK",16}
 
-Like shown above, MITK uses the following libraries.
+As shown above, MITK uses the following libraries.
 <ul>
  <li> The <a href="http://www.itk.org">Insight Toolkit (ITK)</a>, which provides registration and
 segmentation algorithms, but is not designed for visualization or interaction.
@@ -32,7 +32,7 @@ segmentation algorithms, but is not designed for visualization or interaction.
  support.
 </ul>
 
-These are the main libraries MITK is based on. For further functionality you can optionally include others, a list can be found \ref thirdpartylibs "here" .
+These are the main libraries MITK is based on. For more functionality you can optionally include other libraries as well. A list of used libraries can be found \ref thirdpartylibs "here" .
 
 Based on these libraries, MITK includes the following features:
 <ul>
@@ -41,7 +41,7 @@ Based on these libraries, MITK includes the following features:
  <li>Support of 3D + t data.
  <li>Complete application framework, expandable by plug-ins
  <li>Standard tools for medical imaging as default plug-ins (e.g. measurement, segmentation)
- <li>Many specialized module for different topics on medical imaging (e.g. diffusion imaging, image guided therapy, live image/ultrasound data processing)
+ <li>Many specialized modules for different topics on medical imaging (e.g. diffusion imaging, image guided therapy, live image/ultrasound data processing)
 </ul>
 
 */

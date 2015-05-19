@@ -37,7 +37,7 @@ class MITKDCMTESTING_EXPORT TestDCMLoading
     TestDCMLoading();
 
     ImageList
-    LoadFiles( const StringContainer& files, itk::SmartPointer<Image> preLoadedVolume = NULL );
+    LoadFiles( const StringContainer& files, itk::SmartPointer<Image> preLoadedVolume = nullptr );
 
     /**
       \brief Dump relevant image information for later comparison.

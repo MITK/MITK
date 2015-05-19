@@ -33,7 +33,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_ContourFiller = mitk::ContourModelSetToImageFilter::New();
     CPPUNIT_ASSERT_MESSAGE("Failed to initialize ContourModelSetToImageFilter", m_ContourFiller.IsNotNull());

@@ -41,7 +41,7 @@ public:
 
   ~QmitkRenderingManagerFactory();
 
-  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const;
+  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const override;
 
 private:
 

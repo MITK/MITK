@@ -84,7 +84,7 @@ namespace mitk
 
     /** \brief Returns a bool whether the container is empty or not.
     */
-    bool IsEmpty() const;
+    bool IsEmpty() const override;
 
     /** \brief Remove the given ContourModel from the container if exists.
     \param ContourModel - the ContourModel to be removed.
@@ -98,26 +98,26 @@ namespace mitk
 
     /** \brief Clear the storage container.
     */
-    virtual void Clear();
+    virtual void Clear() override;
 
     //////////////// inherit  from mitk::BaseData ////////////////////
 
     /*                  NO support for regions !                    */
 
-    void SetRequestedRegionToLargestPossibleRegion(){}
+    void SetRequestedRegionToLargestPossibleRegion() override{}
 
-    bool RequestedRegionIsOutsideOfTheBufferedRegion(){return false;}
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override{return false;}
 
-    bool VerifyRequestedRegion(){return true;}
+    bool VerifyRequestedRegion() override{return true;}
 
-    void SetRequestedRegion(const itk::DataObject* ){}
+    void SetRequestedRegion(const itk::DataObject* ) override{}
 
     /**
     \brief Update the OutputInformation of a ContourModel object
 
     The BoundingBox of the contour will be updated, if necessary.
     */
-    virtual void UpdateOutputInformation();
+    virtual void UpdateOutputInformation() override;
 
     //////////////// END inherit  from mitk::BaseData ////////////////////
 
@@ -130,7 +130,7 @@ namespace mitk
     virtual ~ContourModelSet();
 
     //inherit from BaseData. Initial state with no contours and a single timestep.
-    virtual void InitializeEmpty();
+    virtual void InitializeEmpty() override;
 
     ContourModelListType m_Contours;
 

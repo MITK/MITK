@@ -52,6 +52,10 @@ if(MITK_USE_DCMTK)
          -DDCMTK_WITH_TIFF:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_XML:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_ICONV:BOOL=OFF  # see bug #9894
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
       )
     set(DCMTK_DIR ${ep_prefix})

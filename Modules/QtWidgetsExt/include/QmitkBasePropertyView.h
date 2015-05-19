@@ -33,8 +33,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkBasePropertyView : public QLabel, public mitk
 
   protected:
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+    virtual void PropertyChanged() override;
+    virtual void PropertyRemoved() override;
 
   private:
 

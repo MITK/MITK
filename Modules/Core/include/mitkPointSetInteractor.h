@@ -62,12 +62,12 @@ namespace mitk
      *
      * overwritten, cause we don't look at the boundingbox, we look at each point
      */
-    virtual float CanHandleEvent(StateEvent const* stateEvent) const;
+    virtual float CanHandleEvent(StateEvent const* stateEvent) const override;
 
     /**
     *@brief If data changed then initialize according to numbers of loaded points
     **/
-    virtual void DataChanged();
+    virtual void DataChanged() override;
 
   protected:
     /**
@@ -86,7 +86,7 @@ namespace mitk
     /**
     * @brief Convert the given Actions to Operations and send to data and UndoController
     */
-    virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
+    virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent ) override;
 
     /** \brief Deselects the Points in the PointSet.
      * supports Undo if enabled

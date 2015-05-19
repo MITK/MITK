@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?BlueBerry version="0.1"?>
-
-<plugin>
-  <extension-point id="org.blueberry.core.expressions.propertyTesters" name="Property Tester Extension-Point" schema="schema/propertyTesters.exsd"/>
-  <extension-point id="org.blueberry.core.expressions.definitions" name="Defintions Extension-Point" schema="schema/definitions.exsd"/>
-</plugin>

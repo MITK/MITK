@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-  <extension point="org.blueberry.osgi.applications">
-    <application id="org.mitk.qt.coreapplication">
+  <extension id="org.mitk.qt.coreapplication" point="org.blueberry.osgi.applications">
+    <application>
       <run class="QmitkCoreApplication"/>
     </application>
   </extension>
-  
+
+  <extension id="org.mitk.product.CoreApp" point="org.blueberry.core.runtime.products">
+    <product name="Core App" application="org.mitk.qt.coreapplication" description="A minimal viewer application">
+    </product>
+  </extension>
+
   <extension point="org.blueberry.ui.perspectives">
     <perspective
       id="org.mitk.coreapp.defaultperspective"
@@ -14,5 +19,5 @@
       class="QmitkDefaultPerspective">
     </perspective>
   </extension>
-  
+
 </plugin>

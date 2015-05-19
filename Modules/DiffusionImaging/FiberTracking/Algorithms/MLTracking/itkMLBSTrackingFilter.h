@@ -127,10 +127,10 @@ public:
     double GetRandDouble(double min=-1, double max=1);
     double RoundToNearest(double num);
 
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
     void PreprocessRawData();
-    void ThreadedGenerateData( const InputImageRegionType &outputRegionForThread, ThreadIdType threadId);
-    void AfterThreadedGenerateData();
+    void ThreadedGenerateData( const InputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
+    void AfterThreadedGenerateData() override;
 
     PolyDataType                        m_FiberPolyData;
     vtkSmartPointer<vtkPoints>          m_Points;

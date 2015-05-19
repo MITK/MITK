@@ -38,7 +38,7 @@ namespace mitk {
     ContourInteractor(const char * type, DataNode* dataNode);
     virtual ~ContourInteractor();
 
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
 
     /**
     * entry method for any interaction. Method is called if user

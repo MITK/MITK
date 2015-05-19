@@ -90,7 +90,7 @@ public:
     itk::ImageRegionIterator< VectorImageType > vecIter(
           output_image, requestedRegion );
 
-    VolumeFileNamesContainer::const_iterator volumesFileNamesIter = filenames.begin();
+    auto volumesFileNamesIter = filenames.begin();
 
     // iterate over the given volumes
     unsigned int component = 0;
@@ -156,7 +156,7 @@ public:
     // generate output
     typedef itk::VectorImage< PixelType, 3 > VectorImageType;
 
-        VolumeFileNamesContainer::const_iterator volumesFileNamesIter = filenames.begin();
+        auto volumesFileNamesIter = filenames.begin();
 
     // probe the first file to retrieve the size of the 2d image
     // we need this information to compute the index relation between mosaic and resulting 3d position

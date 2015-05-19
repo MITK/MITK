@@ -1,4 +1,4 @@
-function(ORGANIZE_SOURCES)
+function(mitkFunctionOrganizeSources)
 
   # this functions gets a filelist as input and looks
   # for corresponding h-files to add them to the project.
@@ -7,7 +7,7 @@ function(ORGANIZE_SOURCES)
 
   # No parameters explicitly declared here, because
   # we want to allow for variable argument lists, which
-  # are later access by the keyword foreach(MYFILE ${ARGV})
+  # are later accessed by the keyword foreach(MYFILE ${ARGV})
 
   # output: after calling the macro, files that were found
   # correspondigly to the given files are stored in the
@@ -20,7 +20,7 @@ function(ORGANIZE_SOURCES)
   # ${GLOBBED_TXX_FILES} (CURRENTLY COMMENTED OUT)
   # ${GLOBBED_DOX_FILES}
 
-  cmake_parse_arguments(_ORG "" "" "HEADER;SOURCE;TXX;DOC;MOC;GEN_QRC;GEN_UI;UI;QRC" ${ARGN})
+  cmake_parse_arguments(_ORG "" "" "HEADER;SOURCE;TXX;DOC;MOC;GEN_QRC;GEN_UI;META;UI;QRC" ${ARGN})
 
   set(CORRESPONDING__H_FILES "")
   set(GLOBBED__H_FILES "")
@@ -69,4 +69,17 @@ function(ORGANIZE_SOURCES)
     source_group("Qt Resource Files" FILES ${_ORG_QRC})
   endif()
 
-endfunction(ORGANIZE_SOURCES)
+  if(_ORG_META)
+    source_group("Plugin META Files" FILES ${_ORG_META})
+  endif()
+
+endfunction()
+
+macro(_MACRO_APPEND_TO_LIST _list _value)
+  set(_origlist ${${_list}})
+  set(${_list} )
+  foreach(_element ${_origlist})
+    list(APPEND ${_list} "${_value}${_element}")
+  endforeach()
+endmacro()
+

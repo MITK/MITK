@@ -30,7 +30,7 @@ namespace mitk
     ///
     /// Actually Updates the algorithm
     ///
-    void Update();
+    void Update() override;
 
     ///
     /// nothing to do here yet

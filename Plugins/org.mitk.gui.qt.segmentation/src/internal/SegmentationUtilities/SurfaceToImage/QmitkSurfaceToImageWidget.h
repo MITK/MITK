@@ -40,7 +40,7 @@ class QmitkSurfaceToImageWidget : public QmitkSegmentationUtilityWidget
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
+  explicit QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkSurfaceToImageWidget();

@@ -44,7 +44,7 @@ struct QmitkIOUtil::Impl
   struct ReaderOptionsDialogFunctor : public ReaderOptionsFunctorBase
   {
 
-    virtual bool operator()(LoadInfo& loadInfo)
+    virtual bool operator()(LoadInfo& loadInfo) override
     {
       QmitkFileReaderOptionsDialog dialog(loadInfo);
       if (dialog.exec() == QDialog::Accepted)
@@ -62,7 +62,7 @@ struct QmitkIOUtil::Impl
   struct WriterOptionsDialogFunctor : public WriterOptionsFunctorBase
   {
 
-    virtual bool operator()(SaveInfo& saveInfo)
+    virtual bool operator()(SaveInfo& saveInfo) override
     {
       QmitkFileWriterOptionsDialog dialog(saveInfo);
       if (dialog.exec() == QDialog::Accepted)
@@ -144,10 +144,9 @@ QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList& paths, QWidg
   for(std::vector<LoadInfo>::const_iterator iter = loadInfos.begin(), iterEnd = loadInfos.end();
       iter != iterEnd; ++iter)
   {
-    for (std::vector<mitk::BaseData::Pointer>::const_iterator dataIter = iter->m_Output.begin(),
-         dataIterEnd = iter->m_Output.end(); dataIter != dataIterEnd; ++dataIter)
+    for (const auto & elem : iter->m_Output)
     {
-      qResult << *dataIter;
+      qResult << elem;
     }
   }
   return qResult;
@@ -274,12 +273,14 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
       continue;
     }
 
+    // Theoretically, the user could have entered an extension that does not match the selected filter
+    // The extension then has prioritry over the filter
     // Check if one of the available mime-types match the filename
     std::vector<mitk::MimeType> filterMimeTypes = filters.GetMimeTypes();
     for (std::vector<mitk::MimeType>::const_iterator mimeTypeIter = filterMimeTypes.begin(),
          mimeTypeIterEnd = filterMimeTypes.end(); mimeTypeIter != mimeTypeIterEnd; ++mimeTypeIter)
     {
-      if (mimeTypeIter->AppliesTo(stdFileName))
+      if (mimeTypeIter->MatchesExtension(stdFileName))
       {
         selectedMimeType = *mimeTypeIter;
         break;
@@ -291,7 +292,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData*>& data,
       // The file name either does not contain an extension or the
       // extension is unknown.
 
-      // If the file already exists, we stop here because we are not able
+      // If the file already exists, we stop here because we are unable
       // to (over)write the file without adding a custom suffix. If the file
       // does not exist, we add the default extension from the currently
       // selected filter. If the "All" filter was selected, we only add the
@@ -415,10 +416,9 @@ struct QmitkIOUtil::SaveFilter::Impl
       QList<QString> filterExtensions;
       mitk::MimeType mimeType = *iter;
       std::vector<std::string> extensions = mimeType.GetExtensions();
-      for (std::vector<std::string>::iterator extIter = extensions.begin(), extIterEnd = extensions.end();
-           extIter != extIterEnd; ++extIter)
+      for (auto & extension : extensions)
       {
-        filterExtensions << QString::fromStdString(*extIter);
+        filterExtensions << QString::fromStdString(extension);
       }
       if (m_DefaultExtension.isEmpty())
       {

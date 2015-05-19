@@ -45,12 +45,12 @@ public:
   //##
   itkGetConstObjectMacro(ProjectionPlane, mitk::PlaneGeometry);
 
-  virtual void ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer* targetLandmarks);
+  virtual void ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer* targetLandmarks) override;
 protected:
   PlaneLandmarkProjector();
   virtual ~PlaneLandmarkProjector();
 
-  virtual void ComputeCompleteAbstractTransform();
+  virtual void ComputeCompleteAbstractTransform() override;
 
   mitk::PlaneGeometry::ConstPointer m_ProjectionPlane;
 };

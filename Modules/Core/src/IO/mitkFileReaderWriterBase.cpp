@@ -73,10 +73,9 @@ us::Any FileReaderWriterBase::GetOption(const std::string& name) const
 
 void FileReaderWriterBase::SetOptions(const FileReaderWriterBase::Options& options)
 {
-  for(Options::const_iterator iter = options.begin(), iterEnd = options.end();
-      iter != iterEnd; ++iter)
+  for(const auto & option : options)
   {
-    this->SetOption(iter->first, iter->second);
+    this->SetOption(option.first, option.second);
   }
 }
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPropertyTreeView.h"
 #include <QtPlugin>
 
-ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::m_Context = NULL;
+ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::m_Context = nullptr;
 
 ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::GetContext()
 {
@@ -35,7 +35,7 @@ void mitk::org_mitk_gui_qt_properties_Activator::start(ctkPluginContext* context
 
 void mitk::org_mitk_gui_qt_properties_Activator::stop(ctkPluginContext*)
 {
-  m_Context = NULL;
+  m_Context = nullptr;
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

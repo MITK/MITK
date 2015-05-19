@@ -35,7 +35,7 @@ class MITKSCENESERIALIZATIONBASE_EXPORT PropertyListSerializer : public itk::Obj
 {
   public:
 
-    mitkClassMacro( PropertyListSerializer, itk::Object );
+    mitkClassMacroItkParent( PropertyListSerializer, itk::Object );
     itkFactorylessNewMacro(Self) // is this needed? should never be instantiated, only subclasses should
     itkCloneMacro(Self)
 

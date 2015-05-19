@@ -95,13 +95,13 @@ protected:
   void ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep );
 
   // Here, the output image is initialized by the input and the newly calculated region
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
   // Purposely not implemented
-  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion() override;
 
   // Crops the image on all time steps
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   float m_BackgroundValue;
 

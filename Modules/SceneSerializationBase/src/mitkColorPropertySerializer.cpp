@@ -32,28 +32,28 @@ class ColorPropertySerializer : public BasePropertySerializer
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (const ColorProperty* prop = dynamic_cast<const ColorProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("color");
+        auto  element = new TiXmlElement("color");
         Color color = prop->GetValue();
         element->SetDoubleAttribute("r", color[0]);
         element->SetDoubleAttribute("g", color[1]);
         element->SetDoubleAttribute("b", color[2]);
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       Color c;
-      if ( element->QueryFloatAttribute( "r", &c[0] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryFloatAttribute( "g", &c[1] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryFloatAttribute( "b", &c[2] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "r", &c[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryFloatAttribute( "g", &c[1] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryFloatAttribute( "b", &c[2] ) != TIXML_SUCCESS ) return nullptr;
 
       return ColorProperty::New( c ).GetPointer();
     }

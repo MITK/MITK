@@ -47,7 +47,7 @@ mitk::Image::Pointer
   if( filenames.empty() )
   {
     MITK_DEBUG << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic.";
-    return NULL; // this is not actually an error but the result is very simple
+    return nullptr; // this is not actually an error but the result is very simple
   }
 
   typedef itk::GDCMImageIO DcmIoType;
@@ -98,7 +98,7 @@ mitk::Image::Pointer
       }
 
       MITK_ERROR << "Unsupported DICOM pixel type";
-      return NULL;
+      return nullptr;
     }
   }
   catch(itk::MemoryAllocationError& e)
@@ -114,7 +114,7 @@ mitk::Image::Pointer
     MITK_ERROR << "Unspecified error encountered when loading DICOM series.";
   }
 
-  return NULL;
+  return nullptr;
 }
 
 #define switch3DnTCase(IOType, T) \
@@ -127,7 +127,7 @@ mitk::Image::Pointer
   if( filenamesLists.empty() || filenamesLists.front().empty() )
   {
     MITK_DEBUG << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic.";
-    return NULL; // this is not actually an error but the result is very simple
+    return nullptr; // this is not actually an error but the result is very simple
   }
 
   typedef itk::GDCMImageIO DcmIoType;
@@ -178,7 +178,7 @@ mitk::Image::Pointer
       }
 
       MITK_ERROR << "Unsupported DICOM pixel type";
-      return NULL;
+      return nullptr;
     }
   }
   catch(itk::MemoryAllocationError& e)
@@ -194,7 +194,7 @@ mitk::Image::Pointer
     MITK_ERROR << "Unspecified error encountered when loading DICOM series.";
   }
 
-  return NULL;
+  return nullptr;
 }
 
 bool ConvertDICOMDateTimeString(const std::string& dateString, const std::string& timeString, OFDateTime& time)

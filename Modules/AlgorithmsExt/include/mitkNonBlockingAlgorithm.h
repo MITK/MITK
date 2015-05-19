@@ -47,7 +47,7 @@ static Pointer New(void) { \
   rawPtr->Initialize(); \
   return smartPtr; \
 }\
-virtual ::itk::LightObject::Pointer CreateAnother(void) const\
+virtual ::itk::LightObject::Pointer CreateAnother(void) const override\
 {\
   Pointer smartPtr = classname::New();\
   ::itk::LightObject::Pointer lightPtr = smartPtr.GetPointer();\
@@ -81,7 +81,7 @@ class MITKALGORITHMSEXT_EXPORT NonBlockingAlgorithm : public itk::Object
     };
 
 
-    mitkClassMacro( NonBlockingAlgorithm, itk::Object )
+    mitkClassMacroItkParent( NonBlockingAlgorithm, itk::Object )
 
     void SetDataStorage(DataStorage& storage);
     DataStorage* GetDataStorage();
@@ -206,7 +206,7 @@ class MITKALGORITHMSEXT_EXPORT NonBlockingAlgorithm : public itk::Object
     void DefineTriggerParameter(const char*);
     void UnDefineTriggerParameter(const char*);
 
-    virtual void Initialize(const NonBlockingAlgorithm* other = NULL);
+    virtual void Initialize(const NonBlockingAlgorithm* other = nullptr);
     virtual bool ReadyToRun();
 
     virtual bool ThreadedUpdateFunction(); // will be called from a thread after calling StartAlgorithm

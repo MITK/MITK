@@ -44,7 +44,7 @@ mitk::ImageVtkReadAccessor::~ImageVtkReadAccessor()
 {
   m_Image->m_VtkReadersLock.Lock();
 
-  std::vector<ImageAccessorBase*>::iterator it =
+  auto it =
       std::find(m_Image->m_VtkReaders.begin(), m_Image->m_VtkReaders.end(), this);
   if (it != m_Image->m_VtkReaders.end())
   {

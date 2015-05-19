@@ -37,7 +37,7 @@ namespace mitk {
   class MITKOPENIGTLINK_EXPORT IGTLMessageCommon  : public itk::DataObject
     {
     public:
-      mitkClassMacro(IGTLMessageCommon, itk::DataObject);
+      mitkClassMacroItkParent(IGTLMessageCommon, itk::DataObject);
       itkFactorylessNewMacro(Self);
       itkCloneMacro(Self);
 

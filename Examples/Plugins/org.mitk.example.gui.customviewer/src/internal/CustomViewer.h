@@ -46,15 +46,10 @@ public:
   ~CustomViewer();
 
 /** Starts the application.*/
-  int Start();
+  QVariant Start(berry::IApplicationContext* context) override;
 
 /** Exits the application.*/
-  void Stop();
-
-private:
-
-/** The WorkbenchAdvisor for the CustomViewer application.*/
-  QScopedPointer<CustomViewerWorkbenchAdvisor> wbAdvisor;
+  void Stop() override;
 };
 
 #endif /*CUSTOMVIEWER_H_*/

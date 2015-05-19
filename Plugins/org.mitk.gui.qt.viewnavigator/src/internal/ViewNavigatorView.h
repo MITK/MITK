@@ -18,12 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ViewNavigatorView_h
 #define ViewNavigatorView_h
 
-#include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
-#include <QmitkViewNavigatorWidget.h>
 
-#include "ui_ViewNavigatorViewControls.h"
-
+class QmitkViewNavigatorWidget;
 
 /**
   \brief ViewNavigatorView
@@ -39,26 +36,19 @@ class ViewNavigatorView : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-  protected slots:
+protected:
 
-    /// \brief Called when the user clicks the GUI button
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  protected:
+  virtual void SetFocus() override;
 
-    virtual void CreateQtPartControl(QWidget *parent);
+private:
 
-    virtual void SetFocus();
-
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes );
-
-    Ui::ViewNavigatorViewControls m_Controls;
-
+  QmitkViewNavigatorWidget* m_ViewNavigatorWidget;
 };
 
 #endif // ViewNavigatorView_h

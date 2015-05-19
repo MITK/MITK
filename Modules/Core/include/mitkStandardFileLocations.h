@@ -75,7 +75,7 @@ namespace mitk
 
 
   */
-    std::string FindFile(const char* filename, const char* pathInSourceDir = NULL );
+    std::string FindFile(const char* filename, const char* pathInSourceDir = nullptr );
 
     /*!
     \brief Return directory of/for option files

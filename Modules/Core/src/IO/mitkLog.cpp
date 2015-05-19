@@ -26,10 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cstdio>
 
 static itk::SimpleFastMutexLock logMutex;
-static mitk::LoggingBackend *mitkLogBackend = 0;
-static std::ofstream *logFile = 0;
+static mitk::LoggingBackend *mitkLogBackend = nullptr;
+static std::ofstream *logFile = nullptr;
 static std::string logFileName = "";
-static std::stringstream *outputWindow = 0;
+static std::stringstream *outputWindow = nullptr;
 static bool logOutputWindow = false;
 
 void mitk::LoggingBackend::EnableAdditionalConsoleWindow(bool enable)
@@ -57,7 +57,7 @@ void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage& l )
   }
   if(logOutputWindow)
   {
-    if(outputWindow == NULL)
+    if(outputWindow == nullptr)
     {  outputWindow = new std::stringstream();}
     outputWindow->str("");
     outputWindow->clear();
@@ -83,10 +83,10 @@ void mitk::LoggingBackend::Unregister()
 {
   if(mitkLogBackend)
   {
-    SetLogFile(0);
+    SetLogFile(nullptr);
     mbilog::UnregisterBackend( mitkLogBackend );
     delete mitkLogBackend;
-    mitkLogBackend=0;
+    mitkLogBackend=nullptr;
   }
 }
 
@@ -104,7 +104,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
       closedFileName = logFileName;
       logFile->close();
       delete logFile;
-      logFile = 0;
+      logFile = nullptr;
       logFileName = "";
     }
     logMutex.Unlock();
@@ -132,7 +132,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
     else
     {
       delete logFile;
-      logFile = 0;
+      logFile = nullptr;
       logMutex.Unlock();
       MITK_WARN << "opening logfile '" << file << "' for writing failed";
     }

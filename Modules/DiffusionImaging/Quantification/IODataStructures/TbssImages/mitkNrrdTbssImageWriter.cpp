@@ -44,7 +44,7 @@ void mitk::NrrdTbssImageWriter::GenerateData()
 {
   m_Success = false;
   InputType* input = this->GetInput();
-  if (input == NULL)
+  if (input == nullptr)
   {
     itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!");
     return;
@@ -73,7 +73,7 @@ void mitk::NrrdTbssImageWriter::GenerateData()
 
 
   std::vector< std::pair <std::string, int> > groups = input->GetGroupInfo();
-  std::vector< std::pair <std::string, int> >::iterator it = groups.begin();
+  auto it = groups.begin();
 
   int i=0;
   while(it != groups.end())
@@ -141,7 +141,7 @@ mitk::TbssImage* mitk::NrrdTbssImageWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
-    return NULL;
+    return nullptr;
   }
   else
   {

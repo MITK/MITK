@@ -84,13 +84,13 @@ protected:
 
   virtual ~ITKImageImport();
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateInputRequestedRegion();
+  virtual void GenerateInputRequestedRegion() override;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
-  virtual void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output);
+  virtual void SetNthOutput(DataObjectPointerArraySizeType num, itk::DataObject *output) override;
 
   /** Typedef for the region copier function object that converts an
    * output region to an input region. */
@@ -116,7 +116,7 @@ protected:
 * \sa itk::Image::CastToMitkImage
 */
 template <typename ItkOutputImageType>
-Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const BaseGeometry* geometry = NULL, bool update = true);
+Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkimage, const BaseGeometry* geometry = nullptr, bool update = true);
 
 /**
 * @brief Imports an itk::Image (with a specific type) as an mitk::Image.
@@ -148,7 +148,7 @@ Image::Pointer ImportItkImage(const itk::SmartPointer<ItkOutputImageType>& itkim
 * \sa GrabItkImageMemory
 */
 template <typename ItkOutputImageType>
-Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const BaseGeometry* geometry = NULL, bool update = true);
+Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const BaseGeometry* geometry = nullptr, bool update = true);
 
 /**
 * @brief Grabs the memory of an itk::Image (with a specific type)
@@ -166,7 +166,7 @@ Image::Pointer ImportItkImage(const ItkOutputImageType* itkimage, const BaseGeom
 * \sa ImportItkImage
 */
 template <typename ItkOutputImageType>
-Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage = NULL, const BaseGeometry* geometry = NULL, bool update = true);
+Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimage, mitk::Image* mitkImage = nullptr, const BaseGeometry* geometry = nullptr, bool update = true);
 
 /**
 * @brief Grabs the memory of an itk::Image (with a specific type)
@@ -184,7 +184,7 @@ Image::Pointer GrabItkImageMemory(itk::SmartPointer<ItkOutputImageType>& itkimag
 * \sa ImportItkImage
 */
 template <typename ItkOutputImageType>
-Image::Pointer GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage = NULL, const BaseGeometry* geometry = NULL, bool update = true);
+Image::Pointer GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage = nullptr, const BaseGeometry* geometry = nullptr, bool update = true);
 
 } // namespace mitk
 

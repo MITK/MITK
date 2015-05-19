@@ -31,7 +31,7 @@ namespace mitk {
     m_ResultName("deformedImage.mhd"),
     m_SaveField(true),
     m_SaveResult(true),
-    m_DeformationField(NULL)
+    m_DeformationField(nullptr)
   {
 
   }

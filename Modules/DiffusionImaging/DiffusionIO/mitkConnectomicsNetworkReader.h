@@ -40,10 +40,10 @@ namespace mitk
     virtual ~ConnectomicsNetworkReader();
 
     using AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   private:
-    ConnectomicsNetworkReader* Clone() const;
+    ConnectomicsNetworkReader* Clone() const override;
 
     us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
   };

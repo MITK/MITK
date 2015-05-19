@@ -52,7 +52,7 @@ namespace mitk
     typedef DiffusionImagePixelType DiffusionPixelType;
     typedef itk::VectorImage< DiffusionPixelType, 3 >   DiffusionImageType;
 
-    mitkClassMacro( TeemDiffusionTensor3DReconstructionImageFilter,
+    mitkClassMacroItkParent( TeemDiffusionTensor3DReconstructionImageFilter,
       itk::Object );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

@@ -82,7 +82,7 @@ connect( m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSu
 }
 }
 
-void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier, std::string supposedName)
+void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorage, const std::string& supposedIdentifier, const std::string& supposedName)
 {
 m_DataStorage = dataStorage;
 

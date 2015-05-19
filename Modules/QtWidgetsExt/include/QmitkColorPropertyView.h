@@ -33,8 +33,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkColorPropertyView : public QLabel, public mit
 
   protected:
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+    virtual void PropertyChanged() override;
+    virtual void PropertyRemoved() override;
 
     void DisplayColor();
 

@@ -55,11 +55,11 @@ class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyEditor : public QSpinBox, publi
 
     void initialize();
 
-    virtual QString textFromValue(int) const;
-    virtual int valueFromText(const QString&) const;
+    virtual QString textFromValue(int) const override;
+    virtual int valueFromText(const QString&) const override;
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+    virtual void PropertyChanged() override;
+    virtual void PropertyRemoved() override;
 
     void DisplayNumber();
 

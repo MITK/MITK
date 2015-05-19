@@ -28,7 +28,7 @@ struct QmitkDefaultPerspective : public QObject, public berry::IPerspectiveFacto
 
   QmitkDefaultPerspective();
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/);
+  void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/) override;
 
 private:
 

@@ -36,13 +36,13 @@ namespace mitk
     {
     }
 
-    void Load(us::ModuleContext* context)
+    void Load(us::ModuleContext* context) override
     {
       m_VtkShaderRepository.reset(new VtkShaderRepository);
       context->RegisterService<IShaderRepository>(m_VtkShaderRepository.get());
     }
 
-    void Unload(us::ModuleContext*)
+    void Unload(us::ModuleContext*) override
     {
       m_VtkShaderRepository.reset(NULL);
     }

@@ -29,7 +29,7 @@ class MITKDIFFUSIONCORE_EXPORT vtkOdfSource : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkOdfSource,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   typedef itk::OrientationDistributionFunction<float, QBALL_ODFSIZE> OdfType;
   // Description:
@@ -53,8 +53,8 @@ protected:
   vtkOdfSource();
   ~vtkOdfSource() {}
 
-  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-  int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
   OdfType Odf;
   double  Scale;

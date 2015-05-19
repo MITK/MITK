@@ -1,6 +1,6 @@
 project(org_mitk_gui_qt_common_tests)
 
-MACRO_CREATE_MITK_CTK_PLUGIN(
+mitk_create_plugin(
   EXPORT_DIRECTIVE org_mitk_gui_qt_common_tests_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src src/api
   MODULE_DEPENDS MitkQtWidgets

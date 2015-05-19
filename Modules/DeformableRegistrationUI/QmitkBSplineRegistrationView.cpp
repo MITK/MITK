@@ -35,7 +35,7 @@ typedef itk::Image< VectorType, 3 >   DeformationFieldType;
 typedef itk::ImageFileReader< DeformationFieldType > ImageReaderType;
 
 QmitkBSplineRegistrationView::QmitkBSplineRegistrationView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
-m_FixedNode(NULL), m_MovingNode(NULL)
+m_FixedNode(nullptr), m_MovingNode(nullptr)
 {
   m_Controls.setupUi(parent);
 
@@ -131,7 +131,7 @@ void QmitkBSplineRegistrationView::PrintDeformationField()
 
 void QmitkBSplineRegistrationView::CalculateTransformation()
 {
-  if (m_FixedNode != NULL && m_MovingNode != NULL)
+  if (m_FixedNode != nullptr && m_MovingNode != nullptr)
   {
     mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());

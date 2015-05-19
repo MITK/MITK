@@ -43,14 +43,14 @@ public:
   // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read();
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
-  virtual ConfidenceLevel GetReaderConfidenceLevel() const;
+  virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
   // -------------- AbstractFileWriter -------------
 
-  virtual void Write();
-  virtual ConfidenceLevel GetWriterConfidenceLevel() const;
+  virtual void Write() override;
+  virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
 
 protected:
 
@@ -60,7 +60,7 @@ private:
 
   ItkImageIO(const ItkImageIO& other);
 
-  ItkImageIO* IOClone() const;
+  ItkImageIO* IOClone() const override;
 
   itk::ImageIOBase::Pointer m_ImageIO;
 };

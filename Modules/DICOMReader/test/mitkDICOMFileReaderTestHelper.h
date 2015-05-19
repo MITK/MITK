@@ -78,16 +78,16 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
     const DICOMImageBlockDescriptor block = reader->GetOutput(o);
 
     const DICOMImageFrameList& outputFiles = block.GetImageFrameList();
-    for(DICOMImageFrameList::const_iterator iter = outputFiles.begin();
+    for(auto iter = outputFiles.begin();
         iter != outputFiles.end();
         ++iter)
     {
       // check that output is part of input
-      StringList::iterator inputPositionOfCurrentOutput = std::find( inputFiles.begin(), inputFiles.end(), (*iter)->Filename );
+      auto inputPositionOfCurrentOutput = std::find( inputFiles.begin(), inputFiles.end(), (*iter)->Filename );
       if (inputPositionOfCurrentOutput !=  inputFiles.end())
       {
         // check that output is only part of ONE output
-        StringList::iterator outputPositionOfCurrentOutput = std::find( allSortedInputsFiles.begin(), allSortedInputsFiles.end(), (*iter)->Filename );
+        auto outputPositionOfCurrentOutput = std::find( allSortedInputsFiles.begin(), allSortedInputsFiles.end(), (*iter)->Filename );
         if (outputPositionOfCurrentOutput == allSortedInputsFiles.end())
         {
           // was not in list before

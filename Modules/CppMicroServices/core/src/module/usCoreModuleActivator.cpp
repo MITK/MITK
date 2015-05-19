@@ -30,12 +30,12 @@ US_BEGIN_NAMESPACE
 class CoreModuleActivator : public ModuleActivator
 {
 
-  void Load(ModuleContext* mc)
+  void Load(ModuleContext* mc) override
   {
     mc->GetModule()->d->coreCtx->Init();
   }
 
-  void Unload(ModuleContext* /*mc*/)
+  void Unload(ModuleContext* /*mc*/) override
   {
     //mc->GetModule()->d->coreCtx->Uninit();
   }

@@ -5,7 +5,7 @@
 
 \section BuildInstructions_Introduction Introduction
 
-The MITK build system (which is based on CMake) supports a "superbuild" process,
+The CMake-based build system of MITK supports a "superbuild" process,
 meaning that it will download, configure, and build all required third-party
 libraries (except Qt) automatically. These instructions will show you how to use
 the MITK superbuild.
@@ -14,7 +14,7 @@ the MITK superbuild.
 create your own project based on MITK, the process described below is completely
 automated. Please see \ref HowToNewProject.
 
-For more advanced users, the last sections explain how to inject custom build
+For more advanced users, the last sections explains how to inject custom build
 libraries into the superbuild process.
 
 \section BuildInstructions_Prerequisites Prerequisites
@@ -24,54 +24,24 @@ You need:
      clients available). We recomment using Git, but see below for a way how to
      get the current source code without using it.
   -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
-  -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based
-     applications (version \minimumQt4Version or above is required, Qt 5.x is only
-     supported experimentally for a very limited number of modules)
-  -# If you are using <b>Mac OS X</b> you need an Xcode installation as this
+  -# <a href="http://qt.nokia.com">Qt</a> 5.x if you plan to develop Qt-based
+     applications (Qt 4 is still supported but may be dropped in near future)
+  -# If you are using <b>Mac OS X</b> you need an XCode installation as it
      provides the neccessary compilers and SDKs
 
 \section BuildInstructions_Qt A note about Qt
 
-Nokia provides several binary packages for Qt. You must make sure that the package
-you download matches your toolchain. On Linux, getting Qt by installing the
-packages provided by your Linux package manager is the preferred way.
+As we do not provide Qt in the MITK superbuild you need to install Qt manually.
+Installing Qt dramatically improved since Qt 5, as The Qt Company provides
+<a href="http://www.qt.io/download/">sophisticated online installers for all
+supported platforms</a>.
 
-On Windows, the Nokia provided binaries are compiled for 32bit architectures.
-You cannot build your own project for a 64bit machine and
-use the 32bit Qt libraries. You have two options for a 64bit Qt-based application:
-
-  -# Download an inofficial 64bit installer, for example
-     <a href="http://code.google.com/p/qt-msvc-installer/">here</a>. Note
-     that we cannot offer support for problems with MITK due to the usage of
-     this kind of installers.
-  -# Compile Qt yourself. This is shortly described below.
-
-To compile Qt on Windows using Visual Studio, follow the steps below:
-
-  -# Download the Qt sources and unpack them, e.g. to
-     C:/qt-everywhere-opensource-src-4.7.4
-  -# Open a Visual Studio command prompt. Make sure to use the appropriate
-     command prompt for either a 32 bit or 64 bit build.
-     Note that Visual Studio Express does not come with 64bit compilers out
-     of the box (the Professional version does).
-  -# Configure Qt by executing the configure.exe command in your Qt source
-     directory. The following configure options will build a Qt compatible
-     with MITK:
-     \verbatim
-configure.exe -prefix C:\Qt\4.7.4_vc9_x64 -debug-and-release -qt-sql-sqlite -no-multimedia -no-audio-backend -no-phonon -no-phonon-backend -no-declarative -mp -nomake examples -nomake demos -nomake docs
-\endverbatim
-  -# Build and install the Qt libraries
-     \verbatim
-nmake
-nmake install
-\endverbatim
-
-After "nmake install" completed successfully, you may delete your Qt source
-directory.
+\note Make sure that you select a Qt version which provides the right <b>OpenGL-enabled</b>
+packages for your architecture and compiler.
 
 \section BuildInstructions_Get_Source Get a source tree
 
-Since MITK is under active development we recommend to use git to check out
+Since MITK is under active development we recommend to use Git to check out
 the latest stable release from the homepage. If you decide to use the most
 current nightly release, make sure to get a stable tree: Check the
 <a href="http://cdash.mitk.org/index.php?project=MITK">MITK dashboard</a>
@@ -79,12 +49,10 @@ before checking out. If the build tree is not clean, you can specify an
 older revision for the checkout or get a stable tar ball from
 <a href="http://www.mitk.org">www.mitk.org</a>.
 
-If you don't want to use Git, you may also download the current source code
-(or any other older version) as a tar.gz package by clicking on the
-<a href="http://mitk.org/git/?p=MITK.git;a=shortlog;h=refs/heads/master">snapshot</a>
-link. You can then skip the clone step below.
+If you don't want to use Git, you may also download a snapshot of the current source code
+(or any other older version) as a <a href="http://mitk.org/git/?p=MITK.git;a=shortlog;h=refs/heads/master">tar.gz package</a>.
 
-To clone MITK's current git repository do:
+To clone MITK's current Git repository do:
 
 \code
 git clone http://git.mitk.org/MITK.git
@@ -94,7 +62,7 @@ git clone http://git.mitk.org/MITK.git
 
 Create a new directory for the superbuild binary tree, change to it and call CMake:
 
-In the shell (assuming you current directory is the same as the one where you
+In the shell (assuming your current directory is the same as the one where you
 issued the git clone command):
 \code
 mkdir MITK-superbuild
@@ -102,23 +70,13 @@ cd MITK-superbuild
 ccmake ../MITK
 \endcode
 
-If you use <b>Windows</b>, then you just start the CMake GUI and enter the
-location of the source and of the binary tree, choose a suitable generator
+If you use <b>Windows</b> or prefer to use the CMake GUI, start the CMake GUI and enter the
+location of the source tree and binary tree, choose a suitable generator
 and configure the project.
-
-If you use <b>Mac OS X</b> you will have to tweak the CMake configuration:
- - First of all you have to check the selected compilers, i.e.:
-  - <tt><b>CMAKE_CXX_COMPILER</b></tt>
-  - <tt><b>CMAKE_C_COMPILER</b></tt>
-  - both should be either apple's clang or apple's gcc compiler
- - Next you have to assure hat <tt><b>CMAKE_OSX_SYSROOT</b></tt> points to
-   the correct SDK location:
-  - This is either /Developer/SDKs/Developer/SDKs/MacOSX10.7.sdk or if you
-    have installed Xcode 4.3+ it is located in
-    /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/
 
 CMake will present you a couple of options, these are the most important ones:
 
+ - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.4/msvc2013_64_opengl</i> or <i>/home/user/Qt/5.4/gcc_64</i>
  - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this
    will download and build ACVD)
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
@@ -131,21 +89,6 @@ CMake will present you a couple of options, these are the most important ones:
  - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also
    configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
  - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
- - <tt><b>MITK_USE_SOFA</b></tt> Build MITK code which depends on SOFA (this will
-   download and build SOFA)
- - <tt><b>QT_QMAKE_EXECUTABLE</b></tt> The path to the qmake executable of your Qt
-   installation
-
-You may also choose to build with either Qt4 or Qt5. When building with Qt5,
-the BlueBerry application framework and hence the MITK Workbench application
-will not be available. Further, many Qt-depdendent MITK modules have not been
-migrated to Qt5 yet. In case of Qt4 you may point CMake to a certain Qt4
-installation directory by setting the <tt>QT_QMAKE_EXECUTABLE</tt> variable.
-When building against Qt5, the following variables are important:
-
- - <tt><b>DESIRED_QT_VERSION</b></tt> Set this to "5" for building with Qt5.
- - <tt><b>CMAKE_PREFIX_PATH</b></tt> If Qt5 is not found automatically, set
-   this variable to the base directory of your Qt5 installation.
 
 If you are satisfied with the configuration of your MITK superbuild, generate
 the project files with CMake by pressing "Generate".
@@ -153,13 +96,8 @@ the project files with CMake by pressing "Generate".
 <b>Linux</b> and <b>Mac OS X</b> users usually just enter "make" (optionally
 supplying the number threads to be used for a parallel build):
 \code
-make -j4
+make -j6
 \endcode
-
-\note On <b>Mac OS X:</b> If you follow these steps CMake will produce Makefiles
-and therefore you cannot use Xcode but you have to use e.g. the QtCreator for
-programming. At the moment developing MITK with Xcode is not supported and using
-Xcode the superbuild doesn't complete without errors.
 
 <b>Windows</b> users using Visual Studio can open the generated
 <tt>MITK-superbuild.sln</tt> solution file in the <tt>MITK-superbuild</tt>
@@ -167,23 +105,25 @@ directory and start the build by building the <tt>BUILD_ALL</tt> project.
 
 \section BuildInstructions_Customize Customize your MITK superbuild
 
-The MITK superbuild configured MITK with all needed external libraries. The
+The MITK superbuild configures MITK as well as all external libraries. The
 build directories of these libraries, and of MITK itself are located inside
 the <tt>MITK-superbuild</tt> directory. For example, the directory layout may
 look like:
 
 \code
 MITK-superbuild
- |- ITK-build
- |- VTK-build
+ |- ep "external projects"
+    |-bin
+    |-lib
+    |-include
+    |-src
  |- MITK-build
 \endcode
 
-To change the configuration of the MITK build, choose the MITK-build directory
-as the binary directory in the CMake GUI. After generating the project files,
-build the MITK project by either issuing "make" in the MITK-build directory
-(Linux), or by opening MITK-build/MITK.sln and building the project with
-Visual Studio.
+To change the configuration of the MITK build itself, choose the MITK-build directory
+as the binary directory in the CMake GUI (not the MITK-superbuild directory).
+After generating the project files, build the MITK project by either issuing "make"
+in the MITK-build directory (Linux, Mac OS X), or by opening MITK-build/MITK.sln (Windows).
 
 You may also change the configuration of any project configured via the
 superbuild process. Make sure to also build the changed project and also the
@@ -195,11 +135,10 @@ On Linux, just execute the application you want to run. MITK executables are
 located in <tt>MITK-superbuild/MITK-build/bin</tt>
 
 On Windows, the <tt>PATH</tt> environment variable must contain the directories
-containging third-party libraries. The MITK build system generated Windows Batch
-files in the <tt>MITK-build</tt> directory which set up a correct environment
-and opens the appropriate Visual Studio solution file. Use (and maybe
-modify/enhance) these Batch files to be able to start and debug MITK applications
-from inside Visual Studio.
+containing the third-party libraries. The MITK build system generated <b>Windows batch
+files</b> in the <tt>MITK-build</tt> directory set up a correct environment
+and opens the appropriate Visual Studio solution file. Use these batch files to be able
+to start and debug MITK applications from inside Visual Studio.
 
 \section BuildInstructions_Documentation Documentation
 
@@ -221,15 +160,15 @@ the CMake macros <code>mitk_create_module()</code> and
 <code>mitk_create_executable()</code> provided by MITK.
 
 Here is an example CMakeLists.txt (from the Examples/QtAppExample/ directory)
-which allows you to create a Qt based application using MITK to display an image.
+which allows you to create a Qt-based application using MITK to display an image.
 \include QtAppExample/CMakeLists.txt
 
-\section BuildInstructions_Advanced_Customization Superbuild Customization
+\section BuildInstructions_Advanced_Customization Superbuild customization
 
 You can inject pre-build third-party libraries into the MITK superbuild by
 setting certain CMake variables before the first configure step. MITK will
 then use these third-party libraries instead of downloading and building them
-itself. Note you must take care to configure those libraries with all options
+by itself. Note that you must take care of configuring those libraries with all options
 MITK requires.
 
 The variables listed below are provided for injecting third-party libraries.
@@ -253,8 +192,6 @@ command line call to CMake.
    (the directory containing the ITKConfig.cmake file)
  - <tt><b>EXTERNAL_OpenCV_DIR</b></tt> Set this variable to your OpenCV binary
    tree (the directory containing the OpenCVConfig.cmake file)
- - <tt><b>EXTERNAL_SOFA_DIR</b></tt> Set this variable to your SOFA binary tree
-   (the directory containing the SOFAConfig.cmake file)
  - <tt><b>EXTERNAL_VTK_DIR</b></tt> Set this variable to your VTK binary tree
    (the directory containing the VTKConfig.cmake file)
 
@@ -267,6 +204,6 @@ ccmake -DITK_DIR:PATH=/opt/ITK-release ../MITK
 
 See the following link for more information about how to configure third-party
 libraries:
-\subpage BuildToolkits "How to build ITK, VTK and QT"
+\subpage BuildToolkits "How to build ITK, VTK and Qt"
 
 */

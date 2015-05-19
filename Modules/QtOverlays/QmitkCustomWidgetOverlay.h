@@ -57,7 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
     void SetWidget( QWidget* widget );
 
-    QSize GetNeededSize();
+    QSize GetNeededSize() override;
 
   };
 

@@ -76,7 +76,7 @@ public:
    *
    * \sa ctkCmdLineModuleFrontend::value
    */
-  virtual QVariant value(const QString &parameter, int role) const;
+  virtual QVariant value(const QString &parameter, int role) const override;
 
   /**
    * \brief A custom method to enable the setting of mitk::DataNode::Pointer for input images.
@@ -92,7 +92,7 @@ public:
    *
    * \sa ctkCmdLineModuleFrontend::setValue
    */
-  virtual void setValue(const QString& parameter, const QVariant& value, int role = DisplayRole);
+  virtual void setValue(const QString& parameter, const QVariant& value, int role = DisplayRole) override;
 
 protected:
 
@@ -100,13 +100,13 @@ protected:
    * \brief Virtual getter.
    * \see ctkCmdLineModuleFrontendQtGui::uiLoader()
    */
-  virtual QUiLoader* uiLoader() const;
+  virtual QUiLoader* uiLoader() const override;
 
   /**
    * \brief Virtual getter.
    * \see ctkCmdLineModuleFrontendQtGui::xslTransform()
    */
-  virtual ctkCmdLineModuleXslTransform* xslTransform() const;
+  virtual ctkCmdLineModuleXslTransform* xslTransform() const override;
 
 private:
 

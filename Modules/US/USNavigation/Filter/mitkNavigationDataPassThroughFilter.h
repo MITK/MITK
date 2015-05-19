@@ -44,7 +44,7 @@ protected:
    * If a subclass wants to implement its own version of the GenerateData()
    * method it should call this method inside its implementation.
    */
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 };
 
 } // namespace mitk

@@ -30,7 +30,7 @@ class FiberBundleSerializer : public BaseDataSerializer
     mitkClassMacro( FiberBundleSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize();
+    virtual std::string Serialize() override;
   protected:
     FiberBundleSerializer();
     virtual ~FiberBundleSerializer();

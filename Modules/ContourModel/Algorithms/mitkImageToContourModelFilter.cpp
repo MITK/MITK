@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ImageToContourModelFilter::ImageToContourModelFilter()
-  : m_SliceGeometry(0)
+  : m_SliceGeometry(nullptr)
 {
 }
 
@@ -60,7 +60,7 @@ void mitk::ImageToContourModelFilter::SetInput ( unsigned int idx, const mitk::I
 const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilter::GetInput( void )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
 
@@ -69,7 +69,7 @@ const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilte
 const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
 

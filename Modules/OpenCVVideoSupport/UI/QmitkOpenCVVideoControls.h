@@ -76,7 +76,7 @@ public:
   ///
   /// calls FromPropertyList
   ///
-  void AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList );
+  void AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* propertyList ) override;
 
 signals:
   ///

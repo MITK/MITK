@@ -58,7 +58,7 @@ QWidget* QmitkBaseItemDelegate::createEditor(QWidget* parent, const QStyleOption
     // TODO
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void QmitkBaseItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const

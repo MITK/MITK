@@ -37,8 +37,8 @@ void mitk::ContourModelToPointSetFilter::GenerateData()
   mitk::ContourModel::Pointer inputContour =  static_cast<mitk::ContourModel*>(this->GetInput(0));
   mitk::ContourModelToPointSetFilter::OutputType* outputPointSet = this->GetOutput();
 
-  InputType::VertexIterator it = inputContour->IteratorBegin();
-  InputType::VertexIterator end = inputContour->IteratorEnd();
+  auto it = inputContour->IteratorBegin();
+  auto end = inputContour->IteratorEnd();
   unsigned int pointId = 0;
 
 

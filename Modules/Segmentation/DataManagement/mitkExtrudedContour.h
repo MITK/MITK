@@ -49,9 +49,9 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual mitk::ScalarType GetVolume();
-  virtual bool IsInside(const Point3D& p) const;
-  virtual void UpdateOutputInformation();
+  virtual mitk::ScalarType GetVolume() override;
+  virtual bool IsInside(const Point3D& p) const override;
+  virtual void UpdateOutputInformation() override;
 
   //##Documentation
   //## @brief Contour to extrude
@@ -76,7 +76,7 @@ public:
   itkGetConstObjectMacro(ClippingGeometry, mitk::BaseGeometry);
   itkSetObjectMacro(ClippingGeometry, mitk::BaseGeometry);
 
-  virtual unsigned long GetMTime() const;
+  virtual unsigned long GetMTime() const override;
 protected:
   ExtrudedContour();
   virtual ~ExtrudedContour();

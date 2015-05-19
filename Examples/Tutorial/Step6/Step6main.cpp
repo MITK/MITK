@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
   // Register Qmitk-dependent global instances
   QmitkRegisterClasses();
 
-  Step6 mainWidget(argc, argv, NULL);
+  Step6 mainWidget(argc, argv, nullptr);
   mainWidget.Initialize();
   mainWidget.show();
 

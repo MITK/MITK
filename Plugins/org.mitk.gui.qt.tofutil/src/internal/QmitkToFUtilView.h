@@ -65,17 +65,17 @@ public:
   ~QmitkToFUtilView();
 
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
   /// \brief Called when the functionality is activated.
-  virtual void Activated();
+  virtual void Activated() override;
   /// \brief Called when the functionality is deactivated. In this case the zombie view of this functionality becomes active!
-  virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView);
+  virtual void ActivatedZombieView(berry::IWorkbenchPartReference::Pointer zombieView) override;
 
-  virtual void Deactivated();
-  virtual void Visible();
-  virtual void Hidden();
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
-  void SetFocus();
+  void SetFocus() override;
 
 protected slots:
 

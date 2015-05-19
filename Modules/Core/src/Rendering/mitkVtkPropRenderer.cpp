@@ -304,6 +304,12 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
 {
   BaseRenderer::InitRenderer(renderWindow);
 
+  vtkCallbackCommand *renderCallbackCommand = vtkCallbackCommand::New();
+  renderCallbackCommand->SetCallback(
+    VtkPropRenderer::RenderingCallback );
+  renderWindow->GetInteractor()->AddObserver( vtkCommand::RenderEvent, renderCallbackCommand );
+  renderCallbackCommand->Delete();
+
   if(renderWindow == NULL)
   {
     m_InitNeeded = false;
@@ -315,6 +321,15 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow* renderWindow)
   m_ResizeNeeded = true;
 
   m_LastUpdateTime = 0;
+}
+
+void mitk::VtkPropRenderer::RenderingCallback( vtkObject *caller, unsigned long , void *, void * )
+{
+  vtkRenderWindowInteractor *renderWindowInteractor
+      = dynamic_cast< vtkRenderWindowInteractor * >( caller );
+  if(!renderWindowInteractor) return;
+  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindowInteractor->GetRenderWindow());
+  if(renderer) renderer->RequestUpdate();
 }
 
 /*!
@@ -684,6 +699,7 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
     this->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(false);
     vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+    this->GetRenderWindow()->GetInteractor()->EnableRenderOff();
     m_CameraInitializedForMapperID = Standard3D;
   }
   else if( this->GetMapperID() == Standard2D)
@@ -696,7 +712,7 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
 
     vtkSmartPointer<mitkVtkInteractorStyle> style = vtkSmartPointer<mitkVtkInteractorStyle>::New();
     this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
-
+    this->GetRenderWindow()->GetInteractor()->EnableRenderOff();
     m_CameraInitializedForMapperID = Standard2D;
   }
   return true;

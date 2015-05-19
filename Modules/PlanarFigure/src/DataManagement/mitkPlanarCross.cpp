@@ -53,7 +53,7 @@ bool mitk::PlanarCross::GetSingleLineMode() const
   mitk::BoolProperty* singleLineMode = dynamic_cast< mitk::BoolProperty* >(
     this->GetProperty( "SingleLineMode" ).GetPointer() );
 
-  if ( singleLineMode != NULL )
+  if ( singleLineMode != nullptr )
   {
     return singleLineMode->GetValue();
   }

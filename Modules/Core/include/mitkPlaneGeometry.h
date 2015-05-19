@@ -161,7 +161,7 @@ namespace mitk {
     *
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-      const AffineTransform3D* transform = NULL,
+      const AffineTransform3D* transform = nullptr,
       PlaneOrientation planeorientation = Axial,
       ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
 
@@ -184,7 +184,7 @@ namespace mitk {
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const Vector3D& rightVector, const Vector3D& downVector,
-      const Vector3D *spacing = NULL);
+      const Vector3D *spacing = nullptr);
 
     /**
     * \brief Initialize plane by width and height in pixels,
@@ -196,7 +196,7 @@ namespace mitk {
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const VnlVector& rightVector, const VnlVector& downVector,
-      const Vector3D * spacing = NULL);
+      const Vector3D * spacing = nullptr);
 
     /**
     * \brief Initialize plane by right-/down-vector (itk) and spacing
@@ -207,7 +207,7 @@ namespace mitk {
     * respective spacing before they are set in the matrix.
     */
     virtual void InitializeStandardPlane(const Vector3D& rightVector,
-      const Vector3D& downVector, const Vector3D * spacing = NULL);
+      const Vector3D& downVector, const Vector3D * spacing = nullptr);
 
     /**
     * \brief Initialize plane by right-/down-vector (vnl) and spacing
@@ -218,7 +218,7 @@ namespace mitk {
     * respective spacing before they are set in the matrix.
     */
     virtual void InitializeStandardPlane(const VnlVector& rightVector,
-      const VnlVector& downVector, const Vector3D * spacing = NULL);
+      const VnlVector& downVector, const Vector3D * spacing = nullptr);
 
     /**
     * \brief Initialize plane by origin and normal (size is 1.0 mm in
@@ -399,10 +399,10 @@ namespace mitk {
     */
     Point3D ProjectPointOntoPlane(const Point3D &pt) const;
 
-    virtual itk::LightObject::Pointer InternalClone() const;
+    virtual itk::LightObject::Pointer InternalClone() const override;
 
     /** Implements operation to re-orient the plane */
-    virtual void ExecuteOperation(Operation *operation);
+    virtual void ExecuteOperation(Operation *operation) override;
 
     /**
     * \brief Project a 3D point given in mm (\a pt3d_mm) onto the 2D
@@ -525,7 +525,7 @@ namespace mitk {
 
     virtual ~PlaneGeometry();
 
-    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const;
+    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
     mitk::BaseGeometry *m_ReferenceGeometry;
 
@@ -535,7 +535,7 @@ namespace mitk {
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){ Superclass::PreSetSpacing(aSpacing); };
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{ Superclass::PreSetSpacing(aSpacing); };
 
     //##Documentation
     //## @brief CheckBounds
@@ -544,14 +544,14 @@ namespace mitk {
     //## If you implement this function in a subclass, make sure, that all classes were your class inherits from
     //## have an implementation of CheckBounds
     //## (e.g. inheritance BaseGeometry <- A <- B. Implementation of CheckBounds in class B needs implementation in A as well!)
-    virtual void CheckBounds(const BoundsArrayType& bounds);
+    virtual void CheckBounds(const BoundsArrayType& bounds) override;
 
     //##Documentation
     //## @brief CheckIndexToWorldTransform
     //##
     //## This function is called in SetIndexToWorldTransform. Assertions can be implemented in this function (see PlaneGeometry.cpp).
     //## In Subclasses of BaseGeometry, implement own conditions or call Superclass::CheckBounds(bounds);.
-    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D* transform);
+    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D* transform) override;
 
   private:
     /**

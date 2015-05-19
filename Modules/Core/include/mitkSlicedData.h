@@ -71,15 +71,15 @@ public:
   //## ProcessObject::UpdateOutputInformation() which determines modified
   //## times, LargestPossibleRegions, and any extra meta data like spacing,
   //## origin, etc.
-  virtual void UpdateOutputInformation();
+  virtual void UpdateOutputInformation() override;
 
-  virtual void PrepareForNewData();
+  virtual void PrepareForNewData() override;
 
   //##Documentation
   //## Set the RequestedRegion to the LargestPossibleRegion.  This forces a
   //## filter to produce all of the output in one execution (i.e. not
   //## streaming) on the next call to Update().
-  virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
   //##Documentation
   //## Determine whether the RequestedRegion is outside of the
@@ -90,7 +90,7 @@ public:
   //## current RequestedRegion is already inside the BufferedRegion from the
   //## previous execution (and the current filter is up to date), then a
   //## given filter does not need to re-execute
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
   //##Documentation
   //## @brief Verify that the RequestedRegion is within the
@@ -105,13 +105,13 @@ public:
   //## PropagateRequestedRegion().  PropagateRequestedRegion() throws a
   //## InvalidRequestedRegionError exception if the requested region is
   //## not within the LargestPossibleRegion.
-  virtual bool VerifyRequestedRegion();
+  virtual bool VerifyRequestedRegion() override;
 
   //##Documentation
   //## Set the requested region from this data object to match the requested
   //## region of the data object passed in as a parameter.  This method is
   //## implemented in the concrete subclasses of DataObject.
-  virtual void SetRequestedRegion( const itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
   //##Documentation
   //## Set the requested region from this data object to match the requested
@@ -143,7 +143,7 @@ public:
   virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const = 0;
   virtual bool IsVolumeSet(int t = 0, int n = 0) const = 0;
   virtual bool IsChannelSet(int n = 0) const = 0;
-  virtual void CopyInformation(const itk::DataObject *data);
+  virtual void CopyInformation(const itk::DataObject *data) override;
 
   //##Documentation
   //## @brief Get the number of channels
@@ -189,7 +189,7 @@ public:
   //##
   //## @warning This method will normally be called internally by the sub-class of SlicedData
   //## during initialization.
-  virtual void SetGeometry(BaseGeometry* aGeometry3D);
+  virtual void SetGeometry(BaseGeometry* aGeometry3D) override;
 
   //##Documentation
   //## @brief Convenience method for setting the origin of
@@ -198,7 +198,7 @@ public:
   //## In case the SlicedGeometry3D is evenly spaced,
   //## the origin of the first slice is set to \a origin.
   //## \sa mitk::BaseData::SetOrigin
-  virtual void SetOrigin(const Point3D& origin);
+  virtual void SetOrigin(const Point3D& origin) override;
 
   //##Documentation
   //## @brief Convenience method for setting the spacing of

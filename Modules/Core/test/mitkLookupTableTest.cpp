@@ -108,7 +108,7 @@ public:
     myLookupTable->SetVtkLookupTable(lut);
     vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = myLookupTable->CreateColorTransferFunction();
 
-    CPPUNIT_ASSERT(colorTransferFunction != 0);
+    CPPUNIT_ASSERT(colorTransferFunction != nullptr);
 
     vtkIdType numberOfTableEntries = lut->GetNumberOfTableValues();
     double rgbaTable[4];
@@ -137,10 +137,10 @@ public:
 
     myLookupTable->SetVtkLookupTable(lut);
     vtkSmartPointer<vtkPiecewiseFunction> opacityTransferFunction = myLookupTable->CreateOpacityTransferFunction();
-    CPPUNIT_ASSERT(opacityTransferFunction != 0);
+    CPPUNIT_ASSERT(opacityTransferFunction != nullptr);
 
     int funcSize = opacityTransferFunction->GetSize();
-    double *table = new double[funcSize];
+    auto table = new double[funcSize];
     double rgba[4];
     opacityTransferFunction->GetTable(0, 1, funcSize, table);
     for (int i = 0; i < funcSize; ++i)
@@ -166,10 +166,10 @@ public:
 
     myLookupTable->SetVtkLookupTable(lut);
     vtkSmartPointer<vtkPiecewiseFunction> gradientTransferFunction = myLookupTable->CreateGradientTransferFunction();
-    CPPUNIT_ASSERT(gradientTransferFunction != 0);
+    CPPUNIT_ASSERT(gradientTransferFunction != nullptr);
 
     int funcSize = gradientTransferFunction->GetSize();
-    double *table = new double[funcSize];
+    auto table = new double[funcSize];
     double rgba[4];
     gradientTransferFunction->GetTable(0, 1, funcSize, table);
     for (int i = 0; i < funcSize; ++i)

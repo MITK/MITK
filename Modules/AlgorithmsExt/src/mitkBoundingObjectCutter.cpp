@@ -40,7 +40,7 @@ const mitk::BoundingObject* BoundingObjectCutter::GetBoundingObject() const
 }
 
 BoundingObjectCutter::BoundingObjectCutter()
-  : m_BoundingObject(NULL), m_InsideValue(1), m_OutsideValue(0), m_AutoOutsideValue(false),
+  : m_BoundingObject(nullptr), m_InsideValue(1), m_OutsideValue(0), m_AutoOutsideValue(false),
     m_UseInsideValue(false), m_OutsidePixelCount(0), m_InsidePixelCount(0), m_UseWholeInputRegion(false)
 {
   this->SetNumberOfIndexedInputs(2);
@@ -81,16 +81,14 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   if(input.IsNull())
   {
-    MITK_WARN << "Input is not a mitk::Image";
-    return;
+    mitkThrow() << "Input is not a mitk::Image";
   }
   itkDebugMacro(<<"GenerateOutputInformation()");
   unsigned int dimension = input->GetDimension();
 
   if (dimension < 3)
   {
-    MITK_WARN << "ImageCropper cannot handle 1D or 2D Objects. Operation aborted.";
-    return;
+    mitkThrow() << "ImageCropper cannot handle 1D or 2D Objects.";
   }
 
   if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeGeometry()->CountTimeSteps() == 0))
@@ -137,7 +135,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
     m_InputRequestedRegion.SetSize(size);
     boRegion.SetSize(size);
     m_BoundingObject->SetRequestedRegion(&boRegion);
-    return;
+    mitkThrow() << "No overlap of the image and the cropping object.";
     }
   }
 
@@ -147,7 +145,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   // PART II: initialize output image
 
-  unsigned int *dimensions = new unsigned int [dimension];
+  auto dimensions = new unsigned int [dimension];
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
   if(dimension>3)
     memcpy(dimensions+3, input->GetDimensions()+3, (dimension-3)*sizeof(unsigned int));
@@ -174,7 +172,14 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
 void BoundingObjectCutter::ComputeData(mitk::Image* input3D, int boTimeStep)
 {
-  AccessFixedDimensionByItk_2(input3D, CutImage, 3, this, boTimeStep);
+  if ( input3D!=nullptr && input3D->GetPixelType().GetNumberOfComponents()==1 )
+  {
+    AccessFixedDimensionByItk_2(input3D, CutImage, 3, this, boTimeStep);
+  }
+  else
+  {
+    AccessVectorFixedDimensionByItk_n(input3D, CutImage, 3, (this, boTimeStep) );
+  }
 }
 
 void BoundingObjectCutter::GenerateData()
@@ -217,8 +222,8 @@ void BoundingObjectCutter::GenerateData()
     ComputeData(m_InputTimeSelector->GetOutput(), timestep);
   }
 
-  m_InputTimeSelector->SetInput(NULL);
-  m_OutputTimeSelector->SetInput(NULL);
+  m_InputTimeSelector->SetInput(nullptr);
+  m_OutputTimeSelector->SetInput(nullptr);
 
   m_TimeOfHeaderInitialization.Modified();
 }

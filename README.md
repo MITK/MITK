@@ -37,7 +37,7 @@ MITK is available as free open-source software under a [BSD-style license][licen
 Download
 ---------
 
-The MITK source code and binaries for the *mitkWorkbench* application are released regularly according to the [MITK release cycle][release-cycle]. See the [Download][download] page for a list of releases.
+The MITK source code and binaries for the *MitkWorkbench* application are released regularly according to the [MITK release cycle][release-cycle]. See the [Download][download] page for a list of releases.
 
 The official MITK source code is available in the [MITK Git repository][gitweb]. The Git clone command is
 

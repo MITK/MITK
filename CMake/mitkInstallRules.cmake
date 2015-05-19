@@ -45,11 +45,17 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlite.dll"
             DESTINATION "bin/plugins/sqldrivers"
             CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/imageformats/qsvg.dll"
+            DESTINATION "bin/plugins/imageformats"
+            CONFIGURATIONS Release)
     install(FILES "${_qmake_path}/../plugins/platforms/qwindowsd.dll"
             DESTINATION "bin/plugins/platforms"
             CONFIGURATIONS Debug)
     install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlited.dll"
             DESTINATION "bin/plugins/sqldrivers"
+            CONFIGURATIONS Debug)
+    install(FILES "${_qmake_path}/../plugins/imageformats/qsvgd.dll"
+            DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Debug)
   endif()
 
@@ -65,20 +71,6 @@ if(WIN32)
     foreach(_dcmtk_lib ${_dcmtk_libs})
       MITK_INSTALL(FILES ${_dcmtk_lib} )
     endforeach()
-  endif()
-
-  #BlueBerry
-  # Since this file is also included from external projects, you
-  # can only use variables which are made available through MITKConfig.cmake
-  if(MITK_USE_BLUEBERRY)
-    if(MINGW)
-      MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/liborg_blueberry_core_runtime.dll")
-    else()
-      if(NOT APPLE)
-        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/debug/liborg_blueberry_core_runtime.dll" CONFIGURATIONS Debug)
-        MITK_INSTALL(FILES "${MITK_BINARY_DIR}/bin/plugins/release/liborg_blueberry_core_runtime.dll" CONFIGURATIONS Release)
-      endif(NOT APPLE)
-    endif()
   endif()
 
   #MinGW dll
@@ -114,5 +106,3 @@ else()
   endif()
 
 endif()
-
-

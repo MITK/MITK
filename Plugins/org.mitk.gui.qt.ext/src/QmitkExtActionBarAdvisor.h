@@ -21,8 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <org_mitk_gui_qt_ext_Export.h>
 
+#include <QIcon>
+#include <QKeySequence>
+
 namespace berry {
 
+struct IContributionItem;
 struct IWorkbenchWindow;
 
 class MenuManager;
@@ -37,9 +41,23 @@ public:
 
 protected:
 
-  void FillMenuBar(berry::IMenuManager* menuBar);
+  void MakeActions(berry::IWorkbenchWindow* window) override;
+
+  void FillMenuBar(berry::IMenuManager* menuBar) override;
+
+  void FillToolBar(berry::IToolBarManager* toolBar) override;
 
 private:
+
+  /**
+   * Creates and returns the File menu.
+   */
+  berry::SmartPointer<berry::MenuManager> CreateFileMenu();
+
+  /**
+   * Creates and returns the Edit menu.
+   */
+  berry::SmartPointer<berry::MenuManager> CreateEditMenu();
 
   /**
    * Creates and returns the Window menu.
@@ -47,9 +65,19 @@ private:
   berry::SmartPointer<berry::MenuManager> CreateWindowMenu();
 
   /**
+   * Creates and returns the Help menu.
+   */
+  berry::SmartPointer<berry::MenuManager> CreateHelpMenu();
+
+
+  /**
    * Adds the perspective actions to the specified menu.
    */
   void AddPerspectiveActions(berry::MenuManager* menu);
+
+  berry::SmartPointer<berry::IContributionItem> GetItem(const QString& commandId, const QString& label,
+                                                        const QString& tooltip = QString(), const QIcon& icon = QIcon(),
+                                                        const QKeySequence& shortcut = QKeySequence());
 
   berry::IWorkbenchWindow* window;
 };

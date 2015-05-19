@@ -95,10 +95,10 @@ class MITKIMAGEEXTRACTION_EXPORT ExtractImageFilter : public ImageToImageFilter
     ExtractImageFilter(); // purposely hidden
     virtual ~ExtractImageFilter();
 
-    virtual void GenerateOutputInformation();
-    virtual void GenerateInputRequestedRegion();
+    virtual void GenerateOutputInformation() override;
+    virtual void GenerateInputRequestedRegion() override;
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* image );

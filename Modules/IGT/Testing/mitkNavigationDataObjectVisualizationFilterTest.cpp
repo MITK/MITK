@@ -89,7 +89,7 @@ private:
 public:
 
   // Set up for variables
-  void setUp()
+  void setUp() override
   {
     // -------------- Setup for Filter ---------------------------
 
@@ -143,7 +143,7 @@ public:
     //now we have ndDummy and mitkToolDataDummy to test with
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

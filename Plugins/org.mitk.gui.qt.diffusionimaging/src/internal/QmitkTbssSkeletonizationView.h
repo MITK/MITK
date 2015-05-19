@@ -52,18 +52,18 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
     QmitkTbssSkeletonizationView();
     virtual ~QmitkTbssSkeletonizationView();
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
     //Creation of the connections of main and control widget
     virtual void CreateConnections();
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+    virtual void StdMultiWidgetNotAvailable() override;
 
     /// \brief Called when the functionality is activated
-    virtual void Activated();
+    virtual void Activated() override;
 
-    virtual void Deactivated();
+    virtual void Deactivated() override;
 
 
   protected slots:
@@ -80,7 +80,7 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
   protected:
 
     //brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
     Ui::QmitkTbssSkeletonizationViewControls* m_Controls;
 

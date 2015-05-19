@@ -36,7 +36,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro( ToFCameraPMDController , itk::Object );
+    mitkClassMacroItkParent( ToFCameraPMDController , itk::Object );
 
     /*!
     \brief opens a connection to the ToF camera. Has to be implemented by the sub class

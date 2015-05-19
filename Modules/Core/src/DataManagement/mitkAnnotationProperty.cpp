@@ -27,7 +27,7 @@ mitk::AnnotationProperty::AnnotationProperty(
 : m_Label( "" ),
   m_Position( position )
 {
-  if ( label != NULL )
+  if ( label != nullptr )
   {
     m_Label = label;
   }
@@ -46,7 +46,7 @@ mitk::AnnotationProperty::AnnotationProperty(
   const char *label, ScalarType x, ScalarType y, ScalarType z )
 : m_Label( "" )
 {
-  if ( label != NULL )
+  if ( label != nullptr )
   {
     m_Label = label;
   }

@@ -200,13 +200,13 @@ public slots:
 
   bool InitializeStandardViews( const mitk::Geometry3D * geometry );
 
-  void wheelEvent( QWheelEvent * e );
+  void wheelEvent( QWheelEvent * e ) override;
 
-  void mousePressEvent(QMouseEvent * e);
+  void mousePressEvent(QMouseEvent * e) override;
 
-  void moveEvent( QMoveEvent* e );
+  void moveEvent( QMoveEvent* e ) override;
 
-  void leaveEvent ( QEvent * e  );
+  void leaveEvent ( QEvent * e  ) override;
 
   void EnsureDisplayContainsPoint(
       mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p);

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKSTATUSBARIMPLEMENTATION_H
 #define MITKSTATUSBARIMPLEMENTATION_H
 #include <MitkCoreExports.h>
-#include <itkMacro.h>
+#include <mitkCommon.h>
 
 namespace mitk {
 //##Documentation
@@ -26,7 +26,7 @@ namespace mitk {
 class MITKCORE_EXPORT StatusBarImplementation
 {
 public:
-  itkTypeMacroNoParent(StatusBarImplementation)
+  mitkClassMacroNoParent(StatusBarImplementation)
 
   //##Documentation
   //## @brief Constructor

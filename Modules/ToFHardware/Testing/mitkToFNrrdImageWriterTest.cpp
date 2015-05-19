@@ -58,7 +58,7 @@ public:
     * @brief Setup a recorder including a device. Here, we use a player, because in an automatic test
     * hardware is not useful.
     */
-  void setUp()
+  void setUp() override
   {
     m_ToFNrrdImageWriter = mitk::ToFNrrdImageWriter::New();
     m_ToFNrrdImageWriter->SetToFImageType(mitk::ToFNrrdImageWriter::ToFImageType3D); //we test the ToFImageType3D since 3D is deprecated?
@@ -79,7 +79,7 @@ public:
     m_IntensityImageName = "test_IntensityImage.nrrd";
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

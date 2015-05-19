@@ -45,7 +45,7 @@ namespace mitk
   {
   public:
 
-    void Load(us::ModuleContext* context)
+    void Load(us::ModuleContext* context) override
     {
       us::ServiceProperties props;
       props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
@@ -76,7 +76,7 @@ namespace mitk
       m_PlanarFigureCompositeWriter = new PlanarFigureCompositeWriter();
     }
 
-    void Unload(us::ModuleContext*)
+    void Unload(us::ModuleContext*) override
     {
       for (unsigned int loop(0); loop < m_MimeTypes.size(); ++loop)
       {

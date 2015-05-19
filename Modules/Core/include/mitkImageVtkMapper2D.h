@@ -130,10 +130,10 @@ public:
 
   /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
-  virtual void Update(mitk::BaseRenderer * renderer);
+  virtual void Update(mitk::BaseRenderer * renderer) override;
 
   //### methods of MITK-VTK rendering pipeline
-  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
   //### end of methods of MITK-VTK rendering pipeline
 
 
@@ -256,7 +256,7 @@ protected:
     * \image html cameraPositioning3D.png
     *
     */
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
   /** \brief This method uses the vtkCamera clipping range and the layer property
     * to calcualte the depth of the object (e.g. image or contour). The depth is used

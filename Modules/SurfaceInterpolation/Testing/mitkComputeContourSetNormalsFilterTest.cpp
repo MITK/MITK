@@ -43,7 +43,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_ContourNormalsFilter = mitk::ComputeContourSetNormalsFilter::New();
     CPPUNIT_ASSERT_MESSAGE("Failed to initialize ReduceContourSetFilter", m_ContourNormalsFilter.IsNotNull());

@@ -37,7 +37,7 @@ namespace mitk
 class MITKCORE_EXPORT DataNodeSource : public itk::ProcessObject
 {
 public:
-    mitkClassMacro( DataNodeSource, itk::ProcessObject )
+    mitkClassMacroItkParent( DataNodeSource, itk::ProcessObject )
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
@@ -52,7 +52,7 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx );
+    virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
 
     /**
      * This is a default implementation to make sure we have something.
@@ -60,7 +60,7 @@ public:
      * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
      * virtual.
      */
-    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name);
+    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override;
 
     OutputType* GetOutput();
     const OutputType* GetOutput() const;

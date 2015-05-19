@@ -38,7 +38,7 @@ namespace mitk {
   protected:
 
     /** @brief Creates a new histogram from the network source. */
-    virtual void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source );
+    virtual void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) override;
 
   };
 

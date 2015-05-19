@@ -43,7 +43,7 @@ class classname ## Serializer : public EnumerationPropertySerializer \
     itkFactorylessNewMacro(Self) \
     itkCloneMacro(Self) \
  \
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) \
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override \
     { \
         if (!element) return NULL; \
             const char* sa( element->Attribute("value") ); \

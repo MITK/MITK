@@ -35,7 +35,7 @@ namespace mitk {
   class MITKUS_EXPORT USProbe : public itk::Object
     {
     public:
-      mitkClassMacro(USProbe,itk::Object);
+      mitkClassMacroItkParent(USProbe,itk::Object);
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
       mitkNewMacro1Param(Self, std::string);

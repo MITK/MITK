@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLocalStorageHandler.h"
 
 #include <vtkActor.h>
-#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkPainterPolyDataMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
@@ -55,6 +54,7 @@ namespace mitk {
   *   - \b "material.interpolation": (VtkInterpolationProperty) Interpolation
   *   - \b "material.representation": (VtkRepresentationProperty*) Representation
   *   - \b "material.wireframeLineWidth": (FloatProperty) Width in pixels of the lines drawn.
+  *   - \b "material.pointSize": (FloatProperty) Size in pixels of the points drawn.
   *   - \b "scalar visibility": (BoolProperty) If the scarlars of the surface are visible
   *   - \b "Surface.TransferFunction (TransferFunctionProperty) Set a transferfunction for coloring the surface
   *   - \b "LookupTable (LookupTableProperty) LookupTable
@@ -88,7 +88,7 @@ public:
 
   virtual const mitk::Surface* GetInput();
 
-  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
+  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
   virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
 
@@ -99,9 +99,9 @@ protected:
 
   virtual ~SurfaceVtkMapper3D();
 
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
-  virtual void ResetMapper( mitk::BaseRenderer* renderer );
+  virtual void ResetMapper( mitk::BaseRenderer* renderer ) override;
 
   /** Checks whether the specified property is a ClippingProperty and if yes,
    * adds it to m_ClippingPlaneCollection (internal method). */
@@ -116,7 +116,7 @@ public:
     public:
 
       vtkSmartPointer<vtkActor> m_Actor;
-      vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
+      vtkSmartPointer<vtkPainterPolyDataMapper> m_VtkPolyDataMapper;
       vtkSmartPointer<vtkPolyDataNormals> m_VtkPolyDataNormals;
       vtkSmartPointer<vtkPlaneCollection> m_ClippingPlaneCollection;
       vtkSmartPointer<vtkDepthSortPolyData> m_DepthSort;
@@ -124,7 +124,7 @@ public:
 
       LocalStorage()
       {
-        m_VtkPolyDataMapper = vtkSmartPointer<vtkOpenGLPolyDataMapper>::New();
+        m_VtkPolyDataMapper = vtkSmartPointer<vtkPainterPolyDataMapper>::New();
         m_VtkPolyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
         m_Actor = vtkSmartPointer<vtkActor>::New();
         m_ClippingPlaneCollection = vtkSmartPointer<vtkPlaneCollection>::New();

@@ -34,9 +34,9 @@ public:
   ~QmitkComboBoxListView();
 
 protected:
-  void paintEvent(QPaintEvent* event);
-  void resizeEvent(QResizeEvent* event);
-  QStyleOptionViewItem viewOptions() const;
+  void paintEvent(QPaintEvent* event) override;
+  void resizeEvent(QResizeEvent* event) override;
+  QStyleOptionViewItem viewOptions() const override;
 
 private:
   QComboBox* m_ComboBox;
@@ -50,10 +50,10 @@ public:
   explicit QmitkPropertyItemDelegate(QObject* parent = NULL);
   ~QmitkPropertyItemDelegate();
 
-  QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-  void setEditorData(QWidget* editor, const QModelIndex& index) const;
-  void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
+  QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+  void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
   void SetPropertyList(mitk::PropertyList* propertyList);
 
 private slots:

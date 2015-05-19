@@ -47,7 +47,7 @@ namespace mitk
     //##Documentation
     //## @brief executes the actions that are sent to this statemachine
     //## derived from StateMachine
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
   };
 } // namespace mitk
 #endif /* MITKPositionTracker_H */

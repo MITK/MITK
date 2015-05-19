@@ -68,7 +68,7 @@ namespace itk{
       N = get_number_of_residuals();
     }
 
-    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) {
+    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) override {
 
       double ef = x[0];
       double D = x[1];
@@ -94,7 +94,7 @@ namespace itk{
       fixDStar = DStar;
     }
 
-    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) {
+    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) override {
 
       double ef = x[0];
       double D = x[1];
@@ -121,7 +121,7 @@ namespace itk{
       N = get_number_of_residuals();
     }
 
-    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) {
+    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) override {
 
       double D = x[0];
       double f = x[1];
@@ -146,7 +146,7 @@ namespace itk{
       fixD = D;
     }
 
-    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) {
+    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) override {
 
       double ef = x[0];
       double Dstar = x[1];
@@ -174,7 +174,7 @@ namespace itk{
       fixF = f;
     }
 
-    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) {
+    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) override {
 
       double Dstar = x[0];
 

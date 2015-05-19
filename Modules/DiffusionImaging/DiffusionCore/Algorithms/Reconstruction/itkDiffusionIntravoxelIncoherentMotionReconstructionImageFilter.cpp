@@ -36,7 +36,7 @@ namespace itk {
 template< class TIn, class TOut>
 DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<TIn, TOut>
 ::DiffusionIntravoxelIncoherentMotionReconstructionImageFilter() :
-    m_GradientDirectionContainer(NULL),
+    m_GradientDirectionContainer(nullptr),
     m_Method(IVIM_DSTAR_FIX),
     m_FitDStar(true),
     m_Verbose(false)

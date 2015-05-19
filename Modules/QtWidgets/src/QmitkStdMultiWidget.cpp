@@ -148,26 +148,22 @@ m_CrosshairNavigationEnabled(false)
 
   //Create RenderWindows 1
   mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", NULL, m_RenderingManager,renderingMode);
-  mitkWidget1->setMaximumSize(2000,2000);
   mitkWidget1->SetLayoutIndex( AXIAL );
   mitkWidgetLayout1->addWidget(mitkWidget1);
 
   //Create RenderWindows 2
   mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, name + ".widget2", NULL, m_RenderingManager,renderingMode);
-  mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( true );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
   mitkWidgetLayout2->addWidget(mitkWidget2);
 
   //Create RenderWindows 3
   mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, name + ".widget3", NULL, m_RenderingManager,renderingMode);
-  mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
   mitkWidgetLayout3->addWidget(mitkWidget3);
 
   //Create RenderWindows 4
   mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, name + ".widget4", NULL, m_RenderingManager,renderingMode);
-  mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
   mitkWidgetLayout4->addWidget(mitkWidget4);
 
@@ -200,7 +196,7 @@ m_CrosshairNavigationEnabled(false)
   sizePolicy.setVerticalStretch(0);
   sizePolicy.setHeightForWidth(levelWindowWidget->sizePolicy().hasHeightForWidth());
   levelWindowWidget->setSizePolicy(sizePolicy);
-  levelWindowWidget->setMaximumSize(QSize(50, 2000));
+  levelWindowWidget->setMaximumWidth(50);
 
   //add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget( levelWindowWidget );
@@ -342,6 +338,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetOffsetVector(offset);
   m_LogoRendering->SetRelativeSize(0.15);
   m_LogoRendering->SetCornerPosition(1);
+  m_LogoRendering->SetLogoImagePath("DefaultLogo");
   renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(),renderer4);
 
   // setup gradient background and renderwindow rectangle frame
@@ -359,10 +356,10 @@ void QmitkStdMultiWidget::InitializeWidget()
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
 {
   //We have 4 widgets and ...
-  for(unsigned int i = 0; i < 4; ++i)
+  for(auto & elem : m_GradientBackgroundColors)
   {
     float black[3] = {0.0f, 0.0f, 0.0f};
-    m_GradientBackgroundColors[i] = std::make_pair(mitk::Color(black), mitk::Color(black));
+    elem = std::make_pair(mitk::Color(black), mitk::Color(black));
   }
 }
 
@@ -665,9 +662,9 @@ void QmitkStdMultiWidget::SetCornerAnnotation( std::string text,
 
 void QmitkStdMultiWidget::SetCornerAnnotationVisibility(bool visibility)
 {
-  for(int i = 0 ; i<4 ; ++i)
+  for(auto ca : m_CornerAnnotations)
   {
-    CornerAnnotation ca = m_CornerAnnotations[i];
+
     if(ca.ren) ca.ren->SetDraw(visibility);
   }
 }
@@ -1803,18 +1800,18 @@ void QmitkStdMultiWidget::EnableGradientBackground()
 {
   // gradient background is by default only in widget 4, otherwise
   // interferences between 2D rendering and VTK rendering may occur.
-  for(unsigned int i = 0; i < 4; ++i)
+  for(auto & elem : m_GradientBackground)
   {
-    m_GradientBackground[i]->Enable();
+    elem->Enable();
   }
   m_GradientBackgroundFlag = true;
 }
 
 void QmitkStdMultiWidget::DisableGradientBackground()
 {
-  for(unsigned int i = 0; i < 4; ++i)
+  for(auto & elem : m_GradientBackground)
   {
-    m_GradientBackground[i]->Disable();
+    elem->Disable();
   }
   m_GradientBackgroundFlag = false;
 }
@@ -1822,11 +1819,13 @@ void QmitkStdMultiWidget::DisableGradientBackground()
 void QmitkStdMultiWidget::EnableDepartmentLogo()
 {
   m_LogoRendering->SetVisibility(true);
+  RequestUpdate();
 }
 
 void QmitkStdMultiWidget::DisableDepartmentLogo()
 {
   m_LogoRendering->SetVisibility(false);
+  RequestUpdate();
 }
 
 bool QmitkStdMultiWidget::IsDepartmentLogoEnabled() const
@@ -2034,9 +2033,9 @@ void QmitkStdMultiWidget::SetGradientBackgroundColorForRenderWindow( const mitk:
 
 void QmitkStdMultiWidget::SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower )
 {
-  for(unsigned int i = 0; i < 4; ++i)
+  for(auto & elem : m_GradientBackground)
   {
-    m_GradientBackground[i]->SetGradientColors(upper, lower);
+    elem->SetGradientColors(upper, lower);
   }
   m_GradientBackgroundFlag = true;
 }

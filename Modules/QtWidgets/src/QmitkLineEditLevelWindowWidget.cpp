@@ -42,7 +42,7 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
 
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this); // true);
 
-  QVBoxLayout* layout = new QVBoxLayout( this );
+  auto  layout = new QVBoxLayout( this );
   layout->setMargin(0);
   layout->setSpacing(0);
 

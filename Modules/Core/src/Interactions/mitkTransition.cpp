@@ -19,13 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkState.h"
 
 mitk::Transition::Transition(std::string name, int nextStateId, int eventId )
-  : m_Name(name), m_NextState(NULL),  m_NextStateId(nextStateId), m_EventId(eventId)
+  : m_Name(name), m_NextState(nullptr),  m_NextStateId(nextStateId), m_EventId(eventId)
 {}
 
 mitk::Transition::~Transition()
 {
   //needed for correct reference counting of mitkState
-  m_NextState = NULL;
+  m_NextState = nullptr;
   m_Actions.clear();
 }
 

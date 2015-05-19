@@ -64,22 +64,22 @@ public:
   using Superclass::TransformVector;
   using Superclass::TransformCovariantVector;
 
-  virtual OutputPointType TransformPoint(const InputPointType  & ) const;
-  virtual OutputVectorType TransformVector(const InputVectorType &) const;
-  virtual OutputVnlVectorType TransformVector(const InputVnlVectorType &) const;
-  virtual OutputCovariantVectorType TransformCovariantVector(const InputCovariantVectorType &) const;
+  virtual OutputPointType TransformPoint(const InputPointType  & ) const override;
+  virtual OutputVectorType TransformVector(const InputVectorType &) const override;
+  virtual OutputVnlVectorType TransformVector(const InputVnlVectorType &) const override;
+  virtual OutputCovariantVectorType TransformCovariantVector(const InputCovariantVectorType &) const override;
 
   virtual InputPointType BackTransform(const OutputPointType  &point ) const;
   virtual InputVectorType BackTransform(const OutputVectorType &vector) const;
   virtual InputVnlVectorType BackTransform(const OutputVnlVectorType &vector) const;
   virtual InputCovariantVectorType BackTransform(const OutputCovariantVectorType &vector) const;
 
-  virtual void SetParameters(const ParametersType&);
-  virtual void SetFixedParameters(const ParametersType&);
-  virtual void ComputeJacobianWithRespectToParameters(const InputPointType&, JacobianType&) const;
-  virtual void ComputeJacobianWithRespectToPosition(const InputPointType&, JacobianType&) const;
+  virtual void SetParameters(const ParametersType&) override;
+  virtual void SetFixedParameters(const ParametersType&) override;
+  virtual void ComputeJacobianWithRespectToParameters(const InputPointType&, JacobianType&) const override;
+  virtual void ComputeJacobianWithRespectToPosition(const InputPointType&, JacobianType&) const override;
 
-  virtual unsigned long GetMTime() const;
+  virtual unsigned long GetMTime() const override;
 
 protected:
   VtkAbstractTransform();

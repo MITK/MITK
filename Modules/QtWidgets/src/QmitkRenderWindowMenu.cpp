@@ -47,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
-:QWidget(parent, Qt::Tool | Qt::FramelessWindowHint ),
+:QWidget(NULL, Qt::Tool | Qt::FramelessWindowHint ),
 
 #else
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
@@ -63,7 +63,8 @@ m_FullScreenMode(false),
 m_Entered(false),
 m_Hidden(true),
 m_Renderer(b),
-m_MultiWidget(mw)
+m_MultiWidget(mw),
+m_Parent(parent)
 {
 
   MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
@@ -78,7 +79,7 @@ m_MultiWidget(mw)
   //for Mac OS see bug 3192
   //for Windows see bug 12130
   //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC) || defined(_WIN32)
+#if defined(Q_OS_MAC)
   this->show();
   this->setWindowOpacity(0.0f);
 #else
@@ -103,6 +104,7 @@ m_MultiWidget(mw)
   // for autorotating
   m_AutoRotationTimer.setInterval( 75 );
   connect( &m_AutoRotationTimer, SIGNAL(timeout()), this, SLOT(AutoRotateNextStep()) );
+  connect( m_Parent, SIGNAL(destroyed()), this, SLOT(deleteLater()));
 }
 
 QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
@@ -249,7 +251,7 @@ void QmitkRenderWindowMenu::HideMenu( )
      //for Mac OS see bug 3192
      //for Windows see bug 12130
      //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC) || defined(_WIN32)
+#if defined(Q_OS_MAC)
     this->setWindowOpacity(0.0f);
 #else
     this->setVisible(false);
@@ -266,7 +268,7 @@ void QmitkRenderWindowMenu::ShowMenu( )
   //for Mac OS see bug 3192
   //for Windows see bug 12130
   //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC) || defined(_WIN32)
+#if defined(Q_OS_MAC)
   this->setWindowOpacity(1.0f);
 #else
   this->setVisible(true);
@@ -292,7 +294,7 @@ void QmitkRenderWindowMenu::DeferredHideMenu( )
   //for Mac OS see bug 3192
   //for Windows see bug 12130
   //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC) || defined(_WIN32)
+#if defined(Q_OS_MAC)
   this->setWindowOpacity(0.0f);
 #else
   this->setVisible(false);
@@ -446,7 +448,7 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
   //for Mac OS see bug 3192
   //for Windows see bug 12130
   //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC) || defined(_WIN32)
+#if defined(Q_OS_MAC)
   this->setWindowOpacity(1.0f);
 #else
   this->setVisible(true);
@@ -770,10 +772,10 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 #endif
 {
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-  int X=floor( double(this->parentWidget()->width() - this->width() - 8.0) );
+  int X=floor( double(this->m_Parent->width() - this->width() - 8.0) );
   int Y=7;
 
-  QPoint pos = this->parentWidget()->mapToGlobal( QPoint(0,0) );
+  QPoint pos = this->m_Parent->mapToGlobal( QPoint(0,0) );
 
   this->move( X+pos.x(), Y+pos.y() );
 
@@ -782,7 +784,7 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 
   this->setWindowOpacity(opacity);
 #else
-  int moveX= floor( double(this->parentWidget()->width() - this->width() - 4.0) );
+  int moveX= floor( double(this->m_Parent->width() - this->width() - 4.0) );
   this->move( moveX, 3 );
   this->show();
 #endif

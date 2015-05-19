@@ -55,7 +55,7 @@ namespace itk
 
     itkSetMacro( InputNetwork, InputType::Pointer)
 
-    void GenerateData();
+    void GenerateData() override;
 
   protected:
 

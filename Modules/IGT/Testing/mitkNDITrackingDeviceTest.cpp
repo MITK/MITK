@@ -53,13 +53,13 @@ int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
   file.append("/SROMFile.rom");
   MITK_INFO << file;
 
-  MITK_TEST_CONDITION( (myNDITrackingDevice->AddTool("Tool0", file.c_str()))!=NULL, "Testing AddTool() for tool 0.");
+  MITK_TEST_CONDITION( (myNDITrackingDevice->AddTool("Tool0", file.c_str()))!=nullptr, "Testing AddTool() for tool 0.");
 
   //test method GetToolCount()
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetToolCount())==1, "Testing GetToolCount() for one tool.");
 
   //test method GetTool(unsigned int toolNumber)
-  MITK_TEST_CONDITION( (myNDITrackingDevice->GetTool(0))!=NULL, "Testing GetTool() for tool 0.");
+  MITK_TEST_CONDITION( (myNDITrackingDevice->GetTool(0))!=nullptr, "Testing GetTool() for tool 0.");
   mitk::TrackingTool::Pointer testtool = myNDITrackingDevice->GetTool(0);
 
   //test method UpdateTool(mitk::TrackingTool* tool)
@@ -82,7 +82,7 @@ int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetOperationMode()==3), "Testing behavior of method GetOperationMode().\n");
 
   //test method GetMarkerPositions(MarkerPointContainerType* markerpositions)
-  mitk::MarkerPointContainerType* markerpositions = new mitk::MarkerPointContainerType();
+  auto  markerpositions = new mitk::MarkerPointContainerType();
   MITK_TEST_CONDITION( (!myNDITrackingDevice->GetMarkerPositions(markerpositions)), "Testing behavior of method GetMarkerPositions().\n");
   delete markerpositions;
 

@@ -65,7 +65,7 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
 
 mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
-  if ( this->GetPlaneGeometry() ==  NULL )
+  if ( this->GetPlaneGeometry() ==  nullptr )
   {
     return point;
   }

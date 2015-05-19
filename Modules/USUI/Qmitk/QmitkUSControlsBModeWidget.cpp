@@ -37,7 +37,7 @@ QmitkUSControlsBModeWidget::QmitkUSControlsBModeWidget(mitk::USControlInterfaceB
   // get possible scanning depth values and set combo box values according to them
   std::vector<double> scanningDepths = m_ControlInterface->GetScanningDepthValues();
   double curDepthValue = m_ControlInterface->GetScanningDepth();
-  for (std::vector<double>::iterator it = scanningDepths.begin(); it != scanningDepths.end(); it++)
+  for (auto it = scanningDepths.begin(); it != scanningDepths.end(); it++)
   {
     ui->scanningDepthComboBox->addItem(QString::number(*it, 'f', 2));
 
@@ -49,7 +49,7 @@ QmitkUSControlsBModeWidget::QmitkUSControlsBModeWidget(mitk::USControlInterfaceB
   // get possible scanning frequency values and set combo box values according to them
   std::vector<double> scanningFrequencies = m_ControlInterface->GetScanningFrequencyValues();
   double curFrequencyValue = m_ControlInterface->GetScanningFrequency();
-  for (std::vector<double>::iterator it = scanningFrequencies.begin(); it != scanningFrequencies.end(); it++)
+  for (auto it = scanningFrequencies.begin(); it != scanningFrequencies.end(); it++)
   {
     ui->scanningFrequencyComboBox->addItem(QString::number(*it, 'f', 2) + QString(" MHz"));
 

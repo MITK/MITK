@@ -29,7 +29,7 @@ int mitkMeshTest(int /*argc*/, char* /*argv*/[])
 
   //try to get the itkmesh
   std::cout << "Create a mesh and try to get the itkMesh";
-  mitk::Mesh::DataType::Pointer itkdata = NULL;
+  mitk::Mesh::DataType::Pointer itkdata = nullptr;
   itkdata = mesh->GetMesh();
   if (itkdata.IsNull())
   {
@@ -49,7 +49,7 @@ int mitkMeshTest(int /*argc*/, char* /*argv*/[])
   int position = 0;
   mitk::Point3D point;
   point.Fill(1);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpINSERT, point, position);
+  auto   doOp = new mitk::PointOperation(mitk::OpINSERT, point, position);
   mesh->ExecuteOperation(doOp);
 
   //now check new condition!

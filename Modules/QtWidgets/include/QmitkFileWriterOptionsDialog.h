@@ -38,7 +38,7 @@ public:
 
   bool ReuseOptions() const;
 
-  virtual void accept();
+  virtual void accept() override;
 
 private:
 

@@ -43,8 +43,8 @@ namespace mitk
     std::string _FileName = *d->m_FileName;
 
     TiXmlDocument doc( _FileName.c_str() );
-    TiXmlElement* root = 0;
-    TiXmlElement* elem = 0;
+    TiXmlElement* root = nullptr;
+    TiXmlElement* elem = nullptr;
     // check if element is already available
     if(doc.LoadFile())
     {
@@ -54,13 +54,13 @@ namespace mitk
         elem = root->FirstChildElement( "EndoDebug" );
         if(elem)
           root->RemoveChild(elem);
-        elem = 0;
+        elem = nullptr;
       }
     }
     else
     {
       // document did not exist, create new one with declration
-      TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+      auto  decl = new TiXmlDeclaration( "1.0", "", "" );
       doc.LinkEndChild( decl );
       // create root
       root = new TiXmlElement( "data" );
@@ -81,7 +81,7 @@ namespace mitk
 
     std::set<std::string> _FilesToDebug = d->m_EndoDebug->GetFilesToDebug();
     std::string _FilesToDebugString;
-    std::set<std::string>::iterator it = _FilesToDebug.begin();
+    auto it = _FilesToDebug.begin();
     while( it != _FilesToDebug.end() )
     {
         if( it != _FilesToDebug.begin() )

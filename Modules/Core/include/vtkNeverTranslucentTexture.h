@@ -56,7 +56,7 @@ public:
 
   static vtkNeverTranslucentTexture* New();
   vtkTypeMacro(vtkNeverTranslucentTexture, vtkTexture);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
     \brief The FIX (see class description).
@@ -67,7 +67,7 @@ public:
     only fully transparent pixels and fully opaque pixels and the
     Interpolate flag is turn off.
   */
-  virtual int IsTranslucent();
+  virtual int IsTranslucent() override;
 
 protected:
 
@@ -95,8 +95,8 @@ class vtkNeverTranslucentTextureFactory : public vtkObjectFactory
     vtkNeverTranslucentTextureFactory();
 
     static vtkNeverTranslucentTextureFactory* New();
-    virtual const char* GetVTKSourceVersion();
-    const char* GetDescription();
+    virtual const char* GetVTKSourceVersion() override;
+    const char* GetDescription() override;
 
   protected:
     vtkNeverTranslucentTextureFactory(const vtkNeverTranslucentTextureFactory&);

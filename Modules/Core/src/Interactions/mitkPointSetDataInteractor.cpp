@@ -539,7 +539,7 @@ void mitk::PointSetDataInteractor::SetMaxPoints(unsigned int maxNumber)
   m_MaxNumberOfPoints = maxNumber;
 }
 
-int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, int time, float accuracy)
+int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, unsigned int time, float accuracy)
 {
   // iterate over point set and check if it contains a point close enough to the pointer to be selected
   PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
@@ -548,6 +548,11 @@ int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, int 
   {
     return index;
   }
+
+
+  if (points->GetPointSet(time) == nullptr)
+    return -1;
+
   PointSet::PointsContainer* pointsContainer = points->GetPointSet(time)->GetPoints();
 
   float minDistance = m_SelectionAccuracy;

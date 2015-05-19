@@ -42,10 +42,10 @@ public:
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void SetRequestedRegionToLargestPossibleRegion();
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion(const itk::DataObject*);
+    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    virtual bool VerifyRequestedRegion() override;
+    virtual void SetRequestedRegion(const itk::DataObject*) override;
 
     // set if this compsition is AND, OR, NOT
     void setOperationType(OperationType);

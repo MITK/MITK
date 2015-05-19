@@ -57,12 +57,12 @@ public:
   virtual const mitk::PlaneGeometryData* GetInput() const;
 
   /** \brief returns the a prop assembly */
-  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
   /** Applies properties specific to this mapper */
   virtual void ApplyAllProperties( BaseRenderer *renderer );
 
-  virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer);
+  virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
   /** \brief set the default properties for this mapper */
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
@@ -99,7 +99,7 @@ protected:
   virtual ~PlaneGeometryDataMapper2D();
 
   /* \brief Applies the color and opacity properties and calls CreateVTKRenderObjects */
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
   void CreateVtkCrosshair(BaseRenderer *renderer);
 

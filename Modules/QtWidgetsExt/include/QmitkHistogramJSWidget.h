@@ -86,7 +86,7 @@ public:
   typedef itk::ParametricPath< 3 >::Superclass PathType;
   typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
 
-  explicit QmitkHistogramJSWidget(QWidget *parent = 0);
+  explicit QmitkHistogramJSWidget(QWidget *parent = nullptr);
 
 
   ~QmitkHistogramJSWidget();
@@ -97,7 +97,7 @@ public:
   * Reimplemented from QWebView::resizeEvent(),
   * reloads the webframe
   */
-  void resizeEvent(QResizeEvent* resizeEvent);
+  void resizeEvent(QResizeEvent* resizeEvent) override;
 
   /**
   * \brief Calculates the histogram.

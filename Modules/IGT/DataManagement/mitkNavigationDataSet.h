@@ -127,10 +127,10 @@ namespace mitk {
     virtual NavigationDataSetIterator End();
 
     // virtual methods, that need to be implemented, but aren't reasonable for NavigationData
-    virtual void SetRequestedRegionToLargestPossibleRegion( );
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion( );
-    virtual bool VerifyRequestedRegion( );
-    virtual void SetRequestedRegion( const itk::DataObject *data );
+    virtual void SetRequestedRegionToLargestPossibleRegion( ) override;
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion( ) override;
+    virtual bool VerifyRequestedRegion( ) override;
+    virtual void SetRequestedRegion( const itk::DataObject *data ) override;
 
   protected:
     /**

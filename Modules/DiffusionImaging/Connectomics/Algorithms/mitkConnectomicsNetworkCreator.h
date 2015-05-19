@@ -56,7 +56,7 @@ namespace mitk
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsNetworkCreator, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsNetworkCreator, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

@@ -42,16 +42,16 @@ public:
 
 private:
 
-  int_type underflow();
+  int_type underflow() override;
 
-  int_type uflow();
+  int_type uflow() override;
 
-  int_type pbackfail(int_type ch);
+  int_type pbackfail(int_type ch) override;
 
-  std::streamsize showmanyc();
+  std::streamsize showmanyc() override;
 
-  pos_type seekoff (off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
-  pos_type seekpos (pos_type sp, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out);
+  pos_type seekoff (off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override;
+  pos_type seekpos (pos_type sp, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override;
 
   // purposely not implemented
   ModuleResourceBuffer(const ModuleResourceBuffer&);

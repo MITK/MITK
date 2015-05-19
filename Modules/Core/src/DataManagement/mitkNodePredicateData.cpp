@@ -33,7 +33,7 @@ mitk::NodePredicateData::~NodePredicateData()
 
 bool mitk::NodePredicateData::CheckNode(const mitk::DataNode* node) const
 {
-  if (node == NULL)
+  if (node == nullptr)
     throw std::invalid_argument("NodePredicateData: invalid node");
 
   return (node->GetData() == m_DataObject);

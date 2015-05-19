@@ -23,9 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkGnuplotWidget::QmitkGnuplotWidget(QWidget* parent)
   : QWidget(parent),
     m_Ui(new Ui::QmitkGnuplotWidget),
-    m_ContextMenu(NULL),
-    m_CopyPlotAction(NULL),
-    m_CopyScriptAction(NULL),
+    m_ContextMenu(nullptr),
+    m_CopyPlotAction(nullptr),
+    m_CopyScriptAction(nullptr),
     m_Process(new QProcess(this))
 {
   m_Ui->setupUi(this);
@@ -60,7 +60,7 @@ void QmitkGnuplotWidget::contextMenuEvent(QContextMenuEvent* event)
 {
   const QPixmap* plot = m_Ui->label->pixmap();
 
-  m_CopyPlotAction->setEnabled(plot != NULL && !plot->isNull());
+  m_CopyPlotAction->setEnabled(plot != nullptr && !plot->isNull());
   m_CopyScriptAction->setEnabled(!m_Commands.empty());
 
   m_ContextMenu->popup(event->globalPos());
@@ -72,7 +72,7 @@ void QmitkGnuplotWidget::OnCopyPlot()
 {
   const QPixmap* plot = m_Ui->label->pixmap();
 
-  if (plot != NULL && !plot->isNull())
+  if (plot != nullptr && !plot->isNull())
     QApplication::clipboard()->setPixmap(*plot);
 }
 

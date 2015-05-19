@@ -37,7 +37,7 @@ void QmitkDataNodeItemModel::AddDataNodes(const QList<mitk::DataNode::Pointer> &
   QList<QStandardItem*> items;
   foreach(mitk::DataNode::Pointer node, nodes)
   {
-    QStandardItem* item = new QStandardItem();
+    auto   item = new QStandardItem();
     item->setData(QVariant::fromValue<mitk::DataNode::Pointer>(node), QmitkDataNodeRole);
     items << item;
   }

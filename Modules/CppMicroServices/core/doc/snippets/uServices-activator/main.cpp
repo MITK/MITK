@@ -8,11 +8,11 @@ class MyActivator : public ModuleActivator
 
 public:
 
-  void Load(ModuleContext* /*context*/)
+  void Load(ModuleContext* /*context*/) override
   { /* register stuff */ }
 
 
-  void Unload(ModuleContext* /*context*/)
+  void Unload(ModuleContext* /*context*/) override
   { /* cleanup */ }
 
 };

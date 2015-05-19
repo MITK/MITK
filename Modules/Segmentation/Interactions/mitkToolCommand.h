@@ -42,13 +42,13 @@ namespace mitk {
       * \brief Reacts on events from ITK filters.
       *
       */
-      void Execute(itk::Object *caller, const itk::EventObject & event);
+      void Execute(itk::Object *caller, const itk::EventObject & event) override;
 
       /**
       * \brief Not implemented...
       *
       */
-      void Execute(const itk::Object * object, const itk::EventObject & event);
+      void Execute(const itk::Object * object, const itk::EventObject & event) override;
 
       /**
       * \brief Add new steps to the progress bar.

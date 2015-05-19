@@ -210,7 +210,7 @@ static void TestWrongInputs()
   bool success = false;
   try
   {
-    nd->CopyInformation(NULL);
+    nd->CopyInformation(nullptr);
   }
   catch(itk::ExceptionObject e)
   {
@@ -223,7 +223,7 @@ static void TestWrongInputs()
   success = false;
   try
   {
-    nd->Graft(NULL);
+    nd->Graft(nullptr);
   }
   catch(itk::ExceptionObject e)
   {

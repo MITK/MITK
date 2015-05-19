@@ -65,7 +65,7 @@ public:
   typedef itk::DiffusionTensor3D< TOdfPixelType >  TensorPixelType;
   typedef itk::Image< TensorPixelType, 3 >         TensorImageType;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   void OnSliceChanged(const itk::EventObject& e);
 
@@ -75,13 +75,13 @@ protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes );
+    const QList<mitk::DataNode::Pointer>& nodes ) override;
 
-  virtual void SetFocus();
-  void Visible();
-  void Hidden();
-  void Activated();
-  void Deactivated();
+  virtual void SetFocus() override;
+  void Visible() override;
+  void Hidden() override;
+  void Activated() override;
+  void Deactivated() override;
 
   void UpdateOdf(); ///< called if slice position or datamanager selection has changed
 

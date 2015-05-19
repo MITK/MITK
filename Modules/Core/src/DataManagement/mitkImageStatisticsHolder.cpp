@@ -40,7 +40,7 @@ mitk::ImageStatisticsHolder::ImageStatisticsHolder( mitk::Image* image)
 
 mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 {
-  m_HistogramGeneratorObject = NULL;
+  m_HistogramGeneratorObject = nullptr;
   //m_TimeSelectorForExtremaObject = NULL;
   //m_Image = NULL;
 }
@@ -48,7 +48,7 @@ mitk::ImageStatisticsHolder::~ImageStatisticsHolder()
 const mitk::ImageStatisticsHolder::HistogramType* mitk::ImageStatisticsHolder::GetScalarHistogram(int t, unsigned int /*component*/)
 {
   mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
-  if(timeSelector!=NULL)
+  if(timeSelector!=nullptr)
   {
     timeSelector->SetTimeNr(t);
     timeSelector->UpdateLargestPossibleRegion();
@@ -58,7 +58,7 @@ const mitk::ImageStatisticsHolder::HistogramType* mitk::ImageStatisticsHolder::G
     generator->ComputeHistogram();
     return static_cast<const mitk::ImageStatisticsHolder::HistogramType*>(generator->GetHistogram());
   }
-  return NULL;
+  return nullptr;
 }
 
 bool mitk::ImageStatisticsHolder::IsValidTimeStep( int t) const
@@ -124,7 +124,7 @@ void mitk::_ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageS
   typedef typename ItkImageType::PixelType TPixel;
   TPixel value = 0;
 
-  if ( statisticsHolder == NULL || !statisticsHolder->IsValidTimeStep( t ) ) return;
+  if ( statisticsHolder == nullptr || !statisticsHolder->IsValidTimeStep( t ) ) return;
   statisticsHolder->Expand(t+1); // make sure we have initialized all arrays
   statisticsHolder->m_CountOfMinValuedVoxels[t] = 0;
   statisticsHolder->m_CountOfMaxValuedVoxels[t] = 0;
@@ -206,7 +206,7 @@ void mitk::_ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::
   typedef typename ItkImageType::PixelType TPixel;
   double value = 0;
 
-  if ( statisticsHolder == NULL || !statisticsHolder->IsValidTimeStep( t ) ) return;
+  if ( statisticsHolder == nullptr || !statisticsHolder->IsValidTimeStep( t ) ) return;
   statisticsHolder->Expand(t+1); // make sure we have initialized all arrays
   statisticsHolder->m_CountOfMinValuedVoxels[t] = 0;
   statisticsHolder->m_CountOfMaxValuedVoxels[t] = 0;

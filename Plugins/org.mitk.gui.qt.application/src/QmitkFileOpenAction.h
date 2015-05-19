@@ -45,6 +45,7 @@ class MITK_QT_APP QmitkFileOpenAction : public QAction
 public:
   QmitkFileOpenAction(berry::IWorkbenchWindow::Pointer window);
   QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
+  QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow* window);
 
   ~QmitkFileOpenAction();
 

@@ -96,7 +96,7 @@ void QmitkGeometryToolsView::RemoveInteractor()
   {
     if( (node.IsNotNull()) && (node->GetDataInteractor().IsNotNull()) )
     {
-      node->SetDataInteractor(NULL);
+      node->SetDataInteractor(nullptr);
     }
   }
 }

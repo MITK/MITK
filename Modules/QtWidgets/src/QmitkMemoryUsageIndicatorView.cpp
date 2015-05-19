@@ -48,7 +48,7 @@ QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView( QWidget *  /*paren
 {
   this->setupUi(this);
 
-  QTimer *timer = new QTimer( this );
+  auto timer = new QTimer( this );
   QObject::connect( timer, SIGNAL( timeout() ), this, SLOT( UpdateMemoryUsage() ) );
   timer->start(1000);
   m_LEDGreen = QPixmap(QmitkMemoryUsageIndicatorImagesGreen_xpm);

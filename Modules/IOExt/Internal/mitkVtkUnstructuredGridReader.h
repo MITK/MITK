@@ -29,10 +29,10 @@ public:
   virtual ~VtkUnstructuredGridReader();
 
   using AbstractFileReader::Read;
-  virtual std::vector< itk::SmartPointer<BaseData> > Read();
+  virtual std::vector< itk::SmartPointer<BaseData> > Read() override;
 
 protected:
-  virtual VtkUnstructuredGridReader* Clone() const;
+  virtual VtkUnstructuredGridReader* Clone() const override;
 
 };
 

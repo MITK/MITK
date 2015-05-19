@@ -77,7 +77,7 @@ public:
   /**
   * clean up the contour data
   */
-  void Initialize();
+  void Initialize() override;
 
   /**
   * add a new vertex to the contour
@@ -118,27 +118,27 @@ public:
   /**
   * intherited from parent
   */
-  virtual void UpdateOutputInformation();
+  virtual void UpdateOutputInformation() override;
 
   /**
   * intherited from parent
   */
-  virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
   /**
   * intherited from parent
   */
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
   /**
   * intherited from parent
   */
-  virtual bool VerifyRequestedRegion();
+  virtual bool VerifyRequestedRegion() override;
 
   /**
   * intherited from parent
   */
-  virtual void SetRequestedRegion( const itk::DataObject *data);
+  virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
 protected:
   mitkCloneMacro(Self);
@@ -147,7 +147,7 @@ protected:
   Contour(const Contour & other);
   virtual ~Contour();
 
-  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
 private:
 

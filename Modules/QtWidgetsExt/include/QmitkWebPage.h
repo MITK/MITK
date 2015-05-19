@@ -33,7 +33,7 @@ public:
   /**
   * @brief Constructor
   */
-  QmitkJSWebPage(QObject *parent=0);
+  QmitkJSWebPage(QObject *parent=nullptr);
 
   /**
   * @brief Destructor
@@ -47,7 +47,11 @@ public slots:
    *  Overwritten from QWebView, to stop asking Qt to stop the JavaScript.
    * @return false so JavaScript is not stopped
    */
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+  bool shouldInterruptJavaScript() override;
+#else
   bool shouldInterruptJavaScript();
+#endif
 };
 
 #endif

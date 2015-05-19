@@ -74,7 +74,7 @@ class MITKSEGMENTATION_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     virtual ~CorrectorAlgorithm();
 
     // does the actual processing
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     bool ImprovedHeimannCorrectionAlgorithm(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic);
     bool ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic);

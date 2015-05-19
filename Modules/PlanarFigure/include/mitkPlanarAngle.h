@@ -50,19 +50,19 @@ public:
   //virtual void Initialize();
 
   /** \brief Angle has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const
+  unsigned int GetMinimumNumberOfControlPoints() const override
   {
     return 3;
   }
 
 
   /** \brief Angle has 3 control points per definition. */
-  unsigned int GetMaximumNumberOfControlPoints() const
+  unsigned int GetMaximumNumberOfControlPoints() const override
   {
     return 3;
   }
 
-  virtual bool Equals(const mitk::PlanarFigure& other) const;
+  virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
 protected:
   PlanarAngle();
@@ -71,15 +71,15 @@ protected:
   mitkCloneMacro(Self);
 
   /** \brief Generates the poly-line representation of the planar figure. */
-  virtual void GeneratePolyLine();
+  virtual void GeneratePolyLine() override;
 
   /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
+  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
   /** \brief Calculates feature quantities of the planar figure. */
-  virtual void EvaluateFeaturesInternal();
+  virtual void EvaluateFeaturesInternal() override;
 
-  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
 private:
 

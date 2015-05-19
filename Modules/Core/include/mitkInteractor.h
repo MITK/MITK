@@ -91,12 +91,12 @@ public:
   //## where 0 represents not responsible and 1 represents definitive responsible!
   //## Standard function to override if needed.
   //## (Used by GlobalInteraction to decide which DESELECTED statemachine to send the event to.)
-  virtual float CanHandleEvent(StateEvent const* stateEvent) const;
+  virtual float CanHandleEvent(StateEvent const* stateEvent) const override;
 
   /**
   * @brief Updates the current TimeStep according to the associated data and calls Superclass::HandleEvent()
   **/
-  bool HandleEvent(StateEvent const* stateEvent);
+  bool HandleEvent(StateEvent const* stateEvent) override;
 
   /**
   * @brief Method to call if the associated data has changed by the user (loading of data)
@@ -110,7 +110,7 @@ public:
   //##Documentation
   //## @brief adds handling of operations used for mode change. Unrecognized Operations are send to Superclass.
   //## *ATTENTION*: THIS METHOD SHOULD NOT BE CALLED FROM OTHER CLASSES DIRECTLY!
-  virtual void ExecuteOperation(Operation* operation);
+  virtual void ExecuteOperation(Operation* operation) override;
 
   static const std::string XML_NODE_NAME;
 
@@ -155,7 +155,7 @@ protected:
   * The number of timesteps is read from the dedicated data.
   * @param[in] timeStep The timeStep that the statemachine has to be set to
   **/
-  virtual void UpdateTimeStep(unsigned int timeStep);
+  virtual void UpdateTimeStep(unsigned int timeStep) override;
 
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for

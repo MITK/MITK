@@ -29,22 +29,22 @@ namespace mitk {
     typedef NonBlockingAlgorithmEvent Self;
     typedef itk::AnyEvent Superclass;
 
-    NonBlockingAlgorithmEvent( const NonBlockingAlgorithm* algorithm = NULL )
+    NonBlockingAlgorithmEvent( const NonBlockingAlgorithm* algorithm = nullptr )
       : m_Algorithm(algorithm) {}
 
     virtual ~NonBlockingAlgorithmEvent() {}
 
-    virtual const char * GetEventName() const
+    virtual const char * GetEventName() const override
     {
       return "NonBlockingAlgorithmEvent";
     }
 
-    virtual bool CheckEvent(const ::itk::EventObject* e) const
+    virtual bool CheckEvent(const ::itk::EventObject* e) const override
     {
       return dynamic_cast<const Self*>(e);
     }
 
-    virtual ::itk::EventObject* MakeObject() const
+    virtual ::itk::EventObject* MakeObject() const override
     {
       return new Self( m_Algorithm );
     }
@@ -69,7 +69,7 @@ namespace mitk {
   {
     public:
 
-      ResultAvailable( const NonBlockingAlgorithm* algorithm = NULL )
+      ResultAvailable( const NonBlockingAlgorithm* algorithm = nullptr )
       : NonBlockingAlgorithmEvent(algorithm)
       {
       }
@@ -83,7 +83,7 @@ namespace mitk {
   {
     public:
 
-      ProcessingError( const NonBlockingAlgorithm* algorithm = NULL )
+      ProcessingError( const NonBlockingAlgorithm* algorithm = nullptr )
       : NonBlockingAlgorithmEvent(algorithm)
       {
       }

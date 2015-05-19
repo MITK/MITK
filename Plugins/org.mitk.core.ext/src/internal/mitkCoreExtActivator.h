@@ -51,9 +51,9 @@ namespace mitk
     * @param context
     *        The context for the plug-in.
     */
-    void start(ctkPluginContext* context);
+    void start(ctkPluginContext* context) override;
 
-    void stop(ctkPluginContext* context);
+    void stop(ctkPluginContext* context) override;
 
   private:
 

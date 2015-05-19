@@ -57,7 +57,7 @@ int mitk::Event::GetKey() const
 bool mitk::Event::operator==(const Event& event) const
 {
   const mitk::Event *input = dynamic_cast<const mitk::Event*>(&event);
-  if(input==0) return false;
+  if(input==nullptr) return false;
 
   if ( (m_Type == event.GetType())
     && (m_Button == event.GetButton())

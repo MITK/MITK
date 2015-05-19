@@ -39,26 +39,26 @@ public:
 
     virtual ~QmitkDicomPreferencePage();
 
-    void Init(berry::IWorkbench::Pointer workbench);
+    void Init(berry::IWorkbench::Pointer workbench) override;
 
-    void CreateQtControl(QWidget* widget);
+    void CreateQtControl(QWidget* widget) override;
 
-    QWidget* GetQtControl() const;
+    QWidget* GetQtControl() const override;
 
     ///
     /// \see IPreferencePage::PerformOk()
     ///
-    virtual bool PerformOk();
+    virtual bool PerformOk() override;
 
     ///
     /// \see IPreferencePage::PerformCancel()
     ///
-    virtual void PerformCancel();
+    virtual void PerformCancel() override;
 
     ///
     /// \see IPreferencePage::Update()
     ///
-    virtual void Update();
+    virtual void Update() override;
 
 protected:
     QWidget* m_MainControl;

@@ -22,12 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <QProgressDialog>
 #include <QVariant>
+#include <QMessageBox>
 
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
   : QWidget(parent)
-  , m_Controls(0)
+  , m_Controls(nullptr)
   , m_LocalIndexer(new ctkDICOMIndexer(parent))
 {
     CreateQtPartControl(this);
@@ -92,23 +93,114 @@ void QmitkDicomLocalStorageWidget::OnFinishedImport()
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()
 {
-  QStringList selectedSeriesUIDs = m_Controls->ctkDicomBrowser->currentSeriesSelection();
-  QString uid;
-  foreach (uid, selectedSeriesUIDs)
+  if (!this->DeletePatients())
   {
-    m_LocalDatabase->removeSeries(uid);
+    if (!this->DeleteStudies())
+    {
+      this->DeleteSeries();
+    }
   }
-  QStringList selectedStudiesUIDs = m_Controls->ctkDicomBrowser->currentStudiesSelection();
-  foreach(uid, selectedStudiesUIDs)
-  {
-    m_LocalDatabase->removeStudy(uid);
-  }
-  QStringList selectedPatientUIDs = m_Controls->ctkDicomBrowser->currentPatientsSelection();
-  foreach(uid, selectedPatientUIDs)
-  {
-    m_LocalDatabase->removePatient(uid);
-  }
+
   m_Controls->ctkDicomBrowser->updateTableViews();
+}
+
+bool QmitkDicomLocalStorageWidget::DeletePatients()
+{
+  auto selectedPatientUIDs = m_Controls->ctkDicomBrowser->currentPatientsSelection();
+
+  if (!selectedPatientUIDs.empty())
+  {
+    QStringList studyUIDs;
+
+    for (const auto& patientUID : selectedPatientUIDs)
+      studyUIDs.append(m_LocalDatabase->studiesForPatient(patientUID));
+
+    QStringList seriesUIDs;
+
+    for (const auto& studyUID : studyUIDs)
+      seriesUIDs.append(m_LocalDatabase->seriesForStudy(studyUID));
+
+    auto answer = QMessageBox::question(
+      nullptr,
+      "Delete Patients",
+      QString("Do you really want to delete %1 %2, containing %3 series in %4 %5?")
+        .arg(selectedPatientUIDs.count())
+        .arg(selectedPatientUIDs.count() != 1 ? "patients" : "patient")
+        .arg(seriesUIDs.count())
+        .arg(studyUIDs.count())
+        .arg(studyUIDs.count() != 1 ? "studies" : "study"),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::No);
+
+    if (answer == QMessageBox::Yes)
+    {
+      for (const auto& patientUID : selectedPatientUIDs)
+        m_LocalDatabase->removePatient(patientUID);
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+bool QmitkDicomLocalStorageWidget::DeleteStudies()
+{
+  auto selectedStudyUIDs = m_Controls->ctkDicomBrowser->currentStudiesSelection();
+
+  if (!selectedStudyUIDs.empty())
+  {
+    QStringList seriesUIDs;
+
+    for (const auto& studyUID : selectedStudyUIDs)
+      seriesUIDs.append(m_LocalDatabase->seriesForStudy(studyUID));
+
+    auto answer = QMessageBox::question(
+      nullptr,
+      "Delete Studies",
+      QString("Do you really want to delete %1 %2, containing %3 series?")
+        .arg(selectedStudyUIDs.count())
+        .arg(selectedStudyUIDs.count() != 1 ? "studies" : "study")
+        .arg(seriesUIDs.count()),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::No);
+
+    if (answer == QMessageBox::Yes)
+    {
+      for (const auto& studyUID : selectedStudyUIDs)
+        m_LocalDatabase->removeStudy(studyUID);
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
+bool QmitkDicomLocalStorageWidget::DeleteSeries()
+{
+  auto selectedSeriesUIDs = m_Controls->ctkDicomBrowser->currentSeriesSelection();
+
+  if (!selectedSeriesUIDs.empty())
+  {
+    auto answer = QMessageBox::question(
+      nullptr,
+      "Delete Series",
+      QString("Do you really want to delete %1 series?")
+        .arg(selectedSeriesUIDs.count()),
+      QMessageBox::Yes | QMessageBox::No,
+      QMessageBox::No);
+
+    if (answer == QMessageBox::Yes)
+    {
+      for (const auto& seriesUID : selectedSeriesUIDs)
+        m_LocalDatabase->removeSeries(seriesUID);
+    }
+
+    return true;
+  }
+
+  return false;
 }
 
 void QmitkDicomLocalStorageWidget::OnViewButtonClicked()

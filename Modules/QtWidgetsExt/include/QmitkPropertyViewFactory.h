@@ -33,8 +33,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPropertyViewFactory
 
     /// Views and editors are created via operator new. After creation they belong to the caller of CreateView()/CreateEditor(),
     /// i.e. the caller has to ensure, that the objects are properly deleted!
-    QWidget* CreateView  (const mitk::BaseProperty* property, unsigned int type = 0, QWidget* parent = 0);
-    QWidget* CreateEditor(mitk::BaseProperty* property, unsigned int type = 0, QWidget* parent = 0);
+    QWidget* CreateView  (const mitk::BaseProperty* property, unsigned int type = 0, QWidget* parent = nullptr);
+    QWidget* CreateEditor(mitk::BaseProperty* property, unsigned int type = 0, QWidget* parent = nullptr);
 
   protected:
 

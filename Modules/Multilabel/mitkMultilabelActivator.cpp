@@ -30,20 +30,19 @@ namespace mitk
   class MultilabelModuleActivator : public us::ModuleActivator
   {
     std::vector<AbstractFileIO*> m_FileIOs;
-    
+
   public:
 
-    void Load(us::ModuleContext* /*context*/)
+    void Load(us::ModuleContext* /*context*/) override
     {
       m_FileIOs.push_back(new LabelSetImageIO());
     }
 
-    void Unload(us::ModuleContext*)
+    void Unload(us::ModuleContext*) override
     {
-      for(std::vector<mitk::AbstractFileIO*>::iterator iter = m_FileIOs.begin(),
-          endIter = m_FileIOs.end(); iter != endIter; ++iter)
+      for(auto & elem : m_FileIOs)
       {
-        delete *iter;
+        delete elem;
       }
     }
   };

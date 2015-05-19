@@ -31,11 +31,11 @@ class MITKALGORITHMSEXT_EXPORT SimpleUnstructuredGridHistogram : public SimpleHi
 public:
     SimpleUnstructuredGridHistogram();
 
-    virtual double GetMin() const;
-    virtual double GetMax() const;
+    virtual double GetMin() const override;
+    virtual double GetMax() const override;
 
-    virtual void ComputeFromBaseData( BaseData* source );
-    virtual float GetRelativeBin( double start, double end ) const;
+    virtual void ComputeFromBaseData( BaseData* source ) override;
+    virtual float GetRelativeBin( double start, double end ) const override;
 
 private:
 

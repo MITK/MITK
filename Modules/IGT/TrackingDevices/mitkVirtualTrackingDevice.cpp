@@ -82,7 +82,7 @@ bool mitk::VirtualTrackingDevice::StartTracking()
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
 
-  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
+  // m_TrackingFinishedMutex->Unlock(); causes bug-18879 // transfer the execution rights to tracking thread
 
   mitk::IGTTimeStamp::GetInstance()->Start(this);
 
@@ -107,7 +107,7 @@ bool mitk::VirtualTrackingDevice::StopTracking()
   }
 
   mitk::IGTTimeStamp::GetInstance()->Stop(this);
-  m_TrackingFinishedMutex->Lock();
+  // m_TrackingFinishedMutex->Lock(); causes bug-18879
 
   return true;
 }
@@ -231,7 +231,7 @@ void mitk::VirtualTrackingDevice::TrackTools()
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
     if (!localStopTracking)
     {
-      m_TrackingFinishedMutex->Lock();
+      // m_TrackingFinishedMutex->Lock(); causes bug-18879
     }
     this->m_StopTrackingMutex->Unlock();
 
@@ -274,11 +274,11 @@ void mitk::VirtualTrackingDevice::TrackTools()
       this->m_StopTrackingMutex->Unlock();
     } // tracking ends if we pass this line
 
-    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
+    // m_TrackingFinishedMutex->Unlock(); causes bug-18879 // transfer control back to main thread
   }
   catch(...)
   {
-    m_TrackingFinishedMutex->Unlock();
+    // m_TrackingFinishedMutex->Unlock(); causes bug-18879
     this->StopTracking();
     mitkThrowException(mitk::IGTException) << "Error while trying to track tools. Thread stopped.";
   }

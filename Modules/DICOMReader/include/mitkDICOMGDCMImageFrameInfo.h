@@ -36,7 +36,7 @@ namespace mitk
   {
     public:
 
-      mitkClassMacro(DICOMGDCMImageFrameInfo, itk::LightObject);
+      mitkClassMacroItkParent(DICOMGDCMImageFrameInfo, itk::LightObject);
       itkNewMacro( DICOMGDCMImageFrameInfo );
       mitkNewMacro1Param( DICOMGDCMImageFrameInfo, const std::string&);
       mitkNewMacro2Param( DICOMGDCMImageFrameInfo, const std::string&, unsigned int );
@@ -45,9 +45,9 @@ namespace mitk
 
       virtual ~DICOMGDCMImageFrameInfo();
 
-      virtual std::string GetTagValueAsString(const DICOMTag&) const;
+      virtual std::string GetTagValueAsString(const DICOMTag&) const override;
 
-      std::string GetFilenameIfAvailable() const;
+      std::string GetFilenameIfAvailable() const override;
 
       /// The frame that this objects refers to
       DICOMImageFrameInfo::Pointer GetFrameInfo() const;

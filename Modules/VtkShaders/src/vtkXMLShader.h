@@ -50,7 +50,7 @@ class vtkXMLShader : public vtkObject
 public:
   static vtkXMLShader* New();
   vtkTypeMacro(vtkXMLShader, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Get/Set the XML root element that describes this shader.

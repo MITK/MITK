@@ -41,10 +41,10 @@ public:
     void setColor(const QColor &);
     QColor color() const;
 
-    virtual QRectF boundingRect() const;
+    virtual QRectF boundingRect() const override;
 
     virtual void draw(QPainter *, const QwtScaleMap &xMap,
-        const QwtScaleMap &yMap, const QRectF &) const;
+        const QwtScaleMap &yMap, const QRectF &) const override;
 
     void setBaseline(double reference);
     double baseline() const;

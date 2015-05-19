@@ -51,7 +51,7 @@ class QmitkCmdLineModuleRunner : public QWidget
 
 public:
 
-  QmitkCmdLineModuleRunner(QWidget *parent = 0);
+  QmitkCmdLineModuleRunner(QWidget *parent = nullptr);
   virtual ~QmitkCmdLineModuleRunner();
 
   /**

@@ -31,16 +31,16 @@ mitk::ConnectomicsHistogramsContainer * mitk::ConnectomicsHistogramCache::operat
   if(!p_BaseData)
   {
     MITK_WARN << "ConnectomicsHistogramCache::operator[] with null connectomics network data called";
-    return 0;
+    return nullptr;
   }
 
-  ConnectomicsHistogramsCacheElement *elementToUpdate = 0;
+  ConnectomicsHistogramsCacheElement *elementToUpdate = nullptr;
 
   bool first( true );
 
   bool found( false );
 
-  for(CacheContainer::iterator iter = cache.begin(); iter != cache.end(); iter++)
+  for(auto iter = cache.begin(); iter != cache.end(); iter++)
   {
     ConnectomicsHistogramsCacheElement *e = dynamic_cast<ConnectomicsHistogramsCacheElement *>(*iter);
     BaseData *p_tmp = e->baseData.GetPointer();
@@ -76,7 +76,7 @@ mitk::ConnectomicsHistogramsContainer * mitk::ConnectomicsHistogramCache::operat
     else
     {
       MITK_WARN << "not supported: " << p_BaseData->GetNameOfClass();
-      return NULL;
+      return nullptr;
     }
 
     elementToUpdate->baseData = p_BaseData;
@@ -90,6 +90,6 @@ mitk::ConnectomicsHistogramsContainer * mitk::ConnectomicsHistogramCache::operat
     elementToUpdate->m_LastUpdateTime.Modified();
     return dynamic_cast<ConnectomicsHistogramsContainer*>( elementToUpdate->GetHistograms() );
   }
-  return NULL;
+  return nullptr;
 }
 

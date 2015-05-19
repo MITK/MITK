@@ -43,7 +43,7 @@ class QmitkRandomParcellationView : public QmitkFunctionality
 
 public:
   static const std::string VIEW_ID;
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /** \brief Interaction with GUI and mitkRandomParcellationGenerator to get random parcels.*/
   template <typename TPixel, unsigned int VImageDimension>
@@ -85,10 +85,10 @@ protected:
   /** \brief Shows the number of nodes on the GUI (may have changed after merging)*/
   void ShowNumberOfNodes(int numberNodes);
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   /** \brief called by QmitkFunctionality when DataManager's selection has changed*/
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
 
   Ui::QmitkRandomParcellationViewControls m_Controls;
 

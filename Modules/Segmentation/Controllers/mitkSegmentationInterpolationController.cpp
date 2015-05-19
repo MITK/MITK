@@ -33,14 +33,14 @@ mitk::SegmentationInterpolationController::InterpolatorMapType mitk::Segmentatio
 
 mitk::SegmentationInterpolationController* mitk::SegmentationInterpolationController::InterpolatorForImage(const Image* image)
 {
-  InterpolatorMapType::iterator iter = s_InterpolatorForImage.find( image );
+  auto iter = s_InterpolatorForImage.find( image );
   if ( iter != s_InterpolatorForImage.end() )
   {
     return iter->second;
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -57,7 +57,7 @@ void mitk::SegmentationInterpolationController::Activate2DInterpolation(bool sta
 mitk::SegmentationInterpolationController::~SegmentationInterpolationController()
 {
   // remove this from the list of interpolators
-  for ( InterpolatorMapType::iterator iter = s_InterpolatorForImage.begin();
+  for ( auto iter = s_InterpolatorForImage.begin();
         iter != s_InterpolatorForImage.end();
         ++iter )
   {
@@ -88,7 +88,7 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume( const Ima
   m_SegmentationCountInSlice.clear();
 
   // delete this from the list of interpolators
-  InterpolatorMapType::iterator iter = s_InterpolatorForImage.find( segmentation );
+  auto iter = s_InterpolatorForImage.find( segmentation );
   if ( iter != s_InterpolatorForImage.end() )
   {
     s_InterpolatorForImage.erase( iter );
@@ -159,7 +159,7 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
      )
   {
     MITK_WARN << "Segmentation image has different image characteristics than reference image." << std::endl;
-    m_ReferenceImage = NULL;
+    m_ReferenceImage = nullptr;
     return;
   }
 
@@ -168,7 +168,7 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
     {
       MITK_WARN << "original patient image does not match segmentation (different extent in dimension " << dim
                 << "), ignoring patient image" << std::endl;
-      m_ReferenceImage = NULL;
+      m_ReferenceImage = nullptr;
       return;
     }
 }
@@ -330,7 +330,7 @@ void mitk::SegmentationInterpolationController::ScanWholeVolume( const itk::Imag
     //DATATYPE* rawSlice = static_cast<DATATYPE*>( volume->GetSliceData(slice)->GetData() ); // TODO THIS wouldn't work. Did I mess up with some internal mitk::Image data structure?
     DATATYPE* rawSlice = rawVolume + ( volume->GetDimension(0) * volume->GetDimension(1) * slice );
 
-    ScanChangedSlice<DATATYPE>( NULL, SetChangedSliceOptions(2, slice, 0, 1, timeStep, rawSlice) );
+    ScanChangedSlice<DATATYPE>( nullptr, SetChangedSliceOptions(2, slice, 0, 1, timeStep, rawSlice) );
   }
 }
 
@@ -394,21 +394,21 @@ void mitk::SegmentationInterpolationController::PrintStatus()
 
 mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( unsigned int sliceDimension, unsigned int sliceIndex, const mitk::PlaneGeometry* currentPlane, unsigned int timeStep )
 {
-  if (m_Segmentation.IsNull()) return NULL;
+  if (m_Segmentation.IsNull()) return nullptr;
 
 
   if(!currentPlane)
   {
-    return NULL;
+    return nullptr;
   }
 
-  if ( timeStep >= m_SegmentationCountInSlice.size() ) return NULL;
-  if ( sliceDimension > 2 ) return NULL;
+  if ( timeStep >= m_SegmentationCountInSlice.size() ) return nullptr;
+  if ( sliceDimension > 2 ) return nullptr;
   unsigned int upperLimit = m_SegmentationCountInSlice[timeStep][sliceDimension].size();
-  if ( sliceIndex >= upperLimit - 1 ) return NULL; // can't interpolate first and last slice
-  if ( sliceIndex < 1  ) return NULL;
+  if ( sliceIndex >= upperLimit - 1 ) return nullptr; // can't interpolate first and last slice
+  if ( sliceIndex < 1  ) return nullptr;
 
-  if ( m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] > 0 ) return NULL; // slice contains a segmentation, won't interpolate anything then
+  if ( m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] > 0 ) return nullptr; // slice contains a segmentation, won't interpolate anything then
 
   unsigned int lowerBound(0);
   unsigned int upperBound(0);
@@ -425,7 +425,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     if (lowerBound == 0) break; // otherwise overflow and start at something like 4294967295
   }
 
-  if (!bounds) return NULL;
+  if (!bounds) return nullptr;
 
   bounds = false;
   for (upperBound = sliceIndex + 1 ; upperBound < upperLimit; ++upperBound)
@@ -437,7 +437,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     }
   }
 
-  if (!bounds) return NULL;
+  if (!bounds) return nullptr;
 
   // ok, we have found two neighboring slices with segmentations (and we made sure that the current slice does NOT contain anything
   //MITK_INFO << "Interpolate in timestep " << timeStep << ", dimension " << sliceDimension << ": estimate slice " << sliceIndex << " from slices " << lowerBound << " and " << upperBound << std::endl;
@@ -504,12 +504,12 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
     upperMITKSlice = extractor->GetOutput();
     upperMITKSlice->DisconnectPipeline();
 
-    if ( lowerMITKSlice.IsNull() || upperMITKSlice.IsNull() ) return NULL;
+    if ( lowerMITKSlice.IsNull() || upperMITKSlice.IsNull() ) return nullptr;
   }
   catch(const std::exception &e)
   {
     MITK_ERROR<<"Error in 2D interpolation: "<<e.what();
-    return NULL;
+    return nullptr;
   }
 
   // interpolation algorithm gets some inputs

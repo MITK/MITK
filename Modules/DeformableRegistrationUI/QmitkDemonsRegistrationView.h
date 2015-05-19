@@ -33,7 +33,7 @@ class MITKDEFORMABLEREGISTRATIONUI_EXPORT QmitkDemonsRegistrationView : public Q
 
 public:
 
-  QmitkDemonsRegistrationView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkDemonsRegistrationView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkDemonsRegistrationView();
 
   int GetNumberOfIterations();

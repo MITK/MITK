@@ -95,25 +95,25 @@ public:
    * Empty implementation, since the ManufacturerLogo doesn't
    * support the requested region concept
    */
-  virtual void SetRequestedRegionToLargestPossibleRegion();
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
   /**
    * Empty implementation, since the ManufacturerLogo doesn't
    * support the requested region concept
    */
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
   /**
    * Empty implementation, since the ManufacturerLogo doesn't
    * support the requested region concept
    */
-  virtual bool VerifyRequestedRegion();
+  virtual bool VerifyRequestedRegion() override;
 
   /**
    * Empty implementation, since the ManufacturerLogo doesn't
    * support the requested region concept
    */
-  virtual void SetRequestedRegion( const itk::DataObject*);
+  virtual void SetRequestedRegion( const itk::DataObject*) override;
 
   /**
    * Returns the vtkRenderWindow, which is used

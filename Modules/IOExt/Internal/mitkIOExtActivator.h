@@ -30,8 +30,8 @@ class IOExtActivator : public us::ModuleActivator
 {
 public:
 
-  void Load(us::ModuleContext*context);
-  void Unload(us::ModuleContext* context);
+  void Load(us::ModuleContext*context) override;
+  void Unload(us::ModuleContext* context) override;
 
 private:
 

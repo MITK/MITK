@@ -44,13 +44,13 @@ namespace mitk
 
       // Change locale if needed
       const std::string& locale = "C";
-      const std::string& currLocale = setlocale( LC_ALL, NULL );
+      const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
       if ( locale.compare(currLocale)!=0 )
       {
         try
         {
-          MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+          MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, nullptr) << " to '" << locale << "'";
           setlocale(LC_ALL, locale.c_str());
         }
         catch(...)
@@ -164,7 +164,7 @@ namespace mitk
       // re-initialize TimeGeometry
       dynamic_cast<ProportionalTimeGeometry *>(static_cast<OutputType*>(this->GetPrimaryOutput())->GetTimeGeometry())->Initialize(slicedGeometry, static_cast<OutputType*>(this->GetOutput(0))->GetDimension(3));
 
-      buffer = NULL;
+      buffer = nullptr;
       MITK_INFO << "number of image components: "<< static_cast<OutputType*>(this->GetPrimaryOutput())->GetPixelType().GetNumberOfComponents() << std::endl;
 
 
@@ -198,7 +198,7 @@ namespace mitk
       // RESET LOCALE
       try
       {
-        MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+        MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, nullptr) << " to '" << currLocale << "'";
         setlocale(LC_ALL, currLocale.c_str());
       }
       catch(...)

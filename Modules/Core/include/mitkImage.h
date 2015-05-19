@@ -159,15 +159,15 @@ public:
 
   //##Documentation
   //## @brief Check whether slice @a s at time @a t in channel @a n is set
-  virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const;
+  virtual bool IsSliceSet(int s = 0, int t = 0, int n = 0) const override;
 
   //##Documentation
   //## @brief Check whether volume at time @a t in channel @a n is set
-  virtual bool IsVolumeSet(int t = 0, int n = 0) const;
+  virtual bool IsVolumeSet(int t = 0, int n = 0) const override;
 
   //##Documentation
   //## @brief Check whether the channel @a n is set
-  virtual bool IsChannelSet(int n = 0) const;
+  virtual bool IsChannelSet(int n = 0) const override;
 
   //##Documentation
   //## @brief Set @a data as slice @a s at time @a t in channel @a n. It is in
@@ -315,7 +315,7 @@ public:
   //## @param sDim override z-space dimension in @a itkimage (if >0 and <)
   template <typename itkImageType> void InitializeByItk(const itkImageType* itkimage, int channels = 1, int tDim = -1, int sDim=-1)
   {
-    if(itkimage==NULL) return;
+    if(itkimage==nullptr) return;
 
     MITK_DEBUG << "Initializing MITK image from ITK image.";
     // build array with dimensions in each direction with at least 4 entries
@@ -481,22 +481,22 @@ public:
 
   /** \brief Sets a geometry to an image.
     */
-  virtual void SetGeometry(BaseGeometry* aGeometry3D);
+  virtual void SetGeometry(BaseGeometry* aGeometry3D) override;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer GetSliceData(int s = 0, int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer GetVolumeData(int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   * @warning for internal use only
   */
-  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   /**
   \brief (DEPRECATED) Get the minimum for scalar images
@@ -607,13 +607,13 @@ protected:
 
   virtual bool IsValidTimeStep(int t) const;
 
-  virtual void Expand( unsigned int timeSteps );
+  virtual void Expand( unsigned int timeSteps ) override;
 
-  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer AllocateSliceData(int s = 0, int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
-  virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer AllocateVolumeData(int t = 0, int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
-  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
+  virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = nullptr, ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
   Image();
 
@@ -621,12 +621,12 @@ protected:
 
   virtual ~Image();
 
-  virtual void Clear();
+  virtual void Clear() override;
 
   //## @warning Has to be called by every Initialize method!
-  virtual void Initialize();
+  virtual void Initialize() override;
 
-  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
   mutable ImageDataItemPointerArray m_Channels;
   mutable ImageDataItemPointerArray m_Volumes;

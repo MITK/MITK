@@ -51,11 +51,11 @@ namespace mitk {
 
     /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
-    virtual void Update(mitk::BaseRenderer * renderer);
+    virtual void Update(mitk::BaseRenderer * renderer) override;
 
 
         /*+++ methods of MITK-VTK rendering pipeline +++*/
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
     /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
@@ -101,7 +101,7 @@ namespace mitk {
     ContourModelMapper3D();
     virtual ~ContourModelMapper3D();
 
-    void GenerateDataForRenderer( mitk::BaseRenderer *renderer );
+    void GenerateDataForRenderer( mitk::BaseRenderer *renderer ) override;
 
     virtual vtkSmartPointer<vtkPolyData> CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour);
 

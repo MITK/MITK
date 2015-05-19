@@ -34,10 +34,9 @@ mitk::FileWriterRegistry::FileWriterRegistry()
 
 mitk::FileWriterRegistry::~FileWriterRegistry()
 {
-  for (std::map<mitk::IFileWriter*, us::ServiceObjects<mitk::IFileWriter> >::iterator iter = m_ServiceObjects.begin(),
-       end = m_ServiceObjects.end(); iter != end; ++iter)
+  for (auto & elem : m_ServiceObjects)
   {
-    iter->second.UngetService(iter->first);
+    elem.second.UngetService(elem.first);
   }
 }
 
@@ -53,6 +52,8 @@ std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry:
     std::vector<mitk::FileWriterRegistry::WriterReference> emptyResult;
     return emptyResult;
   }
+
+  if (context == NULL) context = us::GetModuleContext();
 
   std::vector<WriterReference> result;
 
@@ -75,6 +76,8 @@ mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterReg
 {
   if (!ref) return NULL;
 
+  if (context == NULL) context = us::GetModuleContext();
+
   us::ServiceObjects<mitk::IFileWriter> serviceObjects = context->GetServiceObjects(ref);
   mitk::IFileWriter* writer = serviceObjects.GetService();
   m_ServiceObjects.insert(std::make_pair(writer, serviceObjects));
@@ -88,6 +91,8 @@ std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk:
     std::vector<mitk::IFileWriter*> emptyResult;
     return emptyResult;
   }
+
+  if (context == NULL) context = us::GetModuleContext();
 
   std::vector <mitk::IFileWriter*> result;
 
@@ -130,9 +135,8 @@ void mitk::FileWriterRegistry::UngetWriter(mitk::IFileWriter* writer)
 
 void mitk::FileWriterRegistry::UngetWriters(const std::vector<mitk::IFileWriter*>& writers)
 {
-  for (std::vector<mitk::IFileWriter*>::const_iterator iter = writers.begin(), end = writers.end();
-    iter != end; ++iter)
+  for (const auto & writer : writers)
   {
-    this->UngetWriter(*iter);
+    this->UngetWriter(writer);
   }
 }

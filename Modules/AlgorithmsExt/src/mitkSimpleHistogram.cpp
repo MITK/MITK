@@ -27,9 +27,9 @@ void SimpleImageHistogram::ComputeFromBaseData( BaseData* src )
   valid = false;
 
   //check if input is valid
-  if (src==NULL) return;
+  if (src==nullptr) return;
   Image* source = dynamic_cast<Image*>(src);
-  if (source==NULL) return;
+  if (source==nullptr) return;
   else if (source->IsEmpty()) return;
 
 
@@ -161,12 +161,12 @@ class ImageHistogramCacheElement : public SimpleHistogramCache::Element
 {
   public:
 
-    void ComputeFromBaseData(BaseData* baseData)
+    void ComputeFromBaseData(BaseData* baseData) override
     {
       histogram.ComputeFromBaseData(baseData);
     }
 
-    SimpleHistogram* GetHistogram()
+    SimpleHistogram* GetHistogram() override
     {
       return &histogram;
     }
@@ -178,12 +178,12 @@ class UnstructuredGridHistogramCacheElement : public SimpleHistogramCache::Eleme
 {
   public:
 
-    void ComputeFromBaseData(BaseData* baseData)
+    void ComputeFromBaseData(BaseData* baseData) override
     {
       histogram.ComputeFromBaseData(baseData);
     }
 
-    SimpleHistogram* GetHistogram()
+    SimpleHistogram* GetHistogram() override
     {
       return &histogram;
     }
@@ -198,14 +198,14 @@ SimpleHistogram* SimpleHistogramCache::operator[](BaseData::Pointer sp_BaseData)
   if(!p_BaseData)
   {
     MITK_WARN << "SimpleHistogramCache::operator[] with null base data called";
-    return 0;
+    return nullptr;
   }
 
-  Element *elementToUpdate = 0;
+  Element *elementToUpdate = nullptr;
 
   bool first = true;
 
-  for(CacheContainer::iterator iter = cache.begin(); iter != cache.end(); iter++)
+  for(auto iter = cache.begin(); iter != cache.end(); iter++)
   {
     Element *e = *iter;
     BaseData *p_tmp = e->baseData.GetPointer();

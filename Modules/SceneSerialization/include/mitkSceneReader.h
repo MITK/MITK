@@ -29,7 +29,7 @@ class MITKSCENESERIALIZATION_EXPORT SceneReader : public itk::Object
 {
   public:
 
-    mitkClassMacro( SceneReader, itk::Object );
+    mitkClassMacroItkParent( SceneReader, itk::Object );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

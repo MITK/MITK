@@ -44,7 +44,7 @@ namespace mitk
     MouseButtons GetEventButton() const;
     void SetEventButton(MouseButtons buttons);
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
 
   protected:
     MouseReleaseEvent(BaseRenderer*,
@@ -55,7 +55,7 @@ namespace mitk
         MouseButtons eventButton = NoButton);
     virtual ~MouseReleaseEvent();
 
-    virtual bool IsEqual(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const override;
 
   private:
     MouseButtons m_EventButton;

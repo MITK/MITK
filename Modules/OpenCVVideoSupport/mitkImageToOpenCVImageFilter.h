@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkOpenCVImageBridge.h>
 #include <MitkOpenCVVideoSupportExports.h>
 
+#include "mitkImageSliceSelector.h"
+
 namespace mitk
 {
 
@@ -37,7 +39,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         typedef itk::RGBPixel< float > FloatRGBPixelType;
         typedef itk::RGBPixel< double > DoubleRGBPixelType;
 
-        mitkClassMacro(ImageToOpenCVImageFilter, itk::Object);
+        mitkClassMacroItkParent(ImageToOpenCVImageFilter, itk::Object);
         itkFactorylessNewMacro(Self)
         itkCloneMacro(Self)
 
@@ -68,6 +70,16 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         ///
         cv::Mat GetOpenCVMat();
 
+        //##Documentation
+        //## @brief Convenient method to set a certain slice of a 3D or 4D mitk::Image as input to convert it to an openCV image
+        //##
+        //## This methods sets the input. Call GetOpenCVMat() or GetOpenCVImage() to get the image.
+        //##
+        //## @param mitkImage - the image that should be converted to an openCVImage
+        //## @param timeStep - the time step, which is converted to openCV
+        //## @param slice - the slice which is converted to openCV
+        void SetInputFromTimeSlice(Image::Pointer mitkImage, int timeStep, int slice);
+
     protected:
         ///
         /// the actual templated conversion method
@@ -83,6 +95,9 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
         ///
         mitk::WeakPointer<mitk::Image> m_Image;
         IplImage* m_OpenCVImage;
+
+  private:
+    ImageSliceSelector::Pointer m_sliceSelector;
 };
 
 } // namespace

@@ -47,7 +47,7 @@ namespace mitk
     int GetWheelDelta() const;
     void SetWheelDelta(int delta);
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
 
   protected:
     MouseWheelEvent(BaseRenderer* = NULL,
@@ -58,7 +58,7 @@ namespace mitk
         int wheelDelta = 0);
     virtual ~MouseWheelEvent();
 
-    virtual bool IsEqual(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const override;
 
   private:
     int m_WheelDelta;

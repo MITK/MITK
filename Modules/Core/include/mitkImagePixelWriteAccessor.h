@@ -55,7 +55,7 @@ public:
    */
   ImagePixelWriteAccessor(
       ImagePointer iP,
-      const ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = nullptr,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       )
     : ImagePixelAccessor<TPixel, VDimension>(iP.GetPointer(),iDI)

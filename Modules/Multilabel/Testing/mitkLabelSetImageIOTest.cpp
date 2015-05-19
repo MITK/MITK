@@ -39,7 +39,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     regularImage = mitk::Image::New();
     unsigned int dimensions[3] = {256,256,312};
@@ -67,7 +67,7 @@ public:
     lsetIO = new mitk::LabelSetImageIO();
   }
 
-  void tearDown()
+  void tearDown() override
   {
     regularImage = 0;
     multilabelImage = 0;

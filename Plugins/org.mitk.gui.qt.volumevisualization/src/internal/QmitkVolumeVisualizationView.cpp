@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QComboBox>
 
+#include <vtkVersionMacros.h>
+
 #include <berryISelectionProvider.h>
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -124,7 +126,7 @@ void QmitkVolumeVisualizationView::OnMitkInternalPreset( int mode )
     // -- Creat new TransferFunction
     mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(transferFuncProp->GetValue());
     tfInit->SetTransferFunctionMode(mode);
-    this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
+    RequestRenderWindowUpdate();
     m_Controls->m_TransferFunctionWidget->OnUpdateCanvas();
   }
 }
@@ -296,7 +298,7 @@ void QmitkVolumeVisualizationView::OnEnableRendering(bool state)
 
   m_SelectedNode->SetProperty("volumerendering",mitk::BoolProperty::New(state));
   UpdateInterface();
-  this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
+  RequestRenderWindowUpdate();
 }
 
 void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
@@ -305,7 +307,7 @@ void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
     return;
 
   m_SelectedNode->SetProperty("volumerendering.uselod",mitk::BoolProperty::New(state));
-  this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
+  RequestRenderWindowUpdate();
 }
 
 void QmitkVolumeVisualizationView::OnRenderMode(int mode)
@@ -327,7 +329,7 @@ void QmitkVolumeVisualizationView::OnRenderMode(int mode)
 #endif
   m_SelectedNode->SetProperty("volumerendering.usemip",mitk::BoolProperty::New(usemip));
 
-  this->GetRenderWindowPart()->GetRenderingManager()->RequestUpdateAll();
+  RequestRenderWindowUpdate();
 }
 
 void QmitkVolumeVisualizationView::SetFocus()

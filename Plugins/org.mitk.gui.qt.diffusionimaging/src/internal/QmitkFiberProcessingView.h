@@ -62,11 +62,11 @@ public:
   QmitkFiberProcessingView();
   virtual ~QmitkFiberProcessingView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
-  virtual void Activated();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
+  virtual void Activated() override;
 
 protected slots:
 
@@ -105,7 +105,7 @@ protected:
   void ExtractWithPlanarFigure();
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkFiberProcessingViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;
@@ -180,8 +180,8 @@ protected:
   mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundle::Pointer fib);
   mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundle::Pointer fib);
 
-  void NodeAdded( const mitk::DataNode* node );
-  void NodeRemoved(const mitk::DataNode* node);
+  void NodeAdded( const mitk::DataNode* node ) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
 };
 
 

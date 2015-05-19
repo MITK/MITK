@@ -29,8 +29,8 @@ public:
 
   QmitkExtApplication();
 
-  int Start();
-  void Stop();
+  QVariant Start(berry::IApplicationContext* context) override;
+  void Stop() override;
 };
 
 #endif /*QMITKEXTAPPLICATION_H_*/

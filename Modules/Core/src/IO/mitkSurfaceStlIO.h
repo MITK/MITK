@@ -32,15 +32,15 @@ public:
   // -------------- AbstractFileReader -------------
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read();
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   // -------------- AbstractFileWriter -------------
 
-  virtual void Write();
+  virtual void Write() override;
 
 private:
 
-  SurfaceStlIO* IOClone() const;
+  SurfaceStlIO* IOClone() const override;
 
   static std::string OPTION_MERGE_POINTS();
   static std::string OPTION_TAG_SOLIDS();

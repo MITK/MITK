@@ -46,7 +46,7 @@ namespace mitk {
   class MITKCORE_EXPORT TransferFunctionInitializer : public itk::Object
 {
 public:
-  mitkClassMacro(TransferFunctionInitializer, itk::Object);
+  mitkClassMacroItkParent(TransferFunctionInitializer, itk::Object);
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -61,7 +61,7 @@ public:
   void InitTransferFunctionMode();
 
 protected:
-  TransferFunctionInitializer(TransferFunction::Pointer transferFunction = NULL);
+  TransferFunctionInitializer(TransferFunction::Pointer transferFunction = nullptr);
   virtual ~TransferFunctionInitializer();
 
 private:

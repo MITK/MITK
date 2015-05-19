@@ -84,7 +84,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
   if(m_DicomFilenames.size())
   {
     const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
     if ( locale.compare(currLocale)!=0 )
     {
@@ -154,7 +154,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
       const gdcm::DataSet &ds = f.GetDataSet();
 
       //    gdcm::DataSet ds = header0->GetDataSet();
-      gdcm::DataSet::ConstIterator it = ds.Begin();
+      auto it = ds.Begin();
 
       // Copy of the header->content
       // copy information stored in 0029,1010 into a string for parsing

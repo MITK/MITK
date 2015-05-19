@@ -27,26 +27,26 @@ namespace mitk {
 struct MITKCORE_EXPORT LocaleSwitch
 {
   LocaleSwitch(const std::string& newLocale)
-    : m_OldLocale(std::setlocale(LC_ALL, NULL))
+    : m_OldLocale(std::setlocale(LC_ALL, nullptr))
     , m_NewLocale(newLocale)
   {
-    if (m_OldLocale == NULL)
+    if (m_OldLocale == nullptr)
     {
       m_OldLocale = "";
     }
     else if (m_NewLocale != m_OldLocale)
     {
       // set the locale
-      if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == NULL)
+      if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == nullptr)
       {
         MITK_INFO << "Could not set locale " << m_NewLocale;
-        m_OldLocale = NULL;
+        m_OldLocale = nullptr;
       }
     }
   }
   ~LocaleSwitch()
   {
-    if (m_OldLocale != NULL && std::setlocale(LC_ALL, m_OldLocale) == NULL)
+    if (m_OldLocale != nullptr && std::setlocale(LC_ALL, m_OldLocale) == nullptr)
     {
       MITK_INFO << "Could not reset locale " << m_OldLocale;
     }

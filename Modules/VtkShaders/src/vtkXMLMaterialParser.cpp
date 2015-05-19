@@ -75,7 +75,7 @@ vtkXMLMaterialParser::vtkXMLMaterialParser()
 vtkXMLMaterialParser::~vtkXMLMaterialParser()
 {
   delete this->Internals;
-  this->SetMaterial(0);
+  this->SetMaterial(nullptr);
 }
 
 //-----------------------------------------------------------------------------

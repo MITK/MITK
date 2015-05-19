@@ -28,13 +28,13 @@ namespace mitk
     PropertyAliases();
     ~PropertyAliases();
 
-    bool AddAlias(const std::string& propertyName, const std::string& alias, const std::string& className);
-    std::vector<std::string> GetAliases(const std::string& propertyName, const std::string& className);
-    std::string GetPropertyName(const std::string& alias, const std::string& className);
-    bool HasAliases(const std::string& propertyName, const std::string& className);
-    void RemoveAlias(const std::string& propertyName, const std::string& alias, const std::string& className);
-    void RemoveAliases(const std::string& propertyName, const std::string& className);
-    void RemoveAllAliases(const std::string& className);
+    bool AddAlias(const std::string& propertyName, const std::string& alias, const std::string& className) override;
+    std::vector<std::string> GetAliases(const std::string& propertyName, const std::string& className) override;
+    std::string GetPropertyName(const std::string& alias, const std::string& className) override;
+    bool HasAliases(const std::string& propertyName, const std::string& className) override;
+    void RemoveAlias(const std::string& propertyName, const std::string& alias, const std::string& className) override;
+    void RemoveAliases(const std::string& propertyName, const std::string& className) override;
+    void RemoveAllAliases(const std::string& className) override;
 
   private:
     typedef std::map<std::string, std::vector<std::string> > AliasesMap;

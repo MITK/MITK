@@ -716,6 +716,22 @@ QHash<QString, QVariant> BaseApplication::getFrameworkProperties() const
 
 int BaseApplication::run()
 {
+  /*
+   * This is a workaround for bug 19080:
+   * On Mac OS X the prosess serial number is passed as an commandline argument (-psn_xyz)
+   * if the application is started via the.app bundle.
+   * This option is unknown, which causes a Poco exception.
+   * Since this is done by the system we have to manually remove the argument here.
+   */
+
+  for (int i = 0; i < d->m_Argc; ++i)
+  {
+    if (QString::fromAscii(d->m_Argv[i]).contains("-psn"))
+    {
+      char arg[1] = {' '};
+      d->m_Argv[i] = arg;
+    }
+  }
   this->init(d->m_Argc, d->m_Argv);
   return Application::run();
 }

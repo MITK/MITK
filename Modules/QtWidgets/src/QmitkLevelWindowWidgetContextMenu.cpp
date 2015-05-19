@@ -96,7 +96,14 @@ void QmitkLevelWindowWidgetContextMenu::setFixed()
 
 void QmitkLevelWindowWidgetContextMenu::useAllGreyvaluesFromImage()
 {
-  m_LevelWindow.SetAuto(m_Manager->GetCurrentImage(), true, false);
+  m_LevelWindow.SetToImageRange(m_Manager->GetCurrentImage());
+  m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkLevelWindowWidgetContextMenu::useOptimizedLevelWindow()
+{
+  m_LevelWindow.SetAuto(m_Manager->GetCurrentImage(),false,false);
   m_Manager->SetLevelWindow(m_LevelWindow);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -162,6 +169,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
     sliderFixed->setChecked(m_LevelWindow.IsFixed());
     contextMenu->addSeparator();
     contextMenu->addAction(tr("Use whole image grey values"), this, SLOT(useAllGreyvaluesFromImage()));
+    contextMenu->addAction(tr("Use optimized levelwindow"), this, SLOT(useOptimizedLevelWindow()));
     contextMenu->addSeparator();
     contextMenu->addAction(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
     contextMenu->addAction(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));
@@ -243,6 +251,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
     sliderFixed->setChecked(m_LevelWindow.IsFixed());
     contextMenu->addSeparator();
     contextMenu->addAction(tr("Use whole image grey values"), this, SLOT(useAllGreyvaluesFromImage()));
+    contextMenu->addAction(tr("Use optimized levelwindow"), this, SLOT(useOptimizedLevelWindow()));
     contextMenu->addSeparator();
     contextMenu->addAction(tr("Set Maximum Window"), this, SLOT(setMaximumWindow()));
     contextMenu->addAction(tr("Default Level/Window"), this, SLOT(setDefaultLevelWindow()));

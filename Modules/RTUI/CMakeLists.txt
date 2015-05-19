@@ -1,0 +1,5 @@
+MITK_CREATE_MODULE(
+  INCLUDE_DIRS Qmitk Helper
+  DEPENDS MitkDicomRT MitkQtWidgets MitkQtWidgetsExt
+  PACKAGE_DEPENDS PUBLIC CTK Qt5|Core
+)

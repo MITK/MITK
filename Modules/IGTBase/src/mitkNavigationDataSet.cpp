@@ -150,12 +150,12 @@ void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 
 // ---> methods for Iterators
 
-mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::Begin()
+mitk::NavigationDataSet::NavigationDataSetConstIterator mitk::NavigationDataSet::Begin() const
 {
-  return m_NavigationDataVectors.begin();
+  return m_NavigationDataVectors.cbegin();
 }
 
-mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::End()
+mitk::NavigationDataSet::NavigationDataSetConstIterator mitk::NavigationDataSet::End() const
 {
-  return m_NavigationDataVectors.end();
+  return m_NavigationDataVectors.cend();
 }

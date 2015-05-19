@@ -30,6 +30,10 @@ mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML() : AbstractFileWri
 {
 }
 
+mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML(const mitk::NavigationDataSetWriterXML& other) : AbstractFileWriter(other)
+{
+}
+
 mitk::NavigationDataSetWriterXML::~NavigationDataSetWriterXML()
 {
 }

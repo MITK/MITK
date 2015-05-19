@@ -26,6 +26,10 @@ mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV() : AbstractFileWri
 mitk::NavigationDataSetWriterCSV::~NavigationDataSetWriterCSV()
 {}
 
+mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV(const mitk::NavigationDataSetWriterCSV& other) : AbstractFileWriter(other)
+{
+}
+
 mitk::NavigationDataSetWriterCSV* mitk::NavigationDataSetWriterCSV::Clone() const
 {
   return new NavigationDataSetWriterCSV(*this);

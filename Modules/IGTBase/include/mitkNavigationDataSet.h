@@ -42,6 +42,14 @@ namespace mitk {
     */
     typedef std::vector< std::vector<mitk::NavigationData::Pointer> >::iterator NavigationDataSetIterator;
 
+    /**
+    * \brief This iterator iterates over the distinct time steps in this set. And is const.
+    *
+    * It returns an array of the length equal to GetNumberOfTools(), containing a
+    * mitk::NavigationData for each tool..
+    */
+    typedef std::vector< std::vector<mitk::NavigationData::Pointer> >::const_iterator NavigationDataSetConstIterator;
+
     mitkClassMacro(NavigationDataSet, BaseData);
 
     mitkNewMacro1Param(Self, unsigned int);
@@ -117,14 +125,14 @@ namespace mitk {
     *
     * @return Returns an iterator pointing to the first TimeStep.
     */
-    virtual NavigationDataSetIterator Begin();
+    virtual NavigationDataSetConstIterator Begin() const;
 
     /**
     * \brief Returns an iterator pointing behind to the last TimeStep.
     *
     * @return Returns an iterator pointing behind to the last TimeStep.
     */
-    virtual NavigationDataSetIterator End();
+    virtual NavigationDataSetConstIterator End() const;
 
     // virtual methods, that need to be implemented, but aren't reasonable for NavigationData
     virtual void SetRequestedRegionToLargestPossibleRegion( ) override;

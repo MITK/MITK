@@ -396,15 +396,32 @@ QString BaseApplication::getProvisioningFilePath() const
   {
     QFileInfo appFilePath(QCoreApplication::applicationFilePath());
     QDir basePath(QCoreApplication::applicationDirPath());
-    #ifdef Q_OS_MAC
-      // for MAC applicationDirPath() points to the actual executable within
-      // the bundle instead of the bundle, we need it to point to the bundle
-      basePath.cdUp();
-      basePath.cdUp();
-      basePath.cdUp();
-    #endif
+
     QString provFileName = appFilePath.baseName() + ".provisioning";
+
     QFileInfo provFile(basePath.absoluteFilePath(provFileName));
+
+#ifdef Q_OS_MAC
+    /*
+     * On Mac, if started from the build directory the .provisioning file is located at:
+     * <MITK-build/bin/MitkWorkbench.provisioning>
+     * but the executable path is:
+     * <MITK-build/bin/MitkWorkbench.app/Contents/MacOS/MitkWorkbench>
+     * In this case we have to cdUp threetimes.
+     *
+     * During packaging however the MitkWorkbench.provisioning file is placed at the same
+     * level like the executable, hence nothing has to be done.
+     */
+
+    if (!provFile.exists())
+    {
+      basePath.cdUp();
+      basePath.cdUp();
+      basePath.cdUp();
+      provFile = basePath.absoluteFilePath(provFileName);
+    }
+#endif
+
 
     if (provFile.exists())
     {

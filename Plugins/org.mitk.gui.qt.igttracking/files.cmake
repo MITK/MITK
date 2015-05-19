@@ -7,12 +7,14 @@ set(INTERNAL_CPP_FILES
   QmitkMITKIGTNavigationToolManagerView.cpp
   QmitkMITKIGTTrackingToolboxView.cpp
   QmitkNavigationDataPlayerView.cpp
+  IGTNavigationToolCalibration.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkMITKIGTNavigationToolManagerViewControls.ui
   src/internal/QmitkMITKIGTTrackingToolboxViewControls.ui
   src/internal/QmitkNavigationDataPlayerViewControls.ui
+  src/internal/IGTNavigationToolCalibrationControls.ui
 )
 
 set(MOC_H_FILES
@@ -20,6 +22,7 @@ set(MOC_H_FILES
   src/internal/QmitkMITKIGTNavigationToolManagerView.h
   src/internal/QmitkMITKIGTTrackingToolboxView.h
   src/internal/QmitkNavigationDataPlayerView.h
+  src/internal/IGTNavigationToolCalibration.h
 )
 
 # list of resource files which can be used by the plug-in
@@ -30,13 +33,14 @@ set(CACHED_RESOURCE_FILES
   resources/iconNavigationDataPlayer.png
   resources/iconNavigationToolManager.xpm
   resources/iconTrackingToolBox.xpm
+  resources/iconNavigationToolCalibration.xpm
   plugin.xml
 )
 
 # list of Qt .qrc files which contain additional resources
 # specific to this plugin
 set(QRC_FILES
-
+  resources/IGTNavigationToolCalibration.qrc
 )
 
 set(CPP_FILES )

@@ -73,9 +73,7 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
     mitk::NavigationDataToIGTLMessageFilter::Pointer m_NavDataToIGTLMsgFilter;
     mitk::NavigationDataPlayer::Pointer m_NavDataPlayer;
     mitk::NavigationDataObjectVisualizationFilter::Pointer m_NavDataVisualizer;
-    mitk::DataNode::Pointer m_DemoNodeT1;
-    mitk::DataNode::Pointer m_DemoNodeT2;
-    mitk::DataNode::Pointer m_DemoNodeT3;
+    QList<mitk::DataNode::Pointer> m_DemoNodes;
     mitk::NavigationDataSet::Pointer m_NavDataSet;
     QmitkIGTLStreamingConnector m_StreamingConnector;
 

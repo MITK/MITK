@@ -116,6 +116,8 @@ switch(type)
   m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
   case mitk::VirtualTracker:
   m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);break;
+  case mitk::OpenIGTLinkTrackingDeviceConnection:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(5);break;
   default:
   m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);
 }
@@ -172,6 +174,7 @@ else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Polaris") 
 else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="CT MicronTracker") m_CreatedTool->SetTrackingDeviceType(mitk::ClaronMicron);
 else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NP Optitrack") m_CreatedTool->SetTrackingDeviceType(mitk::NPOptitrack);
 else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Virtual Tracker") m_CreatedTool->SetTrackingDeviceType(mitk::VirtualTracker);
+else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Open IGT Link") m_CreatedTool->SetTrackingDeviceType(mitk::OpenIGTLinkTrackingDeviceConnection);
 else m_CreatedTool->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
 
 //ToolType
@@ -237,6 +240,8 @@ case mitk::NPOptitrack:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
 case mitk::VirtualTracker:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);break;
+case mitk::OpenIGTLinkTrackingDeviceConnection:
+m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(5);break;
 default:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
 }

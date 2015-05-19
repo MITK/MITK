@@ -145,6 +145,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_xmlFormat, SIGNAL(clicked()), this, SLOT(OnToggleFileExtension()));
     connect( m_Controls->m_UseDifferentUpdateRates, SIGNAL(clicked()), this, SLOT(OnToggleDifferentUpdateRates()));
     connect( m_Controls->m_RenderUpdateRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangeRenderUpdateRate()));
+    connect( m_Controls->m_DisableAllTimers, SIGNAL(stateChanged(int)), this, SLOT(EnableDisableTimerButtons(int)));
 
     //connections for the tracking device configuration widget
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
@@ -362,6 +363,13 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   this->m_Controls->m_MainWidget->setEnabled(false);
 }
 
+void QmitkMITKIGTTrackingToolboxView::EnableDisableTimerButtons(int enable)
+{
+  bool enableBool = enable;
+  m_Controls->m_UpdateRateOptionsGroupBox->setEnabled(!enableBool);
+  m_Controls->m_renderWarningLabel->setVisible(enableBool);
+}
+
 void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString errorMessage)
 {
   m_WorkerThread->quit();
@@ -471,6 +479,24 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   if (m_Controls->m_ShowToolQuaternions->isChecked()) {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(true);}
   else {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(false);}
 
+  //if activated enable open IGT link microservice
+  if (m_Controls->m_EnableOpenIGTLinkMicroService->isChecked())
+    {
+    //create convertion filter
+    m_IGTLConversionFilter =  mitk::NavigationDataToIGTLMessageFilter::New();
+    m_IGTLConversionFilter->SetName("IGT Tracking Toolbox");
+    m_IGTLConversionFilter->ConnectTo(m_ToolVisualizationFilter);
+    m_IGTLConversionFilter->SetOperationMode(mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
+    m_IGTLConversionFilter->RegisterAsMicroservice();
+
+    //create server and message provider
+    m_IGTLServer = mitk::IGTLServer::New();
+    m_IGTLServer->SetName("Tracking Toolbox IGTL Server");
+    m_IGTLMessageProvider = mitk::IGTLMessageProvider::New();
+    m_IGTLMessageProvider->SetIGTLDevice(m_IGTLServer);
+    m_IGTLMessageProvider->RegisterAsMicroservice();
+    }
+
   //show tracking volume
   this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
 
@@ -513,6 +539,13 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QStri
   m_Controls->m_StartStopTrackingButton->setText("Start Tracking");
   m_Controls->m_ConnectDisconnectButton->setEnabled(true);
   m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
+
+  //unregister open IGT link micro service
+  if (m_Controls->m_EnableOpenIGTLinkMicroService->isChecked())
+    {
+    m_IGTLConversionFilter->UnRegisterMicroservice();
+    m_IGTLMessageProvider->UnRegisterMicroservice();
+    }
 
   this->GlobalReinit();
 }
@@ -1032,7 +1065,6 @@ void QmitkMITKIGTTrackingToolboxView::EnableLoggingButtons()
 void QmitkMITKIGTTrackingToolboxView::DisableOptionsButtons()
 {
   m_Controls->m_ShowTrackingVolume->setEnabled(false);
-  m_Controls->m_ShowToolQuaternions->setEnabled(false);
   m_Controls->m_UseDifferentUpdateRates->setEnabled(false);
   m_Controls->m_UpdateRate->setEnabled(false);
   m_Controls->m_OptionsUpdateRateLabel->setEnabled(false);
@@ -1041,14 +1073,15 @@ void QmitkMITKIGTTrackingToolboxView::DisableOptionsButtons()
   m_Controls->m_LogUpdateRate->setEnabled(false);
   m_Controls->m_OptionsLogUpdateRateLabel->setEnabled(false);
   m_Controls->m_DisableAllTimers->setEnabled(false);
+  m_Controls->m_OtherOptionsGroupBox->setEnabled(false);
 }
 
 void QmitkMITKIGTTrackingToolboxView::EnableOptionsButtons()
 {
   m_Controls->m_ShowTrackingVolume->setEnabled(true);
-  m_Controls->m_ShowToolQuaternions->setEnabled(true);
   m_Controls->m_UseDifferentUpdateRates->setEnabled(true);
   m_Controls->m_DisableAllTimers->setEnabled(true);
+  m_Controls->m_OtherOptionsGroupBox->setEnabled(true);
   OnToggleDifferentUpdateRates();
 }
 

@@ -31,7 +31,7 @@ Please see special delegates (QmitkDoseColorDelegate, QmitkDoseValueDelegate, Qm
 handle visualization and editing in views that work on this model.
 \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 */
-class MitkRTUI_EXPORT QmitkIsoDoseLevelSetModel : public QAbstractTableModel
+class MITKRTUI_EXPORT QmitkIsoDoseLevelSetModel : public QAbstractTableModel
 {
   Q_OBJECT
 

@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingModeProperty.h>
 
 #include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
 #include <berryPlatform.h>
 
 DicomEventHandler::DicomEventHandler()
@@ -83,11 +84,10 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
         doseOutlineNode->SetData(doseImageNode->GetData());
         if(doseImageNode.IsNotNull() && doseOutlineNode->GetData() != NULL)
         {
-          berry::IPreferencesService::Pointer prefService =
-              berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-          berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
+          berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+          berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID.c_str());
 
-          typedef std::vector<std::string> NamesType;
+          typedef QStringList NamesType;
           NamesType names = prefNode->ChildrenNames();
 
           std::map<std::string, mitk::IsoDoseLevelSet::Pointer> presetMap;
@@ -98,7 +98,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
             if (aPresetNode.IsNull())
             {
-              mitkThrow()<< "Error in preference interface. Cannot find preset node under given name. Name: "<<*pos;
+              mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: "<< (*pos).toStdString();
             }
 
             mitk::IsoDoseLevelSet::Pointer levelSet = mitk::IsoDoseLevelSet::New();
@@ -109,24 +109,24 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
               berry::IPreferences::Pointer levelNode = aPresetNode->Node(*levelName);
               if (aPresetNode.IsNull())
               {
-                mitkThrow()<< "Error in preference interface. Cannot find level node under given preset name. Name: "<<*pos<<"; Level id: "<<*levelName;
+                mitkThrow() << "Error in preference interface. Cannot find level node under given preset name. Name: "<< (*pos).toStdString() <<"; Level id: "<< (*levelName).toStdString();
               }
 
               mitk::IsoDoseLevel::Pointer isoLevel = mitk::IsoDoseLevel::New();
 
-              isoLevel->SetDoseValue(levelNode->GetDouble(mitk::RTUIConstants::ISO_LEVEL_DOSE_VALUE_ID,0.0));
+              isoLevel->SetDoseValue(levelNode->GetDouble(mitk::RTUIConstants::ISO_LEVEL_DOSE_VALUE_ID.c_str(),0.0));
               mitk::IsoDoseLevel::ColorType color;
-              color.SetRed(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_RED_ID,1.0));
-              color.SetGreen(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_GREEN_ID,1.0));
-              color.SetBlue(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID,1.0));
+              color.SetRed(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_RED_ID.c_str(),1.0));
+              color.SetGreen(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_GREEN_ID.c_str(),1.0));
+              color.SetBlue(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID.c_str(),1.0));
               isoLevel->SetColor(color);
-              isoLevel->SetVisibleIsoLine(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID,true));
-              isoLevel->SetVisibleColorWash(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID,true));
+              isoLevel->SetVisibleIsoLine(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID.c_str(),true));
+              isoLevel->SetVisibleColorWash(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID.c_str(),true));
 
               levelSet->SetIsoDoseLevel(isoLevel);
             }
 
-            presetMap.insert(std::make_pair(*pos,levelSet));
+            presetMap.insert(std::make_pair((*pos).toStdString(),levelSet));
           }
 
           if (presetMap.size() == 0)
@@ -142,10 +142,10 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
           doseImageNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
           doseOutlineNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
 
-          berry::IPreferences::Pointer nameNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
-          std::string presetName = nameNode->Get(mitk::RTUIConstants::SELECTED_ISO_PRESET_ID,"");
+          berry::IPreferences::Pointer nameNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
+          QString presetName = nameNode->Get(mitk::RTUIConstants::SELECTED_ISO_PRESET_ID.c_str(),"");
 
-          mitk::IsoDoseLevelSet::Pointer isoDoseLevelPreset = presetMap[presetName];
+          mitk::IsoDoseLevelSet::Pointer isoDoseLevelPreset = presetMap[presetName.toStdString()];
           mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(isoDoseLevelPreset);
 
           doseImageNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),levelSetProp);

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-struct MitkRTUI_EXPORT RTUIConstants
+struct MITKRTUI_EXPORT RTUIConstants
 {
   /** ID/Path of main preference node for RT UI.  */
   static const std::string ROOT_PREFERENCE_NODE_ID;
@@ -69,7 +69,7 @@ struct MitkRTUI_EXPORT RTUIConstants
   static const DoseValueAbs DEFAULT_REFERENCE_DOSE_VALUE;
 };
 
-struct MitkRTUI_EXPORT RTCTKEventConstants
+struct MITKRTUI_EXPORT RTCTKEventConstants
 {
   /** ID/Path of main preference node for RT UI.  */
   static const std::string TOPIC_REFERENCE_DOSE;

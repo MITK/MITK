@@ -57,20 +57,20 @@ void DoseVisualizationPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void DoseVisualizationPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
-  m_DoseVisNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
-
-  m_MainControl = new QWidget(parent);
-  m_Controls = new Ui::DoseVisualizationPreferencePageControls;
-  m_Controls->setupUi( m_MainControl );
+  m_DoseVisNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
 
   m_LevelSetModel = new QmitkIsoDoseLevelSetModel(this);
   m_DoseColorDelegate = new QmitkDoseColorDelegate(this);
   m_DoseValueDelegate = new QmitkDoseValueDelegate(this);
   m_DoseVisualDelegate = new QmitkDoseVisualStyleDelegate(this);
+
+
+  m_MainControl = new QWidget(parent);
+  m_Controls = new Ui::DoseVisualizationPreferencePageControls;
+  m_Controls->setupUi( m_MainControl );
+
 
   this->m_Controls->isoLevelSetView->setModel(m_LevelSetModel);
   this->m_Controls->isoLevelSetView->setItemDelegateForColumn(0,m_DoseColorDelegate);
@@ -101,11 +101,11 @@ QWidget* DoseVisualizationPreferencePage::GetQtControl() const
 
 bool DoseVisualizationPreferencePage::PerformOk()
 {
-  m_DoseVisNode->PutBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID,m_Controls->radioAbsDose->isChecked());
-  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID,m_Controls->checkGlobalVisColorWash->isChecked());
-  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID,m_Controls->checkGlobalVisIsoLine->isChecked());
-  m_DoseVisNode->PutDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID,m_Controls->spinReferenceDose->value());
-  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, m_Controls->checkGlobalSync->isChecked());
+  m_DoseVisNode->PutBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID.c_str(),m_Controls->radioAbsDose->isChecked());
+  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID.c_str(),m_Controls->checkGlobalVisColorWash->isChecked());
+  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID.c_str(),m_Controls->checkGlobalVisIsoLine->isChecked());
+  m_DoseVisNode->PutDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID.c_str(),m_Controls->spinReferenceDose->value());
+  m_DoseVisNode->PutBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID.c_str(), m_Controls->checkGlobalSync->isChecked());
 
   mitk::StorePresetsMap(this->m_Presets);
 
@@ -138,19 +138,20 @@ void DoseVisualizationPreferencePage::PerformCancel()
 
 void DoseVisualizationPreferencePage::Update()
 {
-  m_Controls->checkGlobalVisColorWash->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID, true));
-  m_Controls->checkGlobalVisIsoLine->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID, true));
-  m_Controls->radioAbsDose->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID, true));
-  m_Controls->radioRelDose->setChecked(!(m_DoseVisNode->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID, false)));
-  m_Controls->spinReferenceDose->setValue(m_DoseVisNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE));
-  m_Controls->checkGlobalSync->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID, true));
+  m_Controls->checkGlobalVisColorWash->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID.c_str(), true));
+  m_Controls->checkGlobalVisIsoLine->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID.c_str(), true));
+  m_Controls->radioAbsDose->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID.c_str(), true));
+  m_Controls->radioRelDose->setChecked(!(m_DoseVisNode->GetBool(mitk::RTUIConstants::DOSE_DISPLAY_ABSOLUTE_ID.c_str(), false)));
+  m_Controls->spinReferenceDose->setValue(m_DoseVisNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID.c_str(), mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE));
+  m_Controls->checkGlobalSync->setChecked(m_DoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_REFERENCE_DOSE_SYNC_ID.c_str(), true));
 
   m_referenceDoseChanged = false;
   m_presetMapChanged = false;
 
 
-  berry::IPreferences::Pointer presetsNode = m_DoseVisNode->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID);
   this->m_Presets = mitk::LoadPresetsMap();
+  if(m_Presets.empty())
+    return;
   this->m_selectedPresetName = mitk::GetSelectedPresetName();
   UpdatePresetsWidgets();
 }

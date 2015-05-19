@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-IsoDoseLevelSet::Pointer MitkRTUI_EXPORT GeneratIsoLevels_Virtuos();
+  IsoDoseLevelSet::Pointer MITKRTUI_EXPORT GeneratIsoLevels_Virtuos();
 }
 
 #endif

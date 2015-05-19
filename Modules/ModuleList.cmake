@@ -60,6 +60,7 @@ set(mitk_modules
   IGTUI
   VtkShaders
   DicomRT
+  RTUI
   IOExt
   XNAT
   TubeGraph

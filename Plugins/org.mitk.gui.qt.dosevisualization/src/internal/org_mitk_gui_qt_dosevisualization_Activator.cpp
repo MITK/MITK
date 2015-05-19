@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  ctkPluginContext* org_mitk_gui_qt_dosevisualization_Activator::m_Context = NULL;
+  ctkPluginContext* org_mitk_gui_qt_dosevisualization_Activator::m_Context = 0;
 
   void org_mitk_gui_qt_dosevisualization_Activator::start(ctkPluginContext* context)
   {
@@ -50,4 +50,6 @@ namespace mitk {
 
 }
 
-Q_EXPORT_PLUGIN2(org_mitk_gui_qt_dosevisualization, mitk::org_mitk_gui_qt_dosevisualization_Activator)
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_dosevisualization, mitk::org_mitk_gui_qt_dosevisualization_Activator)
+#endif

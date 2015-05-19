@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \class QmitkFreeIsoDoseLevelWidget
 * \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
 */
-class MitkRTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget, private Ui::QmitkFreeIsoDoseLevelWidget
+class MITKRTUI_EXPORT QmitkFreeIsoDoseLevelWidget : public QWidget, private Ui::QmitkFreeIsoDoseLevelWidget
 {
   Q_OBJECT
 

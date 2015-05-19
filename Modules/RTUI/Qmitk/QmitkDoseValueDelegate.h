@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 The delegate assumes that the model uses the role Qt::UserRole+1
 to indicate if the returned dose value is an absolute (data(Qt::UserRole+1) == true)
 or an relative dose (data(Qt::UserRole+1) == false).*/
-class MitkRTUI_EXPORT QmitkDoseValueDelegate : public QStyledItemDelegate
+class MITKRTUI_EXPORT QmitkDoseValueDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

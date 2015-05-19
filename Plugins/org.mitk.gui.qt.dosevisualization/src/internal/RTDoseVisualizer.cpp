@@ -31,9 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "RTDoseVisualizer.h"
 
-#include <DataStructures/mitkRTConstants.h>
-#include <DataStructures/mitkIsoDoseLevelSetProperty.h>
-#include <DataStructures/mitkIsoDoseLevelVectorProperty.h>
+#include <mitkRTConstants.h>
+#include <mitkIsoDoseLevelSetProperty.h>
+#include <mitkIsoDoseLevelVectorProperty.h>
 #include <mitkIsoLevelsGenerator.h>
 #include <mitkRTUIConstants.h>
 
@@ -506,6 +506,9 @@ void RTDoseVisualizer::UpdateByPreferences()
   m_Controls.comboPresets->clear();
   this->m_selectedPresetName = mitk::GetSelectedPresetName();
 
+  if(m_Presets.empty())
+    return;
+
   int index = 0;
   int selectedIndex = -1;
   for (mitk::PresetMapType::const_iterator pos = m_Presets.begin(); pos != m_Presets.end(); ++pos, ++index)
@@ -564,6 +567,9 @@ void RTDoseVisualizer::ActualizeIsoLevelsForAllDoseDataNodes()
   mitk::NodePredicateProperty::Pointer isDoseNode = mitk::NodePredicateProperty::New(mitk::RTConstants::DOSE_PROPERTY_NAME.c_str(), mitk::BoolProperty::New(true));
 
   mitk::DataStorage::SetOfObjects::ConstPointer nodes = this->GetDataStorage()->GetSubset(isDoseNode);
+
+  if(presetMap.empty())
+    return;
 
   mitk::IsoDoseLevelSet* selectedPreset = presetMap[presetName];
 

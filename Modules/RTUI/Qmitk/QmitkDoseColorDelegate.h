@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /** \class QmitkDoseColorDelegate
 \brief An item delegate for rendering and editing dose color in a QTableView.*/
-class MitkRTUI_EXPORT QmitkDoseColorDelegate : public QStyledItemDelegate
+class MITKRTUI_EXPORT QmitkDoseColorDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

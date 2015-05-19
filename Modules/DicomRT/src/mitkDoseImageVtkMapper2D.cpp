@@ -835,7 +835,7 @@ vtkSmartPointer<vtkPolyData> mitk::DoseImageVtkMapper2D::CreateOutlinePolyData(m
     }//end of if visible dose value
   }//end of loop over all does values
 
-  mitk::IsoDoseLevelVectorProperty::Pointer propfreeIsoVec = dynamic_cast<mitk::IsoDoseLevelVectorProperty* >(GetDataNode()->GetProperty(mitk::Constants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
+  mitk::IsoDoseLevelVectorProperty::Pointer propfreeIsoVec = dynamic_cast<mitk::IsoDoseLevelVectorProperty* >(GetDataNode()->GetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
   mitk::IsoDoseLevelVector::Pointer frereIsoDoseLevelVec = propfreeIsoVec->GetValue();
 
   for(mitk::IsoDoseLevelVector::ConstIterator freeDoseIT = frereIsoDoseLevelVec->Begin(); freeDoseIT!=frereIsoDoseLevelVec->End();++freeDoseIT)

@@ -45,7 +45,7 @@ Create new classes for reader and writers. Optimally, place them in an extra IO-
 
 \imageMacro{reader_writer_classes.png,"",16}
 
-Implement the given Methods. A good example on how to write a simple reader and writer is the mitkPointSetReader.cpp and mitkPointSetWriter.cpp class, from which you can take implementation cues. The following is a simplified version of the header file:
+Implement the given Methods. A good example on how to write a simple reader and writer is the mitkPointSetReaderService.cpp and mitkPointSetWriterService.cpp class, from which you can take implementation cues. The following is a simplified version of the header file:
 
      namespace mitk
      {

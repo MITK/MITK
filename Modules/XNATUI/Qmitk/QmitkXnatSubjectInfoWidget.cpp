@@ -27,10 +27,11 @@ QmitkXnatSubjectInfoWidget::QmitkXnatSubjectInfoWidget(ctkXnatSubject* subject, 
   m_Controls.setupUi(this);
 
   // Set the UI labels
-  for (int i = 0; i < m_Subject->properties().count(); i++)
-  {
-    std::cout << "KEY: " << m_Subject->properties().keys().at(i).toStdString() << " --- " << "VALUE: " << m_Subject->properties().values().at(i).toStdString() << "\n";
-  }
+  m_Controls.birthyearLabel->setText(m_Subject->property("dob"));
+  m_Controls.genderLabel->setText(m_Subject->property("gender"));
+  m_Controls.handednessLabel->setText(m_Subject->property("handedness"));
+  m_Controls.heightLabel->setText(m_Subject->property("height"));
+  m_Controls.weightLabel->setText(m_Subject->property("weight"));
 }
 
 QmitkXnatSubjectInfoWidget::~QmitkXnatSubjectInfoWidget()

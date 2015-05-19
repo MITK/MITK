@@ -24,6 +24,12 @@ QmitkXnatExperimentInfoWidget::QmitkXnatExperimentInfoWidget(ctkXnatExperiment* 
 {
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(this);
+
+  // Set the UI labels
+  m_Controls.modalityLabel->setText(m_Experiment->property("modality"));
+  m_Controls.dateLabel->setText(m_Experiment->property("date"));
+  m_Controls.timeLabel->setText(m_Experiment->property("time"));
+  m_Controls.scannerLabel->setText(m_Experiment->property("scanner"));
 }
 
 QmitkXnatExperimentInfoWidget::~QmitkXnatExperimentInfoWidget()

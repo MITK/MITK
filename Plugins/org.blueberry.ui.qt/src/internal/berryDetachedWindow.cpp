@@ -109,7 +109,7 @@ void DetachedWindow::Create()
   {
     QRect windowRect = page->GetWorkbenchWindow()->GetShell()->GetBounds();
     QPoint center(windowRect.x() + windowRect.width() / 2, windowRect.y()
-        - windowRect.height() / 2);
+        + windowRect.height() / 2);
     bounds = QRect(center.x() - 150, center.y() + 100, 300, 200);
   }
 
@@ -121,9 +121,9 @@ void DetachedWindow::Create()
   if (bounds.height() > dispBounds.height())
     bounds.setHeight(dispBounds.height());
   if (bounds.x() + bounds.width() > dispBounds.width())
-    bounds.setX(dispBounds.width() - bounds.width());
+    bounds.moveLeft(dispBounds.width() - bounds.width());
   if (bounds.y() + bounds.height() > dispBounds.height())
-    bounds.setY(dispBounds.height() - bounds.height());
+    bounds.moveTop(dispBounds.height() - bounds.height());
 
   this->GetShell()->SetBounds(bounds);
 

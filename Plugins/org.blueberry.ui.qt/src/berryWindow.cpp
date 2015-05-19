@@ -367,9 +367,9 @@ QRect Window::GetConstrainedShellBounds(const QRect& preferredSize)
     result.setWidth(bounds.width());
   }
 
-  result.setX( std::max<int>(bounds.x(), std::min<int>(result.x(), bounds.x()
+  result.moveLeft( std::max<int>(bounds.x(), std::min<int>(result.x(), bounds.x()
     + bounds.width() - result.width())));
-  result.setY(std::max<int>(bounds.y(), std::min<int>(result.y(), bounds.y()
+  result.moveTop(std::max<int>(bounds.y(), std::min<int>(result.y(), bounds.y()
     + bounds.height() - result.height())));
 
   return result;

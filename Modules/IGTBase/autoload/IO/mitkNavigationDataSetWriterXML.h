@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNavigationDataSet.h>
 #include <mitkAbstractFileWriter.h>
+#include <mitkCustomMimeType.h>
 
 namespace mitk {
   class NavigationDataSetWriterXML : public AbstractFileWriter
@@ -33,6 +34,8 @@ namespace mitk {
     virtual void Write() override;
 
   protected:
+
+    CustomMimeType NAVIGATIONDATASETXML_MIMETYPE();
 
     NavigationDataSetWriterXML(const NavigationDataSetWriterXML& other);
 

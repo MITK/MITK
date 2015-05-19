@@ -22,8 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <fstream>
 #include <iostream>
+#include <mitkIOMimeTypes.h>
 
-mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML()
+mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML() : AbstractFileWriter(NavigationDataSet::GetStaticNameOfClass(),
+  CustomMimeType(NAVIGATIONDATASETXML_MIMETYPE()),
+  "MITK NavigationDataSet Reader (XML)")
 {
 }
 
@@ -50,7 +53,6 @@ void mitk::NavigationDataSetWriterXML::Write()
   StreamFooter(out);
 
   // Cleanup
-
   out->flush();
 
   //switch back to old locale
@@ -132,4 +134,15 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
 void mitk::NavigationDataSetWriterXML::StreamFooter (std::ostream* stream)
 {
   *stream << "</Data>" << std::endl;
+}
+
+
+mitk::CustomMimeType mitk::NavigationDataSetWriterXML::NAVIGATIONDATASETXML_MIMETYPE()
+{
+  mitk::CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".NavigationDataSet.xml");
+  std::string category = "NavigationDataSet";
+  mimeType.SetComment("NavigationDataSet (XML)");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("xml");
+  return mimeType;
 }

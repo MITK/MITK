@@ -91,7 +91,7 @@ namespace mitk {
     * @param index Index of the timeStep for which the datas should be returned. cannot be larger than mitk::NavigationDataSet::Size()
     * @return Returns a vector that contains all tracking data for a given tool.
     */
-    virtual std::vector< mitk::NavigationData::Pointer > GetTimeStep(unsigned int index);
+    virtual std::vector< mitk::NavigationData::Pointer > GetTimeStep(unsigned int index) const;
 
     /**
     * \brief Returns the number of tools for which NavigationDatas are stored in this set.

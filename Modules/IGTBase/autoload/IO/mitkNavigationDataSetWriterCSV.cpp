@@ -16,7 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataSetWriterCSV.h"
 #include <fstream>
+#include <mitkIOMimeTypes.h>
 
+mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV() : AbstractFileWriter(NavigationDataSet::GetStaticNameOfClass(),
+  CustomMimeType(NAVIGATIONDATASETCSV_MIMETYPE()),
+  "MITK NavigationDataSet Reader (CSV)")
+{}
+
+mitk::NavigationDataSetWriterCSV::~NavigationDataSetWriterCSV()
+{}
 
 mitk::NavigationDataSetWriterCSV* mitk::NavigationDataSetWriterCSV::Clone() const
 {
@@ -76,8 +84,12 @@ void mitk::NavigationDataSetWriterCSV::Write()
   setlocale( LC_ALL, oldLocale );
 }
 
-mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV()
-{}
-
-mitk::NavigationDataSetWriterCSV::~NavigationDataSetWriterCSV()
-{}
+mitk::CustomMimeType mitk::NavigationDataSetWriterCSV::NAVIGATIONDATASETCSV_MIMETYPE()
+{
+  mitk::CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".NavigationDataSet.csv");
+  std::string category = "NavigationDataSet";
+  mimeType.SetComment("NavigationDataSet (csv)");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("csv");
+  return mimeType;
+}

@@ -31,18 +31,16 @@ mitk::NavigationDataSetWriterXML::~NavigationDataSetWriterXML()
 {
 }
 
-void mitk::NavigationDataSetWriterXML::Write (std::string path, mitk::NavigationDataSet::Pointer data)
+mitk::NavigationDataSetWriterXML* mitk::NavigationDataSetWriterXML::Clone() const
 {
-  std::ofstream stream;
-  stream.open (path.c_str(), std::ios_base::trunc);
-
-  // Pass to Stream Handler
-  Write(&stream, data);
-  stream.close();
+  return new NavigationDataSetWriterXML(*this);
 }
 
-void mitk::NavigationDataSetWriterXML::Write (std::ostream* stream, mitk::NavigationDataSet::Pointer data)
+void mitk::NavigationDataSetWriterXML::Write()
 {
+  std::ostream* out = GetOutputStream();
+  mitk::NavigationDataSet::ConstPointer data = dynamic_cast<const NavigationDataSet*> (this->GetInput());
+
   //save old locale
   char * oldLocale;
   oldLocale = setlocale( LC_ALL, nullptr );
@@ -59,7 +57,7 @@ void mitk::NavigationDataSetWriterXML::Write (std::ostream* stream, mitk::Naviga
   setlocale( LC_ALL, oldLocale );
 }
 
-void mitk::NavigationDataSetWriterXML::StreamHeader (std::ostream* stream, mitk::NavigationDataSet::Pointer data)
+void mitk::NavigationDataSetWriterXML::StreamHeader (std::ostream* stream, mitk::NavigationDataSet::ConstPointer data)
 {
   stream->precision(10);
 
@@ -74,7 +72,7 @@ void mitk::NavigationDataSetWriterXML::StreamHeader (std::ostream* stream, mitk:
   }
 }
 
-void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::NavigationDataSet::Pointer data)
+void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::NavigationDataSet::ConstPointer data)
 {
   // For each time step in the Dataset
   for (auto it = data->Begin(); it != data->End(); it++)

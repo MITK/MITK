@@ -17,20 +17,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSetWriterCSV.h"
 #include <fstream>
 
-void mitk::NavigationDataSetWriterCSV::Write (std::string path, mitk::NavigationDataSet::Pointer data)
-{
-  MITK_INFO << "Writing navigation data set to file: " << path;
-  std::ofstream stream;
-  stream.open (path.c_str(), std::ios_base::trunc);
 
-  // Pass to Stream Handler
-  Write(&stream, data);
-  stream.close();
+mitk::NavigationDataSetWriterCSV* mitk::NavigationDataSetWriterCSV::Clone() const
+{
+  return new NavigationDataSetWriterCSV(*this);
 }
 
-void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::NavigationDataSet::Pointer data)
+void mitk::NavigationDataSetWriterCSV::Write()
 {
-  //save old locale
+  std::ostream* out = GetOutputStream();
+  mitk::NavigationDataSet::ConstPointer data = dynamic_cast<const NavigationDataSet*> (this->GetInput());
+
+    //save old locale
   char * oldLocale;
   oldLocale = setlocale( LC_ALL, nullptr );
 

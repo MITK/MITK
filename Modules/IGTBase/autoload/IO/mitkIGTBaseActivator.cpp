@@ -14,22 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkIGTBaseActivator.h"
 
-#ifndef MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
-#define MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
+#include "mitkNavigationDataSetWriterXML.h"
+#include "mitkNavigationDataSetWriterCSV.h"
 
-#include <mitkNavigationDataSet.h>
 
 namespace mitk {
-  class MITKIGT_EXPORT NavigationDataSetWriterCSV
-  {
-  public:
-    NavigationDataSetWriterCSV();
-    virtual~NavigationDataSetWriterCSV();
 
-    virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
-    virtual void Write (std::ostream* stream, mitk::NavigationDataSet::Pointer);
-  };
+void IOExtActivator::Load(us::ModuleContext*)
+{
+  m_NavigationDataSetWriterXML.reset(new NavigationDataSetWriterXML());
+  m_NavigationDataSetWriterCSV.reset(new NavigationDataSetWriterCSV());
 }
 
-#endif // MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
+void IOExtActivator::Unload(us::ModuleContext*)
+{
+}
+
+}
+
+US_EXPORT_MODULE_ACTIVATOR(mitk::IOExtActivator)

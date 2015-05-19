@@ -118,12 +118,12 @@ std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTimeSte
   return m_NavigationDataVectors[index];
 }
 
-unsigned int mitk::NavigationDataSet::GetNumberOfTools()
+unsigned int mitk::NavigationDataSet::GetNumberOfTools() const
 {
   return m_NumberOfTools;
 }
 
-unsigned int mitk::NavigationDataSet::Size()
+unsigned int mitk::NavigationDataSet::Size() const
 {
   return m_NavigationDataVectors.size();
 }

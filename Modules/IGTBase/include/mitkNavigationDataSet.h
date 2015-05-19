@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNAVIGATIONDATASET_H_HEADER_INCLUDED_
 #define MITKNAVIGATIONDATASET_H_HEADER_INCLUDED_
 
-#include <MitkIGTExports.h>
+#include <MitkIGTBaseExports.h>
 #include "mitkBaseData.h"
 #include "mitkNavigationData.h"
 
@@ -30,7 +30,7 @@ namespace mitk {
   * Use mitk::NavigationDataPlayer to stream from these sets easily.
   *
   */
-  class MITKIGT_EXPORT NavigationDataSet : public BaseData
+  class MITKIGTBASE_EXPORT NavigationDataSet : public BaseData
   {
   public:
 
@@ -100,7 +100,7 @@ namespace mitk {
     *
     * @return the number of tools for which NavigationDatas are stored in this set.
     */
-    unsigned int GetNumberOfTools();
+    unsigned int GetNumberOfTools() const;
 
     /**
     * \brief Returns the number of time steps stored in this NavigationDataSet.
@@ -110,7 +110,7 @@ namespace mitk {
     *
     * @return Returns the number of time steps stored in this NavigationDataSet.
     */
-    unsigned int Size();
+    unsigned int Size() const;
 
     /**
     * \brief Returns an iterator pointing to the first TimeStep.

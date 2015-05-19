@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="337.288px" height="178.813px" viewBox="0 0 337.288 178.813" enable-background="new 0 0 337.288 178.813"
+	 xml:space="preserve">
+<g>
+	<g>
+		<path fill="#9D9D9C" d="M89.922,29.26c1.273,3.431-1.904,7.804-7.061,9.717L25.348,60.318c-5.157,1.913-10.417,0.671-11.69-2.76
+			c-1.273-3.431,1.904-7.804,7.061-9.717l57.514-21.34C83.389,24.588,88.649,25.83,89.922,29.26z"/>
+	</g>
+	<polygon fill="#9D9D9C" stroke="#575756" stroke-miterlimit="10" points="85.665,87.111 150.609,169.243 156.626,171.142
+		154.316,164.917 89.861,83.962 	"/>
+	<g>
+		<path fill="#9D9D9C" d="M88.087,87.09c-2.927,2.197-8.023,0.395-11.324-4.004L33.821,25.868
+			c-3.301-4.399-3.608-9.795-0.681-11.992c2.927-2.197,8.023-0.395,11.324,4.004l42.943,57.218
+			C90.708,79.497,91.015,84.894,88.087,87.09z"/>
+	</g>
+	<circle fill="#F6F6F6" stroke="#C6C6C6" stroke-miterlimit="10" cx="37.559" cy="20.167" r="5.257"/>
+	<circle fill="#F6F6F6" stroke="#C6C6C6" stroke-miterlimit="10" cx="24.428" cy="53.562" r="5.257"/>
+	<circle fill="#F6F6F6" stroke="#C6C6C6" stroke-miterlimit="10" cx="80.358" cy="32.809" r="5.257"/>
+	<circle fill="#F6F6F6" stroke="#C6C6C6" stroke-miterlimit="10" cx="83.316" cy="80.783" r="5.257"/>
+</g>
+<g>
+	<polygon fill="#9D9D9C" stroke="#575756" stroke-miterlimit="10" points="252.759,115.645 160.776,165.672 157.881,171.278
+		164.409,170.062 255.148,120.316 	"/>
+	<g>
+		<path fill="#9D9D9C" d="M246.375,122.003c-1.847-3.159,0.525-8.016,5.273-10.792l61.754-36.117
+			c4.747-2.776,10.144-2.463,11.991,0.696s-0.525,8.016-5.272,10.792l-61.754,36.116
+			C253.618,125.475,248.222,125.162,246.375,122.003z"/>
+	</g>
+	<g>
+		<path fill="#9D9D9C" d="M311.406,112.977c-1.768,3.204-7.154,3.652-11.97,0.995l-35.247-19.446
+			c-4.816-2.657-7.31-7.452-5.542-10.657c1.768-3.204,7.154-3.652,11.97-0.995l35.247,19.446
+			C310.68,104.977,313.174,109.772,311.406,112.977z"/>
+	</g>
+	<circle fill="#F6F6F6" stroke="#C6C6C6" stroke-miterlimit="10" cx="320.1" cy="79.073" r="5.257"/>
+	<circle fill="#F6F6F6" stroke="#C6C6C6" stroke-miterlimit="10" cx="252.131" cy="118.533" r="5.258"/>
+	<circle fill="#F6F6F6" stroke="#C6C6C6" stroke-miterlimit="10" cx="266.025" cy="87.941" r="5.257"/>
+	<circle fill="#F6F6F6" stroke="#C6C6C6" stroke-miterlimit="10" cx="303.731" cy="108.743" r="5.258"/>
+</g>
+<text transform="matrix(1 0 0 1 246.873 150.3457)" font-family="'ArialMT'" font-size="12">Tool to calibrate</text>
+<text transform="matrix(1 0 0 1 88.5747 58.8203)" font-family="'ArialMT'" font-size="12">Calibration pointer</text>
+<g>
+	<g>
+
+			<line fill="none" stroke="#000000" stroke-width="2" stroke-miterlimit="10" x1="157.881" y1="124.791" x2="157.881" y2="145.604"/>
+		<g>
+			<polygon points="153.915,144.438 157.903,151.346 161.892,144.438 			"/>
+		</g>
+	</g>
+</g>
+</svg>

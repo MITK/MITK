@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/IGTNavigationToolCalibration">
+        <file>Description.svg</file>
+    </qresource>
+</RCC>

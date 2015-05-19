@@ -30,10 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 vtkStandardNewMacro(vtkMitkRectangleProp);
 
-vtkMitkRectangleProp::vtkMitkRectangleProp()
+vtkMitkRectangleProp::vtkMitkRectangleProp():
+  m_Height(0),
+  m_Width(0)
 {
   vtkSmartPointer<vtkPolyDataMapper2D> mapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
-  m_RectangleActor = vtkSmartPointer<vtkActor2D>::New();
   m_PolyData = vtkSmartPointer<vtkPolyData>::New();
 
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
@@ -42,10 +43,16 @@ vtkMitkRectangleProp::vtkMitkRectangleProp()
   m_PolyData->SetPoints(points);
   m_PolyData->SetLines(lines);
 
-  this->CreateRectangle();
+  vtkCoordinate *tcoord = vtkCoordinate::New();
+  tcoord->SetCoordinateSystemToDisplay();
+  mapper->SetTransformCoordinate(tcoord);
+  tcoord->Delete();
+
+  CreateRectangle();
 
   mapper->SetInputData(m_PolyData);
-  m_RectangleActor->SetMapper(mapper);
+  SetMapper(mapper);
+  GetProperty()->SetLineWidth(2);
 }
 
 vtkMitkRectangleProp::~vtkMitkRectangleProp()
@@ -54,27 +61,42 @@ vtkMitkRectangleProp::~vtkMitkRectangleProp()
 
 int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
 {
-  double right = viewport->GetSize()[0];
-  double top = viewport->GetSize()[1];
-//  double bottom = 0.0;
-  double left = viewport->GetOrigin()[0] + 0.5;
-  double bottom = viewport->GetOrigin()[1] + 0.5;
-//  double left = 0.0;
-  double defaultDepth = 0.0;
+  if (!this->Mapper)
+  {
+    vtkErrorMacro(<< "vtkActor2D::Render - No mapper set");
+    return 0;
+  }
 
-  vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
-  //change the corners to adapt the size of the renderwindow was resized
-  points->SetPoint(m_BottomLeft, left, bottom, defaultDepth);
-  points->SetPoint(m_TopLeft, left, top, defaultDepth);
-  points->SetPoint(m_TopRight, right, top, defaultDepth);
-  points->SetPoint(m_BottomRight, right, bottom, defaultDepth);
+  if(!GetVisibility()) return 0;
+  if(viewport->GetSize()[0] != m_Width || viewport->GetSize()[1] != m_Height)
+  {
+    m_Width = viewport->GetSize()[0];
+    m_Height = viewport->GetSize()[1];
+    UpdateRectangle();
+  }
+  this->Mapper->RenderOverlay(viewport, this);
 
-  //adapt color
-  m_RectangleActor->GetProperty()->SetColor( m_Color[0], m_Color[1], m_Color[2]);
-
-  //render the actor
-  m_RectangleActor->RenderOverlay(viewport);
   return 1;
+}
+
+void vtkMitkRectangleProp::UpdateRectangle()
+{
+  vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
+  float offset = (GetProperty()->GetLineWidth()-0.5);
+  float wLine = m_Width-1;
+  float hLine = m_Height-1;
+
+  points->SetPoint(m_BottomLeftR  ,0.0, offset, 0.0);
+  points->SetPoint(m_BottomRightL ,m_Width, offset, 0.0);
+
+  points->SetPoint(m_BottomLeftU  ,offset, 0.0, 0.0);
+  points->SetPoint(m_TopLeftD     ,offset, m_Height, 0.0);
+
+  points->SetPoint(m_TopLeftR     ,0.0, hLine, 0.0);
+  points->SetPoint(m_TopRightL    ,m_Width, hLine, 0.0);
+
+  points->SetPoint(m_TopRightD    ,wLine, m_Height, 0.0);
+  points->SetPoint(m_BottomRightU ,wLine, 0.0, 0.0);
 }
 
 void vtkMitkRectangleProp::CreateRectangle()
@@ -82,39 +104,47 @@ void vtkMitkRectangleProp::CreateRectangle()
   vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
   vtkSmartPointer<vtkCellArray> lines = m_PolyData->GetLines();
 
-  //just some default values until a renderwindow/viewport is initialized
-  double bottom = 0.0;
-  double left = 0.0;
-  double right = 200.0;
-  double top = 200.0;
-  double defaultDepth = 0.0;
-
   //4 corner points
-  m_BottomLeft = points->InsertNextPoint(left, bottom, defaultDepth);
-  m_BottomRight = points->InsertNextPoint(right, bottom, defaultDepth);
-  m_TopLeft = points->InsertNextPoint(left, top, defaultDepth);
-  m_TopRight = points->InsertNextPoint(right, top, defaultDepth);
+  m_BottomLeftR  = points->InsertNextPoint(0.0, 0.0, 0.0);
+  m_BottomRightL = points->InsertNextPoint(1.0, 0.0, 0.0);
 
-  vtkSmartPointer<vtkLine> lineVtk =  vtkSmartPointer<vtkLine>::New();
-  lineVtk->GetPointIds()->SetNumberOfIds(5);
-  //connect the lines
-  lineVtk->GetPointIds()->SetId(0,m_BottomLeft);
-  lineVtk->GetPointIds()->SetId(1,m_BottomRight);
-  lineVtk->GetPointIds()->SetId(2,m_TopRight);
-  lineVtk->GetPointIds()->SetId(3,m_TopLeft);
-  lineVtk->GetPointIds()->SetId(4,m_BottomLeft);
+  m_BottomLeftU  = points->InsertNextPoint(0.0, 0.0, 0.0);
+  m_TopLeftD     = points->InsertNextPoint(0.0, 1.0, 0.0);
 
+  m_TopLeftR     = points->InsertNextPoint(0.0, 1.0, 0.0);
+  m_TopRightL    = points->InsertNextPoint(1.0, 1.0, 0.0);
+
+  m_TopRightD    = points->InsertNextPoint(1.0, 1.0, 0.0);
+  m_BottomRightU = points->InsertNextPoint(1.0, 0.0, 0.0);
+
+  vtkSmartPointer<vtkLine> lineVtk;
+  lineVtk = vtkSmartPointer<vtkLine>::New();
+  lineVtk->GetPointIds()->SetId(0,m_BottomLeftR);
+  lineVtk->GetPointIds()->SetId(1,m_BottomRightL);
   lines->InsertNextCell(lineVtk);
-}
 
-void vtkMitkRectangleProp::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin)
-{
-  m_RenderWindow = renWin;
+  lineVtk = vtkSmartPointer<vtkLine>::New();
+  lineVtk->GetPointIds()->SetId(0,m_BottomLeftU);
+  lineVtk->GetPointIds()->SetId(1,m_TopLeftD);
+  lines->InsertNextCell(lineVtk);
+
+  lineVtk = vtkSmartPointer<vtkLine>::New();
+  lineVtk->GetPointIds()->SetId(0,m_TopLeftR);
+  lineVtk->GetPointIds()->SetId(1,m_TopRightL);
+  lines->InsertNextCell(lineVtk);
+
+  lineVtk = vtkSmartPointer<vtkLine>::New();
+  lineVtk->GetPointIds()->SetId(0,m_TopRightD);
+  lineVtk->GetPointIds()->SetId(1,m_BottomRightU);
+  lines->InsertNextCell(lineVtk);
 }
 
 void vtkMitkRectangleProp::SetColor(float col1, float col2, float col3)
 {
-  m_Color[0] = col1;
-  m_Color[1] = col2;
-  m_Color[2] = col3;
+  GetProperty()->SetColor(col1,col2,col3);
+}
+
+void vtkMitkRectangleProp::SetLineWidth(unsigned int lineWidth)
+{
+  GetProperty()->SetLineWidth(lineWidth);
 }

@@ -402,7 +402,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 
   for(unsigned int i = 0; i < 4; ++i)
   {
-    d->m_StdMultiWidget->SetCornerAnnotation(d->m_WidgetAnnotation[i].toStdString(),
+    d->m_StdMultiWidget->SetDecorationProperties(d->m_WidgetAnnotation[i].toStdString(),
                                              HexColorToMitkColor(d->m_WidgetDecorationColor[i]), i);
   }
   //The crosshair gap

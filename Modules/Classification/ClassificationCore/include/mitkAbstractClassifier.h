@@ -78,7 +78,7 @@ public:
   /// @brief GetPointWiseWeightCopy
   /// @return Create and return a copy of W
   ///
-  Eigen::MatrixXd & GetPointWiseWeight()
+  virtual Eigen::MatrixXd & GetPointWiseWeight()
   {
     return m_PointWiseWeight;
   }
@@ -87,7 +87,7 @@ public:
   /// @brief SetPointWiseWeight
   /// @param W, The pointwise weights. W matrix of shape = [n_samples, 1]
   ///
-  void SetPointWiseWeight(const Eigen::MatrixXd& W)
+  virtual void SetPointWiseWeight(const Eigen::MatrixXd& W)
   {
     this->m_PointWiseWeight = W;
   }
@@ -96,7 +96,7 @@ public:
   /// @brief UsePointWiseWeight
   /// @param toggle weighting on/off
   ///
-  void UsePointWiseWeight(bool value)
+  virtual void UsePointWiseWeight(bool value)
   {
     this->m_IsUsingPointWiseWeight = value;
   }
@@ -105,7 +105,7 @@ public:
   /// @brief IsUsingPointWiseWeight
   /// @return true if pointewise weighting is enabled.
   ///
-  bool IsUsingPointWiseWeight()
+  virtual bool IsUsingPointWiseWeight()
   {
     return this->m_IsUsingPointWiseWeight;
   }
@@ -129,7 +129,7 @@ public:
   /// @brief GetPointWiseWeightCopy
   /// @return return probability matrix
   ///
-  Eigen::MatrixXd & GetPointWiseProbabilities()
+  virtual Eigen::MatrixXd & GetPointWiseProbabilities()
   {
     return m_OutProbability;
   }
@@ -138,7 +138,7 @@ public:
   /// \brief UsePointWiseProbabilities
   /// \param value
   ///
-  void UsePointWiseProbability(bool value)
+  virtual void UsePointWiseProbability(bool value)
   {
     m_IsUsingPointWiseProbability = value;
   }
@@ -147,7 +147,7 @@ public:
   /// \brief IsUsingPointWiseProbabilities
   /// \return
   ///
-  bool IsUsingPointWiseProbability()
+  virtual bool IsUsingPointWiseProbability()
   {
     return m_IsUsingPointWiseProbability;
   }

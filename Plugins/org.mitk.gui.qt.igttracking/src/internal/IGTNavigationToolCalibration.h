@@ -47,6 +47,10 @@ class IGTNavigationToolCalibration : public QmitkAbstractView
 
   public:
 
+    IGTNavigationToolCalibration();
+
+    virtual ~IGTNavigationToolCalibration();
+
     static const std::string VIEW_ID;
 
     virtual void CreateQtPartControl(QWidget *parent);

@@ -40,6 +40,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string IGTNavigationToolCalibration::VIEW_ID = "org.mitk.views.igtnavigationtoolcalibration";
 
+IGTNavigationToolCalibration::IGTNavigationToolCalibration()
+{}
+
+IGTNavigationToolCalibration::~IGTNavigationToolCalibration()
+{
+//The following code is required due to a bug in the point list widget.
+//If this is removed, MITK crashes when closing the view:
+m_Controls.m_RegistrationLandmarkWidget->SetPointSetNode(NULL);
+m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(NULL);
+}
+
 void IGTNavigationToolCalibration::SetFocus()
 {
 

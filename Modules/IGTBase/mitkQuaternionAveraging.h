@@ -36,7 +36,7 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacro(QuaternionAveraging, itk::Object);
+      mitkClassMacroItkParent(QuaternionAveraging, itk::Object);
       itkNewMacro(Self);
 
       enum Mode

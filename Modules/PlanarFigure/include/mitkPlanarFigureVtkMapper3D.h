@@ -61,6 +61,7 @@ namespace mitk
     void GenerateDataForRenderer(BaseRenderer* renderer) override;
 
     LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
+    bool m_FillPf;
   };
 }
 

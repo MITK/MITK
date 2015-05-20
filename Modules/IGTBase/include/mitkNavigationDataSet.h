@@ -140,6 +140,11 @@ namespace mitk {
     virtual bool VerifyRequestedRegion( ) override;
     virtual void SetRequestedRegion( const itk::DataObject *data ) override;
 
+    /**
+    * \brief This overrid is probably a little hacky. See Bug 19086.
+    */
+    virtual bool IsEmpty() const override;
+
   protected:
     /**
     * \brief Constructs set with fixed number of tools.

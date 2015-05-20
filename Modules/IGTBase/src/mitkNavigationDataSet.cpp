@@ -146,6 +146,12 @@ bool mitk::NavigationDataSet::VerifyRequestedRegion()
 void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 {
 }
+
+bool mitk::NavigationDataSet::IsEmpty() const
+{
+  return (Size() == 0);
+}
+
 // <--- methods necessary for BaseData
 
 // ---> methods for Iterators

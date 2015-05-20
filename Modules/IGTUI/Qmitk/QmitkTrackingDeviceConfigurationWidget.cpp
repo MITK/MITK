@@ -460,16 +460,22 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
   //build prefix (depends on linux/win)
   QString prefix = "";
   #ifdef WIN32
-  prefix ="COM";
-  tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
+    prefix ="COM";
+    tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
+    if (m_Controls->m_trackingDeviceChooser->currentIndex()==0) //Polaris
+    {
+      tempTrackingDevice->SetIlluminationActivationRate(GetPolarisFrameRate());
+    }
   #else
-  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) //Aurora
-    prefix = m_Controls->portTypeAurora->currentText();
-  else //Polaris
-  {
-    prefix = m_Controls->portTypePolaris->currentText();
-    tempTrackingDevice->SetIlluminationActivationRate(GetPolarisFrameRate());
-  }
+    if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) //Aurora
+    {
+      prefix = m_Controls->portTypeAurora->currentText();
+    }
+    else if (m_Controls->m_trackingDeviceChooser->currentIndex()==0) //Polaris
+    {
+      prefix = m_Controls->portTypePolaris->currentText();
+      tempTrackingDevice->SetIlluminationActivationRate(GetPolarisFrameRate());
+    }
   #endif
 
   //build port name string

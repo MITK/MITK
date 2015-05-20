@@ -28,6 +28,7 @@ mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML() : AbstractFileWri
   CustomMimeType(NAVIGATIONDATASETXML_MIMETYPE()),
   "MITK NavigationDataSet Reader (XML)")
 {
+  RegisterService();
 }
 
 mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML(const mitk::NavigationDataSetWriterXML& other) : AbstractFileWriter(other)

@@ -21,7 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV() : AbstractFileWriter(NavigationDataSet::GetStaticNameOfClass(),
   CustomMimeType(NAVIGATIONDATASETCSV_MIMETYPE()),
   "MITK NavigationDataSet Reader (CSV)")
-{}
+{
+  RegisterService();
+}
 
 mitk::NavigationDataSetWriterCSV::~NavigationDataSetWriterCSV()
 {}

@@ -175,7 +175,6 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       imgstenc->ReverseStencilOff();
       imgstenc->SetBackgroundValue(outval);
       imgstenc->Update();
-      MITK_INFO << "a";
       mitk::LabelSetImage* labelImage; // Todo: Get the working Image
       int activePixelValue = eraseMode;
       labelImage = dynamic_cast<LabelSetImage*>(workingImage.GetPointer());
@@ -187,7 +186,6 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       // Fill according to the Color Team
       vtkSmartPointer<vtkImageData> filledImage = imgstenc->GetOutput();
       vtkSmartPointer<vtkImageData> resultImage = sliceImage->GetVtkImageData();
-      MITK_INFO << "a";
       count = filledImage->GetNumberOfPoints();
       if (activePixelValue == 0)
       {

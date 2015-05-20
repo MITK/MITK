@@ -164,10 +164,7 @@ bool mitk::ContourTool::OnMouseReleased( StateMachineAction*, InteractionEvent* 
 
     int timestep = positionEvent->GetSender()->GetTimeStep();
 
-    MITK_INFO << "Fill Contour: " << m_PaintingPixelValue*m_CurrentLabelID;
-    FeedbackContourTool::FillContourInSlice( projectedContour, timestep, slice, (m_PaintingPixelValue * m_CurrentLabelID));
-    //ContourUtils::Pointer util = ContourUtils::New();
-    //util->FillContourInSlice(projectedContour, slice, (m_PaintingPixelValue * m_CurrentLabelID));
+    mitk::ContourModelUtils::FillContourInSlice(projectedContour, timestep, slice, image, (m_PaintingPixelValue*m_CurrentLabelID));
 
     //this->WriteBackSegmentationResult(positionEvent, slice);
     SegTool2D::WriteBackSegmentationResult(positionEvent,slice);

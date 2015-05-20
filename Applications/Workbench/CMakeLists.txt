@@ -20,6 +20,15 @@ set(_exclude_plugins
   org.blueberry.uitest
   org.mitk.gui.qt.coreapplication
   org.mitk.gui.qt.diffusionimagingapp
+  org.mitk.example.gui.customviewer
+  org.mitk.example.gui.customviewer.views
+  org.mitk.example.gui.selectionservicemitk
+  org.mitk.example.gui.selectionservicemitk.views
+  org.mitk.example.gui.selectionserviceqt
+  org.mitk.example.gui.extensionpointcontribution
+  org.mitk.example.gui.extensionpointdefinition
+  org.mitk.example.gui.minimalapplication
+  org.mitk.example.gui.multipleperspectives
 )
 
 mitkFunctionCreateBlueBerryApplication(

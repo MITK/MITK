@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKNavigationDataReaderCSV_H_HEADER_INCLUDED_
 #define MITKNavigationDataReaderCSV_H_HEADER_INCLUDED_
 
-#include "mitkNavigationDataReaderInterface.h"
+#include <mitkAbstractFileReader.h>
+#include <mitkNavigationDataSet.h>
 
 namespace mitk {
   /** This class reads csv logged navigation datas from the hard disc and returns
@@ -27,21 +27,20 @@ namespace mitk {
    *  Caution: at the moment only one navigation data is supported which means that only
    *  the data of the first navigation tool in the file is read!
    */
-  class MITKIGT_EXPORT NavigationDataReaderCSV : public NavigationDataReaderInterface
+  class NavigationDataReaderCSV : public AbstractFileReader
   {
   public:
 
-    mitkClassMacro(NavigationDataReaderCSV, NavigationDataReaderInterface);
-    itkNewMacro(Self);
+    NavigationDataReaderCSV();
+    virtual ~NavigationDataReaderCSV();
 
     /** @return Returns the NavigationDataSet of the first tool in the given file.
      *          Returns an empty NavigationDataSet if the file could not be read.
      */
-    virtual mitk::NavigationDataSet::Pointer Read(std::string fileName) override;
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
   protected:
-    NavigationDataReaderCSV();
-    virtual ~NavigationDataReaderCSV();
 
     /**
      * /brief Creates a NavigationData Pointer based on the given Input.
@@ -72,6 +71,11 @@ namespace mitk {
      * /brief Split line in elemens based on a given delim
      */
     std::vector<std::string> splitLine(std::string line);
+
+    NavigationDataReaderCSV(const NavigationDataReaderCSV& other);
+
+    virtual mitk::NavigationDataReaderCSV* Clone() const override;
+
   };
 }
 

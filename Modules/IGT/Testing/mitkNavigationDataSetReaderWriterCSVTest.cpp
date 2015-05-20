@@ -23,10 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationData.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkTestingMacros.h>
-#include <mitkNavigationDataReaderCSV.h>
 #include <mitkIOUtil.h>
-
-#include <mitkNavigationDataReaderXML.h>
 
 #include <Poco/Path.h>
 #include <Poco/File.h>
@@ -51,9 +48,6 @@ private:
   std::string pathRead;
   std::string pathWrite;
   std::string pathWrong;
-  mitk::NavigationDataReaderCSV::Pointer reader;
-
-  mitk::NavigationDataReaderXML::Pointer xmlReader;
 
   mitk::NavigationDataSet::Pointer set;
 
@@ -65,9 +59,6 @@ public:
 
     pathWrong = GetTestDataFilePath("IGT-Data/NavigationDataTestData.CSV");
     pathWrite="C:\\test.csv";
-
-    reader = mitk::NavigationDataReaderCSV::New();
-    xmlReader= mitk::NavigationDataReaderXML::New();
   }
 
   void tearDown() override
@@ -79,7 +70,8 @@ public:
   {
     // Aim is to read an CSV into a pointset, write that CSV again, and compare the output
 
-    set = xmlReader->Read(pathRead);
+    set = dynamic_cast<mitk::NavigationDataSet*>(mitk::IOUtil::LoadBaseData(pathRead).GetPointer() );
+    CPPUNIT_ASSERT_MESSAGE("Testing whether something was read at all", set != nullptr);
 
     mitk::IOUtil::SaveBaseData(set, pathWrite);
 
@@ -95,7 +87,7 @@ public:
 
   bool CompareFiles(std::string file)
   {
-    set = reader->Read(file);
+    set = dynamic_cast<mitk::NavigationDataSet*>(mitk::IOUtil::LoadBaseData(file).GetPointer());
 
     double sample[2][30] ={
       {5134019.44, 0, 0, 0,  0,  0,  0,  0,  0,  0,                                                                                       5134019.44, 0,   1,  101.2300034,  -62.63999939,  -203.2400055,  -0.3059000075,  0.5752000213,  0,  0.7585999966,                     5134019.44, 0, 0,  0,  0,  0,  0,  0,  0,  0},

@@ -35,6 +35,16 @@ mitk::NavigationDataReaderXML::~NavigationDataReaderXML()
 {
 }
 
+mitk::NavigationDataReaderXML::NavigationDataReaderXML(const mitk::NavigationDataReaderXML& other) : AbstractFileReader(other)
+{
+}
+
+mitk::NavigationDataReaderXML* mitk::NavigationDataReaderXML::Clone() const
+{
+  return new NavigationDataReaderXML(*this);
+}
+
+
 std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderXML::Read()
 {
   mitk::NavigationDataSet::Pointer dataset;

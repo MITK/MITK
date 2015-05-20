@@ -26,3 +26,13 @@ mitk::CustomMimeType mitk::IGTMimeTypes::NAVIGATIONDATASETXML_MIMETYPE()
   mimeType.AddExtension("xml");
   return mimeType;
 }
+
+mitk::CustomMimeType mitk::IGTMimeTypes::NAVIGATIONDATASETCSV_MIMETYPE()
+{
+  mitk::CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".NavigationDataSet.csv");
+  std::string category = "NavigationDataSet";
+  mimeType.SetComment("NavigationDataSet (csv)");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("csv");
+  return mimeType;
+}

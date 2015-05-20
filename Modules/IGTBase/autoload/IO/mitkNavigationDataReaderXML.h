@@ -40,6 +40,9 @@ namespace mitk {
 
   protected:
 
+    NavigationDataReaderXML(const NavigationDataReaderXML& other);
+    virtual mitk::NavigationDataReaderXML* Clone() const override;
+
     NavigationDataSet::Pointer ReadNavigationDataSet();
 
     /**

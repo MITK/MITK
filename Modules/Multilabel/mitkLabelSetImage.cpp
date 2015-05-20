@@ -788,7 +788,6 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
 template < typename ImageType >
 void mitk::LabelSetImage::MaskStampProcessing(ImageType* itkImage, mitk::Image* mask, bool forceOverwrite)
 {
-  typedef itk::ImageRegionIterator< ImageType > IteratorType;
 
   typename ImageType::Pointer itkMask;
   mitk::CastToItkImage(mask, itkMask);
@@ -823,7 +822,6 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType* itkImage, mitk::Image* 
 template < typename ImageType >
 void mitk::LabelSetImage::CreateLabelMaskProcessing(ImageType* itkImage, mitk::Image* mask, PixelType index)
 {
-  typedef itk::ImageRegionIterator< ImageType > IteratorType;
 
   typename ImageType::Pointer itkMask;
   mitk::CastToItkImage(mask, itkMask);

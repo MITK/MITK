@@ -203,7 +203,6 @@ void mitk::_ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::
   if(region != itkImage->GetRequestedRegion()) return;
 
   itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
-  typedef typename ItkImageType::PixelType TPixel;
   double value = 0;
 
   if ( statisticsHolder == nullptr || !statisticsHolder->IsValidTimeStep( t ) ) return;

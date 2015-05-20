@@ -560,7 +560,6 @@ namespace mitk
 
     typedef itk::ImageMaskSpatialObject<3> ImageMaskSpatialObject;
     typedef itk::Image< unsigned char, 3 > ImageType;
-    typedef itk::ImageRegion<3>            RegionType;
 
     typedef mitk::ImageToItk<ImageType> CastType;
     CastType::Pointer caster = CastType::New();
@@ -874,8 +873,6 @@ namespace mitk
     MITK_DEBUG << "InternalCalculateStatisticsUnmasked()";
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
-    typedef itk::Image< unsigned char, VImageDimension > MaskImageType;
-    typedef typename ImageType::IndexType IndexType;
 
     // Progress listening...
     typedef itk::SimpleMemberCommand< PartialVolumeAnalysisHistogramCalculator > ITKCommandType;
@@ -942,7 +939,6 @@ namespace mitk
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
     typedef itk::Image< unsigned char, VImageDimension > MaskImageType;
-    typedef typename ImageType::IndexType IndexType;
 
     // generate a list sample of angles at positions
     // where the fiber-prob is higher than .2*maxprob
@@ -1015,7 +1011,6 @@ namespace mitk
     MITK_DEBUG << "InternalCalculateMaskFromPlanarFigure() start";
 
     typedef itk::Image< TPixel, VImageDimension > ImageType;
-    typedef itk::CastImageFilter< ImageType, MaskImage3DType > CastFilterType;
 
     // Generate mask image as new image with same header as input image and
     // initialize with "1".

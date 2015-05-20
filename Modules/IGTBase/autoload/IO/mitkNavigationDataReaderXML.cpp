@@ -14,24 +14,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// MITK
 #include "mitkNavigationDataReaderXML.h"
+#include <mitkIGTMimeTypes.h>
+
+// Third Party
 #include <itksys/SystemTools.hxx>
 #include <fstream>
-#include "tinyxml.h"
+#include <tinyxml.h>
 
-//includes for exceptions
-#include "mitkIGTException.h"
-#include "mitkIGTIOException.h"
 
-mitk::NavigationDataReaderXML::NavigationDataReaderXML()
-  : m_parentElement(nullptr), m_currentNode(nullptr)
+mitk::NavigationDataReaderXML::NavigationDataReaderXML() : AbstractFileReader(
+  mitk::IGTMimeTypes::NAVIGATIONDATASETXML_MIMETYPE(),
+  "MITK NavigationData Reader (XML)")
 {
+  RegisterService();
 }
 
 mitk::NavigationDataReaderXML::~NavigationDataReaderXML()
 {
-
 }
+
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderXML::Read()
+{
+  mitk::NavigationDataSet::Pointer dataset;
+  std::istream* in = GetInputStream();
+  if (in == nullptr)
+  {
+    dataset = Read(GetInputLocation());
+  } else {
+    dataset = Read(in);
+  }
+  std::vector<mitk::BaseData::Pointer> result;
+  mitk::BaseData::Pointer base = dataset.GetPointer();
+  result.push_back(base);
+  return result;
+}
+
+
 
 mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string fileName)
 {
@@ -161,8 +181,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadVersion1()
 {
   if ( !m_parentElement )
   {
-    mitkThrowException(mitk::IGTIOException)
-        << "Reading XML is not possible. Parent element is not set.";
+    mitkThrowException(mitk::IGTIOException) << "Reading XML is not possible. Parent element is not set.";
   }
 
   TiXmlElement* elem;
@@ -352,4 +371,3 @@ void mitk::NavigationDataReaderXML::StreamInvalid(std::string message)
   mitkThrowException(mitk::IGTIOException) << "Invalid stream!";
 }
 // -- deprecated | end
-

@@ -18,34 +18,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNavigationDataReaderXML_H_HEADER_INCLUDED_
 #define MITKNavigationDataReaderXML_H_HEADER_INCLUDED_
 
-#include "mitkNavigationDataReaderInterface.h"
+#include <mitkAbstractFileReader.h>
+#include <mitkNavigationDataSet.h>
+// includes for exceptions
+#include <mitkIGTException.h>
+#include <mitkIGTIOException.h>
 
 class TiXmlElement;
 class TiXmlNode;
 
 namespace mitk {
 
-  class MITKIGT_EXPORT NavigationDataReaderXML : public NavigationDataReaderInterface
+  class NavigationDataReaderXML : public AbstractFileReader
   {
   public:
-    mitkClassMacro(NavigationDataReaderXML, NavigationDataReaderInterface);
-    itkNewMacro(Self);
-
-    virtual mitk::NavigationDataSet::Pointer Read(std::string fileName) override;
-    virtual mitk::NavigationDataSet::Pointer Read(std::istream* stream);
-
-    // -- deprecated | begin
-    /**
-     * \brief Sets the stream of this player.
-     * @throw mitk::IGTException Throws an exception if stream is NULL or if it is not good.
-     * \deprecated Will be removed in one of the next releases. Use SetFileName() instead.
-     */
-    //void SetStream(std::istream* stream);
-    // -- deprecated | end
-
-  protected:
     NavigationDataReaderXML();
     virtual ~NavigationDataReaderXML();
+
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
+
+  protected:
 
     NavigationDataSet::Pointer ReadNavigationDataSet();
 
@@ -102,6 +95,9 @@ namespace mitk {
      */
     void StreamInvalid(std::string message);  ///< help method which sets the stream invalid and displays an error
     // -- deprecated | end
+  private:
+    NavigationDataSet::Pointer Read(std::istream* stream);
+    NavigationDataSet::Pointer Read(std::string fileName);
   };
 
 } // namespace mitk

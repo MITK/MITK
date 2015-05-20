@@ -16,17 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include "mitkNavigationDataSetWriterXML.h"
+#include <mitkIGTMimeTypes.h>
 
 // Third Party
 #include <tinyxml.h>
 #include <itksys/SystemTools.hxx>
 #include <fstream>
 #include <iostream>
-#include <mitkIOMimeTypes.h>
 
 mitk::NavigationDataSetWriterXML::NavigationDataSetWriterXML() : AbstractFileWriter(NavigationDataSet::GetStaticNameOfClass(),
-  CustomMimeType(NAVIGATIONDATASETXML_MIMETYPE()),
-  "MITK NavigationDataSet Reader (XML)")
+  mitk::IGTMimeTypes::NAVIGATIONDATASETXML_MIMETYPE(),
+  "MITK NavigationDataSet Writer (XML)")
 {
   RegisterService();
 }
@@ -144,15 +144,4 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
 void mitk::NavigationDataSetWriterXML::StreamFooter (std::ostream* stream)
 {
   *stream << "</Data>" << std::endl;
-}
-
-
-mitk::CustomMimeType mitk::NavigationDataSetWriterXML::NAVIGATIONDATASETXML_MIMETYPE()
-{
-  mitk::CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".NavigationDataSet.xml");
-  std::string category = "NavigationDataSet";
-  mimeType.SetComment("NavigationDataSet (XML)");
-  mimeType.SetCategory(category);
-  mimeType.AddExtension("xml");
-  return mimeType;
 }

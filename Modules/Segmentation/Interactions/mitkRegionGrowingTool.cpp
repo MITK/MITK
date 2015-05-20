@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
+#include "mitkLabelSetImage.h"
 
 // us
 #include <usModule.h>
@@ -406,7 +407,17 @@ bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionE
           // false: don't constrain the contour to the image's inside
           if (projectedContour.IsNotNull())
           {
-            FeedbackContourTool::FillContourInSlice( projectedContour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+            //FeedbackContourTool::FillContourInSlice( projectedContour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+            DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+            Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+            LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image.GetPointer());
+            int activeColor = 1;
+            if (labelImage != 0)
+            {
+              activeColor = labelImage->GetActiveLabel()->GetValue();
+            }
+
+            mitk::ContourModelUtils::FillContourInSlice(projectedContour, timestep, m_WorkingSlice, image, m_PaintingPixelValue*activeColor);
 
             const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
 

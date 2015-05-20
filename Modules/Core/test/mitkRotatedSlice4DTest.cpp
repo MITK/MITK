@@ -19,12 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkExtractSliceFilter.h"
 #include "time.h"
 #include "mitkImagePixelReadAccessor.h"
-#include <mitkTestingMacros.h>
-#include <mitkIOUtil.h>
+#include "mitkTestingMacros.h"
+#include "mitkIOUtil.h"
 #include "mitkRotationOperation.h"
 
+
 /*
-*
+* The mitkRotatedSlice4DTest loads a 4D image and extracts a specifically rotated slice in each time step's volume.
 */
 int mitkRotatedSlice4DTest(int  argc , char* argv[])
 {
@@ -78,6 +79,12 @@ int mitkRotatedSlice4DTest(int  argc , char* argv[])
      extractor->Update();
      mitk::Image::Pointer extractedPlane;
      extractedPlane = extractor->GetOutput();
+
+     std::stringstream ss;
+     ss << " : Valid slice in timestep " << ts;
+
+     MITK_TEST_CONDITION_REQUIRED(extractedPlane.IsNotNull()
+         , ss.str().c_str());
 
    }
    MITK_TEST_END();

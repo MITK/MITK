@@ -181,6 +181,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
 
   mitk::Image::Pointer resultSlice = mitk::Image::New();
   resultSlice->Initialize(algorithm->GetOutput());
+
   mitk::ImageReadAccessor imAccess(algorithm->GetOutput());
   resultSlice->SetVolume(imAccess.GetData());
 

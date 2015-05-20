@@ -146,7 +146,6 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       //surface2D->Update();
 
 
-
       // prepare the binary image's voxel grid
       vtkSmartPointer<vtkImageData> whiteImage =
           vtkSmartPointer<vtkImageData>::New();
@@ -160,7 +159,6 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       {
         whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
       }
-
       // polygonal data --> image stencil:
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
@@ -177,11 +175,11 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       imgstenc->ReverseStencilOff();
       imgstenc->SetBackgroundValue(outval);
       imgstenc->Update();
-
+      MITK_INFO << "a";
       mitk::LabelSetImage* labelImage; // Todo: Get the working Image
       int activePixelValue = eraseMode;
       labelImage = dynamic_cast<LabelSetImage*>(workingImage.GetPointer());
-      if (workingImage)
+      if (labelImage)
       {
         activePixelValue = labelImage->GetActiveLabel()->GetValue();
       }
@@ -189,7 +187,7 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       // Fill according to the Color Team
       vtkSmartPointer<vtkImageData> filledImage = imgstenc->GetOutput();
       vtkSmartPointer<vtkImageData> resultImage = sliceImage->GetVtkImageData();
-
+      MITK_INFO << "a";
       count = filledImage->GetNumberOfPoints();
       if (activePixelValue == 0)
       {
@@ -231,6 +229,5 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
           }
         }
       }
-
       sliceImage->SetVolume(resultImage->GetScalarPointer());
 }

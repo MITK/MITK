@@ -193,13 +193,15 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   {
       ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
       projectedContour->Close();
+      MITK_INFO << "blub";
       if (firstPointIsFillingColor)
       {
-        ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_EraseColor);
+        ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_WorkingImage, m_EraseColor);
       } else
       {
-        ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_FillColor);
+        ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_WorkingImage, m_FillColor);
       }
+      MITK_INFO << "No Blub";
   }
   return true;
 }

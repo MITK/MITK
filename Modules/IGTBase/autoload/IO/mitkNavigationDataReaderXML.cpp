@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataReaderXML::NavigationDataReaderXML() : AbstractFileReader(
   mitk::IGTMimeTypes::NAVIGATIONDATASETXML_MIMETYPE(),
-  "MITK NavigationData Reader (XML)")
+  "MITK NavigationData Reader (XML)"), m_parentElement(nullptr), m_currentNode(nullptr)
 {
   RegisterService();
 }
@@ -35,7 +35,7 @@ mitk::NavigationDataReaderXML::~NavigationDataReaderXML()
 {
 }
 
-mitk::NavigationDataReaderXML::NavigationDataReaderXML(const mitk::NavigationDataReaderXML& other) : AbstractFileReader(other)
+mitk::NavigationDataReaderXML::NavigationDataReaderXML(const mitk::NavigationDataReaderXML& other) : AbstractFileReader(other), m_parentElement(nullptr), m_currentNode(nullptr)
 {
 }
 
@@ -67,26 +67,26 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string
 {
   //save old locale
   char * oldLocale;
-  oldLocale = setlocale( LC_ALL, nullptr );
+  oldLocale = setlocale(LC_ALL, 0);
 
   //define own locale
   std::locale C("C");
-  setlocale( LC_ALL, "C" );
+  setlocale(LC_ALL, "C");
 
   m_FileName = fileName;
 
   TiXmlDocument document;
-  if ( !document.LoadFile(fileName))
+  if (!document.LoadFile(fileName))
   {
-    mitkThrowException(mitk::IGTIOException) << "File '"<<fileName<<"' could not be loaded.";
+    mitkThrowException(mitk::IGTIOException) << "File '" << fileName << "' could not be loaded.";
   }
 
   TiXmlElement* m_DataElem = document.FirstChildElement("Version");
-  if(!m_DataElem)
+  if (!m_DataElem)
   {
     // for backwards compatibility of version tag
     m_DataElem = document.FirstChildElement("Data");
-    if(!m_DataElem)
+    if (!m_DataElem)
     {
       mitkThrowException(mitk::IGTIOException) << "Data element not found.";
     }
@@ -103,11 +103,11 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string
 
   if (m_FileVersion != 1)
   {
-    mitkThrowException(mitk::IGTIOException) << "File format version "<<m_FileVersion<<" is not supported.";
+    mitkThrowException(mitk::IGTIOException) << "File format version " << m_FileVersion << " is not supported.";
   }
 
   m_parentElement = document.FirstChildElement("Data");
-  if(!m_parentElement)
+  if (!m_parentElement)
   {
     mitkThrowException(mitk::IGTIOException) << "Data element not found.";
   }
@@ -117,7 +117,7 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string
   mitk::NavigationDataSet::Pointer navigationDataSet = this->ReadNavigationDataSet();
 
   //switch back to old locale
-  setlocale( LC_ALL, oldLocale );
+  setlocale(LC_ALL, oldLocale);
 
   return navigationDataSet;
 }

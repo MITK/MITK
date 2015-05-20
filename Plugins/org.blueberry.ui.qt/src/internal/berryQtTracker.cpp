@@ -309,7 +309,7 @@ void QtTrackerMoveListener::Moved(QtTracker* tracker, const QPoint& location)
   // If snapping then reset the tracker's rectangle based on the current drop target
   if (allowSnapping)
   {
-    if (snapTarget.width() < 0 || snapTarget.height() < 0)
+    if (snapTarget.width() <= 0 || snapTarget.height() <= 0)
     {
       snapTarget = QRect(sourceBounds.x() + location.x() - initialLocation.x(),
           sourceBounds.y() + location.y() - initialLocation.y(), sourceBounds.width(),

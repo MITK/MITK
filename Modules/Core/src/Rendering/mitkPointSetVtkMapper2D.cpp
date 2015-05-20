@@ -513,8 +513,6 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   else
     ls->m_UnselectedGlyphSource2D->FilledOff();
 
-//  ls->m_UnselectedGlyphSource2D->SetScale((double)m_Point2DSize/100);
-
   // apply transform
   vtkSmartPointer<vtkTransformFilter> transformFilterU = vtkSmartPointer<vtkTransformFilter>::New();
   transformFilterU->SetInputConnection(ls->m_UnselectedGlyphSource2D->GetOutputPort());
@@ -596,7 +594,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetBoolProperty("show distant lines", m_ShowDistantLines, renderer);
   node->GetIntProperty("line width",          m_LineWidth, renderer);
   node->GetIntProperty("point line width",    m_PointLineWidth, renderer);
-  node->GetIntProperty("point 2D size",       m_Point2DSize, renderer);
+  node->GetFloatProperty("point 2D size",       m_Point2DSize, renderer);
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillShape, renderer);
   node->GetFloatProperty("Pointset.2D.distance to plane", m_DistanceToPlane, renderer );
 
@@ -697,7 +695,7 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
 {
   node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite );
-  node->AddProperty( "point 2D size", mitk::IntProperty::New(6), renderer, overwrite );
+  node->AddProperty( "point 2D size", mitk::FloatProperty::New(6), renderer, overwrite );
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );

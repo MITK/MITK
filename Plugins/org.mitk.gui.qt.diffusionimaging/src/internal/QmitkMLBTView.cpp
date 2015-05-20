@@ -181,7 +181,7 @@ void QmitkMLBTView::StartTrackingThread()
     mitk::PointSetShapeProperty::Pointer bla = mitk::PointSetShapeProperty::New(); bla->SetValue(8);
     m_SamplingPointsNode->SetProperty("Pointset.2D.shape", bla);
     m_SamplingPointsNode->SetProperty("Pointset.2D.distance to plane", mitk::FloatProperty::New(1.5));
-    m_SamplingPointsNode->SetProperty("point 2D size", mitk::IntProperty::New(3));
+    m_SamplingPointsNode->SetProperty("point 2D size", mitk::FloatProperty::New(0.1));
     m_SamplingPointsNode->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
     this->GetDataStorage()->Add(m_SamplingPointsNode);
 
@@ -191,7 +191,7 @@ void QmitkMLBTView::StartTrackingThread()
     m_AlternativePointsNode->SetProperty("color", mitk::ColorProperty::New(1,0,0));
     m_AlternativePointsNode->SetProperty("Pointset.2D.shape", bla);
     m_AlternativePointsNode->SetProperty("Pointset.2D.distance to plane", mitk::FloatProperty::New(1.5));
-    m_AlternativePointsNode->SetProperty("point 2D size", mitk::IntProperty::New(3));
+    m_AlternativePointsNode->SetProperty("point 2D size", mitk::FloatProperty::New(0.1));
     m_AlternativePointsNode->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
     this->GetDataStorage()->Add(m_AlternativePointsNode);
 

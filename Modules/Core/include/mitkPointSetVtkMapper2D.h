@@ -65,7 +65,7 @@ namespace mitk {
   *
   *   - \b "line width": (IntProperty 2)                      // line width of the line from one point to another
   *   - \b "point line width": (IntProperty 1)                // line width of the cross marking a point
-  *   - \b "point 2D size": (IntProperty 6)                   // size of the glyph marking a point
+  *   - \b "point 2D size": (FloatProperty 6)                 // size of the glyph marking a point
   *   - \b "show contour": (BoolProperty false)               // enable contour rendering between points (lines)
   *   - \b "close contour": (BoolProperty false)              // if enabled, the open strip is closed (first point connected with last point)
   *   - \b "show points": (BoolProperty true)                 // show or hide points
@@ -211,7 +211,7 @@ namespace mitk {
     bool m_ShowDistantLines;        // "show distant lines" property
     int m_LineWidth;                // "line width" property
     int m_PointLineWidth;           // "point line width" property
-    int m_Point2DSize;              // "point 2D size" property
+    float m_Point2DSize;              // "point 2D size" property
     int m_IDShapeProperty;          // ID for mitkPointSetShape Enumeration Property "Pointset.2D.shape"
     bool m_FillShape;               // "Pointset.2D.fill shape" property
     float m_DistanceToPlane;        // "Pointset.2D.distance to plane" property

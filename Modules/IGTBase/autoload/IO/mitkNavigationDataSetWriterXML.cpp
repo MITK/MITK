@@ -47,6 +47,10 @@ mitk::NavigationDataSetWriterXML* mitk::NavigationDataSetWriterXML::Clone() cons
 void mitk::NavigationDataSetWriterXML::Write()
 {
   std::ostream* out = GetOutputStream();
+  if (out == nullptr)
+  {
+    out = new std::ofstream( GetOutputLocation().c_str() );
+  }
   mitk::NavigationDataSet::ConstPointer data = dynamic_cast<const NavigationDataSet*> (this->GetInput());
 
   //save old locale
@@ -59,6 +63,7 @@ void mitk::NavigationDataSetWriterXML::Write()
 
   // Cleanup
   out->flush();
+  delete out;
 
   //switch back to old locale
   setlocale( LC_ALL, oldLocale );

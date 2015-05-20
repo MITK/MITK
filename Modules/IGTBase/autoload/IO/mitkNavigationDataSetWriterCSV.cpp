@@ -40,6 +40,10 @@ mitk::NavigationDataSetWriterCSV* mitk::NavigationDataSetWriterCSV::Clone() cons
 void mitk::NavigationDataSetWriterCSV::Write()
 {
   std::ostream* out = GetOutputStream();
+  if (out == nullptr)
+  {
+    out = new std::ofstream(GetOutputLocation().c_str());
+  }
   mitk::NavigationDataSet::ConstPointer data = dynamic_cast<const NavigationDataSet*> (this->GetInput());
 
     //save old locale
@@ -86,6 +90,8 @@ void mitk::NavigationDataSetWriterCSV::Write()
     *out << "\n";
   }
 
+  out->flush();
+  delete out;
   //switch back to old locale
   setlocale( LC_ALL, oldLocale );
 }

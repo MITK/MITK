@@ -98,7 +98,37 @@ struct BaseApplication::Impl
     , m_Argv(argv)
     , m_SingleMode(false)
     , m_SafeMode(true)
-  {}
+  {
+#ifdef Q_OS_MAC
+    /*
+     * This is a workaround for bug 19080:
+     * On Mac OS X the prosess serial number is passed as an commandline argument (-psn_<NUMBER>)
+     * if the application is started via the.app bundle.
+     * This option is unknown, which causes a Poco exception.
+     * Since this is done by the system we have to manually remove the argument here.
+     */
+
+    int newArgc = m_Argc-1;
+    char** newArgs = new char*[newArgc];
+    bool argFound (false);
+    for (int i = 0; i < m_Argc; ++i)
+    {
+      if (QString::fromAscii(m_Argv[i]).contains("-psn"))
+      {
+        argFound = true;
+      }
+      else
+      {
+        newArgs[i] = m_Argv[i];
+      }
+    }
+    if (argFound)
+    {
+      m_Argc = newArgc;
+      m_Argv = newArgs;
+    }
+#endif
+  }
 
   QVariant getProperty(const QString& property) const
   {

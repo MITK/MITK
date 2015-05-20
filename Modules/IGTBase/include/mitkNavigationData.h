@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNAVIGATIONDATA_H_HEADER_INCLUDED_
 #define MITKNAVIGATIONDATA_H_HEADER_INCLUDED_
 #include <itkDataObject.h>
-#include <MitkIGTExports.h>
+#include <MitkIGTBaseExports.h>
 #include <mitkCommon.h>
 #include <mitkNumericTypes.h>
 
@@ -37,7 +37,7 @@ namespace mitk {
     *
     * \ingroup IGT
     */
-  class MITKIGT_EXPORT NavigationData : public itk::DataObject
+  class MITKIGTBASE_EXPORT NavigationData : public itk::DataObject
     {
     public:
       mitkClassMacroItkParent(NavigationData, itk::DataObject);
@@ -291,7 +291,7 @@ namespace mitk {
       * @param verbose Flag indicating if the user wants detailed console output or not.
       * @return true, if all subsequent comparisons are true, false otherwise
       */
-      MITKIGT_EXPORT bool Equal( const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps = mitk::eps, bool verbose = false );
+      MITKIGTBASE_EXPORT bool Equal( const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps = mitk::eps, bool verbose = false );
 
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

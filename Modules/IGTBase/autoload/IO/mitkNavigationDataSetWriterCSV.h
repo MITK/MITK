@@ -19,16 +19,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataSet.h>
+#include <mitkAbstractFileWriter.h>
 
 namespace mitk {
-  class MITKIGT_EXPORT NavigationDataSetWriterCSV
+  class NavigationDataSetWriterCSV : public AbstractFileWriter
   {
   public:
     NavigationDataSetWriterCSV();
     virtual~NavigationDataSetWriterCSV();
 
-    virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
-    virtual void Write (std::ostream* stream, mitk::NavigationDataSet::Pointer);
+    using AbstractFileWriter::Write;
+    virtual void Write() override;
+
+  protected:
+    NavigationDataSetWriterCSV(const NavigationDataSetWriterCSV& other);
+
+    virtual mitk::NavigationDataSetWriterCSV* Clone() const override;
+
+    CustomMimeType NAVIGATIONDATASETCSV_MIMETYPE();
   };
 }
 

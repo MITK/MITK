@@ -113,17 +113,17 @@ std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetDataStr
   return result;
 }
 
-std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTimeStep(unsigned int index)
+std::vector< mitk::NavigationData::Pointer > mitk::NavigationDataSet::GetTimeStep(unsigned int index) const
 {
   return m_NavigationDataVectors[index];
 }
 
-unsigned int mitk::NavigationDataSet::GetNumberOfTools()
+unsigned int mitk::NavigationDataSet::GetNumberOfTools() const
 {
   return m_NumberOfTools;
 }
 
-unsigned int mitk::NavigationDataSet::Size()
+unsigned int mitk::NavigationDataSet::Size() const
 {
   return m_NavigationDataVectors.size();
 }
@@ -146,16 +146,22 @@ bool mitk::NavigationDataSet::VerifyRequestedRegion()
 void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 {
 }
+
+bool mitk::NavigationDataSet::IsEmpty() const
+{
+  return (Size() == 0);
+}
+
 // <--- methods necessary for BaseData
 
 // ---> methods for Iterators
 
-mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::Begin()
+mitk::NavigationDataSet::NavigationDataSetConstIterator mitk::NavigationDataSet::Begin() const
 {
-  return m_NavigationDataVectors.begin();
+  return m_NavigationDataVectors.cbegin();
 }
 
-mitk::NavigationDataSet::NavigationDataSetIterator mitk::NavigationDataSet::End()
+mitk::NavigationDataSet::NavigationDataSetConstIterator mitk::NavigationDataSet::End() const
 {
-  return m_NavigationDataVectors.end();
+  return m_NavigationDataVectors.cend();
 }

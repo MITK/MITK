@@ -111,7 +111,7 @@ namespace mitk{
     /**
     * \brief Iterator always points to the NavigationData object which is in the outputs at the moment.
     */
-    mitk::NavigationDataSet::NavigationDataSetIterator m_NavigationDataSetIterator;
+    mitk::NavigationDataSet::NavigationDataSetConstIterator m_NavigationDataSetIterator;
   };
 } // namespace mitk
 

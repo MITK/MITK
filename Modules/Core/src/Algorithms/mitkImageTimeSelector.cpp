@@ -77,6 +77,7 @@ void mitk::ImageTimeSelector::GenerateData()
   {
       mitk::ImageDataItem::Pointer im = this->GetVolumeData(m_TimeNr, m_ChannelNr)->Clone();
       im->SetTimestep(0);
+      im->SetManageMemory(0);
       this->SetVolumeItem(im, 0);
   }
   else

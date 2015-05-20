@@ -121,6 +121,11 @@ namespace mitk {
         m_Timestep = t;
     }
 
+    void SetManageMemory(bool b)
+    {
+        m_ManageMemory = b;
+    }
+
     int GetDimension() const
     {
       return m_Dimension;

@@ -46,7 +46,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurfaceVtkMapper3D.h"
 #include "mitkTimeGeometry.h"
 #include "mitkTransferFunctionProperty.h"
-#include "mitkVolumeDataVtkMapper3D.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
@@ -121,7 +120,6 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   if(image.IsNotNull() && image->IsInitialized())
   {
     mitk::ImageVtkMapper2D::SetDefaultProperties(node);
-    mitk::VolumeDataVtkMapper3D::SetDefaultProperties(node);
   }
 
   mitk::PlaneGeometryData::Pointer planeGeometry = dynamic_cast<mitk::PlaneGeometryData*>(node->GetData());
@@ -206,12 +204,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
     }
     else if ( id == mitk::BaseRenderer::Standard3D )
     {
-      if((dynamic_cast<Image*>(data) != NULL))
-      {
-        newMapper = mitk::VolumeDataVtkMapper3D::New();
-        newMapper->SetDataNode(node);
-      }
-      else if((dynamic_cast<PlaneGeometryData*>(data)!=NULL))
+      if((dynamic_cast<PlaneGeometryData*>(data)!=NULL))
       {
         newMapper = mitk::PlaneGeometryDataVtkMapper3D::New();
         newMapper->SetDataNode(node);

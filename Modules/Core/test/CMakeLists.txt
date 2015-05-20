@@ -88,6 +88,7 @@ if(TARGET ${TESTDRIVER})
   )
 
   mitkAddCustomModuleTest(mitkRotatedSlice4DTest mitkRotatedSlice4DTest
+                          ${MITK_DATA_DIR}/UltrasoundImages/4D_TEE_Data_MV.dcm
   )
 
   if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_RENDERING_TESTING

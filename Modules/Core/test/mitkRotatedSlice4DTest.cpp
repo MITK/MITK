@@ -14,11 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkInteractionConst.h>
-//#include "vtkMath.h"
-#include "vnl/vnl_cross.h"
-#include "vnl/vnl_rotation_matrix.h"
-#include "mitkImageStatisticsHolder.h"
+#include "mitkInteractionConst.h"
+#include "mitkImageTimeSelector.h"
 #include "mitkExtractSliceFilter.h"
 #include "time.h"
 #include "mitkImagePixelReadAccessor.h"
@@ -33,20 +30,20 @@ int mitkRotatedSlice4DTest(int  argc , char* argv[])
 {
    MITK_TEST_BEGIN("mitkRotatedSlice4DTest");
 
-   // Load preprocessed Image // TODO
-   mitk::Image::Pointer image4D = mitk::IOUtil::LoadImage(std::string(
-                                                            "D:/MITK-MBI11/bin/CMakeExternals/Source/MITK-MBI-Data/Mitral/img.nrrd"));
+   std::string filename = argv[1];
+
+   // load 4D image
+   mitk::Image::Pointer image4D = mitk::IOUtil::LoadImage(filename);
    // check inputs
    if ( image4D.IsNull() )
    {
-      MITK_INFO << "Could not load all files";
+      MITK_INFO << "Could not load the file";
       return false;
    }
-   MITK_INFO << "Loading successful!";
 
+   // for each time step...
    for (unsigned int ts = 0; ts < image4D->GetTimeSteps(); ts++)
    {
-     MITK_INFO << "Timestep: " << ts;
      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
      timeSelector->SetInput( image4D );
      timeSelector->SetTimeNr( ts );
@@ -75,14 +72,12 @@ int mitkRotatedSlice4DTest(int  argc , char* argv[])
      delete op;
 
      // Now extract
-     mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(); // do not need NEW call when bug-13689 is merged in master
+     mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New();
      extractor->SetInput(image3D);
      extractor->SetWorldGeometry(plane);
-     MITK_INFO<< "Update Extraction" ;
      extractor->Update();
      mitk::Image::Pointer extractedPlane;
      extractedPlane = extractor->GetOutput();
-
 
    }
    MITK_TEST_END();

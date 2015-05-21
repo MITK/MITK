@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 
 #include "mitkConnectomicsConstantsManager.h"
+#include <mitkConnectomicsNetworkProperties.h>
 
 #include <vtkMatrix4x4.h>
 
@@ -65,6 +66,7 @@ mitk::ConnectomicsNetwork::Pointer mitk::ConnectomicsSyntheticNetworkGenerator::
   }
 
   network->UpdateBounds();
+  network->SetProperty(connectomicsDataAdditionalHeaderInformation.c_str(), mitk::StringProperty::New("Synthetic Network"));
 
   return network;
 

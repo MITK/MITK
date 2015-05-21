@@ -4,6 +4,8 @@ set(CPP_FILES
   #mitkFiberBundleIOFactory.cpp
   mitkConnectomicsNetworkReader.cpp
   mitkConnectomicsNetworkWriter.cpp
+  mitkConnectomicsNetworkCSVWriter.cpp
+  mitkConnectomicsNetworkMatrixWriter.cpp
   mitkConnectomicsNetworkSerializer.cpp
   mitkConnectomicsNetworkDefinitions.cpp
   mitkNrrdTbssRoiImageIOFactory.cpp

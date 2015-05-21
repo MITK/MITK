@@ -75,9 +75,13 @@ namespace mitk
         // save this for later
         hRoot = TiXmlHandle(pElem);
 
-        pElem = hRoot.FirstChildElement(mitk::ConnectomicsNetworkDefinitions::XML_GEOMETRY).Element();
+        //get file version
+        std::string version("");
+        hRoot.Element()->QueryStringAttribute(mitk::ConnectomicsNetworkDefinitions::XML_FILE_VERSION, &version);
 
         // read geometry
+        pElem = hRoot.FirstChildElement(mitk::ConnectomicsNetworkDefinitions::XML_GEOMETRY).Element();
+
         mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
 
         // read origin
@@ -176,15 +180,25 @@ namespace mitk
           for( ; edgeElement; edgeElement=edgeElement->NextSiblingElement())
           {
             int edgeID(0), edgeSourceID(0), edgeTargetID(0), edgeWeight(0);
+            double edgeDoubleWeight(0.0);
 
             edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_ID, &edgeID);
             edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_SOURCE_ID, &edgeSourceID);
             edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_TARGET_ID, &edgeTargetID);
             edgeElement->Attribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_WEIGHT_ID, &edgeWeight);
+            if(version == "0.1")
+            {
+              // in version 0.1 only the int weight was saved, assume double weight to be one by default
+              edgeDoubleWeight = 1.0;
+            }
+            else
+            {
+              edgeElement->QueryDoubleAttribute(mitk::ConnectomicsNetworkDefinitions::XML_EDGE_DOUBLE_WEIGHT_ID, &edgeDoubleWeight);
+            }
 
             mitk::ConnectomicsNetwork::VertexDescriptorType source = idToVertexMap.find( edgeSourceID )->second;
             mitk::ConnectomicsNetwork::VertexDescriptorType target = idToVertexMap.find( edgeTargetID )->second;
-            outputNetwork->AddEdge( source, target, edgeSourceID, edgeTargetID, edgeWeight);
+            outputNetwork->AddEdge( source, target, edgeSourceID, edgeTargetID, edgeWeight, edgeDoubleWeight);
           }
         }
 

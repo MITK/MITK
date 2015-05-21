@@ -4,8 +4,12 @@ set(CPP_FILES
   mitkRealTimeClock.cpp
   mitkNavigationData.cpp
   mitkNavigationDataSet.cpp
- mitkStaticIGTHelperFunctions.cpp
- mitkQuaternionAveraging.cpp
+  mitkStaticIGTHelperFunctions.cpp
+  mitkQuaternionAveraging.cpp
+  mitkIGTMimeTypes.cpp
+  mitkIGTException.cpp
+  mitkIGTIOException.cpp
+  mitkIGTHardwareException.cpp
 )
 
 if(WIN32)

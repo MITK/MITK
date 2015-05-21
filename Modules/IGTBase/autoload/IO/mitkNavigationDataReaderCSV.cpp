@@ -52,7 +52,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderCSV::Re
   result.push_back(returnValue.GetPointer());
 
   // start from line 1 to leave out header
-  for (int i = 1; i<fileContent.size(); i++)
+  for (unsigned int i = 1; i<fileContent.size(); i++)
   {
     returnValue->AddNavigationDatas(parseLine(fileContent[i], NumOfTools));
   }

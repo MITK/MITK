@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITK_CORRELATIONCALCULATOR_TXX
 
 #include <algorithm>
+#include <numeric>
 #include <mitkLogMacros.h>
 #include <mitkLog.h>
 #include <mitkImageCast.h>
@@ -150,7 +151,7 @@ void mitk::CorrelationCalculator<T>::DoWholeCorrelation(  )
 }
 
 template< class T >
-void mitk::CorrelationCalculator<T>::DoParcelCorrelation( mitk::CorrelationCalculator<T>::ParcelMode mode  )
+void mitk::CorrelationCalculator<T>::DoParcelCorrelation( typename mitk::CorrelationCalculator<T>::ParcelMode mode  )
 {
   this->ExtractCenterOfMassForParcels();
 
@@ -189,7 +190,7 @@ void mitk::CorrelationCalculator<T>::DoParcelCorrelation( mitk::CorrelationCalcu
 }
 
 template< class T >
-double mitk::CorrelationCalculator<T>::GetParcelCorrelation(const int& parcelA, const int& parcelB, mitk::CorrelationCalculator<T>::ParcelMode& mode) const
+double mitk::CorrelationCalculator<T>::GetParcelCorrelation(const int& parcelA, const int& parcelB, typename mitk::CorrelationCalculator<T>::ParcelMode& mode) const
 {
   double result(0.0);
 

@@ -594,7 +594,12 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetBoolProperty("show distant lines", m_ShowDistantLines, renderer);
   node->GetIntProperty("line width",          m_LineWidth, renderer);
   node->GetIntProperty("point line width",    m_PointLineWidth, renderer);
-  node->GetFloatProperty("point 2D size",       m_Point2DSize, renderer);
+  if(!node->GetFloatProperty("point 2D size", m_Point2DSize, renderer))
+  {
+      int size = 0;
+      if(node->GetIntProperty("point 2D size", size, renderer))
+          m_Point2DSize = size;
+  }
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillShape, renderer);
   node->GetFloatProperty("Pointset.2D.distance to plane", m_DistanceToPlane, renderer );
 

@@ -5,6 +5,8 @@ set(CPP_FILES
   Algorithms/itkSmoothedClassProbabilites.cpp
 
   Features/itkNeighborhoodFunctorImageFilter.cpp
+  mitkCLUtil.hxx
+
 )
 
 set( TOOL_FILES

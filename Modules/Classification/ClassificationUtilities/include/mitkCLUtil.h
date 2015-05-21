@@ -1,18 +1,13 @@
 #ifndef mitkCLUtil_h
 #define mitkCLUtil_h
 
-#include <itkImageRegionIterator.h>
 #include <mitkImage.h>
-#include <mitkImageAccessByItk.h>
-#include <mitkImageCast.h>
-#include <mitkITKImageImport.h>
-
 #include <Eigen/Dense>
-
+#include <MitkClassificationUtilitiesExports.h>
 namespace mitk
 {
 
-struct CLUtil
+struct MITKCLASSIFICATIONUTILITIES_EXPORT CLUtil
 {
 
 
@@ -22,17 +17,8 @@ struct CLUtil
   /// \param map
   ///
   template<class TImageType>
-  static void CountSamplesPerLabels( TImageType * image, std::map<unsigned int, unsigned int> & map)
-  {
-    auto it = itk::ImageRegionIterator< TImageType >(image,image->GetLargestPossibleRegion());
-    while(!it.IsAtEnd())
-    {
-      if(map.find(it.Value()) == map.end())
-        map[it.Value()] = 0;
-      map[it.Value()]++;
-      ++it;
-    }
-  }
+  static void  CountSamplesPerLabels( TImageType * image, std::map<unsigned int, unsigned int> & map);
+
 
   ///
   /// \brief CountVoxelForLabel
@@ -41,47 +27,29 @@ struct CLUtil
   /// \param count
   ///
   template <class TImageType>
-  static void CountVoxelForLabel(TImageType* image, typename TImageType::PixelType label, unsigned int & count )
-  {
-    itk::ImageRegionConstIterator<TImageType> inputIter(image, image->GetLargestPossibleRegion());
-    while(!inputIter.IsAtEnd())
-    {
-      if(inputIter.Value() == label) ++count;
-      ++inputIter;
-    }
-  }
+  static void CountVoxelForLabel(TImageType* image, typename TImageType::PixelType label, unsigned int & count );
 
+
+  ///
+  /// \brief SumVoxelForLabel
+  /// \param image
+  /// \param source
+  /// \param label
+  /// \param val
+  ///
   template <class TImageType>
-  static void SumVoxelForLabel(TImageType* image, const mitk::Image::Pointer & source , typename TImageType::PixelType label, double & val )
-  {
-    itk::Image<double,3>::Pointer itk_source;
-    mitk::CastToItkImage(source,itk_source);
+  static void SumVoxelForLabel(TImageType* image, const mitk::Image::Pointer & source , typename TImageType::PixelType label, double & val );
 
-    itk::ImageRegionConstIterator<TImageType> inputIter(image, image->GetLargestPossibleRegion());
-    itk::ImageRegionConstIterator< itk::Image<double,3> > sourceIter(itk_source, itk_source->GetLargestPossibleRegion());
-    while(!inputIter.IsAtEnd())
-    {
-      if(inputIter.Value() == label) val += sourceIter.Value();
-      ++inputIter;
-      ++sourceIter;
-    }
-  }
 
+  ///
+  /// \brief SqSumVoxelForLabel
+  /// \param image
+  /// \param source
+  /// \param label
+  /// \param val
+  ///
   template <class TImageType>
-  static void SqSumVoxelForLabel(TImageType* image, const mitk::Image::Pointer & source, typename TImageType::PixelType label, double & val )
-  {
-    itk::Image<double,3>::Pointer itk_source;
-    mitk::CastToItkImage(source,itk_source);
-
-    itk::ImageRegionConstIterator<TImageType> inputIter(image, image->GetLargestPossibleRegion());
-    itk::ImageRegionConstIterator< itk::Image<double,3> > sourceIter(itk_source, itk_source->GetLargestPossibleRegion());
-    while(!inputIter.IsAtEnd())
-    {
-      if(inputIter.Value() == label) val += sourceIter.Value() * sourceIter.Value();
-      ++inputIter;
-      ++sourceIter;
-    }
-  }
+  static void SqSumVoxelForLabel(TImageType* image, const mitk::Image::Pointer & source, typename TImageType::PixelType label, double & val );
 
   ///
   /// \brief SampleLabel
@@ -91,24 +59,7 @@ struct CLUtil
   /// \param label
   ///
   template <class TImageType1, class TImageType2>
-  static void SampleLabel(TImageType1* image, TImageType2* output, double acceptrate, unsigned int label)
-  {
-
-    std::srand (time(NULL));
-
-    itk::ImageRegionConstIterator< TImageType1 > inputIter(image, image->GetLargestPossibleRegion());
-    itk::ImageRegionIterator< TImageType2 > outputIter(output, output->GetLargestPossibleRegion());
-
-    while (!inputIter.IsAtEnd())
-    {
-      double r = (double)(rand()) / RAND_MAX;
-      if(inputIter.Get() == label && r < acceptrate)
-        outputIter.Set(label);
-
-      ++inputIter;
-      ++outputIter;
-    }
-  }
+  static void SampleLabel(TImageType1* image, TImageType2* output, double acceptrate, unsigned int label);
 
 
   ///
@@ -117,17 +68,7 @@ struct CLUtil
   /// \param n_numSamples
   ///
   template<typename TImageType>
-  static void CountLabledVoxels(TImageType * mask, unsigned int & n_numSamples)
-  {
-    auto mit = itk::ImageRegionConstIterator<TImageType>(mask, mask->GetLargestPossibleRegion());
-    while (!mit.IsAtEnd())
-    {
-      if(mit.Value() > 0)
-        n_numSamples++;
-      ++mit;
-    }
-  }
-
+  static inline void CountLabledVoxels(TImageType * mask, unsigned int & n_numSamples);
 
   ///
   /// \brief transform
@@ -136,44 +77,7 @@ struct CLUtil
   /// \param outimage
   ///
   template<typename TMatrixElementType>
-  static mitk::Image::Pointer Transform(const Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> & matrix, const mitk::Image::Pointer & mask)
-  {
-    itk::Image<unsigned int, 3>::Pointer itkMask;
-    mitk::CastToItkImage(mask,itkMask);
-
-    typename itk::Image<TMatrixElementType, 3>::Pointer itk_img = itk::Image<TMatrixElementType, 3>::New();
-    itk_img->SetRegions(itkMask->GetLargestPossibleRegion());
-    itk_img->SetOrigin(itkMask->GetOrigin());
-    itk_img->SetSpacing(itkMask->GetSpacing());
-    itk_img->SetDirection(itkMask->GetDirection());
-    itk_img->Allocate();
-
-
-    unsigned int n_numSamples = 0;
-    mitk::CLUtil::CountLabledVoxels(itkMask.GetPointer(),n_numSamples);
-
-    if(n_numSamples != matrix.rows())
-      MITK_ERROR << "Number of samples in matrix and number of points under the masks is not the same!";
-
-    auto mit = itk::ImageRegionConstIterator<itk::Image<unsigned int, 3> >(itkMask, itkMask->GetLargestPossibleRegion());
-    auto oit = itk::ImageRegionIterator<itk::Image<TMatrixElementType, 3> >(itk_img, itk_img->GetLargestPossibleRegion());
-
-    unsigned int current_row = 0;
-    while(!mit.IsAtEnd())
-    {
-      if(mit.Value() > 0)
-        oit.Set(matrix(current_row++,0));
-      else
-        oit.Set(0.0);
-      ++mit;
-      ++oit;
-    }
-
-    mitk::Image::Pointer out_img = mitk::Image::New();
-    mitk::GrabItkImageMemory(itk_img,out_img);
-    return out_img;
-  }
-
+  static mitk::Image::Pointer Transform(const Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> & matrix, const mitk::Image::Pointer & mask);
 
   ///
   /// \brief TransformImageToMatrix
@@ -182,33 +86,56 @@ struct CLUtil
   /// \param out_matrix
   ///
   template<typename TMatrixElementType>
-  static Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> Transform(const mitk::Image::Pointer & img, const mitk::Image::Pointer & mask)
-  {
-    itk::Image<unsigned int, 3>::Pointer current_mask;
-    mitk::CastToItkImage(mask,current_mask);
+  static Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> Transform(const mitk::Image::Pointer & img, const mitk::Image::Pointer & mask);
 
-    unsigned int n_numSamples = 0;
-    mitk::CLUtil::CountLabledVoxels(current_mask.GetPointer(),n_numSamples);
+  ///
+  /// \brief itkDilateBinary
+  /// \param sourceImage
+  /// \param resultImage
+  /// \param factor
+  ///
+  template<typename TImageType>
+  static void itkDilateBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int factor);
 
-    typename itk::Image<TMatrixElementType, 3>::Pointer current_img;
-    mitk::CastToItkImage(img,current_img);
+  ///
+  /// \brief itkErodeBinary
+  /// \param sourceImage
+  /// \param resultImage
+  /// \param factor
+  ///
+  template<typename TImageType>
+  static void itkErodeBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int factor);
 
-    Eigen::Matrix<TMatrixElementType, Eigen::Dynamic, Eigen::Dynamic> out_matrix(n_numSamples,1);
+  /// \brief itkFillHolesBinary
+  /// \param sourceImage
+  /// \param resultImage
+  ///
+  template<typename TPixel, unsigned int VDimension>
+  static void itkFillHolesBinary(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage);
 
-    auto mit = itk::ImageRegionConstIterator<itk::Image<unsigned int, 3> >(current_mask, current_mask->GetLargestPossibleRegion());
-    auto iit = itk::ImageRegionConstIterator<itk::Image<TMatrixElementType, 3> >(current_img,current_img->GetLargestPossibleRegion());
-    unsigned int current_row = 0;
-    while (!mit.IsAtEnd()) {
-      if(mit.Value() > 0)
-        out_matrix(current_row++) = iit.Value();
-      ++mit;
-      ++iit;
-    }
+  ///
+  /// \brief itkLogicalAndImages voxel wise comparison if a voxel of image1 or voxel of image imag2 is zero set
+  /// in image1 and image2 the current voxel to zero
+  /// \param image1
+  /// \param image2
+  ///
+  template<typename TImageType1, typename TImageType2>
+  static void itkLogicalAndImages(TImageType1 * image1, TImageType2 * image2);
 
-    return out_matrix;
-  }
+  ///
+  /// \brief GaussianFilter
+  /// \param image
+  /// \param smoothed
+  /// \param sigma
+  ///
+  template<class TImageType>
+  static void GaussianFilter(TImageType * image, mitk::Image::Pointer & smoothed ,double sigma);
 
-};
+
+  };
+
 } //namespace MITK
+
+#include "../src/mitkCLUtil.hxx"
 
 #endif

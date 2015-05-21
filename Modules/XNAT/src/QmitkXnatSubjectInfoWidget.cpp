@@ -27,6 +27,8 @@ QmitkXnatSubjectInfoWidget::QmitkXnatSubjectInfoWidget(ctkXnatSubject* subject, 
   m_Controls.setupUi(this);
 
   // Set the UI labels
+  m_Controls.breadcrumbLabel->setText("Project:" + m_Subject->parent()->property("name"));
+  m_Controls.nameLabel->setText(m_Subject->property("label"));
   m_Controls.birthyearLabel->setText(m_Subject->property("dob"));
   m_Controls.genderLabel->setText(m_Subject->property("gender"));
   m_Controls.handednessLabel->setText(m_Subject->property("handedness"));

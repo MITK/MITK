@@ -26,6 +26,9 @@ QmitkXnatExperimentInfoWidget::QmitkXnatExperimentInfoWidget(ctkXnatExperiment* 
   m_Controls.setupUi(this);
 
   // Set the UI labels
+  m_Controls.breadcrumbLabel->setText("Project:" + m_Experiment->parent()->parent()->property("name") +
+    " > Subject:" + m_Experiment->parent()->property("label"));
+  m_Controls.nameLabel->setText(m_Experiment->property("label"));
   m_Controls.modalityLabel->setText(m_Experiment->property("modality"));
   m_Controls.dateLabel->setText(m_Experiment->property("date"));
   m_Controls.timeLabel->setText(m_Experiment->property("time"));

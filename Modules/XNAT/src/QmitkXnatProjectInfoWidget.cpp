@@ -26,7 +26,7 @@ QmitkXnatProjectInfoWidget::QmitkXnatProjectInfoWidget(ctkXnatProject* project, 
   m_Controls.setupUi(this);
 
   // Set the UI labels
-  m_Controls.idLabel->setText(m_Project->property("ID"));
+  m_Controls.idLabel->setText(m_Project->property("name"));
   m_Controls.descriptionLabel->setText(m_Project->property("description"));
   if (!m_Project->property("pi_lastname").isEmpty())
   {

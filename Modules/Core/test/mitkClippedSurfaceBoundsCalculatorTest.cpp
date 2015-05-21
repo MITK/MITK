@@ -112,7 +112,7 @@ static void CheckPlanesInsideBoundingBox(mitk::BaseGeometry::Pointer geometry3D)
   //Check planes which are only on one slice:
   //Slice 0
   mitk::Point3D origin;
-  origin[0] = 511; // Set to 511.9 so that the intersection point is inside the bounding box
+  origin[0] = 510; // Set to 511.9 so that the intersection point is inside the bounding box
   origin[1] = 0;
   origin[2] = 0;
 
@@ -196,7 +196,7 @@ static void CheckPlanesInsideBoundingBox(mitk::BaseGeometry::Pointer geometry3D)
   MITK_TEST_CONDITION(minMax.first == 17 && minMax.second == 19, "Check if plane is from slice 17 to slice 19 with inclined plane");
 
 
-  origin[0] = 511;
+  origin[0] = 510;
   origin[1] = 0;
   origin[2] = 0;
 
@@ -228,7 +228,7 @@ static void CheckPlanesOutsideOfBoundingBox(mitk::BaseGeometry::Pointer geometry
 
   //In front of the bounding box
   mitk::Point3D origin;
-  origin[0] = 511;
+  origin[0] = 510;
   origin[1] = 0;
   origin[2] = -5;
 
@@ -399,14 +399,137 @@ static void CheckIntersectionWithPointCloud( mitk::BaseGeometry::Pointer geometr
 }
 
 
+static void CheckIntersectionWithRotatedGeometry()
+{
+
+  //Define origin for second Geometry3D;
+  mitk::Point3D origin3;
+  origin3[0] = -45.25;
+  origin3[1] = -113.22;
+  origin3[2] = 0.62;
+
+  //Define normal:
+  mitk::Vector3D normal3;
+  normal3[0] = -0.02;
+  normal3[1] = -0.18;
+  normal3[2] = 2.99;
+
+  mitk::Vector3D spacing;
+  spacing[0] = 1.43;
+  spacing[1] = 1.43;
+  spacing[2] = 3.0;
+
+
+  //Initialize PlaneGeometry:
+  mitk::PlaneGeometry::Pointer planeGeometry3 = mitk::PlaneGeometry::New();
+  planeGeometry3->InitializePlane(origin3, normal3);
+  planeGeometry3->SetSpacing(spacing);
+
+  mitk::BoundingBox::BoundsArrayType moreBounds = planeGeometry3->GetBounds();
+  moreBounds[0] = 0;
+  moreBounds[1] = 64;
+  moreBounds[2] = 0;
+  moreBounds[3] = 140;
+  moreBounds[4] = 0;
+  moreBounds[5] = 1;
+  planeGeometry3->SetBounds(moreBounds);
+
+
+  //Initialize SlicedGeometry3D:
+  mitk::SlicedGeometry3D::Pointer rotatedSlicedGeometry3D = mitk::SlicedGeometry3D::New();
+  rotatedSlicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::PlaneGeometry*>(planeGeometry3.GetPointer()), 25);
+  rotatedSlicedGeometry3D->SetImageGeometry( true );
+  mitk::AffineTransform3D* geom = rotatedSlicedGeometry3D->GetIndexToWorldTransform();
+
+  mitk::AffineTransform3D::MatrixType matrix;
+  matrix[0][0] = 1.43;
+  matrix[0][1] = -0.01;
+  matrix[0][2] = -0.02;
+
+  matrix[0][0] = 0.01;
+  matrix[1][1] = 1.43;
+  matrix[2][2] = -0.18;
+
+  matrix[0][0] = 0.01;
+  matrix[1][1] = 0.08;
+  matrix[2][2] = 2.99;
+  geom->SetMatrix(matrix);
+
+
+  mitk::ClippedSurfaceBoundsCalculator* calculator = new mitk::ClippedSurfaceBoundsCalculator();
+  mitk::Image::Pointer image = mitk::Image::New();
+  image->Initialize( mitk::MakePixelType<int, int, 1>(), *(rotatedSlicedGeometry3D.GetPointer()) );
+
+  //Check planes which are only on one slice:
+
+  {
+    //last Slice
+    mitk::Point3D origin;
+    origin[0] = -47.79;
+    origin[1] = 81.41;
+    origin[2] = 84.34;
+
+    mitk::Vector3D normal;
+    mitk::FillVector3D(normal, 0.02, 0.18, -2.99);
+
+    mitk::Vector3D spacing;
+    spacing[0] = 1.43;
+    spacing[1] = 1.43;
+    spacing[2] = 3.0;
+
+
+    mitk::PlaneGeometry::Pointer planeOnSliceZero = mitk::PlaneGeometry::New();
+    planeOnSliceZero->InitializePlane(origin, normal);
+    planeOnSliceZero->SetSpacing(spacing);
+
+    calculator->SetInput( planeOnSliceZero , image);
+    calculator->Update();
+
+    mitk::ClippedSurfaceBoundsCalculator::OutputType minMax = calculator->GetMinMaxSpatialDirectionZ();
+
+    MITK_TEST_CONDITION(minMax.first == minMax.second, "Check if plane is only on one slice");
+    MITK_TEST_CONDITION(minMax.first == 24 && minMax.second == 24, "Check if plane is on slice 24");
+  }
+
+  {
+    //Slice 0-24
+    mitk::Point3D origin;
+    origin[0] = -0.98;
+    origin[1] = -113.56;
+    origin[2] = -0.64;
+
+    mitk::Vector3D normal;
+    mitk::FillVector3D(normal, 1.43, 0.01, 0.01 );
+
+    mitk::Vector3D spacing;
+    spacing[0] = 1.43;
+    spacing[1] = 3.0;
+    spacing[2] = 1.43;
+
+    mitk::PlaneGeometry::Pointer planeOnSliceZero = mitk::PlaneGeometry::New();
+    planeOnSliceZero->InitializePlane(origin, normal);
+    planeOnSliceZero->SetSpacing(spacing);
+
+    calculator->SetInput( planeOnSliceZero , image);
+    calculator->Update();
+
+    mitk::ClippedSurfaceBoundsCalculator::OutputType minMax = calculator->GetMinMaxSpatialDirectionZ();
+
+    MITK_TEST_CONDITION(minMax.first != minMax.second, "Check if plane is only on one slice");
+    MITK_TEST_CONDITION(minMax.first == 0 && minMax.second == 24, "Check if plane is on slices 0-24");
+  }
+
+
+}
+
 int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
 {
   // always start with this!
   MITK_TEST_BEGIN("ClippedSurfaceBoundsCalculator");
 
   /** The class mitkClippedSurfaceBoundsCalculator calculates the intersection points of a PlaneGeometry and a Geometry3D.
-  *   This unittest checks if the correct min and max values for the three spatial directions (x, y, z)
-  *   are calculated. To test this we define artifical PlaneGeometries and Geometry3Ds and test different
+  *   This unit test checks if the correct min and max values for the three spatial directions (x, y, z)
+  *   are calculated. To test this we define artificial PlaneGeometries and Geometry3Ds and test different
   *   scenarios:
   *
   *   1. planes which are inside the bounding box of a 3D geometry but only on one slice
@@ -445,7 +568,7 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
   mitk::SlicedGeometry3D::Pointer slicedGeometry3D = mitk::SlicedGeometry3D::New();
   slicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::PlaneGeometry*>(planeGeometry.GetPointer()), 20);
   mitk::BaseGeometry::Pointer geometry3D = dynamic_cast< mitk::BaseGeometry* > ( slicedGeometry3D.GetPointer() );
-  geometry3D->SetImageGeometry(true);
+  geometry3D->SetImageGeometry( true );
 
   //Define origin for second Geometry3D;
   mitk::Point3D origin2;
@@ -465,7 +588,8 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
   mitk::SlicedGeometry3D::Pointer secondSlicedGeometry3D = mitk::SlicedGeometry3D::New();
   secondSlicedGeometry3D->InitializeEvenlySpaced(dynamic_cast<mitk::PlaneGeometry*>(planeGeometry2.GetPointer()), 20);
   mitk::BaseGeometry::Pointer secondGeometry3D = dynamic_cast< mitk::BaseGeometry* > ( secondSlicedGeometry3D.GetPointer() );
-  secondGeometry3D->SetImageGeometry(true);
+  secondGeometry3D->SetImageGeometry( true );
+
 
 
   /***************************************************************/
@@ -475,6 +599,7 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char* [])
   CheckPlanesInsideBoundingBox(geometry3D);
   CheckIntersectionPointsOfTwoGeometry3D(geometry3D, secondGeometry3D);
   CheckIntersectionWithPointCloud( geometry3D );
+  CheckIntersectionWithRotatedGeometry();
 
 
   /** ToDo:

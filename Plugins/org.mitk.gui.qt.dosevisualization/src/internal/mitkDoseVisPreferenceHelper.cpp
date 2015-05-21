@@ -31,8 +31,8 @@ void mitk::StorePresetsMap(const PresetMapType& presetMap)
 {
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   berry::IPreferences::Pointer doseVisNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
-//  berry::IPreferences::Pointer presetsNode = doseVisNode->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID.c_str());
 
+//  berry::IPreferences::Pointer presetsNode = doseVisNode->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID.c_str());
   berry::IPreferences::Pointer presetsNode = doseVisNode->Node("isoPresets");
   presetsNode->RemoveNode();
   doseVisNode->Flush();

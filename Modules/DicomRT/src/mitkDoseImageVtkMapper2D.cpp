@@ -874,7 +874,9 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
 
   double doseValue = level->GetDoseValue()*pref;
   mitk::IsoDoseLevel::ColorType isoColor = level->GetColor();
-  unsigned char colorLine[3] = {isoColor.GetRed()*255, isoColor.GetGreen()*255, isoColor.GetBlue()*255};
+  unsigned char colorLine[3] = {static_cast<unsigned char>(isoColor.GetRed()*255),
+                                static_cast<unsigned char>(isoColor.GetGreen()*255),
+                                static_cast<unsigned char>(isoColor.GetBlue()*255)};
 
   int x = xMin; //pixel index x
   int y = yMin; //pixel index y

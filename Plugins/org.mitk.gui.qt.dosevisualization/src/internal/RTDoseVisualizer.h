@@ -138,6 +138,10 @@ protected:
   @TODO: should be moved outside the class, to be available for other classes at well.*/
   void ActualizeDisplayStyleForAllDoseDataNodes();
 
+  void NodeRemoved(const mitk::DataNode* node) override;
+
+  void NodeChanged(const mitk::DataNode *node) override;
+
   Ui::RTDoseVisualizerControls m_Controls;
   mitk::DataNode::Pointer m_selectedNode;
   unsigned int m_freeIsoValuesCount;

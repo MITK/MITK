@@ -509,6 +509,38 @@ void RTDoseVisualizer::UpdateBySelectedNode()
   }
 }
 
+void RTDoseVisualizer::NodeRemoved(const mitk::DataNode* node)
+{
+  mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(node);
+  mitk::DataStorage::SetOfObjects::const_iterator iterChildNodes = childNodes->begin();
+
+  while (iterChildNodes != childNodes->end())
+  {
+    this->GetDataStorage()->Remove((*iterChildNodes));
+    ++iterChildNodes;
+  }
+}
+
+void RTDoseVisualizer::NodeChanged(const mitk::DataNode *node)
+{
+  bool isdose = false;
+  if(node->GetBoolProperty(mitk::RTConstants::DOSE_PROPERTY_NAME.c_str(),isdose) && isdose)
+  {
+    bool isvisible = true;
+    if(node->GetBoolProperty("visible", isvisible))
+    {
+      mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(node);
+      mitk::DataStorage::SetOfObjects::const_iterator iterChildNodes = childNodes->begin();
+
+      while (iterChildNodes != childNodes->end())
+      {
+        (*iterChildNodes)->SetVisibility(isvisible);
+        ++iterChildNodes;
+      }
+    }
+  }
+}
+
 void RTDoseVisualizer::UpdateByPreferences()
 {
   m_Presets = mitk::LoadPresetsMap();

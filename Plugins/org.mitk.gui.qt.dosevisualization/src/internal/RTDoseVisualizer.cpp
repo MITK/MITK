@@ -85,6 +85,7 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
   m_DoseValueDelegate = new QmitkDoseValueDelegate(this);
   m_DoseVisualDelegate = new QmitkDoseVisualStyleDelegate(this);
 
+
   this->UpdateByPreferences();
   this->ActualizeIsoLevelsForAllDoseDataNodes();
   this->ActualizeReferenceDoseForAllDoseDataNodes();
@@ -228,13 +229,16 @@ void RTDoseVisualizer::OnDataChangedInIsoLevelSetView()
   //colorwash visibility changed, update the colorwash
   this->UpdateColorWashTransferFunction();
 
-  //Hack: This is a dirty hack to reinit the isodose contour node. Only if the node (or property) has changed the rendering process register the RequestUpdateAll
-  //Only way to render the isoline by changes without a global reinit
-  mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-  isoDoseNode->Modified();
+  if(m_selectedNode.IsNotNull())
+  {
+    //Hack: This is a dirty hack to reinit the isodose contour node. Only if the node (or property) has changed the rendering process register the RequestUpdateAll
+    //Only way to render the isoline by changes without a global reinit
+    mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
+    isoDoseNode->Modified();
 
-  // Reinit if visibility of colorwash or isodoselevel changed
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    // Reinit if visibility of colorwash or isodoselevel changed
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void RTDoseVisualizer::OnShowContextMenuIsoSet(const QPoint& pos)
@@ -319,13 +323,16 @@ void RTDoseVisualizer::UpdateFreeIsoValues()
 
 void RTDoseVisualizer::ActualizeFreeIsoLine()
 {
-  //Hack: This is a dirty hack to reinit the isodose contour node. Only if the node (or property) has changed the rendering process register the RequestUpdateAll
-  //Only way to render the isoline by changes without a global reinit
-  mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-  isoDoseNode->Modified();
+  if(m_selectedNode.IsNotNull())
+  {
+    //Hack: This is a dirty hack to reinit the isodose contour node. Only if the node (or property) has changed the rendering process register the RequestUpdateAll
+    //Only way to render the isoline by changes without a global reinit
+    mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
+    isoDoseNode->Modified();
 
-  // Reinit if visibility of colorwash or isodoselevel changed
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    // Reinit if visibility of colorwash or isodoselevel changed
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 void RTDoseVisualizer::OnAbsDoseToggled(bool showAbs)
 {
@@ -368,39 +375,42 @@ void RTDoseVisualizer::UpdateColorWashTransferFunction()
   //Generating the Colorwash
   vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
 
-  mitk::IsoDoseLevelSetProperty::Pointer propIsoSet = dynamic_cast<mitk::IsoDoseLevelSetProperty* >(m_selectedNode->GetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str()));
-  mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = propIsoSet->GetValue();
-
-  float referenceDose;
-  m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),referenceDose);
-  mitk::TransferFunction::ControlPoints scalarOpacityPoints;
-  scalarOpacityPoints.push_back( std::make_pair(0, 1 ) );
-  //Backgroud
-  transferFunction->AddHSVPoint(((isoDoseLevelSet->Begin())->GetDoseValue()*referenceDose)-0.001,0,0,0,1.0,1.0);
-
-  for(mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelSet->Begin(); itIsoDoseLevel != isoDoseLevelSet->End(); ++itIsoDoseLevel)
+  if(m_selectedNode.IsNotNull())
   {
-    float *hsv = new float[3];
-    //used for transfer rgb to hsv
-    vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
+    mitk::IsoDoseLevelSetProperty::Pointer propIsoSet = dynamic_cast<mitk::IsoDoseLevelSetProperty* >(m_selectedNode->GetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str()));
+    mitk::IsoDoseLevelSet::Pointer isoDoseLevelSet = propIsoSet->GetValue();
 
-    if(itIsoDoseLevel->GetVisibleColorWash())
+    float referenceDose;
+    m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),referenceDose);
+    mitk::TransferFunction::ControlPoints scalarOpacityPoints;
+    scalarOpacityPoints.push_back( std::make_pair(0, 1 ) );
+    //Backgroud
+    transferFunction->AddHSVPoint(((isoDoseLevelSet->Begin())->GetDoseValue()*referenceDose)-0.001,0,0,0,1.0,1.0);
+
+    for(mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelSet->Begin(); itIsoDoseLevel != isoDoseLevelSet->End(); ++itIsoDoseLevel)
     {
-      cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0],itIsoDoseLevel->GetColor()[1],itIsoDoseLevel->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
-      transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose,hsv[0],hsv[1],hsv[2],1.0,1.0);
+      float *hsv = new float[3];
+      //used for transfer rgb to hsv
+      vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
+
+      if(itIsoDoseLevel->GetVisibleColorWash())
+      {
+        cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0],itIsoDoseLevel->GetColor()[1],itIsoDoseLevel->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
+        transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose,hsv[0],hsv[1],hsv[2],1.0,1.0);
+      }
+      else
+      {
+        scalarOpacityPoints.push_back( std::make_pair(itIsoDoseLevel->GetDoseValue()*referenceDose, 1 ) );
+      }
     }
-    else
-    {
-      scalarOpacityPoints.push_back( std::make_pair(itIsoDoseLevel->GetDoseValue()*referenceDose, 1 ) );
-    }
+
+    mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
+    mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
+    mitkTransFunc->SetColorTransferFunction(transferFunction);
+    mitkTransFunc->SetScalarOpacityPoints(scalarOpacityPoints);
+    mitkTransFuncProp->SetValue(mitkTransFunc);
+    m_selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
   }
-
-  mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
-  mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
-  mitkTransFunc->SetColorTransferFunction(transferFunction);
-  mitkTransFunc->SetScalarOpacityPoints(scalarOpacityPoints);
-  mitkTransFuncProp->SetValue(mitkTransFunc);
-  m_selectedNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
 }
 
 void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,

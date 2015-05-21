@@ -311,7 +311,13 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
     //fill the tracking element with life
     tde->SetMatrix(igtlTransform);
     tde->SetPosition(position[0], position[1], position[2]);
-    tde->SetName(nd->GetName());
+    std::stringstream name;
+    name << nd->GetName();
+    if (name.rdbuf()->in_avail() == 0 )
+    {
+       name << "TrackingTool" << index;
+    }
+    tde->SetName(name.str().c_str());
 
     //insert this element into the tracking data message
     tdMsg->AddTrackingDataElement(tde);

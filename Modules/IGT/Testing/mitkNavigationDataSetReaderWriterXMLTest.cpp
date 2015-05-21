@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandardFileLocations.h>
 #include <mitkTestingMacros.h>
 #include <mitkNavigationDataReaderXML.h>
-#include <mitkNavigationDataSetWriterXML.h>
+#include <mitkIOUtil.h>
 
 #include <Poco/Path.h>
 #include <Poco/File.h>
@@ -50,7 +50,6 @@ private:
   std::string pathRead;
   std::string pathWrite;
   std::string pathWrong;
-  mitk::NavigationDataSetWriterXML writer;
   mitk::NavigationDataReaderXML::Pointer reader;
   mitk::NavigationDataSet::Pointer set;
 
@@ -83,7 +82,7 @@ public:
     // Aim is to read an xml into a pointset, write that xml again, and compare the output
 
     set = reader->Read(pathRead);
-    writer.Write(pathWrite, set);
+    mitk::IOUtil::SaveBaseData(set, pathWrite);
 
     //FIXME: Commented out, because test fails under linux. binary comparison of files is probably not the wa to go
     // See Bug 17775

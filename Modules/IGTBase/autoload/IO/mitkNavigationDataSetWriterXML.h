@@ -18,22 +18,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKNavigationDataSetWriterXML_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataSet.h>
+#include <mitkAbstractFileWriter.h>
+#include <mitkCustomMimeType.h>
 
 namespace mitk {
-  class MITKIGT_EXPORT NavigationDataSetWriterXML
+  class NavigationDataSetWriterXML : public AbstractFileWriter
   {
   public:
 
     NavigationDataSetWriterXML();
     virtual ~NavigationDataSetWriterXML();
 
-    virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
-    virtual void Write (std::ostream* stream, mitk::NavigationDataSet::Pointer);
+
+    using AbstractFileWriter::Write;
+    virtual void Write() override;
 
   protected:
 
-    virtual void StreamHeader (std::ostream* stream, mitk::NavigationDataSet::Pointer data);
-    virtual void StreamData (std::ostream* stream, mitk::NavigationDataSet::Pointer data);
+    CustomMimeType NAVIGATIONDATASETXML_MIMETYPE();
+
+    NavigationDataSetWriterXML(const NavigationDataSetWriterXML& other);
+
+    virtual mitk::NavigationDataSetWriterXML* Clone() const override;
+
+    virtual void StreamHeader (std::ostream* stream, mitk::NavigationDataSet::ConstPointer data);
+    virtual void StreamData (std::ostream* stream, mitk::NavigationDataSet::ConstPointer data);
     virtual void StreamFooter (std::ostream* stream);
   };
 }

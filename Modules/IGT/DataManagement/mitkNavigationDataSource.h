@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"
 #include "mitkPropertyList.h"
-#include <mitkIGTExports.h>
+#include "MitkIGTExports.h"
 
 // Microservices
 #include <mitkServiceInterface.h>

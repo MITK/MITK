@@ -51,7 +51,7 @@ namespace mitk {
   public:
 
     // Standard macros
-    mitkClassMacro(CorrelationCalculator, itk::Object);
+    mitkClassMacroItkParent(CorrelationCalculator, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

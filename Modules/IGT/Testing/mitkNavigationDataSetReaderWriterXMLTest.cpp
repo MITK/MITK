@@ -118,7 +118,7 @@ public:
       std::string file = GetTestDataFilePath("IGT-Data/InvalidVersionNavigationDataTestData.xml");
       mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
     }
-    catch(mitk::IGTIOException)
+    catch(mitk::Exception)
     {
       exceptionThrown3=true;
     }

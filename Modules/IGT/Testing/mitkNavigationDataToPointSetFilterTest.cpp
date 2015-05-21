@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataToPointSetFilter.h"
 #include "mitkNavigationDataSequentialPlayer.h"
-#include "mitkNavigationDataReaderXML.h"
 #include <mitkIGTConfig.h>
 #include <mitkTestingMacros.h>
+#include <mitkIOUtil.h>
 
 #include <iostream>
 
@@ -178,9 +178,8 @@ static void TestMode3DMean()
   std::string file(MITK_IGT_DATA_DIR);
   file.append("/NavigationDataTestData_2Tools.xml");
 
-  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-
-  player->SetNavigationDataSet( reader->Read(file) );
+  mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
+  player->SetNavigationDataSet(dataset);
 
   for (unsigned int i = 0; i< player->GetNumberOfOutputs(); i++)
   {

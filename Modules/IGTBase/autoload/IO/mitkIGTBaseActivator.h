@@ -37,7 +37,8 @@ private:
 
   std::unique_ptr<IFileWriter> m_NavigationDataSetWriterXML;
   std::unique_ptr<IFileWriter> m_NavigationDataSetWriterCSV;
-
+  std::unique_ptr<IFileReader> m_NavigationDataReaderXML;
+  std::unique_ptr<IFileReader> m_NavigationDataReaderCSV;
 };
 
 }

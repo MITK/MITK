@@ -14,49 +14,79 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// MITK
 #include "mitkNavigationDataReaderXML.h"
+#include <mitkIGTMimeTypes.h>
+
+// Third Party
 #include <itksys/SystemTools.hxx>
 #include <fstream>
-#include "tinyxml.h"
+#include <tinyxml.h>
 
-//includes for exceptions
-#include "mitkIGTException.h"
-#include "mitkIGTIOException.h"
 
-mitk::NavigationDataReaderXML::NavigationDataReaderXML()
-  : m_parentElement(nullptr), m_currentNode(nullptr)
+mitk::NavigationDataReaderXML::NavigationDataReaderXML() : AbstractFileReader(
+  mitk::IGTMimeTypes::NAVIGATIONDATASETXML_MIMETYPE(),
+  "MITK NavigationData Reader (XML)"), m_parentElement(nullptr), m_currentNode(nullptr)
 {
+  RegisterService();
 }
 
 mitk::NavigationDataReaderXML::~NavigationDataReaderXML()
 {
-
 }
+
+mitk::NavigationDataReaderXML::NavigationDataReaderXML(const mitk::NavigationDataReaderXML& other) : AbstractFileReader(other), m_parentElement(nullptr), m_currentNode(nullptr)
+{
+}
+
+mitk::NavigationDataReaderXML* mitk::NavigationDataReaderXML::Clone() const
+{
+  return new NavigationDataReaderXML(*this);
+}
+
+
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderXML::Read()
+{
+  mitk::NavigationDataSet::Pointer dataset;
+  std::istream* in = GetInputStream();
+  if (in == nullptr)
+  {
+    dataset = Read(GetInputLocation());
+  } else {
+    dataset = Read(in);
+  }
+  std::vector<mitk::BaseData::Pointer> result;
+  mitk::BaseData::Pointer base = dataset.GetPointer();
+  result.push_back(base);
+  return result;
+}
+
+
 
 mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string fileName)
 {
   //save old locale
   char * oldLocale;
-  oldLocale = setlocale( LC_ALL, nullptr );
+  oldLocale = setlocale(LC_ALL, 0);
 
   //define own locale
   std::locale C("C");
-  setlocale( LC_ALL, "C" );
+  setlocale(LC_ALL, "C");
 
   m_FileName = fileName;
 
   TiXmlDocument document;
-  if ( !document.LoadFile(fileName))
+  if (!document.LoadFile(fileName))
   {
-    mitkThrowException(mitk::IGTIOException) << "File '"<<fileName<<"' could not be loaded.";
+    mitkThrowException(mitk::IGTIOException) << "File '" << fileName << "' could not be loaded.";
   }
 
   TiXmlElement* m_DataElem = document.FirstChildElement("Version");
-  if(!m_DataElem)
+  if (!m_DataElem)
   {
     // for backwards compatibility of version tag
     m_DataElem = document.FirstChildElement("Data");
-    if(!m_DataElem)
+    if (!m_DataElem)
     {
       mitkThrowException(mitk::IGTIOException) << "Data element not found.";
     }
@@ -73,11 +103,11 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string
 
   if (m_FileVersion != 1)
   {
-    mitkThrowException(mitk::IGTIOException) << "File format version "<<m_FileVersion<<" is not supported.";
+    mitkThrowException(mitk::IGTIOException) << "File format version " << m_FileVersion << " is not supported.";
   }
 
   m_parentElement = document.FirstChildElement("Data");
-  if(!m_parentElement)
+  if (!m_parentElement)
   {
     mitkThrowException(mitk::IGTIOException) << "Data element not found.";
   }
@@ -87,7 +117,7 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string
   mitk::NavigationDataSet::Pointer navigationDataSet = this->ReadNavigationDataSet();
 
   //switch back to old locale
-  setlocale( LC_ALL, oldLocale );
+  setlocale(LC_ALL, oldLocale);
 
   return navigationDataSet;
 }
@@ -161,8 +191,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataReaderXML::ReadVersion1()
 {
   if ( !m_parentElement )
   {
-    mitkThrowException(mitk::IGTIOException)
-        << "Reading XML is not possible. Parent element is not set.";
+    mitkThrowException(mitk::IGTIOException) << "Reading XML is not possible. Parent element is not set.";
   }
 
   TiXmlElement* elem;
@@ -352,4 +381,3 @@ void mitk::NavigationDataReaderXML::StreamInvalid(std::string message)
   mitkThrowException(mitk::IGTIOException) << "Invalid stream!";
 }
 // -- deprecated | end
-

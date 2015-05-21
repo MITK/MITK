@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationData.h>
 #include <mitkStandardFileLocations.h>
 #include <mitkTestingMacros.h>
-#include <mitkNavigationDataReaderXML.h>
 #include <mitkIOUtil.h>
 
 #include <Poco/Path.h>
@@ -50,7 +49,6 @@ private:
   std::string pathRead;
   std::string pathWrite;
   std::string pathWrong;
-  mitk::NavigationDataReaderXML::Pointer reader;
   mitk::NavigationDataSet::Pointer set;
 
 public:
@@ -69,8 +67,6 @@ public:
     }
 
     pathWrong = GetTestDataFilePath("IGT-Data/NavigationDataTestData.xml");
-
-    reader = mitk::NavigationDataReaderXML::New();
   }
 
   void tearDown() override
@@ -81,7 +77,7 @@ public:
   {
     // Aim is to read an xml into a pointset, write that xml again, and compare the output
 
-    set = reader->Read(pathRead);
+    set = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(pathRead).GetPointer());
     mitk::IOUtil::SaveBaseData(set, pathWrite);
 
     //FIXME: Commented out, because test fails under linux. binary comparison of files is probably not the wa to go
@@ -120,8 +116,7 @@ public:
     try
     {
       std::string file = GetTestDataFilePath("IGT-Data/InvalidVersionNavigationDataTestData.xml");
-      mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-      reader->Read(file);
+      mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
     }
     catch(mitk::IGTIOException)
     {

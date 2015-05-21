@@ -24,11 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk
 #include <mitkNavigationDataSet.h>
 #include <mitkNavigationDataReaderInterface.h>
-#include <mitkNavigationDataReaderXML.h>
-#include <mitkNavigationDataReaderCSV.h>
 #include <mitkNavigationDataSequentialPlayer.h>
 #include <mitkNavigationDataPlayer.h>
 #include <mitkVirtualTrackingTool.h>
+#include <mitkIOUtil.h>
 
 // VTK
 #include <vtkSphereSource.h>
@@ -95,17 +94,7 @@ void QmitkNavigationDataPlayerView::OnOpenFile()
 
   try
   {
-    QString suffix = QFileInfo(fileName).suffix().toLower();
-    if(suffix == "xml")
-    {
-      reader = mitk::NavigationDataReaderXML::New();
-    }
-    else if(suffix == "csv")
-    {
-      reader = mitk::NavigationDataReaderCSV::New();
-    }
-
-    m_Data = reader->Read(fileName.toStdString());
+    m_Data = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
   }
   catch ( const mitk::Exception &e )
   {

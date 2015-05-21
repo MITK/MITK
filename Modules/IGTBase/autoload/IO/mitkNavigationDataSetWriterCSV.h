@@ -35,8 +35,6 @@ namespace mitk {
     NavigationDataSetWriterCSV(const NavigationDataSetWriterCSV& other);
 
     virtual mitk::NavigationDataSetWriterCSV* Clone() const override;
-
-    CustomMimeType NAVIGATIONDATASETCSV_MIMETYPE();
   };
 }
 

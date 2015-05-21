@@ -39,8 +39,6 @@ set(CPP_FILES
   IO/mitkNavigationToolStorageDeserializer.cpp
   IO/mitkNavigationToolWriter.cpp
   IO/mitkNavigationDataReaderInterface.cpp
-  IO/mitkNavigationDataReaderXML.cpp
-  IO/mitkNavigationDataReaderCSV.cpp
 
   Rendering/mitkCameraVisualization.cpp
   Rendering/mitkNavigationDataObjectVisualizationFilter.cpp

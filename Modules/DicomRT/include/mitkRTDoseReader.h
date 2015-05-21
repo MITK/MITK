@@ -74,6 +74,8 @@ namespace mitk
 
   protected:
 
+    mitk::Image::Pointer scaledDoseImage;
+
     /**
     * Constructor.
     */

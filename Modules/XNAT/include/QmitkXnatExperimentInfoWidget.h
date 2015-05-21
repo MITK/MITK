@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKXNATEXPERIMENTINFOWIDGET_H
 
 // XNATUI
-#include "ui_QmitkXnatExperimentInfoWidgetControls.h"
-#include "MitkXNATUIExports.h"
+#include <ui_QmitkXnatExperimentInfoWidgetControls.h>
+#include <MitkXNATExports.h>
 
 // Qt
 #include <QWidget>
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // CTK XNAT Core
 class ctkXnatExperiment;
 
-class MITKXNATUI_EXPORT QmitkXnatExperimentInfoWidget : public QWidget
+class MITKXNAT_EXPORT QmitkXnatExperimentInfoWidget : public QWidget
 {
   Q_OBJECT
 

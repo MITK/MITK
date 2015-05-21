@@ -377,8 +377,6 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
           QString  str = it.key().toLatin1().data();
           QVariant var = it.value();
 
-          MITK_INFO << str.toStdString() << ": " << var.toString().toStdString();
-
           // After CTK Change (subjectID = name) to (subjectID = ID)
           // CHANGE TO: if (var == subject->property("ID"))
           if (var == subject->property("URI").right(11))
@@ -425,9 +423,6 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
           QString  str = it.key().toLatin1().data();
           QVariant var = it.value();
 
-          MITK_INFO << str.toStdString() << ": " << var.toString().toStdString();
-          MITK_INFO << experiment->property("ID").toStdString();
-
           if (var == experiment->property("URI"))
           {
             isConcretExperiment = true;
@@ -446,7 +441,6 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
           QString  str = it.key().toLatin1().data();
           QVariant var = it.value();
 
-          MITK_INFO << str.toStdString() << ": " << var.toString().toStdString();
           experiment->setProperty(str, var);
         }
       }

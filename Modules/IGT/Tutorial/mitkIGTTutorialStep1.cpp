@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataDisplacementFilter.h"
 #include <mitkNavigationDataRecorder.h>
 #include <mitkNavigationDataPlayer.h>
-#include <mitkNavigationDataReaderXML.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -157,8 +156,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
 
-  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-  mitk::NavigationDataSet::Pointer naviDataSet = reader->Read(filename.str());
+  mitk::NavigationDataSet::Pointer naviDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(filename.str()).GetPointer());
   player->SetNavigationDataSet(naviDataSet);
 
   player->StartPlaying(); //this starts the player

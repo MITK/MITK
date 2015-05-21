@@ -30,9 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkSurface.h>
 #include <mitkIGTLMessageToNavigationDataFilter.h>
-#include <mitkNavigationDataReaderXML.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkIOUtil.h>
 
 // vtk
 #include <vtkSphereSource.h>
@@ -199,7 +199,6 @@ void OpenIGTLinkProviderExample::Start()
 }
 
 void OpenIGTLinkProviderExample::OnOpenFile(){
-  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
 
   // FIXME Filter for correct files and use correct Reader
   QString fileName =
@@ -208,7 +207,7 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
   try
   {
-    m_NavDataSet = reader->Read(fileName.toStdString());
+    m_NavDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
   }
   catch ( const mitk::Exception &e )
   {

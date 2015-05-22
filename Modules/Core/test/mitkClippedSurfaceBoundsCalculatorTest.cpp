@@ -178,7 +178,7 @@ static void CheckPlanesInsideBoundingBox(mitk::BaseGeometry::Pointer geometry3D)
   minMax = calculator->GetMinMaxSpatialDirectionZ();
   MITK_INFO << "min: " << minMax.first << " max: " << minMax.second;
 
-  MITK_TEST_CONDITION(minMax.first == 0 && minMax.second == 4, "Check if plane is from slice 0 to slice 4 with inclined plane");
+  MITK_TEST_CONDITION(minMax.first == 0 && minMax.second == 6, "Check if plane is from slice 0 to slice 4 with inclined plane");
 
   origin[0] = 512;
   origin[1] = 0;

@@ -6,7 +6,7 @@ from pymiecoated import Mie
 
 #%% setup and create derived paramters
 
-def mieMonteCarlo(wavelength = 450*10**-9, r = 300*10**-9, Vs = 0.1, nParticle = 1.46, nMedium = 1.36):
+def mieMonteCarlo(wavelength = 450*10**-9, r = 0.4*10**-6, Vs = 0.1, nParticle = 1.46, nMedium = 1.36):
     """
     Calculate the scattering parameters relevant for monte carlo simulation.
 
@@ -51,10 +51,10 @@ def mieMonteCarlo(wavelength = 450*10**-9, r = 300*10**-9, Vs = 0.1, nParticle =
     cs = mie.qsca() * A # scattering cross section
 
     us = Vs / (4/3 * r**3 * math.pi) * cs # scattering coefficient [m⁻1]
+    g  = 0.77+0.18*(1.-math.exp(-(wavelength*10**9-378.7)/111.1))
+    return {'us': us, 'g': g}
 
-    return {'us': us, 'g': mie.asy()}
-
-def mieMonteCarlo_FWHM(wavelength = 450*10**-9, r = 300*10**-9, Vs = 0.1, nParticle = 1.46, nMedium = 1.36, FWHM = 0):
+def mieMonteCarlo_FWHM(wavelength = 450*10**-9, r = 0.4*10**-6, Vs = 0.1, nParticle = 1.46, nMedium = 1.36, FWHM = 0):
     vl = mieMonteCarlo(wavelength - FWHM / 2, r, Vs, nParticle, nMedium)
     vr = mieMonteCarlo(wavelength + FWHM / 2, r, Vs, nParticle, nMedium)
     vc = mieMonteCarlo(wavelength,            r, Vs, nParticle, nMedium)
@@ -66,6 +66,7 @@ def mieMonteCarlo_FWHM(wavelength = 450*10**-9, r = 300*10**-9, Vs = 0.1, nParti
 if __name__ == "__main__":
 
     usg = mieMonteCarlo(wavelength = 450*10**-9, r = 300*10**-9, Vs = 0.1, nParticle = 1.46, nMedium = 1.36)
+
 
     #%% print results
     print("Scattering coefficient in [1/cm]: " + str(usg['us'] * 10**-2) + "; expected: 589.36")

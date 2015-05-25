@@ -157,6 +157,7 @@ void SurfaceStlIO::Write()
       break;
     }
   }
+  setlocale(LC_NUMERIC, previousCLocale);
 }
 
 SurfaceStlIO* SurfaceStlIO::IOClone() const

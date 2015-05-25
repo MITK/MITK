@@ -122,6 +122,12 @@ std::vector<itk::SmartPointer<BaseData> > SurfaceStlIO::Read()
 void SurfaceStlIO::Write()
 {
   ValidateOutputLocation();
+  // Temporarily change locale to C to ensure decimal separators (written by fprintf in vtkSTLWriter)
+  // are dots regardless of user locale. Separators other than dots cause issues when importing
+  // STL files into other 3D processing software.
+  // TODO: setlocale is not thread-safe, can we fix this in thread-safe manner?
+  const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
+  setlocale(LC_NUMERIC, "C");
 
   const Surface* input = dynamic_cast<const Surface*>(this->GetInput());
 
@@ -153,6 +159,7 @@ void SurfaceStlIO::Write()
       break;
     }
   }
+  setlocale(LC_NUMERIC, previousCLocale);
 }
 
 SurfaceStlIO* SurfaceStlIO::IOClone() const

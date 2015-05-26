@@ -153,7 +153,7 @@ if(WIN32)
   set(_src_dir_length_max 50)
   set(_bin_dir_length_max 50)
   if(MITK_USE_SUPERBUILD)
-    set(_src_dir_length_max 38) # _src_dir_length_max - strlen(ITK-src)
+    set(_src_dir_length_max 34) # _src_dir_length_max - strlen(ep/src/ITK-build)
     set(_bin_dir_length_max 40) # _bin_dir_length_max - strlen(MITK-build)
   endif()
 

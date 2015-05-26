@@ -52,9 +52,9 @@ namespace mitk {
 
     PrefixMap m_Prefixes;
 
-    librdf_model* m_Model;
-    librdf_storage* m_Storage;
     librdf_world* m_World;
+    librdf_storage* m_Storage;
+    librdf_model* m_Model;
 
     librdf_statement* RdfTripleToStatement(RdfTriple triple) const;
     librdf_node* RdfNodeToLibRdfNode(RdfNode node) const;
@@ -429,7 +429,7 @@ namespace mitk {
   {
     RdfNode mitkNode;
 
-    if (!node) return 0;
+    if (!node) return mitkNode;
 
     if (librdf_node_is_resource(node))
     {

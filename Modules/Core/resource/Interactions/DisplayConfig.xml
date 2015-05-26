@@ -12,7 +12,9 @@
   <!-- react to an event, even tough is was already processed by a DataInteractor-->
   <param name="alwaysReact" value="false"/>
   <!-- Moving -->
-   <event_variant class="MousePressEvent" name="StartMove">
+  <event_variant name="MovePointer" class="MouseMoveEvent" >
+  </event_variant>
+  <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>
   <event_variant class="MouseReleaseEvent" name="EndMoving">

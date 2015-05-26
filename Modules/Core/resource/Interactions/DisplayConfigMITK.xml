@@ -14,6 +14,8 @@
   <!-- reverse levelWindow reaction -->
   <param name="levelWindowDirection" value="updown"/>
   <!-- Moving -->
+  <event_variant name="MovePointer" class="MouseMoveEvent" >
+  </event_variant>
   <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>

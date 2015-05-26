@@ -73,7 +73,9 @@ namespace mitk
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode) override;
 
     virtual bool CheckPositionEvent( const InteractionEvent* interactionEvent );
-
+    bool IsOverObject(const InteractionEvent* interactionEvent);
+    bool SelectObject(StateMachineAction*, InteractionEvent* interactionEvent);
+    bool DeSelectObject(StateMachineAction*, InteractionEvent* interactionEvent);
     /**
      * \brief Initializes an interaction, saves the pointers start position for further reference.
      */

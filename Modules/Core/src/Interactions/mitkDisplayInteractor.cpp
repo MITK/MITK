@@ -57,6 +57,7 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION( "check_position_event", CheckPositionEvent );
   CONNECT_CONDITION( "check_can_rotate", CheckRotationPossible );
   CONNECT_CONDITION( "check_can_swivel", CheckSwivelPossible );
+  CONNECT_CONDITION( "isOverObject", IsOverObject);
 
   CONNECT_FUNCTION("init", Init);
   CONNECT_FUNCTION("move", Move);
@@ -79,6 +80,8 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("rotateDown", RotateDown);
   CONNECT_FUNCTION("rotateClock", RotateClock);
   CONNECT_FUNCTION("rotateBackClock", RotateBackClock);
+  CONNECT_FUNCTION("selectObject", SelectObject);
+  CONNECT_FUNCTION("deSelectObject", DeSelectObject);
 }
 
 mitk::DisplayInteractor::DisplayInteractor()
@@ -107,12 +110,80 @@ mitk::DisplayInteractor::~DisplayInteractor()
 bool mitk::DisplayInteractor::CheckPositionEvent( const InteractionEvent* interactionEvent )
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL)
-  {
-    return false;
-  }
+  return positionEvent != nullptr;
+}
 
-  return true;
+/// <summary>
+/// Will be moved
+/// </summary>
+mitk::DataNode::Pointer m_DataNode[2];
+float m_OldColor[3];
+float m_OldOpacity;
+bool m_Selector = true;
+
+bool mitk::DisplayInteractor::IsOverObject(const InteractionEvent* interactionEvent)
+{
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent == nullptr)
+    return false;
+
+  Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  Point3D currentPickedPoint;
+
+  m_DataNode[0] = interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint);
+  if (m_DataNode[0])
+    return true;
+
+  return false;
+}
+
+#include "mitkSurface.h"
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
+bool mitk::DisplayInteractor::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  if (m_Selector && m_DataNode[0] != m_DataNode[1]) {
+    m_DataNode[1] = m_DataNode[0];
+    if (m_DataNode[1]) {
+      m_DataNode[1]->GetColor(m_OldColor);
+      m_DataNode[1]->GetOpacity(m_OldOpacity, interactionEvent->GetSender());
+      m_DataNode[1]->SetColor(0.0, 5.0, 0.0);
+      m_DataNode[1]->SetOpacity(0.7);
+      std::cout
+        << "Selected object: "
+        << m_DataNode[1]->GetName()
+        << std::endl;
+      interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+      m_Selector = false;
+    }
+    return true;
+  }
+  return false;
+}
+
+bool mitk::DisplayInteractor::DeSelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if (positionEvent == nullptr)
+    return false;
+  Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
+  Point3D currentPickedPoint;
+  m_DataNode[0] = interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint);
+  if (m_DataNode[0] != m_DataNode[1]) {
+    if (m_DataNode[1]) {
+      std::cout
+        << "DeSelected object: "
+        << m_DataNode[1]->GetName()
+        << std::endl;
+      m_DataNode[1]->SetColor(m_OldColor);
+      m_DataNode[1]->SetOpacity(m_OldOpacity);
+      interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+      m_Selector = true;
+    }
+    m_DataNode[1] = nullptr;
+    return true;
+  }
+  return false;
 }
 
 bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent *interactionEvent)

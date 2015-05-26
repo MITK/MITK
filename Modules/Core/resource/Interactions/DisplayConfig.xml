@@ -16,7 +16,9 @@
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
   <!-- Moving -->
-   <event_variant class="MousePressEvent" name="StartMove">
+  <event_variant name="MovePointer" class="MouseMoveEvent" >
+  </event_variant>
+  <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="MiddleMouseButton"/>
   </event_variant>
   <event_variant class="MouseReleaseEvent" name="EndMoving">

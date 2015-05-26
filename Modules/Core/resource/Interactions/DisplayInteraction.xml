@@ -25,6 +25,10 @@ TODO Std move to abort interaction of scroll/pan/zoom
           <condition name="check_position_event"/>
           <action name="init"/>
         </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="MovePointer" target="select">
+          <condition name="isOverObject"/>
+          <action name="selectObject"/>
+        </transition>
         <!-- mitkDispplayInteractor.cpp implements this for all events -->
         <transition event_class="InteractionEvent" event_variant="PlaneUP" target="start">
             <action name="ScrollOneUp"/>
@@ -95,6 +99,14 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="updateStatusbar"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
+    </state>
+    <state name="select" >
+        <transition event_class="InteractionPositionEvent" event_variant="MovePointer" target="start">
+          <action name="deSelectObject"/>
+        </transition>
+        <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+            <action name="deSelectObject"/>
+        </transition>
     </state>
     <state name="move">
       <transition event_class="InteractionPositionEvent" event_variant="Moving" target="move">

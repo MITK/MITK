@@ -103,9 +103,9 @@ namespace mitk {
     bool operator!=(const RdfNode &u) const;
 
   private:
+    Type m_Type;
     std::string m_Value;
     RdfUri m_Datatype;
-    Type m_Type;
   };
 
   MITKRDF_EXPORT std::ostream & operator<<(std::ostream &out, const mitk::RdfNode &n);

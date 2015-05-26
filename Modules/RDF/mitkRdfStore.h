@@ -29,7 +29,7 @@ namespace mitk {
   /**
   * \ingroup MitkRDFModule
   */
-  class MitkRDF_EXPORT RdfStore
+  class MITKRDF_EXPORT RdfStore
   {
   public:
 

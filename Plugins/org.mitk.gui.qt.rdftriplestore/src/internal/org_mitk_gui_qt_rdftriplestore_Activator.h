@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define org_mitk_gui_qt_rdftriplestore_Activator_h
 
 #include <ctkPluginActivator.h>
-#include <mitkExportMacros.h>
 
 namespace mitk {
 

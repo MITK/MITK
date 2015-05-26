@@ -25,7 +25,7 @@ namespace mitk {
   /**
   * \ingroup MitkRDFModule
   */
-  class MitkRDF_EXPORT RdfTriple
+  class MITKRDF_EXPORT RdfTriple
   {
   public:
 
@@ -103,7 +103,7 @@ namespace mitk {
     RdfNode m_Object;
   };
 
-  MitkRDF_EXPORT std::ostream & operator<<(std::ostream &out, const RdfTriple &t);
+  MITKRDF_EXPORT std::ostream & operator<<(std::ostream &out, const RdfTriple &t);
 }
 
 #endif // MITKRDFTRIPLE_H

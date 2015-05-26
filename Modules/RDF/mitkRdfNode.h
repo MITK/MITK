@@ -28,7 +28,7 @@ namespace mitk {
   /**
   * \ingroup MitkRDFModule
   */
-  class MitkRDF_EXPORT RdfNode
+  class MITKRDF_EXPORT RdfNode
   {
   public:
 
@@ -108,7 +108,7 @@ namespace mitk {
     std::string m_Value;
   };
 
-  MitkRDF_EXPORT std::ostream & operator<<(std::ostream &out, const mitk::RdfNode &n);
+  MITKRDF_EXPORT std::ostream & operator<<(std::ostream &out, const mitk::RdfNode &n);
 }
 
 #endif

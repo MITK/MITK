@@ -524,6 +524,7 @@ void IGTNavigationToolCalibration::SaveCalibratedTool()
     calibratedTool->SetToolRegistrationLandmarks(this->m_RegistrationLandmarks);
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toUtf8().data();
+    filename.append(".IGTTool");
     if (filename == "") return;
     if (myWriter->DoWrite(filename,calibratedTool)) MITK_INFO << "Saved calibrated tool to file " << filename;
     else MITK_WARN << "Can't write tool to file " << filename;

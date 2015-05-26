@@ -109,6 +109,11 @@ namespace mitk {
     */
     MouseMode GetCurrentMouseMode() const;
 
+    /**
+    * \brief Enable 3D view selection events
+    */
+    void SetSelectionMode(bool selection);
+
   protected:
     MouseModeSwitcher();
     virtual ~MouseModeSwitcher();

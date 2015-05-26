@@ -434,6 +434,9 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   bool displayMetainfo = prefs->GetBool("Display metainfo", true);
   d->m_StdMultiWidget->setDisplayMetaInfo( displayMetainfo );
 
+  bool selectionMode = prefs->GetBool("Selection on 3D view", false);
+  d->m_StdMultiWidget->setSelectionMode(selectionMode);
+
   // mouse modes toolbar
   bool newMode = prefs->GetBool("PACS like mouse interaction", false);
   d->m_MouseModeToolbar->setVisible( newMode );

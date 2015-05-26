@@ -144,7 +144,13 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
     // Color
     {
       mitk::ColorProperty::Pointer p;
-      node->GetProperty(p, "color", renderer);
+      if (node->IsSelected()) {
+        node->GetProperty(p, "color.selected", renderer);
+      }
+      if (p.IsNull()) {
+        // If not selected or failed to obtain selected color
+        node->GetProperty(p, "color", renderer);
+      }
       if(p.IsNotNull())
       {
         mitk::Color c = p->GetColor();
@@ -247,6 +253,26 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
       node->GetProperty(p, "material.representation", renderer);
       if(p.IsNotNull())
         property->SetRepresentation( p->GetVtkRepresentation() );
+    }
+
+    // Edge visibility
+    {
+      bool edgesVisible = false;
+      node->GetBoolProperty("material.edgeVisibility", edgesVisible, renderer);
+      property->SetEdgeVisibility((int)edgesVisible);
+    }
+
+    // Edge color
+    {
+      double edgeColor[3] = { 0.5, 0.5, 0.5 };
+      mitk::ColorProperty::Pointer p;
+      node->GetProperty(p, "material.edgeColor", renderer);
+      if (p.IsNotNull())
+      {
+        mitk::Color c = p->GetColor();
+        edgeColor[0] = c.GetRed(); edgeColor[1] = c.GetGreen(); edgeColor[2] = c.GetBlue();
+      }
+      property->SetEdgeColor(edgeColor);
     }
 
     // Interpolation
@@ -467,6 +493,9 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
 
     node->AddProperty( "material.representation"      , mitk::VtkRepresentationProperty::New()  , renderer, overwrite );
     node->AddProperty( "material.interpolation"       , mitk::VtkInterpolationProperty::New()   , renderer, overwrite );
+
+    node->AddProperty("material.edgeVisibility", mitk::BoolProperty::New(false), renderer, overwrite);
+    node->AddProperty("material.edgeColor", mitk::ColorProperty::New(0.5f, 0.5f, 0.5f), renderer, overwrite);
   }
 
   // Shaders
@@ -480,6 +509,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "color", mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
+  node->AddProperty( "color.selected", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f), renderer, overwrite);
   node->AddProperty( "opacity", mitk::FloatProperty::New(1.0), renderer, overwrite );
 
   mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(node,renderer,overwrite); // Shading

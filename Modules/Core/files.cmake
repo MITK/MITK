@@ -198,6 +198,8 @@ set(CPP_FILES
   Interactions/mitkVtkEventAdapter.cpp
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkXML2EventParser.cpp
+  Interactions/mitkPickingEventObserver.cpp
+  Interactions/mitkDataNodePickingEventObserver.cpp
 
   IO/mitkAbstractFileIO.cpp
   IO/mitkAbstractFileReader.cpp

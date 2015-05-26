@@ -997,8 +997,10 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
 
   foreach(mitk::DataNode::Pointer node, nodes)
   {
-    if ( node.IsNotNull() )
+    if (node.IsNotNull()) {
       node->SetBoolProperty("selected", false);
+      //node->SetBoolProperty("material.edgeVisibility", false);
+    }
   }
 
   nodes.clear();
@@ -1006,11 +1008,14 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
 
   foreach(mitk::DataNode::Pointer node, nodes)
   {
-    if ( node.IsNotNull() )
+    if (node.IsNotNull()) {
       node->SetBoolProperty("selected", true);
+      //mitk::
+      //node->SetBoolProperty("material.edgeVisibility", true);
+    }
   }
   //changing the selection does NOT require any rendering processes!
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkDataManagerView::ShowIn(const QString &editorId)
@@ -1018,6 +1023,17 @@ void QmitkDataManagerView::ShowIn(const QString &editorId)
   berry::IWorkbenchPage::Pointer page = this->GetSite()->GetPage();
   berry::IEditorInput::Pointer input(new mitk::DataStorageEditorInput(this->GetDataStorageReference()));
   page->OpenEditor(input, editorId, false, berry::IWorkbenchPage::MATCH_ID);
+}
+
+void QmitkDataManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
+{
+  m_NodeTreeView->clearSelection();
+
+  for (int i = 0; i < nodes.size(); ++i) {
+    QModelIndex itemIndex = m_NodeTreeModel->GetIndex(nodes[i]);
+    m_NodeTreeView->selectionModel()->select(m_FilterModel->mapFromSource(itemIndex), QItemSelectionModel::Select);
+    m_NodeTreeView->scrollTo(m_FilterModel->mapFromSource(itemIndex));
+  }
 }
 
 mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart(bool activatedEditor)

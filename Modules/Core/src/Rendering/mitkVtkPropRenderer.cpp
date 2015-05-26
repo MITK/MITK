@@ -442,9 +442,9 @@ mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition, Point3D &world
     if (node == NULL)
       continue;
 
-    bool pickable = false;
-    node->GetBoolProperty("pickable", pickable);
-    if (!pickable)
+    bool pickable = true;
+    node->GetBoolProperty( "pickable", pickable );
+    if ( !pickable )
       continue;
 
     VtkMapper *mapper = dynamic_cast <VtkMapper *>  (node->GetMapper(m_MapperID));

@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <usServiceEvent.h>
 
+#include <mitkInteractionEventObserver.h>
+
 namespace us
 {
 class ModuleContext;
@@ -54,6 +56,8 @@ public:
 private:
 
   QScopedPointer<DataStorageService> dataStorageService;
+
+  std::shared_ptr<mitk::InteractionEventObserver> dataNodePickingObserver;
 
   QMap<long, QObject*> mapMitkIdToAdapter;
   QMap<long, ctkServiceRegistration> mapMitkIdToRegistration;

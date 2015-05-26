@@ -188,6 +188,9 @@ public slots:
   /// Opens the editor with the given id using the current data storage
   void ShowIn(const QString& editorId);
 
+  /// Synchronize item model selection to the selection service one
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes);
+
 protected:
 
   ///

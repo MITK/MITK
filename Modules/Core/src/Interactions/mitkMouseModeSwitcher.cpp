@@ -85,6 +85,11 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
   this->InvokeEvent(MouseModeChangedEvent());
 }
 
+void mitk::MouseModeSwitcher::SetSelectionMode(bool selection)
+{
+  m_CurrentObserver->SetSelectionMode(selection);
+}
+
 void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
 {
   if (m_ActiveInteractionScheme != PACS)

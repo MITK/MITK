@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkProperties.h>
 
+// ITK
+#include <itkImageRegionIterator.h>
+
 // MITK
 #include <mitkIOUtil.h>
 
@@ -93,7 +96,7 @@ int main(int argc, char* argv[])
   // load class mask
   mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(classmask);
   unsigned int num_samples = 0;
-  AccessFixedDimensionByItk_1(mask,mitk::CLUtil::CountLabledVoxels, 3, num_samples);
+  mitk::CLUtil::CountVoxel(mask,num_samples);
 
   // initialize featurematrix [num_samples, num_featureimages]
   Eigen::MatrixXd X(num_samples, strl.size());

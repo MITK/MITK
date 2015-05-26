@@ -222,6 +222,8 @@ set(CPP_FILES
   Interactions/mitkVtkInteractorStyle.cxx
   Interactions/mitkWheelEvent.cpp
   Interactions/mitkXML2EventParser.cpp
+  Interactions/mitkPickingEventObserver.cpp
+  Interactions/mitkDataNodePickingEventObserver.cpp
 
   IO/mitkAbstractFileIO.cpp
   IO/mitkAbstractFileReader.cpp

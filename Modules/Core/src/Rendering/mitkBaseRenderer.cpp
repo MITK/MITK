@@ -274,7 +274,6 @@ mitk::BaseRenderer::~BaseRenderer()
     m_RenderWindow->Delete();
     m_RenderWindow = NULL;
   }
-
 }
 
 void mitk::BaseRenderer::RemoveAllLocalStorages()

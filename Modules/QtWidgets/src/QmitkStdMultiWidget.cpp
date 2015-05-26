@@ -1679,6 +1679,11 @@ void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)
   displayMetaInfo = metainfo;
 }
 
+void QmitkStdMultiWidget::setSelectionMode(bool selection)
+{
+  m_MouseModeSwitcher->SetSelectionMode(selection);
+}
+
 void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 {
   m_PendingCrosshairPositionEvent = false;

@@ -417,7 +417,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
     if ( node == NULL )
       continue;
 
-    bool pickable = false;
+    bool pickable = true;
     node->GetBoolProperty( "pickable", pickable );
     if ( !pickable )
       continue;

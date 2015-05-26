@@ -37,8 +37,8 @@ void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool is
 
 void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 {
-  CONNECT_CONDITION( "check_position_event", CheckPositionEvent );
-  CONNECT_CONDITION( "isOverObject", IsOverObject);
+  CONNECT_CONDITION("check_position_event", CheckPositionEvent);
+  CONNECT_CONDITION("isOverObject", IsOverObject);
 
   CONNECT_FUNCTION("init", Init);
   CONNECT_FUNCTION("move", Move);
@@ -67,6 +67,8 @@ mitk::DisplayInteractor::DisplayInteractor()
   , m_AlwaysReact(false)
   , m_ZoomFactor(2)
   , m_ClockRotationSpeed(5)
+  , m_SelectionMode(false)
+  , m_Selector(true)
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
@@ -83,16 +85,15 @@ bool mitk::DisplayInteractor::CheckPositionEvent( const InteractionEvent* intera
   return positionEvent != nullptr;
 }
 
-/// <summary>
-/// Will be moved
-/// </summary>
-mitk::DataNode::Pointer m_DataNode[2];
-float m_OldColor[3];
-float m_OldOpacity;
-bool m_Selector = true;
+void mitk::DisplayInteractor::SetSelectionMode(bool selection)
+{
+  m_SelectionMode = selection;
+}
 
 bool mitk::DisplayInteractor::IsOverObject(const InteractionEvent* interactionEvent)
 {
+  if (!m_SelectionMode) return false;
+
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
@@ -100,29 +101,30 @@ bool mitk::DisplayInteractor::IsOverObject(const InteractionEvent* interactionEv
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
   Point3D currentPickedPoint;
 
-  m_DataNode[0] = interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint);
-  if (m_DataNode[0])
+  m_CurrentNode = interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint);
+  if (m_CurrentNode)
     return true;
 
   return false;
 }
 
-#include "mitkSurface.h"
-#include <vtkPointData.h>
-#include <vtkPolyData.h>
 bool mitk::DisplayInteractor::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  if (m_Selector && m_DataNode[0] != m_DataNode[1]) {
-    m_DataNode[1] = m_DataNode[0];
-    if (m_DataNode[1]) {
-      m_DataNode[1]->GetColor(m_OldColor);
-      m_DataNode[1]->GetOpacity(m_OldOpacity, interactionEvent->GetSender());
-      m_DataNode[1]->SetColor(0.0, 5.0, 0.0);
-      m_DataNode[1]->SetOpacity(0.7);
-      std::cout
-        << "Selected object: "
-        << m_DataNode[1]->GetName()
-        << std::endl;
+  if (m_Selector && m_CurrentNode != m_SelectedNode) {
+    m_SelectedNode = m_CurrentNode;
+    if (m_SelectedNode) {
+      m_SelectedNode->GetColor(m_OldColor);
+      /// <summary>
+      /// TODO: proper incremention
+      /// </summary>
+      float new_Color0 = (m_OldColor[0] + 0.2 < 1) ? m_OldColor[0] + 0.2 : m_OldColor[0];
+      float new_Color1 = (m_OldColor[1] + 0.2 < 1) ? m_OldColor[1] + 0.2 : m_OldColor[1];
+      float new_Color2 = (m_OldColor[2] + 0.2 < 1) ? m_OldColor[2] + 0.2 : m_OldColor[2];
+      m_SelectedNode->SetColor(new_Color0, new_Color1, new_Color2);
+      //std::cout
+      //  << "Selected object: "
+      //  << m_SelectedNode->GetName()
+      //  << std::endl;
       interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
       m_Selector = false;
     }
@@ -138,19 +140,18 @@ bool mitk::DisplayInteractor::DeSelectObject(StateMachineAction*, InteractionEve
     return false;
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
   Point3D currentPickedPoint;
-  m_DataNode[0] = interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint);
-  if (m_DataNode[0] != m_DataNode[1]) {
-    if (m_DataNode[1]) {
-      std::cout
-        << "DeSelected object: "
-        << m_DataNode[1]->GetName()
-        << std::endl;
-      m_DataNode[1]->SetColor(m_OldColor);
-      m_DataNode[1]->SetOpacity(m_OldOpacity);
+  m_CurrentNode = interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint);
+  if (m_CurrentNode != m_SelectedNode) {
+    if (m_SelectedNode) {
+      //std::cout
+      //  << "DeSelected object: "
+      //  << m_SelectedNode->GetName()
+      //  << std::endl;
+      m_SelectedNode->SetColor(m_OldColor[0], m_OldColor[1], m_OldColor[2]);
       interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
       m_Selector = true;
     }
-    m_DataNode[1] = nullptr;
+    m_SelectedNode = nullptr;
     return true;
   }
   return false;

@@ -436,7 +436,7 @@ void ImageStatisticsCalculator::SetHistogramBinSize(double size)
   this->m_HistogramBinSize = size;
 }
 
-unsigned int ImageStatisticsCalculator::GetHistogramBinSize()
+double ImageStatisticsCalculator::GetHistogramBinSize()
 {
   return this->m_HistogramBinSize;
 }

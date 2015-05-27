@@ -91,7 +91,7 @@ void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(double size)
   this->m_HistogramBinSize = size;
 }
 
-unsigned int QmitkImageStatisticsCalculationThread::GetHistogramBinSize()
+double QmitkImageStatisticsCalculationThread::GetHistogramBinSize()
 {
   return this->m_HistogramBinSize;
 }

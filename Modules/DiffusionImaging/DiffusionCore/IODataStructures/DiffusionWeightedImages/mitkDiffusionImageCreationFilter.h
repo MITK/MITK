@@ -27,7 +27,7 @@ namespace mitk
 /**
  * @brief The DiffusionImageHeaderDescriptor struct bundles the necessary diffusion-weighted image header meta information.
  */
-struct DiffusionImageHeaderDescriptor
+struct MITKDIFFUSIONCORE_EXPORT DiffusionImageHeaderDescriptor
 {
   DiffusionImageHeaderDescriptor()
     : m_GradientDirections(nullptr)

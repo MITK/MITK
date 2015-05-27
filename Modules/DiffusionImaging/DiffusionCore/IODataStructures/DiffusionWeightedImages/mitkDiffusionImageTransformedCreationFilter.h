@@ -33,7 +33,7 @@ namespace mitk
  * to specify a list of transforms to be applied to the separate volumes before
  */
 template <typename TTransformType >
-class DiffusionImageTransformedCreationFilter
+class MITKDIFFUSIONCORE_EXPORT DiffusionImageTransformedCreationFilter
     : public ImageToImageFilter
 {
 public:

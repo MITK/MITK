@@ -223,8 +223,9 @@ berry::MenuManager::Pointer QmitkExtActionBarAdvisor::CreateWindowMenu()
   berry::MenuManager::Pointer menu(new berry::MenuManager("&Window",
                                                           berry::WorkbenchActionConstants::M_WINDOW));
 
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_NEW_WINDOW, "New Window"));
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_NEW_EDITOR, "New Editor"));
+  // See bug 19059.
+  // menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_NEW_WINDOW, "New Window"));
+  // menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_NEW_EDITOR, "New Editor"));
 
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator()));
   AddPerspectiveActions(menu.GetPointer());

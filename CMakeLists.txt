@@ -1405,6 +1405,11 @@ if(MITK_BUILD_EXAMPLES)
   add_subdirectory(Examples)
 endif()
 
+#------------------------------------------------------------------------------
+# Copy file font.
+#------------------------------------------------------------------------------
+file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/Fonts)
+
 #-----------------------------------------------------------------------------
 # Print configuration summary
 #-----------------------------------------------------------------------------

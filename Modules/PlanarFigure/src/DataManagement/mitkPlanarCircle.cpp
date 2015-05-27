@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PlanarCircle::PlanarCircle()
 : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
   FEATURE_ID_DIAMETER( this->AddFeature( "Diameter", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) ),
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm<sup>2</sup>" ) ),
   m_MinRadius(0),
   m_MaxRadius(100),
   m_MinMaxRadiusContraintsActive(false)

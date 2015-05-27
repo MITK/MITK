@@ -25,7 +25,9 @@ QmitkUSControlsProbesWidget::QmitkUSControlsProbesWidget(mitk::USControlInterfac
 
   if ( ! m_ControlInterface )
   {
+    // I do not see an instance of this being reenabled. We might have to look at it again, if we start to reallyuse multiple probes simultaneously.
     ui->probesComboBox->setEnabled(false);
+    ui->probesLabel->setEnabled(false);
     return;
   }
 

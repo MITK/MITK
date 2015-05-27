@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::PlanarPolygon::PlanarPolygon()
 : FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm<sup>2</sup>" ) )
 {
   // Polygon has at least two control points
   this->ResetNumberOfControlPoints( 2 );

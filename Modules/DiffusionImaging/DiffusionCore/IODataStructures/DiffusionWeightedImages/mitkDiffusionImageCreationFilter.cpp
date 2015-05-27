@@ -47,7 +47,7 @@ mitk::DiffusionImageCreationFilter::RemapIntoVectorImage( mitk::Image::Pointer i
     t_selector->SetTimeNr(i);
     t_selector->Update();
 
-    typename ImageVolumeType::Pointer singleImageItk;
+    ImageVolumeType::Pointer singleImageItk;
     mitk::CastToItkImage( t_selector->GetOutput(), singleImageItk );
 
     vec_composer->SetInput( i, singleImageItk );

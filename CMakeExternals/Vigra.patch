@@ -262,7 +262,7 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_split.hxx Vigra/i
          \ref SplitBase::findBestSplit() or \ref SplitBase::makeTerminalNode().
      **/
  
-+      virtual int GetMaximumTreeDepth() 
++      virtual int GetMaximumTreeDepth() const
 +      {
 +        return ext_param_.max_tree_depth;
 +      }

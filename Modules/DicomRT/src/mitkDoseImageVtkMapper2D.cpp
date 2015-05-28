@@ -880,10 +880,10 @@ void mitk::DoseImageVtkMapper2D::CreateLevelOutline(mitk::BaseRenderer* renderer
 
   int x = xMin; //pixel index x
   int y = yMin; //pixel index y
-  unsigned short* currentPixel;
+  float* currentPixel;
 
   // We take the pointer to the first pixel of the image
-  currentPixel = static_cast<unsigned short*>(localStorage->m_ReslicedImage->GetScalarPointer() );
+  currentPixel = static_cast<float*>(localStorage->m_ReslicedImage->GetScalarPointer() );
 
   while (y <= yMax)
   {

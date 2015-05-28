@@ -37,7 +37,7 @@ class QtShowViewDialog : public QDialog
 public:
 
   QtShowViewDialog(const IWorkbenchWindow* window, IViewRegistry* registry,
-                   QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+                   QWidget* parent = nullptr, Qt::WindowFlags f = 0);
 
   QList<QString> GetSelection() const;
 

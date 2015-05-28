@@ -65,6 +65,7 @@ set(mitk_modules
   XNAT
   TubeGraph
   BiophotonicsHardware
+  Classification
 )
 
 if(MITK_ENABLE_PIC_READER)

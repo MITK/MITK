@@ -100,10 +100,10 @@ void  mitk::LibSVMClassifier::ConvertParameter()
 {
 
   // Get the proerty                                                                      // Some defaults
-  if(!this->GetPropertyList()->Get("classifier.svm.svm-type",this->m_Parameter->svm_type))        this->m_Parameter->svm_type = 0; // value?
-  if(!this->GetPropertyList()->Get("classifier.svm.kernel-type",this->m_Parameter->kernel_type))  this->m_Parameter->kernel_type = 0; // value?
+  if(!this->GetPropertyList()->Get("classifier.svm.svm-type",this->m_Parameter->svm_type))        this->m_Parameter->svm_type = 0;
+  if(!this->GetPropertyList()->Get("classifier.svm.kernel-type",this->m_Parameter->kernel_type))  this->m_Parameter->kernel_type = 2;
   if(!this->GetPropertyList()->Get("classifier.svm.degree",this->m_Parameter->degree))            this->m_Parameter->degree = 3;
-  if(!this->GetPropertyList()->Get("classifier.svm.gamma",this->m_Parameter->gamma))              this->m_Parameter->gamma = 0;
+  if(!this->GetPropertyList()->Get("classifier.svm.gamma",this->m_Parameter->gamma))              this->m_Parameter->gamma = 0; // 1/n_features
   if(!this->GetPropertyList()->Get("classifier.svm.coef0",this->m_Parameter->coef0))              this->m_Parameter->coef0 = 0;
   if(!this->GetPropertyList()->Get("classifier.svm.nu",this->m_Parameter->nu))                    this->m_Parameter->nu = 0.5;
   if(!this->GetPropertyList()->Get("classifier.svm.cache-size",this->m_Parameter->cache_size))    this->m_Parameter->cache_size = 100.0;
@@ -111,11 +111,35 @@ void  mitk::LibSVMClassifier::ConvertParameter()
   if(!this->GetPropertyList()->Get("classifier.svm.eps",this->m_Parameter->eps))                  this->m_Parameter->eps = 1e-3;
   if(!this->GetPropertyList()->Get("classifier.svm.p",this->m_Parameter->p))                      this->m_Parameter->p = 0.1;
   if(!this->GetPropertyList()->Get("classifier.svm.shrinking",this->m_Parameter->shrinking))      this->m_Parameter->shrinking = 1;
-  if(!this->GetPropertyList()->Get("classifier.svm.probability",this->m_Parameter->probability))  this->m_Parameter->probability = 1;
+  if(!this->GetPropertyList()->Get("classifier.svm.probability",this->m_Parameter->probability))  this->m_Parameter->probability = 0;
   if(!this->GetPropertyList()->Get("classifier.svm.nr-weight",this->m_Parameter->nr_weight))      this->m_Parameter->nr_weight = 0;
 
-  this->m_Parameter->weight_label = nullptr;
-  this->m_Parameter->weight = nullptr;
+//options:
+//-s svm_type : set type of SVM (default 0)
+//  0 -- C-SVC
+//  1 -- nu-SVC
+//  2 -- one-class SVM
+//  3 -- epsilon-SVR
+//  4 -- nu-SVR
+//-t kernel_type : set type of kernel function (default 2)
+//  0 -- linear: u'*v
+//  1 -- polynomial: (gamma*u'*v + coef0)^degree
+//  2 -- radial basis function: exp(-gamma*|u-v|^2)
+//  3 -- sigmoid: tanh(gamma*u'*v + coef0)
+//-d degree : set degree in kernel function (default 3)
+//-g gamma : set gamma in kernel function (default 1/num_features)
+//-r coef0 : set coef0 in kernel function (default 0)
+//-c cost : set the parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)
+//-n nu : set the parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)
+//-p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)
+//-m cachesize : set cache memory size in MB (default 100)
+//-e epsilon : set tolerance of termination criterion (default 0.001)
+//-h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)
+//-b probability_estimates: whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)
+//-wiweight: set the parameter C of class i to weight*C, for C-SVC (default 1)
+
+//  this->m_Parameter->weight_label = nullptr;
+//  this->m_Parameter->weight = 1;
 }
 
 

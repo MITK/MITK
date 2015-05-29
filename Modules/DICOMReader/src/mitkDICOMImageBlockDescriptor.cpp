@@ -467,14 +467,14 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
     StringProperty::New( PixelSpacingInterpretationToString( this->GetPixelSpacingInterpretation() ) ) );
   mitkImage->SetProperty(
     "dicomseriesreader.PixelSpacingInterpretation",
-    GenericProperty<PixelSpacingInterpretation>::New( this->GetPixelSpacingInterpretation() ) );
+    IntProperty::New( this->GetPixelSpacingInterpretation() ) );
 
   mitkImage->SetProperty(
     "dicomseriesreader.ReaderImplementationLevelString",
     StringProperty::New( ReaderImplementationLevelToString( m_ReaderImplementationLevel ) ) );
 
   mitkImage->SetProperty( "dicomseriesreader.ReaderImplementationLevel",
-                          GenericProperty<ReaderImplementationLevel>::New( m_ReaderImplementationLevel ) );
+                          IntProperty::New( m_ReaderImplementationLevel ) );
 
   mitkImage->SetProperty( "dicomseriesreader.GantyTiltCorrected",
                           BoolProperty::New( this->GetTiltInformation().IsRegularGantryTilt() ) );

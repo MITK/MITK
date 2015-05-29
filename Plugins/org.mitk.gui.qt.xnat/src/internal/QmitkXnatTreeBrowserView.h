@@ -76,6 +76,8 @@ public:
 
   void OnContextMenuDownloadAndOpenFile();
   void OnContextMenuDownloadFile();
+  void OnContextMenuCreateNewSubject();
+  void OnContextMenuCreateNewExperiment();
 
 protected:
 

@@ -153,7 +153,7 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
 
   // workaround for bug 16407
   m_Interactor = mitk::USZonesInteractor::New();
-  m_Interactor->LoadStateMachine(m_StateMachineFileName, us::ModuleRegistry::GetModule("USNavigationPlugin"));
+  m_Interactor->LoadStateMachine(m_StateMachineFileName, us::ModuleRegistry::GetModule("MitkUS"));
   m_Interactor->SetEventConfig("globalConfig.xml");
 
   mitk::DataNode::Pointer dataNode = mitk::DataNode::New();

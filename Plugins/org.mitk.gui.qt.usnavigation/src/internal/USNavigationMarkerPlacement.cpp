@@ -111,6 +111,26 @@ USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
   delete ui;
 }
 
+void USNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
+{
+if((m_AblationZonesVector.size()<id)||(id<0)) {return;}
+
+MITK_INFO << "Ablation Zone " << id << " changed, new size: " << newSize;
+
+// create a vtk sphere with given radius
+vtkSphereSource *vtkData = vtkSphereSource::New();
+vtkData->SetRadius( newSize/2 );
+vtkData->SetCenter(0,0,0);
+vtkData->SetPhiResolution(20);
+vtkData->SetThetaResolution(20);
+vtkData->Update();
+
+mitk::Surface::Pointer zoneSurface = dynamic_cast<mitk::Surface*>(m_AblationZonesVector.at(id)->GetData());
+zoneSurface->SetVtkPolyData(vtkData->GetOutput());
+vtkData->Delete();
+
+}
+
 void USNavigationMarkerPlacement::OnAddAblationZone(int size)
 {
 
@@ -118,6 +138,8 @@ m_AblationZonesDisplacementFilter->SetInitialReferencePose(m_CombinedModality->G
 mitk::DataNode::Pointer NewAblationZone = mitk::DataNode::New();
 
 mitk::Point3D origin = m_CombinedModality->GetNavigationDataSource()->GetOutput(m_NeedleIndex)->GetPosition();
+
+MITK_INFO("USNavigationLogging") << "Ablation Zone Added, initial size: " << size << ", origin: " << origin;
 
 mitk::Surface::Pointer zone = mitk::Surface::New();
 
@@ -463,6 +485,7 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
           new QmitkUSNavigationStepPunctuationIntervention(m_Parent);
 
       connect(stepIntervention, SIGNAL(AddAblationZoneClicked(int)), this, SLOT(OnAddAblationZone(int)));
+      connect(stepIntervention, SIGNAL(AblationZoneChanged(int,int)), this, SLOT(OnChangeAblationZone(int,int)));
 
       m_NavigationStepNames = std::vector<QString>();
       navigationSteps.push_back(stepCombinedModality);

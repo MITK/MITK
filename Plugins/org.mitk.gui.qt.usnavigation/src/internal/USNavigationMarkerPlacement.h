@@ -105,6 +105,8 @@ protected slots:
 
   void OnAddAblationZone(int size);
 
+  void OnChangeAblationZone(int id, int newSize);
+
 public:
   static const char* DATANAME_TUMOUR;
   static const char* DATANAME_TARGETSURFACE;

@@ -77,10 +77,13 @@ signals:
 
   void AddAblationZoneClicked(int);
 
+  void AblationZoneChanged(int,int);
+
 protected slots:
 
   void OnAddAblationZoneClicked();
   void OnEnableAblationZoneMarkingClicked();
+  void OnAblationZoneSizeSliderChanged(int size);
 
 protected:
   virtual void OnSetCombinedModality();

@@ -37,6 +37,7 @@ QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIn
   ui->setupUi(this);
   connect(ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
   connect(ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
+  connect(ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnEnableAblationZoneMarkingClicked()
@@ -47,10 +48,16 @@ void QmitkUSNavigationStepPunctuationIntervention::OnEnableAblationZoneMarkingCl
     ui->m_AblationZonesBox->setEnabled(false);
 }
 
+void QmitkUSNavigationStepPunctuationIntervention::OnAblationZoneSizeSliderChanged(int size)
+{
+int id = ui->m_AblationZonesList->currentRow();
+if (id!=-1) {emit AblationZoneChanged(id,size);}
+}
+
 void QmitkUSNavigationStepPunctuationIntervention::OnAddAblationZoneClicked()
 {
-  MITK_INFO("USNavigationLogging") << "Ablation Zone Added, size: " << ui->m_AblationZoneSizeSlider->value();
-  new QListWidgetItem("Ablation Zone (size: " + QString::number(ui->m_AblationZoneSizeSlider->value()) + " mm)", ui->m_AblationZonesList);
+  QListWidgetItem* newItem = new QListWidgetItem("Ablation Zone (initial size: " + QString::number(ui->m_AblationZoneSizeSlider->value()) + " mm)", ui->m_AblationZonesList);
+  newItem->setSelected(true);
   emit AddAblationZoneClicked(ui->m_AblationZoneSizeSlider->value());
 }
 

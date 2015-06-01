@@ -11,18 +11,60 @@
 #include <itkImage.h>
 
 // itk includes
+#include <itkCheckerBoardImageFilter.h>
+#include <itkShapedNeighborhoodIterator.h>
 // Morphologic Operations
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
 #include <itkBinaryErodeImageFilter.h>
 #include <itkBinaryFillholeImageFilter.h>
 #include <itkBinaryMorphologicalClosingImageFilter.h>
-#include <itkCheckerBoardImageFilter.h>
-#include <itkShapedNeighborhoodIterator.h>
+#include <itkGrayscaleErodeImageFilter.h>
+#include <itkGrayscaleDilateImageFilter.h>
+#include <itkGrayscaleFillholeImageFilter.h>
 
 // Image Filter
 #include <itkDiscreteGaussianImageFilter.h>
 
+void mitk::CLUtil::ProbabilityMap(mitk::Image::Pointer & image , double mean, double stddev, mitk::Image::Pointer & outimage)
+{
+  AccessFixedDimensionByItk_3(image, mitk::CLUtil::itkProbabilityMap, 3, mean, stddev, outimage);
+}
+
+void mitk::CLUtil::ErodeGrayscale(mitk::Image::Pointer & image , unsigned int radius, mitk::CLUtil::MorphologicalDimensions d, mitk::Image::Pointer & outimage)
+{
+  AccessFixedDimensionByItk_3(image, mitk::CLUtil::itkErodeGrayscale, 3, outimage, radius, d);
+}
+
+void mitk::CLUtil::DilateGrayscale(mitk::Image::Pointer & image, unsigned int radius, mitk::CLUtil::MorphologicalDimensions d, mitk::Image::Pointer & outimage)
+{
+  AccessFixedDimensionByItk_3(image, mitk::CLUtil::itkDilateGrayscale, 3, outimage, radius, d);
+}
+
+void mitk::CLUtil::FillHoleGrayscale(mitk::Image::Pointer & image, mitk::Image::Pointer & outimage)
+{
+  AccessFixedDimensionByItk_1(image, mitk::CLUtil::itkFillHoleGrayscale, 3, outimage);
+}
+
+void mitk::CLUtil::InsertLabel(mitk::Image::Pointer & image, mitk::Image::Pointer & maskImage, unsigned int label)
+{
+  AccessByItk_2(image, mitk::CLUtil::itkInsertLabel, maskImage, label);
+}
+
+void mitk::CLUtil::GrabLabel(mitk::Image::Pointer & image, mitk::Image::Pointer & outimage, unsigned int label)
+{
+  AccessFixedDimensionByItk_2(image, mitk::CLUtil::itkGrabLabel, 3, outimage, label);
+}
+
+void mitk::CLUtil::ConnectedComponentsImage(mitk::Image::Pointer & image, mitk::Image::Pointer& mask, mitk::Image::Pointer &outimage, unsigned int& num_components)
+{
+  AccessFixedDimensionByItk_3(image, mitk::CLUtil::itkConnectedComponentsImage,3, mask, outimage, num_components);
+}
+
+void mitk::CLUtil::MergeLabels(mitk::Image::Pointer & img, const std::map<unsigned int, unsigned int> & map)
+{
+  AccessByItk_1(img, mitk::CLUtil::itkMergeLabels, map);
+}
 
 void mitk::CLUtil::CountVoxel(mitk::Image::Pointer image, std::map<unsigned int, unsigned int> & map)
 {
@@ -44,9 +86,10 @@ void mitk::CLUtil::CreateCheckerboardMask(mitk::Image::Pointer image, mitk::Imag
   AccessFixedDimensionByItk_1(image, mitk::CLUtil::itkCreateCheckerboardMask,3, outimage);
 }
 
-void mitk::CLUtil::LogicalAndImages(mitk::Image::Pointer & image1, mitk::Image::Pointer & image2)
+void mitk::CLUtil::LogicalAndImages(mitk::Image::Pointer & image1, mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage)
 {
-  AccessTwoImagesFixedDimensionByItk(image1,image2, itkLogicalAndImages, 3);
+  AccessFixedDimensionByItk_2(image1,itkLogicalAndImages, 3, image2, outimage);
+
 }
 
 void mitk::CLUtil::InterpolateCheckerboardPrediction(mitk::Image::Pointer checkerboard_prediction, mitk::Image::Pointer & checkerboard_mask, mitk::Image::Pointer & outimage)
@@ -75,6 +118,33 @@ void mitk::CLUtil::ErodeBinary(mitk::Image::Pointer & sourceImage, mitk::Image::
 void mitk::CLUtil::ClosingBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int factor, MorphologicalDimensions d)
 {
   AccessFixedDimensionByItk_3(sourceImage, mitk::CLUtil::itkClosingBinary, 3, resultImage, factor, d);
+}
+
+template<typename TImageType>
+void mitk::CLUtil::itkProbabilityMap(TImageType * sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage)
+{
+  itk::Image<double, 3>::Pointer itk_img = itk::Image<double, 3>::New();
+  itk_img->SetRegions(sourceImage->GetLargestPossibleRegion());
+  itk_img->SetOrigin(sourceImage->GetOrigin());
+  itk_img->SetSpacing(sourceImage->GetSpacing());
+  itk_img->SetDirection(sourceImage->GetDirection());
+  itk_img->Allocate();
+
+
+  itk::ImageRegionIterator<TImageType> it(sourceImage,sourceImage->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<itk::Image<double, 3> > outit(itk_img,itk_img->GetLargestPossibleRegion());
+
+  while(!it.IsAtEnd())
+  {
+    double x = it.Value();
+
+    double prob = (1.0/(std_dev*std::sqrt(2.0*M_PI))) * std::exp(-(((x-mean)*(x-mean))/(2.0*std_dev*std_dev)));
+    outit.Set(prob);
+    ++it;
+    ++outit;
+  }
+
+  mitk::GrabItkImageMemory(itk_img, resultImage);
 }
 
 template< typename TImageType >
@@ -231,7 +301,7 @@ void mitk::CLUtil::itkClosingBinary(TImageType * sourceImage, mitk::Image::Point
   erodeFilter->SetKernel(strElem);
   erodeFilter->SetInput(sourceImage);
   erodeFilter->SetForegroundValue(1);
-  erodeFilter->UpdateLargestPossibleRegion();
+  erodeFilter->Update();
 
   mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
 
@@ -251,7 +321,7 @@ void mitk::CLUtil::itkDilateBinary(TImageType * sourceImage, mitk::Image::Pointe
   erodeFilter->SetKernel(strElem);
   erodeFilter->SetInput(sourceImage);
   erodeFilter->SetDilateValue(1);
-  erodeFilter->UpdateLargestPossibleRegion();
+  erodeFilter->Update();
 
   mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
 
@@ -272,7 +342,8 @@ void mitk::CLUtil::itkErodeBinary(TImageType * sourceImage, mitk::Image::Pointer
   erodeFilter->SetKernel(strElem);
   erodeFilter->SetInput(sourceImage);
   erodeFilter->SetErodeValue(1);
-  erodeFilter->UpdateLargestPossibleRegion();
+//  erodeFilter->UpdateLargestPossibleRegion();
+  erodeFilter->Update();
 
   mitk::CastToMitkImage(erodeFilter->GetOutput(), resultImage);
 
@@ -292,31 +363,49 @@ void mitk::CLUtil::itkFillHolesBinary(itk::Image<TPixel, VDimension>* sourceImag
   typename FillHoleFilterType::Pointer fillHoleFilter = FillHoleFilterType::New();
   fillHoleFilter->SetInput(sourceImage);
   fillHoleFilter->SetForegroundValue(1);
-  fillHoleFilter->UpdateLargestPossibleRegion();
+  fillHoleFilter->Update();
 
   mitk::CastToMitkImage(fillHoleFilter->GetOutput(), resultImage);
 }
 
 ///
 /// \brief itkLogicalAndImages
-/// \param image1
+/// \param image1 keep the values of image 1
 /// \param image2
 ///
-template<typename TImageType1, typename TImageType2>
-void mitk::CLUtil::itkLogicalAndImages(TImageType1 * image1, TImageType2 * image2)
+template<typename TImageType>
+void mitk::CLUtil::itkLogicalAndImages(TImageType * image1, mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage)
 {
-  itk::ImageRegionIterator<TImageType1> it1(image1, image1->GetLargestPossibleRegion());
-  itk::ImageRegionIterator<TImageType2> it2(image2, image2->GetLargestPossibleRegion());
+
+  typename TImageType::Pointer itk_outimage = TImageType::New();
+  itk_outimage->SetRegions(image1->GetLargestPossibleRegion());
+  itk_outimage->SetDirection(image1->GetDirection());
+  itk_outimage->SetOrigin(image1->GetOrigin());
+  itk_outimage->SetSpacing(image1->GetSpacing());
+
+  itk_outimage->Allocate();
+  itk_outimage->FillBuffer(0);
+
+  typename TImageType::Pointer itk_image2;
+  mitk::CastToItkImage(image2,itk_image2);
+
+  itk::ImageRegionConstIterator<TImageType> it1(image1, image1->GetLargestPossibleRegion());
+  itk::ImageRegionConstIterator<TImageType> it2(itk_image2, itk_image2->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<TImageType> oit(itk_outimage,itk_outimage->GetLargestPossibleRegion());
+
   while(!it1.IsAtEnd())
   {
     if(it1.Value() == 0 || it2.Value() == 0)
     {
-      it1.Set(0);
-      it2.Set(0);
-    }
+      oit.Set(0);
+    }else
+      oit.Set(it1.Value());
     ++it1;
     ++it2;
+    ++oit;
   }
+
+  mitk::CastToMitkImage(itk_outimage, outimage);
 }
 
 ///
@@ -335,6 +424,52 @@ void mitk::CLUtil::itkGaussianFilter(TImageType * image, mitk::Image::Pointer & 
   filter->Update();
 
   mitk::CastToMitkImage(filter->GetOutput(),smoothed);
+}
+
+template<class TImageType>
+void mitk::CLUtil::itkErodeGrayscale(TImageType * image, mitk::Image::Pointer & outimage , unsigned int radius, mitk::CLUtil::MorphologicalDimensions d)
+{
+  typedef itk::BinaryBallStructuringElement<typename TImageType::PixelType, 3>          StructureElementType;
+  typedef itk::GrayscaleErodeImageFilter<TImageType,TImageType,StructureElementType>    FilterType;
+
+  StructureElementType ball;
+  itkFitStructuringElement(ball,d, radius);
+
+  typename FilterType::Pointer filter = FilterType::New();
+  filter->SetKernel(ball);
+  filter->SetInput(image);
+  filter->Update();
+
+  mitk::CastToMitkImage(filter->GetOutput(),outimage);
+}
+
+template<class TImageType>
+void mitk::CLUtil::itkDilateGrayscale(TImageType * image, mitk::Image::Pointer & outimage , unsigned int radius, mitk::CLUtil::MorphologicalDimensions d)
+{
+  typedef itk::BinaryBallStructuringElement<typename TImageType::PixelType, 3>          StructureElementType;
+  typedef itk::GrayscaleDilateImageFilter<TImageType,TImageType,StructureElementType>    FilterType;
+
+  StructureElementType ball;
+  itkFitStructuringElement(ball,d, radius);
+
+  typename FilterType::Pointer filter = FilterType::New();
+  filter->SetKernel(ball);
+  filter->SetInput(image);
+  filter->Update();
+
+  mitk::CastToMitkImage(filter->GetOutput(),outimage);
+}
+
+template<class TImageType>
+void mitk::CLUtil::itkFillHoleGrayscale(TImageType * image, mitk::Image::Pointer & outimage)
+{
+  typedef itk::GrayscaleFillholeImageFilter<TImageType,TImageType>    FilterType;
+
+  typename FilterType::Pointer filter = FilterType::New();
+  filter->SetInput(image);
+  filter->Update();
+
+  mitk::CastToMitkImage(filter->GetOutput(),outimage);
 }
 
 

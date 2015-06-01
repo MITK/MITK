@@ -10,6 +10,7 @@
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 
+#include <itkConnectedComponentImageFilter.h>
 namespace mitk
 {
 
@@ -83,7 +84,8 @@ public:
   /// \param image1
   /// \param image2
   ///
-  static void LogicalAndImages(Image::Pointer &image1, Image::Pointer &image2);
+  static void LogicalAndImages(Image::Pointer &image1, Image::Pointer &image2, Image::Pointer &outimage);
+
 
   ///
   /// \brief GaussianFilter
@@ -172,31 +174,98 @@ public:
 
   ///
   /// \brief DilateBinary
-  /// \param sourceImage
-  /// \param resultImage
-  /// \param factor
-  /// \param d
+  /// \param BinaryImage
+  /// \param BinaryImage
+  /// \param Size of the StructuringElement
+  /// \param Dimension
   ///
-  static void DilateBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int factor , MorphologicalDimensions d);
+  static void DilateBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius , MorphologicalDimensions d);
 
   ///
   /// \brief ErodeBinary
-  /// \param sourceImage
-  /// \param resultImage
-  /// \param factor
-  /// \param d
+  /// \param BinaryImage
+  /// \param BinaryImage
+  /// \param Size of the StructuringElement
+  /// \param Dimension
   ///
-  static void ErodeBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int factor, MorphologicalDimensions d);
+  static void ErodeBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius, MorphologicalDimensions d);
 
   ///
   /// \brief ClosingBinary
-  /// \param sourceImage
-  /// \param resultImage
-  /// \param factor
+  /// \param BinaryImage
+  /// \param BinaryImage
+  /// \param Size of the StructuringElement
+  /// \param Dimension
+  ///
+  static void ClosingBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int radius, MorphologicalDimensions d);
+
+
+  ///
+  /// \brief MergeLabels
+  /// \param MultilabelImage
+  /// \param map merge instruction where each map entry defines a mapping instruction. Key <sourcelabel> - Value <targetlabel>
+  ///
+  static void MergeLabels(mitk::Image::Pointer & img, const std::map<unsigned int, unsigned int> & map);
+
+  ///
+  /// \brief ConnectedComponentsImage
+  /// \param BinaryImage
+  /// \param BinaryImage
+  /// \param MultilabelImage
+  /// \param Number of components found in the image
+  ///
+  static void ConnectedComponentsImage(mitk::Image::Pointer & image, mitk::Image::Pointer& mask, mitk::Image::Pointer &outimage, unsigned int& num_components);
+
+  ///
+  /// \brief GrabLabel
+  /// \param MultiLabelImage
+  /// \param outimage
+  /// \param label
+  ///
+  static void GrabLabel(mitk::Image::Pointer & image, mitk::Image::Pointer & outimage, unsigned int label);
+
+
+  ///
+  /// \brief itkInsertLabel
+  /// \param image
+  /// \param maskImage
+  /// \param label
+  ///
+  static void InsertLabel(mitk::Image::Pointer & image, mitk::Image::Pointer & maskImage, unsigned int label);
+
+  ///
+  /// \brief ErodeGrayscale
+  /// \param image
+  /// \param outimage
+  /// \param radius
   /// \param d
   ///
-  static void ClosingBinary(mitk::Image::Pointer & sourceImage, mitk::Image::Pointer& resultImage, int factor, MorphologicalDimensions d);
+  static void ErodeGrayscale(mitk::Image::Pointer & image, unsigned int radius, mitk::CLUtil::MorphologicalDimensions d, mitk::Image::Pointer & outimage );
 
+  ///
+  /// \brief DilateGrayscale
+  /// \param image
+  /// \param outimage
+  /// \param radius
+  /// \param d
+  ///
+  static void DilateGrayscale(mitk::Image::Pointer & image, unsigned int radius, mitk::CLUtil::MorphologicalDimensions d, mitk::Image::Pointer & outimage );
+
+  ///
+  /// \brief FillHoleGrayscale
+  /// \param image
+  /// \param outimage
+  ///
+  static void FillHoleGrayscale(mitk::Image::Pointer & image, mitk::Image::Pointer & outimage);
+
+  ///
+  /// \brief ProbabilityMap
+  /// \param sourceImage
+  /// \param mean
+  /// \param std_dev
+  /// \param resultImage
+  ///
+  static void ProbabilityMap(mitk::Image::Pointer&  sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage);
 
   template<class TImageType>
   static void itkCountVoxel( TImageType * image, std::map<unsigned int, unsigned int> & map)
@@ -254,6 +323,109 @@ public:
   }
 
 private:
+
+  template<class TImageType>
+  static void itkErodeGrayscale(TImageType * image, mitk::Image::Pointer & outimage , unsigned int radius, mitk::CLUtil::MorphologicalDimensions d);
+
+  template<class TImageType>
+  static void itkDilateGrayscale(TImageType * image, mitk::Image::Pointer & outimage , unsigned int radius, mitk::CLUtil::MorphologicalDimensions d);
+
+  template<class TImageType>
+  static void itkFillHoleGrayscale(TImageType * image, mitk::Image::Pointer & outimage);
+
+  template< typename TImageType >
+  static void itkInsertLabel(TImageType * image, mitk::Image::Pointer & maskImage, unsigned int label)
+  {
+    typename TImageType::Pointer itkMask;
+    mitk::CastToItkImage(maskImage, itkMask);
+
+    itk::ImageRegionIterator<TImageType> oit(image,image->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator<TImageType> mit(itkMask,itkMask->GetLargestPossibleRegion());
+
+    while(!mit.IsAtEnd())
+    {
+      if(mit.Value() != 0)
+      {
+        oit.Set(label);
+      }
+      ++oit;
+      ++mit;
+    }
+  }
+
+
+  template< typename TImageType >
+  static void itkGrabLabel(TImageType * image, mitk::Image::Pointer & outimage, unsigned int label)
+  {
+    typedef itk::Image<unsigned short, 3> TOutType;
+    TOutType::Pointer itk_out = TOutType::New();
+    itk_out->SetRegions(image->GetLargestPossibleRegion());
+    itk_out->SetDirection(image->GetDirection());
+    itk_out->SetOrigin(image->GetOrigin());
+    itk_out->SetSpacing(image->GetSpacing());
+    itk_out->Allocate();
+
+    itk::ImageRegionConstIterator<TImageType> iit(image, image->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<TOutType> oit(itk_out,itk_out->GetLargestPossibleRegion());
+
+    while(!iit.IsAtEnd())
+    {
+      if(iit.Value() == static_cast<typename TImageType::PixelType>(label))
+        oit.Set(1);
+      else
+        oit.Set(0);
+
+      ++iit;
+      ++oit;
+    }
+
+    mitk::CastToMitkImage(itk_out, outimage);
+  }
+
+  template<class TImagetype>
+  static void itkMergeLabels(TImagetype * img, const std::map<unsigned int, unsigned int> & map)
+  {
+
+    auto it = itk::ImageRegionIterator<TImagetype>(img,img->GetLargestPossibleRegion());
+
+    while(!it.IsAtEnd())
+    {
+      if(map.find(it.Value())!=map.end())
+        it.Set( map.at(it.Value()) );
+      ++it;
+    }
+
+  }
+
+  template<typename TImageType>
+  static void itkConnectedComponentsImage(TImageType * image, mitk::Image::Pointer& mask, mitk::Image::Pointer &outimage, unsigned int& num_components)
+  {
+    typedef itk::Image<unsigned short, 3> MaskImageType;
+    MaskImageType::Pointer itk_mask;
+    if(mask.IsNull())
+    {
+      itk_mask = MaskImageType::New();
+      itk_mask->SetRegions(image->GetLargestPossibleRegion());
+      itk_mask->SetDirection(image->GetDirection());
+      itk_mask->SetOrigin(image->GetOrigin());
+      itk_mask->SetSpacing(image->GetSpacing());
+      itk_mask->Allocate();
+      itk_mask->FillBuffer(1);
+    }else{
+      mitk::CastToItkImage(mask,itk_mask);
+    }
+
+    typedef itk::ConnectedComponentImageFilter<TImageType, MaskImageType, MaskImageType > FilterType;
+    typename FilterType::Pointer cc_filter = FilterType::New();
+    cc_filter->SetMaskImage(itk_mask.GetPointer());
+    cc_filter->SetInput(image);
+    cc_filter->SetBackgroundValue(0);
+    cc_filter->Update();
+
+    num_components = cc_filter->GetObjectCount();
+    mitk::CastToMitkImage(cc_filter->GetOutput(), outimage);
+  }
+
   template< typename TImageType >
   static void itkCreateCheckerboardMask(TImageType * image, mitk::Image::Pointer & outimage);
 
@@ -267,25 +439,29 @@ private:
   static void itkSqSumVoxelForLabel(TImageType* image, const mitk::Image::Pointer & source, typename TImageType::PixelType label, double & val );
 
   template<typename TStructuringElement>
-  static void itkFitStructuringElement(TStructuringElement & se, MorphologicalDimensions d, int factor);
+  static void itkFitStructuringElement(TStructuringElement & se, MorphologicalDimensions d, int radius);
 
   template<typename TImageType>
-  static void itkDilateBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int factor , MorphologicalDimensions d);
+  static void itkDilateBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int radius , MorphologicalDimensions d);
 
   template<typename TImageType>
-  static void itkErodeBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int factor, MorphologicalDimensions d);
+  static void itkErodeBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int radius, MorphologicalDimensions d);
 
   template<typename TImageType>
-  static void itkClosingBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int factor, MorphologicalDimensions d);
+  static void itkClosingBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int radius, MorphologicalDimensions d);
 
   template<typename TPixel, unsigned int VDimension>
   static void itkFillHolesBinary(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage);
 
-  template<typename TImageType1, typename TImageType2>
-  static void itkLogicalAndImages(TImageType1 * image1, TImageType2 * image2);
+  template<typename TImageType>
+  static void itkLogicalAndImages(TImageType * image1, mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage);
 
   template<class TImageType>
   static void itkGaussianFilter(TImageType * image, mitk::Image::Pointer & smoothed ,double sigma);
+
+  template<typename TImageType>
+  static void itkProbabilityMap(TImageType * sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage);
+
 
 
 };

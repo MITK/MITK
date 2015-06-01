@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
-    <height>829</height>
+    <width>430</width>
+    <height>958</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -588,6 +588,30 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_16">
+             <item>
+              <widget class="QCheckBox" name="m_CalibratePosition">
+               <property name="text">
+                <string>Calibrate position</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="m_CalibrateOrientation">
+               <property name="text">
+                <string>Calibrate orientation</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
             <widget class="QPushButton" name="m_RunCalibrationButton">
              <property name="enabled">
               <bool>false</bool>
@@ -613,7 +637,7 @@ p, li { white-space: pre-wrap; }
               </sizepolicy>
              </property>
              <property name="text">
-              <string>New Tool Tip Position of Tool to calibrate:</string>
+              <string>New Tool Tip Position and/or Orientation of Tool to calibrate:</string>
              </property>
             </widget>
            </item>
@@ -669,7 +693,7 @@ p, li { white-space: pre-wrap; }
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>3: Set New Tool Tip Position</string>
+              <string>3: Set New Tool Tip Position and/or Tool Orientation</string>
              </property>
             </widget>
            </item>
@@ -681,7 +705,7 @@ p, li { white-space: pre-wrap; }
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>203</height>
+               <height>40</height>
               </size>
              </property>
             </spacer>

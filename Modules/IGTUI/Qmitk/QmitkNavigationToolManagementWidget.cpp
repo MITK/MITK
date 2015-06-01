@@ -91,6 +91,7 @@ void QmitkNavigationToolManagementWidget::OnSaveTool()
 
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toLatin1().data();
+    filename.append(".IGTTool");
     if (filename == "") return;
     if (!myWriter->DoWrite(filename,m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())))
       MessageBox("Error: "+ myWriter->GetErrorMessage());

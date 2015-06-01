@@ -107,11 +107,10 @@ class IGTNavigationToolCalibration : public QmitkAbstractView
     void LoginSingleRefToolNavigationData();
     std::vector< mitk::Point3D > m_LoggedNavigationDataOffsets;
     std::vector< mitk::NavigationData::Pointer > m_LoggedNavigationDataDifferences;
-    std::vector<double> m_ComputedDistances;
     bool m_OnLoginSingleRefToolNavigationDataClicked;
     int m_NumberOfNavigationData;
     int m_NumberOfNavigationDataCounter;
-    mitk::Point3D m_ResultOffset;
+    mitk::Point3D m_ResultOffsetVector;
 
     // members and helper methods for tool tip preview
     mitk::DataNode::Pointer m_ToolTipPointPreview; //<<< Data node of the tool tip preview

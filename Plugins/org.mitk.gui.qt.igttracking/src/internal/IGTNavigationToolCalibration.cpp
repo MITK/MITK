@@ -121,53 +121,57 @@ void IGTNavigationToolCalibration::CreateQtPartControl( QWidget *parent )
 
 void IGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
 {
-  if (!CheckInitialization()) {return;}
+    if (!CheckInitialization()) { return; }
 
-  //1: Compute mean translational offset
-  m_ResultOffset.Fill(0);
-  for(std::vector<mitk::Point3D>::iterator vecIter = m_LoggedNavigationDataOffsets.begin(); vecIter != m_LoggedNavigationDataOffsets.end(); vecIter++)
-  {
-    m_ResultOffset[0] = m_ResultOffset[0] + (*vecIter)[0];
-    m_ResultOffset[1] = m_ResultOffset[1] + (*vecIter)[1];
-    m_ResultOffset[2] = m_ResultOffset[2] + (*vecIter)[2];
-    for(std::vector<mitk::Point3D>::iterator innerVec = vecIter+1; innerVec != m_LoggedNavigationDataOffsets.end(); innerVec++)
+    mitk::NavigationData::Pointer ToolTipTransform = mitk::NavigationData::New();
+
+    if (m_Controls.m_CalibratePosition->isChecked())
     {
-      m_ComputedDistances.push_back((*vecIter).SquaredEuclideanDistanceTo(*innerVec));
+        //1: Compute mean translational offset vector
+        m_ResultOffsetVector.Fill(0);
+        for (std::vector<mitk::Point3D>::iterator vecIter = m_LoggedNavigationDataOffsets.begin(); vecIter != m_LoggedNavigationDataOffsets.end(); vecIter++)
+        {
+            m_ResultOffsetVector[0] = m_ResultOffsetVector[0] + (*vecIter)[0];
+            m_ResultOffsetVector[1] = m_ResultOffsetVector[1] + (*vecIter)[1];
+            m_ResultOffsetVector[2] = m_ResultOffsetVector[2] + (*vecIter)[2];
+        }
+        m_ResultOffsetVector[0] = m_ResultOffsetVector[0] / m_LoggedNavigationDataOffsets.size();
+        m_ResultOffsetVector[1] = m_ResultOffsetVector[1] / m_LoggedNavigationDataOffsets.size();
+        m_ResultOffsetVector[2] = m_ResultOffsetVector[2] / m_LoggedNavigationDataOffsets.size();
+
+        this->m_Controls.m_ResultOfCalibration->setText(
+            QString("x: ") + QString(QString::number(m_ResultOffsetVector[0], 103, 3)) +
+            QString("; y: ") + (QString::number(m_ResultOffsetVector[1], 103, 3)) +
+            QString("; z: ") + (QString::number(m_ResultOffsetVector[2], 103, 3)));
+
+        ToolTipTransform->SetPosition(m_ResultOffsetVector);
     }
-  }
-  m_ResultOffset[0] = m_ResultOffset[0] / m_LoggedNavigationDataOffsets.size();
-  m_ResultOffset[1] = m_ResultOffset[1] / m_LoggedNavigationDataOffsets.size();
-  m_ResultOffset[2] = m_ResultOffset[2] / m_LoggedNavigationDataOffsets.size();
 
-  double sum = std::accumulate( m_ComputedDistances.begin(), m_ComputedDistances.end(), 0);
-  double meanDistance = sum / m_ComputedDistances.size();
 
-  this->m_Controls.m_ResultOfCalibration->setText(
-    QString("x: ") + QString(QString::number(m_ResultOffset[0],103,3)) +
-    QString("; y: ") + (QString::number(m_ResultOffset[1],103,3)) +
-    QString("; z: ") + (QString::number(m_ResultOffset[2],103,3)));
+    if (m_Controls.m_CalibrateOrientation->isChecked())
+    {
+        //2: Compute mean orientation
+        mitk::Quaternion meanOrientation;
+        std::vector <mitk::Quaternion> allOrientations = std::vector <mitk::Quaternion>();
+        for (int i = 0; i < m_LoggedNavigationDataDifferences.size(); i++) { allOrientations.push_back(m_LoggedNavigationDataDifferences.at(i)->GetOrientation()); }
+        meanOrientation = mitk::QuaternionAveraging::CalcAverage(allOrientations);
+        this->m_Controls.m_ResultOfCalibrationOrientation->setText(
+            QString("qx: ") + QString(QString::number(meanOrientation.x(), 103, 3)) +
+            QString("; qy: ") + (QString::number(meanOrientation.y(), 103, 3)) +
+            QString("; qz: ") + (QString::number(meanOrientation.z(), 103, 3)) +
+            QString("; qr: ") + (QString::number(meanOrientation.r(), 103, 3)));
 
-  //2: Compute mean orientation
-  mitk::Quaternion meanOrientation;
-  std::vector <mitk::Quaternion> allOrientations = std::vector <mitk::Quaternion>();
-  for (int i=0; i<m_LoggedNavigationDataDifferences.size(); i++) {allOrientations.push_back(m_LoggedNavigationDataDifferences.at(i)->GetOrientation());}
-  meanOrientation = mitk::QuaternionAveraging::CalcAverage(allOrientations);
-  this->m_Controls.m_ResultOfCalibrationOrientation->setText(
-    QString("qx: ") + QString(QString::number(meanOrientation.x(),103,3)) +
-    QString("; qy: ") + (QString::number(meanOrientation.y(),103,3)) +
-    QString("; qz: ") + (QString::number(meanOrientation.z(),103,3)) +
-    QString("; qr: ") + (QString::number(meanOrientation.r(),103,3)));
+        ToolTipTransform->SetOrientation(meanOrientation);
+    }
 
-  //3: write everything into the final tool tip transform and save it as member (it will be written to the tool later on)
-  mitk::NavigationData::Pointer ToolTipTransform = mitk::NavigationData::New();
-  ToolTipTransform->SetPosition(m_ResultOffset);
-  ToolTipTransform->SetOrientation(meanOrientation);
-  mitk::NavigationData::Pointer ToolTipInTrackingCoordinates = mitk::NavigationData::New();
-  ToolTipInTrackingCoordinates->Compose(ToolTipTransform);
-  ToolTipInTrackingCoordinates->Compose(m_NavigationDataSourceOfToolToCalibrate->GetOutput(m_IDToolToCalibrate));
-  ShowToolTipPreview(ToolTipInTrackingCoordinates);
-  m_Controls.m_SetNewToolTipPosButton->setEnabled(true);
-  m_ComputedToolTipTransformation = ToolTipTransform;
+      //3: write everything into the final tool tip transform and save it as member (it will be written to the tool later on)
+      mitk::NavigationData::Pointer ToolTipInTrackingCoordinates = mitk::NavigationData::New();
+      ToolTipInTrackingCoordinates->Compose(ToolTipTransform);
+      ToolTipInTrackingCoordinates->Compose(m_NavigationDataSourceOfToolToCalibrate->GetOutput(m_IDToolToCalibrate));
+      ShowToolTipPreview(ToolTipInTrackingCoordinates);
+      m_Controls.m_SetNewToolTipPosButton->setEnabled(true);
+      m_ComputedToolTipTransformation = ToolTipTransform;
+
 }
 
 void IGTNavigationToolCalibration::OnLoginSingleRefToolNavigationDataClicked()
@@ -472,7 +476,7 @@ void IGTNavigationToolCalibration::UpdateOffsetCoordinates()
     if (m_ToolTipPointPreview.IsNotNull()) //NOT WORKING! TODO: fix or remove!
       {
       mitk::NavigationData::Pointer ToolTipTransform = mitk::NavigationData::New();
-      ToolTipTransform->SetPosition(m_ResultOffset);
+      ToolTipTransform->SetPosition(m_ResultOffsetVector);
       mitk::NavigationData::Pointer ToolTipInTrackingCoordinates = mitk::NavigationData::New(); //maybe store as for better peformance...
       ToolTipInTrackingCoordinates->Compose(m_NavigationDataSourceOfToolToCalibrate->GetOutput(m_IDToolToCalibrate));
       ToolTipInTrackingCoordinates->Compose(ToolTipTransform);
@@ -531,6 +535,7 @@ void IGTNavigationToolCalibration::SaveCalibratedTool()
     calibratedTool->SetToolRegistrationLandmarks(this->m_RegistrationLandmarks);
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
     std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toUtf8().data();
+    filename.append(".IGTTool");
     if (filename == "") return;
     if (myWriter->DoWrite(filename,calibratedTool)) MITK_INFO << "Saved calibrated tool to file " << filename;
     else MITK_WARN << "Can't write tool to file " << filename;

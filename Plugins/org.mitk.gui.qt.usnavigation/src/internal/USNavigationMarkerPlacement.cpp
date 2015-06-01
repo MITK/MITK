@@ -408,6 +408,7 @@ void USNavigationMarkerPlacement::OnCombinedModalityChanged(itk::SmartPointer<mi
   // update navigation data recorder for using the new combined modality
   mitk::NavigationDataSource::Pointer navigationDataSource = combinedModality->GetNavigationDataSource();
   m_NavigationDataRecorder->ConnectTo(navigationDataSource);
+  m_NavigationDataRecorder->ResetRecording();
 
 // TODO check for correct connection
 //  for (unsigned int n = 0; n < navigationDataSource->GetNumberOfIndexedOutputs(); ++n)

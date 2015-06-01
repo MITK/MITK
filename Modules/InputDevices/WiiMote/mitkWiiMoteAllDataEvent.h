@@ -28,6 +28,9 @@ namespace mitk
   * This event type is used to store all data available from the <br>
   * Wiimote driver. This includes IR, button, orientation, and acceleration input.
   */
+/**
+* \deprecatedSince{2015_05} WiiMoteAllDataEvent is deprecated. It will be removed in the next release.
+*/
   class mitkWiiMote_EXPORT WiiMoteAllDataEvent: public Event, itk::EventObject
   {
   public:

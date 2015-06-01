@@ -32,6 +32,10 @@ namespace mitk {
   * @brief vtk-based camera controller
   * @ingroup NavigationControl
   */
+/**
+ * \deprecatedSince{2015_05} SpaceNavigatorVtkCameraController is deprecated. It will be removed in the next release.
+ */
+
   class mitkSpaceNavigator_EXPORT SpaceNavigatorVtkCameraController : public CameraController
   {
 

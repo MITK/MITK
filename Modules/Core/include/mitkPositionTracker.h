@@ -31,6 +31,13 @@ namespace mitk
   //##
   //## Tracks a Point from an input device (usaly mouse pointer)
   //## @ingroup Interaction
+
+  /**
+  * \deprecatedSince{2015_05} PositionTracker is deprecated. It will be removed in the next release.
+  *  It will be integrated into the mitk::DisplayInteractor.
+  */
+
+
   class MITKCORE_EXPORT PositionTracker : public StateMachine
   {
   public:

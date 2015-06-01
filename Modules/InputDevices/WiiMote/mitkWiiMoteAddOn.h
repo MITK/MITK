@@ -34,6 +34,10 @@ namespace mitk {
   * @brief EventMapper addon for a Wiimote
   * @ingroup Interaction
   */
+
+  /**
+  * \deprecatedSince{2015_05} WiiMoteAddOn is deprecated. It will be removed in the next release.
+  */
   class mitkWiiMote_EXPORT WiiMoteAddOn : public EventMapperAddOn
   {
 

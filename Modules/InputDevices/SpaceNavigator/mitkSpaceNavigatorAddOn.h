@@ -31,6 +31,10 @@ namespace mitk {
   * @brief EventMapper addon for a 3DConnexion Space Navigator
   * @ingroup Interaction
   */
+
+/**
+ * \deprecatedSince{2015_05} SpaceNavigatorAddOn is deprecated. It will be removed in the next release.
+ */
   class mitkSpaceNavigator_EXPORT SpaceNavigatorAddOn : public EventMapperAddOn
   {
 

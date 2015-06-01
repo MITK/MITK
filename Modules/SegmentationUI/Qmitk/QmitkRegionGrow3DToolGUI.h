@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <QRadioButton>
 
+/**
+* \deprecatedSince{2015_05} QmitkRegionGrow3DToolGUI is deprecated. Class will be removed, code is obsolete.
+*/
+
 class QmitkRegionGrow3DToolGUI : public QmitkToolGUI
 {
   Q_OBJECT

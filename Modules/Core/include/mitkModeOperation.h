@@ -29,6 +29,12 @@ namespace mitk {
 //## @brief class that holds the information for a change of the modus of an interactor object
 //##
 //## @ingroup Undo
+
+/**
+* \deprecatedSince{2015_05} ModeOperation is deprecated. It will be removed in the next release.
+*  It becomes obsolete. Refer to http://docs.mitk.org/nightly/DataInteractionPage.html for updated Interaction documentation.
+*/
+
 class MITKCORE_EXPORT ModeOperation : public Operation
 {
 public:

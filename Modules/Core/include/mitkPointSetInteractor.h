@@ -40,6 +40,11 @@ namespace mitk
    * In this case, the amount of managed points is set to 1.
    * \ingroup Interaction
    */
+
+  /**
+  * \deprecatedSince{2015_05} PointSetInteractor is deprecated. It will be removed in the next release.
+  *  Refer to mitk::PointSetDataInteractor as a substitude.
+  */
   class MITKCORE_EXPORT PointSetInteractor : public Interactor
   {
   public:

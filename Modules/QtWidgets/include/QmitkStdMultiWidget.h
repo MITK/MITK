@@ -76,6 +76,10 @@ public:
 
   QmitkRenderWindow* GetRenderWindow4() const;
 
+  /**
+  * \deprecatedSince{2015_05} GetLastLeftClickPosition is deprecated. Function will be removed and funtionality will move into mitk::DisplayInteractor.
+  */
+
   const mitk::Point3D &
   GetLastLeftClickPosition() const;
 

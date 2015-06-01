@@ -37,6 +37,11 @@ namespace mitk {
   *
   * @ingroup Interaction
   */
+
+/**
+ * \deprecatedSince{2015_05} SpaceNavigatorEvent is deprecated. It will be removed in the next release.
+ */
+
   class mitkSpaceNavigator_EXPORT SpaceNavigatorEvent : public Event
   {
 

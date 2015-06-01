@@ -24,6 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+/**
+ * \deprecatedSince{2015_05} WiiMoteMultiIREvent is deprecated. It will be removed in the next release.
+ */
+
   class mitkInputDevices_EXPORT WiiMoteMultiIREvent : public Event, itk::EventObject
   {
   public:

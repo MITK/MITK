@@ -32,6 +32,9 @@ namespace mitk
 * DOES NOT YET WORK!
 *
 */
+/**
+* \deprecatedSince{2015_05} KalmanFilter is deprecated. It will be removed in the next release.
+*/
   class KalmanFilter : public itk::Object
   {
 

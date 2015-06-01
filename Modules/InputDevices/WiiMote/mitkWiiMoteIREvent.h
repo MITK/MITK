@@ -28,6 +28,11 @@ namespace mitk
   * This event type is used for IR events triggered by the <br>
   * the Wiimote driver.
   */
+
+/**
+ * \deprecatedSince{2015_05} WiiMoteIREvent is deprecated. It will be removed in the next release.
+ */
+
   class mitkWiiMote_EXPORT WiiMoteIREvent : public Event, itk::EventObject
   {
 

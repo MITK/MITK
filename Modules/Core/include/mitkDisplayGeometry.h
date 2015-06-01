@@ -61,6 +61,12 @@ namespace mitk
 
  \ingroup Geometry
  */
+
+/**
+* \deprecatedSince{2015_05} DisplayGeometry is deprecated. It will become obsolete, as functions will be implemented in mitk::BaseRenderer and
+* mitk::CameraController.
+*/
+
   class MITKCORE_EXPORT DisplayGeometry : public PlaneGeometry
   {
   public:

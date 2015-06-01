@@ -24,6 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+/**
+* \deprecatedSince{2015_05} WiiMoteButtonEvent is deprecated. It will be removed in the next release.
+*/
   /**
   * This event type is used for button events triggered by the <br>
   * the Wiimote driver.

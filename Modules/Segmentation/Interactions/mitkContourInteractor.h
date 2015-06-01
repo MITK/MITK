@@ -27,6 +27,12 @@ namespace mitk {
   //##Documentation
   //## @brief Interactor for the creation of an mitk::Contour
   //## @ingroup Interaction
+
+/**
+* \deprecatedSince{2015_05} ContourInteractor is deprecated. It will be removed in the next release.
+*  It will be integrated into an updated the mitk::ContourModelInteractor.
+*/
+
   class MITKSEGMENTATION_EXPORT ContourInteractor : public mitk::Interactor
   {
   public:

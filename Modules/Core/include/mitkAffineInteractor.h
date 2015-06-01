@@ -40,6 +40,11 @@ itkEventMacro(RotateEvent, AffineInteractionEvent);
 itkEventMacro(TranslateEvent, AffineInteractionEvent);
 #pragma GCC visibility pop
 
+/**
+* \deprecatedSince{2015_05} AffineInteractor is deprecated. It will be removed in the next release.
+*  Refer to mitk::AffineDataInteractor3D for a substitude.
+*/
+
 class MITKCORE_EXPORT AffineInteractor : public Interactor
 {
 public:

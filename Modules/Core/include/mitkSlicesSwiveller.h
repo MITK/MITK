@@ -61,6 +61,11 @@ namespace mitk {
  *
  * \sa SlicesRotator
  */
+
+/**
+* \deprecatedSince{2015_05} SlicesSwiveller is deprecated. Class will be removed and funtionality will move into mitk::DisplayInteractor.
+*/
+
 class MITKCORE_EXPORT SlicesSwiveller : public SlicesCoordinator
 {
 public:

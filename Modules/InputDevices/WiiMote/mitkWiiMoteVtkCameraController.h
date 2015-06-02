@@ -29,6 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+/**
+ * \deprecatedSince{2015_05} WiiMoteVtkCameraController is deprecated. It will be removed in the next release.
+ */
   class mitkWiiMote_EXPORT WiiMoteVtkCameraController : public CameraController
   {
 

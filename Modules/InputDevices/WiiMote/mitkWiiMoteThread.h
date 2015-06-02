@@ -32,6 +32,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itksys/SystemTools.hxx" // used for GetTime() and Delay();
 
 
+/**
+ * \deprecatedSince{2015_05} WiiMoteThread is deprecated. It will be removed in the next release.
+ */
+
 namespace mitk
 {
   // instead of include, enables this class to know the addon

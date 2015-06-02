@@ -28,6 +28,10 @@ namespace mitk{
   class StateMachineAction;
   class InteractionEvent;
 
+  /**
+  * \deprecatedSince{2015_05} RegionGrow3DTool is deprecated. Class will be removed, code is obsolete.
+  */
+
   class MITKSEGMENTATION_EXPORT RegionGrow3DTool : public Tool
   {
   public:

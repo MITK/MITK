@@ -49,6 +49,10 @@ namespace mitk
    *
    * \ingroup Interaction
    */
+  /**
+  * \deprecatedSince{2015_05} MoveBaseDataInteractor is deprecated. It will be removed in the next release.
+  *  Refer to mitk::mitk::AffineDataInteractor3D as a substitude.
+  */
   class MITKCORE_EXPORT MoveBaseDataInteractor : public Interactor
   {
   public:

@@ -41,7 +41,7 @@ public:
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
-    return berry::IPreferences::Pointer(0);
+    return berry::IPreferences::Pointer(nullptr);
   }
 
   bool GetOpenEditor() const

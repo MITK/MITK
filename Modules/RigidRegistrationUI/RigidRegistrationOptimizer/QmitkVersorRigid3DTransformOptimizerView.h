@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkVersorRigid3DTransformOptimizerView : 
 
 public:
 
-  QmitkVersorRigid3DTransformOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkVersorRigid3DTransformOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkVersorRigid3DTransformOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

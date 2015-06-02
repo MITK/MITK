@@ -30,9 +30,9 @@ class MITKQTWIDGETSEXT_EXPORT QmitkHotkeyLineEdit : public QLineEdit
 public:
   static const std::string TOOLTIP;
 
-  QmitkHotkeyLineEdit(QWidget* parent = 0);
-  QmitkHotkeyLineEdit(const QKeySequence& _QKeySequence, QWidget* parent = 0);
-  QmitkHotkeyLineEdit(const QString& _QString, QWidget* parent = 0);
+  QmitkHotkeyLineEdit(QWidget* parent = nullptr);
+  QmitkHotkeyLineEdit(const QKeySequence& _QKeySequence, QWidget* parent = nullptr);
+  QmitkHotkeyLineEdit(const QString& _QString, QWidget* parent = nullptr);
 
   virtual void SetKeySequence(const QKeySequence& _QKeySequence);
   virtual void SetKeySequence(const QString& _QKeySequenceAsString);

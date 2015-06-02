@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 
 mitk::ExtractDirectedPlaneImageFilterNew::ExtractDirectedPlaneImageFilterNew()
-:m_CurrentWorldPlaneGeometry(NULL),
+:m_CurrentWorldPlaneGeometry(nullptr),
 m_ActualInputTimestep(0)
 {
   MITK_WARN << "Class ExtractDirectedPlaneImageFilterNew is deprecated! Use ExtractSliceFilter instead.";
@@ -223,7 +223,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (const itk::Im
     }
 
     Image::Pointer resultImage = ImageToImageFilter::GetOutput();
-    GrabItkImageMemory(resultSlice, resultImage, NULL, false);
+    GrabItkImageMemory(resultSlice, resultImage, nullptr, false);
     resultImage->SetClonedGeometry(newSliceGeometryTest);
     //Workaround because of BUG (#6505)
     resultImage->GetGeometry()->GetIndexToWorldTransform()->SetMatrix(tempTransform);

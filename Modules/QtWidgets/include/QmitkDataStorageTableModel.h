@@ -48,8 +48,8 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageTableModel : public QAbstractTableMod
     /// this list.
     /// \see setPredicate()
     ///
-    QmitkDataStorageTableModel(mitk::DataStorage::Pointer _DataStorage, mitk::NodePredicateBase* _Predicate = 0
-      , QObject* parent = 0 );
+    QmitkDataStorageTableModel(mitk::DataStorage::Pointer _DataStorage, mitk::NodePredicateBase* _Predicate = nullptr
+      , QObject* parent = nullptr );
 
     ///
     /// Standard dtor. Delete predicate, disconnect from DataStorage.

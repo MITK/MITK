@@ -36,27 +36,27 @@ public:
   ExtensionHandle(const SmartPointer<const IObjectManager>& objectManager, int id);
   ExtensionHandle(const IObjectManager* objectManager, int id);
 
-  QString GetNamespaceIdentifier() const;
+  QString GetNamespaceIdentifier() const override;
 
-  SmartPointer<IContributor> GetContributor() const;
+  SmartPointer<IContributor> GetContributor() const override;
 
-  QString GetExtensionPointUniqueIdentifier() const;
+  QString GetExtensionPointUniqueIdentifier() const override;
 
-  QString GetLabel() const;
+  QString GetLabel() const override;
 
   QString GetLabelAsIs() const;
 
   QString GetLabel(const QLocale& locale) const;
 
-  QString GetSimpleIdentifier() const;
+  QString GetSimpleIdentifier() const override;
 
-  QString GetUniqueIdentifier() const;
+  QString GetUniqueIdentifier() const override;
 
-  QList<SmartPointer<IConfigurationElement> > GetConfigurationElements() const;
+  QList<SmartPointer<IConfigurationElement> > GetConfigurationElements() const override;
 
-  bool IsValid() const;
+  bool IsValid() const override;
 
-  SmartPointer<RegistryObject> GetObject() const;
+  SmartPointer<RegistryObject> GetObject() const override;
 
 protected:
 

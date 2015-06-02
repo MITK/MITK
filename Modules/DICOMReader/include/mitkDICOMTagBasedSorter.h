@@ -55,6 +55,7 @@ class MITKDICOMREADER_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
         /// \brief Implements the "processing".
         virtual std::string operator()(const std::string&) const = 0;
         virtual TagValueProcessor* Clone() const = 0;
+        virtual ~TagValueProcessor() {}
     };
 
     /**
@@ -79,7 +80,7 @@ class MITKDICOMREADER_EXPORT DICOMTagBasedSorter : public DICOMDatasetSorter
     /**
       \brief Datasets that differ in given tag's value will be sorted into separate outputs.
     */
-    void AddDistinguishingTag( const DICOMTag&, TagValueProcessor* tagValueProcessor = NULL );
+    void AddDistinguishingTag( const DICOMTag&, TagValueProcessor* tagValueProcessor = nullptr );
     DICOMTagList GetDistinguishingTags() const;
     const TagValueProcessor* GetTagValueProcessorForDistinguishingTag(const DICOMTag&) const;
 

@@ -61,6 +61,14 @@ if(NOT DEFINED ITK_DIR)
     )
   endif()
 
+  # this will be in ITK 4.8, see https://issues.itk.org/jira/browse/ITK-3361
+  set(vcl_gcc5_patch)
+  if(GCC_VERSION VERSION_GREATER 4)
+    set(vcl_gcc5_patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1-gcc-5.patch
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.7.1-20c0592.tar.gz
@@ -68,6 +76,7 @@ if(NOT DEFINED ITK_DIR)
      # work with external GDCM
      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1.patch
                    ${vcl_constexpr_patch}
+                   ${vcl_gcc5_patch}
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}

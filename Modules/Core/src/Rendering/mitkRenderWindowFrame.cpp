@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::RenderWindowFrame::RenderWindowFrame()
 {
-  m_RenderWindow           = NULL;
+  m_RenderWindow           = nullptr;
   m_RectangleRenderer      = vtkSmartPointer<vtkRenderer>::New();
 
   m_IsEnabled         = false;
@@ -31,7 +31,7 @@ mitk::RenderWindowFrame::RenderWindowFrame()
 
 mitk::RenderWindowFrame::~RenderWindowFrame()
 {
-  if ( m_RenderWindow != NULL )
+  if ( m_RenderWindow != nullptr )
     if ( this->IsEnabled() )
       this->Disable();
 }
@@ -86,7 +86,6 @@ void mitk::RenderWindowFrame::Disable()
 void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
 {
   vtkSmartPointer<vtkMitkRectangleProp> rect = vtkSmartPointer<vtkMitkRectangleProp>::New();
-  rect->SetRenderWindow(m_RenderWindow);
   rect->SetColor(col1, col2, col3);
 
   m_RectangleRenderer->AddActor(rect);

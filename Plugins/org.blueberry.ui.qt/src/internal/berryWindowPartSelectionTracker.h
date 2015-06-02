@@ -88,7 +88,7 @@ public:
     /*
      * @see AbstractPartSelectionTracker#getSelection()
      */
-    ISelection::ConstPointer GetSelection();
+    ISelection::ConstPointer GetSelection() override;
 
 
 protected:

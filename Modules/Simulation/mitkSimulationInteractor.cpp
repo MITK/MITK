@@ -134,7 +134,7 @@ void mitk::SimulationInteractor::Impl::Initialize(const Node::SPtr rootNode)
 
   typedef ComponentMouseInteraction::ComponentMouseInteractionFactory Factory;
   const Factory* factory = Factory::getInstance();
-  
+
   for (Factory::const_iterator it = factory->begin(); it != factory->end(); ++it)
     m_InteractionComponents.push_back(it->second->createInstance(NULL));
 
@@ -166,7 +166,7 @@ void mitk::SimulationInteractor::Impl::Uninitialize()
     m_PickRayModel.reset();
     m_PickRayContainer.reset();
     m_MouseNode.reset();
-    m_RootNode.reset();    
+    m_RootNode.reset();
   }
 }
 
@@ -479,7 +479,7 @@ void mitk::SimulationInteractor::DataNodeChanged()
     {
       m_Impl->Initialize(simulation->GetRootNode());
       return;
-    }    
+    }
   }
 
   m_Impl->Uninitialize();

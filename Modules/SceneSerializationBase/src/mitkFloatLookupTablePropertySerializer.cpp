@@ -35,17 +35,17 @@ class FloatLookupTablePropertySerializer : public BasePropertySerializer
     virtual TiXmlElement* Serialize() override
     {
       const FloatLookupTableProperty* prop = dynamic_cast<const FloatLookupTableProperty*>(m_Property.GetPointer());
-      if (prop == NULL)
-        return NULL;
+      if (prop == nullptr)
+        return nullptr;
       FloatLookupTable lut = prop->GetValue();
       //if (lut.IsNull())
       //  return NULL; // really?
       const FloatLookupTable::LookupTableType& map = lut.GetLookupTable();
 
-      TiXmlElement* element = new TiXmlElement("FloatLookupTableTable");
-      for (FloatLookupTable::LookupTableType::const_iterator it = map.begin(); it != map.end(); ++it)
+      auto  element = new TiXmlElement("FloatLookupTableTable");
+      for (auto it = map.begin(); it != map.end(); ++it)
         {
-          TiXmlElement* tableEntry = new TiXmlElement("LUTValue");
+          auto  tableEntry = new TiXmlElement("LUTValue");
           tableEntry->SetAttribute("id", it->first);
           tableEntry->SetDoubleAttribute("value", static_cast<double>(it->second));
           element->LinkEndChild( tableEntry );
@@ -56,19 +56,19 @@ class FloatLookupTablePropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element)
-        return NULL;
+        return nullptr;
 
       FloatLookupTable lut;
-      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != NULL; child = child->NextSiblingElement("LUTValue"))
+      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != nullptr; child = child->NextSiblingElement("LUTValue"))
       {
 
         int tempID;
         if (child->QueryIntAttribute("id", &tempID) == TIXML_WRONG_TYPE)
-          return NULL; // TODO: can we do a better error handling?
+          return nullptr; // TODO: can we do a better error handling?
         FloatLookupTable::IdentifierType id = static_cast<FloatLookupTable::IdentifierType>(tempID);
         float tempVal = -1.0;
         if (child->QueryFloatAttribute("value", &tempVal) == TIXML_WRONG_TYPE)
-          return NULL; // TODO: can we do a better error handling?
+          return nullptr; // TODO: can we do a better error handling?
         FloatLookupTable::ValueType val = static_cast<FloatLookupTable::ValueType>(tempVal);
         lut.SetTableValue(id, val);
       }

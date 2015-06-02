@@ -17,52 +17,103 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRdfNode.h"
 
 #include <stdio.h>
+#include <ostream>
 #include <ctype.h>
-#include <string.h>
 #include <stdarg.h>
 
 #include <redland.h>
 
 namespace mitk {
 
-bool RdfNode::dummy()
-{
-  librdf_world* world;
-  librdf_storage *storage;
-  librdf_model* model;
-  librdf_statement* statement;
-  raptor_world *raptor_world_ptr;
-  raptor_iostream* iostr;
-  
-  world=librdf_new_world();
-  librdf_world_open(world);
-  raptor_world_ptr = librdf_world_get_raptor(world);
+  RdfNode::RdfNode()
+    : m_Type(NOTHING)
+  {
+  }
 
-  model=librdf_new_model(world, storage=librdf_new_storage(world, "hashes", NULL, "hash-type='memory'"), NULL);
+  RdfNode::RdfNode(RdfUri uri)
+    : m_Type(URI), m_Value(uri.ToString())
+  {
+  }
 
-  librdf_model_add_statement(model, 
-                             statement=librdf_new_statement_from_nodes(world, librdf_new_node_from_uri_string(world, (const unsigned char*)"http://www.dajobe.org/"),
-                                                             librdf_new_node_from_uri_string(world, (const unsigned char*)"http://purl.org/dc/elements/1.1/creator"),
-                                                             librdf_new_node_from_literal(world, (const unsigned char*)"Dave Beckett", NULL, 0)
-                                                             )
-                             );
+  RdfNode::RdfNode(std::string text)
+    : m_Type(LITERAL), m_Value(text)
+  {
+  }
 
-  librdf_free_statement(statement);
+  RdfNode::RdfNode(std::string text, RdfUri dataType)
+    : m_Type(LITERAL), m_Value(text), m_Datatype(dataType)
+  {
+  }
 
-  iostr = raptor_new_iostream_to_file_handle(raptor_world_ptr, stdout);
-  librdf_model_write(model, iostr);
-  raptor_free_iostream(iostr);
-  
-  librdf_free_model(model);
-  librdf_free_storage(storage);
+  RdfNode::~RdfNode()
+  {
+  }
 
-  librdf_free_world(world);
+  void RdfNode::SetType(RdfNode::Type type)
+  {
+    m_Type = type;
+  }
 
-#ifdef LIBRDF_MEMORY_DEBUG
-  librdf_memory_report(stderr);
-#endif
+  void RdfNode::SetDatatype(RdfUri dataType)
+  {
+    m_Datatype = dataType;
+  }
 
-  return true;
-}
+  void RdfNode::SetValue(std::string value)
+  {
+    m_Value = value;
+  }
 
+  RdfNode::Type RdfNode::GetType() const
+  {
+    return m_Type;
+  }
+
+  RdfUri RdfNode::GetDatatype() const
+  {
+    return m_Datatype;
+  }
+
+  std::string RdfNode::GetValue() const
+  {
+    return m_Value;
+  }
+
+  bool RdfNode::operator==(const RdfNode &u) const
+  {
+    if (this->m_Type != u.m_Type) return false;
+    if (this->m_Value.compare(u.m_Value) != 0) return false;
+    if (this->m_Datatype != u.m_Datatype) return false;
+    return true;
+  }
+
+  bool RdfNode::operator!=(const RdfNode &u) const
+  {
+    return !operator==(u);
+  }
+
+  // Define outstream of a Node
+  std::ostream & operator<<(std::ostream &out, const RdfNode &n)
+  {
+    switch (n.GetType()) {
+    case RdfNode::NOTHING:
+      out << "[]";
+      break;
+    case RdfNode::URI:
+      if (n.GetValue() == "") {
+        out << "[empty-uri]";
+      } else {
+        out << "<" << n.GetValue() << ">";
+      }
+      break;
+    case RdfNode::LITERAL:
+      out << "\"" << n.GetValue() << "\"";
+      if (n.GetDatatype() != RdfUri()) out << "^^" << n.GetDatatype();
+      break;
+    case RdfNode::BLANK:
+      out << "[blank " << n.GetValue() << "]";
+      break;
+    }
+    return out;
+  }
 }

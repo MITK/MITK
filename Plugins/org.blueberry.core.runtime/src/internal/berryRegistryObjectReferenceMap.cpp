@@ -49,7 +49,7 @@ public:
   {
   }
 
-  RegistryObject::Pointer GetValue() const
+  RegistryObject::Pointer GetValue() const override
   {
     return value;
   }
@@ -73,7 +73,7 @@ public:
   {
   }
 
-  RegistryObject::Pointer GetValue() const
+  RegistryObject::Pointer GetValue() const override
   {
     return value.Lock();
   }
@@ -136,7 +136,7 @@ RegistryObjectReferenceMap::NewEntry(const SmartPointer<RegistryObject>& value) 
     return new SmartRef(value);
   case SOFT :
     return new WeakRef(value);
-  default: return NULL;
+  default: return nullptr;
   }
 }
 

@@ -34,7 +34,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDial
 
 public:
 
-  QmitkLevelWindowPresetDefinitionDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkLevelWindowPresetDefinitionDialog(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkLevelWindowPresetDefinitionDialog();
 
   void setPresets(std::map<std::string, double>& level, std::map<std::string, double>& window, QString initLevel, QString initWindow);
@@ -71,7 +71,7 @@ protected:
 
     PresetTableModel(std::map<std::string, double>& levels,
                      std::map<std::string, double>& windows,
-                     QObject* parent = 0);
+                     QObject* parent = nullptr);
 
     int rowCount(const QModelIndex&) const override;
     int columnCount(const QModelIndex&) const override;

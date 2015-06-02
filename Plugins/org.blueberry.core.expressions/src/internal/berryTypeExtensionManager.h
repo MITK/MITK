@@ -43,24 +43,24 @@ private:
   class NULL_PROPERTY_TESTER_ : public IPropertyTester
   {
   public:
-    bool Handles(const QString&  /*namespaze*/, const QString&  /*property*/)
+    bool Handles(const QString&  /*namespaze*/, const QString&  /*property*/) override
     {
       return false;
     }
-    bool IsInstantiated()
+    bool IsInstantiated() override
     {
       return true;
     }
-    bool IsDeclaringPluginActive()
+    bool IsDeclaringPluginActive() override
     {
       return true;
     }
-    IPropertyTester* Instantiate()
+    IPropertyTester* Instantiate() override
     {
       return this;
     }
     bool Test(Object::ConstPointer, const QString& /*property*/,
-              const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/)
+              const QList<Object::Pointer>&  /*args*/, Object::Pointer  /*expectedValue*/) override
     {
       return false;
     }
@@ -116,10 +116,10 @@ private:
 
   /*synchronized*/void InitializeCaches();
 
-  virtual void Added(const QList<SmartPointer<IExtension> >& extensions);
-  virtual void Removed(const QList<SmartPointer<IExtension> >& extensions);
-  virtual void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints);
-  virtual void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints);
+  virtual void Added(const QList<SmartPointer<IExtension> >& extensions) override;
+  virtual void Removed(const QList<SmartPointer<IExtension> >& extensions) override;
+  virtual void Added(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
+  virtual void Removed(const QList<SmartPointer<IExtensionPoint> >& extensionPoints) override;
 };
 
 }

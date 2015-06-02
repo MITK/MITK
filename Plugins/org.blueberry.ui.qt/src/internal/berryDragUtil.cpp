@@ -27,7 +27,7 @@ namespace berry
 const QString DragUtil::DROP_TARGET_ID =
     "org.blueberry.ui.internal.dropTarget";
 
-TestDropLocation::Pointer DragUtil::forcedDropTarget(0);
+TestDropLocation::Pointer DragUtil::forcedDropTarget(nullptr);
 
 QList<IDragOverListener*> DragUtil::defaultTargets = QList<IDragOverListener*>();
 
@@ -61,12 +61,12 @@ IDropTarget::Pointer DragUtil::GetDropTarget(const QList<IDragOverListener*>& to
     }
   }
 
-  return IDropTarget::Pointer(0);
+  return IDropTarget::Pointer(nullptr);
 }
 
 void DragUtil::AddDragTarget(QWidget* control, IDragOverListener* target)
 {
-  if (control == 0)
+  if (control == nullptr)
   {
     defaultTargets.push_back(target);
   }
@@ -86,7 +86,7 @@ void DragUtil::AddDragTarget(QWidget* control, IDragOverListener* target)
 
 void DragUtil::RemoveDragTarget(QWidget* control, IDragOverListener* target)
 {
-  if (control == 0)
+  if (control == nullptr)
   {
     defaultTargets.removeAll(target);
   }
@@ -99,7 +99,7 @@ void DragUtil::RemoveDragTarget(QWidget* control, IDragOverListener* target)
       if (targetList->empty())
       {
         Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetData(control,
-            DROP_TARGET_ID, Object::Pointer(0));
+            DROP_TARGET_ID, Object::Pointer(nullptr));
       }
     }
   }
@@ -109,7 +109,7 @@ QRect DragUtil::GetDisplayBounds(QWidget* boundsControl)
 {
   QWidget* parent = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetParent(
       boundsControl);
-  if (parent == 0)
+  if (parent == nullptr)
   {
     return Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetBounds(boundsControl);
   }
@@ -176,7 +176,7 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
   QWidget* startControl =
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetCursorControl();
 
-  if (startControl != 0 && allowSnapping)
+  if (startControl != nullptr && allowSnapping)
   {
     target = GetDropTarget(startControl, draggedItem, initialLocation,
         sourceBounds);
@@ -249,7 +249,7 @@ IDropTarget::Pointer DragUtil::DragToTarget(Object::Pointer draggedItem,
     dropTarget->DragFinished(false);
   }
 
-  return IDropTarget::Pointer(0);
+  return IDropTarget::Pointer(nullptr);
 }
 
 IDropTarget::Pointer DragUtil::GetDropTarget(QWidget* toSearch,
@@ -257,7 +257,7 @@ IDropTarget::Pointer DragUtil::GetDropTarget(QWidget* toSearch,
     const QRect& dragRectangle)
 {
   // Search for a listener by walking the control's parent hierarchy
-  for (QWidget* current = toSearch; current != 0; current = Tweaklets::Get(
+  for (QWidget* current = toSearch; current != nullptr; current = Tweaklets::Get(
       GuiWidgetsTweaklet::KEY)->GetParent(current))
   {
     TargetListType::Pointer targetList = GetTargetList(current);

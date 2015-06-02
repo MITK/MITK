@@ -60,7 +60,7 @@ public:
 
   void tearDown() override
   {
-    pointSet = NULL;
+    pointSet = nullptr;
     delete doOp;
   }
 

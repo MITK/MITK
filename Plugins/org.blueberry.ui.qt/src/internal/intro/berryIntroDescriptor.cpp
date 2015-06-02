@@ -33,7 +33,7 @@ IntroDescriptor::IntroDescriptor(IConfigurationElement::Pointer configElement)
   QString val = configElement->GetAttribute(WorkbenchRegistryConstants::ATT_CLASS);
   if (val.isEmpty())
   {
-    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, configElement->GetContributor()->GetName(), 0,
+    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, configElement->GetContributor()->GetName(), nullptr,
                                        QString("Invalid extension (Missing class name): ") + GetId()));
     throw CoreException(status);
   }
@@ -50,7 +50,7 @@ IntroContentDetector::Pointer IntroDescriptor::GetIntroContentDetector()
   QString val = element->GetAttribute(WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR);
   if (val.isEmpty())
   {
-    return IntroContentDetector::Pointer(0);
+    return IntroContentDetector::Pointer(nullptr);
   }
 
   IntroContentDetector::Pointer detector(

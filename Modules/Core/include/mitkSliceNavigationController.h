@@ -358,7 +358,7 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
       ReceptorMemberCommandPointer eventReceptorCommand =
         itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
-      unsigned long tag = AddObserver(GeometrySendEvent(NULL,0), eventReceptorCommand);
+      unsigned long tag = AddObserver(GeometrySendEvent(nullptr,0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
@@ -370,7 +370,7 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
       ReceptorMemberCommandPointer eventReceptorCommand =
         itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::UpdateGeometry);
-      unsigned long tag = AddObserver(GeometryUpdateEvent(NULL,0), eventReceptorCommand);
+      unsigned long tag = AddObserver(GeometryUpdateEvent(nullptr,0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
@@ -382,7 +382,7 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
       ReceptorMemberCommandPointer eventReceptorCommand =
         itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
-      unsigned long tag = AddObserver(GeometrySliceEvent(NULL,0), eventReceptorCommand);
+      unsigned long tag = AddObserver(GeometrySliceEvent(nullptr,0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
       if(connectSendEvent)
         ConnectGeometrySendEvent(receiver);
@@ -396,7 +396,7 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
       ReceptorMemberCommandPointer eventReceptorCommand =
         itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
-      unsigned long tag = AddObserver(GeometryTimeEvent(NULL,0), eventReceptorCommand);
+      unsigned long tag = AddObserver(GeometryTimeEvent(nullptr,0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
       if(connectSendEvent)
         ConnectGeometrySendEvent(receiver);
@@ -414,10 +414,10 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
     template <typename T>
     void Disconnect(T* receiver)
     {
-      ObserverTagsMapType::iterator i = m_ReceiverToObserverTagsMap.find(static_cast<void*>(receiver));
+      auto i = m_ReceiverToObserverTagsMap.find(static_cast<void*>(receiver));
       if (i == m_ReceiverToObserverTagsMap.end()) return;
       const std::list<unsigned long>& tags = i->second;
-      for (std::list<unsigned long>::const_iterator tagIter = tags.begin();
+      for (auto tagIter = tags.begin();
            tagIter != tags.end(); ++tagIter)
       {
         RemoveObserver(*tagIter);
@@ -521,7 +521,7 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
 
 
   protected:
-    SliceNavigationController(const char * type = NULL);
+    SliceNavigationController(const char * type = nullptr);
     virtual ~SliceNavigationController();
 
     mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition);

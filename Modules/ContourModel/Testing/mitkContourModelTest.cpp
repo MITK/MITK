@@ -45,7 +45,7 @@ static void TestSelectVertexAtIndex()
 
   contour->SelectVertexAt(0);
 
-  MITK_TEST_CONDITION(contour->GetSelectedVertex() != NULL, "Vertex was selected at index");
+  MITK_TEST_CONDITION(contour->GetSelectedVertex() != nullptr, "Vertex was selected at index");
 }
 
 
@@ -63,7 +63,7 @@ static void TestSelectVertexAtWorldposition()
   //same point is used here so the epsilon can be chosen very small
   contour->SelectVertexAt(p, 0.01);
 
-  MITK_TEST_CONDITION(contour->GetSelectedVertex() != NULL, "Vertex was selected at position");
+  MITK_TEST_CONDITION(contour->GetSelectedVertex() != nullptr, "Vertex was selected at position");
 }
 
 
@@ -260,7 +260,7 @@ static void TestSelectVertexAtWrongPosition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  MITK_TEST_CONDITION_REQUIRED(contour->GetSelectedVertex() == NULL, "selected vertex is NULL");
+  MITK_TEST_CONDITION_REQUIRED(contour->GetSelectedVertex() == nullptr, "selected vertex is NULL");
   mitk::Point3D p;
   p[0] = p[1] = p[2] = 0;
 
@@ -271,7 +271,7 @@ static void TestSelectVertexAtWrongPosition()
 
   contour->SelectVertexAt(p2, 0.1);
 
-  MITK_TEST_CONDITION(contour->GetSelectedVertex() == NULL, "Vertex was not selected");
+  MITK_TEST_CONDITION(contour->GetSelectedVertex() == nullptr, "Vertex was not selected");
 }
 
 

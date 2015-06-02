@@ -46,29 +46,29 @@ namespace mitk
     /*!
     \brief opens a connection to the ToF camera
     */
-    virtual bool OnConnectCamera();
+    virtual bool OnConnectCamera() override;
     /*!
     \brief closes the connection to the camera
     */
-    virtual bool DisconnectCamera();
+    virtual bool DisconnectCamera() override;
     /*!
     \brief starts the continuous updating of the camera.
     A separate thread updates the source data, the main thread processes the source data and creates images and coordinates
     */
-    virtual void StartCamera();
+    virtual void StartCamera() override;
     /*!
     \brief gets the amplitude data from the ToF camera as the strength of the active illumination of every pixel. Caution! The user is responsible for allocating and deleting the images.
     These values can be used to determine the quality of the distance values. The higher the amplitude value, the higher the accuracy of the according distance value
     \param imageSequence the actually captured image sequence number
     \param amplitudeArray contains the returned amplitude data as an array.
     */
-    virtual void GetAmplitudes(float* amplitudeArray, int& imageSequence);
+    virtual void GetAmplitudes(float* amplitudeArray, int& imageSequence) override;
     /*!
     \brief gets the intensity data from the ToF camera as a greyscale image. Caution! The user is responsible for allocating and deleting the images.
     \param intensityArray contains the returned intensities data as an array.
     \param imageSequence the actually captured image sequence number
     */
-    virtual void GetIntensities(float* intensityArray, int& imageSequence);
+    virtual void GetIntensities(float* intensityArray, int& imageSequence) override;
     /*!
     \brief gets the rgb data from the ToF camera. Caution! The user is responsible for allocating and deleting the images.
     \param rgbArray contains the returned rgb data as an array.
@@ -80,7 +80,7 @@ namespace mitk
     \param distanceArray contains the returned distances data as an array.
     \param imageSequence the actually captured image sequence number
     */
-    virtual void GetDistances(float* distanceArray, int& imageSequence);
+    virtual void GetDistances(float* distanceArray, int& imageSequence) override;
     /*!
     \brief gets the 3 images (distance, amplitude, intensity) from the ToF camera. Caution! The user is responsible for allocating and deleting the images.
     \param distanceArray contains the returned distance data as an array.
@@ -91,7 +91,7 @@ namespace mitk
     \param capturedImageSequence the actually captured image sequence number
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
-                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL);
+                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=NULL) override;
    /*!
     \brief Set file name where the data is recorded
     \param inputFileName name of input file which should be played
@@ -101,7 +101,7 @@ namespace mitk
     /*!
     \brief set a BaseProperty
     */
-    virtual void SetProperty( const char *propertyKey, BaseProperty* propertyValue );
+    virtual void SetProperty( const char *propertyKey, BaseProperty* propertyValue ) override;
 
   protected:
 
@@ -111,7 +111,7 @@ namespace mitk
     /*!
     \brief updates the camera for image acquisition
     */
-    virtual void UpdateCamera();
+    virtual void UpdateCamera() override;
     /*!
     \brief Thread method continuously acquiring images from the specified input file
     */

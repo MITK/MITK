@@ -54,16 +54,16 @@ public:
 
   SmartPointer<IConfigurationElement> GetExtensionElement();
 
-  bool Handles(const QString& namespaze, const QString& property);
+  bool Handles(const QString& namespaze, const QString& property) override;
 
-  bool IsInstantiated();
+  bool IsInstantiated() override;
 
-  bool IsDeclaringPluginActive();
+  bool IsDeclaringPluginActive() override;
 
-  IPropertyTester* Instantiate();
+  IPropertyTester* Instantiate() override;
 
   bool Test(Object::ConstPointer receiver, const QString& method,
-            const QList<Object::Pointer>& args, Object::Pointer expectedValue);
+            const QList<Object::Pointer>& args, Object::Pointer expectedValue) override;
 };
 
 }  // namespace berry

@@ -22,15 +22,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-StatusBarImplementation* StatusBar::m_Implementation = NULL;
-StatusBar* StatusBar::m_Instance = NULL;
+StatusBarImplementation* StatusBar::m_Implementation = nullptr;
+StatusBar* StatusBar::m_Instance = nullptr;
 
 /**
  * Display the text in the statusbar of the applikation
  */
 void StatusBar::DisplayText(const char* t)
 {
-    if (m_Implementation != NULL)
+    if (m_Implementation != nullptr)
         m_Implementation->DisplayText(t);
 }
 
@@ -39,48 +39,48 @@ void StatusBar::DisplayText(const char* t)
  */
 void StatusBar::DisplayText(const char* t, int ms)
 {
-  if (m_Implementation != NULL)
+  if (m_Implementation != nullptr)
     m_Implementation->DisplayText(t, ms);
 }
 
 void StatusBar::DisplayErrorText(const char *t)
 {
-  if (m_Implementation != NULL)
+  if (m_Implementation != nullptr)
     m_Implementation->DisplayErrorText(t);
 }
 void StatusBar::DisplayWarningText(const char *t)
 {
-  if (m_Implementation != NULL)
+  if (m_Implementation != nullptr)
     m_Implementation->DisplayWarningText(t);
 }
 void StatusBar::DisplayWarningText(const char *t, int ms)
 {
-  if (m_Implementation != NULL)
+  if (m_Implementation != nullptr)
     m_Implementation->DisplayWarningText(t, ms);
 }
 void StatusBar::DisplayGenericOutputText(const char *t)
 {
-  if (m_Implementation != NULL)
+  if (m_Implementation != nullptr)
     m_Implementation->DisplayGenericOutputText(t);
 }
 void StatusBar::DisplayDebugText(const char *t)
 {
-  if (m_Implementation != NULL)
+  if (m_Implementation != nullptr)
     m_Implementation->DisplayDebugText(t);
 }
 void StatusBar::DisplayGreyValueText(const char *t)
 {
-  if (m_Implementation != NULL)
+  if (m_Implementation != nullptr)
     m_Implementation->DisplayGreyValueText(t);
 }
 void StatusBar::Clear()
 {
-  if ( m_Implementation != NULL)
+  if ( m_Implementation != nullptr)
     m_Implementation->Clear();
 }
 void StatusBar::SetSizeGripEnabled(bool enable)
 {
-  if (m_Implementation != NULL)
+  if (m_Implementation != nullptr)
   {
     m_Implementation->SetSizeGripEnabled(enable);
   }
@@ -90,7 +90,7 @@ void StatusBar::SetSizeGripEnabled(bool enable)
  */
 StatusBar* StatusBar::GetInstance()
 {
-  if (m_Instance == NULL)//if not set, then send a errormessage on OutputWindow
+  if (m_Instance == nullptr)//if not set, then send a errormessage on OutputWindow
   {
     m_Instance = new StatusBar();
   }

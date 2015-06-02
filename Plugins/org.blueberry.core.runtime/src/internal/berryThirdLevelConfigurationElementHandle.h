@@ -32,11 +32,11 @@ public:
   ThirdLevelConfigurationElementHandle(const IObjectManager* objectManager, int id);
 
   using ConfigurationElementHandle::GetChildren;
-  QList<SmartPointer<IConfigurationElement> > GetChildren() const;
+  QList<SmartPointer<IConfigurationElement> > GetChildren() const override;
 
 protected:
 
-  SmartPointer<ConfigurationElement> GetConfigurationElement() const;
+  SmartPointer<ConfigurationElement> GetConfigurationElement() const override;
 
 };
 

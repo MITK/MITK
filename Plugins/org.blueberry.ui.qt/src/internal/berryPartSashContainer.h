@@ -74,9 +74,9 @@ protected:
   {
     ControlListener(PartSashContainer* partSashContainer);
 
-    Events::Types GetEventTypes() const;
+    Events::Types GetEventTypes() const override;
 
-    void ControlResized(GuiTk::ControlEvent::Pointer e);
+    void ControlResized(GuiTk::ControlEvent::Pointer e) override;
 
   private: PartSashContainer* partSashContainer;
   };
@@ -140,11 +140,11 @@ private:
 
     void SetTarget(Object::Pointer sourcePart, int side, int cursor, Object::Pointer targetPart);
 
-     void Drop();
+     void Drop() override;
 
-    CursorType GetCursor();
+    CursorType GetCursor() override;
 
-    QRect GetSnapRectangle();
+    QRect GetSnapRectangle() override;
 };
 
 
@@ -189,7 +189,7 @@ private:
    * Find the sashs around the specified part.
    */
 public:
-  void FindSashes(LayoutPart::Pointer pane, PartPane::Sashes& sashes);
+  void FindSashes(LayoutPart::Pointer pane, PartPane::Sashes& sashes) override;
 
 
 public:
@@ -197,7 +197,7 @@ public:
   /**
    * Add a part.
    */
-  virtual void Add(LayoutPart::Pointer child);
+  virtual void Add(LayoutPart::Pointer child) override;
 
   virtual void AddPart(LayoutPart::Pointer child);
 
@@ -294,7 +294,7 @@ public:
    * @see LayoutPart#getControl
    */
 public:
-  void CreateControl(QWidget* parentWidget);
+  void CreateControl(QWidget* parentWidget) override;
 
   /**
    * Subclasses override this method to specify
@@ -308,7 +308,7 @@ protected:
    * @see LayoutPart#dispose
    */
 public:
-  virtual void Dispose();
+  virtual void Dispose() override;
 
   /**
    * Subclasses override this method to dispose
@@ -327,7 +327,7 @@ public:
    * @see org.blueberry.ui.internal.LayoutPart#setVisible(boolean)
    */
 public:
-  void SetVisible(bool makeVisible);
+  void SetVisible(bool makeVisible) override;
 
   /**
    * Return the most bottom right part or null if none.
@@ -345,13 +345,13 @@ public:
    * @see ILayoutContainer#getChildren
    */
 public:
-  ChildrenType GetChildren() const;
+  ChildrenType GetChildren() const override;
 
   /**
    * @see LayoutPart#getControl
    */
 public:
-  QWidget* GetControl();
+  QWidget* GetControl() override;
 
 public:
   virtual SmartPointer<LayoutTree> GetLayoutTree();
@@ -385,13 +385,13 @@ protected:
    * @see org.blueberry.ui.internal.LayoutPart#forceLayout(org.blueberry.ui.internal.LayoutPart)
    */
 public:
-  void ResizeChild(LayoutPart::Pointer childThatChanged);
+  void ResizeChild(LayoutPart::Pointer childThatChanged) override;
 
   /**
    * Remove a part.
    */
 public:
-  void Remove(LayoutPart::Pointer child);
+  void Remove(LayoutPart::Pointer child) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#forceLayout()
@@ -403,7 +403,7 @@ public:
    * Replace one part with another.
    */
 public:
-  void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
+  void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild) override;
 
 private:
   void ResizeSashes();
@@ -418,16 +418,16 @@ private:
    */
 public:
   virtual int ComputePreferredSize(bool width, int availableParallel,
-      int availablePerpendicular, int preferredParallel);
+      int availablePerpendicular, int preferredParallel) override;
 
 public:
-  int GetSizeFlags(bool width);
+  int GetSizeFlags(bool width) override;
 
   /**
    * @see LayoutPart#setBounds
    */
 public:
-  void SetBounds(const QRect& r);
+  void SetBounds(const QRect& r) override;
 
   /**
    * Zoom in on a particular layout part.
@@ -575,7 +575,7 @@ public:
    */
 public:
   IDropTarget::Pointer Drag(QWidget* currentControl, const Object::Pointer& draggedObject,
-                            const QPoint& position, const QRect& dragRectangle);
+                            const QPoint& position, const QRect& dragRectangle) override;
 
   /**
    * @param sourcePart
@@ -647,7 +647,7 @@ protected:
    * @param buf
    */
 public:
-  void DescribeLayout(QString& buf) const;
+  void DescribeLayout(QString& buf) const override;
 
   /**
    * Adds a new child to the container relative to some part
@@ -673,25 +673,25 @@ protected:
    * @see org.blueberry.ui.internal.ILayoutContainer#allowsAutoFocus()
    */
 public:
-  bool AllowsAutoFocus();
+  bool AllowsAutoFocus() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#startDeferringEvents()
    */
 protected:
-  void StartDeferringEvents();
+  void StartDeferringEvents() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#handleDeferredEvents()
    */
 protected:
-  void HandleDeferredEvents();
+  void HandleDeferredEvents() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#testInvariants()
    */
 public:
-  void TestInvariants();
+  void TestInvariants() override;
 };
 
 }

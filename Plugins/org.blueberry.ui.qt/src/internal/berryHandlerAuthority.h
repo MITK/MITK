@@ -211,7 +211,7 @@ public:
 private:
 
   using IPropertyChangeListener::PropertyChange;
-  void PropertyChange(const SmartPointer<PropertyChangeEvent>& event);
+  void PropertyChange(const SmartPointer<PropertyChangeEvent>& event) override;
 
   /**
    * Evaluate the expression for the handler and bypass the result cache.

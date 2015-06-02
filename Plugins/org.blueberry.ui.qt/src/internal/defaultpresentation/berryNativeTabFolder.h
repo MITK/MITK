@@ -86,41 +86,41 @@ public:
 
   void UpdateColors();
 
-  void SetActive(int activeState);
+  void SetActive(int activeState) override;
 
-  bool eventFilter(QObject* watched, QEvent* event);
+  bool eventFilter(QObject* watched, QEvent* event) override;
 
   void CloseButtonClicked(AbstractTabItem* item);
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#computeSize(int, int)
    */
-  QSize ComputeSize(int widthHint, int heightHint);
+  QSize ComputeSize(int widthHint, int heightHint) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#add(int)
    */
-  AbstractTabItem* Add(int index, int flags);
+  AbstractTabItem* Add(int index, int flags) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#move(int, int)
    */
-  void Move(int from, int to);
+  void Move(int from, int to) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#layout(boolean)
    */
-  void Layout(bool flushCache);
+  void Layout(bool flushCache) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getPaneMenuLocation()
    */
-  QPoint GetPaneMenuLocation();
+  QPoint GetPaneMenuLocation() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setState(int)
    */
-  void SetState(int state);
+  void SetState(int state) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getClientArea()
@@ -130,17 +130,17 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getItems()
    */
-  QList<AbstractTabItem*> GetItems();
+  QList<AbstractTabItem*> GetItems() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setSelection(org.blueberry.ui.internal.presentations.util.Widget)
    */
-  void SetSelection(AbstractTabItem* toSelect);
+  void SetSelection(AbstractTabItem* toSelect) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setSelectedInfo(org.blueberry.ui.internal.presentations.util.PartInfo)
    */
-  void SetSelectedInfo(const PartInfo& info);
+  void SetSelectedInfo(const PartInfo& info) override;
 
   //    /* (non-Javadoc)
   //     * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getToolbarParent()
@@ -152,7 +152,7 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getTabArea()
    */
-  QRect GetTabArea();
+  QRect GetTabArea() override;
 
   //    /* (non-Javadoc)
   //     * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setToolbar(org.blueberry.swt.widgets.Control)
@@ -172,24 +172,24 @@ public:
   //        super.setToolbar(toolbarControl);
   //    }
 
-  QWidget* GetControl();
+  QWidget* GetControl() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#isOnBorder(org.blueberry.swt.graphics.Point)
    */
-  bool IsOnBorder(const QPoint& globalPos);
+  bool IsOnBorder(const QPoint& globalPos) override;
 
-  AbstractTabItem* GetSelection();
+  AbstractTabItem* GetSelection() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getContentParent()
    */
-  QWidget* GetContentParent();
+  QWidget* GetContentParent() override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#setContent(org.blueberry.swt.widgets.Control)
    */
-  void SetContent(QWidget* newContent);
+  void SetContent(QWidget* newContent) override;
 
   /**
    * @return
@@ -215,13 +215,13 @@ public:
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getItem(org.blueberry.swt.graphics.Point)
    */
-  AbstractTabItem* GetItem(const QPoint& toFind);
+  AbstractTabItem* GetItem(const QPoint& toFind) override;
 
   /**
    * @param enabled
    * @since 3.1
    */
-  void EnablePaneMenu(bool enabled);
+  void EnablePaneMenu(bool enabled) override;
 
 };
 

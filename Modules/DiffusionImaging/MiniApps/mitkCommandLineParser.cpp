@@ -313,14 +313,14 @@ mitkCommandLineParser::ctkInternal::argumentDescription(const string& argument)
     }
     else if (!LongPrefix.empty() && !ShortPrefix.empty())
     {
-        return 0;
+        return nullptr;
     }
 
     if (ArgNameToArgumentDescriptionMap.count(unprefixedArg))
     {
         return this->ArgNameToArgumentDescriptionMap[unprefixedArg];
     }
-    return 0;
+    return nullptr;
 }
 
 // --------------------------------------------------------------------------
@@ -364,7 +364,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
     }
     bool error = false;
     bool ignoreRest = false;
-    CommandLineParserArgumentDescription * currentArgDesc = 0;
+    CommandLineParserArgumentDescription * currentArgDesc = nullptr;
     vector<CommandLineParserArgumentDescription*> parsedArgDescriptions;
     for(unsigned int i = 1; i < arguments.size(); ++i)
     {
@@ -652,7 +652,7 @@ void mitkCommandLineParser::addArgument(const string& longarg, const string& sho
     added = this->Internal->ArgNameToArgumentDescriptionMap.count(shortarg);
     if (added) { return; }
 
-    CommandLineParserArgumentDescription* argDesc =
+    auto  argDesc =
             new CommandLineParserArgumentDescription(longarg, this->Internal->LongPrefix,
                                                      shortarg, this->Internal->ShortPrefix, type,
                                                      argHelp, argLabel, defaultValue, ignoreRest, deprecated, optional, ParameterGroupName, ParameterGroupDescription);

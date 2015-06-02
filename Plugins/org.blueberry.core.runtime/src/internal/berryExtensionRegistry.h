@@ -228,77 +228,77 @@ public:
 
   SmartPointer<RegistryObjectManager> GetObjectManager() const;
 
-  void AddListener(IRegistryEventListener* listener, const QString& extensionPointId = QString());
-  void AddListener(IRegistryEventListener *listener, const IExtensionPointFilter& filter);
+  void AddListener(IRegistryEventListener* listener, const QString& extensionPointId = QString()) override;
+  void AddListener(IRegistryEventListener *listener, const IExtensionPointFilter& filter) override;
 
   /*
    * @see IExtensionRegistry#getConfigurationElementsFor(java.lang.  QString)
    */
-  QList<SmartPointer<IConfigurationElement> > GetConfigurationElementsFor(const QString& extensionPointId) const;
+  QList<SmartPointer<IConfigurationElement> > GetConfigurationElementsFor(const QString& extensionPointId) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getConfigurationElementsFor(java.lang.  QString, java.lang.  QString)
    */
   QList<SmartPointer<IConfigurationElement> > GetConfigurationElementsFor(const QString& pluginId,
-                                                                          const QString& extensionPointSimpleId) const;
+                                                                          const QString& extensionPointSimpleId) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getConfigurationElementsFor(java.lang.  QString, java.lang.  QString, java.lang.  QString)
    */
   QList<SmartPointer<IConfigurationElement> > GetConfigurationElementsFor(const QString& pluginId,
                                                                           const QString& extensionPointName,
-                                                                          const QString& extensionId) const;
+                                                                          const QString& extensionId) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtension(java.lang.  QString)
    */
-  SmartPointer<IExtension> GetExtension(const QString& extensionId) const;
+  SmartPointer<IExtension> GetExtension(const QString& extensionId) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtension(java.lang.  QString, java.lang.  QString)
    */
-  SmartPointer<IExtension> GetExtension(const QString& extensionPointId, const QString& extensionId) const;
+  SmartPointer<IExtension> GetExtension(const QString& extensionPointId, const QString& extensionId) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtension(java.lang.  QString, java.lang.  QString, java.lang.  QString)
    */
   SmartPointer<IExtension> GetExtension(const QString& pluginId,
                                         const QString& extensionPointName,
-                                        const QString& extensionId) const;
+                                        const QString& extensionId) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtensionPoint(java.lang.  QString)
    */
-  SmartPointer<IExtensionPoint> GetExtensionPoint(const QString& xptUniqueId) const;
+  SmartPointer<IExtensionPoint> GetExtensionPoint(const QString& xptUniqueId) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtensionPoint(java.lang.  QString, java.lang.  QString)
    */
-  SmartPointer<IExtensionPoint> GetExtensionPoint(const QString& elementName, const QString& xpt) const;
+  SmartPointer<IExtensionPoint> GetExtensionPoint(const QString& elementName, const QString& xpt) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtensionPoints()
    */
-  QList<SmartPointer<IExtensionPoint> > GetExtensionPoints() const;
+  QList<SmartPointer<IExtensionPoint> > GetExtensionPoints() const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtensionPoints(java.lang.  QString)
    */
-  QList<SmartPointer<IExtensionPoint> > GetExtensionPoints(const QString& namespaceName) const;
+  QList<SmartPointer<IExtensionPoint> > GetExtensionPoints(const QString& namespaceName) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getExtensions(java.lang.  QString)
    */
-  QList<SmartPointer<IExtension> > GetExtensions(const QString& namespaceName) const;
+  QList<SmartPointer<IExtension> > GetExtensions(const QString& namespaceName) const override;
 
-  QList<SmartPointer<IExtension> > GetExtensions(const SmartPointer<IContributor>& contributor) const;
+  QList<SmartPointer<IExtension> > GetExtensions(const SmartPointer<IContributor>& contributor) const override;
 
-  QList<SmartPointer<IExtensionPoint> > GetExtensionPoints(const SmartPointer<IContributor>& contributor) const;
+  QList<SmartPointer<IExtensionPoint> > GetExtensionPoints(const SmartPointer<IContributor>& contributor) const override;
 
   /*
    * @see org.eclipse.core.runtime.IExtensionRegistry#getNamespaces()
    */
-  QList<QString> GetNamespaces() const;
+  QList<QString> GetNamespaces() const override;
 
   bool HasContributor(const SmartPointer<IContributor>& contributor) const;
 
@@ -318,7 +318,7 @@ public:
    */
   void Remove(const QString& removedContributorId);
 
-  void RemoveListener(IRegistryEventListener* listener);
+  void RemoveListener(IRegistryEventListener* listener) override;
 
   ExtensionRegistry(RegistryStrategy* registryStrategy, QObject* masterToken, QObject* userToken);
 
@@ -329,7 +329,7 @@ public:
    * close cache and dispose of listeners.
    * @param key - key token for this registry
    */
-  void Stop(QObject* key);
+  void Stop(QObject* key) override;
 
   /*
    * Clear the registry cache files from the file manager so on next start-up we recompute it.
@@ -376,7 +376,7 @@ public:
                        QTranslator* translationBundle, QObject* key, long timestamp);
 
   bool AddContribution(QIODevice* is, const SmartPointer<IContributor>& contributor, bool persist,
-                       const QString& contributionName, QTranslator* translationBundle, QObject* key);
+                       const QString& contributionName, QTranslator* translationBundle, QObject* key) override;
 
   /**
    * Adds an extension point to the extension registry.
@@ -430,13 +430,13 @@ public:
                     bool persist, const QString& label, const QString& extensionPointId,
                     const ConfigurationElementDescription& configurationElements, QObject* token);
 
-  bool RemoveExtension(const SmartPointer<IExtension>& extension, QObject* token);
+  bool RemoveExtension(const SmartPointer<IExtension>& extension, QObject* token) override;
 
-  bool RemoveExtensionPoint(const SmartPointer<IExtensionPoint>& extensionPoint, QObject* token);
+  bool RemoveExtensionPoint(const SmartPointer<IExtensionPoint>& extensionPoint, QObject* token) override;
 
   QList<SmartPointer<IContributor> > GetAllContributors() const;
 
-  bool IsMultiLanguage() const;
+  bool IsMultiLanguage() const override;
 
   QList<QString> Translate(const QList<QString>& nonTranslated, const SmartPointer<IContributor>& contributor,
                            const QLocale& locale) const;

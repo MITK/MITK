@@ -52,7 +52,7 @@ public:
 
   }
 
-  void run()
+  void run() override
   {
     poco_assert(workbench->Close());
   }

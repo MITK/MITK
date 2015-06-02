@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkTranslationTransformView : public Qmit
 
 public:
 
-  QmitkTranslationTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkTranslationTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkTranslationTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

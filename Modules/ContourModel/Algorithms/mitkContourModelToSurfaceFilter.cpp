@@ -60,7 +60,7 @@ void mitk::ContourModelToSurfaceFilter::SetInput ( unsigned int idx, const mitk:
 const mitk::ContourModelToSurfaceFilter::InputType* mitk::ContourModelToSurfaceFilter::GetInput( void )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ContourModelToSurfaceFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
 
@@ -69,7 +69,7 @@ const mitk::ContourModelToSurfaceFilter::InputType* mitk::ContourModelToSurfaceF
 const mitk::ContourModelToSurfaceFilter::InputType* mitk::ContourModelToSurfaceFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ContourModelToSurfaceFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
 
@@ -103,9 +103,9 @@ void mitk::ContourModelToSurfaceFilter::GenerateData()
     }
 
     //iterate over all control points
-    mitk::ContourModel::VertexIterator current = inputContour->IteratorBegin(currentTimeStep);
+    auto current = inputContour->IteratorBegin(currentTimeStep);
 
-    mitk::ContourModel::VertexIterator end = inputContour->IteratorEnd(currentTimeStep);
+    auto end = inputContour->IteratorEnd(currentTimeStep);
 
     vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();
     polygon->GetPointIds()->SetNumberOfIds(inputContour->GetNumberOfVertices(currentTimeStep));

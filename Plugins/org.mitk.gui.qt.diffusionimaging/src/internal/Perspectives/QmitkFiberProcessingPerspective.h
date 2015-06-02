@@ -30,7 +30,7 @@ public:
   QmitkFiberProcessingPerspective();
   QmitkFiberProcessingPerspective(const QmitkFiberProcessingPerspective& other);
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
 #endif /* QmitkFiberProcessingPerspective_H_ */

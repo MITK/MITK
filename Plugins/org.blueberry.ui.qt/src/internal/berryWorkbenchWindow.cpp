@@ -67,10 +67,10 @@ const ActionBarAdvisor::FillFlags WorkbenchWindow::FILL_ALL_ACTION_BARS =
     ActionBarAdvisor::FILL_STATUS_LINE;
 
 WorkbenchWindow::WorkbenchWindow(int number)
-  : Window(Shell::Pointer(0))
-  , pageComposite(0)
-  , windowAdvisor(0)
-  , actionBarAdvisor(0)
+  : Window(Shell::Pointer(nullptr))
+  , pageComposite(nullptr)
+  , windowAdvisor(nullptr)
+  , actionBarAdvisor(nullptr)
   , number(number)
   , largeUpdates(0)
   , closing(false)
@@ -80,7 +80,7 @@ WorkbenchWindow::WorkbenchWindow(int number)
   , perspectiveBarVisible(true)
   , statusLineVisible(true)
   , emptyWindowContentsCreated(false)
-  , emptyWindowContents(0)
+  , emptyWindowContents(nullptr)
   , asMaximizedState(false)
   , partService(this)
   , serviceLocatorOwner(new ServiceLocatorOwner(this))
@@ -158,7 +158,7 @@ bool WorkbenchWindow::ClosePage(IWorkbenchPage::Pointer in, bool save)
   bool oldIsActive = (oldPage == this->GetActivePage());
   if (oldIsActive)
   {
-    this->SetActivePage(IWorkbenchPage::Pointer(0));
+    this->SetActivePage(IWorkbenchPage::Pointer(nullptr));
   }
 
   // Close old page.
@@ -548,7 +548,7 @@ bool WorkbenchWindow::HardClose()
     //getWindowAdvisor().dispose();
     //detachedWindowShells.dispose();
     delete windowAdvisor;
-    windowAdvisor = 0;
+    windowAdvisor = nullptr;
 
     // Null out the progress region. Bug 64024.
     //progressRegion = null;
@@ -589,7 +589,7 @@ bool WorkbenchWindow::HardClose()
 void WorkbenchWindow::CloseAllPages()
 {
   // Deactivate active page.
-  this->SetActivePage(IWorkbenchPage::Pointer(0));
+  this->SetActivePage(IWorkbenchPage::Pointer(nullptr));
 
   // Clone and deref all so that calls to getPages() returns
   // empty list (if called by pageClosed event handlers)
@@ -727,10 +727,10 @@ QWidget* WorkbenchWindow::GetPageComposite()
 
 QWidget *WorkbenchWindow::CreatePageComposite(QWidget *parent)
 {
-  QtControlWidget* pageArea = new QtControlWidget(parent, 0);
+  auto   pageArea = new QtControlWidget(parent, nullptr);
   pageArea->setObjectName("Page Composite");
   new QHBoxLayout(pageArea);
-  if (qobject_cast<QMainWindow*> (parent) != 0)
+  if (qobject_cast<QMainWindow*> (parent) != nullptr)
     qobject_cast<QMainWindow*> (parent)->setCentralWidget(pageArea);
   else
     parent->layout()->addWidget(pageArea);
@@ -748,7 +748,7 @@ QWidget* WorkbenchWindow::CreateContents(Shell::Pointer parent)
   // we know from Window.create that the parent is a Shell.
   this->GetWindowAdvisor()->CreateWindowContents(parent);
   // the page composite must be set by createWindowContents
-  poco_assert(pageComposite != 0)
+  poco_assert(pageComposite != nullptr)
 ; // "createWindowContents must call configurer.createPageComposite"); //$NON-NLS-1$
   return pageComposite;
 }
@@ -1087,7 +1087,7 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     }
 
     // Get the input factory.
-    IAdaptable* input = 0;
+    IAdaptable* input = nullptr;
     IMemento::Pointer inputMem = pageMem->GetChild(WorkbenchConstants::TAG_INPUT);
     if (inputMem)
     {
@@ -1635,7 +1635,7 @@ WorkbenchAdvisor* WorkbenchWindow::GetAdvisor()
 
 WorkbenchWindowAdvisor* WorkbenchWindow::GetWindowAdvisor()
 {
-  if (windowAdvisor == 0)
+  if (windowAdvisor == nullptr)
   {
     windowAdvisor = this->GetAdvisor()->CreateWorkbenchWindowAdvisor(this->GetWindowConfigurer());
     poco_check_ptr(windowAdvisor);
@@ -1676,10 +1676,10 @@ void WorkbenchWindow::HideEmptyWindowContents()
 {
   if (emptyWindowContentsCreated)
   {
-    if (emptyWindowContents != 0)
+    if (emptyWindowContents != nullptr)
     {
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->Dispose(emptyWindowContents);
-      emptyWindowContents = 0;
+      emptyWindowContents = nullptr;
       //this->GetPageComposite().layout();
     }
     emptyWindowContentsCreated = false;
@@ -1729,7 +1729,7 @@ bool WorkbenchWindow::PageList::Remove(IWorkbenchPage::Pointer object)
 {
   if (active == object)
   {
-    active = 0;
+    active = nullptr;
   }
   pagesInActivationOrder.removeAll(object);
   const int origSize = pagesInCreationOrder.size();
@@ -1741,7 +1741,7 @@ void WorkbenchWindow::PageList::Clear()
 {
   pagesInCreationOrder.clear();
   pagesInActivationOrder.clear();
-  active = 0;
+  active = nullptr;
 }
 
 bool WorkbenchWindow::PageList::IsEmpty()
@@ -1781,7 +1781,7 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
   {
     if (pagesInActivationOrder.empty())
     {
-      return WorkbenchPage::Pointer(0);
+      return WorkbenchPage::Pointer(nullptr);
     }
 
     return pagesInActivationOrder.back().Cast<WorkbenchPage>();
@@ -1789,7 +1789,7 @@ WorkbenchPage::Pointer WorkbenchWindow::PageList::GetNextActive()
 
   if (pagesInActivationOrder.size() < 2)
   {
-    return WorkbenchPage::Pointer(0);
+    return WorkbenchPage::Pointer(nullptr);
   }
 
   return pagesInActivationOrder.at(pagesInActivationOrder.size()-2).Cast<WorkbenchPage>();
@@ -1803,7 +1803,7 @@ bool WorkbenchWindow::UpdatesDeferred() const
 void WorkbenchWindow::InitializeDefaultServices()
 {
   workbenchLocationService.reset(
-        new WorkbenchLocationService(IServiceScopes::WINDOW_SCOPE, GetWorkbench(), this, NULL, 1));
+        new WorkbenchLocationService(IServiceScopes::WINDOW_SCOPE, GetWorkbench(), this, nullptr, 1));
   workbenchLocationService->Register();
   serviceLocator->RegisterService(workbenchLocationService.data());
 

@@ -23,11 +23,11 @@ class KeyedHashSet::LocalElement : public KeyedElement
 public:
 
   LocalElement(const QString& k) : k(k) {}
-  QString GetKey() const { return k; }
+  QString GetKey() const override { return k; }
 
 private:
   QString k;
-  bool IsEqual(const KeyedElement& other) const
+  bool IsEqual(const KeyedElement& other) const override
   {
     return k == static_cast<const LocalElement&>(other).k;
   }

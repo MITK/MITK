@@ -217,7 +217,7 @@ void ReopenEditorMenu::Fill(QMenu* menu, QAction* before)
     void Run() override
     {
       QString text = ReopenEditorMenu::CalcText(historyIndex, item);
-      QAction* mi = new QAction(text, nullptr);
+      auto   mi = new QAction(text, nullptr);
       menu->insertAction(before, mi);
       mi->setData(QVariant::fromValue(item));
     }

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
-ctkPluginContext* mitk::PluginActivator::m_Context = NULL;
+ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
 
 ctkPluginContext* mitk::PluginActivator::GetContext()
 {
@@ -36,7 +36,7 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
 void mitk::PluginActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
-  m_Context = NULL;
+  m_Context = nullptr;
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

@@ -69,72 +69,72 @@ public:
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#getWindow
    */
-  SmartPointer<IWorkbenchWindow> GetWindow();
+  SmartPointer<IWorkbenchWindow> GetWindow() override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#getWorkbenchConfigurer()
    */
-  SmartPointer<IWorkbenchConfigurer> GetWorkbenchConfigurer();
+  SmartPointer<IWorkbenchConfigurer> GetWorkbenchConfigurer() override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#getTitle
    */
-  QString GetTitle();
+  QString GetTitle() override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#setTitle
    */
-  void SetTitle(const QString& title);
+  void SetTitle(const QString& title) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#getShowMenuBar
    */
-  bool GetShowMenuBar() const;
+  bool GetShowMenuBar() const override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#setShowMenuBar
    */
-  void SetShowMenuBar(bool show);
+  void SetShowMenuBar(bool show) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#getShowToolBar
    */
-  bool GetShowToolBar() const;
+  bool GetShowToolBar() const override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  void SetShowToolBar(bool show);
+  void SetShowToolBar(bool show) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  bool GetShowPerspectiveBar() const;
+  bool GetShowPerspectiveBar() const override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  void SetShowPerspectiveBar(bool show);
+  void SetShowPerspectiveBar(bool show) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#getShowStatusLine
    */
-  bool GetShowStatusLine() const;
+  bool GetShowStatusLine() const override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#setShowStatusLine
    */
-  void SetShowStatusLine(bool show);
+  void SetShowStatusLine(bool show) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  bool GetShowProgressIndicator() const;
+  bool GetShowProgressIndicator() const override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  void SetShowProgressIndicator(bool show);
+  void SetShowProgressIndicator(bool show) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#getData
@@ -163,12 +163,12 @@ public:
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#addEditorAreaTransfer
    */
-  void AddEditorAreaTransfer(const QStringList& transferTypes);
+  void AddEditorAreaTransfer(const QStringList& transferTypes) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  void ConfigureEditorAreaDropListener(IDropTargetListener* listener);
+  void ConfigureEditorAreaDropListener(IDropTargetListener* listener) override;
 
   /**
    * Returns the array of <code>Transfer</code> added by the application
@@ -183,27 +183,27 @@ public:
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  SmartPointer<IActionBarConfigurer> GetActionBarConfigurer();
+  SmartPointer<IActionBarConfigurer> GetActionBarConfigurer() override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  Qt::WindowFlags GetWindowFlags() const;
+  Qt::WindowFlags GetWindowFlags() const override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  void SetWindowFlags(Qt::WindowFlags shellStyle);
+  void SetWindowFlags(Qt::WindowFlags shellStyle) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  QPoint GetInitialSize() const;
+  QPoint GetInitialSize() const override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  void SetInitialSize(QPoint size);
+  void SetInitialSize(QPoint size) override;
 
   /**
    * Creates the default window contents.
@@ -215,12 +215,12 @@ public:
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  QMenuBar* CreateMenuBar();
+  QMenuBar* CreateMenuBar() override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  QWidget* CreateToolBar(QWidget* parent);
+  QWidget* CreateToolBar(QWidget* parent) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
@@ -232,12 +232,12 @@ public:
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer
    */
-  QWidget* CreatePageComposite(QWidget* parent);
+  QWidget* CreatePageComposite(QWidget* parent) override;
 
   /*
    * @see org.blueberry.ui.application.IWorkbenchWindowConfigurer#saveState(org.blueberry.ui.IMemento)
    */
-  bool SaveState(SmartPointer<IMemento> memento);
+  bool SaveState(SmartPointer<IMemento> memento) override;
 
 protected:
 
@@ -278,7 +278,7 @@ private:
     /*
      * @see org.blueberry.ui.application.IActionBarConfigurer#getWindowConfigurer()
      */
-    IWorkbenchWindowConfigurer::Pointer GetWindowConfigurer();
+    IWorkbenchWindowConfigurer::Pointer GetWindowConfigurer() override;
 
       /*
        * @see org.blueberry.ui.application.IActionBarConfigurer
@@ -293,12 +293,12 @@ private:
     /*
      * @see org.blueberry.ui.application.IActionBarConfigurer
      */
-    IMenuManager* GetMenuManager();
+    IMenuManager* GetMenuManager() override;
 
     /*
      * @see org.blueberry.ui.internal.AbstractActionBarConfigurer
      */
-    IToolBarManager* GetToolBarManager();
+    IToolBarManager* GetToolBarManager() override;
 
     /*
      * @see org.blueberry.ui.application.IActionBarConfigurer

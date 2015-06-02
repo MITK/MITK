@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 3efe86d5)
+    set(revision_tag 4d12a3b8)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -75,7 +75,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 cbd771ea9718cb02e64085e8ddfdaa4d
+      URL_MD5 135910e407bd1f5de29d2a0a9efe5f80
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
       UPDATE_COMMAND ""
@@ -101,6 +101,8 @@ if(MITK_USE_CTK)
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
         -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_5f3a03b1.tar.gz
+        # See bug 19073
+        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_36ab9c7c.tar.gz
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS

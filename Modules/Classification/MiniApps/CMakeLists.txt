@@ -13,7 +13,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     # they are added after a "^^" and separated by "_"
     set( classificationminiapps
         RandomForestTraining^^MitkClassifierVigraRandomForest
-        RandomForestPrediction^^MitkClassifierVigraRandomForest
+    #    RandomForestPrediction^^MitkClassifierVigraRandomForest
     )
 
     foreach(classificationminiapps ${classificationminiapps})
@@ -27,7 +27,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
 
       mitk_create_executable(${appname}
       DEPENDS MitkCore MitkClassificationCore ${dependencies_list}
-      PACKAGE_DEPENDS ITK Qt4
+      PACKAGE_DEPENDS ITK Qt4 Vigra
       CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
       )
 

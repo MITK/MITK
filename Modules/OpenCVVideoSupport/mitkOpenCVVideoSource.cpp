@@ -19,10 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 mitk::OpenCVVideoSource::OpenCVVideoSource()
-: m_VideoCapture(0),
-  m_CurrentImage(0),
-  m_CurrentVideoTexture(0),
-  m_PauseImage(0),
+: m_VideoCapture(nullptr),
+  m_CurrentImage(nullptr),
+  m_CurrentVideoTexture(nullptr),
+  m_PauseImage(nullptr),
   m_GrabbingDeviceNumber(-1),
   m_RepeatVideo(false),
   m_UseCVCAMLib(false),
@@ -131,7 +131,7 @@ void mitk::OpenCVVideoSource::FetchFrame()
         ++m_FrameCount;
       }
 
-      if(m_CurrentImage == NULL) // do we need to repeat the video if it is from video file?
+      if(m_CurrentImage == nullptr) // do we need to repeat the video if it is from video file?
       {
         double framePos = this->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO);
         MITK_DEBUG << "End of video file found. framePos: " << framePos;
@@ -154,7 +154,7 @@ void mitk::OpenCVVideoSource::FetchFrame()
       {
         // only undistort if not paused
         if(m_UndistortImage && m_UndistortCameraImage.IsNotNull())
-          m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
+          m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, nullptr);
       }
 
       if(m_CaptureWidth == 0 || m_CaptureHeight == 0)
@@ -174,7 +174,7 @@ void mitk::OpenCVVideoSource::UpdateVideoTexture()
   if(!m_CurrentImage)
     return;
 
-  if(m_CurrentVideoTexture == NULL)
+  if(m_CurrentVideoTexture == nullptr)
     m_CurrentVideoTexture = new unsigned char[m_CaptureWidth*m_CaptureHeight*3];
 
   int width = m_CurrentImage->width;
@@ -212,7 +212,7 @@ void mitk::OpenCVVideoSource::UpdateVideoTexture()
 
 void mitk::OpenCVVideoSource::StartCapturing()
 {
-  if(m_VideoCapture != NULL)
+  if(m_VideoCapture != nullptr)
     m_CapturingInProcess = true;
   else
     m_CapturingInProcess = false;
@@ -238,14 +238,14 @@ void mitk::OpenCVVideoSource::PauseCapturing()
 
     // undistort this pause image if necessary
     if(m_UndistortImage)
-      m_UndistortCameraImage->UndistortImageFast(m_PauseImage, 0);
+      m_UndistortCameraImage->UndistortImageFast(m_PauseImage, nullptr);
     m_CurrentImage = m_PauseImage;
   }
   else
   {
     cvReleaseImage( &m_PauseImage ); // release old pause image if necessary
-    m_CurrentImage = 0;
-    m_PauseImage = 0;
+    m_CurrentImage = nullptr;
+    m_PauseImage = nullptr;
   }
 }
 
@@ -365,7 +365,7 @@ void mitk::OpenCVVideoSource::RGBtoHSV(float r, float g, float b, float &h, floa
 */
 IplImage* mitk::OpenCVVideoSource::FlipImage(IplImage* input)
 {
-  if(input == NULL)
+  if(input == nullptr)
   { //warn the user and quit
     std::cout<<"openCVVideoSource: Current video image is null! "<< std::endl;
     return input;
@@ -373,15 +373,15 @@ IplImage* mitk::OpenCVVideoSource::FlipImage(IplImage* input)
 
   if(m_FlipXAxisEnabled && !m_FlipYAxisEnabled)
   {
-  cvFlip(input,0,0);
+  cvFlip(input,nullptr,0);
   }
   if(!m_FlipXAxisEnabled && m_FlipYAxisEnabled)
   {
-  cvFlip(input,0,1);
+  cvFlip(input,nullptr,1);
   }
   if(m_FlipXAxisEnabled && m_FlipYAxisEnabled)
   {
-  cvFlip(input,0,-1);
+  cvFlip(input,nullptr,-1);
   }
 
   return input;
@@ -393,15 +393,15 @@ void mitk::OpenCVVideoSource::Reset()
   this->StopCapturing();
   if(m_VideoCapture)
     cvReleaseCapture(&m_VideoCapture);
-  m_VideoCapture = 0;
-  m_CurrentImage = 0;
+  m_VideoCapture = nullptr;
+  m_CurrentImage = nullptr;
   m_CaptureWidth = 0;
   m_CaptureHeight = 0;
   delete m_CurrentVideoTexture;
-  m_CurrentVideoTexture = 0;
+  m_CurrentVideoTexture = nullptr;
   if(m_PauseImage)
     cvReleaseImage(&m_PauseImage);
-  m_PauseImage = 0;
+  m_PauseImage = nullptr;
   m_CapturePaused = false;
   m_VideoFileName.clear();
   m_GrabbingDeviceNumber = -1;

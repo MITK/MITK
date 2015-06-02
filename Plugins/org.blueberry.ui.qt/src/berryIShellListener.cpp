@@ -23,7 +23,7 @@ void
 IShellListener::Events
 ::AddListener(IShellListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   shellActivated += Delegate(listener, &IShellListener::ShellActivated);
   shellClosed += Delegate(listener, &IShellListener::ShellClosed);
@@ -36,7 +36,7 @@ void
 IShellListener::Events
 ::RemoveListener(IShellListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   shellActivated -= Delegate(listener, &IShellListener::ShellActivated);
   shellClosed -= Delegate(listener, &IShellListener::ShellClosed);

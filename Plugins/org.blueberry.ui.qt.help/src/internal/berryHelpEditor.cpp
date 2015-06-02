@@ -39,8 +39,8 @@ namespace berry {
 const QString HelpEditor::EDITOR_ID = "org.blueberry.editors.help";
 
 HelpEditor::HelpEditor()
-  : m_ToolBar(0)
-  , m_WebView(0)
+  : m_ToolBar(nullptr)
+  , m_WebView(nullptr)
 {
 
 }
@@ -60,7 +60,7 @@ void HelpEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Poi
   site->GetPage()->AddPartListener(this);
   site->GetPage()->GetWorkbenchWindow()->AddPerspectiveListener(this);
 
-  m_WebView = new HelpWebView(site, 0);
+  m_WebView = new HelpWebView(site, nullptr);
 
   connect(m_WebView, SIGNAL(loadFinished(bool)), this, SLOT(InitializeTitle()));
 
@@ -69,7 +69,7 @@ void HelpEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Poi
 
 void HelpEditor::CreateQtPartControl(QWidget* parent)
 {
-  QVBoxLayout* verticalLayout = new QVBoxLayout(parent);
+  auto   verticalLayout = new QVBoxLayout(parent);
   verticalLayout->setSpacing(0);
   verticalLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -146,7 +146,7 @@ void HelpEditor::DoSetInput(IEditorInput::Pointer input)
         : editor(editor)
       {}
 
-      void run()
+      void run() override
       {
         editor->GetSite()->GetPage()->CloseEditor(editor, false);
         delete this;

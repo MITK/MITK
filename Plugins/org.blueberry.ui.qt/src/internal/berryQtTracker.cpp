@@ -154,7 +154,7 @@ void QtDragManager::Move(const QPoint& globalPos)
 bool QtDragManager::Drag(QtTracker* tracker)
 {
 
-  if (tracker == 0)
+  if (tracker == nullptr)
     return false;
 
   this->tracker = tracker;
@@ -168,13 +168,13 @@ bool QtDragManager::Drag(QtTracker* tracker)
   eventLoop = new QEventLoop;
   eventLoop->exec();
   delete eventLoop;
-  eventLoop = 0;
+  eventLoop = nullptr;
 
   return !beingCancelled;
 }
 
 QtTracker::QtTracker() :
-  rubberBand(0), dragManager(0), cursorOverride(0)
+  rubberBand(nullptr), dragManager(nullptr), cursorOverride(0)
 {
   rubberBand = new QRubberBand(QRubberBand::Rectangle);
   QPalette rubberPalette(rubberBand->palette());
@@ -188,30 +188,30 @@ QtTracker::QtTracker() :
   rubberBand->ensurePolished();
 
   QPixmap pixCursorTop(":/org.blueberry.ui.qt/cursor_top.xpm");
-  QCursor* cursorTop = new QCursor(pixCursorTop, 15, 8);
+  auto  cursorTop = new QCursor(pixCursorTop, 15, 8);
   cursorMap.insert(CURSOR_TOP, cursorTop);
 
   QPixmap pixCursorRight(":/org.blueberry.ui.qt/cursor_right.xpm");
-  QCursor* cursorRight = new QCursor(pixCursorRight, 23, 15);
+  auto  cursorRight = new QCursor(pixCursorRight, 23, 15);
   cursorMap.insert(CURSOR_RIGHT, cursorRight);
 
   QPixmap pixCursorBottom(":/org.blueberry.ui.qt/cursor_bottom.xpm");
-  QCursor* cursorBottom = new QCursor(pixCursorBottom, 16, 23);
+  auto  cursorBottom = new QCursor(pixCursorBottom, 16, 23);
   cursorMap.insert(CURSOR_BOTTOM, cursorBottom);
 
   QPixmap pixCursorLeft(":/org.blueberry.ui.qt/cursor_left.xpm");
-  QCursor* cursorLeft = new QCursor(pixCursorLeft, 8, 15);
+  auto  cursorLeft = new QCursor(pixCursorLeft, 8, 15);
   cursorMap.insert(CURSOR_LEFT, cursorLeft);
 
   QPixmap pixCursorCenter(":/org.blueberry.ui.qt/cursor_center.xpm");
-  QCursor* cursorCenter = new QCursor(pixCursorCenter, 15, 15);
+  auto  cursorCenter = new QCursor(pixCursorCenter, 15, 15);
   cursorMap.insert(CURSOR_CENTER, cursorCenter);
 
   QPixmap pixCursorOffscreen(":/org.blueberry.ui.qt/cursor_offscreen.xpm");
-  QCursor* cursorOffscreen = new QCursor(pixCursorOffscreen, 15, 15);
+  auto  cursorOffscreen = new QCursor(pixCursorOffscreen, 15, 15);
   cursorMap.insert(CURSOR_OFFSCREEN, cursorOffscreen);
 
-  QCursor* cursorInvalid = new QCursor(Qt::ForbiddenCursor);
+  auto  cursorInvalid = new QCursor(Qt::ForbiddenCursor);
   cursorMap.insert(CURSOR_INVALID, cursorInvalid);
 }
 
@@ -309,7 +309,7 @@ void QtTrackerMoveListener::Moved(QtTracker* tracker, const QPoint& location)
   // If snapping then reset the tracker's rectangle based on the current drop target
   if (allowSnapping)
   {
-    if (snapTarget.width() < 0 || snapTarget.height() < 0)
+    if (snapTarget.width() <= 0 || snapTarget.height() <= 0)
     {
       snapTarget = QRect(sourceBounds.x() + location.x() - initialLocation.x(),
           sourceBounds.y() + location.y() - initialLocation.y(), sourceBounds.width(),

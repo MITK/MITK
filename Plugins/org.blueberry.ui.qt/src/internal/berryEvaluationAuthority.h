@@ -107,12 +107,12 @@ public:
   /*
    * @see ExpressionAuthority#SourceChanged(int)
    */
-  void SourceChanged(int sourcePriority);
+  void SourceChanged(int sourcePriority) override;
 
   /*
    * @see ExpressionAuthority#SourceChanged(QString)
    */
-  void SourceChanged(const QStringList& sourceNames);
+  void SourceChanged(const QStringList& sourceNames) override;
 
   using ExpressionAuthority::SourceChanged;
 

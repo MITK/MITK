@@ -46,7 +46,7 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
                                            int OptionFlags)
   : // m_Image(iP)
 //, imageDataItem(iDI)
-    m_SubRegion(NULL)
+    m_SubRegion(nullptr)
   , m_Options(OptionFlags)
   , m_CoherentMemory(false)
 {
@@ -87,7 +87,7 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
   // Investigate 4 cases of possible image parts/regions
 
   // Case 1: No ImageDataItem and no Subregion => Whole Image is accessed
-  if(imageDataItem == NULL && m_SubRegion == NULL)
+  if(imageDataItem == nullptr && m_SubRegion == nullptr)
   {
     m_CoherentMemory = true;
 
@@ -102,7 +102,7 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
   }
 
   // Case 2: ImageDataItem but no Subregion
-  if(imageDataItem && m_SubRegion == NULL)
+  if(imageDataItem && m_SubRegion == nullptr)
   {
     m_CoherentMemory = true;
 
@@ -112,13 +112,13 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
   }
 
   // Case 3: No ImageDataItem but a SubRegion
-  if(imageDataItem == NULL && m_SubRegion)
+  if(imageDataItem == nullptr && m_SubRegion)
   {
     mitkThrow() << "Invalid ImageAccessor: The use of a SubRegion is not supported (yet).";
   }
 
   // Case 4: ImageDataItem and SubRegion
-  if(imageDataItem == NULL && m_SubRegion)
+  if(imageDataItem == nullptr && m_SubRegion)
   {
     mitkThrow() << "Invalid ImageAccessor: The use of a SubRegion is not supported (yet).";
   }

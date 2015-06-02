@@ -38,13 +38,13 @@ public:
 
   ~LogImpl();
 
-  void AddLogListener(ILogListener* listener);
+  void AddLogListener(ILogListener* listener) override;
 
-  QSharedPointer<ctkPlugin> GetBundle() const;
+  QSharedPointer<ctkPlugin> GetBundle() const override;
 
-  void Log(const SmartPointer<IStatus>& status);
+  void Log(const SmartPointer<IStatus>& status) override;
 
-  void RemoveLogListener(ILogListener* listener);
+  void RemoveLogListener(ILogListener* listener) override;
 };
 
 }

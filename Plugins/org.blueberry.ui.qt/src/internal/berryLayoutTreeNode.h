@@ -56,7 +56,7 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutTree#flushChildren()
      */
-    public: void FlushChildren();
+    public: void FlushChildren() override;
 
     /**
      * Traverses the tree to find the part that intersects the given point
@@ -64,29 +64,29 @@ public:
      * @param toFind
      * @return the part that intersects the given point
      */
-    public: LayoutPart::Pointer FindPart(const QPoint& toFind);
+    public: LayoutPart::Pointer FindPart(const QPoint& toFind) override;
 
     /**
      * Add the relation ship between the children in the list
      * and returns the left children.
      */
-    public: LayoutPart::Pointer ComputeRelation(QList<PartSashContainer::RelationshipInfo>& relations);
+    public: LayoutPart::Pointer ComputeRelation(QList<PartSashContainer::RelationshipInfo>& relations) override;
 
     /**
      * Dispose all Sashs in this tree
      */
-    public: void DisposeSashes();
+    public: void DisposeSashes() override;
 
     /**
      * Find a LayoutPart in the tree and return its sub-tree. Returns
      * null if the child is not found.
      */
-    public: SmartPointer<LayoutTree> Find(LayoutPart::Pointer child);
+    public: SmartPointer<LayoutTree> Find(LayoutPart::Pointer child) override;
 
     /**
      * Find the part that is in the bottom right position.
      */
-    public: LayoutPart::Pointer FindBottomRight();
+    public: LayoutPart::Pointer FindBottomRight() override;
 
     /**
      * Go up in the tree finding a parent that is common of both children.
@@ -99,7 +99,7 @@ public:
      * Find a sash in the tree and return its sub-tree. Returns
      * null if the sash is not found.
      */
-    public: SmartPointer<LayoutTreeNode> FindSash(LayoutPartSash::Pointer sash);
+    public: SmartPointer<LayoutTreeNode> FindSash(LayoutPartSash::Pointer sash) override;
 
     using LayoutTree::FindSashes;
 
@@ -121,7 +121,7 @@ public:
     /**
      * Returns true if this tree has visible parts otherwise returns false.
      */
-    public: bool IsVisible();
+    public: bool IsVisible() override;
 
     using LayoutTree::Remove;
 
@@ -141,7 +141,7 @@ public:
      */
     public: bool SameDirection(bool isVertical, SmartPointer<LayoutTreeNode> subTree);
 
-    public: int DoComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel);
+    public: int DoComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredParallel) override;
 
     /**
      * Computes the pixel sizes of this node's children, given the available
@@ -158,21 +158,21 @@ public:
      */
     ChildSizes ComputeChildSizes(int width, int height, int left, int right, int preferredWidth);
 
-    protected: int DoGetSizeFlags(bool width);
+    protected: int DoGetSizeFlags(bool width) override;
 
     /**
      * Resize the parts on this tree to fit in <code>bounds</code>.
      */
-    public: void DoSetBounds(const QRect& bounds);
+    public: void DoSetBounds(const QRect& bounds) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.LayoutTree#createControl(org.blueberry.swt.widgets.Composite)
      */
-    public: void CreateControl(QWidget* parent);
+    public: void CreateControl(QWidget* parent) override;
 
     //Added by hudsonr@us.ibm.com - bug 19524
 
-    public: bool IsCompressible();
+    public: bool IsCompressible() override;
 
     /**
      * Returns 0 if there is no bias. Returns -1 if the first child should be of
@@ -199,7 +199,7 @@ public:
     /**
      * Returns a string representation of this object.
      */
-    public: QString ToString() const;
+    public: QString ToString() const override;
 
     /**
      * Create the sashes if the children are visible
@@ -217,7 +217,7 @@ public:
      *
      * @param buf
      */
-    public: void DescribeLayout(QString& buf) const;
+    public: void DescribeLayout(QString& buf) const override;
 
 private:
 

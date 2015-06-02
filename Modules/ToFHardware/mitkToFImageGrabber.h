@@ -202,7 +202,7 @@ namespace mitk
     2: intensity image
     3: RGB image
     */
-    void GenerateData();
+    void GenerateData() override;
 
   private:
 

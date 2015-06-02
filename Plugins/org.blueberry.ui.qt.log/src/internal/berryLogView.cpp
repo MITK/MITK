@@ -36,9 +36,9 @@ LogView::LogView()
 
 void LogView::CreateQtPartControl(QWidget* parent)
 {
-  QHBoxLayout* layout = new QHBoxLayout(parent);
+  auto   layout = new QHBoxLayout(parent);
   layout->setContentsMargins(0,0,0,0);
-  QtLogView* logView = new QtLogView(parent);
+  auto   logView = new QtLogView(parent);
   layout->addWidget(logView);
 }
 

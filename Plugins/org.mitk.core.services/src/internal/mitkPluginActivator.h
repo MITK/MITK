@@ -48,8 +48,8 @@ public:
   org_mitk_core_services_Activator();
   ~org_mitk_core_services_Activator();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
   void MitkServiceChanged(const us::ServiceEvent event);
 

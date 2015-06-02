@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProgressBar.h"
 
 QmitkDemonsRegistrationView::QmitkDemonsRegistrationView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
-m_FixedNode(NULL), m_MovingNode(NULL), m_ResultImage(NULL), m_ResultDeformationField(NULL)
+m_FixedNode(nullptr), m_MovingNode(nullptr), m_ResultImage(nullptr), m_ResultDeformationField(nullptr)
 {
   m_Controls.setupUi(parent);
 
@@ -83,7 +83,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
     if (!((fimageRegion.GetSize(0)>=mimageRegion.GetSize(0))&&(fimageRegion.GetSize(1)>=mimageRegion.GetSize(1))
         &&(fimageRegion.GetSize(2)>=mimageRegion.GetSize(2))))
     {
-      QMessageBox::information(NULL,"Registration","Fixed image must be equal or bigger in size than moving image.");
+      QMessageBox::information(nullptr,"Registration","Fixed image must be equal or bigger in size than moving image.");
       return;
     }
     if ( m_Controls.m_RegistrationSelection->currentIndex() == 0)

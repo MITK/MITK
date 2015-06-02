@@ -35,7 +35,7 @@ HandlerService::HandlerService(ICommandService* commandService,
   , handlerAuthority(new HandlerAuthority(commandService, locator))
   , handlerPersistence(new HandlerPersistence(this, evaluationService))
 {
-  if (commandService == NULL)
+  if (commandService == nullptr)
   {
     throw ctkInvalidArgumentException("A handler service requires a command service");
   }
@@ -57,7 +57,7 @@ SmartPointer<IHandlerActivation> HandlerService::ActivateHandler(
 SmartPointer<IHandlerActivation> HandlerService::ActivateHandler(const QString& commandId,
                                                  const SmartPointer<IHandler>& handler)
 {
-  return ActivateHandler(commandId, handler, Expression::Pointer(0));
+  return ActivateHandler(commandId, handler, Expression::Pointer(nullptr));
 }
 
 SmartPointer<IHandlerActivation> HandlerService::ActivateHandler(const QString& commandId,

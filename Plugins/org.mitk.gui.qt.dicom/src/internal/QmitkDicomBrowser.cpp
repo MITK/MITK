@@ -55,7 +55,7 @@ void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
 
     TestHandler();
 
-    OnPreferencesChanged(0);
+    OnPreferencesChanged(nullptr);
     CreateTemporaryDirectory();
     StartDicomDirectoryListener();
 

@@ -127,12 +127,12 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
   A* GetAdapter(const Object* adaptable)
   {
     const char* typeName = qobject_interface_iid<A*>();
-    if (typeName == NULL)
+    if (typeName == nullptr)
     {
       BERRY_WARN << "Error getting adapter for '" << Reflection::GetClassName(adaptable) << "': "
                  << "Cannot get the interface id for type '" << Reflection::GetClassName<A>()
                  << "'. It is probably missing a Q_DECLARE_INTERFACE macro in its header.";
-      return NULL;
+      return nullptr;
     }
     return dynamic_cast<A*>(this->GetAdapter(adaptable, typeName, false));
   }
@@ -180,7 +180,7 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
   int QueryAdapter(const Object* adaptable)
   {
     const char* typeName = qobject_interface_iid<A*>();
-    if (typeName == NULL)
+    if (typeName == nullptr)
     {
       BERRY_WARN << "Error querying adapter manager for '" << Reflection::GetClassName(adaptable) << "': "
                  << "Cannot get the interface id for type '" << Reflection::GetClassName<A>()
@@ -229,7 +229,7 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
   A* LoadAdapter(const Object* adaptable)
   {
     const char* typeName = qobject_interface_iid<A*>();
-    if (typeName == NULL)
+    if (typeName == nullptr)
     {
       BERRY_WARN << "Error getting adapter for '" << Reflection::GetClassName(adaptable) << "': "
                  << "Cannot get the interface id for type '" << Reflection::GetClassName<A>()

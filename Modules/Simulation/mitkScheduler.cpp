@@ -54,7 +54,7 @@ mitk::Scheduler::~Scheduler()
 
 void mitk::Scheduler::AddProcess(SchedulableProcess* process)
 {
-  if (process == NULL)
+  if (process == nullptr)
     return;
 
   if (std::find(m_Impl->processQueue.begin(), m_Impl->processQueue.end(), process) == m_Impl->processQueue.end())
@@ -63,10 +63,10 @@ void mitk::Scheduler::AddProcess(SchedulableProcess* process)
 
 void mitk::Scheduler::RemoveProcess(SchedulableProcess* process)
 {
-  if (process == NULL)
+  if (process == nullptr)
     return;
 
-  std::vector<SchedulableProcess*>::iterator it = std::find(m_Impl->processQueue.begin(), m_Impl->processQueue.end(), process);
+  auto it = std::find(m_Impl->processQueue.begin(), m_Impl->processQueue.end(), process);
 
   if (it != m_Impl->processQueue.end())
     m_Impl->processQueue.erase(it);
@@ -81,7 +81,7 @@ mitk::SchedulableProcess* mitk::Scheduler::GetCurrentProcess()
 {
   return !m_Impl->processQueue.empty()
     ? m_Impl->processQueue[0]
-    : NULL;
+    : nullptr;
 }
 
 mitk::SchedulableProcess* mitk::Scheduler::GetNextProcess()

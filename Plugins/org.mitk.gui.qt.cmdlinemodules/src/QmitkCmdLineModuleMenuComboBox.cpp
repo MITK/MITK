@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // -------------------------------------------------------------------------
 QmitkCmdLineModuleMenuComboBox::QmitkCmdLineModuleMenuComboBox(QWidget* parent)
 : ctkMenuComboBox(parent)
-, m_ModuleManager(NULL)
+, m_ModuleManager(nullptr)
 {
   qRegisterMetaType<ctkCmdLineModuleReference>();
 }
@@ -45,9 +45,9 @@ QmitkCmdLineModuleMenuComboBox::~QmitkCmdLineModuleMenuComboBox()
 // -------------------------------------------------------------------------
 void QmitkCmdLineModuleMenuComboBox::SetManager(ctkCmdLineModuleManager* manager)
 {
-  if (m_ModuleManager != NULL)
+  if (m_ModuleManager != nullptr)
   {
-    QObject::disconnect(manager, 0, this, 0);
+    QObject::disconnect(manager, nullptr, this, nullptr);
   }
 
   m_ModuleManager = manager;
@@ -91,7 +91,7 @@ void QmitkCmdLineModuleMenuComboBox::AddName(
     int need = depth - listOfHashMaps.size();
     for (int i = 0; i <= need; i++)
     {
-      QHash<QString, QMenu*> *newHashMap = new QHash<QString, QMenu*>();
+      auto  newHashMap = new QHash<QString, QMenu*>();
       listOfHashMaps.push_back(newHashMap);
     }
   }
@@ -102,7 +102,7 @@ void QmitkCmdLineModuleMenuComboBox::AddName(
 // -------------------------------------------------------------------------
 void QmitkCmdLineModuleMenuComboBox::RebuildMenu()
 {
-  if (m_ModuleManager == NULL)
+  if (m_ModuleManager == nullptr)
   {
     qDebug() << "QmitkCmdLineModuleMenuComboBox::RebuildMenu(): Module Manager is NULL? Surely a bug?";
     return;
@@ -111,7 +111,7 @@ void QmitkCmdLineModuleMenuComboBox::RebuildMenu()
   // Can't see another way to get a nested menu, without rebuilding the whole thing each time.
   // :-(
 
-  QMenu *menu = new QMenu();
+  auto  menu = new QMenu();
   QStringList listOfModules;
 
   QList<ctkCmdLineModuleReference> references = m_ModuleManager->moduleReferences();
@@ -150,9 +150,9 @@ void QmitkCmdLineModuleMenuComboBox::RebuildMenu()
       if (i != nameParts.size() - 1)
       {
         // Need to add a menu/submenu, not an action.
-        if (list.size() <= i || list[i] == NULL || !list[i]->contains(part))
+        if (list.size() <= i || list[i] == nullptr || !list[i]->contains(part))
         {
-          QMenu *newMenu = new QMenu(part);
+          auto  newMenu = new QMenu(part);
           currentMenu->addMenu(newMenu);
           currentMenu = newMenu;
 

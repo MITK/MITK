@@ -51,7 +51,7 @@ public:
   /**
   * Standard qt constructor
   */
-  QmitkPlotDialog(const char* title, QWidget* parent = 0, const char* name = 0);
+  QmitkPlotDialog(const char* title, QWidget* parent = nullptr, const char* name = nullptr);
 
   /**
   * Virtual destructor

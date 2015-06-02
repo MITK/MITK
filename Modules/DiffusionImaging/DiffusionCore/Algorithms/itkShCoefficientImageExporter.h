@@ -57,7 +57,7 @@ public:
     // output
     itkGetMacro( OutputImage, typename CoefficientImageType::Pointer)    ///< mitk style image containing the SH coefficients
 
-    void GenerateData();
+    void GenerateData() override;
 
 protected:
     ShCoefficientImageExporter();

@@ -51,8 +51,6 @@ public:
   bool SupportsPointWiseProbability();
   void ConvertParameter();
 
-  vigra::MultiArrayView<2, double> GetPointWiseWeight();
-
   void SetRandomForest(const vigra::RandomForest<int> & rf)
   {
     m_RandomForest = rf;
@@ -63,7 +61,7 @@ public:
     return m_RandomForest;
   }
 
-  void UsePointBasedWeights(bool);
+  void UsePointWiseWeight(bool);
   void SetMaximumTreeDepth(int);
   void SetMinimumSplitNodeSize(int);
   void SetPrecision(double);

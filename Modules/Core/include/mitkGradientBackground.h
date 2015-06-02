@@ -35,6 +35,7 @@ class RenderWindow;
  * smoothly shaded plane in a separate layer behind the
  * scene. After setting the renderwindow, the gradient may be
  * activated by calling Enable()
+ * @deprecatedSince{next_release} not used in renderwindows
  */
 class MITKCORE_EXPORT GradientBackground : public itk::Object
 {

@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkMeanReciprocalSquareDifferenceMetricVi
 
 public:
 
-  QmitkMeanReciprocalSquareDifferenceMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkMeanReciprocalSquareDifferenceMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkMeanReciprocalSquareDifferenceMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;

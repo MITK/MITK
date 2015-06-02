@@ -112,12 +112,6 @@ bool mitk::VigraRandomForestClassifier::SupportsPointWiseProbability()
   return true;
 }
 
-vigra::MultiArrayView<2, double> mitk::VigraRandomForestClassifier::GetPointWiseWeight()
-{
-  vigra::MultiArrayView<2, double> eigenview;
-  return eigenview;
-}
-
 void mitk::VigraRandomForestClassifier::OnlineTrain(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in)
 {
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
@@ -128,15 +122,24 @@ void mitk::VigraRandomForestClassifier::OnlineTrain(const Eigen::MatrixXd & X_in
 
 void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in)
 {
+  this->ConvertParameter();
+
   DefaultSplitType splitter;
   splitter.UsePointBasedWeights(m_Parameter->UsePointBasedWeights);
   splitter.UseRandomSplit(m_Parameter->UseRandomSplit);
   splitter.SetPrecision(m_Parameter->Precision);
   splitter.SetMaximumTreeDepth(m_Parameter->TreeDepth);
-  //  splitter.SetWeights(m_Parameter->/*WeightLambda*/);
 
+
+  // Weights handled as member variable
   if (m_Parameter->UsePointBasedWeights)
-    splitter.SetWeights(this->GetPointWiseWeight());
+  {
+    // Set influence of the weight (0 no influenc to 1 max influence)
+    this->m_PointWiseWeight.unaryExpr([this](double t){ return std::pow(t, this->m_Parameter->WeightLambda) ;});
+
+    vigra::MultiArrayView<2, double> W(vigra::Shape2(this->m_PointWiseWeight.rows(),this->m_PointWiseWeight.cols()),this->m_PointWiseWeight.data());
+    splitter.SetWeights(W);
+  }
 
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
   vigra::MultiArrayView<2, int> Y(vigra::Shape2(Y_in.rows(),Y_in.cols()),Y_in.data());
@@ -207,7 +210,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
     splitter.UseRandomSplit(data->m_Splitter.IsUsingRandomSplit());
     splitter.SetPrecision(data->m_Splitter.GetPrecision());
     splitter.SetMaximumTreeDepth(data->m_Splitter.GetMaximumTreeDepth());
-
+    splitter.SetWeights(data->m_Splitter.GetWeights());
 
     rf.trees_.clear();
     rf.set_options().tree_count(numberOfTreesToCalculate);
@@ -284,6 +287,7 @@ void  mitk::VigraRandomForestClassifier::ConvertParameter()
     this->m_Parameter = new Parameter();
   // Get the proerty                                                                      // Some defaults
   if(!this->GetPropertyList()->Get("classifier.vigra-rf.usepointbasedweight",this->m_Parameter->UsePointBasedWeights))      this->m_Parameter->UsePointBasedWeights = false;
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.userandomsplit",this->m_Parameter->UseRandomSplit))                 this->m_Parameter->UseRandomSplit = false;
   if(!this->GetPropertyList()->Get("classifier.vigra-rf.treedepth",this->m_Parameter->TreeDepth))                           this->m_Parameter->TreeDepth = 20;
   if(!this->GetPropertyList()->Get("classifier.vigra-rf.treecount",this->m_Parameter->TreeCount))                           this->m_Parameter->TreeCount = 100;
   if(!this->GetPropertyList()->Get("classifier.vigra-rf.minimalsplitnodesize",this->m_Parameter->MinimumSplitNodeSize))     this->m_Parameter->MinimumSplitNodeSize = 5;
@@ -302,11 +306,19 @@ void mitk::VigraRandomForestClassifier::PrintParameter(std::ostream & str)
     MITK_WARN("VigraRandomForestClassifier") << "Parameters are not initialized. Please call ConvertParameter() first!";
     return;
   }
+
+  this->ConvertParameter();
+
   // Get the proerty                                                                      // Some defaults
   if(!this->GetPropertyList()->Get("classifier.vigra-rf.usepointbasedweight",this->m_Parameter->UsePointBasedWeights))
     str << "classifier.vigra-rf.usepointbasedweight\tNOT SET (default " << this->m_Parameter->UsePointBasedWeights << ")" << "\n";
   else
     str << "classifier.vigra-rf.usepointbasedweight\t" << this->m_Parameter->UsePointBasedWeights << "\n";
+
+  if(!this->GetPropertyList()->Get("classifier.vigra-rf.userandomsplit",this->m_Parameter->UseRandomSplit))
+    str << "classifier.vigra-rf.userandomsplit\tNOT SET (default " << this->m_Parameter->UseRandomSplit << ")" << "\n";
+  else
+    str << "classifier.vigra-rf.userandomsplit\t" << this->m_Parameter->UseRandomSplit << "\n";
 
   if(!this->GetPropertyList()->Get("classifier.vigra-rf.treedepth",this->m_Parameter->TreeDepth))
     str << "classifier.vigra-rf.treedepth\t\tNOT SET (default " << this->m_Parameter->TreeDepth << ")" << "\n";
@@ -347,52 +359,45 @@ void mitk::VigraRandomForestClassifier::PrintParameter(std::ostream & str)
   //  this->m_Parameter->Stratification = vigra:RF_NONE; // no Property given
 }
 
-void mitk::VigraRandomForestClassifier::UsePointBasedWeights(bool val)
+void mitk::VigraRandomForestClassifier::UsePointWiseWeight(bool val)
 {
+  mitk::AbstractClassifier::UsePointWiseWeight(val);
   this->GetPropertyList()->SetBoolProperty("classifier.vigra-rf.usepointbasedweight",val);
-  this->ConvertParameter();
 }
 
 void mitk::VigraRandomForestClassifier::SetMaximumTreeDepth(int val)
 {
   this->GetPropertyList()->SetIntProperty("classifier.vigra-rf.treedepth",val);
-  this->ConvertParameter();
 }
 
 void mitk::VigraRandomForestClassifier::SetMinimumSplitNodeSize(int val)
 {
   this->GetPropertyList()->SetIntProperty("classifier.vigra-rf.minimalsplitnodesize",val);
-  this->ConvertParameter();
 }
 
 void mitk::VigraRandomForestClassifier::SetPrecision(double val)
 {
   this->GetPropertyList()->SetDoubleProperty("classifier.vigra-rf.precision",val);
-  this->ConvertParameter();
 }
 
 void mitk::VigraRandomForestClassifier::SetSamplesPerTree(double val)
 {
   this->GetPropertyList()->SetDoubleProperty("classifier.vigra-rf.samplespertree",val);
-  this->ConvertParameter();
 }
 
 void mitk::VigraRandomForestClassifier::UseSampleWithReplacement(bool val)
 {
   this->GetPropertyList()->SetBoolProperty("classifier.vigra-rf.samplewithreplacement",val);
-  this->ConvertParameter();
 }
 
 void mitk::VigraRandomForestClassifier::SetTreeCount(int val)
 {
   this->GetPropertyList()->SetIntProperty("classifier.vigra-rf.treecount",val);
-  this->ConvertParameter();
 }
 
 void mitk::VigraRandomForestClassifier::SetWeightLambda(double val)
 {
   this->GetPropertyList()->SetDoubleProperty("classifier.vigra-rf.lambda",val);
-  this->ConvertParameter();
 }
 
 void mitk::VigraRandomForestClassifier::SetNthItems(const char * val, unsigned int idx)

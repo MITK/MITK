@@ -65,11 +65,11 @@ public:
  ~QmitkDiffusionImagingAppIntroPart();
 
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  void StandbyStateChanged(bool standby);
+  void StandbyStateChanged(bool standby) override;
 
-  void SetFocus();
+  void SetFocus() override;
 
   virtual void CreateConnections();
 

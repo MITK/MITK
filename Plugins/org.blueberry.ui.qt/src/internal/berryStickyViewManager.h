@@ -42,35 +42,35 @@ public:
    * @see org.eclipse.ui.internal.IStickyViewManager#add(java.lang.String,
    *      java.util.Set)
    */
-  void Add(const QString& perspectiveId, const std::set<QString>& stickyViewSet);
+  void Add(const QString& perspectiveId, const std::set<QString>& stickyViewSet) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.internal.IStickyViewManager#clear()
    */
-  void Clear();
+  void Clear() override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.internal.IStickyViewManager#remove(java.lang.String)
    */
-  void Remove(const QString& perspectiveId);
+  void Remove(const QString& perspectiveId) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.internal.IStickyViewManager#restore(org.eclipse.ui.IMemento)
    */
-  void Restore(IMemento::Pointer memento);
+  void Restore(IMemento::Pointer memento) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.internal.IStickyViewManager#save(org.eclipse.ui.IMemento)
    */
-  void Save(IMemento::Pointer memento);
+  void Save(IMemento::Pointer memento) override;
 
   /*
    * (non-Javadoc)
@@ -78,7 +78,7 @@ public:
    * @see org.eclipse.ui.internal.IStickyViewManager#update(org.eclipse.ui.internal.Perspective,
    *      org.eclipse.ui.internal.Perspective)
    */
-  void Update(SmartPointer<Perspective> oldPersp, SmartPointer<Perspective> newPersp);
+  void Update(SmartPointer<Perspective> oldPersp, SmartPointer<Perspective> newPersp) override;
 
 };
 

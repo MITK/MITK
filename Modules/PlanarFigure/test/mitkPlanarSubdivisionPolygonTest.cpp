@@ -69,7 +69,7 @@ static void TestPlanarSubdivisionPolygonPlacement( mitk::PlanarSubdivisionPolygo
 
   // Test for number of polylines
   const mitk::PlanarFigure::PolyLineType polyLine0 = planarSubdivisionPolygon->GetPolyLine( 0 );
-  mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
+  auto iter = polyLine0.begin();
   MITK_TEST_CONDITION( planarSubdivisionPolygon->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Test if subdivision point count is correct

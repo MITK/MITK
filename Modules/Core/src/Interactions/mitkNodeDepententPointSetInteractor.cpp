@@ -36,7 +36,7 @@ float mitk::NodeDepententPointSetInteractor::CanHandleEvent(StateEvent const* st
 
   // use sender to check if the specified dependentDataNode is visible there
   mitk::BaseRenderer* sender = stateEvent->GetEvent()->GetSender();
-  if (sender == NULL)
+  if (sender == nullptr)
     return 0;
 
   bool value = false;

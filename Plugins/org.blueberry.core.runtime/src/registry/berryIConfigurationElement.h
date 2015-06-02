@@ -106,7 +106,7 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
   C* CreateExecutableExtension(const QString &propertyName) const
   {
     C* interface = qobject_cast<C*>(this->CreateExecutableExtension(propertyName));
-    if (interface == 0)
+    if (interface == nullptr)
     {
       BERRY_WARN << "The QObject subclass " << this->GetAttribute(propertyName).toStdString()
                  << " does not seem to implement the required interface \""

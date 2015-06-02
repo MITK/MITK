@@ -133,7 +133,7 @@ SmartPointer<const IStatus> EditorHistoryItem::RestoreState()
 
   IStatus::ConstPointer result = Status::OK_STATUS(BERRY_STATUS_LOC);
   IMemento::Pointer memento = this->memento;
-  this->memento = 0;
+  this->memento = nullptr;
 
   QString factoryId;
   memento->GetString(WorkbenchConstants::TAG_FACTORY_ID, factoryId);

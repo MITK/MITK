@@ -27,8 +27,8 @@ namespace mitk
   public:
     SOFA_CLASS(MeshMitkLoader, sofa::core::loader::MeshLoader);
 
-    bool canLoad();
-    bool load();
+    bool canLoad() override;
+    bool load() override;
 
   private:
     MeshMitkLoader();

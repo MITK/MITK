@@ -135,17 +135,17 @@ public:
 
   using ContributionItem::Fill;
 
-  void Fill(QMenu* parent, QAction* before);
+  void Fill(QMenu* parent, QAction* before) override;
 
-  void Fill(QToolBar* parent, QAction* before);
+  void Fill(QToolBar* parent, QAction* before) override;
 
-  void Update();
+  void Update() override;
 
-  void Update(const QString& id);
+  void Update(const QString& id) override;
 
-  bool IsEnabled() const;
+  bool IsEnabled() const override;
 
-  bool IsVisible() const;
+  bool IsVisible() const override;
 
   void UpdateCommandPropertiesInUI(const SmartPointer<const CommandEvent>& commandEvent);
 

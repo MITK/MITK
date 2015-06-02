@@ -73,36 +73,36 @@ public:
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  void Fill(QStatusBar* parent);
+  void Fill(QStatusBar* parent) override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  void Fill(QMenu* menu, QAction* before);
+  void Fill(QMenu* menu, QAction* before) override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  void Fill(QMenuBar* menu, QAction* before);
+  void Fill(QMenuBar* menu, QAction* before) override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  void Fill(QToolBar* parent, QAction* before);
+  void Fill(QToolBar* parent, QAction* before) override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  void SaveWidgetState();
+  void SaveWidgetState() override;
 
   /*
    * Method declared on IContributionItem.
    */
-  QString GetId() const;
+  QString GetId() const override;
 
   /**
    * Returns the parent contribution manager, or <code>null</code> if this
@@ -116,31 +116,31 @@ public:
    * The default implementation of this <code>IContributionItem</code>
    * method returns <code>false</code>. Subclasses may override.
    */
-  bool IsDirty() const;
+  bool IsDirty() const override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method returns <code>true</code>. Subclasses may override.
    */
-  bool IsEnabled() const;
+  bool IsEnabled() const override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method returns <code>false</code>. Subclasses may override.
    */
-  bool IsDynamic() const;
+  bool IsDynamic() const override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method returns <code>false</code>. Subclasses may override.
    */
-  bool IsGroupMarker() const;
+  bool IsGroupMarker() const override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method returns <code>false</code>. Subclasses may override.
    */
-  bool IsSeparator() const;
+  bool IsSeparator() const override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
@@ -148,38 +148,38 @@ public:
    * which is <code>true</code> by default. <code>setVisible</code>
    * should be used to change this setting.
    */
-  bool IsVisible() const;
+  bool IsVisible() const override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method stores the value in an internal state variable,
    * which is <code>true</code> by default.
    */
-  void SetVisible(bool visible);
+  void SetVisible(bool visible) override;
 
   /**
    * Returns a string representation of this contribution item
    * suitable only for debugging.
    */
-  QString ToString() const;
+  QString ToString() const override;
 
   /**
    * The default implementation of this <code>IContributionItem</code>
    * method does nothing. Subclasses may override.
    */
-  void Update();
+  void Update() override;
 
   /*
    * Method declared on IContributionItem.
    */
-  void SetParent(IContributionManager* parent);
+  void SetParent(IContributionManager* parent) override;
 
   /**
    * The <code>ContributionItem</code> implementation of this
    * method declared on <code>IContributionItem</code> does nothing.
    * Subclasses should override to update their state.
    */
-  void Update(const QString& id);
+  void Update(const QString& id) override;
 
   /**
    * The ID for this contribution item. It should be set once either in the

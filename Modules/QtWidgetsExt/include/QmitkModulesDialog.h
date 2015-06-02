@@ -27,7 +27,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkModulesDialog : public QDialog
 
 public:
 
-  explicit QmitkModulesDialog(QWidget *parent = 0, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+  explicit QmitkModulesDialog(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
 
 };
 

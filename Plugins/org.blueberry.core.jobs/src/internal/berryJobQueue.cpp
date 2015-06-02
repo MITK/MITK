@@ -27,7 +27,7 @@ class DummyJob: public InternalJob
 
 public:
 
-  IStatus::Pointer Run(IProgressMonitor::Pointer)
+  IStatus::Pointer Run(IProgressMonitor::Pointer) override
   {
     return Status::OK_STATUS(BERRY_STATUS_LOC);
   }
@@ -98,7 +98,7 @@ InternalJob::Pointer JobQueue::Dequeue()
   // sets previous pointer to 0 if there is only 1 Element in the queue
   if (ptr_dummyPrevious == dummy)
   {
-    dummy->previous = 0;
+    dummy->previous = nullptr;
     return dummy;
   }
   return ptr_dummyPrevious->Remove();
@@ -138,7 +138,7 @@ bool JobQueue::IsEmpty()
 InternalJob::Pointer JobQueue::Peek()
 {
 
-  return dummy->Previous() == dummy ? InternalJob::Pointer(0)
+  return dummy->Previous() == dummy ? InternalJob::Pointer(nullptr)
       : dummy->Previous();
 
 }

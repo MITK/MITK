@@ -194,7 +194,7 @@ public:
    * @return <code>true</code> if this job belongs to the given family, and
    * <code>false</code> otherwise.
    */
-  bool BelongsTo(Object::Pointer family);
+  bool BelongsTo(Object::Pointer family) override;
 
   /**
    * Stops the job.  If the job is currently waiting,
@@ -554,7 +554,7 @@ public:
    * @return <code>true</code> if the job manager should schedule this job
    *   and <code>false</code> otherwise
    */
-  virtual bool ShouldSchedule();
+  virtual bool ShouldSchedule() override;
 
   /**
    * Requests that this job be suspended.  If the job is currently waiting to be run, it
@@ -603,7 +603,7 @@ protected:
    * Subclasses may override this method to perform additional work when
    * a cancellation request is made.  This default implementation does nothing.
    */
-  virtual void Canceling();
+  virtual void Canceling() override;
 
   /**
    * Executes this job.  Returns the result of the execution.
@@ -631,7 +631,7 @@ protected:
    * @see #ASYNC_FINISH
    * @see #Done(IStatus)
    */
-  virtual IStatus::Pointer Run(IProgressMonitor::Pointer myProgressMonitor) = 0;
+  virtual IStatus::Pointer Run(IProgressMonitor::Pointer myProgressMonitor) override = 0;
 
 };
 

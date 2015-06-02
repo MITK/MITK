@@ -38,14 +38,14 @@ public:
 
   QtStylePreferencePage();
 
-  void Init(IWorkbench::Pointer workbench);
+  void Init(IWorkbench::Pointer workbench) override;
 
-  void CreateQtControl(QWidget* parent);
-  QWidget* GetQtControl() const;
+  void CreateQtControl(QWidget* parent) override;
+  QWidget* GetQtControl() const override;
 
-  bool PerformOk();
-  void PerformCancel();
-  void Update();
+  bool PerformOk() override;
+  void PerformCancel() override;
+  void Update() override;
 
 protected:
 

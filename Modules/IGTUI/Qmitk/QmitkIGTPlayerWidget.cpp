@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkIGTException.h>
-#include "mitkNavigationDataReaderXML.h"
+#include <mitkIOUtil.h>
 
 //qt headers
 #include <qfiledialog.h>
@@ -158,8 +158,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
         mitk::NavigationDataSet::Pointer navigationDataSet;
         try
         {
-          mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-          navigationDataSet = reader->Read(m_CmpFilename.toStdString());
+          navigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(m_CmpFilename.toStdString()).GetPointer());
         }
         catch(mitk::IGTException)
         {
@@ -464,8 +463,7 @@ void QmitkIGTPlayerWidget::OnOpenFileButtonPressed()
 
   emit SignalInputFileChanged();
 
-  mitk::NavigationDataReaderInterface::Pointer navigationDataReader = mitk::NavigationDataReaderXML::New().GetPointer();
-  mitk::NavigationDataSet::Pointer navigationDataSet = navigationDataReader->Read(m_CmpFilename.toStdString());
+  mitk::NavigationDataSet::Pointer navigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(m_CmpFilename.toStdString()).GetPointer());
   m_RealTimePlayer->SetNavigationDataSet(navigationDataSet);
   m_SequentialPlayer->SetNavigationDataSet(navigationDataSet);
 

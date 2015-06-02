@@ -56,7 +56,7 @@ void WorkbenchPagePartList::FireActivePartChanged(
 {
   partService.SetActivePart(newRef);
 
-  IWorkbenchPart::Pointer realPart = newRef == 0 ? IWorkbenchPart::Pointer(0) : newRef->GetPart(false);
+  IWorkbenchPart::Pointer realPart = newRef == 0 ? IWorkbenchPart::Pointer(nullptr) : newRef->GetPart(false);
   selectionService->SetActivePart(realPart);
 }
 

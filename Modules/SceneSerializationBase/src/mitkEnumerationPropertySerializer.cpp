@@ -23,11 +23,11 @@ TiXmlElement* EnumerationPropertySerializer::Serialize()
 {
   if (const EnumerationProperty* prop = dynamic_cast<const EnumerationProperty*>(m_Property.GetPointer()))
   {
-    TiXmlElement* element = new TiXmlElement("enum");
+    auto  element = new TiXmlElement("enum");
     element->SetAttribute("value", prop->GetValueAsString());
     return element;
   }
-  else return NULL;
+  else return nullptr;
 }
 
 EnumerationPropertySerializer::EnumerationPropertySerializer()

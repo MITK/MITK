@@ -24,11 +24,11 @@ class Step8 : public Step6
 {
   Q_OBJECT
 public:
-  Step8( int argc, char* argv[], QWidget *parent=0 );
+  Step8( int argc, char* argv[], QWidget *parent=nullptr );
   ~Step8() {}
 
 protected:
-  virtual void SetupWidgets();
+  virtual void SetupWidgets() override;
 protected slots:
 };
 #endif // DOXYGEN_IGNORE

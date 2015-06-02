@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkScaleLogarithmicTransformView : public
 
 public:
 
-  QmitkScaleLogarithmicTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkScaleLogarithmicTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkScaleLogarithmicTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

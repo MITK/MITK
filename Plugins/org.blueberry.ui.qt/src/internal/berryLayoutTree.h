@@ -174,7 +174,7 @@ public:
    * @see LayoutPart#computePreferredSize(boolean, int, int, int)
    */
   int ComputePreferredSize(bool width, int availableParallel,
-      int availablePerpendicular, int preferredParallel);
+      int availablePerpendicular, int preferredParallel) override;
 
 protected:
 
@@ -255,7 +255,7 @@ public:
    */
   void FlushCache();
 
-  int GetSizeFlags(bool width);
+  int GetSizeFlags(bool width) override;
 
   /**
    * Returns the parent of this tree or null if it is the root.
@@ -324,7 +324,7 @@ public:
   /**
    * Returns a string representation of this object.
    */
-  virtual QString ToString() const;
+  virtual QString ToString() const override;
 
   /**
    * Creates SWT controls owned by the LayoutTree (ie: the sashes). Does not affect the

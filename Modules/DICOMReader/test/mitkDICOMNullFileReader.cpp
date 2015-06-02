@@ -48,7 +48,7 @@ bool
 mitk::DICOMNullFileReader
 ::operator==(const DICOMFileReader& other) const
 {
-  return dynamic_cast<const Self*>(&other) != NULL; // same class, we don't have members
+  return dynamic_cast<const Self*>(&other) != nullptr; // same class, we don't have members
 }
 void
 mitk::DICOMNullFileReader

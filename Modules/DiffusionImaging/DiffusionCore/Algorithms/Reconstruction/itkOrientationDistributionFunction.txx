@@ -32,7 +32,7 @@ namespace itk
 {
 
   template<class T, unsigned int N>
-  vtkPolyData* itk::OrientationDistributionFunction<T,N>::m_BaseMesh = NULL;
+  vtkPolyData* itk::OrientationDistributionFunction<T,N>::m_BaseMesh = nullptr;
 
   template<class T, unsigned int N>
   double itk::OrientationDistributionFunction<T,N>::m_MaxChordLength = -1.0;
@@ -42,13 +42,13 @@ namespace itk
     = itk::PointShell<N, vnl_matrix_fixed<double, 3, N> >::DistributePointShell();
 
   template<class T, unsigned int N>
-  std::vector< std::vector<int>* >* itk::OrientationDistributionFunction<T,N>::m_NeighborIdxs = NULL;
+  std::vector< std::vector<int>* >* itk::OrientationDistributionFunction<T,N>::m_NeighborIdxs = nullptr;
 
   template<class T, unsigned int N>
-  std::vector< std::vector<int>* >* itk::OrientationDistributionFunction<T,N>::m_AngularRangeIdxs = NULL;
+  std::vector< std::vector<int>* >* itk::OrientationDistributionFunction<T,N>::m_AngularRangeIdxs = nullptr;
 
   template<class T, unsigned int N>
-  std::vector<int>* itk::OrientationDistributionFunction<T,N>::m_HalfSphereIdxs = NULL;
+  std::vector<int>* itk::OrientationDistributionFunction<T,N>::m_HalfSphereIdxs = nullptr;
 
   template<class T, unsigned int N>
   itk::SimpleFastMutexLock itk::OrientationDistributionFunction<T,N>::m_MutexBaseMesh;
@@ -495,7 +495,7 @@ namespace itk
   {
 
     m_MutexBaseMesh.Lock();
-    if(m_BaseMesh == NULL)
+    if(m_BaseMesh == nullptr)
     {
 
       vtkPoints* points = vtkPoints::New();
@@ -609,14 +609,14 @@ namespace itk
     ComputeBaseMesh();
 
     m_MutexNeighbors.Lock();
-    if(m_NeighborIdxs == NULL)
+    if(m_NeighborIdxs == nullptr)
     {
       m_NeighborIdxs = new std::vector< std::vector<int>* >();
       vtkCellArray* polys = m_BaseMesh->GetPolys();
 
       for(unsigned int i=0; i<NOdfDirections; i++)
       {
-        std::vector<int> *idxs = new std::vector<int>();
+        auto      idxs = new std::vector<int>();
         polys->InitTraversal();
         vtkIdType npts; vtkIdType *pts;
         while(polys->GetNextCell(npts,pts))
@@ -1015,13 +1015,13 @@ namespace itk
     // following loop only performed once
     // (computing indices of each angular range)
     m_MutexAngularRange.Lock();
-    if(m_AngularRangeIdxs == NULL)
+    if(m_AngularRangeIdxs == nullptr)
     {
       m_AngularRangeIdxs = new std::vector< std::vector<int>* >();
       for(unsigned int i=0; i<N; i++)
       {
         vnl_vector_fixed<double,3> pDir = GetDirection(i);
-        std::vector<int> *idxs = new std::vector<int>();
+        auto      idxs = new std::vector<int>();
         for(unsigned int j=0; j<N; j++)
         {
           vnl_vector_fixed<double,3> cDir = GetDirection(j);

@@ -38,15 +38,15 @@ public:
                            IWorkbenchWindow* window, IWorkbenchPartSite* partSite,
                            int level);
 
-  IWorkbenchPartSite* GetPartSite() const;
+  IWorkbenchPartSite* GetPartSite() const override;
 
-  QString GetServiceScope() const;
+  QString GetServiceScope() const override;
 
-  IWorkbench* GetWorkbench() const;
+  IWorkbench* GetWorkbench() const override;
 
-  IWorkbenchWindow* GetWorkbenchWindow() const;
+  IWorkbenchWindow* GetWorkbenchWindow() const override;
 
-  int GetServiceLevel() const;
+  int GetServiceLevel() const override;
 
 };
 

@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkAffineTransformView : public QmitkRigi
 
 public:
 
-  QmitkAffineTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkAffineTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkAffineTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

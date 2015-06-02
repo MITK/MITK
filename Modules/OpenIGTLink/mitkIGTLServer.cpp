@@ -106,17 +106,17 @@ void mitk::IGTLServer::Receive()
   //the server can be connected with several clients, therefore it has to check
   //all registered clients
   SocketListIteratorType it;
-  SocketListIteratorType it_end = this->m_RegisteredClients.end();
+  auto it_end = this->m_RegisteredClients.end();
   for ( it = this->m_RegisteredClients.begin(); it != it_end; ++it )
   {
     //it is possible that ReceivePrivate detects that the current socket is
     //already disconnected. Therefore, it is necessary to remove this socket
     //from the registered clients list
     status = this->ReceivePrivate(*it);
-    if ( status == IGTL_STATUS_NOT_PRESENT )
+    if (status == IGTL_STATUS_NOT_PRESENT)
     {
       //remember this socket for later, it is not a good idea to remove it
-      //from the list directly because we iterator over the list at this point
+      //from the list directly because we iterate over the list at this point
       socketsToBeRemoved.push_back(*it);
       MITK_WARN("IGTLServer") << "Lost connection to a client socket. ";
     }
@@ -149,7 +149,7 @@ void mitk::IGTLServer::Send()
   //(I know it is no excuse but PLUS is doing exactly the same, they broadcast
   //everything)
   SocketListIteratorType it;
-  SocketListIteratorType it_end =
+  auto it_end =
       this->m_RegisteredClients.end();
   for ( it = this->m_RegisteredClients.begin(); it != it_end; ++it )
   {
@@ -161,8 +161,8 @@ void mitk::IGTLServer::Send()
 void mitk::IGTLServer::StopCommunicationWithSocket(
     SocketListType& toBeRemovedSockets)
 {
-  SocketListIteratorType it    = toBeRemovedSockets.begin();
-  SocketListIteratorType itEnd = toBeRemovedSockets.end();
+  auto it    = toBeRemovedSockets.begin();
+  auto itEnd = toBeRemovedSockets.end();
   for (; it != itEnd; ++it )
   {
     this->StopCommunicationWithSocket(*it);
@@ -171,8 +171,8 @@ void mitk::IGTLServer::StopCommunicationWithSocket(
 
 void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
 {
-  SocketListIteratorType it    = this->m_RegisteredClients.begin();
-  SocketListIteratorType itEnd = this->m_RegisteredClients.end();
+  auto it    = this->m_RegisteredClients.begin();
+  auto itEnd = this->m_RegisteredClients.end();
 
   for (; it != itEnd; ++it )
   {

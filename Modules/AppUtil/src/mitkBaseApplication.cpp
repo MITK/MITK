@@ -44,6 +44,7 @@ namespace mitk {
 QString BaseApplication::ARG_NEWINSTANCE = "BlueBerry.newInstance";
 QString BaseApplication::ARG_CLEAN = "BlueBerry.clean";
 QString BaseApplication::ARG_APPLICATION = "BlueBerry.application";
+QString BaseApplication::ARG_PRODUCT = "BlueBerry.product";
 QString BaseApplication::ARG_HOME = "BlueBerry.home";
 QString BaseApplication::ARG_STORAGE_DIR = "BlueBerry.storageDir";
 QString BaseApplication::ARG_PLUGIN_CACHE = "BlueBerry.plugin_cache_dir";
@@ -69,6 +70,7 @@ QString BaseApplication::PROP_NO_REGISTRY_CACHE = BaseApplication::ARG_NO_REGIST
 QString BaseApplication::PROP_NO_LAZY_REGISTRY_CACHE_LOADING = BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
 QString BaseApplication::PROP_REGISTRY_MULTI_LANGUAGE = BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE;
 
+QString BaseApplication::PROP_PRODUCT = "blueberry.product";
 QString BaseApplication::PROP_APPLICATION = "blueberry.application";
 QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
 QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
@@ -98,7 +100,37 @@ struct BaseApplication::Impl
     , m_Argv(argv)
     , m_SingleMode(false)
     , m_SafeMode(true)
-  {}
+  {
+#ifdef Q_OS_MAC
+    /*
+     * This is a workaround for bug 19080:
+     * On Mac OS X the prosess serial number is passed as an commandline argument (-psn_<NUMBER>)
+     * if the application is started via the.app bundle.
+     * This option is unknown, which causes a Poco exception.
+     * Since this is done by the system we have to manually remove the argument here.
+     */
+
+    int newArgc = m_Argc-1;
+    char** newArgs = new char*[newArgc];
+    bool argFound (false);
+    for (int i = 0; i < m_Argc; ++i)
+    {
+      if (QString::fromLatin1(m_Argv[i]).contains("-psn"))
+      {
+        argFound = true;
+      }
+      else
+      {
+        newArgs[i] = m_Argv[i];
+      }
+    }
+    if (argFound)
+    {
+      m_Argc = newArgc;
+      m_Argv = newArgs;
+    }
+#endif
+  }
 
   QVariant getProperty(const QString& property) const
   {
@@ -174,8 +206,9 @@ struct BaseApplication::Impl
     for (auto key : keys)
     {
       QString qKey = QString::fromStdString(key);
-      if (!m_FWProps.contains(qKey) && configuration.hasProperty(key))
+      if (configuration.hasProperty(key))
       {
+        // ini and command line options overwrite already inserted keys
         m_FWProps[qKey] = QString::fromStdString(configuration.getString(key));
       }
     }
@@ -292,7 +325,10 @@ void BaseApplication::printHelp(const std::string& /*name*/, const std::string& 
 
 void BaseApplication::setApplicationName(const QString& name)
 {
-  if (qApp) qApp->setApplicationName(name);
+  if (qApp)
+  {
+    qApp->setApplicationName(name);
+  }
   d->m_AppName = name;
 }
 
@@ -307,7 +343,10 @@ QString BaseApplication::getApplicationName() const
 
 void BaseApplication::setOrganizationName(const QString& name)
 {
-  if (qApp) qApp->setOrganizationName(name);
+  if (qApp)
+  {
+    qApp->setOrganizationName(name);
+  }
   d->m_OrgaName = name;
 }
 
@@ -319,7 +358,10 @@ QString BaseApplication::getOrganizationName() const
 
 void BaseApplication::setOrganizationDomain(const QString& domain)
 {
-  if (qApp) qApp->setOrganizationDomain(domain);
+  if (qApp)
+  {
+    qApp->setOrganizationDomain(domain);
+  }
   d->m_OrgaDomain = domain;
 }
 
@@ -387,8 +429,32 @@ QString BaseApplication::getProvisioningFilePath() const
   {
     QFileInfo appFilePath(QCoreApplication::applicationFilePath());
     QDir basePath(QCoreApplication::applicationDirPath());
+
     QString provFileName = appFilePath.baseName() + ".provisioning";
+
     QFileInfo provFile(basePath.absoluteFilePath(provFileName));
+
+#ifdef Q_OS_MAC
+    /*
+     * On Mac, if started from the build directory the .provisioning file is located at:
+     * <MITK-build/bin/MitkWorkbench.provisioning>
+     * but the executable path is:
+     * <MITK-build/bin/MitkWorkbench.app/Contents/MacOS/MitkWorkbench>
+     * In this case we have to cdUp threetimes.
+     *
+     * During packaging however the MitkWorkbench.provisioning file is placed at the same
+     * level like the executable, hence nothing has to be done.
+     */
+
+    if (!provFile.exists())
+    {
+      basePath.cdUp();
+      basePath.cdUp();
+      basePath.cdUp();
+      provFile = basePath.absoluteFilePath(provFileName);
+    }
+#endif
+
 
     if (provFile.exists())
     {
@@ -413,8 +479,19 @@ void BaseApplication::initializeQt()
 {
   if (qApp) return;
 
+  // If previously parameters have been set we have to store them
+  // to hand them through to the application
+  QString appName = this->getApplicationName();
+  QString orgName = this->getOrganizationName();
+  QString orgDomain = this->getOrganizationDomain();
+
   // Create a QCoreApplication instance
   this->getQApplication();
+
+  // provide parameters to QCoreApplication
+  this->setApplicationName(appName);
+  this->setOrganizationName(orgName);
+  this->setOrganizationDomain(orgDomain);
 }
 
 void BaseApplication::initialize(Poco::Util::Application& self)
@@ -519,7 +596,7 @@ QString BaseApplication::getCTKFrameworkStorageDir() const
     // Append a hash value of the absolute path of the executable to the data location.
     // This allows to start the same application from different build or install trees.
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    storageDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + '_';
+    storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + this->getOrganizationName() + "/" + this->getApplicationName() + '_';
 #else
     storageDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
 #endif
@@ -551,7 +628,7 @@ QCoreApplication* BaseApplication::getQApplication() const
     }
     else
     {
-      QmitkSafeApplication* safeApp = new QmitkSafeApplication(d->m_Argc, d->m_Argv);
+      auto  safeApp = new QmitkSafeApplication(d->m_Argc, d->m_Argv);
       safeApp->setSafeMode(d->m_SafeMode);
       qCoreApp = safeApp;
     }
@@ -613,6 +690,10 @@ void BaseApplication::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Option cleanOption(ARG_CLEAN.toStdString(), "", "cleans the plugin cache");
   cleanOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleClean));
   options.addOption(cleanOption);
+
+  Poco::Util::Option productOption(ARG_PRODUCT.toStdString(), "", "the id of the product to be launched");
+  productOption.argument("<id>").binding(PROP_PRODUCT.toStdString());
+  options.addOption(productOption);
 
   Poco::Util::Option appOption(ARG_APPLICATION.toStdString(), "", "the id of the application extension to be executed");
   appOption.argument("<id>").binding(PROP_APPLICATION.toStdString());

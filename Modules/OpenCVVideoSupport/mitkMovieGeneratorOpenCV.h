@@ -39,7 +39,7 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual void SetFileName( const char *fileName );
+  virtual void SetFileName( const char *fileName ) override;
 
   void SetFourCCCodec(char* codec)
   {
@@ -59,13 +59,13 @@ protected:
   MovieGeneratorOpenCV();
 
   //! called directly before the first frame is added
-  virtual bool InitGenerator();
+  virtual bool InitGenerator() override;
 
   //! used to add a frame
-  virtual bool AddFrame( void *data );
+  virtual bool AddFrame( void *data ) override;
 
   //! called after the last frame is added
-  virtual bool TerminateGenerator();
+  virtual bool TerminateGenerator() override;
 
   //! name of output file
   std::string m_sFile;

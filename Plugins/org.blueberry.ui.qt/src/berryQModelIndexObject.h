@@ -39,7 +39,7 @@ public:
 
   const QModelIndex& GetQModelIndex() const;
 
-  bool operator==(const Object* obj) const;
+  bool operator==(const Object* obj) const override;
 
 private:
 

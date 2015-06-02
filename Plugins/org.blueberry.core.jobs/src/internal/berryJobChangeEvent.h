@@ -60,17 +60,17 @@ public:
   /*
    * Method declared on IJobChangeEvent
    */
-  Poco::Timestamp::TimeDiff GetDelay() const;
+  Poco::Timestamp::TimeDiff GetDelay() const override;
 
   /*
    * Method declared on IJobChangeEvent
    */
-  SmartPointer<Job> GetJob() const;
+  SmartPointer<Job> GetJob() const override;
 
   /* (
    * Method declared on IJobChangeEvent
    */
-  IStatus::Pointer GetResult() const;
+  IStatus::Pointer GetResult() const override;
 
 };
 

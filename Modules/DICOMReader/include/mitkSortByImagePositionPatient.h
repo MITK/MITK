@@ -52,7 +52,7 @@ class MITKDICOMREADER_EXPORT SortByImagePositionPatient : public DICOMSortCriter
 
   protected:
 
-    SortByImagePositionPatient( DICOMSortCriterion::Pointer secondaryCriterion = NULL );
+    SortByImagePositionPatient( DICOMSortCriterion::Pointer secondaryCriterion = nullptr );
     virtual ~SortByImagePositionPatient();
 
     SortByImagePositionPatient(const SortByImagePositionPatient& other);

@@ -42,7 +42,7 @@ public:
   /**
    * An instance of DicomView is initially being laid out.
    */
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 
 };
 

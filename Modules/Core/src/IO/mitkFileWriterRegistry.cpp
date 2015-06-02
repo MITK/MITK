@@ -34,10 +34,9 @@ mitk::FileWriterRegistry::FileWriterRegistry()
 
 mitk::FileWriterRegistry::~FileWriterRegistry()
 {
-  for (std::map<mitk::IFileWriter*, us::ServiceObjects<mitk::IFileWriter> >::iterator iter = m_ServiceObjects.begin(),
-       end = m_ServiceObjects.end(); iter != end; ++iter)
+  for (auto & elem : m_ServiceObjects)
   {
-    iter->second.UngetService(iter->first);
+    elem.second.UngetService(elem.first);
   }
 }
 
@@ -136,9 +135,8 @@ void mitk::FileWriterRegistry::UngetWriter(mitk::IFileWriter* writer)
 
 void mitk::FileWriterRegistry::UngetWriters(const std::vector<mitk::IFileWriter*>& writers)
 {
-  for (std::vector<mitk::IFileWriter*>::const_iterator iter = writers.begin(), end = writers.end();
-    iter != end; ++iter)
+  for (const auto & writer : writers)
   {
-    this->UngetWriter(*iter);
+    this->UngetWriter(writer);
   }
 }

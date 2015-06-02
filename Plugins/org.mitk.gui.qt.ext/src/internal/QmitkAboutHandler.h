@@ -25,7 +25,7 @@ class QmitkAboutHandler : public berry::AbstractHandler
 
 public:
 
-  Object::Pointer Execute(const berry::SmartPointer<const berry::ExecutionEvent>& event);
+  Object::Pointer Execute(const berry::SmartPointer<const berry::ExecutionEvent>& event) override;
 };
 
 #endif // QMITKABOUTHANDLER_H

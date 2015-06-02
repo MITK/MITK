@@ -32,7 +32,7 @@ namespace berry
 const QString AbstractUICTKPlugin::FN_DIALOG_SETTINGS = "dialog_settings.xml";
 
 AbstractUICTKPlugin::AbstractUICTKPlugin()
-  : preferencesService(0)
+  : preferencesService(nullptr)
 {
 }
 
@@ -56,7 +56,7 @@ AbstractUICTKPlugin::AbstractUICTKPlugin()
 IPreferencesService* AbstractUICTKPlugin::GetPreferencesService() const
 {
   // Create the preference store lazily.
-  if (preferencesService == 0)
+  if (preferencesService == nullptr)
   {
     ctkServiceReference serviceRef = m_Context->getServiceReference<IPreferencesService>();
     if (!serviceRef)
@@ -71,7 +71,7 @@ IPreferencesService* AbstractUICTKPlugin::GetPreferencesService() const
 SmartPointer<IPreferences> AbstractUICTKPlugin::GetPreferences() const
 {
   IPreferencesService* prefService = this->GetPreferencesService();
-  if (prefService == NULL) return IPreferences::Pointer(0);
+  if (prefService == nullptr) return IPreferences::Pointer(nullptr);
 
   return prefService->GetSystemPreferences();
 }

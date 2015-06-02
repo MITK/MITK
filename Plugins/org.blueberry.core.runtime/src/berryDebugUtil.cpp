@@ -429,7 +429,7 @@ void DebugUtil::SaveState(const QDir& path)
 {
   QString saveFile = path.absoluteFilePath(DEBUG_UTIL_XML);
 
-  Poco::XML::Document* doc = new Poco::XML::Document();
+  auto   doc = new Poco::XML::Document();
   Poco::XML::Element* debugutil = doc->createElement(DEBUGUTIL_TAG.toStdString());
   doc->appendChild(debugutil)->release();
 

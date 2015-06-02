@@ -46,14 +46,14 @@ class QmitkViewNavigatorWidget : public QWidget
 public:
 
     QmitkViewNavigatorWidget (berry::IWorkbenchWindow::Pointer window,
-                              QWidget* parent = 0, Qt::WindowFlags f = 0);
+                              QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     virtual ~QmitkViewNavigatorWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);
     void setFocus();
 
     bool FillTreeList();
-    void UpdateTreeList(QStandardItem* item = NULL, berry::IWorkbenchPartReference* partRef=NULL, const std::string& changeId="");
+    void UpdateTreeList(QStandardItem* item = nullptr, berry::IWorkbenchPartReference* partRef=nullptr, const std::string& changeId="");
 
     QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
     QScopedPointer<berry::IWindowListener>         m_WindowListener;

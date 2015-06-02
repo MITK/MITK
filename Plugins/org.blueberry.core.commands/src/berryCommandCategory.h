@@ -78,14 +78,14 @@ public:
    *
    * @see org.eclipse.core.commands.common.HandleObject#toString()
    */
-  QString ToString() const;
+  QString ToString() const override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.core.commands.common.HandleObject#undefine()
    */
-  void Undefine();
+  void Undefine() override;
 
 protected:
 

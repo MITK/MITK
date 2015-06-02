@@ -102,7 +102,7 @@ namespace mitk {
   private:
     ConnectomicsHistogramBase* GetHistogram() override
     {
-      return NULL;
+      return nullptr;
     }
   };
 

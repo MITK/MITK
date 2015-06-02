@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkPowellOptimizerView : public QmitkRigi
 
 public:
 
-  QmitkPowellOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkPowellOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkPowellOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

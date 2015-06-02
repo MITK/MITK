@@ -43,14 +43,14 @@ public:
 
 private:
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
 
   mitk::Image* GetImage() const;
 

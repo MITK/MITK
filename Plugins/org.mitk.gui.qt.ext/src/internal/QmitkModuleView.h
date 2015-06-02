@@ -31,11 +31,11 @@ public:
 
 protected:
 
-  void SetFocus();
-  void CreateQtPartControl(QWidget *parent);
+  void SetFocus() override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  void Init(berry::IViewSite::Pointer site, berry::IMemento::Pointer memento);
-  void SaveState(berry::IMemento::Pointer memento);
+  void Init(berry::IViewSite::Pointer site, berry::IMemento::Pointer memento) override;
+  void SaveState(berry::IMemento::Pointer memento) override;
 
 private:
 

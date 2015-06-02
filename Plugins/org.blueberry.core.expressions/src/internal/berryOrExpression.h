@@ -25,9 +25,9 @@ class OrExpression : public CompositeExpression {
 
 public:
 
-  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const;
+  EvaluationResult::ConstPointer Evaluate(IEvaluationContext* context) const override;
 
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 };
 
 } // namespace berry

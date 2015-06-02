@@ -84,7 +84,7 @@ public:
 
   void tearDown() override
   {
-    pointSet = NULL;
+    pointSet = nullptr;
   }
 
   void TestIsNotEmpty()
@@ -280,7 +280,7 @@ std::cout<<"[PASSED]"<<std::endl;
 
     //check OpREMOVE  ExecuteOperation
     int id = 11;
-    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, id);
+    auto  doOp = new mitk::PointOperation(mitk::OpREMOVE, point, id);
     pointSet->ExecuteOperation(doOp);
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE( "remove point id 11: ",

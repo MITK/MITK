@@ -159,17 +159,17 @@ public:
    * @return <code>true</code> if the objects are equal; <code>false</code>
    *         otherwise.
    */
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 
-  QString GetId() const;
+  QString GetId() const override;
 
-  QString GetName() const;
+  QString GetName() const override;
 
-  SmartPointer<ParameterType> GetParameterType() const;
+  SmartPointer<ParameterType> GetParameterType() const override;
 
-  IParameterValues* GetValues() const;
+  IParameterValues* GetValues() const override;
 
-  uint HashCode() const
+  uint HashCode() const override
   {
     if (hashCode == HASH_CODE_NOT_COMPUTED)
     {
@@ -182,9 +182,9 @@ public:
     return hashCode;
   }
 
-  bool IsOptional() const;
+  bool IsOptional() const override;
 
-  QString ToString() const;
+  QString ToString() const override;
 };
 
 }

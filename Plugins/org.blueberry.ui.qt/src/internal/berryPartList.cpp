@@ -68,13 +68,13 @@ IEditorReference::Pointer PartList::GetActiveEditorReference()
 
 IEditorPart::Pointer PartList::GetActiveEditor()
 {
-  return activeEditorReference.Expired() ? IEditorPart::Pointer(0) : activeEditorReference.Lock()->GetEditor(
+  return activeEditorReference.Expired() ? IEditorPart::Pointer(nullptr) : activeEditorReference.Lock()->GetEditor(
       false);
 }
 
 IWorkbenchPart::Pointer PartList::GetActivePart()
 {
-  return activePartReference.Expired() ? IWorkbenchPart::Pointer(0) : activePartReference.Lock()->GetPart(false);
+  return activePartReference.Expired() ? IWorkbenchPart::Pointer(nullptr) : activePartReference.Lock()->GetPart(false);
 }
 
 //QList<IEditorReference::Pointer> PartList::GetEditors()

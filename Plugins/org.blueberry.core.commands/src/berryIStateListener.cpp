@@ -24,7 +24,7 @@ void
 IStateListener::Events
 ::AddListener(IStateListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   stateChanged += Delegate(l, &IStateListener::HandleStateChange);
 }
@@ -33,7 +33,7 @@ void
 IStateListener::Events
 ::RemoveListener(IStateListener* l)
 {
-  if (l == NULL) return;
+  if (l == nullptr) return;
 
   stateChanged -= Delegate(l, &IStateListener::HandleStateChange);
 }

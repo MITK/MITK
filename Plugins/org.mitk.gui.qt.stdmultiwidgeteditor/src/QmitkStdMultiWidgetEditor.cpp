@@ -66,12 +66,12 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     : d(dd)
   {}
 
-  Events::Types GetPartEventTypes() const
+  Events::Types GetPartEventTypes() const override
   {
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
   }
 
-  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -85,7 +85,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     }
   }
 
-  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef)
+  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -99,7 +99,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     }
   }
 
-  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef)
+  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -402,7 +402,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 
   for(unsigned int i = 0; i < 4; ++i)
   {
-    d->m_StdMultiWidget->SetCornerAnnotation(d->m_WidgetAnnotation[i].toStdString(),
+    d->m_StdMultiWidget->SetDecorationProperties(d->m_WidgetAnnotation[i].toStdString(),
                                              HexColorToMitkColor(d->m_WidgetDecorationColor[i]), i);
   }
   //The crosshair gap

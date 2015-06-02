@@ -161,6 +161,11 @@ public:
   PointsConstIterator End( int t = 0 ) const;
 
   /**
+  * \brief Get an iterator to the max ID element if existent. Return End() otherwise.
+  */
+  PointsIterator GetMaxId( int t = 0 );
+
+  /**
    * \brief Get the point with ID id in world coordinates
    *
    * check if the ID exists. If it doesn't exist, then return 0,0,0
@@ -194,6 +199,11 @@ public:
   * \brief Set the given point in world coordinate system with given PointSpecificationType
   */
   void InsertPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t );
+
+  /**
+  * \brief Insert the given point in world coordinate system with incremented max id at time step t.
+  */
+  PointIdentifier InsertPoint( PointType point, int t = 0 );
 
   /**
   * \brief Swap a point at the given position (id) with the upper point (moveUpwards=true) or with the lower point (moveUpwards=false).
@@ -266,6 +276,8 @@ protected:
   typedef std::vector< DataType::Pointer > PointSetSeries;
 
   PointSetSeries m_PointSetSeries;
+
+  DataType::PointsContainer::Pointer m_EmptyPointsContainer;
 
   /**
   * @brief flag to indicate the right time to call SetBounds

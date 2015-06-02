@@ -50,7 +50,7 @@ void mitk::PlaneIntersectionVisitor::processVisualModel(sofa::simulation::Node*,
 
   VisualModelImpl* visualModelImpl = dynamic_cast<VisualModelImpl*>(visualModel);
 
-  if (visualModelImpl == NULL)
+  if (visualModelImpl == nullptr)
     return;
 
   const sofa::core::loader::Material& material = visualModelImpl->material.getValue();

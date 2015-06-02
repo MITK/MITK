@@ -23,7 +23,7 @@ int QtTesting()
 {
   //QtTestingClass *qttestingclass = new QtTestingClass;
   std::cout << "Testing ... " << std::endl;
-  QTimer *timer = new QTimer( QApplication::instance() );
+  auto timer = new QTimer( QApplication::instance() );
   timer->setSingleShot(true);
   QObject::connect( timer, SIGNAL(timeout()), QApplication::instance(), SLOT(quit()) );
   timer->start( 2000 ); // 2 seconds single-shot timer

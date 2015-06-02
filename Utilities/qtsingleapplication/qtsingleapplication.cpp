@@ -135,7 +135,7 @@
 
 void QtSingleApplication::sysInit(const QString &appId)
 {
-    actWin = 0;
+    actWin = nullptr;
     peer = new QtLocalPeer(this, appId);
     connect(peer, SIGNAL(messageReceived(const QByteArray&)), SIGNAL(messageReceived(const QByteArray&)));
 }

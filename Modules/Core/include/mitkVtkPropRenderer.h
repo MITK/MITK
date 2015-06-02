@@ -165,7 +165,7 @@ in order to get a vtkTextProperty. This property enables the setup of font, font
   static bool useImmediateModeRendering();
 
 protected:
-  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard );
+  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard );
   virtual ~VtkPropRenderer();
   virtual void Update() override;
 

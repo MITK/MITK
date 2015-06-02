@@ -50,7 +50,7 @@ void mitk::PointSetToPointSetFilter::SetInput( const unsigned int& idx, const mi
 const mitk::PointSetToPointSetFilter::InputType * mitk::PointSetToPointSetFilter::GetInput( void )
 {
   if ( this->GetNumberOfInputs() < 1 )
-    return 0;
+    return nullptr;
   // Process object is not const-correct so the const_cast is required here
   return static_cast<const mitk::PointSetToPointSetFilter::InputType * >( this->ProcessObject::GetInput( 0 ) );
 }
@@ -59,7 +59,7 @@ const mitk::PointSetToPointSetFilter::InputType * mitk::PointSetToPointSetFilter
 const mitk::PointSetToPointSetFilter::InputType * mitk::PointSetToPointSetFilter::GetInput( const unsigned int& idx )
 {
   if (idx > this->GetNumberOfInputs() - 1 )
-    return 0;
+    return nullptr;
   // Process object is not const-correct so the const_cast is required here
   return static_cast< const mitk::PointSetToPointSetFilter::InputType * >(this->ProcessObject::GetInput(idx));
 }

@@ -82,7 +82,7 @@ public:
   /**
   * Standard qt constructor
   */
-  QmitkPlotWidget(QWidget* parent = 0,const char* title = 0, const char* name = 0, Qt::WindowFlags f = 0);
+  QmitkPlotWidget(QWidget* parent = nullptr,const char* title = nullptr, const char* name = nullptr, Qt::WindowFlags f = nullptr);
 
   /**
   * Virtual destructor

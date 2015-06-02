@@ -34,8 +34,8 @@ class org_blueberry_core_commands_Activator :
 public:
   org_blueberry_core_commands_Activator();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 };
 
 typedef org_blueberry_core_commands_Activator PluginActivator;

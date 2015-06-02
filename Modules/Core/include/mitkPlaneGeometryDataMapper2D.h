@@ -82,9 +82,11 @@ public:
     // actor
     vtkSmartPointer<vtkActor2D> m_CrosshairActor;
     vtkSmartPointer<vtkActor2D> m_CrosshairHelperLineActor;
-    vtkSmartPointer<vtkPropAssembly> m_CrosshairAssembly;
+    vtkSmartPointer<vtkActor2D> m_ArrowActor;
     vtkSmartPointer<vtkPolyDataMapper2D> m_HelperLinesmapper;
+    vtkSmartPointer<vtkPolyDataMapper2D> m_Arrowmapper;
     vtkSmartPointer<vtkPolyDataMapper2D> m_Mapper;
+    vtkSmartPointer<vtkPropAssembly> m_CrosshairAssembly;
   };
 
   /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
@@ -132,6 +134,11 @@ protected:
   mitk::ScalarType m_DepthValue;
 
   void ApplyColorAndOpacityProperties2D(BaseRenderer *renderer, vtkActor2D *actor);
+  void DrawOrientationArrow(vtkSmartPointer<vtkCellArray> triangles,
+                            vtkSmartPointer<vtkPoints> triPoints,
+                            double triangleSizeMM,
+                            Vector3D& orthogonalVector,
+                            Point3D& point1, Point3D& point2);
 };
 } // namespace mitk
 #endif /* mitkPlaneGeometryDataMapper2D_h */

@@ -39,8 +39,8 @@ static const double PI = itk::Math::pi;
 vtkStandardNewMacro(vtkMitkLevelWindowFilter);
 
 vtkMitkLevelWindowFilter::vtkMitkLevelWindowFilter()
-  : m_LookupTable(NULL)
-  , m_OpacityFunction(NULL)
+  : m_LookupTable(nullptr)
+  , m_OpacityFunction(nullptr)
   , m_MinOpacity(0.0)
   , m_MaxOpacity(255.0)
 {
@@ -56,7 +56,7 @@ unsigned long int vtkMitkLevelWindowFilter::GetMTime()
   unsigned long mTime=this->vtkObject::GetMTime();
   unsigned long time;
 
-  if ( this->m_LookupTable != NULL )
+  if ( this->m_LookupTable != nullptr )
   {
     time = this->m_LookupTable->GetMTime();
     mTime = ( time > mTime ? time : mTime );
@@ -506,7 +506,7 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
                                        outData,
                                        extent,
                                        m_ClippingBounds,
-                                       static_cast<VTK_TT *>(0)));
+                                       static_cast<VTK_TT *>(nullptr)));
       default:
         vtkErrorMacro(<< "Execute: Unknown ScalarType");
         return;
@@ -540,7 +540,7 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
                                                outData,
                                                extent,
                                                m_ClippingBounds,
-                                               static_cast<VTK_TT *>(0)));
+                                               static_cast<VTK_TT *>(nullptr)));
         default:
           vtkErrorMacro(<< "Execute: Unknown ScalarType");
           return;
@@ -555,7 +555,7 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
                                                 inData,
                                                 outData,
                                                 extent,
-                                                static_cast<VTK_TT *>(0)));
+                                                static_cast<VTK_TT *>(nullptr)));
         default:
           vtkErrorMacro(<< "Execute: Unknown ScalarType");
           return;
@@ -571,7 +571,7 @@ void vtkMitkLevelWindowFilter::ThreadedExecute(vtkImageData *inData,
                                             outData,
                                             extent,
                                             m_ClippingBounds,
-                                            static_cast<VTK_TT *>(0)));
+                                            static_cast<VTK_TT *>(nullptr)));
         default:
           vtkErrorMacro(<< "Execute: Unknown ScalarType");
           return;

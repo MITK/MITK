@@ -75,8 +75,8 @@ const QString ExtensionsParser::PROPERTY_VALUE = "value";
 
 
 ExtensionsParser::ExtensionsParser(const SmartPointer<MultiStatus>& status, ExtensionRegistry* registry)
-  : locator(NULL), extractNamespaces(true), status(status),
-    registry(registry), resources(NULL), objectManager(NULL)
+  : locator(nullptr), extractNamespaces(true), status(status),
+    registry(registry), resources(nullptr), objectManager(nullptr)
 {
 }
 
@@ -239,7 +239,7 @@ ExtensionsParser::parseManifest(QXmlReader* reader, QXmlInputSource* in,
   if (registry->Debug())
     start.start();
 
-  if (reader == NULL)
+  if (reader == nullptr)
   {
     cumulativeTime += start.elapsed();
     throw ctkInvalidArgumentException("XML Reader not available");
@@ -532,7 +532,7 @@ void ExtensionsParser::parseExtensionAttributes(const QXmlAttributes& attributes
 
 void ExtensionsParser::missingAttribute(const QString& attribute, const QString& element)
 {
-  if (locator == NULL)
+  if (locator == nullptr)
     internalError(QString("Missing \"%1\" attribute in \"%2\" element. Element ignored.").arg(attribute).arg(element));
   else
     internalError(QString("Missing \"%1\" attribute in \"%2\" element (line: %3). Element ignored.")
@@ -541,7 +541,7 @@ void ExtensionsParser::missingAttribute(const QString& attribute, const QString&
 
 void ExtensionsParser::unknownAttribute(const QString& attribute, const QString& element)
 {
-  if (locator == NULL)
+  if (locator == nullptr)
     internalError(QString("Unknown attribute \"%1\" for element \"%2\" ignored.").arg(attribute).arg(element));
   else
     internalError(QString("Unknown attribute \"%1\" for element \"%2\" ignored (line: %3).")
@@ -550,7 +550,7 @@ void ExtensionsParser::unknownAttribute(const QString& attribute, const QString&
 
 void ExtensionsParser::unknownElement(const QString& parent, const QString& element)
 {
-  if (locator == NULL)
+  if (locator == nullptr)
     internalError(QString("Unknown element \"%1\", found within a \"%2\", ignored.").arg(element).arg(parent));
   else
     internalError(QString("Unknown element \"%1\", found within a \"%2\", ignored (line: %3).")

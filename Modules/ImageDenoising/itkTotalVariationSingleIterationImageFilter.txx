@@ -144,14 +144,12 @@ namespace itk
     std::vector<double> ws;
     std::vector<double> hs;
 
-    typename NeighborhoodAlgorithm::
-      ImageBoundaryFacesCalculator<InputImageType>::FaceListType::iterator
+    auto
       lv_fit=lv_faceList.begin();
 
     // Process each of the boundary faces.  These are N-d regions which border
     // the edge of the buffer.
-    for ( typename NeighborhoodAlgorithm::
-      ImageBoundaryFacesCalculator<InputImageType>::FaceListType::iterator
+    for ( auto
       fit=faceList.begin(); fit != faceList.end(); ++fit)
     {
 

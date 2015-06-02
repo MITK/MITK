@@ -380,9 +380,9 @@ namespace mitk
 
       ~HelperStructRGBChannels()
       {
-        r = 0;
-        g = 0;
-        b = 0;
+        r = nullptr;
+        g = nullptr;
+        b = nullptr;
       }
     };
 
@@ -396,13 +396,13 @@ namespace mitk
       HistType *hist;
 
       HelperStructPerformRGBClusteringRetval() :
-          rgbChannels(0), params(0), result(0), hist(0)
+          rgbChannels(nullptr), params(nullptr), result(nullptr), hist(nullptr)
       {
       }
 
       ~HelperStructPerformRGBClusteringRetval()
       {
-        rgb = 0;
+        rgb = nullptr;
         delete rgbChannels;
       }
     };
@@ -417,15 +417,15 @@ namespace mitk
       HistType *hist;
 
       HelperStructPerformClusteringRetval() :
-          clusteredImage(0), displayImage(0),
-          params(0), result(0), hist(0)
+          clusteredImage(nullptr), displayImage(nullptr),
+          params(nullptr), result(nullptr), hist(nullptr)
       {
       }
 
       ~HelperStructPerformClusteringRetval()
       {
-        clusteredImage = 0;
-        displayImage = 0;
+        clusteredImage = nullptr;
+        displayImage = nullptr;
       }
     };
 
@@ -441,7 +441,7 @@ namespace mitk
 
     void Normalize(ParamsType params, ClusterResultType* curves) const;
 
-    HelperStructPerformClusteringRetval* PerformClustering(mitk::Image::ConstPointer image, const MitkHistType *histogram, int classIdent, HelperStructPerformClusteringRetval* precResult = 0) const;
+    HelperStructPerformClusteringRetval* PerformClustering(mitk::Image::ConstPointer image, const MitkHistType *histogram, int classIdent, HelperStructPerformClusteringRetval* precResult = nullptr) const;
 
     HelperStructPerformRGBClusteringRetval* PerformRGBClustering(mitk::Image::ConstPointer image, const MitkHistType *histogram) const;
 
@@ -449,7 +449,7 @@ namespace mitk
 
     HelperStructPerformRGBClusteringRetval* PerformRGBQuantiles(mitk::Image::ConstPointer image, const MitkHistType *histogram, double p1, double p2 ) const;
 
-    double* PerformQuantification(mitk::Image::ConstPointer image, mitk::Image::Pointer clusteredImage, mitk::Image::Pointer mask = 0) const;
+    double* PerformQuantification(mitk::Image::ConstPointer image, mitk::Image::Pointer clusteredImage, mitk::Image::Pointer mask = nullptr) const;
 
     mitk::Image::Pointer CaculateAngularErrorImage(
         mitk::Image::Pointer comp1, mitk::Image::Pointer comp2, mitk::Image::Pointer probImg) const;

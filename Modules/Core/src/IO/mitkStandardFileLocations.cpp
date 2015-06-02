@@ -33,7 +33,7 @@ mitk::StandardFileLocations::~StandardFileLocations()
 
 mitk::StandardFileLocations* mitk::StandardFileLocations::GetInstance()
 {
-  static StandardFileLocations::Pointer m_Instance = 0;
+  static StandardFileLocations::Pointer m_Instance = nullptr;
 
   if(m_Instance.IsNull())
     m_Instance = StandardFileLocations::New();
@@ -56,7 +56,7 @@ void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, bool i
   // insert dir into queue
   if(insertInFrontOfSearchList)
   {
-    FileSearchVectorType::iterator it = m_SearchDirectories.begin();
+    auto it = m_SearchDirectories.begin();
     m_SearchDirectories.insert(it,std::string(dir));
   }
   else
@@ -120,7 +120,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
 
   // 1. look for MITKCONF environment variable
   const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");
-  if (mitkConf!=NULL)
+  if (mitkConf!=nullptr)
     AddDirectoryForSearch(mitkConf, false);
 
   // 2. use .mitk-subdirectory in home directory of the user
@@ -138,7 +138,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
 
 #else
   const char* homeDirectory = itksys::SystemTools::GetEnv("HOME");
-  if(homeDirectory != NULL)
+  if(homeDirectory != nullptr)
   {
     directoryPath = homeDirectory;
     directoryPath += "/.mitk/";
@@ -173,7 +173,7 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
   const char* mitkoptions = itksys::SystemTools::GetEnv("MITKOPTIONS");
   std::string optionsDirectory;
 
-  if (mitkoptions!=NULL)
+  if (mitkoptions!=nullptr)
   {
     // 1. look for MITKOPTIONS environment variable
     optionsDirectory = mitkoptions;
@@ -205,7 +205,7 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
     }
 #else
     const char* home = itksys::SystemTools::GetEnv("HOME");
-    if(home==NULL)
+    if(home==nullptr)
     {
       itkGenericOutputMacro( << "Environment variable HOME not set" <<
         ". Using current working directory as home directory: " << itksys::SystemTools::GetCurrentWorkingDirectory());

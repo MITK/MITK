@@ -61,39 +61,46 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceCommandWidget : public QWidget
     QmitkIGTLDeviceCommandWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkIGTLDeviceCommandWidget();
 
-    /**
-    * \brief Is called when the current device received a message
-    */
-    void OnMessageReceived();
-
-    /**
-     * \brief Is called when the current device received a command
-    */
-    void OnCommandReceived();
-
-    /**
-     * \brief Is called when the current device lost a connection to one of its
-     * sockets
-    */
-    void OnLostConnection();
-
-    /**
-     * \brief Is called when the current device connected to another device
-    */
-    void OnNewConnection();
-
 
   protected slots:
     void OnCommandChanged(const QString& curCommand);
 
     void OnSendCommand();
 
-  protected:
+    ///**
+    //* \brief Is called when the current device received a message
+    //*/
+    //void OnMessageReceived();
+
+    ///**
+    //* \brief Is called when the current device received a command
+    //*/
+    //void OnCommandReceived();
 
     /**
-     * \brief Adapts the GUI to the state of the device
-     */
+    * \brief Is called when the current device lost a connection to one of its
+    * sockets
+    */
+    void OnLostConnection();
+
+    /**
+    * \brief Is called when the current device connected to another device
+    */
+    void OnNewConnection();
+
+    /**
+    * \brief Adapts the GUI to the state of the device
+    */
     void AdaptGUIToState();
+
+ signals:
+    /**
+    * \brief used for thread seperation, the worker thread must not call AdaptGUIToState directly
+    * QT signals are thread safe and seperate the threads
+    */
+    void AdaptGUIToStateSignal();
+
+  protected:
 
     /**
      * \brief Calls AdaptGUIToState()

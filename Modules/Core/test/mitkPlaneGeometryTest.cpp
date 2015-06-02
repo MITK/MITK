@@ -94,17 +94,17 @@ public:
     mitk::BaseGeometry::Pointer base = dynamic_cast < mitk::BaseGeometry* > ( plane.GetPointer() );
     CPPUNIT_ASSERT_MESSAGE("Planegeometry should be castable to BaseGeometry", base.IsNotNull());
 
-    base = NULL;
+    base = nullptr;
     g3d = mitk::Geometry3D::New();
     base = dynamic_cast < mitk::BaseGeometry* > ( g3d.GetPointer() );
     CPPUNIT_ASSERT_MESSAGE("Geometry3D should be castable to BaseGeometry", base.IsNotNull());
 
-    g3d=NULL;
+    g3d=nullptr;
     mitk::SlicedGeometry3D::Pointer sliced = mitk::SlicedGeometry3D::New();
     g3d = dynamic_cast < mitk::Geometry3D* > ( sliced.GetPointer() );
     CPPUNIT_ASSERT_MESSAGE("SlicedGeometry3D should not be castable to Geometry3D", g3d.IsNull());
 
-    plane=NULL;
+    plane=nullptr;
     mitk::ThinPlateSplineCurvedGeometry::Pointer thin = mitk::ThinPlateSplineCurvedGeometry::New();
     plane = dynamic_cast < mitk::PlaneGeometry* > ( thin.GetPointer() );
     CPPUNIT_ASSERT_MESSAGE("AbstractTransformGeometry should be castable to PlaneGeometry", plane.IsNotNull());
@@ -300,9 +300,9 @@ public:
 
     //compare z-values with z-value of plane (should be equal)
     bool allPointsOnPlane = true;
-    for ( unsigned int i = 0; i < 5; ++i )
+    for (auto & myProjectedPoint : myProjectedPoints)
     {
-      if ( fabs(myProjectedPoints[i][2] - origin[2]) > mitk::sqrteps )
+      if ( fabs(myProjectedPoint[2] - origin[2]) > mitk::sqrteps )
       {
         allPointsOnPlane = false;
       }
@@ -731,7 +731,7 @@ public:
     mitk::Vector3D clonednormal = clonedplanegeometry2->GetNormal();
     mitk::Point3D clonedorigin = clonedplanegeometry2->GetOrigin();
 
-    mitk::RotationOperation* planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 180.0 );
+    auto  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 180.0 );
 
     clonedplanegeometry2->ExecuteOperation( planerot );
     CPPUNIT_ASSERT_MESSAGE(" Asserting that a flipped plane is still on the original plane: ", clonedplanegeometry2->IsOnPlane(planegeometry.GetPointer()));

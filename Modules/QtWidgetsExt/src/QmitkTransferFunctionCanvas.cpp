@@ -31,12 +31,12 @@ QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget * parent,
   m_Upper(1.0),
   m_Min(0.0),
   m_Max(1.0),
-  m_Histogram(0),
+  m_Histogram(nullptr),
   m_ImmediateUpdate(false),
   m_Range(0.0f),
   m_LineEditAvailable(false),
-  m_XEdit(0),
-  m_YEdit(0)
+  m_XEdit(nullptr),
+  m_YEdit(nullptr)
 {
   setEnabled(false);
   setFocusPolicy(Qt::ClickFocus);

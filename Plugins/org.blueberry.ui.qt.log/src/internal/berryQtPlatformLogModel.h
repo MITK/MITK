@@ -45,21 +45,21 @@ class QtPlatformLogModel : public QAbstractTableModel
 
 public:
 
-  QtPlatformLogModel(QObject* parent = 0);
+  QtPlatformLogModel(QObject* parent = nullptr);
   ~QtPlatformLogModel();
 
   void SetShowAdvancedFiels( bool showAdvancedFiels );
   void SetShowCategory( bool showCategory );
-  int rowCount(const QModelIndex&) const;
-  int columnCount(const QModelIndex&) const;
-  QVariant data(const QModelIndex& index, int) const;
+  int rowCount(const QModelIndex&) const override;
+  int columnCount(const QModelIndex&) const override;
+  QVariant data(const QModelIndex& index, int) const override;
 
   /** Documentation
    *  @return Retruns the complete table data as string representation.
    */
   QString GetDataAsString();
 
-  QVariant headerData(int section, Qt::Orientation orientation, int) const;
+  QVariant headerData(int section, Qt::Orientation orientation, int) const override;
 
   void addLogEntry(const mbilog::LogMessage &msg);
 
@@ -171,13 +171,13 @@ private:
         mbilog::UnregisterBackend(this);
       }
 
-      void ProcessMessage(const mbilog::LogMessage &l )
+      void ProcessMessage(const mbilog::LogMessage &l ) override
       {
         if(!deactivated)
           myModel->addLogEntry(l);
       }
 
-      mbilog::OutputType GetOutputType() const
+      mbilog::OutputType GetOutputType() const override
       {
         return mbilog::Other;
       }

@@ -153,7 +153,7 @@ public slots:
   ///
   /// Invoked when the preferences were changed
   ///
-  void OnPreferencesChanged(const berry::IBerryPreferences*);
+  void OnPreferencesChanged(const berry::IBerryPreferences*) override;
   ///
   /// \brief will be toggled when a extension point context menu action is toggled
   /// this is a proxy method which will load the corresponding extension class
@@ -178,9 +178,9 @@ protected:
   ///
   /// \brief Create the view here.
   ///
-  virtual void CreateQtPartControl(QWidget* parent);
+  virtual void CreateQtPartControl(QWidget* parent) override;
 
-  void SetFocus();
+  void SetFocus() override;
 
   ///
   /// \brief Shows a file open dialog.
@@ -190,7 +190,7 @@ protected:
   ///
   /// React to node changes. Overridden from QmitkAbstractView.
   ///
-  virtual void NodeChanged(const mitk::DataNode* /*node*/);
+  virtual void NodeChanged(const mitk::DataNode* /*node*/) override;
 protected:
 
   QWidget* m_Parent;
@@ -257,7 +257,7 @@ protected:
 
 private:
 
-  QItemSelectionModel* GetDataNodeSelectionModel() const;
+  QItemSelectionModel* GetDataNodeSelectionModel() const override;
 
   /// Reopen multi widget editor if it has been closed
   mitk::IRenderWindowPart *OpenRenderWindowPart(bool activatedEditor = true);

@@ -30,7 +30,7 @@ mitk::NodePredicateIsDWI::~NodePredicateIsDWI()
 
 bool mitk::NodePredicateIsDWI::CheckNode(const mitk::DataNode* node) const
 {
-  if (node == NULL)
+  if (node == nullptr)
     throw std::invalid_argument("NodePredicateIsDWI: invalid node");
 
   mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());

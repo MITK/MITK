@@ -22,7 +22,7 @@ namespace berry
 
   AbstractPreferencesStorage::AbstractPreferencesStorage( const QString& _File )
     : m_File(_File)
-    , m_Root(0)
+    , m_Root(nullptr)
   {
 
   }

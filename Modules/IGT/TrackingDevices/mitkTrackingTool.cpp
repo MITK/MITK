@@ -30,7 +30,7 @@ mitk::TrackingTool::TrackingTool()
 mitk::TrackingTool::~TrackingTool()
 {
   m_MyMutex->Unlock();
-  m_MyMutex = NULL;
+  m_MyMutex = nullptr;
 }
 
 void mitk::TrackingTool::PrintSelf(std::ostream& os, itk::Indent indent) const

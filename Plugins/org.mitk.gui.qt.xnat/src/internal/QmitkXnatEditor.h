@@ -57,14 +57,14 @@ public:
 
   static const QString EDITOR_ID;
 
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
-  void DoSave(/*IProgressMonitor monitor*/);
-  void DoSaveAs();
-  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
-  bool IsDirty() const;
-  bool IsSaveAsAllowed() const;
-  void SetInput(berry::IEditorInput::Pointer input);
+  void DoSave(/*IProgressMonitor monitor*/) override;
+  void DoSaveAs() override;
+  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input) override;
+  bool IsDirty() const override;
+  bool IsSaveAsAllowed() const override;
+  void SetInput(berry::IEditorInput::Pointer input) override;
 
   /**
   \brief Here the root object will be set and the view reset. Additionally the breadcrumbs will set visible.
@@ -101,7 +101,7 @@ public:
 
 protected:
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   Ui::QmitkXnatEditorControls m_Controls;
 

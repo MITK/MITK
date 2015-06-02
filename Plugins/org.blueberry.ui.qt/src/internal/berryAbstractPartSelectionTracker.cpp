@@ -39,7 +39,7 @@ public:
   : p(part), s(sel)
   {}
 
-  void Run()
+  void Run() override
   {
     l->SelectionChanged(p, s);
   }

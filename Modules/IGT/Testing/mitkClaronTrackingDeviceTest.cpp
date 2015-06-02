@@ -45,11 +45,11 @@ static void TestToolConfiguration()
   toolFileName.append("/ClaronTool");
 
   mitk::ClaronTrackingDevice::Pointer testInstance = mitk::ClaronTrackingDevice::New();
-  MITK_TEST_CONDITION(testInstance->AddTool("Tool1", toolFileName.c_str()) != NULL, "Testing AddTool() for tool 1");
+  MITK_TEST_CONDITION(testInstance->AddTool("Tool1", toolFileName.c_str()) != nullptr, "Testing AddTool() for tool 1");
   MITK_TEST_CONDITION(testInstance->GetToolCount() == 1, "Testing adding tool 1");
-  MITK_TEST_CONDITION(testInstance->AddTool("Tool2", toolFileName.c_str()) != NULL, "Testing AddTool() for tool 2");
+  MITK_TEST_CONDITION(testInstance->AddTool("Tool2", toolFileName.c_str()) != nullptr, "Testing AddTool() for tool 2");
   MITK_TEST_CONDITION(testInstance->GetToolCount() == 2, "Testing adding tool 2");
-  MITK_TEST_CONDITION(testInstance->AddTool("Tool3", toolFileName.c_str()) != NULL, "Testing AddTool() for tool 3");
+  MITK_TEST_CONDITION(testInstance->AddTool("Tool3", toolFileName.c_str()) != nullptr, "Testing AddTool() for tool 3");
   MITK_TEST_CONDITION(testInstance->GetToolCount() == 3, "Testing adding tool 3");
 
 
@@ -59,7 +59,7 @@ static void TestToolConfiguration()
   MITK_TEST_CONDITION(testInstance->GetTool(2)->GetToolName() == std::string("Tool3"), "Testing GetTool() for tool 3");
 
   //Testing 100 tools (maximum by MicronTracker)
-  testInstance = NULL;
+  testInstance = nullptr;
   testInstance = mitk::ClaronTrackingDevice::New();
   for (unsigned int i = 0; i < 100; i++)
     testInstance->AddTool("Tool", toolFileName.c_str());

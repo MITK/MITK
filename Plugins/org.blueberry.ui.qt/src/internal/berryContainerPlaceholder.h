@@ -52,16 +52,16 @@ public:
     /**
      * add method comment.
      */
-    void Add(LayoutPart::Pointer child);
+    void Add(LayoutPart::Pointer child) override;
 
-    bool AllowsAdd(LayoutPart::Pointer toAdd);
+    bool AllowsAdd(LayoutPart::Pointer toAdd) override;
 
     /**
      * getChildren method comment.
      */
-    QList<LayoutPart::Pointer> GetChildren() const;
+    QList<LayoutPart::Pointer> GetChildren() const override;
 
-    QString GetID() const;
+    QString GetID() const override;
 
     /**
      * getFocus method comment.
@@ -71,23 +71,23 @@ public:
     /**
      * remove method comment.
      */
-    void Remove(LayoutPart::Pointer child);
+    void Remove(LayoutPart::Pointer child) override;
 
     /**
      * replace method comment.
      */
-    void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild);
+    void Replace(LayoutPart::Pointer oldChild, LayoutPart::Pointer newChild) override;
 
     void SetRealContainer(ILayoutContainer::Pointer container);
 
-    void FindSashes(LayoutPart::Pointer part, PartPane::Sashes& sashes);
+    void FindSashes(LayoutPart::Pointer part, PartPane::Sashes& sashes) override;
 
-    void ResizeChild(LayoutPart::Pointer childThatChanged);
+    void ResizeChild(LayoutPart::Pointer childThatChanged) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.ILayoutContainer#allowsAutoFocus()
      */
-    bool AllowsAutoFocus();
+    bool AllowsAutoFocus() override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.internal.ILayoutContainer#isZoomed(org.blueberry.ui.internal.LayoutPart)

@@ -71,27 +71,27 @@ public:
   /*!
   \brief method for creating the applications main widget
   */
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /*!
   \brief Sets the StdMultiWidget and connects it to the functionality.
   */
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
 
   /*!
   \brief Removes the StdMultiWidget and disconnects it from the functionality.
   */
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetNotAvailable() override;
 
   /*!
   \brief Method for creating the connections of main and control widget
   */
   virtual void CreateConnections();
 
-  virtual void Activated();
-  virtual void Deactivated();
-  virtual void Visible();
-  virtual void Hidden();
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
   //
   //     #ifdef BUILD_TESTING

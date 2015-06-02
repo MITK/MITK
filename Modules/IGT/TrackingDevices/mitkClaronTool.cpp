@@ -39,7 +39,7 @@ void mitk::ClaronTool::SetCalibrationName(std::string name)
 
 bool mitk::ClaronTool::LoadFile(const char* filename)
 {
-  if (filename==NULL)
+  if (filename==nullptr)
   {
     return false;
   }

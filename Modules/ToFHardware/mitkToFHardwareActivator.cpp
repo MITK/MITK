@@ -36,7 +36,7 @@ namespace mitk
 class ToFHardwareActivator : public us::ModuleActivator {
 public:
 
-    void Load(us::ModuleContext* context)
+    void Load(us::ModuleContext* context) override
     {
         //Registering MITKPlayerDevice as MicroService
         ToFCameraMITKPlayerDeviceFactory* toFCameraMITKPlayerDeviceFactory = new ToFCameraMITKPlayerDeviceFactory();
@@ -49,7 +49,7 @@ public:
         m_Factories.push_back( toFCameraMITKPlayerDeviceFactory );
     }
 
-    void Unload(us::ModuleContext* )
+    void Unload(us::ModuleContext* ) override
     {
     }
 

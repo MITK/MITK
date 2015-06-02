@@ -92,8 +92,8 @@ public:
     QmitkFiberfoxView();
     virtual ~QmitkFiberfoxView();
 
-    virtual void CreateQtPartControl(QWidget *parent);
-    void SetFocus();
+    virtual void CreateQtPartControl(QWidget *parent) override;
+    void SetFocus() override;
 
     typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
     typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
@@ -156,7 +156,7 @@ protected slots:
 protected:
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&);
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&) override;
 
     GradientListType GenerateHalfShell(int NPoints);    ///< generate vectors distributed over the halfsphere
 
@@ -169,8 +169,8 @@ protected:
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
     void EnableCrosshairNavigation();               ///< enable crosshair navigation if planar figure interaction ends
     void DisableCrosshairNavigation();              ///< disable crosshair navigation if planar figure interaction starts
-    void NodeAdded( const mitk::DataNode* node );   ///< add observers
-    void NodeRemoved(const mitk::DataNode* node);   ///< remove observers
+    void NodeAdded( const mitk::DataNode* node ) override;   ///< add observers
+    void NodeRemoved(const mitk::DataNode* node) override;   ///< remove observers
 
     /** structure to keep track of planar figures and observers */
     struct QmitkPlanarFigureData

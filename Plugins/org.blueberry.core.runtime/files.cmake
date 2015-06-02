@@ -108,6 +108,7 @@ set(INTERNAL_CPP_FILES
   berryMainApplicationLauncher.cpp
   berryPreferences.cpp
   berryPreferencesService.cpp
+  berryProduct.cpp
   berryProductExtensionBranding.cpp
   berryProviderExtensionBranding.cpp
   berryRegistryContribution.cpp

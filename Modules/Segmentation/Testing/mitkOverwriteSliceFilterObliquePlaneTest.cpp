@@ -61,7 +61,7 @@ static void OverwriteObliquePlaneTest(mitk::Image* workingImage, mitk::Image* re
 
   float degree = 45.0;
 
-  mitk::RotationOperation* op = new mitk::RotationOperation(mitk::OpROTATE, obliquePlane->GetCenter(), rotationVector, degree);
+  auto   op = new mitk::RotationOperation(mitk::OpROTATE, obliquePlane->GetCenter(), rotationVector, degree);
   obliquePlane->ExecuteOperation(op);
   delete op;
 

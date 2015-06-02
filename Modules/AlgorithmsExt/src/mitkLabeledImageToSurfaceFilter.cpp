@@ -123,7 +123,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateOutputInformation()
 void mitk::LabeledImageToSurfaceFilter::GenerateData()
 {
   mitk::Image* image =  ( mitk::Image* )GetInput();
-  if ( image == NULL )
+  if ( image == nullptr )
   {
     itkWarningMacro("Image is NULL");
     return;
@@ -140,7 +140,7 @@ void mitk::LabeledImageToSurfaceFilter::GenerateData()
   // traverse the known labels and create surfaces for them.
   //
   unsigned int currentOutputIndex = 0;
-  for ( LabelMapType::iterator it = m_AvailableLabels.begin() ; it != m_AvailableLabels.end() ; ++it )
+  for ( auto it = m_AvailableLabels.begin() ; it != m_AvailableLabels.end() ; ++it )
   {
     if ( it->first == m_BackgroundLabel )
       continue;
@@ -199,7 +199,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   vtkPolyData *polydata;
   skinExtractor->Update();
   polydata = skinExtractor->GetOutput();
-  polydata->Register(NULL);//RC++
+  polydata->Register(nullptr);//RC++
   skinExtractor->Delete();
 
   if (m_Smooth)
@@ -217,7 +217,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     polydata->Delete();//RC--
     smoother->Update();
     polydata = smoother->GetOutput();
-    polydata->Register(NULL);//RC++
+    polydata->Register(nullptr);//RC++
     smoother->Delete();
   }
 
@@ -239,7 +239,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
     polydata->Delete();//RC--
     decimate->Update();
     polydata = decimate->GetOutput();
-    polydata->Register(NULL);//RC++
+    polydata->Register(nullptr);//RC++
     decimate->Delete();
   }
 
@@ -270,7 +270,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface( int time, vtkImageData *v
   }
 
   surface->SetVtkPolyData(polydata, time);
-  polydata->UnRegister(NULL);
+  polydata->UnRegister(nullptr);
 
   gaussian->Delete();
   threshold->Delete();
@@ -324,7 +324,7 @@ void mitk::LabeledImageToSurfaceFilter::CreateSurface(int, vtkImageData*, mitk::
 
 mitk::LabeledImageToSurfaceFilter::LabelType mitk::LabeledImageToSurfaceFilter::GetLabelForNthOutput( const unsigned int& idx )
 {
-  IdxToLabelMapType::iterator it = m_IdxToLabels.find( idx );
+  auto it = m_IdxToLabels.find( idx );
   if ( it != m_IdxToLabels.end() )
   {
     return it->second;
@@ -349,7 +349,7 @@ mitk::ScalarType mitk::LabeledImageToSurfaceFilter::GetVolumeForLabel( const mit
 
   // get the number of voxels encountered for the given label,
   // calculate the volume and return it.
-  LabelMapType::iterator it = m_AvailableLabels.find( label );
+  auto it = m_AvailableLabels.find( label );
   if ( it != m_AvailableLabels.end() )
   {
     return static_cast<float>(it->second) * ( spacing[0] * spacing[1] * spacing[2] / 1000.0f );

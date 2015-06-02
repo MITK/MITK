@@ -31,7 +31,7 @@ class MITKQTWIDGETSEXT_EXPORT QClickableLabel2 : public QLabel
 
   public:
 
-    QClickableLabel2( QWidget * parent, Qt::WindowFlags f = 0 )
+    QClickableLabel2( QWidget * parent, Qt::WindowFlags f = nullptr )
     :QLabel(parent, f)
     {
     }

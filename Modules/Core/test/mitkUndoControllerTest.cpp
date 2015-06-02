@@ -35,12 +35,12 @@ int mitkUndoControllerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("UndoController")
 
   // let's create an object of our class
-  mitk::UndoController* myUndoController = new mitk::UndoController();
+  auto  myUndoController = new mitk::UndoController();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myUndoController != NULL, "Testing instantiation")
+  MITK_TEST_CONDITION_REQUIRED(myUndoController != nullptr, "Testing instantiation")
 
   //check default model (verbose...)
   mitk::VerboseLimitedLinearUndo::Pointer standardModel = dynamic_cast<mitk::VerboseLimitedLinearUndo*>(myUndoController->GetCurrentUndoModel());

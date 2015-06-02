@@ -118,7 +118,7 @@ bool QmitkFFmpegWriter::IsRunning() const
 
 void QmitkFFmpegWriter::WriteFrame(const unsigned char* frame)
 {
-  if (frame == NULL || !m_Process->isOpen())
+  if (frame == nullptr || !m_Process->isOpen())
     return;
 
   m_Process->write(reinterpret_cast<const char*>(frame), m_Size.width() * m_Size.height() * 3);

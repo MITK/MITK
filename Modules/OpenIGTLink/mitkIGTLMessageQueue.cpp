@@ -38,7 +38,7 @@ void mitk::IGTLMessageQueue::PushMessage( igtl::MessageBase::Pointer message )
 igtl::MessageBase::Pointer mitk::IGTLMessageQueue::PullMessage()
 {
   this->m_Mutex->Lock();
-  igtl::MessageBase::Pointer ret = NULL;
+  igtl::MessageBase::Pointer ret = nullptr;
   if ( this->m_Queue.size() > 0 )
   {
     ret = this->m_Queue.front();

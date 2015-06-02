@@ -59,7 +59,7 @@ namespace mitk
     ///
     /// executes the Algorithm
     ///
-    void Update()
+    void Update() override
     {
       endoAccessCvMat( ToVnlMatrix, T, (*m_VnlMatrix), (*m_CvMat) );
     }

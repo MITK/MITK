@@ -109,8 +109,8 @@ int mitk::ConnectomicsSimulatedAnnealingCostFunctionModularity::getNumberOfModul
   ToModuleMapType *vertexToModuleMap ) const
 {
   int maxModule( 0 );
-  ToModuleMapType::iterator iter = vertexToModuleMap->begin();
-  ToModuleMapType::iterator end =  vertexToModuleMap->end();
+  auto iter = vertexToModuleMap->begin();
+  auto end =  vertexToModuleMap->end();
   while( iter != end )
   {
     if( iter->second > maxModule )

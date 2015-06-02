@@ -22,7 +22,7 @@ namespace itk {
 
 template <class TScalarType>
 itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() :
-  m_VtkAbstractTransform(NULL), m_InverseVtkAbstractTransform(NULL),
+  m_VtkAbstractTransform(nullptr), m_InverseVtkAbstractTransform(nullptr),
   m_LastVtkAbstractTransformTimeStamp(0)
 {
 
@@ -31,8 +31,8 @@ itk::VtkAbstractTransform<TScalarType>::VtkAbstractTransform() :
 template <class TScalarType>
 itk::VtkAbstractTransform<TScalarType>::~VtkAbstractTransform()
 {
-  if(m_VtkAbstractTransform!=NULL)
-    m_VtkAbstractTransform->UnRegister(NULL);
+  if(m_VtkAbstractTransform!=nullptr)
+    m_VtkAbstractTransform->UnRegister(nullptr);
 }
 
 template <class TScalarType>
@@ -53,13 +53,13 @@ void itk::VtkAbstractTransform<TScalarType>::SetVtkAbstractTransform(vtkAbstract
   if(m_VtkAbstractTransform==aVtkAbstractTransform)
     return;
 
-  if(m_VtkAbstractTransform!=NULL)
-    m_VtkAbstractTransform->UnRegister(NULL);
+  if(m_VtkAbstractTransform!=nullptr)
+    m_VtkAbstractTransform->UnRegister(nullptr);
 
   m_VtkAbstractTransform=aVtkAbstractTransform;
-  if(m_VtkAbstractTransform!=NULL)
+  if(m_VtkAbstractTransform!=nullptr)
   {
-    m_VtkAbstractTransform->Register(NULL);
+    m_VtkAbstractTransform->Register(nullptr);
     m_InverseVtkAbstractTransform=m_VtkAbstractTransform->GetInverse(); // memory managed by m_VtkAbstractTransform
   }
 
@@ -74,7 +74,7 @@ typename itk::VtkAbstractTransform<TScalarType>::OutputPointType
 itk::VtkAbstractTransform<TScalarType>::
 TransformPoint(const InputPointType &point) const
 {
-  assert(m_VtkAbstractTransform!=NULL);
+  assert(m_VtkAbstractTransform!=nullptr);
 
   OutputPointType outputpoint;
   vnl_vector<TScalarType> vnl_vec;
@@ -92,7 +92,7 @@ typename itk::VtkAbstractTransform<TScalarType>::OutputVectorType
 itk::VtkAbstractTransform<TScalarType>::
 TransformVector(const InputVectorType &vect) const
 {
-  assert(m_VtkAbstractTransform!=NULL);
+  assert(m_VtkAbstractTransform!=nullptr);
 
   OutputVectorType outputvector;
   vnl_vector<TScalarType> vnl_vec;
@@ -111,7 +111,7 @@ typename itk::VtkAbstractTransform<TScalarType>::OutputVnlVectorType
 itk::VtkAbstractTransform<TScalarType>::
 TransformVector(const InputVnlVectorType &vect) const
 {
-  assert(m_VtkAbstractTransform!=NULL);
+  assert(m_VtkAbstractTransform!=nullptr);
 
   OutputVnlVectorType outputvector;
   mitk::ScalarType vtkpt[3]={0,0,0};
@@ -148,7 +148,7 @@ typename VtkAbstractTransform<TScalarType>::InputPointType
 itk::VtkAbstractTransform<TScalarType>::
 BackTransform(const OutputPointType &point) const
 {
-  assert(m_VtkAbstractTransform!=NULL);
+  assert(m_VtkAbstractTransform!=nullptr);
 
   OutputPointType outputpoint;
   mitk::ScalarType vtkpt[3];
@@ -164,7 +164,7 @@ typename VtkAbstractTransform<TScalarType>::InputVectorType
 itk::VtkAbstractTransform<TScalarType>::
 BackTransform(const OutputVectorType &vect ) const
 {
-  assert(m_VtkAbstractTransform!=NULL);
+  assert(m_VtkAbstractTransform!=nullptr);
 
   OutputVectorType outputvector;
   mitk::ScalarType vtkpt[3]={0,0,0};
@@ -181,7 +181,7 @@ typename VtkAbstractTransform<TScalarType>::InputVnlVectorType
 itk::VtkAbstractTransform<TScalarType>::
 BackTransform(const OutputVnlVectorType &vect ) const
 {
-  assert(m_InverseVtkAbstractTransform!=NULL);
+  assert(m_InverseVtkAbstractTransform!=nullptr);
 
   OutputVnlVectorType outputvector;
   mitk::ScalarType vtkpt[3]={0,0,0};
@@ -214,7 +214,7 @@ template<class TScalarType>
 unsigned long
 itk::VtkAbstractTransform<TScalarType>::GetMTime() const
 {
-  if((m_VtkAbstractTransform != NULL) && (m_LastVtkAbstractTransformTimeStamp < m_VtkAbstractTransform->GetMTime()))
+  if((m_VtkAbstractTransform != nullptr) && (m_LastVtkAbstractTransformTimeStamp < m_VtkAbstractTransform->GetMTime()))
   {
     m_LastVtkAbstractTransformTimeStamp=m_VtkAbstractTransform->GetMTime();
     this->Modified();

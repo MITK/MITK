@@ -119,7 +119,7 @@ class MITKCORE_EXPORT PropertyList : public itk::Object
     bool GetPropertyValue(const char* propertyKey, T & value) const
     {
       GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey));
-      if ( gp != NULL )
+      if ( gp != nullptr )
       {
         value = gp->GetValue();
         return true;

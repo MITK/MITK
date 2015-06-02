@@ -52,7 +52,7 @@ protected:
     /*
      * @see AbstractSelectionService#createPartTracker(String)
      */
-    AbstractPartSelectionTracker::Pointer CreatePartTracker(const QString& partId) const;
+    AbstractPartSelectionTracker::Pointer CreatePartTracker(const QString& partId) const override;
 
 public:
 

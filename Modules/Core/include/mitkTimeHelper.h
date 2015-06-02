@@ -28,8 +28,8 @@ namespace mitk
 template <class TOutputRegion, class TInputRegion>
 void GenerateTimeInInputRegion(const mitk::TimeGeometry *outputTimeGeometry, const TOutputRegion& outputRegion, const mitk::TimeGeometry *inputTimeGeometry, TInputRegion& inputRegion)
 {
-  assert(outputTimeGeometry!=NULL);
-  assert(inputTimeGeometry!=NULL);
+  assert(outputTimeGeometry!=nullptr);
+  assert(inputTimeGeometry!=nullptr);
 
   // convert the start-index-time of output in start-index-time of input via millisecond-time
   mitk::TimePointType timeInMS = outputTimeGeometry->TimeStepToTimePoint(outputRegion.GetIndex(3));
@@ -53,8 +53,8 @@ void GenerateTimeInInputRegion(const mitk::TimeGeometry *outputTimeGeometry, con
 template <class TOutputData, class TInputData>
 void GenerateTimeInInputRegion(const TOutputData* output, TInputData* input)
 {
-  assert(output!=NULL);
-  assert(input!=NULL);
+  assert(output!=nullptr);
+  assert(input!=nullptr);
 
   const typename TOutputData::RegionType& outputRegion = output->GetRequestedRegion();
   typename TInputData::RegionType inputRegion;

@@ -52,7 +52,7 @@ class MITKCORE_EXPORT OperationEndEvent : public itk::EndEvent
 public:
   typedef OperationEndEvent Self;
   typedef itk::EndEvent Superclass;
-  OperationEndEvent(Operation* operation = NULL) :
+  OperationEndEvent(Operation* operation = nullptr) :
     m_Operation(operation) {}
   virtual ~OperationEndEvent() {}
   virtual const char * GetEventName() const override { return "OperationEndEvent"; }

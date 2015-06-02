@@ -41,7 +41,7 @@ int mitkWeakPointerTest(int /*argc*/, char* /*argv*/[])
   weakPointer2 = weakPointer;
 
   MITK_TEST_CONDITION_REQUIRED(1 == smartPointer->GetReferenceCount(), "Testing reference count");
-  smartPointer = 0;
+  smartPointer = nullptr;
   MITK_TEST_CONDITION_REQUIRED(weakPointer.IsNull(), "Testing expired weak pointer (smart pointer assignment)");
   MITK_TEST_CONDITION_REQUIRED(weakPointer2.IsNull(), "Testing expired weak pointer (weak pointer assignment)");
   MITK_TEST_CONDITION_REQUIRED(weakPointer3.IsNull(), "Testing expired weak pointer (smart pointer constructor)");

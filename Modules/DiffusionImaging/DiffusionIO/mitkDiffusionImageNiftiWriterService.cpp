@@ -206,7 +206,6 @@ void mitk::DiffusionImageNiftiWriterService::Write()
 
     itk::NiftiImageIO::Pointer io4 = itk::NiftiImageIO::New();
 
-    typedef itk::VectorImage<short,3> ImageType;
     typedef itk::ImageFileWriter<ImageType4D> WriterType4;
     WriterType4::Pointer nrrdWriter4 = WriterType4::New();
     nrrdWriter4->UseInputMetaDataDictionaryOn();
@@ -345,7 +344,6 @@ void mitk::DiffusionImageNiftiWriterService::Write()
 
     itk::NiftiImageIO::Pointer io4 = itk::NiftiImageIO::New();
 
-    typedef itk::VectorImage<short,3> ImageType;
     typedef itk::ImageFileWriter<ImageType4D> WriterType4;
     WriterType4::Pointer nrrdWriter4 = WriterType4::New();
     nrrdWriter4->UseInputMetaDataDictionaryOn();

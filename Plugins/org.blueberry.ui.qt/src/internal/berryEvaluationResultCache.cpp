@@ -36,7 +36,7 @@ EvaluationResultCache::~EvaluationResultCache()
 
 void EvaluationResultCache::ClearResult()
 {
-  evaluationResult = 0;
+  evaluationResult = nullptr;
 }
 
 bool EvaluationResultCache::Evaluate(IEvaluationContext* context) const

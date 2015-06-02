@@ -19,8 +19,6 @@ set(CPP_FILES
   Common/mitkSerialCommunication.cpp
   Common/mitkTrackingTypes.cpp
 
-  DataManagement/mitkNavigationData.cpp
-  DataManagement/mitkNavigationDataSet.cpp
   DataManagement/mitkNavigationDataSource.cpp
   DataManagement/mitkNavigationTool.cpp
   DataManagement/mitkNavigationToolStorage.cpp
@@ -41,10 +39,6 @@ set(CPP_FILES
   IO/mitkNavigationToolStorageDeserializer.cpp
   IO/mitkNavigationToolWriter.cpp
   IO/mitkNavigationDataReaderInterface.cpp
-  IO/mitkNavigationDataReaderXML.cpp
-  IO/mitkNavigationDataReaderCSV.cpp
-  IO/mitkNavigationDataSetWriterXML.cpp
-  IO/mitkNavigationDataSetWriterCSV.cpp
 
   Rendering/mitkCameraVisualization.cpp
   Rendering/mitkNavigationDataObjectVisualizationFilter.cpp
@@ -63,6 +57,8 @@ set(CPP_FILES
   TrackingDevices/mitkOptitrackErrorMessages.cpp
   TrackingDevices/mitkOptitrackTrackingDevice.cpp
   TrackingDevices/mitkOptitrackTrackingTool.cpp
+  TrackingDevices/mitkOpenIGTLinkTrackingDevice.cpp
+  TrackingDevices/mitkOpenIGTLinkTrackingTool.cpp
 )
 
 set(RESOURCE_FILES

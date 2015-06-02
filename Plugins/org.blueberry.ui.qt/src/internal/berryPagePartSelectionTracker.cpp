@@ -30,21 +30,21 @@ public:
   : tracker(tracker)
   {}
 
-  Events::Types GetPartEventTypes() const
+  Events::Types GetPartEventTypes() const override
   {
     return Events::CLOSED | Events::OPENED;
   }
 
-  void PartClosed(const IWorkbenchPartReference::Pointer& partRef)
+  void PartClosed(const IWorkbenchPartReference::Pointer& partRef) override
   {
     if (tracker->GetPartId(partRef->GetPart(false))
         == tracker->AbstractPartSelectionTracker::GetPartId())
     {
-      tracker->SetPart(IWorkbenchPart::Pointer(0), true);
+      tracker->SetPart(IWorkbenchPart::Pointer(nullptr), true);
     }
   }
 
-  void PartOpened(const IWorkbenchPartReference::Pointer& partRef)
+  void PartOpened(const IWorkbenchPartReference::Pointer& partRef) override
   {
     if (tracker->GetPartId(partRef->GetPart(false))
         == tracker->AbstractPartSelectionTracker::GetPartId())
@@ -67,7 +67,7 @@ public:
   : tracker(tracker)
   {}
 
-  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const
+  IPerspectiveListener::Events::Types GetPerspectiveEventTypes() const override
   {
     return IPerspectiveListener::Events::PART_CHANGED;
   }
@@ -76,7 +76,7 @@ public:
   void PerspectiveChanged(const IWorkbenchPage::Pointer&,
                           const IPerspectiveDescriptor::Pointer&,
                           const IWorkbenchPartReference::Pointer& partRef,
-                          const QString& changeId)
+                          const QString& changeId) override
   {
     if (!partRef)
       return;
@@ -106,7 +106,7 @@ public:
   : tracker(tracker)
   {}
 
-  void SelectionChanged(const SelectionChangedEvent::Pointer& event)
+  void SelectionChanged(const SelectionChangedEvent::Pointer& event) override
   {
     tracker->FireSelection(tracker->GetPart(), event->GetSelection());
   }
@@ -168,7 +168,7 @@ ISelection::ConstPointer PagePartSelectionTracker::GetSelection()
       return sp->GetSelection();
     }
   }
-  return ISelection::Pointer(0);
+  return ISelection::Pointer(nullptr);
 }
 
 PagePartSelectionTracker::~PagePartSelectionTracker()
@@ -176,8 +176,8 @@ PagePartSelectionTracker::~PagePartSelectionTracker()
   IWorkbenchPage::Pointer page = GetPage();
   page->GetWorkbenchWindow()->RemovePerspectiveListener(perspListener.data());
   page->RemovePartListener(partListener.data());
-  this->SetPart(IWorkbenchPart::Pointer(0), false);
-  this->SetPage(0);
+  this->SetPart(IWorkbenchPart::Pointer(nullptr), false);
+  this->SetPage(nullptr);
 }
 
 IWorkbenchPart::Pointer PagePartSelectionTracker::GetPart()
@@ -197,7 +197,7 @@ ISelectionProvider::Pointer PagePartSelectionTracker::GetSelectionProvider()
   {
     return part->GetSite()->GetSelectionProvider();
   }
-  return ISelectionProvider::Pointer(0);
+  return ISelectionProvider::Pointer(nullptr);
 }
 
 QString PagePartSelectionTracker::GetPartId(IWorkbenchPart::Pointer part)

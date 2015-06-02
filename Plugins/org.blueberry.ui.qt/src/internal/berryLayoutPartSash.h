@@ -74,7 +74,7 @@ private:
   {
     SelectionListener(LayoutPartSash* layoutPartSash);
 
-    void WidgetSelected(GuiTk::SelectionEvent::Pointer e);
+    void WidgetSelected(GuiTk::SelectionEvent::Pointer e) override;
 
   private: LayoutPartSash* layoutPartSash;
   };
@@ -90,7 +90,7 @@ private:
    * the control is invisible.
    */
 public:
-  void CreateControl(QWidget* parent);
+  void CreateControl(QWidget* parent) override;
 
   /**
    * Creates the underlying SWT control.
@@ -101,23 +101,23 @@ private:
   void DoCreateControl();
 
 public:
-  void SetBounds(const QRect& r);
+  void SetBounds(const QRect& r) override;
 
   /**
    * Makes the sash visible or invisible. Note: as an optimization, the actual widget is destroyed when the
    * sash is invisible.
    */
 public:
-  void SetVisible(bool visible);
+  void SetVisible(bool visible) override;
 
 public:
-  bool IsVisible();
+  bool IsVisible() override;
 
   /**
    * See LayoutPart#dispose
    */
 public:
-  void Dispose();
+  void Dispose() override;
 
   /**
    * Gets the presentation bounds.
@@ -129,13 +129,13 @@ public:
    * Returns the part control.
    */
 public:
-  QWidget* GetControl();
+  QWidget* GetControl() override;
 
   /**
    *
    */
 public:
-  QString GetID() const;
+  QString GetID() const override;
 
 protected:
 

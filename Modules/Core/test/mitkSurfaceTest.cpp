@@ -44,15 +44,15 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->Update();
 
   vtkPolyData* polys = sphereSource->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData() == NULL, "Testing initial state of vtkPolyData");
+  MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData() == nullptr, "Testing initial state of vtkPolyData");
   surface->SetVtkPolyData( polys );
   sphereSource->Delete();
-  MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData");
+  MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData()!= nullptr, "Testing set vtkPolyData");
 
-  cloneSurface= NULL;
+  cloneSurface= nullptr;
   cloneSurface = surface->Clone();
-  MITK_TEST_CONDITION_REQUIRED(cloneSurface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData of cloned surface!");
-  cloneSurface = NULL;
+  MITK_TEST_CONDITION_REQUIRED(cloneSurface->GetVtkPolyData()!= nullptr, "Testing set vtkPolyData of cloned surface!");
+  cloneSurface = nullptr;
 
     double bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     polys->ComputeBounds();
@@ -140,10 +140,10 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   unsigned int numberoftimesteps = surface->GetTimeSteps();
   mitk::Surface::Pointer dummy = mitk::Surface::New();
   dummy->Graft(surface);
-  MITK_TEST_CONDITION_REQUIRED( dummy->GetVtkPolyData() != NULL, "Testing copying a Surface with Graft()!");
+  MITK_TEST_CONDITION_REQUIRED( dummy->GetVtkPolyData() != nullptr, "Testing copying a Surface with Graft()!");
   MITK_TEST_CONDITION_REQUIRED( dummy->GetTimeSteps() == numberoftimesteps, "orig-numberofTimeSteps:" << numberoftimesteps << "  copy-numberofTimeSteps:" << dummy->GetTimeSteps());
 
-  surface = NULL;
+  surface = nullptr;
   MITK_TEST_CONDITION_REQUIRED( surface.IsNull(), "Testing destruction of surface!");
 
   MITK_TEST_END();

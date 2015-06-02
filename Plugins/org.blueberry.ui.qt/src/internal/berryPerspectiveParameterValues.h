@@ -30,7 +30,7 @@ class PerspectiveParameterValues : public QObject, public IParameterValues
 
 public:
 
-  QHash<QString,QString> GetParameterValues() const;
+  QHash<QString,QString> GetParameterValues() const override;
 };
 
 }

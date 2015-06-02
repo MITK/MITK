@@ -43,7 +43,7 @@ namespace mitk
     ///
     /// executes the Algorithm
     ///
-    void Update()
+    void Update() override
     {
       m_VnlMatrixFromCvMat.Update();
 

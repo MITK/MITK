@@ -22,7 +22,7 @@ void
 IWindowListener::Events
 ::AddListener(IWindowListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   windowActivated += Delegate(listener, &IWindowListener::WindowActivated);
   windowDeactivated += Delegate(listener, &IWindowListener::WindowDeactivated);
@@ -34,7 +34,7 @@ void
 IWindowListener::Events
 ::RemoveListener(IWindowListener* listener)
 {
-  if (listener == NULL) return;
+  if (listener == nullptr) return;
 
   windowActivated -= Delegate(listener, &IWindowListener::WindowActivated);
   windowDeactivated -= Delegate(listener, &IWindowListener::WindowDeactivated);

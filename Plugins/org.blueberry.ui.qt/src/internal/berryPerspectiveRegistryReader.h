@@ -53,7 +53,7 @@ public:
   /**
    * readElement method comment.
    */
-  bool ReadElement(const IConfigurationElement::Pointer& element);
+  bool ReadElement(const IConfigurationElement::Pointer& element) override;
 
 };
 

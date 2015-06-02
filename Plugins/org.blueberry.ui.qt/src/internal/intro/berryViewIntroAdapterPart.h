@@ -113,7 +113,7 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
    */
-  void CreatePartControl(QWidget* parent);
+  void CreatePartControl(QWidget* parent) override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#dispose()
@@ -123,30 +123,30 @@ public:
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchPart#getTitleImage()
    */
-  QIcon GetTitleImage() const;
+  QIcon GetTitleImage() const override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.part.WorkbenchPart#GetPartName()
    */
-  QString GetPartName() const;
+  QString GetPartName() const override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)
    */
   void Init(IViewSite::Pointer site, IMemento::Pointer memento =
-      IMemento::Pointer(0)) throw (PartInitException);
+      IMemento::Pointer(nullptr)) throw (PartInitException) override;
 
   /*
    * (non-Javadoc)
    *
    * @see org.eclipse.ui.IWorkbenchPart#setFocus()
    */
-  void SetFocus();
+  void SetFocus() override;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IViewPart#saveState(org.eclipse.ui.IMemento)
    */
-  void SaveState(IMemento::Pointer memento);
+  void SaveState(IMemento::Pointer memento) override;
 
 };
 

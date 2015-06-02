@@ -41,7 +41,7 @@ namespace mitk {
     protected:
       std::string m_Value;
 
-      StringProperty( const char* string = 0 );
+      StringProperty( const char* string = nullptr );
       StringProperty( const std::string&  s );
 
       StringProperty(const StringProperty&);

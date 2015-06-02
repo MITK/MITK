@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -27,7 +27,7 @@ ipMITKSegmentationCreateGrowerHistory( mitkIpPicDescriptor *seg, int startOfs, m
   if (!histBuffer) {
     histBuffer = mitkIpPicCopyHeader( seg, histBuffer );
     histBuffer->type = mitkIpPicUInt;
-    histBuffer->bpe = 16; 
+    histBuffer->bpe = 16;
     mitkIpUInt4_t size = _mitkIpPicSize( histBuffer );
     histBuffer->data = malloc( size );
     memset( histBuffer->data, 0, size );  // clear buffer
@@ -51,7 +51,7 @@ ipMITKSegmentationCreateGrowerHistory( mitkIpPicDescriptor *seg, int startOfs, m
   flagBuffer->data = malloc( size );
   memset( flagBuffer->data, 0, size );
   *((mitkIpUInt1_t*)flagBuffer->data+startOfs) = 1;    // flag pixel as visited
-    
+
   int line = seg->n[0];
   int maxOfs = (int)(line * seg->n[1]);
   int testOfs;
@@ -59,7 +59,7 @@ ipMITKSegmentationCreateGrowerHistory( mitkIpPicDescriptor *seg, int startOfs, m
   int iteration = 0;
   int currentWave = 1;
   int nextWave = 0;
-  
+
   ofsQueue.push( startOfs );
 
   while (!ofsQueue.empty()) {

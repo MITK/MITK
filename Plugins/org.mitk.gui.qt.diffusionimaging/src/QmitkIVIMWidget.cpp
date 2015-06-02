@@ -36,7 +36,7 @@ QmitkIVIMWidget::QmitkIVIMWidget( QWidget * parent )
     canvas->setContentsMargins(0,0,0,0);
   }
 
-  QwtLogScaleEngine* logScale = new QwtLogScaleEngine();
+  auto   logScale = new QwtLogScaleEngine();
   m_Plot->setAxisScaleEngine(0, logScale);
 
   m_Plot->setAxisScale( 0, 0.15, 1.0 );
@@ -141,7 +141,7 @@ void QmitkIVIMWidget::SetParameters( IVIMFilterType::IVIMSnapshot snap )
 //  margins.setRight(0);
 //  margins.setTop(0);
 
-  QwtLegend* legend = new QwtLegend();
+  auto   legend = new QwtLegend();
 //  legend->setContentsMargins(margins);
   m_Plot->insertLegend(legend, QwtPlot::BottomLegend);
 

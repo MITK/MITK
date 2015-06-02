@@ -63,22 +63,22 @@ public:
     /* (non-Javadoc)
      * @see org.blueberry.ui.IPlaceholderFolderLayout#addPlaceholder(java.lang.String)
      */
-    void AddPlaceholder(const QString& viewId);
+    void AddPlaceholder(const QString& viewId) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.IFolderLayout#addView(java.lang.String)
      */
-    void AddView(const QString& viewId);
+    void AddView(const QString& viewId) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.IPlaceholderFolderLayout#getProperty(java.lang.String)
      */
-    QString GetProperty(const QString& id);
+    QString GetProperty(const QString& id) override;
 
     /* (non-Javadoc)
      * @see org.blueberry.ui.IPlaceholderFolderLayout#setProperty(java.lang.String, java.lang.String)
      */
-    void SetProperty(const QString& id, const QString& value);
+    void SetProperty(const QString& id, const QString& value) override;
 
 
     private:

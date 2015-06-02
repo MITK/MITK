@@ -127,7 +127,7 @@ Object* ViewDescriptor::GetAdapter(const QString& adapter) const
   {
     return GetConfigurationElement().GetPointer();
   }
-  return NULL;
+  return nullptr;
 }
 
 void
@@ -188,7 +188,7 @@ void ViewDescriptor::LoadFromExtension()
   if (name.isEmpty() ||
       RegistryReader::GetClassValue(configElement, WorkbenchRegistryConstants::ATT_CLASS).isEmpty())
   {
-    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, configElement->GetContributor()->GetName(), 0,
+    IStatus::Pointer status(new Status(IStatus::ERROR_TYPE, configElement->GetContributor()->GetName(), nullptr,
                                        QString("Invalid extension (missing label or class name): ") + id));
     throw CoreException(status);
   }

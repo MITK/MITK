@@ -98,7 +98,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
 
   if ( preLoadedImageBlock.IsNull() )
   {
-    for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
+    for (auto df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
     {
       reader->SetFileNames(*df_it);
       reader->Update();

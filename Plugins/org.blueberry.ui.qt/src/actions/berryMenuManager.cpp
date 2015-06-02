@@ -37,8 +37,8 @@ public:
     Menu
   };
 
-  QMenuProxy(Type type, QWidget* parent = 0)
-    : menu(0), menuBar(0)
+  QMenuProxy(Type type, QWidget* parent = nullptr)
+    : menu(nullptr), menuBar(nullptr)
   {
     switch (type)
     {
@@ -49,7 +49,7 @@ public:
 
   bool isMenuBar() const
   {
-    return menuBar != 0;
+    return menuBar != nullptr;
   }
 
   void setTitle(const QString& title)
@@ -98,12 +98,12 @@ struct NullOverrides: public IContributionManagerOverrides
 {
 public:
 
-  int GetEnabled(const IContributionItem* /*item*/) const
+  int GetEnabled(const IContributionItem* /*item*/) const override
   {
     return -1;
   }
 
-  int GetVisible(const IContributionItem* /*item*/) const
+  int GetVisible(const IContributionItem* /*item*/) const override
   {
     return -1;
   }
@@ -125,17 +125,17 @@ void MenuManager::HandleAboutToHide()
 }
 
 MenuManager::MenuManager(const QString& text, const QString& id)
-  : id(id), menu(0), menuItem(0)
-  , menuText(text), parent(0)
+  : id(id), menu(nullptr), menuItem(nullptr)
+  , menuText(text), parent(nullptr)
   , removeAllWhenShown(false), visible(true)
 {
 
 }
 
 MenuManager::MenuManager(const QString& text, const QIcon& image, const QString& id)
-  : id(id), menu(0), menuItem(0)
+  : id(id), menu(nullptr), menuItem(nullptr)
   , menuText(text), image(image)
-  , parent(0), removeAllWhenShown(false), visible(true)
+  , parent(nullptr), removeAllWhenShown(false), visible(true)
 {
 
 }
@@ -233,7 +233,7 @@ IMenuManager::Pointer MenuManager::FindMenuUsingPath(const QString& path) const
   {
     return manager;
   }
-  return IMenuManager::Pointer(0);
+  return IMenuManager::Pointer(nullptr);
 }
 
 IContributionItem::Pointer MenuManager::FindUsingPath(const QString& path) const
@@ -256,7 +256,7 @@ IContributionItem::Pointer MenuManager::FindUsingPath(const QString& path) const
   {
     return manager->FindUsingPath(rest);
   }
-  return IContributionItem::Pointer(0);
+  return IContributionItem::Pointer(nullptr);
 }
 
 QString MenuManager::GetId() const
@@ -525,7 +525,7 @@ void MenuManager::Update(bool force, bool recursive)
             {
               clean.push_back(separator);
             }
-            separator = 0;
+            separator = nullptr;
           }
           clean.push_back(ci);
         }
@@ -570,7 +570,7 @@ void MenuManager::Update(bool force, bool recursive)
         }
         else
         {
-          dest = 0;
+          dest = nullptr;
         }
 
         if (dest && src == dest)
@@ -588,7 +588,7 @@ void MenuManager::Update(bool force, bool recursive)
         {
           int start = menu->actions().size();
           //qDebug() << "***** Filling item destIx = " << destIx << " (size: " << start << ")";
-          this->DoItemFill(src, destIx >= start ? NULL : menu->actions().at(destIx));
+          this->DoItemFill(src, destIx >= start ? nullptr : menu->actions().at(destIx));
           int newItems = menu->actions().size() - start;
           //qDebug() << "***** New items: " << newItems;
           for (int i = 0; i < newItems; ++i)

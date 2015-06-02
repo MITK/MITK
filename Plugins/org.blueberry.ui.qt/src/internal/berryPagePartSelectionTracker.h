@@ -56,7 +56,7 @@ private:
   {
     PostSelectionListener(PagePartSelectionTracker* tracker);
 
-    void SelectionChanged(const SelectionChangedEvent::Pointer& event);
+    void SelectionChanged(const SelectionChangedEvent::Pointer& event) override;
 
     PagePartSelectionTracker* m_Tracker;
   };
@@ -86,7 +86,7 @@ public:
    * Returns the selection from the part being tracked,
    * or <code>null</code> if the part is closed or has no selection.
    */
-  ISelection::ConstPointer GetSelection();
+  ISelection::ConstPointer GetSelection() override;
 
   /**
    * Disposes this selection tracker.  This removes all listeners currently registered.

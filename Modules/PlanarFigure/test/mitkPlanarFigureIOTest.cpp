@@ -331,13 +331,13 @@ public:
     }
 
     MITK_INFO << "List 1:";
-    for (PropertyMap::const_iterator i1 = properties1->begin(); i1 != properties1->end(); ++i1)
+    for (auto i1 = properties1->begin(); i1 != properties1->end(); ++i1)
     {
       std::cout << i1->first << std::endl;
     }
 
     MITK_INFO << "List 2:";
-    for (PropertyMap::const_iterator i2 = properties2->begin(); i2 != properties2->end(); ++i2)
+    for (auto i2 = properties2->begin(); i2 != properties2->end(); ++i2)
     {
       std::cout << i2->first << std::endl;
     }
@@ -576,7 +576,7 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
   PlanarFigureIOTestClass::PlanarFigureList retrievedPlanarFiguresFromMemory =
       PlanarFigureIOTestClass::DeserializePlanarFiguresFromMemoryBuffers( writersWithMemoryBuffers );
 
-  PlanarFigureIOTestClass::PlanarFigureToMemoryWriterList::iterator it = writersWithMemoryBuffers.begin();
+  auto it = writersWithMemoryBuffers.begin();
   while(it != writersWithMemoryBuffers.end())
   {
     (*it)->ReleaseMemory();

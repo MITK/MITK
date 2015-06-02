@@ -88,7 +88,7 @@ namespace mitk
     *
     * emits the Messages
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
   };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATATOMESSAGEFILTER_H_HEADER_INCLUDED_ */

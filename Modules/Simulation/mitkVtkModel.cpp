@@ -65,7 +65,7 @@ mitk::VtkModel::VtkModel()
     m_LastNumberOfQuads(0),
     m_VertexBuffer(0),
     m_IndexBuffer(0),
-    m_VtkRenderer(NULL),
+    m_VtkRenderer(nullptr),
     m_Mode(OpenGL)
 {
 }
@@ -199,11 +199,11 @@ void mitk::VtkModel::DrawSurfaceGroup(int group, bool)
 
   pointData->SetNormals(m_Normals->GetSize() != 0
     ? m_Normals
-    : NULL);
+    : nullptr);
 
   pointData->SetTCoords(m_TexCoords->GetSize() != 0
     ? m_TexCoords
-    : NULL);
+    : nullptr);
 
   m_PolyData->Modified();
 }
@@ -239,7 +239,7 @@ void mitk::VtkModel::InitIndexBuffer()
   if (m_Mode == OpenGL)
   {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles.size() * sizeof(Triangle) + quads.size() * sizeof(Quad), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles.size() * sizeof(Triangle) + quads.size() * sizeof(Quad), nullptr, GL_DYNAMIC_DRAW);
   }
 
   this->UpdateIndexBuffer();
@@ -256,7 +256,7 @@ void mitk::VtkModel::InitVertexBuffer()
   if (m_Mode == OpenGL)
   {
     glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VecCoord::value_type) + normals.size() * sizeof(Deriv) + texCoords.size() * sizeof(VecTexCoord::value_type), NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VecCoord::value_type) + normals.size() * sizeof(Deriv) + texCoords.size() * sizeof(VecTexCoord::value_type), nullptr, GL_DYNAMIC_DRAW);
   }
   else if (m_Mode == Surface)
   {
@@ -314,7 +314,7 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
 
     this->ValidateBoundBuffers();
 
-    glVertexPointer(3, GL_FLOAT, 0, NULL);
+    glVertexPointer(3, GL_FLOAT, 0, nullptr);
     glNormalPointer(GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type)));
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -398,7 +398,7 @@ bool mitk::VtkModel::loadTextures()
 
     vtkSmartPointer<vtkImageReader2> imageReader = vtkSmartPointer<vtkImageReader2>::Take(vtkImageReader2Factory::CreateImageReader2(filename.c_str()));
 
-    if (imageReader == NULL)
+    if (imageReader == nullptr)
     {
       MITK_ERROR("VtkModel") << "File \"" << filename << "\" has unknown image format!";
       retValue = false;
@@ -435,13 +435,13 @@ void mitk::VtkModel::SetMode(Mode mode)
 
   if (mode == OpenGL)
   {
-    m_DataNode = NULL;
-    m_Surface = NULL;
-    m_PolyData = NULL;
-    m_TexCoords = NULL;
-    m_Normals = NULL;
-    m_Polys = NULL;
-    m_Points = NULL;
+    m_DataNode = nullptr;
+    m_Surface = nullptr;
+    m_PolyData = nullptr;
+    m_TexCoords = nullptr;
+    m_Normals = nullptr;
+    m_Polys = nullptr;
+    m_Points = nullptr;
   }
   else if (mode == Surface)
   {

@@ -55,13 +55,13 @@ public:
    * (non-Javadoc)
    * Method declared on IPartService
    */
-  void AddPartListener(IPartListener* l);
+  void AddPartListener(IPartListener* l) override;
 
   /*
    * (non-Javadoc)
    * Method declared on IPartService
    */
-  void RemovePartListener(IPartListener* l);
+  void RemovePartListener(IPartListener* l) override;
 
   /**
    * @param ref
@@ -84,9 +84,9 @@ public:
    */
   void FirePartOpened(IWorkbenchPartReference::Pointer ref);
 
-  IWorkbenchPart::Pointer GetActivePart();
+  IWorkbenchPart::Pointer GetActivePart() override;
 
-  IWorkbenchPartReference::Pointer GetActivePartReference();
+  IWorkbenchPartReference::Pointer GetActivePartReference() override;
 
   void SetActivePart(IWorkbenchPartReference::Pointer ref);
 

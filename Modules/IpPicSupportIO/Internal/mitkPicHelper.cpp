@@ -30,7 +30,7 @@ bool mitk::PicHelper::GetSpacing(const mitkIpPicDescriptor* aPic, Vector3D & spa
   bool pixelSize = false;
 
   tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZE" );
-  if(tsv==NULL)
+  if(tsv==nullptr)
   {
     tsv = mitkIpPicQueryTag( pic, "PIXEL SIZE" );
     pixelSize = true;
@@ -149,7 +149,7 @@ bool mitk::PicHelper::SetSpacing(const mitkIpPicDescriptor* aPic, SlicedGeometry
   Vector3D spacing(slicedgeometry->GetSpacing());
 
   mitkIpPicTSV_t *tsv;
-  if ( (tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
+  if ( (tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZES" )) != nullptr)
   {
     int count = tsv->n[1];
     float* value = (float*) tsv->value;
@@ -179,13 +179,13 @@ bool mitk::PicHelper::SetSpacing(const mitkIpPicDescriptor* aPic, SlicedGeometry
 
 void mitk::PicHelper::InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, unsigned int slices, SlicedGeometry3D* slicedgeometry)
 {
-  assert(pic!=NULL);
-  assert(slicedgeometry!=NULL);
+  assert(pic!=nullptr);
+  assert(slicedgeometry!=nullptr);
 
   mitk::PlaneGeometry::Pointer planegeometry=mitk::PlaneGeometry::New();
 
   mitkIpPicTSV_t *geometryTag;
-  if ( (geometryTag = mitkIpPicQueryTag( const_cast<mitkIpPicDescriptor*>(pic), "ISG" )) != NULL)
+  if ( (geometryTag = mitkIpPicQueryTag( const_cast<mitkIpPicDescriptor*>(pic), "ISG" )) != nullptr)
   {
     mitk::Point3D  origin;
     mitk::Vector3D rightVector;
@@ -215,13 +215,13 @@ void mitk::PicHelper::InitializeEvenlySpaced(const mitkIpPicDescriptor* pic, uns
 bool mitk::PicHelper::SetPlaneGeometry(const mitkIpPicDescriptor* aPic, int s, SlicedGeometry3D* slicedgeometry)
 {
   mitkIpPicDescriptor* pic = const_cast<mitkIpPicDescriptor*>(aPic);
-  if((pic!=NULL) && (slicedgeometry->IsValidSlice(s)))
+  if((pic!=nullptr) && (slicedgeometry->IsValidSlice(s)))
   {
     //construct standard view
     mitk::Point3D origin;
     mitk::Vector3D rightDV, bottomDV;
     mitkIpPicTSV_t *tsv;
-    if ( (tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZES" )) != NULL)
+    if ( (tsv = mitkIpPicQueryTag( pic, "REAL PIXEL SIZES" )) != nullptr)
     {
       unsigned int count = (unsigned int) tsv->n[1];
       float* value = (float*) tsv->value;

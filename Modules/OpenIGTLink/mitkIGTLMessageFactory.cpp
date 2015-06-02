@@ -75,7 +75,7 @@ igtl::MessageBase::Pointer TransformMsgCloneHandler::Clone(igtl::MessageBase* or
   copySuccess = clone_->Copy(original);
 
   if ( !copySuccess )
-    return NULL;
+    return nullptr;
 
   //copy all data that is important for this class
   //copy the matrix
@@ -102,7 +102,7 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
   //create clone handlers
 //  mitk::IGTLMessageCloneHandler::Pointer tmch = ;
 
-  this->AddMessageNewMethod("NONE", NULL);
+  this->AddMessageNewMethod("NONE", nullptr);
 
   //OpenIGTLink Types V1
   this->AddMessageNewMethod("IMAGE",      (PointerToMessageBaseNew)&igtl::ImageMessage::New);
@@ -201,7 +201,7 @@ mitk::IGTLMessageFactory::GetCloneHandler(std::string messageTypeName)
 
   mitkThrow() << messageTypeName << " message type is not registered to factory!";
 
-  return NULL;
+  return nullptr;
 }
 
 igtl::MessageBase::Pointer
@@ -220,7 +220,7 @@ mitk::IGTLMessageFactory::GetMessageTypeNewPointer(std::string messageTypeName)
 
   MITK_ERROR("IGTLMessageFactory") << messageTypeName <<
                                    " message type is not registered to factory!";
-  return NULL;
+  return nullptr;
 }
 
 igtl::MessageBase::Pointer
@@ -228,13 +228,13 @@ mitk::IGTLMessageFactory::CreateInstance(std::string messageTypeName)
 {
   mitk::IGTLMessageFactory::PointerToMessageBaseNew newPointer =
       this->GetMessageTypeNewPointer(messageTypeName);
-  if ( newPointer != NULL )
+  if ( newPointer != nullptr )
   {
     return newPointer();
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -280,18 +280,18 @@ mitk::IGTLMessageFactory::CreateInstance(igtl::MessageHeader::Pointer msgHeader)
   if ( this->m_NewMethods.find( messageType )
        != this->m_NewMethods.end() )
   {
-    if ( this->m_NewMethods[messageType] != NULL)
+    if ( this->m_NewMethods[messageType] != nullptr)
     {
       // Call tracker New() function if tracker not NULL
       return (*this->m_NewMethods[messageType])();
     }
     else
-      return NULL;
+      return nullptr;
   }
   else
   {
     MITK_ERROR("IGTLMessageFactory") << "Unknown IGT message type: "
                                      << messageType;
-    return NULL;
+    return nullptr;
   }
 }

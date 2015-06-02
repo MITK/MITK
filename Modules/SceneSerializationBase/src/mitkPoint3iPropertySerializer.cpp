@@ -33,24 +33,24 @@ class Point3iPropertySerializer : public BasePropertySerializer
     {
       if (const Point3iProperty* prop = dynamic_cast<const Point3iProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("point");
+        auto  element = new TiXmlElement("point");
         Point3I point = prop->GetValue();
         element->SetAttribute("x", point[0]);
         element->SetAttribute("y", point[1]);
         element->SetAttribute("z", point[2]);
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       Point3I v;
-      if ( element->QueryIntAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryIntAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryIntAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryIntAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryIntAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryIntAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return nullptr;
      return Point3iProperty::New( v ).GetPointer();
     }
   protected:

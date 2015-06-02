@@ -51,8 +51,8 @@ mitk::AnisotropicIterativeClosestPointRegistration::AnisotropicIterativeClosestP
     m_FRE(0.0),
     m_TrimmFactor(0.0),
     m_NumberOfIterations(0),
-    m_MovingSurface(NULL),
-    m_FixedSurface(NULL),
+    m_MovingSurface(nullptr),
+    m_FixedSurface(nullptr),
     m_WeightedPointTransform(mitk::WeightedPointTransform::New())
 {
 }

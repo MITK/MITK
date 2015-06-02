@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NodePredicateDataType::NodePredicateDataType(const char* datatype)
 : NodePredicateBase()
 {
-  if (datatype == NULL)
+  if (datatype == nullptr)
     throw std::invalid_argument("NodePredicateDataType: invalid datatype");
 
 
@@ -36,13 +36,13 @@ mitk::NodePredicateDataType::~NodePredicateDataType()
 
 bool mitk::NodePredicateDataType::CheckNode(const mitk::DataNode* node) const
 {
-  if (node == NULL)
+  if (node == nullptr)
     throw std::invalid_argument("NodePredicateDataType: invalid node");
 
 
   mitk::BaseData* data = node->GetData();
 
-  if (data == NULL)
+  if (data == nullptr)
     return false;  // or should we check if m_ValidDataType == "NULL" so that nodes without data can be requested?
 
   return ( m_ValidDataType.compare(data->GetNameOfClass()) == 0); // return true if data type matches

@@ -108,7 +108,7 @@ void QmitkSliderNavigatorWidget::SetStepper( mitk::Stepper * stepper)
 
   // this avoids trying to use m_Stepper until it is set to something != NULL
   // (additionally to the avoiding recursions during refetching)
-  m_InRefetch = (stepper==NULL);
+  m_InRefetch = (stepper==nullptr);
 }
 
 

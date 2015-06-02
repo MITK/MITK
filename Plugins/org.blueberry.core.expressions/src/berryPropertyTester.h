@@ -101,22 +101,22 @@ public:
   /**
    * {@inheritDoc}
    */
-  bool Handles(const QString& namespaze, const QString& property);
+  bool Handles(const QString& namespaze, const QString& property) override;
 
   /**
    * {@inheritDoc}
    */
-  bool IsInstantiated();
+  bool IsInstantiated() override;
 
   /**
    * {@inheritDoc}
    */
-  bool IsDeclaringPluginActive();
+  bool IsDeclaringPluginActive() override;
 
   /**
    * {@inheritDoc}
    */
-  IPropertyTester* Instantiate();
+  IPropertyTester* Instantiate() override;
 
 };
 

@@ -123,7 +123,7 @@ public:
      * @return <code>true</code> if the objects are equal; <code>false</code>
      *         otherwise.
      */
-   bool operator==(const Object* object) const;
+   bool operator==(const Object* object) const override;
 
    QString GetId() const;
 
@@ -132,7 +132,7 @@ public:
      *
      * @return The hash code for this object.
      */
-   virtual uint HashCode() const
+   virtual uint HashCode() const override
    {
      if (hashCode == HASH_CODE_NOT_COMPUTED)
      {

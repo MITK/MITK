@@ -23,14 +23,14 @@ namespace berry
 
 void ICommandManagerListener::Events::AddListener(ICommandManagerListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   commandManagerChanged += Delegate(l, &ICommandManagerListener::CommandManagerChanged);
 }
 
 void ICommandManagerListener::Events::RemoveListener(ICommandManagerListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   commandManagerChanged -= Delegate(l, &ICommandManagerListener::CommandManagerChanged);
 }

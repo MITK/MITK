@@ -33,7 +33,7 @@ class QmitkIsoSurface : public QmitkAbstractView
 
 public:
 
-  QmitkIsoSurface(QObject *parent=0, const char *name=0);
+  QmitkIsoSurface(QObject *parent=nullptr, const char *name=nullptr);
 
   virtual ~QmitkIsoSurface();
 
@@ -42,9 +42,9 @@ private:
   /**
    * \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
    */
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   /**
    * \brief method for creating the connections of main and control widget

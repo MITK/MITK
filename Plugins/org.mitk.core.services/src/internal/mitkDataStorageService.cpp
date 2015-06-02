@@ -81,7 +81,7 @@ bool DataStorageService::RemoveDataStorageReference(IDataStorageReference::Point
 {
   if (m_ActiveDataStorageRef == dataStorageRef)
   {
-    m_ActiveDataStorageRef = 0;
+    m_ActiveDataStorageRef = nullptr;
   }
 
   return m_DataStorageReferences.erase(dataStorageRef);

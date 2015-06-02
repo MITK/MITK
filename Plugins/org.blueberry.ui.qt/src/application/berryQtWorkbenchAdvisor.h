@@ -33,7 +33,7 @@ public:
   /**
    * Creates the global QApplication object
    */
-  void Initialize(IWorkbenchConfigurer::Pointer configurer);
+  void Initialize(IWorkbenchConfigurer::Pointer configurer) override;
 };
 
 }

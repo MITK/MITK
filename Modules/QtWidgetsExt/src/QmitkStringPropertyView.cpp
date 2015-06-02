@@ -35,8 +35,8 @@ void QmitkStringPropertyView::PropertyChanged()
 
 void QmitkStringPropertyView::PropertyRemoved()
 {
-  m_Property = NULL;
-  m_StringProperty = NULL;
+  m_Property = nullptr;
+  m_StringProperty = nullptr;
   setText("n/a");
 }
 

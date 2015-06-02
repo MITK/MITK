@@ -26,7 +26,7 @@ mitk::PlanarFigure::PlanarFigure()
 : m_SelectedControlPoint( -1 ),
   m_PreviewControlPointVisible( false ),
   m_FigurePlaced( false ),
-  m_PlaneGeometry( NULL ),
+  m_PlaneGeometry( nullptr ),
   m_PolyLineUpToDate(false),
   m_HelperLinesUpToDate(false),
   m_FeaturesUpToDate(false),
@@ -87,7 +87,7 @@ const mitk::PlaneGeometry *mitk::PlanarFigure::GetPlaneGeometry() const
 bool mitk::PlanarFigure::IsClosed() const
 {
   mitk::BoolProperty* closed = dynamic_cast< mitk::BoolProperty* >( this->GetProperty( "closed" ).GetPointer() );
-  if ( closed != NULL )
+  if ( closed != nullptr )
   {
     return closed->GetValue();
   }
@@ -130,7 +130,7 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     else
     {
       // insert the point at the given position and set it as selected point
-      ControlPointListType::iterator iter = m_ControlPoints.begin() + position;
+      auto iter = m_ControlPoints.begin() + position;
       m_ControlPoints.insert( iter, this->ApplyControlPointConstraints( position, point ) );
       for( unsigned int i = 0; i < m_ControlPoints.size(); ++i )
       {
@@ -269,7 +269,7 @@ mitk::Point2D mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
 mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) const
 {
   Point3D point3D;
-  if ( (m_PlaneGeometry != NULL) && (index < m_NumberOfControlPoints) )
+  if ( (m_PlaneGeometry != nullptr) && (index < m_NumberOfControlPoints) )
   {
     m_PlaneGeometry->Map( m_ControlPoints.at( index ), point3D );
     return point3D;
@@ -358,7 +358,7 @@ const char *mitk::PlanarFigure::GetFeatureName( unsigned int index ) const
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -371,7 +371,7 @@ const char *mitk::PlanarFigure::GetFeatureUnit( unsigned int index ) const
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -478,7 +478,7 @@ void mitk::PlanarFigure::ResetNumberOfControlPoints( int numberOfControlPoints )
 
 mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point )
 {
-  if ( m_PlaneGeometry ==  NULL )
+  if ( m_PlaneGeometry ==  nullptr )
   {
     return point;
   }
@@ -717,9 +717,9 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   }
   else
   {
-    std::vector<PolyLineType>::const_iterator itThis = this->m_PolyLines.begin();
-    std::vector<PolyLineType>::const_iterator itEnd = this->m_PolyLines.end();
-    std::vector<PolyLineType>::const_iterator itOther = other.m_PolyLines.begin();
+    auto itThis = this->m_PolyLines.begin();
+    auto itEnd = this->m_PolyLines.end();
+    auto itOther = other.m_PolyLines.begin();
 
     while( itThis != itEnd )
     {
@@ -727,9 +727,9 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
         return false;
       else
       {
-        PolyLineType::const_iterator itLineThis = itThis->begin();
-        PolyLineType::const_iterator itLineEnd = itThis->end();
-        PolyLineType::const_iterator itLineOther = itOther->begin();
+        auto itLineThis = itThis->begin();
+        auto itLineEnd = itThis->end();
+        auto itLineOther = itOther->begin();
 
         while(itLineThis != itLineEnd)
         {
@@ -760,9 +760,9 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   }
   else
   {
-    std::vector<Feature>::const_iterator itThis = m_Features.begin();
-    std::vector<Feature>::const_iterator itEnd = m_Features.end();
-    std::vector<Feature>::const_iterator itOther = other.m_Features.begin();
+    auto itThis = m_Features.begin();
+    auto itEnd = m_Features.end();
+    auto itOther = other.m_Features.begin();
 
     while(itThis != itEnd)
     {

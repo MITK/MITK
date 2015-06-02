@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-QtSelectionProvider::QtSelectionProvider() : qSelectionModel(0)
+QtSelectionProvider::QtSelectionProvider() : qSelectionModel(nullptr)
 {
 
 }
@@ -46,7 +46,7 @@ ISelection::ConstPointer QtSelectionProvider::GetSelection() const
     return qsel;
   }
 
-  return ISelection::ConstPointer(0);
+  return ISelection::ConstPointer(nullptr);
 }
 
 void QtSelectionProvider::SetSelection(const ISelection::ConstPointer& selection)

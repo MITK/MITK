@@ -179,11 +179,11 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const QSt
   // Sanity check to avoid invalid or duplicate labels.
   if (!this->ValidateLabel(label))
   {
-    return IPerspectiveDescriptor::Pointer(0);
+    return IPerspectiveDescriptor::Pointer(nullptr);
   }
   if (this->FindPerspectiveWithLabel(label) != 0)
   {
-    return IPerspectiveDescriptor::Pointer(0);
+    return IPerspectiveDescriptor::Pointer(nullptr);
   }
 
   // Calculate ID.
@@ -249,7 +249,7 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithId(const
     }
   }
 
-  return IPerspectiveDescriptor::Pointer(0);
+  return IPerspectiveDescriptor::Pointer(nullptr);
 }
 
 IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithLabel(
@@ -268,7 +268,7 @@ IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithLabel(
       return desc;
     }
   }
-  return IPerspectiveDescriptor::Pointer(0);
+  return IPerspectiveDescriptor::Pointer(nullptr);
 }
 
 QString PerspectiveRegistry::GetDefaultPerspective()

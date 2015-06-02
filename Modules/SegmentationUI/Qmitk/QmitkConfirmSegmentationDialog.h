@@ -12,7 +12,7 @@ class QmitkConfirmSegmentationDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit QmitkConfirmSegmentationDialog(QWidget *parent = 0);
+  explicit QmitkConfirmSegmentationDialog(QWidget *parent = nullptr);
   ~QmitkConfirmSegmentationDialog();
 
   void SetSegmentationName(QString name);

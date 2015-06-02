@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::AutoCropImageFilter::AutoCropImageFilter()
 : m_BackgroundValue(0),
   m_MarginFactor(1.0),
-  m_TimeSelector(NULL),
+  m_TimeSelector(nullptr),
   m_OverrideCroppingRegion(false)
 {
 }
@@ -45,7 +45,7 @@ mitk::AutoCropImageFilter::~AutoCropImageFilter()
 template < typename TPixel, unsigned int VImageDimension>
 void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep)
 {
-  if (inputItkImage == NULL)
+  if (inputItkImage == nullptr)
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
     MITK_ERROR << "image is NULL...returning" << std::endl;
@@ -136,7 +136,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
 
   // PART II: initialize output image
   unsigned int dimension = input->GetDimension();
-  unsigned int *dimensions = new unsigned int [dimension];
+  auto dimensions = new unsigned int [dimension];
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
   if(dimension>3)
     memcpy(dimensions+3, input->GetDimensions()+3, (dimension-3)*sizeof(unsigned int));

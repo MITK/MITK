@@ -49,11 +49,11 @@ public:
 
   ~CoreException() throw();
 
-  const char* name() const throw();
+  const char* name() const throw() override;
 
-  CoreException* clone() const;
+  CoreException* clone() const override;
 
-  void rethrow() const;
+  void rethrow() const override;
 
   /**
    * Returns the status object for this exception.
@@ -74,7 +74,7 @@ private:
    *
    * @param output the stream to write to
    */
-  QDebug printStackTrace(QDebug dbg) const;
+  QDebug printStackTrace(QDebug dbg) const override;
 
   QDebug PrintChildren(IStatus* status, QDebug dbg) const;
 };

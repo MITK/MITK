@@ -34,7 +34,7 @@ class MITKDEFORMABLEREGISTRATIONUI_EXPORT QmitkBSplineRegistrationView : public 
 
 public:
 
-  QmitkBSplineRegistrationView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkBSplineRegistrationView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkBSplineRegistrationView();
 
   int GetNumberOfIterations();

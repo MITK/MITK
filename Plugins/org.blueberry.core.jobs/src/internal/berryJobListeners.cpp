@@ -29,7 +29,7 @@ namespace berry
 struct AboutToRunDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer& event) const
+      const IJobChangeEvent::ConstPointer& event) const override
   {
     events.jobAboutToRun(event);
   }
@@ -38,7 +38,7 @@ struct AboutToRunDoit: public JobListeners::IListenerDoit
 struct AwakeDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer& event) const
+      const IJobChangeEvent::ConstPointer& event) const override
   {
     events.jobAwake(event);
   }
@@ -47,7 +47,7 @@ struct AwakeDoit: public JobListeners::IListenerDoit
 struct DoneDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer& event) const
+      const IJobChangeEvent::ConstPointer& event) const override
   {
     events.jobDone(event);
   }
@@ -56,7 +56,7 @@ struct DoneDoit: public JobListeners::IListenerDoit
 struct RunningDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer& event) const
+      const IJobChangeEvent::ConstPointer& event) const override
   {
     events.jobRunning(event);
   }
@@ -65,7 +65,7 @@ struct RunningDoit: public JobListeners::IListenerDoit
 struct ScheduledDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer& event) const
+      const IJobChangeEvent::ConstPointer& event) const override
   {
     events.jobScheduled(event);
   }
@@ -74,7 +74,7 @@ struct ScheduledDoit: public JobListeners::IListenerDoit
 struct SleepingDoit: public JobListeners::IListenerDoit
 {
   void Notify(const IJobChangeListener::Events& events,
-      const IJobChangeEvent::ConstPointer& event) const
+      const IJobChangeEvent::ConstPointer& event) const override
   {
     events.jobSleeping(event);
   }

@@ -259,10 +259,10 @@ void mitk::InternalTrackingTool::SetErrorMessage(const char* _arg)
 {
   itkDebugMacro("setting  m_ErrorMessage  to " << _arg);
   MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex
-  if ((_arg == NULL) || (_arg == this->m_ErrorMessage))
+  if ((_arg == nullptr) || (_arg == this->m_ErrorMessage))
     return;
 
-  if (_arg != NULL)
+  if (_arg != nullptr)
     this->m_ErrorMessage = _arg;
   else
     this->m_ErrorMessage = "";

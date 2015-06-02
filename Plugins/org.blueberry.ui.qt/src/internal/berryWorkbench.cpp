@@ -71,7 +71,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-Workbench* Workbench::instance = 0;
+Workbench* Workbench::instance = nullptr;
 WorkbenchTestable::Pointer Workbench::testableObject;
 
 const unsigned int Workbench::VERSION_STRING_COUNT = 1;
@@ -100,7 +100,7 @@ public:
 
   }
 
-  void Run()
+  void Run() override
   {
     Poco::FileInputStream input(stateFile.path());
     IMemento::Pointer memento = XMLMemento::CreateReadRoot(input);
@@ -109,9 +109,9 @@ public:
     QString version;
     memento->GetString(WorkbenchConstants::TAG_VERSION, version);
     bool valid = false;
-    for (std::size_t i = 0; i < Workbench::VERSION_STRING_COUNT; i++)
+    for (auto & elem : Workbench::VERSION_STRING)
     {
-      if (Workbench::VERSION_STRING[i] == version)
+      if (elem == version)
       {
         valid = true;
         break;
@@ -122,7 +122,7 @@ public:
       input.close();
       QString msg =
           "Invalid workbench state version. workbench.xml will be deleted";
-      QMessageBox::critical(NULL, "Restoring Problems", msg);
+      QMessageBox::critical(nullptr, "Restoring Problems", msg);
       stateFile.remove();
       //          result[0] = new Status(IStatus.ERROR,
       //              WorkbenchPlugin.PI_WORKBENCH,
@@ -183,7 +183,7 @@ public:
     //        }
   }
 
-  void HandleException(const ctkException& e)
+  void HandleException(const ctkException& e) override
   {
     //StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
@@ -245,7 +245,7 @@ Workbench::ServiceLocatorOwner::ServiceLocatorOwner(Workbench* wb) :
 void Workbench::ServiceLocatorOwner::Dispose()
 {
   QMessageBox::information(
-        NULL,
+        nullptr,
         "Restart needed",
         "A required plug-in is no longer available and the Workbench needs "
         "to be restarted. You will be prompted to save if there is any unsaved work.");
@@ -253,9 +253,9 @@ void Workbench::ServiceLocatorOwner::Dispose()
 }
 
 Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor)
-  : commandManager(0), progressCount(-1)
+  : commandManager(nullptr), progressCount(-1)
   , serviceLocatorOwner(new ServiceLocatorOwner(this))
-  , largeUpdates(0), introManager(0), isStarting(true), isClosing(false)
+  , largeUpdates(0), introManager(nullptr), isStarting(true), isClosing(false)
   , activeWorkbenchWindow(nullptr)
 {
   poco_check_ptr(display)
@@ -272,13 +272,13 @@ Workbench::Workbench(Display* display, WorkbenchAdvisor* advisor)
   serviceLocatorCreator.reset(new ServiceLocatorCreator());
   serviceLocatorCreator->Register();
   this->serviceLocator = serviceLocatorCreator->CreateServiceLocator(
-        NULL,
-        NULL,
+        nullptr,
+        nullptr,
         IDisposable::WeakPtr(serviceLocatorOwner)).Cast<ServiceLocator>();
   serviceLocator->RegisterService(serviceLocatorCreator.data());
 
   workbenchLocationService.reset(
-        new WorkbenchLocationService(IServiceScopes::WORKBENCH_SCOPE, this, NULL, NULL, 0));
+        new WorkbenchLocationService(IServiceScopes::WORKBENCH_SCOPE, this, nullptr, nullptr, 0));
   workbenchLocationService->Register();
   serviceLocator->RegisterService(workbenchLocationService.data());
 
@@ -306,7 +306,7 @@ WorkbenchTestable::Pointer Workbench::GetWorkbenchTestable()
 
 Workbench::~Workbench()
 {
-  this->instance = 0;
+  this->instance = nullptr;
   this->UnRegister(false);
 }
 
@@ -577,7 +577,7 @@ void Workbench::DoRestoreState(IMemento::Pointer memento, bool& status) // final
     try
     {
       //status.merge(newWindow[0].restoreState(childMem, null));
-      status &= newWindow->RestoreState(childMem, IPerspectiveDescriptor::Pointer(0));
+      status &= newWindow->RestoreState(childMem, IPerspectiveDescriptor::Pointer(nullptr));
       try
       {
         newWindow->FireWindowRestored();
@@ -593,7 +593,7 @@ void Workbench::DoRestoreState(IMemento::Pointer memento, bool& status) // final
     {
       // null the window in newWindowHolder so that it won't be
       // opened later on
-      createdWindows[i] = 0;
+      createdWindows[i] = nullptr;
       //StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
       //  public void runWithException() throws Throwable {
@@ -722,7 +722,7 @@ void Workbench::InitializeDefaultServices()
   //    serviceLocator.registerService(ICommandImageService.class,
   //        commandImageService);
 
-  WorkbenchMenuService* wms = new WorkbenchMenuService(serviceLocator.GetPointer());
+  auto   wms = new WorkbenchMenuService(serviceLocator.GetPointer());
   menuService.reset(wms);
   menuService->Register();
 
@@ -1037,7 +1037,7 @@ bool Workbench::BusyClose(bool force)
     {
       //      public void handleException(Throwable e) {
       QString message;
-      if (e.what() == 0)
+      if (e.what() == nullptr)
       {
         message = "An error has occurred. See error log for more details. Do you want to exit?";
       }
@@ -1045,7 +1045,7 @@ bool Workbench::BusyClose(bool force)
       {
         message = QString("An error has occurred: ") + e.what() + ". See error log for more details. Do you want to exit?";
       }
-      if (QMessageBox::question(NULL, "Error", message) != QMessageBox::Yes)
+      if (QMessageBox::question(nullptr, "Error", message) != QMessageBox::Yes)
       {
         isClosing = false;
       }
@@ -1109,7 +1109,7 @@ bool Workbench::SaveMementoToFile(XMLMemento::Pointer memento)
   catch (const Poco::IOException& /*e*/)
   {
     QFile::remove(stateFile);
-    QMessageBox::critical(NULL,
+    QMessageBox::critical(nullptr,
                           "Saving Problems",
                           "Unable to store workbench state.");
     return false;
@@ -1210,9 +1210,9 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
       if (page)
       {
         bool inputSame = false;
-        if (input == 0)
+        if (input == nullptr)
         {
-          inputSame = (page->GetInput() == 0);
+          inputSame = (page->GetInput() == nullptr);
         }
         else
         {
@@ -1299,7 +1299,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
     IWorkbenchWindow::Pointer /*window*/,
     IAdaptable* /*input*/)
 {
-  return IWorkbenchPage::Pointer(0);
+  return IWorkbenchPage::Pointer(nullptr);
   //    // If the specified window has the requested perspective open and the
   //    // same requested
   //    // input, then the window is given focus and the perspective is shown.
@@ -1504,7 +1504,7 @@ int Workbench::GetNewWindowNumber()
 
   // Create an array of booleans (size = window count).
   // Cross off every number found in the window list.
-  bool *checkArray = new bool[count];
+  auto  checkArray = new bool[count];
   for (int nX = 0; nX < count; ++nX)
   {
     if (windows[nX].Cast<WorkbenchWindow> ().IsNotNull())
@@ -1682,7 +1682,7 @@ bool Workbench::FirePreShutdown(bool forced)
   //  public void run() {
   typedef IWorkbenchListener::Events::PreShutdownEvent::ListenerList ListenerList;
   const ListenerList& listeners = workbenchEvents.preShutdown.GetListeners();
-  for ( ListenerList::const_iterator iter = listeners.begin();
+  for ( auto iter = listeners.begin();
       iter != listeners.end(); ++iter )
   {
     // notify each listener
@@ -1724,7 +1724,7 @@ void Workbench::FireWindowClosed(IWorkbenchWindow::Pointer window)
   if (activatedWindow == window)
   {
     // Do not hang onto it so it can be GC'ed
-    activatedWindow = 0;
+    activatedWindow = nullptr;
   }
 
   //  SafeRunner.run(new SafeRunnable() {
@@ -1766,7 +1766,7 @@ IWorkbenchWindow::Pointer Workbench::RestoreWorkbenchWindow(IMemento::Pointer me
 
   try
   {
-    newWindow->RestoreState(memento, IPerspectiveDescriptor::Pointer(0));
+    newWindow->RestoreState(memento, IPerspectiveDescriptor::Pointer(nullptr));
     newWindow->FireWindowRestored();
     newWindow->Open();
     opened = true;
@@ -1841,7 +1841,7 @@ void Workbench::StartSourceProviders()
   IEvaluationService* const evaluationService = serviceLocator->GetService<IEvaluationService>();
   //IContextService* const contextService = serviceLocator->GetService<IContextService>();
 
-  SourceProviderService* sps = new SourceProviderService(serviceLocator.GetPointer());
+  auto   sps = new SourceProviderService(serviceLocator.GetPointer());
   sourceProviderService.reset(sps);
   sourceProviderService->Register();
   serviceLocator->RegisterService<ISourceProviderService>(sourceProviderService.data());
@@ -1850,7 +1850,7 @@ void Workbench::StartSourceProviders()
     SafeSourceProviderRunnable(SourceProviderService* sps, IEvaluationService* es) : sps(sps), es(es)
     {}
 
-    void Run() {
+    void Run() override {
       // this currently instantiates all players ... sigh
       sps->ReadRegistry();
       QList<ISourceProvider::Pointer> sp = sps->GetSourceProviders();
@@ -1864,7 +1864,7 @@ void Workbench::StartSourceProviders()
       }
     }
 
-    void HandleException(const ctkException& exception)
+    void HandleException(const ctkException& exception) override
     {
       WorkbenchPlugin::Log("Failed to initialize a source provider", exception);
     }

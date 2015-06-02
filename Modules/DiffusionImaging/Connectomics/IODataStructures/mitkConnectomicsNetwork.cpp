@@ -57,13 +57,13 @@ void mitk::ConnectomicsNetwork::AddEdge(
 void mitk::ConnectomicsNetwork::AddEdge(
                                         mitk::ConnectomicsNetwork::VertexDescriptorType vertexA,
                                         mitk::ConnectomicsNetwork::VertexDescriptorType vertexB,
-                                        int sourceID, int targetID, int weight )
+                                        int sourceID, int targetID, int weight, double edge_weight )
 {
   boost::add_edge( vertexA, vertexB, m_Network );
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].sourceId = sourceID;
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].targetId = targetID;
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].weight = weight;
-  m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].edge_weight = 1.0;
+  m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].edge_weight = edge_weight;
 
   SetIsModified( true );
 }
@@ -503,7 +503,14 @@ mitk::ConnectomicsNetwork::NetworkNode mitk::ConnectomicsNetwork::GetNode( Verte
 
 mitk::ConnectomicsNetwork::NetworkEdge mitk::ConnectomicsNetwork::GetEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB ) const
 {
-  return m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ];
+  if( EdgeExists(vertexA, vertexB) )
+  {
+    return m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ];
+  }
+  else
+  {
+    mitkThrow() << "Edge does not exist";
+  }
 }
 
 void mitk::ConnectomicsNetwork::UpdateBounds( )
@@ -525,18 +532,18 @@ void mitk::ConnectomicsNetwork::UpdateBounds( )
   }
 
   // for each direction, make certain the point is in between
-  for( int index(0), end(nodeVector.size()) ; index < end; index++ )
+  for(auto & elem : nodeVector)
   {
-    for( unsigned int direction(0); direction < nodeVector.at( index ).coordinates.size(); direction++ )
+    for( unsigned int direction(0); direction < elem.coordinates.size(); direction++ )
     {
-      if( nodeVector.at( index ).coordinates.at(direction) < bounds[ 2 * direction ]  )
+      if( elem.coordinates.at(direction) < bounds[ 2 * direction ]  )
       {
-        bounds[ 2 * direction ] = nodeVector.at( index ).coordinates.at(direction);
+        bounds[ 2 * direction ] = elem.coordinates.at(direction);
       }
 
-      if( nodeVector.at( index ).coordinates.at(direction) > bounds[ 2 * direction + 1]  )
+      if( elem.coordinates.at(direction) > bounds[ 2 * direction + 1]  )
       {
-        bounds[ 2 * direction + 1] = nodeVector.at( index ).coordinates.at(direction);
+        bounds[ 2 * direction + 1] = elem.coordinates.at(direction);
       }
     }
   }
@@ -715,7 +722,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
 {
   bool noDifferenceFound = true;
 
-    if( rightHandSide == NULL )
+    if( rightHandSide == nullptr )
   {
     if(verbose)
     {
@@ -724,7 +731,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
     return false;
   }
 
-  if( leftHandSide == NULL )
+  if( leftHandSide == nullptr )
   {
     if(verbose)
     {

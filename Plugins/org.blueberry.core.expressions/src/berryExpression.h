@@ -155,7 +155,7 @@ public:
   Expression();
   virtual ~Expression();
 
-  virtual uint HashCode() const;
+  virtual uint HashCode() const override;
 
   /**
    * Evaluates this expression.
@@ -191,32 +191,32 @@ public:
    */
   virtual void CollectExpressionInfo(ExpressionInfo* info) const;
 
-  virtual QString ToString() const;
+  virtual QString ToString() const override;
 
-  virtual bool operator==(const Object* object) const;
+  virtual bool operator==(const Object* object) const override;
 
 };
 
 class TRUE_EVALExpression : public Expression
 {
 public:
-  SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* /*context*/) const
+  SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* /*context*/) const override
   {
       return EvaluationResult::TRUE_EVAL;
   }
 
-  void CollectExpressionInfo(ExpressionInfo* /*info*/) const {}
+  void CollectExpressionInfo(ExpressionInfo* /*info*/) const override {}
 };
 
 class FALSE_EVALExpression : public Expression
 {
 public:
-  SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* /*context*/) const
+  SmartPointer<const EvaluationResult> Evaluate(IEvaluationContext* /*context*/) const override
   {
       return EvaluationResult::FALSE_EVAL;
   }
 
-  void CollectExpressionInfo(ExpressionInfo* /*info*/) const {}
+  void CollectExpressionInfo(ExpressionInfo* /*info*/) const override {}
 };
 
 } // namespace berry

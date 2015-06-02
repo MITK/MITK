@@ -34,7 +34,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkSPSAOptimizerView : public QmitkRigidR
 
 public:
 
-  QmitkSPSAOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkSPSAOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkSPSAOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;

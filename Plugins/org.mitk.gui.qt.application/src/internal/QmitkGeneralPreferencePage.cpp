@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 
 QmitkGeneralPreferencePage::QmitkGeneralPreferencePage()
-: m_MainControl(0)
+: m_MainControl(nullptr)
 {
 
 }
@@ -39,7 +39,7 @@ void QmitkGeneralPreferencePage::CreateQtControl(QWidget* parent)
   //empty page
   m_MainControl = new QWidget(parent);
 
-  QVBoxLayout *layout = new QVBoxLayout;
+  auto  layout = new QVBoxLayout;
   layout->addStretch();
   m_MainControl->setLayout(layout);
 

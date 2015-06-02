@@ -237,7 +237,7 @@ void QmitkPopupColorChooser::drawGradient( QPainter* p)
 //----- QmitkColorPropertyEditor --------------------------------------------------
 
 // initialization of static pointer to color picker widget
-QmitkPopupColorChooser* QmitkColorPropertyEditor::colorChooser = NULL;
+QmitkPopupColorChooser* QmitkColorPropertyEditor::colorChooser = nullptr;
                     int QmitkColorPropertyEditor::colorChooserRefCount = 0;
 
 QmitkColorPropertyEditor::QmitkColorPropertyEditor( const mitk::ColorProperty* property, QWidget* parent )
@@ -263,7 +263,7 @@ QmitkColorPropertyEditor::~QmitkColorPropertyEditor()
   if (!colorChooserRefCount)
   {
     delete colorChooser;
-    colorChooser = NULL;
+    colorChooser = nullptr;
   }
 }
 

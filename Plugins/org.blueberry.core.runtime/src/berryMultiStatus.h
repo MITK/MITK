@@ -114,12 +114,12 @@ public:
   /* (Intentionally not javadoc'd)
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  QList<IStatus::Pointer> GetChildren() const;
+  QList<IStatus::Pointer> GetChildren() const override;
 
   /* (Intentionally not javadoc'd)
    * Implements the corresponding method on <code>IStatus</code>.
    */
-  bool IsMultiStatus() const;
+  bool IsMultiStatus() const override;
 
   /**
    * Merges the given status into this multi-status.
@@ -138,7 +138,7 @@ public:
    * Returns a string representation of the status, suitable
    * for debugging purposes only.
    */
-  QString ToString() const;
+  QString ToString() const override;
 
 };
 

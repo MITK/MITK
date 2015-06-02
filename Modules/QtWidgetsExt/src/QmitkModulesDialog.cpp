@@ -30,12 +30,12 @@ QmitkModulesDialog::QmitkModulesDialog(QWidget *parent, Qt::WindowFlags f) :
 {
   this->setWindowTitle("MITK Modules");
 
-  QVBoxLayout* layout = new QVBoxLayout();
+  auto  layout = new QVBoxLayout();
   this->setLayout(layout);
 
-  QTableView* tableView = new QTableView(this);
-  QmitkModuleTableModel* tableModel = new QmitkModuleTableModel(tableView);
-  QSortFilterProxyModel* sortProxyModel = new QSortFilterProxyModel(tableView);
+  auto  tableView = new QTableView(this);
+  auto  tableModel = new QmitkModuleTableModel(tableView);
+  auto  sortProxyModel = new QSortFilterProxyModel(tableView);
   sortProxyModel->setSourceModel(tableModel);
   sortProxyModel->setDynamicSortFilter(true);
   tableView->setModel(sortProxyModel);
@@ -60,7 +60,7 @@ QmitkModulesDialog::QmitkModulesDialog(QWidget *parent, Qt::WindowFlags f) :
 
   layout->addWidget(tableView);
 
-  QDialogButtonBox* btnBox = new QDialogButtonBox(QDialogButtonBox::Close);
+  auto  btnBox = new QDialogButtonBox(QDialogButtonBox::Close);
   layout->addWidget(btnBox);
 
   this->resize(800, 600);

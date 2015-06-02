@@ -41,12 +41,12 @@ class HelpPerspectiveListener : public IPerspectiveListener
 {
 public:
 
-  Events::Types GetPerspectiveEventTypes() const;
+  Events::Types GetPerspectiveEventTypes() const override;
 
   using IPerspectiveListener::PerspectiveChanged;
 
-  void PerspectiveOpened(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective);
-  void PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective, const QString &changeId);
+  void PerspectiveOpened(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective) override;
+  void PerspectiveChanged(const SmartPointer<IWorkbenchPage>& page, const IPerspectiveDescriptor::Pointer& perspective, const QString &changeId) override;
 };
 
 class HelpWindowListener : public IWindowListener
@@ -56,8 +56,8 @@ public:
   HelpWindowListener();
   ~HelpWindowListener();
 
-  void WindowClosed(const IWorkbenchWindow::Pointer& window);
-  void WindowOpened(const IWorkbenchWindow::Pointer& window);
+  void WindowClosed(const IWorkbenchWindow::Pointer& window) override;
+  void WindowOpened(const IWorkbenchWindow::Pointer& window) override;
 
 private:
 
@@ -66,17 +66,17 @@ private:
 };
 
 
-HelpPluginActivator* HelpPluginActivator::instance = 0;
+HelpPluginActivator* HelpPluginActivator::instance = nullptr;
 
 HelpPluginActivator::HelpPluginActivator()
-  : pluginListener(0)
+  : pluginListener(nullptr)
 {
   this->instance = this;
 }
 
 HelpPluginActivator::~HelpPluginActivator()
 {
-  instance = 0;
+  instance = nullptr;
 }
 
 void
@@ -125,13 +125,16 @@ void
 HelpPluginActivator::stop(ctkPluginContext* /*context*/)
 {
   delete pluginListener;
-  pluginListener = 0;
+  pluginListener = nullptr;
 
   if (PlatformUI::IsWorkbenchRunning())
   {
     PlatformUI::GetWorkbench()->RemoveWindowListener(wndListener.data());
   }
   wndListener.reset();
+
+  helpEngineConfiguration.reset();
+  helpEngine.reset();
 }
 
 HelpPluginActivator *HelpPluginActivator::getInstance()
@@ -168,7 +171,7 @@ void HelpPluginActivator::linkActivated(IWorkbenchPage::Pointer page, const QUrl
     {
       // get the last used HelpEditor instance
       QList<IEditorReference::Pointer> editors =
-          page->FindEditors(IEditorInput::Pointer(0), HelpEditor::EDITOR_ID, IWorkbenchPage::MATCH_ID);
+          page->FindEditors(IEditorInput::Pointer(nullptr), HelpEditor::EDITOR_ID, IWorkbenchPage::MATCH_ID);
       if (editors.empty())
       {
         // no HelpEditor is currently open, create a new one
@@ -346,7 +349,7 @@ void HelpPerspectiveListener::PerspectiveOpened(const SmartPointer<IWorkbenchPag
 {
   // if no help editor is opened, open one showing the home page
   if (perspective->GetId() == HelpPerspective::ID &&
-      page->FindEditors(IEditorInput::Pointer(0), HelpEditor::EDITOR_ID, IWorkbenchPage::MATCH_ID).empty())
+      page->FindEditors(IEditorInput::Pointer(nullptr), HelpEditor::EDITOR_ID, IWorkbenchPage::MATCH_ID).empty())
   {
     IEditorInput::Pointer input(new HelpEditorInput());
     page->OpenEditor(input, HelpEditor::EDITOR_ID);
@@ -401,7 +404,7 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
   {
     _runner(const ctkEvent& ev) : ev(ev) {}
 
-    void run()
+    void run() override
     {
       QUrl helpUrl;
       if (ev.containsProperty("url"))

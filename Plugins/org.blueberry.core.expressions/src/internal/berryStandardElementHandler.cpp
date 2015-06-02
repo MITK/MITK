@@ -115,7 +115,7 @@ StandardElementHandler::Create(ExpressionConverter* converter, Poco::XML::Elemen
     return result;
   } else if (ExpressionTagNames::NOT == name) {
     Poco::XML::Node* child = element->firstChild();
-    while (child != 0) {
+    while (child != nullptr) {
       if (child->nodeType() == Poco::XML::Node::ELEMENT_NODE) {
         Expression::Pointer result(new NotExpression(converter->Perform(static_cast<Poco::XML::Element*>(child))));
         return result;

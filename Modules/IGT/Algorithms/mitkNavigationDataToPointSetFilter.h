@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSet.h"
 #include "mitkPointSetSource.h"
 #include "mitkNavigationData.h"
+#include "MitkIGTExports.h"
 
 namespace mitk {
 
@@ -79,7 +80,7 @@ namespace mitk {
     /**
     * \brief filter execute method
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     using Superclass::SetInput;
 
@@ -121,7 +122,7 @@ namespace mitk {
     itkGetConstMacro(OperationMode, OperationMode);
 
 
-    void GenerateOutputInformation() {}; ///< empty implementation to prevent calling of the superclass method that would try to copy information from the input NavigationData to the output PointSet, which makes no sense!
+    void GenerateOutputInformation() override {}; ///< empty implementation to prevent calling of the superclass method that would try to copy information from the input NavigationData to the output PointSet, which makes no sense!
 
   protected:
     NavigationDataToPointSetFilter();

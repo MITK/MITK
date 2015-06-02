@@ -29,8 +29,8 @@ const mitk::ScalarType PI = 3.14159265359;
 mitk::SlicedGeometry3D::SlicedGeometry3D()
   : m_EvenlySpaced( true ),
   m_Slices( 0 ),
-  m_ReferenceGeometry( NULL ),
-  m_SliceNavigationController( NULL )
+  m_ReferenceGeometry( nullptr ),
+  m_SliceNavigationController( nullptr )
 {
   m_DirectionVector.Fill(0);
   this->InitializeSlicedGeometry( m_Slices );
@@ -61,12 +61,12 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D& other)
       if ( other.m_PlaneGeometries[s].IsNull() )
       {
         assert(other.m_EvenlySpaced);
-        m_PlaneGeometries[s] = NULL;
+        m_PlaneGeometries[s] = nullptr;
       }
       else
       {
         PlaneGeometry* geometry2D = other.m_PlaneGeometries[s]->Clone();
-        assert(geometry2D!=NULL);
+        assert(geometry2D!=nullptr);
         SetPlaneGeometry(geometry2D, s);
       }
     }
@@ -80,7 +80,7 @@ mitk::SlicedGeometry3D::~SlicedGeometry3D()
 mitk::PlaneGeometry *
   mitk::SlicedGeometry3D::GetPlaneGeometry( int s ) const
 {
-  mitk::PlaneGeometry::Pointer geometry2D = NULL;
+  mitk::PlaneGeometry::Pointer geometry2D = nullptr;
 
   if ( this->IsValidSlice(s) )
   {
@@ -95,7 +95,7 @@ mitk::PlaneGeometry *
     {
       PlaneGeometry *firstSlice = m_PlaneGeometries[0];
 
-      if ( firstSlice != NULL && dynamic_cast<AbstractTransformGeometry*>(m_PlaneGeometries[0].GetPointer() )==NULL)
+      if ( firstSlice != nullptr && dynamic_cast<AbstractTransformGeometry*>(m_PlaneGeometries[0].GetPointer() )==nullptr)
       {
         if ( (m_DirectionVector[0] == 0.0)
           && (m_DirectionVector[1] == 0.0)
@@ -123,7 +123,7 @@ mitk::PlaneGeometry *
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -152,7 +152,7 @@ void
   Superclass::Initialize();
   m_Slices = slices;
 
-  PlaneGeometry::Pointer gnull = NULL;
+  PlaneGeometry::Pointer gnull = nullptr;
   m_PlaneGeometries.assign( m_Slices, gnull );
 
   Vector3D spacing;
@@ -166,7 +166,7 @@ void
   mitk::SlicedGeometry3D::InitializeEvenlySpaced(
   mitk::PlaneGeometry* geometry2D, unsigned int slices, bool flipped )
 {
-  assert( geometry2D != NULL );
+  assert( geometry2D != nullptr );
   this->InitializeEvenlySpaced(
     geometry2D, geometry2D->GetExtentInMM(2)/geometry2D->GetExtent(2),
     slices, flipped );
@@ -177,7 +177,7 @@ void
   mitk::PlaneGeometry* geometry2D, mitk::ScalarType zSpacing,
   unsigned int slices, bool flipped )
 {
-  assert( geometry2D != NULL );
+  assert( geometry2D != nullptr );
   assert( geometry2D->GetExtent(0) > 0 );
   assert( geometry2D->GetExtent(1) > 0 );
 
@@ -191,7 +191,7 @@ void
   bounds[5] = slices;
 
   // clear and reserve
-  PlaneGeometry::Pointer gnull = NULL;
+  PlaneGeometry::Pointer gnull = nullptr;
   m_PlaneGeometries.assign( m_Slices, gnull );
 
   Vector3D directionVector = geometry2D->GetAxisVector(2);
@@ -412,7 +412,7 @@ void
 
   // Finally, we can clear the previous geometry stack and initialize it with
   // our re-initialized "first plane".
-  m_PlaneGeometries.assign( m_Slices, PlaneGeometry::Pointer( NULL ) );
+  m_PlaneGeometries.assign( m_Slices, PlaneGeometry::Pointer( nullptr ) );
 
   if ( m_Slices > 0 )
   {
@@ -479,7 +479,7 @@ void
   for ( s = 0; s < m_Slices; ++s )
   {
     geometry = m_PlaneGeometries[s];
-    if ( geometry!=NULL )
+    if ( geometry!=nullptr )
     {
       geometry->SetImageGeometry( isAnImageGeometry );
     }
@@ -495,7 +495,7 @@ void
   for ( s = 0; s < m_Slices; ++s )
   {
     geometry = m_PlaneGeometries[s];
-    if ( geometry!=NULL )
+    if ( geometry!=nullptr )
     {
       geometry->ChangeImageGeometryConsideringOriginOffset( isAnImageGeometry );
     }
@@ -589,7 +589,7 @@ void
   }
 
   //clear and reserve
-  PlaneGeometry::Pointer gnull=NULL;
+  PlaneGeometry::Pointer gnull=nullptr;
   m_PlaneGeometries.assign(m_Slices, gnull);
 
   if ( m_Slices > 0 )
@@ -673,7 +673,7 @@ void
 
   os << std::endl;
   os << indent << " GetPlaneGeometry(0): ";
-  if ( this->GetPlaneGeometry(0) == NULL )
+  if ( this->GetPlaneGeometry(0) == nullptr )
   {
     os << "NULL" << std::endl;
   }
@@ -743,7 +743,7 @@ void
         if ( m_PlaneGeometries.size() > 0 )
         {
           // Reach through to all slices in my container
-          for (std::vector<PlaneGeometry::Pointer>::iterator iter = m_PlaneGeometries.begin();
+          for (auto iter = m_PlaneGeometries.begin();
             iter != m_PlaneGeometries.end();
             ++iter)
           {
@@ -763,7 +763,7 @@ void
     else
     {
       // Reach through to all slices
-      for (std::vector<PlaneGeometry::Pointer>::iterator iter = m_PlaneGeometries.begin();
+      for (auto iter = m_PlaneGeometries.begin();
         iter != m_PlaneGeometries.end();
         ++iter)
       {
@@ -904,7 +904,7 @@ void
     else
     {
       // Reach through to all slices
-      for (std::vector<PlaneGeometry::Pointer>::iterator iter = m_PlaneGeometries.begin();
+      for (auto iter = m_PlaneGeometries.begin();
         iter != m_PlaneGeometries.end();
         ++iter)
       {
@@ -923,7 +923,7 @@ void
 
       // Need a PlaneGeometry, a PlaneOperation and a reference frame to
       // carry out the re-orientation
-      if ( m_ReferenceGeometry && (planeGeometry && dynamic_cast<AbstractTransformGeometry*>(planeGeometry.GetPointer()) == NULL) && restorePlaneOp )
+      if ( m_ReferenceGeometry && (planeGeometry && dynamic_cast<AbstractTransformGeometry*>(planeGeometry.GetPointer()) == nullptr) && restorePlaneOp )
       {
         // Clear all generated geometries and then rotate only the first slice.
         // The other slices will be re-generated on demand
@@ -968,7 +968,7 @@ void
           m_Slices = 1;
         }
 
-        m_PlaneGeometries.assign( m_Slices, PlaneGeometry::Pointer( NULL ) );
+        m_PlaneGeometries.assign( m_Slices, PlaneGeometry::Pointer( nullptr ) );
 
         if ( m_Slices > 0 )
         {
@@ -992,7 +992,7 @@ void
     else
     {
       // Reach through to all slices
-      for (std::vector<PlaneGeometry::Pointer>::iterator iter = m_PlaneGeometries.begin();
+      for (auto iter = m_PlaneGeometries.begin();
         iter != m_PlaneGeometries.end();
         ++iter)
       {

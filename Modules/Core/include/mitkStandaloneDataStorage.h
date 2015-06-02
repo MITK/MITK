@@ -55,7 +55,7 @@ namespace mitk {
     //## the addition of a new object will fire the notification mechanism.
     //## If the node parameter is NULL or if the DataNode has already been added,
     //## an exception will be thrown.
-    void Add(mitk::DataNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL) override;
+    void Add(mitk::DataNode* node, const mitk::DataStorage::SetOfObjects* parents = nullptr) override;
 
     //##Documentation
     //## @brief Removes node from the StandaloneDataStorage
@@ -70,7 +70,7 @@ namespace mitk {
     //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
     //##
-    SetOfObjects::ConstPointer GetSources(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const override;
+    SetOfObjects::ConstPointer GetSources(const mitk::DataNode* node, const NodePredicateBase* condition = nullptr, bool onlyDirectSources = true) const override;
 
     //##Documentation
     //## @brief returns a set of derived objects for a given node.
@@ -82,7 +82,7 @@ namespace mitk {
     //## derived from derivations of node are returned too.
     //## The derived objects can be filtered with a predicate object as described in the GetSubset()
     //## method by providing a predicate as the condition parameter.
-    SetOfObjects::ConstPointer GetDerivations(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const override;
+    SetOfObjects::ConstPointer GetDerivations(const mitk::DataNode* node, const NodePredicateBase* condition = nullptr, bool onlyDirectDerivations = true) const override;
 
     //##Documentation
     //## @brief returns a set of all data objects that are stored in the data storage
@@ -111,7 +111,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Traverses the Relation graph and extracts a list of related elements (e.g. Sources or Derivations)
-    SetOfObjects::ConstPointer GetRelations(const mitk::DataNode* node, const AdjacencyList& relation, const NodePredicateBase* condition = NULL, bool onlyDirectlyRelated = true) const;
+    SetOfObjects::ConstPointer GetRelations(const mitk::DataNode* node, const AdjacencyList& relation, const NodePredicateBase* condition = nullptr, bool onlyDirectlyRelated = true) const;
 
     //##Documentation
     //## @brief deletes all references to a node in a given relation (used in Remove() and TreeListener)

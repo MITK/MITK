@@ -91,8 +91,8 @@ static void TestPlanarCrossPlacement( mitk::PlanarCross::Pointer planarCross )
   const mitk::PlanarFigure::PolyLineType polyLine1 = planarCross->GetPolyLine( 1 );
   MITK_TEST_CONDITION( planarCross->GetPolyLinesSize() == 2, "Number of polylines after placement" );
 
-  mitk::PlanarFigure::PolyLineType::const_iterator iter0 = polyLine0.begin();
-  mitk::PlanarFigure::PolyLineType::const_iterator iter1 = polyLine1.begin();
+  auto iter0 = polyLine0.begin();
+  auto iter1 = polyLine1.begin();
 
   // Get polylines and check if the generated coordinates are OK
   const mitk::Point2D& pp0 = *iter0;
@@ -151,7 +151,7 @@ static void TestPlanarCrossPlacementSingleLine(mitk::PlanarCross::Pointer planar
 
   // Test for number of polylines
   const mitk::PlanarFigure::PolyLineType polyLine0 = planarCross->GetPolyLine( 0 );
-  mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
+  auto iter = polyLine0.begin();
   MITK_TEST_CONDITION( planarCross->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK

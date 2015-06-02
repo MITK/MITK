@@ -64,6 +64,7 @@ set(mitk_modules
   IOExt
   XNAT
   TubeGraph
+  BiophotonicsHardware
   Classification
 )
 

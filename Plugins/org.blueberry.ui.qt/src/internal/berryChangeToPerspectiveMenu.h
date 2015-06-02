@@ -57,7 +57,7 @@ public:
   /*
    * Fills the menu with perspective items.
    */
-  void Fill(QMenu* menu, QAction* before);
+  void Fill(QMenu* menu, QAction* before) override;
 
   using ContributionItem::Fill;
 

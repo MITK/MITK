@@ -37,6 +37,6 @@ void mitk::SetVtkRendererVisitor::processVisualModel(sofa::simulation::Node*, so
 {
   VtkModel* vtkModel = dynamic_cast<VtkModel*>(visualModel);
 
-  if (vtkModel != NULL)
+  if (vtkModel != nullptr)
     vtkModel->SetVtkRenderer(m_VtkRenderer);
 }

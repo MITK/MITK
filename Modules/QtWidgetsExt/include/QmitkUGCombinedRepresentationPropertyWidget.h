@@ -40,7 +40,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkUGCombinedRepresentationPropertyWidget : publ
 
 public:
 
-  QmitkUGCombinedRepresentationPropertyWidget(QWidget *parent = 0);
+  QmitkUGCombinedRepresentationPropertyWidget(QWidget *parent = nullptr);
   ~QmitkUGCombinedRepresentationPropertyWidget();
 
   void SetProperty(mitk::GridRepresentationProperty* gridRepresentation,

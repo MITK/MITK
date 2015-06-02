@@ -142,7 +142,7 @@ namespace mitk
     void SetInterpolationMode( ExtractSliceFilter::ResliceInterpolation interpolation){ this->m_InterpolationMode = interpolation; }
 
   protected:
-    ExtractSliceFilter(vtkImageReslice* reslicer = NULL);
+    ExtractSliceFilter(vtkImageReslice* reslicer = nullptr);
     virtual ~ExtractSliceFilter();
 
     virtual void GenerateData() override;

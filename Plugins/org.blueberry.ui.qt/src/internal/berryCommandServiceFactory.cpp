@@ -32,28 +32,28 @@ Object* CommandServiceFactory::Create(const QString& serviceInterface, IServiceL
 {
   if (serviceInterface != qobject_interface_iid<ICommandService*>())
   {
-    return NULL;
+    return nullptr;
   }
 
   IWorkbenchLocationService* wls = locator->GetService<IWorkbenchLocationService>();
   IWorkbench* const wb = wls->GetWorkbench();
-  if (wb == NULL)
+  if (wb == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
 
   Object* parent = parentLocator->GetService(serviceInterface);
-  if (parent == NULL)
+  if (parent == nullptr)
   {
     // we are registering the global services in the Workbench
-    return NULL;
+    return nullptr;
   }
   IWorkbenchWindow* const window = wls->GetWorkbenchWindow();
   IWorkbenchPartSite* const site = wls->GetPartSite();
 
   ICommandService* parentService = dynamic_cast<ICommandService*>(parent);
 
-  if (site == NULL)
+  if (site == nullptr)
   {
     return new SlaveCommandService(parentService,
                                    IServiceScopes::WINDOW_SCOPE, Object::Pointer(window));

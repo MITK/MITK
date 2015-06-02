@@ -44,7 +44,7 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
 
   m_ScalarOpacityFunctionCanvas->SetQLineEdits(m_XEditScalarOpacity, m_YEditScalarOpacity);
   m_GradientOpacityCanvas->SetQLineEdits(m_XEditGradientOpacity, m_YEditGradientOpacity);
-  m_ColorTransferFunctionCanvas->SetQLineEdits(m_XEditColor, 0);
+  m_ColorTransferFunctionCanvas->SetQLineEdits(m_XEditColor, nullptr);
 
   m_ScalarOpacityFunctionCanvas->SetTitle("Grayvalue -> Opacity");
   m_GradientOpacityCanvas->SetTitle("Grayvalue/Gradient -> Opacity");
@@ -143,12 +143,12 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node, const mitk::
 turnOff:
 
   m_ScalarOpacityFunctionCanvas->setEnabled(false);
-  m_ScalarOpacityFunctionCanvas->SetHistogram(0);
+  m_ScalarOpacityFunctionCanvas->SetHistogram(nullptr);
   m_GradientOpacityCanvas->setEnabled(false);
-  m_GradientOpacityCanvas->SetHistogram(0);
+  m_GradientOpacityCanvas->SetHistogram(nullptr);
   m_ColorTransferFunctionCanvas->setEnabled(false);
-  m_ColorTransferFunctionCanvas->SetHistogram(0);
-  tfpToChange = 0;
+  m_ColorTransferFunctionCanvas->SetHistogram(nullptr);
+  tfpToChange = nullptr;
 }
 
 void QmitkTransferFunctionWidget::OnUpdateCanvas()

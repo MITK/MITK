@@ -75,17 +75,17 @@ bool WorkbenchPlugin::DEBUG = false;
 
 char WorkbenchPlugin::PREFERENCE_PAGE_CATEGORY_SEPARATOR = '/';
 
-WorkbenchPlugin* WorkbenchPlugin::inst = 0;
+WorkbenchPlugin* WorkbenchPlugin::inst = nullptr;
 
 WorkbenchPlugin::WorkbenchPlugin()
  : AbstractUICTKPlugin()
 {
   inst = this;
-  presentationFactory = 0;
-  editorRegistry = 0;
-  viewRegistry = 0;
-  perspRegistry = 0;
-  introRegistry = 0;
+  presentationFactory = nullptr;
+  editorRegistry = nullptr;
+  viewRegistry = nullptr;
+  perspRegistry = nullptr;
+  introRegistry = nullptr;
 }
 
 WorkbenchPlugin::~WorkbenchPlugin()
@@ -96,7 +96,7 @@ WorkbenchPlugin::~WorkbenchPlugin()
   delete perspRegistry;
   delete introRegistry;
 
-  inst = 0;
+  inst = nullptr;
 }
 
 bool WorkbenchPlugin::HasExecutableExtension(
@@ -191,7 +191,7 @@ std::size_t WorkbenchPlugin::GetBundleCount()
 
 IPerspectiveRegistry* WorkbenchPlugin::GetPerspectiveRegistry()
 {
-  if (perspRegistry == 0)
+  if (perspRegistry == nullptr)
   {
     perspRegistry = new PerspectiveRegistry();
 
@@ -227,7 +227,7 @@ IPerspectiveRegistry* WorkbenchPlugin::GetPerspectiveRegistry()
 
 IIntroRegistry* WorkbenchPlugin::GetIntroRegistry()
 {
-  if (introRegistry == 0)
+  if (introRegistry == nullptr)
   {
     introRegistry = new IntroRegistry();
   }
@@ -300,13 +300,13 @@ IElementFactory* WorkbenchPlugin::GetElementFactory(const QString& targetID) con
 }
 
 IPresentationFactory* WorkbenchPlugin::GetPresentationFactory() {
-  if (presentationFactory != 0) return presentationFactory;
+  if (presentationFactory != nullptr) return presentationFactory;
 
   QString targetID = Workbench::GetInstance()->GetPresentationId();
   presentationFactory = this->CreateExtension<IPresentationFactory>(
                           WorkbenchRegistryConstants::PL_PRESENTATION_FACTORIES,
                           "factory", targetID);
-  if (presentationFactory == 0)
+  if (presentationFactory == nullptr)
     WorkbenchPlugin::Log("Error creating presentation factory: " +
                          targetID + " -- class is not an IPresentationFactory");
 
@@ -454,7 +454,7 @@ void WorkbenchPlugin::stop(ctkPluginContext* context)
 
   delete perspRegistry;
   // avoid possible crash, see bug #18399
-  perspRegistry = 0;
+  perspRegistry = nullptr;
 }
 
 QString WorkbenchPlugin::GetDataLocation() const

@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkEuler2DTransformView : public QmitkRig
 
 public:
 
-  QmitkEuler2DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkEuler2DTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkEuler2DTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

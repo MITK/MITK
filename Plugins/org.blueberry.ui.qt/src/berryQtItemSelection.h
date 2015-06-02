@@ -38,15 +38,15 @@ public:
 
   QItemSelection GetQItemSelection() const;
 
-  bool IsEmpty() const;
+  bool IsEmpty() const override;
 
-  Object::Pointer GetFirstElement() const;
-  iterator Begin() const;
-  iterator End() const;
-  int Size() const;
-  ContainerType::Pointer ToVector() const;
+  Object::Pointer GetFirstElement() const override;
+  iterator Begin() const override;
+  iterator End() const override;
+  int Size() const override;
+  ContainerType::Pointer ToVector() const override;
 
-  bool operator==(const Object* obj) const;
+  bool operator==(const Object* obj) const override;
 
 private:
 

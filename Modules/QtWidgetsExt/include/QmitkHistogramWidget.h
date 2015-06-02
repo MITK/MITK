@@ -46,7 +46,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkHistogramWidget: public QDialog
 public:
 
   //overloaded constructor to choose between showing only the histogram or the histogram and the report
-  QmitkHistogramWidget(QWidget *parent = 0, bool showreport = false);
+  QmitkHistogramWidget(QWidget *parent = nullptr, bool showreport = false);
   virtual ~QmitkHistogramWidget();
 
   typedef mitk::Image::HistogramType   HistogramType;

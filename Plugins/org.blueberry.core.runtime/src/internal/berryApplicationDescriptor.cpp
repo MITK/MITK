@@ -38,6 +38,7 @@ ApplicationDescriptor::ApplicationDescriptor(const QSharedPointer<ctkPlugin>& co
   , flags(flags)
   , cardinality(cardinality)
   , iconPath(iconPath)
+  , instanceId(0)
   , locked(false)
 {
   if (pid.isEmpty())

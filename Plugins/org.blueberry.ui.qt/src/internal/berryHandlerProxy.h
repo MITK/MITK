@@ -136,24 +136,24 @@ public:
                const SmartPointer<IConfigurationElement>& configurationElement,
                const QString handlerAttributeName,
                const SmartPointer<Expression> enabledWhenExpression = SmartPointer<Expression>(),
-               IEvaluationService* evaluationService = NULL);
+               IEvaluationService* evaluationService = nullptr);
 
   static void UpdateStaleCEs(const QList<SmartPointer<IConfigurationElement> >& replacements);
 
-  void SetEnabled(const Object::Pointer& evaluationContext);
+  void SetEnabled(const Object::Pointer& evaluationContext) override;
 
   /**
    * Passes the dipose on to the proxied handler, if it has been loaded.
    */
-  void Dispose();
+  void Dispose() override;
 
-  Object::Pointer Execute(const SmartPointer<const ExecutionEvent>& event);
+  Object::Pointer Execute(const SmartPointer<const ExecutionEvent>& event) override;
 
-  bool IsEnabled() const;
+  bool IsEnabled() const override;
 
-  bool IsHandled() const;
+  bool IsHandled() const override;
 
-  QString ToString() const;
+  QString ToString() const override;
 
   /*
    * (non-Javadoc)
@@ -161,12 +161,12 @@ public:
    * @see org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.menus.UIElement,
    *      java.util.Map)
    */
-  void UpdateElement(UIElement* element, const QHash<QString, Object::Pointer>& parameters);
+  void UpdateElement(UIElement* element, const QHash<QString, Object::Pointer>& parameters) override;
 
   /* (non-Javadoc)
    * @see org.eclipse.core.commands.IStateListener#handleStateChange(org.eclipse.core.commands.State, java.lang.Object)
    */
-  void HandleStateChange(const SmartPointer<State>& state, const Object::Pointer& oldValue);
+  void HandleStateChange(const SmartPointer<State>& state, const Object::Pointer& oldValue) override;
 
   /**
    * @return the config element for use with the PDE framework.
@@ -197,7 +197,7 @@ private:
   IPropertyChangeListener* GetEnablementListener() const;
 
   using IPropertyChangeListener::PropertyChange;
-  void PropertyChange(const SmartPointer<PropertyChangeEvent>& event);
+  void PropertyChange(const SmartPointer<PropertyChangeEvent>& event) override;
 
   /**
    * Loads the handler, if possible. If the handler is loaded, then the member
@@ -210,7 +210,7 @@ private:
 
   IHandlerListener* GetHandlerListener() const;
 
-  void HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent);
+  void HandlerChanged(const SmartPointer<HandlerEvent>& handlerEvent) override;
 
   /**
    * Retrives the ConfigurationElement attribute according to the

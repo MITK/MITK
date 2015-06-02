@@ -36,16 +36,16 @@ class IntPropertySerializer : public BasePropertySerializer
     {
       if (const IntProperty* prop = dynamic_cast<const IntProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("int");
+        auto  element = new TiXmlElement("int");
         element->SetAttribute("value", prop->GetValue());
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       int integer;
       if ( element->QueryIntAttribute( "value", &integer ) == TIXML_SUCCESS )
@@ -54,7 +54,7 @@ class IntPropertySerializer : public BasePropertySerializer
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

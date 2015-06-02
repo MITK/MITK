@@ -54,29 +54,29 @@ void NativeTabFolder::DragStarted(const QPoint& location)
 
 void NativeTabFolder::ViewFormDestroyed(QObject*)
 {
-  viewForm = 0;
-  content = 0;
+  viewForm = nullptr;
+  content = nullptr;
 }
 
 NativeTabFolder::NativeTabFolder(QWidget* parent)
 : QObject(parent)
 {
-  content = 0;
-  viewForm = new QtControlWidget(parent, 0);
+  content = nullptr;
+  viewForm = new QtControlWidget(parent, nullptr);
   viewForm->setObjectName("ViewForm");
   viewForm->installEventFilter(this);
-  QVBoxLayout* layout = new QVBoxLayout(viewForm);
+  auto   layout = new QVBoxLayout(viewForm);
   layout->setContentsMargins(0,0,0,0);
   layout->setSpacing(0);
   viewForm->setLayout(layout);
 
   connect(viewForm, SIGNAL(destroyed(QObject*)), this, SLOT(ViewFormDestroyed(QObject*)));
 
-  QWidget* topControls = new QWidget(viewForm);
+  auto   topControls = new QWidget(viewForm);
   topControls->setMinimumSize(0, 24);
   topControls->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   layout->addWidget(topControls);
-  QHBoxLayout* topLayout = new QHBoxLayout(topControls);
+  auto   topLayout = new QHBoxLayout(topControls);
   topLayout->setContentsMargins(0, 0, 0, 0);
   topLayout->setSpacing(0);
 
@@ -86,7 +86,7 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   tabControl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   topLayout->addWidget(tabControl);
 
-  QFrame* topRightControls = new QFrame(topControls);
+  auto   topRightControls = new QFrame(topControls);
   topRightControls->setObjectName("TabTopRightControls");
   topRightControls->setMinimumSize(6, 25);
   topRightControls->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -96,7 +96,7 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
   contentFrame->setObjectName("ViewFormContentFrame");
   contentFrame->installEventFilter(this);
   contentFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  QVBoxLayout* contentFrameLayout = new QVBoxLayout(contentFrame);
+  auto   contentFrameLayout = new QVBoxLayout(contentFrame);
   contentFrameLayout->setContentsMargins(0,0,0,0);
   contentFrameLayout->setSpacing(0);
   //contentFrame->setLayout(layout);
@@ -148,9 +148,9 @@ NativeTabFolder::~NativeTabFolder()
   if (!PlatformUI::GetWorkbench()->IsClosing())
   {
     BERRY_DEBUG << "Deleting viewForm";
-    if (content != 0)
+    if (content != nullptr)
     {
-      content->setParent(0);
+      content->setParent(nullptr);
     }
     viewForm->deleteLater();
   }
@@ -195,7 +195,7 @@ QSize NativeTabFolder::ComputeSize(int  /*widthHint*/, int  /*heightHint*/)
 
 AbstractTabItem* NativeTabFolder::Add(int index, int flags)
 {
-  NativeTabItem* item = new NativeTabItem(this, index, flags);
+  auto   item = new NativeTabItem(this, index, flags);
   return item;
 }
 
@@ -241,7 +241,7 @@ void NativeTabFolder::SetState(int state)
 
 QRect NativeTabFolder::GetClientArea()
 {
-  if (content == 0)
+  if (content == nullptr)
   {
     return QRect();
   }
@@ -256,7 +256,7 @@ QList<AbstractTabItem*> NativeTabFolder::GetItems()
 
 void NativeTabFolder::SetSelection(AbstractTabItem* toSelect)
 {
-  if (toSelect == 0)
+  if (toSelect == nullptr)
   {
     return;
   }
@@ -320,7 +320,7 @@ QWidget* NativeTabFolder::GetContentParent()
 void NativeTabFolder::SetContent(QWidget* newContent)
 {
   //viewForm.setContent(newContent);
-  if (content != 0)
+  if (content != nullptr)
   {
     contentFrame->layout()->removeWidget(content);
     disconnect(content);
@@ -351,7 +351,7 @@ AbstractTabItem* NativeTabFolder::GetItem(const QPoint& toFind)
   QPoint localPoint = tabControl->mapFromGlobal(toFind);
   int index = tabControl->tabAt(localPoint);
   if (index < 0)
-    return 0;
+    return nullptr;
   return tabControl->getTab(index);
 }
 

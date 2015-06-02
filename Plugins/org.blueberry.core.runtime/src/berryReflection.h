@@ -171,10 +171,10 @@ private:
 
   template<typename T>
   struct Model : Concept {
-    QString GetName() const
+    QString GetName() const override
     { return GetClassName<T>(); }
 
-    QList<TypeInfo> GetSuperclasses() const;
+    QList<TypeInfo> GetSuperclasses() const override;
   };
 
   std::shared_ptr<const Concept> m_Self;
@@ -211,7 +211,7 @@ class HasTypeSuperclass
   template<typename U> static Small Test(typename U::SuperclassTypes*);
   template<typename U> static Big Test(...);
 public:
-  enum { value = sizeof(Test<T>(NULL)) == sizeof(Small) };
+  enum { value = sizeof(Test<T>(nullptr)) == sizeof(Small) };
 };
 
 template<typename T, bool>

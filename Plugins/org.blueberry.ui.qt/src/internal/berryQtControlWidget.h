@@ -31,7 +31,7 @@ class BERRY_UI_QT QtControlWidget : public QFrame
 
 public:
 
-  QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags f = 0);
+  QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags f = nullptr);
 
   ~QtControlWidget();
 
@@ -40,12 +40,12 @@ public:
 protected:
 
   // used for shell listeners
-  void changeEvent(QEvent* event);
-  void closeEvent(QCloseEvent* closeEvent);
+  void changeEvent(QEvent* event) override;
+  void closeEvent(QCloseEvent* closeEvent) override;
 
   // used for control listeners
-  void moveEvent(QMoveEvent* event);
-  void resizeEvent(QResizeEvent* event);
+  void moveEvent(QMoveEvent* event) override;
+  void resizeEvent(QResizeEvent* event) override;
 
 
 private:

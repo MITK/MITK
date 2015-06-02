@@ -83,7 +83,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
     OpenCVToMitkImageFilter(); // purposely hidden
     virtual ~OpenCVToMitkImageFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
 protected:
     Image::Pointer m_Image;

@@ -28,14 +28,14 @@ namespace mitk
     SimulationIO();
 
     using AbstractFileReader::Read;
-    std::vector<BaseData::Pointer> Read();
-    ConfidenceLevel GetReaderConfidenceLevel() const;
+    std::vector<BaseData::Pointer> Read() override;
+    ConfidenceLevel GetReaderConfidenceLevel() const override;
 
-    void Write();
-    ConfidenceLevel GetWriterConfidenceLevel() const;
+    void Write() override;
+    ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   private:
-    SimulationIO* IOClone() const;
+    SimulationIO* IOClone() const override;
   };
 }
 

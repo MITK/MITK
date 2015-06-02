@@ -292,7 +292,6 @@ set(CPP_FILES
   #Rendering/mitkSurfaceGLMapper2D.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkSurfaceVtkMapper2D.cpp
   Rendering/mitkSurfaceVtkMapper3D.cpp
-  Rendering/mitkVolumeDataVtkMapper3D.cpp
   Rendering/mitkVtkEventProvider.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkVtkOverlay2D.cpp

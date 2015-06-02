@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkPlotDialog::QmitkPlotDialog(const char* title, QWidget* parent, const char*): QDialog(parent)
 {
-  QVBoxLayout* boxLayout = new QVBoxLayout(this);
+  auto  boxLayout = new QVBoxLayout(this);
   m_Plot = new QmitkPlotWidget( this, title ) ;
   m_CloseDialogButton = new QPushButton("close plot window", this);
   boxLayout->addWidget( m_Plot );

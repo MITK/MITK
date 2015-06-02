@@ -39,14 +39,14 @@ void mitk::GeometryData::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::GeometryData::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-  if(GetGeometry()!=NULL) return true;
+  if(GetGeometry()!=nullptr) return true;
 
   return false;
 }
 
 bool mitk::GeometryData::VerifyRequestedRegion()
 {
-  if(GetGeometry()==NULL) return false;
+  if(GetGeometry()==nullptr) return false;
 
   return true;
 }

@@ -48,14 +48,31 @@ namespace mitk
     bool SupportsPointWiseWeight(){return true;}
     bool SupportsPointWiseProbability(){return false;}
 
+    void PrintParameter(std::ostream & str);
+    void ConvertParameter();
+
+    void SetSvmType(int val);
+    void SetProbability(int val);
+    void SetShrinking(int val);
+    void SetNrWeight(int val);
+    void SetNu(double val);
+    void SetP(double val);
+    void SetEps(double val);
+    void SetC(double val);
+    void SetCacheSize(double val);
+    void SetKernelType(int val);
+    void SetDegree(int val);
+    void SetGamma(double val);
+    void SetCoef0(double val);
+
   private:
 
-    void ConvertParameter(LibSVM::svm_parameter* parameter);
     void ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const Eigen::MatrixXd &X);
     void ReadYValues(LibSVM::svm_problem * problem, const Eigen::MatrixXi &Y);
     void ReadWValues(LibSVM::svm_problem * problem);
 
     LibSVM::svm_model* m_Model;
+    LibSVM::svm_parameter * m_Parameter;
 
   };
 }

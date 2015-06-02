@@ -31,7 +31,7 @@ QtShowPerspectiveDialog::QtShowPerspectiveDialog(IPerspectiveRegistry* perspReg,
 
   QAbstractItemModel* model = new PerspectiveListModel(*perspReg, true, this);
 
-  QSortFilterProxyModel* proxyModel = new QSortFilterProxyModel(this);
+  auto   proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(model);
   proxyModel->sort(0);
 

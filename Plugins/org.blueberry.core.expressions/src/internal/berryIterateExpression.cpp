@@ -55,39 +55,39 @@ public:
     fIterEnd = end;
   }
 
-  IEvaluationContext* GetParent() const {
+  IEvaluationContext* GetParent() const override {
     return fParent;
   }
 
-  IEvaluationContext* GetRoot() const {
+  IEvaluationContext* GetRoot() const override {
     return fParent->GetRoot();
   }
 
-  Object::ConstPointer GetDefaultVariable() const {
+  Object::ConstPointer GetDefaultVariable() const override {
     return fDefaultVariable;
   }
 
-  bool GetAllowPluginActivation() const {
+  bool GetAllowPluginActivation() const override {
     return fParent->GetAllowPluginActivation();
   }
 
-  void SetAllowPluginActivation(bool value) {
+  void SetAllowPluginActivation(bool value) override {
     fParent->SetAllowPluginActivation(value);
   }
 
-  void AddVariable(const QString& name, const Object::ConstPointer& value) {
+  void AddVariable(const QString& name, const Object::ConstPointer& value) override {
     fParent->AddVariable(name, value);
   }
 
-  Object::ConstPointer RemoveVariable(const QString& name) {
+  Object::ConstPointer RemoveVariable(const QString& name) override {
     return fParent->RemoveVariable(name);
   }
 
-  Object::ConstPointer GetVariable(const QString& name) const {
+  Object::ConstPointer GetVariable(const QString& name) const override {
     return fParent->GetVariable(name);
   }
 
-  Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const {
+  Object::ConstPointer ResolveVariable(const QString& name, const QList<Object::Pointer>& args) const override {
     return fParent->ResolveVariable(name, args);
   }
 

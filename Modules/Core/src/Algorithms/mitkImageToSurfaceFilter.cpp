@@ -60,7 +60,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   vtkPolyData *polydata;
   skinExtractor->Update();
   polydata = skinExtractor->GetOutput();
-  polydata->Register(NULL);//RC++
+  polydata->Register(nullptr);//RC++
 
   if (m_Smooth)
   {
@@ -77,7 +77,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
     polydata->Delete();//RC--
     polydata = smoother->GetOutput();
-    polydata->Register(NULL);//RC++
+    polydata->Register(nullptr);//RC++
     smoother->Delete();
   }
   ProgressBar::GetInstance()->Progress();
@@ -100,7 +100,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 
     polydata->Delete();//RC--
     polydata = decimate->GetOutput();
-    polydata->Register(NULL);//RC++
+    polydata->Register(nullptr);//RC++
     decimate->Delete();
   }
   else if (m_Decimate==QuadricDecimation)
@@ -112,7 +112,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     decimate->Update();
     polydata->Delete();
     polydata = decimate->GetOutput();
-    polydata->Register(NULL);
+    polydata->Register(nullptr);
     decimate->Delete();
   }
 
@@ -159,7 +159,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   cleanPolyDataFilter->Update();
 
   surface->SetVtkPolyData(cleanPolyDataFilter->GetOutput(), time);
-  polydata->UnRegister(NULL);
+  polydata->UnRegister(nullptr);
 }
 
 
@@ -167,7 +167,7 @@ void mitk::ImageToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
   mitk::Image * image        =  (mitk::Image*)GetInput();
-  if(image == NULL || !image->IsInitialized())
+  if(image == nullptr || !image->IsInitialized())
     mitkThrow() << "No input image set, please set an valid input image!";
 
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
@@ -211,7 +211,7 @@ const mitk::Image *mitk::ImageToSurfaceFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::Image * >

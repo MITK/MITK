@@ -144,9 +144,9 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   TimeGeometry* imageTG = image->GetTimeGeometry();
   ProportionalTimeGeometry* imagePTG = dynamic_cast<ProportionalTimeGeometry*>(imageTG);
   // Requires ProportionalTimeGeometries to work. May not be available for all steps.
-  assert(surfacePTG != NULL);
-  assert(imagePTG != NULL);
-  if ((surfacePTG != NULL) && (imagePTG != NULL))
+  assert(surfacePTG != nullptr);
+  assert(imagePTG != nullptr);
+  if ((surfacePTG != nullptr) && (imagePTG != nullptr))
   {
     TimePointType firstTime = imagePTG->GetFirstTimePoint();
     TimePointType duration = imagePTG->GetStepDuration();

@@ -157,7 +157,7 @@ namespace itk
       }
       else//( right1 != (end-1) )
       {
-        std::map< int, int >::iterator temp = right1;
+        auto temp = right1;
         right2 = ++right1;//rght1 + 1
         right1 = temp;
       }
@@ -169,14 +169,14 @@ namespace itk
       }
       else if( right1 == (++(m_CostMap.begin())) )
       {
-        std::map< int, int >::iterator temp = right1;
+        auto temp = right1;
         left1  = --right1;//rght1 - 1
         right1 = temp;
         left2 = end;
       }
       else
       {
-        std::map< int, int >::iterator temp = right1;
+        auto temp = right1;
         left1  = --right1;//rght1 - 1
         left2 = --right1;//rght1 - 2
         right1 = temp;

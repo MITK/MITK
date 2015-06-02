@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ContourModelSetToImageFilter::ContourModelSetToImageFilter()
   : m_MakeOutputBinary( true ),
     m_TimeStep( 0 ),
-    m_ReferenceImage( 0 )
+    m_ReferenceImage( nullptr )
 {
   // Create the output.
   itk::DataObject::Pointer output = this->MakeOutput(0);
@@ -56,9 +56,9 @@ void mitk::ContourModelSetToImageFilter::GenerateOutputInformation()
 
   itkDebugMacro(<<"GenerateOutputInformation()");
 
-  if((m_ReferenceImage == NULL) ||
+  if((m_ReferenceImage == nullptr) ||
      (m_ReferenceImage->IsInitialized() == false) ||
-     (m_ReferenceImage->GetTimeGeometry() == NULL)) return;
+     (m_ReferenceImage->GetTimeGeometry() == nullptr)) return;
 
   if (m_MakeOutputBinary)
   {
@@ -91,7 +91,7 @@ const mitk::ContourModelSet* mitk::ContourModelSetToImageFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast< const mitk::ContourModelSet* >
@@ -153,8 +153,8 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
   extractor->SetResliceTransformByGeometry( outputImageGeo );
 
   // Fill each contour of the contourmodelset into the image
-  mitk::ContourModelSet::ContourModelSetIterator it = contourSet->Begin();
-  mitk::ContourModelSet::ContourModelSetIterator end = contourSet->End();
+  auto it = contourSet->Begin();
+  auto end = contourSet->End();
   while (it != end)
   {
     mitk::ContourModel* contour = it->GetPointer();
@@ -233,7 +233,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     extractor->Modified();
     extractor->Update();
 
-    reslice->SetInputSlice(0);
+    reslice->SetInputSlice(nullptr);
 
     // Progress
     mitk::ProgressBar::GetInstance()->Progress();

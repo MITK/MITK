@@ -86,7 +86,7 @@ public:
   typedef itk::ParametricPath< 3 >::Superclass PathType;
   typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
 
-  explicit QmitkHistogramJSWidget(QWidget *parent = 0);
+  explicit QmitkHistogramJSWidget(QWidget *parent = nullptr);
 
 
   ~QmitkHistogramJSWidget();

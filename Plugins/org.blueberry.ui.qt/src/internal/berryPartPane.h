@@ -135,7 +135,7 @@ public:
      * for the part widgets. This is passed to
      * IWorkbenchPart::CreatePartControl(QWidget*)
      */
-    public: virtual void CreateControl(QWidget* parent);
+    public: virtual void CreateControl(QWidget* parent) override;
 
     //public: virtual void SetControlEnabled(bool enabled) = 0;
 
@@ -160,7 +160,7 @@ public:
     /**
      * Get the control.
      */
-    public: QWidget* GetControl();
+    public: QWidget* GetControl() override;
 
     /**
      * Answer the part child.
@@ -170,17 +170,17 @@ public:
     /**
      * @see GuiTk::IControlListener
      */
-    public: void ControlActivated(GuiTk::ControlEvent::Pointer e);
+    public: void ControlActivated(GuiTk::ControlEvent::Pointer e) override;
 
     /**
      * @see GuiTk::IControlListener
      */
-    public: GuiTk::IControlListener::Events::Types GetEventTypes() const;
+    public: GuiTk::IControlListener::Events::Types GetEventTypes() const override;
 
     /**
      * Move the control over another one.
      */
-    public: void MoveAbove(QWidget* refControl);
+    public: void MoveAbove(QWidget* refControl) override;
 
     /**
      * Notify the workbook page that the part pane has
@@ -191,20 +191,20 @@ public:
     /**
      * Shows the receiver if <code>visible</code> is true otherwise hide it.
      */
-    public: void SetVisible(bool makeVisible);
-    public: virtual bool GetVisible();
+    public: void SetVisible(bool makeVisible) override;
+    public: virtual bool GetVisible() override;
 
     /**
      * Sets focus to this part.
      */
-    public: void SetFocus();
+    public: void SetFocus() override;
 
     /**
      * Sets the workbench page of the view.
      */
     public: void SetWorkbenchPage(SmartPointer<WorkbenchPage> workbenchPage);
 
-    public: void Reparent(QWidget* newParent);
+    public: void Reparent(QWidget* newParent) override;
 
     /**
      * Indicate focus in part.
@@ -225,7 +225,7 @@ public:
      */
     public: SmartPointer<PartStack> GetStack();
 
-    public: void SetContainer(SmartPointer<ILayoutContainer> stack);
+    public: void SetContainer(SmartPointer<ILayoutContainer> stack) override;
 
     /**
      * Show a title label menu for this pane.
@@ -370,7 +370,7 @@ public:
      *
      * @param buf
      */
-    public: void DescribeLayout(QString& buf) const;
+    public: void DescribeLayout(QString& buf) const override;
 
     /**
      * @return
@@ -382,7 +382,7 @@ public:
 
     public: bool GetInLayout();
 
-    public: bool AllowsAutoFocus();
+    public: bool AllowsAutoFocus() override;
 
     /**
      * Clears all contribution items from the contribution managers (this is done separately
@@ -406,18 +406,18 @@ public:
   public:
 
   using IPropertyChangeListener::PropertyChange;
-  void PropertyChange(const PropertyChangeEvent::Pointer& event);
+  void PropertyChange(const PropertyChangeEvent::Pointer& event) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#computePreferredSize(boolean, int, int, int)
    */
   public: int ComputePreferredSize(bool width, int availableParallel,
-          int availablePerpendicular, int preferredParallel);
+          int availablePerpendicular, int preferredParallel) override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.internal.LayoutPart#getSizeFlags(boolean)
    */
-  public: int GetSizeFlags(bool horizontal);
+  public: int GetSizeFlags(bool horizontal) override;
 
   /**
    * Informs the pane that it's window shell has

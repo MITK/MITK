@@ -35,12 +35,12 @@ public:
   QmitkPropertiesPreferencePage();
   ~QmitkPropertiesPreferencePage();
 
-  void CreateQtControl(QWidget* parent);
-  QWidget* GetQtControl() const;
-  void Init(berry::IWorkbench::Pointer workbench);
-  bool PerformOk();
-  void PerformCancel();
-  void Update();
+  void CreateQtControl(QWidget* parent) override;
+  QWidget* GetQtControl() const override;
+  void Init(berry::IWorkbench::Pointer workbench) override;
+  bool PerformOk() override;
+  void PerformCancel() override;
+  void Update() override;
 
 private slots:
   void OnShowDescriptionsStateChanged(int state);

@@ -114,7 +114,7 @@ QtShowViewDialog::QtShowViewDialog(const IWorkbenchWindow* window, IViewRegistry
   m_UserInterface.m_TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   m_FilterModel = new ViewFilterProxyModel(this);
-  ViewTreeModel* sourceModel = new ViewTreeModel(window, m_FilterModel);
+  auto   sourceModel = new ViewTreeModel(window, m_FilterModel);
   m_FilterModel->setSourceModel(sourceModel);
   m_UserInterface.m_TreeView->setModel(m_FilterModel);
 

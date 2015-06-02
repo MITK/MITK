@@ -24,13 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryFileEditorInput.h>
 
 QmitkOpenXnatEditorAction::QmitkOpenXnatEditorAction(berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+: QAction(nullptr)
 {
   this->init(window);
 }
 
 QmitkOpenXnatEditorAction::QmitkOpenXnatEditorAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+: QAction(nullptr)
 {
   this->setIcon(icon);
 
@@ -61,7 +61,7 @@ void QmitkOpenXnatEditorAction::Run()
   }
 
   QList<berry::IEditorReference::Pointer> editors =
-    m_Window->GetActivePage()->FindEditors(berry::IEditorInput::Pointer(0),
+    m_Window->GetActivePage()->FindEditors(berry::IEditorInput::Pointer(nullptr),
     "org.mitk.editors.xnat.browser", berry::IWorkbenchPage::MATCH_ID);
 
   if (editors.empty())

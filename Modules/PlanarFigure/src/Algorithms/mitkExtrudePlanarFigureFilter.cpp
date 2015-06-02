@@ -31,9 +31,9 @@ static mitk::Point2D GetCenterPoint(const mitk::PlanarFigure::PolyLineType& poly
   centerPoint[0] = 0;
   centerPoint[1] = 0;
 
-  mitk::PlanarFigure::PolyLineType::const_iterator polyLineEnd = polyLine.end();
+  auto polyLineEnd = polyLine.end();
 
-  for (mitk::PlanarFigure::PolyLineType::const_iterator polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
+  for (auto polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
   {
     centerPoint[0] += static_cast<mitk::Point2D>(*polyLineIter)[0];
     centerPoint[1] += static_cast<mitk::Point2D>(*polyLineIter)[1];
@@ -123,7 +123,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
 
   PlanarFigure* input = dynamic_cast<PlanarFigure*>(this->GetPrimaryInput());
 
-  if (input == NULL)
+  if (input == nullptr)
     mitkThrow() << "Primary input is not a planar figure!";
 
   size_t numPolyLines = input->GetPolyLinesSize();
@@ -133,7 +133,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
 
   const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(input->GetPlaneGeometry());
 
-  if (planeGeometry == NULL)
+  if (planeGeometry == nullptr)
     mitkThrow() << "Could not get plane geometry from primary input!";
 
   Vector3D planeNormal = planeGeometry->GetNormal();
@@ -290,14 +290,14 @@ itk::ProcessObject::DataObjectPointer mitk::ExtrudePlanarFigureFilter::MakeOutpu
 {
   return idx == 0
     ? Surface::New().GetPointer()
-    : NULL;
+    : nullptr;
 }
 
 itk::ProcessObject::DataObjectPointer mitk::ExtrudePlanarFigureFilter::MakeOutput(const DataObjectIdentifierType& name)
 {
   return this->IsIndexedOutputName(name)
     ? this->MakeOutput(this->MakeIndexFromOutputName(name))
-    : NULL;
+    : nullptr;
 }
 
 void mitk::ExtrudePlanarFigureFilter::PrintSelf(std::ostream& os, itk::Indent indent) const

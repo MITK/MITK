@@ -70,7 +70,7 @@ public:
     return newImage;
   }
 
-  void setUp()
+  void setUp() override
   {
     m_Controller = mitk::SurfaceInterpolationController::GetInstance();
     m_Controller->SetCurrentTimeStep( 0 );
@@ -123,7 +123,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
 
     // Test 5
-    m_Controller->SetCurrentInterpolationSession(0);
+    m_Controller->SetCurrentInterpolationSession(nullptr);
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().IsNull());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
   }
@@ -566,7 +566,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
 
     // Test 5
-    m_Controller->SetCurrentInterpolationSession(0);
+    m_Controller->SetCurrentInterpolationSession(nullptr);
     CPPUNIT_ASSERT_MESSAGE("Segmentation images are not equal", m_Controller->GetCurrentSegmentation().IsNull());
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 2", m_Controller->GetNumberOfInterpolationSessions() == 2);
   }
@@ -675,7 +675,7 @@ public:
     //CPPUNIT_ASSERT_MESSAGE("Contour accessed from outside of timestep!", m_Controller->GetNumberOfContours() == 0);
     contour_1 = m_Controller->GetContour(contourInfo1);
     contour_2 = m_Controller->GetContour(contourInfo2);
-    CPPUNIT_ASSERT_MESSAGE("Contour accessed from outside of timestep!", contour_1 == 0 && contour_2 == 0);
+    CPPUNIT_ASSERT_MESSAGE("Contour accessed from outside of timestep!", contour_1 == nullptr && contour_2 == nullptr);
 
     const mitk::Surface* contour_3 = m_Controller->GetContour(contourInfo3);
     const mitk::Surface* contour_4 = m_Controller->GetContour(contourInfo4);

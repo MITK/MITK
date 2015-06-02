@@ -38,7 +38,7 @@ WindowManager::WindowManager()
 
 WindowManager::WindowManager(WindowManager* parent)
 {
-  poco_assert(parent != 0);
+  poco_assert(parent != nullptr);
   parent->AddWindowManager(this);
 }
 
@@ -96,7 +96,7 @@ void WindowManager::Remove(Window::Pointer window)
   if (iter != windows.end())
   {
     windows.erase(iter);
-    window->SetWindowManager(0);
+    window->SetWindowManager(nullptr);
   }
 }
 

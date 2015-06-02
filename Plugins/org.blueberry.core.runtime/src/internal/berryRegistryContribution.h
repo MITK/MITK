@@ -40,10 +40,10 @@ public:
 
   QString GetDefaultNamespace() const;
 
-  QString ToString() const;
+  QString ToString() const override;
 
   //Implements the KeyedElement interface
-  QString GetKey() const;
+  QString GetKey() const override;
 
   bool ShouldPersist() const;
 
@@ -99,7 +99,7 @@ private:
 
   QList<int> GetExtensionPoints() const;
 
-  bool IsEqual(const KeyedElement& other) const;
+  bool IsEqual(const KeyedElement& other) const override;
 };
 
 }

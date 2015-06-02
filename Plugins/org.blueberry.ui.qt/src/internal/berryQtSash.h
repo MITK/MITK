@@ -30,7 +30,7 @@ class QtSash : public QWidget
     Q_OBJECT
 
 public:
-    QtSash(Qt::Orientation o, QWidget* parent = 0, bool smooth = true);
+    QtSash(Qt::Orientation o, QWidget* parent = nullptr, bool smooth = true);
     ~QtSash();
 
     //void setOrientation(Qt::Orientation o);
@@ -42,15 +42,15 @@ public:
 
 protected:
     //void paintEvent(QPaintEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    bool event(QEvent *);
+    void mouseMoveEvent(QMouseEvent *) override;
+    void mousePressEvent(QMouseEvent *) override;
+    void mouseReleaseEvent(QMouseEvent *) override;
+    bool event(QEvent *) override;
 
     void drawRubberBand(int x, int y, int width, int height);
 
     // needed for stylesheet support
-    void paintEvent(QPaintEvent*);
+    void paintEvent(QPaintEvent*) override;
 
     //void moveSplitter(int p);
     //int closestLegalPosition(int p);

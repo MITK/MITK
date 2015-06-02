@@ -47,7 +47,7 @@ namespace mitk {
     ~SurfaceToPointSetFilter();
 
     /** @brief method generating the output of this filter. Called in the updated process of the pipeline. */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     //############### members ########################
     mitk::Surface::Pointer m_InputSurface;

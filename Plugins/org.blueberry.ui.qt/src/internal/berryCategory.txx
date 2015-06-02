@@ -74,7 +74,7 @@ Object* Category<T>::GetAdapter(const QString& adapter) const
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 

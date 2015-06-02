@@ -32,7 +32,7 @@ class MITKRIGIDREGISTRATIONUI_EXPORT QmitkSimilarity2DTransformView : public Qmi
 
 public:
 
-  QmitkSimilarity2DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkSimilarity2DTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkSimilarity2DTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;

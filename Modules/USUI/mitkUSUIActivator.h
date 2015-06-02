@@ -44,13 +44,13 @@ namespace mitk
       * load. A plugin can get this widget then when using a
       * mitk::USVideoDevice.
       */
-    void Load(us::ModuleContext* context);
+    void Load(us::ModuleContext* context) override;
 
     /**
       * Custom video device widget is deregistered from micro service on module
       * unload.
       */
-    void Unload(us::ModuleContext* context);
+    void Unload(us::ModuleContext* context) override;
 
   protected:
     us::ServiceRegistration<QmitkUSAbstractCustomWidget>  m_ServiceRegistration;

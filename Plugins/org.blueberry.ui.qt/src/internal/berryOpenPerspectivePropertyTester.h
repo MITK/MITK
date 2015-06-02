@@ -35,7 +35,7 @@ private:
 public:
 
   bool Test(Object::ConstPointer receiver, const QString& property,
-            const QList<Object::Pointer> &args, Object::Pointer expectedValue);
+            const QList<Object::Pointer> &args, Object::Pointer expectedValue) override;
 
 };
 

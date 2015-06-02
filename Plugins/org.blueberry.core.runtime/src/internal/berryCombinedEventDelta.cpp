@@ -43,7 +43,7 @@ struct CombinedEventDeltaData : public QSharedData
   QList<int> allExtensionPoints; // List if Integer IDs
 
   CombinedEventDeltaData(bool addition)
-    : addition(addition), objectManager(0)
+    : addition(addition), objectManager(nullptr)
   {
   }
 

@@ -198,14 +198,14 @@ public: QString GetFileName() const;
    *
    * @return the id
    */
-public: QString GetId() const;
+public: QString GetId() const override;
 
   /**
    * Return the image descriptor describing this editor.
    *
    * @return the image descriptor
    */
-public: QIcon GetImageDescriptor() const;
+public: QIcon GetImageDescriptor() const override;
 
   /**
    * Verifies that the image descriptor generates an image.  If not, the
@@ -227,7 +227,7 @@ public: QString GetImageFilename() const;
    *
    * @return the label
    */
-public: QString GetLabel() const;
+public: QString GetLabel() const override;
 
   /**
    * Returns the class name of the launcher.
@@ -254,17 +254,17 @@ public: QString GetPluginID() const;
   /* (non-Javadoc)
    * @see org.blueberry.ui.IEditorDescriptor#isInternal
    */
-public: bool IsInternal() const;
+public: bool IsInternal() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IEditorDescriptor#isOpenInPlace
    */
-public: bool IsOpenInPlace() const;
+public: bool IsOpenInPlace() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.IEditorDescriptor#isOpenExternal
    */
-public: bool IsOpenExternal() const;
+public: bool IsOpenExternal() const override;
 
   /**
    * Load the object properties from a memento.
@@ -368,7 +368,7 @@ public: void SetOpenMode(int mode);
   /**
    * For debugging purposes only.
    */
-public: QString ToString() const;
+public: QString ToString() const override;
 
   /* (non-Javadoc)
    * @see org.blueberry.ui.activities.support.IPluginContribution#getLocalId()
@@ -383,7 +383,7 @@ public: QString GetPluginId() const;
   /* (non-Javadoc)
    * @see org.blueberry.ui.IEditorDescriptor#getEditorManagementPolicy()
    */
-public: IEditorMatchingStrategy::Pointer GetEditorMatchingStrategy();
+public: IEditorMatchingStrategy::Pointer GetEditorMatchingStrategy() override;
 
 };
 

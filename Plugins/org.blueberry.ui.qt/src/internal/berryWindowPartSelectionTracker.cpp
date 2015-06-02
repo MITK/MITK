@@ -69,7 +69,7 @@ ISelection::ConstPointer WindowPartSelectionTracker::GetSelection()
   {
     return page->GetSelection(GetPartId());
   }
-  return ISelection::ConstPointer(0);
+  return ISelection::ConstPointer(nullptr);
 }
 
 SmartPointer<IWorkbenchWindow> WindowPartSelectionTracker::GetWindow()

@@ -40,7 +40,7 @@ class MITKQTOVERLAYS_EXPORT QmitkScalarBar : public QWidget
     /**
     * @brief Default Constructor
     **/
-    QmitkScalarBar( QWidget *parent = 0 );
+    QmitkScalarBar( QWidget *parent = nullptr );
 
     /**
     * @brief Default Destructor

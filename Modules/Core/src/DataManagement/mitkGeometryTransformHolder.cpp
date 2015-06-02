@@ -260,7 +260,7 @@ namespace mitk {
 
 bool mitk::Equal(const mitk::GeometryTransformHolder *leftHandSide, const mitk::GeometryTransformHolder *rightHandSide, ScalarType eps, bool verbose)
 {
-  if(( leftHandSide == NULL) || ( rightHandSide == NULL ))
+  if(( leftHandSide == nullptr) || ( rightHandSide == nullptr ))
   {
     MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType eps, bool verbose) does not with NULL pointer input.";
     return false;

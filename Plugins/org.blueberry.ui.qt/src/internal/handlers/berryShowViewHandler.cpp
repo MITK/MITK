@@ -64,7 +64,7 @@ Object::Pointer ShowViewHandler::Execute(const ExecutionEvent::ConstPointer& eve
     }
   }
 
-  return Object::Pointer(0);
+  return Object::Pointer(nullptr);
 }
 
 void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)

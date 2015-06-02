@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkMath.h>
 
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter() :
-  m_IplScalarImage(NULL), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0),
+  m_IplScalarImage(nullptr), m_CameraIntrinsics(), m_TextureImageWidth(0), m_TextureImageHeight(0), m_InterPixelDistance(), m_TextureIndex(0),
   m_GenerateTriangularMesh(true), m_TriangulationThreshold(0.0)
 {
   m_InterPixelDistance.Fill(0.045);
@@ -67,7 +67,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::SetInput(  mitk::Image* distanceImag
 
 void mitk::ToFDistanceImageToSurfaceFilter::SetInput( unsigned int idx,  mitk::Image* distanceImage )
 {
-  if ((distanceImage == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
     this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
   else
     this->ProcessObject::SetNthInput(idx, distanceImage);   // Process object is not const-correct so the const_cast is required here
@@ -122,7 +122,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
     m_VertexIdList->SetId(i, 0);
   }
 
-  float* scalarFloatData = NULL;
+  float* scalarFloatData = nullptr;
 
   if (this->m_IplScalarImage) // if scalar image is defined use it for texturing
   {
@@ -306,7 +306,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::CreateOutputsForAllInputs()
 {
   this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);

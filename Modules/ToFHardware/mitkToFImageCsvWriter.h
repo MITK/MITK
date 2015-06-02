@@ -49,18 +49,18 @@ namespace mitk
     /*!
     \brief Checks for file extensions and opens the output files
     */
-    void Open();
+    void Open() override;
     /*!
     \brief Closes the output files
     */
-    void Close();
+    void Close() override;
     /*!
     \brief Pushes the image data to the output files
     \param distanceFloatData from distance image as float value
     \param amplitudeFloatData from amplitude image as float value
     \param intensityFloatData from intensity image as float value
     */
-    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0);
+    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0) override;
 
   protected:
 

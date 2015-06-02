@@ -29,7 +29,7 @@ class CommandServiceFactory : public QObject, public IServiceFactory
 public:
 
   Object* Create(const QString& serviceInterface, IServiceLocator* parentLocator,
-                 IServiceLocator* locator) const;
+                 IServiceLocator* locator) const override;
 
 };
 

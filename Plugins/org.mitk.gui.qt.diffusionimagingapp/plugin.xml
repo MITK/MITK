@@ -7,12 +7,16 @@
     </application>
   </extension>
 
+  <extension id="diffusion" point="org.blueberry.core.runtime.products">
+    <product name="MITK Diffusion" application="org.mitk.qt.diffusionimagingapp" />
+  </extension>
+  
   <extension point="org.blueberry.ui.intro">
     <intro id="org.mitk.qt.diffusionimagingappintro"
       class="QmitkDiffusionImagingAppIntroPart"
       role="editor"/>
     <introProductBinding
-      productId=""
+      productId="org.mitk.gui.qt.diffusionimagingapp.diffusion"
       introId="org.mitk.qt.diffusionimagingappintro"/>
   </extension>
 

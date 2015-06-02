@@ -28,7 +28,7 @@ void
 ICommandListener::Events
 ::AddListener(ICommandListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   commandChanged += Delegate(l, &ICommandListener::CommandChanged);
 }
@@ -37,7 +37,7 @@ void
 ICommandListener::Events
 ::RemoveListener(ICommandListener* l)
 {
-  if (l == 0) return;
+  if (l == nullptr) return;
 
   commandChanged -= Delegate(l, &ICommandListener::CommandChanged);
 }

@@ -74,7 +74,7 @@ ContributionItem::Modes CommandContributionItem::modes = ContributionItem::MODE_
 CommandContributionItem::CommandContributionItem(
     const SmartPointer<CommandContributionItemParameter>& contributionParameters)
   : ContributionItem(contributionParameters->id)
-  , action(0)
+  , action(nullptr)
   , checkedState(false)
 {
   this->icon = contributionParameters->icon;
@@ -111,27 +111,27 @@ CommandContributionItem::CommandContributionItem(
         CommandUIElement(CommandContributionItem* item, IServiceLocator* serviceLocator)
           : UIElement(serviceLocator), item(item) {}
 
-        void SetText(const QString& text)
+        void SetText(const QString& text) override
         {
           item->SetText(text);
         }
 
-        void SetToolTip(const QString& text)
+        void SetToolTip(const QString& text) override
         {
           item->SetToolTip(text);
         }
 
-        void SetIcon(const QIcon& icon)
+        void SetIcon(const QIcon& icon) override
         {
           item->SetIcon(icon);
         }
 
-        void SetChecked(bool checked)
+        void SetChecked(bool checked) override
         {
           item->SetChecked(checked);
         }
 
-        void SetDropDownId(const QString& id)
+        void SetDropDownId(const QString& id) override
         {
           item->dropDownMenuOverride = id;
         }
@@ -176,7 +176,7 @@ CommandContributionItem::CommandContributionItem(
 
 void CommandContributionItem::Fill(QMenu* parent, QAction* before)
 {
-  if (!command || action || parent == 0)
+  if (!command || action || parent == nullptr)
   {
     return;
   }
@@ -186,7 +186,7 @@ void CommandContributionItem::Fill(QMenu* parent, QAction* before)
   if (tmpStyle == STYLE_PULLDOWN)
     tmpStyle = STYLE_PUSH;
 
-  QAction* item = 0;
+  QAction* item = nullptr;
   if (before)
   {
     item = new QAction(icon, label, parent);
@@ -222,12 +222,12 @@ void CommandContributionItem::Fill(QMenu* parent, QAction* before)
 
 void CommandContributionItem::Fill(QToolBar *parent, QAction *before)
 {
-  if (!command || action || parent == 0)
+  if (!command || action || parent == nullptr)
   {
     return;
   }
 
-  QAction* item = 0;
+  QAction* item = nullptr;
   if (before)
   {
     item = parent->addAction(icon, label);
@@ -444,7 +444,7 @@ ICommandListener* CommandContributionItem::GetCommandListener()
         : item(item)
       {}
 
-      void CommandChanged(const SmartPointer<const CommandEvent>& commandEvent)
+      void CommandChanged(const SmartPointer<const CommandEvent>& commandEvent) override
       {
         if (commandEvent->IsHandledChanged() || commandEvent->IsEnabledChanged()
             || commandEvent->IsDefinedChanged())
@@ -629,7 +629,7 @@ void CommandContributionItem::HandleWidgetSelection()
 
   try
   {
-    handlerService->ExecuteCommand(command, UIElement::Pointer(0));
+    handlerService->ExecuteCommand(command, UIElement::Pointer(nullptr));
   }
   catch (const ExecutionException& e)
   {

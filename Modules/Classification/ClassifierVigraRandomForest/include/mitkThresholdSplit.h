@@ -11,9 +11,10 @@ namespace mitk
     {
     public:
         ThresholdSplit();
+//        ThresholdSplit(const ThresholdSplit & other);
 
         void SetFeatureCalculator(TFeatureCalculator processor);
-        TFeatureCalculator GetFeatureCalculator();
+        TFeatureCalculator GetFeatureCalculator() const;
 
         void SetCalculatingFeature(bool calculate);
         bool IsCalculatingFeature() const;
@@ -31,7 +32,7 @@ namespace mitk
         int GetMaximumTreeDepth() const;
 
         void SetWeights(vigra::MultiArrayView<2, double> weights);
-        vigra::MultiArrayView<2, double> GetWeights();
+        vigra::MultiArrayView<2, double> GetWeights() const;
 
         // From vigra::ThresholdSplit
         double minGini() const;
@@ -51,26 +52,27 @@ namespace mitk
         double region_gini_;
 
     private:
+
+        // From vigra::ThresholdSplit
+        typedef vigra::SplitBase<TTag> SB;
+
+       // splitter parameters (used by copy constructor)
         bool m_CalculatingFeature;
         bool m_UseWeights;
         bool m_UseRandomSplit;
         double m_Precision;
         int m_MaximumTreeDepth;
-
         TFeatureCalculator m_FeatureCalculator;
         vigra::MultiArrayView<2, double> m_Weights;
 
-        // From vigra::ThresholdSplit
-        typedef vigra::SplitBase<TTag> SB;
-
+        // variabels to work with
         vigra::ArrayVector<vigra::Int32> splitColumns;
         TColumnDecisionFunctor bgfunc;
-
         vigra::ArrayVector<double> min_gini_;
         vigra::ArrayVector<std::ptrdiff_t> min_indices_;
         vigra::ArrayVector<double> min_thresholds_;
-
         int bestSplitIndex;
+
     };
 }
 

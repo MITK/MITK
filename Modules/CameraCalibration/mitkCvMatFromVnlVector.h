@@ -48,7 +48,7 @@ namespace mitk
     ///
     /// executes the Algorithm
     ///
-    void Update()
+    void Update() override
     {
       m_VnlMatrix.set_size( m_VnlVector->size(), 1 );
       m_VnlMatrix.set_column(0, *m_VnlVector);

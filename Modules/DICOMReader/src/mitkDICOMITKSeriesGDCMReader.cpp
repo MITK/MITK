@@ -90,8 +90,8 @@ mitk::DICOMITKSeriesGDCMReader
       // test sorters for equality
       if (this->m_Sorter.size() != otherSelf->m_Sorter.size()) return false;
 
-      SorterList::const_iterator mySorterIter = this->m_Sorter.begin();
-      SorterList::const_iterator oSorterIter = otherSelf->m_Sorter.begin();
+      auto mySorterIter = this->m_Sorter.begin();
+      auto oSorterIter = otherSelf->m_Sorter.begin();
       for(; mySorterIter != this->m_Sorter.end() && oSorterIter != otherSelf->m_Sorter.end();
           ++mySorterIter, ++oSorterIter)
       {
@@ -148,7 +148,7 @@ mitk::DICOMITKSeriesGDCMReader
   DICOMGDCMImageFrameList output;
   output.reserve(input.size());
 
-  for(DICOMDatasetList::const_iterator inputIter = input.begin();
+  for(auto inputIter = input.begin();
       inputIter != input.end();
       ++inputIter)
   {
@@ -167,7 +167,7 @@ mitk::DICOMITKSeriesGDCMReader
   DICOMDatasetList output;
   output.reserve(input.size());
 
-  for(DICOMGDCMImageFrameList::const_iterator inputIter = input.begin();
+  for(auto inputIter = input.begin();
       inputIter != input.end();
       ++inputIter)
   {
@@ -186,7 +186,7 @@ mitk::DICOMITKSeriesGDCMReader
   DICOMImageFrameList output;
   output.reserve(input.size());
 
-  for(DICOMGDCMImageFrameList::const_iterator inputIter = input.begin();
+  for(auto inputIter = input.begin();
       inputIter != input.end();
       ++inputIter)
   {
@@ -203,7 +203,7 @@ mitk::DICOMITKSeriesGDCMReader
 ::InternalPrintConfiguration(std::ostream& os) const
 {
   unsigned int sortIndex(1);
-  for(SorterList::const_iterator sorterIter = m_Sorter.begin();
+  for(auto sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
       ++sortIndex, ++sorterIter)
   {
@@ -220,14 +220,14 @@ std::string
 mitk::DICOMITKSeriesGDCMReader
 ::GetActiveLocale() const
 {
-  return setlocale(LC_NUMERIC, NULL);
+  return setlocale(LC_NUMERIC, nullptr);
 }
 
 void
 mitk::DICOMITKSeriesGDCMReader
 ::PushLocale() const
 {
-  std::string currentCLocale = setlocale(LC_NUMERIC, NULL);
+  std::string currentCLocale = setlocale(LC_NUMERIC, nullptr);
   m_ReplacedCLocales.push( currentCLocale );
   setlocale(LC_NUMERIC, "C");
 
@@ -356,7 +356,7 @@ mitk::DICOMITKSeriesGDCMReader
 
   timeStart("Sorting frames");
   unsigned int sorterIndex = 0;
-  for(SorterList::iterator sorterIter = m_Sorter.begin();
+  for(auto sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
       ++sorterIndex, ++sorterIter)
   {
@@ -382,7 +382,7 @@ mitk::DICOMITKSeriesGDCMReader
   timeStart("Output");
   unsigned int o = this->GetNumberOfOutputs();
   this->SetNumberOfOutputs( o + m_SortingResultInProgress.size() ); // Condense3DBlocks may already have added outputs!
-  for (SortingBlockList::iterator blockIter = m_SortingResultInProgress.begin();
+  for (auto blockIter = m_SortingResultInProgress.begin();
        blockIter != m_SortingResultInProgress.end();
        ++o, ++blockIter)
   {
@@ -438,7 +438,7 @@ mitk::DICOMITKSeriesGDCMReader
   MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ": " << input.size() << " groups input";
   unsigned int groupIndex = 0;
 
-  for(SortingBlockList::const_iterator blockIter = input.begin();
+  for(auto blockIter = input.begin();
       blockIter != input.end();
       ++groupIndex, ++blockIter)
   {
@@ -447,7 +447,7 @@ mitk::DICOMITKSeriesGDCMReader
 
     MITK_DEBUG << "--------------------------------------------------------------------------------";
     MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " (" << datasetList.size() << " datasets): ";
-    for (DICOMDatasetList::iterator oi = datasetList.begin();
+    for (auto oi = datasetList.begin();
         oi != datasetList.end();
         ++oi)
     {
@@ -462,7 +462,7 @@ mitk::DICOMITKSeriesGDCMReader
     {
       DICOMDatasetList blockResult = sorter->GetOutput(b);
 
-      for (DICOMDatasetList::iterator oi = blockResult.begin();
+      for (auto oi = blockResult.begin();
           oi != blockResult.end();
           ++oi)
       {
@@ -539,7 +539,7 @@ mitk::DICOMITKSeriesGDCMReader
   bool hasTilt = tiltInfo.IsRegularGantryTilt();
 
   ITKDICOMSeriesReaderHelper::StringContainer filenames;
-  for (DICOMImageFrameList::const_iterator frameIter = frames.begin();
+  for (auto frameIter = frames.begin();
       frameIter != frames.end();
       ++frameIter)
   {
@@ -604,7 +604,7 @@ mitk::DICOMITKSeriesGDCMReader
   std::list<DICOMDatasetSorter::ConstPointer> result;
 
   unsigned int sortIndex(0);
-  for(SorterList::const_iterator sorterIter = m_Sorter.begin();
+  for(auto sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
       ++sortIndex, ++sorterIter)
   {
@@ -703,7 +703,7 @@ mitk::DICOMITKSeriesGDCMReader
   DICOMTagList completeList;
 
   // check all configured sorters
-  for(SorterList::const_iterator sorterIter = m_Sorter.begin();
+  for(auto sorterIter = m_Sorter.begin();
       sorterIter != m_Sorter.end();
       ++sorterIter)
   {

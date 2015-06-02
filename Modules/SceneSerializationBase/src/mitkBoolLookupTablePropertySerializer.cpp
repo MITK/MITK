@@ -35,17 +35,17 @@ class BoolLookupTablePropertySerializer : public BasePropertySerializer
     virtual TiXmlElement* Serialize() override
     {
       const BoolLookupTableProperty* prop = dynamic_cast<const BoolLookupTableProperty*>(m_Property.GetPointer());
-      if (prop == NULL)
-        return NULL;
+      if (prop == nullptr)
+        return nullptr;
       BoolLookupTable lut = prop->GetValue();
       //if (lut.IsNull())
       //  return NULL; // really?
       const BoolLookupTable::LookupTableType& map = lut.GetLookupTable();
 
-      TiXmlElement* element = new TiXmlElement("BoolLookupTable");
-      for (BoolLookupTable::LookupTableType::const_iterator it = map.begin(); it != map.end(); ++it)
+      auto  element = new TiXmlElement("BoolLookupTable");
+      for (auto it = map.begin(); it != map.end(); ++it)
         {
-          TiXmlElement* tableEntry = new TiXmlElement("LUTValue");
+          auto  tableEntry = new TiXmlElement("LUTValue");
           tableEntry->SetAttribute("id", it->first);
           if (it->second == true)
             tableEntry->SetAttribute("value", "true");
@@ -59,15 +59,15 @@ class BoolLookupTablePropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element)
-        return NULL;
+        return nullptr;
 
       BoolLookupTable lut;
-      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != NULL; child = child->NextSiblingElement("LUTValue"))
+      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != nullptr; child = child->NextSiblingElement("LUTValue"))
       {
 
         int xmlID;
         if (child->QueryIntAttribute("id", &xmlID) == TIXML_WRONG_TYPE)
-          return NULL; // TODO: can we do a better error handling?
+          return nullptr; // TODO: can we do a better error handling?
         BoolLookupTable::IdentifierType id = static_cast<BoolLookupTable::IdentifierType>(xmlID);
         BoolLookupTable::ValueType val = std::string(child->Attribute("value")) == std::string("true");
         lut.SetTableValue(id, val);

@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryCTKPluginActivator.h"
 #include "berryPlatformException.h"
 #include "berryApplicationContainer.h"
+#include "berryProduct.h"
 
 #include "berryIBranding.h"
 
@@ -97,7 +98,7 @@ QVariant InternalPlatform::GetOption(const QString& option, const QVariant& defa
 IAdapterManager* InternalPlatform::GetAdapterManager() const
 {
   AssertInitialized();
-  return NULL;
+  return nullptr;
 }
 
 SmartPointer<IProduct> InternalPlatform::GetProduct() const
@@ -106,7 +107,13 @@ SmartPointer<IProduct> InternalPlatform::GetProduct() const
   ApplicationContainer* container = org_blueberry_core_runtime_Activator::GetContainer();
   IBranding* branding = container == nullptr ? nullptr : container->GetBranding();
   if (branding == nullptr) return IProduct::Pointer();
-  return branding->GetProduct();
+  IProduct::Pointer brandingProduct = branding->GetProduct();
+  if (!brandingProduct)
+  {
+    brandingProduct = new Product(branding);
+  }
+  product = brandingProduct;
+  return product;
 }
 
 void InternalPlatform::InitializePluginPaths()
@@ -170,7 +177,7 @@ void InternalPlatform::InitializePluginPaths()
     // Append a hash value of the absolute path of the executable to the data location.
     // This allows to start the same application from different build or install trees.
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + '_';
+    dataLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + this->getOrganizationName() + "/" + this->getApplicationName() + '_';
 #else
     dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
 #endif
@@ -386,7 +393,7 @@ ctkLocation* InternalPlatform::GetUserLocation()
 ILog *InternalPlatform::GetLog(const QSharedPointer<ctkPlugin> &plugin) const
 {
   LogImpl* result = m_Logs.value(plugin->getPluginId());
-  if (result != NULL)
+  if (result != nullptr)
     return result;
 
 //  ExtendedLogService logService = (ExtendedLogService) extendedLogTracker.getService();
@@ -419,7 +426,7 @@ QSharedPointer<ctkPlugin> InternalPlatform::GetPlugin(const QString &symbolicNam
 {
   QList<QSharedPointer<ctkPlugin> > plugins = m_Context->getPlugins();
 
-  QSharedPointer<ctkPlugin> res(0);
+  QSharedPointer<ctkPlugin> res(nullptr);
   foreach(QSharedPointer<ctkPlugin> plugin, plugins)
   {
     if ((plugin->getState() & (ctkPlugin::INSTALLED | ctkPlugin::UNINSTALLED)) == 0 &&

@@ -31,7 +31,7 @@ class DefaultSafeRunnableRunner: public ISafeRunnableRunner
 {
 public:
 
-  void Run(ISafeRunnable::Pointer code)
+  void Run(ISafeRunnable::Pointer code) override
   {
     try
     {

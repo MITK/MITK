@@ -41,14 +41,14 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QWidget
   public:
     static const std::string VIEW_ID;
 
-    QmitkInteractiveTransformationWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkInteractiveTransformationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     ~QmitkInteractiveTransformationWidget();
 
     /** Sets the geometry which will be modified by this widget. Default values may be
      *  provided by the second variable. These values will be applied to the geometry
      *  in the beginning and the UI will also hold these values.
      */
-    void SetGeometry(mitk::BaseGeometry::Pointer geometry, mitk::BaseGeometry::Pointer defaultValues = NULL);
+    void SetGeometry(mitk::BaseGeometry::Pointer geometry, mitk::BaseGeometry::Pointer defaultValues = nullptr);
 
     mitk::BaseGeometry::Pointer GetGeometry();
 

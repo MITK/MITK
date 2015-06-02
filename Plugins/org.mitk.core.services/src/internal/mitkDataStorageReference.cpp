@@ -48,7 +48,7 @@ void DataStorageReference::SetLabel(const QString& label)
 bool DataStorageReference::operator==(const berry::Object* o) const
 {
   const DataStorageReference* other = dynamic_cast<const DataStorageReference*>(o);
-  if (other == 0) return false;
+  if (other == nullptr) return false;
   return (m_DataStorage == other->m_DataStorage);
 }
 

@@ -15,17 +15,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkFileExitAction.h"
+#include "internal/org_mitk_gui_qt_application_Activator.h"
 
 #include <berryPlatformUI.h>
 
 QmitkFileExitAction::QmitkFileExitAction(berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+  : QAction(nullptr)
+  , m_Window(nullptr)
 {
-  m_Window = window.GetPointer();
+  this->init(window.GetPointer());
+}
 
-  this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
+QmitkFileExitAction::QmitkFileExitAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
+  : QAction(nullptr)
+  , m_Window(nullptr)
+{
+  this->setIcon(icon);
+  this->init(window.GetPointer());
+}
+
+QmitkFileExitAction::QmitkFileExitAction(berry::IWorkbenchWindow* window)
+  : QAction(nullptr)
+  , m_Window(nullptr)
+{
+  this->init(window);
+}
+
+QmitkFileExitAction::QmitkFileExitAction(const QIcon& icon, berry::IWorkbenchWindow* window)
+  : QAction(nullptr)
+  , m_Window(nullptr)
+{
+  this->setIcon(icon);
+  this->init(window);
+}
+
+void QmitkFileExitAction::init(berry::IWorkbenchWindow* window)
+{
+  m_Window = window;
   this->setText("&Exit");
-
+  this->setToolTip("Exit the application. Please save your data before exiting.");
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
 

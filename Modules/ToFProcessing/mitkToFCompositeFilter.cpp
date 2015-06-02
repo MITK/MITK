@@ -20,9 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 
-mitk::ToFCompositeFilter::ToFCompositeFilter() : m_SegmentationMask(NULL), m_ImageWidth(0), m_ImageHeight(0), m_ImageSize(0),
-m_IplDistanceImage(NULL), m_IplOutputImage(NULL), m_ItkInputImage(NULL), m_ApplyTemporalMedianFilter(false), m_ApplyAverageFilter(false),
-  m_ApplyMedianFilter(false), m_ApplyThresholdFilter(false), m_ApplyMaskSegmentation(false), m_ApplyBilateralFilter(false), m_DataBuffer(NULL),
+mitk::ToFCompositeFilter::ToFCompositeFilter() : m_SegmentationMask(nullptr), m_ImageWidth(0), m_ImageHeight(0), m_ImageSize(0),
+m_IplDistanceImage(nullptr), m_IplOutputImage(nullptr), m_ItkInputImage(nullptr), m_ApplyTemporalMedianFilter(false), m_ApplyAverageFilter(false),
+  m_ApplyMedianFilter(false), m_ApplyThresholdFilter(false), m_ApplyMaskSegmentation(false), m_ApplyBilateralFilter(false), m_DataBuffer(nullptr),
 m_DataBufferCurrentIndex(0), m_DataBufferMaxSize(0), m_TemporalMedianFilterNumOfFrames(10), m_ThresholdFilterMin(1),
 m_ThresholdFilterMax(7000), m_BilateralFilterDomainSigma(2), m_BilateralFilterRangeSigma(60), m_BilateralFilterKernelRadius(0)
 {
@@ -32,7 +32,7 @@ mitk::ToFCompositeFilter::~ToFCompositeFilter()
 {
   cvReleaseImage(&(this->m_IplDistanceImage));
   cvReleaseImage(&(this->m_IplOutputImage));
-  if (m_DataBuffer!=NULL)
+  if (m_DataBuffer!=nullptr)
   {
     delete [] m_DataBuffer;
   }
@@ -45,7 +45,7 @@ void mitk::ToFCompositeFilter::SetInput(  mitk::Image* distanceImage )
 
 void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanceImage )
 {
-  if ((distanceImage == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
   {
     this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
   }
@@ -59,7 +59,7 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
         this->m_ImageHeight = distanceImage->GetDimension(1);
         this->m_ImageSize = this->m_ImageWidth * this->m_ImageHeight * sizeof(float);
 
-        if (this->m_IplDistanceImage != NULL)
+        if (this->m_IplDistanceImage != nullptr)
         {
           cvReleaseImage(&(this->m_IplDistanceImage));
         }
@@ -68,7 +68,7 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
         this->m_IplDistanceImage = cvCreateImage(cvSize(this->m_ImageWidth, this->m_ImageHeight), IPL_DEPTH_32F, 1);
         memcpy(this->m_IplDistanceImage->imageData, (void*)distanceFloatData, this->m_ImageSize);
 
-        if (this->m_IplOutputImage != NULL)
+        if (this->m_IplOutputImage != nullptr)
         {
           cvReleaseImage(&(this->m_IplOutputImage));
         }
@@ -91,7 +91,7 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
  mitk::Image* mitk::ToFCompositeFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL; //TODO: geeignete exception werfen
+    return nullptr; //TODO: geeignete exception werfen
   return static_cast< mitk::Image*>(this->ProcessObject::GetInput(idx));
 }
 
@@ -150,7 +150,7 @@ void mitk::ToFCompositeFilter::CreateOutputsForAllInputs()
 {
   this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);
@@ -182,7 +182,7 @@ void mitk::ToFCompositeFilter::ProcessSegmentation(IplImage* inputIplImage)
   }
   else
   {
-    segmentationMask = NULL;
+    segmentationMask = nullptr;
   }
   float *f = (float*)inputIplImage->imageData;
   for(int i=0; i<this->m_ImageWidth*this->m_ImageHeight; i++)
@@ -255,7 +255,7 @@ void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplIm
     for( int i=0; i<this->m_DataBufferMaxSize; i++ ) {
       delete[] this->m_DataBuffer[i];
     }
-    if (this->m_DataBuffer != NULL)
+    if (this->m_DataBuffer != nullptr)
     {
       delete[] this->m_DataBuffer;
     }
@@ -266,7 +266,7 @@ void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplIm
     this->m_DataBuffer = new float*[this->m_DataBufferMaxSize];
     for(int i=0; i<this->m_DataBufferMaxSize; i++)
     {
-      this->m_DataBuffer[i] = NULL;
+      this->m_DataBuffer[i] = nullptr;
     }
     this->m_DataBufferCurrentIndex = 0;
   }
@@ -275,7 +275,7 @@ void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplIm
   tmpArray = new float[this->m_DataBufferMaxSize];
 
   // copy data to buffer
-  if (this->m_DataBuffer[this->m_DataBufferCurrentIndex] == NULL)
+  if (this->m_DataBuffer[this->m_DataBufferCurrentIndex] == nullptr)
   {
     this->m_DataBuffer[this->m_DataBufferCurrentIndex] = new float[imageSize];
     currentBufferSize = this->m_DataBufferCurrentIndex + 1;

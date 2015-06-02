@@ -61,7 +61,7 @@ public:
   void InitTransferFunctionMode();
 
 protected:
-  TransferFunctionInitializer(TransferFunction::Pointer transferFunction = NULL);
+  TransferFunctionInitializer(TransferFunction::Pointer transferFunction = nullptr);
   virtual ~TransferFunctionInitializer();
 
 private:

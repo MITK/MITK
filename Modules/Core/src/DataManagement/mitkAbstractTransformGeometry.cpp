@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAbstractTransformGeometry.h"
 #include <vtkAbstractTransform.h>
 
-mitk::AbstractTransformGeometry::AbstractTransformGeometry() : Superclass(), m_Plane(NULL), m_FrameGeometry(NULL)
+mitk::AbstractTransformGeometry::AbstractTransformGeometry() : Superclass(), m_Plane(nullptr), m_FrameGeometry(nullptr)
 {
   Initialize();
   m_ItkVtkAbstractTransform = itk::VtkAbstractTransform<ScalarType>::New();
@@ -206,7 +206,7 @@ void mitk::AbstractTransformGeometry::SetVtkAbstractTransform(vtkAbstractTransfo
 
 void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane)
 {
-  if (aPlane != NULL)
+  if (aPlane != nullptr)
   {
     m_Plane = static_cast<mitk::PlaneGeometry*>(aPlane->Clone().GetPointer());
 
@@ -220,7 +220,7 @@ void mitk::AbstractTransformGeometry::SetPlane(const mitk::PlaneGeometry* aPlane
   {
     if (m_Plane.IsNull())
       return;
-    m_Plane = NULL;
+    m_Plane = nullptr;
   }
   Modified();
 }
@@ -235,7 +235,7 @@ void mitk::AbstractTransformGeometry::CalculateFrameGeometry()
 
 void mitk::AbstractTransformGeometry::SetFrameGeometry(const mitk::BaseGeometry* frameGeometry)
 {
-  if ((frameGeometry != NULL) && (frameGeometry->IsValid()))
+  if ((frameGeometry != nullptr) && (frameGeometry->IsValid()))
   {
     m_FrameGeometry = static_cast<mitk::BaseGeometry*>(frameGeometry->Clone().GetPointer());
     SetIndexToWorldTransform(m_FrameGeometry->GetIndexToWorldTransform());
@@ -243,7 +243,7 @@ void mitk::AbstractTransformGeometry::SetFrameGeometry(const mitk::BaseGeometry*
   }
   else
   {
-    m_FrameGeometry = NULL;
+    m_FrameGeometry = nullptr;
   }
 }
 

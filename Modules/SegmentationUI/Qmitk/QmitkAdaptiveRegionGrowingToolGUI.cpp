@@ -237,11 +237,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       //Now calculation mean of the pixelValues
       unsigned int numberOfValues(0);
-      for (unsigned int i = 0; i < 125; i++)
+      for (auto & pixelValue : pixelValues)
       {
-        if(pixelValues[i] > -10000000)
+        if(pixelValue > -10000000)
         {
-          m_SeedPointValueMean += pixelValues[i];
+          m_SeedPointValueMean += pixelValue;
           numberOfValues++;
         }
       }

@@ -73,7 +73,7 @@ void WorkbenchAdvisor::PostShutdown()
 IAdaptable* WorkbenchAdvisor::GetDefaultPageInput()
 {
   // default: no input
-  return 0;
+  return nullptr;
 }
 
 QString WorkbenchAdvisor::GetMainPreferencePageId()

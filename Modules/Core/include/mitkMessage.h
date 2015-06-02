@@ -377,7 +377,7 @@ class MessageBase
     typedef std::vector<AbstractDelegate* > ListenerList;
 
     virtual ~MessageBase() {
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
+      for (auto iter = m_Listeners.begin();
            iter != m_Listeners.end(); ++iter )
       {
         delete *iter;
@@ -407,7 +407,7 @@ class MessageBase
       AbstractDelegate* msgCmd = delegate.Clone();
 
       m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
+      for (auto iter = m_Listeners.begin();
            iter != m_Listeners.end();
            ++iter )
       {
@@ -429,7 +429,7 @@ class MessageBase
     void RemoveListener( const AbstractDelegate& delegate ) const
     {
       m_Mutex.Lock();
-      for (typename ListenerList::iterator iter = m_Listeners.begin();
+      for (auto iter = m_Listeners.begin();
            iter != m_Listeners.end();
            ++iter )
       {
@@ -638,7 +638,7 @@ public:
       this->m_Mutex.Unlock();
     }
 
-      for (typename ListenerList::iterator iter = listeners.begin();
+      for (auto iter = listeners.begin();
            iter != listeners.end();
            ++iter )
       {
@@ -675,7 +675,7 @@ public:
       this->m_Mutex.Unlock();
     }
 
-    for ( typename ListenerList::iterator iter = listeners.begin();
+    for ( auto iter = listeners.begin();
           iter != listeners.end();
           ++iter )
     {
@@ -711,7 +711,7 @@ public:
       this->m_Mutex.Unlock();
     }
 
-    for ( typename ListenerList::iterator iter = listeners.begin();
+    for ( auto iter = listeners.begin();
           iter != listeners.end();
           ++iter )
     {

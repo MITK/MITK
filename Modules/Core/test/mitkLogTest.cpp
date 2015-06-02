@@ -105,17 +105,17 @@ static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* pInfoStruct)
   {
   /* extract this pointer from Thread Info structure */
   struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == NULL)
+  if (pInfo == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
-  if (pInfo->UserData == NULL)
+  if (pInfo->UserData == nullptr)
   {
     return ITK_THREAD_RETURN_VALUE;
   }
   mitkTestLoggingThread *thisthread = (mitkTestLoggingThread*)pInfo->UserData;
 
-  if (thisthread != NULL)
+  if (thisthread != nullptr)
     thisthread->LogMessages();
 
   return ITK_THREAD_RETURN_VALUE;

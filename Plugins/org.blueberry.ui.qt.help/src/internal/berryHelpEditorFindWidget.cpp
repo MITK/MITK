@@ -32,7 +32,7 @@ HelpEditorFindWidget::HelpEditorFindWidget(QWidget *parent)
   , appPalette(qApp->palette())
 {
   installEventFilter(this);
-  QHBoxLayout *hboxLayout = new QHBoxLayout(this);
+  auto  hboxLayout = new QHBoxLayout(this);
   QString resourcePath = QLatin1String(":/org.blueberry.ui.qt.help");
 
 #ifndef Q_OS_MAC
@@ -155,7 +155,7 @@ bool HelpEditorFindWidget::eventFilter(QObject *object, QEvent *e)
 
 QToolButton* HelpEditorFindWidget::setupToolButton(const QString &text, const QString &icon)
 {
-  QToolButton *toolButton = new QToolButton(this);
+  auto  toolButton = new QToolButton(this);
 
   toolButton->setText(text);
   toolButton->setAutoRaise(true);

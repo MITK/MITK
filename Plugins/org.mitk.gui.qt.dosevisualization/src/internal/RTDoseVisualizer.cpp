@@ -366,6 +366,10 @@ void RTDoseVisualizer::OnGlobalVisIsoLineToggled(bool showIsoLines)
   {
     mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
     isoDoseNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsoLines);
+
+    //toggle the visibility of the free isolevel sliders
+    this->m_Controls.listFreeValues->setEnabled(showIsoLines);
+
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

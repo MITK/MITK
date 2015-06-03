@@ -184,7 +184,7 @@ void ReadPixel(mitk::PixelType, mitk::Image::Pointer image, itk::Index<3> indexP
   }
 }
 
-void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep)
+void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep, bool computeStatistics)
 {
   this->ClearData();
   m_ParametricPath->Initialize();
@@ -227,6 +227,11 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep)
   {
     m_Frequency.push_back(it.GetMeasurementVector()[0]);
     m_Measurement.push_back(++i);
+  }
+
+  if ( computeStatistics )
+  {
+    mitk::ComputeIntensityProfileStatistics( intensityProfile, m_Statistics );
   }
 
   m_IntensityProfile = true;

@@ -18,9 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLimitedLinearUndo.h"
 #include <mitkRenderingManager.h>
 
+// Without it does not compile.
+unsigned int mitk::LimitedLinearUndo::m_dequeSize;
+
 mitk::LimitedLinearUndo::LimitedLinearUndo()
 {
-  // nothing to do
+  m_dequeSize = MAX_DEQUE_SIZE;
 }
 
 mitk::LimitedLinearUndo::~LimitedLinearUndo()
@@ -28,6 +31,16 @@ mitk::LimitedLinearUndo::~LimitedLinearUndo()
   //delete undo and redo list
   this->ClearList(&m_UndoList);
   this->ClearList(&m_RedoList);
+}
+
+void mitk::LimitedLinearUndo::setDequeSize(unsigned int size)
+{
+  m_dequeSize = size;
+}
+
+unsigned int mitk::LimitedLinearUndo::getDequeSize()
+{
+  return m_dequeSize;
 }
 
 void mitk::LimitedLinearUndo::ClearList(UndoContainer* list)
@@ -50,6 +63,12 @@ bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem* stackItem)
   {
     this->ClearList(&m_RedoList);
     InvokeEvent( RedoEmptyEvent() );
+  }
+
+  if ((m_UndoList.size() + 1) > m_dequeSize)
+  {
+    delete m_UndoList.front();
+    m_UndoList.pop_front();
   }
 
   m_UndoList.push_back(operationEvent);
@@ -130,7 +149,14 @@ bool mitk::LimitedLinearUndo::Redo(int oeid)
   {
     m_RedoList.back()->ReverseAndExecute();
 
+    if ((m_UndoList.size() + 1) > m_dequeSize)
+    {
+      delete m_UndoList.front();
+      m_UndoList.pop_front();
+    }
+
     m_UndoList.push_back(m_RedoList.back());
+
     m_RedoList.pop_back();
     InvokeEvent( UndoNotEmptyEvent() );
 

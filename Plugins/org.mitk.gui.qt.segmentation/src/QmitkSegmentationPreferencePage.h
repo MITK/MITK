@@ -26,6 +26,7 @@ class QWidget;
 class QCheckBox;
 class QRadioButton;
 class QDoubleSpinBox;
+class QSpinBox;
 
 class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -75,6 +76,7 @@ protected:
   QDoubleSpinBox* m_DecimationSpinBox;
   QDoubleSpinBox* m_ClosingSpinBox;
   QCheckBox* m_SelectionModeCheckBox;
+  QSpinBox* m_dequeMaxSize;
 
   bool m_Initializing;
 

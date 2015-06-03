@@ -24,12 +24,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUndoModel.h"
 // STL header
 #include <vector>
+#include <deque>
 // ITK header
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
 #pragma GCC visibility pop
 
 namespace mitk {
+
+const unsigned int MIN_DEQUE_SIZE = 10;
+const unsigned int MAX_DEQUE_SIZE = 30;
 
 //##Documentation
 //## @brief A linear undo model with one undo and one redo stack.
@@ -39,8 +43,11 @@ namespace mitk {
 class MITKCORE_EXPORT LimitedLinearUndo : public UndoModel
 {
 public:
-  typedef std::vector<UndoStackItem*> UndoContainer;
-  typedef std::vector<UndoStackItem*>::reverse_iterator UndoContainerRevIter;
+  typedef std::deque<UndoStackItem*> UndoContainer;
+  typedef std::deque<UndoStackItem*>::reverse_iterator UndoContainerRevIter;
+
+  static void setDequeSize(unsigned int size);
+  static unsigned int getDequeSize();
 
   mitkClassMacro(LimitedLinearUndo, UndoModel);
   itkFactorylessNewMacro(Self)
@@ -122,6 +129,8 @@ protected:
 
 private:
   int FirstObjectEventIdOfCurrentGroup(UndoContainer& stack);
+
+  static unsigned int m_dequeSize;
 
 };
 

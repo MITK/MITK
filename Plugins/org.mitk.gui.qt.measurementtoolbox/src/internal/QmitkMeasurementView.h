@@ -60,7 +60,6 @@ class QmitkMeasurementView : public QmitkAbstractView
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
   protected slots:
     ///# draw actions
-    void ActionDrawCommentTriggered(bool checked = false);
     void ActionDrawLineTriggered( bool checked = false );
     void ActionDrawPathTriggered( bool checked = false );
     void ActionDrawAngleTriggered( bool checked = false );

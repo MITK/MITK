@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarAngle.h>
 #include <mitkPlanarRectangle.h>
-#include <mitkPlanarComment.h>
 #include <mitkPlanarLine.h>
 #include <mitkPlanarCross.h>
 #include <mitkPlanarFourPointAngle.h>
@@ -653,22 +652,6 @@ void QmitkMeasurementView::ActionDrawLineTriggered(bool checked)
   this->AddFigureToDataStorage(figure, qString);
 
   MEASUREMENT_DEBUG << "PlanarLine initialized...";
-}
-
-void QmitkMeasurementView::ActionDrawCommentTriggered(bool checked)
-{
-  Q_UNUSED(checked)
-
-  m_commentTextView.show();
-
-  mitk::PlanarComment::Pointer figure = mitk::PlanarComment::New();
-  QString qString = QString("Comment%1").arg(++d->m_CommentCounter);
-  this->AddFigureToDataStorage(figure, qString);
-
-  std::string comment = m_commentTextView.getText().toStdString();
-  figure->setText(comment);
-
-  MEASUREMENT_DEBUG << "PlanarComment initialized...";
 }
 
 void QmitkMeasurementView::ActionDrawPathTriggered(bool checked)

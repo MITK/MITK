@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatProject.h>
 
 QmitkXnatProjectInfoWidget::QmitkXnatProjectInfoWidget(ctkXnatProject* project, QWidget* parent)
-  : m_Project(project)
-  , QWidget(parent)
+  : QWidget(parent)
+  , m_Project(project)
 {
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(this);

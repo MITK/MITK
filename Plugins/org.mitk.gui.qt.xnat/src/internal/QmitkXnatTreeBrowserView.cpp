@@ -52,10 +52,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
+m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
 m_TreeModel(new ctkXnatTreeModel()),
 m_Tracker(0),
-m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", "")),
-m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext())
+m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", ""))
 {
   m_DataStorageServiceTracker.open();
 

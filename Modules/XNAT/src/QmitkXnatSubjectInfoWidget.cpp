@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 
 QmitkXnatSubjectInfoWidget::QmitkXnatSubjectInfoWidget(ctkXnatSubject* subject, QWidget* parent)
-  : m_Subject(subject)
-  , QWidget(parent)
+  : QWidget(parent)
+  , m_Subject(subject)
 {
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(this);

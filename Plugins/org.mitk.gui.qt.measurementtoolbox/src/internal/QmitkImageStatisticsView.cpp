@@ -161,7 +161,18 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
 
     if (histogram.IsNotNull())
     {
-      this->m_Controls->m_JSHistogram->ComputeHistogram(histogram.GetPointer());
+      bool closedFigure = this->m_CalculationThread->GetStatisticsUpdateSuccessFlag();
+
+      if ( closedFigure )
+      {
+        this->m_Controls->m_JSHistogram->ComputeHistogram(histogram.GetPointer());
+      }
+      //this->m_Controls->m_JSHistogram->ComputeHistogram(histogram.GetPointer());
+      /*else
+      {
+        m_Controls->m_JSHistogram->ComputeIntensityProfile(timestep, true);
+      }*/
+
 //      this->m_Controls->m_JSHistogram->SignalGraphChanged();
 
       // hacky way to make sure the protected SignalGraphChanged() is called
@@ -757,6 +768,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_Controls->m_JSHistogram->SetImage(this->m_CalculationThread->GetStatisticsImage());
       m_Controls->m_JSHistogram->SetPlanarFigure(m_SelectedPlanarFigure);
       m_Controls->m_JSHistogram->ComputeIntensityProfile(timeStep, true);
+      //m_Controls->m_JSHistogram->ComputeIntensityProfile(timeStep);
       m_Controls->m_lineRadioButton->setEnabled(false);
       m_Controls->m_barRadioButton->setEnabled(false);
       m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
@@ -960,10 +972,11 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
   /*this->m_Controls->m_StatisticsTable->setItem( 1, 0, new QTableWidgetItem(
     QString("%1").arg(stats.GetSigma(), 0, 'f', decimals) ) );*/
 
-  /*this->m_Controls->m_StatisticsTable->setItem( 2, t, new QTableWidgetItem(
-    QString("%1").arg(s[t].GetRMS(), 0, 'f', decimals) ) );*/
+  double rms = stats.GetRMS();
+  this->m_Controls->m_StatisticsTable->setItem( 2, 0, new QTableWidgetItem(
+    QString("%1").arg( rms, 0, 'f', decimals) ) );
 
-  this->m_Controls->m_StatisticsTable->setItem( 2, 0, new QTableWidgetItem( "NA" ) );
+  //this->m_Controls->m_StatisticsTable->setItem( 2, 0, new QTableWidgetItem( "NA" ) );
 
   QString max; max.append(QString("%1").arg(stats.GetMax(), 0, 'f', decimals));
   /*max += " (";
@@ -1021,11 +1034,11 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
   this->m_Controls->m_StatisticsTable->setMinimumHeight(height);
 
   // make sure the current timestep's column is highlighted (and the correct histogram is displayed)
-  unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->
+  /*unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->
     GetPos();
   mitk::SliceNavigationController::GeometryTimeEvent timeEvent(this->m_SelectedImage->GetTimeGeometry(),
     t);
-  this->OnTimeChanged(timeEvent);
+  this->OnTimeChanged(timeEvent);*/
 
   //t = std::min(image->GetTimeSteps() - 1, t);
   }

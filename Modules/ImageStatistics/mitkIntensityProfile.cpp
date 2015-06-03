@@ -351,11 +351,15 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensity
   StatsVecType::size_type numSamples = statsVec.size();
 
   double mean = 0.0;
+  double rms = 0.0;
   for ( StatsVecType::const_iterator it = statsVec.begin(); it != statsVec.end(); ++it )
   {
-    mean += *it;
+    double val = *it;
+    mean += val;
+    rms += val*val;
   }
   mean /= numSamples;
+  rms /= numSamples;
 
   double var = 0.0;
   for ( StatsVecType::const_iterator it = statsVec.begin(); it != statsVec.end(); ++it )
@@ -366,11 +370,12 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensity
   var /= ( numSamples - 1 );
 
   double stdDev = sqrt( var );
+  rms = sqrt( rms );
 
   stats.SetMin( static_cast<double>( min ) );
   stats.SetMax( static_cast<double>( max ) );
   stats.SetN( numSamples );
   stats.SetMean( mean );
   stats.SetVariance( var );
-
+  stats.SetRMS( rms );
 }

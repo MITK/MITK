@@ -33,7 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarAngle.h>
 #include <mitkPlanarRectangle.h>
-#include <mitkPlanarComment.h>
 #include <mitkPlanarLine.h>
 #include <mitkPlanarCross.h>
 #include <mitkPlanarFourPointAngle.h>

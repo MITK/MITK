@@ -62,13 +62,6 @@
           </property>
         </widget>
       </item>
-      <item row="4" column="0">
-        <widget class="QLabel" name="nameLabel">
-          <property name="text">
-            <string>Name:</string>
-          </property>
-        </widget>
-      </item>
       <item row="2" column="0" colspan="2">
         <widget class="QLabel" name="breadcrumbLabel">
           <property name="font">
@@ -97,13 +90,6 @@
       </item>
       <item row="3" column="1">
         <widget class="QLineEdit" name="labelLineEdit">
-          <property name="readOnly">
-            <bool>true</bool>
-          </property>
-        </widget>
-      </item>
-      <item row="4" column="1">
-        <widget class="QLineEdit" name="nameLineEdit">
           <property name="readOnly">
             <bool>true</bool>
           </property>

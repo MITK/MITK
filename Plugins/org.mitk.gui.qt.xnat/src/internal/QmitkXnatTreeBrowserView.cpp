@@ -343,6 +343,14 @@ void QmitkXnatTreeBrowserView::NodeTableViewContextMenuRequested(const QPoint & 
       connect(actCreateSubject, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewSubject()));
       m_NodeMenu->popup(QCursor::pos());
     }
+    ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(variant.value<ctkXnatObject*>());
+    if (subject != NULL)
+    {
+      QAction* actCreateExperiment = new QAction("Create new experiment", m_NodeMenu);
+      m_NodeMenu->addAction(actCreateExperiment);
+      connect(actCreateExperiment, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewExperiment()));
+      m_NodeMenu->popup(QCursor::pos());
+    }
   }
 }
 
@@ -475,9 +483,19 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
     QmitkXnatCreateObjectDialog* dialog = new QmitkXnatCreateObjectDialog(QmitkXnatCreateObjectDialog::SpecificType::SUBJECT);
     if (dialog->exec() == QDialog::Accepted)
     {
+      ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(variant.value<ctkXnatObject*>());
       ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(dialog->GetXnatObject());
-      subject->setParent(dynamic_cast<ctkXnatProject*>(variant.value<ctkXnatObject*>()));
+      subject->setParent(project);
+      subject->setId(subject->label());
       subject->save();
+
+      // Get xnat session from micro service
+      ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+
+      // Update View
+      m_TreeModel->removeDataModel(session->dataModel());
+      UpdateSession(session);
     }
   }
 }
@@ -491,9 +509,21 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
     QmitkXnatCreateObjectDialog* dialog = new QmitkXnatCreateObjectDialog(QmitkXnatCreateObjectDialog::SpecificType::EXPERIMENT);
     if (dialog->exec() == QDialog::Accepted)
     {
+      ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(variant.value<ctkXnatObject*>());
       ctkXnatExperiment* experiment = dynamic_cast<ctkXnatExperiment*>(dialog->GetXnatObject());
-      experiment->setParent(dynamic_cast<ctkXnatSubject*>(variant.value<ctkXnatObject*>()));
+      experiment->setParent(subject);
+      experiment->setId(experiment->label());
+      experiment->setProperty("project", QString(subject->parent()->property("ID")));
+      experiment->setProperty("xsiType", QString("xnat:crSessionData"));
       experiment->save();
+
+      // Get xnat session from micro service
+      ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+
+      // Update View
+      m_TreeModel->removeDataModel(session->dataModel());
+      UpdateSession(session);
     }
   }
 }

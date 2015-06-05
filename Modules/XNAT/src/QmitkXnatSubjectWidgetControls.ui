@@ -17,6 +17,13 @@
       <string>Qmitk Template</string>
     </property>
     <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="1">
+        <widget class="QLineEdit" name="labelLineEdit">
+          <property name="readOnly">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
       <item row="5" column="0">
         <widget class="QLabel" name="genderLabel">
           <property name="text">
@@ -129,13 +136,6 @@
         <widget class="QLabel" name="mandatoryLabel">
           <property name="text">
             <string>* mandatory field</string>
-          </property>
-        </widget>
-      </item>
-      <item row="3" column="1">
-        <widget class="QLineEdit" name="labelLineEdit">
-          <property name="readOnly">
-            <bool>true</bool>
           </property>
         </widget>
       </item>

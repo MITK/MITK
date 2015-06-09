@@ -620,8 +620,8 @@ function(mitk_create_module)
     endif()
     if(DEPENDS OR MODULE_PACKAGE_DEPENDS)
       mitk_use_modules(TARGET ${MODULE_TARGET}
-                       MODULES ${DEPENDS}
-                       PACKAGES ${MODULE_PACKAGE_DEPENDS}
+                       MODULES INTERFACE ${DEPENDS}
+                       PACKAGES INTERFACE ${MODULE_PACKAGE_DEPENDS}
                       )
     endif()
 

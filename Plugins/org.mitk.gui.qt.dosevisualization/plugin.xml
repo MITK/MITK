@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.gui.qt.dosevisualization"
+          name="RT Dose Visualization"
+          class="RTDoseVisualizer"
+          icon="resources/iso.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.prefpage.main" name="Radiotherapy" class="RTUIPreferencePage"></page>
+    <page id="org.mitk.prefpage.dose" name="Dose Visualization" class="DoseVisualizationPreferencePage" category="org.mitk.prefpage.main"></page>
+  </extension>
+</plugin>

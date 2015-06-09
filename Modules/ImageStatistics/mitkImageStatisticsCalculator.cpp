@@ -473,7 +473,7 @@ namespace mitk
     return m_HotspotRadiusInMM;
   }
 
-  void ImageStatisticsCalculator::SetHistogramBinSize(unsigned int size)
+  void ImageStatisticsCalculator::SetHistogramBinSize( double size)
   {
     this->m_HistogramBinSize = size;
   }
@@ -1386,16 +1386,16 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     {
       diff = 1;
     }
-  }
-  unsigned int numberOfBins = 200; // default number of bins
-  if (m_UseDefaultBinSize)
-  {
-    m_HistogramBinSize = std::ceil( static_cast<double>((statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1)/numberOfBins) );
-  }
-  else
-  {
-    numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
-  }
+  //}
+//     unsigned int numberOfBins = 200; // default number of bins
+//     if (m_UseDefaultBinSize)
+//     {
+//       m_HistogramBinSize = std::ceil( static_cast<double>((statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1)/numberOfBins) );
+//     }
+//     else
+//     {
+//       numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
+//     }
 
     typename  LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( adaptedImage );

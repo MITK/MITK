@@ -19,6 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkExtendedLabelStatisticsImageFilter.h"
 
 #include "itkImageRegionConstIteratorWithIndex.h"
+#include "itkImageRegionConstIterator.h"
+
+#include "mitkNumericConstants.h"
+#include "mitkLogMacros.h"
 
 namespace itk
 {
@@ -96,8 +100,8 @@ namespace itk
     if ( maskNonEmpty )
     {
       typename std::list< LabelPixelType >::const_iterator it;
-      for ( it = relevantLabels.begin();
-        it != relevantLabels.end();
+      for ( it = relevantLabels.cbegin();
+        it != relevantLabels.cend();
         ++it )
       {
         RealType sigma = GetSigma( *it );
@@ -105,9 +109,14 @@ namespace itk
         Subregion = Superclass::GetRegion(*it);
 
         int count( GetCount(*it) );
-        if ( count == 0 || sigma==0)
+        if ( count == 0 )
         {
           throw std::logic_error( "Empty segmentation" );
+        }
+
+        if ( fabs( sigma ) < typename mitk::sqrteps )
+        {
+          throw std::logic_error( "Sigma == 0" );
         }
 
 
@@ -140,7 +149,15 @@ namespace itk
 
     Superclass::AfterThreadedGenerateData();
 
-    ComputeSkewnessAndKurtosis();
+    try
+    {
+      ComputeSkewnessAndKurtosis();
+    }
+    catch ( const std::exception& e )
+    {
+      MITK_ERROR << "Caught an exception during calculation of skewness and kurtosis: " << e.what();
+    }
+
   }
 
 } // end namespace itk

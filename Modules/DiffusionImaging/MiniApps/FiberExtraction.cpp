@@ -14,32 +14,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-#include <mitkBaseDataIOFactory.h>
 #include <metaCommand.h>
-#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.h"
 #include <usAny.h>
 #include <mitkIOUtil.h>
 #include <boost/lexical_cast.hpp>
 #include <mitkCoreObjectFactory.h>
 #include <mitkPlanarFigure.h>
 #include <mitkPlanarFigureComposite.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
+#include <mitkStandaloneDataStorage.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-int FiberExtraction(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    std::cout << "FiberExtraction";
     mitkCommandLineParser parser;
 
     parser.setTitle("Fiber Extraction");
     parser.setCategory("Fiber Tracking and Processing Methods");
     parser.setContributor("MBI");
-    parser.setDescription("");
+    parser.setDescription(" ");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);
@@ -71,47 +69,50 @@ int FiberExtraction(int argc, char* argv[])
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
 
         // load fiber bundle
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(inFib)->GetData());
-        mitk::FiberBundleX::Pointer result;
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(inFib)->GetData());
+        mitk::FiberBundle::Pointer result;
 
-        mitk::BaseData::Pointer input1 = mitk::IOUtil::LoadDataNode(pf1_path)->GetData();
-        mitk::PlanarFigure::Pointer pf1 = dynamic_cast<mitk::PlanarFigure*>(input1.GetPointer());
+        mitk::StandaloneDataStorage::Pointer storage = mitk::StandaloneDataStorage::New();
+        mitk::DataNode::Pointer input1 = mitk::IOUtil::LoadDataNode(pf1_path);
 
-        if (pf1.IsNotNull())
+        if (input1.IsNotNull())
         {
-            mitk::BaseData::Pointer input2;
-            mitk::PlanarFigure::Pointer pf2;
+            mitk::PlanarFigureComposite::Pointer pfc = mitk::PlanarFigureComposite::New();
+            mitk::DataNode::Pointer pfcNode = mitk::DataNode::New();
+            pfcNode->SetData(pfc);
+            mitk::DataStorage::SetOfObjects::Pointer set1 = mitk::DataStorage::SetOfObjects::New();
+            set1->push_back(pfcNode);
+            storage->Add(pfcNode);
+
+            mitk::DataNode::Pointer input2;
             if (!pf2_path.empty())
             {
-                input2 = mitk::IOUtil::LoadDataNode(pf2_path)->GetData();
-                pf2 = dynamic_cast<mitk::PlanarFigure*>(input2.GetPointer());
+                input2 = mitk::IOUtil::LoadDataNode(pf2_path);
             }
-
-            mitk::PlanarFigureComposite::Pointer pfc = mitk::PlanarFigureComposite::New();
 
             if (operation.empty())
             {
-                result = inputTractogram->ExtractFiberSubset(input1);
+                result = inputTractogram->ExtractFiberSubset(input1, NULL);
             }
             else if (operation=="NOT")
             {
-                pfc->setOperationType(mitk::PFCOMPOSITION_NOT_OPERATION);
-                pfc->addPlanarFigure(input1);
-                result = inputTractogram->ExtractFiberSubset(pfc);
+                pfc->setOperationType(mitk::PlanarFigureComposite::NOT);
+                storage->Add(input1, set1);
+                result = inputTractogram->ExtractFiberSubset(pfcNode, storage);
             }
-            else if (operation=="AND" && pf2.IsNotNull())
+            else if (operation=="AND" && input2.IsNotNull())
             {
-                pfc->setOperationType(mitk::PFCOMPOSITION_AND_OPERATION);
-                pfc->addPlanarFigure(input1);
-                pfc->addPlanarFigure(input2);
-                result = inputTractogram->ExtractFiberSubset(pfc);
+                pfc->setOperationType(mitk::PlanarFigureComposite::AND);
+                storage->Add(input1, set1);
+                storage->Add(input2, set1);
+                result = inputTractogram->ExtractFiberSubset(pfcNode, storage);
             }
-            else if (operation=="OR" && pf2.IsNotNull())
+            else if (operation=="OR" && input2.IsNotNull())
             {
-                pfc->setOperationType(mitk::PFCOMPOSITION_OR_OPERATION);
-                pfc->addPlanarFigure(input1);
-                pfc->addPlanarFigure(input2);
-                result = inputTractogram->ExtractFiberSubset(pfc);
+                pfc->setOperationType(mitk::PlanarFigureComposite::OR);
+                storage->Add(input1, set1);
+                storage->Add(input2, set1);
+                result = inputTractogram->ExtractFiberSubset(pfcNode, storage);
             }
             else
             {
@@ -155,4 +156,3 @@ int FiberExtraction(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(FiberExtraction);

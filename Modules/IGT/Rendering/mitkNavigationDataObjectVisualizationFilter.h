@@ -31,7 +31,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataObjectVisualizationFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataObjectVisualizationFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataObjectVisualizationFilter, NavigationDataToNavigationDataFilter);
@@ -124,7 +124,7 @@ namespace mitk {
     /*
     * \brief Transfer the information from the input to the associated BaseData
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
 
   protected:

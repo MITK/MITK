@@ -31,7 +31,7 @@ namespace mitk
   * This offers users the oppertunity to generate new MESA SR4000 Devices via a global instance of this factory.
   * @ingroup ToFHardware
   */
-  class MITK_MESASR4000MODULE_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
+  class MITKMESASR4000_EXPORT ToFCameraMESASR4000DeviceFactory : public itk::LightObject, public AbstractToFDeviceFactory {
 
   public:
     /**

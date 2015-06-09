@@ -41,7 +41,7 @@ itk::Object::Pointer QmitkScaleSkewVersor3DTransformView::GetTransform()
     AccessFixedDimensionByItk(m_FixedImage, GetTransform2, 3);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 template < class TPixelType, unsigned int VImageDimension >
@@ -88,7 +88,7 @@ itk::Object::Pointer QmitkScaleSkewVersor3DTransformView::GetTransform2(itk::Ima
     m_TransformObject = transformPointer.GetPointer();
     return transformPointer.GetPointer();
   }
-  return NULL;
+  return nullptr;
 }
 
 itk::Array<double> QmitkScaleSkewVersor3DTransformView::GetTransformParameters()

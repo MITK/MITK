@@ -28,9 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkImageCast.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkImage.h>
-#include <mitkDiffusionImage.h>
 #include <mitkImageToItk.h>
 #include <mitkTensorImage.h>
 
@@ -275,7 +274,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
         else
             maxSpacing = outImageSpacing[2];
 
-        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
         // directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
@@ -330,7 +329,7 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
         else
             maxSpacing = outImageSpacing[2];
 
-        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
         //directions->SetGeometry(geom);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
@@ -459,7 +458,7 @@ void QmitkOdfMaximaExtractionView::StartTensor()
         else
             minSpacing = outImageSpacing[2];
 
-        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
         // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
@@ -583,7 +582,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
         else
             minSpacing = outImageSpacing[2];
 
-        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
         // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);
@@ -722,7 +721,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
         else
             minSpacing = outImageSpacing[2];
 
-        mitk::FiberBundleX::Pointer directions = filter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
         // directions->SetGeometry(geometry);
         DataNode::Pointer node = DataNode::New();
         node->SetData(directions);

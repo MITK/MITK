@@ -1,9 +1,8 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS Algorithms DataManagement Interactions IO Rendering
-  DEPENDS MitkLegacyIO MitkSceneSerializationBase
+  INCLUDE_DIRS PRIVATE src/Algorithms src/DataManagement src/Interactions src/IO src/Rendering
+  DEPENDS MitkSceneSerializationBase MitkLegacyGL MitkOverlays
   WARNINGS_AS_ERRORS
 )
 
-IF( BUILD_TESTING )
-add_subdirectory(Testing)
-ENDIF()
+add_subdirectory(test)
+

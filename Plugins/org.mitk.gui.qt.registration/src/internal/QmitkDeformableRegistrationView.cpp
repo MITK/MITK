@@ -143,12 +143,12 @@ struct SelListenerDeformableRegistration : ISelectionListener
     }
   }
 
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part, const ISelection::ConstPointer& selection) override
   {
     // check, if selection comes from datamanager
     if (part)
     {
-      QString partname(part->GetPartName().c_str());
+      QString partname = part->GetPartName();
       if(partname.compare("Data Manager")==0)
       {
         // apply selection
@@ -170,12 +170,10 @@ QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject * /*par
 
 QmitkDeformableRegistrationView::~QmitkDeformableRegistrationView()
 {
-  if (m_SelListener.IsNotNull())
+  if (m_SelListener)
   {
     berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-    if(s)
-      s->RemovePostSelectionListener(m_SelListener);
-    m_SelListener = NULL;
+    if(s) s->RemovePostSelectionListener(m_SelListener.data());
   }
 }
 
@@ -308,14 +306,14 @@ void QmitkDeformableRegistrationView::Activated()
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
-  if (m_SelListener.IsNull())
+  if (m_SelListener.isNull())
   {
-    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+    m_SelListener.reset(new SelListenerDeformableRegistration(this));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
     berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-    m_SelListener.Cast<SelListenerDeformableRegistration>()->DoSelectionChanged(sel);
+    static_cast<SelListenerDeformableRegistration*>(m_SelListener.data())->DoSelectionChanged(sel);
   }
   this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
   this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
@@ -354,8 +352,8 @@ void QmitkDeformableRegistrationView::Deactivated()
   m_MovingNode = NULL;
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
-    s->RemovePostSelectionListener(m_SelListener);
-  m_SelListener = NULL;
+    s->RemovePostSelectionListener(m_SelListener.data());
+  m_SelListener.reset();
 }
 
 void QmitkDeformableRegistrationView::Hidden()

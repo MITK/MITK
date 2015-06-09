@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <itkExceptionObject.h>
 #include <itkImageFileWriter.h>
-#include <mitkBaseDataIOFactory.h>
 #include <mitkQBallImage.h>
 #include <itkTensorDerivedMeasurementsFilter.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>
@@ -26,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/algorithm/string.hpp>
 #include <itksys/SystemTools.hxx>
 #include <itkMultiThreader.h>
+#include <mitkIOUtil.h>
 
 /**
  * Calculate indices derived from Qball or tensor images
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
     parser.setTitle("Diffusion Indices");
     parser.setCategory("Diffusion Related Measures");
-    parser.setDescription("");
+    parser.setDescription("Computes requested diffusion related measures");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -59,14 +59,13 @@ int main(int argc, char* argv[])
     try
     {
         // load input image
-        const std::string s1="", s2="";
-        std::vector<mitk::BaseData::Pointer> infile = mitk::BaseDataIO::LoadBaseDataFromFile( inFileName, s1, s2, false );
+        std::vector<mitk::BaseData::Pointer> infile = mitk::IOUtil::Load( inFileName );
 
         if( boost::algorithm::ends_with(inFileName, ".qbi") && index=="gfa" )
         {
             typedef itk::Vector<float, QBALL_ODFSIZE>   OdfVectorType;
             typedef itk::Image<OdfVectorType,3>         ItkQballImageType;
-            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile.at(0).GetPointer());
+            mitk::QBallImage::Pointer mitkQballImage = dynamic_cast<mitk::QBallImage*>(infile[0].GetPointer());
             ItkQballImageType::Pointer itk_qbi = ItkQballImageType::New();
             mitk::CastToItkImage(mitkQballImage, itk_qbi);
 
@@ -85,7 +84,7 @@ int main(int argc, char* argv[])
         else if( boost::algorithm::ends_with(inFileName, ".dti") )
         {
             typedef itk::Image< itk::DiffusionTensor3D<float>, 3 >    ItkTensorImage;
-            mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile.at(0).GetPointer());
+            mitk::TensorImage::Pointer mitkTensorImage = dynamic_cast<mitk::TensorImage*>(infile[0].GetPointer());
             ItkTensorImage::Pointer itk_dti = ItkTensorImage::New();
             mitk::CastToItkImage(mitkTensorImage, itk_dti);
 

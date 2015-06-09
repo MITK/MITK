@@ -37,13 +37,13 @@ namespace mitk {
   * mitk::AbstractOpenCVImageFilter::filterImage() method.
   *
   */
-class MITK_OPENCVVIDEOSUPPORT_EXPORT AbstractOpenCVImageFilter : public itk::Object
+class MITKOPENCVVIDEOSUPPORT_EXPORT AbstractOpenCVImageFilter : public itk::Object
 {
 
 public:
   static int INVALID_IMAGE_ID;
 
-  mitkClassMacro(AbstractOpenCVImageFilter, itk::Object);
+  mitkClassMacroItkParent(AbstractOpenCVImageFilter, itk::Object);
 
   virtual bool FilterImage( cv::Mat& image, int id = INVALID_IMAGE_ID );
 

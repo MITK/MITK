@@ -1,0 +1,21 @@
+/**
+
+\page mitkExtPointsIndex MITK Extension-Point Reference
+
+<center>
+  <h1>MITK Extension Points</h1>
+</center>
+
+The following extension points can be used to extend the capabilities
+of MITK Plugins:
+
+
+<h3>Input Devices</h3>
+<ul>
+<li>\subpage xp_org_mitk_core_ext_inputdevices
+</ul>
+
+\page xp_org_mitk_core_ext_inputdevices org.mitk.core.ext.inputdevices
+\htmlinclude org_mitk_core_ext_inputdevices.html
+
+*/

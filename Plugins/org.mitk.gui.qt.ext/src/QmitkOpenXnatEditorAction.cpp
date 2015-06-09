@@ -24,13 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryFileEditorInput.h>
 
 QmitkOpenXnatEditorAction::QmitkOpenXnatEditorAction(berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+: QAction(nullptr)
 {
   this->init(window);
 }
 
 QmitkOpenXnatEditorAction::QmitkOpenXnatEditorAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+: QAction(nullptr)
 {
   this->setIcon(icon);
 
@@ -44,9 +44,7 @@ void QmitkOpenXnatEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   this->setText("&XNAT");
   this->setToolTip("Open XNAT tool");
 
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
   m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
@@ -58,18 +56,18 @@ void QmitkOpenXnatEditorAction::Run()
   // check if there is an open perspective, if not open the default perspective
   if (m_Window->GetActivePage().IsNull())
   {
-    std::string defaultPerspId = m_Window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
+    QString defaultPerspId = m_Window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
     m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
   }
 
-  std::vector<berry::IEditorReference::Pointer> editors =
-    m_Window->GetActivePage()->FindEditors(berry::IEditorInput::Pointer(0),
+  QList<berry::IEditorReference::Pointer> editors =
+    m_Window->GetActivePage()->FindEditors(berry::IEditorInput::Pointer(nullptr),
     "org.mitk.editors.xnat.browser", berry::IWorkbenchPage::MATCH_ID);
 
   if (editors.empty())
   {
     // no XnatEditor is currently open, create a new one
-    berry::IEditorInput::Pointer editorInput(new berry::FileEditorInput(Poco::Path()));
+    berry::IEditorInput::Pointer editorInput(new berry::FileEditorInput(QString()));
     m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.xnat.browser");
   }
   else

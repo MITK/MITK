@@ -29,7 +29,7 @@ namespace mitk {
   * its orientation and the camera specific information "direction of projection", "view up", "focal length", "view angle"
   *
   * \ingroup IGT
-  */  class MitkIGT_EXPORT CameraVisualization : public NavigationDataToNavigationDataFilter
+  */  class MITKIGT_EXPORT CameraVisualization : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(CameraVisualization, NavigationDataToNavigationDataFilter);
@@ -85,7 +85,7 @@ namespace mitk {
     *  - "CameraVisualization_FocalLength" : mitk::FloatProperty
     *  - "CameraVisualization_ViewAngle" : mitk::FloatProperty
     */
-    virtual void SetParameters(const mitk::PropertyList* p);
+    virtual void SetParameters(const mitk::PropertyList* p) override;
 
     /**Documentation
     *\brief Get all filter parameters as a PropertyList
@@ -99,7 +99,7 @@ namespace mitk {
     * The returned PropertyList must be assigned to a
     * SmartPointer immediately, or else it will get destroyed.
     */
-    mitk::PropertyList::ConstPointer GetParameters() const;
+    mitk::PropertyList::ConstPointer GetParameters() const override;
 
   protected:
     CameraVisualization();
@@ -110,7 +110,7 @@ namespace mitk {
     *
     * positions and orients camera according to the position and orientation hold in the NavigationData
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     mitk::BaseRenderer::Pointer m_Renderer; ///< renderer that visualizes the navigation data-
 

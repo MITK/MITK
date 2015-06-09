@@ -38,7 +38,7 @@ namespace mitk {
   * \ingroup ContourModelFilters
   * \ingroup Process
   */
-  class MitkSegmentation_EXPORT ImageToLiveWireContourFilter : public ContourModelSource
+  class MITKSEGMENTATION_EXPORT ImageToLiveWireContourFilter : public ContourModelSource
   {
 
   public:
@@ -71,9 +71,9 @@ namespace mitk {
 
     virtual ~ImageToLiveWireContourFilter();
 
-    void GenerateData();
+    void GenerateData() override;
 
-    void GenerateOutputInformation() {};
+    void GenerateOutputInformation() override {};
 
     mitk::Point3D m_StartPoint;
     mitk::Point3D m_EndPoint;

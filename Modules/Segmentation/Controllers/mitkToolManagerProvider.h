@@ -44,10 +44,10 @@ namespace mitk
    \note Can only be instantiated by SegmentationModuleActivator. The common way to get the ToolManager is by
    <code> mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); </code>
   */
-  class MitkSegmentation_EXPORT ToolManagerProvider : public itk::LightObject
+  class MITKSEGMENTATION_EXPORT ToolManagerProvider : public itk::LightObject
   {
   public:
-    mitkClassMacro(ToolManagerProvider, itk::LightObject);
+    mitkClassMacroItkParent(ToolManagerProvider, itk::LightObject);
 
     /**
     \brief Returns ToolManager object.

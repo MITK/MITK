@@ -23,22 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include "mitkProgressBar.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkDoubleArray.h"
-#include "vtkCellArray.h"
-#include "vtkCellData.h"
-#include "vtkPolyData.h"
-
-#include "vnl/vnl_matrix.h"
-#include "vnl/vnl_vector.h"
 #include "vnl/vnl_vector_fixed.h"
-#include "vnl/algo/vnl_qr.h"
 
 #include "itkImageBase.h"
-#include "itkImageRegionIteratorWithIndex.h"
-#include "itkNeighborhoodIterator.h"
-
-#include <queue>
 
 #include <Eigen/Dense>
 
@@ -72,7 +59,7 @@ namespace mitk {
 
   $Author: fetzer$
   */
-  class MitkSurfaceInterpolation_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
+  class MITKSURFACEINTERPOLATION_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
   {
 
   public:
@@ -81,8 +68,6 @@ namespace mitk {
 
     typedef itk::Image<double, 3> DistanceImageType;
     typedef DistanceImageType::IndexType IndexType;
-    typedef itk::ImageRegionIteratorWithIndex<DistanceImageType> ImageIterator;
-    typedef itk::NeighborhoodIterator<DistanceImageType> NeighborhoodImageIterator;
 
     typedef std::vector< PointType > NormalList;
     typedef std::vector< PointType > CenterList;
@@ -140,8 +125,8 @@ namespace mitk {
   protected:
     CreateDistanceImageFromSurfaceFilter();
     virtual ~CreateDistanceImageFromSurfaceFilter();
-    virtual void GenerateData();
-    virtual void GenerateOutputInformation();
+    virtual void GenerateData() override;
+    virtual void GenerateOutputInformation() override;
 
 
   private:
@@ -149,7 +134,7 @@ namespace mitk {
     void CreateSolutionMatrixAndFunctionValues();
     double CalculateDistanceValue(PointType p);
 
-    void CreateDistanceImage ();
+    void FillDistanceImage ();
 
     /**
     * \brief This method fills the given variables with the minimum and
@@ -171,7 +156,8 @@ namespace mitk {
                           DistanceImageType::IndexType &maxPointInIndexCoordinates );
 
 
-    void FillImageRegion(DistanceImageType::RegionType reqRegion, DistanceImageType::PixelType pixelValue, DistanceImageType::Pointer image);
+    void PreprocessContourPoints();
+    void CreateEmptyDistanceImage();
 
     //Datastructures for the interpolation
     CenterList m_Centers;
@@ -181,15 +167,16 @@ namespace mitk {
     Eigen::VectorXd m_FunctionValues;
     Eigen::VectorXd m_Weights;
 
-    double m_DistanceImageSpacing;
-
+    DistanceImageType::Pointer m_DistanceImageITK;
     itk::ImageBase<3>::Pointer m_ReferenceImage;
 
+    double m_DistanceImageSpacing;
+    double m_DistanceImageDefaultBufferValue;
     unsigned int m_DistanceImageVolume;
 
     bool m_UseProgressBar;
     unsigned int m_ProgressStepSize;
-};
+  };
 
 }//namespace
 

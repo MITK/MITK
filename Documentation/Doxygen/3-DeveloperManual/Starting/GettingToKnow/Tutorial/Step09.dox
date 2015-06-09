@@ -1,0 +1,80 @@
+/**
+
+\page Step09Page MITK Tutorial - Step 9: A plug-in
+
+MITK uses a very modular concept to maximize reusability and portability. A MITK application based on the BlueBerry
+application framework (for example the MITK Workbench) consists of several bundles (or plug-ins). A bundle can contain
+resources and program logic. It can also contribute so-called Views to the main application, which provide a specific
+user interface for controlling the bundles functions.
+
+The creation of a MITK plug-in is considerably facilitated by using the MITK PluginGenerator as described in \ref NewPluginPage if you want to add a new view to an existing plugin see \ref NewViewPage.
+
+The mentioned tool was used to create a plug-in called org.mitk.example.gui.regiongrowing.
+Let's first take a look at which files the PluginGenerator has created:
+
+\verbatim
+documentation\doxygen\
+  modules.dox......................... Doxygen file for documenting your plug-in
+
+resources\
+  icon.png............................ The icon of your plug-in. GIMP or other programs (including your text editor)
+                                       can be used to change this
+
+src\internal\
+  QmitkRegionGrowingView.cpp.......... The most important file, implementing behaviour
+  QmitkRegionGrowingView.h............ Header file of the functionality
+  QmitkRegionGrowingViewControls.ui... XML file of the Qt Designer, describes buttons, combo boxes, etc. of your controls
+
+CMakeLists.txt \...................... Build system related files for CMake
+files.cmake    /
+manifest_headers.cmake................ Information about your plug-in
+plugin.xml ........................... BlueBerry integration
+\endverbatim
+
+If you are not familiar with Qt development, please look into
+<a href="http://doc.qt.io/qt-5/qtdesigner-manual.html">this Qt company page describing .ui files</a> (no, forget about the please, DO it!)
+
+The C++ files implement a subclass of QmitkAbstractView. In this special case of QmitkRegionGrowing, we added the option to set some seed points and run a region grower. If you are interested in the concrete changes necessary to turn a freshly generated QmitkRegionGrowing into an integrated one:
+
+The plug-in will be build as part of MITK Workbench. Do use it start MITK Workbench an select the region growing view in the view menu.
+
+To add a mitk::PointSet for the seed points:
+QmitkRegionGrowingView.h
+
+Add includes and forward declarations:
+\snippet QmitkRegionGrowingView.h includes
+
+Add the point set and a pointer to a QmitkPointListWidget as a private member:
+\snippet QmitkRegionGrowingView.h members
+
+QmitkRegionGrowingView.cpp
+
+CreateQtPartControl():
+\snippet QmitkRegionGrowingView.cpp cpp-createqtpartcontrol
+
+To use the ITK region grower:
+
+QmitkRegionGrowingView.h
+
+Add the private method:
+\snippet QmitkRegionGrowingView.h itkimageprocessing
+
+QmitkRegionGrowingView.cpp
+
+Add includes:
+\snippet QmitkRegionGrowingView.cpp cpp-includes
+
+DoImageProcessing():
+\snippet QmitkRegionGrowingView.cpp cpp-doimageprocessing
+
+And add the new method:
+\snippet QmitkRegionGrowingView.cpp cpp-itkimageaccess
+
+Have fun using MITK!
+
+If you meet any difficulties during your first steps, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net!
+People there are kind and will try to help you.
+
+ \ref Step08Page "[Previous step]" \ref Step10Page "[Next Step]" \ref TutorialPage "[Main tutorial page]"
+
+*/

@@ -46,20 +46,20 @@ public:
   static ctkPluginContext* GetContext();
   static QmitkCommonActivator* GetInstance();
 
-  berry::IPreferencesService::Pointer GetPreferencesService();
+  berry::IPreferencesService* GetPreferencesService();
 
   /**
    * Sets default StateMachine to EventMapper.
    */
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
 private:
 
   static QmitkCommonActivator* m_Instance;
   static ctkPluginContext* m_Context;
 
-  QmitkViewCoordinator::Pointer m_ViewCoordinator;
+  QScopedPointer<QmitkViewCoordinator> m_ViewCoordinator;
   QScopedPointer<ctkServiceTracker<berry::IPreferencesService*> > m_PrefServiceTracker;
 
 };

@@ -39,7 +39,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_PMDMODULE_EXPORT ToFCameraPMDDevice : public ToFCameraDevice
+  class MITKPMD_EXPORT ToFCameraPMDDevice : public ToFCameraDevice
   {
   public:
 

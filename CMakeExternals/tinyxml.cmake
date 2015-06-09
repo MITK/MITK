@@ -18,24 +18,31 @@ if(NOT DEFINED tinyxml_DIR)
     set(additional_cmake_args -DBUILD_SHARED_LIBS:BOOL=OFF)
   endif()
 
-  set(patch_cmd ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=tinyxml -P ${MITK_SOURCE_DIR}/CMakeExternals/Patchtinyxml-2.6.2.cmake)
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
 
   ExternalProject_Add(${proj}
-     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-     BINARY_DIR ${proj}-build
-     PREFIX ${proj}-cmake
+     LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/tinyxml_2_6_2.tar.gz
      URL_MD5 c1b864c96804a10526540c664ade67f0
-     PATCH_COMMAND ${patch_cmd}
-     INSTALL_COMMAND ""
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/tinyxml-2.6.2.patch
+       COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=tinyxml -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(${proj}_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

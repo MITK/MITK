@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionIOMimeTypes.h"
 
 mitk::ConnectomicsNetworkWriter::ConnectomicsNetworkWriter()
-  : AbstractFileWriter(mitk::ConnectomicsNetwork::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION() )
+  : AbstractFileWriter(mitk::ConnectomicsNetwork::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE() ), mitk::DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_DESCRIPTION() )
 {
   RegisterService();
 }

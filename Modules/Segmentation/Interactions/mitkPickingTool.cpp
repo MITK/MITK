@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-MITK_TOOL_MACRO(MitkSegmentation_EXPORT, PickingTool, "PickingTool");
+MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, PickingTool, "PickingTool");
 }
 
 mitk::PickingTool::PickingTool()

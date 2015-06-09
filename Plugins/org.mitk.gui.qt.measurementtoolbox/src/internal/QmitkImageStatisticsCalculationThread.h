@@ -77,7 +77,7 @@ public:
   bool GetIgnoreZeroValueVoxel();
   /*!
   /brief Set bin size for histogram resolution.*/
-  void SetHistogramBinSize( unsigned int size);
+  void SetHistogramBinSize( double size);
   /*!
   /brief Get bin size for histogram resolution.*/
   unsigned int GetHistogramBinSize();
@@ -92,7 +92,7 @@ public:
   bool GetStatisticsUpdateSuccessFlag();
   /*!
   /brief Method called once the thread is executed. */
-  void run();
+  void run() override;
 
   std::string GetLastErrorMessage();
 
@@ -105,7 +105,7 @@ private:
   std::vector<mitk::ImageStatisticsCalculator::Statistics> m_StatisticsVector; ///< member variable holds the result structs.
   int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
-  unsigned int m_HistogramBinSize;                                ///< member variable holds the bin size for histogram resolution.
+  double m_HistogramBinSize;                                      ///< member variable holds the bin size for histogram resolution.
   bool m_StatisticChanged;                                        ///< flag set if statistics have changed
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
   std::vector<HistogramType::Pointer> m_HistogramVector;          ///< member holds the histograms of all time steps.

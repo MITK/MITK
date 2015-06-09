@@ -30,14 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIInputDeviceDescriptor.h>
 #include <mitkCoreExtConstants.h>
 
+#include "QmitkCommonExtPlugin.h"
+
 
 QmitkInputDevicesPrefPage::QmitkInputDevicesPrefPage()
-: m_MainControl(0)
+: m_MainControl(nullptr)
 {
   // gets the old setting of the preferences and loads them into the preference node
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   this->m_InputDevicesPrefNode = prefService->GetSystemPreferences()->Node(mitk::CoreExtConstants::INPUTDEVICE_PREFERENCES);
 }
 
@@ -48,16 +48,14 @@ void QmitkInputDevicesPrefPage::Init(berry::IWorkbench::Pointer )
 void QmitkInputDevicesPrefPage::CreateQtControl(QWidget* parent)
 {
   m_MainControl = new QWidget(parent);
-  QVBoxLayout *layout = new QVBoxLayout;
+  auto  layout = new QVBoxLayout;
 
-  mitk::IInputDeviceRegistry::Pointer inputDeviceRegistry =
-    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IInputDeviceRegistry>(mitk::CoreExtConstants::INPUTDEVICE_SERVICE);
-  std::vector<mitk::IInputDeviceDescriptor::Pointer> temp(inputDeviceRegistry->GetInputDevices());
+  QList<mitk::IInputDeviceDescriptor::Pointer> temp(GetInputDeviceRegistry()->GetInputDevices());
 
-  for(std::vector<mitk::IInputDeviceDescriptor::Pointer>::const_iterator it = temp.begin(); it != temp.end();++it)
+  for(QList<mitk::IInputDeviceDescriptor::Pointer>::const_iterator it = temp.begin(); it != temp.end();++it)
   {
-    QString inputDeviceName(QString::fromStdString((*it)->GetName()));
-    QCheckBox* checkBox = new QCheckBox((inputDeviceName),m_MainControl);
+    QString inputDeviceName((*it)->GetName());
+    auto   checkBox = new QCheckBox((inputDeviceName),m_MainControl);
     layout->addWidget(checkBox);
     m_InputDevices.insert(checkBox,(*it)->GetID());
 
@@ -65,13 +63,11 @@ void QmitkInputDevicesPrefPage::CreateQtControl(QWidget* parent)
     {
       m_WiiMoteModes = new QGroupBox("WiiMote Modus");
 
-      m_WiiMoteHeadTracking = new QRadioButton
-        (QString::fromStdString(mitk::CoreExtConstants::WIIMOTE_HEADTRACKING));
-      m_WiiMoteSurfaceInteraction = new QRadioButton
-        (QString::fromStdString(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION));
+      m_WiiMoteHeadTracking = new QRadioButton(mitk::CoreExtConstants::WIIMOTE_HEADTRACKING);
+      m_WiiMoteSurfaceInteraction = new QRadioButton(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION);
       m_WiiMoteHeadTracking->setChecked(true);
 
-      QVBoxLayout* vBoxLayout = new QVBoxLayout;
+      auto   vBoxLayout = new QVBoxLayout;
 
       vBoxLayout->addWidget(m_WiiMoteHeadTracking);
       vBoxLayout->addWidget(m_WiiMoteSurfaceInteraction);
@@ -97,11 +93,9 @@ bool QmitkInputDevicesPrefPage::PerformOk()
 {
   bool result = true;
 
-  mitk::IInputDeviceRegistry::Pointer inputDeviceRegistry =
-    berry::Platform::GetServiceRegistry().
-    GetServiceById<mitk::IInputDeviceRegistry>(mitk::CoreExtConstants::INPUTDEVICE_SERVICE);
+  mitk::IInputDeviceRegistry* inputDeviceRegistry = GetInputDeviceRegistry();
 
-  QHashIterator<QCheckBox*, std::string> it(m_InputDevices);
+  QHashIterator<QCheckBox*, QString> it(m_InputDevices);
   while (it.hasNext())
   {
     it.next();
@@ -113,17 +107,15 @@ bool QmitkInputDevicesPrefPage::PerformOk()
       QString surfaceInteraction(m_WiiMoteSurfaceInteraction->text());
 
       this->m_InputDevicesPrefNode->PutBool
-        (headTracking.toStdString(),m_WiiMoteHeadTracking->isChecked());
+        (headTracking, m_WiiMoteHeadTracking->isChecked());
       this->m_InputDevicesPrefNode->PutBool
-        (surfaceInteraction.toStdString(),m_WiiMoteSurfaceInteraction->isChecked());
+        (surfaceInteraction, m_WiiMoteSurfaceInteraction->isChecked());
 
       // forced flush of the preferences is needed
       // because otherwise the mitk::WiiMoteActivator class
       // cannot distinguish the two different modes without
       // changing the interface for all input devices
-      berry::IPreferencesService::Pointer prefService =
-        berry::Platform::GetServiceRegistry().
-        GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+      berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
       if (prefService)
       {
@@ -150,7 +142,7 @@ bool QmitkInputDevicesPrefPage::PerformOk()
         // It was suggested that it might have something to do
         // with the type of stack, that is used for the pairing.
         // MS-Stack for example does not work properly.
-        QMessageBox::information(NULL,"WiiMote supportproblem",
+        QMessageBox::information(nullptr,"WiiMote supportproblem",
           "A reconnect of the WiiMote is not yet supported! "
           "Please restart the application, if you want to "
           "activate the Wii remote/s again.");
@@ -172,7 +164,7 @@ void QmitkInputDevicesPrefPage::PerformCancel()
 
 void QmitkInputDevicesPrefPage::Update()
 {
-  QHashIterator<QCheckBox*, std::string> it(m_InputDevices);
+  QHashIterator<QCheckBox*, QString> it(m_InputDevices);
   while (it.hasNext())
   {
     it.next();
@@ -185,4 +177,12 @@ void QmitkInputDevicesPrefPage::Update()
         (this->m_InputDevicesPrefNode->GetBool(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION,false));
     }
   }
+}
+
+mitk::IInputDeviceRegistry *QmitkInputDevicesPrefPage::GetInputDeviceRegistry() const
+{
+  ctkServiceReference serviceRef = QmitkCommonExtPlugin::getContext()->getServiceReference<mitk::IInputDeviceRegistry>();
+  if (!serviceRef) return nullptr;
+
+  return QmitkCommonExtPlugin::getContext()->getService<mitk::IInputDeviceRegistry>(serviceRef);
 }

@@ -15,13 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "org_mitk_simulation_Activator.h"
+#include <QmitkNodeDescriptorManager.h>
 #include <mitkGetSimulationPreferences.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkMeshMitkLoader.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkPropertyFilter.h>
 #include <mitkSimulationObjectFactory.h>
-#include <QmitkNodeDescriptorManager.h>
+#include <boost/core/ignore_unused.hpp>
 #include <QtPlugin>
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/helper/system/PluginManager.h>
@@ -29,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static void RegisterSofaClasses()
 {
   int MeshMitkLoaderClass = sofa::core::RegisterObject("").add<mitk::MeshMitkLoader>();
+  boost::ignore_unused(MeshMitkLoaderClass);
 }
 
 static void LoadSofaPlugins()
@@ -38,7 +40,7 @@ static void LoadSofaPlugins()
   if (preferences.IsNull())
     return;
 
-  QString plugins = preferences->GetByteArray("plugins", "").c_str();
+  QString plugins = preferences->Get("plugins", "");
 
   if (plugins.isEmpty())
     return;

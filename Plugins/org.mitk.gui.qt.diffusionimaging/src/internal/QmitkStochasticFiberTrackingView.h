@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkFunctionality.h>
 #include "ui_QmitkStochasticFiberTrackingViewControls.h"
-#include <mitkDiffusionImage.h>
 #include <mitkDataStorage.h>
 #include <itkVectorImage.h>
 #include <itkImage.h>
@@ -27,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDTITubeSpatialObjectPoint.h>
 #include <itkSceneSpatialObject.h>
 #include <itkStochasticTractographyFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 /*!
 \brief View for probabilistic streamline fiber tracking
@@ -41,6 +41,12 @@ class QmitkStochasticFiberTrackingView : public QmitkFunctionality
 
 public:
 
+  typedef short                                                           DiffusionPixelType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
+  typedef mitk::DiffusionPropertyHelper::BValueMapType                    BValueMapType;
+  typedef itk::VectorImage< DiffusionPixelType, 3 >                       ITKDiffusionImageType;
+
     typedef itk::Image< unsigned char, 3 >  BinaryImageType;
 
     static const std::string VIEW_ID;
@@ -48,9 +54,9 @@ public:
     QmitkStochasticFiberTrackingView();
     virtual ~QmitkStochasticFiberTrackingView();
 
-    virtual void CreateQtPartControl(QWidget *parent);
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void CreateQtPartControl(QWidget *parent) override;
+    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+    virtual void StdMultiWidgetNotAvailable() override;
 
 protected slots:
 
@@ -59,7 +65,7 @@ protected slots:
 protected:
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
     Ui::QmitkStochasticFiberTrackingViewControls* m_Controls;
     QmitkStdMultiWidget* m_MultiWidget;
 
@@ -73,7 +79,7 @@ protected slots:
 private:
 
     mitk::Image::Pointer                  m_SeedRoi;              ///< binary image defining seed voxels for tracking process
-    mitk::DiffusionImage<short>::Pointer  m_DiffusionImage;       ///< input image
+    mitk::Image::Pointer                  m_DiffusionImage;       ///< input image
     mitk::DataNode::Pointer               m_DiffusionImageNode;   ///< data node containing input image
 };
 

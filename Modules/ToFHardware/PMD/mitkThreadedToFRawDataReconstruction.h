@@ -42,11 +42,11 @@ namespace mitk
     itk::FastMutexLock::Pointer m_ThreadDataMutex; ///< mutex to control access to images
   };
 
-  class MITK_PMDMODULE_EXPORT ThreadedToFRawDataReconstruction : public itk::ProcessObject
+  class MITKPMD_EXPORT ThreadedToFRawDataReconstruction : public itk::ProcessObject
   {
    public:
 
-    mitkClassMacro( ThreadedToFRawDataReconstruction ,  itk::ProcessObject );
+    mitkClassMacroItkParent( ThreadedToFRawDataReconstruction ,  itk::ProcessObject );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

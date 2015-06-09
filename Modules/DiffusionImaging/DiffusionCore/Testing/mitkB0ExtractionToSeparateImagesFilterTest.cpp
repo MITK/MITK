@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileWriter.h"
 
 #include "itkB0ImageExtractionToSeparateImageFilter.h"
-#include "mitkDiffusionImage.h"
 
 #include "mitkDiffusionCoreObjectFactory.h"
 
@@ -38,7 +37,7 @@ int mitkB0ExtractionToSeparateImagesFilterTest(int  argc , char* argv[])
   MITK_TEST_CONDITION_REQUIRED(argc > 2, "Test image is specified. ");
 
   typedef short DiffusionPixelType;
-  typedef mitk::DiffusionImage< DiffusionPixelType > DiffusionImageType;
+  typedef mitk::Image DiffusionImageType;
   typedef mitk::NrrdDiffusionImageReader< DiffusionPixelType> DiffusionNrrdReaderType;
 
   RegisterDiffusionImagingObjectFactory();

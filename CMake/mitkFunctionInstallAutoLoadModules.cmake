@@ -15,7 +15,7 @@
 #! \param DESTINATION The install destination, e.g. "bin".
 function(mitkFunctionInstallAutoLoadModules)
 
-  MACRO_PARSE_ARGUMENTS(_INSTALL "PLUGINS;DESTINATION" "" ${ARGN})
+  cmake_parse_arguments(_INSTALL "" "DESTINATION" "PLUGINS" ${ARGN})
 
   if(NOT _INSTALL_PLUGINS)
     message(SEND_ERROR "PLUGINS argument is required")
@@ -92,7 +92,7 @@ endfunction()
 
 function(BlueBerryApplicationInstallHook)
 
-  MACRO_PARSE_ARGUMENTS(_INSTALL "APP_NAME;PLUGINS" "" ${ARGN})
+  cmake_parse_arguments(_INSTALL "" "APP_NAME" "PLUGINS" ${ARGN})
 
   set(_destination bin)
   if(APPLE)

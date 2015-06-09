@@ -86,12 +86,14 @@ function Button(moduleName, moduleLink, picFilename, aniFilename, moduleDescr){
     bttn.width = 136;
     bttn.onmouseover = function(){startAni(this.id);};
     bttn.onmouseout = function(){stopAni(this.id);};
+    bttn.onclick = function(){openPage();};
 
     // append button to link-element
     bttnPicLink.appendChild(bttn);
 
     // create text-link and add it to DIV-wrapper
     bttnTxtLink = document.createElement("a");
+    bttnTxtLink.onclick = function(){openPage();};
     bttnTxtLink.href = this.modLink;
     bttnTxtLink.className = "txtLink";
     bttnTxtLink.appendChild(document.createTextNode(this.modName));
@@ -222,6 +224,10 @@ function setExperimental(modPos){
 function changeToHover(targetId){
   bttn = document.getElementById(targetId);
   bttn.className = "modBttnHover";
+}
+
+function openPage(){
+  window.open("http://www.mitk.org","_blank");
 }
 
 function changeToNormal(targetId){

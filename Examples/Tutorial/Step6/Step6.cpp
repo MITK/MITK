@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindow.h"
 #include "QmitkSliceWidget.h"
 
-#include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 
@@ -29,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 
 #include "mitkRenderingManager.h"
+#include <mitkIOUtil.h>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -134,33 +134,18 @@ void Step6::Load(int argc, char* argv[])
     if (strcmp(argv[i], "-testing") == 0)
       continue;
 
-    // Create a DataNodeFactory to read a data format supported
-    // by the DataNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataNodeFactory::Pointer nodeReader =
-        mitk::DataNodeFactory::New();
-    const char * filename = argv[i];
-    try
-    {
-      nodeReader->SetFileName(filename);
-      nodeReader->Update();
-      //*********************************************************************
-      // Part III: Put the data into the datastorage
-      //*********************************************************************
+    // Load datanode (eg. many image formats, surface formats, etc.)
+    mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[i],*m_DataStorage);
 
-      // Since the DataNodeFactory directly creates a node,
-      // use the iterator to add the read node to the tree
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
-      m_DataStorage->Add(node);
-
-      mitk::Image::Pointer image =
-          dynamic_cast<mitk::Image*> (node->GetData());
-      if ((m_FirstImage.IsNull()) && (image.IsNotNull()))
-        m_FirstImage = image;
-    } catch (...)
+    if(dataNodes->empty())
     {
-      fprintf(stderr, "Could not open file %s \n\n", filename);
+      fprintf( stderr, "Could not open file %s \n\n", argv[i] );
       exit(2);
     }
+
+    mitk::Image::Pointer image =  dynamic_cast<mitk::Image*> (dataNodes->at(0)->GetData());
+    if ((m_FirstImage.IsNull()) && (image.IsNotNull()))
+      m_FirstImage = image;
   }
 }
 

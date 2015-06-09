@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageReadAccessor.h>
 
+#include <vtkRenderWindowInteractor.h>
+
 const std::string QmitkODFDetailsView::VIEW_ID = "org.mitk.views.odfdetails";
 
 QmitkODFDetailsView::QmitkODFDetailsView()

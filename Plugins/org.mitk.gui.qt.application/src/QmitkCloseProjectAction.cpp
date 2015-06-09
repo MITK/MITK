@@ -25,36 +25,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryIEditorReference.h>
 #include <berryIWorkbenchPage.h>
+#include <berryIWorkbenchWindow.h>
 
 #include <QMessageBox>
 
 QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+  : QAction(0)
+  , m_Window(nullptr)
+{
+  this->init(window.GetPointer());
+}
+
+QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
+  : QAction(0)
+  , m_Window(nullptr)
+{
+  this->setIcon(icon);
+  this->init(window.GetPointer());
+}
+
+QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow* window)
+  : QAction(0)
+  , m_Window(nullptr)
 {
   this->init(window);
 }
 
-QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-: QAction(0)
+QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon& icon, berry::IWorkbenchWindow* window)
+  : QAction(0)
+  , m_Window(nullptr)
 {
   this->setIcon(icon);
   this->init(window);
 }
 
-void QmitkCloseProjectAction::init(berry::IWorkbenchWindow::Pointer window)
+void QmitkCloseProjectAction::init(berry::IWorkbenchWindow* window)
 {
   m_Window = window;
-  this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Close Project...");
   this->setToolTip("Close Project will remove all data objects from the application. This will free up the memory that is used by the data.");
-  m_Window = window;
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
 
 void QmitkCloseProjectAction::Run()
 {
-
-
   try
   {
     ctkPluginContext* context = mitk::PluginActivator::GetContext();
@@ -110,13 +124,12 @@ void QmitkCloseProjectAction::Run()
 
     // Close all editors with this data storage as input
     mitk::DataStorageEditorInput::Pointer dsInput(new mitk::DataStorageEditorInput(dataStorageRef));
-    std::vector<berry::IEditorReference::Pointer> dsEditors =
-        m_Window->GetActivePage()->FindEditors(dsInput, std::string(), berry::IWorkbenchPage::MATCH_INPUT);
+    QList<berry::IEditorReference::Pointer> dsEditors =
+        m_Window->GetActivePage()->FindEditors(dsInput, QString(), berry::IWorkbenchPage::MATCH_INPUT);
 
     if (!dsEditors.empty())
     {
-      std::list<berry::IEditorReference::Pointer> editorsToClose;
-      editorsToClose.assign(dsEditors.begin(), dsEditors.end());
+      QList<berry::IEditorReference::Pointer> editorsToClose = dsEditors;
       m_Window->GetActivePage()->CloseEditors(editorsToClose, false);
     }
   }

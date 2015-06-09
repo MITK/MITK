@@ -29,7 +29,7 @@ namespace mitk
   *
   * @ingroup ToFProcessing
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageRecorderFilter : public ImageToImageFilter
+  class MITKTOFHARDWARE_EXPORT ToFImageRecorderFilter : public ImageToImageFilter
   {
   public:
     mitkClassMacro( ToFImageRecorderFilter , ImageToImageFilter );
@@ -100,7 +100,7 @@ namespace mitk
     \brief method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the output of the ToFSurfaceSource: The generated surface of the 3d points
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
     /**
     * \brief Create an output for each input
     *

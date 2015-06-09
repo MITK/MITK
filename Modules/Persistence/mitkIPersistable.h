@@ -22,7 +22,7 @@ namespace mitk
     ///
     /// Just a base class for persistable classes
     ///
-    class MitkPersistence_EXPORT IPersistable
+    class MITKPERSISTENCE_EXPORT IPersistable
     {
     public:
         virtual bool Save(const std::string& fileName="") = 0;

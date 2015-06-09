@@ -26,21 +26,21 @@ class QmitkPropertiesPreferencePage : public QObject, public berry::IQtPreferenc
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
-  static const std::string FILTER_PROPERTIES;
-  static const std::string SHOW_ALIASES;
-  static const std::string SHOW_DESCRIPTIONS;
-  static const std::string SHOW_ALIASES_IN_DESCRIPTION;
-  static const std::string DEVELOPER_MODE;
+  static const QString FILTER_PROPERTIES;
+  static const QString SHOW_ALIASES;
+  static const QString SHOW_DESCRIPTIONS;
+  static const QString SHOW_ALIASES_IN_DESCRIPTION;
+  static const QString DEVELOPER_MODE;
 
   QmitkPropertiesPreferencePage();
   ~QmitkPropertiesPreferencePage();
 
-  void CreateQtControl(QWidget* parent);
-  QWidget* GetQtControl() const;
-  void Init(berry::IWorkbench::Pointer workbench);
-  bool PerformOk();
-  void PerformCancel();
-  void Update();
+  void CreateQtControl(QWidget* parent) override;
+  QWidget* GetQtControl() const override;
+  void Init(berry::IWorkbench::Pointer workbench) override;
+  bool PerformOk() override;
+  void PerformCancel() override;
+  void Update() override;
 
 private slots:
   void OnShowDescriptionsStateChanged(int state);

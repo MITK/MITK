@@ -37,11 +37,11 @@ namespace mitk {
   /// between opencv/vnl/mitk/xml representations of transform
   /// data
   ///
-  class MitkCameraCalibration_EXPORT Transform: public itk::Object,
+  class MITKCAMERACALIBRATION_EXPORT Transform: public itk::Object,
     public XMLSerializable
   {
   public:
-    mitkClassMacro(Transform, itk::Object);
+    mitkClassMacroItkParent(Transform, itk::Object);
     itkFactorylessNewMacro(Transform);
     mitkNewMacro1Param(Transform, const mitk::NavigationData*);
     mitkNewMacro1Param(Transform, const std::string&);
@@ -121,7 +121,7 @@ namespace mitk {
     ///
     /// read from xml
     ///
-    void FromXML(TiXmlElement* elem);
+    void FromXML(TiXmlElement* elem) override;
     ///
     /// read csv file
     ///
@@ -243,7 +243,7 @@ namespace mitk {
     ///
     /// create xml representation
     ///
-    void ToXML(TiXmlElement* elem) const;
+    void ToXML(TiXmlElement* elem) const override;
     ///
     /// create string representation
     ///
@@ -299,7 +299,7 @@ namespace mitk {
 
 } // namespace mitk
 
-MitkCameraCalibration_EXPORT std::ostream& operator<<
+MITKCAMERACALIBRATION_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::Transform::Pointer p);
 
 #endif // MITKTRANSFORM_H

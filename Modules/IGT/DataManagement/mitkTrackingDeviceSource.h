@@ -39,7 +39,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT TrackingDeviceSource : public NavigationDataSource
+  class MITKIGT_EXPORT TrackingDeviceSource : public NavigationDataSource
   {
   public:
     mitkClassMacro(TrackingDeviceSource, NavigationDataSource);
@@ -106,7 +106,7 @@ namespace mitk {
     /**
     * \brief Used for pipeline update
     */
-    virtual void UpdateOutputInformation();
+    virtual void UpdateOutputInformation() override;
 
   protected:
     TrackingDeviceSource();
@@ -120,7 +120,7 @@ namespace mitk {
     * \warning Will raise a std::out_of_range exception, if tools were added to the
     * tracking device after it was set as input for this filter
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /**
     * \brief Create the necessary outputs for the TrackingTool objects in m_TrackingDevice

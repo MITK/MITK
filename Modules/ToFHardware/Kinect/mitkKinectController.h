@@ -31,11 +31,11 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_KINECTMODULE_EXPORT KinectController : public itk::Object
+  class MITKKINECT_EXPORT KinectController : public itk::Object
   {
   public:
 
-    mitkClassMacro( KinectController , itk::Object );
+    mitkClassMacroItkParent( KinectController , itk::Object );
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

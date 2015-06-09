@@ -29,10 +29,10 @@ namespace mitk {
   *
   * \deprecated Deprecated since 2014-06
   */
-  class MitkUS_EXPORT USImageMetadata : public itk::Object
+  class MITKUS_EXPORT USImageMetadata : public itk::Object
   {
   public:
-    mitkClassMacro(USImageMetadata, itk::Object);
+    mitkClassMacroItkParent(USImageMetadata, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

@@ -17,12 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDWIHEADMOTIONCORRECTIONFILTER_H
 #define MITKDWIHEADMOTIONCORRECTIONFILTER_H
 
-#include "mitkDiffusionImageToDiffusionImageFilter.h"
+#include "mitkImageToImageFilter.h"
 
 #include <itkAccumulateImageFilter.h>
 #include <itkExtractImageFilter.h>
 
 #include "mitkITKImageImport.h"
+#include <itkVectorImage.h>
+#include <MitkDiffusionCoreExports.h>
 
 namespace mitk
 {
@@ -39,15 +41,15 @@ namespace mitk
  * by an affine transformation using the MattesMutualInformation metric as optimizer guidance.
  *
  */
-template< typename DiffusionPixelType>
-class DWIHeadMotionCorrectionFilter
-    : public DiffusionImageToDiffusionImageFilter< DiffusionPixelType >
+
+class MITKDIFFUSIONCORE_EXPORT DWIHeadMotionCorrectionFilter
+    : public ImageToImageFilter
 {
 public:
 
   // class macros
   mitkClassMacro( DWIHeadMotionCorrectionFilter,
-                  DiffusionImageToDiffusionImageFilter<DiffusionPixelType> )
+                  ImageToImageFilter )
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
@@ -59,17 +61,16 @@ public:
   itkSetMacro( AverageUnweighted, bool )
 
   // public typedefs
-  typedef typename Superclass::InputImageType         DiffusionImageType;
-  typedef typename Superclass::InputImagePointerType  DiffusionImagePointerType;
-
-  typedef typename Superclass::OutputImageType        OutputImageType;
-  typedef typename Superclass::OutputImagePointerType OutputImagePointerType;
+  typedef short         DiffusionPixelType;
+  typedef Superclass::InputImageType         InputImageType;
+  typedef Superclass::OutputImageType        OutputImageType;
+  typedef itk::VectorImage<DiffusionPixelType, 3> ITKDiffusionImageType;
 
 protected:
   DWIHeadMotionCorrectionFilter();
   virtual ~DWIHeadMotionCorrectionFilter() {}
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   unsigned long   m_CurrentStep;
   unsigned long   m_Steps;
@@ -125,8 +126,6 @@ static void ItkAccumulateFilter(
 }
 
 } //end namespace mitk
-
-#include "mitkDWIHeadMotionCorrectionFilter.cpp"
 
 
 #endif // MITKDWIHEADMOTIONCORRECTIONFILTER_H

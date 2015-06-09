@@ -44,7 +44,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUSNavigation_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
+  class MITKUSNAVIGATION_EXPORT NeedleProjectionFilter : public NavigationDataPassThroughFilter
   {
   public:
     mitkClassMacro(NeedleProjectionFilter, NavigationDataPassThroughFilter);
@@ -60,7 +60,7 @@ namespace mitk {
     NeedleProjectionFilter();
     virtual ~NeedleProjectionFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     mitk::AffineTransform3D::Pointer m_TargetPlane;
 

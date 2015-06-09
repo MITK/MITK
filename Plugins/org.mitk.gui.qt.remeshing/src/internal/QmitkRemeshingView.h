@@ -29,8 +29,8 @@ public:
   QmitkRemeshingView();
   ~QmitkRemeshingView();
 
-  void CreateQtPartControl(QWidget* parent);
-  void SetFocus();
+  void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
 
 private slots:
   void OnAdvancedSettingsButtonToggled(bool toggled);

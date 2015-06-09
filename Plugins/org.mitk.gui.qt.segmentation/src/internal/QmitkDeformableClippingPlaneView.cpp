@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDeformableClippingPlaneView.h"
 
-#include "mitkAffineDataInteractor3D.h"
+#include "mitkClippingPlaneInteractor3D.h"
 #include "mitkHeightFieldSurfaceClipImageFilter.h"
 #include "mitkImageToSurfaceFilter.h"
 #include "mitkInteractionConst.h"
@@ -584,9 +584,9 @@ void QmitkDeformableClippingPlaneView::OnTranslationMode(bool check)
     m_Controls.rotationPushButton->setChecked(false);
     m_Controls.deformationPushButton->setChecked(false);
 
-    mitk::AffineDataInteractor3D::Pointer affineDataInteractor = mitk::AffineDataInteractor3D::New();
-    affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
-    affineDataInteractor->SetEventConfig("AffineTranslationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    mitk::ClippingPlaneInteractor3D::Pointer affineDataInteractor = mitk::ClippingPlaneInteractor3D::New();
+    affineDataInteractor->LoadStateMachine("ClippingPlaneInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    affineDataInteractor->SetEventConfig("ClippingPlaneTranslationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
     affineDataInteractor->SetDataNode(m_WorkingNode);
   }
   else
@@ -600,9 +600,9 @@ void QmitkDeformableClippingPlaneView::OnRotationMode(bool check)
     m_Controls.translationPushButton->setChecked(false);
     m_Controls.deformationPushButton->setChecked(false);
 
-    mitk::AffineDataInteractor3D::Pointer affineDataInteractor = mitk::AffineDataInteractor3D::New();
-    affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
-    affineDataInteractor->SetEventConfig("AffineRotationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    mitk::ClippingPlaneInteractor3D::Pointer affineDataInteractor = mitk::ClippingPlaneInteractor3D::New();
+    affineDataInteractor->LoadStateMachine("ClippingPlaneInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    affineDataInteractor->SetEventConfig("ClippingPlaneRotationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
     affineDataInteractor->SetDataNode(m_WorkingNode);
   }
   else
@@ -617,8 +617,8 @@ void QmitkDeformableClippingPlaneView::OnDeformationMode(bool check)
     m_Controls.rotationPushButton->setChecked(false);
 
     mitk::SurfaceDeformationDataInteractor3D::Pointer surfaceDataInteractor = mitk::SurfaceDeformationDataInteractor3D::New();
-    surfaceDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
-    surfaceDataInteractor->SetEventConfig("AffineDeformationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    surfaceDataInteractor->LoadStateMachine("ClippingPlaneInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+    surfaceDataInteractor->SetEventConfig("ClippingPlaneDeformationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
     surfaceDataInteractor->SetDataNode(m_WorkingNode);
   }
   else

@@ -27,7 +27,7 @@ namespace mitk
   ///
   /// \brief interface for all classes able to write themselves to XML files
   ///
-  class MitkCameraCalibration_EXPORT XMLSerializable
+  class MITKCAMERACALIBRATION_EXPORT XMLSerializable
   {
   public:
     ///

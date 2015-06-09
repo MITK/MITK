@@ -1,0 +1,35 @@
+/**
+  \defgroup ToolManagerEtAl Classes related to the Segmentation plugin
+
+  \brief A couple of classes related to the Segmentation plugin. See also
+  \ref QmitkSegmentationTechnicalPage
+*/
+
+/**
+  \defgroup MITKModules MITK Modules
+
+  \brief This group includes all MITK Modules.
+*/
+
+/**
+
+  \defgroup BlueBerryPlugins BlueBerry Plugins
+
+  \brief This group includes all BlueBerry Plugins.
+
+  \defgroup MITKPlugins MITK Plugins
+
+  \brief This group includes all MITK Plugins.
+*/
+
+/**
+  \defgroup MITKExamplePlugins MITK Example Plugins
+
+  \brief This group includes all MITK example plugins demonstrating specific framework features.
+*/
+
+/**
+  \defgroup MITKTestingAPI MITK Testing
+
+  \brief In this group, the API documentation of methods useful for testing is collected. The more general concepts of testing in MITK are described on the \ref GeneralTests page.
+*/

@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, SubtractContourTool, "Subtract tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, SubtractContourTool, "Subtract tool");
 }
 
 mitk::SubtractContourTool::SubtractContourTool()

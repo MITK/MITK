@@ -40,6 +40,30 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QComboBox" name="planeSelectionComboBox">
+        <item>
+         <property name="text">
+          <string>3D Operation</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2D Operation - Axial</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2D Operation - Sagital</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2D Operation - Coronal</string>
+         </property>
+        </item>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -210,7 +234,7 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Globally fills holes in segmentation (radius not required)</string>
+        <string>Globally fills holes in segmentation (structuring element and radius not required)</string>
        </property>
        <property name="text">
         <string>Fill Holes</string>

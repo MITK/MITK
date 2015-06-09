@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __itkTensorDerivedMeasurementsFilter_txx
 
 
-
+#include <itkImageRegionIterator.h>
 
 
 namespace itk {

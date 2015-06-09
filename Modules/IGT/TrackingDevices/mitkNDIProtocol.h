@@ -35,10 +35,10 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NDIProtocol : public itk::Object
+  class MITKIGT_EXPORT NDIProtocol : public itk::Object
   {
   public:
-    mitkClassMacro(NDIProtocol, itk::Object);
+    mitkClassMacroItkParent(NDIProtocol, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -75,7 +75,7 @@ namespace mitk
     NDIErrorCode SFLIST(std::string* info);       ///< Returns information about the supported feature of the tracking system
     NDIErrorCode TSTART(bool resetFrameCounter = false);  ///< Start Tracking Mode. The tracking system must be in setup mode and must be initialized.
     NDIErrorCode TSTOP();                         ///< Stop Tracking Mode. The tracking system must be in Tracking mode.
-    NDIErrorCode TX(bool trackIndividualMarkers = false, MarkerPointContainerType* markerPositions = NULL); ///< Report transformations in text mode. Optionally, individual markers can be tracked
+    NDIErrorCode TX(bool trackIndividualMarkers = false, MarkerPointContainerType* markerPositions = nullptr); ///< Report transformations in text mode. Optionally, individual markers can be tracked
     NDIErrorCode BX();                            ///< Report transformations in binary mode.
     NDIErrorCode POS3D(MarkerPointContainerType* markerPositions); ///< Report 3D Positions of single markers. can only be used in diagnostics mode
     NDIErrorCode VER(mitk::TrackingDeviceType& t);                 ///< returns if the tracking device is a Polaris or an Aurora system
@@ -101,7 +101,7 @@ namespace mitk
     * This is used by commands like INIT, DSTART, DSTOP,... that do not need parameters
     * or special parsing of replies
     */
-    NDIErrorCode GenericCommand(const std::string command, const std::string* parameter = NULL);
+    NDIErrorCode GenericCommand(const std::string command, const std::string* parameter = nullptr);
 
     /**Documentation
     * \brief returns the error code for an Error String returned from the NDI tracking device

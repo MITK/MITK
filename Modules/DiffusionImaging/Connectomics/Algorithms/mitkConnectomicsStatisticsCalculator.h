@@ -31,14 +31,14 @@ namespace mitk
 {
   /**
   * \brief A class giving functions for calculating a variety of network indices */
-  class MitkConnectomics_EXPORT ConnectomicsStatisticsCalculator : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsStatisticsCalculator : public itk::Object
   {
   public:
 
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsStatisticsCalculator, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsStatisticsCalculator, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

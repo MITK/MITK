@@ -31,11 +31,11 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFDeviceFactoryManager: public itk::Object
+  class MITKTOFHARDWARE_EXPORT ToFDeviceFactoryManager: public itk::Object
   {
   public:
 
-    mitkClassMacro( ToFDeviceFactoryManager, itk::Object );
+    mitkClassMacroItkParent( ToFDeviceFactoryManager, itk::Object );
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

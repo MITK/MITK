@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mbilogTextBackendBase.h"
 #include "mbilogLoggingTypes.h"
-#include "mbilogTextDictionary.h"
 #include <ctime>
 #include <iostream>
 #include <iomanip>
@@ -25,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifdef _WIN32
  #define USE_WIN32COLOREDCONSOLE
  #include <windows.h>
+ #include "mbilogTextDictionary.h"
 #endif
 
 static bool g_init=false;
@@ -393,7 +393,7 @@ void mbilog::TextBackendBase::FormatFull(const LogMessage &l,int threadID)
 
 void mbilog::TextBackendBase::AppendTimeStamp(std::ostream& out)
 {
-  time_t rawtime = time(NULL);
+  time_t rawtime = time(nullptr);
   std::string timestring( ctime(&rawtime) );
   timestring.replace( timestring.length() -1, 1," "); // replace \n by " " (separates date/time from following output of relative time since start)
 

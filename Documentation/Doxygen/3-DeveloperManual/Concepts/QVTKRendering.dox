@@ -1,0 +1,128 @@
+/**
+
+\page QVTKRendering Rendering Concept
+
+\tableofcontents
+
+The MITK rendering pipeline is derived from the VTK rendering pipeline.
+
+\section QVTKRendering_Pipeline_VTK VTK Rendering Pipeline
+
+\imageMacro{RenderingOverviewVTK.png,"Rendering in VTK",12}
+
+In VTK, the vtkRenderWindow coordinates the rendering process. Several vtkRenderers may be associated to one vtkRenderWindow.
+All visible objects, which can exist in a rendered scene (2D and 3D scene), inherit from vtkProp (or any subclass e.g. vtkActor).
+A vtkPropAssembly is an assembly of several vtkProps, which appears like one single vtkProp.
+MITK uses a new interface class, the "vtkMitkRenderProp", which is inherited from vtkProp. Similar to a vtkPropAssembly, all MITK rendering stuff is performed via this interface class.
+Thus, the MITK rendering process is completely integrated into the VTK rendering pipeline. From VTK point of view, MITK renders like a custom vtkProp object.
+
+More information about the VTK rendering pipeline can be found at http://www.vtk.org and in the several VTK books.
+
+
+
+\section QVTKRendering_Pipeline_MITK MITK Rendering Pipeline
+
+This process is tightly connected to VTK, which makes it straight forward and simple. We use the above mentioned "vtkMitkRenderProp" in conjunction with the mitk::VtkPropRenderer for integration into the VTK pipeline. The QmitkRenderWindow does not inherit from mitk::RenderWindow, but from the QVTKWidget, which is provided by VTK.
+
+The main classes of the MITK rendering process can be illustrated like this:
+
+\imageMacro{qVtkRenderingClassOverview.png,"Rendering in MITK",16}
+
+A render request to the vtkRenderWindow does not only update the VTK pipeline, but also the MITK pipeline. However, the mitk::RenderingManager still coordinates the rendering update behavior.
+Update requests should be sent to the RenderingManager, which then, if needed, will request an update of the overall vtkRenderWindow. The vtkRenderWindow then starts to call the Render() function of all vtkRenderers, which are associated to the vtkRenderWindow. Currently, MITK uses specific vtkRenderers (outside the standard MITK rendering pipeline) for purposes, like displaying a gradient background (mitk::GradientBackground), displaying video sources (QmitkVideoBackround and mitk::VideoSource), or displaying a (department) logo (mitk::ManufacturerLogo), etc..
+Despite these specific renderers, a kind of "SceneRenderer" is member of each QmitkRenderWindow. This vtkRenderer is associated with the custom vtkMitkRenderProp and is responsible for the MITK rendering.
+
+The vtkRenderer calls four different functions in vtkMitkRenderProp, namely RenderOpaqueGeometry(), RenderTranslucentPolygonalGeometry(), RenderVolumetricGeometry() and RenderOverlay(). These function calls are forwarded to the mitk::VtkPropRenderer.
+Then, depending on the mapper type (OpenGL- or VTK-based), OpenGL is enabled or disabled. In the case of OpenGL rendering, the Paint()-method of each individual mapper is called. If the mapper is VTK-based, the four function calls are forwarded to mitk::VtkMapper and within these methods the corresponding VtkProp is evaluated.
+Both strategies are illustrated in the sequence diagrams below:
+
+\imageMacro{qVtkRenderingSequenceVTK.png,"Sequence diagram for MITK VTK rendering",16}
+
+In MITK, VTK-based mapper are more common and we recommend on implementing VTK-based mappers. However, MITK supports OpenGL-based mappers as well.
+
+\imageMacro{qVtkRenderingSequenceGL.png,"Sequence diagram for MITK OpenGL rendering",16}
+
+
+\section QVTKRendering_Mapper MITK Mapper Architecture
+
+Mappers are used to transform the input data in tangible primitives, such as surfaces, points, lines, etc. The base class of all mappers is mitk::Mapper. The mapper hierarchy reflects the two possible ways to render in MITK: Subclasses of mitk::Mapper control the creation of rendering primitives
+that interface to the graphics library (e.g. via OpenGL, vtk). The mapper architecture is illustrated in the following UML diagram:
+
+\imageMacro{qVtkRenderingMapper.jpg,"Mapper architecture",16}
+
+mitk::Mapper::Update() calls the time step of the input data for the specified renderer and checks whether the time step is valid and calls method mitk::Mapper::GenerateDataForRenderer(), which is reimplemented in the individual mappers and should be used to generate primitives.
+mitk::Mapper::SetDefaultProperties() should be used to define mapper-specific properties.
+
+\section QVTKRendering_programmerGuide User Guide: Programming hints for rendering related stuff (in plugins)
+
+\li The QmitkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("axial");
+\li The vtkRenderWindow can be accessed like this: this->GetRenderWindowPart()->GetRenderWindow("axial")->GetVtkRenderWindow();
+\li The mitkBaseRenderer can be accessed like this: mitk::BaseRenderer* renderer  = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("sagittal")->GetRenderWindow());
+\li An update request of the overall QmitkStdMultiWidget can be performed with: mitk::RenderingManager::GetInstance()->RequestUpdateAll() or alternatively with the shorthand this->RequestRenderWindowUpdate();
+\li A single QmitkRenderWindow update request can be done like this: mitk::RenderingManager::GetInstance()->RequestUpdate(this->GetRenderWindowPart()->GetRenderWindow("axial")->GetVtkRenderWindow());
+\li be aware that GetRenderWindowPart() can return null if the editor is closed. This is a common reason for nullpointer exceptions.
+
+\note The usage of ForceImmediateUpdateAll() is not desired in most common use-cases.
+
+
+\subsection QVTKRendering_distinctRenderWindow Setting up a distinct Rendering-Pipeline
+
+It is sometimes desired to have one (or more) QmitkRenderWindows that are managed totally independent of the 'usual' renderwindows defined by the QmitkStdMultiWidget.
+This may include the data that is rendered as well as possible interactions. In order to achieve this, a set of objects is needed:
+
+\li mitk::RenderingManager   -> Manages the rendering
+\li mitk::DataStorage        -> Manages the data that is rendered
+\li mitk::GlobalInteraction  -> Manages all interaction
+\li QmitkRenderWindow        -> Actually visualizes the data
+
+The actual setup, respectively the connection, of these classes is rather simple:
+
+\code
+// create a new instance of mitk::RenderingManager
+mitk::RenderingManager::Pointer renderingManager = mitk::RenderingManager::New();
+
+// create new instances of DataStorage and GlobalInteraction
+mitk::DataStorage::Pointer dataStorage = mitk::DataStorage::New();
+mitk::GlobalInteraction::Pointer globalInteraction = mitk::GlobalInteraction::New();
+
+// add both to the RenderingManager
+renderingManager->SetDataStorage( dataStorage );
+renderingManager->SetGlobalInteraction( globalInteraction );
+
+// now create a new QmitkRenderWindow with this renderingManager as parameter
+QmitkRenderWindow* renderWindow = new QmitkRenderWindow( parent, "name", renderer, renderingManager );
+
+\endcode
+
+That is basically all you need to setup your own rendering pipeline.
+Obviously you have to add all data you want to render to your new DataStorage. If you want to interact with this renderwindow, you will also have
+to add additional Interactors/Listeners.
+
+\note Dynamic casts of a mitk::BaseRenderer class to an OpenGLRenderer (or now, to an VtkPropRenderer) should be avoided. The "MITK Scene" vtkRenderer and the vtkRenderWindow as well, are therefore now included in the mitk::BaseRenderer.
+
+\subsection QVTKRendering_userGuideMapper How to write your own Mapper
+
+If you want to write your own mapper, you first need to decide whether you want to write a VTK-based mapper or a GL-based mapper.
+We recommend  to write a VTK-based mapper, as VTK is easy to learn and some GL-based mappers can have unexpected site effects.
+However, you need to derive from the respective classes.
+
+In the following we provide some programming hints for writing a Vtk-based mapper:
+
+\li include mitkLocalStorageHandler.h  and derive from class BaseLocalStorage as a nested class in your own mapper. The LocalStorage instance should
+contain all VTK ressources such as actors, textures, mappers, polydata etc.
+The LocalStorageHandler is responsible for providing a LocalStorage to a concrete mitk::Mapper subclass. Each RenderWindow / mitk::BaseRenderer is
+assigned its own LocalStorage instance so that all contained ressources (actors, shaders, textures, ...) are provided individually per window.
+
+\li GenerateDataForRenderer() should be reimplemented in order to generate the primitives that should be rendered. This method is called in each Mapper::Update() pass, thus,
+all primitives that are rendered are recomputed. Employ LocalStorage::IsGenerateDataRequired() to determine whether it is necessary to generate the primitives again. It is not
+necessary to generate them again in case the scene has just been translated or rotated.
+
+\li For 2D mappers, it is necessary to determine the 3D primitives close to the current plane that should be drawn. Use
+   planeGeometry = renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry() to get the current plane. The distance to it can be determined by using planeGeometry->DistanceFromPlane(point).
+
+\li Reimplement GetVtkProp(), that should return the specific VtkProp generated in GenerateDataForRender() (e.g. a single actor or a propassembly, which is a combination of different actors).
+The VtkProp is picked up in one of the four render passes and thus integrated into the VTK render pipeline.
+
+\li SetDefaultProperties() should be used to define mapper-specific properties.
+
+*/

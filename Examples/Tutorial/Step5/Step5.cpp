@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindow.h"
 #include "QmitkSliceWidget.h"
 
-#include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
@@ -30,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <QApplication>
 #include <QHBoxLayout>
+#include <mitkIOUtil.h>
 
 //##Documentation
 //## @brief Interactively add points
@@ -75,26 +75,16 @@ int main(int argc, char* argv[])
     // For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // Create a DataNodeFactory to read a data format supported
-    // by the DataNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataNodeFactory::Pointer nodeReader=mitk::DataNodeFactory::New();
-    const char * filename = argv[i];
-    try
-    {
-      nodeReader->SetFileName(filename);
-      nodeReader->Update();
-      //*********************************************************************
-      // Part III: Put the data into the datastorage
-      //*********************************************************************
+    // Load datanode (eg. many image formats, surface formats, etc.)
+    mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[i],*ds);
 
-      // Since the DataNodeFactory directly creates a node,
-      // use the iterator to add the read node to the tree
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
-      ds->Add(node);
-    }
-    catch(...)
+    //*********************************************************************
+    // Part III: Put the data into the datastorage
+    //*********************************************************************
+    // Add the node to the DataStorage
+    if(dataNodes->empty())
     {
-      fprintf( stderr, "Could not open file %s \n\n", filename );
+      fprintf( stderr, "Could not open file %s \n\n", argv[i] );
       exit(2);
     }
   }

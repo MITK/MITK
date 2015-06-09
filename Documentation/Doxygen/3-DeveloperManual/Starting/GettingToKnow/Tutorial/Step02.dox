@@ -1,0 +1,29 @@
+ /**
+
+ \page Step02Page MITK Tutorial - Step 2: Load one or more data sets
+
+
+  \li \ref Step2.cpp "Step2.cpp" \n
+ Contains the code for this example.
+ \li Path to files used in this step: \n
+http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+
+ \image html step2_result.png
+
+ \dontinclude Step2.cpp
+
+ This program shows how to load multiple data sets.
+ The picture above shows the result of the program when reading both the image file and the surface file.
+ In order to obtain the result the program has to be executed using the image file Pic3D.nrrd and the surface file lungs.vtk.
+
+ The code for this example equals the code of Step 1 except for part II and part III which are changed as follows:
+ \skipline Part II
+ \until mitk::IOUtil::Load(argv[i],*storage);
+ \line }
+
+
+
+ \ref Step01Page "[Previous step]" \ref Step03Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+
+  */

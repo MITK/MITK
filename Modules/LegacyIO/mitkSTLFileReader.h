@@ -22,9 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 //##Documentation
 //## @brief Reader to read files in stl-format
-//## @ingroup IO
+//## @ingroup MitkLegacyIOModule
 //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class MitkLegacyIO_EXPORT STLFileReader : public SurfaceSource
+class MITKLEGACYIO_EXPORT STLFileReader : public SurfaceSource
 {
 public:
     mitkClassMacro(STLFileReader, SurfaceSource);
@@ -45,7 +45,7 @@ public:
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
 protected:
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     STLFileReader();
 

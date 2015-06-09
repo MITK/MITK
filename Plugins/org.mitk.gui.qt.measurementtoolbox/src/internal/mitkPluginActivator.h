@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKPLUGINACTIVATOR_H
 
 #include <ctkPluginActivator.h>
-#include <mitkExportMacros.h>
 
 namespace mitk
 {
@@ -32,8 +31,8 @@ namespace mitk
   public:
     static ctkPluginContext* GetContext();
 
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+    void start(ctkPluginContext* context) override;
+    void stop(ctkPluginContext* context) override;
 
   private:
     static ctkPluginContext* m_Context;

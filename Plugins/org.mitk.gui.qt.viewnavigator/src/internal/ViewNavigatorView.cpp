@@ -15,35 +15,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-// Blueberry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-
-// Qmitk
 #include "ViewNavigatorView.h"
 
-// Qt
-#include <QMessageBox>
+#include "QmitkViewNavigatorWidget.h"
 
-//mitk image
-#include <mitkImage.h>
+// BlueBerry
+#include <berryIWorkbenchPartSite.h>
+
+#include <QVBoxLayout>
 
 const std::string ViewNavigatorView::VIEW_ID = "org.mitk.views.viewnavigatorview";
 
 void ViewNavigatorView::SetFocus()
 {
-  m_Controls.widget->setFocus();
+  m_ViewNavigatorWidget->setFocus();
 }
 
 void ViewNavigatorView::CreateQtPartControl( QWidget *parent )
 {
-  // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
-
-}
-
-void ViewNavigatorView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                             const QList<mitk::DataNode::Pointer>& nodes )
-{
-
+  parent->setLayout(new QVBoxLayout);
+  parent->layout()->setContentsMargins(0, 0, 0, 0);
+  m_ViewNavigatorWidget = new QmitkViewNavigatorWidget(this->GetSite()->GetWorkbenchWindow(), parent);
+  parent->layout()->addWidget(m_ViewNavigatorWidget);
 }

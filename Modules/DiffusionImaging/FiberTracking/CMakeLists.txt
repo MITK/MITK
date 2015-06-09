@@ -54,9 +54,9 @@ endif()
 
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
-  INCLUDE_DIRS Algorithms Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundleX IODataStructures/PlanarFigureComposite Interactions SignalModels Rendering ${CMAKE_CURRENT_BINARY_DIR}
+  INCLUDE_DIRS Algorithms Algorithms/MLTracking Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundle IODataStructures/PlanarFigureComposite Interactions SignalModels Rendering ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${_module_deps}
-  PACKAGE_DEPENDS ITK|ITKFFT ITK|ITKDiffusionTensorImage
+  PACKAGE_DEPENDS PUBLIC ITK|ITKFFT ITK|ITKDiffusionTensorImage Vigra HDF5
   #WARNINGS_AS_ERRORS
 )
 

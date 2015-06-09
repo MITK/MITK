@@ -24,12 +24,12 @@ namespace mitk
   {
   public:
 
-    void Load(us::ModuleContext* /*context*/)
+    void Load(us::ModuleContext* /*context*/) override
     {
 
     }
 
-    void Unload(us::ModuleContext*)
+    void Unload(us::ModuleContext*) override
     {
 
     }

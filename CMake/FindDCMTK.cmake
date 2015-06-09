@@ -81,7 +81,7 @@ foreach(lib
 
   # Find Debug libraries
   find_library(DCMTK_${lib}_LIBRARY_DEBUG
-    ${lib}
+    ${lib}${DCMTK_CMAKE_DEBUG_POSTFIX}
     PATHS
     ${DCMTK_DIR}/${lib}/libsrc
     ${DCMTK_DIR}/${lib}/libsrc/Debug
@@ -149,9 +149,12 @@ foreach(dir
   #message("** DCMTKs ${dir} found at ${DCMTK_${dir}_INCLUDE_DIR}")
 
   if(DCMTK_${dir}_INCLUDE_DIR)
-    list(APPEND
-      DCMTK_INCLUDE_DIRS
-      ${DCMTK_${dir}_INCLUDE_DIR})
+    # add the 'include' path so eg
+    #include "dcmtk/dcmimgle/dcmimage.h"
+    # works
+    get_filename_component(_include ${DCMTK_${dir}_INCLUDE_DIR} PATH)
+    get_filename_component(_include ${_include} PATH)
+    list(APPEND DCMTK_INCLUDE_DIRS ${DCMTK_${dir}_INCLUDE_DIR} ${_include})
   endif()
 endforeach()
 

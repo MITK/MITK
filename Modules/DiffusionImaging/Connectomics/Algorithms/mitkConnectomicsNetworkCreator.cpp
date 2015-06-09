@@ -48,7 +48,7 @@ mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator()
 {
 }
 
-mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Pointer segmentation, mitk::FiberBundleX::Pointer fiberBundle )
+mitk::ConnectomicsNetworkCreator::ConnectomicsNetworkCreator( mitk::Image::Pointer segmentation, mitk::FiberBundle::Pointer fiberBundle )
 : m_FiberBundle(fiberBundle)
 , m_Segmentation(segmentation)
 , m_ConNetwork( mitk::ConnectomicsNetwork::New() )
@@ -69,7 +69,7 @@ mitk::ConnectomicsNetworkCreator::~ConnectomicsNetworkCreator()
 {
 }
 
-void mitk::ConnectomicsNetworkCreator::SetFiberBundle(mitk::FiberBundleX::Pointer fiberBundle)
+void mitk::ConnectomicsNetworkCreator::SetFiberBundle(mitk::FiberBundle::Pointer fiberBundle)
 {
   m_FiberBundle = fiberBundle;
 }
@@ -106,7 +106,7 @@ void mitk::ConnectomicsNetworkCreator::CreateNetworkFromFibersAndSegmentation()
   for( int fiberID( 0 ); fiberID < numFibers; fiberID++ )
   {
     vtkIdType   numPointsInCell(0);
-    vtkIdType*  pointsInCell(NULL);
+    vtkIdType*  pointsInCell(nullptr);
     vLines->GetNextCell ( numPointsInCell, pointsInCell );
 
     TractType::Pointer singleTract = TractType::New();

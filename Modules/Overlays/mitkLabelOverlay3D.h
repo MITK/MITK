@@ -37,7 +37,7 @@ class PointSet;
 
 
 /** \brief Can display a high amount of 3D labels to a PointSet */
-class MitkOverlays_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
+class MITKOVERLAYS_EXPORT LabelOverlay3D : public mitk::VtkOverlay3D {
 public:
 
   /** \brief Internal class holding the vtkActor, etc. for each of the render windows */
@@ -80,8 +80,8 @@ protected:
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const;
-  void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
+  virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const override;
+  void UpdateVtkOverlay(mitk::BaseRenderer *renderer) override;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit LabelOverlay3D();

@@ -44,7 +44,7 @@ public:
   * An instance of each the QmitkDataManagerView and the SimpleRenderWindowView are
   * initially being laid out.
   */
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 
 };
 // //! [ViewerPerspectiveClassDeclaration]

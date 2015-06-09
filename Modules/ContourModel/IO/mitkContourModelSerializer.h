@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkContourModel_EXPORT ContourModelSerializer : public BaseDataSerializer
+class MITKCONTOURMODEL_EXPORT ContourModelSerializer : public BaseDataSerializer
 {
 
 public:
@@ -32,7 +32,7 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual std::string Serialize();
+  virtual std::string Serialize() override;
 
 protected:
 

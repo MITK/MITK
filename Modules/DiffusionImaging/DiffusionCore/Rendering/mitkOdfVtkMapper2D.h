@@ -70,12 +70,12 @@ public:
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
     bool IsVisibleOdfs(mitk::BaseRenderer* renderer);
-    virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer);
-    virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
-    virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
-    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/){}
+    virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer) override;
+    virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer) override;
+    virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer) override;
+    virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer*  /*renderer*/) override{}
 
     OdfDisplayGeometry MeasureDisplayedGeometry(mitk::BaseRenderer* renderer);
     double GetMinImageSpacing( int index );
@@ -83,9 +83,9 @@ public:
     virtual void Slice(mitk::BaseRenderer* renderer, OdfDisplayGeometry dispGeo);
     virtual int GetIndex(mitk::BaseRenderer* renderer);
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
-    virtual void Update(mitk::BaseRenderer * renderer);
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
-    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return true; }
+    virtual void Update(mitk::BaseRenderer * renderer) override;
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const override { return true; }
 
     class LocalStorage : public mitk::Mapper::BaseLocalStorage
     {

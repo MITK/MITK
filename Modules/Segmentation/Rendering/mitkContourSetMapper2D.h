@@ -33,7 +33,7 @@ class ContourSet;
  *
  * @ingroup Mapper
  */
-class MitkSegmentation_EXPORT ContourSetMapper2D : public GLMapper
+class MITKSEGMENTATION_EXPORT ContourSetMapper2D : public GLMapper
 {
 public:
 
@@ -45,7 +45,7 @@ public:
     /**
      * reimplemented from Baseclass
      */
-    virtual void Paint(mitk::BaseRenderer * renderer);
+    virtual void Paint(mitk::BaseRenderer * renderer) override;
 
     /**
      * return a refernce of the rendered data object

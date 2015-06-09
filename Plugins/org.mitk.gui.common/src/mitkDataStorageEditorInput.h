@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDATASTORAGEEDITORINPUT_H_
 
 #include <berryIEditorInput.h>
+#include <berryIPersistableElement.h>
+
 #include <mitkIDataStorageReference.h>
 
 #include <org_mitk_gui_common_Export.h>
@@ -33,23 +35,30 @@ namespace mitk
  * This editor input is usually used in render window editors inheriting from
  * QmitkAbstractRenderEditor.
  */
-class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public berry::IEditorInput
+class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public berry::IEditorInput //, private berry::IPersistableElement
 {
 public:
-  berryObjectMacro(DataStorageEditorInput);
+  berryObjectMacro(DataStorageEditorInput)
 
   DataStorageEditorInput();
   DataStorageEditorInput(IDataStorageReference::Pointer ref);
 
-  bool Exists() const;
-  std::string GetName() const;
-  std::string GetToolTipText() const;
+  bool Exists() const override;
+  QString GetName() const override;
+  QString GetToolTipText() const override;
+  QIcon GetIcon() const override;
+
+  const berry::IPersistableElement* GetPersistable() const override;
+  Object* GetAdapter(const QString &adapterType) const override;
 
   IDataStorageReference::Pointer GetDataStorageReference();
 
-  bool operator==(const berry::Object*) const;
+  bool operator==(const berry::Object*) const override;
 
 private:
+
+  //QString GetFactoryId() const;
+  //void SaveState(const berry::SmartPointer<berry::IMemento>& memento) const;
 
   IDataStorageReference::Pointer m_DataStorageRef;
 };

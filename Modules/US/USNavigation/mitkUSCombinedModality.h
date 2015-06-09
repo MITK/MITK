@@ -42,7 +42,7 @@ namespace mitk {
    * The ultrasound images are transformed according to this calibration in the
    * GenerateData() method.
    */
-  class MitkUSNavigation_EXPORT USCombinedModality : public USDevice
+  class MITKUSNAVIGATION_EXPORT USCombinedModality : public USDevice
   {
   public:
     static const std::string DeviceClassIdentifier;
@@ -114,32 +114,32 @@ namespace mitk {
     /**
     * \brief Returns the Class of the Device.
     */
-    virtual std::string GetDeviceClass();
+    virtual std::string GetDeviceClass() override;
 
     /**
     * \brief Wrapper for returning USImageSource of the UltrasoundDevice.
     */
-    virtual USImageSource::Pointer GetUSImageSource();
+    virtual USImageSource::Pointer GetUSImageSource() override;
 
     /**
     * \brief Wrapper for returning custom control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom();
+    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom() override;
 
     /**
     * \brief Wrapper for returning B mode control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode();
+    virtual itk::SmartPointer<USControlInterfaceBMode> GetControlInterfaceBMode() override;
 
     /**
     * \brief Wrapper for returning probes control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes();
+    virtual itk::SmartPointer<USControlInterfaceProbes> GetControlInterfaceProbes() override;
 
     /**
     * \brief Wrapper for returning doppler control interface of the UltrasoundDevice.
     */
-    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler();
+    virtual itk::SmartPointer<USControlInterfaceDoppler> GetControlInterfaceDoppler() override;
 
     virtual itk::SmartPointer<mitk::NavigationDataSource> GetNavigationDataSource();
 
@@ -190,38 +190,38 @@ namespace mitk {
     /**
     * \brief Initializes UltrasoundDevice.
     */
-    virtual bool OnInitialization();
+    virtual bool OnInitialization() override;
 
     /**
     * \brief Connects UltrasoundDevice.
     */
-    virtual bool OnConnection();
+    virtual bool OnConnection() override;
 
     /**
     * \brief Disconnects UltrasoundDevice.
     */
-    virtual bool OnDisconnection();
+    virtual bool OnDisconnection() override;
 
     /**
     * \brief Activates UltrasoundDevice.
     */
-    virtual bool OnActivation();
+    virtual bool OnActivation() override;
 
     /**
     * \brief Deactivates UltrasoundDevice.
     */
-    virtual bool OnDeactivation();
+    virtual bool OnDeactivation() override;
 
     /**
     * \brief Freezes or unfreezes UltrasoundDevice.
     */
-    virtual void OnFreeze(bool);
+    virtual void OnFreeze(bool) override;
 
     /**
     * \brief Grabs the next frame from the input.
     * This method is called internally, whenever Update() is invoked by an Output.
     */
-    void GenerateData();
+    void GenerateData() override;
 
     std::string GetIdentifierForCurrentCalibration();
     std::string GetIdentifierForCurrentProbe();

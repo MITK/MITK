@@ -35,7 +35,7 @@ namespace mitk
   * \ingroup IGT
   */
 
-  class MitkIGT_EXPORT NavigationDataRecorder : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataRecorder : public NavigationDataToNavigationDataFilter
   {
   public:
 
@@ -98,7 +98,7 @@ namespace mitk
 
   protected:
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     NavigationDataRecorder();
 

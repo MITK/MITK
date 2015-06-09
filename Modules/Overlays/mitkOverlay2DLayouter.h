@@ -24,7 +24,7 @@ namespace mitk {
 
 /** @brief A simple implementation of a layouter for 2D Overlays
  */
-class MitkOverlays_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter {
+class MITKOVERLAYS_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter {
 public:
   enum Alignment{TopLeft, Top, TopRight, BottomLeft, Bottom, BottomRight};
   mitkClassMacro(Overlay2DLayouter, mitk::AbstractOverlayLayouter);
@@ -46,7 +46,7 @@ public:
   /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
   static Overlay2DLayouter::Pointer CreateLayouter(const std::string& identifier, BaseRenderer* renderer);
 
-  void PrepareLayout();
+  void PrepareLayout() override;
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */

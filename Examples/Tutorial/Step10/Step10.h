@@ -18,14 +18,13 @@
 #include "itkSmartPointer.h"
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"
-#include <MitkCoreExports.h>
 #include "mitkDataInteractor.h"
 #include <mitkPointSet.h>
 
 
 namespace mitk
 {
-  class MITK_CORE_EXPORT ExampleInteractor: public DataInteractor
+  class ExampleInteractor: public DataInteractor
   {
   public:
     mitkClassMacro(ExampleInteractor, DataInteractor);

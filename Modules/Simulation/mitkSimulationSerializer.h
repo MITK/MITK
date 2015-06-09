@@ -22,14 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SimulationSerializer : public BaseDataSerializer
+  class MITKSIMULATION_EXPORT SimulationSerializer : public BaseDataSerializer
   {
   public:
     mitkClassMacro(SimulationSerializer, BaseDataSerializer);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    std::string Serialize();
+    std::string Serialize() override;
 
   protected:
     SimulationSerializer();

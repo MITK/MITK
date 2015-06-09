@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkVectorContainer.h>
 #include <itkRGBAPixel.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 namespace itk{
 
@@ -51,7 +51,7 @@ public:
   itkSetMacro( InvertImage, bool)
   itkGetMacro( InvertImage, bool)
 
-  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer)
+  itkSetMacro( FiberBundle, mitk::FiberBundle::Pointer)
   itkSetMacro( InputImage, typename OutputImageType::Pointer)
 
   /** Use input image geometry to initialize output image **/
@@ -69,7 +69,7 @@ protected:
   TractsToFiberEndingsImageFilter();
   virtual ~TractsToFiberEndingsImageFilter();
 
-  mitk::FiberBundleX::Pointer       m_FiberBundle;          ///< input fiber bundle
+  mitk::FiberBundle::Pointer       m_FiberBundle;          ///< input fiber bundle
   float                             m_UpsamplingFactor;     ///< use higher resolution for ouput image
   bool                              m_InvertImage;          ///< voxelvalue = 1-voxelvalue
   bool                              m_UseImageGeometry;     ///< output image is given other geometry than fiberbundle (input image geometry)

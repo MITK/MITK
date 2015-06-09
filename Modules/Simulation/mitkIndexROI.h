@@ -23,13 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT IndexROI : public sofa::core::DataEngine
+  class MITKSIMULATION_EXPORT IndexROI : public sofa::core::DataEngine
   {
   public:
     SOFA_CLASS(IndexROI, sofa::core::DataEngine);
 
-    void init();
-    void update();
+    void init() override;
+    void update() override;
 
     sofa::core::objectmodel::Data<unsigned int> m_First;
     sofa::core::objectmodel::Data<unsigned int> m_Last;

@@ -20,37 +20,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatformUI.h>
 #include <berryQtWorkbenchAdvisor.h>
 
+#include <QPoint>
+
 class SelectionServiceMITKWorkbenchAdvisor : public berry::QtWorkbenchAdvisor
 {
 
 public:
 
-  static const std::string DEFAULT_PERSPECTIVE_ID;
+  static const QString DEFAULT_PERSPECTIVE_ID;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-      berry::IWorkbenchWindowConfigurer::Pointer configurer)
+      berry::IWorkbenchWindowConfigurer::Pointer configurer) override
   {
     // Set an individual initial size
-    configurer->SetInitialSize(berry::Point(600,400));
+    configurer->SetInitialSize(QPoint(600,400));
     // Set the window title
     configurer->SetTitle("MITK Selection Service");
 
-    wwAdvisor.reset(new berry::WorkbenchWindowAdvisor(configurer));
-    return wwAdvisor.data();
+    return new berry::WorkbenchWindowAdvisor(configurer);
   }
 
-  std::string GetInitialWindowPerspectiveId()
+  QString GetInitialWindowPerspectiveId() override
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
 
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
-
 };
 
-const std::string SelectionServiceMITKWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
+const QString SelectionServiceMITKWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.extendedperspective";
 
 SelectionServiceMitk::SelectionServiceMitk()
 {
@@ -60,7 +57,7 @@ SelectionServiceMitk::~SelectionServiceMitk()
 {
 }
 
-int SelectionServiceMitk::Start()
+QVariant SelectionServiceMitk::Start(berry::IApplicationContext* /*context*/)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
   wbAdvisor.reset(new SelectionServiceMITKWorkbenchAdvisor);

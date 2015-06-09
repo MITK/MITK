@@ -80,7 +80,7 @@ namespace mitk
 
   $Author$
   */
-  class MitkSegmentation_EXPORT Tool : public EventStateMachine
+  class MITKSEGMENTATION_EXPORT Tool : public EventStateMachine
                                  , public InteractionEventObserver
   {
   public:
@@ -191,7 +191,7 @@ namespace mitk
 
     virtual void SetToolManager(ToolManager*);
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
     /**
     \brief Called when the tool gets activated (registered to mitk::GlobalInteraction).
@@ -211,9 +211,9 @@ namespace mitk
     Tool( const char*); // purposely hidden
     virtual ~Tool();
 
-    virtual void Notify( InteractionEvent* interactionEvent,bool isHandled );
+    virtual void Notify( InteractionEvent* interactionEvent,bool isHandled ) override;
 
-    bool FilterEvents(InteractionEvent* , DataNode* );
+    bool FilterEvents(InteractionEvent* , DataNode* ) override;
 
     ToolManager* m_ToolManager;
 

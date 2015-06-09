@@ -156,7 +156,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
 
   //create result image, get mask node and reference image
-  mitk::Image::Pointer resultImage(0);
+  mitk::Image::Pointer resultImage(nullptr);
   mitk::DataNode::Pointer maskingNode = dataSelectionWidget->GetSelection(1);
   mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(dataSelectionWidget->GetSelection(0)->GetData());
 
@@ -243,7 +243,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
 mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer referenceImage, mitk::Image::Pointer maskImage )
 {
-  mitk::Image::Pointer resultImage(0);
+  mitk::Image::Pointer resultImage(nullptr);
 
   mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
   maskFilter->SetInput( referenceImage );
@@ -257,7 +257,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
   catch(itk::ExceptionObject& excpt)
   {
     MITK_ERROR << excpt.GetDescription();
-    return 0;
+    return nullptr;
   }
 
   resultImage = maskFilter->GetOutput();
@@ -281,7 +281,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image
   catch(itk::ExceptionObject& excpt)
   {
     MITK_ERROR << excpt.GetDescription();
-    return 0;
+    return nullptr;
   }
 
   mitk::ProgressBar::GetInstance()->Progress();

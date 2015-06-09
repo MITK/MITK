@@ -44,7 +44,7 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
   m_Success = false;
   InputType* input = this->GetInput();
 
-  if (input == NULL)
+  if (input == nullptr)
   {
     itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!")
     return;
@@ -61,7 +61,7 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
 
   std::vector< itk::Index<3> > roi = input->GetRoi();
 
-  std::vector< itk::Index<3> >::iterator it = roi.begin();
+  auto it = roi.begin();
 
   int i=0;
   while(it != roi.end())
@@ -123,7 +123,7 @@ mitk::TbssRoiImage* mitk::NrrdTbssRoiImageWriter::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
-    return NULL;
+    return nullptr;
   }
   else
   {

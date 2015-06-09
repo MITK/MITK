@@ -49,11 +49,11 @@ namespace mitk
      * \param[in] boundaryFixing Keep original surface boundaries by adding additional polygons.
      * \return Returns the remeshed surface or NULL if input surface is invalid.
      */
-    MitkRemeshing_EXPORT Surface::Pointer Remesh(Surface::ConstPointer surface, unsigned int t, int numVertices, double gradation, int subsampling = 10, double edgeSplitting = 0.0, int optimizationLevel = 1, bool forceManifold = false, bool boundaryFixing = false);
+    MITKREMESHING_EXPORT Surface::Pointer Remesh(Surface::ConstPointer surface, unsigned int t, int numVertices, double gradation, int subsampling = 10, double edgeSplitting = 0.0, int optimizationLevel = 1, bool forceManifold = false, bool boundaryFixing = false);
 
     /** \brief Encapsulates mitk::ACVD::Remesh function as filter.
      */
-    class MitkRemeshing_EXPORT RemeshFilter : public mitk::SurfaceToSurfaceFilter
+    class MITKREMESHING_EXPORT RemeshFilter : public mitk::SurfaceToSurfaceFilter
     {
     public:
       mitkClassMacro(RemeshFilter, SurfaceToSurfaceFilter);
@@ -70,7 +70,7 @@ namespace mitk
       itkSetMacro(BoundaryFixing, bool);
 
     protected:
-      void GenerateData();
+      void GenerateData() override;
 
     private:
       RemeshFilter();

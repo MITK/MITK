@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKXNATEDITOR_h
 #define QMITKXNATEDITOR_h
 
@@ -53,19 +52,19 @@ public:
 
   berryObjectMacro(QmitkXnatEditor)
 
-  QmitkXnatEditor();
+    QmitkXnatEditor();
   ~QmitkXnatEditor();
 
-  static const std::string EDITOR_ID;
+  static const QString EDITOR_ID;
 
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
-  void DoSave(/*IProgressMonitor monitor*/);
-  void DoSaveAs();
-  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
-  bool IsDirty() const;
-  bool IsSaveAsAllowed() const;
-  void SetInput(berry::IEditorInput::Pointer input);
+  void DoSave(/*IProgressMonitor monitor*/) override;
+  void DoSaveAs() override;
+  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input) override;
+  bool IsDirty() const override;
+  bool IsSaveAsAllowed() const override;
+  void SetInput(berry::IEditorInput::Pointer input) override;
 
   /**
   \brief Here the root object will be set and the view reset. Additionally the breadcrumbs will set visible.
@@ -74,38 +73,35 @@ public:
 
   protected slots:
 
-    /**
-    \brief A resource folder will be downloaded to the chosen download path.
-    */
-    void DownloadResource();
+  /**
+  \brief Any XNAT resource (file or folder) will be downloaded to the chosen download path.
+  */
+  void DownloadResource();
 
-    /**
-    \brief A file will be downloaded to the chosen download path.
-    */
-    void DownloadFile();
+  /**
+  \brief Every time you activate a node in the list, the root item will be updated to a child of the previous parent.\
+  In exception of the node is a file. The file will be downloaded and loaded to the DataManager.
+  */
+  void OnObjectActivated(const QModelIndex& index);
 
-    /**
-    \brief Every time you activate a node in the list, the root item will be updated to a child of the previous parent.\
-    In exception of the node is a file. The file will be downloaded and loaded to the DataManager.
-    */
-    void OnObjectActivated(const QModelIndex& index);
+  // Breadcrumb button slots
+  void OnDataModelButtonClicked();
+  void OnProjectButtonClicked();
+  void OnSubjectButtonClicked();
+  void OnExperimentButtonClicked();
+  void OnKindOfDataButtonClicked();
+  void OnSessionButtonClicked();
+  void OnResourceButtonClicked();
 
-    // Breadcrumb button slots
-    void OnDataModelButtonClicked();
-    void OnProjectButtonClicked();
-    void OnSubjectButtonClicked();
-    void OnExperimentButtonClicked();
-    void OnKindOfDataButtonClicked();
-    void OnSessionButtonClicked();
-    void OnResourceButtonClicked();
+  /// \brief Updates the ctkXnatSession and the user interface
+  void UpdateSession(ctkXnatSession* session);
 
-    /// \brief Updates the ctkXnatSession and the user interface
-    void UpdateSession(ctkXnatSession* session);
-    void CleanListModel(ctkXnatSession* session);
+  void CleanListModel(ctkXnatSession* session);
+  void itemSelected(const QModelIndex &index);
 
 protected:
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   Ui::QmitkXnatEditorControls m_Controls;
 
@@ -123,8 +119,9 @@ private:
   ctkXnatSession* m_Session;
   mitk::XnatSessionTracker* m_Tracker;
 
-  berry::ISelectionListener::Pointer m_SelectionListener;
-  void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
+  QScopedPointer<berry::ISelectionListener> m_SelectionListener;
+  void SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
+    const berry::ISelection::ConstPointer& selection);
 };
 
 #endif // QMITKXNATEDITOR_h

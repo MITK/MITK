@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <sstream>
 
+#include <vnl/vnl_math.h>
+
 mitk::DiffusionHeaderPhilipsDICOMFileReader::DiffusionHeaderPhilipsDICOMFileReader()
 {
 }

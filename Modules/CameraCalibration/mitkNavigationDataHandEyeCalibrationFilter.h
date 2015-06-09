@@ -36,7 +36,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkCameraCalibration_EXPORT NavigationDataHandEyeCalibrationFilter : public NavigationDataToNavigationDataFilter
+  class MITKCAMERACALIBRATION_EXPORT NavigationDataHandEyeCalibrationFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataHandEyeCalibrationFilter, NavigationDataToNavigationDataFilter);
@@ -69,7 +69,7 @@ namespace mitk {
     /*
     * \brief Transfer the information from the input to the associated BaseData
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
 
   protected:

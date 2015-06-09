@@ -49,7 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
       \sa vtkImageReslice
       (Note that the execute and interpolation functions are no members and thus can not be overriden)
    */
-  class MitkSegmentation_EXPORT mitkVtkImageOverwrite : public vtkImageReslice
+  class MITKSEGMENTATION_EXPORT mitkVtkImageOverwrite : public vtkImageReslice
   {
   public:
     static mitkVtkImageOverwrite *New();
@@ -81,7 +81,7 @@ See LICENSE.txt or http://www.mitk.org for details.
                                       vtkInformationVector *vtkNotUsed(outputVector),
                                       vtkImageData ***inData,
                                       vtkImageData **outData,
-                                      int outExt[6], int id);
+                                      int outExt[6], int id) override;
   };
 
 

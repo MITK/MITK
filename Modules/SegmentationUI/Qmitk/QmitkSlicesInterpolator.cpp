@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkSelectableGLWidget.h"
 
 #include "mitkToolManager.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
@@ -41,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkImageWriteAccessor.h>
+#include <mitkImageReadAccessor.h>
 
 #include <itkCommand.h>
 
@@ -148,7 +148,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_InterpolatedSurfaceNode->SetProperty( "color", mitk::ColorProperty::New(SURFACE_COLOR_RGB) );
   m_InterpolatedSurfaceNode->SetProperty( "name", mitk::StringProperty::New("Surface Interpolation feedback") );
   m_InterpolatedSurfaceNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5) );
-  m_InterpolatedSurfaceNode->SetProperty( "line width", mitk::IntProperty::New(4) );
+  m_InterpolatedSurfaceNode->SetProperty( "line width", mitk::FloatProperty::New(4.0f) );
   m_InterpolatedSurfaceNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
   m_InterpolatedSurfaceNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
   m_InterpolatedSurfaceNode->SetVisibility(false);
@@ -454,7 +454,9 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object* sender, const itk::Even
   mitk::SliceNavigationController* slicer = dynamic_cast<mitk::SliceNavigationController*>(sender);
   Q_ASSERT(slicer);
 
-  m_TimeStep[slicer];
+  m_TimeStep[slicer] = slicer->GetTime()->GetPos();
+
+  m_SurfaceInterpolator->SetCurrentTimeStep( slicer->GetTime()->GetPos() );
 
   if (m_LastSNC == slicer)
   {
@@ -690,10 +692,10 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
         mitk::ExtractSliceFilter::Pointer diffslicewriter =  mitk::ExtractSliceFilter::New(reslice);
         diffslicewriter->SetInput( diffImage );
-        diffslicewriter->SetTimeStep( timeStep );
+        diffslicewriter->SetTimeStep( 0 );
         diffslicewriter->SetWorldGeometry(reslicePlane);
         diffslicewriter->SetVtkOutputRequest(true);
-        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeGeometry()->GetGeometryForTimeStep( timeStep ) );
+        diffslicewriter->SetResliceTransformByGeometry( diffImage->GetTimeGeometry()->GetGeometryForTimeStep( 0 ) );
 
         diffslicewriter->Modified();
         diffslicewriter->Update();
@@ -766,14 +768,22 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     s2iFilter->Update();
 
     mitk::DataNode* segmentationNode = m_ToolManager->GetWorkingData(0);
-    mitk::Image* oldSeg = dynamic_cast<mitk::Image*>(segmentationNode->GetData());
     mitk::Image::Pointer newSeg = s2iFilter->GetOutput();
-    if (oldSeg)
-      m_SurfaceInterpolator->ReplaceInterpolationSession(oldSeg, newSeg);
-    else
-      return;
+    mitk::Image* currSeg = dynamic_cast<mitk::Image*>(segmentationNode->GetData());
 
-    segmentationNode->SetData(newSeg);
+    unsigned int timestep = m_LastSNC->GetTime()->GetPos();
+    mitk::ImageReadAccessor readAccess(newSeg, newSeg->GetVolumeData(timestep));
+    const void* cPointer = readAccess.GetData();
+
+    if (currSeg && cPointer)
+    {
+      currSeg->SetVolume( cPointer, timestep, 0 );
+    }
+    else
+    {
+      return;
+    }
+
     m_CmbInterpolation->setCurrentIndex(0);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     mitk::DataNode::Pointer segSurface = mitk::DataNode::New();
@@ -789,6 +799,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     segSurface->SetProperty( "opacity", mitk::FloatProperty::New(0.7) );
     segSurface->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(true));
     segSurface->SetProperty( "3DInterpolationResult", mitk::BoolProperty::New(true));
+    segSurface->SetVisibility(false);
     m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
   }
@@ -1029,6 +1040,7 @@ void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
     mitk::BaseRenderer* renderer = m_LastSNC->GetRenderer();
     if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
     {
+      //TODO 18735: This cast always returns NULL, cuase GetWorldGeometry returns a Base Geometry?!?!?!
       const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
       if (timeGeometry)
       {
@@ -1091,7 +1103,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
           {
             minSpacing = spacing[i];
           }
-          else if (spacing[i] > maxSpacing)
+          if (spacing[i] > maxSpacing)
           {
             maxSpacing = spacing[i];
           }
@@ -1102,10 +1114,13 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
         mitk::Image* segmentationImage = dynamic_cast<mitk::Image*>(workingNode->GetData());
-        if (segmentationImage->GetDimension() == 3)
+        /*if (segmentationImage->GetDimension() == 3)
+        {*/
           m_SurfaceInterpolator->SetCurrentInterpolationSession(segmentationImage);
-        else
-          MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";
+          m_SurfaceInterpolator->SetCurrentTimeStep( time_position );
+        //}
+        /*else
+          MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";*/
 
         if (m_3DInterpolationEnabled)
         {
@@ -1139,7 +1154,7 @@ void QmitkSlicesInterpolator::CheckSupportedImageDimension()
   if (m_ToolManager->GetWorkingData(0))
     m_Segmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
 
-  if (m_3DInterpolationEnabled && m_Segmentation && m_Segmentation->GetDimension() != 3)
+  /*if (m_3DInterpolationEnabled && m_Segmentation && m_Segmentation->GetDimension() != 3)
   {
     QMessageBox info;
     info.setWindowTitle("3D Interpolation Process");
@@ -1147,7 +1162,7 @@ void QmitkSlicesInterpolator::CheckSupportedImageDimension()
     info.setText("3D Interpolation is only supported for 3D images at the moment!");
     info.exec();
     m_CmbInterpolation->setCurrentIndex(0);
-  }
+  }*/
 }
 
 void QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject& /*e*/)

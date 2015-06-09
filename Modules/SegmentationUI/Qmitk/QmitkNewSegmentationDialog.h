@@ -43,13 +43,13 @@ class QPushButton;
 
   Last contribution by $Author: maleike $.
 */
-class MitkSegmentationUI_EXPORT QmitkNewSegmentationDialog : public QDialog
+class MITKSEGMENTATIONUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
 
   public:
 
-    QmitkNewSegmentationDialog(QWidget* parent = 0);
+    QmitkNewSegmentationDialog(QWidget* parent = nullptr);
 
     virtual ~QmitkNewSegmentationDialog();
 

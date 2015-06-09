@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <itkDiffusionTensor3D.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 namespace itk{
 
@@ -95,7 +95,7 @@ public:
     itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)  ///< contains one vectorimage for each input ROI
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                  ///< contains number of directions per voxel
     itkGetMacro( SNRImage, ItkFloatImgType::Pointer)                            ///< contains local SNR values
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                ///< output vector field
+    itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                ///< output vector field
 
     protected:
     DwiPhantomGenerationFilter();
@@ -113,7 +113,7 @@ private:
     ItkDirectionImageContainer::Pointer             m_DirectionImageContainer;  ///< contains one vectorimage for each input ROI
     ItkUcharImgType::Pointer                        m_NumDirectionsImage;       ///< contains number of directions per voxel
     ItkFloatImgType::Pointer                        m_SNRImage;                 ///< contains local SNR values
-    mitk::FiberBundleX::Pointer                     m_OutputFiberBundle;        ///< output vector field
+    mitk::FiberBundle::Pointer                     m_OutputFiberBundle;        ///< output vector field
 
     // signal regions
     std::vector< ItkUcharImgType::Pointer >         m_SignalRegions;    ///< binary images defining the regions for the signal generation

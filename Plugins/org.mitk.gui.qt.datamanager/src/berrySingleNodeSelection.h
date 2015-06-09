@@ -52,7 +52,7 @@ namespace berry
     ///
     /// \brief Checks if node is 0.
     ///
-    virtual bool IsEmpty() const;
+    virtual bool IsEmpty() const override;
 
   protected:
     ///

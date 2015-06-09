@@ -43,7 +43,7 @@ void mitk::ToFDistanceImageToPointSetFilter::SetInput(const mitk::Image* distanc
 
 void mitk::ToFDistanceImageToPointSetFilter::SetInput( unsigned int idx,const mitk::Image* distanceImage )
 {
-  if ((distanceImage == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
   {
     this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
   }
@@ -62,7 +62,7 @@ mitk::Image* mitk::ToFDistanceImageToPointSetFilter::GetInput()
 mitk::Image* mitk::ToFDistanceImageToPointSetFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast< mitk::Image*>(this->ProcessObject::GetInput(idx));
 }
@@ -193,7 +193,7 @@ void mitk::ToFDistanceImageToPointSetFilter::CreateOutputsForAllInputs()
 {
   this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);

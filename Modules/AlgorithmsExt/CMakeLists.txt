@@ -1,8 +1,9 @@
-MITK_CREATE_MODULE(DEPENDS MitkDataTypesExt
-                   PACKAGE_DEPENDS ITK|ITKThresholding ANN
+mitk_create_module(DEPENDS MitkDataTypesExt MitkLegacyGL
+                   PACKAGE_DEPENDS
+                     PUBLIC ITK|ITKThresholding
+                     PRIVATE ANN
                    WARNINGS_AS_ERRORS
                   )
 
-if(BUILD_TESTING)
-  add_subdirectory(Testing)
-endif()
+add_subdirectory(test)
+

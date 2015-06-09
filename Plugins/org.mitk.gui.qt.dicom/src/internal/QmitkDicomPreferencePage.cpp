@@ -40,7 +40,7 @@ static QString CreateDefaultPath()
 }
 
 QmitkDicomPreferencePage::QmitkDicomPreferencePage()
-  : m_MainControl(0)
+  : m_MainControl(nullptr)
 {
 }
 
@@ -54,18 +54,17 @@ void QmitkDicomPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService::Pointer prefService=
-    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
   m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader");
 
   m_MainControl = new QWidget(parent);
 
-  QFormLayout *formLayout = new QFormLayout;
+  auto  formLayout = new QFormLayout;
   formLayout->setHorizontalSpacing(8);
   formLayout->setVerticalSpacing(24);
 
-  QHBoxLayout* displayOptionsLayout = new QHBoxLayout;
+  auto   displayOptionsLayout = new QHBoxLayout;
   m_PathEdit = new QLineEdit(m_MainControl);
   displayOptionsLayout->addWidget(m_PathEdit);
 
@@ -95,14 +94,14 @@ void QmitkDicomPreferencePage::PerformCancel()
 
 bool QmitkDicomPreferencePage::PerformOk()
 {
-  m_DicomPreferencesNode->Put("default dicom path",m_PathEdit->text().toStdString());
+  m_DicomPreferencesNode->Put("default dicom path",m_PathEdit->text());
   return true;
 }
 
 void QmitkDicomPreferencePage::Update()
 {
-  std::string path = m_DicomPreferencesNode->Get("default dicom path", CreateDefaultPath().toStdString());
-  m_PathEdit->setText(path.c_str());
+  QString path = m_DicomPreferencesNode->Get("default dicom path", CreateDefaultPath());
+  m_PathEdit->setText(path);
 }
 
 void QmitkDicomPreferencePage::DefaultButtonPushed()
@@ -112,7 +111,7 @@ void QmitkDicomPreferencePage::DefaultButtonPushed()
 
 void QmitkDicomPreferencePage::PathSelectButtonPushed()
 {
-  QString path = QFileDialog::getExistingDirectory(m_MainControl,"Folder for Dicom directory","dir",false);
+  QString path = QFileDialog::getExistingDirectory(m_MainControl,"Folder for Dicom directory","dir");
   if (!path.isEmpty())
   {
     m_PathEdit->setText(path);

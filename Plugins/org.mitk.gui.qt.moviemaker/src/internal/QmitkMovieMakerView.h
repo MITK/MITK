@@ -41,8 +41,8 @@ public:
   QmitkMovieMakerView();
   ~QmitkMovieMakerView();
 
-  void CreateQtPartControl(QWidget* parent);
-  void SetFocus();
+  void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
 
 private slots:
   void OnMoveAnimationUpButtonClicked();
@@ -82,6 +82,8 @@ private:
   void CalculateTotalDuration();
   QmitkAnimationItem* GetSelectedAnimationItem() const;
   QVector<QPair<QmitkAnimationItem*, double> > GetActiveAnimations(double t) const;
+
+  QString GetFFmpegPath() const;
 
   QmitkFFmpegWriter* m_FFmpegWriter;
   Ui::QmitkMovieMakerView* m_Ui;

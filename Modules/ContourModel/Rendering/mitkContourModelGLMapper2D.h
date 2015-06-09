@@ -34,9 +34,9 @@ namespace mitk {
   * @brief OpenGL-based mapper to display a mitk::Contour object in a 2D render window
   *
   *
-  * @ingroup Mapper
+  * @ingroup MitkContourModelModule
   */
-  class MitkContourModel_EXPORT ContourModelGLMapper2D : public ContourModelGLMapper2DBase
+  class MITKCONTOURMODEL_EXPORT ContourModelGLMapper2D : public ContourModelGLMapper2DBase
   {
   public:
 
@@ -48,7 +48,7 @@ namespace mitk {
     /**
     * reimplemented from Baseclass
     */
-    virtual void Paint(BaseRenderer * renderer);
+    virtual void Paint(BaseRenderer * renderer) override;
 
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 

@@ -51,40 +51,23 @@ class QmitkControlVisualizationPropertiesView : public QmitkFunctionality//, pub
   static const std::string VIEW_ID;
 
   QmitkControlVisualizationPropertiesView();
-  QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other);
   virtual ~QmitkControlVisualizationPropertiesView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
   /// \brief Called when the functionality is activated
-  virtual void Activated();
+  virtual void Activated() override;
 
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
-
-  mitk::DataStorage::SetOfObjects::Pointer ActiveSet(std::string);
-
-  void SetBoolProp (mitk::DataStorage::SetOfObjects::Pointer,std::string,bool);
-  void SetIntProp  (mitk::DataStorage::SetOfObjects::Pointer,std::string,int);
-  void SetFloatProp(mitk::DataStorage::SetOfObjects::Pointer,std::string,float);
-  void SetLevelWindowProp(mitk::DataStorage::SetOfObjects::Pointer,std::string,mitk::LevelWindow);
-  void SetEnumProp (mitk::DataStorage::SetOfObjects::Pointer,std::string,mitk::EnumerationProperty::Pointer);
-
-  virtual int GetSizeFlags(bool width);
-  virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredResult);
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
 protected slots:
 
-  void DisplayIndexChanged(int);
-  void TextIntON();
-  void Reinit();
-
-  void VisibleOdfsON(int view);
   void VisibleOdfsON_S();
   void VisibleOdfsON_T();
   void VisibleOdfsON_C();
@@ -93,40 +76,33 @@ protected slots:
   void NormalizationDropdownChanged(int);
   void ScalingFactorChanged(double);
   void AdditionalScaling(int);
-  void IndexParam1Changed(double);
-  void IndexParam2Changed(double);
-  void OpacityChanged(double,double);
   void ScalingCheckbox();
 
   void OnThickSlicesModeSelected( QAction* action );
   void OnTSNumChanged(int num);
 
-  void BundleRepresentationColor();
   void BundleRepresentationResetColoring();
   void PlanarFigureFocus();
   void Fiber2DfadingEFX();
   void FiberSlicingThickness2D();
   void FiberSlicingUpdateLabel(int);
+  void LineWidthChanged();
+  void TubeRadiusChanged();
 
   void SetInteractor();
 
-  void PFWidth(int);
-  void PFColor();
-
-  void LineWidthChanged();
-
-  void GenerateTdi();
   void Welcome();
 
 protected:
 
-  virtual void NodeRemoved(const mitk::DataNode* node);
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
-  virtual void NodeAdded(const mitk::DataNode *node);
+  virtual void NodeAdded(const mitk::DataNode *node) override;
   void SetFiberBundleCustomColor(const itk::EventObject& /*e*/);
+  void SetFiberBundleOpacity(const itk::EventObject& /*e*/);
   bool IsPlaneRotated();
 
   void SliceRotation(const itk::EventObject&);
@@ -135,11 +111,9 @@ protected:
 
   QmitkStdMultiWidget* m_MultiWidget;
 
-  berry::ISelectionListener::Pointer m_SelListener;
+  QScopedPointer<berry::ISelectionListener> m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
-  bool m_FoundSingleOdfImage;
-  bool m_IsInitialized;
   mitk::DataNode::Pointer m_NodeUsedForOdfVisualization;
 
   QIcon* m_IconTexOFF;
@@ -161,13 +135,15 @@ protected:
   QMenu* m_MyMenu;
 
   // for planarfigure and bundle handling:
-  mitk::DataNode* m_SelectedNode;
+  mitk::DataNode::Pointer m_SelectedNode;
   mitk::DataNode* m_CurrentPickingNode;
 
   unsigned long m_SlicesRotationObserverTag1;
   unsigned long m_SlicesRotationObserverTag2;
   unsigned long m_FiberBundleObserverTag;
+  unsigned long m_FiberBundleObserveOpacityTag;
   mitk::ColorProperty::Pointer m_Color;
+  mitk::FloatProperty::Pointer m_Opacity;
 };
 
 

@@ -30,12 +30,12 @@ namespace mitk
   /** \brief Executes a DiffSliceOperation.
     \sa DiffSliceOperation
   */
-  class MitkSegmentation_EXPORT DiffSliceOperationApplier : public OperationActor
+  class MITKSEGMENTATION_EXPORT DiffSliceOperationApplier : public OperationActor
   {
 
   public:
 
-    mitkClassMacro(DiffSliceOperationApplier, OperationActor);
+    mitkClassMacroNoParent(DiffSliceOperationApplier)
 
     //itkFactorylessNewMacro(Self)
     //itkCloneMacro(Self)
@@ -48,7 +48,7 @@ namespace mitk
       Note:
         Only DiffSliceOperation is supported.
     */
-    virtual void ExecuteOperation(Operation* op);
+    virtual void ExecuteOperation(Operation* op) override;
 
 
   protected:

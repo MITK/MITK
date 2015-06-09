@@ -86,7 +86,7 @@ class PlaneGeometry;
 
   $Author$
 */
-class MitkSegmentation_EXPORT ToolManager : public itk::Object
+class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
 {
   public:
 
@@ -107,7 +107,7 @@ class MitkSegmentation_EXPORT ToolManager : public itk::Object
     Message1<std::string> ToolErrorMessage;
     Message1<std::string> GeneralToolMessage;
 
-    mitkClassMacro(ToolManager, itk::Object);
+    mitkClassMacroItkParent(ToolManager, itk::Object);
     mitkNewMacro1Param(ToolManager, DataStorage*);
 
     /**
@@ -135,7 +135,7 @@ class MitkSegmentation_EXPORT ToolManager : public itk::Object
     int GetToolIdByToolType()
     {
       int id = 0;
-      for ( ToolVectorType::iterator iter = m_Tools.begin();
+      for ( auto iter = m_Tools.begin();
             iter != m_Tools.end();
             ++iter, ++id )
       {

@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDateTime>
 #include <QtPlugin>
 
-QmitkExtApplicationPlugin* QmitkExtApplicationPlugin::inst = 0;
+QmitkExtApplicationPlugin* QmitkExtApplicationPlugin::inst = nullptr;
 
 QmitkExtApplicationPlugin::QmitkExtApplicationPlugin()
 {
@@ -61,7 +61,7 @@ void QmitkExtApplicationPlugin::start(ctkPluginContext* context)
 
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
-  ctkConfigurationAdmin* configAdmin = 0;
+  ctkConfigurationAdmin* configAdmin = nullptr;
   if (cmRef)
   {
     configAdmin = context->getService<ctkConfigurationAdmin>(cmRef);

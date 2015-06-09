@@ -38,11 +38,11 @@ namespace mitk {
 
   \author Daniel Stein
   */
-  class MITK_RIGIDREGISTRATION_EXPORT OptimizerParameters : public ::itk::Object
+  class MITKRIGIDREGISTRATION_EXPORT OptimizerParameters : public ::itk::Object
   {
   public:
 
-    mitkClassMacro(OptimizerParameters,::itk::Object);
+    mitkClassMacroItkParent(OptimizerParameters,::itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

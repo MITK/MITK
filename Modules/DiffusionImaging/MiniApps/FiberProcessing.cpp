@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "MiniAppManager.h"
-
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -26,34 +24,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMetaDataObject.h>
 #include <itkVectorImage.h>
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
-#include <mitkFiberBundleX.h>
-#include "ctkCommandLineParser.h"
+#include <mitkFiberBundle.h>
+#include "mitkCommandLineParser.h"
 #include <boost/lexical_cast.hpp>
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 
 
-mitk::FiberBundleX::Pointer LoadFib(std::string filename)
+mitk::FiberBundle::Pointer LoadFib(std::string filename)
 {
-    const std::string s1="", s2="";
-    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::BaseDataIO::LoadBaseDataFromFile( filename, s1, s2, false );
+    std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(filename);
     if( fibInfile.empty() )
         std::cout << "File " << filename << " could not be read!";
-
     mitk::BaseData::Pointer baseData = fibInfile.at(0);
-    return dynamic_cast<mitk::FiberBundleX*>(baseData.GetPointer());
+    return dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
 }
 
-int FiberProcessing(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
-    std::cout << "FiberProcessing";
     mitkCommandLineParser parser;
 
     parser.setTitle("Fiber Processing");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -150,7 +144,7 @@ int FiberProcessing(int argc, char* argv[])
 
     try
     {
-        mitk::FiberBundleX::Pointer fib = LoadFib(inFileName);
+        mitk::FiberBundle::Pointer fib = LoadFib(inFileName);
 
         if (minFiberLength>0)
             fib->RemoveShortFibers(minFiberLength);
@@ -207,4 +201,3 @@ int FiberProcessing(int argc, char* argv[])
     }
     return EXIT_SUCCESS;
 }
-RegisterDiffusionMiniApp(FiberProcessing);

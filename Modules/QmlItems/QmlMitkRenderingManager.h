@@ -36,7 +36,7 @@ class QmlMitkRenderingManagerFactory;
  * receive it back in the GUI thread where we are allowed to do rendering.
  *
  */
-class MitkQmlItems_EXPORT QmlMitkRenderingManager : public QObject, public mitk::RenderingManager
+class MITKQMLITEMS_EXPORT QmlMitkRenderingManager : public QObject, public mitk::RenderingManager
 {
   Q_OBJECT
 
@@ -45,7 +45,7 @@ public:
   mitkClassMacro( QmlMitkRenderingManager, mitk::RenderingManager );
   virtual ~QmlMitkRenderingManager();
 
-  virtual bool event( QEvent *event );
+  virtual bool event( QEvent *event ) override;
 
 protected:
 
@@ -53,9 +53,9 @@ protected:
 
   QmlMitkRenderingManager();
 
-  virtual void GenerateRenderingRequestEvent();
+  virtual void GenerateRenderingRequestEvent() override;
 
-  virtual void StartOrResetTimer();
+  virtual void StartOrResetTimer() override;
 
   int pendingTimerCallbacks;
 

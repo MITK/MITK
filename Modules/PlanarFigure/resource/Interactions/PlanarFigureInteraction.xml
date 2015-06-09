@@ -1,0 +1,277 @@
+<statemachine NAME="PlanarFigureInteractor">
+  <state name="Start" startstate="true">
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure"> <!-- Figure is placed -->
+      <condition name="figure_is_placed" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="PlaceFigure"> <!-- Figure is not placed -->
+      <condition name="figure_is_placed" inverted="true"/>
+    </transition>
+  </state>
+
+  <state name="FigurePlaced">
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="FigurePlaced" >
+      <condition name="figure_is_on_current_slice" />
+      <action name="move_current_point" ID="90" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <action name="move_current_point" ID="90" />
+    </transition>
+
+    <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Start" >
+      <condition name="minimal_figure_is_finished" />
+      <action name="finalize_figure" />"
+    </transition>
+
+    <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="FigurePlaced" >
+      <condition name="minimal_figure_is_finished" inverted="true" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Start" >
+      <condition name="point_is_valid" />
+      <condition name="figure_is_finished" />
+      <action name="finalize_figure" />"
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlaced" >
+      <condition name="point_is_valid" />
+      <condition name="figure_is_finished" inverted="true" />
+      <action name="add_new_point" ID="10" /> <!-- AcADDPOINT -->
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlaced" > <!-- point is invalid -->
+      <condition name="point_is_valid" inverted="true" />
+    </transition>
+  </state>
+
+  <state name="ControlPointSelected">
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="ControlPointSelected" >
+      <action name="move_current_point" ID="90" /> <!-- AcMOVEPOINT -->
+    </transition>
+
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="EditFigure" >
+      <action name="deselect_point" ID="76" /> <!-- AcDESELECTPOINT -->
+    </transition>
+  </state>
+
+  <state name="PlaceFigure">
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlaced" >
+      <action name="add_initial_point" ID="11" /> <!-- AcADD -->
+    </transition>
+  </state>
+
+  <state name="EditFigure">
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="hovering_above_figure" />
+      <action name="start_hovering" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverPoint" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="hovering_above_point" />
+      <action name="start_hovering" />
+      <action name="select_point" />
+    </transition>
+
+    <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
+      <condition name="figure_is_selected" />
+      <action name="delete_figure" />
+    </transition>
+  </state>
+
+  <state name="HoveringOverFigure">
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
+      <condition name="hovering_above_figure" inverted="true" />
+      <action name="hide_preview_point" />
+      <action name="end_hovering" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >  <!-- continue hovering -->
+      <condition name="hovering_above_point" inverted="true"/>
+      <condition name="hovering_above_figure" />
+      <action name="set_preview_point_position" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverPoint" >  <!-- continue hovering -->
+      <condition name="hovering_above_point" />
+      <action name="hide_preview_point" />
+      <action name="select_point" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_selected" />
+      <condition name="point_is_valid" />
+      <condition name="figure_is_finished" inverted="true" />
+      <action name="add_new_point" ID="10" /> <!-- AcADDPOINT -->
+    </transition>
+    
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_selected" />
+      <condition name="point_is_valid" />
+      <condition name="figure_is_finished" />
+      <condition name="reset_on_point_select_needed" />
+      <action name="move_current_point" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_selected" />
+      <condition name="point_is_valid" />
+      <condition name="figure_is_finished" />
+      <condition name="reset_on_point_select_needed" />
+      <action name="move_current_point" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="HoveringOverFigure" > <!-- continue hovering -->
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_selected" inverted="true" />
+      <action name="select_figure" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <action name="move_current_point" ID="90" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="ContextMenuHelperState" > <!-- continue hovering -->
+      <condition name="figure_is_on_current_slice" />
+      <action name="request_context_menu" ID="48000" />
+    </transition>
+
+  </state>
+
+  <state name="ContextMenuHelperState">
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
+      <condition name="hovering_above_point" inverted="true" />
+      <condition name="hovering_above_figure" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
+      <condition name="hovering_above_point" inverted="true" />
+      <condition name="hovering_above_figure" inverted="true" />
+      <action name="hide_preview_point" />
+      <action name="end_hovering" />
+      <action name="select_point" />
+    </transition>
+    
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverPoint" >  <!-- continue hovering -->
+      <condition name="hovering_above_point" />
+      <action name="hide_preview_point" />
+      <action name="select_point" />
+    </transition>
+  </state>
+  
+  <state name="HoveringOverPoint">
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
+      <condition name="hovering_above_point" inverted="true" />
+      <condition name="hovering_above_figure" />
+      <action name="set_preview_point_position" />
+      <action name="select_point" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
+      <condition name="hovering_above_point" inverted="true" />
+      <condition name="hovering_above_figure" inverted="true" />
+      <action name="hide_preview_point" />
+      <action name="end_hovering" />
+      <action name="select_point" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlaced" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_selected" />
+      <condition name="reset_on_point_select_needed" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="ControlPointSelected" >
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_selected" />
+      <condition name="reset_on_point_select_needed" inverted="true" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="HoveringOverPoint" >
+      <!-- select the control-point under the cursor -->
+      <condition name="figure_is_on_current_slice" />
+      <condition name="figure_is_selected" inverted="true" />
+      <action name="select_figure" />
+      <action name="select_point" />
+    </transition>
+
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
+      <condition name="figure_is_on_current_slice" />
+      <action name="move_current_point" ID="90" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="HoveringAfterPointRemovedGuardState" >
+      <!-- remove the control-point under the cursor -->
+      <condition name="figure_is_on_current_slice" />
+      <condition name="points_can_be_added_or_removed" />
+      <action name="remove_selected_point" />
+    </transition>
+
+    <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="HoveringOverPoint" >
+      <!-- nothing to do, just blocking event -->
+      <condition name="figure_is_on_current_slice" />
+      <condition name="points_can_be_added_or_removed" inverted="true" />
+    </transition>
+
+  </state>
+
+  <state name="HoveringAfterPointRemovedGuardState">
+    <transition event_class="InternalEvent" event_variant="Dummy-Event" target="HoveringOverFigure" >
+      <!-- yes, we are still hovering above the figure -->
+      <condition name="hovering_above_figure" />
+    </transition>
+
+    <transition event_class="InternalEvent" event_variant="Dummy-Event" target="EditFigure" >
+      <!-- no, we are no longer hovering above the figure -->
+      <condition name="hovering_above_figure" inverted="true"/>
+      <action name="deselect_point" />
+      <action name="end_hovering" />
+    </transition>
+  </state>
+
+  <state name="FigurePlacedByDrag">
+    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
+      <!-- move the currently selected point by drag -->
+      <action name="move_current_point" ID="90" />
+    </transition>
+
+    <!-- Transition for adding and moving points in existing ROIs -->
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="HoveringOverPoint" >
+      <!-- we just put the point there, hovering by definition -->
+      <condition name="minimal_figure_is_finished" />
+      <condition name="figure_is_placed" />
+      <action name="select_point" />
+      <action name="end_interaction" />
+    </transition>
+
+    <!-- Transition for adding and moving points in new PlanarFigures -->
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="HoveringOverPoint" >
+      <!-- we just put the point there, hovering by definition -->
+      <condition name="point_is_valid" />
+      <condition name="figure_is_finished" />
+      <condition name="figure_is_placed" inverted="true" />
+      <action name="select_point" />
+      <!--<action name="end_interaction" />-->
+      <action name="finalize_figure" />
+    </transition>
+
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="FigurePlaced" >
+      <!-- add this point, we are not finished yet -->
+      <condition name="point_is_valid" />
+      <condition name="figure_is_finished" inverted="true" />
+      <action name="add_new_point" ID="10" />
+    </transition>
+
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="FigurePlaced" >
+      <!-- point is invalid, nothing to do here -->
+      <condition name="point_is_valid" inverted="true" />
+    </transition>
+  </state>
+</statemachine>

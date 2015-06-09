@@ -24,7 +24,7 @@ class QmitkCTKWidgetsWidget : public QmitkSegmentationUtilityWidget
   Q_OBJECT
 
 public:
-  explicit QmitkCTKWidgetsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
+  explicit QmitkCTKWidgetsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
   ~QmitkCTKWidgetsWidget();
 };
 

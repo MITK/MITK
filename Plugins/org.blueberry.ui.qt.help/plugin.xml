@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <category id="org.blueberry.views.help"
+              name="Help"/>
+
+    <view id="org.blueberry.views.helpcontents"
+          name="Help - Contents"
+          category="Help"
+          class="berry::HelpContentView"
+          icon="resources/help.png" />
+
+    <view id="org.blueberry.views.helpindex"
+          name="Help - Index"
+          category="Help"
+          class="berry::HelpIndexView"
+          icon="resources/helpIndex.png" />
+
+    <view id="org.blueberry.views.helpsearch"
+          name="Help - Search"
+          category="Help"
+          class="berry::HelpSearchView"
+          icon="resources/helpSearch.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.editors">
+    <editor id="org.blueberry.editors.help"
+            name="Help Contents"
+            class="berry::HelpEditor"
+            icon="resources/help.png">
+    </editor>
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective id="org.blueberry.perspectives.help"
+                 name="Help"
+                 class="berry::HelpPerspective"
+                 icon="resources/help.png">
+    </perspective>
+  </extension>
+
+  <extension point="org.blueberry.ui.elementFactories">
+    <factory id="org.blueberry.ui.internal.HelpEditorInputFactory"
+            class="berry::HelpEditorInputFactory">
+    </factory>
+  </extension>
+</plugin>

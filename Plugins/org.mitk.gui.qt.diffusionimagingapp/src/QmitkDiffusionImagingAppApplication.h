@@ -29,8 +29,8 @@ public:
   QmitkDiffusionImagingAppApplication() {}
   ~QmitkDiffusionImagingAppApplication() {}
 
-  int Start();
-  void Stop();
+  QVariant Start(berry::IApplicationContext*) override;
+  void Stop() override;
 };
 
 #endif /*QMITKDiffusionImagingAppAPPLICATION_H_*/

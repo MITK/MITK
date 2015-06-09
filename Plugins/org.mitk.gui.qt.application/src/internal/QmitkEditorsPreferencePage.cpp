@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVBoxLayout>
 
 QmitkEditorsPreferencePage::QmitkEditorsPreferencePage()
-: m_MainControl(0)
+: m_MainControl(nullptr)
 {
 
 }
@@ -32,7 +32,7 @@ void QmitkEditorsPreferencePage::CreateQtControl(QWidget* parent)
 {
   //empty page
   m_MainControl = new QWidget(parent);
-  QVBoxLayout *layout = new QVBoxLayout;
+  auto  layout = new QVBoxLayout;
   m_MainControl->setLayout(layout);
   this->Update();
 }

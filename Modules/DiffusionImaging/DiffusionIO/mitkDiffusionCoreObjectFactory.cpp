@@ -20,18 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
 
-#include "mitkNrrdDiffusionImageWriter.h"
-#include "mitkDiffusionImage.h"
-
 #include "mitkCompositeMapper.h"
-#include "mitkDiffusionImageMapper.h"
 #include "mitkGPUVolumeMapper3D.h"
-#include "mitkVolumeDataVtkMapper3D.h"
 
 
 typedef short DiffusionPixelType;
 
-typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::DiffusionCoreObjectFactory::DiffusionCoreObjectFactory()
@@ -76,13 +70,6 @@ mitk::Mapper::Pointer mitk::DiffusionCoreObjectFactory::CreateMapper(mitk::DataN
       node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
     }
 
-    classname = "DiffusionImage";
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::DiffusionImageMapper<short>::New();
-      newMapper->SetDataNode(node);
-    }
-
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -93,12 +80,6 @@ mitk::Mapper::Pointer mitk::DiffusionCoreObjectFactory::CreateMapper(mitk::DataN
       newMapper->SetDataNode(node);
     }
     classname = "TensorImage";
-    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    {
-      newMapper = mitk::GPUVolumeMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-    classname = "DiffusionImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::GPUVolumeMapper3D::New();
@@ -125,12 +106,6 @@ void mitk::DiffusionCoreObjectFactory::SetDefaultProperties(mitk::DataNode* node
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 
-  classname = "DiffusionImage";
-  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-  {
-    mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
-    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
-  }
 }
 
 const char* mitk::DiffusionCoreObjectFactory::GetFileExtensions()

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkComputeContourSetNormalsFilter.h"
 
 #include "mitkImagePixelReadAccessor.h"
-
+#include "mitkIOUtil.h"
 
 mitk::ComputeContourSetNormalsFilter::ComputeContourSetNormalsFilter()
   : m_SegmentationBinaryImage(NULL)
@@ -38,7 +38,6 @@ mitk::ComputeContourSetNormalsFilter::~ComputeContourSetNormalsFilter()
 void mitk::ComputeContourSetNormalsFilter::GenerateData()
 {
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
-  this->CreateOutputsForAllInputs(numberOfInputs);
 
   //Iterating over each input
   for(unsigned int i = 0; i < numberOfInputs; i++)
@@ -141,6 +140,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
         finalNormal[0] = (vertexNormal[0] + vertexNormalTemp[0])*0.5;
         finalNormal[1] = (vertexNormal[1] + vertexNormalTemp[1])*0.5;
         finalNormal[2] = (vertexNormal[2] + vertexNormalTemp[2])*0.5;
+        vtkMath::Normalize(finalNormal);
 
         //Here we determine the direction of the normal
         if (m_SegmentationBinaryImage)
@@ -166,10 +166,12 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
           if (val == 0.0)
           {
+              //MITK_INFO << "val equals zero.";
               ++m_PositiveNormalCounter;
           }
           else
           {
+            //MITK_INFO << "val does not equal zero.";
               ++m_NegativeNormalCounter;
           }
         }
@@ -196,6 +198,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
       vertexNormal[0] = (vertexNormal[0] + vertexNormalTemp[0])*0.5;
       vertexNormal[1] = (vertexNormal[1] + vertexNormalTemp[1])*0.5;
       vertexNormal[2] = (vertexNormal[2] + vertexNormalTemp[2])*0.5;
+      vtkMath::Normalize(vertexNormal);
 
       vtkIdType id = cell[0];
       normals->SetTuple(id,vertexNormal);

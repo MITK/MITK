@@ -37,7 +37,7 @@
 vtkStandardNewMacro(mitkVtkLogoRepresentation);
 
 //----------------------------------------------------------------------
-inline void mitkVtkLogoRepresentation::AdjustImageSize(double o[2],
+inline void mitkVtkLogoRepresentation::AdjustImageSize(double /*o*/[2],
                                                    double borderSize[2],
                                                    double imageSize[2])
 {
@@ -132,6 +132,21 @@ void mitkVtkLogoRepresentation::BuildRepresentation()
         this->TexturePoints->SetPoint(1, o[0]+imageSize[0],o[1]-imageSize[1],0.0);
         this->TexturePoints->SetPoint(2, o[0]+imageSize[0],o[1],0.0);
         this->TexturePoints->SetPoint(3, o[0],o[1],0.0);
+        break;
+      }
+      case 4:
+      {
+        double ish[2];
+        //ish = middle of the image
+        ish[0] = imageSize[0]/2.0;
+        ish[1] = imageSize[1]/2.0;
+        //o = middle of the window
+        o[0] = (size[0])/2.0;
+        o[1] = (size[1])/2.0;
+        this->TexturePoints->SetPoint(0, o[0]-ish[0],o[1]-ish[1],0.0);
+        this->TexturePoints->SetPoint(1, o[0]+ish[0],o[1]-ish[1],0.0);
+        this->TexturePoints->SetPoint(2, o[0]+ish[0],o[1]+ish[1],0.0);
+        this->TexturePoints->SetPoint(3, o[0]-ish[0],o[1]+ish[1],0.0);
         break;
       }
       default:

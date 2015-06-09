@@ -28,7 +28,7 @@ QmitkODFDetailsWidget::QmitkODFDetailsWidget( QWidget * parent )
     canvas->setContentsMargins(0,0,0,0);
   }
 
-  QwtLinearScaleEngine* scale = new QwtLinearScaleEngine();
+  auto   scale = new QwtLinearScaleEngine();
   m_Plot->setAxisScaleEngine(0, scale);
 
   m_Plot->setAxisScale   ( 0, -0.5, 0.5 );

@@ -17,22 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_SHOW_SEGMENTATION_AS_SMOOTHED_SURFACE_H
 #define MITK_SHOW_SEGMENTATION_AS_SMOOTHED_SURFACE_H
 
+#include <MitkSegmentationExports.h>
 #include "mitkSegmentationSink.h"
 #include <mitkSurface.h>
 
 namespace mitk
 {
-  class MitkSegmentation_EXPORT ShowSegmentationAsSmoothedSurface : public SegmentationSink
+  class MITKSEGMENTATION_EXPORT ShowSegmentationAsSmoothedSurface : public SegmentationSink
   {
   public:
     mitkClassMacro(ShowSegmentationAsSmoothedSurface, SegmentationSink);
     mitkAlgorithmNewMacro(ShowSegmentationAsSmoothedSurface);
 
   protected:
-    void Initialize(const NonBlockingAlgorithm *other = NULL);
-    bool ReadyToRun();
-    bool ThreadedUpdateFunction();
-    void ThreadedUpdateSuccessful();
+    void Initialize(const NonBlockingAlgorithm *other = nullptr) override;
+    bool ReadyToRun() override;
+    bool ThreadedUpdateFunction() override;
+    void ThreadedUpdateSuccessful() override;
 
   private:
     ShowSegmentationAsSmoothedSurface();

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 
-MITK_TOOL_GUI_MACRO(MitkSegmentationUI_EXPORT, QmitkLiveWireTool2DGUI, "")
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkLiveWireTool2DGUI, "")
 
 QmitkLiveWireTool2DGUI::QmitkLiveWireTool2DGUI()
   : QmitkToolGUI()

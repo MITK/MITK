@@ -53,7 +53,7 @@ namespace mitk {
   * mitk::USAbstractControlInterface which must be implemented, too.
   *
   */
-class MitkUS_EXPORT USControlInterfaceBMode : public USAbstractControlInterface
+class MITKUS_EXPORT USControlInterfaceBMode : public USAbstractControlInterface
 {
 public:
   mitkClassMacro(USControlInterfaceBMode, USAbstractControlInterface);

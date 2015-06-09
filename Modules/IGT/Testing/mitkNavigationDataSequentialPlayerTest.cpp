@@ -43,14 +43,14 @@ private:
 
 public:
 
-  void setUp(){
+  void setUp() override{
     player = mitk::NavigationDataSequentialPlayer::New();
     std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2ToolsDouble.xml");
     mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
     NavigationDataSet =reader->Read(file);
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

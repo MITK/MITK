@@ -75,7 +75,7 @@ class QPushButton;
 
   Last contributor: $Author: maleike $
 */
-class MitkSegmentationUI_EXPORT QmitkSlicesInterpolator : public QWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkSlicesInterpolator : public QWidget
 {
   Q_OBJECT
 

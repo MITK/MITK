@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NrrdTensorImageWriter::NrrdTensorImageWriter()
-  : AbstractFileWriter(mitk::TensorImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DTI_MIMETYPE_NAME() ), mitk::DiffusionIOMimeTypes::DTI_MIMETYPE_DESCRIPTION() )
+  : AbstractFileWriter(mitk::TensorImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DTI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DTI_MIMETYPE_DESCRIPTION() )
 {
   RegisterService();
 }

@@ -31,7 +31,7 @@ class QmitkUSControlsProbesWidget;
   * This class handles the mitk::USControlInterfaceProbes of mitk::USDevice
   * objects.
   */
-class MitkUSUI_EXPORT QmitkUSControlsProbesWidget : public QWidget
+class MITKUSUI_EXPORT QmitkUSControlsProbesWidget : public QWidget
 {
     Q_OBJECT
 
@@ -50,7 +50,7 @@ public:
     * If a null pointer is given for 'controlInterface' all gui control elements
     * will be disabled.
     */
-  explicit QmitkUSControlsProbesWidget(mitk::USControlInterfaceProbes::Pointer controlInterface, QWidget *parent = 0);
+  explicit QmitkUSControlsProbesWidget(mitk::USControlInterfaceProbes::Pointer controlInterface, QWidget *parent = nullptr);
   ~QmitkUSControlsProbesWidget();
 
 private:

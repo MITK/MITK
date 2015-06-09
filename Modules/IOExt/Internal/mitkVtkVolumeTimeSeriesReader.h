@@ -47,7 +47,7 @@ public:
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
 protected:
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     VtkVolumeTimeSeriesReader();
 

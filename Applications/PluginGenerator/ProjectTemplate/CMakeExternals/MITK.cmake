@@ -61,9 +61,11 @@ if(NOT MITK_DIR)
     MITK_USE_Python
    )
 
-  if(MITK_USE_QT)
+  if(MITK_USE_Qt4)
     # Look for Qt at the superbuild level, to catch missing Qt libs early
     find_package(Qt4 4.7 REQUIRED)
+  elseif(MITK_USE_Qt5)
+    find_package(Qt5Widgets REQUIRED)
   endif()
 
   set(additional_mitk_cmakevars )
@@ -131,8 +133,10 @@ if(NOT MITK_DIR)
   # Additional MITK CMake variables
   #-----------------------------------------------------------------------------
 
-  if(MITK_USE_QT AND QT_QMAKE_EXECUTABLE)
+  if(MITK_USE_Qt4 AND QT_QMAKE_EXECUTABLE)
     list(APPEND additional_mitk_cmakevars "-DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}")
+  elseif(MITK_USE_Qt5)
+    list(APPEND additional_mitk_cmakevars "-DDESIRED_QT_VERSION:STRING=5")
   endif()
 
   if(MITK_USE_CTK)
@@ -178,6 +182,10 @@ if(NOT MITK_DIR)
       ${additional_mitk_cmakevars}
       -DBUILD_SHARED_LIBS:BOOL=ON
       -DBUILD_TESTING:BOOL=${MITK_BUILD_TESTING}
+    CMAKE_CACHE_ARGS
+      ${ep_common_cache_args}
+    CMAKE_CACHE_DEFAULT_ARGS
+      ${ep_common_cache_default_args}
     DEPENDS
       ${proj_DEPENDENCIES}
     )
@@ -197,7 +205,6 @@ else()
   # Further, do some sanity checks in the case of a pre-built MITK
   set(my_itk_dir ${ITK_DIR})
   set(my_vtk_dir ${VTK_DIR})
-  set(my_qmake_executable ${QT_QMAKE_EXECUTABLE})
 
   find_package(MITK REQUIRED)
 
@@ -209,8 +216,14 @@ else()
     message(FATAL_ERROR "VTK packages do not match:\n   ${MY_PROJECT_NAME}: ${my_vtk_dir}\n  MITK: ${VTK_DIR}")
   endif()
 
-  if(my_qmake_executable AND NOT my_qmake_executable STREQUAL ${MITK_QMAKE_EXECUTABLE})
-    message(FATAL_ERROR "Qt qmake does not match:\n   ${MY_PROJECT_NAME}: ${my_qmake_executable}\n  MITK: ${MITK_QMAKE_EXECUTABLE}")
+  if(MITK_USE_Qt4)
+    set(my_qmake_executable ${QT_QMAKE_EXECUTABLE})
+
+    if(my_qmake_executable AND MITK_QMAKE_EXECUTABLE)
+      if(NOT my_qmake_executable STREQUAL ${MITK_QMAKE_EXECUTABLE})
+        message(FATAL_ERROR "Qt qmake does not match:\n   ${MY_PROJECT_NAME}: ${my_qmake_executable}\n  MITK: ${MITK_QMAKE_EXECUTABLE}")
+      endif()
+    endif()
   endif()
 
 endif()

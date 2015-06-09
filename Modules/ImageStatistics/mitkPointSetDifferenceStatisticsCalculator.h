@@ -31,11 +31,11 @@ namespace mitk
  * The user can access the single distances between corresponding points as well as a complete statistic (mean, sd, rms, median, max, min)
  * The point sets must be of equal size!
  */
-class MitkImageStatistics_EXPORT PointSetDifferenceStatisticsCalculator : public itk::Object
+class MITKIMAGESTATISTICS_EXPORT PointSetDifferenceStatisticsCalculator : public itk::Object
 {
 public:
 
-  mitkClassMacro( PointSetDifferenceStatisticsCalculator, itk::Object );
+  mitkClassMacroItkParent( PointSetDifferenceStatisticsCalculator, itk::Object );
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

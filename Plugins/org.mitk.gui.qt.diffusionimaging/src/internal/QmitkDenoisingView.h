@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkVectorImage.h>
 #include <itkImage.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <itkNonLocalMeansDenoisingFilter.h>
 #include <itkMaskImageFilter.h>
 #include <itkDiscreteGaussianImageFilter.h>
@@ -76,19 +76,20 @@ public:
 
   /** Typedefs */
   typedef short                                                                                                         DiffusionPixelType;
-  typedef mitk::DiffusionImage< DiffusionPixelType >                                                                    DiffusionImageType;
   typedef mitk::Image                                                                                                   MaskImageType;
   typedef itk::NonLocalMeansDenoisingFilter< DiffusionPixelType >                                                       NonLocalMeansDenoisingFilterType;
   typedef itk::DiscreteGaussianImageFilter < itk::Image< DiffusionPixelType, 3>, itk::Image< DiffusionPixelType, 3> >   GaussianFilterType;
   typedef itk::VectorImageToImageFilter < DiffusionPixelType >                                                          ExtractFilterType;
   typedef itk::ComposeImageFilter < itk::Image<DiffusionPixelType, 3> >                                                 ComposeFilterType;
+  typedef itk::VectorImage<DiffusionPixelType, 3>
+    ITKDiffusionImageType;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
   /// \brief Creation of the connections of the FilterComboBox
-  virtual void Activated();
+  virtual void Activated() override;
 
 private slots:
 
@@ -101,7 +102,7 @@ private slots:
 private:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
   void ResetParameterPanel();
 
   Ui::QmitkDenoisingViewControls*  m_Controls;
@@ -113,7 +114,7 @@ private:
   bool m_CompletedCalculation;
   NonLocalMeansDenoisingFilterType::Pointer m_NonLocalMeansFilter;
   GaussianFilterType::Pointer m_GaussianFilter;
-  DiffusionImageType::Pointer m_InputImage;
+  mitk::Image::Pointer m_InputImage;
   MaskImageType::Pointer m_ImageMask;
   QTimer* m_DenoisingTimer;
   unsigned int m_LastProgressCount;

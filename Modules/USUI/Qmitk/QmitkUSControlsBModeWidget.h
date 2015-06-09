@@ -31,7 +31,7 @@ class QmitkUSControlsBModeWidget;
   * This class handles the mitk::USControlInterfaceBMode of mitk::USDevice
   * objects.
   */
-class MitkUSUI_EXPORT QmitkUSControlsBModeWidget : public QWidget
+class MITKUSUI_EXPORT QmitkUSControlsBModeWidget : public QWidget
 {
     Q_OBJECT
 
@@ -75,7 +75,7 @@ public:
     * If a null pointer is given for 'controlInterface' all gui control elements
     * will be disabled.
     */
-  explicit QmitkUSControlsBModeWidget(mitk::USControlInterfaceBMode::Pointer controlInterface, QWidget *parent = 0);
+  explicit QmitkUSControlsBModeWidget(mitk::USControlInterfaceBMode::Pointer controlInterface, QWidget *parent = nullptr);
   ~QmitkUSControlsBModeWidget();
 
 private:

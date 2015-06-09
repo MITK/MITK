@@ -35,14 +35,14 @@ public:
   QmitkAppInstancesPreferencePage();
   QmitkAppInstancesPreferencePage(const QmitkAppInstancesPreferencePage& other);
 
-  void Init(berry::IWorkbench::Pointer workbench);
+  void Init(berry::IWorkbench::Pointer workbench) override;
 
-  void CreateQtControl(QWidget* parent);
-  QWidget* GetQtControl() const;
+  void CreateQtControl(QWidget* parent) override;
+  QWidget* GetQtControl() const override;
 
-  bool PerformOk();
-  void PerformCancel();
-  void Update();
+  bool PerformOk() override;
+  void PerformCancel() override;
+  void Update() override;
 
 private:
 

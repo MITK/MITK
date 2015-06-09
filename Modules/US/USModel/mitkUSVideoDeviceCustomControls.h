@@ -28,7 +28,7 @@ namespace mitk {
   * \brief Custom controls for mitk::USVideoDevice.
   * Controls image cropping of the corresponding mitk::USImageVideoSource.
   */
-class MitkUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterface
+class MITKUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterface
 {
 public:
   mitkClassMacro(USVideoDeviceCustomControls, USAbstractControlInterface);
@@ -41,12 +41,12 @@ public:
     * mitk::USVideoDeviceCustomControls::SetCropArea() with an empty are
     * instead.
     */
-  virtual void SetIsActive( bool isActive );
+  virtual void SetIsActive( bool isActive ) override;
 
   /**
     * \return if this custom controls are currently activated
     */
-  virtual bool GetIsActive( );
+  virtual bool GetIsActive( ) override;
 
   /**
     * \brief Sets the area that will be cropped from the US image.

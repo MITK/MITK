@@ -9,25 +9,56 @@ if(MITK_USE_PCRE)
 
     set(proj PCRE)
     set(${proj}_DEPENDENCIES "")
-    set(PCRE_TARGET_VERSION 8.35)
+    set(${proj}_DEPENDS ${proj})
+
+    if(UNIX)
+      # Some other projects (e.g. Swig) require a pcre-config script which is not
+      # generated when using the CMake build system.
+      set(configure_cmd
+        CONFIGURE_COMMAND <SOURCE_DIR>/./configure
+        CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
+        CFLAGS=-fPIC
+        "CXXFLAGS=-fPIC ${MITK_CXX11_FLAG} ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE}"
+        "LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE} ${_install_rpath_linkflag}"
+        CXX=${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}
+        --prefix=<INSTALL_DIR>
+        --disable-shared
+        --enable-jit
+      )
+    else()
+
+      set(additional_cmake_args )
+      if(CTEST_USE_LAUNCHERS)
+        list(APPEND additional_cmake_args
+          "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+        )
+      endif()
+
+      set(configure_cmd
+        CMAKE_ARGS
+          ${ep_common_args}
+          ${additional_cmake_args}
+         "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} -fPIC"
+         -DBUILD_SHARED_LIBS:BOOL=OFF
+         -DPCRE_BUILD_PCREGREP:BOOL=OFF
+         -DPCRE_BUILD_TESTS:BOOL=OFF
+         -DPCRE_SUPPORT_JIT:BOOL=ON
+       CMAKE_CACHE_ARGS
+         ${ep_common_cache_args}
+       CMAKE_CACHE_DEFAULT_ARGS
+         ${ep_common_cache_default_args}
+      )
+    endif()
 
     ExternalProject_add(${proj}
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/pcre-8.35.tar.gz
       URL_MD5 "ed58bcbe54d3b1d59e9f5415ef45ce1c"
-      SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build
-      INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
-      PREFIX ${proj}-cmake
-      CONFIGURE_COMMAND <SOURCE_DIR>/./configure
-                        CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
-                        LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}
-                        CXX=${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}
-                        --prefix=<INSTALL_DIR>
-                        --disable-shared
+      ${configure_cmd}
       DEPENDS "${${proj}_DEPENDENCIES}"
       )
 
-    set(PCRE_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+    set(PCRE_DIR ${ep_prefix})
 
   else()
     mitkMacroEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")

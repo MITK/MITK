@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferences.h>
 #include <berryIPreferencesService.h>
 #include <berryIBerryPreferences.h>
+#include <berryPlatform.h>
 
 // Qmitk
 #include "CommandLineModulesView.h"
@@ -52,12 +53,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //-----------------------------------------------------------------------------
 CommandLineModulesView::CommandLineModulesView()
-: m_Controls(NULL)
-, m_Parent(NULL)
-, m_Layout(NULL)
-, m_ModuleManager(NULL)
-, m_ModuleBackend(NULL)
-, m_DirectoryWatcher(NULL)
+: m_Controls(nullptr)
+, m_Parent(nullptr)
+, m_Layout(nullptr)
+, m_ModuleManager(nullptr)
+, m_ModuleBackend(nullptr)
+, m_DirectoryWatcher(nullptr)
 , m_TemporaryDirectoryName("")
 , m_MaximumConcurrentProcesses(4)
 , m_CurrentlyRunningProcesses(0)
@@ -70,22 +71,22 @@ CommandLineModulesView::CommandLineModulesView()
 //-----------------------------------------------------------------------------
 CommandLineModulesView::~CommandLineModulesView()
 {
-  if (m_ModuleManager != NULL)
+  if (m_ModuleManager != nullptr)
   {
     delete m_ModuleManager;
   }
 
-  if (m_ModuleBackend != NULL)
+  if (m_ModuleBackend != nullptr)
   {
     delete m_ModuleBackend;
   }
 
-  if (m_DirectoryWatcher != NULL)
+  if (m_DirectoryWatcher != nullptr)
   {
     delete m_DirectoryWatcher;
   }
 
-  if (m_Layout != NULL)
+  if (m_Layout != nullptr)
   {
     delete m_Layout;
   }
@@ -153,13 +154,10 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 //-----------------------------------------------------------------------------
 berry::IBerryPreferences::Pointer CommandLineModulesView::RetrievePreferences()
 {
-  berry::IPreferencesService::Pointer prefService
-      = berry::Platform::GetServiceRegistry()
-      .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   assert( prefService );
 
-  std::string id = "/" + CommandLineModulesViewConstants::VIEW_ID;
+  QString id = "/" + CommandLineModulesViewConstants::VIEW_ID;
   berry::IBerryPreferences::Pointer prefs
       = (prefService->GetSystemPreferences()->Node(id))
         .Cast<berry::IBerryPreferences>();
@@ -176,8 +174,8 @@ void CommandLineModulesView::RetrieveAndStoreTemporaryDirectoryPreferenceValues(
   berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
 
   QString fallbackTmpDir = QDir::tempPath();
-  m_TemporaryDirectoryName = QString::fromStdString(
-      prefs->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString()));
+  m_TemporaryDirectoryName =
+      prefs->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir);
 }
 
 
@@ -186,7 +184,7 @@ void CommandLineModulesView::RetrieveAndStoreValidationMode()
 {
   berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
 
-  int value = prefs->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0);
+  int value = prefs->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2);
   if (value == 0)
   {
     m_ValidationMode = ctkCmdLineModuleManager::STRICT_VALIDATION;
@@ -208,8 +206,8 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
 
   QString fallbackHomeDir = QDir::homePath();
-  m_OutputDirectoryName = QString::fromStdString(
-      prefs->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackHomeDir.toStdString()));
+  m_OutputDirectoryName =
+      prefs->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackHomeDir);
 
   m_MaximumConcurrentProcesses = prefs->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4);
 
@@ -247,7 +245,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   QStringList defaultPaths = builder.getDirectoryList();
 
   // We get additional directory paths from preferences.
-  QString pathString = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
+  QString pathString = prefs->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, "");
   QStringList additionalPaths = pathString.split(";", QString::SkipEmptyParts);
 
   // Combine the sets of directory paths.
@@ -255,7 +253,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   totalPaths << defaultPaths;
   totalPaths << additionalPaths;
 
-  QString additionalModulesString = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, ""));
+  QString additionalModulesString = prefs->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, "");
   QStringList additionalModules = additionalModulesString.split(";", QString::SkipEmptyParts);
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
@@ -422,7 +420,7 @@ void CommandLineModulesView::OnRunButtonPressed()
   if (tabNumber >= 0)
   {
     // 1. Create a new QmitkCmdLineModuleRunner to represent the running widget.
-    QmitkCmdLineModuleRunner *widget = new QmitkCmdLineModuleRunner(m_Controls->m_RunningWidgets);
+    auto  widget = new QmitkCmdLineModuleRunner(m_Controls->m_RunningWidgets);
     widget->SetDataStorage(this->GetDataStorage());
     widget->SetManager(m_ModuleManager);
     widget->SetOutputDirectory(m_OutputDirectoryName);

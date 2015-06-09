@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 
 QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
-: m_MainControl(0)
+: m_MainControl(nullptr)
 , m_Initializing(false)
 {
 
@@ -48,22 +48,20 @@ void QmitkSegmentationPreferencePage::Init(berry::IWorkbench::Pointer )
 void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_Initializing = true;
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
   m_SegmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
 
   m_MainControl = new QWidget(parent);
 
-  QFormLayout *formLayout = new QFormLayout;
+  auto  formLayout = new QFormLayout;
   formLayout->setHorizontalSpacing(8);
   formLayout->setVerticalSpacing(24);
 
   m_SlimViewCheckBox = new QCheckBox("Hide tool button texts and increase icon size", m_MainControl);
   formLayout->addRow("Slim view", m_SlimViewCheckBox);
 
-  QVBoxLayout* displayOptionsLayout = new QVBoxLayout;
+  auto   displayOptionsLayout = new QVBoxLayout;
   m_RadioOutline = new QRadioButton( "Draw as outline", m_MainControl);
   displayOptionsLayout->addWidget( m_RadioOutline );
   m_RadioOverlay = new QRadioButton( "Draw as transparent overlay", m_MainControl);
@@ -74,7 +72,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   formLayout->addRow( "3D display", m_VolumeRenderingCheckBox );
   connect( m_VolumeRenderingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnVolumeRenderingCheckboxChecked(int)) );
 
-  QFormLayout* surfaceLayout = new QFormLayout;
+  auto   surfaceLayout = new QFormLayout;
   surfaceLayout->setSpacing(8);
 
   m_SmoothingCheckBox = new QCheckBox("Use image spacing as smoothing value hint", m_MainControl);
@@ -179,7 +177,7 @@ void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state
 
   if ( state != Qt::Unchecked )
   {
-    QMessageBox::information(NULL,
+    QMessageBox::information(nullptr,
                              "Memory warning",
                              "Turning on volume rendering of segmentations will make the application more memory intensive (and potentially prone to crashes).\n\n"
                              "If you encounter out-of-memory problems, try turning off volume rendering again.");

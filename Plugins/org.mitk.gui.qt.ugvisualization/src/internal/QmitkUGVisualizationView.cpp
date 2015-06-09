@@ -45,13 +45,13 @@ public:
 
 protected:
 
-  virtual void PropertyChanged()
+  virtual void PropertyChanged() override
   {
     m_View->m_VolumeMode = m_BoolProperty->GetValue();
     m_View->UpdateEnablement();
   }
 
-  virtual void PropertyRemoved()
+  virtual void PropertyRemoved() override
   {
     m_View->m_VolumeMode = false;
     m_Property = 0;
@@ -75,12 +75,6 @@ QmitkUGVisualizationView::QmitkUGVisualizationView()
   m_ShowScalarOpacityAction(0), m_ShowColorAction(0), m_ShowGradientOpacityAction(0),
   m_VolumeModeObserver(0)
 {
-}
-
-QmitkUGVisualizationView::QmitkUGVisualizationView(const QmitkUGVisualizationView& other)
-{
-  Q_UNUSED(other)
-  throw std::runtime_error("Copy constructor not implemented");
 }
 
 QmitkUGVisualizationView::~QmitkUGVisualizationView()

@@ -33,7 +33,7 @@ namespace mitk {
    *
    *  \ingroup US
    */
-  class MitkUS_EXPORT USImageLoggingFilter : public mitk::ImageToImageFilter
+  class MITKUS_EXPORT USImageLoggingFilter : public mitk::ImageToImageFilter
   {
   public:
 
@@ -42,7 +42,7 @@ namespace mitk {
     itkNewMacro(USImageLoggingFilter);
 
     /** This method is internally called by the Update() mechanism of the pipeline. Don't call it directly. */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /** Adds a message to the current (last logged) image. This message is internally stored and written to the
      *  harddisc when SaveImages(...) is called.

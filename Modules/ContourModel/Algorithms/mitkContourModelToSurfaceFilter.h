@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkContourModel_EXPORT ContourModelToSurfaceFilter : public SurfaceSource
+  class MITKCONTOURMODEL_EXPORT ContourModelToSurfaceFilter : public SurfaceSource
   {
 
   public:
@@ -45,7 +45,7 @@ namespace mitk {
 
     typedef mitk::ContourModel InputType;
 
-    void GenerateOutputInformation();
+    void GenerateOutputInformation() override;
 
     /** Set/Get the image input of this process object.  */
     using Superclass::SetInput;
@@ -58,7 +58,7 @@ namespace mitk {
     ContourModelToSurfaceFilter();
     ~ContourModelToSurfaceFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
   };
 }

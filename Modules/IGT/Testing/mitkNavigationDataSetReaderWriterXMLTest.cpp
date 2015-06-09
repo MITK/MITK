@@ -56,7 +56,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     pathRead = GetTestDataFilePath("IGT-Data/RecordedNavigationData.xml");
 
@@ -74,7 +74,7 @@ public:
     reader = mitk::NavigationDataReaderXML::New();
   }
 
-  void tearDown()
+  void tearDown() override
   {
   }
 

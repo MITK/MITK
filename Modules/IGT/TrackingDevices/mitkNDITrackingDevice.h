@@ -42,7 +42,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NDITrackingDevice : public TrackingDevice
+  class MITKIGT_EXPORT NDITrackingDevice : public TrackingDevice
   {
     friend class NDIProtocol;
 
@@ -80,14 +80,14 @@ namespace mitk
     * @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device.
     * @throw mitk::IGTException Throws a normal IGT exception if an error occures which is not related to the hardware.
     */
-    virtual bool OpenConnection();
+    virtual bool OpenConnection() override;
 
     /**
     * \brief Closes the connection
     *
     * CloseConnection() resets the tracking device, invalidates all tools and then closes the serial port.
     */
-    virtual bool CloseConnection();
+    virtual bool CloseConnection() override;
 
     /** @throw mitk::IGTHardwareException Throws an exception if there are errors while connecting to the device. */
     bool InitializeWiredTools();
@@ -95,7 +95,7 @@ namespace mitk
     /** Sets the rotation mode of this class. See documentation of enum RotationMode for details
      *  on the different modes.
      */
-    virtual void SetRotationMode(RotationMode r);
+    virtual void SetRotationMode(RotationMode r) override;
 
     /**
     * \brief TestConnection() tries to connect to a NDI tracking device on the current port/device and returns which device it has found
@@ -125,18 +125,18 @@ namespace mitk
     * 3D marker positions (MarkerTracking3D) or both 6D tools and 3D markers (HybridTracking) are updated.
     * Call StopTracking() to stop the tracking thread.
     */
-    virtual bool StartTracking();
+    virtual bool StartTracking() override;
 
     /**
     * \brief return the tool with index toolNumber
     */
-    virtual TrackingTool* GetTool(unsigned int toolNumber) const;
+    virtual TrackingTool* GetTool(unsigned int toolNumber) const override;
 
-    virtual mitk::TrackingTool* GetToolByName(std::string name) const;
+    virtual mitk::TrackingTool* GetToolByName(std::string name) const override;
     /**
     * \brief return current number of tools
     */
-    virtual unsigned int GetToolCount() const;
+    virtual unsigned int GetToolCount() const override;
 
     /**
     * \brief Create a passive 6D tool with toolName and fileName and add it to the list of tools

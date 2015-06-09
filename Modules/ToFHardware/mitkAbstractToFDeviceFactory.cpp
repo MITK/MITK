@@ -23,15 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
-//TinyXML
 #include <tinyxml.h>
 
 mitk::ToFCameraDevice::Pointer mitk::AbstractToFDeviceFactory::ConnectToFDevice()
 {
- ToFCameraDevice::Pointer device = CreateToFCameraDevice();
- mitk::CameraIntrinsics::Pointer cameraIntrinsics = GetCameraIntrinsics();
- device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
- m_Devices.push_back(device);
+  ToFCameraDevice::Pointer device = CreateToFCameraDevice();
+  mitk::CameraIntrinsics::Pointer cameraIntrinsics = GetCameraIntrinsics();
+  device->SetProperty("CameraIntrinsics", mitk::CameraIntrinsicsProperty::New(cameraIntrinsics));
+  m_Devices.push_back(device);
 
   us::ModuleContext* context = us::GetModuleContext();
   us::ServiceProperties deviceProps;

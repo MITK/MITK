@@ -8,31 +8,29 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
   endif()
 
   if(NOT DEFINED Python_DIR)
-    set(proj Python)
-    set(Python_DEPENDENCIES ZLIB Python-src)
-    set(Python_DEPENDS ${proj})
 
     set(MITK_PYTHON_MAJOR_VERSION 2)
     set(MITK_PYTHON_MINOR_VERSION 7)
     set(MITK_PYTHON_PATCH_VERSION 3)
 
     set(PYTHON_SOURCE_PACKAGE Python-${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}.${MITK_PYTHON_PATCH_VERSION})
-    set(PYTHON_SOURCE_DIR  "${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}")
-    # patch the VS compiler config
-
-    set(PYTHON_PATCH_COMMAND PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${CMAKE_CURRENT_LIST_DIR}/Patch${proj}.cmake)
+    set(proj ${PYTHON_SOURCE_PACKAGE})
 
     # download the source code
-    ExternalProject_Add(Python-src
+    ExternalProject_Add(${proj}
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/${PYTHON_SOURCE_PACKAGE}.tgz
       URL_MD5  "2cf641732ac23b18d139be077bd906cd"
-      PREFIX   ${CMAKE_BINARY_DIR}/${PYTHON_SOURCE_PACKAGE}-cmake
-      SOURCE_DIR  "${PYTHON_SOURCE_DIR}"
-      ${PYTHON_PATCH_COMMAND}
+      # patch the VS compiler config
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Python-2.7.3.patch
       CONFIGURE_COMMAND ""
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
     )
+
+    set(proj Python)
+    set(Python_DEPENDENCIES ZLIB ${PYTHON_SOURCE_PACKAGE})
+    set(Python_DEPENDS ${proj})
 
     set(additional_cmake_cache_args )
     list(APPEND additional_cmake_cache_args
@@ -112,20 +110,32 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DUSE_SYSTEM_ZLIB:BOOL=ON
         )
 
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_cache_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
+    # windows has to be installed to a seperate dir, or all py files will end up
+    # directly in the ep/lib folder
+    set(_python_install_dir )
+    if(WIN32)
+      set(_python_install_dir -DCMAKE_INSTALL_PREFIX:PATH=${ep_prefix}/lib/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION})
+    endif()
+
     # CMake build environment for python from:
     # https://github.com/davidsansome/python-cmake-buildsystem
     ExternalProject_Add(${proj}
+      LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/python-cmake-buildsystem-47845c55.tar.gz
       URL_MD5 "6e49d1ed93a5a0fff7621430c163d2d1"
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/Patch${proj}CMake.cmake
-      PREFIX ${proj}-cmake
-      BINARY_DIR ${proj}-build
-      INSTALL_DIR ${proj}-install
+      # fix to build python on i686 and i386 with the python cmake build system,
+      # the x86 path must be set as default
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/python-cmake-buildsystem-47845c55.patch
       CMAKE_ARGS
         ${ep_common_args}
-        -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
       CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
         -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
         -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
         #-DBUILD_TESTING:BOOL=OFF
@@ -133,24 +143,33 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
         -DBUILD_STATIC:BOOL=OFF
         -DUSE_SYSTEM_LIBRARIES:BOOL=OFF
         ${additional_cmake_cache_args}
+        ${_python_install_dir}
         -DZLIB_INCLUDE_DIR:PATH=${ZLIB_INCLUDE_DIR}
         -DZLIB_LIBRARY:FILEPATH=${ZLIB_LIBRARY}
+        # Python (and Numpy) do not like different shared library names
+        -DCMAKE_DEBUG_POSTFIX:STRING=
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS
         ${Python_DEPENDENCIES}
     )
 
-    set(Python_DIR "${CMAKE_BINARY_DIR}/${proj}-install")
+    # set versions, override
+    set(PYTHON_VERSION_MAJOR ${MITK_PYTHON_MAJOR_VERSION})
+    set(PYTHON_VERSION_MINOR ${MITK_PYTHON_MINOR_VERSION})
 
     if(UNIX)
+      set(Python_DIR "${ep_prefix}")
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}")
+      set(PYTHON_INCLUDE_DIR2 "${PYTHON_INCLUDE_DIR}")
       set(PYTHON_LIBRARY "${Python_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}${CMAKE_SHARED_LIBRARY_SUFFIX}")
       set(MITK_PYTHON_SITE_DIR "${Python_DIR}/lib/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}/site-packages")
 
       # linux custom compile step, set the environment variables and python home to the right
       # path. Other runtimes can mess up the paths of the installation and the stripped executable
       # used to compile links to the wrong library in /usr/lib
-      set(_python_compile_step ${CMAKE_BINARY_DIR}/${proj}-cmake/${proj}_compile_step.sh)
+      set(_python_compile_step ${ep_prefix}/tmp/python_compile_step.sh)
       file(WRITE ${_python_compile_step}
 "#!/bin/bash
 export PYTHONHOME=${Python_DIR}
@@ -169,10 +188,13 @@ ${PYTHON_EXECUTABLE} -m compileall
       # ones will cause conflicts if system libraries are present during the build/configure process
       # of opencv, since they will try to lookup the sys path first if no lib is directly
       # linked with it s path into the executable
-      set(PYTHON_EXECUTABLE "${CMAKE_BINARY_DIR}/${proj}-build/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
+      #ExternalProject_Get_Property(${proj} binary_dir)
+      #set(PYTHON_EXECUTABLE "${binary_dir}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
     else()
+      set(Python_DIR "${ep_prefix}/lib/python${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}")
       set(PYTHON_EXECUTABLE "${Python_DIR}/bin/python${CMAKE_EXECUTABLE_SUFFIX}")
       set(PYTHON_INCLUDE_DIR "${Python_DIR}/include")
+      set(PYTHON_INCLUDE_DIR2 "${PYTHON_INCLUDE_DIR}")
       set(PYTHON_LIBRARY "${Python_DIR}/libs/python${MITK_PYTHON_MAJOR_VERSION}${MITK_PYTHON_MINOR_VERSION}.lib")
       set(MITK_PYTHON_SITE_DIR "${Python_DIR}/Lib/site-packages")
 
@@ -183,6 +205,13 @@ ${PYTHON_EXECUTABLE} -m compileall
         DEPENDEES install
       )
     endif()
+
+    mitkFunctionInstallExternalCMakeProject(${proj})
+    install(DIRECTORY ${Python_DIR}
+            DESTINATION .
+            COMPONENT runtime
+            FILES_MATCHING PATTERN "*.pyc"
+           )
 
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")

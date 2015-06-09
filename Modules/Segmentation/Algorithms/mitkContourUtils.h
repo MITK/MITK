@@ -32,11 +32,11 @@ namespace mitk
  *  Legacy support for mitk::Contour
  *  TODO remove this class when mitk::Contour is removed
  */
-class MitkSegmentation_EXPORT ContourUtils : public itk::Object
+class MITKSEGMENTATION_EXPORT ContourUtils : public itk::Object
 {
   public:
 
-    mitkClassMacro(ContourUtils, itk::Object);
+    mitkClassMacroItkParent(ContourUtils, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

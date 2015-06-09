@@ -31,7 +31,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataTransformFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataTransformFilter : public NavigationDataToNavigationDataFilter
   {
 
   public:
@@ -79,7 +79,7 @@ namespace mitk {
     *
     * transforms navigation data
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     TransformType::Pointer m_Rigid3DTransform; ///< transform which will be applied on navigation data(s)
     bool m_Precompose;

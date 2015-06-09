@@ -35,7 +35,7 @@ public:
 
     static const std::string VIEW_ID;
 
-    QmitkTensorModelParametersWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkTensorModelParametersWidget (QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     virtual ~QmitkTensorModelParametersWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);

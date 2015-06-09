@@ -23,11 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkQBallReconstructionViewControls.h"
 
-#include "mitkDiffusionImage.h"
-
 #include <berryIPartListener.h>
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
+
+#include <mitkImage.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <itkVectorImage.h>
 
 typedef short DiffusionPixelType;
 
@@ -51,6 +53,11 @@ class QmitkQBallReconstructionView : public QmitkFunctionality
 
   friend struct QbrShellSelection;
 
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
+  typedef mitk::DiffusionPropertyHelper::BValueMapType                    BValueMapType;
+  typedef itk::VectorImage< DiffusionPixelType, 3 >                       ITKDiffusionImageType;
+
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
@@ -61,18 +68,18 @@ class QmitkQBallReconstructionView : public QmitkFunctionality
   QmitkQBallReconstructionView();
   virtual ~QmitkQBallReconstructionView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
   /// \brief Called when the functionality is activated
-  virtual void Activated();
+  virtual void Activated() override;
 
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
   static const int nrconvkernels;
 
@@ -97,7 +104,7 @@ protected slots:
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkQBallReconstructionViewControls* m_Controls;
 
@@ -113,7 +120,7 @@ protected:
 
   //void Create
 
-  berry::ISelectionListener::Pointer m_SelListener;
+  QScopedPointer<berry::ISelectionListener> m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
   mitk::DataStorage::SetOfObjects::Pointer m_DiffusionImages;

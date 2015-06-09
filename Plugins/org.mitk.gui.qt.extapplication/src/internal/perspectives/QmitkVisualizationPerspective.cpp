@@ -23,7 +23,7 @@ void QmitkVisualizationPerspective::CreateInitialLayout(berry::IPageLayout::Poin
   // all di-app perspectives should have the following:
   /////////////////////////////////////////////////////
 
-  std::string editorArea = layout->GetEditorArea();
+  QString editorArea = layout->GetEditorArea();
 
   layout->AddStandaloneView("org.mitk.views.datamanager",
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);
@@ -39,15 +39,9 @@ void QmitkVisualizationPerspective::CreateInitialLayout(berry::IPageLayout::Poin
   // here goes the perspective specific stuff
   /////////////////////////////////////////////
 
-  left->AddView("org.mitk.views.volumevisualization");
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.volumevisualization");
-  lo->SetCloseable(true);
+  // Adding the entry for the image navigator to the Windows->"Show View" menu
+  layout->AddShowViewShortcut("org.mitk.views.imagenavigator");
 
-  left->AddView("org.mitk.views.screenshotmaker");
-  lo = layout->GetViewLayout("org.mitk.views.screenshotmaker");
-  lo->SetCloseable(true);
-
-  left->AddView("org.mitk.views.moviemaker");
-  lo = layout->GetViewLayout("org.mitk.views.moviemaker");
-  lo->SetCloseable(true);
+  layout->AddPerspectiveShortcut("org.mitk.extapp.defaultperspective");
+  layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.editor");
 }

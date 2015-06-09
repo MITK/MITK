@@ -42,7 +42,7 @@ namespace mitk {
 
   $Author: fetzer$
 */
-class MitkSegmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
+class MITKSEGMENTATION_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
 {
  public:
 
@@ -78,8 +78,8 @@ class MitkSegmentation_EXPORT ImageToContourFilter : public ImageToSurfaceFilter
  protected:
    ImageToContourFilter();
    virtual ~ImageToContourFilter();
-   virtual void GenerateData();
-   virtual void GenerateOutputInformation();
+   virtual void GenerateData() override;
+   virtual void GenerateOutputInformation() override;
 
  private:
    const BaseGeometry* m_SliceGeometry;

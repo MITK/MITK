@@ -146,13 +146,14 @@ struct SelListenerRigidRegistration : ISelectionListener
     }
   }
 
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part,
+                        const ISelection::ConstPointer& selection) override
   {
     // check, if selection comes from datamanager
     if (part)
     {
-      QString partname(part->GetPartName().c_str());
-      if(partname.compare("Data Manager")==0)
+      QString partname = part->GetPartName();
+      if(partname == "Data Manager")
       {
         // apply selection
         DoSelectionChanged(selection);
@@ -183,6 +184,8 @@ m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(fal
   rotationParams = new int[3];
   scalingParams = new int[3];
 
+  m_PresetSelected = false;
+
   m_TimeStepperAdapter = NULL;
 
   this->GetDataStorage()->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
@@ -191,12 +194,10 @@ m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(fal
 
 QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 {
-  if(m_SelListener.IsNotNull())
+  if(m_SelListener)
   {
     berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-    if(s)
-      s->RemovePostSelectionListener(m_SelListener);
-    m_SelListener = NULL;
+    if(s) s->RemovePostSelectionListener(m_SelListener.data());
   }
 
   this->GetDataStorage()->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
@@ -232,6 +233,8 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_ManualFrame->setEnabled(false);
   m_Parent->setEnabled(false);
 
+  this->m_Controls.m_RigidTransform->removeTab(1);
+
   mitk::NodePredicateAnd::Pointer andPred =                       // we want binary images in the selectors
     mitk::NodePredicateAnd::New(mitk::NodePredicateDataType::New("Image"),
     mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)));
@@ -247,6 +250,39 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MovingMaskLB->hide();
 
   this->CreateConnections();
+  this->CheckCalculateEnabled();
+
+  mitk::RigidRegistrationPreset* preset = new mitk::RigidRegistrationPreset();
+  preset->LoadPreset();
+
+  this->FillPresetComboBox( preset->getAvailablePresets() );
+  this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(false);
+}
+
+void QmitkRigidRegistrationView::FillPresetComboBox( const std::list< std::string>& presets)
+{
+  this->m_Controls.m_RigidRegistrationPresetBox->addItem( QString("== select a registration configuration ==") );
+  for( const std::string &preset : presets )
+  {
+    this->m_Controls.m_RigidRegistrationPresetBox->addItem( QString(preset.c_str()) );
+  }
+}
+
+void QmitkRigidRegistrationView::PresetSelectionChanged()
+{
+  this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(true);
+}
+
+void QmitkRigidRegistrationView::LoadSelectedPreset()
+{
+  this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(false);
+
+  QString current_item = this->m_Controls.m_RigidRegistrationPresetBox->currentText();
+  emit PresetSelected(current_item);
+
+  // first item is blank == no preset selected
+  m_PresetSelected = ( this->m_Controls.m_RigidRegistrationPresetBox->currentIndex() > 0 );
+
   this->CheckCalculateEnabled();
 }
 
@@ -289,10 +325,16 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect(m_Controls.m_XScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(xScale_valueChanged(int)));
   connect(m_Controls.m_YScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(yScale_valueChanged(int)));
   connect(m_Controls.m_ZScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(zScale_valueChanged(int)));
-  connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationParameter()));
+
+  /*connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationParameter()));
   connect(m_Controls.m_SaveRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationParameter()));
   connect(m_Controls.m_LoadRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationTestParameter()));
-  connect(m_Controls.m_SaveRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationTestParameter()));
+  connect(m_Controls.m_SaveRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationTestParameter()));*/
+  connect(this, SIGNAL(PresetSelected(QString)), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationPresetParameter(QString) ) );
+  connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), this, SLOT(LoadSelectedPreset()) );
+  connect(m_Controls.m_RigidRegistrationPresetBox, SIGNAL(activated(int)), this, SLOT(PresetSelectionChanged()) );
+
+
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(OptimizerChanged(double)),this,SLOT(SetOptimizerValue( double )));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(TransformChanged()),this,SLOT(CheckCalculateEnabled()));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(AddNewTransformationToUndoList()),this,SLOT(AddNewTransformationToUndoList()));
@@ -306,14 +348,14 @@ void QmitkRigidRegistrationView::Activated()
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
-  if (m_SelListener.IsNull())
+  if (m_SelListener.isNull())
   {
-    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+    m_SelListener.reset(new SelListenerRigidRegistration(this));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
     berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-    m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
+    static_cast<SelListenerRigidRegistration*>(m_SelListener.data())->DoSelectionChanged(sel);
   }
   this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
   this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
@@ -369,9 +411,8 @@ void QmitkRigidRegistrationView::Deactivated()
   m_MovingNode = NULL;
   this->ClearTransformationLists();
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemovePostSelectionListener(m_SelListener);
-  m_SelListener = NULL;
+  if(s) s->RemovePostSelectionListener(m_SelListener.data());
+  m_SelListener.reset();
   /*
   m_Deactivated = true;
   this->SetImageColor(false);
@@ -1086,6 +1127,7 @@ void QmitkRigidRegistrationView::AlignCenters()
     mitk::Point3D movingPoint = m_MovingNode->GetData()->GetGeometry()->GetCenter();
     mitk::Vector3D translateVec;
     translateVec =  fixedPoint - movingPoint;
+    translateVec *= 10; // account for slider sensitivity
     m_Controls.m_XTransSlider->setValue((int)m_Controls.m_XTransSlider->value() + (int)translateVec[0]);
     m_Controls.m_YTransSlider->setValue((int)m_Controls.m_YTransSlider->value() + (int)translateVec[1]);
     m_Controls.m_ZTransSlider->setValue((int)m_Controls.m_ZTransSlider->value() + (int)translateVec[2]);
@@ -1104,25 +1146,29 @@ void QmitkRigidRegistrationView::SetRedoEnabled( bool enable )
 
 void QmitkRigidRegistrationView::CheckCalculateEnabled()
 {
-  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull())
+  if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull() )
   {
     m_Controls.m_ManualFrame->setEnabled(true);
-    m_Controls.m_CalculateTransformation->setEnabled(true);
-    if ( (m_FixedDimension != m_MovingDimension && std::max<int>(m_FixedDimension, m_MovingDimension) != 4) || m_FixedDimension < 2 /*|| m_FixedDimension > 3*/)
+
+    if( m_PresetSelected )
     {
-      m_Controls.m_CalculateTransformation->setEnabled(false);
-    }
-    else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 5 &&  (m_FixedDimension < 2) /*|| m_FixedDimension > 3)*/)
-    {
-      m_Controls.m_CalculateTransformation->setEnabled(false);
-    }
-    else if ((m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 4 && m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 13) && !(m_FixedDimension > 2))
-    {
-      m_Controls.m_CalculateTransformation->setEnabled(false);
-    }
-    else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 12 &&  m_FixedDimension != 2)
-    {
-      m_Controls.m_CalculateTransformation->setEnabled(false);
+      m_Controls.m_CalculateTransformation->setEnabled(true);
+      if ( (m_FixedDimension != m_MovingDimension && std::max<int>(m_FixedDimension, m_MovingDimension) != 4) || m_FixedDimension < 2 /*|| m_FixedDimension > 3*/)
+      {
+        m_Controls.m_CalculateTransformation->setEnabled(false);
+      }
+      else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 5 &&  (m_FixedDimension < 2) /*|| m_FixedDimension > 3)*/)
+      {
+        m_Controls.m_CalculateTransformation->setEnabled(false);
+      }
+      else if ((m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 4 && m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() < 13) && !(m_FixedDimension > 2))
+      {
+        m_Controls.m_CalculateTransformation->setEnabled(false);
+      }
+      else if (m_Controls.qmitkRigidRegistrationSelector1->GetSelectedTransform() > 12 &&  m_FixedDimension != 2)
+      {
+        m_Controls.m_CalculateTransformation->setEnabled(false);
+      }
     }
   }
   else
@@ -1300,6 +1346,7 @@ void QmitkRigidRegistrationView::Calculate()
 {
   m_Controls.qmitkRigidRegistrationSelector1->SetFixedNode(m_FixedNode);
   m_Controls.qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingNode);
+
   if (m_FixedMaskNode.IsNotNull() && m_Controls.m_UseMaskingCB->isChecked())
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_FixedMaskNode);
@@ -1316,6 +1363,12 @@ void QmitkRigidRegistrationView::Calculate()
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(NULL);
   }
+
+  if(m_Controls.m_cbAlignImageCenters->isChecked() )
+  {
+    this->AlignCenters();
+  }
+
   m_Controls.frame_2->setEnabled(false);
   m_Controls.frame_3->setEnabled(false);
   m_Controls.m_CalculateTransformation->setEnabled(false);

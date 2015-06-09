@@ -26,8 +26,8 @@ namespace mitk
   void mitk::XMLSerializable::ToXMLFile(const std::string& file
                                         , const std::string& elemName)
   {
-    TiXmlElement * rootElem=0;
-    TiXmlElement * element=0;
+    TiXmlElement * rootElem=nullptr;
+    TiXmlElement * element=nullptr;
 
     // determine element to write to
     std::string elementName = elemName;
@@ -48,7 +48,7 @@ namespace mitk
       if( rootElem->ValueStr() == elementName )
       {
         doc.RemoveChild(rootElem);
-        rootElem = 0;
+        rootElem = nullptr;
       }
       else
       {
@@ -61,7 +61,7 @@ namespace mitk
     else
     {
       // document did not exist, create new one with declration
-      TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+      auto  decl = new TiXmlDeclaration( "1.0", "", "" );
       doc.LinkEndChild( decl );
     }
 
@@ -78,7 +78,7 @@ namespace mitk
     rootElem->LinkEndChild(element);
 
     // if no root element exists, add it now
-    if(doc.RootElement() == 0)
+    if(doc.RootElement() == nullptr)
       doc.LinkEndChild( rootElem );
 
     if(!doc.SaveFile( file ))

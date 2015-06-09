@@ -41,11 +41,11 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationTool : public itk::DataObject
+  class MITKIGT_EXPORT NavigationTool : public itk::DataObject
   {
   public:
 
-    mitkClassMacro(NavigationTool,itk::DataObject);
+    mitkClassMacroItkParent(NavigationTool,itk::DataObject);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -156,7 +156,7 @@ namespace mitk {
       * SmartPointers to the same NavigationTool object since separate DataObjects are
       * still maintained.
       */
-    virtual void Graft(const DataObject *data);
+    virtual void Graft(const DataObject *data) override;
     //#######################
 
   protected:

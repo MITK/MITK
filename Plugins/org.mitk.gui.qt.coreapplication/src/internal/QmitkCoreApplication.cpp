@@ -25,11 +25,12 @@ QmitkCoreApplication::QmitkCoreApplication()
 
 }
 
-int QmitkCoreApplication::Start()
+QVariant QmitkCoreApplication::Start(berry::IApplicationContext* /*context*/)
 {
-  berry::Display* display = berry::PlatformUI::CreateDisplay();
+  QScopedPointer<berry::Display> display(berry::PlatformUI::CreateDisplay());
 
-  int code = berry::PlatformUI::CreateAndRunWorkbench(display, new QmitkWorkbenchAdvisor());
+  QScopedPointer<QmitkWorkbenchAdvisor> wbAdvisor(new QmitkWorkbenchAdvisor());
+  int code = berry::PlatformUI::CreateAndRunWorkbench(display.data(), wbAdvisor.data());
 
   // exit the application with an appropriate return code
   return code == berry::PlatformUI::RETURN_RESTART

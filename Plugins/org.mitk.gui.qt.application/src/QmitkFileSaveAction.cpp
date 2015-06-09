@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionService.h>
 #include <berryINullSelectionListener.h>
+#include <berryIPreferences.h>
 
 #include <QmitkIOUtil.h>
 
@@ -33,12 +34,13 @@ class QmitkFileSaveActionPrivate
 {
 private:
 
-  void HandleSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, berry::ISelection::ConstPointer selection)
+  void HandleSelectionChanged(const berry::IWorkbenchPart::Pointer& /*part*/,
+                              const berry::ISelection::ConstPointer& selection)
   {
     this->setEnabled(selection);
   }
 
-  berry::ISelectionListener::Pointer m_SelectionListener;
+  QScopedPointer<berry::ISelectionListener> m_SelectionListener;
 
 public:
 
@@ -52,31 +54,30 @@ public:
   {
     if (!m_Window.Expired())
     {
-      m_Window.Lock()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener);
+      m_Window.Lock()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener.data());
     }
   }
 
-  void init ( berry::IWorkbenchWindow::Pointer window, QmitkFileSaveAction* action )
+  void init ( berry::IWorkbenchWindow* window, QmitkFileSaveAction* action )
   {
-    m_Window = window;
+    m_Window = berry::IWorkbenchWindow::Pointer(window);
     m_Action = action;
 
-    action->setParent(static_cast<QWidget*>(m_Window.Lock()->GetShell()->GetControl()));
     action->setText("&Save...");
     action->setToolTip("Save data objects (images, surfaces,...)");
 
     berry::ISelectionService* selectionService = m_Window.Lock()->GetSelectionService();
     setEnabled(selectionService->GetSelection());
 
-    selectionService->AddSelectionListener(m_SelectionListener);
+    selectionService->AddSelectionListener(m_SelectionListener.data());
 
     QObject::connect(action, SIGNAL(triggered(bool)), action, SLOT(Run()));
   }
 
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService::Pointer prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
-    if (prefService.IsNotNull())
+    berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
+    if (prefService != nullptr)
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
@@ -88,7 +89,7 @@ public:
     berry::IPreferences::Pointer prefs = GetPreferences();
     if(prefs.IsNotNull())
     {
-      return QString::fromStdString(prefs->Get("LastFileSavePath", ""));
+      return prefs->Get("LastFileSavePath", "");
     }
     return QString();
   }
@@ -98,7 +99,7 @@ public:
     berry::IPreferences::Pointer prefs = GetPreferences();
     if(prefs.IsNotNull())
     {
-      prefs->Put("LastFileSavePath", path.toStdString());
+      prefs->Put("LastFileSavePath", path);
       prefs->Flush();
     }
   }
@@ -134,10 +135,17 @@ public:
 QmitkFileSaveAction::QmitkFileSaveAction(berry::IWorkbenchWindow::Pointer window)
   : QAction(0), d(new QmitkFileSaveActionPrivate)
 {
-  d->init(window, this);
+  d->init(window.GetPointer(), this);
 }
 
 QmitkFileSaveAction::QmitkFileSaveAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
+  : QAction(0), d(new QmitkFileSaveActionPrivate)
+{
+  d->init(window.GetPointer(), this);
+  this->setIcon(icon);
+}
+
+QmitkFileSaveAction::QmitkFileSaveAction(const QIcon& icon, berry::IWorkbenchWindow* window)
   : QAction(0), d(new QmitkFileSaveActionPrivate)
 {
   d->init(window, this);

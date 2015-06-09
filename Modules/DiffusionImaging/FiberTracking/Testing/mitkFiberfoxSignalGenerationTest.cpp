@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkTractsToDWIImageFilter.h>
 #include <mitkFiberfoxParameters.h>
 #include <mitkStickModel.h>
@@ -24,12 +24,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBallModel.h>
 #include <mitkDotModel.h>
 #include <mitkAstroStickModel.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <itkTestingComparisonImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include <mitkRicianNoiseModel.h>
 #include <mitkChiSquareNoiseModel.h>
 #include <mitkIOUtil.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkProperties.h>
+#include <mitkITKImageImport.h>
+#include <mitkImageCast.h>
+
+#include <itkVectorImage.h>
+
+typedef itk::VectorImage< short, 3>   ItkDwiType;
 
 /**Documentation
  * Test the Fiberfox simulation functions (fiberBundle -> diffusion weighted image)
@@ -55,7 +63,7 @@ bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >
     return true;
 }
 
-void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointer fiberBundle, mitk::DiffusionImage<short>::Pointer refImage, string message)
+void StartSimulation(FiberfoxParameters<double> parameters, FiberBundle::Pointer fiberBundle, mitk::Image::Pointer refImage, string message)
 {
     itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
     tractsToDwiFilter->SetUseConstantRandSeed(true);
@@ -63,22 +71,31 @@ void StartSimulation(FiberfoxParameters<double> parameters, FiberBundleX::Pointe
     tractsToDwiFilter->SetFiberBundle(fiberBundle);
     tractsToDwiFilter->Update();
 
-    mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
-    testImage->SetVectorImage( tractsToDwiFilter->GetOutput() );
-    testImage->SetReferenceBValue(parameters.m_SignalGen.m_Bvalue);
-    testImage->SetDirections(parameters.m_SignalGen.GetGradientDirections());
-    testImage->InitializeFromVectorImage();
+    mitk::Image::Pointer testImage = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
+    testImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
+    testImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ) );
+
+    mitk::DiffusionPropertyHelper propertyHelper( testImage );
+    propertyHelper.InitializeImage();
 
     if (refImage.IsNotNull())
     {
-        bool cond = CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage());
+      if( static_cast<mitk::GradientDirectionsProperty*>( refImage->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer().IsNotNull() )
+      {
+        ItkDwiType::Pointer itkTestImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(testImage, itkTestImagePointer);
+        ItkDwiType::Pointer itkRefImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(refImage, itkRefImagePointer);
+
+        bool cond = CompareDwi(itkTestImagePointer, itkRefImagePointer);
         if (!cond)
         {
-            MITK_INFO << "Saving test and rference image to " << mitk::IOUtil::GetTempPath();
-            mitk::IOUtil::SaveBaseData(testImage, mitk::IOUtil::GetTempPath()+"testImage.dwi");
-            mitk::IOUtil::SaveBaseData(refImage, mitk::IOUtil::GetTempPath()+"refImage.dwi");
+          MITK_INFO << "Saving test and rference image to " << mitk::IOUtil::GetTempPath();
+          mitk::IOUtil::SaveBaseData(testImage, mitk::IOUtil::GetTempPath()+"testImage.nrrd");
+          mitk::IOUtil::SaveBaseData(refImage, mitk::IOUtil::GetTempPath()+"refImage.nrrd");
         }
         MITK_TEST_CONDITION_REQUIRED(cond, message);
+      }
     }
 }
 
@@ -89,39 +106,42 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(argc>=19,"check for input data");
 
     // input fiber bundle
-    FiberBundleX::Pointer fiberBundle = dynamic_cast<FiberBundleX*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
+    FiberBundle::Pointer fiberBundle = dynamic_cast<FiberBundle*>(mitk::IOUtil::Load(argv[1])[0].GetPointer());
 
     // reference diffusion weighted images
-    mitk::DiffusionImage<short>::Pointer stickBall = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
-    mitk::DiffusionImage<short>::Pointer stickAstrosticks = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[3])->GetData());
-    mitk::DiffusionImage<short>::Pointer stickDot = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
-    mitk::DiffusionImage<short>::Pointer tensorBall = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
-    mitk::DiffusionImage<short>::Pointer stickTensorBall = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
-    mitk::DiffusionImage<short>::Pointer stickTensorBallAstrosticks = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
-    mitk::DiffusionImage<short>::Pointer gibbsringing = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[8])->GetData());
-    mitk::DiffusionImage<short>::Pointer ghost = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[9])->GetData());
-    mitk::DiffusionImage<short>::Pointer aliasing = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[10])->GetData());
-    mitk::DiffusionImage<short>::Pointer eddy = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[11])->GetData());
-    mitk::DiffusionImage<short>::Pointer linearmotion = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[12])->GetData());
-    mitk::DiffusionImage<short>::Pointer randommotion = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[13])->GetData());
-    mitk::DiffusionImage<short>::Pointer spikes = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[14])->GetData());
-    mitk::DiffusionImage<short>::Pointer riciannoise = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[15])->GetData());
-    mitk::DiffusionImage<short>::Pointer chisquarenoise = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[16])->GetData());
-    mitk::DiffusionImage<short>::Pointer distortions = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(argv[17])->GetData());
+    mitk::Image::Pointer stickBall = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[2])->GetData());
+    mitk::Image::Pointer stickAstrosticks = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[3])->GetData());
+    mitk::Image::Pointer stickDot = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[4])->GetData());
+    mitk::Image::Pointer tensorBall = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[5])->GetData());
+    mitk::Image::Pointer stickTensorBall = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[6])->GetData());
+    mitk::Image::Pointer stickTensorBallAstrosticks = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
+    mitk::Image::Pointer gibbsringing = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[8])->GetData());
+    mitk::Image::Pointer ghost = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[9])->GetData());
+    mitk::Image::Pointer aliasing = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[10])->GetData());
+    mitk::Image::Pointer eddy = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[11])->GetData());
+    mitk::Image::Pointer linearmotion = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[12])->GetData());
+    mitk::Image::Pointer randommotion = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[13])->GetData());
+    mitk::Image::Pointer spikes = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[14])->GetData());
+    mitk::Image::Pointer riciannoise = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[15])->GetData());
+    mitk::Image::Pointer chisquarenoise = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[16])->GetData());
+    mitk::Image::Pointer distortions = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[17])->GetData());
     mitk::Image::Pointer mitkFMap = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(argv[18])->GetData());
     typedef itk::Image<double, 3> ItkDoubleImgType;
     ItkDoubleImgType::Pointer fMap = ItkDoubleImgType::New();
     mitk::CastToItkImage(mitkFMap, fMap);
 
+    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+  mitk::CastToItkImage(stickBall, itkVectorImagePointer);
+
     FiberfoxParameters<double> parameters;
     parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
     parameters.m_SignalGen.m_SignalScale = 10000;
-    parameters.m_SignalGen.m_ImageRegion = stickBall->GetVectorImage()->GetLargestPossibleRegion();
-    parameters.m_SignalGen.m_ImageSpacing = stickBall->GetVectorImage()->GetSpacing();
-    parameters.m_SignalGen.m_ImageOrigin = stickBall->GetVectorImage()->GetOrigin();
-    parameters.m_SignalGen.m_ImageDirection = stickBall->GetVectorImage()->GetDirection();
-    parameters.m_SignalGen.m_Bvalue = stickBall->GetReferenceBValue();
-    parameters.m_SignalGen.SetGradienDirections(stickBall->GetDirections());
+    parameters.m_SignalGen.m_ImageRegion = itkVectorImagePointer->GetLargestPossibleRegion();
+    parameters.m_SignalGen.m_ImageSpacing = itkVectorImagePointer->GetSpacing();
+    parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
+    parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
+    parameters.m_SignalGen.m_Bvalue = static_cast<mitk::FloatProperty*>(stickBall->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue();
+    parameters.m_SignalGen.SetGradienDirections( static_cast<mitk::GradientDirectionsProperty*>( stickBall->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
 
     // intra and inter axonal compartments
     mitk::StickModel<double> stickModel;

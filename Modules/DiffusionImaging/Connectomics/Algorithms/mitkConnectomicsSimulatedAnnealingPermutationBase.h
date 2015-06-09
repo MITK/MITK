@@ -32,14 +32,14 @@ namespace mitk
 
     /**
   * \brief Base class of a permutation to be used in simulated annealing */
-  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingPermutationBase : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSimulatedAnnealingPermutationBase : public itk::Object
   {
   public:
 
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsSimulatedAnnealingPermutationBase, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsSimulatedAnnealingPermutationBase, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

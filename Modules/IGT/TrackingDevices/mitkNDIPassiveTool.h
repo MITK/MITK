@@ -32,7 +32,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NDIPassiveTool : public InternalTrackingTool
+  class MITKIGT_EXPORT NDIPassiveTool : public InternalTrackingTool
   {
   public:
     friend class NDITrackingDevice;

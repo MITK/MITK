@@ -33,8 +33,8 @@ namespace mitk
     {
     public:
         PersistenceActivator();
-        void Load(us::ModuleContext* context);
-        void Unload(us::ModuleContext* context);
+        void Load(us::ModuleContext* context) override;
+        void Unload(us::ModuleContext* context) override;
         virtual ~PersistenceActivator();
 
     private:

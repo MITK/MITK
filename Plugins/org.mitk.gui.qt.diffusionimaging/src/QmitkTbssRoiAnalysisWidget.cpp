@@ -36,8 +36,8 @@ QmitkTbssRoiAnalysisWidget::QmitkTbssRoiAnalysisWidget( QWidget * parent )
 
 
 
-void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mitk::Image* img,
-                                                    mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
+void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundle *fib, mitk::Image* img,
+                                                    mitk::DataNode* startRoi, mitk::DataNode* endRoi, bool avg, int number)
 {
 
   TractContainerType tracts = CreateTracts(fib, startRoi, endRoi);
@@ -53,19 +53,19 @@ void QmitkTbssRoiAnalysisWidget::DoPlotFiberBundles(mitk::FiberBundleX *fib, mit
 }
 
 
-TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *fib,
-                                                            mitk::PlanarFigure *startRoi,
-                                                            mitk::PlanarFigure *endRoi)
+TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundle *fib,
+                                                            mitk::DataNode *startRoi,
+                                                            mitk::DataNode *endRoi)
 {
-    mitk::PlaneGeometry* startGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(startRoi->GetGeometry2D()) );
-    mitk::PlaneGeometry* endGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(endRoi->GetGeometry2D()) );
+    mitk::PlaneGeometry* startGeometry2D = const_cast<mitk::PlaneGeometry*>(dynamic_cast<mitk::PlanarFigure*>(startRoi->GetData())->GetPlaneGeometry());
+    mitk::PlaneGeometry* endGeometry2D = const_cast<mitk::PlaneGeometry*>(dynamic_cast<mitk::PlanarFigure*>(endRoi->GetData())->GetPlaneGeometry());
 
 
-    mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
-    mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
+    mitk::Point3D startCenter = dynamic_cast<mitk::PlanarFigure*>(startRoi->GetData())->GetWorldControlPoint(0); //center Point of start roi
+    mitk::Point3D endCenter = dynamic_cast<mitk::PlanarFigure*>(startRoi->GetData())->GetWorldControlPoint(0); //center Point of end roi
 
-    mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
-    mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+    mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(startRoi, nullptr);
+    mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(endRoi, nullptr);
 
 
 
@@ -86,7 +86,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
     for( int fiberID( 0 ); fiberID < num; fiberID++ )
     {
       vtkIdType   numPointsInCell(0);
-      vtkIdType*  pointsInCell(NULL);
+      vtkIdType*  pointsInCell(nullptr);
       lines->GetNextCell ( numPointsInCell, pointsInCell );
 
       int startId = 0;
@@ -384,11 +384,11 @@ TractContainerType QmitkTbssRoiAnalysisWidget::CreateTracts(mitk::FiberBundleX *
     return tracts;
 }
 
-void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, mitk::Image* img,
-                                mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi, bool avg, int number)
+void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundle *fib, mitk::Image* img,
+                                mitk::DataNode* startRoi, mitk::DataNode* endRoi, bool avg, int number)
 {
 
-  if(fib == NULL || img == NULL || startRoi == NULL || endRoi == NULL)
+  if(fib == nullptr || img == nullptr || startRoi == nullptr || endRoi == nullptr)
     return;
 
 
@@ -405,7 +405,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBetweenRois(mitk::FiberBundleX *fib, m
 
 void QmitkTbssRoiAnalysisWidget::ModifyPlot(int number, bool avg)
 {
-  if(m_Fib == NULL || m_CurrentTbssImage == NULL || m_CurrentStartRoi == NULL || m_CurrentEndRoi == NULL)
+  if(m_Fib == nullptr || m_CurrentTbssImage == nullptr || m_CurrentStartRoi == nullptr || m_CurrentEndRoi == nullptr)
     return;
 
   if(m_PlottingFiberBundle)
@@ -426,7 +426,7 @@ TractContainerType QmitkTbssRoiAnalysisWidget::ParameterizeTracts(TractContainer
 
 
 
-  for(TractContainerType::iterator it = tracts.begin(); it != tracts.end(); ++it)
+  for(auto it = tracts.begin(); it != tracts.end(); ++it)
   {
     TractType resampledTract;
     TractType tract = *it;
@@ -507,7 +507,7 @@ mitk::Point3D QmitkTbssRoiAnalysisWidget::GetPositionInWorld(int index)
   mitk::ScalarType xSum = 0.0;
   mitk::ScalarType ySum = 0.0;
   mitk::ScalarType zSum = 0.0;
-  for(TractContainerType::iterator it = m_CurrentTracts.begin();
+  for(auto it = m_CurrentTracts.begin();
       it!=m_CurrentTracts.end(); ++it)
   {
     TractType tract = *it;
@@ -679,7 +679,7 @@ void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<mitk::ScalarType>
     }
 
 
-    QwtLegend *legend = new QwtLegend;
+    auto  legend = new QwtLegend;
     this->SetLegend(legend, QwtPlot::RightLegend, 0.5);
 
 
@@ -692,9 +692,9 @@ void QmitkTbssRoiAnalysisWidget::Plot(std::vector <std::vector<mitk::ScalarType>
 
 
 std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::CalculateGroupProfilesFibers(mitk::TbssImage::Pointer tbssImage,
-                                                                                            mitk::FiberBundleX *fib,
-                                                                                            mitk::PlanarFigure* startRoi,
-                                                                                            mitk::PlanarFigure* endRoi,
+                                                                                            mitk::FiberBundle *fib,
+                                                                                            mitk::DataNode* startRoi,
+                                                                                            mitk::DataNode* endRoi,
                                                                                             int number)
 {
     TractContainerType tracts = CreateTracts(fib, startRoi, endRoi);
@@ -721,7 +721,7 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
       {
         // Iterate trough the tract
         std::vector<mitk::ScalarType> profile;
-        TractType::iterator it = resampledTracts[t].begin();
+        auto it = resampledTracts[t].begin();
         while(it != resampledTracts[t].end())
         {
           PointType p = *it;
@@ -794,9 +794,9 @@ std::vector< std::vector<mitk::ScalarType> > QmitkTbssRoiAnalysisWidget::Calcula
 
 
 void QmitkTbssRoiAnalysisWidget::PlotFiber4D(mitk::TbssImage::Pointer tbssImage,
-                                             mitk::FiberBundleX *fib,
-                                             mitk::PlanarFigure* startRoi,
-                                             mitk::PlanarFigure* endRoi,
+                                             mitk::FiberBundle *fib,
+                                             mitk::DataNode* startRoi,
+                                             mitk::DataNode* endRoi,
                                              int number)
 {
   m_PlottingFiberBundle = false;
@@ -817,7 +817,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, T
   m_PlottingFiberBundle = true;
 
   this->Clear();
-  std::vector<TractType>::iterator it = tracts.begin();
+  auto it = tracts.begin();
 
 
   std::vector< std::vector <mitk::ScalarType > > profiles;
@@ -829,7 +829,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, T
   {
 
     TractType tract = *it;
-    TractType::iterator tractIt = tract.begin();
+    auto tractIt = tract.begin();
 
     std::vector<mitk::ScalarType> profile;
 
@@ -869,7 +869,7 @@ void QmitkTbssRoiAnalysisWidget::PlotFiberBundles(const mitk::PixelType ptype, T
   }
 
 
-  std::vector< std::vector<mitk::ScalarType> >::iterator profit = profiles.begin();
+  auto profit = profiles.begin();
 
   int id=0;
   while(profit != profiles.end())

@@ -46,7 +46,7 @@ namespace mitk
   * @ingroup SurfaceFilters
   * @ingroup ToFProcessing
   */
-  class MitkToFProcessing_EXPORT ToFDistanceImageToSurfaceFilter : public SurfaceSource
+  class MITKTOFPROCESSING_EXPORT ToFDistanceImageToSurfaceFilter : public SurfaceSource
   {
   public:
 
@@ -157,12 +157,12 @@ namespace mitk
     \brief Standard destructor
     */
     ~ToFDistanceImageToSurfaceFilter();
-    virtual void GenerateOutputInformation();
+    virtual void GenerateOutputInformation() override;
     /*!
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the output of the ToFSurfaceSource: The generated surface of the 3d points
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
     /**
     * \brief Create an output for each input
     *

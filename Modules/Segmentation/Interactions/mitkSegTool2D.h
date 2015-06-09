@@ -58,7 +58,7 @@ class BaseRenderer;
 
   $Author$
 */
-class MitkSegmentation_EXPORT SegTool2D : public Tool
+class MITKSEGMENTATION_EXPORT SegTool2D : public Tool
 {
   public:
 
@@ -119,7 +119,7 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
     * Current an event is discarded if it was not sent by a 2D renderwindow and if it is
     * not of type InteractionPositionEvent
     */
-    virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode);
+    virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode) override;
 
     /**
       \brief Extract the slice of an image that the user just scribbles on.
@@ -173,9 +173,6 @@ class MitkSegmentation_EXPORT SegTool2D : public Tool
 
     bool m_ShowMarkerNodes;
     static bool m_SurfaceInterpolationEnabled;
-
-    DiffSliceOperation* m_doOperation;
-    DiffSliceOperation* m_undoOperation;
 };
 
 } // namespace

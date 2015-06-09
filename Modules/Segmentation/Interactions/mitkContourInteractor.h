@@ -27,7 +27,7 @@ namespace mitk {
   //##Documentation
   //## @brief Interactor for the creation of an mitk::Contour
   //## @ingroup Interaction
-  class MitkSegmentation_EXPORT ContourInteractor : public mitk::Interactor
+  class MITKSEGMENTATION_EXPORT ContourInteractor : public mitk::Interactor
   {
   public:
     mitkClassMacro(ContourInteractor, Interactor);
@@ -38,7 +38,7 @@ namespace mitk {
     ContourInteractor(const char * type, DataNode* dataNode);
     virtual ~ContourInteractor();
 
-    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
+    virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
 
     /**
     * entry method for any interaction. Method is called if user

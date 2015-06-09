@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDTIAtlasAppApplicationPlugin.h"
 #include <QtPlugin>
 #include <mitkVersion.h>
-#include <berryQtAssistantUtil.h>
 
 #include "src/QmitkDTIAtlasAppApplication.h"
 
@@ -28,17 +27,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileInfo>
 #include <QDateTime>
 
-QmitkDTIAtlasAppApplicationPlugin* QmitkDTIAtlasAppApplicationPlugin::inst = 0;
+QmitkDTIAtlasAppApplicationPlugin* QmitkDTIAtlasAppApplicationPlugin::inst = nullptr;
 
 QmitkDTIAtlasAppApplicationPlugin::QmitkDTIAtlasAppApplicationPlugin()
-    : pluginListener(0)
 {
   inst = this;
 }
 
 QmitkDTIAtlasAppApplicationPlugin::~QmitkDTIAtlasAppApplicationPlugin()
 {
-  delete pluginListener;
 }
 
 QmitkDTIAtlasAppApplicationPlugin* QmitkDTIAtlasAppApplicationPlugin::GetDefault()
@@ -61,14 +58,6 @@ void QmitkDTIAtlasAppApplicationPlugin::start(ctkPluginContext* context)
 
 //  berry::QtAssistantUtil::SetHelpCollectionFile(collectionFile);
 //  berry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.dtiatlasapp/bundle/index.html");
-
-  delete pluginListener;
-  pluginListener = new berry::QCHPluginListener(context);
-  context->connectPluginListener(pluginListener, SLOT(pluginChanged(ctkPluginEvent)), Qt::DirectConnection);
-
-  // register all QCH files from all the currently installed plugins
-  pluginListener->processPlugins();
-
 
 }
 

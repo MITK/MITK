@@ -109,10 +109,7 @@ int vtkOdfSource::RequestInformation(
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-               -1);
-
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),1,1,1,1,1,1);
+  outInfo->Set(vtkAlgorithm::CAN_HANDLE_PIECE_REQUEST(),0);
 
   return 1;
 }

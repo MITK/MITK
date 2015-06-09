@@ -1,0 +1,209 @@
+/**
+\page BuildInstructionsPage Build Instructions
+
+\tableofcontents
+
+\section BuildInstructions_Introduction Introduction
+
+The CMake-based build system of MITK supports a "superbuild" process,
+meaning that it will download, configure, and build all required third-party
+libraries (except Qt) automatically. These instructions will show you how to use
+the MITK superbuild.
+
+\note This page explains explicitly how to build MITK itself. If you want to
+create your own project based on MITK, the process described below is completely
+automated. Please see \ref HowToNewProject.
+
+For more advanced users, the last sections explains how to inject custom build
+libraries into the superbuild process.
+
+\section BuildInstructions_Prerequisites Prerequisites
+
+You need:
+  -# Git from http://git-scm.com (there are also numerous third-party graphical
+     clients available). We recomment using Git, but see below for a way how to
+     get the current source code without using it.
+  -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
+  -# <a href="http://qt.nokia.com">Qt</a> 5.x if you plan to develop Qt-based
+     applications (Qt 4 is still supported but may be dropped in near future)
+  -# If you are using <b>Mac OS X</b> you need an XCode installation as it
+     provides the neccessary compilers and SDKs
+
+\section BuildInstructions_Qt A note about Qt
+
+As we do not provide Qt in the MITK superbuild you need to install Qt manually.
+Installing Qt dramatically improved since Qt 5, as The Qt Company provides
+<a href="http://www.qt.io/download/">sophisticated online installers for all
+supported platforms</a>.
+
+\note Make sure that you select a Qt version which provides the right <b>OpenGL-enabled</b>
+packages for your architecture and compiler.
+
+\section BuildInstructions_Get_Source Get a source tree
+
+Since MITK is under active development we recommend to use Git to check out
+the latest stable release from the homepage. If you decide to use the most
+current nightly release, make sure to get a stable tree: Check the
+<a href="http://cdash.mitk.org/index.php?project=MITK">MITK dashboard</a>
+before checking out. If the build tree is not clean, you can specify an
+older revision for the checkout or get a stable tar ball from
+<a href="http://www.mitk.org">www.mitk.org</a>.
+
+If you don't want to use Git, you may also download a snapshot of the current source code
+(or any other older version) as a <a href="http://mitk.org/git/?p=MITK.git;a=shortlog;h=refs/heads/master">tar.gz package</a>.
+
+To clone MITK's current Git repository do:
+
+\code
+git clone http://git.mitk.org/MITK.git
+\endcode
+
+\section BuildInstructions_Build_With_CMake Build MITK with CMake
+
+Create a new directory for the superbuild binary tree, change to it and call CMake:
+
+In the shell (assuming your current directory is the same as the one where you
+issued the git clone command):
+\code
+mkdir MITK-superbuild
+cd MITK-superbuild
+ccmake ../MITK
+\endcode
+
+If you use <b>Windows</b> or prefer to use the CMake GUI, start the CMake GUI and enter the
+location of the source tree and binary tree, choose a suitable generator
+and configure the project.
+
+CMake will present you a couple of options, these are the most important ones:
+
+ - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.4/msvc2013_64_opengl</i> or <i>/home/user/Qt/5.4/gcc_64</i>
+ - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this
+   will download and build ACVD)
+ - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
+ - <tt><b>MITK_USE_Boost</b></tt> Build MITK code which depends on Boost (this
+   will download Boost 1.56)
+ - <tt><b>MITK_USE_Boost_LIBRARIES</b></tt> If you need binary Boost libraries,
+   specify them here.
+ - <tt><b>MITK_USE_OpenCV</b></tt> Build MITK code which depends on OpenCV (this
+   will download and build OpenCV 2.4)
+ - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also
+   configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
+ - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
+
+If you are satisfied with the configuration of your MITK superbuild, generate
+the project files with CMake by pressing "Generate".
+
+<b>Linux</b> and <b>Mac OS X</b> users usually just enter "make" (optionally
+supplying the number threads to be used for a parallel build):
+\code
+make -j6
+\endcode
+
+<b>Windows</b> users using Visual Studio can open the generated
+<tt>MITK-superbuild.sln</tt> solution file in the <tt>MITK-superbuild</tt>
+directory and start the build by building the <tt>BUILD_ALL</tt> project.
+
+\section BuildInstructions_Customize Customize your MITK superbuild
+
+The MITK superbuild configures MITK as well as all external libraries. The
+build directories of these libraries, and of MITK itself are located inside
+the <tt>MITK-superbuild</tt> directory. For example, the directory layout may
+look like:
+
+\code
+MITK-superbuild
+ |- ep "external projects"
+    |-bin
+    |-lib
+    |-include
+    |-src
+ |- MITK-build
+\endcode
+
+To change the configuration of the MITK build itself, choose the MITK-build directory
+as the binary directory in the CMake GUI (not the MITK-superbuild directory).
+After generating the project files, build the MITK project by either issuing "make"
+in the MITK-build directory (Linux, Mac OS X), or by opening MITK-build/MITK.sln (Windows).
+
+You may also change the configuration of any project configured via the
+superbuild process. Make sure to also build the changed project and also the
+projects which depend on it.
+
+\section BuildInstructions_Running Running Applications
+
+On Linux, just execute the application you want to run. MITK executables are
+located in <tt>MITK-superbuild/MITK-build/bin</tt>
+
+On Windows, the <tt>PATH</tt> environment variable must contain the directories
+containing the third-party libraries. The MITK build system generated <b>Windows batch
+files</b> in the <tt>MITK-build</tt> directory set up a correct environment
+and opens the appropriate Visual Studio solution file. Use these batch files to be able
+to start and debug MITK applications from inside Visual Studio.
+
+\section BuildInstructions_Documentation Documentation
+
+If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool
+installed, you get a new project (Visual Studio) or "make" target named "doc".
+You can build this to generate the HTML documentation of MITK in the
+Documentation/Doxygen directory of your MITK-build binary tree or in the
+<tt>MITK_DOXYGEN_OUTPUT_DIR</tt> CMake variable (if specified).
+
+\section BuildInstructions_Extending Extend MITK on your own (using the application framework BlueBerry)
+
+Please see \ref NewPluginPage
+
+\section BuildInstructions_As_Toolkit Use MITK in your own project (as a toolkit)
+
+To use MITK in your external project, add the CMake command
+<code>find_package(MITK REQUIRED)</code> to your CMakeLists.txt and make use of
+the CMake macros <code>mitk_create_module()</code> and
+<code>mitk_create_executable()</code> provided by MITK.
+
+Here is an example CMakeLists.txt (from the Examples/QtAppExample/ directory)
+which allows you to create a Qt-based application using MITK to display an image.
+\include QtAppExample/CMakeLists.txt
+
+\section BuildInstructions_Advanced_Customization Superbuild customization
+
+You can inject pre-build third-party libraries into the MITK superbuild by
+setting certain CMake variables before the first configure step. MITK will
+then use these third-party libraries instead of downloading and building them
+by itself. Note that you must take care of configuring those libraries with all options
+MITK requires.
+
+The variables listed below are provided for injecting third-party libraries.
+Their occurrence in the CMake GUI or in ccmake may depend on specific
+MITK_USE_* options set to ON. You may also use the variable names below without
+the <tt>EXTERNAL_</tt> prefix, for example when providing their values on a
+command line call to CMake.
+
+ - <tt><b>EXTERNAL_BOOST_ROOT</b></tt> Set this variable to your custom Boost
+   installation
+ - <tt><b>EXTERNAL_CTK_DIR</b></tt> Set this variable to your CTK binary tree
+   (the directory containing the CTKConfig.cmake file)
+ - <tt><b>EXTERNAL_CableSwig_DIR</b></tt> Set this variable to your CableSwig
+   binary tree for Python wrapping (the directory containing the
+   CableSwigConfig.cmake file)
+ - <tt><b>EXTERNAL_DCMTK_DIR</b></tt> Set this variable to your DCMTK binary
+   tree (the directory containing the DCMTKConfig.cmake file)
+ - <tt><b>EXTERNAL_GDCM_DIR</b></tt> Set this variable to your GDCM binary
+   tree (the directory containing the GDCMConfig.cmake file)
+ - <tt><b>EXTERNAL_ITK_DIR</b></tt> Set this variable to your ITK binary tree
+   (the directory containing the ITKConfig.cmake file)
+ - <tt><b>EXTERNAL_OpenCV_DIR</b></tt> Set this variable to your OpenCV binary
+   tree (the directory containing the OpenCVConfig.cmake file)
+ - <tt><b>EXTERNAL_VTK_DIR</b></tt> Set this variable to your VTK binary tree
+   (the directory containing the VTKConfig.cmake file)
+
+To set CMake options before the first configure step is invoked, supply them
+on the command line, i.e.
+
+\code
+ccmake -DITK_DIR:PATH=/opt/ITK-release ../MITK
+\endcode
+
+See the following link for more information about how to configure third-party
+libraries:
+\subpage BuildToolkits "How to build ITK, VTK and Qt"
+
+*/

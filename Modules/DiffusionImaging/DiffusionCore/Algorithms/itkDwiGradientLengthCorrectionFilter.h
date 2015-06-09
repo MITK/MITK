@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-class MitkDiffusionCore_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
+class MITKDIFFUSIONCORE_EXPORT DwiGradientLengthCorrectionFilter : public ProcessObject
 {
 
 public:
@@ -42,9 +42,9 @@ public:
     itkCloneMacro(Self)
     itkTypeMacro(DwiGradientLengthCorrectionFilter,ProcessObject)
 
-    void GenerateData();
+    void GenerateData() override;
 
-    virtual void Update(){
+    virtual void Update() override{
         this->GenerateData();
     }
 

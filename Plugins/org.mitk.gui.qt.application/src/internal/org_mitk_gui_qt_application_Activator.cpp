@@ -21,13 +21,15 @@
 
 #include <QmitkRegisterClasses.h>
 
+#include "QmitkShowPreferencePageHandler.h"
+
 #include <QtPlugin>
 
 namespace mitk
 {
 
-  org_mitk_gui_qt_application_Activator* org_mitk_gui_qt_application_Activator::m_Instance = 0;
-  ctkPluginContext* org_mitk_gui_qt_application_Activator::m_Context = 0;
+  org_mitk_gui_qt_application_Activator* org_mitk_gui_qt_application_Activator::m_Instance = nullptr;
+  ctkPluginContext* org_mitk_gui_qt_application_Activator::m_Context = nullptr;
 
   void org_mitk_gui_qt_application_Activator::start(ctkPluginContext* context)
   {
@@ -36,6 +38,7 @@ namespace mitk
 
     BERRY_REGISTER_EXTENSION_CLASS(QmitkGeneralPreferencePage, context)
     BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorsPreferencePage, context)
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkShowPreferencePageHandler, context)
 
     QmitkRegisterClasses();
 
@@ -49,8 +52,8 @@ namespace mitk
 
     this->m_PrefServiceTracker.reset();
 
-    this->m_Context = 0;
-    this->m_Instance = 0;
+    this->m_Context = nullptr;
+    this->m_Instance = nullptr;
   }
 
   ctkPluginContext* org_mitk_gui_qt_application_Activator::GetContext()
@@ -63,9 +66,9 @@ namespace mitk
     return m_Instance;
   }
 
-  berry::IPreferencesService::Pointer org_mitk_gui_qt_application_Activator::GetPreferencesService()
+  berry::IPreferencesService* org_mitk_gui_qt_application_Activator::GetPreferencesService()
   {
-    return berry::IPreferencesService::Pointer(m_PrefServiceTracker->getService());
+    return m_PrefServiceTracker->getService();
   }
 
 }

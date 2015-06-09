@@ -24,11 +24,11 @@ class QmitkActionBarAdvisor : public berry::ActionBarAdvisor
 {
 public:
 
-  QmitkActionBarAdvisor(berry::IActionBarConfigurer::Pointer configurer);
+  QmitkActionBarAdvisor(const berry::SmartPointer<berry::IActionBarConfigurer>& configurer);
 
 protected:
 
-  void FillMenuBar(void* menuBar);
+  void FillMenuBar(berry::IMenuManager* menuBar) override;
 };
 
 #endif /*QMITKACTIONBARADVISOR_H_*/

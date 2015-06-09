@@ -23,7 +23,7 @@ QmitkExtDefaultPerspective::QmitkExtDefaultPerspective()
 
 void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  std::string editorArea = layout->GetEditorArea();
+  QString editorArea = layout->GetEditorArea();
 
   layout->AddView("org.mitk.views.datamanager", berry::IPageLayout::LEFT, 0.3f, editorArea);
 
@@ -36,4 +36,7 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer
   berry::IPlaceholderFolderLayout::Pointer bottomFolder = layout->CreatePlaceholderFolder("bottom", berry::IPageLayout::BOTTOM, 0.7f, editorArea);
   bottomFolder->AddPlaceholder("org.blueberry.views.logview");
   bottomFolder->AddPlaceholder("org.mitk.views.modules");
+
+  layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.editor");
+  layout->AddPerspectiveShortcut("org.mitk.mitkworkbench.perspectives.visualization");
 }

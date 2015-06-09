@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *
   *   \ingroup IGTUI
   */
-class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
 {
   Q_OBJECT
 
@@ -51,7 +51,7 @@ class MitkIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
       * @param dataStorage  The data storage is needed to offer the possibility to choose surfaces from the data storage for tool visualization.
       * @param supposedIdentifier This Identifier is supposed for the user. It is needed because every identifier in a navigation tool storage must be unique and we don't know the others.
       */
-    void Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier, std::string supposedName = "NewTool");
+    void Initialize(mitk::DataStorage* dataStorage, const std::string &supposedIdentifier, const std::string &supposedName = "NewTool");
 
     /** @brief Sets the default tracking device type. You may also define if it is changeable or not.*/
     void SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable = true);

@@ -55,7 +55,7 @@ void mitk::ContourModelSubDivisionFilter::SetInput ( unsigned int idx, const mit
 const mitk::ContourModelSubDivisionFilter::InputType* mitk::ContourModelSubDivisionFilter::GetInput( void )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ContourModelSubDivisionFilter::InputType*>(this->ProcessObject::GetInput(0));
 }
 
@@ -63,7 +63,7 @@ const mitk::ContourModelSubDivisionFilter::InputType* mitk::ContourModelSubDivis
 const mitk::ContourModelSubDivisionFilter::InputType* mitk::ContourModelSubDivisionFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const mitk::ContourModelSubDivisionFilter::InputType*>(this->ProcessObject::GetInput(idx));
 }
 
@@ -86,11 +86,11 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
     {
       for( int iterations = 0; iterations < this->m_InterpolationIterations; iterations++)
       {
-        InputType::VertexIterator it = contour->IteratorBegin();
-        InputType::VertexIterator end = contour->IteratorEnd();
+        auto it = contour->IteratorBegin();
+        auto end = contour->IteratorEnd();
 
-        InputType::VertexIterator first = contour->IteratorBegin();
-        InputType::VertexIterator last = contour->IteratorEnd()-1;
+        auto first = contour->IteratorBegin();
+        auto last = contour->IteratorEnd()-1;
 
         //tempory contour to store result of a subdivision iteration
         mitk::ContourModel::Pointer tempContour = mitk::ContourModel::New();
@@ -102,7 +102,7 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
           tempContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, currentTimestep);
 
           //control points for interpolation
-          InputType::VertexIterator Ci = it;
+          auto Ci = it;
           InputType::VertexIterator CiPlus1;
           InputType::VertexIterator CiPlus2;
           InputType::VertexIterator CiMinus1;

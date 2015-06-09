@@ -1,0 +1,28 @@
+/**
+\page MITKModuleManualsListPage MITK Module Manuals
+
+\section MITKModuleManualsListPageOverview Overview
+
+The modules are shared libraries that provide functionality that can be used by developers.
+
+\section MITKModuleManualsListPageModuleManualList List of Module Manuals
+
+  \li \subpage IGTGeneralModulePage
+  \li \subpage MitkOpenCL_Overview
+  \li \subpage LegacyGLModule
+  \li \subpage GeneratingDeviceModulesPage
+  \li \subpage mitkPython_Overview
+  \li \subpage USModulePage
+  \li \subpage OverlaysModulePage
+
+\section MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules
+
+  \li \ref PlanarPropertiesPage
+  \li \subpage DiffusionImagingPropertiesPage
+  \li \subpage ConnectomicsRenderingPropertiesPage
+
+\section MITKMigrationGuides Migration Guides
+
+  \li \subpage InteractionMigration
+  \li \subpage GeometryMigration
+*/

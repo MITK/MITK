@@ -1,7 +1,8 @@
 project(org_mitk_gui_qt_ext)
 
-MACRO_CREATE_MITK_CTK_PLUGIN(
+mitk_create_plugin(
   EXPORT_DIRECTIVE MITK_QT_COMMON_EXT_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkQtWidgetsExt MitkSceneSerialization
+  MODULE_DEPENDS
+    PRIVATE MitkQtWidgetsExt MitkSceneSerialization MitkAppUtil
 )

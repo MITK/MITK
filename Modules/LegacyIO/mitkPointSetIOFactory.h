@@ -30,9 +30,9 @@ namespace mitk
 //##Documentation
 //## @brief Create instances of PointSetReader objects using an object factory.
 //##
-//## @ingroup IO
+//## @ingroup MitkLegacyIOModule
 //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() MitkLegacyIO_EXPORT PointSetIOFactory : public itk::ObjectFactoryBase
+class DEPRECATED() MITKLEGACYIO_EXPORT PointSetIOFactory : public itk::ObjectFactoryBase
 {
 public:
   /** Standard class typedefs. */
@@ -42,8 +42,8 @@ public:
   typedef itk::SmartPointer<const Self>  ConstPointer;
 
   /** Class methods used to interface with the registered factories. */
-  virtual const char* GetITKSourceVersion(void) const;
-  virtual const char* GetDescription(void) const;
+  virtual const char* GetITKSourceVersion(void) const override;
+  virtual const char* GetDescription(void) const override;
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);

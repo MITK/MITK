@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
 
-class MitkDiffusionCore_EXPORT ADCFitFunctor : public DWIVoxelFunctor
+class MITKDIFFUSIONCORE_EXPORT ADCFitFunctor : public DWIVoxelFunctor
 {
 public:
   ADCFitFunctor(){}
@@ -39,7 +39,7 @@ public:
   /** Runtime information support. */
   itkTypeMacro(ADCFitFunctor, DWIVoxelFunctor)
 
-  void operator()(vnl_matrix<double> & newSignal, const vnl_matrix<double> & SignalMatrix, const double & S0);
+  void operator()(vnl_matrix<double> & newSignal, const vnl_matrix<double> & SignalMatrix, const double & S0) override;
 
   void setTargetBValue(const double & targetBValue){m_TargetBvalue = targetBValue;}
   void setListOfBValues(const vnl_vector<double> & BValueList){m_BValueList = BValueList;}
@@ -82,7 +82,7 @@ protected:
       N = get_number_of_residuals();
     }
 
-    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) {
+    void f(const vnl_vector<double>& x, vnl_vector<double>& fx) override {
 
       const double & ADC = x[0];
 

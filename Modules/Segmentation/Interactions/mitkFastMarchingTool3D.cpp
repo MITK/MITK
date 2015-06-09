@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, FastMarchingTool3D, "FastMarching3D tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, FastMarchingTool3D, "FastMarching3D tool");
 }
 
 

@@ -48,34 +48,34 @@ public:
    * \brief Called by framework to initialise this preference page, but currently does nothing.
    * \param workbench The workbench.
    */
-  void Init(berry::IWorkbench::Pointer workbench);
+  void Init(berry::IWorkbench::Pointer workbench) override;
 
   /**
    * \brief Called by framework to create the GUI, and connect signals and slots.
    * \param widget The Qt widget that acts as parent to all GUI components, as this class itself is not derived from QWidget.
    */
-  void CreateQtControl(QWidget* widget);
+  void CreateQtControl(QWidget* widget) override;
 
   /**
    * \brief Required by framework to get hold of the GUI.
    * \return QWidget* the top most QWidget for the GUI.
    */
-  QWidget* GetQtControl() const;
+  QWidget* GetQtControl() const override;
 
   /**
    * \see IPreferencePage::PerformOk
    */
-  virtual bool PerformOk();
+  virtual bool PerformOk() override;
 
   /**
    * \see IPreferencePage::PerformCancel
    */
-  virtual void PerformCancel();
+  virtual void PerformCancel() override;
 
   /**
    * \see IPreferencePage::Update
    */
-  virtual void Update();
+  virtual void Update() override;
 
 public slots:
 

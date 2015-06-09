@@ -110,7 +110,7 @@ void QmitkImageStatisticsView::OnDefaultBinSizeBoxChanged()
         m_Controls->m_BinSizeFrame->setVisible(true);
 }
 
-void QmitkImageStatisticsView::PartClosed( berry::IWorkbenchPartReference::Pointer )
+void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer& )
 {
 }
 
@@ -226,7 +226,7 @@ void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
       it != histogram->End();
       ++it )
     {
-      if( m_Controls->m_HistogramBinSizeSpinbox->value() == 1)
+      if( m_Controls->m_HistogramBinSizeSpinbox->value() == 1.0)
       {
         clipboard = clipboard.append( "%L1 \t %L2\n" )
           .arg( it.GetMeasurementVector()[0], 0, 'f', 0 )
@@ -263,14 +263,14 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
     // Copy statistics to clipboard ("%Ln" will use the default locale for
     // number formatting)
     QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t V (mm³)\n" );
-    clipboard = clipboard.append( "%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7" )
-      .arg( statistics[t].GetMean(), 0, 'f', 10 )
-      .arg( statistics[t].GetSigma(), 0, 'f', 10 )
-      .arg( statistics[t].GetRMS(), 0, 'f', 10 )
-      .arg( statistics[t].GetMax(), 0, 'f', 10 )
-      .arg( statistics[t].GetMin(), 0, 'f', 10 )
-      .arg( statistics[t].GetN() )
-      .arg( m_Controls->m_StatisticsTable->item( 0, 6 )->text().toDouble(), 0, 'f', 10 );
+    clipboard = clipboard.append("%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7")
+      .arg(statistics[t].GetMean(), 0, 'f', 10)
+      .arg(statistics[t].GetSigma(), 0, 'f', 10)
+      .arg(statistics[t].GetRMS(), 0, 'f', 10)
+      .arg(statistics[t].GetMax(), 0, 'f', 10)
+      .arg(statistics[t].GetMin(), 0, 'f', 10)
+      .arg(statistics[t].GetN())
+      .arg( m_Controls->m_StatisticsTable->item(6, 0)->data(Qt::DisplayRole).toDouble(), 0, 'f', 10);
 
     QApplication::clipboard()->setText(
       clipboard, QClipboard::Clipboard );
@@ -763,7 +763,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
 //      m_Controls->m_HistogramBinSizeLabel->setEnabled(false);
       std::stringstream message;
-      message << "<font color='red'>Only linegraph available for an intesityprofile!</font>";
+      message << "<font color='red'>Only linegraph available for an intensity profile!</font>";
       m_Controls->m_InfoLabel->setText(message.str().c_str());
     }
   }
@@ -875,7 +875,8 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
 
   t = std::min(image->GetTimeSteps() - 1, t);
 
-  QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMean(), 0, 'f', decimals));
+  // See bug 18340
+  /*QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMean(), 0, 'f', decimals));
     hotspotMean += " (";
     for (int i=0; i<s[t].GetHotspotIndex().size(); i++)
     {
@@ -911,7 +912,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     }
     hotspotMin += ")";
 
-  this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );
+  this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );*/
 }
 
 void QmitkImageStatisticsView::InvalidateStatisticsTableView()

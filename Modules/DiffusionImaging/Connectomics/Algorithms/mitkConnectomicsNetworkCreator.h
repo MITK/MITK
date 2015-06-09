@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkImage.h"
 
-#include "mitkFiberBundleX.h"
+#include "mitkFiberBundle.h"
 #include "mitkConnectomicsNetwork.h"
 
 #include <MitkConnectomicsExports.h>
@@ -39,7 +39,7 @@ namespace mitk
     * a connectomics network from the two, using different strategies.
     */
 
-  class MitkConnectomics_EXPORT ConnectomicsNetworkCreator : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsNetworkCreator : public itk::Object
   {
   public:
 
@@ -56,7 +56,7 @@ namespace mitk
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsNetworkCreator, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsNetworkCreator, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -82,7 +82,7 @@ namespace mitk
 
     /** Given a fiber bundle and a parcellation are set, this will create a network from both */
     void CreateNetworkFromFibersAndSegmentation();
-    void SetFiberBundle(mitk::FiberBundleX::Pointer fiberBundle);
+    void SetFiberBundle(mitk::FiberBundle::Pointer fiberBundle);
     void SetSegmentation(mitk::Image::Pointer segmentation);
 
     mitk::ConnectomicsNetwork::Pointer GetNetwork();
@@ -103,7 +103,7 @@ namespace mitk
 
     //////////////////// Functions ///////////////////////
     ConnectomicsNetworkCreator();
-    ConnectomicsNetworkCreator( mitk::Image::Pointer segmentation, mitk::FiberBundleX::Pointer fiberBundle );
+    ConnectomicsNetworkCreator( mitk::Image::Pointer segmentation, mitk::FiberBundle::Pointer fiberBundle );
     ~ConnectomicsNetworkCreator();
 
     /** Add a connection to the network */
@@ -191,7 +191,7 @@ namespace mitk
     void SegmentationToFiberCoords( mitk::Point3D& segCoord, mitk::Point3D& fiberCoord );
 
     /////////////////////// Variables ////////////////////////
-    mitk::FiberBundleX::Pointer m_FiberBundle;
+    mitk::FiberBundle::Pointer m_FiberBundle;
     mitk::Image::Pointer m_Segmentation;
     ITKImageType::Pointer m_SegmentationItk;
 

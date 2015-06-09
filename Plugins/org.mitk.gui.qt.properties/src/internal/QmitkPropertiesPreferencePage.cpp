@@ -16,16 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPropertiesPreferencePage.h"
 #include <berryIPreferencesService.h>
+#include <berryPlatform.h>
 
-const std::string QmitkPropertiesPreferencePage::FILTER_PROPERTIES = "filter properties";
-const std::string QmitkPropertiesPreferencePage::SHOW_ALIASES = "show aliases";
-const std::string QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS = "show descriptions";
-const std::string QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION = "show aliases in description";
-const std::string QmitkPropertiesPreferencePage::DEVELOPER_MODE = "enable developer mode";
+const QString QmitkPropertiesPreferencePage::FILTER_PROPERTIES = "filter properties";
+const QString QmitkPropertiesPreferencePage::SHOW_ALIASES = "show aliases";
+const QString QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS = "show descriptions";
+const QString QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION = "show aliases in description";
+const QString QmitkPropertiesPreferencePage::DEVELOPER_MODE = "enable developer mode";
 
 QmitkPropertiesPreferencePage::QmitkPropertiesPreferencePage()
-  : m_Control(NULL),
-    m_Preferences(berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID)->GetSystemPreferences()->Node("/org.mitk.views.properties"))
+  : m_Control(nullptr),
+    m_Preferences(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.properties"))
 {
 }
 

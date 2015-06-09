@@ -33,7 +33,7 @@ class QFrame;
   This GUI shows two sliders to change the watershed parameters. It executes the watershed algorithm by clicking on the button.
 
 */
-class MitkSegmentationUI_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

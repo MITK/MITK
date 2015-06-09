@@ -17,7 +17,7 @@
 
   \warning Subject to change.
 */
-class MitkQmlItems_EXPORT QmlMitkFourRenderWindowWidget : public QQuickItem
+class MITKQMLITEMS_EXPORT QmlMitkFourRenderWindowWidget : public QQuickItem
 {
     Q_OBJECT
 

@@ -37,7 +37,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataDelayFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataDelayFilter : public NavigationDataToNavigationDataFilter
   {
     //     |pairs of| timestamp and |one navigation Data for each input
     typedef std::pair<itk::ModifiedTimeType, std::vector<mitk::NavigationData::Pointer> > BufferType;
@@ -54,7 +54,7 @@ namespace mitk {
     NavigationDataDelayFilter(unsigned int delay);
     virtual ~NavigationDataDelayFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /**
     * \brief This field containes the buffered navigation datas. It is a queue of (pair of (time and vector of (several navigation datas from one point in time))

@@ -34,7 +34,7 @@ namespace mitk
   ///
   /// \brief class representing camera intrinsics and related functions
   ///
-  class MitkCameraCalibration_EXPORT CameraIntrinsics: virtual public itk::Object,
+  class MITKCAMERACALIBRATION_EXPORT CameraIntrinsics: virtual public itk::Object,
     virtual public mitk::XMLSerializable
   {
   public:
@@ -45,7 +45,7 @@ namespace mitk
     ///
     /// smartpointer typedefs
     ///
-    mitkClassMacro(CameraIntrinsics, itk::Object);
+    mitkClassMacroItkParent(CameraIntrinsics, itk::Object);
     ///
     /// the static new function
     ///
@@ -86,7 +86,7 @@ namespace mitk
     cv::Mat GetCameraMatrix() const;
     cv::Mat GetDistorsionCoeffs();
     cv::Mat GetDistorsionCoeffs() const;
-    void ToXML(TiXmlElement* elem) const;
+    void ToXML(TiXmlElement* elem) const override;
     std::string ToString() const;
     std::string GetString();
     double GetFocalLengthX() const;
@@ -116,7 +116,7 @@ namespace mitk
                         const mitk::Point3D& principalPoint,
                         const mitk::Point4D& distortionCoefficients);
 
-    void FromXML(TiXmlElement* elem);
+    void FromXML(TiXmlElement* elem) override;
     void FromGMLCalibrationXML(TiXmlElement* elem);
     std::string ToOctaveString(const std::string& varName="CameraIntrinsics");
 
@@ -133,12 +133,12 @@ namespace mitk
 
   private:
 
-    virtual itk::LightObject::Pointer InternalClone() const;
+    virtual itk::LightObject::Pointer InternalClone() const override;
   };
 
 } // namespace mitk
 
-MitkCameraCalibration_EXPORT std::ostream& operator<<
+MITKCAMERACALIBRATION_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::CameraIntrinsics::Pointer p);
 
 #endif // mitkCameraIntrinsics_h

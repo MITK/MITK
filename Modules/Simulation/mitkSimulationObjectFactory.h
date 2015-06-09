@@ -17,38 +17,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSimulationObjectFactory_h
 #define mitkSimulationObjectFactory_h
 
-#include "mitkSimulationIOFactory.h"
-#include "mitkSimulationWriterFactory.h"
 #include <mitkCoreObjectFactoryBase.h>
+#include <MitkSimulationExports.h>
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SimulationObjectFactory : public CoreObjectFactoryBase
+  class MITKSIMULATION_EXPORT SimulationObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(SimulationObjectFactory, CoreObjectFactoryBase);
     itkFactorylessNewMacro(Self);
 
-    Mapper::Pointer CreateMapper(DataNode* node, MapperSlotId slotId);
-    const char* GetDescription() const;
-    const char* GetFileExtensions();
-    MultimapType GetFileExtensionsMap();
-    const char* GetITKSourceVersion() const;
-    const char* GetSaveFileExtensions();
-    MultimapType GetSaveFileExtensionsMap();
-    void SetDefaultProperties(DataNode* node);
+    Mapper::Pointer CreateMapper(DataNode* node, MapperSlotId slotId) override;
+    const char* GetDescription() const override;
+    const char* GetFileExtensions() override;
+    MultimapType GetFileExtensionsMap() override;
+    const char* GetSaveFileExtensions() override;
+    MultimapType GetSaveFileExtensionsMap() override;
+    void SetDefaultProperties(DataNode* node) override;
 
   private:
     SimulationObjectFactory();
     ~SimulationObjectFactory();
-
-    SimulationIOFactory::Pointer m_SimulationIOFactory;
-    SimulationWriterFactory::Pointer m_SimulationWriterFactory;
-    MultimapType m_FileExtensionsMap;
-    MultimapType m_SaveFileExtensionsMap;
   };
 
-  MitkSimulation_EXPORT void RegisterSimulationObjectFactory();
+  MITKSIMULATION_EXPORT void RegisterSimulationObjectFactory();
 }
 
 #endif

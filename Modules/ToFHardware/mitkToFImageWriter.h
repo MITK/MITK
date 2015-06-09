@@ -35,7 +35,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageWriter : public itk::Object
+  class MITKTOFHARDWARE_EXPORT ToFImageWriter : public itk::Object
   {
   public:
 
@@ -43,7 +43,7 @@ namespace mitk
 
     ~ToFImageWriter();
 
-    mitkClassMacro( ToFImageWriter , itk::Object );
+    mitkClassMacroItkParent( ToFImageWriter , itk::Object );
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

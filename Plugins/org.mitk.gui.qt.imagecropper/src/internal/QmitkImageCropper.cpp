@@ -286,12 +286,13 @@ void QmitkImageCropper::CropImage()
     cutter->Update();
     //cutter->UpdateLargestPossibleRegion();
   }
-  catch(itk::ExceptionObject&)
+  catch(const itk::ExceptionObject& e)
   {
+    std::string message = std::string("The Cropping filter could not process because of: \n ") + e.GetDescription();
+
     QMessageBox::warning ( NULL,
-      tr("Cropping not possible"),
-      tr("Sorry, the bounding box has to be completely inside the image.\n\n"
-      "The possibility to drag it larger than the image is a bug and has to be fixed."),
+      tr("Cropping not possible!"),
+      tr(message.c_str()),
       QMessageBox::Ok,  QMessageBox::NoButton,  QMessageBox::NoButton );
     return;
   }
@@ -299,6 +300,7 @@ void QmitkImageCropper::CropImage()
   // cutting successful
   mitk::Image::Pointer resultImage = cutter->GetOutput();
   resultImage->DisconnectPipeline();
+  resultImage->SetPropertyList(m_ImageToCrop->GetPropertyList()->Clone());
 
   RemoveBoundingObjectFromNode();
 

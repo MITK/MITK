@@ -14,78 +14,107 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
-#define QMITKSTDMULTIWIDGETEDITORPREFERENCEPAGE_H_
+#ifndef QmitkStdMultiWidgetEditorPreferencePage_h
+#define QmitkStdMultiWidgetEditorPreferencePage_h
 
-#include "berryIQtPreferencePage.h"
 #include <berryIPreferences.h>
+#include <berryIQtPreferencePage.h>
+#include <QProcess>
+#include <QScopedPointer>
+#include <QPushButton>
 
-class QWidget;
-class QCheckBox;
-class QPushButton;
-class QWidgetAction;
-class QComboBox;
+namespace Ui
+{
+class QmitkStdMultiWidgetEditorPreferencePage;
+}
 
-struct QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
+class QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
   QmitkStdMultiWidgetEditorPreferencePage();
+  ~QmitkStdMultiWidgetEditorPreferencePage();
 
-  void Init(berry::IWorkbench::Pointer workbench);
-
-  void CreateQtControl(QWidget* widget);
-
-  QWidget* GetQtControl() const;
-
-  ///
-  /// \see IPreferencePage::PerformOk()
-  ///
-  virtual bool PerformOk();
-
-  ///
-  /// \see IPreferencePage::PerformCancel()
-  ///
-  virtual void PerformCancel();
-
-  ///
-  /// \see IPreferencePage::Update()
-  ///
-  virtual void Update();
+  void CreateQtControl(QWidget* parent) override;
+  QWidget* GetQtControl() const override;
+  void Init(berry::IWorkbench::Pointer) override;
+  void PerformCancel() override;
+  bool PerformOk() override;
+  void Update() override;
 
 public slots:
-  void FirstColorChanged();
+  /**
+   * @brief ResetColors set default colors and refresh the GUI.
+   */
+  void ResetPreferencesAndGUI();
 
-  void SecondColorChanged();
-
-  void UseGradientBackgroundSelected();
-
-  void ColorActionChanged();
-
-  void ResetColors();
-
+  /**
+   * @brief ChangeRenderingMode slot to chose the rendering mode via QComboBox.
+   * @param i index of the box.
+   */
   void ChangeRenderingMode(int i);
 
-protected:
-  QWidget* m_MainControl;
-  QCheckBox* m_EnableFlexibleZooming;
-  QCheckBox* m_ShowLevelWindowWidget;
-  QCheckBox* m_UseGradientBackground;
-  QCheckBox* m_ChangeBackgroundColors;
-  QCheckBox* m_PACSLikeMouseMode;
-  QComboBox* m_RenderingMode;
+  /**
+   * @brief OnWidgetComboBoxChanged slot called when the QComboBox to chose the widget was modified.
+   * @param i index of the combobox to select the widget (1-4).
+   */
+  void OnWidgetComboBoxChanged(int i);
 
+  /**
+   * @brief AnnotationTextChanged called when QLineEdit for the annotation was changed.
+   * @param text The new text.
+   */
+  void AnnotationTextChanged(QString text);
+
+protected:
+  /**
+   * @brief m_CurrentRenderingMode String for the rendering mode.
+   */
   std::string m_CurrentRenderingMode;
 
-  QPushButton* m_ColorButton1;
-  QPushButton* m_ColorButton2;
-  std::string m_FirstColor;
-  std::string m_SecondColor;
-  QString m_FirstColorStyleSheet;
-  QString m_SecondColorStyleSheet;
-  berry::IPreferences::Pointer m_StdMultiWidgetEditorPreferencesNode;
-};
+  /**
+   * @brief m_WidgetBackgroundColor1 the background colors.
+   *
+   * If two different colors are chosen, a gradient background appears.
+   */
+  QString m_WidgetBackgroundColor1[4];
+  QString m_WidgetBackgroundColor2[4];
 
-#endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */
+  /**
+   * @brief m_WidgetDecorationColor the decoration color.
+   *
+   * The rectangle prop, the crosshair, the 3D planes and the corner annotation use this.
+   */
+  QString m_WidgetDecorationColor[4];
+
+  /**
+   * @brief m_Widget1Annotation the text of the corner annotation.
+   */
+  QString m_WidgetAnnotation[4];
+
+  /**
+   * @brief m_Preferences the berry preferences.
+   */
+  berry::IPreferences::Pointer m_Preferences;
+
+  /**
+   * @brief SetStyleSheetToColorChooserButton colorize a button.
+   * @param backgroundcolor color for the button.
+   * @param button the button.
+   */
+  void SetStyleSheetToColorChooserButton(QColor backgroundcolor, QPushButton* button);
+
+protected slots:
+
+  /**
+   * @brief ColorChooserButtonClicked slot called when a button to choose color was clicked.
+   */
+  void ColorChooserButtonClicked();
+
+private:
+  QScopedPointer<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;
+  QWidget* m_Control;
+};
+#endif //QmitkStdMultiWidgetEditorPreferencePage_h

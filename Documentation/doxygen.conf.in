@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = MITK
+PROJECT_NAME           = "Medical Imaging Interaction Toolkit"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -234,7 +234,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "bundlemainpage{1}=\page \1" \
                          "embmainpage{1}=\page \1" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
-                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" " \
+                         "deprecatedSince{1}=\xrefitem deprecatedSince\1 \"\" \"Functions deprecated as of \1\" \deprecated (as of \1) " \
                          "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
                          "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
@@ -293,7 +293,7 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 # Note that for custom extensions you also need to set FILE_PATTERNS otherwise
 # the files are not read by doxygen.
 
-EXTENSION_MAPPING      =
+EXTENSION_MAPPING      = cmake=c++
 
 # If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -810,28 +810,23 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @MITK_SOURCE_DIR@/BlueBerry/Documentation/reference/api/MainPage.dox \
-                         @MITK_SOURCE_DIR@/Utilities/IpFunc/ \
+EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/IpFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/IpSegmentation/ \
                          @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
-                         @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Utilities/qtsingleapplication/ \
                          @MITK_SOURCE_DIR@/Applications/PluginGenerator/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/snippets/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/doxygen/standalone/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/test/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/examples/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/src/util/jsoncpp.cpp \
-                         @MITK_SOURCE_DIR@/Deprecated/ \
-                         @MITK_SOURCE_DIR@/Build/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/doxygen/standalone/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/test/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/examples/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/src/util/jsoncpp.cpp \
                          @MITK_SOURCE_DIR@/CMake/PackageDepends \
-                         @MITK_SOURCE_DIR@/CMake/QBundleTemplate \
                          @MITK_SOURCE_DIR@/CMakeExternals \
-                         @MITK_SOURCE_DIR@/Modules/QmitkExt/vtkQtChartHeaders/ \
+                         @MITK_BINARY_DIR@/Documentation/Doxygen \
                          @MITK_BINARY_DIR@/bin/ \
                          @MITK_BINARY_DIR@/PT/ \
                          @MITK_BINARY_DIR@/GP/ \
-                         @MITK_BINARY_DIR@/Core/CppMicroServices/ \
+                         @MITK_BINARY_DIR@/Modules/CppMicroServices/ \
                          @MITK_BINARY_DIR@/_CPack_Packages/ \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
 
@@ -859,6 +854,8 @@ EXCLUDE_PATTERNS       = README* \
                          */.git/* \
                          *_p.h \
                          *Private.* \
+                         */Internal/* \
+                         */internal/* \
                          */Snippets/* \
                          */snippets/* \
                          */testing/* \
@@ -881,16 +878,15 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
+EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Documentation/Snippets/ \
+                         @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Tutorial/ \
                          @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
-                         @MITK_SOURCE_DIR@/Core/Code/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/doc/snippets/ \
-                         @MITK_SOURCE_DIR@/Core/CppMicroServices/core/examples/ \
+                         @MITK_SOURCE_DIR@/Modules/Core/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/ \
+                         @MITK_SOURCE_DIR@/Modules/CppMicroServices/core/examples/ \
                          @MITK_DOXYGEN_OUTPUT_DIR@/html/extension-points/html/ \
-                         @MITK_SOURCE_DIR@/Documentation/Snippets/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/ExampleCode/ \
                          @MITK_SOURCE_DIR@/Modules/OpenCL/Documentation/doxygen/snippets/ \
                          @MITK_SOURCE_DIR@/Modules/IGT/Tutorial/
 
@@ -913,8 +909,6 @@ EXAMPLE_RECURSIVE      = YES
 # \image command).
 
 IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/Modules/ \
-                         @MITK_SOURCE_DIR@/Documentation/Doxygen/Tutorial/ \
                          @MITK_SOURCE_DIR@
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
@@ -963,7 +957,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+USE_MDFILE_AS_MAINPAGE = README.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1164,7 +1158,7 @@ HTML_EXTRA_STYLESHEET  = @MITK_DOXYGEN_STYLESHEET@
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       =
+HTML_EXTRA_FILES       = @MITK_SOURCE_DIR@/Documentation/Doxygen/mitkLogo.jpg
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the stylesheet and background images according to
@@ -2077,8 +2071,8 @@ PREDEFINED             = itkNotUsed(x)= \
                          VXL_LITTLE_ENDIAN=0 \
                          VNL_DLL_DATA= \
                          size_t=vcl_size_t \
-                         "US_PREPEND_NAMESPACE(x)=mitk::x" \
-                         "US_BEGIN_NAMESPACE= namespace mitk {" \
+                         "US_PREPEND_NAMESPACE(x)=us::x" \
+                         "US_BEGIN_NAMESPACE= namespace us {" \
                          "US_END_NAMESPACE=}" \
                          "US_BASECLASS_NAME=itk::LightObject" \
                          US_EXPORT= \
@@ -2120,7 +2114,7 @@ SKIP_FUNCTION_MACROS   = YES
 # the path). If a tag file is not located in the directory in which doxygen is
 # run, you must also specify the path to the tagfile here.
 
-TAGFILES               = @BLUEBERRY_DOXYGEN_TAGFILE@
+TAGFILES               =
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to

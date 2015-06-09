@@ -16,56 +16,112 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkModel.h"
 #include <mitkLogMacros.h>
+#include <mitkRenderingManager.h>
 #include <sofa/core/visual/VisualParams.h>
+#include <vtkCellArray.h>
+#include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
 #include <vtkOpenGLTexture.h>
 
-bool mitk::VtkModel::IsGlewInitialized = false;
+// Defined in mitkExportMitkVisitor.cpp
+void ApplyMaterial(mitk::DataNode::Pointer dataNode, const sofa::core::loader::Material& material);
+
+static bool InitGLEW()
+{
+  static bool isInitialized = false;
+
+  // If no render window is shown, OpenGL is potentially not initialized, e.g., the
+  // Display tab of the Workbench might be closed while loading a SOFA scene file.
+  // In this case initialization is deferred (see mitk::VtkModel::internalDraw()).
+  if (mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows().empty())
+    return false;
+
+  if (!isInitialized)
+  {
+    GLenum error = glewInit();
+
+    if (error != GLEW_OK)
+    {
+      MITK_ERROR("glewInit") << glewGetErrorString(error);
+    }
+    else
+    {
+      isInitialized = true;
+    }
+  }
+
+  return isInitialized;
+}
 
 mitk::VtkModel::VtkModel()
-  : m_BuffersCreated(false),
+  : m_GlewIsInitialized(InitGLEW()),
+    m_BuffersWereCreated(false),
     m_LastNumberOfVertices(0),
     m_LastNumberOfTriangles(0),
     m_LastNumberOfQuads(0),
     m_VertexBuffer(0),
     m_IndexBuffer(0),
-    m_VtkRenderer(NULL)
+    m_VtkRenderer(nullptr),
+    m_Mode(OpenGL)
 {
-  if (!IsGlewInitialized)
-  {
-    GLenum error = glewInit();
-
-    if (error != GLEW_OK)
-      MITK_ERROR("glewInit") << glewGetErrorString(error);
-    else
-      IsGlewInitialized = true;
-  }
 }
 
 mitk::VtkModel::~VtkModel()
 {
-  /*if (m_BuffersCreated)
+  if (m_Mode == OpenGL && m_BuffersWereCreated)
   {
     glDeleteBuffers(1, &m_IndexBuffer);
     glDeleteBuffers(1, &m_VertexBuffer);
-  }*/
+  }
 }
 
 void mitk::VtkModel::CreateIndexBuffer()
 {
-  glGenBuffers(1, &m_IndexBuffer);
+  if (m_Mode == OpenGL)
+  {
+    glGenBuffers(1, &m_IndexBuffer);
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Polys = vtkSmartPointer<vtkCellArray>::New();
+  }
+
   this->InitIndexBuffer();
 }
 
 void mitk::VtkModel::CreateVertexBuffer()
 {
-  glGenBuffers(1, &m_VertexBuffer);
+  if (m_Mode == OpenGL)
+  {
+    glGenBuffers(1, &m_VertexBuffer);
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Points = vtkSmartPointer<vtkPoints>::New();
+    m_Normals = vtkSmartPointer<vtkFloatArray>::New();
+    m_TexCoords = vtkSmartPointer<vtkFloatArray>::New();
+  }
+
   this->InitVertexBuffer();
 }
 
-void mitk::VtkModel::DrawGroup(int group, bool)
+void mitk::VtkModel::DrawGroup(int group, bool transparent)
+{
+  if (m_Mode == OpenGL)
+  {
+    this->DrawOpenGLGroup(group, transparent);
+  }
+  else if (m_Mode == Surface)
+  {
+    this->DrawSurfaceGroup(group, transparent);
+  }
+}
+
+void mitk::VtkModel::DrawOpenGLGroup(int group, bool)
 {
   using sofa::core::loader::Material;
   using sofa::defaulttype::ResizableExtVector;
@@ -134,6 +190,24 @@ void mitk::VtkModel::DrawGroup(int group, bool)
   }
 }
 
+void mitk::VtkModel::DrawSurfaceGroup(int group, bool)
+{
+  m_PolyData->SetPoints(m_Points);
+  m_PolyData->SetPolys(m_Polys);
+
+  vtkPointData* pointData = m_PolyData->GetPointData();
+
+  pointData->SetNormals(m_Normals->GetSize() != 0
+    ? m_Normals
+    : nullptr);
+
+  pointData->SetTCoords(m_TexCoords->GetSize() != 0
+    ? m_TexCoords
+    : nullptr);
+
+  m_PolyData->Modified();
+}
+
 void mitk::VtkModel::DrawGroups(bool transparent)
 {
   using sofa::core::objectmodel::Data;
@@ -162,8 +236,11 @@ void mitk::VtkModel::InitIndexBuffer()
   const ResizableExtVector<Triangle>& triangles = this->getTriangles();
   const ResizableExtVector<Quad>& quads = this->getQuads();
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles.size() * sizeof(Triangle) + quads.size() * sizeof(Quad), NULL, GL_DYNAMIC_DRAW);
+  if (m_Mode == OpenGL)
+  {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles.size() * sizeof(Triangle) + quads.size() * sizeof(Quad), nullptr, GL_DYNAMIC_DRAW);
+  }
 
   this->UpdateIndexBuffer();
 }
@@ -176,12 +253,21 @@ void mitk::VtkModel::InitVertexBuffer()
   const ResizableExtVector<Deriv> normals = this->getVnormals();
   const VecTexCoord& texCoords = this->getVtexcoords();
 
-  GLsizeiptr sizeOfVertices = vertices.size() * sizeof(VecCoord::value_type);
-  GLsizeiptr sizeOfNormals = normals.size() * sizeof(Deriv);
-  GLsizeiptr sizeOfTexCoords = texCoords.size() * sizeof(VecTexCoord::value_type);
+  if (m_Mode == OpenGL)
+  {
+    glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(VecCoord::value_type) + normals.size() * sizeof(Deriv) + texCoords.size() * sizeof(VecTexCoord::value_type), nullptr, GL_DYNAMIC_DRAW);
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Points->SetNumberOfPoints(vertices.size());
 
-  glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals + sizeOfTexCoords, NULL, GL_DYNAMIC_DRAW);
+    m_Normals->SetNumberOfComponents(3);
+    m_Normals->SetNumberOfTuples(normals.size());
+
+    m_TexCoords->SetNumberOfComponents(2);
+    m_TexCoords->SetNumberOfTuples(texCoords.size());
+  }
 
   this->UpdateVertexBuffer();
 }
@@ -191,40 +277,61 @@ void mitk::VtkModel::internalDraw(const sofa::core::visual::VisualParams* vparam
   using sofa::core::visual::DisplayFlags;
   using sofa::defaulttype::ResizableExtVector;
 
-  if (!IsGlewInitialized)
-    return;
+  if (m_Mode == OpenGL && !m_GlewIsInitialized)
+  {
+    // Try lazy initialization since initialization potentially failed so far
+    // due to missing render windows (see InitGLEW()).
+    m_GlewIsInitialized = InitGLEW();
+
+    if (m_GlewIsInitialized)
+    {
+      this->updateBuffers();
+    }
+    else
+    {
+      return;
+    }
+  }
 
   const DisplayFlags& displayFlags = vparams->displayFlags();
 
   if (!displayFlags.getShowVisualModels())
     return;
 
-  glEnable(GL_LIGHTING);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glPolygonMode(GL_FRONT_AND_BACK, displayFlags.getShowWireFrame() ? GL_LINE : GL_FILL);
+  if (m_BuffersWereCreated == false)
+    return;
 
-  const VecCoord& vertices = this->getVertices();
-  const ResizableExtVector<Deriv>& normals = this->getVnormals();
-  const VecTexCoord& texCoords = this->getVtexcoords();
+  if (m_Mode == OpenGL)
+  {
+    glEnable(GL_LIGHTING);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glPolygonMode(GL_FRONT_AND_BACK, displayFlags.getShowWireFrame() ? GL_LINE : GL_FILL);
 
-  glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
-  glVertexPointer(3, GL_FLOAT, 0, NULL);
-  glNormalPointer(GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type)));
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
+    const VecCoord& vertices = this->getVertices();
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+
+    this->ValidateBoundBuffers();
+
+    glVertexPointer(3, GL_FLOAT, 0, nullptr);
+    glNormalPointer(GL_FLOAT, 0, reinterpret_cast<const GLvoid*>(vertices.size() * sizeof(VecCoord::value_type)));
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
+  }
 
   this->DrawGroups(transparent);
 
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  if (m_Mode == OpenGL)
+  {
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
 
-  if (displayFlags.getShowWireFrame())
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (displayFlags.getShowWireFrame())
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-  glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
+  }
 
   if (displayFlags.getShowNormals())
     this->DrawNormals();
@@ -234,21 +341,24 @@ void mitk::VtkModel::DrawNormals()
 {
   using sofa::defaulttype::ResizableExtVector;
 
-  const VecCoord& vertices = this->getVertices();
-  const ResizableExtVector<Deriv>& normals = this->getVnormals();
-  size_t numVertices = vertices.size();
-  Coord normal;
-
-  glBegin(GL_LINES);
-
-  for (size_t i = 0; i < numVertices; ++i)
+  if (m_Mode == OpenGL)
   {
-    glVertex3fv(vertices[i].ptr());
-    normal = vertices[i] + normals[i];
-    glVertex3fv(normal.ptr());
-  }
+    const VecCoord& vertices = this->getVertices();
+    const ResizableExtVector<Deriv>& normals = this->getVnormals();
+    size_t numVertices = vertices.size();
+    Coord normal;
 
-  glEnd();
+    glBegin(GL_LINES);
+
+    for (size_t i = 0; i < numVertices; ++i)
+    {
+      glVertex3fv(vertices[i].ptr());
+      normal = vertices[i] + normals[i];
+      glVertex3fv(normal.ptr());
+    }
+
+    glEnd();
+  }
 }
 
 bool mitk::VtkModel::loadTextures()
@@ -288,7 +398,7 @@ bool mitk::VtkModel::loadTextures()
 
     vtkSmartPointer<vtkImageReader2> imageReader = vtkSmartPointer<vtkImageReader2>::Take(vtkImageReader2Factory::CreateImageReader2(filename.c_str()));
 
-    if (imageReader == NULL)
+    if (imageReader == nullptr)
     {
       MITK_ERROR("VtkModel") << "File \"" << filename << "\" has unknown image format!";
       retValue = false;
@@ -308,6 +418,60 @@ bool mitk::VtkModel::loadTextures()
   return retValue;
 }
 
+mitk::DataNode::Pointer mitk::VtkModel::GetDataNode() const
+{
+  return m_DataNode;
+}
+
+mitk::VtkModel::Mode mitk::VtkModel::GetMode() const
+{
+  return m_Mode;
+}
+
+void mitk::VtkModel::SetMode(Mode mode)
+{
+  if (m_Mode == mode)
+    return;
+
+  if (mode == OpenGL)
+  {
+    m_DataNode = nullptr;
+    m_Surface = nullptr;
+    m_PolyData = nullptr;
+    m_TexCoords = nullptr;
+    m_Normals = nullptr;
+    m_Polys = nullptr;
+    m_Points = nullptr;
+  }
+  else if (mode == Surface)
+  {
+    if (m_Mode == OpenGL && m_BuffersWereCreated)
+    {
+      glDeleteBuffers(1, &m_IndexBuffer);
+      m_IndexBuffer = 0;
+
+      glDeleteBuffers(1, &m_VertexBuffer);
+      m_VertexBuffer = 0;
+    }
+
+    m_PolyData = vtkSmartPointer<vtkPolyData>::New();
+
+    m_Surface = Surface::New();
+    m_Surface->SetVtkPolyData(m_PolyData);
+
+    m_DataNode = DataNode::New();
+    m_DataNode->SetName(name.getValue());
+    m_DataNode->SetData(m_Surface);
+
+    ApplyMaterial(m_DataNode, this->material.getValue());
+  }
+
+  m_Mode = mode;
+
+  m_BuffersWereCreated = false;
+  this->updateBuffers();
+}
+
 void mitk::VtkModel::SetVtkRenderer(vtkRenderer* renderer)
 {
   m_VtkRenderer = renderer;
@@ -317,19 +481,19 @@ void mitk::VtkModel::updateBuffers()
 {
   using sofa::defaulttype::ResizableExtVector;
 
+  if (m_Mode == OpenGL && !m_GlewIsInitialized)
+    return;
+
   const VecCoord& vertices = this->getVertices();
   const ResizableExtVector<Triangle>& triangles = this->getTriangles();
   const ResizableExtVector<Quad>& quads = this->getQuads();
 
-  if (!IsGlewInitialized)
-    return;
-
-  if (!m_BuffersCreated)
+  if (!m_BuffersWereCreated)
   {
     this->CreateVertexBuffer();
     this->CreateIndexBuffer();
 
-    m_BuffersCreated = true;
+    m_BuffersWereCreated = true;
   }
   else
   {
@@ -359,10 +523,47 @@ void mitk::VtkModel::UpdateIndexBuffer()
   GLsizeiptr sizeOfTriangleIndices = triangles.size() * sizeof(Triangle);
   GLsizeiptr sizeOfQuadIndices = quads.size() * sizeof(Quad);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
-  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeOfTriangleIndices, triangles.getData());
-  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeOfTriangleIndices, sizeOfQuadIndices, quads.getData());
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  if (m_Mode == OpenGL)
+  {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeOfTriangleIndices, triangles.getData());
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeOfTriangleIndices, sizeOfQuadIndices, quads.getData());
+  }
+  else if (m_Mode == Surface)
+  {
+    m_Polys->Initialize();
+
+    if (!triangles.empty())
+    {
+      ResizableExtVector<Triangle>::const_iterator trianglesEnd = triangles.end();
+
+      for (ResizableExtVector<Triangle>::const_iterator it = triangles.begin(); it != trianglesEnd; ++it)
+      {
+        const Triangle& triangle = *it;
+
+        m_Polys->InsertNextCell(3);
+        m_Polys->InsertCellPoint(triangle[0]);
+        m_Polys->InsertCellPoint(triangle[1]);
+        m_Polys->InsertCellPoint(triangle[2]);
+      }
+    }
+
+    if (!quads.empty())
+    {
+      ResizableExtVector<Quad>::const_iterator quadsEnd = quads.end();
+
+      for (ResizableExtVector<Quad>::const_iterator it = quads.begin(); it != quadsEnd; ++it)
+      {
+        const Quad& quad = *it;
+
+        m_Polys->InsertNextCell(4);
+        m_Polys->InsertCellPoint(quad[0]);
+        m_Polys->InsertCellPoint(quad[1]);
+        m_Polys->InsertCellPoint(quad[2]);
+        m_Polys->InsertCellPoint(quad[3]);
+      }
+    }
+  }
 }
 
 void mitk::VtkModel::UpdateVertexBuffer()
@@ -373,18 +574,60 @@ void mitk::VtkModel::UpdateVertexBuffer()
   const ResizableExtVector<Deriv> normals = this->getVnormals();
   const VecTexCoord& texCoords = this->getVtexcoords();
 
-  GLsizeiptr sizeOfVertices = vertices.size() * sizeof(VecCoord::value_type);
-  GLsizeiptr sizeOfNormals = normals.size() * sizeof(Deriv);
-
-  glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeOfVertices, vertices.getData());
-  glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices, sizeOfNormals, normals.getData());
-
-  if (!m_Textures.empty())
+  if (m_Mode == OpenGL)
   {
-    GLsizeiptr sizeOfTexCoords = texCoords.size() * sizeof(VecTexCoord::value_type);
-    glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals, sizeOfTexCoords, texCoords.getData());
-  }
+    GLsizeiptr sizeOfVertices = vertices.size() * sizeof(VecCoord::value_type);
+    GLsizeiptr sizeOfNormals = normals.size() * sizeof(Deriv);
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeOfVertices, vertices.getData());
+    glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices, sizeOfNormals, normals.getData());
+
+    if (!m_Textures.empty())
+    {
+      GLsizeiptr sizeOfTexCoords = texCoords.size() * sizeof(VecTexCoord::value_type);
+      glBufferSubData(GL_ARRAY_BUFFER, sizeOfVertices + sizeOfNormals, sizeOfTexCoords, texCoords.getData());
+    }
+  }
+  else if (m_Mode == Surface)
+  {
+    size_t numPoints = vertices.size();
+
+    for (size_t i = 0; i < numPoints; ++i)
+      m_Points->SetPoint(i, vertices[i].elems);
+
+    if (!normals.empty())
+    {
+      size_t numNormals = normals.size();
+
+      for (size_t i = 0; i < numNormals; ++i)
+        m_Normals->SetTuple(i, normals[i].elems);
+    }
+
+    if (!texCoords.empty())
+    {
+      size_t numTexCoords = texCoords.size();
+
+      for (size_t i = 0; i < numTexCoords; ++i)
+        m_TexCoords->SetTuple(i, normals[i].elems);
+    }
+  }
+}
+
+void mitk::VtkModel::ValidateBoundBuffers()
+{
+  if (m_Mode != OpenGL)
+    return;
+
+  GLint indexBufferSize;
+  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &indexBufferSize);
+
+  if (indexBufferSize == 0)
+  {
+    glDeleteBuffers(1, &m_IndexBuffer);
+    this->CreateIndexBuffer();
+
+    glDeleteBuffers(1, &m_VertexBuffer);
+    this->CreateVertexBuffer();
+  }
 }

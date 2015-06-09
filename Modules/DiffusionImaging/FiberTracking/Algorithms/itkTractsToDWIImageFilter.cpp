@@ -634,6 +634,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             if (!m_Parameters.m_FiberModelList.empty())
                 for( int i=0; i<numFibers; i++ )
                 {
+                    float fiberWeight = m_FiberBundleTransformed->GetFiberWeight(i);
                     vtkCell* cell = fiberPolyData->GetCell(i);
                     int numPoints = cell->GetNumberOfPoints();
                     vtkPoints* points = cell->GetPoints();
@@ -675,13 +676,13 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         {
                             m_Parameters.m_FiberModelList[k]->SetFiberDirection(dir);
                             DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(idx);
-                            pix[g] += segmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
+                            pix[g] += fiberWeight*segmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
 
                             m_CompartmentImages.at(k)->SetPixel(idx, pix);
                         }
 
                         // update fiber volume image
-                        double vol = intraAxonalVolumeImage->GetPixel(idx) + segmentVolume;
+                        double vol = intraAxonalVolumeImage->GetPixel(idx) + segmentVolume*fiberWeight;
                         intraAxonalVolumeImage->SetPixel(idx, vol);
                         if (g==0 && vol>maxVolume)
                             maxVolume = vol;

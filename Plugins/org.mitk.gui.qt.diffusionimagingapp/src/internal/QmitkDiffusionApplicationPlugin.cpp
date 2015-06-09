@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDateTime>
 #include <QtPlugin>
 
-QmitkDiffusionApplicationPlugin* QmitkDiffusionApplicationPlugin::inst = 0;
+QmitkDiffusionApplicationPlugin* QmitkDiffusionApplicationPlugin::inst = nullptr;
 
 QmitkDiffusionApplicationPlugin::QmitkDiffusionApplicationPlugin()
 {
@@ -58,7 +58,7 @@ void QmitkDiffusionApplicationPlugin::start(ctkPluginContext* context)
 
 
   ctkServiceReference cmRef = context->getServiceReference<ctkConfigurationAdmin>();
-  ctkConfigurationAdmin* configAdmin = 0;
+  ctkConfigurationAdmin* configAdmin = nullptr;
   if (cmRef)
   {
     configAdmin = context->getService<ctkConfigurationAdmin>(cmRef);

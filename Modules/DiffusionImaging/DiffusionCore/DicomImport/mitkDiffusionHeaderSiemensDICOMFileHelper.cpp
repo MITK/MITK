@@ -18,7 +18,6 @@ mitk::SiemensDiffusionHeaderType mitk::GetHeaderType( std::string header )
 
 bool mitk::ParseInputString( std::string input, std::vector<double>& values, Siemens_Header_Format format_specs )
 {
-
   // TODO : Compute offset based on the format_specs, where does the 84 come from???
   int offset = 84;
   int vm = *(input.c_str() + format_specs.NameLength );
@@ -36,7 +35,8 @@ bool mitk::ParseInputString( std::string input, std::vector<double>& values, Sie
     offset += 16+strideSize;
   }
 
-  return true;
+  // If there are no values it is invalid
+  return (values.size() > 0 );
 }
 
 

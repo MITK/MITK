@@ -108,11 +108,11 @@ bool PropertyListsXmlFileReaderAndWriter::PropertyToXmlElem(const std::string& n
         return false;
     }
 
-    const mitk::IntProperty* intProp = 0;
-    const mitk::FloatProperty* floatProp = 0;
-    const mitk::DoubleProperty* doubleProp = 0;
-    const mitk::BoolProperty* boolProp = 0;
-    const mitk::StringProperty* stringProp = 0;
+    const mitk::IntProperty* intProp = nullptr;
+    const mitk::FloatProperty* floatProp = nullptr;
+    const mitk::DoubleProperty* doubleProp = nullptr;
+    const mitk::BoolProperty* boolProp = nullptr;
+    const mitk::StringProperty* stringProp = nullptr;
     bool writeOp = true;
 
     if( (boolProp = dynamic_cast<const BoolProperty*>( prop  ) ) )
@@ -157,27 +157,27 @@ bool PropertyListsXmlFileReaderAndWriter::WriteLists( const std::string& fileNam
 
     TiXmlDocument doc;
 
-    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+    auto  decl = new TiXmlDeclaration( "1.0", "", "" );
     doc.LinkEndChild( decl );
     // create root
-    TiXmlElement* propertyListsElem = new TiXmlElement( "PropertyLists" );
+    auto  propertyListsElem = new TiXmlElement( "PropertyLists" );
 
     bool allPropsConverted = true;
-    std::map<std::string, mitk::PropertyList::Pointer>::const_iterator it = _PropertyLists.begin();
+    auto it = _PropertyLists.begin();
     while( it != _PropertyLists.end() )
     {
         const std::string& id = (*it).first;
         const PropertyList* propList = (*it).second;
-        TiXmlElement* propertyListElem = new TiXmlElement( "PropertyList" );
+        auto  propertyListElem = new TiXmlElement( "PropertyList" );
         propertyListElem->SetAttribute(GetPropertyListIdElementName(), id);
 
         const std::map< std::string, BaseProperty::Pointer>* propMap = propList->GetMap();
-        std::map< std::string, BaseProperty::Pointer>::const_iterator propMapIt = propMap->begin();
+        auto propMapIt = propMap->begin();
         while( propMapIt != propMap->end() )
         {
             const std::string& propName = (*propMapIt).first;
             const BaseProperty* prop = (*propMapIt).second;
-            TiXmlElement* propertyElem = new TiXmlElement( "Property" );
+            auto  propertyElem = new TiXmlElement( "Property" );
 
             if( !this->PropertyToXmlElem(propName, prop, propertyElem) )
                 allPropsConverted = false;

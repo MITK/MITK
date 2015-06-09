@@ -1,0 +1,27 @@
+/**
+
+\page DevelopmentApplication Developing with the MITK Application Framework
+
+MITK offers a powerful application featuring a plugin system and many
+predefined plugins. You can configure this application to offer a set of
+functionality to the user and easily create an installer.
+
+Working with the application, you will have to learn about extension
+points and the Blueberry framework itself. If you are new to the matter,
+please also consult \ref Architecture and \ref FirstSteps.
+
+<ul>
+  <li> \subpage BlueBerryIntro </li>
+  <li> \subpage BlueBerryExamples </li>
+</ul>
+
+The BlueBerry framework extension-point reference is available here:
+
+ - \subpage BlueBerryExtPointsIndex
+
+
+The MITK application extension-point reference is available here:
+
+ - \subpage mitkExtPointsIndex
+
+*/

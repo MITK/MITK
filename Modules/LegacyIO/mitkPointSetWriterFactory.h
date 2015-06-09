@@ -28,15 +28,15 @@ namespace mitk
 /**
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-class DEPRECATED() MitkLegacyIO_EXPORT PointSetWriterFactory : public itk::ObjectFactoryBase
+class DEPRECATED() MITKLEGACYIO_EXPORT PointSetWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 
-  mitkClassMacro( mitk::PointSetWriterFactory, itk::ObjectFactoryBase )
+  mitkClassMacroItkParent( mitk::PointSetWriterFactory, itk::ObjectFactoryBase )
 
   /** Class methods used to interface with the registered factories. */
-  virtual const char* GetITKSourceVersion(void) const;
-  virtual const char* GetDescription(void) const;
+  virtual const char* GetITKSourceVersion(void) const override;
+  virtual const char* GetDescription(void) const override;
 
   /** Method for class instantiation. */
   itkFactorylessNewMacro(Self);

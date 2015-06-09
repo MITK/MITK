@@ -36,7 +36,7 @@ namespace mitk
 /// \class QmitkNDIToolDelegate
 /// \brief An item delegate for rendering and editing mitk::Properties in a QTableView.
 ///
-class MitkIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
+class MITKIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 
@@ -44,7 +44,7 @@ class MitkIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
     ///
     /// Creates a new PropertyDelegate.
     ///
-    QmitkNDIToolDelegate(QObject *parent = 0);
+    QmitkNDIToolDelegate(QObject *parent = nullptr);
 
     enum ToolTableColumns
     {
@@ -82,18 +82,18 @@ class MitkIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
     /// Create an editor for a specific property  (overwritten from QItemDelegate)
     ///
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option
-      , const QModelIndex &index) const;
+      , const QModelIndex &index) const override;
 
     ///
     /// Create an editor for a specific property  (overwritten from QItemDelegate)
     ///
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 
     ///
     /// When the user accepts input this func commits the data to the model  (overwritten from QItemDelegate)
     ///
     void setModelData(QWidget *editor, QAbstractItemModel* model
-      , const QModelIndex &index) const;
+      , const QModelIndex &index) const override;
 
     ///
     /// \brief Fit an editor to some geometry (overwritten from QItemDelegate)

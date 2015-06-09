@@ -33,7 +33,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFactory {
+struct MITKTOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFactory {
    public:
 
   /**
@@ -57,7 +57,7 @@ struct MITK_TOFHARDWARE_EXPORT AbstractToFDeviceFactory : public IToFDeviceFacto
     */
   size_t GetNumberOfDevices();
 
-  std::string GetCurrentDeviceName()
+  std::string GetCurrentDeviceName() override
   {
     std::stringstream name;
     if(this->GetNumberOfDevices()>1)

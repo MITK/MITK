@@ -46,7 +46,7 @@ namespace mitk
     int s = h.xVals.size();
     int s30 = 0.3 * s;
     int s70 = 0.7 * s;
-    ParamsType* params = new ParamsType();
+    auto  params = new ParamsType();
     params->means[0] = h.xVals(s30);
     params->means[1] = h.xVals(s70);
     params->sigmas[0] = (h.xVals(s-1) - h.xVals(0)) / 5.0;
@@ -60,7 +60,7 @@ namespace mitk
   PartialVolumeAnalysisClusteringCalculator::ParamsType*
       PartialVolumeAnalysisClusteringCalculator::Cluster(HistType h, ParamsType *initialGuess) const
   {
-    ParamsType *params = new ParamsType();
+    auto params = new ParamsType();
     params->Initialize(initialGuess);
 
     double ll = 9999999999999999999.9;
@@ -242,7 +242,7 @@ namespace mitk
       PartialVolumeAnalysisClusteringCalculator::PerformRGBClustering(mitk::Image::ConstPointer image, const MitkHistType *histogram) const
   {
 
-    HelperStructRGBChannels *rgbChannels = new HelperStructRGBChannels();
+    auto rgbChannels = new HelperStructRGBChannels();
 
     HelperStructPerformClusteringRetval *resultr = PerformClustering(image, histogram, 2);
     rgbChannels->r = resultr->clusteredImage;
@@ -270,7 +270,7 @@ namespace mitk
         InternalGenerateRGB<3>(rgbChannels, outImage);
     }
 
-    HelperStructPerformRGBClusteringRetval *retval
+    auto retval
         = new HelperStructPerformRGBClusteringRetval();
     retval->rgbChannels = rgbChannels;
     retval->rgb     = outImage;
@@ -376,10 +376,10 @@ namespace mitk
       PartialVolumeAnalysisClusteringCalculator::PerformClustering(mitk::Image::ConstPointer image, const MitkHistType *histogram, int classIdent, HelperStructPerformClusteringRetval* precResult) const
   {
 
-    HelperStructPerformClusteringRetval *retval =
+    auto retval =
         new HelperStructPerformClusteringRetval();
 
-    if(precResult == 0)
+    if(precResult == nullptr)
     {
       retval->hist = new HistType();
       retval->hist->InitByMitkHistogram(histogram);
@@ -600,7 +600,7 @@ namespace mitk
       mitk::Image::ConstPointer image, mitk::Image::Pointer clusteredImage, mitk::Image::Pointer mask) const
   {
 
-    double *retval = new double[2];
+    auto retval = new double[2];
 
     AccessFixedDimensionByItk_3(
         image.GetPointer(),
@@ -628,7 +628,7 @@ namespace mitk
     castFilter->Update();
     typename ProbImageType::Pointer clusterImage = castFilter->GetOutput();
 
-    typename MaskImageType::Pointer itkmask = 0;
+    typename MaskImageType::Pointer itkmask = nullptr;
     if(mask.IsNotNull())
     {
       typedef mitk::ImageToItk<MaskImageType> CastFilterType2;
@@ -840,7 +840,7 @@ namespace mitk
       PartialVolumeAnalysisClusteringCalculator::PerformRGBQuantiles(mitk::Image::ConstPointer image, const MitkHistType *histogram, double p1, double p2) const
   {
 
-    HelperStructRGBChannels *rgbChannels = new HelperStructRGBChannels();
+    auto rgbChannels = new HelperStructRGBChannels();
 
     HelperStructPerformClusteringRetval *resultr = PerformQuantiles(image, histogram, p2, 999999999.0 );
     rgbChannels->r = resultr->clusteredImage;
@@ -868,7 +868,7 @@ namespace mitk
         InternalGenerateRGB<3>(rgbChannels, outImage);
     }
 
-    HelperStructPerformRGBClusteringRetval *retval
+    auto retval
         = new HelperStructPerformRGBClusteringRetval();
     retval->rgbChannels = rgbChannels;
     retval->rgb     = outImage;
@@ -887,13 +887,13 @@ namespace mitk
       PartialVolumeAnalysisClusteringCalculator::PerformQuantiles(mitk::Image::ConstPointer image, const MitkHistType *histogram, double p1, double p2 ) const
   {
 
-    HelperStructPerformClusteringRetval *retval =
+    auto retval =
         new HelperStructPerformClusteringRetval();
 
     retval->hist = new HistType();
     retval->hist->InitByMitkHistogram(histogram);
 
-    double* q = new double[2];
+    auto  q = new double[2];
     q[0] = histogram->Quantile(0, p1);
     q[1] = histogram->Quantile(0, p2);
 

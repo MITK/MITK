@@ -42,7 +42,7 @@ of a single segmentation. One or several segmentations can be selected to be the
 $Author: maleike $
 */
 
-class MitkSegmentationUI_EXPORT QmitkToolWorkingDataSelectionBox : public QListWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkToolWorkingDataSelectionBox : public QListWidget
 {
   Q_OBJECT
 

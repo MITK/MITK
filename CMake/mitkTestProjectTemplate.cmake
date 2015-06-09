@@ -42,12 +42,10 @@ if(BUILD_TESTING)
     -DAwesomeProject_BUILD_ALL_PLUGINS:BOOL=ON
     -DAwesomeProject_BUILD_ALL_APPS:BOOL=ON
     -G${CMAKE_GENERATOR}
+    -C "${MITK_BINARY_DIR}/mitkTestInitialCache.txt"
     )
   if(MITK_USE_Qt4)
     list(APPEND configure_options -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
-  endif()
-  if(CMAKE_PREFIX_PATH)
-    list(APPEND configure_options -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH})
   endif()
 
   if(CMAKE_CONFIGURATION_TYPES)

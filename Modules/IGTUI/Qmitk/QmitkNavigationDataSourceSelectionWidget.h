@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   *   \brief This widget allows the user to select a NavigationDataSource. Tools of this Source are also shown and the user can select one of these tools.
   *   \ingroup IGTUI
   */
-class MitkIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
 {
   Q_OBJECT
 

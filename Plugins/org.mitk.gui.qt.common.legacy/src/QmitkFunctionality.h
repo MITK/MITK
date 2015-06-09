@@ -35,12 +35,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_common_legacy_Export.h>
 #include "mitkDataNodeSelection.h"
 #include <mitkDataStorage.h>
+#include <mitkIDataStorageService.h>
+#include <mitkIDataStorageReference.h>
 #include <QmitkStdMultiWidget.h>
+
+// CTK Includes
+#include <ctkServiceTracker.h>
+
 
 //# forward declarations
 
 namespace mitk {
   class DataNode;
+  struct IDataStorageService;
 }
 
 namespace berry {
@@ -240,6 +247,9 @@ protected:
   /// \return always returns the default DataStorage
   ///
   mitk::DataStorage::Pointer GetDefaultDataStorage() const;
+
+  mitk::IDataStorageReference::Pointer GetDataStorageReference() const;
+
   ///
   /// Returns the default and active StdMultiWidget.
   /// \param reCreateWidget a boolean flag to en-/disable the attept to re-create the StdWidget
@@ -286,12 +296,12 @@ public:
   ///
   /// Creates a scroll area for this view and calls CreateQtPartControl then
   ///
-  void CreatePartControl(void* parent);
+  void CreatePartControl(QWidget* parent) override;
   ///
   /// Called when this view receives the focus. Same as Activated()
   /// \see Activated()
   ///
-  void SetFocus();
+  void SetFocus() override;
   ///
   /// Called when a DataStorage Add Event was thrown. Sets
   /// m_InDataStorageChanged to true and calls NodeAdded afterwards.
@@ -340,7 +350,7 @@ protected:
   ///
   /// reactions to selection events from data manager (and potential other senders)
   ///
-  void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
+  void BlueBerrySelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart, const berry::ISelection::ConstPointer& selection);
   ///
   /// Converts a mitk::DataNodeSelection to a std::vector<mitk::DataNode*> (possibly empty
   ///
@@ -352,8 +362,8 @@ protected:
   ///
   friend struct berry::SelectionChangedAdapter<QmitkFunctionality>;
   ///
-  /// Saves the parent of this view (this is the scrollarea created in CreatePartControl(void*)
-  /// \see CreatePartControl(void*)
+  /// Saves the parent of this view (this is the scrollarea created in CreatePartControl(QWidget*)
+  /// \see CreatePartControl(QWidget*)
   ///
   QWidget* m_Parent;
   ///
@@ -365,7 +375,8 @@ protected:
   ///
   bool m_Visible;
 
-//# private fields:
+  //# private fields:
+
 private:
   ///
   /// Holds the current selection (selection made by this Functionality !!!)
@@ -374,7 +385,11 @@ private:
   ///
   /// object to observe BlueBerry selections
   ///
-  berry::ISelectionListener::Pointer m_BlueBerrySelectionListener;
+  QScopedPointer<berry::ISelectionListener> m_BlueBerrySelectionListener;
+
+  ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
+
+
   ///
   /// Saves if this view handles multiple datastorages
   ///
@@ -387,10 +402,6 @@ private:
   /// saves all visible functionalities
   ///
   std::set<std::string> m_VisibleFunctionalities;
-  ///
-  /// The Preferences Service to retrieve and store preferences.
-  ///
-  berry::IPreferencesService::WeakPtr m_PreferencesService;
 };
 
 #endif /*QMITKFUNCTIONALITY_H_*/

@@ -1,6 +1,7 @@
 set(MODULE_TESTS
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
+  mitkContourModelSetToImageFilterTest.cpp
   mitkDataNodeSegmentationTest.cpp
   mitkImageToContourFilterTest.cpp
 #  mitkSegmentationInterpolationTest.cpp
@@ -8,6 +9,7 @@ set(MODULE_TESTS
   mitkOverwriteSliceFilterObliquePlaneTest.cpp
 #  mitkToolManagerTest.cpp
   mitkToolManagerProviderTest.cpp
+  mitkManualSegmentationToSurfaceFilterTest.cpp #new cpp unit style
 )
 
 if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
@@ -18,7 +20,6 @@ set(MODULE_TESTS
 endif()
 
 set(MODULE_IMAGE_TESTS
-  mitkManualSegmentationToSurfaceFilterTest.cpp #only runs on images
   mitkOverwriteSliceImageFilterTest.cpp #only runs on images
 )
 set(MODULE_CUSTOM_TESTS

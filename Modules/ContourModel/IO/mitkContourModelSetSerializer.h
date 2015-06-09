@@ -7,14 +7,14 @@
 namespace mitk
 {
 
-class MitkContourModel_EXPORT ContourModelSetSerializer : public BaseDataSerializer
+class MITKCONTOURMODEL_EXPORT ContourModelSetSerializer : public BaseDataSerializer
 {
 public:
   mitkClassMacro(ContourModelSetSerializer, BaseDataSerializer);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual std::string Serialize();
+  virtual std::string Serialize() override;
 
 protected:
 

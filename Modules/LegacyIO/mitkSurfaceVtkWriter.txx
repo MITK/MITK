@@ -80,7 +80,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
   for(t = 0; t < timesteps; ++t)
   {
     // surfaces do not have to exist in all timeteps; therefor, only write valid surfaces
-    if( input->GetVtkPolyData(t) == NULL ) continue;
+    if( input->GetVtkPolyData(t) == nullptr ) continue;
 
     std::ostringstream filename;
     filename.imbue(::std::locale::classic());
@@ -126,7 +126,7 @@ const mitk::Surface* mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()
 {
   if ( this->GetNumberOfInputs() < 1 )
   {
-    return NULL;
+    return nullptr;
   }
   else
   {

@@ -18,12 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONHEADERFILEREADER_H
 
 #include <MitkDiffusionCoreExports.h>
+#include <mitkCommon.h>
 
 #include <itkLightObject.h>
-#include "mitkDiffusionImage.h"
+#include <itkObjectFactory.h>
 
 #include "gdcmScanner.h"
 #include "gdcmReader.h"
+#include <vnl/vnl_vector_fixed.h>
+
 
 namespace mitk
 {
@@ -71,14 +74,14 @@ struct DiffusionImageMosaicDICOMHeaderInformation
  *
  * To provide a diffusion header reader for a new vendor, reimplement the \sa ReadDiffusionHeader method.
  */
-class MitkDiffusionCore_EXPORT DiffusionHeaderDICOMFileReader
+class MITKDIFFUSIONCORE_EXPORT DiffusionHeaderDICOMFileReader
     : public itk::LightObject
 {
 public:
 
   typedef std::vector< DiffusionImageDICOMHeaderInformation > DICOMHeaderListType;
 
-  mitkClassMacro( DiffusionHeaderDICOMFileReader, itk::LightObject )
+  mitkClassMacroItkParent( DiffusionHeaderDICOMFileReader, itk::LightObject )
   itkSimpleNewMacro( Self )
 
   /**

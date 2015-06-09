@@ -55,7 +55,7 @@ public:
     * @brief Setup a recorder including a device. Here, we use a player, because in an automatic test
     * hardware is not useful.
     */
-  void setUp()
+  void setUp() override
   {
     m_ToFImageRecorder = mitk::ToFImageRecorder::New();
     m_DistanceImageName = mitk::IOUtil::CreateTemporaryFile();
@@ -94,7 +94,7 @@ public:
     m_PlayerDevice->StartCamera();
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_PlayerDevice->StopCamera();
     m_PlayerDevice->DisconnectCamera();

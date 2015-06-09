@@ -36,7 +36,7 @@ namespace mitk
  *  Last contributor:
  *  $Author:$
  */
-class MitkSegmentation_EXPORT ShapeBasedInterpolationAlgorithm : public SegmentationInterpolationAlgorithm
+class MITKSEGMENTATION_EXPORT ShapeBasedInterpolationAlgorithm : public SegmentationInterpolationAlgorithm
 {
   public:
 
@@ -50,7 +50,7 @@ class MitkSegmentation_EXPORT ShapeBasedInterpolationAlgorithm : public Segmenta
                                unsigned int sliceDimension,
                                Image::Pointer resultImage,
                                unsigned int timeStep,
-                               Image::ConstPointer referenceImage);
+                               Image::ConstPointer referenceImage) override;
 };
 
 } // namespace

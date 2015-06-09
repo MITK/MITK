@@ -115,6 +115,14 @@ public:
         m_NewSpacing[2] /= sampling[2];
     }
 
+    virtual void UpdateOutputInformation();
+
+    virtual void PropagateRequestedRegion(){}
+
+    virtual void PropagateRequestedRegion(itk::DataObject *output){}
+
+    virtual void VerifyInputInformation(){}
+
     protected:
         ResampleDwiImageFilter();
     ~ResampleDwiImageFilter(){}

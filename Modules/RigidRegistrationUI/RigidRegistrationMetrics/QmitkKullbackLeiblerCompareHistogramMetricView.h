@@ -29,27 +29,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for rigid registration.
 */
-class MITK_RIGIDREGISTRATION_UI_EXPORT QmitkKullbackLeiblerCompareHistogramMetricView : public QmitkRigidRegistrationMetricsGUIBase
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkKullbackLeiblerCompareHistogramMetricView : public QmitkRigidRegistrationMetricsGUIBase
 {
 
 public:
 
-  QmitkKullbackLeiblerCompareHistogramMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkKullbackLeiblerCompareHistogramMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkKullbackLeiblerCompareHistogramMetricView();
 
-  virtual mitk::MetricParameters::MetricType GetMetricType();
+  virtual mitk::MetricParameters::MetricType GetMetricType() override;
 
-  virtual itk::Object::Pointer GetMetric();
+  virtual itk::Object::Pointer GetMetric() override;
 
-  virtual itk::Array<double> GetMetricParameters();
+  virtual itk::Array<double> GetMetricParameters() override;
 
-  virtual void SetMetricParameters(itk::Array<double> metricValues);
+  virtual void SetMetricParameters(itk::Array<double> metricValues) override;
 
-  virtual QString GetName();
+  virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent);
+  virtual void SetupUI(QWidget* parent) override;
 
-  virtual bool Maximize();
+  virtual bool Maximize() override;
 
 
 private:

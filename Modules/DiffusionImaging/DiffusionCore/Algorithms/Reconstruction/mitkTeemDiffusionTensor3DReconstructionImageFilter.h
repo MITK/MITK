@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 #include "mitkTensorImage.h"
-#include "mitkDiffusionImage.h"
 #include "itkDiffusionTensor3D.h"
 
 namespace mitk
@@ -53,15 +52,15 @@ namespace mitk
     typedef DiffusionImagePixelType DiffusionPixelType;
     typedef itk::VectorImage< DiffusionPixelType, 3 >   DiffusionImageType;
 
-    mitkClassMacro( TeemDiffusionTensor3DReconstructionImageFilter,
+    mitkClassMacroItkParent( TeemDiffusionTensor3DReconstructionImageFilter,
       itk::Object );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
     itkGetMacro(Input,
-      typename DiffusionImage<DiffusionImagePixelType>::Pointer);
+      mitk::Image::Pointer);
     itkSetMacro(Input,
-      typename DiffusionImage<DiffusionImagePixelType>::Pointer);
+      mitk::Image::Pointer);
 
     itkGetMacro(EstimateErrorImage, bool);
     itkSetMacro(EstimateErrorImage, bool);
@@ -95,7 +94,7 @@ namespace mitk
     TeemDiffusionTensor3DReconstructionImageFilter();
     virtual ~TeemDiffusionTensor3DReconstructionImageFilter();
 
-    typename DiffusionImage<DiffusionImagePixelType>::Pointer m_Input;
+    mitk::Image::Pointer m_Input;
     bool m_EstimateErrorImage;
     float m_Sigma;
     TeemTensorEstimationMethods m_EstimationMethod;

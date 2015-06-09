@@ -33,10 +33,10 @@ PointShell<NPoints, TMatrixType >
 ::DistributePointShell()
 {
 
-  vnl_vector_fixed<double,NPoints> *theta
+  auto theta
       = new vnl_vector_fixed<double,NPoints>();
 
-  vnl_vector_fixed<double,NPoints> *phi
+  auto phi
       = new vnl_vector_fixed<double,NPoints>();
 
   double C = sqrt(4*DIST_POINTSHELL_PI);
@@ -55,7 +55,7 @@ PointShell<NPoints, TMatrixType >
     }
   }
 
-  vnl_matrix_fixed<double, 3, NPoints> *pointshell
+  auto pointshell
       = new vnl_matrix_fixed<double, 3, NPoints>();
 
   for(int i=0; i<NPoints; i++)
@@ -100,7 +100,7 @@ public:
       0.313082,0.944172,-0.671442,
       0.349683,-0.648822,0.128204 };
 
-    vnl_matrix_fixed<double, 3, 12> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 12>(coords);
 
     return pointshell;
@@ -157,7 +157,7 @@ public:
       0.7605089118538748,0.6002024649156598,0.3496833143594963,
       0.02151295276860444,-0.175829673802738,0.2808952005684321 };
 
-    vnl_matrix_fixed<double, 3, 42> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 42>(coords);
 
     return pointshell;
@@ -264,7 +264,7 @@ public:
       -0.0965434988571485,-0.07170210104888378,0.2326162031595532,
       0.3176193294845107,0.7995412648414353,0.5965106290979496 };
 
-    vnl_matrix_fixed<double, 3, 92> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 92>(coords);
 
     return pointshell;
@@ -441,7 +441,7 @@ public:
       0.6857580324047194,0.78950721141067,0.8807755242176112,
       0.4790578522946484,0.7312056921497674,0.5474986596025796 };
 
-    vnl_matrix_fixed<double, 3, 162> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 162>(coords);
 
     return pointshell;
@@ -708,7 +708,7 @@ public:
       0.403998910419839,0.62060207699311,0.7967976318501995,
       0.4726965405256068,0.6757048258462731,0.5106167801856609 };
 
-    vnl_matrix_fixed<double, 3, 252> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 252>(coords);
 
     return pointshell;
@@ -1085,7 +1085,7 @@ public:
       0.4153929051801631,0.5965106290979496,0.7496353473630305,
       0.4607548496345096,0.6278760663083329,0.4841605931432954 };
 
-    vnl_matrix_fixed<double, 3, 362> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 362>(coords);
 
     return pointshell;
@@ -1592,7 +1592,7 @@ public:
       0.4176372345893317,0.5707694457794332,0.7042664250854263,
       0.4489457715859918,0.5898772631309003,0.4647496441635906 };
 
-    vnl_matrix_fixed<double, 3, 492> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 492>(coords);
 
     return pointshell;
@@ -2249,7 +2249,7 @@ public:
       0.415971059154168,0.5474986596025796,0.6648558465528478,
       0.4386113475958364,0.5599721413103722,0.4500523932965443 };
 
-    vnl_matrix_fixed<double, 3, 642> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 642>(coords);
 
     return pointshell;
@@ -3076,7 +3076,7 @@ public:
       0.4127894497989522,0.5275207205127158,0.631704463913464,
       0.4298578384111184,0.536188255170367,0.4385954324163403 };
 
-    vnl_matrix_fixed<double, 3, 812> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 812>(coords);
 
     return pointshell;
@@ -4093,7 +4093,7 @@ public:
       0.4091542831822379,0.5106167801856609,0.6039998362037971,
       0.422484479771868,0.5169744155067602,0.4294387727293252 };
 
-    vnl_matrix_fixed<double, 3, 1002> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 1002>(coords);
 
     return pointshell;
@@ -4149,7 +4149,7 @@ public:
       0.5319989685716170,-0.4881652317616310,-0.6918611160759410,
       0.3581867553682760,0.1086899080235520,0.9273018668009770
     };
-    vnl_matrix_fixed<double, 3, 7> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 7>(coords);
 
     // List sorted for each row [x,y,z]
@@ -4187,7 +4187,7 @@ public:
       0.7837589636894810,0.6201599634850410,0.0335187488821074,
       0.0539036789368123,0.3663544585938050,-0.9289126999161520
     };
-    vnl_matrix_fixed<double, 3, 16> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 16>(coords);
     // List sorted for each row [x,y,z]
     // pointshell need [x...x
@@ -4230,7 +4230,7 @@ public:
       0.2732684357685670,-0.3457098692283190,-0.8976686740277500,
       -0.5333383595673660,0.8405849409324210,0.0946950436486956
     };
-    vnl_matrix_fixed<double, 3, 22> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 22>();
 
     // List sorted for each row [x,y,z]
@@ -4273,7 +4273,7 @@ public:
       -0.6557865116475140,-0.4999608118385060,-0.5656706088944040,
       -0.0693103556967315,0.9875634181798020,-0.1411189911607090
     };
-    vnl_matrix_fixed<double, 3, 15> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 15>(coords);
 
     // List sorted for each row [x,y,z]
@@ -4325,7 +4325,7 @@ public:
       0.4840608825017460,-0.5520432393197750,-0.6789207052027200,
       0.4932109057185150,-0.8496377203461870,-0.1867049722028180
     };
-    vnl_matrix_fixed<double, 3, 30> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 30>(coords);
     // List sorted for each row [x,y,z]
     // pointshell need [x...x
@@ -4391,7 +4391,7 @@ public:
       0.8227143106676380,0.0339170261757165,0.5674423304249230,
       -0.5076617466917020,0.3007946007639900,0.8073426528415060
     };
-    vnl_matrix_fixed<double, 3, 45> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 45>();
 
     // List sorted for each row [x,y,z]
@@ -4441,7 +4441,7 @@ public:
       -0.18653146496488500,0.84209830314271900,-0.50603997907498000,
       -0.63212021995023600,-0.37635030041830100,0.67733631152118100,
     };
-    vnl_matrix_fixed<double, 3, 22> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 22>(coords);
 
     // List sorted for each row [x,y,z]
@@ -4509,7 +4509,7 @@ public:
       -0.43706646286549800,-0.78947199903364200,-0.43093719934587400,
       -0.40196779675371200,-0.59965623521593900,-0.69197853286038600,
     };
-    vnl_matrix_fixed<double, 3, 46> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 46>(coords);
     // List sorted for each row [x,y,z]
     // pointshell need [x...x
@@ -4597,7 +4597,7 @@ public:
       0.28885209645735200,0.75743720323072100,0.58553680459405300,
       -0.49988083572550200,0.08893492748180820,0.86151594805214000,
     };
-    vnl_matrix_fixed<double, 3, 67> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 67>();
 
     // List sorted for each row [x,y,z]
@@ -4654,7 +4654,7 @@ public:
       -0.7632149908465080,-0.1335295186020360,0.6321967616249480,
       0.0826215834627986,-0.6217188595585800,0.7788705499730220,
     };
-    vnl_matrix_fixed<double, 3, 30> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 30>(coords);
 
     // List sorted for each row [x,y,z]
@@ -4736,7 +4736,7 @@ public:
       -0.1166393819714400,0.8099047244599660,-0.5748474509561170,
       0.8653655945438620,-0.2118053715810700,-0.4541815411805620,
     };
-    vnl_matrix_fixed<double, 3, 60> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 60>(coords);
 
     // List sorted for each row [x,y,z]
@@ -4848,7 +4848,7 @@ public:
       -0.3912157018163170,-0.8815613582567070,-0.2641966053547140,
       -0.6919685152992150,0.6644155090244570,-0.2823678544069240,
     };
-    vnl_matrix_fixed<double, 3, 90> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 90>(coords);
 
     // List sorted for each row [x,y,z]
@@ -4928,7 +4928,7 @@ public:
       0.446853673336740,-0.414239447718517,-0.792923372451158
     };
 
-    vnl_matrix_fixed<double, 3, 50> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 50>();
 
 
@@ -5051,7 +5051,7 @@ public:
       -0.7903491223400260,-0.2661789011279690,0.5518125201648250,
       -0.4240807031724980,0.0532021972358502,0.9040603317290260
     };
-    vnl_matrix_fixed<double, 3, 100> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 100>();
 
     // List sorted for each row [x,y,z]
@@ -5223,7 +5223,7 @@ public:
       0.6652607437466560,0.6063117536090580,-0.4356767153121150,
       0.3394557649489950,-0.6705912128459400,-0.6596038272301810
     };
-    vnl_matrix_fixed<double, 3, 150> *pointshell
+    auto      pointshell
         = new vnl_matrix_fixed<double, 3, 150>();
 
     // List sorted for each row [x,y,z]

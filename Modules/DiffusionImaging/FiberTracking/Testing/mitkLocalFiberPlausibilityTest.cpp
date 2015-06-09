@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
@@ -50,7 +49,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
     string LDFP_VECTOR_FIELD = argv[6];
     string LDFP_ERROR_IMAGE_IGNORE = argv[7];
 
-    float angularThreshold = 25;
+    float angularThreshold = 30;
 
     try
     {
@@ -60,7 +59,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         typedef itk::EvaluateDirectionImagesFilter< float >                     EvaluationFilterType;
 
         // load fiber bundle
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 
         // load reference directions
         ItkDirectionImageContainerType::Pointer referenceImageContainer = ItkDirectionImageContainerType::New();
@@ -96,8 +95,8 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         fOdfFilter->SetMaskImage(itkMaskImage);
         fOdfFilter->SetAngularThreshold(cos(angularThreshold*M_PI/180));
         fOdfFilter->SetNormalizeVectors(true);
-        //fOdfFilter->SetMaxNumDirections(1);
-        fOdfFilter->SetSizeThreshold(0.0);
+        fOdfFilter->SetMaxNumDirections(3);
+        fOdfFilter->SetSizeThreshold(0.3);
 
         fOdfFilter->SetUseWorkingCopy(false);
         fOdfFilter->SetNumberOfThreads(1);
@@ -109,7 +108,10 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         mitk::Image::Pointer mitkNumDirImage = mitk::Image::New();
         mitkNumDirImage->InitializeByItk( numDirImage.GetPointer() );
         mitkNumDirImage->SetVolume( numDirImage->GetBufferPointer() );
-        mitk::FiberBundleX::Pointer testDirections = fOdfFilter->GetOutputFiberBundle();
+        mitk::FiberBundle::Pointer testDirections = fOdfFilter->GetOutputFiberBundle();
+
+        //mitk::IOUtil::SaveImage(mitkNumDirImage, "/local/mitk/release-binary/MITK-superbuild/CMakeExternals/Source/MITK-Data/DiffusionImaging/LDFP_NUM_DIRECTIONS.nrrd");
+        //mitk::IOUtil::SaveBaseData(testDirections, "/local/mitk/release-binary/MITK-superbuild/CMakeExternals/Source/MITK-Data/DiffusionImaging/LDFP_VECTOR_FIELD.fib");
 
         // evaluate directions with missing directions
         EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
@@ -123,6 +125,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         mitk::Image::Pointer mitkAngularErrorImage = mitk::Image::New();
         mitkAngularErrorImage->InitializeByItk( angularErrorImage.GetPointer() );
         mitkAngularErrorImage->SetVolume( angularErrorImage->GetBufferPointer() );
+        //mitk::IOUtil::SaveImage(mitkAngularErrorImage, "/local/mitk/release-binary/MITK-superbuild/CMakeExternals/Source/MITK-Data/DiffusionImaging/LDFP_ERROR_IMAGE.nrrd");
 
         // evaluate directions without missing directions
         evaluationFilter->SetIgnoreMissingDirections(true);
@@ -132,16 +135,12 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         mitk::Image::Pointer mitkAngularErrorImageIgnore = mitk::Image::New();
         mitkAngularErrorImageIgnore->InitializeByItk( angularErrorImageIgnore.GetPointer() );
         mitkAngularErrorImageIgnore->SetVolume( angularErrorImageIgnore->GetBufferPointer() );
+        //mitk::IOUtil::SaveImage(mitkAngularErrorImageIgnore, "/local/mitk/release-binary/MITK-superbuild/CMakeExternals/Source/MITK-Data/DiffusionImaging/LDFP_ERROR_IMAGE_IGNORE.nrrd");
 
         mitk::Image::Pointer gtAngularErrorImageIgnore = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(LDFP_ERROR_IMAGE_IGNORE)->GetData());
         mitk::Image::Pointer gtAngularErrorImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(LDFP_ERROR_IMAGE)->GetData());
         mitk::Image::Pointer gtNumTestDirImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(LDFP_NUM_DIRECTIONS)->GetData());
-        mitk::FiberBundleX::Pointer gtTestDirections = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(LDFP_VECTOR_FIELD)->GetData());
-
-//        mitk::IOUtil::SaveBaseData(mitkAngularErrorImageIgnore, mitk::IOUtil::GetTempPath()+"mitkAngularErrorImageIgnore.nrrd");
-//        mitk::IOUtil::SaveBaseData(mitkAngularErrorImage, mitk::IOUtil::GetTempPath()+"mitkAngularErrorImage.nrrd");
-//        mitk::IOUtil::SaveBaseData(mitkNumDirImage, mitk::IOUtil::GetTempPath()+"mitkNumDirImage.nrrd");
-//        mitk::IOUtil::SaveBaseData(testDirections, mitk::IOUtil::GetTempPath()+"testDirections.fib");
+        mitk::FiberBundle::Pointer gtTestDirections = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(LDFP_VECTOR_FIELD)->GetData());
 
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImageIgnore, mitkAngularErrorImageIgnore, 0.01, true), "Check if error images are equal (ignored missing directions).");
         MITK_TEST_CONDITION_REQUIRED(mitk::Equal(gtAngularErrorImage, mitkAngularErrorImage, 0.01, true), "Check if error images are equal.");

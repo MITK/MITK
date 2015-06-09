@@ -30,7 +30,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkVectorContainer.h>
 #include <itkVectorImage.h>
 #include <itkDiffusionTensor3D.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 namespace itk{
 /** \brief Extracts principal eigenvectors of the input tensors
@@ -71,7 +71,7 @@ public:
     itkSetMacro( NormalizeVectors, bool)
 
     // output
-    itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)
+    itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)
 
     protected:
@@ -86,7 +86,7 @@ public:
 private:
 
     bool                                m_NormalizeVectors;     ///< Normalizes the output vector to length 1
-    mitk::FiberBundleX::Pointer         m_OutputFiberBundle;    ///< Vector field representation of the output vectors
+    mitk::FiberBundle::Pointer         m_OutputFiberBundle;    ///< Vector field representation of the output vectors
     ItkUcharImgType::Pointer            m_NumDirectionsImage;   ///< Image containing the number of fiber directions per voxel
     ItkUcharImgType::Pointer            m_MaskImage;            ///< Extraction is only performed inside of the binary mask
     float                               m_MaxEigenvalue;

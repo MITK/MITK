@@ -1,11 +1,10 @@
-if(MITK_USE_SOFA)
-  MITK_CREATE_MODULE(
-    DEPENDS MitkSceneSerializationBase
-    PACKAGE_DEPENDS Boost GLUT GLEW SOFA
-  )
+MITK_CREATE_MODULE(
+  DEPENDS MitkSceneSerializationBase
+  PACKAGE_DEPENDS
+    PUBLIC SOFA Boost
+    PRIVATE GLUT GLEW
+)
 
-  if(MSVC)
-    list(APPEND module_compile_flags /wd4250 4251 4267 4275)
-    set_target_properties(${MODULE_TARGET} PROPERTIES COMPILE_FLAGS "${module_compile_flags}")
-  endif()
+if(TARGET ${MODULE_TARGET})
+  target_compile_options(${MODULE_TARGET} PUBLIC "$<$<CXX_COMPILER_ID:MSVC>:/wd4068;/wd4250;/wd4251;/wd4267;/wd4275>")
 endif()

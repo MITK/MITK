@@ -34,7 +34,7 @@ class QMimeData;
 /// Reimplements the ctkPythonConsole with drag and drop functionality for text
 /// Furthermore it calls NotifyObserver() on the IPythonService to inform listeners
 ///
-class MITK_PYTHON_EXPORT QmitkCtkPythonShell : public ctkPythonConsole
+class MITKPYTHON_EXPORT QmitkCtkPythonShell : public ctkPythonConsole
 {
   Q_OBJECT
 

@@ -30,10 +30,9 @@ namespace mitk {
   *
   * \brief Base class for all filters with mitk::Image as input and mitk::ContourModel
   *
-  * \ingroup ContourModelFilters
-  * \ingroup Process
+  * @ingroup MitkContourModelModule
   */
-  class MitkContourModel_EXPORT ImageToContourModelFilter : public ContourModelSource
+  class MITKCONTOURMODEL_EXPORT ImageToContourModelFilter : public ContourModelSource
   {
 
   public:
@@ -60,7 +59,7 @@ namespace mitk {
 
     virtual ~ImageToContourModelFilter();
 
-    void GenerateData();
+    void GenerateData() override;
 
     template<typename TPixel, unsigned int VImageDimension>
     void Itk2DContourExtraction (const itk::Image<TPixel, VImageDimension>* sliceImage);

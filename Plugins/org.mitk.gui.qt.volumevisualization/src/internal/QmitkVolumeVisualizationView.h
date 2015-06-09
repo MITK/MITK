@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
-#include <berryISelectionListener.h>
 #include <mitkDataNodeSelection.h>
 
 #include <mitkWeakPointer.h>
@@ -43,18 +42,18 @@ class QmitkVolumeVisualizationView : public QmitkAbstractView
 
 public:
 
-  void SetFocus();
+  void SetFocus() override;
 
   QmitkVolumeVisualizationView();
 
   virtual ~QmitkVolumeVisualizationView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   static const std::string VIEW_ID;
 
@@ -70,11 +69,6 @@ protected slots:
 
 protected:
 
-  ///
-  /// A selection listener for datatreenode events
-  ///
-  berry::ISelectionListener::Pointer m_SelectionListener;
-
   Ui::QmitkVolumeVisualizationViewControls* m_Controls;
 
 private:
@@ -82,7 +76,7 @@ private:
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
 
   void UpdateInterface();
-  void NodeRemoved(const mitk::DataNode* node);
+  void NodeRemoved(const mitk::DataNode* node) override;
 
 };
 

@@ -1,0 +1,373 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.blueberry.ui" id="perspectiveExtensions" name="Perspective Extensions"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to extend perspectives
+registered by other plug-ins. A perspective defines
+the initial contents of the window action bars
+(menu and toolbar) and the initial set of views
+and their layout within a workbench page.
+Other plug-ins may contribute actions or views to
+the perspective which appear when the perspective
+is selected.  Optional additions by other plug-ins
+are appended to the initial definition.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="perspectiveExtension" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="perspectiveExtension">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="targetID"/>
+         </appInfo>
+      </annotation>
+      <complexType>
+         <choice minOccurs="0" maxOccurs="unbounded">
+            <element ref="actionSet"/>
+            <element ref="viewShortcut"/>
+            <element ref="perspectiveShortcut"/>
+            <element ref="newWizardShortcut"/>
+            <element ref="view"/>
+            <element ref="showInPart"/>
+            <element ref="hiddenMenuItem"/>
+            <element ref="hiddenToolBarItem"/>
+         </choice>
+         <attribute name="targetID" use="required">
+            <annotation>
+               <documentation>
+                  the unique identifier of the perspective (as specified in the registry) into which the contribution is made. If the value is set to &quot;*&quot; the extension is applied to all perspectives.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.perspectives/perspective/@id"/>
+               </appInfo>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="*">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="actionSet">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the unique identifier of the action set which will be added to the perspective.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.actionSets/actionSet/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="viewShortcut">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the unique identifier of the view which will be added to the perspective&apos;s &quot;Show View&quot; submenu of the &quot;Window&quot; menu.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.views/view/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="perspectiveShortcut">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the unique identifier of the perspective which will be added to the perspective&apos;s &quot;Open Perspective&quot; submenu of the &quot;Window&quot; menu.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.perspectives/perspective/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="newWizardShortcut">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the unique identifier of the new wizard which will be added to the perspective&apos;s &quot;New&quot; submenu of the &quot;File&quot; menu.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.newWizards/wizard/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="showInPart">
+      <complexType>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  the unique identifier of the view which will be added to the perspective&apos;s &quot;Show In...&quot; prompter in the Navigate menu.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.views/view/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="view">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the unique identifier of the view which will be added to the perspective layout.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.views/view/@id"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="relative">
+            <annotation>
+               <documentation>
+                  the unique identifier of a view which already exists in the perspective.  This will be used as a reference point for placement of the view.  The relationship between these two views is defined by &lt;samp&gt;relationship&lt;/samp&gt;.  Ignored if relationship is &quot;fast&quot;.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.views/view/@id"/>
+               </appInfo>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="org.blueberry.ui.editorss">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="relationship" use="required">
+            <annotation>
+               <documentation>
+                  specifies the relationship between &lt;samp&gt;id&lt;/samp&gt; and
+&lt;samp&gt;relative&lt;/samp&gt;.
+The following values are supported:
+&lt;ul&gt;
+&lt;b&gt;fast&lt;/b&gt; - the view extension will be created as a fast view.
+&lt;br&gt;&lt;b&gt;stack&lt;/b&gt; - the view extension will be stacked with the relative
+view in a folder.
+&lt;br&gt;&lt;b&gt;left, right, top, bottom&lt;/b&gt; - the view extension will be placed
+beside the relative view. In this case a &lt;samp&gt;ratio&lt;/samp&gt; must also
+be defined.&lt;/ul&gt;
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="stack">
+                  </enumeration>
+                  <enumeration value="left">
+                  </enumeration>
+                  <enumeration value="right">
+                  </enumeration>
+                  <enumeration value="top">
+                  </enumeration>
+                  <enumeration value="bottom">
+                  </enumeration>
+                  <enumeration value="fast">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="ratio" type="string">
+            <annotation>
+               <documentation>
+                  the percentage of area within the relative view which will be donated to the view extension. If the view extension is a fast view, the ratio is the percentage of the workbench the fast view will cover when active. This must be defined as a floating point value and lie between 0.05 and 0.95.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="visible" type="boolean">
+            <annotation>
+               <documentation>
+                  whether the view is initially visible when the perspective is opened.  This attribute should have a value of &quot;true&quot; or &quot;false&quot; if used.
+If this attribute is not used, the view will be initially visible by default.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="closeable" type="boolean">
+            <annotation>
+               <documentation>
+                  whether the view is closeable in the target perspective. This attribute should have a value of &quot;true&quot; or &quot;false&quot; if used.  If this attribute is not used, the view will be closeable, unless the perspective itself is marked as fixed.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="moveable" type="boolean">
+            <annotation>
+               <documentation>
+                  whether the view is moveable.  A non-moveable view cannot be moved either within the same folder, or moved between folders in the perspective.  This attribute should have a value of &quot;true&quot; or &quot;false&quot; if used.
+If this attribute is not used, the view will be moveable, unless the perspective itself is marked as fixed.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="standalone" type="boolean">
+            <annotation>
+               <documentation>
+                  whether the view is a standalone view.  A standalone view cannot be docked together with others in the same folder.  This attribute should have a value of &quot;true&quot; or &quot;false&quot; if used.  This attribute is ignored if the relationship attribute is &quot;fast&quot; or &quot;stacked&quot;.  If this attribute is not used, the view will be a regular view, not a standalone view (default is &quot;false&quot;).
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="showTitle" type="boolean">
+            <annotation>
+               <documentation>
+                  whether the view&apos;s title is shown.  This attribute should have a value of &quot;true&quot; or &quot;false&quot; if used.  This attribute only applies to standalone views.  If this attribute is not used, the view&apos;s title will be shown (default is &quot;true&quot;).
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="minimized" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  If the perspective extension will result in a new view stack being created (i.e. the &apos;relationship&apos; attribute is one of left, right, top or bottom) this field determines the new stack&apos;s initial display state.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="hiddenMenuItem">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique identifier of the Command which is to be removed from the menu.
+
+&lt;strong&gt;WARNING:&lt;/strong&gt; This is considered to be a &apos;Product level&apos; extension and should not be used in consumable plugins without great care.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="hiddenToolBarItem">
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The unique identifier of the Command which is to be removed from thetoolbar.
+
+&lt;strong&gt;WARNING:&lt;/strong&gt; This is considered to be a &apos;Product level&apos; extension and should not be used in consumable plugins without great care.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         The following is an example of a perspective extension (note the subelements and the way attributes are used):
+&lt;p&gt;
+&lt;pre&gt;
+    &lt;extension point=&quot;org.blueberry.ui.perspectiveExtensions&quot;&gt;
+        &lt;perspectiveExtension
+            targetID=&quot;org.blueberry.ui.resourcePerspective&quot;&gt;
+            &lt;actionSet id=&quot;org.xyz.MyActionSet&quot;/&gt;
+            &lt;viewShortcut id=&quot;org.xyz.views.PackageExplorer&quot;/&gt;
+            &lt;newWizardShortcut id=&quot;org.xyz.wizards.NewProjectCreationWizard&quot;/&gt;
+            &lt;perspectiveShortcut id=&quot;org.xyz.MyPerspective&quot;/&gt;
+            &lt;view id=&quot;org.xyz.views.PackageExplorer&quot;
+                relative=&quot;org.blueberry.ui.views.ResourceNavigator&quot;
+                relationship=&quot;stack&quot;/&gt;
+            &lt;view id=&quot;org.xyz.views.TypeHierarchy&quot;
+                relative=&quot;org.blueberry.ui.views.ResourceNavigator&quot;
+                relationship=&quot;left&quot;
+                ratio=&quot;0.50&quot;/&gt;
+        &lt;/perspectiveExtension&gt;
+    &lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
+&lt;p&gt;
+In the example above, an action set, view shortcut,
+new wizard shortcut, and perspective shortcut are
+contributed to the initial contents of the
+Resource Perspective.  In addition, the
+Package Explorer view is stacked on the
+Resource Navigator and the Type Hierarchy View is
+added beside the Resource Navigator.
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The items defined within the perspective extension are contributed to the initial contents of the target perspective.  Following this, the user may remove any contribution or add others to a perspective from within the workbench user interface.
+      </documentation>
+   </annotation>
+
+
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2002, 2007 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made
+available under the terms of the Eclipse Public License v1.0 which accompanies
+this distribution, and is available at &lt;a
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

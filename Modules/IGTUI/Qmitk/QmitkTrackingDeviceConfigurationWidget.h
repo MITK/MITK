@@ -47,7 +47,7 @@ class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker;
   *
   *   \ingroup IGTUI
   */
-class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
+class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 {
   Q_OBJECT
 
@@ -88,6 +88,10 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      *          Returns false if configuration is not finished.
      */
     bool GetTrackingDeviceConfigured();
+
+    /** @return Returns the frame rate set in the m_frameRatePolaris ComboBox
+     */
+    mitk::IlluminationActivationRate GetPolarisFrameRate();
 
     /** @brief Sets the style of this widget. Default is ADVANCED. Caution: The style can only be set once at startup! */
     void SetGUIStyle(Style style);

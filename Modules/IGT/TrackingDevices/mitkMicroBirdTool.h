@@ -28,7 +28,7 @@ namespace mitk {
     //##
     //## \ingroup IGT
 
-    class MitkIGT_EXPORT MicroBirdTool : public InternalTrackingTool
+    class MITKIGT_EXPORT MicroBirdTool : public InternalTrackingTool
     {
     public:
       mitkClassMacro(MicroBirdTool, InternalTrackingTool);

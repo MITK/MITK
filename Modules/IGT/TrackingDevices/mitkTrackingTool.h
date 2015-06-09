@@ -33,12 +33,12 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT TrackingTool : public itk::Object
+  class MITKIGT_EXPORT TrackingTool : public itk::Object
   {
   public:
-    mitkClassMacro(TrackingTool, itk::Object);
+    mitkClassMacroItkParent(TrackingTool, itk::Object);
 
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     virtual void SetToolTip(Point3D toolTipPosition, Quaternion orientation, ScalarType eps=0.0) = 0; ///< defines a tool tip for this tool in tool coordinates. GetPosition() and GetOrientation() return the data of the tool tip if it is defined. By default no tooltip is defined.
     virtual void GetPosition(Point3D& position) const = 0;          ///< returns the current position of the tool as an array of three floats (in the tracking device coordinate system)

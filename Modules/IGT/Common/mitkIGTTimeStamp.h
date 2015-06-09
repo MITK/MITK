@@ -49,11 +49,11 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT IGTTimeStamp : public itk::Object
+  class MITKIGT_EXPORT IGTTimeStamp : public itk::Object
   {
   public:
 
-    mitkClassMacro(IGTTimeStamp, itk::Object);
+    mitkClassMacroItkParent(IGTTimeStamp, itk::Object);
 
    /**
     * \brief creates a new instance of mitkTimeStamp

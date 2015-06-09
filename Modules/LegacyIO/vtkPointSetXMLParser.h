@@ -34,11 +34,11 @@ namespace mitk
  * This class implements the XMLParser interface of the vtkXMLParser which is based
  * on expat. It is used by the mitk::PointSetReader and is NOT INTENDED TO BE USED
  * FROM THE END-USER. If you want to read point sets, use the mitk::PointSetReader.
- * @ingroup Process
+ * @ingroup MitkLegacyIOModule
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-class DEPRECATED() MitkLegacyIO_EXPORT vtkPointSetXMLParser : public vtkXMLParser
+class DEPRECATED() MITKLEGACYIO_EXPORT vtkPointSetXMLParser : public vtkXMLParser
 {
 public:
     vtkTypeMacro(vtkPointSetXMLParser,vtkXMLParser);
@@ -55,19 +55,19 @@ public:
 
     typedef PointSetType::PointType PointType;
 
-    virtual int InitializeParser();
-    virtual int CleanupParser();
+    virtual int InitializeParser() override;
+    virtual int CleanupParser() override;
     /**
      * Handler function which is called, when a new xml start-tag
      * has been parsed.
      */
-    virtual void StartElement (const char *name, const char **atts);
+    virtual void StartElement (const char *name, const char **atts) override;
 
     /**
      * Handler function which is called, when a xml end-tag
      * has been parsed.
      */
-    virtual void EndElement (const char *name);
+    virtual void EndElement (const char *name) override;
 
     /**
      * Handler function which is called, if characted data has been
@@ -75,7 +75,7 @@ public:
      * @param inData a char array containing the parsed string data
      * @param inLength the length of the parsed data string.
      */
-    virtual void CharacterDataHandler (const char *inData, int inLength);
+    virtual void CharacterDataHandler (const char *inData, int inLength) override;
 
     /**
      * Converts the given data to mitk::ScalarType.

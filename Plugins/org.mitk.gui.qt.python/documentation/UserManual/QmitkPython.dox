@@ -21,7 +21,7 @@ same properties. When a two dimensional image is transferred the user can choose
 image object. Surfaces are fully memory mapped as a vtkPolyData object. To transfer an image or surface
 from the python runtime to the data manager just double click on the corresponding entry in the Variable Stack View.
 
-\imageMacro{MitkPythonPluginView.png,"Screenshot of the MITK Python Plugin",20}
+\imageMacro{MitkPythonPluginView.png,"Screenshot of the MITK Python Plugin",6}
 
 \section org_mitk_gui_qt_PythonConsole Console
 The Python console can be used for interactive programming. All items in the data storage can be accessed

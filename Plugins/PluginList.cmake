@@ -1,7 +1,23 @@
 
 # Plug-ins must be ordered according to their dependencies
 
-set(MITK_EXT_PLUGINS
+set(MITK_PLUGINS
+
+  org.blueberry.core.runtime:ON
+  org.blueberry.core.expressions:OFF
+  org.blueberry.core.commands:OFF
+  org.blueberry.core.jobs:OFF
+  org.blueberry.ui.qt:OFF
+  org.blueberry.ui.qt.help:OFF
+  org.blueberry.ui.qt.log:ON
+  org.blueberry.ui.qt.objectinspector:OFF
+
+  #org.blueberry.test:ON
+  #org.blueberry.uitest:ON
+
+  #Testing/org.blueberry.core.runtime.tests:ON
+  #Testing/org.blueberry.osgi.tests:ON
+
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
   org.mitk.planarfigure:ON
@@ -25,8 +41,10 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF
+  org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
   org.mitk.gui.qt.igttracking:OFF
+  org.mitk.gui.qt.igtlplugin:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.viewnavigator:OFF
@@ -39,8 +57,10 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.simulation:OFF
+  org.mitk.gui.qt.aicpregistration:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.tofutil:OFF
+  org.mitk.gui.qt.tubegraph:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.ultrasound:OFF
   org.mitk.gui.qt.volumevisualization:OFF

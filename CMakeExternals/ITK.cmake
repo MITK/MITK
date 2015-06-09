@@ -14,6 +14,10 @@ if(MITK_USE_OpenCV)
   list(APPEND proj_DEPENDENCIES OpenCV)
 endif()
 
+if(MITK_USE_HDF5)
+  list(APPEND proj_DEPENDENCIES HDF5)
+endif()
+
 set(ITK_DEPENDS ${proj})
 
 if(NOT DEFINED ITK_DIR)
@@ -40,30 +44,55 @@ if(NOT DEFINED ITK_DIR)
   # see MITK bug #17338
   list(APPEND additional_cmake_args
     -DModule_ITKReview:BOOL=ON
+  # for 4.7, the OpenJPEG is needed by review but the variable must be set
+    -DModule_ITKOpenJPEG:BOOL=ON
   )
 
-  set(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-4.5.1.cmake)
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
+  set(vcl_constexpr_patch)
+  if(GCC_VERSION VERSION_LESS 4.8 AND GCC_VERSION VERSION_GREATER 4)
+    set(vcl_constexpr_patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1-gcc-4.6.patch
+    )
+  endif()
+
+  # this will be in ITK 4.8, see https://issues.itk.org/jira/browse/ITK-3361
+  set(vcl_gcc5_patch)
+  if(GCC_VERSION VERSION_GREATER 4)
+    set(vcl_gcc5_patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1-gcc-5.patch
+    )
+  endif()
 
   ExternalProject_Add(${proj}
-     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-     BINARY_DIR ${proj}-build
-     PREFIX ${proj}-cmake
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.5.1-3e550bf8.tar.gz
-     URL_MD5 80e433ffc0e81cdc19a03dd02a3c329b
-     INSTALL_COMMAND ""
-     PATCH_COMMAND ${ITK_PATCH_COMMAND}
+     LIST_SEPARATOR ${sep}
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.7.1-20c0592.tar.gz
+     URL_MD5 f778a5f0e297c06dc629c33ec45733dc
+     # work with external GDCM
+     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1.patch
+                   ${vcl_constexpr_patch}
+                   ${vcl_gcc5_patch}
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}
-       -DBUILD_TESTING:BOOL=OFF
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(ITK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(ITK_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

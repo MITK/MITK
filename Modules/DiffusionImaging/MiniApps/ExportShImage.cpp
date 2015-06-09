@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
@@ -27,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <itkShCoefficientImageExporter.h>
 #include <itkFlipImageFilter.h>
+#include <mitkIOUtil.h>
+#include <mitkITKImageImport.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -38,7 +39,7 @@ int StartShConversion(int argc, char* argv[])
 
     parser.setTitle("Export SH Image");
     parser.setCategory("Preprocessing Tools");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -73,11 +74,14 @@ int StartShConversion(int argc, char* argv[])
         filter->GenerateData();
         OutImageType::Pointer outImage = filter->GetOutputImage();
 
-        typedef itk::ImageFileWriter< OutImageType > WriterType;
-        WriterType::Pointer writer = WriterType::New();
-        writer->SetFileName(outFile.c_str());
-        writer->SetInput(outImage);
-        writer->Update();
+        mitk::Image::Pointer image = mitk::GrabItkImageMemory(outImage.GetPointer());
+        mitk::IOUtil::Save(image, outFile );
+
+//        typedef itk::ImageFileWriter< OutImageType > WriterType;
+//        WriterType::Pointer writer = WriterType::New();
+//        writer->SetFileName(outFile.c_str());
+//        writer->SetInput(outImage);
+//        writer->Update();
     }
     catch (itk::ExceptionObject e)
     {
@@ -108,7 +112,7 @@ int main(int argc, char* argv[])
 
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Export SH Image");
-    parser.setDescription("");
+    parser.setDescription(" ");
     parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

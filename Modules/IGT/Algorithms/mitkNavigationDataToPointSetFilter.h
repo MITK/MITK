@@ -35,7 +35,7 @@ namespace mitk {
   * \ingroup IGT
   *
   */
-  class MitkIGT_EXPORT NavigationDataToPointSetFilter : public PointSetSource
+  class MITKIGT_EXPORT NavigationDataToPointSetFilter : public PointSetSource
   {
   public:
     mitkClassMacro(NavigationDataToPointSetFilter, PointSetSource);
@@ -79,7 +79,7 @@ namespace mitk {
     /**
     * \brief filter execute method
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     using Superclass::SetInput;
 
@@ -121,7 +121,7 @@ namespace mitk {
     itkGetConstMacro(OperationMode, OperationMode);
 
 
-    void GenerateOutputInformation() {}; ///< empty implementation to prevent calling of the superclass method that would try to copy information from the input NavigationData to the output PointSet, which makes no sense!
+    void GenerateOutputInformation() override {}; ///< empty implementation to prevent calling of the superclass method that would try to copy information from the input NavigationData to the output PointSet, which makes no sense!
 
   protected:
     NavigationDataToPointSetFilter();

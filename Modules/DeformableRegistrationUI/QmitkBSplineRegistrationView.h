@@ -28,13 +28,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for demons registration.
 */
-class MITK_DEFORMABLEREGISTRATION_UI_EXPORT QmitkBSplineRegistrationView : public QWidget
+class MITKDEFORMABLEREGISTRATIONUI_EXPORT QmitkBSplineRegistrationView : public QWidget
 {
   Q_OBJECT
 
 public:
 
-  QmitkBSplineRegistrationView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkBSplineRegistrationView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkBSplineRegistrationView();
 
   int GetNumberOfIterations();

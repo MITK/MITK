@@ -19,13 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIQtStyleManager.h"
 #include "org_mitk_example_gui_customviewer_Activator.h"
 
-const std::string CustomViewerWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.viewerperspective";
+const QString CustomViewerWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.example.viewerperspective";
 
 // //! [WorkbenchAdvisorCreateWindowAdvisor]
 berry::WorkbenchWindowAdvisor* CustomViewerWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
-  wwAdvisor.reset(new CustomViewerWorkbenchWindowAdvisor(configurer));
-  return wwAdvisor.data();
+  return new CustomViewerWorkbenchWindowAdvisor(configurer);
 }
 // //! [WorkbenchAdvisorCreateWindowAdvisor]
 
@@ -53,7 +52,7 @@ void CustomViewerWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Point
   //styleManager->SetStyle("/home/me/customstyle.qss");
 }
 // //! [WorkbenchAdvisorInit]
-std::string CustomViewerWorkbenchAdvisor::GetInitialWindowPerspectiveId()
+QString CustomViewerWorkbenchAdvisor::GetInitialWindowPerspectiveId()
 {
   return DEFAULT_PERSPECTIVE_ID;
 }

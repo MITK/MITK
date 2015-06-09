@@ -34,7 +34,7 @@ namespace mitk {
  * @ingroup SurfaceFilters
  * @ingroup Process
  */
-class MitkSegmentation_EXPORT ContourSetToPointSetFilter : public PointSetSource
+class MITKSEGMENTATION_EXPORT ContourSetToPointSetFilter : public PointSetSource
 {
 public:
   mitkClassMacro(ContourSetToPointSetFilter, PointSetSource);
@@ -46,9 +46,9 @@ public:
 
   itkGetMacro(Frequency, unsigned int);
 
-  virtual void GenerateOutputInformation();
+  virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   const mitk::ContourSet* GetInput(void);
 

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONIMAGINGACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
-#include <mitkExportMacros.h>
 
 namespace mitk
 {
@@ -32,7 +31,7 @@ namespace mitk
  * When the plug-in is started by the framework, it initialzes diffusion imaging
  * specific things.
  */
-class MITK_LOCAL DiffusionImagingActivator :
+class DiffusionImagingActivator :
   public QObject, public ctkPluginActivator
 {
 
@@ -47,9 +46,9 @@ public:
   /**
    * Registers diffusion imaging object factories.
    */
-  void start(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
 
-  void stop(ctkPluginContext* context);
+  void stop(ctkPluginContext* context) override;
 
 };
 

@@ -40,7 +40,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUS_EXPORT USVideoDevice : public mitk::USDevice
+  class MITKUS_EXPORT USVideoDevice : public mitk::USDevice
   {
   public:
     mitkClassMacro(USVideoDevice, mitk::USDevice);
@@ -56,7 +56,7 @@ namespace mitk {
     /**
     * \return the qualified name of this class (as returned by GetDeviceClassStatic())
     */
-    virtual std::string GetDeviceClass();
+    virtual std::string GetDeviceClass() override;
 
     /**
      * This methode is necessary instead of a static member attribute to avoid
@@ -73,7 +73,7 @@ namespace mitk {
     *
     * \return custom control interface of the video device
     */
-    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom();
+    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom() override;
 
     /**
     * \brief Remove this device from the micro service.
@@ -86,7 +86,7 @@ namespace mitk {
     /**
     * \return mitk::USImageSource connected to this device
     */
-    virtual USImageSource::Pointer GetUSImageSource();
+    virtual USImageSource::Pointer GetUSImageSource() override;
 
     itkGetMacro(Image, mitk::Image::Pointer);
     itkGetMacro(DeviceID,int);
@@ -125,29 +125,29 @@ namespace mitk {
     * \brief Is called during the initialization process.
     *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
     */
-    virtual bool OnInitialization();
+    virtual bool OnInitialization() override;
 
     /**
     * \brief Is called during the connection process.
     *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
     */
-    virtual bool OnConnection();
+    virtual bool OnConnection() override;
 
     /**
     * \brief Is called during the disconnection process.
     *  Returns true if successful and false if unsuccessful. Additionally, you may throw an exception to clarify what went wrong.
     */
-    virtual bool OnDisconnection();
+    virtual bool OnDisconnection() override;
 
     /**
     * \brief Is called during the activation process. After this method is finsihed, the device should be generating images
     */
-    virtual bool OnActivation();
+    virtual bool OnActivation() override;
 
     /**
     * \brief Is called during the deactivation process. After a call to this method the device should still be connected, but not producing images anymore.
     */
-    virtual bool OnDeactivation();
+    virtual bool OnDeactivation() override;
 
     /**
     * \brief The image source that we use to aquire data

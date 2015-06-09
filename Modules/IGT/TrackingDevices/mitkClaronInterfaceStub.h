@@ -39,11 +39,11 @@ namespace mitk
   *       methods.
   *   \ingroup IGT
   */
-  class MitkIGT_EXPORT ClaronInterface : public itk::Object
+  class MITKIGT_EXPORT ClaronInterface : public itk::Object
   {
   public:
 
-    mitkClassMacro(ClaronInterface, itk::Object);
+    mitkClassMacroItkParent(ClaronInterface, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     /**

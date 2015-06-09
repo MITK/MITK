@@ -40,10 +40,10 @@ namespace mitk {
     *
     * \ingroup US
     */
-  class MitkUS_EXPORT USImageVideoSource : public mitk::USImageSource
+  class MITKUS_EXPORT USImageVideoSource : public mitk::USImageSource
   {
   public:
-    mitkClassMacro(USImageVideoSource, itk::ProcessObject);
+    mitkClassMacroItkParent(USImageVideoSource, itk::ProcessObject);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -178,14 +178,14 @@ namespace mitk {
       *
       * \param[out] image an OpenCV-Matrix containing this image
       */
-    virtual void GetNextRawImage( cv::Mat& image );
+    virtual void GetNextRawImage( cv::Mat& image ) override;
 
     /**
       * \brief Next image is gathered from the image source.
       *
       * \param[out] image an mitk::Image containing this image
       */
-    virtual void GetNextRawImage( mitk::Image::Pointer& image );
+    virtual void GetNextRawImage( mitk::Image::Pointer& image ) override;
 
     /**
       * \brief The source of the video, managed internally

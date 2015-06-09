@@ -128,7 +128,7 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::permutateMapping
   const std::vector< VertexDescriptorType > allNodesVector
     = network->GetVectorOfAllVertexDescriptors();
 
-  ToModuleMapType::iterator iter = vertexToModuleMap->find( allNodesVector[ randomNode ] );
+  auto iter = vertexToModuleMap->find( allNodesVector[ randomNode ] );
   const int previousModuleNumber = iter->second;
 
   // if we move the node to its own module, do nothing
@@ -193,8 +193,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::joinTwoModules(
   ToModuleMapType *vertexToModuleMap, int moduleA, int moduleB )
 {
 
-  ToModuleMapType::iterator iter = vertexToModuleMap->begin();
-  ToModuleMapType::iterator end =  vertexToModuleMap->end();
+  auto iter = vertexToModuleMap->begin();
+  auto end =  vertexToModuleMap->end();
 
   while( iter != end )
   {
@@ -268,8 +268,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::splitModule(
     moduleTranslationVector[ index ] = originalNumber + index;
   }
 
-  ToModuleMapType::iterator iter2 = vertexToModuleSubMap.begin();
-  ToModuleMapType::iterator end2 =  vertexToModuleSubMap.end();
+  auto iter2 = vertexToModuleSubMap.begin();
+  auto end2 =  vertexToModuleSubMap.end();
 
   while( iter2 != end2 )
   {
@@ -321,8 +321,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::extractModuleSub
   }
 
   // add edges to subgraph
-  VertexToVertexMapType::iterator iter = graphToSubgraphVertexMap->begin();
-  VertexToVertexMapType::iterator end =  graphToSubgraphVertexMap->end();
+  auto iter = graphToSubgraphVertexMap->begin();
+  auto end =  graphToSubgraphVertexMap->end();
 
   while( iter != end )
   {
@@ -356,8 +356,8 @@ int mitk::ConnectomicsSimulatedAnnealingPermutationModularity::getNumberOfModule
   ToModuleMapType *vertexToModuleMap ) const
 {
   int maxModule( 0 );
-  ToModuleMapType::iterator iter = vertexToModuleMap->begin();
-  ToModuleMapType::iterator end =  vertexToModuleMap->end();
+  auto iter = vertexToModuleMap->begin();
+  auto end =  vertexToModuleMap->end();
   while( iter != end )
   {
     if( iter->second > maxModule )
@@ -375,8 +375,8 @@ int mitk::ConnectomicsSimulatedAnnealingPermutationModularity::getNumberOfVertic
   ToModuleMapType *vertexToModuleMap, int module ) const
 {
   int number( 0 );
-  ToModuleMapType::iterator iter = vertexToModuleMap->begin();
-  ToModuleMapType::iterator end =  vertexToModuleMap->end();
+  auto iter = vertexToModuleMap->begin();
+  auto end =  vertexToModuleMap->end();
   while( iter != end )
   {
     if( iter->second == module )
@@ -406,8 +406,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::removeModule(
     return;
   }
 
-  ToModuleMapType::iterator iter = vertexToModuleMap->begin();
-  ToModuleMapType::iterator end =  vertexToModuleMap->end();
+  auto iter = vertexToModuleMap->begin();
+  auto end =  vertexToModuleMap->end();
   while( iter != end )
   {
     if( iter->second == lastModuleNumber )
@@ -470,8 +470,8 @@ void mitk::ConnectomicsSimulatedAnnealingPermutationModularity::randomlyAssignNo
     }
   }
 
-  ToModuleMapType::iterator iter = vertexToModuleMap->begin();
-  ToModuleMapType::iterator end =  vertexToModuleMap->end();
+  auto iter = vertexToModuleMap->begin();
+  auto end =  vertexToModuleMap->end();
 
   for( unsigned int index( 0 ); ( iter != end ) && ( index < nodeList.size() ); index++, iter++ )
   {

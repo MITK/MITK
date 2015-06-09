@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 class QmitkBooleanOperationsWidget;
+class QmitkContourModelToImageWidget;
 class QmitkImageMaskingWidget;
 class QmitkMorphologicalOperationsWidget;
 class QmitkSurfaceToImageWidget;
@@ -35,17 +36,18 @@ public:
   QmitkSegmentationUtilitiesView();
   ~QmitkSegmentationUtilitiesView();
 
-  void CreateQtPartControl(QWidget* parent);
-  void SetFocus();
+  void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
 
-  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
 private:
   void AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text);
 
   Ui::QmitkSegmentationUtilitiesViewControls m_Controls;
   QmitkBooleanOperationsWidget* m_BooleanOperationsWidget;
+  QmitkContourModelToImageWidget* m_ContourModelToImageWidget;
   QmitkImageMaskingWidget* m_ImageMaskingWidget;
   QmitkMorphologicalOperationsWidget* m_MorphologicalOperationsWidget;
   QmitkSurfaceToImageWidget* m_SurfaceToImageWidget;

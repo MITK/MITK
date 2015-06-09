@@ -46,8 +46,8 @@ public:
   QmitkNavigationDataPlayerView();
   virtual ~QmitkNavigationDataPlayerView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
-  void SetFocus();
+  virtual void CreateQtPartControl(QWidget *parent) override;
+  void SetFocus() override;
 
   /**
   \brief This method creates this bundle's SIGNAL and SLOT connections

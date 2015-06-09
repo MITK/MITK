@@ -56,10 +56,10 @@ public:
 
   virtual ~QmitkImageNavigatorView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual int GetSizeFlags(bool width);
-  virtual int ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult);
+  virtual int GetSizeFlags(bool width) override;
+  virtual int ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult) override;
 
 protected slots:
 
@@ -68,10 +68,10 @@ protected slots:
 
 protected:
 
-  void SetFocus();
+  void SetFocus() override;
 
-  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart);
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
   void SetBorderColors();
   void SetBorderColor(QDoubleSpinBox *spinBox, QString colorAsStyleSheetString);
@@ -91,6 +91,12 @@ protected:
   QWidget* m_Parent;
 
   mitk::IRenderWindowPart* m_IRenderWindowPart;
+  /**
+   * @brief GetDecorationColorOfGeometry helper method to get the color of a helper geometry node.
+   * @param renderWindow The renderwindow of the geometry
+   * @return the color for decoration in QString format (#RRGGBB).
+   */
+  QString GetDecorationColorOfGeometry(QmitkRenderWindow *renderWindow);
 };
 
 #endif // _QMITKIMAGENAVIGATORVIEW_H_INCLUDED

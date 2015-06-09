@@ -1,0 +1,7 @@
+file(GLOB libFiles "@BOOST_ROOT@/bin/boost_*.lib")
+
+foreach(libFile ${libFiles})
+  message(STATUS "Moving lib file from bin to lib directory: ${libFile}")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${libFile}" "@BOOST_ROOT@/lib")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E remove "${libFile}")
+endforeach()

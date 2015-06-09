@@ -35,10 +35,10 @@ class MITK_QT_APP QmitkPreferencesDialog : public QDialog
 
 public:
 
-    QmitkPreferencesDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
+    QmitkPreferencesDialog(QWidget * parent = nullptr, Qt::WindowFlags f = nullptr);
     ~QmitkPreferencesDialog();
 
-    void SetSelectedPage(const std::string& id);
+    void SetSelectedPage(const QString& id);
 
 protected slots:
 

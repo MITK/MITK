@@ -35,10 +35,9 @@ namespace mitk {
   *
   * The number of interpolation iterations can be set via SetNumberOfIterations(int) which are 4 by dafault.
   *
-  * \ingroup ContourModelFilters
-  * \ingroup Process
+  * @ingroup MitkContourModelModule
   */
-  class MitkContourModel_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
+  class MITKCONTOURMODEL_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
   {
 
   public:
@@ -76,9 +75,9 @@ namespace mitk {
 
     virtual ~ContourModelSubDivisionFilter();
 
-    void GenerateOutputInformation() {};
+    void GenerateOutputInformation() override {};
 
-    void GenerateData();
+    void GenerateData() override;
 
     int m_InterpolationIterations;
   };

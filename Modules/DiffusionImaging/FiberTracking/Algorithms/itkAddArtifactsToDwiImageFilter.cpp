@@ -332,5 +332,45 @@ std::string AddArtifactsToDwiImageFilter< TPixelType >::GetTime()
     return out;
 }
 
+template< class TPixelType >
+void AddArtifactsToDwiImageFilter< TPixelType >::UpdateOutputInformation()
+{
+    // Calls to superclass updateoutputinformation
+    Superclass::UpdateOutputInformation();
+
+    typename InputImageType::Pointer inputImage  = static_cast< InputImageType* >( this->ProcessObject::GetInput(0) );
+    itk::ImageRegion<3> inputRegion = inputImage->GetLargestPossibleRegion();
+
+    typename itk::ImageDuplicator<InputImageType>::Pointer duplicator = itk::ImageDuplicator<InputImageType>::New();
+    duplicator->SetInputImage( inputImage );
+    duplicator->Update();
+    typename InputImageType::Pointer outputImage = duplicator->GetOutput();
+
+    if ( m_Parameters.m_SignalGen.m_CroppingFactor<1.0)
+    {
+        ImageRegion<3> croppedRegion = inputRegion; croppedRegion.SetSize(1, croppedRegion.GetSize(1)* m_Parameters.m_SignalGen.m_CroppingFactor);
+        itk::Point<double,3> shiftedOrigin = inputImage->GetOrigin(); shiftedOrigin[1] += (inputRegion.GetSize(1)-croppedRegion.GetSize(1))*inputImage->GetSpacing()[1]/2;
+
+        outputImage = InputImageType::New();
+        outputImage->SetSpacing( inputImage->GetSpacing() );
+        outputImage->SetOrigin( shiftedOrigin );
+        outputImage->SetDirection( inputImage->GetDirection() );
+        outputImage->SetLargestPossibleRegion( croppedRegion );
+        outputImage->SetBufferedRegion( croppedRegion );
+        outputImage->SetRequestedRegion( croppedRegion );
+        outputImage->SetVectorLength( inputImage->GetVectorLength() );
+        outputImage->Allocate();
+        typename InputImageType::PixelType temp;
+        temp.SetSize(inputImage->GetVectorLength());
+        temp.Fill(0.0);
+        outputImage->FillBuffer(temp);
+    }
+
+    this->GetOutput()->SetOrigin( outputImage->GetOrigin() );
+    this->GetOutput()->SetLargestPossibleRegion( outputImage->GetLargestPossibleRegion() );
+    this->GetOutput()->SetBufferedRegion( outputImage->GetLargestPossibleRegion() );
+    this->GetOutput()->SetRequestedRegion( outputImage->GetLargestPossibleRegion() );
+}
+
 }
 #endif

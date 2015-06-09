@@ -36,44 +36,36 @@ public:
   ///
   /// Creates smartpointer typedefs
   ///
-  berryObjectMacro(QmitkFunctionalitySelectionProvider);
-  ///
-  /// Create a selection provider for the given _Functionality
-  ///
-  berryNewMacro1Param(QmitkFunctionalitySelectionProvider, QmitkFunctionality*);
+  berryObjectMacro(QmitkFunctionalitySelectionProvider)
+
+  QmitkFunctionalitySelectionProvider(QmitkFunctionality* _Functionality);
+
+  virtual ~QmitkFunctionalitySelectionProvider();
 
   //# ISelectionProvider methods
   ///
   /// \see ISelectionProvider::AddSelectionChangedListener()
   ///
-  virtual void AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
+  virtual void AddSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
   ///
   /// \see ISelectionProvider::GetSelection()
   ///
-  virtual berry::ISelection::ConstPointer GetSelection() const;
+  virtual berry::ISelection::ConstPointer GetSelection() const override;
   ///
   /// \see ISelectionProvider::RemoveSelectionChangedListener()
   ///
-  virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
+  virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
   ///
   /// \see ISelectionProvider::SetSelection()
   ///
-  virtual void SetSelection(berry::ISelection::ConstPointer selection);
+  virtual void SetSelection(const berry::ISelection::ConstPointer& selection) override;
   ///
   /// Sends the nodes as selected to the workbench
   ///
-  void FireNodesSelected( std::vector<mitk::DataNode::Pointer> nodes );
+  void FireNodesSelected(const std::vector<mitk::DataNode::Pointer>& nodes );
 
 protected:
 
-  ///
-  /// nothing to do here
-  ///
-  QmitkFunctionalitySelectionProvider(QmitkFunctionality* _Functionality);
-  ///
-  /// nothing to do here
-  ///
-  virtual ~QmitkFunctionalitySelectionProvider();
   ///
   /// the functionality parent
   ///

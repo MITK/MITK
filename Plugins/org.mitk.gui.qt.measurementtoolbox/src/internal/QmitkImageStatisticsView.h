@@ -57,13 +57,13 @@ public:
 
   /*!
   \brief default constructor */
-  QmitkImageStatisticsView(QObject *parent=0, const char *name=0);
+  QmitkImageStatisticsView(QObject *parent=nullptr, const char *name=nullptr);
   /*!
   \brief default destructor */
   virtual ~QmitkImageStatisticsView();
   /*!
   \brief method for creating the widget containing the application   controls, like sliders, buttons etc. */
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
   /*!
   \brief method for creating the connections of main and control widget */
   virtual void CreateConnections();
@@ -72,7 +72,7 @@ public:
   //bool IsExclusiveFunctionality() const;
   /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
-  void OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes );
+  void OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes ) override;
 
   static const std::string VIEW_ID;
   static const int STAT_TABLE_BASE_HEIGHT;
@@ -125,11 +125,11 @@ protected:
   /** \brief Removes all Observers to images, masks and planar figures and sets corresponding members to zero */
   void ClearObservers();
 
-  void Activated();
-  void Deactivated();
-  void Visible();
-  void Hidden();
-  void SetFocus();
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
+  void SetFocus() override;
 
   /** \brief Method called when itkModifiedEvent is called by selected data. */
   void SelectedDataModified();
@@ -140,16 +140,14 @@ protected:
   /** \brief  writes the statistics to the gui*/
   void WriteStatisticsToGUI();
 
-  void NodeRemoved(const mitk::DataNode *node);
+  void NodeRemoved(const mitk::DataNode *node) override;
 
   /** \brief Is called right before the view closes (before the destructor) */
-  virtual void PartClosed( berry::IWorkbenchPartReference::Pointer );
+  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer& ) override;
   /** \brief Is called from the image navigator once the time step has changed */
   void OnTimeChanged( const itk::EventObject& );
   /** \brief Required for berry::IPartListener */
-  virtual const char* GetClassName() const { return "QmitkImageStatisticsView"; }
-  /** \brief Required for berry::IPartListener */
-  virtual Events::Types GetPartEventTypes() const { return Events::CLOSED; }
+  virtual Events::Types GetPartEventTypes() const override { return Events::CLOSED; }
 
   // member variables
   Ui::QmitkImageStatisticsViewControls *m_Controls;

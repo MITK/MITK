@@ -25,14 +25,14 @@ class QmitkDiffusionImagingAppWorkbenchAdvisor : public berry::QtWorkbenchAdviso
 
 public:
 
-  static const std::string WELCOME_PERSPECTIVE_ID; // = "org.mitk.qt.diffusionimagingapp.defaultperspective"
+  static const QString WELCOME_PERSPECTIVE_ID; // = "org.mitk.qt.diffusionimagingapp.defaultperspective"
 
-  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer);
+  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer) override;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-        berry::IWorkbenchWindowConfigurer::Pointer configurer);
+        berry::IWorkbenchWindowConfigurer::Pointer configurer) override;
 
-  std::string GetInitialWindowPerspectiveId();
+  QString GetInitialWindowPerspectiveId() override;
 
 };
 

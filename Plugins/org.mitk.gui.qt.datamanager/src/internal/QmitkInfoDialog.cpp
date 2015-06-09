@@ -31,8 +31,8 @@ QmitkInfoDialog::QmitkInfoDialog( const QList<mitk::DataNode::Pointer> &_Nodes, 
 : QDialog(parent, f)
 {
   // DIM
-  QGridLayout* parentLayout = new QGridLayout;
-  QmitkDataStorageComboBox* _QmitkDataStorageComboBox = new QmitkDataStorageComboBox(this, true);
+  auto   parentLayout = new QGridLayout;
+  auto   _QmitkDataStorageComboBox = new QmitkDataStorageComboBox(this, true);
   m_KeyWord = new QLineEdit;
   m_KeyWord->installEventFilter(this);
   m_SearchButton = new QPushButton("Search (F3)", this);

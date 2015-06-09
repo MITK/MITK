@@ -17,11 +17,18 @@ function(mitkFunctionExternalPythonBuildStep proj step _python_executable _bin_d
   # the specific python build command run by this step
   set(_command ${ARGN})
 
-  message("Running ${proj} ${step}:${_python_executable} ${_command}")
+  message("Running ${proj} ${step}: ${_python_executable} ${_command}")
 
-  set(_workdir ${_bin_dir}/${proj}-src)
-  set(_prefixdir ${_bin_dir}/${proj}-cmake)
-  set(_python ${_python_executable})
+  set(_workdir "${_bin_dir}/ep/src/${proj}")
+  set(_prefixdir "${_bin_dir}/ep/tmp")
+  set(_python "${_python_executable}")
+
+  foreach(_dir "${_workdir}" "${_prefixdir}")
+    if(NOT EXISTS "${_dir}")
+      message(SEND_ERROR "The directory ${_dir} does not exist")
+    endif()
+  endforeach()
+
   # escape spaces
   if(UNIX)
     STRING(REPLACE " " "\ " _workdir ${_workdir})
@@ -33,17 +40,15 @@ function(mitkFunctionExternalPythonBuildStep proj step _python_executable _bin_d
      COMMAND ${_python} ${_command}
      WORKING_DIRECTORY ${_workdir}
      RESULT_VARIABLE result
-     OUTPUT_VARIABLE output
+     #ERROR_QUIET
      ERROR_VARIABLE error
+     OUTPUT_VARIABLE output
+     #OUTPUT_QUIET
   )
-  set(output_file "${_prefixdir}/${proj}_${step}_step_output.txt")
-  file(WRITE ${output_file} ${output})
-
-  set(error_file "${_prefixdir}/${proj}_${step}_step_error.txt")
-  file(WRITE ${error_file} ${error})
 
   if(NOT ${result} EQUAL 0)
-    message(FATAL_ERROR "Error in: ${proj}: ${error}")
+    message("Error in: ${proj}: ${error}")
+    message("Output in: ${proj}: ${output}")
   endif()
 endfunction()
 

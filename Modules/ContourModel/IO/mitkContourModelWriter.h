@@ -53,8 +53,7 @@ namespace mitk
  *      </data>
  *    </contourModel>
  *
- * @ingroup PSIO
- * @ingroup Process
+ * @ingroup MitkContourModelModule
  */
 
 class TimeSlicedGeometry;
@@ -67,13 +66,13 @@ public:
   virtual ~ContourModelWriter();
 
   using AbstractFileWriter::Write;
-  virtual void Write();
+  virtual void Write() override;
 
 protected:
 
   ContourModelWriter(const ContourModelWriter& other);
 
-  virtual mitk::ContourModelWriter* Clone() const;
+  virtual mitk::ContourModelWriter* Clone() const override;
 
     /**
      * Converts an arbitrary type to a string. The type has to

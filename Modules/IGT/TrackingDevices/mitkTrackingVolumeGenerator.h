@@ -44,7 +44,7 @@ namespace mitk
     *  \ingroup IGT
     */
 
-class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
+class MITKIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
   {
   public:
 
@@ -99,7 +99,7 @@ class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
       /** \brief Holds the current tracking device data object, which is used to generate the volume. */
       mitk::TrackingDeviceData m_Data;
 
-      void GenerateData();
+      void GenerateData() override;
   };
 }
 #endif // MITKTRACKINGVOLUMEGENERATOR_H

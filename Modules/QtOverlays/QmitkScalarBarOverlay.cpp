@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkScalarBarOverlay::QmitkScalarBarOverlay( const char* id )
 :QmitkOverlay(id)
-, m_ScalarBar( NULL )
+, m_ScalarBar( nullptr )
 , m_ObserverTag(0)
 {
   m_Widget = m_ScalarBar = new QmitkScalarBar();
@@ -37,7 +37,7 @@ QmitkScalarBarOverlay::QmitkScalarBarOverlay( const char* id )
 QmitkScalarBarOverlay::~QmitkScalarBarOverlay()
 {
   m_PropertyList->GetProperty( m_Id )->RemoveObserver(m_ObserverTag);
-  m_PropertyList = NULL;
+  m_PropertyList = nullptr;
 }
 
 void QmitkScalarBarOverlay::GenerateData( mitk::PropertyList::Pointer pl )
@@ -69,7 +69,7 @@ void QmitkScalarBarOverlay::SetScaleFactor()
     MITK_DEBUG << "Property " << m_Id << " could not be found";
   }
 
-  if ( m_ScalarBar != NULL )
+  if ( m_ScalarBar != nullptr )
   {
     m_ScalarBar->SetScaleFactor( scale );
   }

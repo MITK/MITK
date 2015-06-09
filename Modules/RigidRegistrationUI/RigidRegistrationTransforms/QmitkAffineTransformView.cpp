@@ -39,26 +39,26 @@ itk::Object::Pointer QmitkAffineTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())
   {
-    AccessByItk(m_FixedImage, GetTransform2);
+    AccessTwoImagesFixedDimensionByItk(m_FixedImage, m_MovingImage, GetTransform2, 3);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template < class TPixelType, class MovingPixelType, unsigned int VImageDimension >
+itk::Object::Pointer QmitkAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1, itk::Image<MovingPixelType, VImageDimension>* itkImage2)
 {
   typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
+  typedef typename itk::Image< MovingPixelType, VImageDimension >  MovingImageType;
 
   // the fixedImage is the input parameter (fix for Bug #14626)
   typename FixedImageType::Pointer fixedImage = itkImage1;
 
-  // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
-  typename mitk::ImageToItk<MovingImageType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImageType>::New();
-  movingImageToItk->SetInput(m_MovingImage);
-  movingImageToItk->Update();
-  typename MovingImageType::Pointer movingImage = movingImageToItk->GetOutput();
+//  // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
+//  typename mitk::ImageToItk<MovingImageType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImageType>::New();
+//  movingImageToItk->SetInput(m_MovingImage);
+//  movingImageToItk->Update();
+  typename MovingImageType::Pointer movingImage = itkImage2;
 
   typename itk::AffineTransform< double, VImageDimension>::Pointer transformPointer = itk::AffineTransform< double, VImageDimension>::New();
   transformPointer->SetIdentity();

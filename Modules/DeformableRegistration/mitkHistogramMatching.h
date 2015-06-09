@@ -34,7 +34,7 @@ namespace mitk
   \author Daniel Stein
   */
 
-  class MITK_DEFORMABLEREGISTRATION_EXPORT HistogramMatching : public RegistrationBase
+  class MITKDEFORMABLEREGISTRATION_EXPORT HistogramMatching : public RegistrationBase
   {
 
   public:
@@ -64,7 +64,7 @@ namespace mitk
     /*!
     * \brief Starts the histogram matching.
     */
-    virtual void GenerateData()
+    virtual void GenerateData() override
     {
       if (this->GetInput())
       {

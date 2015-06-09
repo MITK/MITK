@@ -1,0 +1,9 @@
+<config>
+  <event_variant name="PickByDouble" class="MouseDoubleClickEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant name="PickByShift" class="MousePressEvent">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+</config>

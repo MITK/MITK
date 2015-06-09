@@ -19,13 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkFunctionality.h>
 
-#include <string>
-
 #include "ui_QmitkPreprocessingViewControls.h"
 
-#include "itkDWIVoxelFunctor.h"
+// st includes
+#include <string>
 
-#include "mitkDiffusionImage.h"
+// itk includes
+#include <itkImage.h>
+#include <itkVectorImage.h>
+
+// mitk includes
+#include <mitkImage.h>
+#include "itkDWIVoxelFunctor.h"
+#include <mitkDiffusionPropertyHelper.h>
 
 typedef short DiffusionPixelType;
 
@@ -52,28 +58,27 @@ class QmitkPreprocessingView : public QmitkFunctionality
 
   static const std::string VIEW_ID;
 
-  typedef vnl_vector_fixed< double, 3 >                                 GradientDirectionType;
-  typedef itk::VectorContainer< unsigned int, GradientDirectionType >   GradientDirectionContainerType;
-  typedef mitk::DiffusionImage<short>                                   MitkDwiType;
-  typedef itk::VectorImage< short, 3 >                                  ItkDwiType;
-  typedef itk::Image< unsigned char, 3 >                                UcharImageType;
-  typedef itk::Image< double, 3 >                                       ItkDoubleImageType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
+  typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
+  typedef itk::Image< unsigned char, 3 >                                  UcharImageType;
+  typedef itk::Image< double, 3 >                                         ItkDoubleImageType;
 
   QmitkPreprocessingView();
   virtual ~QmitkPreprocessingView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
   /// \brief Called when the functionality is activated
-  virtual void Activated();
+  virtual void Activated() override;
 
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
   static const int nrconvkernels;
 
@@ -132,7 +137,7 @@ protected:
   void UpdateBValueTableWidget(int i);
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkPreprocessingViewControls* m_Controls;
 
@@ -142,10 +147,9 @@ protected:
 
   mitk::DataNode::Pointer                           m_SelectedImageNode;
   mitk::Image::Pointer                              m_SelectedImage;
-  mitk::DiffusionImage<DiffusionPixelType>::Pointer m_DiffusionImage;
   std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
 
-  void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::DiffusionImage<DiffusionPixelType>::Pointer ImPtr, QString imageName, mitk::DataNode* parent);
+  void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::Image::Pointer ImPtr, QString imageName, mitk::DataNode* parent);
 };
 
 

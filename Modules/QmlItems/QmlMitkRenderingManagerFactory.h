@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * CreateRenderingManager().
  *
  */
-class MitkQmlItems_EXPORT QmlMitkRenderingManagerFactory : public mitk::RenderingManagerFactory
+class MITKQMLITEMS_EXPORT QmlMitkRenderingManagerFactory : public mitk::RenderingManagerFactory
 {
 public:
 
@@ -38,7 +38,7 @@ public:
 
   ~QmlMitkRenderingManagerFactory();
 
-  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const;
+  virtual mitk::RenderingManager::Pointer CreateRenderingManager() const override;
 
 private:
 

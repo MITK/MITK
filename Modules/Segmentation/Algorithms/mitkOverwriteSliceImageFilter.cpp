@@ -123,8 +123,8 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
   if ( m_CreateUndoInformation )
   {
     // create do/undo operations (we don't execute the doOp here, because it has already been executed during calculation of the diff image
-    ApplyDiffImageOperation* doOp = new ApplyDiffImageOperation( OpTEST, const_cast<Image*>(input.GetPointer()), m_SliceDifferenceImage, m_TimeStep, m_SliceDimension, m_SliceIndex );
-    ApplyDiffImageOperation* undoOp = new ApplyDiffImageOperation( OpTEST, const_cast<Image*>(input.GetPointer()), m_SliceDifferenceImage, m_TimeStep, m_SliceDimension, m_SliceIndex );
+    auto   doOp = new ApplyDiffImageOperation( OpTEST, const_cast<Image*>(input.GetPointer()), m_SliceDifferenceImage, m_TimeStep, m_SliceDimension, m_SliceIndex );
+    auto   undoOp = new ApplyDiffImageOperation( OpTEST, const_cast<Image*>(input.GetPointer()), m_SliceDifferenceImage, m_TimeStep, m_SliceDimension, m_SliceIndex );
     undoOp->SetFactor( -1.0 );
     OperationEvent* undoStackItem = new OperationEvent( DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, this->EventDescription(m_SliceDimension, m_SliceIndex, m_TimeStep) );
     UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );

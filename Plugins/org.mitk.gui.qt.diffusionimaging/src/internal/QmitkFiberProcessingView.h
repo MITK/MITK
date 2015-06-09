@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkFiberProcessingViewControls.h"
 
 #include <mitkPlanarFigureComposite.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkSurface.h>
 
 #include <itkCastImageFilter.h>
@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkFloatArray.h>
 
 /*!
-\brief View to process fiber bundles. Supplies methods to generate images from the selected bundle and much more.
+\brief View to process fiber bundles. Supplies methods to extract fibers from the bundle, join and subtract bundles and much more.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
@@ -62,27 +62,50 @@ public:
   QmitkFiberProcessingView();
   virtual ~QmitkFiberProcessingView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
-  virtual void Activated();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
+  virtual void Activated() override;
 
 protected slots:
 
-  void PruneBundle();               ///< remove too short/too long fibers
-  void MirrorFibers();              ///< mirror bundle on the specified plane
-  void ProcessSelectedBundles();    ///< start selected operation on fiber bundle (e.g. tract density image generation)
-  void ResampleSelectedBundles();   ///< smooth fiber bundle using the specified number of sampling points per cm.
-  void DoImageColorCoding();        ///< color fibers by selected scalar image
-  void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
-  void CompressSelectedBundles();   ///< remove points below certain error threshold
-  void CalculateFiberDirections();  ///< Calculate main fiber directions from tractogram
+  void OnDrawCircle();          ///< add circle interactors etc.
+  void OnDrawPolygon();         ///< add circle interactors etc.
+  void GenerateAndComposite();
+  void GenerateOrComposite();
+  void GenerateNotComposite();
+
+  void JoinBundles();               ///< merge selected fiber bundles
+  void SubstractBundles();          ///< subtract bundle A from bundle B. Not commutative! Defined by order of selection.
+  void GenerateRoiImage();          ///< generate binary image of selected planar figures.
+
+  void Remove();
+  void Extract();
+  void Modify();
+  void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
+
+  virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
 protected:
 
+  void MirrorFibers();              ///< mirror bundle on the specified plane
+  void ResampleSelectedBundles();   ///< smooth fiber bundle using the specified number of sampling points per cm.
+  void DoImageColorCoding();        ///< color fibers by selected scalar image
+  void DoCurvatureColorCoding();    ///< color fibers by curvature
+  void CompressSelectedBundles();   ///< remove points below certain error threshold
+  void WeightFibers();
+
+  void RemoveWithMask(bool removeInside);
+  void RemoveDir();
+  void ApplyCurvatureThreshold();   ///< remove/split fibers with a too high curvature threshold
+  void PruneBundle();               ///< remove too short/too long fibers
+
+  void ExtractWithMask(bool onlyEnds, bool invert);
+  void ExtractWithPlanarFigure();
+
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkFiberProcessingViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;
@@ -134,20 +157,31 @@ protected:
 
   template < typename TPixel, unsigned int VImageDimension >
       void InternalReorientImagePlane(
-          const itk::Image< TPixel, VImageDimension > *image, mitk::Geometry3D* planegeo3D, int additionalIndex );
+        const itk::Image< TPixel, VImageDimension > *image, mitk::BaseGeometry* planegeo3D, int additionalIndex );
 
-  void GenerateStats(); ///< generate statistics of selected fiber bundles
-  void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
-
+  int m_CircleCounter;                                      ///< used for data node naming
+  int m_PolygonCounter;                                     ///< used for data node naming
   std::vector<mitk::DataNode::Pointer>  m_SelectedFB;       ///< selected fiber bundle nodes
-  mitk::Image::Pointer                  m_SelectedImage;
-  float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
+  std::vector<mitk::DataNode::Pointer>  m_SelectedPF;       ///< selected planar figure nodes
   std::vector<mitk::Surface::Pointer>   m_SelectedSurfaces;
+  mitk::Image::Pointer                  m_SelectedImage;
+  mitk::Image::Pointer                  m_InternalImage;
+  mitk::PlanarFigure::Pointer           m_PlanarFigure;
+  itkUCharImageType::Pointer            m_InternalImageMask3D;
+  itkUCharImageType::Pointer            m_PlanarFigureImage;
+  float                                 m_UpsamplingFactor; ///< upsampling factor for all image generations
+  mitk::DataNode::Pointer               m_MaskImageNode;
 
-  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundleX::Pointer fib, bool binary, bool absolute);
-  mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundleX::Pointer fib);
-  mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundleX::Pointer fib);
-  mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundleX::Pointer fib);
+  void AddCompositeToDatastorage(mitk::DataNode::Pointer pfc, std::vector<mitk::DataNode::Pointer> children, mitk::DataNode::Pointer parentNode=NULL);
+  void debugPFComposition(mitk::PlanarFigureComposite::Pointer , int );
+  void WritePfToImage(mitk::DataNode::Pointer node, mitk::Image* image);
+  mitk::DataNode::Pointer GenerateTractDensityImage(mitk::FiberBundle::Pointer fib, bool binary, bool absolute);
+  mitk::DataNode::Pointer GenerateColorHeatmap(mitk::FiberBundle::Pointer fib);
+  mitk::DataNode::Pointer GenerateFiberEndingsImage(mitk::FiberBundle::Pointer fib);
+  mitk::DataNode::Pointer GenerateFiberEndingsPointSet(mitk::FiberBundle::Pointer fib);
+
+  void NodeAdded( const mitk::DataNode* node ) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
 };
 
 

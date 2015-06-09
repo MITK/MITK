@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QMenu>
-#include <QmitkNewPerspectiveDialog.h>
 #include <mitkQtPerspectiveItem.h>
 #include <mitkQtViewItem.h>
 
@@ -46,26 +45,25 @@ class QmitkViewNavigatorWidget : public QWidget
 
 public:
 
-    QmitkViewNavigatorWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkViewNavigatorWidget (berry::IWorkbenchWindow::Pointer window,
+                              QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     virtual ~QmitkViewNavigatorWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);
     void setFocus();
 
     bool FillTreeList();
-    void UpdateTreeList(QStandardItem* item = NULL, berry::IWorkbenchPartReference* partRef=NULL, const std::string& changeId="");
+    void UpdateTreeList(QStandardItem* item = nullptr, berry::IWorkbenchPartReference* partRef=nullptr, const std::string& changeId="");
 
-    berry::IPerspectiveListener::Pointer    m_PerspectiveListener;
-    berry::IWindowListener::Pointer         m_WindowListener;
+    QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
+    QScopedPointer<berry::IWindowListener>         m_WindowListener;
 
 public slots:
 
     void CustomMenuRequested(QPoint pos);
     void ItemClicked(const QModelIndex &index);
-    void AddPerspective();
-    void ClonePerspective();
-    void ResetPerspective();
-    void DeletePerspective();
+    void SaveCurrentPerspectiveAs();
+    void ResetCurrentPerspective();
     void CloseAllPerspectives();
     void ClosePerspective();
     void ExpandAll();
@@ -74,17 +72,20 @@ public slots:
 
 protected:
 
+    friend class ViewNavigatorPerspectiveListener;
+
     // member variables
-    Ui::QmitkViewNavigatorWidgetControls          m_Controls;
+    Ui::QmitkViewNavigatorWidgetControls        m_Controls;
     QWidget*                                    m_Parent;
     QStandardItemModel*                         m_TreeModel;
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
-    berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
+    berry::IPerspectiveDescriptor::Pointer      m_ActivePerspective;
     bool                                        m_Generated;
 
 private:
 
+    berry::IWorkbenchWindow::Pointer m_Window;
 };
 
 #endif // _QMITKViewNavigatorWidget_H_INCLUDED

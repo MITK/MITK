@@ -31,7 +31,7 @@ class QmitkUSControlsDopplerWidget;
   * This class handles the mitk::USControlInterfaceDoppler of mitk::USDevice
   * objects.
   */
-class MitkUSUI_EXPORT QmitkUSControlsDopplerWidget : public QWidget
+class MITKUSUI_EXPORT QmitkUSControlsDopplerWidget : public QWidget
 {
     Q_OBJECT
 
@@ -46,7 +46,7 @@ public:
     * If a null pointer is given for 'controlInterface' all gui control elements
     * will be disabled.
     */
-  explicit QmitkUSControlsDopplerWidget(mitk::USControlInterfaceDoppler::Pointer controlInterface, QWidget *parent = 0);
+  explicit QmitkUSControlsDopplerWidget(mitk::USControlInterfaceDoppler::Pointer controlInterface, QWidget *parent = nullptr);
   ~QmitkUSControlsDopplerWidget();
 
 private:

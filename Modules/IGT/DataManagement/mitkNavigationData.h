@@ -37,10 +37,10 @@ namespace mitk {
     *
     * \ingroup IGT
     */
-  class MitkIGT_EXPORT NavigationData : public itk::DataObject
+  class MITKIGT_EXPORT NavigationData : public itk::DataObject
     {
     public:
-      mitkClassMacro(NavigationData, itk::DataObject);
+      mitkClassMacroItkParent(NavigationData, itk::DataObject);
       itkFactorylessNewMacro(Self);
       itkCloneMacro(Self);
       mitkNewMacro2Param(Self, mitk::AffineTransform3D::Pointer, const bool);
@@ -138,21 +138,21 @@ namespace mitk {
       * SmartPointers to the same NavigationData object since separate DataObjects are
       * still maintained.
       */
-      virtual void Graft(const DataObject *data);
+      virtual void Graft(const DataObject *data) override;
 
       /**
       * \brief copy meta data of a NavigationData object
       *
       * copies all meta data from NavigationData data to this object
       */
-      virtual void CopyInformation(const DataObject* data);
+      virtual void CopyInformation(const DataObject* data) override;
 
       /**
       * \brief Prints the object information to the given stream os.
       * \param os The stream which is used to print the output.
       * \param indent Defines the indentation of the output.
       */
-      void PrintSelf(std::ostream& os, itk::Indent indent) const;
+      void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
       /**
       * Set the position part of m_CovErrorMatrix to I*error^2
@@ -291,7 +291,7 @@ namespace mitk {
       * @param verbose Flag indicating if the user wants detailed console output or not.
       * @return true, if all subsequent comparisons are true, false otherwise
       */
-      MitkIGT_EXPORT bool Equal( const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps = mitk::eps, bool verbose = false );
+      MITKIGT_EXPORT bool Equal( const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps = mitk::eps, bool verbose = false );
 
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

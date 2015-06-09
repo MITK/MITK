@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
-    <height>592</height>
+    <width>388</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -102,11 +102,35 @@ p, li { white-space: pre-wrap; }
             <widget class="QWidget" name="page">
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <item>
-               <widget class="QLabel" name="m_toolLabel">
-                <property name="text">
-                 <string>Loaded Tools: &lt;none&gt;</string>
-                </property>
-               </widget>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>ToolStorage:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="m_toolLabel">
+                  <property name="text">
+                   <string>&lt;none&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
               <item>
                <widget class="QmitkToolTrackingStatusWidget" name="m_TrackingToolsStatusWidget" native="true">
@@ -225,7 +249,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QLabel" name="m_TrackingControlLabel">
             <property name="text">
-             <string>Status: &lt;not configured&gt;</string>
+             <string>Status: disconnected</string>
             </property>
            </widget>
           </item>
@@ -248,7 +272,7 @@ p, li { white-space: pre-wrap; }
              <widget class="QPushButton" name="m_ConnectDisconnectButton">
               <property name="minimumSize">
                <size>
-                <width>120</width>
+                <width>142</width>
                 <height>0</height>
                </size>
               </property>
@@ -278,12 +302,52 @@ p, li { white-space: pre-wrap; }
              <widget class="QPushButton" name="m_StartStopTrackingButton">
               <property name="minimumSize">
                <size>
-                <width>120</width>
+                <width>142</width>
                 <height>0</height>
                </size>
               </property>
               <property name="text">
                <string>Start Tracking</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <item>
+             <spacer name="horizontalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="m_TrackingFrozenLabel">
+              <property name="text">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Tracking Frozen!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="m_FreezeUnfreezeTrackingButton">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>142</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Freeze Tracking</string>
               </property>
              </widget>
             </item>
@@ -347,7 +411,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QLabel" name="m_OptionsUpdateRateLabel">
            <property name="text">
-            <string>Update Rate (Times Per Second)</string>
+            <string>Update Rate [per second]</string>
            </property>
           </widget>
          </item>
@@ -366,8 +430,11 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <widget class="QSpinBox" name="m_UpdateRate">
+           <property name="minimum">
+            <number>1</number>
+           </property>
            <property name="maximum">
-            <number>999</number>
+            <number>100</number>
            </property>
            <property name="value">
             <number>10</number>
@@ -377,25 +444,158 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="m_ShowToolQuaternions">
+        <widget class="QCheckBox" name="m_UseDifferentUpdateRates">
          <property name="text">
-          <string>Show Tool Quaternions</string>
+          <string>Use different Render and Log Update Rates</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_6">
+        <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0">
+         <item>
+          <widget class="QLabel" name="m_OptionsRenderUpdateRateLabel">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Render Update Rate [fps]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_RenderUpdateRate">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="m_renderWarningLabel">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="text">
-          <string>Caution, only for backward compatibility:</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Rendering Disabled!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::AutoText</enum>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="m_InverseMode">
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QLabel" name="m_OptionsLogUpdateRateLabel">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Log Update Rate [per second]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="m_LogUpdateRate">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>120</number>
+           </property>
+           <property name="singleStep">
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>60</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="m_DisableAllTimers">
          <property name="text">
-          <string>Inverse mode (Quaternions are stored inverse)</string>
+          <string>Disable All Timers</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>100</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_12">
+         <item>
+          <widget class="QCheckBox" name="m_ShowToolQuaternions">
+           <property name="text">
+            <string>Show Tool Quaternions</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Caution, only for backward compatibility:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="m_InverseMode">
+           <property name="text">
+            <string>Inverse mode (Quaternions are stored inverse)</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <spacer name="verticalSpacer_3">
@@ -405,7 +605,7 @@ p, li { white-space: pre-wrap; }
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>597</height>
+           <height>600</height>
           </size>
          </property>
         </spacer>

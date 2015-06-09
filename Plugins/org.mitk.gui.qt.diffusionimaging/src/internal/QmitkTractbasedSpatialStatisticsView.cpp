@@ -82,9 +82,9 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
   mitk::TbssRoiImage* roiImage;
   mitk::TbssImage* image;
   mitk::Image* img;
-  mitk::FiberBundleX* fib;
-  mitk::PlanarFigure* start;
-  mitk::PlanarFigure* end;
+  mitk::FiberBundle* fib;
+  mitk::DataNode* start;
+  mitk::DataNode* end;
 
   m_CurrentStartRoi = NULL;
   m_CurrentEndRoi = NULL;
@@ -122,10 +122,10 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
         }
       }
 
-      else if (QString("FiberBundleX").compare(nodeData->GetNameOfClass())==0)
+      else if (QString("FiberBundle").compare(nodeData->GetNameOfClass())==0)
       {
         foundFiberBundle = true;
-        fib = static_cast<mitk::FiberBundleX*>(nodeData);
+        fib = static_cast<mitk::FiberBundle*>(nodeData);
         this->m_CurrentFiberNode = nodes[i];
       }
 
@@ -134,13 +134,13 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
       {
         if(!foundStartRoi)
         {
-          start = dynamic_cast<mitk::PlanarFigure*>(nodeData);
+          start = nodes[i];
           this->m_CurrentStartRoi = nodes[i];
           foundStartRoi =  true;
         }
         else
         {
-          end = dynamic_cast<mitk::PlanarFigure*>(nodeData);
+          end = nodes[i];
           this->m_CurrentEndRoi = nodes[i];
           foundEndRoi = true;
         }
@@ -525,21 +525,16 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QPointF& pos)
 void QmitkTractbasedSpatialStatisticsView::Cut()
 {
   mitk::BaseData* fibData = m_CurrentFiberNode->GetData();
-  mitk::FiberBundleX* fib = static_cast<mitk::FiberBundleX*>(fibData);
+  mitk::FiberBundle* fib = static_cast<mitk::FiberBundle*>(fibData);
 
-  mitk::BaseData* startData = m_CurrentStartRoi->GetData();
-  mitk::PlanarFigure* startRoi = static_cast<mitk::PlanarFigure*>(startData);
-  mitk::PlaneGeometry* startGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(startRoi->GetGeometry2D()) );
+  mitk::PlaneGeometry* startGeometry2D = const_cast<mitk::PlaneGeometry*>(dynamic_cast<mitk::PlanarFigure*>(m_CurrentStartRoi->GetData())->GetPlaneGeometry());
+  mitk::PlaneGeometry* endGeometry2D = const_cast<mitk::PlaneGeometry*>(dynamic_cast<mitk::PlanarFigure*>(m_CurrentEndRoi->GetData())->GetPlaneGeometry());
 
-  mitk::BaseData* endData = m_CurrentEndRoi->GetData();
-  mitk::PlanarFigure* endRoi = static_cast<mitk::PlanarFigure*>(endData);
-  mitk::PlaneGeometry* endGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(endRoi->GetGeometry2D()) );
+  mitk::Point3D startCenter = dynamic_cast<mitk::PlanarFigure*>(m_CurrentStartRoi->GetData())->GetWorldControlPoint(0); //center Point of start roi
+  mitk::Point3D endCenter = dynamic_cast<mitk::PlanarFigure*>(m_CurrentEndRoi->GetData())->GetWorldControlPoint(0); //center Point of end roi
 
-  mitk::Point3D startCenter = startRoi->GetWorldControlPoint(0); //center Point of start roi
-  mitk::Point3D endCenter = endRoi->GetWorldControlPoint(0); //center Point of end roi
-
-  mitk::FiberBundleX::Pointer inStart = fib->ExtractFiberSubset(startRoi);
-  mitk::FiberBundleX::Pointer inBoth = inStart->ExtractFiberSubset(endRoi);
+  mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(m_CurrentStartRoi, NULL);
+  mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(m_CurrentEndRoi, NULL);
 
   int num = inBoth->GetNumFibers();
 
@@ -986,7 +981,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
   // Add the lines to the dataset
   polyData->SetLines(cells);
 
-  mitk::FiberBundleX::Pointer cutBundle = mitk::FiberBundleX::New(polyData);
+  mitk::FiberBundle::Pointer cutBundle = mitk::FiberBundle::New(polyData);
 
 
   mitk::DataNode::Pointer cutNode = mitk::DataNode::New();
@@ -1082,9 +1077,9 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 }
 
 void QmitkTractbasedSpatialStatisticsView::PlotFiber4D(mitk::TbssImage* image,
-                                                            mitk::FiberBundleX* fib,
-                                                            mitk::PlanarFigure* startRoi,
-                                                            mitk::PlanarFigure* endRoi)
+                                                            mitk::FiberBundle* fib,
+                                                            mitk::DataNode* startRoi,
+                                                            mitk::DataNode* endRoi)
 {
 
 
@@ -1101,8 +1096,8 @@ void QmitkTractbasedSpatialStatisticsView::PlotFiber4D(mitk::TbssImage* image,
 
 }
 
-void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundleX *fib, mitk::Image* img,
-                                                           mitk::PlanarFigure* startRoi, mitk::PlanarFigure* endRoi)
+void QmitkTractbasedSpatialStatisticsView:: PlotFiberBundle(mitk::FiberBundle *fib, mitk::Image* img,
+                                                           mitk::DataNode* startRoi, mitk::DataNode* endRoi)
 {
   bool avg = m_Controls->m_Average->isChecked();
   int segments = m_Controls->m_Segments->value();

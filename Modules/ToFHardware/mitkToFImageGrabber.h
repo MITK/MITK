@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkToFImageGrabber_h
 
 #include <MitkToFHardwareExports.h>
-#include "mitkCommon.h"
-#include "mitkImageSource.h"
-#include "mitkToFCameraDevice.h"
+#include <mitkCommon.h>
+#include <mitkToFImageSource.h>
+#include <mitkToFCameraDevice.h>
 
-#include "itkObject.h"
-#include "itkObjectFactory.h"
+#include <itkObject.h>
+#include <itkObjectFactory.h>
 
 namespace mitk
 {
@@ -35,7 +35,7 @@ namespace mitk
   *
   * \ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFImageGrabber : public mitk::ImageSource
+  class MITKTOFHARDWARE_EXPORT ToFImageGrabber : public mitk::ToFImageSource
   {
   public:
 
@@ -202,7 +202,7 @@ namespace mitk
     2: intensity image
     3: RGB image
     */
-    void GenerateData();
+    void GenerateData() override;
 
   private:
 

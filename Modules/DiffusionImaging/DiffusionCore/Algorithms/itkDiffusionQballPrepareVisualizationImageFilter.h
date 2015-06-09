@@ -38,7 +38,7 @@ namespace itk{
 
 template< class TOdfPixelType,
           int NrOdfDirections>
-class MitkDiffusionCore_EXPORT DiffusionQballPrepareVisualizationImageFilter :
+class MITKDIFFUSIONCORE_EXPORT DiffusionQballPrepareVisualizationImageFilter :
   public ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >,
                               Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {

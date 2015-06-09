@@ -1,0 +1,21 @@
+diff -urNb ITK-4.7.1/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in ITK/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in
+--- ITK-4.7.1/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in	2014-02-28 19:46:45.000000000 +0100
++++ ITK/Modules/ThirdParty/VNL/src/vxl/vcl/vcl_config_compiler.h.in	2015-02-06 01:37:50.344008518 +0100
+@@ -120,7 +120,7 @@
+ // define VCL_CAN_STATIC_CONST_INIT_INT to either 0 or 1.
+ 
+ //#define VCL_CAN_STATIC_CONST_INIT_INT 1 /* allowed */
+-//#define VCL_CAN_STATIC_CONST_INIT_INT 0 /* not allowed */
++#define VCL_CAN_STATIC_CONST_INIT_INT 0 /* not allowed */
+ #ifndef VCL_CAN_STATIC_CONST_INIT_INT
+ # define VCL_CAN_STATIC_CONST_INIT_INT @VCL_STATIC_CONST_INIT_INT@
+ #endif
+@@ -144,7 +144,7 @@
+ // define VCL_CAN_STATIC_CONST_INIT_FLOAT to either 0 or 1.
+ 
+ //#define VCL_CAN_STATIC_CONST_INIT_FLOAT 1 /* allowed */
+-//#define VCL_CAN_STATIC_CONST_INIT_FLOAT 0 /* not allowed */
++#define VCL_CAN_STATIC_CONST_INIT_FLOAT 0 /* not allowed */
+ #ifndef VCL_CAN_STATIC_CONST_INIT_FLOAT
+ # define VCL_CAN_STATIC_CONST_INIT_FLOAT @VCL_STATIC_CONST_INIT_FLOAT@
+ #endif

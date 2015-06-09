@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string ListenerViewMitk::VIEW_ID = "org.mitk.views.listenerviewmitk";
 
-ListenerViewMitk::ListenerViewMitk() : m_Parent(0)
+ListenerViewMitk::ListenerViewMitk() : m_Parent(nullptr)
 {
 }
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.geometrytools"
+          name="Geometry Tools"
+          class="QmitkGeometryToolsView"
+          icon="resources/icon.xpm" >
+          <description>Modify the geometry of objects</description>
+          <keywordReference id="org.mitk.views.geometrytools.Keyword"/>
+    </view>
+  </extension>
+  <extension point="org.blueberry.ui.keywords">
+    <keyword label="Rotate" id="org.mitk.views.geometrytools.Keyword"/>
+    <keyword label="Translate" id="org.mitk.views.geometrytools.Keyword"/>
+    <keyword label="Geometry" id="org.mitk.views.geometrytools.Keyword"/>
+    <keyword label="Interaction" id="org.mitk.views.geometrytools.Keyword"/>
+    <keyword label="Move" id="org.mitk.views.geometrytools.Keyword"/>
+    <keyword label="Shift" id="org.mitk.views.geometrytools.Keyword"/>
+  </extension>
+</plugin>

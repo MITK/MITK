@@ -1,42 +1,63 @@
-
-# Update the CMake module path
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
-
-set(CppMicroServices_DIR "@CppMicroServices_DIR@")
-
-# Include MITK macros
-include(MacroParseArguments)
-include(mitkFunctionCheckMitkCompatibility)
-include(mitkFunctionOrganizeSources)
-include(mitkFunctionCreateWindowsBatchScript)
-include(mitkFunctionInstallProvisioningFiles)
-include(mitkFunctionInstallAutoLoadModules)
-include(mitkFunctionGetLibrarySearchPaths)
-include(mitkFunctionUseModules)
-include(mitkMacroCreateModuleConf)
-include(mitkFunctionCheckModuleDependencies)
-include(mitkFunctionCreateModule)
-include(mitkMacroCreateExecutable)
-include(mitkMacroCheckModule)
-include(mitkMacroCreateModuleTests)
-include(mitkFunctionAddCustomModuleTest)
-include(mitkMacroUseModule)
-include(mitkMacroMultiplexPicType)
-include(mitkMacroInstall)
-include(mitkMacroInstallHelperApp)
-include(mitkMacroInstallTargets)
-include(mitkMacroGenerateToolsLibrary)
-include(mitkMacroCreateCTKPlugin)
-include(mitkMacroGetPMDPlatformString)
-
-# Standard CMake macros
-include(FeatureSummary)
+if(CMAKE_VERSION VERSION_LESS @MITK_CMAKE_MINIMUM_REQUIRED_VERSION@)
+  message(FATAL_ERROR "MITK requires at least CMake Version @MITK_CMAKE_MINIMUM_REQUIRED_VERSION@")
+endif()
 
 # The MITK version number
 set(MITK_VERSION_MAJOR "@MITK_VERSION_MAJOR@")
 set(MITK_VERSION_MINOR "@MITK_VERSION_MINOR@")
 set(MITK_VERSION_PATCH "@MITK_VERSION_PATCH@")
 set(MITK_VERSION_STRING "@MITK_VERSION_STRING@")
+
+#-----------------------------------------------------------------------------
+# C++ language standard
+#-----------------------------------------------------------------------------
+
+set(MITK_CXX_STANDARD @MITK_CXX_STANDARD@)
+
+#-----------------------------------------------------------------------------
+# Include required CMake scripts
+#-----------------------------------------------------------------------------
+
+# Update the CMake module path
+set(MITK_CMAKE_MODULE_PATH "@MITK_SOURCE_DIR@/CMake")
+list(APPEND CMAKE_MODULE_PATH ${MITK_CMAKE_MODULE_PATH})
+
+# Standard CMake macros
+include(CMakeParseArguments)
+include(FeatureSummary)
+include(FindPackageHandleStandardArgs)
+include(GenerateExportHeader)
+
+# Include MITK macros
+include(MacroParseArguments)
+include(mitkFunctionAddCustomModuleTest)
+include(mitkFunctionCheckMitkCompatibility)
+include(mitkFunctionCheckModuleDependencies)
+include(mitkFunctionCreateBlueBerryApplication)
+include(mitkFunctionCreateModule)
+include(mitkFunctionCreatePlugin)
+include(mitkFunctionCreateProvisioningFile)
+include(mitkFunctionCreateWindowsBatchScript)
+include(mitkFunctionGetLibrarySearchPaths)
+include(mitkFunctionInstallAutoLoadModules)
+include(mitkFunctionInstallCTKPlugin)
+include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionInstallThirdPartyCTKPlugins)
+include(mitkFunctionOrganizeSources)
+include(mitkFunctionUseModules)
+include(mitkMacroCreateExecutable)
+include(mitkMacroCreateModuleTests)
+include(mitkMacroFindDependency)
+include(mitkMacroGenerateToolsLibrary)
+include(mitkMacroGetPMDPlatformString)
+include(mitkMacroInstall)
+include(mitkMacroInstallHelperApp)
+include(mitkMacroInstallTargets)
+include(mitkMacroMultiplexPicType)
+
+#-----------------------------------------------------------------------------
+# MITK flags and directories
+#-----------------------------------------------------------------------------
 
 # MITK compiler flags
 set(MITK_C_FLAGS "@MITK_C_FLAGS@")
@@ -46,21 +67,40 @@ set(MITK_CXX_FLAGS "@MITK_CXX_FLAGS@")
 set(MTTK_CXX_FLAGS_DEBUG "@MITK_CXX_FLAGS_DEBUG@")
 set(MITK_CXX_FLAGS_RELEASE "@MITK_CXX_FLAGS_RELEASE@")
 
+# MITK linker flags
 set(MITK_EXE_LINKER_FLAGS "@MITK_EXE_LINKER_FLAGS@")
 set(MITK_SHARED_LINKER_FLAGS "@MITK_SHARED_LINKER_FLAGS@")
 set(MITK_MODULE_LINKER_FLAGS "@MITK_MODULE_LINKER_FLAGS@")
+
+# MITK specific directories
+set(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")
+set(MITK_BINARY_DIR "@MITK_BINARY_DIR@")
+set(MITK_CMAKE_DIR "@MITK_CMAKE_DIR@")
+
+# MITK output directories
+set(MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY "@MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY@")
+set(MITK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY "@MITK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY@")
+set(MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY "@MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY@")
+
+#-----------------------------------------------------------------------------
+# Miscellaneous variables
+#-----------------------------------------------------------------------------
 
 # Internal version numbers, used for approximate compatibility checks
 # of a MITK development version (non-release).
 set(MITK_VERSION_PLUGIN_SYSTEM 2) # dropped legacy BlueBerry plug-in CMake support
 
-# MITK specific variables
-set(MITK_SOURCE_DIR "@MITK_SOURCE_DIR@")
-set(MITK_BINARY_DIR "@MITK_BINARY_DIR@")
-set(MITK_CMAKE_DIR "@MITK_CMAKE_DIR@")
+set(MITK_DATA_DIR "@MITK_DATA_DIR@")
 set(UTILITIES_DIR "@UTILITIES_DIR@")
 set(REGISTER_QFUNCTIONALITY_CPP_IN "@REGISTER_QFUNCTIONALITY_CPP_IN@")
 set(MITK_DOXYGEN_TAGFILE_NAME "@MITK_DOXYGEN_TAGFILE_NAME@")
+set(MITK_LEGACY_EXPORT_MACRO_NAME 1)
+
+set(DCMTK_CMAKE_DEBUG_POSTFIX @DCMTK_CMAKE_DEBUG_POSTFIX@)
+
+if(CMAKE_CURRENT_LIST_DIR STREQUAL MITK_BINARY_DIR)
+  set(MITK_EXTERNAL_PROJECT_PREFIX @MITK_EXTERNAL_PROJECT_PREFIX@)
+endif()
 
 set(MITK_MODULES_PACKAGE_DEPENDS_DIR "@MITK_MODULES_PACKAGE_DEPENDS_DIR@")
 if(MODULES_PACKAGE_DEPENDS_DIRS)
@@ -70,69 +110,157 @@ else()
   set(MODULES_PACKAGE_DEPENDS_DIRS ${MITK_MODULES_PACKAGE_DEPENDS_DIR})
 endif()
 
-if(MODULES_CONF_DIRS)
-  list(APPEND MODULES_CONF_DIRS "@MODULES_CONF_DIRS@")
-  list(REMOVE_DUPLICATES MODULES_CONF_DIRS)
-else()
-  set(MODULES_CONF_DIRS "@MODULES_CONF_DIRS@")
-endif()
+#-----------------------------------------------------------------------------
+# External dependencies
+#-----------------------------------------------------------------------------
 
-set(MODULES_CONF_DIRNAME "@MODULES_CONF_DIRNAME@")
+list(APPEND CMAKE_PREFIX_PATH "@MITK_EXTERNAL_PROJECT_PREFIX@")
 
-foreach(_module @MITK_MODULE_NAMES@)
-  set(${_module}_CONFIG_FILE "@MITK_BINARY_DIR@/@MODULES_CONF_DIRNAME@/${_module}Config.cmake")
-endforeach()
+# -----------------------------------------
+# Qt variables and dependencies
 
-# External projects
-set(CTK_DIR "@CTK_DIR@")
-set(ANN_DIR "@ANN_DIR@")
-set(CppUnit_DIR "@CppUnit_DIR@")
-set(Eigen_DIR "@Eigen_DIR@")
-set(GLEW_DIR "@GLEW_DIR@")
-set(tinyxml_DIR "@tinyxml_DIR@")
-set(ITK_DIR "@ITK_DIR@")
-set(VTK_DIR "@VTK_DIR@")
-set(DCMTK_DIR "@DCMTK_DIR@")
-set(GDCM_DIR "@GDCM_DIR@")
-set(BOOST_ROOT "@BOOST_ROOT@")
-set(OpenCV_DIR "@OpenCV_DIR@")
-set(Poco_DIR "@Poco_DIR@")
-set(SOFA_DIR "@SOFA_DIR@")
-set(Qwt_DIR "@Qwt_DIR@")
-set(Qxt_DIR "@Qxt_DIR@")
-set(ACVD_DIR "@ACVD_DIR@")
-set(MITK_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
-set(MITK_DATA_DIR "@MITK_DATA_DIR@")
-set(SimpleITK_DIR "@SimpleITK_DIR@")
-set(Python_DIR "@Python_DIR@")
-
-# External SDK directories
-set(MITK_PMD_SDK_DIR @MITK_PMD_SDK_DIR@)
-
-# MITK use variables
 set(MITK_USE_QT @MITK_USE_QT@)
 set(MITK_USE_Qt4 @MITK_USE_Qt4@)
 set(MITK_USE_Qt5 @MITK_USE_Qt5@)
+
 set(MITK_DESIRED_QT_VERSION @DESIRED_QT_VERSION@)
-set(MITK_USE_BLUEBERRY @MITK_USE_BLUEBERRY@)
-set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
-set(MITK_USE_Boost @MITK_USE_Boost@)
-set(MITK_USE_Boost_LIBRARIES @MITK_USE_Boost_LIBRARIES@)
-set(MITK_USE_CTK @MITK_USE_CTK@)
-set(MITK_USE_DCMTK @MITK_USE_DCMTK@)
-set(MITK_USE_OpenCV @MITK_USE_OpenCV@)
-set(MITK_USE_SOFA @MITK_USE_SOFA@)
-set(MITK_USE_Python @MITK_USE_Python@)
-set(MITK_USE_SimpleITK @MITK_USE_SimpleITK@)
-set(MITK_USE_ACVD @MITK_USE_ACVD@)
 
 if(MITK_USE_Qt4)
   set(MITK_QT4_MINIMUM_VERSION @MITK_QT4_MINIMUM_VERSION@)
   find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
 elseif(MITK_USE_Qt5)
   set(MITK_QT5_MINIMUM_VERSION @MITK_QT5_MINIMUM_VERSION@)
-  find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED)
+  set(MITK_QT5_COMPONENTS @MITK_QT5_COMPONENTS@)
+  mitkMacroFindDependency(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS})
 endif()
+
+# -----------------------------------------
+# Special Python variables
+
+set(MITK_USE_Python @MITK_USE_Python@)
+set(MITK_USE_SYSTEM_PYTHON @MITK_USE_SYSTEM_PYTHON@)
+if(MITK_USE_Python)
+  set(PYTHON_EXECUTABLE "@PYTHON_EXECUTABLE@" CACHE FILEPATH "")
+  set(PYTHON_INCLUDE_DIR "@PYTHON_INCLUDE_DIR@" CACHE PATH "")
+  set(PYTHON_LIBRARY "@PYTHON_LIBRARY@" CACHE FILEPATH "")
+  set(PYTHON_INCLUDE_DIR2 "@PYTHON_INCLUDE_DIR2@" CACHE PATH "")
+
+  mitkMacroFindDependency(PythonLibs)
+  mitkMacroFindDependency(PythonInterp)
+endif()
+
+# -----------------------------------------
+# Special Boost variables
+
+set(MITK_USE_Boost @MITK_USE_Boost@)
+set(MITK_USE_Boost_LIBRARIES @MITK_USE_Boost_LIBRARIES@)
+set(MITK_USE_SYSTEM_Boost @MITK_USE_SYSTEM_Boost@)
+if(MITK_USE_Boost)
+  set(BOOST_ROOT "@BOOST_ROOT@" CACHE PATH "")
+  set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")
+endif()
+
+# We need this later for a DCMTK workaround
+set(_dcmtk_dir_orig "@DCMTK_DIR@")
+
+# -----------------------------------------
+# External dependencies from the superbuild
+# or injected from somewhere else via
+# <project>_DIR variables.
+
+@MITK_CONFIG_EXTERNAL_PROJECTS@
+
+# Ensure the MITK module path comes first
+set(CMAKE_MODULE_PATH ${MITK_CMAKE_MODULE_PATH} ${CMAKE_MODULE_PATH})
+
+# -----------------------------------------
+# Special handling for DCMTK
+
+if(MITK_USE_DCMTK)
+  # Due to the preferred CONFIG mode in find_package calls above,
+  # the DCMTKConfig.cmake file is read, which does not provide useful
+  # package information. We explictly need MODULE mode to find DCMTK.
+  if(${_dcmtk_dir_orig} MATCHES "${MITK_EXTERNAL_PROJECT_PREFIX}.*")
+    # Help our FindDCMTK.cmake script find our super-build DCMTK
+    set(DCMTK_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
+  else()
+    # Use the original value
+    set(DCMTK_DIR ${_dcmtk_dir_orig})
+  endif()
+  find_package(DCMTK REQUIRED MODULE)
+endif()
+
+# -----------------------------------------
+# Special handling for SOFA
+
+if(MITK_USE_SOFA)
+  # The SOFAConfig.cmake file does not provide exported targets or
+  # libraries with absolute paths, hence we need to make the link
+  # directories globally available until the SOFAConfig.cmake file
+  # supports a proper mechanism for handling targets.
+# find_package(SOFA PATHS ${SOFA_DIR} CONFIG REQUIRED)
+  link_directories(${SOFA_LIBRARY_DIRS})
+endif()
+
+# -----------------------------------------
+# Special handling for Boost
+
+if(MITK_USE_Boost)
+  # Same as SOFA above
+  link_directories(${Boost_LIBRARY_DIRS})
+endif()
+
+# -----------------------------------------
+# Special handling for OpenIGTLink
+
+if(MITK_USE_OpenIGTLink)
+  # Same as SOFA above
+  link_directories(${OpenIGTLink_LIBRARY_DIRS})
+endif()
+
+# -----------------------------------------
+# Internal project dependencies
+
+set(CppMicroServices_DIR "@CppMicroServices_DIR@")
+mitkMacroFindDependency(CppMicroServices)
+
+set(MITK_USE_BLUEBERRY @MITK_USE_BLUEBERRY@)
+if(MITK_USE_BLUEBERRY)
+
+  set(MITK_PLUGIN_USE_FILE "@MITK_PLUGIN_USE_FILE@")
+  if(MITK_PLUGIN_USE_FILE)
+    if(EXISTS "${MITK_PLUGIN_USE_FILE}")
+      include("${MITK_PLUGIN_USE_FILE}")
+    endif()
+  endif()
+
+  set(MITK_PLUGIN_PROVISIONING_FILE "@MITK_EXTAPP_PROVISIONING_FILE@")
+  set(MITK_PROVISIONING_FILES
+      "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
+      "${MITK_PLUGIN_PROVISIONING_FILE}")
+
+endif()
+
+set(BLUEBERRY_USE_QT_HELP @BLUEBERRY_USE_QT_HELP@)
+if(BLUEBERRY_USE_QT_HELP AND DOXYGEN_VERSION VERSION_LESS "1.8.7")
+  message("Setting BLUEBERRY_USE_QT_HELP to OFF because Doxygen version 1.8.7 or newer not found.")
+  set(BLUEBERRY_USE_QT_HELP OFF)
+endif()
+
+set(BLUEBERRY_QTPLUGIN_PATH "@BLUEBERRY_QTPLUGIN_PATH@")
+
+set(QT_HELPGENERATOR_EXECUTABLE "@QT_HELPGENERATOR_EXECUTABLE@")
+set(QT_COLLECTIONGENERATOR_EXECUTABLE "@QT_COLLECTIONGENERATOR_EXECUTABLE@")
+set(QT_ASSISTANT_EXECUTABLE "@QT_ASSISTANT_EXECUTABLE@")
+set(QT_XMLPATTERNS_EXECUTABLE "@QT_XMLPATTERNS_EXECUTABLE@")
+
+
+#-----------------------------------------------------------------------------
+# MITK sub-project variables
+#-----------------------------------------------------------------------------
+
+# External SDK directories
+set(MITK_PMD_SDK_DIR @MITK_PMD_SDK_DIR@)
 
 # MITK ToF use variables
 
@@ -170,10 +298,9 @@ if(MITK_USE_IGT)
   #include("${MITK_DIR}/mitkIGTConfig.cmake")
 endif()
 
-# Install rules for ToF libraries loaded at runtime
-if(EXISTS "@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
-  include("@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
-endif()
+#-----------------------------------------------------------------------------
+# Import MITK targets and set custom properties
+#-----------------------------------------------------------------------------
 
 if(NOT MITK_EXPORTS_FILE_INCLUDED)
   if(EXISTS "@MITK_EXPORTS_FILE@")
@@ -182,33 +309,14 @@ if(NOT MITK_EXPORTS_FILE_INCLUDED)
   endif()
 endif()
 
-# BlueBerry support
-if(MITK_USE_BLUEBERRY)
-
-  set(BlueBerry_DIR "@MITK_BINARY_DIR@/BlueBerry")
-
-  # Don't include the BlueBerry exports file, since the targets are
-  # also exported in the MITK exports file
-  set(BB_PLUGIN_EXPORTS_FILE_INCLUDED 1)
-  find_package(BlueBerry)
-
-  if(NOT BlueBerry_FOUND)
-    message(SEND_ERROR "MITK does not seem to be configured with BlueBerry support. Set MITK_USE_BLUEBERRY to ON in your MITK build configuration.")
-  endif()
-
-  set(MITK_PLUGIN_USE_FILE "@MITK_PLUGIN_USE_FILE@")
-  if(MITK_PLUGIN_USE_FILE)
-    if(EXISTS "${MITK_PLUGIN_USE_FILE}")
-      include("${MITK_PLUGIN_USE_FILE}")
-    endif()
-  endif()
-
-  set(MITK_PLUGIN_PROVISIONING_FILE "@MITK_EXTAPP_PROVISIONING_FILE@")
-  set(MITK_PROVISIONING_FILES
-      "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
-      "${MITK_PLUGIN_PROVISIONING_FILE}")
-
-endif()
-
 # Set properties on exported targets
 @MITK_EXPORTED_TARGET_PROPERTIES@
+
+#-----------------------------------------------------------------------------
+# Install rules
+#-----------------------------------------------------------------------------
+
+# Install rules for ToF libraries loaded at runtime
+if(EXISTS "@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
+  include("@MITK_BINARY_DIR@/mitkToFHardwareInstallRules.cmake")
+endif()

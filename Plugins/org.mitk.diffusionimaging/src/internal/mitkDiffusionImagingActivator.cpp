@@ -18,6 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeDescriptorManager.h"
 #include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateProperty.h"
+#include "mitkNodePredicateIsDWI.h"
+#include <mitkDiffusionPropertyHelper.h>
 
 #include <QtPlugin>
 
@@ -29,7 +32,7 @@ mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
   QmitkNodeDescriptorManager* manager =
     QmitkNodeDescriptorManager::GetInstance();
 
-  mitk::NodePredicateDataType::Pointer isDiffusionImage = mitk::NodePredicateDataType::New("DiffusionImage");
+  mitk::NodePredicateIsDWI::Pointer isDiffusionImage = mitk::NodePredicateIsDWI::New();
   QmitkNodeDescriptor* desc = new QmitkNodeDescriptor(QObject::tr("DiffusionImage"), QString(":/QmitkDiffusionImaging/QBallData24.png"), isDiffusionImage, manager);
   manager->AddDescriptor(desc);
 
@@ -41,9 +44,6 @@ mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 
   mitk::NodePredicateDataType::Pointer isFiberBundle = mitk::NodePredicateDataType::New("FiberBundle");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundle"), QString(":/QmitkDiffusionImaging/FiberBundle.png"), isFiberBundle, manager));
-
-  mitk::NodePredicateDataType::Pointer isFiberBundleX = mitk::NodePredicateDataType::New("FiberBundleX");
-  manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("FiberBundleX"), QString(":/QmitkDiffusionImaging/FiberBundleX.png"), isFiberBundleX, manager));
 
   mitk::NodePredicateDataType::Pointer isConnectomicsNetwork = mitk::NodePredicateDataType::New("ConnectomicsNetwork");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("ConnectomicsNetwork"), QString(":/QmitkDiffusionImaging/ConnectomicsNetwork.png"), isConnectomicsNetwork, manager));

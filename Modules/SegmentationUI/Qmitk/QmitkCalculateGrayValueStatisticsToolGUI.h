@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   Last contributor: $Author$
 */
-class MitkSegmentationUI_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

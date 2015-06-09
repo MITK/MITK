@@ -77,9 +77,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkVersorRigid3DTransformOptimizerView.h"
 
 QmitkRigidRegistrationSelectorView::QmitkRigidRegistrationSelectorView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
-m_FixedNode(NULL), m_FixedMaskNode(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedDimension(0), m_MovingDimension(0),
-m_StopOptimization(false), m_GeometryItkPhysicalToWorldTransform(NULL), m_GeometryWorldToItkPhysicalTransform(NULL),
-m_MovingGeometry(NULL), m_ImageGeometry(NULL)
+m_FixedNode(nullptr), m_FixedMaskNode(nullptr), m_MovingNode(nullptr), m_MovingMaskNode(nullptr), m_FixedDimension(0), m_MovingDimension(0),
+m_StopOptimization(false), m_GeometryItkPhysicalToWorldTransform(nullptr), m_GeometryWorldToItkPhysicalTransform(nullptr),
+m_MovingGeometry(nullptr), m_ImageGeometry(nullptr)
 {
   m_Controls.setupUi(parent);
 
@@ -167,7 +167,7 @@ m_MovingGeometry(NULL), m_ImageGeometry(NULL)
   m_Preset = new mitk::RigidRegistrationPreset();
   m_Preset->LoadPreset();
 
-  this->DoLoadRigidRegistrationPreset("AffineMutualInformationGradientDescent");
+  this->DoLoadRigidRegistrationPreset("Affine3DMutualInformation_LinearInterp");
 }
 
 QmitkRigidRegistrationSelectorView::~QmitkRigidRegistrationSelectorView()
@@ -183,8 +183,8 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
     mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData())->Clone();
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData())->Clone();
-    mitk::Image::Pointer mmimage = NULL;
-    mitk::Image::Pointer fmimage = NULL;
+    mitk::Image::Pointer mmimage = nullptr;
+    mitk::Image::Pointer fmimage = nullptr;
     if (m_MovingMaskNode.IsNotNull())
     {
       mmimage = dynamic_cast<mitk::Image*>(m_MovingMaskNode->GetData());
@@ -535,16 +535,21 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationParameter()
   }
   if (presets.empty())
   {
-    QMessageBox::warning( NULL, "RigidRegistrationParameters.xml", "RigidRegistrationParameters.xml is empty/does not exist. There are no presets to select.");
+    QMessageBox::warning( nullptr, "RigidRegistrationParameters.xml", "RigidRegistrationParameters.xml is empty/does not exist. There are no presets to select.");
     return;
   }
   presets.sort();
   // ask about the name to load a preset
-  QmitkLoadPresetDialog dialog( this, 0, "Load Preset", presets ); // needs a QWidget as parent
+  QmitkLoadPresetDialog dialog( this, nullptr, "Load Preset", presets ); // needs a QWidget as parent
   int dialogReturnValue = dialog.exec();
   if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
   this->DoLoadRigidRegistrationPreset(dialog.GetPresetName());
+}
+
+void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationPresetParameter(QString preset_name)
+{
+  this->DoLoadRigidRegistrationPreset(preset_name.toStdString() );
 }
 
 void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::string presetName)
@@ -625,7 +630,7 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter()
     std::map<std::string, itk::Array<double> > existingPresets;
     existingPresets = m_Preset->getTransformValuesPresets();
 
-    std::map<std::string, itk::Array<double> >::iterator iter = existingPresets.find(std::string((const char*)text.toLatin1()));
+    auto iter = existingPresets.find(std::string((const char*)text.toLatin1()));
     if (iter != existingPresets.end())
     {
       QMessageBox::critical( this, "Preset definition",

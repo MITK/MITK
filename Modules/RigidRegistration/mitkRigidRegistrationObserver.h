@@ -58,7 +58,7 @@ namespace mitk {
   *
   * \author Daniel Stein
   */
-  class MITK_RIGIDREGISTRATION_EXPORT RigidRegistrationObserver : public itk::Command
+  class MITKRIGIDREGISTRATION_EXPORT RigidRegistrationObserver : public itk::Command
   {
     public:
       typedef  RigidRegistrationObserver   Self;
@@ -118,13 +118,13 @@ namespace mitk {
       * Stores the optimizer values, adds progress to the progress bar and sends a stop flag to stop the optimization process if it is
       * set in this class. Also emits a signal to inform listeners about new optimizer values.
       */
-      void Execute(itk::Object *caller, const itk::EventObject & event);
+      void Execute(itk::Object *caller, const itk::EventObject & event) override;
 
       /**
       * \brief Not implemented...
       *
       */
-      void Execute(const itk::Object * object, const itk::EventObject & event);
+      void Execute(const itk::Object * object, const itk::EventObject & event) override;
 
       /**
       * \brief Add new steps to the progress bar.

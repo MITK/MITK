@@ -64,7 +64,7 @@ namespace mitk {
     ConnectomicsShortestPathHistogram m_ShortestPathHistogram;
   };
 
-  class MitkConnectomics_EXPORT ConnectomicsHistogramCache : public SimpleHistogramCache
+  class MITKCONNECTOMICS_EXPORT ConnectomicsHistogramCache : public SimpleHistogramCache
   {
   public:
 
@@ -87,7 +87,7 @@ namespace mitk {
   {
   public:
 
-    void ComputeFromBaseData(BaseData* baseData)
+    void ComputeFromBaseData(BaseData* baseData) override
     {
       m_Container.ComputeFromBaseData(baseData);
     }
@@ -100,9 +100,9 @@ namespace mitk {
     ConnectomicsHistogramsContainer m_Container;
 
   private:
-    ConnectomicsHistogramBase* GetHistogram()
+    ConnectomicsHistogramBase* GetHistogram() override
     {
-      return NULL;
+      return nullptr;
     }
   };
 

@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUndoController.h>
 #include <mitkStateEvent.h>
 #include <mitkState.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include "mitkBaseRenderer.h"
 
 #include <vtkLinearTransform.h>
@@ -131,7 +131,7 @@ float mitk::FiberBundleInteractor::CanHandleEvent(StateEvent const* stateEvent) 
   }
 
   //check on the right data-type
-  mitk::FiberBundleX* bundle = dynamic_cast<mitk::FiberBundleX*>(m_DataNode->GetData());
+  mitk::FiberBundle* bundle = dynamic_cast<mitk::FiberBundle*>(m_DataNode->GetData());
   if (bundle == NULL)
     return 0;
 
@@ -145,7 +145,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
   bool ok = false;//for return type bool
 
   //checking corresponding Data; has to be a PointSet or a subclass
-  mitk::FiberBundleX* bundle = dynamic_cast<mitk::FiberBundleX*>(m_DataNode->GetData());
+  mitk::FiberBundle* bundle = dynamic_cast<mitk::FiberBundle*>(m_DataNode->GetData());
   if (bundle == NULL)
     return false;
 

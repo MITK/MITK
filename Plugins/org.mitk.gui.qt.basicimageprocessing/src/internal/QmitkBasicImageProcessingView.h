@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkStepperAdapter.h"
 
-#include <berryISelectionListener.h>
-
 #include <mitkDataStorageSelection.h>
 
 /*!
@@ -68,19 +66,19 @@ public:
   /*!
   \brief method for creating the widget containing the application controls, like sliders, buttons etc.
   */
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /*!
   \brief method for creating the connections of main and control widget
   */
   virtual void CreateConnections();
 
-  virtual void Activated();
+  virtual void Activated() override;
 
   /*!
   \brief Invoked when the DataManager selection changed
   */
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
 
 
   protected slots:
@@ -137,8 +135,6 @@ private:
   //mitk::DataNode*       m_SelectedImageNode;
   mitk::DataStorageSelection::Pointer m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
-
-  berry::ISelectionListener::Pointer m_SelectionListener;
 
   enum ActionType {
     NOACTIONSELECTED,

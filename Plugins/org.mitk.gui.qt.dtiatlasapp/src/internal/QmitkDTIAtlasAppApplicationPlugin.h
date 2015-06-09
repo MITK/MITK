@@ -19,12 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QString>
 #include <berryAbstractUICTKPlugin.h>
-#include <berryIBundleContext.h>
 
-#include <berryQCHPluginListener.h>
-
-class QmitkDTIAtlasAppApplicationPlugin :
-    public QObject, public berry::AbstractUICTKPlugin
+class QmitkDTIAtlasAppApplicationPlugin : public berry::AbstractUICTKPlugin
 {
   Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -41,7 +37,7 @@ public:
 
       ctkPluginContext* GetPluginContext() const;
 
-      void start(ctkPluginContext*);
+      void start(ctkPluginContext*) override;
 
       QString GetQtHelpCollectionFile() const;
 
@@ -50,7 +46,6 @@ public:
       static QmitkDTIAtlasAppApplicationPlugin* inst;
 
       ctkPluginContext* context;
-      berry::QCHPluginListener* pluginListener;
 
       mutable QString helpCollectionFile;
 

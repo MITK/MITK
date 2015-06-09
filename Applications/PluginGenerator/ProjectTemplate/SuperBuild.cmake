@@ -73,6 +73,15 @@ set(ep_common_args
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
 
+set(ep_common_cache_args
+)
+
+set(ep_common_cache_default_args
+  "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}"
+  "-DCMAKE_INCLUDE_PATH:PATH=${CMAKE_INCLUDE_PATH}"
+  "-DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}"
+)
+
 # Include external projects
 foreach(p ${external_projects})
   include(CMakeExternals/${p}.cmake)
@@ -147,6 +156,9 @@ ExternalProject_Add(${proj}
     -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
     -DBUILD_SHARED_LIBS:BOOL=${ep_build_shared_libs}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+    "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}"
+    "-DCMAKE_INCLUDE_PATH:PATH=${CMAKE_INCLUDE_PATH}"
+    "-DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}"
     # --------------- Compile options ----------------
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
     -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -173,7 +185,6 @@ ExternalProject_Add(${proj}
     # ----------------- Miscellaneous ---------------
     -D${MY_PROJECT_NAME}_SUPERBUILD_BINARY_DIR:PATH=${PROJECT_BINARY_DIR}
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-    -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
     -DMITK_DIR:PATH=${MITK_DIR}
     -DITK_DIR:PATH=${ITK_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}

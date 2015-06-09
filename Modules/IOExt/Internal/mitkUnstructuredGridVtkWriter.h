@@ -109,17 +109,17 @@ public:
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
-    virtual std::vector<std::string> GetPossibleFileExtensions();
+    virtual std::vector<std::string> GetPossibleFileExtensions() override;
 
-    virtual std::string GetSupportedBaseData() const
+    virtual std::string GetSupportedBaseData() const override
     { return UnstructuredGrid::GetStaticNameOfClass(); }
 
     // FileWriterWithInformation methods
-    virtual const char * GetDefaultFilename();
-    virtual const char * GetFileDialogPattern();
-    virtual const char * GetDefaultExtension();
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data);
-    virtual void DoWrite(BaseData::Pointer data);
+    virtual const char * GetDefaultFilename() override;
+    virtual const char * GetFileDialogPattern() override;
+    virtual const char * GetDefaultExtension() override;
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) override;
+    virtual void DoWrite(BaseData::Pointer data) override;
 
 protected:
 
@@ -135,7 +135,7 @@ protected:
 
     void ExecuteWrite(VTKWRITER* vtkWriter);
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     std::string m_FileName;
 

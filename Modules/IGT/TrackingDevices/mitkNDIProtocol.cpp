@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::NDIProtocol::NDIProtocol()
-: itk::Object(), m_TrackingDevice(NULL), m_UseCRC(true)
+: itk::Object(), m_TrackingDevice(nullptr), m_UseCRC(true)
 {
 }
 
@@ -135,7 +135,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::IRCHK(bool* IRdetected)
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   /* send command */
@@ -216,7 +216,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHSR(PHSRQueryType queryType, std::string*
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR;
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   /* send command */
@@ -300,7 +300,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PHRQ(std::string* portHandle)
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking device
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   /* send command */
@@ -362,7 +362,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PVWR(std::string* portHandle, const unsign
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   if (sromDataLength > 1024)
@@ -415,7 +415,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PINIT(std::string* portHandle)
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   /* send command */
@@ -494,7 +494,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::PINIT(std::string* portHandle)
 mitk::NDIErrorCode mitk::NDIProtocol::PENA(std::string* portHandle, TrackingPriority prio)
 {
   std::string param;
-  if (portHandle != NULL)
+  if (portHandle != nullptr)
     param = *portHandle + (char) prio;
   else
     param = "";
@@ -555,7 +555,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::BEEP(unsigned char count)
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   std::string p;
@@ -656,7 +656,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
   if(trackIndividualMarkers)
     markerPositions->clear();
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   /* send command */
@@ -786,7 +786,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
           localQuat[i] = number / 10000.0;  // the value is send with an implied decimal point with 4 digits to the right
         }
         /* read and parse the three 7 character translation values */
-        for (unsigned int i = 0; i < 3; i++)
+        for (auto & localPo : localPos)
         {
           m_TrackingDevice->Receive(&s, 7); // read the next position vector number
           reply += s;                       // build complete command string
@@ -794,7 +794,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX(bool trackIndividualMarkers, MarkerPoin
           converter >> number;              // extract first number as integer
           converter.clear();                // converter must be cleared to be reused
           converter.str("");
-          localPos[i] = number / 100.0;     // the value is send with an implied decimal point with 2 digits to the right
+          localPo = number / 100.0;     // the value is send with an implied decimal point with 2 digits to the right
         }
         /* read and parse 6 character error value */
         m_TrackingDevice->Receive(&s, 6);   // read the error value
@@ -928,7 +928,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
 
   markerPositions->clear();
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   /* send command */
@@ -1044,7 +1044,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
           localQuat[i] = number / 10000.0;  // the value is send with an implied decimal point with 4 digits to the right
         }
         /* read and parse the three 7 character translation values */
-        for (unsigned int i = 0; i < 3; i++)
+        for (auto & localPo : localPos)
         {
           m_TrackingDevice->Receive(&s, 7); // read the next position vector number
           reply += s;                       // build complete command string
@@ -1052,7 +1052,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::TX1000(MarkerPointContainerType* markerPos
           converter >> number;              // extract first number as integer
           converter.clear();                // converter must be cleared to be reused
           converter.str("");
-          localPos[i] = number / 100.0;     // the value is send with an implied decimal point with 2 digits to the right
+          localPo = number / 100.0;     // the value is send with an implied decimal point with 2 digits to the right
         }
         /* read and parse 6 character error value */
         m_TrackingDevice->Receive(&s, 6);   // read the error value
@@ -1177,7 +1177,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::BX()
 
 mitk::NDIErrorCode mitk::NDIProtocol::VER(mitk::TrackingDeviceType& t)
 {
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
@@ -1241,11 +1241,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
   {
     return TRACKINGDEVICENOTSET;
   }
-  if (markerPositions == NULL)
+  if (markerPositions == nullptr)
   {
     std::cout << "ERROR: markerPositions==NULL" << std::endl;
     return NDIUNKNOWNERROR;
@@ -1260,7 +1260,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
   }
   const TrackingTool* t = m_TrackingDevice->GetTool(static_cast<unsigned int>(0));
   const NDIPassiveTool* t2 = dynamic_cast<const NDIPassiveTool*>(t);
-  if (t2 == NULL)
+  if (t2 == nullptr)
   {
     std::cout << "ERROR: no tool present" << std::endl;
     return NDIUNKNOWNERROR;
@@ -1407,11 +1407,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, 
 {
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from trackingsystem
 
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   std::string p;
-  if (parameter != NULL)
+  if (parameter != nullptr)
     p = *parameter;
   else
     p = "";
@@ -1586,7 +1586,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::GetErrorCode(const std::string* input)
 
 mitk::NDIErrorCode mitk::NDIProtocol::APIREV(std::string* revision)
 {
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
@@ -1657,7 +1657,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::APIREV(std::string* revision)
 
 mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
 {
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
@@ -1796,7 +1796,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
 
 mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::TrackingDeviceData deviceData)
 {
-  if (m_TrackingDevice == NULL)
+  if (m_TrackingDevice == nullptr)
     return TRACKINGDEVICENOTSET;
 
   NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
@@ -1816,7 +1816,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::TrackingDeviceData deviceData)
   //find the index where volumes[n] == device
 
   unsigned int index = 1; //the index for VSEL starts at 1
-  mitk::NDITrackingDevice::NDITrackingVolumeContainerType::iterator it = volumes.begin();
+  auto it = volumes.begin();
   while (it != volumes.end())
   {
     if ((*it) == deviceData.Model)

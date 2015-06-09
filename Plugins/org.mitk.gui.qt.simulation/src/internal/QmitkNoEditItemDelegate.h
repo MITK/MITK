@@ -24,10 +24,10 @@ class QmitkNoEditItemDelegate : public QStyledItemDelegate
   Q_OBJECT
 
 public:
-  explicit QmitkNoEditItemDelegate(QObject* parent = NULL);
+  explicit QmitkNoEditItemDelegate(QObject* parent = nullptr);
   ~QmitkNoEditItemDelegate();
 
-  QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+  QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
 #endif

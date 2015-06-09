@@ -2,12 +2,12 @@
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
+Copyright (c) German Cancer Research Center,
 Division of Medical and Biological Informatics.
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.
 
 See LICENSE.txt or http://www.mitk.org for details.
@@ -39,7 +39,7 @@ ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int startOfs, mitkI
   int testOfs;
   mitkIpInt1_t replaceMe = *((mitkIpInt1_t*)seg->data + startOfs);
   if (replaceMe == newValue) return 0;
-  
+
   mitkIpInt1_t segVal;
   ofsQueue.push( startOfs );
   *((mitkIpInt1_t*)seg->data+startOfs) = newValue;

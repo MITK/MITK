@@ -156,7 +156,7 @@ namespace mitk
   * ImageStatisticsCalculator is able to reproduce the known statistics.
   *
   */
-  class MitkImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
+  class MITKIMAGESTATISTICS_EXPORT ImageStatisticsCalculator : public itk::Object
   {
   public:
 
@@ -172,7 +172,7 @@ namespace mitk
     typedef HistogramType::ConstIterator HistogramConstIteratorType;
 
     /** \brief Class for common statistics, includig hotspot properties. */
-    class MitkImageStatistics_EXPORT Statistics
+    class MITKIMAGESTATISTICS_EXPORT Statistics
     {
     public:
 
@@ -260,8 +260,7 @@ namespace mitk
     typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
     typedef std::vector< Statistics > StatisticsContainer;
 
-
-    mitkClassMacro( ImageStatisticsCalculator, itk::Object );
+    mitkClassMacroItkParent( ImageStatisticsCalculator, itk::Object );
     itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
@@ -306,7 +305,7 @@ namespace mitk
     bool GetDoIgnorePixelValue();
 
     /** \brief Set bin size for histogram resolution.*/
-    void SetHistogramBinSize( unsigned int size);
+    void SetHistogramBinSize( double size);
 
     /** \brief Get bin size for histogram resolution.*/
     unsigned int GetHistogramBinSize();
@@ -583,12 +582,18 @@ namespace mitk
     int m_PlanarFigureCoordinate0;      // First plane-axis for PlanarFigure
     int m_PlanarFigureCoordinate1;      // Second plane-axis for PlanarFigure
 
-    unsigned int m_HistogramBinSize;    ///Bin size for histogram resoluion.
+    double m_HistogramBinSize;    ///Bin size for histogram resoluion.
     bool m_UseDefaultBinSize;
     double m_HotspotRadiusInMM;
     bool m_CalculateHotspot;
     bool m_HotspotRadiusInMMChanged;
     bool m_HotspotMustBeCompletelyInsideImage;
+
+
+private:
+
+  unsigned int calcNumberOfBins(mitk::ScalarType min, mitk::ScalarType max);
+
 
   };
 

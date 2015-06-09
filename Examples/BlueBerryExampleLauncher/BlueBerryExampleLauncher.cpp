@@ -14,70 +14,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <application/berryStarter.h>
-#include <Poco/Util/MapConfiguration.h>
-
-#include <QMessageBox>
-#include <QApplication>
+#include <mitkBaseApplication.h>
 
 #include "BlueBerryExampleLauncherDialog.h"
 
-class QSafeApplication : public QApplication
-{
-
-public:
-
-  QSafeApplication(int& argc, char** argv)
-    : QApplication(argc, argv)
-  {}
-
-  /**
-   * Reimplement notify to catch unhandled exceptions and open an error message.
-   *
-   * @param receiver
-   * @param event
-   * @return
-   */
-  bool notify(QObject* receiver, QEvent* event)
-  {
-    QString msg;
-    try
-    {
-      return QApplication::notify(receiver, event);
-    } catch (Poco::Exception& e)
-    {
-      msg = QString::fromStdString(e.displayText());
-    } catch (std::exception& e)
-    {
-      msg = e.what();
-    } catch (...)
-    {
-      msg = "Unknown exception";
-    }
-
-    QString text("An error occurred. You should save all data and quit the program "
-                 "to prevent possible data loss.\nSee the error log for details.\n\n");
-    text += msg;
-    QMessageBox::critical(0, "Error", text);
-    return false;
-  }
-
-};
+#include <QFileInfo>
+#include <QVariant>
 
 int main(int argc, char** argv)
 {
-  QSafeApplication safeApp(argc, argv);
-  safeApp.setApplicationName("BlueBerryExampleLauncher");
-  safeApp.setOrganizationName("DKFZ");
+  mitk::BaseApplication app(argc, argv);
+  app.setApplicationName("BlueBerryExampleLauncher");
+  app.setOrganizationName("DKFZ");
+  app.initializeQt();
 
   BlueBerryExampleLauncherDialog demoDialog;
   QString selectedConfiguration = demoDialog.getDemoConfiguration();
 
   if (selectedConfiguration.isEmpty()) return EXIT_SUCCESS;
 
-  Poco::Util::MapConfiguration* coreConfig(new Poco::Util::MapConfiguration());
-  coreConfig->setString(berry::Platform::ARG_PROVISIONING, selectedConfiguration.toStdString());
-//  coreConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.coreapplication");
+  app.setProvisioningFilePath(selectedConfiguration);
 
-  return berry::Starter::Run(argc, argv, coreConfig);
+  // We create the application id relying on a convention:
+  // org.mitk.example.<configuration-name>
+  QString appId = "org.mitk.example.";
+  QStringList appIdTokens = QFileInfo(selectedConfiguration).baseName().toLower().split('_', QString::SkipEmptyParts);
+  appId += appIdTokens.size() > 1 ? appIdTokens.at(1) : appIdTokens.at(0);
+
+  // Special cases
+  if (appId == "org.mitk.example.exampleplugins")
+  {
+    appId = "org.mitk.qt.extapplication";
+  }
+
+  app.setProperty(mitk::BaseApplication::PROP_APPLICATION, appId);
+
+  return app.run();
 }

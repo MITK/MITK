@@ -1,6 +1,5 @@
 MITK_CREATE_MODULE(OpenCVVideoSupportUI
   DEPENDS MitkQtWidgetsExt MitkOpenCVVideoSupport
-  EXPORT_DEFINE MITK_OPENCVVIDEOSUPPORTUI_EXPORT
 )
 
 # no tests yet

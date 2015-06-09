@@ -23,7 +23,7 @@ const std::string QmitkTensorModelParametersWidget::VIEW_ID = "org.mitk.views.te
 QmitkTensorModelParametersWidget::QmitkTensorModelParametersWidget( QWidget * parent, Qt::WindowFlags )
     : QWidget(parent)
 {
-    m_Controls = NULL;
+    m_Controls = nullptr;
     this->CreateQtPartControl(this);
 }
 

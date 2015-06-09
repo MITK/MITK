@@ -31,10 +31,10 @@ namespace mitk {
   * \brief Superclass for all ultrasound device control interfaces.
   * Defines an interface for activating and deactivating a control interface.
   */
-class MitkUS_EXPORT USAbstractControlInterface : public itk::Object
+class MITKUS_EXPORT USAbstractControlInterface : public itk::Object
 {
 public:
-  mitkClassMacro(USAbstractControlInterface, itk::Object);
+  mitkClassMacroItkParent(USAbstractControlInterface, itk::Object);
 
   /**
     * Method must be implemented in every control interface to handle all

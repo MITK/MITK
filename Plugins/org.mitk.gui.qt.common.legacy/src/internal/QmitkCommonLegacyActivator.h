@@ -38,12 +38,16 @@ public:
   /**
    * Sets default StateMachine to EventMapper.
    */
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
+
+  static ctkPluginContext* GetContext();
 
 private:
 
-  QmitkFunctionalityCoordinator::Pointer m_FunctionalityCoordinator;
+  QmitkFunctionalityCoordinator m_FunctionalityCoordinator;
+
+  static ctkPluginContext* m_Context;
 
 };
 

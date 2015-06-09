@@ -29,7 +29,7 @@ namespace mitk
 class StlVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
 {
 public:
-    mitkClassMacro( StlVolumeTimeSeriesReader, FileReader );
+  mitkClassMacro(StlVolumeTimeSeriesReader, FileSeriesReader);
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -47,7 +47,7 @@ public:
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
 protected:
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     StlVolumeTimeSeriesReader();
 

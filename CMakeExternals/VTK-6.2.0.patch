@@ -1,0 +1,21 @@
+diff -urNb VTK-6.1.0+74f4888/GUISupport/Qt/CMakeLists.txt VTK/GUISupport/Qt/CMakeLists.txt
+--- VTK-6.1.0+74f4888/GUISupport/Qt/CMakeLists.txt	2014-09-24 14:50:44.000000000 +0200
++++ VTK/GUISupport/Qt/CMakeLists.txt	2015-01-23 01:59:32.308391229 +0100
+@@ -153,6 +153,7 @@ if(BUILD_SHARED_LIBS)
+   endif()
+
+   if(NOT VTK_INSTALL_NO_QT_PLUGIN)
++    install(TARGETS QVTKWidgetPlugin DESTINATION ${VTK_INSTALL_QT_DIR})
+     # Set default plugin install directory.
+     set(DOLLAR "$")
+     if(DEFINED VTK_INSTALL_QT_PLUGIN_DIR)
+@@ -169,8 +170,8 @@ if(BUILD_SHARED_LIBS)
+     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/PluginInstall.cmake.in
+       ${CMAKE_CURRENT_BINARY_DIR}/PluginInstall.cmake
+       @ONLY)
+-    set_target_properties(${vtk-module} PROPERTIES POST_INSTALL_SCRIPT
+-      ${CMAKE_CURRENT_BINARY_DIR}/PluginInstall.cmake)
++    #set_target_properties(${vtk-module} PROPERTIES POST_INSTALL_SCRIPT
++    #  ${CMAKE_CURRENT_BINARY_DIR}/PluginInstall.cmake)
+   endif()
+ endif()

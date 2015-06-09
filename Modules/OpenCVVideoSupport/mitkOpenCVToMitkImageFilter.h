@@ -35,7 +35,7 @@ namespace mitk
 ///
 /// \brief Filter for creating MITK RGB Images from an OpenCV image
 ///
-class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
+class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
 {
   public:
     typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
@@ -67,12 +67,23 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSourc
 
     OutputImageType* GetOutput(void);
 
+    //##Documentation
+    //## @brief Convenient method to insert an openCV image as a slice at a
+    //## certain time step into a 3D or 4D mitk::Image.
+    //##
+    //## @param openCVImage - the image that is inserted into the mitk Image
+    //## @param mitkImage - pointer to the mitkImage, which is changed by this method!
+    //## @param timeStep - the time step, at which the openCVImage is inserted
+    //##
+    //## @attention The parameter mitkImage will be changed!
+    void InsertOpenCVImageAsMitkTimeSlice(const cv::Mat openCVImage, Image::Pointer mitkImage, int timeStep);
+
   protected:
 
     OpenCVToMitkImageFilter(); // purposely hidden
     virtual ~OpenCVToMitkImageFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
 protected:
     Image::Pointer m_Image;

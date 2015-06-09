@@ -38,7 +38,7 @@ namespace mitk
   */
 
 
-  class MITK_DEFORMABLEREGISTRATION_EXPORT BSplineRegistration : public RegistrationBase
+  class MITKDEFORMABLEREGISTRATION_EXPORT BSplineRegistration : public RegistrationBase
   {
 
   public:
@@ -73,7 +73,7 @@ namespace mitk
     /*!
     * \brief Starts the B-Spline registration.
     */
-    virtual void GenerateData()
+    virtual void GenerateData() override
     {
       if (this->GetInput())
       {

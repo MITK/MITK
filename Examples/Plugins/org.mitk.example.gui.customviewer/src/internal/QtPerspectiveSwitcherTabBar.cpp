@@ -38,7 +38,7 @@ struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener
   /**
    * Only listens to perspective activation events.
    */
-  Events::Types GetPerspectiveEventTypes() const
+  Events::Types GetPerspectiveEventTypes() const override
   {
     return Events::ACTIVATED;
   }
@@ -47,8 +47,8 @@ struct QtPerspectiveSwitcherTabBarListener : public berry::IPerspectiveListener
    * Sets the corresponding perspective index within the associated QtPerspectiveSwitcherTabBar instance.
    */
 // //! [SwitchPerspectiveListenerPerspectiveActivated]
-  void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
-    berry::IPerspectiveDescriptor::Pointer perspective)
+  void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
+                            const berry::IPerspectiveDescriptor::Pointer& perspective) override
   {
     int index = perspective->GetId() == "org.mitk.example.viewerperspective" ? 0 : 1;
     switcher->setCurrentIndex(index);
@@ -65,6 +65,7 @@ private:
 
 QtPerspectiveSwitcherTabBar::QtPerspectiveSwitcherTabBar(berry::IWorkbenchWindow::Pointer window)
 : window(window)
+, perspListener(new QtPerspectiveSwitcherTabBarListener(this))
 {
   this->tabChanged = false;
 
@@ -74,12 +75,12 @@ QtPerspectiveSwitcherTabBar::QtPerspectiveSwitcherTabBar(berry::IWorkbenchWindow
   QObject::connect( this, SIGNAL( currentChanged( int ) )
     , this, SLOT( SwitchPerspective( void ) ) );
 
-  this->perspListener = new QtPerspectiveSwitcherTabBarListener(this);
-  window->AddPerspectiveListener(this->perspListener);
+  window->AddPerspectiveListener(this->perspListener.data());
 }
 
 QtPerspectiveSwitcherTabBar::~QtPerspectiveSwitcherTabBar()
 {
+  window->RemovePerspectiveListener(this->perspListener.data());
 }
 
 // //! [PerspectiveSwitcherSwitchPerspective]
@@ -94,12 +95,12 @@ void QtPerspectiveSwitcherTabBar::SwitchPerspective()
   int index = this->currentIndex();
   if (index == 0)
   {
-    std::string perspectiveId = "org.mitk.example.viewerperspective";
+    QString perspectiveId = "org.mitk.example.viewerperspective";
     this->window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
   }
   else if (index == 1)
   {
-    std::string perspectiveId = "org.mitk.example.dicomperspective";
+    QString perspectiveId = "org.mitk.example.dicomperspective";
     this->window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
   }
 }

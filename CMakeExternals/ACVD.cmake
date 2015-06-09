@@ -12,30 +12,36 @@ if(MITK_USE_ACVD)
   set(proj_DEPENDENCIES VTK)
   set(ACVD_DEPENDS ${proj})
 
-  set(additional_cmake_args
-    -DUSE_MULTITHREADING:BOOL=ON
-    -DVTK_DIR:PATH=${VTK_DIR}
-  )
-
-  set(ACVD_PATCH_COMMAND ${CMAKE_COMMAND} -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchACVD.cmake)
-
   if(NOT DEFINED ACVD_DIR)
+
+    set(additional_args )
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_args
+        "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      BINARY_DIR ${proj}-build
-      PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_2d8f5ea5.tar.gz
-      URL_MD5 ecc97728a86798b35c20eef964b094c9
-      PATCH_COMMAND ${ACVD_PATCH_COMMAND}
-      INSTALL_COMMAND ""
+      LIST_SEPARATOR ${sep}
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/ACVD-vtk6_3d5ae388-patched.tar.gz
+      URL_MD5 a59e658c8309f6a7004705d86d520d12
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
-        ${additional_cmake_args}
+        ${additional_args}
+        -DUSE_MULTITHREADING:BOOL=ON
+        -DBUILD_EXAMPLES:BOOL=OFF
+        -DVTK_DIR:PATH=${VTK_DIR}
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
     )
 
-    set(ACVD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+    set(ACVD_DIR ${ep_prefix})
+    mitkFunctionInstallExternalCMakeProject(${proj})
+
   else()
     mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()

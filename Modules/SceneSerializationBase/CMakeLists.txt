@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS BasePropertySerializer
   DEPENDS MitkCore
+  PACKAGE_DEPENDS PUBLIC tinyxml
   WARNINGS_AS_ERRORS
 )
-add_subdirectory(Testing)
+add_subdirectory(test)
 

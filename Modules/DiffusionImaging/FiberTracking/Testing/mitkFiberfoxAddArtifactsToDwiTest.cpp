@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkTestingMacros.h>
 #include <mitkIOUtil.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkAddArtifactsToDwiImageFilter.h>
 #include <mitkFiberfoxParameters.h>
 #include <mitkStickModel.h>
@@ -24,12 +24,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBallModel.h>
 #include <mitkDotModel.h>
 #include <mitkAstroStickModel.h>
-#include <mitkDiffusionImage.h>
+#include <mitkImage.h>
 #include <itkTestingComparisonImageFilter.h>
 #include <itkImageRegionConstIterator.h>
 #include <mitkRicianNoiseModel.h>
 #include <mitkChiSquareNoiseModel.h>
 #include <mitkTestFixture.h>
+#include <mitkITKImageImport.h>
+#include <mitkProperties.h>
+#include <mitkImageCast.h>
+
+typedef itk::VectorImage<short, 3> ITKDiffusionImageType;
 
 /**Documentation
  * Test the Fiberfox simulation functions (diffusion weighted image -> diffusion weighted image)
@@ -50,24 +55,28 @@ class mitkFiberfoxAddArtifactsToDwiTestSuite : public mitk::TestFixture
 
 private:
 
-    mitk::DiffusionImage<short>::Pointer m_InputDwi;
+    mitk::Image::Pointer m_InputDwi;
     FiberfoxParameters<short> m_Parameters;
 
 public:
 
-    void setUp()
+    void setUp() override
     {
         // reference files
-        m_InputDwi = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(GetTestDataFilePath("DiffusionImaging/Fiberfox/StickBall_RELAX.dwi"))->GetData());
+        m_InputDwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(GetTestDataFilePath("DiffusionImaging/Fiberfox/StickBall_RELAX.dwi"))->GetData());
 
         // parameter setup
+
+        ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+        mitk::CastToItkImage(m_InputDwi, itkVectorImagePointer);
+
         m_Parameters = FiberfoxParameters<short>();
-        m_Parameters.m_SignalGen.m_ImageRegion = m_InputDwi->GetVectorImage()->GetLargestPossibleRegion();
-        m_Parameters.m_SignalGen.m_ImageSpacing = m_InputDwi->GetVectorImage()->GetSpacing();
-        m_Parameters.m_SignalGen.m_ImageOrigin = m_InputDwi->GetVectorImage()->GetOrigin();
-        m_Parameters.m_SignalGen.m_ImageDirection = m_InputDwi->GetVectorImage()->GetDirection();
-        m_Parameters.m_SignalGen.m_Bvalue = m_InputDwi->GetReferenceBValue();
-        m_Parameters.m_SignalGen.SetGradienDirections(m_InputDwi->GetDirections());
+        m_Parameters.m_SignalGen.m_ImageRegion = itkVectorImagePointer->GetLargestPossibleRegion();
+        m_Parameters.m_SignalGen.m_ImageSpacing = itkVectorImagePointer->GetSpacing();
+        m_Parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
+        m_Parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
+        m_Parameters.m_SignalGen.m_Bvalue = static_cast<mitk::FloatProperty*>(m_InputDwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue();
+        m_Parameters.m_SignalGen.SetGradienDirections( static_cast<mitk::GradientDirectionsProperty*>( m_InputDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
     }
 
     bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >* dwi2)
@@ -93,27 +102,35 @@ public:
 
     void StartSimulation(string testFileName)
     {
-        mitk::DiffusionImage<short>::Pointer refImage = NULL;
+        mitk::Image::Pointer refImage = NULL;
         if (!testFileName.empty())
-            CPPUNIT_ASSERT(refImage = dynamic_cast<mitk::DiffusionImage<short>*>(mitk::IOUtil::LoadDataNode(testFileName)->GetData()));
+            CPPUNIT_ASSERT(refImage = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(testFileName)->GetData()));
+
+        ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+        mitk::CastToItkImage(m_InputDwi, itkVectorImagePointer);
 
         itk::AddArtifactsToDwiImageFilter< short >::Pointer artifactsToDwiFilter = itk::AddArtifactsToDwiImageFilter< short >::New();
         artifactsToDwiFilter->SetUseConstantRandSeed(true);
-        artifactsToDwiFilter->SetInput(m_InputDwi->GetVectorImage());
+        artifactsToDwiFilter->SetInput(itkVectorImagePointer);
         artifactsToDwiFilter->SetParameters(m_Parameters);
         CPPUNIT_ASSERT_NO_THROW(artifactsToDwiFilter->Update());
 
-        mitk::DiffusionImage<short>::Pointer testImage = mitk::DiffusionImage<short>::New();
-        testImage->SetVectorImage( artifactsToDwiFilter->GetOutput() );
-        testImage->SetReferenceBValue( m_Parameters.m_SignalGen.m_Bvalue);
-        testImage->SetDirections( m_Parameters.m_SignalGen.GetGradientDirections());
-        testImage->InitializeFromVectorImage();
+        mitk::Image::Pointer testImage = mitk::GrabItkImageMemory( artifactsToDwiFilter->GetOutput() );
+        testImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( m_Parameters.m_SignalGen.GetGradientDirections() ) );
+        testImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( m_Parameters.m_SignalGen.m_Bvalue ) );
+        mitk::DiffusionPropertyHelper propertyHelper( testImage );
+        propertyHelper.InitializeImage();
 
         if (refImage.IsNotNull())
         {
-            if (!CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage()))
-                mitk::IOUtil::SaveBaseData(testImage, mitk::IOUtil::GetTempPath()+"testImage.dwi");
-            CPPUNIT_ASSERT_MESSAGE(testFileName, CompareDwi(testImage->GetVectorImage(), refImage->GetVectorImage()));
+          ITKDiffusionImageType::Pointer itkTestVectorImagePointer = ITKDiffusionImageType::New();
+          mitk::CastToItkImage(testImage, itkTestVectorImagePointer);
+          ITKDiffusionImageType::Pointer itkRefVectorImagePointer = ITKDiffusionImageType::New();
+          mitk::CastToItkImage(refImage, itkRefVectorImagePointer);
+          if (!CompareDwi( itkTestVectorImagePointer, itkRefVectorImagePointer))
+              mitk::IOUtil::SaveBaseData(testImage, mitk::IOUtil::GetTempPath()+"testImage.dwi");
+
+          CPPUNIT_ASSERT_MESSAGE(testFileName, CompareDwi( itkTestVectorImagePointer, itkRefVectorImagePointer));
         }
     }
 

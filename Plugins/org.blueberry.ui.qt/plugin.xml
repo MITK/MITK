@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+   <extension-point id="org.blueberry.ui.commands" name="Commands" schema="schema/commands.exsd"/>
+   <extension-point id="org.blueberry.ui.editors" name="Editors" schema="schema/editors.exsd"/>
+   <extension-point id="org.blueberry.ui.handlers" name="Handlers" schema="schema/handlers.exsd"/>
+   <extension-point id="org.blueberry.ui.intro" name="Introduction Extensions" schema="schema/intro.exsd"/>
+   <extension-point id="org.blueberry.ui.preferencePages" name="Preference Pages" schema="schema/preferencePages.exsd"/>
+   <extension-point id="org.blueberry.ui.views" name="Views" schema="schema/views.exsd"/>
+   <extension-point id="org.blueberry.ui.keywords" name="keywords" schema="schema/keywords.exsd"/>
+   <extension-point id="org.blueberry.ui.tweaklets" name="Tweaklets" schema="schema/tweaklets.exsd"/>
+   <extension-point id="org.blueberry.ui.perspectives" name="Perspectives" schema="schema/perspectives.exsd"/>
+   <extension-point id="org.blueberry.ui.presentationFactories" name="Presentation Factories" schema="schema/presentationFactories.exsd"/>
+   <extension-point id="org.blueberry.ui.services" name="Services" schema="schema/services.exsd"/>
+   <extension-point id="org.blueberry.ui.perspectiveExtensions" name="Perspective Extensions" schema="schema/perspectiveExtensions.exsd"/>
+
+   <extension point="org.blueberry.ui.services">
+
+      <serviceFactory factoryClass="berry::WorkbenchSupportFactory">
+         <service serviceClass="org.blueberry.ui.IProgressService"/>
+         <service serviceClass="org.blueberry.ui.IWorkbenchSiteProgressService"/>
+         <service serviceClass="org.blueberry.ui.IPartService"/>
+         <service serviceClass="org.blueberry.ui.IPageService"/>
+         <service serviceClass="org.blueberry.ui.ISelectionService"/>
+      </serviceFactory>
+
+      <serviceFactory factoryClass="berry::HandlerServiceFactory">
+         <service serviceClass="org.blueberry.ui.IHandlerService"/>
+      </serviceFactory>
+
+      <serviceFactory factoryClass="berry::EvaluationServiceFactory">
+         <service serviceClass="org.blueberry.ui.IEvaluationService"/>
+      </serviceFactory>
+<!--
+      <serviceFactory factoryClass="berry::ContextServiceFactory">
+         <service serviceClass="org.blueberry.ui.IContextService"/>
+      </serviceFactory>
+-->
+      <serviceFactory factoryClass="berry::CommandServiceFactory">
+         <service serviceClass="org.blueberry.ui.ICommandService"/>
+      </serviceFactory>
+
+      <serviceFactory factoryClass="berry::MenuServiceFactory">
+         <service serviceClass="org.blueberry.ui.IMenuService"/>
+      </serviceFactory>
+
+      <sourceProvider provider="berry::WorkbenchSourceProvider">
+         <variable name="selection" priorityLevel="workbench"/>
+         <variable name="activeShell" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindowShell" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow.isToolbarVisible" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow.isPerspectiveBarVisible" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow.isSatusLineVisible" priorityLevel="workbench"/>
+         <variable name="activeWorkbenchWindow.activePerspective" priorityLevel="workbench"/>
+         <variable name="activeEditor" priorityLevel="workbench"/>
+         <variable name="activeEditorId" priorityLevel="workbench"/>
+         <variable name="activePart" priorityLevel="workbench"/>
+         <variable name="activePartId" priorityLevel="workbench"/>
+         <variable name="activeSite" priorityLevel="workbench"/>
+         <variable name="activeEditorInput" priorityLevel="workbench"/>
+      </sourceProvider>
+
+   </extension>
+
+   <extension point="org.blueberry.ui.commands">
+     <category
+       name="File"
+       description=""
+       id="org.blueberry.ui.category.file" />
+     <category
+       name="Edit"
+       description=""
+       id="org.blueberry.ui.category.edit" />
+     <category
+       name="Window"
+       description=""
+       id="org.blueberry.ui.category.window" />
+     <category
+       name="Help"
+       description=""
+       id="org.blueberry.ui.category.help" />
+     <category
+       name="Views"
+       description="Commands for opening views"
+       id="org.blueberry.ui.category.views">
+     </category>
+     <category
+       name="Perspectives"
+       description="Commands for opening perspectives"
+       id="org.blueberry.ui.category.perspectives">
+     </category>
+
+     <command
+        name="Save"
+        description="Save the current contents"
+        categoryId="org.blueberry.ui.category.file"
+        id="org.blueberry.ui.file.save" />
+     <!--
+     <command
+        name="Save"
+        description="Save the current contents"
+        categoryId="org.blueberry.ui.category.file"
+        defaultHandler="berry::SaveHandler"
+        id="org.blueberry.ui.file.save" />
+     -->
+     <command
+        categoryId="org.blueberry.ui.category.file"
+        defaultHandler="berry::QuitHandler"
+        description="Exit the application"
+        id="org.blueberry.ui.file.exit"
+        name="Exit"/>
+     <command
+        name="Undo"
+        description="Undo the last operation"
+        categoryId="org.blueberry.ui.category.edit"
+        id="org.blueberry.ui.edit.undo" />
+     <command
+        name="Redo"
+        description="Redo the last operation"
+        categoryId="org.blueberry.ui.category.edit"
+        id="org.blueberry.ui.edit.redo" />
+     <command
+        name="Cut"
+        description="Cut the selection to the clipboard"
+        categoryId="org.blueberry.ui.category.edit"
+        id="org.blueberry.ui.edit.cut" />
+     <command
+        name="Copy"
+        description="Copy the selection to the clipboard"
+        categoryId="org.blueberry.ui.category.edit"
+        id="org.blueberry.ui.edit.copy" />
+     <command
+        name="Paste"
+        description="Paste from the clipboard"
+        categoryId="org.blueberry.ui.category.edit"
+        id="org.blueberry.ui.edit.paste" />
+     <command
+        name="Delete"
+        description="Delete the selection"
+        categoryId="org.blueberry.ui.category.edit"
+        id="org.blueberry.ui.edit.delete" />
+
+     <command
+       name="Help Contents"
+       description="Open the help contents"
+       categoryId="org.blueberry.ui.category.help"
+       defaultHandler="berry::HelpContentsHandler"
+       id="org.blueberry.ui.help.helpContents" />
+     <!--
+     <command
+       name="Help Search"
+       description="Open the help search"
+       categoryId="org.blueberry.ui.category.help"
+       defaultHandler="berry::HelpSearchHandler"
+       id="org.blueberry.ui.help.helpSearch" />
+     -->
+     <command
+       name="Dynamic Help"
+       description="Open the dynamic help"
+       categoryId="org.blueberry.ui.category.help"
+       defaultHandler="berry::DynamicHelpHandler"
+       id="org.blueberry.ui.help.dynamicHelp" />
+     <command
+       name="Welcome"
+       description="Show help for beginning users"
+       categoryId="org.blueberry.ui.category.help"
+       id="org.blueberry.ui.help.intro" />
+     <command
+       name="About"
+       description="Open the about dialog"
+       categoryId="org.blueberry.ui.category.help"
+       helpContextId="org.blueberry.ui.about_action_context"
+       id="org.blueberry.ui.help.aboutAction" />
+     <command
+        name="Show View"
+        description="Shows a particular view"
+        id="org.blueberry.ui.views.showView"
+        defaultHandler="berry::ShowViewHandler">
+        <commandParameter
+          id="org.blueberry.ui.views.showView.viewId"
+          name="View"
+          values="berry::ViewParameterValues" />
+        <commandParameter
+          id="org.blueberry.ui.views.showView.secondaryId"
+          name="Secondary Id"
+          optional="true"/>
+     </command>
+     <command
+        name="Save Perspective As"
+        description="Save the current perspective"
+        categoryId="org.blueberry.ui.category.window"
+        id="org.blueberry.ui.window.savePerspective" />
+     <command
+        name="Close All Perspectives"
+        description="Close all open perspectives"
+        categoryId="org.blueberry.ui.category.window"
+        id="org.blueberry.ui.window.closeAllPerspectives" />
+     <command
+        name="Close Perspective"
+        description="Close the current perspective"
+        categoryId="org.blueberry.ui.category.window"
+        id="org.blueberry.ui.window.closePerspective">
+        <commandParameter
+          id="org.blueberry.ui.window.closePerspective.perspectiveId"
+          name="Perspective Id"
+          optional="true"
+          values="berry::PerspectiveParameterValues">
+        </commandParameter>
+     </command>
+     <command
+        name="Reset Perspective"
+        description="Reset the current perspective to its default state"
+        categoryId="org.blueberry.ui.category.window"
+        id="org.blueberry.ui.window.resetPerspective" />
+
+     <command
+        categoryId="org.blueberry.ui.category.perspectives"
+        defaultHandler="berry::ShowPerspectiveHandler"
+        description="Show a particular perspective"
+        id="org.blueberry.ui.perspectives.showPerspective"
+        name="Show Perspective">
+        <commandParameter
+           id="org.blueberry.ui.perspectives.showPerspective.perspectiveId"
+           name="Parameter"
+           values="berry::PerspectiveParameterValues">
+        </commandParameter>
+        <commandParameter
+           id="org.blueberry.ui.perspectives.showPerspective.newWindow"
+           name="In New Window"
+           optional="true">
+        </commandParameter>
+     </command>
+
+     <command
+        categoryId="org.blueberry.ui.category.window"
+        description="Open the preferences dialog"
+        id="org.blueberry.ui.window.preferences"
+        name="Preferences">
+        <commandParameter
+           id="preferencePageId"
+           name="Preference Page"
+           optional="true"
+           values="berry::PreferencePageParameterValues"/>
+     </command>
+
+     <command
+        categoryId="org.blueberry.ui.category.window"
+        defaultHandler="berry::OpenInNewWindowHandler"
+        description="Open another window"
+        id="org.blueberry.ui.window.newWindow"
+        name="New Window"/>
+     <command
+        name="New Editor"
+        description="Open another editor on the active editor's input"
+        categoryId="org.blueberry.ui.category.window"
+        id="org.blueberry.ui.window.newEditor"/>
+
+   </extension>
+
+  <extension point="org.blueberry.core.expressions.propertyTesters">
+    <propertyTester
+      class="berry::OpenPerspectivePropertyTester"
+      id="org.blueberry.ui.openPerspectivePropertyTester"
+      namespace="org.blueberry.ui.workbenchWindow"
+      properties="isPerspectiveOpen"
+      type="berry::IWorkbenchWindow">
+    </propertyTester>
+  </extension>
+
+   <extension point="org.blueberry.ui.handlers">
+     <handler
+       class="berry::NewEditorHandler"
+       commandId="org.blueberry.ui.window.newEditor">
+       <enabledWhen>
+         <with variable="activeEditor">
+           <instanceof value="berry::IEditorPart"/>
+         </with>
+       </enabledWhen>
+     </handler>
+     <handler
+       class="berry::SavePerspectiveHandler"
+       commandId="org.blueberry.ui.window.savePerspective">
+       <enabledWhen>
+         <or>
+           <with variable="activeWorkbenchWindow">
+             <test property="org.blueberry.ui.workbenchWindow.isPerspectiveOpen"/>
+           </with>
+           <!-- this is a workaround to evaluate the expression -->
+           <with variable="activePart">
+             <instanceof value="berry::IWorkbenchPart"/>
+           </with>
+         </or>
+       </enabledWhen>
+     </handler>
+     <handler
+       class="berry::CloseAllPerspectivesHandler"
+       commandId="org.blueberry.ui.window.closeAllPerspectives">
+       <enabledWhen>
+         <or>
+           <with variable="activeWorkbenchWindow">
+             <test property="org.blueberry.ui.workbenchWindow.isPerspectiveOpen"/>
+           </with>
+           <!-- this is a workaround to evaluate the expression -->
+           <with variable="activePart">
+             <instanceof value="berry::IWorkbenchPart"/>
+           </with>
+         </or>
+       </enabledWhen>
+     </handler>
+     <handler
+       class="berry::ClosePerspectiveHandler"
+       commandId="org.blueberry.ui.window.closePerspective">
+       <enabledWhen>
+         <or>
+           <with variable="activeWorkbenchWindow">
+             <test property="org.blueberry.ui.workbenchWindow.isPerspectiveOpen"/>
+           </with>
+           <!-- this is a workaround to evaluate the expression -->
+           <with variable="activePart">
+             <instanceof value="berry::IWorkbenchPart"/>
+           </with>
+         </or>
+       </enabledWhen>
+     </handler>
+     <handler
+       class="berry::ResetPerspectiveHandler"
+       commandId="org.blueberry.ui.window.resetPerspective">
+       <enabledWhen>
+         <or>
+           <with variable="activeWorkbenchWindow">
+             <test property="org.blueberry.ui.workbenchWindow.isPerspectiveOpen"/>
+           </with>
+           <!-- this is a workaround to evaluate the expression -->
+           <with variable="activePart">
+             <instanceof value="berry::IWorkbenchPart"/>
+           </with>
+         </or>
+       </enabledWhen>
+     </handler>
+     <handler
+       class="berry::IntroHandler"
+       commandId="org.blueberry.ui.help.intro">
+       <enabledWhen>
+         <or>
+           <with variable="activeWorkbenchWindow">
+             <test property="org.blueberry.ui.workbenchWindow.isPerspectiveOpen"/>
+           </with>
+           <!-- this is a workaround to evaluate the expression -->
+           <with variable="activePart">
+             <instanceof value="berry::IWorkbenchPart"/>
+           </with>
+         </or>
+       </enabledWhen>
+     </handler>
+     <handler
+       class="berry::HelpContentsHandler"
+       commandId="org.blueberry.ui.help.helpContents">
+       <enabledWhen>
+         <or>
+           <with variable="org.blueberry.core.runtime.Platform">
+             <test property="org.blueberry.core.runtime.pluginState" args="org.blueberry.ui.qt.help" value="STARTING"/>
+           </with>
+           <with variable="org.blueberry.core.runtime.Platform">
+             <test property="org.blueberry.core.runtime.pluginState" args="org.blueberry.ui.qt.help" value="ACTIVE"/>
+           </with>
+         </or>
+       </enabledWhen>
+     </handler>
+     <handler
+       class="berry::DynamicHelpHandler"
+       commandId="org.blueberry.ui.help.dynamicHelp">
+       <enabledWhen>
+         <or>
+           <with variable="org.blueberry.core.runtime.Platform">
+             <test property="org.blueberry.core.runtime.pluginState" args="org.blueberry.ui.qt.help" value="STARTING"/>
+           </with>
+           <with variable="org.blueberry.core.runtime.Platform">
+             <test property="org.blueberry.core.runtime.pluginState" args="org.blueberry.ui.qt.help" value="ACTIVE"/>
+           </with>
+         </or>
+       </enabledWhen>
+     </handler>
+   </extension>
+
+   <extension point="org.blueberry.ui.views">
+      <category
+            name="General"
+            id="org.blueberry.ui"/>
+      <view
+            class="berry::ViewIntroAdapterPart"
+            category="org.blueberry.ui"
+            name="Welcome"
+            id="org.blueberry.ui.internal.introview"/>
+      <stickyView
+            location="RIGHT"
+            id="org.blueberry.ui.internal.introview"/>
+   </extension>
+
+   <extension point="org.blueberry.ui.editors">
+      <editor
+            class="berry::EditorIntroAdapterPart"
+            name="Welcome"
+            id="org.blueberry.ui.internal.introeditor">
+      </editor>
+   </extension>
+
+   <extension point="org.blueberry.ui.tweaklets">
+      <tweaklet
+         id="org.blueberry.ui.qt.tweaklets.WorkbenchTweaklet"
+         name="Qt Workbench Tweaklet"
+         description="Qt specific Workbench tweaks"
+         definition="org.blueberry.WorkbenchTweaklet"
+         implementation="berry::QtWorkbenchTweaklet" />
+
+      <tweaklet
+         id="org.blueberry.ui.qt.tweaklets.WorkbenchPageTweaklet"
+         name="Qt WorkbenchPage Tweaklet"
+         description="Qt specific WorkbenchPage tweaks"
+         definition="org.blueberry.WorkbenchPageTweaklet"
+         implementation="berry::QtWorkbenchPageTweaklet" />
+
+      <tweaklet
+         id="org.blueberry.ui.qt.tweaklets.GuiWidgetsTweaklet"
+         name="Qt Widgets Tweaklet"
+         description="Qt specific widget tweaks"
+         definition="org.blueberry.GuiWidgetsTweaklet"
+         implementation="berry::QtWidgetsTweaklet" />
+
+       <tweaklet
+         id="org.blueberry.ui.qt.tweaklets.DnDTweaklet"
+         name="Qt DnD Tweaklet"
+         description="Qt specific DnD tweaks"
+         definition="org.blueberry.DnDTweaklet"
+         implementation="berry::QtDnDTweaklet" />
+
+       <tweaklet
+         id="org.blueberry.ui.qt.tweaklets.ImageTweaklet"
+         name="Qt Image Tweaklet"
+         description="Qt specific image tweaks"
+         definition="org.blueberry.ImageTweaklet"
+         implementation="berry::QtImageTweaklet" />
+
+       <tweaklet
+         id="org.blueberry.ui.qt.tweaklets.MessageDialogTweaklet"
+         name="Qt Message Dialog Tweaklet"
+         description="Qt specific message dialogs"
+         definition="org.blueberry.MessageDialogTweaklet"
+         implementation="berry::QtMessageDialogTweaklet" />
+   </extension>
+
+   <extension point="org.blueberry.ui.presentationFactories">
+      <factory
+            name="Default"
+            class="berry::QtWorkbenchPresentationFactory"
+            id="org.blueberry.ui.presentations.default">
+      </factory>
+   </extension>
+
+   <extension point="org.blueberry.ui.keywords">
+     <keyword id="org.blueberry.ui.style" label="theme skin style appearance"/>
+     <keyword id="org.blueberry.ui.perspectives" label="open view switch"/>
+   </extension>
+
+</plugin>

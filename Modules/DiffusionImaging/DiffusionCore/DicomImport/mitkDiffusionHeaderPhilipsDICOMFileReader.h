@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkDiffusionCore_EXPORT DiffusionHeaderPhilipsDICOMFileReader
+class MITKDIFFUSIONCORE_EXPORT DiffusionHeaderPhilipsDICOMFileReader
     : public DiffusionHeaderDICOMFileReader
 {
 public:
@@ -32,7 +32,7 @@ public:
   mitkClassMacro( DiffusionHeaderPhilipsDICOMFileReader, DiffusionHeaderDICOMFileReader )
   itkNewMacro( Self )
 
-  virtual bool ReadDiffusionHeader(std::string filename);
+  virtual bool ReadDiffusionHeader(std::string filename) override;
 
 protected:
   DiffusionHeaderPhilipsDICOMFileReader();

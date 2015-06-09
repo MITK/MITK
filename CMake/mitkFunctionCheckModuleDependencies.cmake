@@ -13,61 +13,44 @@
 function(mitk_check_module_dependencies)
 
   set(_macro_params
-      MODULES                  # MITK modules which the given TARGET uses
-      PACKAGES                 # MITK packages which the given TARGET uses
       MISSING_DEPENDENCIES_VAR # variable for storing missing dependencies
       MODULE_DEPENDENCIES_VAR  # variable for storing all module dependencies
       PACKAGE_DEPENDENCIES_VAR # variable for storing all package dependencies
      )
 
+  set(_macro_multiparams
+      MODULES                  # MITK modules which the given TARGET uses
+      PACKAGES                 # MITK packages which the given TARGET uses
+     )
+
   set(_macro_options )
 
-  MACRO_PARSE_ARGUMENTS(CHECK "${_macro_params}" "${_macro_options}" ${ARGN})
+  cmake_parse_arguments(CHECK "" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
 
   set(missing_deps )
   set(depends ${CHECK_MODULES})
   set(package_depends ${CHECK_PACKAGES})
+  set(module_names )
+  set(package_names )
 
-  if(depends)
-    set(depends_before "not initialized")
-    while(NOT "${depends}" STREQUAL "${depends_before}")
-      set(depends_before ${depends})
-      foreach(dependency ${depends})
-        set(_module_found 1)
-        if(NOT ${dependency}_CONFIG_FILE)
-          set(_module_found 0)
-        endif()
-        set(_dependency_file_name ${${dependency}_CONFIG_FILE})
-        if(NOT EXISTS ${_dependency_file_name})
-          set(_module_found 0)
-        endif()
+  foreach(dep ${depends})
+    if(NOT dep STREQUAL "PUBLIC" AND NOT dep STREQUAL "PRIVATE" AND NOT dep STREQUAL "INTERFACE")
+      if(NOT TARGET ${dep})
+        list(APPEND missing_deps ${dep})
+      endif()
+      list(APPEND module_names ${dep})
+    endif()
+  endforeach()
 
-        if(_module_found)
-          include(${_dependency_file_name})
-          if(${dependency}_IS_ENABLED)
-            list(APPEND depends ${${dependency}_DEPENDS})
-            list(APPEND package_depends ${${dependency}_PACKAGE_DEPENDS})
-          else(${dependency}_IS_ENABLED)
-            list(APPEND missing_deps ${dependency})
-          endif()
-        else()
-          list(APPEND missing_deps ${dependency})
-        endif()
-      endforeach()
-      list(REMOVE_DUPLICATES depends)
-      list(SORT depends)
-    endwhile()
-  endif()
-
-  set(package_names_depends)
+  set(package_names)
   if(package_depends)
-    list(REMOVE_DUPLICATES package_depends)
     _mitk_parse_package_args(${package_depends})
-    foreach(_package ${PACKAGE_NAMES})
+    set(package_names ${PUBLIC_PACKAGE_NAMES} ${PRIVATE_PACKAGE_NAMES} ${INTERFACE_PACKAGE_NAMES})
+    list(REMOVE_DUPLICATES package_names)
+    foreach(_package ${package_names})
       if((DEFINED MITK_USE_${_package}) AND NOT (${MITK_USE_${_package}}))
         list(APPEND missing_deps ${_package})
       endif()
-      list(APPEND package_names_depends ${_package})
     endforeach()
   endif()
 
@@ -78,12 +61,9 @@ function(mitk_check_module_dependencies)
     endif()
   endif()
   if(CHECK_MODULE_DEPENDENCIES_VAR)
-    set(${CHECK_MODULE_DEPENDENCIES_VAR} ${depends} PARENT_SCOPE)
+    set(${CHECK_MODULE_DEPENDENCIES_VAR} ${module_names} PARENT_SCOPE)
   endif()
   if(CHECK_PACKAGE_DEPENDENCIES_VAR)
-    if(package_depends)
-      list(REMOVE_DUPLICATES package_names_depends)
-    endif()
-    set(${CHECK_PACKAGE_DEPENDENCIES_VAR} ${package_names_depends} PARENT_SCOPE)
+    set(${CHECK_PACKAGE_DEPENDENCIES_VAR} ${package_names} PARENT_SCOPE)
   endif()
 endfunction()

@@ -36,15 +36,15 @@ namespace mitk
 
   $Author: maleike $
 */
-class MitkSegmentation_EXPORT DiffImageApplier : public itk::Object, public OperationActor
+class MITKSEGMENTATION_EXPORT DiffImageApplier : public itk::Object, public OperationActor
 {
   public:
 
-    mitkClassMacro(DiffImageApplier, Object);
+    mitkClassMacroItkParent(DiffImageApplier, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual void ExecuteOperation( Operation* operation );
+    virtual void ExecuteOperation( Operation* operation ) override;
 
     static DiffImageApplier* GetInstanceForUndo();
 

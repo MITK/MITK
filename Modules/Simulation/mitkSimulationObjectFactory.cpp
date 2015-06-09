@@ -17,10 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIndexROI.h"
 #include "mitkSimulation.h"
 #include "mitkSimulationObjectFactory.h"
+#include "mitkSimulationVtkMapper2D.h"
 #include "mitkSimulationVtkMapper3D.h"
-#include "mitkSimulationWriter.h"
 #include "mitkVtkModel.h"
 #include <mitkCoreObjectFactory.h>
+#include <boost/core/ignore_unused.hpp>
 #include <sofa/helper/system/glut.h>
 #include <sofa/component/init.h>
 #include <sofa/core/ObjectFactory.h>
@@ -45,31 +46,20 @@ static void RegisterSofaClasses()
 
   int IndexROIClass = RegisterObject("").add<mitk::IndexROI>();
   int VtkModelClass = RegisterObject("").add<mitk::VtkModel>();
+  boost::ignore_unused(IndexROIClass, VtkModelClass);
 
   ObjectFactory::AddAlias("VisualModel", "VtkModel", true);
   ObjectFactory::AddAlias("OglModel", "VtkModel", true);
 }
 
 mitk::SimulationObjectFactory::SimulationObjectFactory()
-  : m_SimulationIOFactory(SimulationIOFactory::New()),
-    m_SimulationWriterFactory(SimulationWriterFactory::New())
 {
-  itk::ObjectFactoryBase::RegisterFactory(m_SimulationIOFactory);
-  itk::ObjectFactoryBase::RegisterFactory(m_SimulationWriterFactory);
-
-  m_FileWriters.push_back(SimulationWriter::New().GetPointer());
-
-  std::string description = "SOFA Scene Files";
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.scn", description));
-
   InitializeSofa();
   RegisterSofaClasses();
 }
 
 mitk::SimulationObjectFactory::~SimulationObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationWriterFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_SimulationIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::SimulationObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
@@ -78,8 +68,14 @@ mitk::Mapper::Pointer mitk::SimulationObjectFactory::CreateMapper(mitk::DataNode
 
   if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
   {
-    if (slotId == BaseRenderer::Standard3D)
-      mapper = mitk::SimulationVtkMapper3D::New();
+    if (slotId == BaseRenderer::Standard2D)
+    {
+      mapper = SimulationVtkMapper2D::New();
+    }
+    else if (slotId == BaseRenderer::Standard3D)
+    {
+      mapper = SimulationVtkMapper3D::New();
+    }
 
     if (mapper.IsNotNull())
       mapper->SetDataNode(node);
@@ -95,31 +91,22 @@ const char* mitk::SimulationObjectFactory::GetDescription() const
 
 const char* mitk::SimulationObjectFactory::GetFileExtensions()
 {
-  std::string fileExtensions;
-  this->CreateFileExtensions(m_FileExtensionsMap, fileExtensions);
-  return fileExtensions.c_str();
+  return NULL;
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetFileExtensionsMap()
 {
-  return m_FileExtensionsMap;
-}
-
-const char* mitk::SimulationObjectFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
+  return MultimapType();
 }
 
 const char* mitk::SimulationObjectFactory::GetSaveFileExtensions()
 {
-  std::string saveFileExtensions;
-  this->CreateFileExtensions(m_FileExtensionsMap, saveFileExtensions);
-  return saveFileExtensions.c_str();
+  return NULL;
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetSaveFileExtensionsMap()
 {
-  return m_SaveFileExtensionsMap;
+  return MultimapType();
 }
 
 void mitk::SimulationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
@@ -128,7 +115,10 @@ void mitk::SimulationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     return;
 
   if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
+  {
+    SimulationVtkMapper2D::SetDefaultProperties(node);
     SimulationVtkMapper3D::SetDefaultProperties(node);
+  }
 }
 
 void mitk::RegisterSimulationObjectFactory()
@@ -137,7 +127,7 @@ void mitk::RegisterSimulationObjectFactory()
 
   if (!alreadyRegistered)
   {
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::SimulationObjectFactory::New());
+    CoreObjectFactory::GetInstance()->RegisterExtraFactory(SimulationObjectFactory::New());
     alreadyRegistered = true;
   }
 }

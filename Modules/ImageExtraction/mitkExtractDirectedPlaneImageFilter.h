@@ -66,7 +66,7 @@ namespace mitk
   Last contributor: $Author: T. Schwarz$
 */
 
-  class MitkImageExtraction_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
+  class MITKIMAGEEXTRACTION_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
   {
   public:
 
@@ -100,8 +100,8 @@ namespace mitk
     ExtractDirectedPlaneImageFilter(); // purposely hidden
     virtual ~ExtractDirectedPlaneImageFilter();
 
-    virtual void GenerateData();
-    virtual void GenerateOutputInformation();
+    virtual void GenerateData() override;
+    virtual void GenerateOutputInformation() override;
 
     bool CalculateClippedPlaneBounds( const BaseGeometry *boundingGeometry,
       const PlaneGeometry *planeGeometry, double *bounds );

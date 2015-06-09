@@ -29,14 +29,14 @@ namespace mitk
 {
   /**
   * \brief A generic base class for cost functions for use in simulated annealing */
-  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingCostFunctionBase : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSimulatedAnnealingCostFunctionBase : public itk::Object
   {
   public:
 
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsSimulatedAnnealingCostFunctionBase, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsSimulatedAnnealingCostFunctionBase, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

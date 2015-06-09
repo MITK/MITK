@@ -50,7 +50,7 @@ void QmitkXnatConnectionPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
 {
-  IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
+  IPreferencesService* prefService = Platform::GetPreferencesService();
   berry::IPreferences::Pointer _XnatConnectionPreferencesNode = prefService->GetSystemPreferences()->Node("/XnatConnection");
   m_XnatConnectionPreferencesNode = _XnatConnectionPreferencesNode;
 
@@ -109,11 +109,11 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
     IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
     if(_XnatConnectionPreferencesNode.IsNotNull())
     {
-      _XnatConnectionPreferencesNode->Put(m_Controls.hostAddressLabel->text().toStdString(), m_Controls.inHostAddress->text().toStdString());
-      _XnatConnectionPreferencesNode->Put(m_Controls.portLabel->text().toStdString(), m_Controls.inPort->text().toStdString());
-      _XnatConnectionPreferencesNode->Put(m_Controls.usernameLabel->text().toStdString(), m_Controls.inUsername->text().toStdString());
-      _XnatConnectionPreferencesNode->Put(m_Controls.passwortLabel->text().toStdString(), m_Controls.inPassword->text().toStdString());
-      _XnatConnectionPreferencesNode->Put(m_Controls.downloadPathLabel->text().toStdString(), m_Controls.inDownloadPath->text().toStdString());
+      _XnatConnectionPreferencesNode->Put(m_Controls.hostAddressLabel->text(), m_Controls.inHostAddress->text());
+      _XnatConnectionPreferencesNode->Put(m_Controls.portLabel->text(), m_Controls.inPort->text());
+      _XnatConnectionPreferencesNode->Put(m_Controls.usernameLabel->text(), m_Controls.inUsername->text());
+      _XnatConnectionPreferencesNode->Put(m_Controls.passwortLabel->text(), m_Controls.inPassword->text());
+      _XnatConnectionPreferencesNode->Put(m_Controls.downloadPathLabel->text(), m_Controls.inDownloadPath->text());
 
       _XnatConnectionPreferencesNode->Flush();
 
@@ -171,16 +171,16 @@ void QmitkXnatConnectionPreferencePage::Update()
   IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
   if(_XnatConnectionPreferencesNode.IsNotNull())
   {
-    m_Controls.inHostAddress->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(
-      m_Controls.hostAddressLabel->text().toStdString(), m_Controls.inHostAddress->text().toStdString())));
-    m_Controls.inPort->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(
-      m_Controls.portLabel->text().toStdString(), m_Controls.inPort->text().toStdString())));
-    m_Controls.inUsername->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(
-      m_Controls.usernameLabel->text().toStdString(), m_Controls.inUsername->text().toStdString())));
-    m_Controls.inPassword->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(
-      m_Controls.passwortLabel->text().toStdString(), m_Controls.inPassword->text().toStdString())));
-    m_Controls.inDownloadPath->setText(QString::fromStdString(_XnatConnectionPreferencesNode->Get(
-      m_Controls.downloadPathLabel->text().toStdString(), m_Controls.inDownloadPath->text().toStdString())));
+    m_Controls.inHostAddress->setText(_XnatConnectionPreferencesNode->Get(
+      m_Controls.hostAddressLabel->text(), m_Controls.inHostAddress->text()));
+    m_Controls.inPort->setText(_XnatConnectionPreferencesNode->Get(
+      m_Controls.portLabel->text(), m_Controls.inPort->text()));
+    m_Controls.inUsername->setText(_XnatConnectionPreferencesNode->Get(
+      m_Controls.usernameLabel->text(), m_Controls.inUsername->text()));
+    m_Controls.inPassword->setText(_XnatConnectionPreferencesNode->Get(
+      m_Controls.passwortLabel->text(), m_Controls.inPassword->text()));
+    m_Controls.inDownloadPath->setText(_XnatConnectionPreferencesNode->Get(
+      m_Controls.downloadPathLabel->text(), m_Controls.inDownloadPath->text()));
   }
 }
 
@@ -206,8 +206,14 @@ void QmitkXnatConnectionPreferencePage::UrlChanged()
 void QmitkXnatConnectionPreferencePage::DownloadPathChanged()
 {
   m_Controls.inDownloadPath->setStyleSheet("QLineEdit { background-color: white; }");
-  if(!m_Controls.inDownloadPath->text().isEmpty())
+  QString downloadPath = m_Controls.inDownloadPath->text();
+  if(!downloadPath.isEmpty())
   {
+    if (downloadPath.lastIndexOf("/") != downloadPath.size()-1)
+    {
+      downloadPath.append("/");
+      m_Controls.inDownloadPath->setText(downloadPath);
+    }
     QFileInfo path(m_Controls.inDownloadPath->text());
     if(!path.isDir())
     {

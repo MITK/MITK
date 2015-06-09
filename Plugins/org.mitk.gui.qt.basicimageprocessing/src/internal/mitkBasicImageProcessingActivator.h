@@ -17,11 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKBASICIMAGEPROCESSINGACTIVATOR_H
 
 #include <ctkPluginActivator.h>
-#include <mitkExportMacros.h>
 
 namespace mitk {
 
-class MITK_LOCAL BasicImageProcessingActivator :
+class BasicImageProcessingActivator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
@@ -32,8 +31,8 @@ class MITK_LOCAL BasicImageProcessingActivator :
 
 public:
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
 }; // basicImageProcessingActivator
 

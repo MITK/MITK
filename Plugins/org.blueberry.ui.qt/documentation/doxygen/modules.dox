@@ -1,0 +1,17 @@
+/**
+  \defgroup org_blueberry_ui_qt org.blueberry.ui.qt
+  \ingroup BlueBerryPlugins
+
+  \brief This is the user interface plugin. It provides a Qt based framework
+  to build a BlueBerry workbench.
+
+*/
+
+/**
+  \defgroup org_blueberry_ui_qt_internal Internal
+  \ingroup org_blueberry_ui_qt
+
+  \brief This subcategory includes the internal classes of the org.blueberry.ui.qt plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

@@ -17,7 +17,9 @@ set(proj VTK)
 set(proj_DEPENDENCIES )
 set(VTK_DEPENDS ${proj})
 
-  set(VTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchVTK.cmake)
+if(MITK_USE_HDF5)
+  list(APPEND proj_DEPENDENCIES HDF5)
+endif()
 
 if(NOT DEFINED VTK_DIR)
 
@@ -49,7 +51,11 @@ if(NOT DEFINED VTK_DIR)
   if(MITK_USE_Python)
     if(NOT MITK_USE_SYSTEM_PYTHON)
      list(APPEND proj_DEPENDENCIES Python)
+     set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:FILEPATH=${MITK_PYTHON_SITE_DIR})
+    else()
+      set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:PATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
     endif()
+
     list(APPEND additional_cmake_args
          -DVTK_WRAP_PYTHON:BOOL=ON
          -DVTK_USE_TK:BOOL=OFF
@@ -58,6 +64,7 @@ if(NOT DEFINED VTK_DIR)
          -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
          -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
          -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
+         ${_vtk_install_python_dir}
         )
   else()
     list(APPEND additional_cmake_args
@@ -78,34 +85,40 @@ if(NOT DEFINED VTK_DIR)
      )
   endif()
 
-  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.1.0+74f4888.tar.gz)
-  set(VTK_URL_MD5 1f19dae22c42c032109bd3cf91c4e8c9)
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
 
+  set(VTK_URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-6.2.0.tar.gz)
+  set(VTK_URL_MD5 4790f8b3acdbc376997fbdc9d203f0b7)
 
   ExternalProject_Add(${proj}
-    SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-    BINARY_DIR ${proj}-build
-    PREFIX ${proj}-cmake
+    LIST_SEPARATOR ${sep}
     URL ${VTK_URL}
     URL_MD5 ${VTK_URL_MD5}
-    PATCH_COMMAND ${VTK_PATCH_COMMAND}
-    INSTALL_COMMAND ""
+    PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-6.2.0.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
         -DVTK_WRAP_TCL:BOOL=OFF
         -DVTK_WRAP_PYTHON:BOOL=OFF
         -DVTK_WRAP_JAVA:BOOL=OFF
-        -DBUILD_SHARED_LIBS:BOOL=ON
         -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
         -DVTK_LEGACY_REMOVE:BOOL=ON
         -DModule_vtkTestingRendering:BOOL=ON
         -DVTK_MAKE_INSTANTIATORS:BOOL=ON
         ${additional_cmake_args}
-     DEPENDS ${proj_DEPENDENCIES}
-    )
+    CMAKE_CACHE_ARGS
+      ${ep_common_cache_args}
+    CMAKE_CACHE_DEFAULT_ARGS
+      ${ep_common_cache_default_args}
+    DEPENDS ${proj_DEPENDENCIES}
+  )
 
-  set(VTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(VTK_DIR ${ep_prefix})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// implements a table model to show the variables of the Python "__main__" dictionary
 /// furthermore implements dragging and dropping of datanodes (conversion from and to python)
 ///
-class MITK_PYTHON_EXPORT QmitkPythonVariableStackTableModel : public QAbstractTableModel, public mitk::PythonCommandObserver
+class MITKPYTHON_EXPORT QmitkPythonVariableStackTableModel : public QAbstractTableModel, public mitk::PythonCommandObserver
 {
   Q_OBJECT
 
@@ -49,7 +49,7 @@ public:
   QStringList mimeTypes() const;
   bool dropMimeData ( const QMimeData *, Qt::DropAction, int, int, const QModelIndex & );
   Qt::DropActions supportedDropActions() const;
-  Qt::DropActions supportedDragActions() const;
+  //Qt::DropActions supportedDragActions() const;
 
   void CommandExecuted(const std::string& pythonCommand);
 

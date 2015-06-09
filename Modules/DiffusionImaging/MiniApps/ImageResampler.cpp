@@ -22,8 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
-#include <mitkDiffusionImage.h>
 #include <mitkImageTimeSelector.h>
+#include <mitkDiffusionPropertyHelper.h>
+#include <mitkProperties.h>
 
 // ITK
 #include <itksys/SystemTools.hxx>
@@ -35,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkResampleDwiImageFilter.h"
 
 typedef itk::Image<double, 3> InputImageType;
-typedef mitk::DiffusionImage<short> DiffusionImageType;
 
 
 static mitk::Image::Pointer TransformToReference(mitk::Image *reference, mitk::Image *moving, bool sincInterpol = false)
@@ -172,25 +172,10 @@ static void SaveImage(std::string fileName, mitk::Image* image, std::string file
 {
   std::cout << "----Save to " << fileName;
 
-  if (fileType == "dwi") // IOUtil does not handle dwi files properly Bug 15772
-  {
-    try
-    {
-      mitk::IOUtil::Save(dynamic_cast<mitk::DiffusionImage<short>*>(image), fileName.c_str());
-    }
-    catch( const itk::ExceptionObject& e)
-    {
-      MITK_ERROR << "Caught exception: " << e.what();
-      mitkThrow() << "Failed with exception from subprocess!";
-    }
-  }
-  else
-  {
-    mitk::IOUtil::SaveImage(image, fileName);
-  }
+  mitk::IOUtil::Save(image, fileName);
 }
 
-DiffusionImageType::Pointer ResampleDWIbySpacing(DiffusionImageType::Pointer input, float* spacing, bool useLinInt = true)
+mitk::Image::Pointer ResampleDWIbySpacing(mitk::Image::Pointer input, float* spacing, bool useLinInt = true)
 {
 
   itk::Vector<double, 3> spacingVector;
@@ -200,17 +185,20 @@ DiffusionImageType::Pointer ResampleDWIbySpacing(DiffusionImageType::Pointer inp
 
   typedef itk::ResampleDwiImageFilter<short> ResampleFilterType;
 
+  mitk::DiffusionPropertyHelper::ImageType::Pointer itkVectorImagePointer = mitk::DiffusionPropertyHelper::ImageType::New();
+  mitk::CastToItkImage(input, itkVectorImagePointer);
+
   ResampleFilterType::Pointer resampler = ResampleFilterType::New();
-  resampler->SetInput(input->GetVectorImage());
+  resampler->SetInput( itkVectorImagePointer );
   resampler->SetInterpolation(ResampleFilterType::Interpolate_Linear);
   resampler->SetNewSpacing(spacingVector);
   resampler->Update();
 
-  DiffusionImageType::Pointer output = DiffusionImageType::New();
-  output->SetVectorImage(resampler->GetOutput());
-  output->SetDirections(input->GetDirections());
-  output->SetReferenceBValue(input->GetReferenceBValue());
-  output->InitializeFromVectorImage();
+  mitk::Image::Pointer output = mitk::GrabItkImageMemory( resampler->GetOutput() );
+  output->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( mitk::DiffusionPropertyHelper::GetGradientContainer(input) ) );
+  output->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( mitk::DiffusionPropertyHelper::GetReferenceBValue(input) ) );
+  mitk::DiffusionPropertyHelper propertyHelper( output );
+  propertyHelper.InitializeImage();
 
   return output;
 }
@@ -228,9 +216,9 @@ int main( int argc, char* argv[] )
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Show this help text");
   parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "Input:", "Input file",us::Any(),false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory, "Output:", "Output folder (ending with /)",us::Any(),false);
+  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output:", "Output file",us::Any(),false);
   parser.addArgument("spacing", "s", mitkCommandLineParser::String, "Spacing:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
-  parser.addArgument("reference", "r", mitkCommandLineParser::String, "Reference:", "Resample using supplied reference image. Also cuts image to same dimensions",us::Any());
+  parser.addArgument("reference", "r", mitkCommandLineParser::InputImage, "Reference:", "Resample using supplied reference image. Also cuts image to same dimensions",us::Any());
   parser.addArgument("win-sinc", "w", mitkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
@@ -254,21 +242,25 @@ int main( int argc, char* argv[] )
       std::cout << parser.helpText();
       return EXIT_SUCCESS;
     }
-   }
+  }
 
-  std::string outputPath = us::any_cast<string>(parsedArgs["output"]);
+  std::string outputFile = us::any_cast<string>(parsedArgs["output"]);
   std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
 
   std::vector<std::string> spacings;
   float spacing[3];
   if (parsedArgs.count("spacing"))
   {
+
     std::string arg =  us::any_cast<string>(parsedArgs["spacing"]);
-    spacings = split(arg ,',');
-    spacing[0] = atoi(spacings.at(0).c_str());
-    spacing[1] = atoi(spacings.at(1).c_str());
-    spacing[2] = atoi(spacings.at(2).c_str());
-    useSpacing = true;
+    if (arg != "")
+    {
+      spacings = split(arg ,',');
+      spacing[0] = atoi(spacings.at(0).c_str());
+      spacing[1] = atoi(spacings.at(1).c_str());
+      spacing[2] = atoi(spacings.at(2).c_str());
+      useSpacing = true;
+    }
   }
 
   std::string refImageFile = "";
@@ -286,12 +278,12 @@ int main( int argc, char* argv[] )
 
   mitk::Image::Pointer refImage;
   if (!useSpacing)
-      refImage = mitk::IOUtil::LoadImage(refImageFile);
+    refImage = mitk::IOUtil::LoadImage(refImageFile);
 
-  DiffusionImageType::Pointer inputDWI = dynamic_cast<DiffusionImageType*>(mitk::IOUtil::LoadBaseData(inputFile).GetPointer());
-  if (inputDWI.IsNotNull())
+  mitk::Image::Pointer inputDWI = mitk::IOUtil::LoadImage(inputFile);
+  if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(inputDWI.GetPointer()))
   {
-    DiffusionImageType::Pointer outputImage;
+    mitk::Image::Pointer outputImage;
 
     if (useSpacing)
       outputImage = ResampleDWIbySpacing(inputDWI, spacing);
@@ -301,10 +293,7 @@ int main( int argc, char* argv[] )
       return EXIT_FAILURE;
     }
 
-    std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(inputFile);
-
-    std::string outName(outputPath + fileStem + "_res.dwi");
-    mitk::IOUtil::Save(outputImage, outName.c_str());
+    mitk::IOUtil::Save(outputImage, outputFile.c_str());
 
     return EXIT_SUCCESS;
   }
@@ -318,9 +307,8 @@ int main( int argc, char* argv[] )
   else
     resultImage = TransformToReference(refImage,inputImage);
 
-  std::string fileStem = itksys::SystemTools::GetFilenameWithoutExtension(inputFile);
 
-  mitk::IOUtil::SaveImage(resultImage, outputPath + fileStem + "_res.nrrd");
+  mitk::IOUtil::SaveImage(resultImage, outputFile);
 
   return EXIT_SUCCESS;
 }

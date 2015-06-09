@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, CorrectorTool2D, "Correction tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, CorrectorTool2D, "Correction tool");
 }
 
 mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
@@ -97,7 +97,7 @@ bool mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEve
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
-  contour->Clear();
+  contour->Initialize();
   contour->Expand(timestep + 1);
   contour->SetClosed(false, timestep);
   mitk::Point3D point = positionEvent->GetPositionInWorld();
@@ -188,4 +188,3 @@ bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
 
   return true;
 }
-

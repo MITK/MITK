@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
-ctkPluginContext* org_mitk_example_gui_customviewer_Activator::PluginContext = 0;
+ctkPluginContext* org_mitk_example_gui_customviewer_Activator::PluginContext = nullptr;
 
 void org_mitk_example_gui_customviewer_Activator::start(ctkPluginContext* context)
 {
@@ -37,7 +37,7 @@ void org_mitk_example_gui_customviewer_Activator::stop(ctkPluginContext* context
 {
   Q_UNUSED(context)
 
-  PluginContext = 0;
+  PluginContext = nullptr;
 }
 
 ctkPluginContext* org_mitk_example_gui_customviewer_Activator::GetPluginContext()

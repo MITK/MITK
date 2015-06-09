@@ -65,21 +65,19 @@ public:
  ~QmitkDTIAtlasAppIntroPart();
 
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  void StandbyStateChanged(bool standby);
+  void StandbyStateChanged(bool standby) override;
 
-  void SetFocus();
-#ifdef QT_WEBKIT
+  void SetFocus() override;
 
   virtual void CreateConnections();
-
 
 protected slots:
 
 
   void DelegateMeTo(const QUrl& ShowMeNext);
-#endif
+
 protected:
 
   Ui::QmitkWelcomeScreenViewControls* m_Controls;

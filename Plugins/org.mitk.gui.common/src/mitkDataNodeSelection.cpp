@@ -37,7 +37,7 @@ DataNodeSelection::DataNodeSelection(DataNode::Pointer node) :
 DataNodeSelection::DataNodeSelection(const std::vector<DataNode::Pointer>& nodes) :
   m_Selection(new ContainerType())
 {
-  for (std::vector<DataNode::Pointer>::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
+  for (auto i = nodes.begin(); i != nodes.end(); ++i)
   {
     DataNodeObject::Pointer obj(new DataNodeObject(*i));
     m_Selection->push_back(obj);

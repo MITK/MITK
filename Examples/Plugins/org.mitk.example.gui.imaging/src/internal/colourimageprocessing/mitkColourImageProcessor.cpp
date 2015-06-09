@@ -232,7 +232,7 @@ template<class TType> mitk::Image::Pointer mitkColourImageProcessor::ScalarToRGB
 
   int voxel = ioSize[0] * ioSize[1] * ioSize[2];
 
-  unsigned char* RGBABuffer = new unsigned char[4*voxel];
+  auto  RGBABuffer = new unsigned char[4*voxel];
 
   // Convert volume
   {
@@ -280,7 +280,7 @@ template<class TType> mitk::Image::Pointer mitkColourImageProcessor::ScalarToRGB
   else
   {
     MITK_ERROR << "unsupported pixel type";
-    return NULL;
+    return nullptr;
   }
 
   mitkResult->SetClonedGeometry(mitkInput->GetGeometry());
@@ -520,7 +520,7 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryToRGBA(itk::Image<
 
   int voxel= ioSize[0] * ioSize[1] * ioSize[2];
 
-  unsigned char* RGBABuffer = new unsigned char[4*voxel];
+  auto  RGBABuffer = new unsigned char[4*voxel];
 
   //for(int i=0;i<voxel;i++)
 
@@ -567,7 +567,7 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryToRGBA(itk::Image<
   else
   {
     MITK_ERROR << "unsupported pixel type";
-    return 0;
+    return nullptr;
   }
 
   mitk::Image::Pointer resultImage = ScalarAndBinaryToRGBA<short,unsigned char>(inputCT,inputBinary, tf);
@@ -807,7 +807,7 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryAndColorToRGBA(itk
 
   int voxel= ioSize[0] * ioSize[1] * ioSize[2];
 
-  unsigned char* RGBABuffer = new unsigned char[4*voxel];
+  auto  RGBABuffer = new unsigned char[4*voxel];
 
   //for(int i=0;i<voxel;i++)
 
@@ -856,7 +856,7 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryAndColorToRGBA(itk
   else
   {
     MITK_ERROR << "unsupported pixel type";
-    return 0;
+    return nullptr;
   }
 
   mitk::Image::Pointer resultImage = ScalarAndBinaryAndColorToRGBA<short,unsigned char>(inputCT,inputBinary, tf,color);
@@ -876,7 +876,7 @@ mitk::Image::Pointer mitkColourImageProcessor::CombineRGBAImage( const unsigned 
 {
   int voxel= sizeX*sizeY*sizeZ;
 
-  unsigned char* RGBABuffer = new unsigned char[4*voxel];
+  auto  RGBABuffer = new unsigned char[4*voxel];
 
   // Convert volume
   {
@@ -975,7 +975,7 @@ mitk::Image::Pointer mitkColourImageProcessor::combineRGBAImage( mitk::Image::Po
   catch(mitk::Exception& e)
   {
     MITK_ERROR << "mitkColourImageProcessor::combineRGBAImage - No access to image data possible." << e.what();
-    return NULL;
+    return nullptr;
   }
 }
 }//end namespace mitk

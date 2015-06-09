@@ -24,14 +24,14 @@ if(_missing_deps)
 else(_missing_deps)
 
   # dumps out image information
-  add_executable(DumpDICOMMitkImage DumpDICOMMitkImage.cpp)
+  add_executable(DumpDICOMMitkImage src/DumpDICOMMitkImage.cpp)
   mitk_use_modules(TARGET DumpDICOMMitkImage MODULES MitkDICOMTesting)
 
   # compares dumped out image information against reference dump
-  add_executable(VerifyDICOMMitkImageDump VerifyDICOMMitkImageDump.cpp)
+  add_executable(VerifyDICOMMitkImageDump src/VerifyDICOMMitkImageDump.cpp)
   mitk_use_modules(TARGET VerifyDICOMMitkImageDump MODULES MitkDICOMTesting)
 
-  add_subdirectory(Testing)
+  add_subdirectory(test)
 endif()
 
 endif()

@@ -40,10 +40,10 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationToolStorage : public itk::Object
+  class MITKIGT_EXPORT NavigationToolStorage : public itk::Object
   {
   public:
-    mitkClassMacro(NavigationToolStorage,itk::Object);
+    mitkClassMacroItkParent(NavigationToolStorage,itk::Object);
     /** @brief Constructs a NavigationToolStorage without reference to a DataStorage. The Data Nodes of tools have to be added and removed to a data storage outside this class.
      *         Normaly the other constructor should be used.
      */

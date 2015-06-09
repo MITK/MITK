@@ -31,8 +31,8 @@ class org_mitk_example_gui_multipleperspectives_Activator :
 
 public:
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
 
 };
 

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPerspectiveRegistry.h>
 #include <berryWorkbenchPreferenceConstants.h>
 #include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
 #include <berryIEditorReference.h>
 
 #include <mitkLogMacros.h>
@@ -30,12 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <QMessageBox>
 #include <QtCore/qconfig.h>
-#ifdef QT_WEBKIT
-#  include <QWebView>
-#  include <QWebPage>
-#  if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-#    include <QUrlQuery>
-#  endif
+#include <QWebView>
+#include <QWebPage>
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+#  include <QUrlQuery>
 #endif
 #include <QString>
 #include <QStringList>
@@ -49,10 +48,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDTIAtlasAppApplicationPlugin.h"
 #include "mitkDataStorageEditorInput.h"
 
-#include "mitkBaseDataIOFactory.h"
+#include <mitkIOUtil.h>
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 
@@ -101,7 +99,6 @@ void QmitkDTIAtlasAppIntroPart::CreateQtPartControl(QWidget* parent)
     // create GUI widgets
     m_Controls = new Ui::QmitkWelcomeScreenViewControls;
     m_Controls->setupUi(parent);
-#ifdef QT_WEBKIT
 
     // create a QWebView as well as a QWebPage and QWebFrame within the QWebview
     m_view = new QWebView(parent);
@@ -113,13 +110,9 @@ void QmitkDTIAtlasAppIntroPart::CreateQtPartControl(QWidget* parent)
     // adds the webview as a widget
     parent->layout()->addWidget(m_view);
     this->CreateConnections();
-#else
-    parent->layout()->addWidget(new QLabel("<h1><center>Please install Qt with the WebKit option to see cool pictures!</center></h1>"));
-#endif
   }
 }
 
-#ifdef QT_WEBKIT
 void QmitkDTIAtlasAppIntroPart::CreateConnections()
 {
   if ( m_Controls )
@@ -158,9 +151,8 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       // the simplified method removes every whitespace
       // ( whitespace means any character for which the standard C++ isspace() method returns true)
       urlPath = urlPath.simplified();
-      QString tmpPerspectiveId(urlPath.data());
-      tmpPerspectiveId.replace(QString("/"), QString("") );
-      std::string perspectiveId  = tmpPerspectiveId.toStdString();
+      QString perspectiveId(urlPath.data());
+      perspectiveId.replace(QString("/"), QString("") );
 
       // is working fine as long as the perspective id is valid, if not the application crashes
       GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
@@ -207,29 +199,8 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       }
       else
       {
-        mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-        try
-        {
-          nodeReader->SetFileName(fileName->toLocal8Bit().data());
-          nodeReader->Update();
-          for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
-          {
-            mitk::DataNode::Pointer node;
-            node = nodeReader->GetOutput(i);
-            if ( node->GetData() != NULL )
-            {
-              dataStorage->Add(node);
-              dsmodified = true;
-            }
-          }
-        }
-        catch(...)
-        {
-          MITK_INFO << "Could not open file!";
-        }
+        mitk::IOUtil::Load(fileName->toStdString(),*(dataStorage.GetPointer()));
       }
-
-
 
       if(dataStorage.IsNotNull() && dsmodified)
       {
@@ -249,10 +220,6 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
         }
       }
 
-
-
-
-
     }
     // searching for the load
     if(urlHostname.contains(QByteArray("perspectives")) )
@@ -260,9 +227,8 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
       // the simplified method removes every whitespace
       // ( whitespace means any character for which the standard C++ isspace() method returns true)
       urlPath = urlPath.simplified();
-      QString tmpPerspectiveId(urlPath.data());
-      tmpPerspectiveId.replace(QString("/"), QString("") );
-      std::string perspectiveId  = tmpPerspectiveId.toStdString();
+      QString perspectiveId(urlPath.data());
+      perspectiveId.replace(QString("/"), QString("") );
 
       // is working fine as long as the perspective id is valid, if not the application crashes
       GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
@@ -289,8 +255,6 @@ void QmitkDTIAtlasAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
   }
 
 }
-
-#endif
 
 void QmitkDTIAtlasAppIntroPart::StandbyStateChanged(bool standby)
 {

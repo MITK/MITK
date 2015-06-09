@@ -33,10 +33,10 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationToolStorageDeserializer : public itk::Object
+  class MITKIGT_EXPORT NavigationToolStorageDeserializer : public itk::Object
   {
   public:
-    mitkClassMacro(NavigationToolStorageDeserializer,itk::Object);
+    mitkClassMacroItkParent(NavigationToolStorageDeserializer,itk::Object);
     mitkNewMacro1Param(Self,mitk::DataStorage::Pointer);
 
     /**

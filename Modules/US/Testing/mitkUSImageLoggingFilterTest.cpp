@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
 
+#include <mitkIOMimeTypes.h>
+#include <mitkCoreServices.h>
+#include <mitkIMimeTypeProvider.h>
+
 #include "mitkImageGenerator.h"
 
 #include "itksys/SystemTools.hxx"
@@ -30,11 +34,12 @@ class mitkUSImageLoggingFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkUSImageLoggingFilterTestSuite);
   MITK_TEST(TestInstantiation);
+  MITK_TEST(TestSetFileExtension);
+  MITK_TEST(TestSetWrongFileExtension);
   MITK_TEST(TestSavingValidTestImage);
   MITK_TEST(TestSavingAfterMupltipleUpdateCalls);
   MITK_TEST(TestFilterWithEmptyImages);
   MITK_TEST(TestFilterWithInvalidPath);
-  MITK_TEST(TestWrongImageFileExtensions);
   MITK_TEST(TestJpgFileExtension);
   CPPUNIT_TEST_SUITE_END();
 
@@ -49,7 +54,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_TestFilter = mitk::USImageLoggingFilter::New();
     m_TemporaryTestDirectory = mitk::IOUtil::GetTempPath();
@@ -59,7 +64,7 @@ public:
     m_RealTestImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_TestFilter = NULL;
     m_RandomRestImage1 = NULL;
@@ -157,11 +162,6 @@ public:
                                mitk::Exception);
   }
 
-  void TestWrongImageFileExtensions()
-  {
-  CPPUNIT_ASSERT_MESSAGE("Testing invalid extension.",!m_TestFilter->SetImageFilesExtension(".INVALID"));
-  }
-
   void TestJpgFileExtension()
   {
   CPPUNIT_ASSERT_MESSAGE("Testing setting of jpg extension.",m_TestFilter->SetImageFilesExtension(".jpg"));
@@ -179,6 +179,34 @@ public:
   std::remove(filenames.at(0).c_str());
   std::remove(csvFileName.c_str());
   }
+
+  void TestSetFileExtension()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if PIC extension can be set.",m_TestFilter->SetImageFilesExtension("PIC"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if bmp extension can be set.",m_TestFilter->SetImageFilesExtension("bmp"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if gdc extension can be set.",m_TestFilter->SetImageFilesExtension("gdcm"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if dcm extension can be set.",m_TestFilter->SetImageFilesExtension("dcm"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if dc3 extension can be set.",m_TestFilter->SetImageFilesExtension("dc3"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if ima extension can be set.",m_TestFilter->SetImageFilesExtension(".ima"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if img extension can be set.",m_TestFilter->SetImageFilesExtension("img"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if gip extension can be set.",m_TestFilter->SetImageFilesExtension("gipl"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if gipl.gz extension can be set.",m_TestFilter->SetImageFilesExtension(".gipl.gz"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if jpg extension can be set.",m_TestFilter->SetImageFilesExtension("jpg"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if jpe extension can be set.",m_TestFilter->SetImageFilesExtension("jpeg"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if pic extension can be set.",m_TestFilter->SetImageFilesExtension("pic"));
+  }
+
+  void TestSetWrongFileExtension()
+  {
+
+    CPPUNIT_ASSERT_MESSAGE("Testing if wrong obj  extension is recognized",!m_TestFilter->SetImageFilesExtension("obj "));
+    CPPUNIT_ASSERT_MESSAGE("Testing if wrong stl  extension is recognized",!m_TestFilter->SetImageFilesExtension("stl "));
+    CPPUNIT_ASSERT_MESSAGE("Testing if wrong pvtp extension is recognized",!m_TestFilter->SetImageFilesExtension("pvtp"));
+    CPPUNIT_ASSERT_MESSAGE("Testing if wrong vtp  extension is recognized",!m_TestFilter->SetImageFilesExtension("vtp "));
+    CPPUNIT_ASSERT_MESSAGE("Testing if wrong vtk  extension is recognized",!m_TestFilter->SetImageFilesExtension("vtk "));
+
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkUSImageLoggingFilter)

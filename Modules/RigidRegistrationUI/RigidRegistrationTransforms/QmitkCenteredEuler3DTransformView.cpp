@@ -41,7 +41,7 @@ itk::Object::Pointer QmitkCenteredEuler3DTransformView::GetTransform()
     AccessByItk(m_FixedImage, GetTransform2);
     return m_TransformObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 template < class TPixelType, unsigned int VImageDimension >
@@ -59,7 +59,7 @@ itk::Object::Pointer QmitkCenteredEuler3DTransformView::GetTransform2(itk::Image
     m_TransformObject = transformPointer.GetPointer();
     return transformPointer.GetPointer();
   }
-  return NULL;
+  return nullptr;
 }
 
 itk::Array<double> QmitkCenteredEuler3DTransformView::GetTransformParameters()

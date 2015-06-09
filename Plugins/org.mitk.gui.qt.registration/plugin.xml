@@ -2,19 +2,15 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.deformableregistration"
-          name="DeformableRegistration"
-          category="Registration"
-          class="QmitkDeformableRegistrationView"
-          icon="resources/DeformableRegistration.xpm" />
-  </extension>
-
-  <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.pointbasedregistration"
           name="PointBasedRegistration"
           category="Registration"
           class="QmitkPointBasedRegistrationView"
-          icon="resources/PointBasedRegistration.xpm"/>
+          icon="resources/PointBasedRegistration.xpm" >
+      <description>Register two images using user-defined points registration</description>
+      <keywordReference id="org.mitk.views.xnat.registrationViews.ViewKeyword"/>
+      <keywordReference id="org.mitk.views.xnat.pointbasedregistration.ViewKeyword"/>
+    </view>
   </extension>
 
   <extension point="org.blueberry.ui.views">
@@ -22,7 +18,22 @@
           name="RigidRegistration"
           category="Registration"
           class="QmitkRigidRegistrationView"
-          icon="resources/RigidRegistration.xpm" />
+          icon="resources/RigidRegistration.xpm" >
+      <description>Register two images using a rigid registration</description>
+      <keywordReference id="org.mitk.views.xnat.registrationViews.ViewKeyword"/>
+    </view>
   </extension>
 
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.xnat.registrationViews.ViewKeyword"  label="Registration" />
+    <keyword id="org.mitk.views.xnat.registrationViews.ViewKeyword"  label="Match" />
+    <keyword id="org.mitk.views.xnat.registrationViews.ViewKeyword"  label="Overlay" />
+    <keyword id="org.mitk.views.xnat.registrationViews.ViewKeyword"  label="Align" />
+    <keyword id="org.mitk.views.xnat.registrationViews.ViewKeyword"  label="Manual Registration" />
+
+    <keyword id="org.mitk.views.xnat.pointbasedregistration.ViewKeyword"  label="Rigid Registration" />
+    <keyword id="org.mitk.views.xnat.pointbasedregistration.ViewKeyword"  label="Similarity Registration" />
+    <keyword id="org.mitk.views.xnat.pointbasedregistration.ViewKeyword"  label="Affine Registration" />
+    <keyword id="org.mitk.views.xnat.pointbasedregistration.ViewKeyword"  label="Landmark based Registration" />
+  </extension>
 </plugin>

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  class MitkImageDenoising_EXPORT BilateralFilter : public ImageToImageFilter
+  class MITKIMAGEDENOISING_EXPORT BilateralFilter : public ImageToImageFilter
   {
   public:
 
@@ -57,12 +57,12 @@ namespace mitk
     \brief Method generating the output information of this filter (e.g. image dimension, image type, etc.).
     The interface ImageToImageFilter requires this implementation. Everything is taken from the input image.
     */
-    virtual void GenerateOutputInformation();
+    virtual void GenerateOutputInformation() override;
     /*!
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the smoothed output image.
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /*!
     \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.

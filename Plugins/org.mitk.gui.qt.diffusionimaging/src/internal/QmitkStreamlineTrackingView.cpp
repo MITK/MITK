@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkImageToItk.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <mitkImageCast.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
@@ -268,7 +268,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         warnBox.exec();
         return;
     }
-    mitk::FiberBundleX::Pointer fib = mitk::FiberBundleX::New(fiberBundle);
+    mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
     fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_TensorImageNodes.at(0)->GetData())->GetGeometry());
     if (m_Controls->m_ResampleFibersBox->isChecked())
         fib->Compress(m_Controls->m_FiberErrorBox->value());

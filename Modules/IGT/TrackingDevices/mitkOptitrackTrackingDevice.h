@@ -63,7 +63,7 @@ namespace mitk
   *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */
-  class MitkIGT_EXPORT OptitrackTrackingDevice : public mitk::TrackingDevice
+  class MITKIGT_EXPORT OptitrackTrackingDevice : public mitk::TrackingDevice
   {
 
   friend class OptitrackTrackingTool;
@@ -75,7 +75,7 @@ namespace mitk
     /**
     * @returns Returns true if the Optitrack tracker is installed on this build (means activated in CMAKE). False if not.
     */
-    virtual bool IsDeviceInstalled();
+    virtual bool IsDeviceInstalled() override;
 
     // Define the Type of Tracker as DefinitionOfTool (MITK)
     typedef mitk::TrackingDeviceType OptiTrackTrackingDeviceType;
@@ -86,7 +86,7 @@ namespace mitk
     * \return Returns true if the connection is well done. Throws an exception if an error occures related to the Optitrack API messages.
     * @throw mitk::IGTException Throws an exception if InitializeCameras or LoadCalibration failed.
     */
-    virtual bool OpenConnection();
+    virtual bool OpenConnection() override;
 
     /**
     * \brief Close the Connection with the Tracker. Also CleanUp the Optitrack variables using the API: TT_CleanUp and TT_ShutDown.
@@ -94,7 +94,7 @@ namespace mitk
     * \return Returns true if the cleaning up and shutdown worked correctly. Throws an exception if an error occures related to the Optitrack API messages.
     * @throw mitk::IGTException Throws an exception if the System cannot ShutDown now or was not initialized.
     */
-    virtual bool CloseConnection();
+    virtual bool CloseConnection() override;
 
     /**
     * \brief Start to Track the tools already defined. If no tools are defined for this tracker, it returns an error.
@@ -102,14 +102,14 @@ namespace mitk
     * \return Returns true at least one tool was defined and the tracking is correct
     * @throw mitk::IGTException Throws an exception if the System is not in State Ready .
     */
-    virtual bool StartTracking();
+    virtual bool StartTracking() override;
 
     /**
     * \brief Stop the Tracking Thread and tools will not longer be updated.
     * \return Returns true if Tracking thread could be stopped.
     * @throw mitk::IGTException Throws an exception if System is not in State Tracking.
     */
-    virtual bool StopTracking();
+    virtual bool StopTracking() override;
 
     /**
     * \brief Return the tool pointer of the tool number toolNumber
@@ -117,7 +117,7 @@ namespace mitk
     * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
     * no tool with this number.
     */
-    TrackingTool* GetTool(unsigned int toolNumber) const;
+    TrackingTool* GetTool(unsigned int toolNumber) const override;
 
     /**
     * \brief Return the tool pointer of the tool number toolNumber
@@ -132,7 +132,7 @@ namespace mitk
     * \brief Returns the number of defined tools
     * \return Returns the number of defined tools in the Optitrack device.
     */
-    unsigned int GetToolCount() const;
+    unsigned int GetToolCount() const override;
 
 /** @brief Sets the directory where the calibration file of the MicronTracker can be found. */
     itkSetMacro(Exp,int);

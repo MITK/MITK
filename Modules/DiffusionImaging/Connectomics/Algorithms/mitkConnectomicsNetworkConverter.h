@@ -31,14 +31,14 @@ namespace mitk
 {
   /**
   * \brief A class giving functions for conversion of connectomics networks into different formats */
-  class MitkConnectomics_EXPORT ConnectomicsNetworkConverter : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsNetworkConverter : public itk::Object
   {
   public:
 
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsNetworkConverter, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsNetworkConverter, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

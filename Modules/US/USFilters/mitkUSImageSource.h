@@ -40,12 +40,12 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUS_EXPORT USImageSource : public itk::Object
+  class MITKUS_EXPORT USImageSource : public itk::Object
   {
   public:
     static const char* IMAGE_PROPERTY_IDENTIFIER;
 
-    mitkClassMacro(USImageSource, itk::Object);
+    mitkClassMacroItkParent(USImageSource, itk::Object);
 
     itkGetMacro(ImageFilter, mitk::BasicCombinationOpenCVImageFilter::Pointer);
 

@@ -43,7 +43,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataLandmarkTransformFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataLandmarkTransformFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataLandmarkTransformFilter, NavigationDataToNavigationDataFilter);
@@ -132,7 +132,7 @@ namespace mitk {
     * \brief transforms input NDs according to the calculated LandmarkTransform
     *
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /**Documentation
     * \brief perform an iterative closest point matching to find corresponding landmarks that will be used for landmark transform calculation
@@ -164,7 +164,7 @@ namespace mitk {
     void UpdateLandmarkTransform(const LandmarkPointContainer &sources, const  LandmarkPointContainer &targets); ///<
     void AccumulateStatistics(ErrorVector& vector); ///< calculate error metrics for the transforms.
 
-    void PrintSelf( std::ostream& os, itk::Indent indent ) const;     ///< print object info to ostream
+    void PrintSelf( std::ostream& os, itk::Indent indent ) const override;     ///< print object info to ostream
 
     mitk::ScalarType m_ErrorMean;     ///< Fiducial Registration Error
     mitk::ScalarType m_ErrorStdDev;   ///< standard deviation of the Fiducial Registration Error

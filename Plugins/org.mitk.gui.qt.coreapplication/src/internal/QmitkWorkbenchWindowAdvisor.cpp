@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
+#include <berryIActionBarConfigurer.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIPreferencesService.h>
 
@@ -68,26 +69,24 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
   fileMenu->addAction(new QmitkFileExitAction(window));
 
   berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-  const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
+  QList<berry::IViewDescriptor::Pointer> viewDescriptors = viewRegistry->GetViews();
 
   QMenu* viewMenu = menuBar->addMenu("Show &View");
 
   // sort elements (converting vector to map...)
-  std::vector<berry::IViewDescriptor::Pointer>::const_iterator iter;
-  std::map<std::string, berry::IViewDescriptor::Pointer> VDMap;
+  std::map<QString, berry::IViewDescriptor::Pointer> VDMap;
 
-  for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
+  for (auto iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
   {
     if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
       continue;
-    std::pair<std::string, berry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter));
+    std::pair<QString, berry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter));
     VDMap.insert(p);
   }
 
-  QToolBar* qToolbar = new QToolBar;
+  auto   qToolbar = new QToolBar;
 
-  std::map<std::string, berry::IViewDescriptor::Pointer>::const_iterator MapIter;
-  for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
+  for (auto MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
   {
     berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window, (*MapIter).second);
     //m_ViewActions.push_back(viewAction);
@@ -97,24 +96,24 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
 
   mainWindow->addToolBar(qToolbar);
 
-  QStatusBar* qStatusBar = new QStatusBar();
+  auto   qStatusBar = new QStatusBar();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar
-  QmitkStatusBar *statusBar = new QmitkStatusBar(qStatusBar);
+  auto  statusBar = new QmitkStatusBar(qStatusBar);
   //disabling the SizeGrip in the lower right corner
   statusBar->SetSizeGripEnabled(false);
 
-  QmitkProgressBar *progBar = new QmitkProgressBar();
+  auto  progBar = new QmitkProgressBar();
   qStatusBar->addPermanentWidget(progBar, 0);
   progBar->hide();
   mainWindow->setStatusBar(qStatusBar);
 
-  QmitkMemoryUsageIndicatorView* memoryIndicator = new QmitkMemoryUsageIndicatorView();
+  auto   memoryIndicator = new QmitkMemoryUsageIndicatorView();
   qStatusBar->addPermanentWidget(memoryIndicator, 0);
 }
 
 void QmitkWorkbenchWindowAdvisor::PreWindowOpen()
 {
   this->GetWindowConfigurer()->AddEditorAreaTransfer(QStringList("text/uri-list"));
-  this->GetWindowConfigurer()->ConfigureEditorAreaDropListener(dropTargetListener);
+  this->GetWindowConfigurer()->ConfigureEditorAreaDropListener(dropTargetListener.data());
 }

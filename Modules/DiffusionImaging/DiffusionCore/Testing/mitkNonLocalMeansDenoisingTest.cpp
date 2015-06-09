@@ -14,11 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkDiffusionImage.h"
 #include "mitkIOUtil.h"
 #include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
 #include "itkNonLocalMeansDenoisingFilter.h"
+#include "mitkGradientDirectionsProperty.h"
+#include "mitkITKImageImport.h"
+#include <mitkImageCast.h>
 
 class mitkNonLocalMeansDenoisingTestSuite : public mitk::TestFixture
 {
@@ -32,10 +34,12 @@ class mitkNonLocalMeansDenoisingTestSuite : public mitk::TestFixture
 
 private:
 
+  typedef itk::VectorImage<short,3> VectorImagetType;
+
   /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
-  mitk::DiffusionImage<short>::Pointer m_Image;
-  mitk::DiffusionImage<short>::Pointer m_ReferenceImage;
-  mitk::DiffusionImage<short>::Pointer m_DenoisedImage;
+  mitk::Image::Pointer m_Image;
+  mitk::Image::Pointer m_ReferenceImage;
+  mitk::Image::Pointer m_DenoisedImage;
   itk::Image<short, 3>::Pointer m_ImageMask;
   itk::NonLocalMeansDenoisingFilter<short>::Pointer m_DenoisingFilter;
 
@@ -44,29 +48,27 @@ public:
   /**
 * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
 */
-  void setUp()
+  void setUp() override
   {
     //generate test images
     std::string imagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi.dwi");
-//    std::string maskPath = GetTestDataFilePath("DiffusionImaging/Denoising/denoising_mask.nrrd");
 
-    m_Image = static_cast<mitk::DiffusionImage<short>*>( mitk::IOUtil::LoadImage(imagePath).GetPointer());
-//    mitk::Image::Pointer imageMask = static_cast<mitk::Image*>( mitk::IOUtil::LoadImage(maskPath).GetPointer());
-//    mitk::CastToItkImage(imageMask, m_ImageMask);
+    m_Image =  mitk::IOUtil::LoadImage(imagePath);
     m_ReferenceImage = NULL;
-    m_DenoisedImage = mitk::DiffusionImage<short>::New();
+    m_DenoisedImage = mitk::Image::New();
 
     //initialise Filter
     m_DenoisingFilter = itk::NonLocalMeansDenoisingFilter<short>::New();
-    m_DenoisingFilter->SetInputImage(m_Image->GetVectorImage());
-//    m_DenoisingFilter->SetInputMask(m_ImageMask);
+    VectorImagetType::Pointer vectorImage;
+    mitk::CastToItkImage(m_Image,vectorImage);
+    m_DenoisingFilter->SetInputImage(vectorImage);
     m_DenoisingFilter->SetNumberOfThreads(1);
     m_DenoisingFilter->SetComparisonRadius(1);
     m_DenoisingFilter->SetSearchRadius(1);
     m_DenoisingFilter->SetVariance(500);
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_Image = NULL;
     m_ImageMask = NULL;
@@ -78,7 +80,7 @@ public:
   void Denoise_NLMg_shouldReturnTrue()
   {
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMg.dwi");
-    m_ReferenceImage = static_cast<mitk::DiffusionImage<short>*>( mitk::IOUtil::LoadImage(referenceImagePath).GetPointer());
+    m_ReferenceImage =  mitk::IOUtil::LoadImage(referenceImagePath);
 
     m_DenoisingFilter->SetUseRicianAdaption(false);
     m_DenoisingFilter->SetUseJointInformation(false);
@@ -91,10 +93,8 @@ public:
       MITK_ERROR << e.what();
     }
 
-    m_DenoisedImage->SetVectorImage(m_DenoisingFilter->GetOutput());
-    m_DenoisedImage->SetReferenceBValue(m_Image->GetReferenceBValue());
-    m_DenoisedImage->SetDirections(m_Image->GetDirections());
-    m_DenoisedImage->InitializeFromVectorImage();
+    mitk::GrabItkImageMemory(m_DenoisingFilter->GetOutput(),m_DenoisedImage);
+    m_DenoisedImage->SetPropertyList(m_Image->GetPropertyList()->Clone());
 
     MITK_ASSERT_EQUAL( m_DenoisedImage, m_ReferenceImage, "NLMg should always return the same result.");
   }
@@ -102,7 +102,7 @@ public:
   void Denoise_NLMr_shouldReturnTrue()
   {
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMr.dwi");
-    m_ReferenceImage = static_cast<mitk::DiffusionImage<short>*>( mitk::IOUtil::LoadImage(referenceImagePath).GetPointer());
+    m_ReferenceImage = mitk::IOUtil::LoadImage(referenceImagePath);
 
     m_DenoisingFilter->SetUseRicianAdaption(true);
     m_DenoisingFilter->SetUseJointInformation(false);
@@ -115,10 +115,8 @@ public:
       MITK_ERROR << e.what();
     }
 
-    m_DenoisedImage->SetVectorImage(m_DenoisingFilter->GetOutput());
-    m_DenoisedImage->SetReferenceBValue(m_Image->GetReferenceBValue());
-    m_DenoisedImage->SetDirections(m_Image->GetDirections());
-    m_DenoisedImage->InitializeFromVectorImage();
+    mitk::GrabItkImageMemory(m_DenoisingFilter->GetOutput(),m_DenoisedImage);
+    m_DenoisedImage->SetPropertyList(m_Image->GetPropertyList()->Clone());
 
     MITK_ASSERT_EQUAL( m_DenoisedImage, m_ReferenceImage, "NLMr should always return the same result.");
   }
@@ -126,8 +124,7 @@ public:
   void Denoise_NLMv_shouldReturnTrue()
   {
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMv.dwi");
-    m_ReferenceImage = static_cast<mitk::DiffusionImage<short>*>( mitk::IOUtil::LoadImage(referenceImagePath).GetPointer());
-
+    m_ReferenceImage = mitk::IOUtil::LoadImage(referenceImagePath);
     m_DenoisingFilter->SetUseRicianAdaption(false);
     m_DenoisingFilter->SetUseJointInformation(true);
     try
@@ -139,10 +136,8 @@ public:
       MITK_ERROR << e.what();
     }
 
-    m_DenoisedImage->SetVectorImage(m_DenoisingFilter->GetOutput());
-    m_DenoisedImage->SetReferenceBValue(m_Image->GetReferenceBValue());
-    m_DenoisedImage->SetDirections(m_Image->GetDirections());
-    m_DenoisedImage->InitializeFromVectorImage();
+    mitk::GrabItkImageMemory(m_DenoisingFilter->GetOutput(),m_DenoisedImage);
+    m_DenoisedImage->SetPropertyList(m_Image->GetPropertyList()->Clone());
 
     MITK_ASSERT_EQUAL( m_DenoisedImage, m_ReferenceImage, "NLMv should always return the same result.");
   }
@@ -150,7 +145,7 @@ public:
   void Denoise_NLMvr_shouldReturnTrue()
   {
     std::string referenceImagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi_NLMvr.dwi");
-    m_ReferenceImage = static_cast<mitk::DiffusionImage<short>*>( mitk::IOUtil::LoadImage(referenceImagePath).GetPointer());
+    m_ReferenceImage = mitk::IOUtil::LoadImage(referenceImagePath);
 
     m_DenoisingFilter->SetUseRicianAdaption(true);
     m_DenoisingFilter->SetUseJointInformation(true);
@@ -163,10 +158,8 @@ public:
       MITK_ERROR << e.what();
     }
 
-    m_DenoisedImage->SetVectorImage(m_DenoisingFilter->GetOutput());
-    m_DenoisedImage->SetReferenceBValue(m_Image->GetReferenceBValue());
-    m_DenoisedImage->SetDirections(m_Image->GetDirections());
-    m_DenoisedImage->InitializeFromVectorImage();
+    mitk::GrabItkImageMemory(m_DenoisingFilter->GetOutput(),m_DenoisedImage);
+    m_DenoisedImage->SetPropertyList(m_Image->GetPropertyList()->Clone());
 
     MITK_ASSERT_EQUAL( m_DenoisedImage, m_ReferenceImage, "NLMvr should always return the same result.");
   }

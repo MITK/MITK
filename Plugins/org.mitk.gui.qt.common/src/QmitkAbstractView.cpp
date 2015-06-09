@@ -52,7 +52,7 @@ public:
     : q(qq)
     , m_PrefServiceTracker(QmitkCommonActivator::GetContext())
     , m_DataStorageServiceTracker(QmitkCommonActivator::GetContext())
-    , m_Parent(0)
+    , m_Parent(nullptr)
     , m_DataNodeItemModel(new QmitkDataNodeItemModel)
     , m_DataNodeSelectionModel(new QItemSelectionModel(m_DataNodeItemModel))
     , m_InDataStorageChanged(false)
@@ -124,7 +124,8 @@ public:
   /**
    * reactions to selection events from views
    */
-  void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+  void BlueBerrySelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
+                                 const berry::ISelection::ConstPointer& selection)
   {
     if(sourcepart.IsNull() || sourcepart.GetPointer() == static_cast<berry::IWorkbenchPart*>(q))
       return;
@@ -152,8 +153,8 @@ public:
   ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
 
   /**
-   * Saves the parent of this view (this is the scrollarea created in CreatePartControl(void*)
-   * \see CreatePartControl(void*)
+   * Saves the parent of this view (this is the scrollarea created in CreatePartControl(QWidget*)
+   * \see CreatePartControl(QWidget*)
    */
   QWidget* m_Parent;
 
@@ -175,7 +176,7 @@ public:
   /**
    * object to observe BlueBerry selections
    */
-  berry::ISelectionListener::Pointer m_BlueBerrySelectionListener;
+  QScopedPointer<berry::ISelectionListener> m_BlueBerrySelectionListener;
 
   /**
    * Saves if this class is currently working on DataStorage changes.
@@ -190,11 +191,11 @@ QmitkAbstractView::QmitkAbstractView()
 {
 }
 
-void QmitkAbstractView::CreatePartControl(void* parent)
+void QmitkAbstractView::CreatePartControl(QWidget* parent)
 {
 
   // scrollArea
-  QScrollArea* scrollArea = new QScrollArea;
+  auto   scrollArea = new QScrollArea;
   //QVBoxLayout* scrollAreaLayout = new QVBoxLayout(scrollArea);
   scrollArea->setFrameShadow(QFrame::Plain);
   scrollArea->setFrameShape(QFrame::NoFrame);
@@ -215,7 +216,7 @@ void QmitkAbstractView::CreatePartControl(void* parent)
 
   // add the scroll area to the real parent (the view tabbar)
   QWidget* parentQWidget = static_cast<QWidget*>(parent);
-  QVBoxLayout* parentLayout = new QVBoxLayout(parentQWidget);
+  auto   parentLayout = new QVBoxLayout(parentQWidget);
   parentLayout->setMargin(0);
   parentLayout->setSpacing(0);
   parentLayout->addWidget(scrollArea);
@@ -246,10 +247,9 @@ void QmitkAbstractView::AfterCreateQtPartControl()
                                                                               &QmitkAbstractView::OnPreferencesChanged));
 
   // REGISTER FOR WORKBENCH SELECTION EVENTS
-  d->m_BlueBerrySelectionListener = berry::ISelectionListener::Pointer(
-        new berry::NullSelectionChangedAdapter<QmitkAbstractViewPrivate>(d.data(),
-                                                             &QmitkAbstractViewPrivate::BlueBerrySelectionChanged));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener);
+  d->m_BlueBerrySelectionListener.reset(new berry::NullSelectionChangedAdapter<QmitkAbstractViewPrivate>(
+                                          d.data(), &QmitkAbstractViewPrivate::BlueBerrySelectionChanged));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(d->m_BlueBerrySelectionListener.data());
 
   // EMULATE INITIAL SELECTION EVENTS
 
@@ -286,12 +286,12 @@ QmitkAbstractView::~QmitkAbstractView()
   }
 
   // REMOVE SELECTION PROVIDER
-  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(NULL));
+  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(nullptr));
 
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
   {
-    s->RemovePostSelectionListener(d->m_BlueBerrySelectionListener);
+    s->RemovePostSelectionListener(d->m_BlueBerrySelectionListener.data());
   }
 
   this->UnRegister(false);
@@ -307,7 +307,7 @@ void QmitkAbstractView::SetSelectionProvider()
 
 QItemSelectionModel *QmitkAbstractView::GetDataNodeSelectionModel() const
 {
-  return 0;
+  return nullptr;
 }
 
 void QmitkAbstractView::OnPreferencesChanged( const berry::IBerryPreferences* )
@@ -332,8 +332,8 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
   if (renderPart) return renderPart;
 
   // No suitable active editor found, check visible editors
-  std::list<berry::IEditorReference::Pointer> editors = page->GetEditorReferences();
-  for (std::list<berry::IEditorReference::Pointer>::iterator i = editors.begin();
+  QList<berry::IEditorReference::Pointer> editors = page->GetEditorReferences();
+  for (QList<berry::IEditorReference::Pointer>::iterator i = editors.begin();
        i != editors.end(); ++i)
   {
     berry::IWorkbenchPart::Pointer part = (*i)->GetPart(false);
@@ -345,8 +345,8 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
   }
 
   // No suitable visible editor found, check visible views
-  std::vector<berry::IViewReference::Pointer> views = page->GetViewReferences();
-  for(std::vector<berry::IViewReference::Pointer>::iterator i = views.begin();
+  QList<berry::IViewReference::Pointer> views = page->GetViewReferences();
+  for(QList<berry::IViewReference::Pointer>::iterator i = views.begin();
       i != views.end(); ++i)
   {
     berry::IWorkbenchPart::Pointer part = (*i)->GetPart(false);
@@ -358,7 +358,7 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
   }
 
   // No strategies given
-  if (strategies == NONE) return 0;
+  if (strategies == NONE) return nullptr;
 
   mitk::DataStorageEditorInput::Pointer input(new mitk::DataStorageEditorInput(GetDataStorageReference()));
 
@@ -406,7 +406,7 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart( IRenderWindowPa
 void QmitkAbstractView::RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType)
 {
   mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
-  if (renderPart == 0) return;
+  if (renderPart == nullptr) return;
 
   if (mitk::IRenderingManager* renderingManager = renderPart->GetRenderingManager())
   {
@@ -462,8 +462,8 @@ berry::IPreferences::Pointer QmitkAbstractView::GetPreferences() const
 {
   berry::IPreferencesService* prefService = d->m_PrefServiceTracker.getService();
   // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
-  std::string id = "/" + (const_cast<QmitkAbstractView*>(this))->GetViewSite()->GetId();
-  return prefService ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(0);
+  QString id = "/" + (const_cast<QmitkAbstractView*>(this))->GetViewSite()->GetId();
+  return prefService ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(nullptr);
 }
 
 mitk::DataStorage::Pointer
@@ -471,24 +471,24 @@ QmitkAbstractView::GetDataStorage() const
 {
   mitk::IDataStorageService* dsService = d->m_DataStorageServiceTracker.getService();
 
-  if (dsService != 0)
+  if (dsService != nullptr)
   {
     return dsService->GetDataStorage()->GetDataStorage();
   }
 
-  return 0;
+  return nullptr;
 }
 
 mitk::IDataStorageReference::Pointer QmitkAbstractView::GetDataStorageReference() const
 {
   mitk::IDataStorageService* dsService = d->m_DataStorageServiceTracker.getService();
 
-  if (dsService != 0)
+  if (dsService != nullptr)
   {
     return dsService->GetDataStorage();
   }
 
-  return mitk::IDataStorageReference::Pointer(0);
+  return mitk::IDataStorageReference::Pointer(nullptr);
 }
 
 QList<mitk::DataNode::Pointer> QmitkAbstractView::GetCurrentSelection() const
@@ -570,7 +570,7 @@ void QmitkAbstractView::FireNodesSelected( const QList<mitk::DataNode::Pointer>&
 {
   // if this is the first call to FireNodesSelected and the selection provider has no QItemSelectiomMode
   // yet, set our helper model
-  if (d->m_SelectionProvider->GetItemSelectionModel() == 0)
+  if (d->m_SelectionProvider->GetItemSelectionModel() == nullptr)
   {
     d->m_SelectionProvider->SetItemSelectionModel(d->m_DataNodeSelectionModel);
   }

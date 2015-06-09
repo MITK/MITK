@@ -13,23 +13,34 @@ set(${proj}_DEPENDS ${proj})
 
 if(NOT DEFINED CppUnit_DIR)
 
-  set(patch_cmd ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=cppunit -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchCppUnit-1.12.1.cmake)
+  set(additional_args )
+  if(CTEST_USE_LAUNCHERS)
+    list(APPEND additional_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
 
   ExternalProject_Add(${proj}
-     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-     BINARY_DIR ${proj}-build
-     PREFIX ${proj}-cmake
+     LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/cppunit-1.12.1.tar.gz
      URL_MD5 bd30e9cf5523cdfc019b94f5e1d7fd19
-     PATCH_COMMAND ${patch_cmd}
-     INSTALL_COMMAND ""
+     PATCH_COMMAND
+       ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CppUnit-1.12.1.patch
+       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/${proj}config.h.cmake <SOURCE_DIR>/config/config.h.cmake
+       COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=cppunit -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
+       ${additional_args}
+     CMAKE_CACHE_ARGS
+       ${ep_common_cache_args}
+     CMAKE_CACHE_DEFAULT_ARGS
+       ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  set(${proj}_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  set(${proj}_DIR ${ep_prefix}/lib/cmake/CppUnit)
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

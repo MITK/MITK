@@ -50,13 +50,12 @@ class QmitkUGVisualizationView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkUGVisualizationView();
-    QmitkUGVisualizationView(const QmitkUGVisualizationView& other);
     virtual ~QmitkUGVisualizationView();
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+    virtual void StdMultiWidgetNotAvailable() override;
 
   protected slots:
 
@@ -70,7 +69,7 @@ class QmitkUGVisualizationView : public QmitkFunctionality
   protected:
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
     void CreateConnections();
 

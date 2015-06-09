@@ -44,7 +44,7 @@ namespace mitk {
   *
   * \ingroup US
   */
-  class MitkUSNavigation_EXPORT NodeDisplacementFilter : public NavigationDataPassThroughFilter
+  class MITKUSNAVIGATION_EXPORT NodeDisplacementFilter : public NavigationDataPassThroughFilter
   {
   public:
     mitkClassMacro(NodeDisplacementFilter, NavigationDataPassThroughFilter);
@@ -96,6 +96,13 @@ namespace mitk {
     */
     virtual void SelectInput(int i);
 
+    /** Manually sets the initial marker pose which is used for computing the offset. By default this
+     *  option is disabled and the current pose of the selected input is used to compute the offset.
+     *  However, sometimes it is needed to give a defined marker pose, then this method can be used.
+     *  To disable the option you can set MarkerPosition to NULL.
+     */
+    itkSetMacro(InitialReferencePose,mitk::NavigationData::Pointer);
+
     /**Documentation
     * \brief Removes all added Nodes from the Filter but leaves all other configuration intact.
     */
@@ -105,7 +112,7 @@ namespace mitk {
     NodeDisplacementFilter();
     virtual ~NodeDisplacementFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /**
      * \brief Creates an Geometry 3D Object from an AffineTransformation.
@@ -127,6 +134,11 @@ namespace mitk {
      * \brief The Input that is used as a reference to orient the managed nodes.
      */
     int m_SelectedInput;
+
+    /**
+     * Reference pose of the selected input to compute the offset. If this is NULL the current pose of the selected input is used instead.
+     */
+    mitk::NavigationData::Pointer m_InitialReferencePose;
   };
 } // namespace mitk
 

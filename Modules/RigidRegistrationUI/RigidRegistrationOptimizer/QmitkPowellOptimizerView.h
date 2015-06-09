@@ -29,27 +29,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for rigid registration.
 */
-class MITK_RIGIDREGISTRATION_UI_EXPORT QmitkPowellOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkPowellOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
 {
 
 public:
 
-  QmitkPowellOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkPowellOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkPowellOptimizerView();
 
-  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;
 
-  virtual itk::Object::Pointer GetOptimizer();
+  virtual itk::Object::Pointer GetOptimizer() override;
 
-  virtual itk::Array<double> GetOptimizerParameters();
+  virtual itk::Array<double> GetOptimizerParameters() override;
 
-  virtual void SetOptimizerParameters(itk::Array<double> metricValues);
+  virtual void SetOptimizerParameters(itk::Array<double> metricValues) override;
 
-  virtual void SetNumberOfTransformParameters(int transformParameters);
+  virtual void SetNumberOfTransformParameters(int transformParameters) override;
 
-  virtual QString GetName();
+  virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent);
+  virtual void SetupUI(QWidget* parent) override;
 
 protected:
 

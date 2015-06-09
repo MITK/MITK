@@ -19,3 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::IPythonService::~IPythonService()
 {
 }
+
+std::string mitk::IPythonService::ForceLoadModule()
+{
+  std::string ret = "Load python module";
+  MITK_INFO << ret;
+  return ret;
+}
+

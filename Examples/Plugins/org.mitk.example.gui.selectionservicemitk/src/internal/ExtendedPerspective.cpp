@@ -26,7 +26,7 @@ ExtendedPerspective::ExtendedPerspective()
 void ExtendedPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   // Editors are placed for free.
-  std::string editorAreaId = layout->GetEditorArea();
+  QString editorAreaId = layout->GetEditorArea();
   // Hides the editor area.
   layout->SetEditorAreaVisible(false);
 

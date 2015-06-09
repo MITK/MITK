@@ -48,7 +48,7 @@ namespace mitk {
   *  <li> double edge_weight - Used for boost and algorithms, should be between 0 and 1
   * </ul>
   */
-  class MitkConnectomics_EXPORT ConnectomicsNetwork : public BaseData
+  class MITKCONNECTOMICS_EXPORT ConnectomicsNetwork : public BaseData
   {
   public:
     /** Structs for the graph */
@@ -77,11 +77,11 @@ namespace mitk {
     typedef boost::graph_traits<NetworkType>::edge_descriptor EdgeDescriptorType;
 
     // virtual methods that need to be implemented
-    virtual void UpdateOutputInformation();
-    virtual void SetRequestedRegionToLargestPossibleRegion();
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-    virtual bool VerifyRequestedRegion();
-    virtual void SetRequestedRegion(const itk::DataObject * );
+    virtual void UpdateOutputInformation() override;
+    virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    virtual bool VerifyRequestedRegion() override;
+    virtual void SetRequestedRegion(const itk::DataObject * ) override;
 
 
     // Macros
@@ -229,7 +229,7 @@ namespace mitk {
   * - Smallworldness
   */
 
-  MitkConnectomics_EXPORT bool Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNetwork* rightHandSide, mitk::ScalarType eps, bool verbose);
+  MITKCONNECTOMICS_EXPORT bool Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNetwork* rightHandSide, mitk::ScalarType eps, bool verbose);
 
 } // namespace mitk
 

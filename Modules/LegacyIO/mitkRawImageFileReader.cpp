@@ -64,7 +64,7 @@ void mitk::RawImageFileReader::GenerateData()
 {
   mitk::Image::Pointer output = this->GetOutput();
 
-  if (this->GetOutput()==NULL)
+  if (this->GetOutput()==nullptr)
   {
     MITK_INFO << "Error" << std::endl;
   }
@@ -124,7 +124,7 @@ void mitk::RawImageFileReader::TypedGenerateData()
 {
   mitk::Image::Pointer output = this->GetOutput();
 
-  if (this->GetOutput()==NULL)
+  if (this->GetOutput()==nullptr)
   {
     MITK_INFO << "Error" << std::endl;
   }

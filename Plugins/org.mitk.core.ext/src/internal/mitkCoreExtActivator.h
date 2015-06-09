@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginActivator.h>
 
-#include <org_mitk_core_ext_Export.h>
-#include <mitkExportMacros.h>
+#include "mitkInputDeviceRegistry.h"
 
 namespace mitk
 {
+
   /**
   * @brief The activator class for the org.mitk.core.ext plug-in.
   * @ingroup org_mitk_core_ext_internal
@@ -33,7 +33,7 @@ namespace mitk
   * the mitkCoreExt module.
   *
   */
-  class MITK_LOCAL CoreExtActivator : public QObject, public ctkPluginActivator
+  class CoreExtActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -43,22 +43,26 @@ namespace mitk
 
   public:
 
+    ~CoreExtActivator();
+
     /**
     * Starts this plug-in and registers object factories.
     *
     * @param context
     *        The context for the plug-in.
     */
-    void start(ctkPluginContext* context);
+    void start(ctkPluginContext* context) override;
 
-    void stop(ctkPluginContext* context);
+    void stop(ctkPluginContext* context) override;
 
   private:
 
     /**
     * Activates the input device modules.
     */
-    void StartInputDeviceModules();
+    void StartInputDeviceModules(ctkPluginContext *context);
+
+    QScopedPointer<InputDeviceRegistry> m_InputDeviceRegistry;
 
   }; // end class CoreExtActivator
 } //end namespace mitk

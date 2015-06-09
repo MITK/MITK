@@ -32,7 +32,7 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFOpenCVImageGrabber : public mitk::OpenCVImageSource
+  class MITKTOFHARDWARE_EXPORT ToFOpenCVImageGrabber : public mitk::OpenCVImageSource
   {
   public:
 
@@ -48,7 +48,7 @@ namespace mitk
     /*!
     \brief Get current ToF image. Specify image you want to grab with SetImageType()
     */
-    cv::Mat GetImage();
+    cv::Mat GetImage() override;
 
     /*!
     \brief set type of image you want to grab.

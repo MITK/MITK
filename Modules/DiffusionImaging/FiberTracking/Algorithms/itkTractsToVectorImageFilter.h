@@ -2,7 +2,7 @@
 #define __itkTractsToVectorImageFilter_h__
 
 // MITK
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 // ITK
 #include <itkImageSource.h>
@@ -59,14 +59,14 @@ public:
     itkSetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
     itkGetMacro( MaxNumDirections, unsigned long)                       ///< If more directions are extracted, only the largest are kept.
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)                   ///< only process voxels inside mask
-    itkSetMacro( FiberBundle, FiberBundleX::Pointer)                    ///< input fiber bundle
+    itkSetMacro( FiberBundle, FiberBundle::Pointer)                    ///< input fiber bundle
     itkGetMacro( ClusteredDirectionsContainer, ContainerType::Pointer)  ///< output directions
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)          ///< number of directions per voxel
-    itkGetMacro( OutputFiberBundle, FiberBundleX::Pointer)              ///< vector field for visualization purposes
+    itkGetMacro( OutputFiberBundle, FiberBundle::Pointer)              ///< vector field for visualization purposes
     itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer) ///< output directions
     itkSetMacro( CreateDirectionImages, bool)
 
-    void GenerateData();
+    void GenerateData() override;
 
 protected:
 
@@ -82,7 +82,7 @@ protected:
     TractsToVectorImageFilter();
     virtual ~TractsToVectorImageFilter();
 
-    FiberBundleX::Pointer               m_FiberBundle;                      ///< input fiber bundle
+    FiberBundle::Pointer               m_FiberBundle;                      ///< input fiber bundle
     float                               m_AngularThreshold;                 ///< cluster directions that are closer together than the specified threshold
     float                               m_Epsilon;                          ///< epsilon for vector equality check
     ItkUcharImgType::Pointer            m_MaskImage;                        ///< only voxels inside the binary mask are processed
@@ -98,7 +98,7 @@ protected:
     ContainerType::Pointer                  m_ClusteredDirectionsContainer; ///< contains direction vectors for each voxel
     ItkUcharImgType::Pointer                m_NumDirectionsImage;           ///< shows number of fibers per voxel
     DirectionImageContainerType::Pointer    m_DirectionImageContainer;      ///< contains images that contain the output directions
-    FiberBundleX::Pointer                   m_OutputFiberBundle;            ///< vector field for visualization purposes
+    FiberBundle::Pointer                   m_OutputFiberBundle;            ///< vector field for visualization purposes
 };
 
 }

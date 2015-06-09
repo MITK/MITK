@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string DicomView::VIEW_ID = "org.mitk.customviewer.views.dicomview";
 
 DicomView::DicomView()
-  : m_Parent(0)
+  : m_Parent(nullptr)
 {
 }
 
@@ -92,7 +92,7 @@ void DicomView::AddDataNodeFromDICOM( QHash<QString,QVariant> eventProperties)
 
       // //! [DicomViewCreateAddDataNodeActivatePersp]
             berry::IWorkbenchWindow::Pointer window = this->GetSite()->GetWorkbenchWindow();
-            std::string perspectiveId = "org.mitk.example.viewerperspective";
+            QString perspectiveId = "org.mitk.example.viewerperspective";
             window->GetWorkbench()->ShowPerspective(perspectiveId, berry::IWorkbenchWindow::Pointer(window));
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       // //! [DicomViewCreateAddDataNodeActivatePersp]

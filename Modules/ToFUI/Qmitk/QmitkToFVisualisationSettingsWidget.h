@@ -35,7 +35,7 @@ class QmitkStdMultiWidget;
   *
   * \ingroup ToFUI
   */
-class MitkToFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
+class MITKTOFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
 {
 
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -45,7 +45,7 @@ class MitkToFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
 
     static const std::string VIEW_ID;
 
-    QmitkToFVisualisationSettingsWidget (QWidget* p = 0, Qt::WindowFlags f1 = 0);
+    QmitkToFVisualisationSettingsWidget (QWidget* p = nullptr, Qt::WindowFlags f1 = nullptr);
     virtual ~QmitkToFVisualisationSettingsWidget ();
 
     /* @brief This method is part of the widget an needs not to be called seperately. */
@@ -58,8 +58,8 @@ class MitkToFUI_EXPORT QmitkToFVisualisationSettingsWidget :public QWidget
     \param amplitudeImageNode image holding the amplitude image of a ToF camera
     \param intensityImageNode image holding the intensity image of a ToF camera
     */
-    void Initialize(mitk::DataNode* distanceImageNode=NULL, mitk::DataNode* amplitudeImageNode=NULL,
-                    mitk::DataNode* intensityImageNode=NULL, mitk::DataNode* surfaceNode=NULL);
+    void Initialize(mitk::DataNode* distanceImageNode=nullptr, mitk::DataNode* amplitudeImageNode=nullptr,
+                    mitk::DataNode* intensityImageNode=nullptr, mitk::DataNode* surfaceNode=nullptr);
 
     /*!
     \brief Access the color transfer function of widget 1 (distance image)

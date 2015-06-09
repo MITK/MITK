@@ -32,7 +32,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataEvaluationFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataEvaluationFilter : public NavigationDataToNavigationDataFilter
   {
 
   public:
@@ -99,7 +99,7 @@ namespace mitk {
     *
     * transforms navigation data
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     /** @brief Creates the member variables which store all the statistical data for every input. */
     void CreateMembersForAllInputs();

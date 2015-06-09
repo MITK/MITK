@@ -24,14 +24,24 @@ namespace mitk
 {
   /** \brief Encapsulates several morphological operations that can be performed on segmentations.
     */
-  class MitkSegmentation_EXPORT MorphologicalOperations
+  class MITKSEGMENTATION_EXPORT MorphologicalOperations
   {
   public:
     enum StructuralElementType
     {
-       Ball,
-       Cross
+      Ball = 7,
+      Ball_Axial = 1,
+      Ball_Sagital = 2,
+      Ball_Coronal = 4,
+
+      Cross = 56,
+      Cross_Axial = 8,
+      Cross_Sagital = 16,
+      Cross_Coronal = 32
+
     };
+
+
 
     ///@{
     /** \brief Perform morphological operation on 2D, 3D or 3D+t segmentation.
@@ -45,6 +55,39 @@ namespace mitk
 
   private:
     MorphologicalOperations();
+
+    template<class TStructuringElement>
+    static TStructuringElement CreateStructuringElement(StructuralElementType structuralElementFlag, int factor)
+    {
+      TStructuringElement strElem;
+      typename TStructuringElement::SizeType size;
+      size.Fill(0);
+      switch (structuralElementFlag) {
+      case Ball_Axial:
+      case Cross_Axial:
+        size.SetElement(0,factor);
+        size.SetElement(1,factor);
+        break;
+      case Ball_Coronal:
+      case Cross_Coronal:
+        size.SetElement(0,factor);
+        size.SetElement(2,factor);
+        break;
+      case Ball_Sagital:
+      case Cross_Sagital:
+        size.SetElement(1,factor);
+        size.SetElement(2,factor);
+        break;
+      case Ball:
+      case Cross:
+        size.Fill(factor);
+        break;
+      }
+
+      strElem.SetRadius(size);
+      strElem.CreateStructuringElement();
+      return strElem;
+    }
 
     ///@{
     /** \brief Perform morphological operation by using corresponding ITK filter.
@@ -65,6 +108,9 @@ namespace mitk
     void static itkFillHoles(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage);
     ///@}
   };
+
 }
 
 #endif
+
+

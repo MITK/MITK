@@ -38,7 +38,7 @@ namespace mitk
 
   \author Daniel Stein
   */
-  class MITK_RIGIDREGISTRATION_EXPORT ImageRegistrationMethod : public ImageToImageFilter
+  class MITKRIGIDREGISTRATION_EXPORT ImageRegistrationMethod : public ImageToImageFilter
   {
 
   public:
@@ -58,7 +58,7 @@ namespace mitk
 
     void SetInterpolator(int interpolator);
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     virtual void SetReferenceImage( Image::Pointer fixedImage);
 
@@ -86,7 +86,7 @@ namespace mitk
     Image::Pointer m_FixedMask;
     Image::Pointer m_MovingMask;
 
-    virtual void GenerateOutputInformation(){};
+    virtual void GenerateOutputInformation() override{};
 
   private:
     itk::Object::Pointer m_Transform;

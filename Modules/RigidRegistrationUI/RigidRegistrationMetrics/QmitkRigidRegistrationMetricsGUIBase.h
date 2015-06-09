@@ -30,12 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for rigid registration.
 */
-class MITK_RIGIDREGISTRATION_UI_EXPORT QmitkRigidRegistrationMetricsGUIBase : public QWidget
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigidRegistrationMetricsGUIBase : public QWidget
 {
 
 public:
 
-  QmitkRigidRegistrationMetricsGUIBase(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkRigidRegistrationMetricsGUIBase(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkRigidRegistrationMetricsGUIBase();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() = 0;

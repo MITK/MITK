@@ -34,7 +34,7 @@ namespace mitk
   \author Daniel Stein
   */
 
-  class MITK_DEFORMABLEREGISTRATION_EXPORT SymmetricForcesDemonsRegistration : public RegistrationBase
+  class MITKDEFORMABLEREGISTRATION_EXPORT SymmetricForcesDemonsRegistration : public RegistrationBase
   {
 
   public:
@@ -85,7 +85,7 @@ namespace mitk
     /*!
     * \brief Starts the symmetric forces demons registration.
     */
-    virtual void GenerateData()
+    virtual void GenerateData() override
     {
       if (this->GetInput())
       {

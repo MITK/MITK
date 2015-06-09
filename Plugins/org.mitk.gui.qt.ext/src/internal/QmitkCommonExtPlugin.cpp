@@ -18,29 +18,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtWidgetsExtRegisterClasses.h>
 
+#include "QmitkAboutHandler.h"
 #include "QmitkAppInstancesPreferencePage.h"
 #include "QmitkExternalProgramsPreferencePage.h"
 #include "QmitkInputDevicesPrefPage.h"
 
 #include "QmitkModuleView.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkIDataStorageService.h>
 #include <mitkSceneIO.h>
 #include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
+#include <mitkIOUtil.h>
+
+#include <mitkBaseApplication.h>
 
 #include <berryPlatformUI.h>
 #include <berryIPreferencesService.h>
+#include <berryPlatform.h>
 
 #include <Poco/Util/OptionProcessor.h>
 
 #include <QProcess>
 #include <QMainWindow>
 #include <QtPlugin>
-#include <berryIPreferencesService.h>
-#include "berryPlatform.h"
-#include <QMessageBox>
 
 ctkPluginContext* QmitkCommonExtPlugin::_context = 0;
 
@@ -50,6 +51,7 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 
   QtWidgetsExtRegisterClasses();
 
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAboutHandler, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkAppInstancesPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExternalProgramsPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkInputDevicesPrefPage, context)
@@ -61,14 +63,8 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
     connect(qApp, SIGNAL(messageReceived(QByteArray)), this, SLOT(handleIPCMessage(QByteArray)));
   }
 
-  std::vector<std::string> args = berry::Platform::GetApplicationArgs();
-  QStringList qargs;
-  for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
-  {
-    qargs << QString::fromStdString(*it);
-  }
   // This is a potentially long running operation.
-  loadDataFromDisk(qargs, true);
+  loadDataFromDisk(berry::Platform::GetApplicationArgs(), true);
 }
 
 void QmitkCommonExtPlugin::stop(ctkPluginContext* context)
@@ -108,20 +104,11 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
          }
          else
          {
-           mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
            try
            {
-             nodeReader->SetFileName(arguments[i].toStdString());
-             nodeReader->Update();
-             for (unsigned int j = 0 ; j < nodeReader->GetNumberOfOutputs( ); ++j)
-             {
-               mitk::DataNode::Pointer node = nodeReader->GetOutput(j);
-               if (node->GetData() != 0)
-               {
-                 dataStorage->Add(node);
-                 argumentsAdded++;
-               }
-             }
+             const std::string path(arguments[i].toStdString());
+             mitk::IOUtil::Load(path, *dataStorage);
+             argumentsAdded++;
            }
            catch(...)
            {
@@ -147,9 +134,9 @@ void QmitkCommonExtPlugin::startNewInstance(const QStringList &args, const QStri
 {
   QStringList newArgs(args);
 #ifdef Q_OS_UNIX
-  newArgs << QString("--") + QString::fromStdString(berry::Platform::ARG_NEWINSTANCE);
+  newArgs << QString("--") + mitk::BaseApplication::ARG_NEWINSTANCE;
 #else
-  newArgs << QString("/") + QString::fromStdString(berry::Platform::ARG_NEWINSTANCE);
+  newArgs << QString("/") + mitk::BaseApplication::ARG_NEWINSTANCE;
 #endif
   newArgs << files;
   QProcess::startDetached(qApp->applicationFilePath(), newArgs);
@@ -176,9 +163,7 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
   mainWindow->activateWindow();
 
   // Get the preferences for the instantiation behavior
-  berry::IPreferencesService::Pointer prefService
-      = berry::Platform::GetServiceRegistry()
-      .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
   berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/General");
   bool newInstanceAlways = prefs->GetBool("newInstance.always", false);
   bool newInstanceScene = prefs->GetBool("newInstance.scene", true);
@@ -189,33 +174,15 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
   QStringList fileArgs;
   QStringList sceneArgs;
 
-  Poco::Util::OptionSet os;
-  berry::Platform::GetOptionSet(os);
-  Poco::Util::OptionProcessor processor(os);
-#if !defined(POCO_OS_FAMILY_UNIX)
-  processor.setUnixStyle(false);
-#endif
-  args.pop_front();
-  QStringList::Iterator it = args.begin();
-  while (it != args.end())
+  foreach (QString arg, args)
   {
-    std::string name;
-    std::string value;
-    if (processor.process(it->toStdString(), name, value))
+    if (arg.endsWith(".mitk"))
     {
-      ++it;
+      sceneArgs << arg;
     }
     else
     {
-      if (it->endsWith(".mitk"))
-      {
-        sceneArgs << *it;
-      }
-      else
-      {
-        fileArgs << *it;
-      }
-      it = args.erase(it);
+      fileArgs << arg;
     }
   }
 

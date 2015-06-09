@@ -33,14 +33,14 @@ namespace mitk
 
     /**
   * \brief A class to generate synthetic networks */
-  class MitkConnectomics_EXPORT ConnectomicsSyntheticNetworkGenerator : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSyntheticNetworkGenerator : public itk::Object
   {
   public:
 
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsSyntheticNetworkGenerator, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsSyntheticNetworkGenerator, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

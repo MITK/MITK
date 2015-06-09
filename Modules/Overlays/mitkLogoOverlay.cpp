@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageReader2.h>
 
 #include <mitkVtkLogoRepresentation.h>
-#include <vtkLogoWidget.h>
 #include <vtkProperty2D.h>
 #include <vtkImageImport.h>
 #include <mbilogo.h>
@@ -40,7 +39,8 @@ mitk::LogoOverlay::LogoOverlay()
   offset.Fill(0.03);
   SetOffsetVector(offset);
   SetRelativeSize(0.2);
-  SetCornerPosition(4);
+  SetCornerPosition(3);
+  m_VtkImageImport = vtkSmartPointer<vtkImageImport>::New();
 }
 
 
@@ -55,8 +55,6 @@ mitk::LogoOverlay::LocalStorage::~LocalStorage()
 mitk::LogoOverlay::LocalStorage::LocalStorage()
 {
   m_LogoRep = vtkSmartPointer<mitkVtkLogoRepresentation>::New();
-  m_LogoWidget = vtkSmartPointer<vtkLogoWidget>::New();
-  m_LogoWidget->SetRepresentation(m_LogoRep);
 }
 
 void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
@@ -65,6 +63,11 @@ void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   if(ls->IsGenerateDataRequired(renderer,this))
   {
 
+    if (GetLogoImagePath().empty())
+    {
+      ls->m_LogoRep->SetVisibility(0);
+      return;
+    }
     vtkImageReader2* imageReader = m_readerFactory->CreateImageReader2(GetLogoImagePath().c_str());
     if(imageReader)
     {
@@ -101,11 +104,10 @@ void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 
 vtkImageData *mitk::LogoOverlay::CreateMbiLogo()
 {
-  vtkImageImport*     VtkImageImport = vtkImageImport::New();
-  VtkImageImport->SetDataScalarTypeToUnsignedChar();
-  VtkImageImport->SetNumberOfScalarComponents(mbiLogo_NumberOfScalars);
-  VtkImageImport->SetWholeExtent(0,mbiLogo_Width-1,0,mbiLogo_Height-1,0,1-1);
-  VtkImageImport->SetDataExtentToWholeExtent();
+  m_VtkImageImport->SetDataScalarTypeToUnsignedChar();
+  m_VtkImageImport->SetNumberOfScalarComponents(mbiLogo_NumberOfScalars);
+  m_VtkImageImport->SetWholeExtent(0,mbiLogo_Width-1,0,mbiLogo_Height-1,0,1-1);
+  m_VtkImageImport->SetDataExtentToWholeExtent();
 
   char *              ImageData;
   // flip mbi logo around y axis and change color order
@@ -129,10 +131,10 @@ vtkImageData *mitk::LogoOverlay::CreateMbiLogo()
         *dest++ = a;
       }
 
-  VtkImageImport->SetImportVoidPointer(ImageData);
-  VtkImageImport->Modified();
-  VtkImageImport->Update();
-  return VtkImageImport->GetOutput();
+  m_VtkImageImport->SetImportVoidPointer(ImageData);
+  m_VtkImageImport->Modified();
+  m_VtkImageImport->Update();
+  return m_VtkImageImport->GetOutput();
 }
 
 void mitk::LogoOverlay::SetLogoImagePath(std::string path)

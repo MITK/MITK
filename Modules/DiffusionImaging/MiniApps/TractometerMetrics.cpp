@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkBaseDataIOFactory.h>
 #include <mitkBaseData.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
@@ -49,7 +48,6 @@ int main(int argc, char* argv[])
     parser.addArgument("labels", "l", mitkCommandLineParser::StringList, "Label pairs:", "label pairs", false);
     parser.addArgument("labelimage", "li", mitkCommandLineParser::String, "Label image:", "label image", false);
     parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output valid, invalid and no connections as fiber bundles");
-
     parser.addArgument("fileID", "id", mitkCommandLineParser::String, "ID:", "optional ID field");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -77,7 +75,7 @@ int main(int argc, char* argv[])
         typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 
         // load fiber bundle
-        mitk::FiberBundleX::Pointer inputTractogram = dynamic_cast<mitk::FiberBundleX*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 
         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadDataNode(labelImageFile)->GetData());
         typedef mitk::ImageToItk< ItkShortImgType > CasterType;
@@ -286,7 +284,7 @@ int main(int argc, char* argv[])
             vtkSmartPointer<vtkPolyData> noConnPolyData = vtkSmartPointer<vtkPolyData>::New();
             noConnPolyData->SetPoints(noConnPoints);
             noConnPolyData->SetLines(noConnCells);
-            mitk::FiberBundleX::Pointer noConnFib = mitk::FiberBundleX::New(noConnPolyData);
+            mitk::FiberBundle::Pointer noConnFib = mitk::FiberBundle::New(noConnPolyData);
 
             string ncfilename = outRoot;
             ncfilename.append("_NC.fib");
@@ -296,7 +294,7 @@ int main(int argc, char* argv[])
             vtkSmartPointer<vtkPolyData> invalidPolyData = vtkSmartPointer<vtkPolyData>::New();
             invalidPolyData->SetPoints(invalidPoints);
             invalidPolyData->SetLines(invalidCells);
-            mitk::FiberBundleX::Pointer invalidFib = mitk::FiberBundleX::New(invalidPolyData);
+            mitk::FiberBundle::Pointer invalidFib = mitk::FiberBundle::New(invalidPolyData);
 
             string icfilename = outRoot;
             icfilename.append("_IC.fib");
@@ -306,7 +304,7 @@ int main(int argc, char* argv[])
             vtkSmartPointer<vtkPolyData> validPolyData = vtkSmartPointer<vtkPolyData>::New();
             validPolyData->SetPoints(validPoints);
             validPolyData->SetLines(validCells);
-            mitk::FiberBundleX::Pointer validFib = mitk::FiberBundleX::New(validPolyData);
+            mitk::FiberBundle::Pointer validFib = mitk::FiberBundle::New(validPolyData);
 
             string vcfilename = outRoot;
             vcfilename.append("_VC.fib");

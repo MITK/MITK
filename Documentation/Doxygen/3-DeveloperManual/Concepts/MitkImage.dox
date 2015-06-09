@@ -1,0 +1,199 @@
+/**
+\page MitkImagePage MITK Image
+
+\tableofcontents
+
+\section MitkImagePage_Introduction Introduction to MITK Image
+
+The MITK Image obviously is a very central class to MITK and one of those you are most
+likely to work with. This section will get you up and running with the basics. Consider
+this document a prerequisite for the Pipelining Introduction and the \ref
+GeometryOverviewPage.
+
+\imageMacro{mitkimagehierarchy.png,"",16}
+
+Image is a direct descendant of SlicedData which itself inherits from BaseData. In MITK,
+BaseData is the common DataType from which all other Datatypes stem. SlicedData specifies
+this class to contain image slices, a typical example being a CT scan, and introduces
+properties and methods necessary to give the data a well defined geometry. Image further
+specializes the concept to allow for multiple channels, volumes and slices as well as
+additional information like image properties.
+
+For the sake of this introduction, we will have a look at three different aspects:
+
+1. SlicedData and Geometry
+2. ImageData
+3. Image Properties
+
+\subsection MitkImagePage_SlicedData SlicedData and Geometry
+The mother class of Image introduces a fundamental aspect: Image geometry. It defines the
+image's spatial context: Dimension and orientation. A more in depth introduction is given
+here: \ref GeometryOverviewPage
+
+\subsection MitkImagePage_ImageData ImageData
+
+Objects of the class Image store the actual image data. It is important to discern four
+different concepts:
+
+1. Channels, which can be of a specific data type e.g. an intensity image or a vector
+   field. Each channel consists of one or more...
+2. Volumes, which contain data of a certain type. A volume is represented by
+   ImageDataItems that define volume properties. Inside of a channel, each volume must be
+   of the same type (float, int, etc.). Each volume consists of several...
+3. Slices, which each contain a two-dimensional image slice.
+
+There is also the pointer m_CompleteData that references all of the data (i.e. all
+volumes) as a singular array. This member is helpful, when one wants to copy image data
+from one image to another.
+
+\imageMacro{mitkimagememory.png,"",16}
+
+\subsection MitkImagePage_Properties Image Properties
+
+Lastly, we'll talk about properties. Properties are a set of additional information mainly
+used to save DICOM information. The functionality is introduced very early in the image's
+lineage, in BaseData. The system works quite similar to a hashmap by using property keys
+and properties. For further reference, see BaseData::GetProperty() or, for a simple
+example implementation, USImage::GetMetadata().
+
+
+\section MitkImagePage_AccessImageData Access image data
+
+Since many modules and plugins in MITK work with the same images, it can be difficult to
+comprehend and control all ongoing image accesses. Thus, we decided to introduce the
+concept of image accessors. They are responsible for organisation of image access and for
+keeping data consistent. Every Image manages its image accessors and thus is responsible
+for them. In the following subsections, image accessors are explained and their use is
+depicted. Code examples are added to make understanding easier.
+
+\subsection MitkImagePage_ImageAccessors Image accessors
+
+Image accessors provide an image access, which is
+ -# <b>controlled and surveilled:</b> at all time it is known how many instances have
+    access to a specific image part.
+ -# <b>consistent and thread-safe:</b> a lock-mechanism allows a concurrent read access on
+    image parts and guarantees a consistent data state during access.
+ -# <b>restricted to an image part:</b> it is possible to restrict access to a specific
+    image part (e.g. volume or slice), which is represented in an ImageDataItem.
+ -# <b>simple and comfortable through pixel index:</b> get- and set-methods are provided
+    to access pixel values easily (see next section).
+
+The existing instantiable image accessor classes are: mitk::ImageReadAccessor,
+mitk::ImageWriteAccessor and mitk::ImageVtkAccessor. They all inherit from
+mitk::ImageAccessorBase, which mainly contains the lock functionality and a representation
+of the specified image area. The classes mitk::ImageReadAccessor and
+mitk::ImageWriteAccessor provide access to an mitk::Image or mitk::ImageDataItem and
+supply a (const) void* pointer, while mitk::ImageVtkAccessor supports Vtk image access in
+a legacy mode (you should not instantiate it).
+
+\imageMacro{mitkimageaccessorhierarchy.png,"",16}
+
+\subsection MitkImagePage_HowToGetAccess How to get access
+Although the concept of image accessors is extensive, the use of image accessors is
+simple. Requesting an image access consists only of creating an instance of an image
+accessor. The constructor of an image accessor requires a pointer to the mitk::Image class
+and optionally an image part (e.g. mitk::ImageDataItem), which restricts the access of an
+image accessor to a specific image sector (e.g. Volume, Slice). Since the constructor can
+throw a mitk::Exception, it is necessary to order an image accessor within a try block.
+Possible exceptions are invalid images, wrong dimensions, etc. which cannot be accepted.
+
+If only a pointer to image data is needed, following code example shows how to get a const
+or non-const pointer. mitk::ImageReadAccessor only provides a const void* pointer while
+mitk::ImageWriteAccessor provides a void* pointer to image data.
+
+\verbatim
+// we assume you already have an mitk::Image::Pointer image
+
+try
+{
+  mitk::ImageReadAccessor readAccess(image, image->GetVolumeData(0));
+  const void* cPointer = readAccess.GetData();
+
+  mitk::ImageWriteAccessor writeAccess(image);
+  void* vPointer = writeAccess.GetData();
+}
+catch(mitk::Exception& e)
+{
+  // deal with the situation not to have access
+}
+\endverbatim
+
+Please note that an explicit call of Modified() method is needed after the write access is done.
+The accessor makes no such call on default.
+
+A more convenient way to access image data is provided by the classes
+mitk::ImagePixelReadAccessor and mitk::ImagePixelWriteAccessor. They are equipped with
+set- and get-methods, which allow an index-based access. Both classes are templated and
+need to know about pixel type and image dimension at compile time. That means, both
+parameters need to be defined with arrow brackets when calling the constructor.
+
+\verbatim
+// we assume you already have an mitk::Image::Pointer image
+
+try
+{
+  itk::Index<2> idx = {{ 12, 34 }};
+
+  mitk::ImagePixelReadAccessor<short,2> readAccess(image, image->GetSliceData(2));
+  short value = readAccess.GetPixelByIndex(idx);
+
+  mitk::ImagePixelWriteAccessor<short,2> writeAccess(image, image->GetSliceData(4));
+  writeAccess.SetPixelByIndex(idx, 42);
+}
+catch(mitk::Exception& e)
+{
+  // deal with the situation not to have access
+}
+\endverbatim
+
+\subsection MitkImagePage_AdditionalProperties Additional properties
+
+It is possible to commit options to the constructor affecting the behavior of an image
+accessor. Properties have to be specified using enum flags (e.g.
+mitk::ImageAccessorBase::ExceptionIfLocked) and can be unified by bitwise operations. The
+flag ExceptionIfLocked causes an exception if the requested image part is locked. Usually
+the requesting image accessor waits for the locking image accessor.
+
+\verbatim
+try
+{
+  mitk::ImageReadAccessor imageAccess(image, image->GetSliceData(2), mitk::ImageAccessorBase::ExceptionIfLocked);
+  const void* pointer = imageAccess.GetData();
+}
+catch(mitk::MemoryIsLockedException& e) {
+  // do something else
+}
+catch(mitk::Exception& e) {
+  // deal with the situation not to have access
+}
+\endverbatim
+
+
+\section MitkImagePage_WorkingWith Working with MITK Image
+
+\subsection MitkImagePage_Cloning     Cloning a MITK Image
+In order to clone an image, you can simply call the inherited method Clone(). It returns
+an itk::SmartPointer and works also with const image pointers.
+
+\verbatim
+mitk::Image::Pointer testMethod(const mitk::Image* image)
+{
+  mitk::Image::Pointer nIm = image->Clone();
+  return nIm;
+}
+\endverbatim
+
+Cloning can also be done manually by copying the Geometry, the visual Data and further
+properties separately. The simplest way to achieve this is to first call
+Image::Initialize(const Image * image). This will copy the geometry information, but not
+the data or the properties. Afterwards, copy the image's data (e.g. with SetVolume) and,
+if necessary, it's properties with SetPropertyList(image->GetPropertyList()).
+
+\subsection MitkImagePage_Inheriting Inheriting from MITK Image
+In general, one should try to avoid inheriting from mitk Image. The simple reason for this
+is that your derived class will not cleanly work together with the Filters already
+implemented (See the chapter on Pipelining for Details). If however, mitk Image does not
+offer the functionality you require it is possible to do so. See the documentation for
+various examples of classes that inherit from image.
+
+*/

@@ -1,0 +1,16 @@
+To execute the python scripts in this folder you will need:
+
+A working executable to gpumcml (e.g. gpumcml.sm_20) somewhere on your computer. You can find gpumcml in
+https://code.google.com/p/gpumcml/
+Apply patch gpumcml.pathch to gpumcml. This will change the output made by gpumcml slightly to only output things
+needed for our simulations.
+
+Python libraries:
+pymiecoated
+numpy
+scipy 0.15
+sklearn
+
+Other:
+graphviz
+

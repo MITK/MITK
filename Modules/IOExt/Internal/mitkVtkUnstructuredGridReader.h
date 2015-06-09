@@ -16,40 +16,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VtkUnstructuredGridReader_H_HEADER_INCLUDED
 #define VtkUnstructuredGridReader_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
-#include "mitkUnstructuredGridSource.h"
+#include <mitkAbstractFileReader.h>
 
 namespace mitk {
 //##Documentation
 //## @brief Reader to read unstructured grid files in vtk-format
-class VtkUnstructuredGridReader : public UnstructuredGridSource
+class VtkUnstructuredGridReader : public AbstractFileReader
 {
 public:
-    mitkClassMacro(VtkUnstructuredGridReader, UnstructuredGridSource);
 
-    /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+  VtkUnstructuredGridReader();
+  virtual ~VtkUnstructuredGridReader();
 
-    itkSetStringMacro(FileName);
-    itkGetStringMacro(FileName);
-
-    itkSetStringMacro(FilePrefix);
-    itkGetStringMacro(FilePrefix);
-
-    itkSetStringMacro(FilePattern);
-    itkGetStringMacro(FilePattern);
-
-    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
+  using AbstractFileReader::Read;
+  virtual std::vector< itk::SmartPointer<BaseData> > Read() override;
 
 protected:
-    virtual void GenerateData();
-
-    VtkUnstructuredGridReader();
-
-    ~VtkUnstructuredGridReader();
-
-    std::string m_FileName, m_FilePrefix, m_FilePattern;
+  virtual VtkUnstructuredGridReader* Clone() const override;
 
 };
 

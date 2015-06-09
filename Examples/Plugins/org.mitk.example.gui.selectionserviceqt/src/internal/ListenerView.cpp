@@ -30,7 +30,7 @@ const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview";
 
 ListenerView::ListenerView()
   : m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))
-  , m_Parent(0)
+  , m_Parent(nullptr)
 {
 }
 
@@ -38,7 +38,7 @@ ListenerView::~ListenerView()
 {
   // remove selection service
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  s->RemoveSelectionListener(m_SelectionListener);
+  s->RemoveSelectionListener(m_SelectionListener.data());
 }
 
 void ListenerView::CreateQtPartControl(QWidget *parent)
@@ -48,7 +48,7 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
 
   // register selection listener
-  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener);
+  GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(m_SelectionListener.data());
 
   m_Parent->setEnabled(true);
 }
@@ -65,8 +65,8 @@ void ListenerView::SetFocus()
 }
 
 //! [Qt Selection Listener method implementation]
-void ListenerView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart,
-                               berry::ISelection::ConstPointer selection)
+void ListenerView::SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
+                                    const berry::ISelection::ConstPointer& selection)
 {
   // check for null selection
   if (selection.IsNull())

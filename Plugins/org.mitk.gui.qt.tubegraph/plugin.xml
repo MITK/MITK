@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.tubegraph"
+           name="Tube Graph"
+           icon="resources/tubeGraph.png"
+           class="QmitkTubeGraphView" />
+  </extension>
+</plugin>

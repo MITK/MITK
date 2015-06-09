@@ -17,7 +17,7 @@ namespace mitk
   ///
   /// prints the EndoDebug to xml
   ///
-  class MitkCameraCalibration_EXPORT EndoDebugToXmlFile:
+  class MITKCAMERACALIBRATION_EXPORT EndoDebugToXmlFile:
     virtual public mitk::Algorithm
   {
   public:
@@ -25,14 +25,14 @@ namespace mitk
     /// init default values
     ///
     EndoDebugToXmlFile(
-      EndoDebug* _EndoDebug=0,
-      const std::string* _FileName=0);
+      EndoDebug* _EndoDebug=nullptr,
+      const std::string* _FileName=nullptr);
 
 
     ///
     /// Actually executes the algorithm.
     ///
-    void Update();
+    void Update() override;
 
     ///
     /// setter EndoDebug

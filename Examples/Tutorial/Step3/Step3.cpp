@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkProperties.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingManager.h>
+#include <mitkIOUtil.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -68,23 +68,19 @@ int main(int argc, char* argv[])
     // For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // Create a DataNodeFactory to read a data format supported
-    // by the DataNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataNodeFactory::Pointer nodeReader=mitk::DataNodeFactory::New();
-    const char * filename = argv[i];
-    try
-    {
-      nodeReader->SetFileName(filename);
-      nodeReader->Update();
-
       //*********************************************************************
       // Part III: Put the data into the datastorage
       //*********************************************************************
+    // Load datanode (eg. many image formats, surface formats, etc.)
+    mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[i],*ds);
 
-      // Since the DataNodeFactory directly creates a node,
-      // use the datastorage to add the read node
-      mitk::DataNode::Pointer node = nodeReader->GetOutput();
-      ds->Add(node);
+
+    if(dataNodes->empty())
+    {
+      fprintf( stderr, "Could not open file %s \n\n", argv[i] );
+      exit(2);
+    }
+    mitk::DataNode::Pointer node = dataNodes->at(0);
 
       // *********************************************************
       // ****************** START OF NEW PART 1 ******************
@@ -122,12 +118,6 @@ int main(int argc, char* argv[])
       // *********************************************************
       // ******************* END OF NEW PART 1 *******************
       // *********************************************************
-    }
-    catch(...)
-    {
-      fprintf( stderr, "Could not open file %s \n\n", filename );
-      exit(2);
-    }
   }
 
   //*************************************************************************

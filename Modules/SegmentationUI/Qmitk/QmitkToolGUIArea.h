@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   Last contributor: $Author$
 */
-class MitkSegmentationUI_EXPORT QmitkToolGUIArea : public QWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkToolGUIArea : public QWidget
 {
   Q_OBJECT
 
@@ -37,7 +37,7 @@ class MitkSegmentationUI_EXPORT QmitkToolGUIArea : public QWidget
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   QmitkToolGUIArea( QWidget* parent = 0, Qt::WFlags f = 0 );
 #else
-  QmitkToolGUIArea( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkToolGUIArea( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
 #endif
   virtual ~QmitkToolGUIArea();
 

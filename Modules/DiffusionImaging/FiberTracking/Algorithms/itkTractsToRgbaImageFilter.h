@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <itkVectorContainer.h>
 #include <itkRGBAPixel.h>
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 namespace itk{
 
@@ -48,7 +48,7 @@ public:
   itkSetMacro( UpsamplingFactor, float)
   itkGetMacro( UpsamplingFactor, float)
 
-  itkSetMacro( FiberBundle, mitk::FiberBundleX::Pointer)
+  itkSetMacro( FiberBundle, mitk::FiberBundle::Pointer)
   itkSetMacro( InputImage, typename InputImageType::Pointer)
 
   /** Use input image geometry to initialize output image **/
@@ -65,7 +65,7 @@ protected:
   TractsToRgbaImageFilter();
   virtual ~TractsToRgbaImageFilter();
 
-  mitk::FiberBundleX::Pointer       m_FiberBundle;      ///< input fiber bundle
+  mitk::FiberBundle::Pointer       m_FiberBundle;      ///< input fiber bundle
   float                             m_UpsamplingFactor; ///< use higher resolution for ouput image
   bool                              m_UseImageGeometry; ///< output image is given other geometry than fiberbundle (input image geometry)
   typename InputImageType::Pointer  m_InputImage;

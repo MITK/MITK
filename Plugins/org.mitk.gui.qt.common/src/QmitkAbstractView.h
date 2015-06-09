@@ -246,13 +246,13 @@ protected:
    * \param showDialog controls, whether additionally a message box should be
    *        displayed to inform the user that something went wrong
    */
-  void HandleException( std::exception& e, QWidget* parent = NULL, bool showDialog = true ) const;
+  void HandleException( std::exception& e, QWidget* parent = nullptr, bool showDialog = true ) const;
 
   /**
    * Calls HandleException ( std::exception&, QWidget*, bool ) internally
    * \see HandleException ( std::exception&, QWidget*, bool )
    */
-  void HandleException( const char* str, QWidget* parent = NULL, bool showDialog = true ) const;
+  void HandleException( const char* str, QWidget* parent = nullptr, bool showDialog = true ) const;
 
   /**
    * Convenient method to set and reset a wait cursor ("hourglass")
@@ -367,7 +367,7 @@ private:
   /**
    * Creates a scroll area for this view and calls CreateQtPartControl then
    */
-  void CreatePartControl(void* parent);
+  void CreatePartControl(QWidget* parent) override;
 
   /**
    * Called immediately after CreateQtPartControl().

@@ -27,7 +27,7 @@ namespace mitk
     RoundRobinSchedulingAlgorithm();
     ~RoundRobinSchedulingAlgorithm();
 
-    SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue);
+    SchedulableProcess* GetNextProcess(std::vector<SchedulableProcess*>& processQueue) override;
   };
 }
 

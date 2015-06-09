@@ -171,7 +171,7 @@ void QmitkAmoebaOptimizerView::SetupUI(QWidget* parent)
 
 void QmitkAmoebaOptimizerView::ShowSimplexDelta()
 {
-  std::list<QLineEdit*>::iterator it_edit = simplexDeltaLineEdits.begin();
+  auto it_edit = simplexDeltaLineEdits.begin();
   for (it_edit = simplexDeltaLineEdits.begin(); it_edit != simplexDeltaLineEdits.end(); it_edit++)
   {
     (*it_edit)->hide();
@@ -182,7 +182,7 @@ void QmitkAmoebaOptimizerView::ShowSimplexDelta()
     (*it_edit)->show();
     it_edit++;
   }
-  std::list<QLabel*>::iterator it_label = simplexDeltaLabels.begin();
+  auto it_label = simplexDeltaLabels.begin();
   for (it_label = simplexDeltaLabels.begin(); it_label != simplexDeltaLabels.end(); it_label++)
   {
     (*it_label)->hide();

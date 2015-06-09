@@ -63,11 +63,11 @@ class Image;
 
   $Author$
 */
-class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::Object
+class MITKSEGMENTATION_EXPORT SegmentationInterpolationController : public itk::Object
 {
   public:
 
-    mitkClassMacro(SegmentationInterpolationController, itk::Object);
+    mitkClassMacroItkParent(SegmentationInterpolationController, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -148,7 +148,7 @@ class MitkSegmentation_EXPORT SegmentationInterpolationController : public itk::
     /**
       \brief Protected class of mitk::SegmentationInterpolationController. Don't use (you shouldn't be able to do so)!
     */
-    class MitkSegmentation_EXPORT SetChangedSliceOptions
+    class MITKSEGMENTATION_EXPORT SetChangedSliceOptions
     {
       public:
         SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )

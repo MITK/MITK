@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef EXTENSIONPOINTDEFINITIONCONSTANTS_H_
 #define EXTENSIONPOINTDEFINITIONCONSTANTS_H_
 
-#include <string>
+#include <QString>
 
 /**
  * The ExtensionPointDefinitionConstants contains a list of unique ids in the
@@ -32,11 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 struct ExtensionPointDefinitionConstants
 {
-  static const std::string CHANGETEXT_XP_NAME;
-  static const std::string CHANGETEXT_CHILD_DESCRIPTION;
-  static const std::string CHANGETEXT_XMLATTRIBUTE_CLASS;
-  static const std::string CHANGETEXT_XMLATTRIBUTE_NAME;
-  static const std::string CHANGETEXT_XMLATTRIBUTE_ID;
+  static const QString CHANGETEXT_XP_NAME;
+  static const QString CHANGETEXT_CHILD_DESCRIPTION;
+  static const QString CHANGETEXT_XMLATTRIBUTE_CLASS;
+  static const QString CHANGETEXT_XMLATTRIBUTE_NAME;
+  static const QString CHANGETEXT_XMLATTRIBUTE_ID;
 };
 
 #endif /*EXTENSIONPOINTDEFINITIONCONSTANTS_H_*/

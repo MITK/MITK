@@ -24,10 +24,10 @@ This file is based heavily on a corresponding ITK filter.
 
 #include "itkImageToImageFilter.h"
 #include "itkVectorImage.h"
-#include <mitkDiffusionImage.h>
 #include <itkLabelStatisticsImageFilter.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkShiftScaleImageFilter.h>
+#include <mitkDiffusionPropertyHelper.h>
 
 namespace itk{
 /** \class DwiNormilzationFilter
@@ -60,8 +60,8 @@ public:
     typedef typename Superclass::InputImageType InputImageType;
     typedef typename Superclass::OutputImageType OutputImageType;
     typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
-    typedef mitk::DiffusionImage< short >::GradientDirectionType GradientDirectionType;
-    typedef mitk::DiffusionImage< short >::GradientDirectionContainerType::Pointer GradientContainerType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
+    typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer GradientContainerType;
     typedef itk::LabelStatisticsImageFilter< TInPixelImageType,BinImageType >  StatisticsFilterType;
     typedef itk::Statistics::Histogram< typename TInPixelImageType::PixelType  > HistogramType;
     typedef typename HistogramType::MeasurementType MeasurementType;

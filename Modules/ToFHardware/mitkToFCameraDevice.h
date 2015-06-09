@@ -37,11 +37,11 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFCameraDevice : public itk::Object
+  class MITKTOFHARDWARE_EXPORT ToFCameraDevice : public itk::Object
   {
   public:
 
-    mitkClassMacro(ToFCameraDevice, itk::Object);
+    mitkClassMacroItkParent(ToFCameraDevice, itk::Object);
     /*!
     \brief Opens a connection to the ToF camera. Has to be implemented
     in the specialized inherited classes.

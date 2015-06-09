@@ -34,7 +34,7 @@ namespace mitk
   \author Daniel Stein
   */
 
-  class MITK_DEFORMABLEREGISTRATION_EXPORT DemonsRegistration : public RegistrationBase
+  class MITKDEFORMABLEREGISTRATION_EXPORT DemonsRegistration : public RegistrationBase
   {
 
   public:
@@ -85,7 +85,7 @@ namespace mitk
     /*!
     * \brief Starts the demons registration.
     */
-    virtual void GenerateData()
+    virtual void GenerateData() override
     {
       if (this->GetInput())
       {

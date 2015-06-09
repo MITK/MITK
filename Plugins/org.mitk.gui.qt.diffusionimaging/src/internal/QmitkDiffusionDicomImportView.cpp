@@ -35,7 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // diffusion module includes
 #include "mitkDicomDiffusionImageHeaderReader.h"
 #include "mitkDicomDiffusionImageReader.h"
-#include "mitkDiffusionImage.h"
+#include "mitkImage.h"
+#include <mitkDiffusionPropertyHelper.h>
 
 #include "mitkDiffusionDICOMFileReader.h"
 #include "mitkDICOMTagBasedSorter.h"
@@ -488,15 +489,14 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
       for( int o = 0; o < gdcmReader->GetNumberOfOutputs(); o++ )
       {
         mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(o).GetMitkImage();
-        mitk::DiffusionImage<short>::Pointer d_img = static_cast<mitk::DiffusionImage<short>*>( loaded_image.GetPointer() );
 
         std::stringstream ss;
         ss << "ImportedData_" << o;
 
         node = mitk::DataNode::New();
-        node->SetData( d_img );
+        node->SetData( loaded_image );
         std::string outname;
-        d_img->GetPropertyList()->GetStringProperty("diffusion.dicom.importname", outname );
+        loaded_image->GetPropertyList()->GetStringProperty("diffusion.dicom.importname", outname );
 
         node->SetName( outname.c_str() );
 

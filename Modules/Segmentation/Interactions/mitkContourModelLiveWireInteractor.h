@@ -39,7 +39,7 @@ namespace mitk
   \warning Make sure the working image is properly set, otherwise the algorithm for computing livewire contour segments will not work!
 
   */
-  class MitkSegmentation_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
+  class MITKSEGMENTATION_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
   {
   public:
 
@@ -55,10 +55,10 @@ namespace mitk
     ContourModelLiveWireInteractor(DataNode* dataNode);
     virtual ~ContourModelLiveWireInteractor();
 
-    virtual bool OnDeletePoint(Action*, const StateEvent*);
-    virtual bool OnMovePoint(Action*, const StateEvent*);
-    virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent);
-    virtual bool OnFinishEditing( Action* action, const StateEvent* stateEvent);
+    virtual bool OnDeletePoint(Action*, const StateEvent*) override;
+    virtual bool OnMovePoint(Action*, const StateEvent*) override;
+    virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent) override;
+    virtual bool OnFinishEditing( Action* action, const StateEvent* stateEvent) override;
 
     int SplitContourFromSelectedVertex(mitk::ContourModel* srcContour,
                                        mitk::ContourModel* destContour,

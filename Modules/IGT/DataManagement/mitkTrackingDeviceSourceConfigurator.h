@@ -37,10 +37,10 @@ namespace mitk {
   *        GetErrorMessage().
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT TrackingDeviceSourceConfigurator : public itk::Object
+  class MITKIGT_EXPORT TrackingDeviceSourceConfigurator : public itk::Object
   {
   public:
-    mitkClassMacro(TrackingDeviceSourceConfigurator,  itk::Object);
+    mitkClassMacroItkParent(TrackingDeviceSourceConfigurator,  itk::Object);
     mitkNewMacro2Param(Self,mitk::NavigationToolStorage::Pointer,mitk::TrackingDevice::Pointer);
 
     /** @return Returns if it's possible to create a tracking device source, which means the tools are checked
@@ -99,6 +99,7 @@ namespace mitk {
     mitk::TrackingDeviceSource::Pointer CreateNDIAuroraTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
     mitk::TrackingDeviceSource::Pointer CreateMicronTrackerTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
     mitk::TrackingDeviceSource::Pointer CreateNPOptitrackTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
+    mitk::TrackingDeviceSource::Pointer CreateVirtualTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
   mitk::NavigationDataObjectVisualizationFilter::Pointer CreateNavigationDataObjectVisualizationFilter(mitk::TrackingDeviceSource::Pointer trackingDeviceSource, mitk::NavigationToolStorage::Pointer navigationTools);
 
   };

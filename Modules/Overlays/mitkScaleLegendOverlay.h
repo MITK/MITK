@@ -27,7 +27,7 @@ class vtkLegendScaleActor;
 namespace mitk {
 
 /** \brief Displays configurable scales on the renderwindow. The scale is determined by the image spacing. */
-class MitkOverlays_EXPORT ScaleLegendOverlay : public mitk::VtkOverlay {
+class MITKOVERLAYS_EXPORT ScaleLegendOverlay : public mitk::VtkOverlay {
 public:
 
   class LocalStorage : public mitk::Overlay::BaseLocalStorage
@@ -75,8 +75,8 @@ protected:
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-  virtual vtkProp* GetVtkProp(BaseRenderer *renderer) const;
-  virtual void UpdateVtkOverlay(BaseRenderer *renderer);
+  virtual vtkProp* GetVtkProp(BaseRenderer *renderer) const override;
+  virtual void UpdateVtkOverlay(BaseRenderer *renderer) override;
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit ScaleLegendOverlay();

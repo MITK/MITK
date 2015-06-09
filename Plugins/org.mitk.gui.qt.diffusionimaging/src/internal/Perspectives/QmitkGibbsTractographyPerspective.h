@@ -30,7 +30,7 @@ public:
   QmitkGibbsTractographyPerspective() {}
   ~QmitkGibbsTractographyPerspective() {}
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
 #endif /* QmitkGibbsTractographyPerspective_H_ */

@@ -55,7 +55,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarRectangle.h"
 #include "mitkPlanarPolygon.h"
 #include "mitkPartialVolumeAnalysisClusteringCalculator.h"
-#include "mitkDiffusionImage.h"
 #include "usModuleRegistry.h"
 
 #include <itkVectorImage.h>
@@ -468,7 +467,7 @@ void QmitkPartialVolumeAnalysisView::EstimateCircle()
     point2[1] = factor*len2;
 
     mitk::PlanarCircle::Pointer circle = mitk::PlanarCircle::New();
-    circle->SetGeometry2D(planegeometry);
+    circle->SetPlaneGeometry(planegeometry);
     circle->PlaceFigure( point1 );
     circle->SetControlPoint(0,point1);
     circle->SetControlPoint(1,point2);
@@ -599,9 +598,7 @@ void QmitkPartialVolumeAnalysisView::PlanarFigureFocus(mitk::DataNode* node)
 
         FindRenderWindow(node);
 
-        const mitk::PlaneGeometry
-                * _PlaneGeometry =
-                dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetGeometry2D());
+        const mitk::PlaneGeometry* _PlaneGeometry = _PlanarFigure->GetPlaneGeometry();
 
         // make node visible
         if (m_SelectedRenderWindow)

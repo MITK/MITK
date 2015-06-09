@@ -55,13 +55,13 @@ namespace mitk
  *   - MattesMutualInformation for CrossModality=on ( default ) and
  *   - NormalizedCorrelation for CrossModality=off.
  */
-class MitkDiffusionCore_EXPORT PyramidImageRegistrationMethod :
+class MITKDIFFUSIONCORE_EXPORT PyramidImageRegistrationMethod :
     public itk::Object
 {
 public:
 
   /** Typedefs */
-  mitkClassMacro(PyramidImageRegistrationMethod, itk::Object)
+  mitkClassMacroItkParent(PyramidImageRegistrationMethod, itk::Object)
 
   /** Smart pointer support */
   itkFactorylessNewMacro(Self)

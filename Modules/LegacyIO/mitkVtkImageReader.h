@@ -25,9 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 //##Documentation
 //## @brief Reader to read image files in vtk file format
-//## @ingroup IO
+//## @ingroup MitkLegacyIOModule
 //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() MitkLegacyIO_EXPORT VtkImageReader : public ImageSource, public FileReader
+class DEPRECATED() MITKLEGACYIO_EXPORT VtkImageReader : public ImageSource, public FileReader
 {
 public:
   mitkClassMacro(VtkImageReader, FileReader);
@@ -53,7 +53,7 @@ protected:
 
   ~VtkImageReader();
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   //##Description
   //## @brief Time when Header was last read

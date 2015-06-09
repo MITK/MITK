@@ -1,0 +1,47 @@
+/**
+
+\page Architecture The Architecture of MITK
+
+MITK is an open source software toolkit for medical image processing, subsequent data analysis and integration of medical hardware.
+It is designed with the aim of providing a modular and reusable code base to enable rapid development of new features. Following
+this design philosophy, MITK includes many specialized modules.
+
+This document is aimed at giving an overview of the general structure of MITK. It will give you an introduction to the coding
+and design concepts behind the toolkit.
+
+\section OverviewPage_DesignOverview Design Overview
+
+MITK is designed to be used either as a <B>pure software library</B> or as a <B>complete application framework</B>. Thus, a user
+of MITK can decide if he or she simply wants to add a new plug-in to the existing application framework or to implement an
+own application by using MITK as a software library. Depending on the type of use MITK uses different software libraries, which is
+shown in the next figure for overview.
+
+\imageMacro{MitkOverview.png,"Overview of MITK",16}
+
+As shown above, MITK uses the following libraries.
+<ul>
+ <li> The <a href="http://www.itk.org">Insight Toolkit (ITK)</a>, which provides registration and
+segmentation algorithms, but is not designed for visualization or interaction.
+
+ <li> The <a href="http://www.vtk.org">Visualization Toolkit (VTK)</a>, which provides powerful visualization capabilities
+ and low-level support for interaction such as picking methods, rotation, movement and scaling of objects.
+
+ <li> The <a href="http://www.commontk.org">Common Toolkit (CTK)</a>, which focuses on DICOM support and a plug-in framework.
+
+ <li> The <a href="http://qt.nokia.com/">Qt Cross-platform application and UI framework (Qt)</a> as a framework for UI and application
+ support.
+</ul>
+
+These are the main libraries MITK is based on. For more functionality you can optionally include other libraries as well. A list of used libraries can be found \ref thirdpartylibs "here" .
+
+Based on these libraries, MITK includes the following features:
+<ul>
+ <li>High level interactions with data.
+ <li>Specialized medical imaging algorithms (e.g. segmentation)
+ <li>Support of 3D + t data.
+ <li>Complete application framework, expandable by plug-ins
+ <li>Standard tools for medical imaging as default plug-ins (e.g. measurement, segmentation)
+ <li>Many specialized modules for different topics on medical imaging (e.g. diffusion imaging, image guided therapy, live image/ultrasound data processing)
+</ul>
+
+*/

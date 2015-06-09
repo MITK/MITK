@@ -16,17 +16,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include <mitkNrrdDiffusionImageReader.h>
+#include <mitkDiffusionImageNrrdReaderService.h>
+#include <mitkDiffusionImageNiftiReaderService.h>
 #include <mitkNrrdTensorImageReader.h>
 #include <mitkNrrdQBallImageReader.h>
-#include <mitkFiberBundleXReader.h>
+#include <mitkFiberBundleVtkReader.h>
+#include <mitkFiberBundleTrackVisReader.h>
 #include <mitkConnectomicsNetworkReader.h>
+#include <mitkPlanarFigureCompositeReader.h>
 
-#include <mitkNrrdDiffusionImageWriter.h>
+#include <mitkDiffusionImageNrrdWriterService.h>
+#include <mitkDiffusionImageNiftiWriterService.h>
 #include <mitkNrrdTensorImageWriter.h>
 #include <mitkNrrdQBallImageWriter.h>
-#include <mitkFiberBundleXWriter.h>
+#include <mitkFiberBundleVtkWriter.h>
+#include <mitkFiberBundleTrackVisWriter.h>
 #include <mitkConnectomicsNetworkWriter.h>
+#include <mitkPlanarFigureCompositeWriter.h>
 
 #include "mitkDiffusionIOMimeTypes.h"
 
@@ -39,59 +45,84 @@ namespace mitk
   {
   public:
 
-    void Load(us::ModuleContext* context)
+    void Load(us::ModuleContext* context) override
     {
       us::ServiceProperties props;
       props[ us::ServiceConstants::SERVICE_RANKING() ] = 10;
 
-      std::vector<mitk::CustomMimeType*> mimeTypes = mitk::DiffusionIOMimeTypes::Get();
-      for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = mimeTypes.begin(),
-        iterEnd = mimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
+      m_MimeTypes = mitk::DiffusionIOMimeTypes::Get();
+      for (std::vector<mitk::CustomMimeType*>::const_iterator mimeTypeIter = m_MimeTypes.begin(),
+        iterEnd = m_MimeTypes.end(); mimeTypeIter != iterEnd; ++mimeTypeIter)
       {
         context->RegisterService(*mimeTypeIter, props);
       }
 
-      m_NrrdDiffusionImageReader = new NrrdDiffusionImageReader();
+      m_DiffusionImageNrrdReaderService = new DiffusionImageNrrdReaderService();
+      m_DiffusionImageNiftiReaderService = new DiffusionImageNiftiReaderService();
       m_NrrdTensorImageReader = new NrrdTensorImageReader();
       m_NrrdQBallImageReader = new NrrdQBallImageReader();
-      m_FiberBundleXReader = new FiberBundleXReader();
+      m_FiberBundleVtkReader = new FiberBundleVtkReader();
+      m_FiberBundleTrackVisReader = new FiberBundleTrackVisReader();
       m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
+      m_PlanarFigureCompositeReader = new PlanarFigureCompositeReader();
 
-      m_NrrdDiffusionImageWriter = new NrrdDiffusionImageWriter();
+      m_DiffusionImageNrrdWriterService = new DiffusionImageNrrdWriterService();
+      m_DiffusionImageNiftiWriterService = new DiffusionImageNiftiWriterService();
       m_NrrdTensorImageWriter = new NrrdTensorImageWriter();
       m_NrrdQBallImageWriter = new NrrdQBallImageWriter();
-      m_FiberBundleXWriter = new FiberBundleXWriter();
+      m_FiberBundleVtkWriter = new FiberBundleVtkWriter();
+      m_FiberBundleTrackVisWriter = new FiberBundleTrackVisWriter();
       m_ConnectomicsNetworkWriter = new ConnectomicsNetworkWriter();
+      m_PlanarFigureCompositeWriter = new PlanarFigureCompositeWriter();
     }
 
-    void Unload(us::ModuleContext*)
+    void Unload(us::ModuleContext*) override
     {
-      delete m_NrrdDiffusionImageReader;
+      for (unsigned int loop(0); loop < m_MimeTypes.size(); ++loop)
+      {
+        delete m_MimeTypes.at(loop);
+      }
+
+      delete m_DiffusionImageNrrdReaderService;
+      delete m_DiffusionImageNiftiReaderService;
       delete m_NrrdTensorImageReader;
       delete m_NrrdQBallImageReader;
-      delete m_FiberBundleXReader;
+      delete m_FiberBundleVtkReader;
+      delete m_FiberBundleTrackVisReader;
       delete m_ConnectomicsNetworkReader;
+      delete m_PlanarFigureCompositeReader;
 
-      delete m_NrrdDiffusionImageWriter;
+      delete m_DiffusionImageNrrdWriterService;
+      delete m_DiffusionImageNiftiWriterService;
       delete m_NrrdTensorImageWriter;
       delete m_NrrdQBallImageWriter;
-      delete m_FiberBundleXWriter;
+      delete m_FiberBundleVtkWriter;
+      delete m_FiberBundleTrackVisWriter;
       delete m_ConnectomicsNetworkWriter;
+      delete m_PlanarFigureCompositeWriter;
     }
 
   private:
 
-    NrrdDiffusionImageReader * m_NrrdDiffusionImageReader;
+    DiffusionImageNrrdReaderService * m_DiffusionImageNrrdReaderService;
+    DiffusionImageNiftiReaderService * m_DiffusionImageNiftiReaderService;
     NrrdTensorImageReader * m_NrrdTensorImageReader;
     NrrdQBallImageReader * m_NrrdQBallImageReader;
-    FiberBundleXReader * m_FiberBundleXReader;
+    FiberBundleVtkReader * m_FiberBundleVtkReader;
+    FiberBundleTrackVisReader * m_FiberBundleTrackVisReader;
     ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
+    PlanarFigureCompositeReader* m_PlanarFigureCompositeReader;
 
-    NrrdDiffusionImageWriter * m_NrrdDiffusionImageWriter;
+    DiffusionImageNrrdWriterService * m_DiffusionImageNrrdWriterService;
+    DiffusionImageNiftiWriterService * m_DiffusionImageNiftiWriterService;
     NrrdTensorImageWriter * m_NrrdTensorImageWriter;
     NrrdQBallImageWriter * m_NrrdQBallImageWriter;
-    FiberBundleXWriter * m_FiberBundleXWriter;
+    FiberBundleVtkWriter * m_FiberBundleVtkWriter;
+    FiberBundleTrackVisWriter * m_FiberBundleTrackVisWriter;
     ConnectomicsNetworkWriter * m_ConnectomicsNetworkWriter;
+    PlanarFigureCompositeWriter* m_PlanarFigureCompositeWriter;
+
+    std::vector<mitk::CustomMimeType*> m_MimeTypes;
 
   };
 }

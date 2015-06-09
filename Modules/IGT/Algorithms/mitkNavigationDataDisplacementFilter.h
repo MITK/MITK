@@ -30,7 +30,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataDisplacementFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataDisplacementFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataDisplacementFilter, NavigationDataToNavigationDataFilter);
@@ -46,7 +46,7 @@ namespace mitk
     * This method reads the following properties from the PropertyList (name : data type):
     *  - "NavigationDataDisplacementFilter_Offset" : mitk::Vector3DProperty
     */
-    virtual void SetParameters(const mitk::PropertyList* p);
+    virtual void SetParameters(const mitk::PropertyList* p) override;
 
     /**
     *\brief Get all filter parameters (offset) as a PropertyList
@@ -57,7 +57,7 @@ namespace mitk
     * The returned PropertyList must be assigned to a
     * SmartPointer immediately, or else it will get destroyed.
     */
-    mitk::PropertyList::ConstPointer GetParameters() const;
+    mitk::PropertyList::ConstPointer GetParameters() const override;
 
   protected:
     NavigationDataDisplacementFilter();
@@ -68,7 +68,7 @@ namespace mitk
     *
     * adds the offset m_Offset to all inputs
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     mitk::Vector3D m_Offset; ///< offset that is added to all inputs
   };

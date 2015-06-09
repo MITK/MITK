@@ -75,7 +75,7 @@ namespace us {
   * }
   * \endcode
   */
-class MitkUSUI_EXPORT QmitkUSAbstractCustomWidget : public QWidget
+class MITKUSUI_EXPORT QmitkUSAbstractCustomWidget : public QWidget
 {
   Q_OBJECT
 
@@ -137,7 +137,7 @@ public:
     *
     * \throws mitk::Exception
     */
-  void showEvent ( QShowEvent * event );
+  void showEvent ( QShowEvent * event ) override;
 
   /**
     * \brief Property key for the class name of corresponding us device object.

@@ -1,7 +1,7 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
 QmitkApplicationCursor.cpp
-QmitkEnums.h
-QmitkCustomVariants.h
 QmitkDataStorageComboBox.cpp
 QmitkDataStorageListModel.cpp
 QmitkDataStorageTableModel.cpp
@@ -34,44 +34,46 @@ QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
 QmitkMouseModeSwitcher.cpp
 QmitkDataStorageFilterProxyModel.cpp
+QmitkDataStorageComboBoxWithSelectNone.cpp
 )
 
 set(MOC_H_FILES
-QmitkDataStorageComboBox.h
-QmitkDataStorageTableModel.h
-QmitkFileReaderOptionsDialog.h
-QmitkFileReaderWriterOptionsWidget.h
-QmitkFileWriterOptionsDialog.h
-QmitkLevelWindowPresetDefinitionDialog.h
-QmitkLevelWindowRangeChangeDialog.h
-QmitkLevelWindowWidgetContextMenu.h
-QmitkLevelWindowWidget.h
-QmitkLineEditLevelWindowWidget.h
-QmitkMemoryUsageIndicatorView.h
-QmitkNodeDescriptor.h
-QmitkNodeDescriptorManager.h
-QmitkRenderWindowMenu.h
-QmitkProgressBar.h
-QmitkPropertiesTableEditor.h
-QmitkPropertyDelegate.h
-QmitkRenderingManager.h
-QmitkRenderWindow.h
-QmitkServiceListWidget.h
-QmitkSliderLevelWindowWidget.h
-QmitkStdMultiWidget.h
-QmitkMouseModeSwitcher.h
+  include/QmitkDataStorageComboBox.h
+  include/QmitkDataStorageTableModel.h
+  include/QmitkFileReaderOptionsDialog.h
+  include/QmitkFileReaderWriterOptionsWidget.h
+  include/QmitkFileWriterOptionsDialog.h
+  include/QmitkLevelWindowPresetDefinitionDialog.h
+  include/QmitkLevelWindowRangeChangeDialog.h
+  include/QmitkLevelWindowWidgetContextMenu.h
+  include/QmitkLevelWindowWidget.h
+  include/QmitkLineEditLevelWindowWidget.h
+  include/QmitkMemoryUsageIndicatorView.h
+  include/QmitkNodeDescriptor.h
+  include/QmitkNodeDescriptorManager.h
+  include/QmitkRenderWindowMenu.h
+  include/QmitkProgressBar.h
+  include/QmitkPropertiesTableEditor.h
+  include/QmitkPropertyDelegate.h
+  include/QmitkRenderingManager.h
+  include/QmitkRenderWindow.h
+  include/QmitkServiceListWidget.h
+  include/QmitkSliderLevelWindowWidget.h
+  include/QmitkStdMultiWidget.h
+  include/QmitkMouseModeSwitcher.h
+  include/QmitkDataStorageComboBoxWithSelectNone.h
 )
 
 set(UI_FILES
-QmitkFileReaderOptionsDialog.ui
-QmitkFileWriterOptionsDialog.ui
-QmitkLevelWindowPresetDefinition.ui
-QmitkLevelWindowWidget.ui
-QmitkLevelWindowRangeChange.ui
-QmitkMemoryUsageIndicator.ui
-QmitkServiceListWidgetControls.ui
+  src/QmitkFileReaderOptionsDialog.ui
+  src/QmitkFileWriterOptionsDialog.ui
+  src/QmitkLevelWindowPresetDefinition.ui
+  src/QmitkLevelWindowWidget.ui
+  src/QmitkLevelWindowRangeChange.ui
+  src/QmitkMemoryUsageIndicator.ui
+  src/QmitkServiceListWidgetControls.ui
 )
 
 set(QRC_FILES
-  Qmitk.qrc
+  resource/Qmitk.qrc
 )

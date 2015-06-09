@@ -17,32 +17,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ChangeTextDescriptor.h"
 #include "ExtensionPointDefinitionConstants.h"
 
-#include "berryPlatformException.h"
+#include "berryIContributor.h"
 
 ChangeTextDescriptor::ChangeTextDescriptor(berry::IConfigurationElement::Pointer changeTextExtensionPoint)
   : m_ChangeTextExtensionPoint(changeTextExtensionPoint)
 {
-  std::string id;
-  std::string name;
+  this->m_Id = this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID);
+  this->m_Name = this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME);
 
   // Check if the "id" and "name" attributes are available
-  if (!this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_ID, id) ||
-      !this->m_ChangeTextExtensionPoint->GetAttribute(ExtensionPointDefinitionConstants::CHANGETEXT_XMLATTRIBUTE_NAME, name))
+  if (this->m_Id.isNull() || this->m_Name.isNull())
   {
-    throw berry::CoreException("Invalid changetext configuration element (missing id or name) from: " +
-                               m_ChangeTextExtensionPoint->GetContributor());
+    throw ctkRuntimeException("Invalid changetext configuration element (missing id or name) from: " +
+                              m_ChangeTextExtensionPoint->GetContributor()->GetName());
   }
 
-  this->m_Id = QString::fromStdString(id);
-  this->m_Name = QString::fromStdString(name);
-
   // Get the optional "description" child element
-  std::vector<berry::IConfigurationElement::Pointer> descriptions(
+  QList<berry::IConfigurationElement::Pointer> descriptions(
         this->m_ChangeTextExtensionPoint->GetChildren(ExtensionPointDefinitionConstants::CHANGETEXT_CHILD_DESCRIPTION));
 
-  if(!descriptions.empty())
+  if(!descriptions.isEmpty())
   {
-    this->m_Description = QString::fromStdString(descriptions[0]->GetValue());
+    this->m_Description = descriptions[0]->GetValue();
   }
 }
 

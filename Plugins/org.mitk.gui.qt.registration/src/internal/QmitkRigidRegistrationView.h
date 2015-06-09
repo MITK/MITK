@@ -66,17 +66,17 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     /*!
     \brief method for creating the applications main widget
     */
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
     /*!
     \brief Sets the StdMultiWidget and connects it to the functionality.
     */
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
+    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
 
     /*!
     \brief Removes the StdMultiWidget and disconnects it from the functionality.
     */
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void StdMultiWidgetNotAvailable() override;
 
     /*!
     \brief method for creating the connections of main and control widget
@@ -86,19 +86,20 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     /*!
     \brief Method which is called when this functionality is selected in MITK
     */
-    virtual void Activated();
+    virtual void Activated() override;
 
     /*!
     \brief Method which is called whenever the functionality is deselected in MITK
     */
-    virtual void Deactivated();
+    virtual void Deactivated() override;
 
-    virtual void Visible();
-    virtual void Hidden();
+    virtual void Visible() override;
+    virtual void Hidden() override;
 
     void DataNodeHasBeenRemoved(const mitk::DataNode* node);
 
   signals:
+    void PresetSelected( QString preset_name );
 
   protected slots:
 
@@ -116,6 +117,11 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     * checks if registration is possible
     */
     bool CheckCalculate();
+
+    /**
+      \brief Load the preset set within the combo box
+      */
+    void LoadSelectedPreset();
 
     /*!
     * \brief Undo the last registration.
@@ -269,9 +275,12 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     */
     void OnMovingMaskImageChanged(const mitk::DataNode* node);
 
-  protected:
+    void PresetSelectionChanged();
+protected:
 
-    berry::ISelectionListener::Pointer m_SelListener;
+    void FillPresetComboBox(const std::list<std::string> &preset);
+
+    QScopedPointer<berry::ISelectionListener> m_SelListener;
     berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     /*!
@@ -316,6 +325,8 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
     int m_TranslateSliderPos[3];
     int m_RotateSliderPos[3];
     int m_ScaleSliderPos[3];
+
+    bool m_PresetSelected;
 
     QmitkStepperAdapter*      m_TimeStepperAdapter;
 };

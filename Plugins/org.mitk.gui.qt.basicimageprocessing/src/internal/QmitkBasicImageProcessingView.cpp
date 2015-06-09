@@ -143,8 +143,7 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 : QmitkFunctionality(),
   m_Controls(NULL),
   m_SelectedImageNode(NULL),
-  m_TimeStepperAdapter(NULL),
-  m_SelectionListener(NULL)
+  m_TimeStepperAdapter(NULL)
 {
 }
 
@@ -388,6 +387,8 @@ void QmitkBasicImageProcessing::SelectAction(int action)
     m_Controls->dsbParam1->hide();
     m_Controls->dsbParam2->hide();
     m_Controls->dsbParam3->hide();
+    m_Controls->tlParam1->show();
+    m_Controls->tlParam2->show();
     m_Controls->tlParam3->hide();
     m_Controls->tlParam4->hide();
     m_Controls->sbParam1->show();
@@ -401,12 +402,16 @@ void QmitkBasicImageProcessing::SelectAction(int action)
     {
       m_SelectedAction = GAUSSIAN;
       m_Controls->tlParam1->setEnabled(true);
-      m_Controls->sbParam1->setEnabled(true);
+      m_Controls->sbParam1->hide();
+      m_Controls->dsbParam1->show();
+      m_Controls->dsbParam1->setEnabled(true);
       text1 = "&Variance:";
+      m_Controls->tlParam2->hide();
+      m_Controls->sbParam2->hide();
 
-      m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 200 );
-      m_Controls->sbParam1->setValue( 2 );
+      m_Controls->dsbParam1->setMinimum( 0 );
+      m_Controls->dsbParam1->setMaximum( 200 );
+      m_Controls->dsbParam1->setValue( 2 );
       break;
     }
 
@@ -492,11 +497,16 @@ void QmitkBasicImageProcessing::SelectAction(int action)
     {
       m_SelectedAction = GRADIENT;
       m_Controls->tlParam1->setEnabled(true);
-      m_Controls->sbParam1->setEnabled(true);
+      m_Controls->sbParam1->hide();
+      m_Controls->dsbParam1->show();
+      m_Controls->dsbParam1->setEnabled(true);
       text1 = "Sigma of Gaussian Kernel:\n(in Image Spacing Units)";
-      m_Controls->sbParam1->setMinimum( 0 );
-      m_Controls->sbParam1->setMaximum( 200 );
-      m_Controls->sbParam1->setValue( 2 );
+      m_Controls->tlParam2->hide();
+      m_Controls->sbParam2->hide();
+
+      m_Controls->dsbParam1->setMinimum( 0 );
+      m_Controls->dsbParam1->setMaximum( 200 );
+      m_Controls->dsbParam1->setValue( 2 );
       break;
     }
 
@@ -705,10 +715,10 @@ void QmitkBasicImageProcessing::StartButtonClicked()
     {
       GaussianFilterType::Pointer gaussianFilter = GaussianFilterType::New();
       gaussianFilter->SetInput( itkImage );
-      gaussianFilter->SetVariance( param1 );
+      gaussianFilter->SetVariance( dparam1 );
       gaussianFilter->UpdateLargestPossibleRegion();
       newImage = mitk::ImportItkImage(gaussianFilter->GetOutput())->Clone();
-      nameAddition << "_Gaussian_var_" << param1;
+      nameAddition << "_Gaussian_var_" << dparam1;
       std::cout << "Gaussian filtering successful." << std::endl;
       break;
     }
@@ -830,10 +840,10 @@ void QmitkBasicImageProcessing::StartButtonClicked()
     {
       GradientFilterType::Pointer gradientFilter = GradientFilterType::New();
       gradientFilter->SetInput( itkImage );
-      gradientFilter->SetSigma( param1 );
+      gradientFilter->SetSigma( dparam1 );
       gradientFilter->UpdateLargestPossibleRegion();
       newImage = mitk::ImportItkImage(gradientFilter->GetOutput())->Clone();
-      nameAddition << "_Gradient_sigma_" << param1;
+      nameAddition << "_Gradient_sigma_" << dparam1;
       std::cout << "Gradient calculation successful." << std::endl;
       break;
     }
@@ -1009,7 +1019,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
       ImageType::Pointer resampledImage = resampler->GetOutput();
 
-      newImage = mitk::ImportItkImage( resampledImage );
+      newImage = mitk::ImportItkImage( resampledImage )->Clone();
       nameAddition << "_Resampled_" << selectedInterpolator;
       std::cout << "Resampling successful." << std::endl;
       break;

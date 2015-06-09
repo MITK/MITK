@@ -26,7 +26,7 @@ class ChangeTextToLowerCase : public QObject, public IChangeText
 
 public:
 
-  QString ChangeText(const QString& s);
+  QString ChangeText(const QString& s) override;
 };
 
 #endif // CHANGETEXTTOLOWERCASE_H

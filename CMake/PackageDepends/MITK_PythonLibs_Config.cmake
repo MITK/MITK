@@ -1,5 +1,5 @@
-FIND_PACKAGE(PythonLibs REQUIRED)
 list(APPEND ALL_LIBRARIES ${PYTHON_LIBRARIES})
-#include_directories(${PYTHON_INCLUDE_DIRS})
 list(APPEND ALL_INCLUDE_DIRECTORIES ${PYTHON_INCLUDE_DIRS})
-#link_directories(${PYTHON_LIBRARIES})
+if(MITK_USE_Numpy)
+  include(${CMAKE_CURRENT_LIST_DIR}/MITK_Numpy_Config.cmake)
+endif()

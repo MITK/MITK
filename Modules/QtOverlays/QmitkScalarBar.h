@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 
-class MitkQtOverlays_EXPORT QmitkScalarBar : public QWidget
+class MITKQTOVERLAYS_EXPORT QmitkScalarBar : public QWidget
   {
     Q_OBJECT
   public:
@@ -40,7 +40,7 @@ class MitkQtOverlays_EXPORT QmitkScalarBar : public QWidget
     /**
     * @brief Default Constructor
     **/
-    QmitkScalarBar( QWidget *parent = 0 );
+    QmitkScalarBar( QWidget *parent = nullptr );
 
     /**
     * @brief Default Destructor
@@ -59,7 +59,7 @@ class MitkQtOverlays_EXPORT QmitkScalarBar : public QWidget
 
   protected:
 
-    void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event) override;
 
     void SetupGeometry( alignment align );
 

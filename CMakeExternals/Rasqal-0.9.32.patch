@@ -1,0 +1,1017 @@
+diff -urNb rasqal-0.9.32-orig/CMakeLists.txt rasqal-0.9.32-patched/CMakeLists.txt
+--- rasqal-0.9.32-orig/CMakeLists.txt	1970-01-01 01:00:00.000000000 +0100
++++ rasqal-0.9.32-patched/CMakeLists.txt	2014-11-26 03:43:49.708342271 +0100
+@@ -0,0 +1,395 @@
++# rasqal/CMakeLists.txt
++#
++# This file allows building rasqal with the CMake configuration tool.
++# Download CMake in source or binary form from http://www.cmake.org/
++#
++# Based on the CMakeLists.txt file from Raptor.
++# This file is in the public domain.
++#
++
++set(RASQAL_VERSION_MAJOR 0)
++set(RASQAL_VERSION_MINOR 9)
++set(RASQAL_VERSION_RELEASE 32)
++set(RASQAL_MIN_VERSION_DECIMAL 00932)
++
++set(VERSION "${RASQAL_VERSION_MAJOR}.${RASQAL_VERSION_MINOR}.${RASQAL_VERSION_RELEASE}")
++math(EXPR RASQAL_VERSION_DECIMAL "${RASQAL_VERSION_MAJOR} * 10000 + ${RASQAL_VERSION_MINOR} * 100 + ${RASQAL_VERSION_RELEASE}")
++
++project(rasqal C)
++
++cmake_minimum_required(VERSION 2.8.9)
++
++set(CMAKE_include_CURRENT_DIR 1)
++
++set(PROJECT_DESCRIPTION "Rasqal RDF Query Library")
++
++################################################################
++
++# Third-party libraries
++
++set(RAPTOR_MIN_VERSION 2.0.7)
++find_package(Raptor2 ${RAPTOR_MIN_VERSION} REQUIRED)
++include_directories(${Raptor2_INCLUDE_DIR})
++
++find_package(LibXml2)
++
++if(LIBXML2_FOUND)
++  include_directories(
++    ${EXPAT_include_DIRS}
++    ${LIBXML2_include_DIR}
++  )
++endif()
++
++################################################################
++
++# Configuration checks
++
++include(CheckIncludeFile)
++include(CheckIncludeFiles)
++include(CheckFunctionExists)
++include(CheckTypeSize)
++include(CheckStructHasMember)
++include(CheckCSourceCompiles)
++
++check_include_file(dlfcn.h HAVE_DLFCN_H)
++check_include_file(errno.h HAVE_ERRNO_H)
++check_include_file(stddef.h HAVE_STDDEF_H)
++check_include_file(stdlib.h HAVE_STDLIB_H)
++check_include_file(stdint.h HAVE_STDINT_H)
++check_include_file(unistd.h HAVE_UNISTD_H)
++check_include_file(string.h HAVE_STRING_H)
++check_include_file(strings.h HAVE_STRINGS_H)
++check_include_file(getopt.h HAVE_GETOPT_H)
++check_include_file(regex.h HAVE_REGEX_H)
++check_include_file(uuid/uuid.h HAVE_UUID_UUID_H)
++
++check_include_file(sys/time.h HAVE_SYS_TIME_H)
++check_include_file(time.h HAVE_TIME_H)
++CHECK_include_FILES("sys/time.h;time.h" TIME_WITH_SYS_TIME)
++
++# Make sure these variables are set to a specific value
++# because they are substituted in rasqal.h.in
++if(NOT HAVE_SYS_TIME_H)
++  set(HAVE_SYS_TIME_H 0)
++endif()
++if(NOT HAVE_TIME_H)
++  set(HAVE_TIME_H 0)
++endif()
++
++check_include_file(math.h HAVE_MATH_H)
++check_include_file(limits.h HAVE_LIMITS_H)
++check_include_file(float.h HAVE_FLOAT_H)
++check_include_file(memory.h HAVE_MEMORY_H)
++check_include_file(sys/stat.h HAVE_SYS_STAT_H)
++check_include_file(sys/types.h HAVE_SYS_TYPES_H)
++check_include_file(inttypes.h HAVE_INTTYPES_H)
++
++if(LIBXML2_FOUND)
++  check_include_file(libxml/xmlschemas.h HAVE_LIBXML_XMLSCHEMAS_H)
++  check_include_file(libxml/xmlschemastypes.h HAVE_LIBXML_XMLSCHEMASTYPES_H)
++  check_include_file(libxml/schemasInternals.h HAVE_LIBXML_SCHEMASINTERNALS_H)
++endif()
++
++CHECK_FUNCTION_EXISTS(access HAVE_ACCESS)
++CHECK_FUNCTION_EXISTS(_access HAVE__ACCESS)
++CHECK_FUNCTION_EXISTS(getopt HAVE_GETOPT)
++CHECK_FUNCTION_EXISTS(getopt_long HAVE_GETOPT_LONG)
++CHECK_FUNCTION_EXISTS(gettimeofday HAVE_GETTIMEOFDAY)
++CHECK_FUNCTION_EXISTS(getmtime_r HAVE_GETMTIME_R)
++CHECK_FUNCTION_EXISTS(snprintf HAVE_SNPRINTF)
++CHECK_FUNCTION_EXISTS(_snprintf HAVE__SNPRINTF)
++CHECK_FUNCTION_EXISTS(initstate HAVE_INITSTATE)
++CHECK_FUNCTION_EXISTS(initstate_r HAVE_INITSTATE_R)
++CHECK_FUNCTION_EXISTS(rand HAVE_RAND)
++CHECK_FUNCTION_EXISTS(random HAVE_RANDOM)
++CHECK_FUNCTION_EXISTS(random_r HAVE_RANDOM_R)
++CHECK_FUNCTION_EXISTS(rand_r HAVE_RAND_R)
++CHECK_FUNCTION_EXISTS(srand HAVE_SRAND)
++CHECK_FUNCTION_EXISTS(strcasecmp HAVE_STRCASECMP)
++CHECK_FUNCTION_EXISTS(stricmp HAVE_STRICMP)
++CHECK_FUNCTION_EXISTS(_stricmp HAVE__STRICMP)
++CHECK_FUNCTION_EXISTS(strnicmp HAVE_STRNICMP)
++CHECK_FUNCTION_EXISTS(_strnicmp HAVE__STRNICMP)
++CHECK_FUNCTION_EXISTS(timegm HAVE_TIMEGM)
++CHECK_FUNCTION_EXISTS(vasprintf HAVE_VASPRINTF)
++CHECK_FUNCTION_EXISTS(vsnprintf HAVE_VSNPRINTF)
++CHECK_FUNCTION_EXISTS(_vsnprintf HAVE__VSNPRINTF)
++
++CHECK_C_SOURCE_COMPILES("
++\#include <time.h>
++int main() {struct tm x; x.tm_gmtoff = 0; return 0;}"
++   HAVE_TM_GMTOFF
++)
++
++CHECK_C_SOURCE_COMPILES("
++int main() {char *function_name = __func__; return 0;}"
++   HAVE___FUNC__
++)
++CHECK_C_SOURCE_COMPILES("
++int main() {char *function_name = __FUNCTION__; return 0;}"
++  HAVE___FUNCTION__
++)
++
++CHECK_C_SOURCE_COMPILES("
++\#include <sys/types.h>
++\#include <regex.h>
++int main() {regex_t reg; char *pat=\"abc\"; regcomp(&reg, pat, 0); return 0;}"
++  HAVE_REGEX_POSIX
++)
++
++find_library(PCRE_LIBRARY_DEBUG NAMES libpcred libpcre pcred pcre)
++find_library(PCRE_LIBRARY_RELEASE NAMES libpcre pcre)
++find_path(PCRE_INCLUDE_DIR pcre.h)
++if((PCRE_LIBRARY_DEBUG OR PCRE_LIBRARY_RELEASE) AND PCRE_INCLUDE_DIR)
++  set(HAVE_REGEX_PCRE 1)
++  set(PCRE_LIBRARY )
++  if(PCRE_LIBRARY_DEBUG)
++    list(APPEND PCRE_LIBRARY debug ${PCRE_LIBRARY_DEBUG})
++  endif()
++  if(PCRE_LIBRARY_RELEASE)
++    list(APPEND PCRE_LIBRARY optimized ${PCRE_LIBRARY_RELEASE})
++  endif()
++endif()
++
++################################################################
++
++# User-configurable options
++#
++# (Note: The CMake GUI displays these in alphabetical order, regardless of
++# the order we use here)
++
++set(BUILD_SHARED_LIBS OFF CACHE BOOL
++    "Build shared libraries instead of static ones.")
++
++#set(RASQAL_ENABLE_TESTING TRUE CACHE BOOL
++#    "Enable unit tests")
++
++if(BUILD_SHARED_LIBS)
++  set(RASQAL_STATIC FALSE)
++else()
++  set(RASQAL_STATIC TRUE)
++endif()
++
++# ----------------------- REGEX library -----------------------
++
++set(RASQAL_REGEX_INIT none)
++if(HAVE_REGEX_POSIX)
++  set(RASQAL_REGEX_INIT posix)
++elseif(PCRE_LIBRARY)
++  set(RASQAL_REGEX_INIT pcre)
++endif()
++
++set(RASQAL_REGEX ${RASQAL_REGEX_INIT} CACHE STRING
++    "Which regular expression library to use (any of \"posix\", \"pcre\", \"none\").")
++
++set(RASQAL_REGEX_LIBRARY )
++if(RASQAL_REGEX STREQUAL "none")
++  set(RASQAL_REGEX_NONE 1)
++  set(RASQAL_REGEX_POSIX 0)
++  set(RASQAL_REGEX_PCRE 0)
++elseif(RASQAL_REGEX STREQUAL "posix")
++  set(RASQAL_REGEX_NONE 0)
++  set(RASQAL_REGEX_POSIX 1)
++  set(RASQAL_REGEX_PCRE 0)
++elseif(RASQAL_REGEX STREQUAL "pcre")
++  set(RASQAL_REGEX_NONE 0)
++  set(RASQAL_REGEX_POSIX 0)
++  set(RASQAL_REGEX_PCRE 1)
++  set(RASQAL_REGEX_LIBRARY ${PCRE_LIBRARY})
++  include_directories(${PCRE_INCLUDE_DIR})
++else()
++  set(RASQAL_REGEX_NONE 0)
++  set(RASQAL_REGEX_POSIX 0)
++  set(RASQAL_REGEX_PCRE 0)
++endif()
++
++# ----------------------- Decimal number library -----------------------
++
++set(RASQAL_DECIMAL_INIT none)
++
++set(RASQAL_DECIMAL ${RASQAL_DECIMAL_INIT} CACHE STRING
++    "Which decimal number library to use (any of \"gmp\", \"mpfr\", \"none\").")
++
++if(RASQAL_DECIMAL STREQUAL "none")
++  set(RASQAL_DECIMAL_NONE 1)
++  set(RASQAL_DECIMAL_GMP 0)
++  set(RASQAL_DECIMAL_MPFR 0)
++elseif(RASQAL_DECIMAL STREQUAL "gmp")
++  set(RASQAL_DECIMAL_NONE 0)
++  set(RASQAL_DECIMAL_GMP 1)
++  set(RASQAL_DECIMAL_MPFR 0)
++elseif(RASQAL_DECIMAL STREQUAL "mpfr")
++  set(RASQAL_DECIMAL_NONE 0)
++  set(RASQAL_DECIMAL_GMP 0)
++  set(RASQAL_DECIMAL_MPFR 1)
++ELSE()
++  set(RASQAL_DECIMAL_NONE 0)
++  set(RASQAL_DECIMAL_GMP 0)
++  set(RASQAL_DECIMAL_MPFR 0)
++endif()
++
++# ----------------------- Digest library -----------------------
++
++set(RASQAL_DIGEST_INIT internal)
++
++set(RASQAL_DIGEST ${RASQAL_DIGEST_INIT} CACHE STRING
++    "Which message digest library to use (any of \"gcrypt\", \"internal\", \"mhash\", \"none\").")
++
++if(RASQAL_DIGEST STREQUAL "none")
++  set(RASQAL_DIGEST_NONE 1)
++  set(RASQAL_DIGEST_GCRYPT 0)
++  set(RASQAL_DIGEST_INTERNAL 0)
++  set(RASQAL_DIGEST_MHASH 0)
++elseif(RASQAL_DIGEST STREQUAL "gcrypt")
++  set(RASQAL_DIGEST_NONE 0)
++  set(RASQAL_DIGEST_GCRYPT 1)
++  set(RASQAL_DIGEST_INTERNAL 0)
++  set(RASQAL_DIGEST_MHASH 0)
++elseif(RASQAL_DIGEST STREQUAL "internal")
++  set(RASQAL_DIGEST_NONE 0)
++  set(RASQAL_DIGEST_GCRYPT 0)
++  set(RASQAL_DIGEST_INTERNAL 1)
++  set(RASQAL_DIGEST_MHASH 0)
++elseif(RASQAL_DIGEST STREQUAL "mhash")
++  set(RASQAL_DIGEST_NONE 0)
++  set(RASQAL_DIGEST_GCRYPT 0)
++  set(RASQAL_DIGEST_INTERNAL 0)
++  set(RASQAL_DIGEST_MHASH 1)
++else()
++  set(RASQAL_DIGEST_NONE 0)
++  set(RASQAL_DIGEST_GCRYPT 0)
++  set(RASQAL_DIGEST_INTERNAL 0)
++  set(RASQAL_DIGEST_MHASH 0)
++endif()
++
++# ----------------------- uuid library -----------------------
++
++set(RASQAL_UUID_INIT internal)
++
++set(RASQAL_UUID ${RASQAL_UUID_INIT} CACHE STRING
++    "Which uuid library to use (any of \"internal\", \"libc\", \"libuuid\", \"none\").")
++
++if(RASQAL_UUID STREQUAL "none")
++  set(RASQAL_UUID_NONE 1)
++  set(RASQAL_UUID_LIBC 0)
++  set(RASQAL_UUID_INTERNAL 0)
++  set(RASQAL_UUID_LIBUUID 0)
++elseif(RASQAL_UUID STREQUAL "libc")
++  set(RASQAL_UUID_NONE 0)
++  set(RASQAL_UUID_LIBC 1)
++  set(RASQAL_UUID_INTERNAL 0)
++  set(RASQAL_UUID_LIBUUID 0)
++elseif(RASQAL_UUID STREQUAL "internal")
++  set(RASQAL_UUID_NONE 0)
++  set(RASQAL_UUID_LIBC 0)
++  set(RASQAL_UUID_INTERNAL 1)
++  set(RASQAL_UUID_LIBUUID 0)
++elseif(RASQAL_UUID STREQUAL "libuuid")
++  set(RASQAL_UUID_NONE 0)
++  set(RASQAL_UUID_LIBC 0)
++  set(RASQAL_UUID_INTERNAL 0)
++  set(RASQAL_UUID_LIBUUID 1)
++else()
++  set(RASQAL_UUID_NONE 0)
++  set(RASQAL_UUID_LIBC 0)
++  set(RASQAL_UUID_INTERNAL 0)
++  set(RASQAL_UUID_LIBUUID 0)
++endif()
++
++# ----------------------- random number generator -----------------------
++
++set(RASQAL_RANDOM_ALGO_INIT rand)
++
++set(RASQAL_RANDOM_ALGO ${RASQAL_RANDOM_ALGO_INIT} CACHE STRING
++    "Which random number generator to use (any of \"gmp_rand\", \"mtwist\", \"rand\", \"random\", \"random_r\", \"rand_r\").")
++
++set(RANDOM_ALGO_GMP_RAND 0)
++set(RANDOM_ALGO_MTWIST 0)
++set(RANDOM_ALGO_RAND 0)
++set(RANDOM_ALGO_RANDOM 0)
++set(RANDOM_ALGO_RANDOM_R 0)
++set(RANDOM_ALGO_RAND_R 0)
++
++string(TOUPPER ${RASQAL_RANDOM_ALGO} _random_algo_uc)
++set(RANDOM_ALGO_${_random_algo_uc} 1)
++
++# ----------------------- Query language -----------------------
++
++set(RASQAL_QUERY_INIT all)
++
++set(RASQAL_QUERY ${RASQAL_QUERY_INIT} CACHE STRING
++    "Which query languages to enable (semi-colon separated list of \"sparql\", \"laqrs\", or just \"all\").")
++
++set(_query_languages SPARQL LAQRS)
++set(_query_lang_default 0)
++list(FIND RASQAL_QUERY all _result)
++if(NOT _result EQUAL -1)
++  set(_query_lang_default 1)
++endif()
++foreach(_lang ${_query_languages})
++  set(RASQAL_QUERY_${_lang} ${_query_lang_default})
++  string(TOLOWER ${_lang} _lang_lc)
++  list(FIND RASQAL_QUERY ${_lang_lc} _result)
++  if(NOT _result EQUAL -1)
++    set(RASQAL_QUERY_${_lang} 1)
++  endif()
++endforeach()
++
++
++################################################################
++
++include(CMakePackageConfigHelpers)
++
++configure_file(
++  src/rasqal_config_cmake.h.in
++  src/rasqal_config.h
++  @ONLY
++)
++
++add_definitions(-DHAVE_CONFIG_H)
++
++configure_file(
++  src/rasqal.h.in
++  src/rasqal.h
++  @ONLY
++)
++
++set(INCLUDE_INSTALL_DIR include/rasqal)
++set(LIB_INSTALL_DIR lib)
++set(BIN_INSTALL_DIR bin)
++set(CMAKE_INSTALL_DIR lib/rasqal/cmake)
++
++add_subdirectory(libsv)
++add_subdirectory(src)
++#SUBDIRS(utils)
++
++configure_package_config_file(RasqalConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/RasqalConfig.cmake
++  INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
++  PATH_VARS INCLUDE_INSTALL_DIR
++  NO_CHECK_REQUIRED_COMPONENTS_MACRO
++)
++
++write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/RasqalConfigVersion.cmake
++  VERSION ${VERSION}
++  COMPATIBILITY AnyNewerVersion
++)
++
++install(FILES
++  ${CMAKE_CURRENT_BINARY_DIR}/RasqalConfig.cmake
++  ${CMAKE_CURRENT_BINARY_DIR}/RasqalConfigVersion.cmake
++  DESTINATION ${CMAKE_INSTALL_DIR}
++)
++
++
++message("Rasqal configuration:
++  RDF query languages available : ${_query_languages}
++  RDF query languages enabled   : ${RASQAL_QUERY}
++  Raptor version                : ${Raptor2_VERSION}
++  Decimal library               : ${RASQAL_DECIMAL}
++  Regex library                 : ${RASQAL_REGEX}
++  Message digest library        : ${RASQAL_DIGEST}
++  UUID library                  : ${RASQAL_UUID}
++  Random approach               : ${RASQAL_RANDOM_ALGO}"
++)
++
++# end rasqal/CMakeLists.txt
+diff -urNb rasqal-0.9.32-orig/libsv/CMakeLists.txt rasqal-0.9.32-patched/libsv/CMakeLists.txt
+--- rasqal-0.9.32-orig/libsv/CMakeLists.txt	1970-01-01 01:00:00.000000000 +0100
++++ rasqal-0.9.32-patched/libsv/CMakeLists.txt	2014-11-26 00:50:20.188343513 +0100
+@@ -0,0 +1,12 @@
++include_directories(${CMAKE_CURRENT_SOURCE_DIR})
++include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
++include_directories(${CMAKE_CURRENT_BINARY_DIR}/../src)
++
++add_library(sv STATIC sv.c sv.h)
++
++set_target_properties(
++  sv
++  PROPERTIES
++  COMPILE_DEFINITIONS "SV_CONFIG"
++  POSITION_INDEPENDENT_CODE ON
++)
+diff -urNb rasqal-0.9.32-orig/RasqalConfig.cmake.in rasqal-0.9.32-patched/RasqalConfig.cmake.in
+--- rasqal-0.9.32-orig/RasqalConfig.cmake.in	1970-01-01 01:00:00.000000000 +0100
++++ rasqal-0.9.32-patched/RasqalConfig.cmake.in	2014-11-17 02:35:41.080582128 +0100
+@@ -0,0 +1,9 @@
++set(Rasqal_VERSION @VERSION@)
++
++@PACKAGE_INIT@
++
++set_and_check(Rasqal_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
++
++if(NOT TARGET rasqal AND EXISTS ${CMAKE_CURRENT_LIST_DIR}/RasqalTargets.cmake)
++  include(${CMAKE_CURRENT_LIST_DIR}/RasqalTargets.cmake)
++endif()
+diff -urNb rasqal-0.9.32-orig/src/CMakeLists.txt rasqal-0.9.32-patched/src/CMakeLists.txt
+--- rasqal-0.9.32-orig/src/CMakeLists.txt	1970-01-01 01:00:00.000000000 +0100
++++ rasqal-0.9.32-patched/src/CMakeLists.txt	2014-11-26 01:52:37.032343067 +0100
+@@ -0,0 +1,159 @@
++# rasqal/src/CMakeLists.txt
++#
++# Based on the src/CMakeLists.txt file from Raptor
++# This file is in the public domain.
++#
++
++set(rasqal_srcs
++  rasqal_algebra.c
++  rasqal_bindings.c
++  rasqal_data_graph.c
++  rasqal_dataset.c
++  rasqal_datetime.c
++  rasqal_decimal.c
++  rasqal_digest.c
++  rasqal_double.c
++  rasqal_engine_algebra.c
++  rasqal_engine.c
++  rasqal_engine_sort.c
++  rasqal_expr.c
++  rasqal_expr_datetimes.c
++  rasqal_expr_evaluate.c
++  rasqal_expr_numerics.c
++  rasqal_expr_strings.c
++  rasqal_feature.c
++  rasqal_format_html.c
++  rasqal_format_json.c
++  rasqal_format_rdf.c
++  rasqal_format_sparql_xml.c
++  rasqal_format_sv.c
++  rasqal_format_table.c
++  rasqal_formula.c
++  rasqal_general.c
++  rasqal_graph_pattern.c
++  rasqal_iostream.c
++  rasqal_literal.c
++  rasqal_map.c
++  rasqal_ntriples.c
++  rasqal_prefix.c
++  rasqal_projection.c
++  rasqal_query.c
++  rasqal_query_results.c
++  rasqal_query_transform.c
++  rasqal_query_write.c
++  rasqal_random.c
++  rasqal_raptor.c
++  rasqal_regex.c
++  rasqal_result_formats.c
++  rasqal_row.c
++  rasqal_row_compatible.c
++  rasqal_rowsource_aggregation.c
++  rasqal_rowsource_assignment.c
++  rasqal_rowsource_bindings.c
++  rasqal_rowsource.c
++  rasqal_rowsource_distinct.c
++  rasqal_rowsource_empty.c
++  rasqal_rowsource_filter.c
++  rasqal_rowsource_graph.c
++  rasqal_rowsource_groupby.c
++  rasqal_rowsource_having.c
++  rasqal_rowsource_join.c
++  rasqal_rowsource_project.c
++  rasqal_rowsource_rowsequence.c
++  rasqal_rowsource_service.c
++  rasqal_rowsource_slice.c
++  rasqal_rowsource_sort.c
++  rasqal_rowsource_triples.c
++  rasqal_rowsource_union.c
++  rasqal_service.c
++  rasqal_solution_modifier.c
++  rasqal_triple.c
++  rasqal_triples_source.c
++  rasqal_update.c
++  rasqal_variable.c
++  rasqal_xsd_datatypes.c
++  snprintf.c
++)
++
++if(RASQAL_QUERY_SPARQL)
++  list(APPEND rasqal_srcs
++    sparql_lexer.c
++    sparql_lexer.h
++    sparql_parser.c
++    sparql_parser.h
++    sparql_common.h
++  )
++endif()
++
++if(NOT HAVE_STRCASECMP AND NOT HAVE_STRICMP)
++  list(APPEND rasqal_srcs strcasecmp.c)
++endif()
++
++if(NOT HAVE_TIMEGM)
++  list(APPEND rasqal_srcs timegm.c)
++endif()
++
++if(NOT HAVE_GETTIMEOFDAY)
++  list(APPEND rasqal_srcs gettimeofday.c)
++endif()
++
++if(RASQAL_DIGEST_INTERNAL)
++  list(APPEND rasqal_srcs
++    rasqal_digest_md5.c
++    rasqal_digest_sha1.c
++  )
++endif()
++
++include_directories(${CMAKE_CURRENT_SOURCE_DIR})
++include_directories(${CMAKE_CURRENT_BINARY_DIR})
++include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../libsv)
++add_library(rasqal ${rasqal_srcs})
++
++target_link_libraries(rasqal LINK_PRIVATE sv ${RASQAL_REGEX_LIBRARY})
++target_link_libraries(rasqal LINK_PUBLIC raptor2)
++
++set_target_properties(
++  rasqal
++  PROPERTIES
++  COMPILE_DEFINITIONS "RASQAL_INTERNAL;SV_CONFIG" #;${LIBXML2_DEFINITIONS};${LIBXSLT_DEFINITIONS}"
++)
++
++# Generate pkg-config metadata file
++#
++file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/rasqal.pc
++"prefix=${CMAKE_INSTALL_PREFIX}
++exec_prefix=\${prefix}
++libdir=\${exec_prefix}/${LIB_INSTALL_DIR}
++includedir=\${prefix}/${INCLUDE_INSTALL_DIR}
++
++have_raptor2_api=1
++
++Name: ${PROJECT_DESCRIPTION}
++Description: Rasqal RDF Query parsing and execution library
++Requires: raptor2 >= ${RAPTOR_MIN_VERSION}
++Version: ${VERSION}
++Libs: -L\${libdir} -lrasqal
++Cflags: -I\${includedir}
++")
++
++install(FILES
++  ${CMAKE_CURRENT_BINARY_DIR}/rasqal.h
++  DESTINATION ${INCLUDE_INSTALL_DIR}
++)
++
++install(FILES
++  ${CMAKE_CURRENT_BINARY_DIR}/rasqal.pc
++  DESTINATION ${LIB_INSTALL_DIR}/pkgconfig
++)
++
++install(
++  TARGETS rasqal
++  EXPORT  RasqalTargets
++  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
++  LIBRARY DESTINATION ${LIB_INSTALL_DIR}
++  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
++)
++
++install(EXPORT RasqalTargets DESTINATION ${CMAKE_INSTALL_DIR})
++
++# end rasqal/src/CMakeLists.txt
+diff -urNb rasqal-0.9.32-orig/src/gettimeofday.c rasqal-0.9.32-patched/src/gettimeofday.c
+--- rasqal-0.9.32-orig/src/gettimeofday.c	2011-08-22 23:20:56.000000000 +0200
++++ rasqal-0.9.32-patched/src/gettimeofday.c	2014-11-19 03:53:51.512582102 +0100
+@@ -7,7 +7,7 @@
+  */
+ 
+ #ifdef WIN32
+-#include <win32_rasqal_config.h>
++#include <rasqal_config.h>
+ 
+ #include <time.h>
+ #include <windows.h>
+diff -urNb rasqal-0.9.32-orig/src/rasqal_config_cmake.h.in rasqal-0.9.32-patched/src/rasqal_config_cmake.h.in
+--- rasqal-0.9.32-orig/src/rasqal_config_cmake.h.in	1970-01-01 01:00:00.000000000 +0100
++++ rasqal-0.9.32-patched/src/rasqal_config_cmake.h.in	2014-11-19 04:56:07.408581656 +0100
+@@ -0,0 +1,340 @@
++/* rasqal_config.h */
++
++#ifndef RASQAL_CONFIG_H
++
++/* Release version as a decimal */
++#define RASQAL_VERSION_DECIMAL @RASQAL_VERSION_DECIMAL@
++
++/* Major version number */
++#define RASQAL_VERSION_MAJOR @RASQAL_VERSION_MAJOR@
++
++/* Minor version number */
++#define RASQAL_VERSION_MINOR @RASQAL_VERSION_MINOR@
++
++/* Release version number */
++#define RASQAL_VERSION_RELEASE @RASQAL_VERSION_RELEASE@
++
++/* ---------- package information ------------ */
++
++/* Name of package */
++#define PACKAGE "@PROJECT_NAME@"
++
++/* Define to the address where bug reports for this package should be sent. */
++#define PACKAGE_BUGREPORT "http://bugs.librdf.org/"
++
++/* Define to the full name of this package. */
++#define PACKAGE_NAME "@PROJECT_DESCRIPTION@"
++
++/* Define to the full name and version of this package. */
++#define PACKAGE_STRING "@PROJECT_DESCRIPTION@ @VERSION@"
++
++/* Define to the one symbol short name of this package. */
++#define PACKAGE_TARNAME "@PROJECT_NAME@"
++
++/* Define to the home page for this package. */
++#define PACKAGE_URL ""
++
++/* Define to the version of this package. */
++#define PACKAGE_VERSION "@VERSION@"
++
++/* Version number of package */
++#define VERSION "@VERSION@"
++
++/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
++   significant byte first (like Motorola and SPARC, unlike Intel). */
++#if defined AC_APPLE_UNIVERSAL_BUILD
++# if defined __BIG_ENDIAN__
++#  define WORDS_BIGENDIAN 1
++# endif
++#else
++# ifndef WORDS_BIGENDIAN
++#  undef WORDS_BIGENDIAN
++# endif
++#endif
++
++/* Define to the sub-directory in which libtool stores uninstalled libraries. */
++#cmakedefine LT_OBJDIR
++
++/* ------------ header availability --------------- */
++
++#cmakedefine HAVE_DLFCN_H
++#cmakedefine HAVE_ERRNO_H
++#cmakedefine HAVE_STDDEF_H
++#cmakedefine HAVE_STDLIB_H
++#cmakedefine HAVE_STDINT_H
++#cmakedefine HAVE_UNISTD_H
++#cmakedefine HAVE_STRING_H
++#cmakedefine HAVE_STRINGS_H
++#cmakedefine HAVE_GETOPT_H
++#cmakedefine HAVE_REGEX_H
++#cmakedefine HAVE_UUID_UUID_H
++
++#cmakedefine HAVE_SYS_TIME_H
++#cmakedefine HAVE_TIME_H
++
++#cmakedefine HAVE_MATH_H
++#cmakedefine HAVE_LIMITS_H
++#cmakedefine HAVE_FLOAT_H
++#cmakedefine HAVE_MEMORY_H
++#cmakedefine HAVE_SYS_STAT_H
++#cmakedefine HAVE_SYS_TYPES_H
++#cmakedefine HAVE_INTTYPES_H
++
++#cmakedefine HAVE_MHASH_H
++#cmakedefine HAVE_MPFR_H
++#cmakedefine HAVE_GCRYPT_H
++#cmakedefine HAVE_GMP_H
++
++#cmakedefine HAVE_LIBXML_SCHEMASINTERNALS_H
++#cmakedefine HAVE_LIBXML_XMLSCHEMASTYPES_H
++#cmakedefine HAVE_LIBXML_XMLSCHEMAS_H
++
++
++/* --------- feature availability ------------ */
++
++#cmakedefine HAVE_GMP_VERSION
++
++#cmakedefine HAVE_REGEX_PCRE
++#cmakedefine HAVE_REGEX_POSIX
++
++/* need 'extern int optind' declaration? */
++#cmakedefine NEED_OPTIND_DECLARATION
++
++/* Define to 1 if your C compiler doesn't accept -c and -o together. */
++#cmakedefine NO_MINUS_C_MINUS_O
++
++/* Use GMP gmp_randseed_ui() and mpz_urandomm() */
++#cmakedefine RANDOM_ALGO_GMP_RAND
++
++/* Use internal Mersenne Twister */
++#cmakedefine RANDOM_ALGO_MTWIST
++
++/* Use POSIX srand() and rand() */
++#cmakedefine RANDOM_ALGO_RAND
++
++/* Use BSD initstate() and random() */
++#cmakedefine RANDOM_ALGO_RANDOM
++
++/* Use glibc initstate_r() and random_r() */
++#cmakedefine RANDOM_ALGO_RANDOM_R
++
++/* Use POSIX rand_r() */
++#cmakedefine RANDOM_ALGO_RAND_R
++
++/* Decimal from GNU MP library */
++#cmakedefine RASQAL_DECIMAL_GMP
++
++/* Decimal from MPFR library */
++#cmakedefine RASQAL_DECIMAL_MPFR
++
++/* Decimal without a library */
++#cmakedefine RASQAL_DECIMAL_NONE
++
++/* Use gcrypt library for message digests */
++#cmakedefine RASQAL_DIGEST_GCRYPT
++
++/* Use internal routines for message digests */
++#cmakedefine RASQAL_DIGEST_INTERNAL
++
++/* Use mhash library for message digests */
++#cmakedefine RASQAL_DIGEST_MHASH
++
++/* Use no message digest library */
++#cmakedefine RASQAL_DIGEST_NONE
++
++/* Building LAQRS query */
++#cmakedefine RASQAL_QUERY_LAQRS
++
++/* Building SPARQL query */
++#cmakedefine RASQAL_QUERY_SPARQL
++
++/* Use no regex library */
++#cmakedefine RASQAL_REGEX_NONE
++
++/* Use PCRE regex library */
++#cmakedefine RASQAL_REGEX_PCRE
++
++/* Use POSIX regex library */
++#cmakedefine RASQAL_REGEX_POSIX
++
++/* Use internal routines for UUID */
++#cmakedefine RASQAL_UUID_INTERNAL
++
++/* Use UUID in libc library for UUID */
++#cmakedefine RASQAL_UUID_LIBC
++
++/* Use libuuid library for UUID */
++#cmakedefine RASQAL_UUID_LIBUUID
++
++/* Use no UUID library */
++#cmakedefine RASQAL_UUID_NONE
++
++/* Use OSSP library for UUID */
++#cmakedefine RASQAL_UUID_OSSP
++
++/* Define to 1 if you have the ANSI C header files. */
++#cmakedefine STDC_HEADERS
++
++/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
++#cmakedefine TIME_WITH_SYS_TIME
++
++/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
++   `char[]'. */
++#cmakedefine YYTEXT_POINTER
++
++/* Define to empty if `const' does not conform to ANSI C. */
++// #cmakedefine const
++
++/* --------- function availability ----------- */
++
++#cmakedefine HAVE_ACCESS
++#cmakedefine HAVE__ACCESS
++#cmakedefine HAVE_GETOPT
++#cmakedefine HAVE_GETOPT_LONG
++#cmakedefine HAVE_GETTIMEOFDAY
++#cmakedefine HAVE_GMTIME_R
++#cmakedefine HAVE_SNPRINTF
++#cmakedefine HAVE__SNPRINTF
++#cmakedefine HAVE_INITSTATE
++#cmakedefine HAVE_INITSTATE_R
++#cmakedefine HAVE_RAND
++#cmakedefine HAVE_RANDOM
++#cmakedefine HAVE_RANDOM_R
++#cmakedefine HAVE_RAND_R
++#cmakedefine HAVE_SRAND
++#cmakedefine HAVE_STRCASECMP
++#cmakedefine HAVE_STRICMP
++#cmakedefine HAVE__STRICMP
++#cmakedefine HAVE_STRNICMP
++#cmakedefine HAVE__STRNICMP
++#cmakedefine HAVE_TIMEGM
++#cmakedefine HAVE_VASPRINTF
++#cmakedefine HAVE_VSNPRINTF
++#cmakedefine HAVE__VSNPRINTF
++
++/* struct tm has tm_gmtoff field */
++#cmakedefine HAVE_TM_GMTOFF
++#cmakedefine HAVE___FUNC__
++
++
++/* --------- WIN32 config ----------- */
++
++#ifdef WIN32
++
++# ifdef __cplusplus
++  extern "C" {
++# endif
++
++# define WIN32_LEAN_AND_MEAN 1
++# define _CRT_NONSTDC_NO_DEPRECATE
++# define _CRT_SECURE_NO_DEPRECATE
++# include <windows.h>
++
++  /* MS names for these functions */
++  // next line breaks build on wntmsci12
++  //#define vsnprintf _vsnprintf
++# if !defined(HAVE_SNPRINTF) && defined(HAVE__SNPRINTF)
++#   define snprintf _snprintf
++# endif
++# if !defined(HAVE_STRICMP) && defined(HAVE__STRICMP)
++#   define stricmp _stricmp
++# endif
++# if !defined(HAVE_STRNICMP) && defined(HAVE__STRNICMP)
++#   define strnicmp _strnicmp
++# endif
++
++  /* definition from winsock2.h */
++# ifndef _TIMEVAL_DEFINED
++# define _TIMEVAL_DEFINED
++  typedef struct timeval {
++    long tv_sec;
++    long tv_usec;
++  } timeval;
++# endif
++
++# ifndef _TIMEZONE_DEFINED
++# define _TIMEZONE_DEFINED
++  struct timezone
++  {
++    int tz_minuteswest; /* minutes West of Greenwich */
++    int tz_dsttime;     /* type of dst correction */
++  };
++# endif
++
++# ifndef HAVE_GETTIMEOFDAY
++  int rasqal_gettimeofday(struct timeval *tv, struct timezone *tz);
++# endif
++
++# include <float.h>
++# define isnan(n) _isnan(n)
++# ifdef _MSC_VER
++#  if (_MSC_VER < 1800)
++#   define round(x) floor(x+0.5)
++#  endif
++# endif
++
++  /* These are SPARQL token definitions */
++# ifdef OPTIONAL
++# undef OPTIONAL
++# endif
++
++# ifdef DELETE
++# undef DELETE
++# endif
++
++# ifdef IN
++# undef IN
++# endif
++
++# ifdef GROUP
++# undef GROUP
++# endif
++
++  /* for access() which is POSIX but doesn't seem to have the defines in VC */
++# ifndef R_OK
++# define R_OK 4
++# endif
++
++# ifndef W_OK
++# define W_OK 2
++# endif
++
++  /* bison: output uses ERROR in an enum which breaks if this is defined */
++# ifdef ERROR
++# undef ERROR
++# endif
++
++# ifdef _MSC_VER
++#   if (_MSC_VER >= 1300) && !defined(__func__)
++#     define __func__ __FUNCTION__
++#     define HAVE___FUNC__
++#   elif !defined(__func__)
++      /* better than nothing */
++#     define rasqal_str(s) #s
++#     define __func__ "func@" __FILE__ ":" rasqal_str(__LINE__)
++#   endif
++# endif
++
++# if !defined(HAVE_ACCESS) && defined(HAVE__ACCESS)
++#   define access(p,m) _access(p,m)
++# endif
++
++  /* flex: const is available */
++# define YY_USE_CONST
++  /* looks like the .c files define this anyway */
++  /* #define YY_NO_UNISTD_H */
++
++# undef RASQAL_INLINE
++# define RASQAL_INLINE __inline
++
++# ifdef _DEBUG
++# define RASQAL_DEBUG 1
++# endif
++
++# ifdef __cplusplus
++  }
++# endif
++
++#endif
++
++#endif
+diff -urNb rasqal-0.9.32-orig/src/rasqal_config.h.in rasqal-0.9.32-patched/src/rasqal_config.h.in
+--- rasqal-0.9.32-orig/src/rasqal_config.h.in	2014-02-23 16:22:21.000000000 +0100
++++ rasqal-0.9.32-patched/src/rasqal_config.h.in	2014-11-18 02:32:39.740582443 +0100
+@@ -245,16 +245,16 @@
+ #undef RASQAL_UUID_OSSP
+ 
+ /* Release version as a decimal */
+-#undef RASQAL_VERSION_DECIMAL
++#define RASQAL_VERSION_DECIMAL @RASQAL_VERSION_DECIMAL@
+ 
+ /* Major version number */
+-#undef RASQAL_VERSION_MAJOR
++#define RASQAL_VERSION_MAJOR @RASQAL_VERSION_MAJOR@
+ 
+ /* Minor version number */
+-#undef RASQAL_VERSION_MINOR
++#define RASQAL_VERSION_MINOR @RASQAL_VERSION_MINOR@
+ 
+ /* Release version number */
+-#undef RASQAL_VERSION_RELEASE
++#define RASQAL_VERSION_RELEASE @RASQAL_VERSION_RELEASE@
+ 
+ /* Define to 1 if you have the ANSI C header files. */
+ #undef STDC_HEADERS
+diff -urNb rasqal-0.9.32-orig/src/rasqal_regex.c rasqal-0.9.32-patched/src/rasqal_regex.c
+--- rasqal-0.9.32-orig/src/rasqal_regex.c	2014-02-20 06:00:40.000000000 +0100
++++ rasqal-0.9.32-patched/src/rasqal_regex.c	2014-11-19 02:55:04.604582523 +0100
+@@ -161,7 +161,7 @@
+ #ifdef RASQAL_REGEX_NONE
+   rasqal_log_warning_simple(world, RASQAL_WARNING_LEVEL_MISSING_SUPPORT, locator,
+                             "Regex support missing, cannot compare '%s' to '%s'",
+-                            match_string, pattern);
++                            subject, pattern);
+   rc = -1;
+ #endif
+ 
+diff -urNb rasqal-0.9.32-orig/src/win32_rasqal_config.h rasqal-0.9.32-patched/src/win32_rasqal_config.h
+--- rasqal-0.9.32-orig/src/win32_rasqal_config.h	2014-02-23 17:39:47.000000000 +0100
++++ rasqal-0.9.32-patched/src/win32_rasqal_config.h	2014-11-19 02:34:19.852582671 +0100
+@@ -21,7 +21,7 @@
+  * 
+  */
+ 
+-
++#if 0
+ #ifndef WIN32_CONFIG_H
+ #define WIN32_CONFIG_H
+ 
+@@ -171,3 +171,4 @@
+ #endif
+ 
+ #endif
++#endif
+diff -urNb rasqal-0.9.32-orig/src/win32_rasqal_config.h.in rasqal-0.9.32-patched/src/win32_rasqal_config.h.in
+--- rasqal-0.9.32-orig/src/win32_rasqal_config.h.in	2013-04-05 19:17:36.000000000 +0200
++++ rasqal-0.9.32-patched/src/win32_rasqal_config.h.in	2014-11-19 02:34:14.668582672 +0100
+@@ -21,7 +21,7 @@
+  * 
+  */
+ 
+-
++#if 0
+ #ifndef WIN32_CONFIG_H
+ #define WIN32_CONFIG_H
+ 
+@@ -171,3 +171,4 @@
+ #endif
+ 
+ #endif
++#endif

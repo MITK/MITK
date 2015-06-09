@@ -40,7 +40,7 @@ namespace mitk
  * used here.
  * Initialize via SetVideoFileInput() or SetVideoCameraInput(), start processing with StartCapturing();
  */
-  class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource :
+  class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource :
       virtual public VideoSource, virtual public OpenCVImageSource
   {
   public:
@@ -89,23 +89,23 @@ namespace mitk
     ///
     /// \return a copy of the image as opencv 2 Mat
     ///
-    virtual cv::Mat GetImage();
+    virtual cv::Mat GetImage() override;
     virtual const IplImage * GetCurrentFrame();
     ////##Documentation
     ////## @brief returns the current video data as an ITK image.
     virtual void GetCurrentFrameAsItkHSVPixelImage(HSVPixelImageType::Pointer &Image);
     ////##Documentation
     ////## @brief assigns the grabbing devices for acquiring the next frame.
-    virtual void FetchFrame();
+    virtual void FetchFrame() override;
     ////##Documentation
     ////## @brief returns a pointer to the image data array for opengl rendering.
-    virtual unsigned char * GetVideoTexture();
+    virtual unsigned char * GetVideoTexture() override;
     ////##Documentation
     ////## @brief starts the video capturing.
-    virtual void StartCapturing();
+    virtual void StartCapturing() override;
     ////##Documentation
     ////## @brief stops the video capturing.
-    virtual void StopCapturing();
+    virtual void StopCapturing() override;
     ////##Documentation
     ////## @brief rotate image according to the set angle.
     virtual IplImage* FlipImage(IplImage* input);
@@ -122,7 +122,7 @@ namespace mitk
     ///
     virtual bool OnlineImageUndistortionEnabled() const;
 
-    virtual void PauseCapturing();
+    virtual void PauseCapturing() override;
     ///
     /// Returns the video file name (maybe empty if a grabbing device is used)
     ///

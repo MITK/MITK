@@ -23,21 +23,32 @@ if(MITK_USE_GLUT)
     else()
       set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=freeglut -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
 
+      set(additional_args )
+      if(CTEST_USE_LAUNCHERS)
+        list(APPEND additional_args
+          "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+        )
+      endif()
+
       ExternalProject_Add(${proj}
-         SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-         BINARY_DIR ${proj}-build
-         PREFIX ${proj}-cmake
+         LIST_SEPARATOR ${sep}
          URL http://mitk.org/download/thirdparty/freeglut-2.8.1.tar.gz
          URL_MD5 918ffbddcffbac83c218bc52355b6d5a
          PATCH_COMMAND ${patch_cmd}
-         INSTALL_COMMAND ""
          CMAKE_GENERATOR ${gen}
          CMAKE_ARGS
            ${ep_common_args}
+           ${additional_args}
+         CMAKE_CACHE_ARGS
+           ${ep_common_cache_args}
+         CMAKE_CACHE_DEFAULT_ARGS
+           ${ep_common_cache_default_args}
          DEPENDS ${proj_DEPENDENCIES}
         )
 
-      set(GLUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+      set(GLUT_DIR ${ep_prefix})
+      mitkFunctionInstallExternalCMakeProject(${proj})
+
     endif()
 
   else()

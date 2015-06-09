@@ -33,7 +33,7 @@ public:
 
   ExtendedPerspective();
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 
 };
 

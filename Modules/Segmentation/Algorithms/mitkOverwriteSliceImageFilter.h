@@ -54,7 +54,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkSegmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
+class MITKSEGMENTATION_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
 {
   public:
 
@@ -98,7 +98,7 @@ class MitkSegmentation_EXPORT OverwriteSliceImageFilter : public ImageToImageFil
     OverwriteSliceImageFilter(); // purposely hidden
     virtual ~OverwriteSliceImageFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkImageSwitch( itk::Image<TPixel,VImageDimension>* image );

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactory.h"
 
 namespace mitk {
-class MITK_OPENCVVIDEOSUPPORT_EXPORT BasicCombinationOpenCVImageFilter : public AbstractOpenCVImageFilter
+class MITKOPENCVVIDEOSUPPORT_EXPORT BasicCombinationOpenCVImageFilter : public AbstractOpenCVImageFilter
 {
 public:
   mitkClassMacro(BasicCombinationOpenCVImageFilter, AbstractOpenCVImageFilter);
@@ -34,7 +34,7 @@ public:
     * \brief Apply list of filters to the given image.
     * \return false if one of the filter returns false. Be careful, that the image could already be changed when the function returned false.
     */
-  bool OnFilterImage( cv::Mat& image );
+  bool OnFilterImage( cv::Mat& image ) override;
 
   /**
     * \brief Push an additional filter to the list of filters for applying to an image.

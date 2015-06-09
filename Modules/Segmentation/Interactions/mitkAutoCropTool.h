@@ -33,7 +33,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkSegmentation_EXPORT AutoCropTool : public SegmentationsProcessingTool
+class MITKSEGMENTATION_EXPORT AutoCropTool : public SegmentationsProcessingTool
 {
   public:
 
@@ -41,13 +41,13 @@ class MitkSegmentation_EXPORT AutoCropTool : public SegmentationsProcessingTool
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual const char* GetName() const;
+    virtual const char** GetXPM() const override;
+    virtual const char* GetName() const override;
 
   protected:
 
-    virtual bool ProcessOneWorkingData( DataNode* node );
-    virtual std::string GetErrorMessage();
+    virtual bool ProcessOneWorkingData( DataNode* node ) override;
+    virtual std::string GetErrorMessage() override;
 
     AutoCropTool(); // purposely hidden
     virtual ~AutoCropTool();

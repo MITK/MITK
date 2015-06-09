@@ -15,11 +15,12 @@ set(MOC_H_FILES
 )
 
 set(UI_FILES
-
+  src/internal/QmitkStdMultiWidgetEditorPreferencePage.ui
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
+  resources/StdMultiWidgetEditor.png
 )
 
 set(QRC_FILES

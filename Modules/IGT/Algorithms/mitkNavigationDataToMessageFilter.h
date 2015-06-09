@@ -38,7 +38,7 @@ namespace mitk
   * The filter has as many outputs as it has inputs. It copies the inputs to the outputs after sending the messages.
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataToMessageFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataToMessageFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataToMessageFilter, NavigationDataToNavigationDataFilter);
@@ -88,7 +88,7 @@ namespace mitk
     *
     * emits the Messages
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
   };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATATOMESSAGEFILTER_H_HEADER_INCLUDED_ */

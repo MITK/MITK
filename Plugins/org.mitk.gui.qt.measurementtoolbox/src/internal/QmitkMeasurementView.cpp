@@ -103,7 +103,7 @@ struct QmitkMeasurementViewData
   unsigned int m_SubdivisionPolygonCounter;
   QList<mitk::DataNode::Pointer> m_CurrentSelection;
   std::map<mitk::DataNode*, QmitkPlanarFigureData> m_DataNodeToPlanarFigureData;
-  mitk::WeakPointer<mitk::DataNode> m_SelectedImageNode;
+  mitk::DataNode::Pointer m_SelectedImageNode;
   bool m_UnintializedPlanarFigure;
 
   // WIDGETS
@@ -357,10 +357,22 @@ void QmitkMeasurementView::CheckForTopMostVisibleImage(mitk::DataNode* _NodeToNe
   if( d->m_SelectedImageNode.GetPointer() == _NodeToNeglect )
     d->m_SelectedImageNode = 0;
 
+  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  mitk::NodePredicateProperty::Pointer isHelpherObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+  mitk::NodePredicateNot::Pointer isNotHelpherObject = mitk::NodePredicateNot::New( isHelpherObject );
+  mitk::DataStorage::SetOfObjects::ConstPointer nodeElements
+      = this->GetDataStorage()->GetSubset( isNotHelpherObject );
+
   if( d->m_SelectedImageNode.IsNotNull() && d->m_UnintializedPlanarFigure == false )
   {
     MEASUREMENT_DEBUG << "Reference image found";
     d->m_SelectedImageLabel->setText( QString::fromStdString( d->m_SelectedImageNode->GetName() ) );
+    d->m_DrawActionsToolBar->setEnabled(true);
+    MEASUREMENT_DEBUG << "Updating Measurement text";
+  } else if(d->m_UnintializedPlanarFigure == false && nodeElements->size() > 0) {
+    MEASUREMENT_DEBUG << "Reference data present";
+
+    d->m_SelectedImageLabel->setText( QString::fromStdString("Working without an image...") );
     d->m_DrawActionsToolBar->setEnabled(true);
     MEASUREMENT_DEBUG << "Updating Measurement text";
   }
@@ -368,7 +380,7 @@ void QmitkMeasurementView::CheckForTopMostVisibleImage(mitk::DataNode* _NodeToNe
   {
     MEASUREMENT_DEBUG << "No reference image available. Will disable actions for creating new planarfigures";
     if( d->m_UnintializedPlanarFigure == false )
-      d->m_SelectedImageLabel->setText( "No visible image available." );
+      d->m_SelectedImageLabel->setText( "No visible data available." );
 
     d->m_DrawActionsToolBar->setEnabled(false);
   }
@@ -412,7 +424,6 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   {
     mitk::PlanarFigure* planarFigure  = dynamic_cast<mitk::PlanarFigure*>  (nodes->at(x)->GetData());
     if (planarFigure != NULL) {
-
       isFigureFinished = planarFigure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
       if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
         GetDataStorage()->Remove(nodes->at(x));
@@ -530,7 +541,6 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
 
     if (_PlanarFigure && _PlanarFigure->GetPlaneGeometry())
     {
-
       QmitkRenderWindow* selectedRenderWindow = 0;
       bool PlanarFigureInitializedWindow = false;
 
@@ -768,19 +778,24 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(
 {
   // add as
   MEASUREMENT_DEBUG << "Adding new figure to datastorage...";
-  if( d->m_SelectedImageNode.IsNull() )
-  {
-    MITK_ERROR << "No reference image available";
-    return 0;
-  }
+  //if( d->m_SelectedImageNode.IsNull() )
+  //{
+  //  MITK_ERROR << "No reference image available";
+  //  return 0;
+  //}
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(name.toStdString());
   newNode->SetData(figure);
   // set as selected
   newNode->SetSelected( true );
-  this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
-
+  if (d->m_SelectedImageNode.IsNotNull())
+  {
+    this->GetDataStorage()->Add(newNode, d->m_SelectedImageNode);
+  } else
+  {
+    this->GetDataStorage()->Add(newNode);
+  }
   // set all others in selection as deselected
   for( int i=0; i<d->m_CurrentSelection.size(); ++i)
     d->m_CurrentSelection.at(i)->SetSelected(false);

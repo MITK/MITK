@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void QmitkDTIAtlasAppPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
-  std::string editorArea = layout->GetEditorArea();
+  QString editorArea = layout->GetEditorArea();
 
   layout->AddStandaloneView("org.mitk.views.datamanager",
     false, berry::IPageLayout::LEFT, 0.3f, editorArea);

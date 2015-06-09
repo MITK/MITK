@@ -79,11 +79,11 @@ public:
 
   typedef itk::RegularStepGradientDescentOptimizer OptimizerType;
 
-  mitkClassMacro(PyramidOptControlCommand<RegistrationType>, itk::Command)
+  mitkClassMacroItkParent(PyramidOptControlCommand<RegistrationType>, itk::Command)
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
+  void Execute(itk::Object *caller, const itk::EventObject & /*event*/) override
   {
     RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
 
@@ -103,7 +103,7 @@ public:
           return;
     }
 
-    MITK_INFO /*<< optimizer->GetStopConditionDescription()  << "\n"*/
+    MITK_DEBUG /*<< optimizer->GetStopConditionDescription()  << "\n"*/
                << optimizer->GetValue() << " : " << optimizer->GetCurrentPosition();
 
     optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.25f );
@@ -111,7 +111,7 @@ public:
    // optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 1.5f );
   }
 
-  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/) override{}
 };
 
 #include <itkGradientDescentLineSearchOptimizerv4.h>
@@ -123,11 +123,11 @@ public:
 
   typedef itk::GradientDescentLineSearchOptimizerv4 OptimizerType;
 
-  mitkClassMacro(PyramidOptControlCommandv4<RegistrationType>, itk::Command)
+  mitkClassMacroItkParent(PyramidOptControlCommandv4<RegistrationType>, itk::Command)
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
+  void Execute(itk::Object *caller, const itk::EventObject & /*event*/) override
   {
     RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
 
@@ -153,7 +153,7 @@ public:
 
   }
 
-  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/){}
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/) override{}
 };
 
 
@@ -161,11 +161,11 @@ template <typename OptimizerType>
 class OptimizerIterationCommand : public itk::Command
 {
 public:
-  mitkClassMacro(OptimizerIterationCommand<OptimizerType>, itk::Command)
+  mitkClassMacroItkParent(OptimizerIterationCommand<OptimizerType>, itk::Command)
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  void Execute(itk::Object *caller, const itk::EventObject & /*event*/)
+  void Execute(itk::Object *caller, const itk::EventObject & /*event*/) override
   {
 
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >( caller );
@@ -175,7 +175,7 @@ public:
 
   }
 
-  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/)
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/) override
   {
 
   }
@@ -187,7 +187,7 @@ class OptimizerIterationCommandv4 : public itk::Command
 public:
   itkNewMacro( OptimizerIterationCommandv4 )
 
-  void Execute(itk::Object *object, const itk::EventObject & event)
+  void Execute(itk::Object *object, const itk::EventObject & event) override
   {
     OptimizerType* optimizer = dynamic_cast< OptimizerType* >( object );
 
@@ -201,7 +201,7 @@ public:
 
   }
 
-  void Execute(const itk::Object * object, const itk::EventObject & event)
+  void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/) override
   {
 
 

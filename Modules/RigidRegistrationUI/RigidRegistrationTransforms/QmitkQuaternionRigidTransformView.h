@@ -27,31 +27,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for rigid registration.
 */
-class MITK_RIGIDREGISTRATION_UI_EXPORT QmitkQuaternionRigidTransformView : public QmitkRigidRegistrationTransformsGUIBase
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkQuaternionRigidTransformView : public QmitkRigidRegistrationTransformsGUIBase
 {
 
 public:
 
-  QmitkQuaternionRigidTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkQuaternionRigidTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkQuaternionRigidTransformView();
 
-  virtual mitk::TransformParameters::TransformType GetTransformType();
+  virtual mitk::TransformParameters::TransformType GetTransformType() override;
 
-  virtual itk::Object::Pointer GetTransform();
+  virtual itk::Object::Pointer GetTransform() override;
 
-  virtual itk::Array<double> GetTransformParameters();
+  virtual itk::Array<double> GetTransformParameters() override;
 
-  virtual void SetTransformParameters(itk::Array<double> transformValues);
+  virtual void SetTransformParameters(itk::Array<double> transformValues) override;
 
-  virtual QString GetName();
+  virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent);
+  virtual void SetupUI(QWidget* parent) override;
 
-  virtual itk::Array<double> GetScales();
+  virtual itk::Array<double> GetScales() override;
 
-  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams);
+  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams) override;
 
-  virtual int GetNumberOfTransformParameters();
+  virtual int GetNumberOfTransformParameters() override;
 
 private:
 

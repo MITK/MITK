@@ -313,14 +313,14 @@ mitkCommandLineParser::ctkInternal::argumentDescription(const string& argument)
     }
     else if (!LongPrefix.empty() && !ShortPrefix.empty())
     {
-        return 0;
+        return nullptr;
     }
 
     if (ArgNameToArgumentDescriptionMap.count(unprefixedArg))
     {
         return this->ArgNameToArgumentDescriptionMap[unprefixedArg];
     }
-    return 0;
+    return nullptr;
 }
 
 // --------------------------------------------------------------------------
@@ -335,7 +335,7 @@ mitkCommandLineParser::mitkCommandLineParser()
     this->Contributor = string();
     this->Description = string();
     this->ParameterGroupName = "Parameters";
-    this->ParameterGroupDescription = "Groupbox containing parameters.";
+    this->ParameterGroupDescription = "Parameters";
 }
 
 // --------------------------------------------------------------------------
@@ -364,7 +364,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
     }
     bool error = false;
     bool ignoreRest = false;
-    CommandLineParserArgumentDescription * currentArgDesc = 0;
+    CommandLineParserArgumentDescription * currentArgDesc = nullptr;
     vector<CommandLineParserArgumentDescription*> parsedArgDescriptions;
     for(unsigned int i = 1; i < arguments.size(); ++i)
     {
@@ -640,7 +640,7 @@ const mitkCommandLineParser::StringContainerType& mitkCommandLineParser::unparse
 // --------------------------------------------------------------------------
 void mitkCommandLineParser::addArgument(const string& longarg, const string& shortarg,
                                        Type type, const string& argLabel, const string& argHelp,
-                                       const us::Any& defaultValue, bool optional, bool ignoreRest,
+                                       const us::Any &defaultValue, bool optional, bool ignoreRest,
                                        bool deprecated)
 {
     if (longarg.empty() && shortarg.empty()) { return; }
@@ -652,7 +652,7 @@ void mitkCommandLineParser::addArgument(const string& longarg, const string& sho
     added = this->Internal->ArgNameToArgumentDescriptionMap.count(shortarg);
     if (added) { return; }
 
-    CommandLineParserArgumentDescription* argDesc =
+    auto  argDesc =
             new CommandLineParserArgumentDescription(longarg, this->Internal->LongPrefix,
                                                      shortarg, this->Internal->ShortPrefix, type,
                                                      argHelp, argLabel, defaultValue, ignoreRest, deprecated, optional, ParameterGroupName, ParameterGroupDescription);
@@ -843,10 +843,17 @@ void mitkCommandLineParser::generateXmlOutput()
       lastParameterGroup = (*it)->ArgGroup;
     }
 
+    // Skip help item, as it's no use in GUI
+    if ((*it)->ShortArg == "h")
+      continue;
+
     xml << "<" << type << ">" << endl;
     xml << "<name>" << (*it)->LongArg << "</name>" << endl;
-    xml << "<label>" << (*it)->ArgLabel << "</label>" << endl;
     xml << "<description>" << (*it)->ArgHelp << "</description>" << endl;
+    xml << "<label>" << (*it)->ArgLabel << "</label>" << endl;
+    if (!(*it)->DefaultValue.Empty())
+      xml << "<default>" << (*it)->DefaultValue.ToString() << "</default>" << endl;
+
     xml << "<longflag>" << (*it)->LongArg << "</longflag>" << endl;
     xml << "<flag>" << (*it)->ShortArg << "</flag>" << endl;
 

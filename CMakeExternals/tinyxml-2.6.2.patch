@@ -1,0 +1,266 @@
+diff -burN tinyxml/tinyxml.cpp tinyxml-src/tinyxml.cpp
+--- tinyxml/tinyxml.cpp	2011-05-15 04:24:57.000000000 +0200
++++ tinyxml-src/tinyxml.cpp	2015-01-14 15:19:38.685333149 +0100
+@@ -34,6 +34,9 @@
+ FILE* TiXmlFOpen( const char* filename, const char* mode );
+ 
+ bool TiXmlBase::condenseWhiteSpace = true;
++static unsigned int required_decimal_places = 14+1; // Need 14 for mitk default accuracy plus 1 to make sure we're within tolerance.
++
++
+ 
+ // Microsoft compiler security
+ FILE* TiXmlFOpen( const char* filename, const char* mode )
+@@ -757,21 +760,21 @@
+ #endif
+ 
+ 
+-void TiXmlElement::SetDoubleAttribute( const char * name, double val )
++void TiXmlElement::SetDoubleAttribute( const char * name, double val, const unsigned int requiredDecimalPlaces )
+ {	
+ 	TiXmlAttribute* attrib = attributeSet.FindOrCreate( name );
+ 	if ( attrib ) {
+-		attrib->SetDoubleValue( val );
++    attrib->SetDoubleValue( val, requiredDecimalPlaces );
+ 	}
+ }
+ 
+ 
+ #ifdef TIXML_USE_STL
+-void TiXmlElement::SetDoubleAttribute( const std::string& name, double val )
++void TiXmlElement::SetDoubleAttribute( const std::string& name, double val, const unsigned int requiredDecimalPlaces )
+ {	
+ 	TiXmlAttribute* attrib = attributeSet.FindOrCreate( name );
+ 	if ( attrib ) {
+-		attrib->SetDoubleValue( val );
++    attrib->SetDoubleValue( val, requiredDecimalPlaces );
+ 	}
+ }
+ #endif 
+@@ -1242,33 +1245,73 @@
+ 
+ int TiXmlAttribute::QueryDoubleValue( double* dval ) const
+ {
++  //save old locale
++  char * oldLocale;
++  oldLocale = setlocale( LC_ALL, 0 );
++
++  //set new locale
++  setlocale( LC_ALL, "C" );
+ 	if ( TIXML_SSCANF( value.c_str(), "%lf", dval ) == 1 )
++  {
++    //restore locale
++    setlocale( LC_ALL, oldLocale );
+ 		return TIXML_SUCCESS;
++  }
++  //restore locale
++  setlocale( LC_ALL, oldLocale );
+ 	return TIXML_WRONG_TYPE;
+ }
+ 
+ void TiXmlAttribute::SetIntValue( int _value )
+ {
+ 	char buf [64];
+-	#if defined(TIXML_SNPRINTF)		
++#if defined(TIXML_SNPRINTF)
+ 		TIXML_SNPRINTF(buf, sizeof(buf), "%d", _value);
+-	#else
++#else
+ 		sprintf (buf, "%d", _value);
+-	#endif
++#endif
+ 	SetValue (buf);
+ }
+ 
+-void TiXmlAttribute::SetDoubleValue( double _value )
++
++
++
++void TiXmlAttribute::SetDoubleValue( double _value, const unsigned int requiredDecimalPlaces )
+ {
++#if defined(TIXML_USE_STL)
++  std::ostringstream ss;
++  //save old locale
++  char * oldLocale;
++  oldLocale = setlocale( LC_ALL, 0 );
++
++  //set new locale
++  setlocale( LC_ALL, "C" );
++  ss.precision(TiXmlBase::Precision(_value, requiredDecimalPlaces));
++  ss << _value;
++  SetValue( ss.str() );
++  //restore locale
++  setlocale( LC_ALL, oldLocale );
++#else
+ 	char buf [256];
+-	#if defined(TIXML_SNPRINTF)		
+-		TIXML_SNPRINTF( buf, sizeof(buf), "%g", _value);
+-	#else
+-		sprintf (buf, "%g", _value);
+-	#endif
++
++  //save old locale
++  char * oldLocale;
++  oldLocale = setlocale( LC_ALL, 0 );
++
++  //set new locale
++  setlocale( LC_ALL, "C" );
++#if defined(TIXML_SNPRINTF)
++  TIXML_SNPRINTF( buf, sizeof(buf), TiXmlBase::Format(_value, requiredDecimalPlaces).c_str(), _value);
++#else
++  sprintf (buf, TiXmlBase::Format(_value, requiredDecimalPlaces).c_str(), _value);
++#endif
+ 	SetValue (buf);
++  //restore locale
++  setlocale( LC_ALL, oldLocale );
++#endif
+ }
+ 
++
+ int TiXmlAttribute::IntValue() const
+ {
+ 	return atoi (value.c_str ());
+@@ -1276,7 +1319,15 @@
+ 
+ double  TiXmlAttribute::DoubleValue() const
+ {
++#if defined(TIXML_USE_STL)
++  std::istringstream ss(value);
++  ss.imbue(std::locale("C"));
++  double dval;
++  ss >> dval;
++  return dval;
++#else
+ 	return atof (value.c_str ());
++#endif
+ }
+ 
+ 
+@@ -1884,3 +1935,36 @@
+ 	return true;
+ }
+ 
++unsigned int TiXmlBase::Precision( const double value, const unsigned int requiredDecimalPlaces ) const
++{
++  unsigned int lhs = 0;
++  unsigned int one_for_plus_minus_sign = 1;
++
++  lhs = 0;
++  double temp(value);
++  while (temp >= 1.0)
++  {
++    lhs++;
++    temp /= 10.0;
++  }
++
++  return( lhs + requiredDecimalPlaces + one_for_plus_minus_sign );
++}
++
++/**
++    Return the printf format string that will ensure that the double value
++    passed in will be stored with 'required_decimal_places' worth of decimal
++    points as well as enough digits for the left hand side of the decimal point.
++ */
++TIXML_STRING TiXmlBase::Format( const double value, const unsigned int requiredDecimalPlaces ) const
++{
++  char buf[ 32 ];
++
++#if defined(TIXML_SNPRINTF)
++  TIXML_SNPRINTF( buf, sizeof(buf), "%%%d.%dlf", Precision(value, requiredDecimalPlaces), requiredDecimalPlaces);
++#else
++  sprintf( buf, "%%%d.%dlf", Precision(value, requiredDecimalPlaces), requiredDecimalPlaces);
++#endif
++
++  return(TIXML_STRING(buf));
++}
+diff -burN tinyxml/tinyxml.h tinyxml-src/tinyxml.h
+--- tinyxml/tinyxml.h	2011-05-15 04:24:57.000000000 +0200
++++ tinyxml-src/tinyxml.h	2015-01-14 15:19:38.686333149 +0100
+@@ -20,12 +20,24 @@
+ 
+ 3. This notice may not be removed or altered from any source
+ distribution.
+-*/
++ */
+ 
+ 
+ #ifndef TINYXML_INCLUDED
+ #define TINYXML_INCLUDED
+ 
++#ifndef TIXML_USE_STL
++  #define TIXML_USE_STL
++#endif
++
++#ifndef TIXML_USE_STL
++#define TIXML_USE_STL
++#endif
++
++#ifndef TIXML_USE_STL
++#define TIXML_USE_STL
++#endif
++
+ #ifdef _MSC_VER
+ #pragma warning( push )
+ #pragma warning( disable : 4530 )
+@@ -93,9 +105,11 @@
+ const int TIXML_MINOR_VERSION = 6;
+ const int TIXML_PATCH_VERSION = 2;
+ 
++#define DEFAULT_REQUIRED_DECIMAL_PLACES 14
++
+ /*	Internal structure for tracking location of items 
+ 	in the XML file.
+-*/
++ */
+ struct TiXmlCursor
+ {
+ 	TiXmlCursor()		{ Clear(); }
+@@ -283,6 +297,10 @@
+ 		TIXML_ERROR_STRING_COUNT
+ 	};
+ 
++  unsigned int Precision( const double value, const unsigned int requiredDecimalPlaces ) const ;
++
++  TIXML_STRING Format( const double value, const unsigned int requiredDecimalPlaces ) const;
++
+ protected:
+ 
+ 	static const char* SkipWhiteSpace( const char*, TiXmlEncoding encoding );
+@@ -836,14 +854,14 @@
+ 	void SetValue( const char* _value )	{ value = _value; }				///< Set the value.
+ 
+ 	void SetIntValue( int _value );										///< Set the value from an integer.
+-	void SetDoubleValue( double _value );								///< Set the value from a double.
++  void SetDoubleValue( double _value, const unsigned int requiredDecimalPlaces = DEFAULT_REQUIRED_DECIMAL_PLACES );        ///< Set the value from a double.
+ 
+-    #ifdef TIXML_USE_STL
++#ifdef TIXML_USE_STL
+ 	/// STL std::string form.
+ 	void SetName( const std::string& _name )	{ name = _name; }	
+ 	/// STL std::string form.	
+ 	void SetValue( const std::string& _value )	{ value = _value; }
+-	#endif
++#endif
+ 
+ 	/// Get the next sibling attribute in the DOM. Returns null at end.
+ 	const TiXmlAttribute* Next() const;
+@@ -1061,8 +1079,8 @@
+ 	///< STL std::string form.
+ 	void SetAttribute( const std::string& name, int _value );
+ 	///< STL std::string form.
+-	void SetDoubleAttribute( const std::string& name, double value );
+-	#endif
++  void SetDoubleAttribute( const std::string& name, double value, const unsigned int requiredDecimalPlaces = DEFAULT_REQUIRED_DECIMAL_PLACES );
++#endif
+ 
+ 	/** Sets an attribute of name to a given value. The attribute
+ 		will be created if it does not exist, or changed if it does.
+@@ -1072,7 +1090,7 @@
+ 	/** Sets an attribute of name to a given value. The attribute
+ 		will be created if it does not exist, or changed if it does.
+ 	*/
+-	void SetDoubleAttribute( const char * name, double value );
++  void SetDoubleAttribute( const char * name, double value, const unsigned int requiredDecimalPlaces = DEFAULT_REQUIRED_DECIMAL_PLACES );
+ 
+ 	/** Deletes an attribute with the given name.
+ 	*/

@@ -22,14 +22,25 @@
     </view>
   </extension>
 
-  <extension point="org.blueberry.ui.keywords">
+   <extension point="org.blueberry.ui.keywords">
+    <keyword label="image" id="org.mitk.views.screenshotmaker.Keyword"/>
+    <keyword label="picture" id="org.mitk.views.screenshotmaker.Keyword"/>
+    <keyword label="screenshot" id="org.mitk.views.screenshotmaker.Keyword"/>
+    <keyword label="capture" id="org.mitk.views.screenshotmaker.Keyword"/>
+    <keyword label="png bmp jpg jepg" id="org.mitk.views.screenshotmaker.Keyword"/>
 
-  <keyword label="image" id="org.mitk.views.screenshotmaker.Keyword"/>
-  <keyword label="picture" id="org.mitk.views.screenshotmaker.Keyword"/>
-  <keyword label="screenshot" id="org.mitk.views.screenshotmaker.Keyword"/>
+    <keyword label="movie" id="org.mitk.views.moviemaker.Keyword"/>
+    <keyword label="clip" id="org.mitk.views.moviemaker.Keyword"/>
+    <keyword label="capture" id="org.mitk.views.moviemaker.Keyword"/>
+    <keyword label="avi" id="org.mitk.views.moviemaker.Keyword"/>
+  </extension>
 
-  <keyword label="movie" id="org.mitk.views.moviemaker.Keyword"/>
-  <keyword label="clip" id="org.mitk.views.moviemaker.Keyword"/>
-
- </extension>
+  <!--This extension points adds the screenshot and movie maker views to the
+  "Window->Show Views" menu if the visualization perspective is opened-->
+  <extension point="org.blueberry.ui.perspectiveExtensions">
+           <perspectiveExtension targetID="org.mitk.mitkworkbench.perspectives.visualization">
+                <viewShortcut id="org.mitk.views.screenshotmaker"/>
+                <viewShortcut id="org.mitk.views.moviemaker"/>
+           </perspectiveExtension>
+  </extension>
 </plugin>

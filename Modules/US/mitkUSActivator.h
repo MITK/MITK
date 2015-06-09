@@ -44,12 +44,12 @@ public:
   /**
     * \brief The mitk::USVideoDevice obejcts are loaded from hard disk and registered into micro service.
     */
-  void Load(us::ModuleContext* context);
+  void Load(us::ModuleContext* context) override;
 
   /**
     * \brief Registered mitk::USVideoDevice objects are stored to hard disk an deregistered from micro service.
     */
-  void Unload(us::ModuleContext* context);
+  void Unload(us::ModuleContext* context) override;
 
 protected:
   /**

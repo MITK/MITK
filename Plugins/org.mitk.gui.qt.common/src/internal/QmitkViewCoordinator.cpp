@@ -25,9 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 
 QmitkViewCoordinator::QmitkViewCoordinator()
-  : m_ActiveZombieView(0)
-  , m_ActiveRenderWindowPart(0)
-  , m_VisibleRenderWindowPart(0)
+  : m_ActiveZombieView(nullptr)
+  , m_ActiveRenderWindowPart(nullptr)
+  , m_VisibleRenderWindowPart(nullptr)
 {
 }
 
@@ -37,12 +37,12 @@ QmitkViewCoordinator::~QmitkViewCoordinator()
 
 void QmitkViewCoordinator::Start()
 {
-  berry::PlatformUI::GetWorkbench()->AddWindowListener(berry::IWindowListener::Pointer(this));
-  std::vector<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
-  for (std::vector<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
+  berry::PlatformUI::GetWorkbench()->AddWindowListener(this);
+  QList<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
+  for (QList<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
        i != wnds.end(); ++i)
   {
-    (*i)->GetPartService()->AddPartListener(berry::IPartListener::Pointer(this));
+    (*i)->GetPartService()->AddPartListener(this);
   }
 }
 
@@ -50,12 +50,12 @@ void QmitkViewCoordinator::Stop()
 {
   if (!berry::PlatformUI::IsWorkbenchRunning()) return;
 
-  berry::PlatformUI::GetWorkbench()->RemoveWindowListener(berry::IWindowListener::Pointer(this));
-  std::vector<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
-  for (std::vector<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
+  berry::PlatformUI::GetWorkbench()->RemoveWindowListener(this);
+  QList<berry::IWorkbenchWindow::Pointer> wnds(berry::PlatformUI::GetWorkbench()->GetWorkbenchWindows());
+  for (QList<berry::IWorkbenchWindow::Pointer>::iterator i = wnds.begin();
        i != wnds.end(); ++i)
   {
-    (*i)->GetPartService()->RemovePartListener(berry::IPartListener::Pointer(this));
+    (*i)->GetPartService()->RemovePartListener(this);
   }
 }
 
@@ -66,7 +66,7 @@ berry::IPartListener::Events::Types QmitkViewCoordinator::GetPartEventTypes() co
     | berry::IPartListener::Events::VISIBLE | berry::IPartListener::Events::OPENED;
 }
 
-void QmitkViewCoordinator::PartActivated( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkViewCoordinator::PartActivated(const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   //MITK_INFO << "*** PartActivated (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
@@ -101,7 +101,7 @@ void QmitkViewCoordinator::PartActivated( berry::IWorkbenchPartReference::Pointe
   }
 }
 
-void QmitkViewCoordinator::PartDeactivated( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkViewCoordinator::PartDeactivated(const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   //MITK_INFO << "*** PartDeactivated (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
@@ -112,7 +112,7 @@ void QmitkViewCoordinator::PartDeactivated( berry::IWorkbenchPartReference::Poin
   }
 }
 
-void QmitkViewCoordinator::PartOpened( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkViewCoordinator::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   //MITK_INFO << "*** PartOpened (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
@@ -123,7 +123,7 @@ void QmitkViewCoordinator::PartOpened( berry::IWorkbenchPartReference::Pointer p
   }
 }
 
-void QmitkViewCoordinator::PartClosed( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkViewCoordinator::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   //MITK_INFO << "*** PartClosed (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
@@ -134,7 +134,7 @@ void QmitkViewCoordinator::PartClosed( berry::IWorkbenchPartReference::Pointer p
   }
 }
 
-void QmitkViewCoordinator::PartHidden( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkViewCoordinator::PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   //MITK_INFO << "*** PartHidden (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
@@ -146,7 +146,7 @@ void QmitkViewCoordinator::PartHidden( berry::IWorkbenchPartReference::Pointer p
     if (!m_ActiveRenderWindowPart && m_VisibleRenderWindowPart == renderPart)
     {
       RenderWindowPartDeactivated(renderPart);
-      m_VisibleRenderWindowPart = 0;
+      m_VisibleRenderWindowPart = nullptr;
     }
   }
 
@@ -156,7 +156,7 @@ void QmitkViewCoordinator::PartHidden( berry::IWorkbenchPartReference::Pointer p
   }
 }
 
-void QmitkViewCoordinator::PartVisible( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkViewCoordinator::PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   //MITK_INFO << "*** PartVisible (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
@@ -194,12 +194,12 @@ void QmitkViewCoordinator::RenderWindowPartDeactivated(mitk::IRenderWindowPart* 
   }
 }
 
-void QmitkViewCoordinator::WindowClosed( berry::IWorkbenchWindow::Pointer /*window*/ )
+void QmitkViewCoordinator::WindowClosed(const berry::IWorkbenchWindow::Pointer& /*window*/ )
 {
 }
 
-void QmitkViewCoordinator::WindowOpened( berry::IWorkbenchWindow::Pointer window )
+void QmitkViewCoordinator::WindowOpened(const berry::IWorkbenchWindow::Pointer& window )
 {
-  window->GetPartService()->AddPartListener(berry::IPartListener::Pointer(this));
+  window->GetPartService()->AddPartListener(this);
 }
 

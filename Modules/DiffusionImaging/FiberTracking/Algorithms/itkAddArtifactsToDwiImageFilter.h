@@ -62,6 +62,8 @@ namespace itk{
     void SetParameters( FiberfoxParameters<short> param ){ m_Parameters = param; }
     FiberfoxParameters<short> GetParameters(){ return m_Parameters; }
 
+    virtual void UpdateOutputInformation();
+
   protected:
     AddArtifactsToDwiImageFilter();
     ~AddArtifactsToDwiImageFilter() {}

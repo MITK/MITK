@@ -13,10 +13,13 @@ set(_exclude_plugins
 
 )
 
-FunctionCreateBlueBerryApplication(
+mitkFunctionCreateBlueBerryApplication(
   NAME ${MY_APP_NAME}
   DESCRIPTION "MITK - ${MY_APP_NAME} Application"
   EXCLUDE_PLUGINS ${_exclude_plugins}
   ${_app_options}
 )
-mitk_use_modules(TARGET ${MY_APP_NAME} PACKAGES Qt4|QtGui)
+mitk_use_modules(TARGET ${MY_APP_NAME}
+  MODULES MitkAppUtil
+  PACKAGES Qt4|QtGui Qt5|Widgets
+)

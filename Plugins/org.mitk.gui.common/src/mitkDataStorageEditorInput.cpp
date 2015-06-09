@@ -17,7 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorageEditorInput.h"
 
 #include <berryPlatform.h>
+#include <berryIAdapterManager.h>
+#include <berryIMemento.h>
+
 #include <mitkIDataStorageService.h>
+
+#include "internal/org_mitk_gui_common_Activator.h"
+#include "internal/mitkDataStorageEditorInputFactory.h"
+
+#include <QIcon>
 
 namespace mitk
 {
@@ -36,15 +44,46 @@ bool DataStorageEditorInput::Exists() const
   return true;
 }
 
-std::string DataStorageEditorInput::GetName() const
+QString DataStorageEditorInput::GetName() const
 {
   return "DataStorage Scene";
 }
 
-std::string DataStorageEditorInput::GetToolTipText() const
+QString DataStorageEditorInput::GetToolTipText() const
 {
   return "";
 }
+
+QIcon DataStorageEditorInput::GetIcon() const
+{
+  return QIcon();
+}
+
+const berry::IPersistableElement*DataStorageEditorInput::GetPersistable() const
+{
+  //return this;
+  return nullptr;
+}
+
+berry::Object* DataStorageEditorInput::GetAdapter(const QString& adapterType) const
+{
+  berry::IAdapterManager* adapterManager = berry::Platform::GetAdapterManager();
+  if (adapterManager)
+  {
+    return adapterManager->GetAdapter(this, adapterType);
+  }
+  return nullptr;
+}
+
+//QString DataStorageEditorInput::GetFactoryId() const
+//{
+//  return DataStorageEditorInputFactory::GetFactoryId();
+//}
+
+//void DataStorageEditorInput::SaveState(const berry::IMemento::Pointer& memento) const
+//{
+//  return DataStorageEditorInputFactory::SaveState(memento, this);
+//}
 
 bool DataStorageEditorInput::operator==(const berry::Object* o) const
 {
@@ -59,9 +98,11 @@ DataStorageEditorInput::GetDataStorageReference()
 {
   if (m_DataStorageRef.IsNull())
   {
-    berry::ServiceRegistry& serviceRegistry = berry::Platform::GetServiceRegistry();
-    IDataStorageService::Pointer dataService = serviceRegistry.GetServiceById<IDataStorageService>(IDataStorageService::ID);
-    if (!dataService) return IDataStorageReference::Pointer(0);
+    ctkPluginContext* context = PluginActivator::GetContext();
+    ctkServiceReference serviceRef = context->getServiceReference<IDataStorageService>();
+    if (!serviceRef) return IDataStorageReference::Pointer(nullptr);
+    IDataStorageService* dataService = context->getService<IDataStorageService>(serviceRef);
+    if (!dataService) return IDataStorageReference::Pointer(nullptr);
     m_DataStorageRef = dataService->GetDefaultDataStorage();
   }
 

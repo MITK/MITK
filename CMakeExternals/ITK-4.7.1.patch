@@ -1,0 +1,36 @@
+diff --git a/CMake/UseITK.cmake b/CMake/UseITK.cmake
+index 596c69c..085da7a 100644
+--- a/CMake/UseITK.cmake
++++ b/CMake/UseITK.cmake
+@@ -108,7 +108,11 @@ if(NOT ITK_NO_IO_FACTORY_REGISTER_MANAGER)
+   unset(LIST_OF_FACTORY_NAMES)
+ 
+   #-------------------
++  if(NOT NO_DIRECTORY_SCOPED_ITK_COMPILE_DEFINITION)
++    # We add a target scoped compile definition in MITK manually, to avoid leaking
++    # the definition to other targets in the same directory or sub-directory.
+   set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ITK_IO_FACTORY_REGISTER_MANAGER)
++  endif()
+   include_directories(BEFORE ${CMAKE_CURRENT_BINARY_DIR}/ITKIOFactoryRegistration)
+ 
+ endif()
+diff --git a/Modules/IO/GDCM/src/itkGDCMImageIO.cxx b/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
+index 68b09ea..4cdb36b 100644
+--- a/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
++++ b/Modules/IO/GDCM/src/itkGDCMImageIO.cxx
+@@ -477,10 +477,15 @@ void GDCMImageIO::InternalReadImageInformation()
+             break;
+           }
+         }
++      // ITK-3357, mitk : Bug 18887
++      // can assign values only if there are some sp.empty occurs if the tag is not found
++      if( sp.size() == 2)
++      {
+         spacing[0] = sp[0];
+         spacing[1] = sp[1];
+         spacing[2] = 1.0; // punt?
+       }
++      }
+       break;
+     default:
+       {

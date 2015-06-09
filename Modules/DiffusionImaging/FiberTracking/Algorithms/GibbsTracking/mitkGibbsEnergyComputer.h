@@ -15,7 +15,7 @@ using namespace mitk;
 /**
 * \brief ODF lookuptable based energy computer.   */
 
-class MitkFiberTracking_EXPORT GibbsEnergyComputer : public EnergyComputer
+class MITKFIBERTRACKING_EXPORT GibbsEnergyComputer : public EnergyComputer
 {
   public:
 
@@ -29,12 +29,12 @@ class MitkFiberTracking_EXPORT GibbsEnergyComputer : public EnergyComputer
     virtual ~GibbsEnergyComputer();
 
     // external energy calculation
-    float ComputeExternalEnergy(vnl_vector_fixed<float, 3>& R, vnl_vector_fixed<float, 3>& N, Particle* dp);
+    float ComputeExternalEnergy(vnl_vector_fixed<float, 3>& R, vnl_vector_fixed<float, 3>& N, Particle* dp) override;
 
     // internal energy calculation
-    float ComputeInternalEnergyConnection(Particle *p1,int ep1);
-    float ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2);
-    float ComputeInternalEnergy(Particle *dp);
+    float ComputeInternalEnergyConnection(Particle *p1,int ep1) override;
+    float ComputeInternalEnergyConnection(Particle *p1,int ep1, Particle *p2, int ep2) override;
+    float ComputeInternalEnergy(Particle *dp) override;
 
     float EvaluateOdf(vnl_vector_fixed<float, 3>& pos, vnl_vector_fixed<float, 3> dir);
   protected:

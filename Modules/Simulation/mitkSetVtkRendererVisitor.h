@@ -24,13 +24,14 @@ class vtkRenderer;
 
 namespace mitk
 {
-  class MitkSimulation_EXPORT SetVtkRendererVisitor : public sofa::simulation::Visitor
+  class MITKSIMULATION_EXPORT SetVtkRendererVisitor : public sofa::simulation::Visitor
   {
   public:
     explicit SetVtkRendererVisitor(vtkRenderer* renderer, const sofa::core::ExecParams* params = sofa::core::ExecParams::defaultInstance());
     ~SetVtkRendererVisitor();
 
-    Result processNodeTopDown(sofa::simulation::Node* node);
+    using sofa::simulation::Visitor::processNodeTopDown;
+    Result processNodeTopDown(sofa::simulation::Node* node) override;
 
   private:
     SetVtkRendererVisitor(const SetVtkRendererVisitor&);

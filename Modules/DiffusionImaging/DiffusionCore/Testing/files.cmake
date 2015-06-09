@@ -1,7 +1,6 @@
 set(MODULE_TESTS
-  mitkDiffusionImageEqualTest.cpp
   mitkNonLocalMeansDenoisingTest.cpp
-  mitkDiffusionImageEqualTest.cpp
+  mitkDiffusionPropertySerializerTest.cpp
 )
 
 set(MODULE_CUSTOM_TESTS

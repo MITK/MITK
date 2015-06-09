@@ -1,8 +1,6 @@
-cmake_minimum_required(VERSION 2.8.5)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 
 project(QtAppExample)
-
-find_package(MITK REQUIRED)
 
 # Check that MITK has been build with Qt support
 if(NOT MITK_USE_QT)

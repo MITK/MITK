@@ -27,19 +27,6 @@ DataStorageService::DataStorageService()
   m_ActiveDataStorageRef = m_DefaultDataStorageRef;
 }
 
-bool
-DataStorageService::IsA(const std::type_info& type) const
-{
-  std::string name(GetType().name());
-  return name == type.name() || Service::IsA(type);
-}
-
-const std::type_info&
-DataStorageService::GetType() const
-{
-  return typeid(IDataStorageService);
-}
-
 IDataStorageReference::Pointer DataStorageService::CreateDataStorage(const QString& label)
 {
 
@@ -94,7 +81,7 @@ bool DataStorageService::RemoveDataStorageReference(IDataStorageReference::Point
 {
   if (m_ActiveDataStorageRef == dataStorageRef)
   {
-    m_ActiveDataStorageRef = 0;
+    m_ActiveDataStorageRef = nullptr;
   }
 
   return m_DataStorageReferences.erase(dataStorageRef);

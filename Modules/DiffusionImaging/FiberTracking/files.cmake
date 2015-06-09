@@ -3,8 +3,8 @@ set(CPP_FILES
   mitkFiberTrackingModuleActivator.cpp
 
   ## IO datastructures
-  IODataStructures/FiberBundleX/mitkFiberBundleX.cpp
-  IODataStructures/FiberBundleX/mitkTrackvis.cpp
+  IODataStructures/FiberBundle/mitkFiberBundle.cpp
+  IODataStructures/FiberBundle/mitkTrackvis.cpp
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
   # Interactions
@@ -20,9 +20,9 @@ set(CPP_FILES
 )
 
 set(H_FILES
-  # DataStructures -> FiberBundleX
-  IODataStructures/FiberBundleX/mitkFiberBundleX.h
-  IODataStructures/FiberBundleX/mitkTrackvis.h
+  # DataStructures -> FiberBundle
+  IODataStructures/FiberBundle/mitkFiberBundle.h
+  IODataStructures/FiberBundle/mitkTrackvis.h
   IODataStructures/mitkFiberfoxParameters.h
 
   # Algorithms
@@ -40,8 +40,9 @@ set(H_FILES
   Algorithms/itkFieldmapGeneratorFilter.h
   Algorithms/itkEvaluateDirectionImagesFilter.h
   Algorithms/itkEvaluateTractogramDirectionsFilter.h
+  Algorithms/itkFiberCurvatureFilter.h
 
-  # (old) Tractography
+  # Tractography
   Algorithms/itkGibbsTrackingFilter.h
   Algorithms/itkStochasticTractographyFilter.h
   Algorithms/itkStreamlineTrackingFilter.h
@@ -53,6 +54,8 @@ set(H_FILES
   Algorithms/GibbsTracking/mitkGibbsEnergyComputer.h
   Algorithms/GibbsTracking/mitkSphereInterpolator.h
   Algorithms/GibbsTracking/mitkFiberBuilder.h
+  Algorithms/MLTracking/mitkTrackingForestHandler.h
+  Algorithms/MLTracking/itkMLBSTrackingFilter.h
 
   # Signal Models
   SignalModels/mitkDiffusionSignalModel.h

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONIOMIMETYPES_H
 
 #include "mitkCustomMimeType.h"
+#include <MitkDiffusionIOExports.h>
 
 #include <string>
 
@@ -27,28 +28,51 @@ class DiffusionIOMimeTypes
 {
 public:
 
+  class MITKDIFFUSIONIO_EXPORT DiffusionImageNrrdMimeType : public CustomMimeType
+  {
+  public:
+    DiffusionImageNrrdMimeType();
+    virtual bool AppliesTo(const std::string &path) const override;
+    virtual DiffusionImageNrrdMimeType* Clone() const override;
+  };
+
+  class MITKDIFFUSIONIO_EXPORT DiffusionImageNiftiMimeType : public CustomMimeType
+  {
+  public:
+    DiffusionImageNiftiMimeType();
+    virtual bool AppliesTo(const std::string &path) const override;
+    virtual DiffusionImageNiftiMimeType* Clone() const override;
+  };
   // Get all Diffusion Mime Types
   static std::vector<CustomMimeType*> Get();
 
   // ------------------------------ VTK formats ----------------------------------
 
-  static CustomMimeType FIBERBUNDLE_MIMETYPE(); // fib
-
-  static std::string FIBERBUNDLE_MIMETYPE_NAME();
+  static CustomMimeType FIBERBUNDLE_VTK_MIMETYPE();
+  static std::string FIBERBUNDLE_VTK_MIMETYPE_NAME();
 
   static std::string FIBERBUNDLE_MIMETYPE_DESCRIPTION();
 
+  // ------------------------------ TrackVis formats ----------------------------------
+
+  static CustomMimeType FIBERBUNDLE_TRK_MIMETYPE();
+  static std::string FIBERBUNDLE_TRK_MIMETYPE_NAME();
+
+
   // ------------------------- Image formats (ITK based) --------------------------
 
-  static CustomMimeType DWI_MIMETYPE(); // dwi, hdwi
+  static DiffusionImageNrrdMimeType DWI_NRRD_MIMETYPE();
+  static DiffusionImageNiftiMimeType DWI_NIFTI_MIMETYPE();
   static CustomMimeType DTI_MIMETYPE(); // dti, hdti
   static CustomMimeType QBI_MIMETYPE(); // qbi, hqbi
 
-  static std::string DWI_MIMETYPE_NAME();
+  static std::string DWI_NRRD_MIMETYPE_NAME();
+  static std::string DWI_NIFTI_MIMETYPE_NAME();
   static std::string DTI_MIMETYPE_NAME();
   static std::string QBI_MIMETYPE_NAME();
 
-  static std::string DWI_MIMETYPE_DESCRIPTION();
+  static std::string DWI_NRRD_MIMETYPE_DESCRIPTION();
+  static std::string DWI_NIFTI_MIMETYPE_DESCRIPTION();
   static std::string DTI_MIMETYPE_DESCRIPTION();
   static std::string QBI_MIMETYPE_DESCRIPTION();
 
@@ -59,6 +83,12 @@ public:
   static std::string CONNECTOMICS_MIMETYPE_NAME();
 
   static std::string CONNECTOMICS_MIMETYPE_DESCRIPTION();
+
+  static CustomMimeType PLANARFIGURECOMPOSITE_MIMETYPE();
+
+  static std::string PLANARFIGURECOMPOSITE_MIMETYPE_NAME();
+
+  static std::string PLANARFIGURECOMPOSITE_MIMETYPE_DESCRIPTION();
 
 private:
 

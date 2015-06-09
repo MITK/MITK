@@ -18,24 +18,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKWORKBENCHWINDOWADVISOR_H_
 
 #include <berryWorkbenchWindowAdvisor.h>
+#include <berryIDropTargetListener.h>
 
 
 class QmitkWorkbenchWindowAdvisor : public berry::WorkbenchWindowAdvisor
 {
 public:
 
-    QmitkWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer);
+    QmitkWorkbenchWindowAdvisor(berry::SmartPointer<berry::IWorkbenchWindowConfigurer> configurer);
 
-    berry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
-        berry::IActionBarConfigurer::Pointer configurer);
+    berry::SmartPointer<berry::ActionBarAdvisor> CreateActionBarAdvisor(
+        berry::SmartPointer<berry::IActionBarConfigurer> configurer) override;
 
-    void PostWindowCreate();
+    void PostWindowCreate() override;
 
-    void PreWindowOpen();
+    void PreWindowOpen() override;
 
 private:
 
-    berry::IDropTargetListener::Pointer dropTargetListener;
+    QScopedPointer<berry::IDropTargetListener> dropTargetListener;
 };
 
 #endif /*QMITKWORKBENCHWINDOWADVISOR_H_*/

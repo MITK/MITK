@@ -29,7 +29,7 @@ using namespace std;
 /**
  * \brief Lookuptable based trilinear interpolation of spherically arranged scalar values.
  */
-class MitkFiberTracking_EXPORT SphereInterpolator
+class MITKFIBERTRACKING_EXPORT SphereInterpolator
 {
 
 public:

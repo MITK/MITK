@@ -28,6 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QWidget;
 class QCheckBox;
 
+namespace mitk {
+struct IInputDeviceRegistry;
+}
+
 class QmitkInputDevicesPrefPage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
@@ -43,38 +47,38 @@ public:
   /**
   * @see berry::IPreferencePage::Init(berry::IWorkbench::Pointer workbench)
   */
-  void Init(berry::IWorkbench::Pointer workbench);
+  void Init(berry::IWorkbench::Pointer workbench) override;
 
   /**
   * @see berry::IPreferencePage::CreateQtControl(void* parent)
   */
-  void CreateQtControl(QWidget* widget);
+  void CreateQtControl(QWidget* widget) override;
 
   /**
   * @see berry::IPreferencePage::CreateQtControl()
   */
-  QWidget* GetQtControl() const;
+  QWidget* GetQtControl() const override;
 
   /**
   * @see berry::IPreferencePage::PerformOk()
   */
-  virtual bool PerformOk();
+  virtual bool PerformOk() override;
 
   /**
   * @see berry::IPreferencePage::PerformCancel()
   */
-  virtual void PerformCancel();
+  virtual void PerformCancel() override;
 
    /**
   * @see berry::IPreferencePage::Update()
   */
-  virtual void Update();
+  virtual void Update() override;
 
 protected:
 
   QWidget* m_MainControl;
 
-  QHash<QCheckBox*,std::string> m_InputDevices;
+  QHash<QCheckBox*,QString> m_InputDevices;
 
   // specific for Wiimote
   QGroupBox* m_WiiMoteModes;
@@ -82,6 +86,8 @@ protected:
   QRadioButton* m_WiiMoteSurfaceInteraction;
 
   berry::IPreferences::Pointer m_InputDevicesPrefNode;
+
+  mitk::IInputDeviceRegistry* GetInputDeviceRegistry() const;
 
 };
 

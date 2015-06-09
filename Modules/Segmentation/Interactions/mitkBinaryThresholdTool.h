@@ -40,7 +40,7 @@ namespace mitk
 
   Last contributor: $Author$
   */
-  class MitkSegmentation_EXPORT BinaryThresholdTool : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT BinaryThresholdTool : public AutoSegmentationTool
   {
   public:
 
@@ -51,12 +51,12 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    us::ModuleResource GetIconResource() const;
-    virtual const char* GetName() const;
+    virtual const char** GetXPM() const override;
+    us::ModuleResource GetIconResource() const override;
+    virtual const char* GetName() const override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     virtual void SetThresholdValue(double value);
     virtual void AcceptCurrentThresholdValue();

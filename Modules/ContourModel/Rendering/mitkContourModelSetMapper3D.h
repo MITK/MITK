@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-  class MitkContourModel_EXPORT ContourModelSetMapper3D : public VtkMapper
+  class MITKCONTOURMODEL_EXPORT ContourModelSetMapper3D : public VtkMapper
   {
       public:
     /** Standard class typedefs. */
@@ -53,16 +53,16 @@ namespace mitk {
 
     /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
-    virtual void Update(mitk::BaseRenderer * renderer);
+    virtual void Update(mitk::BaseRenderer * renderer) override;
 
 
         /*+++ methods of MITK-VTK rendering pipeline +++*/
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
 
     /*+++ END methods of MITK-VTK rendering pipeline +++*/
 
 
-    class MitkContourModel_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
+    class MITKCONTOURMODEL_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
 
@@ -97,7 +97,7 @@ namespace mitk {
     ContourModelSetMapper3D();
     virtual ~ContourModelSetMapper3D();
 
-    void GenerateDataForRenderer( mitk::BaseRenderer *renderer );
+    void GenerateDataForRenderer( mitk::BaseRenderer *renderer ) override;
 
     virtual vtkSmartPointer<vtkPolyData> CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour,mitk::BaseRenderer* renderer);
 

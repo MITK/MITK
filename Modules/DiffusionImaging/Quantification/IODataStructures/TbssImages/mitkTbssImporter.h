@@ -37,14 +37,14 @@ namespace mitk
   * This class converts the FSL Nifty image to NRRD and adds information about the type of measurement and the study groups.
   */
 
-  class MitkQuantification_EXPORT TbssImporter : public itk::Object {
+  class MITKQUANTIFICATION_EXPORT TbssImporter : public itk::Object {
 
   public:
 
     // type of the 3d vector image containing the skeletonized images
     typedef itk::VectorImage<float,3> DataImageType;
 
-    mitkClassMacro( TbssImporter, Object )
+    mitkClassMacroItkParent( TbssImporter, itk::Object )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

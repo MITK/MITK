@@ -1,11 +1,7 @@
 project(org_mitk_gui_qt_simulation)
 
-MACRO_CREATE_MITK_CTK_PLUGIN(
+mitk_create_plugin(
   EXPORT_DIRECTIVE SIMULATION_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkQtWidgets MitkSimulation
 )
-
-if(MSVC)
-  set_property(TARGET ${PLUGIN_TARGET} APPEND_STRING PROPERTY COMPILE_FLAGS " /wd4250 /wd4251 /wd4267 /wd4275")
-endif()

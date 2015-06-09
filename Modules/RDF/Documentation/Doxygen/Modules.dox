@@ -1,0 +1,8 @@
+/**
+  \defgroup MitkRDFModule MitkRDF
+  \ingroup MITKModules
+
+  \brief MITK RDF Library
+
+  This module provides classes to work with RDF concepts and data formats.
+*/

@@ -24,7 +24,7 @@ namespace mitk
 {
   class InteractionPositionEvent;
 
-  class MitkSimulation_EXPORT SimulationInteractor : public DataInteractor
+  class MITKSIMULATION_EXPORT SimulationInteractor : public DataInteractor
   {
   public:
     mitkClassMacro(SimulationInteractor, DataInteractor);
@@ -32,8 +32,8 @@ namespace mitk
     itkCloneMacro(Self);
 
   protected:
-    void ConnectActionsAndFunctions();
-    void DataNodeChanged();
+    void ConnectActionsAndFunctions() override;
+    void DataNodeChanged() override;
 
   private:
     SimulationInteractor();

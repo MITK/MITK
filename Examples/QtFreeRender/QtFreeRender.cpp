@@ -35,8 +35,6 @@
 #include "mitkDisplayInteractor.h"
 #include "mitkSlicesRotator.h"
 #include "mitkSlicesSwiveller.h"
-#include "mitkRenderWindowFrame.h"
-#include "mitkGradientBackground.h"
 #include "mitkCoordinateSupplier.h"
 #include "mitkDataStorage.h"
 #include "mitkIOUtil.h"
@@ -46,6 +44,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkAnnotatedCubeActor.h"
+#include "vtkMitkRectangleProp.h"
 #include "vtkOrientationMarkerWidget.h"
 #include "vtkProperty.h"
 
@@ -65,11 +64,10 @@ mitk::RenderWindow::Pointer mitkWidget4;
 
 mitk::DisplayInteractor::Pointer m_DisplayInteractor;
 mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
-mitk::GradientBackground::Pointer m_GradientBackground4;
-mitk::RenderWindowFrame::Pointer m_RectangleRendering1;
-mitk::RenderWindowFrame::Pointer m_RectangleRendering2;
-mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
-mitk::RenderWindowFrame::Pointer m_RectangleRendering4;
+vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering1;
+vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering2;
+vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering3;
+vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering4;
 
 mitk::SliceNavigationController* m_TimeNavigationController = NULL;
 
@@ -109,26 +107,25 @@ void InitializeWindows()
   m_LastLeftClickPositionSupplier = mitk::CoordinateSupplier::New("navigation", NULL);
   mitk::GlobalInteraction::GetInstance()->AddListener(m_LastLeftClickPositionSupplier);
 
-  m_GradientBackground4 = mitk::GradientBackground::New();
-  m_GradientBackground4->SetRenderWindow(mitkWidget4->GetVtkRenderWindow());
-  m_GradientBackground4->SetGradientColors(0.1, 0.1, 0.1, 0.5, 0.5, 0.5);
-  m_GradientBackground4->Enable();
+  mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.1,0.1,0.1);
+  mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.5,0.5,0.5);
+  mitkWidget4->GetRenderer()->GetVtkRenderer()->GradientBackgroundOn();
 
-  m_RectangleRendering1 = mitk::RenderWindowFrame::New();
-  m_RectangleRendering1->SetRenderWindow(mitkWidget1->GetVtkRenderWindow());
-  m_RectangleRendering1->Enable(1.0, 0.0, 0.0);
+  m_RectangleRendering1 = vtkSmartPointer<vtkMitkRectangleProp>::New();
+  m_RectangleRendering1->SetColor(1.0, 0.0, 0.0);
+  mitkWidget1->GetRenderer()->GetVtkRenderer()->AddViewProp(m_RectangleRendering1);
 
-  m_RectangleRendering2 = mitk::RenderWindowFrame::New();
-  m_RectangleRendering2->SetRenderWindow(mitkWidget2->GetVtkRenderWindow());
-  m_RectangleRendering2->Enable(0.0, 1.0, 0.0);
+  m_RectangleRendering2 = vtkSmartPointer<vtkMitkRectangleProp>::New();
+  m_RectangleRendering2->SetColor(0.0, 1.0, 0.0);
+  mitkWidget2->GetRenderer()->GetVtkRenderer()->AddViewProp(m_RectangleRendering2);
 
-  m_RectangleRendering3 = mitk::RenderWindowFrame::New();
-  m_RectangleRendering3->SetRenderWindow(mitkWidget3->GetVtkRenderWindow());
-  m_RectangleRendering3->Enable(0.0, 0.0, 1.0);
+  m_RectangleRendering3 = vtkSmartPointer<vtkMitkRectangleProp>::New();
+  m_RectangleRendering3->SetColor(0.0, 0.0, 1.0);
+  mitkWidget3->GetRenderer()->GetVtkRenderer()->AddViewProp(m_RectangleRendering3);
 
-  m_RectangleRendering4 = mitk::RenderWindowFrame::New();
-  m_RectangleRendering4->SetRenderWindow(mitkWidget4->GetVtkRenderWindow());
-  m_RectangleRendering4->Enable(1.0, 1.0, 0.0);
+  m_RectangleRendering4 = vtkSmartPointer<vtkMitkRectangleProp>::New();
+  m_RectangleRendering4->SetColor(1.0, 1.0, 0.0);
+  mitkWidget4->GetRenderer()->GetVtkRenderer()->AddViewProp(m_RectangleRendering4);
 
 }
 
@@ -191,12 +188,6 @@ void AddDisplayPlaneSubTree()
       m_DataStorage->Add(m_PlaneNode1, m_Node);
       m_DataStorage->Add(m_PlaneNode2, m_Node);
       m_DataStorage->Add(m_PlaneNode3, m_Node);
-      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode1->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
-          m_DataStorage, m_Node);
-      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode2->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
-          m_DataStorage, m_Node);
-      static_cast<mitk::PlaneGeometryDataMapper2D*>(m_PlaneNode3->GetMapper(mitk::BaseRenderer::Standard2D))->SetDatastorageAndGeometryBaseNode(
-          m_DataStorage, m_Node);
     }
   }
 }

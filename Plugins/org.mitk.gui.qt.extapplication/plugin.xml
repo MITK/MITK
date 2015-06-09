@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-  <extension point="org.blueberry.osgi.applications">
-    <application id="org.mitk.qt.extapplication">
+  <extension id="org.mitk.qt.extapplication" point="org.blueberry.osgi.applications">
+    <application>
       <run class="QmitkExtApplication"/>
     </application>
   </extension>
-  
+
+  <extension id="workbench" point="org.blueberry.core.runtime.products">
+    <product name="MITK Workbench" application="org.mitk.qt.extapplication" />
+  </extension>
+
   <extension point="org.blueberry.ui.intro">
     <intro id="org.mitk.qt.extapplicationintro"
       class="QmitkMitkWorkbenchIntroPart"
       role="editor"/>
     <introProductBinding
-      productId=""
+      productId="org.mitk.gui.qt.extapplication.workbench"
       introId="org.mitk.qt.extapplicationintro"/>
   </extension>
-  
+
   <extension point="org.blueberry.ui.perspectives">
     <perspective
       id="org.mitk.extapp.defaultperspective"
@@ -23,17 +27,34 @@
       class="QmitkExtDefaultPerspective"
       icon="resources/icon_research.xpm">
     </perspective>
-    <perspective 
+    <perspective
       id="org.mitk.mitkworkbench.perspectives.editor"
       name="Viewer"
       class="QmitkEditorPerspective"
       icon="resources/icon.png">
     </perspective>
-    <perspective 
+    <perspective
       id="org.mitk.mitkworkbench.perspectives.visualization"
       name="Visualization"
       class="QmitkVisualizationPerspective"
       icon="resources/perspectives/eye.png">
     </perspective>
   </extension>
+
+   <extension point="org.blueberry.ui.preferencePages">
+     <page
+       id="org.blueberry.ui.preferencePages.Style"
+       name="Themes"
+       category="org.mitk.GeneralPreferencePage"
+       class="berry::ExtensionFactory:stylePreferencePage">
+       <keywordreference id="org.blueberry.ui.style"/>
+     </page>
+     <page
+       id="org.blueberry.ui.preferencePages.Perspectives"
+       name="Perspectives"
+       category="org.mitk.GeneralPreferencePage"
+       class="berry::ExtensionFactory:perspectivesPreferencePage">
+       <keywordReference id="org.blueberry.ui.perspectives"/>
+     </page>
+   </extension>
 </plugin>

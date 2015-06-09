@@ -16,14 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkTractsToDWIImageFilter_h__
 #define __itkTractsToDWIImageFilter_h__
 
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 #include <itkVnlForwardFFTImageFilter.h>
 #include <itkVectorImage.h>
 #include <cmath>
 #include <mitkFiberfoxParameters.h>
 #include <itkTimeProbe.h>
 #include <mitkRawShModel.h>
-#include <mitkDiffusionImage.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 
 namespace itk
@@ -48,7 +47,7 @@ public:
     typedef typename Superclass::OutputImageType                        OutputImageType;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
-    typedef mitk::FiberBundleX::Pointer                                 FiberBundleType;
+    typedef mitk::FiberBundle::Pointer                                 FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
     typedef itk::Image< double, 2 >                                     SliceType;

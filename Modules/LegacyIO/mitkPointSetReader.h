@@ -40,12 +40,12 @@ namespace mitk
  * The reader is able to read the old 3D Pointsets without the "specification" and "timeseries" tags and the new 4D Pointsets.
  * @note loading point sets from multiple files according to a given file pattern
  * is not yet supported!
- * @ingroup PSIO
- * @ingroup IO
+ *
+ * @ingroup MitkLegacyIOModule
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
 */
-class MitkLegacyIO_EXPORT PointSetReader: public PointSetSource, public FileReader
+class MITKLEGACYIO_EXPORT PointSetReader: public PointSetSource, public FileReader
 {
 public:
 
@@ -108,7 +108,7 @@ protected:
     /**
      * Actually reads the point sets from the given file
      */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     virtual mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet,
       TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);
@@ -116,7 +116,7 @@ protected:
     /**
      * Does nothing in the current implementation
      */
-    virtual void GenerateOutputInformation();
+    virtual void GenerateOutputInformation() override;
 
     /**
      * Resizes the output-objects according to the given number.

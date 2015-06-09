@@ -1,0 +1,24 @@
+####
+# Template of input files for Monte Carlo simulation (mcml).
+# Anything in a line after "#" is ignored as comments.
+# Space lines are also ignored.
+# Lengths are in cm, mua and mus are in 1/cm.
+####
+
+1.0         # file version
+1           # number of runs
+
+### Specify data for run 1
+outputFilename  A     # output filename, ASCII/Binary
+c_ph                  # No. of photons
+0.01  0.01            # dz, dr
+150 100 30            # No. of dz, dr & da.
+
+4                     # No. of layers
+# n mua mus g d       # One line for each layer
+1.0                   # n for medium above.
+1.0 0 0 1 0.01        # layer 0: air
+1.38  muc_c_ua  muc_c_us  muc_c_g muc_c_d   # layer 1: mucosa
+1.36  sm_c_ua   sm_c_us   sm_c_g  0.05      # layer 2: submucosa
+1.36  mus_c_ua  mus_c_us  0.96    0.09      # layer 3: muscle layer
+1.0                                         # n for medium below.

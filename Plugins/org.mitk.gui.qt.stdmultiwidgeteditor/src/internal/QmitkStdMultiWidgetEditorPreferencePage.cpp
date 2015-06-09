@@ -14,228 +14,244 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkStdMultiWidgetEditorPreferencePage.h"
-#include "QmitkStdMultiWidgetEditor.h"
 
-#include <QLabel>
-#include <QPushButton>
-#include <QFormLayout>
-#include <QCheckBox>
-#include <QColorDialog>
-#include <QComboBox>
+#include <ui_QmitkStdMultiWidgetEditorPreferencePage.h>
+#include "QmitkStdMultiWidgetEditorPreferencePage.h"
+#include <QmitkStdMultiWidgetEditor.h>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
+#include <QColorDialog>
+
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
-: m_MainControl(0)
+  : m_Preferences(nullptr),
+    m_Ui(new Ui::QmitkStdMultiWidgetEditorPreferencePage),
+    m_Control(nullptr)
 {
 }
 
-void QmitkStdMultiWidgetEditorPreferencePage::Init(berry::IWorkbench::Pointer )
+QmitkStdMultiWidgetEditorPreferencePage::~QmitkStdMultiWidgetEditorPreferencePage()
 {
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  m_Control = new QWidget(parent);
 
-  m_StdMultiWidgetEditorPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkStdMultiWidgetEditor::EDITOR_ID);
+  m_Ui->setupUi(m_Control);
 
-  m_MainControl = new QWidget(parent);
-  m_EnableFlexibleZooming = new QCheckBox;
-  m_ShowLevelWindowWidget = new QCheckBox;
-  m_PACSLikeMouseMode = new QCheckBox;
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  Q_ASSERT(prefService);
 
-  QFormLayout *formLayout = new QFormLayout;
-  formLayout->addRow("&Use constrained zooming and padding", m_EnableFlexibleZooming);
-  formLayout->addRow("&Show level/window widget", m_ShowLevelWindowWidget);
-  formLayout->addRow("&PACS like mouse interactions (select left mouse button action)", m_PACSLikeMouseMode);
+  m_Preferences = prefService->GetSystemPreferences()->Node(QmitkStdMultiWidgetEditor::EDITOR_ID);
 
-  // gradient background
-  QLabel* gBName = new QLabel;
-  gBName->setText("Gradient background");
-  formLayout->addRow(gBName);
+  QObject::connect( m_Ui->m_ColorButton1, SIGNAL( clicked() )
+                    , this, SLOT( ColorChooserButtonClicked() ) );
 
-  // color
-  m_ColorButton1 = new QPushButton;
-  m_ColorButton1->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
-  m_ColorButton2 = new QPushButton;
-  m_ColorButton2->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
-  QPushButton* resetButton = new QPushButton;
-  resetButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
-  resetButton->setText("Reset");
+  QObject::connect( m_Ui->m_ColorButton2, SIGNAL( clicked() )
+                    , this, SLOT( ColorChooserButtonClicked() ) );
 
-  QLabel* colorLabel1 = new QLabel("first color : ");
-  colorLabel1->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-  QLabel* colorLabel2 = new QLabel("second color: ");
-  colorLabel2->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+  QObject::connect( m_Ui->m_ResetButton, SIGNAL( clicked() )
+                    , this, SLOT( ResetPreferencesAndGUI() ) );
 
-  QHBoxLayout* colorWidgetLayout = new QHBoxLayout;
-  colorWidgetLayout->setContentsMargins(4,4,4,4);
-  colorWidgetLayout->addWidget(colorLabel1);
-  colorWidgetLayout->addWidget(m_ColorButton1);
-  colorWidgetLayout->addWidget(colorLabel2);
-  colorWidgetLayout->addWidget(m_ColorButton2);
-  colorWidgetLayout->addWidget(resetButton);
+  QObject::connect( m_Ui->m_RenderingMode, SIGNAL(activated(int) )
+                    , this, SLOT( ChangeRenderingMode(int) ) );
 
-  QWidget* colorWidget = new QWidget;
-  colorWidget->setLayout(colorWidgetLayout);
+  QObject::connect( m_Ui->m_RenderWindowDecorationColor, SIGNAL( clicked() )
+                    , this, SLOT( ColorChooserButtonClicked() ) );
 
-  QLabel* renderLabel = new QLabel;
-  renderLabel->setText("Rendering Mode* ");
-
-  m_RenderingMode = new QComboBox;
-  m_RenderingMode->addItem("Standard Rendering");
-  m_RenderingMode->addItem("Enable Multisampling (Antialiasing)" );
-  m_RenderingMode->addItem("Enable Depth Peeling" );
-
-  QLabel* cBHint = new QLabel;
-  cBHint->setText("* Changes require restart of MITK. \n Depth Peeling is only supported by Windows. \n For other OS, use Standard Rendering and enable \n the property 'Depth Sorting' in the property list of the surface data node.");
-
-  QSpacerItem *spacer1 = new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
-
-  QHBoxLayout* renderingWidgetLayout = new QHBoxLayout;
-  renderingWidgetLayout->setContentsMargins(4,4,4,4);
-  renderingWidgetLayout->addWidget(renderLabel);
-  renderingWidgetLayout->addWidget(m_RenderingMode);
-  renderingWidgetLayout->addWidget(cBHint);
-  renderingWidgetLayout->addSpacerItem(spacer1);
-
-  QWidget* renderingWidget = new QWidget;
-  renderingWidget->setLayout(renderingWidgetLayout);
-
-  //spacer
-  QSpacerItem *spacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  QVBoxLayout* vBoxLayout = new QVBoxLayout;
-  vBoxLayout->addLayout(formLayout);
-  vBoxLayout->addWidget(colorWidget);
-  vBoxLayout->addWidget(renderingWidget);
-  vBoxLayout->addSpacerItem(spacer);
-
-  m_MainControl->setLayout(vBoxLayout);
-
-  QObject::connect( m_ColorButton1, SIGNAL( clicked() )
-    , this, SLOT( FirstColorChanged() ) );
-
-  QObject::connect( m_ColorButton2, SIGNAL( clicked() )
-    , this, SLOT( SecondColorChanged() ) );
-
-  QObject::connect( resetButton, SIGNAL( clicked() )
-    , this, SLOT( ResetColors() ) );
-
-  QObject::connect( m_RenderingMode, SIGNAL(activated(int) )
-    , this, SLOT( ChangeRenderingMode(int) ) );
+  QObject::connect( m_Ui->m_RenderWindowChooser, SIGNAL(activated(int) )
+                    , this, SLOT( OnWidgetComboBoxChanged(int) ) );
+  QObject::connect( m_Ui->m_RenderWindowDecorationText, SIGNAL(textChanged(QString) )
+                    , this, SLOT( AnnotationTextChanged(QString) ) );
 
   this->Update();
 }
 
 QWidget* QmitkStdMultiWidgetEditorPreferencePage::GetQtControl() const
 {
-  return m_MainControl;
+  return m_Control;
 }
 
-bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
+void QmitkStdMultiWidgetEditorPreferencePage::Init(berry::IWorkbench::Pointer)
 {
-  m_StdMultiWidgetEditorPreferencesNode->Put("first background color style sheet", m_FirstColorStyleSheet.toStdString());
-  m_StdMultiWidgetEditorPreferencesNode->Put("second background color style sheet", m_SecondColorStyleSheet.toStdString());
-  m_StdMultiWidgetEditorPreferencesNode->PutByteArray("first background color", m_FirstColor);
-  m_StdMultiWidgetEditorPreferencesNode->PutByteArray("second background color", m_SecondColor);
-  m_StdMultiWidgetEditorPreferencesNode->PutBool("Use constrained zooming and padding"
-                                        , m_EnableFlexibleZooming->isChecked());
-  m_StdMultiWidgetEditorPreferencesNode->PutBool("Show level/window widget", m_ShowLevelWindowWidget->isChecked());
-  m_StdMultiWidgetEditorPreferencesNode->PutBool("PACS like mouse interaction", m_PACSLikeMouseMode->isChecked());
-  m_StdMultiWidgetEditorPreferencesNode->PutInt("Rendering Mode", m_RenderingMode->currentIndex());
-
-  return true;
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::PerformCancel()
 {
 }
 
-void QmitkStdMultiWidgetEditorPreferencePage::Update()
+bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
 {
-  m_EnableFlexibleZooming->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Use constrained zooming and padding", true));
-  m_ShowLevelWindowWidget->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("Show level/window widget", true));
-  m_PACSLikeMouseMode->setChecked(m_StdMultiWidgetEditorPreferencesNode->GetBool("PACS like mouse interaction", false));
-  m_FirstColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("first background color style sheet", ""));
-  m_SecondColorStyleSheet = QString::fromStdString(m_StdMultiWidgetEditorPreferencesNode->Get("second background color style sheet", ""));
-  m_FirstColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("first background color", "");
-  m_SecondColor = m_StdMultiWidgetEditorPreferencesNode->GetByteArray("second background color", "");
-  int index=m_StdMultiWidgetEditorPreferencesNode->GetInt("Rendering Mode",0);
-  m_RenderingMode->setCurrentIndex(index);
+  m_Preferences->Put("widget1 corner annotation", m_WidgetAnnotation[0]);
+  m_Preferences->Put("widget2 corner annotation", m_WidgetAnnotation[1]);
+  m_Preferences->Put("widget3 corner annotation", m_WidgetAnnotation[2]);
+  m_Preferences->Put("widget4 corner annotation", m_WidgetAnnotation[3]);
 
-  if (m_FirstColorStyleSheet=="")
-  {
-    m_FirstColorStyleSheet = "background-color:rgb(25,25,25)";
-  }
-  if (m_SecondColorStyleSheet=="")
-  {
-    m_SecondColorStyleSheet = "background-color:rgb(127,127,127)";
-  }
-  if (m_FirstColor=="")
-  {
-    m_FirstColor = "#191919";
-  }
-  if (m_SecondColor=="")
-  {
-    m_SecondColor = "#7F7F7F";
-  }
-  m_ColorButton1->setStyleSheet(m_FirstColorStyleSheet);
-  m_ColorButton2->setStyleSheet(m_SecondColorStyleSheet);
+  m_Preferences->Put("widget1 decoration color", m_WidgetDecorationColor[0]);
+  m_Preferences->Put("widget2 decoration color", m_WidgetDecorationColor[1]);
+  m_Preferences->Put("widget3 decoration color", m_WidgetDecorationColor[2]);
+  m_Preferences->Put("widget4 decoration color", m_WidgetDecorationColor[3]);
+
+  m_Preferences->Put("widget1 first background color", m_WidgetBackgroundColor1[0]);
+  m_Preferences->Put("widget2 first background color", m_WidgetBackgroundColor1[1]);
+  m_Preferences->Put("widget3 first background color", m_WidgetBackgroundColor1[2]);
+  m_Preferences->Put("widget4 first background color", m_WidgetBackgroundColor1[3]);
+  m_Preferences->Put("widget1 second background color", m_WidgetBackgroundColor2[0]);
+  m_Preferences->Put("widget2 second background color", m_WidgetBackgroundColor2[1]);
+  m_Preferences->Put("widget3 second background color", m_WidgetBackgroundColor2[2]);
+  m_Preferences->Put("widget4 second background color", m_WidgetBackgroundColor2[3]);
+  m_Preferences->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
+
+  m_Preferences->PutBool("Use constrained zooming and padding"
+                         , m_Ui->m_EnableFlexibleZooming->isChecked());
+  m_Preferences->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
+  m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
+  m_Preferences->PutInt("Rendering Mode", m_Ui->m_RenderingMode->currentIndex());
+
+  return true;
 }
 
-void QmitkStdMultiWidgetEditorPreferencePage::FirstColorChanged()
+void QmitkStdMultiWidgetEditorPreferencePage::Update()
 {
-  QColor color = QColorDialog::getColor();
-  m_ColorButton1->setAutoFillBackground(true);
+  //Note: there should be default preferences already defined in the
+  //QmitkStdMultiWidgetEditor::InitializePreferences(). Therefore,
+  //all default values here are not relevant.
+  //gradient background colors
+  m_WidgetBackgroundColor1[0] = m_Preferences->Get("widget1 first background color", "#000000");
+  m_WidgetBackgroundColor2[0] = m_Preferences->Get("widget1 second background color", "#000000");
+  m_WidgetBackgroundColor1[1] = m_Preferences->Get("widget2 first background color", "#000000");
+  m_WidgetBackgroundColor2[1] = m_Preferences->Get("widget2 second background color", "#000000");
+  m_WidgetBackgroundColor1[2] = m_Preferences->Get("widget3 first background color", "#000000");
+  m_WidgetBackgroundColor2[2] = m_Preferences->Get("widget3 second background color", "#000000");
+  m_WidgetBackgroundColor1[3] = m_Preferences->Get("widget4 first background color", "#191919");
+  m_WidgetBackgroundColor2[3] = m_Preferences->Get("widget4 second background color", "#7F7F7F");
+
+  //decoration colors
+  m_WidgetDecorationColor[0] = m_Preferences->Get("widget1 decoration color", "#FF0000");
+  m_WidgetDecorationColor[1] = m_Preferences->Get("widget2 decoration color", "#00FF00");
+  m_WidgetDecorationColor[2] = m_Preferences->Get("widget3 decoration color", "#0000FF");
+  m_WidgetDecorationColor[3] = m_Preferences->Get("widget4 decoration color", "#FFFF00");
+
+  //annotation text
+  m_WidgetAnnotation[0] = m_Preferences->Get("widget1 corner annotation", "Axial");
+  m_WidgetAnnotation[1] = m_Preferences->Get("widget2 corner annotation", "Sagittal");
+  m_WidgetAnnotation[2] = m_Preferences->Get("widget3 corner annotation", "Coronal");
+  m_WidgetAnnotation[3] = m_Preferences->Get("widget4 corner annotation", "3D");
+
+
+  //Ui stuff
+  int index = m_Ui->m_RenderWindowChooser->currentIndex();
+  QColor firstBackgroundColor(m_WidgetBackgroundColor1[index]);
+  QColor secondBackgroundColor(m_WidgetBackgroundColor2[index]);
+  QColor widgetColor(m_WidgetDecorationColor[index]);
+
+  this->SetStyleSheetToColorChooserButton(firstBackgroundColor, m_Ui->m_ColorButton1);
+  this->SetStyleSheetToColorChooserButton(secondBackgroundColor, m_Ui->m_ColorButton2);
+  this->SetStyleSheetToColorChooserButton(widgetColor, m_Ui->m_RenderWindowDecorationColor);
+
+  m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[index]);
+
+  m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and padding", true));
+  m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
+  m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
+  int mode= m_Preferences->GetInt("Rendering Mode",0);
+  m_Ui->m_RenderingMode->setCurrentIndex(mode);
+  m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
+}
+
+void QmitkStdMultiWidgetEditorPreferencePage::ColorChooserButtonClicked()
+{
+  unsigned int widgetIndex = m_Ui->m_RenderWindowChooser->currentIndex();
+  if(widgetIndex > 3)
+  {
+    MITK_ERROR << "Selected index for unknown.";
+    return;
+  }
+  QObject *senderObj = sender(); // This will give Sender button
+  //find out last used color and set it
+  QColor initialColor;
+  if( senderObj->objectName() == m_Ui->m_ColorButton1->objectName())
+  {
+    initialColor = QColor(m_WidgetBackgroundColor1[widgetIndex]);
+  }else if( senderObj->objectName() == m_Ui->m_ColorButton2->objectName())
+  {
+    initialColor = QColor(m_WidgetBackgroundColor2[widgetIndex]);
+  }else if( senderObj->objectName() == m_Ui->m_RenderWindowDecorationColor->objectName())
+  {
+    initialColor = QColor(m_WidgetDecorationColor[widgetIndex]);
+  }
+
+  //get the new color
+  QColor newcolor = QColorDialog::getColor(initialColor);
+  if(!newcolor.isValid())
+  {
+    newcolor = initialColor;
+  }
+  this->SetStyleSheetToColorChooserButton(newcolor, static_cast<QPushButton*>(senderObj));
+
+  //convert it to std string and apply it
+  if( senderObj->objectName() == m_Ui->m_ColorButton1->objectName())
+  {
+    m_WidgetBackgroundColor1[widgetIndex] = newcolor.name();
+  }
+  else if( senderObj->objectName() == m_Ui->m_ColorButton2->objectName())
+  {
+    m_WidgetBackgroundColor2[widgetIndex] = newcolor.name();
+  }
+  else if( senderObj->objectName() == m_Ui->m_RenderWindowDecorationColor->objectName())
+  {
+    m_WidgetDecorationColor[widgetIndex] = newcolor.name();
+  }
+}
+
+void QmitkStdMultiWidgetEditorPreferencePage::SetStyleSheetToColorChooserButton(QColor backgroundcolor,
+                                                                                QPushButton* button)
+{
+  button->setAutoFillBackground(true);
   QString styleSheet = "background-color:rgb(";
 
-  styleSheet.append(QString::number(color.red()));
+  styleSheet.append(QString::number(backgroundcolor.red()));
   styleSheet.append(",");
-  styleSheet.append(QString::number(color.green()));
+  styleSheet.append(QString::number(backgroundcolor.green()));
   styleSheet.append(",");
-  styleSheet.append(QString::number(color.blue()));
+  styleSheet.append(QString::number(backgroundcolor.blue()));
   styleSheet.append(")");
-  m_ColorButton1->setStyleSheet(styleSheet);
+  button->setStyleSheet(styleSheet);
+}
 
-  m_FirstColorStyleSheet = styleSheet;
-  QStringList firstColor;
-  firstColor << color.name();
-  m_FirstColor = firstColor.replaceInStrings(";","\\;").join(";").toStdString();
- }
-
-void QmitkStdMultiWidgetEditorPreferencePage::SecondColorChanged()
+void QmitkStdMultiWidgetEditorPreferencePage::AnnotationTextChanged(QString text)
 {
-  QColor color = QColorDialog::getColor();
-  m_ColorButton2->setAutoFillBackground(true);
-  QString styleSheet = "background-color:rgb(";
+  unsigned int widgetIndex = m_Ui->m_RenderWindowChooser->currentIndex();
+  if( widgetIndex > 3)
+  {
+    MITK_INFO << "Selected index for unknown widget.";
+    return;
+  }
+  m_WidgetAnnotation[widgetIndex] = text;
+}
 
-  styleSheet.append(QString::number(color.red()));
-  styleSheet.append(",");
-  styleSheet.append(QString::number(color.green()));
-  styleSheet.append(",");
-  styleSheet.append(QString::number(color.blue()));
-  styleSheet.append(")");
-  m_ColorButton2->setStyleSheet(styleSheet);
-
-  m_SecondColorStyleSheet = styleSheet;
-  QStringList secondColor;
-  secondColor << color.name();
-  m_SecondColor = secondColor.replaceInStrings(";","\\;").join(";").toStdString();
- }
-
-void QmitkStdMultiWidgetEditorPreferencePage::ResetColors()
+void QmitkStdMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
-  m_FirstColorStyleSheet = "background-color:rgb(25,25,25)";
-  m_SecondColorStyleSheet = "background-color:rgb(127,127,127)";
-  m_FirstColor = "#191919";
-  m_SecondColor = "#7F7F7F";
-  m_ColorButton1->setStyleSheet(m_FirstColorStyleSheet);
-  m_ColorButton2->setStyleSheet(m_SecondColorStyleSheet);
+  m_Preferences->Clear();
+  this->Update();
+}
+
+void QmitkStdMultiWidgetEditorPreferencePage::OnWidgetComboBoxChanged(int i)
+{
+  if( i > 3)
+  {
+    MITK_ERROR << "Selected unknown widget.";
+    return;
+  }
+  QColor widgetColor(m_WidgetDecorationColor[i]);
+  QColor gradientBackground1(m_WidgetBackgroundColor1[i]);
+  QColor gradientBackground2(m_WidgetBackgroundColor2[i]);
+  this->SetStyleSheetToColorChooserButton(widgetColor, m_Ui->m_RenderWindowDecorationColor);
+  this->SetStyleSheetToColorChooserButton(gradientBackground1, m_Ui->m_ColorButton1);
+  this->SetStyleSheetToColorChooserButton(gradientBackground2, m_Ui->m_ColorButton2);
+  m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[i]);
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
@@ -246,18 +262,10 @@ void QmitkStdMultiWidgetEditorPreferencePage::ChangeRenderingMode(int i)
   }
   else if( i == 1 )
   {
-   m_CurrentRenderingMode = "Multisampling";
+    m_CurrentRenderingMode = "Multisampling";
   }
   else if( i == 2 )
   {
     m_CurrentRenderingMode = "DepthPeeling";
   }
-}
-
-void QmitkStdMultiWidgetEditorPreferencePage::UseGradientBackgroundSelected()
-{
-}
-
-void QmitkStdMultiWidgetEditorPreferencePage::ColorActionChanged()
-{
 }

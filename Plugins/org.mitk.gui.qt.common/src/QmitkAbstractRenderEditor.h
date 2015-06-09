@@ -66,6 +66,8 @@ class MITK_QT_COMMON QmitkAbstractRenderEditor : public berry::QtEditorPart,
 
 public:
 
+  berryObjectMacro(QmitkAbstractRenderEditor, QtEditorPart, mitk::IRenderWindowPart)
+
   QmitkAbstractRenderEditor();
   ~QmitkAbstractRenderEditor();
 
@@ -76,7 +78,7 @@ protected:
    *
    * \see berry::IEditorPart::Init
    */
-  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
+  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input) override;
 
   /**
    * Get a reference to the DataStorage set by the editor input.
@@ -99,7 +101,7 @@ protected:
    *
    * \see mitk::IRenderWindowPart::GetRenderingManager
    */
-  mitk::IRenderingManager* GetRenderingManager() const;
+  mitk::IRenderingManager* GetRenderingManager() const override;
 
   /**
    * Request an update of this editor's render windows.
@@ -110,7 +112,7 @@ protected:
    *
    * \see mitk::IRenderWindowPart::RequestUpdate
    */
-  void RequestUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL);
+  void RequestUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL) override;
 
   /**
    * Force an immediate update of this editor's render windows.
@@ -121,7 +123,7 @@ protected:
    *
    * \see mitk::IRenderWindowPart::ForceImmediateUpdate
    */
-  void ForceImmediateUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL);
+  void ForceImmediateUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL) override;
 
   /**
    * Get the time navigation controller for this editor.
@@ -130,19 +132,19 @@ protected:
    *
    * \see mitk::IRenderingManager::GetTimeNavigationController
    */
-  mitk::SliceNavigationController* GetTimeNavigationController() const;
+  mitk::SliceNavigationController* GetTimeNavigationController() const override;
 
   /** \see berry::IEditorPart::DoSave */
-  void DoSave();
+  void DoSave() override;
 
   /** \see berry::IEditorPart::DoSaveAs */
-  void DoSaveAs();
+  void DoSaveAs() override;
 
   /** \see berry::IEditorPart::IsDirty */
-  bool IsDirty() const;
+  bool IsDirty() const override;
 
   /** \see berry::IEditorPart::IsSaveAsAllowed */
-  bool IsSaveAsAllowed() const;
+  bool IsSaveAsAllowed() const override;
 
 private:
 

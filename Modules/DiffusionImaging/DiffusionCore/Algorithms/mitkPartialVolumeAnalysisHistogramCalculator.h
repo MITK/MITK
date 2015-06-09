@@ -54,7 +54,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-  class MitkDiffusionCore_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
+  class MITKDIFFUSIONCORE_EXPORT PartialVolumeAnalysisHistogramCalculator : public itk::Object
   {
   public:
 
@@ -102,7 +102,7 @@ namespace mitk
 
     typedef itk::Image< float, 2 > InternalImage2DType;
 
-    mitkClassMacro( PartialVolumeAnalysisHistogramCalculator, itk::Object )
+    mitkClassMacroItkParent( PartialVolumeAnalysisHistogramCalculator, itk::Object )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -220,7 +220,7 @@ namespace mitk
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

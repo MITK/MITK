@@ -1,0 +1,43 @@
+/**
+\defgroup Geometry Geometry Classes
+\ingroup Core
+
+\brief This subcategory includes the geometry classes, which describe the geometry of the
+data in space and time.
+
+The Geometry3D class holds (see figure)
+\li a bounding box which is axes-parallel in intrinsic coordinates (often integer indices of pixels), to be accessed by Geometry3D::GetBoundingBox()
+\li a transform to convert intrinsic coordinates into a world-coordinate system with coordinates in millimeters and milliseconds (floating point values), to be accessed by Geometry3D::GetIndexToWorldTransform()
+\li a life span, i.e. a bounding box in time in ms (with start and end time), to be accessed by Geometry3D::GetTimeBounds(). The default is minus infinity to plus infinity.
+
+\imageMacro{ModuleGeometryFig1.png,"Geometry: Bounding box and transform",14.82}
+
+Geometry3D and its sub-classes allow converting between intrinsic coordinates (called index or unit coordinates) and word-coordinates (called world or mm coordinates), e.g. Geometry3D::WorldToIndex.
+
+Every data object (sub-)class of BaseData has a TimeGeometry which is accessed by BaseData::GetTimeGeometry(). This TimeGeometry holds one or more Geometry3D objects which describes the object at specific time points, e.g. provides conversion between world and index coordinates and contains bounding boxes covering the area in which the data are placed. There is the possibility of using different implementations of the abstract TimeGeometry class which may differ in how the time steps are saved and the times are calculated.
+
+There are two ways to represent a time, either by a TimePointType or a TimeStepType. The first is similar to the continous index coordinates and defines a Time Point in milliseconds from timepoint zero. The second type is similar to index coordinates. These are discrete values which specify the number of the current time step going from 0 to GetNumberOfTimeSteps(). The conversion between a time point and a time step is done by calling the method TimeGeometry::TimeStepToTimePoint() or TimeGeometry::TimePointToTimeStep(). Note that the duration of a time step may differ from object to object, so in general it is better to calculate the corresponding time steps by using time points. Also the distance of the time steps does not need to be equidistant over time, it depends on the used TimeGeometry implementation. 
+
+Each TimeGeometry has a bounding box covering the whole area in which the corresponding object is situated during all time steps. This bounding box may be accessed by calling TimeGeometry::GetBoundingBoxInWorld() and is always in world coordinates. The bounding box is calculated from all time steps, to manually start this calculation process call TimeGeometry::Update().  The bounding box is not updated if the getter is called. 
+
+The TimeGeometry does not provide a transformation of world coordinates into image coordinates since each time step may has a different transformation. If a conversion between image and world is needed, the Geometry3D for a specific time step or time point must be fetched either by TimeGeometry::GetGeometryForTimeStep() or TimeGeometry::GetGeometryForTimePoint() and then the conversion is calculated by using this geometry. 
+
+The TimeGeometry class is an abstract class therefore it is not possible to instantiate it. instead a derived class must be used. Currently the only class that can be chosen is ProportionalTimeGeometry() which assumes that the time steps are ordered equidistant. To initialize an object with given geometries call ProportionalTimeGeometry::Initialize() with an existing Geometry3D and the number of time steps. The given geometries will be copied and not referenced!
+
+For each time step of a given object a geometry-object needs to be specified. This are Geometry3D objects of objects of classes which are derived from Geometry3D. For example, images uses the sub-class SlicedGeometry, which contains several Geometry2D objects.
+
+Geometry instances referring to images need a slightly different definition of corners, see Geometry3D::SetImageGeometry. This is usualy automatically called by Image.
+
+The class SlicedGeometry3D contains a list of Geometry2D objects describing the slices in the data object. It has spatial steps from 0 to GetSlices(). SlicedGeometry3D::InitializeEvenlySpaced (Geometry2D *geometry2D, unsigned int slices) initializes a stack of slices with the same thickness, one starting at the position where the previous one ends.
+
+Geometry2D provides methods for working with 2D manifolds (i.e., simply spoken, an object that can be described using a 2D coordinate-system) in 3D space. For example it allows mapping a 3D point on the 2D manifold using Geometry2D::Map. The most important sub-class is PlaneGeometry2D, which describes a planar rectangle.
+
+\section ExampleForImage Putting it together for Image
+
+Image has a TimeGeometry, which contains one or more SlicedGeometry3D instances (one for each time step), all of which contain one or more instances of (sub-classes of) Geometry2D (usually PlaneGeometry2D).
+
+\deprecated For ITK rev. 3.8 and earlier: Converting coordinates from the ITK physical coordinate system (which did not support rotated images for ITK v3.8 and earlier) to the MITK world coordinate system should be performed via the Geometry3D of the Image, see Geometry3D::WorldToItkPhysicalPoint.
+
+As a reminder: Geometry instances referring to images need a slightly different definition of corners, see Geometry3D::SetImageGeometry. This is usualy automatically called by Image.
+*/
+

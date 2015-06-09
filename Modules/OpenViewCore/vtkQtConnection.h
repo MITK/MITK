@@ -44,7 +44,7 @@ class vtkEventQtSlotConnect;
 // class for managing a single VTK/Qt connection
 // not to be included in other projects
 // only here for moc to process for vtkEventQtSlotConnect
-class MitkOpenViewCore_EXPORT vtkQtConnection : public QObject
+class MITKOPENVIEWCORE_EXPORT vtkQtConnection : public QObject
 {
   Q_OBJECT
 

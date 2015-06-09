@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, LiveWireTool2D, "LiveWire tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, LiveWireTool2D, "LiveWire tool");
 }
 
 static void AddInteractorToGlobalInteraction(mitk::Interactor* interactor)
@@ -239,11 +239,31 @@ void mitk::LiveWireTool2D::ClearSegmentation()
   this->ResetToStartState();
 }
 
+bool mitk::LiveWireTool2D::IsPositionEventInsideImageRegion(mitk::InteractionPositionEvent* positionEvent, mitk::BaseData *data)
+{
+  bool IsPositionEventInsideImageRegion =
+      data != nullptr &&
+      data->GetGeometry()->IsInside(positionEvent->GetPositionInWorld());
+  if(!IsPositionEventInsideImageRegion)
+  {
+    MITK_WARN("LiveWireTool2D") << "PositionEvent is outside ImageRegion!";
+    return false;
+  }
+  return true;
+}
+
 bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
   if (!positionEvent) return false;
+
+  mitk::DataNode* workingDataNode = m_ToolManager->GetWorkingData(0);
+  if(!IsPositionEventInsideImageRegion(positionEvent, workingDataNode->GetData()))
+  {
+    this->ResetToStartState();
+    return false;
+  }
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
@@ -284,8 +304,6 @@ bool mitk::LiveWireTool2D::OnInitLiveWire ( StateMachineAction*, InteractionEven
   m_EditingContourNode->AddProperty( "contour.color", ColorProperty::New(0.1, 1.0, 0.1), NULL, true );
   m_EditingContourNode->AddProperty( "contour.points.color", ColorProperty::New(0.0, 0.0, 1.0), NULL, true );
   m_EditingContourNode->AddProperty( "contour.width", mitk::FloatProperty::New( 4.0 ), NULL, true );
-
-  mitk::DataNode* workingDataNode = m_ToolManager->GetWorkingData(0);
 
   m_ToolManager->GetDataStorage()->Add(m_ContourModelNode, workingDataNode);
   m_ToolManager->GetDataStorage()->Add(m_LiveWireContourNode, workingDataNode);

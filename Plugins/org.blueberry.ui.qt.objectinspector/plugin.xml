@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.blueberry.ui.views.objectbrowser"
+          name="Object Browser"
+          class="berry::ObjectBrowserView"
+      icon="resources/ObjectBrowser.png" />
+  </extension>
+
+</plugin>

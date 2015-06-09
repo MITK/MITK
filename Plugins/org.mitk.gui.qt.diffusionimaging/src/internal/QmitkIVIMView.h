@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include "itkImage.h"
 
-#include "mitkDiffusionImage.h"
+#include <mitkDiffusionPropertyHelper.h>
 #include "itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h"
 
 /*!
@@ -51,21 +51,23 @@ public:
   QmitkIVIMView();
   virtual ~QmitkIVIMView();
 
-  typedef mitk::DiffusionImage<short>::GradientDirectionContainerType DirContainerType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType DirContainerType;
   typedef itk::DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<short, float> IVIMFilterType;
+  typedef itk::VectorImage<short,3> VecImgType;
   typedef itk::Image<float,3> OutImgType;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
   void OnSliceChanged(const itk::EventObject& e);
   void OutputToDatastorage(std::vector<mitk::DataNode*> nodes);
   bool FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos);
 
-  void Activated();
-  void Deactivated();
+  void Activated() override;
+  void Deactivated() override;
 
 protected slots:
 
@@ -88,7 +90,7 @@ protected slots:
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkIVIMViewControls* m_Controls;
 

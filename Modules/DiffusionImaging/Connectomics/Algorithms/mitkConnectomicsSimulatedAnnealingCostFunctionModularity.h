@@ -25,7 +25,7 @@ namespace mitk
 {
   /**
   * \brief A cost function using the modularity of the network */
-  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingCostFunctionModularity : public mitk::ConnectomicsSimulatedAnnealingCostFunctionBase
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSimulatedAnnealingCostFunctionModularity : public mitk::ConnectomicsSimulatedAnnealingCostFunctionBase
   {
   public:
 
@@ -36,7 +36,7 @@ namespace mitk
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsSimulatedAnnealingCostFunctionModularity, itk::Object);
+    mitkClassMacro(ConnectomicsSimulatedAnnealingCostFunctionModularity, mitk::ConnectomicsSimulatedAnnealingCostFunctionBase);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

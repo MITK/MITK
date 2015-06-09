@@ -34,7 +34,7 @@ class QmitkUiLoader : public ctkCmdLineModuleQtUiLoader
   Q_OBJECT
 
 public:
-  QmitkUiLoader(const mitk::DataStorage* dataStorage, QObject *parent=0);
+  QmitkUiLoader(const mitk::DataStorage* dataStorage, QObject *parent=nullptr);
   virtual ~QmitkUiLoader();
 
   /**
@@ -48,7 +48,7 @@ public:
    * otherwise delegates to base class.
    * \see ctkCmdLineModuleQtGuiLoader::createWidget()
    */
-  virtual QWidget* createWidget(const QString & className, QWidget * parent = 0, const QString & name = QString() );
+  virtual QWidget* createWidget(const QString & className, QWidget * parent = nullptr, const QString & name = QString() ) override;
 
 private:
 

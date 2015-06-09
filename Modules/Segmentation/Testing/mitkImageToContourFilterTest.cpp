@@ -38,7 +38,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     //Load the image
     //TODO Move/create segmentation subfolder

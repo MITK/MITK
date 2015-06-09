@@ -17,88 +17,178 @@ if(MITK_USE_Boost)
 
   if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
+    set(_boost_version 1_56)
+    set(_boost_install_include_dir include/boost)
+    if(WIN32)
+      set(_boost_install_include_dir include/boost-${_boost_version}/boost)
+    endif()
+
     set(_boost_libs )
-    set(INSTALL_COMMAND "")
+    set(_with_boost_libs )
+    set(_install_lib_dir )
+
+    # Set the boost root to the libraries install directory
+    set(BOOST_ROOT "${ep_prefix}")
 
     if(MITK_USE_Boost_LIBRARIES)
-
-      # Set the boost root to the libraries install directory
-      set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-install")
-
-      # We need binary boost libraries
+      string(REPLACE ";" "," _boost_libs "${MITK_USE_Boost_LIBRARIES}")
       foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
-        set(_boost_libs ${_boost_libs} --with-${_boost_lib})
+        list(APPEND _with_boost_libs ${_with_boost_libs} --with-${_boost_lib})
       endforeach()
+    endif()
 
-      if(WIN32)
-        set(_boost_variant "")
-        set(_shell_extension .bat)
-        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-          set(_boost_address_model "address-model=64")
-        else()
-          set(_boost_address_model "address-model=32")
-        endif()
-        if(MSVC)
-          if(MSVC_VERSION EQUAL 1400)
-            set(_boost_toolset "toolset=msvc-8.0")
-          elseif(MSVC_VERSION EQUAL 1500)
-            set(_boost_toolset "toolset=msvc-9.0")
-          elseif(MSVC_VERSION EQUAL 1600)
-            set(_boost_toolset "toolset=msvc-10.0")
-          elseif(MSVC_VERSION EQUAL 1700)
-            set(_boost_toolset "toolset=msvc-11.0")
-          endif()
-        endif()
-      else()
-        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-          set(_boost_variant "variant=debug")
-        else()
-          set(_boost_variant "variant=release")
-        endif()
-        set(_shell_extension .sh)
-      endif()
-
-      if(APPLE)
-        set(APPLE_CMAKE_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake)
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeBoostLibsInstallNameForMac.cmake.in ${APPLE_CMAKE_SCRIPT} @ONLY)
-        set(INSTALL_COMMAND ${CMAKE_COMMAND} -P ${APPLE_CMAKE_SCRIPT})
-
-        # Set OSX_SYSROOT
-        set (APPLE_SYSROOT_FLAG)
-        if (NOT ${CMAKE_OSX_SYSROOT} STREQUAL "")
-          set (APPLE_SYSROOT_FLAG --sysroot=${CMAKE_OSX_SYSROOT})
-        endif()
-
-        # Set the boost build command for apple
-        set(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam ${APPLE_SYSROOT_FLAG} --builddir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
-            ${_boost_toolset} ${_boost_address_model} ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
-      else()
-        set(_boost_build_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bjam --build-dir=${CMAKE_CURRENT_BINARY_DIR}/${proj}-build --prefix=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install ${_boost_toolset} ${_boost_address_model}
-            ${_boost_variant} ${_boost_libs} link=shared,static threading=multi runtime-link=shared -q install)
-      endif()
-
-      set(_boost_cfg_cmd ${CMAKE_CURRENT_BINARY_DIR}/${proj}-src/bootstrap${_shell_extension})
-
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(_boost_address_model "address-model=64")
     else()
-      # If no libraries are specified set the boost root to the boost src directory
-      set(BOOST_ROOT "${CMAKE_CURRENT_BINARY_DIR}/${proj}-src")
-      set(_boost_cfg_cmd )
-      set(_boost_build_cmd )
+      set(_boost_address_model "address-model=32")
+    endif()
+
+    if(WIN32)
+      set(_shell_extension .bat)
+      set(_boost_layout)
+      if(MSVC)
+        if(MSVC_VERSION EQUAL 1600)
+          set(_boost_with_toolset "vc10")
+          set(_boost_toolset "msvc-10.0")
+        elseif(MSVC_VERSION EQUAL 1700)
+          set(_boost_with_toolset "vc11")
+          set(_boost_toolset "msvc-11.0")
+        elseif(MSVC_VERSION EQUAL 1800)
+          set(_boost_with_toolset "vc12")
+          set(_boost_toolset "msvc-12.0")
+        endif()
+      endif()
+      set(_install_lib_dir "--libdir=<INSTALL_DIR>/bin")
+      set(WIN32_CMAKE_SCRIPT ${ep_prefix}/src/${proj}-cmake/MoveBoostLibsToLibDirForWindows.cmake)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/MoveBoostLibsToLibDirForWindows.cmake.in ${WIN32_CMAKE_SCRIPT} @ONLY)
+      set(_windows_move_libs_cmd COMMAND ${CMAKE_COMMAND} -P ${WIN32_CMAKE_SCRIPT})
+    else()
+      set(_shell_extension .sh)
+      set(_boost_layout "--layout=tagged")
+    endif()
+
+    if(UNIX AND NOT APPLE)
+      if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        set(_boost_with_toolset "gcc")
+      elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(_boost_with_toolset "clang")
+      else()
+        message(FATAL_ERROR "Compiler '${CMAKE_CXX_COMPILER_ID}' not supported. Use GNU or Clang instead.")
+      endif()
+      string(REGEX MATCH "^[0-9]+\\.[0-9]+" _compiler_version "${CMAKE_CXX_COMPILER_VERSION}")
+      set(_boost_toolset "${_boost_with_toolset}-${_compiler_version}")
+    endif()
+
+    if(_boost_toolset)
+      set(_boost_toolset "--toolset=${_boost_toolset}")
+    endif()
+
+    set (APPLE_SYSROOT_FLAG)
+    if(APPLE)
+      set(APPLE_CMAKE_SCRIPT ${ep_prefix}/src/${proj}-cmake/ChangeBoostLibsInstallNameForMac.cmake)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMakeExternals/ChangeBoostLibsInstallNameForMac.cmake.in ${APPLE_CMAKE_SCRIPT} @ONLY)
+      set(_macos_change_install_name_cmd COMMAND ${CMAKE_COMMAND} -P ${APPLE_CMAKE_SCRIPT})
+
+      # Set OSX_SYSROOT
+      if (NOT ${CMAKE_OSX_SYSROOT} STREQUAL "")
+        set (APPLE_SYSROOT_FLAG --sysroot=${CMAKE_OSX_SYSROOT})
+      endif()
+    endif()
+
+    set(_boost_variant "$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>")
+    set(_boost_link shared)
+    if(NOT BUILD_SHARED_LIBS)
+      set(_boost_link static)
+    endif()
+    set(_boost_cxxflags )
+    if(CMAKE_CXX_FLAGS OR MITK_CXX11_FLAG)
+      set(_boost_cxxflags "cxxflags=${MITK_CXX11_FLAG} ${CMAKE_CXX_FLAGS}")
+    endif()
+    set(_boost_linkflags )
+    if(BUILD_SHARED_LIBS AND _install_rpath_linkflag)
+      set(_boost_linkflags "linkflags=${_install_rpath_linkflag}")
+    endif()
+
+    set(_build_cmd "<SOURCE_DIR>/b2"
+        ${APPLE_SYSROOT_FLAG}
+        ${_boost_toolset}
+        ${_boost_layout}
+        "--prefix=<INSTALL_DIR>"
+        ${_install_lib_dir}
+        ${_with_boost_libs}
+        # Use the option below to view the shell commands (for debugging)
+        #-d+4
+        variant=${_boost_variant}
+        link=${_boost_link}
+        ${_boost_cxxflags}
+        ${_boost_linkflags}
+        ${_boost_address_model}
+        threading=multi
+        runtime-link=shared
+        -q
+    )
+
+    if(MITK_USE_Boost_LIBRARIES)
+      set(_boost_build_cmd BUILD_COMMAND ${_build_cmd})
+      set(_install_cmd ${_build_cmd} install ${_macos_change_install_name_cmd} ${_windows_move_libs_cmd})
+    else()
+      set(_boost_build_cmd BUILD_COMMAND ${CMAKE_COMMAND} -E echo "no binary libraries")
+      set(_install_cmd ${CMAKE_COMMAND} -E echo "copying Boost header..."
+             COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
     endif()
 
     ExternalProject_Add(${proj}
-      SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}-src
-      # Boost needs in-source builds
-      BINARY_DIR ${proj}-src
-      PREFIX ${proj}-cmake
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_56_0.tar.bz2
+      LIST_SEPARATOR ${sep}
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.tar.bz2
       URL_MD5 a744cf167b05d72335f27c88115f211d
-      INSTALL_DIR ${proj}-install
-      CONFIGURE_COMMAND "${_boost_cfg_cmd}"
-      BUILD_COMMAND "${_boost_build_cmd}"
-      INSTALL_COMMAND "${INSTALL_COMMAND}"
+      # We use in-source builds for Boost
+      BINARY_DIR ${ep_prefix}/src/${proj}
+      CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
+        --with-toolset=${_boost_with_toolset}
+        --with-libraries=${_boost_libs}
+        "--prefix=<INSTALL_DIR>"
+      ${_boost_build_cmd}
+      INSTALL_COMMAND ${_install_cmd}
       DEPENDS ${proj_DEPENDENCIES}
       )
+
+    ExternalProject_Get_Property(${proj} install_dir)
+
+    if(WIN32)
+      set(BOOST_LIBRARYDIR "${install_dir}/lib")
+    endif()
+
+    # Manual install commands (for a MITK super-build install)
+    # until the Boost CMake system is used.
+
+    # We just copy the include directory
+    install(DIRECTORY "${install_dir}/${_boost_install_include_dir}"
+            DESTINATION "include"
+            COMPONENT dev
+           )
+
+    if(MITK_USE_Boost_LIBRARIES)
+      # Copy the boost libraries
+      file(GLOB _boost_libs
+           "${install_dir}/lib/libboost*.so*"
+           "${install_dir}/lib/libboost*.dylib")
+      install(FILES ${_boost_libs}
+              DESTINATION "lib"
+              COMPONENT runtime)
+
+      file(GLOB _boost_libs
+           "${install_dir}/bin/libboost*.dll")
+      install(FILES ${_boost_libs}
+              DESTINATION "bin"
+              COMPONENT runtime)
+
+      file(GLOB _boost_libs
+           "${install_dir}/lib/libboost*.lib"
+           "${install_dir}/lib/libboost*.a")
+      install(FILES ${_boost_libs}
+              DESTINATION "lib"
+              COMPONENT dev)
+    endif()
 
   else()
 

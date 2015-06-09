@@ -25,7 +25,7 @@ namespace mitk
 {
   /**
   * \brief A class providing permutations for the calculation of modularity using simulated annealing */
-  class MitkConnectomics_EXPORT ConnectomicsSimulatedAnnealingPermutationModularity : public mitk::ConnectomicsSimulatedAnnealingPermutationBase
+  class MITKCONNECTOMICS_EXPORT ConnectomicsSimulatedAnnealingPermutationModularity : public mitk::ConnectomicsSimulatedAnnealingPermutationBase
   {
   public:
 
@@ -36,18 +36,18 @@ namespace mitk
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsSimulatedAnnealingPermutationModularity, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsSimulatedAnnealingPermutationModularity, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
     // Initialize the permutation
-    virtual void Initialize();
+    virtual void Initialize() override;
 
     // Do a permutation for a specific temperature
-    virtual void Permutate( double temperature );
+    virtual void Permutate( double temperature ) override;
 
     // Do clean up necessary after a permutation
-    virtual void CleanUp();
+    virtual void CleanUp() override;
 
     // set the network permutation is to be run upon
     void SetNetwork( mitk::ConnectomicsNetwork::Pointer theNetwork );

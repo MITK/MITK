@@ -34,24 +34,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //-----------------------------------------------------------------------------
 CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
-: m_MainControl(0)
-, m_DebugOutput(0)
-, m_ShowAdvancedWidgets(0)
-, m_OutputDirectory(0)
-, m_TemporaryDirectory(0)
-, m_ModulesDirectories(0)
-, m_ModulesFiles(0)
-, m_GridLayoutForLoadCheckboxes(0)
-, m_LoadFromHomeDir(0)
-, m_LoadFromHomeDirCliModules(0)
-, m_LoadFromCurrentDir(0)
-, m_LoadFromCurrentDirCliModules(0)
-, m_LoadFromApplicationDir(0)
-, m_LoadFromApplicationDirCliModules(0)
-, m_LoadFromAutoLoadPathDir(0)
-, m_ValidationMode(0)
-, m_MaximumNumberProcesses(0)
-, m_CLIPreferencesNode(0)
+: m_MainControl(nullptr)
+, m_DebugOutput(nullptr)
+, m_ShowAdvancedWidgets(nullptr)
+, m_OutputDirectory(nullptr)
+, m_TemporaryDirectory(nullptr)
+, m_ModulesDirectories(nullptr)
+, m_ModulesFiles(nullptr)
+, m_GridLayoutForLoadCheckboxes(nullptr)
+, m_LoadFromHomeDir(nullptr)
+, m_LoadFromHomeDirCliModules(nullptr)
+, m_LoadFromCurrentDir(nullptr)
+, m_LoadFromCurrentDirCliModules(nullptr)
+, m_LoadFromApplicationDir(nullptr)
+, m_LoadFromApplicationDirCliModules(nullptr)
+, m_LoadFromAutoLoadPathDir(nullptr)
+, m_ValidationMode(nullptr)
+, m_MaximumNumberProcesses(nullptr)
+, m_CLIPreferencesNode(nullptr)
 {
 
 }
@@ -74,11 +74,9 @@ void CommandLineModulesPreferencesPage::Init(berry::IWorkbench::Pointer )
 //-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService::Pointer prefService
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
-  std::string id = "/" + CommandLineModulesViewConstants::VIEW_ID;
+  QString id = "/" + CommandLineModulesViewConstants::VIEW_ID;
   m_CLIPreferencesNode = prefService->GetSystemPreferences()->Node(id);
 
   m_MainControl = new QWidget(parent);
@@ -150,7 +148,7 @@ void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
   m_XmlTimeoutInSeconds->setMinimum(1);
   m_XmlTimeoutInSeconds->setMaximum(3600);
 
-  QFormLayout *formLayout = new QFormLayout;
+  auto  formLayout = new QFormLayout;
   formLayout->addRow("show debug output:", m_DebugOutput);
   formLayout->addRow("show advanced widgets:", m_ShowAdvancedWidgets);
   formLayout->addRow("XML time-out (secs):", m_XmlTimeoutInSeconds);
@@ -190,8 +188,8 @@ std::string CommandLineModulesPreferencesPage::ConvertToStdString(const QStringL
 //-----------------------------------------------------------------------------
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
-  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
-  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, m_OutputDirectory->directory().toStdString());
+  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory());
+  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, m_OutputDirectory->directory());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, m_DebugOutput->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME, m_ShowAdvancedWidgets->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, m_LoadFromApplicationDir->isChecked());
@@ -202,13 +200,13 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, m_LoadFromCurrentDirCliModules->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, m_LoadFromAutoLoadPathDir->isChecked());
 
-  std::string paths = this->ConvertToStdString(m_ModulesDirectories->directories());
+  QString paths = m_ModulesDirectories->directories().join(";");
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, paths);
 
-  std::string modules = this->ConvertToStdString(m_ModulesFiles->files());
+  QString modules = m_ModulesFiles->files().join(";");
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, modules);
 
-  int currentValidationMode = m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0);
+  int currentValidationMode = m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2);
   if (currentValidationMode != m_ValidationMode->currentIndex())
   {
     QMessageBox msgBox;
@@ -233,10 +231,10 @@ void CommandLineModulesPreferencesPage::PerformCancel()
 void CommandLineModulesPreferencesPage::Update()
 {
   QString fallbackTmpDir = QDir::tempPath();
-  m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir.toStdString())));
+  m_TemporaryDirectory->setDirectory(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir));
 
   QString fallbackOutputDir = QDir::homePath();
-  m_OutputDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackOutputDir.toStdString())));
+  m_OutputDirectory->setDirectory(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackOutputDir));
 
   m_ShowAdvancedWidgets->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME, false));
   m_DebugOutput->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false));
@@ -248,15 +246,15 @@ void CommandLineModulesPreferencesPage::Update()
   m_LoadFromCurrentDirCliModules->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, false));
   m_LoadFromAutoLoadPathDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, false));
 
-  QString paths = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
+  QString paths = m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, "");
   QStringList directoryList = paths.split(";", QString::SkipEmptyParts);
   m_ModulesDirectories->setDirectories(directoryList);
 
-  QString files = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, ""));
+  QString files = m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, "");
   QStringList fileList = files.split(";", QString::SkipEmptyParts);
   m_ModulesFiles->setFiles(fileList);
 
-  m_ValidationMode->setCurrentIndex(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 0));
+  m_ValidationMode->setCurrentIndex(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2));
   m_XmlTimeoutInSeconds->setValue(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_TIMEOUT_SECS, 30)); // 30 secs = QProcess default timeout
   m_MaximumNumberProcesses->setValue(m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4));
 }

@@ -32,11 +32,11 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_TOFHARDWARE_EXPORT ToFCameraMITKPlayerController : public itk::Object
+  class MITKTOFHARDWARE_EXPORT ToFCameraMITKPlayerController : public itk::Object
   {
   public:
 
-    mitkClassMacro( ToFCameraMITKPlayerController , itk::Object );
+    mitkClassMacroItkParent( ToFCameraMITKPlayerController , itk::Object );
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

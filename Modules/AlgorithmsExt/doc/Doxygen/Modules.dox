@@ -1,0 +1,9 @@
+/**
+  \defgroup MitkAlgorithmsExtModule AlgorithmsExt
+  \ingroup MITKModules
+
+  \brief General purpose algorithms.
+
+  This module provides general purpose algorithms which do not
+  belong to a specific domain.
+*/

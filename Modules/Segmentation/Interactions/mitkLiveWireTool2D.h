@@ -47,7 +47,7 @@ namespace mitk
 
   \warning Only to be instantiated by mitk::ToolManager.
 */
-class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
+class MITKSEGMENTATION_EXPORT LiveWireTool2D : public SegTool2D
 {
   public:
 
@@ -55,11 +55,11 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual us::ModuleResource GetCursorIconResource() const;
-    us::ModuleResource GetIconResource() const;
+    virtual const char** GetXPM() const override;
+    virtual us::ModuleResource GetCursorIconResource() const override;
+    us::ModuleResource GetIconResource() const override;
 
-    virtual const char* GetName() const;
+    virtual const char* GetName() const override;
 
     /// \brief Convert all current contour objects to binary segmentation image.
     void ConfirmSegmentation();
@@ -72,10 +72,10 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
     LiveWireTool2D();
     virtual ~LiveWireTool2D();
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     /// \brief Initialize tool
     virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
@@ -100,6 +100,13 @@ class MitkSegmentation_EXPORT LiveWireTool2D : public SegTool2D
 
     /// \brief Finish contour interaction.
     void FinishTool();
+
+    ///
+    /// \brief IsPositionEventInsideImageRegion
+    /// \param interactionEvent
+    /// \return
+    ///
+    virtual bool IsPositionEventInsideImageRegion(InteractionPositionEvent *positionEvent, BaseData * data);
 
     /** \brief Enable interaction with contours.
     * Contours that are created by the tool can be edited using LiveWire functionality.

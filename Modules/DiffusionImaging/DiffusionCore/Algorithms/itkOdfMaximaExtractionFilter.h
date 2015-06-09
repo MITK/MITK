@@ -17,7 +17,7 @@
 #ifndef __itkOdfMaximaExtractionFilter_h_
 #define __itkOdfMaximaExtractionFilter_h_
 
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 #include <itkImageToImageFilter.h>
 #include <itkVectorContainer.h>
@@ -65,7 +65,7 @@ public:
   typedef itk::VectorContainer< unsigned int, ItkDirectionImage::Pointer >                          ItkDirectionImageContainer;
 
   // output
-  itkGetMacro( OutputFiberBundle, mitk::FiberBundleX::Pointer)                  ///< vector field (peak sizes rescaled for visualization purposes)
+  itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                  ///< vector field (peak sizes rescaled for visualization purposes)
   itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                    ///< number of peaks per voxel
   itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)    ///< container for output peaks
 
@@ -79,7 +79,7 @@ public:
   itkSetMacro( MaxNumPeaks, unsigned int)                           ///< if more peaks are found, only the largest are kept
   itkSetMacro( PeakThreshold, double)                               ///< threshold on peak length relative to the largest peak in the current voxel
 
-  void GenerateData();
+  void GenerateData() override;
 
 protected:
   OdfMaximaExtractionFilter();
@@ -127,7 +127,7 @@ protected:
   std::vector< vnl_vector_fixed< double, 2 > >  m_CandidatePeaks;   ///< container for candidate peaks (all extrema, also minima)
 
   // output data
-  mitk::FiberBundleX::Pointer               m_OutputFiberBundle;        ///< vector field (peak sizes rescaled for visualization purposes)
+  mitk::FiberBundle::Pointer               m_OutputFiberBundle;        ///< vector field (peak sizes rescaled for visualization purposes)
   ItkUcharImgType::Pointer                  m_NumDirectionsImage;       ///< number of peaks per voxel
   ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;  ///< output peaks
 

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-class MitkDiffusionCore_EXPORT DiffusionDICOMFileReader
+class MITKDIFFUSIONCORE_EXPORT DiffusionDICOMFileReader
         : public ThreeDnTDICOMSeriesReader
 {
 public:
@@ -36,11 +36,11 @@ public:
 
   itkNewMacro( DiffusionDICOMFileReader )
 
-  virtual void AnalyzeInputFiles();
+  virtual void AnalyzeInputFiles() override;
 
-  virtual bool LoadImages();
+  virtual bool LoadImages() override;
 
-  virtual bool CanHandleFile(const std::string &filename);
+  virtual bool CanHandleFile(const std::string &filename) override;
 
   void SetResolveMosaic( bool flag )
   {

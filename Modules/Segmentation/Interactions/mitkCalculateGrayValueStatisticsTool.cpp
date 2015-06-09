@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkHistogram.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, CalculateGrayValueStatisticsTool, "Statistics tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, CalculateGrayValueStatisticsTool, "Statistics tool");
 }
 
 mitk::CalculateGrayValueStatisticsTool::CalculateGrayValueStatisticsTool()

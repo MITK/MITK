@@ -31,7 +31,7 @@ namespace mitk
 /**
  * Encapsulates the enumeration of different rendering schemes for connectomics networks
  */
-class MitkConnectomics_EXPORT ConnectomicsRenderingEdgeThresholdParameterProperty : public EnumerationProperty
+class MITKCONNECTOMICS_EXPORT ConnectomicsRenderingEdgeThresholdParameterProperty : public EnumerationProperty
 {
 public:
 
@@ -71,7 +71,7 @@ protected:
    * this function is overridden as protected, so that the user may not add
    * additional enumerations.
    */
-  virtual bool AddEnum( const std::string& name, const IdType& id );
+  virtual bool AddEnum( const std::string& name, const IdType& id ) override;
 
   /**
    * Adds the enumeration types as defined by vtk to the list of known

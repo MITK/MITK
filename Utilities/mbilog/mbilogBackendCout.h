@@ -31,7 +31,7 @@ namespace mbilog{
    *         The backend formats the logging messages to a normal string and writes them to std::cout.
    *  \ingroup mbilog
    */
-  class MBILOG_DLL_API BackendCout : public TextBackendBase
+  class MBILOG_EXPORT BackendCout : public TextBackendBase
   {
     public:
 
@@ -44,14 +44,14 @@ namespace mbilog{
        *
        *  \param logMessage Logging message.
        */
-      virtual void ProcessMessage(const mbilog::LogMessage &l );
+      virtual void ProcessMessage(const mbilog::LogMessage &l ) override;
 
       /** \brief Sets the formatting mode. If true long messages will be displayed. Default is false (short/smart messages).
        *         Long messages provide all informations and are also capable to be postproccessed (e.g. in a web viewer).
        */
       void SetFull(bool full);
 
-      virtual OutputType GetOutputType() const;
+      virtual OutputType GetOutputType() const override;
 
     private:
 

@@ -17,13 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIINPUTDEVICEREGISTRY_H_
 #define MITKIINPUTDEVICEREGISTRY_H_
 
-#include <org_mitk_core_ext_Export.h>
-
-#include <berryService.h>
-
-#include <vector>
-#include <string>
-
 #include <QtPlugin>
 
 #include "mitkIInputDeviceDescriptor.h"
@@ -45,9 +38,8 @@ namespace mitk
    * @noimplement This interface is not intended to be implemented by clients.
    * @ingroup org_mitk_core_ext
    */
-  struct MITKCOREEXT_EXPORT IInputDeviceRegistry: public berry::Service
+  struct IInputDeviceRegistry
   {
-    berryInterfaceMacro(IInputDeviceRegistry, mitk);
 
     /**
      * Return an input device descriptor with the given extension id. If no input device exists,
@@ -57,14 +49,14 @@ namespace mitk
      *      the id to search for
      * @return the descriptor or <code>null</code>
      */
-    virtual IInputDeviceDescriptor::Pointer Find(const std::string& id) const = 0;
+    virtual IInputDeviceDescriptor::Pointer Find(const QString& id) const = 0;
 
     /**
      * Return a list of input devices defined in the registry.
      *
      * @return the input devices.
      */
-    virtual std::vector<IInputDeviceDescriptor::Pointer> GetInputDevices() const = 0;
+    virtual QList<IInputDeviceDescriptor::Pointer> GetInputDevices() const = 0;
 
     virtual ~IInputDeviceRegistry() {}
 

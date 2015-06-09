@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
 #include <berryIPartListener.h>
+#include <berryIPreferences.h>
 
 #include <QWidget>
 
@@ -45,28 +46,32 @@ public:
 
   QmitkStdMultiWidget* m_StdMultiWidget;
   QmitkMouseModeSwitcher* m_MouseModeToolbar;
-  std::string m_FirstBackgroundColor;
-  std::string m_SecondBackgroundColor;
+  /**
+  * @brief Members for the MultiWidget decorations.
+  */
+  QString m_WidgetBackgroundColor1[4];
+  QString m_WidgetBackgroundColor2[4];
+  QString m_WidgetDecorationColor[4];
+  QString m_WidgetAnnotation[4];
   bool m_MenuWidgetsEnabled;
-  berry::IPartListener::Pointer m_PartListener;
+  QScopedPointer<berry::IPartListener> m_PartListener;
 
   QHash<QString, QmitkRenderWindow*> m_RenderWindows;
+
 };
 
 struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 {
-  berryObjectMacro(QmitkStdMultiWidgetPartListener)
-
   QmitkStdMultiWidgetPartListener(QmitkStdMultiWidgetEditorPrivate* dd)
     : d(dd)
   {}
 
-  Events::Types GetPartEventTypes() const
+  Events::Types GetPartEventTypes() const override
   {
     return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
   }
 
-  void PartClosed (berry::IWorkbenchPartReference::Pointer partRef)
+  void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -80,7 +85,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     }
   }
 
-  void PartHidden (berry::IWorkbenchPartReference::Pointer partRef)
+  void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -94,7 +99,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
     }
   }
 
-  void PartVisible (berry::IWorkbenchPartReference::Pointer partRef)
+  void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
@@ -111,6 +116,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 private:
 
   QmitkStdMultiWidgetEditorPrivate* const d;
+
 };
 
 QmitkStdMultiWidgetEditorPrivate::QmitkStdMultiWidgetEditorPrivate()
@@ -123,7 +129,7 @@ QmitkStdMultiWidgetEditorPrivate::~QmitkStdMultiWidgetEditorPrivate()
 {
 }
 
-const std::string QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
+const QString QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
 QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
   : d(new QmitkStdMultiWidgetEditorPrivate)
@@ -132,7 +138,7 @@ QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
 
 QmitkStdMultiWidgetEditor::~QmitkStdMultiWidgetEditor()
 {
-  this->GetSite()->GetPage()->RemovePartListener(d->m_PartListener);
+  this->GetSite()->GetPage()->RemovePartListener(d->m_PartListener.data());
 }
 
 QmitkStdMultiWidget* QmitkStdMultiWidgetEditor::GetStdMultiWidget()
@@ -279,7 +285,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     mitk::BaseRenderer::RenderingMode::Type renderingMode = static_cast<mitk::BaseRenderer::RenderingMode::Type>(prefs->GetInt( "Rendering Mode" , 0 ));
 
     d->m_StdMultiWidget = new QmitkStdMultiWidget(parent,0,0,renderingMode);
-
     d->m_RenderWindows.insert("axial", d->m_StdMultiWidget->GetRenderWindow1());
     d->m_RenderWindows.insert("sagittal", d->m_StdMultiWidget->GetRenderWindow2());
     d->m_RenderWindows.insert("coronal", d->m_StdMultiWidget->GetRenderWindow3());
@@ -317,9 +322,11 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     // Store the initial visibility status of the menu widget.
     d->m_MenuWidgetsEnabled = d->m_StdMultiWidget->IsMenuWidgetEnabled();
 
-    this->GetSite()->GetPage()->AddPartListener(d->m_PartListener);
+    this->GetSite()->GetPage()->AddPartListener(d->m_PartListener.data());
 
-    this->OnPreferencesChanged(dynamic_cast<berry::IBerryPreferences*>(prefs.GetPointer()));
+    berry::IBerryPreferences* berryprefs = dynamic_cast<berry::IBerryPreferences*>(prefs.GetPointer());
+    InitializePreferences(berryprefs);
+    this->OnPreferencesChanged(berryprefs);
 
     this->RequestUpdate();
   }
@@ -337,16 +344,14 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
 
   while(currentNode)
   {
-    std::vector<std::string> keys = currentNode->Keys();
-
     bool logoFound = false;
-    for( std::size_t i = 0; i < keys.size(); ++i )
+    foreach (const QString& key, prefs->Keys())
     {
-      if( keys[i] == "DepartmentLogo")
+      if( key == "DepartmentLogo")
       {
-        std::string departmentLogoLocation = currentNode->Get("DepartmentLogo", "");
+        QString departmentLogoLocation = prefs->Get("DepartmentLogo", "");
 
-        if (departmentLogoLocation.empty())
+        if (departmentLogoLocation.isEmpty())
         {
           d->m_StdMultiWidget->DisableDepartmentLogo();
         }
@@ -355,7 +360,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
           // we need to disable the logo first, otherwise setting a new logo will have
           // no effect due to how mitkManufacturerLogo works...
           d->m_StdMultiWidget->DisableDepartmentLogo();
-          d->m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
+          d->m_StdMultiWidget->SetDepartmentLogoPath(qPrintable(departmentLogoLocation));
           d->m_StdMultiWidget->EnableDepartmentLogo();
         }
         logoFound = true;
@@ -367,44 +372,50 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     currentNode = currentNode->Parent().GetPointer();
   }
 
-  // preferences for gradient background
-  float color = 255.0;
-  QString firstColorName = QString::fromStdString (prefs->GetByteArray("first background color", ""));
-  QColor firstColor(firstColorName);
-  mitk::Color upper;
-  if (firstColorName=="") // default values
-  {
-    upper[0] = 0.1;
-    upper[1] = 0.1;
-    upper[2] = 0.1;
-  }
-  else
-  {
-    upper[0] = firstColor.red() / color;
-    upper[1] = firstColor.green() / color;
-    upper[2] = firstColor.blue() / color;
-  }
-
-  QString secondColorName = QString::fromStdString (prefs->GetByteArray("second background color", ""));
-  QColor secondColor(secondColorName);
-  mitk::Color lower;
-  if (secondColorName=="") // default values
-  {
-    lower[0] = 0.5;
-    lower[1] = 0.5;
-    lower[2] = 0.5;
-  }
-  else
-  {
-    lower[0] = secondColor.red() / color;
-    lower[1] = secondColor.green() / color;
-    lower[2] = secondColor.blue() / color;
-  }
-  d->m_StdMultiWidget->SetGradientBackgroundColors(upper, lower);
+  //Update internal members
+  this->FillMembersWithCurrentDecorations();
+  this->GetPreferenceDecorations(prefs);
+  //Now the members can be used to modify the stdmultiwidget
+  mitk::Color upper = HexColorToMitkColor(d->m_WidgetBackgroundColor1[0]);
+  mitk::Color lower = HexColorToMitkColor(d->m_WidgetBackgroundColor2[0]);
+  d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 0);
+  upper = HexColorToMitkColor(d->m_WidgetBackgroundColor1[1]);
+  lower = HexColorToMitkColor(d->m_WidgetBackgroundColor2[1]);
+  d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 1);
+  upper = HexColorToMitkColor(d->m_WidgetBackgroundColor1[2]);
+  lower = HexColorToMitkColor(d->m_WidgetBackgroundColor2[2]);
+  d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 2);
+  upper = HexColorToMitkColor(d->m_WidgetBackgroundColor1[3]);
+  lower = HexColorToMitkColor(d->m_WidgetBackgroundColor2[3]);
+  d->m_StdMultiWidget->SetGradientBackgroundColorForRenderWindow(upper, lower, 3);
   d->m_StdMultiWidget->EnableGradientBackground();
 
+  // preferences for renderWindows
+  mitk::Color colorDecorationWidget1 = HexColorToMitkColor(d->m_WidgetDecorationColor[0]);
+  mitk::Color colorDecorationWidget2 = HexColorToMitkColor(d->m_WidgetDecorationColor[1]);
+  mitk::Color colorDecorationWidget3 = HexColorToMitkColor(d->m_WidgetDecorationColor[2]);
+  mitk::Color colorDecorationWidget4 = HexColorToMitkColor(d->m_WidgetDecorationColor[3]);
+  d->m_StdMultiWidget->SetDecorationColor(0, colorDecorationWidget1);
+  d->m_StdMultiWidget->SetDecorationColor(1, colorDecorationWidget2);
+  d->m_StdMultiWidget->SetDecorationColor(2, colorDecorationWidget3);
+  d->m_StdMultiWidget->SetDecorationColor(3, colorDecorationWidget4);
+
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    d->m_StdMultiWidget->SetDecorationProperties(d->m_WidgetAnnotation[i].toStdString(),
+                                             HexColorToMitkColor(d->m_WidgetDecorationColor[i]), i);
+  }
+  //The crosshair gap
+  int crosshairgapsize = prefs->GetInt("crosshair gap size", 32);
+  d->m_StdMultiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  d->m_StdMultiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  d->m_StdMultiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+
+  //refresh colors of rectangles
+  d->m_StdMultiWidget->EnableColoredRectangles();
+
   // Set preferences respecting zooming and padding
-  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
+  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", true);
 
   mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
 
@@ -429,6 +440,98 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   d->m_StdMultiWidget->GetMouseModeSwitcher()->SetInteractionScheme( newMode ? mitk::MouseModeSwitcher::PACS : mitk::MouseModeSwitcher::MITK );
 }
 
+mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(const QString& widgetColorInHex)
+{
+  QColor qColor(widgetColorInHex);
+  mitk::Color returnColor;
+  float colorMax = 255.0f;
+  if (widgetColorInHex.isEmpty()) // default value
+  {
+    returnColor[0] = 1.0;
+    returnColor[1] = 1.0;
+    returnColor[2] = 1.0;
+    MITK_ERROR << "Using default color for unknown widget " << qPrintable(widgetColorInHex);
+  }
+  else
+  {
+    returnColor[0] = qColor.red() / colorMax;
+    returnColor[1] = qColor.green() / colorMax;
+    returnColor[2] = qColor.blue() / colorMax;
+  }
+  return returnColor;
+}
+
+QString QmitkStdMultiWidgetEditor::MitkColorToHex(const mitk::Color& color)
+{
+  QColor returnColor;
+  float colorMax = 255.0f;
+  returnColor.setRed(static_cast<int>(color[0]* colorMax + 0.5));
+  returnColor.setGreen(static_cast<int>(color[1]* colorMax + 0.5));
+  returnColor.setBlue(static_cast<int>(color[2]* colorMax + 0.5));
+  return returnColor.name();
+}
+
+void QmitkStdMultiWidgetEditor::FillMembersWithCurrentDecorations()
+{
+  //fill members with current values (or default values) from the std multi widget
+  for(unsigned int i = 0; i < 4; ++i)
+  {
+    d->m_WidgetDecorationColor[i] = MitkColorToHex(d->m_StdMultiWidget->GetDecorationColor(i));
+    d->m_WidgetBackgroundColor1[i] = MitkColorToHex(d->m_StdMultiWidget->GetGradientColors(i).first);
+    d->m_WidgetBackgroundColor2[i] = MitkColorToHex(d->m_StdMultiWidget->GetGradientColors(i).second);
+    d->m_WidgetAnnotation[i] = QString::fromStdString(d->m_StdMultiWidget->GetCornerAnnotationText(i));
+  }
+}
+
+void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPreferences * preferences)
+{
+  //overwrite members with values from the preferences, if they the prefrence is defined
+  d->m_WidgetBackgroundColor1[0] = preferences->Get("widget1 first background color", d->m_WidgetBackgroundColor1[0]);
+  d->m_WidgetBackgroundColor2[0] = preferences->Get("widget1 second background color", d->m_WidgetBackgroundColor2[0]);
+  d->m_WidgetBackgroundColor1[1] = preferences->Get("widget2 first background color", d->m_WidgetBackgroundColor1[1]);
+  d->m_WidgetBackgroundColor2[1] = preferences->Get("widget2 second background color", d->m_WidgetBackgroundColor2[1]);
+  d->m_WidgetBackgroundColor1[2] = preferences->Get("widget3 first background color", d->m_WidgetBackgroundColor1[2]);
+  d->m_WidgetBackgroundColor2[2] = preferences->Get("widget3 second background color", d->m_WidgetBackgroundColor2[2]);
+  d->m_WidgetBackgroundColor1[3] = preferences->Get("widget4 first background color", d->m_WidgetBackgroundColor1[3]);
+  d->m_WidgetBackgroundColor2[3] = preferences->Get("widget4 second background color", d->m_WidgetBackgroundColor2[3]);
+
+  d->m_WidgetDecorationColor[0] = preferences->Get("widget1 decoration color", d->m_WidgetDecorationColor[0]);
+  d->m_WidgetDecorationColor[1] = preferences->Get("widget2 decoration color", d->m_WidgetDecorationColor[1]);
+  d->m_WidgetDecorationColor[2] = preferences->Get("widget3 decoration color", d->m_WidgetDecorationColor[2]);
+  d->m_WidgetDecorationColor[3] = preferences->Get("widget4 decoration color", d->m_WidgetDecorationColor[3]);
+
+  d->m_WidgetAnnotation[0] = preferences->Get("widget1 corner annotation", d->m_WidgetAnnotation[0]);
+  d->m_WidgetAnnotation[1] = preferences->Get("widget2 corner annotation", d->m_WidgetAnnotation[1]);
+  d->m_WidgetAnnotation[2] = preferences->Get("widget3 corner annotation", d->m_WidgetAnnotation[2]);
+  d->m_WidgetAnnotation[3] = preferences->Get("widget4 corner annotation", d->m_WidgetAnnotation[3]);
+}
+
+void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences * preferences)
+{
+  this->FillMembersWithCurrentDecorations(); //fill members
+  this->GetPreferenceDecorations(preferences); //overwrite if preferences are defined
+
+  //create new preferences
+  preferences->Put("widget1 corner annotation", d->m_WidgetAnnotation[0]);
+  preferences->Put("widget2 corner annotation", d->m_WidgetAnnotation[1]);
+  preferences->Put("widget3 corner annotation", d->m_WidgetAnnotation[2]);
+  preferences->Put("widget4 corner annotation", d->m_WidgetAnnotation[3]);
+
+  preferences->Put("widget1 decoration color", d->m_WidgetDecorationColor[0]);
+  preferences->Put("widget2 decoration color", d->m_WidgetDecorationColor[1]);
+  preferences->Put("widget3 decoration color", d->m_WidgetDecorationColor[2]);
+  preferences->Put("widget4 decoration color", d->m_WidgetDecorationColor[3]);
+
+  preferences->Put("widget1 first background color", d->m_WidgetBackgroundColor1[0]);
+  preferences->Put("widget2 first background color", d->m_WidgetBackgroundColor1[1]);
+  preferences->Put("widget3 first background color", d->m_WidgetBackgroundColor1[2]);
+  preferences->Put("widget4 first background color", d->m_WidgetBackgroundColor1[3]);
+  preferences->Put("widget1 second background color", d->m_WidgetBackgroundColor2[0]);
+  preferences->Put("widget2 second background color", d->m_WidgetBackgroundColor2[1]);
+  preferences->Put("widget3 second background color", d->m_WidgetBackgroundColor2[2]);
+  preferences->Put("widget4 second background color", d->m_WidgetBackgroundColor2[3]);
+}
+
 void QmitkStdMultiWidgetEditor::SetFocus()
 {
   if (d->m_StdMultiWidget != 0)
@@ -450,3 +553,4 @@ void QmitkStdMultiWidgetEditor::RequestActivateMenuWidget(bool on)
     }
   }
 }
+

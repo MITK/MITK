@@ -17,17 +17,17 @@
   in rendering thread safe. This solution is much more
   work though, so it will come later.
 */
-class MitkQmlItems_EXPORT QmlMitkBigRenderLock : public QObject
+class MITKQMLITEMS_EXPORT QmlMitkBigRenderLock : public QObject
 {
   Q_OBJECT
   public:
 
     static QMutex& GetMutex();
 
-    QmlMitkBigRenderLock(QObject* parent = 0);
+    QmlMitkBigRenderLock(QObject* parent = nullptr);
 
   protected:
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 };
 
 #endif

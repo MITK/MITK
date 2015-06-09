@@ -26,7 +26,6 @@ namespace mitk
 
 NrrdTbssImageWriterFactory::NrrdTbssImageWriterFactory()
 {
-  typedef float TbssPixelType;
   this->RegisterOverride("IOWriter",
                          "NrrdTbssImageWriter",
                          "NrrdTbssImage Writer",

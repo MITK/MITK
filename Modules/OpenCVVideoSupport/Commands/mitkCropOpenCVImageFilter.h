@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class MITK_OPENCVVIDEOSUPPORT_EXPORT CropOpenCVImageFilter : public AbstractOpenCVImageFilter
+class MITKOPENCVVIDEOSUPPORT_EXPORT CropOpenCVImageFilter : public AbstractOpenCVImageFilter
 {
 
 public:
@@ -40,7 +40,7 @@ public:
     * \brief Crops image to rectangle given by mitk::CropOpenCVImageFilter::SetCropRegion.
     * \return false if no crop region was set or the crop region width is zero, true otherwise.
     */
-  bool OnFilterImage( cv::Mat& image );
+  bool OnFilterImage( cv::Mat& image ) override;
 
   /**
     * \brief Set region of interest for cropping.

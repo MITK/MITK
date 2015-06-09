@@ -36,7 +36,7 @@ public:
   PicFileReader();
 
   using AbstractFileReader::Read;
-  std::vector<mitk::BaseData::Pointer> Read();
+  std::vector<mitk::BaseData::Pointer> Read() override;
 
 protected:
 
@@ -48,7 +48,7 @@ private:
 
   static void ConvertHandedness(mitkIpPicDescriptor* pic);
 
-  PicFileReader* Clone() const;
+  PicFileReader* Clone() const override;
 
 };
 

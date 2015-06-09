@@ -1,0 +1,18 @@
+/**
+\page org_mitk_gui_qt_geometrytools The Geometry Tools
+
+\imageMacro{icon.png,"Icon of Geometry Tools",2.00}
+
+\tableofcontents
+
+\section org_mitk_gui_qt_geometrytoolsOverview Overview
+
+A plugin to modify geometry of mitkBaseData via interaction. Currently, the following
+operations can be performed:
+
+<ul>
+<li>Translation
+<li>Rotation
+<li>Scaling (not supported for images, yet, and will not happen in coordinate origin)
+</ul>
+*/

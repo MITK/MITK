@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#define MBILOG_ENABLE_DEBUG
 
 #include "QmitkQBallReconstructionView.h"
-#include "mitkDiffusionImagingConfigure.h"
 
 // qt includes
 #include <QMessageBox>
@@ -50,6 +49,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNodeObject.h"
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
+#include <mitkImageCast.h>
+#include "mitkDiffusionImagingConfigure.h"
 
 #include "berryIStructuredSelection.h"
 #include "berryIWorkbenchWindow.h"
@@ -67,6 +68,11 @@ const int QmitkQBallReconstructionView::nrconvkernels = 252;
 
 struct QbrShellSelection
 {
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionType            GradientDirectionType;
+  typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
+  typedef mitk::DiffusionPropertyHelper::BValueMapType                    BValueMapType;
+  typedef itk::VectorImage< DiffusionPixelType, 3 >                       ITKDiffusionImageType;
+
   QmitkQBallReconstructionView* m_View;
   mitk::DataNode * m_Node;
   std::string m_NodeName;
@@ -74,16 +80,28 @@ struct QbrShellSelection
   std::vector<QCheckBox *> m_CheckBoxes;
   QLabel * m_Label;
 
-  mitk::DiffusionImage<DiffusionPixelType> * m_Image;
-  typedef mitk::DiffusionImage<DiffusionPixelType>::BValueMap  BValueMap;
+  mitk::Image * m_Image;
 
   QbrShellSelection(QmitkQBallReconstructionView* view, mitk::DataNode * node)
     : m_View(view),
       m_Node(node),
       m_NodeName(node->GetName())
   {
-    m_Image = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType> * > (node->GetData());
-    if(!m_Image){MITK_INFO << "QmitkQBallReconstructionView::QbrShellSelection : fail to initialize DiffusionImage "; return;}
+    m_Image = dynamic_cast<mitk::Image * > (node->GetData());
+
+    if(!m_Image)
+    {
+      MITK_ERROR << "QmitkQBallReconstructionView::QbrShellSelection : no image selected";
+      return;
+    }
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(m_Node->GetData())) );
+
+    if( !isDiffusionImage )
+    {
+      MITK_ERROR <<
+        "QmitkQBallReconstructionView::QbrShellSelection : selected image contains no diffusion information";
+      return;
+    }
 
     GenerateCheckboxes();
 
@@ -91,16 +109,16 @@ struct QbrShellSelection
 
   void GenerateCheckboxes()
   {
-    BValueMap origMap = m_Image->GetBValueMap();
-    BValueMap::iterator itStart = origMap.begin();
+    BValueMapType origMap = static_cast<mitk::BValueMapProperty*>(m_Image->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+    BValueMapType::iterator itStart = origMap.begin();
     itStart++;
-    BValueMap::iterator itEnd = origMap.end();
+    BValueMapType::iterator itEnd = origMap.end();
 
     m_Label = new QLabel(m_NodeName.c_str());
     m_Label->setVisible(true);
     m_View->m_Controls->m_QBallSelectionBox->layout()->addWidget(m_Label);
 
-    for(BValueMap::iterator it = itStart ; it!= itEnd; it++)
+    for(BValueMapType::iterator it = itStart ; it!= itEnd; it++)
     {
       QCheckBox * box  = new QCheckBox(QString::number(it->first));
       m_View->m_Controls->m_QBallSelectionBox->layout()->addWidget(box);
@@ -120,10 +138,10 @@ struct QbrShellSelection
     }
   }
 
-  BValueMap GetBValueSelctionMap()
+  BValueMapType GetBValueSelctionMap()
   {
-    BValueMap inputMap = m_Image->GetBValueMap();
-    BValueMap outputMap;
+    BValueMapType inputMap = static_cast<mitk::BValueMapProperty*>(m_Image->GetProperty(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME.c_str()).GetPointer() )->GetBValueMap();
+    BValueMapType outputMap;
 
     unsigned int val = 0;
 
@@ -166,8 +184,6 @@ using namespace berry;
 struct QbrSelListener : ISelectionListener
 {
 
-  berryObjectMacro(QbrSelListener);
-
   QbrSelListener(QmitkQBallReconstructionView* view)
   {
     m_View = view;
@@ -202,9 +218,10 @@ struct QbrSelListener : ISelectionListener
         if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
         {
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-          mitk::DiffusionImage<DiffusionPixelType>* diffusionImage = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType> * >(node->GetData());
+          bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );
+          mitk::Image* diffusionImage = dynamic_cast<mitk::Image * >(node->GetData());
           // only look at interesting types
-          if(diffusionImage)
+          if(diffusionImage && isDiffusionImage)
           {
             foundDwiVolume = true;
             selected_images += QString(node->GetName().c_str());
@@ -224,13 +241,14 @@ struct QbrSelListener : ISelectionListener
     }
   }
 
-  void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
+  void SelectionChanged(const IWorkbenchPart::Pointer& part,
+                        const ISelection::ConstPointer& selection) override
   {
     // check, if selection comes from datamanager
     if (part)
     {
-      QString partname(part->GetPartName().c_str());
-      if(partname.compare("Data Manager")==0)
+      QString partname = part->GetPartName();
+      if(partname == "Data Manager")
       {
 
         // apply selection
@@ -256,7 +274,7 @@ QmitkQBallReconstructionView::QmitkQBallReconstructionView()
 
 QmitkQBallReconstructionView::~QmitkQBallReconstructionView()
 {
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
 }
 
 void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
@@ -284,12 +302,12 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     AdvancedCheckboxClicked();
   }
 
-  m_SelListener = berry::ISelectionListener::Pointer(new QbrSelListener(this));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+  m_SelListener.reset(new QbrSelListener(this));
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
   berry::ISelection::ConstPointer sel(
         this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<QbrSelListener>()->DoSelectionChanged(sel);
+  static_cast<QbrSelListener*>(m_SelListener.data())->DoSelectionChanged(sel);
 }
 
 void QmitkQBallReconstructionView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -325,7 +343,7 @@ void QmitkQBallReconstructionView::Activated()
   berry::ISelection::ConstPointer sel(
         this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<QbrSelListener>()->DoSelectionChanged(sel);
+  static_cast<QbrSelListener*>(m_SelListener.data())->DoSelectionChanged(sel);
 }
 
 void QmitkQBallReconstructionView::Deactivated()
@@ -341,7 +359,8 @@ void QmitkQBallReconstructionView::Deactivated()
           continue;
 
       // only look at interesting types
-      if(dynamic_cast<mitk::DiffusionImage<short>*>(node->GetData()))
+      bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );
+      if( isDiffusionImage )
       {
           if (this->GetDefaultDataStorage()->GetNamedDerivedNode("ThresholdOverlay", *itemiter))
           {
@@ -496,7 +515,9 @@ void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
         mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+
+        bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );
+        if ( isDiffusionImage )
         {
           set->InsertElement(at++, node);
         }
@@ -550,8 +571,8 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
     while ( itemiter != itemiterend ) // for all items
     {
 
-      mitk::DiffusionImage<DiffusionPixelType>* vols =
-          static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
+      mitk::Image* vols =
+          static_cast<mitk::Image*>(
             (*itemiter)->GetData());
 
       std::string nodename;
@@ -567,10 +588,13 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
           <DiffusionPixelType, DiffusionPixelType, TTensorPixelType, QBALL_ODFSIZE>
           QballReconstructionImageFilterType;
 
+      ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+      mitk::CastToItkImage(vols, itkVectorImagePointer);
+
       QballReconstructionImageFilterType::Pointer filter =
           QballReconstructionImageFilterType::New();
-      filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
-      filter->SetBValue(vols->GetReferenceBValue());
+      filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+      filter->SetBValue( static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
       filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
 
       std::string nodePostfix;
@@ -735,9 +759,13 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
       <DiffusionPixelType,DiffusionPixelType,TTensorPixelType,L,QBALL_ODFSIZE> FilterType;
   typename FilterType::Pointer filter = FilterType::New();
 
-  mitk::DiffusionImage<DiffusionPixelType>* vols = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType>*>(dataNodePointer->GetData());
-  filter->SetGradientImage( vols->GetDirections(), vols->GetVectorImage() );
-  filter->SetBValue(vols->GetReferenceBValue());
+  mitk::Image* vols = dynamic_cast<mitk::Image*>(dataNodePointer->GetData());
+
+    ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+  mitk::CastToItkImage(vols, itkVectorImagePointer);
+
+  filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+  filter->SetBValue( static_cast<mitk::FloatProperty*>(vols->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
   filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
   filter->SetLambda(lambda);
 
@@ -921,8 +949,8 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
   std::string nodename;
   dataNodePointer->GetStringProperty("name",nodename);
 
-  mitk::DiffusionImage<DiffusionPixelType>* dwi = dynamic_cast<mitk::DiffusionImage<DiffusionPixelType>*>(dataNodePointer->GetData());
-  mitk::DiffusionImage<short>::BValueMap currSelectionMap = m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap();
+  mitk::Image* dwi = dynamic_cast<mitk::Image*>(dataNodePointer->GetData());
+  BValueMapType currSelectionMap = m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap();
 
   if(currSelectionMap.size() != 4 && currSelectionMap.find(0) != currSelectionMap.end())
   {
@@ -930,8 +958,8 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
     return;
   }
 
-  mitk::DiffusionImage<short>::BValueMap::reverse_iterator it1 = currSelectionMap.rbegin();
-  mitk::DiffusionImage<short>::BValueMap::reverse_iterator it2 = currSelectionMap.rbegin();
+  BValueMapType::reverse_iterator it1 = currSelectionMap.rbegin();
+  BValueMapType::reverse_iterator it2 = currSelectionMap.rbegin();
   ++it2;
 
   // Get average distance
@@ -951,36 +979,38 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
       return;
     }
 
+    ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+    mitk::CastToItkImage(dwi, itkVectorImagePointer);
 
-  filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
-  filter->SetGradientImage( dwi->GetDirections(), dwi->GetVectorImage(), dwi->GetReferenceBValue() );
-  filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
-  filter->SetLambda(lambda);
-  filter->Update();
+    filter->SetBValueMap(m_ShellSelectorMap[dataNodePointer]->GetBValueSelctionMap());
+    filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( dwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer, static_cast<mitk::FloatProperty*>(dwi->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+    filter->SetThreshold( m_Controls->m_QBallReconstructionThreasholdEdit->value() );
+    filter->SetLambda(lambda);
+    filter->Update();
 
 
-  // ODFs TO DATATREE
-  mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-  image->InitializeByItk( filter->GetOutput() );
-  image->SetVolume( filter->GetOutput()->GetBufferPointer() );
-  mitk::DataNode::Pointer node=mitk::DataNode::New();
-  node->SetData( image );
-  SetDefaultNodeProperties(node, nodename+"_SphericalHarmonics_MultiShell_Qball");
+    // ODFs TO DATATREE
+    mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+    image->InitializeByItk( filter->GetOutput() );
+    image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer node=mitk::DataNode::New();
+    node->SetData( image );
+    SetDefaultNodeProperties(node, nodename+"_SphericalHarmonics_MultiShell_Qball");
 
-  GetDefaultDataStorage()->Add(node, dataNodePointer);
+    GetDefaultDataStorage()->Add(node, dataNodePointer);
 
-  if(m_Controls->m_OutputCoeffsImage->isChecked())
-  {
-    mitk::Image::Pointer coeffsImage = mitk::Image::New();
-    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
-    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
-    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
-    coeffsNode->SetData( coeffsImage );
-    coeffsNode->SetProperty( "name", mitk::StringProperty::New(
-                               QString(nodename.c_str()).append("_SH-Coefficients").toStdString()) );
-    coeffsNode->SetVisibility(false);
-    GetDefaultDataStorage()->Add(coeffsNode, node);
-  }
+    if(m_Controls->m_OutputCoeffsImage->isChecked())
+    {
+      mitk::Image::Pointer coeffsImage = mitk::Image::New();
+      coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+      coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
+      mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
+      coeffsNode->SetData( coeffsImage );
+      coeffsNode->SetProperty( "name", mitk::StringProperty::New(
+        QString(nodename.c_str()).append("_SH-Coefficients").toStdString()) );
+      coeffsNode->SetVisibility(false);
+      GetDefaultDataStorage()->Add(coeffsNode, node);
+    }
 
 }
 
@@ -1040,15 +1070,18 @@ void QmitkQBallReconstructionView::PreviewThreshold(int threshold)
     mitk::DataStorage::SetOfObjects::const_iterator itemiterend( m_DiffusionImages->end() );
     while ( itemiter != itemiterend ) // for all items
     {
-        mitk::DiffusionImage<DiffusionPixelType>* vols =
-                static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
+        mitk::Image* vols =
+                static_cast<mitk::Image*>(
                     (*itemiter)->GetData());
 
         // Extract b0 image
+        ITKDiffusionImageType::Pointer itkVectorImagePointer = ITKDiffusionImageType::New();
+        mitk::CastToItkImage(vols, itkVectorImagePointer);
+
         typedef itk::B0ImageExtractionImageFilter<short, short> FilterType;
         FilterType::Pointer filterB0 = FilterType::New();
-        filterB0->SetInput(vols->GetVectorImage());
-        filterB0->SetDirections(vols->GetDirections());
+        filterB0->SetInput( itkVectorImagePointer );
+        filterB0->SetDirections( static_cast<mitk::GradientDirectionsProperty*>( vols->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
         filterB0->Update();
 
         mitk::Image::Pointer mitkImage = mitk::Image::New();

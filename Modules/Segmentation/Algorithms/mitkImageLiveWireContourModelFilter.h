@@ -49,7 +49,7 @@ namespace mitk {
    \ingroup ContourModelFilters
    \ingroup Process
   */
-  class MitkSegmentation_EXPORT ImageLiveWireContourModelFilter : public ContourModelSource
+  class MITKSEGMENTATION_EXPORT ImageLiveWireContourModelFilter : public ContourModelSource
   {
 
   public:
@@ -123,9 +123,9 @@ namespace mitk {
 
     virtual ~ImageLiveWireContourModelFilter();
 
-    void GenerateOutputInformation() {};
+    void GenerateOutputInformation() override {};
 
-    void GenerateData();
+    void GenerateData() override;
 
     void UpdateLiveWire();
 

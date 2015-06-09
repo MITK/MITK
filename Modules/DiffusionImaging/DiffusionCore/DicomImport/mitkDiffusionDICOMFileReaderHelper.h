@@ -1,8 +1,6 @@
 #ifndef MITKDIFFUSIONDICOMFILEREADERHELPER_H
 #define MITKDIFFUSIONDICOMFILEREADERHELPER_H
 
-#include "mitkDiffusionImage.h"
-
 #include "itkImageSeriesReader.h"
 #include "itkVectorImage.h"
 
@@ -92,7 +90,7 @@ public:
     itk::ImageRegionIterator< VectorImageType > vecIter(
           output_image, requestedRegion );
 
-    VolumeFileNamesContainer::const_iterator volumesFileNamesIter = filenames.begin();
+    auto volumesFileNamesIter = filenames.begin();
 
     // iterate over the given volumes
     unsigned int component = 0;
@@ -158,7 +156,7 @@ public:
     // generate output
     typedef itk::VectorImage< PixelType, 3 > VectorImageType;
 
-        VolumeFileNamesContainer::const_iterator volumesFileNamesIter = filenames.begin();
+        auto volumesFileNamesIter = filenames.begin();
 
     // probe the first file to retrieve the size of the 2d image
     // we need this information to compute the index relation between mosaic and resulting 3d position
@@ -245,7 +243,7 @@ public:
 
         typename MosaicImageType::IndexType mosaic_index;
 
-        mosaic_index[2] = 1;
+        mosaic_index[2] = 0;
 
         // first find the corresponding tile in the mosaic
         // this is defined by the z-position of the vector (3D) image iterator
@@ -254,7 +252,7 @@ public:
         //
         // the remaining is just computing the correct position in the mosaic, done by
         //                --------- index of (0,0,z) -----        + --- current 2d position ---
-        mosaic_index[0] = (threeD_index[2] % images_per_row) * dx + threeD_index[0] + images_per_row;
+        mosaic_index[0] = (threeD_index[2] % images_per_row) * dx + threeD_index[0];
         mosaic_index[1] = (threeD_index[2] / images_per_row) * dy + threeD_index[1];
 
         typename MosaicImageType::PixelType mosaic_pixel = current_mosaic->GetPixel( mosaic_index );

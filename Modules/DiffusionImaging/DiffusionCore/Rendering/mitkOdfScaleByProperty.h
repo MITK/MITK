@@ -36,7 +36,7 @@ namespace mitk
  *     ODFSB_NONE, ODFSB_GFA, ODFSB_PC
  * Default is ODFSB_NONE
  */
-class MitkDiffusionCore_EXPORT OdfScaleByProperty : public EnumerationProperty
+class MITKDIFFUSIONCORE_EXPORT OdfScaleByProperty : public EnumerationProperty
 {
 public:
 
@@ -77,7 +77,7 @@ protected:
    * this function is overridden as protected, so that the user may not add
    * additional invalid interpolation types.
    */
-  virtual bool AddEnum( const std::string& name, const IdType& id );
+  virtual bool AddEnum( const std::string& name, const IdType& id ) override;
 
   /**
    * Adds the enumeration types as defined by vtk to the list of known
@@ -86,7 +86,7 @@ protected:
   virtual void AddInterpolationTypes();
 };
 
-class MitkDiffusionCore_EXPORT OdfScaleByPropertySerializer : public EnumerationPropertySerializer
+class MITKDIFFUSIONCORE_EXPORT OdfScaleByPropertySerializer : public EnumerationPropertySerializer
 {
   public:
 
@@ -94,9 +94,9 @@ class MitkDiffusionCore_EXPORT OdfScaleByPropertySerializer : public Enumeration
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
       const char* sa( element->Attribute("value") );
       std::string s(sa?sa:"");
       OdfScaleByProperty::Pointer property = OdfScaleByProperty::New();

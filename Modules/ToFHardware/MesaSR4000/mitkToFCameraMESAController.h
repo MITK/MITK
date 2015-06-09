@@ -31,11 +31,11 @@ namespace mitk
   *
   * @ingroup ToFHardware
   */
-  class MITK_MESASR4000MODULE_EXPORT ToFCameraMESAController : public itk::Object
+  class MITKMESASR4000_EXPORT ToFCameraMESAController : public itk::Object
   {
   public:
 
-    mitkClassMacro( ToFCameraMESAController , itk::Object );
+    mitkClassMacroItkParent( ToFCameraMESAController , itk::Object );
 
     /*!
     \brief opens a connection to the ToF camera. Has to be implemented by the sub class

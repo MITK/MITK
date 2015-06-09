@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-#include <mitkDataNodeFactory.h>
 
 #include <itkDiffusionTensor3D.h>
 
@@ -35,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkTbssTableModel.h"
 #include "QmitkTbssMetaTableModel.h"
 
-#include <mitkFiberBundleX.h>
+#include <mitkFiberBundle.h>
 
 
 // Image types
@@ -78,18 +77,18 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     QmitkTractbasedSpatialStatisticsView();
     virtual ~QmitkTractbasedSpatialStatisticsView();
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
     /// \brief Creation of the connections of main and control widget
     virtual void CreateConnections();
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+    virtual void StdMultiWidgetNotAvailable() override;
 
     /// \brief Called when the functionality is activated
-    virtual void Activated();
+    virtual void Activated() override;
 
-    virtual void Deactivated();
+    virtual void Deactivated() override;
 
 
   protected slots:
@@ -122,16 +121,16 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
 
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
     // Creates a plot using a 4D image containing the projections of all subjects and a region of interest
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
 
 
-    void PlotFiberBundle(mitk::FiberBundleX* fib, mitk::Image* img, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
+    void PlotFiberBundle(mitk::FiberBundle* fib, mitk::Image* img, mitk::DataNode* startRoi=NULL, mitk::DataNode* endRoi=NULL);
 
 
-    void PlotFiber4D(mitk::TbssImage*, mitk::FiberBundleX* fib, mitk::PlanarFigure* startRoi=NULL, mitk::PlanarFigure* endRoi=NULL);
+    void PlotFiber4D(mitk::TbssImage*, mitk::FiberBundle* fib, mitk::DataNode *startRoi=NULL, mitk::DataNode *endRoi=NULL);
 
     // Create a point set. This point set defines the points through which a region of interest should go
     void InitPointsets();
@@ -151,7 +150,7 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkFunctionality
     // Used to save the region of interest in a vector of itk::index.
     std::vector< itk::Index<3> > m_Roi;
 
-    mitk::FiberBundleX* m_Fib;
+    mitk::FiberBundle* m_Fib;
 
     mitk::BaseGeometry* m_CurrentGeometry;
 

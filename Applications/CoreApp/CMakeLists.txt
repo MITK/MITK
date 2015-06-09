@@ -11,7 +11,6 @@ endif()
 set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MitkCoreApp.provisioning" CACHE INTERNAL "CoreApp provisioning file" FORCE)
 
 set(_plugins
-  org.blueberry.compat
   org.mitk.gui.qt.coreapplication
   org.mitk.gui.qt.stdmultiwidgeteditor
 )
@@ -23,13 +22,16 @@ set(_plugins
 
 set(_exclude_plugins )
 
-FunctionCreateBlueBerryApplication(
+mitkFunctionCreateBlueBerryApplication(
   NAME MitkCoreApp
   DESCRIPTION "MITK - CoreApp Application"
   PLUGINS ${_plugins}
   ${_app_options}
 )
-mitk_use_modules(TARGET MitkCoreApp PACKAGES Qt4|QtGui Qt5|Widgets)
+
+mitk_use_modules(TARGET MitkCoreApp
+  MODULES MitkAppUtil
+)
 
 # subproject support
 add_dependencies(MITK-CoreUI MitkCoreApp)

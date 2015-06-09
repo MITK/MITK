@@ -29,7 +29,7 @@ namespace mitk {
  * method in their own GenerateData() implementation to pass through navigation data
  * from all inputs to the outputs.
  */
-class MitkUSNavigation_EXPORT NavigationDataPassThroughFilter : public NavigationDataToNavigationDataFilter
+class MITKUSNAVIGATION_EXPORT NavigationDataPassThroughFilter : public NavigationDataToNavigationDataFilter
 {
 public:
   mitkClassMacro(NavigationDataPassThroughFilter, NavigationDataToNavigationDataFilter)
@@ -44,7 +44,7 @@ protected:
    * If a subclass wants to implement its own version of the GenerateData()
    * method it should call this method inside its implementation.
    */
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 };
 
 } // namespace mitk

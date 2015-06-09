@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.openigtlinkmanager"
+          name="OpenIGTLinkManager"
+          class="OpenIGTLinkManager"
+          icon="resources/manager.png" />
+  </extension>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.OpenIGTLinkExample"
+          name="OpenIGTLinkExample"
+          class="OpenIGTLinkExample"
+          icon="resources/example.png" />
+  </extension>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.OpenIGTLinkProviderExample"
+          name="OpenIGTLinkProviderExample"
+          class="OpenIGTLinkProviderExample"
+          icon="resources/provider.png" />
+  </extension>
+
+</plugin>

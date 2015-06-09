@@ -30,7 +30,7 @@ namespace mitk {
   *
   * @ingroup Navigation
   */
-  class MitkIGT_EXPORT NavigationDataSmoothingFilter : public NavigationDataToNavigationDataFilter
+  class MITKIGT_EXPORT NavigationDataSmoothingFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataSmoothingFilter, NavigationDataToNavigationDataFilter);
@@ -46,7 +46,7 @@ namespace mitk {
     NavigationDataSmoothingFilter();
     virtual ~NavigationDataSmoothingFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     std::map< int, std::map< int , mitk::Point3D> > m_LastValuesList;
 

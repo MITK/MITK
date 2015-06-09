@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRegionGrow3DTool.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, RegionGrow3DTool, "RegionGrower 3D");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, RegionGrow3DTool, "RegionGrower 3D");
 }
 
 mitk::RegionGrow3DTool::RegionGrow3DTool(): Tool("PressMoveRelease"),

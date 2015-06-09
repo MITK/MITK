@@ -31,14 +31,14 @@ namespace mitk
 {
   /**
   * \brief A class for thresholding connectomics networks */
-  class MitkConnectomics_EXPORT ConnectomicsNetworkThresholder : public itk::Object
+  class MITKCONNECTOMICS_EXPORT ConnectomicsNetworkThresholder : public itk::Object
   {
   public:
 
     /** Standard class typedefs. */
     /** Method for creation through the object factory. */
 
-    mitkClassMacro(ConnectomicsNetworkThresholder, itk::Object);
+    mitkClassMacroItkParent(ConnectomicsNetworkThresholder, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkDiffusionImagingAppWorkbenchAdvisor.h"
 
-int QmitkDiffusionImagingAppApplication::Start()
+QVariant QmitkDiffusionImagingAppApplication::Start(berry::IApplicationContext*)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
 

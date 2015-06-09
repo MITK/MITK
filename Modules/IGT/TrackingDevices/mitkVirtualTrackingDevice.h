@@ -36,7 +36,7 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT VirtualTrackingDevice : public TrackingDevice
+  class MITKIGT_EXPORT VirtualTrackingDevice : public TrackingDevice
   {
   public:
 
@@ -68,36 +68,36 @@ namespace mitk
     * \warning tool speed is not yet used in the current version
     * \return Returns true if the tracking is started. Returns false if there was an error.
     */
-    virtual bool StartTracking();
+    virtual bool StartTracking() override;
 
     /**
     * \brief Stops the tracking.
     * \return Returns true if the tracking is stopped. Returns false if there was an error.
     */
-    virtual bool StopTracking();
+    virtual bool StopTracking() override;
 
     /**
     * \brief Opens the connection to the device. This have to be done before the tracking is started.
     * @throw mitk::IGTException Throws an exception if there are two less control points to start the the virtual device.
     */
-    virtual bool OpenConnection();
+    virtual bool OpenConnection() override;
 
     /**
     * \brief Closes the connection and clears all resources.
     */
-    virtual bool CloseConnection();
+    virtual bool CloseConnection() override;
 
     /**
     * \return Returns the number of tools which have been added to the device.
     */
-    virtual unsigned int GetToolCount() const;
+    virtual unsigned int GetToolCount() const override;
 
     /**
     * \param toolNumber The number of the tool which should be given back.
     * \return Returns the tool which the number "toolNumber". Returns NULL, if there is
     * no tool with this number.
     */
-    TrackingTool* GetTool(unsigned int toolNumber) const;
+    TrackingTool* GetTool(unsigned int toolNumber) const override;
 
     /**
     * \brief Adds a tool to the tracking device.

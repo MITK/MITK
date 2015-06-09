@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkXnatObjectEditorInput.h"
 
+#include <QIcon>
+
 QmitkXnatObjectEditorInput::QmitkXnatObjectEditorInput(ctkXnatObject* object)
   : m_Object(object)
 {
@@ -35,14 +37,14 @@ bool QmitkXnatObjectEditorInput::Exists() const
   return m_Object->exists();
 }
 
-std::string QmitkXnatObjectEditorInput::GetName() const
+QString QmitkXnatObjectEditorInput::GetName() const
 {
-  return m_Object->id().toStdString();
+  return m_Object->id();
 }
 
-std::string QmitkXnatObjectEditorInput::GetToolTipText() const
+QString QmitkXnatObjectEditorInput::GetToolTipText() const
 {
-  return m_Object->description().toStdString();
+  return m_Object->description();
 }
 
 bool QmitkXnatObjectEditorInput::operator==(const berry::Object* o) const
@@ -60,4 +62,20 @@ bool QmitkXnatObjectEditorInput::operator==(const berry::Object* o) const
     }
   }
   return false;
+}
+
+
+QIcon QmitkXnatObjectEditorInput::GetIcon() const
+{
+  return QIcon();
+}
+
+const berry::IPersistableElement* QmitkXnatObjectEditorInput::GetPersistable() const
+{
+  return nullptr;
+}
+
+berry::Object* QmitkXnatObjectEditorInput::GetAdapter(const QString& /*adapterType*/) const
+{
+  return nullptr;
 }

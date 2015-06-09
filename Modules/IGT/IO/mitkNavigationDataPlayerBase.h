@@ -30,7 +30,7 @@ namespace mitk{
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataPlayerBase
+  class MITKIGT_EXPORT NavigationDataPlayerBase
     : public NavigationDataSource
   {
   public:
@@ -49,7 +49,7 @@ namespace mitk{
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update.
     */
-    virtual void UpdateOutputInformation();
+    virtual void UpdateOutputInformation() override;
 
     itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer)
 

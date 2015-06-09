@@ -45,7 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkExceptionObject.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MitkSegmentation_EXPORT, WatershedTool, "Watershed tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, WatershedTool, "Watershed tool");
 }
 
 
@@ -78,7 +78,7 @@ us::ModuleResource mitk::WatershedTool::GetIconResource() const
 
 const char** mitk::WatershedTool::GetXPM() const
 {
-  return NULL;
+  return nullptr;
 }
 
 const char* mitk::WatershedTool::GetName() const

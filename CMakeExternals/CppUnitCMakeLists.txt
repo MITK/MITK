@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
 project(CppUnit)
 
@@ -11,12 +11,6 @@ set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_M
 # See Visual C Unicode Programming Summary
 # http://msdn.microsoft.com/en-us/library/dybsewaf%28VS.100%29.aspx
 #add_definitions(-DUNICODE -D_UNICODE)
-
-
-add_definitions(-DCPPUNIT_BUILD_DLL)
-
-include_directories(include)
-
 
 # Generates include/cppunit/config-auto.h
 # This is originally done by autoconf
@@ -183,23 +177,53 @@ set(cppunit_SRCS
 )
 
 add_library(cppunit SHARED ${cppunit_SRCS})
+target_include_directories(cppunit
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>"
+)
+target_compile_definitions(cppunit PRIVATE CPPUNIT_BUILD_DLL)
 
 set_target_properties(cppunit PROPERTIES
   VERSION ${${PROJECT_NAME}_VERSION}
   SOVERSION ${${PROJECT_NAME}_VERSION}
 )
 
-# Config files
 set(${PROJECT_NAME}_LIBRARIES cppunit)
-set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-configure_file(${PROJECT_NAME}Config.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
-export(TARGETS ${${PROJECT_NAME}_LIBRARIES} FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Exports.cmake)
+# Install support
 
-# Version information
+install(TARGETS ${${PROJECT_NAME}_LIBRARIES} EXPORT ${PROJECT_NAME}_TARGETS
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+install(DIRECTORY include/cppunit
+  DESTINATION include
+)
+
+# Config files
+configure_file(
+  ${PROJECT_NAME}Config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+  @ONLY
+)
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   @ONLY
-  )
+)
+
+export(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
+)
+
+set(config_package_location lib/cmake/${PROJECT_NAME})
+install(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${PROJECT_NAME}Targets.cmake
+  DESTINATION ${config_package_location}
+)
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  DESTINATION ${config_package_location}
+)

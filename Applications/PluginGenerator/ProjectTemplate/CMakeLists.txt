@@ -1,8 +1,16 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 
 # Change project and application name to your own
 set(MY_PROJECT_NAME $(project-name))
 set(MY_APP_NAME $(project-app-name))
+
+#-----------------------------------------------------------------------------
+# Set the language standard (MITK requires C++11)
+#-----------------------------------------------------------------------------
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED 1)
+set(CMAKE_CXX_EXTENSIONS 0)
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -279,27 +287,13 @@ endif()
 # Qt support
 #-----------------------------------------------------------------------------
 
-if(MITK_USE_QT)
+if(MITK_USE_Qt4)
   set(QT_QMAKE_EXECUTABLE ${MITK_QMAKE_EXECUTABLE})
 endif()
 
 #-----------------------------------------------------------------------------
 # MITK modules
 #-----------------------------------------------------------------------------
-
-# This project's directory holding module config files
-#set(${PROJECT_NAME}_MODULES_CONF_DIR "${PROJECT_BINARY_DIR}/${MODULES_CONF_DIRNAME}")
-
-# Append this projects's module config directory to the global list
-# (This is used to get include directories for the <module_name>Exports.h files right)
-#list(APPEND MODULES_CONF_DIRS ${${PROJECT_NAME}_MODULES_CONF_DIR})
-
-# Clean the modulesConf directory. This ensures that modules are sorted
-# according to their dependencies in the Modules/CMakeLists.txt file
-#file(GLOB _modules_conf_files ${${PROJECT_NAME}_MODULES_CONF_DIR}/*.cmake)
-#if(_modules_conf_files)
-#  file(REMOVE ${_modules_conf_files})
-#endif()
 
 #add_subdirectory(Modules)
 

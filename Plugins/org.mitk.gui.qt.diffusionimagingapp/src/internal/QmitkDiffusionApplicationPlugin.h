@@ -22,9 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QString>
 
-#include <berryQCHPluginListener.h>
-
-class QmitkDiffusionApplicationPlugin : public QObject, public berry::AbstractUICTKPlugin
+class QmitkDiffusionApplicationPlugin : public berry::AbstractUICTKPlugin
 {
   Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -41,7 +39,7 @@ public:
 
   ctkPluginContext* GetPluginContext() const;
 
-  void start(ctkPluginContext*);
+  void start(ctkPluginContext*) override;
 
   QString GetQtHelpCollectionFile() const;
 

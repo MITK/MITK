@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/org_mitk_gui_qt_application_Activator.h"
 
 #include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
 #include <berryPlatformUI.h>
 
 #include <mitkWorkbenchUtil.h>
@@ -35,12 +36,12 @@ public:
 
   berry::IPreferences::Pointer GetPreferences() const
   {
-    berry::IPreferencesService::Pointer prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
+    berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
     if (prefService)
     {
       return prefService->GetSystemPreferences()->Node("/General");
     }
-    return berry::IPreferences::Pointer(0);
+    return berry::IPreferences::Pointer(nullptr);
   }
 
   bool GetOpenEditor() const

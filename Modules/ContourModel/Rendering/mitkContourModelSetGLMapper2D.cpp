@@ -68,7 +68,7 @@ mitk::ContourModelSet* mitk::ContourModelSetGLMapper2D::GetInput(void)
 }
 
 
-void mitk::ContourModelSetGLMapper2D::DrawContour(mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer)
+void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer)
 {
   if(!renderingContour) return;
 
@@ -275,10 +275,10 @@ void mitk::ContourModelSetGLMapper2D::DrawContour(mitk::ContourModel* renderingC
             ss << index;
             l.append(ss.str());
 
-            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
             float rgb[3];
             rgb[0] = 0.0; rgb[1] = 0.0; rgb[2] = 0.0;
-            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
+
+            WriteTextWithOverlay( m_PointNumbersOverlay, l.c_str(), rgb, pt2d, renderer );
         }
 
 
@@ -289,10 +289,10 @@ void mitk::ContourModelSetGLMapper2D::DrawContour(mitk::ContourModel* renderingC
             ss << index;
             l.append(ss.str());
 
-            mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
             float rgb[3];
             rgb[0] = 1.0; rgb[1] = 1.0; rgb[2] = 0.0;
-            OpenGLrenderer->WriteSimpleText(l, pt2d[0] + 2, pt2d[1] + 2,rgb[0], rgb[1],rgb[2]);
+
+            WriteTextWithOverlay( m_ControlPointNumbersOverlay, l.c_str(), rgb, pt2d, renderer );
         }
 
         index++;

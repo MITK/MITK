@@ -40,7 +40,7 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class MitkSegmentation_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
   {
   public:
 
@@ -51,39 +51,39 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    bool CanHandle(BaseData* referenceData) const;
+    bool CanHandle(BaseData* referenceData) const override;
 
     /**
      * @brief Get XPM
      * @return NULL
      */
-    virtual const char** GetXPM() const;
+    virtual const char** GetXPM() const override;
 
     /**
      * @brief Get name
      * @return name of the Tool
      */
-    virtual const char* GetName() const;
+    virtual const char* GetName() const override;
 
     /**
      * @brief Get icon resource
      * @return the resource Object of the Icon
      */
-    us::ModuleResource GetIconResource() const;
+    us::ModuleResource GetIconResource() const override;
 
     /**
      * @brief Adds interactor for the seedpoint and creates a seedpoint if neccessary.
      *
      *
      */
-    virtual void Activated();
+    virtual void Activated() override;
 
     /**
      * @brief Removes all set points and interactors.
      *
      *
      */
-    virtual void Deactivated();
+    virtual void Deactivated() override;
 
     /**
      * @brief get pointset node

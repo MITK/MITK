@@ -20,12 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include "MitkIGTUIExports.h"
 
-class MitkIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget //MitkIGTUI_EXPORT
+class MITKIGTUI_EXPORT QmitkTrackingDeviceWidget : public QWidget //MITKIGTUI_EXPORT
 {
   Q_OBJECT
 
   public:
-    QmitkTrackingDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkTrackingDeviceWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
     ~QmitkTrackingDeviceWidget();
 
 

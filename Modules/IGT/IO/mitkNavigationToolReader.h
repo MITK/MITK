@@ -35,11 +35,11 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationToolReader : public itk::Object
+  class MITKIGT_EXPORT NavigationToolReader : public itk::Object
   {
   friend class mitk::NavigationToolStorageDeserializer;
   public:
-    mitkClassMacro(NavigationToolReader,itk::Object);
+    mitkClassMacroItkParent(NavigationToolReader,itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

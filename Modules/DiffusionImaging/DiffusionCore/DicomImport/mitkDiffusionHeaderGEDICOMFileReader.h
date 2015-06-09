@@ -7,7 +7,7 @@
 namespace mitk
 {
 
-class MitkDiffusionCore_EXPORT DiffusionHeaderGEDICOMFileReader
+class MITKDIFFUSIONCORE_EXPORT DiffusionHeaderGEDICOMFileReader
     : public DiffusionHeaderDICOMFileReader
 {
 public:
@@ -15,7 +15,7 @@ public:
   mitkClassMacro( DiffusionHeaderGEDICOMFileReader, DiffusionHeaderDICOMFileReader )
   itkNewMacro( Self )
 
-  virtual bool ReadDiffusionHeader(std::string filename);
+  virtual bool ReadDiffusionHeader(std::string filename) override;
 
 protected:
   DiffusionHeaderGEDICOMFileReader();

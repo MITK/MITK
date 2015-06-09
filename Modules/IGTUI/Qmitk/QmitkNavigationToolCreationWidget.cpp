@@ -17,23 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNavigationToolCreationWidget.h"
 
 //mitk headers
-#include "mitkTrackingTypes.h"
-#include <mitkSTLFileReader.h>
+#include <mitkTrackingTypes.h>
 #include <mitkSurface.h>
-#include "mitkNavigationData.h"
-#include "mitkRenderingManager.h"
+#include <mitkNavigationData.h>
+#include <mitkRenderingManager.h>
 
 //qt headers
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 #include <QDialog>
+#include <mitkIOUtil.h>
 
 //poco headers
 #include <Poco/Path.h>
 
 // vtk
 #include <vtkSphereSource.h>
-#include "vtkConeSource.h"
+#include <vtkConeSource.h>
 
 const std::string QmitkNavigationToolCreationWidget::VIEW_ID = "org.mitk.views.navigationtoolcreationwizardwidget";
 
@@ -82,7 +82,7 @@ connect( m_Controls->m_Surface_Use_Other, SIGNAL(toggled(bool)), this, SLOT(OnSu
 }
 }
 
-void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorage, std::string supposedIdentifier, std::string supposedName)
+void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorage, const std::string& supposedIdentifier, const std::string& supposedName)
 {
 m_DataStorage = dataStorage;
 
@@ -106,16 +106,18 @@ void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDevi
 {
 switch(type)
 {
-case mitk::NDIAurora:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);break;
-case mitk::NDIPolaris:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
-case mitk::ClaronMicron:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
-case mitk::NPOptitrack:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
-default:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
+  case mitk::NDIAurora:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);break;
+  case mitk::NDIPolaris:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
+  case mitk::ClaronMicron:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
+  case mitk::NPOptitrack:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
+  case mitk::VirtualTracker:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);break;
+  default:
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);
 }
 m_Controls->m_TrackingDeviceTypeChooser->setEnabled(changeable);
 }
@@ -167,8 +169,9 @@ m_CreatedTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toLatin1()
 //Tracking Device
 if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Aurora") m_CreatedTool->SetTrackingDeviceType(mitk::NDIAurora);
 else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Polaris") m_CreatedTool->SetTrackingDeviceType(mitk::NDIPolaris);
-else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Claron Technology Micron Tracker") m_CreatedTool->SetTrackingDeviceType(mitk::ClaronMicron);
+else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="CT MicronTracker") m_CreatedTool->SetTrackingDeviceType(mitk::ClaronMicron);
 else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NP Optitrack") m_CreatedTool->SetTrackingDeviceType(mitk::NPOptitrack);
+else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Virtual Tracker") m_CreatedTool->SetTrackingDeviceType(mitk::VirtualTracker);
 else m_CreatedTool->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
 
 //ToolType
@@ -200,25 +203,15 @@ emit Canceled();
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
-mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-try
-{
-stlReader->SetFileName( filename.c_str() );
-stlReader->Update();
-}
-catch (...)
-{
-}
-
-if ( stlReader->GetOutput() == NULL );
-else
-{
-mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-newNode->SetName(filename);
-newNode->SetData(stlReader->GetOutput());
-m_DataStorage->Add(newNode);
-}
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
+  try
+  {
+    mitk::IOUtil::Load(filename.c_str(), *m_DataStorage);
+  }
+  catch (mitk::Exception &e)
+  {
+    MITK_ERROR << "Exception occured: " << e.what();
+  }
 }
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
@@ -242,6 +235,8 @@ case mitk::ClaronMicron:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
 case mitk::NPOptitrack:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
+case mitk::VirtualTracker:
+m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);break;
 default:
 m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
 }

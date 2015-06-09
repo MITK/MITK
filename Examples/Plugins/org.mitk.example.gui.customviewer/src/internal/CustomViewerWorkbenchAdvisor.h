@@ -33,23 +33,19 @@ public:
   /**
    * Holds the ID-String of the initial window perspective.
    */
-  static const std::string DEFAULT_PERSPECTIVE_ID;
+  static const QString DEFAULT_PERSPECTIVE_ID;
 
-  berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer);
+  berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer) override;
   ~CustomViewerWorkbenchAdvisor();
 
   /**
    * Gets the style manager (berry::IQtStyleManager), adds and initializes a Qt-Stylesheet-File (.qss).
    */
-  void Initialize(berry::IWorkbenchConfigurer::Pointer);
+  void Initialize(berry::IWorkbenchConfigurer::Pointer) override;
 
   /**
    * Returns the ID-String of the initial window perspective.
    */
-  std::string GetInitialWindowPerspectiveId();
-
-private:
-
-  QScopedPointer<berry::WorkbenchWindowAdvisor> wwAdvisor;
+  QString GetInitialWindowPerspectiveId() override;
 
 };

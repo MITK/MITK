@@ -99,6 +99,8 @@ public:
 
     void OnHandleCTKEventPresetsChanged(const ctkEvent& event);
 
+    void OnHandleCTKEventGlobalVisChanged(const ctkEvent& event);
+
     void ActualizeFreeIsoLine();
 
 protected:

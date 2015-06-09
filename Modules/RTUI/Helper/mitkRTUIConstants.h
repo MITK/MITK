@@ -76,6 +76,7 @@ struct MITKRTUI_EXPORT RTCTKEventConstants
   static const std::string TOPIC_REFERENCE_DOSE_CHANGED;
   static const std::string TOPIC_ISO_DOSE_LEVEL_PRESETS;
   static const std::string TOPIC_ISO_DOSE_LEVEL_PRESETS_CHANGED;
+  static const std::string TOPIC_GLOBAL_VISIBILITY_CHANGED;
 };
 
 }

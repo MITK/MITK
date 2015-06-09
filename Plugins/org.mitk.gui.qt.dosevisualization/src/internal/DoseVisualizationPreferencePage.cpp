@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "org_mitk_gui_qt_dosevisualization_Activator.h"
 
 DoseVisualizationPreferencePage::DoseVisualizationPreferencePage()
-  : m_MainControl(0), m_Controls(0), m_referenceDoseChanged(false), m_presetMapChanged(false)
+  : m_MainControl(0), m_Controls(0), m_referenceDoseChanged(false), m_presetMapChanged(false), m_globalVisChanged(false)
 {
 
 }
@@ -90,6 +90,8 @@ void DoseVisualizationPreferencePage::CreateQtControl(QWidget* parent)
   connect(m_Controls->btnResetPreset, SIGNAL(clicked(bool)), this, SLOT(OnResetPresetClicked(bool)));
   connect(m_Controls->btnDelLevel, SIGNAL(clicked(bool)), this, SLOT(OnDelLevelClicked(bool)));
   connect(m_Controls->btnAddLevel, SIGNAL(clicked(bool)), this, SLOT(OnAddLevelClicked(bool)));
+  connect(m_Controls->checkGlobalVisColorWash, SIGNAL(toggled(bool)), this, SLOT(OnGlobalVisChanged(bool)));
+  connect(m_Controls->checkGlobalVisIsoLine, SIGNAL(toggled(bool)), this, SLOT(OnGlobalVisChanged(bool)));
 
   this->Update();
 }
@@ -129,6 +131,11 @@ bool DoseVisualizationPreferencePage::PerformOk()
     mitk::SignalPresetMapChange(mitk::org_mitk_gui_qt_dosevisualization_Activator::GetContext());
   }
 
+  if(m_globalVisChanged)
+  {
+    mitk::SignalGlobalVisChange(m_Controls->checkGlobalSync->isChecked(), m_Controls->checkGlobalVisIsoLine->isChecked(), m_Controls->checkGlobalVisColorWash->isChecked(), mitk::org_mitk_gui_qt_dosevisualization_Activator::GetContext());
+  }
+
   return true;
 }
 
@@ -147,6 +154,7 @@ void DoseVisualizationPreferencePage::Update()
 
   m_referenceDoseChanged = false;
   m_presetMapChanged = false;
+  m_globalVisChanged = false;
 
 
   this->m_Presets = mitk::LoadPresetsMap();
@@ -375,4 +383,9 @@ void DoseVisualizationPreferencePage::OnDelLevelClicked(bool checked)
 void DoseVisualizationPreferencePage::OnReferenceDoseChanged(double dose)
 {
   this->m_referenceDoseChanged = true;
-};
+}
+
+void DoseVisualizationPreferencePage::OnGlobalVisChanged(bool vis)
+{
+  this->m_globalVisChanged = true;
+}

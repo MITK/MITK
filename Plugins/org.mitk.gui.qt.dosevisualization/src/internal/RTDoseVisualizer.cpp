@@ -125,6 +125,9 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
 
     propsForSlot[ctkEventConstants::EVENT_TOPIC] = mitk::RTCTKEventConstants::TOPIC_REFERENCE_DOSE_CHANGED.c_str();
     eventAdmin->subscribeSlot(this, SLOT(OnHandleCTKEventReferenceDoseChanged(ctkEvent)), propsForSlot);
+
+    propsForSlot[ctkEventConstants::EVENT_TOPIC] = mitk::RTCTKEventConstants::TOPIC_GLOBAL_VISIBILITY_CHANGED.c_str();
+    eventAdmin->subscribeSlot(this, SLOT(OnHandleCTKEventGlobalVisChanged(ctkEvent)), propsForSlot);
   }
 
   this->UpdateBySelectedNode();
@@ -489,15 +492,25 @@ void RTDoseVisualizer::UpdateBySelectedNode()
 
     //global dose issues
     //ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring
-    bool showIsoLine = false;
-
-    isoDoseNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(),showIsoLine);
-
+    bool showIsoLine = mitk::GetGlobalIsolineVis();
+    isoDoseNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(),showIsoLine);
     m_Controls.checkGlobalVisIsoLine->setChecked(showIsoLine);
 
-    bool showColorWash = false;
-    m_selectedNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(),showColorWash);
+    //toggle the visibility of the free isolevel sliders
+    this->m_Controls.listFreeValues->setEnabled(showIsoLine);
+
+    bool showColorWash = mitk::GetGlobalColorwashVis();
+    m_selectedNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(),showColorWash);
     m_Controls.checkGlobalVisColorWash->setChecked(showColorWash);
+
+    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+    if(showColorWash)
+      renderingMode->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
+    else
+      renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+    m_selectedNode->SetProperty("Image Rendering.Mode", renderingMode);
+
+//    -> Handled by the DoseVisPreferenceHelper::GetGlobalIsolineVis and GetGlobalColorwashVis
 
     float referenceDose = 0.0;
     m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),referenceDose);
@@ -551,6 +564,9 @@ void RTDoseVisualizer::UpdateByPreferences()
   m_internalUpdate = true;
   m_Controls.comboPresets->clear();
   this->m_selectedPresetName = mitk::GetSelectedPresetName();
+
+  m_Controls.checkGlobalVisIsoLine->setChecked(mitk::GetGlobalIsolineVis());
+  m_Controls.checkGlobalVisColorWash->setChecked(mitk::GetGlobalColorwashVis());
 
   if(m_Presets.empty())
     return;
@@ -671,6 +687,12 @@ void RTDoseVisualizer::OnHandleCTKEventReferenceDoseChanged(const ctkEvent& even
   bool globalSync = mitk::GetReferenceDoseValue(referenceDose);
 
   this->m_Controls.spinReferenceDose->setValue(referenceDose);
+}
+
+void RTDoseVisualizer::OnHandleCTKEventGlobalVisChanged(const ctkEvent& event)
+{
+  this->m_Controls.checkGlobalVisIsoLine->setChecked(mitk::GetGlobalIsolineVis());
+  this->m_Controls.checkGlobalVisColorWash->setChecked(mitk::GetGlobalColorwashVis());
 }
 
 void RTDoseVisualizer::OnHandleCTKEventPresetsChanged(const ctkEvent& event)

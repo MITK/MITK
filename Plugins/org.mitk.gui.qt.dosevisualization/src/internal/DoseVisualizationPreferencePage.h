@@ -90,6 +90,7 @@ public:
     void OnAddLevelClicked(bool checked);
     void OnDelLevelClicked(bool checked);
     void OnReferenceDoseChanged(double dose);
+    void OnGlobalVisChanged(bool vis);
 
 protected:
 
@@ -112,6 +113,7 @@ protected:
 
   bool m_referenceDoseChanged;
   bool m_presetMapChanged;
+  bool m_globalVisChanged;
 
   QmitkIsoDoseLevelSetModel* m_LevelSetModel;
   QmitkDoseColorDelegate* m_DoseColorDelegate;

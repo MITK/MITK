@@ -70,6 +70,28 @@ void mitk::StorePresetsMap(const PresetMapType& presetMap)
   presetsNode->Flush();
 }
 
+bool mitk::GetGlobalIsolineVis()
+{
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+
+  berry::IPreferences::Pointer glIsolineVisNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
+
+  bool vis = glIsolineVisNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID.c_str(),false);
+
+  return vis;
+}
+
+bool mitk::GetGlobalColorwashVis()
+{
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+
+  berry::IPreferences::Pointer glDoseVisNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
+
+  bool vis = glDoseVisNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID.c_str(),false);
+
+  return vis;
+}
+
 mitk::PresetMapType mitk::LoadPresetsMap()
 {
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
@@ -232,6 +254,21 @@ void mitk::SignalReferenceDoseChange(bool globalSync, mitk::DoseValueAbs value, 
     props["value"] = value;
     props["globalSync"] = globalSync;
     ctkEvent presetMapChangedEvent(mitk::RTCTKEventConstants::TOPIC_REFERENCE_DOSE_CHANGED.c_str());
+    eventAdmin->sendEvent(presetMapChangedEvent);
+  }
+}
+
+void mitk::SignalGlobalVisChange(bool globalSync, bool isolineVis, bool colorwashVis, ctkPluginContext *context)
+{
+  ctkServiceReference ref = context->getServiceReference<ctkEventAdmin>();
+  if (ref)
+  {
+    ctkEventAdmin* eventAdmin = context->getService<ctkEventAdmin>(ref);
+    ctkProperties props;
+    props["globalIsolineVis"] = isolineVis;
+    props["globalColorwashVis"] = colorwashVis;
+    props["globalSync"] = globalSync;
+    ctkEvent presetMapChangedEvent(mitk::RTCTKEventConstants::TOPIC_GLOBAL_VISIBILITY_CHANGED.c_str());
     eventAdmin->sendEvent(presetMapChangedEvent);
   }
 }

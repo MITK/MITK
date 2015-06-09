@@ -63,8 +63,12 @@ namespace mitk
     bool GetDoseDisplayAbsolute();
     void SetDoseDisplayAbsolute(bool isAbsolute);
 
+    bool GetGlobalIsolineVis();
+    bool GetGlobalColorwashVis();
+
     void SignalReferenceDoseChange(bool globalSync, mitk::DoseValueAbs value, ctkPluginContext* context);
     void SignalPresetMapChange(ctkPluginContext* context);
+    void SignalGlobalVisChange(bool globalSync, bool isolineVis, bool colorwashVis, ctkPluginContext* context);
 }
 
 #endif

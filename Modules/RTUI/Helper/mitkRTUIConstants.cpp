@@ -43,3 +43,4 @@ const std::string mitk::RTCTKEventConstants::TOPIC_ISO_DOSE_LEVEL_PRESETS = "org
 const std::string mitk::RTCTKEventConstants::TOPIC_ISO_DOSE_LEVEL_PRESETS_CHANGED = "org/mitk/rt/dosevisualization/presets/CHANGED";
 const std::string mitk::RTCTKEventConstants::TOPIC_REFERENCE_DOSE = "org/mitk/rt/dosevisualization/referenceDose";
 const std::string mitk::RTCTKEventConstants::TOPIC_REFERENCE_DOSE_CHANGED = "org/mitk/rt/dosevisualization/referenceDose/CHANGED";
+const std::string mitk::RTCTKEventConstants::TOPIC_GLOBAL_VISIBILITY_CHANGED = "org/mitk/rt/dosevisualization/globalVis/CHANGED";

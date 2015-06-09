@@ -493,24 +493,12 @@ void RTDoseVisualizer::UpdateBySelectedNode()
     //global dose issues
     //ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring
     bool showIsoLine = mitk::GetGlobalIsolineVis();
-    isoDoseNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(),showIsoLine);
+    isoDoseNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(),showIsoLine);
     m_Controls.checkGlobalVisIsoLine->setChecked(showIsoLine);
 
-    //toggle the visibility of the free isolevel sliders
-    this->m_Controls.listFreeValues->setEnabled(showIsoLine);
-
     bool showColorWash = mitk::GetGlobalColorwashVis();
-    m_selectedNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(),showColorWash);
+    m_selectedNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(),showColorWash);
     m_Controls.checkGlobalVisColorWash->setChecked(showColorWash);
-
-    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    if(showColorWash)
-      renderingMode->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
-    else
-      renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-    m_selectedNode->SetProperty("Image Rendering.Mode", renderingMode);
-
-//    -> Handled by the DoseVisPreferenceHelper::GetGlobalIsolineVis and GetGlobalColorwashVis
 
     float referenceDose = 0.0;
     m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),referenceDose);

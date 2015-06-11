@@ -158,8 +158,8 @@ bool mitk::LimitedLinearUndo::Redo(int oeid)
   {
     m_RedoList.back()->ReverseAndExecute();
 
-    if (m_UndoList.size() >= m_dequeSize)
-    {
+  if (m_UndoList.size() >= m_dequeSize)
+  {
     unsigned int deleteItemCount = 1;
     if (m_UndoList.size() > m_dequeSize)
     {
@@ -171,6 +171,7 @@ bool mitk::LimitedLinearUndo::Redo(int oeid)
       delete m_UndoList.front();
       m_UndoList.pop_front();
     }
+  }
 
     m_UndoList.push_back(m_RedoList.back());
 

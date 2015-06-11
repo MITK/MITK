@@ -99,15 +99,22 @@ public:
     testFilter->SetInput(0, m_UnstructuredGrid1);
     testFilter->SetInput(1, m_UnstructuredGrid2);
     testFilter->Update();
-    CPPUNIT_ASSERT_MESSAGE("Testing mitkUnstructuredGrid generation!", testFilter->GetOutput() != NULL);
+
+    if(!testFilter->GetOutput()->GetVtkUnstructuredGrid())
+      std::cout << "ITS EMPTY1!" << std::endl;
+
+    CPPUNIT_ASSERT_MESSAGE("Testing mitkUnstructuredGrid generation!", testFilter->GetOutput()->GetVtkUnstructuredGrid() != NULL);
   }
 
   void testScoring()
   {
     mitk::PointCloudScoringFilter::Pointer testFilter = mitk::PointCloudScoringFilter::New();
-    testFilter->SetInput(0, m_UnstructuredGrid2);
-    testFilter->SetInput(1, m_UnstructuredGrid1);
+    testFilter->SetInput(0, m_UnstructuredGrid1);
+    testFilter->SetInput(1, m_UnstructuredGrid2);
     testFilter->Update();
+
+    if(!testFilter->GetOutput()->GetVtkUnstructuredGrid())
+      std::cout << "ITS EMPTY2!" << std::endl;
 
     mitk::UnstructuredGrid::Pointer outpGrid = testFilter->GetOutput();
 

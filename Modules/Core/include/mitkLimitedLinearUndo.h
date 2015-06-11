@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 const unsigned int MIN_DEQUE_SIZE = 10;
-const unsigned int MAX_DEQUE_SIZE = 30;
+const unsigned int MAX_DEQUE_SIZE = 10000;
 
 //##Documentation
 //## @brief A linear undo model with one undo and one redo stack.

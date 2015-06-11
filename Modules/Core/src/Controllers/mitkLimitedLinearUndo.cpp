@@ -65,10 +65,19 @@ bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem* stackItem)
     InvokeEvent( RedoEmptyEvent() );
   }
 
-  if ((m_UndoList.size() + 1) > m_dequeSize)
+  if (m_UndoList.size() >= m_dequeSize)
   {
-    delete m_UndoList.front();
-    m_UndoList.pop_front();
+    unsigned int deleteItemCount = 1;
+    if (m_UndoList.size() > m_dequeSize)
+    {
+      deleteItemCount += m_UndoList.size() - m_dequeSize;
+    }
+
+    for (unsigned int i = 0; i < deleteItemCount; ++i)
+    {
+      delete m_UndoList.front();
+      m_UndoList.pop_front();
+    }
   }
 
   m_UndoList.push_back(operationEvent);
@@ -149,7 +158,15 @@ bool mitk::LimitedLinearUndo::Redo(int oeid)
   {
     m_RedoList.back()->ReverseAndExecute();
 
-    if ((m_UndoList.size() + 1) > m_dequeSize)
+    if (m_UndoList.size() >= m_dequeSize)
+    {
+    unsigned int deleteItemCount = 1;
+    if (m_UndoList.size() > m_dequeSize)
+    {
+      deleteItemCount += m_UndoList.size() - m_dequeSize;
+    }
+
+    for (unsigned int i = 0; i < deleteItemCount; ++i)
     {
       delete m_UndoList.front();
       m_UndoList.pop_front();

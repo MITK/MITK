@@ -76,7 +76,7 @@ namespace mitk {
       /** Sets the number of clusters which are used for the plane suggestion
       * if the number of found clusters is lower than the "NumberOfUsedClusters"
       * all found clusters are used */
-      itkSetMacro(NumberOfUsedClusters, int)
+      itkSetMacro(NumberOfUsedClusters, unsigned int)
 
 
     protected:

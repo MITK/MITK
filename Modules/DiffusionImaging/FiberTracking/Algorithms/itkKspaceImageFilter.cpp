@@ -111,7 +111,12 @@ void KspaceImageFilter< TPixelType >
         kIdx[0] = oit.GetIndex()[0];
         kIdx[1] = oit.GetIndex()[1];
 
-        double t = fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;    // dephasing time
+        // dephasing time
+        double t = 0;
+        if (!m_Parameters.m_SignalGen.m_ReversePhase)
+            t = fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
+        else
+            t = fromMaxEcho + ((double)(kyMax-1-kIdx[1])*kxMax+(double)kIdx[0])*dt;
 
         // rearrange slice
         if( kIdx[0] <  kxMax/2 )
@@ -133,7 +138,7 @@ void KspaceImageFilter< TPixelType >
         std::vector< double > relaxFactor;
         if ( m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
             for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-                relaxFactor.push_back(exp(-( m_Parameters.m_SignalGen.m_tEcho+t)/m_T2.at(i) -fabs(t)/ m_Parameters.m_SignalGen.m_tInhom));
+                relaxFactor.push_back( exp(-( m_Parameters.m_SignalGen.m_tEcho+t)/m_T2.at(i) -fabs(t)/ m_Parameters.m_SignalGen.m_tInhom)*(1.0-exp(-m_Parameters.m_SignalGen.m_tRep/m_T1.at(i))) );
 
         double kx = kIdx[0];
         double ky = kIdx[1];

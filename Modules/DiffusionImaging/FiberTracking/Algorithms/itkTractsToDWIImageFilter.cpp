@@ -47,6 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractDensityImageFilter.h>
 #include <boost/lexical_cast.hpp>
 #include <itkTractsToVectorImageFilter.h>
+#include <itkInvertIntensityImageFilter.h>
+#include <itkShiftScaleImageFilter.h>
 
 namespace itk
 {
@@ -68,7 +70,7 @@ TractsToDWIImageFilter< PixelType >::~TractsToDWIImageFilter()
 }
 
 template< class PixelType >
-TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilter< PixelType >::DoKspaceStuff( std::vector< DoubleDwiType::Pointer >& images )
+TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilter< PixelType >::SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& images )
 {
     int numFiberCompartments = m_Parameters.m_FiberModelList.size();
     // create slice object
@@ -79,30 +81,70 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     sliceSpacing[0] = m_WorkingSpacing[0];
     sliceSpacing[1] = m_WorkingSpacing[1];
 
-    // frequency map slice
-    SliceType::Pointer fMapSlice = NULL;
-    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
-    {
-        fMapSlice = SliceType::New();
-        ImageRegion<2> region;
-        region.SetSize(0, m_WorkingImageRegion.GetSize()[0]);
-        region.SetSize(1, m_WorkingImageRegion.GetSize()[1]);
-        fMapSlice->SetLargestPossibleRegion( region );
-        fMapSlice->SetBufferedRegion( region );
-        fMapSlice->SetRequestedRegion( region );
-        fMapSlice->Allocate();
-        fMapSlice->FillBuffer(0.0);
-    }
+    DoubleDwiType::PixelType nullPix; nullPix.SetSize(images.at(0)->GetVectorLength()); nullPix.Fill(0.0);
+    DoubleDwiType::Pointer magnitudeDwiImage = DoubleDwiType::New();
+    magnitudeDwiImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
+    magnitudeDwiImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
+    magnitudeDwiImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
+    magnitudeDwiImage->SetLargestPossibleRegion( m_CroppedRegion );
+    magnitudeDwiImage->SetBufferedRegion( m_CroppedRegion );
+    magnitudeDwiImage->SetRequestedRegion( m_CroppedRegion );
+    magnitudeDwiImage->SetVectorLength( images.at(0)->GetVectorLength() );
+    magnitudeDwiImage->Allocate();
+    magnitudeDwiImage->FillBuffer(nullPix);
 
-    DoubleDwiType::Pointer newImage = DoubleDwiType::New();
-    newImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
-    newImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
-    newImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
-    newImage->SetLargestPossibleRegion( m_CroppedRegion );
-    newImage->SetBufferedRegion( m_CroppedRegion );
-    newImage->SetRequestedRegion( m_CroppedRegion );
-    newImage->SetVectorLength( images.at(0)->GetVectorLength() );
-    newImage->Allocate();
+    m_PhaseImage = DoubleDwiType::New();
+    m_PhaseImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
+    m_PhaseImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
+    m_PhaseImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
+    m_PhaseImage->SetLargestPossibleRegion( m_CroppedRegion );
+    m_PhaseImage->SetBufferedRegion( m_CroppedRegion );
+    m_PhaseImage->SetRequestedRegion( m_CroppedRegion );
+    m_PhaseImage->SetVectorLength( images.at(0)->GetVectorLength() );
+    m_PhaseImage->Allocate();
+    m_PhaseImage->FillBuffer(nullPix);
+
+
+//    itk::ImageRegion<4>                 imageRegion4D;
+//    itk::Vector<double,4>               imageSpacing4D; imageSpacing4D.Fill(1);
+//    itk::Point<double,4>                imageOrigin4D; imageOrigin4D.Fill(0);
+//    itk::Matrix<double, 4, 4>           imageDirection4D; imageDirection4D.SetIdentity();
+//    imageRegion4D.SetSize(0, m_CroppedRegion.GetSize(0));
+//    imageRegion4D.SetSize(1, m_CroppedRegion.GetSize(1));
+//    imageRegion4D.SetSize(2, m_CroppedRegion.GetSize(2));
+//    imageRegion4D.SetSize(3, m_Parameters.m_SignalGen.m_NumberOfCoils);
+//    for (int i=0; i<3; i++)
+//    {
+//        imageSpacing4D[i] = m_Parameters.m_SignalGen.m_ImageSpacing[i];
+//        imageOrigin4D[i] = m_Parameters.m_SignalGen.m_ImageOrigin[i];
+//        for (int j=0; j<3; j++)
+//            imageDirection4D[i][j]=m_Parameters.m_SignalGen.m_ImageDirection[i][j];
+//    }
+
+////    ItkDoubleImgType4D::PixelType nullPix4D;
+////    nullPix4D.SetSize(images.at(0)->GetVectorLength());
+////    nullPix4D.Fill(0.0);
+//    m_KspaceImage = ItkDoubleImgType4D::New();
+//    m_KspaceImage->SetSpacing( imageSpacing4D );
+//    m_KspaceImage->SetOrigin( imageOrigin4D );
+//    m_KspaceImage->SetDirection( imageDirection4D );
+//    m_KspaceImage->SetLargestPossibleRegion( imageRegion4D );
+//    m_KspaceImage->SetBufferedRegion( imageRegion4D );
+//    m_KspaceImage->SetRequestedRegion( imageRegion4D );
+////    m_KspaceImage->SetVectorLength( images.at(0)->GetVectorLength() );
+//    m_KspaceImage->Allocate();
+//    m_KspaceImage->FillBuffer(0);
+
+    m_KspaceImage = DoubleDwiType::New();
+    m_KspaceImage->SetSpacing( m_Parameters.m_SignalGen.m_ImageSpacing );
+    m_KspaceImage->SetOrigin( m_Parameters.m_SignalGen.m_ImageOrigin );
+    m_KspaceImage->SetDirection( m_Parameters.m_SignalGen.m_ImageDirection );
+    m_KspaceImage->SetLargestPossibleRegion( m_CroppedRegion );
+    m_KspaceImage->SetBufferedRegion( m_CroppedRegion );
+    m_KspaceImage->SetRequestedRegion( m_CroppedRegion );
+    m_KspaceImage->SetVectorLength( m_Parameters.m_SignalGen.m_NumberOfCoils );
+    m_KspaceImage->Allocate();
+    m_KspaceImage->FillBuffer(nullPix);
 
     std::vector< unsigned int > spikeVolume;
     for (unsigned int i=0; i<m_Parameters.m_SignalGen.m_Spikes; i++)
@@ -110,11 +152,39 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
     std::sort (spikeVolume.begin(), spikeVolume.end());
     std::reverse (spikeVolume.begin(), spikeVolume.end());
 
+    // calculate coil positions
+    double a = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters.m_SignalGen.m_ImageSpacing[0];
+    double b = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1)*m_Parameters.m_SignalGen.m_ImageSpacing[1];
+    double c = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(2)*m_Parameters.m_SignalGen.m_ImageSpacing[2];
+    double diagonal = sqrt(a*a+b*b)/1000;   // image diagonal in m
+
+    m_CoilPointset = mitk::PointSet::New();
+    std::vector< itk::Vector<double, 3> > coilPositions;
+    itk::Vector<double, 3> pos; pos.Fill(0.0); pos[1] = -diagonal/2;
+    itk::Vector<double, 3> center;
+    center[0] = a/2-m_Parameters.m_SignalGen.m_ImageSpacing[0]/2;
+    center[1] = b/2-m_Parameters.m_SignalGen.m_ImageSpacing[2]/2;
+    center[2] = c/2-m_Parameters.m_SignalGen.m_ImageSpacing[1]/2;
+    for (int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
+    {
+        coilPositions.push_back(pos);
+        m_CoilPointset->InsertPoint(c, pos*1000 + m_Parameters.m_SignalGen.m_ImageOrigin.GetVectorFromOrigin() + center );
+
+        double rz = 360.0/m_Parameters.m_SignalGen.m_NumberOfCoils * M_PI/180;
+        vnl_matrix_fixed< double, 3, 3 > rotZ; rotZ.set_identity();
+        rotZ[0][0] = cos(rz);
+        rotZ[1][1] = rotZ[0][0];
+        rotZ[0][1] = -sin(rz);
+        rotZ[1][0] = -rotZ[0][1];
+
+        pos.SetVnlVector(rotZ*pos.GetVnlVector());
+    }
+
     m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
     m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
     unsigned long lastTick = 0;
 
-    boost::progress_display disp(2*images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
+    boost::progress_display disp(images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
     for (unsigned int g=0; g<images.at(0)->GetVectorLength(); g++)
     {
         std::vector< unsigned int > spikeSlice;
@@ -156,9 +226,6 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                         DoubleDwiType::IndexType index3D; index3D[0]=x; index3D[1]=y; index3D[2]=z;
 
                         slice->SetPixel(index2D, images.at(i)->GetPixel(index3D)[g]);
-
-                        if (fMapSlice.IsNotNull() && i==0)
-                            fMapSlice->SetPixel(index2D, m_Parameters.m_SignalGen.m_FrequencyMap->GetPixel(index3D));
                     }
 
                 compartmentSlices.push_back(slice);
@@ -166,92 +233,249 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 t1Vector.push_back(signalModel->GetT1());
             }
 
-            if (this->GetAbortGenerateData())
-                return NULL;
-
-            // create k-sapce (inverse fourier transform slices)
-            itk::Size<2> outSize; outSize.SetElement(0, m_CroppedRegion.GetSize(0)); outSize.SetElement(1, m_CroppedRegion.GetSize(1));
-            itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
-            idft->SetCompartmentImages(compartmentSlices);
-            idft->SetT2(t2Vector);
-            idft->SetT1(t1Vector);
-            idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
-            idft->SetParameters(m_Parameters);
-            idft->SetZ((double)z-(double)images.at(0)->GetLargestPossibleRegion().GetSize(2)/2.0);
-            idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
-            idft->SetFrequencyMapSlice(fMapSlice);
-            idft->SetOutSize(outSize);
             int numSpikes = 0;
             while (!spikeSlice.empty() && spikeSlice.back()==z)
             {
                 numSpikes++;
                 spikeSlice.pop_back();
             }
-            idft->SetSpikesPerSlice(numSpikes);
-            idft->Update();
+            int spikeCoil = m_RandGen->GetIntegerVariate()%m_Parameters.m_SignalGen.m_NumberOfCoils;
 
-            ComplexSliceType::Pointer fSlice;
-            fSlice = idft->GetOutput();
+            if (this->GetAbortGenerateData())
+                return NULL;
+
+#pragma omp parallel for
+            for (int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
+            {
+                // create k-sapce (inverse fourier transform slices)
+                itk::Size<2> outSize; outSize.SetElement(0, m_CroppedRegion.GetSize(0)); outSize.SetElement(1, m_CroppedRegion.GetSize(1));
+                itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
+                idft->SetCompartmentImages(compartmentSlices);
+                idft->SetT2(t2Vector);
+                idft->SetT1(t1Vector);
+                idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
+                idft->SetParameters(m_Parameters);
+                idft->SetZ((double)z-(double)(images.at(0)->GetLargestPossibleRegion().GetSize(2)-images.at(0)->GetLargestPossibleRegion().GetSize(2)%2)/2.0);
+                idft->SetZidx(z);
+                idft->SetCoilPosition(coilPositions.at(c));
+                idft->SetFiberBundle(m_FiberBundleWorkingCopy);
+                if (m_Parameters.m_SignalGen.m_DoAddMotion)
+                {
+                    idft->SetTranslation(m_Translations.at(g));
+                    idft->SetRotation(m_Rotations.at(g));
+                }
+                idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
+                idft->SetOutSize(outSize);
+                if (c==spikeCoil)
+                    idft->SetSpikesPerSlice(numSpikes);
+//                idft->SetNumberOfThreads(1);
+                idft->Update();
+
+                ComplexSliceType::Pointer fSlice;
+                fSlice = idft->GetOutput();
+
+                // fourier transform slice
+                ComplexSliceType::Pointer newSlice;
+                itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
+                dft->SetInput(fSlice);
+                dft->SetParameters(m_Parameters);
+                dft->Update();
+                newSlice = dft->GetOutput();
+
+                // put slice back into channel g
+                for (unsigned int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
+                    for (unsigned int x=0; x<fSlice->GetLargestPossibleRegion().GetSize(0); x++)
+                    {
+                        DoubleDwiType::IndexType index3D; index3D[0]=x; index3D[1]=y; index3D[2]=z;
+                        ComplexSliceType::IndexType index2D; index2D[0]=x; index2D[1]=y;
+
+                        ComplexSliceType::PixelType cPix = newSlice->GetPixel(index2D);
+                        double magn = sqrt(cPix.real()*cPix.real()+cPix.imag()*cPix.imag());
+                        double phase = 0;
+                        if (cPix.real()!=0)
+                            phase = atan( cPix.imag()/cPix.real() );
+
+
+                        DoubleDwiType::PixelType dwiPix = magnitudeDwiImage->GetPixel(index3D);
+                        DoubleDwiType::PixelType phasePix = m_PhaseImage->GetPixel(index3D);
+
+                        if (m_Parameters.m_SignalGen.m_NumberOfCoils>1)
+                        {
+                            dwiPix[g] += magn*magn;
+                            phasePix[g] += phase*phase;
+                        }
+                        else
+                        {
+                            dwiPix[g] = magn;
+                            phasePix[g] = phase;
+                        }
+
+#pragma omp critical
+                        {
+                            magnitudeDwiImage->SetPixel(index3D, dwiPix);
+                            m_PhaseImage->SetPixel(index3D, phasePix);
+
+                            // k-space image
+//                            {
+//                                DoubleDwiType4D::IndexType idx4d;
+//                                idx4d[0]=index3D[0];
+//                                idx4d[1]=index3D[1];
+//                                idx4d[2]=index3D[2];
+//                                idx4d[3]=c;
+//                                ItkDoubleImgType4D::PixelType pix4D = m_KspaceImage->GetPixel(idx4d);
+//                                pix4D = idft->GetKSpaceImage()->GetPixel(index2D);
+//                                m_KspaceImage->SetPixel(idx4d, pix4D);
+//                            }
+
+                            if (g==0)
+                            {
+                                DoubleDwiType::PixelType kspacePix = m_KspaceImage->GetPixel(index3D);
+                                kspacePix[c] = idft->GetKSpaceImage()->GetPixel(index2D);
+                                m_KspaceImage->SetPixel(index3D, kspacePix);
+                            }
+                        }
+                    }
+            }
+
+            if (m_Parameters.m_SignalGen.m_NumberOfCoils>1)
+            {
+#pragma omp parallel for collapse(2)
+                for (unsigned int y=0; y<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(1); y++)
+                    for (unsigned int x=0; x<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(0); x++)
+                    {
+                        DoubleDwiType::IndexType index3D; index3D[0]=x; index3D[1]=y; index3D[2]=z;
+                        DoubleDwiType::PixelType magPix = magnitudeDwiImage->GetPixel(index3D);
+                        magPix[g] = sqrt(magPix[g]/m_Parameters.m_SignalGen.m_NumberOfCoils);
+
+                        DoubleDwiType::PixelType phasePix = m_PhaseImage->GetPixel(index3D);
+                        phasePix[g] = sqrt(phasePix[g]/m_Parameters.m_SignalGen.m_NumberOfCoils);
+
+#pragma omp critical
+                        {
+                            magnitudeDwiImage->SetPixel(index3D, magPix);
+                            m_PhaseImage->SetPixel(index3D, phasePix);
+                        }
+                    }
+            }
 
             ++disp;
             unsigned long newTick = 50*disp.count()/disp.expected_count();
-            for (unsigned  long tick = 0; tick<(newTick-lastTick); tick++)
-                m_StatusText += "*";
-            lastTick = newTick;
-
-            // fourier transform slice
-            SliceType::Pointer newSlice;
-            itk::DftImageFilter< SliceType::PixelType >::Pointer dft = itk::DftImageFilter< SliceType::PixelType >::New();
-            dft->SetInput(fSlice);
-            dft->Update();
-            newSlice = dft->GetOutput();
-
-            // put slice back into channel g
-            for (unsigned int y=0; y<fSlice->GetLargestPossibleRegion().GetSize(1); y++)
-                for (unsigned int x=0; x<fSlice->GetLargestPossibleRegion().GetSize(0); x++)
-                {
-                    DoubleDwiType::IndexType index3D; index3D[0]=x; index3D[1]=y; index3D[2]=z;
-                    SliceType::IndexType index2D; index2D[0]=x; index2D[1]=y;
-
-                    DoubleDwiType::PixelType pix3D = newImage->GetPixel(index3D);
-                    pix3D[g] = newSlice->GetPixel(index2D);
-                    newImage->SetPixel(index3D, pix3D);
-                }
-            ++disp;
-            newTick = 50*disp.count()/disp.expected_count();
             for (unsigned long tick = 0; tick<(newTick-lastTick); tick++)
                 m_StatusText += "*";
             lastTick = newTick;
         }
     }
     m_StatusText += "\n\n";
-    return newImage;
+    return magnitudeDwiImage;
+}
+
+template< class PixelType >
+TractsToDWIImageFilter< PixelType >::ItkDoubleImgType::Pointer TractsToDWIImageFilter< PixelType >::NormalizeInsideMask(ItkDoubleImgType::Pointer image)
+{
+    double max = itk::NumericTraits< double >::min();
+    double min = itk::NumericTraits< double >::max();
+
+    itk::ImageRegionIterator< ItkDoubleImgType > it(image, image->GetLargestPossibleRegion());
+    while(!it.IsAtEnd())
+    {
+        if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull() && m_Parameters.m_SignalGen.m_MaskImage->GetPixel(it.GetIndex())<=0)
+        {
+            it.Set(0.0);
+            ++it;
+            continue;
+        }
+        //        if (it.Get()>900)
+        //            it.Set(900);
+
+        if (it.Get()>max)
+            max = it.Get();
+        if (it.Get()<min)
+            min = it.Get();
+        ++it;
+    }
+    typename itk::ShiftScaleImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer scaler = itk::ShiftScaleImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+    scaler->SetInput(image);
+    scaler->SetShift(-min);
+    scaler->SetScale(1.0/(max-min));
+    scaler->Update();
+    return scaler->GetOutput();
 }
 
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
 {
+    m_UseRelativeNonFiberVolumeFractions = false;
+
     // check for fiber volume fraction maps
+    int fibVolImages = 0;
     for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
         if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage().IsNotNull())
+        {
             m_StatusText += "Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1) + "\n";
+            MITK_INFO << "Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1);
+            fibVolImages++;
+        }
 
     // check for non-fiber volume fraction maps
+    int nonfibVolImages = 0;
     for (int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
         if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNotNull())
+        {
             m_StatusText += "Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1) + "\n";
+            MITK_INFO << "Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1);
+            nonfibVolImages++;
+        }
 
-    // check volume fraction images
-    if (m_Parameters.m_FiberModelList.size()>2)
-        for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
-            if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage().IsNull())
-                itkExceptionMacro("More than two fiber compartment selected but no volume fraction maps set!");
+    // not all fiber compartments are using volume fraction maps --> non-fiber volume fractions are assumed to be relative to the non-fiber volume and not absolute voxel-volume fractions.
+    // this means if two non-fiber compartments are used but only one of them has an associated volume fraction map, the repesctive other volume fraction map can be determined as inverse (1-val) of the present volume fraction map-
+    if ( fibVolImages<m_Parameters.m_FiberModelList.size() && nonfibVolImages==1 && m_Parameters.m_NonFiberModelList.size()==2)
+    {
+        m_StatusText += "Calculating missing non-fiber volume fraction image by inverting the other.\n";
+        MITK_INFO << "Calculating missing non-fiber volume fraction image by inverting the other.";
 
-    if (m_Parameters.m_NonFiberModelList.size()>1)
-        for (int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
-            if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNull())
-                itkExceptionMacro("More than one non-fiber compartment selected but no volume fraction maps set!");
+        itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
+        inverter->SetMaximum(1.0);
+        if ( m_Parameters.m_NonFiberModelList[0]->GetVolumeFractionImage().IsNull() && m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage().IsNotNull() )
+        {
+            //            m_Parameters.m_NonFiberModelList[1]->SetVolumeFractionImage( NormalizeInsideMask( m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage() ) );
+            inverter->SetInput( m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage() );
+            inverter->Update();
+            m_Parameters.m_NonFiberModelList[0]->SetVolumeFractionImage(inverter->GetOutput());
+        }
+        else if ( m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage().IsNull() && m_Parameters.m_NonFiberModelList[0]->GetVolumeFractionImage().IsNotNull() )
+        {
+            //            m_Parameters.m_NonFiberModelList[0]->SetVolumeFractionImage( NormalizeInsideMask( m_Parameters.m_NonFiberModelList[0]->GetVolumeFractionImage() ) );
+            inverter->SetInput( m_Parameters.m_NonFiberModelList[0]->GetVolumeFractionImage() );
+            inverter->Update();
+            m_Parameters.m_NonFiberModelList[1]->SetVolumeFractionImage(inverter->GetOutput());
+        }
+        else
+        {
+            itkExceptionMacro("Something went wrong in automatically calculating the missing non-fiber volume fraction image! Did you use two non fiber compartments but only one volume fraction image? Then it should work and this error is really strange.");
+        }
 
+        nonfibVolImages++;
+    }
+
+    // Up to two fiber compartments are allowed without volume fraction maps since the volume fractions can then be determined automatically
+    if (m_Parameters.m_FiberModelList.size()>2 && fibVolImages!=m_Parameters.m_FiberModelList.size())
+        itkExceptionMacro("More than two fiber compartment selected but no corresponding volume fraction maps set!");
+
+    // One non-fiber compartment is allowed without volume fraction map since the volume fraction can then be determined automatically
+    if (m_Parameters.m_NonFiberModelList.size()>1 && nonfibVolImages!=m_Parameters.m_NonFiberModelList.size())
+        itkExceptionMacro("More than one non-fiber compartment selected but no volume fraction maps set!");
+
+    if (fibVolImages<m_Parameters.m_FiberModelList.size() && nonfibVolImages>0)
+    {
+        m_StatusText += "Not all fiber compartments are using an associated volume fraction image.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.\n";
+        MITK_INFO << "Not all fiber compartments are using an associated volume fraction image.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.";
+        m_UseRelativeNonFiberVolumeFractions = true;
+
+        //        itk::ImageFileWriter<ItkDoubleImgType>::Pointer wr = itk::ImageFileWriter<ItkDoubleImgType>::New();
+        //        wr->SetInput(m_Parameters.m_NonFiberModelList[1]->GetVolumeFractionImage());
+        //        wr->SetFileName("/local/volumefraction.nrrd");
+        //        wr->Update();
+    }
 
     // initialize the images that store the output volume fraction of each compartment
     m_VolumeFractions.clear();
@@ -290,35 +514,36 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     temp.Fill(0.0);
     m_OutputImage->FillBuffer(temp);
 
-    if ( m_CroppedRegion.GetSize(0)%2 == 1 )
-        m_CroppedRegion.SetSize(0, m_CroppedRegion.GetSize(0)+1);
-    if ( m_CroppedRegion.GetSize(1)%2 == 1 )
-        m_CroppedRegion.SetSize(1, m_CroppedRegion.GetSize(1)+1);
+    //// NOT NECESSARY ANYMORE
+//    if ( m_CroppedRegion.GetSize(0)%2 == 1 )
+//        m_CroppedRegion.SetSize(0, m_CroppedRegion.GetSize(0)+1);
+//    if ( m_CroppedRegion.GetSize(1)%2 == 1 )
+//        m_CroppedRegion.SetSize(1, m_CroppedRegion.GetSize(1)+1);
 
-    // ADJUST GEOMETRY FOR FURTHER PROCESSING
-    // is input slize size a power of two?
-    unsigned int x=m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0); unsigned int y=m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1);
-    ItkDoubleImgType::SizeType pad; pad[0]=x%2; pad[1]=y%2; pad[2]=0;
-    m_Parameters.m_SignalGen.m_ImageRegion.SetSize(0, x+pad[0]);
-    m_Parameters.m_SignalGen.m_ImageRegion.SetSize(1, y+pad[1]);
-    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && (pad[0]>0 || pad[1]>0))
-    {
-        itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
-        zeroPadder->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
-        zeroPadder->SetConstant(0);
-        zeroPadder->SetPadUpperBound(pad);
-        zeroPadder->Update();
-        m_Parameters.m_SignalGen.m_FrequencyMap = zeroPadder->GetOutput();
-    }
-    if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull() && (pad[0]>0 || pad[1]>0))
-    {
-        itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
-        zeroPadder->SetInput(m_Parameters.m_SignalGen.m_MaskImage);
-        zeroPadder->SetConstant(0);
-        zeroPadder->SetPadUpperBound(pad);
-        zeroPadder->Update();
-        m_Parameters.m_SignalGen.m_MaskImage = zeroPadder->GetOutput();
-    }
+//    // ADJUST GEOMETRY FOR FURTHER PROCESSING
+//    // is input slize size a power of two?
+//    unsigned int x=m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0); unsigned int y=m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1);
+//    ItkDoubleImgType::SizeType pad; pad[0]=x%2; pad[1]=y%2; pad[2]=0;
+//    m_Parameters.m_SignalGen.m_ImageRegion.SetSize(0, x+pad[0]);
+//    m_Parameters.m_SignalGen.m_ImageRegion.SetSize(1, y+pad[1]);
+//    if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull() && (pad[0]>0 || pad[1]>0))
+//    {
+//        itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkDoubleImgType, ItkDoubleImgType>::New();
+//        zeroPadder->SetInput(m_Parameters.m_SignalGen.m_FrequencyMap);
+//        zeroPadder->SetConstant(0);
+//        zeroPadder->SetPadUpperBound(pad);
+//        zeroPadder->Update();
+//        m_Parameters.m_SignalGen.m_FrequencyMap = zeroPadder->GetOutput();
+//    }
+//    if (m_Parameters.m_SignalGen.m_MaskImage.IsNotNull() && (pad[0]>0 || pad[1]>0))
+//    {
+//        itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::Pointer zeroPadder = itk::ConstantPadImageFilter<ItkUcharImgType, ItkUcharImgType>::New();
+//        zeroPadder->SetInput(m_Parameters.m_SignalGen.m_MaskImage);
+//        zeroPadder->SetConstant(0);
+//        zeroPadder->SetPadUpperBound(pad);
+//        zeroPadder->Update();
+//        m_Parameters.m_SignalGen.m_MaskImage = zeroPadder->GetOutput();
+//    }
 
     // Apply in-plane upsampling for Gibbs ringing artifact
     double upsampling = 1;
@@ -419,7 +644,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     }
     else
     {
-        if (m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_Parameters.m_SignalGen.m_ImageRegion)
+        if (m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_WorkingImageRegion)
             itkExceptionMacro("Mask image and specified DWI geometry are not matching!");
 
         m_StatusText += "Using tissue mask\n";
@@ -462,9 +687,14 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
         MITK_INFO << "Adding motion artifacts";
         MITK_INFO << "Maximum rotation: " << m_Parameters.m_SignalGen.m_Rotation;
         MITK_INFO << "Maxmimum translation: " << m_Parameters.m_SignalGen.m_Translation;
+        MITK_INFO << "Motion logfile: " << filePath << fileName;
     }
 
     // get transform for motion artifacts
+    m_Rotation.Fill(0.0);
+    m_Translation.Fill(0.0);
+    m_Rotations.push_back(m_Rotation);
+    m_Translations.push_back(m_Translation);
     m_Rotation = m_Parameters.m_SignalGen.m_Rotation/m_Parameters.m_SignalGen.GetNumVolumes();
     m_Translation = m_Parameters.m_SignalGen.m_Translation/m_Parameters.m_SignalGen.GetNumVolumes();
 
@@ -507,7 +737,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 {
     // resample fiber bundle for sufficient voxel coverage
     m_StatusText += "\n"+this->GetTime()+" > Resampling fibers ...\n";
-    segmentVolume = 0.0001;
+    m_SegmentVolume = 0.0001;
     float minSpacing = 1;
     if(m_WorkingSpacing[0]<m_WorkingSpacing[1] && m_WorkingSpacing[0]<m_WorkingSpacing[2])
         minSpacing = m_WorkingSpacing[0];
@@ -518,9 +748,9 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
     m_FiberBundleWorkingCopy = m_FiberBundle->GetDeepCopy();    // working copy is needed because we need to resample the fibers but do not want to change the original bundle
     double volumeAccuracy = 10;
     m_FiberBundleWorkingCopy->ResampleSpline(minSpacing/volumeAccuracy);
-    mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
-    if (mmRadius>0)
-        segmentVolume = M_PI*mmRadius*mmRadius*minSpacing/volumeAccuracy;
+    m_mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
+    if (m_mmRadius>0)
+        m_SegmentVolume = M_PI*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy;
     m_FiberBundleTransformed = m_FiberBundleWorkingCopy;    // a secon fiber bundle is needed to store the transformed version of the m_FiberBundleWorkingCopy
 }
 
@@ -642,13 +872,13 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                         {
                             m_Parameters.m_FiberModelList[k]->SetFiberDirection(dir);
                             DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(idx);
-                            pix[g] += fiberWeight*segmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
+                            pix[g] += fiberWeight*m_SegmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
 
                             m_CompartmentImages.at(k)->SetPixel(idx, pix);
                         }
 
                         // update fiber volume image
-                        double vol = intraAxonalVolumeImage->GetPixel(idx) + segmentVolume*fiberWeight;
+                        double vol = intraAxonalVolumeImage->GetPixel(idx) + m_SegmentVolume*fiberWeight;
                         intraAxonalVolumeImage->SetPixel(idx, vol);
                         if (vol>maxVolume)  // we assume that the first volume is always unweighted!
                             maxVolume = vol;
@@ -936,10 +1166,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
 
     DoubleDwiType::Pointer doubleOutImage;
+    double signalScale = m_Parameters.m_SignalGen.m_SignalScale;
     if ( m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition ) // do k-space stuff
     {
-        m_StatusText += this->GetTime()+" > Adjusting complex signal\n";
-        MITK_INFO << "Adjusting complex signal:";
+        m_StatusText += this->GetTime()+" > Simulating k-space acquisition using "+boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NumberOfCoils)+" coil(s)\n";
+        MITK_INFO << "Simulating k-space acquisition using " << m_Parameters.m_SignalGen.m_NumberOfCoils << " coil(s).";
 
         if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
             m_StatusText += "Simulating signal relaxation\n";
@@ -956,8 +1187,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         if (m_Parameters.m_SignalGen.m_KspaceLineOffset>0)
             m_StatusText += "Simulating ghosts\n";
 
-        doubleOutImage = DoKspaceStuff(m_CompartmentImages);
-        m_Parameters.m_SignalGen.m_SignalScale = 1; // already scaled in DoKspaceStuff
+        doubleOutImage = SimulateKspaceAcquisition(m_CompartmentImages);
+        signalScale = 1; // already scaled in DoKspaceStuff
     }
     else    // don't do k-space stuff, just sum compartments
     {
@@ -982,7 +1213,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 
     m_StatusText += this->GetTime()+" > Finalizing image\n";
     MITK_INFO << "Finalizing image";
-    if (m_Parameters.m_SignalGen.m_SignalScale>1)
+    if (signalScale>1)
         m_StatusText += " Scaling signal\n";
     if (m_Parameters.m_NoiseModel!=NULL)
         m_StatusText += " Adding noise\n";
@@ -1011,7 +1242,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         lastTick = newTick;
 
         typename OutputImageType::IndexType index = it4.GetIndex();
-        signal = doubleOutImage->GetPixel(index)*m_Parameters.m_SignalGen.m_SignalScale;
+        signal = doubleOutImage->GetPixel(index)*signalScale;
 
         if (m_Parameters.m_NoiseModel!=NULL)
             m_Parameters.m_NoiseModel->AddNoise(signal);
@@ -1087,6 +1318,17 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
             }
         }
 
+        if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
+        {
+            m_Rotations.push_back(m_Rotation);
+            m_Translations.push_back(m_Translation);
+        }
+        else
+        {
+            m_Rotations.push_back(m_Rotation*(g+1));
+            m_Translations.push_back(m_Translation*(g+1));
+        }
+
         // rotate fibers
         if (m_Logfile.is_open())
         {
@@ -1149,10 +1391,10 @@ void TractsToDWIImageFilter< PixelType >::SimulateExtraAxonalSignal(ItkUcharImgT
                 double weight = 0;
                 if (numNonFiberCompartments>1)
                 {
-//                    ItkUcharImgType::IndexType maskIndex;
-//                    m_UpsampledMaskImage->TransformPhysicalPointToIndex(point, maskIndex);
-//                    if (!m_UpsampledMaskImage->GetLargestPossibleRegion().IsInside(maskIndex) || m_UpsampledMaskImage->GetPixel(maskIndex)==0)
-//                        continue;
+                    //                    ItkUcharImgType::IndexType maskIndex;
+                    //                    m_UpsampledMaskImage->TransformPhysicalPointToIndex(point, maskIndex);
+                    //                    if (!m_UpsampledMaskImage->GetLargestPossibleRegion().IsInside(maskIndex) || m_UpsampledMaskImage->GetPixel(maskIndex)==0)
+                    //                        continue;
                     DoubleDwiType::IndexType newIndex;
                     m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
                     if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
@@ -1210,10 +1452,10 @@ void TractsToDWIImageFilter< PixelType >::SimulateExtraAxonalSignal(ItkUcharImgT
 
                 if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage()!=nullptr)
                 {
-//                    ItkUcharImgType::IndexType maskIndex;
-//                    m_UpsampledMaskImage->TransformPhysicalPointToIndex(point, maskIndex);
-//                    if (!m_UpsampledMaskImage->GetLargestPossibleRegion().IsInside(maskIndex) || m_UpsampledMaskImage->GetPixel(maskIndex)==0)
-//                        continue;
+                    //                    ItkUcharImgType::IndexType maskIndex;
+                    //                    m_UpsampledMaskImage->TransformPhysicalPointToIndex(point, maskIndex);
+                    //                    if (!m_UpsampledMaskImage->GetLargestPossibleRegion().IsInside(maskIndex) || m_UpsampledMaskImage->GetPixel(maskIndex)==0)
+                    //                        continue;
                     DoubleDwiType::IndexType newIndex;
                     m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
                     if (!m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
@@ -1236,15 +1478,17 @@ void TractsToDWIImageFilter< PixelType >::SimulateExtraAxonalSignal(ItkUcharImgT
                 DoubleDwiType::PixelType pix = m_CompartmentImages.at(i+numFiberCompartments)->GetPixel(index);
                 if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()!=nullptr)
                 {
-//                    ItkUcharImgType::IndexType maskIndex;
-//                    m_UpsampledMaskImage->TransformPhysicalPointToIndex(point, maskIndex);
-//                    if (!m_UpsampledMaskImage->GetLargestPossibleRegion().IsInside(maskIndex) || m_UpsampledMaskImage->GetPixel(maskIndex)==0)
-//                        continue;
+                    //                    ItkUcharImgType::IndexType maskIndex;
+                    //                    m_UpsampledMaskImage->TransformPhysicalPointToIndex(point, maskIndex);
+                    //                    if (!m_UpsampledMaskImage->GetLargestPossibleRegion().IsInside(maskIndex) || m_UpsampledMaskImage->GetPixel(maskIndex)==0)
+                    //                        continue;
                     DoubleDwiType::IndexType newIndex;
                     m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->TransformPhysicalPointToIndex(point, newIndex);
                     if (!m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetLargestPossibleRegion().IsInside(newIndex))
                         continue;
                     weight = m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage()->GetPixel(newIndex)*m_VoxelVolume;
+                    if (m_UseRelativeNonFiberVolumeFractions)
+                        weight *= other/m_VoxelVolume;
                 }
 
                 if (g>=0)

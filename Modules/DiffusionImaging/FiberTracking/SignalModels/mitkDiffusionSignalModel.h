@@ -38,7 +38,7 @@ public:
 
     DiffusionSignalModel()
         : m_T2(100)
-        , m_T1(800)
+        , m_T1(0)
     {}
     ~DiffusionSignalModel(){}
 

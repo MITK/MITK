@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBallModel.h>
 #include <mitkDotModel.h>
 #include <mitkRawShModel.h>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 using namespace std;
 
@@ -53,13 +55,23 @@ public:
         RANDOM_DIRECTIONS
     };
 
+    enum CoilSensitivityProfile : int {
+        COIL_CONSTANT,
+        COIL_LINEAR,
+        COIL_EXPONENTIAL
+    };
+
     SignalGenerationParameters()
         : m_SignalScale(100)
         , m_tEcho(100)
-        , m_tRep(500)
+        , m_tRep(4000)
         , m_tLine(1)
         , m_tInhom(50)
         , m_ReversePhase(false)
+        , m_PartialFourier(1.0)
+        , m_NoiseVariance(0.001)
+        , m_NumberOfCoils(1)
+        , m_CoilSensitivityProfile(SignalGenerationParameters::COIL_CONSTANT)
         , m_Bvalue(1000)
         , m_SimulateKspaceAcquisition(false)
         , m_AxonRadius(0)
@@ -69,7 +81,7 @@ public:
         , m_Spikes(0)
         , m_SpikeAmplitude(1)
         , m_KspaceLineOffset(0)
-        , m_EddyStrength(0)
+        , m_EddyStrength(300)
         , m_Tau(70)
         , m_CroppingFactor(1)
         , m_DoAddGibbsRinging(false)
@@ -103,6 +115,10 @@ public:
     double                              m_tLine;                    ///< k-space line readout time (dwell time).
     double                              m_tInhom;                   ///< T2'
     bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
+    double                              m_PartialFourier;           ///< Partial fourier factor (0.5-1)
+    double                              m_NoiseVariance;            ///< Variance of complex gaussian noise
+    int                                 m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
+    CoilSensitivityProfile              m_CoilSensitivityProfile;   ///< Choose between constant, linear or exponential sensitivity profile of the used coils
     double                              m_Bvalue;                   ///< Acquisition b-value
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
@@ -316,6 +332,9 @@ public:
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(string filename);       ///< Save image generation parameters to .ffp file.
     void LoadParameters(string filename);       ///< Load image generation parameters from .ffp file.
+    template< class ParameterType >
+    ParameterType ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential=false);
+    std::string                         m_MissingTags;
 };
 }
 

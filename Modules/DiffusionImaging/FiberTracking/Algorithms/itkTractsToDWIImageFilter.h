@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTimeProbe.h>
 #include <mitkRawShModel.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
+#include <mitkPointSet.h>
 
 namespace itk
 {
@@ -45,14 +46,17 @@ public:
     typedef SmartPointer< const Self >                      ConstPointer;
 
     typedef typename Superclass::OutputImageType                        OutputImageType;
+    typedef itk::Image<double, 4>                                       ItkDoubleImgType4D;
     typedef itk::Image<double, 3>                                       ItkDoubleImgType;
     typedef itk::Image<float, 3>                                        ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
     typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
+    typedef itk::VectorImage< double, 4 >                               DoubleDwiType4D;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
     typedef itk::Image< double, 2 >                                     SliceType;
     typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType   ComplexSliceType;
+    typedef itk::VectorImage< vcl_complex< double >, 3 >                ComplexDwiType;
     typedef itk::Vector< double,3>                                      DoubleVectorType;
 
     itkFactorylessNewMacro(Self)
@@ -71,6 +75,9 @@ public:
     { return m_VolumeFractions; }
     mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
     itkGetMacro( StatusText, std::string )
+    itkGetMacro( PhaseImage, DoubleDwiType::Pointer )
+    itkGetMacro( KspaceImage, DoubleDwiType::Pointer )
+    itkGetMacro( CoilPointset, mitk::PointSet::Pointer )
 
     void GenerateData();
 
@@ -86,7 +93,7 @@ protected:
     std::string GetTime();
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts. */
-    DoubleDwiType::Pointer DoKspaceStuff(std::vector< DoubleDwiType::Pointer >& images);
+    DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Generate signal of non-fiber compartments. */
     void SimulateExtraAxonalSignal(ItkUcharImgType::IndexType index, double intraAxonalVolume, int g=-1);
@@ -95,6 +102,7 @@ protected:
     void SimulateMotion(int g=-1);
 
     void CheckVolumeFractionImages();
+    ItkDoubleImgType::Pointer NormalizeInsideMask(ItkDoubleImgType::Pointer image);
     void InitializeData();
     void InitializeFiberData();
 
@@ -104,6 +112,8 @@ protected:
 
     // output
     typename OutputImageType::Pointer           m_OutputImage;
+    typename DoubleDwiType::Pointer             m_PhaseImage;
+    typename DoubleDwiType::Pointer             m_KspaceImage;
     mitk::LevelWindow                           m_LevelWindow;
     std::vector< ItkDoubleImgType::Pointer >    m_VolumeFractions;
     std::string                                 m_StatusText;
@@ -122,13 +132,18 @@ protected:
     ImageRegion<3>                              m_WorkingImageRegion;
     double                                      m_VoxelVolume;
     std::vector< DoubleDwiType::Pointer >       m_CompartmentImages;
-    ItkUcharImgType::Pointer                    m_TransformedMaskImage;                ///< copy of mask image (changes for each motion step)
+    ItkUcharImgType::Pointer                    m_TransformedMaskImage;     ///< copy of mask image (changes for each motion step)
     ItkUcharImgType::Pointer                    m_UpsampledMaskImage;       ///< helper image for motion simulation
     DoubleVectorType                            m_Rotation;
     DoubleVectorType                            m_Translation;
+    std::vector< DoubleVectorType >             m_Rotations;                ///<stores the individual rotation of each volume (needed for k-space simulation to obtain correct frequency map position)
+    std::vector< DoubleVectorType >             m_Translations;             ///<stores the individual translation of each volume (needed for k-space simulation to obtain correct frequency map position)
     ImageRegion<3>                              m_CroppedRegion;
-    double                                      mmRadius;
-    double                                      segmentVolume;
+    double                                      m_mmRadius;
+    double                                      m_SegmentVolume;
+    bool                                        m_UseRelativeNonFiberVolumeFractions;
+    mitk::PointSet::Pointer                     m_CoilPointset;
+
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen;
 };
 }

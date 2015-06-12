@@ -40,6 +40,13 @@ DftImageFilter< TPixelType >
 
 template< class TPixelType >
 void DftImageFilter< TPixelType >
+::BeforeThreadedGenerateData()
+{
+
+}
+
+template< class TPixelType >
+void DftImageFilter< TPixelType >
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType)
 {
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
@@ -54,18 +61,29 @@ void DftImageFilter< TPixelType >
 
     while( !oit.IsAtEnd() )
     {
-        int kx = oit.GetIndex()[0];
-        int ky = oit.GetIndex()[1];
+        double kx = oit.GetIndex()[0];
+        double ky = oit.GetIndex()[1];
+//        kx -= (double)szx/2;
+//        ky -= (double)szy/2;
 
-        if( kx <  szx/2 )
-            kx = kx + szx/2;
+        if ((int)szx%2==1)
+            kx -= (szx-1)/2;
         else
-            kx = kx - szx/2;
+            kx -= szx/2;
+        if ((int)szy%2==1)
+            ky -= (szy-1)/2;
+        else
+            ky -= szy/2;
 
-        if( ky <  szy/2 )
-            ky = ky + szy/2;
-        else
-            ky = ky - szy/2;
+//        if( kx <  szx/2 )
+//            kx = kx + szx/2;
+//        else
+//            kx = kx - szx/2;
+
+//        if( ky <  szy/2 )
+//            ky = ky + szy/2;
+//        else
+//            ky = ky - szy/2;
 
         vcl_complex<double> s(0,0);
         InputIteratorType it(inputImage, inputImage->GetLargestPossibleRegion() );
@@ -73,15 +91,26 @@ void DftImageFilter< TPixelType >
         {
             int x = it.GetIndex()[0];
             int y = it.GetIndex()[1];
+//            x -= (double)szx/2;
+//            y -= (double)szy/2;
+
+            if ((int)szx%2==1)
+                x -= (szx-1)/2;
+            else
+                x -= szx/2;
+            if ((int)szy%2==1)
+                y -= (szy-1)/2;
+            else
+                y -= szy/2;
 
             vcl_complex<double> f(it.Get().real(), it.Get().imag());
+
             s += f * exp( std::complex<double>(0, -2 * M_PI * (kx*(double)x/szx + ky*(double)y/szy) ) );
 
             ++it;
         }
-        double magn = sqrt(s.real()*s.real()+s.imag()*s.imag());
-        oit.Set(magn);
 
+        oit.Set(s);
         ++oit;
     }
 }

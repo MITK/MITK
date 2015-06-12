@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>479</width>
-    <height>2397</height>
+    <width>524</width>
+    <height>2652</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -171,6 +171,9 @@
                <property name="toolTip">
                 <string>Rotation angle (in degree) around x-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
                </property>
@@ -205,6 +208,9 @@
               <widget class="QDoubleSpinBox" name="m_YrotBox">
                <property name="toolTip">
                 <string>Rotation angle (in degree) around y-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
@@ -241,6 +247,9 @@
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the z-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>
                </property>
@@ -256,6 +265,9 @@
               <widget class="QDoubleSpinBox" name="m_YtransBox">
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the y-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>
@@ -330,6 +342,9 @@
                <property name="toolTip">
                 <string>Rotation angle (in degree) around z-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
                </property>
@@ -345,6 +360,9 @@
               <widget class="QDoubleSpinBox" name="m_XtransBox">
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the x-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>
@@ -1023,7 +1041,7 @@
           <string>Extra-axonal Compartments</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_14">
-          <item row="17" column="0">
+          <item row="18" column="0">
            <widget class="QFrame" name="m_Comp4FractionFrame">
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
@@ -1031,7 +1049,7 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QGridLayout" name="gridLayout_18">
+            <layout class="QGridLayout" name="gridLayout_30">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -1045,14 +1063,14 @@
               <number>0</number>
              </property>
              <item row="0" column="0">
-              <widget class="QLabel" name="m_NoiseLabel_3">
+              <widget class="QLabel" name="m_NoiseLabel_9">
                <property name="text">
                 <string>Volume Fraction:</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QmitkDataStorageComboBox" name="m_Comp4VolumeFraction">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp4VolumeFraction">
                <property name="toolTip">
                 <string/>
                </property>
@@ -1094,29 +1112,67 @@
           <item row="10" column="0">
            <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget3" native="true"/>
           </item>
-          <item row="15" column="0">
+          <item row="16" column="0">
            <widget class="QmitkDotModelParametersWidget" name="m_DotWidget2" native="true"/>
           </item>
           <item row="9" column="0">
            <widget class="QmitkDotModelParametersWidget" name="m_DotWidget1" native="true"/>
           </item>
-          <item row="11" column="0">
+          <item row="12" column="0">
            <widget class="Line" name="line_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
-          <item row="13" column="0">
+          <item row="11" column="0">
+           <widget class="QFrame" name="m_Comp3FractionFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_29">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_8">
+               <property name="text">
+                <string>Volume Fraction:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp3VolumeFraction">
+               <property name="toolTip">
+                <string>Optional! If no volume fraction map for this compartment is set, the corresponding volume fractions are calculated from the input fibers.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="14" column="0">
            <widget class="QmitkBallModelParametersWidget" name="m_BallWidget2" native="true"/>
           </item>
           <item row="7" column="0">
            <widget class="QmitkBallModelParametersWidget" name="m_BallWidget1" native="true"/>
           </item>
-          <item row="14" column="0">
+          <item row="15" column="0">
            <widget class="QmitkAstrosticksModelParametersWidget" name="m_AstrosticksWidget2" native="true"/>
           </item>
-          <item row="12" column="0">
+          <item row="13" column="0">
            <widget class="QComboBox" name="m_Compartment4Box">
             <property name="toolTip">
              <string>Select signal model for extra-axonal compartment.</string>
@@ -1148,7 +1204,7 @@
             </item>
            </widget>
           </item>
-          <item row="16" column="0">
+          <item row="17" column="0">
            <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget4" native="true"/>
           </item>
          </layout>
@@ -1763,6 +1819,44 @@
           <item row="4" column="0">
            <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget2" native="true"/>
           </item>
+          <item row="5" column="0">
+           <widget class="QFrame" name="m_Comp2FractionFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_27">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_7">
+               <property name="text">
+                <string>Volume Fraction:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp2VolumeFraction">
+               <property name="toolTip">
+                <string>Optional! If no volume fraction map for this compartment is set, the corresponding volume fractions are calculated from the input fibers.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1835,6 +1929,9 @@
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a binary image to define the area of signal generation. Outside of the mask image only noise will be actively generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+            </property>
            </widget>
           </item>
           <item row="0" column="0" rowspan="2" colspan="2">
@@ -1899,6 +1996,9 @@
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a fiber bundle to generate the white matter signal from. You can either use the fiber definition tab to manually define an input fiber bundle or you can also use any existing bundle, e.g. yielded by a tractography algorithm.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+            </property>
            </widget>
           </item>
           <item row="3" column="0">
@@ -1924,6 +2024,9 @@
            <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TemplateComboBox">
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The parameters for the simulation (e.g. spacing, size, diffuison-weighted gradients, b-value) are adopted from this image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
             </property>
            </widget>
           </item>
@@ -2912,11 +3015,14 @@
           <string>Intra-axonal Compartment</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_13">
-          <item row="2" column="0">
-           <widget class="QmitkZeppelinModelParametersWidget" name="m_ZeppelinWidget1" native="true"/>
-          </item>
           <item row="3" column="0">
            <widget class="QmitkTensorModelParametersWidget" name="m_TensorWidget1" native="true"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QmitkStickModelParametersWidget" name="m_StickWidget1" native="true"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget1" native="true"/>
           </item>
           <item row="0" column="0">
            <widget class="QComboBox" name="m_Compartment1Box">
@@ -2945,11 +3051,46 @@
             </item>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QmitkStickModelParametersWidget" name="m_StickWidget1" native="true"/>
+          <item row="2" column="0">
+           <widget class="QmitkZeppelinModelParametersWidget" name="m_ZeppelinWidget1" native="true"/>
           </item>
-          <item row="4" column="0">
-           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget1" native="true"/>
+          <item row="5" column="0">
+           <widget class="QFrame" name="m_Comp1FractionFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_26">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_6">
+               <property name="text">
+                <string>Volume Fraction:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp1VolumeFraction">
+               <property name="toolTip">
+                <string>Optional! If no volume fraction map for this compartment is set, the corresponding volume fractions are calculated from the input fibers.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>

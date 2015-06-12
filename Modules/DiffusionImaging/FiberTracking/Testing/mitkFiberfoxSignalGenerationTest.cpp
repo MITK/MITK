@@ -115,6 +115,7 @@ int mitkFiberfoxSignalGenerationTest(int argc, char* argv[])
         // Load parameter file
         FiberfoxParameters<double> parameters;
         string file = argv[i];
+        MITK_INFO << "Starting test: " << file;
         parameters.LoadParameters(file+".ffp");
 
         // Load reference diffusion weighted image

@@ -29,15 +29,7 @@ set(H_FILES
   Algorithms/itkTractDensityImageFilter.h
   Algorithms/itkTractsToFiberEndingsImageFilter.h
   Algorithms/itkTractsToRgbaImageFilter.h
-  # moved to DiffusionCore
-  #Algorithms/itkElectrostaticRepulsionDiffusionGradientReductionFilter.h
-  Algorithms/itkFibersFromPlanarFiguresFilter.h
-  Algorithms/itkTractsToDWIImageFilter.h
   Algorithms/itkTractsToVectorImageFilter.h
-  Algorithms/itkKspaceImageFilter.h
-  Algorithms/itkDftImageFilter.h
-  Algorithms/itkAddArtifactsToDwiImageFilter.h
-  Algorithms/itkFieldmapGeneratorFilter.h
   Algorithms/itkEvaluateDirectionImagesFilter.h
   Algorithms/itkEvaluateTractogramDirectionsFilter.h
   Algorithms/itkFiberCurvatureFilter.h
@@ -57,17 +49,28 @@ set(H_FILES
   Algorithms/MLTracking/mitkTrackingForestHandler.h
   Algorithms/MLTracking/itkMLBSTrackingFilter.h
 
-  # Signal Models
-  SignalModels/mitkDiffusionSignalModel.h
-  SignalModels/mitkTensorModel.h
-  SignalModels/mitkBallModel.h
-  SignalModels/mitkDotModel.h
-  SignalModels/mitkAstroStickModel.h
-  SignalModels/mitkStickModel.h
-  SignalModels/mitkRawShModel.h
-  SignalModels/mitkDiffusionNoiseModel.h
-  SignalModels/mitkRicianNoiseModel.h
-  SignalModels/mitkChiSquareNoiseModel.h
+  # Fiberfox
+  Fiberfox/itkFibersFromPlanarFiguresFilter.h
+  Fiberfox/itkTractsToDWIImageFilter.h
+  Fiberfox/itkKspaceImageFilter.h
+  Fiberfox/itkDftImageFilter.h
+  Fiberfox/itkAddArtifactsToDwiImageFilter.h
+  Fiberfox/itkFieldmapGeneratorFilter.h
+
+  Fiberfox/SignalModels/mitkDiffusionSignalModel.h
+  Fiberfox/SignalModels/mitkTensorModel.h
+  Fiberfox/SignalModels/mitkBallModel.h
+  Fiberfox/SignalModels/mitkDotModel.h
+  Fiberfox/SignalModels/mitkAstroStickModel.h
+  Fiberfox/SignalModels/mitkStickModel.h
+  Fiberfox/SignalModels/mitkRawShModel.h
+  Fiberfox/SignalModels/mitkDiffusionNoiseModel.h
+  Fiberfox/SignalModels/mitkRicianNoiseModel.h
+  Fiberfox/SignalModels/mitkChiSquareNoiseModel.h
+
+  Fiberfox/Sequences/mitkAcquisitionType.h
+  Fiberfox/Sequences/mitkSingleShotEpi.h
+  Fiberfox/Sequences/mitkCartesianReadout.h
 )
 
 set(RESOURCE_FILES

@@ -29,6 +29,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include <mitkFiberfoxParameters.h>
 #include <mitkFiberBundle.h>
+#include <mitkAcquisitionType.h>
 
 using namespace std;
 
@@ -77,7 +78,6 @@ namespace itk{
 
     itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
-    itkSetMacro( OutSize, itk::Size<2> )            ///< Output slice size. Can be different from input size, e.g. if Gibbs ringing is enabled.
     itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results.
     itkSetMacro( Rotation, DoubleVectorType )
     itkSetMacro( Translation, DoubleVectorType )
@@ -86,8 +86,7 @@ namespace itk{
     itkSetMacro( CoilPosition, DoubleVectorType )
     itkGetMacro( KSpaceImage, typename InputImageType::Pointer )    ///< k-space magnitude image
 
-    void SetParameters( FiberfoxParameters<double> param ){ m_Parameters = param; }
-    FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
+    void SetParameters( FiberfoxParameters<double>* param ){ m_Parameters = param; }
 
     void SetCompartmentImages( std::vector< InputImagePointerType > cImgs ) { m_CompartmentImages=cImgs; }  ///< One signal image per compartment.
     void SetT2( std::vector< double > t2Vector ) { m_T2=t2Vector; } ///< One T2 relaxation constant per compartment image.
@@ -103,9 +102,10 @@ namespace itk{
     void BeforeThreadedGenerateData();
     void ThreadedGenerateData( const OutputImageRegionType &outputRegionForThread, ThreadIdType threadID);
     void AfterThreadedGenerateData();
+    double InterpolateFmapValue(itk::Point<float, 3> itkP);
 
     DoubleVectorType                        m_CoilPosition;
-    FiberfoxParameters<double>              m_Parameters;
+    FiberfoxParameters<double>*             m_Parameters;
     vector< double >                        m_T2;
     vector< double >                        m_T1;
     vector< InputImagePointerType >         m_CompartmentImages;
@@ -114,7 +114,6 @@ namespace itk{
     int                                     m_Zidx;
     bool                                    m_UseConstantRandSeed;
     unsigned int                            m_SpikesPerSlice;
-    itk::Size<2>                            m_OutSize;
     FiberBundle::Pointer                    m_FiberBundle;
     double                                  m_Gamma;
     DoubleVectorType                        m_Rotation;     ///< used to find correct point in frequency map (head motion)
@@ -126,6 +125,9 @@ namespace itk{
 
     double                                  m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;
+    typename InputImageType::Pointer        m_TimeFromEchoImage;
+    typename InputImageType::Pointer        m_ReadoutTimeImage;
+    AcquisitionType*                        m_ReadoutScheme;
 
   private:
 

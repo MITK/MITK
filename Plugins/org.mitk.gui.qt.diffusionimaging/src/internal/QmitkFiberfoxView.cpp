@@ -113,7 +113,7 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     connect(&m_Thread, SIGNAL(started()), this, SLOT(BeforeThread()));
     connect(&m_Thread, SIGNAL(started()), &m_Worker, SLOT(run()));
     connect(&m_Thread, SIGNAL(finished()), this, SLOT(AfterThread()));
-    connect(&m_Thread, SIGNAL(terminated()), this, SLOT(AfterThread()));
+//    connect(&m_Thread, SIGNAL(terminated()), this, SLOT(AfterThread()));
     m_SimulationTimer = new QTimer(this);
 }
 
@@ -238,6 +238,9 @@ void QmitkFiberfoxView::AfterThread()
             }
         }
         m_TractsToDwiFilter = NULL;
+
+        if (parameters.m_Misc.m_AfterSimulationMessage.size()>0)
+            QMessageBox::information( NULL, "Warning", parameters.m_Misc.m_AfterSimulationMessage.c_str());
         break;
     }
     case 1:
@@ -494,6 +497,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     parameters.m_Misc.m_CheckAdvancedFiberOptionsBox = m_Controls->m_AdvancedOptionsBox->isChecked();
     parameters.m_Misc.m_CheckAdvancedSignalOptionsBox = m_Controls->m_AdvancedOptionsBox_2->isChecked();
     parameters.m_Misc.m_CheckOutputVolumeFractionsBox = m_Controls->m_VolumeFractionsBox->isChecked();
+    parameters.m_Misc.m_AfterSimulationMessage = "";
 
     string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
     if (outputPath.compare("-")!=0)
@@ -698,6 +702,8 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     parameters.m_SignalGen.m_Rotation[0] = m_Controls->m_MaxRotationBoxX->value();
     parameters.m_SignalGen.m_Rotation[1] = m_Controls->m_MaxRotationBoxY->value();
     parameters.m_SignalGen.m_Rotation[2] = m_Controls->m_MaxRotationBoxZ->value();
+    parameters.m_SignalGen.m_MotionVolumes.clear();
+    parameters.m_Misc.m_MotionVolumesBox = m_Controls->m_MotionVolumesBox->text().toStdString();
     if ( m_Controls->m_AddMotion->isChecked() && m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull() )
     {
         parameters.m_Misc.m_ArtifactModelString += "_MOTION";
@@ -708,9 +714,29 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-x", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[0]));
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-y", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[1]));
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-z", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[2]));
+
+        if (parameters.m_Misc.m_MotionVolumesBox=="random")
+        {
+            for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
+                parameters.m_SignalGen.m_MotionVolumes.push_back(rand()%2);
+        }
+        else if (!parameters.m_Misc.m_MotionVolumesBox.empty())
+        {
+            for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
+                parameters.m_SignalGen.m_MotionVolumes.push_back(false);
+
+            stringstream stream(parameters.m_Misc.m_MotionVolumesBox);
+            int n;
+            while(stream >> n)
+            {
+                if (n<parameters.m_SignalGen.GetNumVolumes() && n>=0)
+                    parameters.m_SignalGen.m_MotionVolumes[n]=true;
+            }
+        }
     }
 
     // other imaging parameters
+    parameters.m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)m_Controls->m_AcquisitionTypeBox->currentIndex();
     parameters.m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)m_Controls->m_CoilSensBox->currentIndex();
     parameters.m_SignalGen.m_NumberOfCoils = m_Controls->m_NumCoilsBox->value();
     parameters.m_SignalGen.m_PartialFourier = m_Controls->m_PartialFourier->value();
@@ -728,15 +754,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         parameters.m_SignalGen.m_SignalScale = itk::NumericTraits<short>::max()*0.75/voxelVolume;
         m_Controls->m_SignalScaleBox->setValue(parameters.m_SignalGen.m_SignalScale);
         QMessageBox::information( NULL, "Warning", "Maximum signal exceeding data type limits. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_SignalScale)+" to obtain a maximum  signal of 75% of the data type maximum. Relaxation and other effects that affect the signal intensities are not accounted for.");
-    }
-
-    // adjust echo time if needed
-    int numLines = parameters.m_SignalGen.m_ImageRegion.GetSize(1)+parameters.m_SignalGen.m_ImageRegion.GetSize(1)%2;
-    if ( parameters.m_SignalGen.m_tEcho < numLines*parameters.m_SignalGen.m_tLine )
-    {
-        this->m_Controls->m_TEbox->setValue( numLines*parameters.m_SignalGen.m_tLine );
-        parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
-        QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_tEcho)+" ms");
     }
 
     // Noise
@@ -1326,6 +1343,7 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_TRbox->setValue(parameters.m_SignalGen.m_tRep);
     m_Controls->m_NumCoilsBox->setValue(parameters.m_SignalGen.m_NumberOfCoils);
     m_Controls->m_CoilSensBox->setCurrentIndex(parameters.m_SignalGen.m_CoilSensitivityProfile);
+    m_Controls->m_AcquisitionTypeBox->setCurrentIndex(parameters.m_SignalGen.m_AcquisitionType);
 
     if (parameters.m_NoiseModel!=NULL)
     {
@@ -1358,6 +1376,8 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_AddGibbsRinging->setChecked(parameters.m_SignalGen.m_DoAddGibbsRinging);
     m_Controls->m_AddMotion->setChecked(parameters.m_SignalGen.m_DoAddMotion);
     m_Controls->m_RandomMotion->setChecked(parameters.m_SignalGen.m_DoRandomizeMotion);
+    m_Controls->m_MotionVolumesBox->setText(QString(parameters.m_Misc.m_MotionVolumesBox.c_str()));
+
     m_Controls->m_MaxTranslationBoxX->setValue(parameters.m_SignalGen.m_Translation[0]);
     m_Controls->m_MaxTranslationBoxY->setValue(parameters.m_SignalGen.m_Translation[1]);
     m_Controls->m_MaxTranslationBoxZ->setValue(parameters.m_SignalGen.m_Translation[2]);

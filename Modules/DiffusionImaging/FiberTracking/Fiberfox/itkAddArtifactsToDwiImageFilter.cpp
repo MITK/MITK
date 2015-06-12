@@ -198,11 +198,10 @@ void AddArtifactsToDwiImageFilter< TPixelType >
                 itk::Size<2> outSize; outSize.SetElement(0, xMax); outSize.SetElement(1, croppedRegion.GetSize()[1]);
                 typename itk::KspaceImageFilter< SliceType::PixelType >::Pointer idft = itk::KspaceImageFilter< SliceType::PixelType >::New();
                 idft->SetUseConstantRandSeed(m_UseConstantRandSeed);
-                idft->SetParameters(doubleParam);
+                idft->SetParameters(&doubleParam);
                 idft->SetCompartmentImages(compartmentSlices);
                 idft->SetDiffusionGradientDirection( m_Parameters.m_SignalGen.GetGradientDirection(g));
                 idft->SetZ((double)z-(double)inputRegion.GetSize(2)/2.0);
-                idft->SetOutSize(outSize);
                 int numSpikes = 0;
                 while (!spikeSlice.empty() && spikeSlice.back()==z)
                 {

@@ -49,7 +49,7 @@ public:
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
 
-    enum DiffusionDirectionMode {
+    enum DiffusionDirectionMode : int {
         FIBER_TANGENT_DIRECTIONS,
         MAIN_FIBER_DIRECTIONS,
         RANDOM_DIRECTIONS
@@ -61,8 +61,14 @@ public:
         COIL_EXPONENTIAL
     };
 
+    enum AcquisitionType : int {
+        SingleShotEpi,
+        SpinEcho
+    };
+
     SignalGenerationParameters()
-        : m_SignalScale(100)
+        : m_AcquisitionType(SignalGenerationParameters::SingleShotEpi)
+        , m_SignalScale(100)
         , m_tEcho(100)
         , m_tRep(4000)
         , m_tLine(1)
@@ -103,12 +109,14 @@ public:
     }
 
     /** input/output image specifications */
+    itk::ImageRegion<3>                 m_CroppedRegion;            ///< Image size with reduced FOV.
     itk::ImageRegion<3>                 m_ImageRegion;              ///< Image size.
     itk::Vector<double,3>               m_ImageSpacing;             ///< Image voxel size.
     itk::Point<double,3>                m_ImageOrigin;              ///< Image origin.
     itk::Matrix<double, 3, 3>           m_ImageDirection;           ///< Image rotation matrix.
 
     /** Other acquisitions parameters */
+    AcquisitionType                     m_AcquisitionType;            ///< determines k-space trajectory and maximum echo position(s)
     double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     double                              m_tEcho;                    ///< Echo time TE.
     double                              m_tRep;                     ///< Echo time TR.
@@ -137,6 +145,7 @@ public:
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
     bool                                m_DoAddMotion;              ///< Enable motion artifacts.
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
+    std::vector< bool >                 m_MotionVolumes;            ///< Indicates the image volumes that are affected by motion
     itk::Vector<double,3>               m_Translation;              ///< Maximum translational motion.
     itk::Vector<double,3>               m_Rotation;                 ///< Maximum rotational motion.
     ItkDoubleImgType::Pointer           m_FrequencyMap;             ///< If != NULL, distortions are added to the image using this frequency map.
@@ -222,6 +231,7 @@ public:
         , m_CheckAddSpikesBox(false)
         , m_CheckAddEddyCurrentsBox(false)
         , m_CheckAddDistortionsBox(false)
+        , m_MotionVolumesBox("random")
         , m_CheckRealTimeFibersBox(true)
         , m_CheckAdvancedFiberOptionsBox(false)
         , m_CheckConstantRadiusBox(false)
@@ -233,6 +243,7 @@ public:
     string              m_SignalModelString;                ///< Appendet to the name of the result node
     string              m_ArtifactModelString;              ///< Appendet to the name of the result node
     string              m_OutputPath;                       ///< Image is automatically saved to the specified folder after simulation is finished.
+    string              m_AfterSimulationMessage;           ///< Store messages that are displayed after the simulation has finished (e.g. warnings, automatic parameter adjustments etc.)
 
     /** member variables that store the check-state of GUI checkboxes */
     // image generation
@@ -244,6 +255,7 @@ public:
     bool                m_CheckAddSpikesBox;
     bool                m_CheckAddEddyCurrentsBox;
     bool                m_CheckAddDistortionsBox;
+    string              m_MotionVolumesBox;
     // fiber generation
     bool                m_CheckRealTimeFibersBox;
     bool                m_CheckAdvancedFiberOptionsBox;

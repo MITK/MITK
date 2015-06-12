@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageFileWriter.h>
+#include <mitkSingleShotEpi.h>
+#include <mitkCartesianReadout.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -52,7 +54,7 @@ void KspaceImageFilter< TPixelType >
     m_Spike = vcl_complex<double>(0,0);
 
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
-    itk::ImageRegion<2> region; region.SetSize(0, m_OutSize[0]);  region.SetSize(1, m_OutSize[1]);
+    itk::ImageRegion<2> region; region.SetSize(0, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0));  region.SetSize(1, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1));
     outputImage->SetLargestPossibleRegion( region );
     outputImage->SetBufferedRegion( region );
     outputImage->SetRequestedRegion( region );
@@ -67,25 +69,25 @@ void KspaceImageFilter< TPixelType >
     m_KSpaceImage->FillBuffer(0.0);
 
     m_Gamma = 42576000;    // Gyromagnetic ratio in Hz/T
-    if ( m_Parameters.m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
+    if ( m_Parameters->m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
     {
         m_DiffusionGradientDirection.Normalize();
-        m_DiffusionGradientDirection = m_DiffusionGradientDirection *  m_Parameters.m_SignalGen.m_EddyStrength/1000 *  m_Gamma;
+        m_DiffusionGradientDirection = m_DiffusionGradientDirection *  m_Parameters->m_SignalGen.m_EddyStrength/1000 *  m_Gamma;
         m_IsBaseline = false;
     }
 
     this->SetNthOutput(0, outputImage);
 
-    m_Transform =  m_Parameters.m_SignalGen.m_ImageDirection;
+    m_Transform =  m_Parameters->m_SignalGen.m_ImageDirection;
     for (int i=0; i<3; i++)
         for (int j=0; j<3; j++)
-            m_Transform[i][j] *=  m_Parameters.m_SignalGen.m_ImageSpacing[j];
+            m_Transform[i][j] *=  m_Parameters->m_SignalGen.m_ImageSpacing[j];
 
-    double a = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters.m_SignalGen.m_ImageSpacing[0];
-    double b = m_Parameters.m_SignalGen.m_ImageRegion.GetSize(1)*m_Parameters.m_SignalGen.m_ImageSpacing[1];
+    double a = m_Parameters->m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters->m_SignalGen.m_ImageSpacing[0];
+    double b = m_Parameters->m_SignalGen.m_ImageRegion.GetSize(1)*m_Parameters->m_SignalGen.m_ImageSpacing[1];
     double diagonal = sqrt(a*a+b*b)/1000;   // image diagonal in m
 
-    switch (m_Parameters.m_SignalGen.m_CoilSensitivityProfile)
+    switch (m_Parameters->m_SignalGen.m_CoilSensitivityProfile)
     {
     case SignalGenerationParameters::COIL_CONSTANT:
     {
@@ -103,6 +105,20 @@ void KspaceImageFilter< TPixelType >
         break;
     }
     }
+
+    switch (m_Parameters->m_SignalGen.m_AcquisitionType)
+    {
+    case SignalGenerationParameters::SingleShotEpi:
+        m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
+        break;
+    case SignalGenerationParameters::SpinEcho:
+        m_ReadoutScheme = new mitk::CartesianReadout(m_Parameters);
+        break;
+    default:
+        m_ReadoutScheme = new mitk::SingleShotEpi(m_Parameters);
+    }
+
+    m_ReadoutScheme->AdjustEchoTime();
 }
 
 template< class TPixelType >
@@ -113,7 +129,7 @@ double KspaceImageFilter< TPixelType >::CoilSensitivity(DoubleVectorType& pos)
     m_CoilPosition[2] = pos[2];
     // *************************************************************************
 
-    switch (m_Parameters.m_SignalGen.m_CoilSensitivityProfile)
+    switch (m_Parameters->m_SignalGen.m_CoilSensitivityProfile)
     {
     case SignalGenerationParameters::COIL_CONSTANT:
         return 1;
@@ -153,83 +169,66 @@ void KspaceImageFilter< TPixelType >
 
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
 
-    double kxMax = outputImage->GetLargestPossibleRegion().GetSize(0);  // k-space size in x-direction
-    double kyMax = outputImage->GetLargestPossibleRegion().GetSize(1);  // k-space size in y-direction
+    double kxMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0);
+    double kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
     double xMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0); // scanner coverage in x-direction
     double yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
+    double yMaxFov = yMax*m_Parameters->m_SignalGen.m_CroppingFactor;                // actual FOV in y-direction (in x-direction FOV=xMax)
 
     double numPix = kxMax*kyMax;
-    double dt =  m_Parameters.m_SignalGen.m_tLine/kxMax;
 
-    // k-space center at maximum echo
-    double fromMaxEcho = 0;
-    if ( (int)kyMax%2==0 )
-    {
-        fromMaxEcho = -m_Parameters.m_SignalGen.m_tLine*(kyMax-1)/2 + dt*(kxMax-(int)kxMax%2)/2;
-    }
-    else
-        fromMaxEcho = -m_Parameters.m_SignalGen.m_tLine*(kyMax-1)/2 - dt*(kxMax-(int)kxMax%2)/2;
+    double noiseVar = m_Parameters->m_SignalGen.m_PartialFourier*m_Parameters->m_SignalGen.m_NoiseVariance/(kyMax*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
 
-    double yMaxFov = yMax*m_Parameters.m_SignalGen.m_CroppingFactor;  //  actual FOV in y-direction (in x-direction FOV=xMax)
-
-    double noiseVar = m_Parameters.m_SignalGen.m_PartialFourier*m_Parameters.m_SignalGen.m_NoiseVariance/(kyMax*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
+//    double dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
 
     while( !oit.IsAtEnd() )
     {
-        itk::Index< 2 > kIdx;
-        kIdx[0] = oit.GetIndex()[0];
-        kIdx[1] = oit.GetIndex()[1];
-
         // dephasing time
-        double t= fromMaxEcho + ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
+        double t= m_ReadoutScheme->GetTimeFromMaxEcho(oit.GetIndex());
 
         // readout time
-        double tall = ((double)kIdx[1]*kxMax+(double)kIdx[0])*dt;
+        double tall = m_ReadoutScheme->GetRedoutTime(oit.GetIndex());
 
         // calculate eddy current decay factor
         double eddyDecay = 0;
-        if ( m_Parameters.m_Misc.m_CheckAddEddyCurrentsBox && m_Parameters.m_SignalGen.m_EddyStrength>0)
-            eddyDecay = exp(-tall/m_Parameters.m_SignalGen.m_Tau );
+        if ( m_Parameters->m_Misc.m_CheckAddEddyCurrentsBox && m_Parameters->m_SignalGen.m_EddyStrength>0)
+            eddyDecay = exp(-tall/m_Parameters->m_SignalGen.m_Tau );
 
         // calcualte signal relaxation factors
         std::vector< double > relaxFactor;
-        if ( m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
+        if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
             for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-                relaxFactor.push_back( exp(-( m_Parameters.m_SignalGen.m_tEcho+t)/m_T2.at(i) -fabs(t)/ m_Parameters.m_SignalGen.m_tInhom)*(1.0-exp(-m_Parameters.m_SignalGen.m_tRep/m_T1.at(i))) );
+                relaxFactor.push_back( exp(-( m_Parameters->m_SignalGen.m_tEcho+t)/m_T2.at(i) -fabs(t)/ m_Parameters->m_SignalGen.m_tInhom)*(1.0-exp(-m_Parameters->m_SignalGen.m_tRep/m_T1.at(i))) );
 
-        // reverse phase
-        if (!m_Parameters.m_SignalGen.m_ReversePhase)
-            kIdx[1] = kyMax-1-kIdx[1];
+        // get current k-space index (depends on the schosen k-space readout scheme)
+        itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(oit.GetIndex());
+
 
         // partial fourier
         bool pf = false;
-        if (kIdx[1]>kyMax*m_Parameters.m_SignalGen.m_PartialFourier)
+        if (kIdx[1]>kyMax*m_Parameters->m_SignalGen.m_PartialFourier)
             pf = true;
-
-        // reverse readout direction
-        if (oit.GetIndex()[1]%2 == 1)
-            kIdx[0] = kxMax-kIdx[0]-1;
-
-        // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
-        double kx = kIdx[0];
-        double ky = kIdx[1];
-        if ((int)kxMax%2==1)
-            kx -= (kxMax-1)/2;
-        else
-            kx -= kxMax/2;
-        if ((int)kyMax%2==1)
-            ky -= (kyMax-1)/2;
-        else
-            ky -= kyMax/2;
-
-        // add ghosting
-        if (oit.GetIndex()[1]%2 == 1)
-            kx -= m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
-        else
-            kx += m_Parameters.m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
 
         if (!pf)
         {
+            // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
+            double kx = kIdx[0];
+            double ky = kIdx[1];
+            if ((int)kxMax%2==1)
+                kx -= (kxMax-1)/2;
+            else
+                kx -= kxMax/2;
+            if ((int)kyMax%2==1)
+                ky -= (kyMax-1)/2;
+            else
+                ky -= kyMax/2;
+
+            // add ghosting
+            if (oit.GetIndex()[1]%2 == 1)
+                kx -= m_Parameters->m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
+            else
+                kx += m_Parameters->m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
+
             vcl_complex<double> s(0,0);
             InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
             while( !it.IsAtEnd() )
@@ -252,35 +251,33 @@ void KspaceImageFilter< TPixelType >
 
                 // sum compartment signals and simulate relaxation
                 for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-                    if ( m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
-                        f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * relaxFactor.at(i) *  m_Parameters.m_SignalGen.m_SignalScale, 0);
+                    if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
+                        f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) * relaxFactor.at(i) *  m_Parameters->m_SignalGen.m_SignalScale, 0);
                     else
-                        f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) *  m_Parameters.m_SignalGen.m_SignalScale );
+                        f += std::complex<double>( m_CompartmentImages.at(i)->GetPixel(it.GetIndex()) *  m_Parameters->m_SignalGen.m_SignalScale );
 
-                if (m_Parameters.m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
+                if (m_Parameters->m_SignalGen.m_CoilSensitivityProfile!=SignalGenerationParameters::COIL_CONSTANT)
                     f *= CoilSensitivity(pos);
 
                 // simulate eddy currents and other distortions
                 double omega = 0;   // frequency offset
-                if (  m_Parameters.m_SignalGen.m_EddyStrength>0 && m_Parameters.m_Misc.m_CheckAddEddyCurrentsBox && !m_IsBaseline)
+                if (  m_Parameters->m_SignalGen.m_EddyStrength>0 && m_Parameters->m_Misc.m_CheckAddEddyCurrentsBox && !m_IsBaseline)
                 {
                     omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
                 }
-                if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
+                if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
                 {
                     itk::Point<double, 3> point3D;
                     ItkDoubleImgType::IndexType index; index[0] = it.GetIndex()[0]; index[1] = it.GetIndex()[1]; index[2] = m_Zidx;
-                    if (m_Parameters.m_SignalGen.m_DoAddMotion)
+                    if (m_Parameters->m_SignalGen.m_DoAddMotion)
                     {
-                        m_Parameters.m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
+                        m_Parameters->m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
                         point3D = m_FiberBundle->TransformPoint(point3D.GetVnlVector(), -m_Rotation[0],-m_Rotation[1],-m_Rotation[2],-m_Translation[0],-m_Translation[1],-m_Translation[2]);
-                        m_Parameters.m_SignalGen.m_FrequencyMap->TransformPhysicalPointToIndex(point3D, index);
-                        if (m_Parameters.m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().IsInside(index))
-                            omega += m_Parameters.m_SignalGen.m_FrequencyMap->GetPixel(index);
+                        omega += InterpolateFmapValue(point3D);
                     }
                     else
                     {
-                        omega += m_Parameters.m_SignalGen.m_FrequencyMap->GetPixel(index);
+                        omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index);
                     }
                 }
 
@@ -300,12 +297,23 @@ void KspaceImageFilter< TPixelType >
             if (m_SpikesPerSlice>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
                 m_Spike = s;
 
-            if (m_Parameters.m_SignalGen.m_NoiseVariance>0)
+            if (m_Parameters->m_SignalGen.m_NoiseVariance>0)
                 s = vcl_complex<double>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
 
             outputImage->SetPixel(kIdx, s);
-//            m_KSpaceImage->SetPixel(kIdx, t/dt );
+            //            m_KSpaceImage->SetPixel(kIdx, t/dt );
             m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
+//            if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
+//            {
+//                itk::Point<double, 3> point3D;
+//                ItkDoubleImgType::IndexType index; index[0] = kIdx[0]; index[1] = kIdx[1]; index[2] = m_Zidx;
+//                if (m_Parameters->m_SignalGen.m_DoAddMotion)
+//                {
+//                    m_Parameters->m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
+//                    point3D = m_FiberBundle->TransformPoint(point3D.GetVnlVector(), -m_Rotation[0],-m_Rotation[1],-m_Rotation[2],-m_Translation[0],-m_Translation[1],-m_Translation[2]);
+//                    m_KSpaceImage->SetPixel(kIdx, InterpolateFmapValue(point3D) );
+//                }
+//            }
         }
 
         ++oit;
@@ -316,6 +324,8 @@ template< class TPixelType >
 void KspaceImageFilter< TPixelType >
 ::AfterThreadedGenerateData()
 {
+    delete m_ReadoutScheme;
+
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
     double kxMax = outputImage->GetLargestPossibleRegion().GetSize(0);  // k-space size in x-direction
     double kyMax = outputImage->GetLargestPossibleRegion().GetSize(1);  // k-space size in y-direction
@@ -328,10 +338,10 @@ void KspaceImageFilter< TPixelType >
         kIdx[1] = oit.GetIndex()[1];
 
         // reverse phase
-        if (!m_Parameters.m_SignalGen.m_ReversePhase)
+        if (!m_Parameters->m_SignalGen.m_ReversePhase)
             kIdx[1] = kyMax-1-kIdx[1];
 
-        if (kIdx[1]>kyMax*m_Parameters.m_SignalGen.m_PartialFourier)
+        if (kIdx[1]>kyMax*m_Parameters->m_SignalGen.m_PartialFourier)
         {
             // reverse readout direction
             if (oit.GetIndex()[1]%2 == 1)
@@ -359,7 +369,7 @@ void KspaceImageFilter< TPixelType >
     else
         randGen->SetSeed();
 
-    m_Spike *=  m_Parameters.m_SignalGen.m_SpikeAmplitude;
+    m_Spike *=  m_Parameters->m_SignalGen.m_SpikeAmplitude;
     itk::Index< 2 > spikeIdx;
     for (unsigned int i=0; i<m_SpikesPerSlice; i++)
     {
@@ -367,6 +377,79 @@ void KspaceImageFilter< TPixelType >
         spikeIdx[1] = randGen->GetIntegerVariate()%(int)kyMax;
         outputImage->SetPixel(spikeIdx, m_Spike);
     }
+}
+
+
+
+template< class TPixelType >
+double KspaceImageFilter< TPixelType >::InterpolateFmapValue(itk::Point<float, 3> itkP)
+{
+    itk::Index<3> idx;
+    itk::ContinuousIndex< double, 3> cIdx;
+    m_Parameters->m_SignalGen.m_FrequencyMap->TransformPhysicalPointToIndex(itkP, idx);
+    m_Parameters->m_SignalGen.m_FrequencyMap->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+
+    double pix = 0;
+    if ( m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().IsInside(idx) )
+        pix = m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(idx);
+    else
+        return pix;
+
+    double frac_x = cIdx[0] - idx[0];
+    double frac_y = cIdx[1] - idx[1];
+    double frac_z = cIdx[2] - idx[2];
+    if (frac_x<0)
+    {
+        idx[0] -= 1;
+        frac_x += 1;
+    }
+    if (frac_y<0)
+    {
+        idx[1] -= 1;
+        frac_y += 1;
+    }
+    if (frac_z<0)
+    {
+        idx[2] -= 1;
+        frac_z += 1;
+    }
+    frac_x = 1-frac_x;
+    frac_y = 1-frac_y;
+    frac_z = 1-frac_z;
+
+    // int coordinates inside image?
+    if (idx[0] >= 0 && idx[0] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(0)-1 &&
+            idx[1] >= 0 && idx[1] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(1)-1 &&
+            idx[2] >= 0 && idx[2] < m_Parameters->m_SignalGen.m_FrequencyMap->GetLargestPossibleRegion().GetSize(2)-1)
+    {
+        vnl_vector_fixed<double, 8> interpWeights;
+        interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
+        interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
+        interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
+        interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
+        interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
+        interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
+        interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
+        interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
+
+        pix = m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(idx) * interpWeights[0];
+        ItkDoubleImgType::IndexType tmpIdx = idx; tmpIdx[0]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[1];
+        tmpIdx = idx; tmpIdx[1]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[2];
+        tmpIdx = idx; tmpIdx[2]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[3];
+        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[4];
+        tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[5];
+        tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[6];
+        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
+        pix +=  m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(tmpIdx) * interpWeights[7];
+    }
+
+    return pix;
 }
 
 }

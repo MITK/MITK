@@ -89,7 +89,7 @@ protected:
   bool m_ShowDistantLines;
   int  m_LineWidth;
   int m_PointLineWidth;
-  int m_Point2DSize;
+  float m_Point2DSize;
 };
 
 } // namespace mitk

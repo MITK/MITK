@@ -96,6 +96,8 @@ protected:
   TrackerType::Pointer tracker;
   QTimer*   m_TrackingTimer;
   mitk::DataNode::Pointer m_TractogramNode;
+  mitk::DataNode::Pointer m_SamplingPointsNode;
+  mitk::DataNode::Pointer m_AlternativePointsNode;
 
 private:
 

@@ -61,6 +61,7 @@ public:
     itkSetMacro( ReferenceImageSet , DirectionImageContainerType::Pointer)  ///< reference image containers
     itkSetMacro( MaskImage , UCharImageType::Pointer)                       ///< Calculation is only performed inside of the mask image.
     itkSetMacro( IgnoreMissingDirections , bool)                            ///< If in one voxel, the number of directions differs between the test container and the reference, the excess directions are ignored. Otherwise, the error to the next closest direction is calculated.
+    itkSetMacro( IgnoreEmptyVoxels , bool)                                  ///< Don't increase error if either reference or test voxel is empty.
 
     /** Output statistics of the measured angular errors. */
     itkGetMacro( MeanAngularError, float)
@@ -86,6 +87,7 @@ protected:
     DirectionImageContainerType::Pointer     m_ImageSet;
     DirectionImageContainerType::Pointer     m_ReferenceImageSet;
     bool                                     m_IgnoreMissingDirections;
+    bool                                     m_IgnoreEmptyVoxels;
     double                                   m_MeanAngularError;
     double                                   m_MedianAngularError;
     double                                   m_MaxAngularError;

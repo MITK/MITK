@@ -475,7 +475,7 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
     connectomicsRenderingEdgeRadiusParameter, renderer, overwrite );
 
   node-> AddProperty( connectomicsRenderingBalloonTextName.c_str(), balloonText,
-                      nullptr, overwrite ); // renderer=nullptr: Property is renderer independant.
+                      nullptr, overwrite ); // renderer=nullptr: Property is renderer independent.
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

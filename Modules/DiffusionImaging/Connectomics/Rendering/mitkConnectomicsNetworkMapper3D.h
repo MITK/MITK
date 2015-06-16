@@ -73,7 +73,7 @@ namespace mitk {
     itkCloneMacro(Self)
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like deprecated.. should be replaced bz GetViewProp()
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
 
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
 

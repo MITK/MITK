@@ -51,7 +51,7 @@ mitk::ConnectomicsNetworkMapper3D:: ~ConnectomicsNetworkMapper3D()
 
 void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* /*renderer*/)
 {
-  if( this->GetInput() == NULL )
+  if( this-> GetInput() == nullptr )
   {
     return;
   }

@@ -42,8 +42,8 @@ const std::string QmitkConnectomicsStatisticsView::VIEW_ID = "org.mitk.views.con
 
 QmitkConnectomicsStatisticsView::QmitkConnectomicsStatisticsView()
 : QmitkFunctionality()
-, m_Controls( 0 )
-, m_MultiWidget( NULL )
+, m_Controls( nullptr )
+, m_MultiWidget( nullptr )
 , m_currentIndex( 0 )
 {
 }
@@ -76,7 +76,7 @@ void QmitkConnectomicsStatisticsView::StdMultiWidgetAvailable (QmitkStdMultiWidg
 
 void QmitkConnectomicsStatisticsView::StdMultiWidgetNotAvailable()
 {
-  m_MultiWidget = NULL;
+  m_MultiWidget = nullptr;
 }
 
 void QmitkConnectomicsStatisticsView::WipeDisplay()
@@ -86,9 +86,9 @@ void QmitkConnectomicsStatisticsView::WipeDisplay()
   m_Controls->inputImageOneNameLabel->setVisible( false );
   m_Controls->inputImageOneLabel->setVisible( false );
   m_Controls->networkStatisticsPlainTextEdit->clear();
-  m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(   NULL );
-  m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       NULL );
-  m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( NULL );
+  m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(  nullptr );
+  m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       nullptr );
+  m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( nullptr );
   m_Controls->betweennessNetworkHistogramCanvas->update();
   m_Controls->degreeNetworkHistogramCanvas->update();
   m_Controls->shortestPathNetworkHistogramCanvas->update();

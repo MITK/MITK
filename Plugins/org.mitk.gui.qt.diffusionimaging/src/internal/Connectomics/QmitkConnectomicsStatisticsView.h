@@ -57,7 +57,7 @@ public:
 
 protected slots:
 
-  void OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( int );
+  void OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged(  );
 
 protected:
 
@@ -76,9 +76,6 @@ protected:
 
   /// Cache for histograms
   mitk::ConnectomicsHistogramCache histogramCache;
-
-  // The selected synthetic network type
-  int m_currentIndex;
 };
 
 

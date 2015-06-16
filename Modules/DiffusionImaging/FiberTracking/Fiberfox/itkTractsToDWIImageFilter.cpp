@@ -335,7 +335,11 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 
             if (m_Parameters.m_SignalGen.m_NumberOfCoils>1)
             {
+#ifdef WIN32
+#pragma omp parallel for
+#else
 #pragma omp parallel for collapse(2)
+#endif
                 for (unsigned int y=0; y<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(1); y++)
                     for (unsigned int x=0; x<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(0); x++)
                     {

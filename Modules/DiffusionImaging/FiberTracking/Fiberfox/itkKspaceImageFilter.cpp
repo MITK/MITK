@@ -159,7 +159,7 @@ void KspaceImageFilter< TPixelType >
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
     randGen->SetSeed();
     if (m_UseConstantRandSeed)  // always generate the same random numbers?
-        randGen->SetSeed(threadID*100);
+        randGen->SetSeed(0);
     else
         randGen->SetSeed();
 

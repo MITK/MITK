@@ -78,7 +78,7 @@ namespace itk{
 
     itkSetMacro( SpikesPerSlice, unsigned int )     ///< Number of spikes per slice. Corresponding parameter in fiberfox parameter object specifies the number of spikes for the whole image and can thus not be used here.
     itkSetMacro( Z, double )                        ///< Slice position, necessary for eddy current simulation.
-    itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results.
+    itkSetMacro( UseConstantRandSeed, bool )        ///< Use constant seed for random generator for reproducible results. ONLY USE FOR TESTING PURPOSES!
     itkSetMacro( Rotation, DoubleVectorType )
     itkSetMacro( Translation, DoubleVectorType )
     itkSetMacro( Zidx, int )

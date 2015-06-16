@@ -34,13 +34,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingEdgeRadiusParameterProperty.h"
 #include "mitkConnectomicsRenderingNodeThresholdParameterProperty.h"
 #include "mitkConnectomicsRenderingEdgeThresholdParameterProperty.h"
+#include <mbilog.h>
+#include <vtkIndent.h>
+#include <ciso646> // Workaround MSVC "extension": and &&, or ||, not !, ...
+// iso646.h reenables 11 Alternative operator representations:
+// http://en.cppreference.com/w/cpp/language/operator_alternative
+
+#include <string>
 
 #include <algorithm>
 
 mitk::ConnectomicsNetworkMapper3D::ConnectomicsNetworkMapper3D()
 {
   m_NetworkAssembly = vtkPropAssembly::New();
-
+  m_Translator = mitk::FreeSurferParcellationTranslator::New();
 }
 
 mitk::ConnectomicsNetworkMapper3D:: ~ConnectomicsNetworkMapper3D()
@@ -49,10 +56,10 @@ mitk::ConnectomicsNetworkMapper3D:: ~ConnectomicsNetworkMapper3D()
 }
 
 void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
-void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* /*renderer*/)
 {
   if( this-> GetInput() == nullptr )
   {
+    renderer-> GetOverlayManager()-> RemoveOverlay( m_TextOverlay3D.GetPointer() );
     return;
   }
 
@@ -61,252 +68,333 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
   if( this-> GetInput()-> GetIsModified() || propertiesHaveChanged )
   {
 
-  m_NetworkAssembly->Delete();
-  m_NetworkAssembly = vtkPropAssembly::New();
+    m_NetworkAssembly-> Delete();
+    m_NetworkAssembly = vtkPropAssembly::New();
 
-  // Here is the part where a graph is given and converted to points and connections between points...
-  std::vector< mitk::ConnectomicsNetwork::NetworkNode > vectorOfNodes = this->GetInput()->GetVectorOfAllNodes();
-  std::vector< std::pair<
-    std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
-    , mitk::ConnectomicsNetwork::NetworkEdge > >  vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
+    // Here is the part where a graph is given and converted to points and connections between points...
+    std::vector< mitk::ConnectomicsNetwork::NetworkNode > vectorOfNodes = this->GetInput()->GetVectorOfAllNodes();
+    std::vector< std::pair<
+      std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
+      , mitk::ConnectomicsNetwork::NetworkEdge > >  vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
 
-  // Decide on the style of rendering due to property
-
-  if( m_ChosenRenderingScheme == connectomicsRenderingMITKScheme )
-  {
-    mitk::Point3D tempWorldPoint, tempCNFGeometryPoint;
-
-    //////////////////////Prepare coloring and radius////////////
-
-    std::vector< double > vectorOfNodeRadiusParameterValues;
-    vectorOfNodeRadiusParameterValues.resize( vectorOfNodes.size() );
-    double maxNodeRadiusParameterValue( FillNodeParameterVector( &vectorOfNodeRadiusParameterValues, m_NodeRadiusParameter ) );
-
-    std::vector< double > vectorOfNodeColorParameterValues;
-    vectorOfNodeColorParameterValues.resize( vectorOfNodes.size() );
-    double maxNodeColorParameterValue( FillNodeParameterVector( &vectorOfNodeColorParameterValues, m_NodeColorParameter ) );
-
-    std::vector< double > vectorOfEdgeRadiusParameterValues;
-    vectorOfEdgeRadiusParameterValues.resize( vectorOfEdges.size() );
-    double maxEdgeRadiusParameterValue( FillEdgeParameterVector( &vectorOfEdgeRadiusParameterValues, m_EdgeRadiusParameter ) );
-
-    std::vector< double > vectorOfEdgeColorParameterValues;
-    vectorOfEdgeColorParameterValues.resize( vectorOfEdges.size() );
-    double maxEdgeColorParameterValue( FillEdgeParameterVector( &vectorOfEdgeColorParameterValues, m_EdgeColorParameter ) );
-
-    //////////////////////Prepare Filtering//////////////////////
-    // true will be rendered
-    std::vector< bool > vectorOfNodeFilterBools( vectorOfNodes.size(), true );
-    if( m_ChosenNodeFilter == connectomicsRenderingNodeThresholdingFilter )
+    // Decide on the style of rendering due to property
+    if( m_ChosenRenderingScheme == connectomicsRenderingMITKScheme )
     {
-      FillNodeFilterBoolVector( &vectorOfNodeFilterBools, m_NodeThresholdParameter );
-    }
+      mitk::Point3D tempWorldPoint, tempCNFGeometryPoint;
 
-    std::vector< bool > vectorOfEdgeFilterBools( vectorOfEdges.size(), true );
-    if( m_ChosenEdgeFilter == connectomicsRenderingEdgeThresholdFilter )
-    {
-      FillEdgeFilterBoolVector( &vectorOfEdgeFilterBools, m_EdgeThresholdParameter );
-    }
-
-    //////////////////////Create Spheres/////////////////////////
-    for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
-    {
-      vtkSmartPointer<vtkSphereSource> sphereSource =
-        vtkSmartPointer<vtkSphereSource>::New();
-
-      for(unsigned int dimension = 0; dimension < 3; dimension++)
+      ////// Prepare BalloonWidgets/Overlays: ////////////////////
+      if( ( m_ChosenNodeLabel == "" or m_ChosenNodeLabel == "-1" ) and m_TextOverlay3D )
       {
-        tempCNFGeometryPoint.SetElement( dimension , vectorOfNodes[i].coordinates[dimension] );
+        renderer-> GetOverlayManager()-> RemoveOverlay( m_TextOverlay3D.GetPointer() );
+        GetDataNode()-> SetProperty( connectomicsRenderingBalloonTextName.c_str(), mitk::StringProperty::New(""), nullptr );
+        GetDataNode()-> SetProperty( connectomicsRenderingBalloonNodeStatsName.c_str(), mitk::StringProperty::New(""), nullptr );
       }
 
-      GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+      //////////////////////Prepare coloring and radius////////////
+      std::vector< double > vectorOfNodeRadiusParameterValues;
+      vectorOfNodeRadiusParameterValues.resize( vectorOfNodes.size() );
+      double maxNodeRadiusParameterValue( FillNodeParameterVector( &vectorOfNodeRadiusParameterValues, m_NodeRadiusParameter ) );
 
-      sphereSource->SetCenter( tempWorldPoint[0] , tempWorldPoint[1], tempWorldPoint[2] );
+      std::vector< double > vectorOfNodeColorParameterValues;
+      vectorOfNodeColorParameterValues.resize( vectorOfNodes.size() );
+      double maxNodeColorParameterValue( FillNodeParameterVector( &vectorOfNodeColorParameterValues, m_NodeColorParameter ) );
 
-      // determine radius
-      double radiusFactor = vectorOfNodeRadiusParameterValues[i] / maxNodeRadiusParameterValue;
+      std::vector< double > vectorOfEdgeRadiusParameterValues;
+      vectorOfEdgeRadiusParameterValues.resize( vectorOfEdges.size() );
+      double maxEdgeRadiusParameterValue( FillEdgeParameterVector( &vectorOfEdgeRadiusParameterValues, m_EdgeRadiusParameter ) );
 
-      double radius = m_NodeRadiusStart + ( m_NodeRadiusEnd - m_NodeRadiusStart) * radiusFactor;
-      sphereSource->SetRadius( radius );
+      std::vector< double > vectorOfEdgeColorParameterValues;
+      vectorOfEdgeColorParameterValues.resize( vectorOfEdges.size() );
+      double maxEdgeColorParameterValue( FillEdgeParameterVector( &vectorOfEdgeColorParameterValues, m_EdgeColorParameter ) );
 
-      vtkSmartPointer<vtkPolyDataMapper> mapper =
-        vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper->SetInputConnection(sphereSource->GetOutputPort());
-
-      vtkSmartPointer<vtkActor> actor =
-        vtkSmartPointer<vtkActor>::New();
-      actor->SetMapper(mapper);
-
-      // determine color
-      double colorFactor = vectorOfNodeColorParameterValues[i] / maxNodeColorParameterValue;
-
-      double redStart = m_NodeColorStart.GetElement( 0 );
-      double greenStart = m_NodeColorStart.GetElement( 1 );
-      double blueStart = m_NodeColorStart.GetElement( 2 );
-      double redEnd = m_NodeColorEnd.GetElement( 0 );
-      double greenEnd = m_NodeColorEnd.GetElement( 1 );
-      double blueEnd = m_NodeColorEnd.GetElement( 2 );
-
-      double red = redStart + ( redEnd - redStart ) * colorFactor;
-      double green = greenStart + ( greenEnd - greenStart ) * colorFactor;
-      double blue = blueStart + ( blueEnd - blueStart ) * colorFactor;
-
-      actor->GetProperty()->SetColor( red, green, blue);
-
-      if( vectorOfNodeFilterBools[i] )
+      //////////////////////Prepare Filtering//////////////////////
+      // true will be rendered
+      std::vector< bool > vectorOfNodeFilterBools( vectorOfNodes.size(), true );
+      if( m_ChosenNodeFilter == connectomicsRenderingNodeThresholdingFilter )
       {
-        m_NetworkAssembly->AddPart(actor);
-      }
-    }
-
-    //////////////////////Create Tubes/////////////////////////
-
-    for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
-    {
-
-      vtkSmartPointer<vtkLineSource> lineSource =
-        vtkSmartPointer<vtkLineSource>::New();
-
-      for(unsigned int dimension = 0; dimension < 3; dimension++)
-      {
-        tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.first.coordinates[dimension];
+        FillNodeFilterBoolVector( &vectorOfNodeFilterBools, m_NodeThresholdParameter );
       }
 
-      GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
-
-      lineSource->SetPoint1(tempWorldPoint[0], tempWorldPoint[1],tempWorldPoint[2]  );
-
-      for(unsigned int dimension = 0; dimension < 3; dimension++)
+      std::vector< bool > vectorOfEdgeFilterBools( vectorOfEdges.size(), true );
+      if( m_ChosenEdgeFilter == connectomicsRenderingEdgeThresholdFilter )
       {
-        tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.second.coordinates[dimension];
+        FillEdgeFilterBoolVector( &vectorOfEdgeFilterBools, m_EdgeThresholdParameter );
       }
 
-      GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
 
-      lineSource->SetPoint2(tempWorldPoint[0], tempWorldPoint[1], tempWorldPoint[2] );
+      //////////////////////Create Spheres/////////////////////////
+      std::stringstream nodeLabelStream; //local stream variable to hold csv list of node label names and node label numbers.
 
-      vtkSmartPointer<vtkTubeFilter> tubes = vtkSmartPointer<vtkTubeFilter>::New();
-      tubes->SetInputConnection( lineSource->GetOutputPort() );
-      tubes->SetNumberOfSides( 12 );
-
-      // determine radius
-      double radiusFactor = vectorOfEdgeRadiusParameterValues[i] / maxEdgeRadiusParameterValue;
-
-      double radius = m_EdgeRadiusStart + ( m_EdgeRadiusEnd - m_EdgeRadiusStart) * radiusFactor;
-      tubes->SetRadius( radius );
-
-      // originally we used a logarithmic scaling,
-      // double radiusFactor = 1.0 + ((double) vectorOfEdges[i].second.weight) / 10.0 ;
-      // tubes->SetRadius( std::log10( radiusFactor ) );
-
-      vtkSmartPointer<vtkPolyDataMapper> mapper2 =
-        vtkSmartPointer<vtkPolyDataMapper>::New();
-      mapper2->SetInputConnection( tubes->GetOutputPort() );
-
-      vtkSmartPointer<vtkActor> actor =
-        vtkSmartPointer<vtkActor>::New();
-      actor->SetMapper(mapper2);
-
-      // determine color
-      double colorFactor = vectorOfEdgeColorParameterValues[i] / maxEdgeColorParameterValue;
-
-      double redStart = m_EdgeColorStart.GetElement( 0 );
-      double greenStart = m_EdgeColorStart.GetElement( 1 );
-      double blueStart = m_EdgeColorStart.GetElement( 2 );
-      double redEnd = m_EdgeColorEnd.GetElement( 0 );
-      double greenEnd = m_EdgeColorEnd.GetElement( 1 );
-      double blueEnd = m_EdgeColorEnd.GetElement( 2 );
-
-      double red = redStart + ( redEnd - redStart ) * colorFactor;
-      double green = greenStart + ( greenEnd - greenStart ) * colorFactor;
-      double blue = blueStart + ( blueEnd - blueStart ) * colorFactor;
-
-      actor->GetProperty()->SetColor( red, green, blue);
-
-      if( vectorOfEdgeFilterBools[i] )
+      for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
       {
-        m_NetworkAssembly->AddPart(actor);
+        vtkSmartPointer<vtkSphereSource> sphereSource =
+          vtkSmartPointer<vtkSphereSource>::New();
+
+        for(unsigned int dimension = 0; dimension < 3; dimension++)
+        {
+          tempCNFGeometryPoint.SetElement( dimension , vectorOfNodes[i].coordinates[dimension] );
+        }
+
+        GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+
+        sphereSource->SetCenter( tempWorldPoint[0] , tempWorldPoint[1], tempWorldPoint[2] );
+
+        // determine radius
+        double radiusFactor = vectorOfNodeRadiusParameterValues[i] / maxNodeRadiusParameterValue;
+
+        double radius = m_NodeRadiusStart + ( m_NodeRadiusEnd - m_NodeRadiusStart) * radiusFactor;
+        sphereSource->SetRadius( radius );
+
+        vtkSmartPointer<vtkPolyDataMapper> mapper =
+          vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(sphereSource->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actor =
+          vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+
+        // determine color
+        double colorFactor = vectorOfNodeColorParameterValues[i] / maxNodeColorParameterValue;
+
+        double redStart = m_NodeColorStart.GetElement( 0 );
+        double greenStart = m_NodeColorStart.GetElement( 1 );
+        double blueStart = m_NodeColorStart.GetElement( 2 );
+        double redEnd = m_NodeColorEnd.GetElement( 0 );
+        double greenEnd = m_NodeColorEnd.GetElement( 1 );
+        double blueEnd = m_NodeColorEnd.GetElement( 2 );
+
+        double red = redStart + ( redEnd - redStart ) * colorFactor;
+        double green = greenStart + ( greenEnd - greenStart ) * colorFactor;
+        double blue = blueStart + ( blueEnd - blueStart ) * colorFactor;
+
+        actor->GetProperty()->SetColor( red, green, blue);
+
+        //append to csv list of nodelabels.
+        nodeLabelStream << m_Translator-> GetName( std::stoi( vectorOfNodes[i].label ) )
+                         << ": " << vectorOfNodes[i].label << ",";
+
+        if( vectorOfNodeFilterBools[i] )
+        {
+          if( vectorOfNodes[i].label ==  m_ChosenNodeLabel )
+          { // if chosen and enabled, show information in Balloon or TextOverlay:
+            // What to show:
+            std::stringstream balloonStringstream;
+            balloonStringstream << "Node id: " << vectorOfNodes[i].id
+                                << ", label: " << vectorOfNodes[i].label
+                                << ",\n    name: "
+                                << m_Translator-> GetName( std::stoi( vectorOfNodes[i].label ) )
+                                << std::endl;
+            m_BalloonText = balloonStringstream.str();
+            GetDataNode()->
+                SetProperty( connectomicsRenderingBalloonTextName.c_str(),
+                             mitk::StringProperty::New( m_BalloonText.c_str()), nullptr );
+
+            std::stringstream balloonNodeStatsStream;
+            balloonNodeStatsStream
+                << ", Coordinates: (" << vectorOfNodes[i].coordinates[0]
+                << " ; " << vectorOfNodes[i].coordinates[1]
+                << " ; " << vectorOfNodes[i].coordinates[2] << " )"
+                << ", Degree: "
+                << ( this-> GetInput()-> GetDegreeOfNodes() ).at( vectorOfNodes[i].id )
+                << ", Betweenness centrality: "
+                << ( this->GetInput()->GetNodeBetweennessVector() ).at( vectorOfNodes[i].id )
+                << ", Clustering coefficient: "
+                << ( this->GetInput()->GetLocalClusteringCoefficients()).at( vectorOfNodes[i].id )
+                << std::endl;
+            m_BalloonNodeStats = balloonNodeStatsStream.str();
+            GetDataNode()->
+                SetProperty( connectomicsRenderingBalloonNodeStatsName.c_str(),
+                             mitk::StringProperty::New( m_BalloonNodeStats.c_str()), nullptr );
+
+            // Where to show:
+            float r[3];
+            r[0]= vectorOfNodes[i].coordinates[0];
+            r[1]= vectorOfNodes[i].coordinates[1];
+            r[2]= vectorOfNodes[i].coordinates[2];
+            mitk::Point3D BalloonAnchor( r );
+            mitk::Point3D BalloonAnchorWorldCoord( r );
+            GetDataNode()-> GetData()-> GetGeometry()-> IndexToWorld( BalloonAnchor, BalloonAnchorWorldCoord );
+
+            // How to show:
+            if( m_ChosenNodeLabel != "-1" )
+            {
+              if (m_TextOverlay3D != nullptr)
+              {
+                renderer-> GetOverlayManager()-> RemoveOverlay( m_TextOverlay3D.GetPointer() );
+              }
+              m_TextOverlay3D = mitk::TextOverlay3D::New();
+              renderer-> GetOverlayManager()-> AddOverlay( m_TextOverlay3D.GetPointer() );
+              m_TextOverlay3D-> SetFontSize( 2.5 );
+              m_TextOverlay3D-> SetColor( 0.96, 0.69, 0.01 );
+              m_TextOverlay3D-> SetOpacity( 0.81 );
+              m_TextOverlay3D-> SetPosition3D( BalloonAnchorWorldCoord );
+              m_TextOverlay3D-> SetText( "...." + m_BalloonText );
+              m_TextOverlay3D-> SetForceInForeground( true ); // TODO: does not work anymore.
+              m_TextOverlay3D-> SetVisibility( GetDataNode()-> IsVisible( renderer ) );
+              renderer-> GetOverlayManager()-> UpdateOverlays( renderer );
+              // Colorize chosen node:
+              actor-> GetProperty()-> SetColor( 1.0, 0.69, 0.01);
+            }
+          }
+          m_NetworkAssembly-> AddPart( actor );
+        }
       }
+      m_AllNodeLabels = nodeLabelStream.str(); // Store all Node Names and Node Labels in 1 Property.
+      m_AllNodeLabels.erase( m_AllNodeLabels.rfind(","), 1 ); // remove trailing ,.
+      GetDataNode()->
+          SetProperty( connectomicsRenderingBalloonAllNodeLabelsName.c_str(),
+                       mitk::StringProperty::New( m_AllNodeLabels.c_str() ), nullptr );
+
+
+      //////////////////////Create Tubes/////////////////////////
+      for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
+        {
+
+        vtkSmartPointer<vtkLineSource> lineSource =
+          vtkSmartPointer<vtkLineSource>::New();
+
+        for(unsigned int dimension = 0; dimension < 3; dimension++)
+          {
+          tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.first.coordinates[dimension];
+          }
+
+        GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+
+        lineSource->SetPoint1(tempWorldPoint[0], tempWorldPoint[1],tempWorldPoint[2]  );
+
+        for(unsigned int dimension = 0; dimension < 3; dimension++)
+          {
+          tempCNFGeometryPoint[ dimension ] = vectorOfEdges[i].first.second.coordinates[dimension];
+          }
+
+        GetDataNode()->GetData()->GetGeometry()->IndexToWorld( tempCNFGeometryPoint, tempWorldPoint );
+
+        lineSource->SetPoint2(tempWorldPoint[0], tempWorldPoint[1], tempWorldPoint[2] );
+
+        vtkSmartPointer<vtkTubeFilter> tubes = vtkSmartPointer<vtkTubeFilter>::New();
+        tubes->SetInputConnection( lineSource->GetOutputPort() );
+        tubes->SetNumberOfSides( 12 );
+
+        // determine radius
+        double radiusFactor = vectorOfEdgeRadiusParameterValues[i] / maxEdgeRadiusParameterValue;
+
+        double radius = m_EdgeRadiusStart + ( m_EdgeRadiusEnd - m_EdgeRadiusStart) * radiusFactor;
+        tubes->SetRadius( radius );
+
+        // originally we used a logarithmic scaling,
+        // double radiusFactor = 1.0 + ((double) vectorOfEdges[i].second.weight) / 10.0 ;
+        // tubes->SetRadius( std::log10( radiusFactor ) );
+
+        vtkSmartPointer<vtkPolyDataMapper> mapper2 =
+          vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper2->SetInputConnection( tubes->GetOutputPort() );
+
+        vtkSmartPointer<vtkActor> actor =
+          vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper2);
+
+        // determine color
+        double colorFactor = vectorOfEdgeColorParameterValues[i] / maxEdgeColorParameterValue;
+
+        double redStart = m_EdgeColorStart.GetElement( 0 );
+        double greenStart = m_EdgeColorStart.GetElement( 1 );
+        double blueStart = m_EdgeColorStart.GetElement( 2 );
+        double redEnd = m_EdgeColorEnd.GetElement( 0 );
+        double greenEnd = m_EdgeColorEnd.GetElement( 1 );
+        double blueEnd = m_EdgeColorEnd.GetElement( 2 );
+
+        double red = redStart + ( redEnd - redStart ) * colorFactor;
+        double green = greenStart + ( greenEnd - greenStart ) * colorFactor;
+        double blue = blueStart + ( blueEnd - blueStart ) * colorFactor;
+
+        actor->GetProperty()->SetColor( red, green, blue);
+
+        if( vectorOfEdgeFilterBools[i] )
+          {
+          m_NetworkAssembly->AddPart(actor);
+          }
+        }
+      }
+    else if( m_ChosenRenderingScheme == connectomicsRenderingVTKScheme )
+      {
+      vtkSmartPointer<vtkMutableUndirectedGraph> graph =
+        vtkSmartPointer<vtkMutableUndirectedGraph>::New();
+
+      std::vector< vtkIdType > networkToVTKvector;
+      networkToVTKvector.resize(vectorOfNodes.size());
+
+      for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
+        {
+        networkToVTKvector[vectorOfNodes[i].id] = graph->AddVertex();
+        }
+
+      for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
+        {
+        graph->AddEdge(networkToVTKvector[vectorOfEdges[i].first.first.id],
+            networkToVTKvector[vectorOfEdges[i].first.second.id]);
+        }
+
+      vtkSmartPointer<vtkPoints> points =
+        vtkSmartPointer<vtkPoints>::New();
+      for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
+        {
+        double x = vectorOfNodes[i].coordinates[0];
+        double y = vectorOfNodes[i].coordinates[1];
+        double z = vectorOfNodes[i].coordinates[2];
+        points->InsertNextPoint( x, y, z);
+        }
+
+      graph->SetPoints(points);
+
+      vtkGraphLayout* layout = vtkGraphLayout::New();
+      layout->SetInputData(graph);
+      vtkPassThroughLayoutStrategy* ptls = vtkPassThroughLayoutStrategy::New();
+      layout->SetLayoutStrategy( ptls );
+
+      vtkGraphToPolyData* graphToPoly = vtkGraphToPolyData::New();
+      graphToPoly->SetInputConnection(layout->GetOutputPort());
+
+      // Create the standard VTK polydata mapper and actor
+      // for the connections (edges) in the tree.
+      vtkPolyDataMapper* edgeMapper = vtkPolyDataMapper::New();
+      edgeMapper->SetInputConnection(graphToPoly->GetOutputPort());
+      vtkActor* edgeActor = vtkActor::New();
+      edgeActor->SetMapper(edgeMapper);
+      edgeActor->GetProperty()->SetColor(0.0, 0.5, 1.0);
+
+      // Glyph the points of the tree polydata to create
+      // VTK_VERTEX cells at each vertex in the tree.
+      vtkGlyph3D* vertGlyph = vtkGlyph3D::New();
+      vertGlyph->SetInputConnection(0, graphToPoly->GetOutputPort());
+      vtkGlyphSource2D* glyphSource = vtkGlyphSource2D::New();
+      glyphSource->SetGlyphTypeToVertex();
+      vertGlyph->SetInputConnection(1, glyphSource->GetOutputPort());
+
+      // Create a mapper for the vertices, and tell the mapper
+      // to use the specified color array.
+      vtkPolyDataMapper* vertMapper = vtkPolyDataMapper::New();
+      vertMapper->SetInputConnection(vertGlyph->GetOutputPort());
+      /*if (colorArray)
+        {
+        vertMapper->SetScalarModeToUsePointFieldData();
+        vertMapper->SelectColorArray(colorArray);
+        vertMapper->SetScalarRange(colorRange);
+        }*/
+
+      // Create an actor for the vertices.  Move the actor forward
+      // in the z direction so it is drawn on top of the edge actor.
+      vtkActor* vertActor = vtkActor::New();
+      vertActor->SetMapper(vertMapper);
+      vertActor->GetProperty()->SetPointSize(5);
+      vertActor->SetPosition(0, 0, 0.001);
+      //vtkProp3D.h: virtual void SetPosition(double,double,double):
+      //Set/Get/Add the position of the Prop3D in world coordinates.
+      m_NetworkAssembly->AddPart(edgeActor);
+      m_NetworkAssembly->AddPart(vertActor);
+      }
+
+    (static_cast<mitk::ConnectomicsNetwork * > ( GetDataNode()->GetData() ) )-> SetIsModified( false );
     }
-  }
-  else if( m_ChosenRenderingScheme == connectomicsRenderingVTKScheme )
-  {
-    vtkSmartPointer<vtkMutableUndirectedGraph> graph =
-      vtkSmartPointer<vtkMutableUndirectedGraph>::New();
-
-    std::vector< vtkIdType > networkToVTKvector;
-    networkToVTKvector.resize(vectorOfNodes.size());
-
-    for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
-    {
-      networkToVTKvector[vectorOfNodes[i].id] = graph->AddVertex();
-    }
-
-    for(unsigned int i = 0; i < vectorOfEdges.size(); i++)
-    {
-      graph->AddEdge(networkToVTKvector[vectorOfEdges[i].first.first.id], networkToVTKvector[vectorOfEdges[i].first.second.id]);
-    }
-
-    vtkSmartPointer<vtkPoints> points =
-      vtkSmartPointer<vtkPoints>::New();
-    for(unsigned int i = 0; i < vectorOfNodes.size(); i++)
-    {
-      double x = vectorOfNodes[i].coordinates[0];
-      double y = vectorOfNodes[i].coordinates[1];
-      double z = vectorOfNodes[i].coordinates[2];
-      points->InsertNextPoint( x, y, z);
-    }
-
-    graph->SetPoints(points);
-
-    vtkGraphLayout* layout = vtkGraphLayout::New();
-    layout->SetInputData(graph);
-    vtkPassThroughLayoutStrategy* ptls = vtkPassThroughLayoutStrategy::New();
-    layout->SetLayoutStrategy( ptls );
-
-    vtkGraphToPolyData* graphToPoly = vtkGraphToPolyData::New();
-    graphToPoly->SetInputConnection(layout->GetOutputPort());
-
-    // Create the standard VTK polydata mapper and actor
-    // for the connections (edges) in the tree.
-    vtkPolyDataMapper* edgeMapper = vtkPolyDataMapper::New();
-    edgeMapper->SetInputConnection(graphToPoly->GetOutputPort());
-    vtkActor* edgeActor = vtkActor::New();
-    edgeActor->SetMapper(edgeMapper);
-    edgeActor->GetProperty()->SetColor(0.0, 0.5, 1.0);
-
-    // Glyph the points of the tree polydata to create
-    // VTK_VERTEX cells at each vertex in the tree.
-    vtkGlyph3D* vertGlyph = vtkGlyph3D::New();
-    vertGlyph->SetInputConnection(0, graphToPoly->GetOutputPort());
-    vtkGlyphSource2D* glyphSource = vtkGlyphSource2D::New();
-    glyphSource->SetGlyphTypeToVertex();
-    vertGlyph->SetInputConnection(1, glyphSource->GetOutputPort());
-
-    // Create a mapper for the vertices, and tell the mapper
-    // to use the specified color array.
-    vtkPolyDataMapper* vertMapper = vtkPolyDataMapper::New();
-    vertMapper->SetInputConnection(vertGlyph->GetOutputPort());
-    /*if (colorArray)
-    {
-    vertMapper->SetScalarModeToUsePointFieldData();
-    vertMapper->SelectColorArray(colorArray);
-    vertMapper->SetScalarRange(colorRange);
-    }*/
-
-    // Create an actor for the vertices.  Move the actor forward
-    // in the z direction so it is drawn on top of the edge actor.
-    vtkActor* vertActor = vtkActor::New();
-    vertActor->SetMapper(vertMapper);
-    vertActor->GetProperty()->SetPointSize(5);
-    vertActor->SetPosition(0, 0, 0.001);
-
-    m_NetworkAssembly->AddPart(edgeActor);
-    m_NetworkAssembly->AddPart(vertActor);
-  }
-
-  (static_cast<mitk::ConnectomicsNetwork * > ( GetDataNode()->GetData() ) )->SetIsModified( false );
-  }
 }
 
 const mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkMapper3D::GetInput()
@@ -337,6 +425,8 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
     mitk::ConnectomicsRenderingNodeThresholdParameterProperty::New();
   mitk::ConnectomicsRenderingEdgeThresholdParameterProperty::Pointer connectomicsRenderingEdgeThresholdParameter =
     mitk::ConnectomicsRenderingEdgeThresholdParameterProperty::New();
+
+  mitk::StringProperty::Pointer balloonText = mitk::StringProperty::New();
 
   // set the properties
   node->AddProperty( connectomicsRenderingSchemePropertyName.c_str(),
@@ -387,13 +477,15 @@ void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, Bas
   node->AddProperty( connectomicsRenderingEdgeRadiusParameterName.c_str(),
     connectomicsRenderingEdgeRadiusParameter, renderer, overwrite );
 
+  node-> AddProperty( connectomicsRenderingBalloonTextName.c_str(), balloonText,
+                      nullptr, overwrite ); // renderer=nullptr: Property is renderer independant.
+
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-void mitk::ConnectomicsNetworkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper* /*mapper*/)
+void mitk::ConnectomicsNetworkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper* mapper)
 {
-  //TODO: implement
-
+  mapper-> ImmediateModeRenderingOn();
 }
 
 void mitk::ConnectomicsNetworkMapper3D::UpdateVtkObjects()

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkConnectomicsStatisticsViewControls.h"
 
@@ -55,6 +56,8 @@ public:
   virtual void StdMultiWidgetNotAvailable() override;
 
 protected slots:
+
+  void OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( int );
 
 protected:
 

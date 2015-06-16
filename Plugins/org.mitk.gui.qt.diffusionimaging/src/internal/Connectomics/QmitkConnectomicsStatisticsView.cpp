@@ -48,7 +48,6 @@ QmitkConnectomicsStatisticsView::QmitkConnectomicsStatisticsView()
 : QmitkFunctionality()
 , m_Controls( nullptr )
 , m_MultiWidget( nullptr )
-, m_currentIndex( 0 )
 {
 }
 
@@ -64,7 +63,7 @@ void QmitkConnectomicsStatisticsView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkConnectomicsStatisticsViewControls;
     m_Controls-> setupUi( parent );
     connect( m_Controls-> networkBalloonsNodeLabelsComboBox, SIGNAL( currentIndexChanged( int ) ),
-             this, SLOT( OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( int ) ) );
+             this, SLOT( OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( ) ) );
   }
   this-> WipeDisplay();
 }
@@ -102,7 +101,7 @@ void QmitkConnectomicsStatisticsView::WipeDisplay()
   m_Controls-> networkBalloonsPlainTextEdit-> clear();
 }
 
-void QmitkConnectomicsStatisticsView::OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( int currentIndex )
+void QmitkConnectomicsStatisticsView::OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( )
 {
   std::vector<mitk::DataNode*> nodes = this-> GetDataManagerSelection();
 

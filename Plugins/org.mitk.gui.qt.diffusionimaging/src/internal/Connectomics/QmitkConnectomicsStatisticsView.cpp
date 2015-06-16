@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ####### Qmitk includes #######
 #include "QmitkConnectomicsStatisticsView.h"
 #include "QmitkStdMultiWidget.h"
-//#include "QmitkRenderWindow.h"//?
 
 // ####### Qt includes #######
 #include <QMessageBox>
@@ -35,8 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsConstantsManager.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 #include <mitkConnectomicsRenderingProperties.h>
-//#include <mitkRenderWindowBase.h>//?
-//#include <mitkIRenderingManager.h>//?
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"

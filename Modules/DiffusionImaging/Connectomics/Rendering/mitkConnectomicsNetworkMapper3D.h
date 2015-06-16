@@ -53,7 +53,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkInteractorStyleTrackball.h>
 
+#include <vtkRegularPolygonSource.h>
+#include "mitkTextOverlay2D.h"
+#include "mitkTextOverlay3D.h"
+#include <vtkPolyDataMapper2D.h>
+#include <vtkActor2D.h>
+#include <vtkProperty2D.h>
+#include <mitkOverlayManager.h>
+#include "mitkFreeSurferParcellationTranslator.h"
+#include "mitkVtkInteractorStyle.h"
+
 #include <vector>
+#include <iostream>
+#include <string>
 
 #include <MitkConnectomicsExports.h>
 
@@ -73,14 +85,13 @@ namespace mitk {
     itkCloneMacro(Self)
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like deprecated.. should be replaced bz GetViewProp()
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
 
-    static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
+    static void SetVtkMapperImmediateModeRendering(vtkMapper* mapper);
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
     virtual const mitk::ConnectomicsNetwork* GetInput();
-
 
   protected:
 
@@ -124,12 +135,16 @@ namespace mitk {
     std::string m_NodeColorParameter;
     std::string m_EdgeRadiusParameter;
     std::string m_EdgeColorParameter;
+
+    // Balloons
+    std::string m_BalloonText;
+    std::string m_BalloonNodeStats;
+    mitk::FreeSurferParcellationTranslator::Pointer m_Translator;
+    std::string m_AllNodeLabels;
+
+    mitk::TextOverlay3D::Pointer m_TextOverlay3D;
   };
 
 } // namespace mitk
 
-
-
-
 #endif /* ConnectomicsNetworkMapper3D_H_HEADER_INCLUDED */
-

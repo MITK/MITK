@@ -322,6 +322,16 @@ namespace mitk {
    const  mitk::FloatProperty::Pointer connectomicsRenderingEdgeRadiusEndDefault =
      mitk::FloatProperty::New( 0.4 );
 
+   /**
+   * \brief Balloon controls and content
+   */
+   const std::string connectomicsRenderingBalloonTextName =
+       "Connectomics.Rendering.Balloon.Text";
+   const std::string connectomicsRenderingBalloonAllNodeLabelsName =
+       "Connectomics.Rendering.Balloon.AllNodeLabels";
+   const std::string connectomicsRenderingBalloonNodeStatsName =
+       "Connectomics.Rendering.Balloon.NodeStats";
+
 } // namespace mitk
 
 

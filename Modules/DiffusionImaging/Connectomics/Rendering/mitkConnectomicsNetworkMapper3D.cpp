@@ -36,9 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsRenderingEdgeThresholdParameterProperty.h"
 #include <mbilog.h>
 #include <vtkIndent.h>
-#include <ciso646> // Workaround MSVC "extension": and &&, or ||, not !, ...
-// iso646.h reenables 11 Alternative operator representations:
-// http://en.cppreference.com/w/cpp/language/operator_alternative
 
 #include <string>
 
@@ -83,7 +80,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
       mitk::Point3D tempWorldPoint, tempCNFGeometryPoint;
 
       ////// Prepare BalloonWidgets/Overlays: ////////////////////
-      if( ( m_ChosenNodeLabel == "" or m_ChosenNodeLabel == "-1" ) and m_TextOverlay3D )
+      if( ( m_ChosenNodeLabel == "" || m_ChosenNodeLabel == "-1" ) && m_TextOverlay3D )
       {
         renderer-> GetOverlayManager()-> RemoveOverlay( m_TextOverlay3D.GetPointer() );
         GetDataNode()-> SetProperty( connectomicsRenderingBalloonTextName.c_str(), mitk::StringProperty::New(""), nullptr );

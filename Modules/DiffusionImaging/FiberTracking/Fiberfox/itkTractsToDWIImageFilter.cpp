@@ -340,8 +340,8 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
 #else
 #pragma omp parallel for collapse(2)
 #endif
-                for (unsigned int y=0; y<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(1); y++)
-                    for (unsigned int x=0; x<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(0); x++)
+                for (int y=0; y<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(1); y++)
+                    for (int x=0; x<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(0); x++)
                     {
                         DoubleDwiType::IndexType index3D; index3D[0]=x; index3D[1]=y; index3D[2]=z;
                         DoubleDwiType::PixelType magPix = magnitudeDwiImage->GetPixel(index3D);

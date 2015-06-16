@@ -104,8 +104,8 @@
         </property>
         <property name="font">
          <font>
-          <family>Liberation Mono</family>
-          <pointsize>12</pointsize>
+          <family>MS Shell Dlg 2</family>
+          <pointsize>8</pointsize>
          </font>
         </property>
         <property name="cursor" stdset="0">
@@ -113,6 +113,9 @@
         </property>
         <property name="acceptDrops">
          <bool>false</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

@@ -136,12 +136,12 @@ void QmitkConnectomicsStatisticsView::OnNetworkBalloonsNodeLabelsComboBoxCurrent
           tempCurrentText != "-1" )
       {
         balloonTextStream << node-> GetProperty( mitk::connectomicsRenderingBalloonTextName.c_str() )
-                             -> GetValueAsString() << std::endl
+                             -> GetValueAsString()
                           << node-> GetProperty( mitk::connectomicsRenderingBalloonNodeStatsName.c_str() )
                              -> GetValueAsString() << std::endl;
         QString balloonQString ( balloonTextStream.str().c_str() );
         // setPlainText() overwrites, insertPlainText() appends.
-        m_Controls-> networkBalloonsPlainTextEdit-> setPlainText( balloonQString.simplified() );
+        m_Controls-> networkBalloonsPlainTextEdit-> setPlainText( balloonQString );
       }
       if( tempCurrentText == "-1" )
       {

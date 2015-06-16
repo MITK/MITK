@@ -177,8 +177,8 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
             // What to show:
             std::stringstream balloonStringstream;
             balloonStringstream << "Node id: " << vectorOfNodes[i].id
-                                << ", label: " << vectorOfNodes[i].label
-                                << ",\n    name: "
+                                << "\nlabel: " << vectorOfNodes[i].label
+                                << "\nname: "
                                 << m_Translator-> GetName( std::stoi( vectorOfNodes[i].label ) )
                                 << std::endl;
             m_BalloonText = balloonStringstream.str();
@@ -188,14 +188,14 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
             std::stringstream balloonNodeStatsStream;
             balloonNodeStatsStream
-                << ", Coordinates: (" << vectorOfNodes[i].coordinates[0]
+                << "Coordinates: (" << vectorOfNodes[i].coordinates[0]
                 << " ; " << vectorOfNodes[i].coordinates[1]
                 << " ; " << vectorOfNodes[i].coordinates[2] << " )"
-                << ", Degree: "
+                << "\nDegree: "
                 << ( this-> GetInput()-> GetDegreeOfNodes() ).at( vectorOfNodes[i].id )
-                << ", Betweenness centrality: "
+                << "\nBetweenness centrality: "
                 << ( this->GetInput()->GetNodeBetweennessVector() ).at( vectorOfNodes[i].id )
-                << ", Clustering coefficient: "
+                << "\nClustering coefficient: "
                 << ( this->GetInput()->GetLocalClusteringCoefficients()).at( vectorOfNodes[i].id )
                 << std::endl;
             m_BalloonNodeStats = balloonNodeStatsStream.str();
@@ -221,7 +221,7 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
               }
               m_TextOverlay3D = mitk::TextOverlay3D::New();
               renderer-> GetOverlayManager()-> AddOverlay( m_TextOverlay3D.GetPointer() );
-              m_TextOverlay3D-> SetFontSize( 2.5 );
+              m_TextOverlay3D-> SetFontSize( 2 );
               m_TextOverlay3D-> SetColor( 0.96, 0.69, 0.01 );
               m_TextOverlay3D-> SetOpacity( 0.81 );
               m_TextOverlay3D-> SetPosition3D( BalloonAnchorWorldCoord );

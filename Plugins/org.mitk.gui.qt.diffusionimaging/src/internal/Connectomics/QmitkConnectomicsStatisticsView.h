@@ -54,7 +54,7 @@ public:
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
   virtual void StdMultiWidgetNotAvailable() override;
 
-  protected slots:
+protected slots:
 
 protected:
 
@@ -67,8 +67,6 @@ protected:
 
 
   // ####### Variables #######
-
-
   Ui::QmitkConnectomicsStatisticsViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;

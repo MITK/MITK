@@ -46,9 +46,9 @@ mitk::ConnectomicsNetworkMapper3D::ConnectomicsNetworkMapper3D()
 mitk::ConnectomicsNetworkMapper3D:: ~ConnectomicsNetworkMapper3D()
 {
   m_NetworkAssembly->Delete();
-
 }
 
+void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* /*renderer*/)
 {
   if( this-> GetInput() == nullptr )
@@ -56,9 +56,9 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
     return;
   }
 
-  bool propertiesHaveChanged = this->PropertiesChanged();
+  bool propertiesHaveChanged = this-> PropertiesChanged();
 
-  if( this->GetInput()->GetIsModified( ) || propertiesHaveChanged )
+  if( this-> GetInput()-> GetIsModified() || propertiesHaveChanged )
   {
 
   m_NetworkAssembly->Delete();
@@ -311,14 +311,12 @@ void mitk::ConnectomicsNetworkMapper3D::GenerateDataForRenderer(mitk::BaseRender
 
 const mitk::ConnectomicsNetwork* mitk::ConnectomicsNetworkMapper3D::GetInput()
 {
-
   return static_cast<const mitk::ConnectomicsNetwork * > ( GetDataNode()->GetData() );
 }
 
 void mitk::ConnectomicsNetworkMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer , bool overwrite)
 {
   // Initialize enumeration properties
-
   mitk::ConnectomicsRenderingSchemeProperty::Pointer connectomicsRenderingScheme =
     mitk::ConnectomicsRenderingSchemeProperty::New();
   mitk::ConnectomicsRenderingEdgeFilteringProperty::Pointer connectomicsRenderingEdgeFiltering =
@@ -405,9 +403,7 @@ void mitk::ConnectomicsNetworkMapper3D::UpdateVtkObjects()
 
 vtkProp* mitk::ConnectomicsNetworkMapper3D::GetVtkProp(mitk::BaseRenderer* /*renderer*/)
 {
-
   return m_NetworkAssembly;
-
 }
 
 bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
@@ -465,27 +461,26 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
     this->GetDataNode()->GetProperty( connectomicsRenderingEdgeRadiusParameterName.c_str() ) );
 
   if(
-    m_ChosenRenderingScheme != renderingScheme->GetValueAsString() ||
-    m_ChosenEdgeFilter != edgeFilter->GetValueAsString() ||
-    m_EdgeThreshold != edgeThreshold->GetValue() ||
-    m_EdgeThresholdParameter != edgeThresholdParameter->GetValueAsString() ||
-    m_ChosenNodeFilter != nodeFilter->GetValueAsString() ||
-    m_NodeThreshold != nodeThreshold->GetValue() ||
-    m_NodeThresholdParameter != nodeThresholdParameter->GetValueAsString() ||
-    m_NodeColorStart != nodeColorStart->GetValue() ||
-    m_NodeColorEnd != nodeColorEnd->GetValue() ||
-    m_NodeRadiusStart != nodeRadiusStart->GetValue() ||
-    m_NodeRadiusEnd != nodeRadiusEnd->GetValue() ||
-    m_ChosenNodeLabel != chosenNode->GetValueAsString() ||
-    m_EdgeColorStart != edgeColorStart->GetValue() ||
-    m_EdgeColorEnd != edgeColorEnd->GetValue() ||
-    m_EdgeRadiusStart != edgeRadiusStart->GetValue() ||
-    m_EdgeRadiusEnd != edgeRadiusEnd->GetValue() ||
-    m_NodeColorParameter != nodeColorParameter->GetValueAsString() ||
-    m_NodeRadiusParameter != nodeRadiusParameter->GetValueAsString() ||
-    m_EdgeColorParameter != edgeColorParameter->GetValueAsString() ||
-    m_EdgeRadiusParameter != edgeRadiusParameter->GetValueAsString()
-    )
+     m_ChosenRenderingScheme != renderingScheme->GetValueAsString() ||
+     m_ChosenEdgeFilter != edgeFilter->GetValueAsString() ||
+     m_EdgeThreshold != edgeThreshold->GetValue() ||
+     m_EdgeThresholdParameter != edgeThresholdParameter->GetValueAsString() ||
+     m_ChosenNodeFilter != nodeFilter->GetValueAsString() ||
+     m_NodeThreshold != nodeThreshold->GetValue() ||
+     m_NodeThresholdParameter != nodeThresholdParameter->GetValueAsString() ||
+     m_NodeColorStart != nodeColorStart->GetValue() ||
+     m_NodeColorEnd != nodeColorEnd->GetValue() ||
+     m_NodeRadiusStart != nodeRadiusStart->GetValue() ||
+     m_NodeRadiusEnd != nodeRadiusEnd->GetValue() ||
+     m_ChosenNodeLabel != chosenNode->GetValueAsString() ||
+     m_EdgeColorStart != edgeColorStart->GetValue() ||
+     m_EdgeColorEnd != edgeColorEnd->GetValue() ||
+     m_EdgeRadiusStart != edgeRadiusStart->GetValue() ||
+     m_EdgeRadiusEnd != edgeRadiusEnd->GetValue() ||
+     m_NodeColorParameter != nodeColorParameter->GetValueAsString() ||
+     m_NodeRadiusParameter != nodeRadiusParameter->GetValueAsString() ||
+     m_EdgeColorParameter != edgeColorParameter->GetValueAsString() ||
+     m_EdgeRadiusParameter != edgeRadiusParameter->GetValueAsString() )
   {
     m_ChosenRenderingScheme = renderingScheme->GetValueAsString();
     m_ChosenEdgeFilter = edgeFilter->GetValueAsString();
@@ -512,7 +507,6 @@ bool mitk::ConnectomicsNetworkMapper3D::PropertiesChanged()
   }
 
   return false;
-
 }
 
 double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< double > * parameterVector, std::string parameterName )
@@ -539,7 +533,6 @@ double mitk::ConnectomicsNetworkMapper3D::FillNodeParameterVector( std::vector< 
     {
       parameterVector->at( index ) = vectorOfDegree[ index ];
     }
-
     maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
   }
 
@@ -621,12 +614,10 @@ double mitk::ConnectomicsNetworkMapper3D::FillEdgeParameterVector( std::vector< 
     std::vector< std::pair<
       std::pair< mitk::ConnectomicsNetwork::NetworkNode, mitk::ConnectomicsNetwork::NetworkNode >
       , mitk::ConnectomicsNetwork::NetworkEdge > >  vectorOfEdges = this->GetInput()->GetVectorOfAllEdges();
-
     for(int index(0); index < end; index++)
     {
       parameterVector->at( index ) = vectorOfEdges[ index ].second.weight;
     }
-
     maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
   }
 
@@ -638,7 +629,6 @@ double mitk::ConnectomicsNetworkMapper3D::FillEdgeParameterVector( std::vector< 
     {
       parameterVector->at( index ) = vectorOfCentrality[index];
     }
-
     maximum = *std::max_element( parameterVector->begin(), parameterVector->end() );
   }
 
@@ -698,9 +688,7 @@ void mitk::ConnectomicsNetworkMapper3D::FillNodeFilterBoolVector( std::vector< b
       boolVector->at( index ) = false;
     }
   }
-
   return;
-
 }
 
 void mitk::ConnectomicsNetworkMapper3D::FillEdgeFilterBoolVector( std::vector< bool > * boolVector, std::string parameterName )
@@ -744,6 +732,5 @@ void mitk::ConnectomicsNetworkMapper3D::FillEdgeFilterBoolVector( std::vector< b
       boolVector->at( index ) = false;
     }
   }
-
   return;
 }

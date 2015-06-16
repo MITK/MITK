@@ -75,12 +75,11 @@ namespace mitk {
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override; //looks like deprecated.. should be replaced bz GetViewProp()
     static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
 
-    static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
+    static void SetVtkMapperImmediateModeRendering(vtkMapper* mapper);
 
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
     virtual const mitk::ConnectomicsNetwork* GetInput();
-
 
   protected:
 
@@ -124,12 +123,11 @@ namespace mitk {
     std::string m_NodeColorParameter;
     std::string m_EdgeRadiusParameter;
     std::string m_EdgeColorParameter;
+
+
   };
 
 } // namespace mitk
-
-
-
 
 #endif /* ConnectomicsNetworkMapper3D_H_HEADER_INCLUDED */
 

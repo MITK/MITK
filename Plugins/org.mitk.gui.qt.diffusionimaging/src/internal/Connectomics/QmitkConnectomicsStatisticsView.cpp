@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRGBAPixel.h>
 
 // ####### MITK includes #######
-
 #include <mitkConnectomicsConstantsManager.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
 
@@ -52,27 +51,21 @@ QmitkConnectomicsStatisticsView::~QmitkConnectomicsStatisticsView()
 {
 }
 
-
 void QmitkConnectomicsStatisticsView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
   if ( !m_Controls )
-  {
-    // create GUI widgets from the Qt Designer's .ui file
+  {// create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkConnectomicsStatisticsViewControls;
-    m_Controls->setupUi( parent );
-
+    m_Controls-> setupUi( parent );
   }
-
-  this->WipeDisplay();
+  this-> WipeDisplay();
 }
-
 
 void QmitkConnectomicsStatisticsView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
   m_MultiWidget = &stdMultiWidget;
 }
-
 
 void QmitkConnectomicsStatisticsView::StdMultiWidgetNotAvailable()
 {
@@ -138,6 +131,7 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
           this->WipeDisplay();
           return;
         }
+
         m_Controls->lblWarning->setVisible( false );
         m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
         m_Controls->inputImageOneNameLabel->setVisible( true );
@@ -172,7 +166,7 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
           statisticsStream << "# Central Points: " << calculator->GetNumberOfCentralPoints() << "\n";
 
           QString statisticsString( statisticsStream.str().c_str() );
-          m_Controls->networkStatisticsPlainTextEdit->setPlainText( statisticsString );
+          m_Controls-> networkStatisticsPlainTextEdit-> setPlainText( statisticsString );
         }
 
         mitk::ConnectomicsNetwork::Pointer connectomicsNetwork( network );

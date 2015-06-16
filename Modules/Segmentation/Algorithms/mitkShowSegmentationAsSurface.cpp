@@ -54,6 +54,7 @@ void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm* other)
   SetParameter("Decimate mesh", true );
   SetParameter("Decimation rate", 0.8f );
   SetParameter("Wireframe", false );
+  SetParameter("Creation type", 0u );
 }
 
 
@@ -192,6 +193,11 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     if(smooth) groupNodesName.append("_smoothed");
   }
   m_Node->SetProperty( "name", StringProperty::New(groupNodesName) );
+
+  unsigned int creationType(0u);
+  GetParameter("Creation type", creationType );
+
+  m_Node->SetIntProperty( "Creation type", creationType );
 
   // synchronize this object's color with the parent's color
   //surfaceNode->SetProperty( "color", parentNode->GetProperty( "color" ) );

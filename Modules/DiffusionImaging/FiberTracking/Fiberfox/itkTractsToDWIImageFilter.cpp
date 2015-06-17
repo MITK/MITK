@@ -430,8 +430,8 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
     // this means if two non-fiber compartments are used but only one of them has an associated volume fraction map, the repesctive other volume fraction map can be determined as inverse (1-val) of the present volume fraction map-
     if ( fibVolImages<m_Parameters.m_FiberModelList.size() && nonfibVolImages==1 && m_Parameters.m_NonFiberModelList.size()==2)
     {
-        m_StatusText += "Calculating missing non-fiber volume fraction image by inverting the other.\n";
-        MITK_INFO << "Calculating missing non-fiber volume fraction image by inverting the other.";
+        m_StatusText += "Calculating missing non-fiber volume fraction image by inverting the other.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.\n";
+        MITK_INFO << "Calculating missing non-fiber volume fraction image by inverting the other.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.";
 
         itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
         inverter->SetMaximum(1.0);
@@ -453,6 +453,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
         {
             itkExceptionMacro("Something went wrong in automatically calculating the missing non-fiber volume fraction image! Did you use two non fiber compartments but only one volume fraction image? Then it should work and this error is really strange.");
         }
+        m_UseRelativeNonFiberVolumeFractions = true;
 
         nonfibVolImages++;
     }

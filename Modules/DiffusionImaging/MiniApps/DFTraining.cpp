@@ -135,6 +135,8 @@ int main(int argc, char* argv[])
 
     mitk::TrackingForestHandler<> forestHandler;
     forestHandler.SetRawData(rawData);
+    forestHandler.SetMaskImages(maskImageVector);
+    forestHandler.SetWhiteMatterImages(wmMaskImageVector);
     forestHandler.SetTractograms(tractograms);
     forestHandler.SetNumTrees(numTrees);
     forestHandler.SetMaxTreeDepth(max_tree_depth);

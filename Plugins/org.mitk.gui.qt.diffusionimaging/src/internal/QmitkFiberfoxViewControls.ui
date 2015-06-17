@@ -1383,7 +1383,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of Coils:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of Channels:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -1722,7 +1722,7 @@
              <item row="2" column="1">
               <widget class="QSpinBox" name="m_NumCoilsBox">
                <property name="toolTip">
-                <string>Number of coils</string>
+                <string>Number of coil elements used for the acquisiton.</string>
                </property>
                <property name="minimum">
                 <number>1</number>
@@ -2964,7 +2964,7 @@
           <item row="19" column="0">
            <widget class="QCheckBox" name="m_AddEddy">
             <property name="toolTip">
-             <string>!!!EXPERIMENTAL!!!</string>
+             <string/>
             </property>
             <property name="text">
              <string>Add Eddy Current Effects</string>

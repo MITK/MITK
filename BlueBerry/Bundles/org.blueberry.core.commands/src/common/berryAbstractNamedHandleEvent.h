@@ -55,17 +55,17 @@ protected:
    * The bit used to represent whether the category has changed its
    * description.
    */
-  static const int CHANGED_DESCRIPTION; // = LAST_BIT_USED_ABSTRACT_HANDLE << 1;
+  static int CHANGED_DESCRIPTION(); // = LAST_BIT_USED_ABSTRACT_HANDLE << 1;
 
   /**
    * The bit used to represent whether the category has changed its name.
    */
-  static const int CHANGED_NAME; // = LAST_BIT_USED_ABSTRACT_HANDLE << 2;
+  static int CHANGED_NAME(); // = LAST_BIT_USED_ABSTRACT_HANDLE << 2;
 
   /**
    * The last used bit so that subclasses can add more properties.
    */
-  static const int LAST_USED_BIT; // = CHANGED_NAME;
+  static int LAST_USED_BIT(); // = CHANGED_NAME;
 
   /**
    * Constructs a new instance of <code>AbstractHandleObjectEvent</code>.

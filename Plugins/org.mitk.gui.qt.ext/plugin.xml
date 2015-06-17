@@ -31,4 +31,10 @@
       icon="resources/ModuleView.png" />
   </extension>
 
+  <extension point="org.blueberry.ui.handlers">
+    <handler
+      commandId="org.blueberry.ui.help.aboutAction"
+      class="QmitkAboutHandler"/>
+  </extension>
+
 </plugin>

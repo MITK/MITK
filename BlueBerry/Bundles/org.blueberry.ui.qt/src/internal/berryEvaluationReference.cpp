@@ -31,7 +31,7 @@ EvaluationReference::EvaluationReference(const SmartPointer<Expression>& express
 
 IPropertyChangeListener* EvaluationReference::GetListener() const
 {
-  return listener.data();
+  return listener;
 }
 
 QString EvaluationReference::GetProperty() const

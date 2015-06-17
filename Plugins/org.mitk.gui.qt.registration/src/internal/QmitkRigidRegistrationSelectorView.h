@@ -86,6 +86,7 @@ public:
     void AddMetric(QmitkRigidRegistrationMetricsGUIBase* metric);
     void AddOptimizer(QmitkRigidRegistrationOptimizerGUIBase* optimizer);
 
+    void LoadRigidRegistrationPresetParameter(QString preset_name);
 protected:
 
   Ui::QmitkRigidRegistrationSelector m_Controls;

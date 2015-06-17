@@ -81,16 +81,14 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
   if(input.IsNull())
   {
-    MITK_WARN << "Input is not a mitk::Image";
-    return;
+    mitkThrow() << "Input is not a mitk::Image";
   }
   itkDebugMacro(<<"GenerateOutputInformation()");
   unsigned int dimension = input->GetDimension();
 
   if (dimension < 3)
   {
-    MITK_WARN << "ImageCropper cannot handle 1D or 2D Objects. Operation aborted.";
-    return;
+    mitkThrow() << "ImageCropper cannot handle 1D or 2D Objects.";
   }
 
   if((m_BoundingObject.IsNull()) || (m_BoundingObject->GetTimeGeometry()->CountTimeSteps() == 0))
@@ -137,7 +135,7 @@ void BoundingObjectCutter::GenerateOutputInformation()
     m_InputRequestedRegion.SetSize(size);
     boRegion.SetSize(size);
     m_BoundingObject->SetRequestedRegion(&boRegion);
-    return;
+    mitkThrow() << "No overlap of the image and the cropping object.";
     }
   }
 
@@ -174,7 +172,14 @@ void BoundingObjectCutter::GenerateOutputInformation()
 
 void BoundingObjectCutter::ComputeData(mitk::Image* input3D, int boTimeStep)
 {
-  AccessFixedDimensionByItk_2(input3D, CutImage, 3, this, boTimeStep);
+  if ( input3D!=nullptr && input3D->GetPixelType().GetNumberOfComponents()==1 )
+  {
+    AccessFixedDimensionByItk_2(input3D, CutImage, 3, this, boTimeStep);
+  }
+  else
+  {
+    AccessVectorFixedDimensionByItk_n(input3D, CutImage, 3, (this, boTimeStep) );
+  }
 }
 
 void BoundingObjectCutter::GenerateData()

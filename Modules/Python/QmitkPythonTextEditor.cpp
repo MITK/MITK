@@ -19,7 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QList>
 #include <QFileInfo>
 #include <QUrl>
-#include <QtGui>
+#include <QToolBar>
+#include <QGridLayout>
+#include <QAction>
+#include <QIcon>
+#include <QMimeData>
+#include <QFileDialog>
+
 #include <usModuleContext.h>
 #include <usServiceReference.h>
 #include <mitkDataNode.h>

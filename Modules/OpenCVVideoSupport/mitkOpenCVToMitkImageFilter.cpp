@@ -156,4 +156,23 @@ namespace mitk{
     this->Modified();
   }
 
+  void OpenCVToMitkImageFilter::InsertOpenCVImageAsMitkTimeSlice(cv::Mat openCVImage, Image::Pointer mitkImage, int timeStep)
+  {
+    // convert it to an mitk::Image
+    this->SetOpenCVMat(openCVImage);
+    this->Modified();
+    this->Update();
+
+    //insert it as a timeSlice
+    mitkImage->GetGeometry(timeStep)->SetSpacing(this->GetOutput()->GetGeometry()->GetSpacing());
+    mitkImage->GetGeometry(timeStep)->SetOrigin(this->GetOutput()->GetGeometry()->GetOrigin());
+    mitkImage->GetGeometry(timeStep)->SetIndexToWorldTransform(this->GetOutput()->GetGeometry()->GetIndexToWorldTransform());
+    mitkImage->SetImportVolume(this->GetOutput()->GetData(), timeStep);
+
+    mitkImage->Modified();
+    mitkImage->Update();
+
+    m_Image = mitkImage;
+  }
+
 } // end namespace mitk

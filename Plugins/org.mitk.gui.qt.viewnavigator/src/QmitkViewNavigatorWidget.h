@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QMenu>
-#include <QmitkNewPerspectiveDialog.h>
 #include <mitkQtPerspectiveItem.h>
 #include <mitkQtViewItem.h>
 
@@ -46,7 +45,8 @@ class QmitkViewNavigatorWidget : public QWidget
 
 public:
 
-    QmitkViewNavigatorWidget (QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkViewNavigatorWidget (berry::IWorkbenchWindow::Pointer window,
+                              QWidget* parent = 0, Qt::WindowFlags f = 0);
     virtual ~QmitkViewNavigatorWidget();
 
     virtual void CreateQtPartControl(QWidget *parent);
@@ -62,10 +62,8 @@ public slots:
 
     void CustomMenuRequested(QPoint pos);
     void ItemClicked(const QModelIndex &index);
-    void AddPerspective();
-    void ClonePerspective();
-    void ResetPerspective();
-    void DeletePerspective();
+    void SaveCurrentPerspectiveAs();
+    void ResetCurrentPerspective();
     void CloseAllPerspectives();
     void ClosePerspective();
     void ExpandAll();
@@ -74,17 +72,20 @@ public slots:
 
 protected:
 
+    friend class ViewNavigatorPerspectiveListener;
+
     // member variables
     Ui::QmitkViewNavigatorWidgetControls        m_Controls;
     QWidget*                                    m_Parent;
     QStandardItemModel*                         m_TreeModel;
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
-    berry::IPerspectiveDescriptor::Pointer      m_RegisteredPerspective;
+    berry::IPerspectiveDescriptor::Pointer      m_ActivePerspective;
     bool                                        m_Generated;
 
 private:
 
+    berry::IWorkbenchWindow::Pointer m_Window;
 };
 
 #endif // _QMITKViewNavigatorWidget_H_INCLUDED

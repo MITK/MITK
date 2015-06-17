@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPerspectiveDescriptor.h"
 #include "berryIPerspectiveFactory.h"
+#include "berryIPluginContribution.h"
 #include "berryIMemento.h"
 
 #include <QStringList>
@@ -45,10 +46,10 @@ namespace berry {
  * </ol>
  *
  */
-class PerspectiveDescriptor : public IPerspectiveDescriptor {
+class PerspectiveDescriptor : public IPerspectiveDescriptor, public IPluginContribution {
 
 public:
-  berryObjectMacro(PerspectiveDescriptor);
+  berryObjectMacro(PerspectiveDescriptor, IPerspectiveDescriptor, IPluginContribution)
 
 private:
 
@@ -74,6 +75,8 @@ private:
 
    mutable QStringList categoryPath;
 
+public:
+
   /**
    * Create a new empty descriptor.
    *
@@ -84,8 +87,8 @@ private:
    * @param originalDescriptor
    *            the descriptor that this descriptor is based on
    */
-  public: PerspectiveDescriptor(const QString& id, const QString& label,
-      PerspectiveDescriptor::Pointer originalDescriptor);
+  PerspectiveDescriptor(const QString& id, const QString& label,
+                        PerspectiveDescriptor::Pointer originalDescriptor);
 
   /**
    * Create a descriptor from a config element.
@@ -97,7 +100,7 @@ private:
    * @throws CoreException
    *             thrown if there are any missing attributes
    */
-  public: PerspectiveDescriptor(const QString& id, IConfigurationElement::Pointer configElement);
+  PerspectiveDescriptor(const QString& id, IConfigurationElement::Pointer configElement);
 
   /**
    * Creates a factory for a predefined perspective. If the perspective is not
@@ -107,21 +110,19 @@ private:
    * @throws CoreException
    *             if the object could not be instantiated.
    */
-  public: IPerspectiveFactory::Pointer CreateFactory();
+  IPerspectiveFactory::Pointer CreateFactory();
 
   /**
    * Deletes the custom definition for a perspective..
    */
-  public: void DeleteCustomDefinition();
+  void DeleteCustomDefinition();
 
   /*
-   * (non-Javadoc)
-   *
-   * @see org.blueberry.ui.IPerspectiveDescriptor#getDescription()
+   * @see IPerspectiveDescriptor#getDescription()
    */
-  public: QString GetDescription() const;
+  QString GetDescription() const;
 
-  public: void SetDescription(const QString& desc);
+  void SetDescription(const QString& desc);
 
   QStringList GetKeywordReferences() const;
 
@@ -130,50 +131,47 @@ private:
    *
    * @return whether or not this perspective is fixed
    */
-  public: bool GetFixed() const;
+  bool GetFixed() const;
 
   /*
-   * (non-Javadoc)
-   *
-   * @see org.blueberry.ui.IPerspectiveDescriptor#getId()
+   * @see IPerspectiveDescriptor#GetId()
    */
-  public: QString GetId() const;
+  QString GetId() const;
 
-  public: QString GetPluginId() const;
+  QString GetLocalId() const;
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.blueberry.ui.IPerspectiveDescriptor#getImageDescriptor()
-   */
-  public: QIcon GetImageDescriptor() const;
+  QString GetPluginId() const;
 
   /*
-   * (non-Javadoc)
-   *
-   * @see org.blueberry.ui.IPerspectiveDescriptor#getLabel()
+   * @see IPerspectiveDescriptor#GetImageDescriptor()
    */
-  public: QString GetLabel() const;
+  QIcon GetImageDescriptor() const;
+
+  /*
+   * @see IPerspectiveDescriptor#GetLabel()
+   */
+  QString GetLabel() const;
+
   /**
    * Return the original id of this descriptor.
    *
    * @return the original id of this descriptor
    */
-  public: QString GetOriginalId() const;
+  QString GetOriginalId() const;
 
   /**
    * Returns <code>true</code> if this perspective has a custom definition.
    *
    * @return whether this perspective has a custom definition
    */
-  public: bool HasCustomDefinition() const;
+  bool HasCustomDefinition() const;
 
   /**
    * Returns <code>true</code> if this perspective wants to be default.
    *
    * @return whether this perspective wants to be default
    */
-  public: bool HasDefaultFlag() const;
+  bool HasDefaultFlag() const;
 
   /**
    * Returns <code>true</code> if this perspective is predefined by an
@@ -181,14 +179,14 @@ private:
    *
    * @return boolean whether this perspective is predefined by an extension
    */
-  public: bool IsPredefined() const;
+  bool IsPredefined() const;
 
   /**
    * Returns <code>true</code> if this perspective is a singleton.
    *
    * @return whether this perspective is a singleton
    */
-  public: bool IsSingleton() const;
+  bool IsSingleton() const;
 
   /**
    * Restore the state of a perspective from a memento.
@@ -198,13 +196,13 @@ private:
    * @return the <code>IStatus</code> of the operation
    * @see org.blueberry.ui.IPersistableElement
    */
-  public: bool RestoreState(IMemento::Pointer memento);
+  bool RestoreState(IMemento::Pointer memento);
 
   /**
    * Revert to the predefined extension template. Does nothing if this
    * descriptor is user defined.
    */
-  public: void RevertToPredefined();
+  void RevertToPredefined();
 
   /**
    * Save the state of a perspective to a memento.
@@ -214,31 +212,29 @@ private:
    * @return the <code>IStatus</code> of the operation
    * @see org.blueberry.ui.IPersistableElement
    */
-  public: bool SaveState(IMemento::Pointer memento);
+  bool SaveState(IMemento::Pointer memento);
 
   /**
    * Return the configuration element used to create this perspective, if one
    * was used.
    *
    * @return the configuration element used to create this perspective
-   * @since 3.0
    */
-  public: IConfigurationElement::Pointer GetConfigElement() const;
+  IConfigurationElement::Pointer GetConfigElement() const;
 
   /**
    * Returns the factory class name for this descriptor.
    *
    * @return the factory class name for this descriptor
-   * @since 3.1
    */
-  public: QString GetFactoryClassName() const;
+  QString GetFactoryClassName() const;
 
   /**
    * Return the category path of this descriptor
    *
    * @return the category path of this descriptor
    */
-  public: QStringList GetCategoryPath() const;
+  QStringList GetCategoryPath() const;
 };
 
 }

@@ -17,9 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryMenuManager.h"
 
 #include "berryIContributionManagerOverrides.h"
+#include "berryQActionProperties.h"
 #include "berrySubContributionItem.h"
-
-#include "internal/berryMMMenuListener.h"
 
 #include <QMenu>
 #include <QMenuBar>
@@ -85,6 +84,11 @@ public:
     menu ? menu->setEnabled(enabled) : menuBar->setEnabled(enabled);
   }
 
+  QAction* getParentItem() const
+  {
+    return menu ? menu->menuAction() : nullptr;
+  }
+
 };
 
 namespace berry
@@ -105,34 +109,23 @@ public:
   }
 };
 
-//struct GuiTkMenuListener : public GuiTk::IMenuListener
-//{
-//public:
+void MenuManager::HandleAboutToShow()
+{
+  if (this->removeAllWhenShown)
+  {
+    this->RemoveAll();
+  }
+  emit AboutToShow(this);
+  this->Update(false, false);
+}
 
-//  GuiTkMenuListener(MenuManager::Pointer manager) :
-//    manager(manager)
-//  {
-
-//  }
-
-//  void MenuAboutToHide()
-//  {
-//    //      ApplicationWindow.resetDescription(e.widget);
-//    MenuManager::Pointer(manager)->HandleAboutToHide();
-//  }
-
-//  void MenuAboutToShow()
-//  {
-//    MenuManager::Pointer(manager)->HandleAboutToShow();
-//  }
-
-//private:
-
-//  MenuManager::WeakPtr manager;
-//};
+void MenuManager::HandleAboutToHide()
+{
+  emit AboutToHide(this);
+}
 
 MenuManager::MenuManager(const QString& text, const QString& id)
-  : id(id), menu(0), menuItem(0), menuListener(new MMMenuListener(this))
+  : id(id), menu(0), menuItem(0)
   , menuText(text), parent(0)
   , removeAllWhenShown(false), visible(true)
 {
@@ -140,7 +133,7 @@ MenuManager::MenuManager(const QString& text, const QString& id)
 }
 
 MenuManager::MenuManager(const QString& text, const QIcon& image, const QString& id)
-  : id(id), menu(0), menuItem(0), menuListener(new MMMenuListener(this))
+  : id(id), menu(0), menuItem(0)
   , menuText(text), image(image)
   , parent(0), removeAllWhenShown(false), visible(true)
 {
@@ -156,11 +149,6 @@ MenuManager::~MenuManager()
 {
   delete menu;
 }
-
-//void MenuManager::AddMenuListener(SmartPointer<IMenuListener> listener)
-//{
-//  menuEvents.AddListener(listener);
-//}
 
 QMenu* MenuManager::CreateContextMenu(QWidget* parent)
 {
@@ -182,26 +170,36 @@ QMenuBar* MenuManager::CreateMenuBar(QWidget* parent)
   return menu->menuBar;
 }
 
+void MenuManager::AddMenuListener(QObject* listener)
+{
+  this->connect(this, SIGNAL(AboutToShow(IMenuManager*)), listener, SLOT(MenuAboutToShow(IMenuManager*)));
+  this->connect(this, SIGNAL(AboutToHide(IMenuManager*)), listener, SLOT(MenuAboutToHide(IMenuManager*)));
+}
+
+void MenuManager::RemoveMenuListener(QObject* listener)
+{
+  this->disconnect(listener);
+}
+
 void MenuManager::Fill(QStatusBar* /*parent*/)
 {
 }
 
-QAction* MenuManager::Fill(QToolBar* /*parent*/, QAction* /*before*/)
+void MenuManager::Fill(QToolBar* /*parent*/, QAction* /*before*/)
 {
-  return 0;
 }
 
-QAction* MenuManager::Fill(QMenu* parent, QAction* before)
+void MenuManager::Fill(QMenu* parent, QAction* before)
 {
-   return this->FillMenu(parent, before);
+  this->FillMenu(parent, before);
 }
 
-QAction* MenuManager::Fill(QMenuBar* parent, QAction* before)
+void MenuManager::Fill(QMenuBar* parent, QAction* before)
 {
-  return this->FillMenu(parent, before);
+  this->FillMenu(parent, before);
 }
 
-QAction* MenuManager::FillMenu(QWidget* parent, QAction* before)
+void MenuManager::FillMenu(QWidget* parent, QAction* before)
 {
   if (!menuItem)
   {
@@ -226,7 +224,6 @@ QAction* MenuManager::FillMenu(QWidget* parent, QAction* before)
 
     this->SetDirty(true);
   }
-  return menuItem;
 }
 
 IMenuManager::Pointer MenuManager::FindMenuUsingPath(const QString& path) const
@@ -388,11 +385,6 @@ void MenuManager::MarkDirty()
   }
 }
 
-//void MenuManager::RemoveMenuListener(SmartPointer<IMenuListener> listener)
-//{
-//  menuEvents.RemoveListener(listener);
-//}
-
 void MenuManager::SaveWidgetState()
 {
 }
@@ -418,7 +410,7 @@ void MenuManager::SetVisible(bool visible)
   this->visible = visible;
 }
 
-void MenuManager::SetActionDefinitionId(const QString& definitionId)
+void MenuManager::SetCommandId(const QString& definitionId)
 {
   this->definitionId = definitionId;
 }
@@ -428,9 +420,30 @@ void MenuManager::Update()
   this->UpdateMenuItem();
 }
 
-void MenuManager::Update(const QString& /*property*/)
+void MenuManager::Update(const QString& property)
 {
+  QList<IContributionItem::Pointer> items = GetItems();
 
+  for (int i = 0; i < items.size(); i++)
+  {
+    items[i]->Update(property);
+  }
+
+  if (menu != nullptr && menu->getParentItem() != nullptr)
+  {
+    if (QActionProperties::TEXT == property)
+    {
+      QString text = GetMenuText();
+      if (!text.isNull())
+      {
+        menu->getParentItem()->setText(text);
+      }
+    }
+    else if (QActionProperties::IMAGE == property && !image.isNull())
+    {
+      menu->getParentItem()->setIcon(image);
+    }
+  }
 }
 
 void MenuManager::Update(bool force)
@@ -443,55 +456,20 @@ void MenuManager::UpdateAll(bool force)
   this->Update(force, true);
 }
 
-//void MenuManager::FireAboutToShow(IMenuManager::Pointer manager)
-//{
-//  menuEvents.menuAboutToShow(manager);
-//}
-
-//void MenuManager::FireAboutToHide(IMenuManager::Pointer manager)
-//{
-//  menuEvents.menuAboutToHide(manager);
-//}
-
-//void MenuManager::HandleAboutToShow()
-//{
-//  if (removeAllWhenShown)
-//  {
-//    this->RemoveAll();
-//  }
-//  this->FireAboutToShow(IMenuManager::Pointer(this));
-//  this->Update(false, false);
-//}
-
-//void MenuManager::HandleAboutToHide()
-//{
-//  this->FireAboutToHide(IMenuManager::Pointer(this));
-//}
-
 void MenuManager::InitializeMenu()
 {
   menu->setTitle(GetMenuText());
   menu->setIcon(GetImage());
 
-  //menuListener = new GuiTkMenuListener(MenuManager::Pointer(this));
   if (!menu->isMenuBar())
   {
-    QObject::connect(menu->menu, SIGNAL(aboutToShow()), menuListener.data(), SLOT(HandleAboutToShow()));
+    this->connect(menu->menu, SIGNAL(aboutToShow()), SLOT(HandleAboutToShow()));
+    this->connect(menu->menu, SIGNAL(aboutToHide()), SLOT(HandleAboutToHide()));
   }
-  //menu->AddMenuListener(menuListener);
 
   // Don't do an update(true) here, in case menu is never opened.
   // Always do it lazily in handleAboutToShow().
 }
-
-//void MenuManager::DisposeOldImages()
-//{
-//  if (imageManager)
-//  {
-//    imageManager.dispose();
-//    imageManager = null;
-//  }
-//}
 
 void MenuManager::UpdateMenuItem()
 {
@@ -504,33 +482,6 @@ void MenuManager::UpdateMenuItem()
     }
   }
 }
-
-//QList<SmartPointer<IMenuItem> > MenuManager::GetMenuItems()
-//{
-//  if (menu)
-//  {
-//    return menu->GetItems();
-//  }
-//  return QList<IMenuItem::Pointer>();
-//}
-
-//SmartPointer<IMenuItem> MenuManager::GetMenuItem(unsigned int index)
-//{
-//  if (menu)
-//  {
-//    return menu->GetItem(index);
-//  }
-//  return IMenuItem::Pointer(0);
-//}
-
-//unsigned int MenuManager::GetMenuItemCount()
-//{
-//  if (menu)
-//  {
-//    return menu->GetItemCount();
-//  }
-//  return 0;
-//}
 
 void MenuManager::DoItemFill(IContributionItem::Pointer ci, QAction* before)
 {
@@ -636,10 +587,10 @@ void MenuManager::Update(bool force, bool recursive)
         else
         {
           int start = menu->actions().size();
-          qDebug() << "***** Filling item destIx = " << destIx << " (size: " << start << ")";
+          //qDebug() << "***** Filling item destIx = " << destIx << " (size: " << start << ")";
           this->DoItemFill(src, destIx >= start ? NULL : menu->actions().at(destIx));
           int newItems = menu->actions().size() - start;
-          qDebug() << "***** New items: " << newItems;
+          //qDebug() << "***** New items: " << newItems;
           for (int i = 0; i < newItems; ++i)
           {
             menu->actions().at(destIx++)->setData(QVariant::fromValue<Object::Pointer>(src));
@@ -701,12 +652,12 @@ void MenuManager::DumpActionInfo(QMenuProxy* menu)
 {
   if (menu->isMenuBar())
   {
-    qDebug() << "QMenuBar [" << menu->menuBar << "]";
+    //qDebug() << "QMenuBar [" << menu->menuBar << "]";
     DumpActionInfo(menu->menuBar, 1);
   }
   else
   {
-    qDebug() << "QMenu [" << menu->menu << "]" << menu->menu;
+    //qDebug() << "QMenu [" << menu->menu << "]" << menu->menu;
     DumpActionInfo(menu->menu, 1);
   }
 }

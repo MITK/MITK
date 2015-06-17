@@ -39,6 +39,7 @@ namespace berry
 {
 
 struct IExtensionPoint;
+struct IExtensionTracker;
 
 //class PartPane;
 //class PartPane::Sashes;
@@ -61,7 +62,7 @@ class BERRY_UI_QT WorkbenchPage: public IWorkbenchPage
 {
 
 public:
-  berryObjectMacro(WorkbenchPage);
+  berryObjectMacro(WorkbenchPage)
 
 protected:
 
@@ -80,10 +81,9 @@ private:
    */
   class ActionSwitcher
   {
-  private:
-    IWorkbenchPart::WeakPtr activePart;
+  public:
 
-    IEditorPart::WeakPtr topEditor;
+    ActionSwitcher(WorkbenchPage* page);
 
     /**
      * Updates the contributions given the new part as the active part.
@@ -91,7 +91,6 @@ private:
      * @param newPart
      *            the new active part, may be <code>null</code>
      */
-  public:
     void UpdateActivePart(IWorkbenchPart::Pointer newPart);
 
     /**
@@ -100,8 +99,9 @@ private:
      * @param newEditor
      *            the new top editor, may be <code>null</code>
      */
-  public:
     void UpdateTopEditor(IEditorPart::Pointer newEditor);
+
+  private:
 
     /**
      * Activates the contributions of the given part. If <code>enable</code>
@@ -114,7 +114,6 @@ private:
      *            <code>true</code> the contributions are to be enabled,
      *            not just visible.
      */
-  private:
     void ActivateContributions(IWorkbenchPart::Pointer part, bool enable);
 
     /**
@@ -128,8 +127,13 @@ private:
      *            <code>true</code> the contributions are to be removed,
      *            not just disabled.
      */
-  private:
     void DeactivateContributions(IWorkbenchPart::Pointer part, bool remove);
+
+    WorkbenchPage* page;
+
+    IWorkbenchPart::WeakPtr activePart;
+
+    IEditorPart::WeakPtr topEditor;
 
   };
 
@@ -403,7 +407,7 @@ private:
 
   ActionSwitcher actionSwitcher;
 
-  //IExtensionTracker tracker;
+  mutable QScopedPointer<IExtensionTracker> tracker;
 
   // Deferral count... delays disposing parts and sending certain events if nonzero
   int deferCount;
@@ -452,53 +456,55 @@ public:
   void Activate(IWorkbenchPart::Pointer part);
 
   /**
-   * Activates a part. The part is given focus, the pane is hilighted.
-   */
-private:
-  void ActivatePart(const IWorkbenchPart::Pointer part);
-
-  /**
    * Adds an IPartListener to the part service.
    */
-public:
   void AddPartListener(IPartListener* l);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
-public:
   void AddSelectionListener(ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
-public:
   void AddSelectionListener(const QString& partId,
       ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
-public:
   void AddPostSelectionListener(ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
-public:
   void AddPostSelectionListener(const QString& partId,
       ISelectionListener* listener);
 
+  /**
+   * Moves a part forward in the Z order of a perspective so it is visible.
+   * If the part is in the same stack as the active part, the new part is
+   * activated.
+   *
+   * @param part
+   *            the part to bring to move forward
+   */
+  void BringToTop(IWorkbenchPart::Pointer part);
+
 private:
+
+  /**
+   * Activates a part. The part is given focus, the pane is hilighted.
+   */
+  void ActivatePart(const IWorkbenchPart::Pointer part);
+
   ILayoutContainer::Pointer GetContainer(IWorkbenchPart::Pointer part);
 
-private:
   ILayoutContainer::Pointer GetContainer(IWorkbenchPartReference::Pointer part);
 
-private:
   SmartPointer<PartPane> GetPane(IWorkbenchPart::Pointer part);
 
-private:
   SmartPointer<PartPane> GetPane(IWorkbenchPartReference::Pointer part);
 
   /**
@@ -509,19 +515,7 @@ private:
    *
    * @param part
    */
-private:
   bool InternalBringToTop(IWorkbenchPartReference::Pointer part);
-
-  /**
-   * Moves a part forward in the Z order of a perspective so it is visible.
-   * If the part is in the same stack as the active part, the new part is
-   * activated.
-   *
-   * @param part
-   *            the part to bring to move forward
-   */
-public:
-  void BringToTop(IWorkbenchPart::Pointer part);
 
   /**
    * Resets the layout for the perspective. The active part in the old layout
@@ -529,7 +523,6 @@ public:
    *
    * Assumes the busy cursor is active.
    */
-private:
   void BusyResetPerspective();
 
   /**
@@ -540,8 +533,31 @@ private:
    * @param desc
    *            identifies the new perspective.
    */
-private:
   void BusySetPerspective(IPerspectiveDescriptor::Pointer desc);
+
+  /*
+   * Performs showing of the view in the given mode.
+   */
+  void BusyShowView(IViewPart::Pointer part, int mode);
+
+  /**
+   * Returns whether a part exists in the current page.
+   */
+  bool CertifyPart(IWorkbenchPart::Pointer part);
+
+protected:
+
+  /**
+   * Shows a view.
+   *
+   * Assumes that a busy cursor is active.
+   */
+  IViewPart::Pointer BusyShowView(const QString& viewID,
+      const QString& secondaryID, int mode);
+
+public:
+
+  void UpdateActionBars();
 
   /**
    * Removes the perspective which match the given description.
@@ -549,79 +565,48 @@ private:
    * @param desc
    *            identifies the perspective to be removed.
    */
-public:
   void RemovePerspective(IPerspectiveDescriptor::Pointer desc);
-
-  /**
-   * Shows a view.
-   *
-   * Assumes that a busy cursor is active.
-   */
-protected:
-  IViewPart::Pointer BusyShowView(const QString& viewID,
-      const QString& secondaryID, int mode);
-
-  /*
-   * Performs showing of the view in the given mode.
-   */
-private:
-  void BusyShowView(IViewPart::Pointer part, int mode);
-
-  /**
-   * Returns whether a part exists in the current page.
-   */
-private:
-  bool CertifyPart(IWorkbenchPart::Pointer part);
 
   /**
    * Closes the perspective.
    */
-public:
   bool Close();
 
   /**
    * See IWorkbenchPage
    */
-public:
   bool CloseAllSavedEditors();
 
   /**
    * See IWorkbenchPage
    */
-public:
   bool CloseAllEditors(bool save);
 
+  /**
+   * See IWorkbenchPage
+   */
+  bool CloseEditors(const QList<IEditorReference::Pointer>& refArray,
+      bool save);
+
 private:
+
   void UpdateActivePart();
 
   /**
    * Makes the given part active. Brings it in front if necessary. Permits null
    * (indicating that no part should be active).
    *
-   * @since 3.1
-   *
    * @param ref new active part (or null)
    */
-private:
   void MakeActive(IWorkbenchPartReference::Pointer ref);
 
   /**
    * Makes the given editor active. Brings it to front if necessary. Permits <code>null</code>
    * (indicating that no editor is active).
    *
-   * @since 3.1
-   *
    * @param ref the editor to make active, or <code>null</code> for no active editor
    */
-private:
   void MakeActiveEditor(IEditorReference::Pointer ref);
-
-  /**
-   * See IWorkbenchPage
-   */
-public:
-  bool CloseEditors(const QList<IEditorReference::Pointer>& refArray,
-      bool save);
 
   /**
    * Enables or disables listener notifications. This is used to delay listener notifications until the
@@ -629,28 +614,24 @@ public:
    *
    * @param shouldDefer
    */
-private:
   void DeferUpdates(bool shouldDefer);
 
-private:
   void StartDeferring();
 
-private:
   void HandleDeferredEvents();
 
-private:
   bool IsDeferred();
+
+public:
 
   /**
    * See IWorkbenchPage#closeEditor
    */
-public:
   bool CloseEditor(IEditorReference::Pointer editorRef, bool save);
 
   /**
    * See IWorkbenchPage#closeEditor
    */
-public:
   bool CloseEditor(IEditorPart::Pointer editor, bool save);
 
   /**
@@ -662,15 +643,20 @@ public:
    * @param closePage
    *            whether the page itself should be closed if last perspective
    */
-public:
   void CloseCurrentPerspective(bool saveParts, bool closePage);
 
   /**
    * @see IWorkbenchPage#closePerspective(IPerspectiveDescriptor, boolean, boolean)
    */
-public:
   void ClosePerspective(IPerspectiveDescriptor::Pointer desc, bool saveParts,
       bool closePage);
+
+  /**
+   * @see IWorkbenchPage#closeAllPerspectives(boolean, boolean)
+   */
+  void CloseAllPerspectives(bool saveEditors, bool closePage);
+
+protected:
 
   /**
    * Closes the specified perspective. If last perspective, then entire page
@@ -683,21 +669,26 @@ public:
    *            (editors if last perspective, views if not shown in other
    *            parspectives)
    */
-  /* package */
-protected:
   void ClosePerspective(SmartPointer<Perspective> persp, bool saveParts,
       bool closePage);
 
   /**
-   * @see IWorkbenchPage#closeAllPerspectives(boolean, boolean)
+   * This is called by child objects after a part has been added to the page.
+   * The page will in turn notify its listeners.
    */
-public:
-  void CloseAllPerspectives(bool saveEditors, bool closePage);
+  void PartAdded(WorkbenchPartReference::Pointer ref);
+
+  /**
+   * This is called by child objects after a part has been added to the page.
+   * The part will be queued for disposal after all listeners have been notified
+   */
+  void PartRemoved(WorkbenchPartReference::Pointer ref);
+
+private:
 
   /**
    * Creates the client composite.
    */
-private:
   void CreateClientComposite();
 
   /**
@@ -706,46 +697,15 @@ private:
    * @param desc the perspective descriptor
    * @param notify whether to fire a perspective opened event
    */
-private:
   SmartPointer<Perspective> CreatePerspective(SmartPointer<PerspectiveDescriptor> desc,
       bool notify);
 
-  /**
-   * This is called by child objects after a part has been added to the page.
-   * The page will in turn notify its listeners.
-   */
-  /* package */
-protected:
-  void PartAdded(WorkbenchPartReference::Pointer ref);
-
-  /**
-   * This is called by child objects after a part has been added to the page.
-   * The part will be queued for disposal after all listeners have been notified
-   */
-  /* package */
-protected:
-  void PartRemoved(WorkbenchPartReference::Pointer ref);
-
-private:
   void DisposePart(WorkbenchPartReference::Pointer ref);
 
   /**
    * Deactivates a part. The pane is unhilighted.
    */
-private:
   void DeactivatePart(IWorkbenchPart::Pointer part);
-
-  /**
-   * Detaches a view from the WorkbenchWindow.
-   */
-public:
-  void DetachView(IViewReference::Pointer ref);
-
-  /**
-   * Removes a detachedwindow.
-   */
-public:
-  void AttachView(IViewReference::Pointer ref);
 
   /**
    * Dispose a perspective.
@@ -753,19 +713,28 @@ public:
    * @param persp the perspective descriptor
    * @param notify whether to fire a perspective closed event
    */
-private:
   void DisposePerspective(SmartPointer<Perspective> persp, bool notify);
+
+public:
+
+  /**
+   * Detaches a view from the WorkbenchWindow.
+   */
+  void DetachView(IViewReference::Pointer ref);
+
+  /**
+   * Removes a detachedwindow.
+   */
+  void AttachView(IViewReference::Pointer ref);
 
   /**
    * Returns the first view manager with given ID.
    */
-public:
   SmartPointer<Perspective> FindPerspective(IPerspectiveDescriptor::Pointer desc);
 
   /**
    * See IWorkbenchPage@findView.
    */
-public:
   IViewPart::Pointer FindView(const QString& id);
 
   /*
@@ -773,7 +742,6 @@ public:
    *
    * @see org.blueberry.ui.IWorkbenchPage
    */
-public:
   IViewReference::Pointer FindViewReference(const QString& viewId);
 
   /*
@@ -781,7 +749,6 @@ public:
    *
    * @see org.blueberry.ui.IWorkbenchPage
    */
-public:
   IViewReference::Pointer FindViewReference(const QString& viewId,
       const QString& secondaryId);
 
@@ -813,7 +780,6 @@ public:
   /**
    * @see IWorkbenchPage
    */
-public:
   IEditorPart::Pointer GetActiveEditor();
 
   /**
@@ -822,32 +788,27 @@ public:
    *
    * @return the active editor reference or <code>null</code>
    */
-public:
   IEditorReference::Pointer GetActiveEditorReference();
 
   /*
    * (non-Javadoc) Method declared on IPartService
    */
-public:
   IWorkbenchPart::Pointer GetActivePart();
 
   /*
    * (non-Javadoc) Method declared on IPartService
    */
-public:
   IWorkbenchPartReference::Pointer GetActivePartReference();
 
   /**
    * Returns the active perspective for the page, <code>null</code> if
    * none.
    */
-public:
   SmartPointer<Perspective> GetActivePerspective();
 
   /**
    * Returns the client composite.
    */
-public:
   QWidget* GetClientComposite();
 
   //  for dynamic UI - change access from private to protected
@@ -855,19 +816,16 @@ public:
   /**
    * Answer the editor manager for this window.
    */
-public:
   EditorManager* GetEditorManager();
 
   /**
    * Answer the perspective presentation.
    */
-public:
   PerspectiveHelper* GetPerspectivePresentation();
 
   /**
    * Answer the editor presentation.
    */
-public:
   EditorAreaHelper* GetEditorPresentation();
 
   /**
@@ -875,68 +833,57 @@ public:
    * propogate certain types of events to the page part listeners.
    * @return the part service for this page.
    */
-public: PartService* GetPartService();
+  PartService* GetPartService();
 
   /**
    * See IWorkbenchPage.
    */
-public:
   QList<IEditorPart::Pointer> GetEditors();
 
-public:
   QList<IEditorPart::Pointer> GetDirtyEditors();
 
-public:
   QList<ISaveablePart::Pointer> GetDirtyParts();
 
   /**
    * See IWorkbenchPage.
    */
-public:
   IEditorPart::Pointer FindEditor(IEditorInput::Pointer input);
 
   /**
    * See IWorkbenchPage.
    */
-public:
   QList<IEditorReference::Pointer> FindEditors(
       IEditorInput::Pointer input, const QString& editorId, int matchFlags);
 
   /**
    * See IWorkbenchPage.
    */
-public:
   QList<IEditorReference::Pointer> GetEditorReferences();
 
   /**
    * @see IWorkbenchPage
    */
-public:
   IAdaptable* GetInput();
 
   /**
    * Returns the page label. This is a combination of the page input and
    * active perspective.
    */
-public:
   QString GetLabel();
 
   /**
    * Returns the perspective.
    */
-public:
   IPerspectiveDescriptor::Pointer GetPerspective();
 
   /*
    * (non-Javadoc) Method declared on ISelectionService
    */
-public:
   ISelection::ConstPointer GetSelection() const;
 
   /*
    * (non-Javadoc) Method declared on ISelectionService
    */
-public:
   ISelection::ConstPointer GetSelection(const QString& partId);
 
 //public:
@@ -945,56 +892,53 @@ public:
   /*
    * Returns the view factory.
    */
-public:
   ViewFactory* GetViewFactory();
 
   /**
    * See IWorkbenchPage.
    */
-public:
   QList<IViewReference::Pointer> GetViewReferences();
 
   /**
    * See IWorkbenchPage.
    */
-public:
   QList<IViewPart::Pointer> GetViews();
+
+protected:
 
   /**
    * Returns all view parts in the specified perspective
    *
    * @param persp the perspective
    * @return an array of view parts
-   * @since 3.1
    */
   /*package*/
-protected:
   QList<IViewPart::Pointer> GetViews(SmartPointer<Perspective> persp,
       bool restore);
+
+  /* package */
+  void RefreshActiveView();
+
+public:
 
   /**
    * See IWorkbenchPage.
    */
-public:
-  IWorkbenchWindow::Pointer GetWorkbenchWindow();
+  IWorkbenchWindow::Pointer GetWorkbenchWindow() const;
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.IWorkbenchPage#hideView(org.blueberry.ui.IViewReference)
    */
-public:
   void HideView(IViewReference::Pointer ref);
-
-  /* package */
-protected:
-  void RefreshActiveView();
 
   /**
    * See IPerspective
    */
-public:
   void HideView(IViewPart::Pointer view);
+
+private:
 
   /**
    * Initialize the page.
@@ -1008,7 +952,6 @@ public:
    * @param openExtras
    *            whether to process the perspective extras preference
    */
-private:
   void Init(WorkbenchWindow* w, const QString& layoutID,
       IAdaptable* input, bool openExtras);
 
@@ -1021,19 +964,16 @@ public:
   /**
    * See IWorkbenchPage.
    */
-public:
   bool IsPartVisible(IWorkbenchPart::Pointer part);
 
   /**
    * See IWorkbenchPage.
    */
-public:
   bool IsEditorAreaVisible();
 
   /**
    * Returns whether the view is fast.
    */
-public:
   bool IsFastView(IViewReference::Pointer ref);
 
   /**
@@ -1041,9 +981,7 @@ public:
    *
    * @param ref the view reference to check.  Must not be <code>null</code>.
    * @return true if the part is closeable.
-   * @since 3.1.1
    */
-public:
   bool IsCloseable(IViewReference::Pointer ref);
 
   /**
@@ -1051,68 +989,60 @@ public:
    *
    * @param ref the view reference to check.  Must not be <code>null</code>.
    * @return true if the part is moveable.
-   * @since 3.1.1
    */
-public:
   bool IsMoveable(IViewReference::Pointer ref);
 
   /**
    * Returns whether the layout of the active
    * perspective is fixed.
    */
-public:
   bool IsFixedLayout();
+
+protected:
 
   /**
    * Return true if the perspective has a dirty editor.
    */
-protected:
   bool IsSaveNeeded();
 
   /**
    * This method is called when the page is activated.
    */
-protected:
   void OnActivate();
 
   /**
    * This method is called when the page is deactivated.
    */
-protected:
   void OnDeactivate();
 
-  /**
-   * See IWorkbenchPage.
-   */
 public:
-  void
-  ReuseEditor(IReusableEditor::Pointer editor, IEditorInput::Pointer input);
 
   /**
    * See IWorkbenchPage.
    */
-public:
+  void ReuseEditor(IReusableEditor::Pointer editor, IEditorInput::Pointer input);
+
+  /**
+   * See IWorkbenchPage.
+   */
   IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
       const QString& editorID);
 
   /**
    * See IWorkbenchPage.
    */
-public:
   IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
       const QString& editorID, bool activate);
 
   /**
    * See IWorkbenchPage.
    */
-public:
   IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
       const QString& editorID, bool activate, int matchFlags);
 
   /**
    * This is not public API but for use internally.  editorState can be <code>null</code>.
    */
-public:
   IEditorPart::Pointer OpenEditor(IEditorInput::Pointer input,
       const QString& editorID, bool activate, int matchFlags,
       IMemento::Pointer editorState);
@@ -1122,15 +1052,15 @@ public:
    * Opens a new editor using the given input and descriptor. (Normally, editors are opened using
    * an editor ID and an input.)
    */
-public:
   IEditorPart::Pointer OpenEditorFromDescriptor(IEditorInput::Pointer input,
       IEditorDescriptor::Pointer editorDescriptor, bool activate,
       IMemento::Pointer editorState);
 
+private:
+
   /**
    * @see #openEditor(IEditorInput, String, boolean, int)
    */
-private:
   IEditorPart::Pointer BusyOpenEditor(IEditorInput::Pointer input,
       const QString& editorID, bool activate, int matchFlags,
       IMemento::Pointer editorState);
@@ -1139,72 +1069,52 @@ private:
    * Added to fix Bug 178235 [EditorMgmt] DBCS 3.3 - Cannot open file with external program.
    * See openEditorFromDescriptor().
    */
-private:
   IEditorPart::Pointer BusyOpenEditorFromDescriptor(
       IEditorInput::Pointer input,
       EditorDescriptor::Pointer editorDescriptor, bool activate,
-      IMemento::Pointer editorState);
-
-  /**
-   * Do not call this method.  Use <code>busyOpenEditor</code>.
-   *
-   * @see IWorkbenchPage#openEditor(IEditorInput, String, boolean)
-   */
-protected:
-  IEditorPart::Pointer BusyOpenEditorBatched(IEditorInput::Pointer input,
-      const QString& editorID, bool activate, int matchFlags,
       IMemento::Pointer editorState);
 
   /*
    * Added to fix Bug 178235 [EditorMgmt] DBCS 3.3 - Cannot open file with external program.
    * See openEditorFromDescriptor().
    */
-private:
   IEditorPart::Pointer BusyOpenEditorFromDescriptorBatched(
       IEditorInput::Pointer input, EditorDescriptor::Pointer editorDescriptor,
       bool activate, IMemento::Pointer editorState);
 
 public:
-  void OpenEmptyTab();
 
-protected:
-  void ShowEditor(bool activate, IEditorPart::Pointer editor);
+  void OpenEmptyTab();
 
   /**
    * See IWorkbenchPage.
    */
-public:
   bool IsEditorPinned(IEditorPart::Pointer editor);
 
   /**
    * Removes an IPartListener from the part service.
    */
-public:
   void RemovePartListener(IPartListener* l);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
-public:
   void RemoveSelectionListener(ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
-public:
   void RemoveSelectionListener(const QString& partId,
                                ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
-public:
   void RemovePostSelectionListener(ISelectionListener* listener);
 
   /*
    * (non-Javadoc) Method declared on ISelectionListener.
    */
-public:
   void RemovePostSelectionListener(const QString& partId,
                                    ISelectionListener* listener);
 
@@ -1215,14 +1125,12 @@ public:
    * In the current design this method is invoked by the part pane when the
    * pane, the part, or any children gain focus.
    */
-public:
   void RequestActivation(IWorkbenchPart::Pointer part);
 
   /**
    * Resets the layout for the perspective. The active part in the old layout
    * is activated in the new layout for consistent user context.
    */
-public:
   void ResetPerspective();
 
   /**
@@ -1231,14 +1139,12 @@ public:
    * perspective for that descriptor. If activeDescriptor is null active the
    * old perspective.
    */
-public:
   /*IStatus*/bool RestoreState(IMemento::Pointer memento,
       IPerspectiveDescriptor::Pointer activeDescriptor);
 
   /**
    * See IWorkbenchPage
    */
-public:
   bool SaveAllEditors(bool confirm);
 
   /**
@@ -1247,15 +1153,7 @@ public:
    * @return false if the user cancelled
    *
    */
-public:
   bool SaveAllEditors(bool confirm, bool addNonPartSources);
-
-  /*
-   * Saves the workbench part.
-   */
-protected:
-  bool SavePart(ISaveablePart::Pointer saveable, IWorkbenchPart::Pointer part,
-      bool confirm);
 
   /**
    * Saves an editors in the workbench. If <code>confirm</code> is <code>true</code>
@@ -1266,59 +1164,27 @@ protected:
    * @return <code>true</code> if the command succeeded, or <code>false</code>
    *         if the user cancels the command
    */
-public:
   bool SaveEditor(IEditorPart::Pointer editor, bool confirm);
 
   /**
    * Saves the current perspective.
    */
-public:
   void SavePerspective();
 
   /**
    * Saves the perspective.
    */
-public:
   void SavePerspectiveAs(IPerspectiveDescriptor::Pointer newDesc);
 
   /**
    * Save the state of the page.
    */
-public:
   /*IStatus*/bool SaveState(IMemento::Pointer memento);
-
-private:
-  QString GetId(IWorkbenchPart::Pointer part);
-
-private:
-  QString GetId(IWorkbenchPartReference::Pointer ref);
-
-  /**
-   * Sets the active part.
-   */
-private:
-  void SetActivePart(IWorkbenchPart::Pointer newPart);
 
   /**
    * See IWorkbenchPage.
    */
-public:
   void SetEditorAreaVisible(bool showEditorArea);
-
-  /**
-   * Sets the layout of the page. Assumes the new perspective is not null.
-   * Keeps the active part if possible. Updates the window menubar and
-   * toolbar if necessary.
-   */
-private:
-  void SetPerspective(SmartPointer<Perspective> newPersp);
-
-  /*
-   * Update visibility state of all views.
-   */
-private:
-  void UpdateVisibility(SmartPointer<Perspective> oldPersp,
-      SmartPointer<Perspective> newPersp);
 
   /**
    * Sets the perspective.
@@ -1326,19 +1192,11 @@ private:
    * @param desc
    *            identifies the new perspective.
    */
-public:
   void SetPerspective(IPerspectiveDescriptor::Pointer desc);
-
-  /**
-   * Restore the toolbar layout for the active perspective.
-   */
-protected:
-  void ResetToolBarLayout();
 
   /**
    * See IWorkbenchPage.
    */
-public:
   IViewPart::Pointer ShowView(const QString& viewID);
 
   /*
@@ -1347,38 +1205,50 @@ public:
    * @see org.blueberry.ui.IWorkbenchPage#showView(java.lang.String,
    *      java.lang.String, int)
    */
-public:
   IViewPart::Pointer ShowView(const QString& viewID,
       const QString& secondaryID, int mode);
 
-  /**
-   * @param mode the mode to test
-   * @return whether the mode is recognized
-   * @since 3.0
-   */
-private:
-  bool CertifyMode(int mode);
 
   /*
    * Returns the editors in activation order (oldest first).
    */
-public:
   QList<IEditorReference::Pointer> GetSortedEditors();
 
   /**
    * @see IWorkbenchPage#getOpenPerspectives()
    */
-public:
   QList<IPerspectiveDescriptor::Pointer> GetOpenPerspectives();
+
+protected:
+
+  /**
+   * Do not call this method.  Use <code>busyOpenEditor</code>.
+   *
+   * @see IWorkbenchPage#openEditor(IEditorInput, String, boolean)
+   */
+  IEditorPart::Pointer BusyOpenEditorBatched(IEditorInput::Pointer input,
+      const QString& editorID, bool activate, int matchFlags,
+      IMemento::Pointer editorState);
+
+  void ShowEditor(bool activate, IEditorPart::Pointer editor);
+
+  /*
+   * Saves the workbench part.
+   */
+  bool SavePart(ISaveablePart::Pointer saveable, IWorkbenchPart::Pointer part,
+      bool confirm);
+
+  /**
+   * Restore the toolbar layout for the active perspective.
+   */
+  void ResetToolBarLayout();
 
   /**
    * Return all open Perspective objects.
    *
    * @return all open Perspective objects
-   * @since 3.1
    */
   /*package*/
-protected:
   QList<SmartPointer<Perspective> > GetOpenInternalPerspectives();
 
   /**
@@ -1388,22 +1258,23 @@ protected:
    *
    * @param part specified part to search for
    * @return the first sorted perspespective containing the part
-   * @since 3.1
    */
   /*package*/
-protected:
   SmartPointer<Perspective> GetFirstPerspectiveWithView(IViewPart::Pointer part);
+
+  // for dynamic UI
+  void AddPerspective(SmartPointer<Perspective> persp);
+
+public:
 
   /**
    * Returns the perspectives in activation order (oldest first).
    */
-public:
   QList<IPerspectiveDescriptor::Pointer> GetSortedPerspectives();
 
   /*
    * Returns the parts in activation order (oldest first).
    */
-public:
   QList<IWorkbenchPartReference::Pointer> GetSortedParts();
 
   /**
@@ -1414,292 +1285,13 @@ public:
    * @return the part's reference or <code>null</code> if the given part does not belong
    * to this workbench page
    */
-public:
   IWorkbenchPartReference::Pointer GetReference(IWorkbenchPart::Pointer part);
-
-  //  private: class ActivationList {
-  //        //List of parts in the activation order (oldest first)
-  //        List parts = new ArrayList();
-  //
-  //        /*
-  //         * Add/Move the active part to end of the list;
-  //         */
-  //        void setActive(IWorkbenchPart part) {
-  //            if (parts.size() <= 0) {
-  //        return;
-  //      }
-  //      IWorkbenchPartReference ref = getReference(part);
-  //      if (ref != null) {
-  //        if (ref == parts.get(parts.size() - 1)) {
-  //          return;
-  //        }
-  //        parts.remove(ref);
-  //        parts.add(ref);
-  //      }
-  //        }
-  //
-  //        /*
-  //     * Ensures that the given part appears AFTER any other part in the same
-  //     * container.
-  //     */
-  //        void bringToTop(IWorkbenchPartReference ref) {
-  //            ILayoutContainer targetContainer = getContainer(ref);
-  //
-  //            int newIndex = lastIndexOfContainer(targetContainer);
-  //
-  //            //New index can be -1 if there is no last index
-  //            if (newIndex >= 0 && ref == parts.get(newIndex))
-  //        return;
-  //
-  //            parts.remove(ref);
-  //            if(newIndex >= 0)
-  //              parts.add(newIndex, ref);
-  //            else
-  //              parts.add(ref);
-  //        }
-  //
-  //        /*
-  //         * Returns the last (most recent) index of the given container in the activation list, or returns
-  //         * -1 if the given container does not appear in the activation list.
-  //         */
-  //        int lastIndexOfContainer(ILayoutContainer container) {
-  //            for (int i = parts.size() - 1; i >= 0; i--) {
-  //                IWorkbenchPartReference ref = (IWorkbenchPartReference)parts.get(i);
-  //
-  //                ILayoutContainer cnt = getContainer(ref);
-  //                if (cnt == container) {
-  //                    return i;
-  //                }
-  //            }
-  //
-  //            return -1;
-  //        }
-  //
-  //        /*
-  //         * Add/Move the active part to end of the list;
-  //         */
-  //        void setActive(IWorkbenchPartReference ref) {
-  //            setActive(ref.getPart(true));
-  //        }
-  //
-  //        /*
-  //         * Add the active part to the beginning of the list.
-  //         */
-  //        void add(IWorkbenchPartReference ref) {
-  //            if (parts.indexOf(ref) >= 0) {
-  //        return;
-  //      }
-  //
-  //            IWorkbenchPart part = ref.getPart(false);
-  //            if (part != null) {
-  //                PartPane pane = ((PartSite) part.getSite()).getPane();
-  //                if (pane instanceof MultiEditorInnerPane) {
-  //                    MultiEditorInnerPane innerPane = (MultiEditorInnerPane) pane;
-  //                    add(innerPane.getParentPane().getPartReference());
-  //                    return;
-  //                }
-  //            }
-  //            parts.add(0, ref);
-  //        }
-  //
-  //        /*
-  //         * Return the active part. Filter fast views.
-  //         */
-  //        IWorkbenchPart getActive() {
-  //            if (parts.isEmpty()) {
-  //        return null;
-  //      }
-  //            return getActive(parts.size() - 1);
-  //        }
-  //
-  //        /*
-  //         * Return the previously active part. Filter fast views.
-  //         */
-  //        IWorkbenchPart getPreviouslyActive() {
-  //            if (parts.size() < 2) {
-  //        return null;
-  //      }
-  //            return getActive(parts.size() - 2);
-  //        }
-  //
-  //  private: IWorkbenchPart getActive(int start) {
-  //            IWorkbenchPartReference ref = getActiveReference(start, false);
-  //
-  //            if (ref == null) {
-  //                return null;
-  //            }
-  //
-  //            return ref.getPart(true);
-  //        }
-  //
-  //  public: IWorkbenchPartReference getActiveReference(boolean editorsOnly) {
-  //            return getActiveReference(parts.size() - 1, editorsOnly);
-  //        }
-  //
-  //  private: IWorkbenchPartReference getActiveReference(int start, boolean editorsOnly) {
-  //            // First look for parts that aren't obscured by the current zoom state
-  //            IWorkbenchPartReference nonObscured = getActiveReference(start, editorsOnly, true);
-  //
-  //            if (nonObscured != null) {
-  //                return nonObscured;
-  //            }
-  //
-  //            // Now try all the rest of the parts
-  //            return getActiveReference(start, editorsOnly, false);
-  //        }
-  //
-  //        /*
-  //         * Find a part in the list starting from the end and filter
-  //         * and views from other perspectives. Will filter fast views
-  //         * unless 'includeActiveFastViews' is true;
-  //         */
-  //  private: IWorkbenchPartReference getActiveReference(int start, boolean editorsOnly, boolean skipPartsObscuredByZoom) {
-  //            IWorkbenchPartReference[] views = getViewReferences();
-  //            for (int i = start; i >= 0; i--) {
-  //                WorkbenchPartReference ref = (WorkbenchPartReference) parts
-  //                        .get(i);
-  //
-  //                if (editorsOnly && !(ref instanceof IEditorReference)) {
-  //                    continue;
-  //                }
-  //
-  //                // Skip parts whose containers have disabled auto-focus
-  //                PartPane pane = ref.getPane();
-  //
-  //                if (pane != null) {
-  //                    if (!pane.allowsAutoFocus()) {
-  //                        continue;
-  //                    }
-  //
-  //                    if (skipPartsObscuredByZoom) {
-  //                        if (pane.isObscuredByZoom()) {
-  //                            continue;
-  //                        }
-  //                    }
-  //                }
-  //
-  //                // Skip fastviews (unless overridden)
-  //                if (ref instanceof IViewReference) {
-  //                    if (ref == getActiveFastView() || !((IViewReference) ref).isFastView()) {
-  //                        for (int j = 0; j < views.length; j++) {
-  //                            if (views[j] == ref) {
-  //                                return ref;
-  //                            }
-  //                        }
-  //                    }
-  //                } else {
-  //                    return ref;
-  //                }
-  //            }
-  //            return null;
-  //        }
-  //
-  //        /*
-  //         * Retuns the index of the part within the activation list. The higher
-  //         * the index, the more recently it was used.
-  //         */
-  //        int indexOf(IWorkbenchPart part) {
-  //          IWorkbenchPartReference ref = getReference(part);
-  //          if (ref == null) {
-  //            return -1;
-  //          }
-  //            return parts.indexOf(ref);
-  //        }
-  //
-  //        /*
-  //         * Returns the index of the part reference within the activation list.
-  //         * The higher the index, the more recent it was used.
-  //         */
-  //        int indexOf(IWorkbenchPartReference ref) {
-  //            return parts.indexOf(ref);
-  //        }
-  //
-  //        /*
-  //         * Remove a part from the list
-  //         */
-  //        boolean remove(IWorkbenchPartReference ref) {
-  //            return parts.remove(ref);
-  //        }
-  //
-  //        /*
-  //         * Returns the editors in activation order (oldest first).
-  //         */
-  //  private: IEditorReference[] getEditors() {
-  //            ArrayList editors = new ArrayList(parts.size());
-  //            for (Iterator i = parts.iterator(); i.hasNext();) {
-  //                IWorkbenchPartReference part = (IWorkbenchPartReference) i
-  //                        .next();
-  //                if (part instanceof IEditorReference) {
-  //                    editors.add(part);
-  //                }
-  //            }
-  //            return (IEditorReference[]) editors
-  //                    .toArray(new IEditorReference[editors.size()]);
-  //        }
-  //
-  //        /*
-  //         * Return a list with all parts (editors and views).
-  //         */
-  //        private: IWorkbenchPartReference[] getParts() {
-  //            IWorkbenchPartReference[] views = getViewReferences();
-  //            ArrayList resultList = new ArrayList(parts.size());
-  //            for (Iterator iterator = parts.iterator(); iterator.hasNext();) {
-  //                IWorkbenchPartReference ref = (IWorkbenchPartReference) iterator
-  //                        .next();
-  //                if (ref instanceof IViewReference) {
-  //                    //Filter views from other perspectives
-  //                    for (int i = 0; i < views.length; i++) {
-  //                        if (views[i] == ref) {
-  //                            resultList.add(ref);
-  //                            break;
-  //                        }
-  //                    }
-  //                } else {
-  //                    resultList.add(ref);
-  //                }
-  //            }
-  //            IWorkbenchPartReference[] result = new IWorkbenchPartReference[resultList
-  //                    .size()];
-  //            return (IWorkbenchPartReference[]) resultList.toArray(result);
-  //        }
-  //
-  //        /*
-  //         * Returns the topmost editor on the stack, or null if none.
-  //         */
-  //        IEditorPart getTopEditor() {
-  //            IEditorReference editor = (IEditorReference)getActiveReference(parts.size() - 1, true);
-  //
-  //            if (editor == null) {
-  //                return null;
-  //            }
-  //
-  //            return editor.getEditor(true);
-  //        }
-  //    };
-
-
-  // for dynamic UI
-protected:
-  void AddPerspective(SmartPointer<Perspective> persp);
-
-  /**
-   * Find the stack of view references stacked with this view part.
-   *
-   * @param part
-   *            the part
-   * @return the stack of references
-   * @since 3.0
-   */
-private:
-  QList<IViewReference::Pointer> GetViewReferenceStack(
-      IViewPart::Pointer part);
 
   /*
    * (non-Javadoc)
    *
    * @see org.blueberry.ui.IWorkbenchPage#getViewStack(org.blueberry.ui.IViewPart)
    */
-public:
   QList<IViewPart::Pointer> GetViewStack(IViewPart::Pointer part);
 
   /**
@@ -1714,10 +1306,72 @@ public:
    * <li>has no effect when view is zoomed</li>
    * </ul>
    */
-public:
   void ResizeView(IViewPart::Pointer part, int width, int height);
 
+  /**
+   * Sanity-checks the objects in this page. Throws an Assertation exception
+   * if an object's internal state is invalid. ONLY INTENDED FOR USE IN THE
+   * UI TEST SUITES.
+   */
+  void TestInvariants();
+
+  IExtensionTracker* GetExtensionTracker() const;
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see org.blueberry.ui.IWorkbenchPage#getPerspectiveShortcuts()
+   */
+  QList<QString> GetPerspectiveShortcuts();
+
+  /*
+   * (non-Javadoc)
+   *
+   * @see org.blueberry.ui.IWorkbenchPage#getShowViewShortcuts()
+   */
+  QList<QString> GetShowViewShortcuts();
+
+  bool IsPartVisible(IWorkbenchPartReference::Pointer reference);
+
 private:
+
+  QString GetId(IWorkbenchPart::Pointer part);
+
+  QString GetId(IWorkbenchPartReference::Pointer ref);
+
+  /**
+   * Sets the active part.
+   */
+  void SetActivePart(IWorkbenchPart::Pointer newPart);
+
+  /**
+   * Sets the layout of the page. Assumes the new perspective is not null.
+   * Keeps the active part if possible. Updates the window menubar and
+   * toolbar if necessary.
+   */
+  void SetPerspective(SmartPointer<Perspective> newPersp);
+
+  /*
+   * Update visibility state of all views.
+   */
+  void UpdateVisibility(SmartPointer<Perspective> oldPersp,
+      SmartPointer<Perspective> newPersp);
+
+  /**
+   * @param mode the mode to test
+   * @return whether the mode is recognized
+   */
+  bool CertifyMode(int mode);
+
+  /**
+   * Find the stack of view references stacked with this view part.
+   *
+   * @param part
+   *            the part
+   * @return the stack of references
+   */
+  QList<IViewReference::Pointer> GetViewReferenceStack(
+      IViewPart::Pointer part);
 
   struct ActivationOrderPred : std::binary_function<IViewReference::Pointer,
   IViewReference::Pointer, bool>
@@ -1753,12 +1407,13 @@ private:
   void FindSashParts(SmartPointer<LayoutTree> tree, const PartPane::Sashes& sashes,
       SashInfo& info);
 
+protected:
+
   /**
    * Returns all parts that are owned by this page
    *
    * @return
    */
-protected:
   QList<IWorkbenchPartReference::Pointer> GetAllParts();
 
   /**
@@ -1766,46 +1421,11 @@ protected:
    * for which a part opened event would have been sent -- these would be
    * activated parts whose controls have already been created.
    */
-protected:
   QList<IWorkbenchPartReference::Pointer> GetOpenParts();
 
-  /**
-   * Sanity-checks the objects in this page. Throws an Assertation exception
-   * if an object's internal state is invalid. ONLY INTENDED FOR USE IN THE
-   * UI TEST SUITES.
-   */
-public:
-  void TestInvariants();
-
-  /* (non-Javadoc)
-   * @see org.blueberry.ui.IWorkbenchPage#getExtensionTracker()
-   */
-  //public: IExtensionTracker GetExtensionTracker();
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.blueberry.ui.IWorkbenchPage#getPerspectiveShortcuts()
-   */
-public:
-  QList<QString> GetPerspectiveShortcuts();
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.blueberry.ui.IWorkbenchPage#getShowViewShortcuts()
-   */
-public:
-  QList<QString> GetShowViewShortcuts();
-
-  /**
-   * @since 3.1
-   */
 private:
-  void SuggestReset();
 
-public:
-  bool IsPartVisible(IWorkbenchPartReference::Pointer reference);
+  void SuggestReset();
 
 };
 

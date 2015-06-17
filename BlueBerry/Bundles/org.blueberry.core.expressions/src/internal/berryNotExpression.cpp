@@ -17,11 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryNotExpression.h"
 
 #include <Poco/Exception.h>
-#include <Poco/Hash.h>
 
 namespace berry {
 
-const std::size_t NotExpression::HASH_INITIAL = Poco::hash("berry::NotExpression");
+const uint NotExpression::HASH_INITIAL = qHash("berry::NotExpression");
 
 NotExpression::NotExpression(Expression::Pointer expression)
 {

@@ -140,20 +140,21 @@ void JobListeners::HandleException(const std::exception& e)
 {
   //this code is roughly copied from InternalPlatform.run(ISafeRunnable),
   //but in-lined here for performance reasons
-  try
+  if(dynamic_cast<const OperationCanceledException*>(&e))
   {
-    dynamic_cast<const OperationCanceledException&> (e);
     return;
   }
-  catch (const std::bad_cast&)
+  else
   {
     // TODO get bundle id (find a C++ way)
     //std::string pluginId = JobOSGiUtils.getDefault().getBundleId(listener);
     QString pluginId;
     if (pluginId.isEmpty())
+    {
       pluginId = JobManager::PI_JOBS();
+    }
     QString message = "Problems occurred when invoking code from plug-in: "
-        + pluginId;
+                      + pluginId;
     BERRY_ERROR << message;
     // TODO Logging
     //  RuntimeLog.log(new Status(IStatus.ERROR, pluginId, JobManager.PLUGIN_ERROR,

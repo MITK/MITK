@@ -33,11 +33,16 @@ class MimeType;
  * @ingroup MicroServices_Interfaces
  *
  * @brief The CustomMimeType class represents a custom mime-type which
- *        may be registered as a service object.
+ *        may be registered as a service object. It should only be used for mime-type registration,
+ *        see also mitk::MimeType.
  *
  * Instances of this class are usually created and registered as a service.
- * They wire files to specific IFileReader instances and provide data format
+ * They act as meta data information to allow the linking of files to reader and writer.
+ * They write files to specific IFileReader instances and provide data format
  * meta-data for selecting compatible IFileWriter instances.
+ * mirk::CustomMimetype should only be used to register mime-types. All other interaction should happen trough
+ * mitk::MimeTypeProvider, from which registered mimetypes can be pulled. mitk::MimeType provides a safe and memory-managed
+ * way of interacting with Mimetypes.
  */
 class MITKCORE_EXPORT CustomMimeType
 {
@@ -53,12 +58,41 @@ public:
   CustomMimeType& operator=(const CustomMimeType& other);
   CustomMimeType& operator=(const MimeType& other);
 
+  /**
+  * \brief Returns the unique name for the MimeType.
+  */
   std::string GetName() const;
+
+  /**
+  * \brief Returns the human-readable Category of the mime-type. Allows grouping of similar mime-types (like Surfaces)
+  */
   std::string GetCategory() const;
+
+  /**
+  * \brief Returns all extensions that this MimeType can handle.
+  */
   std::vector<std::string> GetExtensions() const;
+
+  /**
+  * \brief Returns the Human readable comment of the MimeType, a string that describes its unique role.
+  */
   std::string GetComment() const;
 
+  /**
+  * \brief Checks if the MimeType can handle file at the given location.
+  *
+  * In its base implementation, this function exclusively looks a the given string.
+  * However, child classes can override this behaviour and peek into the file.
+  */
   virtual bool AppliesTo(const std::string& path) const;
+
+  /**
+  * \brief Checks if the MimeType can handle the etension of the given path
+  *
+  * This function exclusively looks a the given string
+  */
+  bool MatchesExtension(const std::string& path) const;
+
   /**
   * \brief Provides the first matching extension
   *
@@ -66,6 +100,7 @@ public:
   * Returns the first found one.
   */
   std::string GetExtension(const std::string& path) const;
+
   /**
   * \brief Provides the filename minus the extension
   *

@@ -122,8 +122,13 @@ std::string CustomMimeType::GetComment() const
 
 bool CustomMimeType::AppliesTo(const std::string& path) const
 {
-  std::string extension,filename;
-  return ParsePathForExtension(path,extension,filename);
+  return MatchesExtension(path);
+}
+
+bool CustomMimeType::MatchesExtension(const std::string& path) const
+{
+  std::string extension, filename;
+  return ParsePathForExtension(path, extension, filename);
 }
 
 std::string CustomMimeType::GetExtension(const std::string& path) const

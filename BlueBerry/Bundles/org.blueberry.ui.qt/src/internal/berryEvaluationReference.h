@@ -28,7 +28,7 @@ class EvaluationReference : public EvaluationResultCache, public IEvaluationRefe
 
 private:
 
-  QScopedPointer<IPropertyChangeListener> listener;
+  IPropertyChangeListener* listener;
   QString property;
   bool postingChanges;
 

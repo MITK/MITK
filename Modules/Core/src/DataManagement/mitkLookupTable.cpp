@@ -171,19 +171,19 @@ void mitk::LookupTable::ChangeOpacity(int index, float opacity )
   this->Modified();  // need to call modified, since LookupTableProperty seems to be unchanged so no widget-update is executed
 }
 
-void mitk::LookupTable::GetColor(int x, double rgb[3])
+void mitk::LookupTable::GetColor(double value, double rgb[3])
 {
-  this->GetVtkLookupTable()->GetColor(x,rgb);
+  this->GetVtkLookupTable()->GetColor(value,rgb);
 }
 
-void mitk::LookupTable::GetTableValue(int x, double rgba[4])
+void mitk::LookupTable::GetTableValue(int index, double rgba[4])
 {
-  this->GetVtkLookupTable()->GetTableValue(x,rgba);
+  this->GetVtkLookupTable()->GetTableValue(index,rgba);
 }
 
-void mitk::LookupTable::SetTableValue(int x, double rgba[4])
+void mitk::LookupTable::SetTableValue(int index, double rgba[4])
 {
-  this->GetVtkLookupTable()->SetTableValue(x,rgba);
+  this->GetVtkLookupTable()->SetTableValue(index,rgba);
 }
 
 vtkSmartPointer<vtkLookupTable> mitk::LookupTable::GetVtkLookupTable() const

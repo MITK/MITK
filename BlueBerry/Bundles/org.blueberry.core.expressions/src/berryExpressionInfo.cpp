@@ -20,6 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
+ExpressionInfo::ExpressionInfo()
+  : fHasDefaultVariableAccess(false)
+  , fHasSystemPropertyAccess(false)
+{
+}
+
 bool
 ExpressionInfo::HasDefaultVariableAccess() const
 {

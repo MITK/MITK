@@ -16,12 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryCompositeExpression.h"
 
-#include "Poco/Hash.h"
-
 namespace berry
 {
 
-const uint CompositeExpression::HASH_INITIAL = Poco::Hash<std::string>()("berry::CompositeExpression");
+const uint CompositeExpression::HASH_INITIAL = qHash("berry::CompositeExpression");
 
 void CompositeExpression::Add(Expression::Pointer expression)
 {

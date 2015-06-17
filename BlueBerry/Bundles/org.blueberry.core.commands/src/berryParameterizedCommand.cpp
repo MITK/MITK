@@ -34,11 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace berry
 {
 
-const int INDEX_PARAMETER_ID = 0;
-const int INDEX_PARAMETER_NAME = 1;
-const int INDEX_PARAMETER_VALUE_NAME = 2;
-const int INDEX_PARAMETER_VALUE_VALUE = 3;
-
 const uint ParameterizedCommand::HASH_CODE_NOT_COMPUTED = 0;
 const uint ParameterizedCommand::HASH_FACTOR = 89;
 const uint ParameterizedCommand::HASH_INITIAL = qHash("berry::ParameterizedCommand");
@@ -311,7 +306,7 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
       ParameterType::Pointer parameterType(command->GetParameterType(key));
       if (!parameterType)
       {
-        QString val(*(i.value().Cast<ObjectString>()));
+        QString val = i.value()->ToString();
         parms.push_back(Parameterization(parameter, val));
       }
       else
@@ -324,7 +319,7 @@ ParameterizedCommand::Pointer ParameterizedCommand::GenerateCommand(const SmartP
         }
         else
         {
-          QString val(*(i.value().Cast<ObjectString>()));
+          QString val = i.value()->ToString();
           parms.push_back(Parameterization(parameter, val));
         }
       }

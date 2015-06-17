@@ -63,6 +63,11 @@ void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   if(ls->IsGenerateDataRequired(renderer,this))
   {
 
+    if (GetLogoImagePath().empty())
+    {
+      ls->m_LogoRep->SetVisibility(0);
+      return;
+    }
     vtkImageReader2* imageReader = m_readerFactory->CreateImageReader2(GetLogoImagePath().c_str());
     if(imageReader)
     {

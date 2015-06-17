@@ -15,8 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "berryNullEditorInput.h"
-#include "berryPartPane.h"
 
+#include "berryPartPane.h"
+#include "berryAbstractUICTKPlugin.h"
 
 namespace berry
 {
@@ -36,6 +37,11 @@ bool NullEditorInput::Exists() const
   return false;
 }
 
+QIcon NullEditorInput::GetIcon() const
+{
+  return AbstractUICTKPlugin::GetMissingIcon();
+}
+
 QString NullEditorInput::GetName() const
 {
   if (editorReference.IsNotNull())
@@ -43,11 +49,21 @@ QString NullEditorInput::GetName() const
   return "";
 }
 
+const IPersistableElement* NullEditorInput::GetPersistable() const
+{
+  return nullptr;
+}
+
 QString NullEditorInput::GetToolTipText() const
 {
   if (editorReference.IsNotNull())
     return editorReference->GetTitleToolTip();
   return "";
+}
+
+Object*NullEditorInput::GetAdapter(const QString& /*adapterType*/) const
+{
+  return nullptr;
 }
 
 bool NullEditorInput::operator==(const Object* o) const

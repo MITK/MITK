@@ -173,9 +173,6 @@ class MITKSEGMENTATION_EXPORT SegTool2D : public Tool
 
     bool m_ShowMarkerNodes;
     static bool m_SurfaceInterpolationEnabled;
-
-    DiffSliceOperation* m_doOperation;
-    DiffSliceOperation* m_undoOperation;
 };
 
 } // namespace

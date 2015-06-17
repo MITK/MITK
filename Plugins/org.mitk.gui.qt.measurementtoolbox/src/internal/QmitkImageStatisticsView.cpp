@@ -263,14 +263,14 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
     // Copy statistics to clipboard ("%Ln" will use the default locale for
     // number formatting)
     QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t V (mm³)\n" );
-    clipboard = clipboard.append( "%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7" )
-      .arg( statistics[t].GetMean(), 0, 'f', 10 )
-      .arg( statistics[t].GetSigma(), 0, 'f', 10 )
-      .arg( statistics[t].GetRMS(), 0, 'f', 10 )
-      .arg( statistics[t].GetMax(), 0, 'f', 10 )
-      .arg( statistics[t].GetMin(), 0, 'f', 10 )
-      .arg( statistics[t].GetN() )
-      .arg( m_Controls->m_StatisticsTable->item( 0, 6 )->text().toDouble(), 0, 'f', 10 );
+    clipboard = clipboard.append("%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7")
+      .arg(statistics[t].GetMean(), 0, 'f', 10)
+      .arg(statistics[t].GetSigma(), 0, 'f', 10)
+      .arg(statistics[t].GetRMS(), 0, 'f', 10)
+      .arg(statistics[t].GetMax(), 0, 'f', 10)
+      .arg(statistics[t].GetMin(), 0, 'f', 10)
+      .arg(statistics[t].GetN())
+      .arg( m_Controls->m_StatisticsTable->item(6, 0)->data(Qt::DisplayRole).toDouble(), 0, 'f', 10);
 
     QApplication::clipboard()->setText(
       clipboard, QClipboard::Clipboard );

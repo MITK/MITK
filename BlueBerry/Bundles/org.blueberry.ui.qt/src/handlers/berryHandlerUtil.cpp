@@ -141,14 +141,14 @@ ObjectString::ConstPointer HandlerUtil::GetActiveEditorIdChecked(
   return o.Cast<const ObjectString>();
 }
 
-IWorkbenchPart::ConstPointer HandlerUtil::GetActivePart(const ExecutionEvent::ConstPointer& event)
+IWorkbenchPart::Pointer HandlerUtil::GetActivePart(const ExecutionEvent::ConstPointer& event)
 {
   Object::ConstPointer o = HandlerUtil::GetVariable(event,
                                                     ISources::ACTIVE_PART_NAME());
-  return o.Cast<const IWorkbenchPart>();
+  return IWorkbenchPart::Pointer(const_cast<IWorkbenchPart*>(dynamic_cast<const IWorkbenchPart*>(o.GetPointer())));
 }
 
-IWorkbenchPart::ConstPointer HandlerUtil::GetActivePartChecked(
+IWorkbenchPart::Pointer HandlerUtil::GetActivePartChecked(
     const ExecutionEvent::ConstPointer& event)
 {
   Object::ConstPointer o = HandlerUtil::GetVariableChecked(event,
@@ -158,7 +158,7 @@ IWorkbenchPart::ConstPointer HandlerUtil::GetActivePartChecked(
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_PART_NAME(),
                                     "IWorkbenchPart", o->GetClassName());
   }
-  return o.Cast<const IWorkbenchPart>();
+  return IWorkbenchPart::Pointer(const_cast<IWorkbenchPart*>(dynamic_cast<const IWorkbenchPart*>(o.GetPointer())));
 }
 
 ObjectString::ConstPointer HandlerUtil::GetActivePartId(const ExecutionEvent::ConstPointer& event)
@@ -181,15 +181,15 @@ ObjectString::ConstPointer HandlerUtil::GetActivePartIdChecked(
   return o.Cast<const ObjectString>();
 }
 
-IWorkbenchPartSite::ConstPointer HandlerUtil::GetActiveSite(
+IWorkbenchPartSite::Pointer HandlerUtil::GetActiveSite(
     const ExecutionEvent::ConstPointer& event)
 {
   Object::ConstPointer o = HandlerUtil::GetVariable(event,
                                                     ISources::ACTIVE_SITE_NAME());
-  return o.Cast<const IWorkbenchPartSite>();
+  return IWorkbenchPartSite::Pointer(const_cast<IWorkbenchPartSite*>(dynamic_cast<const IWorkbenchPartSite*>(o.GetPointer())));
 }
 
-IWorkbenchPartSite::ConstPointer HandlerUtil::GetActiveSiteChecked(
+IWorkbenchPartSite::Pointer HandlerUtil::GetActiveSiteChecked(
     const ExecutionEvent::ConstPointer& event)
 {
   Object::ConstPointer o = HandlerUtil::GetVariableChecked(event,
@@ -199,7 +199,7 @@ IWorkbenchPartSite::ConstPointer HandlerUtil::GetActiveSiteChecked(
     HandlerUtil::IncorrectTypeFound(event, ISources::ACTIVE_SITE_NAME(),
                                     "IWorkbenchSitePart", o->GetClassName());
   }
-  return o.Cast<const IWorkbenchPartSite>();
+  return IWorkbenchPartSite::Pointer(const_cast<IWorkbenchPartSite*>(dynamic_cast<const IWorkbenchPartSite*>(o.GetPointer())));
 }
 
 ISelection::ConstPointer HandlerUtil::GetCurrentSelection(
@@ -267,15 +267,15 @@ ISelection::ConstPointer HandlerUtil::GetActiveMenuSelectionChecked(
   return o.Cast<const ISelection>();
 }
 
-IWorkbenchWindow::ConstPointer HandlerUtil::GetActiveWorkbenchWindow(
+IWorkbenchWindow::Pointer HandlerUtil::GetActiveWorkbenchWindow(
     const ExecutionEvent::ConstPointer& event)
 {
   Object::ConstPointer o = HandlerUtil::GetVariable(event,
                                                     ISources::ACTIVE_WORKBENCH_WINDOW_NAME());
-  return o.Cast<const IWorkbenchWindow>();
+  return IWorkbenchWindow::Pointer(const_cast<IWorkbenchWindow*>(dynamic_cast<const IWorkbenchWindow*>(o.GetPointer())));
 }
 
-IWorkbenchWindow::ConstPointer HandlerUtil::GetActiveWorkbenchWindowChecked(
+IWorkbenchWindow::Pointer HandlerUtil::GetActiveWorkbenchWindowChecked(
     const ExecutionEvent::ConstPointer& event)
 {
   Object::ConstPointer o = HandlerUtil::GetVariableChecked(event,
@@ -286,7 +286,7 @@ IWorkbenchWindow::ConstPointer HandlerUtil::GetActiveWorkbenchWindowChecked(
                                     ISources::ACTIVE_WORKBENCH_WINDOW_NAME(), "IWorkbenchWindow",
                                     o->GetClassName());
   }
-  return o.Cast<const IWorkbenchWindow>();
+  return IWorkbenchWindow::Pointer(const_cast<IWorkbenchWindow*>(dynamic_cast<const IWorkbenchWindow*>(o.GetPointer())));
 }
 
 ISelection::ConstPointer HandlerUtil::GetActiveMenuEditorInput(

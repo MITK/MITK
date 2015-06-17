@@ -132,3 +132,61 @@ bool mitk::PixelType::operator!=(const mitk::PixelType& rhs) const
 {
   return !(this->operator==(rhs));
 }
+
+mitk::PixelType mitk::MakePixelType(vtkImageData* vtkimagedata)
+{
+  int numOfComponents = vtkimagedata->GetNumberOfScalarComponents();
+
+  switch ( vtkimagedata->GetScalarType() )
+  {
+  case VTK_BIT:
+  case VTK_CHAR:
+    return mitk::MakePixelType<char, char>(numOfComponents);
+    break;
+
+  case VTK_UNSIGNED_CHAR:
+    return mitk::MakePixelType<unsigned char, unsigned char>(numOfComponents);
+    break;
+
+  case VTK_SHORT:
+    return mitk::MakePixelType<short, short>(numOfComponents);
+    break;
+
+  case VTK_UNSIGNED_SHORT:
+    return mitk::MakePixelType<unsigned short, unsigned short>(numOfComponents);
+    break;
+
+  case VTK_INT:
+    return mitk::MakePixelType<int, int>(numOfComponents);
+    break;
+
+  case VTK_UNSIGNED_INT:
+    return mitk::MakePixelType<unsigned int, unsigned int>(numOfComponents);
+    break;
+
+  case VTK_LONG:
+    return mitk::MakePixelType<long, long>(numOfComponents);
+    break;
+
+  case VTK_UNSIGNED_LONG:
+    return mitk::MakePixelType<unsigned long, unsigned long>(numOfComponents);
+    break;
+
+  case VTK_FLOAT:
+    return mitk::MakePixelType<float, float>(numOfComponents);
+    break;
+
+  case VTK_DOUBLE:
+    return mitk::MakePixelType<double, double>(numOfComponents);
+    break;
+
+  default:
+    break;
+  }
+
+  mitkThrow() << "tried to make pixeltype from vtkimage of unknown data type(short, char, int, ...)";
+
+}
+
+
+

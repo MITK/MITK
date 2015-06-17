@@ -50,11 +50,6 @@ public:
 
 /** Exits the application.*/
   void Stop();
-
-private:
-
-/** The WorkbenchAdvisor for the CustomViewer application.*/
-  QScopedPointer<CustomViewerWorkbenchAdvisor> wbAdvisor;
 };
 
 #endif /*CUSTOMVIEWER_H_*/

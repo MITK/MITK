@@ -53,7 +53,7 @@ struct org_blueberry_core_runtime_EXPORT ISafeRunnable: public Object
    *    the body of this runnable (i.e., in <code>run()</code>)
    * @see SafeRunner#run(ISafeRunnable)
    */
-  virtual void HandleException(const std::exception& exception) = 0;
+  virtual void HandleException(const ctkException& exception) = 0;
 
   /**
    * Runs this runnable.  Any exceptions thrown from this method will
@@ -83,7 +83,7 @@ struct SafeRunnableDelegate: public ISafeRunnable
     m_Runnable->*m_RunFunc();
   }
 
-  void HandleException(const std::exception& exception)
+  void HandleException(const ctkException& exception)
   {
     if (m_HandleExcFunc)
       m_Runnable->*m_HandleExcFunc(exception);

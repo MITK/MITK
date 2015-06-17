@@ -36,7 +36,7 @@ struct IWorkbenchPart;
 struct BERRY_UI_QT IWorkbenchPartSite : public IWorkbenchSite
 {
 
-  berryObjectMacro(berry::IWorkbenchPartSite)
+  berryObjectMacro(berry::IWorkbenchPartSite, IWorkbenchSite)
 
   ~IWorkbenchPartSite();
 

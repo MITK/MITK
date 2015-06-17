@@ -49,7 +49,6 @@ void FolderLayout::AddPlaceholder(const QString& viewId)
 
 void FolderLayout::AddView(const QString& viewId)
 {
-  pageLayout->AddShowViewShortcut(viewId);
   if (pageLayout->CheckPartInLayout(viewId))
   {
     return;

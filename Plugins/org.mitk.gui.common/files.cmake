@@ -16,6 +16,7 @@ set(SRC_CPP_FILES
   mitkIRenderWindowPartListener.cpp
   mitkIZombieViewPart.h
   mitkIZombieViewPart.cpp
+  mitkWorkbenchCommandConstants.cpp
   mitkWorkbenchUtil.cpp
 )
 

@@ -49,7 +49,7 @@ public:
    * @param in the extension registry
    * @param out the view registry
    */
-  void ReadViews(ViewRegistry* out);
+  void ReadViews(IExtensionRegistry* in, ViewRegistry* out);
 
 protected:
   /**

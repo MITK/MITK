@@ -25,6 +25,7 @@ namespace mitk{
   ImageToOpenCVImageFilter::ImageToOpenCVImageFilter()
     : m_OpenCVImage(0)
   {
+    m_sliceSelector = ImageSliceSelector::New();
   }
 
   ImageToOpenCVImageFilter::~ImageToOpenCVImageFilter()
@@ -96,6 +97,15 @@ namespace mitk{
   void ImageToOpenCVImageFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* image )
   {
     m_OpenCVImage = itk::OpenCVImageBridge::ITKImageToIplImage(image);
+  }
+
+  void ImageToOpenCVImageFilter::SetInputFromTimeSlice(Image::Pointer mitkImage, int timeStep, int slice)
+  {
+    m_sliceSelector->SetInput(mitkImage);
+    m_sliceSelector->SetSliceNr(slice);
+    m_sliceSelector->SetTimeNr(timeStep);
+    m_sliceSelector->Update();
+    this->SetImage(m_sliceSelector->GetOutput());
   }
 
 } // end namespace mitk

@@ -33,7 +33,7 @@ set(BLUEBERRY_DOXYGEN_TAGFILE_NAME ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/BlueBerry.tag
 # This is relative to the working directory of the doxygen command
 set(BLUEBERRY_DOXYGEN_STYLESHEET bb_doxygen.css)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${BLUEBERRY_DOXYGEN_STYLESHEET}
-               ${CMAKE_CURRENT_BINARY_DIR}/${BLUEBERRY_DOXYGEN_STYLESHEET} @COPYONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/${BLUEBERRY_DOXYGEN_STYLESHEET} COPYONLY)
 
 file(RELATIVE_PATH BLUEBERRY_DOXYGEN_XP_RELATIVEDIR ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/html ${BLUEBERRY_XPDOC_OUTPUT_DIR}/)
 
@@ -68,6 +68,10 @@ configure_file(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 
 find_package(Doxygen)
+# doxygen does not necessarily create the output dir if it does not exist
+if(NOT EXISTS ${BLUEBERRY_DOXYGEN_OUTPUT_DIR})
+  file(MAKE_DIRECTORY ${BLUEBERRY_DOXYGEN_OUTPUT_DIR})
+endif()
 
 add_custom_target(BlueBerryDoc
                   ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf

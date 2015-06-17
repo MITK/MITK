@@ -154,8 +154,6 @@ protected:
 
   public:
 
-    berryObjectMacro(TestWindowListener)
-
     TestWindowListener(QList<IWorkbenchWindow::Pointer>& testWindows);
 
     void SetEnabled(bool enabled);

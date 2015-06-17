@@ -35,8 +35,9 @@ class CommandContributionItemParameter;
  * View actions. The visible views are determined by user preference from the
  * Perspective Customize dialog.
  */
-class ShowViewMenu : public ContributionItem
+class ShowViewMenu : public QObject, public ContributionItem
 {
+  Q_OBJECT
 
 public:
 
@@ -59,7 +60,7 @@ public:
 
   using ContributionItem::Fill;
 
-  QAction* Fill(QMenu* menu, QAction *before);
+  void Fill(QMenu* menu, QAction *before);
 
 private:
 
@@ -67,7 +68,7 @@ private:
 
   IWorkbenchWindow* window;
 
-  //static const QString NO_TARGETS_MSG = WorkbenchMessages.Workbench_showInNoTargets;
+  static const QString NO_TARGETS_MSG;
 
   /**
    * Fills the menu with Show View actions.
@@ -78,15 +79,9 @@ private:
 
   IContributionItem::Pointer showDlgItem;
 
-//  IMenuListener menuListener = new IMenuListener() {
-//    public void menuAboutToShow(IMenuManager manager) {
-//      manager.markDirty();
-//      dirty = true;
-//    }
-//  };
-
 //  bool makeFast;
 
+  Q_SLOT void AboutToShow(IMenuManager* manager);
 
   SmartPointer<CommandContributionItemParameter> GetItem(const QString& viewId, const QString& secondaryId) const;
 

@@ -34,11 +34,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace berry {
 
-bool Command::DEBUG_COMMAND_EXECUTION = true;
+bool Command::DEBUG_COMMAND_EXECUTION = false;
 
-bool Command::DEBUG_HANDLERS = true;
+bool Command::DEBUG_HANDLERS = false;
 
-QString Command::DEBUG_HANDLERS_COMMAND_ID = "";
+QString Command::DEBUG_HANDLERS_COMMAND_ID = QString::null;
 
 
 Command::Command(const QString& id)

@@ -75,7 +75,7 @@ public:
 
 public:
 
-  berryObjectMacro(WorkbenchWindow)
+  berryObjectMacro(WorkbenchWindow, Window, IWorkbenchWindow)
 
   WorkbenchWindow(int number);
 
@@ -112,7 +112,7 @@ public:
 
   SmartPointer<IWorkbenchPage> GetActivePage() const;
 
-  SmartPointer<IWorkbenchPage> GetPage(int i) const;
+  QList<SmartPointer<IWorkbenchPage> >  GetPages() const;
 
   void SetPerspectiveExcludeList(const QStringList& v);
   QStringList GetPerspectiveExcludeList() const;
@@ -134,11 +134,11 @@ public:
    */
   MenuManager* GetMenuManager() const;
 
-  IWorkbench* GetWorkbench();
+  IWorkbench* GetWorkbench() const;
 
   IPartService* GetPartService();
 
-  ISelectionService* GetSelectionService();
+  ISelectionService* GetSelectionService() const;
 
   /**
    * @return whether the tool bar should be shown. This is only applicable if
@@ -357,8 +357,6 @@ private:
 
   /**
    * Constant indicating that all the actions bars should be filled.
-   *
-   * @since 3.0
    */
   static const ActionBarAdvisor::FillFlags FILL_ALL_ACTION_BARS;
 
@@ -367,8 +365,6 @@ private:
   /**
    * Object for configuring this workbench window. Lazily initialized to an
    * instance unique to this window.
-   *
-   * @since 3.0
    */
   mutable WorkbenchWindowConfigurer::Pointer windowConfigurer;
 

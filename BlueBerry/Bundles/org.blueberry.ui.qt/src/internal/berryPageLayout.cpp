@@ -117,8 +117,7 @@ void PageLayout::AddPart(LayoutPart::Pointer newPart,
 
 void PageLayout::AddPerspectiveShortcut(const QString& id)
 {
-  if (std::find(perspectiveShortcuts.begin(),
-      perspectiveShortcuts.end(), id) == perspectiveShortcuts.end())
+  if (!perspectiveShortcuts.contains(id))
   {
     perspectiveShortcuts.push_back(id);
   }
@@ -632,7 +631,7 @@ QHash<QString, ViewLayoutRec::Pointer> PageLayout::GetIDtoViewLayoutRecMap()
 void PageLayout::RemovePlaceholder(const QString& id)
 {
   LayoutPart::Pointer part = this->GetRefPart(id);
-  if (part->IsPlaceHolder())
+  if (part != nullptr && part->IsPlaceHolder())
   {
     ILayoutContainer::Pointer stack = this->GetFolderPart(id);
     if (stack != 0)

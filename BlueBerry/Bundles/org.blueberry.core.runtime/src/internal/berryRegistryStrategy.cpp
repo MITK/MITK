@@ -132,7 +132,8 @@ QObject* RegistryStrategy::CreateExecutableExtension(const SmartPointer<Registry
     throw CoreException(status);
   }
 
-  QString typeName = contributor->GetActualName() + "_" + className;
+  //QString typeName = contributor->GetActualName() + "_" + className;
+  QString typeName = className;
   int extensionTypeId = ExtensionType::type(typeName.toLatin1().data());
   if (extensionTypeId == 0)
   {

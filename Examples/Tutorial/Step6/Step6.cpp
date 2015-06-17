@@ -135,7 +135,7 @@ void Step6::Load(int argc, char* argv[])
       continue;
 
     // Load datanode (eg. many image formats, surface formats, etc.)
-    mitk::StandaloneDataStorage::SetOfObjects* dataNodes = mitk::IOUtil::Load(argv[i],*m_DataStorage);
+    mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[i],*m_DataStorage);
 
     if(dataNodes->empty())
     {

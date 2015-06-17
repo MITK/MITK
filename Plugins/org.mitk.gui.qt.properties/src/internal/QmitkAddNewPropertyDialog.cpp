@@ -19,10 +19,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <cassert>
 
+QmitkAddNewPropertyDialog::QmitkAddNewPropertyDialog(mitk::BaseData::Pointer baseData, QWidget* parent)
+  : QDialog(parent),
+    m_BaseData(baseData)
+{
+  this->Initialize();
+}
+
 QmitkAddNewPropertyDialog::QmitkAddNewPropertyDialog(mitk::DataNode::Pointer dataNode, mitk::BaseRenderer::Pointer renderer, QWidget* parent)
   : QDialog(parent),
     m_DataNode(dataNode),
     m_Renderer(renderer)
+{
+  this->Initialize();
+}
+
+QmitkAddNewPropertyDialog::~QmitkAddNewPropertyDialog()
+{
+}
+
+void QmitkAddNewPropertyDialog::Initialize()
 {
   m_Controls.setupUi(this);
 
@@ -36,10 +52,6 @@ QmitkAddNewPropertyDialog::QmitkAddNewPropertyDialog(mitk::DataNode::Pointer dat
   connect(m_Controls.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
   this->ShowAdequateValueWidget(types[0]);
-}
-
-QmitkAddNewPropertyDialog::~QmitkAddNewPropertyDialog()
-{
 }
 
 void QmitkAddNewPropertyDialog::AddNewProperty()
@@ -56,7 +68,14 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
     return;
   }
 
-  m_DataNode->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), this->CreateProperty(), m_Renderer);
+  if (m_BaseData.IsNotNull())
+  {
+    m_BaseData->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), this->CreateProperty());
+  }
+  else
+  {
+    m_DataNode->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), this->CreateProperty(), m_Renderer);
+  }
 
   this->accept();
 }

@@ -36,9 +36,9 @@ struct IWorkbenchWindow;
  * Example usage:
  * <pre>
  * MenuManager menu = ...;
- * IContributionItem reEdit
- *     = ContributionItemFactory.REOPEN_EDITORS.create(window);
- * menu.add(reEdit);
+ * IContributionItem::Pointer reEdit
+ *     = ContributionItemFactory::REOPEN_EDITORS->Create(window);
+ * menu->Add(reEdit);
  * </pre>
  * </p>
  * <p>
@@ -92,13 +92,41 @@ public:
    QString GetId() const;
 
    /**
+    * Workbench contribution item (id "openWindows"): A list of windows
+    * currently open in the workbench. Selecting one of the items makes the
+    * corresponding window the active window.
+    * This action dynamically maintains the list of windows.
+    */
+   static const QScopedPointer<ContributionItemFactory> OPEN_WINDOWS;
+
+   /**
     * Workbench contribution item (id "viewsShortlist"): A list of views
     * available to be opened in the window, arranged as a shortlist of
     * promising views and an "Other" subitem. Selecting
     * one of the items opens the corresponding view in the active window.
     * This action dynamically maintains the view shortlist.
     */
-   static ContributionItemFactory* const VIEWS_SHORTLIST;
+   static const QScopedPointer<ContributionItemFactory> VIEWS_SHORTLIST;
+
+   /**
+    * Workbench contribution item (id "reopenEditors"): A list of recent
+    * editors (with inputs) available to be reopened in the window. Selecting
+    * one of the items reopens the corresponding editor on its input in the
+    * active window. This action dynamically maintains the list of editors.
+    */
+   static const QScopedPointer<ContributionItemFactory> REOPEN_EDITORS;
+
+   /**
+    * Workbench contribution item (id "perspectivesShortlist"): A list of
+    * perspectives available to be opened, arranged as a shortlist of
+    * promising perspectives and an "Other" subitem. Selecting
+    * one of the items makes the corresponding perspective active. Should a
+    * new perspective need to be opened, a workbench user preference controls
+    * whether the prespective is opened in the active window or a new window.
+    * This action dynamically maintains the perspectives shortlist.
+    */
+   static const QScopedPointer<ContributionItemFactory> PERSPECTIVES_SHORTLIST;
+
 };
 
 }

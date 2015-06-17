@@ -30,11 +30,10 @@ class QmitkFileOpenActionPrivate
 {
 public:
 
-  void init ( berry::IWorkbenchWindow::Pointer window, QmitkFileOpenAction* action )
+  void init ( berry::IWorkbenchWindow* window, QmitkFileOpenAction* action )
   {
     m_Window = window;
-    action->setParent(static_cast<QWidget*>(m_Window.Lock()->GetShell()->GetControl()));
-    action->setText("&Open...");
+    action->setText("&Open File...");
     action->setToolTip("Open data files (images, surfaces,...)");
 
     QObject::connect(action, SIGNAL(triggered(bool)), action, SLOT(Run()));
@@ -80,16 +79,23 @@ public:
     return true;
   }
 
-  berry::IWorkbenchWindow::WeakPtr m_Window;
+  berry::IWorkbenchWindow* m_Window;
 };
 
 QmitkFileOpenAction::QmitkFileOpenAction(berry::IWorkbenchWindow::Pointer window)
   : QAction(0), d(new QmitkFileOpenActionPrivate)
 {
-  d->init(window, this);
+  d->init(window.GetPointer(), this);
 }
 
 QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
+  : QAction(0), d(new QmitkFileOpenActionPrivate)
+{
+  d->init(window.GetPointer(), this);
+  this->setIcon(icon);
+}
+
+QmitkFileOpenAction::QmitkFileOpenAction(const QIcon& icon, berry::IWorkbenchWindow* window)
   : QAction(0), d(new QmitkFileOpenActionPrivate)
 {
   d->init(window, this);
@@ -112,5 +118,6 @@ void QmitkFileOpenAction::Run()
     return;
 
   d->setLastFileOpenPath(fileNames.front());
-  mitk::WorkbenchUtil::LoadFiles(fileNames, d->m_Window.Lock(), d->GetOpenEditor());
+  mitk::WorkbenchUtil::LoadFiles(fileNames, berry::IWorkbenchWindow::Pointer(d->m_Window),
+                                 d->GetOpenEditor());
 }

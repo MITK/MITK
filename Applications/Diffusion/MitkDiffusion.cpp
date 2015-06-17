@@ -119,7 +119,7 @@ int main(int argc, char** argv)
   Poco::Util::MapConfiguration* diffConfig(new Poco::Util::MapConfiguration());
   if (!storageDir.isEmpty())
   {
-    diffConfig->setString(berry::Platform::ARG_STORAGE_DIR.toStdString(), storageDir.toStdString());
+    diffConfig->setString(berry::Platform::ARG_STORAGE_DIR.toStdString(), storageDir.toUtf8().constData());
   }
 
   diffConfig->setString(berry::Platform::ARG_PROVISIONING.toStdString(), provFile.toStdString());

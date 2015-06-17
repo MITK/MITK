@@ -24,11 +24,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIEvaluationContext.h>
 #include <berrySafeRunner.h>
 #include <berryAbstractContributionFactory.h>
-#include <berryAbstractGroupMarker.h>
 #include <berryObjects.h>
 #include <berryMenuUtil.h>
 #include <berryWorkbenchActionConstants.h>
 
+#include "berryAbstractGroupMarker.h"
 #include "berryAbstractMenuAdditionCacheEntry.h"
 #include "berryAlwaysEnabledExpression.h"
 #include "berryContributionItem.h"
@@ -822,7 +822,7 @@ bool WorkbenchMenuService::ProcessAdditions(IServiceLocator* serviceLocatorToUse
         restriction(restriction), mgr(mgr), cache(cache), itemsAdded(itemsAdded)
     {}
 
-    void HandleException(const std::exception&)
+    void HandleException(const ctkException&)
     {}
 
     void Run()

@@ -161,7 +161,7 @@ public:
   virtual bool IsVisible() const = 0;
   virtual void SetVisible(bool visible) = 0;
 
-  virtual QWidget* GetControl() = 0;
+  virtual QWidget* GetControl() const = 0;
 
   virtual void SetImages(const QList<QIcon>& images) = 0;
 

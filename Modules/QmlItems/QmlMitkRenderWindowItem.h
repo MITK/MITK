@@ -81,6 +81,9 @@ protected:
   virtual void mouseMoveEvent(QMouseEvent* e);
   virtual void wheelEvent(QWheelEvent* e);
 
+  virtual void keyPressEvent(QKeyEvent * e);
+  virtual void keyReleaseEvent(QKeyEvent * e);
+
 private slots:
 
 private:

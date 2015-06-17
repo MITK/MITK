@@ -285,19 +285,22 @@ void QmlMitkRenderWindowItem::mouseMoveEvent(QMouseEvent* me)
   mitk::MouseMoveEvent::Pointer mMoveEvent =
     mitk::MouseMoveEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, worldPosition, GetButtonState(me), GetModifiers(me));
 
-#if defined INTERACTION_LEGACY
-  bool modernInteractorHandledEvent =
-#endif
-  mitk::RenderWindowBase::HandleEvent(mMoveEvent.GetPointer());
-#if defined INTERACTION_LEGACY
-  if (!modernInteractorHandledEvent)
-  {
-    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(mitk::RenderWindowBase::GetRenderer(), me));
-    mitk::RenderWindowBase::mouseMoveMitkEvent(&myevent);
-  }
-#endif
+//#if defined INTERACTION_LEGACY
+//  bool modernInteractorHandledEvent =
+//#endif
+  bool isHandled = mitk::RenderWindowBase::HandleEvent(mMoveEvent.GetPointer());
+//#if defined INTERACTION_LEGACY
+//  if (!modernInteractorHandledEvent)
+//  {
+//    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(mitk::RenderWindowBase::GetRenderer(), me));
+//    mitk::RenderWindowBase::mouseMoveMitkEvent(&myevent);
+//  }
+//#endif
 
-  QVTKQuickItem::mouseMoveEvent(me);
+  if (!isHandled)
+  {
+     QVTKQuickItem::mouseMoveEvent(me);
+  }
 
 // TODO: why was this not put here initially? What is special about mouse move?
 //  if (m_ResendQtEvents)
@@ -327,6 +330,58 @@ void QmlMitkRenderWindowItem::wheelEvent(QWheelEvent *we)
 
 //  if (m_ResendQtEvents)
 //    we->ignore();
+}
+
+
+void QmlMitkRenderWindowItem::keyPressEvent(QKeyEvent * e)
+{
+//   mitk::Point2D mousePosition = GetMousePosition(me);
+//   mitk::Point3D worldPosition = mitk::RenderWindowBase::GetRenderer()->Map2DRendererPositionTo3DWorldPosition(mousePosition);
+//   mitk::MousePressEvent::Pointer mPressEvent =
+//      mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, worldPosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
+//
+//#if defined INTERACTION_LEGACY
+//   bool modernInteractorHandledEvent =
+//#endif
+//      mitk::RenderWindowBase::HandleEvent(mPressEvent.GetPointer());
+//#if defined INTERACTION_LEGACY
+//   if (!modernInteractorHandledEvent)
+//   {
+//      mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(mitk::RenderWindowBase::GetRenderer(), me));
+//      mitk::RenderWindowBase::mousePressMitkEvent(&myevent);
+//   }
+//#endif
+
+   QVTKQuickItem::keyPressEvent(e);
+
+   //  if (m_ResendQtEvents)
+   //    me->ignore();
+}
+
+
+void QmlMitkRenderWindowItem::keyReleaseEvent(QKeyEvent * e)
+{
+   //   mitk::Point2D mousePosition = GetMousePosition(me);
+   //   mitk::Point3D worldPosition = mitk::RenderWindowBase::GetRenderer()->Map2DRendererPositionTo3DWorldPosition(mousePosition);
+   //   mitk::MousePressEvent::Pointer mPressEvent =
+   //      mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, worldPosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
+   //
+   //#if defined INTERACTION_LEGACY
+   //   bool modernInteractorHandledEvent =
+   //#endif
+   //      mitk::RenderWindowBase::HandleEvent(mPressEvent.GetPointer());
+   //#if defined INTERACTION_LEGACY
+   //   if (!modernInteractorHandledEvent)
+   //   {
+   //      mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(mitk::RenderWindowBase::GetRenderer(), me));
+   //      mitk::RenderWindowBase::mousePressMitkEvent(&myevent);
+   //   }
+   //#endif
+
+   QVTKQuickItem::keyReleaseEvent(e);
+
+   //  if (m_ResendQtEvents)
+   //    me->ignore();
 }
 
 

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourModel.h"
 
 #include <itkImage.h>
+#include <vtkSmartPointer.h>
 
 namespace mitk
 {
@@ -63,7 +64,10 @@ class MitkContourModel_EXPORT ContourModelUtils : public itk::Object
     */
     static void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, mitk::Image::Pointer workingImage, int paintingPixelValue = 1 );
 
-
+    /**
+    \brief Fills a image (filledImage) into another image (resultImage) by incorporating the rules of LabelSet-Images
+    */
+    static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, mitk::Image::Pointer image, int eraseMode);
 protected:
 
     ContourModelUtils();

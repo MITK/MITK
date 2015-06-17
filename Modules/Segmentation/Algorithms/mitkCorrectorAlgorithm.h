@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 
+#define multilabelSegmentationType unsigned short
 namespace mitk
 {
 /**
@@ -51,6 +52,11 @@ class MitkSegmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
      */
     void SetContour( ContourModel* contour){this->m_Contour = contour;}
 
+    itkSetMacro(FillColor, int);
+    itkGetConstMacro(FillColor, int);
+
+    itkSetMacro(EraseColor, int);
+    itkGetConstMacro(EraseColor, int);
     /**
      * \brief Calculated difference image.
      */
@@ -76,8 +82,8 @@ class MitkSegmentation_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     // does the actual processing
     virtual void GenerateData();
 
-    bool ImprovedHeimannCorrectionAlgorithm(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic);
-    bool ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic);
+    bool ImprovedHeimannCorrectionAlgorithm(itk::Image< multilabelSegmentationType, 2 >::Pointer pic);
+    bool ModifySegment(const TSegData &segment, itk::Image< multilabelSegmentationType, 2 >::Pointer pic);
 
     Image::Pointer m_WorkingImage;
     ContourModel::Pointer m_Contour;

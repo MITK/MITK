@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 
+
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
 :ImageToImageFilter()
 {
@@ -68,9 +69,9 @@ void mitk::CorrectorAlgorithm::GenerateData()
   }
 
   Image::Pointer temporarySlice;
-  // Convert to ipMITKSegmentationTYPE (because TobiasHeimannCorrectionAlgorithm relys on that data type)
+  // Convert to multilabelSegmentationType (because TobiasHeimannCorrectionAlgorithm relys on that data type)
   {
-    itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
+    itk::Image< multilabelSegmentationType, 2 >::Pointer correctPixelTypeImage;
     CastToItkImage( m_WorkingImage, correctPixelTypeImage );
     assert (correctPixelTypeImage.IsNotNull() );
 
@@ -79,13 +80,13 @@ void mitk::CorrectorAlgorithm::GenerateData()
     // mitk/Core/DataStructures/mitkSlicedGeometry3D.cpp, 479:
     // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
     // solution here: we overwrite it with an unity matrix
-    itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
+    itk::Image< multilabelSegmentationType, 2 >::DirectionType imageDirection;
     imageDirection.SetIdentity();
     //correctPixelTypeImage->SetDirection(imageDirection);
 
     temporarySlice = this->GetOutput();
     //  temporarySlice = ImportItkImage( correctPixelTypeImage );
-    m_FillColor = 1;
+    //m_FillColor = 1;
     m_EraseColor = 0;
     ImprovedHeimannCorrectionAlgorithm(correctPixelTypeImage);
     CastToMitkImage( correctPixelTypeImage, temporarySlice );
@@ -93,7 +94,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   temporarySlice->SetTimeGeometry(originalGeometry);
 }
 
-bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
+bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(itk::Image< multilabelSegmentationType, 2 >::Pointer pic)
 {
 /*!
 Some documentation (not by the original author)
@@ -120,7 +121,6 @@ segmentation, its enclosed area it will be added to the segmentation.
 The algorithm is described in full length in Tobias Heimann's diploma thesis
 (MBI Technical Report 145, p. 37 - 40).
 */
-
   ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
 
   bool firstPointIsFillingColor = false;
@@ -193,7 +193,6 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   {
       ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice( m_WorkingImage, m_Contour, true, false );
       projectedContour->Close();
-      MITK_INFO << "blub";
       if (firstPointIsFillingColor)
       {
         ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_WorkingImage, m_EraseColor);
@@ -201,12 +200,11 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
       {
         ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_WorkingImage, m_FillColor);
       }
-      MITK_INFO << "No Blub";
   }
   return true;
 }
 
-static void ColorSegment(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor, int eraseColor)
+static void ColorSegment(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< multilabelSegmentationType, 2 >::Pointer pic, int fillColor, int eraseColor)
 {
   int colorMode = (pic->GetPixel(segment.points[0]) == fillColor);
   int color = 0;
@@ -226,9 +224,9 @@ static void ColorSegment(const mitk::CorrectorAlgorithm::TSegData &segment, itk:
     pic->SetPixel(*indexIterator, color);
   }
 }
-static itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer CloneImage(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
+static itk::Image< multilabelSegmentationType, 2 >::Pointer CloneImage(itk::Image< multilabelSegmentationType, 2 >::Pointer pic)
 {
-  typedef itk::Image< ipMITKSegmentationTYPE, 2 > ItkImageType;
+  typedef itk::Image< multilabelSegmentationType, 2 > ItkImageType;
 
   typedef itk::ImageDuplicator< ItkImageType > DuplicatorType;
   DuplicatorType::Pointer duplicator = DuplicatorType::New();
@@ -237,7 +235,7 @@ static itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer CloneImage(itk::Image< i
 
   return duplicator->GetOutput();
 }
-static itk::Index<2> GetFirstPoint(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor)
+static itk::Index<2> GetFirstPoint(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< multilabelSegmentationType, 2 >::Pointer pic, int fillColor)
 {
   int colorMode = (pic->GetPixel(segment.points[0]) == fillColor);
 
@@ -266,10 +264,10 @@ static itk::Index<2> GetFirstPoint(const mitk::CorrectorAlgorithm::TSegData &seg
   mitkThrow() << "No Starting point is found next to the curve.";
 }
 
-static std::vector<itk::Index<2> > FindSeedPoints(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor)
+static std::vector<itk::Index<2> > FindSeedPoints(const mitk::CorrectorAlgorithm::TSegData &segment, itk::Image< multilabelSegmentationType, 2 >::Pointer pic, int fillColor)
 {
-  typedef itk::Image< ipMITKSegmentationTYPE, 2 > ItkImageType;
-  typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
+  typedef itk::Image< multilabelSegmentationType, 2 > ItkImageType;
+  typedef itk::Image< multilabelSegmentationType, 2 >::Pointer ItkImagePointerType;
 
   int colorMode = (pic->GetPixel(segment.points[0]) == fillColor);
   std::vector<itk::Index<2> > seedPoints;
@@ -364,7 +362,7 @@ static std::vector<itk::Index<2> > FindSeedPoints(const mitk::CorrectorAlgorithm
   return seedPoints;
 }
 
-static int FillRegion(const std::vector<itk::Index<2> > &seedPoints, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic, int fillColor, int eraseColor)
+static int FillRegion(const std::vector<itk::Index<2> > &seedPoints, itk::Image< multilabelSegmentationType, 2 >::Pointer pic, int fillColor, int eraseColor)
 {
   int numberOfPixel = 0;
   int mode = (pic->GetPixel(seedPoints[0]) == fillColor);
@@ -405,9 +403,9 @@ static int FillRegion(const std::vector<itk::Index<2> > &seedPoints, itk::Image<
 
 
 
-static void OverwriteImage(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer source, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer target)
+static void OverwriteImage(itk::Image< multilabelSegmentationType, 2 >::Pointer source, itk::Image< multilabelSegmentationType, 2 >::Pointer target)
 {
-  typedef itk::Image< ipMITKSegmentationTYPE, 2 > ItkImageType;
+  typedef itk::Image< multilabelSegmentationType, 2 > ItkImageType;
   typedef itk::ImageRegionIterator<ItkImageType> ImageIteratorType;
 
   ImageIteratorType sourceIter(source, source->GetLargestPossibleRegion());
@@ -420,9 +418,9 @@ static void OverwriteImage(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer sour
   }
 }
 
-bool  mitk::CorrectorAlgorithm::ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic)
+bool  mitk::CorrectorAlgorithm::ModifySegment(const TSegData &segment, itk::Image< multilabelSegmentationType, 2 >::Pointer pic)
 {
-    typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
+    typedef itk::Image< multilabelSegmentationType, 2 >::Pointer ItkImagePointerType;
 
     ItkImagePointerType firstSideImage = CloneImage(pic);
     ColorSegment(segment, firstSideImage, m_FillColor, m_EraseColor);

@@ -428,6 +428,14 @@ berry::WorkbenchWindowAdvisor(configurer),
 
 QmitkExtWorkbenchWindowAdvisor::~QmitkExtWorkbenchWindowAdvisor()
 {
+    productName = QCoreApplication::applicationName();
+    viewExcludeList.push_back("org.mitk.views.viewnavigatorview");
+
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    berry::IPreferences::Pointer segmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+
+    int value = segmentationPreferencesNode->GetInt("queue size", mitk::DEF_DEQUE_SIZE);
+    mitk::LimitedLinearUndo::setDequeSize(value);
 }
 
 berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(

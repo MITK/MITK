@@ -161,7 +161,18 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
 
     if (histogram.IsNotNull())
     {
-      this->m_Controls->m_JSHistogram->ComputeHistogram(histogram.GetPointer());
+      bool closedFigure = this->m_CalculationThread->GetStatisticsUpdateSuccessFlag();
+
+      if ( closedFigure )
+      {
+        this->m_Controls->m_JSHistogram->ComputeHistogram(histogram.GetPointer());
+      }
+      //this->m_Controls->m_JSHistogram->ComputeHistogram(histogram.GetPointer());
+      /*else
+      {
+        m_Controls->m_JSHistogram->ComputeIntensityProfile(timestep, true);
+      }*/
+
 //      this->m_Controls->m_JSHistogram->SignalGraphChanged();
 
       // hacky way to make sure the protected SignalGraphChanged() is called
@@ -756,12 +767,16 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
       m_Controls->m_JSHistogram->SetImage(this->m_CalculationThread->GetStatisticsImage());
       m_Controls->m_JSHistogram->SetPlanarFigure(m_SelectedPlanarFigure);
-      m_Controls->m_JSHistogram->ComputeIntensityProfile(timeStep);
+      m_Controls->m_JSHistogram->ComputeIntensityProfile(timeStep, true);
+      //m_Controls->m_JSHistogram->ComputeIntensityProfile(timeStep);
       m_Controls->m_lineRadioButton->setEnabled(false);
       m_Controls->m_barRadioButton->setEnabled(false);
       m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
 //      m_Controls->m_HistogramBinSizeLabel->setEnabled(false);
+
+      this->FillLinearProfileStatisticsTableView( this->m_CalculationThread->GetStatisticsImage() );
+
       std::stringstream message;
       message << "<font color='red'>Only linegraph available for an intensity profile!</font>";
       m_Controls->m_InfoLabel->setText(message.str().c_str());
@@ -914,6 +929,56 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
 
   this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );*/
 }
+
+void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk::Image *image )
+{
+  this->m_Controls->m_StatisticsTable->setColumnCount(1);
+  this->m_Controls->m_StatisticsTable->horizontalHeader()->setVisible(false);
+
+  int decimals = 2;
+
+  mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();
+  mitk::PixelType floatPix = mitk::MakeScalarPixelType< float >();
+  if (image->GetPixelType()==doublePix || image->GetPixelType()==floatPix)
+  {
+    decimals = 5;
+  }
+
+  mitk::ImageStatisticsCalculator::Statistics &stats = m_Controls->m_JSHistogram->GetStatistics();
+
+  this->m_Controls->m_StatisticsTable->setItem( 0, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetMean(), 0, 'f', decimals) ) );
+
+  double stdDev = sqrt( stats.GetVariance() );
+  this->m_Controls->m_StatisticsTable->setItem( 1, 0, new QTableWidgetItem( QString("%1").arg( stdDev, 0, 'f', decimals) ) );
+
+  double rms = stats.GetRMS();
+  this->m_Controls->m_StatisticsTable->setItem( 2, 0, new QTableWidgetItem(
+    QString("%1").arg( rms, 0, 'f', decimals) ) );
+
+  QString max; max.append(QString("%1").arg(stats.GetMax(), 0, 'f', decimals));
+
+  this->m_Controls->m_StatisticsTable->setItem( 3, 0, new QTableWidgetItem( max ) );
+
+  QString min; min.append(QString("%1").arg(stats.GetMin(), 0, 'f', decimals));
+
+  this->m_Controls->m_StatisticsTable->setItem( 4, 0, new QTableWidgetItem( min ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 5, 0, new QTableWidgetItem( QString("%1").arg(stats.GetN()) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 6, 0, new QTableWidgetItem( "NA" ) );
+
+  this->m_Controls->m_StatisticsTable->resizeColumnsToContents();
+  int height = STAT_TABLE_BASE_HEIGHT;
+
+  if (this->m_Controls->m_StatisticsTable->horizontalHeader()->isVisible())
+    height += this->m_Controls->m_StatisticsTable->horizontalHeader()->height();
+
+  if (this->m_Controls->m_StatisticsTable->horizontalScrollBar()->isVisible())
+    height += this->m_Controls->m_StatisticsTable->horizontalScrollBar()->height();
+
+  this->m_Controls->m_StatisticsTable->setMinimumHeight(height);
+  }
 
 void QmitkImageStatisticsView::InvalidateStatisticsTableView()
 {

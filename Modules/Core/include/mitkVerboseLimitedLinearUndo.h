@@ -47,8 +47,6 @@ public:
   typedef std::pair<int,std::string> StackDescriptionItem;
   typedef std::vector<StackDescriptionItem> StackDescription; /// a list of pairs (int,string), representing a stack with ObjectEventIDs and descriptions
 
-  virtual bool SetOperationEvent(UndoStackItem* undoStackItem) override;
-
   virtual StackDescription GetUndoDescriptions();
   virtual StackDescription GetRedoDescriptions();
 

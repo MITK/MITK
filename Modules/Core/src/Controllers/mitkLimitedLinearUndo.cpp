@@ -23,7 +23,7 @@ unsigned int mitk::LimitedLinearUndo::m_dequeSize;
 
 mitk::LimitedLinearUndo::LimitedLinearUndo()
 {
-  m_dequeSize = MAX_DEQUE_SIZE;
+  m_dequeSize = DEF_DEQUE_SIZE;
 }
 
 mitk::LimitedLinearUndo::~LimitedLinearUndo()

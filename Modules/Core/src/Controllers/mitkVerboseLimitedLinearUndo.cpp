@@ -26,24 +26,6 @@ mitk::VerboseLimitedLinearUndo::~VerboseLimitedLinearUndo()
 {
 }
 
-bool mitk::VerboseLimitedLinearUndo::SetOperationEvent(UndoStackItem* undoStackItem)
-{
-  if (!undoStackItem) return false;
-
-  // clear the redolist, if a new operation is saved
-  if (!m_RedoList.empty())
-  {
-    this->ClearList(&m_RedoList);
-    InvokeEvent( RedoEmptyEvent() );
-  }
-
-  m_UndoList.push_back(undoStackItem);
-
-  InvokeEvent( UndoNotEmptyEvent() );
-
-  return true;
-}
-
 mitk::VerboseLimitedLinearUndo::StackDescription mitk::VerboseLimitedLinearUndo::GetUndoDescriptions()
 {
   mitk::VerboseLimitedLinearUndo::StackDescription descriptions;

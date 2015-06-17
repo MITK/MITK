@@ -944,24 +944,6 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
     decimals = 5;
   }
 
-  /*if (s[ts].GetMaxIndex().size()==3)
-  {
-    mitk::Point3D index, max, min;
-    index[0] = s[t].GetMaxIndex()[0];
-    index[1] = s[t].GetMaxIndex()[1];
-    index[2] = s[t].GetMaxIndex()[2];
-    m_SelectedImage->GetGeometry()->IndexToWorld(index, max);
-    this->m_WorldMaxList.push_back(max);
-    index[0] = s[t].GetMinIndex()[0];
-    index[1] = s[t].GetMinIndex()[1];
-    index[2] = s[t].GetMinIndex()[2];
-    m_SelectedImage->GetGeometry()->IndexToWorld(index, min);
-    this->m_WorldMinList.push_back(min);
-  }*/
-
-
-  /*this->m_Controls->m_StatisticsTable->setItem( 0, t, new QTableWidgetItem(
-    QString("%1").arg(s[t].GetMean(), 0, 'f', decimals) ) );*/
   mitk::ImageStatisticsCalculator::Statistics &stats = m_Controls->m_JSHistogram->GetStatistics();
 
   this->m_Controls->m_StatisticsTable->setItem( 0, 0, new QTableWidgetItem(
@@ -969,58 +951,22 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
 
   double stdDev = sqrt( stats.GetVariance() );
   this->m_Controls->m_StatisticsTable->setItem( 1, 0, new QTableWidgetItem( QString("%1").arg( stdDev, 0, 'f', decimals) ) );
-  /*this->m_Controls->m_StatisticsTable->setItem( 1, 0, new QTableWidgetItem(
-    QString("%1").arg(stats.GetSigma(), 0, 'f', decimals) ) );*/
 
   double rms = stats.GetRMS();
   this->m_Controls->m_StatisticsTable->setItem( 2, 0, new QTableWidgetItem(
     QString("%1").arg( rms, 0, 'f', decimals) ) );
 
-  //this->m_Controls->m_StatisticsTable->setItem( 2, 0, new QTableWidgetItem( "NA" ) );
-
   QString max; max.append(QString("%1").arg(stats.GetMax(), 0, 'f', decimals));
-  /*max += " (";
-  for (int i=0; i<s[t].GetMaxIndex().size(); i++)
-  {
-    max += QString::number(s[t].GetMaxIndex()[i]);
-    if (i<s[t].GetMaxIndex().size()-1)
-      max += ",";
-  }
-  max += ")";*/
+
   this->m_Controls->m_StatisticsTable->setItem( 3, 0, new QTableWidgetItem( max ) );
 
   QString min; min.append(QString("%1").arg(stats.GetMin(), 0, 'f', decimals));
-  /*min += " (";
-  for (int i=0; i<s[t].GetMinIndex().size(); i++)
-  {
-    min += QString::number(s[t].GetMinIndex()[i]);
-    if (i<s[t].GetMinIndex().size()-1)
-      min += ",";
-  }
-  min += ")";*/
+
   this->m_Controls->m_StatisticsTable->setItem( 4, 0, new QTableWidgetItem( min ) );
 
-  //this->m_Controls->m_StatisticsTable->setItem( 5, 0, new QTableWidgetItem( "NA" ) );
   this->m_Controls->m_StatisticsTable->setItem( 5, 0, new QTableWidgetItem( QString("%1").arg(stats.GetN()) ) );
 
   this->m_Controls->m_StatisticsTable->setItem( 6, 0, new QTableWidgetItem( "NA" ) );
-
-  /*this->m_Controls->m_StatisticsTable->setItem( 5, t, new QTableWidgetItem(
-    QString("%1").arg(stats.GetN()) ) );
-
-  const mitk::BaseGeometry *geometry = image->GetGeometry();
-  if ( geometry != NULL )
-  {
-    const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
-    double volume = spacing[0] * spacing[1] * spacing[2] * (double) stats.GetN();
-    this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
-      QString("%1").arg(volume, 0, 'f', decimals) ) );
-  }
-  else
-  {
-    this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
-      "NA" ) );
-  }*/
 
   this->m_Controls->m_StatisticsTable->resizeColumnsToContents();
   int height = STAT_TABLE_BASE_HEIGHT;
@@ -1032,15 +978,6 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
     height += this->m_Controls->m_StatisticsTable->horizontalScrollBar()->height();
 
   this->m_Controls->m_StatisticsTable->setMinimumHeight(height);
-
-  // make sure the current timestep's column is highlighted (and the correct histogram is displayed)
-  /*unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->
-    GetPos();
-  mitk::SliceNavigationController::GeometryTimeEvent timeEvent(this->m_SelectedImage->GetTimeGeometry(),
-    t);
-  this->OnTimeChanged(timeEvent);*/
-
-  //t = std::min(image->GetTimeSteps() - 1, t);
   }
 
 void QmitkImageStatisticsView::InvalidateStatisticsTableView()

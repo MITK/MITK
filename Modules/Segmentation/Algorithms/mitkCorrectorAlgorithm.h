@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSegmentationExports.h>
 #include "mitkContourModel.h"
 #include "ipSegmentation.h"
+#include <mitkLabel.h>
 
 #include <itkImage.h>
 
@@ -45,6 +46,8 @@ class MITKSEGMENTATION_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     mitkClassMacro(CorrectorAlgorithm, ImageToImageFilter);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
+
+    typedef mitk::Label::PixelType DefaultSegmentationDataType;
 
     /**
      * \brief User drawn contour
@@ -76,8 +79,8 @@ class MITKSEGMENTATION_EXPORT CorrectorAlgorithm : public ImageToImageFilter
     // does the actual processing
     virtual void GenerateData() override;
 
-    bool ImprovedHeimannCorrectionAlgorithm(itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic);
-    bool ModifySegment(const TSegData &segment, itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer pic);
+    bool ImprovedHeimannCorrectionAlgorithm(itk::Image< DefaultSegmentationDataType, 2 >::Pointer pic);
+    bool ModifySegment(const TSegData &segment, itk::Image< DefaultSegmentationDataType, 2 >::Pointer pic);
 
     Image::Pointer m_WorkingImage;
     ContourModel::Pointer m_Contour;

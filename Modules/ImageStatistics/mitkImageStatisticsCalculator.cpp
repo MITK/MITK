@@ -127,6 +127,8 @@ namespace mitk
     this->SetVariance( other.GetVariance() );
     this->SetKurtosis( other.GetKurtosis() );
     this->SetSkewness( other.GetSkewness() );
+    this->SetUniformity( other.GetUniformity() );
+    this->SetEntropy( other.GetEntropy() );
     this->SetSigma( other.GetSigma() );
     this->SetRMS( other.GetRMS() );
     this->SetMaxIndex( other.GetMaxIndex() );
@@ -213,6 +215,8 @@ namespace mitk
 
     SetSkewness( 0.0 );
     SetKurtosis( 0.0 );
+    SetUniformity( 0.0 );
+    SetEntropy( 0.0 );
 
     vnl_vector<int> zero;
     zero.set_size(dimension);
@@ -277,6 +281,8 @@ namespace mitk
     this->SetHotspotIndex( other.GetHotspotIndex() );
     this->SetSkewness( other.GetSkewness() );
     this->SetKurtosis( other.GetKurtosis() );
+    this->SetUniformity( other.GetUniformity() );
+    this->SetEntropy( other.GetEntropy() );
 
 
     delete this->m_HotspotStatistics;
@@ -1468,6 +1474,8 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
         statistics.SetSigma(labelStatisticsFilter->GetSigma( *it ));
         statistics.SetSkewness(labelStatisticsFilter->GetSkewness( *it ));
         statistics.SetKurtosis(labelStatisticsFilter->GetKurtosis( *it ));
+        statistics.SetUniformity( labelStatisticsFilter->GetUniformity( *it ));
+        statistics.SetEntropy( labelStatisticsFilter->GetEntropy( *it ));
         statistics.SetRMS(sqrt( statistics.GetMean() * statistics.GetMean()
           + statistics.GetSigma() * statistics.GetSigma() ));
 

@@ -63,6 +63,8 @@ namespace itk
       {
         m_Kurtosis = 0.0;
         m_Skewness = 0.0;
+        m_Entropy = 0;
+        m_Uniformity = 0;
       };
 
       ~CoefficientsClass(){};
@@ -70,13 +72,19 @@ namespace itk
       /* the new member coefficients*/
       RealType m_Kurtosis;
       RealType m_Skewness;
-
+      RealType m_Entropy;
+      RealType m_Uniformity;
     };
 
 
     /*getter method for the new coefficients*/
     RealType GetSkewness(LabelPixelType label) const;
     RealType GetKurtosis(LabelPixelType label) const;
+    RealType GetUniformity( LabelPixelType label) const;
+    RealType GetEntropy( LabelPixelType label) const;
+
+    std::list< int>  GetRelevantlabels() const;
+    bool             GetMaskingNonEmpty() const;
 
   protected:
 
@@ -90,20 +98,25 @@ namespace itk
     /**
     * brief Calls AfterThreadedGenerateData() of the superclass and ComputeSkewnessAndKurtosis().
     */
+    void ComputeSkewnessAndKurtosis();
     void AfterThreadedGenerateData();
+    void ComputeEntropyAndUniformity();
+    void CalculateSettingsForLabels();
+
 
     /**
     * \brief Calculate Skewness and Kurtosis.
     *
     * This method will calculate the new coefficients with sigma and mean value of the threaded generate data of the base class.
     */
-    void ComputeSkewnessAndKurtosis();
+
 
 
   private:
 
     CoefficientsMap         m_LabelStatisticsCoefficients;
-
+    std::list< int>         m_relevantLabels;
+    bool                    m_maskNonEmpty;
 
   }; // end of class
 

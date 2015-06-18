@@ -30,7 +30,7 @@ public:
   QmitkWelcomePerspective() {}
   ~QmitkWelcomePerspective() {}
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/);
+  void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/) override;
 };
 
 #endif /* QMITKWelcomePERSPECTIVE_H_ */

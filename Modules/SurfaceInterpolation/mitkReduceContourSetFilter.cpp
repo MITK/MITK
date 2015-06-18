@@ -64,7 +64,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
 
     existingPolys->InitTraversal();
 
-    vtkIdType* cell (NULL);
+    vtkIdType* cell (nullptr);
     vtkIdType cellSize (0);
 
     for( existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
@@ -364,7 +364,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection (vtkIdType* currentCell,
     vtkSmartPointer<vtkCellArray> polygonArray = poly->GetPolys();
     polygonArray->InitTraversal();
     vtkIdType anotherInputPolygonSize (0);
-    vtkIdType* anotherInputPolygonIDs(NULL);
+    vtkIdType* anotherInputPolygonIDs(nullptr);
 
     /*
     The procedure is:

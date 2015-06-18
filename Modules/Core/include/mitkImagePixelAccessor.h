@@ -50,7 +50,7 @@ protected:
   ImagePixelAccessor(ImageConstPointer iP, const mitk::ImageDataItem* iDI)
     : m_ImageDataItem(iDI)
   {
-    if(iDI == NULL)
+    if(iDI == nullptr)
     {
         m_ImageDataItem = iP->GetChannelData();
     }
@@ -65,7 +65,7 @@ protected:
   void CheckData(const Image* image)
   {
     // Check if Dimensions are correct
-    if(m_ImageDataItem == NULL)
+    if(m_ImageDataItem == nullptr)
     {
       if(image->GetDimension() != VDimension)
       {

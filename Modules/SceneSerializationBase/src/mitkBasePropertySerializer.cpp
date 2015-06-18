@@ -29,11 +29,11 @@ TiXmlElement* mitk::BasePropertySerializer::Serialize()
   MITK_INFO << this->GetNameOfClass()
            << " is asked to serialize an object " << (const void*) this->m_Property;
 
-  return NULL;
+  return nullptr;
 }
 
 mitk::BaseProperty::Pointer mitk::BasePropertySerializer::Deserialize(TiXmlElement*)
 {
   MITK_ERROR << this->GetNameOfClass() << " is asked to deserialize an object but has no implementation. This is bad.";
-  return NULL;
+  return nullptr;
 }

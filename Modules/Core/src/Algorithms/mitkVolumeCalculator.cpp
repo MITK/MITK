@@ -45,7 +45,7 @@ void mitk::VolumeCalculator::InternalCompute(const itk::Image< TPixel, VImageDim
 }
 
 mitk::VolumeCalculator::VolumeCalculator()
-: m_Image(NULL),
+: m_Image(nullptr),
   m_Threshold(0),
   m_Volume(0)
 {

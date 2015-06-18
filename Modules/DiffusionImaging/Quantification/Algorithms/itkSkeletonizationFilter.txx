@@ -165,7 +165,7 @@ namespace itk
       ix[0]=x; ix[1]=y; ix[2]=z;
 
       // Find the vector that occured most
-      int* localsum = new int[27];
+      auto  localsum = new int[27];
       int localmax=0, xxx, yyy, zzz;
 
       for(int zz=0; zz<27; zz++) localsum[zz]=0;

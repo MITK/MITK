@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //==== Header information ====
 const char* mitk::ConnectomicsNetworkDefinitions::XML_CONNECTOMICS_FILE = "connectomics_network_file" ;
 const char* mitk::ConnectomicsNetworkDefinitions::XML_FILE_VERSION = "file_version" ;
-const char* mitk::ConnectomicsNetworkDefinitions::VERSION_STRING = "0.1" ;
+const char* mitk::ConnectomicsNetworkDefinitions::VERSION_STRING = "0.2" ;
 const char* mitk::ConnectomicsNetworkDefinitions::ASCII_FILE = "ascii_file" ;
 const char* mitk::ConnectomicsNetworkDefinitions::FILE_NAME = "file_name" ;
 
@@ -62,3 +62,4 @@ const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_ID = "e_id";
 const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_SOURCE_ID = "e_s_id";
 const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_TARGET_ID = "e_t_id";
 const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_WEIGHT_ID = "e_weight";
+const char* mitk::ConnectomicsNetworkDefinitions::XML_EDGE_DOUBLE_WEIGHT_ID = "e_double_weight";

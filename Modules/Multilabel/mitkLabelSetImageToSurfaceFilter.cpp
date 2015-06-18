@@ -67,7 +67,7 @@ const mitk::Image *mitk::LabelSetImageToSurfaceFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
-    return 0;
+    return nullptr;
   }
 
   return static_cast<const mitk::Image * >( this->ProcessObject::GetInput(0) );

@@ -34,20 +34,20 @@ class DoublePropertySerializer : public BasePropertySerializer
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize()
+    virtual TiXmlElement* Serialize() override
     {
       if (const DoubleProperty* prop = dynamic_cast<const DoubleProperty*>(m_Property.GetPointer()))
       {
-        TiXmlElement* element = new TiXmlElement("double");
+        auto  element = new TiXmlElement("double");
         element->SetDoubleAttribute("value", prop->GetValue());
         return element;
       }
-      else return NULL;
+      else return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
 
       double d;
       if ( element->QueryDoubleAttribute( "value", &d ) == TIXML_SUCCESS )
@@ -56,7 +56,7 @@ class DoublePropertySerializer : public BasePropertySerializer
       }
       else
       {
-        return NULL;
+        return nullptr;
       }
     }
 

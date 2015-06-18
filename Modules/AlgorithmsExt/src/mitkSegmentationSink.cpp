@@ -97,7 +97,7 @@ DataNode* SegmentationSink::LookForPointerTargetBelowGroupNode(const char* name)
     return m_DataStorage->GetNamedDerivedNode(name, groupNode, true);
   }
 
-  return NULL;
+  return nullptr;
 
 }
 

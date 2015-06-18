@@ -123,9 +123,9 @@ namespace mitk {
 
     virtual ~ImageLiveWireContourModelFilter();
 
-    void GenerateOutputInformation() {};
+    void GenerateOutputInformation() override {};
 
-    void GenerateData();
+    void GenerateData() override;
 
     void UpdateLiveWire();
 

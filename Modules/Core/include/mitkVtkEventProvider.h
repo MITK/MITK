@@ -39,8 +39,8 @@ class MITKCORE_EXPORT vtkEventProvider : public vtkInteractorObserver
     vtkTypeMacro(vtkEventProvider,vtkInteractorObserver);
 
     // Satisfy the superclass API. Enable/disable listening for events.
-    virtual void SetEnabled(int);
-    virtual void SetInteractor(vtkRenderWindowInteractor* iren);
+    virtual void SetEnabled(int) override;
+    virtual void SetInteractor(vtkRenderWindowInteractor* iren) override;
 
     // Interface to MITK
     virtual void SetMitkRenderWindow(mitk::RenderWindow* renWin);

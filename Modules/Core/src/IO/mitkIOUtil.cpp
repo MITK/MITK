@@ -294,7 +294,7 @@ struct IOUtil::Impl
       : m_Options(options)
     {}
 
-    virtual bool operator()(LoadInfo& loadInfo)
+    virtual bool operator()(LoadInfo& loadInfo) override
     {
       IFileReader* reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
       if (reader)
@@ -314,7 +314,7 @@ struct IOUtil::Impl
       : m_Options(options)
     {}
 
-    virtual bool operator()(SaveInfo& saveInfo)
+    virtual bool operator()(SaveInfo& saveInfo) override
     {
       IFileWriter* writer = saveInfo.m_WriterSelector.GetSelected().GetWriter();
       if (writer)
@@ -535,10 +535,9 @@ DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::vector<std::string>& 
 {
   DataStorage::SetOfObjects::Pointer nodeResult = DataStorage::SetOfObjects::New();
   std::vector<LoadInfo> loadInfos;
-  for (std::vector<std::string>::const_iterator iter = paths.begin(), iterEnd = paths.end();
-       iter != iterEnd; ++iter)
+  for (auto loadInfo : paths)
   {
-    LoadInfo loadInfo(*iter);
+
     loadInfos.push_back(loadInfo);
   }
   std::string errMsg = Load(loadInfos, nodeResult, &storage, NULL);
@@ -553,10 +552,9 @@ std::vector<BaseData::Pointer> IOUtil::Load(const std::vector<std::string>& path
 {
   std::vector<BaseData::Pointer> result;
   std::vector<LoadInfo> loadInfos;
-  for (std::vector<std::string>::const_iterator iter = paths.begin(), iterEnd = paths.end();
-       iter != iterEnd; ++iter)
+  for (auto loadInfo : paths)
   {
-    LoadInfo loadInfo(*iter);
+
     loadInfos.push_back(loadInfo);
   }
   std::string errMsg = Load(loadInfos, NULL, NULL, NULL);
@@ -659,20 +657,19 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
 
   std::map<std::string, FileReaderSelector::Item> usedReaderItems;
 
-  for(std::vector<LoadInfo>::iterator infoIter = loadInfos.begin(),
-      infoIterEnd = loadInfos.end(); infoIter != infoIterEnd; ++infoIter)
+  for(auto & loadInfo : loadInfos)
   {
-    std::vector<FileReaderSelector::Item> readers = infoIter->m_ReaderSelector.Get();
+    std::vector<FileReaderSelector::Item> readers = loadInfo.m_ReaderSelector.Get();
 
     if (readers.empty())
     {
-      if (!itksys::SystemTools::FileExists(infoIter->m_Path.c_str()))
+      if (!itksys::SystemTools::FileExists(loadInfo.m_Path.c_str()))
       {
-        errMsg += "File '" + infoIter->m_Path + "' does not exist\n";
+        errMsg += "File '" + loadInfo.m_Path + "' does not exist\n";
       }
       else
       {
-        errMsg += "No reader available for '" + infoIter->m_Path + "'\n";
+        errMsg += "No reader available for '" + loadInfo.m_Path + "'\n";
       }
       continue;
     }
@@ -680,7 +677,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
     bool callOptionsCallback = readers.size() > 1 || !readers.front().GetReader()->GetOptions().empty();
 
     // check if we already used a reader which should be re-used
-    std::vector<MimeType> currMimeTypes = infoIter->m_ReaderSelector.GetMimeTypes();
+    std::vector<MimeType> currMimeTypes = loadInfo.m_ReaderSelector.GetMimeTypes();
     std::string selectedMimeType;
     for (std::vector<MimeType>::const_iterator mimeTypeIter = currMimeTypes.begin(),
          mimeTypeIterEnd = currMimeTypes.end(); mimeTypeIter != mimeTypeIterEnd; ++mimeTypeIter)
@@ -702,8 +699,8 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
             // okay, we used the same reader already, re-use its options
             selectedMimeType = mimeTypeIter->GetName();
             callOptionsCallback = false;
-            infoIter->m_ReaderSelector.Select(oldSelectedItemIter->second.GetServiceId());
-            infoIter->m_ReaderSelector.GetSelected().GetReader()->SetOptions(
+            loadInfo.m_ReaderSelector.Select(oldSelectedItemIter->second.GetServiceId());
+            loadInfo.m_ReaderSelector.GetSelected().GetReader()->SetOptions(
                   oldSelectedItemIter->second.GetReader()->GetOptions());
             break;
           }
@@ -714,23 +711,23 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
 
     if (callOptionsCallback && optionsCallback)
     {
-      callOptionsCallback = (*optionsCallback)(*infoIter);
-      if (!callOptionsCallback && !infoIter->m_Cancel)
+      callOptionsCallback = (*optionsCallback)(loadInfo);
+      if (!callOptionsCallback && !loadInfo.m_Cancel)
       {
         usedReaderItems.erase(selectedMimeType);
-        FileReaderSelector::Item selectedItem = infoIter->m_ReaderSelector.GetSelected();
+        FileReaderSelector::Item selectedItem = loadInfo.m_ReaderSelector.GetSelected();
         usedReaderItems.insert(std::make_pair(selectedItem.GetMimeType().GetName(),
                                               selectedItem));
       }
     }
 
-    if (infoIter->m_Cancel)
+    if (loadInfo.m_Cancel)
     {
       errMsg += "Reading operation(s) cancelled.";
       break;
     }
 
-    IFileReader* reader = infoIter->m_ReaderSelector.GetSelected().GetReader();
+    IFileReader* reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
     if (reader == NULL)
     {
       errMsg += "Unexpected NULL reader.";
@@ -771,24 +768,24 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
           continue;
         }
 
-        mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(infoIter->m_Path);
+        mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(loadInfo.m_Path);
         data->SetProperty("path", pathProp);
 
-        infoIter->m_Output.push_back(data);
+        loadInfo.m_Output.push_back(data);
         if (nodeResult)
         {
           nodeResult->push_back(nodeIter->Value());
         }
       }
 
-      if (infoIter->m_Output.empty() || (nodeResult && nodeResult->Size() == 0))
+      if (loadInfo.m_Output.empty() || (nodeResult && nodeResult->Size() == 0))
       {
-        errMsg += "Unknown read error occurred reading " + infoIter->m_Path;
+        errMsg += "Unknown read error occurred reading " + loadInfo.m_Path;
       }
     }
     catch (const std::exception& e)
     {
-      errMsg += "Exception occured when reading file " + infoIter->m_Path + ":\n" + e.what() + "\n\n";
+      errMsg += "Exception occured when reading file " + loadInfo.m_Path + ":\n" + e.what() + "\n\n";
     }
     mitk::ProgressBar::GetInstance()->Progress(2);
     --filesToRead;
@@ -953,12 +950,11 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
 
   std::set<SaveInfo> usedSaveInfos;
 
-  for (std::vector<SaveInfo>::iterator infoIter = saveInfos.begin(),
-       infoIterEnd = saveInfos.end(); infoIter != infoIterEnd; ++infoIter)
+  for (auto & saveInfo : saveInfos)
   {
-    const std::string baseDataType = infoIter->m_BaseData->GetNameOfClass();
+    const std::string baseDataType = saveInfo.m_BaseData->GetNameOfClass();
 
-    std::vector<FileWriterSelector::Item> writers = infoIter->m_WriterSelector.Get();
+    std::vector<FileWriterSelector::Item> writers = saveInfo.m_WriterSelector.Get();
 
     // Error out if no compatible Writer was found
     if (writers.empty())
@@ -971,7 +967,7 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
 
     // check if we already used a writer for this base data type
     // which should be re-used
-    std::set<SaveInfo>::const_iterator oldSaveInfoIter = usedSaveInfos.find(*infoIter);
+    std::set<SaveInfo>::const_iterator oldSaveInfoIter = usedSaveInfos.find(saveInfo);
     if (oldSaveInfoIter != usedSaveInfos.end())
     {
       // we previously saved a base data object of the same data with the same mime-type,
@@ -987,8 +983,8 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
         {
           // okay, we used the same writer already, re-use its options
           callOptionsCallback = false;
-          infoIter->m_WriterSelector.Select(oldSaveInfoIter->m_WriterSelector.GetSelectedId());
-          infoIter->m_WriterSelector.GetSelected().GetWriter()->SetOptions(
+          saveInfo.m_WriterSelector.Select(oldSaveInfoIter->m_WriterSelector.GetSelectedId());
+          saveInfo.m_WriterSelector.GetSelected().GetWriter()->SetOptions(
                 oldSelectedItem.GetWriter()->GetOptions());
           break;
         }
@@ -997,21 +993,21 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
 
     if (callOptionsCallback && optionsCallback)
     {
-      callOptionsCallback = (*optionsCallback)(*infoIter);
-      if (!callOptionsCallback && !infoIter->m_Cancel)
+      callOptionsCallback = (*optionsCallback)(saveInfo);
+      if (!callOptionsCallback && !saveInfo.m_Cancel)
       {
-        usedSaveInfos.erase(*infoIter);
-        usedSaveInfos.insert(*infoIter);
+        usedSaveInfos.erase(saveInfo);
+        usedSaveInfos.insert(saveInfo);
       }
     }
 
-    if (infoIter->m_Cancel)
+    if (saveInfo.m_Cancel)
     {
       errMsg += "Writing operation(s) cancelled.";
       break;
     }
 
-    IFileWriter* writer = infoIter->m_WriterSelector.GetSelected().GetWriter();
+    IFileWriter* writer = saveInfo.m_WriterSelector.GetSelected().GetWriter();
     if (writer == NULL)
     {
       errMsg += "Unexpected NULL writer.";
@@ -1021,12 +1017,12 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
     // Do the actual writing
     try
     {
-      writer->SetOutputLocation(infoIter->m_Path);
+      writer->SetOutputLocation(saveInfo.m_Path);
       writer->Write();
     }
     catch(const std::exception& e)
     {
-      errMsg += std::string("Exception occurred when writing to ") + infoIter->m_Path + ":\n" + e.what() + "\n";
+      errMsg += std::string("Exception occurred when writing to ") + saveInfo.m_Path + ":\n" + e.what() + "\n";
     }
     mitk::ProgressBar::GetInstance()->Progress(2);
     --filesToWrite;

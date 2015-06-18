@@ -31,7 +31,7 @@ namespace mitk
     ~ExportMitkVisitor();
 
     using sofa::simulation::Visitor::processNodeTopDown;
-    Result processNodeTopDown(sofa::simulation::Node* node);
+    Result processNodeTopDown(sofa::simulation::Node* node) override;
 
   private:
     ExportMitkVisitor(const ExportMitkVisitor&);

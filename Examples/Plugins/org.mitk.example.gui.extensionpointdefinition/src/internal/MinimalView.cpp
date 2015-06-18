@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string MinimalView::VIEW_ID = "org.mitk.views.minimalview";
 
-MinimalView::MinimalView() : m_Parent(0)
+MinimalView::MinimalView() : m_Parent(nullptr)
 {
 }
 
@@ -32,7 +32,7 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
   m_Controls.setupUi(parent);
 
-  QVBoxLayout* layout = new QVBoxLayout(m_Controls.m_ButtonContainer);
+  auto  layout = new QVBoxLayout(m_Controls.m_ButtonContainer);
   //! [Collect extensions through registry]
   QList<ChangeTextDescriptor::Pointer> changeTexts = m_Registry.GetChangeTexts();
   foreach(const ChangeTextDescriptor::Pointer& changeText, changeTexts)

@@ -37,7 +37,7 @@ public:
     return AbstractFileReader::GetConfidenceLevel();
   }
 
-  virtual ConfidenceLevel GetConfidenceLevel() const
+  virtual ConfidenceLevel GetConfidenceLevel() const override
   {
     return this->GetReaderConfidenceLevel();
   }
@@ -52,7 +52,7 @@ protected:
 private:
 
   virtual IFileReader* ReaderClone() const = 0;
-  IFileReader* Clone() const { return ReaderClone(); }
+  IFileReader* Clone() const override { return ReaderClone(); }
 };
 
 struct AbstractFileIOWriter : public AbstractFileWriter
@@ -62,7 +62,7 @@ struct AbstractFileIOWriter : public AbstractFileWriter
     return AbstractFileWriter::GetConfidenceLevel();
   }
 
-  virtual ConfidenceLevel GetConfidenceLevel() const
+  virtual ConfidenceLevel GetConfidenceLevel() const override
   {
     return this->GetWriterConfidenceLevel();
   }
@@ -78,7 +78,7 @@ protected:
 private:
 
   virtual IFileWriter* WriterClone() const = 0;
-  IFileWriter* Clone() const { return WriterClone(); }
+  IFileWriter* Clone() const override { return WriterClone(); }
 };
 
 #endif // DOXYGEN_SKIP
@@ -104,9 +104,9 @@ public:
   void SetWriterOptions(const Options& options);
   void SetWriterOption(const std::string& name, const us::Any& value);
 
-  virtual ConfidenceLevel GetReaderConfidenceLevel() const;
+  virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
-  virtual ConfidenceLevel GetWriterConfidenceLevel() const;
+  virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   std::pair<us::ServiceRegistration<IFileReader>, us::ServiceRegistration<IFileWriter> >
   RegisterService(us::ModuleContext* context = us::GetModuleContext());
@@ -174,8 +174,8 @@ private:
 
   virtual AbstractFileIO* IOClone() const = 0;
 
-  virtual IFileReader* ReaderClone() const;
-  virtual IFileWriter* WriterClone() const;
+  virtual IFileReader* ReaderClone() const override;
+  virtual IFileWriter* WriterClone() const override;
 
 };
 

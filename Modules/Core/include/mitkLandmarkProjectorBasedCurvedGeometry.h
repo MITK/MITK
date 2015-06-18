@@ -36,13 +36,13 @@ namespace mitk {
     void SetLandmarkProjector(mitk::LandmarkProjector* aLandmarkProjector);
     itkGetConstObjectMacro(LandmarkProjector, mitk::LandmarkProjector);
 
-    virtual void SetFrameGeometry(const mitk::BaseGeometry* frameGeometry);
+    virtual void SetFrameGeometry(const mitk::BaseGeometry* frameGeometry) override;
 
     virtual void ComputeGeometry();
 
     itkGetConstMacro(InterpolatingAbstractTransform, vtkAbstractTransform*);
 
-    itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
     //##Documentation
     //## @brief Set the landmarks through which the geometry shall pass
@@ -70,7 +70,7 @@ namespace mitk {
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing){ Superclass::PreSetSpacing(aSpacing); };
+    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{ Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk
 

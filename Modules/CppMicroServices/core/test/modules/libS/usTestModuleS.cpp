@@ -58,7 +58,7 @@ public:
     return "TestModuleS";
   }
 
-  void ServiceControl(int offset, const std::string& operation, int ranking)
+  void ServiceControl(int offset, const std::string& operation, int ranking) override
   {
     if (0 <= offset && offset <= 3)
     {
@@ -119,12 +119,12 @@ public:
   TestModuleSActivator() : s(0) {}
   ~TestModuleSActivator() { delete s; }
 
-  void Load(ModuleContext* context)
+  void Load(ModuleContext* context) override
   {
     s = new TestModuleS(context);
   }
 
-  void Unload(ModuleContext* /*context*/)
+  void Unload(ModuleContext* /*context*/) override
   {
   #ifndef US_BUILD_SHARED_LIBS
     s->Unregister();

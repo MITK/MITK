@@ -44,7 +44,7 @@ namespace mitk
     // type of the 3d vector image containing the skeletonized images
     typedef itk::VectorImage<float,3> DataImageType;
 
-    mitkClassMacro( TbssImporter, Object )
+    mitkClassMacroItkParent( TbssImporter, itk::Object )
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

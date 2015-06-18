@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPaintEvent>
 
 QmitkScalarBar::QmitkScalarBar(QWidget* parent)
-: QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical), m_MainLine(NULL)
+: QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical), m_MainLine(nullptr)
 {
   m_NumberOfSubDivisions = 7;
 
@@ -127,15 +127,15 @@ void QmitkScalarBar::CleanUpLines()
   foreach(QLine* line, m_SubDivisionLines)
   {
     delete line; //QLine is not a QObject
-    line = NULL;
+    line = nullptr;
   }
 
   m_SubDivisionLines.clear();
 
-  if(m_MainLine != NULL)
+  if(m_MainLine != nullptr)
   {
     delete m_MainLine;
-    m_MainLine = NULL;
+    m_MainLine = nullptr;
   }
 }
 
@@ -145,7 +145,7 @@ void QmitkScalarBar::SetScaleFactor( double scale )
   m_ScaleFactor = scale;
 
   // Adopt the number of small, intersecting lines to the size of the widget.
-  if ( this->parentWidget() != NULL && this->parentWidget()->parentWidget() != NULL )
+  if ( this->parentWidget() != nullptr && this->parentWidget()->parentWidget() != nullptr )
   {
     // If the widget is larger than 80% of the size of the parent -> reduce number by two (must not be smaller than 3)
     if ( this->height() > this->parentWidget()->parentWidget()->height()*0.7 && m_NumberOfSubDivisions >= 3 )

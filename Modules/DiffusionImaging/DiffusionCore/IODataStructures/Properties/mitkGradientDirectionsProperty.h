@@ -57,12 +57,12 @@ namespace mitk
     GradientDirectionsProperty(const GradientDirectionsContainerType::Pointer gradientDirectionsContainer);
     GradientDirectionsProperty(const AlternativeGradientDirectionsContainerType gradientDirectionsContainer);
 
-    virtual bool IsEqual(const BaseProperty& property) const;
-    virtual bool Assign(const BaseProperty & property);
+    virtual bool IsEqual(const BaseProperty& property) const override;
+    virtual bool Assign(const BaseProperty & property) override;
 
     GradientDirectionsContainerType::Pointer m_GradientDirectionsContainer;
 
-    virtual itk::LightObject::Pointer InternalClone() const;
+    virtual itk::LightObject::Pointer InternalClone() const override;
   };
 }
 #endif

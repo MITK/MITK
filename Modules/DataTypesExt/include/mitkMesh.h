@@ -123,7 +123,7 @@ public:
     unsigned long cellId, int t = 0 );
 
   /** \brief executes the given Operation */
-  virtual void ExecuteOperation(Operation* operation);
+  virtual void ExecuteOperation(Operation* operation) override;
 
 protected:
   Mesh();

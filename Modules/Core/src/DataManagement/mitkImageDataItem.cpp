@@ -41,9 +41,9 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
   : m_Data(static_cast<unsigned char*>(aParent.m_Data)+offset)
   , m_PixelType(new mitk::PixelType(aParent.GetPixelType()))
   , m_ManageMemory(false)
-  , m_VtkImageData(NULL)
-  , m_VtkImageReadAccessor(NULL)
-  , m_VtkImageWriteAccessor(NULL)
+  , m_VtkImageData(nullptr)
+  , m_VtkImageReadAccessor(nullptr)
+  , m_VtkImageWriteAccessor(nullptr)
   , m_Offset(offset)
   , m_IsComplete(false)
   , m_Size(0)
@@ -59,7 +59,7 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
   }
   this->ComputeItemSize(m_Dimensions,dimension);
 
-  if(data != NULL && data != m_Data)
+  if(data != nullptr && data != m_Data)
   {
     memcpy(m_Data, data, m_Size);
     if(manageMemory)
@@ -74,18 +74,21 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem& aParent, const mitk::Ima
 
 mitk::ImageDataItem::~ImageDataItem()
 {
-  if(m_VtkImageData!=NULL)
+  if(m_VtkImageData!=nullptr)
   {
     m_VtkImageData->Delete();
   }
-  if(m_VtkImageReadAccessor != NULL)
+
+  if(m_VtkImageReadAccessor != nullptr)
   {
     delete m_VtkImageReadAccessor;
   }
-  if(m_VtkImageWriteAccessor != NULL)
+  if(m_VtkImageWriteAccessor != nullptr)
   {
-    delete m_VtkImageWriteAccessor;
-  }
+
+   delete m_VtkImageWriteAccessor;
+}
+
   if(m_Parent.IsNull())
   {
     if(m_ManageMemory)
@@ -99,9 +102,9 @@ mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc, in
   : m_Data(static_cast<unsigned char*>(data))
   , m_PixelType(new mitk::PixelType(desc->GetChannelDescriptor(0).GetPixelType()))
   , m_ManageMemory(manageMemory)
-  , m_VtkImageData(NULL)
-  , m_VtkImageReadAccessor(NULL)
-  , m_VtkImageWriteAccessor(NULL)
+  , m_VtkImageData(nullptr)
+  , m_VtkImageReadAccessor(nullptr)
+  , m_VtkImageWriteAccessor(nullptr)
   , m_Offset(0)
   , m_IsComplete(false)
   , m_Size(0)
@@ -118,7 +121,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc, in
 
   this->ComputeItemSize(m_Dimensions, m_Dimension );
 
-  if(m_Data == NULL)
+  if(m_Data == nullptr)
   {
     m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( m_Size );
     m_ManageMemory = true;
@@ -136,13 +139,13 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, int timestep,
   : m_Data(static_cast<unsigned char*>(data))
   , m_PixelType(new mitk::PixelType(type))
   , m_ManageMemory(manageMemory)
-  , m_VtkImageData(NULL)
-  , m_VtkImageReadAccessor(NULL)
-  , m_VtkImageWriteAccessor(NULL)
+  , m_VtkImageData(nullptr)
+  , m_VtkImageReadAccessor(nullptr)
+  , m_VtkImageWriteAccessor(nullptr)
   , m_Offset(0)
   , m_IsComplete(false)
   , m_Size(0)
-  , m_Parent(NULL)
+  , m_Parent(nullptr)
   , m_Dimension(dimension)
   , m_Timestep(timestep)
 {
@@ -153,7 +156,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, int timestep,
 
   this->ComputeItemSize(dimensions, dimension);
 
-  if(m_Data == NULL)
+  if(m_Data == nullptr)
   {
     m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>( m_Size );
     m_ManageMemory = true;
@@ -166,12 +169,12 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, int timestep,
 
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
   : itk::LightObject()
-  , m_Data(NULL)
-  , m_PixelType(other.m_PixelType)
+  , m_Data(other.m_Data)
+  , m_PixelType(new mitk::PixelType(*other.m_PixelType))
   , m_ManageMemory(other.m_ManageMemory)
-  , m_VtkImageData(NULL)
-  , m_VtkImageReadAccessor(NULL)
-  , m_VtkImageWriteAccessor(NULL)
+  , m_VtkImageData(nullptr)
+  , m_VtkImageReadAccessor(nullptr)
+  , m_VtkImageWriteAccessor(nullptr)
   , m_Offset(other.m_Offset)
   , m_IsComplete(other.m_IsComplete)
   , m_Size(other.m_Size)
@@ -180,6 +183,16 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
   , m_Timestep(other.m_Timestep)
 {
   // copy m_Data ??
+    for (int i = 0; i < MAX_IMAGE_DIMENSIONS; ++i)
+        m_Dimensions[i] = other.m_Dimensions[i];
+}
+
+itk::LightObject::Pointer
+mitk::ImageDataItem::InternalClone() const
+{
+    Self::Pointer newGeometry = new Self(*this);
+    newGeometry->UnRegister();
+    return newGeometry.GetPointer();
 }
 
 void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsigned int dimension)
@@ -194,7 +207,7 @@ void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsign
 void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
 {
   vtkImageData *inData = vtkImageData::New();
-  vtkDataArray *scalars = NULL;
+  vtkDataArray *scalars = nullptr;
 
   const unsigned int *dims = m_Dimensions;
   const unsigned int dim = m_Dimension;
@@ -230,10 +243,13 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
 
   if (m_Timestep >= 0)
   {
-    SlicedGeometry3D* geom3d = iP->GetSlicedGeometry(m_Timestep);
-    const mitk::Vector3D vspacing = geom3d->GetSpacing();
-    double dspacing[3] = { vspacing[0], vspacing[1], vspacing[2] };
-    inData->SetSpacing( dspacing );
+      SlicedGeometry3D* geom3d;
+      geom3d = iP->GetSlicedGeometry(m_Timestep);
+
+      const mitk::Vector3D vspacing = geom3d->GetSpacing();
+      double dspacing[3] = { vspacing[0], vspacing[1], vspacing[2] };
+      inData->SetSpacing(dspacing);
+
   }
 
   if ( m_PixelType->GetComponentType() == itk::ImageIOBase::CHAR )
@@ -290,6 +306,7 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
 
   m_VtkImageData->GetPointData()->SetScalars(scalars);
   scalars->Delete();
+
 }
 
 void mitk::ImageDataItem::Modified() const
@@ -300,11 +317,11 @@ void mitk::ImageDataItem::Modified() const
 
 mitk::ImageVtkReadAccessor* mitk::ImageDataItem::GetVtkImageAccessor(mitk::ImageDataItem::ImageConstPointer iP) const
 {
-  if(m_VtkImageData==NULL)
+  if(m_VtkImageData==nullptr)
   {
     ConstructVtkImageData(iP);
   }
-  if (m_VtkImageReadAccessor == NULL)
+  if (m_VtkImageReadAccessor == nullptr)
   {
     m_VtkImageReadAccessor = new ImageVtkReadAccessor(iP, this, m_VtkImageData);
   }
@@ -313,11 +330,11 @@ mitk::ImageVtkReadAccessor* mitk::ImageDataItem::GetVtkImageAccessor(mitk::Image
 
 mitk::ImageVtkWriteAccessor* mitk::ImageDataItem::GetVtkImageAccessor(ImagePointer iP)
 {
-  if(m_VtkImageData==NULL)
+  if(m_VtkImageData==nullptr)
   {
     ConstructVtkImageData(iP.GetPointer());
   }
-  if (m_VtkImageWriteAccessor == NULL)
+  if (m_VtkImageWriteAccessor == nullptr)
   {
     m_VtkImageWriteAccessor = new ImageVtkWriteAccessor(iP, this, m_VtkImageData);
   }

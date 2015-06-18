@@ -52,6 +52,17 @@ QmitkIGTLStreamingManagementWidget::QmitkIGTLStreamingManagementWidget(
 
 QmitkIGTLStreamingManagementWidget::~QmitkIGTLStreamingManagementWidget()
 {
+   this->RemoveObserver();
+}
+
+void QmitkIGTLStreamingManagementWidget::RemoveObserver()
+{
+   if (this->m_IGTLDevice.IsNotNull())
+   {
+      this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+      this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+      this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
+   }
 }
 
 void QmitkIGTLStreamingManagementWidget::CreateQtPartControl(QWidget *parent)
@@ -81,6 +92,10 @@ void QmitkIGTLStreamingManagementWidget::CreateConnections()
     connect( m_Controls->stopStreamPushButton, SIGNAL(clicked()),
              this, SLOT(OnStopStreaming()));
   }
+  //this is used for thread seperation, otherwise the worker thread would change the ui elements
+  //which would cause an exception
+  connect(this, SIGNAL(AdaptGUIToStateSignal()), this, SLOT(AdaptGUIToState()));
+  connect(this, SIGNAL(SelectSourceAndAdaptGUISignal()), this, SLOT(SelectSourceAndAdaptGUI()));
 }
 
 void QmitkIGTLStreamingManagementWidget::AdaptGUIToState()
@@ -181,14 +196,7 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
     return;
 
   //reset the observers
-  if ( this->m_IGTLDevice.IsNotNull() )
-  {
-//    this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
-//    this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
-  }
+  this->RemoveObserver();
 
 
     this->m_IGTLMsgProvider = provider;
@@ -290,18 +298,23 @@ void QmitkIGTLStreamingManagementWidget::OnCommandReceived()
 
 void QmitkIGTLStreamingManagementWidget::OnDeviceStateChanged()
 {
-  this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLStreamingManagementWidget::OnLostConnection()
 {
-  this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLStreamingManagementWidget::OnNewConnection()
 {
-  //get the current selection and call SourceSelected which will call AdaptGUI
-  mitk::IGTLMessageSource::Pointer curSelSrc =
+   emit SelectSourceAndAdaptGUISignal();
+}
+
+void QmitkIGTLStreamingManagementWidget::SelectSourceAndAdaptGUI()
+{
+   //get the current selection and call SourceSelected which will call AdaptGUI
+   mitk::IGTLMessageSource::Pointer curSelSrc =
       m_Controls->messageSourceSelectionWidget->GetSelectedIGTLMessageSource();
-  SourceSelected(curSelSrc);
+   SourceSelected(curSelSrc);
 }

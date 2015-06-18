@@ -46,7 +46,7 @@ namespace mitk
   {
    public:
 
-    mitkClassMacro( ThreadedToFRawDataReconstruction ,  itk::ProcessObject );
+    mitkClassMacroItkParent( ThreadedToFRawDataReconstruction ,  itk::ProcessObject );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

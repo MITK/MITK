@@ -42,14 +42,14 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    virtual std::vector<BaseData::Pointer> Read();
+    virtual std::vector<BaseData::Pointer> Read() override;
 
-    virtual ConfidenceLevel GetReaderConfidenceLevel() const;
+    virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
     // -------------- AbstractFileWriter -------------
 
-    virtual void Write();
-    virtual ConfidenceLevel GetWriterConfidenceLevel() const;
+    virtual void Write() override;
+    virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
 
     static CustomMimeType TUBEGRAPH_MIMETYPE() // tsf
     {
@@ -66,7 +66,7 @@ namespace mitk
     }
 
   private:
-    TubeGraphIO* IOClone() const;
+    TubeGraphIO* IOClone() const override;
     TubeGraphIO(const TubeGraphIO& other);
     const BoundingBox::Pointer ComputeBoundingBox(TubeGraph::Pointer graph ) const;
 

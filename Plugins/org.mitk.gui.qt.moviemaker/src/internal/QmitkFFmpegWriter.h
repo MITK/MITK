@@ -25,7 +25,7 @@ class QmitkFFmpegWriter : public QObject
   Q_OBJECT
 
 public:
-  explicit QmitkFFmpegWriter(QObject* parent = NULL);
+  explicit QmitkFFmpegWriter(QObject* parent = nullptr);
   ~QmitkFFmpegWriter();
 
   QString GetFFmpegPath() const;

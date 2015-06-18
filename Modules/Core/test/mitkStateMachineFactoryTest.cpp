@@ -57,7 +57,7 @@ int mitkStateMachineFactoryTest(int argc, char* argv[])
 
   //manually create a state machine pattern and add it to factory
   std::string patternName("manuallyCreatedStateMachine");
-  mitk::StateMachineFactory::StateMachineMapType* allStatesMap = new mitk::StateMachineFactory::StateMachineMapType();
+  auto  allStatesMap = new mitk::StateMachineFactory::StateMachineMapType();
 
   mitk::State::Pointer state1 = mitk::State::New("firstState", 1);
   mitk::Transition* transition1 = new mitk::Transition("goto2", 2, mitk::EIDNULLEVENT);

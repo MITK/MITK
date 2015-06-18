@@ -66,7 +66,7 @@ class MITKCORE_EXPORT PropertyList : public itk::Object
 
   public:
 
-    mitkClassMacro(PropertyList, itk::Object)
+    mitkClassMacroItkParent(PropertyList, itk::Object)
 
     /**
      * Method for creation through the object factory.
@@ -119,7 +119,7 @@ class MITKCORE_EXPORT PropertyList : public itk::Object
     bool GetPropertyValue(const char* propertyKey, T & value) const
     {
       GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey));
-      if ( gp != NULL )
+      if ( gp != nullptr )
       {
         value = gp->GetValue();
         return true;
@@ -225,7 +225,7 @@ class MITKCORE_EXPORT PropertyList : public itk::Object
      * @brief Get the timestamp of the last change of the map or the last change of one of
      * the properties store in the list (whichever is later).
      */
-    virtual unsigned long GetMTime() const;
+    virtual unsigned long GetMTime() const override;
 
     /**
      * @brief Remove a property from the list/map.
@@ -254,7 +254,7 @@ class MITKCORE_EXPORT PropertyList : public itk::Object
 
   private:
 
-    virtual itk::LightObject::Pointer InternalClone() const;
+    virtual itk::LightObject::Pointer InternalClone() const override;
 
 };
 

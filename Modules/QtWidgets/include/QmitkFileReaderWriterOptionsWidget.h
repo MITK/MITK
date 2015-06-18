@@ -51,8 +51,8 @@ class QmitkAnyStringWidget : public QLineEdit, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyStringWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyStringWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkAnyVectorWidget : public QComboBox, public QmitkAnyAdapter
@@ -61,8 +61,8 @@ class QmitkAnyVectorWidget : public QComboBox, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyVectorWidget(const std::string& name, const us::Any& any, const QString& defaultValue, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyVectorWidget(const std::string& name, const us::Any& any, const QString& defaultValue, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkAnyBoolWidget : public QCheckBox, public QmitkAnyAdapter
@@ -71,8 +71,8 @@ class QmitkAnyBoolWidget : public QCheckBox, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyBoolWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyBoolWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkAnyShortWidget : public QSpinBox, public QmitkAnyAdapter
@@ -81,8 +81,8 @@ class QmitkAnyShortWidget : public QSpinBox, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyShortWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyShortWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkAnyUShortWidget : public QSpinBox, public QmitkAnyAdapter
@@ -91,8 +91,8 @@ class QmitkAnyUShortWidget : public QSpinBox, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyUShortWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyUShortWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkAnyIntWidget : public QSpinBox, public QmitkAnyAdapter
@@ -101,8 +101,8 @@ class QmitkAnyIntWidget : public QSpinBox, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyIntWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyIntWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkAnyUIntWidget : public QSpinBox, public QmitkAnyAdapter
@@ -111,8 +111,8 @@ class QmitkAnyUIntWidget : public QSpinBox, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyUIntWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyUIntWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkAnyFloatWidget : public QDoubleSpinBox, public QmitkAnyAdapter
@@ -121,8 +121,8 @@ class QmitkAnyFloatWidget : public QDoubleSpinBox, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyFloatWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyFloatWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkAnyDoubleWidget : public QDoubleSpinBox, public QmitkAnyAdapter
@@ -131,8 +131,8 @@ class QmitkAnyDoubleWidget : public QDoubleSpinBox, public QmitkAnyAdapter
 
 public:
 
-  QmitkAnyDoubleWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkAnyDoubleWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 class QmitkInvalidAnyWidget : public QLabel, public QmitkAnyAdapter
@@ -141,8 +141,8 @@ class QmitkInvalidAnyWidget : public QLabel, public QmitkAnyAdapter
 
 public:
 
-  QmitkInvalidAnyWidget(const std::string& name, const us::Any& any, QWidget* parent = 0);
-  us::Any GetAny() const;
+  QmitkInvalidAnyWidget(const std::string& name, const us::Any& any, QWidget* parent = nullptr);
+  us::Any GetAny() const override;
 };
 
 
@@ -154,7 +154,7 @@ public:
 
   typedef std::map<std::string, us::Any> Options;
 
-  QmitkFileReaderWriterOptionsWidget(const Options& options, QWidget* parent = NULL);
+  QmitkFileReaderWriterOptionsWidget(const Options& options, QWidget* parent = nullptr);
 
   Options GetOptions() const;
 

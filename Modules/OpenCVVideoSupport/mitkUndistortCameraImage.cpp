@@ -27,12 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::UndistortCameraImage::UndistortCameraImage()
 {
-  m_tempImage = NULL;
+  m_tempImage = nullptr;
 
 }
 mitk::UndistortCameraImage::~UndistortCameraImage()
 {
-  if(m_tempImage != NULL)
+  if(m_tempImage != nullptr)
     cvReleaseImage(&m_tempImage);
 }
 
@@ -165,7 +165,7 @@ void mitk::UndistortCameraImage::UndistortImageFast(IplImage * src, IplImage* ds
     m_tempImage = cvCloneImage( src );
     cvRemap(m_tempImage, src, m_mapX, m_mapY, CV_INTER_CUBIC);
     cvReleaseImage( &m_tempImage );
-    m_tempImage = 0;
+    m_tempImage = nullptr;
     /*memcpy( src->imageData, m_tempImage->imageData, m_tempImage->imageSize );
     cvReleaseImage( &m_tempImage );*/
   }

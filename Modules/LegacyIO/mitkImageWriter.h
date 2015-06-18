@@ -48,7 +48,7 @@ public:
      * Sets the filename of the file to write.
      * @param _arg the name of the file to write.
      */
-    virtual void SetFileName (const char* fileName);
+    virtual void SetFileName (const char* fileName) override;
     virtual void SetFileName (const std::string& fileName);
 
     /**
@@ -104,24 +104,24 @@ public:
 
     //##Documentation
     //## @brief Return the possible file extensions for the data type associated with the writer
-    virtual std::vector<std::string> GetPossibleFileExtensions();
+    virtual std::vector<std::string> GetPossibleFileExtensions() override;
 
-    virtual std::string GetSupportedBaseData() const;
+    virtual std::string GetSupportedBaseData() const override;
 
     /**
     * @brief Return the extension to be added to the filename.
     */
-    virtual std::string GetFileExtension();
+    virtual std::string GetFileExtension() override;
 
     /**
     * @brief Check if the Writer can write the Content of the
     */
-    virtual bool CanWriteDataType( DataNode* );
+    virtual bool CanWriteDataType( DataNode* ) override;
 
     /**
     * @brief Return the MimeType of the saved File.
     */
-    virtual std::string GetWritenMIMEType();
+    virtual std::string GetWritenMIMEType() override;
 
     using Superclass::SetInput;
     /**
@@ -135,11 +135,11 @@ public:
     const mitk::Image* GetInput();
 
     // FileWriterWithInformation methods
-    virtual const char* GetDefaultFilename();
-    virtual const char *GetFileDialogPattern();
-    virtual const char *GetDefaultExtension();
-    virtual bool CanWriteBaseDataType(BaseData::Pointer data);
-    virtual void DoWrite(BaseData::Pointer data);
+    virtual const char* GetDefaultFilename() override;
+    virtual const char *GetFileDialogPattern() override;
+    virtual const char *GetDefaultExtension() override;
+    virtual bool CanWriteBaseDataType(BaseData::Pointer data) override;
+    virtual void DoWrite(BaseData::Pointer data) override;
 
     void SetUseCompression( bool useCompression );
 
@@ -155,7 +155,7 @@ protected:
      */
     virtual ~ImageWriter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     virtual void WriteByITK(mitk::Image* image, const std::string& fileName);
 

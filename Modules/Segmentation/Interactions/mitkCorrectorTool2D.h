@@ -60,21 +60,21 @@ class MITKSEGMENTATION_EXPORT CorrectorTool2D : public FeedbackContourTool
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual us::ModuleResource GetCursorIconResource() const;
-    us::ModuleResource GetIconResource() const;
+    virtual const char** GetXPM() const override;
+    virtual us::ModuleResource GetCursorIconResource() const override;
+    us::ModuleResource GetIconResource() const override;
 
-    virtual const char* GetName() const;
+    virtual const char* GetName() const override;
 
   protected:
 
     CorrectorTool2D(int paintingPixelValue = 1); // purposely hidden
     virtual ~CorrectorTool2D();
 
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
     virtual bool OnMouseMoved   ( StateMachineAction*, InteractionEvent* );

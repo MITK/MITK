@@ -34,7 +34,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_rtStructureReader = mitk::RTStructureSetReader::New();
     CPPUNIT_ASSERT_MESSAGE("Failed to initialize RTStructureSetReader", m_rtStructureReader.IsNotNull());
@@ -107,7 +107,7 @@ public:
           {
             mitk::Point3D p1 = cm1->GetVertexAt(i)->Coordinates;
             mitk::Point3D p2 = cm2->GetVertexAt(i)->Coordinates;
-            if(abs(p1[0]-p2[0]) > ep || abs(p1[0]-p2[0]) > ep || abs(p1[0]-p2[0]) > ep)
+            if(fabs(p1[0]-p2[0]) > ep || fabs(p1[0]-p2[0]) > ep || fabs(p1[0]-p2[0]) > ep)
             {
               return false;
             }

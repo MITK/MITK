@@ -46,7 +46,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT UndistortCameraImage : public itk::Object
 {
   public:
 
-    mitkClassMacro(UndistortCameraImage,itk::Object);
+    mitkClassMacroItkParent(UndistortCameraImage,itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
@@ -94,7 +94,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT UndistortCameraImage : public itk::Object
     * The use of only a source parameter will cause the source to be overwritten.
     * NOTE: Using the Fast undistortion methods does not require a initialization via the Set... methods.
     */
-    void UndistortImageFast( IplImage * src, IplImage* dst = NULL );
+    void UndistortImageFast( IplImage * src, IplImage* dst = nullptr );
     void SetUndistortImageFastInfo(float in_dF1, float in_dF2,
                                    float in_dPrincipalX, float in_dPrincipalY,
                                    float in_Dist[4], float ImageSizeX, float ImageSizeY);

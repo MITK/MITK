@@ -39,7 +39,7 @@ class MITKQTWIDGETS_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
 public:
 
   /// constructor
-  QmitkLineEditLevelWindowWidget( QWidget * parent = 0, Qt::WindowFlags f = 0 );
+  QmitkLineEditLevelWindowWidget( QWidget * parent = nullptr, Qt::WindowFlags f = nullptr );
 
   /// destructor
   ~QmitkLineEditLevelWindowWidget();
@@ -71,7 +71,7 @@ public:
 private:
 
   /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu
-  void contextMenuEvent ( QContextMenuEvent * );
+  void contextMenuEvent ( QContextMenuEvent * ) override;
 
   /// change notifications from the mitkLevelWindowManager
   void OnPropertyModified(const itk::EventObject& e);

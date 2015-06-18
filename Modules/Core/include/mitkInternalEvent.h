@@ -46,13 +46,13 @@ namespace mitk
     std::string GetSignalName() const;
     DataInteractor* GetTargetInteractor() const;
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const;
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
 
   protected:
     InternalEvent(BaseRenderer*, DataInteractor* destInteractor, const std::string& signalName);
     virtual ~InternalEvent();
 
-    virtual bool IsEqual(const InteractionEvent&) const;
+    virtual bool IsEqual(const InteractionEvent&) const override;
 
   private:
     DataInteractor::Pointer m_DataInteractor;

@@ -70,12 +70,12 @@ namespace mitk
         break;
       case Ball_Coronal:
       case Cross_Coronal:
-        size.SetElement(1,factor);
+        size.SetElement(0,factor);
         size.SetElement(2,factor);
         break;
       case Ball_Sagital:
       case Cross_Sagital:
-        size.SetElement(0,factor);
+        size.SetElement(1,factor);
         size.SetElement(2,factor);
         break;
       case Ball:

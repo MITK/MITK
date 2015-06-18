@@ -37,10 +37,10 @@ class MITKLEGACYGL_EXPORT vtkGLMapperProp : public vtkProp
      * @param viewport viewport of the renderwindow.
      * @return
      */
-    int RenderOverlay(vtkViewport* viewport);
-    int RenderVolumetricGeometry(vtkViewport *);
-    int RenderTranslucentPolygonalGeometry(vtkViewport *);
-    int RenderOpaqueGeometry(vtkViewport *);
+    int RenderOverlay(vtkViewport* viewport) override;
+    int RenderVolumetricGeometry(vtkViewport *) override;
+    int RenderTranslucentPolygonalGeometry(vtkViewport *) override;
+    int RenderOpaqueGeometry(vtkViewport *) override;
 
     const mitk::GLMapper *GetWrappedGLMapper() const;
     void SetWrappedGLMapper(mitk::GLMapper *glMapper);

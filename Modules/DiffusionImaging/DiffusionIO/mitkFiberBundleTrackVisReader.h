@@ -37,10 +37,10 @@ namespace mitk
     FiberBundleTrackVisReader();
     virtual ~FiberBundleTrackVisReader(){}
     FiberBundleTrackVisReader(const FiberBundleTrackVisReader& other);
-    virtual FiberBundleTrackVisReader * Clone() const;
+    virtual FiberBundleTrackVisReader * Clone() const override;
 
     using mitk::AbstractFileReader::Read;
-    virtual std::vector<itk::SmartPointer<BaseData> > Read();
+    virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   private:
 

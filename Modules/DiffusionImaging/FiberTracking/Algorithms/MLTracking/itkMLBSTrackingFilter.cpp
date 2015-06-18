@@ -45,7 +45,6 @@ MLBSTrackingFilter< NumImageFeatures >
     , m_MinTractLength(20.0)
     , m_MaxTractLength(400.0)
     , m_SeedsPerVoxel(1)
-    , m_UseDirection(true)
     , m_NumberOfSamples(50)
     , m_SamplingDistance(-1)
     , m_SeedImage(NULL)
@@ -58,6 +57,8 @@ MLBSTrackingFilter< NumImageFeatures >
     , m_RemoveWmEndFibers(false)
     , m_AposterioriCurvCheck(false)
     , m_AvoidStop(true)
+    , m_RandomSampling(false)
+    , m_Verbose(false)
 {
     this->SetNumberOfRequiredInputs(1);
 }
@@ -178,6 +179,8 @@ void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
     m_BuildFibersFinished = false;
     m_Threads = 0;
     m_Tractogram.clear();
+    m_SamplingPointset = mitk::PointSet::New();
+    m_AlternativePointset = mitk::PointSet::New();
 
     std::cout << "MLBSTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
     std::cout << "MLBSTrackingFilter: Stepsize: " << m_StepSize << " mm" << std::endl;
@@ -325,6 +328,8 @@ typename MLBSTrackingFilter< NumImageFeatures >::FeatureImageType::PixelType MLB
         tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
         pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[7];
     }
+
+    return pix;
 }
 
 template< int NumImageFeatures >
@@ -332,11 +337,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::Classify(itk:
 {
     vnl_vector_fixed<double,3> direction; direction.fill(0);
 
-    vigra::MultiArray<2, double> featureData;
-    if(m_UseDirection)
-        featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,NumImageFeatures+3) );
-    else
-        featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,NumImageFeatures) );
+    vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,NumImageFeatures+3) );
 
     typename FeatureImageType::PixelType featurePixel = GetImageValues(pos);
 
@@ -346,7 +347,6 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::Classify(itk:
 
     // direction features
     int c = 0;
-    if (m_UseDirection)
     {
         vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
         for (unsigned int f=NumImageFeatures; f<NumImageFeatures+3; f++)
@@ -402,11 +402,14 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::Classify(itk:
     }
 
     ItkDoubleImgType::IndexType idx;
-    m_NotWmImage->TransformPhysicalPointToIndex(pos, idx);
-    if (m_NotWmImage->GetLargestPossibleRegion().IsInside(idx))
+    if (m_Verbose)
     {
-        m_NotWmImage->SetPixel(idx, m_NotWmImage->GetPixel(idx)+outProb);
-        m_WmImage->SetPixel(idx, m_WmImage->GetPixel(idx)+prob);
+        m_NotWmImage->TransformPhysicalPointToIndex(pos, idx);
+        if (m_NotWmImage->GetLargestPossibleRegion().IsInside(idx))
+        {
+            m_NotWmImage->SetPixel(idx, m_NotWmImage->GetPixel(idx)+outProb);
+            m_WmImage->SetPixel(idx, m_WmImage->GetPixel(idx)+prob);
+        }
     }
     if (outProb>prob && prob>0)
     {
@@ -414,7 +417,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::Classify(itk:
         prob = 0;
         direction.fill(0.0);
     }
-    if (avoidStop && m_AvoidStopImage->GetLargestPossibleRegion().IsInside(idx) && candidates>0 && direction.magnitude()>0.001)
+    if (m_Verbose && avoidStop && m_AvoidStopImage->GetLargestPossibleRegion().IsInside(idx) && candidates>0 && direction.magnitude()>0.001)
         m_AvoidStopImage->SetPixel(idx, m_AvoidStopImage->GetPixel(idx)+0.1);
 
     return direction;
@@ -430,6 +433,11 @@ double MLBSTrackingFilter< NumImageFeatures >::GetRandDouble(double min, double 
 template< int NumImageFeatures >
 vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirection(itk::Point<double, 3> &pos, vnl_vector_fixed<double, 3>& olddir)
 {
+    if (m_DemoMode)
+    {
+        m_SamplingPointset->Clear();
+        m_AlternativePointset->Clear();
+    }
     vnl_vector_fixed<double,3> direction; direction.fill(0);
 
     ItkUcharImgType::IndexType idx;
@@ -448,19 +456,30 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
 
     itk::OrientationDistributionFunction< double, 50 >  probeVecs;
 
+    itk::Point<double, 3> sample_pos;
+    int alternatives = 1;
     for (int i=0; i<m_NumberOfSamples; i++)
     {
         vnl_vector_fixed<double,3> d;
-//        probe[0] = GetRandDouble()*m_SamplingDistance;
-//        probe[1] = GetRandDouble()*m_SamplingDistance;
-//        probe[2] = GetRandDouble()*m_SamplingDistance;
 
-        d = probeVecs.GetDirection(i)*m_SamplingDistance;
+        if (m_RandomSampling)
+        {
+            d[0] = GetRandDouble();
+            d[1] = GetRandDouble();
+            d[2] = GetRandDouble();
+            d.normalize();
+            d *= GetRandDouble(0,m_SamplingDistance);
+        }
+        else
+        {
+            d = probeVecs.GetDirection(i)*m_SamplingDistance;
+        }
 
-        itk::Point<double, 3> sample_pos;
         sample_pos[0] = pos[0] + d[0];
         sample_pos[1] = pos[1] + d[1];
         sample_pos[2] = pos[2] + d[2];
+        if(m_DemoMode)
+            m_SamplingPointset->InsertPoint(i, sample_pos);
 
         candidates = 0;
         vnl_vector_fixed<double,3> tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
@@ -477,9 +496,12 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
                 d = -d; // invert
 
             // look a bit further into the other direction
-            sample_pos[0] = pos[0] + d[0]*2;
-            sample_pos[1] = pos[1] + d[1]*2;
-            sample_pos[2] = pos[2] + d[2]*2;
+            sample_pos[0] = pos[0] + d[0];
+            sample_pos[1] = pos[1] + d[1];
+            sample_pos[2] = pos[2] + d[2];
+            if(m_DemoMode)
+                m_AlternativePointset->InsertPoint(alternatives, sample_pos);
+            alternatives++;
             candidates = 0;
             vnl_vector_fixed<double,3> tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob, true); // sample neighborhood
 
@@ -512,17 +534,6 @@ double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(ThreadIdType thr
 
     for (int step=0; step< m_MaxLength/2; step++)
     {
-        while (m_PauseTracking){}
-        if (m_DemoMode)
-        {
-            m_Mutex.Lock();
-            m_BuildFibersReady++;
-            m_Tractogram.push_back(*fib);
-            BuildFibers(true);
-            m_Stop = true;
-            m_Mutex.Unlock();
-            while (m_Stop){}
-        }
 
         // get new position
         CalculateNewPosition(pos, dir);
@@ -561,8 +572,21 @@ double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(ThreadIdType thr
             if (tractLength>m_MaxTractLength)
                 return tractLength;
         }
+        if (m_DemoMode) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?
+        {
+            m_Mutex.Lock();
+            m_BuildFibersReady++;
+            m_Tractogram.push_back(*fib);
+            BuildFibers(true);
+            m_Stop = true;
+            m_Mutex.Unlock();
 
+            while (m_Stop){
+            }
+        }
         dir = GetNewDirection(pos, dirOld);
+
+        while (m_PauseTracking){}
 
         if (dir.magnitude()<0.0001)
             return tractLength;
@@ -761,13 +785,14 @@ void MLBSTrackingFilter< NumImageFeatures >::BuildFibers(bool check)
     {
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
         FiberType fib = m_Tractogram.at(i);
-        for (FiberType::iterator it = fib.begin(); it!=fib.end(); it++)
+        for (FiberType::iterator it = fib.begin(); it!=fib.end(); ++it)
         {
             vtkIdType id = vNewPoints->InsertNextPoint((*it).GetDataPointer());
             container->GetPointIds()->InsertNextId(id);
         }
         vNewLines->InsertNextCell(container);
     }
+
     if (check)
         for (int i=0; i<m_BuildFibersReady; i++)
             m_Tractogram.pop_back();

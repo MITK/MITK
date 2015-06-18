@@ -38,7 +38,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidgetContextMenu : public QWidget {
 public:
 
   /// constructor
-  QmitkLevelWindowWidgetContextMenu(QWidget * parent, Qt::WindowFlags f = 0 );
+  QmitkLevelWindowWidgetContextMenu(QWidget * parent, Qt::WindowFlags f = nullptr );
   virtual ~QmitkLevelWindowWidgetContextMenu();
 
   /*!
@@ -93,6 +93,9 @@ protected slots:
   void setPreset(QAction* presetAction);
 
   /// calls the mitkLevelWindow SetAuto method with guessByCentralSlice false, so that the greyvalues from whole image will be considered
+  void useOptimizedLevelWindow();
+
+  /// calls the mitkLevelWindow SetToImageRange method, so that the greyvalues from whole image will be used
   void useAllGreyvaluesFromImage();
 
   /// sets the level window slider to be fixed

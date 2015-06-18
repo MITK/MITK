@@ -44,7 +44,7 @@ protected:
 
   RawImageFileReaderService(const RawImageFileReaderService& other);
 
-  virtual std::vector<itk::SmartPointer<BaseData> > Read();
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
   using mitk::AbstractFileReader::Read;
 
@@ -53,7 +53,7 @@ private:
   template <typename TPixel, unsigned int VImageDimensions>
   mitk::BaseData::Pointer TypedRead(const std::string& path, EndianityType endianity, int* size);
 
-  RawImageFileReaderService* Clone() const;
+  RawImageFileReaderService* Clone() const override;
 
   /** Vector containing dimensions of image to be read. */
   itk::Vector<int, 3> m_Dimensions;

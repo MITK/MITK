@@ -62,7 +62,7 @@ private slots:
   void OnCurrentIndexChanged(int);
 
 public:
-  QmitkComboBoxStepThrough(QWidget* parent = 0);
+  QmitkComboBoxStepThrough(QWidget* parent = nullptr);
   ~QmitkComboBoxStepThrough();
 
   // --> Overwritten superclass methods

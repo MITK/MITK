@@ -66,7 +66,7 @@ mitk::LandmarkWarping::MovingImageType::Pointer mitk::LandmarkWarping::Register(
   {
     std::cerr << "Exception thrown " << std::endl;
     std::cerr << excp << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   try
@@ -79,7 +79,7 @@ mitk::LandmarkWarping::MovingImageType::Pointer mitk::LandmarkWarping::Register(
   {
     std::cerr << "Exception thrown " << std::endl;
     std::cerr << excp << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   m_DeformationField = m_Deformer->GetOutput();

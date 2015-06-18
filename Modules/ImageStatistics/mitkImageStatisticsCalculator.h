@@ -249,7 +249,7 @@ public:
   typedef std::vector< HistogramType::ConstPointer > HistogramContainer;
   typedef std::vector< Statistics > StatisticsContainer;
 
-  mitkClassMacro( ImageStatisticsCalculator, itk::Object );
+  mitkClassMacroItkParent( ImageStatisticsCalculator, itk::Object );
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
@@ -297,7 +297,7 @@ public:
   void SetHistogramBinSize( double size);
 
   /** \brief Get bin size for histogram resolution.*/
-  unsigned int GetHistogramBinSize();
+  double GetHistogramBinSize();
 
   /** \brief Sets the radius for the hotspot */
   void SetHotspotRadiusInMM (double hotspotRadiusInMM);

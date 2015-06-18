@@ -37,7 +37,7 @@ class BaseRenderer;
 class MITKCORE_EXPORT AbstractOverlayLayouter : public itk::LightObject {
 public:
 
-  mitkClassMacro(AbstractOverlayLayouter, itk::LightObject);
+  mitkClassMacroItkParent(AbstractOverlayLayouter, itk::LightObject);
 
   void SetBaseRenderer(BaseRenderer* renderer);
   BaseRenderer *GetBaseRenderer();

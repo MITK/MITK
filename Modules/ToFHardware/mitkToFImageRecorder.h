@@ -51,7 +51,7 @@ public:
 
   ~ToFImageRecorder();
 
-  mitkClassMacro( ToFImageRecorder , itk::Object );
+  mitkClassMacroItkParent( ToFImageRecorder , itk::Object );
 
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)

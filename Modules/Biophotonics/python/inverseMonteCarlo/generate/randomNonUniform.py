@@ -19,8 +19,8 @@ import random
 import numpy as np
 
 from helper import monteCarloHelper as mch
-
 from setup import simulation
+from setup import systemPaths
 
 def drawFromNormal(parameterVector):
     """
@@ -28,7 +28,7 @@ def drawFromNormal(parameterVector):
     the boarders of the parameter range
     """
     # draw sample from some normal distribution
-    sample = random.gauss(np.mean(parameterVector), (max(parameterVector) - min (parameterVector)) /20.0)
+    sample = random.gauss(np.mean(parameterVector), (max(parameterVector) - min (parameterVector)) / 10.0)
     # clip it to be in the allowed range
     sample = np.clip(sample, min(parameterVector), max(parameterVector))
     return sample
@@ -36,31 +36,16 @@ def drawFromNormal(parameterVector):
 
 
 def randomNonUniform(generatedFilename):
-    # the input file without the run specific parameters for ua, us and d:
-    infileString = 'data/colonTemplate.mci'
-    infile       = open(infileString)
-    # the output folder for the mc simulations
-    outfolderMC = 'outputMC/'
-    # the output folder for the reflectance spectra
-    outfolderRS = 'outputRS/'
 
 
-    # the input file without the run specific parameters for ua, us and d:
-    infileString = 'data/colonTemplate.mci'
-    infile       = open(infileString)
-    # the output folder for the mc simulations
-    # attention: this is relative to your gpumcml path!
-    outfolderMC ='outputMC/'
-    # the output folder for the reflectance spectra
-    outfolderRS = 'data/output/'
-    gpumcmlDirectory = '/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/'
-    gpumcmlExecutable = 'gpumcml.sm_20'
+    infileString, outfolderMC, outfolderRS, gpumcmlDirectory, gpumcmlExecutable = systemPaths.initPaths()
+    infile = open(infileString)
 
 
-    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = simulation.perfect()
+    BVFs, Vss, ds, SaO2s, rs, nrSamples, photons, wavelengths, FWHM, eHbO2, eHb, nrSimulations = simulation.noisy()
 
     reflectances  = np.zeros((nrSimulations, len(wavelengths)))
-    parameters    = np.zeros((nrSimulations, 5))
+    parameters    = np.zeros((nrSimulations, 8))
 
     print('start simulations...')
 
@@ -75,10 +60,15 @@ def randomNonUniform(generatedFilename):
         BVF = drawFromNormal(BVFs)
         Vs  = drawFromNormal(Vss)
         d   = drawFromNormal(ds)
-        r   = drawFromNormal(rs)
         SaO2= drawFromNormal(SaO2s)
+        r   = drawFromNormal(rs)
 
-        parameters[i,:] = np.array([BVF, Vs, d, r, SaO2])
+        min_sm_BVF = max(min(BVFs), 0.03)
+        sm_BVF = drawFromNormal([min_sm_BVF, max(BVFs)])
+        sm_Vs  = drawFromNormal(Vss)
+        sm_SaO2= drawFromNormal(SaO2s)
+
+        parameters[i,:] = np.array([BVF, Vs, d, SaO2, r, sm_BVF, sm_Vs, sm_SaO2])
 
 
         for j, wavelength in enumerate(wavelengths):
@@ -105,7 +95,7 @@ def randomNonUniform(generatedFilename):
     # save the reflectance results!
     now = datetime.datetime.now().strftime("%Y%B%d%I:%M%p")
     np.save(outfolderRS + now + generatedFilename + "reflectances" + str(photons) + "photons", reflectances)
-    np.save(outfolderRS + now + generatedFilename + "parameters", parameters)
+    np.save(outfolderRS + now + generatedFilename  + str(nrSimulations) + "parameters", parameters)
 
     end = time.time()
     print "total time for generating random non uniform data: " + str((end - start))

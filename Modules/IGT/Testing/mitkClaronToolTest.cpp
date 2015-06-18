@@ -82,7 +82,7 @@ int mitkClaronToolTest(int /* argc */, char* /*argv*/[])
 
     myClaronTool->LoadFile(name);
     MITK_TEST_CONDITION(myClaronTool->GetFile() == name ,"Testing GetFile() after setting file name with LoadFile()");
-    MITK_TEST_CONDITION(myClaronTool->LoadFile(NULL) == false ,"Test LoadFile() with NULL as parameter.")
+    MITK_TEST_CONDITION(myClaronTool->LoadFile(nullptr) == false ,"Test LoadFile() with NULL as parameter.")
     MITK_TEST_CONDITION(myClaronTool->LoadFile(std::string("")) == false ,"Test LoadFile() with empty string as parameter.")
 
     myClaronTool->SetToolHandle(011022);

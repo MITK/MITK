@@ -52,7 +52,7 @@ namespace mitk {
     void SetWeakPointer(itk::Object* pointer);
     void SetValue(const ValueType& value);
 
-    virtual std::string GetValueAsString() const;
+    virtual std::string GetValueAsString() const override;
 
     using BaseProperty::operator=;
 
@@ -61,16 +61,16 @@ namespace mitk {
 
     WeakPointerProperty(const WeakPointerProperty&);
 
-    WeakPointerProperty(itk::Object* pointer = 0);
+    WeakPointerProperty(itk::Object* pointer = nullptr);
 
   private:
     // purposely not implemented
     WeakPointerProperty& operator=(const WeakPointerProperty&);
 
-    itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty& property) const;
-    virtual bool Assign(const BaseProperty& property);
+    virtual bool IsEqual(const BaseProperty& property) const override;
+    virtual bool Assign(const BaseProperty& property) override;
   };
 
 #ifdef _MSC_VER

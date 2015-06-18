@@ -23,10 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk
 #include <mitkNavigationDataSet.h>
-#include <mitkNavigationDataReaderXML.h>
+#include <mitkNavigationDataReaderInterface.h>
 #include <mitkNavigationDataSequentialPlayer.h>
 #include <mitkNavigationDataPlayer.h>
 #include <mitkVirtualTrackingTool.h>
+#include <mitkIOUtil.h>
 
 // VTK
 #include <vtkSphereSource.h>
@@ -81,16 +82,19 @@ void QmitkNavigationDataPlayerView::CreateConnections()
   this->SetInteractionComponentsEnabledState(false);
 }
 
-void QmitkNavigationDataPlayerView::OnOpenFile(){
-  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
+void QmitkNavigationDataPlayerView::OnOpenFile()
+{
+  mitk::NavigationDataReaderInterface::Pointer reader = NULL;
 
-  // FIXME Filter for correct Files and use correct Reader
-  QString fileName = QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "XML files (*.xml)"); //"XML files (*.xml);; Csv files (*.csv)" for additional csv files. Not supported yet.
+  QString filter = tr("NavigationData File (*.csv *.xml)");
+
+  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open NavigationData Set"), "", filter);
+
   if ( fileName.isNull() ) { return; } // user pressed cancel
 
   try
   {
-    m_Data = reader->Read(fileName.toStdString());
+    m_Data = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
   }
   catch ( const mitk::Exception &e )
   {

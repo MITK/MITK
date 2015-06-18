@@ -45,7 +45,7 @@ public:
   mitkClassMacro( QmlMitkRenderingManager, mitk::RenderingManager );
   virtual ~QmlMitkRenderingManager();
 
-  virtual bool event( QEvent *event );
+  virtual bool event( QEvent *event ) override;
 
 protected:
 
@@ -53,9 +53,9 @@ protected:
 
   QmlMitkRenderingManager();
 
-  virtual void GenerateRenderingRequestEvent();
+  virtual void GenerateRenderingRequestEvent() override;
 
-  virtual void StartOrResetTimer();
+  virtual void StartOrResetTimer() override;
 
   int pendingTimerCallbacks;
 

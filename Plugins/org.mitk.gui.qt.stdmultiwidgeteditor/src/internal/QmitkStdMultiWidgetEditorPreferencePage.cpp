@@ -25,9 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QColorDialog>
 
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
-  : m_Preferences(NULL),
+  : m_Preferences(nullptr),
     m_Ui(new Ui::QmitkStdMultiWidgetEditorPreferencePage),
-    m_Control(NULL)
+    m_Control(nullptr)
 {
 }
 

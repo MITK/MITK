@@ -30,7 +30,7 @@ public:
   static const QString DEFAULT_PERSPECTIVE_ID;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-      berry::IWorkbenchWindowConfigurer::Pointer configurer)
+      berry::IWorkbenchWindowConfigurer::Pointer configurer) override
   {
     // Set an individual initial size
     configurer->SetInitialSize(QPoint(600,400));
@@ -40,7 +40,7 @@ public:
     return new berry::WorkbenchWindowAdvisor(configurer);
   }
 
-  QString GetInitialWindowPerspectiveId()
+  QString GetInitialWindowPerspectiveId() override
   {
     return DEFAULT_PERSPECTIVE_ID;
   }
@@ -57,7 +57,7 @@ SelectionServiceMitk::~SelectionServiceMitk()
 {
 }
 
-int SelectionServiceMitk::Start()
+QVariant SelectionServiceMitk::Start(berry::IApplicationContext* /*context*/)
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();
   wbAdvisor.reset(new SelectionServiceMITKWorkbenchAdvisor);

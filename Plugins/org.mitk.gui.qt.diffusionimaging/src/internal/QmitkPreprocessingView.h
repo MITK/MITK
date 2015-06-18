@@ -67,18 +67,18 @@ class QmitkPreprocessingView : public QmitkFunctionality
   QmitkPreprocessingView();
   virtual ~QmitkPreprocessingView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
   /// \brief Called when the functionality is activated
-  virtual void Activated();
+  virtual void Activated() override;
 
-  virtual void Deactivated();
+  virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
   static const int nrconvkernels;
 
@@ -105,6 +105,8 @@ protected slots:
   void DoUpdateInterpolationGui(int i);
   void DoRemoveGradient();
   void DoExtractGradient();
+  void DoFlipAxis();
+  void OnImageSelectionChanged();
 
 protected:
 
@@ -112,6 +114,9 @@ protected:
   void DoAKCFit();
   void DoBiExpFit();
   void DoADCAverage();
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedFlipAxis( itk::Image<TPixel, VImageDimension>* itkImage);
 
   template < typename TPixel, unsigned int VImageDimension >
   void TemplatedCropImage( itk::Image<TPixel, VImageDimension>* itkImage);
@@ -137,18 +142,13 @@ protected:
   void UpdateBValueTableWidget(int i);
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+//  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkPreprocessingViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
-
-  mitk::DataNode::Pointer                           m_SelectedImageNode;
-  mitk::Image::Pointer                              m_SelectedImage;
-  std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
-
   void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::Image::Pointer ImPtr, QString imageName, mitk::DataNode* parent);
 };
 

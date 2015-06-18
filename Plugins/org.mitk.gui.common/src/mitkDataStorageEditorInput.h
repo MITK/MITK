@@ -43,17 +43,17 @@ public:
   DataStorageEditorInput();
   DataStorageEditorInput(IDataStorageReference::Pointer ref);
 
-  bool Exists() const;
-  QString GetName() const;
-  QString GetToolTipText() const;
-  QIcon GetIcon() const;
+  bool Exists() const override;
+  QString GetName() const override;
+  QString GetToolTipText() const override;
+  QIcon GetIcon() const override;
 
-  const berry::IPersistableElement* GetPersistable() const;
-  Object* GetAdapter(const QString &adapterType) const;
+  const berry::IPersistableElement* GetPersistable() const override;
+  Object* GetAdapter(const QString &adapterType) const override;
 
   IDataStorageReference::Pointer GetDataStorageReference();
 
-  bool operator==(const berry::Object*) const;
+  bool operator==(const berry::Object*) const override;
 
 private:
 

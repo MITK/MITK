@@ -42,7 +42,7 @@ void mitk::UnstructuredGridToUnstructuredGridFilter::CreateOutputsForAllInputs(u
   this->SetNumberOfIndexedOutputs( this->GetNumberOfIndexedInputs() );
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       mitk::UnstructuredGrid::Pointer newOutputX = mitk::UnstructuredGrid::New();
       this->SetNthOutput(idx, newOutputX);
@@ -64,7 +64,7 @@ void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(unsigned int idx, 
 const mitk::UnstructuredGrid* mitk::UnstructuredGridToUnstructuredGridFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const mitk::UnstructuredGrid* >( this->ProcessObject::GetInput(0) );
 }
@@ -72,7 +72,7 @@ const mitk::UnstructuredGrid* mitk::UnstructuredGridToUnstructuredGridFilter::Ge
 const mitk::UnstructuredGrid* mitk::UnstructuredGridToUnstructuredGridFilter::GetInput( unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const mitk::UnstructuredGrid*>(this->ProcessObject::GetInput(idx));
 }

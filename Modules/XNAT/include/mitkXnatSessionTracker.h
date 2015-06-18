@@ -41,8 +41,8 @@ private:
 
   us::ModuleContext* m_Context;
 
-  virtual TrackedType AddingService(const ServiceReferenceType &reference);
-  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType tracked);
+  virtual TrackedType AddingService(const ServiceReferenceType &reference) override;
+  virtual void RemovedService(const ServiceReferenceType& reference, TrackedType tracked) override;
 
   private slots:
     void SessionOpened();

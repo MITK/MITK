@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 void mitk::ItkImageFileReader::GenerateData()
 {
   const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, NULL );
+  const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
   if ( locale.compare(currLocale)!=0 )
   {
@@ -162,7 +162,7 @@ void mitk::ItkImageFileReader::GenerateData()
   timeGeometry->Initialize(slicedGeometry, image->GetDimension(3));
   image->SetTimeGeometry(timeGeometry);
 
-  buffer = NULL;
+  buffer = nullptr;
   MITK_INFO("mitkItkImageFileReader") << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
 //  mitk::DataNode::Pointer node = this->GetOutput();
 //  node->SetData( image );

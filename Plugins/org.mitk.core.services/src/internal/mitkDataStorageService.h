@@ -34,18 +34,18 @@ public:
 
   const std::type_info& GetType() const;
 
-  IDataStorageReference::Pointer CreateDataStorage(const QString& label);
+  IDataStorageReference::Pointer CreateDataStorage(const QString& label) override;
 
-  std::vector<IDataStorageReference::Pointer> GetDataStorageReferences() const;
+  std::vector<IDataStorageReference::Pointer> GetDataStorageReferences() const override;
 
-  IDataStorageReference::Pointer GetDefaultDataStorage() const;
-  IDataStorageReference::Pointer GetDataStorage() const;
+  IDataStorageReference::Pointer GetDefaultDataStorage() const override;
+  IDataStorageReference::Pointer GetDataStorage() const override;
 
-  IDataStorageReference::Pointer GetActiveDataStorage() const;
-  void SetActiveDataStorage(IDataStorageReference::Pointer dataStorageRef);
+  IDataStorageReference::Pointer GetActiveDataStorage() const override;
+  void SetActiveDataStorage(IDataStorageReference::Pointer dataStorageRef) override;
 
-  void AddDataStorageReference(IDataStorageReference::Pointer dataStorageRef);
-  bool RemoveDataStorageReference(IDataStorageReference::Pointer dataStorageRef);
+  void AddDataStorageReference(IDataStorageReference::Pointer dataStorageRef) override;
+  bool RemoveDataStorageReference(IDataStorageReference::Pointer dataStorageRef) override;
 
 private:
 

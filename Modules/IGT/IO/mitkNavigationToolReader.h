@@ -39,7 +39,7 @@ namespace mitk {
   {
   friend class mitk::NavigationToolStorageDeserializer;
   public:
-    mitkClassMacro(NavigationToolReader,itk::Object);
+    mitkClassMacroItkParent(NavigationToolReader,itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

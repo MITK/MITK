@@ -23,7 +23,7 @@ mitk::DICOMImageBlockDescriptor
 ::DICOMImageBlockDescriptor()
 :m_ReaderImplementationLevel(SOPClassUnknown)
 ,m_PropertyList(PropertyList::New())
-,m_TagCache(NULL)
+,m_TagCache(nullptr)
 ,m_PropertiesOutOfDate(true)
 {
 }
@@ -150,14 +150,14 @@ mitk::DICOMImageBlockDescriptor
     if (m_TagCache.IsNull())
     {
       MITK_ERROR << "Unable to describe MITK image with properties without a tag-cache object!";
-      m_MitkImage = NULL;
+      m_MitkImage = nullptr;
       return;
     }
 
     if (m_ImageFrameList.empty())
     {
       MITK_ERROR << "Unable to describe MITK image with properties without a frame list!";
-      m_MitkImage = NULL;
+      m_MitkImage = nullptr;
       return;
     }
 
@@ -236,7 +236,7 @@ mitk::DICOMImageBlockDescriptor
 ::AllSlicesAreLoaded() const
 {
   bool allLoaded = true;
-  for (BoolList::const_iterator iter = m_SliceIsLoaded.begin();
+  for (auto iter = m_SliceIsLoaded.begin();
        iter != m_SliceIsLoaded.end();
        ++iter)
   {
@@ -658,7 +658,7 @@ mitk::DICOMImageBlockDescriptor
   if (filenameDetails)
   {
     os << "  Files in this image block:" << std::endl;
-    for (DICOMImageFrameList::const_iterator frameIter = m_ImageFrameList.begin();
+    for (auto frameIter = m_ImageFrameList.begin();
         frameIter != m_ImageFrameList.end();
         ++frameIter)
     {
@@ -742,7 +742,7 @@ mitk::DICOMImageBlockDescriptor
     const DICOMTag tagSOPInstanceNumber(0x0008,0x0018);
 
     unsigned int slice(0);
-    for (DICOMImageFrameList::const_iterator frameIter = m_ImageFrameList.begin();
+    for (auto frameIter = m_ImageFrameList.begin();
          frameIter != m_ImageFrameList.end();
          ++slice, ++frameIter)
     {

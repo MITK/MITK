@@ -21,10 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::DiffSliceOperation::DiffSliceOperation():Operation(1)
 {
   m_TimeStep = 0;
-  m_Slice = NULL;
-  m_Image = NULL;
-  m_WorldGeometry = NULL;
-  m_SliceGeometry = NULL;
+  m_Slice = nullptr;
+  m_Image = nullptr;
+  m_WorldGeometry = nullptr;
+  m_SliceGeometry = nullptr;
   m_ImageIsValid = false;
 }
 
@@ -74,8 +74,8 @@ mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
 mitk::DiffSliceOperation::~DiffSliceOperation()
 {
 
-  m_Slice = NULL;
-  m_WorldGeometry = NULL;
+  m_Slice = nullptr;
+  m_WorldGeometry = nullptr;
   //m_zlibSliceContainer = NULL;
 
   if (m_ImageIsValid)
@@ -83,7 +83,7 @@ mitk::DiffSliceOperation::~DiffSliceOperation()
     //if the image is still there, we have to remove the observer from it
     m_Image->RemoveObserver( m_DeleteObserverTag );
   }
-  m_Image = NULL;
+  m_Image = nullptr;
 }
 
 vtkImageData* mitk::DiffSliceOperation::GetSlice()
@@ -94,7 +94,7 @@ vtkImageData* mitk::DiffSliceOperation::GetSlice()
 
 bool mitk::DiffSliceOperation::IsValid()
 {
-  return m_ImageIsValid && (m_Slice.GetPointer() != NULL) && (m_WorldGeometry.IsNotNull());//TODO improve
+  return m_ImageIsValid && (m_Slice.GetPointer() != nullptr) && (m_WorldGeometry.IsNotNull());//TODO improve
 }
 
 void mitk::DiffSliceOperation::OnImageDeleted()

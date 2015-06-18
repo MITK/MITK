@@ -34,7 +34,7 @@ class MITKCORE_EXPORT vtkMitkThickSlicesFilter : public vtkThreadedImageAlgorith
 public:
   static vtkMitkThickSlicesFilter *New();
   vtkTypeMacro(vtkMitkThickSlicesFilter,vtkThreadedImageAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Determines how the input is interpreted (set of 2d slices ...)
@@ -67,13 +67,13 @@ protected:
 
   virtual int RequestInformation (vtkInformation*,
                                   vtkInformationVector**,
-                                  vtkInformationVector*);
+                                  vtkInformationVector*) override;
   virtual int RequestUpdateExtent(vtkInformation*,
                                   vtkInformationVector**,
-                                  vtkInformationVector*);
+                                  vtkInformationVector*) override;
   virtual int RequestData(vtkInformation*,
                           vtkInformationVector**,
-                          vtkInformationVector*);
+                          vtkInformationVector*) override;
 
   void ThreadedRequestData(vtkInformation*,
                            vtkInformationVector**,
@@ -81,7 +81,7 @@ protected:
                            vtkImageData*** inData,
                            vtkImageData** outData,
                            int outExt[6],
-                           int threadId);
+                           int threadId) override;
 
 
   int m_CurrentMode;

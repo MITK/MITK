@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk{
 
   OpenCVToMitkImageFilter::OpenCVToMitkImageFilter()
-    : m_OpenCVImage(0)
+    : m_OpenCVImage(nullptr)
   {
   }
 
@@ -45,8 +45,8 @@ namespace mitk{
   void OpenCVToMitkImageFilter::GenerateData()
   {
     IplImage cvMatIplImage;
-    const IplImage* targetImage = 0;
-    if(m_OpenCVImage == 0)
+    const IplImage* targetImage = nullptr;
+    if(m_OpenCVImage == nullptr)
     {
       if( m_OpenCVMat.cols == 0 || m_OpenCVMat.rows == 0 )
       {
@@ -152,7 +152,7 @@ namespace mitk{
   void OpenCVToMitkImageFilter::SetOpenCVMat(const cv::Mat &image)
   {
     m_OpenCVMat = image;
-    m_OpenCVImage = NULL;
+    m_OpenCVImage = nullptr;
     this->Modified();
   }
 

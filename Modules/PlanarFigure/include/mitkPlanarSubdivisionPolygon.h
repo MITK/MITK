@@ -40,14 +40,14 @@ public:
   itkCloneMacro(Self)
 
   /** \brief Subdivision Polygon has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const
+  unsigned int GetMinimumNumberOfControlPoints() const override
   {
     return 3;
   }
 
 
   /** \brief Polygon maximum number of control points is principally not limited. */
-  unsigned int GetMaximumNumberOfControlPoints() const
+  unsigned int GetMaximumNumberOfControlPoints() const override
   {
     return 1000;
   }
@@ -85,7 +85,7 @@ public:
   void IncreaseSubdivisions();
   void DecreaseSubdivisions();
 
-  virtual bool Equals(const mitk::PlanarFigure& other) const;
+  virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
 protected:
   PlanarSubdivisionPolygon();
@@ -94,7 +94,7 @@ protected:
   mitkCloneMacro(Self);
 
   /** \brief Generates the poly-line representation of the planar figure. */
-  virtual void GeneratePolyLine();
+  virtual void GeneratePolyLine() override;
 
   float m_TensionParameter;
   int m_SubdivisionRounds;

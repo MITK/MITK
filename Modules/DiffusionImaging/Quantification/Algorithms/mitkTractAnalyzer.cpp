@@ -80,7 +80,7 @@ namespace mitk {
 
         std::vector< itk::Index<3> > path = CreateSegment(startPoint, endPoint);
 
-        for(std::vector< itk::Index<3> >::iterator it = path.begin();
+        for(auto it = path.begin();
             it != path.end(); it++)
         {
           itk::Index<3> ix = *it;

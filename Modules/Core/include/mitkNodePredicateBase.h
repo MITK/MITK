@@ -41,7 +41,7 @@ namespace mitk {
 
   public:
 
-    mitkClassMacro(NodePredicateBase,itk::Object);
+    mitkClassMacroItkParent(NodePredicateBase,itk::Object);
 
     //##Documentation
     //## @brief Standard Destructor

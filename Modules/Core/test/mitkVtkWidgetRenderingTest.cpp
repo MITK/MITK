@@ -55,7 +55,7 @@ int mitkVtkWidgetRenderingTest(int /* argc */, char* /*argv*/[])
   widgetRendering->Disable();
 
   // Test: Retrieve widget before it has been set (should return NULL)
-  MITK_TEST_CONDITION(widgetRendering->GetVtkWidget() == NULL,
+  MITK_TEST_CONDITION(widgetRendering->GetVtkWidget() == nullptr,
     "Trying to retrieve widget before it has been set")
 
   // Test: Create vtkWidget instance (vtkScalarWidget) and add it

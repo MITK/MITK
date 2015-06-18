@@ -87,7 +87,7 @@ ImageToPathFilter<TInputImage,TOutputPath>
 {
   if (this->GetNumberOfInputs() < 1)
     {
-    return 0;
+    return nullptr;
     }
 
   return static_cast<const TInputImage * >

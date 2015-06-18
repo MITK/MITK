@@ -85,7 +85,7 @@ namespace mitk
     virtual ~TSpecificActionFunctor()
     {
     }
-    virtual bool DoAction(StateMachineAction* action, InteractionEvent* event)
+    virtual bool DoAction(StateMachineAction* action, InteractionEvent* event) override
     {
       return (*m_Object.*m_MemberFunctionPointer)(action, event);// executes member function
     }
@@ -122,7 +122,7 @@ namespace mitk
       * Default is the Mitk module (core).
       * The files have to be placed in the Resources/Interaction folder of their respective module.
       **/
-    bool LoadStateMachine(const std::string& filename, const us::Module* module = NULL);
+    bool LoadStateMachine(const std::string& filename, const us::Module* module = nullptr);
     /**
      * Receives Event from Dispatcher.
      * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for

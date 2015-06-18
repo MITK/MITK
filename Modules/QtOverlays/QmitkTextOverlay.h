@@ -82,9 +82,9 @@ See LICENSE.txt or http://www.mitk.org for details.
     * \WARNING No error will be issued if the property containing the text is not found, the TextOverlay
     * will show an empty string!
     */
-    void GenerateData( mitk::PropertyList::Pointer );
+    void GenerateData( mitk::PropertyList::Pointer ) override;
 
-    QSize GetNeededSize();
+    QSize GetNeededSize() override;
 
 
   protected:

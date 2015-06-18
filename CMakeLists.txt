@@ -23,7 +23,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2014.10.99)
+  project(MITK VERSION 2015.05.99)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ if(WIN32)
   set(_src_dir_length_max 50)
   set(_bin_dir_length_max 50)
   if(MITK_USE_SUPERBUILD)
-    set(_src_dir_length_max 43) # _src_dir_length_max - strlen(ITK-src)
+    set(_src_dir_length_max 34) # _src_dir_length_max - strlen(ep/src/ITK-build)
     set(_bin_dir_length_max 40) # _bin_dir_length_max - strlen(MITK-build)
   endif()
 
@@ -222,7 +222,7 @@ if(MITK_USE_QT)
     set(MITK_USE_Qt4 FALSE)
     set(MITK_USE_Qt5 TRUE)
     set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
-    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools)
+    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg WebKitWidgets Xml XmlPatterns UiTools Help)
     find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
     if(Qt5_DIR)
       get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
@@ -471,9 +471,6 @@ endif()
 
 # A list of topologically ordered targets
 set(CTEST_PROJECT_SUBPROJECTS)
-if(MITK_USE_BLUEBERRY)
-  list(APPEND CTEST_PROJECT_SUBPROJECTS BlueBerry)
-endif()
 
 list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-Core
@@ -529,28 +526,39 @@ endif()
 include(WriteBasicConfigVersionFile)
 include(CheckCXXSourceCompiles)
 include(GenerateExportHeader)
-include(mitkFunctionOrganizeSources)
+
+include(mitkFunctionAddCustomModuleTest)
+include(mitkFunctionCheckModuleDependencies)
+include(mitkFunctionCompileSnippets)
+include(mitkFunctionConvertXPSchema)
+include(mitkFunctionCreateBlueBerryApplication)
+include(mitkFunctionCreateModule)
+include(mitkFunctionCreatePlugin)
+include(mitkFunctionCreateProvisioningFile)
+include(mitkFunctionCreateWindowsBatchScript)
+include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
-include(mitkFunctionCreateWindowsBatchScript)
-include(mitkFunctionInstallProvisioningFiles)
 include(mitkFunctionInstallAutoLoadModules)
-include(mitkFunctionGetLibrarySearchPaths)
-include(mitkFunctionCompileSnippets)
+include(mitkFunctionInstallCTKPlugin)
+include(mitkFunctionInstallProvisioningFiles)
+include(mitkFunctionInstallThirdPartyCTKPlugins)
+include(mitkFunctionOrganizeSources)
+include(mitkFunctionTestPlugin)
 include(mitkFunctionUseModules)
-include(mitkFunctionCheckModuleDependencies)
-include(mitkFunctionCreateModule)
+include(mitkMacroConfigureItkPixelTypes)
 include(mitkMacroCreateExecutable)
 include(mitkMacroCreateModuleTests)
-include(mitkFunctionAddCustomModuleTest)
-include(mitkMacroMultiplexPicType)
-include(mitkMacroInstall)
-include(mitkMacroInstallHelperApp)
-include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
 include(mitkMacroGetLinuxDistribution)
 include(mitkMacroGetPMDPlatformString)
-include(mitkMacroConfigureItkPixelTypes)
+include(mitkMacroInstall)
+include(mitkMacroInstallHelperApp)
+include(mitkMacroInstallTargets)
+include(mitkMacroMultiplexPicType)
+
+# Deprecated
+include(mitkMacroCreateCTKPlugin)
 
 #-----------------------------------------------------------------------------
 # Global CMake variables
@@ -617,6 +625,12 @@ endforeach()
 # Set MITK specific options and variables (NOT available during superbuild)
 #-----------------------------------------------------------------------------
 
+# Look for optional Doxygen package
+find_package(Doxygen)
+
+option(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
+mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
+
 # ASK THE USER TO SHOW THE CONSOLE WINDOW FOR CoreApp and mitkWorkbench
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
@@ -637,10 +651,6 @@ set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERS
 if(MITK_VERSION_PATCH STREQUAL "99")
   set(MITK_VERSION_STRING "${MITK_VERSION_STRING}-${MITK_REVISION_SHORTID}")
 endif()
-
-# Needed early on for redirecting the BlueBerry documentation output dir
-set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH
-    "Output directory for doxygen generated documentation." )
 
 if(NOT UNIX AND NOT MINGW)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
@@ -886,6 +896,73 @@ if(MITK_USE_QT)
       message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
     endif()
   endif()
+
+  find_program(QT_HELPGENERATOR_EXECUTABLE
+    NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
+  find_program(QT_COLLECTIONGENERATOR_EXECUTABLE
+    NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
+  find_program(QT_ASSISTANT_EXECUTABLE
+    NAMES assistant-qt4 assistant4 assistant
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
+  find_program(QT_XMLPATTERNS_EXECUTABLE
+    NAMES xmlpatterns
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+
+  mark_as_advanced(QT_HELPGENERATOR_EXECUTABLE
+                   QT_COLLECTIONGENERATOR_EXECUTABLE
+                   QT_ASSISTANT_EXECUTABLE
+                   QT_XMLPATTERNS_EXECUTABLE
+                  )
+
+  if(MITK_USE_BLUEBERRY)
+    option(BLUEBERRY_USE_QT_HELP "Enable support for integrating plugin documentation into Qt Help" ${DOXYGEN_FOUND})
+    mark_as_advanced(BLUEBERRY_USE_QT_HELP)
+
+    # Sanity checks for in-application BlueBerry plug-in help generation
+    if(BLUEBERRY_USE_QT_HELP)
+      set(_force_blueberry_use_qt_help_to_off 0)
+      if(NOT DOXYGEN_FOUND)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because Doxygen was not found.")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+      if(DOXYGEN_FOUND AND DOXYGEN_VERSION VERSION_LESS 1.8.7)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because Doxygen version 1.8.7 or newer not found.")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+
+      if(NOT QT_HELPGENERATOR_EXECUTABLE)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because QT_HELPGENERATOR_EXECUTABLE is empty.")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+
+      if(NOT QT_XMLPATTERNS_EXECUTABLE)
+        message("You have enabled Qt Help support, but QT_XMLPATTERNS_EXECUTABLE is empty")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+
+      if(_force_blueberry_use_qt_help_to_off)
+        set(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating plugin documentation into Qt Help" FORCE)
+      endif()
+    endif()
+
+    if(BLUEBERRY_QT_HELP_REQUIRED AND NOT BLUEBERRY_USE_QT_HELP)
+      message(FATAL_ERROR "BLUEBERRY_USE_QT_HELP is required to be set to ON")
+    endif()
+  endif()
+
 endif()
 
 #-----------------------------------------------------------------------------
@@ -979,64 +1056,6 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MITK_SHARED_LINKER
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${MITK_MODULE_LINKER_FLAGS}")
 
 #-----------------------------------------------------------------------------
-# Compile Utilities and set-up MITK variables
-#-----------------------------------------------------------------------------
-
-add_subdirectory(Utilities)
-
-if(MITK_USE_BLUEBERRY)
-
-  # We need to hack a little bit because MITK applications may need
-  # to enable certain BlueBerry plug-ins. However, these plug-ins
-  # are validated separately from the MITK plug-ins and know nothing
-  # about potential MITK plug-in dependencies of the applications. Hence
-  # we cannot pass the MITK application list to the BlueBerry
-  # ctkMacroSetupPlugins call but need to extract the BlueBerry dependencies
-  # from the applications and set them explicitly.
-
-  include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
-
-  foreach(mitk_app ${MITK_APPS})
-    # extract target_dir and option_name
-    string(REPLACE "^^" "\\;" target_info ${mitk_app})
-    set(target_info_list ${target_info})
-    list(GET target_info_list 0 target_dir)
-    list(GET target_info_list 1 option_name)
-    # check if the application is enabled and if target_libraries.cmake exists
-    if((${option_name} OR MITK_BUILD_ALL_APPS) AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
-      include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/${target_dir}/target_libraries.cmake")
-      foreach(_target_dep ${target_libraries})
-        if(_target_dep MATCHES org_blueberry_)
-          string(REPLACE _ . _app_bb_dep ${_target_dep})
-          # explicitly set the build option for the BlueBerry plug-in
-          set(BLUEBERRY_BUILD_${_app_bb_dep} ON CACHE BOOL "Build the ${_app_bb_dep} plug-in")
-        endif()
-      endforeach()
-    endif()
-  endforeach()
-
-  set(mbilog_DIR "${mbilog_BINARY_DIR}")
-
-  if(MITK_BUILD_ALL_PLUGINS)
-    set(BLUEBERRY_BUILD_ALL_PLUGINS ON)
-  endif()
-
-  set(BLUEBERRY_CXX_FLAGS "${MITK_CXX_FLAGS}")
-  set(BLUEBERRY_CXX_FLAGS_RELEASE "${MITK_CXX_FLAGS_RELEASE}")
-  set(BLUEBERRY_C_FLAGS "${MITK_C_FLAGS}")
-
-  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
-
-  add_subdirectory(BlueBerry)
-
-  set(BlueBerry_DIR ${CMAKE_CURRENT_BINARY_DIR}/BlueBerry
-      CACHE PATH "The directory containing a CMake configuration file for BlueBerry" FORCE)
-
-  include(mitkMacroCreateCTKPlugin)
-
-endif()
-
-#-----------------------------------------------------------------------------
 # Add custom targets representing CDash subprojects
 #-----------------------------------------------------------------------------
 
@@ -1050,18 +1069,18 @@ endforeach()
 # Add subdirectories
 #-----------------------------------------------------------------------------
 
+add_subdirectory(Utilities)
+
 add_subdirectory(Modules)
 
 if(MITK_USE_BLUEBERRY)
 
-  find_package(BlueBerry REQUIRED)
+  set(BLUEBERRY_XPDOC_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html/)
 
   set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
 
   # Plug-in testing (needs some work to be enabled again)
   if(BUILD_TESTING)
-    include(berryTestingHelpers)
-
     set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")
     if(TARGET CoreApp)
       get_target_property(_is_macosx_bundle CoreApp MACOSX_BUNDLE)
@@ -1073,10 +1092,10 @@ if(MITK_USE_BLUEBERRY)
   endif()
 
   include("${CMAKE_CURRENT_SOURCE_DIR}/Plugins/PluginList.cmake")
-  mitkFunctionWhitelistPlugins(MITK MITK_EXT_PLUGINS)
+  mitkFunctionWhitelistPlugins(MITK MITK_PLUGINS)
 
   set(mitk_plugins_fullpath "")
-  foreach(mitk_plugin ${MITK_EXT_PLUGINS})
+  foreach(mitk_plugin ${MITK_PLUGINS})
     list(APPEND mitk_plugins_fullpath Plugins/${mitk_plugin})
   endforeach()
 
@@ -1138,7 +1157,9 @@ endif()
 # Documentation
 #-----------------------------------------------------------------------------
 
-add_subdirectory(Documentation)
+if(DOXYGEN_FOUND)
+  add_subdirectory(Documentation)
+endif()
 
 #-----------------------------------------------------------------------------
 # Installation

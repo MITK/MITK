@@ -70,7 +70,7 @@ public:
 
   /** Methods from mitk::BaseProcess. */
   itkFactorylessNewMacro(Self);
-  mitk::BaseProcess::Pointer CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern)
+  mitk::BaseDataSource::Pointer CreateIOProcessObject(const std::string filename, const std::string filePrefix, const std::string filePattern) override
   {
     typename T::Pointer ioProcessObject = T::New();
     ioProcessObject->SetFileName(filename.c_str());
@@ -79,7 +79,7 @@ public:
     return ioProcessObject.GetPointer();
   }
 
-  virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern)
+  virtual bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) override
   {
     return T::CanReadFile(filename, filePrefix, filePattern);
   }

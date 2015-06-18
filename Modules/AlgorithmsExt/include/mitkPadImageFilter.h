@@ -61,7 +61,7 @@ protected:
 
   virtual ~PadImageFilter();
 
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
 private:
   bool m_BinaryFilter;

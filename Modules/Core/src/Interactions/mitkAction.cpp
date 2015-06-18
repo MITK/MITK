@@ -22,7 +22,7 @@ namespace mitk {
  * Default Constructor
  */
 Action::Action( int actionId )
-:m_ActionId( actionId ), m_PropertiesList(NULL)
+:m_ActionId( actionId ), m_PropertiesList(nullptr)
 {}
 
 Action::~Action()
@@ -56,7 +56,7 @@ mitk::BaseProperty* Action::GetProperty( const char *propertyKey ) const
   if (m_PropertiesList.IsNotNull())
     return m_PropertiesList->GetProperty( propertyKey );
   else
-    return NULL;
+    return nullptr;
 }
 
 } // namespace mitk

@@ -42,7 +42,7 @@ class MITKDICOMREADER_EXPORT DICOMSortCriterion : public itk::LightObject
 {
   public:
 
-    mitkClassMacro( DICOMSortCriterion, itk::LightObject );
+    mitkClassMacroItkParent( DICOMSortCriterion, itk::LightObject );
 
     /// \brief Tags used for comparison (includes seconary criteria).
     DICOMTagList GetAllTagsOfInterest() const;

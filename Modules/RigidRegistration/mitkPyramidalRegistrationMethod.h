@@ -68,7 +68,7 @@ namespace mitk
 
     void SetInterpolator(int interpolator);
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     virtual void SetReferenceImage( Image::Pointer fixedImage);
 
@@ -131,7 +131,7 @@ namespace mitk
     Image::Pointer m_FixedMask;
     Image::Pointer m_MovingMask;
 
-    void GenerateOutputInformation(){};
+    void GenerateOutputInformation() override{};
 
 
   private:

@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkCubeSource.h>
 
 mitk::ExtrudedContour::ExtrudedContour()
-  : m_Contour(NULL), m_ClippingGeometry(NULL), m_AutomaticVectorGeneration(false)
+  : m_Contour(nullptr), m_ClippingGeometry(nullptr), m_AutomaticVectorGeneration(false)
 {
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(1);
@@ -148,7 +148,7 @@ void mitk::ExtrudedContour::BuildSurface()
 {
   if(m_Contour.IsNull())
   {
-    SetVtkPolyData(NULL);
+    SetVtkPolyData(nullptr);
     return;
   }
 

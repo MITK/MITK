@@ -28,14 +28,14 @@ public:
 
   DataStorageReference(DataStorage::Pointer dataStorage, bool isDefault = false);
 
-  DataStorage::Pointer GetDataStorage() const;
+  DataStorage::Pointer GetDataStorage() const override;
 
-  bool IsDefault() const;
+  bool IsDefault() const override;
 
-  QString GetLabel() const;
-  void SetLabel(const QString& label);
+  QString GetLabel() const override;
+  void SetLabel(const QString& label) override;
 
-  bool operator==(const berry::Object* o) const;
+  bool operator==(const berry::Object* o) const override;
 
 private:
 

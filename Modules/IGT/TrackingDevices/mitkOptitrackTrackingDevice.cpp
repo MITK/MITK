@@ -721,7 +721,7 @@ ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* 
 mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( unsigned int toolNumber) const
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
-  return NULL;
+  return nullptr;
 }
 
 //=======================================================
@@ -756,7 +756,7 @@ bool mitk::OptitrackTrackingDevice::SetCameraParams(int exposure, int threshold 
 mitk::TrackingTool* mitk::OptitrackTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
-  return NULL;
+  return nullptr;
 }
 
 //=======================================================

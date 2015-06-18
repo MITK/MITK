@@ -29,7 +29,7 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    std::string Serialize();
+    std::string Serialize() override;
 
   protected:
     SimulationSerializer();

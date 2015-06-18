@@ -39,7 +39,7 @@ std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement*> mitk::TubeGra
   if (!m_TubeGraph)
   {
     MITK_ERROR << "mitk::TubeGraphPicker: No tube graph available. Please set an input!" << std::endl;
-    mitk::TubeElement* nullPointer = NULL;
+    mitk::TubeElement* nullPointer = nullptr;
     return std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement*>(TubeGraph::ErrorId, nullPointer);
   }
   m_WorldPosition = pickedPosition;
@@ -56,7 +56,7 @@ std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement*> mitk::TubeGra
 
   //iterate over all edges and find the edge, which element is near by the clicked point
   std::vector<mitk::TubeGraphEdge> allEdges = m_TubeGraph->GetVectorOfAllEdges();
-  for(std::vector<mitk::TubeGraphEdge>::iterator edge = allEdges.begin(); edge != allEdges.end(); ++edge)
+  for(auto edge = allEdges.begin(); edge != allEdges.end(); ++edge)
   {
     std::pair<mitk::TubeGraphVertex, mitk::TubeGraphVertex> soureTargetPair = m_TubeGraph->GetVerticesOfAnEdge(m_TubeGraph->GetEdgeDescriptor(*edge));
 

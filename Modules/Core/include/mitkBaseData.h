@@ -40,7 +40,7 @@ namespace mitk {
 class MITKCORE_EXPORT BaseData : public itk::DataObject, public OperationActor
 {
 public:
-  mitkClassMacro(BaseData,itk::DataObject)
+  mitkClassMacroItkParent(BaseData,itk::DataObject)
 
   /**
   * \brief Return the TimeGeometry of the data as const pointer.
@@ -140,7 +140,7 @@ public:
   mitk::BaseGeometry* GetGeometry(int t=0) const
   {
     if(m_TimeGeometry.IsNull())
-      return NULL;
+      return nullptr;
     return m_TimeGeometry->GetGeometryForTimeStep(t);
   }
 
@@ -159,14 +159,14 @@ public:
   //## that the geometry is updated by calling
   //## GetTimeGeometry()->UpdateInformation()
   //## \em after calling its source's BaseProcess::UpdateOutputInformation().
-  void UpdateOutputInformation();
+  void UpdateOutputInformation() override;
 
   //##Documentation
   //## @brief Set the RequestedRegion to the LargestPossibleRegion.
   //##
   //## This forces a filter to produce all of the output in one execution
   //## (i.e. not streaming) on the next call to Update().
-  virtual void SetRequestedRegionToLargestPossibleRegion()=0;
+  virtual void SetRequestedRegionToLargestPossibleRegion() override = 0;
 
   //##Documentation
   //## @brief Determine whether the RequestedRegion is outside of the BufferedRegion.
@@ -179,7 +179,7 @@ public:
   //## inside the BufferedRegion from the previous execution (and the
   //## current filter is up to date), then a given filter does not need
   //## to re-execute
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion()=0;
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override = 0;
 
   //##Documentation
   //## @brief Verify that the RequestedRegion is within the LargestPossibleRegion.
@@ -192,7 +192,7 @@ public:
   //## PropagateRequestedRegion().  PropagateRequestedRegion() throws a
   //## InvalidRequestedRegionError exception if the requested region is
   //## not within the LargestPossibleRegion.
-  virtual bool VerifyRequestedRegion() = 0;
+  virtual bool VerifyRequestedRegion() override = 0;
 
   //##Documentation
   //## @brief Copy information from the specified data set.
@@ -205,7 +205,7 @@ public:
   //## The default implementation of this method copies the time sliced geometry
   //## and the property list of an object. If a subclass overrides this
   //## method, it should always call its superclass' version.
-  void CopyInformation(const itk::DataObject* data);
+  void CopyInformation(const itk::DataObject* data) override;
 
   //##Documentation
   //## @brief Check whether the data has been initialized, i.e.,
@@ -247,14 +247,14 @@ public:
   //## region of the data object passed in as a parameter.
   //##
   //## This method is implemented in the concrete subclasses of BaseData.
-  virtual void SetRequestedRegion(const itk::DataObject *data)=0;
+  virtual void SetRequestedRegion(const itk::DataObject *data) override = 0;
 
   //##Documentation
   //##@brief overwrite if the Data can be called by an Interactor (StateMachine).
   //##
   //## Empty by default. Overwrite and implement all the necessary operations here
   //## and get the necessary information from the parameter operation.
-  void ExecuteOperation(Operation* operation);
+  void ExecuteOperation(Operation* operation) override;
 
   /**
   * \brief Set the BaseGeometry of the data, which will be referenced (not copied!).
@@ -363,12 +363,12 @@ public:
   //##Documentation
   //## @brief Get the modified time of the last change of the contents
   //## this data object or its geometry.
-  virtual unsigned long GetMTime() const;
+  virtual unsigned long GetMTime() const override;
 
   /**
    * \sa itk::ProcessObject::Graft
    */
-  virtual void Graft(const DataObject*);
+  virtual void Graft(const DataObject*) override;
 
 protected:
   BaseData();
@@ -403,7 +403,7 @@ protected:
   virtual void InitializeEmpty(){}
 
 
-  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
   bool m_LastRequestedRegionWasOutsideOfTheBufferedRegion;
 

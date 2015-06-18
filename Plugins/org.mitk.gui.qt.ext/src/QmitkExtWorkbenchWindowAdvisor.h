@@ -44,17 +44,17 @@ public:
     ~QmitkExtWorkbenchWindowAdvisor();
 
     berry::SmartPointer<berry::ActionBarAdvisor> CreateActionBarAdvisor(
-        berry::SmartPointer<berry::IActionBarConfigurer> configurer);
+        berry::SmartPointer<berry::IActionBarConfigurer> configurer) override;
 
-    QWidget* CreateEmptyWindowContents(QWidget* parent);
+    QWidget* CreateEmptyWindowContents(QWidget* parent) override;
 
-    void PostWindowCreate();
+    void PostWindowCreate() override;
 
-    void PreWindowOpen();
+    void PreWindowOpen() override;
 
-    void PostWindowOpen();
+    void PostWindowOpen() override;
 
-    void PostWindowClose();
+    void PostWindowClose() override;
 
     void ShowViewToolbar(bool show);
 

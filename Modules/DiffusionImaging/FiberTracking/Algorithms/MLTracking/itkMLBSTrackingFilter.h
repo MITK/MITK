@@ -36,6 +36,7 @@ This file is based heavily on a corresponding ITK filter.
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 #include <itkSimpleFastMutexLock.h>
 #include <mitkDiffusionPropertyHelper.h>
+#include <mitkPointSet.h>
 
 // classification includes
 #include <vigra/random_forest.hxx>
@@ -78,11 +79,13 @@ public:
     typedef std::deque< itk::Point<double> > FiberType;
     typedef std::vector< FiberType > BundleType;
 
-    bool    m_PauseTracking;
+    volatile bool    m_PauseTracking;
     bool    m_AbortTracking;
     bool    m_BuildFibersFinished;
     int     m_BuildFibersReady;
-    bool    m_Stop;
+    volatile bool m_Stop;
+    mitk::PointSet::Pointer             m_SamplingPointset;
+    mitk::PointSet::Pointer             m_AlternativePointset;
 //    void RequestFibers(){ m_Stop=true; m_BuildFibersReady=0; m_BuildFibersFinished=false; }
 
     itkGetMacro( FiberPolyData, PolyDataType )          ///< Output fibers
@@ -93,7 +96,6 @@ public:
     itkSetMacro( MinTractLength, double )               ///< Shorter tracts are discarded.
     itkSetMacro( MaxTractLength, double )
     itkSetMacro( AngularThreshold, double )
-    itkSetMacro( UseDirection, bool )
     itkSetMacro( SamplingDistance, double )
     itkSetMacro( NumberOfSamples, int )
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer)
@@ -103,6 +105,8 @@ public:
     itkSetMacro( RemoveWmEndFibers, bool )
     itkSetMacro( AposterioriCurvCheck, bool )
     itkSetMacro( AvoidStop, bool )
+    itkSetMacro( RandomSampling, bool )
+    itkSetMacro( Verbose, bool )
 
     void SetDecisionForest( DecisionForestType* forest )
     {
@@ -127,10 +131,10 @@ public:
     double GetRandDouble(double min=-1, double max=1);
     double RoundToNearest(double num);
 
-    void BeforeThreadedGenerateData();
+    void BeforeThreadedGenerateData() override;
     void PreprocessRawData();
-    void ThreadedGenerateData( const InputImageRegionType &outputRegionForThread, ThreadIdType threadId);
-    void AfterThreadedGenerateData();
+    void ThreadedGenerateData( const InputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
+    void AfterThreadedGenerateData() override;
 
     PolyDataType                        m_FiberPolyData;
     vtkSmartPointer<vtkPoints>          m_Points;
@@ -143,7 +147,7 @@ public:
     double                              m_MinTractLength;
     double                              m_MaxTractLength;
     int                                 m_SeedsPerVoxel;
-    bool                                m_UseDirection;
+    bool                                m_RandomSampling;
     double                              m_SamplingDistance;
     int                                 m_NumberOfSamples;
     std::vector< int >                  m_ImageSize;
@@ -164,7 +168,7 @@ public:
     bool                                m_AposterioriCurvCheck;
     bool                                m_RemoveWmEndFibers;
     bool                                m_AvoidStop;
-
+    bool                                m_Verbose;
     int                                 m_Threads;
     bool                                m_DemoMode;
     void BuildFibers(bool check);

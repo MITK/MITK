@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"
-
+#include "MitkIGTExports.h"
 #include <iostream>
 
 #include <mitkRealTimeClock.h>
@@ -44,7 +44,7 @@ namespace mitk
   class MITKIGT_EXPORT NavigationDataRecorderDeprecated : public itk::ProcessObject
   {
   public:
-    mitkClassMacro( NavigationDataRecorderDeprecated, itk::ProcessObject );
+    mitkClassMacroItkParent( NavigationDataRecorderDeprecated, itk::ProcessObject );
 
     itkNewMacro( Self );
 
@@ -174,7 +174,7 @@ namespace mitk
     * \brief filter execute method here it is not used
     *
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     NavigationDataRecorderDeprecated();
 

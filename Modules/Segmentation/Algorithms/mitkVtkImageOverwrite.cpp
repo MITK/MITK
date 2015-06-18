@@ -482,7 +482,7 @@ static void vtkGetResliceInterpFunc(mitkVtkImageOverwrite *self,
       mitkVtkImageOverwrite *self))interpolate) = \
       &vtkNearestNeighborInterpolation);
   default:
-    interpolate = 0;
+    interpolate = nullptr;
   }
 }
 
@@ -545,7 +545,7 @@ static void vtkGetSetPixelsFunc(mitkVtkImageOverwrite *self,
           *setpixels = &vtkImageResliceSetPixels<VTK_TT>::Set1
           );
         default:
-          setpixels = 0;
+          setpixels = nullptr;
         }
     default:
       switch (dataType)
@@ -554,7 +554,7 @@ static void vtkGetSetPixelsFunc(mitkVtkImageOverwrite *self,
           *setpixels = &vtkImageResliceSetPixels<VTK_TT>::Set
           );
         default:
-          setpixels = 0;
+          setpixels = nullptr;
         }
     }
 }
@@ -598,7 +598,7 @@ static void vtkFreeBackgroundPixel(mitkVtkImageOverwrite *self, void **rval)
     vtkTemplateAliasMacro(delete [] *((VTK_TT **)rval));
     }
 
-  *rval = 0;
+  *rval = nullptr;
 }
 
 //----------------------------------------------------------------------------
@@ -901,7 +901,7 @@ void mitkVtkImageOverwrite::ThreadedRequestData(
 
   if (this->HitInputExtent == 0)
     {
-    vtkImageResliceClearExecute(this, inData[0][0], 0, outData[0], outPtr,
+    vtkImageResliceClearExecute(this, inData[0][0], nullptr, outData[0], outPtr,
                                 outExt, id);
     return;
     }

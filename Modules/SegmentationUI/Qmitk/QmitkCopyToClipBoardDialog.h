@@ -31,7 +31,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkCopyToClipBoardDialog : public QDialog
 
   public:
 
-    QmitkCopyToClipBoardDialog(const QString& text, QWidget* parent = 0, const char* name = 0);
+    QmitkCopyToClipBoardDialog(const QString& text, QWidget* parent = nullptr, const char* name = nullptr);
     virtual ~QmitkCopyToClipBoardDialog();
 
   signals:

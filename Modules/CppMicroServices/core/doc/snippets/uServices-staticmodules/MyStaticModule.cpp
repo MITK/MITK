@@ -26,12 +26,12 @@ US_USE_NAMESPACE
 
 struct MyStaticModuleActivator : public ModuleActivator
 {
-  void Load(ModuleContext* /*context*/)
+  void Load(ModuleContext* /*context*/) override
   {
     std::cout << "Hello from a static module." << std::endl;
   }
 
-  void Unload(ModuleContext* /*context*/) {}
+  void Unload(ModuleContext* /*context*/) override {}
 };
 
 US_EXPORT_MODULE_ACTIVATOR(MyStaticModuleActivator)

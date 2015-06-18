@@ -25,7 +25,9 @@ QmitkUSControlsProbesWidget::QmitkUSControlsProbesWidget(mitk::USControlInterfac
 
   if ( ! m_ControlInterface )
   {
+    // I do not see an instance of this being reenabled. We might have to look at it again, if we start to reallyuse multiple probes simultaneously.
     ui->probesComboBox->setEnabled(false);
+    ui->probesLabel->setEnabled(false);
     return;
   }
 
@@ -33,7 +35,7 @@ QmitkUSControlsProbesWidget::QmitkUSControlsProbesWidget(mitk::USControlInterfac
 
   // get all probes an put their names into a combo box
   std::vector<mitk::USProbe::Pointer> probes = m_ControlInterface->GetProbeSet();
-  for ( std::vector<mitk::USProbe::Pointer>::iterator it = probes.begin();
+  for ( auto it = probes.begin();
     it != probes.end(); ++it )
   {
     std::string probeIdentifier = (*it)->GetName();

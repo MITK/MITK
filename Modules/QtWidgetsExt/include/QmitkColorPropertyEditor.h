@@ -30,12 +30,12 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPopupColorChooser : public QFrame
 
   public:
 
-    QmitkPopupColorChooser(QWidget* parent = 0, unsigned int steps = 16, unsigned int size = 150);
+    QmitkPopupColorChooser(QWidget* parent = nullptr, unsigned int steps = 16, unsigned int size = 150);
     virtual ~QmitkPopupColorChooser();
 
     void setSteps(int);
 
-    virtual void popup(QWidget* parent, const QPoint& point, const mitk::Color* = 0);  /// Call to popup this widget. parent determines popup position
+    virtual void popup(QWidget* parent, const QPoint& point, const mitk::Color* = nullptr);  /// Call to popup this widget. parent determines popup position
 
   signals:
 
@@ -43,13 +43,13 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPopupColorChooser : public QFrame
 
   protected:
 
-    virtual void keyReleaseEvent(QKeyEvent*);
+    virtual void keyReleaseEvent(QKeyEvent*) override;
 
-    virtual void mouseMoveEvent(QMouseEvent*);
-    virtual void mouseReleaseEvent(QMouseEvent*);
-    virtual void closeEvent(QCloseEvent*);
+    virtual void mouseMoveEvent(QMouseEvent*) override;
+    virtual void mouseReleaseEvent(QMouseEvent*) override;
+    virtual void closeEvent(QCloseEvent*) override;
 
-    virtual void paintEvent(QPaintEvent*);
+    virtual void paintEvent(QPaintEvent*) override;
     void drawGradient(QPainter* p);
 
   private:
@@ -81,8 +81,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkColorPropertyEditor : public QmitkColorProper
 
   protected:
 
-    virtual void mousePressEvent(QMouseEvent*);
-    virtual void mouseReleaseEvent(QMouseEvent*);
+    virtual void mousePressEvent(QMouseEvent*) override;
+    virtual void mouseReleaseEvent(QMouseEvent*) override;
 
     static QmitkPopupColorChooser* colorChooser;
     static int colorChooserRefCount;

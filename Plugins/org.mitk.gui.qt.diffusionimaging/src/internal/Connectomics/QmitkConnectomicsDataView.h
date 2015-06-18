@@ -50,10 +50,10 @@ public:
   QmitkConnectomicsDataView();
   virtual ~QmitkConnectomicsDataView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
   protected slots:
 
@@ -66,11 +66,14 @@ public:
     /// \brief Adjust parameters depending on synthetic network type
     void OnSyntheticNetworkComboBoxCurrentIndexChanged(int currentIndex);
 
+    /// \brief Create #voxel x #voxel correlation matrix of a timeseries image
+    void OnCreateCorrelationMatrixPushButtonClicked();
+
 protected:
 
   // ####### Functions #######
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   /// \brief Converts an image into a RGBA image
   template < typename TPixel, unsigned int VImageDimension >
@@ -79,6 +82,11 @@ protected:
   /// \brief Wipe display and empty statistics
   void WipeDisplay();
 
+  template< typename TPixel, unsigned int VImageDimension >
+  void DoWholeCorrelation( itk::Image<TPixel, VImageDimension>* itkTimeSeriesImage );
+
+  template< typename TPixel, unsigned int VImageDimension >
+  void DoParcelCorrelation( itk::Image<TPixel, VImageDimension>* itkTimeSeriesImage, mitk::Image::Pointer parcelImage );
 
   // ####### Variables #######
 

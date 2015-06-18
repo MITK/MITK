@@ -57,7 +57,7 @@ void QClickableLabel::AddHotspot( const QString& name, const QRect position )
 
 void QClickableLabel::RemoveHotspot( const QString& name )
 {
-  NameToIndexMapType::iterator iter = m_HotspotIndexForName.find( name );
+  auto iter = m_HotspotIndexForName.find( name );
 
   if ( iter != m_HotspotIndexForName.end() )
   {
@@ -106,7 +106,7 @@ void QClickableLabel::mouseReleaseEvent( QMouseEvent* e )
 unsigned int QClickableLabel::matchingRect( const QPoint& p )
 {
   unsigned int index(0);
-  for ( RectVectorType::iterator iter = m_Hotspots.begin();
+  for ( auto iter = m_Hotspots.begin();
         iter != m_Hotspots.end();
         ++iter )
   {

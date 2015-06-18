@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkPlotWidget::QmitkPlotWidget(QWidget* parent, const char* title, const char*, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  QVBoxLayout* boxLayout = new QVBoxLayout(this);
+  auto  boxLayout = new QVBoxLayout(this);
   m_Plot = new QwtPlot( QwtText(title), this ) ;
   m_Plot->setCanvasBackground(Qt::white);
   boxLayout->addWidget( m_Plot );
@@ -136,7 +136,7 @@ void QmitkPlotWidget::Clear()
 
 double* QmitkPlotWidget::ConvertToRawArray( const QmitkPlotWidget::DataVector& values )
 {
-  double* raw = new double[ values.size() ];
+  auto  raw = new double[ values.size() ];
   for( unsigned int i = 0; i < values.size(); ++i )
     raw[i] = values[i];
   return raw;
@@ -145,7 +145,7 @@ double* QmitkPlotWidget::ConvertToRawArray( const QmitkPlotWidget::DataVector& v
 
 double* QmitkPlotWidget::ConvertToRawArray( const QmitkPlotWidget::XYDataVector& values, unsigned int component )
 {
-  double* raw = new double[ values.size() ];
+  auto  raw = new double[ values.size() ];
   for( unsigned int i = 0; i < values.size(); ++i )
   {
     switch (component)

@@ -47,17 +47,17 @@ public:
    */
   //virtual void Initialize();
 
-  bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false );
+  bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false ) override;
 
   /** \brief Circle has 2 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const
+  unsigned int GetMinimumNumberOfControlPoints() const override
   {
     return 2;
   }
 
 
   /** \brief Circle has 2 control points per definition. */
-  unsigned int GetMaximumNumberOfControlPoints() const
+  unsigned int GetMaximumNumberOfControlPoints() const override
   {
     return 2;
   }
@@ -95,9 +95,9 @@ public:
       m_MinMaxRadiusContraintsActive = active;
   }
 
-  virtual bool SetCurrentControlPoint( const Point2D& point );
+  virtual bool SetCurrentControlPoint( const Point2D& point ) override;
 
-  virtual bool Equals(const mitk::PlanarFigure& other) const;
+  virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
 protected:
   PlanarCircle();
@@ -106,18 +106,18 @@ protected:
   mitkCloneMacro(Self);
 
   /** \brief Generates the poly-line representation of the planar figure. */
-  virtual void GeneratePolyLine();
+  virtual void GeneratePolyLine() override;
 
   /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.*/
-  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight);
+  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) override;
 
   /** \brief Spatially constrain control points of second (orthogonal) line */
-  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point );
+  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point ) override;
 
   /** \brief Calculates feature quantities of the planar figure. */
-  virtual void EvaluateFeaturesInternal();
+  virtual void EvaluateFeaturesInternal() override;
 
-  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
 
   // Feature identifiers

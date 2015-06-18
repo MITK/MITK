@@ -44,8 +44,8 @@ public:
    */
   virtual ~VtkShaderProgram();
 
-  virtual void Activate();
-  virtual void Deactivate();
+  virtual void Activate() override;
+  virtual void Deactivate() override;
 
   void SetVtkShaderProgram(vtkSmartPointer<vtkShaderProgram2> p);
   vtkSmartPointer<vtkShaderProgram2> GetVtkShaderProgram() const;

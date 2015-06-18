@@ -45,7 +45,7 @@ class MITKDICOMREADER_EXPORT DICOMDatasetSorter : public itk::LightObject
 {
   public:
 
-    mitkClassMacro( DICOMDatasetSorter, itk::LightObject )
+    mitkClassMacroItkParent( DICOMDatasetSorter, itk::LightObject )
 
     /**
       \brief Return the tags of interest (to facilitate scanning)

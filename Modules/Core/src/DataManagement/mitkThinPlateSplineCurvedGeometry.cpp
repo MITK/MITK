@@ -39,9 +39,9 @@ mitk::ThinPlateSplineCurvedGeometry::~ThinPlateSplineCurvedGeometry()
   // the same as m_InterpolatingAbstractTransform, which will be deleted
   // by the superclass.
 
-  if(m_VtkTargetLandmarks!=NULL)
+  if(m_VtkTargetLandmarks!=nullptr)
     m_VtkTargetLandmarks->Delete();
-  if(m_VtkProjectedLandmarks!=NULL)
+  if(m_VtkProjectedLandmarks!=nullptr)
     m_VtkProjectedLandmarks->Delete();
 }
 

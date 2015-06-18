@@ -119,7 +119,7 @@ class MITKSEGMENTATION_EXPORT SegTool2D : public Tool
     * Current an event is discarded if it was not sent by a 2D renderwindow and if it is
     * not of type InteractionPositionEvent
     */
-    virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode);
+    virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode) override;
 
     /**
       \brief Extract the slice of an image that the user just scribbles on.

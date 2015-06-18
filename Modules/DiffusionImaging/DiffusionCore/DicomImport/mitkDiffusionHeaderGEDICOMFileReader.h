@@ -15,7 +15,7 @@ public:
   mitkClassMacro( DiffusionHeaderGEDICOMFileReader, DiffusionHeaderDICOMFileReader )
   itkNewMacro( Self )
 
-  virtual bool ReadDiffusionHeader(std::string filename);
+  virtual bool ReadDiffusionHeader(std::string filename) override;
 
 protected:
   DiffusionHeaderGEDICOMFileReader();

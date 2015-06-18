@@ -180,19 +180,19 @@ int mitk::LimitedLinearUndo::GetLastGroupEventIdInList()
 mitk::OperationEvent* mitk::LimitedLinearUndo::GetLastOfType(OperationActor* destination, OperationType opType)
 {
   // When/where is this function needed? In CoordinateSupplier...
-  for ( UndoContainerRevIter iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter )
+  for ( auto iter = m_UndoList.rbegin(); iter != m_UndoList.rend(); ++iter )
   {
     OperationEvent* opEvent = dynamic_cast<OperationEvent*>(*iter);
     if (!opEvent) continue;
 
-    if (   opEvent->GetOperation() != NULL
+    if (   opEvent->GetOperation() != nullptr
         && opEvent->GetOperation()->GetOperationType() == opType
         && opEvent->IsValid()
         && opEvent->GetDestination() == destination )
       return opEvent;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 int mitk::LimitedLinearUndo::FirstObjectEventIdOfCurrentGroup(mitk::LimitedLinearUndo::UndoContainer& stack)
@@ -200,7 +200,7 @@ int mitk::LimitedLinearUndo::FirstObjectEventIdOfCurrentGroup(mitk::LimitedLinea
   int currentGroupEventId = stack.back()->GetGroupEventId();
   int firstObjectEventId = -1;
 
-  for ( UndoContainerRevIter iter = stack.rbegin(); iter != stack.rend(); ++iter )
+  for ( auto iter = stack.rbegin(); iter != stack.rend(); ++iter )
   {
     if ( (*iter)->GetGroupEventId() == currentGroupEventId )
     {

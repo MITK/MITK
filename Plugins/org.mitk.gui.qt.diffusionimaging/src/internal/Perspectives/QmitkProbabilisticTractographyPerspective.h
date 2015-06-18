@@ -30,7 +30,7 @@ public:
   QmitkProbabilisticTractographyPerspective() {}
   ~QmitkProbabilisticTractographyPerspective() {}
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
 #endif /* QmitkProbabilisticTractographyPerspective_H_ */

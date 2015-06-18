@@ -66,7 +66,6 @@ int main(int argc, char* argv[])
     parser.addArgument("samplingdist", "sd", mitkCommandLineParser::Float, "Sampling distance:", "sampling distance (in voxels)", us::Any());
     parser.addArgument("seeds", "nse", mitkCommandLineParser::Int, "Seeds per voxel:", "seeds per voxel", us::Any());
 
-    parser.addArgument("usedirection", "ud", mitkCommandLineParser::Bool, "Use previous direction:", "use previous direction as feature", us::Any());
     parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output additional images", us::Any());
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -100,10 +99,6 @@ int main(int argc, char* argv[])
     float samplingdist = 0.25;
     if (parsedArgs.count("samplingdist"))
         samplingdist = us::any_cast<float>(parsedArgs["samplingdist"]);
-
-    bool useDirection = false;
-    if (parsedArgs.count("usedirection"))
-        useDirection = true;
 
     bool verbose = false;
     if (parsedArgs.count("verbose"))
@@ -162,13 +157,13 @@ int main(int argc, char* argv[])
     tracker->SetSeedImage(seed);
     tracker->SetStoppingRegions(stop);
     tracker->SetSeedsPerVoxel(seeds);
-    tracker->SetUseDirection(useDirection);
     tracker->SetStepSize(stepsize);
     tracker->SetAngularThreshold(athres);
     tracker->SetDecisionForest(&rf);
     tracker->SetSamplingDistance(samplingdist);
     tracker->SetNumberOfSamples(samples);
     //tracker->SetAvoidStop(false);
+    tracker->SetVerbose(verbose);
     tracker->SetAposterioriCurvCheck(false);
     tracker->SetRemoveWmEndFibers(false);
     tracker->Update();

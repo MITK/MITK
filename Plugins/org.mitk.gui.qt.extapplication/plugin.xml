@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-  <extension point="org.blueberry.osgi.applications">
-    <application id="org.mitk.qt.extapplication">
+  <extension id="org.mitk.qt.extapplication" point="org.blueberry.osgi.applications">
+    <application>
       <run class="QmitkExtApplication"/>
     </application>
+  </extension>
+
+  <extension id="workbench" point="org.blueberry.core.runtime.products">
+    <product name="MITK Workbench" application="org.mitk.qt.extapplication" />
   </extension>
 
   <extension point="org.blueberry.ui.intro">
@@ -12,7 +16,7 @@
       class="QmitkMitkWorkbenchIntroPart"
       role="editor"/>
     <introProductBinding
-      productId="org.mitk.qt.workbench"
+      productId="org.mitk.gui.qt.extapplication.workbench"
       introId="org.mitk.qt.extapplicationintro"/>
   </extension>
 

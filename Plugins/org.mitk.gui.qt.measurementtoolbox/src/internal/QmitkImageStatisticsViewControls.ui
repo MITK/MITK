@@ -141,7 +141,7 @@
          </size>
         </property>
         <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
+         <enum>Qt::ScrollBarAsNeeded</enum>
         </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAsNeeded</enum>
@@ -165,7 +165,7 @@
          <bool>false</bool>
         </property>
         <property name="rowCount">
-         <number>10</number>
+         <number>7</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -239,21 +239,6 @@
         <row>
          <property name="text">
           <string>V (mm³)</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
-          <string>Hotspot Peak</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
-          <string>Hotspot Max</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
-          <string>Hotspot Min</string>
          </property>
         </row>
         <column>

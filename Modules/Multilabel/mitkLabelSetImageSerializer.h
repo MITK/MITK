@@ -29,7 +29,7 @@ class LabelSetImageSerializer : public BaseDataSerializer
   public:
     mitkClassMacro( LabelSetImageSerializer, BaseDataSerializer );
     itkNewMacro(Self);
-    virtual std::string Serialize();
+    virtual std::string Serialize() override;
 
   protected:
     LabelSetImageSerializer();

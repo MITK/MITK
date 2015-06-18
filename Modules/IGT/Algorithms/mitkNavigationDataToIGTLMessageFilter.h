@@ -65,7 +65,7 @@ namespace mitk {
     /**
     * \brief filter execute method
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     using Superclass::SetInput;
 
@@ -111,7 +111,7 @@ namespace mitk {
     * would try to copy information from the input NavigationData to the output
     * PointSet, which makes no sense!
     */
-    void GenerateOutputInformation() {};
+    void GenerateOutputInformation() override {};
 
     /**
     *\brief Connects the input of this filter to the outputs of the given

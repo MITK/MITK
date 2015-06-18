@@ -38,11 +38,11 @@ namespace mitk
     void SetFixedValue( int value );
     int GetFixedValue();
 
-    virtual const char* GetName() const;
-    virtual const char** GetXPM() const;
+    virtual const char* GetName() const override;
+    virtual const char** GetXPM() const override;
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     virtual void CalculateImage();
 

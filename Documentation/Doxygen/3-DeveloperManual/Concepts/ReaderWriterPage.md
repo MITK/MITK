@@ -45,7 +45,7 @@ Create new classes for reader and writers. Optimally, place them in an extra IO-
 
 \imageMacro{reader_writer_classes.png,"",16}
 
-Implement the given Methods. A good example on how to write a simple reader and writer is the mitkPointSetReader.cpp and mitkPointSetWriter.cpp class, from which you can take implementation cues. The following is a simplified version of the header file:
+Implement the given Methods. A good example on how to write a simple reader and writer is the mitkPointSetReaderService.cpp and mitkPointSetWriterService.cpp class, from which you can take implementation cues. The following is a simplified version of the header file:
 
      namespace mitk
      {
@@ -87,7 +87,7 @@ C) Provide a constructor . It should contain a minimal amount of information and
 
 Note the call to the superclass constructor containing the MIME-type. You can either reuse an existent MIME type here or create your own MIME-type locally . Finally, register the service to make it available to MITK.
 
-D) Provide a Clone Method: Readers are clones when the registry requires a new reader. Provide a clone method to accommodate for this. Use the mitkPointSetReader.cpp as a reference if necessary.
+D) Provide a Clone Method: Readers are clones when the registry requires a new reader. Provide a clone method to accommodate for this. Use the mitkPointSetReaderService.cpp as a reference if necessary.
 
 E) Instantiate it in the module activator. Open the module activator and make sure that the new Reader/Writer is instantiated and held somewhere in the code.  Also, unregister the reader/writer in the unload function if necessary.
 

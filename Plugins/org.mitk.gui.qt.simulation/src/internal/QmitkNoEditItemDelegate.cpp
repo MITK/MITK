@@ -27,5 +27,5 @@ QmitkNoEditItemDelegate::~QmitkNoEditItemDelegate()
 
 QWidget* QmitkNoEditItemDelegate::createEditor(QWidget*, const QStyleOptionViewItem&, const QModelIndex&) const
 {
-  return NULL;
+  return nullptr;
 }

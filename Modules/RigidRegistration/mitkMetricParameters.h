@@ -41,7 +41,7 @@ namespace mitk {
   class MITKRIGIDREGISTRATION_EXPORT MetricParameters : public itk::Object
   {
   public:
-    mitkClassMacro(MetricParameters,::itk::Object);
+    mitkClassMacroItkParent(MetricParameters,::itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

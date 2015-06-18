@@ -27,7 +27,7 @@ namespace mitk
 {
   PlaneGeometry::PlaneGeometry()
     : Superclass(),
-    m_ReferenceGeometry( NULL )
+    m_ReferenceGeometry( nullptr )
   {
     Initialize();
   }
@@ -264,7 +264,7 @@ namespace mitk
     default:
       itkExceptionMacro("unknown PlaneOrientation");
     }
-    if ( transform != NULL )
+    if ( transform != nullptr )
     {
       origin = transform->TransformPoint( origin );
       rightDV = transform->TransformVector( rightDV );
@@ -274,7 +274,7 @@ namespace mitk
     ScalarType bounds[6]= { 0, width, 0, height, 0, 1 };
     this->SetBounds( bounds );
 
-    if ( transform == NULL )
+    if ( transform == nullptr )
     {
       this->SetMatrixByVectors( rightDV, bottomDV );
     }
@@ -413,7 +413,7 @@ namespace mitk
     VnlVector normal  = vnl_cross_3d(rightVector, downVector);
     normal.normalize();
 
-    if(spacing!=NULL)
+    if(spacing!=nullptr)
     {
       rightDV *= (*spacing)[0];
       downDV  *= (*spacing)[1];
@@ -692,7 +692,7 @@ namespace mitk
     case OpORIENT:
       {
         mitk::PlaneOperation *planeOp = dynamic_cast< mitk::PlaneOperation * >( operation );
-        if ( planeOp == NULL )
+        if ( planeOp == nullptr )
         {
           return;
         }
@@ -719,7 +719,7 @@ namespace mitk
     case OpRESTOREPLANEPOSITION:
       {
         RestorePlanePositionOperation *op = dynamic_cast< mitk::RestorePlanePositionOperation* >(operation);
-        if(op == NULL)
+        if(op == nullptr)
         {
           return;
         }
@@ -891,6 +891,6 @@ namespace mitk
   bool
     PlaneGeometry::HasReferenceGeometry() const
   {
-    return ( m_ReferenceGeometry != NULL );
+    return ( m_ReferenceGeometry != nullptr );
   }
 } // namespace

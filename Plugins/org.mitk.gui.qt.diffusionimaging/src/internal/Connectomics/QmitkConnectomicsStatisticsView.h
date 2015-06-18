@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkConnectomicsStatisticsViewControls.h"
 
@@ -49,35 +50,32 @@ public:
   QmitkConnectomicsStatisticsView();
   virtual ~QmitkConnectomicsStatisticsView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
-  protected slots:
+protected slots:
+
+  void OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged(  );
 
 protected:
 
   // ####### Functions #######
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   /// \brief Wipe display and empty statistics
   void WipeDisplay();
 
 
   // ####### Variables #######
-
-
   Ui::QmitkConnectomicsStatisticsViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
   /// Cache for histograms
   mitk::ConnectomicsHistogramCache histogramCache;
-
-  // The selected synthetic network type
-  int m_currentIndex;
 };
 
 

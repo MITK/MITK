@@ -40,7 +40,7 @@ int mitkLevelWindowTest(int, char* [])
   std::cout << "Testing mitk::LevelWindow  "<<std::endl;
 
   std::cout << "Testing mitk::LevelWindow constructor with Level and Window ";
-  mitk::LevelWindow* levWin = new mitk::LevelWindow(256, 500);
+  auto  levWin = new mitk::LevelWindow(256, 500);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing mitk::LevelWindow GetDefaultWindow ";

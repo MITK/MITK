@@ -71,7 +71,6 @@ public:
 
     void SetNumTrees(int num){ m_NumTrees = num; }
     void SetMaxTreeDepth(int depth){ m_MaxTreeDepth = depth; }
-    void SetUsePreviousDirection(bool use){ m_UsePreviousDirection = use; }
     void SetStepSize(double step){ m_StepSize = step; }
     void SetGrayMatterSamplesPerVoxel(int samples){ m_GrayMatterSamplesPerVoxel = samples; }
     void SetSampleFraction(double fraction){ m_SampleFraction = fraction; }
@@ -87,7 +86,6 @@ protected:
 
     int         m_GrayMatterSamplesPerVoxel;
     double      m_StepSize;
-    bool        m_UsePreviousDirection;
     int         m_NumTrees;
     int         m_MaxTreeDepth;
     double      m_SampleFraction;

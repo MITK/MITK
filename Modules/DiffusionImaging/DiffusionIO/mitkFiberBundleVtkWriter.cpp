@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointData.h>
 #include <mitkAbstractFileWriter.h>
 #include <mitkCustomMimeType.h>
+#include <vtkXMLPolyDataWriter.h>
 #include "mitkDiffusionIOMimeTypes.h"
 
 mitk::FiberBundleVtkWriter::FiberBundleVtkWriter()
@@ -32,7 +33,8 @@ mitk::FiberBundleVtkWriter::FiberBundleVtkWriter()
 {
     Options defaultOptions;
     defaultOptions["Save as binary file"] = true;
-    defaultOptions["Save color information"] = true;
+    defaultOptions["Save as xml file (vtp style)"] = false;
+    defaultOptions["Save color information"] = false;
     defaultOptions["Save fiber weights"] = true;
     this->SetDefaultOptions(defaultOptions);
     RegisterService();
@@ -108,20 +110,40 @@ void mitk::FiberBundleVtkWriter::Write()
             this->SetOutputLocation(this->GetOutputLocation() + ext);
         }
 
-        vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
-        writer->SetInputData(fibPoly);
-        writer->SetFileName(filename.c_str());
-        if (us::any_cast<bool>(options["Save as binary file"]))
+        if (us::any_cast<bool>(options["Save as xml file (vtp style)"]))
         {
-            MITK_INFO << "Writing fiber bundle as vtk binary file";
-            writer->SetFileTypeToBinary();
+            vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+            writer->SetInputData(fibPoly);
+            writer->SetFileName(filename.c_str());
+            if (us::any_cast<bool>(options["Save as binary file"]))
+            {
+                MITK_INFO << "Writing fiber bundle as vtk binary file";
+                writer->SetDataModeToBinary();
+            }
+            else
+            {
+                MITK_INFO << "Writing fiber bundle as vtk ascii file";
+                writer->SetDataModeToAscii();
+            }
+            writer->Write();
         }
         else
         {
-            MITK_INFO << "Writing fiber bundle as vtk ascii file";
-            writer->SetFileTypeToASCII();
+            vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
+            writer->SetInputData(fibPoly);
+            writer->SetFileName(filename.c_str());
+            if (us::any_cast<bool>(options["Save as binary file"]))
+            {
+                MITK_INFO << "Writing fiber bundle as vtk binary file";
+                writer->SetFileTypeToBinary();
+            }
+            else
+            {
+                MITK_INFO << "Writing fiber bundle as vtk ascii file";
+                writer->SetFileTypeToASCII();
+            }
+            writer->Write();
         }
-        writer->Write();
 
         setlocale(LC_ALL, currLocale.c_str());
         MITK_INFO << "Fiber bundle written";

@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::ImageDescriptor::ImageDescriptor()
 {
   //initialize the dimensions array
-  for(unsigned int i=0; i<MAX_IMAGE_DIMENSIONS; i++)
+  for(auto & elem : m_Dimensions)
   {
-    m_Dimensions[i] = 1;
+    elem = 1;
   }
 
   this->m_NumberOfChannels = 0;
@@ -38,7 +38,7 @@ void mitk::ImageDescriptor::AddNewChannel(mitk::PixelType ptype, const char *nam
 
   this->m_ChannelDesc.push_back( desc );
 
-  if( name == 0)
+  if( name == nullptr)
     m_ChannelNames.push_back( "Unnamed ["+ptype.GetPixelTypeAsString()+"]");
   else
     m_ChannelNames.push_back(name);
@@ -88,7 +88,7 @@ mitk::PixelType mitk::ImageDescriptor::GetChannelTypeByName(const char *name) co
   unsigned int idFound = 0;
   const std::string search_str(name);
 
-  for( ConstChannelNamesIter iter = this->m_ChannelNames.begin();
+  for( auto iter = this->m_ChannelNames.begin();
        iter < this->m_ChannelNames.end(); iter++)
   {
     if( search_str.compare( *iter ) ) idFound = iter - this->m_ChannelNames.begin();

@@ -46,7 +46,7 @@ namespace mitk {
   class MITKRIGIDREGISTRATION_EXPORT TransformFactory : public itk::Object
   {
   public:
-    mitkClassMacro(TransformFactory, itk::Object);
+    mitkClassMacroItkParent(TransformFactory, itk::Object);
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)

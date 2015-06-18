@@ -32,7 +32,7 @@ namespace mitk
   class MITKOPENCL_EXPORT OclBaseData : public itk::Object
   {
   public:
-    mitkClassMacro(OclBaseData, itk::Object);
+    mitkClassMacroItkParent(OclBaseData, itk::Object);
 
     /*!  \brief Copies the RAM-stored data to GPU-MEM.
      * This method has to be implemented for each data type.

@@ -31,7 +31,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkSliderNavigatorWidget : public QWidget, publi
 
 public:
 
-  QmitkSliderNavigatorWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkSliderNavigatorWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
   QString GetLabelUnit();
 

@@ -107,7 +107,7 @@ void QmitkTubeGraphNewLabelGroupDialog::OnCreateNewLabelGroup()
   layout->addWidget(labelDescriptionLabel);
 
 
-  QHBoxLayout* labelLayout = new QHBoxLayout();
+  auto   labelLayout = new QHBoxLayout();
 
   labelLineEdit = new QLineEdit(this);
   labelLayout->addWidget(labelLineEdit);
@@ -152,12 +152,12 @@ void QmitkTubeGraphNewLabelGroupDialog::OnAddStandardLabelGroup()
   labelGroupTreeWidget->header()->close();
 
 
-  mitk::TubeGraphDefaultLabelGroups* defaultLabelGroups = new mitk::TubeGraphDefaultLabelGroups();
+  auto   defaultLabelGroups = new mitk::TubeGraphDefaultLabelGroups();
 
   m_LabelGroupsLiver = defaultLabelGroups->GetLabelGroupForLiver();
   m_LabelGroupsLung = defaultLabelGroups->GetLabelGroupForLung();
 
-  QTreeWidgetItem* liverItem = new QTreeWidgetItem(labelGroupTreeWidget);
+  auto   liverItem = new QTreeWidgetItem(labelGroupTreeWidget);
   liverItem->setText(0, tr("Liver"));
   QTreeWidgetItem* liverChildItem;
   for (unsigned int k = 0; k < m_LabelGroupsLiver.size(); k++)
@@ -167,7 +167,7 @@ void QmitkTubeGraphNewLabelGroupDialog::OnAddStandardLabelGroup()
   }
   liverItem->setExpanded(true);
 
-  QTreeWidgetItem* lungItem = new QTreeWidgetItem(labelGroupTreeWidget);
+  auto   lungItem = new QTreeWidgetItem(labelGroupTreeWidget);
   lungItem->setText(0, tr("Lung"));
   QTreeWidgetItem* lungChildItem;
   for (unsigned int k = 0; k < m_LabelGroupsLung.size(); k++)
@@ -215,7 +215,7 @@ void QmitkTubeGraphNewLabelGroupDialog::OnAddingNewLabelGroup()
 
   for (int i =0; i < labelListWidget->count(); i++)
   {
-    LabelType* label = new LabelType();
+    auto   label = new LabelType();
     label->labelName = (labelListWidget->item(i)->text()).toStdString();
     mitk::Color color;
 
@@ -259,7 +259,7 @@ void QmitkTubeGraphNewLabelGroupDialog::OnAddingStandardLabelGroup()
         m_NewLabelGroup = m_LabelGroupsLiver.at(k);
     }
   }
-  if (m_NewLabelGroup == 0)
+  if (m_NewLabelGroup == nullptr)
     return;
 
 

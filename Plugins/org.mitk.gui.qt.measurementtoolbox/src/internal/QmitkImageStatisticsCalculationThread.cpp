@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 
 QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
-  m_StatisticsImage(NULL), m_BinaryMask(NULL), m_PlanarFigureMask(NULL), m_TimeStep(0),
+  m_StatisticsImage(nullptr), m_BinaryMask(nullptr), m_PlanarFigureMask(nullptr), m_TimeStep(0),
   m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(1.0), m_UseDefaultBinSize(true)
 {
 }
@@ -34,13 +34,13 @@ void QmitkImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer ima
 {
   // reset old values
   if( this->m_StatisticsImage.IsNotNull() )
-    this->m_StatisticsImage = 0;
+    this->m_StatisticsImage = nullptr;
 
   if( this->m_BinaryMask.IsNotNull() )
-    this->m_BinaryMask = 0;
+    this->m_BinaryMask = nullptr;
 
   if( this->m_PlanarFigureMask.IsNotNull())
-    this->m_PlanarFigureMask = 0;
+    this->m_PlanarFigureMask = nullptr;
 
   // set new values if passed in
   if(image.IsNotNull())
@@ -91,7 +91,7 @@ void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(double size)
   this->m_HistogramBinSize = size;
 }
 
-unsigned int QmitkImageStatisticsCalculationThread::GetHistogramBinSize()
+double QmitkImageStatisticsCalculationThread::GetHistogramBinSize()
 {
   return this->m_HistogramBinSize;
 }
@@ -105,7 +105,7 @@ QmitkImageStatisticsCalculationThread::HistogramType::Pointer
 QmitkImageStatisticsCalculationThread::GetTimeStepHistogram(unsigned int t)
 {
   if (t >= this->m_HistogramVector.size())
-    return NULL;
+    return nullptr;
 
   return this->m_HistogramVector[t];
 }

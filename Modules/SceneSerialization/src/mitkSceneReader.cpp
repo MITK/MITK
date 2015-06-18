@@ -42,7 +42,7 @@ bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& w
     MITK_WARN << "Multiple scene readers found for scene file version " << fileVersion << ". Using arbitrary first one.";
   }
 
-  for ( std::list<itk::LightObject::Pointer>::iterator iter = sceneReaders.begin();
+  for ( auto iter = sceneReaders.begin();
         iter != sceneReaders.end();
         ++iter )
   {

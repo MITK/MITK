@@ -56,12 +56,12 @@ public:
 
   ~TestModuleA2Activator() { delete s; }
 
-  void Load(ModuleContext* context)
+  void Load(ModuleContext* context) override
   {
     s = new TestModuleA2(context);
   }
 
-  void Unload(ModuleContext* /*context*/)
+  void Unload(ModuleContext* /*context*/) override
   {
     s->Unregister();
   }

@@ -60,7 +60,7 @@ mitk::InputDeviceRegistry::InputDeviceDescriptorPtr mitk::InputDeviceRegistry::F
   // first = key, second = element or vice versa, if inserted different in the hash map
   if(result != this->m_ListRegisteredDevices.end()) return result.value();
 
-  return InputDeviceDescriptorPtr(0);
+  return InputDeviceDescriptorPtr(nullptr);
 }
 
 QList<mitk::InputDeviceRegistry::InputDeviceDescriptorPtr> mitk::InputDeviceRegistry::GetInputDevices() const

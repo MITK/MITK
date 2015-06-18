@@ -77,12 +77,12 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool3D : public AutoSegmentationTool
     typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
     typedef FastMarchingFilterType::NodeType                                                            NodeType;
 
-    bool CanHandle(BaseData* referenceData) const;
+    bool CanHandle(BaseData* referenceData) const override;
 
     /* icon stuff */
-    virtual const char** GetXPM() const;
-    virtual const char* GetName() const;
-    us::ModuleResource GetIconResource() const;
+    virtual const char** GetXPM() const override;
+    virtual const char* GetName() const override;
+    us::ModuleResource GetIconResource() const override;
 
     /// \brief Set parameter used in Threshold filter.
     void SetUpperThreshold(double);
@@ -119,8 +119,8 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool3D : public AutoSegmentationTool
     FastMarchingTool3D();
     virtual ~FastMarchingTool3D();
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
     virtual void Initialize();
 
     /// \brief Add point action of StateMachine pattern

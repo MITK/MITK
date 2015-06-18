@@ -46,19 +46,19 @@ public:
   ///
   /// \see ISelectionProvider::AddSelectionChangedListener()
   ///
-  virtual void AddSelectionChangedListener(berry::ISelectionChangedListener* listener);
+  virtual void AddSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
   ///
   /// \see ISelectionProvider::GetSelection()
   ///
-  virtual berry::ISelection::ConstPointer GetSelection() const;
+  virtual berry::ISelection::ConstPointer GetSelection() const override;
   ///
   /// \see ISelectionProvider::RemoveSelectionChangedListener()
   ///
-  virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener);
+  virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
   ///
   /// \see ISelectionProvider::SetSelection()
   ///
-  virtual void SetSelection(const berry::ISelection::ConstPointer& selection);
+  virtual void SetSelection(const berry::ISelection::ConstPointer& selection) override;
   ///
   /// Sends the nodes as selected to the workbench
   ///

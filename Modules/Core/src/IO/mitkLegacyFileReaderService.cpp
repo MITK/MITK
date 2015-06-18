@@ -36,10 +36,9 @@ mitk::LegacyFileReaderService::LegacyFileReaderService(const std::vector<std::st
   CustomMimeType customMimeType;
   customMimeType.SetCategory(category);
 
-  for(std::vector<std::string>::const_iterator iter = extensions.begin(),
-      endIter = extensions.end(); iter != endIter; ++iter)
+  for(auto extension : extensions)
   {
-    std::string extension = *iter;
+
     if (!extension.empty() && extension[0] == '.')
     {
       extension.assign(extension.begin()+1, extension.end());
@@ -91,7 +90,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::LegacyFileReaderService::R
 
     if( canReadFile )
     {
-      BaseProcess::Pointer ioObject = (*k)->CreateIOProcessObject(path, "", "");
+      BaseDataSource::Pointer ioObject = (*k)->CreateIOProcessObject(path, "", "");
       ioObject->Update();
       int numberOfContents = static_cast<int>(ioObject->GetNumberOfOutputs());
 

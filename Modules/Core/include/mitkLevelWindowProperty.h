@@ -67,7 +67,7 @@ public:
     void SetLevelWindow(const LevelWindow &levWin);
     void SetValue(const ValueType& levWin);
 
-    virtual std::string GetValueAsString() const;
+    virtual std::string GetValueAsString() const override;
 
     using BaseProperty::operator=;
 
@@ -76,10 +76,10 @@ private:
     // purposely not implemented
     LevelWindowProperty& operator=(const LevelWindowProperty&);
 
-    itk::LightObject::Pointer InternalClone() const;
+    itk::LightObject::Pointer InternalClone() const override;
 
-    virtual bool IsEqual(const BaseProperty& property) const;
-    virtual bool Assign(const BaseProperty& property);
+    virtual bool IsEqual(const BaseProperty& property) const override;
+    virtual bool Assign(const BaseProperty& property) override;
 
 };
 

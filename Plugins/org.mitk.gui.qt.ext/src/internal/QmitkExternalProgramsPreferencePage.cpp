@@ -41,9 +41,9 @@ static berry::IPreferences::Pointer GetPreferences()
 QmitkExternalProgramsPreferencePage::QmitkExternalProgramsPreferencePage()
   : m_Preferences(GetPreferences()),
     m_Ui(new Ui::QmitkExternalProgramsPreferencePage),
-    m_Control(NULL),
-    m_FFmpegProcess(NULL),
-    m_GnuplotProcess(NULL)
+    m_Control(nullptr),
+    m_FFmpegProcess(nullptr),
+    m_GnuplotProcess(nullptr)
 {
 }
 

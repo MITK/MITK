@@ -53,9 +53,9 @@ public:
 
 protected:
 
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
-  void SetFocus();
+  void SetFocus() override;
 
   //! [MITK Selection Listener method]
   /** @brief Reimplemention of method from QmitkAbstractView that implements the selection listener functionality.
@@ -65,7 +65,7 @@ protected:
    * @see QmitkAbstractView
    *
    */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
   //! [MITK Selection Listener method]
 
 private Q_SLOTS:

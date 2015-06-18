@@ -35,8 +35,8 @@ public:
   {
   public:
     DicomMimeType();
-    virtual bool AppliesTo(const std::string &path) const;
-    virtual DicomMimeType* Clone() const;
+    virtual bool AppliesTo(const std::string &path) const override;
+    virtual DicomMimeType* Clone() const override;
   };
 
   static std::vector<CustomMimeType*> Get();

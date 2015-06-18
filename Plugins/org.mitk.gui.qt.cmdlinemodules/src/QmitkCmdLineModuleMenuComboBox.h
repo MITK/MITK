@@ -36,7 +36,7 @@ class QmitkCmdLineModuleMenuComboBox : public ctkMenuComboBox {
 
 public:
 
-  QmitkCmdLineModuleMenuComboBox(QWidget* parent = 0);
+  QmitkCmdLineModuleMenuComboBox(QWidget* parent = nullptr);
   virtual ~QmitkCmdLineModuleMenuComboBox();
 
   /**

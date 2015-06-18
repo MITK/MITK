@@ -50,13 +50,13 @@ public:
    * @return a vector of mitk::LabelSetImages
    * @throws throws an mitk::Exception if an error ocurrs during parsing the nrrd header
    */
-  virtual std::vector<BaseData::Pointer> Read();
-  virtual ConfidenceLevel GetReaderConfidenceLevel() const;
+  virtual std::vector<BaseData::Pointer> Read() override;
+  virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
   // -------------- AbstractFileWriter -------------
 
-  virtual void Write();
-  virtual ConfidenceLevel GetWriterConfidenceLevel() const;
+  virtual void Write() override;
+  virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
 
   // -------------- LabelSetImageIO specific functions -------------
 
@@ -68,7 +68,7 @@ public:
 
 private:
 
-  LabelSetImageIO* IOClone() const;
+  LabelSetImageIO* IOClone() const override;
 
   static TiXmlElement *GetLabelAsTiXmlElement(Label *label);
 

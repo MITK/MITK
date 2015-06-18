@@ -43,14 +43,14 @@ void mitk::IndexROI::init()
 
   if (!m_Position.isSet())
   {
-    MeshLoader* loader = NULL;
+    MeshLoader* loader = nullptr;
     this->getContext()->get(loader, BaseContext::Local);
 
-    if (loader != NULL)
+    if (loader != nullptr)
     {
       BaseData* parent = loader->findField("position");
 
-      if (parent != NULL)
+      if (parent != nullptr)
       {
         m_Position.setParent(parent);
         m_Position.setReadOnly(true);

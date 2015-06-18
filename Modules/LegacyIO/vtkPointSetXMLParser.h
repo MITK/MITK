@@ -55,19 +55,19 @@ public:
 
     typedef PointSetType::PointType PointType;
 
-    virtual int InitializeParser();
-    virtual int CleanupParser();
+    virtual int InitializeParser() override;
+    virtual int CleanupParser() override;
     /**
      * Handler function which is called, when a new xml start-tag
      * has been parsed.
      */
-    virtual void StartElement (const char *name, const char **atts);
+    virtual void StartElement (const char *name, const char **atts) override;
 
     /**
      * Handler function which is called, when a xml end-tag
      * has been parsed.
      */
-    virtual void EndElement (const char *name);
+    virtual void EndElement (const char *name) override;
 
     /**
      * Handler function which is called, if characted data has been
@@ -75,7 +75,7 @@ public:
      * @param inData a char array containing the parsed string data
      * @param inLength the length of the parsed data string.
      */
-    virtual void CharacterDataHandler (const char *inData, int inLength);
+    virtual void CharacterDataHandler (const char *inData, int inLength) override;
 
     /**
      * Converts the given data to mitk::ScalarType.

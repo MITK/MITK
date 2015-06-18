@@ -46,7 +46,7 @@ namespace mitk
      * its infrastructure.
      * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
      */
-    virtual void Notify(InteractionEvent* interactionEvent, bool isHandled);
+    virtual void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
   protected:
     DisplayInteractor();
     virtual ~DisplayInteractor();
@@ -55,14 +55,14 @@ namespace mitk
      * Connects the action names used in the state machine pattern with functions implemented within
      * this InteractionEventObserver. This is only necessary here because the events are processed by the state machine.
      */
-    void ConnectActionsAndFunctions();
+    void ConnectActionsAndFunctions() override;
     /**
      * Derived function.
      * Is executed when config object is set / changed.
      * Here it is used to read out the parameters set in the configuration file,
      * and set the member variables accordingly.
      */
-    virtual void ConfigurationChanged();
+    virtual void ConfigurationChanged() override;
 
     /**
      * Derived function.
@@ -70,7 +70,7 @@ namespace mitk
      * Here it is used to read out the parameters set in the configuration file,
      * and set the member variables accordingly.
      */
-    virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
+    virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode) override;
 
     virtual bool CheckPositionEvent( const InteractionEvent* interactionEvent );
 

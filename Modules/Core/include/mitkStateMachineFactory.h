@@ -142,12 +142,12 @@ namespace mitk {
     /**
     * @brief Derived from XMLReader
     **/
-    void  StartElement (const char* elementName, const char **atts);
+    void  StartElement (const char* elementName, const char **atts) override;
 
     /**
     * @brief Derived from XMLReader
     **/
-    void  EndElement (const char* elementName);
+    void  EndElement (const char* elementName) override;
 
   private:
     /**

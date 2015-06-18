@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkColourImageProcessingView::VIEW_ID = "org.mitk.views.colourimageprocessing";
 
 QmitkColourImageProcessingView::QmitkColourImageProcessingView()
-  : m_Controls(NULL)
+  : m_Controls(nullptr)
 {
   m_Color[0]= 255;
   m_Color[1]= 0;
@@ -110,7 +110,7 @@ void QmitkColourImageProcessingView::OnSelectionChanged(berry::IWorkbenchPart::P
       }
       else
       {
-        m_SelectedNode2= 0;
+        m_SelectedNode2= nullptr;
       }
       m_Controls->m_ImageSelectedLabel->setText( QString( infoText.c_str() ) );
     }
@@ -119,8 +119,8 @@ void QmitkColourImageProcessingView::OnSelectionChanged(berry::IWorkbenchPart::P
       m_Controls->m_ImageSelectedLabel->hide();
       m_Controls->m_NoImageSelectedLabel->show();
 
-      m_SelectedNode = 0;
-      m_SelectedNode2= 0;
+      m_SelectedNode = nullptr;
+      m_SelectedNode2= nullptr;
     }
   }
 }
@@ -156,7 +156,7 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
 
   if (!RGBAImageResult)
   {
-    QMessageBox::warning(NULL, "Warning", QString("Unsupported pixeltype"));
+    QMessageBox::warning(nullptr, "Warning", QString("Unsupported pixeltype"));
     return;
   }
 
@@ -200,7 +200,7 @@ void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage( )
 
   if (!RGBAImageResult)
   {
-    QMessageBox::warning(NULL, "Warning", QString("Unsupported pixeltype"));
+    QMessageBox::warning(nullptr, "Warning", QString("Unsupported pixeltype"));
     return;
   }
 

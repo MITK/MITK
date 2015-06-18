@@ -55,7 +55,7 @@ void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
 
     TestHandler();
 
-    OnPreferencesChanged(0);
+    OnPreferencesChanged(nullptr);
     CreateTemporaryDirectory();
     StartDicomDirectoryListener();
 
@@ -139,6 +139,10 @@ void QmitkDicomBrowser::OnViewButtonAddToDataManager(QHash<QString, QVariant> ev
 //    properties["SeriesUID"] = eventProperties["SeriesUID"];
 //    properties["SeriesName"] = eventProperties["SeriesName"];
     properties["FilesForSeries"] = eventProperties["FilesForSeries"];
+    if(eventProperties.contains("Modality"))
+    {
+      properties["Modality"] = eventProperties["Modality"];
+    }
 
     m_Publisher->PublishSignals(mitk::PluginActivator::getContext());
     m_Publisher->AddSeriesToDataManagerEvent(properties);

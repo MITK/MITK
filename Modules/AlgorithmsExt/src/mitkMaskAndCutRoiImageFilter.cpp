@@ -42,7 +42,7 @@ void mitk::MaskAndCutRoiImageFilter::SetRegionOfInterest(mitk::BaseData* roi)
   }
 
   mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*> (roi);
-  if (boundingObject.IsNotNull() && this->GetInput(0) != NULL)
+  if (boundingObject.IsNotNull() && this->GetInput(0) != nullptr)
   {
     mitk::BoundingObjectToSegmentationFilter::Pointer filter = mitk::BoundingObjectToSegmentationFilter::New();
     filter->SetBoundingObject( boundingObject);

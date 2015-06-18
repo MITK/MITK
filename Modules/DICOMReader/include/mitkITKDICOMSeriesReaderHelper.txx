@@ -123,7 +123,7 @@ mitk::ITKDICOMSeriesReaderHelper
   image->SetImportVolume(readVolume->GetBufferPointer(), currentTimeStep++); // timestep 0
 
   // for other time-steps
-  for (StringContainerList::const_iterator timestepsIter = ++(filenamesForTimeSteps.begin()); // start with SECOND entry
+  for (auto timestepsIter = ++(filenamesForTimeSteps.begin()); // start with SECOND entry
       timestepsIter != filenamesForTimeSteps.end();
       ++currentTimeStep, ++timestepsIter)
   {

@@ -42,18 +42,18 @@ class QmitkVolumeVisualizationView : public QmitkAbstractView
 
 public:
 
-  void SetFocus();
+  void SetFocus() override;
 
   QmitkVolumeVisualizationView();
 
   virtual ~QmitkVolumeVisualizationView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   static const std::string VIEW_ID;
 
@@ -76,7 +76,7 @@ private:
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
 
   void UpdateInterface();
-  void NodeRemoved(const mitk::DataNode* node);
+  void NodeRemoved(const mitk::DataNode* node) override;
 
 };
 

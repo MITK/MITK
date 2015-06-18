@@ -46,7 +46,7 @@ namespace mitk {
   class MetricFactory : public itk::Object
   {
   public:
-    mitkClassMacro(MetricFactory, itk::Object);
+    mitkClassMacroItkParent(MetricFactory, itk::Object);
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)

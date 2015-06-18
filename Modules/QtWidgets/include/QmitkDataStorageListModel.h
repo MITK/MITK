@@ -40,7 +40,7 @@ public:
   ///
   /// The NodePredicate is owned by the model
   ///
-  QmitkDataStorageListModel(mitk::DataStorage::Pointer dataStorage = 0, mitk::NodePredicateBase* pred = 0, QObject* parent = 0);
+  QmitkDataStorageListModel(mitk::DataStorage::Pointer dataStorage = nullptr, mitk::NodePredicateBase* pred = nullptr, QObject* parent = nullptr);
   ~QmitkDataStorageListModel();
 
 
@@ -56,10 +56,10 @@ public:
   mitk::DataNode::Pointer getNode(const QModelIndex &index) const;
 
   //# From QAbstractListModel
-  Qt::ItemFlags flags(const QModelIndex& index) const;
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-  int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
+  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+  QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
   ///
   /// Called when a DataStorage Add Event was thrown. May be reimplemented

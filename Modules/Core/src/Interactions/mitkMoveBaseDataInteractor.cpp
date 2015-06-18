@@ -76,7 +76,7 @@ bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEve
     */
     {
       mitk::DisplayPositionEvent const *posEvent = dynamic_cast <const mitk::DisplayPositionEvent *> (stateEvent->GetEvent());
-      if (posEvent == NULL)
+      if (posEvent == nullptr)
       {
         MITK_WARN<<"Wrong usage of mitkMoveBaseDataInteractor! Aborting interaction!\n";
         return false;
@@ -152,7 +152,7 @@ bool mitk::MoveBaseDataInteractor::ExecuteAction( Action* action, mitk::StateEve
       mitk::IntProperty* xP = dynamic_cast<mitk::IntProperty*>(action->GetProperty("DIRECTION_X"));
       mitk::IntProperty* yP = dynamic_cast<mitk::IntProperty*>(action->GetProperty("DIRECTION_Y"));
       mitk::IntProperty* zP = dynamic_cast<mitk::IntProperty*>(action->GetProperty("DIRECTION_Z"));
-      if (xP == NULL || yP == NULL || zP == NULL)
+      if (xP == nullptr || yP == nullptr || zP == nullptr)
       {
         MITK_WARN<<"No properties returned\n!";
         return false;

@@ -207,16 +207,16 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
       \brief Runs the sorting / splitting process described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
       Method required by DICOMFileReader.
     */
-    virtual void AnalyzeInputFiles();
+    virtual void AnalyzeInputFiles() override;
 
     // void AllocateOutputImages();
     /**
       \brief Loads images using itk::ImageSeriesReader, potentially applies shearing to correct gantry tilt.
     */
-    virtual bool LoadImages();
+    virtual bool LoadImages() override;
 
     // re-implemented from super-class
-    virtual bool CanHandleFile(const std::string& filename);
+    virtual bool CanHandleFile(const std::string& filename) override;
 
     /**
       \brief Add an element to the sorting procedure described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy.
@@ -254,13 +254,13 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     double GetDecimalPlacesForOrientation() const;
 
-    virtual bool operator==(const DICOMFileReader& other) const;
+    virtual bool operator==(const DICOMFileReader& other) const override;
 
-    virtual DICOMTagList GetTagsOfInterest() const;
+    virtual DICOMTagList GetTagsOfInterest() const override;
 
   protected:
 
-    virtual void InternalPrintConfiguration(std::ostream& os) const;
+    virtual void InternalPrintConfiguration(std::ostream& os) const override;
 
     /// \brief Return active C locale
     std::string GetActiveLocale() const;
@@ -296,7 +296,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     virtual SortingBlockList Condense3DBlocks(SortingBlockList& resultOf3DGrouping);
 
     virtual DICOMTagCache::Pointer GetTagCache() const;
-    void SetTagCache(DICOMTagCache::Pointer);
+    void SetTagCache(DICOMTagCache::Pointer) override;
 
     /// \brief Sorting step as described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy
     SortingBlockList InternalExecuteSortingStep(

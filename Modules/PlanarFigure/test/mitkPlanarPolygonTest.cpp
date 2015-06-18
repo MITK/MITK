@@ -65,7 +65,7 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
 
   // Test for number of polylines
   const mitk::PlanarFigure::PolyLineType polyLine0 = planarPolygon->GetPolyLine( 0 );
-  mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
+  auto iter = polyLine0.begin();
   MITK_TEST_CONDITION( planarPolygon->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK

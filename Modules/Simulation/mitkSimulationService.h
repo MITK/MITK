@@ -28,9 +28,9 @@ namespace mitk
     SimulationService();
     ~SimulationService();
 
-    Simulation::Pointer GetActiveSimulation() const;
-    void SetActiveSimulation(Simulation::Pointer activeSimulation);
-    Scheduler* GetScheduler();
+    Simulation::Pointer GetActiveSimulation() const override;
+    void SetActiveSimulation(Simulation::Pointer activeSimulation) override;
+    Scheduler* GetScheduler() override;
 
   private:
     Simulation::Pointer m_ActiveSimulation;

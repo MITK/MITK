@@ -39,10 +39,10 @@ public:
   QmitkDwiSoftwarePhantomView();
   virtual ~QmitkDwiSoftwarePhantomView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  virtual void StdMultiWidgetNotAvailable() override;
 
   typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
   typedef itk::Image<float, 3>          ItkFloatImgType;
@@ -58,7 +58,7 @@ public:
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   /** Generate gradient directions distributed on half sphere (suboptimal distribution but arbitrary number of gradients) **/
   GradientListType GenerateHalfShell(int NPoints);

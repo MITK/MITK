@@ -32,7 +32,7 @@ class ContourModelActivator : public us::ModuleActivator
 {
 public:
 
-  void Load(us::ModuleContext* /*context*/)
+  void Load(us::ModuleContext* /*context*/) override
   {
     m_ContourModelReader = new ContourModelReader();
     m_ContourModelSetReader = new ContourModelSetReader();
@@ -40,7 +40,7 @@ public:
     m_ContourModelSetWriter = new ContourModelSetWriter();
   }
 
-  void Unload(us::ModuleContext* )
+  void Unload(us::ModuleContext* ) override
   {
     delete m_ContourModelReader;
     delete m_ContourModelSetReader;

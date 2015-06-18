@@ -32,16 +32,16 @@ public:
   {
   public:
     DiffusionImageNrrdMimeType();
-    virtual bool AppliesTo(const std::string &path) const;
-    virtual DiffusionImageNrrdMimeType* Clone() const;
+    virtual bool AppliesTo(const std::string &path) const override;
+    virtual DiffusionImageNrrdMimeType* Clone() const override;
   };
 
   class MITKDIFFUSIONIO_EXPORT DiffusionImageNiftiMimeType : public CustomMimeType
   {
   public:
     DiffusionImageNiftiMimeType();
-    virtual bool AppliesTo(const std::string &path) const;
-    virtual DiffusionImageNiftiMimeType* Clone() const;
+    virtual bool AppliesTo(const std::string &path) const override;
+    virtual DiffusionImageNiftiMimeType* Clone() const override;
   };
   // Get all Diffusion Mime Types
   static std::vector<CustomMimeType*> Get();
@@ -79,8 +79,12 @@ public:
   // ------------------------------ MITK formats ----------------------------------
 
   static CustomMimeType CONNECTOMICS_MIMETYPE(); // cnf
+  static CustomMimeType CONNECTOMICS_MATRIX_MIMETYPE(); // mat
+  static CustomMimeType CONNECTOMICS_LIST_MIMETYPE(); // txt
 
   static std::string CONNECTOMICS_MIMETYPE_NAME();
+  static std::string CONNECTOMICS_MATRIX_MIMETYPE_NAME();
+  static std::string CONNECTOMICS_LIST_MIMETYPE_NAME();
 
   static std::string CONNECTOMICS_MIMETYPE_DESCRIPTION();
 

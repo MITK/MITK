@@ -30,7 +30,7 @@ class PointSetSerializer : public BaseDataSerializer
     mitkClassMacro( PointSetSerializer, BaseDataSerializer );
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
-    virtual std::string Serialize();
+    virtual std::string Serialize() override;
   protected:
     PointSetSerializer();
     virtual ~PointSetSerializer();

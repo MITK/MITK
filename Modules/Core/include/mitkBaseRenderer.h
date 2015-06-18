@@ -107,9 +107,9 @@ namespace mitk
 #pragma GCC visibility pop
 
     /** Standard class typedefs. */
-    mitkClassMacro(BaseRenderer, itk::Object);
+    mitkClassMacroItkParent(BaseRenderer, itk::Object);
 
-    BaseRenderer(const char* name = NULL, vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL,RenderingMode::Type mode = RenderingMode::Standard);
+    BaseRenderer(const char* name = nullptr, vtkRenderWindow * renWin = nullptr, mitk::RenderingManager* rm = nullptr,RenderingMode::Type mode = RenderingMode::Standard);
 
     //##Documentation
     //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.
@@ -369,7 +369,7 @@ namespace mitk
     * implemented for 3D renderers */
     virtual DataNode* PickObject(const Point2D& /*displayPosition*/, Point3D& /*worldPosition*/) const
     {
-      return NULL;
+      return nullptr;
     }
 
     //##Documentation
@@ -618,7 +618,7 @@ namespace mitk
     bool m_KeepDisplayedRegion;
 
   protected:
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
+    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     //##Documentation
     //## Data object containing the m_WorldGeometry defined above.

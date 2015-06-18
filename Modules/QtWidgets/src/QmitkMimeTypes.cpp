@@ -36,7 +36,7 @@ QList<mitk::DataNode *> QmitkMimeTypes::ToDataNodePtrList(const QByteArray &ba)
 
 QList<mitk::DataNode *> QmitkMimeTypes::ToDataNodePtrList(const QMimeData *mimeData)
 {
-  if (mimeData == NULL || !mimeData->hasFormat(QmitkMimeTypes::DataNodePtrs))
+  if (mimeData == nullptr || !mimeData->hasFormat(QmitkMimeTypes::DataNodePtrs))
   {
     return QList<mitk::DataNode*>();
   }

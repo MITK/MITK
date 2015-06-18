@@ -43,7 +43,7 @@ namespace mitk
       /*###########      Constructors, Typedefs and Enumerations      ###########*/
     public:
       typedef map<string, string>  NameTable;
-      mitkClassMacro( FreeSurferParcellationTranslator, Object )
+      mitkClassMacroItkParent( FreeSurferParcellationTranslator, itk::Object )
       itkNewMacro(    FreeSurferParcellationTranslator )
     protected:
       FreeSurferParcellationTranslator();

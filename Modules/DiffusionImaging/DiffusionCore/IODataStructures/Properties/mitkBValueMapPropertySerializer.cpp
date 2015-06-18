@@ -52,24 +52,24 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual TiXmlElement* Serialize()
+  virtual TiXmlElement* Serialize() override
   {
     if (const BValueMapProperty* prop = dynamic_cast<const BValueMapProperty*>(m_Property.GetPointer()))
     {
 
       BValueMapProperty::BValueMap map = prop->GetBValueMap();
 
-      if(map.empty()) return NULL;
+      if(map.empty()) return nullptr;
 
       BValueMapProperty::BValueMap::const_iterator it = map.begin();
       BValueMapProperty::BValueMap::const_iterator end = map.end();
 
-      TiXmlElement* element = new TiXmlElement("bvaluemap");
+      auto  element = new TiXmlElement("bvaluemap");
 
 
 
       while (it != end) {
-        TiXmlElement* child = new TiXmlElement("entry");
+        auto  child = new TiXmlElement("entry");
         {
           std::stringstream ss;
           ss << it->first;
@@ -91,18 +91,18 @@ public:
 
       return element;
     }
-    else return NULL;
+    else return nullptr;
   }
 
 
-  virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+  virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
   {
-    if (!element) return NULL;
+    if (!element) return nullptr;
 
     BValueMapProperty::BValueMap map;
 
     TiXmlElement* entry = element->FirstChildElement( "entry" )->ToElement();
-    while(entry != NULL){
+    while(entry != nullptr){
 
       std::string key, value;
       entry->QueryStringAttribute("key",&key);

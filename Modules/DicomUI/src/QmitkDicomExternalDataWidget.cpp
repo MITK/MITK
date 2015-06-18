@@ -30,7 +30,7 @@ const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.Qm
 
 QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
   : QWidget(parent)
-  , m_Controls (0)
+  , m_Controls (nullptr)
 {
     Initialize();
     CreateQtPartControl(this);
@@ -117,6 +117,11 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
     QStringList filesForSeries = m_ExternalDatabase->filesForSeries(uid);
     QHash<QString, QVariant> eventProperty;
     eventProperty.insert("FilesForSeries", filesForSeries);
+    if(!filesForSeries.isEmpty())
+    {
+      QString modality = m_ExternalDatabase->fileValue(filesForSeries.at(0),"0008,0060");
+      eventProperty.insert("Modality", modality);
+    }
     emit SignalDicomToDataManager(eventProperty);
   }
 }

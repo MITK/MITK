@@ -27,7 +27,7 @@ typedef sofa::helper::system::PluginManager::PluginMap PluginMap;
 
 QmitkSimulationPreferencePage::QmitkSimulationPreferencePage()
   : m_Preferences(mitk::GetSimulationPreferences()),
-    m_Control(NULL)
+    m_Control(nullptr)
 {
 }
 
@@ -84,7 +84,7 @@ void QmitkSimulationPreferencePage::OnAddButtonClicked()
   {
     if (!errlog.str().empty())
     {
-      QMessageBox* messageBox = new QMessageBox(m_Control);
+      auto  messageBox = new QMessageBox(m_Control);
       messageBox->setIcon(QMessageBox::Warning);
       messageBox->setStandardButtons(QMessageBox::Ok);
       messageBox->setText(errlog.str().c_str());
@@ -107,7 +107,7 @@ void QmitkSimulationPreferencePage::OnAddButtonClicked()
   }
   else
   {
-    QMessageBox* messageBox = new QMessageBox(m_Control);
+    auto  messageBox = new QMessageBox(m_Control);
     messageBox->setIcon(QMessageBox::Critical);
     messageBox->setStandardButtons(QMessageBox::Ok);
     messageBox->setText(errlog.str().c_str());
@@ -156,7 +156,7 @@ void QmitkSimulationPreferencePage::OnRemoveButtonClicked()
   }
   else
   {
-    QMessageBox* messageBox = new QMessageBox(m_Control);
+    auto  messageBox = new QMessageBox(m_Control);
     messageBox->setIcon(QMessageBox::Critical);
     messageBox->setStandardButtons(QMessageBox::Ok);
     messageBox->setText(errlog.str().c_str());
@@ -175,7 +175,7 @@ bool QmitkSimulationPreferencePage::PerformOk()
   PluginMap& pluginMap = pluginManager.getPluginMap();
   QString plugins;
 
-  for (PluginIterator it = pluginMap.begin(); it != pluginMap.end(); ++it)
+  for (auto it = pluginMap.begin(); it != pluginMap.end(); ++it)
   {
     if (!plugins.isEmpty())
       plugins += ";";
@@ -192,7 +192,7 @@ void QmitkSimulationPreferencePage::Update()
   PluginManager& pluginManager = PluginManager::getInstance();
   PluginMap& pluginMap = pluginManager.getPluginMap();
 
-  for (PluginIterator it = pluginMap.begin(); it != pluginMap.end(); ++it)
+  for (auto it = pluginMap.begin(); it != pluginMap.end(); ++it)
   {
     Plugin& plugin = it->second;
 

@@ -34,7 +34,7 @@ class MITKQT4QT5TESTMODULE_EXPORT QWonderString : public QObject
 
   public:
 
-    QWonderString(QObject* parent = 0, const QString& text = "");
+    QWonderString(QObject* parent = nullptr, const QString& text = "");
 
     QString text();
 

@@ -49,7 +49,7 @@ namespace mitk{
     /**
     * \brief Used for pipeline update just to tell the pipeline that we always have to update.
     */
-    virtual void UpdateOutputInformation();
+    virtual void UpdateOutputInformation() override;
 
     itkGetMacro(NavigationDataSet, NavigationDataSet::Pointer)
 
@@ -111,7 +111,7 @@ namespace mitk{
     /**
     * \brief Iterator always points to the NavigationData object which is in the outputs at the moment.
     */
-    mitk::NavigationDataSet::NavigationDataSetIterator m_NavigationDataSetIterator;
+    mitk::NavigationDataSet::NavigationDataSetConstIterator m_NavigationDataSetIterator;
   };
 } // namespace mitk
 

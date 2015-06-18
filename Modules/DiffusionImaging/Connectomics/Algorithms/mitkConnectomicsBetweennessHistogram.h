@@ -57,7 +57,7 @@ namespace mitk {
     typedef std::vector< double > BCMapType;
 
     /** @brief Creates a new histogram from the network source. */
-    virtual void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source );
+    virtual void ComputeFromConnectomicsNetwork( ConnectomicsNetwork* source ) override;
 
     /** Calculate betweenness centrality ignoring the weight of the edges */
     void CalculateUnweightedUndirectedBetweennessCentrality( NetworkType*, IteratorType, IteratorType );

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+  <extension-point id="org.blueberry.osgi.applications" name="Applications" schema="schema/applications.exsd"/>
+  <extension-point id="org.blueberry.core.runtime.products" name="Products" schema="schema/products.exsd"/>
+  <extension
+      id="error"
+      point="org.blueberry.osgi.applications">
+    <application visible="false">
+      <run class="berry::ErrorApplication"/>
+    </application>
+  </extension>
+</plugin>

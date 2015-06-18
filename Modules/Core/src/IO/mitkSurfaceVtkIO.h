@@ -46,7 +46,7 @@ public:
   SurfaceVtkIO(const std::string& baseDataType, const CustomMimeType& mimeType,
                const std::string& description);
 
-  virtual ConfidenceLevel GetWriterConfidenceLevel() const;
+  virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
 
 protected:
 

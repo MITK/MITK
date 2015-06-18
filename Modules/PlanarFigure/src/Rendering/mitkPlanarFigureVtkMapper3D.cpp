@@ -28,8 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolygon.h>
 
 mitk::PlanarFigureVtkMapper3D::LocalStorage::LocalStorage()
-  : m_Actor(vtkSmartPointer<vtkActor>::New()),
-    m_LastMTime(0)
+  : m_Actor(vtkSmartPointer<vtkActor>::New())
+  , m_LastMTime(0)
 {
 }
 
@@ -44,6 +44,7 @@ void mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(DataNode* node, BaseRen
 }
 
 mitk::PlanarFigureVtkMapper3D::PlanarFigureVtkMapper3D()
+    : m_FillPf(false)
 {
 }
 
@@ -106,9 +107,6 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
   if (node == NULL)
     return;
 
-  bool fill3d = false;
-  node->GetBoolProperty("planarfigure.3drendering.fill", fill3d);
-
   PlanarFigure* planarFigure = dynamic_cast<PlanarFigure*>(node->GetData());
 
   if (planarFigure == NULL || !planarFigure->IsPlaced())
@@ -117,7 +115,16 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
   LocalStorage* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
   unsigned long mTime = planarFigure->GetMTime();
 
-  if (mTime > localStorage->m_LastMTime)
+  bool fillPf = false;
+  bool refresh = false;
+  node->GetBoolProperty("planarfigure.3drendering.fill", fillPf);
+  if (m_FillPf!=fillPf)
+  {
+        m_FillPf = fillPf;
+        refresh = true;
+  }
+
+  if (mTime > localStorage->m_LastMTime || refresh)
   {
     localStorage->m_LastMTime = mTime;
 
@@ -186,7 +193,7 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
     vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
     polyData->SetPoints(points);
     polyData->SetLines(cells);
-    if (fill3d)
+    if (m_FillPf)
       polyData->SetPolys(polygons);
 
     vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();

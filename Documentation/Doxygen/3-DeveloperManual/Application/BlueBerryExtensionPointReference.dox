@@ -1,0 +1,99 @@
+/**
+
+\page BlueBerryExtPointsIndex BlueBerry Extension-Point Reference
+
+<center>
+  <h1>BlueBerry Platform Extension Points</h1>
+</center>
+
+The following extension points can be used to extend the capabilities
+of the platform infrastructure:
+
+<h3><a name="runtime"></a>Platform Core Expressions</h3>
+<ul>
+  <li>\subpage xp_org_blueberry_core_expressions_definitions
+  <li>\subpage xp_org_blueberry_core_expressions_commonExpression
+  <li>\subpage xp_org_blueberry_core_expressions_propertyTesters
+</ul>
+
+
+<h3><a name="runtime"></a>Platform Runtime</h3>
+<ul>
+  <li>\subpage xp_org_blueberry_osgi_applications
+  <li>\subpage xp_org_blueberry_core_runtime_products
+</ul>
+
+<h3><a name="workbench"></a>Workbench</h3>
+<ul>
+  <li>\subpage xp_org_blueberry_ui_editors
+  <li>\subpage xp_org_blueberry_ui_elementFactories
+  <li>\subpage xp_org_blueberry_ui_keywords
+  <li>\subpage xp_org_blueberry_ui_menus
+  <li>\subpage xp_org_blueberry_ui_perspectiveExtensions
+  <li>\subpage xp_org_blueberry_ui_perspectives
+  <li>\subpage xp_org_blueberry_ui_preferencePages
+  <li>\subpage xp_org_blueberry_ui_presentationFactories
+  <li>\subpage xp_org_blueberry_ui_services
+  <li>\subpage xp_org_blueberry_ui_tweaklets
+  <li>\subpage xp_org_blueberry_ui_views
+</ul>
+
+<h3><a name="other"></a>Other</h3>
+<ul>
+    <li>\subpage xp_org_blueberry_tests
+</ul>
+
+\page xp_org_blueberry_core_expressions_definitions org.blueberry.core.expressions.definitions
+\htmlinclude org_blueberry_core_expressions_definitions.html
+
+\page xp_org_blueberry_core_expressions_commonExpression org.blueberry.core.expressions.commonExpression
+\htmlinclude org_blueberry_core_expressions_commonExpression.html
+
+\page xp_org_blueberry_core_expressions_propertyTesters org.blueberry.core.expressions.propertyTesters
+\htmlinclude org_blueberry_core_expressions_propertyTesters.html
+
+
+\page xp_org_blueberry_osgi_applications org.blueberry.osgi.applications
+\htmlinclude org_blueberry_osgi_applications.html
+
+\page xp_org_blueberry_core_runtime_products org.blueberry.core.runtime.products
+\htmlinclude org_blueberry_core_runtime_products.html
+
+
+\page xp_org_blueberry_ui_elementFactories org.blueberry.ui.elementFactories
+\htmlinclude org_blueberry_ui_elementFactories.html
+
+\page xp_org_blueberry_ui_menus org.blueberry.ui.menus
+\htmlinclude org_blueberry_ui_menus.html
+
+\page xp_org_blueberry_ui_perspectiveExtensions org.blueberry.ui.perspectiveExtensions
+\htmlinclude org_blueberry_ui_perspectiveExtensions.html
+
+\page xp_org_blueberry_ui_editors org.blueberry.ui.editors
+\htmlinclude org_blueberry_ui_editors.html
+
+\page xp_org_blueberry_ui_perspectives org.blueberry.ui.perspectives
+\htmlinclude org_blueberry_ui_perspectives.html
+
+\page xp_org_blueberry_ui_presentationFactories org.blueberry.ui.presentationFactories
+\htmlinclude org_blueberry_ui_presentationFactories.html
+
+\page xp_org_blueberry_ui_services org.blueberry.ui.services
+\htmlinclude org_blueberry_ui_services.html
+
+\page xp_org_blueberry_ui_keywords org.blueberry.ui.keywords
+\htmlinclude org_blueberry_ui_keywords.html
+
+\page xp_org_blueberry_ui_preferencePages org.blueberry.ui.preferencePages
+\htmlinclude org_blueberry_ui_preferencePages.html
+
+\page xp_org_blueberry_ui_tweaklets org.blueberry.ui.tweaklets
+\htmlinclude org_blueberry_ui_tweaklets.html
+
+\page xp_org_blueberry_ui_views org.blueberry.ui.views
+\htmlinclude org_blueberry_ui_views.html
+
+\page xp_org_blueberry_tests org.blueberry.tests
+\htmlinclude org_blueberry_tests.html
+
+*/

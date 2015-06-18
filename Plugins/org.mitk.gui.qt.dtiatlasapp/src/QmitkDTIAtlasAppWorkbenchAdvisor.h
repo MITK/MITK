@@ -27,12 +27,12 @@ public:
 
   static const QString WELCOME_PERSPECTIVE_ID; // = "org.mitk.qt.dtiatlasapp.defaultperspective"
 
-  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer);
+  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer) override;
 
   berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-        berry::IWorkbenchWindowConfigurer::Pointer configurer);
+        berry::IWorkbenchWindowConfigurer::Pointer configurer) override;
 
-  QString GetInitialWindowPerspectiveId();
+  QString GetInitialWindowPerspectiveId() override;
 
 };
 

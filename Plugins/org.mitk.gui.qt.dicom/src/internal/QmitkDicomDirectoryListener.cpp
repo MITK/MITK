@@ -61,7 +61,7 @@ void QmitkDicomDirectoryListener::OnDirectoryChanged(const QString&)
     }
 }
 
-void QmitkDicomDirectoryListener::OnDicomNetworkError(const QString& errorMsg)
+void QmitkDicomDirectoryListener::OnDicomNetworkError(const QString& /*errorMsg*/)
 {
     m_IsListening = false;
     m_AlreadyImportedFiles.clear();

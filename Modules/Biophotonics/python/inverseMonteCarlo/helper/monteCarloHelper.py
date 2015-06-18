@@ -11,6 +11,7 @@ import numpy as np
 import mieMonteCarlo
 import subprocess
 import os
+from setup import systemPaths
 
 import contextlib
 
@@ -37,9 +38,9 @@ def calcUa(BVF, cHb, SaO2, eHbO2, eHb, wavelength):
     # determine ua [1/m] as combination of extinction coefficients.
     # For more on this equation, please refer to
     # http://omlc.org/spectra/hemoglobin/
-    return BVF * math.log(10) * cHb * \
+    return math.log(10) * cHb * \
         (SaO2 * eHbO2(wavelength) +  (1-SaO2) * eHb(wavelength)) \
-        / 64500
+        / 64500 * BVF
 
 def calcUsMuscle(wavelength):
     return 168.52 * (wavelength * 10**9)**-0.332 / (1 - 0.96) * 100
@@ -67,31 +68,56 @@ def getReflectanceFromFile(fileName):
     return sum(reflectances)
 
 
-def normalizeIntegral(data, wavelengths):
+from setup import simulation
+
+def normalizeIntegral(data):
     # normalize data
-    norms = np.trapz(data, wavelengths, axis=1)
+    # first sort by wavelength:
+    ourWavelengths = simulation.wavelengths
+    #ourWavelengths = np.delete(simulation.getWavelengths(), [2,7])
+
+    sortedIndices = sorted(range(len(ourWavelengths)), key=lambda k: ourWavelengths[k])
+
+    norms = np.trapz(data[:,sortedIndices], ourWavelengths[sortedIndices], axis=1)
     return data / norms[:,None]
 
-def normalizeImageQuotient(data, iqBand=0):
-    # use line 0 as image quotient
+def normalizeSum(data):
+    return data/data.sum(axis=1)[:,None]
+
+def normalizeMean(data):
+    return data - data.mean(axis=1)[:,None]
+
+iqBand = 2
+
+def normalizeImageQuotient(data):
+
+
+    # use line iqBand as image quotient
     normData = data / data[:,iqBand][:,None]
     # discard it
-    normData = np.concatenate((normData[:,0:iqBand], normData[:,iqBand+1:]), axis=1)
-    return normData
+    normData = np.delete(normData, iqBand, axis=1)
 
+    #normData = normalizeMean(normData)
+
+    return normData
+    #return normalizeIntegral(data)
+
+    #return normalizeMean(firstNorm)
+
+def removeIqWavelength(wavelenghts):
+    #return wavelenghts
+    return np.delete(wavelenghts, iqBand)
 
 def runOneSimulation(wavelength, eHbO2, eHb,
                      infile, simulationOutputFolderName, gpumcmlDirectory, gpumcmlExecutable,
                      BVF=0.1, Vs=0.4, d=500 * 10**-6,
                      r=0.4 * 10**-6, SaO2=0.7, cHb=120,
-                     submucosa_BVF=0.1, submucosa_Vs=0.3, submucosa_SaO2=0.7,
+                     submucosa_BVF=0.1, submucosa_Vs=0.3, submucosa_r = 2*10**-6, submucosa_SaO2=0.7,
                      Fwhm = 20 * 10**-9, nrPhotons = 10**6,
                      ):
     """
     Args:
     _____
-    gpumcmlString:
-        a string containing the full absolute path gpumcml (e.g. /home/wirkert/gpumcml.sm20)
     cHb:
         concentration of haemoglobin per unit volume of blood in colon [g/L],
         taken from: "Modelling and validation of spectral reflectance for the colon"
@@ -115,7 +141,7 @@ def runOneSimulation(wavelength, eHbO2, eHb,
     # histological parameters characteristic of cancer
     # from ex-vivo multispectral images of the colon"
     ua_sm  = calcUa(submucosa_BVF, cHb, submucosa_SaO2, eHbO2, eHb, wavelength)
-    usg_sm = mieMonteCarlo.mieMonteCarlo_FWHM(wavelength, 2*10**-6, submucosa_Vs, FWHM = Fwhm)
+    usg_sm = mieMonteCarlo.mieMonteCarlo_FWHM(wavelength,submucosa_r, submucosa_Vs, FWHM = Fwhm)
 
     # now create us and ua for muscle layer according to
     # "Modelling and validation of spectral reflectance for the colon"
@@ -135,9 +161,9 @@ def runOneSimulation(wavelength, eHbO2, eHb,
         'c_ph': str(nrPhotons)}
 
     createSimulationFile(infile, replacements,
-                         "data/output/simulationFile.mci")
+                         systemPaths.getOutputFolder() + "simulationFile.mci")
 
-    args = ("./" + gpumcmlExecutable, "-A", os.getcwd() + "/data/output/simulationFile.mci")
+    args = ("./" + gpumcmlExecutable, "-A", systemPaths.getOutputFolder() + "simulationFile.mci")
 
     with cd(gpumcmlDirectory):
         popen = subprocess.Popen(args, stdout=subprocess.PIPE)

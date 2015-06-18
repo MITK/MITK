@@ -57,7 +57,7 @@ namespace mitk
      * returns 0 if node is not visible in sending render window
      * If Sender within stateEvent is NULL a value of 0 is returned.
      */
-    virtual float CanHandleEvent(StateEvent const* stateEvent) const;
+    virtual float CanHandleEvent(StateEvent const* stateEvent) const override;
 
   protected:
     /**

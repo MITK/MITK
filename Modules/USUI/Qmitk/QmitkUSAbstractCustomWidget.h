@@ -137,7 +137,7 @@ public:
     *
     * \throws mitk::Exception
     */
-  void showEvent ( QShowEvent * event );
+  void showEvent ( QShowEvent * event ) override;
 
   /**
     * \brief Property key for the class name of corresponding us device object.

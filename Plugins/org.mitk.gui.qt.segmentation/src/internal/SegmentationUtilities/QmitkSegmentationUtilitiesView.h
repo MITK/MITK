@@ -36,11 +36,11 @@ public:
   QmitkSegmentationUtilitiesView();
   ~QmitkSegmentationUtilitiesView();
 
-  void CreateQtPartControl(QWidget* parent);
-  void SetFocus();
+  void CreateQtPartControl(QWidget* parent) override;
+  void SetFocus() override;
 
-  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
 private:
   void AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text);

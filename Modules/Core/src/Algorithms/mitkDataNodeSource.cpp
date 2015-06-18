@@ -63,7 +63,7 @@ const  mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput(DataObj
   const OutputType *out = dynamic_cast< const OutputType * >
                       ( this->ProcessObject::GetOutput(idx) );
 
-  if ( out == NULL && this->ProcessObject::GetOutput(idx) != NULL )
+  if ( out == nullptr && this->ProcessObject::GetOutput(idx) != nullptr )
     {
     itkWarningMacro (<< "Unable to convert output number " << idx << " to type " <<  typeid( OutputType ).name () );
     }

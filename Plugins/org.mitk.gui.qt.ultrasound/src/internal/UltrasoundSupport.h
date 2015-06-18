@@ -46,11 +46,11 @@ class UltrasoundSupport : public QmitkAbstractView
 
 public:
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   UltrasoundSupport();
   virtual ~UltrasoundSupport();
@@ -65,7 +65,7 @@ public:
 
       void OnClickedAddNewDevice();
 
-      void OnChangedFramerateLimit(int);
+      void OnChangedFramerateLimit();
 
       /*
        *\brief Called, when the selection in the list of the active devices changes.
@@ -77,9 +77,17 @@ public:
       void OnDeciveServiceEvent(const ctkServiceEvent event);
 
       /*
-      * \brief This is the main imaging loop that is called regularily during the imaging process
+      * \brief This is the main imaging loop that updates the image and is called regularily during the imaging process
       */
-      void DisplayImage();
+      void UpdateImage();
+
+      void RenderImage2d();
+
+      void RenderImage3d();
+
+      void StartTimers();
+
+      void StopTimers();
 
 protected:
 
@@ -89,14 +97,23 @@ protected:
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;
 
-  /** This timer triggers periodic updates to the pipeline */
-  QTimer* m_Timer;
 
-  /** This clock is used to compute the framerate in the method DisplayImage(). */
+  void SetTimerIntervals(int intervalPipeline, int interval2D, int interval3D);
+  /** This timer triggers periodic updates to the pipeline */
+  QTimer* m_UpdateTimer;
+  QTimer* m_RenderingTimer2d;
+  QTimer* m_RenderingTimer3d;
+
+  /** These clocks are used to compute the framerate in the methods DisplayImage(),RenderImage2d() and RenderImage3d(). */
   QTime  m_Clock;
+  QTime  m_Clock2d;
+  QTime  m_Clock3d;
 
   /** A counter to comute the framerate. */
-  int m_FrameCounter;
+  int m_FrameCounterPipeline;
+  int m_FrameCounter2d;
+  int m_FrameCounter3d;
+  int m_FPSPipeline, m_FPS2d, m_FPS3d;
 
   /** Stores the properties of some QWidgets (and the tool storage file name) to QSettings.*/
   void StoreUISettings();

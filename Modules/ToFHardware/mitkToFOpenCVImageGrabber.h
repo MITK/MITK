@@ -48,7 +48,7 @@ namespace mitk
     /*!
     \brief Get current ToF image. Specify image you want to grab with SetImageType()
     */
-    cv::Mat GetImage();
+    cv::Mat GetImage() override;
 
     /*!
     \brief set type of image you want to grab.

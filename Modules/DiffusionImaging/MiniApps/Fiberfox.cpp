@@ -25,10 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkAddArtifactsToDwiImageFilter.h>
 #include <itkTractsToDWIImageFilter.h>
-
-#include "boost/property_tree/ptree.hpp"
-#include "boost/property_tree/xml_parser.hpp"
-#include "boost/foreach.hpp"
+#include <boost/lexical_cast.hpp>
 
 /** TODO: Proritype signal komplett speichern oder bild mit speichern. */
 /** TODO: Tarball aus images und parametern? */
@@ -47,6 +44,7 @@ int main(int argc, char* argv[])
     parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
     parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file", us::Any(), false);
     parser.addArgument("fiberbundle", "f", mitkCommandLineParser::String, "Fiberbundle:", "", us::Any(), false);
+    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:", "", false, true);
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -59,25 +57,60 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("fiberbundle"))
         fibFile = us::any_cast<string>(parsedArgs["fiberbundle"]);
 
+    bool verbose = false;
+    if (parsedArgs.count("verbose"))
+        verbose = us::any_cast<bool>(parsedArgs["verbose"]);
+
+    FiberfoxParameters<double> parameters;
+    parameters.LoadParameters(paramName);
+    parameters.m_Misc.m_OutputPath = itksys::SystemTools::GetFilenamePath(outName)+"/";
+
+    if (verbose)
+        parameters.SaveParameters(outName+".ffp");
+
+    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+
+    itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
+    tractsToDwiFilter->SetParameters(parameters);
+    tractsToDwiFilter->SetFiberBundle(inputTractogram);
+    tractsToDwiFilter->Update();
+
+    mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
+    image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
+    image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ) );
+    mitk::DiffusionPropertyHelper propertyHelper( image );
+    propertyHelper.InitializeImage();
+
+    mitk::IOUtil::Save(image, outName+".dwi");
+
+    if (verbose)
     {
-        FiberfoxParameters<double> parameters;
-        parameters.LoadParameters(paramName);
+        std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = tractsToDwiFilter->GetVolumeFractions();
+        for (unsigned int k=0; k<volumeFractions.size(); k++)
+        {
+            mitk::Image::Pointer image = mitk::Image::New();
+            image->InitializeByItk(volumeFractions.at(k).GetPointer());
+            image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
+            mitk::IOUtil::Save(image, outName+"_Compartment"+boost::lexical_cast<string>(k)+".nrrd");
+        }
 
-        mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+        if (tractsToDwiFilter->GetPhaseImage().IsNotNull())
+        {
+            mitk::Image::Pointer image = mitk::Image::New();
+            itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer itkPhase = tractsToDwiFilter->GetPhaseImage();
+            image = mitk::GrabItkImageMemory( itkPhase.GetPointer() );
+            mitk::IOUtil::Save(image, outName+"_Phase.nrrd");
+        }
 
-        itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
-        tractsToDwiFilter->SetParameters(parameters);
-        tractsToDwiFilter->SetFiberBundle(inputTractogram);
-        tractsToDwiFilter->Update();
-
-        mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );
-        image->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( parameters.m_SignalGen.GetGradientDirections() ) );
-        image->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ) );
-        mitk::DiffusionPropertyHelper propertyHelper( image );
-        propertyHelper.InitializeImage();
-
-        mitk::IOUtil::Save(image, outName.c_str());
+        if (tractsToDwiFilter->GetKspaceImage().IsNotNull())
+        {
+            mitk::Image::Pointer image = mitk::Image::New();
+            itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer itkImage = tractsToDwiFilter->GetKspaceImage();
+            image = mitk::GrabItkImageMemory( itkImage.GetPointer() );
+            mitk::IOUtil::Save(image, outName+"_kSpace.nrrd");
+        }
     }
+
     return EXIT_SUCCESS;
 }
 

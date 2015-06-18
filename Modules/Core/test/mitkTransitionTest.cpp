@@ -79,8 +79,8 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
 
   //check ActionIterators
   std::cout << "Check ActionIterators: ";
-  mitk::Transition::ActionVectorIterator iter = transition->GetActionBeginIterator();
-  mitk::Transition::ActionVectorConstIterator end = transition->GetActionEndIterator();
+  auto iter = transition->GetActionBeginIterator();
+  auto end = transition->GetActionEndIterator();
   while (iter != end)
   {
     if((*iter)->GetActionId()!=(int)count)

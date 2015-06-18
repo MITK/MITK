@@ -70,7 +70,7 @@ namespace mitk
       itkSetMacro(BoundaryFixing, bool);
 
     protected:
-      void GenerateData();
+      void GenerateData() override;
 
     private:
       RemeshFilter();

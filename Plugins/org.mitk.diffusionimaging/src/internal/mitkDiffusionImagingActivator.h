@@ -46,9 +46,9 @@ public:
   /**
    * Registers diffusion imaging object factories.
    */
-  void start(ctkPluginContext* context);
+  void start(ctkPluginContext* context) override;
 
-  void stop(ctkPluginContext* context);
+  void stop(ctkPluginContext* context) override;
 
 };
 

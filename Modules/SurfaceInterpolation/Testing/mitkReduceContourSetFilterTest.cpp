@@ -34,7 +34,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     m_ContourReducer = mitk::ReduceContourSetFilter::New();
     CPPUNIT_ASSERT_MESSAGE("Failed to initialize ReduceContourSetFilter", m_ContourReducer.IsNotNull());

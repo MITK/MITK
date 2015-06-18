@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConnectomicsSimulatedAnnealingManager.h"
 #include "mitkConnectomicsSimulatedAnnealingPermutationModularity.h"
 #include "mitkConnectomicsSimulatedAnnealingCostFunctionModularity.h"
+#include <mitkCorrelationCalculator.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -70,6 +71,7 @@ void QmitkConnectomicsDataView::CreateQtPartControl( QWidget *parent )
     QObject::connect( m_Controls->networkifyPushButton, SIGNAL(clicked()), this, SLOT(OnNetworkifyPushButtonClicked()) );
     QObject::connect( m_Controls->syntheticNetworkCreationPushButton, SIGNAL(clicked()), this, SLOT(OnSyntheticNetworkCreationPushButtonClicked()) );
     QObject::connect( (QObject*)( m_Controls->syntheticNetworkComboBox ), SIGNAL(currentIndexChanged (int)),  this, SLOT(OnSyntheticNetworkComboBoxCurrentIndexChanged(int)) );
+    QObject::connect( m_Controls->createCorrelationMatrixPushButton, SIGNAL(clicked()), this, SLOT(OnCreateCorrelationMatrixPushButtonClicked()) );
   }
 
   // GUI is different for developer and demo mode
@@ -401,4 +403,131 @@ void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkConnectomicsDataView::OnCreateCorrelationMatrixPushButtonClicked()
+{
+
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  if ( nodes.empty() )
+  {
+    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+    return;
+  }
+
+  if( nodes.size() == 1 )
+  {
+    mitk::DataNode* firstNode = nodes.front();
+
+    if (!firstNode)
+    {
+      // Nothing selected. Inform the user and return
+      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+      return;
+    }
+
+    // here we have a valid mitk::DataNode
+
+    // a node itself is not very useful, we need its data item (the image)
+    mitk::BaseData* firstData = firstNode->GetData();
+    if (firstData)
+    {
+      // test if this data item is an image or not (could also be a surface or something totally different)
+      mitk::Image* image = dynamic_cast<mitk::Image*>( firstData );
+      if(image && image->GetDimension() == 4)
+      {
+        AccessFixedDimensionByItk(image, DoWholeCorrelation, 4);
+      }
+    }
+  }
+  else if( nodes.size() == 2 )
+  {
+    mitk::DataNode* firstNode = nodes.front();
+    mitk::DataNode* secondNode = nodes.at(1);
+
+    if (!firstNode)
+    {
+      // Nothing selected. Inform the user and return
+      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+      return;
+    }
+    if (!secondNode)
+    {
+      // Nothing selected. Inform the user and return
+      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+      return;
+    }
+
+
+    // here we have a valid mitk::DataNode
+
+    // a node itself is not very useful, we need its data item (the image)
+    mitk::BaseData* firstData = firstNode->GetData();
+    mitk::BaseData* secondData = secondNode->GetData();
+    if (firstData && secondData)
+    {
+      // test if this data item is an image or not (could also be a surface or something totally different)
+      mitk::Image* firstImage = dynamic_cast<mitk::Image*>( firstData );
+      mitk::Image* secondImage = dynamic_cast<mitk::Image*>( secondData );
+      if(firstImage && secondImage)
+      {
+        if( firstImage->GetDimension() == 4 && secondImage->GetDimension() == 3 )
+        {
+          AccessFixedDimensionByItk_n(firstImage, DoParcelCorrelation, 4, ( secondImage));
+        }
+        else if( firstImage->GetDimension() == 3 && secondImage->GetDimension() == 4 )
+        {
+          AccessFixedDimensionByItk_n(secondImage, DoParcelCorrelation, 4, ( firstImage));
+        }
+        else
+        {
+          QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+          return;
+        }
+      }
+    }
+  }
+}
+
+template< typename TPixel, unsigned int VImageDimension >
+void QmitkConnectomicsDataView::DoWholeCorrelation( itk::Image<TPixel, VImageDimension>* itkTimeSeriesImage )
+{
+  typename mitk::CorrelationCalculator<TPixel>::Pointer correlationCalculator = mitk::CorrelationCalculator<TPixel>::New();
+
+  mitk::Image::Pointer timeSeriesImage = mitk::Image::New();
+  mitk::CastToMitkImage(itkTimeSeriesImage, timeSeriesImage);
+
+  correlationCalculator->SetTimeSeriesImage( timeSeriesImage );
+  correlationCalculator->SetParcellationImage( nullptr );
+
+  correlationCalculator->DoWholeCorrelation();
+  const vnl_matrix< double >* vnlmat = correlationCalculator->GetCorrelationMatrix();
+  std::stringstream output;
+  for(unsigned int i(0); i < (*vnlmat).rows(); ++i)
+  {
+    for(unsigned int j(0); j < (*vnlmat).cols(); ++j)
+    {
+      output << (*vnlmat)[i][j] << " ";
+    }
+    output << "\n";
+  }
+  MITK_INFO << "\n" << output.str();
+}
+
+template< typename TPixel, unsigned int VImageDimension >
+void QmitkConnectomicsDataView::DoParcelCorrelation( itk::Image<TPixel, VImageDimension>* itkTimeSeriesImage, mitk::Image::Pointer parcelImage )
+{
+  typename mitk::CorrelationCalculator<TPixel>::Pointer correlationCalculator = mitk::CorrelationCalculator<TPixel>::New();
+
+  mitk::Image::Pointer timeSeriesImage = mitk::Image::New();
+  mitk::CastToMitkImage(itkTimeSeriesImage, timeSeriesImage);
+
+  correlationCalculator->SetTimeSeriesImage( timeSeriesImage );
+  correlationCalculator->SetParcellationImage( parcelImage );
+
+  correlationCalculator->DoParcelCorrelation();
+  mitk::DataNode::Pointer networkNode = mitk::DataNode::New();
+  networkNode->SetData( correlationCalculator->GetConnectomicsNetwork() );
+  networkNode->SetName("ParcelCorrelationNetwork");
+  this->GetDefaultDataStorage()->Add(networkNode);
 }

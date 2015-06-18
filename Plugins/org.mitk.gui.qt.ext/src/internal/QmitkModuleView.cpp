@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSettings>
 
 QmitkModuleView::QmitkModuleView()
-  : tableView(0)
+  : tableView(nullptr)
 {
 }
 
@@ -37,13 +37,13 @@ void QmitkModuleView::SetFocus()
 
 void QmitkModuleView::CreateQtPartControl(QWidget *parent)
 {
-  QHBoxLayout* layout = new QHBoxLayout();
+  auto   layout = new QHBoxLayout();
   layout->setMargin(0);
   parent->setLayout(layout);
 
   tableView = new QTableView(parent);
-  QmitkModuleTableModel* tableModel = new QmitkModuleTableModel(tableView);
-  QSortFilterProxyModel* sortProxyModel = new QSortFilterProxyModel(tableView);
+  auto   tableModel = new QmitkModuleTableModel(tableView);
+  auto   sortProxyModel = new QSortFilterProxyModel(tableView);
   sortProxyModel->setSourceModel(tableModel);
   sortProxyModel->setDynamicSortFilter(true);
   tableView->setModel(sortProxyModel);

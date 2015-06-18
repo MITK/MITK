@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::Contour::Contour() :
 m_ContourPath (PathType::New()),
-m_CurrentWindow ( NULL ),
+m_CurrentWindow ( nullptr ),
 m_BoundingBox (BoundingBoxType::New()),
 m_Vertices ( BoundingBoxType::PointsContainer::New() ),
 m_Closed ( true ),

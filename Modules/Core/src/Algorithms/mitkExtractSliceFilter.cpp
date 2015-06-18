@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlaneClipping.h>
 
 mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
-  if(reslicer == NULL){
+  if(reslicer == nullptr){
     m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
   }
   else
@@ -34,7 +34,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
   m_TimeStep = 0;
   m_Reslicer->ReleaseDataFlagOn();
   m_InterpolationMode = ExtractSliceFilter::RESLICE_NEAREST;
-  m_ResliceTransform = NULL;
+  m_ResliceTransform = nullptr;
   m_InPlaneResampleExtentByGeometry = false;
   m_OutPutSpacing = new mitk::ScalarType[2];
   m_OutputDimension = 2;
@@ -46,8 +46,8 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice* reslicer ){
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter(){
-  m_ResliceTransform = NULL;
-  m_WorldGeometry = NULL;
+  m_ResliceTransform = nullptr;
+  m_WorldGeometry = nullptr;
   delete [] m_OutPutSpacing;
 }
 
@@ -95,7 +95,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
   }
 
   const TimeGeometry* inputTimeGeometry = this->GetInput()->GetTimeGeometry();
-  if ( ( inputTimeGeometry == NULL )
+  if ( ( inputTimeGeometry == nullptr )
     || ( inputTimeGeometry->CountTimeSteps() <= 0 ) )
   {
     itkWarningMacro(<<"Error reading input image TimeGeometry.");
@@ -130,7 +130,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
   const mitk::AbstractTransformGeometry* abstractGeometry =
     dynamic_cast< const AbstractTransformGeometry * >(m_WorldGeometry);
 
-  if(abstractGeometry != NULL)
+  if(abstractGeometry != nullptr)
   {
     m_ResliceTransform = abstractGeometry;
 
@@ -172,7 +172,7 @@ void mitk::ExtractSliceFilter::GenerateData(){
     m_Reslicer->SetBackgroundLevel( m_BackgroundLevel );
   }
   else{
-    if ( planeGeometry != NULL )
+    if ( planeGeometry != nullptr )
     {
       //if the worldGeomatry is a PlaneGeometry everthing is straight forward
 
@@ -311,9 +311,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
   double sliceBounds[6];
   if (m_WorldGeometry->GetReferenceGeometry())
   {
-    for ( int i = 0; i < 6; ++i )
+    for (auto & sliceBound : sliceBounds)
     {
-      sliceBounds[i] = 0.0;
+      sliceBound = 0.0;
     }
 
     if (this->GetClippedPlaneBounds( m_WorldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds ))

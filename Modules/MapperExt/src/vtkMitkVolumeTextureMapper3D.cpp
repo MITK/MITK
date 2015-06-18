@@ -44,21 +44,21 @@ vtkMitkVolumeTextureMapper3D::vtkMitkVolumeTextureMapper3D()
 {
   //GPU_INFO << "vtkMitkVolumeTextureMapper3D";
 
-  this->PolygonBuffer                 = NULL;
-  this->IntersectionBuffer            = NULL;
+  this->PolygonBuffer                 = nullptr;
+  this->IntersectionBuffer            = nullptr;
   this->NumberOfPolygons              = 0;
   this->BufferSize                    = 0;
 
   // The input used when creating the textures
-  this->SavedTextureInput             = NULL;
+  this->SavedTextureInput             = nullptr;
 
   // The input used when creating the color tables
-  this->SavedParametersInput           = NULL;
+  this->SavedParametersInput           = nullptr;
 
-  this->SavedRGBFunction              = NULL;
-  this->SavedGrayFunction             = NULL;
-  this->SavedScalarOpacityFunction    = NULL;
-  this->SavedGradientOpacityFunction  = NULL;
+  this->SavedRGBFunction              = nullptr;
+  this->SavedGrayFunction             = nullptr;
+  this->SavedScalarOpacityFunction    = nullptr;
+  this->SavedGradientOpacityFunction  = nullptr;
   this->SavedColorChannels            = 0;
   this->SavedSampleDistance           = 0;
   this->SavedScalarOpacityDistance    = 0;
@@ -472,8 +472,8 @@ int vtkMitkVolumeTextureMapper3D::UpdateColorLookup( vtkVolume *vol )
     needToUpdate = 1;
     }
 
-  vtkColorTransferFunction *rgbFunc  = NULL;
-  vtkPiecewiseFunction     *grayFunc = NULL;
+  vtkColorTransferFunction *rgbFunc  = nullptr;
+  vtkPiecewiseFunction     *grayFunc = nullptr;
 
   // How many color channels for this component?
   int colorChannels = vol->GetProperty()->GetColorChannels(0);

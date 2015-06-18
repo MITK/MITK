@@ -45,9 +45,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ManufacturerLogo::ManufacturerLogo()
-:m_ImageData(NULL)
+:m_ImageData(nullptr)
 {
-  m_RenderWindow      = NULL;
+  m_RenderWindow      = nullptr;
   m_Renderer          = vtkRenderer::New();
   m_Actor             = vtkImageActor::New();
   m_Mapper            = vtkImageMapper::New();
@@ -68,26 +68,26 @@ mitk::ManufacturerLogo::ManufacturerLogo()
 
 mitk::ManufacturerLogo::~ManufacturerLogo()
 {
-  if ( m_RenderWindow != NULL )
+  if ( m_RenderWindow != nullptr )
     if ( this->IsEnabled() )
       this->Disable();
 
-  if ( m_Mapper != NULL )
+  if ( m_Mapper != nullptr )
     m_Mapper->Delete();
 
-  if ( m_Actor!=NULL )
+  if ( m_Actor!=nullptr )
     m_Actor->Delete();
 
-  if ( m_Renderer != NULL )
+  if ( m_Renderer != nullptr )
     m_Renderer->Delete();
 
-  if ( m_PngReader != NULL )
+  if ( m_PngReader != nullptr )
     m_PngReader->Delete();
 
-  if ( m_VtkImageImport != NULL )
+  if ( m_VtkImageImport != nullptr )
     m_VtkImageImport->Delete();
 
-  if ( m_ImageData != NULL)
+  if ( m_ImageData != nullptr)
     delete[] m_ImageData;
 }
 
@@ -156,7 +156,7 @@ void mitk::ManufacturerLogo::Enable()
   if(m_IsEnabled)
     return;
 
-  if(m_RenderWindow != NULL)
+  if(m_RenderWindow != nullptr)
   {
     if(itksys::SystemTools::FileExists(m_FileName.c_str()) && !m_ForceShowMBIDepartmentLogo)
     {

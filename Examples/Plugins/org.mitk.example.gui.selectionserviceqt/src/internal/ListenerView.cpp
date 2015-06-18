@@ -30,7 +30,7 @@ const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview";
 
 ListenerView::ListenerView()
   : m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))
-  , m_Parent(0)
+  , m_Parent(nullptr)
 {
 }
 

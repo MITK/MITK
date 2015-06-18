@@ -101,14 +101,14 @@ void mitk::ConnectomicsHistogramBase::ComputeFromBaseData( BaseData* source )
   m_HistogramVector.clear();
 
   //check if input is valid
-  if (source==NULL)
+  if (source==nullptr)
   { // empty base data
     return;
   }
 
   mitk::ConnectomicsNetwork* networkSource = dynamic_cast<mitk::ConnectomicsNetwork*>(source);
 
-  if (networkSource==NULL)
+  if (networkSource==nullptr)
   { // base data but no network
     return;
   }

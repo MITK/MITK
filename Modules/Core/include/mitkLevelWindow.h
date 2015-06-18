@@ -146,9 +146,14 @@ public:
   void SetDefaultBoundaries(ScalarType low, ScalarType up);
 
   /**!
-  * \brief sets level/window to the min/max greyvalues of the given Image
+  * \brief sets level/window to optimize the contrast of the given Image
   */
   void SetAuto(const Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
+
+  /**!
+  * \brief sets level/window to the min/max greyvalues of the given Image
+  */
+  void SetToImageRange(const Image* image);
 
   /**
    * If a level window is set to fixed, the set and get methods won't accept

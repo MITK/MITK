@@ -40,7 +40,7 @@ private:
 
 public:
 
-  void setUp()
+  void setUp() override
   {
     us::ModuleContext* context = us::GetModuleContext();
     //get the service which is generated in the mitkToFHardwareModuleActivator

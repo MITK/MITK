@@ -27,7 +27,7 @@ class QmitkTubeGraphLabelGroupWidget : public QWidget
     Q_OBJECT
 
 public:
-    QmitkTubeGraphLabelGroupWidget(QWidget *parent = 0, const char* name = 0);
+    QmitkTubeGraphLabelGroupWidget(QWidget *parent = nullptr, const char* name = nullptr);
     virtual ~QmitkTubeGraphLabelGroupWidget();
 
     void SetGroupName(QString name);

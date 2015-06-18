@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFileSaveAction.h"
 #include "QmitkExtFileSaveProjectAction.h"
 #include "QmitkCloseProjectAction.h"
+#include <QmitkFileExitAction.h>
 
 #include <mitkWorkbenchCommandConstants.h>
 
@@ -69,6 +70,10 @@ void QmitkExtActionBarAdvisor::MakeActions(berry::IWorkbenchWindow* window)
                                                QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
   this->Register(closeProjectAction, mitk::WorkbenchCommandConstants::PROJECT_CLOSE);
 
+  QAction* fileExitAction = new QmitkFileExitAction(window);
+  fileExitAction->setIcon(QIcon::fromTheme("system-log-out", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/system-log-out.svg")));
+  fileExitAction->setShortcut(QKeySequence::Quit);
+  this->Register(fileExitAction, mitk::WorkbenchCommandConstants::FILE_EXIT);
 }
 
 void QmitkExtActionBarAdvisor::FillMenuBar(berry::IMenuManager* menuBar)
@@ -140,7 +145,8 @@ berry::SmartPointer<berry::MenuManager> QmitkExtActionBarAdvisor::CreateFileMenu
   //ActionContributionItem quitItem = new ActionContributionItem(quitAction);
   //quitItem.setVisible(!Util.isMac());
   //menu.add(quitItem);
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::FILE_EXIT, "Exit"));
+  menu->Add(this->GetAction(berry::IWorkbenchCommandConstants::FILE_EXIT),
+    berry::IWorkbenchCommandConstants::FILE_EXIT);
   menu->Add(berry::IContributionItem::Pointer(new berry::GroupMarker(berry::WorkbenchActionConstants::FILE_END)));
 
   return menu;
@@ -199,7 +205,7 @@ berry::SmartPointer<berry::MenuManager> QmitkExtActionBarAdvisor::CreateHelpMenu
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator("group.main")));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_HELP_CONTENTS, "Help &Contents"));
   //menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_HELP_SEARCH, "Help Search"));
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_DYNAMIC_HELP, "Conte&xt Help"));
+  menu->Add(GetItem(berry::IWorkbenchCommandConstants::HELP_DYNAMIC_HELP, "Conte&xt Help", "", QIcon(), QKeySequence::HelpContents));
   menu->Add(berry::IContributionItem::Pointer(new berry::GroupMarker(berry::WorkbenchActionConstants::HELP_END)));
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator(berry::WorkbenchActionConstants::MB_ADDITIONS)));
 
@@ -217,8 +223,9 @@ berry::MenuManager::Pointer QmitkExtActionBarAdvisor::CreateWindowMenu()
   berry::MenuManager::Pointer menu(new berry::MenuManager("&Window",
                                                           berry::WorkbenchActionConstants::M_WINDOW));
 
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_NEW_WINDOW, "New Window"));
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_NEW_EDITOR, "New Editor"));
+  // See bug 19059.
+  // menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_NEW_WINDOW, "New Window"));
+  // menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_NEW_EDITOR, "New Editor"));
 
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator()));
   AddPerspectiveActions(menu.GetPointer());
@@ -259,20 +266,21 @@ void QmitkExtActionBarAdvisor::AddPerspectiveActions(berry::MenuManager* menu)
   }
   menu->Add(berry::IContributionItem::Pointer(new berry::Separator()));
   //menu.add(editActionSetAction);
-  menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_SAVE_PERSPECTIVE_AS, "Save Serspective &As..."));
+  menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_SAVE_PERSPECTIVE_AS, "Save Perspective &As..."));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_RESET_PERSPECTIVE, "&Reset Perspective..."));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_CLOSE_PERSPECTIVE, "&Close Perspective"));
   menu->Add(GetItem(berry::IWorkbenchCommandConstants::WINDOW_CLOSE_ALL_PERSPECTIVES, "Close All Perspectives"));
 }
 
 berry::SmartPointer<berry::IContributionItem> QmitkExtActionBarAdvisor::GetItem(const QString& commandId, const QString& label,
-                                                                                const QString& tooltip, const QIcon& icon)
+                                                                                const QString& tooltip, const QIcon& icon, const QKeySequence& shortcut)
 {
   berry::CommandContributionItemParameter::Pointer param(
         new berry::CommandContributionItemParameter(window, QString(), commandId, berry::CommandContributionItem::STYLE_PUSH));
   param->icon = icon;
   param->label = label;
   param->tooltip = tooltip;
+  param->shortcut = shortcut;
   berry::IContributionItem::Pointer item(new berry::CommandContributionItem(param));
   return item;
 }

@@ -193,8 +193,8 @@ void mitk::DiffImageApplier::ExecuteOperation( Operation* operation )
     }
   }
 
-  m_Image = NULL;
-  m_SliceDifferenceImage = NULL;
+  m_Image = nullptr;
+  m_SliceDifferenceImage = nullptr;
 }
 
 mitk::DiffImageApplier* mitk::DiffImageApplier::GetInstanceForUndo()

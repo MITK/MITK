@@ -139,10 +139,10 @@ public:
   typedef DataType::PointDataContainerIterator PointDataIterator;
   typedef DataType::PointDataContainerIterator PointDataConstIterator;
 
-  virtual void Expand( unsigned int timeSteps );
+  virtual void Expand( unsigned int timeSteps ) override;
 
   /** \brief executes the given Operation */
-  virtual void ExecuteOperation(Operation* operation);
+  virtual void ExecuteOperation(Operation* operation) override;
 
   /** \brief returns the current size of the point-list */
   virtual int GetSize( unsigned int t = 0 ) const;
@@ -159,6 +159,11 @@ public:
   PointsIterator End( int t = 0 );
 
   PointsConstIterator End( int t = 0 ) const;
+
+  /**
+  * \brief Get an iterator to the max ID element if existent. Return End() otherwise.
+  */
+  PointsIterator GetMaxId( int t = 0 );
 
   /**
    * \brief Get the point with ID id in world coordinates
@@ -194,6 +199,11 @@ public:
   * \brief Set the given point in world coordinate system with given PointSpecificationType
   */
   void InsertPoint( PointIdentifier id, PointType point, PointSpecificationType spec, int t );
+
+  /**
+  * \brief Insert the given point in world coordinate system with incremented max id at time step t.
+  */
+  PointIdentifier InsertPoint( PointType point, int t = 0 );
 
   /**
   * \brief Swap a point at the given position (id) with the upper point (moveUpwards=true) or with the lower point (moveUpwards=false).
@@ -234,14 +244,14 @@ public:
    */
   int SearchPoint( Point3D point, ScalarType distance, int t = 0 ) const;
 
-  virtual bool IsEmptyTimeStep(unsigned int t) const;
+  virtual bool IsEmptyTimeStep(unsigned int t) const override;
 
   //virtual methods, that need to be implemented
-  virtual void UpdateOutputInformation();
-  virtual void SetRequestedRegionToLargestPossibleRegion();
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
-  virtual bool VerifyRequestedRegion();
-  virtual void SetRequestedRegion(const itk::DataObject *data);
+  virtual void UpdateOutputInformation() override;
+  virtual void SetRequestedRegionToLargestPossibleRegion() override;
+  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+  virtual bool VerifyRequestedRegion() override;
+  virtual void SetRequestedRegion(const itk::DataObject *data) override;
 
   //Method for subclasses
   virtual void OnPointSetChange(){};
@@ -254,11 +264,11 @@ protected:
   PointSet(const PointSet &other);
   virtual ~PointSet();
 
-  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const; ///< print content of the object to os
+  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override; ///< print content of the object to os
 
-  virtual void ClearData();
+  virtual void ClearData() override;
 
-  virtual void InitializeEmpty();
+  virtual void InitializeEmpty() override;
 
   /** \brief swaps point coordinates and point data of the points with identifiers id1 and id2 */
   bool SwapPointContents(PointIdentifier id1, PointIdentifier id2,  int t = 0 );
@@ -266,6 +276,8 @@ protected:
   typedef std::vector< DataType::Pointer > PointSetSeries;
 
   PointSetSeries m_PointSetSeries;
+
+  DataType::PointsContainer::Pointer m_EmptyPointsContainer;
 
   /**
   * @brief flag to indicate the right time to call SetBounds

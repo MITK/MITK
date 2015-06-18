@@ -69,7 +69,7 @@ namespace mitk {
     /*
     * \brief Transfer the information from the input to the associated BaseData
     */
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
 
   protected:

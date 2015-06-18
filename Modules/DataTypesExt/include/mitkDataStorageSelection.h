@@ -41,7 +41,7 @@ namespace mitk
     DataNodeEvent NodeRemoved;
     Message2<const mitk::DataNode*, const mitk::BaseProperty*> PropertyChanged;
 
-    mitkClassMacro(DataStorageSelection, itk::Object);
+    mitkClassMacroItkParent(DataStorageSelection, itk::Object);
 
     mitkNewMacro2Param(DataStorageSelection, DataStorage*, bool);
     mitkNewMacro3Param(DataStorageSelection, DataStorage*, NodePredicateBase*, bool);

@@ -88,7 +88,7 @@ protected:
   ~CovarianceMatrixCalculator();
 
 public:
-  mitkClassMacro(CovarianceMatrixCalculator, itk::Object)
+  mitkClassMacroItkParent(CovarianceMatrixCalculator, itk::Object)
   itkFactorylessNewMacro (Self)
   itkCloneMacro(Self)
 

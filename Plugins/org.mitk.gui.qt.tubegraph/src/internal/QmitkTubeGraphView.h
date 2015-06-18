@@ -55,7 +55,7 @@ public:
   */
   virtual ~QmitkTubeGraphView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
   virtual void CreateConnections();
@@ -92,10 +92,10 @@ public:
 protected:
 
   mitk::TubeGraphDataInteractor::ActivationMode GetActivationMode();
-  virtual void SetFocus();
-  virtual void NodeRemoved(const mitk::DataNode* node);
+  virtual void SetFocus() override;
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,const QList<mitk::DataNode::Pointer>& nodes );
+  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,const QList<mitk::DataNode::Pointer>& nodes ) override;
 
   Ui::QmitkTubeGraphViewControls m_Controls;
   // the Qt parent of our GUI (NOT of this object)

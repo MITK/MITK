@@ -38,7 +38,7 @@ class REGISTRATION_EXPORT QmitkRigidRegistrationSelectorView : public QWidget
 
 public:
 
-  QmitkRigidRegistrationSelectorView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkRigidRegistrationSelectorView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
   ~QmitkRigidRegistrationSelectorView();
 
   signals:

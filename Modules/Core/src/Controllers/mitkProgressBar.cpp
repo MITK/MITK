@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  ProgressBar* ProgressBar::m_Instance = NULL;
+  ProgressBar* ProgressBar::m_Instance = nullptr;
 
   /**
    * Sets the current amount of progress to current progress + steps.
@@ -40,7 +40,7 @@ namespace mitk
       for ( iter = m_Implementations.begin(); iter != m_Implementations.end(); iter++ )
       {
         // update progress for all ProgressBarImplementations
-        if ( (*iter) != NULL )
+        if ( (*iter) != nullptr )
         {
           (*iter)->Progress(steps);
         }
@@ -59,7 +59,7 @@ namespace mitk
       for ( iter = m_Implementations.begin(); iter != m_Implementations.end(); iter++ )
       {
         // set steps to do for all ProgressBarImplementations
-        if ( (*iter) != NULL )
+        if ( (*iter) != nullptr )
         {
           (*iter)->Reset();
         }
@@ -78,7 +78,7 @@ namespace mitk
       for ( iter = m_Implementations.begin(); iter != m_Implementations.end(); iter++ )
       {
         // set steps to do for all ProgressBarImplementations
-        if ( (*iter) != NULL )
+        if ( (*iter) != nullptr )
         {
           (*iter)->AddStepsToDo(steps);
         }
@@ -97,7 +97,7 @@ namespace mitk
       for ( iter = m_Implementations.begin(); iter != m_Implementations.end(); iter++ )
       {
         // set percentage visible for all ProgressBarImplementations
-        if ( (*iter) != NULL )
+        if ( (*iter) != nullptr )
         {
           (*iter)->SetPercentageVisible(visible);
         }
@@ -110,7 +110,7 @@ namespace mitk
    */
   ProgressBar* ProgressBar::GetInstance()
   {
-    if (m_Instance == NULL)
+    if (m_Instance == nullptr)
     {
       m_Instance = new ProgressBar();
     }
@@ -131,7 +131,7 @@ namespace mitk
 
   void ProgressBar::UnregisterImplementationInstance(ProgressBarImplementation* implementation)
   {
-    ProgressBarImplementationsListIterator iter = std::find( m_Implementations.begin(), m_Implementations.end(), implementation );
+    auto iter = std::find( m_Implementations.begin(), m_Implementations.end(), implementation );
     if ( iter != m_Implementations.end() )
     {
       m_Implementations.erase( iter );

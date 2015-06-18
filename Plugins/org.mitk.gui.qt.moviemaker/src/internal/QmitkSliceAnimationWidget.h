@@ -34,7 +34,7 @@ public:
   explicit QmitkSliceAnimationWidget(QWidget* parent = NULL);
   ~QmitkSliceAnimationWidget();
 
-  void SetAnimationItem(QmitkAnimationItem* sliceAnimationItem);
+  void SetAnimationItem(QmitkAnimationItem* sliceAnimationItem) override;
 
 private slots:
   void OnRenderWindowChanged(int renderWindow);

@@ -88,7 +88,7 @@ int mitkImageGeneratorTest(int /*argc*/, char* /*argv*/[])
     MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMax() <= 1000, "Testing if max value holds");
     MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMin() >= 0, "Testing if min value holds");
 
-    const unsigned int* image3DcBuffer = NULL;
+    const unsigned int* image3DcBuffer = nullptr;
     try
     {
       mitk::ImageReadAccessor readAccess( image3Dc );

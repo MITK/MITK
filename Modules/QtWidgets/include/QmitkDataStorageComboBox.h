@@ -52,12 +52,12 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Ctor for an empty combobox. Use setDataStorage and setPredicate afterwards.
     ///
-    QmitkDataStorageComboBox(QWidget* parent = 0, bool _AutoSelectNewNodes=false);
+    QmitkDataStorageComboBox(QWidget* parent = nullptr, bool _AutoSelectNewNodes=false);
 
     ///
     /// \brief Ctor for constructing QmitkDataStorageComboBox with given DataStorageComboBox and given _Predicate.
     ///
-    QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate, QWidget* parent = 0, bool _AutoSelectNewNodes=false);
+    QmitkDataStorageComboBox( mitk::DataStorage* _DataStorage, const mitk::NodePredicateBase* _Predicate, QWidget* parent = nullptr, bool _AutoSelectNewNodes=false);
 
     ///
     /// \brief Standard Dtor. Nothing to do here.

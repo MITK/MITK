@@ -27,11 +27,11 @@ public:
   DicomSeriesReaderService();
 
   using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read();
+  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
 private:
 
-  virtual DicomSeriesReaderService* Clone() const;
+  virtual DicomSeriesReaderService* Clone() const override;
 };
 
 }

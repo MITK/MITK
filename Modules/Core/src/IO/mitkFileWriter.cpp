@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 bool mitk::FileWriter::CanWriteDataType( DataNode* node )
 {
   //TODO #345 check for writing permission
-  if (node == NULL || node->GetData() == NULL) return false;
+  if (node == nullptr || node->GetData() == nullptr) return false;
   return node->GetData()->GetNameOfClass() == this->GetSupportedBaseData();
 }
 

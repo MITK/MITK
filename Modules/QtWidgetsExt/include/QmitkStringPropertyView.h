@@ -33,8 +33,8 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStringPropertyView : public QLabel, public mi
 
   protected:
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
+    virtual void PropertyChanged() override;
+    virtual void PropertyRemoved() override;
 
     const mitk::StringProperty* m_StringProperty;
 };

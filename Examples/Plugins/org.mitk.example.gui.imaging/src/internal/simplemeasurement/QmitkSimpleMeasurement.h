@@ -44,20 +44,20 @@ public:
 
 private:
 
-  virtual void CreateQtPartControl(QWidget* parent);
+  virtual void CreateQtPartControl(QWidget* parent) override;
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  virtual void NodeRemoved(const mitk::DataNode* node);
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
 
-  virtual void Activated();
-  virtual void Deactivated();
-  virtual void Visible();
-  virtual void Hidden();
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
-  virtual void ActivatedZombieView(berry::SmartPointer<berry::IWorkbenchPartReference> zombieView);
+  virtual void ActivatedZombieView(berry::SmartPointer<berry::IWorkbenchPartReference> zombieView) override;
 
 private slots:
 

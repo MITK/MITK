@@ -67,7 +67,7 @@ class MITKSEGMENTATION_EXPORT SegmentationInterpolationController : public itk::
 {
   public:
 
-    mitkClassMacro(SegmentationInterpolationController, itk::Object);
+    mitkClassMacroItkParent(SegmentationInterpolationController, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

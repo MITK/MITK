@@ -44,9 +44,9 @@ public:
 
 protected:
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  void SetFocus();
+  void SetFocus() override;
 
 private:
 
@@ -54,7 +54,7 @@ private:
   /** @brief Reimplementation of method from QmitkAbstractView that returns the data node
   *   selection model for the selection listener.
   */
-  QItemSelectionModel* GetDataNodeSelectionModel() const;
+  QItemSelectionModel* GetDataNodeSelectionModel() const override;
   //! [MITK Selection Provider method]
 
   Ui::SelectionViewMitkControls m_Controls;

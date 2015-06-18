@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 
 mitk::OverwriteDirectedPlaneImageFilter::OverwriteDirectedPlaneImageFilter()
-:m_PlaneGeometry(0),
-m_ImageGeometry3D(0),
+:m_PlaneGeometry(nullptr),
+m_ImageGeometry3D(nullptr),
 m_TimeStep(0),
 m_Dimension0(0),
 m_Dimension1(1),

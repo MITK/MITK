@@ -27,12 +27,12 @@ int mitkEventMapperTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(argc >= 3, "Test if a file to load has been specified");
 
   //construct IDs to be checked
-  mitk::Event* mouseButtonPressEvent = new mitk::Event(NULL, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_NoButton, mitk::Key_none);
+  auto  mouseButtonPressEvent = new mitk::Event(nullptr, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_NoButton, mitk::Key_none);
   const int mouseButtonPressID = 1;
   //there is no combination Type_MouseButtonPress and Keys, so use this to be sure to have unique events
-  mitk::Event* uniqueEventFile1 = new mitk::Event(NULL, mitk::Type_MouseButtonPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_R);
+  auto  uniqueEventFile1 = new mitk::Event(nullptr, mitk::Type_MouseButtonPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_R);
   const int uniqueEventIDFile1 = 13000;
-  mitk::Event* uniqueEventFile2 = new mitk::Event(NULL, mitk::Type_MouseButtonPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_N);
+  auto  uniqueEventFile2 = new mitk::Event(nullptr, mitk::Type_MouseButtonPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_N);
   const int uniqueEventIDFile2 = 13001;
 
 

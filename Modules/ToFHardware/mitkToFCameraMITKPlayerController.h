@@ -36,7 +36,7 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro( ToFCameraMITKPlayerController , itk::Object );
+    mitkClassMacroItkParent( ToFCameraMITKPlayerController , itk::Object );
 
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)

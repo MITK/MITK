@@ -45,7 +45,7 @@ public:
   QmitkCorrespondingPointSetsModel( int t = 0, QObject* parent = 0 );
   ~QmitkCorrespondingPointSetsModel();
 
-  Qt::ItemFlags flags(const QModelIndex& index) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const override;
 
   void UpdateSelection(mitk::DataNode* selectedNode);
 
@@ -55,17 +55,17 @@ public:
   int SearchSelectedPoint();
 
   /// interface of QAbstractTableModel
-  int rowCount( const QModelIndex& parent = QModelIndex() ) const;
+  int rowCount( const QModelIndex& parent = QModelIndex() ) const override;
 
   /// interface of QAbstractTableModel
-  int columnCount( const QModelIndex& parent = QModelIndex() ) const;
+  int columnCount( const QModelIndex& parent = QModelIndex() ) const override;
 
   /// interface of QAbstractTableModel
-  QVariant data(const QModelIndex& index, int role) const;
+  QVariant data(const QModelIndex& index, int role) const override;
 
   /// interface of QAbstractTableModel
   QVariant headerData(int section, Qt::Orientation orientation,
-    int role = Qt::DisplayRole) const;
+    int role = Qt::DisplayRole) const override;
 
   /// which point set to work on
   void SetPointSetNodes( std::vector<mitk::DataNode*> nodes );
@@ -135,9 +135,9 @@ public:
 
   mitk::Stepper::Pointer GetStepper();
 
-  Qt::DropActions supportedDropActions() const;
+  Qt::DropActions supportedDropActions() const override;
 
-  bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+  bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
 
   bool GetModelIndexForSelectedPoint(QModelIndex& index) const;
 

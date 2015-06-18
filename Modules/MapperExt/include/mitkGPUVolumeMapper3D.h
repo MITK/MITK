@@ -66,20 +66,20 @@ public:
 
   virtual const mitk::Image* GetInput();
 
-  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
+  virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+  virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer) override;
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
   /** Returns true if this Mapper currently allows for Level-of-Detail rendering.
    * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
    * ProgressEvent on BaseRenderer. */
-  virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
+  virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const override;
   bool IsMIPEnabled( BaseRenderer *renderer = NULL );
   bool IsGPUEnabled( BaseRenderer *renderer = NULL );
   bool IsRAYEnabled( BaseRenderer *renderer = NULL );
 
-  virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
+  virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer) override;
 
 protected:
 
@@ -110,7 +110,7 @@ protected:
 
   void InitVtkMapper(mitk::BaseRenderer* renderer);
 
-  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
+  virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
   void CreateDefaultTransferFunctions();
   void UpdateTransferFunctions( mitk::BaseRenderer *renderer );

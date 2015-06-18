@@ -90,11 +90,30 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWidg
      */
     void SourceSelected(mitk::IGTLMessageSource::Pointer source);
 
-  protected:
     /**
-     * \brief Adapts the GUI to the state of the device
-     */
+    * \brief Adapts the GUI to the state of the device
+    */
     void AdaptGUIToState();
+
+    /**
+    * \brief selects the current source and adapts the GUI according to the selection
+    */
+    void SelectSourceAndAdaptGUI();
+
+ signals:
+    /**
+    * \brief used for thread seperation, the worker thread must not call AdaptGUIToState directly.
+    * QT signals are thread safe and seperate the threads
+    */
+    void AdaptGUIToStateSignal();
+    /**
+    * \brief used for thread seperation, the worker thread must not call SelectSourceAndAdaptGUI
+    * directly.
+    * QT signals are thread safe and seperate the threads
+    */
+    void SelectSourceAndAdaptGUISignal();
+
+  protected:
 
     /**
      * \brief Calls AdaptGUIToState()
@@ -131,5 +150,6 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWidg
 
     //############## private help methods #######################
     void DisableSourceControls();
+    void RemoveObserver();
 };
 #endif

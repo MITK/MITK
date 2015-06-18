@@ -21,6 +21,7 @@ set(CPP_FILES
   # DataStructures -> DWI
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageHeaderInformation.cpp
   IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCorrectionFilter.cpp
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageCreationFilter.cpp
 
   # Properties
   IODataStructures/Properties/mitkBValueMapProperty.cpp
@@ -99,6 +100,8 @@ set(H_FILES
   IODataStructures/Properties/mitkGradientDirectionsProperty.h
   IODataStructures/Properties/mitkMeasurementFrameProperty.h
   IODataStructures/Properties/mitkDiffusionPropertyHelper.h
+
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageTransformedCreationFilter.h
 
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h

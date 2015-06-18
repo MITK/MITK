@@ -79,9 +79,9 @@ namespace mitk {
 
       virtual int GetNumberOfFoundClusters();
 
-      virtual void GenerateOutputInformation();
+      virtual void GenerateOutputInformation() override;
 
-      virtual void GenerateData();
+      virtual void GenerateData() override;
 
     protected:
 

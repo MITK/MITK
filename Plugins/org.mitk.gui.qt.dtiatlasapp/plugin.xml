@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?BlueBerry version="0.1"?>
 <plugin>
-  <extension point="org.blueberry.osgi.applications">
-    <application id="org.mitk.qt.dtiatlasapp">
+  <extension id="org.mitk.qt.dtiatlasapp" point="org.blueberry.osgi.applications">
+    <application>
       <run class="QmitkDTIAtlasAppApplication"/>
     </application>
   </extension>
-  
+
   <extension point="org.blueberry.ui.intro">
     <intro id="org.mitk.qt.dtiatlasappintro"
       class="QmitkDTIAtlasAppIntroPart"
@@ -15,11 +15,11 @@
       productId=""
       introId="org.mitk.qt.dtiatlasappintro"/>
   </extension>
-  
+
   <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.dtiatlasapp.perspectives.dtiatlasapp" name="Springer DTI Atlas" class="QmitkDTIAtlasAppPerspective" icon="resources/diffusionimaging.png"/>
     <perspective id="org.mitk.dtiatlasapp.perspectives.welcome" name="Welcome" class="QmitkWelcomePerspective" icon="resources/icon_home.png"/>
   </extension>
-  
+
 </plugin>
 

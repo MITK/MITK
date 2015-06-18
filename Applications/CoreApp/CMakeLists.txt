@@ -22,13 +22,16 @@ set(_plugins
 
 set(_exclude_plugins )
 
-FunctionCreateBlueBerryApplication(
+mitkFunctionCreateBlueBerryApplication(
   NAME MitkCoreApp
   DESCRIPTION "MITK - CoreApp Application"
   PLUGINS ${_plugins}
   ${_app_options}
 )
-mitk_use_modules(TARGET MitkCoreApp PACKAGES Qt4|QtGui Qt5|Widgets)
+
+mitk_use_modules(TARGET MitkCoreApp
+  MODULES MitkAppUtil
+)
 
 # subproject support
 add_dependencies(MITK-CoreUI MitkCoreApp)

@@ -39,8 +39,8 @@ public:
   /// this list.
   /// \see setPredicate()
   ///
-  QmitkPlanarFiguresTableModel(mitk::DataStorage::Pointer _DataStorage, mitk::NodePredicateBase* _Predicate = 0
-    , QObject* parent = 0 );
+  QmitkPlanarFiguresTableModel(mitk::DataStorage::Pointer _DataStorage, mitk::NodePredicateBase* _Predicate = nullptr
+    , QObject* parent = nullptr );
 
   ///
   /// Standard dtor. Delete predicate, disconnect from DataStorage.
@@ -54,20 +54,20 @@ public:
   /// for given orientation and role.
   ///
   QVariant headerData(int section, Qt::Orientation orientation,
-    int role) const;
+    int role) const override;
   ///
   /// Overridden from QAbstractTableModel. Returns what can be done
   /// with an item.
   ///
-  Qt::ItemFlags flags(const QModelIndex &index) const;
+  Qt::ItemFlags flags(const QModelIndex &index) const override;
   ///
   /// Overridden from QAbstractTableModel. Returns the number of features (columns) to display.
   ///
-  int columnCount(const QModelIndex &parent) const;
+  int columnCount(const QModelIndex &parent) const override;
   ///
   /// Overridden from QAbstractTableModel. Returns the data at index for given role.
   ///
-  QVariant data(const QModelIndex &index, int role) const;
+  QVariant data(const QModelIndex &index, int role) const override;
 
 };
 

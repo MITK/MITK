@@ -22,9 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPositionTracker.h>
 #include <mitkSlicesRotator.h>
 #include <mitkSlicesSwiveller.h>
-#include <mitkRenderWindowFrame.h>
 #include <mitkLogoOverlay.h>
-#include <mitkGradientBackground.h>
 #include <mitkCoordinateSupplier.h>
 #include <mitkDataStorage.h>
 
@@ -37,9 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
 
-#include <vtkTextProperty.h>
-#include <vtkCornerAnnotation.h>
-
 #include <mitkBaseRenderer.h>
 
 class QHBoxLayout;
@@ -48,6 +43,8 @@ class QGridLayout;
 class QSpacerItem;
 class QmitkLevelWindowWidget;
 class QmitkRenderWindow;
+class vtkCornerAnnotation;
+class vtkMitkRectangleProp;
 
 namespace mitk {
 class RenderingManager;
@@ -200,13 +197,13 @@ public slots:
 
   bool InitializeStandardViews( const mitk::Geometry3D * geometry );
 
-  void wheelEvent( QWheelEvent * e );
+  void wheelEvent( QWheelEvent * e ) override;
 
-  void mousePressEvent(QMouseEvent * e);
+  void mousePressEvent(QMouseEvent * e) override;
 
-  void moveEvent( QMoveEvent* e );
+  void moveEvent( QMoveEvent* e ) override;
 
-  void leaveEvent ( QEvent * e  );
+  void leaveEvent ( QEvent * e  ) override;
 
   void EnsureDisplayContainsPoint(
       mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p);
@@ -302,7 +299,7 @@ public:
    * @param color The color.
    * @param widgetNumber The widget (0-3).
    */
-  void SetCornerAnnotation(std::string text, mitk::Color color, int widgetNumber);
+  void SetDecorationProperties(std::string text, mitk::Color color, int widgetNumber);
   /**
    * @brief GetRenderWindow convinience method to get a widget.
    * @param number of the widget (0-3)
@@ -360,14 +357,8 @@ protected:
 
   mitk::RenderingManager* m_RenderingManager;
 
-  /**
-   * @brief m_RectangleRendering1 the 4 frames of the renderwindow.
-   */
-  mitk::RenderWindowFrame::Pointer m_RectangleRendering[4];
-
   mitk::LogoOverlay::Pointer m_LogoRendering;
 
-  mitk::GradientBackground::Pointer m_GradientBackground[4];
   bool m_GradientBackgroundFlag;
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
@@ -416,15 +407,8 @@ protected:
   QWidget *mitkWidget3Container;
   QWidget *mitkWidget4Container;
 
-  /**
-   * @brief The CornerAnnotation struct to hold the 4 corner annotations.
-   */
-  struct CornerAnnotation
-  {
-    vtkSmartPointer<vtkCornerAnnotation> cornerText;
-    vtkSmartPointer<vtkTextProperty> textProp;
-    vtkSmartPointer<vtkRenderer> ren;
-  } m_CornerAnnotations[4];
+  vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotations[4];
+  vtkSmartPointer<vtkMitkRectangleProp> m_RectangleProps[4];
 
   bool m_PendingCrosshairPositionEvent;
   bool m_CrosshairNavigationEnabled;
@@ -432,9 +416,9 @@ protected:
    * @brief CreateCornerAnnotation helper method to create a corner annotation.
    * @param text of the annotation.
    * @param color of the annotation.
-   * @return the complete struct.
+   * @return the complete CornerAnnotation.
    */
-  CornerAnnotation CreateCornerAnnotation(std::string text, mitk::Color color);
+  vtkSmartPointer<vtkCornerAnnotation> CreateCornerAnnotation(std::string text, mitk::Color color);
 
   /**
    * @brief FillGradientBackgroundWithBlack Internal helper method to initialize the

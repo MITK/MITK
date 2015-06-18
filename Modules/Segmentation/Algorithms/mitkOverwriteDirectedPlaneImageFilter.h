@@ -90,7 +90,7 @@ class MITKSEGMENTATION_EXPORT OverwriteDirectedPlaneImageFilter : public ImageTo
     OverwriteDirectedPlaneImageFilter(); // purposely hidden
     virtual ~OverwriteDirectedPlaneImageFilter();
 
-    virtual void GenerateData();
+    virtual void GenerateData() override;
 
     template<typename TPixel, unsigned int VImageDimension>
     void ItkSliceOverwriting ( itk::Image<TPixel, VImageDimension>* input3D);

@@ -45,7 +45,7 @@ namespace mitk {
   public:
     static const char* IMAGE_PROPERTY_IDENTIFIER;
 
-    mitkClassMacro(USImageSource, itk::Object);
+    mitkClassMacroItkParent(USImageSource, itk::Object);
 
     itkGetMacro(ImageFilter, mitk::BasicCombinationOpenCVImageFilter::Pointer);
 

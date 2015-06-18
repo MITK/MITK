@@ -49,9 +49,9 @@ public:
   QmitkViewInitializationView();
   virtual ~QmitkViewInitializationView();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus();
+  virtual void SetFocus() override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
@@ -64,10 +64,10 @@ private:
 
   void UpdateRendererList();
 
-  virtual void Activated();
-  virtual void Deactivated();
-  virtual void Visible();
-  virtual void Hidden();
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
 private slots:
 

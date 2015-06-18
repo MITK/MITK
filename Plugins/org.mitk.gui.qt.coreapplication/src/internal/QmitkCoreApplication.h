@@ -31,8 +31,8 @@ public:
 
   QmitkCoreApplication();
 
-  int Start();
-  void Stop();
+  QVariant Start(berry::IApplicationContext* context) override;
+  void Stop() override;
 };
 
 #endif /*QMITKCOREAPPLICATION_H_*/

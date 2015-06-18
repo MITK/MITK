@@ -44,10 +44,10 @@ namespace mitk {
       itkCloneMacro(Self)
 
       /** This method is called by Update(). */
-      virtual void GenerateData();
+      virtual void GenerateData() override;
 
       /** Initializes the output information */
-      virtual void GenerateOutputInformation();
+      virtual void GenerateOutputInformation() override;
 
       /** Returns a const reference to the input image */
       const mitk::Image* GetInput(void);

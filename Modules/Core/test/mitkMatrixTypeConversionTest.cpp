@@ -66,7 +66,7 @@ private:
 
 public:
 
-  void setUp(void)
+  void setUp(void) override
   {
     for (unsigned i = 0; i < 3; i++)
       for (unsigned j = 0; j < 3; j++)
@@ -76,7 +76,7 @@ public:
       }
   }
 
-  void tearDown(void)
+  void tearDown(void) override
   {
 
   }

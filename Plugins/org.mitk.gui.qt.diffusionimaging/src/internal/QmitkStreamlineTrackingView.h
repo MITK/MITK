@@ -49,10 +49,10 @@ public:
     QmitkStreamlineTrackingView();
     virtual ~QmitkStreamlineTrackingView();
 
-    virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
+    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+    virtual void StdMultiWidgetNotAvailable() override;
 
 protected slots:
 
@@ -61,7 +61,7 @@ protected slots:
 protected:
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
+    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
     Ui::QmitkStreamlineTrackingViewControls* m_Controls;
     QmitkStdMultiWidget* m_MultiWidget;
 
@@ -70,7 +70,7 @@ protected slots:
     /** update labels if parameters have changed */
     void OnSeedsPerVoxelChanged(int value);
     void OnMinTractLengthChanged(int value);
-    void OnFaThresholdChanged(int value);
+    void OnFaThresholdChanged(double value);
     void OnAngularThresholdChanged(int value);
     void OnfChanged(int value);
     void OngChanged(int value);

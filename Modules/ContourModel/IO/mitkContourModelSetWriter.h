@@ -38,12 +38,12 @@ namespace mitk
     virtual ~ContourModelSetWriter();
 
     using AbstractFileWriter::Write;
-    virtual void Write();
+    virtual void Write() override;
 
   protected:
     ContourModelSetWriter(const ContourModelSetWriter& other);
 
-    virtual mitk::ContourModelSetWriter* Clone() const;
+    virtual mitk::ContourModelSetWriter* Clone() const override;
   };
 
 }

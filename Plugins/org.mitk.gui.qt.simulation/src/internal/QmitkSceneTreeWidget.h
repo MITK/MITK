@@ -49,7 +49,7 @@ public:
   typedef sofa::core::objectmodel::BaseObject BaseObject;
   typedef sofa::simulation::Node Node;
 
-  explicit QmitkSceneTreeWidget(QWidget* parent = NULL);
+  explicit QmitkSceneTreeWidget(QWidget* parent = nullptr);
   ~QmitkSceneTreeWidget();
 
   Base* GetBaseFromItem(QTreeWidgetItem* item) const;
@@ -59,15 +59,15 @@ public:
   /////////////////////////////////////////////////////////////////////////////
 
   // MutationListener Interface ///////////////////////////////////////////////
-  void addChild(Node* parent, Node* child);
-  void removeChild(Node* parent, Node* child);
-  void moveChild(Node* previous, Node* parent, Node* child);
-  void addObject(Node* parent, BaseObject* object);
-  void removeObject(Node* parent, BaseObject* object);
-  void moveObject(Node* previous, Node* parent, BaseObject* object);
-  void addSlave(BaseObject* master, BaseObject* slave);
-  void removeSlave(BaseObject* master, BaseObject* slave);
-  void moveSlave(BaseObject* previousMaster, BaseObject* master, BaseObject* slave);
+  void addChild(Node* parent, Node* child) override;
+  void removeChild(Node* parent, Node* child) override;
+  void moveChild(Node* previous, Node* parent, Node* child) override;
+  void addObject(Node* parent, BaseObject* object) override;
+  void removeObject(Node* parent, BaseObject* object) override;
+  void moveObject(Node* previous, Node* parent, BaseObject* object) override;
+  void addSlave(BaseObject* master, BaseObject* slave) override;
+  void removeSlave(BaseObject* master, BaseObject* slave) override;
+  void moveSlave(BaseObject* previousMaster, BaseObject* master, BaseObject* slave) override;
   /////////////////////////////////////////////////////////////////////////////
 
 private:

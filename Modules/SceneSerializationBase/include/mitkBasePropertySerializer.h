@@ -43,7 +43,7 @@ class MITKSCENESERIALIZATIONBASE_EXPORT BasePropertySerializer : public itk::Obj
 {
   public:
 
-    mitkClassMacro( BasePropertySerializer, itk::Object );
+    mitkClassMacroItkParent( BasePropertySerializer, itk::Object );
 
     itkSetConstObjectMacro(Property, BaseProperty);
 

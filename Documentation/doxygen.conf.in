@@ -293,7 +293,7 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 # Note that for custom extensions you also need to set FILE_PATTERNS otherwise
 # the files are not read by doxygen.
 
-EXTENSION_MAPPING      =
+EXTENSION_MAPPING      = cmake=c++
 
 # If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -810,8 +810,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @MITK_SOURCE_DIR@/BlueBerry/Documentation/reference/api/MainPage.dox \
-                         @MITK_SOURCE_DIR@/Utilities/IpFunc/ \
+EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/IpFunc/ \
                          @MITK_SOURCE_DIR@/Utilities/IpSegmentation/ \
                          @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
                          @MITK_SOURCE_DIR@/Utilities/qtsingleapplication/ \
@@ -879,7 +878,8 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Examples/ \
+EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Documentation/Snippets/ \
+                         @MITK_SOURCE_DIR@/Examples/ \
                          @MITK_SOURCE_DIR@/Examples/Tutorial/ \
                          @MITK_SOURCE_DIR@/Examples/Plugins/ \
                          @MITK_SOURCE_DIR@/Examples/QtFreeRender/ \
@@ -2071,8 +2071,8 @@ PREDEFINED             = itkNotUsed(x)= \
                          VXL_LITTLE_ENDIAN=0 \
                          VNL_DLL_DATA= \
                          size_t=vcl_size_t \
-                         "US_PREPEND_NAMESPACE(x)=mitk::x" \
-                         "US_BEGIN_NAMESPACE= namespace mitk {" \
+                         "US_PREPEND_NAMESPACE(x)=us::x" \
+                         "US_BEGIN_NAMESPACE= namespace us {" \
                          "US_END_NAMESPACE=}" \
                          "US_BASECLASS_NAME=itk::LightObject" \
                          US_EXPORT= \
@@ -2114,7 +2114,7 @@ SKIP_FUNCTION_MACROS   = YES
 # the path). If a tag file is not located in the directory in which doxygen is
 # run, you must also specify the path to the tagfile here.
 
-TAGFILES               = @BLUEBERRY_DOXYGEN_TAGFILE@
+TAGFILES               =
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create a
 # tag file that is based on the input files it reads. See section "Linking to

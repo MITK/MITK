@@ -84,12 +84,12 @@ public:
   }
 
   // Get it from the QVTKWidget parent
-  virtual vtkRenderWindow* GetVtkRenderWindow()
+  virtual vtkRenderWindow* GetVtkRenderWindow() override
   {
     return GetRenderWindow();
   }
 
-  virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor()
+  virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor() override
   {
     return NULL;
   }
@@ -98,37 +98,37 @@ public:
 
 protected:
   // overloaded move handler
-  virtual void moveEvent(QMoveEvent* event);
+  virtual void moveEvent(QMoveEvent* event) override;
   // overloaded show handler
-  void showEvent(QShowEvent* event);
+  void showEvent(QShowEvent* event) override;
   // overloaded resize handler
-  virtual void resizeEvent(QResizeEvent* event);
+  virtual void resizeEvent(QResizeEvent* event) override;
   // overloaded paint handler
-  virtual void paintEvent(QPaintEvent* event);
+  virtual void paintEvent(QPaintEvent* event) override;
   // overloaded mouse press handler
-  virtual void mousePressEvent(QMouseEvent* event);
+  virtual void mousePressEvent(QMouseEvent* event) override;
   // overloaded mouse double-click handler
-  virtual void mouseDoubleClickEvent( QMouseEvent *event );
+  virtual void mouseDoubleClickEvent( QMouseEvent *event ) override;
   // overloaded mouse move handler
-  virtual void mouseMoveEvent(QMouseEvent* event);
+  virtual void mouseMoveEvent(QMouseEvent* event) override;
   // overloaded mouse release handler
-  virtual void mouseReleaseEvent(QMouseEvent* event);
+  virtual void mouseReleaseEvent(QMouseEvent* event) override;
   // overloaded key press handler
-  virtual void keyPressEvent(QKeyEvent* event);
+  virtual void keyPressEvent(QKeyEvent* event) override;
   // overloaded enter handler
-  virtual void enterEvent(QEvent*);
+  virtual void enterEvent(QEvent*) override;
   // overloaded leave handler
-  virtual void leaveEvent(QEvent*);
+  virtual void leaveEvent(QEvent*) override;
 
   /// \brief Simply says we accept the event type.
-  virtual void dragEnterEvent(QDragEnterEvent *event);
+  virtual void dragEnterEvent(QDragEnterEvent *event) override;
 
   /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode pointers and emitting the NodesDropped signal.
-  virtual void dropEvent(QDropEvent * event);
+  virtual void dropEvent(QDropEvent * event) override;
 
 #ifndef QT_NO_WHEELEVENT
   // overload wheel mouse event
-  virtual void wheelEvent(QWheelEvent*);
+  virtual void wheelEvent(QWheelEvent*) override;
 #endif
 
   void AdjustRenderWindowMenuVisibility(const QPoint& pos);

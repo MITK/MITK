@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"
 #include "mitkPropertyList.h"
+#include "MitkIGTExports.h"
 
 // Microservices
 #include <mitkServiceInterface.h>
@@ -41,7 +42,7 @@ namespace mitk {
   class MITKIGT_EXPORT NavigationDataSource : public itk::ProcessObject
   {
   public:
-    mitkClassMacro(NavigationDataSource, itk::ProcessObject);
+    mitkClassMacroItkParent(NavigationDataSource, itk::ProcessObject);
 
     /** @return Returns a human readable name of this source. There will be a default name,
       *         or you can set the name with the method SetName() if you want to change it.
@@ -120,7 +121,7 @@ namespace mitk {
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
 
     /**
      * This is a default implementation to make sure we have something.
@@ -128,7 +129,7 @@ namespace mitk {
      * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
      * virtual.
      */
-    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
+    virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
     /**
     * \brief Set all filter parameters as the PropertyList p

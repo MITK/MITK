@@ -105,7 +105,7 @@ mitk::Image::Pointer mitk::TargetPointsCalculator::CreateBinaryImage(mitk::Surfa
   dim[1] = ROUND(spacingFactor*(abs(maximum[1]-minimum[1])));
   dim[2] = ROUND(spacingFactor*(abs(maximum[2]-minimum[2])));
 
-  float* origin = new float[3];
+  auto  origin = new float[3];
   origin[0] = minimum[0];
   origin[1] = minimum[1];
   origin[2] = minimum[2];

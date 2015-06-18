@@ -37,7 +37,7 @@ mitk::SchedulableProcess* mitk::WeightedRoundRobinSchedulingAlgorithm::GetNextPr
   size_t numProcesses = processQueue.size();
 
   if (numProcesses == 0)
-    return NULL;
+    return nullptr;
 
   boost::chrono::nanoseconds maxElapsedTime = (*std::max_element(processQueue.begin(), processQueue.end(), CompareElapsedTime))->GetElapsedTime();
   mitk::SchedulableProcess* process = processQueue[0];

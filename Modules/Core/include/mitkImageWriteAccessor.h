@@ -45,7 +45,7 @@ public:
    */
   ImageWriteAccessor(
       ImagePointer image,
-      const ImageDataItem* iDI = NULL,
+      const ImageDataItem* iDI = nullptr,
       int OptionFlags = ImageAccessorBase::DefaultBehavior
       );
 
@@ -60,7 +60,7 @@ public:
 
 protected:
 
-  virtual const Image* GetImage() const;
+  virtual const Image* GetImage() const override;
 
 private:
 

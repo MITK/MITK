@@ -22,16 +22,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stack>
 
 mitk::TestDCMLoading::TestDCMLoading()
-:m_PreviousCLocale(NULL)
+:m_PreviousCLocale(nullptr)
 {
 }
 
 void mitk::TestDCMLoading::SetDefaultLocale()
 {
   // remember old locale only once
-  if (m_PreviousCLocale == NULL)
+  if (m_PreviousCLocale == nullptr)
   {
-    m_PreviousCLocale = setlocale(LC_NUMERIC, NULL);
+    m_PreviousCLocale = setlocale(LC_NUMERIC, nullptr);
 
     // set to "C"
     setlocale(LC_NUMERIC, "C");
@@ -53,14 +53,14 @@ void mitk::TestDCMLoading::ResetUserLocale()
     std::cin.imbue(m_PreviousCppLocale);
     std::cout.imbue(m_PreviousCppLocale);
 
-    m_PreviousCLocale = NULL;
+    m_PreviousCLocale = nullptr;
   }
 }
 
 
 mitk::TestDCMLoading::ImageList mitk::TestDCMLoading::LoadFiles( const StringContainer& files, itk::SmartPointer<Image> preLoadedVolume )
 {
-  for (StringContainer::const_iterator iter = files.begin();
+  for (auto iter = files.begin();
        iter != files.end();
        ++iter)
   {
@@ -78,7 +78,7 @@ mitk::TestDCMLoading::ImageList mitk::TestDCMLoading::LoadFiles( const StringCon
   {
     StringContainer files = seriesIter->second.GetFilenames();
 
-    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files, true, true, true, 0, preLoadedVolume ); // true, true, true ist just a copy of the default values
+    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files, true, true, true, nullptr, preLoadedVolume ); // true, true, true ist just a copy of the default values
 
     if (node.IsNotNull())
     {
@@ -137,7 +137,7 @@ mitk::TestDCMLoading::DumpImageInformation( const Image* image )
 {
   std::stringstream result;
 
-  if (image == NULL) return result.str();
+  if (image == nullptr) return result.str();
 
   SetDefaultLocale();
 

@@ -1,7 +1,23 @@
 
 # Plug-ins must be ordered according to their dependencies
 
-set(MITK_EXT_PLUGINS
+set(MITK_PLUGINS
+
+  org.blueberry.core.runtime:ON
+  org.blueberry.core.expressions:OFF
+  org.blueberry.core.commands:OFF
+  org.blueberry.core.jobs:OFF
+  org.blueberry.ui.qt:OFF
+  org.blueberry.ui.qt.help:OFF
+  org.blueberry.ui.qt.log:ON
+  org.blueberry.ui.qt.objectinspector:OFF
+
+  #org.blueberry.test:ON
+  #org.blueberry.uitest:ON
+
+  #Testing/org.blueberry.core.runtime.tests:ON
+  #Testing/org.blueberry.osgi.tests:ON
+
   org.mitk.core.services:ON
   org.mitk.gui.common:ON
   org.mitk.planarfigure:ON
@@ -24,6 +40,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
+  org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
@@ -36,6 +53,7 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.measurementtoolbox:OFF
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
+  org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.remeshing:OFF
@@ -50,4 +68,5 @@ set(MITK_EXT_PLUGINS
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
+  org.mitk.gui.qt.spectrocamrecorder:OFF
 )

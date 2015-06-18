@@ -66,7 +66,7 @@ public:
     itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
     itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
 
-    void GenerateData();
+    void GenerateData() override;
 
 protected:
     ShCoefficientImageImporter();

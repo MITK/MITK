@@ -32,32 +32,32 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
   {
     TransferFunction* transferfunction = prop->GetValue();
     if (!transferfunction)
-      return NULL;
+      return nullptr;
 
-    TiXmlElement* element = new TiXmlElement("TransferFunction");
+    auto  element = new TiXmlElement("TransferFunction");
 
     // serialize scalar opacity function
-    TiXmlElement* scalarOpacityPointlist = new TiXmlElement( "ScalarOpacity" );
+    auto  scalarOpacityPointlist = new TiXmlElement( "ScalarOpacity" );
 
     TransferFunction::ControlPoints scalarOpacityPoints = transferfunction->GetScalarOpacityPoints();
-    for ( TransferFunction::ControlPoints::iterator iter = scalarOpacityPoints.begin();
+    for ( auto iter = scalarOpacityPoints.begin();
       iter != scalarOpacityPoints.end();
       ++iter )
     {
-      TiXmlElement* pointel = new TiXmlElement("point");
+      auto  pointel = new TiXmlElement("point");
       pointel->SetDoubleAttribute("x", iter->first);
       pointel->SetDoubleAttribute("y", iter->second);
       scalarOpacityPointlist->LinkEndChild( pointel );
     }
     element->LinkEndChild( scalarOpacityPointlist );
     // serialize gradient opacity function
-    TiXmlElement* gradientOpacityPointlist = new TiXmlElement( "GradientOpacity" );
+    auto  gradientOpacityPointlist = new TiXmlElement( "GradientOpacity" );
     TransferFunction::ControlPoints gradientOpacityPoints = transferfunction->GetGradientOpacityPoints();
-    for ( TransferFunction::ControlPoints::iterator iter = gradientOpacityPoints.begin();
+    for ( auto iter = gradientOpacityPoints.begin();
       iter != gradientOpacityPoints.end();
       ++iter )
     {
-      TiXmlElement* pointel = new TiXmlElement("point");
+      auto  pointel = new TiXmlElement("point");
       pointel->SetDoubleAttribute("x", iter->first);
       pointel->SetDoubleAttribute("y", iter->second);
       gradientOpacityPointlist->LinkEndChild( pointel );
@@ -66,14 +66,14 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
 
     // serialize color function
     vtkColorTransferFunction* ctf = transferfunction->GetColorTransferFunction();
-    if (ctf == NULL)
-      return NULL;
-    TiXmlElement* pointlist = new TiXmlElement("Color");
+    if (ctf == nullptr)
+      return nullptr;
+    auto  pointlist = new TiXmlElement("Color");
     for (int i = 0; i < ctf->GetSize(); i++ )
     {
       double myVal[6];
       ctf->GetNodeValue(i, myVal);
-      TiXmlElement* pointel = new TiXmlElement("point");
+      auto  pointel = new TiXmlElement("point");
       pointel->SetDoubleAttribute("x", myVal[0]);
       pointel->SetDoubleAttribute("r", myVal[1]);
       pointel->SetDoubleAttribute("g", myVal[2]);
@@ -85,7 +85,7 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
     element->LinkEndChild( pointlist );
     return element;
   }
-  else return NULL;
+  else return nullptr;
 }
 
 bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const char * filename, TransferFunction::Pointer tf )
@@ -101,10 +101,10 @@ bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const 
   }
 
   TiXmlDocument document;
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "UTF-8", "" ); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
+  auto  decl = new TiXmlDeclaration( "1.0", "UTF-8", "" ); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
   document.LinkEndChild( decl );
 
-  TiXmlElement* version = new TiXmlElement("Version");
+  auto  version = new TiXmlElement("Version");
   version->SetAttribute("TransferfunctionVersion",  1 );
 
   document.LinkEndChild(version);
@@ -121,70 +121,70 @@ bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const 
 BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXmlElement* element)
 {
   if (!element)
-    return NULL;
+    return nullptr;
 
   TransferFunction::Pointer tf = TransferFunction::New();
 
   // deserialize scalar opacity function
   TiXmlElement* scalarOpacityPointlist = element->FirstChildElement("ScalarOpacity");
-  if (scalarOpacityPointlist == NULL)
-    return NULL;
+  if (scalarOpacityPointlist == nullptr)
+    return nullptr;
 
   tf->ClearScalarOpacityPoints();
 
-  for( TiXmlElement* pointElement = scalarOpacityPointlist->FirstChildElement("point"); pointElement != NULL; pointElement = pointElement->NextSiblingElement("point"))
+  for( TiXmlElement* pointElement = scalarOpacityPointlist->FirstChildElement("point"); pointElement != nullptr; pointElement = pointElement->NextSiblingElement("point"))
   {
     double x;
     double y;
     if (pointElement->QueryDoubleAttribute("x", &x) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     if (pointElement->QueryDoubleAttribute("y", &y) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     tf->AddScalarOpacityPoint(x, y);
   }
 
   TiXmlElement* gradientOpacityPointlist = element->FirstChildElement("GradientOpacity");
-  if (gradientOpacityPointlist == NULL)
-    return NULL;
+  if (gradientOpacityPointlist == nullptr)
+    return nullptr;
 
   tf->ClearGradientOpacityPoints();
 
-  for( TiXmlElement* pointElement = gradientOpacityPointlist->FirstChildElement("point"); pointElement != NULL; pointElement = pointElement->NextSiblingElement("point"))
+  for( TiXmlElement* pointElement = gradientOpacityPointlist->FirstChildElement("point"); pointElement != nullptr; pointElement = pointElement->NextSiblingElement("point"))
   {
     double x;
     double y;
     if (pointElement->QueryDoubleAttribute("x", &x) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     if (pointElement->QueryDoubleAttribute("y", &y) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     tf->AddGradientOpacityPoint(x, y);
   }
 
   TiXmlElement* rgbPointlist = element->FirstChildElement("Color");
-  if (rgbPointlist == NULL)
-    return NULL;
+  if (rgbPointlist == nullptr)
+    return nullptr;
   vtkColorTransferFunction* ctf = tf->GetColorTransferFunction();
-  if (ctf == NULL)
-    return NULL;
+  if (ctf == nullptr)
+    return nullptr;
 
   ctf->RemoveAllPoints();
 
-  for( TiXmlElement* pointElement = rgbPointlist->FirstChildElement("point"); pointElement != NULL; pointElement = pointElement->NextSiblingElement("point"))
+  for( TiXmlElement* pointElement = rgbPointlist->FirstChildElement("point"); pointElement != nullptr; pointElement = pointElement->NextSiblingElement("point"))
   {
     double x;
     double r,g,b, midpoint, sharpness;
     if (pointElement->QueryDoubleAttribute("x", &x) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     if (pointElement->QueryDoubleAttribute("r", &r) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     if (pointElement->QueryDoubleAttribute("g", &g) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     if (pointElement->QueryDoubleAttribute("b", &b) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     if (pointElement->QueryDoubleAttribute("midpoint", &midpoint) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     if (pointElement->QueryDoubleAttribute("sharpness", &sharpness) == TIXML_WRONG_TYPE)
-      return NULL; // TODO: can we do a better error handling?
+      return nullptr; // TODO: can we do a better error handling?
     ctf->AddRGBPoint(x, r, g, b, midpoint, sharpness);
   }
   return TransferFunctionProperty::New(tf).GetPointer();
@@ -197,7 +197,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPropertySerializer::Deseri
   if (!document.LoadFile())
   {
     MITK_ERROR << "Could not open/read/parse " << filePath << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
-    return NULL;
+    return nullptr;
   }
 
   // find version node --> note version in some variable
@@ -223,7 +223,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPropertySerializer::Deseri
     return tf;
   }
   MITK_WARN << "Can't deserialize transfer function";
-  return NULL;
+  return nullptr;
 }
 
 } // namespace

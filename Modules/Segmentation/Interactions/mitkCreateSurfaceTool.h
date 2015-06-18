@@ -40,15 +40,15 @@ class MITKSEGMENTATION_EXPORT CreateSurfaceTool : public SegmentationsProcessing
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const;
-    virtual const char* GetName() const;
+    virtual const char** GetXPM() const override;
+    virtual const char* GetName() const override;
 
     void OnSurfaceCalculationDone();
 
   protected:
 
-    virtual bool ProcessOneWorkingData( DataNode* node );
-    virtual std::string GetErrorMessage();
+    virtual bool ProcessOneWorkingData( DataNode* node ) override;
+    virtual std::string GetErrorMessage() override;
 
     CreateSurfaceTool(); // purposely hidden
     virtual ~CreateSurfaceTool();

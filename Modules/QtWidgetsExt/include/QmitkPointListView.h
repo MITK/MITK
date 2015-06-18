@@ -129,8 +129,8 @@ protected slots:
 
 protected:
 
-  void keyPressEvent( QKeyEvent * e ); ///< react to F2, F3 and DEL keys
-  void wheelEvent( QWheelEvent* event); ///< change timestep of the current pointset by mouse wheel
+  void keyPressEvent( QKeyEvent * e ) override; ///< react to F2, F3 and DEL keys
+  void wheelEvent( QWheelEvent* event) override; ///< change timestep of the current pointset by mouse wheel
   void fadeTimeStepIn(); ///< fade a label with the currently shown timestep in
 
 

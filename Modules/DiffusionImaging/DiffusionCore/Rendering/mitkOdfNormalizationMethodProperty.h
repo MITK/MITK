@@ -96,7 +96,7 @@ protected:
    * this function is overridden as protected, so that the user may not add
    * additional invalid interpolation types.
    */
-  virtual bool AddEnum( const std::string& name, const IdType& id );
+  virtual bool AddEnum( const std::string& name, const IdType& id ) override;
 
   /**
    * Adds the enumeration types as defined by vtk to the list of known
@@ -113,9 +113,9 @@ class MITKDIFFUSIONCORE_EXPORT OdfNormalizationMethodPropertySerializer : public
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
-      if (!element) return NULL;
+      if (!element) return nullptr;
       const char* sa( element->Attribute("value") );
       std::string s(sa?sa:"");
       OdfNormalizationMethodProperty::Pointer property = OdfNormalizationMethodProperty::New();

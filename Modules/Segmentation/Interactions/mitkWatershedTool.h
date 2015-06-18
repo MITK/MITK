@@ -72,17 +72,17 @@ class MITKSEGMENTATION_EXPORT WatershedTool : public AutoSegmentationTool
     template <typename TPixel, unsigned int VImageDimension>
     void ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, itk::SmartPointer<mitk::Image>& segmentation );
 
-    const char** GetXPM() const;
-    const char* GetName() const;
-    us::ModuleResource GetIconResource() const;
+    const char** GetXPM() const override;
+    const char* GetName() const override;
+    us::ModuleResource GetIconResource() const override;
 
   protected:
 
     WatershedTool(); // purposely hidden
     virtual ~WatershedTool();
 
-    virtual void Activated();
-    virtual void Deactivated();
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     /** \brief Threshold parameter of the ITK Watershed Image Filter. See ITK Documentation for more information. */
     double m_Threshold;

@@ -29,11 +29,11 @@ class MITKQTWIDGETSEXT_EXPORT QmitkCrossWidget : public QLabel
 
 public:
 
-  QmitkCrossWidget( QWidget * parent=0, Qt::WindowFlags f = 0 );
+  QmitkCrossWidget( QWidget * parent=nullptr, Qt::WindowFlags f = nullptr );
 
-  void mousePressEvent( QMouseEvent* mouseEvent );
-  void mouseMoveEvent( QMouseEvent* mouseEvent );
-  void mouseReleaseEvent( QMouseEvent* mouseEvent );
+  void mousePressEvent( QMouseEvent* mouseEvent ) override;
+  void mouseMoveEvent( QMouseEvent* mouseEvent ) override;
+  void mouseReleaseEvent( QMouseEvent* mouseEvent ) override;
 
  signals:
 

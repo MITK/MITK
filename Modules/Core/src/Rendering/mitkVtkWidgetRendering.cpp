@@ -34,8 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::VtkWidgetRendering::VtkWidgetRendering()
-: m_RenderWindow( NULL ),
-  m_VtkWidget( NULL ),
+: m_RenderWindow( nullptr ),
+  m_VtkWidget( nullptr ),
   m_IsEnabled( false )
 {
   m_Renderer = vtkRenderer::New();
@@ -44,11 +44,11 @@ mitk::VtkWidgetRendering::VtkWidgetRendering()
 
 mitk::VtkWidgetRendering::~VtkWidgetRendering()
 {
-  if ( m_RenderWindow != NULL )
+  if ( m_RenderWindow != nullptr )
     if ( this->IsEnabled() )
       this->Disable();
 
-  if ( m_Renderer != NULL )
+  if ( m_Renderer != nullptr )
     m_Renderer->Delete();
 }
 
@@ -90,11 +90,11 @@ void mitk::VtkWidgetRendering::Enable()
   if(m_IsEnabled)
     return;
 
-  if(m_RenderWindow != NULL)
+  if(m_RenderWindow != nullptr)
   {
     vtkRenderWindowInteractor *interactor = m_RenderWindow->GetInteractor();
 
-    if ( m_VtkWidget != NULL )
+    if ( m_VtkWidget != nullptr )
     {
       m_VtkWidget->SetInteractor( interactor );
 

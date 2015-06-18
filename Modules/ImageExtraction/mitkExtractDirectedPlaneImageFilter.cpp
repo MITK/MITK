@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
-: m_WorldGeometry(NULL)
+: m_WorldGeometry(nullptr)
 {
   MITK_WARN << "Class ExtractDirectedPlaneImageFilter is deprecated! Use ExtractSliceFilter instead.";
 
@@ -41,21 +41,21 @@ mitk::ExtractDirectedPlaneImageFilter::ExtractDirectedPlaneImageFilter()
 
   m_TargetTimestep = 0;
   m_InPlaneResampleExtentByGeometry = true;
-  m_ResliceInterpolationProperty = NULL;//VtkResliceInterpolationProperty::New(); //TODO initial with value
+  m_ResliceInterpolationProperty = nullptr;//VtkResliceInterpolationProperty::New(); //TODO initial with value
     m_ThickSlicesMode = 0;
   m_ThickSlicesNum = 1;
 }
 
 mitk::ExtractDirectedPlaneImageFilter::~ExtractDirectedPlaneImageFilter()
 {
-  if(m_ResliceInterpolationProperty!=NULL)m_ResliceInterpolationProperty->Delete();
+  if(m_ResliceInterpolationProperty!=nullptr)m_ResliceInterpolationProperty->Delete();
   m_Reslicer->Delete();
 }
 
 void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 {
   // A world geometry must be set...
-  if ( m_WorldGeometry == NULL )
+  if ( m_WorldGeometry == nullptr )
   {
     itkWarningMacro(<<"No world geometry has been set. Returning.");
     return;
@@ -64,14 +64,14 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   Image *input = const_cast< ImageToImageFilter::InputImageType* >( this->GetInput() );
   input->Update();
 
-  if ( input == NULL )
+  if ( input == nullptr )
   {
     itkWarningMacro(<<"No input set.");
     return;
   }
 
   const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
-  if ( ( inputTimeGeometry == NULL )
+  if ( ( inputTimeGeometry == nullptr )
     || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
   {
     itkWarningMacro(<<"Error reading input image geometry.");
@@ -103,7 +103,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   vtkImageData* inputData = input->GetVtkImageData( timestep );
 
-  if ( inputData == NULL )
+  if ( inputData == nullptr )
   {
     itkWarningMacro(<<"Could not extract vtk image data for given timestep"<<timestep);
     return;
@@ -124,7 +124,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   // take transform of input image into account
   BaseGeometry* inputGeometry = inputTimeGeometry->GetGeometryForTimeStep( timestep );
-  if ( inputGeometry == NULL )
+  if ( inputGeometry == nullptr )
   {
     itkWarningMacro(<<"There is no Geometry3D at given timestep "<<timestep);
     return;
@@ -137,16 +137,16 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   double bounds[6];
   bool boundsInitialized = false;
 
-  for ( int i = 0; i < 6; ++i )
+  for (auto & bound : bounds)
   {
-    bounds[i] = 0.0;
+    bound = 0.0;
   }
 
   Vector2D extent; extent.Fill( 0.0 );
 
   // Do we have a simple PlaneGeometry?
-  if ( dynamic_cast< const PlaneGeometry * >( m_WorldGeometry ) != NULL &&
-       dynamic_cast< const AbstractTransformGeometry * >( m_WorldGeometry ) == NULL)
+  if ( dynamic_cast< const PlaneGeometry * >( m_WorldGeometry ) != nullptr &&
+       dynamic_cast< const AbstractTransformGeometry * >( m_WorldGeometry ) == nullptr)
   {
     const PlaneGeometry *planeGeometry =
       static_cast< const PlaneGeometry * >( m_WorldGeometry );
@@ -340,7 +340,7 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   // 1. Check the result
   vtkImageData* reslicedImage = m_Reslicer->GetOutput();
 
-  if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
+  if((reslicedImage == nullptr) || (reslicedImage->GetDataDimension() < 1))
   {
     itkWarningMacro(<<"Reslicer returned empty image");
     return;

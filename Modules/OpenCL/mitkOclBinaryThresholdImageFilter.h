@@ -36,7 +36,7 @@ class MITKOPENCL_EXPORT OclBinaryThresholdImageFilter : public OclImageToImageFi
 {
 
 public:
-  mitkClassMacro(OclBinaryThresholdImageFilter, OclImageToImageFilter);
+  mitkClassMacroItkParent(OclBinaryThresholdImageFilter, itk::Object);
   itkNewMacro(Self);
 
   /**

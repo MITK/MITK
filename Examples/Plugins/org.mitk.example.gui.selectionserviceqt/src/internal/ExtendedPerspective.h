@@ -31,7 +31,7 @@ class ExtendedPerspective : public QObject, public berry::IPerspectiveFactory
 
 public:
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 
 };
 

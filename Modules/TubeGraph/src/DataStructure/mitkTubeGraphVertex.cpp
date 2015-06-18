@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTubeGraphVertex.h"
 
 mitk::TubeGraphVertex::TubeGraphVertex()
-: m_element(NULL)
+: m_element(nullptr)
 {
 }
 

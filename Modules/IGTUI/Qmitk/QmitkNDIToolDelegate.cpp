@@ -33,7 +33,7 @@ Q_DECLARE_METATYPE(mitk::NDIPassiveTool*)
 
 
 QmitkNDIToolDelegate::QmitkNDIToolDelegate(QObject * parent) : QStyledItemDelegate(parent),
-m_Types(), m_DataStorage(NULL), m_Predicate(NULL), m_TagProperty(NULL), m_TagPropertyName()
+m_Types(), m_DataStorage(nullptr), m_Predicate(nullptr), m_TagProperty(nullptr), m_TagPropertyName()
 {
 }
 
@@ -51,7 +51,7 @@ QWidget* QmitkNDIToolDelegate::createEditor(QWidget *parent, const QStyleOptionV
     }
   case TypeCol:
     {
-      QComboBox* c = new QComboBox(parent);
+      auto  c = new QComboBox(parent);
       c->addItems(m_Types);
       return c;
     }

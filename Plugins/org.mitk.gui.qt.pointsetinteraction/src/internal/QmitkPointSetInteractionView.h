@@ -40,14 +40,14 @@ public:
   virtual ~QmitkPointSetInteractionView();
 
 
-  virtual void CreateQtPartControl(QWidget *parent);
-  void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
-  void Activated();
-  void Deactivated();
-  void NodeChanged(const mitk::DataNode* node);
-  bool IsExclusiveFunctionality() const;
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
-  virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
+  virtual void CreateQtPartControl(QWidget *parent) override;
+  void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+  void Activated() override;
+  void Deactivated() override;
+  void NodeChanged(const mitk::DataNode* node) override;
+  bool IsExclusiveFunctionality() const override;
+  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget) override;
+  virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget) override;
 protected slots:
   void OnAddPointSetClicked();
 protected:

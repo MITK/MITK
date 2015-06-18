@@ -39,18 +39,18 @@ public:
 
   }
 
-  void foo()
+  void foo() override
   {
     US_INFO << "TestModuleSL4: Doing foo";
   }
 
-  void Load(ModuleContext* context)
+  void Load(ModuleContext* context) override
   {
     sr = context->RegisterService<FooService>(this);
     US_INFO << "TestModuleSL4: Registered " << sr;
   }
 
-  void Unload(ModuleContext* /*context*/)
+  void Unload(ModuleContext* /*context*/) override
   {
   }
 

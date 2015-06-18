@@ -1,7 +1,7 @@
 #include <mitkTrackvis.h>
 #include <vtkTransformPolyDataFilter.h>
 
-TrackVisFiberReader::TrackVisFiberReader()  { m_Filename = ""; m_FilePointer = NULL; }
+TrackVisFiberReader::TrackVisFiberReader()  { m_Filename = ""; m_FilePointer = nullptr; }
 
 TrackVisFiberReader::~TrackVisFiberReader() { if (m_FilePointer) fclose( m_FilePointer ); }
 
@@ -51,7 +51,7 @@ short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib
 
     // write the header to the file
     m_FilePointer = fopen(filename.c_str(),"w+b");
-    if (m_FilePointer == NULL)
+    if (m_FilePointer == nullptr)
     {
         printf("[ERROR] Unable to create file '%s'\n",filename.c_str());
         return 0;
@@ -72,7 +72,7 @@ short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib
 short TrackVisFiberReader::open( string filename )
 {
     m_FilePointer = fopen(filename.c_str(),"r+b");
-    if (m_FilePointer == NULL)
+    if (m_FilePointer == nullptr)
     {
         printf("[ERROR] Unable to open file '%s'\n",filename.c_str());
         return 0;
@@ -226,7 +226,7 @@ void TrackVisFiberReader::writeHdr()
 void TrackVisFiberReader::close()
 {
     fclose(m_FilePointer);
-    m_FilePointer = NULL;
+    m_FilePointer = nullptr;
 }
 
 bool TrackVisFiberReader::IsTransformValid()

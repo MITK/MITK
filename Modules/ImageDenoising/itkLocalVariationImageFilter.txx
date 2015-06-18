@@ -140,8 +140,7 @@ namespace itk
 
     // Process each of the boundary faces.  These are N-d regions which border
     // the edge of the buffer.
-    for ( typename NeighborhoodAlgorithm::
-      ImageBoundaryFacesCalculator<InputImageType>::FaceListType::iterator
+    for ( auto
       fit=faceList.begin(); fit != faceList.end(); ++fit)
     {
 

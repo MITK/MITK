@@ -31,11 +31,11 @@ public:
   // Description:
   // Standard VTK class methods.
   vtkTypeMacro(mitkVtkLogoRepresentation,vtkLogoRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   // Description:
   // Satisfy the superclasses' API.
-  virtual void BuildRepresentation();
+  virtual void BuildRepresentation() override;
 
   void SetCornerPosition(int corner){cornerPosition = corner;}
 

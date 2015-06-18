@@ -20,6 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../QmitkSegmentationUtilityWidget.h"
 #include <ui_QmitkContourModelToImageWidgetControls.h>
 
+#include <QScopedPointer>
+
+class QmitkContourModelToImageWidgetPrivate;
+
 namespace mitk {
   class Image;
   class ContourModelSet;
@@ -43,7 +47,7 @@ class QmitkContourModelToImageWidget : public QmitkSegmentationUtilityWidget
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = NULL);
+  explicit QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkContourModelToImageWidget();
@@ -56,21 +60,15 @@ private slots:
   /** @brief This slot is called if user activates the button to mask an image. */
   void OnProcessPressed();
 
+  /** @brief This slot is called after processing is finished */
+  void OnProcessingFinished();
+
 private:
 
-  /** @brief Check if selections is valid. */
-  void SelectionControl( unsigned int index, const mitk::DataNode* selection);
+  QScopedPointer<QmitkContourModelToImageWidgetPrivate> d_ptr;
 
-  /** @brief Enable buttons if data selction is valid. */
-  void EnableButtons(bool enable = true);
-
-  /** @brief Fills a mitk::ContourModel into a given segmentation image */
-  itk::SmartPointer<mitk::Image> ContourModelToImage(itk::SmartPointer<mitk::Image> segmenationImage, itk::SmartPointer<mitk::ContourModel> contour );
-
-  /** @brief Fills a whole ContourModelSet into a given segmentation image */
-  itk::SmartPointer<mitk::Image> ContourModelSetToImage( itk::SmartPointer<mitk::Image> segmenationImage, itk::SmartPointer<mitk::ContourModelSet> contourSet );
-
-  Ui::QmitkContourModelToImageWidgetControls m_Controls;
+  Q_DECLARE_PRIVATE(QmitkContourModelToImageWidget)
+  Q_DISABLE_COPY(QmitkContourModelToImageWidget)
 };
 
 #endif

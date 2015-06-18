@@ -41,7 +41,7 @@ class MITKDATATYPESEXT_EXPORT CompressedImageContainer : public itk::Object
 {
   public:
 
-    mitkClassMacro(CompressedImageContainer, Object);
+    mitkClassMacroItkParent(CompressedImageContainer, itk::Object);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 

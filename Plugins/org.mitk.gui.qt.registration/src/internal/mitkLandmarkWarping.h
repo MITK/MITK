@@ -87,12 +87,12 @@ namespace mitk
 
     public:
 
-      void Execute(itk::Object *object, const itk::EventObject & event)
+      void Execute(itk::Object *object, const itk::EventObject & event) override
       {
         Execute( (const itk::Object*) object, event );
       }
 
-      void Execute(const itk::Object * object, const itk::EventObject & /*event*/)
+      void Execute(const itk::Object * object, const itk::EventObject & /*event*/) override
       {
         const itk::ProcessObject * internalFilter = dynamic_cast<const itk::ProcessObject *>( object );
         if (!(internalFilter->GetProgress() == 0 || internalFilter->GetProgress() == 1))

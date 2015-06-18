@@ -64,7 +64,7 @@ public:
   itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                  ///< vector field (peak sizes rescaled for visualization purposes)
   itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer)   ///< container for output peaks
 
-  void GenerateData();
+  void GenerateData() override;
 
 protected:
   FslPeakImageConverter();

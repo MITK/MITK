@@ -29,10 +29,10 @@ const mitk::Label::PixelType mitk::Label::MAX_LABEL_VALUE = std::numeric_limits<
 mitk::Label::Label() :
   PropertyList()
 {
-  if(GetProperty("locked") == NULL) SetLocked(true);
-  if(GetProperty("visible") == NULL) SetVisible(true);
-  if(GetProperty("opacity") == NULL) SetOpacity(0.6);
-  if(GetProperty("center.coordinates") == NULL)
+  if(GetProperty("locked") == nullptr) SetLocked(true);
+  if(GetProperty("visible") == nullptr) SetVisible(true);
+  if(GetProperty("opacity") == nullptr) SetOpacity(0.6);
+  if(GetProperty("center.coordinates") == nullptr)
   {
     mitk::Point3D pnt;
     pnt.SetElement(0,0);
@@ -40,7 +40,7 @@ mitk::Label::Label() :
     pnt.SetElement(2,0);
     SetCenterOfMassCoordinates(pnt);
   }
-  if(GetProperty("center.index") == NULL)
+  if(GetProperty("center.index") == nullptr)
   {
     mitk::Point3D pnt;
     pnt.SetElement(0,0);
@@ -48,15 +48,15 @@ mitk::Label::Label() :
     pnt.SetElement(2,0);
     SetCenterOfMassIndex(pnt);
   }
-  if(GetProperty("color") == NULL)
+  if(GetProperty("color") == nullptr)
   {
     mitk::Color col;
     col.Set(0,0,0);
     SetColor(col);
   }
-  if(GetProperty("name") == NULL) SetName("noName!");
-  if(GetProperty("value") == NULL) SetValue(0);
-  if(GetProperty("layer") == NULL) SetLayer(0);
+  if(GetProperty("name") == nullptr) SetName("noName!");
+  if(GetProperty("value") == nullptr) SetValue(0);
+  if(GetProperty("layer") == nullptr) SetLayer(0);
 }
 
 mitk::Label::Label(const Label& other)
@@ -66,8 +66,8 @@ mitk::Label::Label(const Label& other)
 
 
   mitk::PropertyList::PropertyMap * map = const_cast<mitk::PropertyList::PropertyMap *>(this->GetMap());
-  mitk::PropertyList::PropertyMap::iterator it = map->begin();
-  mitk::PropertyList::PropertyMap::iterator end = map->end();
+  auto it = map->begin();
+  auto end = map->end();
 
   for(; it != end ; ++it)
   {
@@ -95,7 +95,7 @@ void mitk::Label::SetProperty(const std::string &propertyKey, BaseProperty *prop
 void mitk::Label::SetLocked(bool locked)
 {
   mitk::BoolProperty* property = dynamic_cast<mitk::BoolProperty *>(GetProperty("locked"));
-  if(property != NULL)
+  if(property != nullptr)
     // Update Property
     property->SetValue(locked);
   else
@@ -113,7 +113,7 @@ bool mitk::Label::GetLocked() const
 void mitk::Label::SetVisible(bool visible)
 {
   mitk::BoolProperty* property = dynamic_cast<mitk::BoolProperty *>(GetProperty("visible"));
-  if(property != NULL)
+  if(property != nullptr)
     // Update Property
     property->SetValue(visible);
   else
@@ -131,7 +131,7 @@ bool mitk::Label::GetVisible() const
 void mitk::Label::SetOpacity(float opacity)
 {
   mitk::FloatProperty* property = dynamic_cast<mitk::FloatProperty *>(GetProperty("opacity"));
-  if(property != NULL)
+  if(property != nullptr)
     // Update Property
     property->SetValue(opacity);
   else
@@ -161,7 +161,7 @@ std::string mitk::Label::GetName() const
 void mitk::Label::SetValue(PixelType pixelValue)
 {
   mitk::UShortProperty* property = dynamic_cast<mitk::UShortProperty*>(GetProperty("value"));
-  if(property != NULL)
+  if(property != nullptr)
     // Update Property
     property->SetValue(pixelValue);
   else
@@ -181,7 +181,7 @@ mitk::Label::PixelType mitk::Label::GetValue() const
 void mitk::Label::SetLayer(unsigned int layer)
 {
   mitk::UIntProperty* property = dynamic_cast<mitk::UIntProperty *>(GetProperty("layer"));
-  if(property != NULL)
+  if(property != nullptr)
     // Update Property
     property->SetValue(layer);
   else
@@ -206,7 +206,7 @@ const mitk::Color & mitk::Label::GetColor() const
 void mitk::Label::SetColor(const mitk::Color &_color)
 {
   mitk::ColorProperty* colorProp = dynamic_cast<mitk::ColorProperty *>(GetProperty("color"));
-  if(colorProp != NULL)
+  if(colorProp != nullptr)
     // Update Property
     colorProp->SetColor(_color);
   else
@@ -217,7 +217,7 @@ void mitk::Label::SetColor(const mitk::Color &_color)
 void mitk::Label::SetCenterOfMassIndex(const mitk::Point3D& center)
 {
   mitk::Point3dProperty* property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.index"));
-  if(property != NULL)
+  if(property != nullptr)
     // Update Property
     property->SetValue(center);
   else
@@ -234,7 +234,7 @@ mitk::Point3D mitk::Label::GetCenterOfMassIndex() const
 void mitk::Label::SetCenterOfMassCoordinates(const mitk::Point3D& center)
 {
   mitk::Point3dProperty* property = dynamic_cast<mitk::Point3dProperty *>(GetProperty("center.coordinates"));
-  if(property != NULL)
+  if(property != nullptr)
     // Update Property
     property->SetValue(center);
   else
@@ -280,8 +280,8 @@ bool mitk::Equal( const mitk::Label& leftHandSide, const mitk::Label& rightHandS
   }
 
 
-  mitk::PropertyList::PropertyMap::const_iterator lhsmapIt = lhsmap->begin();
-  mitk::PropertyList::PropertyMap::const_iterator lhsmapItEnd = lhsmap->end();
+  auto lhsmapIt = lhsmap->begin();
+  auto lhsmapItEnd = lhsmap->end();
 
   for(;lhsmapIt != lhsmapItEnd; ++lhsmapIt)
   {

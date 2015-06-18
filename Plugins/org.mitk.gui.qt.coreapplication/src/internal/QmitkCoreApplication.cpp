@@ -25,7 +25,7 @@ QmitkCoreApplication::QmitkCoreApplication()
 
 }
 
-int QmitkCoreApplication::Start()
+QVariant QmitkCoreApplication::Start(berry::IApplicationContext* /*context*/)
 {
   QScopedPointer<berry::Display> display(berry::PlatformUI::CreateDisplay());
 

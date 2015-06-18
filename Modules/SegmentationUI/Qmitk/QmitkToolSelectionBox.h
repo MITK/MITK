@@ -112,8 +112,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolSelectionBox : public QWidget
 
   protected:
 
-    void showEvent( QShowEvent* );
-    void hideEvent( QHideEvent* );
+    void showEvent( QShowEvent* ) override;
+    void hideEvent( QHideEvent* ) override;
 
     void SetOrUnsetButtonForActiveTool();
 

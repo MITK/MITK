@@ -69,7 +69,7 @@ public:
 
   typedef ShrinkableMap<ModuleContext*, ShrinkableVector<ServiceListenerHook::ListenerInfo> > MapType;
 
-  void Event(const ServiceEvent& /*event*/, MapType& listeners)
+  void Event(const ServiceEvent& /*event*/, MapType& listeners) override
   {
     US_TEST_CONDITION_REQUIRED(listeners.size() > 0 && listeners.find(GetModuleContext()) != listeners.end(), "Check listener content");
     ShrinkableVector<ServiceListenerHook::ListenerInfo>& listenerInfos = listeners[GetModuleContext()];
@@ -149,7 +149,7 @@ public:
   }
 
   void Find(const ModuleContext* context, const std::string& /*name*/,
-            const std::string& /*filter*/, ShrinkableVector<ServiceReferenceBase>& references)
+            const std::string& /*filter*/, ShrinkableVector<ServiceReferenceBase>& references) override
   {
     US_TEST_CONDITION(context == GetModuleContext(), "Module context");
 
@@ -174,7 +174,7 @@ public:
   {
   }
 
-  void Added(const std::vector<ListenerInfo>& listeners)
+  void Added(const std::vector<ListenerInfo>& listeners) override
   {
     for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin();
          iter != listeners.end(); ++iter)
@@ -186,7 +186,7 @@ public:
     }
   }
 
-  void Removed(const std::vector<ListenerInfo>& listeners)
+  void Removed(const std::vector<ListenerInfo>& listeners) override
   {
     for (std::vector<ListenerInfo>::const_iterator iter = listeners.begin();
          iter != listeners.end(); ++iter)

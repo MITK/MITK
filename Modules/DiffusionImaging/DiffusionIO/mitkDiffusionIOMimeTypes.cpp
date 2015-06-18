@@ -250,9 +250,29 @@ CustomMimeType DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE()
 {
   CustomMimeType mimeType(CONNECTOMICS_MIMETYPE_NAME());
   std::string category = "Connectomics Networks";
-  mimeType.SetComment("Connectomics Networks");
+  mimeType.SetComment("Connectomics Networks Files");
   mimeType.SetCategory(category);
   mimeType.AddExtension("cnf");
+  return mimeType;
+}
+
+CustomMimeType DiffusionIOMimeTypes::CONNECTOMICS_MATRIX_MIMETYPE()
+{
+  CustomMimeType mimeType(CONNECTOMICS_MATRIX_MIMETYPE_NAME());
+  std::string category = "Connectomics Networks export";
+  mimeType.SetComment("Connectomics Matrix Files");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("mat");
+  return mimeType;
+}
+
+CustomMimeType DiffusionIOMimeTypes::CONNECTOMICS_LIST_MIMETYPE()
+{
+  CustomMimeType mimeType(CONNECTOMICS_LIST_MIMETYPE_NAME());
+  std::string category = "Connectomics Networks export";
+  mimeType.SetComment("Connectomics Connection Lists");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("txt");
   return mimeType;
 }
 
@@ -296,6 +316,18 @@ std::string DiffusionIOMimeTypes::FIBERBUNDLE_TRK_MIMETYPE_NAME()
 std::string DiffusionIOMimeTypes::CONNECTOMICS_MIMETYPE_NAME()
 {
   static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".cnf";
+  return name;
+}
+
+std::string DiffusionIOMimeTypes::CONNECTOMICS_MATRIX_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".mat";
+  return name;
+}
+
+std::string DiffusionIOMimeTypes::CONNECTOMICS_LIST_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".txt";
   return name;
 }
 

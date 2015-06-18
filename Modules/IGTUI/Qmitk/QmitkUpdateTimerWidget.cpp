@@ -27,7 +27,7 @@ static unsigned int MAXIMUMUPDATEVALUE = 1000; // greatest value for the update 
 static unsigned int UPDATEVALUESTEP = 10; // step size for the update rate spinbox
 
 QmitkUpdateTimerWidget::QmitkUpdateTimerWidget(QWidget* parent)
-: QWidget(parent), m_Controls(NULL)
+: QWidget(parent), m_Controls(nullptr)
 {
   this->m_UpdateTimer = new QTimer( this );
   this->CreateQtPartControl( this );
@@ -44,8 +44,8 @@ QmitkUpdateTimerWidget::QmitkUpdateTimerWidget(QWidget* parent)
 QmitkUpdateTimerWidget::~QmitkUpdateTimerWidget()
 {
   m_UpdateTimer->stop();
-  m_UpdateTimer = NULL;
-  m_Controls = NULL;
+  m_UpdateTimer = nullptr;
+  m_Controls = nullptr;
 }
 
 

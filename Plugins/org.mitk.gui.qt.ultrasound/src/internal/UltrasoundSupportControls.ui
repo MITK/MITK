@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>307</width>
-    <height>355</height>
+    <width>407</width>
+    <height>820</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -111,7 +111,7 @@
                <item>
                 <widget class="QCheckBox" name="m_ShowImageStream">
                  <property name="text">
-                  <string>Show Image Stream</string>
+                  <string>Show US image in MITK</string>
                  </property>
                  <property name="checked">
                   <bool>true</bool>
@@ -184,7 +184,7 @@
        <item>
         <widget class="QCheckBox" name="m_RunImageTimer">
          <property name="text">
-          <string>Update Image Automatically</string>
+          <string>Update Image Data Automatically</string>
          </property>
          <property name="checked">
           <bool>true</bool>
@@ -219,16 +219,56 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QLabel" name="m_FramerateLabel">
             <property name="text">
-             <string>Current Framerate: 0 FPS</string>
+             <string>Current overall Framerate: 0 FPS</string>
             </property>
            </widget>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>Image Pipeline Framerate Limit [FPS]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="m_FrameRatePipeline">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>500</number>
+              </property>
+              <property name="value">
+               <number>50</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QLabel" name="label_2">
+             <widget class="QCheckBox" name="m_Update2DView">
               <property name="text">
-               <string>Framerate Limit:</string>
+               <string>Update 2D View</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -246,15 +286,69 @@ p, li { white-space: pre-wrap; }
              </spacer>
             </item>
             <item>
-             <widget class="QSpinBox" name="m_FrameRate">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Framerate Limit [FPS]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="m_FrameRate2d">
               <property name="minimum">
                <number>1</number>
               </property>
               <property name="maximum">
-               <number>50</number>
+               <number>100</number>
               </property>
               <property name="value">
-               <number>30</number>
+               <number>20</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QCheckBox" name="m_Update3DView">
+              <property name="text">
+               <string>Update 3D View</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>18</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Framerate Limit [FPS]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="m_FrameRate3d">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>5</number>
               </property>
              </widget>
             </item>

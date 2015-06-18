@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkPropertyItem::QmitkPropertyItem(const QList<QVariant>& data)
   : m_Data(data),
-    m_Parent(NULL)
+    m_Parent(nullptr)
 {
 }
 
@@ -30,7 +30,7 @@ QmitkPropertyItem::~QmitkPropertyItem()
 
 void QmitkPropertyItem::AppendChild(QmitkPropertyItem* child)
 {
-  if (child == NULL)
+  if (child == nullptr)
     return;
 
   // If property name doesn't contain period(s), append property directly, but...
@@ -69,7 +69,7 @@ void QmitkPropertyItem::AppendChild(QmitkPropertyItem* child)
     {
       if (i != names.count() - 1)
       {
-        QmitkPropertyItem* currentChild = NULL;
+        QmitkPropertyItem* currentChild = nullptr;
 
         // Search for current node.
         for (int j = 0; j < currentParent->m_Children.count(); ++j)
@@ -82,7 +82,7 @@ void QmitkPropertyItem::AppendChild(QmitkPropertyItem* child)
         }
 
         // Node doesn't exist. Create and append it.
-        if (currentChild == NULL)
+        if (currentChild == nullptr)
         {
           QList<QVariant> data;
           data << names[i] << QVariant();
@@ -102,7 +102,7 @@ void QmitkPropertyItem::AppendChild(QmitkPropertyItem* child)
         currentParent->AppendChild(new QmitkPropertyItem(data));
 
         delete child;
-        child = NULL;
+        child = nullptr;
       }
     }
   }
@@ -135,7 +135,7 @@ QmitkPropertyItem* QmitkPropertyItem::GetParent() const
 
 int QmitkPropertyItem::GetRow()
 {
-  if (m_Parent != NULL)
+  if (m_Parent != nullptr)
     return m_Parent->m_Children.indexOf(this);
 
   return 0;

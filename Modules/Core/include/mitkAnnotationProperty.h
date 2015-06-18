@@ -57,7 +57,7 @@ public:
   const Point3D &GetPosition() const;
   void SetPosition( const Point3D &position );
 
-  virtual std::string GetValueAsString() const;
+  virtual std::string GetValueAsString() const override;
   virtual BaseProperty& operator=(const BaseProperty& other) { return Superclass::operator=(other); } \
 
   using BaseProperty::operator =;
@@ -80,10 +80,10 @@ private:
   // purposely not implemented
   AnnotationProperty& operator=(const AnnotationProperty&);
 
-  itk::LightObject::Pointer InternalClone() const;
+  itk::LightObject::Pointer InternalClone() const override;
 
-  virtual bool IsEqual(const BaseProperty& property) const;
-  virtual bool Assign(const BaseProperty & property);
+  virtual bool IsEqual(const BaseProperty& property) const override;
+  virtual bool Assign(const BaseProperty & property) override;
 
 };
 

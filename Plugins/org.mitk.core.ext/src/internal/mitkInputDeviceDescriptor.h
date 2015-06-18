@@ -54,27 +54,27 @@ public:
   /**
    * @see mitk::IInputDeviceDescriptor::CreateInputDevice()
    */
-  mitk::IInputDevice::Pointer CreateInputDevice();
+  mitk::IInputDevice::Pointer CreateInputDevice() override;
 
   /**
    * @see mitk::IInputDeviceDescriptor::GetDescription()
    */
-  QString GetDescription() const;
+  QString GetDescription() const override;
 
   /**
    * @see mitk::IInputDeviceDescriptor::GetID()
    */
-  QString GetID() const;
+  QString GetID() const override;
 
   /**
    * @see mitk::IInputDeviceDescriptor::GetName()
    */
-  QString GetName() const;
+  QString GetName() const override;
 
   /**
    * @see mitk::IInputDeviceDescriptor::operator==(const Object* object)
    */
-  bool operator==(const Object* object) const;
+  bool operator==(const Object* object) const override;
 
 private:
 

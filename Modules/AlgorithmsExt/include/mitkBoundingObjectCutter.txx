@@ -38,7 +38,7 @@ void CutImageWithOutputTypeSelect
   if(cutter->m_BoundingObject.IsNull())
     return;
 
-  if (inputItkImage == NULL)
+  if (inputItkImage == nullptr)
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
     std::cout << " image is NULL...returning" << std::endl;
@@ -150,7 +150,7 @@ void CutImageWithOutputTypeSelect
   if(cutter->m_BoundingObject.IsNull())
     return;
 
-  if (inputItkImage == NULL)
+  if (inputItkImage == nullptr)
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
     std::cout << " image is NULL...returning" << std::endl;
@@ -252,7 +252,7 @@ void CutImageWithOutputTypeSelect
 template < typename TPixel, unsigned int VImageDimension >
 void CutImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep )
 {
-  TPixel* dummy = NULL;
+  TPixel* dummy = nullptr;
   CutImageWithOutputTypeSelect<TPixel, VImageDimension, TPixel>(inputItkImage, cutter, boTimeStep, dummy);
 }
 
@@ -260,7 +260,7 @@ void CutImage( itk::Image< TPixel, VImageDimension >* inputItkImage, mitk::Bound
 template < typename TPixel, unsigned int VImageDimension >
 void CutImage( itk::VectorImage< TPixel, VImageDimension >* inputItkImage, mitk::BoundingObjectCutter* cutter, int boTimeStep )
 {
-  TPixel* dummy = NULL;
+  TPixel* dummy = nullptr;
   CutImageWithOutputTypeSelect<TPixel, VImageDimension, TPixel>(inputItkImage, cutter, boTimeStep, dummy);
 }
 

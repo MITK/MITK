@@ -78,7 +78,7 @@ class MITKCORE_EXPORT BaseDataSource : public itk::ProcessObject
 {
 public:
 
-  mitkClassMacro(BaseDataSource, itk::ProcessObject)
+  mitkClassMacroItkParent(BaseDataSource, itk::ProcessObject)
 
   typedef BaseData OutputType;
   typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;
@@ -131,12 +131,12 @@ public:
   /**
    * @sa itk::ProcessObject::MakeOutput(DataObjectPointerArraySizeType)
    */
-  virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx ) = 0;
+  virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx ) override = 0;
 
   /**
    * @sa itk::ProcessObject::MakeOutput(const DataObjectIdentifierType&)
    */
-  virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType& name) = 0;
+  virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType& name) override = 0;
 
   /**
    * @brief Access itk::ProcessObject::m_Updating

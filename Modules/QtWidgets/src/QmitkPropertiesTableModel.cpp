@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //# PUBLIC CTORS,DTOR
 QmitkPropertiesTableModel::QmitkPropertiesTableModel(QObject* parent, mitk::PropertyList::Pointer _PropertyList)
 : QAbstractTableModel(parent)
-, m_PropertyList(0)
+, m_PropertyList(nullptr)
 , m_BlockEvents(false)
 , m_SortDescending(false)
 , m_FilterKeyWord("")
@@ -44,7 +44,7 @@ QmitkPropertiesTableModel::QmitkPropertiesTableModel(QObject* parent, mitk::Prop
 QmitkPropertiesTableModel::~QmitkPropertiesTableModel()
 {
   // remove all event listeners by setting the property list to 0
-  this->SetPropertyList(0);
+  this->SetPropertyList(nullptr);
 }
 
 //# PUBLIC GETTER
@@ -163,7 +163,7 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
       else if(role == Qt::EditRole)
       {
         QStringList values;
-        for(mitk::EnumerationProperty::EnumConstIterator it=enumerationProp->Begin(); it!=enumerationProp->End()
+        for(auto it=enumerationProp->Begin(); it!=enumerationProp->End()
           ; it++)
         {
           values << QString::fromStdString(it->second);
@@ -454,7 +454,7 @@ void QmitkPropertiesTableModel::Reset()
   if(m_PropertyList.IsNotNull())
   {
     // first of all: collect all properties from the list
-    for(mitk::PropertyList::PropertyMap::const_iterator it=m_PropertyList->GetMap()->begin()
+    for(auto it=m_PropertyList->GetMap()->begin()
       ; it!=m_PropertyList->GetMap()->end()
       ; it++)
     {
@@ -466,7 +466,7 @@ void QmitkPropertiesTableModel::Reset()
   {
     std::vector<PropertyDataSet> subSelection;
 
-    for(std::vector<PropertyDataSet>::iterator it=allPredicates.begin()
+    for(auto it=allPredicates.begin()
       ; it!=allPredicates.end()
       ; it++)
     {
@@ -480,7 +480,7 @@ void QmitkPropertiesTableModel::Reset()
 
   PropertyDataSet tmpPropertyDataSet;
   // add all selected now to the Model
-  for(std::vector<PropertyDataSet>::iterator it=allPredicates.begin()
+  for(auto it=allPredicates.begin()
     ; it!=allPredicates.end()
     ; it++)
   {

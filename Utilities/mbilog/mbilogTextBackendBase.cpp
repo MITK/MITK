@@ -393,7 +393,7 @@ void mbilog::TextBackendBase::FormatFull(const LogMessage &l,int threadID)
 
 void mbilog::TextBackendBase::AppendTimeStamp(std::ostream& out)
 {
-  time_t rawtime = time(NULL);
+  time_t rawtime = time(nullptr);
   std::string timestring( ctime(&rawtime) );
   timestring.replace( timestring.length() -1, 1," "); // replace \n by " " (separates date/time from following output of relative time since start)
 

@@ -63,12 +63,12 @@ namespace mitk
     BValueMapProperty(const BValueMapProperty& other);
     BValueMapProperty(const BValueMap& bValueMap);
 
-    virtual bool IsEqual(const BaseProperty& property) const;
-    virtual bool Assign(const BaseProperty & property);
+    virtual bool IsEqual(const BaseProperty& property) const override;
+    virtual bool Assign(const BaseProperty & property) override;
 
     BValueMap m_BValueMap;
 
-    virtual itk::LightObject::Pointer InternalClone() const;
+    virtual itk::LightObject::Pointer InternalClone() const override;
   };
 }
 #endif

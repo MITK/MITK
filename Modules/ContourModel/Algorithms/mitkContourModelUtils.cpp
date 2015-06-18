@@ -47,7 +47,7 @@ mitk::ContourModelUtils::~ContourModelUtils()
 
 mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(Image* slice, ContourModel* contourIn3D, bool itkNotUsed( correctionForIpSegmentation ), bool constrainToInside)
 {
-  if ( !slice || !contourIn3D ) return NULL;
+  if ( !slice || !contourIn3D ) return nullptr;
 
   ContourModel::Pointer projectedContour = ContourModel::New();
   projectedContour->Initialize(*contourIn3D);
@@ -58,8 +58,8 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(Ima
 
   for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {
-    ContourModel::VertexIterator iter = contourIn3D->Begin(currentTimestep);
-    ContourModel::VertexIterator end = contourIn3D->End(currentTimestep);
+    auto iter = contourIn3D->Begin(currentTimestep);
+    auto end = contourIn3D->End(currentTimestep);
 
     while( iter != end)
     {
@@ -87,7 +87,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(Ima
 
 mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
 {
-  if ( !sliceGeometry || !contourIn2D ) return NULL;
+  if ( !sliceGeometry || !contourIn2D ) return nullptr;
 
   ContourModel::Pointer worldContour = ContourModel::New();
   worldContour->Initialize(*contourIn2D);
@@ -96,8 +96,8 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
 
   for(int currentTimestep = 0; currentTimestep < numberOfTimesteps; currentTimestep++)
   {
-  ContourModel::VertexIterator iter = contourIn2D->Begin(currentTimestep);
-  ContourModel::VertexIterator end = contourIn2D->End(currentTimestep);
+  auto iter = contourIn2D->Begin(currentTimestep);
+  auto end = contourIn2D->End(currentTimestep);
 
   while( iter != end)
   {
@@ -135,7 +135,7 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
 
       // that's our vtkPolyData-Surface
       vtkSmartPointer<vtkPolyData> surface2D = vtkSmartPointer<vtkPolyData>::New();
-      if (surface->GetVtkPolyData(timeStep) == NULL)
+      if (surface->GetVtkPolyData(timeStep) == nullptr)
       {
         MITK_WARN << "No surface has been created from contour model. Add more points to fill contour in slice.";
         return;

@@ -46,13 +46,13 @@ void mitk::ITKImageImport<TInputImage>::SetInput(const InputImageType* input)
 template <class TInputImage>
 void mitk::ITKImageImport<TInputImage>::SetGeometry(const BaseGeometry* geometry)
 {
-  if(geometry != NULL)
+  if(geometry != nullptr)
   {
     m_Geometry = static_cast<mitk::BaseGeometry*>(geometry->Clone().GetPointer());
   }
   else
   {
-    m_Geometry = NULL;
+    m_Geometry = nullptr;
   }
   Modified();
 }
@@ -106,7 +106,7 @@ void mitk::ITKImageImport<TInputImage>::GenerateInputRequestedRegion()
 template <class TInputImage>
 void mitk::ITKImageImport<TInputImage>::SetNthOutput(DataObjectPointerArraySizeType idx, itk::DataObject *output)
 {
-  if((output == NULL) && (idx == 0))
+  if((output == nullptr) && (idx == 0))
   {
     // we are disconnected from our output:
     // copy buffer of input to output, because we
@@ -155,7 +155,7 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk
     itkimage->Update();
 
   mitk::Image::Pointer resultImage;
-  if(mitkImage != NULL)
+  if(mitkImage != nullptr)
   {
     resultImage = mitkImage;
   }
@@ -168,7 +168,7 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk
     Image::ManageMemory );
   itkimage->GetPixelContainer()->ContainerManageMemoryOff();
 
-  if(geometry != NULL)
+  if(geometry != nullptr)
     resultImage->SetGeometry(static_cast<mitk::BaseGeometry*>(geometry->Clone().GetPointer()));
 
   return resultImage;

@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
 
     mitk::StringList filenamesOfThisGroup;
     const mitk::DICOMImageFrameList& frames = outputDescriptor.GetImageFrameList();
-    for (mitk::DICOMImageFrameList::const_iterator fIter = frames.begin(); fIter != frames.end(); ++fIter)
+    for (auto fIter = frames.begin(); fIter != frames.end(); ++fIter)
     {
       filenamesOfThisGroup.push_back( (*fIter)->Filename );
     }
@@ -211,7 +211,7 @@ int main(int argc, char* argv[])
       MITK_ERROR << "****** Re-analyzing files of output group " << outputIndex << " yields " << dicomReader->GetNumberOfOutputs() << " groups";
       outputError = true;
 
-      for (mitk::DICOMImageFrameList::const_iterator fIter = frames.begin(); fIter != frames.end(); ++fIter)
+      for (auto fIter = frames.begin(); fIter != frames.end(); ++fIter)
       {
         MITK_INFO << "filename group " << outputIndex << ": "  << (*fIter)->Filename;
       }

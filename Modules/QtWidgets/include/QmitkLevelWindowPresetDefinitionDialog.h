@@ -34,7 +34,7 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDial
 
 public:
 
-  QmitkLevelWindowPresetDefinitionDialog(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  QmitkLevelWindowPresetDefinitionDialog(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkLevelWindowPresetDefinitionDialog();
 
   void setPresets(std::map<std::string, double>& level, std::map<std::string, double>& window, QString initLevel, QString initWindow);
@@ -71,13 +71,13 @@ protected:
 
     PresetTableModel(std::map<std::string, double>& levels,
                      std::map<std::string, double>& windows,
-                     QObject* parent = 0);
+                     QObject* parent = nullptr);
 
-    int rowCount(const QModelIndex&) const;
-    int columnCount(const QModelIndex&) const;
-    QVariant data(const QModelIndex& index, int) const;
+    int rowCount(const QModelIndex&) const override;
+    int columnCount(const QModelIndex&) const override;
+    QVariant data(const QModelIndex& index, int) const override;
 
-    QVariant headerData(int section, Qt::Orientation orientation, int) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int) const override;
 
     void addPreset(std::string& name, double level, double window);
     void removePreset(const QModelIndex&);
@@ -96,8 +96,8 @@ protected:
 
   };
 
-  void resizeEvent(QResizeEvent* event);
-  void showEvent(QShowEvent* event);
+  void resizeEvent(QResizeEvent* event) override;
+  void showEvent(QShowEvent* event) override;
 
   void resizeColumns();
 

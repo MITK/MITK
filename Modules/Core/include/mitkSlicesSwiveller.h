@@ -82,13 +82,13 @@ protected:
   virtual ~SlicesSwiveller();
 
   // check if the slices of this SliceNavigationController can be rotated (???) Possible
-  virtual void OnSliceControllerAdded(SliceNavigationController* snc);
+  virtual void OnSliceControllerAdded(SliceNavigationController* snc) override;
 
-  virtual void OnSliceControllerRemoved(SliceNavigationController* snc);
+  virtual void OnSliceControllerRemoved(SliceNavigationController* snc) override;
 
   virtual void UpdateRelevantSNCs();
 
-  virtual bool ExecuteAction(Action * action, StateEvent const* stateEvent);
+  virtual bool ExecuteAction(Action * action, StateEvent const* stateEvent) override;
 
 
   /** All SNCs that currently have CreatedWorldGeometries, that can be rotated */

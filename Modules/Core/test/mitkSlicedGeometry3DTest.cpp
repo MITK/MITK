@@ -189,7 +189,7 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Testing availability and type (PlaneGeometry) of first geometry in the SlicedGeometry3D: ";
   mitk::PlaneGeometry* accessedplanegeometry3 = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetPlaneGeometry(0));
-  if(accessedplanegeometry3==NULL)
+  if(accessedplanegeometry3==nullptr)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -210,7 +210,7 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
   std::cout << "Testing availability and type (PlaneGeometry) of the last geometry in the SlicedGeometry3D: ";
   mitk::PlaneGeometry* accessedplanegeometry3last = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetPlaneGeometry(numSlices-1));
   mitk::Point3D origin3last; origin3last = planegeometry3->GetOrigin()+slicedWorldGeometry->GetDirectionVector()*(numSlices-1);
-  if(accessedplanegeometry3last==NULL)
+  if(accessedplanegeometry3last==nullptr)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -231,7 +231,7 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Again for first slice - Testing availability and type (PlaneGeometry) of first geometry in the SlicedGeometry3D: ";
   accessedplanegeometry3 = dynamic_cast<mitk::PlaneGeometry*>(slicedWorldGeometry->GetPlaneGeometry(0));
-  if(accessedplanegeometry3==NULL)
+  if(accessedplanegeometry3==nullptr)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

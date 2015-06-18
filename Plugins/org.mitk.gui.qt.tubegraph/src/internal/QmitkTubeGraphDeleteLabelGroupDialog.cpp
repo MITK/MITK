@@ -29,7 +29,7 @@ QmitkTubeGraphDeleteLabelGroupDialog::QmitkTubeGraphDeleteLabelGroupDialog(QWidg
 
   QDialog::setFixedSize(400, 400);
 
-  QVBoxLayout* layout = new QVBoxLayout(this);
+  auto   layout = new QVBoxLayout(this);
   layout->setMargin(5);
   layout->setSpacing(5);
 
@@ -40,7 +40,7 @@ QmitkTubeGraphDeleteLabelGroupDialog::QmitkTubeGraphDeleteLabelGroupDialog(QWidg
   labelGroupListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
   layout->addWidget(labelGroupListWidget);
 
-  QHBoxLayout* buttonLayout = new QHBoxLayout();
+  auto   buttonLayout = new QHBoxLayout();
 
   deleteButton = new QPushButton("Delete", this);
   buttonLayout->addWidget(deleteButton);

@@ -117,17 +117,17 @@ public:
       delete m_Fixture;
   }
 
-  void runTest()
+  void runTest() override
   {
     (m_Fixture->*m_Test)();
   }
 
-  void setUp()
+  void setUp() override
   {
     m_Fixture->setUp();
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_Fixture->tearDown();
   }

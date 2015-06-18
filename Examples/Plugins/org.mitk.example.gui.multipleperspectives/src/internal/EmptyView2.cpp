@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string EmptyView2::VIEW_ID = "org.mitk.views.emptyview2";
 
-EmptyView2::EmptyView2() : m_Parent(0)
+EmptyView2::EmptyView2() : m_Parent(nullptr)
 {
 }
 

@@ -41,7 +41,7 @@ class MITKSCENESERIALIZATIONBASE_EXPORT BaseDataSerializer : public itk::Object
 {
   public:
 
-    mitkClassMacro( BaseDataSerializer, itk::Object );
+    mitkClassMacroItkParent( BaseDataSerializer, itk::Object );
 
     itkSetStringMacro(FilenameHint);
     itkGetStringMacro(FilenameHint);

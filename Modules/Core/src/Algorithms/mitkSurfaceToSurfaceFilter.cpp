@@ -48,7 +48,7 @@ void mitk::SurfaceToSurfaceFilter::SetInput( unsigned int idx, const mitk::Surfa
 const mitk::Surface* mitk::SurfaceToSurfaceFilter::GetInput()
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const mitk::Surface*>(this->ProcessObject::GetInput(0));
 }
@@ -57,14 +57,14 @@ const mitk::Surface* mitk::SurfaceToSurfaceFilter::GetInput()
 const mitk::Surface* mitk::SurfaceToSurfaceFilter::GetInput( unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
 
   return static_cast<const mitk::Surface*>(this->ProcessObject::GetInput(idx));
 }
 
 void mitk::SurfaceToSurfaceFilter::CreateOutputForInput(unsigned int idx)
 {
-  if (this->GetNumberOfIndexedInputs() < idx || this->GetInput(idx) == NULL)
+  if (this->GetNumberOfIndexedInputs() < idx || this->GetInput(idx) == nullptr)
   {
     mitkThrow() << "Error creating output for input [" <<idx<< "]. Input does not exists!";
   }
@@ -72,7 +72,7 @@ void mitk::SurfaceToSurfaceFilter::CreateOutputForInput(unsigned int idx)
   if (this->GetNumberOfIndexedOutputs() <= idx)
     this->SetNumberOfIndexedOutputs( idx+1 );
 
-  if (this->GetOutput(idx) == NULL)
+  if (this->GetOutput(idx) == nullptr)
   {
     DataObjectPointer newOutput = this->MakeOutput(idx);
     this->SetNthOutput(idx, newOutput);
@@ -86,7 +86,7 @@ void mitk::SurfaceToSurfaceFilter::CreateOutputsForAllInputs()
   this->SetNumberOfIndexedOutputs( this->GetNumberOfIndexedInputs() );
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);

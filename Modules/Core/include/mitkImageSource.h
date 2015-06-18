@@ -121,7 +121,7 @@ public:
    * SmartPointer to a DataObject. If a subclass of ImageSource has
    * multiple outputs of different types, then that class must provide
    * an implementation of MakeOutput(). */
-  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx );
+  virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
 
   /**
    * This is a default implementation to make sure we have something.
@@ -129,7 +129,7 @@ public:
    * MakeOutput(), then ProcessObject::MakeOutput() can be made pure
    * virtual.
    */
-  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name);
+  virtual itk::DataObject::Pointer MakeOutput(const DataObjectIdentifierType &name) override;
 
   virtual vtkImageData* GetVtkImageData();
   virtual const vtkImageData* GetVtkImageData() const;
@@ -155,7 +155,7 @@ protected:
    * instead.
    *
    * \sa ThreadedGenerateData() */
-  virtual void GenerateData();
+  virtual void GenerateData() override;
 
   /** @brief If an imaging filter can be implemented as a multithreaded
    * algorithm, the filter will provide an implementation of
@@ -193,7 +193,7 @@ protected:
    * from GenerateData()) will resize the container if more memory is
    * needed.  Otherwise, the memory can be reused.
    */
-  virtual void PrepareOutputs();
+  virtual void PrepareOutputs() override;
 
   /** @brief The GenerateData method normally allocates the buffers for all of the
    * outputs of a filter.

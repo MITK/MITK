@@ -300,9 +300,9 @@ ContourExtractor2DImageFilter<TInputImage>
     {
     // We need to connect these two contours. The act of connecting them will
     // add the needed arc.
-    ContourRef tail = newTail->second;
+    auto tail = newTail->second;
     itkAssertOrThrowMacro( (tail->front() == to), "End doesn't match Beginning" );
-    ContourRef head = newHead->second;
+    auto head = newHead->second;
     itkAssertOrThrowMacro( (head->back() == from), "Beginning doesn't match End");
     if (head == tail)
       {
@@ -379,7 +379,7 @@ ContourExtractor2DImageFilter<TInputImage>
     m_Contours.push_back(contour);
 
     // recall that end() is an iterator to one past the back!
-    ContourRef newContour = --m_Contours.end();
+    auto newContour = --m_Contours.end();
     // add the endpoints and an iterator pointing to the contour
     // in the list to the maps.
     m_ContourStarts.insert(VertexContourRefPair(from, newContour));
@@ -388,7 +388,7 @@ ContourExtractor2DImageFilter<TInputImage>
   else if (newTail != m_ContourStarts.end() && newHead == m_ContourEnds.end())
     {
     // Found a single contour to which the new arc should be prepended.
-    ContourRef tail = newTail->second;
+    auto tail = newTail->second;
     itkAssertOrThrowMacro( (tail->front() == to), "End doesn't match Beginning" );
     tail->push_front(from);
     // erase the old start of this contour
@@ -399,7 +399,7 @@ ContourExtractor2DImageFilter<TInputImage>
   else if (newTail == m_ContourStarts.end() && newHead != m_ContourEnds.end())
     {
     // Found a single contour to which the new arc should be appended.
-    ContourRef head = newHead->second;
+    auto head = newHead->second;
     itkAssertOrThrowMacro( (head->back() == from), "Beginning doesn't match End");
     head->push_back(to);
     // erase the old end of this contour
@@ -416,7 +416,7 @@ ContourExtractor2DImageFilter<TInputImage>
 {
   this->SetNumberOfIndexedOutputs(m_Contours.size());
   int i = 0;
-  for(ContourRef it = m_Contours.begin(); it != m_Contours.end(); it++, i++)
+  for(auto it = m_Contours.begin(); it != m_Contours.end(); it++, i++)
     {
     OutputPathPointer output = this->GetOutput(i);
     if (output.IsNull())

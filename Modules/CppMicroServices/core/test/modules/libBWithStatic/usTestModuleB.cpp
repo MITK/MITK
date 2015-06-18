@@ -45,12 +45,12 @@ public:
   TestModuleBActivator() : s(0) {}
   ~TestModuleBActivator() { delete s; }
 
-  void Load(ModuleContext* context)
+  void Load(ModuleContext* context) override
   {
     s = new TestModuleB(context);
   }
 
-  void Unload(ModuleContext*)
+  void Unload(ModuleContext*) override
   {
   }
 

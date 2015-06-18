@@ -42,15 +42,15 @@ namespace mitk
     /*!
     \brief Open file(s) for writing
     */
-    void Open();
+    void Open() override;
     /*!
     \brief Close file(s) add .pic header and write
     */
-    void Close();
+    void Close() override;
     /*!
     \brief Add new data to file.
     */
-    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0);
+    void Add(float* distanceFloatData, float* amplitudeFloatData, float* intensityFloatData, unsigned char* rgbData=0) override;
 
   protected:
 

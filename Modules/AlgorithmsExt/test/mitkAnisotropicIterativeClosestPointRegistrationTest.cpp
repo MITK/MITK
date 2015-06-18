@@ -60,7 +60,7 @@ public:
    * correct and new intialization of the used members for a new test case.
    * (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp()
+  void setUp() override
   {
     mitk::CovarianceMatrixCalculator::Pointer matrixCalculator
                                       = mitk::CovarianceMatrixCalculator::New();
@@ -85,7 +85,7 @@ public:
     m_FRENormalizationFactor = sqrt( meanVarX + meanVarY );
   }
 
-  void tearDown()
+  void tearDown() override
   {
     m_MovingSurface = NULL;
     m_FixedSurface = NULL;

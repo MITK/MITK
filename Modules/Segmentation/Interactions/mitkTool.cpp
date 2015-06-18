@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 #include "mitkProperties.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
 #include "mitkLabelSetImage.h"

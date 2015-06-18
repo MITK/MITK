@@ -127,6 +127,10 @@ namespace mitk
     this->SetVariance( other.GetVariance() );
     this->SetKurtosis( other.GetKurtosis() );
     this->SetSkewness( other.GetSkewness() );
+    this->SetUniformity( other.GetUniformity() );
+    this->SetEntropy( other.GetEntropy() );
+    this->SetUPP( other.GetUPP() );
+    this->SetMPP( other.GetMPP() );
     this->SetSigma( other.GetSigma() );
     this->SetRMS( other.GetRMS() );
     this->SetMaxIndex( other.GetMaxIndex() );
@@ -213,6 +217,10 @@ namespace mitk
 
     SetSkewness( 0.0 );
     SetKurtosis( 0.0 );
+    SetUniformity( 0.0 );
+    SetEntropy( 0.0 );
+    SetMPP( 0.0 );
+    SetUPP( 0.0 );
 
     vnl_vector<int> zero;
     zero.set_size(dimension);
@@ -277,6 +285,10 @@ namespace mitk
     this->SetHotspotIndex( other.GetHotspotIndex() );
     this->SetSkewness( other.GetSkewness() );
     this->SetKurtosis( other.GetKurtosis() );
+    this->SetUniformity( other.GetUniformity() );
+    this->SetEntropy( other.GetEntropy() );
+    this->SetUPP( other.GetUPP() );
+    this->SetMPP( other.GetMPP() );
 
 
     delete this->m_HotspotStatistics;
@@ -298,7 +310,6 @@ namespace mitk
     {
       m_Image = image;
       this->Modified();
-
       unsigned int numberOfTimeSteps = image->GetTimeSteps();
 
       // Initialize vectors to time-size of this image
@@ -1115,6 +1126,7 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     typedef itk::ExtendedStatisticsImageFilter< ImageType > StatisticsFilterType;
     typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
     statisticsFilter->SetInput( image );
+    statisticsFilter->SetBinSize( 100 );
 
     unsigned long observerTag = statisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
     statisticsFilter->Update();
@@ -1141,6 +1153,10 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     statistics.SetVariance(statisticsFilter->GetVariance());
     statistics.SetSkewness(statisticsFilter->GetSkewness());
     statistics.SetKurtosis(statisticsFilter->GetKurtosis());
+    statistics.SetUniformity( statisticsFilter->GetUniformity());
+    statistics.SetEntropy( statisticsFilter->GetEntropy());
+    statistics.SetUPP( statisticsFilter->GetUPP());
+    statistics.SetMPP( statisticsFilter->GetMPP());
     statistics.SetSigma(statisticsFilter->GetSigma());
     statistics.SetRMS(sqrt( statistics.GetMean() * statistics.GetMean() + statistics.GetSigma() * statistics.GetSigma() ));
 
@@ -1191,7 +1207,7 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
 
     statisticsContainer->push_back( statistics );
 
-  // calculate bin size or number of bins
+    histogramContainer->push_back( statisticsFilter->GetHistogram() );
   unsigned int numberOfBins = 200; // default number of bins
   if (m_UseDefaultBinSize)
   {
@@ -1201,17 +1217,6 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
   {
     numberOfBins = calcNumberOfBins(statistics.GetMin(), statistics.GetMax());
   }
-
-    // Calculate histogram
-    typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
-    histogramGenerator->SetInput( image );
-    histogramGenerator->SetMarginalScale( 100 );
-    histogramGenerator->SetNumberOfBins( statistics.GetMax() - statistics.GetMin() );
-    histogramGenerator->SetHistogramMin( statistics.GetMin() );
-    histogramGenerator->SetHistogramMax( statistics.GetMax() );
-    histogramGenerator->Compute();
-
-    histogramContainer->push_back( histogramGenerator->GetOutput() );
   }
 
   template < typename TPixel, unsigned int VImageDimension >
@@ -1382,9 +1387,9 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     //Find the min and max values for the Roi to set the range for the histogram
     GetMinAndMaxValue( minimum, maximum, counter, sig, image, maskImage);
     double diff = maximum - minimum;
-    if(maximum - minimum <= 1)
+    if(maximum - minimum <= 10)
     {
-      diff = 1;
+      diff = 100;
     }
   //}
 //     unsigned int numberOfBins = 200; // default number of bins
@@ -1401,7 +1406,7 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     labelStatisticsFilter->SetInput( adaptedImage );
     labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
     labelStatisticsFilter->UseHistogramsOn();
-    labelStatisticsFilter->SetHistogramParameters( diff, minimum, maximum);   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
+    labelStatisticsFilter->SetHistogramParameters( diff, floor(minimum), ceil(maximum) );   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
 
     // Add progress listening
     typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;
@@ -1436,19 +1441,10 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     labelStatisticsFilter->RemoveObserver( observerTag );
 
     // Find all relevant labels of mask (other than 0)
-    std::list< int > relevantLabels;
-    bool maskNonEmpty = false;
+    std::list< int > relevantLabels = labelStatisticsFilter->GetRelevantLabels();
     unsigned int i;
-    for ( i = 1; i < 4096; ++i )
-    {
-      if ( labelStatisticsFilter->HasLabel( i ) )
-      {
-        relevantLabels.push_back( i );
-        maskNonEmpty = true;
-      }
-    }
 
-    if ( maskNonEmpty )
+    if ( labelStatisticsFilter->GetMaskingNonEmpty() )
     {
       std::list< int >::iterator it;
       for ( it = relevantLabels.begin(), i = 0;
@@ -1456,6 +1452,7 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
         ++it, ++i )
       {
         Statistics statistics; // restore previous code
+        labelStatisticsFilter->GetHistogram(*it) ;
         histogramContainer->push_back( HistogramType::ConstPointer( labelStatisticsFilter->GetHistogram( (*it) ) ) );
 
         statistics.SetLabel (*it);
@@ -1468,6 +1465,10 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
         statistics.SetSigma(labelStatisticsFilter->GetSigma( *it ));
         statistics.SetSkewness(labelStatisticsFilter->GetSkewness( *it ));
         statistics.SetKurtosis(labelStatisticsFilter->GetKurtosis( *it ));
+        statistics.SetUniformity( labelStatisticsFilter->GetUniformity( *it ));
+        statistics.SetEntropy( labelStatisticsFilter->GetEntropy( *it ));
+        statistics.SetUPP( labelStatisticsFilter->GetUPP( *it));
+        statistics.SetMPP( labelStatisticsFilter->GetMPP( *it));
         statistics.SetRMS(sqrt( statistics.GetMean() * statistics.GetMean()
           + statistics.GetSigma() * statistics.GetSigma() ));
 

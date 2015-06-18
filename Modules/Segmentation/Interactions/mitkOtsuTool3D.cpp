@@ -184,7 +184,7 @@ template< typename TPixel, unsigned int VImageDimension>
 void mitk::OtsuTool3D::CalculatePreview(itk::Image< TPixel, VImageDimension>* itkImage, std::vector<int> regionIDs)
 {
   typedef itk::Image< TPixel, VImageDimension > InputImageType;
-  typedef itk::Image< unsigned char, VImageDimension > OutputImageType;
+  typedef itk::Image< mitk::Tool::DefaultSegmentationDataType, VImageDimension > OutputImageType;
 
   typedef itk::BinaryThresholdImageFilter< InputImageType, OutputImageType > FilterType;
 

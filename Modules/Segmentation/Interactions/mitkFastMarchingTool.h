@@ -69,7 +69,7 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
     /* typedefs for itk pipeline */
     typedef float                                     InternalPixelType;
     typedef itk::Image< InternalPixelType, 2 >        InternalImageType;
-    typedef unsigned char                             OutputPixelType;
+    typedef mitk::Tool::DefaultSegmentationDataType   OutputPixelType;
     typedef itk::Image< OutputPixelType, 2 >          OutputImageType;
 
     typedef itk::BinaryThresholdImageFilter< InternalImageType, OutputImageType >                       ThresholdingFilterType;

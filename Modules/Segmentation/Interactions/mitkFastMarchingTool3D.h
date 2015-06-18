@@ -66,7 +66,7 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool3D : public AutoSegmentationTool
     /* typedefs for itk pipeline */
     typedef float                                     InternalPixelType;
     typedef itk::Image< InternalPixelType, 3 >        InternalImageType;
-    typedef unsigned char                             OutputPixelType;
+    typedef mitk::Tool::DefaultSegmentationDataType   OutputPixelType;
     typedef itk::Image< OutputPixelType, 3 >          OutputImageType;
 
     typedef itk::BinaryThresholdImageFilter< InternalImageType, OutputImageType >                       ThresholdingFilterType;

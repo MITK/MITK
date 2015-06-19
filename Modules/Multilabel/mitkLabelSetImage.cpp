@@ -279,7 +279,7 @@ void mitk::LabelSetImage::RemoveLayer()
 unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
 {
   mitk::Image::Pointer newImage = mitk::Image::New();
-  newImage->Initialize(this);
+  newImage->Initialize( this->GetPixelType(), this->GetDimension(), this->GetDimensions(), this->GetImageDescriptor()->GetNumberOfChannels() );
 
   LabelSetImageType::Pointer itkImage;
   mitk::CastToItkImage(newImage, itkImage);

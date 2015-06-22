@@ -18,6 +18,10 @@ if(MITK_USE_HDF5)
   list(APPEND proj_DEPENDENCIES HDF5)
 endif()
 
+if(MITK_USE_VTK)
+  list(APPEND proj_DEPENDENCIES VTK)
+endif()
+
 set(ITK_DEPENDS ${proj})
 
 if(NOT DEFINED ITK_DIR)
@@ -51,6 +55,28 @@ if(NOT DEFINED ITK_DIR)
   if(CTEST_USE_LAUNCHERS)
     list(APPEND additional_cmake_args
       "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+    )
+  endif()
+
+  set(vcl_constexpr_patch)
+  if(GCC_VERSION VERSION_LESS 4.8 AND GCC_VERSION VERSION_GREATER 4)
+    set(vcl_constexpr_patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1-gcc-4.6.patch
+    )
+  endif()
+
+  # this will be in ITK 4.8, see https://issues.itk.org/jira/browse/ITK-3361
+  set(vcl_gcc5_patch)
+  if(GCC_VERSION VERSION_GREATER 4)
+    set(vcl_gcc5_patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1-gcc-5.patch
+    )
+  endif()
+
+  if(MITK_USE_VTK)
+    list(APPEND additional_cmake_args
+      -DModule_ITKVtkGlue:BOOL=ON
+      -DVTK_DIR:PATH=${VTK_DIR}
     )
   endif()
 

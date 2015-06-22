@@ -639,7 +639,6 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
     }
     break;
   }
-
   this->RequestRenderWindowUpdate();
 }
 

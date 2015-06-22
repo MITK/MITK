@@ -141,6 +141,7 @@ namespace mitk
     bool GetBoolProperty( mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue );
 
   private:
+
     /**
      * \brief Coordinate of the pointer at begin of an interaction
      */
@@ -231,6 +232,13 @@ namespace mitk
     * 3D view selection mode
     */
     bool m_SelectionMode;
+    /// <summary>
+    /// TODO: select world point on multiwidget
+    /// </summary>
+    /**
+    * \brief Coordinate of the picked pointer in the world
+    */
+    //double m_InitialPickedWorldPoint[4];
   };
 }
 #endif

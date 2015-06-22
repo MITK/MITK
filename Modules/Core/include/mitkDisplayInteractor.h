@@ -182,6 +182,11 @@ namespace mitk
     mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition, BaseRenderer* ren);
 
     /**
+     * \brief Coordinate of the pointer at begin of an interaction
+     */
+    mitk::Point2D m_StartDisplayCoordinate;
+
+    /**
      * \brief Coordinate of the pointer at begin of an interaction translated to mm unit
      */
     mitk::Point2D m_StartCoordinateInMM;
@@ -294,6 +299,13 @@ namespace mitk
     * 3D view selection mode
     */
     bool m_SelectionMode;
+    /// <summary>
+    /// TODO: select world point on multiwidget
+    /// </summary>
+    /**
+    * \brief Coordinate of the picked pointer in the world
+    */
+    //double m_InitialPickedWorldPoint[4];
   };
 }
 #endif

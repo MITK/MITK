@@ -28,6 +28,9 @@
 #include "mitkLevelWindowProperty.h"
 #include "mitkLevelWindow.h"
 #include "vtkRenderWindowInteractor.h"
+
+#include <vtkInteractorObserver.h>
+
 #include "mitkLine.h"
 
 // Rotation
@@ -132,8 +135,20 @@ bool mitk::DisplayInteractor::IsOverObject(const InteractionEvent* interactionEv
   Point3D currentPickedPoint;
 
   m_CurrentNode = interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint);
-  if (m_CurrentNode)
+  if (m_CurrentNode) {
+    /// <summary>
+    /// TODO: select world point on multiwidget
+    /// </summary>
+    /*
+    vtkInteractorObserver::ComputeDisplayToWorld(
+      interactionEvent->GetSender()->GetVtkRenderer(),
+      currentPickedDisplayPoint[0],
+      currentPickedDisplayPoint[1],
+      0.0,
+      m_InitialPickedWorldPoint);
+    */
     return true;
+  }
 
   return false;
 }
@@ -151,10 +166,6 @@ bool mitk::DisplayInteractor::SelectObject(StateMachineAction*, InteractionEvent
       float new_Color1 = (m_OldColor[1] + 0.2 < 1) ? m_OldColor[1] + 0.2 : m_OldColor[1];
       float new_Color2 = (m_OldColor[2] + 0.2 < 1) ? m_OldColor[2] + 0.2 : m_OldColor[2];
       m_SelectedNode->SetColor(new_Color0, new_Color1, new_Color2);
-      //std::cout
-      //  << "Selected object: "
-      //  << m_SelectedNode->GetName()
-      //  << std::endl;
       interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
       m_Selector = false;
     }
@@ -173,10 +184,6 @@ bool mitk::DisplayInteractor::DeSelectObject(StateMachineAction*, InteractionEve
   m_CurrentNode = interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint);
   if (m_CurrentNode != m_SelectedNode) {
     if (m_SelectedNode) {
-      //std::cout
-      //  << "DeSelected object: "
-      //  << m_SelectedNode->GetName()
-      //  << std::endl;
       m_SelectedNode->SetColor(m_OldColor[0], m_OldColor[1], m_OldColor[2]);
       interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
       m_Selector = true;

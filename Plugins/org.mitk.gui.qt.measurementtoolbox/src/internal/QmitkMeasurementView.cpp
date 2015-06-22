@@ -623,7 +623,6 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, co
 
     break;
   }
-
   this->RequestRenderWindowUpdate();
 }
 

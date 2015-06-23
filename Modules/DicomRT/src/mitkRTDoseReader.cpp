@@ -20,8 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 #include <itkImageIterator.h>
 #include <itkImageRegionIterator.h>
+#include <itkShiftScaleImageFilter.h>
+#include <itkCastImageFilter.h>
 
 #include <mitkRTConstants.h>
 
@@ -80,9 +83,10 @@ namespace mitk
     double prescripeDose = this->GetMaxDoseValue(dataset);
 
     originalNode->SetName("RT Dose");
-    originalNode->SetFloatProperty(mitk::Constants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
-    originalNode->SetFloatProperty(mitk::Constants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
-    originalNode->SetBoolProperty(mitk::Constants::DOSE_PROPERTY_NAME.c_str(),true);
+    originalNode->SetData(this->scaledDoseImage);
+    originalNode->SetFloatProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
+    originalNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
+    originalNode->SetBoolProperty(mitk::RTConstants::DOSE_PROPERTY_NAME.c_str(),true);
     return originalNode;
   }
 
@@ -91,13 +95,22 @@ namespace mitk
                                            VImageDimension>* image,
                                            Float32 gridscale)
   {
+    typedef itk::Image<Float32, VImageDimension> OutputImageType;
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    itk::ImageRegionIterator<InputImageType> it(image,
-                                                image->GetRequestedRegion());
-    for(it=it.Begin(); !it.IsAtEnd(); ++it)
-    {
-      it.Set(it.Get()*gridscale);
-    }
+
+    typedef itk::CastImageFilter<InputImageType, OutputImageType> CastFilterType;
+    typedef itk::ShiftScaleImageFilter<OutputImageType, OutputImageType> ScaleFilterType;
+    typename CastFilterType::Pointer castFilter = CastFilterType::New();
+    typename ScaleFilterType::Pointer scaleFilter = ScaleFilterType::New();
+
+    castFilter->SetInput(image);
+    scaleFilter->SetInput(castFilter->GetOutput());
+    scaleFilter->SetScale(gridscale);
+    scaleFilter->Update();
+    typename OutputImageType::Pointer scaledOutput = scaleFilter->GetOutput();
+    this->scaledDoseImage = mitk::Image::New();
+
+    mitk::CastToMitkImage(scaledOutput, this->scaledDoseImage);
   }
 
   double RTDoseReader::GetMaxDoseValue(DcmDataset* dataSet)

@@ -1,0 +1,5 @@
+set(Plugin-Name "RTDoseVisualization")
+set(Plugin-Version "0.1")
+set(Plugin-Vendor "DKFZ, Software development for Integrated Diagnostic and Therapy")
+set(Plugin-ContactAddress "sbr@dkfz-heidelber.de")
+set(Require-Plugin org.mitk.gui.qt.common org.commontk.eventadmin)

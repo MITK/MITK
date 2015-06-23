@@ -180,21 +180,17 @@ public:
     konvertiert wird und die erste Matrix des Datenmatrixpaares die Trainingsmatrix ist
     und die zweite Matrix des Paares die Testmatrix ist. */
     std::pair<MatrixDoubleType,MatrixDoubleType> matrixDouble;
-    matrixDouble = convertCSVToMatrix<double>("C:/Users/tschlats/Desktop/FeaturematrixMatlab.txt",';',0.5,true);
+    matrixDouble = convertCSVToMatrix<double>(GetTestDataFilePath("Classification/FeaturematrixMatlab.csv"),';',0.5,true);
     m_TrainingMatrixX = matrixDouble.first;
     m_TestXPredict = matrixDouble.second;
 
     /* Analog zur Featurematrix; Deklaraton des Labelmatrixdatensatzes. */
+
     std::pair<MatrixIntType,MatrixIntType> matrixInt;
-    matrixInt = convertCSVToMatrix<int>("C:/Users/tschlats/Desktop/LabelmatrixMatlab.csv",';',0.5,false);
+    matrixInt = convertCSVToMatrix<int>(GetTestDataFilePath("Classification/LabelmatrixMatlab.csv"),';',0.5,false);
     m_TrainingLabelMatrixY = matrixInt.first;
     m_TestYPredict = matrixInt.second;
     classifier = mitk::VigraRandomForestClassifier::New();
-
-    /* Ließt eine CSV-Quelldatei ein, und schreibt diese zeichenformatiert in eine Zieldatei. */
-    MatrixDoubleType matrixD;
-    matrixD = readCsvData<double>("C:/Users/tschlats/Desktop/DataSet.csv",';');
-    writeMatrixToCsv(matrixD,"C:/Users/tschlats/Desktop/ConvertedDataSet.csv");
 
     /* Trainiert den Classifier, indem Trainingsdaten der Labels und Features übergeben werden.
     Als Ergebnis erhalten wir einen Spaltenvektor, der Labels*/

@@ -65,23 +65,23 @@ ctkXnatSubject* QmitkXnatSubjectWidget::GetSubject() const
     }
     if (!m_Controls.birthdateLineEdit->text().isEmpty())
     {
-      m_Subject->setProperty("label", m_Controls.birthdateLineEdit->text());
+      m_Subject->setProperty("dob", m_Controls.birthdateLineEdit->text());
     }
     if (!m_Controls.genderLineEdit->text().isEmpty())
     {
-      m_Subject->setProperty("label", m_Controls.genderLineEdit->text());
+      m_Subject->setProperty("gender", m_Controls.genderLineEdit->text());
     }
     if (!m_Controls.handednessLineEdit->text().isEmpty())
     {
-      m_Subject->setProperty("label", m_Controls.handednessLineEdit->text());
+      m_Subject->setProperty("handedness", m_Controls.handednessLineEdit->text());
     }
     if (!m_Controls.heightLineEdit->text().isEmpty())
     {
-      m_Subject->setProperty("label", m_Controls.heightLineEdit->text());
+      m_Subject->setProperty("height", m_Controls.heightLineEdit->text());
     }
     if (!m_Controls.weightLineEdit->text().isEmpty())
     {
-      m_Subject->setProperty("label", m_Controls.weightLineEdit->text());
+      m_Subject->setProperty("weight", m_Controls.weightLineEdit->text());
     }
   }
 

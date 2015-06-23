@@ -145,6 +145,14 @@ void QmitkXnatCreateObjectDialog::OnAcceptClicked()
       msgBox.exec();
       return;
     }
+    else if (experiment->property("xsiType").isEmpty())
+    {
+      QMessageBox msgBox;
+      msgBox.setIcon(QMessageBox::Warning);
+      msgBox.setText("Please fill in an XSI Type to create a new experiment!");
+      msgBox.exec();
+      return;
+    }
 
     m_Object = experiment;
     break;

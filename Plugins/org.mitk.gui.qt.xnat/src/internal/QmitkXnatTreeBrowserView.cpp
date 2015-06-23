@@ -486,7 +486,6 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(variant.value<ctkXnatObject*>());
       ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(dialog->GetXnatObject());
       subject->setParent(project);
-      subject->setId(subject->label());
       subject->save();
 
       // Get xnat session from micro service
@@ -512,9 +511,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
       ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(variant.value<ctkXnatObject*>());
       ctkXnatExperiment* experiment = dynamic_cast<ctkXnatExperiment*>(dialog->GetXnatObject());
       experiment->setParent(subject);
-      experiment->setId(experiment->label());
-      experiment->setProperty("project", QString(subject->parent()->property("ID")));
-      experiment->setProperty("xsiType", QString("xnat:crSessionData"));
+      experiment->setProperty("xsiType", experiment->imageModality());
       experiment->save();
 
       // Get xnat session from micro service

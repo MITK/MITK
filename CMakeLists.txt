@@ -365,6 +365,18 @@ if(MITK_USE_SOFA)
 endif()
 
 if(MITK_USE_Python)
+
+  # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
+  if(MITK_USE_Qt5)
+    set(minimum_required_python_qt5_version 5.3.0)
+    find_package(Qt5 ${minimum_required_python_qt5_version} COMPONENTS Core REQUIRED)
+  endif()
+
+  # sanity check build type. Only release is supported
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(FATAL_ERROR "Building MITK Python in debug mode is not supported!")
+  endif()
+
   set(MITK_USE_ZLIB ON)
   if(NOT MITK_USE_Numpy)
     message("> Forcing MITK_USE_Numpy to ON because of MITK_USE_Python")

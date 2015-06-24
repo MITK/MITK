@@ -830,6 +830,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
                   }
                   this->SetToolManagerSelection(NULL, selectedNode);
                }
+               mitk::RenderingManager::GetInstance()->InitializeViews(selectedNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
             }
             else
             {
@@ -845,7 +846,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
             }
          }
       }
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
        if ( m_Controls->lblSegmentationWarnings->isVisible()) // "RenderingManagerReinitialized()" caused a warning. we do not need to go any further
         return;
       RenderingManagerReinitialized();

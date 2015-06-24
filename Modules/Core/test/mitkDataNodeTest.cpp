@@ -91,6 +91,9 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   baseData = mitk::Surface::New();
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a Surface object was set correctly" )
+
+  dataNode->SetData(nullptr);
+  MITK_TEST_CONDITION( nullptr == dataNode->GetData(), "Testing if base data (already set) was replaced by a NULL pointer" )
 }
 static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
 {

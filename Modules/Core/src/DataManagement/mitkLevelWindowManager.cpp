@@ -440,34 +440,19 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
     if ((it->Value().IsNull()) || (it->Value() == m_NodeMarkedToDelete))
       {continue;}
 
+
     /* register listener for changes in visible property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command->SetCallbackFunction(this, &LevelWindowManager::Update);
     unsigned long idx = it->Value()->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command );
     m_PropObserverToNode[PropDataPair(idx, it->Value())] = it->Value()->GetProperty("visible");
-  }
 
-  /* add observers for all layer properties*/
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
-       it != all->End();
-       ++it)
-  {
-    if ((it->Value().IsNull()) || (it->Value() == m_NodeMarkedToDelete))
-      {continue;}
     /* register listener for changes in layer property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command2 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command2->SetCallbackFunction(this, &LevelWindowManager::Update);
-    unsigned long idx = it->Value()->GetProperty("layer")->AddObserver( itk::ModifiedEvent(), command2 );
+    idx = it->Value()->GetProperty("layer")->AddObserver( itk::ModifiedEvent(), command2 );
     m_PropObserverToNode2[PropDataPair(idx, it->Value())] = it->Value()->GetProperty("layer");
-  }
 
-  /* add observers for all Image rendering.mode properties*/
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
-       it != all->End();
-       ++it)
-  {
-    if ((it->Value().IsNull()) || (it->Value() == m_NodeMarkedToDelete))
-      {continue;}
     /* register listener for changes in layer property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command3 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command3->SetCallbackFunction(this, &LevelWindowManager::Update);
@@ -477,6 +462,8 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
       unsigned long idx = imageRenderingMode->AddObserver( itk::ModifiedEvent(), command3 );
       m_PropObserverToNode3[PropDataPair(idx, it->Value())] = imageRenderingMode.GetPointer();
     }
+
+
   }
 
 }

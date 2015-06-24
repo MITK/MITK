@@ -32,7 +32,7 @@ TrackingForestHandler< NumberOfSignalFeatures >::TrackingForestHandler()
     , m_MaxTreeDepth(50)
     , m_SampleFraction(1.0)
 {
-
+    m_Forest.reset();
 }
 
 template< int NumberOfSignalFeatures >
@@ -138,6 +138,14 @@ void TrackingForestHandler< NumberOfSignalFeatures >::InputDataValidForTraining(
         mitkThrow() << "No tractograms set!";
     if (m_RawData.size()!=m_Tractograms.size())
         mitkThrow() << "Unequal number of diffusion-weighted images and tractograms detected!";
+}
+
+template< int NumberOfSignalFeatures >
+bool TrackingForestHandler< NumberOfSignalFeatures >::IsForestValid()
+{
+    if(m_Forest.tree_count()>0 && m_Forest.feature_count()==(NumberOfSignalFeatures+3))
+        return true;
+    return false;
 }
 
 template< int NumberOfSignalFeatures >
@@ -435,7 +443,10 @@ template< int NumberOfSignalFeatures >
 void TrackingForestHandler< NumberOfSignalFeatures >::SaveForest(std::string forestFile)
 {
     MITK_INFO << "Saving forest to " << forestFile;
-    vigra::rf_export_HDF5( m_Forest, forestFile, "" );
+    if (IsForestValid())
+        vigra::rf_export_HDF5( m_Forest, forestFile, "" );
+    else
+        MITK_INFO << "Forest invalid! Could not be saved.";
 }
 
 template< int NumberOfSignalFeatures >

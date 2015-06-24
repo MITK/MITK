@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkEnumerationProperty.h>
 #include <mitkPointSetShapeProperty.h>
 #include <mitkPointSet.h>
+#include <mitkNodePredicateIsDWI.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -88,12 +89,9 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_TrackingStopImageBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_TrackingRawImageBox->SetDataStorage(this->GetDataStorage());
 
+        mitk::NodePredicateIsDWI::Pointer isDiffusionImage = mitk::NodePredicateIsDWI::New();
+
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
-        mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-        mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
-        mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
-        mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
-        isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
         mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
         mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
         mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
@@ -101,7 +99,27 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_TrackingMaskImageBox->SetPredicate(finalPredicate);
         m_Controls->m_TrackingSeedImageBox->SetPredicate(finalPredicate);
         m_Controls->m_TrackingStopImageBox->SetPredicate(finalPredicate);
-        m_Controls->m_TrackingRawImageBox->SetPredicate(isMitkImage);
+        m_Controls->m_TrackingRawImageBox->SetPredicate(isDiffusionImage);
+
+        m_Controls->m_TrackingMaskImageBox->SetZeroEntryText("--");
+        m_Controls->m_TrackingSeedImageBox->SetZeroEntryText("--");
+        m_Controls->m_TrackingStopImageBox->SetZeroEntryText("--");
+
+        UpdateGui();
+    }
+}
+
+void QmitkMLBTView::UpdateGui()
+{
+    if (m_ForestHandler.IsForestValid())
+    {
+        m_Controls->statusLabel->setText("Random forest available");
+        m_Controls->m_SaveForestButton->setEnabled(true);
+    }
+    else
+    {
+        m_Controls->statusLabel->setText("Please load or train random forest!");
+        m_Controls->m_SaveForestButton->setEnabled(false);
     }
 }
 
@@ -162,6 +180,7 @@ void QmitkMLBTView::LoadForest()
         return;
 
     m_ForestHandler.LoadForest( filename.toStdString() );
+    UpdateGui();
 }
 
 void QmitkMLBTView::StartTrackingThread()
@@ -223,7 +242,7 @@ void QmitkMLBTView::OnTrackingThreadStop()
 
 void QmitkMLBTView::StartTracking()
 {
-    if ( m_Controls->m_TrackingRawImageBox->GetSelectedNode().IsNull() )
+    if ( m_Controls->m_TrackingRawImageBox->GetSelectedNode().IsNull() || !m_ForestHandler.IsForestValid())
         return;
 
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
@@ -235,21 +254,21 @@ void QmitkMLBTView::StartTracking()
     tracker->SetDemoMode(m_Controls->m_DemoModeBox->isChecked());
     if (m_Controls->m_DemoModeBox->isChecked())
         tracker->SetNumberOfThreads(1);
-    if (m_Controls->m_TrackingUseMaskImageBox->isChecked() && m_Controls->m_TrackingMaskImageBox->GetSelectedNode().IsNotNull())
+    if (m_Controls->m_TrackingMaskImageBox->GetSelectedNode().IsNotNull())
     {
         mitk::Image::Pointer mask = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingMaskImageBox->GetSelectedNode()->GetData());
         ItkUcharImgType::Pointer itkMask = ItkUcharImgType::New();
         mitk::CastToItkImage(mask, itkMask);
         tracker->SetMaskImage(itkMask);
     }
-    if (m_Controls->m_TrackingUseSeedImageBox->isChecked() && m_Controls->m_TrackingSeedImageBox->GetSelectedNode().IsNotNull())
+    if (m_Controls->m_TrackingSeedImageBox->GetSelectedNode().IsNotNull())
     {
         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingSeedImageBox->GetSelectedNode()->GetData());
         ItkUcharImgType::Pointer itkImg = ItkUcharImgType::New();
         mitk::CastToItkImage(img, itkImg);
         tracker->SetSeedImage(itkImg);
     }
-    if (m_Controls->m_TrackingUseStopImageBox->isChecked() && m_Controls->m_TrackingStopImageBox->GetSelectedNode().IsNotNull())
+    if (m_Controls->m_TrackingStopImageBox->GetSelectedNode().IsNotNull())
     {
         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingStopImageBox->GetSelectedNode()->GetData());
         ItkUcharImgType::Pointer itkImg = ItkUcharImgType::New();
@@ -284,6 +303,11 @@ void QmitkMLBTView::StartTracking()
 
 void QmitkMLBTView::SaveForest()
 {
+    if (!m_ForestHandler.IsForestValid())
+    {
+        UpdateGui();
+        return;
+    }
     QString filename = QFileDialog::getSaveFileName(0, tr("Save Forest"), QDir::currentPath()+"/forest.rf", tr("HDF5 random forest file (*.rf)") );
 
     if(filename.isEmpty() || filename.isNull())
@@ -308,6 +332,7 @@ void QmitkMLBTView::OnTrainingThreadStop()
     m_Controls->m_StartTrainingButton->setEnabled(true);
     m_Controls->m_SaveForestButton->setEnabled(true);
     m_Controls->m_LoadForestButton->setEnabled(true);
+    UpdateGui();
 }
 
 void QmitkMLBTView::StartTraining()

@@ -58,6 +58,16 @@
   <keyword label="dti" id="org.mitk.views.stochasticfibertracking.Keyword"/>
   <keyword label="diffusion" id="org.mitk.views.stochasticfibertracking.Keyword"/>
 
+  <keyword label="tractography" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="tracking" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="fiber" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="machine" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="learning" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="streamline" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="tensor" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="dwi" id="org.mitk.views.mlbtview.Keyword"/>
+  <keyword label="diffusion" id="org.mitk.views.mlbtview.Keyword"/>
+
   <keyword label="diffusion" id="org.mitk.views.fiberfoxview.Keyword"/>
   <keyword label="signal" id="org.mitk.views.fiberfoxview.Keyword"/>
   <keyword label="simulation" id="org.mitk.views.fiberfoxview.Keyword"/>
@@ -81,6 +91,7 @@
   <keyword label="ghost" id="org.mitk.views.fiberfoxview.Keyword"/>
   <keyword label="fieldmap" id="org.mitk.views.fiberfoxview.Keyword"/>
   <keyword label="generator" id="org.mitk.views.fiberfoxview.Keyword"/>
+  <keyword label="fourier" id="org.mitk.views.fiberfoxview.Keyword"/>
 
   <keyword label="GFA" id="org.mitk.views.diffusionquantification.Keyword"/>
   <keyword label="RA" id="org.mitk.views.diffusionquantification.Keyword"/>
@@ -371,6 +382,7 @@
     category="Fiber tractography"
     class="QmitkMLBTView"
     icon="resources/fiberTracking1.png">
+    <keywordReference id="org.mitk.views.mlbtview.Keyword"/>
     </view>
   </extension>
 
@@ -407,6 +419,14 @@
     class="QmitkProbabilisticTractographyPerspective"
     icon="resources/tractography.png">
     <keywordReference id="org.mitk.perspectives.tractography3.Keyword"/>
+    </perspective>
+
+    <perspective id="org.mitk.perspectives.tractography4"
+    name="Machine-learning based tractography"
+    category="Fiber Tractography"
+    class="QmitkMachineLearningTractographyPerspective"
+    icon="resources/tractography.png">
+    <keywordReference id="org.mitk.perspectives.tractography4.Keyword"/>
     </perspective>
 
     <perspective id="org.mitk.perspectives.syntheticdata"

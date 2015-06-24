@@ -77,6 +77,7 @@ protected:
 
   void StartTracking();
   void StartTraining();
+  void UpdateGui();
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;

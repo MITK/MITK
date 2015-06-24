@@ -75,6 +75,7 @@ public:
     void SetGrayMatterSamplesPerVoxel(int samples){ m_GrayMatterSamplesPerVoxel = samples; }
     void SetSampleFraction(double fraction){ m_SampleFraction = fraction; }
     vigra::RandomForest<int> GetForest(){ return m_Forest; }
+    bool IsForestValid();
 
 protected:
 

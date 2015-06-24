@@ -424,6 +424,17 @@ for( ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin();
     (*iter).second = 0;
   }
   m_PropObserverToNode3.clear();
+
+  for( ObserverToPropertyMap::iterator iter = m_PropObserverToNode4.begin();
+       iter != m_PropObserverToNode4.end();
+       ++iter )
+  {
+    (*iter).second->RemoveObserver((*iter).first.first);
+    (*iter).second = 0;
+  }
+  m_PropObserverToNode4.clear();
+
+
 }
 
 void mitk::LevelWindowManager::CreatePropObserverLists()
@@ -463,6 +474,14 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
       m_PropObserverToNode3[PropDataPair(idx, it->Value())] = imageRenderingMode.GetPointer();
     }
 
+    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command4 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    command4->SetCallbackFunction(this, &LevelWindowManager::Update);
+    mitk::BaseProperty::Pointer displayedImageComponent = it->Value()->GetProperty("Image.Displayed Component");
+    if( displayedImageComponent.IsNotNull() )
+    {
+      unsigned long idx = displayedImageComponent->AddObserver( itk::ModifiedEvent(), command4 );
+      m_PropObserverToNode4[PropDataPair(idx, it->Value())] = displayedImageComponent.GetPointer();
+    }
 
   }
 

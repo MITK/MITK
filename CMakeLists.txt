@@ -1408,7 +1408,10 @@ endif()
 #------------------------------------------------------------------------------
 # Copy file font.
 #------------------------------------------------------------------------------
-file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/Fonts)
+file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/Debug/Fonts)
+file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/Release/Fonts)
+file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/RelWithDebInfo/Fonts)
+file(COPY Fonts/DejaVuSans.ttf DESTINATION ${PROJECT_BINARY_DIR}/bin/MinSizeRel/Fonts)
 
 #-----------------------------------------------------------------------------
 # Print configuration summary

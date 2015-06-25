@@ -138,127 +138,6 @@ unsigned int mitk::LabelSetImage::GetNumberOfLayers() const
   return m_LabelSetContainer.size();
 }
 
-mitk::LabelSetImage::VectorImageType::Pointer mitk::LabelSetImage::GetVectorImage(bool forceUpdate) const
-{
-  try
-  {
-    if (forceUpdate)
-    {
-      AccessByItk_1(this, ImageToLayerContainerProcessing, GetActiveLayer());
-    }
-
-    LabelSetImageType::Pointer itkImage;
-    mitk::CastToItkImage(this,itkImage);
-
-    VectorImageType::Pointer newVectorImage = VectorImageType::New();
-    newVectorImage->SetSpacing( itkImage->GetSpacing() );
-    newVectorImage->SetOrigin( itkImage->GetOrigin() );
-    newVectorImage->SetDirection( itkImage->GetDirection() );
-    newVectorImage->SetRegions( itkImage->GetLargestPossibleRegion());
-    newVectorImage->SetNumberOfComponentsPerPixel( m_LayerContainer.size() );
-    newVectorImage->Allocate();
-
-    itkImage = nullptr;
-
-    // fill inside
-    VariableVectorType defaultValue;
-    defaultValue.SetSize( m_LayerContainer.size());
-    defaultValue.Fill(0);
-    newVectorImage->FillBuffer(defaultValue);
-
-    ImageAdaptorType::Pointer targetAdaptor = ImageAdaptorType::New();
-    targetAdaptor->SetImage( newVectorImage );
-
-    // transfer layers to a vector image.
-    for (unsigned int lidx = 0; lidx < m_LayerContainer.size(); ++lidx)
-    {
-      MITK_INFO << lidx ;
-      LabelSetImageType::Pointer itkImageLayer;
-      mitk::CastToItkImage(m_LayerContainer[lidx],itkImageLayer);
-
-      targetAdaptor->SetExtractComponentIndex(lidx);
-      targetAdaptor->Update();
-
-      typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
-      typedef itk::ImageRegionIterator< ImageAdaptorType >       TargetIteratorType;
-
-      SourceIteratorType sourceIter( itkImageLayer, itkImageLayer->GetLargestPossibleRegion() );
-      sourceIter.GoToBegin();
-
-      TargetIteratorType targetIter( targetAdaptor, targetAdaptor->GetLargestPossibleRegion() );
-      targetIter.GoToBegin();
-
-      while(!sourceIter.IsAtEnd())
-      {
-        targetIter.Set( sourceIter.Get() );
-        ++sourceIter;
-        ++targetIter;
-      }
-    }
-    return newVectorImage;
-  }
-  catch(itk::ExceptionObject& e)
-  {
-    mitkThrow() << e.GetDescription();
-    return nullptr;
-  }
-}
-
-void mitk::LabelSetImage::SetVectorImage(VectorImageType::Pointer vectorImage )
-{
-  try
-  {
-    int numberOfLayers = vectorImage->GetNumberOfComponentsPerPixel();
-
-    MITK_INFO << numberOfLayers;
-
-    ImageAdaptorType::Pointer vectorAdaptor = ImageAdaptorType::New();
-    vectorAdaptor->SetImage( vectorImage );
-
-    for (int lidx = 0; lidx < numberOfLayers; ++lidx)
-    {
-      LabelSetImageType::Pointer auxImg = LabelSetImageType::New();
-      auxImg->SetSpacing( vectorImage->GetSpacing() );
-      auxImg->SetOrigin( vectorImage->GetOrigin() );
-      auxImg->SetDirection( vectorImage->GetDirection() );
-      auxImg->SetRegions( vectorImage->GetLargestPossibleRegion() );
-      auxImg->Allocate();
-
-      vectorAdaptor->SetExtractComponentIndex(lidx);
-
-      typedef itk::ImageRegionConstIterator< ImageAdaptorType > SourceIteratorType;
-      typedef itk::ImageRegionIterator< LabelSetImageType >     TargetIteratorType;
-
-      SourceIteratorType sourceIter( vectorAdaptor, vectorAdaptor->GetLargestPossibleRegion() );
-      sourceIter.GoToBegin();
-
-      TargetIteratorType targetIter( auxImg, auxImg->GetLargestPossibleRegion() );
-      targetIter.GoToBegin();
-
-      while(!sourceIter.IsAtEnd())
-      {
-        targetIter.Set( sourceIter.Get() );
-        ++sourceIter;
-        ++targetIter;
-      }
-
-      mitk::Image::Pointer newLayerImage = mitk::Image::New();
-      newLayerImage->Initialize(this);
-      newLayerImage->SetVolume(auxImg->GetBufferPointer());
-      m_LayerContainer[lidx] = newLayerImage;
-      AccessByItk_1(this, LayerContainerToImageProcessing, lidx);
-    }
-    // reset active layer
-    SetActiveLayer(0);
-
-  }
-  catch(itk::ExceptionObject& e)
-  {
-    mitkThrow() << e.GetDescription();
-  }
-  this->Modified();
-}
-
 void mitk::LabelSetImage::RemoveLayer()
 {
 
@@ -266,7 +145,7 @@ void mitk::LabelSetImage::RemoveLayer()
   // remove all observers from active label set
   GetLabelSet(layerToDelete)->RemoveAllObservers();
 
-  // set the active layer to one belo, if exists.
+  // set the active layer to one below, if exists.
   SetActiveLayer(layerToDelete-1);
 
   // remove labelset and image data
@@ -285,7 +164,15 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
   mitk::CastToItkImage(newImage, itkImage);
   itkImage->FillBuffer(0);
 
-  // get upcoming new labelset id
+  unsigned int newLabelSetId = this->AddLayer(newImage, lset);
+
+  //  important to release the itk image
+  itkImage = nullptr;
+  return newLabelSetId;
+}
+
+unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer lset)
+{
   unsigned int newLabelSetId = m_LayerContainer.size();
 
   // Add labelset to layer
@@ -306,18 +193,15 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
   //mitk::Label::Pointer exteriorLabel = CreateExteriorLabel();
 
   // push a new working image for the new layer
-  m_LayerContainer.push_back(newImage);
+  m_LayerContainer.push_back(layerImage);
 
   // push a new labelset for the new layer
   m_LabelSetContainer.push_back(ls);
 
   // add modified event listener to LabelSet (listen to LabelSet changes)
   itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
-  command->SetCallbackFunction(this,&mitk::LabelSetImage::OnLabelSetModified);
+  command->SetCallbackFunction(this, &mitk::LabelSetImage::OnLabelSetModified);
   ls->AddObserver(itk::ModifiedEvent(), command);
-
-  //  important to release the itk image
-  itkImage = nullptr;
 
   SetActiveLayer(newLabelSetId);
   //MITK_INFO << GetActiveLayer();

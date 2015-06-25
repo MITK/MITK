@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 #include <itkVectorImage.h>
-#include <itkVectorImageToImageAdaptor.h>
 
 
 namespace mitk
@@ -49,8 +48,6 @@ public:
 
   typedef itk::Image< PixelType, 3 >                     LabelSetImageType;
   typedef itk::VariableLengthVector< PixelType >         VariableVectorType;
-  typedef itk::VectorImage< PixelType, 3 >               VectorImageType;
-  typedef itk::VectorImageToImageAdaptor< PixelType, 3 > ImageAdaptorType;
 
   /**
   * \brief BeforeChangeLayerEvent (e.g. used for GUI integration)
@@ -221,19 +218,19 @@ public:
   unsigned int GetNumberOfLayers() const;
 
   /**
-    * \brief  */
-  VectorImageType::Pointer GetVectorImage(bool forceUpdate) const;
-
-  /**
-    * \brief  */
-  void SetVectorImage(VectorImageType::Pointer image );
-
-  /**
    * @brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one
    * @param layer a mitk::LabelSet which will be set as new layer.
    * @return the layer ID of the new layer
    */
   unsigned int AddLayer(mitk::LabelSet::Pointer layer =nullptr);
+
+  /**
+  * \brief Add a layer based on a provided mitk::Image
+  * \param layerImage is added to the vector of label images
+  * \param lset a label set that will be added to the new layer if provided
+  *\return the layer ID of the new layer
+  */
+  unsigned int AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer lset = nullptr);
 
   /**
    * @brief Removes the active layer and the respective mitk::LabelSet and image information.

@@ -364,13 +364,18 @@ if(MITK_USE_SOFA)
   set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
 endif()
 
-if(MITK_USE_Python AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-  # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
-  if(MITK_USE_Qt5)
-    set(minimum_required_python_qt5_version 5.3.0)
-    find_package(Qt5 ${minimum_required_python_qt5_version} COMPONENTS Core REQUIRED)
-  endif()
+# sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
+if(MITK_USE_Qt5 AND MITK_USE_Python)
+  set(minimum_required_python_qt5_version "5.3.0")
+  find_package(Qt5 COMPONENTS Core REQUIRED)
 
+  if(${Qt5Core_VERSION_STRING} VERSION_LESS ${minimum_required_python_qt5_version})
+    message(WARNING "Can't build MITK Python with Qt version < ${minimum_required_python_qt5_version}. Disabling Python support")
+    set(MITK_USE_Python OFF CACHE BOOL "Use python wrapping in MITK" FORCE)
+  endif()
+endif()
+
+if(MITK_USE_Python AND NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
   set(MITK_USE_ZLIB ON)
   if(NOT MITK_USE_Numpy)
     message("> Forcing MITK_USE_Numpy to ON because of MITK_USE_Python")

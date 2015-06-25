@@ -67,16 +67,19 @@ void mitk::DataNode::SetData(mitk::BaseData* baseData)
     m_Mappers.clear();
     m_Mappers.resize(10);
 
-    // Do previous and new data have same type? Keep properties.
-    if(m_Data.IsNotNull() && baseData != nullptr && (0 == strcmp(m_Data->GetNameOfClass(), baseData->GetNameOfClass())))
+    if(m_Data.IsNotNull() && baseData != nullptr)
     {
-      m_Data = baseData;
-    }
-    else if(m_Data.IsNotNull() && baseData != nullptr && (0 != strcmp(m_Data->GetNameOfClass(), baseData->GetNameOfClass())))
-    {
-      m_Data = baseData;
-      this->GetPropertyList()->Clear();
-      mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
+      // Do previous and new data have same type? Keep existing properties.
+      if (0 == strcmp(m_Data->GetNameOfClass(), baseData->GetNameOfClass()))
+      {
+        m_Data = baseData;
+      }
+      else
+      {
+        m_Data = baseData;
+        this->GetPropertyList()->Clear();
+        mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
+      }
     }
     else
     {

@@ -70,7 +70,7 @@ protected:
   void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, double lower, double upper);
 
   template <typename TPixel, unsigned int VImageDimension>
-  void ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage,  mitk::BaseGeometry* geo);
+  void ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage);
 
 private:
 

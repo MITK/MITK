@@ -840,70 +840,56 @@ void::QmitkSlicesInterpolator::RunPlaneSuggestion()
   m_EdgeDetector->SetInput(dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData()));
   m_EdgeDetector->Update();
 
-  mitk::Image::Pointer test = mitk::Image::New();
-  test = m_EdgeDetector->GetTestImage();
-  mitk::DataNode::Pointer testNode = mitk::DataNode::New();
-  testNode->SetData(test);
-  testNode->SetName("BestNodeEver!");
-  this->GetDataStorage()->Add(testNode);
+  mitk::UnstructuredGrid::Pointer uGrid = mitk::UnstructuredGrid::New();
+  uGrid->SetVtkUnstructuredGrid(m_EdgeDetector->GetOutput()->GetVtkUnstructuredGrid());
 
-  mitk::Image::Pointer ab = mitk::Image::New();
-  ab = m_EdgeDetector->GetthresholdImage();
-  mitk::DataNode::Pointer x = mitk::DataNode::New();
-  x->SetData(ab);
-  x->SetName("ThresholdNode!");
-  this->GetDataStorage()->Add(x);
+  mitk::ProgressBar::GetInstance()->Progress();
 
-//  mitk::UnstructuredGrid::Pointer uGrid = mitk::UnstructuredGrid::New();
-//  uGrid->SetVtkUnstructuredGrid(m_EdgeDetector->GetOutput()->GetVtkUnstructuredGrid());
+  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData());
 
-//  mitk::ProgressBar::GetInstance()->Progress();
+  vtkSmartPointer< vtkPolyData > vtkpoly = surface->GetVtkPolyData();
+  vtkSmartPointer< vtkPoints> vtkpoints = vtkpoly->GetPoints();
 
-//  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData());
+  vtkSmartPointer<vtkUnstructuredGrid> vGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+  vtkSmartPointer<vtkPolyVertex> verts = vtkSmartPointer<vtkPolyVertex>::New();
 
-//  vtkSmartPointer< vtkPolyData > vtkpoly = surface->GetVtkPolyData();
-//  vtkSmartPointer< vtkPoints> vtkpoints = vtkpoly->GetPoints();
+  verts->GetPointIds()->SetNumberOfIds(vtkpoints->GetNumberOfPoints());
+  for(int i=0; i<vtkpoints->GetNumberOfPoints(); i++)
+  {
+    verts->GetPointIds()->SetId(i,i);
+  }
 
-//  vtkSmartPointer<vtkUnstructuredGrid> vGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-//  vtkSmartPointer<vtkPolyVertex> verts = vtkSmartPointer<vtkPolyVertex>::New();
+  vGrid->Allocate(1);
+  vGrid->InsertNextCell(verts->GetCellType(), verts->GetPointIds());
+  vGrid->SetPoints(vtkpoints);
 
-//  verts->GetPointIds()->SetNumberOfIds(vtkpoints->GetNumberOfPoints());
-//  for(int i=0; i<vtkpoints->GetNumberOfPoints(); i++)
-//  {
-//    verts->GetPointIds()->SetId(i,i);
-//  }
+  mitk::UnstructuredGrid::Pointer interpolationGrid = mitk::UnstructuredGrid::New();
+  interpolationGrid->SetVtkUnstructuredGrid(vGrid);
 
-//  vGrid->Allocate(1);
-//  vGrid->InsertNextCell(verts->GetCellType(), verts->GetPointIds());
-//  vGrid->SetPoints(vtkpoints);
+  m_PointScorer->SetInput(0, uGrid);
+  m_PointScorer->SetInput(1, interpolationGrid);
+  m_PointScorer->Update();
 
-//  mitk::UnstructuredGrid::Pointer interpolationGrid = mitk::UnstructuredGrid::New();
-//  interpolationGrid->SetVtkUnstructuredGrid(vGrid);
+  mitk::UnstructuredGrid::Pointer scoredGrid = mitk::UnstructuredGrid::New();
+  scoredGrid = m_PointScorer->GetOutput();
 
-//  m_PointScorer->SetInput(0, uGrid);
-//  m_PointScorer->SetInput(1, interpolationGrid);
-//  m_PointScorer->Update();
+  mitk::ProgressBar::GetInstance()->Progress();
 
-//  mitk::UnstructuredGrid::Pointer scoredGrid = mitk::UnstructuredGrid::New();
-//  scoredGrid = m_PointScorer->GetOutput();
+  double spacing = mitk::SurfaceInterpolationController::GetInstance()->GetDistanceImageSpacing();
 
-//  mitk::ProgressBar::GetInstance()->Progress();
+  m_PlaneSuggester->SetInput(scoredGrid);
+  m_PlaneSuggester->SetMinPts(4);
+  m_PlaneSuggester->SetEps(spacing);
+  m_PlaneSuggester->Update();
 
-//  double spacing = mitk::SurfaceInterpolationController::GetInstance()->GetDistanceImageSpacing();
+  mitk::GeometryData::Pointer geoData = m_PlaneSuggester->GetGeoData();
+  mitk::PlaneGeometry::Pointer plane = dynamic_cast<mitk::PlaneGeometry*>(geoData->GetGeometry());
 
-//  m_PlaneSuggester->SetInput(scoredGrid);
-//  m_PlaneSuggester->SetMinPts(4);
-//  m_PlaneSuggester->SetEps(spacing);
-//  m_PlaneSuggester->Update();
+  mitk::ProgressBar::GetInstance()->Progress();
 
-//  mitk::GeometryData::Pointer geoData = m_PlaneSuggester->GetGeoData();
-//  mitk::PlaneGeometry::Pointer plane = dynamic_cast<mitk::PlaneGeometry*>(geoData->GetGeometry());
-
-//  mitk::ProgressBar::GetInstance()->Progress();
-
-//  mitk::BaseRenderer::Pointer br = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
-//  br->GetSliceNavigationController()->ReorientSlices(plane->GetOrigin(),plane->GetNormal());
-//  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::BaseRenderer::Pointer br = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
+  br->GetSliceNavigationController()->ReorientSlices(plane->GetOrigin(),plane->GetNormal());
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   m_FirstRun = false;
 }

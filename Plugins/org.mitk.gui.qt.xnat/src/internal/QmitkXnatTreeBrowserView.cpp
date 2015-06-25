@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkXnatTreeBrowserView.h"
 
 // Qmitk
-#include "QmitkXnatObjectEditorInput.h"
-#include "QmitkXnatEditor.h"
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 
 // Blueberry
@@ -123,43 +121,11 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 {
   if (!index.isValid()) return;
-
-  berry::IWorkbenchPage::Pointer page = GetSite()->GetPage();
-  QmitkXnatObjectEditorInput::Pointer oPtr(new QmitkXnatObjectEditorInput(index.data(Qt::UserRole).value<ctkXnatObject*>()));
-  berry::IEditorInput::Pointer editorInput(oPtr);
-  berry::IEditorPart::Pointer reuseEditor = page->FindEditor(editorInput);
-
-  if (reuseEditor)
+  ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(index.data(Qt::UserRole).value<ctkXnatObject*>());
+  if (file != NULL)
   {
-    // Just set it activ
-    page->Activate(reuseEditor);
-  }
-  else
-  {
-    QList<berry::IEditorReference::Pointer> editors =
-      page->FindEditors(berry::IEditorInput::Pointer(0), QmitkXnatEditor::EDITOR_ID, berry::IWorkbenchPage::MATCH_ID);
-
-    if (editors.isEmpty())
-    {
-      ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(oPtr->GetXnatObject());
-      if (file != NULL)
-      {
-        // If the selected node is a file, so show it in MITK
-        InternalFileDownload(index, true);
-      }
-      else
-      {
-        // No XnatEditor is currently open, create a new one
-        page->OpenEditor(editorInput, QmitkXnatEditor::EDITOR_ID);
-      }
-    }
-    else
-    {
-      // Reuse an existing editor
-      reuseEditor = editors.front()->GetEditor(true);
-      page->ReuseEditor(reuseEditor.Cast<berry::IReusableEditor>(), editorInput);
-      page->Activate(reuseEditor);
-    }
+    // If the selected node is a file, so show it in MITK
+    InternalFileDownload(index, true);
   }
 }
 

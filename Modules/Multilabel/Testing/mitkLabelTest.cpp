@@ -83,9 +83,9 @@ public:
     indexToBeCompared.Fill(0);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong center of mass index", mitk::Equal(currentIndex, indexToBeCompared));
 
-    indexToBeCompared.SetElement(1, 234.3f);
-    indexToBeCompared.SetElement(2, -53);
-    indexToBeCompared.SetElement(3, 120);
+    indexToBeCompared.SetElement(0, 234.3f);
+    indexToBeCompared.SetElement(1, -53);
+    indexToBeCompared.SetElement(2, 120);
     label->SetCenterOfMassIndex(indexToBeCompared);
     currentIndex = label->GetCenterOfMassIndex();
     CPPUNIT_ASSERT_MESSAGE("Label has wrong center of mass index", mitk::Equal(currentIndex, indexToBeCompared));
@@ -99,9 +99,9 @@ public:
     pointToBeCompared.Fill(0);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong center of mass index", mitk::Equal(currentPoint, pointToBeCompared));
 
-    pointToBeCompared.SetElement(1, 234.3f);
-    pointToBeCompared.SetElement(2, -53);
-    pointToBeCompared.SetElement(3, 120);
+    pointToBeCompared.SetElement(0, 234.3f);
+    pointToBeCompared.SetElement(1, -53);
+    pointToBeCompared.SetElement(2, 120);
     label->SetCenterOfMassCoordinates(pointToBeCompared);
     currentPoint = label->GetCenterOfMassCoordinates();
     CPPUNIT_ASSERT_MESSAGE("Label has wrong center of mass index", mitk::Equal(currentPoint, pointToBeCompared));

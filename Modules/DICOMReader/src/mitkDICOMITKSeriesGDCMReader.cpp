@@ -34,7 +34,10 @@ mitk::DICOMITKSeriesGDCMReader
 ,m_DecimalPlacesForOrientation(decimalPlacesForOrientation)
 {
   this->EnsureMandatorySortersArePresent(decimalPlacesForOrientation);
+
+  m_LocaleMutex = itk::MutexLock::New();
 }
+
 
 mitk::DICOMITKSeriesGDCMReader
 ::DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other )
@@ -227,6 +230,8 @@ void
 mitk::DICOMITKSeriesGDCMReader
 ::PushLocale() const
 {
+  m_LocaleMutex->Lock();
+
   std::string currentCLocale = setlocale(LC_NUMERIC, nullptr);
   m_ReplacedCLocales.push( currentCLocale );
   setlocale(LC_NUMERIC, "C");
@@ -235,12 +240,16 @@ mitk::DICOMITKSeriesGDCMReader
   m_ReplacedCinLocales.push( currentCinLocale );
   std::locale l( "C" );
   std::cin.imbue(l);
+
+  m_LocaleMutex->Unlock();
 }
 
 void
 mitk::DICOMITKSeriesGDCMReader
 ::PopLocale() const
 {
+  m_LocaleMutex->Lock();
+
   if (!m_ReplacedCLocales.empty())
   {
     setlocale(LC_NUMERIC, m_ReplacedCLocales.top().c_str());
@@ -261,6 +270,7 @@ mitk::DICOMITKSeriesGDCMReader
     MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
   }
 
+  m_LocaleMutex->Unlock();
 }
 
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList

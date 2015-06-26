@@ -15,6 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkBaseApplication.h>
+#include <mitkBreakpadConfig.h>
+
+#ifdef MITK_USE_BREAKPAD
+  mitk::BreakpadCrashReporting myBreakpad;
+  myBreakpad.StartCrashServer(true);
+  myBreakpad.InitializeClientHandler( true );
+#endif
+
 
 #include <QVariant>
 

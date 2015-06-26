@@ -69,6 +69,7 @@ endif()
 #-----------------------------------------------------------------------------
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
+  Breakpad
 
 if(MITK_CTEST_SCRIPT_MODE)
   # Write a file containing the list of enabled external project targets.
@@ -253,6 +254,7 @@ set(mitk_cmake_boolean_args
   MITK_BUILD_EXAMPLES
 
   MITK_USE_QT
+  MITK_USE_BREAKPAD
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL
@@ -285,6 +287,7 @@ ExternalProject_Add(${proj}
   INSTALL_COMMAND ""
   DEPENDS
     ${mitk_depends}
+    ${Breakpad_DEPENDS}
 )
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
@@ -396,6 +399,7 @@ ExternalProject_Add(${proj}
     -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
+    -DBreakpad_SRC:PATH=${Breakpad_SRC}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}

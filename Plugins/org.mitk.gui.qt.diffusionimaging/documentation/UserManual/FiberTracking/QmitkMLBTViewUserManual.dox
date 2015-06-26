@@ -16,7 +16,7 @@ Parameters:
 
 \li Num. Trees: Number of trees that constitute the random forest. The default of 30 works well for most cases.
 \li Max. Depth: Maximum tree depth.
-\li GM Sampling Points: Number of randomly placed sampling points in each non-white-matter voxel. These sampling points are needed to train the classifier for non-fiber tissue.
+\li Non-WM Sampling Points: Number of randomly placed sampling points in each non-white-matter voxel. These sampling points are needed to train the classifier for non-fiber tissue.
 \li Sample Fraction: Fraction of randomly drawn samples used to train each tree.
 \li Step Size: The fibers are resampled with this step size. Influences the number of white-matter sampling ponts. Defaul is 0.5*min. voxel size.
 
@@ -44,6 +44,8 @@ Parameters and options:
 
 \section MlbstUserManualReferences References
 
-[1] Neher et al.: A machine learning based approach to fiber tractography. Proceedings of ISMRM 2015\n
-[2] Neher et al.: A machine learning based approach to fiber tractography using classifier voting. Proceedings of MICCAI 2015\n
+[1] Neher, P.F., Götz, M., Norajitra, T., Weber, C., Maier-Hein, K.H., 2015. A machine learning based approach to fiber tractography, in: Proceedings of International Society of Magnetic Resonance in Medicine.
+
+[2] Neher, P.F., Götz, M., Norajitra, T., Weber, C., Maier-Hein, K.H., 2015. A machine learning based approach to fiber tractography using classifier voting, in: Proceedings of Medical Image Computing and Computer-Assisted Intervention. Presented at the Medical Image Computing and Computer-Assisted Intervention.
+
 */

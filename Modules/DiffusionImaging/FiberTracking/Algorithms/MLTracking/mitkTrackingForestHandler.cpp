@@ -179,6 +179,19 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
             newMask->FillBuffer(1);
             m_MaskImages.push_back(newMask);
         }
+
+        if (m_MaskImages.at(i)==nullptr)
+        {
+            m_MaskImages.at(i) = ItkUcharImgType::New();
+            m_MaskImages.at(i)->SetSpacing( m_InterpolatedRawImages.at(i)->GetSpacing() );
+            m_MaskImages.at(i)->SetOrigin( m_InterpolatedRawImages.at(i)->GetOrigin() );
+            m_MaskImages.at(i)->SetDirection( m_InterpolatedRawImages.at(i)->GetDirection() );
+            m_MaskImages.at(i)->SetLargestPossibleRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+            m_MaskImages.at(i)->SetBufferedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+            m_MaskImages.at(i)->SetRequestedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+            m_MaskImages.at(i)->Allocate();
+            m_MaskImages.at(i)->FillBuffer(1);
+        }
     }
 
     MITK_INFO << "Resampling fibers and calculating number of samples ...";
@@ -187,11 +200,11 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
     {
         ItkUcharImgType::Pointer mask = m_MaskImages.at(t);
         ItkUcharImgType::Pointer wmmask;
-        if (t<m_WhiteMatterImages.size())
+        if (t<m_WhiteMatterImages.size() && m_WhiteMatterImages.at(t)!=nullptr)
             wmmask = m_WhiteMatterImages.at(t);
         else
         {
-            MITK_INFO << "Calculating fiber envelope";
+            MITK_INFO << "No white-matter mask found. Using fiber envelope.";
             itk::TractDensityImageFilter< ItkUcharImgType >::Pointer env = itk::TractDensityImageFilter< ItkUcharImgType >::New();
             env->SetFiberBundle(m_Tractograms.at(t));
             env->SetInputImage(mask);
@@ -199,20 +212,13 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
             env->SetUseImageGeometry(true);
             env->Update();
             wmmask = env->GetOutput();
-            m_WhiteMatterImages.push_back(wmmask);
+            if (t>=m_WhiteMatterImages.size())
+                m_WhiteMatterImages.push_back(wmmask);
+            else
+                m_WhiteMatterImages.at(t) = wmmask;
         }
 
-        itk::ImageRegionConstIterator<ItkUcharImgType> it(wmmask, wmmask->GetLargestPossibleRegion());
-        int OUTOFWM = 0;
-        while(!it.IsAtEnd())
-        {
-            if (it.Get()==0 && mask->GetPixel(it.GetIndex())>0)
-                OUTOFWM++;
-            ++it;
-        }
-        m_NumberOfSamples += m_GrayMatterSamplesPerVoxel*OUTOFWM;
-        MITK_INFO << "Samples outside of WM: " << m_NumberOfSamples;
-
+        // Calculate white-matter samples
         if (m_StepSize<0)
         {
             typename InterpolatedRawImageType::Pointer image = m_InterpolatedRawImages.at(t);
@@ -227,8 +233,38 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
         }
 
         m_Tractograms.at(t)->ResampleSpline(m_StepSize);
-        m_NumberOfSamples += m_Tractograms.at(t)->GetNumberOfPoints();
-        m_NumberOfSamples -= 2*m_Tractograms.at(t)->GetNumFibers();
+        unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()-2*m_Tractograms.at(t)->GetNumFibers();
+        m_NumberOfSamples += wmSamples;
+        MITK_INFO << "Samples inside of WM: " << wmSamples;
+
+
+        // calculate gray-matter samples
+        itk::ImageRegionConstIterator<ItkUcharImgType> it(wmmask, wmmask->GetLargestPossibleRegion());
+        int OUTOFWM = 0;
+        while(!it.IsAtEnd())
+        {
+            if (it.Get()==0 && mask->GetPixel(it.GetIndex())>0)
+                OUTOFWM++;
+            ++it;
+        }
+        MITK_INFO << "Non-white matter voxels: " << OUTOFWM;
+
+        if (m_GrayMatterSamplesPerVoxel>0)
+        {
+            m_GmSamples.push_back(m_GrayMatterSamplesPerVoxel);
+            m_NumberOfSamples += m_GrayMatterSamplesPerVoxel*OUTOFWM;
+        }
+        else if (OUTOFWM>0)
+        {
+            m_GmSamples.push_back(std::round((double)wmSamples/(double)OUTOFWM));
+            m_NumberOfSamples += m_GmSamples.back()*OUTOFWM;
+            MITK_INFO << "Non-white matter samples per voxel: " << m_GmSamples.back();
+        }
+        else
+        {
+            m_GmSamples.push_back(0);
+        }
+        MITK_INFO << "Samples outside of WM: " << m_GmSamples.back()*OUTOFWM;
     }
     MITK_INFO << "Number of samples: " << m_NumberOfSamples;
 }
@@ -271,44 +307,44 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
             {
                 typename InterpolatedRawImageType::PixelType pix = image->GetPixel(it.GetIndex());
 
-                    // null direction
+                // null direction
+                for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
+                {
+                    m_FeatureData(sampleCounter,f) = pix[directionIndices[f]];
+                    if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
+                        m_FeatureData(sampleCounter,f) = 0;
+                }
+                m_FeatureData(sampleCounter,NumberOfSignalFeatures) = 0;
+                m_FeatureData(sampleCounter,NumberOfSignalFeatures+1) = 0;
+                m_FeatureData(sampleCounter,NumberOfSignalFeatures+2) = 0;
+                m_LabelData(sampleCounter,0) = directionIndices.size();
+                sampleCounter++;
+
+                // random directions
+                for (int i=1; i<m_GmSamples.at(t); i++)
+                {
                     for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
                     {
                         m_FeatureData(sampleCounter,f) = pix[directionIndices[f]];
                         if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
                             m_FeatureData(sampleCounter,f) = 0;
                     }
-                    m_FeatureData(sampleCounter,NumberOfSignalFeatures) = 0;
-                    m_FeatureData(sampleCounter,NumberOfSignalFeatures+1) = 0;
-                    m_FeatureData(sampleCounter,NumberOfSignalFeatures+2) = 0;
+                    int c=0;
+                    vnl_vector_fixed<double,3> probe;
+                    probe[0] = m_RandGen->GetVariate()*2-1;
+                    probe[1] = m_RandGen->GetVariate()*2-1;
+                    probe[2] = m_RandGen->GetVariate()*2-1;
+                    probe.normalize();
+                    if (dot_product(ref, probe)<0)
+                        probe *= -1;
+                    for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
+                    {
+                        m_FeatureData(sampleCounter,f) = probe[c];
+                        c++;
+                    }
                     m_LabelData(sampleCounter,0) = directionIndices.size();
                     sampleCounter++;
-
-                    // random directions
-                    for (int i=1; i<m_GrayMatterSamplesPerVoxel; i++)
-                    {
-                        for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
-                        {
-                            m_FeatureData(sampleCounter,f) = pix[directionIndices[f]];
-                            if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
-                                m_FeatureData(sampleCounter,f) = 0;
-                        }
-                        int c=0;
-                        vnl_vector_fixed<double,3> probe;
-                        probe[0] = m_RandGen->GetVariate()*2-1;
-                        probe[1] = m_RandGen->GetVariate()*2-1;
-                        probe[2] = m_RandGen->GetVariate()*2-1;
-                        probe.normalize();
-                        if (dot_product(ref, probe)<0)
-                            probe *= -1;
-                        for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
-                        {
-                            m_FeatureData(sampleCounter,f) = probe[c];
-                            c++;
-                        }
-                        m_LabelData(sampleCounter,0) = directionIndices.size();
-                        sampleCounter++;
-                    }
+                }
             }
             ++it;
         }

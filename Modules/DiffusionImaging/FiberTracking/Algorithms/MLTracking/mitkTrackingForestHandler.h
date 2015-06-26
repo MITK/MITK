@@ -98,7 +98,8 @@ protected:
     std::vector< ItkUcharImgType::Pointer > m_SeedImages;
     std::vector< ItkUcharImgType::Pointer > m_StopImages;
 
-    int m_NumberOfSamples;
+    unsigned int m_NumberOfSamples;
+    std::vector< unsigned int > m_GmSamples;
     vigra::RandomForest<int> m_Forest;
     vigra::MultiArray<2, double> m_FeatureData;
     vigra::MultiArray<2, double> m_LabelData;

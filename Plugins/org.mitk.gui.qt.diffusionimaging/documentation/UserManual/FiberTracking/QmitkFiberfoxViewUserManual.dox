@@ -133,10 +133,12 @@ If any other issues or feature requests arises during the use of Fiberfox, pleas
 
 \section QmitkFiberfoxViewUserManualReferences References
 
-[1] Peter F. Neher, Frederik B. Laun, Bram Stieltjes, and Klaus H. Fritzsche: Fiberfox: Facilitating the creation of realistic white matter software phantoms, Magn Reson Med, DOI: 10.1002/mrm.25045.
+[1] Neher, P.F., Laun, F.B., Stieltjes, B., Maier-Hein, K.H., 2014. Fiberfox: facilitating the creation of realistic white matter software phantoms. Magn Reson Med 72, 1460–1470. doi:10.1002/mrm.25045
 
-[2] Peter F. Neher, Frederik B. Laun, Bram Stieltjes, and Klaus H. Fritzsche: Fiberfox: An extensible system for generating realistic white matter software phantoms, MICCAI CDMRI Workshop, Nagoya; 09/2013
+[2] Neher, P.F., Laun, F.Neher, P.F., Stieltjes, B., Laun, F.B., Meinzer, H.-P., Fritzsche, K.H., 2013. Fiberfox: A novel tool to generate software phantoms of complex fiber geometries, in: Proceedings of International Society of Magnetic Resonance in Medicine.
 
-[3] Peter F. Neher, Bram Stieltjes, Frederik B. Laun, Hans-Peter Meinzer, and Klaus H. Fritzsche: Fiberfox: Fiberfox: A novel tool to generate software phantoms of complex fiber geometries, ISMRM, Salt Lake City; 04/2013
+[3] Neher, P.F., Stieltjes, B., Laun, F.B., Meinzer, H.-P., Fritzsche, K.H., 2013. Fiberfox: A novel tool to generate software phantoms of complex fiber geometries, in: Proceedings of International Society of Magnetic Resonance in Medicine.
+
+[4] Hering, J., Neher, P.F., Meinzer, H.-P., Maier-Hein, K.H., 2014. Construction of ground-truth data for head motion correction in diffusion MRI, in: Proceedings of International Society of Magnetic Resonance in Medicine.
 
 */

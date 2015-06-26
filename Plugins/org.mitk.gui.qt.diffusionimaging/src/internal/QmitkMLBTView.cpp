@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QString>
 
-#include "mitkNodePredicateDataType.h"
+#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
@@ -50,7 +50,7 @@ QmitkMLBTView::QmitkMLBTView()
     , m_Controls( 0 )
     , m_MultiWidget( NULL )
 {
-    m_TrackingTimer = new QTimer(this);
+    m_TrackingTimer = std::make_shared<QTimer>(this);
 }
 
 // Destructor
@@ -74,11 +74,13 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         connect( &m_TrackingWatcher, SIGNAL ( finished() ), this, SLOT( OnTrackingThreadStop() ) );
         connect( m_Controls->m_SaveForestButton, SIGNAL ( clicked() ), this, SLOT( SaveForest() ) );
         connect( m_Controls->m_LoadForestButton, SIGNAL ( clicked() ), this, SLOT( LoadForest() ) );
-        connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(BuildFibers()) );
+        connect( m_TrackingTimer.get(), SIGNAL(timeout()), this, SLOT(BuildFibers()) );
         connect( m_Controls->m_TimerIntervalBox, SIGNAL(valueChanged(int)), this, SLOT( ChangeTimerInterval(int) ));
         connect( m_Controls->m_DemoModeBox, SIGNAL(stateChanged(int)), this, SLOT( ToggleDemoMode(int) ));
         connect( m_Controls->m_PauseTrackingButton, SIGNAL ( clicked() ), this, SLOT( PauseTracking() ) );
         connect( m_Controls->m_AbortTrackingButton, SIGNAL ( clicked() ), this, SLOT( AbortTracking() ) );
+        connect( m_Controls->m_AddTwButton, SIGNAL ( clicked() ), this, SLOT( AddTrainingWidget() ) );
+        connect( m_Controls->m_RemoveTwButton, SIGNAL ( clicked() ), this, SLOT( RemoveTrainingWidget() ) );
 
         int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
         m_Controls->m_NumberOfThreadsBox->setMaximum(numThread);
@@ -104,8 +106,26 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_TrackingMaskImageBox->SetZeroEntryText("--");
         m_Controls->m_TrackingSeedImageBox->SetZeroEntryText("--");
         m_Controls->m_TrackingStopImageBox->SetZeroEntryText("--");
+        AddTrainingWidget();
 
         UpdateGui();
+    }
+}
+
+void QmitkMLBTView::AddTrainingWidget()
+{
+    std::shared_ptr<QmitkMlbstTrainingDataWidget> tw = std::make_shared<QmitkMlbstTrainingDataWidget>();
+    tw->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_TwFrame->layout()->addWidget(tw.get());
+    m_TrainingWidgets.push_back(tw);
+}
+
+void QmitkMLBTView::RemoveTrainingWidget()
+{
+    if(m_TrainingWidgets.size()>1)
+    {
+        m_TrainingWidgets.back().reset();
+        m_TrainingWidgets.pop_back();
     }
 }
 
@@ -337,8 +357,41 @@ void QmitkMLBTView::OnTrainingThreadStop()
 
 void QmitkMLBTView::StartTraining()
 {
+    std::vector< mitk::Image::Pointer > m_SelectedDiffImages;
+    std::vector< mitk::FiberBundle::Pointer > m_SelectedFB;
+    std::vector< ItkUcharImgType::Pointer > m_MaskImages;
+    std::vector< ItkUcharImgType::Pointer > m_WhiteMatterImages;
+
+    for (auto w : m_TrainingWidgets)
+    {
+        m_SelectedDiffImages.push_back(dynamic_cast<mitk::Image*>(w->GetImage()->GetData()));
+        m_SelectedFB.push_back(dynamic_cast<mitk::FiberBundle*>(w->GetFibers()->GetData()));
+
+        if (w->GetMask().IsNotNull())
+        {
+            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(w->GetMask()->GetData());
+            ItkUcharImgType::Pointer itkMask = ItkUcharImgType::New();
+            mitk::CastToItkImage(img, itkMask);
+            m_MaskImages.push_back(itkMask);
+        }
+        else
+            m_MaskImages.push_back(nullptr);
+
+        if (w->GetWhiteMatter().IsNotNull())
+        {
+            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(w->GetWhiteMatter()->GetData());
+            ItkUcharImgType::Pointer itkMask = ItkUcharImgType::New();
+            mitk::CastToItkImage(img, itkMask);
+            m_WhiteMatterImages.push_back(itkMask);
+        }
+        else
+            m_WhiteMatterImages.push_back(nullptr);
+    }
+
     m_ForestHandler.SetRawData(m_SelectedDiffImages);
     m_ForestHandler.SetTractograms(m_SelectedFB);
+    m_ForestHandler.SetMaskImages(m_MaskImages);
+    m_ForestHandler.SetWhiteMatterImages(m_WhiteMatterImages);
     m_ForestHandler.SetNumTrees(m_Controls->m_NumTreesBox->value());
     m_ForestHandler.SetMaxTreeDepth(m_Controls->m_MaxDepthBox->value());
     m_ForestHandler.SetGrayMatterSamplesPerVoxel(m_Controls->m_GmSamplingBox->value());
@@ -356,29 +409,6 @@ void QmitkMLBTView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget
 void QmitkMLBTView::StdMultiWidgetNotAvailable()
 {
     m_MultiWidget = NULL;
-}
-
-void QmitkMLBTView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
-{
-    if ( !this->IsVisible() )
-    {
-        // do nothing if nobody wants to see me :-(
-        return;
-    }
-
-    m_SelectedFB.clear();
-    m_SelectedDiffImages.clear();
-    m_MaskImages.clear();
-    m_WhiteMatterImages.clear();
-
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
-    {
-        mitk::DataNode::Pointer node = *it;
-        if ( dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
-            m_SelectedFB.push_back( dynamic_cast<mitk::FiberBundle*>(node->GetData()) );
-        else if (mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(node))
-            m_SelectedDiffImages.push_back( dynamic_cast<mitk::Image*>(node->GetData()) );
-    }
 }
 
 void QmitkMLBTView::Activated()

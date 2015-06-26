@@ -13,6 +13,7 @@ set(SRC_CPP_FILES
   QmitkBallModelParametersWidget.cpp
   QmitkAstrosticksModelParametersWidget.cpp
   QmitkPrototypeSignalParametersWidget.cpp
+  QmitkMlbstTrainingDataWidget.cpp
 
   QmitkFreeSurferParcellationHandler.cpp
   QmitkFreeSurferParcellationWidget.cpp
@@ -99,6 +100,7 @@ set(UI_FILES
   src/internal/QmitkDenoisingViewControls.ui
   src/internal/QmitkMLBTViewControls.ui
   src/QmitkFreeSurferParcellationWidgetControls.ui
+  src/QmitkMlbstTrainingDataWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -158,6 +160,7 @@ set(MOC_H_FILES
 
   src/QmitkFreeSurferParcellationHandler.h
   src/QmitkFreeSurferParcellationWidget.h
+  src/QmitkMlbstTrainingDataWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

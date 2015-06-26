@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasePropertySerializer.h"
 #include "mitkIOMimeTypes.h"
 #include "mitkLabelSetImageIO.h"
+#include "mitkLabelSetImageConverter.h"
 
 // itk
 #include "itkMetaDataDictionary.h"
@@ -27,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkNrrdImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itkImageFileReader.h"
+#include "mitkImageAccessByItk.h"
 
 #include "tinyxml.h"
 
@@ -50,6 +52,82 @@ IFileIO::ConfidenceLevel LabelSetImageIO::GetWriterConfidenceLevel() const
     return Unsupported;
 }
 
+template<typename TPixel, unsigned int VDimensions>
+void TemplatedWrite(const itk::Image< TPixel, VDimensions> * source, const LabelSetImage* input, std::string filename)
+{
+  mitkThrow() << "Tried to write non-vector labelsetimage";
+}
+
+template<typename TPixel, unsigned int VDimensions>
+void TemplatedWrite(const itk::VectorImage< TPixel, VDimensions> * source, const LabelSetImage* input, std::string filename)
+{
+  typedef itk::ImageFileWriter< itk::VectorImage< TPixel, VDimensions> > WriterType;
+
+  char keybuffer[512];
+  char valbuffer[512];
+
+  sprintf( keybuffer, "modality");
+  sprintf( valbuffer, "org.mitk.image.multilabel");
+  itk::EncapsulateMetaData<std::string>(source->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+
+  sprintf( keybuffer, "layers");
+  sprintf( valbuffer, "%1d", input->GetNumberOfLayers());
+  itk::EncapsulateMetaData<std::string>(source->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+
+  for (unsigned int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
+  {
+    sprintf( keybuffer, "layer_%03d", layerIdx ); // layer idx
+    sprintf( valbuffer, "%1d", input->GetNumberOfLabels(layerIdx)); // number of labels for the layer
+    itk::EncapsulateMetaData<std::string>(source->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+
+    mitk::LabelSet::LabelContainerConstIteratorType iter = input->GetLabelSet(layerIdx)->IteratorConstBegin();
+    unsigned int count(0);
+    while (iter != input->GetLabelSet(layerIdx)->IteratorConstEnd())
+    {
+      std::auto_ptr<TiXmlDocument> document;
+      document.reset(new TiXmlDocument());
+
+      TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
+      document->LinkEndChild( decl );
+      TiXmlElement * labelElem = GetLabelAsTiXmlElement(iter->second);
+      document->LinkEndChild( labelElem );
+      TiXmlPrinter printer;
+      printer.SetIndent("");
+      printer.SetLineBreak("");
+
+      document->Accept(&printer);
+
+      sprintf( keybuffer, "org.mitk.label_%03u_%05u", layerIdx, count );
+      itk::EncapsulateMetaData<std::string>(source->GetMetaDataDictionary(), std::string(keybuffer), printer.Str());
+      ++iter;
+      ++count;
+    }
+  }
+
+  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+  io->SetFileType( itk::ImageIOBase::Binary );
+  io->UseCompressionOn();
+
+  WriterType::Pointer nrrdWriter = WriterType::New();
+  nrrdWriter->UseInputMetaDataDictionaryOn();
+  nrrdWriter->SetInput(source);
+
+  nrrdWriter->SetFileName(filename.c_str());
+  nrrdWriter->UseCompressionOn();
+  nrrdWriter->SetImageIO(io);
+
+  try
+  {
+    nrrdWriter->Update();
+  }
+  catch (itk::ExceptionObject e)
+  {
+    MITK_ERROR << "Could not write segmentation session. See error log for details.";
+    mitkThrow() << e.GetDescription();
+  }
+
+}
+
 void LabelSetImageIO::Write()
 {
   ValidateOutputLocation();
@@ -71,73 +149,11 @@ void LabelSetImageIO::Write()
     }
   }
 
-  typedef itk::ImageFileWriter<VectorImageType> WriterType;
-
-  VectorImageType::Pointer vectorImage = input->GetVectorImage(true); // force update
-
-  char keybuffer[512];
-  char valbuffer[512];
-
-  sprintf( keybuffer, "modality");
-  sprintf( valbuffer, "org.mitk.image.multilabel");
-  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
-
-  sprintf( keybuffer, "layers");
-  sprintf( valbuffer, "%1d", input->GetNumberOfLayers());
-  itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
-
-  for (unsigned int layerIdx=0; layerIdx<input->GetNumberOfLayers(); layerIdx++)
-  {
-    sprintf( keybuffer, "layer_%03d", layerIdx ); // layer idx
-    sprintf( valbuffer, "%1d", input->GetNumberOfLabels(layerIdx)); // number of labels for the layer
-    itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), std::string(valbuffer));
-
-    mitk::LabelSet::LabelContainerConstIteratorType iter = input->GetLabelSet(layerIdx)->IteratorConstBegin();
-    unsigned int count(0);
-    while (iter != input->GetLabelSet(layerIdx)->IteratorConstEnd())
-    {
-      std::auto_ptr<TiXmlDocument> document;
-      document.reset(new TiXmlDocument());
-
-      TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
-      document->LinkEndChild( decl );
-      TiXmlElement * labelElem = GetLabelAsTiXmlElement(iter->second);
-      document->LinkEndChild( labelElem );
-      TiXmlPrinter printer;
-      printer.SetIndent("");
-      printer.SetLineBreak("");
-
-      document->Accept(&printer);
-
-      sprintf( keybuffer, "org.mitk.label_%03u_%05u", layerIdx, count );
-      itk::EncapsulateMetaData<std::string>(vectorImage->GetMetaDataDictionary(),std::string(keybuffer), printer.Str());
-      ++iter;
-      ++count;
-    }
-  }
-
-  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-  io->SetFileType( itk::ImageIOBase::Binary );
-  io->UseCompressionOn();
-
-  WriterType::Pointer nrrdWriter = WriterType::New();
-  nrrdWriter->UseInputMetaDataDictionaryOn();
-  nrrdWriter->SetInput(vectorImage);
+  mitk::Image::ConstPointer inputVector = mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(input);
 
   LocalFile localFile(this);
-  nrrdWriter->SetFileName(localFile.GetFileName().c_str());
-  nrrdWriter->UseCompressionOn();
-  nrrdWriter->SetImageIO(io);
 
-  try
-  {
-    nrrdWriter->Update();
-  }
-  catch (itk::ExceptionObject e)
-  {
-    MITK_ERROR << "Could not write segmentation session. See error log for details.";
-    mitkThrow() << e.GetDescription();
-  }
+  AccessByItk_2(inputVector, TemplatedWrite, input, localFile.GetFileName());
 
   try
   {
@@ -185,80 +201,93 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
     }
   }
 
-  LabelSetImage::VectorImageType::Pointer vectorImage;
+  std::string filename = this->GetLocalFileName();
 
-  typedef itk::ImageFileReader<VectorImageType> FileReaderType;
-  FileReaderType::Pointer reader = FileReaderType::New();
-  reader->SetFileName(this->GetLocalFileName());
-  itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
-  reader->SetImageIO(io);
-  try
+  itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO(filename.c_str(), itk::ImageIOFactory::ReadMode);
+  if (imageIO.IsNull())
   {
-    reader->Update();
-  }
-  catch(itk::ExceptionObject& e)
-  {
-    mitkThrow() << e.GetDescription();
-  }
-  catch(...)
-  {
-    mitkThrow() << "Unknown exception caught!";
+    mitkThrow() << "Could not create itk::ImageIOBase object for filename " << filename;
   }
 
-  vectorImage = reader->GetOutput();
+  // Got to allocate space for the image. Determine the characteristics of
+  // the image.
+  imageIO->SetFileName(filename.c_str());
+  imageIO->ReadImageInformation();
 
-  if (vectorImage.IsNull())
-    mitkThrow() << "Could not retrieve the vector image.";
+  //LabelSetImage::VectorImageType::Pointer vectorImage;
 
-  LabelSetImage::Pointer output = LabelSetImage::New();
+  //typedef itk::ImageFileReader<VectorImageType> FileReaderType;
+  //FileReaderType::Pointer reader = FileReaderType::New();
+  //reader->SetFileName(this->GetLocalFileName());
+  //itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
+  //reader->SetImageIO(io);
+  //try
+  //{
+  //  reader->Update();
+  //}
+  //catch(itk::ExceptionObject& e)
+  //{
+  //  mitkThrow() << e.GetDescription();
+  //}
+  //catch(...)
+  //{
+  //  mitkThrow() << "Unknown exception caught!";
+  //}
 
-  ImageType::Pointer auxImg = ImageType::New();
-  auxImg->SetSpacing( vectorImage->GetSpacing() );
-  auxImg->SetOrigin( vectorImage->GetOrigin() );
-  auxImg->SetDirection( vectorImage->GetDirection() );
-  auxImg->SetRegions( vectorImage->GetLargestPossibleRegion() );
-  auxImg->Allocate();
+  //vectorImage = reader->GetOutput();
 
-  // initialize output image based on vector image meta information
-  output->InitializeByItk<ImageType>( auxImg.GetPointer() );
+  //if (vectorImage.IsNull())
+  //  mitkThrow() << "Could not retrieve the vector image.";
 
-  itk::MetaDataDictionary imgMetaDictionary = vectorImage->GetMetaDataDictionary();
+  //LabelSetImage::Pointer output = LabelSetImage::New();
 
-  char keybuffer[256];
+  //ImageType::Pointer auxImg = ImageType::New();
+  //auxImg->SetSpacing( vectorImage->GetSpacing() );
+  //auxImg->SetOrigin( vectorImage->GetOrigin() );
+  //auxImg->SetDirection( vectorImage->GetDirection() );
+  //auxImg->SetRegions( vectorImage->GetLargestPossibleRegion() );
+  //auxImg->Allocate();
 
-  int numberOfLayers = GetIntByKey(imgMetaDictionary,"layers");
-  std::string _xmlStr;
-  mitk::Label::Pointer label;
+  //// initialize output image based on vector image meta information
+  //output->InitializeByItk<ImageType>( auxImg.GetPointer() );
 
-  for( int layerIdx=0; layerIdx < numberOfLayers; layerIdx++)
-  {
-    sprintf( keybuffer, "layer_%03d", layerIdx );
-    int numberOfLabels = GetIntByKey(imgMetaDictionary,keybuffer);
+  //itk::MetaDataDictionary imgMetaDictionary = vectorImage->GetMetaDataDictionary();
 
-    mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
+  //char keybuffer[256];
 
-    for(int labelIdx=0; labelIdx < numberOfLabels; labelIdx++)
-    {
-      TiXmlDocument doc;
-      sprintf( keybuffer, "label_%03d_%05d", layerIdx, labelIdx );
-      _xmlStr = GetStringByKey(imgMetaDictionary,keybuffer);
-      doc.Parse(_xmlStr.c_str());
+  //int numberOfLayers = GetIntByKey(imgMetaDictionary,"layers");
+  //std::string _xmlStr;
+  //mitk::Label::Pointer label;
 
-      TiXmlElement * labelElem = doc.FirstChildElement("Label");
-      if (labelElem == 0)
-        mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
+  //for( int layerIdx=0; layerIdx < numberOfLayers; layerIdx++)
+  //{
+  //  sprintf( keybuffer, "layer_%03d", layerIdx );
+  //  int numberOfLabels = GetIntByKey(imgMetaDictionary,keybuffer);
 
-      label = LoadLabelFromTiXmlDocument(labelElem);
+  //  mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
 
-      if(label->GetValue() == 0) // set exterior label is needed to hold exterior information
-        output->SetExteriorLabel(label);
-      labelSet->AddLabel(label);
-    }
-    output->AddLayer(labelSet);
-  }
+  //  for(int labelIdx=0; labelIdx < numberOfLabels; labelIdx++)
+  //  {
+  //    TiXmlDocument doc;
+  //    sprintf( keybuffer, "label_%03d_%05d", layerIdx, labelIdx );
+  //    _xmlStr = GetStringByKey(imgMetaDictionary,keybuffer);
+  //    doc.Parse(_xmlStr.c_str());
 
-  // set vector image
-  output->SetVectorImage(vectorImage);
+  //    TiXmlElement * labelElem = doc.FirstChildElement("Label");
+  //    if (labelElem == 0)
+  //      mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
+
+  //    label = LoadLabelFromTiXmlDocument(labelElem);
+
+  //    if(label->GetValue() == 0) // set exterior label is needed to hold exterior information
+  //      output->SetExteriorLabel(label);
+  //    labelSet->AddLabel(label);
+  //  }
+  //  output->AddLayer(labelSet);
+  //}
+
+  //// set vector image
+  //output->SetVectorImage(vectorImage);
 
   try
   {
@@ -270,7 +299,7 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
   }
 
   std::vector<BaseData::Pointer> result;
-  result.push_back(output.GetPointer());
+  //result.push_back(output.GetPointer());
   return result;
 }
 

@@ -40,7 +40,7 @@ class MITKMULTILABEL_EXPORT LabelSetImageConverter
 
 public:
   /// \brief Converts a mitk::LabelSetImage to an a itk::VectorImage containing mitk::Image, templating is internal
-  static mitk::Image::Pointer ConvertLabelSetImageToImage( const mitk::LabelSetImage::Pointer input );
+  static mitk::Image::Pointer ConvertLabelSetImageToImage( const mitk::LabelSetImage::ConstPointer input );
 
   /// \brief Converst a mitk::Image to a mitk::LabelSetImage, templating and differentation between itk::Image and itk::VectorImage is internal
   static mitk::LabelSetImage::Pointer ConvertImageToLabelSetImage( const mitk::Image::Pointer input );

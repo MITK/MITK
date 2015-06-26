@@ -27,10 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkComposeImageFilter.h>
 #include <itkVectorIndexSelectionCastImageFilter.h>
 
-template < typename ImageType >
-void VectorOfMitkImagesToMitkVectorImage(ImageType* source, mitk::Image::Pointer &output, mitk::LabelSetImage::Pointer input)
+template < typename TPixel, unsigned int VImageDimension >
+void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimension>* source, mitk::Image::Pointer &output, mitk::LabelSetImage::ConstPointer input)
 {
-  typedef itk::ComposeImageFilter< ImageType > ComposeFilterType;
+  typedef itk::ComposeImageFilter< itk::Image<TPixel, VImageDimension> > ComposeFilterType;
 
   unsigned int numberOfLayers = input->GetNumberOfLayers();
 
@@ -38,7 +38,7 @@ void VectorOfMitkImagesToMitkVectorImage(ImageType* source, mitk::Image::Pointer
 
   for (unsigned int layer(0); layer < numberOfLayers; layer++)
   {
-    typename ImageType::Pointer itkCurrentLayer;
+    typename itk::Image<TPixel, VImageDimension>::Pointer itkCurrentLayer;
     mitk::CastToItkImage(input->GetLayerImage(layer), itkCurrentLayer);
 
     vectorImageComposer->SetInput(layer, itkCurrentLayer);
@@ -56,7 +56,7 @@ void VectorOfMitkImagesToMitkVectorImage(ImageType* source, mitk::Image::Pointer
   output = mitk::GrabItkImageMemory(vectorImageComposer->GetOutput());
 }
 
-mitk::Image::Pointer mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(const mitk::LabelSetImage::Pointer input)
+mitk::Image::Pointer mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(const mitk::LabelSetImage::ConstPointer input)
 {
   unsigned int numberOfLayers = input->GetNumberOfLayers();
 

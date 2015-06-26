@@ -40,6 +40,7 @@ namespace mitk
     mitkClassMacro(DisplayInteractor, EventStateMachine)
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
+
     /**
      * By this function the Observer gets notified about new events.
      * Here it is adapted to pass the events to the state machine in order to use
@@ -47,9 +48,12 @@ namespace mitk
      * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
      */
     virtual void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
+
+
   protected:
+
     DisplayInteractor();
-    virtual ~DisplayInteractor();
+
     /**
      * Derived function.
      * Connects the action names used in the state machine pattern with functions implemented within
@@ -109,13 +113,13 @@ namespace mitk
      */
     virtual bool AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
 
-    mitk::DataNode::Pointer GetDataNodeForLevelWindowInteraction( InteractionEvent* interactionEvent );
+    mitk::DataNode::Pointer GetDataNodeForLevelWindowInteraction( InteractionEvent* interactionEvent ) const;
 
     /**
     * \brief Method to retrieve bool-value for given property from string-property
     * in given propertylist.
     */
-    bool GetBoolProperty( mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue );
+    bool GetBoolProperty( mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue ) const;
 
     ScalarType m_LevelModifier;
 

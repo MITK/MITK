@@ -4,7 +4,7 @@ if(BUILD_TESTING)
   #set_tests_properties(mitkBreakpadCrashReportingDumpTest PROPERTIES TIMEOUT 5) # the test should not need 5 seconds
 
 if(CMAKE_SYSTEM MATCHES "Windows")
-    MITK_CREATE_MODULE_TESTS()
+    #MITK_CREATE_MODULE_TESTS()
 
     add_executable(BreakpadCrashReportingDumpTestApplication mitkBreakpadCrashReportingDumpTestApplication.cpp)
     target_link_libraries(BreakpadCrashReportingDumpTestApplication ${ALL_LIBRARIES} MitkBreakpadCrashReporting)

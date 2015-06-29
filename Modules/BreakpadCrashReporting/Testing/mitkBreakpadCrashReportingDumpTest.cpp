@@ -26,7 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string.h>
 #include <limits.h>
 #include <signal.h>
-#include <sys/wait.h>
+#include <direct.h>
+//#include <sys/wait.h>
 
 std::string CreateEmptyTestFolder()
 {

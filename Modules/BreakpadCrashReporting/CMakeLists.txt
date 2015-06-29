@@ -16,16 +16,19 @@ if(MITK_USE_BREAKPAD) # from top-level CMakeLists.txt
   endif()
 
   MITK_CREATE_MODULE(BreakpadCrashReporting
-    DEPENDS MitkCore
-    INTERNAL_INCLUDE_DIRS ${Breakpad_INCLUDE_DIR}
+    DEPENDS PUBLIC MitkCore
+    #PACKAGE_DEPENDS PUBLIC Breakpad
+    INCLUDE_DIRS ${Breakpad_INCLUDE_DIR}
     ADDITIONAL_LIBS ${Breakpad_LIBRARIES}
     FORCE_STATIC
     )
 
   if(CMAKE_SYSTEM MATCHES "Windows")
-    add_executable(CrashReportingServer mitkCrashReportingServer.cpp)
-    target_link_libraries(CrashReportingServer ${ALL_LIBRARIES} BreakpadCrashReporting)
-    MITK_INSTALL(TARGETS CrashReportingServer)
+    mitk_create_executable( CrashReportingServer
+                        CPP_FILES mitkCrashReportingServer.cpp
+                        DEPENDS PUBLIC MitkCore MitkBreakpadCrashReporting
+                      )
+    #MITK_INSTALL_TARGETS(EXECUTABLES CrashReportingServer)
   endif()
 
   if(CMAKE_SYSTEM MATCHES "Linux")
@@ -35,4 +38,3 @@ if(MITK_USE_BREAKPAD) # from top-level CMakeLists.txt
 add_subdirectory(Testing)
 
 endif(MITK_USE_BREAKPAD)
-

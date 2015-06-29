@@ -69,7 +69,6 @@ endif()
 #-----------------------------------------------------------------------------
 
 get_property(external_projects GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
-  Breakpad
 
 if(MITK_CTEST_SCRIPT_MODE)
   # Write a file containing the list of enabled external project targets.
@@ -445,4 +444,3 @@ add_custom_target(MITK
   COMMAND ${mitk_build_cmd}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
 )
-

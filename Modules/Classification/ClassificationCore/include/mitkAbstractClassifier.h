@@ -163,7 +163,7 @@ public:
   virtual void SetRequestedRegionToLargestPossibleRegion(){}
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}
   virtual bool VerifyRequestedRegion(){return false;}
-  virtual void SetRequestedRegion(const itk::DataObject */*data*/){}
+  virtual void SetRequestedRegion(const itk::DataObject * /*data*/){}
 
   // Override
   virtual bool IsEmpty() const override

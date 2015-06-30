@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <boost/algorithm/string.hpp>
 
+
 class mitkLibSVMClassifierTestSuite : public mitk::TestFixture
 {
 

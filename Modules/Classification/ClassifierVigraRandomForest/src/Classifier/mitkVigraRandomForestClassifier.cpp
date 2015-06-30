@@ -226,8 +226,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
 
   }
 
-  ITK_THREAD_RETURN_TYPE value = NULL;
-  return value;
+  return ITK_THREAD_RETURN_VALUE;
 }
 
 
@@ -278,8 +277,8 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictCallback(void *
   data->m_RandomForest.predictLabels(split_features,split_labels);
   data->m_RandomForest.predictProbabilities(split_features, split_probability);
 
-  ITK_THREAD_RETURN_TYPE value = NULL;
-  return value;
+  //ITK_THREAD_RETURN_TYPE value = NULL;
+  return ITK_THREAD_RETURN_VALUE;
 }
 
 

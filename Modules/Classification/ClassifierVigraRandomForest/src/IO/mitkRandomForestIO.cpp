@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVigraRandomForestClassifier.h"
 #include "mitkIOMimeTypes.h"
 
-#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string.hpp>
 
 
 #define GetAttribute(name,type)\

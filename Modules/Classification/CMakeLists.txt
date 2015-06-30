@@ -1,0 +1,5 @@
+add_subdirectory(ClassificationCore)
+add_subdirectory(ClassificationUtilities)
+add_subdirectory(ClassifierLibSVM)
+add_subdirectory(ClassifierVigraRandomForest)
+add_subdirectory(MiniApps)

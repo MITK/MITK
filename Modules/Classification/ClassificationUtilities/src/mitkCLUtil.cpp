@@ -170,7 +170,7 @@ void mitk::CLUtil::itkInterpolateCheckerboardPrediction(TImageType * checkerboar
   itk::ImageRegionIterator<TImageType> oit(itk_outimage,itk_outimage->GetLargestPossibleRegion());
 
   typedef typename itk::ShapedNeighborhoodIterator<TImageType>::OffsetType OffsetType;
-  typename OffsetType offset;
+  OffsetType offset;
   offset.Fill(0);
   offset[0] = 1;       // {1,0,0}
   iit.ActivateOffset(offset);

@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMaskImageFilter.h>
 #include <mitkImageToPointCloudFilter.h>
 #include <mitkUnstructuredGrid.h>
+#include <mitkProgressBar.h>
 
 mitk::FeatureBasedEdgeDetectionFilter::FeatureBasedEdgeDetectionFilter()
 {
@@ -66,11 +67,17 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   double upperThreshold = mean + stdDev;
   double lowerThreshold = mean - stdDev;
 
+  mitk::ProgressBar::GetInstance()->Progress();
+
   //thresholding
   AccessByItk_2(ncImage.GetPointer(), ITKThresholding, lowerThreshold, upperThreshold)
 
+  mitk::ProgressBar::GetInstance()->Progress();
+
   //fill holes
   mitk::MorphologicalOperations::FillHoles(m_thresholdImage);
+
+  mitk::ProgressBar::GetInstance()->Progress();
 
 //  mitk::MorphologicalOperations::Closing(m_morphThreshold,1,mitk::MorphologicalOperations::Ball);
 //  mitk::MorphologicalOperations::Opening(m_morphThreshold,1,mitk::MorphologicalOperations::Ball);
@@ -93,10 +100,14 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
 
   mitk::Image::Pointer resultImage = maskFilter->GetOutput();
 
+  mitk::ProgressBar::GetInstance()->Progress();
+
   //imagetopointcloudfilter
   mitk::ImageToPointCloudFilter::Pointer pclFilter = mitk::ImageToPointCloudFilter::New();
   pclFilter->SetInput(resultImage);
   pclFilter->Update();
+
+  mitk::ProgressBar::GetInstance()->Progress();
 
   mitk::UnstructuredGrid::Pointer outp = mitk::UnstructuredGrid::New();
   outp->SetVtkUnstructuredGrid( pclFilter->GetOutput()->GetVtkUnstructuredGrid() );

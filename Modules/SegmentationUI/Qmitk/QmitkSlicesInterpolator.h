@@ -295,7 +295,7 @@ private:
     QFuture<void> m_PlaneFuture;
     QFutureWatcher<void> m_PlaneWatcher;
 
-    bool m_FirstRun = true;
+    bool m_FirstRun;
 };
 
 #endif

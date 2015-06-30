@@ -209,7 +209,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
     splitter.UsePointBasedWeights(data->m_Splitter.IsUsingPointBasedWeights());
     splitter.UseRandomSplit(data->m_Splitter.IsUsingRandomSplit());
     splitter.SetPrecision(data->m_Splitter.GetPrecision());
-    splitter.SetMaximumTreeDepth(data->m_Splitter.GetMaximumTreeDepth());
+    splitter.SetMaximumTreeDepth(data->m_Splitter.GetConstMaximumTreeDepth());
     splitter.SetWeights(data->m_Splitter.GetWeights());
 
     rf.trees_.clear();

@@ -76,9 +76,9 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     endforeach()
 
   # This mini app does not depend on mitkDiffusionImaging at all
-  mitk_create_executable(Dicom2Nrrd
+  mitk_create_executable(CLDicom2Nrrd
     DEPENDS MitkCore
-    CPP_FILES Dicom2Nrrd.cpp mitkCommandLineParser.cpp
+    CPP_FILES CLDicom2Nrrd.cpp mitkCommandLineParser.cpp
   )
 
         # On Linux, create a shell script to start a relocatable application

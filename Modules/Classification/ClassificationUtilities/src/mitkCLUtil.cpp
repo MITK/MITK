@@ -163,13 +163,13 @@ void mitk::CLUtil::itkInterpolateCheckerboardPrediction(TImageType * checkerboar
 
   //typedef typename itk::ShapedNeighborhoodIterator<TImageType>::SizeType SizeType;
   typedef itk::Size<3> SizeType;
-  typename SizeType size;
+  SizeType size;
   size.Fill(1);
   itk::ShapedNeighborhoodIterator<TImageType> iit(size,checkerboard_prediction,checkerboard_prediction->GetLargestPossibleRegion());
   itk::ShapedNeighborhoodIterator<TImageType> mit(size,itk_checkerboard_mask,itk_checkerboard_mask->GetLargestPossibleRegion());
   itk::ImageRegionIterator<TImageType> oit(itk_outimage,itk_outimage->GetLargestPossibleRegion());
 
-  typedef itk::ShapedNeighborhoodIterator<TImageType>::OffsetType OffsetType;
+  typedef typename itk::ShapedNeighborhoodIterator<TImageType>::OffsetType OffsetType;
   typename OffsetType offset;
   offset.Fill(0);
   offset[0] = 1;       // {1,0,0}

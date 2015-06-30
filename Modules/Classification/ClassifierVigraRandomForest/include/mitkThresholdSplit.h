@@ -29,7 +29,7 @@ namespace mitk
         double GetPrecision() const;
 
         void SetMaximumTreeDepth(int value);
-        int GetMaximumTreeDepth() const;
+        virtual int GetMaximumTreeDepth() const;
 
         void SetWeights(vigra::MultiArrayView<2, double> weights);
         vigra::MultiArrayView<2, double> GetWeights() const;

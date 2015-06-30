@@ -30,11 +30,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUnstructuredGrid.h>
 #include <mitkProgressBar.h>
 
+#include <mitkIOUtil.h>
+#include <mitkBaseData.h>
+#include <itkNeighborhoodIterator.h>
+#include <mitkImageToUnstructuredGridFilter.h>
+
 mitk::FeatureBasedEdgeDetectionFilter::FeatureBasedEdgeDetectionFilter()
 {
   m_PointGrid = mitk::UnstructuredGrid::New();
   m_SegmentationMask = mitk::Image::New();
   m_thresholdImage = mitk::Image::New();
+  m_TestImage = mitk::Image::New();
 
   this->SetNumberOfRequiredInputs(1);
 
@@ -67,7 +73,7 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   double upperThreshold = mean + stdDev;
   double lowerThreshold = mean - stdDev;
 
-  mitk::ProgressBar::GetInstance()->Progress();
+  std::cout << "Lower: " << lowerThreshold << " - Upper: " << upperThreshold << std::endl;
 
   //thresholding
   AccessByItk_2(ncImage.GetPointer(), ITKThresholding, lowerThreshold, upperThreshold)
@@ -75,46 +81,51 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   mitk::ProgressBar::GetInstance()->Progress();
 
   //fill holes
+//  mitk::MorphologicalOperations::FillHoles(m_thresholdImage);
+
+  mitk::ProgressBar::GetInstance()->Progress();
+
+  mitk::MorphologicalOperations::Closing(m_thresholdImage, 1, mitk::MorphologicalOperations::Ball);
   mitk::MorphologicalOperations::FillHoles(m_thresholdImage);
+//  mitk::MorphologicalOperations::Opening(m_thresholdImage,1,mitk::MorphologicalOperations::Ball);
 
   mitk::ProgressBar::GetInstance()->Progress();
 
-//  mitk::MorphologicalOperations::Closing(m_morphThreshold,1,mitk::MorphologicalOperations::Ball);
-//  mitk::MorphologicalOperations::Opening(m_morphThreshold,1,mitk::MorphologicalOperations::Ball);
+  AccessByItk(m_thresholdImage,ContourSearch)
 
-  //masking
-  mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
-  maskFilter->SetInput(image);
-  maskFilter->SetMask(m_thresholdImage);
-  maskFilter->OverrideOutsideValueOn();
-  maskFilter->SetOutsideValue(0);
-  try
-  {
-    maskFilter->Update();
-  }
-  catch(itk::ExceptionObject& excpt)
-  {
-    MITK_ERROR << excpt.GetDescription();
-    return;
-  }
+      //m_TestImage
+  mitk::ImageToUnstructuredGridFilter::Pointer i2UFilter = mitk::ImageToUnstructuredGridFilter::New();
+  i2UFilter->SetInput(m_TestImage);
+  i2UFilter->SetThreshold(1.0);
+  i2UFilter->Update();
 
-  mitk::Image::Pointer resultImage = maskFilter->GetOutput();
+  m_PointGrid->SetVtkUnstructuredGrid( i2UFilter->GetOutput()->GetVtkUnstructuredGrid() );
+  m_PointGrid = this->GetOutput();
 
   mitk::ProgressBar::GetInstance()->Progress();
+}
 
-  //imagetopointcloudfilter
-  mitk::ImageToPointCloudFilter::Pointer pclFilter = mitk::ImageToPointCloudFilter::New();
-  pclFilter->SetInput(resultImage);
-  pclFilter->Update();
+#include <itkSimpleContourExtractorImageFilter.h>
+#include <mitkImageCast.h>
 
-  mitk::ProgressBar::GetInstance()->Progress();
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::FeatureBasedEdgeDetectionFilter::ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::BinaryContourImageFilter<ImageType, ImageType> binaryContourImageFilterType;
+  typedef unsigned char OutputPixelType;
+  typedef itk::Image< OutputPixelType, VImageDimension > OutputImageType;
 
-  mitk::UnstructuredGrid::Pointer outp = mitk::UnstructuredGrid::New();
-  outp->SetVtkUnstructuredGrid( pclFilter->GetOutput()->GetVtkUnstructuredGrid() );
-  this->SetNthOutput(0, outp);
+  typename binaryContourImageFilterType::Pointer binaryContourFilter = binaryContourImageFilterType::New();
+  binaryContourFilter->SetInput(originalImage);
+  binaryContourFilter->SetForegroundValue(1);
+  binaryContourFilter->SetBackgroundValue(0);
+  binaryContourFilter->Update();
 
-//  m_PointGrid->SetVtkUnstructuredGrid( pclFilter->GetOutput()->GetVtkUnstructuredGrid() );
-//  m_PointGrid = this->GetOutput();
+  typename itk::Image<TPixel, VImageDimension>::Pointer itkImage = itk::Image<TPixel, VImageDimension>::New();
+  itkImage->Graft(binaryContourFilter->GetOutput());
+
+  mitk::CastToMitkImage(itkImage, m_TestImage);
 }
 
 template <typename TPixel, unsigned int VImageDimension>
@@ -124,6 +135,13 @@ void mitk::FeatureBasedEdgeDetectionFilter::ITKThresholding( itk::Image<TPixel, 
   typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
+  if( typeid(TPixel) != typeid(float) && typeid(TPixel) != typeid(double))
+  {
+    //round the thresholds if we have nor a float or double image
+    lower = std::floor(lower + 0.5);
+    upper = std::floor(upper - 0.5);
+  }
+
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
   filter->SetInput(originalImage);
   filter->SetLowerThreshold(lower);
@@ -132,7 +150,7 @@ void mitk::FeatureBasedEdgeDetectionFilter::ITKThresholding( itk::Image<TPixel, 
   filter->SetOutsideValue(0);
   filter->Update();
 
-  m_thresholdImage = mitk::ImportItkImage(filter->GetOutput());
+  mitk::CastToMitkImage(filter->GetOutput(),m_thresholdImage);
 }
 
 void mitk::FeatureBasedEdgeDetectionFilter::SetSegmentationMask(mitk::Image::Pointer segmentation)

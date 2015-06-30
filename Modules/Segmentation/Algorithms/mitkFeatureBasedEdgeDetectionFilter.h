@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSegmentationExports.h>
 #include <mitkImageToUnstructuredGridFilter.h>
 
+#include <itkBinaryContourImageFilter.h>
+
 namespace mitk
 {
 
@@ -43,6 +45,9 @@ public:
 
   itkFactorylessNewMacro(Self)
 
+  itkGetMacro(thresholdImage,mitk::Image::Pointer)
+  itkGetMacro(TestImage, mitk::Image::Pointer)
+
   /** Sets the segmentation for calculating the statistics within that */
   void SetSegmentationMask(mitk::Image::Pointer);
 
@@ -64,6 +69,9 @@ protected:
   template <typename TPixel, unsigned int VImageDimension>
   void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, double lower, double upper);
 
+  template <typename TPixel, unsigned int VImageDimension>
+  void ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage);
+
 private:
 
   mitk::UnstructuredGrid::Pointer m_PointGrid;
@@ -73,6 +81,8 @@ private:
 
   /** The thesholded image */
   mitk::Image::Pointer m_thresholdImage;
+
+  mitk::Image::Pointer m_TestImage;
 
 };
 

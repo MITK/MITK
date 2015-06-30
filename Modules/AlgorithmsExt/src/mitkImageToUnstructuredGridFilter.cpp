@@ -82,7 +82,7 @@ void mitk::ImageToUnstructuredGridFilter::
   it.GoToBegin();
   while( !it.IsAtEnd() )
   {
-    if(it.Get() > m_Threshold)
+    if(it.Get() >= m_Threshold)
     {
       mitk::Point3D imagePoint;
       mitk::Point3D worldPoint;

@@ -293,10 +293,10 @@ public:
 
         if (m_NoiseModel!=NULL)
         {
-            if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel))
-                out.m_NoiseModel = new mitk::RicianNoiseModel<OutType>();
-            else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel))
-                out.m_NoiseModel = new mitk::ChiSquareNoiseModel<OutType>();
+            if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
+                out.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<OutType> >();
+            else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel.get()))
+                out.m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<OutType> >();
             out.m_NoiseModel->SetNoiseVariance(m_NoiseModel->GetNoiseVariance());
         }
 
@@ -339,7 +339,7 @@ public:
     /** Templated parameters */
     DiffusionModelListType              m_FiberModelList;       ///< Intra- and inter-axonal compartments.
     DiffusionModelListType              m_NonFiberModelList;    ///< Extra-axonal compartments.
-    NoiseModelType*                     m_NoiseModel;           ///< If != NULL, noise is added to the image.
+    std::shared_ptr< NoiseModelType >   m_NoiseModel;           ///< If != NULL, noise is added to the image.
 
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(string filename);       ///< Save image generation parameters to .ffp file.

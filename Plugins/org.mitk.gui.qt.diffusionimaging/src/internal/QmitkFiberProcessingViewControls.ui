@@ -25,7 +25,7 @@
         <x>0</x>
         <y>0</y>
         <width>355</width>
-        <height>308</height>
+        <height>330</height>
        </rect>
       </property>
       <attribute name="label">
@@ -77,36 +77,6 @@
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="4" column="0">
-        <widget class="QComboBox" name="m_ExtractionBoxMask">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <item>
-          <property name="text">
-           <string>Ending in mask</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Not ending in mask</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Passing mask</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Not passing mask</string>
-          </property>
-         </item>
-        </widget>
        </item>
        <item row="3" column="0">
         <widget class="QFrame" name="m_ExtactionFramePF">
@@ -416,6 +386,77 @@
          </item>
         </widget>
        </item>
+       <item row="4" column="0">
+        <widget class="QFrame" name="m_MaskExtractionFrame">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_19">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="m_ExtractionBoxMask">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <item>
+             <property name="text">
+              <string>Ending in mask</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Not ending in mask</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Passing mask</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Not passing mask</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Extract fibers:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="m_BothEnds">
+            <property name="text">
+             <string>Both ends</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_3">
@@ -423,8 +464,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>306</width>
-        <height>410</height>
+        <width>270</width>
+        <height>380</height>
        </rect>
       </property>
       <attribute name="label">
@@ -811,8 +852,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>355</width>
-        <height>382</height>
+        <width>280</width>
+        <height>349</height>
        </rect>
       </property>
       <attribute name="label">

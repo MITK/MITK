@@ -290,9 +290,9 @@ void mitk::FiberfoxParameters< ScalarType >::SaveParameters(string filename)
     if (m_NoiseModel!=NULL)
     {
         parameters.put("fiberfox.image.artifacts.noisevariance", m_NoiseModel->GetNoiseVariance());
-        if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel))
+        if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
             parameters.put("fiberfox.image.artifacts.noisetype", "rice");
-        else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel))
+        else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel.get()))
             parameters.put("fiberfox.image.artifacts.noisetype", "chisquare");
     }
 
@@ -475,8 +475,8 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
     m_FiberModelList.clear();
     m_NonFiberModelList.clear();
-    if (m_NoiseModel!=NULL)
-        delete m_NoiseModel;
+    if (m_NoiseModel)
+        m_NoiseModel = nullptr;
 
     BOOST_FOREACH( boost::property_tree::ptree::value_type const& v1, parameterTree.get_child("fiberfox") )
     {
@@ -632,7 +632,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             {
                 if (ReadVal<string>(v1,"artifacts.noisetype","")=="rice")
                 {
-                    m_NoiseModel = new mitk::RicianNoiseModel<ScalarType>();
+                    m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<ScalarType> >();
                     m_NoiseModel->SetNoiseVariance(ReadVal<double>(v1,"artifacts.noisevariance",m_NoiseModel->GetNoiseVariance()));
                 }
             }
@@ -641,7 +641,7 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             {
                 if (ReadVal<string>(v1,"artifacts.noisetype","")=="chisquare")
                 {
-                    m_NoiseModel = new mitk::ChiSquareNoiseModel<ScalarType>();
+                    m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<ScalarType> >();
                     m_NoiseModel->SetNoiseVariance(ReadVal<double>(v1,"artifacts.noisevariance",m_NoiseModel->GetNoiseVariance()));
                 }
             }

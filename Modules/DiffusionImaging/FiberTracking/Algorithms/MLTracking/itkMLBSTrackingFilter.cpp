@@ -442,7 +442,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
 
     ItkUcharImgType::IndexType idx;
     m_StoppingRegions->TransformPhysicalPointToIndex(pos, idx);
-    if (m_StoppingRegions->GetPixel(idx)>0)
+    if (m_StoppingRegions->GetLargestPossibleRegion().IsInside(idx) && m_StoppingRegions->GetPixel(idx)>0)
         return direction;
 
     if (olddir.magnitude()>0)
@@ -450,8 +450,11 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
 
     int candidates = 0; // number of directions with probability > 0
     double prob = 0;
-    direction = Classify(pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
-    direction *= prob;
+    if (IsValidPosition(pos))
+    {
+        direction = Classify(pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
+        direction *= prob;
+    }
 
 
     itk::OrientationDistributionFunction< double, 50 >  probeVecs;
@@ -482,7 +485,9 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
             m_SamplingPointset->InsertPoint(i, sample_pos);
 
         candidates = 0;
-        vnl_vector_fixed<double,3> tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
+        vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
+        if (IsValidPosition(sample_pos))
+            tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
         if (candidates>0 && tempDir.magnitude()>0.001)
         {
             direction += tempDir*prob;
@@ -503,7 +508,9 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
                 m_AlternativePointset->InsertPoint(alternatives, sample_pos);
             alternatives++;
             candidates = 0;
-            vnl_vector_fixed<double,3> tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob, true); // sample neighborhood
+            vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
+            if (IsValidPosition(sample_pos))
+                tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob, true); // sample neighborhood
 
             if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
             {
@@ -539,7 +546,7 @@ double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(ThreadIdType thr
         CalculateNewPosition(pos, dir);
 
         // is new position inside of image and mask
-        if (!IsValidPosition(pos) || m_AbortTracking)   // if not end streamline
+        if (m_AbortTracking)   // if not end streamline
         {
             return tractLength;
         }
@@ -716,7 +723,9 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
             int candidates = 0;
             double prob = 0;
             vnl_vector_fixed<double,3> dirOld; dirOld.fill(0.0);
-            vnl_vector_fixed<double,3> dir = Classify(worldPos, candidates, dirOld, 0, prob);
+            vnl_vector_fixed<double,3> dir; dir.fill(0.0);
+            if (IsValidPosition(worldPos))
+                dir = Classify(worldPos, candidates, dirOld, 0, prob);
             if (dir.magnitude()<0.0001)
                 continue;
 

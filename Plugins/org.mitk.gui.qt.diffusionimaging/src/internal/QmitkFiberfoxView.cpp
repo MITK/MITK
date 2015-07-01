@@ -780,7 +780,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         {
             if (noiseVariance>0)
             {
-                parameters.m_NoiseModel = new mitk::RicianNoiseModel<ScalarType>();
+                parameters.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<ScalarType> >();
                 parameters.m_Misc.m_ArtifactModelString += "_RICIAN-";
                 parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
                 parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
@@ -791,7 +791,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
         {
             if (noiseVariance>0)
             {
-                parameters.m_NoiseModel = new mitk::ChiSquareNoiseModel<ScalarType>();
+                parameters.m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<ScalarType> >();
                 parameters.m_Misc.m_ArtifactModelString += "_CHISQUARED-";
                 parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Chi-squared"));
                 parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
@@ -1348,9 +1348,9 @@ void QmitkFiberfoxView::LoadParameters()
     if (parameters.m_NoiseModel!=NULL)
     {
         m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
-        if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel))
+        if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel.get()))
             m_Controls->m_NoiseDistributionBox->setCurrentIndex(0);
-        else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(parameters.m_NoiseModel))
+        else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(parameters.m_NoiseModel.get()))
             m_Controls->m_NoiseDistributionBox->setCurrentIndex(1);
         m_Controls->m_NoiseLevel->setValue(parameters.m_NoiseModel->GetNoiseVariance());
     }

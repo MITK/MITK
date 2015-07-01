@@ -250,7 +250,7 @@ void AddArtifactsToDwiImageFilter< TPixelType >
         m_StatusText += "\n\n";
     }
 
-    if ( m_Parameters.m_NoiseModel!=NULL)
+    if ( m_Parameters.m_NoiseModel )
     {
         m_StatusText += this->GetTime()+" > Adding noise\n";
         m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";

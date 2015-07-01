@@ -43,7 +43,7 @@ public:
 
 protected:
 
-    double                       m_TEhalf;
+    double                       m_NegTEhalf;  ///< negative time to read half the k-space (needed to calculate the ms from the maximum echo); THIS IS NOT THE WELL KNOWN TE/2 SCANNER PARAMETER
     FiberfoxParameters<double>*  m_Parameters;
     itk::Size< 2 >               m_Size;
 };

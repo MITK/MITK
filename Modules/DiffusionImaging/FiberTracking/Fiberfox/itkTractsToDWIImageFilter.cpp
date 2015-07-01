@@ -1239,7 +1239,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     MITK_INFO << "Finalizing image";
     if (signalScale>1)
         m_StatusText += " Scaling signal\n";
-    if (m_Parameters.m_NoiseModel!=NULL)
+    if (m_Parameters.m_NoiseModel)
         m_StatusText += " Adding noise\n";
     unsigned int window = 0;
     unsigned int min = itk::NumericTraits<unsigned int>::max();
@@ -1268,7 +1268,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         typename OutputImageType::IndexType index = it4.GetIndex();
         signal = doubleOutImage->GetPixel(index)*signalScale;
 
-        if (m_Parameters.m_NoiseModel!=NULL)
+        if (m_Parameters.m_NoiseModel)
             m_Parameters.m_NoiseModel->AddNoise(signal);
 
         for (unsigned int i=0; i<signal.Size(); i++)

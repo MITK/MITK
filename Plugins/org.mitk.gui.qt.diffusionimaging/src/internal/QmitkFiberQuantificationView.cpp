@@ -410,33 +410,66 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateColorHeatmap(mitk:
 // generate tract density image from fiber bundle
 mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(mitk::FiberBundle::Pointer fib, bool binary, bool absolute)
 {
-    typedef float OutPixType;
-    typedef itk::Image<OutPixType, 3> OutImageType;
-
-    itk::TractDensityImageFilter< OutImageType >::Pointer generator = itk::TractDensityImageFilter< OutImageType >::New();
-    generator->SetFiberBundle(fib);
-    generator->SetBinaryOutput(binary);
-    generator->SetOutputAbsoluteValues(absolute);
-    generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
-    if (m_SelectedImage.IsNotNull())
-    {
-        OutImageType::Pointer itkImage = OutImageType::New();
-        CastToItkImage(m_SelectedImage, itkImage);
-        generator->SetInputImage(itkImage);
-        generator->SetUseImageGeometry(true);
-
-    }
-    generator->Update();
-
-    // get output image
-    typedef itk::Image<OutPixType,3> OutType;
-    OutType::Pointer outImg = generator->GetOutput();
-    mitk::Image::Pointer img = mitk::Image::New();
-    img->InitializeByItk(outImg.GetPointer());
-    img->SetVolume(outImg->GetBufferPointer());
-
-    // init data node
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(img);
+    if (binary)
+    {
+        typedef unsigned char OutPixType;
+        typedef itk::Image<OutPixType, 3> OutImageType;
+
+        itk::TractDensityImageFilter< OutImageType >::Pointer generator = itk::TractDensityImageFilter< OutImageType >::New();
+        generator->SetFiberBundle(fib);
+        generator->SetBinaryOutput(binary);
+        generator->SetOutputAbsoluteValues(absolute);
+        generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
+        if (m_SelectedImage.IsNotNull())
+        {
+            OutImageType::Pointer itkImage = OutImageType::New();
+            CastToItkImage(m_SelectedImage, itkImage);
+            generator->SetInputImage(itkImage);
+            generator->SetUseImageGeometry(true);
+
+        }
+        generator->Update();
+
+        // get output image
+        typedef itk::Image<OutPixType,3> OutType;
+        OutType::Pointer outImg = generator->GetOutput();
+        mitk::Image::Pointer img = mitk::Image::New();
+        img->InitializeByItk(outImg.GetPointer());
+        img->SetVolume(outImg->GetBufferPointer());
+
+        // init data node
+        node->SetData(img);
+    }
+    else
+    {
+        typedef float OutPixType;
+        typedef itk::Image<OutPixType, 3> OutImageType;
+
+        itk::TractDensityImageFilter< OutImageType >::Pointer generator = itk::TractDensityImageFilter< OutImageType >::New();
+        generator->SetFiberBundle(fib);
+        generator->SetBinaryOutput(binary);
+        generator->SetOutputAbsoluteValues(absolute);
+        generator->SetUpsamplingFactor(m_Controls->m_UpsamplingSpinBox->value());
+        if (m_SelectedImage.IsNotNull())
+        {
+            OutImageType::Pointer itkImage = OutImageType::New();
+            CastToItkImage(m_SelectedImage, itkImage);
+            generator->SetInputImage(itkImage);
+            generator->SetUseImageGeometry(true);
+
+        }
+        generator->Update();
+
+        // get output image
+        typedef itk::Image<OutPixType,3> OutType;
+        OutType::Pointer outImg = generator->GetOutput();
+        mitk::Image::Pointer img = mitk::Image::New();
+        img->InitializeByItk(outImg.GetPointer());
+        img->SetVolume(outImg->GetBufferPointer());
+
+        // init data node
+        node->SetData(img);
+    }
     return node;
 }

@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("numtrees"))
         numTrees = us::any_cast<int>(parsedArgs["numtrees"]);
 
-    int gmsamples = 50;
+    int gmsamples = -1;
     if (parsedArgs.count("gmsamples"))
         gmsamples = us::any_cast<int>(parsedArgs["gmsamples"]);
 
@@ -98,18 +98,18 @@ int main(int argc, char* argv[])
 
     MITK_INFO << "loading diffusion-weighted images";
     std::vector< mitk::Image::Pointer > rawData;
-    for (unsigned int i=0; i<imageFiles.size(); i++)
+    for (auto imgFile : imageFiles)
     {
-        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(imageFiles.at(i)).GetPointer());
+        mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(imgFile).GetPointer());
         rawData.push_back(dwi);
     }
 
     typedef itk::Image<unsigned char, 3> ItkUcharImgType;
     MITK_INFO << "loading mask images";
     std::vector< ItkUcharImgType::Pointer > maskImageVector;
-    for (unsigned int i=0; i<maskFiles.size(); i++)
+    for (auto maskFile : maskFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(maskFiles.at(i)).GetPointer());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(maskFile).GetPointer());
         ItkUcharImgType::Pointer mask = ItkUcharImgType::New();
         mitk::CastToItkImage(img, mask);
         maskImageVector.push_back(mask);
@@ -117,9 +117,9 @@ int main(int argc, char* argv[])
 
     MITK_INFO << "loading white matter mask images";
     std::vector< ItkUcharImgType::Pointer > wmMaskImageVector;
-    for (unsigned int i=0; i<wmMaskFiles.size(); i++)
+    for (auto wmFile : wmMaskFiles)
     {
-        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(wmMaskFiles.at(i)).GetPointer());
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(wmFile).GetPointer());
         ItkUcharImgType::Pointer wmmask = ItkUcharImgType::New();
         mitk::CastToItkImage(img, wmmask);
         wmMaskImageVector.push_back(wmmask);
@@ -127,9 +127,9 @@ int main(int argc, char* argv[])
 
     MITK_INFO << "loading tractograms";
     std::vector< mitk::FiberBundle::Pointer > tractograms;
-    for (unsigned int t=0; t<tractogramFiles.size(); t++)
+    for (auto tractFile : tractogramFiles)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(tractogramFiles.at(t)).at(0).GetPointer());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(tractFile).at(0).GetPointer());
         tractograms.push_back(fib);
     }
 

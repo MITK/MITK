@@ -68,7 +68,7 @@ void KspaceImageFilter< TPixelType >
     m_KSpaceImage->Allocate();
     m_KSpaceImage->FillBuffer(0.0);
 
-    m_Gamma = 42576000;    // Gyromagnetic ratio in Hz/T
+    m_Gamma = 42576000;    // Gyromagnetic ratio in Hz/T (1.5T)
     if ( m_Parameters->m_SignalGen.m_EddyStrength>0 && m_DiffusionGradientDirection.GetNorm()>0.001)
     {
         m_DiffusionGradientDirection.Normalize();
@@ -173,7 +173,7 @@ void KspaceImageFilter< TPixelType >
     double kyMax = m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1);
     double xMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(0); // scanner coverage in x-direction
     double yMax = m_CompartmentImages.at(0)->GetLargestPossibleRegion().GetSize(1); // scanner coverage in y-direction
-    double yMaxFov = yMax*m_Parameters->m_SignalGen.m_CroppingFactor;                // actual FOV in y-direction (in x-direction FOV=xMax)
+    double yMaxFov = yMax*m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
 
     double numPix = kxMax*kyMax;
 
@@ -189,7 +189,7 @@ void KspaceImageFilter< TPixelType >
         // readout time
         double tall = m_ReadoutScheme->GetRedoutTime(oit.GetIndex());
 
-        // calculate eddy current decay factor
+        // calculate eddy current decay factor (TODO: vielleichtumbauen dass hier die zeit vom letzten diffusionsgradienten an genommen wird. doku dann auch entsprechend anpassen.)
         double eddyDecay = 0;
         if ( m_Parameters->m_Misc.m_CheckAddEddyCurrentsBox && m_Parameters->m_SignalGen.m_EddyStrength>0)
             eddyDecay = exp(-tall/m_Parameters->m_SignalGen.m_Tau );
@@ -202,7 +202,6 @@ void KspaceImageFilter< TPixelType >
 
         // get current k-space index (depends on the schosen k-space readout scheme)
         itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(oit.GetIndex());
-
 
         // partial fourier
         bool pf = false;
@@ -269,7 +268,7 @@ void KspaceImageFilter< TPixelType >
                 {
                     itk::Point<double, 3> point3D;
                     ItkDoubleImgType::IndexType index; index[0] = it.GetIndex()[0]; index[1] = it.GetIndex()[1]; index[2] = m_Zidx;
-                    if (m_Parameters->m_SignalGen.m_DoAddMotion)
+                    if (m_Parameters->m_SignalGen.m_DoAddMotion)    // we have to account for the head motion since this also moves our frequency map
                     {
                         m_Parameters->m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
                         point3D = m_FiberBundle->TransformPoint(point3D.GetVnlVector(), -m_Rotation[0],-m_Rotation[1],-m_Rotation[2],-m_Translation[0],-m_Translation[1],-m_Translation[2]);
@@ -301,19 +300,7 @@ void KspaceImageFilter< TPixelType >
                 s = vcl_complex<double>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
 
             outputImage->SetPixel(kIdx, s);
-            //            m_KSpaceImage->SetPixel(kIdx, t/dt );
             m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
-//            if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
-//            {
-//                itk::Point<double, 3> point3D;
-//                ItkDoubleImgType::IndexType index; index[0] = kIdx[0]; index[1] = kIdx[1]; index[2] = m_Zidx;
-//                if (m_Parameters->m_SignalGen.m_DoAddMotion)
-//                {
-//                    m_Parameters->m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
-//                    point3D = m_FiberBundle->TransformPoint(point3D.GetVnlVector(), -m_Rotation[0],-m_Rotation[1],-m_Rotation[2],-m_Translation[0],-m_Translation[1],-m_Translation[2]);
-//                    m_KSpaceImage->SetPixel(kIdx, InterpolateFmapValue(point3D) );
-//                }
-//            }
         }
 
         ++oit;

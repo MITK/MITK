@@ -217,4 +217,5 @@ GetNextDataCollectionIterator(size_t start)
   return iterator;
 }
 
-#endif // mitkDataCollectionSingleImageIterator_CXX
+// mitkDataCollectionSingleImageIterator_CXX
+#endif 

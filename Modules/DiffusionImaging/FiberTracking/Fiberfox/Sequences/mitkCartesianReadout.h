@@ -37,7 +37,7 @@ public:
         dt =  m_Parameters->m_SignalGen.m_tLine/kxMax;  // time to read one k-space voxel
 
         // maximum echo at center of each line
-        m_TEhalf = -dt*(kxMax-(int)kxMax%2)/2;
+        m_NegTEhalf = -dt*(kxMax-(int)kxMax%2)/2;
     }
     ~CartesianReadout()
     {}
@@ -45,7 +45,7 @@ public:
     double GetTimeFromMaxEcho(itk::Index< 2 > index)
     {
         double t = 0;
-        t = m_TEhalf + (double)index[0]*dt;
+        t = m_NegTEhalf + (double)index[0]*dt;
         return t;
     }
 

@@ -135,11 +135,13 @@ void QmitkMLBTView::UpdateGui()
     {
         m_Controls->statusLabel->setText("Random forest available");
         m_Controls->m_SaveForestButton->setEnabled(true);
+        m_Controls->m_StartTrackingButton->setEnabled(true);
     }
     else
     {
         m_Controls->statusLabel->setText("Please load or train random forest!");
         m_Controls->m_SaveForestButton->setEnabled(false);
+        m_Controls->m_StartTrackingButton->setEnabled(false);
     }
 }
 
@@ -248,11 +250,13 @@ void QmitkMLBTView::OnTrackingThreadStop()
 
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
     mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
-    outFib->SetFiberColors(255,255,255);
-//    mitk::DataNode::Pointer node = mitk::DataNode::New();
     m_TractogramNode->SetData(outFib);
-    m_SamplingPointsNode->SetData(tracker->m_SamplingPointset);
-    m_AlternativePointsNode->SetData(tracker->m_AlternativePointset);
+    m_TractogramNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(1));
+    if (m_Controls->m_DemoModeBox->isChecked())
+    {
+        m_SamplingPointsNode->SetData(tracker->m_SamplingPointset);
+        m_AlternativePointsNode->SetData(tracker->m_AlternativePointset);
+    }
 
     tracker = NULL;
     m_TrackingTimer->stop();
@@ -297,7 +301,6 @@ void QmitkMLBTView::StartTracking()
     }
     tracker->SetSeedsPerVoxel(m_Controls->m_NumberOfSeedsBox->value());
     tracker->SetStepSize(m_Controls->m_TrackingStepSizeBox->value());
-    tracker->SetAngularThreshold(cos((float)m_Controls->m_AngularThresholdBox->value()*M_PI/180));
     tracker->SetMinTractLength(m_Controls->m_MinLengthBox->value());
     tracker->SetMaxTractLength(m_Controls->m_MaxLengthBox->value());
     tracker->SetAposterioriCurvCheck(m_Controls->m_Curvcheck2->isChecked());
@@ -310,15 +313,6 @@ void QmitkMLBTView::StartTracking()
     tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
     tracker->SetRandomSampling(m_Controls->m_RandomSampling->isChecked());
     tracker->Update();
-//    vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
-//    mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
-//    outFib->SetColorCoding(mitk::FiberBundle::COLORCODING_CUSTOM);
-//    mitk::DataNode::Pointer node = mitk::DataNode::New();
-//    m_TractogramNode->SetData(outFib);
-//    node->SetData(outFib);
-//    node->SetName("MLBT Result");
-//    this->GetDataStorage()->Add(node);
-//    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMLBTView::SaveForest()
@@ -364,6 +358,12 @@ void QmitkMLBTView::StartTraining()
 
     for (auto w : m_TrainingWidgets)
     {
+        if ( w->GetImage().IsNull() || w->GetFibers().IsNull() )
+        {
+            QMessageBox::information(nullptr, "Warning", "Training could not be started. Not all necessary datasets were selected.");
+            return;
+        }
+
         m_SelectedDiffImages.push_back(dynamic_cast<mitk::Image*>(w->GetImage()->GetData()));
         m_SelectedFB.push_back(dynamic_cast<mitk::FiberBundle*>(w->GetFibers()->GetData()));
 

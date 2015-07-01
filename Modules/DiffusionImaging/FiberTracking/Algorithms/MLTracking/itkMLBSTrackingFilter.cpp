@@ -442,7 +442,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
 
     ItkUcharImgType::IndexType idx;
     m_StoppingRegions->TransformPhysicalPointToIndex(pos, idx);
-    if (m_StoppingRegions->GetPixel(idx)>0)
+    if (m_StoppingRegions->GetLargestPossibleRegion().IsInside(idx) && m_StoppingRegions->GetPixel(idx)>0)
         return direction;
 
     if (olddir.magnitude()>0)

@@ -347,7 +347,7 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage(mitkMask, mask);
-        mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert);
+        mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert, m_Controls->m_BothEnds->isChecked());
         if (newFib->GetNumFibers()<=0)
         {
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
@@ -836,7 +836,6 @@ void QmitkFiberProcessingView::UpdateGui()
 
     // disable alle frames
     m_Controls->m_BundleWeightFrame->setVisible(false);
-    m_Controls->m_ExtractionBoxMask->setVisible(false);
     m_Controls->m_ExtactionFramePF->setVisible(false);
     m_Controls->m_RemoveDirectionFrame->setVisible(false);
     m_Controls->m_RemoveLengthFrame->setVisible(false);
@@ -845,6 +844,7 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_CompressFibersFrame->setVisible(false);
     m_Controls->m_ColorFibersFrame->setVisible(false);
     m_Controls->m_MirrorFibersFrame->setVisible(false);
+    m_Controls->m_MaskExtractionFrame->setVisible(false);
 
     bool pfSelected = !m_SelectedPF.empty();
     bool fibSelected = !m_SelectedFB.empty();
@@ -859,7 +859,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_ExtactionFramePF->setVisible(true);
         break;
     case 1:
-        m_Controls->m_ExtractionBoxMask->setVisible(true);
+        m_Controls->m_MaskExtractionFrame->setVisible(true);
         break;
     }
 
@@ -899,6 +899,8 @@ void QmitkFiberProcessingView::UpdateGui()
         break;
     case 3:
         m_Controls->m_MirrorFibersFrame->setVisible(true);
+        if (m_SelectedSurfaces.size()>0)
+            m_Controls->m_ModifyButton->setEnabled(true);
         break;
     case 4:
         m_Controls->m_BundleWeightFrame->setVisible(true);
@@ -912,7 +914,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_FibLabel->setText(QString(m_SelectedFB.at(0)->GetName().c_str()));
 
         // one bundle and one planar figure needed to extract fibers
-        if (pfSelected)
+        if (pfSelected && m_Controls->m_ExtractionMethodBox->currentIndex()==0)
         {
             m_Controls->m_InputData->setTitle("Input Data");
             m_Controls->m_PfLabel->setText(QString(m_SelectedPF.at(0)->GetName().c_str()));
@@ -928,8 +930,10 @@ void QmitkFiberProcessingView::UpdateGui()
             m_Controls->m_SubstractBundles->setEnabled(true);
         }
 
-        if (maskSelected)
+        if (maskSelected && m_Controls->m_ExtractionMethodBox->currentIndex()==1)
         {
+            m_Controls->m_InputData->setTitle("Input Data");
+            m_Controls->m_PfLabel->setText(QString(m_MaskImageNode->GetName().c_str()));
             m_Controls->m_RemoveButton->setEnabled(true);
             m_Controls->m_ExtractFibersButton->setEnabled(true);
         }
@@ -997,7 +1001,7 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
             m_SelectedSurfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
     }
 
-    if (m_SelectedFB.empty())
+    if (m_SelectedFB.empty() && m_SelectedSurfaces.empty())
     {
         int maxLayer = 0;
         itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer nodes = this->GetDefaultDataStorage()->GetAll();

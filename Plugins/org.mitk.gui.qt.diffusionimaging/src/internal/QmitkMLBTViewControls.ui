@@ -27,7 +27,7 @@
    <item row="1" column="0">
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
@@ -496,16 +496,6 @@
          </layout>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="m_Curvcheck2">
-         <property name="text">
-          <string>Secondary curvature check</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0">
         <widget class="QFrame" name="frame_2">
          <property name="frameShape">
@@ -527,51 +517,6 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="m_TrackingStepSizeBox">
-            <property name="value">
-             <double>0.500000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Max. Length</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QSpinBox" name="m_NumSamplesBox">
-            <property name="maximum">
-             <number>999999999</number>
-            </property>
-            <property name="value">
-             <number>50</number>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>Num. Samples:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Step Size:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Sampling Distance:</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
            <widget class="QSpinBox" name="m_NumberOfSeedsBox">
             <property name="statusTip">
@@ -585,51 +530,10 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>Min. Length</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QDoubleSpinBox" name="m_SamplingDistanceBox">
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-            <property name="value">
-             <double>0.500000000000000</double>
-            </property>
-           </widget>
+          <item row="0" column="1">
+           <widget class="QmitkDataStorageComboBox" name="m_TrackingRawImageBox"/>
           </item>
           <item row="6" column="1">
-           <widget class="QDoubleSpinBox" name="m_MinLengthBox">
-            <property name="maximum">
-             <double>999999999.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>20.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Angular Threshold:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Num. Seeds:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
            <widget class="QDoubleSpinBox" name="m_MaxLengthBox">
             <property name="maximum">
              <double>999999999.000000000000000</double>
@@ -642,33 +546,71 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="m_AngularThresholdBox">
-            <property name="decimals">
-             <number>1</number>
-            </property>
+          <item row="5" column="1">
+           <widget class="QDoubleSpinBox" name="m_MinLengthBox">
             <property name="maximum">
-             <double>90.000000000000000</double>
+             <double>999999999.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
             </property>
             <property name="value">
-             <double>45.000000000000000</double>
+             <double>20.000000000000000</double>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Num. Threads:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QSpinBox" name="m_NumberOfThreadsBox">
-            <property name="minimum">
-             <number>1</number>
-            </property>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="m_NumSamplesBox">
             <property name="maximum">
-             <number>30</number>
+             <number>999999999</number>
+            </property>
+            <property name="value">
+             <number>50</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Num. Seeds:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Min. Length</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Sampling Distance:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QDoubleSpinBox" name="m_SamplingDistanceBox">
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Max. Length</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Step Size:</string>
             </property>
            </widget>
           </item>
@@ -679,8 +621,36 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QmitkDataStorageComboBox" name="m_TrackingRawImageBox"/>
+          <item row="7" column="1">
+           <widget class="QSpinBox" name="m_NumberOfThreadsBox">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>30</number>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_15">
+            <property name="text">
+             <string>Num. Threads:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="m_TrackingStepSizeBox">
+            <property name="value">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Num. Samples:</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -773,6 +743,16 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="m_Curvcheck2">
+         <property name="text">
+          <string>Secondary curvature check</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

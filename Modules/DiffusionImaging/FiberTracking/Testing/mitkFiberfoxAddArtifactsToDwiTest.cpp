@@ -167,22 +167,20 @@ public:
 
     void RicianNoise()
     {
-        mitk::RicianNoiseModel<short>* ricianNoiseModel = new mitk::RicianNoiseModel<short>();
+        std::shared_ptr< mitk::RicianNoiseModel<short> > ricianNoiseModel = std::make_shared< mitk::RicianNoiseModel<short> >();
         ricianNoiseModel->SetNoiseVariance(1000000);
         ricianNoiseModel->SetSeed(0);
         m_Parameters.m_NoiseModel = ricianNoiseModel;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/riciannoise2.dwi") );
-        delete  m_Parameters.m_NoiseModel;
     }
 
     void ChiSquareNoise()
     {
-        mitk::ChiSquareNoiseModel<short>* chiSquareNoiseModel = new mitk::ChiSquareNoiseModel<short>();
+        std::shared_ptr< mitk::ChiSquareNoiseModel<short> > chiSquareNoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<short> >();
         chiSquareNoiseModel->SetNoiseVariance(1000000);
         chiSquareNoiseModel->SetSeed(0);
         m_Parameters.m_NoiseModel = chiSquareNoiseModel;
         StartSimulation( GetTestDataFilePath("DiffusionImaging/Fiberfox/chisquarenoise2.dwi") );
-        delete  m_Parameters.m_NoiseModel;
     }
 
     void Distortions()

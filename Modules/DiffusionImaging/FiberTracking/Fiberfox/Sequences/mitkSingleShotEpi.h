@@ -39,10 +39,10 @@ public:
         // k-space center at maximum echo
         if ( kyMax%2==0 )
         {
-            m_TEhalf = -m_Parameters->m_SignalGen.m_tLine*(kyMax-1)/2 + dt*(kxMax-(int)kxMax%2)/2;
+            m_NegTEhalf = -m_Parameters->m_SignalGen.m_tLine*(kyMax-1)/2 + dt*(kxMax-(int)kxMax%2)/2;
         }
         else
-            m_TEhalf = -m_Parameters->m_SignalGen.m_tLine*(kyMax-1)/2 - dt*(kxMax-(int)kxMax%2)/2;
+            m_NegTEhalf = -m_Parameters->m_SignalGen.m_tLine*(kyMax-1)/2 - dt*(kxMax-(int)kxMax%2)/2;
     }
     ~SingleShotEpi()
     {}
@@ -50,7 +50,7 @@ public:
     double GetTimeFromMaxEcho(itk::Index< 2 > index)
     {
         double t = 0;
-        t = m_TEhalf + ((double)index[1]*kxMax+(double)index[0])*dt;
+        t = m_NegTEhalf + ((double)index[1]*kxMax+(double)index[0])*dt;
         return t;
     }
 

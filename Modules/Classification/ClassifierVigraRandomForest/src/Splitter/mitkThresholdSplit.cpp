@@ -91,18 +91,10 @@ mitk::ThresholdSplit<TColumnDecisionFunctor, TFeatureCalculator, TTag>::SetMaxim
 
 template<class TColumnDecisionFunctor, class TFeatureCalculator, class TTag>
 int
-mitk::ThresholdSplit<TColumnDecisionFunctor, TFeatureCalculator, TTag>::GetMaximumTreeDepth()
+mitk::ThresholdSplit<TColumnDecisionFunctor, TFeatureCalculator, TTag>::GetMaximumTreeDepth() const
 {
   return m_MaximumTreeDepth;
 }
-
-template<class TColumnDecisionFunctor, class TFeatureCalculator, class TTag>
-int
-mitk::ThresholdSplit<TColumnDecisionFunctor, TFeatureCalculator, TTag>::GetConstMaximumTreeDepth()  const
-{
-  return m_MaximumTreeDepth;
-}
-
 
 template<class TColumnDecisionFunctor, class TFeatureCalculator, class TTag>
 void

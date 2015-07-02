@@ -189,6 +189,11 @@ mitk::DICOMImageBlockDescriptor
     ScalarType desiredSpacingY = imageSpacing[1];
     this->GetDesiredMITKImagePixelSpacing( desiredSpacingX, desiredSpacingY ); // prefer pixel spacing over imager pixel spacing
 
+    if ( desiredSpacingX <=0 || desiredSpacingY <=0 )
+    {
+      return mitkImage;
+    }
+
     MITK_DEBUG << "Loaded image with spacing " << imageSpacing[0] << ", " << imageSpacing[1];
     MITK_DEBUG << "Found correct spacing info " << desiredSpacingX << ", " << desiredSpacingY;
 

@@ -19,11 +19,13 @@
 #include "mitkInteractionPositionEvent.h"
 #include "mitkPropertyList.h"
 #include <string.h>
+
 // level window
-#include "mitkStandaloneDataStorage.h"
+#include "mitkDataStorage.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkLevelWindow.h"
+
 
 void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
@@ -49,22 +51,20 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 }
 
 mitk::DisplayInteractor::DisplayInteractor()
-  : m_IndexToSliceModifier(4)
-  , m_AutoRepeat(false)
-  , m_InvertScrollDirection( false )
-  , m_InvertZoomDirection( false )
-  , m_InvertMoveDirection( false )
-  , m_InvertLevelWindowDirection( false )
-  , m_AlwaysReact(false)
-  , m_ZoomFactor(2)
+:  m_LevelModifier(2)
+, m_WindowModifier(2)
+, m_IndexToSliceModifier(4)
+, m_AutoRepeat(false)
+, m_InvertScrollDirection( false )
+, m_InvertZoomDirection( false )
+, m_InvertMoveDirection( false )
+, m_InvertLevelWindowDirection( false )
+, m_AlwaysReact(false)
+ , m_ZoomFactor(2)
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
   m_CurrentDisplayCoordinate.Fill(0);
-}
-
-mitk::DisplayInteractor::~DisplayInteractor()
-{
 }
 
 bool mitk::DisplayInteractor::CheckPositionEvent( const InteractionEvent* interactionEvent )
@@ -80,11 +80,11 @@ bool mitk::DisplayInteractor::CheckPositionEvent( const InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer* sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+  const BaseRenderer* sender = interactionEvent->GetSender();
+  const InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+  const Vector2D origin = sender->GetDisplayGeometry()->GetOriginInMM();
+  const double scaleFactorMMPerDisplayUnit = sender->GetDisplayGeometry()->GetScaleFactorMMPerDisplayUnit();
 
-  Vector2D origin = sender->GetDisplayGeometry()->GetOriginInMM();
-  double scaleFactorMMPerDisplayUnit = sender->GetDisplayGeometry()->GetScaleFactorMMPerDisplayUnit();
   m_StartDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
@@ -96,7 +96,7 @@ bool mitk::DisplayInteractor::Init(StateMachineAction*, InteractionEvent* intera
 bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   BaseRenderer* sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+  const InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   float invertModifier = -1.0;
   if ( m_InvertMoveDirection )
@@ -114,7 +114,7 @@ bool mitk::DisplayInteractor::Move(StateMachineAction*, InteractionEvent* intera
 bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   const BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+  const InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   float factor = 1.0;
   float distance = 0;
@@ -156,7 +156,7 @@ bool mitk::DisplayInteractor::Zoom(StateMachineAction*, InteractionEvent* intera
 
 bool mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+  const InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
   if (sliceNaviController)
@@ -192,7 +192,7 @@ bool mitk::DisplayInteractor::Scroll(StateMachineAction*, InteractionEvent* inte
     int newPos = sliceNaviController->GetSlice()->GetPos() + delta;
 
     // if auto repeat is on, start at first slice if you reach the last slice and vice versa
-    int maxSlices = sliceNaviController->GetSlice()->GetSteps();
+    const int maxSlices = sliceNaviController->GetSlice()->GetSteps();
     if (m_AutoRepeat)
     {
       while (newPos < 0)
@@ -255,30 +255,13 @@ bool mitk::DisplayInteractor::ScrollOneUp(StateMachineAction*, InteractionEvent*
 
 bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+  const InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
   m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
   m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
-  // search for active image
-  mitk::DataStorage::Pointer storage = sender->GetDataStorage();
-  mitk::DataNode::Pointer node = NULL;
-  mitk::DataStorage::SetOfObjects::ConstPointer allImageNodes = storage->GetSubset(mitk::NodePredicateDataType::New("Image"));
-  for (unsigned int i = 0; i < allImageNodes->size(); i++)
-  {
-    bool isActiveImage = false;
-    bool propFound = allImageNodes->at(i)->GetBoolProperty("imageForLevelWindow", isActiveImage);
 
-    if (propFound && isActiveImage)
-    {
-      node = allImageNodes->at(i);
-      continue;
-    }
-  }
-  if (node.IsNull())
-  {
-    node = storage->GetNode(mitk::NodePredicateDataType::New("Image"));
-  }
+  // search for active image
+  const mitk::DataNode::Pointer node = GetDataNodeForLevelWindowInteraction( interactionEvent );
   if (node.IsNull())
   {
     return false;
@@ -304,38 +287,36 @@ bool mitk::DisplayInteractor::AdjustLevelWindow(StateMachineAction*, Interaction
     directionModifier = -1;
   }
 
+  const ScalarType levelChange  = m_CurrentDisplayCoordinate[levelIndex] - m_LastDisplayCoordinate[levelIndex];
+  const ScalarType windowChange = m_CurrentDisplayCoordinate[windowIndex] - m_LastDisplayCoordinate[windowIndex];
+
   // calculate adjustments from mouse movements
-  level += (m_CurrentDisplayCoordinate[levelIndex] - m_LastDisplayCoordinate[levelIndex]) * static_cast<ScalarType>(2) * directionModifier;
-  window += (m_CurrentDisplayCoordinate[windowIndex] - m_LastDisplayCoordinate[windowIndex]) * static_cast<ScalarType>(2) * directionModifier;
+  level  += (static_cast<int>( m_LevelModifier  * levelChange  * directionModifier * 100 )) / 100.0;
+  window += (static_cast<int>( m_WindowModifier * windowChange * directionModifier * 100 )) / 100.0;
 
   lv.SetLevelWindow(level, window);
   dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"))->SetLevelWindow(lv);
 
+  BaseRenderer::Pointer sender = interactionEvent->GetSender();
   sender->GetRenderingManager()->RequestUpdateAll();
   return true;
 }
 
 void mitk::DisplayInteractor::ConfigurationChanged()
 {
-  mitk::PropertyList::Pointer properties = GetAttributes();
-  // auto repeat
-  std::string strAutoRepeat = "";
-  if (properties->GetStringProperty("autoRepeat", strAutoRepeat))
-  {
-    if (strAutoRepeat == "true")
-    {
-      m_AutoRepeat = true;
-    }
-    else
-    {
-      m_AutoRepeat = false;
-    }
-  }
+  const mitk::PropertyList::Pointer properties = GetAttributes();
+
+
+
+  //////////////////////////////////////////////////////////////////////////
+  // Scroll
+  //////////////////////////////////////////////////////////////////////////
+
   // pixel movement for scrolling one slice
   std::string strPixelPerSlice = "";
   if (properties->GetStringProperty("pixelPerSlice", strPixelPerSlice))
   {
-    m_IndexToSliceModifier = atoi(strPixelPerSlice.c_str());
+    m_IndexToSliceModifier = atoi( strPixelPerSlice.c_str() );
   }
   else
   {
@@ -350,6 +331,53 @@ void mitk::DisplayInteractor::ConfigurationChanged()
   m_InvertScrollDirection = GetBoolProperty( properties, "invertScrollDirection", false );
 
 
+
+
+  //////////////////////////////////////////////////////////////////////////
+  // Move
+  //////////////////////////////////////////////////////////////////////////
+
+  m_InvertMoveDirection = GetBoolProperty( properties, "invertMoveDirection", false );
+
+
+
+
+  //////////////////////////////////////////////////////////////////////////
+  // Level/Window
+  //////////////////////////////////////////////////////////////////////////
+  if (!properties->GetStringProperty("levelWindowDirection", m_LevelDirection))
+  {
+    m_LevelDirection = "leftright";
+  }
+
+  m_InvertLevelWindowDirection = GetBoolProperty( properties, "invertLevelWindowDirection", false );
+
+  std::string strLevelModifier = "";
+  if (properties->GetStringProperty( "levelModifier", strLevelModifier ))
+  {
+    m_LevelModifier = atof( strLevelModifier.c_str() );
+  }
+
+  std::string strWindowModifier = "";
+  if (properties->GetStringProperty( "windowModifier", strWindowModifier ))
+  {
+    m_WindowModifier = atof( strWindowModifier.c_str() );
+  }
+
+
+
+
+  //////////////////////////////////////////////////////////////////////////
+  // Zoom
+  //////////////////////////////////////////////////////////////////////////
+  std::string strZoomFactor = "";
+  properties->GetStringProperty("zoomFactor", strZoomFactor);
+  m_ZoomFactor = .05;
+  if (atoi(strZoomFactor.c_str()) > 0)
+  {
+    m_ZoomFactor = 1.0 + (atoi(strZoomFactor.c_str()) / 100.0);
+  }
+
   // zoom direction
   if (!properties->GetStringProperty("zoomDirection", m_ZoomDirection))
   {
@@ -358,25 +386,12 @@ void mitk::DisplayInteractor::ConfigurationChanged()
 
   m_InvertZoomDirection = GetBoolProperty( properties, "invertZoomDirection", false );
 
-  m_InvertMoveDirection = GetBoolProperty( properties, "invertMoveDirection", false );
 
 
-  if (!properties->GetStringProperty("levelWindowDirection", m_LevelDirection))
-  {
-    m_LevelDirection = "leftright";
-  }
+  //////////////////////////////////////////////////////////////////////////
+  // Generic
+  //////////////////////////////////////////////////////////////////////////
 
-  m_InvertLevelWindowDirection = GetBoolProperty( properties, "invertLevelWindowDirection", false );
-
-
-  // zoom factor
-  std::string strZoomFactor = "";
-  properties->GetStringProperty("zoomFactor", strZoomFactor);
-  m_ZoomFactor = .05;
-  if (atoi(strZoomFactor.c_str()) > 0)
-  {
-    m_ZoomFactor = 1.0 + (atoi(strZoomFactor.c_str()) / 100.0);
-  }
   // allwaysReact
   std::string strAlwaysReact = "";
   if (properties->GetStringProperty("alwaysReact", strAlwaysReact))
@@ -394,6 +409,22 @@ void mitk::DisplayInteractor::ConfigurationChanged()
   {
     m_AlwaysReact = false;
   }
+
+
+  // auto repeat
+  std::string strAutoRepeat = "";
+  if (properties->GetStringProperty("autoRepeat", strAutoRepeat))
+  {
+    if (strAutoRepeat == "true")
+    {
+      m_AutoRepeat = true;
+    }
+    else
+    {
+      m_AutoRepeat = false;
+    }
+  }
+
 }
 
 bool mitk::DisplayInteractor::FilterEvents(InteractionEvent* interactionEvent, DataNode* /*dataNode*/)
@@ -408,7 +439,7 @@ bool mitk::DisplayInteractor::FilterEvents(InteractionEvent* interactionEvent, D
 
 bool mitk::DisplayInteractor::GetBoolProperty( mitk::PropertyList::Pointer propertyList,
                                                const char* propertyName,
-                                               bool defaultValue )
+                                               bool defaultValue ) const
 {
   std::string valueAsString;
   if ( !propertyList->GetStringProperty( propertyName, valueAsString ) )
@@ -426,4 +457,34 @@ bool mitk::DisplayInteractor::GetBoolProperty( mitk::PropertyList::Pointer prope
       return false;
     }
   }
+}
+
+mitk::DataNode::Pointer mitk::DisplayInteractor::GetDataNodeForLevelWindowInteraction( mitk::InteractionEvent* interactionEvent ) const
+{
+  mitk::DataNode::Pointer node = mitk::DataNode::Pointer();
+
+  const mitk::NodePredicateDataType::Pointer imageTypePred = mitk::NodePredicateDataType::New("Image");
+
+  const BaseRenderer::Pointer sender = interactionEvent->GetSender();
+  const mitk::DataStorage::Pointer storage = sender->GetDataStorage();
+  const mitk::DataStorage::SetOfObjects::ConstPointer allImageNodes = storage->GetSubset( imageTypePred );
+  const auto numberOfNodes = allImageNodes->size();
+  for (unsigned int i=0; i<numberOfNodes ; ++i)
+  {
+    const mitk::DataNode::Pointer dataNode = allImageNodes->at(i);
+    bool isActiveImage = false;
+    bool propFound = dataNode->GetBoolProperty("imageForLevelWindow", isActiveImage);
+
+    if (propFound && isActiveImage)
+    {
+      node = dataNode;
+      continue;
+    }
+  }
+  if (node.IsNull())
+  {
+    node = storage->GetNode( imageTypePred );
+  }
+
+  return node;
 }

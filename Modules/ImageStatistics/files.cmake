@@ -5,3 +5,10 @@ set(CPP_FILES
   mitkIntensityProfile.cpp
 )
 
+set(H_FILES
+  mitkImageStatisticsCalculator.h
+  mitkPointSetDifferenceStatisticsCalculator.h
+  mitkPointSetStatisticsCalculator.h
+  mitkExtendedStatisticsImageFilter.h
+  mitkExtendedLabelStatisticsImageFilter.h
+)

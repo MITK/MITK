@@ -256,7 +256,7 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
         }
         else if (OUTOFWM>0)
         {
-            m_GmSamples.push_back(std::round((double)wmSamples/(double)OUTOFWM));
+            m_GmSamples.push_back(0.5+(double)wmSamples/(double)OUTOFWM);
             m_NumberOfSamples += m_GmSamples.back()*OUTOFWM;
             MITK_INFO << "Non-white matter samples per voxel: " << m_GmSamples.back();
         }

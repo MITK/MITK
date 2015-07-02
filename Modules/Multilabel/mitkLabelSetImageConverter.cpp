@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkVectorImage.h"
 #include <itkComposeImageFilter.h>
 #include <itkVectorIndexSelectionCastImageFilter.h>
+#include "itkImageDuplicator.h"
 
 template < typename TPixel, unsigned int VImageDimension >
 void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimension>* source, mitk::Image::Pointer &output, mitk::LabelSetImage::ConstPointer input)
@@ -33,27 +34,52 @@ void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimensio
   typedef itk::ComposeImageFilter< itk::Image<TPixel, VImageDimension> > ComposeFilterType;
 
   unsigned int numberOfLayers = input->GetNumberOfLayers();
+  // 2015/07/01 At the time of writing MITK has problems with mitk::Images encapsulating itk::VectorImage
+  // if the vector length is less than 2, which might very well happen for segmentations.
+  if ( numberOfLayers > 1 )
+  { // if we have only one image we do not need to create a vector
+    ComposeFilterType::Pointer vectorImageComposer = ComposeFilterType::New();
 
-  ComposeFilterType::Pointer vectorImageComposer = ComposeFilterType::New();
+    unsigned int activeLayer = input->GetActiveLayer();
+    for (unsigned int layer(0); layer < numberOfLayers; layer++)
+    {
+      typename itk::Image<TPixel, VImageDimension>::Pointer itkCurrentLayer;
+      // for the active layer use the current state not the saved one in the vector
+      if (layer == activeLayer)
+      {
+        mitk::CastToItkImage(dynamic_cast<const mitk::Image*>(input.GetPointer()), itkCurrentLayer);
+      }
+      else
+      {
+        mitk::CastToItkImage(input->GetLayerImage(layer), itkCurrentLayer);
+      }
 
-  for (unsigned int layer(0); layer < numberOfLayers; layer++)
+      vectorImageComposer->SetInput(layer, itkCurrentLayer);
+    }
+
+    try
+    {
+      vectorImageComposer->Update();
+    }
+    catch (const itk::ExceptionObject& e)
+    {
+      MITK_ERROR << "Caught exception while updating compose filter: " << e.what();
+    }
+
+    output = mitk::GrabItkImageMemory(vectorImageComposer->GetOutput());
+  }
+  else
   {
+    // we want the clone to be a mitk::Image, not a mitk::LabelSetImage
     typename itk::Image<TPixel, VImageDimension>::Pointer itkCurrentLayer;
-    mitk::CastToItkImage(input->GetLayerImage(layer), itkCurrentLayer);
+    mitk::CastToItkImage(dynamic_cast<const mitk::Image*>(input.GetPointer()), itkCurrentLayer);
+    typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicatorType;
+    DuplicatorType::Pointer duplicator = DuplicatorType::New();
+    duplicator->SetInputImage(itkCurrentLayer);
+    duplicator->Update();
 
-    vectorImageComposer->SetInput(layer, itkCurrentLayer);
+    output = mitk::GrabItkImageMemory(duplicator->GetOutput());
   }
-
-  try
-  {
-    vectorImageComposer->Update();
-  }
-  catch (const itk::ExceptionObject& e)
-  {
-    MITK_ERROR << "Caugt exception while updating compose filter: " << e.what();
-  }
-
-  output = mitk::GrabItkImageMemory(vectorImageComposer->GetOutput());
   output->SetGeometry(input->GetGeometry()->Clone());
 }
 

@@ -80,6 +80,10 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore
     CPP_FILES CLDicom2Nrrd.cpp mitkCommandLineParser.cpp
   )
+  mitk_create_executable(CLPolyToNrrd
+    DEPENDS MitkCore
+    CPP_FILES CLPolyToNrrd.cpp mitkCommandLineParser.cpp
+  )
 
         # On Linux, create a shell script to start a relocatable application
         if(UNIX AND NOT APPLE)

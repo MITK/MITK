@@ -76,6 +76,7 @@ protected slots:
   void GenerateOrComposite();
   void GenerateNotComposite();
 
+  void CopyBundles();               ///< add copies of selected bundles to data storage
   void JoinBundles();               ///< merge selected fiber bundles
   void SubstractBundles();          ///< subtract bundle A from bundle B. Not commutative! Defined by order of selection.
   void GenerateRoiImage();          ///< generate binary image of selected planar figures.

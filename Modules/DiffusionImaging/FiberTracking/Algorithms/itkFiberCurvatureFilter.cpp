@@ -100,9 +100,9 @@ void FiberCurvatureFilter::GenerateData()
             meanV.normalize();
 
             double dev = 0;
-            for (int c=0; c<vectors.size(); c++)
+            for (auto vec : vectors)
             {
-                double angle = dot_product(meanV, vectors.at(c));
+                double angle = dot_product(meanV, vec);
                 if (angle>1.0)
                     angle = 1.0;
                 if (angle<-1.0)

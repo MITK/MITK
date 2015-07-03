@@ -15,6 +15,8 @@ namespace mitk
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
+      GIFCooccurenceMatrix();
+
       /**
       * \brief Calculates the Cooccurence-Matrix based features for this class.
       */
@@ -24,6 +26,12 @@ namespace mitk
       * \brief Returns a list of the names of all features that are calculated from this class
       */
       virtual FeatureNameListType GetFeatureNames();
+
+      itkGetConstMacro(Range,double);
+      itkSetMacro(Range, double);
+
+    private:
+      double m_Range;
   };
 
 }

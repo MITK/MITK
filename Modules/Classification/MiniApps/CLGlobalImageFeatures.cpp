@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "time.h"
 #include <sstream>
+#include <fstream>
 
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
@@ -28,6 +29,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned char, 3 >          MaskImageType;
 
+
+vector<double> splitDouble(string str, char delimiter) {
+  vector<double> internal;
+  stringstream ss(str); // Turn the string into a stream.
+  string tok;
+  double val;
+  while(getline(ss, tok, delimiter)) {
+    stringstream s2(tok);
+    s2 >> val;
+    internal.push_back(val);
+  }
+
+  return internal;
+}
+
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -37,7 +54,8 @@ int main(int argc, char* argv[])
   parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Mask", "Mask Image that specifies the area over for the statistic, (Values = 1)", us::Any(), false);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
 
-  parser.addArgument("cooccurence","cooc",mitkCommandLineParser::Int, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
+  parser.addArgument("cooccurence","cooc",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
+  parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -60,18 +78,44 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
 
+
+  ////////////////////////////////////////////////////////////////
+  // CAlculate Co-occurence Features
+  ////////////////////////////////////////////////////////////////
   mitk::AbstractGlobalImageFeature::FeatureListType stats;
-  if (useCooc)
+  if (parsedArgs.count("cooccurence"))
   {
-    MITK_INFO << "Calculating co-occurence matrix features";
-    mitk::GIFCooccurenceMatrix coocCalculator;
-    stats = coocCalculator.CalculateFeatures(image, mask);
+    auto ranges = splitDouble(parsedArgs["cooccurence"].ToString(),';');
+
+    for (int i = 0; i < ranges.size(); ++i)
+    {
+      mitk::GIFCooccurenceMatrix coocCalculator;
+      coocCalculator.SetRange(ranges[i]);
+      auto localResults = coocCalculator.CalculateFeatures(image, mask);
+      stats.insert(stats.end(), localResults.begin(), localResults.end());
+    }
   }
 
   for (int i = 0; i < stats.size(); ++i)
   {
     std::cout << stats[i].first << " - " << stats[i].second <<std::endl;
   }
+
+  std::ofstream output(parsedArgs["output"].ToString(),std::ios::app);
+  if ( parsedArgs.count("header") )
+  {
+    for (int i = 0; i < stats.size(); ++i)
+    {
+      output << stats[i].first << ";";
+    }
+    output << std::endl;
+  }
+  for (int i = 0; i < stats.size(); ++i)
+  {
+    output << stats[i].second << ";";
+  }
+  output << std::endl;
+  output.close();
 
   return 0;
 }

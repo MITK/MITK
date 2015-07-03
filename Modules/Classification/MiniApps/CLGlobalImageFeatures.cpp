@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 
 #include <mitkGIFCooccurenceMatrix.h>
+#include <mitkGIFGrayLevelRunLength.h>
 
 
 typedef itk::Image< double, 3 >                 FloatImageType;
@@ -55,6 +56,7 @@ int main(int argc, char* argv[])
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
 
   parser.addArgument("cooccurence","cooc",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
+  parser.addArgument("run-length","rl",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
   parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
 
   // Miniapp Infos
@@ -79,10 +81,10 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
 
 
+  mitk::AbstractGlobalImageFeature::FeatureListType stats;
   ////////////////////////////////////////////////////////////////
   // CAlculate Co-occurence Features
   ////////////////////////////////////////////////////////////////
-  mitk::AbstractGlobalImageFeature::FeatureListType stats;
   if (parsedArgs.count("cooccurence"))
   {
     auto ranges = splitDouble(parsedArgs["cooccurence"].ToString(),';');
@@ -96,6 +98,21 @@ int main(int argc, char* argv[])
     }
   }
 
+  ////////////////////////////////////////////////////////////////
+  // CAlculate Run-Length Features
+  ////////////////////////////////////////////////////////////////
+  if (parsedArgs.count("run-length"))
+  {
+    auto ranges = splitDouble(parsedArgs["run-length"].ToString(),';');
+
+    for (int i = 0; i < ranges.size(); ++i)
+    {
+      mitk::GIFGrayLevelRunLength calculator;
+      calculator.SetRange(ranges[i]);
+      auto localResults = calculator.CalculateFeatures(image, mask);
+      stats.insert(stats.end(), localResults.begin(), localResults.end());
+    }
+  }
   for (int i = 0; i < stats.size(); ++i)
   {
     std::cout << stats[i].first << " - " << stats[i].second <<std::endl;

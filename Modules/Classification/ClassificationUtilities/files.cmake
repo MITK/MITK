@@ -7,6 +7,7 @@ set(CPP_FILES
   Features/itkNeighborhoodFunctorImageFilter.cpp
 
   GlobalImageFeatures/mitkGIFCooccurenceMatrix.cpp
+  GlobalImageFeatures/mitkGIFGrayLevelRunLength.cpp
   mitkCLUtil.cpp
 
 )

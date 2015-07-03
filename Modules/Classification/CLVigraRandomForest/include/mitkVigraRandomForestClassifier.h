@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkVigraRandomForestClassifier_h
 #define mitkVigraRandomForestClassifier_h
 
-#include <MitkClassifierVigraRandomForestExports.h>
+#include <MitkCLVigraRandomForestExports.h>
 #include <mitkAbstractClassifier.h>
 
 //#include <vigra/multi_array.hxx>
@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class MITKCLASSIFIERVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : public AbstractClassifier
+class MITKCLVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : public AbstractClassifier
 {
 public:
 

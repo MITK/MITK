@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 #include <mitkRandomForestIO.h>
 #include "mitkNodePredicateDataType.h"
+#include <mitkDummyLsetReader.h>
 
 namespace mitk
 {
@@ -36,15 +37,18 @@ namespace mitk
       // *-----------------*
 
       m_DecisionForestIO = new mitk::RandomForestFileIO();
+      m_DummyLsetReader = new mitk::DummyLsetFileReader();
     }
 
     void Unload(us::ModuleContext*)
     {
       delete m_DecisionForestIO;
+      delete m_DummyLsetReader;
     }
 
   private:
     mitk::RandomForestFileIO * m_DecisionForestIO;
+    mitk::DummyLsetFileReader * m_DummyLsetReader;
   };
 }
 

@@ -6,11 +6,18 @@ set(CPP_FILES
 
     Classifier/mitkVigraRandomForestClassifier.cpp
 
+    Algorithm/itkHessianMatrixEigenvalueImageFilter.cpp
+    Algorithm/itkStructureTensorEigenvalueImageFilter.cpp
+    Algorithm/mitkLineHistogramBasedMassImageFilter.cpp
+    Algorithm/mitkRandomForestAccurecyWeighting.cpp
+
     Splitter/mitkImpurityLoss.cpp
     Splitter/mitkLinearSplitting.cpp
     Splitter/mitkThresholdSplit.cpp
 
     IO/mitkRandomForestIO.cpp
+    IO/mitkVigraRandomForestClassifierSerializer.cpp
+    IO/mitkDummyLsetReader.cpp
 )
 
 set( TOOL_FILES

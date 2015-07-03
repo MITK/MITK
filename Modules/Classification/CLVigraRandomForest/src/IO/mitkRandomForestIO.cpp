@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itksys/SystemTools.hxx"
 //#include "mitkHDF5IOMimeTypes.h"
 
-#include "vigra/random_forest.hxx"
+
 #include "vigra/random_forest_hdf5_impex.hxx"
 
 #include <iostream>
@@ -29,9 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVigraRandomForestClassifier.h"
 #include "mitkIOMimeTypes.h"
-
-//#include <boost/algorithm/string.hpp>
-
 
 #define GetAttribute(name,type)\
   type name;\
@@ -41,13 +38,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::RandomForestFileIO::ConfidenceLevel mitk::RandomForestFileIO::GetReaderConfidenceLevel() const
 {
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetLocalFileName().c_str());
-  return ext == ".hdf5" ? IFileReader::Supported : IFileReader::Unsupported;
+  bool is_loaded = vigra::rf_import_HDF5(m_rf, this->GetInputLocation());
+  return ext == ".hdf5"  && is_loaded == true? IFileReader::Supported : IFileReader::Unsupported;
 }
 
 mitk::RandomForestFileIO::ConfidenceLevel mitk::RandomForestFileIO::GetWriterConfidenceLevel() const
 {
-  MITK_INFO << "WRITER CONFIDENCE LEVEL";
-  // Check if the image dimension is supported
   mitk::VigraRandomForestClassifier::ConstPointer input = dynamic_cast<const mitk::VigraRandomForestClassifier *>(this->GetInput());
   if (input.IsNull())
   {
@@ -67,7 +63,8 @@ mitk::RandomForestFileIO::RandomForestFileIO()
   customReaderMimeType.SetCategory(category);
   customReaderMimeType.AddExtension("hdf5");
 
-
+//  this->AbstractFileIOReader::SetRanking(100);
+//  this->AbstractFileIOWriter::SetRanking(100);
   this->AbstractFileWriter::SetMimeTypePrefix(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".hdf5");
   this->AbstractFileWriter::SetMimeType(customReaderMimeType);
   this->SetWriterDescription("Vigra Random Forest");
@@ -120,11 +117,11 @@ Read()
     }
 
 
-    vigra::RandomForest<int> rf;
-    vigra::rf_import_HDF5(rf, this->GetInputLocation());
+
+
 //    vigra::HDF5File hdf5_file;
 //    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
-    output->SetRandomForest(rf);
+    output->SetRandomForest(m_rf);
     result.push_back(output.GetPointer());
 
 //    if(!hdf5_file.existsAttribute(".","mitk")){

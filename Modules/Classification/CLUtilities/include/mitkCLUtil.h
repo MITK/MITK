@@ -2,7 +2,7 @@
 #define mitkCLUtil_h
 
 #include <Eigen/Dense>
-#include <MitkClassificationUtilitiesExports.h>
+#include <MitkCLUtilitiesExports.h>
 #include <itkImageRegionIterator.h>
 
 
@@ -14,7 +14,7 @@
 namespace mitk
 {
 
-class MITKCLASSIFICATIONUTILITIES_EXPORT CLUtil
+class MITKCLUTILITIES_EXPORT CLUtil
 {
 public:
   ///
@@ -22,7 +22,7 @@ public:
   ///
   enum MorphologicalDimensions
   {
-    Axial,Coronal,Sagial,All
+    Axial,Coronal,Sagital,All
   };
 
   ///
@@ -84,7 +84,7 @@ public:
   /// \param image1
   /// \param image2
   ///
-  static void LogicalAndImages(Image::Pointer &image1, Image::Pointer &image2, Image::Pointer &outimage);
+  static void LogicalAndImages(const Image::Pointer &image1, const Image::Pointer &image2, Image::Pointer &outimage);
 
 
   ///
@@ -265,7 +265,7 @@ public:
   /// \param std_dev
   /// \param resultImage
   ///
-  static void ProbabilityMap(mitk::Image::Pointer&  sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage);
+  static void ProbabilityMap(const mitk::Image::Pointer&  sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage);
 
   template<class TImageType>
   static void itkCountVoxel( TImageType * image, std::map<unsigned int, unsigned int> & map)
@@ -322,6 +322,44 @@ public:
     }
   }
 
+  template <class TImageType>
+  static void itkSampleLabel(TImageType* image, mitk::Image::Pointer & output, unsigned int n_samples_drawn)
+  {
+    std::srand (time(NULL));
+
+    typename TImageType::Pointer itk_out = TImageType::New();
+    itk_out->SetRegions(image->GetLargestPossibleRegion());
+    itk_out->SetDirection(image->GetDirection());
+    itk_out->SetOrigin(image->GetOrigin());
+    itk_out->SetSpacing(image->GetSpacing());
+    itk_out->Allocate();
+    itk_out->FillBuffer(0);
+
+    itk::ImageRegionConstIterator< TImageType > inputIter(image, image->GetLargestPossibleRegion());
+    itk::ImageRegionIterator< TImageType > outputIter(itk_out, itk_out->GetLargestPossibleRegion());
+
+    for(unsigned int i = 0 ; i < n_samples_drawn ;)
+    {
+      double r = (double)(rand()) / RAND_MAX;
+      if(inputIter.Value() != 0 && r < 0.01 && outputIter.Value() == 0)
+      {
+        outputIter.Set(inputIter.Value());
+        i++;
+      }
+      ++inputIter;
+      ++outputIter;
+
+      if(inputIter.IsAtEnd())
+      {
+        inputIter.GoToBegin();
+        outputIter.GoToBegin();
+      }
+
+    }
+
+    mitk::CastToMitkImage(itk_out, output);
+  }
+
 private:
 
   template<class TImageType>
@@ -334,13 +372,28 @@ private:
   static void itkFillHoleGrayscale(TImageType * image, mitk::Image::Pointer & outimage);
 
   template< typename TImageType >
-  static void itkInsertLabel(TImageType * image, mitk::Image::Pointer & maskImage, unsigned int label)
+  static void itkInsertLabel(TImageType * maskImage, mitk::Image::Pointer & outimage, unsigned int label)
   {
-    typename TImageType::Pointer itkMask;
-    mitk::CastToItkImage(maskImage, itkMask);
 
-    itk::ImageRegionIterator<TImageType> oit(image,image->GetLargestPossibleRegion());
-    itk::ImageRegionConstIterator<TImageType> mit(itkMask,itkMask->GetLargestPossibleRegion());
+    typename TImageType::Pointer itk_out;
+
+    if(outimage.IsNull()) // create if necessary
+    {
+      MITK_INFO << "Initialize new image";
+      itk_out = TImageType::New();
+      itk_out->SetSpacing(maskImage->GetSpacing());
+      itk_out->SetDirection(maskImage->GetDirection());
+      itk_out->SetOrigin(maskImage->GetOrigin());
+      itk_out->SetRegions(maskImage->GetLargestPossibleRegion());
+      itk_out->Allocate();
+      itk_out->FillBuffer(0);
+    }else
+    {
+      mitk::CastToItkImage(outimage, itk_out);
+    }
+
+    itk::ImageRegionIterator<TImageType> oit(itk_out,itk_out->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator<TImageType> mit(maskImage,maskImage->GetLargestPossibleRegion());
 
     while(!mit.IsAtEnd())
     {
@@ -351,6 +404,8 @@ private:
       ++oit;
       ++mit;
     }
+
+    mitk::CastToMitkImage(itk_out,outimage);
   }
 
 
@@ -454,13 +509,13 @@ private:
   static void itkFillHolesBinary(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage);
 
   template<typename TImageType>
-  static void itkLogicalAndImages(TImageType * image1, mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage);
+  static void itkLogicalAndImages(const TImageType * image1, const mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage);
 
   template<class TImageType>
   static void itkGaussianFilter(TImageType * image, mitk::Image::Pointer & smoothed ,double sigma);
 
   template<typename TImageType>
-  static void itkProbabilityMap(TImageType * sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage);
+  static void itkProbabilityMap(const TImageType * sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage);
 
 
 

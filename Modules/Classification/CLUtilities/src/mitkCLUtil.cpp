@@ -26,7 +26,7 @@
 // Image Filter
 #include <itkDiscreteGaussianImageFilter.h>
 
-void mitk::CLUtil::ProbabilityMap(mitk::Image::Pointer & image , double mean, double stddev, mitk::Image::Pointer & outimage)
+void mitk::CLUtil::ProbabilityMap(const mitk::Image::Pointer & image , double mean, double stddev, mitk::Image::Pointer & outimage)
 {
   AccessFixedDimensionByItk_3(image, mitk::CLUtil::itkProbabilityMap, 3, mean, stddev, outimage);
 }
@@ -86,7 +86,7 @@ void mitk::CLUtil::CreateCheckerboardMask(mitk::Image::Pointer image, mitk::Imag
   AccessFixedDimensionByItk_1(image, mitk::CLUtil::itkCreateCheckerboardMask,3, outimage);
 }
 
-void mitk::CLUtil::LogicalAndImages(mitk::Image::Pointer & image1, mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage)
+void mitk::CLUtil::LogicalAndImages(const mitk::Image::Pointer & image1, const mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage)
 {
   AccessFixedDimensionByItk_2(image1,itkLogicalAndImages, 3, image2, outimage);
 
@@ -121,7 +121,7 @@ void mitk::CLUtil::ClosingBinary(mitk::Image::Pointer & sourceImage, mitk::Image
 }
 
 template<typename TImageType>
-void mitk::CLUtil::itkProbabilityMap(TImageType * sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage)
+void mitk::CLUtil::itkProbabilityMap(const TImageType * sourceImage, double mean, double std_dev, mitk::Image::Pointer& resultImage)
 {
   itk::Image<double, 3>::Pointer itk_img = itk::Image<double, 3>::New();
   itk_img->SetRegions(sourceImage->GetLargestPossibleRegion());
@@ -131,7 +131,7 @@ void mitk::CLUtil::itkProbabilityMap(TImageType * sourceImage, double mean, doub
   itk_img->Allocate();
 
 
-  itk::ImageRegionIterator<TImageType> it(sourceImage,sourceImage->GetLargestPossibleRegion());
+  itk::ImageRegionConstIterator<TImageType> it(sourceImage,sourceImage->GetLargestPossibleRegion());
   itk::ImageRegionIterator<itk::Image<double, 3> > outit(itk_img,itk_img->GetLargestPossibleRegion());
 
   while(!it.IsAtEnd())
@@ -144,7 +144,7 @@ void mitk::CLUtil::itkProbabilityMap(TImageType * sourceImage, double mean, doub
     ++outit;
   }
 
-  mitk::GrabItkImageMemory(itk_img, resultImage);
+  mitk::CastToMitkImage(itk_img, resultImage);
 }
 
 template< typename TImageType >
@@ -285,7 +285,7 @@ void mitk::CLUtil::itkFitStructuringElement(TStructuringElement & se, Morphologi
   case(Axial):
     size.SetElement(2,0);
     break;
-  case(Sagial):
+  case(Sagital):
     size.SetElement(0,0);
     break;
   case(Coronal):
@@ -383,7 +383,7 @@ void mitk::CLUtil::itkFillHolesBinary(itk::Image<TPixel, VDimension>* sourceImag
 /// \param image2
 ///
 template<typename TImageType>
-void mitk::CLUtil::itkLogicalAndImages(TImageType * image1, mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage)
+void mitk::CLUtil::itkLogicalAndImages(const TImageType * image1, const mitk::Image::Pointer & image2, mitk::Image::Pointer & outimage)
 {
 
   typename TImageType::Pointer itk_outimage = TImageType::New();

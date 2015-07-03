@@ -47,6 +47,7 @@ struct NeighborhoodFirstOrderStatistics
     sqmean /= it.Size();
 
     double variance = sqmean - mean * mean;
+
     double stdderivation = std::sqrt(variance);
     double skewness = 0;
     double kurtosis = 0;
@@ -62,8 +63,14 @@ struct NeighborhoodFirstOrderStatistics
     kurtosis /= it.Size();
     kurtosis /= (variance * variance);
 
-    OutputVectorType output_vector;
+    if(skewness!=skewness){
+        skewness = 0;
+    }
+    if(kurtosis!=kurtosis){
+        kurtosis = 0;
+    }
 
+    OutputVectorType output_vector;
     output_vector[MEAN] = mean;
     output_vector[VARIANCE] = variance;
     output_vector[SKEWNESS] = skewness;

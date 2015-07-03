@@ -35,7 +35,7 @@ public:
 
     typedef TInputImageType                                         InputImageType;
     typedef typename TInputImageType::PixelType                     InputImagePixelType;
-    typedef itk::Image<unsigned char, InputImageDimension>          MaskImageType;
+    typedef itk::Image<short, InputImageDimension>          MaskImageType;
     typedef typename MaskImageType::PixelType                       MaskImagePixelType;
     typedef TFeatureImageType                                       FeatureImageType;
     typedef typename FeatureImageType::PixelType                    FeaturePixelType;

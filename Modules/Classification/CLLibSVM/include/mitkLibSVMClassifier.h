@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkLibSVMClassifier_h
 #define mitkLibSVMClassifier_h
 
-#include <MitkClassifierLibSVMExports.h>
+#include <MitkCLLibSVMExports.h>
 
 #include <mitkAbstractClassifier.h>
 
@@ -31,7 +31,7 @@ namespace LibSVM
 
 namespace mitk
 {
-  class MITKCLASSIFIERLIBSVM_EXPORT LibSVMClassifier : public AbstractClassifier
+  class MITKCLLIBSVM_EXPORT LibSVMClassifier : public AbstractClassifier
   {
   public:
 

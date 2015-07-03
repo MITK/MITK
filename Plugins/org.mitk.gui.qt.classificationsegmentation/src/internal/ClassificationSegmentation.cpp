@@ -150,8 +150,7 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
   m_PointSetDataInteractor = mitk::PointSetDataInteractor::New();
   m_PointSetDataInteractor->LoadStateMachine("PointSet.xml");
   m_PointSetDataInteractor->SetEventConfig("PointSetConfig.xml");
-
-
+  m_PointSetDataInteractor->EnableUndo(true);
 
 
   connect( cb_inputimage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnInitializeSession(const mitk::DataNode*)));

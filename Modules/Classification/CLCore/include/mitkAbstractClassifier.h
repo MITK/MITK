@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkAbstractClassifier_h
 #define mitkAbstractClassifier_h
 
-#include <MitkClassificationCoreExports.h>
+#include <MitkCLCoreExports.h>
 
 #include <mitkBaseData.h>
 
@@ -32,9 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class MITKCLASSIFICATIONCORE_EXPORT AbstractClassifier : public BaseData
+class MITKCLCORE_EXPORT AbstractClassifier : public BaseData
 {
 public:
+
+  mitkClassMacro(AbstractClassifier,BaseData)
 
   ///
   /// @brief Build a forest of trees from the training set (X, y).

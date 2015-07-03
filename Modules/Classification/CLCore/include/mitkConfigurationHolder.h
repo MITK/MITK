@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkConfigurationHolder_h
 #define mitkConfigurationHolder_h
 
-#include <MitkClassificationCoreExports.h>
+#include <MitkCLCoreExports.h>
 
 //#include <mitkBaseData.h>
 
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKCLASSIFICATIONCORE_EXPORT ConfigurationHolder // : public BaseData
+  class MITKCLCORE_EXPORT ConfigurationHolder // : public BaseData
   {
   public:
     enum ValueType

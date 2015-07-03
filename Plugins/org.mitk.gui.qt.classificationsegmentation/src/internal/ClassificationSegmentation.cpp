@@ -107,26 +107,6 @@ void ClassificationSegmentation::OnButtonNoInteractionToggle(bool checked)
     m_PointSetDataInteractor->SetDataNode(nullptr);
 }
 
-//void ClassificationSegmentation::RenderWindowPartActivated(
-//    mitk::IRenderWindowPart* renderWindowPart)
-//{
-//  // let the point set widget know about the slice navigation controllers
-//  // in the active render window part (crosshair updates)
-//  foreach(QmitkRenderWindow* renderWindow, renderWindowPart->GetQmitkRenderWindows().values())
-//  {
-//    m_PointListWidget->AddSliceNavigationController(renderWindow->GetSliceNavigationController());
-//  }
-//}
-
-//void ClassificationSegmentation::RenderWindowPartDeactivated(
-//    mitk::IRenderWindowPart* renderWindowPart)
-//{
-//  foreach(QmitkRenderWindow* renderWindow, renderWindowPart->GetQmitkRenderWindows().values())
-//  {
-//    m_PointListWidget->RemoveSliceNavigationController(renderWindow->GetSliceNavigationController());
-//  }
-//}
-
 void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
@@ -171,64 +151,7 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
   m_PointSetDataInteractor->LoadStateMachine("PointSet.xml");
   m_PointSetDataInteractor->SetEventConfig("PointSetConfig.xml");
 
-  /// CSF POINTSET
-  mitk::PointSet::Pointer pntset = mitk::PointSet::New();
-  mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-  pointSetNode->SetData(pntset);
-  pointSetNode->SetName("CSF_Points.");
-  pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
-  pointSetNode->SetColor(0,1.0,0);
-  pointSetNode->SetDataInteractor(m_PointSetDataInteractor.GetPointer());
 
-  itk::SimpleMemberCommand<ClassificationSegmentation>::Pointer command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
-  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
-  pntset->AddObserver( mitk::PointSetAddEvent(), command );
-  pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
-  pntset->AddObserver( mitk::PointSetMoveEvent(), command );
-
-
-  m_PointSetList.push_back(pointSetNode);
-  GetDataStorage()->Add(pointSetNode);
-
-  /// LES POINTSET
-  pntset = mitk::PointSet::New();
-  pointSetNode = mitk::DataNode::New();
-  pointSetNode->SetData(pntset);
-  pointSetNode->SetName("LES_Points.");
-  pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
-  pointSetNode->SetColor(1.0,0,0);
-  pointSetNode->SetDataInteractor(m_PointSetDataInteractor.GetPointer());
-
-  command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
-  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
-  pntset->AddObserver( mitk::PointSetAddEvent(), command );
-  pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
-  pntset->AddObserver( mitk::PointSetMoveEvent(), command );
-
-
-  m_PointSetList.push_back(pointSetNode);
-  GetDataStorage()->Add(pointSetNode);
-
-  /// BRA POINTSET
-  pntset = mitk::PointSet::New();
-  pointSetNode = mitk::DataNode::New();
-  pointSetNode->SetData(pntset);
-  pointSetNode->SetName("BRA_Points.");
-  pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
-  pointSetNode->SetColor(0,0,1.0);
-  pointSetNode->SetDataInteractor(m_PointSetDataInteractor.GetPointer());
-
-  command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
-  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
-  pntset->AddObserver( mitk::PointSetAddEvent(), command );
-  pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
-  pntset->AddObserver( mitk::PointSetMoveEvent(), command );
-
-  m_PointSetList.push_back(pointSetNode);
-  GetDataStorage()->Add(pointSetNode);
 
 
   connect( cb_inputimage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnInitializeSession(const mitk::DataNode*)));
@@ -249,6 +172,33 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
   connect( m_HessianSlider, SIGNAL(valueChanged(double)), this, SLOT(OnSliderPositionChanged()));
   connect( m_STInnerSlider, SIGNAL(valueChanged(double)), this, SLOT(OnSliderPositionChanged()));
   connect( m_STOuterSlider, SIGNAL(valueChanged(double)), this, SLOT(OnSliderPositionChanged()));
+
+  mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+  pointSetNode->SetName("CSF_Points.");
+  pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
+  pointSetNode->SetColor(0,1.0,0);
+  pointSetNode->SetDataInteractor(m_PointSetDataInteractor.GetPointer());
+  m_PointSetList.push_back(pointSetNode);
+  GetDataStorage()->Add(pointSetNode);
+
+  pointSetNode = mitk::DataNode::New();
+  pointSetNode->SetName("LES_Points.");
+  pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
+  pointSetNode->SetColor(1.0,0,0);
+  pointSetNode->SetDataInteractor(m_PointSetDataInteractor.GetPointer());
+  m_PointSetList.push_back(pointSetNode);
+  GetDataStorage()->Add(pointSetNode);
+
+  pointSetNode = mitk::DataNode::New();
+  pointSetNode->SetName("BRA_Points.");
+  pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024));
+  pointSetNode->SetColor(0,0,1.0);
+  pointSetNode->SetDataInteractor(m_PointSetDataInteractor.GetPointer());
+  m_PointSetList.push_back(pointSetNode);
+  GetDataStorage()->Add(pointSetNode);
 
 }
 
@@ -274,6 +224,48 @@ void ClassificationSegmentation::OnSelectionChanged( berry::IWorkbenchPart::Poin
 void ClassificationSegmentation::OnInitializeSession(const mitk::DataNode *)
 {
   MITK_WARN << "Data selection changed! New session initialized.";
+
+
+  m_PointSetDataInteractor->SetDataNode(nullptr);
+
+  /// CSF POINTSET
+  mitk::PointSet::Pointer pntset = mitk::PointSet::New();
+  m_PointSetList[0]->SetData(pntset);
+
+  itk::SimpleMemberCommand<ClassificationSegmentation>::Pointer command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
+  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
+  pntset->AddObserver( mitk::PointSetAddEvent(), command );
+  pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
+  pntset->AddObserver( mitk::PointSetMoveEvent(), command );
+
+
+
+  /// LES POINTSET
+  pntset = mitk::PointSet::New();
+  m_PointSetList[1]->SetData(pntset);
+
+  command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
+  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
+  pntset->AddObserver( mitk::PointSetAddEvent(), command );
+  pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
+  pntset->AddObserver( mitk::PointSetMoveEvent(), command );
+
+
+  /// BRA POINTSET
+  pntset = mitk::PointSet::New();
+  m_PointSetList[2]->SetData(pntset);
+
+  command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
+  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
+  pntset->AddObserver( mitk::PointSetAddEvent(), command );
+  pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
+  pntset->AddObserver( mitk::PointSetMoveEvent(), command );
+
+
+
+  m_Controls.m_NumCsfPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[0]->GetData())->GetSize()));
+  m_Controls.m_NumLesPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[1]->GetData())->GetSize()));
+  m_Controls.m_NumBraPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[2]->GetData())->GetSize()));
 }
 
 void ClassificationSegmentation::DoSavePointsAsMask()
@@ -440,7 +432,7 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
       mitk::Image::Pointer featureimage;
       mitk::CastToMitkImage(dynamic_cast<FloatImageType *>(array[i].GetPointer()),featureimage);
       m_FeatureImageVector.push_back(featureimage);
-      AddImageAsDataNode(featureimage,FunctorType::GetFeatureName(i))->SetVisibility(show_nodes);
+      //      AddImageAsDataNode(featureimage,FunctorType::GetFeatureName(i))->SetVisibility(show_nodes);
 
     }
   }
@@ -463,7 +455,7 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
     m_FeatureImageVector.push_back(o2);
     m_FeatureImageVector.push_back(o3);
 
-    AddImageAsDataNode(o1,"HE_1")->SetVisibility(show_nodes);
+    //    AddImageAsDataNode(o1,"HE_1")->SetVisibility(show_nodes);
     //    AddImageAsDataNode(o2,"HE_2")->SetVisibility(show_nodes);
     //    AddImageAsDataNode(o3,"HE_3")->SetVisibility(show_nodes);
   }
@@ -485,23 +477,23 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
     m_FeatureImageVector.push_back(o2);
     m_FeatureImageVector.push_back(o3);
 
-    AddImageAsDataNode(o1,"ST_1")->SetVisibility(show_nodes);
+    //    AddImageAsDataNode(o1,"ST_1")->SetVisibility(show_nodes);
     //    AddImageAsDataNode(o2,"ST_2")->SetVisibility(show_nodes);
     //    AddImageAsDataNode(o3,"ST_3")->SetVisibility(show_nodes);
   }
 
-  //  {
+    {
 
-  //    itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::Pointer filter = itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::New();
-  //    filter->SetInput(input);
-  //    filter->SetImageMask(mask);
-  //    filter->Update();
+      itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::Pointer filter = itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::New();
+      filter->SetInput(input);
+      filter->SetImageMask(mask);
+      filter->Update();
 
-  //    mitk::Image::Pointer o1;
-  //    mitk::CastToMitkImage(filter->GetOutput(0),o1);
+      mitk::Image::Pointer o1;
+      mitk::CastToMitkImage(filter->GetOutput(0),o1);
 
-  //    m_FeatureImageVector.push_back(o1);
-  //  }
+      m_FeatureImageVector.push_back(o1);
+    }
 }
 
 void ClassificationSegmentation::OnSliderPositionChanged()
@@ -563,7 +555,7 @@ void ClassificationSegmentation::DoAutomSegmentation()
 
 
 
-mitk::Image::Pointer ClassificationSegmentation::DoManualSegmentation()
+std::vector<mitk::Image::Pointer> ClassificationSegmentation::DoManualSegmentation()
 {
 
 
@@ -576,7 +568,7 @@ mitk::Image::Pointer ClassificationSegmentation::DoManualSegmentation()
   if(raw_image.IsNull() || mask_image.IsNull())
   {
     MITK_WARN << "Please provide input iamge and mask image";
-    return nullptr;
+    //return nullptr;
   }
 
   if(m_CalculateFeatures)
@@ -596,8 +588,7 @@ mitk::Image::Pointer ClassificationSegmentation::DoManualSegmentation()
   }
 
   mitk::VigraRandomForestClassifier::Pointer classifier = mitk::VigraRandomForestClassifier::New();
-  classifier->SetTreeCount(30);
-  classifier->SetMaximumTreeDepth(100);
+  classifier->SetTreeCount(20);
   classifier->SetSamplesPerTree(0.66);
 
   Eigen::MatrixXd X_train;
@@ -622,10 +613,17 @@ mitk::Image::Pointer ClassificationSegmentation::DoManualSegmentation()
   classifier->Train(X_train,Y);
 
   Eigen::MatrixXi Y_test = classifier->Predict(X_test);
-  mitk::Image::Pointer result_mask = mitk::CLUtil::Transform<int>(Y_test,mask_image);
+  Eigen::MatrixXd Yp_test = classifier->GetPointWiseProbabilities();
+  //  mitk::Image::Pointer result_mask = mitk::CLUtil::Transform<int>(Y_test,mask_image);
+
+  std::vector<mitk::Image::Pointer> resultvector;
+  resultvector.push_back( mitk::CLUtil::Transform<int>(Y_test,mask_image) );
+  resultvector.push_back( mitk::CLUtil::Transform<double>(Yp_test.col(0),mask_image) );
+  resultvector.push_back( mitk::CLUtil::Transform<double>(Yp_test.col(1),mask_image) );
+  resultvector.push_back( mitk::CLUtil::Transform<double>(Yp_test.col(2),mask_image) );
 
 
-  return result_mask;
+  return resultvector;
 
 }
 
@@ -633,11 +631,10 @@ mitk::Image::Pointer ClassificationSegmentation::DoManualSegmentation()
 void ClassificationSegmentation::OnManualSegmentationFinished()
 {
   // Receive Future result
-  mitk::Image::Pointer result_mask = m_ManualSegmentationFutureWatcher.result();
+  std::vector<mitk::Image::Pointer> resultvector = m_ManualSegmentationFutureWatcher.result();
 
   // Add result to Datastorage
-  mitk::DataNode::Pointer node = AddImageAsDataNode(result_mask,"Manual-ResultMask");
-
+  mitk::DataNode::Pointer node = AddImageAsDataNode(resultvector[0],"Manual-ResultMask");
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
   lut->SetType(mitk::LookupTable::PET_20);
   mitk::LookupTableProperty * lut_prop = dynamic_cast<mitk::LookupTableProperty *>(node->GetProperty("LookupTable"));
@@ -647,11 +644,24 @@ void ClassificationSegmentation::OnManualSegmentationFinished()
   node->SetLevelWindow(lw);
   node->SetOpacity(0.3);
 
+  mitk::Image::Pointer CSF_PMap, LES_PMap, BRA_PMap;
+  mitk::CLUtil::GaussianFilter(resultvector[1], CSF_PMap, 1.5);
+  mitk::CLUtil::GaussianFilter(resultvector[2], LES_PMap, 3);
+  mitk::CLUtil::GaussianFilter(resultvector[3], BRA_PMap, 0.5);
+  AddImageAsDataNode(CSF_PMap,"Manual-ResultProbCSF");
+  AddImageAsDataNode(LES_PMap,"Manual-ResultProbLES");
+  AddImageAsDataNode(BRA_PMap,"Manual-ResultProbBRA");
+
+
+  PostProcessing(resultvector[1],resultvector[2],resultvector[3],resultvector[0]);
+
+  //  PostProcessing()
+
 
   // Update Volume data
   std::map<unsigned int, unsigned int> perlabelvoxelcount;
-  mitk::CLUtil::CountVoxel(result_mask, perlabelvoxelcount);
-  double voxel_volume = result_mask->GetGeometry()->GetSpacing().GetVnlVector().inf_norm();
+  mitk::CLUtil::CountVoxel(resultvector[0], perlabelvoxelcount);
+  double voxel_volume = resultvector[0]->GetGeometry()->GetSpacing().GetVnlVector().inf_norm();
   QString newtext;
   newtext += "Name\tVolume\tUnit\n";
   for(const auto & pair: perlabelvoxelcount)
@@ -666,6 +676,10 @@ void ClassificationSegmentation::OnManualSegmentationFinished()
 
 void ClassificationSegmentation::OnSetupModiefied()
 {
+
+  m_Controls.m_NumCsfPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[0]->GetData())->GetSize()));
+  m_Controls.m_NumLesPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[1]->GetData())->GetSize()));
+  m_Controls.m_NumBraPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[2]->GetData())->GetSize()));
 
   unsigned int samplecounter = 0;
   for( auto datanode : m_PointSetList)
@@ -818,18 +832,15 @@ mitk::DataNode::Pointer ClassificationSegmentation::AddImageAsDataNode(const mit
 
 }
 
-void ClassificationSegmentation::PostProcessing(mitk::VigraRandomForestClassifier * classifier, mitk::Image::Pointer & mask)
+void ClassificationSegmentation::PostProcessing(mitk::Image::Pointer & CSF_PMap,mitk::Image::Pointer & LES_PMap,mitk::Image::Pointer & BRA_PMap, mitk::Image::Pointer & mask)
 {
 
   typedef itk::Image<double, 3> TImageType;
 
-
   MITK_INFO << "ProbabilityMap merg strat ...";
-  mitk::Image::Pointer CSF_PMap = mitk::CLUtil::Transform<double>(classifier->GetPointWiseProbabilities().col(0), mask);
-  mitk::Image::Pointer LES_PMap = mitk::CLUtil::Transform<double>(classifier->GetPointWiseProbabilities().col(1), mask);
-  mitk::Image::Pointer BRA_PMap = mitk::CLUtil::Transform<double>(classifier->GetPointWiseProbabilities().col(2), mask);
-  mitk::Image::Pointer resultmask = mitk::CLUtil::Transform<int>(classifier->GetLabels(), mask);
+
   {
+    mitk::Image::Pointer resultmask = mask->Clone();
     mitk::CLUtil::GaussianFilter(CSF_PMap, CSF_PMap, 1.5);
     mitk::CLUtil::GaussianFilter(LES_PMap, LES_PMap, 3);
     mitk::CLUtil::GaussianFilter(BRA_PMap, BRA_PMap, 0.5);
@@ -865,78 +876,79 @@ void ClassificationSegmentation::PostProcessing(mitk::VigraRandomForestClassifie
     }
 
     mitk::CastToMitkImage(itk_result, resultmask);
+
+
+    //  {
+
+    //    mitk::CLUtil::ClosingBinary(mask,mask,1,mitk::CLUtil::Axial);
+    //    mitk::CLUtil::LogicalAndImages(resultmask, mask, resultmask);
+    //  }
+
+    AddImageAsDataNode(resultmask, "SmoothedMask");
+    MITK_INFO << "ProbabilityMap merg end!";
   }
 
-  {
-
-    mitk::CLUtil::ClosingBinary(mask,mask,1,mitk::CLUtil::Axial);
-    mitk::CLUtil::LogicalAndImages(resultmask, mask, resultmask);
-  }
-
-  AddImageAsDataNode(resultmask, "SmoothedMask");
-  MITK_INFO << "ProbabilityMap merg end!";
 
 
+//  {
 
-  {
+//    MITK_INFO << "Morphological processing strat ...";
+//    mitk::Image::Pointer resultmask =  mask->Clone();
 
-    MITK_INFO << "Morphological processing strat ...";
-    mitk::Image::Pointer resultmask = mitk::CLUtil::Transform<int>(classifier->GetLabels(), mask);
+//    mitk::Image::Pointer csf_mask;
+//    mitk::CLUtil::GrabLabel(resultmask, csf_mask, 1);
+//    mitk::CLUtil::ClosingBinary(csf_mask,csf_mask,1,mitk::CLUtil::Axial);
 
-    mitk::Image::Pointer csf_mask;
-    mitk::CLUtil::GrabLabel(resultmask, csf_mask, 1);
-    mitk::CLUtil::ClosingBinary(csf_mask,csf_mask,1,mitk::CLUtil::Axial);
+//    mitk::CLUtil::ErodeBinary(csf_mask, csf_mask, 2, mitk::CLUtil::Axial);
+//    mitk::CLUtil::DilateBinary(csf_mask, csf_mask, 1, mitk::CLUtil::Axial);
 
-    mitk::CLUtil::ErodeBinary(csf_mask, csf_mask, 2, mitk::CLUtil::Axial);
-    mitk::CLUtil::DilateBinary(csf_mask, csf_mask, 1, mitk::CLUtil::Axial);
+//    std::map<unsigned int, unsigned int> merge_instruction = {{0,0},{1,3},{2,2},{3,3}};
+//    mitk::CLUtil::MergeLabels(resultmask, merge_instruction);
 
-    std::map<unsigned int, unsigned int> merge_instruction = {{0,0},{1,3},{2,2},{3,3}};
-    mitk::CLUtil::MergeLabels(resultmask, merge_instruction);
-
-    mitk::CLUtil::InsertLabel(resultmask, csf_mask, 1/*as csf mask*/); // add morpological manipulated csf_mask
-
-
-    // ------------
-
-    mitk::Image::Pointer les_mask;
-    mitk::CLUtil::GrabLabel(resultmask, les_mask, 2);
-    mitk::CLUtil::ClosingBinary(les_mask,les_mask,1,mitk::CLUtil::Axial);
-
-    mitk::Image::Pointer les_cc_mask; unsigned int num = 0;
-    mitk::CLUtil::ConnectedComponentsImage(les_mask, mask, les_cc_mask, num);
-    std::map<unsigned int, unsigned int> map;
-    mitk::CLUtil::CountVoxel(les_cc_mask,map);
-    unsigned int counter = 0;
-
-    while(map.size() > 2)
-    {
-      mitk::CLUtil::ErodeBinary(les_mask, les_mask, 1, mitk::CLUtil::Axial);
-      mitk::CLUtil::LogicalAndImages(les_cc_mask,les_mask,les_cc_mask);
-      map.clear();
-      mitk::CLUtil::CountVoxel(les_cc_mask,map);
-      MITK_INFO("PostProcessing") << map.size();
-      counter++;
-    }
-
-    while(counter != 0)
-    {
-      mitk::CLUtil::DilateBinary(les_mask, les_mask, 1, mitk::CLUtil::Axial);
-      counter--;
-    }
-
-    merge_instruction = {{0,0},{1,1},{2,3},{3,3}};
-    mitk::CLUtil::MergeLabels(resultmask, merge_instruction);
-    mitk::CLUtil::InsertLabel(resultmask, les_mask, 2/*as les mask*/);
-
-    MITK_INFO << "Morphological processing end";
+//    mitk::CLUtil::InsertLabel(resultmask, csf_mask, 1/*as csf mask*/); // add morpological manipulated csf_mask
 
 
-    // ------------
-    mitk::CLUtil::LogicalAndImages(resultmask,mask,resultmask);
+//    // ------------
 
-    AddImageAsDataNode(resultmask,"SmoothedMaskMorphed");
+//    mitk::Image::Pointer les_mask;
+//    mitk::CLUtil::GrabLabel(resultmask, les_mask, 2);
+//    mitk::CLUtil::ClosingBinary(les_mask,les_mask,1,mitk::CLUtil::Axial);
 
-  }
+//    mitk::Image::Pointer les_cc_mask; unsigned int num = 0;
+//    mitk::CLUtil::ConnectedComponentsImage(les_mask, mask, les_cc_mask, num);
+//    std::map<unsigned int, unsigned int> map;
+//    mitk::CLUtil::CountVoxel(les_cc_mask,map);
+//    unsigned int counter = 0;
+
+//    while(map.size() > 2)
+//    {
+//      mitk::CLUtil::ErodeBinary(les_mask, les_mask, 1, mitk::CLUtil::Axial);
+//      mitk::CLUtil::LogicalAndImages(les_cc_mask,les_mask,les_cc_mask);
+//      map.clear();
+//      mitk::CLUtil::CountVoxel(les_cc_mask,map);
+//      MITK_INFO("PostProcessing") << map.size();
+//      counter++;
+//    }
+
+//    while(counter != 0)
+//    {
+//      mitk::CLUtil::DilateBinary(les_mask, les_mask, 1, mitk::CLUtil::Axial);
+//      counter--;
+//    }
+
+//    merge_instruction = {{0,0},{1,1},{2,3},{3,3}};
+//    mitk::CLUtil::MergeLabels(resultmask, merge_instruction);
+//    mitk::CLUtil::InsertLabel(resultmask, les_mask, 2/*as les mask*/);
+
+//    MITK_INFO << "Morphological processing end";
+
+
+//    // ------------
+//    mitk::CLUtil::LogicalAndImages(resultmask,mask,resultmask);
+
+//    AddImageAsDataNode(resultmask,"SmoothedMaskMorphed");
+
+//  }
 }
 
 //  mitk::Image::Pointer r= mitk::Image::New(),g= mitk::Image::New(),b = mitk::Image::New();

@@ -70,9 +70,9 @@ public:
 
 
   bool m_BlockManualSegmentation = {false};
-  QFutureWatcher<mitk::Image::Pointer> m_ManualSegmentationFutureWatcher;
-  QFuture<mitk::Image::Pointer> m_ManualsegmentationFuture;
-  mitk::Image::Pointer DoManualSegmentation();
+  QFutureWatcher<std::vector<mitk::Image::Pointer>> m_ManualSegmentationFutureWatcher;
+  QFuture<std::vector<mitk::Image::Pointer>> m_ManualsegmentationFuture;
+  std::vector<mitk::Image::Pointer> DoManualSegmentation();
 
 protected slots:
 
@@ -105,7 +105,7 @@ protected:
 
   mitk::DataNode::Pointer AddImageAsDataNode(const mitk::Image::Pointer & data_image, const std::string & name );
 
-  void PostProcessing(mitk::VigraRandomForestClassifier * classifier, mitk::Image::Pointer & mask);
+  void PostProcessing(mitk::Image::Pointer &prob1, mitk::Image::Pointer &prob2, mitk::Image::Pointer &prob3, mitk::Image::Pointer &mask);
 
   void SampleClassMaskByPointSet(const mitk::Image::Pointer & ref_img, mitk::PointSet::Pointer & pointset, mitk::Image::Pointer & outimage);
 

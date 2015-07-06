@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/xnat">
+    <file>server.ico</file>
+    <file>project.ico</file>
+    <file>subject.ico</file>
+    <file>experiment.ico</file>
+  </qresource>
+</RCC>

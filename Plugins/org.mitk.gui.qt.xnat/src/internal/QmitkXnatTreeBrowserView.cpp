@@ -26,16 +26,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryPlatform.h>
 
 // CTK XNAT Core
+#include <ctkXnatAssessor.h>
+#include <ctkXnatAssessorFolder.h>
+#include <ctkXnatException.h>
+#include <ctkXnatExperiment.h>
 #include "ctkXnatFile.h"
+#include <ctkXnatProject.h>
+#include <ctkXnatReconstruction.h>
+#include <ctkXnatReconstructionFolder.h>
+#include <ctkXnatResource.h>
+#include <ctkXnatResourceFolder.h>
+#include <ctkXnatScan.h>
+#include <ctkXnatScanFolder.h>
+#include <ctkXnatSubject.h>
 
 // Qt
+#include <QAction>
 #include <QDir>
+#include <QFileDialog>
+#include <QInputDialog>
 #include <QMenu>
 #include <QAction>
 #include <QDirIterator>
+#include <QMessageBox>
 
 // MITK
 #include <mitkDataStorage.h>
+#include <mitkProgressBar.h>
 #include <QmitkIOUtil.h>
 
 // Poco
@@ -44,10 +61,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
-m_TreeModel(new ctkXnatTreeModel()),
+m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
+m_TreeModel(new QmitkXnatTreeModel()),
 m_Tracker(0),
-m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", "")),
-m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext())
+m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", ""))
 {
   m_DataStorageServiceTracker.open();
 
@@ -78,6 +95,9 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
   m_Controls.treeView->setModel(m_TreeModel);
   m_Controls.treeView->header()->hide();
+  m_Controls.treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  m_Controls.treeView->setAcceptDrops(true);
+  m_Controls.treeView->setDropIndicatorShown(true);
   m_Controls.labelError->setText("Please use the 'Connect' button in the Preferences.");
   m_Controls.labelError->setStyleSheet("QLabel { color: red; }");
 
@@ -87,10 +107,11 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   m_Controls.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_Tracker = new mitk::XnatSessionTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext());
-  m_NodeMenu = new QMenu(m_Controls.treeView);
+
+  m_ContextMenu = new QMenu(m_Controls.treeView);
 
   connect(m_Controls.treeView, SIGNAL(customContextMenuRequested(const QPoint&)),
-    this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)));
+    this, SLOT(OnContextMenuRequested(const QPoint&)));
   connect(m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanTreeModel(ctkXnatSession*)));
   connect(m_Tracker, SIGNAL(Opened(ctkXnatSession*)), this, SLOT(UpdateSession(ctkXnatSession*)));
 
@@ -118,6 +139,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   }
 
   connect(m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)));
+  connect(m_TreeModel, SIGNAL(ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*)), this, SLOT(OnUploadResource(const QList<mitk::DataNode*>&, ctkXnatObject*)));
 }
 
 void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
@@ -177,6 +199,9 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
     m_TreeModel->addDataModel(session->dataModel());
     m_Controls.treeView->reset();
     m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
+
+    connect(session, SIGNAL(progress(QUuid,double)), this, SLOT(OnProgress(QUuid,double)));
+    connect(session, SIGNAL(uploadFinished()), this, SLOT(OnProgress(QUuid,double)));
   }
 }
 
@@ -187,6 +212,15 @@ void QmitkXnatTreeBrowserView::CleanTreeModel(ctkXnatSession* session)
     m_TreeModel->removeDataModel(session->dataModel());
     m_Controls.treeView->reset();
   }
+}
+
+void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
+{
+  unsigned int currentProgress = progress*100;
+  if (currentProgress < 1)
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
+  else
+    mitk::ProgressBar::GetInstance()->Progress();
 }
 
 void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bool loadData)
@@ -303,23 +337,224 @@ void QmitkXnatTreeBrowserView::OnContextMenuDownloadAndOpenFile()
   InternalFileDownload(index, true);
 }
 
-void QmitkXnatTreeBrowserView::NodeTableViewContextMenuRequested(const QPoint & pos)
+void QmitkXnatTreeBrowserView::OnContextMenuCreateResourceFolder()
 {
-  m_NodeMenu->clear();
-  QModelIndex index = m_Controls.treeView->indexAt(pos);
-  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
-  if (variant.isValid())
+  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  ctkXnatObject* parentObject = m_TreeModel->xnatObject(index);
+
+  if (parentObject != nullptr)
   {
-    ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
-    if (file != NULL)
+    this->InternalAddResourceFolder(parentObject);
+  }
+}
+
+ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObject *parent)
+{
+  bool ok;
+  QString folderName = QInputDialog::getText(m_Controls.treeView, tr("Create XNAT resource folder"),
+                                       tr("Folder name:"), QLineEdit::Normal, tr("data"), &ok);
+  if (ok)
+  {
+    if (folderName.isEmpty())
+      folderName = "NO LABEL";
+
+    return parent->addResourceFolder(folderName);
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+void QmitkXnatTreeBrowserView::InternalFileUpload(ctkXnatFile* file)
+{
+  try
+  {
+    file->save();
+  }
+  catch (ctkXnatException &e)
+  {
+    QMessageBox msgbox;
+    msgbox.setText(e.what());
+    msgbox.setIcon(QMessageBox::Critical);
+    msgbox.exec();
+  }
+}
+
+void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
+{
+  QString filename = QFileDialog::getOpenFileName(m_Controls.treeView, tr("Open File"), QDir::homePath());
+  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(m_TreeModel->xnatObject(index));
+  if (resource)
+  {
+    ctkXnatFile* file = new ctkXnatFile(resource);
+    file->setLocalFilePath(filename);
+    QFileInfo fileInfo (filename);
+    file->setName(fileInfo.fileName());
+    file->setFileFormat("some format");
+    file->setFileContent("some content");
+    file->setFileTags("some, tags");
+    file->save();
+    m_TreeModel->addChildNode(index, file);
+  }
+}
+
+#include <ctkXnatDataModel.h>
+void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& droppedNodes, ctkXnatObject* parentObject)
+{
+  if (parentObject == nullptr)
+    return;
+
+  if (dynamic_cast<ctkXnatSession*>(parentObject))
+    MITK_INFO<<"SESSION";
+  else if (dynamic_cast<ctkXnatDataModel*>(parentObject))
+    MITK_INFO<<"DATAMODEL";
+  else if (dynamic_cast<ctkXnatProject*>(parentObject))
+    MITK_INFO<<"PROJECT";
+  else if (dynamic_cast<ctkXnatSubject*>(parentObject))
+    MITK_INFO<<"SUBJECT";
+  //1. If not dropped on a resource, create a new folder
+  //2. Save file locally
+  //3. Upload file
+  ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(parentObject);
+  if (resource == nullptr)
+  {
+    resource = this->InternalAddResourceFolder(parentObject);
+  }
+
+  if (resource == nullptr)
+  {
+    MITK_WARN << "Could not upload file! No resource available!";
+  }
+
+  mitk::DataNode* node = NULL;
+  foreach (node, droppedNodes)
+  {
+    mitk::BaseData* data = node->GetData();
+    if (!data)
+      return;
+
+
+    QString fileName (QString::fromStdString(node->GetName()));
+
+    ctkXnatFile* xnatFile = new ctkXnatFile(resource);
+
+    if (dynamic_cast<mitk::Image*>(data))
     {
-      QAction* actShow = new QAction("Download and Open", m_NodeMenu);
-      QAction* actDownload = new QAction("Download", m_NodeMenu);
-      m_NodeMenu->addAction(actShow);
-      m_NodeMenu->addAction(actDownload);
-      connect(actShow, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadAndOpenFile()));
-      connect(actDownload, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadFile()));
-      m_NodeMenu->popup(QCursor::pos());
+      fileName.append(".nrrd");
+    }
+    else if (dynamic_cast<mitk::Surface*>(data))
+    {
+      fileName.append(".vtk");
+    }
+    else if (dynamic_cast<mitk::PointSet*>(data))
+    {
+      fileName.append(".mps");
+    }
+
+    xnatFile->setName(fileName);
+
+    QString xnatFolder = "XNAT_UPLOADS";
+    QDir dir(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()->getDataFile("").absoluteFilePath());
+    dir.mkdir(xnatFolder);
+
+    fileName = dir.path().append("/" + fileName);
+    mitk::IOUtil::Save (data, fileName.toStdString());
+
+    // TODO Check if file exists
+    // AbstractFileReader::SetDefaultDataNodeProperties
+    // und in die andere SetDefaultDataNodeProperties
+    // PropertyName klein: mtime.initial + Kommentar
+    mitk::StringProperty::Pointer orignalFilePath = mitk::StringProperty::New();
+    node->GetProperty(orignalFilePath, "path");
+
+    xnatFile->setLocalFilePath(fileName);
+    //
+    xnatFile->setFileFormat("some format");
+    xnatFile->setFileContent("some content");
+    xnatFile->setFileTags("some, tags");
+    //
+    xnatFile->save();
+    m_TreeModel->addChildNode(m_Controls.treeView->currentIndex(), xnatFile);
+    parentObject->fetch();
+
+    // The filename for uploading
+//    QFileInfo fileInfo;
+    //      if (surface)
+    //      {
+    //        // Save surface
+    //        fileName.append(".stl");
+    //        xnatFile->setName(fileName);
+    //        dir.setPath(dir.path().append("/" + fileName));
+
+//    QString origFile = QString::fromStdString(orignalFilePath->GetValueAsString());
+//    origFile.append("/" + fileName);
+    //        origFile.append(".stl");
+
+    //        fileInfo.setFile(origFile);
+    //        if (!fileInfo.exists())
+    //          mitk::IOUtil::SaveSurface(surface, dir.path().toStdString());
+    //      }
+//    this->uploadFileToXnat(xnatFile, dir.path());
+
+    // TODO delete file!!!
+  }
+}
+
+void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
+{
+  m_ContextMenu->clear();
+  QModelIndex index = m_Controls.treeView->indexAt(pos);
+
+  ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
+
+  bool downloadable = false;
+  downloadable |= dynamic_cast<ctkXnatFile*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatScan*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatScanFolder*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatAssessor*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatAssessorFolder*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatResource*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatReconstruction*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatReconstructionFolder*>(xnatObject)!=NULL;
+
+  bool canHaveResourceFolder = false;
+  canHaveResourceFolder |= dynamic_cast<ctkXnatProject*>(xnatObject) != NULL;
+  canHaveResourceFolder |=  dynamic_cast<ctkXnatSubject*>(xnatObject) != NULL;
+  canHaveResourceFolder |=  dynamic_cast<ctkXnatExperiment*>(xnatObject) != NULL;
+
+  bool uploadFilePossible = false;
+  uploadFilePossible |= dynamic_cast<ctkXnatResource*>(xnatObject) != NULL;
+  uploadFilePossible |=  dynamic_cast<ctkXnatScan*>(xnatObject) != NULL;
+  uploadFilePossible |=  dynamic_cast<ctkXnatAssessor*>(xnatObject) != NULL;
+
+  if (downloadable)
+  {
+    QAction* actDownload = new QAction("Download", m_ContextMenu);
+    connect(actDownload, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadFile()));
+    m_ContextMenu->addAction(actDownload);
+    ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(xnatObject);
+    if (file)
+    {
+      QAction* actView = new QAction("Download and Open", m_ContextMenu);
+      connect(actView, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadAndOpenFile()));
+      m_ContextMenu->addAction(actView);
     }
   }
+
+  if (canHaveResourceFolder)
+  {
+    QAction* actCreateResource = new QAction("Add resource folder", m_ContextMenu);
+    connect(actCreateResource, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateResourceFolder()));
+    m_ContextMenu->addAction(actCreateResource);
+  }
+
+  if (uploadFilePossible)
+  {
+    QAction* actUploadFile = new QAction("Upload File", m_ContextMenu);
+    connect(actUploadFile, SIGNAL(triggered()), this, SLOT(OnContextMenuUploadFile()));
+    m_ContextMenu->addAction(actUploadFile);
+  }
+  m_ContextMenu->popup(QCursor::pos());
 }

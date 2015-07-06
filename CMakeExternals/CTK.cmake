@@ -74,10 +74,10 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 135910e407bd1f5de29d2a0a9efe5f80
-      #GIT_REPOSITORY https://github.com/commontk/CTK.git
-      #GIT_TAG origin/master
+#      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
+#      URL /Users/fetzer/proj/ctk/CTK/CTK-XNAT-Upload.tar.gz
+      URL https://www.dropbox.com/s/imutmjs81ox9vsi/CTK-XNAT-Upload.tar.gz
+      URL_MD5 c495e7125451b27e557fb8cc4e3f31f2
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -100,9 +100,9 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
-        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_5f3a03b1.tar.gz
         # See bug 19073
         -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_36ab9c7c.tar.gz
+        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_4293694a.tar.gz
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS

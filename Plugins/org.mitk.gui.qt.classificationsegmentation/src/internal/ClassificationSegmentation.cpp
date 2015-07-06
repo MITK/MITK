@@ -120,37 +120,78 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
   m_Controls.m_MaskImageLayout->addWidget(cb_maskimage);
   m_Controls.m_RandomForestLayout->addWidget(cb_classifer);
 
-  m_Controls.m_ParameterLayout->addWidget(new QLabel("Gauss Sigma"));
+  m_Controls.m_ParameterLayout->layout()->addWidget(new QLabel("Gauss Sigma"));
   m_GaussSlider = new ctkSliderWidget();
   m_GaussSlider->setMinimum(0);
   m_GaussSlider->setMaximum(10);
   m_GaussSlider->setValue(1);
-  m_Controls.m_ParameterLayout->addWidget(m_GaussSlider);
+  m_Controls.m_ParameterLayout->layout()->addWidget(m_GaussSlider);
 
-  m_Controls.m_ParameterLayout->addWidget(new QLabel("Hessian Sigma"));
+  m_Controls.m_ParameterLayout->layout()->addWidget(new QLabel("Hessian Sigma"));
   m_HessianSlider = new ctkSliderWidget();
   m_HessianSlider->setMinimum(0);
   m_HessianSlider->setMaximum(10);
   m_HessianSlider->setValue(3);
-  m_Controls.m_ParameterLayout->addWidget(m_HessianSlider);
+  m_Controls.m_ParameterLayout->layout()->addWidget(m_HessianSlider);
 
-  m_Controls.m_ParameterLayout->addWidget(new QLabel("Structure Tensor Inner and Outer Scale"));
+  m_Controls.m_ParameterLayout->layout()->addWidget(new QLabel("Structure Tensor Inner and Outer Scale"));
   m_STInnerSlider = new ctkSliderWidget();
   m_STInnerSlider->setMinimum(0);
   m_STInnerSlider->setMaximum(10);
   m_STInnerSlider->setValue(1.5);
-  m_Controls.m_ParameterLayout->addWidget(m_STInnerSlider);
+  m_Controls.m_ParameterLayout->layout()->addWidget(m_STInnerSlider);
 
   m_STOuterSlider = new ctkSliderWidget();
   m_STOuterSlider->setMinimum(0);
   m_STOuterSlider->setMaximum(10);
   m_STOuterSlider->setValue(3);
-  m_Controls.m_ParameterLayout->addWidget(m_STOuterSlider);
+  m_Controls.m_ParameterLayout->layout()->addWidget(m_STOuterSlider);
+
+  m_Controls.m_PostProcessingLayout->layout()->addWidget(new QLabel("Probability map smoothing"));
+  m_GaussCSFSlider = new ctkSliderWidget;
+  m_GaussCSFSlider->setMinimum(0);
+  m_GaussCSFSlider->setMaximum(10);
+  m_GaussCSFSlider->setValue(1.5);
+  m_Controls.m_PostProcessingLayout->layout()->addWidget(m_GaussCSFSlider);
+
+  m_GaussLESSlider = new ctkSliderWidget;
+  m_GaussLESSlider->setMinimum(0);
+  m_GaussLESSlider->setMaximum(10);
+  m_GaussLESSlider->setValue(3);
+  m_Controls.m_PostProcessingLayout->layout()->addWidget(m_GaussLESSlider);
+
+  m_GaussBRASlider = new ctkSliderWidget;
+  m_GaussBRASlider->setMinimum(0);
+  m_GaussBRASlider->setMaximum(10);
+  m_GaussBRASlider->setValue(0.5);
+  m_Controls.m_PostProcessingLayout->layout()->addWidget(m_GaussBRASlider);
+
+  m_Controls.m_PostProcessingLayout->layout()->addWidget(new QLabel("Probability map weighting"));
+  m_WeightCSFSlider = new ctkSliderWidget;
+  m_WeightCSFSlider->setMinimum(0.0);
+  m_WeightCSFSlider->setMaximum(2.0);
+  m_WeightCSFSlider->setValue(1.0);
+  m_WeightCSFSlider->setSingleStep(0.1);
+  m_Controls.m_PostProcessingLayout->layout()->addWidget(m_WeightCSFSlider);
+
+  m_WeightLESSlider = new ctkSliderWidget;
+  m_WeightLESSlider->setMinimum(0.0);
+  m_WeightLESSlider->setMaximum(2.0);
+  m_WeightLESSlider->setValue(1.0);
+  m_WeightLESSlider->setSingleStep(0.1);
+  m_Controls.m_PostProcessingLayout->layout()->addWidget(m_WeightLESSlider);
+
+  m_WeightBRASlider = new ctkSliderWidget;
+  m_WeightBRASlider->setMinimum(0.0);
+  m_WeightBRASlider->setMaximum(2.0);
+  m_WeightBRASlider->setValue(1.0);
+  m_WeightBRASlider->setSingleStep(0.1);
+  m_Controls.m_PostProcessingLayout->layout()->addWidget(m_WeightBRASlider);
+
 
   m_PointSetDataInteractor = mitk::PointSetDataInteractor::New();
   m_PointSetDataInteractor->LoadStateMachine("PointSet.xml");
   m_PointSetDataInteractor->SetEventConfig("PointSetConfig.xml");
-  m_PointSetDataInteractor->EnableUndo(true);
 
 
   connect( cb_inputimage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnInitializeSession(const mitk::DataNode*)));
@@ -164,13 +205,25 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_ButtonLESToggle, SIGNAL(toggled(bool)), this, SLOT(OnButtonLESToggle(bool)));
   connect( m_Controls.m_ButtonBRAToggle, SIGNAL(toggled(bool)), this, SLOT(OnButtonBRAToggle(bool)));
   connect( m_Controls.m_ButtonNoInteraction, SIGNAL(toggled(bool)), this, SLOT(OnButtonNoInteractionToggle(bool)));
-  connect( &m_ManualSegmentationFutureWatcher, SIGNAL(finished()), this, SLOT(OnManualSegmentationFinished()));
+  connect( &m_ManualSegmentationFutureWatcher, SIGNAL(finished()), this, SLOT(ManualSegmentationFinished()));
+  connect( &m_PostProcessingFutureWatcher, SIGNAL(finished()), this, SLOT(PostProcessingFinished()));
 
   //connect( m_Controls.m_AddPointSets, SIGNAL(clicked()),this, SLOT(OnAddPointSets()) );
-  connect( m_GaussSlider, SIGNAL(valueChanged(double)), this, SLOT(OnSliderPositionChanged()));
-  connect( m_HessianSlider, SIGNAL(valueChanged(double)), this, SLOT(OnSliderPositionChanged()));
-  connect( m_STInnerSlider, SIGNAL(valueChanged(double)), this, SLOT(OnSliderPositionChanged()));
-  connect( m_STOuterSlider, SIGNAL(valueChanged(double)), this, SLOT(OnSliderPositionChanged()));
+  connect( m_GaussSlider, SIGNAL(valueChanged(double)), this, SLOT(OnFeatureSettingsChanged()));
+  connect( m_HessianSlider, SIGNAL(valueChanged(double)), this, SLOT(OnFeatureSettingsChanged()));
+  connect( m_STInnerSlider, SIGNAL(valueChanged(double)), this, SLOT(OnFeatureSettingsChanged()));
+  connect( m_STOuterSlider, SIGNAL(valueChanged(double)), this, SLOT(OnFeatureSettingsChanged()));
+
+  connect( m_GaussCSFSlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
+  connect( m_GaussLESSlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
+  connect( m_GaussBRASlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
+  connect( m_WeightCSFSlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
+  connect( m_WeightLESSlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
+  connect( m_WeightBRASlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
+
+
+
+
 
   mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
   pointSetNode->SetName("CSF_Points.");
@@ -232,7 +285,7 @@ void ClassificationSegmentation::OnInitializeSession(const mitk::DataNode *)
   m_PointSetList[0]->SetData(pntset);
 
   itk::SimpleMemberCommand<ClassificationSegmentation>::Pointer command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
-  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
+  command->SetCallbackFunction(this, &ClassificationSegmentation::ManualSegmentationTrigger);
   pntset->AddObserver( mitk::PointSetAddEvent(), command );
   pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
   pntset->AddObserver( mitk::PointSetMoveEvent(), command );
@@ -244,7 +297,7 @@ void ClassificationSegmentation::OnInitializeSession(const mitk::DataNode *)
   m_PointSetList[1]->SetData(pntset);
 
   command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
-  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
+  command->SetCallbackFunction(this, &ClassificationSegmentation::ManualSegmentationTrigger);
   pntset->AddObserver( mitk::PointSetAddEvent(), command );
   pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
   pntset->AddObserver( mitk::PointSetMoveEvent(), command );
@@ -255,7 +308,7 @@ void ClassificationSegmentation::OnInitializeSession(const mitk::DataNode *)
   m_PointSetList[2]->SetData(pntset);
 
   command = itk::SimpleMemberCommand<ClassificationSegmentation>::New();
-  command->SetCallbackFunction(this, &ClassificationSegmentation::OnSetupModiefied);
+  command->SetCallbackFunction(this, &ClassificationSegmentation::ManualSegmentationTrigger);
   pntset->AddObserver( mitk::PointSetAddEvent(), command );
   pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
   pntset->AddObserver( mitk::PointSetMoveEvent(), command );
@@ -481,26 +534,31 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
     //    AddImageAsDataNode(o3,"ST_3")->SetVisibility(show_nodes);
   }
 
-    {
+  {
 
-      itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::Pointer filter = itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::New();
-      filter->SetInput(input);
-      filter->SetImageMask(mask);
-      filter->Update();
+    itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::Pointer filter = itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::New();
+    filter->SetInput(input);
+    filter->SetImageMask(mask);
+    filter->Update();
 
-      mitk::Image::Pointer o1;
-      mitk::CastToMitkImage(filter->GetOutput(0),o1);
+    mitk::Image::Pointer o1;
+    mitk::CastToMitkImage(filter->GetOutput(0),o1);
 
-      m_FeatureImageVector.push_back(o1);
-    }
+    m_FeatureImageVector.push_back(o1);
+  }
 }
 
-void ClassificationSegmentation::OnSliderPositionChanged()
+void ClassificationSegmentation::OnFeatureSettingsChanged()
 {
-  MITK_INFO << "SliderPositionChanged";
+  MITK_INFO << "FeatureSettingsChanged";
   m_CalculateFeatures = true;
+  ManualSegmentationTrigger();
+}
 
-  OnSetupModiefied();
+void ClassificationSegmentation::OnPostProcessingSettingsChanged()
+{
+  MITK_INFO << "PostProcessingSettigsChanged";
+  PostProcessingTrigger();
 }
 
 void ClassificationSegmentation::DoAutomSegmentation()
@@ -554,9 +612,8 @@ void ClassificationSegmentation::DoAutomSegmentation()
 
 
 
-std::vector<mitk::Image::Pointer> ClassificationSegmentation::DoManualSegmentation()
+std::vector<mitk::Image::Pointer> ClassificationSegmentation::ManualSegmentationCallback()
 {
-
 
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_InputImageLayout->itemAt(1)->widget());
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_MaskImageLayout->itemAt(1)->widget());
@@ -627,13 +684,13 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::DoManualSegmentati
 }
 
 
-void ClassificationSegmentation::OnManualSegmentationFinished()
+void ClassificationSegmentation::ManualSegmentationFinished()
 {
   // Receive Future result
-  std::vector<mitk::Image::Pointer> resultvector = m_ManualSegmentationFutureWatcher.result();
+  m_ResultImageVector = m_ManualSegmentationFutureWatcher.result();
 
   // Add result to Datastorage
-  mitk::DataNode::Pointer node = AddImageAsDataNode(resultvector[0],"Manual-ResultMask");
+  mitk::DataNode::Pointer node = AddImageAsDataNode(m_ResultImageVector[0],"Manual-ResultMask");
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
   lut->SetType(mitk::LookupTable::PET_20);
   mitk::LookupTableProperty * lut_prop = dynamic_cast<mitk::LookupTableProperty *>(node->GetProperty("LookupTable"));
@@ -643,24 +700,13 @@ void ClassificationSegmentation::OnManualSegmentationFinished()
   node->SetLevelWindow(lw);
   node->SetOpacity(0.3);
 
-  mitk::Image::Pointer CSF_PMap, LES_PMap, BRA_PMap;
-  mitk::CLUtil::GaussianFilter(resultvector[1], CSF_PMap, 1.5);
-  mitk::CLUtil::GaussianFilter(resultvector[2], LES_PMap, 3);
-  mitk::CLUtil::GaussianFilter(resultvector[3], BRA_PMap, 0.5);
-  AddImageAsDataNode(CSF_PMap,"Manual-ResultProbCSF");
-  AddImageAsDataNode(LES_PMap,"Manual-ResultProbLES");
-  AddImageAsDataNode(BRA_PMap,"Manual-ResultProbBRA");
-
-
-  PostProcessing(resultvector[1],resultvector[2],resultvector[3],resultvector[0]);
-
-  //  PostProcessing()
-
+  m_BlockManualSegmentation = false;
+  this->PostProcessingTrigger();
 
   // Update Volume data
   std::map<unsigned int, unsigned int> perlabelvoxelcount;
-  mitk::CLUtil::CountVoxel(resultvector[0], perlabelvoxelcount);
-  double voxel_volume = resultvector[0]->GetGeometry()->GetSpacing().GetVnlVector().inf_norm();
+  mitk::CLUtil::CountVoxel(m_ResultImageVector[0], perlabelvoxelcount);
+  double voxel_volume = m_ResultImageVector[0]->GetGeometry()->GetSpacing().GetVnlVector().inf_norm();
   QString newtext;
   newtext += "Name\tVolume\tUnit\n";
   for(const auto & pair: perlabelvoxelcount)
@@ -670,10 +716,9 @@ void ClassificationSegmentation::OnManualSegmentationFinished()
   // Enable Functionality
   m_Controls.m_StartProcessingButton_RF->setDisabled(false);
 
-  m_BlockManualSegmentation = false;
 }
 
-void ClassificationSegmentation::OnSetupModiefied()
+void ClassificationSegmentation::ManualSegmentationTrigger()
 {
 
   m_Controls.m_NumCsfPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[0]->GetData())->GetSize()));
@@ -693,7 +738,7 @@ void ClassificationSegmentation::OnSetupModiefied()
     m_Controls.m_StartProcessingButton_RF->setDisabled(true);
     // Start GUI Thread
     m_ManualSegmentationFutureWatcher.setFuture(
-          QtConcurrent::run(this, &ClassificationSegmentation::DoManualSegmentation)); // on finish call OnManualSegmentationFinished();
+          QtConcurrent::run(this, &ClassificationSegmentation::ManualSegmentationCallback)); // on finish call OnManualSegmentationFinished();
     m_BlockManualSegmentation = true;
   }
 }
@@ -831,18 +876,63 @@ mitk::DataNode::Pointer ClassificationSegmentation::AddImageAsDataNode(const mit
 
 }
 
-void ClassificationSegmentation::PostProcessing(mitk::Image::Pointer & CSF_PMap,mitk::Image::Pointer & LES_PMap,mitk::Image::Pointer & BRA_PMap, mitk::Image::Pointer & mask)
+
+void ClassificationSegmentation::PostProcessingTrigger()
 {
+
+  if(m_ResultImageVector.empty() || m_ResultImageVector.size() < 4)
+  {
+    MITK_ERROR("PostProcessingCallback") << "Result image vector not initialized!";
+    return;
+  }
+
+  if(!m_BlockPostProcessing){
+
+    m_PostProcessingFutureWatcher.setFuture(
+          QtConcurrent::run(this, &ClassificationSegmentation::PostProcessingCallback)); // on finish call OnManualSegmentationFinished();
+    m_BlockPostProcessing = true;
+  }
+}
+
+void ClassificationSegmentation::PostProcessingFinished()
+{
+  // Receive Future result
+  m_PostProcessingImageVector = m_PostProcessingFutureWatcher.result();
+
+  // Add result to Datastorage
+  mitk::DataNode::Pointer node = AddImageAsDataNode(m_PostProcessingImageVector[0],"Manual-ResultMask-PostProcessing");
+  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+  lut->SetType(mitk::LookupTable::PET_20);
+  mitk::LookupTableProperty * lut_prop = dynamic_cast<mitk::LookupTableProperty *>(node->GetProperty("LookupTable"));
+  lut_prop->SetLookupTable(lut);
+
+  mitk::LevelWindow lw(1,3);
+  node->SetLevelWindow(lw);
+  node->SetOpacity(0.3);
+
+  m_BlockPostProcessing = false;
+
+}
+
+std::vector<mitk::Image::Pointer> ClassificationSegmentation::PostProcessingCallback()
+{
+
+  std::vector<mitk::Image::Pointer> resultvector;
+
+  mitk::Image::Pointer CSF_PMap = m_ResultImageVector[1]->Clone();
+  mitk::Image::Pointer LES_PMap = m_ResultImageVector[2]->Clone();
+  mitk::Image::Pointer BRA_PMap = m_ResultImageVector[3]->Clone();
+  mitk::Image::Pointer mask = m_ResultImageVector[0]->Clone();
 
   typedef itk::Image<double, 3> TImageType;
 
-  MITK_INFO << "ProbabilityMap merg strat ...";
+  MITK_INFO("PostProcessingCallback") << "ProbabilityMap merg strat ...";
 
   {
     mitk::Image::Pointer resultmask = mask->Clone();
-    mitk::CLUtil::GaussianFilter(CSF_PMap, CSF_PMap, 1.5);
-    mitk::CLUtil::GaussianFilter(LES_PMap, LES_PMap, 3);
-    mitk::CLUtil::GaussianFilter(BRA_PMap, BRA_PMap, 0.5);
+    mitk::CLUtil::GaussianFilter(CSF_PMap, CSF_PMap, m_GaussCSFSlider->value());
+    mitk::CLUtil::GaussianFilter(LES_PMap, LES_PMap, m_GaussLESSlider->value());
+    mitk::CLUtil::GaussianFilter(BRA_PMap, BRA_PMap, m_GaussBRASlider->value());
 
     itk::Image<double, 3>::Pointer itk_csf, itk_les, itk_bra;
     itk::Image<unsigned char, 3>::Pointer itk_result;
@@ -860,9 +950,9 @@ void ClassificationSegmentation::PostProcessing(mitk::Image::Pointer & CSF_PMap,
     itk::ImageRegionIterator<itk::Image<unsigned char, 3> > it_res(itk_result,itk_result->GetLargestPossibleRegion());
 
     while (!it_csf.IsAtEnd()) {
-      double csf = it_csf.Value();
-      double les = it_les.Value();
-      double bra = it_bra.Value();
+      double csf = it_csf.Value() * m_WeightCSFSlider->value();
+      double les = it_les.Value() * m_WeightLESSlider->value();
+      double bra = it_bra.Value() * m_WeightBRASlider->value();
 
       if(csf > les && csf > bra) it_res.Set(1);
       if(les > csf && les > bra) it_res.Set(2);
@@ -877,77 +967,80 @@ void ClassificationSegmentation::PostProcessing(mitk::Image::Pointer & CSF_PMap,
     mitk::CastToMitkImage(itk_result, resultmask);
 
 
-    //  {
+    {
+      mitk::Image::Pointer brain_mask = mask->Clone();
+      mitk::CLUtil::MergeLabels(brain_mask,{{1,1},{2,1},{3,1},{4,1},{5,1},{6,1}});
+      mitk::CLUtil::ClosingBinary(brain_mask,brain_mask,2,mitk::CLUtil::All);
+      mitk::CLUtil::LogicalAndImages(resultmask, brain_mask, resultmask);
+    }
+    MITK_INFO("PostProcessingCallback") << "ProbabilityMap merg end!";
 
-    //    mitk::CLUtil::ClosingBinary(mask,mask,1,mitk::CLUtil::Axial);
-    //    mitk::CLUtil::LogicalAndImages(resultmask, mask, resultmask);
-    //  }
-
-    AddImageAsDataNode(resultmask, "SmoothedMask");
-    MITK_INFO << "ProbabilityMap merg end!";
+    resultvector.push_back(resultmask);
   }
 
+  return resultvector;
 
 
-//  {
 
-//    MITK_INFO << "Morphological processing strat ...";
-//    mitk::Image::Pointer resultmask =  mask->Clone();
+  //  {
 
-//    mitk::Image::Pointer csf_mask;
-//    mitk::CLUtil::GrabLabel(resultmask, csf_mask, 1);
-//    mitk::CLUtil::ClosingBinary(csf_mask,csf_mask,1,mitk::CLUtil::Axial);
+  //    MITK_INFO << "Morphological processing strat ...";
+  //    mitk::Image::Pointer resultmask =  mask->Clone();
 
-//    mitk::CLUtil::ErodeBinary(csf_mask, csf_mask, 2, mitk::CLUtil::Axial);
-//    mitk::CLUtil::DilateBinary(csf_mask, csf_mask, 1, mitk::CLUtil::Axial);
+  //    mitk::Image::Pointer csf_mask;
+  //    mitk::CLUtil::GrabLabel(resultmask, csf_mask, 1);
+  //    mitk::CLUtil::ClosingBinary(csf_mask,csf_mask,1,mitk::CLUtil::Axial);
 
-//    std::map<unsigned int, unsigned int> merge_instruction = {{0,0},{1,3},{2,2},{3,3}};
-//    mitk::CLUtil::MergeLabels(resultmask, merge_instruction);
+  //    mitk::CLUtil::ErodeBinary(csf_mask, csf_mask, 2, mitk::CLUtil::Axial);
+  //    mitk::CLUtil::DilateBinary(csf_mask, csf_mask, 1, mitk::CLUtil::Axial);
 
-//    mitk::CLUtil::InsertLabel(resultmask, csf_mask, 1/*as csf mask*/); // add morpological manipulated csf_mask
+  //    std::map<unsigned int, unsigned int> merge_instruction = {{0,0},{1,3},{2,2},{3,3}};
+  //    mitk::CLUtil::MergeLabels(resultmask, merge_instruction);
 
-
-//    // ------------
-
-//    mitk::Image::Pointer les_mask;
-//    mitk::CLUtil::GrabLabel(resultmask, les_mask, 2);
-//    mitk::CLUtil::ClosingBinary(les_mask,les_mask,1,mitk::CLUtil::Axial);
-
-//    mitk::Image::Pointer les_cc_mask; unsigned int num = 0;
-//    mitk::CLUtil::ConnectedComponentsImage(les_mask, mask, les_cc_mask, num);
-//    std::map<unsigned int, unsigned int> map;
-//    mitk::CLUtil::CountVoxel(les_cc_mask,map);
-//    unsigned int counter = 0;
-
-//    while(map.size() > 2)
-//    {
-//      mitk::CLUtil::ErodeBinary(les_mask, les_mask, 1, mitk::CLUtil::Axial);
-//      mitk::CLUtil::LogicalAndImages(les_cc_mask,les_mask,les_cc_mask);
-//      map.clear();
-//      mitk::CLUtil::CountVoxel(les_cc_mask,map);
-//      MITK_INFO("PostProcessing") << map.size();
-//      counter++;
-//    }
-
-//    while(counter != 0)
-//    {
-//      mitk::CLUtil::DilateBinary(les_mask, les_mask, 1, mitk::CLUtil::Axial);
-//      counter--;
-//    }
-
-//    merge_instruction = {{0,0},{1,1},{2,3},{3,3}};
-//    mitk::CLUtil::MergeLabels(resultmask, merge_instruction);
-//    mitk::CLUtil::InsertLabel(resultmask, les_mask, 2/*as les mask*/);
-
-//    MITK_INFO << "Morphological processing end";
+  //    mitk::CLUtil::InsertLabel(resultmask, csf_mask, 1/*as csf mask*/); // add morpological manipulated csf_mask
 
 
-//    // ------------
-//    mitk::CLUtil::LogicalAndImages(resultmask,mask,resultmask);
+  //    // ------------
 
-//    AddImageAsDataNode(resultmask,"SmoothedMaskMorphed");
+  //    mitk::Image::Pointer les_mask;
+  //    mitk::CLUtil::GrabLabel(resultmask, les_mask, 2);
+  //    mitk::CLUtil::ClosingBinary(les_mask,les_mask,1,mitk::CLUtil::Axial);
 
-//  }
+  //    mitk::Image::Pointer les_cc_mask; unsigned int num = 0;
+  //    mitk::CLUtil::ConnectedComponentsImage(les_mask, mask, les_cc_mask, num);
+  //    std::map<unsigned int, unsigned int> map;
+  //    mitk::CLUtil::CountVoxel(les_cc_mask,map);
+  //    unsigned int counter = 0;
+
+  //    while(map.size() > 2)
+  //    {
+  //      mitk::CLUtil::ErodeBinary(les_mask, les_mask, 1, mitk::CLUtil::Axial);
+  //      mitk::CLUtil::LogicalAndImages(les_cc_mask,les_mask,les_cc_mask);
+  //      map.clear();
+  //      mitk::CLUtil::CountVoxel(les_cc_mask,map);
+  //      MITK_INFO("PostProcessing") << map.size();
+  //      counter++;
+  //    }
+
+  //    while(counter != 0)
+  //    {
+  //      mitk::CLUtil::DilateBinary(les_mask, les_mask, 1, mitk::CLUtil::Axial);
+  //      counter--;
+  //    }
+
+  //    merge_instruction = {{0,0},{1,1},{2,3},{3,3}};
+  //    mitk::CLUtil::MergeLabels(resultmask, merge_instruction);
+  //    mitk::CLUtil::InsertLabel(resultmask, les_mask, 2/*as les mask*/);
+
+  //    MITK_INFO << "Morphological processing end";
+
+
+  //    // ------------
+  //    mitk::CLUtil::LogicalAndImages(resultmask,mask,resultmask);
+
+  //    AddImageAsDataNode(resultmask,"SmoothedMaskMorphed");
+
+  //  }
 }
 
 //  mitk::Image::Pointer r= mitk::Image::New(),g= mitk::Image::New(),b = mitk::Image::New();

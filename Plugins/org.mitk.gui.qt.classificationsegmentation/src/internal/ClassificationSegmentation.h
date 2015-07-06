@@ -66,13 +66,18 @@ public:
   QmitkPointListViewWidget * m_PointListWidget;
   std::vector<mitk::DataNode::Pointer> m_PointSetList;
   bool m_CalculateFeatures = {true};
-  std::vector<mitk::Image::Pointer> m_FeatureImageVector;
 
+  std::vector<mitk::Image::Pointer> m_FeatureImageVector;
+  std::vector<mitk::Image::Pointer> m_ResultImageVector;
+  std::vector<mitk::Image::Pointer> m_PostProcessingImageVector;
 
   bool m_BlockManualSegmentation = {false};
   QFutureWatcher<std::vector<mitk::Image::Pointer>> m_ManualSegmentationFutureWatcher;
-  QFuture<std::vector<mitk::Image::Pointer>> m_ManualsegmentationFuture;
-  std::vector<mitk::Image::Pointer> DoManualSegmentation();
+
+  bool m_BlockPostProcessing = {false};
+  QFutureWatcher<std::vector<mitk::Image::Pointer>> m_PostProcessingFutureWatcher;
+
+
 
 protected slots:
 
@@ -83,9 +88,17 @@ protected slots:
   void OnButtonLESToggle(bool);
   void OnButtonBRAToggle(bool);
   void OnButtonNoInteractionToggle(bool);
-  void OnSetupModiefied();
-  void OnManualSegmentationFinished();
-  void OnSliderPositionChanged();
+
+  void ManualSegmentationTrigger();
+  std::vector<mitk::Image::Pointer> ManualSegmentationCallback();
+  void ManualSegmentationFinished();
+
+  void PostProcessingTrigger();
+  std::vector<mitk::Image::Pointer> PostProcessingCallback();
+  void PostProcessingFinished();
+
+  void OnFeatureSettingsChanged();
+  void OnPostProcessingSettingsChanged();
   void OnInitializeSession(const mitk::DataNode*);
 
 
@@ -105,8 +118,6 @@ protected:
 
   mitk::DataNode::Pointer AddImageAsDataNode(const mitk::Image::Pointer & data_image, const std::string & name );
 
-  void PostProcessing(mitk::Image::Pointer &prob1, mitk::Image::Pointer &prob2, mitk::Image::Pointer &prob3, mitk::Image::Pointer &mask);
-
   void SampleClassMaskByPointSet(const mitk::Image::Pointer & ref_img, mitk::PointSet::Pointer & pointset, mitk::Image::Pointer & outimage);
 
   double GetEntropyForLabel(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
@@ -122,10 +133,19 @@ protected:
 
   Ui::ClassificationSegmentationControls m_Controls;
 
+  // Feature settings
   ctkSliderWidget * m_GaussSlider;
   ctkSliderWidget * m_HessianSlider;
   ctkSliderWidget * m_STInnerSlider;
   ctkSliderWidget * m_STOuterSlider;
+
+  ctkSliderWidget * m_GaussCSFSlider;
+  ctkSliderWidget * m_GaussLESSlider;
+  ctkSliderWidget * m_GaussBRASlider;
+
+  ctkSliderWidget * m_WeightCSFSlider;
+  ctkSliderWidget * m_WeightLESSlider;
+  ctkSliderWidget * m_WeightBRASlider;
 
   mitk::PointSetDataInteractor::Pointer m_PointSetDataInteractor;
 

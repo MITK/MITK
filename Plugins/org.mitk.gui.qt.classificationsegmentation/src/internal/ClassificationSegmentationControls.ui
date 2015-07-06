@@ -61,25 +61,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Feature settings</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <layout class="QVBoxLayout" name="m_ParameterLayout"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QVBoxLayout" name="m_PointSetLayout">
      <item>
       <widget class="QLabel" name="label">
@@ -199,6 +180,29 @@
     </layout>
    </item>
    <item>
+    <widget class="QGroupBox" name="m_ParameterLayout">
+     <property name="title">
+      <string>Feature settings</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="m_PostProcessingLayout">
+     <property name="title">
+      <string>Postprocessing settings</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetMinAndMaxSize</enum>
@@ -229,13 +233,6 @@
     <widget class="Line" name="m_SeperaterIO">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="m_UsePostProcessing">
-     <property name="text">
-      <string>Postprocessing</string>
      </property>
     </widget>
    </item>

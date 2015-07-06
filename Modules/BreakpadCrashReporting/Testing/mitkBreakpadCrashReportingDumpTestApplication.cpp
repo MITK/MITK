@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     folderForCrashDumps = argv[1];
   }
 
-  mitk::BreakpadCrashReporting crashReporting( folderForCrashDumps );
+  mitk::BreakpadCrashReporting crashReporting( QString::fromStdString(folderForCrashDumps) );
 
   // start out-of-process crash dump server
   crashReporting.StartCrashServer(true);

@@ -8,7 +8,7 @@
 #    OK otherwise we cannot switch between custom-built versions of breakpad and our superbuild version
 #  [optional] add install step to our Breakpad build
 
-if(MITK_USE_BREAKPAD) # from top-level CMakeLists.txt
+if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
 
   find_package(Breakpad)
   if (NOT Breakpad_FOUND)
@@ -17,7 +17,7 @@ if(MITK_USE_BREAKPAD) # from top-level CMakeLists.txt
 
   MITK_CREATE_MODULE(BreakpadCrashReporting
     DEPENDS PUBLIC MitkCore
-    #PACKAGE_DEPENDS PUBLIC Breakpad
+    PACKAGE_DEPENDS PUBLIC Qt5|Widgets
     INCLUDE_DIRS ${Breakpad_INCLUDE_DIR}
     ADDITIONAL_LIBS ${Breakpad_LIBRARIES}
     FORCE_STATIC
@@ -37,4 +37,4 @@ if(MITK_USE_BREAKPAD) # from top-level CMakeLists.txt
 
 add_subdirectory(Testing)
 
-endif(MITK_USE_BREAKPAD)
+endif(MITK_USE_Breakpad)

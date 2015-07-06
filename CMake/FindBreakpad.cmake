@@ -71,9 +71,10 @@ endfunction()
 
 # -------------------- end functions ----------------------------
 
-find_path(Breakpad_INCLUDE_DIR breakpad_googletest_includes.h DOC  "Directory breakpad/src/" PATHS ${Breakpad_SRC}/src ${Breakpad_DIR})
 
-set( Breakpad_DIR ${Breakpad_SRC}/../Breakpad  )
+find_path(Breakpad_INCLUDE_DIR breakpad_googletest_includes.h DOC  "Directory breakpad/src/" PATHS ${MITK_Breakpad_SRC}/src ${Breakpad_DIR})
+
+set( Breakpad_DIR ${MITK_Breakpad_SRC}/../Breakpad  )
 if(CMAKE_SYSTEM MATCHES "Windows")
 
   checkWindowsCompilerFlags() # without debug information, Breakpad makes not much sense, so inform developer
@@ -105,6 +106,9 @@ elseif(CMAKE_SYSTEM MATCHES "Linux")
 else()
   message(FATAL_ERROR "Unsupported platform for Breakpad crash reporting: ${CMAKE_SYSTEM}")
 endif()
+
+message( "Breakpad_LIBRARIES " ${Breakpad_LIBRARIES} )
+message( "Breakpad_INCLUDE_DIR " ${Breakpad_INCLUDE_DIR} )
 
 if (Breakpad_LIBRARIES MATCHES "NOTFOUND")
   set(Breakpad_FOUND FALSE)

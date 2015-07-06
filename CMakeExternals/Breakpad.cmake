@@ -2,10 +2,8 @@
 # Breakpad
 #-----------------------------------------------------------------------------
 
-message( "hier1" )
 if(MITK_USE_Breakpad)
 
-message( "hier2" )
   # Sanity checks
   if(DEFINED Breakpad_DIR AND NOT EXISTS ${Breakpad_DIR})
     message(FATAL_ERROR "Breakpad_DIR variable is defined but corresponds to non-existing directory")
@@ -38,7 +36,10 @@ message( "hier2" )
   #set(Breakpad_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
   set(Breakpad_SRC ${ep_prefix}/src/${proj}-src)
 
-  set(Breakpad_DIR ${ep_prefix})
+  set(Breakpad_DIR ${ep_prefix}}/src/Breakpad)
+
+  #message( "Breakpad_DIR " ${Breakpad_DIR} )
+
   mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()

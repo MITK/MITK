@@ -333,105 +333,24 @@ void ClassificationSegmentation::DoSavePointsAsMask()
     mitk::Image::Pointer temp_img;
     SampleClassMaskByPointSet(raw_image, point_set,temp_img);
     mitk::CLUtil::InsertLabel(temp_img,sampled_image,label++);
+    QmitkIOUtil::Save(datanode->GetData(),QString("PointSet.mps"));
   }
 
 
-  QmitkIOUtil::Save(sampled_image,QString("PointSetMask"));
+  QmitkIOUtil::Save(sampled_image,QString("PointSetMask.nrrd"));
+
 
 }
-
-double ClassificationSegmentation::GetEntropyForLabel(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image)
-{
-
-  //  mitk::ImageStatisticsCalculator::Pointer calculator = mitk::ImageStatisticsCalculator::New();
-  //  calculator->SetImage(raw_image);
-  //  calculator->SetImageMask(mask_image);
-  //  calculator->SetMaskingMode(mitk::ImageStatisticsCalculator::MASKING_MODE_IMAGE);
-  //  calculator->ComputeStatistics();
-  //  calculator->GetHistogram()->Print(std::cout);
-
-  itk::Image<short, 3>::Pointer itk_raw_image;
-  mitk::CastToItkImage(raw_image, itk_raw_image);
-
-  itk::Image<short, 3>::Pointer itk_mask_image;
-  mitk::CastToItkImage(mask_image, itk_mask_image);
-
-  itk::ImageRegionConstIterator<itk::Image<short, 3>> iit(itk_raw_image,itk_raw_image->GetLargestPossibleRegion());
-  itk::ImageRegionConstIterator<itk::Image<short, 3>> mit(itk_mask_image,itk_mask_image->GetLargestPossibleRegion());
-
-  std::map<short, unsigned int> map;
-
-  while(!iit.IsAtEnd())
-  {
-    if(mit.Value()!= 0)
-    {
-      if(map.find(iit.Value()) == map.end())
-        map[iit.Value()] = 0;
-      ++map[iit.Value()];
-    }
-    ++iit;
-    ++mit;
-  }
-
-  double entropy = 0;
-  double sum = 0;
-
-  for(auto const & pair : map)
-    sum += pair.second;
-
-  for(auto const & pair : map)
-    entropy += pair.second/sum * std::log2(pair.second/sum);
-
-  //  MITK_INFO << "Entropy " << - entropy;
-  //  for(auto const & pair : map)
-  //  {
-  //    MITK_INFO << pair.first << ": " << pair.second;
-  //  }
-  return entropy;
-}
-
-double ClassificationSegmentation::GetVarianceForLabel(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image)
-{
-  itk::Image<short, 3>::Pointer itk_raw_image;
-  mitk::CastToItkImage(raw_image, itk_raw_image);
-
-  itk::Image<short, 3>::Pointer itk_mask_image;
-  mitk::CastToItkImage(mask_image, itk_mask_image);
-
-  itk::ImageRegionConstIterator<itk::Image<short, 3>> iit(itk_raw_image,itk_raw_image->GetLargestPossibleRegion());
-  itk::ImageRegionConstIterator<itk::Image<short, 3>> mit(itk_mask_image,itk_mask_image->GetLargestPossibleRegion());
-
-
-  unsigned int num = 0 ;
-  double sum = 0, sqsum = 0;
-
-  while(!iit.IsAtEnd())
-  {
-    if(mit.Value()!= 0)
-    {
-      sum += iit.Value();
-      sqsum += iit.Value() * iit.Value();
-      num++;
-    }
-    ++iit;
-    ++mit;
-  }
-
-  double varaince = (sqsum / num) - (sum/ num) * (sum/num);
-
-  return varaince;
-}
-
 void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & brain_mask)
 {
-  typedef itk::Image<float,3> FloatImageType;
+  typedef itk::Image<double,3> DoubleImageType;
   typedef itk::Image<short,3> ShortImageType;
-  typedef itk::ConstNeighborhoodIterator<FloatImageType> NeighborhoodType; // Neighborhood iterator to access image
+  typedef itk::ConstNeighborhoodIterator<DoubleImageType> NeighborhoodType; // Neighborhood iterator to access image
   typedef itk::Functor::NeighborhoodFirstOrderStatistics<NeighborhoodType, double> FunctorType;
-  typedef itk::NeighborhoodFunctorImageFilter<FloatImageType, FloatImageType, FunctorType> FOSFilerType;
+  typedef itk::NeighborhoodFunctorImageFilter<DoubleImageType, DoubleImageType, FunctorType> FOSFilerType;
   typedef FOSFilerType::MaskImageType MaskImageType;
 
-  bool show_nodes = false;
+  m_FeatureImageVector.clear();
 
   // RAW
   m_FeatureImageVector.push_back(raw_image);
@@ -463,7 +382,7 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
   std::vector<unsigned int> FOS_sizes;
   FOS_sizes.push_back(1);
 
-  FloatImageType::Pointer input;
+  DoubleImageType::Pointer input;
   ShortImageType::Pointer mask;
   mitk::CastToItkImage(smoothed, input);
   mitk::CastToItkImage(brain_mask, mask);
@@ -482,7 +401,7 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
     for( unsigned int i = 0; i < FunctorType::OutputCount; i++)
     {
       mitk::Image::Pointer featureimage;
-      mitk::CastToMitkImage(dynamic_cast<FloatImageType *>(array[i].GetPointer()),featureimage);
+      mitk::CastToMitkImage(dynamic_cast<DoubleImageType *>(array[i].GetPointer()),featureimage);
       m_FeatureImageVector.push_back(featureimage);
       //      AddImageAsDataNode(featureimage,FunctorType::GetFeatureName(i))->SetVisibility(show_nodes);
 
@@ -492,7 +411,7 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
 
   {
 
-    itk::HessianMatrixEigenvalueImageFilter< itk::Image<float,3> >::Pointer filter = itk::HessianMatrixEigenvalueImageFilter< itk::Image<float,3> >::New();
+    itk::HessianMatrixEigenvalueImageFilter< DoubleImageType >::Pointer filter = itk::HessianMatrixEigenvalueImageFilter< DoubleImageType >::New();
     filter->SetInput(input);
     filter->SetImageMask(mask);
     filter->SetSigma(m_HessianSlider->value());
@@ -513,7 +432,7 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
   }
 
   {
-    itk::StructureTensorEigenvalueImageFilter< itk::Image<float,3> >::Pointer filter = itk::StructureTensorEigenvalueImageFilter< itk::Image<float,3> >::New();
+    itk::StructureTensorEigenvalueImageFilter< DoubleImageType >::Pointer filter = itk::StructureTensorEigenvalueImageFilter< DoubleImageType >::New();
     filter->SetInput(input);
     filter->SetImageMask(mask);
     filter->SetInnerScale(m_STInnerSlider->value());
@@ -536,7 +455,7 @@ void ClassificationSegmentation::ProcessFeatureImages(const mitk::Image::Pointer
 
   {
 
-    itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::Pointer filter = itk::LineHistogramBasedMassImageFilter< itk::Image<float,3> >::New();
+    itk::LineHistogramBasedMassImageFilter< DoubleImageType >::Pointer filter = itk::LineHistogramBasedMassImageFilter< DoubleImageType >::New();
     filter->SetInput(input);
     filter->SetImageMask(mask);
     filter->Update();
@@ -644,7 +563,7 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::ManualSegmentation
   }
 
   mitk::VigraRandomForestClassifier::Pointer classifier = mitk::VigraRandomForestClassifier::New();
-  classifier->SetTreeCount(20);
+  classifier->SetTreeCount(50);
   classifier->SetSamplesPerTree(0.66);
 
   Eigen::MatrixXd X_train;

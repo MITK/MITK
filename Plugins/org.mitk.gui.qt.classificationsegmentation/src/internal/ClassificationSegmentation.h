@@ -120,9 +120,6 @@ protected:
 
   void SampleClassMaskByPointSet(const mitk::Image::Pointer & ref_img, mitk::PointSet::Pointer & pointset, mitk::Image::Pointer & outimage);
 
-  double GetEntropyForLabel(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
-  double GetVarianceForLabel(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
-
   void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
@@ -148,6 +145,90 @@ protected:
   ctkSliderWidget * m_WeightBRASlider;
 
   mitk::PointSetDataInteractor::Pointer m_PointSetDataInteractor;
+
+
+  double GetEntropyForLabel(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image)
+  {
+
+    //  mitk::ImageStatisticsCalculator::Pointer calculator = mitk::ImageStatisticsCalculator::New();
+    //  calculator->SetImage(raw_image);
+    //  calculator->SetImageMask(mask_image);
+    //  calculator->SetMaskingMode(mitk::ImageStatisticsCalculator::MASKING_MODE_IMAGE);
+    //  calculator->ComputeStatistics();
+    //  calculator->GetHistogram()->Print(std::cout);
+
+    itk::Image<short, 3>::Pointer itk_raw_image;
+    mitk::CastToItkImage(raw_image, itk_raw_image);
+
+    itk::Image<short, 3>::Pointer itk_mask_image;
+    mitk::CastToItkImage(mask_image, itk_mask_image);
+
+    itk::ImageRegionConstIterator<itk::Image<short, 3>> iit(itk_raw_image,itk_raw_image->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator<itk::Image<short, 3>> mit(itk_mask_image,itk_mask_image->GetLargestPossibleRegion());
+
+    std::map<short, unsigned int> map;
+
+    while(!iit.IsAtEnd())
+    {
+      if(mit.Value()!= 0)
+      {
+        if(map.find(iit.Value()) == map.end())
+          map[iit.Value()] = 0;
+        ++map[iit.Value()];
+      }
+      ++iit;
+      ++mit;
+    }
+
+    double entropy = 0;
+    double sum = 0;
+
+    for(auto const & pair : map)
+      sum += pair.second;
+
+    for(auto const & pair : map)
+      entropy += pair.second/sum * std::log2(pair.second/sum);
+
+    //  MITK_INFO << "Entropy " << - entropy;
+    //  for(auto const & pair : map)
+    //  {
+    //    MITK_INFO << pair.first << ": " << pair.second;
+    //  }
+    return entropy;
+  }
+
+  double GetVarianceForLabel(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image)
+  {
+    itk::Image<short, 3>::Pointer itk_raw_image;
+    mitk::CastToItkImage(raw_image, itk_raw_image);
+
+    itk::Image<short, 3>::Pointer itk_mask_image;
+    mitk::CastToItkImage(mask_image, itk_mask_image);
+
+    itk::ImageRegionConstIterator<itk::Image<short, 3>> iit(itk_raw_image,itk_raw_image->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator<itk::Image<short, 3>> mit(itk_mask_image,itk_mask_image->GetLargestPossibleRegion());
+
+
+    unsigned int num = 0 ;
+    double sum = 0, sqsum = 0;
+
+    while(!iit.IsAtEnd())
+    {
+      if(mit.Value()!= 0)
+      {
+        sum += iit.Value();
+        sqsum += iit.Value() * iit.Value();
+        num++;
+      }
+      ++iit;
+      ++mit;
+    }
+
+    double varaince = (sqsum / num) - (sum/ num) * (sum/num);
+
+    return varaince;
+  }
+
 
 
 };

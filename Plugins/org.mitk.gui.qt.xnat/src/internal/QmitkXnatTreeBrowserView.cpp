@@ -40,6 +40,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatScanFolder.h>
 #include <ctkXnatSubject.h>
 
+
+// MITK XNAT UI
+#include <QmitkXnatProjectInfoWidget.h>
+#include <QmitkXnatSubjectInfoWidget.h>
+#include <QmitkXnatExperimentInfoWidget.h>
+
 // Qt
 #include <QAction>
 #include <QDir>
@@ -81,6 +87,7 @@ m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()-
 
 QmitkXnatTreeBrowserView::~QmitkXnatTreeBrowserView()
 {
+  m_DataStorageServiceTracker.close();
   delete m_TreeModel;
   delete m_Tracker;
 }
@@ -110,6 +117,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 
   m_ContextMenu = new QMenu(m_Controls.treeView);
 
+  connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), SLOT(itemSelected(const QModelIndex&)));
   connect(m_Controls.treeView, SIGNAL(customContextMenuRequested(const QPoint&)),
     this, SLOT(OnContextMenuRequested(const QPoint&)));
   connect(m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanTreeModel(ctkXnatSession*)));
@@ -557,4 +565,121 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
     m_ContextMenu->addAction(actUploadFile);
   }
   m_ContextMenu->popup(QCursor::pos());
+}
+
+void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
+{
+  QLayout* layout = m_Controls.infoVerticalLayout;
+  QLayoutItem *child;
+  while ((child = layout->takeAt(0)) != 0) {
+    delete child->widget();
+  }
+
+  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
+  if (variant.isValid())
+  {
+    ctkXnatSession *session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+
+    ctkXnatObject* object = variant.value<ctkXnatObject*>();
+    ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(object);
+    ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(object);
+    ctkXnatExperiment* experiment = dynamic_cast<ctkXnatExperiment*>(object);
+
+    if (project != NULL)
+    {
+      QmitkXnatProjectInfoWidget* widget = new QmitkXnatProjectInfoWidget(project);
+      layout->addWidget(widget);
+    }
+    else if (subject != NULL)
+    {
+      QMap<QString, QString> paramMap;
+      paramMap.insert("columns", "dob,gender,handedness,weight,height");
+      QUuid requestID = session->httpGet(QString("%1/subjects").arg(subject->parent()->resourceUri()), paramMap);
+      QList<QVariantMap> results = session->httpSync(requestID);
+
+      foreach(const QVariantMap& propertyMap, results)
+      {
+        QMapIterator<QString, QVariant> it(propertyMap);
+        bool isConcretSubject = false;
+
+        if (it.hasNext())
+        {
+          it.next();
+
+          QString  str = it.key().toLatin1().data();
+          QVariant var = it.value();
+
+          // After CTK Change (subjectID = name) to (subjectID = ID)
+          // CHANGE TO: if (var == subject->property("ID"))
+          if (var == subject->property("URI").right(11))
+          {
+            isConcretSubject = true;
+          }
+          else
+          {
+            isConcretSubject = false;
+          }
+          it.toFront();
+        }
+
+        while (it.hasNext() && isConcretSubject)
+        {
+          it.next();
+
+          QString  str = it.key().toLatin1().data();
+          QVariant var = it.value();
+
+          subject->setProperty(str, var);
+        }
+      }
+
+      QmitkXnatSubjectInfoWidget* widget = new QmitkXnatSubjectInfoWidget(subject);
+      layout->addWidget(widget);
+    }
+    else if (experiment != NULL)
+    {
+      QMap<QString, QString> paramMap;
+      paramMap.insert("columns", "date,time,scanner,modality");
+      QUuid requestID = session->httpGet(QString("%1/experiments").arg(experiment->parent()->resourceUri()), paramMap);
+      QList<QVariantMap> results = session->httpSync(requestID);
+
+      foreach(const QVariantMap& propertyMap, results)
+      {
+        QMapIterator<QString, QVariant> it(propertyMap);
+        bool isConcretExperiment = false;
+
+        if (it.hasNext())
+        {
+          it.next();
+
+          QString  str = it.key().toLatin1().data();
+          QVariant var = it.value();
+
+          if (var == experiment->property("URI"))
+          {
+            isConcretExperiment = true;
+          }
+          else
+          {
+            isConcretExperiment = false;
+          }
+          it.toFront();
+        }
+
+        while (it.hasNext() && isConcretExperiment)
+        {
+          it.next();
+
+          QString  str = it.key().toLatin1().data();
+          QVariant var = it.value();
+
+          experiment->setProperty(str, var);
+        }
+      }
+
+      QmitkXnatExperimentInfoWidget* widget = new QmitkXnatExperimentInfoWidget(experiment);
+      layout->addWidget(widget);
+    }
+  }
 }

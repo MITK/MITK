@@ -72,6 +72,8 @@ public:
   void CleanTreeModel(ctkXnatSession* session);
 
   void OnContextMenuRequested(const QPoint & pos);
+  void itemSelected(const QModelIndex& index);
+
   void OnContextMenuDownloadAndOpenFile();
   void OnContextMenuDownloadFile();
   void OnContextMenuCreateResourceFolder();

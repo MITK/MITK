@@ -72,16 +72,18 @@ public:
   void CleanTreeModel(ctkXnatSession* session);
 
   void OnContextMenuRequested(const QPoint & pos);
-  void itemSelected(const QModelIndex& index);
-
   void OnContextMenuDownloadAndOpenFile();
   void OnContextMenuDownloadFile();
   void OnContextMenuCreateResourceFolder();
   void OnContextMenuUploadFile();
+  void OnContextMenuCreateNewSubject();
+  void OnContextMenuCreateNewExperiment();
 
   void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *);
 
   void OnProgress(QUuid, double);
+
+  void itemSelected(const QModelIndex& index);
 
 protected:
 

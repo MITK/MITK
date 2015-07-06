@@ -3,7 +3,7 @@
 The Medical Imaging Interaction Toolkit (MITK)
 
 Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Division of Medical and Biological rmatics.
 All rights reserved.
 
 This software is distributed WITHOUT ANY WARRANTY; without
@@ -14,35 +14,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKXNATSUBJECTINFOWIDGET_H
-#define QMITKXNATSUBJECTINFOWIDGET_H
+#ifndef QMITKXNATPROJECTWIDGET_H
+#define QMITKXNATPROJECTWIDGET_H
 
 // XNATUI
-#include <ui_QmitkXnatSubjectInfoWidgetControls.h>
+#include <ui_QmitkXnatProjectWidgetControls.h>
 #include <MitkXNATExports.h>
 
 // Qt
 #include <QWidget>
 
 // CTK XNAT Core
-class ctkXnatSubject;
+class ctkXnatProject;
 
-class MITKXNAT_EXPORT QmitkXnatSubjectInfoWidget : public QWidget
+class MITKXNAT_EXPORT QmitkXnatProjectWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  QmitkXnatSubjectInfoWidget(ctkXnatSubject* subject, QWidget* parent = 0);
-  ~QmitkXnatSubjectInfoWidget();
 
-  void SetSubject(ctkXnatSubject* subject);
-  ctkXnatSubject* GetSubject() const;
+  enum Mode
+  {
+    INFO,
+    CREATE
+  };
+
+  QmitkXnatProjectWidget(Mode mode, QWidget* parent = 0);
+  ~QmitkXnatProjectWidget();
+
+  void SetProject(ctkXnatProject* project);
+  ctkXnatProject* GetProject() const;
 
 protected:
-  Ui::QmitkXnatSubjectInfoWidgetControls m_Controls;
+  Ui::QmitkXnatProjectWidgetControls m_Controls;
 
 private:
-  ctkXnatSubject* m_Subject;
+  Mode m_Mode;
+  ctkXnatProject* m_Project;
 };
 
-#endif // QMITKXNATSUBJECTINFOWIDGET_H
+#endif // QMITKXNATPROJECTWIDGET_H

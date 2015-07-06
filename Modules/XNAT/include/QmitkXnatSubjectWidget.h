@@ -14,35 +14,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKXNATEXPERIMENTINFOWIDGET_H
-#define QMITKXNATEXPERIMENTINFOWIDGET_H
+#ifndef QMITKXNATSUBJECTWIDGET_H
+#define QMITKXNATSUBJECTWIDGET_H
 
-// XNATUI
-#include <ui_QmitkXnatExperimentInfoWidgetControls.h>
+#include <ui_QmitkXnatSubjectWidgetControls.h>
 #include <MitkXNATExports.h>
 
 // Qt
 #include <QWidget>
 
 // CTK XNAT Core
-class ctkXnatExperiment;
+class ctkXnatSubject;
 
-class MITKXNAT_EXPORT QmitkXnatExperimentInfoWidget : public QWidget
+class MITKXNAT_EXPORT QmitkXnatSubjectWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  QmitkXnatExperimentInfoWidget(ctkXnatExperiment* experiment = 0, QWidget* parent = 0);
-  ~QmitkXnatExperimentInfoWidget();
 
-  void SetExperiment(ctkXnatExperiment* experiment);
-  ctkXnatExperiment* GetExperiment() const;
+  enum Mode
+  {
+    INFO,
+    CREATE
+  };
+
+  QmitkXnatSubjectWidget(Mode mode, QWidget* parent = 0);
+  ~QmitkXnatSubjectWidget();
+
+  void SetSubject(ctkXnatSubject* subject);
+  ctkXnatSubject* GetSubject() const;
 
 protected:
-  Ui::QmitkXnatExperimentInfoWidgetControls m_Controls;
+  Ui::QmitkXnatSubjectWidgetControls m_Controls;
 
 private:
-  ctkXnatExperiment* m_Experiment;
+  Mode m_Mode;
+  ctkXnatSubject* m_Subject;
 };
 
-#endif // QMITKXNATEXPERIMENTINFOWIDGET_H
+#endif // QMITKXNATSUBJECTWIDGET_H

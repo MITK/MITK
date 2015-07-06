@@ -41,19 +41,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatSubject.h>
 
 
-// MITK XNAT UI
-#include <QmitkXnatProjectInfoWidget.h>
-#include <QmitkXnatSubjectInfoWidget.h>
-#include <QmitkXnatExperimentInfoWidget.h>
+// MITK XNAT
+#include <QmitkXnatProjectWidget.h>
+#include <QmitkXnatSubjectWidget.h>
+#include <QmitkXnatExperimentWidget.h>
+#include <QmitkXnatCreateObjectDialog.h>
 
 // Qt
 #include <QAction>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QDir>
+#include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QlayoutItem>
 #include <QMenu>
-#include <QAction>
-#include <QDirIterator>
 #include <QMessageBox>
 
 // MITK
@@ -549,6 +552,22 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
       connect(actView, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadAndOpenFile()));
       m_ContextMenu->addAction(actView);
     }
+    ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(variant.value<ctkXnatObject*>());
+    if (project != NULL)
+    {
+      QAction* actCreateSubject = new QAction("Create new subject", m_NodeMenu);
+      m_NodeMenu->addAction(actCreateSubject);
+      connect(actCreateSubject, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewSubject()));
+      m_NodeMenu->popup(QCursor::pos());
+    }
+    ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(variant.value<ctkXnatObject*>());
+    if (subject != NULL)
+    {
+      QAction* actCreateExperiment = new QAction("Create new experiment", m_NodeMenu);
+      m_NodeMenu->addAction(actCreateExperiment);
+      connect(actCreateExperiment, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewExperiment()));
+      m_NodeMenu->popup(QCursor::pos());
+    }
   }
 
   if (canHaveResourceFolder)
@@ -588,7 +607,8 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
 
     if (project != NULL)
     {
-      QmitkXnatProjectInfoWidget* widget = new QmitkXnatProjectInfoWidget(project);
+      QmitkXnatProjectWidget* widget = new QmitkXnatProjectWidget(QmitkXnatProjectWidget::Mode::INFO);
+      widget->SetProject(project);
       layout->addWidget(widget);
     }
     else if (subject != NULL)
@@ -634,7 +654,8 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
         }
       }
 
-      QmitkXnatSubjectInfoWidget* widget = new QmitkXnatSubjectInfoWidget(subject);
+      QmitkXnatSubjectWidget* widget = new QmitkXnatSubjectWidget(QmitkXnatSubjectWidget::Mode::INFO);
+      widget->SetSubject(subject);
       layout->addWidget(widget);
     }
     else if (experiment != NULL)
@@ -678,8 +699,60 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
         }
       }
 
-      QmitkXnatExperimentInfoWidget* widget = new QmitkXnatExperimentInfoWidget(experiment);
+      QmitkXnatExperimentWidget* widget = new QmitkXnatExperimentWidget(QmitkXnatExperimentWidget::Mode::INFO);
+      widget->SetExperiment(experiment);
       layout->addWidget(widget);
+    }
+  }
+}
+
+void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
+{
+  QModelIndex index = m_Controls.treeView->currentIndex();
+  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
+  if (variant.isValid())
+  {
+    QmitkXnatCreateObjectDialog* dialog = new QmitkXnatCreateObjectDialog(QmitkXnatCreateObjectDialog::SpecificType::SUBJECT);
+    if (dialog->exec() == QDialog::Accepted)
+    {
+      ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(variant.value<ctkXnatObject*>());
+      ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(dialog->GetXnatObject());
+      subject->setParent(project);
+      subject->save();
+
+      // Get xnat session from micro service
+      ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+
+      // Update View
+      m_TreeModel->removeDataModel(session->dataModel());
+      UpdateSession(session);
+    }
+  }
+}
+
+void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
+{
+  QModelIndex index = m_Controls.treeView->currentIndex();
+  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
+  if (variant.isValid())
+  {
+    QmitkXnatCreateObjectDialog* dialog = new QmitkXnatCreateObjectDialog(QmitkXnatCreateObjectDialog::SpecificType::EXPERIMENT);
+    if (dialog->exec() == QDialog::Accepted)
+    {
+      ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(variant.value<ctkXnatObject*>());
+      ctkXnatExperiment* experiment = dynamic_cast<ctkXnatExperiment*>(dialog->GetXnatObject());
+      experiment->setParent(subject);
+      experiment->setProperty("xsiType", experiment->imageModality());
+      experiment->save();
+
+      // Get xnat session from micro service
+      ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+
+      // Update View
+      m_TreeModel->removeDataModel(session->dataModel());
+      UpdateSession(session);
     }
   }
 }

@@ -14,6 +14,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     set( classificationminiapps
         RandomForestTraining^^MitkCLVigraRandomForest
         NativeHeadCTSegmentation^^MitkCLVigraRandomForest
+        ManualSegmentationEvaluation^^MitkCLVigraRandomForest
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 
@@ -27,7 +28,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
       set(dependencies_list ${dependencies})
 
       mitk_create_executable(${appname}
-      DEPENDS MitkCore MitkClassificationCore ${dependencies_list}
+      DEPENDS MitkCore MitkCLCore ${dependencies_list}
       PACKAGE_DEPENDS ITK Qt4 Vigra
       CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
       )

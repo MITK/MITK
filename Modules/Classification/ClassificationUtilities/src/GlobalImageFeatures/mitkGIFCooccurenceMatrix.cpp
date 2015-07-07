@@ -69,7 +69,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   std::ostringstream  ss;
   ss << range;
   std::string strRange = ss.str();
-  for (int i = 0; i < featureMeans->size(); ++i)
+  for (std::size_t i = 0; i < featureMeans->size(); ++i)
   {
     switch (i)
     {

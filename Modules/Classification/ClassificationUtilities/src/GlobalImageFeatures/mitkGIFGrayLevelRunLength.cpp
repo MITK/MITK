@@ -33,7 +33,7 @@ CalculateGrayLevelRunLengthFeatures(itk::Image<TPixel, VImageDimension>* itkImag
   while(oldOffsetsIterator != oldOffsets->End())
   {
     typename FilterType::OffsetType offset = oldOffsetsIterator->Value();
-    for (int i = 0; i < VImageDimension; ++i)
+    for (unsigned int i = 0; i < VImageDimension; ++i)
     {
       offset[i] *= range;
     }
@@ -71,7 +71,7 @@ CalculateGrayLevelRunLengthFeatures(itk::Image<TPixel, VImageDimension>* itkImag
   std::ostringstream  ss;
   ss << range;
   std::string strRange = ss.str();
-  for (int i = 0; i < featureMeans->size(); ++i)
+  for (std::size_t i = 0; i < featureMeans->size(); ++i)
   {
     switch (i)
     {

@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
   itk::ImageRegionIteratorWithIndex<itk::Image<short,3> > iit(itk_classmask_sampled,itk_classmask_sampled->GetLargestPossibleRegion());
 
   std::ofstream myfile;
-    myfile.open (inputdir + "/results.csv");
+  myfile.open (inputdir + "/results_2.csv");
 
 
   for(unsigned int k = 0 ; k < runs; k++)
@@ -277,8 +277,6 @@ int main(int argc, char* argv[])
     BRA_vec.pop_back();
 
 
-
-    vnl_random random;
     std::stringstream ss;
 
     while(!(CSF_vec.empty() && LES_vec.empty() && BRA_vec.empty()))
@@ -288,7 +286,7 @@ int main(int argc, char* argv[])
 
       // Train forest
       mitk::VigraRandomForestClassifier::Pointer classifier = mitk::VigraRandomForestClassifier::New();
-      classifier->SetTreeCount(100);
+      classifier->SetTreeCount(40);
       classifier->SetSamplesPerTree(0.66);
 
       Eigen::MatrixXd X_train;
@@ -330,49 +328,43 @@ int main(int argc, char* argv[])
       ss << overlap_filter->GetDiceCoefficient() <<",";
 
       bool sampled = false;
-      while(true)
+
+      // random class selection
+
+      if(!CSF_vec.empty())
       {
-        // random class selection
-        switch(random.lrand32(0,2))
-        {
-        case 0:
-          if(!CSF_vec.empty())
-          {
-            std::random_shuffle(CSF_vec.begin(), CSF_vec.end());
-            class_mask->GetGeometry()->WorldToIndex(CSF_vec.back(),index);
-            iit.SetIndex(index);
-            iit.Set(1);
-            CSF_vec.pop_back();
-            sampled = true;
-          }
-          break;
-        case 1:
-          if(!LES_vec.empty())
-          {
-            std::random_shuffle(LES_vec.begin(), LES_vec.end());
-            class_mask->GetGeometry()->WorldToIndex(LES_vec.back(),index);
-            iit.SetIndex(index);
-            iit.Set(2);
-            LES_vec.pop_back();
-            sampled = true;
-          }
-          break;
-        case 2:
-          if(!BRA_vec.empty())
-          {
-            std::random_shuffle(BRA_vec.begin(), BRA_vec.end());
-            class_mask->GetGeometry()->WorldToIndex(BRA_vec.back(),index);
-            iit.SetIndex(index);
-            iit.Set(3);
-            BRA_vec.pop_back();
-            sampled = true;
-          }
-          break;
-        }
-        if(sampled == true) break;
+        std::random_shuffle(CSF_vec.begin(), CSF_vec.end());
+        class_mask->GetGeometry()->WorldToIndex(CSF_vec.back(),index);
+        iit.SetIndex(index);
+        iit.Set(1);
+        CSF_vec.pop_back();
+        sampled = true;
       }
+
+      if(!LES_vec.empty())
+      {
+        std::random_shuffle(LES_vec.begin(), LES_vec.end());
+        class_mask->GetGeometry()->WorldToIndex(LES_vec.back(),index);
+        iit.SetIndex(index);
+        iit.Set(2);
+        LES_vec.pop_back();
+        sampled = true;
+      }
+
+      if(!BRA_vec.empty())
+      {
+        std::random_shuffle(BRA_vec.begin(), BRA_vec.end());
+        class_mask->GetGeometry()->WorldToIndex(BRA_vec.back(),index);
+        iit.SetIndex(index);
+        iit.Set(3);
+        BRA_vec.pop_back();
+        sampled = true;
+      }
+
     }
+
     myfile << ss.str() << "\n";
+    myfile.flush();
   }
 
   myfile.close();

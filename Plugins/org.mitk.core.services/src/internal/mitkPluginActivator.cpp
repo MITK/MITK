@@ -106,7 +106,7 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   {
     this->AddMitkService(*i);
   }
-
+  
   dataNodePickingObserver.reset(new DataNodePickingEventObserver());
   us::ServiceProperties pickingObserverServiceProperties;
   pickingObserverServiceProperties["name"] = std::string("DataNodePicker");

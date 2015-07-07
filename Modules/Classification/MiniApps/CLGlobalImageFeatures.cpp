@@ -31,7 +31,7 @@ typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned char, 3 >          MaskImageType;
 
 
-vector<double> splitDouble(string str, char delimiter) {
+static vector<double> splitDouble(string str, char delimiter) {
   vector<double> internal;
   stringstream ss(str); // Turn the string into a stream.
   string tok;

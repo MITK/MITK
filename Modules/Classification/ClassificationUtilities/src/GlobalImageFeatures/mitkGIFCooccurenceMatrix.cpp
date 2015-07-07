@@ -43,7 +43,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   filter->SetOffsets(newOffset);
 
   // All features are required
-  typename FilterType::FeatureNameVectorPointer requestedFeatures = typename FilterType::FeatureNameVector::New();
+  typename FilterType::FeatureNameVectorPointer requestedFeatures = FilterType::FeatureNameVector::New();
   requestedFeatures->push_back(TextureFilterType::Energy);
   requestedFeatures->push_back(TextureFilterType::Entropy);
   requestedFeatures->push_back(TextureFilterType::Correlation);

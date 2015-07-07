@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
     parser.addArgument("masks", "m", mitkCommandLineParser::StringList, "Masks:", "mask images", us::Any());
     parser.addArgument("forest", "f", mitkCommandLineParser::OutputFile, "Forest:", "output forest", us::Any(), false);
 
-    parser.addArgument("stepsize", "s", mitkCommandLineParser::Float, "Stepsize:", "stepsize", us::Any());
+    parser.addArgument("stepsize", "s", mitkCommandLineParser::Float, "Stepsize:", "stepsize in mm (determines number of white-matter samples)", us::Any());
     parser.addArgument("gmsamples", "g", mitkCommandLineParser::Int, "Number of gray matter samples per voxel:", "Number of gray matter samples per voxel", us::Any());
     parser.addArgument("numtrees", "n", mitkCommandLineParser::Int, "Number of trees:", "number of trees", us::Any());
     parser.addArgument("max_tree_depth", "d", mitkCommandLineParser::Int, "Max. tree depth:", "maximum tree depth", us::Any());

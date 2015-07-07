@@ -24,25 +24,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-template< int NumberOfSignalFeatures >
-TrackingForestHandler< NumberOfSignalFeatures >::TrackingForestHandler()
-    : m_GrayMatterSamplesPerVoxel(50)
-    , m_StepSize(-1)
+template< int ShOrder, int NumberOfSignalFeatures >
+TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::TrackingForestHandler()
+    : m_WmSampleDistance(-1)
     , m_NumTrees(30)
     , m_MaxTreeDepth(50)
     , m_SampleFraction(1.0)
-{
-    m_Forest.reset();
-}
-
-template< int NumberOfSignalFeatures >
-TrackingForestHandler< NumberOfSignalFeatures >::~TrackingForestHandler()
+    , m_NumberOfSamples(0)
+    , m_GmSamplesPerVoxel(50)
 {
 
 }
 
-template< int NumberOfSignalFeatures >
-typename TrackingForestHandler< NumberOfSignalFeatures >::InterpolatedRawImageType::PixelType TrackingForestHandler< NumberOfSignalFeatures >::GetImageValues(itk::Point<float, 3> itkP, typename InterpolatedRawImageType::Pointer image)
+template< int ShOrder, int NumberOfSignalFeatures >
+TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::~TrackingForestHandler()
+{
+
+}
+
+template< int ShOrder, int NumberOfSignalFeatures >
+typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InterpolatedRawImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetImageValues(itk::Point<float, 3> itkP, typename InterpolatedRawImageType::Pointer image)
 {
     itk::Index<3> idx;
     itk::ContinuousIndex< double, 3> cIdx;
@@ -113,24 +114,227 @@ typename TrackingForestHandler< NumberOfSignalFeatures >::InterpolatedRawImageTy
     return pix;
 }
 
-template< int NumberOfSignalFeatures >
-void TrackingForestHandler< NumberOfSignalFeatures >::InputDataValidForTracking()
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidForTracking()
 {
     if (m_RawData.empty())
         mitkThrow() << "No diffusion-weighted images set!";
+    if (!IsForestValid())
+        mitkThrow() << "No or invalid random forest detected!";
 }
 
-template< int NumberOfSignalFeatures >
-void TrackingForestHandler< NumberOfSignalFeatures >::StartTraining()
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 {
-    InputDataValidForTraining();
-    PreprocessInputData();
-    CalculateFeatures();
-    TrainForest();
+    InputDataValidForTracking();
+
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
+
+    MITK_INFO << "Spherically interpolating raw data and creating feature image ...";
+
+    typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
+    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_RawData.at(0)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_RawData.at(0)) );
+    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_RawData.at(0)));
+    filter->SetLambda(0.006);
+    filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
+    filter->Update();
+
+    vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+    itk::OrientationDistributionFunction< double, NumberOfSignalFeatures*2 > odf;
+    m_DirectionIndices.clear();
+    for (unsigned int f=0; f<NumberOfSignalFeatures*2; f++)
+    {
+        if (dot_product(ref, odf.GetDirection(f))>0)    // only used directions on one hemisphere
+            m_DirectionIndices.push_back(f);
+    }
+
+    m_FeatureImage = FeatureImageType::New();
+    m_FeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
+    m_FeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
+    m_FeatureImage->SetDirection(filter->GetOutput()->GetDirection());
+    m_FeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    m_FeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    m_FeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    m_FeatureImage->Allocate();
+
+    itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
+    while(!it.IsAtEnd())
+    {
+        typename FeatureImageType::PixelType pix;
+        for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
+            pix[f] = it.Get()[m_DirectionIndices.at(f)];
+        m_FeatureImage->SetPixel(it.GetIndex(), pix);
+        ++it;
+    }
 }
 
-template< int NumberOfSignalFeatures >
-void TrackingForestHandler< NumberOfSignalFeatures >::InputDataValidForTraining()
+template< int ShOrder, int NumberOfSignalFeatures >
+typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::FeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetFeatureValues(itk::Point<float, 3> itkP)
+{
+    itk::Index<3> idx;
+    itk::ContinuousIndex< double, 3> cIdx;
+    m_FeatureImage->TransformPhysicalPointToIndex(itkP, idx);
+    m_FeatureImage->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+
+    typename FeatureImageType::PixelType pix; pix.Fill(0.0);
+    if ( m_FeatureImage->GetLargestPossibleRegion().IsInside(idx) )
+        pix = m_FeatureImage->GetPixel(idx);
+    else
+        return pix;
+
+    double frac_x = cIdx[0] - idx[0];
+    double frac_y = cIdx[1] - idx[1];
+    double frac_z = cIdx[2] - idx[2];
+    if (frac_x<0)
+    {
+        idx[0] -= 1;
+        frac_x += 1;
+    }
+    if (frac_y<0)
+    {
+        idx[1] -= 1;
+        frac_y += 1;
+    }
+    if (frac_z<0)
+    {
+        idx[2] -= 1;
+        frac_z += 1;
+    }
+    frac_x = 1-frac_x;
+    frac_y = 1-frac_y;
+    frac_z = 1-frac_z;
+
+    // int coordinates inside image?
+    if (idx[0] >= 0 && idx[0] < m_FeatureImage->GetLargestPossibleRegion().GetSize(0)-1 &&
+            idx[1] >= 0 && idx[1] < m_FeatureImage->GetLargestPossibleRegion().GetSize(1)-1 &&
+            idx[2] >= 0 && idx[2] < m_FeatureImage->GetLargestPossibleRegion().GetSize(2)-1)
+    {
+        vnl_vector_fixed<double, 8> interpWeights;
+        interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
+        interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
+        interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
+        interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
+        interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
+        interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
+        interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
+        interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
+
+        pix = m_FeatureImage->GetPixel(idx) * interpWeights[0];
+        typename FeatureImageType::IndexType tmpIdx = idx; tmpIdx[0]++;
+        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[1];
+        tmpIdx = idx; tmpIdx[1]++;
+        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[2];
+        tmpIdx = idx; tmpIdx[2]++;
+        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[3];
+        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
+        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[4];
+        tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
+        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[5];
+        tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
+        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[6];
+        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
+        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[7];
+    }
+
+    return pix;
+}
+
+template< int ShOrder, int NumberOfSignalFeatures >
+vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& prob)
+{
+    vnl_vector_fixed<double,3> direction; direction.fill(0);
+
+    vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,NumberOfSignalFeatures+3) );
+
+    typename FeatureImageType::PixelType featurePixel = GetFeatureValues(pos);
+
+    // pixel values
+    for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
+        featureData(0,f) = featurePixel[f];
+
+    // direction features
+    int c = 0;
+    {
+        vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+        for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
+        {
+            if (dot_product(ref, olddir)<0)
+                featureData(0,f) = -olddir[c];
+            else
+                featureData(0,f) = olddir[c];
+            c++;
+        }
+    }
+
+    vigra::MultiArray<2, double> probs(vigra::Shape2(1, m_Forest->class_count()));
+    m_Forest->predictProbabilities(featureData, probs);
+
+    double outProb = 0;
+    prob = 0;
+    candidates = 0; // directions with probability > 0
+    for (int i=0; i<m_Forest->class_count(); i++)
+    {
+        if (probs(0,i)>0)
+        {
+            int classLabel = 0;
+            m_Forest->ext_param_.to_classlabel(i, classLabel);
+
+            if (classLabel<m_DirectionIndices.size())
+            {
+                candidates++;
+
+                vnl_vector_fixed<double,3> d = m_DirContainer.GetDirection(m_DirectionIndices.at(classLabel));
+                double dot = dot_product(d, olddir);
+
+                if (olddir.magnitude()>0)
+                {
+                    if (fabs(dot)>angularThreshold)
+                    {
+                        if (dot<0)
+                            d *= -1;
+                        dot = fabs(dot);
+                        direction += probs(0,i)*dot*d;
+                        prob += probs(0,i)*dot;
+                    }
+                }
+                else
+                {
+                    direction += probs(0,i)*d;
+                    prob += probs(0,i);
+                }
+            }
+            else
+                outProb += probs(0,i);
+        }
+    }
+
+    if (outProb>prob && prob>0)
+    {
+        candidates = 0;
+        prob = 0;
+        direction.fill(0.0);
+    }
+
+    return direction;
+}
+
+
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::StartTraining()
+{
+    m_StartTime = std::chrono::system_clock::now();
+    InputDataValidForTraining();
+    PreprocessInputDataForTraining();
+    CalculateFeaturesForTraining();
+    TrainForest();
+    m_EndTime = std::chrono::system_clock::now();
+    std::chrono::hours   hh = std::chrono::duration_cast<std::chrono::hours>(m_EndTime - m_StartTime);
+    std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>((m_EndTime - m_StartTime) % std::chrono::hours(1));
+    MITK_INFO << "Training took " << hh.count() << "h and " << mm.count() << "m";
+}
+
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidForTraining()
 {
     if (m_RawData.empty())
         mitkThrow() << "No diffusion-weighted images set!";
@@ -140,18 +344,18 @@ void TrackingForestHandler< NumberOfSignalFeatures >::InputDataValidForTraining(
         mitkThrow() << "Unequal number of diffusion-weighted images and tractograms detected!";
 }
 
-template< int NumberOfSignalFeatures >
-bool TrackingForestHandler< NumberOfSignalFeatures >::IsForestValid()
+template< int ShOrder, int NumberOfSignalFeatures >
+bool TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::IsForestValid()
 {
-    if(m_Forest.tree_count()>0 && m_Forest.feature_count()==(NumberOfSignalFeatures+3))
+    if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count()==(NumberOfSignalFeatures+3))
         return true;
     return false;
 }
 
-template< int NumberOfSignalFeatures >
-void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::PreprocessInputDataForTraining()
 {
-    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,6, 2*NumberOfSignalFeatures> InterpolationFilterType;
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
     MITK_INFO << "Spherical signal interpolation and sampling ...";
     for (unsigned int i=0; i<m_RawData.size(); i++)
@@ -163,7 +367,6 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
         qballfilter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
         qballfilter->Update();
         //      FeatureImageType::Pointer itkFeatureImage = qballfilter->GetCoefficientImage();
-        //      featureImageVector.push_back(itkFeatureImage);
         m_InterpolatedRawImages.push_back(qballfilter->GetOutput());
 
         if (i>=m_MaskImages.size())
@@ -219,7 +422,7 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
         }
 
         // Calculate white-matter samples
-        if (m_StepSize<0)
+        if (m_WmSampleDistance<0)
         {
             typename InterpolatedRawImageType::Pointer image = m_InterpolatedRawImages.at(t);
             float minSpacing = 1;
@@ -229,10 +432,10 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
                 minSpacing = image->GetSpacing()[1];
             else
                 minSpacing = image->GetSpacing()[2];
-            m_StepSize = minSpacing*0.5;
+            m_WmSampleDistance = minSpacing*0.5;
         }
 
-        m_Tractograms.at(t)->ResampleSpline(m_StepSize);
+        m_Tractograms.at(t)->ResampleSpline(m_WmSampleDistance);
         unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()-2*m_Tractograms.at(t)->GetNumFibers();
         m_NumberOfSamples += wmSamples;
         MITK_INFO << "Samples inside of WM: " << wmSamples;
@@ -249,10 +452,10 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
         }
         MITK_INFO << "Non-white matter voxels: " << OUTOFWM;
 
-        if (m_GrayMatterSamplesPerVoxel>0)
+        if (m_GmSamplesPerVoxel>0)
         {
-            m_GmSamples.push_back(m_GrayMatterSamplesPerVoxel);
-            m_NumberOfSamples += m_GrayMatterSamplesPerVoxel*OUTOFWM;
+            m_GmSamples.push_back(m_GmSamplesPerVoxel);
+            m_NumberOfSamples += m_GmSamplesPerVoxel*OUTOFWM;
         }
         else if (OUTOFWM>0)
         {
@@ -269,8 +472,8 @@ void TrackingForestHandler< NumberOfSignalFeatures >::PreprocessInputData()
     MITK_INFO << "Number of samples: " << m_NumberOfSamples;
 }
 
-template< int NumberOfSignalFeatures >
-void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateFeaturesForTraining()
 {
     vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
     itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > directions;
@@ -415,7 +618,6 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
                 double m = dir.magnitude();
                 if (m>0.0001)
                 {
-                    int label = 0;
                     for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
                     {
                         double a = fabs(dot_product(dir, directions.GetDirection(directionIndices[f])));
@@ -423,7 +625,6 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
                         {
                             m_LabelData(sampleCounter,0) = f;
                             angle = a;
-                            label = f;
                         }
                     }
                 }
@@ -435,30 +636,28 @@ void TrackingForestHandler< NumberOfSignalFeatures >::CalculateFeatures()
     }
 }
 
-template< int NumberOfSignalFeatures >
-void TrackingForestHandler< NumberOfSignalFeatures >::TrainForest()
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::TrainForest()
 {
 
     MITK_INFO << "Maximum tree depths: " << m_MaxTreeDepth;
     MITK_INFO << "Sample fraction per tree: " << m_SampleFraction;
     MITK_INFO << "Number of trees: " << m_NumTrees;
 
-    std::vector< vigra::RandomForest<int> > trees;
+    std::vector< std::shared_ptr< vigra::RandomForest<int> > > trees;
     int count = 0;
 #pragma omp parallel for
     for (int i = 0; i < m_NumTrees; ++i)
     {
-        vigra::RandomForest<int> lrf;
-        vigra::rf::visitors::OOB_Error loob_v;
+        std::shared_ptr< vigra::RandomForest<int> > lrf = std::make_shared< vigra::RandomForest<int> >();
+        lrf->set_options().use_stratification(vigra::RF_NONE); // How the data should be made equal
+        lrf->set_options().sample_with_replacement(true); // if sampled with replacement or not
+        lrf->set_options().samples_per_tree(m_SampleFraction); // Fraction of samples that are used to train a tree
+        lrf->set_options().tree_count(1); // Number of trees that are calculated;
+        lrf->set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
+        lrf->ext_param_.max_tree_depth = m_MaxTreeDepth;
 
-        lrf.set_options().use_stratification(vigra::RF_NONE); // How the data should be made equal
-        lrf.set_options().sample_with_replacement(true); // if sampled with replacement or not
-        lrf.set_options().samples_per_tree(m_SampleFraction); // Fraction of samples that are used to train a tree
-        lrf.set_options().tree_count(1); // Number of trees that are calculated;
-        lrf.set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
-        lrf.ext_param_.max_tree_depth = m_MaxTreeDepth;
-
-        lrf.learn(m_FeatureData, m_LabelData);
+        lrf->learn(m_FeatureData, m_LabelData);
 #pragma omp critical
         {
             count++;
@@ -468,56 +667,30 @@ void TrackingForestHandler< NumberOfSignalFeatures >::TrainForest()
     }
 
     for (int i = 1; i < m_NumTrees; ++i)
-        trees.at(0).trees_.push_back(trees.at(i).trees_[0]);
+        trees.at(0)->trees_.push_back(trees.at(i)->trees_[0]);
 
     m_Forest = trees.at(0);
-    m_Forest.options_.tree_count_ = m_NumTrees;
+    m_Forest->options_.tree_count_ = m_NumTrees;
     MITK_INFO << "Training finsihed";
 }
 
-template< int NumberOfSignalFeatures >
-void TrackingForestHandler< NumberOfSignalFeatures >::SaveForest(std::string forestFile)
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::SaveForest(std::string forestFile)
 {
     MITK_INFO << "Saving forest to " << forestFile;
     if (IsForestValid())
-        vigra::rf_export_HDF5( m_Forest, forestFile, "" );
+        vigra::rf_export_HDF5( *m_Forest, forestFile, "" );
     else
         MITK_INFO << "Forest invalid! Could not be saved.";
 }
 
-template< int NumberOfSignalFeatures >
-void TrackingForestHandler< NumberOfSignalFeatures >::LoadForest(std::string forestFile)
+template< int ShOrder, int NumberOfSignalFeatures >
+void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::LoadForest(std::string forestFile)
 {
     MITK_INFO << "Loading forest from " << forestFile;
-    vigra::rf_import_HDF5(m_Forest, forestFile);
+    m_Forest = std::make_shared< vigra::RandomForest<int> >();
+    vigra::rf_import_HDF5( *m_Forest, forestFile);
 }
-
-//// superclass implementations
-//template< int NumberOfSignalFeatures >
-//void TrackingForestHandler< NumberOfSignalFeatures >::UpdateOutputInformation()
-//{
-
-//}
-//template< int NumberOfSignalFeatures >
-//void TrackingForestHandler< NumberOfSignalFeatures >::SetRequestedRegionToLargestPossibleRegion()
-//{
-
-//}
-//template< int NumberOfSignalFeatures >
-//bool TrackingForestHandler< NumberOfSignalFeatures >::RequestedRegionIsOutsideOfTheBufferedRegion()
-//{
-//    return false;
-//}
-//template< int NumberOfSignalFeatures >
-//bool TrackingForestHandler< NumberOfSignalFeatures >::VerifyRequestedRegion()
-//{
-//    return true;
-//}
-//template< int NumberOfSignalFeatures >
-//void TrackingForestHandler< NumberOfSignalFeatures >::SetRequestedRegion(const itk::DataObject* )
-//{
-
-//}
 
 }
 

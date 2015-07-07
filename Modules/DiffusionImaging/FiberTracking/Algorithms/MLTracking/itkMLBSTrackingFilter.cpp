@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageFileWriter.h>
-//#include <boost/thread/thread.hpp>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -45,11 +44,10 @@ MLBSTrackingFilter< NumImageFeatures >
     , m_MinTractLength(20.0)
     , m_MaxTractLength(400.0)
     , m_SeedsPerVoxel(1)
-    , m_NumberOfSamples(50)
     , m_SamplingDistance(-1)
+    , m_NumberOfSamples(50)
     , m_SeedImage(NULL)
     , m_MaskImage(NULL)
-    , m_DecisionForest(NULL)
     , m_StoppingRegions(NULL)
     , m_DemoMode(false)
     , m_PauseTracking(false)
@@ -58,7 +56,6 @@ MLBSTrackingFilter< NumImageFeatures >
     , m_AposterioriCurvCheck(false)
     , m_AvoidStop(true)
     , m_RandomSampling(false)
-    , m_Verbose(false)
 {
     this->SetNumberOfRequiredInputs(1);
 }
@@ -73,21 +70,16 @@ template< int NumImageFeatures >
 void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
 {
     m_InputImage = const_cast<InputImageType*>(this->GetInput(0));
-    PreprocessRawData();
+    m_ForestHandler.InitForTracking();
 
     m_FiberPolyData = PolyDataType::New();
     m_Points = vtkSmartPointer< vtkPoints >::New();
     m_Cells = vtkSmartPointer< vtkCellArray >::New();
 
-    m_ImageSize.resize(3);
-    m_ImageSize[0] = m_FeatureImage->GetLargestPossibleRegion().GetSize()[0];
-    m_ImageSize[1] = m_FeatureImage->GetLargestPossibleRegion().GetSize()[1];
-    m_ImageSize[2] = m_FeatureImage->GetLargestPossibleRegion().GetSize()[2];
-
-    m_ImageSpacing.resize(3);
-    m_ImageSpacing[0] = m_FeatureImage->GetSpacing()[0];
-    m_ImageSpacing[1] = m_FeatureImage->GetSpacing()[1];
-    m_ImageSpacing[2] = m_FeatureImage->GetSpacing()[2];
+    std::vector< double > m_ImageSpacing; m_ImageSpacing.resize(3);
+    m_ImageSpacing[0] = m_InputImage->GetSpacing()[0];
+    m_ImageSpacing[1] = m_InputImage->GetSpacing()[1];
+    m_ImageSpacing[2] = m_InputImage->GetSpacing()[2];
 
     double minSpacing;
     if(m_ImageSpacing[0]<m_ImageSpacing[1] && m_ImageSpacing[0]<m_ImageSpacing[2])
@@ -112,37 +104,13 @@ void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
         m_PolyDataContainer.push_back(poly);
     }
 
-    m_NotWmImage = ItkDoubleImgType::New();
-    m_NotWmImage->SetSpacing( m_FeatureImage->GetSpacing() );
-    m_NotWmImage->SetOrigin( m_FeatureImage->GetOrigin() );
-    m_NotWmImage->SetDirection( m_FeatureImage->GetDirection() );
-    m_NotWmImage->SetRegions( m_FeatureImage->GetLargestPossibleRegion() );
-    m_NotWmImage->Allocate();
-    m_NotWmImage->FillBuffer(0);
-
-    m_WmImage = ItkDoubleImgType::New();
-    m_WmImage->SetSpacing( m_FeatureImage->GetSpacing() );
-    m_WmImage->SetOrigin( m_FeatureImage->GetOrigin() );
-    m_WmImage->SetDirection( m_FeatureImage->GetDirection() );
-    m_WmImage->SetRegions( m_FeatureImage->GetLargestPossibleRegion() );
-    m_WmImage->Allocate();
-    m_WmImage->FillBuffer(0);
-
-    m_AvoidStopImage = ItkDoubleImgType::New();
-    m_AvoidStopImage->SetSpacing( m_FeatureImage->GetSpacing() );
-    m_AvoidStopImage->SetOrigin( m_FeatureImage->GetOrigin() );
-    m_AvoidStopImage->SetDirection( m_FeatureImage->GetDirection() );
-    m_AvoidStopImage->SetRegions( m_FeatureImage->GetLargestPossibleRegion() );
-    m_AvoidStopImage->Allocate();
-    m_AvoidStopImage->FillBuffer(0);
-
     if (m_StoppingRegions.IsNull())
     {
         m_StoppingRegions = ItkUcharImgType::New();
-        m_StoppingRegions->SetSpacing( m_FeatureImage->GetSpacing() );
-        m_StoppingRegions->SetOrigin( m_FeatureImage->GetOrigin() );
-        m_StoppingRegions->SetDirection( m_FeatureImage->GetDirection() );
-        m_StoppingRegions->SetRegions( m_FeatureImage->GetLargestPossibleRegion() );
+        m_StoppingRegions->SetSpacing( m_InputImage->GetSpacing() );
+        m_StoppingRegions->SetOrigin( m_InputImage->GetOrigin() );
+        m_StoppingRegions->SetDirection( m_InputImage->GetDirection() );
+        m_StoppingRegions->SetRegions( m_InputImage->GetLargestPossibleRegion() );
         m_StoppingRegions->Allocate();
         m_StoppingRegions->FillBuffer(0);
     }
@@ -150,10 +118,10 @@ void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
     if (m_SeedImage.IsNull())
     {
         m_SeedImage = ItkUcharImgType::New();
-        m_SeedImage->SetSpacing( m_FeatureImage->GetSpacing() );
-        m_SeedImage->SetOrigin( m_FeatureImage->GetOrigin() );
-        m_SeedImage->SetDirection( m_FeatureImage->GetDirection() );
-        m_SeedImage->SetRegions( m_FeatureImage->GetLargestPossibleRegion() );
+        m_SeedImage->SetSpacing( m_InputImage->GetSpacing() );
+        m_SeedImage->SetOrigin( m_InputImage->GetOrigin() );
+        m_SeedImage->SetDirection( m_InputImage->GetDirection() );
+        m_SeedImage->SetRegions( m_InputImage->GetLargestPossibleRegion() );
         m_SeedImage->Allocate();
         m_SeedImage->FillBuffer(1);
     }
@@ -162,10 +130,10 @@ void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
     {
         // initialize mask image
         m_MaskImage = ItkUcharImgType::New();
-        m_MaskImage->SetSpacing( m_FeatureImage->GetSpacing() );
-        m_MaskImage->SetOrigin( m_FeatureImage->GetOrigin() );
-        m_MaskImage->SetDirection( m_FeatureImage->GetDirection() );
-        m_MaskImage->SetRegions( m_FeatureImage->GetLargestPossibleRegion() );
+        m_MaskImage->SetSpacing( m_InputImage->GetSpacing() );
+        m_MaskImage->SetOrigin( m_InputImage->GetOrigin() );
+        m_MaskImage->SetDirection( m_InputImage->GetDirection() );
+        m_MaskImage->SetRegions( m_InputImage->GetLargestPossibleRegion() );
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
     }
@@ -181,6 +149,7 @@ void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
     m_Tractogram.clear();
     m_SamplingPointset = mitk::PointSet::New();
     m_AlternativePointset = mitk::PointSet::New();
+    m_StartTime = std::chrono::system_clock::now();
 
     std::cout << "MLBSTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
     std::cout << "MLBSTrackingFilter: Stepsize: " << m_StepSize << " mm" << std::endl;
@@ -190,51 +159,6 @@ void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
     std::cout << "MLBSTrackingFilter: Max. tract length: " << m_MaxTractLength << " mm" << std::endl;
     std::cout << "MLBSTrackingFilter: Min. tract length: " << m_MinTractLength << " mm" << std::endl;
     std::cout << "MLBSTrackingFilter: Starting streamline tracking using " << this->GetNumberOfThreads() << " threads." << std::endl;
-}
-
-template< int NumImageFeatures >
-void MLBSTrackingFilter< NumImageFeatures >::PreprocessRawData()
-{
-    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,6, 2*NumImageFeatures> InterpolationFilterType;
-
-    std::cout << "MLBSTrackingFilter: Spherical signal interpolation and sampling ..." << std::endl;
-    typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-    filter->SetGradientImage( m_GradientDirections, m_InputImage );
-    filter->SetBValue( m_B_Value );
-    filter->SetLambda(0.006);
-    filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
-    filter->Update();
-    //      FeatureImageType::Pointer itkFeatureImage = qballfilter->GetCoefficientImage();
-    //      featureImageVector.push_back(itkFeatureImage);
-
-    std::cout << "MLBSTrackingFilter: Creating feature image ..." << std::endl;
-    vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-    itk::OrientationDistributionFunction< double, NumImageFeatures*2 > odf;
-    m_DirectionIndices.clear();
-    for (unsigned int f=0; f<NumImageFeatures*2; f++)
-    {
-        if (dot_product(ref, odf.GetDirection(f))>0)    // only used directions on one hemisphere
-            m_DirectionIndices.push_back(f);
-    }
-
-    m_FeatureImage = FeatureImageType::New();
-    m_FeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
-    m_FeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
-    m_FeatureImage->SetDirection(filter->GetOutput()->GetDirection());
-    m_FeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    m_FeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    m_FeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    m_FeatureImage->Allocate();
-
-    itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
-    while(!it.IsAtEnd())
-    {
-        typename FeatureImageType::PixelType pix;
-        for (unsigned int f=0; f<NumImageFeatures; f++)
-            pix[f] = it.Get()[m_DirectionIndices.at(f)];
-        m_FeatureImage->SetPixel(it.GetIndex(), pix);
-        ++it;
-    }
 }
 
 template< int NumImageFeatures >
@@ -254,175 +178,12 @@ bool MLBSTrackingFilter< NumImageFeatures >
 ::IsValidPosition(itk::Point<double, 3> &pos)
 {
     typename FeatureImageType::IndexType idx;
-    m_FeatureImage->TransformPhysicalPointToIndex(pos, idx);
-    if (!m_FeatureImage->GetLargestPossibleRegion().IsInside(idx) || m_MaskImage->GetPixel(idx)==0)
+    m_InputImage->TransformPhysicalPointToIndex(pos, idx);
+    if (!m_InputImage->GetLargestPossibleRegion().IsInside(idx) || m_MaskImage->GetPixel(idx)==0)
         return false;
 
     return true;
 }
-
-template< int NumImageFeatures >
-typename MLBSTrackingFilter< NumImageFeatures >::FeatureImageType::PixelType MLBSTrackingFilter< NumImageFeatures >::GetImageValues(itk::Point<float, 3> itkP)
-{
-    itk::Index<3> idx;
-    itk::ContinuousIndex< double, 3> cIdx;
-    m_FeatureImage->TransformPhysicalPointToIndex(itkP, idx);
-    m_FeatureImage->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
-
-    typename FeatureImageType::PixelType pix; pix.Fill(0.0);
-    if ( m_FeatureImage->GetLargestPossibleRegion().IsInside(idx) )
-        pix = m_FeatureImage->GetPixel(idx);
-    else
-        return pix;
-
-    double frac_x = cIdx[0] - idx[0];
-    double frac_y = cIdx[1] - idx[1];
-    double frac_z = cIdx[2] - idx[2];
-    if (frac_x<0)
-    {
-        idx[0] -= 1;
-        frac_x += 1;
-    }
-    if (frac_y<0)
-    {
-        idx[1] -= 1;
-        frac_y += 1;
-    }
-    if (frac_z<0)
-    {
-        idx[2] -= 1;
-        frac_z += 1;
-    }
-    frac_x = 1-frac_x;
-    frac_y = 1-frac_y;
-    frac_z = 1-frac_z;
-
-    // int coordinates inside image?
-    if (idx[0] >= 0 && idx[0] < m_FeatureImage->GetLargestPossibleRegion().GetSize(0)-1 &&
-            idx[1] >= 0 && idx[1] < m_FeatureImage->GetLargestPossibleRegion().GetSize(1)-1 &&
-            idx[2] >= 0 && idx[2] < m_FeatureImage->GetLargestPossibleRegion().GetSize(2)-1)
-    {
-        vnl_vector_fixed<double, 8> interpWeights;
-        interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
-        interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
-        interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
-        interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
-        interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
-        interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
-        interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
-        interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
-
-        pix = m_FeatureImage->GetPixel(idx) * interpWeights[0];
-        typename FeatureImageType::IndexType tmpIdx = idx; tmpIdx[0]++;
-        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[1];
-        tmpIdx = idx; tmpIdx[1]++;
-        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[2];
-        tmpIdx = idx; tmpIdx[2]++;
-        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[3];
-        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
-        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[4];
-        tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
-        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[5];
-        tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
-        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[6];
-        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-        pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[7];
-    }
-
-    return pix;
-}
-
-template< int NumImageFeatures >
-vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& prob, bool avoidStop)
-{
-    vnl_vector_fixed<double,3> direction; direction.fill(0);
-
-    vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,NumImageFeatures+3) );
-
-    typename FeatureImageType::PixelType featurePixel = GetImageValues(pos);
-
-    // pixel values
-    for (unsigned int f=0; f<NumImageFeatures; f++)
-        featureData(0,f) = featurePixel[f];
-
-    // direction features
-    int c = 0;
-    {
-        vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-        for (unsigned int f=NumImageFeatures; f<NumImageFeatures+3; f++)
-        {
-            if (dot_product(ref, olddir)<0)
-                featureData(0,f) = -olddir[c];
-            else
-                featureData(0,f) = olddir[c];
-            c++;
-        }
-    }
-
-    vigra::MultiArray<2, double> probs(vigra::Shape2(1, m_DecisionForest->class_count()));
-    m_DecisionForest->predictProbabilities(featureData, probs);
-
-    double outProb = 0;
-    prob = 0;
-    candidates = 0; // directions with probability > 0
-    for (int i=0; i<m_DecisionForest->class_count(); i++)
-    {
-        if (probs(0,i)>0)
-        {
-            int classLabel = 0;
-            m_DecisionForest->ext_param_.to_classlabel(i, classLabel);
-
-            if (classLabel<m_DirectionIndices.size())
-            {
-                candidates++;
-
-                vnl_vector_fixed<double,3> d = m_ODF.GetDirection(m_DirectionIndices.at(classLabel));
-                double dot = dot_product(d, olddir);
-
-                if (olddir.magnitude()>0)
-                {
-                    if (fabs(dot)>angularThreshold)
-                    {
-                        if (dot<0)
-                            d *= -1;
-                        dot = fabs(dot);
-                        direction += probs(0,i)*dot*d;
-                        prob += probs(0,i)*dot;
-                    }
-                }
-                else
-                {
-                    direction += probs(0,i)*d;
-                    prob += probs(0,i);
-                }
-            }
-            else
-                outProb += probs(0,i);
-        }
-    }
-
-    ItkDoubleImgType::IndexType idx;
-    if (m_Verbose)
-    {
-        m_NotWmImage->TransformPhysicalPointToIndex(pos, idx);
-        if (m_NotWmImage->GetLargestPossibleRegion().IsInside(idx))
-        {
-            m_NotWmImage->SetPixel(idx, m_NotWmImage->GetPixel(idx)+outProb);
-            m_WmImage->SetPixel(idx, m_WmImage->GetPixel(idx)+prob);
-        }
-    }
-    if (outProb>prob && prob>0)
-    {
-        candidates = 0;
-        prob = 0;
-        direction.fill(0.0);
-    }
-    if (m_Verbose && avoidStop && m_AvoidStopImage->GetLargestPossibleRegion().IsInside(idx) && candidates>0 && direction.magnitude()>0.001)
-        m_AvoidStopImage->SetPixel(idx, m_AvoidStopImage->GetPixel(idx)+0.1);
-
-    return direction;
-}
-
 
 template< int NumImageFeatures >
 double MLBSTrackingFilter< NumImageFeatures >::GetRandDouble(double min, double max)
@@ -452,7 +213,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
     double prob = 0;
     if (IsValidPosition(pos))
     {
-        direction = Classify(pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
+        direction = m_ForestHandler.Classify(pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
         direction *= prob;
     }
 
@@ -487,7 +248,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
         candidates = 0;
         vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
         if (IsValidPosition(sample_pos))
-            tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
+            tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
         if (candidates>0 && tempDir.magnitude()>0.001)
         {
             direction += tempDir*prob;
@@ -510,7 +271,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
             candidates = 0;
             vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
             if (IsValidPosition(sample_pos))
-                tempDir = Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob, true); // sample neighborhood
+                tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
 
             if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
             {
@@ -725,7 +486,7 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
             vnl_vector_fixed<double,3> dirOld; dirOld.fill(0.0);
             vnl_vector_fixed<double,3> dir; dir.fill(0.0);
             if (IsValidPosition(worldPos))
-                dir = Classify(worldPos, candidates, dirOld, 0, prob);
+                dir = m_ForestHandler.Classify(worldPos, candidates, dirOld, 0, prob);
             if (dir.magnitude()<0.0001)
                 continue;
 
@@ -818,6 +579,11 @@ void MLBSTrackingFilter< NumImageFeatures >::AfterThreadedGenerateData()
     MITK_INFO << "Generating polydata ";
     BuildFibers(false);
     MITK_INFO << "done";
+
+    m_EndTime = std::chrono::system_clock::now();
+    std::chrono::hours   hh = std::chrono::duration_cast<std::chrono::hours>(m_EndTime - m_StartTime);
+    std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>((m_EndTime - m_StartTime) % std::chrono::hours(1));
+    MITK_INFO << "Tracking took " << hh.count() << "h and " << mm.count() << "m";
 }
 
 }

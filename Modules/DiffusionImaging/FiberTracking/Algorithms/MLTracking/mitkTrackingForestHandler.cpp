@@ -45,6 +45,7 @@ TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::~TrackingForestHandler
 template< int ShOrder, int NumberOfSignalFeatures >
 typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InterpolatedRawImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetImageValues(itk::Point<float, 3> itkP, typename InterpolatedRawImageType::Pointer image)
 {
+    // transform physical point to index coordinates
     itk::Index<3> idx;
     itk::ContinuousIndex< double, 3> cIdx;
     image->TransformPhysicalPointToIndex(itkP, idx);
@@ -83,6 +84,7 @@ typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InterpolatedR
             idx[1] >= 0 && idx[1] < image->GetLargestPossibleRegion().GetSize(1)-1 &&
             idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
     {
+        // trilinear interpolation
         vnl_vector_fixed<double, 8> interpWeights;
         interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
         interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
@@ -128,9 +130,8 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 {
     InputDataValidForTracking();
 
-    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
-
     MITK_INFO << "Spherically interpolating raw data and creating feature image ...";
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
     typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
     filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_RawData.at(0)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_RawData.at(0)) );
@@ -145,7 +146,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
     for (unsigned int f=0; f<NumberOfSignalFeatures*2; f++)
     {
         if (dot_product(ref, odf.GetDirection(f))>0)    // only used directions on one hemisphere
-            m_DirectionIndices.push_back(f);
+            m_DirectionIndices.push_back(f);            // store indices for later mapping the classifier output to the actual direction
     }
 
     m_FeatureImage = FeatureImageType::New();
@@ -157,6 +158,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
     m_FeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
     m_FeatureImage->Allocate();
 
+    // get signal values and store them in the feature image
     itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
     while(!it.IsAtEnd())
     {
@@ -171,6 +173,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 template< int ShOrder, int NumberOfSignalFeatures >
 typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::FeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetFeatureValues(itk::Point<float, 3> itkP)
 {
+    // transform physical point to index coordinates
     itk::Index<3> idx;
     itk::ContinuousIndex< double, 3> cIdx;
     m_FeatureImage->TransformPhysicalPointToIndex(itkP, idx);
@@ -209,6 +212,7 @@ typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::FeatureImageT
             idx[1] >= 0 && idx[1] < m_FeatureImage->GetLargestPossibleRegion().GetSize(1)-1 &&
             idx[2] >= 0 && idx[2] < m_FeatureImage->GetLargestPossibleRegion().GetSize(2)-1)
     {
+        // trilinear interpolation
         vnl_vector_fixed<double, 8> interpWeights;
         interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
         interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
@@ -240,78 +244,76 @@ typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::FeatureImageT
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& prob)
+vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w)
 {
     vnl_vector_fixed<double,3> direction; direction.fill(0);
 
+    // store feature pixel values in a vigra data type
     vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,NumberOfSignalFeatures+3) );
-
     typename FeatureImageType::PixelType featurePixel = GetFeatureValues(pos);
-
-    // pixel values
     for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
         featureData(0,f) = featurePixel[f];
 
-    // direction features
+    // append normalized previous direction to feature vector
     int c = 0;
+    vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+    for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
     {
-        vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-        for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
-        {
-            if (dot_product(ref, olddir)<0)
-                featureData(0,f) = -olddir[c];
-            else
-                featureData(0,f) = olddir[c];
-            c++;
-        }
+        if (dot_product(ref, olddir)<0)
+            featureData(0,f) = -olddir[c];
+        else
+            featureData(0,f) = olddir[c];
+        c++;
     }
 
+    // perform classification
     vigra::MultiArray<2, double> probs(vigra::Shape2(1, m_Forest->class_count()));
     m_Forest->predictProbabilities(featureData, probs);
 
-    double outProb = 0;
-    prob = 0;
-    candidates = 0; // directions with probability > 0
-    for (int i=0; i<m_Forest->class_count(); i++)
+    double pNonFib = 0;     // probability that we left the white matter
+    w = 0;                  // weight of the predicted direction
+    candidates = 0;         // directions with probability > 0
+    for (int i=0; i<m_Forest->class_count(); i++)   // for each class (number of possible directions + out-of-wm class)
     {
-        if (probs(0,i)>0)
+        if (probs(0,i)>0)   // if probability of respective class is 0, do nothing
         {
+            // get label of class (does not correspond to the loop variable i)
             int classLabel = 0;
             m_Forest->ext_param_.to_classlabel(i, classLabel);
 
-            if (classLabel<m_DirectionIndices.size())
+            if (classLabel<m_DirectionIndices.size())   // does class label correspond to a direction or to the out-of-wm class?
             {
-                candidates++;
+                candidates++;   // now we have one direction more with probability > 0 (DO WE NEED THIS???)
+                vnl_vector_fixed<double,3> d = m_DirContainer.GetDirection(m_DirectionIndices.at(classLabel));  // get direction vector assiciated with the respective direction index
 
-                vnl_vector_fixed<double,3> d = m_DirContainer.GetDirection(m_DirectionIndices.at(classLabel));
-                double dot = dot_product(d, olddir);
-
-                if (olddir.magnitude()>0)
+                if (olddir.magnitude()>0)   // do we have a previous streamline direction or did we just start?
                 {
-                    if (fabs(dot)>angularThreshold)
+                    double dot = dot_product(d, olddir);    // claculate angle between the candidate direction vector and the previous streamline direction
+                    if (fabs(dot)>angularThreshold)         // is angle between the directions smaller than our hard threshold?
                     {
-                        if (dot<0)
+                        if (dot<0)                          // make sure we don't walk backwards
                             d *= -1;
-                        dot = fabs(dot);
-                        direction += probs(0,i)*dot*d;
-                        prob += probs(0,i)*dot;
+                        double w_i = probs(0,i)*fabs(dot);
+                        direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
+                        w += w_i;           // increase output weight of the final direction
                     }
                 }
                 else
                 {
                     direction += probs(0,i)*d;
-                    prob += probs(0,i);
+                    w += probs(0,i);
                 }
             }
             else
-                outProb += probs(0,i);
+                pNonFib += probs(0,i);  // probability that we are not in the whte matter anymore
         }
     }
 
-    if (outProb>prob && prob>0)
+    // if we did not find a suitable direction, make sure that we return (0,0,0)
+    if (pNonFib>w && w>0)
     {
         candidates = 0;
-        prob = 0;
+        w = 0;
         direction.fill(0.0);
     }
 

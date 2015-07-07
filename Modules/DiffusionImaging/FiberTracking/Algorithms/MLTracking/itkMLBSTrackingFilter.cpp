@@ -210,11 +210,11 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
         olddir.normalize();
 
     int candidates = 0; // number of directions with probability > 0
-    double prob = 0;
+    double w = 0;       // weight of the direction predicted at each sampling point
     if (IsValidPosition(pos))
     {
-        direction = m_ForestHandler.Classify(pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
-        direction *= prob;
+        direction = m_ForestHandler.Classify(pos, candidates, olddir, m_AngularThreshold, w); // sample neighborhood
+        direction *= w;  // HERE WE ARE WEIGHTING AGAIN!!! THE EFFECT OF THIS HAS YET TO BE EVALUATED QUANTITATIVELY.
     }
 
 
@@ -248,10 +248,10 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
         candidates = 0;
         vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
         if (IsValidPosition(sample_pos))
-            tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
+            tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w); // sample neighborhood
         if (candidates>0 && tempDir.magnitude()>0.001)
         {
-            direction += tempDir*prob;
+            direction += tempDir*w;
         }
         else if (m_AvoidStop && candidates==0 && olddir.magnitude()>0) // out of white matter
         {
@@ -271,12 +271,12 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
             candidates = 0;
             vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
             if (IsValidPosition(sample_pos))
-                tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, prob); // sample neighborhood
+                tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w); // sample neighborhood
 
             if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
             {
                 direction += d;         // go into the direction of the white matter
-                direction += tempDir*prob;  // go into the direction of the white matter direction at this location
+                direction += tempDir*w;  // go into the direction of the white matter direction at this location
             }
         }
     }

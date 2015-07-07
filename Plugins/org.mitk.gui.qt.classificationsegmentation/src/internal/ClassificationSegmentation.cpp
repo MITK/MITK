@@ -47,15 +47,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNeighborhoodFunctorImageFilter.h>
 #include <itkFirstOrderStatisticsFeatureFunctor.h>
 #include <itkNeighborhood.h>
+#include <itkHessianMatrixEigenvalueImageFilter.h>
+#include <itkStructureTensorEigenvalueImageFilter.h>
+#include <mitkLineHistogramBasedMassImageFilter.h>
 #include <mitkHistogramGenerator.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkImageStatisticsCalculator.h>
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
-#include <itkHessianMatrixEigenvalueImageFilter.h>
-#include <itkStructureTensorEigenvalueImageFilter.h>
-#include <mitkLineHistogramBasedMassImageFilter.h>
+
 #include <mitkRandomForestAccurecyWeighting.h>
 
 #include <mitkLookupTable.h>

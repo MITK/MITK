@@ -92,7 +92,7 @@ void
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType >  GaussFilterType;
 
-  GaussFilterType::Pointer gaussianFilter = GaussFilterType::New();
+  typename GaussFilterType::Pointer gaussianFilter = GaussFilterType::New();
   gaussianFilter->SetInput( itkImage );
   gaussianFilter->SetVariance(variance);
   gaussianFilter->Update();
@@ -107,15 +107,15 @@ void
   typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType >  GaussFilterType;
   typedef itk::SubtractImageFilter<ImageType, ImageType, ImageType> SubFilterType;
 
-  GaussFilterType::Pointer gaussianFilter1 = GaussFilterType::New();
+  typename GaussFilterType::Pointer gaussianFilter1 = GaussFilterType::New();
   gaussianFilter1->SetInput( itkImage );
   gaussianFilter1->SetVariance(variance);
   gaussianFilter1->Update();
-  GaussFilterType::Pointer gaussianFilter2 = GaussFilterType::New();
+  typename GaussFilterType::Pointer gaussianFilter2 = GaussFilterType::New();
   gaussianFilter2->SetInput( itkImage );
   gaussianFilter2->SetVariance(variance*0.66*0.66);
   gaussianFilter2->Update();
-  SubFilterType::Pointer subFilter = SubFilterType::New();
+  typename SubFilterType::Pointer subFilter = SubFilterType::New();
   subFilter->SetInput1(gaussianFilter1->GetOutput());
   subFilter->SetInput2(gaussianFilter2->GetOutput());
   subFilter->Update();
@@ -130,11 +130,11 @@ void
   typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType >  GaussFilterType;
   typedef itk::LaplacianRecursiveGaussianImageFilter<ImageType, ImageType>    LaplacianFilter;
 
-  GaussFilterType::Pointer gaussianFilter = GaussFilterType::New();
+  typename GaussFilterType::Pointer gaussianFilter = GaussFilterType::New();
   gaussianFilter->SetInput( itkImage );
   gaussianFilter->SetVariance(variance);
   gaussianFilter->Update();
-  LaplacianFilter::Pointer laplaceFilter = LaplacianFilter::New();
+  typename LaplacianFilter::Pointer laplaceFilter = LaplacianFilter::New();
   laplaceFilter->SetInput(gaussianFilter->GetOutput());
   laplaceFilter->Update();
   mitk::CastToMitkImage(laplaceFilter->GetOutput(), output);
@@ -151,12 +151,12 @@ void
   typedef Functor::MatrixFirstEigenvalue<VectorImageType::PixelType, double> DeterminantFunctorType;
   typedef itk::UnaryFunctorImageFilter<VectorImageType, FloatImageType, DeterminantFunctorType> DetFilterType;
 
-  HessianFilterType::Pointer hessianFilter = HessianFilterType::New();
+  typename HessianFilterType::Pointer hessianFilter = HessianFilterType::New();
   hessianFilter->SetInput(itkImage);
   hessianFilter->SetSigma(std::sqrt(variance));
   for (int i = 0; i < VImageDimension; ++i)
   {
-    DetFilterType::Pointer detFilter = DetFilterType::New();
+    typename DetFilterType::Pointer detFilter = DetFilterType::New();
     detFilter->SetInput(hessianFilter->GetOutput());
     detFilter->GetFunctor().order = i;
     detFilter->Update();

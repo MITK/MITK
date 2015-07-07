@@ -5,6 +5,9 @@ set(CPP_FILES
   Algorithms/itkSmoothedClassProbabilites.cpp
 
   Features/itkNeighborhoodFunctorImageFilter.cpp
+
+  GlobalImageFeatures/mitkGIFCooccurenceMatrix.cpp
+  GlobalImageFeatures/mitkGIFGrayLevelRunLength.cpp
   mitkCLUtil.cpp
 
 )

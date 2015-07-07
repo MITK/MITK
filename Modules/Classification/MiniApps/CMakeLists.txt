@@ -84,6 +84,14 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore
     CPP_FILES CLPolyToNrrd.cpp mitkCommandLineParser.cpp
   )
+  mitk_create_executable(CLGlobalImageFeatures
+    DEPENDS MitkCore MitkClassificationUtilities
+    CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp
+  )
+  mitk_create_executable(CLVoxelFeatures
+    DEPENDS MitkCore MitkClassificationUtilities
+    CPP_FILES CLVoxelFeatures.cpp mitkCommandLineParser.cpp
+  )
 
         # On Linux, create a shell script to start a relocatable application
         if(UNIX AND NOT APPLE)

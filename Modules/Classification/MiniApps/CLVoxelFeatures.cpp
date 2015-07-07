@@ -148,7 +148,7 @@ void
   typedef itk::Image<double, VImageDimension> FloatImageType;
   typedef itk::HessianRecursiveGaussianImageFilter <ImageType> HessianFilterType;
   typedef typename HessianFilterType::OutputImageType VectorImageType;
-  typedef Functor::MatrixFirstEigenvalue<VectorImageType::PixelType, double> DeterminantFunctorType;
+  typedef Functor::MatrixFirstEigenvalue<typename VectorImageType::PixelType, double> DeterminantFunctorType;
   typedef itk::UnaryFunctorImageFilter<VectorImageType, FloatImageType, DeterminantFunctorType> DetFilterType;
 
   typename HessianFilterType::Pointer hessianFilter = HessianFilterType::New();

@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkHessianRecursiveGaussianImageFilter.h"
 #include "itkUnaryFunctorImageFilter.h"
 #include "vnl/algo/vnl_symmetric_eigensystem.h"
+#include <itkSubtractImageFilter.h>
 
 static vector<double> splitDouble(string str, char delimiter) {
   vector<double> internal;
@@ -100,6 +101,29 @@ void
 
 template<typename TPixel, unsigned int VImageDimension>
 void
+  DifferenceOfGaussFilter(itk::Image<TPixel, VImageDimension>* itkImage, double variance, mitk::Image::Pointer &output)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType >  GaussFilterType;
+  typedef itk::SubtractImageFilter<ImageType, ImageType, ImageType> SubFilterType;
+
+  GaussFilterType::Pointer gaussianFilter1 = GaussFilterType::New();
+  gaussianFilter1->SetInput( itkImage );
+  gaussianFilter1->SetVariance(variance);
+  gaussianFilter1->Update();
+  GaussFilterType::Pointer gaussianFilter2 = GaussFilterType::New();
+  gaussianFilter2->SetInput( itkImage );
+  gaussianFilter2->SetVariance(variance*0.66*0.66);
+  gaussianFilter2->Update();
+  SubFilterType::Pointer subFilter = SubFilterType::New();
+  subFilter->SetInput1(gaussianFilter1->GetOutput());
+  subFilter->SetInput2(gaussianFilter2->GetOutput());
+  subFilter->Update();
+  mitk::CastToMitkImage(subFilter->GetOutput(), output);
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void
   LaplacianOfGaussianFilter(itk::Image<TPixel, VImageDimension>* itkImage, double variance, mitk::Image::Pointer &output)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -149,6 +173,7 @@ int main(int argc, char* argv[])
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
 
   parser.addArgument("gaussian","g",mitkCommandLineParser::String, "Gaussian Filtering of the input images", "Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
+  parser.addArgument("difference-of-gaussian","dog",mitkCommandLineParser::String, "Difference of Gaussian Filtering of the input images", "Difference of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("laplace-of-gauss","log",mitkCommandLineParser::String, "Laplacian of Gaussian Filtering", "Laplacian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("hessian-of-gauss","hog",mitkCommandLineParser::String, "Hessian of Gaussian Filtering", "Hessian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   // Miniapp Infos
@@ -172,12 +197,13 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   std::string filename=parsedArgs["output"].ToString();
 
-  mitk::AbstractGlobalImageFeature::FeatureListType stats;
   ////////////////////////////////////////////////////////////////
   // CAlculate Gaussian Features
   ////////////////////////////////////////////////////////////////
+  MITK_INFO << "Check for Gaussian...";
   if (parsedArgs.count("gaussian"))
   {
+    MITK_INFO << "Calculate Gaussian... " << parsedArgs["gaussian"].ToString();
     auto ranges = splitDouble(parsedArgs["gaussian"].ToString(),';');
 
     for (int i = 0; i < ranges.size(); ++i)
@@ -190,10 +216,30 @@ int main(int argc, char* argv[])
   }
 
   ////////////////////////////////////////////////////////////////
+  // CAlculate Difference of Gaussian Features
+  ////////////////////////////////////////////////////////////////
+  MITK_INFO << "Check for DoG...";
+  if (parsedArgs.count("difference-of-gaussian"))
+  {
+    MITK_INFO << "Calculate Difference of Gaussian... " << parsedArgs["difference-of-gaussian"].ToString();
+    auto ranges = splitDouble(parsedArgs["difference-of-gaussian"].ToString(),';');
+
+    for (int i = 0; i < ranges.size(); ++i)
+    {
+      mitk::Image::Pointer output;
+      AccessByItk_2(image, DifferenceOfGaussFilter, ranges[i], output);
+      std::string name = filename + "-dog-" + us::any_value_to_string(ranges[i])+".nrrd";
+      mitk::IOUtil::SaveImage(output, name);
+    }
+  }
+
+  MITK_INFO << "Check for LoG...";
+  ////////////////////////////////////////////////////////////////
   // CAlculate Laplacian Of Gauss Features
   ////////////////////////////////////////////////////////////////
   if (parsedArgs.count("laplace-of-gauss"))
   {
+    MITK_INFO << "Calculate LoG... " << parsedArgs["laplace-of-gauss"].ToString();
     auto ranges = splitDouble(parsedArgs["laplace-of-gauss"].ToString(),';');
 
     for (int i = 0; i < ranges.size(); ++i)
@@ -205,11 +251,13 @@ int main(int argc, char* argv[])
     }
   }
 
+  MITK_INFO << "Check for HoG...";
   ////////////////////////////////////////////////////////////////
   // CAlculate Hessian Of Gauss Features
   ////////////////////////////////////////////////////////////////
   if (parsedArgs.count("hessian-of-gauss"))
   {
+    MITK_INFO << "Calculate HoG... " << parsedArgs["hessian-of-gauss"].ToString();
     auto ranges = splitDouble(parsedArgs["hessian-of-gauss"].ToString(),';');
 
     for (int i = 0; i < ranges.size(); ++i)

@@ -43,7 +43,7 @@ CalculateGrayLevelRunLengthFeatures(itk::Image<TPixel, VImageDimension>* itkImag
   filter->SetOffsets(newOffset);
 
   // All features are required
-  typename FilterType::FeatureNameVectorPointer requestedFeatures = typename FilterType::FeatureNameVector::New();
+  typename FilterType::FeatureNameVectorPointer requestedFeatures = FilterType::FeatureNameVector::New();
   requestedFeatures->push_back(TextureFilterType::ShortRunEmphasis);
   requestedFeatures->push_back(TextureFilterType::LongRunEmphasis);
   requestedFeatures->push_back(TextureFilterType::GreyLevelNonuniformity);

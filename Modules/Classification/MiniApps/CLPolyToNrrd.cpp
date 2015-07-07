@@ -92,13 +92,12 @@ int main(int argc, char* argv[])
   multiFilter->Update();
   resultImage = multiFilter->GetOutput();
 
-
   std::string saveAs = parsedArgs["output"].ToString();
   MITK_INFO << "Save as: " << saveAs;
   saveAs = saveAs + ".vtk";
   mitk::IOUtil::SaveSurface(surf.GetPointer(),saveAs);
 
-  saveAs = argv[4];
+  saveAs = parsedArgs["output"].ToString();
   MITK_INFO << "Save as: " << saveAs;
   saveAs = saveAs + ".nrrd";
   mitk::IOUtil::SaveImage(resultImage,saveAs);

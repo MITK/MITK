@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
+bool DataNodePickingEventObserver::m_Enabled = false;
+
 DataNodePickingEventObserver::DataNodePickingEventObserver()
 {
 }
@@ -32,18 +34,26 @@ DataNodePickingEventObserver::~DataNodePickingEventObserver()
 {
 }
 
-void DataNodePickingEventObserver::HandlePickOneEvent(InteractionEvent* interactionEvent)
+void DataNodePickingEventObserver::SetEnabled(bool enabled)
 {
+  m_Enabled = enabled;
+}
+
+  void DataNodePickingEventObserver::HandlePickOneEvent(InteractionEvent* interactionEvent)
+{
+  if (m_Enabled)
     SingleNodePickEvent.Send(GetPickedDataNode(interactionEvent));
 }
 
 void DataNodePickingEventObserver::HandlePickAddEvent(InteractionEvent* interactionEvent)
 {
+  if (m_Enabled)
     AddNodePickEvent.Send(GetPickedDataNode(interactionEvent));
 }
 
 void DataNodePickingEventObserver::HandlePickToggleEvent(InteractionEvent* interactionEvent)
 {
+  if (m_Enabled)
     ToggleNodePickEvent.Send(GetPickedDataNode(interactionEvent));
 }
 

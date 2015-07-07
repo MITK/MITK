@@ -35,12 +35,16 @@ namespace mitk
         mitk::Message1<mitk::DataNode*> SingleNodePickEvent;
         mitk::Message1<mitk::DataNode*> AddNodePickEvent;
         mitk::Message1<mitk::DataNode*> ToggleNodePickEvent;
+
+        static void SetEnabled(bool enabled);
     protected:
-        virtual void HandlePickOneEvent(InteractionEvent* interactionEvent);
-        virtual void HandlePickAddEvent(InteractionEvent* interactionEvent);
-        virtual void HandlePickToggleEvent(InteractionEvent* interactionEvent);
+        virtual void HandlePickOneEvent(InteractionEvent* interactionEvent) override;
+        virtual void HandlePickAddEvent(InteractionEvent* interactionEvent) override;
+        virtual void HandlePickToggleEvent(InteractionEvent* interactionEvent) override;
 
         mitk::DataNode* GetPickedDataNode(InteractionEvent* interactionEvent);
+
+        static bool m_Enabled;
     };
 
 } /* namespace mitk */

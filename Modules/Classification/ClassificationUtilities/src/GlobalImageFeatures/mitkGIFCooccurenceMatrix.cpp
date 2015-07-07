@@ -33,7 +33,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   while(oldOffsetsIterator != oldOffsets->End())
   {
     typename FilterType::OffsetType offset = oldOffsetsIterator->Value();
-    for (int i = 0; i < VImageDimension; ++i)
+    for (unsigned int i = 0; i < VImageDimension; ++i)
     {
       offset[i] *= range;
     }

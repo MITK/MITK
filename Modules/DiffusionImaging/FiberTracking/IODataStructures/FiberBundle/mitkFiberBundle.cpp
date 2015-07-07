@@ -409,7 +409,7 @@ void mitk::FiberBundle::ColorFibersByOrientation()
     m_UpdateTime2D.Modified();
 }
 
-void mitk::FiberBundle::ColorFibersByCurvature()
+void mitk::FiberBundle::ColorFibersByCurvature(bool minMaxNorm)
 {
     double window = 5;
 
@@ -516,7 +516,9 @@ void mitk::FiberBundle::ColorFibersByCurvature()
         for (int j=0; j<numPoints; j++)
         {
             double color[3];
-            double dev = (values.at(count)-min)/(max-min);
+            double dev = values.at(count);
+            if (minMaxNorm)
+                dev = (dev-min)/(max-min);
             //            double dev = values.at(count)*values.at(count);
             lookupTable->GetColor(dev, color);
 

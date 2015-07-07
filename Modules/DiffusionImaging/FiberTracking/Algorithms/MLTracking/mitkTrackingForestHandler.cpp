@@ -288,6 +288,10 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
 
                 if (olddir.magnitude()>0)   // do we have a previous streamline direction or did we just start?
                 {
+                    // TODO: check if hard curvature threshold is necessary.
+                    // alternatively try square of dot pruduct as weight.
+                    // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
+
                     double dot = dot_product(d, olddir);    // claculate angle between the candidate direction vector and the previous streamline direction
                     if (fabs(dot)>angularThreshold)         // is angle between the directions smaller than our hard threshold?
                     {

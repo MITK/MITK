@@ -62,7 +62,7 @@ public:
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>) // custom constructor
 
     // colorcoding related methods
-    void ColorFibersByCurvature();
+    void ColorFibersByCurvature(bool minMaxNorm=true);
     void ColorFibersByScalarMap(mitk::Image::Pointer, bool opacity);
     template <typename TPixel>
     void ColorFibersByScalarMap(const mitk::PixelType pixelType, mitk::Image::Pointer, bool opacity);

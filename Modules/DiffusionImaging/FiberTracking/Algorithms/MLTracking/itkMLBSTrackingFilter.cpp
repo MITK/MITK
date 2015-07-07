@@ -213,13 +213,11 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
     double w = 0;       // weight of the direction predicted at each sampling point
     if (IsValidPosition(pos))
     {
-        direction = m_ForestHandler.Classify(pos, candidates, olddir, m_AngularThreshold, w); // sample neighborhood
-        direction *= w;  // HERE WE ARE WEIGHTING AGAIN!!! THE EFFECT OF THIS HAS YET TO BE EVALUATED QUANTITATIVELY.
+        direction = m_ForestHandler.Classify(pos, candidates, olddir, m_AngularThreshold, w); // get direction proposal at current streamline position
+        direction *= w;  // HERE WE ARE WEIGHTING AGAIN EVEN THOUGH THE OUTPUT DIRECTIONS ARE ALREADY WEIGHTED!!! THE EFFECT OF THIS HAS YET TO BE EVALUATED QUANTITATIVELY.
     }
 
-
     itk::OrientationDistributionFunction< double, 50 >  probeVecs;
-
     itk::Point<double, 3> sample_pos;
     int alternatives = 1;
     for (int i=0; i<m_NumberOfSamples; i++)

@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
     mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
 
-    mitk::IOUtil::SaveBaseData(outFib, outFile);
+    mitk::IOUtil::Save(outFib, outFile);
 
     return EXIT_SUCCESS;
 }

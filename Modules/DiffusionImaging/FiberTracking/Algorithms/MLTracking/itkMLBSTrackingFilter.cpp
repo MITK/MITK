@@ -35,7 +35,9 @@ namespace itk {
 template< int NumImageFeatures >
 MLBSTrackingFilter< NumImageFeatures >
 ::MLBSTrackingFilter()
-    : m_FiberPolyData(NULL)
+    : m_PauseTracking(false)
+    , m_AbortTracking(false)
+    , m_FiberPolyData(NULL)
     , m_Points(NULL)
     , m_Cells(NULL)
     , m_AngularThreshold(0.7)
@@ -44,18 +46,16 @@ MLBSTrackingFilter< NumImageFeatures >
     , m_MinTractLength(20.0)
     , m_MaxTractLength(400.0)
     , m_SeedsPerVoxel(1)
+    , m_RandomSampling(false)
     , m_SamplingDistance(-1)
     , m_NumberOfSamples(50)
+    , m_StoppingRegions(NULL)
     , m_SeedImage(NULL)
     , m_MaskImage(NULL)
-    , m_StoppingRegions(NULL)
-    , m_DemoMode(false)
-    , m_PauseTracking(false)
-    , m_AbortTracking(false)
-    , m_RemoveWmEndFibers(false)
     , m_AposterioriCurvCheck(false)
+    , m_RemoveWmEndFibers(false)
     , m_AvoidStop(true)
-    , m_RandomSampling(false)
+    , m_DemoMode(false)
 {
     this->SetNumberOfRequiredInputs(1);
 }

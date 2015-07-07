@@ -145,8 +145,6 @@ public:
     ItkUcharImgType::Pointer            m_StoppingRegions;
     ItkUcharImgType::Pointer            m_SeedImage;
     ItkUcharImgType::Pointer            m_MaskImage;
-    mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer m_GradientDirections;
-    float                               m_B_Value;
 
     bool                                m_AposterioriCurvCheck;
     bool                                m_RemoveWmEndFibers;

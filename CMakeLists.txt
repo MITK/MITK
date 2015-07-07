@@ -269,7 +269,7 @@ mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME HDF5        OFF ADVANCED)
-mitkFunctionAddExternalProject(NAME Breakpad    OFF ADVANCED NO_PACKAGE DOC "Use Breakpad for crashdump creation")
+mitkFunctionAddExternalProject(NAME Breakpad    OFF ADVANCED DOC "Use Breakpad for crashdump creation")
 
 # -----------------------------------------
 # The following external projects must be

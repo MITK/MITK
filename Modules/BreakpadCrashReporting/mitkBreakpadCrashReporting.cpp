@@ -67,7 +67,7 @@ mitk::BreakpadCrashReporting::BreakpadCrashReporting( const QString& dumpPath )
 , client_fd(-1)
   // Windows connection parameters
 , m_NamedPipeString("\\\\.\\pipe\\MitkCrashServices\\MitkBasedApplication")
-,  m_CrashReportingServerExecutable( QDir(QCoreApplication::instance()->applicationDirPath()).absolutePath().append("/MitkCrashReportingServer.exe") )
+,  m_CrashReportingServerExecutable( QDir(QCoreApplication::instance()->applicationDirPath()).absolutePath().append("/CrashReportingServer.exe") )
 , m_NumberOfConnectionAttempts(3)
 , m_ReconnectDelay(300)
 {

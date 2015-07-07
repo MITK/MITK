@@ -36,7 +36,7 @@ if(MITK_USE_Breakpad)
   #set(Breakpad_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
   set(Breakpad_SRC ${ep_prefix}/src/${proj}-src)
 
-  set(Breakpad_DIR ${ep_prefix}}/src/Breakpad)
+  set(Breakpad_DIR ${ep_prefix}/src/Breakpad)
 
   #message( "Breakpad_DIR " ${Breakpad_DIR} )
 

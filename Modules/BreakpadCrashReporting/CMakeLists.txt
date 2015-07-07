@@ -12,7 +12,7 @@ if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
 
   find_package(Breakpad)
   if (NOT Breakpad_FOUND)
-    message(FATAL_ERROR "MITK_USE_BREAKPAD was set but Breakpad build cannot be found. Plaese check CMake cache variables regarding Breakpad")
+    message(FATAL_ERROR "MITK_USE_Breakpad was set but Breakpad build cannot be found. Plaese check CMake cache variables regarding Breakpad")
   endif()
 
   MITK_CREATE_MODULE(BreakpadCrashReporting
@@ -24,11 +24,9 @@ if(MITK_USE_Breakpad) # from top-level CMakeLists.txt
     )
 
   if(CMAKE_SYSTEM MATCHES "Windows")
-    mitk_create_executable( CrashReportingServer
-                        CPP_FILES mitkCrashReportingServer.cpp
-                        DEPENDS PUBLIC MitkCore MitkBreakpadCrashReporting
-                      )
-    #MITK_INSTALL_TARGETS(EXECUTABLES CrashReportingServer)
+    add_executable(CrashReportingServer WIN32 mitkCrashReportingServer.cpp)
+    target_link_libraries(CrashReportingServer ${ALL_LIBRARIES} MitkBreakpadCrashReporting)
+    MITK_INSTALL(TARGETS CrashReportingServer)
   endif()
 
   if(CMAKE_SYSTEM MATCHES "Linux")

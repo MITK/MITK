@@ -398,8 +398,8 @@ ExternalProject_Add(${proj}
     -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
-    -DBreakpad_SRC:PATH=${Breakpad_SRC}
-    -DBreakpad_DIR:PATH=${Breakpad_DIR}
+    -DMITK_Breakpad_SRC:PATH=${Breakpad_SRC}
+    -DMITK_Breakpad_DIR:PATH=${Breakpad_DIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}

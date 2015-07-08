@@ -46,9 +46,6 @@ public:
 
   typedef mitk::Label::PixelType PixelType;
 
-  typedef itk::Image< PixelType, 3 >                     LabelSetImageType;
-  typedef itk::VariableLengthVector< PixelType >         VariableVectorType;
-
   /**
   * \brief BeforeChangeLayerEvent (e.g. used for GUI integration)
   * As soon as active labelset should be changed, the signal emits.
@@ -188,9 +185,12 @@ public:
    */
   unsigned int GetTotalNumberOfLabels() const;
 
-  /**
-    * \brief  */
-  void SurfaceStamp(mitk::Surface* surface, bool forceOverwrite);
+  // This function will need to be ported to an external class
+  // it requires knowledge of pixeltype and dimension and includes
+  // too much algorithm to be sensibly part of a data class
+  ///**
+  //  * \brief  */
+  //void SurfaceStamp(mitk::Surface* surface, bool forceOverwrite);
 
   /**
     * \brief  */

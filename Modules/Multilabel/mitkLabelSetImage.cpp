@@ -155,20 +155,22 @@ void mitk::LabelSetImage::RemoveLayer()
   this->Modified();
 }
 
+template<typename TPixel, unsigned int VDimensions>
+void SetToZero(itk::Image< TPixel, VDimensions> * source)
+{
+  source->FillBuffer(0);
+}
+
 unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
 {
   mitk::Image::Pointer newImage = mitk::Image::New();
   newImage->Initialize( this->GetPixelType(), this->GetDimension(), this->GetDimensions(), this->GetImageDescriptor()->GetNumberOfChannels() );
   newImage->SetGeometry(this->GetGeometry()->Clone());
 
-  LabelSetImageType::Pointer itkImage;
-  mitk::CastToItkImage(newImage, itkImage);
-  itkImage->FillBuffer(0);
+  AccessByItk(newImage, SetToZero);
 
   unsigned int newLabelSetId = this->AddLayer(newImage, lset);
 
-  //  important to release the itk image
-  itkImage = nullptr;
   return newLabelSetId;
 }
 
@@ -497,123 +499,123 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
   return mask;
 }
 
-void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwrite)
-{
-  if (!surface)
-  {
-    MITK_ERROR << "Input surface is NULL.";
-    return;
-  }
-
-  try
-  {
-    LabelSetImageType::Pointer itkImage;
-    mitk::CastToItkImage(this, itkImage);
-
-    vtkPolyData *polydata = surface->GetVtkPolyData();
-
-    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-    transform->SetMatrix( surface->GetGeometry()->GetVtkTransform()->GetMatrix() );
-    transform->Update();
-
-    vtkSmartPointer<vtkTransformPolyDataFilter> transformer = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-    transformer->SetInputData(polydata);
-    transformer->SetTransform(transform);
-    transformer->Update();
-
-    typedef double Coord;
-    typedef itk::QuadEdgeMesh< Coord, 3 > MeshType;
-
-    MeshType::Pointer mesh = MeshType::New();
-    mesh->SetCellsAllocationMethod( MeshType::CellsAllocatedDynamicallyCellByCell );
-    int numberOfPoints = polydata->GetNumberOfPoints();
-    mesh->GetPoints()->Reserve( numberOfPoints );
-
-    vtkPoints* points = polydata->GetPoints();
-
-    MeshType::PointType point;
-    for( int i=0; i < numberOfPoints; i++ )
-    {
-      double* aux = points->GetPoint(i);
-      point[0] = aux[0];
-      point[1] = aux[1];
-      point[2] = aux[2];
-      mesh->SetPoint( i, point );
-    }
-
-    // Load the polygons into the itk::Mesh
-    typedef MeshType::CellAutoPointer     CellAutoPointerType;
-    typedef MeshType::CellType            CellType;
-    typedef itk::TriangleCell< CellType > TriangleCellType;
-    typedef MeshType::PointIdentifier     PointIdentifierType;
-    typedef MeshType::CellIdentifier      CellIdentifierType;
-
-    // Read the number of polygons
-    CellIdentifierType numberOfPolygons = 0;
-    numberOfPolygons = polydata->GetNumberOfPolys();
-
-    PointIdentifierType numberOfCellPoints = 3;
-
-    for (CellIdentifierType i=0; i<numberOfPolygons; i++)
-    {
-      vtkIdList *cellIds;
-      vtkCell *vcell = polydata->GetCell(i);
-      cellIds = vcell->GetPointIds();
-
-      CellAutoPointerType cell;
-      auto   triangleCell = new TriangleCellType;
-      PointIdentifierType k;
-      for( k = 0; k < numberOfCellPoints; k++ )
-      {
-        triangleCell->SetPointId( k, cellIds->GetId(k) );
-      }
-
-      cell.TakeOwnership( triangleCell );
-      mesh->SetCell( i, cell );
-    }
-
-    typedef itk::TriangleMeshToBinaryImageFilter<MeshType, LabelSetImageType> TriangleMeshToBinaryImageFilterType;
-
-    TriangleMeshToBinaryImageFilterType::Pointer filter = TriangleMeshToBinaryImageFilterType::New();
-    filter->SetInput(mesh);
-    filter->SetInfoImage(itkImage);
-    filter->SetInsideValue(1);
-    filter->SetOutsideValue(0);
-    filter->Update();
-
-    LabelSetImageType::Pointer resultImage = filter->GetOutput();
-    resultImage->DisconnectPipeline();
-
-    typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
-    typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
-
-    SourceIteratorType sourceIter( resultImage, resultImage->GetLargestPossibleRegion() );
-    sourceIter.GoToBegin();
-
-    TargetIteratorType targetIter( itkImage, itkImage->GetLargestPossibleRegion() );
-    targetIter.GoToBegin();
-
-    int activeLabel = GetActiveLabel(GetActiveLayer())->GetValue();
-
-    while ( !sourceIter.IsAtEnd() )
-    {
-      int sourceValue = static_cast<int>(sourceIter.Get());
-      int targetValue =  static_cast<int>(targetIter.Get());
-
-      if ( (sourceValue != 0) && (forceOverwrite || !this->GetLabel(targetValue)->GetLocked()) ) // skip exterior and locked labels
-      {
-        targetIter.Set( activeLabel );
-      }
-      ++sourceIter;
-      ++targetIter;
-    }
-  }
-  catch(itk::ExceptionObject& e)
-  {
-    mitkThrow() << e.GetDescription();
-  }
-  this->Modified();
-}
+//void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwrite)
+//{
+//  if (!surface)
+//  {
+//    MITK_ERROR << "Input surface is NULL.";
+//    return;
+//  }
+//
+//  try
+//  {
+//    LabelSetImageType::Pointer itkImage;
+//    mitk::CastToItkImage(this, itkImage);
+//
+//    vtkPolyData *polydata = surface->GetVtkPolyData();
+//
+//    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+//    transform->SetMatrix( surface->GetGeometry()->GetVtkTransform()->GetMatrix() );
+//    transform->Update();
+//
+//    vtkSmartPointer<vtkTransformPolyDataFilter> transformer = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+//    transformer->SetInputData(polydata);
+//    transformer->SetTransform(transform);
+//    transformer->Update();
+//
+//    typedef double Coord;
+//    typedef itk::QuadEdgeMesh< Coord, 3 > MeshType;
+//
+//    MeshType::Pointer mesh = MeshType::New();
+//    mesh->SetCellsAllocationMethod( MeshType::CellsAllocatedDynamicallyCellByCell );
+//    int numberOfPoints = polydata->GetNumberOfPoints();
+//    mesh->GetPoints()->Reserve( numberOfPoints );
+//
+//    vtkPoints* points = polydata->GetPoints();
+//
+//    MeshType::PointType point;
+//    for( int i=0; i < numberOfPoints; i++ )
+//    {
+//      double* aux = points->GetPoint(i);
+//      point[0] = aux[0];
+//      point[1] = aux[1];
+//      point[2] = aux[2];
+//      mesh->SetPoint( i, point );
+//    }
+//
+//    // Load the polygons into the itk::Mesh
+//    typedef MeshType::CellAutoPointer     CellAutoPointerType;
+//    typedef MeshType::CellType            CellType;
+//    typedef itk::TriangleCell< CellType > TriangleCellType;
+//    typedef MeshType::PointIdentifier     PointIdentifierType;
+//    typedef MeshType::CellIdentifier      CellIdentifierType;
+//
+//    // Read the number of polygons
+//    CellIdentifierType numberOfPolygons = 0;
+//    numberOfPolygons = polydata->GetNumberOfPolys();
+//
+//    PointIdentifierType numberOfCellPoints = 3;
+//
+//    for (CellIdentifierType i=0; i<numberOfPolygons; i++)
+//    {
+//      vtkIdList *cellIds;
+//      vtkCell *vcell = polydata->GetCell(i);
+//      cellIds = vcell->GetPointIds();
+//
+//      CellAutoPointerType cell;
+//      auto   triangleCell = new TriangleCellType;
+//      PointIdentifierType k;
+//      for( k = 0; k < numberOfCellPoints; k++ )
+//      {
+//        triangleCell->SetPointId( k, cellIds->GetId(k) );
+//      }
+//
+//      cell.TakeOwnership( triangleCell );
+//      mesh->SetCell( i, cell );
+//    }
+//
+//    typedef itk::TriangleMeshToBinaryImageFilter<MeshType, LabelSetImageType> TriangleMeshToBinaryImageFilterType;
+//
+//    TriangleMeshToBinaryImageFilterType::Pointer filter = TriangleMeshToBinaryImageFilterType::New();
+//    filter->SetInput(mesh);
+//    filter->SetInfoImage(itkImage);
+//    filter->SetInsideValue(1);
+//    filter->SetOutsideValue(0);
+//    filter->Update();
+//
+//    LabelSetImageType::Pointer resultImage = filter->GetOutput();
+//    resultImage->DisconnectPipeline();
+//
+//    typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
+//    typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
+//
+//    SourceIteratorType sourceIter( resultImage, resultImage->GetLargestPossibleRegion() );
+//    sourceIter.GoToBegin();
+//
+//    TargetIteratorType targetIter( itkImage, itkImage->GetLargestPossibleRegion() );
+//    targetIter.GoToBegin();
+//
+//    int activeLabel = GetActiveLabel(GetActiveLayer())->GetValue();
+//
+//    while ( !sourceIter.IsAtEnd() )
+//    {
+//      int sourceValue = static_cast<int>(sourceIter.Get());
+//      int targetValue =  static_cast<int>(targetIter.Get());
+//
+//      if ( (sourceValue != 0) && (forceOverwrite || !this->GetLabel(targetValue)->GetLocked()) ) // skip exterior and locked labels
+//      {
+//        targetIter.Set( activeLabel );
+//      }
+//      ++sourceIter;
+//      ++targetIter;
+//    }
+//  }
+//  catch(itk::ExceptionObject& e)
+//  {
+//    mitkThrow() << e.GetDescription();
+//  }
+//  this->Modified();
+//}
 
 void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
 {

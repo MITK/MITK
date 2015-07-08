@@ -210,6 +210,31 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   return newLabelSetId;
 }
 
+void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const mitk::LabelSet::Pointer labelSet)
+{
+  if (m_LayerContainer.size() <= layerIdx)
+  {
+    mitkThrow() << "Trying to add labelSet to non-existing layer.";
+  }
+
+  if (layerIdx < m_LabelSetContainer.size())
+  {
+    m_LabelSetContainer[layerIdx] = labelSet;
+  }
+  else
+  {
+    while (layerIdx >= m_LabelSetContainer.size())
+    {
+      mitk::LabelSet::Pointer defaultLabelSet = mitk::LabelSet::New();
+      defaultLabelSet->AddLabel(GetExteriorLabel());
+      defaultLabelSet->SetActiveLabel(0 /*Exterior Label*/);
+      defaultLabelSet->SetLayer(m_LabelSetContainer.size());
+      m_LabelSetContainer.push_back(defaultLabelSet);
+    }
+    m_LabelSetContainer.push_back(labelSet);
+  }
+}
+
 void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
 {
   try

@@ -233,6 +233,20 @@ public:
   unsigned int AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer lset = nullptr);
 
   /**
+  * \brief Add a LabelSet to an existing layer
+  *
+  * This will replace an existing labelSet if one exists. Throws an exceptions if you are trying
+  * to add a labelSet to a non-existing layer.
+  *
+  * If there are no labelSets for layers with an id less than layerIdx default ones will be added
+  * for them.
+  *
+  * \param layerIdx The index of the layer the LabelSet should be added to
+  * \param labelSet The LabelSet that should be added
+  */
+  void AddLabelSetToLayer(const unsigned int layerIdx, const mitk::LabelSet::Pointer labelSet);
+
+  /**
    * @brief Removes the active layer and the respective mitk::LabelSet and image information.
    *        The new active layer is the one below, if exists
    */

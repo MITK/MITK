@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "tinyxml.h"
 
+
+
 namespace mitk {
 
 LabelSetImageIO::LabelSetImageIO()
@@ -401,41 +403,41 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
 
   // end regular image loading
 
-  // get labels and add them as properties to the image
-  //char keybuffer[256];
-
-  //int numberOfLayers = GetIntByKey(dictionary, "layers");
-  //std::string _xmlStr;
-  //mitk::Label::Pointer label;
-
-  //for (int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
-  //{
-  //  sprintf(keybuffer, "layer_%03d", layerIdx);
-  //  int numberOfLabels = GetIntByKey(imgMetaDictionary, keybuffer);
-
-  //  mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
-
-  //  for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
-  //  {
-  //    TiXmlDocument doc;
-  //    sprintf(keybuffer, "label_%03d_%05d", layerIdx, labelIdx);
-  //    _xmlStr = GetStringByKey(imgMetaDictionary, keybuffer);
-  //    doc.Parse(_xmlStr.c_str());
-
-  //    TiXmlElement * labelElem = doc.FirstChildElement("Label");
-  //    if (labelElem == 0)
-  //      mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
-
-  //    label = LoadLabelFromTiXmlDocument(labelElem);
-
-  //    if (label->GetValue() == 0) // set exterior label is needed to hold exterior information
-  //      output->SetExteriorLabel(label);
-  //    labelSet->AddLabel(label);
-  //  }
-  //  output->AddLayer(labelSet);
-  //}
-
   LabelSetImage::Pointer output = LabelSetImageConverter::ConvertImageToLabelSetImage(image);
+
+  // get labels and add them as properties to the image
+  char keybuffer[256];
+
+  int numberOfLayers = GetIntByKey(dictionary, "layers");
+  std::string _xmlStr;
+  mitk::Label::Pointer label;
+
+  for (int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
+  {
+    sprintf(keybuffer, "layer_%03d", layerIdx);
+    int numberOfLabels = GetIntByKey(dictionary, keybuffer);
+
+    mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
+
+    for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
+    {
+      TiXmlDocument doc;
+      sprintf(keybuffer, "label_%03d_%05d", layerIdx, labelIdx);
+      _xmlStr = GetStringByKey(dictionary, keybuffer);
+      doc.Parse(_xmlStr.c_str());
+
+      TiXmlElement * labelElem = doc.FirstChildElement("Label");
+      if (labelElem == 0)
+        mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
+
+      label = LoadLabelFromTiXmlDocument(labelElem);
+
+      if (label->GetValue() == 0) // set exterior label is needed to hold exterior information
+        output->SetExteriorLabel(label);
+      labelSet->AddLabel(label);
+    }
+    output->AddLabelSetToLayer(layerIdx, labelSet);
+  }
 
   MITK_INFO << "...finished!" << std::endl;
 

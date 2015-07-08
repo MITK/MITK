@@ -139,7 +139,7 @@ protected:
   /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */
   void DoExtractBOWithoutAveraging();
 
-  void UpdateBValueTableWidget(int i);
+  void UpdateBValueTableWidget(int);
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
 //  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
@@ -150,6 +150,9 @@ protected:
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
   void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::Image::Pointer ImPtr, QString imageName, mitk::DataNode* parent);
+
+  void CleanBValueTableWidget();
+
 };
 
 

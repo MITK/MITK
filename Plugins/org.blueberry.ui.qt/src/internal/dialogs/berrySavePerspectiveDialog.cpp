@@ -31,13 +31,14 @@ SavePerspectiveDialog::SavePerspectiveDialog(PerspectiveRegistry& perspReg, QWid
   : QDialog(parent)
   , ui(new Ui::SavePerspectiveDialog)
   , model(new PerspectiveListModel(perspReg, true, this))
+  , proxyModel(new QSortFilterProxyModel(this))
   , perspReg(perspReg)
 {
   ui->setupUi(this);
 
-  auto   proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(model);
   proxyModel->sort(0);
+
   ui->listView->setModel(proxyModel);
   ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);
   ui->listView->setIconSize(QSize(16, 16));
@@ -60,10 +61,10 @@ void SavePerspectiveDialog::SetInitialSelection(const SmartPointer<IPerspectiveD
   if (initialSelection.IsNotNull() &&
       ui->listView->selectionModel()->selection().empty())
   {
-    QModelIndex index = this->model->index(initialSelection->GetId());
+    QModelIndex index = model->index(initialSelection->GetId());
     if (index.isValid())
     {
-      ui->listView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
+      ui->listView->selectionModel()->select(proxyModel->mapFromSource(index), QItemSelectionModel::ClearAndSelect);
     }
   }
 }
@@ -120,7 +121,7 @@ void SavePerspectiveDialog::PerspectiveNameChanged(const QString& text)
   else
   {
     QModelIndex selIndex = model->index(persp->GetId());
-    ui->listView->selectionModel()->select(selIndex, QItemSelectionModel::ClearAndSelect);
+    ui->listView->selectionModel()->select(proxyModel->mapFromSource(selIndex), QItemSelectionModel::ClearAndSelect);
   }
 
   this->UpdateButtons();
@@ -129,9 +130,11 @@ void SavePerspectiveDialog::PerspectiveNameChanged(const QString& text)
 void SavePerspectiveDialog::PerspectiveSelected(const QItemSelection& selected, const QItemSelection& /*deselected*/)
 {
   persp = nullptr;
+
   if (!selected.isEmpty())
   {
-    persp = model->perspectiveDescriptor(selected.indexes().front());
+    QModelIndex index = selected.indexes().front();
+    persp = model->perspectiveDescriptor(proxyModel->mapToSource(index));
   }
 
   if (!persp.IsNull())

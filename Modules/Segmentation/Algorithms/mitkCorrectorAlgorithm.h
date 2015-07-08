@@ -59,6 +59,11 @@ class MITKSEGMENTATION_EXPORT CorrectorAlgorithm : public ImageToImageFilter
      */
     //itkGetObjectMacro(DifferenceImage, Image);
 
+    itkSetMacro(FillColor, int);
+    itkSetMacro(EraseColor, int);
+
+    itkGetMacro(FillColor, int);
+    itkGetMacro(EraseColor, int);
 
     // used by TobiasHeimannCorrectionAlgorithm
     typedef struct

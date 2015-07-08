@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkAbstractTransformGeometry.h"
+#include "mitkLabelSetImage.h"
 
 #include "mitkCorrectorTool2D.xpm"
 
@@ -170,6 +171,12 @@ bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   CorrectorAlgorithm::Pointer algorithm = CorrectorAlgorithm::New();
   algorithm->SetInput( m_WorkingSlice );
   algorithm->SetContour( singleTimestepContour );
+
+  mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  if (labelSetImage.IsNotNull())
+  {
+    algorithm->SetFillColor(labelSetImage->GetActiveLabel()->GetValue());
+  }
   try
   {
       algorithm->UpdateLargestPossibleRegion();

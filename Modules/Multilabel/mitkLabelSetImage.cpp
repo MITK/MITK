@@ -159,6 +159,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
 {
   mitk::Image::Pointer newImage = mitk::Image::New();
   newImage->Initialize( this->GetPixelType(), this->GetDimension(), this->GetDimensions(), this->GetImageDescriptor()->GetNumberOfChannels() );
+  newImage->SetGeometry(this->GetGeometry()->Clone());
 
   LabelSetImageType::Pointer itkImage;
   mitk::CastToItkImage(newImage, itkImage);

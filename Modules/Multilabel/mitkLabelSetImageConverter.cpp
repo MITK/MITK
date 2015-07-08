@@ -80,7 +80,6 @@ void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimensio
 
     output = mitk::GrabItkImageMemory(duplicator->GetOutput());
   }
-  output->SetGeometry(input->GetGeometry()->Clone());
 }
 
 mitk::Image::Pointer mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(const mitk::LabelSetImage::ConstPointer input)

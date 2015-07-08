@@ -98,12 +98,6 @@ mitk::Image::Pointer mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(c
 }
 
 template<typename TPixel, unsigned int VDimensions>
-void MitkImageToMitkLabelSetImage(itk::Image< TPixel, VDimensions> * source, mitk::LabelSetImage::Pointer &output)
-{
-  // do nothing for non-vector images
-}
-
-template<typename TPixel, unsigned int VDimensions>
 void MitkImageToMitkLabelSetImage(itk::VectorImage< TPixel, VDimensions> * source, mitk::LabelSetImage::Pointer &output)
 {
   typedef itk::VectorImage< TPixel, VDimensions > VectorImageType;
@@ -114,16 +108,17 @@ void MitkImageToMitkLabelSetImage(itk::VectorImage< TPixel, VDimensions> * sourc
 
   if (numberOfComponents < 1)
   {
-    mitkThrow() << "At least one Component is required."
+    mitkThrow() << "At least one Component is required.";
   }
 
   typename VectorIndexSelectorType::Pointer vectorIndexSelector = typename VectorIndexSelectorType::New();
 
-  VectorIndexSelector->SetIndex(0);
-  VectorIndexSelector->SetInput(source);
+  vectorIndexSelector->SetIndex(0);
+  vectorIndexSelector->SetInput(source);
+  vectorIndexSelector->Update();
 
   mitk::Image::Pointer tempImage;
-  mitk::GrabItkImageMemory(VectorIndexSelector->GetOutput(), tempImage);
+  mitk::CastToMitkImage(vectorIndexSelector->GetOutput(), tempImage);
 
   output = mitk::LabelSetImage::New();
   output->InitializeByLabeledImage(tempImage);
@@ -131,11 +126,12 @@ void MitkImageToMitkLabelSetImage(itk::VectorImage< TPixel, VDimensions> * sourc
   for (unsigned int layer = 1; layer < numberOfComponents; ++layer)
   {
     typename VectorIndexSelectorType::Pointer vectorIndexSelectorLoop = typename VectorIndexSelectorType::New();
-    VectorIndexSelectorLoop->SetIndex(layer);
-    VectorIndexSelector->SetInput(source);
+    vectorIndexSelectorLoop->SetIndex(layer);
+    vectorIndexSelector->SetInput(source);
+    vectorIndexSelector->Update();
 
     mitk::Image::Pointer loopImage;
-    mitk::GrabItkImageMemory(vectorIndexSelectorLoop->GetOutput(), loopImage);
+    mitk::CastToMitkImage(vectorIndexSelector->GetOutput(), loopImage);
 
     output->AddLayer(loopImage);
   }
@@ -146,10 +142,11 @@ mitk::LabelSetImage::Pointer mitk::LabelSetImageConverter::ConvertImageToLabelSe
 {
   mitk::LabelSetImage::Pointer output;
 
-  AccessByItk_1(input, MitkImageToMitkLabelSetImage, output);
-
-  // if no vector image was detected
-  if ( output.IsNull() )
+  if (input->GetChannelDescriptor().GetPixelType().GetPixelType() == itk::ImageIOBase::VECTOR)
+  {
+    AccessVectorPixelTypeByItk_n(input, MitkImageToMitkLabelSetImage, (output));
+  }
+  else
   {
     output = mitk::LabelSetImage::New();
     output->InitializeByLabeledImage( input );

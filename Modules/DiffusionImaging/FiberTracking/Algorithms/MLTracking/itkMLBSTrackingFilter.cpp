@@ -580,7 +580,8 @@ void MLBSTrackingFilter< NumImageFeatures >::AfterThreadedGenerateData()
 
     m_EndTime = std::chrono::system_clock::now();
     std::chrono::hours   hh = std::chrono::duration_cast<std::chrono::hours>(m_EndTime - m_StartTime);
-    std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>((m_EndTime - m_StartTime) % std::chrono::hours(1));
+    std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>(m_EndTime - m_StartTime);
+    mm %= 60;
     MITK_INFO << "Tracking took " << hh.count() << "h and " << mm.count() << "m";
 }
 

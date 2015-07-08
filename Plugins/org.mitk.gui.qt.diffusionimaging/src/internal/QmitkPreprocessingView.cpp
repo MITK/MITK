@@ -1426,28 +1426,39 @@ void QmitkPreprocessingView::DoAdcCalculation()
     GetDefaultDataStorage()->Add(imageNode, node);
 }
 
+void QmitkPreprocessingView::CleanBValueTableWidget()
+{
+  m_Controls->m_B_ValueMap_TableWidget->clear();
+  m_Controls->m_B_ValueMap_TableWidget->setRowCount(1);
+  QStringList headerList;
+  headerList << "b-Value" << "Number of gradients";
+  m_Controls->m_B_ValueMap_TableWidget->setHorizontalHeaderLabels(headerList);
+  m_Controls->m_B_ValueMap_TableWidget->setItem(0,0,new QTableWidgetItem("-"));
+  m_Controls->m_B_ValueMap_TableWidget->setItem(0,1,new QTableWidgetItem("-"));
+}
 
-void QmitkPreprocessingView::UpdateBValueTableWidget(int i)
+void QmitkPreprocessingView::UpdateBValueTableWidget(int)
 {
     mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
+
     if (node.IsNull())
+    {
+        CleanBValueTableWidget();
         return;
+    }
+
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
     bool isDiffusionImage(false);
+
     isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image);
 
     if ( ! isDiffusionImage )
     {
-        m_Controls->m_B_ValueMap_TableWidget->clear();
-        m_Controls->m_B_ValueMap_TableWidget->setRowCount(1);
-        QStringList headerList;
-        headerList << "b-Value" << "Number of gradients";
-        m_Controls->m_B_ValueMap_TableWidget->setHorizontalHeaderLabels(headerList);
-        m_Controls->m_B_ValueMap_TableWidget->setItem(0,0,new QTableWidgetItem("-"));
-        m_Controls->m_B_ValueMap_TableWidget->setItem(0,1,new QTableWidgetItem("-"));
-    }else{
-
+        CleanBValueTableWidget();
+    }
+    else
+    {
         typedef mitk::BValueMapProperty::BValueMap BValueMap;
         typedef mitk::BValueMapProperty::BValueMap::iterator BValueMapIterator;
 
@@ -1855,6 +1866,10 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
 
     imageNode->SetName(name.toStdString().c_str());
     GetDefaultDataStorage()->Add(imageNode, node);
+
+    // update the b-value widget to remove the modified number of gradients used for extraction
+    this->CleanBValueTableWidget();
+    this->UpdateBValueTableWidget(0);
 }
 
 void QmitkPreprocessingView::MergeDwis()

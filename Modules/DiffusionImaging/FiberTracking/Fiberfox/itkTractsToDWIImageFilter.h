@@ -73,7 +73,8 @@ public:
     FiberfoxParameters<double> GetParameters(){ return m_Parameters; }
     std::vector< ItkDoubleImgType::Pointer > GetVolumeFractions() ///< one double image for each compartment containing the corresponding volume fraction per voxel
     { return m_VolumeFractions; }
-    mitk::LevelWindow GetLevelWindow(){ return m_LevelWindow; }
+    mitk::LevelWindow GetLevelWindow()  ///< Level window is determined from the output image
+    { return m_LevelWindow; }
     itkGetMacro( StatusText, std::string )
     itkGetMacro( PhaseImage, DoubleDwiType::Pointer )
     itkGetMacro( KspaceImage, DoubleDwiType::Pointer )
@@ -92,7 +93,7 @@ protected:
     double RoundToNearest(double num);
     std::string GetTime();
 
-    /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts. */
+    /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts/effects. */
     DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
 
     /** Generate signal of non-fiber compartments. */

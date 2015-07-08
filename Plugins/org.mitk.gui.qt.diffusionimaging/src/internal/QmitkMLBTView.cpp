@@ -270,11 +270,11 @@ void QmitkMLBTView::StartTracking()
         return;
 
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
+    m_ForestHandler.AddRawData(dwi);
+
     tracker = TrackerType::New();
     tracker->SetNumberOfThreads(m_Controls->m_NumberOfThreadsBox->value());
     tracker->SetInput(0,  mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi) );
-    tracker->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) );
-    tracker->SetB_Value( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) );
     tracker->SetDemoMode(m_Controls->m_DemoModeBox->isChecked());
     if (m_Controls->m_DemoModeBox->isChecked())
         tracker->SetNumberOfThreads(1);
@@ -306,9 +306,7 @@ void QmitkMLBTView::StartTracking()
     tracker->SetAposterioriCurvCheck(m_Controls->m_Curvcheck2->isChecked());
     tracker->SetRemoveWmEndFibers(false);
     tracker->SetAvoidStop(m_Controls->m_AvoidStop->isChecked());
-
-    vigra::RandomForest<int> forest = m_ForestHandler.GetForest();
-    tracker->SetDecisionForest(&forest);
+    tracker->SetForestHandler(m_ForestHandler);
     tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
     tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
     tracker->SetRandomSampling(m_Controls->m_RandomSampling->isChecked());

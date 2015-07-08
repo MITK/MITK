@@ -167,7 +167,14 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
   newImage->Initialize( this->GetPixelType(), this->GetDimension(), this->GetDimensions(), this->GetImageDescriptor()->GetNumberOfChannels() );
   newImage->SetGeometry(this->GetGeometry()->Clone());
 
-  AccessByItk(newImage, SetToZero);
+  if (newImage->GetDimension() < 4)
+  {
+    AccessByItk(newImage, SetToZero);
+  }
+  else
+  {
+    AccessFixedDimensionByItk(newImage, SetToZero, 4);
+  }
 
   unsigned int newLabelSetId = this->AddLayer(newImage, lset);
 

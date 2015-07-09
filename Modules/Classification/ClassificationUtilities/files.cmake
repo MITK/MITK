@@ -8,6 +8,7 @@ set(CPP_FILES
 
   GlobalImageFeatures/mitkGIFCooccurenceMatrix.cpp
   GlobalImageFeatures/mitkGIFGrayLevelRunLength.cpp
+  GlobalImageFeatures/mitkGIFFirstOrderStatistics.cpp
   mitkCLUtil.cpp
 
 )

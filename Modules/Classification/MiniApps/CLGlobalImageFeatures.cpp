@@ -25,11 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkGIFCooccurenceMatrix.h>
 #include <mitkGIFGrayLevelRunLength.h>
-
+#include <mitkGIFFirstOrderStatistics.h>
 
 typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned char, 3 >          MaskImageType;
-
 
 static vector<double> splitDouble(string str, char delimiter) {
   vector<double> internal;
@@ -45,7 +44,6 @@ static vector<double> splitDouble(string str, char delimiter) {
   return internal;
 }
 
-
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -57,6 +55,7 @@ int main(int argc, char* argv[])
 
   parser.addArgument("cooccurence","cooc",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
   parser.addArgument("run-length","rl",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
+  parser.addArgument("first-order","fo",mitkCommandLineParser::String, "Use First Order Features", "calculates First order based features",us::Any());
   parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
 
   // Miniapp Infos
@@ -80,8 +79,17 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
 
-
   mitk::AbstractGlobalImageFeature::FeatureListType stats;
+  ////////////////////////////////////////////////////////////////
+  // CAlculate First Order Features
+  ////////////////////////////////////////////////////////////////
+  if (parsedArgs.count("first-order"))
+  {
+    mitk::GIFFirstOrderStatistics firstOrderCalculator;
+    auto localResults = firstOrderCalculator.CalculateFeatures(image, mask);
+    stats.insert(stats.end(), localResults.begin(), localResults.end());
+  }
+
   ////////////////////////////////////////////////////////////////
   // CAlculate Co-occurence Features
   ////////////////////////////////////////////////////////////////

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef ClassificationSegmentation_h
 #define ClassificationSegmentation_h
 
@@ -38,16 +37,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPointListViewWidget.h"
 #include <mitkPointSetDataInteractor.h>
 /**
-  \brief ClassificationSegmentation
+\brief ClassificationSegmentation
 
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+\warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
-  \sa QmitkAbstractView
-  \ingroup ${plugin_target}_internal
+\sa QmitkAbstractView
+\ingroup ${plugin_target}_internal
 */
 
 namespace mitk{
-class VigraRandomForestClassifier;
+  class VigraRandomForestClassifier;
 }
 
 //class QmitkPointListWidget;
@@ -64,52 +63,48 @@ public:
 
   QmitkPointListViewWidget * m_PointListWidget;
   std::vector<mitk::DataNode::Pointer> m_PointSetList;
-  bool m_CalculateFeatures = true;
+  bool m_CalculateFeatures;
 
   std::vector<mitk::Image::Pointer> m_FeatureImageVector;
   std::vector<mitk::Image::Pointer> m_ResultImageVector;
   std::vector<mitk::Image::Pointer> m_PostProcessingImageVector;
 
-  bool m_BlockManualSegmentation = false;
+  bool m_BlockManualSegmentation;
   QFutureWatcher<std::vector<mitk::Image::Pointer>> m_ManualSegmentationFutureWatcher;
 
-  bool m_BlockPostProcessing = false;
+  bool m_BlockPostProcessing;
   QFutureWatcher<std::vector<mitk::Image::Pointer>> m_PostProcessingFutureWatcher;
 
+  protected slots:
 
+    /// \brief Called when the user clicks the GUI button
+    void DoAutomSegmentation();
+    void DoSavePointsAsMask();
+    void OnButtonCSFToggle(bool);
+    void OnButtonLESToggle(bool);
+    void OnButtonBRAToggle(bool);
+    void OnButtonNoInteractionToggle(bool);
 
-protected slots:
+    void ManualSegmentationTrigger();
+    std::vector<mitk::Image::Pointer> ManualSegmentationCallback();
+    void ManualSegmentationFinished();
 
-  /// \brief Called when the user clicks the GUI button
-  void DoAutomSegmentation();
-  void DoSavePointsAsMask();
-  void OnButtonCSFToggle(bool);
-  void OnButtonLESToggle(bool);
-  void OnButtonBRAToggle(bool);
-  void OnButtonNoInteractionToggle(bool);
+    void PostProcessingTrigger();
+    std::vector<mitk::Image::Pointer> PostProcessingCallback();
+    void PostProcessingFinished();
 
-  void ManualSegmentationTrigger();
-  std::vector<mitk::Image::Pointer> ManualSegmentationCallback();
-  void ManualSegmentationFinished();
-
-  void PostProcessingTrigger();
-  std::vector<mitk::Image::Pointer> PostProcessingCallback();
-  void PostProcessingFinished();
-
-  void OnFeatureSettingsChanged();
-  void OnPostProcessingSettingsChanged();
-  void OnInitializeSession(const mitk::DataNode*);
-
+    void OnFeatureSettingsChanged();
+    void OnPostProcessingSettingsChanged();
+    void OnInitializeSession(const mitk::DataNode*);
 
 protected:
 
   typedef float MeasurementType;
   typedef itk::Statistics::Histogram< MeasurementType,
-  itk::Statistics::DenseFrequencyContainer2 > HistogramType;
+    itk::Statistics::DenseFrequencyContainer2 > HistogramType;
 
-
-//  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-//  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+  //  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
+  //  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
@@ -123,7 +118,7 @@ protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                   const QList<mitk::DataNode::Pointer>& nodes ) override;
+    const QList<mitk::DataNode::Pointer>& nodes ) override;
 
   mitk::Image::Pointer CreateClassMaskByPointsetList(std::map<unsigned int, mitk::PointSet *> a_args);
 
@@ -144,8 +139,6 @@ protected:
   ctkSliderWidget * m_WeightBRASlider;
 
   mitk::PointSetDataInteractor::Pointer m_PointSetDataInteractor;
-
-
 };
 
 #endif // ClassificationSegmentation_h

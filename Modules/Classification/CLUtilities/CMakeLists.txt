@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  DEPENDS MitkCore MitkClassificationCore
+  DEPENDS MitkCore MitkCLCore
   PACKAGE_DEPENDS PUBLIC Eigen Boost
   WARNINGS_AS_ERRORS
 )

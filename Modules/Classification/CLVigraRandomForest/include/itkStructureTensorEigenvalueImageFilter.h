@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ITKSTRUCTURETENSOREIGENVALUEIMAGEFILTER_H
 
 #include <itkImageToImageFilter.h>
-#include <MitkCLVigraRandomForestExports.h>
 
 namespace itk
 {

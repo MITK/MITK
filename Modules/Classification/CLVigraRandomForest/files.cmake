@@ -8,7 +8,6 @@ set(CPP_FILES
 
     Algorithm/itkHessianMatrixEigenvalueImageFilter.cpp
     Algorithm/itkStructureTensorEigenvalueImageFilter.cpp
-    Algorithm/mitkLineHistogramBasedMassImageFilter.cpp
 
     Splitter/mitkImpurityLoss.cpp
     Splitter/mitkLinearSplitting.cpp

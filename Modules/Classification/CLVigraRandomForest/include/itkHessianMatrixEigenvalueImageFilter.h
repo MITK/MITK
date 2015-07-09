@@ -18,50 +18,43 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ITKHESSIANMATRIXEIGENVALUEIMAGEFILTER_H
 
 #include <itkImageToImageFilter.h>
-#include <MitkCLVigraRandomForestExports.h>
 
 namespace itk
 {
-
-template< class TInputImageType, class TOutputImageType = TInputImageType, class TMaskImageType = itk::Image<short,3> >
-class MITKCLVIGRARANDOMFOREST_EXPORT HessianMatrixEigenvalueImageFilter
+  template< class TInputImageType, class TOutputImageType = TInputImageType, class TMaskImageType = itk::Image<short,3> >
+  class HessianMatrixEigenvalueImageFilter
     : public itk::ImageToImageFilter<TInputImageType, TOutputImageType>
-{
+  {
+  public:
 
-public:
+    typedef HessianMatrixEigenvalueImageFilter< TInputImageType, TOutputImageType > Self;
+    typedef SmartPointer<Self>                      Pointer;
+    typedef SmartPointer<const Self>                ConstPointer;
+    typedef ImageToImageFilter<  TInputImageType, TOutputImageType  > Superclass;
 
-  typedef HessianMatrixEigenvalueImageFilter< TInputImageType, TOutputImageType > Self;
-  typedef SmartPointer<Self>                      Pointer;
-  typedef SmartPointer<const Self>                ConstPointer;
-  typedef ImageToImageFilter<  TInputImageType, TOutputImageType  > Superclass;
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-  itkFactorylessNewMacro(Self);
-  itkCloneMacro(Self);
+    void SetImageMask(TMaskImageType * maskimage);
 
-  void SetImageMask(TMaskImageType * maskimage);
+    itkSetMacro(Sigma,double)
+      itkGetMacro(Sigma,double)
 
-  itkSetMacro(Sigma,double)
-  itkGetMacro(Sigma,double)
+  private:
 
+    typename TMaskImageType::Pointer m_ImageMask;
+    double m_Sigma;
 
-private:
+    void GenerateData();
+    void GenerateOutputInformation();
 
-  typename TMaskImageType::Pointer m_ImageMask;
-  double m_Sigma;
-
-  void GenerateData();
-  void GenerateOutputInformation();
-
-  HessianMatrixEigenvalueImageFilter();
-  virtual ~HessianMatrixEigenvalueImageFilter();
-
-};
-
+    HessianMatrixEigenvalueImageFilter();
+    virtual ~HessianMatrixEigenvalueImageFilter();
+  };
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "../src/Algorithm/itkHessianMatrixEigenvalueImageFilter.cpp"
 #endif
-
 
 #endif

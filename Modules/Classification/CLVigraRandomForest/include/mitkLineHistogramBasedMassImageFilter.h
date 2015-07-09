@@ -22,47 +22,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk
 {
-
-template< class TInputImageType, class TOutputImageType = TInputImageType, class TMaskImageType = itk::Image<short,3> >
-class MITKCLVIGRARANDOMFOREST_EXPORT LineHistogramBasedMassImageFilter
+  template< class TInputImageType, class TOutputImageType = TInputImageType, class TMaskImageType = itk::Image<short,3> >
+  class LineHistogramBasedMassImageFilter
     : public itk::ImageToImageFilter<TInputImageType, TOutputImageType>
-{
+  {
+  public:
 
-public:
+    typedef LineHistogramBasedMassImageFilter< TInputImageType, TOutputImageType > Self;
+    typedef SmartPointer<Self>                      Pointer;
+    typedef SmartPointer<const Self>                ConstPointer;
+    typedef ImageToImageFilter<  TInputImageType, TOutputImageType  > Superclass;
 
-  typedef LineHistogramBasedMassImageFilter< TInputImageType, TOutputImageType > Self;
-  typedef SmartPointer<Self>                      Pointer;
-  typedef SmartPointer<const Self>                ConstPointer;
-  typedef ImageToImageFilter<  TInputImageType, TOutputImageType  > Superclass;
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-  itkFactorylessNewMacro(Self);
-  itkCloneMacro(Self);
+    void SetImageMask(TMaskImageType * maskimage);
+    void SetBinaryContour(TMaskImageType * contouriamge);
 
-  void SetImageMask(TMaskImageType * maskimage);
-  void SetBinaryContour(TMaskImageType * contouriamge);
+  private:
 
-private:
+    typename TMaskImageType::Pointer m_ImageMask;
+    typename TMaskImageType::Pointer m_BinaryContour;
+    vnl_vector<double> m_CenterOfMask;
 
-  typename TMaskImageType::Pointer m_ImageMask;
-  typename TMaskImageType::Pointer m_BinaryContour;
-  vnl_vector<double> m_CenterOfMask;
+    void ThreadedGenerateData(const typename Superclass::OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
+    void BeforeThreadedGenerateData();
+    //  void GenerateOutputInformation();
 
-  void ThreadedGenerateData(const typename Superclass::OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);
-  void BeforeThreadedGenerateData();
-//  void GenerateOutputInformation();
+    vnl_vector<double> GetCenterOfMass(const TMaskImageType * maskImage);
 
-  vnl_vector<double> GetCenterOfMass(const TMaskImageType * maskImage);
-
-  LineHistogramBasedMassImageFilter();
-  virtual ~LineHistogramBasedMassImageFilter();
-
-};
-
+    LineHistogramBasedMassImageFilter();
+    virtual ~LineHistogramBasedMassImageFilter();
+  };
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "../src/Algorithm/mitkLineHistogramBasedMassImageFilter.cpp"
 #endif
-
 
 #endif

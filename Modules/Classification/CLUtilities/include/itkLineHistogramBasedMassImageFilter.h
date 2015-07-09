@@ -56,7 +56,7 @@ namespace itk
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "../src/Algorithm/mitkLineHistogramBasedMassImageFilter.cpp"
+#include "../src/Features/itkLineHistogramBasedMassImageFilter.cpp"
 #endif
 
 #endif

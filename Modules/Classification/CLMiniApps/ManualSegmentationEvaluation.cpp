@@ -137,9 +137,6 @@ void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Im
     m_FeatureImageVector.push_back(o2);
     m_FeatureImageVector.push_back(o3);
 
-    //    AddImageAsDataNode(o1,"HE_1")->SetVisibility(show_nodes);
-    //    AddImageAsDataNode(o2,"HE_2")->SetVisibility(show_nodes);
-    //    AddImageAsDataNode(o3,"HE_3")->SetVisibility(show_nodes);
   }
 
   {
@@ -159,9 +156,6 @@ void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Im
     m_FeatureImageVector.push_back(o2);
     m_FeatureImageVector.push_back(o3);
 
-    //    AddImageAsDataNode(o1,"ST_1")->SetVisibility(show_nodes);
-    //    AddImageAsDataNode(o2,"ST_2")->SetVisibility(show_nodes);
-    //    AddImageAsDataNode(o3,"ST_3")->SetVisibility(show_nodes);
   }
 
   {
@@ -228,6 +222,8 @@ int main(int argc, char* argv[])
   raw_image = map.size() <= 7 ? dynamic_cast<mitk::Image *>(so[0].GetPointer()) : dynamic_cast<mitk::Image *>(so[1].GetPointer());
   class_mask = map.size() <= 7 ? dynamic_cast<mitk::Image *>(so[1].GetPointer()) : dynamic_cast<mitk::Image *>(so[0].GetPointer());
 
+
+
   CSF_mps = mitk::IOUtil::LoadPointSet(inputdir + "/" + csf_mps_name);
   LES_mps = mitk::IOUtil::LoadPointSet(inputdir + "/" + les_mps_name);
   BRA_mps = mitk::IOUtil::LoadPointSet(inputdir + "/" + bra_mps_name);
@@ -235,8 +231,9 @@ int main(int argc, char* argv[])
   unsigned int num_points = CSF_mps->GetSize() + LES_mps->GetSize() + BRA_mps->GetSize();
   MITK_INFO << "Found #" << num_points << " points over all classes.";
 
-  unsigned int runs = 20;
+
   ProcessFeatureImages(raw_image, class_mask);
+
   mitk::CLUtil::MergeLabels(class_mask, {{0,0},{1,1},{2,1},{3,1},{4,2},{5,3},{6,3}});
   class_mask_sampled = class_mask->Clone();
   itk::Image<short,3>::Pointer itk_classmask_sampled;
@@ -244,10 +241,27 @@ int main(int argc, char* argv[])
   itk::ImageRegionIteratorWithIndex<itk::Image<short,3> >::IndexType index;
   itk::ImageRegionIteratorWithIndex<itk::Image<short,3> > iit(itk_classmask_sampled,itk_classmask_sampled->GetLargestPossibleRegion());
 
+
+
+
+
   std::ofstream myfile;
-  myfile.open (inputdir + "/results_2.csv");
+  myfile.open (inputdir + "/results_3.csv");
 
+  Eigen::MatrixXd X_test;
 
+  unsigned int count_test = 0;
+  mitk::CLUtil::CountVoxel(class_mask, count_test);
+  X_test = Eigen::MatrixXd(count_test, m_FeatureImageVector.size());
+
+  unsigned int pos = 0;
+  for( const auto & image : m_FeatureImageVector)
+  {
+    X_test.col(pos) = mitk::CLUtil::Transform<double>(image,class_mask);
+    ++pos;
+  }
+
+  unsigned int runs = 20;
   for(unsigned int k = 0 ; k < runs; k++)
   {
 
@@ -290,20 +304,15 @@ int main(int argc, char* argv[])
       classifier->SetSamplesPerTree(0.66);
 
       Eigen::MatrixXd X_train;
-      Eigen::MatrixXd X_test;
 
       unsigned int count_train = 0;
-      unsigned int count_test = 0;
       mitk::CLUtil::CountVoxel(class_mask_sampled, count_train);
-      mitk::CLUtil::CountVoxel(class_mask, count_test);
       X_train = Eigen::MatrixXd(count_train, m_FeatureImageVector.size() );
-      X_test = Eigen::MatrixXd(count_test, m_FeatureImageVector.size());
 
       unsigned int pos = 0;
       for( const auto & image : m_FeatureImageVector)
       {
         X_train.col(pos) = mitk::CLUtil::Transform<double>(image,class_mask_sampled);
-        X_test.col(pos) = mitk::CLUtil::Transform<double>(image,class_mask);
         ++pos;
       }
 
@@ -327,8 +336,6 @@ int main(int argc, char* argv[])
       MITK_INFO << "DICE (" << num_points - (CSF_vec.size() + LES_vec.size() + BRA_vec.size()) << "): " << overlap_filter->GetDiceCoefficient();
       ss << overlap_filter->GetDiceCoefficient() <<",";
 
-      bool sampled = false;
-
       // random class selection
 
       if(!CSF_vec.empty())
@@ -338,7 +345,6 @@ int main(int argc, char* argv[])
         iit.SetIndex(index);
         iit.Set(1);
         CSF_vec.pop_back();
-        sampled = true;
       }
 
       if(!LES_vec.empty())
@@ -348,7 +354,6 @@ int main(int argc, char* argv[])
         iit.SetIndex(index);
         iit.Set(2);
         LES_vec.pop_back();
-        sampled = true;
       }
 
       if(!BRA_vec.empty())
@@ -358,7 +363,6 @@ int main(int argc, char* argv[])
         iit.SetIndex(index);
         iit.Set(3);
         BRA_vec.pop_back();
-        sampled = true;
       }
 
     }

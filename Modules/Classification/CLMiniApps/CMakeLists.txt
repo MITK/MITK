@@ -87,11 +87,11 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     CPP_FILES CLPolyToNrrd.cpp mitkCommandLineParser.cpp
   )
   mitk_create_executable(CLGlobalImageFeatures
-    DEPENDS MitkCore MitkClassificationUtilities
+    DEPENDS MitkCore MitkCLUtilities
     CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp
   )
   mitk_create_executable(CLVoxelFeatures
-    DEPENDS MitkCore MitkClassificationUtilities
+    DEPENDS MitkCore MitkCLUtilities
     CPP_FILES CLVoxelFeatures.cpp mitkCommandLineParser.cpp
   )
 

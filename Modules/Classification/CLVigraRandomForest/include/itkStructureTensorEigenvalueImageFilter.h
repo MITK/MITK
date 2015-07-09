@@ -22,51 +22,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk
 {
-
-template< class TInputImageType,
-          class TOutputImageType = TInputImageType,
-          class TMaskImageType = itk::Image<short,3> >
-class MITKCLVIGRARANDOMFOREST_EXPORT StructureTensorEigenvalueImageFilter
+  template< class TInputImageType,
+  class TOutputImageType = TInputImageType,
+  class TMaskImageType = itk::Image<short,3> >
+  class StructureTensorEigenvalueImageFilter
     : public itk::ImageToImageFilter<TInputImageType, TOutputImageType>
-{
+  {
+  public:
 
-public:
+    typedef StructureTensorEigenvalueImageFilter< TInputImageType, TOutputImageType > Self;
+    typedef SmartPointer<Self>                      Pointer;
+    typedef SmartPointer<const Self>                ConstPointer;
+    typedef ImageToImageFilter<  TInputImageType, TOutputImageType  > Superclass;
 
-  typedef StructureTensorEigenvalueImageFilter< TInputImageType, TOutputImageType > Self;
-  typedef SmartPointer<Self>                      Pointer;
-  typedef SmartPointer<const Self>                ConstPointer;
-  typedef ImageToImageFilter<  TInputImageType, TOutputImageType  > Superclass;
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-  itkFactorylessNewMacro(Self);
-  itkCloneMacro(Self);
+    void SetImageMask(TMaskImageType * maskimage);
 
-  void SetImageMask(TMaskImageType * maskimage);
+    itkSetMacro(InnerScale,double)
+      itkGetMacro(InnerScale,double)
 
-  itkSetMacro(InnerScale,double)
-  itkGetMacro(InnerScale,double)
+      itkSetMacro(OuterScale,double)
+      itkGetMacro(OuterScale,double)
 
-  itkSetMacro(OuterScale,double)
-  itkGetMacro(OuterScale,double)
+  private:
 
+    typename TMaskImageType::Pointer m_ImageMask;
+    double m_InnerScale, m_OuterScale;
 
-private:
+    void GenerateData();
+    void GenerateOutputInformation();
 
-  typename TMaskImageType::Pointer m_ImageMask;
-  double m_InnerScale, m_OuterScale;
-
-  void GenerateData();
-  void GenerateOutputInformation();
-
-  StructureTensorEigenvalueImageFilter();
-  virtual ~StructureTensorEigenvalueImageFilter();
-
-};
-
+    StructureTensorEigenvalueImageFilter();
+    virtual ~StructureTensorEigenvalueImageFilter();
+  };
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "../src/Algorithm/itkStructureTensorEigenvalueImageFilter.cpp"
 #endif
-
 
 #endif

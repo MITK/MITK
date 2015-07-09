@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_CPP
 #define ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_CPP
 
-#include <mitkLineHistogramBasedMassImageFilter.h>
+#include <itkLineHistogramBasedMassImageFilter.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkBinaryContourImageFilter.h>
 #include <mitkImageCast.h>

@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vigra/multi_array.hxx>
 #include <mitkPointSet.h>
 #include <itkHistogram.h>
-#include <initializer_list>
 #include <QFutureWatcher>
 #include "QmitkPointListViewWidget.h"
 #include <mitkPointSetDataInteractor.h>

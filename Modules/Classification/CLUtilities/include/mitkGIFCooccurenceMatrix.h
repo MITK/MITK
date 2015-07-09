@@ -1,21 +1,21 @@
-#ifndef mitkGIFGrayLevelRunLength_h
-#define mitkGIFGrayLevelRunLength_h
+#ifndef mitkGIFCooccurenceMatrix_h
+#define mitkGIFCooccurenceMatrix_h
 
 #include <mitkAbstractGlobalImageFeature.h>
 #include <mitkBaseData.h>
-#include <MitkClassificationUtilitiesExports.h>
+#include <MitkCLUtilitiesExports.h>
 
 namespace mitk
 {
 
-  class MITKCLASSIFICATIONUTILITIES_EXPORT GIFGrayLevelRunLength : public AbstractGlobalImageFeature
+  class MITKCLUTILITIES_EXPORT GIFCooccurenceMatrix : public AbstractGlobalImageFeature
   {
     public:
-      mitkClassMacro(GIFGrayLevelRunLength,AbstractGlobalImageFeature)
+      mitkClassMacro(GIFCooccurenceMatrix,AbstractGlobalImageFeature)
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-      GIFGrayLevelRunLength();
+      GIFCooccurenceMatrix();
 
       /**
       * \brief Calculates the Cooccurence-Matrix based features for this class.
@@ -35,4 +35,4 @@ namespace mitk
   };
 
 }
-#endif //mitkGIFGrayLevelRunLength_h
+#endif //mitkGIFCooccurenceMatrix_h

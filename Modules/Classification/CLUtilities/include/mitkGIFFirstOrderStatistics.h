@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractGlobalImageFeature.h>
 #include <mitkBaseData.h>
-#include <MitkClassificationUtilitiesExports.h>
+#include <MitkCLUtilitiesExports.h>
 
 namespace mitk
 {
-  class MITKCLASSIFICATIONUTILITIES_EXPORT GIFFirstOrderStatistics : public AbstractGlobalImageFeature
+  class MITKCLUTILITIES_EXPORT GIFFirstOrderStatistics : public AbstractGlobalImageFeature
   {
   public:
     mitkClassMacro(GIFFirstOrderStatistics,AbstractGlobalImageFeature)

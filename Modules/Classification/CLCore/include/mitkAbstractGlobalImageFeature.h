@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkAbstractGlobalImageFeature_h
 #define mitkAbstractGlobalImageFeature_h
 
-#include <MitkClassificationCoreExports.h>
+#include <MitkCLCoreExports.h>
 
 #include <mitkBaseData.h>
 #include <mitkImage.h>
@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class MITKCLASSIFICATIONCORE_EXPORT AbstractGlobalImageFeature : public BaseData
+class MITKCLCORE_EXPORT AbstractGlobalImageFeature : public BaseData
 {
 public:
 

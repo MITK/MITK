@@ -43,8 +43,8 @@ public:
 
 private:
 
-  typename TMaskImageType::Pointer m_ImageMask = nullptr;
-  typename TMaskImageType::Pointer m_BinaryContour = nullptr;
+  typename TMaskImageType::Pointer m_ImageMask;
+  typename TMaskImageType::Pointer m_BinaryContour;
   vnl_vector<double> m_CenterOfMask;
 
   void ThreadedGenerateData(const typename Superclass::OutputImageRegionType &outputRegionForThread, ThreadIdType threadId);

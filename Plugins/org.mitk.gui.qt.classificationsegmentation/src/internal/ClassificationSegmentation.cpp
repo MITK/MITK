@@ -57,7 +57,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
 
-#include <mitkRandomForestAccurecyWeighting.h>
+//#include <mitkRandomForestAccurecyWeighting.h>
 
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>

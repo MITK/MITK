@@ -24,27 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 
 
-
-//template< class TInputImageType, class TOutputImageType, class TMaskImageType>
-//void itk::LineHistogramBasedMassImageFilter<TInputImageType,TOutputImageType, TMaskImageType>::GenerateOutputInformation()
-//{
-//  Superclass::GenerateOutputInformation();
-//  this->GetOutput(0)->SetDirection(this->GetInput()->GetDirection());
-//  this->GetOutput(0)->SetSpacing(this->GetInput()->GetSpacing());
-//  this->GetOutput(0)->SetRegions(this->GetInput()->GetLargestPossibleRegion());
-//  this->GetOutput(0)->Allocate();
-
-//  this->GetOutput(1)->SetDirection(this->GetInput()->GetDirection());
-//  this->GetOutput(1)->SetSpacing(this->GetInput()->GetSpacing());
-//  this->GetOutput(1)->SetRegions(this->GetInput()->GetLargestPossibleRegion());
-//  this->GetOutput(1)->Allocate();
-
-//  this->GetOutput(2)->SetDirection(this->GetInput()->GetDirection());
-//  this->GetOutput(2)->SetSpacing(this->GetInput()->GetSpacing());
-//  this->GetOutput(2)->SetRegions(this->GetInput()->GetLargestPossibleRegion());
-//  this->GetOutput(2)->Allocate();
-//}
-
 template< class TInputImageType, class TOutputImageType, class TMaskImageType>
 void itk::LineHistogramBasedMassImageFilter<TInputImageType,TOutputImageType,TMaskImageType>
 ::BeforeThreadedGenerateData()

@@ -630,8 +630,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     viewActions.push_back(viewAction);
   }
 
-  //if (!USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS)
-  if (false)
+  if (!USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS)
   {
     QMenu* fileMenu = menuBar->addMenu("&File");
     fileMenu->setObjectName("FileMenu");

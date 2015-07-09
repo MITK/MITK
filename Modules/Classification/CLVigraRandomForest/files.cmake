@@ -9,7 +9,6 @@ set(CPP_FILES
     Algorithm/itkHessianMatrixEigenvalueImageFilter.cpp
     Algorithm/itkStructureTensorEigenvalueImageFilter.cpp
     Algorithm/mitkLineHistogramBasedMassImageFilter.cpp
-    Algorithm/mitkRandomForestAccurecyWeighting.cpp
 
     Splitter/mitkImpurityLoss.cpp
     Splitter/mitkLinearSplitting.cpp

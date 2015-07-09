@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCorrectorAlgorithm.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkITKImageImport.h"
 #include "mitkImageDataItem.h"
 #include "mitkContourUtils.h"
 #include "mitkLegacyAdaptors.h"
@@ -25,11 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImageDuplicator.h"
 #include "itkImageRegionIterator.h"
+#include "itkCastImageFilter.h"
 
 #include <mitkIOUtil.h>
 
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
 :ImageToImageFilter()
+, m_FillColor( 1 )
+, m_EraseColor( 0 )
 {
 }
 
@@ -37,6 +41,20 @@ mitk::CorrectorAlgorithm::~CorrectorAlgorithm()
 {
 }
 
+template<typename TPixel, unsigned int VDimensions>
+void ConvertBackToCorrectPixelType(itk::Image< TPixel, VDimensions> * reference, mitk::Image::Pointer target, itk::Image< mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2 >::Pointer segmentationPixelTypeImage)
+{
+  typedef itk::Image< mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2 >   InputImageType;
+  typedef itk::Image< TPixel, 2 >  OutputImageType;
+  typedef itk::CastImageFilter< InputImageType, OutputImageType > CastImageFilterType;
+
+  CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
+  castImageFilter->SetInput( segmentationPixelTypeImage );
+  castImageFilter->Update();
+  OutputImageType::Pointer tempItkImage = castImageFilter->GetOutput();
+  tempItkImage->DisconnectPipeline();
+  mitk::CastToMitkImage(tempItkImage, target);
+}
 
 void mitk::CorrectorAlgorithm::GenerateData()
 {
@@ -85,10 +103,18 @@ void mitk::CorrectorAlgorithm::GenerateData()
 
     temporarySlice = this->GetOutput();
     //  temporarySlice = ImportItkImage( correctPixelTypeImage );
-    m_FillColor = 1;
-    m_EraseColor = 0;
     ImprovedHeimannCorrectionAlgorithm(correctPixelTypeImage);
-    CastToMitkImage( correctPixelTypeImage, temporarySlice );
+
+    //this is suboptimal, needs to be kept synchronous to DefaultSegmentationDataType
+    if (inputImage->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT)
+    { //the cast at the beginning did not copy the data
+      CastToMitkImage(correctPixelTypeImage, temporarySlice);
+    }
+    else
+    { //it did copy the data and cast the pixel type
+      AccessByItk_n(m_WorkingImage, ConvertBackToCorrectPixelType, (temporarySlice, correctPixelTypeImage));
+    }
+
   }
   temporarySlice->SetTimeGeometry(originalGeometry);
 }

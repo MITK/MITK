@@ -73,7 +73,6 @@ public:
 
 protected:
   PlanarPolygon();
-  virtual ~PlanarPolygon();
 
   mitkCloneMacro(Self);
 

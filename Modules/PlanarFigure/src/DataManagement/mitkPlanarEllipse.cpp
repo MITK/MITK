@@ -36,11 +36,6 @@ mitk::PlanarEllipse::PlanarEllipse()
     this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 }
 
-
-mitk::PlanarEllipse::~PlanarEllipse()
-{
-}
-
 bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
 {
     if(index == 0) // moving center point and control points accordingly

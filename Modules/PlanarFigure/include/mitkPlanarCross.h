@@ -98,8 +98,6 @@ public:
 
 protected:
   PlanarCross();
-  virtual ~PlanarCross();
-
   mitkCloneMacro(Self);
 
   /** \brief Spatially constrain control points of second (orthogonal) line */

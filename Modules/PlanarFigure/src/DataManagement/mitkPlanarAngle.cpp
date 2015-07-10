@@ -32,11 +32,6 @@ mitk::PlanarAngle::PlanarAngle()
 }
 
 
-mitk::PlanarAngle::~PlanarAngle()
-{
-}
-
-
 void mitk::PlanarAngle::GeneratePolyLine()
 {
   this->ClearPolyLines();

@@ -37,11 +37,6 @@ mitk::PlanarPolygon::PlanarPolygon()
 }
 
 
-mitk::PlanarPolygon::~PlanarPolygon()
-{
-}
-
-
 void mitk::PlanarPolygon::SetClosed( bool closed )
 {
   this->SetProperty( "closed", mitk::BoolProperty::New( closed ) );

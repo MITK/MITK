@@ -32,9 +32,6 @@ mitk::PlanarDoubleEllipse::PlanarDoubleEllipse()
   this->SetProperty("closed", mitk::BoolProperty::New(true));
 }
 
-mitk::PlanarDoubleEllipse::~PlanarDoubleEllipse()
-{
-}
 
 mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D& point)
 {

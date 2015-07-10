@@ -35,11 +35,6 @@ mitk::PlanarCircle::PlanarCircle()
   this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 }
 
-
-mitk::PlanarCircle::~PlanarCircle()
-{
-}
-
 bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &point, bool /*createIfDoesNotExist*/ )
 {
   // moving center point

@@ -259,8 +259,7 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
     GetDataNode()->GetData() );
 
-  mitk::PlaneGeometry *planarFigureGeometry =
-    dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   mitk::AbstractTransformGeometry *abstractTransformGeometry =
     dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
 
@@ -334,7 +333,7 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
     point2D = planarFigure->GetPreviewControlPoint();
   }
 
-  planarFigure->AddControlPoint( point2D, nextIndex );
+  planarFigure->AddControlPoint( point2D, planarFigure->GetControlPointForPolylinePoint( nextIndex, 0 ) );
 
   if ( planarFigure->IsPreviewControlPointVisible() )
   {
@@ -489,7 +488,7 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
-  mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
@@ -774,12 +773,16 @@ bool mitk::PlanarFigureInteractor::IsPointNearLine(
   mitk::Point2D crossPoint = startPoint + n1 * l1;
   projectedPoint = crossPoint;
 
+  float dist1 = crossPoint.SquaredEuclideanDistanceTo(point);
+  float dist2 = endPoint.SquaredEuclideanDistanceTo(point);
+  float dist3 = startPoint.SquaredEuclideanDistanceTo(point);
+
   // Point is inside encompassing rectangle IF
   // - its distance to its projected point is small enough
   // - it is not further outside of the line than the defined tolerance
-  if (((crossPoint.SquaredEuclideanDistanceTo(point) < 20.0) && (l1 > 0.0) && (l2 > 0.0))
-      || endPoint.SquaredEuclideanDistanceTo(point) < 20.0
-      || startPoint.SquaredEuclideanDistanceTo(point) < 20.0)
+  if (((dist1 < 20.0) && (l1 > 0.0) && (l2 > 0.0))
+      || dist2 < 20.0
+      || dist3 < 20.0)
   {
     return true;
   }
@@ -805,7 +808,6 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
   Point2D polyLinePoint;
   Point2D firstPolyLinePoint;
   Point2D previousPolyLinePoint;
-
   for ( unsigned short loop=0; loop<planarFigure->GetPolyLinesSize(); ++loop )
   {
     const VertexContainerType polyLine = planarFigure->GetPolyLine( loop );
@@ -990,5 +992,3 @@ void mitk::PlanarFigureInteractor::ConfigurationChanged()
     m_MinimumPointDistance = (ScalarType) 25.0;
   }
 }
-
-

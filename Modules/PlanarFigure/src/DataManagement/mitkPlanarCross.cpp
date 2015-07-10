@@ -36,11 +36,6 @@ mitk::PlanarCross::PlanarCross()
 }
 
 
-mitk::PlanarCross::~PlanarCross()
-{
-}
-
-
 void mitk::PlanarCross::SetSingleLineMode( bool singleLineMode )
 {
   this->SetProperty( "SingleLineMode", mitk::BoolProperty::New( singleLineMode ) );

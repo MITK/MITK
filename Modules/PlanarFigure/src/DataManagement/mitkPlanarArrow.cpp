@@ -35,10 +35,6 @@ mitk::PlanarArrow::PlanarArrow()
 }
 
 
-mitk::PlanarArrow::~PlanarArrow()
-{
-}
-
 void mitk::PlanarArrow::GeneratePolyLine()
 {
   this->ClearPolyLines();

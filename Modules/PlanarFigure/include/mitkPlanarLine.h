@@ -65,7 +65,6 @@ public:
 
 protected:
   PlanarLine();
-  virtual ~PlanarLine();
 
   mitkCloneMacro(Self);
 

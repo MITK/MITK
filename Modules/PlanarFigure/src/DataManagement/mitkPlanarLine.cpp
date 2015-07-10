@@ -29,11 +29,6 @@ mitk::PlanarLine::PlanarLine()
 }
 
 
-mitk::PlanarLine::~PlanarLine()
-{
-}
-
-
 void mitk::PlanarLine::GeneratePolyLine()
 {
   this->ClearPolyLines();

@@ -65,7 +65,6 @@ public:
 
 protected:
   PlanarRectangle();
-  virtual ~PlanarRectangle();
 
   mitkCloneMacro(Self);
 

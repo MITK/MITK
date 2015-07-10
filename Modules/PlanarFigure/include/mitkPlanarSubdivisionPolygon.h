@@ -63,6 +63,11 @@ public:
     m_SubdivisionRounds = subdivisionRounds;
   }
 
+  /**
+  * \brief Returns the id of the control-point that corresponds to the given
+  * polyline-point.
+  */
+  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
 
 
   /** \brief Parameter w_tension defines the tension.
@@ -89,7 +94,6 @@ public:
 
 protected:
   PlanarSubdivisionPolygon();
-  virtual ~PlanarSubdivisionPolygon();
 
   mitkCloneMacro(Self);
 

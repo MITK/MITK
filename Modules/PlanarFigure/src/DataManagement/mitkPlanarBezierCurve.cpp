@@ -103,7 +103,7 @@ mitk::Point2D mitk::PlanarBezierCurve::ComputeDeCasteljauPoint(mitk::ScalarType 
 int mitk::PlanarBezierCurve::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const
 {
   mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine( polyLineIndex );
-  if ( indexOfPolylinePoint > polyLine.size() )
+  if ( indexOfPolylinePoint > static_cast<int>(polyLine.size()) )
   {
     return -1;
   }

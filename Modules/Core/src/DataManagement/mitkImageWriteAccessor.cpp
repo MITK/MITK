@@ -29,6 +29,7 @@ mitk::ImageWriteAccessor::~ImageWriteAccessor()
 {
   // In case of non-coherent memory, copied area needs to be written back
   // TODO
+  return;
 
   m_Image->m_ReadWriteLock.Lock();
 
@@ -57,6 +58,7 @@ const mitk::Image*mitk::ImageWriteAccessor::GetImage() const
 
 void mitk::ImageWriteAccessor::OrganizeWriteAccess()
 {
+  return;
   m_Image->m_ReadWriteLock.Lock();
 
   bool readOverlap = false;

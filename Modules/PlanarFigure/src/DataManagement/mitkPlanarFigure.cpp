@@ -345,7 +345,7 @@ unsigned int mitk::PlanarFigure::GetNumberOfFeatures() const
 }
 
 
-int mitk::PlanarFigure::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const
+int mitk::PlanarFigure::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int /*polyLineIndex*/ ) const
 {
   return indexOfPolylinePoint;
 }

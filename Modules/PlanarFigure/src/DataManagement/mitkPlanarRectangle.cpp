@@ -30,12 +30,6 @@ mitk::PlanarRectangle::PlanarRectangle()
   this->SetNumberOfPolyLines( 1 );
 }
 
-
-mitk::PlanarRectangle::~PlanarRectangle()
-{
-}
-
-
 bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
 {
   // heres the deal with the rectangle:

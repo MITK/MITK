@@ -269,6 +269,7 @@ mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME HDF5        OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME Breakpad    OFF ADVANCED DOC "Use Breakpad for crashdump creation")
 
 # -----------------------------------------
 # The following external projects must be
@@ -499,6 +500,14 @@ endif()
 
 # Generate Project.xml file expected by the CTest driver script
 mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} MITK "${subproject_list}" ${MITK_USE_SUPERBUILD})
+
+# Configure mitkBreakpadConfig.h that should be used for including breakpad
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/mitkBreakpadConfig.h.in" "${CMAKE_CURRENT_BINARY_DIR}/mitkBreakpadConfig.h" @ONLY)
+if (MITK_USE_Breakpad)
+  set (MITK_USE_Breakpad 1)
+else()
+  set (MITK_USE_Breakpad 0)
+endif()
 
 #-----------------------------------------------------------------------------
 # Superbuild script
@@ -1398,4 +1407,3 @@ feature_summary(
   DESCRIPTION "------- FEATURE SUMMARY FOR ${PROJECT_NAME} -------"
   WHAT ALL
 )
-

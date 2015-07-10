@@ -256,6 +256,7 @@ set(mitk_cmake_boolean_args
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL
+  MITK_USE_Breakpad
 
   MITK_ENABLE_PIC_READER
   )
@@ -285,6 +286,7 @@ ExternalProject_Add(${proj}
   INSTALL_COMMAND ""
   DEPENDS
     ${mitk_depends}
+    ${Breakpad_DEPENDS}
 )
 #-----------------------------------------------------------------------------
 # Additional MITK CXX/C Flags
@@ -396,6 +398,8 @@ ExternalProject_Add(${proj}
     -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
+    -DMITK_Breakpad_SRC:PATH=${Breakpad_SRC}
+    -DMITK_Breakpad_DIR:PATH=${Breakpad_DIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
@@ -441,4 +445,3 @@ add_custom_target(MITK
   COMMAND ${mitk_build_cmd}
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
 )
-

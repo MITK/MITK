@@ -44,11 +44,6 @@ mitk::PlanarFigure::PlanarFigure()
 }
 
 
-mitk::PlanarFigure::~PlanarFigure()
-{
-}
-
-
 mitk::PlanarFigure::PlanarFigure(const Self& other)
   : BaseData(other),
     m_ControlPoints(other.m_ControlPoints),
@@ -289,7 +284,7 @@ mitk::PlanarFigure::GetPolyLine(unsigned int index)
       m_PolyLineUpToDate = true;
     }
 
-  return m_PolyLines.at( index );;
+  return m_PolyLines.at( index );
 }
 
 

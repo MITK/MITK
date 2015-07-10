@@ -28,9 +28,6 @@ mitk::PlanarBezierCurve::PlanarBezierCurve()
   this->SetNumberOfHelperPolyLines(1);
 }
 
-mitk::PlanarBezierCurve::~PlanarBezierCurve()
-{
-}
 
 void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
 {

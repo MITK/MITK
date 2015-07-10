@@ -94,7 +94,6 @@ public:
 
 protected:
   PlanarSubdivisionPolygon();
-  virtual ~PlanarSubdivisionPolygon();
 
   mitkCloneMacro(Self);
 

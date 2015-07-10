@@ -279,7 +279,6 @@ public:
 
 protected:
   PlanarFigure();
-  virtual ~PlanarFigure();
 
   PlanarFigure(const Self& other);
 

@@ -49,7 +49,6 @@ namespace mitk
 
   protected:
     PlanarBezierCurve();
-    virtual ~PlanarBezierCurve();
 
     mitkCloneMacro(Self)
 
@@ -66,4 +65,3 @@ namespace mitk
 }
 
 #endif
-

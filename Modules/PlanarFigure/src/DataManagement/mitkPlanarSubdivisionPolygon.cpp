@@ -34,10 +34,6 @@ mitk::PlanarSubdivisionPolygon::PlanarSubdivisionPolygon():
 }
 
 
-mitk::PlanarSubdivisionPolygon::~PlanarSubdivisionPolygon()
-{
-}
-
 void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
 {
   this->ClearPolyLines();

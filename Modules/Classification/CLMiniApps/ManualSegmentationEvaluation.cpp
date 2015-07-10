@@ -46,7 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNeighborhood.h>
 #include <itkHessianMatrixEigenvalueImageFilter.h>
 #include <itkStructureTensorEigenvalueImageFilter.h>
-#include <mitkLineHistogramBasedMassImageFilter.h>
+#include <itkLineHistogramBasedMassImageFilter.h>
 
 using namespace mitk;
 

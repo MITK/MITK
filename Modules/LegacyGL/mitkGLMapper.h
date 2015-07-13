@@ -39,7 +39,7 @@ namespace mitk {
 * ApplyColorAndOpacity() can be used in the subclasses to apply color and opacity properties
 * read from the PropertyList.
 *
-* @deprecatedSince{next_release} GLMappers are no longer supported in the rendering pipeline.
+* @deprecatedSince{2015_05} GLMappers are no longer supported in the rendering pipeline.
 * Please use mitkVtkMapper instead or consider writing your own vtk classes, such as vtkActor
 * or vtkMapper
 * \ingroup Mapper

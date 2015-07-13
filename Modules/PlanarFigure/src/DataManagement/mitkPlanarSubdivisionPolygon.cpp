@@ -72,11 +72,11 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       }
 
       ControlPointListType mergedSubdivisionPoints;
-      ControlPointListType::iterator it, itNew;
+      ControlPointListType::const_iterator it, itNew;
 
 
-      for ( it = subdivisionPoints.begin() , itNew = newSubdivisionPoints.begin();
-            it != subdivisionPoints.end();
+      for ( it = subdivisionPoints.cbegin() , itNew = newSubdivisionPoints.begin();
+            it != subdivisionPoints.cend();
             ++it, ++itNew )
       {
         mergedSubdivisionPoints.push_back( *it );
@@ -92,9 +92,9 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
   bool isInitiallyPlaced = this->GetProperty("initiallyplaced");
 
   unsigned int i;
-  ControlPointListType::iterator it;
-  for ( it = subdivisionPoints.begin(), i = 0;
-        it != subdivisionPoints.end();
+  ControlPointListType::const_iterator it;
+  for ( it = subdivisionPoints.cbegin(), i = 0;
+        it != subdivisionPoints.cend();
         ++it, ++i )
   {
     // Determine the index of the control point FOLLOWING this poly-line element

@@ -139,7 +139,7 @@ unsigned int mitk::PlanarBezierCurve::GetMinimumNumberOfControlPoints() const
   return 2;
 }
 
-bool mitk::PlanarBezierCurve::IsHelperToBePainted(unsigned int index)
+bool mitk::PlanarBezierCurve::IsHelperToBePainted(unsigned int index) const
 {
   return index == 0 && m_ControlPoints.size() > 2;
 }

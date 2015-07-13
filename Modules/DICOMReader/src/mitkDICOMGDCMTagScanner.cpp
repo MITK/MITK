@@ -119,6 +119,8 @@ mitk::DICOMGDCMTagScanner
   m_GDCMScanner.Scan( m_InputFilenames );
 
   m_ScanResult.clear();
+  m_ScanResult.reserve( m_InputFilenames.size() );
+
   for (StringList::const_iterator inputIter = m_InputFilenames.begin();
        inputIter != m_InputFilenames.end();
        ++inputIter)

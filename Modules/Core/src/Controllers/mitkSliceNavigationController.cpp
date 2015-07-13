@@ -475,10 +475,7 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
   if ( slicedWorldGeometry )
   {
     int bestSlice = -1;
-    double bestDistance = itk::NumericTraits<double>::max();
 
-    int s, slices;
-    slices = slicedWorldGeometry->GetSlices();
     if ( slicedWorldGeometry->GetEvenlySpaced() )
     {
       mitk::PlaneGeometry *plane = slicedWorldGeometry->GetPlaneGeometry( 0 );
@@ -489,19 +486,24 @@ SliceNavigationController::SelectSliceByPoint( const Point3D &point )
       plane->Project( point, projectedPoint );
 
       // Check whether the point is somewhere within the slice stack volume;
-      // otherwise, the defualt slice (0) will be selected
+      // otherwise, the default slice (0) will be selected
       if ( direction[0] * (point[0] - projectedPoint[0])
          + direction[1] * (point[1] - projectedPoint[1])
          + direction[2] * (point[2] - projectedPoint[2]) >= 0 )
       {
-        bestSlice = (int)(plane->Distance( point )
-          / slicedWorldGeometry->GetSpacing()[2] + 0.5);
+        mitk::ScalarType spacing = slicedWorldGeometry->GetSpacing()[2];
+        mitk::ScalarType distance = projectedPoint.EuclideanDistanceTo(point);
+        bestSlice = (int)( ( distance / spacing ) + 0.5 );
       }
     }
     else
     {
       Point3D projectedPoint;
-      for ( s = 0; s < slices; ++s )
+      double bestDistance = itk::NumericTraits<double>::max();
+
+      for ( int s = 0;
+            s < slicedWorldGeometry->GetSlices();
+            ++s )
       {
         slicedWorldGeometry->GetPlaneGeometry( s )->Project( point, projectedPoint );
         Vector3D distance = projectedPoint - point;

@@ -21,4 +21,7 @@
 \page deprecatedSince2014_10 Deprecated as of 2014.10
 \ingroup MITKDeprecatedAPI
 
+\page deprecatedSince2015_05 Deprecated as of 2015.05
+\ingroup MITKDeprecatedAPI
+
 */

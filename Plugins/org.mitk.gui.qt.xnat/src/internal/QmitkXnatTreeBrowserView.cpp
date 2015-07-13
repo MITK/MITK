@@ -518,22 +518,6 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
       connect(actView, SIGNAL(triggered()), this, SLOT(OnContextMenuDownloadAndOpenFile()));
       m_ContextMenu->addAction(actView);
     }
-    ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(variant.value<ctkXnatObject*>());
-    if (project != NULL)
-    {
-      QAction* actCreateSubject = new QAction("Create new subject", m_NodeMenu);
-      m_NodeMenu->addAction(actCreateSubject);
-      connect(actCreateSubject, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewSubject()));
-      m_NodeMenu->popup(QCursor::pos());
-    }
-    ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(variant.value<ctkXnatObject*>());
-    if (subject != NULL)
-    {
-      QAction* actCreateExperiment = new QAction("Create new experiment", m_NodeMenu);
-      m_NodeMenu->addAction(actCreateExperiment);
-      connect(actCreateExperiment, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewExperiment()));
-      m_NodeMenu->popup(QCursor::pos());
-    }
   }
 
   if (canHaveResourceFolder)
@@ -549,6 +533,24 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
     connect(actUploadFile, SIGNAL(triggered()), this, SLOT(OnContextMenuUploadFile()));
     m_ContextMenu->addAction(actUploadFile);
   }
+
+  ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(xnatObject);
+  if (project != NULL)
+  {
+    QAction* actCreateSubject = new QAction("Create new subject", m_ContextMenu);
+    m_ContextMenu->addAction(actCreateSubject);
+    connect(actCreateSubject, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewSubject()));
+    m_ContextMenu->popup(QCursor::pos());
+  }
+  ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(xnatObject);
+  if (subject != NULL)
+  {
+    QAction* actCreateExperiment = new QAction("Create new experiment", m_ContextMenu);
+    m_ContextMenu->addAction(actCreateExperiment);
+    connect(actCreateExperiment, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewExperiment()));
+    m_ContextMenu->popup(QCursor::pos());
+  }
+
   m_ContextMenu->popup(QCursor::pos());
 }
 

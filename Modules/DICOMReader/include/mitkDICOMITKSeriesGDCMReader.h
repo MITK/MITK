@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <stack>
 
+#include "itkMutexLock.h"
+
 namespace itk
 {
   class TimeProbesCollectorBase;
@@ -342,6 +344,8 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     mitk::NormalDirectionConsistencySorter::Pointer m_NormalDirectionConsistencySorter;
 
   private:
+
+    itk::MutexLock::Pointer m_LocaleMutex;
 
     mutable std::stack<std::string> m_ReplacedCLocales;
     mutable std::stack<std::locale> m_ReplacedCinLocales;

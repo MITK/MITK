@@ -73,8 +73,13 @@ void mitk::ImageTimeSelector::GenerateData()
   const Image::RegionType& requestedRegion = this->GetOutput()->GetRequestedRegion();
 
   //do we really need a complete volume at a time?
-  if(requestedRegion.GetSize(2)>1)
-    this->SetVolumeItem( this->GetVolumeData(m_TimeNr, m_ChannelNr), 0 );
+  if (requestedRegion.GetSize(2) > 1)
+  {
+      mitk::ImageDataItem::Pointer im = this->GetVolumeData(m_TimeNr, m_ChannelNr)->Clone();
+      im->SetTimestep(0);
+      im->SetManageMemory(0);
+      this->SetVolumeItem(im, 0);
+  }
   else
   //no, so take just a slice!
     this->SetSliceItem( this->GetSliceData(requestedRegion.GetIndex(2), m_TimeNr, m_ChannelNr), requestedRegion.GetIndex(2), 0 );

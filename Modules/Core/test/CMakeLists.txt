@@ -87,6 +87,10 @@ if(TARGET ${TESTDRIVER})
                           ${MITK_DATA_DIR}/Pic2DplusT.nrrd
   )
 
+  mitkAddCustomModuleTest(mitkRotatedSlice4DTest mitkRotatedSlice4DTest
+                          ${MITK_DATA_DIR}/UltrasoundImages/4D_TEE_Data_MV.dcm
+  )
+
   if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_RENDERING_TESTING
     mitkAddCustomModuleTest(mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2DTest
                             ${MITK_DATA_DIR}/RenderingTestData/rgbaImage.png #input image to load in data storage
@@ -209,7 +213,7 @@ if(TARGET ${TESTDRIVER})
     #mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest
     #                        ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz
     #)
-    SET_PROPERTY(TEST mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw
+    SET_PROPERTY(TEST mitkRotatedSlice4DTest mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw
       # mitkImageVtkMapper2D_pic3dOpacity640x480
       mitkSurfaceVtkMapper2DTest mitkSurfaceVtkMapper3DTest_TextureProperty mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2D_openMeAloneTransformed640x480 #mitkSurfaceVtkMapper3DTexturedSphereTest_Football
     PROPERTY RUN_SERIAL TRUE)

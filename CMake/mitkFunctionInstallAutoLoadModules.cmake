@@ -15,7 +15,7 @@
 #! \param DESTINATION The install destination, e.g. "bin".
 function(mitkFunctionInstallAutoLoadModules)
 
-  cmake_parse_arguments(_INSTALL "" "DESTINATION" "PLUGINS" ${ARGN})
+  cmake_parse_arguments(_INSTALL "" "DESTINATION" "PLUGINS" "RETURN_ADDITIONAL_PLUGINS" ${ARGN})
 
   if(NOT _INSTALL_PLUGINS)
     message(SEND_ERROR "PLUGINS argument is required")
@@ -81,12 +81,25 @@ function(mitkFunctionInstallAutoLoadModules)
               endif()
             endif()
           endif()
+
+          if(_target_filename_debug)
+            list(APPEND additional_absolute_plugins_for_dependey_check ${CMAKE_INSTALL_PREFIX}/${_module_install_dir}/${_target_filename_debug})
+          endif()
+          if(_target_filename_release)
+            list(APPEND additional_absolute_plugins_for_dependey_check ${CMAKE_INSTALL_PREFIX}/${_module_install_dir}/${_target_filename_release})
+          endif()
+
         endforeach()
       endif()
     else()
       message(WARNING "Ignoring unknown target \"${_install_plugin}\" for installation.")
     endif()
   endforeach()
+
+  # return a list of additional targets that should be checked for dependencies
+  list(REMOVE_DUPLICATES additional_absolute_plugins_for_dependey_check)
+  set(${_INSTALL_RETURN_ADDITIONAL_PLUGINS} ${additional_absolute_plugins_for_dependey_check} PARENT_SCOPE)
+
 
 endfunction()
 

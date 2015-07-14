@@ -48,10 +48,10 @@ void ConvertBackToCorrectPixelType(itk::Image< TPixel, VDimensions> * reference,
   typedef itk::Image< TPixel, 2 >  OutputImageType;
   typedef itk::CastImageFilter< InputImageType, OutputImageType > CastImageFilterType;
 
-  CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
+  typename CastImageFilterType::Pointer castImageFilter = typename CastImageFilterType::New();
   castImageFilter->SetInput( segmentationPixelTypeImage );
   castImageFilter->Update();
-  OutputImageType::Pointer tempItkImage = castImageFilter->GetOutput();
+  typename OutputImageType::Pointer tempItkImage = castImageFilter->GetOutput();
   tempItkImage->DisconnectPipeline();
   mitk::CastToMitkImage(tempItkImage, target);
 }

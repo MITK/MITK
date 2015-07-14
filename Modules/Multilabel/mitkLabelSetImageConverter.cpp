@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageDuplicator.h"
 
 template < typename TPixel, unsigned int VImageDimension >
-void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimension>* source, mitk::Image::Pointer &output, mitk::LabelSetImage::ConstPointer input)
+void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimension>* /*source*/, mitk::Image::Pointer &output, mitk::LabelSetImage::ConstPointer input)
 {
   typedef itk::ComposeImageFilter< itk::Image<TPixel, VImageDimension> > ComposeFilterType;
 
@@ -38,7 +38,7 @@ void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimensio
   // if the vector length is less than 2, which might very well happen for segmentations.
   if ( numberOfLayers > 1 )
   { // if we have only one image we do not need to create a vector
-    ComposeFilterType::Pointer vectorImageComposer = ComposeFilterType::New();
+    typename ComposeFilterType::Pointer vectorImageComposer = ComposeFilterType::New();
 
     unsigned int activeLayer = input->GetActiveLayer();
     for (unsigned int layer(0); layer < numberOfLayers; layer++)
@@ -74,7 +74,7 @@ void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimensio
     typename itk::Image<TPixel, VImageDimension>::Pointer itkCurrentLayer;
     mitk::CastToItkImage(dynamic_cast<const mitk::Image*>(input.GetPointer()), itkCurrentLayer);
     typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicatorType;
-    DuplicatorType::Pointer duplicator = DuplicatorType::New();
+    typename DuplicatorType::Pointer duplicator = DuplicatorType::New();
     duplicator->SetInputImage(itkCurrentLayer);
     duplicator->Update();
 
@@ -111,7 +111,7 @@ void MitkImageToMitkLabelSetImage(itk::VectorImage< TPixel, VDimensions> * sourc
     mitkThrow() << "At least one Component is required.";
   }
 
-  typename VectorIndexSelectorType::Pointer vectorIndexSelector = typename VectorIndexSelectorType::New();
+  typename VectorIndexSelectorType::Pointer vectorIndexSelector = VectorIndexSelectorType::New();
 
   vectorIndexSelector->SetIndex(0);
   vectorIndexSelector->SetInput(source);
@@ -125,7 +125,7 @@ void MitkImageToMitkLabelSetImage(itk::VectorImage< TPixel, VDimensions> * sourc
 
   for (unsigned int layer = 1; layer < numberOfComponents; ++layer)
   {
-    typename VectorIndexSelectorType::Pointer vectorIndexSelectorLoop = typename VectorIndexSelectorType::New();
+    typename VectorIndexSelectorType::Pointer vectorIndexSelectorLoop = VectorIndexSelectorType::New();
     vectorIndexSelectorLoop->SetIndex(layer);
     vectorIndexSelector->SetInput(source);
     vectorIndexSelector->Update();

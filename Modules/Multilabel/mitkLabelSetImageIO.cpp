@@ -75,7 +75,7 @@ void LabelSetImageIO::Write()
     }
   }
 
-  mitk::Image::ConstPointer inputVector = mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(input);
+  mitk::Image::Pointer inputVector = mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(input);
 
   // image write
   if ( inputVector.IsNull() )

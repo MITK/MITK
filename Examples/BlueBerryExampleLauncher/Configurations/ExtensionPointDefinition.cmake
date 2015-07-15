@@ -15,5 +15,5 @@ The following features are demonstrated:
 <li> collecting extensions for an extension point </li>
 </ul>
 
-See the main <a href=\"http://docs.mitk.org/nightly-qt4/BlueBerryExampleExtensionPoint.html\">documentation</a> for details."
+See the main <a href=\"http://docs.mitk.org/nightly/BlueBerryExampleExtensionPoint.html\">documentation</a> for details."
 )

@@ -230,7 +230,7 @@ int main( int argc, char* argv[] )
 
   parser.setTitle("Folder Registration");
   parser.setCategory("Preprocessing Tools");
-  parser.setDescription("For detail description see http://docs.mitk.org/nightly-qt4/DiffusionMiniApps.html");
+  parser.setDescription("For detail description see http://docs.mitk.org/nightly/DiffusionMiniApps.html");
   parser.setContributor("MBI");
 
   // Add command line argument names

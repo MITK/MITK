@@ -695,7 +695,7 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
                                  m_LineColor[lineDisplayMode][1],
                                  m_LineColor[lineDisplayMode][2] );
   m_AnnotationOverlay->SetOpacity( globalOpacity );
-  m_AnnotationOverlay->SetFontSize( 12 );
+  m_AnnotationOverlay->SetFontSize( 14 );
   m_AnnotationOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
   m_AnnotationOverlay->SetVisibility( true, renderer );
 
@@ -742,7 +742,7 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
                                m_LineColor[lineDisplayMode][2] );
 
   m_QuantityOverlay->SetOpacity( globalOpacity );
-  m_QuantityOverlay->SetFontSize( 12 );
+  m_QuantityOverlay->SetFontSize( 14 );
   m_QuantityOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
   m_QuantityOverlay->SetVisibility( true, renderer );
 

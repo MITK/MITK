@@ -83,8 +83,12 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     ls->m_TextProp->SetColor( color[0], color[1], color[2]);
     ls->m_STextProp->SetColor( 0,0,0 );
     ls->m_TextProp->SetFontSize(GetFontSize());
+    ls->m_TextProp->SetFontFamilyToArial();
+    ls->m_TextProp->BoldOn();
     ls->m_TextProp->SetOpacity(opacity);
     ls->m_STextProp->SetFontSize(GetFontSize());
+    ls->m_STextProp->SetFontFamilyToArial();
+    ls->m_STextProp->BoldOn();
     ls->m_STextProp->SetOpacity(opacity);
 
     bool drawShadow;

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
-#include <mitkAffineDataInteractor3D.h>
+#include <mitkAffineBaseDataInteractor3D.h>
 
 #include "ui_QmitkGeometryToolsViewControls.h"
 

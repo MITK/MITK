@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk
 #include <mitkImage.h>
-#include <mitkAffineDataInteractor3D.h>
+#include <mitkAffineBaseDataInteractor3D.h>
 
 //micro services
 #include <usModuleRegistry.h>
@@ -77,10 +77,21 @@ void QmitkGeometryToolsView::AddInteractor()
   {
     if( node.IsNotNull() )
     {
-      mitk::AffineDataInteractor3D::Pointer affineDataInteractor = mitk::AffineDataInteractor3D::New();
-      affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
-      affineDataInteractor->SetEventConfig("AffineConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+
+      mitk::AffineBaseDataInteractor3D::Pointer affineDataInteractor = mitk::AffineBaseDataInteractor3D::New();
+      if (m_Controls.m_KeyboardMode->isChecked())
+      {
+        affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+        affineDataInteractor->SetEventConfig("AffineKeyConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+      }
+      else if(m_Controls.m_MouseMode->isChecked())
+      {
+        affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+        affineDataInteractor->SetEventConfig("AffineMouseConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+      }
+
       affineDataInteractor->SetDataNode(node);
+
       node->SetBoolProperty("pickable", true);
       node->SetFloatProperty("AffineDataInteractor3D.Translation Step Size", m_Controls.m_TranslationStep->value());
       node->SetFloatProperty("AffineDataInteractor3D.Rotation Step Size", m_Controls.m_RotationStep->value());

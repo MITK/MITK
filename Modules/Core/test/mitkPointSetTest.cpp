@@ -45,6 +45,8 @@ class mitkPointSetTestSuite : public mitk::TestFixture
   MITK_TEST(TestSwapPointPositionDownwardsNotPossible);
   MITK_TEST(TestCreateHoleInThePointIDs);
   MITK_TEST(TestInsertPointWithPointSpecification);
+  MITK_TEST(TestMaxIdAccess);
+  MITK_TEST(TestInsertPointAtEnd);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -322,7 +324,6 @@ std::cout<<"[PASSED]"<<std::endl;
         true, ((newP10 == p10) && (newP12 == p12)));
   }
 
-
   void TestInsertPointWithPointSpecification()
   {
     //check InsertPoint with PointSpecification
@@ -343,6 +344,101 @@ std::cout<<"[PASSED]"<<std::endl;
       }
       std::cout<<"[PASSED]"<<std::endl;
      */
+  }
+
+  void TestMaxIdAccess()
+  {
+    typedef mitk::PointSet::PointIdentifier IdType;
+    typedef mitk::PointSet::PointsIterator PointsIteratorType;
+    PointsIteratorType empty;
+
+    mitk::Point3D new1, new2, new3, new4, refMaxPt;
+    new1.Fill(4);
+    new2.Fill(5);
+    new3.Fill(6);
+    new4.Fill(7);
+    refMaxPt.Fill(5);
+
+    pointSet->SetPoint( 0, new1, 2 );
+    pointSet->InsertPoint( 1, new2, 2 );
+    pointSet->InsertPoint( 3, new3, 2 );
+    pointSet->InsertPoint( 6, new4, 2 );
+
+    PointsIteratorType maxIt = pointSet->GetMaxId( 1 );
+    empty = pointSet->End( 1 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Check empty time step max id." , true, maxIt == empty);
+
+    maxIt = pointSet->GetMaxId( 3 );
+    empty = pointSet->End( 3 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Check non-existent time step max id." , true, maxIt == empty);
+
+    maxIt = pointSet->GetMaxId( 0 );
+    empty = pointSet->End( 0 );
+    IdType maxId = maxIt.Index();
+    mitk::Point3D maxPt = maxIt.Value();
+    bool equal = mitk::Equal( maxPt, refMaxPt );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Check time step 0 max id iterator." , false, maxIt == empty);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Check time step 0 max id." , true, maxId == 4);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Check time step 0 max id point." , true, equal);
+
+    maxIt = pointSet->GetMaxId( 2 );
+    empty = pointSet->End( 2 );
+    maxId = maxIt.Index();
+    maxPt = maxIt.Value();
+    equal = mitk::Equal( maxPt, new4 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Check time step 2 max id iterator." , false, maxIt == empty);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Check time step 2 max id." , true, maxId == 6);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Check time step 2 max id point." , true, equal);
+  }
+
+  void TestInsertPointAtEnd()
+  {
+    typedef mitk::PointSet::PointType PointType;
+    typedef mitk::PointSet::PointIdentifier IndexType;
+
+    PointType new1, new2, new3, new4, refMaxPt;
+    new1.Fill(4);
+    new2.Fill(5);
+    new3.Fill(6);
+    new4.Fill(7);
+
+    pointSet->SetPoint( 1, new1, 2 );
+    pointSet->InsertPoint( 3, new2, 2 );
+    pointSet->InsertPoint( 4, new3, 2 );
+    pointSet->InsertPoint( 6, new4, 2 );
+
+    PointType in1, in2, in3, in4;
+    in1.Fill(8);
+    in2.Fill(9);
+    in3.Fill(10);
+    in4.Fill(11);
+
+    mitk::PointSet::Pointer refPs1 = pointSet->Clone();
+    refPs1->SetPoint( 5, in1, 0 );
+    mitk::PointSet::Pointer refPs2 = pointSet->Clone();
+    refPs2->SetPoint( 5, in1, 0 );
+    refPs2->SetPoint( 0, in2, 1 );
+    mitk::PointSet::Pointer refPs3 = pointSet->Clone();
+    refPs3->SetPoint( 5, in1, 0 );
+    refPs3->SetPoint( 0, in2, 1 );
+    refPs3->SetPoint( 7, in3, 2 );
+    mitk::PointSet::Pointer refPs4 = pointSet->Clone();
+    refPs4->SetPoint( 5, in1, 0 );
+    refPs4->SetPoint( 0, in2, 1 );
+    refPs4->SetPoint( 7, in3, 2 );
+    refPs4->SetPoint( 0, in4, 7 );
+
+    pointSet->InsertPoint( in1, 0 );
+    MITK_ASSERT_EQUAL( pointSet, refPs1, "Check point insertion for time step 0." );
+
+    pointSet->InsertPoint( in2, 1 );
+    MITK_ASSERT_EQUAL( pointSet, refPs2, "Check point insertion for time step 1." );
+
+    pointSet->InsertPoint( in3, 2 );
+    MITK_ASSERT_EQUAL( pointSet, refPs3, "Check point insertion for time step 2." );
+
+    pointSet->InsertPoint( in4, 7 );
+    MITK_ASSERT_EQUAL( pointSet, refPs4, "Check point insertion for time step 7." );
   }
 
 };

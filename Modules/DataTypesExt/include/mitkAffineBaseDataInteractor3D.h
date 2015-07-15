@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkAffineDataInteractor3D_h_
-#define mitkAffineDataInteractor3D_h_
+#ifndef mitkAffineBaseDataInteractor3D_h_
+#define mitkAffineBaseDataInteractor3D_h_
 
 #include <mitkDataInteractor.h>
 #include <mitkGeometry3D.h>
@@ -29,11 +29,11 @@ namespace mitk
   * \ingroup Interaction
   */
 // Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
-class MITKDATATYPESEXT_EXPORT AffineDataInteractor3D: public DataInteractor
+class MITKDATATYPESEXT_EXPORT AffineBaseDataInteractor3D: public DataInteractor
 {
 
 public:
-  mitkClassMacro(AffineDataInteractor3D, DataInteractor);
+  mitkClassMacro(AffineBaseDataInteractor3D, DataInteractor);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
@@ -43,8 +43,8 @@ public:
   void ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry* geometry);
   mitk::BaseGeometry *GetUpdatedTimeGeometry(mitk::InteractionEvent *interactionEvent);
 protected:
-  AffineDataInteractor3D();
-  virtual ~AffineDataInteractor3D();
+  AffineBaseDataInteractor3D();
+  virtual ~AffineBaseDataInteractor3D();
   /**
     * Here actions strings from the loaded state machine pattern are mapped to functions of
     * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
@@ -66,6 +66,7 @@ protected:
   virtual bool InitRotate (StateMachineAction*, InteractionEvent*);
   virtual bool TranslateObject (StateMachineAction*, InteractionEvent*);
   virtual bool RotateObject (StateMachineAction*, InteractionEvent*);
+  virtual bool ScaleObject(StateMachineAction*, InteractionEvent*);
   virtual bool TranslateUpKey(StateMachineAction*, InteractionEvent* interactionEvent);
   virtual bool TranslateDownKey(StateMachineAction*, InteractionEvent* interactionEvent);
   virtual bool TranslateLeftKey(StateMachineAction*, InteractionEvent* interactionEvent);

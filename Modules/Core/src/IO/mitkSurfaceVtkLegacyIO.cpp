@@ -31,6 +31,9 @@ namespace mitk {
 SurfaceVtkLegacyIO::SurfaceVtkLegacyIO()
   : SurfaceVtkIO(Surface::GetStaticNameOfClass(), IOMimeTypes::VTK_POLYDATA_LEGACY_MIMETYPE(), "VTK Legacy PolyData")
 {
+  Options defaultOptions;
+  defaultOptions["Save as binary file"] = true;
+  this->SetDefaultWriterOptions(defaultOptions);
   this->RegisterService();
 }
 
@@ -83,7 +86,10 @@ void SurfaceVtkLegacyIO::Write()
     vtkSmartPointer<vtkPolyData> polyData = this->GetPolyData(t, fileName);
     vtkSmartPointer<vtkPolyDataWriter> writer = vtkSmartPointer<vtkPolyDataWriter>::New();
     writer->SetInputData(polyData);
-
+    if (us::any_cast<bool> (GetWriterOption("Save as binary file")))
+    {
+      writer->SetFileTypeToBinary();
+    }
     // The legacy vtk poly data writer cannot write to streams
     LocalFile localFile(this);
     writer->SetFileName(localFile.GetFileName().c_str());

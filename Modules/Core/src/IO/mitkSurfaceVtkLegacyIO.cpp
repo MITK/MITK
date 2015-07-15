@@ -32,7 +32,7 @@ SurfaceVtkLegacyIO::SurfaceVtkLegacyIO()
   : SurfaceVtkIO(Surface::GetStaticNameOfClass(), IOMimeTypes::VTK_POLYDATA_LEGACY_MIMETYPE(), "VTK Legacy PolyData")
 {
   Options defaultOptions;
-  defaultOptions["Save as binary file"] = true;
+  defaultOptions["Save as binary file"] = false;
   this->SetDefaultWriterOptions(defaultOptions);
   this->RegisterService();
 }

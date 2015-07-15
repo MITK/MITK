@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_stochasticfibertracking Stochastic Tracking View
+\page org_mitk_views_stochasticfibertracking Probabilistic Streamline Tractography
 
 This view provides the user interface for the Stochastic Fibertracking algorithm, proposed by Ngo [1]. 
 

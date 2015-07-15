@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
     parser.addArgument("seed", "s", mitkCommandLineParser::String, "Seed image:", "seed image", us::Any());
 
     parser.addArgument("athres", "a", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold (in radians)", us::Any());
-    parser.addArgument("stepsize", "se", mitkCommandLineParser::Float, "Stepsize:", "stepsize", us::Any());
+    parser.addArgument("stepsize", "se", mitkCommandLineParser::Float, "Stepsize:", "stepsize (in voxels)", us::Any());
     parser.addArgument("samples", "ns", mitkCommandLineParser::Int, "Samples:", "samples", us::Any());
     parser.addArgument("samplingdist", "sd", mitkCommandLineParser::Float, "Sampling distance:", "sampling distance (in voxels)", us::Any());
     parser.addArgument("seeds", "nse", mitkCommandLineParser::Int, "Seeds per voxel:", "seeds per voxel", us::Any());

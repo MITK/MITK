@@ -233,7 +233,6 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 idft->SetDiffusionGradientDirection(m_Parameters.m_SignalGen.GetGradientDirection(g));
                 if (c==spikeCoil)
                     idft->SetSpikesPerSlice(numSpikes);
-//                idft->SetNumberOfThreads(1);
                 idft->Update();
 
                 ComplexSliceType::Pointer fSlice;

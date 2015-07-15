@@ -293,7 +293,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
 }
 
 template< int NumImageFeatures >
-double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(ThreadIdType threadId, itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
+double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
 {
     vnl_vector_fixed<double,3> dirOld = dir;
     dirOld = dir;
@@ -489,7 +489,7 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
                 continue;
 
             // forward tracking
-            tractLength = FollowStreamline(threadId, worldPos, dir, &fib, 0, false);
+            tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
             fib.push_front(worldPos);
 
             if (m_RemoveWmEndFibers)
@@ -505,7 +505,7 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
             }
 
             // backward tracking
-            tractLength = FollowStreamline(threadId, worldPos, -dir, &fib, tractLength, true);
+            tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
             counter = fib.size();
 
             if (m_RemoveWmEndFibers)
@@ -581,8 +581,10 @@ void MLBSTrackingFilter< NumImageFeatures >::AfterThreadedGenerateData()
     m_EndTime = std::chrono::system_clock::now();
     std::chrono::hours   hh = std::chrono::duration_cast<std::chrono::hours>(m_EndTime - m_StartTime);
     std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>(m_EndTime - m_StartTime);
+    std::chrono::seconds ss = std::chrono::duration_cast<std::chrono::seconds>(m_EndTime - m_StartTime);
     mm %= 60;
-    MITK_INFO << "Tracking took " << hh.count() << "h and " << mm.count() << "m";
+    ss %= 3600;
+    MITK_INFO << "Tracking took " << hh.count() << "h, " << mm.count() << "m and " << ss.count() << "s";
 }
 
 }

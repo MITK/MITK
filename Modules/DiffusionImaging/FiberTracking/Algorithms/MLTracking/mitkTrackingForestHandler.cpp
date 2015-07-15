@@ -168,6 +168,8 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
         m_FeatureImage->SetPixel(it.GetIndex(), pix);
         ++it;
     }
+
+    m_Forest->multithreadPrediction = false;
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >

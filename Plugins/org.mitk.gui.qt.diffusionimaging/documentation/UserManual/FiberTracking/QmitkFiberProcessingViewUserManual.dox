@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_fiberprocessing Fiber Extraction View
+\page org_mitk_views_fiberprocessing Fiber Processing
 
 This view provides tools to extract subbundles from a given fiber bundle, to remove unwanted fibers (e.g. via length, curvature and directional constraints) and to modify the properties of a fiber bundles such as coloring or fiber sampling.
 

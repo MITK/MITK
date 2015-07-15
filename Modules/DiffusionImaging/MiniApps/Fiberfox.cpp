@@ -68,6 +68,7 @@ int main(int argc, char* argv[])
     if (verbose)
         parameters.SaveParameters(outName+".ffp");
 
+
     mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 
     itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();

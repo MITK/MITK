@@ -82,10 +82,6 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_AddTwButton, SIGNAL ( clicked() ), this, SLOT( AddTrainingWidget() ) );
         connect( m_Controls->m_RemoveTwButton, SIGNAL ( clicked() ), this, SLOT( RemoveTrainingWidget() ) );
 
-        int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
-        m_Controls->m_NumberOfThreadsBox->setMaximum(numThread);
-        m_Controls->m_NumberOfThreadsBox->setValue(numThread);
-
         m_Controls->m_TrackingMaskImageBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_TrackingSeedImageBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_TrackingStopImageBox->SetDataStorage(this->GetDataStorage());
@@ -272,8 +268,9 @@ void QmitkMLBTView::StartTracking()
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
     m_ForestHandler.AddRawData(dwi);
 
+//    int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
+
     tracker = TrackerType::New();
-    tracker->SetNumberOfThreads(m_Controls->m_NumberOfThreadsBox->value());
     tracker->SetInput(0,  mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi) );
     tracker->SetDemoMode(m_Controls->m_DemoModeBox->isChecked());
     if (m_Controls->m_DemoModeBox->isChecked())

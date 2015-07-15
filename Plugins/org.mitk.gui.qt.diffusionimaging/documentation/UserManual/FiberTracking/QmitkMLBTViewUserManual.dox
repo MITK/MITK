@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_mlbtview Machine Learning Based Streamline Tractography View
+\page org_mitk_views_mlbtview Machine Learning Based Streamline Tractography
 
 This view provides the user interface for machine-learning based streamline fiber tractography on diffusion-weighted images. It is dived in two parts: (1) training of the random-forest classifier used for tractography and (2) the actual tractography.
 
@@ -26,7 +26,7 @@ Parameters and options:
 
 \li Input DWI: Input diffusion-weighted image for tractography. Minimum number of gradient directions is 28, since 6th order spherical harmonics are used to spherically interpolate the raw signal.
 \li Num. Seeds: Number of seed points per voxel. If set to 1, the seed is defined as the voxel center. If > 1 the seeds are distributet randomly inside the voxel.
-\li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
+\li Step Size: The algorithm proceeds along the streamline with a fixed stepsize (in voxels). Default is 0.5*minSpacing.
 \li Angular Threshold: Sudden directional changes larger than the specified angle have a probability of 0.
 \li Num. Samples: Number of samples used to probe the local neighborhood.
 \li Sampling Distance: Maximum distance of the sampling points from the current streamline position (in voxel).

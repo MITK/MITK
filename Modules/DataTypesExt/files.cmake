@@ -36,8 +36,8 @@ set(CPP_FILES
 
 set(RESOURCE_FILES
   Interactions/AffineInteraction3D.xml
-  Interactions/AffineConfig.xml
-
+  Interactions/AffineMouseConfig.xml
+  Interactions/AffineKeyConfig.xml
   Interactions/ClippingPlaneInteraction3D.xml
   Interactions/ClippingPlaneTranslationConfig.xml
   Interactions/ClippingPlaneRotationConfig.xml

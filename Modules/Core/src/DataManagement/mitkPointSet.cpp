@@ -396,6 +396,54 @@ mitk::PointSet::PointIdentifier mitk::PointSet::InsertPoint( PointType point, in
     return id;
 }
 
+bool mitk::PointSet::RemovePointIfExists( PointIdentifier id, int t )
+{
+  if ( (unsigned int) t < m_PointSetSeries.size() )
+  {
+    DataType* pointSet = m_PointSetSeries[ t ];
+
+    PointsContainer* points = pointSet->GetPoints();
+    PointDataContainer* pdata = pointSet->GetPointData();
+
+    bool exists = points->IndexExists( id );
+    if ( exists )
+    {
+      points->DeleteIndex(id);
+      pdata->DeleteIndex(id);
+      return true;
+    }
+  }
+  return false;
+}
+
+mitk::PointSet::PointsIterator mitk::PointSet::RemovePointAtEnd( int t )
+{
+  if ( (unsigned int) t < m_PointSetSeries.size() )
+  {
+    DataType* pointSet = m_PointSetSeries[ t ];
+
+    PointsContainer* points = pointSet->GetPoints();
+    PointDataContainer* pdata = pointSet->GetPointData();
+
+    PointsIterator bit = points->Begin();
+    PointsIterator eit = points->End();
+
+    if ( eit != bit )
+    {
+      PointsContainer::ElementIdentifier id = (--eit).Index();
+      points->DeleteIndex(id);
+      pdata->DeleteIndex(id);
+      PointsIterator eit2 = points->End();
+      return --eit2;
+    }
+    else
+    {
+      return eit;
+    }
+  }
+  return m_EmptyPointsContainer->End();
+}
+
 bool mitk::PointSet::SwapPointPosition( PointIdentifier id, bool moveUpwards, int t )
 {
   if(IndexExists(id, t) )

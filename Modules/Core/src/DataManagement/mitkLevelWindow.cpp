@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkLevelWindow.h"
 #include "mitkImage.h"
 #include "mitkImageSliceSelector.h"
@@ -53,23 +52,24 @@ void mitk::LevelWindow::EnsureConsistency()
 }
 
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
-: m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
+  : m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
   m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
   m_DefaultLowerBound( -2048.0 ), m_DefaultUpperBound( 4096.0 ),
-  m_Fixed( false )
+  m_Fixed( false ), m_IsFloatingImage(false)
 {
   SetDefaultLevelWindow(level, window);
   SetLevelWindow(level, window, true);
 }
 
 mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
-: m_LowerWindowBound( levWin.GetLowerWindowBound() )
-, m_UpperWindowBound( levWin.GetUpperWindowBound() )
-, m_RangeMin( levWin.GetRangeMin() )
-, m_RangeMax( levWin.GetRangeMax() )
-, m_DefaultLowerBound( levWin.GetDefaultLowerBound() )
-, m_DefaultUpperBound( levWin.GetDefaultUpperBound() )
-, m_Fixed( levWin.GetFixed() )
+  : m_LowerWindowBound( levWin.GetLowerWindowBound() )
+  , m_UpperWindowBound( levWin.GetUpperWindowBound() )
+  , m_RangeMin( levWin.GetRangeMin() )
+  , m_RangeMax( levWin.GetRangeMax() )
+  , m_DefaultLowerBound( levWin.GetDefaultLowerBound() )
+  , m_DefaultUpperBound( levWin.GetDefaultUpperBound() )
+  , m_Fixed( levWin.GetFixed() )
+  , m_IsFloatingImage( levWin.IsFloatingValues() )
 {
 }
 
@@ -167,7 +167,7 @@ void mitk::LevelWindow::SetDefaultBoundaries(mitk::ScalarType low, mitk::ScalarT
       std::swap(m_DefaultLowerBound,m_DefaultUpperBound);
 
     if (m_DefaultLowerBound == m_DefaultUpperBound )
-        m_DefaultLowerBound--;
+      m_DefaultLowerBound--;
   }
   EnsureConsistency();
 }
@@ -250,6 +250,15 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
 
   if ( image == nullptr || !image->IsInitialized() ) return;
 
+  if ((image->GetPixelType().GetComponentType() == 9) || (image->GetPixelType().GetComponentType() == 10))
+  {
+    // Floating image
+    m_IsFloatingImage = true;
+  } else
+  {
+    m_IsFloatingImage = false;
+  }
+
   const mitk::Image* wholeImage = image;
   ScalarType minValue = 0.0;
   ScalarType maxValue = 0.0;
@@ -306,8 +315,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
   if (   image->GetPixelType().GetPixelType()==itk::ImageIOBase::SCALAR
-      && image->GetPixelType().GetComponentType() == itk::ImageIOBase::INT
-      && image->GetPixelType().GetBpe() >= 8)
+    && image->GetPixelType().GetComponentType() == itk::ImageIOBase::INT
+    && image->GetPixelType().GetBpe() >= 8)
   {
     // the windows compiler complains about ambiguos 'pow' call, therefore static casting to (double, int)
     if (minValue == -( pow( (double) 2.0, static_cast<int>(image->GetPixelType().GetBpe()/2) ) ) )
@@ -324,23 +333,23 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   }
   else
   {
-      //Due to bug #8690 level window now is no longer of fixed range by default but the range adapts according to levelwindow interaction
-      //This is done because the range should be a little bit larger from the beginning so that the scale doesn't start to resize right from the beginning
-      double additionalRange = 0.15*(maxValue-minValue);
-      minValue -= additionalRange;
-      maxValue += additionalRange;
+    //Due to bug #8690 level window now is no longer of fixed range by default but the range adapts according to levelwindow interaction
+    //This is done because the range should be a little bit larger from the beginning so that the scale doesn't start to resize right from the beginning
+    double additionalRange = 0.15*(maxValue-minValue);
+    minValue -= additionalRange;
+    maxValue += additionalRange;
   }
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
-/*
+  /*
   if ( tryPicTags ) // level and window will be set by informations provided directly by the mitkIpPicDescriptor
   {
-    if ( SetAutoByPicTags(const_cast<Image*>(image)->GetPic()) )
-    {
-      return;
-    }
+  if ( SetAutoByPicTags(const_cast<Image*>(image)->GetPic()) )
+  {
+  return;
   }
- */
+  }
+  */
 
   unsigned int numPixelsInDataset = image->GetDimensions()[0];
   for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
@@ -422,15 +431,25 @@ bool mitk::LevelWindow::IsFixed() const
   return m_Fixed;
 }
 
+bool mitk::LevelWindow::IsFloatingValues() const
+{
+  return m_IsFloatingImage;
+}
+
+void mitk::LevelWindow::SetFloatingValues(bool value)
+{
+  m_IsFloatingImage = value;
+}
+
 bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {
   if ( m_RangeMin == levWin.GetRangeMin() &&
     m_RangeMax == levWin.GetRangeMax() &&
     m_LowerWindowBound == levWin.GetLowerWindowBound() && m_UpperWindowBound == levWin.GetUpperWindowBound() &&
-    m_DefaultLowerBound == levWin.GetDefaultLowerBound() && m_DefaultUpperBound == levWin.GetDefaultUpperBound() && m_Fixed == levWin.IsFixed() ) {
-
+    m_DefaultLowerBound == levWin.GetDefaultLowerBound() && m_DefaultUpperBound == levWin.GetDefaultUpperBound() && m_Fixed == levWin.IsFixed() &&
+    m_IsFloatingImage == levWin.IsFloatingValues() ) {
       return true;
-    }
+  }
   else {
     return false;
   }
@@ -454,6 +473,7 @@ mitk::LevelWindow& mitk::LevelWindow::operator=(const mitk::LevelWindow& levWin)
     m_DefaultLowerBound = levWin.GetDefaultLowerBound();
     m_DefaultUpperBound = levWin.GetDefaultUpperBound();
     m_Fixed = levWin.GetFixed();
+    m_IsFloatingImage = levWin.IsFloatingValues();
     return *this;
   }
 }

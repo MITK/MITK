@@ -31,7 +31,7 @@ using namespace std;
 * Constructor
 */
 QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, Qt::WindowFlags f)
- : QWidget(parent, f)
+  : QWidget(parent, f)
 {
   m_Manager = mitk::LevelWindowManager::New();
 
@@ -93,10 +93,19 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
     m_LevelWindow = m_Manager->GetLevelWindow();
     //setValidator();
     QString level;
-    level.setNum((int)(m_LevelWindow.GetLevel()));
-    m_LevelInput->setText(level);
     QString window;
-    window.setNum((int)(m_LevelWindow.GetWindow()));
+    if (m_LevelWindow.IsFloatingValues())
+    {
+      MITK_INFO << "Use a double variant";
+      level.setNum((double)(m_LevelWindow.GetLevel()));
+      window.setNum((double)(m_LevelWindow.GetWindow()));
+    } else
+    {
+      MITK_INFO << "Use a int variant";
+      level.setNum((int)(m_LevelWindow.GetLevel()));
+      window.setNum((int)(m_LevelWindow.GetWindow()));
+    }
+    m_LevelInput->setText(level);
     m_WindowInput->setText(window);
     m_LevelInput->setEnabled(!m_LevelWindow.IsFixed());
     m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());
@@ -139,10 +148,10 @@ void QmitkLineEditLevelWindowWidget::SetDataStorage( mitk::DataStorage* ds )
 //read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetLevelValue()
 {
-    double level = m_LevelInput->text().toDouble();
-    m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
-    m_Manager->SetLevelWindow(m_LevelWindow);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  double level = m_LevelInput->text().toDouble();
+  m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
+  m_Manager->SetLevelWindow(m_LevelWindow);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 //read the windowInput and change window and slider when the button "ENTER" was pressed in the windowInput-LineEdit

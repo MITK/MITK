@@ -68,7 +68,10 @@ IFileIO::ConfidenceLevel SurfaceVtkLegacyIO::GetReaderConfidenceLevel() const
   reader->SetFileName(this->GetLocalFileName().c_str());
   if (reader->IsFilePolyData())
   {
-    return Supported;
+    if (reader->GetHeader() == "vtk output"){
+      return Supported;
+    }
+    else return PartiallySupported;
   }
   return Unsupported;
 }

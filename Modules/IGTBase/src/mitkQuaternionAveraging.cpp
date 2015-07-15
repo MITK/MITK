@@ -29,7 +29,7 @@ mitk::QuaternionAveraging::~QuaternionAveraging()
 
 }
 
-mitk::Quaternion mitk::QuaternionAveraging::CalcAverage(const std::vector<Quaternion>  quaternions, Mode mode)
+mitk::Quaternion mitk::QuaternionAveraging::CalcAverage(const std::vector<Quaternion>& quaternions, Mode mode)
 {
 mitk::Quaternion result;
 switch (mode)

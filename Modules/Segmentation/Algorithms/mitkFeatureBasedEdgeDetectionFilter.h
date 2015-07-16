@@ -72,6 +72,12 @@ protected:
   template <typename TPixel, unsigned int VImageDimension>
   void ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage);
 
+  template <typename TPixel, unsigned int VImageDimension>
+  void ThreadedOpening( itk::Image<TPixel, VImageDimension>* originalImage);
+
+  template <typename TPixel, unsigned int VImageDimension>
+  void ThreadedClosing( itk::Image<TPixel, VImageDimension>* originalImage);
+
 private:
 
   mitk::UnstructuredGrid::Pointer m_PointGrid;

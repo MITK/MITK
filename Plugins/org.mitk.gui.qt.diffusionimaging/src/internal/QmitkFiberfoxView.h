@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionSignalModel.h>
 #include <mitkRicianNoiseModel.h>
 #include <itkTractsToDWIImageFilter.h>
-#include <itkAddArtifactsToDwiImageFilter.h>
 #include <mitkTensorModel.h>
 #include <mitkBallModel.h>
 #include <mitkStickModel.h>
@@ -67,7 +66,6 @@ class QmitkFiberfoxWorker : public QObject
 public:
 
     QmitkFiberfoxWorker(QmitkFiberfoxView* view);
-    int m_FilterType;
 
 public slots:
 
@@ -213,7 +211,6 @@ protected:
 
     /** Image filters that do all the simulations. */
     itk::TractsToDWIImageFilter< short >::Pointer           m_TractsToDwiFilter;
-    itk::AddArtifactsToDwiImageFilter< short >::Pointer     m_ArtifactsToDwiFilter;
 
     friend class QmitkFiberfoxWorker;
 };

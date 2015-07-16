@@ -1,20 +1,21 @@
 /**
 \page org_mitk_views_fiberfoxview Fiberfox DW-MRI Simulation
 
-This view provides the user interface for Fiberfox [1,2,3], an interactive simulation tool for defining artificial white matter fibers and generating corresponding diffusion weighted images.
+This view provides the user interface for Fiberfox [1,2,3], an interactive simulation tool for defining artificial white matter fibers and generating corresponding diffusion-weighted images.
 Arbitrary fiber configurations like bent, crossing, kissing, twisting, and fanning bundles can be intuitively defined by positioning only a few 3D waypoints to trigger the automated generation of synthetic fibers.
-From these fibers a diffusion weighted signal is simulated using a flexible combination of various diffusion models.
+From these fibers a diffusion-weighted signal is simulated using a flexible combination of various diffusion models.
 Instead of using manually created artificial fiber bundles, fibers obtained in any other way, e.g. using fiber tractography, can be used to simulate the signal (Example: <a href="http://www.tractometer.org/ismrm_2015_challenge/">ISMRM Tractography Challenge</a>).
 The simulation can be modified using specified acquisition settings such as gradient direction, b-value, image size, image resolution, echo time, and much more.
 Additionally it enables the simulation of magnetic resonance artifacts including thermal noise, Gibbs ringing, N/2 ghosting, aliasing, susceptibility distortions, eddy currents and motion artifacts.
 The employed parameters can be saved and loaded as xml file with the ending ".ffp" (Fiberfox parameters).
+It is furthermore possible to add artifacts to an already existing diffusion-weighted image.
 
 <b>Available sections:</b>
   - \ref QmitkFiberfoxViewUserManualFiberDefinition
   - \ref QmitkFiberfoxViewUserManualSignalGeneration
   - \ref QmitkFiberfoxViewUserManualKnownIssues
   - \ref QmitkFiberfoxViewUserManualReferences
-\imageMacro{Fiberfox.png, "Fig. 1: Screenshot of the Fiberfox framework. The four render windows display an axial (top left)\, sagittal (top right) and coronal (bottom left) 2D cut as well as a 3D view of a synthetic fiber helix and the fiducials used to define its shape. In the 2D views the helix is superimposing the baseline volume of the corresponding diffusion weighted image. The sagittal render window shows a close-up view on one of the circular fiducials.",16}
+\imageMacro{Fiberfox.png, "Fig. 1: Screenshot of the Fiberfox framework. The four render windows display an axial (top left)\, sagittal (top right) and coronal (bottom left) 2D cut as well as a 3D view of a synthetic fiber helix and the fiducials used to define its shape. In the 2D views the helix is superimposing the baseline volume of the corresponding diffusion-weighted image. The sagittal render window shows a close-up view on one of the circular fiducials.",16}
 
 \section QmitkFiberfoxViewUserManualFiberDefinition Fiber Definition
 
@@ -58,18 +59,20 @@ To generate an artificial signal from the input fibers we follow the concepts re
 a flexible model combining multiple compartments is used to simulate the anisotropic diffusion inside (intra-axonal compartment) and between axons (inter-axonal compartment), isotropic diffusion outside of the axons (extra-axonal compartment 1)
 and the restricted diffusion in other cell types (extra-axonal compartment 2) weighted according to their respective volume fraction.
 
-A diffusion weighted image is generated from the fibers by selecting the according fiber bundle in the "Fiber Bundle" combobox and clicking "Generate Image".
-If some other diffusion weighted image is selected together with the fiber bundle, Fiberfox directly uses the parameters of the selected image (size, spacing, gradient directions, b-values) for the signal generation process.
+A diffusion-weighted image is generated from the fibers by selecting the according fiber bundle in the "Fiber Bundle" combobox and clicking "Generate Image".
+If some other diffusion-weighted image is selected together with the fiber bundle, Fiberfox directly uses the parameters of the selected image (size, spacing, gradient directions, b-values) for the signal generation process.
 Additionally a binary image can be selected that defines the tissue area. Voxels outside of this mask will contain no signal, only noise and other effects induced by the acquisiton (ghosts etc.).
 If a save path is specified, the simualted image will be saved at this location. Eventually generated log files (e.g. recording the head motion) are also saved at this location. If not path is specified,
 the simualted image will only appear in the data manager and has to be saved manually. Logfiles are then saved in the system specific temp directory.
+
+If no fiber bundle but a diffusion-weighted image is selected, the specified artifacts are added to the selected image. In this mode, signal relaxation is disabled since multiple compartments are not available and the input image alrady contains relaxation effects.
 
 
 <b>Basic Image Settings:</b>
 \li <b>Image Dimensions</b>: Specifies actual image size (number of voxels in each dimension).
 \li <b>Image Spacing</b>: Specifies voxel size in mm. Beware that changing the voxel size also changes the signal strength, e.g. increasing the resolution from <em>2x2x2</em> mm to <em>1x1x1</em> mm decreases the signal obtained for each voxel by a factor 8.
 \li <b>Gradient Directions</b>: Number of gradients directions distributed equally over the half sphere. 10% baseline images are automatically added.
-\li <b>b-Value</b>: Diffusion weighting in s/mm². If an existing diffusion weighted image is used to set the basic parameters, the b-value is defined by the gradient direction magnitudes of this image, which also enables the use of multiple b-values.
+\li <b>b-Value</b>: Diffusion weighting in s/mm². If an existing diffusion-weighted image is used to set the basic parameters, the b-value is defined by the gradient direction magnitudes of this image, which also enables the use of multiple b-values.
 
 
 <b>Advanced Image Settings (activate checkbox "Advanced Options"):</b>

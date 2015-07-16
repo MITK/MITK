@@ -54,7 +54,6 @@ set(H_FILES
   Fiberfox/itkTractsToDWIImageFilter.h
   Fiberfox/itkKspaceImageFilter.h
   Fiberfox/itkDftImageFilter.h
-  Fiberfox/itkAddArtifactsToDwiImageFilter.h
   Fiberfox/itkFieldmapGeneratorFilter.h
 
   Fiberfox/SignalModels/mitkDiffusionSignalModel.h

@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberfoxParameters.h>
 #include "mitkCommandLineParser.h"
 
-#include <itkAddArtifactsToDwiImageFilter.h>
 #include <itkTractsToDWIImageFilter.h>
 #include <boost/lexical_cast.hpp>
 

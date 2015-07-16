@@ -52,7 +52,6 @@ public:
     typedef itk::Image<unsigned char, 3>                                ItkUcharImgType;
     typedef mitk::FiberBundle::Pointer                                  FiberBundleType;
     typedef itk::VectorImage< double, 3 >                               DoubleDwiType;
-    typedef itk::VectorImage< double, 4 >                               DoubleDwiType4D;
     typedef itk::Matrix<double, 3, 3>                                   MatrixType;
     typedef itk::Image< double, 2 >                                     SliceType;
     typedef itk::VnlForwardFFTImageFilter<SliceType>::OutputImageType   ComplexSliceType;
@@ -65,6 +64,7 @@ public:
 
     /** Input */
     itkSetMacro( FiberBundle, FiberBundleType )             ///< Input fiber bundle
+    itkSetMacro( InputImage, typename OutputImageType::Pointer )     ///< Input diffusion-weighted image. If no fiber bundle is set, then the acquisition is simulated for this image without a new diffusion simulation.
     itkSetMacro( UseConstantRandSeed, bool )                ///< Seed for random generator.
     void SetParameters( FiberfoxParameters<double> param )  ///< Simulation parameters.
     { m_Parameters = param; }
@@ -111,6 +111,7 @@ protected:
     // input
     mitk::FiberfoxParameters<double>            m_Parameters;
     FiberBundleType                             m_FiberBundle;
+    typename OutputImageType::Pointer           m_InputImage;
 
     // output
     typename OutputImageType::Pointer           m_OutputImage;

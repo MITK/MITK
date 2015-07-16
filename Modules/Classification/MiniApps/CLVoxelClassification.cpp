@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCostingStatistic.h>
 #include <vtkSmartPointer.h>
 
+#include <mitkDataCollectionUtilities.h>
+
 // ----------------------- Forest Handling ----------------------
 //#include <mitkDecisionForest.h>
 #include <mitkVigraRandomForestClassifier.h>
@@ -216,21 +218,17 @@ int main(int argc, char* argv[])
     // If required do Training....
     //////////////////////////////////////////////////////////////////////////////
     //mitk::DecisionForest forest;
-    mitk::VigraRandomForestClassifier forest;
-    forest.SetModalities(modalities);
-    forest.SetMaskName(trainMask);
-    forest.SetResultMask(resultMask);
-    forest.SetResultProb(resultProb);
-    forest.UseWeightedPoints(false);
-    forest.UseRandomSplit(randomSplit);
 
+    mitk::VigraRandomForestClassifier forest;
+    forest.SetSamplesPerTree(samplesPerTree);
     forest.SetMinimumSplitNodeSize(minimumSplitNodeSize);
     forest.SetTreeCount(numberOfTrees);
-    forest.SetSamplesPerTree(samplesPerTree);
     forest.UseSampleWithReplacement(sampleWithReplacement);
     forest.SetPrecision(trainPrecision);
     forest.SetMaximumTreeDepth(maximumTreeDepth);
     forest.SetWeightLambda(weightLambda);
+
+    // TOOD forest.UseRandomSplit(randomSplit);
 
     if (doTraining)
     {
@@ -241,12 +239,15 @@ int main(int argc, char* argv[])
       // 4 = Zadrozny
       // 5 = Spectral
       // 6 = uLSIF
-      forest.SetCollection(trainCollection);
+      auto trainDataX = mitk::DCUtilities::DC3dDToMatrixXd(trainCollection, modalities, trainMask);
+      auto trainDataY = mitk::DCUtilities::DC3dDToMatrixXi(trainCollection, trainMask, trainMask);
+
       if (useWeightedPoints)
       {
         MITK_INFO << "Activated Point-based weighting...";
-        forest.UseWeightedPoints(true);
-        forest.SetWeightName("calculated_weight");
+        //forest.UseWeightedPoints(true);
+        forest.UsePointWiseWeight(true);
+        //forest.SetWeightName("calculated_weight");
         /*if (importanceWeightAlgorithm == 1)
         {
         mitk::KNNDensityEstimation est;
@@ -306,11 +307,13 @@ int main(int argc, char* argv[])
           est.Update();
         }
       }
-      forest.Train();
-      forest.Save(forestPath);
+      auto trainDataW = mitk::DCUtilities::DC3dDToMatrixXd(trainCollection, "calculated_weight", trainMask);
+      forest.SetPointWiseWeight(trainDataW);
+      forest.Train(trainDataX, trainDataY);
+      // TODO forest.Save(forestPath);
     } else
     {
-      forest.Load(forestPath);
+      // TODO forest.Load(forestPath);
     }
 
     time(&now);
@@ -324,10 +327,14 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // If required do test
     //////////////////////////////////////////////////////////////////////////////
-    forest.SetMaskName(testMask);
-    forest.SetCollection(testCollection);
-    forest.Test();
-    forest.PrintTree(0);
+    auto testDataX = mitk::DCUtilities::DC3dDToMatrixXd(testCollection,modalities, testMask);
+    auto testDataNewY = forest.Predict(testDataX);
+
+    mitk::DCUtilities::MatrixToDC3d(testDataNewY, testCollection, resultMask, testMask);
+    //forest.SetMaskName(testMask);
+    //forest.SetCollection(testCollection);
+    //forest.Test();
+    //forest.PrintTree(0);
 
     time(&now);
     seconds =  std::difftime(now, lastTimePoint);
@@ -338,32 +345,33 @@ int main(int argc, char* argv[])
     // Cost-based analysis
     //////////////////////////////////////////////////////////////////////////////
 
-    MITK_INFO << "Calculate Cost-based Statistic ";
-    mitk::CostingStatistic costStat;
-    costStat.SetCollection(forest.GetCollection());
-    costStat.SetCombinedA("combinedHealty");
-    costStat.SetCombinedB("combinedTumor");
-    costStat.SetCombinedLabel("combinedLabel");
-    costStat.SetMaskName(testMask);
-    //std::vector<std::string> labelHealthy;
-    //labelHealthy.push_back("result_prop_Class-0");
-    //labelHealthy.push_back("result_prop_Class-4");
-    //std::vector<std::string> labelTumor;
-    //labelTumor.push_back("result_prop_Class-1");
-    //labelTumor.push_back("result_prop_Class-2");
-    //labelTumor.push_back("result_prop_Class-3");
-    costStat.SetProbabilitiesA(labelGroupA);
-    costStat.SetProbabilitiesB(labelGroupB);
+    // TODO Reactivate
+    //MITK_INFO << "Calculate Cost-based Statistic ";
+    //mitk::CostingStatistic costStat;
+    //costStat.SetCollection(testCollection);
+    //costStat.SetCombinedA("combinedHealty");
+    //costStat.SetCombinedB("combinedTumor");
+    //costStat.SetCombinedLabel("combinedLabel");
+    //costStat.SetMaskName(testMask);
+    ////std::vector<std::string> labelHealthy;
+    ////labelHealthy.push_back("result_prop_Class-0");
+    ////labelHealthy.push_back("result_prop_Class-4");
+    ////std::vector<std::string> labelTumor;
+    ////labelTumor.push_back("result_prop_Class-1");
+    ////labelTumor.push_back("result_prop_Class-2");
+    ////labelTumor.push_back("result_prop_Class-3");
+    //costStat.SetProbabilitiesA(labelGroupA);
+    //costStat.SetProbabilitiesB(labelGroupB);
 
-    std::ofstream costStatisticFile;
-    costStatisticFile.open((statisticFilePath + ".cost").c_str(), std::ios::app);
-    std::ofstream lcostStatisticFile;
+    //std::ofstream costStatisticFile;
+    //costStatisticFile.open((statisticFilePath + ".cost").c_str(), std::ios::app);
+    //std::ofstream lcostStatisticFile;
 
-    lcostStatisticFile.open((statisticFilePath + ".longcost").c_str(), std::ios::app);
-    costStat.WriteStatistic(lcostStatisticFile,costStatisticFile,2.5,statisticShortFileLabel);
-    costStatisticFile.close();
+    //lcostStatisticFile.open((statisticFilePath + ".longcost").c_str(), std::ios::app);
+    //costStat.WriteStatistic(lcostStatisticFile,costStatisticFile,2.5,statisticShortFileLabel);
+    //costStatisticFile.close();
 
-    costStat.CalculateClass(50);
+    //costStat.CalculateClass(50);
 
     //////////////////////////////////////////////////////////////////////////////
     // Save results to folder
@@ -372,7 +380,7 @@ int main(int argc, char* argv[])
     //outputFilter.push_back(resultMask);
     //std::vector<std::string> propNames = forest.GetListOfProbabilityNames();
     //outputFilter.insert(outputFilter.begin(), propNames.begin(), propNames.end());
-    mitk::CollectionWriter::ExportCollectionToFolder(forest.GetCollection(),
+    mitk::CollectionWriter::ExportCollectionToFolder(testCollection,
       outputFolder + "/result_collection.xml",
       outputFilter);
 
@@ -386,7 +394,7 @@ int main(int argc, char* argv[])
     sstatisticFile.open(statisticShortFilePath.c_str(), std::ios::app);
 
     mitk::CollectionStatistic stat;
-    stat.SetCollection(forest.GetCollection());
+    stat.SetCollection(testCollection);
     stat.SetClassCount(2);
     stat.SetGoldName(statisticGoldStandard);
     stat.SetTestName(resultMask);

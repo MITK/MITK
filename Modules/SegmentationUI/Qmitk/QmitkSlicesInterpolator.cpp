@@ -880,8 +880,6 @@ void::QmitkSlicesInterpolator::RunPlaneSuggestion()
   m_PlaneSuggester->SetInput(scoredGrid);
   m_PlaneSuggester->SetMinPts(4);
   m_PlaneSuggester->SetEps(spacing);
-  m_PlaneSuggester->SetUseDistances(true);
-  m_PlaneSuggester->SetNumberOfUsedClusters(10);
   m_PlaneSuggester->Update();
 
   mitk::GeometryData::Pointer geoData = m_PlaneSuggester->GetGeoData();

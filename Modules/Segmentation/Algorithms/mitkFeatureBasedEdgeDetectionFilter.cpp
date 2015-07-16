@@ -35,6 +35,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNeighborhoodIterator.h>
 #include <mitkImageToUnstructuredGridFilter.h>
 
+#include <itkSimpleContourExtractorImageFilter.h>
+#include <mitkImageCast.h>
+#include <itkTimeProbe.h>
+
 mitk::FeatureBasedEdgeDetectionFilter::FeatureBasedEdgeDetectionFilter()
 {
   m_PointGrid = mitk::UnstructuredGrid::New();
@@ -48,7 +52,8 @@ mitk::FeatureBasedEdgeDetectionFilter::FeatureBasedEdgeDetectionFilter()
 }
 
 mitk::FeatureBasedEdgeDetectionFilter::~FeatureBasedEdgeDetectionFilter(){}
-
+#include <itkErodeObjectMorphologyImageFilter.h>
+#include <itkDilateObjectMorphologyImageFilter.h>
 void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
 {
   mitk::Image::ConstPointer image = ImageToUnstructuredGridFilter::GetInput();
@@ -73,8 +78,6 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   double upperThreshold = mean + stdDev;
   double lowerThreshold = mean - stdDev;
 
-  std::cout << "Lower: " << lowerThreshold << " - Upper: " << upperThreshold << std::endl;
-
   //thresholding
   AccessByItk_2(ncImage.GetPointer(), ITKThresholding, lowerThreshold, upperThreshold)
 
@@ -85,13 +88,25 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
 
   mitk::ProgressBar::GetInstance()->Progress();
 
-  mitk::MorphologicalOperations::Closing(m_thresholdImage, 1, mitk::MorphologicalOperations::Ball);
-  mitk::MorphologicalOperations::FillHoles(m_thresholdImage);
-//  mitk::MorphologicalOperations::Opening(m_thresholdImage,1,mitk::MorphologicalOperations::Ball);
+//  mitk::MorphologicalOperations::Closing(m_thresholdImage, 1, mitk::MorphologicalOperations::Ball);
+//  mitk::MorphologicalOperations::FillHoles(m_thresholdImage);
+////  mitk::MorphologicalOperations::Opening(m_thresholdImage,1,mitk::MorphologicalOperations::Ball);
+///
+
+  itk::TimeProbe clock;
+  clock.Start();
+
+  AccessByItk(m_thresholdImage, ThreadedClosing);
+//  AccessByItk(m_TestImage, ThreadedOpening);
+  mitk::MorphologicalOperations::FillHoles(m_TestImage);
+
+  clock.Stop();
+  std::cout << "Time needed: " << clock.GetTotal() << std::endl;
 
   mitk::ProgressBar::GetInstance()->Progress();
 
-  AccessByItk(m_thresholdImage,ContourSearch)
+//  AccessByItk(m_thresholdImage,ContourSearch)
+  AccessByItk(m_TestImage,ContourSearch)
 
       //m_TestImage
   mitk::ImageToUnstructuredGridFilter::Pointer i2UFilter = mitk::ImageToUnstructuredGridFilter::New();
@@ -105,8 +120,59 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   mitk::ProgressBar::GetInstance()->Progress();
 }
 
-#include <itkSimpleContourExtractorImageFilter.h>
-#include <mitkImageCast.h>
+#include <itkBinaryBallStructuringElement.h>
+
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::FeatureBasedEdgeDetectionFilter::ThreadedClosing( itk::Image<TPixel, VImageDimension>* originalImage)
+{
+  typedef itk::BinaryBallStructuringElement<TPixel, VImageDimension> myKernelType;
+
+  myKernelType ball;
+  ball.SetRadius(1);
+  ball.CreateStructuringElement();
+
+  typedef typename itk::Image<TPixel, VImageDimension> ImageType;
+
+  typename itk::DilateObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::Pointer dilationFilter = itk::DilateObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::New();
+  dilationFilter->SetInput(originalImage);
+  dilationFilter->SetKernel(ball);
+  dilationFilter->Update();
+
+  typename itk::Image<TPixel, VImageDimension>::Pointer dilatedImage = dilationFilter->GetOutput();
+
+  typename itk::ErodeObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::Pointer erodeFilter = itk::ErodeObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::New();
+  erodeFilter->SetInput(dilatedImage);
+  erodeFilter->SetKernel(ball);
+  erodeFilter->Update();
+
+  mitk::CastToMitkImage(erodeFilter->GetOutput(), m_TestImage);
+}
+
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::FeatureBasedEdgeDetectionFilter::ThreadedOpening( itk::Image<TPixel, VImageDimension>* originalImage)
+{
+  typedef itk::BinaryBallStructuringElement<TPixel, VImageDimension> myKernelType;
+
+  myKernelType ball;
+  ball.SetRadius(1);
+  ball.CreateStructuringElement();
+
+  typedef typename itk::Image<TPixel, VImageDimension> ImageType;
+
+  typename itk::ErodeObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::Pointer erodeFilter = itk::ErodeObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::New();
+  erodeFilter->SetInput(originalImage);
+  erodeFilter->SetKernel(ball);
+  erodeFilter->Update();
+
+  typename itk::Image<TPixel, VImageDimension>::Pointer erodedImage = erodeFilter->GetOutput();
+
+  typename itk::DilateObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::Pointer dilationFilter = itk::DilateObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::New();
+  dilationFilter->SetInput(erodedImage);
+  dilationFilter->SetKernel(ball);
+  dilationFilter->Update();
+
+  mitk::CastToMitkImage(erodeFilter->GetOutput(), m_TestImage);
+}
 
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::FeatureBasedEdgeDetectionFilter::ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage)
@@ -140,6 +206,10 @@ void mitk::FeatureBasedEdgeDetectionFilter::ITKThresholding( itk::Image<TPixel, 
     //round the thresholds if we have nor a float or double image
     lower = std::floor(lower + 0.5);
     upper = std::floor(upper - 0.5);
+  }
+  if(lower >= upper)
+  {
+    upper = lower;
   }
 
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();

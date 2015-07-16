@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUnstructuredGridClusteringFilter.h>
 
 
-mitk::ClusteredPlaneSuggestionFilter::ClusteredPlaneSuggestionFilter(): m_Meshing(false), m_MinPts(4), m_Eps(1.2), m_UseDistances(false), m_NumberOfUsedClusters(3)
+mitk::ClusteredPlaneSuggestionFilter::ClusteredPlaneSuggestionFilter(): m_Meshing(false), m_MinPts(4), m_Eps(1.2), m_UseDistances(true), m_NumberOfUsedClusters(3)
 {
   this->m_MainCluster = mitk::UnstructuredGrid::New();
   this->m_GeoData = mitk::GeometryData::New();

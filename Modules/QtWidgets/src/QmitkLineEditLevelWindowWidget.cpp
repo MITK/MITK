@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLayout>
 #include <QLineEdit>
 #include <limits>
+#include <sstream>
 
 using namespace std;
 
@@ -96,12 +97,14 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
     QString window;
     if (m_LevelWindow.IsFloatingValues())
     {
-      MITK_INFO << "Use a double variant";
-      level.setNum((double)(m_LevelWindow.GetLevel()));
-      window.setNum((double)(m_LevelWindow.GetWindow()));
+      std::stringstream ssLevel;
+      std::stringstream ssWindow;
+      ssLevel << std::setprecision(3) << m_LevelWindow.GetLevel();
+      ssWindow << std::setprecision(3) << m_LevelWindow.GetWindow();
+      level = ssLevel.str().c_str();
+      window = ssWindow.str().c_str();
     } else
     {
-      MITK_INFO << "Use a int variant";
       level.setNum((int)(m_LevelWindow.GetLevel()));
       window.setNum((int)(m_LevelWindow.GetWindow()));
     }

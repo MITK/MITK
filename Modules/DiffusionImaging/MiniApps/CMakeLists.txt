@@ -3,15 +3,15 @@ option(BUILD_DiffusionMiniApps "Build commandline tools for diffusion" OFF)
 if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 
 
-        find_package(OpenMP)
-        if(NOT OPENMP_FOUND)
-           message("OpenMP is not available.")
-        endif()
-        if(OPENMP_FOUND)
-          message(STATUS "Found OpenMP.")
-          set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        endif()
+find_package(OpenMP)
+if(NOT OPENMP_FOUND)
+   message("OpenMP is not available.")
+endif()
+if(OPENMP_FOUND)
+  message(STATUS "Found OpenMP.")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
   # needed include directories
   include_directories(

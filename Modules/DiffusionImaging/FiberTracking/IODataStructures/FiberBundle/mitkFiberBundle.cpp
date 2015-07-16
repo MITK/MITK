@@ -787,7 +787,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                             }
                         }
                     }
-                    else if ( mask->GetPixel(idxStart)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart) || mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
+                    else if ( (mask->GetPixel(idxStart)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart)) || (mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxEnd)) )
                     {
                         for (int j=0; j<numPointsOriginal; j++)
                         {
@@ -886,7 +886,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
     newPolyData->SetPoints(vtkNewPoints);
     newPolyData->SetLines(vtkNewCells);
     mitk::FiberBundle::Pointer newFib = mitk::FiberBundle::New(newPolyData);
-    newFib->ResampleSpline(minSpacing/2);
+    newFib->Compress(0.1);
     return newFib;
 }
 

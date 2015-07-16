@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_fiberfoxview Fiberfox
+\page org_mitk_views_fiberfoxview Fiberfox DW-MRI Simulation
 
 This view provides the user interface for Fiberfox [1,2,3], an interactive simulation tool for defining artificial white matter fibers and generating corresponding diffusion weighted images.
 Arbitrary fiber configurations like bent, crossing, kissing, twisting, and fanning bundles can be intuitively defined by positioning only a few 3D waypoints to trigger the automated generation of synthetic fibers.

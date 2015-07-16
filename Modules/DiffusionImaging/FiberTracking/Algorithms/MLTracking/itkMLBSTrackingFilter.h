@@ -115,7 +115,7 @@ public:
     ~MLBSTrackingFilter() {}
 
     void CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& dir);    ///< Calculate next integration step.
-    double FollowStreamline(ThreadIdType threadId, itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front);       ///< Start streamline in one direction.
+    double FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front);       ///< Start streamline in one direction.
     bool IsValidPosition(itk::Point<double, 3>& pos);   ///< Are we outside of the mask image?
     vnl_vector_fixed<double,3> GetNewDirection(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& olddir); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 

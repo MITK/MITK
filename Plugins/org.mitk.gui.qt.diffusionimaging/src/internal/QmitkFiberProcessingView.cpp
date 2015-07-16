@@ -922,8 +922,14 @@ void QmitkFiberProcessingView::UpdateGui()
         {
             m_Controls->m_InputData->setTitle("Input Data");
             m_Controls->m_PfLabel->setText(QString(m_MaskImageNode->GetName().c_str()));
-            m_Controls->m_RemoveButton->setEnabled(true);
             m_Controls->m_ExtractFibersButton->setEnabled(true);
+        }
+
+        if (maskSelected && (m_Controls->m_RemovalMethodBox->currentIndex()==3 || m_Controls->m_RemovalMethodBox->currentIndex()==4) )
+        {
+            m_Controls->m_InputData->setTitle("Input Data");
+            m_Controls->m_PfLabel->setText(QString(m_MaskImageNode->GetName().c_str()));
+            m_Controls->m_RemoveButton->setEnabled(true);
         }
     }
 

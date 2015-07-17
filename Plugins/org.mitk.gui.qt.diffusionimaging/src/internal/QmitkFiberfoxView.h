@@ -170,6 +170,7 @@ protected:
     void DisableCrosshairNavigation();              ///< disable crosshair navigation if planar figure interaction starts
     void NodeAdded( const mitk::DataNode* node ) override;   ///< add observers
     void NodeRemoved(const mitk::DataNode* node) override;   ///< remove observers
+    void SaveParameters(QString filename);
 
     /** structure to keep track of planar figures and observers */
     struct QmitkPlanarFigureData

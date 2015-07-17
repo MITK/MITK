@@ -65,7 +65,7 @@ Additionally a binary image can be selected that defines the tissue area. Voxels
 If a save path is specified, the simualted image will be saved at this location. Eventually generated log files (e.g. recording the head motion) are also saved at this location. If not path is specified,
 the simualted image will only appear in the data manager and has to be saved manually. Logfiles are then saved in the system specific temp directory.
 
-If no fiber bundle but a diffusion-weighted image is selected, the specified artifacts are added to the selected image. In this mode, signal relaxation is disabled since multiple compartments are not available and the input image alrady contains relaxation effects.
+If no fiber bundle but a diffusion-weighted image is selected, the specified artifacts are added to the selected image. In this mode, signal relaxation is disabled since multiple compartments are not available and the input image alrady contains relaxation effects. Also, introducing head motion is not possible since this qould require a contrast change in the weighted volumes.
 
 
 <b>Basic Image Settings:</b>

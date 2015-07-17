@@ -463,7 +463,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-70</y>
+        <y>0</y>
         <width>355</width>
         <height>380</height>
        </rect>
@@ -852,7 +852,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>280</width>
+        <width>355</width>
         <height>349</height>
        </rect>
       </property>
@@ -1023,7 +1023,7 @@
          </property>
          <item>
           <property name="text">
-           <string>Smooth fibers</string>
+           <string>Resample fibers</string>
           </property>
          </item>
          <item>
@@ -1203,8 +1203,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>360</width>
-        <height>104</height>
+        <width>368</width>
+        <height>152</height>
        </rect>
       </property>
       <attribute name="label">

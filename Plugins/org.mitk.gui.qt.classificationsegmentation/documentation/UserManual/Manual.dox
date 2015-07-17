@@ -1,17 +1,18 @@
 /**
-\page org_mitk_gui_qt_classificationsegmentation The Classificationsegmentation
+\page org_mitk_gui_qt_classificationsegmentation The Classificationsegmentation Plugin
 
-\imageMacro{icon.png,"Icon of Classificationsegmentation",2.00}
+\imageMacro{icon.png,"Icon of Classificationsegmentation Plugin",2.00}
 
 \tableofcontents
 
 \section org_mitk_gui_qt_classificationsegmentationOverview Overview
-Describe the features of your awesome plugin here
+Segmentation of the classes:
 <ul>
-<li>Increases productivity
-<li>Creates beautiful images
-<li>Generates PhD thesis
-<li>Brings world peace
+<li>CSF (value of 1)
+<li>Lesion (value of 2)
+<li>Brain (value of 3)
 </ul>
+
+using a random forest based approach.
 
 */

@@ -32,6 +32,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_gui_qt_aicpregistration
   \li \subpage org_mitk_gui_qt_igtlplugin
   \li \subpage org_mitk_gui_qt_geometrytools
+  \li \subpage org_mitk_gui_qt_classificationsegmentation
   
 \section PluginListPageDevPluginList List of Plugins for Developer Use and Examples
 

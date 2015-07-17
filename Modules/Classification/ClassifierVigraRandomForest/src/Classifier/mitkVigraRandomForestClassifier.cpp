@@ -43,22 +43,23 @@ struct mitk::VigraRandomForestClassifier::Parameter
   double Precision;
   double WeightLambda;
   double SamplesPerTree;
-
 };
 
 struct mitk::VigraRandomForestClassifier::TrainingData
 {
   TrainingData(unsigned int numberOfTrees,
-               const vigra::RandomForest<int> & refRF,
-               const DefaultSplitType & refSplitter,
-               const vigra::MultiArrayView<2, double> refFeature,
-               const vigra::MultiArrayView<2, int> refLabel)
+    const vigra::RandomForest<int> & refRF,
+    const DefaultSplitType & refSplitter,
+    const vigra::MultiArrayView<2, double> refFeature,
+    const vigra::MultiArrayView<2, int> refLabel,
+    const Parameter parameter)
     : m_ClassCount(0),
-      m_NumberOfTrees(numberOfTrees),
-      m_RandomForest(refRF),
-      m_Splitter(refSplitter),
-      m_Feature(refFeature),
-      m_Label(refLabel)
+    m_NumberOfTrees(numberOfTrees),
+    m_RandomForest(refRF),
+    m_Splitter(refSplitter),
+    m_Feature(refFeature),
+    m_Label(refLabel),
+    m_Parameter(parameter)
   {
     m_mutex = itk::FastMutexLock::New();
   }
@@ -71,18 +72,19 @@ struct mitk::VigraRandomForestClassifier::TrainingData
   const vigra::MultiArrayView<2, double> m_Feature;
   const vigra::MultiArrayView<2, int> m_Label;
   itk::FastMutexLock::Pointer m_mutex;
+  Parameter m_Parameter;
 };
 
 struct mitk::VigraRandomForestClassifier::PredictionData
 {
   PredictionData(const vigra::RandomForest<int> & refRF,
-                 const vigra::MultiArrayView<2, double> refFeature,
-                 vigra::MultiArrayView<2, int> refLabel,
-                 vigra::MultiArrayView<2, double> refProb)
+    const vigra::MultiArrayView<2, double> refFeature,
+    vigra::MultiArrayView<2, int> refLabel,
+    vigra::MultiArrayView<2, double> refProb)
     : m_RandomForest(refRF),
-      m_Feature(refFeature),
-      m_Label(refLabel),
-      m_Probabilities(refProb)
+    m_Feature(refFeature),
+    m_Label(refLabel),
+    m_Probabilities(refProb)
   {
   }
   const vigra::RandomForest<int> & m_RandomForest;
@@ -99,7 +101,6 @@ mitk::VigraRandomForestClassifier::VigraRandomForestClassifier()
 
 mitk::VigraRandomForestClassifier::~VigraRandomForestClassifier()
 {
-
 }
 
 bool mitk::VigraRandomForestClassifier::SupportsPointWiseWeight()
@@ -119,7 +120,6 @@ void mitk::VigraRandomForestClassifier::OnlineTrain(const Eigen::MatrixXd & X_in
   m_RandomForest.onlineLearn(X,Y,0,true);
 }
 
-
 void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in)
 {
   this->ConvertParameter();
@@ -129,7 +129,6 @@ void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, cons
   splitter.UseRandomSplit(m_Parameter->UseRandomSplit);
   splitter.SetPrecision(m_Parameter->Precision);
   splitter.SetMaximumTreeDepth(m_Parameter->TreeDepth);
-
 
   // Weights handled as member variable
   if (m_Parameter->UsePointBasedWeights)
@@ -144,11 +143,16 @@ void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, cons
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
   vigra::MultiArrayView<2, int> Y(vigra::Shape2(Y_in.rows(),Y_in.cols()),Y_in.data());
 
-
   m_RandomForest.set_options().tree_count(1); // Number of trees that are calculated;
+
+  m_RandomForest.set_options().use_stratification(m_Parameter->Stratification);
+  m_RandomForest.set_options().sample_with_replacement(m_Parameter->SampleWithReplacement);
+  m_RandomForest.set_options().samples_per_tree(m_Parameter->SamplesPerTree);
+  m_RandomForest.set_options().min_split_node_size(m_Parameter->MinimumSplitNodeSize);
+
   m_RandomForest.learn(X, Y,vigra::rf::visitors::VisitorBase(),splitter);
 
-  std::auto_ptr<TrainingData> data(new TrainingData(m_Parameter->TreeCount,m_RandomForest,splitter,X,Y));
+  std::auto_ptr<TrainingData> data(new TrainingData(m_Parameter->TreeCount,m_RandomForest,splitter,X,Y, *m_Parameter));
 
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
   threader->SetSingleMethod(this->TrainTreesCallback,data.get());
@@ -162,7 +166,6 @@ void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, cons
 
 Eigen::MatrixXi mitk::VigraRandomForestClassifier::Predict(const Eigen::MatrixXd &X_in)
 {
-
   // Initialize output Eigen matrices
   m_OutProbability = Eigen::MatrixXd(X_in.rows(),m_RandomForest.class_count());
   m_OutProbability.fill(0);
@@ -183,10 +186,8 @@ Eigen::MatrixXi mitk::VigraRandomForestClassifier::Predict(const Eigen::MatrixXd
   return m_OutLabel;
 }
 
-
 ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(void * arg)
 {
-
   // Get the ThreadInfoStruct
   typedef itk::MultiThreader::ThreadInfoStruct  ThreadInfoType;
   ThreadInfoType * infoStruct = static_cast< ThreadInfoType * >( arg );
@@ -214,6 +215,10 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
 
     rf.trees_.clear();
     rf.set_options().tree_count(numberOfTreesToCalculate);
+    rf.set_options().use_stratification(data->m_Parameter.Stratification);
+    rf.set_options().sample_with_replacement(data->m_Parameter.SampleWithReplacement);
+    rf.set_options().samples_per_tree(data->m_Parameter.SamplesPerTree);
+    rf.set_options().min_split_node_size(data->m_Parameter.MinimumSplitNodeSize);
     rf.learn(data->m_Feature, data->m_Label,vigra::rf::visitors::VisitorBase(),splitter);
 
     data->m_mutex->Lock();
@@ -223,16 +228,13 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
 
     data->m_ClassCount = rf.class_count();
     data->m_mutex->Unlock();
-
   }
 
   return ITK_THREAD_RETURN_VALUE;
 }
 
-
 ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictCallback(void * arg)
 {
-
   // Get the ThreadInfoStruct
   typedef itk::MultiThreader::ThreadInfoStruct  ThreadInfoType;
   ThreadInfoType * infoStruct = static_cast< ThreadInfoType * >( arg );
@@ -280,7 +282,6 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictCallback(void *
   //ITK_THREAD_RETURN_TYPE value = NULL;
   return ITK_THREAD_RETURN_VALUE;
 }
-
 
 void  mitk::VigraRandomForestClassifier::ConvertParameter()
 {
@@ -430,4 +431,3 @@ std::vector<std::string> mitk::VigraRandomForestClassifier::GetItemList()
   }
   return result;
 }
-

@@ -38,6 +38,9 @@ namespace mitk
     static void MatrixToDC3d(const Eigen::MatrixXi &matrix, mitk::DataCollection::Pointer dc, const std::vector<std::string> &names, std::string mask);
     static void MatrixToDC3d(const Eigen::MatrixXd &matrix, mitk::DataCollection::Pointer dc, const std::string &names, std::string mask);
     static void MatrixToDC3d(const Eigen::MatrixXi &matrix, mitk::DataCollection::Pointer dc, const std::string &names, std::string mask);
+
+    static void EnsureUCharImageInDC(mitk::DataCollection::Pointer dc, std::string name, std::string origin);
+    static void EnsureDoubleImageInDC(mitk::DataCollection::Pointer dc, std::string name, std::string origin);
   };
 }
 

@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
   bool readFile = true;
   std::stringstream ss;
-  for (int i = 3; i < argc; ++i )
+  for (int i = 0; i < argc; ++i )
   {
     MITK_INFO << "-----"<< argv[i]<<"------";
     if (readFile)
@@ -242,7 +242,8 @@ int main(int argc, char* argv[])
       auto trainDataX = mitk::DCUtilities::DC3dDToMatrixXd(trainCollection, modalities, trainMask);
       auto trainDataY = mitk::DCUtilities::DC3dDToMatrixXi(trainCollection, trainMask, trainMask);
 
-      if (useWeightedPoints)
+      //if (useWeightedPoints)
+      if (false)
       {
         MITK_INFO << "Activated Point-based weighting...";
         //forest.UseWeightedPoints(true);
@@ -306,9 +307,10 @@ int main(int argc, char* argv[])
           est.SetWeightName("calculated_weight");
           est.Update();
         }
+        auto trainDataW = mitk::DCUtilities::DC3dDToMatrixXd(trainCollection, "calculated_weight", trainMask);
+        forest.SetPointWiseWeight(trainDataW);
+        forest.UsePointWiseWeight(true);
       }
-      auto trainDataW = mitk::DCUtilities::DC3dDToMatrixXd(trainCollection, "calculated_weight", trainMask);
-      forest.SetPointWiseWeight(trainDataW);
       forest.Train(trainDataX, trainDataY);
       // TODO forest.Save(forestPath);
     } else

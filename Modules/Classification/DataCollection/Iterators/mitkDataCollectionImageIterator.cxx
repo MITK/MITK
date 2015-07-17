@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template <typename TDataType, int TImageDimension>
 mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-DataCollectionImageIterator(DataCollection::Pointer collection, std::string imageName) :
+  DataCollectionImageIterator(DataCollection::Pointer collection, std::string imageName) :
   m_Collection(collection), m_ImageName(imageName), m_IsAtEnd(false),
   m_IteratingImages(true), m_CurrentIndex(0),
   m_CurrentElement(0), m_CurrentCollectionIterator(0)
@@ -32,8 +32,8 @@ DataCollectionImageIterator(DataCollection::Pointer collection, std::string imag
 
 template <typename TDataType, int TImageDimension>
 void
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-ToBegin()
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  ToBegin()
 {
   m_IsAtEnd = false;
   m_IteratingImages = false;
@@ -74,59 +74,55 @@ ToBegin()
     if (m_CurrentCollectionIterator == 0)
     {
       m_IsAtEnd = true;
-
-      MITK_ERROR << "collection '" << m_Collection->GetName() << "' does not contain item '" << m_ImageName << "'";
-    }
-    else
+    } else
     {
-        m_CurrentIterator = m_CurrentCollectionIterator->GetImageIterator();
+      m_CurrentIterator = m_CurrentCollectionIterator->GetImageIterator();
     }
   }
 }
 
 template <typename TDataType, int TImageDimension>
 bool
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-IsAtEnd()
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  IsAtEnd()
 {
   return m_IsAtEnd;
 }
 
 template <typename TDataType, int TImageDimension>
 void
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-operator++()
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  operator++()
 {
   ++m_CurrentIndex;
   ++m_CurrentIterator;
 
-    if (m_CurrentIterator.IsAtEnd())
-    {
-        ++m_ImageIndex;
-        NextObject();
-    }
+  if (m_CurrentIterator.IsAtEnd())
+  {
+    ++m_ImageIndex;
+    NextObject();
+  }
 }
 
 template <typename TDataType, int TImageDimension>
 void
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-operator++(int)
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  operator++(int)
 {
-    ++m_CurrentIndex;
-    ++m_CurrentIterator;
+  ++m_CurrentIndex;
+  ++m_CurrentIterator;
 
-      if (m_CurrentIterator.IsAtEnd())
-      {
-          ++m_ImageIndex;
-          NextObject();
-      }
+  if (m_CurrentIterator.IsAtEnd())
+  {
+    ++m_ImageIndex;
+    NextObject();
+  }
 }
-
 
 template <typename TDataType, int TImageDimension>
 mitk::DataCollectionImageIterator<TDataType, TImageDimension>*
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-GetNextDataCollectionIterator(size_t start)
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  GetNextDataCollectionIterator(size_t start)
 {
   DataCollectionImageIterator<TDataType, TImageDimension>* iterator = 0;
   size_t index =start;
@@ -153,35 +149,34 @@ GetNextDataCollectionIterator(size_t start)
   return iterator;
 }
 
-
 template <typename TDataType, int TImageDimension>
 TDataType
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-GetVoxel()
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  GetVoxel()
 {
   return m_CurrentIterator.Get();
 }
 
 template <typename TDataType, int TImageDimension>
 void
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-SetVoxel(TDataType value)
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  SetVoxel(TDataType value)
 {
   m_CurrentIterator.Set(value);
 }
 
 template <typename TDataType, int TImageDimension>
 size_t
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-GetIndex()
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  GetIndex()
 {
   return m_CurrentIndex;
 }
 
 template <typename TDataType, int TImageDimension>
 std::string
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
-GetFilePrefix()
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::
+  GetFilePrefix()
 {
   if (m_IteratingImages)
   {
@@ -196,45 +191,44 @@ GetFilePrefix()
 template <typename TDataType, int TImageDimension>
 void mitk::DataCollectionImageIterator<TDataType, TImageDimension>::NextObject()
 {
-    if (m_IteratingImages)
+  if (m_IteratingImages)
+  {
+    if (m_CurrentCollectionIterator != NULL)
     {
-        if (m_CurrentCollectionIterator != NULL)
-        {
-            delete m_CurrentCollectionIterator;
-            m_CurrentCollectionIterator = 0;
-        }
-        m_IteratingImages = false;
-        m_CurrentElement = 0;
-        m_CurrentCollectionIterator = GetNextDataCollectionIterator(m_CurrentElement);
-        if (m_CurrentCollectionIterator == NULL)
-        {
-            m_IsAtEnd = true;
-            return;
-        }
+      delete m_CurrentCollectionIterator;
+      m_CurrentCollectionIterator = 0;
     }
-    else
+    m_IteratingImages = false;
+    m_CurrentElement = 0;
+    m_CurrentCollectionIterator = GetNextDataCollectionIterator(m_CurrentElement);
+    if (m_CurrentCollectionIterator == NULL)
     {
-        m_CurrentCollectionIterator->NextObject();
-        if (m_CurrentCollectionIterator->IsAtEnd()) //Current collection is finished iterated
-        {
-          delete m_CurrentCollectionIterator;
-          m_CurrentCollectionIterator = GetNextDataCollectionIterator(m_CurrentElement+1);
-        }
-        if (m_CurrentCollectionIterator == NULL) //If no collection is known
-        {
-          m_IsAtEnd = true;
-          return;
-        }
+      m_IsAtEnd = true;
+      return;
     }
-    m_CurrentIterator = m_CurrentCollectionIterator->GetImageIterator();
+  }
+  else
+  {
+    m_CurrentCollectionIterator->NextObject();
+    if (m_CurrentCollectionIterator->IsAtEnd()) //Current collection is finished iterated
+    {
+      delete m_CurrentCollectionIterator;
+      m_CurrentCollectionIterator = GetNextDataCollectionIterator(m_CurrentElement+1);
+    }
+    if (m_CurrentCollectionIterator == NULL) //If no collection is known
+    {
+      m_IsAtEnd = true;
+      return;
+    }
+  }
+  m_CurrentIterator = m_CurrentCollectionIterator->GetImageIterator();
 }
 
 template <typename TDataType, int TImageDimension>
 typename mitk::DataCollectionImageIterator<TDataType, TImageDimension>::ImageIterator
-mitk::DataCollectionImageIterator<TDataType, TImageDimension>::GetImageIterator()
+  mitk::DataCollectionImageIterator<TDataType, TImageDimension>::GetImageIterator()
 {
   return m_CurrentIterator;
 };
-
 
 #endif // mitkDataCollectionImageIterator_CXX

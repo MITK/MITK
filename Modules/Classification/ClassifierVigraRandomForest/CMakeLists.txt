@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(
   DEPENDS MitkClassificationCore MitkClassificationUtilities
-  AUTOLOAD_WITH MitkCore
+  #AUTOLOAD_WITH MitkCore
   PACKAGE_DEPENDS
     PUBLIC Boost
     PRIVATE Vigra

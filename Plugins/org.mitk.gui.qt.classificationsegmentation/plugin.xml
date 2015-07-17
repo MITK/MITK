@@ -5,7 +5,7 @@
     <view id="org.mitk.views.classificationsegmentation"
           name="Classification Segmentation"
           class="ClassificationSegmentation"
-          icon="resources/icon.xpm" />
+          icon="resources/icon_32.png" />
   </extension>
 
 </plugin>

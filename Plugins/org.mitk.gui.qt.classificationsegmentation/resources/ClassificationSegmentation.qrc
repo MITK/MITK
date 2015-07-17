@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/ClassificationSegmentation">
+        <file>button_process.png</file>
+        <file>icon_32.png</file>
+        <file>icon.png</file>
+        <file>button_process_2.png</file>
+    </qresource>
+</RCC>

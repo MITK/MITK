@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFutureWatcher>
 #include "QmitkPointListViewWidget.h"
 #include <mitkPointSetDataInteractor.h>
+
+#include <mitkVigraRandomForestClassifier.h>
 /**
 \brief ClassificationSegmentation
 
@@ -45,9 +47,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 \ingroup ${plugin_target}_internal
 */
 
-namespace mitk{
-  class VigraRandomForestClassifier;
-}
 
 //class QmitkPointListWidget;
 class ctkSliderWidget;
@@ -84,6 +83,7 @@ public:
     void OnButtonLESToggle(bool);
     void OnButtonBRAToggle(bool);
     void OnButtonNoInteractionToggle(bool);
+    void OnAddForestToDataManager();
 
     void ManualSegmentationTrigger();
     std::vector<mitk::Image::Pointer> ManualSegmentationCallback();
@@ -110,7 +110,7 @@ protected:
 
   virtual void SetFocus() override;
 
-  mitk::DataNode::Pointer AddImageAsDataNode(const mitk::Image::Pointer & data_image, const std::string & name );
+  mitk::DataNode::Pointer AddAsDataNode(const mitk::BaseData::Pointer & data_, const std::string & name );
 
   void SampleClassMaskByPointSet(const mitk::Image::Pointer & ref_img, mitk::PointSet::Pointer & pointset, mitk::Image::Pointer & outimage);
 
@@ -139,6 +139,7 @@ protected:
   ctkSliderWidget * m_WeightBRASlider;
 
   mitk::PointSetDataInteractor::Pointer m_PointSetDataInteractor;
+  mitk::VigraRandomForestClassifier::Pointer m_TempClassifier;
 };
 
 #endif // ClassificationSegmentation_h

@@ -195,8 +195,7 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
 
   connect( cb_inputimage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnInitializeSession(const mitk::DataNode*)));
   connect( cb_maskimage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnInitializeSession(const mitk::DataNode*)));
-  connect( cb_classifer, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnInitializeSession(const mitk::DataNode*)));
-  connect( cb_inputimage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnInitializeSession(const mitk::DataNode*)));
+
   connect( m_Controls.m_SavePointsButton, SIGNAL(clicked(bool)), this, SLOT(DoSavePointsAsMask()));
 
   connect( m_Controls.m_ButtonCSFToggle, SIGNAL(toggled(bool)), this, SLOT(OnButtonCSFToggle(bool)));
@@ -218,6 +217,9 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
   connect( m_WeightCSFSlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
   connect( m_WeightLESSlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
   connect( m_WeightBRASlider, SIGNAL(valueChanged(double)), this, SLOT(OnPostProcessingSettingsChanged()));
+
+  connect(m_Controls.m_DoAutomaticSecmentation, SIGNAL(clicked(bool)), this, SLOT(DoAutomSegmentation()));
+  connect(m_Controls.m_AddForestToDataManager, SIGNAL(clicked(bool)), this, SLOT(OnAddForestToDataManager()));
 
   mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
   pointSetNode->SetName("CSF_Points.");
@@ -267,6 +269,11 @@ void ClassificationSegmentation::OnSelectionChanged( berry::IWorkbenchPart::Poin
 
   //  m_Controls.labelWarning->setVisible( true );
   //  m_Controls.buttonPerformImageProcessing->setEnabled( false );
+}
+
+void ClassificationSegmentation::OnAddForestToDataManager()
+{
+  AddAsDataNode(m_TempClassifier.GetPointer(),"ManualSegmentation_Classifier");
 }
 
 void ClassificationSegmentation::OnInitializeSession(const mitk::DataNode *)
@@ -490,7 +497,16 @@ void ClassificationSegmentation::DoAutomSegmentation()
   Eigen::MatrixXi Y_test = classifier->Predict(X_test);
   mitk::Image::Pointer result_mask = mitk::CLUtil::Transform<int>(Y_test,mask_image);
 
-  AddImageAsDataNode(result_mask,"Autom-ResultMask");
+  auto node = AddAsDataNode(result_mask.GetPointer(),"Autom-ResultMask");
+
+  auto lut = mitk::LookupTable::New();
+  lut->SetType(mitk::LookupTable::PET_20);
+  auto * lut_prop = dynamic_cast<mitk::LookupTableProperty *>(node->GetProperty("LookupTable"));
+  lut_prop->SetLookupTable(lut);
+
+  mitk::LevelWindow lw(1,3);
+  node->SetLevelWindow(lw);
+  node->SetOpacity(0.3);
 
   std::map<unsigned int, unsigned int> perlabelvoxelcount;
   mitk::CLUtil::CountVoxel(result_mask, perlabelvoxelcount);
@@ -536,9 +552,9 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::ManualSegmentation
     mitk::CLUtil::InsertLabel(temp_img,sampled_image,label++);
   }
 
-  mitk::VigraRandomForestClassifier::Pointer classifier = mitk::VigraRandomForestClassifier::New();
-  classifier->SetTreeCount(50);
-  classifier->SetSamplesPerTree(0.66);
+  m_TempClassifier = mitk::VigraRandomForestClassifier::New();
+  m_TempClassifier->SetTreeCount(50);
+  m_TempClassifier->SetSamplesPerTree(0.66);
 
   Eigen::MatrixXd X_train;
   Eigen::MatrixXd X_test;
@@ -559,10 +575,10 @@ std::vector<mitk::Image::Pointer> ClassificationSegmentation::ManualSegmentation
   }
 
   Eigen::MatrixXi Y = mitk::CLUtil::Transform<int>(sampled_image,sampled_image);
-  classifier->Train(X_train,Y);
+  m_TempClassifier->Train(X_train,Y);
 
-  Eigen::MatrixXi Y_test = classifier->Predict(X_test);
-  Eigen::MatrixXd Yp_test = classifier->GetPointWiseProbabilities();
+  Eigen::MatrixXi Y_test = m_TempClassifier->Predict(X_test);
+  Eigen::MatrixXd Yp_test = m_TempClassifier->GetPointWiseProbabilities();
   //  mitk::Image::Pointer result_mask = mitk::CLUtil::Transform<int>(Y_test,mask_image);
 
   std::vector<mitk::Image::Pointer> resultvector;
@@ -580,7 +596,7 @@ void ClassificationSegmentation::ManualSegmentationFinished()
   m_ResultImageVector = m_ManualSegmentationFutureWatcher.result();
 
   // Add result to Datastorage
-  mitk::DataNode::Pointer node = AddImageAsDataNode(m_ResultImageVector[0],"Manual-ResultMask");
+  mitk::DataNode::Pointer node = AddAsDataNode(m_ResultImageVector[0].GetPointer(),"Manual-ResultMask");
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
   lut->SetType(mitk::LookupTable::PET_20);
   mitk::LookupTableProperty * lut_prop = dynamic_cast<mitk::LookupTableProperty *>(node->GetProperty("LookupTable"));
@@ -730,7 +746,7 @@ void ClassificationSegmentation::SampleClassMaskByPointSet(const mitk::Image::Po
 
 //}
 
-mitk::DataNode::Pointer ClassificationSegmentation::AddImageAsDataNode(const mitk::Image::Pointer & data_image, const std::string & name )
+mitk::DataNode::Pointer ClassificationSegmentation::AddAsDataNode(const mitk::BaseData::Pointer & data_, const std::string & name )
 {
   mitk::DataNode::Pointer node = nullptr;
   node = this->GetDataStorage()->GetNamedNode(name);
@@ -738,14 +754,26 @@ mitk::DataNode::Pointer ClassificationSegmentation::AddImageAsDataNode(const mit
   if(node.IsNull())
   {
     node = mitk::DataNode::New();
-    node->SetData(data_image);
+    node->SetData(data_);
     node->SetName(name);
     this->GetDataStorage()->Add(node);
   }else{
-    mitk::ImageReadAccessor ra(data_image);
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-    image->SetImportVolume(const_cast<void *>(ra.GetData()));
-    this->RequestRenderWindowUpdate();
+
+    if(dynamic_cast<mitk::Image*>(node->GetData()) && dynamic_cast<mitk::Image*>(data_.GetPointer()))
+    {
+      mitk::Image::Pointer target_image = dynamic_cast<mitk::Image*>(node->GetData());
+      mitk::Image::Pointer source_image = dynamic_cast<mitk::Image*>(data_.GetPointer());
+      mitk::ImageReadAccessor ra(source_image);
+      target_image->SetImportVolume(const_cast<void *>(ra.GetData()));
+      this->RequestRenderWindowUpdate();
+    }
+
+    if(dynamic_cast<mitk::VigraRandomForestClassifier*>(node->GetData()) && dynamic_cast<mitk::VigraRandomForestClassifier*>(data_.GetPointer()))
+    {
+      node->SetData(data_);
+      node->Modified();
+    }
+
   }
 
   return node;
@@ -772,7 +800,7 @@ void ClassificationSegmentation::PostProcessingFinished()
   m_PostProcessingImageVector = m_PostProcessingFutureWatcher.result();
 
   // Add result to Datastorage
-  mitk::DataNode::Pointer node = AddImageAsDataNode(m_PostProcessingImageVector[0],"Manual-ResultMask-PostProcessing");
+  mitk::DataNode::Pointer node = AddAsDataNode(m_PostProcessingImageVector[0].GetPointer(),"Manual-ResultMask-PostProcessing");
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
   lut->SetType(mitk::LookupTable::PET_20);
   mitk::LookupTableProperty * lut_prop = dynamic_cast<mitk::LookupTableProperty *>(node->GetProperty("LookupTable"));

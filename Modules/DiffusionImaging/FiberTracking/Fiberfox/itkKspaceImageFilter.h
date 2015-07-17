@@ -85,6 +85,7 @@ namespace itk{
     itkSetMacro( FiberBundle, FiberBundle::Pointer )
     itkSetMacro( CoilPosition, DoubleVectorType )
     itkGetMacro( KSpaceImage, typename InputImageType::Pointer )    ///< k-space magnitude image
+    itkGetMacro( SpikeLog, std::string )
 
     void SetParameters( FiberfoxParameters<double>* param ){ m_Parameters = param; }
 
@@ -122,6 +123,7 @@ namespace itk{
     bool                                    m_IsBaseline;
     vcl_complex<double>                     m_Spike;
     MatrixType                              m_Transform;
+    std::string                             m_SpikeLog;
 
     double                                  m_CoilSensitivityFactor;
     typename InputImageType::Pointer        m_KSpaceImage;

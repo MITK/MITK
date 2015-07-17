@@ -52,6 +52,7 @@ void KspaceImageFilter< TPixelType >
 ::BeforeThreadedGenerateData()
 {
     m_Spike = vcl_complex<double>(0,0);
+    m_SpikeLog = "";
 
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
     itk::ImageRegion<2> region; region.SetSize(0, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0));  region.SetSize(1, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1));
@@ -360,6 +361,7 @@ void KspaceImageFilter< TPixelType >
         spikeIdx[0] = randGen->GetIntegerVariate()%(int)kxMax;
         spikeIdx[1] = randGen->GetIntegerVariate()%(int)kyMax;
         outputImage->SetPixel(spikeIdx, m_Spike);
+        m_SpikeLog += "[" + boost::lexical_cast<std::string>(spikeIdx[0]) + "," + boost::lexical_cast<std::string>(spikeIdx[1]) + "," + boost::lexical_cast<std::string>(m_Zidx) + "] Magnitude: " + boost::lexical_cast<std::string>(m_Spike.real()) + "+" + boost::lexical_cast<std::string>(m_Spike.imag()) + "i\n";
     }
 }
 

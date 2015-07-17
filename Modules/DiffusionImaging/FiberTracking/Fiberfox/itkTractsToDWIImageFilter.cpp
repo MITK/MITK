@@ -51,6 +51,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkShiftScaleImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkResampleDwiImageFilter.h>
+#include <boost/algorithm/string/replace.hpp>
 
 namespace itk
 {
@@ -151,8 +152,8 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
         pos.SetVnlVector(rotZ*pos.GetVnlVector());
     }
 
-    m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
-    m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
+    PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false);
+    PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false);
     unsigned long lastTick = 0;
 
     boost::progress_display disp(images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
@@ -235,6 +236,13 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
                 if (c==spikeCoil)
                     idft->SetSpikesPerSlice(numSpikes);
                 idft->Update();
+
+#pragma omp critical
+                if (c==spikeCoil && numSpikes>0)
+                {
+                    m_SpikeLog += "Volume " + boost::lexical_cast<std::string>(g) + " Coil " + boost::lexical_cast<std::string>(c) + "\n";
+                    m_SpikeLog += idft->GetSpikeLog();
+                }
 
                 ComplexSliceType::Pointer fSlice;
                 fSlice = idft->GetOutput();
@@ -319,11 +327,11 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             ++disp;
             unsigned long newTick = 50*disp.count()/disp.expected_count();
             for (unsigned long tick = 0; tick<(newTick-lastTick); tick++)
-                m_StatusText += "*";
+                PrintToLog("*", false, false);
             lastTick = newTick;
         }
     }
-    m_StatusText += "\n\n";
+    PrintToLog("\n", false);
     return magnitudeDwiImage;
 }
 
@@ -369,8 +377,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
     for (int i=0; i<m_Parameters.m_FiberModelList.size(); i++)
         if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage().IsNotNull())
         {
-            m_StatusText += "Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1) + "\n";
-            MITK_INFO << "Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1);
+            PrintToLog("Using volume fraction map for fiber compartment " + boost::lexical_cast<std::string>(i+1));
             fibVolImages++;
         }
 
@@ -379,8 +386,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
     for (int i=0; i<m_Parameters.m_NonFiberModelList.size(); i++)
         if (m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage().IsNotNull())
         {
-            m_StatusText += "Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1) + "\n";
-            MITK_INFO << "Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1);
+            PrintToLog("Using volume fraction map for non-fiber compartment " + boost::lexical_cast<std::string>(i+1));
             nonfibVolImages++;
         }
 
@@ -388,8 +394,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
     // this means if two non-fiber compartments are used but only one of them has an associated volume fraction map, the repesctive other volume fraction map can be determined as inverse (1-val) of the present volume fraction map-
     if ( fibVolImages<m_Parameters.m_FiberModelList.size() && nonfibVolImages==1 && m_Parameters.m_NonFiberModelList.size()==2)
     {
-        m_StatusText += "Calculating missing non-fiber volume fraction image by inverting the other.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.\n";
-        MITK_INFO << "Calculating missing non-fiber volume fraction image by inverting the other.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.";
+        PrintToLog("Calculating missing non-fiber volume fraction image by inverting the other.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.");
 
         auto inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
         inverter->SetMaximum(1.0);
@@ -426,8 +431,7 @@ void TractsToDWIImageFilter< PixelType >::CheckVolumeFractionImages()
 
     if (fibVolImages<m_Parameters.m_FiberModelList.size() && nonfibVolImages>0)
     {
-        m_StatusText += "Not all fiber compartments are using an associated volume fraction image.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.\n";
-        MITK_INFO << "Not all fiber compartments are using an associated volume fraction image.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.";
+        PrintToLog("Not all fiber compartments are using an associated volume fraction image.\nAssuming non-fiber volume fraction images to contain values relative to the remaining non-fiber volume, not absolute values.");
         m_UseRelativeNonFiberVolumeFractions = true;
 
         //        itk::ImageFileWriter<ItkDoubleImgType>::Pointer wr = itk::ImageFileWriter<ItkDoubleImgType>::New();
@@ -458,6 +462,8 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
 {
     m_Rotations.clear();
     m_Translations.clear();
+    m_MotionLog = "";
+    m_SpikeLog = "";
 
     // initialize output dwi image
     m_Parameters.m_SignalGen.m_CroppedRegion = m_Parameters.m_SignalGen.m_ImageRegion; m_Parameters.m_SignalGen.m_CroppedRegion.SetSize(1, m_Parameters.m_SignalGen.m_CroppedRegion.GetSize(1)*m_Parameters.m_SignalGen.m_CroppingFactor);
@@ -521,16 +527,14 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
         m_Parameters.m_SignalGen.m_DoAddMotion = false;
         m_Parameters.m_SignalGen.m_DoSimulateRelaxation = false;
 
-        m_StatusText += "Using input diffusion-weighted image.\n";
-        MITK_INFO << "Using input diffusion-weighted image.";
+        PrintToLog("Simulating acquisition for input diffusion-weighted image.", false);
         auto caster = itk::CastImageFilter< OutputImageType, DoubleDwiType >::New();
         caster->SetInput(m_InputImage);
         caster->Update();
 
         if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
         {
-            m_StatusText += "Upsampling input diffusion-weighted image for Gibbs ringing simulation.\n";
-            MITK_INFO << "Upsampling input diffusion-weighted image for Gibbs ringing simulation.";
+            PrintToLog("Upsampling input diffusion-weighted image for Gibbs ringing simulation.", false);
 
             auto resampler = itk::ResampleDwiImageFilter< double >::New();
             resampler->SetInput(caster->GetOutput());
@@ -599,8 +603,7 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
     if (m_Parameters.m_SignalGen.m_MaskImage.IsNull())
     {
         // no input tissue mask is set -> create default
-        m_StatusText += "No tissue mask set\n";
-        MITK_INFO << "No tissue mask set";
+        PrintToLog("No tissue mask set", false);
         m_Parameters.m_SignalGen.m_MaskImage = ItkUcharImgType::New();
         m_Parameters.m_SignalGen.m_MaskImage->SetSpacing( m_WorkingSpacing );
         m_Parameters.m_SignalGen.m_MaskImage->SetOrigin( m_WorkingOrigin );
@@ -617,45 +620,23 @@ void TractsToDWIImageFilter< PixelType >::InitializeData()
         if (m_Parameters.m_SignalGen.m_MaskImage->GetLargestPossibleRegion()!=m_WorkingImageRegion)
             itkExceptionMacro("Mask image and specified DWI geometry are not matching!");
 
-        m_StatusText += "Using tissue mask\n";
-        MITK_INFO << "Using tissue mask";
+        PrintToLog("Using tissue mask", false);
     }
 
     if (m_Parameters.m_SignalGen.m_DoAddMotion)
     {
-        std::string fileName = "fiberfox_motion_0.log";
-        std::string filePath = mitk::IOUtil::GetTempPath();
-        if (m_Parameters.m_Misc.m_OutputPath.size()>0)
-            filePath = m_Parameters.m_Misc.m_OutputPath;
-
-        int c = 1;
-
-        while (itksys::SystemTools::FileExists((filePath+fileName).c_str()))
-        {
-            fileName = "fiberfox_motion_";
-            fileName += boost::lexical_cast<std::string>(c);
-            fileName += ".log";
-            c++;
-        }
-
-        m_MotionLogfile.open((filePath+fileName).c_str());
         if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
         {
-            m_StatusText += "Adding random motion artifacts:\n";
-            m_StatusText += "Maximum rotation: +/-" + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Rotation) + "°\n";
-            m_StatusText += "Maximum translation: +/-" + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Translation) + "mm\n";
+            PrintToLog("Random motion artifacts:", false);
+            PrintToLog("Maximum rotation: +/-" + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Rotation) + "°", false);
+            PrintToLog("Maximum translation: +/-" + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Translation) + "mm", false);
         }
         else
         {
-            m_StatusText += "Adding linear motion artifacts:\n";
-            m_StatusText += "Maximum rotation: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Rotation) + "°\n";
-            m_StatusText += "Maximum translation: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Translation) + "mm\n";
+            PrintToLog("Linear motion artifacts:", false);
+            PrintToLog("Maximum rotation: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Rotation) + "°", false);
+            PrintToLog("Maximum translation: " + boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_Translation) + "mm", false);
         }
-        m_StatusText += "Motion logfile: " + (filePath+fileName) + "\n";
-        MITK_INFO << "Adding motion artifacts";
-        MITK_INFO << "Maximum rotation: " << m_Parameters.m_SignalGen.m_Rotation;
-        MITK_INFO << "Maxmimum translation: " << m_Parameters.m_SignalGen.m_Translation;
-        MITK_INFO << "Motion logfile: " << filePath << fileName;
     }
     if ( m_Parameters.m_SignalGen.m_MotionVolumes.empty() )
     {
@@ -712,7 +693,7 @@ template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 {
     // resample fiber bundle for sufficient voxel coverage
-    m_StatusText += "\n"+this->GetTime()+" > Resampling fibers ...\n";
+    PrintToLog("Resampling fibers ...");
     m_SegmentVolume = 0.0001;
     float minSpacing = 1;
     if(m_WorkingSpacing[0]<m_WorkingSpacing[1] && m_WorkingSpacing[0]<m_WorkingSpacing[2])
@@ -733,8 +714,42 @@ void TractsToDWIImageFilter< PixelType >::InitializeFiberData()
 template< class PixelType >
 void TractsToDWIImageFilter< PixelType >::GenerateData()
 {
+    // prepare logfile
+    {
+        std::string fileName = "fiberfox_0.log";
+        std::string filePath = mitk::IOUtil::GetTempPath();
+        if (m_Parameters.m_Misc.m_OutputPath.size()>0)
+        {
+            filePath = m_Parameters.m_Misc.m_OutputPath;
+            fileName = m_Parameters.m_Misc.m_ResultNode->GetName();
+            boost::replace_all(fileName, ".", "_");
+            fileName += ".log";
+        }
+        else
+        {
+            int c = 1;
+            while (itksys::SystemTools::FileExists((filePath+fileName).c_str()))
+            {
+                fileName = "fiberfox_";
+                fileName += boost::lexical_cast<std::string>(c);
+                fileName += ".log";
+                c++;
+            }
+        }
+
+        m_Logfile.open((filePath+fileName).c_str());
+
+        if (!m_Logfile.is_open())
+        {
+            m_StatusText += "Logfile could not be opened!\n";
+            MITK_INFO << "Logfile could not be opened!";
+        }
+
+        PrintToLog( "Logfile: " + (filePath+fileName), false );
+    }
+
+
     m_TimeProbe.Start();
-    m_StatusText = "Starting simulation\n";
 
     // check input data
     if (m_FiberBundle.IsNull() && m_InputImage.IsNull())
@@ -771,13 +786,13 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         unsigned long lastTick = 0;
         int signalModelSeed = m_RandGen->GetIntegerVariate();
 
-        m_StatusText += "\n"+this->GetTime()+" > Generating " + boost::lexical_cast<std::string>(numFiberCompartments+numNonFiberCompartments) + "-compartment diffusion-weighted signal.\n";
-        MITK_INFO << "Generating " << numFiberCompartments+numNonFiberCompartments << "-compartment diffusion-weighted signal.";
+        PrintToLog("\n", false, false);
+        PrintToLog("Generating " + boost::lexical_cast<std::string>(numFiberCompartments+numNonFiberCompartments) + "-compartment diffusion-weighted signal.");
         int numFibers = m_FiberBundleWorkingCopy->GetNumFibers();
         boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
 
-        m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
-        m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
+        PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false);
+        PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false);
 
         for (unsigned int g=0; g<m_Parameters.m_SignalGen.GetNumVolumes(); g++)
         {
@@ -819,7 +834,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     {
                         if (this->GetAbortGenerateData())
                         {
-                            m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
+                            PrintToLog("\n", false, false);
+                            PrintToLog("Simulation aborted");
                             return;
                         }
 
@@ -865,7 +881,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     ++disp;
                     unsigned long newTick = 50*disp.count()/disp.expected_count();
                     for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
-                        m_StatusText += "*";
+                        PrintToLog("*", false, false);
                     lastTick = newTick;
                 }
 
@@ -915,15 +931,11 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             }
         }
 
-        if (m_MotionLogfile.is_open())
-        {
-            m_MotionLogfile << "DONE";
-            m_MotionLogfile.close();
-        }
-        m_StatusText += "\n\n";
+        PrintToLog("\n", false);
         if (this->GetAbortGenerateData())
         {
-            m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
+            PrintToLog("\n", false, false);
+            PrintToLog("Simulation aborted");
             return;
         }
     }
@@ -932,43 +944,42 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     double signalScale = m_Parameters.m_SignalGen.m_SignalScale;
     if ( m_Parameters.m_SignalGen.m_SimulateKspaceAcquisition ) // do k-space stuff
     {
-        m_StatusText += this->GetTime()+" > Simulating k-space acquisition using "+boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NumberOfCoils)+" coil(s)\n";
-        MITK_INFO << "Simulating k-space acquisition using " << m_Parameters.m_SignalGen.m_NumberOfCoils << " coil(s).";
+        PrintToLog("\n", false, false);
+        PrintToLog("Simulating k-space acquisition using "+boost::lexical_cast<std::string>(m_Parameters.m_SignalGen.m_NumberOfCoils)+" coil(s)");
 
         switch (m_Parameters.m_SignalGen.m_AcquisitionType)
         {
         case SignalGenerationParameters::SingleShotEpi:
-            m_StatusText += "Acquisition type: single shot EPI\n";
+            PrintToLog("Acquisition type: single shot EPI", false);
             break;
         case SignalGenerationParameters::SpinEcho:
-            m_StatusText += "Acquisition type: classic spin echo with cartesian k-space trajectory\n";
+            PrintToLog("Acquisition type: classic spin echo with cartesian k-space trajectory", false);
             break;
         default:
-            m_StatusText += "Acquisition type: single shot EPI\n";
+            PrintToLog("Acquisition type: single shot EPI", false);
         }
 
         if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
-            m_StatusText += "Simulating signal relaxation\n";
+            PrintToLog("Simulating signal relaxation", false);
         if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
-            m_StatusText += "Simulating distortions\n";
+            PrintToLog("Simulating distortions", false);
         if (m_Parameters.m_SignalGen.m_DoAddGibbsRinging)
-            m_StatusText += "Simulating ringing artifacts\n";
+            PrintToLog("Simulating ringing artifacts", false);
         if (m_Parameters.m_SignalGen.m_EddyStrength>0)
-            m_StatusText += "Simulating eddy currents\n";
+            PrintToLog("Simulating eddy currents", false);
         if (m_Parameters.m_SignalGen.m_Spikes>0)
-            m_StatusText += "Simulating spikes\n";
+            PrintToLog("Simulating spikes", false);
         if (m_Parameters.m_SignalGen.m_CroppingFactor<1.0)
-            m_StatusText += "Simulating aliasing artifacts\n";
+            PrintToLog("Simulating aliasing artifacts", false);
         if (m_Parameters.m_SignalGen.m_KspaceLineOffset>0)
-            m_StatusText += "Simulating ghosts\n";
+            PrintToLog("Simulating ghosts", false);
 
         doubleOutImage = SimulateKspaceAcquisition(m_CompartmentImages);
         signalScale = 1; // already scaled in SimulateKspaceAcquisition()
     }
     else    // don't do k-space stuff, just sum compartments
     {
-        m_StatusText += this->GetTime()+" > Summing compartments\n";
-        MITK_INFO << "Summing compartments";
+        PrintToLog("Summing compartments");
         doubleOutImage = m_CompartmentImages.at(0);
 
         for (unsigned int i=1; i<m_CompartmentImages.size(); i++)
@@ -982,38 +993,39 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     }
     if (this->GetAbortGenerateData())
     {
-        m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
+        PrintToLog("\n", false, false);
+        PrintToLog("Simulation aborted");
         return;
     }
 
-    m_StatusText += this->GetTime()+" > Finalizing image\n";
-    MITK_INFO << "Finalizing image";
+    PrintToLog("Finalizing image");
     if (signalScale>1)
-        m_StatusText += " Scaling signal\n";
+        PrintToLog(" Scaling signal", false);
     if (m_Parameters.m_NoiseModel)
-        m_StatusText += " Adding noise\n";
+        PrintToLog(" Adding noise", false);
     unsigned int window = 0;
     unsigned int min = itk::NumericTraits<unsigned int>::max();
     ImageRegionIterator<OutputImageType> it4 (m_OutputImage, m_OutputImage->GetLargestPossibleRegion());
     DoubleDwiType::PixelType signal; signal.SetSize(m_Parameters.m_SignalGen.GetNumVolumes());
     boost::progress_display disp2(m_OutputImage->GetLargestPossibleRegion().GetNumberOfPixels());
 
-    m_StatusText += "0%   10   20   30   40   50   60   70   80   90   100%\n";
-    m_StatusText += "|----|----|----|----|----|----|----|----|----|----|\n*";
+    PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false);
+    PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false);
     int lastTick = 0;
 
     while(!it4.IsAtEnd())
     {
         if (this->GetAbortGenerateData())
         {
-            m_StatusText += "\n"+this->GetTime()+" > Simulation aborted\n";
+            PrintToLog("\n", false, false);
+            PrintToLog("Simulation aborted");
             return;
         }
 
         ++disp2;
         unsigned long newTick = 50*disp2.count()/disp2.expected_count();
         for (unsigned long tick = 0; tick<(newTick-lastTick); tick++)
-            m_StatusText += "*";
+            PrintToLog("*", false, false);
         lastTick = newTick;
 
         typename OutputImageType::IndexType index = it4.GetIndex();
@@ -1042,10 +1054,51 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     m_LevelWindow.SetLevelWindow(level, window);
     this->SetNthOutput(0, m_OutputImage);
 
-    m_StatusText += "\n\n";
-    m_StatusText += "Finished simulation\n";
-    m_StatusText += "Simulation time: "+GetTime();
+    PrintToLog("\n", false);
+    PrintToLog("Finished simulation");
     m_TimeProbe.Stop();
+
+    if (m_Parameters.m_SignalGen.m_DoAddMotion)
+    {
+        PrintToLog("\nHead motion log:", false);
+        PrintToLog(m_MotionLog, false, false);
+    }
+
+    if (m_Parameters.m_SignalGen.m_Spikes>0)
+    {
+        PrintToLog("\nSpike log:", false);
+        PrintToLog(m_SpikeLog, false, false);
+    }
+
+    if (m_Logfile.is_open())
+        m_Logfile.close();
+}
+
+template< class PixelType >
+void TractsToDWIImageFilter< PixelType >::PrintToLog(string m, bool addTime, bool linebreak)
+{
+    // timestamp
+    if (addTime)
+    {
+        m_Logfile << this->GetTime() << " > ";
+        m_StatusText += this->GetTime() + " > ";
+        std::cout << this->GetTime() << " > ";
+    }
+
+    // message
+    if (m_Logfile.is_open())
+        m_Logfile << m;
+    m_StatusText += m;
+    std::cout << m;
+
+    // new line
+    if (linebreak)
+    {
+        if (m_Logfile.is_open())
+            m_Logfile << "\n";
+        m_StatusText += "\n";
+        std::cout << "\n";
+    }
 }
 
 template< class PixelType >
@@ -1105,21 +1158,16 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
         {
             m_Rotations.push_back(m_Rotation);
             m_Translations.push_back(m_Translation);
-            if (m_MotionLogfile.is_open())
-            {
-                m_MotionLogfile << g << " rotation: " << m_Rotation[0] << "," << m_Rotation[1] << "," << m_Rotation[2] << ";";
-                m_MotionLogfile << " translation: " << m_Translation[0] << "," << m_Translation[1] << "," << m_Translation[2] << "\n";
-            }
+            m_MotionLog += boost::lexical_cast<std::string>(g) + " rotation: " + boost::lexical_cast<std::string>(m_Rotation[0]) + "," + boost::lexical_cast<std::string>(m_Rotation[1]) + "," + boost::lexical_cast<std::string>(m_Rotation[2]) + ";";
+            m_MotionLog += " translation: " + boost::lexical_cast<std::string>(m_Translation[0]) + "," + boost::lexical_cast<std::string>(m_Translation[1]) + "," + boost::lexical_cast<std::string>(m_Translation[2]) + "\n";
         }
         else
         {
             m_Rotations.push_back(m_Rotation*m_MotionCounter);
             m_Translations.push_back(m_Translation*m_MotionCounter);
-            if (m_MotionLogfile.is_open())
-            {
-                m_MotionLogfile << g << " rotation: " << m_Rotation[0]*m_MotionCounter << "," << m_Rotation[1]*m_MotionCounter << "," << m_Rotation[2]*m_MotionCounter << ";";
-                m_MotionLogfile << " translation: " << m_Translation[0]*m_MotionCounter << "," << m_Translation[1]*m_MotionCounter << "," << m_Translation[2]*m_MotionCounter << "\n";
-            }
+
+            m_MotionLog += boost::lexical_cast<std::string>(g) + " rotation: " + boost::lexical_cast<std::string>(m_Rotation[0]*m_MotionCounter) + "," + boost::lexical_cast<std::string>(m_Rotation[1]*m_MotionCounter) + "," + boost::lexical_cast<std::string>(m_Rotation[2]*m_MotionCounter) + ";";
+            m_MotionLog += " translation: " + boost::lexical_cast<std::string>(m_Translation[0]*m_MotionCounter) + "," + boost::lexical_cast<std::string>(m_Translation[1]*m_MotionCounter) + "," + boost::lexical_cast<std::string>(m_Translation[2]*m_MotionCounter) + "\n";
         }
 
         m_FiberBundleTransformed->TransformFibers(m_Rotation[0],m_Rotation[1],m_Rotation[2],m_Translation[0],m_Translation[1],m_Translation[2]);
@@ -1130,8 +1178,8 @@ void TractsToDWIImageFilter< PixelType >::SimulateMotion(int g)
         m_Translation.Fill(0.0);
         m_Rotations.push_back(m_Rotation);
         m_Translations.push_back(m_Translation);
-        m_MotionLogfile << g << " rotation: " << m_Rotation[0] << "," << m_Rotation[1] << "," << m_Rotation[2] << ";";
-        m_MotionLogfile << " translation: " << m_Translation[0] << "," << m_Translation[1] << "," << m_Translation[2] << "\n";
+        m_MotionLog += boost::lexical_cast<std::string>(g) + " rotation: " + boost::lexical_cast<std::string>(m_Rotation[0]) + "," + boost::lexical_cast<std::string>(m_Rotation[1]) + "," + boost::lexical_cast<std::string>(m_Rotation[2]) + ";";
+        m_MotionLog += " translation: " + boost::lexical_cast<std::string>(m_Translation[0]) + "," + boost::lexical_cast<std::string>(m_Translation[1]) + "," + boost::lexical_cast<std::string>(m_Translation[2]) + "\n";
     }
 }
 

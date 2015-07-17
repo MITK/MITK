@@ -92,6 +92,7 @@ protected:
     vnl_vector_fixed<double, 3> GetVnlVector(Vector< float, 3 >& vector);
     double RoundToNearest(double num);
     std::string GetTime();
+    void PrintToLog(string m, bool addTime=true, bool linebreak=true);
 
     /** Transform generated image compartment by compartment, channel by channel and slice by slice using DFT and add k-space artifacts/effects. */
     DoubleDwiType::Pointer SimulateKspaceAcquisition(std::vector< DoubleDwiType::Pointer >& images);
@@ -125,7 +126,9 @@ protected:
     itk::TimeProbe                              m_TimeProbe;
     bool                                        m_UseConstantRandSeed;
     bool                                        m_MaskImageSet;
-    ofstream                                    m_MotionLogfile;
+    ofstream                                    m_Logfile;
+    std::string                                 m_MotionLog;
+    std::string                                 m_SpikeLog;
 
     // signal generation
     FiberBundleType                             m_FiberBundleWorkingCopy;   ///< we work on an upsampled version of the input bundle

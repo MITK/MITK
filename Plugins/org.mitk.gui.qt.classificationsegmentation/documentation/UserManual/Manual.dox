@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_classificationsegmentation The Classificationsegmentation Plugin
 
-\imageMacro{icon.png,"Icon of Classificationsegmentation Plugin",2.00}
+\imageMacro{brain.png,"Icon of Classificationsegmentation Plugin",2.00}
 
 \tableofcontents
 
@@ -15,4 +15,10 @@ Segmentation of the classes:
 
 using a random forest based approach.
 
+
+Credits (from the Noun Project):
+<ul>
+<li> Brain by Santiago Arias
+<li> process by Marek Polakovic
+</ul>
 */

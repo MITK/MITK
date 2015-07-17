@@ -119,7 +119,7 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
 
   m_Controls.m_InputImageLayout->addWidget(cb_inputimage);
   m_Controls.m_MaskImageLayout->addWidget(cb_maskimage);
-  m_Controls.m_RandomForestLayout->addWidget(cb_classifer);
+  m_Controls.m_ClassifierLayout->addWidget(cb_classifer);
 
   m_Controls.m_ParameterLayout->layout()->addWidget(new QLabel("Gauss Sigma"));
   m_GaussSlider = new ctkSliderWidget();
@@ -199,7 +199,6 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
   connect( cb_inputimage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnInitializeSession(const mitk::DataNode*)));
   connect( m_Controls.m_SavePointsButton, SIGNAL(clicked(bool)), this, SLOT(DoSavePointsAsMask()));
 
-  connect( m_Controls.m_StartProcessingButton_RF, SIGNAL(clicked()), this, SLOT(DoAutomSegmentation()) );
   connect( m_Controls.m_ButtonCSFToggle, SIGNAL(toggled(bool)), this, SLOT(OnButtonCSFToggle(bool)));
   connect( m_Controls.m_ButtonLESToggle, SIGNAL(toggled(bool)), this, SLOT(OnButtonLESToggle(bool)));
   connect( m_Controls.m_ButtonBRAToggle, SIGNAL(toggled(bool)), this, SLOT(OnButtonBRAToggle(bool)));
@@ -246,10 +245,14 @@ void ClassificationSegmentation::CreateQtPartControl( QWidget *parent )
   pointSetNode->SetDataInteractor(m_PointSetDataInteractor.GetPointer());
   m_PointSetList.push_back(pointSetNode);
   GetDataStorage()->Add(pointSetNode);
+
+
+  m_Controls.m_PostProcessingLayout->hide();
+  m_Controls.m_ParameterLayout->hide();
 }
 
 void ClassificationSegmentation::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                                    const QList<mitk::DataNode::Pointer>& nodes )
+                                                     const QList<mitk::DataNode::Pointer>& nodes )
 {
   // iterate all selected objects, adjust warning visibility
   foreach( mitk::DataNode::Pointer node, nodes )
@@ -302,9 +305,6 @@ void ClassificationSegmentation::OnInitializeSession(const mitk::DataNode *)
   pntset->AddObserver( mitk::PointSetRemoveEvent(), command );
   pntset->AddObserver( mitk::PointSetMoveEvent(), command );
 
-  m_Controls.m_NumCsfPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[0]->GetData())->GetSize()));
-  m_Controls.m_NumLesPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[1]->GetData())->GetSize()));
-  m_Controls.m_NumBraPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[2]->GetData())->GetSize()));
 }
 
 void ClassificationSegmentation::DoSavePointsAsMask()
@@ -463,7 +463,7 @@ void ClassificationSegmentation::DoAutomSegmentation()
   QmitkDataStorageComboBox * cb_image = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_InputImageLayout->itemAt(1)->widget());
   mitk::Image::Pointer raw_image = dynamic_cast<mitk::Image *>(cb_image->GetSelectedNode()->GetData());
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_MaskImageLayout->itemAt(1)->widget());
-  QmitkDataStorageComboBox * cb_rf = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_RandomForestLayout->itemAt(1)->widget());
+  QmitkDataStorageComboBox * cb_rf = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_ClassifierLayout->itemAt(1)->widget());
 
   mitk::Image::Pointer mask_image = dynamic_cast<mitk::Image *>(cb_maskimage->GetSelectedNode()->GetData());
   mitk::VigraRandomForestClassifier::Pointer classifier = dynamic_cast<mitk::VigraRandomForestClassifier *>(cb_rf->GetSelectedNode()->GetData());
@@ -603,16 +603,11 @@ void ClassificationSegmentation::ManualSegmentationFinished()
     newtext += "Label" + QString::number(pair.first) + "\t" + QString::number(pair.second*voxel_volume* 0.001) + "\tml\n";
   m_Controls.m_ResultTextEdit->setText(newtext);
 
-  // Enable Functionality
-  m_Controls.m_StartProcessingButton_RF->setDisabled(false);
+
 }
 
 void ClassificationSegmentation::ManualSegmentationTrigger()
 {
-  m_Controls.m_NumCsfPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[0]->GetData())->GetSize()));
-  m_Controls.m_NumLesPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[1]->GetData())->GetSize()));
-  m_Controls.m_NumBraPoints->setText(QString::number(dynamic_cast<mitk::PointSet *>(m_PointSetList[2]->GetData())->GetSize()));
-
   unsigned int samplecounter = 0;
   for( auto datanode : m_PointSetList)
   {
@@ -622,11 +617,9 @@ void ClassificationSegmentation::ManualSegmentationTrigger()
   if(samplecounter < 10) return;
 
   if(!m_BlockManualSegmentation){
-    // Disable Functionality
-    m_Controls.m_StartProcessingButton_RF->setDisabled(true);
     // Start GUI Thread
     m_ManualSegmentationFutureWatcher.setFuture(
-      QtConcurrent::run(this, &ClassificationSegmentation::ManualSegmentationCallback)); // on finish call OnManualSegmentationFinished();
+          QtConcurrent::run(this, &ClassificationSegmentation::ManualSegmentationCallback)); // on finish call OnManualSegmentationFinished();
     m_BlockManualSegmentation = true;
   }
 }
@@ -768,7 +761,7 @@ void ClassificationSegmentation::PostProcessingTrigger()
 
   if(!m_BlockPostProcessing){
     m_PostProcessingFutureWatcher.setFuture(
-      QtConcurrent::run(this, &ClassificationSegmentation::PostProcessingCallback)); // on finish call OnManualSegmentationFinished();
+          QtConcurrent::run(this, &ClassificationSegmentation::PostProcessingCallback)); // on finish call OnManualSegmentationFinished();
     m_BlockPostProcessing = true;
   }
 }

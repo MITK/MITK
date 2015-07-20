@@ -45,12 +45,11 @@ if(MITK_USE_CTK)
     if(MITK_USE_DCMTK)
       list(APPEND ctk_optional_cache_args
            -DDCMTK_DIR:PATH=${DCMTK_DIR}
-           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
           )
       if(NOT MITK_USE_Python)
-      list(APPEND ctk_optional_cache_args
-           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
-          )
+        list(APPEND ctk_optional_cache_args
+            -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
+            )
       endif()
       list(APPEND proj_DEPENDENCIES DCMTK)
     else()

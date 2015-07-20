@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class MITKCLVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : public AbstractClassifier
+  class MITKCLVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : public AbstractClassifier
   {
   public:
 
@@ -72,6 +72,7 @@ class MITKCLVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : public Abstra
     void SetWeightLambda(double);
 
     void SetTreeWeights(Eigen::MatrixXd weights);
+    void SetTreeWeight(int treeId, double weight);
     Eigen::MatrixXd GetTreeWeights() const;
 
     void SetNthItems(const char *val, unsigned int idx);

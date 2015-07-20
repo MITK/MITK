@@ -328,19 +328,19 @@ int main(int argc, char* argv[])
     // If required do Save Forest....
     //////////////////////////////////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////////////////////////////////
-    // If required do test
-    //////////////////////////////////////////////////////////////////////////////
-    auto testDataX = mitk::DCUtilities::DC3dDToMatrixXd(testCollection,modalities, testMask);
-    auto testDataNewY = forest->Predict(testDataX);
-    MITK_INFO << testDataNewY;
-
     //writer.// (forest);
     /*
     auto w = forest->GetTreeWeights();
     w(0,0) = 10;
     forest->SetTreeWeights(w);*/
     mitk::IOUtil::Save(forest,"d:/tmp/forest.forest");
+
+    //////////////////////////////////////////////////////////////////////////////
+    // If required do test
+    //////////////////////////////////////////////////////////////////////////////
+    auto testDataX = mitk::DCUtilities::DC3dDToMatrixXd(testCollection,modalities, testMask);
+    auto testDataNewY = forest->Predict(testDataX);
+    //MITK_INFO << testDataNewY;
 
     mitk::DCUtilities::MatrixToDC3d(testDataNewY, testCollection, resultMask, testMask);
     //forest.SetMaskName(testMask);

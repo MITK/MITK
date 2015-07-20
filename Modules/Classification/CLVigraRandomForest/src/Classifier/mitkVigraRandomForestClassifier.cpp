@@ -504,3 +504,8 @@ std::vector<std::string> mitk::VigraRandomForestClassifier::GetItemList()
   }
   return result;
 }
+
+void mitk::VigraRandomForestClassifier::SetTreeWeight(int treeId, double weight)
+{
+  m_TreeWeights(treeId,0) = weight;
+}

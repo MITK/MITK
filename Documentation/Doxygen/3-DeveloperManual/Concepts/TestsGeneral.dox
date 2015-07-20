@@ -1,6 +1,13 @@
 /**
 \page GeneralTests General: Tests in MITK
 
+MITK has switched to using the CppUnit framework. This page will be rewritten to reflect that. Until that is the done please take a look at either a CPPUnit tutorial (such as http://robotics.usc.edu/~ampereir/wordpress/?p=772)
+or the following example test.
+
+\include Examples\FirstSteps\NewModule\test\mitkExampleDataStructureTest.cpp
+
+\warning The text below shows the old MITK test framework and will be replaced once a more comprehensive CppUnit text is available
+
 Two types of standardizes automated tests are provided by MITK. These types are <B> unit tests </B> and <B> rendering tests </B>. This section will describe unit testing in MITK, while more information on rendering tests can be found in the section \ref RenderingTests.
 
 -# \ref GeneralTestsSection1 "Basic Information on Unit Testing"

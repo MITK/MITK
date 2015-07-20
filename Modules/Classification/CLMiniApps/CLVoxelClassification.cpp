@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 
 #include <mitkDataCollectionUtilities.h>
+#include <mitkRandomForestIO.h>
 
 // ----------------------- Forest Handling ----------------------
 //#include <mitkDecisionForest.h>
@@ -331,9 +332,15 @@ int main(int argc, char* argv[])
     // If required do test
     //////////////////////////////////////////////////////////////////////////////
     auto testDataX = mitk::DCUtilities::DC3dDToMatrixXd(testCollection,modalities, testMask);
-    auto testDataNewY = forest->WeightedPredict(testDataX);
+    auto testDataNewY = forest->Predict(testDataX);
     MITK_INFO << testDataNewY;
-    mitk::IOUtil::Save(forest,"d:/tmp/forest.hdf5");
+
+    //writer.// (forest);
+    /*
+    auto w = forest->GetTreeWeights();
+    w(0,0) = 10;
+    forest->SetTreeWeights(w);*/
+    mitk::IOUtil::Save(forest,"d:/tmp/forest.forest");
 
     mitk::DCUtilities::MatrixToDC3d(testDataNewY, testCollection, resultMask, testMask);
     //forest.SetMaskName(testMask);

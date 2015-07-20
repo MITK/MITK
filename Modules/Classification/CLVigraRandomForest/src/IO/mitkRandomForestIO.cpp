@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itksys/SystemTools.hxx"
 //#include "mitkHDF5IOMimeTypes.h"
 
-
 #include "vigra/random_forest_hdf5_impex.hxx"
 
 #include <iostream>
@@ -38,7 +37,7 @@ mitk::RandomForestFileIO::ConfidenceLevel mitk::RandomForestFileIO::GetReaderCon
 {
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetLocalFileName().c_str());
   bool is_loaded = vigra::rf_import_HDF5(m_rf, this->GetInputLocation());
-  return ext == ".hdf5"  && is_loaded == true? IFileReader::Supported : IFileReader::Unsupported;
+  return ext == ".forest"  && is_loaded == true? IFileReader::Supported : IFileReader::Unsupported;
 }
 
 mitk::RandomForestFileIO::ConfidenceLevel mitk::RandomForestFileIO::GetWriterConfidenceLevel() const
@@ -55,17 +54,17 @@ mitk::RandomForestFileIO::ConfidenceLevel mitk::RandomForestFileIO::GetWriterCon
 mitk::RandomForestFileIO::RandomForestFileIO()
   : AbstractFileIO(mitk::VigraRandomForestClassifier::GetStaticNameOfClass())
 {
-  CustomMimeType customReaderMimeType(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".hdf5");
+  CustomMimeType customReaderMimeType(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".forest");
   std::string category = "Vigra Random Forest File";
   customReaderMimeType.SetComment("Vigra Random Forest");
   customReaderMimeType.SetCategory(category);
-  customReaderMimeType.AddExtension("hdf5");
+  customReaderMimeType.AddExtension("forest");
 
-//  this->AbstractFileIOWriter::SetRanking(100);
-  this->AbstractFileWriter::SetMimeTypePrefix(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".hdf5");
+  //  this->AbstractFileIOWriter::SetRanking(100);
+  this->AbstractFileWriter::SetMimeTypePrefix(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".forest");
   this->AbstractFileWriter::SetMimeType(customReaderMimeType);
   this->SetWriterDescription("Vigra Random Forest");
-  this->AbstractFileReader::SetMimeTypePrefix(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".hdf5");
+  this->AbstractFileReader::SetMimeTypePrefix(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".forest");
   this->AbstractFileReader::SetMimeType(customReaderMimeType);
   this->SetReaderDescription("Vigra Random Forest");
 
@@ -111,12 +110,21 @@ std::vector<itk::SmartPointer<mitk::BaseData> >
       }
     }
 
-
-
     //    vigra::HDF5File hdf5_file;
     //    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
     output->SetRandomForest(m_rf);
     result.push_back(output.GetPointer());
+
+    auto treeWeight = output->GetTreeWeights();
+    treeWeight.resize(m_rf.tree_count(),1);
+    vigra::MultiArrayView<2, double> W(vigra::Shape2(treeWeight.rows(),treeWeight.cols()),treeWeight.data());
+
+    vigra::HDF5File hdf5_file(this->GetInputLocation() , vigra::HDF5File::Open);
+
+    hdf5_file.cd_mk("/_mitkOptions");
+    hdf5_file.read("treeWeights",W);
+    output->SetTreeWeights(treeWeight);
+    hdf5_file.close();
 
     //    if(!hdf5_file.existsAttribute(".","mitk")){
     //      return result;
@@ -168,12 +176,13 @@ void mitk::RandomForestFileIO::Write()
     //mitkDC->GetRandomForest()
     vigra::rf_export_HDF5(mitkDC->GetRandomForest(), this->GetOutputLocation());
 
-    //vigra::HDF5File hdf5_file(this->GetOutputLocation() , vigra::HDF5File::Open);
+    vigra::HDF5File hdf5_file(this->GetOutputLocation() , vigra::HDF5File::Open);
 
-    /*auto treeWeight = mitkDC->GetTreeWeights();
-    hdf5_file.cd_mk("/treeWeights");
-    hdf5_file.write("weight",treeWeight(0,0));
-    hdf5_file.write("weight",2.0);*/
+    auto treeWeight = mitkDC->GetTreeWeights();
+    hdf5_file.cd_mk("/_mitkOptions");
+    vigra::MultiArrayView<2, double> W(vigra::Shape2(treeWeight.rows(),treeWeight.cols()),treeWeight.data());
+    hdf5_file.write("treeWeights",W);
+    hdf5_file.close();
 
     //    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
     //    output->SetRandomForest(rf);

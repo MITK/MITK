@@ -96,7 +96,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
   )
   # This mini app does not depend on mitkDiffusionImaging at all
   mitk_create_executable(CLVoxelClassification
-    DEPENDS MitkCore MitkClassificationCore MitkDataCollection MitkCLImportanceWeighting MitkClassifierVigraRandomForest
+    DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLImportanceWeighting MitkCLVigraRandomForest
     CPP_FILES CLVoxelClassification.cpp
   )
 

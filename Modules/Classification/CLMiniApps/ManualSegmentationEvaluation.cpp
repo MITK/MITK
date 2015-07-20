@@ -89,7 +89,6 @@ void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Im
   mitk::CLUtil::ProbabilityMap(smoothed,32, 5.6,brain_prob);
   m_FeatureImageVector.push_back(brain_prob);
 
-
   std::vector<unsigned int> FOS_sizes;
   FOS_sizes.push_back(1);
 
@@ -100,7 +99,6 @@ void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Im
 
   for(unsigned int i = 0 ; i < FOS_sizes.size(); i++)
   {
-
     FOSFilerType::Pointer filter = FOSFilerType::New();
     filter->SetNeighborhoodSize(FOS_sizes[i]);
     filter->SetInput(input);
@@ -115,13 +113,10 @@ void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Im
       mitk::CastToMitkImage(dynamic_cast<DoubleImageType *>(array[i].GetPointer()),featureimage);
       m_FeatureImageVector.push_back(featureimage);
       //      AddImageAsDataNode(featureimage,FunctorType::GetFeatureName(i))->SetVisibility(show_nodes);
-
     }
   }
 
-
   {
-
     itk::HessianMatrixEigenvalueImageFilter< DoubleImageType >::Pointer filter = itk::HessianMatrixEigenvalueImageFilter< DoubleImageType >::New();
     filter->SetInput(input);
     filter->SetImageMask(mask);
@@ -136,7 +131,6 @@ void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Im
     m_FeatureImageVector.push_back(o1);
     m_FeatureImageVector.push_back(o2);
     m_FeatureImageVector.push_back(o3);
-
   }
 
   {
@@ -155,11 +149,9 @@ void ProcessFeatureImages(const mitk::Image::Pointer & raw_image, const mitk::Im
     m_FeatureImageVector.push_back(o1);
     m_FeatureImageVector.push_back(o2);
     m_FeatureImageVector.push_back(o3);
-
   }
 
   {
-
     itk::LineHistogramBasedMassImageFilter< DoubleImageType >::Pointer filter = itk::LineHistogramBasedMassImageFilter< DoubleImageType >::New();
     filter->SetInput(input);
     filter->SetImageMask(mask);
@@ -222,8 +214,6 @@ int main(int argc, char* argv[])
   raw_image = map.size() <= 7 ? dynamic_cast<mitk::Image *>(so[0].GetPointer()) : dynamic_cast<mitk::Image *>(so[1].GetPointer());
   class_mask = map.size() <= 7 ? dynamic_cast<mitk::Image *>(so[1].GetPointer()) : dynamic_cast<mitk::Image *>(so[0].GetPointer());
 
-
-
   CSF_mps = mitk::IOUtil::LoadPointSet(inputdir + "/" + csf_mps_name);
   LES_mps = mitk::IOUtil::LoadPointSet(inputdir + "/" + les_mps_name);
   BRA_mps = mitk::IOUtil::LoadPointSet(inputdir + "/" + bra_mps_name);
@@ -231,19 +221,22 @@ int main(int argc, char* argv[])
   unsigned int num_points = CSF_mps->GetSize() + LES_mps->GetSize() + BRA_mps->GetSize();
   MITK_INFO << "Found #" << num_points << " points over all classes.";
 
-
   ProcessFeatureImages(raw_image, class_mask);
 
-  mitk::CLUtil::MergeLabels(class_mask, {{0,0},{1,1},{2,1},{3,1},{4,2},{5,3},{6,3}});
+  std::map<unsigned int, unsigned int> tmpMap;
+  tmpMap[0] = 0;
+  tmpMap[1] = 1;
+  tmpMap[2] = 1;
+  tmpMap[3] = 1;
+  tmpMap[4] = 2;
+  tmpMap[5] = 3;
+  tmpMap[6] = 3;
+  mitk::CLUtil::MergeLabels( class_mask, tmpMap);
   class_mask_sampled = class_mask->Clone();
   itk::Image<short,3>::Pointer itk_classmask_sampled;
   mitk::CastToItkImage(class_mask_sampled,itk_classmask_sampled);
   itk::ImageRegionIteratorWithIndex<itk::Image<short,3> >::IndexType index;
   itk::ImageRegionIteratorWithIndex<itk::Image<short,3> > iit(itk_classmask_sampled,itk_classmask_sampled->GetLargestPossibleRegion());
-
-
-
-
 
   std::ofstream myfile;
   myfile.open (inputdir + "/results_3.csv");
@@ -264,7 +257,6 @@ int main(int argc, char* argv[])
   unsigned int runs = 20;
   for(unsigned int k = 0 ; k < runs; k++)
   {
-
     auto CSF_vec = PointSetToVector(CSF_mps);
     auto LES_vec = PointSetToVector(LES_mps);
     auto BRA_vec = PointSetToVector(BRA_mps);
@@ -290,12 +282,10 @@ int main(int argc, char* argv[])
     iit.Set(3);
     BRA_vec.pop_back();
 
-
     std::stringstream ss;
 
     while(!(CSF_vec.empty() && LES_vec.empty() && BRA_vec.empty()))
     {
-
       mitk::CastToMitkImage(itk_classmask_sampled, class_mask_sampled);
 
       // Train forest
@@ -326,7 +316,6 @@ int main(int argc, char* argv[])
 
       mitk::CastToItkImage(result_mask,itk_result_mask);
       mitk::CastToItkImage(class_mask, itk_class_mask);
-
 
       itk::LabelOverlapMeasuresImageFilter<itk::Image<short,3> >::Pointer overlap_filter = itk::LabelOverlapMeasuresImageFilter<itk::Image<short,3> >::New();
       overlap_filter->SetInput(0,itk_result_mask);
@@ -364,7 +353,6 @@ int main(int argc, char* argv[])
         iit.Set(3);
         BRA_vec.pop_back();
       }
-
     }
 
     myfile << ss.str() << "\n";
@@ -372,10 +360,6 @@ int main(int argc, char* argv[])
   }
 
   myfile.close();
-
-
-
-
 
   return EXIT_SUCCESS;
 }

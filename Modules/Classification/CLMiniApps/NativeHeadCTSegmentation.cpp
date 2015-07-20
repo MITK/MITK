@@ -41,7 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageAccessByItk.h>
 
-
 using namespace mitk;
 
 typedef unsigned int uint;
@@ -49,8 +48,8 @@ void ReadMitkProjectImageAndMask(string input_file, mitk::Image::Pointer & raw_i
 std::map<unsigned int, double> VolumeUnderMaskByLabel(mitk::Image::Pointer mask);
 
 /**
- *
- */
+*
+*/
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -105,7 +104,6 @@ int main(int argc, char* argv[])
     Eigen::MatrixXd feature_matrix(n_samples, n_features);
     Eigen::MatrixXi label_matrix(n_samples, 1);
 
-
     uint pos = 0;
 
     for(auto entry : strl)
@@ -122,19 +120,14 @@ int main(int argc, char* argv[])
       mitk::CLUtil::DilateGrayscale(csf_prob,3,mitk::CLUtil::Axial,csf_prob);
       mitk::CLUtil::FillHoleGrayscale(csf_prob,csf_prob);
 
-
       feature_matrix.block(pos, 0, n_samples_per_image, 1) = mitk::CLUtil::Transform<double>(raw_image,brain_mask_sampled);
       feature_matrix.block(pos, 1, n_samples_per_image, 1) = mitk::CLUtil::Transform<double>(csf_prob,brain_mask_sampled);
 
       label_matrix.block(pos, 0, n_samples_per_image, 1) = mitk::CLUtil::Transform<int>(class_mask, brain_mask_sampled);
       pos += n_samples_per_image;
-
-
     }
     classifier->Train(feature_matrix, label_matrix);
     classifier->PrintParameter();
-
-
   }
 
   std::map<std::string, std::pair<double, double> > map_error;
@@ -159,8 +152,6 @@ int main(int argc, char* argv[])
     feature_matrix.block(0, 0, count, 1) = mitk::CLUtil::Transform<double>(raw_image,brain_mask);
     feature_matrix.block(0, 1, count, 1) = mitk::CLUtil::Transform<double>(csf_prob,brain_mask);
 
-
-
     mitk::Image::Pointer result_mask = mitk::CLUtil::Transform<int>(classifier->Predict(feature_matrix),brain_mask);
 
     std::string name = itksys::SystemTools::GetFilenameWithoutExtension(entry.toStdString());
@@ -169,7 +160,6 @@ int main(int argc, char* argv[])
     auto map_pred = VolumeUnderMaskByLabel(result_mask);
 
     map_error[entry.toStdString()] = std::make_pair(std::abs(map_true[1] - map_pred[1]) / map_true[1], map_true[2] != 0 ? std::abs(map_true[2] - map_pred[2]) / map_true[2]: 0);
-
   }
 
   double mean_error_csf = 0;
@@ -183,11 +173,8 @@ int main(int argc, char* argv[])
   }
   MITK_INFO("Mean") << "CSF error: " << mean_error_csf/num_subjects << "%\t LES error: " << mean_error_les/num_subjects << "%";
 
-
-
   return EXIT_SUCCESS;
 }
-
 
 void ReadMitkProjectImageAndMask(std::string input_file, mitk::Image::Pointer & raw_image, mitk::Image::Pointer & class_mask, mitk::Image::Pointer & brain_mask)
 {
@@ -200,11 +187,25 @@ void ReadMitkProjectImageAndMask(std::string input_file, mitk::Image::Pointer & 
   raw_image = map.size() <= 7 ? dynamic_cast<mitk::Image *>(so[0].GetPointer()) : dynamic_cast<mitk::Image *>(so[1].GetPointer());
   class_mask = map.size() <= 7 ? dynamic_cast<mitk::Image *>(so[1].GetPointer()) : dynamic_cast<mitk::Image *>(so[0].GetPointer());
 
-  std::map<uint, uint> merge_instructions = {{0,0},{1,1},{2,1},{3,1},{4,2},{5,3},{6,3}};
+  std::map<uint, uint> merge_instructions;// = {{0,0},{1,1},{2,1},{3,1},{4,2},{5,3},{6,3}};
+  merge_instructions[0] = 0;
+  merge_instructions[1] = 1;
+  merge_instructions[2] = 1;
+  merge_instructions[3] = 1;
+  merge_instructions[4] = 2;
+  merge_instructions[5] = 3;
+  merge_instructions[6] = 3;
   mitk::CLUtil::MergeLabels(class_mask, merge_instructions);
 
   brain_mask = class_mask->Clone();
-  merge_instructions = {{0,0},{1,1},{2,1},{3,1},{4,1},{5,1},{6,1}};
+  //merge_instructions = {{0,0},{1,1},{2,1},{3,1},{4,1},{5,1},{6,1}};
+  merge_instructions[0] = 0;
+  merge_instructions[1] = 1;
+  merge_instructions[2] = 1;
+  merge_instructions[3] = 1;
+  merge_instructions[4] = 1;
+  merge_instructions[5] = 1;
+  merge_instructions[6] = 1;
   mitk::CLUtil::MergeLabels(brain_mask, merge_instructions);
 }
 

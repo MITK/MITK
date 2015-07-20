@@ -94,6 +94,11 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore MitkCLUtilities
     CPP_FILES CLVoxelFeatures.cpp mitkCommandLineParser.cpp
   )
+  # This mini app does not depend on mitkDiffusionImaging at all
+  mitk_create_executable(CLVoxelClassification
+    DEPENDS MitkCore MitkClassificationCore MitkDataCollection MitkCLImportanceWeighting MitkClassifierVigraRandomForest
+    CPP_FILES CLVoxelClassification.cpp
+  )
 
         # On Linux, create a shell script to start a relocatable application
         if(UNIX AND NOT APPLE)

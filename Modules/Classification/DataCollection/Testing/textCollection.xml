@@ -1,0 +1,18 @@
+<col name="TestCollection">
+  <subcol name="Patient1" description="dummyShit" id="oma">
+    <data name="TimeStep1" description="BeforeOp" id="opa">
+      <item name="T2" link="/home/cweber/E011-Projekte/Glioma/high_grade_data_20_cases/Ciwis_Damian/PROCESSED-001/CiwisDamian_20100812_T2_reg.nrrd" />
+      <item name="DWI" link="/home/cweber/E011-Projekte/Glioma/high_grade_data_20_cases/Ciwis_Damian/PROCESSED-001/CiwisDamian_20100812_reg.dwi" />
+      <item name="GTV" link="/home/cweber/E011-Projekte/Glioma/high_grade_data_20_cases/Ciwis_Damian/PROCESSED-001/CiwisDamian_20100812_gtv_reg.nrrd" />
+    </data>
+    <data name="TimeStep2" description="PostOP" id="1">
+      <item name="T2" link="/home/cweber/E011-Projekte/Glioma/high_grade_data_20_cases/Ciwis_Damian/PROCESSED-001/CiwisDamian_20100812_T2_reg.nrrd" />
+      <item name="GTV" link="/home/cweber/E011-Projekte/Glioma/high_grade_data_20_cases/Ciwis_Damian/PROCESSED-001/CiwisDamian_20100812_gtv_reg.nrrd" />
+    </data>
+  </subcol>
+  <subcol name="Patient2" description="dummyShit" id="patient2ID">
+    <data name="TimeStep0" description="BeforeOp" id="2">
+      <item name="T2" link="/home/cweber/E011-Projekte/Glioma/high_grade_data_20_cases/Ciwis_Damian/PROCESSED-001/CiwisDamian_20100909_T2_reg.nrrd" />
+    </data>
+  </subcol>
+</col>

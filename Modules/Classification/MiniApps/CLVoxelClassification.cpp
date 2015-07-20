@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCollectionStatistic.h>
 #include <mitkCostingStatistic.h>
 #include <vtkSmartPointer.h>
+#include <mitkIOUtil.h>
 
 #include <mitkDataCollectionUtilities.h>
 
@@ -219,14 +220,14 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     //mitk::DecisionForest forest;
 
-    mitk::VigraRandomForestClassifier forest;
-    forest.SetSamplesPerTree(samplesPerTree);
-    forest.SetMinimumSplitNodeSize(minimumSplitNodeSize);
-    forest.SetTreeCount(numberOfTrees);
-    forest.UseSampleWithReplacement(sampleWithReplacement);
-    forest.SetPrecision(trainPrecision);
-    forest.SetMaximumTreeDepth(maximumTreeDepth);
-    forest.SetWeightLambda(weightLambda);
+    mitk::VigraRandomForestClassifier::Pointer forest = mitk::VigraRandomForestClassifier::New();
+    forest->SetSamplesPerTree(samplesPerTree);
+    forest->SetMinimumSplitNodeSize(minimumSplitNodeSize);
+    forest->SetTreeCount(numberOfTrees);
+    forest->UseSampleWithReplacement(sampleWithReplacement);
+    forest->SetPrecision(trainPrecision);
+    forest->SetMaximumTreeDepth(maximumTreeDepth);
+    forest->SetWeightLambda(weightLambda);
 
     // TOOD forest.UseRandomSplit(randomSplit);
 
@@ -247,7 +248,7 @@ int main(int argc, char* argv[])
       {
         MITK_INFO << "Activated Point-based weighting...";
         //forest.UseWeightedPoints(true);
-        forest.UsePointWiseWeight(true);
+        forest->UsePointWiseWeight(true);
         //forest.SetWeightName("calculated_weight");
         /*if (importanceWeightAlgorithm == 1)
         {
@@ -308,10 +309,10 @@ int main(int argc, char* argv[])
           est.Update();
         }
         auto trainDataW = mitk::DCUtilities::DC3dDToMatrixXd(trainCollection, "calculated_weight", trainMask);
-        forest.SetPointWiseWeight(trainDataW);
-        forest.UsePointWiseWeight(true);
+        forest->SetPointWiseWeight(trainDataW);
+        forest->UsePointWiseWeight(true);
       }
-      forest.Train(trainDataX, trainDataY);
+      forest->Train(trainDataX, trainDataY);
       // TODO forest.Save(forestPath);
     } else
     {
@@ -330,7 +331,9 @@ int main(int argc, char* argv[])
     // If required do test
     //////////////////////////////////////////////////////////////////////////////
     auto testDataX = mitk::DCUtilities::DC3dDToMatrixXd(testCollection,modalities, testMask);
-    auto testDataNewY = forest.Predict(testDataX);
+    auto testDataNewY = forest->WeightedPredict(testDataX);
+    MITK_INFO << testDataNewY;
+    mitk::IOUtil::Save(forest,"d:/tmp/forest.hdf5");
 
     mitk::DCUtilities::MatrixToDC3d(testDataNewY, testCollection, resultMask, testMask);
     //forest.SetMaskName(testMask);
@@ -402,7 +405,8 @@ int main(int argc, char* argv[])
     stat.SetTestName(resultMask);
     stat.SetMaskName(testMask);
     stat.Update();
-    stat.Print(statisticFile,sstatisticFile,statisticWithHeader, statisticShortFileLabel);
+    //stat.Print(statisticFile,sstatisticFile,statisticWithHeader, statisticShortFileLabel);
+    stat.Print(statisticFile,sstatisticFile,true, statisticShortFileLabel);
     statisticFile.close();
 
     time(&now);

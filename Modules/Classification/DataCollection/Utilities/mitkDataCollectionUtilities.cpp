@@ -180,7 +180,7 @@ void mitk::DCUtilities::MatrixToDC3d(const Eigen::MatrixXi &matrix, mitk::DataCo
     {
       for (int col = 0; col < numberOfNames; ++col)
       {
-        dataIter[col].SetVoxel(matrix(row,col));
+        (dataIter[col]).SetVoxel(matrix(row,col));
       }
       ++row;
     }
@@ -230,6 +230,7 @@ void mitk::DCUtilities::EnsureUCharImageInDC(mitk::DataCollection::Pointer dc, s
       image->SetOrigin(originImage->GetOrigin());
       image->SetDirection(originImage->GetDirection());
       image->Allocate();
+      image->FillBuffer(0);
 
       dc->AddData(dynamic_cast<itk::DataObject*>(image.GetPointer()),name,"");
     }

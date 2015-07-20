@@ -32,11 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <boost/algorithm/string.hpp>
 
-
 #define GetAttribute(name,type)\
   type name;\
   hdf5_file.readAttribute(".",name,name);
-
 
 mitk::RandomForestFileIO::ConfidenceLevel mitk::RandomForestFileIO::GetReaderConfidenceLevel() const
 {
@@ -57,7 +55,6 @@ mitk::RandomForestFileIO::ConfidenceLevel mitk::RandomForestFileIO::GetWriterCon
   }
 }
 
-
 mitk::RandomForestFileIO::RandomForestFileIO()
   : AbstractFileIO(mitk::VigraRandomForestClassifier::GetStaticNameOfClass())
 {
@@ -66,7 +63,6 @@ mitk::RandomForestFileIO::RandomForestFileIO()
   customReaderMimeType.SetComment("Vigra Random Forest");
   customReaderMimeType.SetCategory(category);
   customReaderMimeType.AddExtension("hdf5");
-
 
   this->AbstractFileWriter::SetMimeTypePrefix(mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".hdf5");
   this->AbstractFileWriter::SetMimeType(customReaderMimeType);
@@ -89,10 +85,9 @@ mitk::RandomForestFileIO::~RandomForestFileIO()
 {}
 
 std::vector<itk::SmartPointer<mitk::BaseData> >
-mitk::RandomForestFileIO::
-Read()
+  mitk::RandomForestFileIO::
+  Read()
 {
-
   mitk::VigraRandomForestClassifier::Pointer output = mitk::VigraRandomForestClassifier::New();
   std::vector<itk::SmartPointer<mitk::BaseData> > result;
 
@@ -103,7 +98,6 @@ Read()
   }
   else
   {
-
     const std::string& locale = "C";
     const std::string& currLocale = setlocale( LC_ALL, NULL );
 
@@ -119,33 +113,30 @@ Read()
       }
     }
 
-
     vigra::RandomForest<int> rf;
     vigra::rf_import_HDF5(rf, this->GetInputLocation());
-//    vigra::HDF5File hdf5_file;
-//    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
+    //    vigra::HDF5File hdf5_file;
+    //    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
     output->SetRandomForest(rf);
     result.push_back(output.GetPointer());
 
-//    if(!hdf5_file.existsAttribute(".","mitk")){
-//      return result;
-//    }else{
+    //    if(!hdf5_file.existsAttribute(".","mitk")){
+    //      return result;
+    //    }else{
+    //      GetAttribute(mitk_isMitkDecisionTree,std::string);
+    //      if(mitk_isMitkDecisionTree.empty()) return result;
 
-//      GetAttribute(mitk_isMitkDecisionTree,std::string);
-//      if(mitk_isMitkDecisionTree.empty()) return result;
+    //      GetAttribute(mitk_Modalities,std::string);
+    //      std::vector<std::string> strs;
+    //      boost::split(strs, mitk_Modalities, boost::is_any_of("\t ,"));
+    //      MITK_INFO << "Import Modalities: " << mitk_Modalities;
+    //      output->SetModalities(strs);
 
-//      GetAttribute(mitk_Modalities,std::string);
-//      std::vector<std::string> strs;
-//      boost::split(strs, mitk_Modalities, boost::is_any_of("\t ,"));
-//      MITK_INFO << "Import Modalities: " << mitk_Modalities;
-//      output->SetModalities(strs);
-
-//    }
+    //    }
 
     return result;
   }
 }
-
 
 void mitk::RandomForestFileIO::Write()
 {
@@ -179,29 +170,32 @@ void mitk::RandomForestFileIO::Write()
     //mitkDC->GetRandomForest()
     vigra::rf_export_HDF5(mitkDC->GetRandomForest(), this->GetOutputLocation());
 
-    vigra::HDF5File hdf5_file;
-//    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
-//    output->SetRandomForest(rf);
-//    result.push_back(output.GetPointer());
+    //vigra::HDF5File hdf5_file(this->GetOutputLocation() , vigra::HDF5File::Open);
 
-//    if(!hdf5_file.existsAttribute(".","mitk")){
-//      return result;
-//    }else{
+    /*auto treeWeight = mitkDC->GetTreeWeights();
+    hdf5_file.cd_mk("/treeWeights");
+    hdf5_file.write("weight",treeWeight(0,0));
+    hdf5_file.write("weight",2.0);*/
 
-//      GetAttribute(mitk_isMitkDecisionTree,std::string);
-//      if(mitk_isMitkDecisionTree.empty()) return result;
+    //    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
+    //    output->SetRandomForest(rf);
+    //    result.push_back(output.GetPointer());
 
-//      GetAttribute(mitk_Modalities,std::string);
-//      std::vector<std::string> strs;
-//      boost::split(strs, mitk_Modalities, boost::is_any_of("\t ,"));
-//      MITK_INFO << "Import Modalities: " << mitk_Modalities;
-//      output->SetModalities(strs);
+    //    if(!hdf5_file.existsAttribute(".","mitk")){
+    //      return result;
+    //    }else{
+    //      GetAttribute(mitk_isMitkDecisionTree,std::string);
+    //      if(mitk_isMitkDecisionTree.empty()) return result;
 
-//    }
+    //      GetAttribute(mitk_Modalities,std::string);
+    //      std::vector<std::string> strs;
+    //      boost::split(strs, mitk_Modalities, boost::is_any_of("\t ,"));
+    //      MITK_INFO << "Import Modalities: " << mitk_Modalities;
+    //      output->SetModalities(strs);
 
+    //    }
   }
 }
-
 
 mitk::AbstractFileIO* mitk::RandomForestFileIO::IOClone() const
 {

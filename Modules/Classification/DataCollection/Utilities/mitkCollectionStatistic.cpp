@@ -8,15 +8,13 @@
 
 void mitk::CollectionStatistic::SetCollection(mitk::DataCollection::Pointer collection)
 {
-    m_Collection = collection;
+  m_Collection = collection;
 }
-
 
 mitk::DataCollection::Pointer mitk::CollectionStatistic::GetCollection()
 {
-    return m_Collection;
+  return m_Collection;
 }
-
 
 void mitk::CollectionStatistic::SetClassCount (size_t count)
 {
@@ -64,7 +62,7 @@ int mitk::CollectionStatistic::IsInSameVirtualClass(unsigned char gold, unsigned
 
 unsigned char mitk::CollectionStatistic::ToGoldIndex(unsigned char value)
 {
-  return value;
+  return value-1;
 }
 unsigned char mitk::CollectionStatistic::ToTestIndex(unsigned char value)
 {
@@ -151,7 +149,6 @@ bool mitk::CollectionStatistic::Update()
   return true;
 }
 
-
 void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, bool withHeader, std::string label)
 {
   assert(m_ImageClassStatistic[0].size() == m_ClassCount);
@@ -204,7 +201,6 @@ void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, boo
     out << "|--------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|--------------|" << std::endl;
     out << "| Class  |    DICE     |   Jaccard   | Sensitivity | Specificity |     TP      |     TN      |     FP      |      FN      |" << std::endl;
     out << "|--------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|--------------|" << std::endl;
-
 
     for (int j =0; j < m_ImageClassStatistic[i].size(); ++j)
     {

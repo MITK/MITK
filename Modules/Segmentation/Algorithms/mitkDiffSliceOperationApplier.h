@@ -21,10 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include <mitkOperationActor.h>
 
-#include "mitkDiffSliceOperation.h"
-#include <mitkExtractSliceFilter.h>
-#include <mitkVtkImageOverwrite.h>
-
 namespace mitk
 {
   /** \brief Executes a DiffSliceOperation.
@@ -36,9 +32,6 @@ namespace mitk
   public:
 
     mitkClassMacroNoParent(DiffSliceOperationApplier)
-
-    //itkFactorylessNewMacro(Self)
-    //itkCloneMacro(Self)
 
     /** \brief Returns an instance of the class */
     static DiffSliceOperationApplier* GetInstance();
@@ -56,9 +49,6 @@ namespace mitk
     DiffSliceOperationApplier();
 
     virtual ~DiffSliceOperationApplier();
-
-    //static DiffSliceOperationApplier* s_Instance;
-
   };
 }
 #endif

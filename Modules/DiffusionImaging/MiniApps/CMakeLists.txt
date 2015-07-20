@@ -61,9 +61,9 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
       set(dependencies_list ${dependencies})
 
       mitk_create_executable(${appname}
-      DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
+      DEPENDS MitkCore MitkDiffusionCore MitkCommandLine ${dependencies_list}
       PACKAGE_DEPENDS ITK
-      CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
+      CPP_FILES ${appname}.cpp
       )
 
       if(EXECUTABLE_IS_ENABLED)
@@ -112,8 +112,8 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 
   # This mini app does not depend on mitkDiffusionImaging at all
   mitk_create_executable(Dicom2Nrrd
-    DEPENDS MitkCore
-    CPP_FILES Dicom2Nrrd.cpp mitkCommandLineParser.cpp
+    DEPENDS MitkCore MitkCommandLine
+    CPP_FILES Dicom2Nrrd.cpp
   )
 
         # On Linux, create a shell script to start a relocatable application

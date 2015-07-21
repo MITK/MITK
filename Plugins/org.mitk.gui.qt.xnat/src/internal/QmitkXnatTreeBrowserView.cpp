@@ -52,6 +52,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkProgressBar.h>
 #include <QmitkIOUtil.h>
+#include <QmitkXnatUploadFromDataStorageDialog.h>
 
 const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
@@ -133,8 +134,77 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
     m_Controls.labelError->setVisible(true);
   }
 
-  connect(m_Controls.treeView, SIGNAL(activated(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)));
+  connect(m_Controls.treeView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)));
+  connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnXnatNodeSelected(const QModelIndex&)));
   connect(m_TreeModel, SIGNAL(ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*)), this, SLOT(OnUploadResource(const QList<mitk::DataNode*>&, ctkXnatObject*)));
+
+  connect(m_Controls.btnXnatUpload, SIGNAL(clicked()), this, SLOT(OnUploadFromDataStorage()));
+  connect(m_Controls.btnXnatDownload, SIGNAL(clicked()), this, SLOT(OnDownloadSelectedXnatFile()));
+  connect(m_Controls.btnCreateXnatFolder, SIGNAL(clicked()), this, SLOT(OnCreateResourceFolder()));
+}
+
+void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
+{
+  QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+
+  if(!index.isValid()) return;
+
+  ctkXnatObject* parent = index.data(Qt::UserRole).value<ctkXnatObject*>();
+
+  this->InternalAddResourceFolder(parent);
+}
+
+void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
+{
+  QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+
+  if(!index.isValid()) return;
+
+  ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
+
+  ctkXnatFile* selectedXnatFile = dynamic_cast<ctkXnatFile*>(selectedXnatObject);
+
+  if (selectedXnatFile != nullptr)
+  {
+    this->InternalFileDownload(index, true);
+  }
+  else
+  {
+    // Do something
+  }
+}
+
+void QmitkXnatTreeBrowserView::OnUploadFromDataStorage()
+{
+  QmitkXnatUploadFromDataStorageDialog dialog;
+  dialog.SetDataStorage(this->GetDataStorage());
+  int result = dialog.exec();
+
+  if (result == QmitkXnatUploadFromDataStorageDialog::UPLOAD)
+  {
+    QList<mitk::DataNode::Pointer> nodes;
+    nodes << dialog.GetSelectedNode();
+    this->OnUploadResource();
+  }
+}
+
+void QmitkXnatTreeBrowserView::OnXnatNodeSelected(const QModelIndex& index)
+{
+  // Enable download button
+  if (!index.isValid()) return;
+
+  ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
+
+  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject);
+  m_Controls.btnXnatDownload->setEnabled(enableDownload);
+
+  bool enableCreateFolder = dynamic_cast<ctkXnatProject*>(selectedXnatObject) != nullptr;
+  enableCreateFolder |= dynamic_cast<ctkXnatSubject*>(selectedXnatObject) != nullptr;
+  enableCreateFolder |= dynamic_cast<ctkXnatExperiment*>(selectedXnatObject) != nullptr;
+  m_Controls.btnCreateXnatFolder->setEnabled(enableCreateFolder);
+
+  bool enableUpload = dynamic_cast<ctkXnatResource*>(selectedXnatObject) != nullptr;
+  m_Controls.btnXnatUpload->setEnabled(enableUpload);
 }
 
 void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
@@ -177,7 +247,7 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
       page->ReuseEditor(reuseEditor.Cast<berry::IReusableEditor>(), editorInput);
       page->Activate(reuseEditor);
     }
-  }
+  } 
 }
 
 void QmitkXnatTreeBrowserView::SetSelectionProvider()

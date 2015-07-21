@@ -40,10 +40,14 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="btnXnatUpload">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Upload to XNAT</string>
+       </property>
        <property name="styleSheet">
-        <string notr="true">
-
-</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string/>
@@ -62,12 +66,41 @@
      </item>
      <item>
       <widget class="QPushButton" name="btnXnatDownload">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Download File</string>
+       </property>
        <property name="text">
         <string/>
        </property>
        <property name="icon">
         <iconset resource="../../resources/xnat.qrc">
          <normaloff>:/xnat/xnat-download.png</normaloff>:/xnat/xnat-download.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCreateXnatFolder">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Create Folder</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resources/xnat.qrc">
+         <normaloff>:/xnat/xnat-folder.png</normaloff>:/xnat/xnat-folder.png</iconset>
        </property>
        <property name="iconSize">
         <size>

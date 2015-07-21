@@ -16,5 +16,5 @@ The following features are demonstrated:
 <li> setting an initial size </li>
 </ul>
 
-See the main <a href=\"http://docs.mitk.org/nightly-qt4/BlueBerryExampleMultiplePerspectives.html\">documentation</a> for details."
+See the main <a href=\"http://docs.mitk.org/nightly/BlueBerryExampleMultiplePerspectives.html\">documentation</a> for details."
 )

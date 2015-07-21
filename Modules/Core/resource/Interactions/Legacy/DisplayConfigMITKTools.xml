@@ -6,7 +6,7 @@
     So if an action here conflicts with you tool you can comment out this section.
     ! Alternatively you can also just change the event description, so that the actions are triggered by different mouse/key events
     during Tool use. !
-    Refer to 'How to create a Config-File' http://docs.mitk.org/nightly-qt4/Step10Page.html for details.
+    Refer to 'How to create a Config-File' http://docs.mitk.org/nightly/Step10Page.html for details.
 
 *   - middle mouse button : panning
 *   - right mouse button  : zooming

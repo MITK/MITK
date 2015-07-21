@@ -261,7 +261,7 @@ namespace mitk {
 
         librdf_node *node = librdf_query_results_get_binding_value(results, i);
 
-        list.push_front(LibRdfNodeToRdfNode(node));
+        list.push_back(LibRdfNodeToRdfNode(node));
 
         resultMap[key] = list;
       }

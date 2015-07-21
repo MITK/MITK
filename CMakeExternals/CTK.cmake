@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag abca3189)
+    set(revision_tag 1e3470e7)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -74,10 +74,8 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-#      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-#      URL /Users/fetzer/proj/ctk/CTK/CTK-XNAT-Upload.tar.gz
-      URL https://www.dropbox.com/s/imutmjs81ox9vsi/CTK-XNAT-Upload.tar.gz
-      URL_MD5 c495e7125451b27e557fb8cc4e3f31f2
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
+      URL_MD5 4cd017f7b4ac5ee9b396f4e7d0ed5024
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

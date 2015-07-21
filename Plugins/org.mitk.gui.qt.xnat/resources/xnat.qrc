@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/xnat">
+        <file>xnat-download.png</file>
+        <file>xnat-upload.png</file>
+    </qresource>
+</RCC>

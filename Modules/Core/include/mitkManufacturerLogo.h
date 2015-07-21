@@ -37,7 +37,7 @@ class RenderWindow;
 /**
  * Renders a company logo in the foreground
  * of a vtkRenderWindow.
- * @deprecatedSince{next_release} Use mitk::LogoOverlay instead
+ * @deprecatedSince{2015_05} Use mitk::LogoOverlay instead
  */
 class MITKCORE_EXPORT ManufacturerLogo : public BaseData
 {

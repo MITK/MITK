@@ -32,7 +32,7 @@ class mitkExampleDataStructureTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkExampleDataStructureTestSuite);
 
   // Test the append method
-  MITK_TEST(ExampleDataAppend);
+  MITK_TEST(Append_ExampleString_AddsExampleStringToData);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -58,7 +58,7 @@ public:
     m_Data = nullptr;
   }
 
-  void ExampleDataAppend()
+  void Append_ExampleString_AddsExampleStringToData()
   {
     std::string appendedString = "And a third line\n";
     std::string wholeString = m_DefaultDataString + appendedString;

@@ -33,7 +33,7 @@ class mitkExampleDataStructureReaderWriterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkExampleDataStructureReaderWriterTestSuite);
 
   // Test saving/loading
-  MITK_TEST(ExampleDataInOutput);
+  MITK_TEST(ReadWrite_ExampleData_SavedAndLoadedDataEqualToExample);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -59,7 +59,7 @@ public:
     m_Data = nullptr;
   }
 
-  void ExampleDataInOutput()
+  void ReadWrite_ExampleData_SavedAndLoadedDataEqualToExample()
   {
     std::string path = mitk::IOUtil::GetTempPath() + "ExampleDataOutput.txt";
     mitk::IOUtil::SaveBaseData(m_Data, path);

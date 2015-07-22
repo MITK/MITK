@@ -77,6 +77,8 @@ class QmitkPreprocessingView : public QmitkFunctionality
 
   virtual void Deactivated() override;
 
+  virtual void Visible() override;
+
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
   virtual void StdMultiWidgetNotAvailable() override;
 

@@ -1651,6 +1651,12 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
     }
 }
 
+void QmitkPreprocessingView::Visible()
+{
+    QmitkFunctionality::Visible();
+    OnImageSelectionChanged();
+}
+
 void QmitkPreprocessingView::Activated()
 {
     QmitkFunctionality::Activated();

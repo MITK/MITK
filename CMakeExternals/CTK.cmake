@@ -74,10 +74,10 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL https://www.dropbox.com/s/j9ii4udqfa6jn2k/CTK-CGS-2015.06_dcc02437.tar.gz
-      URL_MD5 1720e40402238619908c55a44d5036ff
-      #GIT_REPOSITORY https://github.com/commontk/CTK.git
-      #GIT_TAG origin/master
+      #URL https://www.dropbox.com/s/j9ii4udqfa6jn2k/CTK-CGS-2015.06_dcc02437.tar.gz
+      #URL_MD5 1720e40402238619908c55a44d5036ff
+      GIT_REPOSITORY https://github.com/AndreasFetzer/CTK.git
+      GIT_TAG origin/ctk-for-mitk-cgs-workbench-2015.06
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

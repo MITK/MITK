@@ -126,7 +126,7 @@ public:
 
     itk::DataObject::Pointer obj = (dynamic_cast<mitk::DataCollection*> (col1->GetData("0001").GetPointer()))->GetData("T3");
     int spacing = dynamic_cast<itk::Image<double, 3> *> (obj.GetPointer())->GetSpacing()[0];
-    MITK_INFO << "Spacing: " << spacing;
+//    MITK_INFO << "Spacing: " << spacing;
     MITK_TEST_CONDITION_REQUIRED(spacing == 6, "Image is the first image (Checked by Spacing)");
   }
 
@@ -143,7 +143,7 @@ public:
 
     itk::DataObject::Pointer obj = (dynamic_cast<mitk::DataCollection*> (col1->GetData("0002").GetPointer()))->GetData("T3");
     int spacing = dynamic_cast<itk::Image<double, 3> *> (obj.GetPointer())->GetSpacing()[0];
-    MITK_INFO << "Spacing: " << spacing;
+//    MITK_INFO << "Spacing: " << spacing;
     MITK_TEST_CONDITION_REQUIRED(spacing == 6, "Image is the first image (Checked by Spacing)");
   }
 

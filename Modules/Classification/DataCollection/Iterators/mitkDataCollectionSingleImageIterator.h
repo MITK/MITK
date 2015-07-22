@@ -35,10 +35,9 @@ namespace mitk
   {
   public:
     typedef itk::Image<TDataType, ImageDimension> ImageType;
-    typedef typename ImageType::Pointer ImagePointerType;
     typedef itk::ImageRegionIterator<ImageType> ImageIterator;
 
-    DataCollectionSingleImageIterator(mitk::DataCollection::Pointer collection, std::string imageName);
+    DataCollectionSingleImageIterator(mitk::DataCollection * collection, std::string imageName);
 
     void ToBegin();
 
@@ -55,19 +54,19 @@ namespace mitk
 
     void NextObject();
 
-    ImagePointerType GetImage();
+    ImageType * GetImage();
 
-    void AddImage(ImagePointerType image, std::string name);
+    void AddImage(ImageType * image, std::string name);
 
   private:
     // Variables
-    DataCollection::Pointer m_Collection;
+    DataCollection * m_Collection;
     std::string m_ImageName;
     bool m_IsAtEnd;
     bool m_IteratingImages;
     size_t m_CurrentIndex;
     size_t m_CurrentElement;
-    ImagePointerType m_Image;
+    ImageType * m_Image;
     DataCollectionSingleImageIterator<TDataType, ImageDimension>* m_CurrentSingleCollectionIterator;
 
     // Methods

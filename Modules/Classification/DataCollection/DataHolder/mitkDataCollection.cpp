@@ -40,11 +40,10 @@ mitk::DataCollection::Init(std::string name)
 
 size_t mitk::DataCollection::AddData(DataObject::Pointer data, std::string name, std::string filePath)
 {
-  mitk::DataCollection::Pointer dc = dynamic_cast<mitk::DataCollection*>(data.GetPointer());
-  if (dc)
-    dc->SetParent(this);
+  mitk::DataCollection* dc = dynamic_cast<mitk::DataCollection*>(data.GetPointer());
+  if (dc) dc->SetParent(this);
 
-  m_DataVector.push_back(data);
+  m_DataVector.push_back(data.GetPointer());
   m_NameVector.push_back(name);
   m_FilePathVector.push_back(filePath);
   size_t lastIndex = m_DataVector.size()-1;

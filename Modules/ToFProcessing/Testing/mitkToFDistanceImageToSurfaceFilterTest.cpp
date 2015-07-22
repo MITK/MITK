@@ -374,8 +374,6 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
 
     if (!mitk::Equal(distanceBackward, (float) resultPointBackward[2]))
     {
-//      MITK_INFO<<"expected: "<< image->GetPixelValueByIndex(pixelIndex);
-//      MITK_INFO<<"result: "<< resultPoint;
       compareToInput = false;
     }
   }

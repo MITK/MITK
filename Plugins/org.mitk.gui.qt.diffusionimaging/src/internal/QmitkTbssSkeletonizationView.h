@@ -88,8 +88,8 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
 
     void AddToDataStorage(mitk::Image* img, std::string name);
 
-    Float4DImageType::Pointer ConvertToItk(itk::SmartPointer<mitk::Image> image);
-
+    template <class TPixel>
+    void ConvertToItk(mitk::PixelType, mitk::Image::Pointer image, Float4DImageType::Pointer);
 
 };
 

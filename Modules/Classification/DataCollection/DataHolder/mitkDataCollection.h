@@ -280,7 +280,7 @@ namespace mitk
     std::vector<std::string> m_FilePathVector;
     std::map<std::string, size_t> m_DataNames;
 
-    mitk::DataCollection::Pointer m_Parent;
+    mitk::DataCollection * m_Parent;
 
     std::string m_XMLFile; // is only filled for the hightest layer when loading a data collection
   };

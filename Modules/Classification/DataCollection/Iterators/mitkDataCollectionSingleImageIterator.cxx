@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template <typename TDataType, int TImageDimension>
 mitk::DataCollectionSingleImageIterator<TDataType, TImageDimension>::
-DataCollectionSingleImageIterator(DataCollection::Pointer collection, std::string imageName) :
+DataCollectionSingleImageIterator(DataCollection *collection, std::string imageName) :
   m_Collection(collection),
   m_ImageName(imageName),
   m_IsAtEnd(false),
@@ -63,11 +63,11 @@ ToBegin()
       m_Image = image;
     }
   }
-  if (m_Image.IsNull())
+  if (m_Image == nullptr)
   {
     m_CurrentElement = 0;
     m_CurrentSingleCollectionIterator = GetNextDataCollectionIterator(m_CurrentElement);
-    if (m_Image.IsNull())
+    if (m_Image  == nullptr)
     {
       m_IsAtEnd = true;
     } else
@@ -163,7 +163,7 @@ NextObject()
 }
 
 template <typename TDataType, int TImageDimension>
-typename mitk::DataCollectionSingleImageIterator<TDataType, TImageDimension>::ImagePointerType
+typename mitk::DataCollectionSingleImageIterator<TDataType, TImageDimension>::ImageType *
 mitk::DataCollectionSingleImageIterator<TDataType, TImageDimension>::
 GetImage()
 {
@@ -173,11 +173,11 @@ GetImage()
 template <typename TDataType, int TImageDimension>
 void
 mitk::DataCollectionSingleImageIterator<TDataType, TImageDimension>::
-AddImage(ImagePointerType image, std::string name)
+AddImage(ImageType *image, std::string name)
 {
   if (m_Collection->HasElement(m_ImageName))
   {
-    itk::DataObject::Pointer dataObject = dynamic_cast<itk::DataObject*>(image.GetPointer());
+    itk::DataObject::Pointer dataObject = dynamic_cast<itk::DataObject*>(image);
     m_Collection->AddData(dataObject, name);
   } else
   {

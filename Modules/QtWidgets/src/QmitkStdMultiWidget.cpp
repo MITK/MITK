@@ -47,6 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextProperty.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
+#include "mitkPixelTypeMultiplex.h"
+#include "mitkImagePixelReadAccessor.h"
 
 #include <iomanip>
 
@@ -1694,7 +1696,17 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     stream.precision(2);
     stream<<"Position: <" << std::fixed <<crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", " << std::fixed << crosshairPos[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
-    mitk::ScalarType pixelValue = image->GetPixelValueByIndex(p, timestep, component);
+
+    mitk::ScalarType pixelValue;
+
+    mitkPixelTypeMultiplex4(
+      mitk::FastSinglePixelAccess,
+      image->GetChannelDescriptor().GetPixelType(),
+      image,
+      image->GetVolumeData(baseRenderer->GetTimeStep()),
+      p,
+      pixelValue);
+
     if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
     {
       stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< std::scientific<< pixelValue <<"  ";

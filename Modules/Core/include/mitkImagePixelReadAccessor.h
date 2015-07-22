@@ -171,6 +171,18 @@ private:
 
 };
 
+/** Static method that gets direct access to a single pixel value.
+ *  The value is not guaranteed to be in a well-defined state and is automatically casted to mitk::ScalarType
+ *  The method can be called by the macros in mitkPixelTypeMultiplex.h
+ */
+template <class TPixel>
+mitk::ScalarType FastSinglePixelAccess(mitk::PixelType, mitk::Image::Pointer im, ImageDataItem* item, itk::Index<3> idx, mitk::ScalarType & val)
+{
+  mitk::ImagePixelReadAccessor<TPixel, 3> imAccess(im, item, mitk::ImageAccessorBase::IgnoreLock);
+  val =  imAccess.GetPixelByIndex(idx);
+  return val;
+}
+
 }
 
 #endif // MITKIMAGEPIXELREADACCESSOR_H

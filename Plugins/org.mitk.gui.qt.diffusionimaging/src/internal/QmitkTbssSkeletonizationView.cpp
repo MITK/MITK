@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk
 #include <mitkImagePixelReadAccessor.h>
+#include <mitkImagePixelWriteAccessor.h>
+#include <mitkPixelTypeMultiplex.h>
 #include <mitkImage.h>
 
 // Qt
@@ -296,7 +298,8 @@ void QmitkTbssSkeletonizationView::Project()
 
   }
 
-  Float4DImageType::Pointer allFA = ConvertToItk(subjects);
+  Float4DImageType::Pointer allFA;
+  mitkPixelTypeMultiplex2(ConvertToItk,subjects->GetChannelDescriptor().GetPixelType(),subjects, allFA);
 
     // Calculate skeleton
   FloatImageType::Pointer itkImg = FloatImageType::New();
@@ -406,10 +409,11 @@ void QmitkTbssSkeletonizationView::AddToDataStorage(mitk::Image* img, std::strin
 }
 
 
-Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(itk::SmartPointer<mitk::Image> image)
-{
 
-  Float4DImageType::Pointer output = Float4DImageType::New();
+template <class TPixel>
+void QmitkTbssSkeletonizationView::ConvertToItk(mitk::PixelType ptype, mitk::Image::Pointer image, Float4DImageType::Pointer output)
+{
+  output = Float4DImageType::New();
 
   mitk::BaseGeometry* geo = image->GetGeometry();
   mitk::Vector3D mitkSpacing = geo->GetSpacing();
@@ -466,6 +470,8 @@ Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(itk::SmartP
       // iterate through the subjects and copy data to output
       for(int t=0; t<timesteps; t++)
       {
+        mitk::ImagePixelReadAccessor <TPixel,3> inAcc(image,image->GetVolumeData(t));
+
         for(int x=0; x<image->GetDimension(0); x++)
         {
           for(int y=0; y<image->GetDimension(1); y++)
@@ -475,7 +481,7 @@ Float4DImageType::Pointer QmitkTbssSkeletonizationView::ConvertToItk(itk::SmartP
               itk::Index<3> ix = {x, y, z};
               itk::Index<4> ix4 = {x, y, z, t};
 
-              output->SetPixel(ix4, image->GetPixelValueByIndex(ix, t));
+              output->SetPixel(ix4, inAcc.GetPixelByIndex(ix, t));
 
             }
           }

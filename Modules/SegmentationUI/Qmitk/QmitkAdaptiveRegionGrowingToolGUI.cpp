@@ -223,7 +223,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
             {
                 int component = 0;
                 m_InputImageNode->GetIntProperty("Image.Displayed Component", component);
-              pixelValues[pos] = image->GetPixelValueByIndex(currentIndex, 0, component);
+              mitkPixelTypeMultiplex4(mitk::FastSinglePixelAccess,image->GetChannelDescriptor().GetPixelType(),image,NULL,currentIndex,pixelValues[pos]);
+
               pos++;
             }
             else

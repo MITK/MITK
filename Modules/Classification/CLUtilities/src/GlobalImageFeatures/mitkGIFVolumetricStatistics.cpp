@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkLabelStatisticsImageFilter.h>
+#include <itkNeighborhoodIterator.h>
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -60,6 +61,60 @@ void
   featureList.push_back(std::make_pair("Volumetric Features Volume (pixel based)",volume));
 }
 
+template<typename TPixel, unsigned int VImageDimension>
+void
+  CalculateLargestDiameter(itk::Image<TPixel, VImageDimension>* mask, mitk::GIFVolumetricStatistics::FeatureListType & featureList)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef typename ImageType::PointType PointType;
+  typename ImageType::SizeType radius;
+  for (int i=0; i < VImageDimension; ++i)
+    radius[i] = 1;
+  itk::NeighborhoodIterator<ImageType> iterator(radius,mask, mask->GetRequestedRegion());
+  std::vector<PointType> borderPoints;
+  while(!iterator.IsAtEnd())
+  {
+    if (iterator.GetCenterPixel() == 0)
+    {
+      ++iterator;
+      continue;
+    }
+
+    bool border = false;
+    for (int i = 0; i < iterator.Size(); ++i)
+    {
+      if (iterator.GetPixel(i) == 0)
+      {
+        border = true;
+        break;
+      }
+    }
+    if (border)
+    {
+      auto centerIndex = iterator.GetIndex();
+      PointType centerPoint;
+      mask->TransformIndexToPhysicalPoint(centerIndex, centerPoint );
+      borderPoints.push_back(centerPoint);
+    }
+    ++iterator;
+  }
+
+  double longestDiameter = 0;
+  unsigned long numberOfBorderPoints = borderPoints.size();
+  for (int i = 0; i < numberOfBorderPoints; ++i)
+  {
+    auto point = borderPoints[i];
+    for (int j = i; j < numberOfBorderPoints; ++j)
+    {
+      double newDiameter=point.EuclideanDistanceTo(borderPoints[j]);
+      if (newDiameter > longestDiameter)
+        longestDiameter = newDiameter;
+    }
+  }
+
+  featureList.push_back(std::make_pair("Volumetric Features Maximum 3D diameter",longestDiameter));
+}
+
 mitk::GIFVolumetricStatistics::GIFVolumetricStatistics()
 {
 }
@@ -69,6 +124,7 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   FeatureListType featureList;
 
   AccessByItk_2(image, CalculateVolumeStatistic, mask, featureList);
+  AccessByItk_1(mask, CalculateLargestDiameter, featureList);
 
   vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
   vtkSmartPointer<vtkMassProperties> stats = vtkSmartPointer<vtkMassProperties>::New();
@@ -87,6 +143,7 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
 
   double sphericity=std::pow(pi,1/3.0) *std::pow(6*pixelVolume, 2.0/3.0) / meshSurf;
   double surfaceToVolume = meshSurf / pixelVolume;
+  double sphericalDisproportion = meshSurf / 4 / pi / std::pow(3.0 / 4.0 / pi * pixelVolume, 2.0 / 3.0);
 
   featureList.push_back(std::make_pair("Volumetric Features Volume (mesh based)",meshVolume));
   featureList.push_back(std::make_pair("Volumetric Features Surface area",meshSurf));
@@ -94,6 +151,7 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   featureList.push_back(std::make_pair("Volumetric Features Sphericity",sphericity));
   featureList.push_back(std::make_pair("Volumetric Features Compactness 1",compactness1));
   featureList.push_back(std::make_pair("Volumetric Features Compactness 2",compactness2));
+  featureList.push_back(std::make_pair("Volumetric Features Spherical disproportion",sphericalDisproportion));
 
   return featureList;
 }
@@ -101,13 +159,14 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
 mitk::GIFVolumetricStatistics::FeatureNameListType mitk::GIFVolumetricStatistics::GetFeatureNames()
 {
   FeatureNameListType featureList;
-  featureList.push_back("FirstOrder Minimum");
-  featureList.push_back("FirstOrder Maximum");
-  featureList.push_back("FirstOrder Mean");
-  featureList.push_back("FirstOrder Variance");
-  featureList.push_back("FirstOrder Sum");
-  featureList.push_back("FirstOrder Median");
-  featureList.push_back("FirstOrder Standard deviation");
-  featureList.push_back("FirstOrder No. of Voxel");
+  featureList.push_back("Volumetric Features Compactness 1");
+  featureList.push_back("Volumetric Features Compactness 2");
+  featureList.push_back("Volumetric Features Sphericity");
+  featureList.push_back("Volumetric Features Surface to volume ratio");
+  featureList.push_back("Volumetric Features Surface area");
+  featureList.push_back("Volumetric Features Volume (mesh based)");
+  featureList.push_back("Volumetric Features Volume (pixel based)");
+  featureList.push_back("Volumetric Features Spherical disproportion");
+  featureList.push_back("Volumetric Features Maximum 3D diameter");
   return featureList;
 }

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFCooccurenceMatrix.h>
 #include <mitkGIFGrayLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
+#include <mitkGIFVolumetricStatistics.h>
 
 typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned char, 3 >          MaskImageType;
@@ -54,6 +55,7 @@ int main(int argc, char* argv[])
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
 
   parser.addArgument("cooccurence","cooc",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
+  parser.addArgument("volume","vol",mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features",us::Any());
   parser.addArgument("run-length","rl",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
   parser.addArgument("first-order","fo",mitkCommandLineParser::String, "Use First Order Features", "calculates First order based features",us::Any());
   parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
@@ -87,6 +89,16 @@ int main(int argc, char* argv[])
   {
     mitk::GIFFirstOrderStatistics firstOrderCalculator;
     auto localResults = firstOrderCalculator.CalculateFeatures(image, mask);
+    stats.insert(stats.end(), localResults.begin(), localResults.end());
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // CAlculate Co-occurence Features
+  ////////////////////////////////////////////////////////////////
+  if (parsedArgs.count("volume"))
+  {
+    mitk::GIFVolumetricStatistics volCalculator;
+    auto localResults = volCalculator.CalculateFeatures(image, mask);
     stats.insert(stats.end(), localResults.begin(), localResults.end());
   }
 

@@ -17,6 +17,11 @@ if(MITK_USE_Vigra)
   set(proj_DEPENDENCIES HDF5)
   set(Vigra_DEPENDS ${proj})
 
+  set(mac_additional_cmake_args)
+  if(APPLE)
+    set(mac_additional_cmake_args -DEXCLUDE_DIR:PATH="/opt/local")
+  endif()
+
   if(NOT DEFINED Vigra_DIR)
 
     set(additional_cmake_args )
@@ -34,6 +39,7 @@ if(MITK_USE_Vigra)
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_cmake_args}
+         ${mac_additional_cmake_args}
          -DAUTOEXEC_TESTS:BOOL=OFF
          -DWITH_VIGRANUMPY:BOOL=OFF
          -DHDF5_DIR:PATH=${HDF5_DIR}

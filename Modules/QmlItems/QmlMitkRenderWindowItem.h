@@ -81,6 +81,7 @@ protected:
   virtual void mouseMoveEvent(QMouseEvent* e) override;
   virtual void wheelEvent(QWheelEvent* e) override;
 
+  const char* GetUniqueName(QString name);
 private slots:
 
 private:

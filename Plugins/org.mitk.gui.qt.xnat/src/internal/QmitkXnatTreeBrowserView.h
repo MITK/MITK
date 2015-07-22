@@ -60,7 +60,7 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  protected slots:
+protected slots:
 
   /// \brief Opens or reuses the xnat editor with the activated node as root item.
   void OnActivatedNode(const QModelIndex& index);
@@ -79,11 +79,13 @@ public:
   void OnContextMenuCreateNewSubject();
   void OnContextMenuCreateNewExperiment();
 
-  void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *);
+  void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *, const QModelIndex &parentIndex);
 
   void OnProgress(QUuid, double);
 
   void itemSelected(const QModelIndex& index);
+
+  void OnUploadFromDataStorage();
 
 protected:
 
@@ -91,8 +93,12 @@ protected:
 
   Ui::QmitkXnatTreeBrowserViewControls m_Controls;
 
-private:
+private slots:
+  void OnXnatNodeSelected(const QModelIndex &index);
+  void OnDownloadSelectedXnatFile();
+  void OnCreateResourceFolder();
 
+private:
   void InternalFileDownload(const QModelIndex& index, bool loadData);
   void InternalFileUpload(ctkXnatFile *file);
   ctkXnatResource* InternalAddResourceFolder(ctkXnatObject* parent);

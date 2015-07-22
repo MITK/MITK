@@ -7,6 +7,7 @@ set(CPP_FILES
   QmitkXnatSubjectWidget.cpp
   QmitkXnatExperimentWidget.cpp
   QmitkXnatCreateObjectDialog.cpp
+  QmitkXnatUploadFromDataStorageDialog.cpp
 )
 
 set(MOC_H_FILES
@@ -16,7 +17,11 @@ set(MOC_H_FILES
  include/QmitkXnatSubjectWidget.h
  include/QmitkXnatExperimentWidget.h
  include/QmitkXnatCreateObjectDialog.h
+ include/QmitkXnatUploadFromDataStorageDialog.h
+)
 
+set(UI_FILES
+ src/QmitkXnatUploadFromDataStorageDialog.ui
 )
 
 set(QRC_FILES

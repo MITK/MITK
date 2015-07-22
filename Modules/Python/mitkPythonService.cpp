@@ -292,20 +292,14 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   mitk::ImageReadAccessor racc(image);
   void* array = (void*) racc.GetData();
 
-  //Vector3D xDirection = image->GetGeometry()->GetAxisVector(1);
-  //Vector3D yDirection = image->GetGeometry()->GetAxisVector(0);
-  //Vector3D zDirection = image->GetGeometry()->GetAxisVector(2);
-
-  //xDirection.Normalize();
-  //yDirection.Normalize();
-  //zDirection.Normalize();
-
   mitk::Vector3D xDirection;
   mitk::Vector3D yDirection;
   mitk::Vector3D zDirection;
-  const vnl_matrix_fixed<ScalarType, 3, 3> &transform
-      = image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
+  const vnl_matrix_fixed<ScalarType, 3, 3> &transform =
+      image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
 
+  // ToDo: Check if this is a collumn or row vector from the matrix.
+  // right now it works but not sure for rotated geometries
   mitk::FillVector3D(xDirection, transform[0][0], transform[0][1], transform[0][2]);
   mitk::FillVector3D(yDirection, transform[1][0], transform[1][1], transform[1][2]);
   mitk::FillVector3D(zDirection, transform[2][0], transform[2][1], transform[2][2]);

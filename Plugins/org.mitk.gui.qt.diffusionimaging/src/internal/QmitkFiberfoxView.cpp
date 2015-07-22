@@ -286,10 +286,13 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
         m_Controls->m_BallWidget1->setVisible(true);
         m_Controls->m_BallWidget2->setVisible(false);
+        m_Controls->m_BallWidget2->SetT1(4500);
         m_Controls->m_AstrosticksWidget1->setVisible(false);
         m_Controls->m_AstrosticksWidget2->setVisible(false);
+        m_Controls->m_AstrosticksWidget2->SetT1(4500);
         m_Controls->m_DotWidget1->setVisible(false);
         m_Controls->m_DotWidget2->setVisible(false);
+        m_Controls->m_DotWidget2->SetT1(4500);
 
         m_Controls->m_PrototypeWidget1->setVisible(false);
         m_Controls->m_PrototypeWidget2->setVisible(false);

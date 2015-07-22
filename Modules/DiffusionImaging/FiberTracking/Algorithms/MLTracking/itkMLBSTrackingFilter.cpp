@@ -32,8 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk {
 
-template< int NumImageFeatures >
-MLBSTrackingFilter< NumImageFeatures >
+template<  int ShOrder, int NumImageFeatures >
+MLBSTrackingFilter<  ShOrder, NumImageFeatures >
 ::MLBSTrackingFilter()
     : m_PauseTracking(false)
     , m_AbortTracking(false)
@@ -60,14 +60,14 @@ MLBSTrackingFilter< NumImageFeatures >
     this->SetNumberOfRequiredInputs(1);
 }
 
-template< int NumImageFeatures >
-double MLBSTrackingFilter< NumImageFeatures >
+template<  int ShOrder, int NumImageFeatures >
+double MLBSTrackingFilter<  ShOrder, NumImageFeatures >
 ::RoundToNearest(double num) {
     return (num > 0.0) ? floor(num + 0.5) : ceil(num - 0.5);
 }
 
-template< int NumImageFeatures >
-void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
+template<  int ShOrder, int NumImageFeatures >
+void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BeforeThreadedGenerateData()
 {
     m_InputImage = const_cast<InputImageType*>(this->GetInput(0));
     m_ForestHandler.InitForTracking();
@@ -142,7 +142,6 @@ void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
 
     if (m_AngularThreshold<0.0)
         m_AngularThreshold = 0.5*minSpacing;
-
     m_BuildFibersReady = 0;
     m_BuildFibersFinished = false;
     m_Threads = 0;
@@ -161,8 +160,8 @@ void MLBSTrackingFilter< NumImageFeatures >::BeforeThreadedGenerateData()
     std::cout << "MLBSTrackingFilter: Starting streamline tracking using " << this->GetNumberOfThreads() << " threads." << std::endl;
 }
 
-template< int NumImageFeatures >
-void MLBSTrackingFilter< NumImageFeatures >::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double, 3>& dir)
+template<  int ShOrder, int NumImageFeatures >
+void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double, 3>& dir)
 {
     //    vnl_matrix_fixed< double, 3, 3 > rot = m_FeatureImage->GetDirection().GetTranspose();
     //    dir = rot*dir;
@@ -173,8 +172,8 @@ void MLBSTrackingFilter< NumImageFeatures >::CalculateNewPosition(itk::Point<dou
     pos[2] += dir[2];
 }
 
-template< int NumImageFeatures >
-bool MLBSTrackingFilter< NumImageFeatures >
+template<  int ShOrder, int NumImageFeatures >
+bool MLBSTrackingFilter<  ShOrder, NumImageFeatures >
 ::IsValidPosition(itk::Point<double, 3> &pos)
 {
     typename FeatureImageType::IndexType idx;
@@ -185,14 +184,14 @@ bool MLBSTrackingFilter< NumImageFeatures >
     return true;
 }
 
-template< int NumImageFeatures >
-double MLBSTrackingFilter< NumImageFeatures >::GetRandDouble(double min, double max)
+template<  int ShOrder, int NumImageFeatures >
+double MLBSTrackingFilter<  ShOrder, NumImageFeatures >::GetRandDouble(double min, double max)
 {
     return (double)(rand()%((int)(10000*(max-min))) + 10000*min)/10000;
 }
 
-template< int NumImageFeatures >
-vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirection(itk::Point<double, 3> &pos, vnl_vector_fixed<double, 3>& olddir)
+template<  int ShOrder, int NumImageFeatures >
+vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::GetNewDirection(itk::Point<double, 3> &pos, vnl_vector_fixed<double, 3>& olddir)
 {
     if (m_DemoMode)
     {
@@ -206,6 +205,9 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
     if (m_StoppingRegions->GetLargestPossibleRegion().IsInside(idx) && m_StoppingRegions->GetPixel(idx)>0)
         return direction;
 
+    if (m_MaskImage.IsNotNull() && ((m_MaskImage->GetLargestPossibleRegion().IsInside(idx) && m_MaskImage->GetPixel(idx)<=0) || !m_MaskImage->GetLargestPossibleRegion().IsInside(idx)) )
+        return direction;
+
     if (olddir.magnitude()>0)
         olddir.normalize();
 
@@ -213,8 +215,8 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
     double w = 0;       // weight of the direction predicted at each sampling point
     if (IsValidPosition(pos))
     {
-        direction = m_ForestHandler.Classify(pos, candidates, olddir, m_AngularThreshold, w); // get direction proposal at current streamline position
-        direction *= w;  // HERE WE ARE WEIGHTING AGAIN EVEN THOUGH THE OUTPUT DIRECTIONS ARE ALREADY WEIGHTED!!! THE EFFECT OF THIS HAS YET TO BE EVALUATED QUANTITATIVELY.
+        direction = m_ForestHandler.Classify(pos, candidates, olddir, m_AngularThreshold, w, m_MaskImage); // get direction proposal at current streamline position
+        direction *= w;  // HERE WE ARE WEIGHTING AGAIN EVEN THOUGH THE OUTPUT DIRECTIONS ARE ALREADY WEIGHTED!!! THE EFFECT OF THIS HAS YET TO BE EVALUATED.
     }
 
     itk::OrientationDistributionFunction< double, 50 >  probeVecs;
@@ -246,7 +248,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
         candidates = 0;
         vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
         if (IsValidPosition(sample_pos))
-            tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w); // sample neighborhood
+            tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w, m_MaskImage); // sample neighborhood
         if (candidates>0 && tempDir.magnitude()>0.001)
         {
             direction += tempDir*w;
@@ -269,7 +271,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
             candidates = 0;
             vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
             if (IsValidPosition(sample_pos))
-                tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w); // sample neighborhood
+                tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w, m_MaskImage); // sample neighborhood
 
             if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
             {
@@ -292,8 +294,8 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter< NumImageFeatures >::GetNewDirecti
     return direction;
 }
 
-template< int NumImageFeatures >
-double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
+template<  int ShOrder, int NumImageFeatures >
+double MLBSTrackingFilter<  ShOrder, NumImageFeatures >::FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
 {
     vnl_vector_fixed<double,3> dirOld = dir;
     dirOld = dir;
@@ -360,8 +362,8 @@ double MLBSTrackingFilter< NumImageFeatures >::FollowStreamline(itk::Point<doubl
     return tractLength;
 }
 
-template< int NumImageFeatures >
-int MLBSTrackingFilter<NumImageFeatures>::CheckCurvature(FiberType* fib, bool front)
+template<  int ShOrder, int NumImageFeatures >
+int MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CheckCurvature(FiberType* fib, bool front)
 {
     double m_Distance = 5;
     if (fib->size()<3)
@@ -432,8 +434,8 @@ int MLBSTrackingFilter<NumImageFeatures>::CheckCurvature(FiberType* fib, bool fr
         return vectors.size();
 }
 
-template< int NumImageFeatures >
-void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputImageRegionType &regionForThread, ThreadIdType threadId)
+template<  int ShOrder, int NumImageFeatures >
+void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(const InputImageRegionType &regionForThread, ThreadIdType threadId)
 {
     m_Mutex.Lock();
     m_Threads++;
@@ -484,7 +486,7 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
             vnl_vector_fixed<double,3> dirOld; dirOld.fill(0.0);
             vnl_vector_fixed<double,3> dir; dir.fill(0.0);
             if (IsValidPosition(worldPos))
-                dir = m_ForestHandler.Classify(worldPos, candidates, dirOld, 0, prob);
+                dir = m_ForestHandler.Classify(worldPos, candidates, dirOld, 0, prob, m_MaskImage);
             if (dir.magnitude()<0.0001)
                 continue;
 
@@ -539,8 +541,8 @@ void MLBSTrackingFilter< NumImageFeatures >::ThreadedGenerateData(const InputIma
     std::cout << "Thread " << threadId << " finished tracking" << std::endl;
 }
 
-template< int NumImageFeatures >
-void MLBSTrackingFilter< NumImageFeatures >::BuildFibers(bool check)
+template<  int ShOrder, int NumImageFeatures >
+void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BuildFibers(bool check)
 {
     if (m_BuildFibersReady<m_Threads && check)
         return;
@@ -571,8 +573,8 @@ void MLBSTrackingFilter< NumImageFeatures >::BuildFibers(bool check)
     m_BuildFibersFinished = true;
 }
 
-template< int NumImageFeatures >
-void MLBSTrackingFilter< NumImageFeatures >::AfterThreadedGenerateData()
+template<  int ShOrder, int NumImageFeatures >
+void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::AfterThreadedGenerateData()
 {
     MITK_INFO << "Generating polydata ";
     BuildFibers(false);
@@ -583,7 +585,7 @@ void MLBSTrackingFilter< NumImageFeatures >::AfterThreadedGenerateData()
     std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>(m_EndTime - m_StartTime);
     std::chrono::seconds ss = std::chrono::duration_cast<std::chrono::seconds>(m_EndTime - m_StartTime);
     mm %= 60;
-    ss %= 3600;
+    ss %= 60;
     MITK_INFO << "Tracking took " << hh.count() << "h, " << mm.count() << "m and " << ss.count() << "s";
 }
 

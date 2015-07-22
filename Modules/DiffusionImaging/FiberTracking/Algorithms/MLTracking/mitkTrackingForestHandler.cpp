@@ -246,9 +246,15 @@ typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::FeatureImageT
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w)
+vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w, ItkUcharImgType::Pointer mask)
 {
     vnl_vector_fixed<double,3> direction; direction.fill(0);
+
+
+    itk::Index<3> idx;
+    m_FeatureImage->TransformPhysicalPointToIndex(pos, idx);
+    if (mask.IsNotNull() && ((mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)<=0) || !mask->GetLargestPossibleRegion().IsInside(idx)) )
+        return direction;
 
     // store feature pixel values in a vigra data type
     vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,NumberOfSignalFeatures+3) );
@@ -691,6 +697,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::SaveForest(std::s
         vigra::rf_export_HDF5( *m_Forest, forestFile, "" );
     else
         MITK_INFO << "Forest invalid! Could not be saved.";
+    MITK_INFO << "Forest saved successfully.";
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >

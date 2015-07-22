@@ -51,7 +51,7 @@ public:
   static const std::string VIEW_ID;
 
   typedef itk::Image<unsigned char, 3>      ItkUcharImgType;
-  typedef itk::MLBSTrackingFilter<100>      TrackerType;
+  typedef itk::MLBSTrackingFilter<>         TrackerType;
 
   QmitkMLBTView();
   virtual ~QmitkMLBTView();

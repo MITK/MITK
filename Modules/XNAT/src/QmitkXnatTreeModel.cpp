@@ -21,9 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QIcon>
 
 #include <ctkXnatDataModel.h>
-#include <ctkXnatProject.h>
-#include <ctkXnatSubject.h>
 #include <ctkXnatExperiment.h>
+#include <ctkXnatProject.h>
+#include <ctkXnatResource.h>
+#include <ctkXnatResourceFolder.h>
+#include <ctkXnatSubject.h>
 
 QmitkXnatTreeModel::QmitkXnatTreeModel ()
   : ctkXnatTreeModel()
@@ -76,8 +78,8 @@ bool QmitkXnatTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction acti
   {
     returnVal = true;
     QList<mitk::DataNode*> droppedNodes = QmitkMimeTypes::ToDataNodePtrList(data);
-    ctkXnatObject* parentObj = this->xnatObject(parent);
-    emit ResourceDropped(droppedNodes, parentObj);
+    ctkXnatObject* parentXnatObj = this->xnatObject(parent);
+    emit ResourceDropped(droppedNodes, parentXnatObj, parent);
   }
   return returnVal;
 }
@@ -94,10 +96,13 @@ Qt::ItemFlags QmitkXnatTreeModel::flags(const QModelIndex &index) const
 
   if (index.isValid())
   {
-    ctkXnatProject* xnatProj = dynamic_cast<ctkXnatProject*>(this->xnatObject(index));
+    bool droppingAllowed = dynamic_cast<ctkXnatSubject*>(this->xnatObject(index)) != nullptr;
+    droppingAllowed |= dynamic_cast<ctkXnatExperiment*>(this->xnatObject(index)) != nullptr;
+    droppingAllowed |= dynamic_cast<ctkXnatResource*>(this->xnatObject(index)) != nullptr;
+    droppingAllowed |= dynamic_cast<ctkXnatResourceFolder*>(this->xnatObject(index)) != nullptr;
 
-    // No dropping at project level allowed
-    if (xnatProj == NULL)
+    // No dropping at project, session or data model level allowed
+    if (droppingAllowed)
     {
       return Qt::ItemIsDropEnabled | defaultFlags;
     }

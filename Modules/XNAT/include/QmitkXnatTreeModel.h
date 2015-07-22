@@ -44,7 +44,7 @@ public:
   virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 
   signals:
-  void ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*);
+  void ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&);
 
 };
 

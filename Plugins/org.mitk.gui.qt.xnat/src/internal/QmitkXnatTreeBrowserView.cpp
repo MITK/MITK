@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // CTK XNAT Core
 #include <ctkXnatAssessor.h>
 #include <ctkXnatAssessorFolder.h>
+#include <ctkXnatDataModel.h>
 #include <ctkXnatException.h>
 #include <ctkXnatExperiment.h>
 #include "ctkXnatFile.h"
@@ -50,7 +51,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkDataStorage.h>
-#include <mitkProgressBar.h>
 #include <QmitkIOUtil.h>
 #include <QmitkXnatUploadFromDataStorageDialog.h>
 
@@ -102,6 +102,8 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
+  m_Controls.groupBox->hide();
+
   m_Tracker = new mitk::XnatSessionTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext());
 
   m_ContextMenu = new QMenu(m_Controls.treeView);
@@ -136,7 +138,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 
   connect(m_Controls.treeView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)));
   connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnXnatNodeSelected(const QModelIndex&)));
-  connect(m_TreeModel, SIGNAL(ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*)), this, SLOT(OnUploadResource(const QList<mitk::DataNode*>&, ctkXnatObject*)));
+  connect(m_TreeModel, SIGNAL(ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&)), this, SLOT(OnUploadResource(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&)));
 
   connect(m_Controls.btnXnatUpload, SIGNAL(clicked()), this, SLOT(OnUploadFromDataStorage()));
   connect(m_Controls.btnXnatDownload, SIGNAL(clicked()), this, SLOT(OnDownloadSelectedXnatFile()));
@@ -152,6 +154,7 @@ void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
   ctkXnatObject* parent = index.data(Qt::UserRole).value<ctkXnatObject*>();
 
   this->InternalAddResourceFolder(parent);
+  m_TreeModel->refresh(index);
 }
 
 void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
@@ -168,10 +171,6 @@ void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
   {
     this->InternalFileDownload(index, true);
   }
-  else
-  {
-    // Do something
-  }
 }
 
 void QmitkXnatTreeBrowserView::OnUploadFromDataStorage()
@@ -182,9 +181,13 @@ void QmitkXnatTreeBrowserView::OnUploadFromDataStorage()
 
   if (result == QmitkXnatUploadFromDataStorageDialog::UPLOAD)
   {
-    QList<mitk::DataNode::Pointer> nodes;
-    nodes << dialog.GetSelectedNode();
-    this->OnUploadResource();
+    QList<mitk::DataNode*> nodes;
+    nodes << dialog.GetSelectedNode().GetPointer();
+    QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+
+    if (!index.isValid()) return;
+    ctkXnatObject* parent = m_TreeModel->xnatObject(index);
+    this->OnUploadResource(nodes, parent, index);
   }
 }
 
@@ -247,7 +250,7 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
       page->ReuseEditor(reuseEditor.Cast<berry::IReusableEditor>(), editorInput);
       page->Activate(reuseEditor);
     }
-  } 
+  }
 }
 
 void QmitkXnatTreeBrowserView::SetSelectionProvider()
@@ -266,7 +269,6 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
     m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
 
     connect(session, SIGNAL(progress(QUuid,double)), this, SLOT(OnProgress(QUuid,double)));
-    connect(session, SIGNAL(uploadFinished()), this, SLOT(OnProgress(QUuid,double)));
   }
 }
 
@@ -282,10 +284,12 @@ void QmitkXnatTreeBrowserView::CleanTreeModel(ctkXnatSession* session)
 void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
 {
   unsigned int currentProgress = progress*100;
-  if (currentProgress < 1)
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
-  else
-    mitk::ProgressBar::GetInstance()->Progress();
+  if (m_Controls.groupBox->isHidden())
+  {
+    m_Controls.groupBox->show();
+    m_Controls.progressBar->setValue(0);
+  }
+  m_Controls.progressBar->setValue(currentProgress);
 }
 
 void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bool loadData)
@@ -299,7 +303,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       QDir downDir(m_DownloadPath);
       QString filePath = m_DownloadPath + file->name();
 
-      // Testing if the file exists already
+      // Checking if the file exists already
       if (downDir.exists(file->name()))
       {
         MITK_INFO << "File '" << file->name().toStdString() << "' already exists!";
@@ -307,19 +311,35 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       else
       {
         MITK_INFO << "Download started ...";
-        MITK_INFO << "...";
+
+        m_Controls.groupBox->setTitle("Downloading file...");
+        m_Controls.groupBox->show();
+        m_Controls.progressBar->setValue(0);
+
         file->download(filePath);
 
-        // Testing if the file exists now
+        // Checking if the file exists now
         if (downDir.exists(file->name()))
         {
-          MITK_INFO << "Download of " << file->name().toStdString() << " was completed!";
+          MITK_INFO << "Download of " << file->name().toStdString() << " completed!";
+          QMessageBox msgBox;
+          msgBox.setText("Download of " + file->name() + " completed!");
+          msgBox.setIcon(QMessageBox::Information);
+          msgBox.exec();
+          m_Controls.groupBox->hide();
         }
         else
         {
           MITK_INFO << "Download of " << file->name().toStdString() << " failed!";
+          QMessageBox msgBox;
+          msgBox.setText("Download of " + file->name() + " failed!");
+          msgBox.setIcon(QMessageBox::Critical);
+          msgBox.exec();
+          m_Controls.groupBox->hide();
+          return;
         }
       }
+
       if (downDir.exists(file->name()))
       {
         if (loadData)
@@ -392,9 +412,18 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
 
 void QmitkXnatTreeBrowserView::InternalFileUpload(ctkXnatFile* file)
 {
+  m_Controls.groupBox->setTitle("Uploading file...");
+  m_Controls.groupBox->show();
+
   try
   {
     file->save();
+    MITK_INFO << "Upload of " << file->name().toStdString() << " completed!";
+    QMessageBox msgBox;
+    msgBox.setText("Upload of " + file->name() + " completed!");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.show();
+    msgBox.exec();
   }
   catch (ctkXnatException &e)
   {
@@ -402,7 +431,9 @@ void QmitkXnatTreeBrowserView::InternalFileUpload(ctkXnatFile* file)
     msgbox.setText(e.what());
     msgbox.setIcon(QMessageBox::Critical);
     msgbox.exec();
+    m_Controls.progressBar->setValue(0);
   }
+  m_Controls.groupBox->hide();
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
@@ -416,31 +447,17 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
     file->setLocalFilePath(filename);
     QFileInfo fileInfo (filename);
     file->setName(fileInfo.fileName());
-    file->setFileFormat("some format");
-    file->setFileContent("some content");
-    file->setFileTags("some, tags");
-    file->save();
+    this->InternalFileUpload(file);
     m_TreeModel->addChildNode(index, file);
   }
 }
 
-#include <ctkXnatDataModel.h>
-void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& droppedNodes, ctkXnatObject* parentObject)
+void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& droppedNodes, ctkXnatObject* parentObject, const QModelIndex& parentIndex)
 {
   if (parentObject == nullptr)
     return;
 
-  if (dynamic_cast<ctkXnatSession*>(parentObject))
-    MITK_INFO<<"SESSION";
-  else if (dynamic_cast<ctkXnatDataModel*>(parentObject))
-    MITK_INFO<<"DATAMODEL";
-  else if (dynamic_cast<ctkXnatProject*>(parentObject))
-    MITK_INFO<<"PROJECT";
-  else if (dynamic_cast<ctkXnatSubject*>(parentObject))
-    MITK_INFO<<"SUBJECT";
   //1. If not dropped on a resource, create a new folder
-  //2. Save file locally
-  //3. Upload file
   ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(parentObject);
   if (resource == nullptr)
   {
@@ -450,8 +467,15 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
   if (resource == nullptr)
   {
     MITK_WARN << "Could not upload file! No resource available!";
+    QMessageBox msgbox;
+    msgbox.setText("Could not upload file! No resource available!");
+    msgbox.setIcon(QMessageBox::Critical);
+    msgbox.exec();
+    return;
   }
 
+  //2. Save files locally
+  //3. Upload file
   mitk::DataNode* node = NULL;
   foreach (node, droppedNodes)
   {
@@ -476,6 +500,14 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     {
       fileName.append(".mps");
     }
+    else
+    {
+      MITK_WARN << "Could not upload file! File-type not supported";
+      QMessageBox msgbox;
+      msgbox.setText("Could not upload file! File-type not supported");
+      msgbox.setIcon(QMessageBox::Critical);
+      msgbox.exec();
+    }
 
     xnatFile->setName(fileName);
 
@@ -494,14 +526,12 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     node->GetProperty(orignalFilePath, "path");
 
     xnatFile->setLocalFilePath(fileName);
-    //
-    xnatFile->setFileFormat("some format");
-    xnatFile->setFileContent("some content");
-    xnatFile->setFileTags("some, tags");
-    //
-    xnatFile->save();
-    m_TreeModel->addChildNode(m_Controls.treeView->currentIndex(), xnatFile);
-    parentObject->fetch();
+
+    this->InternalFileUpload(xnatFile);
+    MITK_INFO << "XNAT-OBJECT: "<<m_TreeModel->xnatObject(parentIndex)->name();
+
+//    m_TreeModel->addChildNode(parentIndex, xnatFile);
+    m_TreeModel->refresh(parentIndex);
 
     // The filename for uploading
 //    QFileInfo fileInfo;

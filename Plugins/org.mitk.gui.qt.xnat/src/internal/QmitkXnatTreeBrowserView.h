@@ -77,7 +77,7 @@ protected slots:
   void OnContextMenuCreateResourceFolder();
   void OnContextMenuUploadFile();
 
-  void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *);
+  void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *, const QModelIndex &parentIndex);
 
   void OnProgress(QUuid, double);
 

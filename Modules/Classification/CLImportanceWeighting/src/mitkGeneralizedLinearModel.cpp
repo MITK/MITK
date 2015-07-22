@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <v3p_netlib.h>
 #include <vnl/algo/vnl_qr.h>
 #include <mitkLogMacros.h>
+#include <algorithm>
 #include <limits>
 
 static void _UpdateXMatrix(const vnl_matrix<double> &xData, bool addConstant, v3p_netlib_doublereal *x);

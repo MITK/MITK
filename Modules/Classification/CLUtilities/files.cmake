@@ -11,6 +11,9 @@ set(CPP_FILES
   GlobalImageFeatures/mitkGIFGrayLevelRunLength.cpp
   GlobalImageFeatures/mitkGIFFirstOrderStatistics.cpp
   GlobalImageFeatures/mitkGIFVolumetricStatistics.cpp
+  GlobalImageFeatures/itkEnhancedScalarImageToRunLengthMatrixFilter.hxx
+  GlobalImageFeatures/itkEnhancedScalarImageToRunLengthMatrixFilter.hxx
+  GlobalImageFeatures/itkEnhancedHistogramToRunLengthFeaturesFilter.hxx
   mitkCLUtil.cpp
 
 )

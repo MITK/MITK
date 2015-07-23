@@ -411,7 +411,7 @@ void QmitkTbssSkeletonizationView::AddToDataStorage(mitk::Image* img, std::strin
 
 
 template <class TPixel>
-void QmitkTbssSkeletonizationView::ConvertToItk(mitk::PixelType ptype, mitk::Image::Pointer image, Float4DImageType::Pointer output)
+void QmitkTbssSkeletonizationView::ConvertToItk(mitk::PixelType ptype, mitk::Image* image, Float4DImageType::Pointer output)
 {
   output = Float4DImageType::New();
 
@@ -481,7 +481,7 @@ void QmitkTbssSkeletonizationView::ConvertToItk(mitk::PixelType ptype, mitk::Ima
               itk::Index<3> ix = {x, y, z};
               itk::Index<4> ix4 = {x, y, z, t};
 
-              output->SetPixel(ix4, inAcc.GetPixelByIndex(ix, t));
+              output->SetPixel(ix4, inAcc.GetPixelByIndex(ix));
 
             }
           }
@@ -495,6 +495,4 @@ void QmitkTbssSkeletonizationView::ConvertToItk(mitk::PixelType ptype, mitk::Ima
 
   }
 
-
-  return output;
 }

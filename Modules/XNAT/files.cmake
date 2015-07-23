@@ -20,17 +20,14 @@ set(MOC_H_FILES
  include/QmitkXnatUploadFromDataStorageDialog.h
 )
 
-set(UI_FILES
- src/QmitkXnatUploadFromDataStorageDialog.ui
-)
-
 set(QRC_FILES
   resources/xnat.qrc
 )
 
 
 set(UI_FILES
+  src/QmitkXnatExperimentWidgetControls.ui
   src/QmitkXnatProjectWidgetControls.ui
   src/QmitkXnatSubjectWidgetControls.ui
-  src/QmitkXnatExperimentWidgetControls.ui
+  src/QmitkXnatUploadFromDataStorageDialog.ui
 )

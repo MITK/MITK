@@ -148,6 +148,9 @@
      </item>
     </layout>
    </item>
+   <item>
+    <layout class="QVBoxLayout" name="infoVerticalLayout"/>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

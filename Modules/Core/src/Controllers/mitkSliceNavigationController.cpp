@@ -814,7 +814,7 @@ SliceNavigationController
                   stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";
                   stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
 
-                  mitk::ScalarType pixelValue;
+                  mitk::ScalarType pixelValue = 0.0;
 
                   mitkPixelTypeMultiplex4(
                     mitk::FastSinglePixelAccess,

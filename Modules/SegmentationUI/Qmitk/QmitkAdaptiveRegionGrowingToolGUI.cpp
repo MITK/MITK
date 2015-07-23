@@ -43,8 +43,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 MITK_TOOL_GUI_MACRO( , QmitkAdaptiveRegionGrowingToolGUI, "")
 
-QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent) :
-QmitkToolGUI(), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSuggestedThreshold(true), m_SuggestedThValue(0.0), m_DataStorage(NULL)
+QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent)
+  : QmitkToolGUI(),
+    m_MultiWidget(nullptr),
+    m_DataStorage(nullptr),
+    m_UseVolumeRendering(false),
+    m_UpdateSuggestedThreshold(true),
+    m_SuggestedThValue(0.0)
 {
   this->setParent(parent);
 

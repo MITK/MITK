@@ -117,8 +117,8 @@ void mitk::RegionGrow3DTool::Deactivated()
     ds->Remove(m_PointSetNode);
     ds->Remove(m_FeedbackNode);
   }
-  m_FeedbackNode->SetData(NULL);
-  m_FeedbackNode->SetLevelWindow(NULL);
+  m_FeedbackNode->SetData(nullptr);
+  m_FeedbackNode->SetLevelWindow(LevelWindow());
   m_FeedbackNode->SetVisibility(false);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -382,7 +382,7 @@ void mitk::RegionGrow3DTool::SetupPreviewNodeFor( DataNode* nodeToProceed)
       int layer(50);
       nodeToProceed->GetIntProperty("layer", layer);
       m_FeedbackNode->SetIntProperty("layer", layer+1);
-      m_FeedbackNode->SetLevelWindow(NULL);
+      m_FeedbackNode->SetLevelWindow(LevelWindow());
 
       if (DataStorage* storage = m_ToolManager->GetDataStorage())
       {

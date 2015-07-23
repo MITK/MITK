@@ -39,7 +39,7 @@ public:
   void SetColor(QColor color);
 
 signals:
-  void ColorPicked(QColor color);
+  void ColorPicked();
 
   private slots:
   void OnButtonClicked();
@@ -85,7 +85,7 @@ public:
 private slots:
   void OnComboBoxCurrentIndexChanged(int index);
   void OnSpinBoxEditingFinished();
-  void OnColorPicked(QColor color);
+  void OnColorPicked();
 
 private:
   std::string GetPropertyName(const QModelIndex& index) const;

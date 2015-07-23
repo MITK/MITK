@@ -145,13 +145,7 @@ void mitk::ImageLiveWireContourModelFilter::DumpMaskImage()
     mitk::Image::Pointer mask = mitk::Image::New();
     mask->InitializeByItk( this->m_CostFunction->GetMaskImage() );
     mask->SetVolume( this->m_CostFunction->GetMaskImage()->GetBufferPointer() );
-    mitk::IOUtil::SaveImage(mask, "G:\\Data\\mask.nrrd");
-/*
-    mitk::Image::Pointer slice = mitk::Image::New();
-    slice->InitializeByItk( this->m_CostFunction->m_MaskImage.GetPointer() );
-    slice->SetVolume(this->m_CostFunction->m_MaskImage->GetBufferPointer());
-    */
-
+    mitk::IOUtil::Save(mask, "G:\\Data\\mask.nrrd");
 }
 
 void mitk::ImageLiveWireContourModelFilter::RemoveRepulsivePoint( const itk::Index<2>& idx )

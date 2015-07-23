@@ -369,7 +369,6 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensity
   }
   var /= ( numSamples - 1 );
 
-  double stdDev = sqrt( var );
   rms = sqrt( rms );
 
   stats.SetMin( static_cast<double>( min ) );

@@ -110,9 +110,6 @@ namespace itk
         return 1000;
     }
 
-    unsigned long xMAX = this->m_Image->GetLargestPossibleRegion().GetSize()[0];
-    unsigned long yMAX = this->m_Image->GetLargestPossibleRegion().GetSize()[1];
-
     double gradientX, gradientY;
     gradientX = gradientY = 0.0;
 
@@ -246,19 +243,6 @@ namespace itk
     {
       laplacianCost = 0.0;
     }
-
-    // Gradient direction costs
-    //vector q-p   i.e. p2-p1
-    double vQP[2];
-    vQP[0] = p2[0] - p1[0];
-    vQP[1] = p2[1] - p1[1];
-    //-------
-
-    //vector p-q   i.e. p1-p2
-    double vPQ[2];
-    vPQ[0] = p1[0] - p2[0];
-    vPQ[1] = p1[1] - p2[1];
-    //-------
 
     // gradient vector at p1
     double nGradientAtP1[2];

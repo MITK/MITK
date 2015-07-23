@@ -87,6 +87,7 @@ public:
     m_DilateImageFilter->SetInput( const_cast<InputImageType *>( input ) );
   }
 
+  using Superclass::SetInput;
   virtual void SetInput( unsigned int i, const TInputImage * image)
   {
     if (i != 0)

@@ -83,7 +83,7 @@ mitk::DataNode::Pointer QmitkDataStorageComboBoxWithSelectNone::GetSelectedNode(
 void QmitkDataStorageComboBoxWithSelectNone::SetSelectedNode(const mitk::DataNode::Pointer& node)
 {
   int currentIndex = -1;
-  for (int i = 0; i < m_Nodes.size(); i++)
+  for (int i = 0; i < static_cast<int>(m_Nodes.size()); i++)
   {
     if (m_Nodes[i] == node.GetPointer())
     {

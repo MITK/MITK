@@ -68,7 +68,7 @@ mitk::SegTool2D::~SegTool2D()
 {
 }
 
-bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*dataNode)
+bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*)
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( interactionEvent );
 

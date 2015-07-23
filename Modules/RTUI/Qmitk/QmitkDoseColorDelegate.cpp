@@ -44,7 +44,7 @@ void QmitkDoseColorDelegate::paint(QPainter *painter, const QStyleOptionViewItem
   }
 }
 
-bool QmitkDoseColorDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+bool QmitkDoseColorDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &,
   const QModelIndex &index)
 {
   Q_ASSERT(event);

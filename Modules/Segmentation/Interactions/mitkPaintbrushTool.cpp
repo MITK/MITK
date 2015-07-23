@@ -413,7 +413,7 @@ bool mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEven
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
   */
-bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
+bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent* )
 {
     // Inversion only for 0 and 1 as painting values
     if (m_PaintingPixelValue == 1)

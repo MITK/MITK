@@ -20,9 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkIsoDoseLevelSetModel.h"
 #include "mitkRTUIConstants.h"
 
-QmitkIsoDoseLevelSetModel::
-  QmitkIsoDoseLevelSetModel(QObject *parent) :
-QAbstractTableModel(parent), m_referenceDose(mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE), m_showAbsoluteDose(false), m_visibilityEditOnly(false), m_modified(false)
+QmitkIsoDoseLevelSetModel::QmitkIsoDoseLevelSetModel(QObject *parent)
+  : QAbstractTableModel(parent),
+    m_showAbsoluteDose(false),
+    m_visibilityEditOnly(false),
+    m_referenceDose(mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE),
+    m_modified(false)
 {
   m_DoseSet = mitk::IsoDoseLevelSet::New();
 }
@@ -73,7 +76,7 @@ QVariant
 
   QVariant result;
 
-  if(index.row()<m_DoseSet->Size())
+  if (static_cast<unsigned int>(index.row()) < m_DoseSet->Size())
   {
     const mitk::IsoDoseLevel& level = m_DoseSet->GetIsoDoseLevel(static_cast<mitk::IsoDoseLevelSet::IsoLevelIndexType>(index.row()));
 
@@ -155,7 +158,7 @@ Qt::ItemFlags
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags(index);
 
-  if(index.row()<m_DoseSet->Size())
+  if (static_cast<unsigned int>(index.row()) < m_DoseSet->Size())
   {
     if (index.column() < 4)
     {
@@ -167,7 +170,6 @@ Qt::ItemFlags
       {
         flags |= Qt::ItemIsEnabled | Qt::ItemIsSelectable;
       }
-
     }
   }
 
@@ -212,7 +214,7 @@ bool
   QmitkIsoDoseLevelSetModel::
   setData(const QModelIndex &index, const QVariant &value, int role)
 {
-  if(!index.isValid() || (m_DoseSet->Size() <= index.row()) || (index.column()>3))
+  if(!index.isValid() || (m_DoseSet->Size() <= static_cast<unsigned int>(index.row())) || (index.column()>3))
   {
     return false;
   }
@@ -433,7 +435,7 @@ void QmitkIsoDoseLevelSetModel::addLevel()
 
 void QmitkIsoDoseLevelSetModel::deleteLevel(const QModelIndex &index)
 {
-  if(!index.isValid() || (m_DoseSet->Size() <= index.row()) || (index.column()>3))
+  if(!index.isValid() || (m_DoseSet->Size() <= static_cast<unsigned int>(index.row())) || (index.column()>3))
   {
     return;
   }

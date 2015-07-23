@@ -1,5 +1,3 @@
-# The project name must correspond to the directory name of your plug-in
-# and must not contain periods.
 project(org_mitk_gui_qt_pointsetinteraction)
 
 mitk_create_plugin(

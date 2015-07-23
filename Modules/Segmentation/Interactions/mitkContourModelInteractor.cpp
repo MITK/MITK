@@ -111,7 +111,7 @@ void mitk::ContourModelInteractor::DataChanged()
 }
 
 
-bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnCheckPointClick(Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -152,7 +152,7 @@ bool mitk::ContourModelInteractor::OnCheckPointClick( Action* action, const Stat
 }
 
 
-bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnCheckContourClick(Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -182,11 +182,9 @@ bool mitk::ContourModelInteractor::OnCheckContourClick( Action* action, const St
 }
 
 
-bool mitk::ContourModelInteractor::OnDeletePoint( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnDeletePoint(Action*, const StateEvent*)
 {
-  int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
-
-  mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
+  mitk::ContourModel* contour = dynamic_cast<mitk::ContourModel*>(m_DataNode->GetData());
 
   contour->RemoveVertex(contour->GetSelectedVertex());
 
@@ -194,7 +192,7 @@ bool mitk::ContourModelInteractor::OnDeletePoint( Action* action, const StateEve
 }
 
 
-bool mitk::ContourModelInteractor::OnMove( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnMove(Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -214,7 +212,7 @@ bool mitk::ContourModelInteractor::OnMove( Action* action, const StateEvent* sta
 }
 
 
-bool mitk::ContourModelInteractor::OnMovePoint( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnMovePoint(Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -238,7 +236,7 @@ bool mitk::ContourModelInteractor::OnMovePoint( Action* action, const StateEvent
 
 
 
-bool mitk::ContourModelInteractor::OnMoveContour( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnMoveContour(Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -264,7 +262,7 @@ bool mitk::ContourModelInteractor::OnMoveContour( Action* action, const StateEve
 
 
 
-bool mitk::ContourModelInteractor::OnFinishEditing( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelInteractor::OnFinishEditing(Action*, const StateEvent* stateEvent)
 {
   mitk::ContourModel *contour = dynamic_cast<mitk::ContourModel *>( m_DataNode->GetData() );
   contour->Deselect();

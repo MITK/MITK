@@ -514,7 +514,7 @@ bool mitk::LiveWireTool2D::OnFinish( StateMachineAction*, InteractionEvent* inte
 
 void mitk::LiveWireTool2D::FinishTool()
 {
-  TimeStepType numberOfTimesteps = m_Contour->GetTimeGeometry()->CountTimeSteps();
+  int numberOfTimesteps = static_cast<int>(m_Contour->GetTimeGeometry()->CountTimeSteps());
 
   //close contour in each timestep
   for( int i = 0; i <= numberOfTimesteps; i++)

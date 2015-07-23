@@ -82,7 +82,7 @@ void QmitkColorWidget::OnButtonClicked()
   if (color.isValid())
   {
     this->SetColor(color);
-    emit ColorPicked(m_Color);
+    emit ColorPicked();
   }
 }
 
@@ -252,7 +252,7 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
     {
       QmitkColorWidget* colorWidget = new QmitkColorWidget(parent);
 
-      connect(colorWidget, SIGNAL(ColorPicked(QColor)), this, SLOT(OnColorPicked(QColor)));
+      connect(colorWidget, SIGNAL(ColorPicked()), this, SLOT(OnColorPicked()));
 
       return colorWidget;
     }
@@ -293,7 +293,7 @@ void QmitkPropertyItemDelegate::OnSpinBoxEditingFinished()
   emit closeEditor(spinBox);
 }
 
-void QmitkPropertyItemDelegate::OnColorPicked(QColor color)
+void QmitkPropertyItemDelegate::OnColorPicked()
 {
   QmitkColorWidget* colorWidget = qobject_cast<QmitkColorWidget*>(sender());
 

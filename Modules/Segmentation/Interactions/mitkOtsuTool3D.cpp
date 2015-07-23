@@ -33,8 +33,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkOrImageFilter.h>
 
-#include "mitkRegionGrow3DTool.xpm"
-
 // us
 #include <usModule.h>
 #include <usModuleResource.h>

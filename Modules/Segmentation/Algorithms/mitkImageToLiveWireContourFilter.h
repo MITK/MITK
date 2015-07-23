@@ -60,6 +60,7 @@ namespace mitk {
 
     virtual void SetInput( const InputType *input);
 
+    using Superclass::SetInput;
     virtual void SetInput( unsigned int idx, const InputType * input);
 
     const InputType* GetInput(void);

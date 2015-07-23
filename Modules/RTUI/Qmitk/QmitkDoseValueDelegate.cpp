@@ -39,7 +39,7 @@ void QmitkDoseValueDelegate::paint(QPainter *painter, const QStyleOptionViewItem
   style->drawItemText(painter, opt.rect.adjusted(0,0,-5,0), Qt::AlignRight | Qt::AlignVCenter, opt.palette,true, data.toString());
 }
 
-QWidget* QmitkDoseValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option
+QWidget* QmitkDoseValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &
   , const QModelIndex &index) const
 {
   QVariant data = index.data(Qt::EditRole);

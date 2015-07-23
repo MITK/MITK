@@ -269,7 +269,6 @@ static std::vector<itk::Index<2> > FindSeedPoints(const mitk::CorrectorAlgorithm
   typedef itk::Image< ipMITKSegmentationTYPE, 2 > ItkImageType;
   typedef itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer ItkImagePointerType;
 
-  int colorMode = (pic->GetPixel(segment.points[0]) == fillColor);
   std::vector<itk::Index<2> > seedPoints;
 
   try

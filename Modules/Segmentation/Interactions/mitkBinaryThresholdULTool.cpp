@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkBinaryThresholdULTool.h"
-#include "mitkBinaryThresholdULTool.xpm"
 
 #include "mitkToolManager.h"
 

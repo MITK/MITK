@@ -42,7 +42,7 @@ mitk::ContourModelLiveWireInteractor::~ContourModelLiveWireInteractor()
 {
 }
 
-bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
 
@@ -151,7 +151,7 @@ void mitk::ContourModelLiveWireInteractor::SetWorkingImage (mitk::Image* _arg)
   }
 }
 
-bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelLiveWireInteractor::OnDeletePoint(Action*, const StateEvent* stateEvent)
 {
 
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
@@ -205,7 +205,7 @@ bool mitk::ContourModelLiveWireInteractor::OnDeletePoint( Action* action, const 
   return false;
 }
 
-bool mitk::ContourModelLiveWireInteractor::OnMovePoint( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelLiveWireInteractor::OnMovePoint(Action*, const StateEvent* stateEvent)
 {
   const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return false;
@@ -457,7 +457,7 @@ int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::C
 }
 
 
-bool mitk::ContourModelLiveWireInteractor::OnFinishEditing( Action* action, const StateEvent* stateEvent)
+bool mitk::ContourModelLiveWireInteractor::OnFinishEditing(Action*, const StateEvent* stateEvent)
 {
   int timestep = stateEvent->GetEvent()->GetSender()->GetTimeStep();
 

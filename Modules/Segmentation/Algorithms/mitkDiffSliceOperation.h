@@ -18,20 +18,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkDiffSliceOperation_h_Included
 
 #include <MitkSegmentationExports.h>
-#include "mitkCommon.h"
+#include "mitkCompressedImageContainer.h"
 #include <mitkOperation.h>
-//#include "mitkCompressedImageContainer.h"
 
-#include <mitkImage.h>
 #include <vtkSmartPointer.h>
-#include <vtkImageData.h>
-
-//DEPRECATED
-#include <mitkTimeGeometry.h>
 
 
 namespace mitk
 {
+
+class Image;
+
   /** \brief An Operation for applying an edited slice to the volume.
     \sa DiffSliceOperationApplier
 
@@ -62,13 +59,7 @@ namespace mitk
     DiffSliceOperation();
 
     /** \brief */
-    DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, SlicedGeometry3D* sliceGeometry, unsigned int timestep, BaseGeometry* currentWorldGeometry);
-
-    /** \brief
-    *
-    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
-    */
-    DEPRECATED(DiffSliceOperation( mitk::Image* imageVolume, vtkImageData* slice, TimeSlicedGeometry* sliceGeometry, unsigned int timestep, BaseGeometry* currentWorldGeometry));
+    DiffSliceOperation( mitk::Image* imageVolume, mitk::Image* slice, SlicedGeometry3D* sliceGeometry, unsigned int timestep, BaseGeometry* currentWorldGeometry);
 
     /** \brief Check if it is a valid operation.*/
     bool IsValid();
@@ -81,7 +72,7 @@ namespace mitk
     /** \brief Set thee slice to be applied.*/
     void SetImage(vtkImageData* slice){ this->m_Slice = slice;}
     /** \brief Get the slice that is applied in the operation.*/
-    vtkImageData* GetSlice();
+    Image::Pointer GetSlice();
 
     /** \brief Get timeStep.*/
     void SetTimeStep(unsigned int timestep){this->m_TimeStep = timestep;}
@@ -93,22 +84,10 @@ namespace mitk
     /** \brief Get the axis where the slice has to be applied in the volume.*/
     SlicedGeometry3D* GetSliceGeometry(){return this->m_SliceGeometry;}
 
-
-    /** \brief Set the axis where the slice has to be applied in the volume.
-    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
-    */
-    void SetSliceGeometry(TimeSlicedGeometry* sliceGeometry);
-
     /** \brief Set the axis where the slice has to be applied in the volume.*/
     void SetCurrentWorldGeometry(BaseGeometry* worldGeometry){this->m_WorldGeometry = worldGeometry;}
     /** \brief Get the axis where the slice has to be applied in the volume.*/
     BaseGeometry* GetWorldGeometry(){return this->m_WorldGeometry;}
-
-
-    /** \brief Set the axis where the slice has to be applied in the volume.
-    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
-    */
-    void SetCurrentWorldGeometry(TimeSlicedGeometry* worldGeometry);
 
   protected:
 
@@ -117,7 +96,7 @@ namespace mitk
     /** \brief Callback for image observer.*/
     void OnImageDeleted();
 
-    //CompressedImageContainer::Pointer m_zlibSliceContainer;
+    CompressedImageContainer::Pointer m_zlibSliceContainer;
 
     mitk::Image* m_Image;
 

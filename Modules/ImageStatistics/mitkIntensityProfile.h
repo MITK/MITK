@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkListSample.h>
 #include <mitkImage.h>
 #include <mitkPlanarLine.h>
+#include <mitkImageStatisticsCalculator.h>
 #include <MitkImageStatisticsExports.h>
 
 namespace mitk
@@ -88,7 +89,7 @@ namespace mitk
     *
     * \return Index of the global maximum.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMaximum(IntensityProfile::Pointer intensityProfile);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMaximum(IntensityProfile::Pointer intensityProfile, IntensityProfile::MeasurementType &max);
 
   /** \brief Compute global minimum of an intensity profile.
     *
@@ -96,7 +97,16 @@ namespace mitk
     *
     * \return Index of the global minimum.
     */
-  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMinimum(IntensityProfile::Pointer intensityProfile);
+  MITKIMAGESTATISTICS_EXPORT IntensityProfile::InstanceIdentifier ComputeGlobalMinimum(IntensityProfile::Pointer intensityProfile, IntensityProfile::MeasurementType &min);
+
+  /** \brief Compute statistics of an intensity profile.
+    *
+    * \param[in] intensityProfile An intensity profile.
+    *
+    * \param[in] stats An ImageStatisticsCalculator::Statistics object to hold the calculated statistics.
+    *
+    */
+  MITKIMAGESTATISTICS_EXPORT void ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensityProfile, ImageStatisticsCalculator::Statistics &stats);
 
   /** \brief Compute center of maximum area under the curve of an intensity profile.
     *

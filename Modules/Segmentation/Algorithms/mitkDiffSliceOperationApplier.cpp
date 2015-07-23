@@ -15,8 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDiffSliceOperationApplier.h"
+
+#include "mitkDiffSliceOperation.h"
+#include <mitkExtractSliceFilter.h>
 #include "mitkRenderingManager.h"
 #include "mitkSegTool2D.h"
+#include <mitkVtkImageOverwrite.h>
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -44,8 +48,9 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
     //the actual overwrite filter (vtk)
     vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
+    mitk::Image::Pointer slice = imageOperation->GetSlice();
     //Set the slice as 'input'
-    reslice->SetInputSlice(imageOperation->GetSlice());
+    reslice->SetInputSlice(const_cast<vtkImageData*>(slice->GetVtkImageData()));
 
     //set overwrite mode to true to write back to the image volume
     reslice->SetOverwriteMode(true);
@@ -75,19 +80,15 @@ void mitk::DiffSliceOperationApplier::ExecuteOperation( Operation* operation )
     extractor2->Update();
 
     // TODO Move this code to SurfaceInterpolationController!
-    mitk::Image::Pointer slice = extractor2->GetOutput();
+    mitk::Image::Pointer slice2 = extractor2->GetOutput();
     mitk::PlaneGeometry::Pointer plane = dynamic_cast<PlaneGeometry*>(imageOperation->GetWorldGeometry());
-    slice->DisconnectPipeline();
-    mitk::SegTool2D::UpdateSurfaceInterpolation(slice, imageOperation->GetImage(), plane, true);
+    slice2->DisconnectPipeline();
+    mitk::SegTool2D::UpdateSurfaceInterpolation(slice2, imageOperation->GetImage(), plane, true);
   }
 }
 
-//mitk::DiffSliceOperationApplier* mitk::DiffSliceOperationApplier::s_Instance = NULL;
-
 mitk::DiffSliceOperationApplier* mitk::DiffSliceOperationApplier::GetInstance()
 {
-  //if(!s_Instance)
   static DiffSliceOperationApplier*  s_Instance = new DiffSliceOperationApplier();
-
   return s_Instance;
 }

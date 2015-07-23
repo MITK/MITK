@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCLCoreExports.h>
 
+
 #include <mitkBaseData.h>
 
 // Eigen
@@ -158,6 +159,9 @@ protected:
   Eigen::MatrixXd m_OutProbability;
   bool m_IsUsingPointWiseProbability;
 
+  private:
+    void MethodForBuild();
+
 public:
 
 #ifndef DOXYGEN_SKIP
@@ -165,7 +169,9 @@ public:
   virtual void SetRequestedRegionToLargestPossibleRegion(){}
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}
   virtual bool VerifyRequestedRegion(){return false;}
-  virtual void SetRequestedRegion(const itk::DataObject * /*data*/){}
+
+  virtual void SetRequestedRegion(const itk::DataObject* /*data*/){}
+
 
   // Override
   virtual bool IsEmpty() const override

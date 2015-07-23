@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNotImageFilter.h>
 #include <itkOrImageFilter.h>
 
-typedef itk::Image<unsigned char, 3> ImageType;
+typedef itk::Image< mitk::Label::PixelType, 3> ImageType;
 
 static mitk::Image::Pointer Get3DSegmentation(mitk::Image::Pointer segmentation, unsigned int time)
 {
@@ -59,9 +59,9 @@ mitk::BooleanOperation::~BooleanOperation()
 {
 }
 
-mitk::Image::Pointer mitk::BooleanOperation::GetResult() const
+mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetResult() const
 {
-  Image::Pointer result;
+  mitk::LabelSetImage::Pointer result;
 
   switch (m_Type)
   {
@@ -84,7 +84,7 @@ mitk::Image::Pointer mitk::BooleanOperation::GetResult() const
   return result;
 }
 
-mitk::Image::Pointer mitk::BooleanOperation::GetDifference() const
+mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetDifference() const
 {
   ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
   ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
@@ -98,14 +98,17 @@ mitk::Image::Pointer mitk::BooleanOperation::GetDifference() const
 
   andFilter->UpdateLargestPossibleRegion();
 
-  Image::Pointer result = Image::New();
-  CastToMitkImage<ImageType>(andFilter->GetOutput(), result);
+  Image::Pointer tempResult = Image::New();
+  CastToMitkImage<ImageType>(andFilter->GetOutput(), tempResult);
 
-  result->DisconnectPipeline();
+  tempResult->DisconnectPipeline();
+
+  mitk::LabelSetImage::Pointer result = mitk::LabelSetImage::New();
+  result->InitializeByLabeledImage(tempResult );
   return result;
 }
 
-mitk::Image::Pointer mitk::BooleanOperation::GetIntersection() const
+mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetIntersection() const
 {
   ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
   ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
@@ -116,14 +119,16 @@ mitk::Image::Pointer mitk::BooleanOperation::GetIntersection() const
 
   andFilter->UpdateLargestPossibleRegion();
 
-  Image::Pointer result = Image::New();
-  CastToMitkImage<ImageType>(andFilter->GetOutput(), result);
+  Image::Pointer tempResult = Image::New();
+  CastToMitkImage<ImageType>(andFilter->GetOutput(), tempResult);
 
-  result->DisconnectPipeline();
+  tempResult->DisconnectPipeline();
+  mitk::LabelSetImage::Pointer result = mitk::LabelSetImage::New();
+  result->InitializeByLabeledImage(tempResult);
   return result;
 }
 
-mitk::Image::Pointer mitk::BooleanOperation::GetUnion() const
+mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetUnion() const
 {
   ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
   ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
@@ -134,10 +139,12 @@ mitk::Image::Pointer mitk::BooleanOperation::GetUnion() const
 
   orFilter->UpdateLargestPossibleRegion();
 
-  Image::Pointer result = Image::New();
-  CastToMitkImage<ImageType>(orFilter->GetOutput(), result);
+  Image::Pointer tempResult = Image::New();
+  CastToMitkImage<ImageType>(orFilter->GetOutput(), tempResult);
 
-  result->DisconnectPipeline();
+  tempResult->DisconnectPipeline();
+  mitk::LabelSetImage::Pointer result = mitk::LabelSetImage::New();
+  result->InitializeByLabeledImage(tempResult);
   return result;
 }
 
@@ -151,8 +158,10 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentat
 
   mitk::PixelType pixelType = segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType();
 
-  if (pixelType.GetPixelType() != itk::ImageIOBase::SCALAR || pixelType.GetComponentType() != itk::ImageIOBase::UCHAR)
-    mitkThrow() << "Segmentation is not a scalar image of type 'unsigned char'!";
+  if (pixelType.GetPixelType() != itk::ImageIOBase::SCALAR || ( pixelType.GetComponentType() != itk::ImageIOBase::UCHAR && pixelType.GetComponentType() != itk::ImageIOBase::USHORT ) )
+  {
+    mitkThrow() << "Segmentation is not of a supported type. Supported are scalar images of type 'unsigned char' or 'unsigned short'.";
+  }
 
   unsigned int dimension = segmentation->GetDimension();
 

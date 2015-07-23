@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkBooleanOperation_h
 #define mitkBooleanOperation_h
 
-#include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 #include <MitkSegmentationExports.h>
 
 namespace mitk
@@ -54,15 +54,15 @@ namespace mitk
      *
      * \return The resulting segmentation.
      */
-    Image::Pointer GetResult() const;
+    LabelSetImage::Pointer GetResult() const;
 
   private:
     BooleanOperation(const BooleanOperation &);
     BooleanOperation & operator=(const BooleanOperation &);
 
-    Image::Pointer GetDifference() const;
-    Image::Pointer GetIntersection() const;
-    Image::Pointer GetUnion() const;
+    LabelSetImage::Pointer GetDifference() const;
+    LabelSetImage::Pointer GetIntersection() const;
+    LabelSetImage::Pointer GetUnion() const;
 
     void ValidateSegmentation(Image::Pointer segmentation) const;
     void ValidateSegmentations() const;

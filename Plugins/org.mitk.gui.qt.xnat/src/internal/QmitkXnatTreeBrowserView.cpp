@@ -555,9 +555,8 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     xnatFile->setLocalFilePath(fileName);
 
     this->InternalFileUpload(xnatFile);
-    MITK_INFO << "XNAT-OBJECT: "<<m_TreeModel->xnatObject(parentIndex)->name();
+    QFile::remove(fileName);
 
-//    m_TreeModel->addChildNode(parentIndex, xnatFile);
     m_TreeModel->refresh(parentIndex);
 
     // The filename for uploading
@@ -578,8 +577,6 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     //          mitk::IOUtil::SaveSurface(surface, dir.path().toStdString());
     //      }
 //    this->uploadFileToXnat(xnatFile, dir.path());
-
-    // TODO delete file!!!
   }
 }
 

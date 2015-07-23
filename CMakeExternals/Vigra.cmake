@@ -19,7 +19,7 @@ if(MITK_USE_Vigra)
 
   set(mac_additional_cmake_args)
   if(APPLE)
-    set(mac_additional_cmake_args -DEXCLUDE_DIR:PATH="/opt/local")
+    set(mac_additional_cmake_args -DEXCLUDE_DIR:PATH=/opt/local -DPNG_LIBRARY_RELEASE= -DPNG_PNG_INCLUDE_DIR= )
   endif()
 
   if(NOT DEFINED Vigra_DIR)

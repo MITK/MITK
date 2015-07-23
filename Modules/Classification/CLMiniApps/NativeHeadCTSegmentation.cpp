@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QDir>
 #include <QString>
-#include <QstringList>
+#include <QStringList>
 
 #include <mitkImageAccessByItk.h>
 

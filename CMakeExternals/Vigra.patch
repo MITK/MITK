@@ -1,22 +1,7 @@
 diff -urNb vigra-Version-1-10-0/CMakeLists.txt Vigra/CMakeLists.txt
 --- vigra-Version-1-10-0/CMakeLists.txt	2013-11-18 17:48:16.000000000 +0100
-+++ Vigra/CMakeLists.txt	2015-07-22 14:46:11.475927292 +0200
-@@ -59,9 +59,11 @@
- ##################################################
- 
- INCLUDE(VigraFindPackage)
--VIGRA_FIND_PACKAGE(TIFF NAMES libtiff)
--VIGRA_FIND_PACKAGE(JPEG NAMES libjpeg)
--VIGRA_FIND_PACKAGE(PNG)
-+if(NOT APPLE)
-+  VIGRA_FIND_PACKAGE(TIFF NAMES libtiff)
-+  VIGRA_FIND_PACKAGE(JPEG NAMES libjpeg)
-+  VIGRA_FIND_PACKAGE(PNG)
-+endif()
- VIGRA_FIND_PACKAGE(FFTW3 NAMES libfftw3-3 libfftw-3.3)
- VIGRA_FIND_PACKAGE(FFTW3F NAMES libfftw3f-3 libfftwf-3.3)
- 
-@@ -70,8 +72,11 @@
++++ Vigra/CMakeLists.txt	2015-03-03 10:13:57.693725000 +0100
+@@ -70,8 +70,11 @@
  ENDIF()
  
  IF(WITH_HDF5)
@@ -28,7 +13,7 @@ diff -urNb vigra-Version-1-10-0/CMakeLists.txt Vigra/CMakeLists.txt
  
  IF(WITH_BOOST_GRAPH)
      IF(WITH_VIGRANUMPY)
-@@ -395,3 +400,4 @@
+@@ -395,3 +398,4 @@
  ENDIF()
  
  MESSAGE( STATUS "---------------------------------------------------------" )

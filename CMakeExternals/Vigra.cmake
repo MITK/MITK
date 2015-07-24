@@ -17,9 +17,11 @@ if(MITK_USE_Vigra)
   set(proj_DEPENDENCIES HDF5)
   set(Vigra_DEPENDS ${proj})
 
+  # If a mac ports installation is present some imaging-io-libraries may interfere with the vigra build.
+  # Hence, we exclude them here.
   set(mac_additional_cmake_args)
   if(APPLE)
-    set(mac_additional_cmake_args -DEXCLUDE_DIR:PATH=/opt/local -DPNG_LIBRARY_RELEASE= -DPNG_PNG_INCLUDE_DIR= )
+    set(mac_additional_cmake_args -DJPEG_INCLUDE_DIR= -DJPEG_LIBRARY= -DTIFF_INCLUDE_DIR= -DTIFF_LIBRARY= -DPNG_LIBRARY_RELEASE= -DPNG_PNG_INCLUDE_DIR= )
   endif()
 
   if(NOT DEFINED Vigra_DIR)

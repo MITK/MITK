@@ -67,15 +67,15 @@ public:
     , ShortArgPrefix( shortArgPrefix )
     , ArgHelp( argHelp )
     , ArgLabel( argLabel )
+    , ArgGroup( argGroup )
+    , ArgGroupDescription( groupDescription )
     , IgnoreRest( ignoreRest )
     , NumberOfParametersToProcess( 0 )
     , Deprecated( deprecated )
+    , Optional( optional )
     , DefaultValue( defaultValue )
     , Value( type )
     , ValueType( type )
-    , Optional( optional )
-    , ArgGroup( argGroup )
-    , ArgGroupDescription( groupDescription )
   {
     Value = defaultValue;
 

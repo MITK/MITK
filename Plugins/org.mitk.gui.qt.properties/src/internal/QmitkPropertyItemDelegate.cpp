@@ -38,7 +38,6 @@ QmitkColorWidget::QmitkColorWidget(QWidget* parent)
     m_Button(new QToolButton)
 {
   m_LineEdit->setText(m_Color.name());
-
   m_Button->setText("...");
 
   QHBoxLayout* layout = new QHBoxLayout;
@@ -47,6 +46,8 @@ QmitkColorWidget::QmitkColorWidget(QWidget* parent)
 
   layout->addWidget(m_LineEdit);
   layout->addWidget(m_Button);
+
+  this->setFocusProxy(m_LineEdit);
   this->setLayout(layout);
 
   connect(m_LineEdit, SIGNAL(editingFinished()), this, SLOT(OnLineEditEditingFinished()));

@@ -104,7 +104,7 @@ private:
   void InternalFileUpload(ctkXnatFile *file);
   ctkXnatResource* InternalAddResourceFolder(ctkXnatObject* parent);
 
-  void InternalOpenFiles(const QFileInfoList&);
+  void InternalOpenFiles(const QFileInfoList&, mitk::StringProperty::Pointer xnatURL);
 
   void SetStatusInformation(const QString&);
 

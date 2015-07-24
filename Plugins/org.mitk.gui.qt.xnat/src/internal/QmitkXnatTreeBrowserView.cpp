@@ -289,6 +289,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
     // The path to the downloaded file
     QString filePath;
     QDir downloadPath (m_DownloadPath);
+    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Server Address", "");
     bool isDICOM (false);
 
     // If a scan was selected, downloading the contained DICOM folder as ZIP
@@ -311,6 +312,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           folderName.replace("/","_");
           downloadPath = m_DownloadPath + folderName;
           this->InternalDICOMDownload(obj, downloadPath);
+          serverURL.append(obj->resourceUri());
         }
       }
     }
@@ -341,6 +343,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           folderName.replace("/","_");
           downloadPath = m_DownloadPath + folderName;
           this->InternalDICOMDownload(parent, downloadPath);
+          serverURL.append(parent->resourceUri());
         }
         else
         {
@@ -357,6 +360,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
             msgBox.setIcon(QMessageBox::Information);
             msgBox.exec();
             m_Controls.groupBox->hide();
+            serverURL.append(file->resourceUri());
           }
           else
           {
@@ -383,7 +387,9 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
         QFileInfo fileInfo(filePath);
         fileList << fileInfo;
       }
-      this->InternalOpenFiles(fileList);
+
+      mitk::StringProperty::Pointer xnatURL = mitk::StringProperty::New(serverURL.toStdString());
+      this->InternalOpenFiles(fileList, xnatURL);
     }
   }
 }
@@ -427,7 +433,7 @@ void QmitkXnatTreeBrowserView::InternalDICOMDownload(ctkXnatObject *obj, QDir &D
   }
 }
 
-void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList)
+void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList, mitk::StringProperty::Pointer xnatURL)
 {
 
   if (fileList.isEmpty())
@@ -446,7 +452,7 @@ void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList)
     if (nodes->size() == 1)
     {
       mitk::DataNode* node = nodes->at(0);
-      node->SetProperty("xnat.url", mitk::StringProperty::New());
+      node->SetProperty("xnat.url", xnatURL);
     }
   }
   catch (const mitk::Exception& e)

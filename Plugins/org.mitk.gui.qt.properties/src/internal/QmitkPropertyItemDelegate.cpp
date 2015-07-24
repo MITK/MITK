@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFloatPropertyExtension.h>
 #include <mitkIntPropertyExtension.h>
 #include <mitkIPropertyExtensions.h>
+#include <QApplication>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -77,7 +78,7 @@ void QmitkColorWidget::OnLineEditEditingFinished()
 
 void QmitkColorWidget::OnButtonClicked()
 {
-  QColor color = QColorDialog::getColor(m_Color, this);
+  QColor color = QColorDialog::getColor(m_Color, QApplication::activeWindow());
 
   if (color.isValid())
   {

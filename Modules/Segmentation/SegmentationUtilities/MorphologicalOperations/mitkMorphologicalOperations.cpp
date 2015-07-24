@@ -48,7 +48,7 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer& image, int fac
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessFixedPixelTypeByItk_3(img3D, itkClosing, (unsigned char), img3D, factor, structuralElement);
+      AccessByItk_3(img3D, itkClosing, img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -56,7 +56,7 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer& image, int fac
   }
   else
   {
-    AccessFixedPixelTypeByItk_3(image, itkClosing, (unsigned char), image, factor, structuralElement);
+    AccessByItk_3(image, itkClosing, image, factor, structuralElement);
   }
 
   MITK_INFO << "Finished Closing";
@@ -83,7 +83,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer& image, int facto
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessFixedPixelTypeByItk_3(img3D, itkErode, (unsigned char), img3D, factor, structuralElement);
+      AccessByItk_3(img3D, itkErode,  img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -91,7 +91,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer& image, int facto
   }
   else
   {
-    AccessFixedPixelTypeByItk_3(image, itkErode, (unsigned char), image, factor, structuralElement);
+    AccessByItk_3(image, itkErode, image, factor, structuralElement);
   }
 
   MITK_INFO << "Finished Erode";
@@ -118,7 +118,7 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer& image, int fact
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessFixedPixelTypeByItk_3(img3D, itkDilate, (unsigned char), img3D, factor, structuralElement);
+      AccessByItk_3(img3D, itkDilate, img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -126,7 +126,7 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer& image, int fact
   }
   else
   {
-    AccessFixedPixelTypeByItk_3(image, itkDilate, (unsigned char), image, factor, structuralElement);
+    AccessByItk_3(image, itkDilate, image, factor, structuralElement);
   }
 
   MITK_INFO << "Finished Dilate";
@@ -153,7 +153,7 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer& image, int fac
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessFixedPixelTypeByItk_3(img3D, itkOpening, (unsigned char), img3D, factor, structuralElement);
+      AccessByItk_3(img3D, itkOpening, img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -161,7 +161,7 @@ void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer& image, int fac
   }
   else
   {
-    AccessFixedPixelTypeByItk_3(image, itkOpening, (unsigned char), image, factor, structuralElement);
+    AccessByItk_3(image, itkOpening, image, factor, structuralElement);
   }
 
   MITK_INFO << "Finished Opening";
@@ -188,7 +188,7 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessFixedPixelTypeByItk_1(img3D, itkFillHoles, (unsigned char), img3D);
+      AccessByItk_1(img3D, itkFillHoles, img3D);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -196,7 +196,7 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
   }
   else
   {
-    AccessFixedPixelTypeByItk_1(image, itkFillHoles, (unsigned char), image);
+    AccessByItk_1(image, itkFillHoles, image);
   }
 
   MITK_INFO << "Finished FillHole";

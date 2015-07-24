@@ -199,6 +199,7 @@ void CutImageWithOutputTypeSelect
   mitk::BaseGeometry* inputGeometry = cutter->GetInput()->GetGeometry();
 
   typename ItkOutputImageType::PixelType outsideValue;
+  outsideValue.SetSize( outputItkImage->GetVectorLength() );
   if(cutter->m_AutoOutsideValue)
   {
     outsideValue.Fill(itk::NumericTraits<TOutputPixel>::min());

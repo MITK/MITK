@@ -32,6 +32,13 @@ namespace mitk
     unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
 
+    /**
+    * \brief Returns the id of the control-point that corresponds to the given
+    * polyline-point.
+    */
+    int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
+
+
     virtual unsigned int GetMaximumNumberOfControlPoints() const override;
     virtual unsigned int GetMinimumNumberOfControlPoints() const override;
     virtual bool IsHelperToBePainted(unsigned int index) override;
@@ -42,7 +49,6 @@ namespace mitk
 
   protected:
     PlanarBezierCurve();
-    virtual ~PlanarBezierCurve();
 
     mitkCloneMacro(Self)
 
@@ -59,4 +65,3 @@ namespace mitk
 }
 
 #endif
-

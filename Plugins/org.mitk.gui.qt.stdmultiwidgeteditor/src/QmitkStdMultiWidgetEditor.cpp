@@ -345,11 +345,11 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   while(currentNode)
   {
     bool logoFound = false;
-    foreach (const QString& key, prefs->Keys())
+    foreach (const QString& key, currentNode->Keys())
     {
       if( key == "DepartmentLogo")
       {
-        QString departmentLogoLocation = prefs->Get("DepartmentLogo", "");
+        QString departmentLogoLocation = currentNode->Get("DepartmentLogo", "");
 
         if (departmentLogoLocation.isEmpty())
         {

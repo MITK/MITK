@@ -78,14 +78,17 @@ mitk::ImageDataItem::~ImageDataItem()
   {
     m_VtkImageData->Delete();
   }
+
   if(m_VtkImageReadAccessor != nullptr)
   {
     delete m_VtkImageReadAccessor;
   }
   if(m_VtkImageWriteAccessor != nullptr)
   {
-    delete m_VtkImageWriteAccessor;
-  }
+
+   delete m_VtkImageWriteAccessor;
+}
+
   if(m_Parent.IsNull())
   {
     if(m_ManageMemory)
@@ -166,8 +169,8 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType& type, int timestep,
 
 mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
   : itk::LightObject()
-  , m_Data(nullptr)
-  , m_PixelType(other.m_PixelType)
+  , m_Data(other.m_Data)
+  , m_PixelType(new mitk::PixelType(*other.m_PixelType))
   , m_ManageMemory(other.m_ManageMemory)
   , m_VtkImageData(nullptr)
   , m_VtkImageReadAccessor(nullptr)
@@ -180,6 +183,16 @@ mitk::ImageDataItem::ImageDataItem(const ImageDataItem &other)
   , m_Timestep(other.m_Timestep)
 {
   // copy m_Data ??
+    for (int i = 0; i < MAX_IMAGE_DIMENSIONS; ++i)
+        m_Dimensions[i] = other.m_Dimensions[i];
+}
+
+itk::LightObject::Pointer
+mitk::ImageDataItem::InternalClone() const
+{
+    Self::Pointer newGeometry = new Self(*this);
+    newGeometry->UnRegister();
+    return newGeometry.GetPointer();
 }
 
 void mitk::ImageDataItem::ComputeItemSize(const unsigned int *dimensions, unsigned int dimension)
@@ -230,10 +243,13 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
 
   if (m_Timestep >= 0)
   {
-    SlicedGeometry3D* geom3d = iP->GetSlicedGeometry(m_Timestep);
-    const mitk::Vector3D vspacing = geom3d->GetSpacing();
-    double dspacing[3] = { vspacing[0], vspacing[1], vspacing[2] };
-    inData->SetSpacing( dspacing );
+      SlicedGeometry3D* geom3d;
+      geom3d = iP->GetSlicedGeometry(m_Timestep);
+
+      const mitk::Vector3D vspacing = geom3d->GetSpacing();
+      double dspacing[3] = { vspacing[0], vspacing[1], vspacing[2] };
+      inData->SetSpacing(dspacing);
+
   }
 
   if ( m_PixelType->GetComponentType() == itk::ImageIOBase::CHAR )
@@ -290,6 +306,7 @@ void mitk::ImageDataItem::ConstructVtkImageData(ImageConstPointer iP) const
 
   m_VtkImageData->GetPointData()->SetScalars(scalars);
   scalars->Delete();
+
 }
 
 void mitk::ImageDataItem::Modified() const

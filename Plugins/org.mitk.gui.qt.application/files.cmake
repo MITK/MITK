@@ -4,6 +4,8 @@ set(SRC_CPP_FILES
   QmitkFileExitAction.cpp
   QmitkFileOpenAction.cpp
   QmitkFileSaveAction.cpp
+  QmitkUndoAction.cpp
+  QmitkRedoAction.cpp
   QmitkPreferencesDialog.cpp
   QmitkStatusBar.cpp
 )
@@ -20,6 +22,8 @@ set(MOC_H_FILES
   src/QmitkFileExitAction.h
   src/QmitkFileOpenAction.h
   src/QmitkFileSaveAction.h
+  src/QmitkUndoAction.h
+  src/QmitkRedoAction.h
   src/QmitkPreferencesDialog.h
 
   src/internal/org_mitk_gui_qt_application_Activator.h

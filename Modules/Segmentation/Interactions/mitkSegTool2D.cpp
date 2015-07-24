@@ -337,7 +337,7 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   /*============= BEGIN undo/redo feature block ========================*/
   // Create undo operation by caching the not yet modified slices
   mitk::Image::Pointer originalSlice = GetAffectedImageSliceAs2DImage(sliceInfo.plane, image, sliceInfo.timestep);
-  DiffSliceOperation* undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), originalSlice->GetVtkImageData(), dynamic_cast<SlicedGeometry3D*>(originalSlice->GetGeometry()), sliceInfo.timestep, sliceInfo.plane);
+  DiffSliceOperation* undoOperation = new DiffSliceOperation(const_cast<mitk::Image*>(image), originalSlice, dynamic_cast<SlicedGeometry3D*>(originalSlice->GetGeometry()), sliceInfo.timestep, sliceInfo.plane);
   /*============= END undo/redo feature block ========================*/
 
   //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
@@ -354,7 +354,7 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   extractor->SetInput( image );
   extractor->SetTimeStep( sliceInfo.timestep );
   extractor->SetWorldGeometry( sliceInfo.plane );
-  extractor->SetVtkOutputRequest(true);
+  extractor->SetVtkOutputRequest(false);
   extractor->SetResliceTransformByGeometry( image->GetGeometry( sliceInfo.timestep ) );
 
   extractor->Modified();
@@ -366,7 +366,7 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
 
   /*============= BEGIN undo/redo feature block ========================*/
   //specify the undo operation with the edited slice
-  DiffSliceOperation* doOperation = new DiffSliceOperation(image, extractor->GetVtkOutput(),dynamic_cast<SlicedGeometry3D*>(sliceInfo.slice->GetGeometry()), sliceInfo.timestep, sliceInfo.plane);
+  DiffSliceOperation* doOperation = new DiffSliceOperation(image, extractor->GetOutput(),dynamic_cast<SlicedGeometry3D*>(sliceInfo.slice->GetGeometry()), sliceInfo.timestep, sliceInfo.plane);
 
   //create an operation event for the undo stack
   OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation" );

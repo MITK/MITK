@@ -44,7 +44,6 @@ namespace mitk
 
   protected:
     PlanarDoubleEllipse();
-    virtual ~PlanarDoubleEllipse();
 
     mitkCloneMacro(Self)
 

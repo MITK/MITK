@@ -62,19 +62,35 @@ mitk::Interactor* mitk::DataNode::GetInteractor() const
 
 void mitk::DataNode::SetData(mitk::BaseData* baseData)
 {
-  if(m_Data!=baseData)
+  if(m_Data != baseData)
   {
-    m_Data=baseData;
-
     m_Mappers.clear();
     m_Mappers.resize(10);
 
-    mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
+    if(m_Data.IsNotNull() && baseData != nullptr)
+    {
+      // Do previous and new data have same type? Keep existing properties.
+      if (0 == strcmp(m_Data->GetNameOfClass(), baseData->GetNameOfClass()))
+      {
+        m_Data = baseData;
+      }
+      else
+      {
+        m_Data = baseData;
+        this->GetPropertyList()->Clear();
+        mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
+      }
+    }
+    else
+    {
+      m_Data = baseData;
+      mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(this);
+    }
 
     m_DataReferenceChangedTime.Modified();
     Modified();
 
-    //inform the interactor about the change
+    // inform the interactor about the change
     if (m_Interactor.IsNotNull())
       m_Interactor->DataChanged();
   }

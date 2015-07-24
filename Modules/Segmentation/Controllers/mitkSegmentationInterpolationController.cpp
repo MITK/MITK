@@ -324,11 +324,12 @@ void mitk::SegmentationInterpolationController::ScanWholeVolume( const itk::Imag
   if (!volume) return;
   if ( timeStep >= m_SegmentationCountInSlice.size() ) return;
 
+  ImageReadAccessor readAccess(volume, volume->GetVolumeData(timeStep));
+
   for (unsigned int slice = 0; slice < volume->GetDimension(2); ++slice)
   {
-    DATATYPE* rawVolume = static_cast<DATATYPE*>( volume->GetVolumeData(timeStep)->GetData() ); // we again promise not to change anything, we'll just count
-    //DATATYPE* rawSlice = static_cast<DATATYPE*>( volume->GetSliceData(slice)->GetData() ); // TODO THIS wouldn't work. Did I mess up with some internal mitk::Image data structure?
-    DATATYPE* rawSlice = rawVolume + ( volume->GetDimension(0) * volume->GetDimension(1) * slice );
+    const DATATYPE* rawVolume = static_cast<const DATATYPE*>( readAccess.GetData() ); // we again promise not to change anything, we'll just count
+    const DATATYPE* rawSlice = rawVolume + ( volume->GetDimension(0) * volume->GetDimension(1) * slice );
 
     ScanChangedSlice<DATATYPE>( nullptr, SetChangedSliceOptions(2, slice, 0, 1, timeStep, rawSlice) );
   }

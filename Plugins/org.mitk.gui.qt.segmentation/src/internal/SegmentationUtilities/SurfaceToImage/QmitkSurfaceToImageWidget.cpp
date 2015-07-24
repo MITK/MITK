@@ -59,7 +59,7 @@ void QmitkSurfaceToImageWidget::EnableButtons(bool enable)
   m_Controls.btnSurface2Image->setEnabled(enable);
 }
 
-void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
+void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
 {
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer imageNode = dataSelectionWidget->GetSelection(0);

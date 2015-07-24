@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBinaryThresholdTool.h"
 
-#include "mitkBinaryThresholdTool.xpm"
-
 #include "mitkToolManager.h"
 #include "mitkBoundingObjectToSegmentationFilter.h"
 
@@ -33,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkImageStatisticsHolder.h"
 #include <itkImageRegionIterator.h>
 #include <itkBinaryThresholdImageFilter.h>
 #include "mitkPadImageFilter.h"
@@ -177,8 +176,9 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
         else
            m_IsFloatImage = false;
 
-       m_SensibleMinimumThresholdValue = static_cast<double>( originalImage->GetScalarValueMin() );
-       m_SensibleMaximumThresholdValue = static_cast<double>( originalImage->GetScalarValueMax() );
+       Image::StatisticsHolderPointer statistics = originalImage->GetStatistics();
+       m_SensibleMinimumThresholdValue = static_cast<double>( statistics->GetScalarValueMin() );
+       m_SensibleMaximumThresholdValue = static_cast<double>( statistics->GetScalarValueMax() );
       }
 
       LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));

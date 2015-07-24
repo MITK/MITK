@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkConnectedAdaptiveThresholdImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageStatisticsHolder.h"
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 
@@ -100,8 +101,9 @@ void mitk::RegionGrow3DTool::Activated()
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData());
       if (image.IsNotNull())
       {
-       m_RoiMin = image->GetScalarValueMin();
-       m_RoiMax = image->GetScalarValueMax();
+        Image::StatisticsHolderPointer statistics = image->GetStatistics();
+        m_RoiMin = statistics->GetScalarValueMin();
+        m_RoiMax = statistics->GetScalarValueMax();
       }
     }
     else
@@ -408,8 +410,9 @@ void mitk::RegionGrow3DTool::UpdatePreview()
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData());
     if (image.IsNotNull())
     {
-      m_RoiMin = image->GetScalarValueMin();
-      m_RoiMax = image->GetScalarValueMax();
+      Image::StatisticsHolderPointer statistics = image->GetStatistics();
+      m_RoiMin = statistics->GetScalarValueMin();
+      m_RoiMax = statistics->GetScalarValueMax();
     }
     return;
   }

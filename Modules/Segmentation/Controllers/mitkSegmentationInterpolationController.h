@@ -151,7 +151,7 @@ class MITKSEGMENTATION_EXPORT SegmentationInterpolationController : public itk::
     class MITKSEGMENTATION_EXPORT SetChangedSliceOptions
     {
       public:
-        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )
+        SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, const void* pixels )
           : sliceDimension(sd), sliceIndex(si), dim0(d0), dim1(d1), timeStep(t), pixelData(pixels)
         {
         }
@@ -161,7 +161,7 @@ class MITKSEGMENTATION_EXPORT SegmentationInterpolationController : public itk::
         unsigned int dim0;
         unsigned int dim1;
         unsigned int timeStep;
-        void* pixelData;
+        const void* pixelData;
     };
 
     typedef std::vector<unsigned int> DirtyVectorType;

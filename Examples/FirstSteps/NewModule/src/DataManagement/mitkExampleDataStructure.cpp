@@ -62,7 +62,7 @@ void mitk::ExampleDataStructure::AppendAString(const std::string input)
 }
 
 
-bool mitk::Equal( mitk::ExampleDataStructure* leftHandSide, mitk::ExampleDataStructure* rightHandSide, mitk::ScalarType eps, bool verbose )
+bool mitk::Equal( mitk::ExampleDataStructure* leftHandSide, mitk::ExampleDataStructure* rightHandSide, mitk::ScalarType /*eps*/, bool verbose )
 {
   bool noDifferenceFound = true;
 

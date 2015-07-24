@@ -100,8 +100,13 @@ private slots:
 
 private:
   void InternalFileDownload(const QModelIndex& index, bool loadData);
+  void InternalDICOMDownload(ctkXnatObject* obj, QDir &DICOMDirPath);
   void InternalFileUpload(ctkXnatFile *file);
   ctkXnatResource* InternalAddResourceFolder(ctkXnatObject* parent);
+
+  void InternalOpenFiles(const QFileInfoList&);
+
+  void SetStatusInformation(const QString&);
 
   berry::QtSelectionProvider::Pointer m_SelectionProvider;
   void SetSelectionProvider() override;

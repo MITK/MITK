@@ -178,10 +178,10 @@ void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
   if(!index.isValid()) return;
 
   ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
+  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject) != nullptr;
+  enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
 
-  ctkXnatFile* selectedXnatFile = dynamic_cast<ctkXnatFile*>(selectedXnatObject);
-
-  if (selectedXnatFile != nullptr)
+  if (enableDownload)
   {
     this->InternalFileDownload(index, true);
   }
@@ -212,7 +212,8 @@ void QmitkXnatTreeBrowserView::OnXnatNodeSelected(const QModelIndex& index)
 
   ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
 
-  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject);
+  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject) != nullptr;
+  enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
   m_Controls.btnXnatDownload->setEnabled(enableDownload);
 
   bool enableCreateFolder = dynamic_cast<ctkXnatProject*>(selectedXnatObject) != nullptr;
@@ -227,8 +228,11 @@ void QmitkXnatTreeBrowserView::OnXnatNodeSelected(const QModelIndex& index)
 void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 {
   if (!index.isValid()) return;
-  ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(index.data(Qt::UserRole).value<ctkXnatObject*>());
-  if (file != NULL)
+
+  ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
+  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject) != nullptr;
+  enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
+  if (enableDownload)
   {
     // If the selected node is a file, so show it in MITK
     InternalFileDownload(index, true);
@@ -276,17 +280,54 @@ void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
 
 void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bool loadData)
 {
-  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
-  if (variant.isValid())
+  if (!index.isValid())
+    return;
+
+  ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
+  if (xnatObject != nullptr)
   {
-    ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
-    if (file != NULL)
+    // The path to the downloaded file
+    QString filePath;
+    QDir downloadPath (m_DownloadPath);
+    bool isDICOM (false);
+
+    // If a scan was selected, downloading the contained DICOM folder as ZIP
+    ctkXnatScan* scan = dynamic_cast<ctkXnatScan*>(xnatObject);
+
+    if (scan != nullptr)
     {
-      QDir downDir(m_DownloadPath);
-      QString filePath = m_DownloadPath + file->name();
+      isDICOM = true;
+
+      if (!scan->isFetched())
+        scan->fetch();
+
+      QList<ctkXnatObject*> children = scan->children();
+
+      foreach (ctkXnatObject* obj, children)
+      {
+        if (obj->name() == "DICOM")
+        {
+          QString folderName = obj->resourceUri();
+          folderName.replace("/","_");
+          downloadPath = m_DownloadPath + folderName;
+          this->InternalDICOMDownload(obj, downloadPath);
+        }
+      }
+    }
+    else
+    {
+      ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(xnatObject);
+
+      if (file == nullptr)
+      {
+        MITK_ERROR << "Selected XNAT object not downloadable!";
+        return;
+      }
+
+      filePath = m_DownloadPath + file->name();
 
       // Checking if the file exists already
-      if (downDir.exists(file->name()))
+      if (downloadPath.exists(file->name()))
       {
         MITK_INFO << "File '" << file->name().toStdString() << "' already exists!";
       }
@@ -294,38 +335,21 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       {
         if (file->property("collection") == QString("DICOM"))
         {
+          isDICOM = true;
           ctkXnatObject* parent = file->parent();
-
-          filePath = m_DownloadPath + parent->property("label") + ".zip";
-
-          m_Controls.groupBox->setTitle("Downloading DICOM series...");
-          m_Controls.groupBox->show();
-          m_Controls.progressBar->setValue(0);
-
-          parent->download(filePath);
-
-          std::ifstream in(filePath.toStdString().c_str(), std::ios::binary);
-          poco_assert(in);
-
-          // decompress to XNAT_DOWNLOAD dir
-          Poco::Zip::Decompress dec(in, Poco::Path(m_DownloadPath.toStdString()));
-          dec.decompressAllFiles();
-
-          in.close();
-          QFile::remove(filePath);
+          QString folderName = parent->resourceUri();
+          folderName.replace("/","_");
+          downloadPath = m_DownloadPath + folderName;
+          this->InternalDICOMDownload(parent, downloadPath);
         }
         else
         {
-          MITK_INFO << "Download started ...";
-
-          m_Controls.groupBox->setTitle("Downloading file...");
-          m_Controls.groupBox->show();
-          m_Controls.progressBar->setValue(0);
+          this->SetStatusInformation("Downloading file " + file->name());
 
           file->download(filePath);
 
           // Checking if the file exists now
-          if (downDir.exists(file->name()))
+          if (downloadPath.exists(file->name()))
           {
             MITK_INFO << "Download of " << file->name().toStdString() << " completed!";
             QMessageBox msgBox;
@@ -346,54 +370,92 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           }
         }
       }
-      if (downDir.exists(file->name()) || file->property("collection") == "DICOM")
-      {
-        if (loadData)
-        {
-          if (file->property("collection") == "DICOM")
-          {
-            // Search for the downloaded file an its file path
-            QDirIterator it(m_DownloadPath, QStringList() << file->name(), QDir::Files, QDirIterator::Subdirectories);
-            while (it.hasNext()) {
-              it.next();
-              filePath = it.filePath();
-            }
-          }
-
-          if (filePath.isEmpty())
-          {
-            MITK_INFO << "Decompressing failed!";
-            return;
-          }
-          else if (!QFile(filePath).exists())
-          {
-            MITK_INFO << "Decompressing failed!";
-            return;
-          }
-
-          mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-          mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
-          QStringList list;
-          list << filePath;
-          try
-          {
-            QmitkIOUtil::Load(list, *dataStorage);
-          }
-          catch (const mitk::Exception& e)
-          {
-            MITK_INFO << e;
-            return;
-          }
-          mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
-            dsService->GetDataStorage()->GetDataStorage());
-        }
-      }
     }
-    else
+    if (loadData)
     {
-      MITK_INFO << "Selection was not a file!";
+      QFileInfoList fileList;
+      if (isDICOM)
+      {
+        fileList = downloadPath.entryInfoList(QDir::Files);
+      }
+      else
+      {
+        QFileInfo fileInfo(filePath);
+        fileList << fileInfo;
+      }
+      this->InternalOpenFiles(fileList);
     }
   }
+}
+
+void QmitkXnatTreeBrowserView::InternalDICOMDownload(ctkXnatObject *obj, QDir &DICOMDirPath)
+{
+
+  QString filePath = m_DownloadPath + obj->property("label") + ".zip";
+
+  this->SetStatusInformation("Downloading DICOM series " + obj->parent()->name());
+  obj->download(filePath);
+
+  std::ifstream in(filePath.toStdString().c_str(), std::ios::binary);
+  poco_assert(in);
+
+  // decompress to XNAT_DOWNLOAD dir
+  Poco::Zip::Decompress dec(in, Poco::Path(DICOMDirPath.path().toStdString()), true);
+  dec.decompressAllFiles();
+
+  in.close();
+  QFile::remove(filePath);
+
+  // Checking if the file exists now
+  if (DICOMDirPath.exists())
+  {
+    MITK_INFO << "Download of DICOM series " << obj->parent()->name().toStdString() << " completed!";
+    QMessageBox msgBox;
+    msgBox.setText("Download of DICOM series " + obj->parent()->name() + " completed!");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
+    m_Controls.groupBox->hide();
+  }
+  else
+  {
+    MITK_INFO << "Download of DICOM series " << obj->parent()->name().toStdString() << " failed!";
+    QMessageBox msgBox;
+    msgBox.setText("Download of DICOM series " + obj->parent()->name() + " failed!");
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+    m_Controls.groupBox->hide();
+  }
+}
+
+void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList)
+{
+
+  if (fileList.isEmpty())
+  {
+    MITK_WARN << "No files available for laoding!";
+    return;
+  }
+
+  mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
+  mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+  QStringList list;
+  list << fileList.at(0).absoluteFilePath();
+  try
+  {
+    mitk::DataStorage::SetOfObjects::Pointer nodes = QmitkIOUtil::Load(list, *dataStorage);
+    if (nodes->size() == 1)
+    {
+      mitk::DataNode* node = nodes->at(0);
+      node->SetProperty("xnat.url", mitk::StringProperty::New());
+    }
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_INFO << e;
+    return;
+  }
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
+        dsService->GetDataStorage()->GetDataStorage());
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuDownloadFile()
@@ -824,4 +886,11 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
       UpdateSession(session);
     }
   }
+}
+
+void QmitkXnatTreeBrowserView::SetStatusInformation(const QString& text)
+{
+  m_Controls.groupBox->setTitle(text);
+  m_Controls.progressBar->setValue(0);
+  m_Controls.groupBox->show();
 }

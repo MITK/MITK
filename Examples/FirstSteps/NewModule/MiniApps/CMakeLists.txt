@@ -1,48 +1,22 @@
-option(BUILD_DiffusionMiniApps "Build commandline tools for diffusion" OFF)
+option(BUILD_NewModuleMiniApps "Build commandline tools for the example module" OFF)
 
-if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
+if(BUILD_NewModuleMiniApps)
 
   # needed include directories
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     )
-
-    # list of diffusion miniapps
+    # list of miniapps
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
-    set( diffusionminiapps
-    DwiDenoising^^
-    ImageResampler^^
-    NetworkCreation^^MitkFiberTracking_MitkConnectomics
-    NetworkStatistics^^MitkConnectomics
-    ExportShImage^^
-    Fiberfox^^MitkFiberTracking
-    MultishellMethods^^MitkFiberTracking
-    PeaksAngularError^^MitkFiberTracking
-    PeakExtraction^^MitkFiberTracking
-    FiberExtraction^^MitkFiberTracking
-    FiberProcessing^^MitkFiberTracking
-    FiberDirectionExtraction^^MitkFiberTracking
-    LocalDirectionalFiberPlausibility^^MitkFiberTracking
-    StreamlineTracking^^MitkFiberTracking
-    GibbsTracking^^MitkFiberTracking
-    CopyGeometry^^
-    DiffusionIndices^^
-    TractometerMetrics^^MitkFiberTracking
-    QballReconstruction^^
-    Registration^^
-    FileFormatConverter^^MitkFiberTracking
-    TensorReconstruction^^
-    TensorDerivedMapsExtraction^^
-    DICOMLoader^^
-    DFTraining^^MitkFiberTracking
-    DFTracking^^MitkFiberTracking
+    set( miniapps
+    ExampleToUpperCaseMiniApp^^
     )
 
-    foreach(diffusionminiapp ${diffusionminiapps})
+    foreach(miniapp ${miniapps})
       # extract mini app name and dependencies
-      string(REPLACE "^^" "\\;" miniapp_info ${diffusionminiapp})
+      string(REPLACE "^^" "\\;" miniapp_info ${miniapp})
       set(miniapp_info_list ${miniapp_info})
       list(GET miniapp_info_list 0 appname)
       list(GET miniapp_info_list 1 raw_dependencies)
@@ -50,7 +24,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
       set(dependencies_list ${dependencies})
 
       mitk_create_executable(${appname}
-      DEPENDS MitkCore MitkDiffusionCore MitkCommandLine ${dependencies_list}
+      DEPENDS MitkNewModule MitkCommandLine ${dependencies_list}
       PACKAGE_DEPENDS ITK
       CPP_FILES ${appname}.cpp
       )
@@ -98,20 +72,5 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
        endif()
       endif()
     endforeach()
-
-  # This mini app does not depend on mitkDiffusionImaging at all
-  mitk_create_executable(Dicom2Nrrd
-    DEPENDS MitkCore MitkCommandLine
-    CPP_FILES Dicom2Nrrd.cpp
-  )
-
-        # On Linux, create a shell script to start a relocatable application
-        if(UNIX AND NOT APPLE)
-          install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${EXECUTABLE_TARGET}.sh)
-        endif()
-
-  if(EXECUTABLE_IS_ENABLED)
-    MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})
-  endif()
 
 endif()

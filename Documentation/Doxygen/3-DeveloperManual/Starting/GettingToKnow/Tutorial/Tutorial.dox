@@ -41,6 +41,8 @@ This file contains a surface and can be downloaded from http://mitk.org/download
 \li \subpage Step09Page "Step 9: A plug-in"
 \li \subpage Step10Page "Step 10: How to use Interactor and how to implement new ones"
 
+More advanced How-Tos can be found at \ref FirstSteps .
+
 Enjoy MITK!
 
 */

@@ -3,6 +3,7 @@
 
 set(mitk_modules
   Core
+  CommandLine
   AppUtil
   DCMTesting
   RDF

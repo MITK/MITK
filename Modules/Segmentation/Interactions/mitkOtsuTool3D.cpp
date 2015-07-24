@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLevelWindowProperty.h>
 #include <mitkLookupTableProperty.h>
 #include "mitkOtsuSegmentationFilter.h"
-#include "mitkImage.h"
+#include "mitkLabelSetImage.h"
 #include "mitkImageAccessByItk.h"
 
 // ITK
@@ -139,7 +139,9 @@ void mitk::OtsuTool3D::RunSegmentation(int regions, bool useValley, int numberOf
   m_ToolManager->GetDataStorage()->Add( this->m_MultiLabelResultNode );
   m_MultiLabelResultNode->SetOpacity(1.0);
 
-  this->m_MultiLabelResultNode->SetData( otsuFilter->GetOutput() );
+  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
+  resultImage->InitializeByLabeledImage( otsuFilter->GetOutput() );
+  this->m_MultiLabelResultNode->SetData(resultImage);
   m_MultiLabelResultNode->SetProperty("binary", mitk::BoolProperty::New(false));
   mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
   renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
@@ -169,7 +171,10 @@ void mitk::OtsuTool3D::RunSegmentation(int regions, bool useValley, int numberOf
 
 void mitk::OtsuTool3D::ConfirmSegmentation()
 {
-  GetTargetSegmentationNode()->SetData(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
+  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
+  resultImage->InitializeByLabeledImage(dynamic_cast<mitk::Image*>(m_BinaryPreviewNode->GetData()));
+  GetTargetSegmentationNode()->SetData(resultImage);
+
   m_ToolManager->ActivateTool(-1);
 }
 

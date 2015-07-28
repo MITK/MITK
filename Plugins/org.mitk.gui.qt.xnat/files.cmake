@@ -4,6 +4,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_xnatinterface_Activator.cpp
+  QmitkUploadToXNATAction.cpp
   QmitkXnatTreeBrowserView.cpp
   QmitkXnatConnectionPreferencePage.cpp
   QmitkXnatSessionManager.cpp
@@ -16,6 +17,7 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_xnatinterface_Activator.h
+  src/internal/QmitkUploadToXNATAction.h
   src/internal/QmitkXnatTreeBrowserView.h
   src/internal/QmitkXnatConnectionPreferencePage.h
 )
@@ -27,6 +29,7 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   resources/icon.xpm
   resources/xnat_treebrowser_icon.xpm
+  resources/xnat-icon.png
   plugin.xml
 )
 

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QtPlugin>
 
+#include "QmitkUploadToXNATAction.h"
 #include "QmitkXnatTreeBrowserView.h"
 #include "QmitkXnatConnectionPreferencePage.h"
 
@@ -28,8 +29,8 @@ US_INITIALIZE_MODULE
 
 namespace mitk {
 
-ctkPluginContext* org_mitk_gui_qt_xnatinterface_Activator::m_Context = 0;
-us::ModuleContext* org_mitk_gui_qt_xnatinterface_Activator::m_ModuleContext = 0;
+ctkPluginContext* org_mitk_gui_qt_xnatinterface_Activator::m_Context = nullptr;
+us::ModuleContext* org_mitk_gui_qt_xnatinterface_Activator::m_ModuleContext = nullptr;
 
 QmitkXnatSessionManager* org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()
 {
@@ -54,6 +55,7 @@ void org_mitk_gui_qt_xnatinterface_Activator::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatTreeBrowserView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkXnatConnectionPreferencePage, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkUploadToXNATAction, context)
 }
 
 void org_mitk_gui_qt_xnatinterface_Activator::stop(ctkPluginContext* context)

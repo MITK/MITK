@@ -192,8 +192,7 @@ void QmitkXnatTreeBrowserView::OnUploadFromDataStorage()
   QmitkXnatUploadFromDataStorageDialog dialog;
   dialog.SetDataStorage(this->GetDataStorage());
   int result = dialog.exec();
-
-  if (result == QmitkXnatUploadFromDataStorageDialog::UPLOAD)
+  if (result == QDialog::Accepted)
   {
     QList<mitk::DataNode*> nodes;
     nodes << dialog.GetSelectedNode().GetPointer();
@@ -234,8 +233,15 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
   enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
   if (enableDownload)
   {
-    // If the selected node is a file, so show it in MITK
-    InternalFileDownload(index, true);
+    QMessageBox msgBox;
+    QString msg ("Do you want to download "+selectedXnatObject->name()+"?");
+    msgBox.setWindowTitle("MITK XNAT upload");
+    msgBox.setText(msg);
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    int result = msgBox.exec();
+    if (result == QMessageBox::Ok)
+      InternalFileDownload(index, true);
   }
 }
 
@@ -602,6 +608,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
       msgbox.setText("Could not upload file! File-type not supported");
       msgbox.setIcon(QMessageBox::Critical);
       msgbox.exec();
+      return;
     }
 
     xnatFile->setName(fileName);

@@ -24,11 +24,6 @@ public:
   void SetDataStorage(mitk::DataStorage* ds);
   mitk::DataNode::Pointer GetSelectedNode();
 
-  enum
-  {
-    UPLOAD, CANCEL
-  };
-
 protected slots:
 
   void OnUpload();

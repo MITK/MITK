@@ -318,7 +318,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           folderName.replace("/","_");
           downloadPath = m_DownloadPath + folderName;
           this->InternalDICOMDownload(obj, downloadPath);
-          serverURL.append(obj->resourceUri());
+          serverURL = obj->resourceUri();
         }
       }
     }
@@ -349,13 +349,14 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           folderName.replace("/","_");
           downloadPath = m_DownloadPath + folderName;
           this->InternalDICOMDownload(parent, downloadPath);
-          serverURL.append(parent->resourceUri());
+          serverURL = parent->resourceUri();
         }
         else
         {
           this->SetStatusInformation("Downloading file " + file->name());
 
           file->download(filePath);
+          serverURL = file->parent()->resourceUri();
 
           // Checking if the file exists now
           if (downloadPath.exists(file->name()))
@@ -366,7 +367,6 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
             msgBox.setIcon(QMessageBox::Information);
             msgBox.exec();
             m_Controls.groupBox->hide();
-            serverURL.append(file->resourceUri());
           }
           else
           {

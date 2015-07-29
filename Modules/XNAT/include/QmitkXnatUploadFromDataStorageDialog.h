@@ -3,6 +3,7 @@
 
 #include <QDialog>
 
+#include "MitkXNATExports.h"
 #include <mitkDataNode.h>
 
 namespace Ui {
@@ -13,7 +14,7 @@ namespace mitk {
 class DataStorage;
 }
 
-class QmitkXnatUploadFromDataStorageDialog : public QDialog
+class MITKXNAT_EXPORT QmitkXnatUploadFromDataStorageDialog : public QDialog
 {
   Q_OBJECT
 

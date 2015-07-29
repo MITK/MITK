@@ -60,7 +60,8 @@ QmlMitkRenderWindowItem
                           mitk::RenderingManager* renderingManager)
 : QVTKQuickItem(parent)
 {
-  mitk::RenderWindowBase::Initialize(renderingManager, GetUniqueName(name));
+  QString uniqueName = GetUniqueName(name);
+  mitk::RenderWindowBase::Initialize(renderingManager, uniqueName.toStdString().c_str());
 
   /* from QmitkRenderWindow. Required?
   setFocusPolicy(Qt::StrongFocus);
@@ -79,7 +80,7 @@ QmlMitkRenderWindowItem
 // called automatically in a generic way. A second option would be to first construct the render
 // window item and subsequently set the name but as far as I know MITK does not allow the change of
 // the name after the construction.
-const char* QmlMitkRenderWindowItem::GetUniqueName(QString name)
+QString QmlMitkRenderWindowItem::GetUniqueName(const QString& name)
 {
    static unsigned int nameCounter = 1;
    QString uniqueName = name;
@@ -95,7 +96,7 @@ const char* QmlMitkRenderWindowItem::GetUniqueName(QString name)
          break;
       }
    }
-   return uniqueName.toStdString().c_str();
+   return uniqueName;
 }
 
 // called from QVTKQuickItem when window is painted for the first time!

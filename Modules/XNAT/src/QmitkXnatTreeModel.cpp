@@ -26,6 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatResource.h>
 #include <ctkXnatResourceFolder.h>
 #include <ctkXnatSubject.h>
+#include <ctkXnatFile.h>
+#include <ctkXnatResourceCatalogXmlParser.h>
+#include <ctkXnatScan.h>
+#include <ctkXnatScanFolder.h>
 
 QmitkXnatTreeModel::QmitkXnatTreeModel ()
   : ctkXnatTreeModel()
@@ -51,7 +55,7 @@ QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
     }
     else if(dynamic_cast<ctkXnatProject*>(xnatObject))
     {
-      path = ":/xnat/project.ico";
+      path = ":/xnat/project.png";
     }
     else if(dynamic_cast<ctkXnatSubject*>(xnatObject))
     {
@@ -60,6 +64,26 @@ QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
     else if(dynamic_cast<ctkXnatExperiment*>(xnatObject))
     {
       path = ":/xnat/experiment.ico";
+    }
+    else if (dynamic_cast<ctkXnatResourceFolder*>(xnatObject))
+    {
+      path = ":/xnat/folder.ico";
+    }
+    else if (dynamic_cast<ctkXnatResource*>(xnatObject))
+    {
+      path = ":/xnat/resource.png";
+    }
+    else if (dynamic_cast<ctkXnatScanFolder*>(xnatObject))
+    {
+      path = ":/xnat/folder.ico";
+    }
+    else if (dynamic_cast<ctkXnatScan*>(xnatObject))
+    {
+      path = ":/xnat/scan.png";
+    }
+    else if (dynamic_cast<ctkXnatFile*>(xnatObject))
+    {
+      path = ":/xnat/file.png";
     }
     return QIcon(path);
   }

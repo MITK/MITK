@@ -338,6 +338,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       if (downloadPath.exists(file->name()))
       {
         MITK_INFO << "File '" << file->name().toStdString() << "' already exists!";
+        serverURL = file->parent()->resourceUri();
       }
       else
       {

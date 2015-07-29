@@ -92,51 +92,42 @@ void QmitkUploadToXNATAction::Run( const QList<mitk::DataNode::Pointer> &selecte
   if (selectedNode == nullptr)
     return;
 
-/////////////////////////////////////////////////////////////////////////////////////
- /*
-  * TODO
-  * Preselect possible upload destination by evaluating the xnat.url property of a parent node
-  * Problem here: We need a valid ctkXnatObject as parent for uploading the file
-  */
-/////////////////////////////////////////////////////////////////////////////////////
-//  ctkServiceTracker<mitk::IDataStorageService*> dataStorageServiceTracker (mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext());
-//  dataStorageServiceTracker.open();
-//  mitk::IDataStorageService* dsService = dataStorageServiceTracker.getService();
-//  mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+  ctkServiceTracker<mitk::IDataStorageService*> dataStorageServiceTracker (mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext());
+  dataStorageServiceTracker.open();
+  mitk::IDataStorageService* dsService = dataStorageServiceTracker.getService();
+  mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
 
-//  mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("xnat.url");
-//  mitk::DataStorage::SetOfObjects::ConstPointer result = dataStorage->GetSources(selectedNode, pred);
-//  mitk::DataStorage::SetOfObjects::ConstIterator it = result->Begin();
+  mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("xnat.url");
+  mitk::DataStorage::SetOfObjects::ConstPointer result = dataStorage->GetSources(selectedNode, pred);
+  mitk::DataStorage::SetOfObjects::ConstIterator it = result->Begin();
 
-//  QList<ctkXnatObject*> resourceFolders;
-//  QStringList resourceNames;
-//  QString url;
-//  for (;it != result->End(); ++it)
-//  {
-//    mitk::DataNode::Pointer node = it->Value();
+  QList<ctkXnatObject*> resourceFolders;
+  QStringList resourceNames;
+  QString url;
+  for (;it != result->End(); ++it)
+  {
+    mitk::DataNode::Pointer node = it->Value();
 
-//    std::string xnatUrl("");
-//    node->GetStringProperty("xnat.url", xnatUrl);
-//    url = QString::fromStdString(xnatUrl);
+    std::string xnatUrl("");
+    node->GetStringProperty("xnat.url", xnatUrl);
+    url = QString::fromStdString(xnatUrl);
 
-//    int start = url.lastIndexOf("resources/") + 10; //length of "resources/"
-//    url = url.left(start);
+    int start = url.lastIndexOf("resources/") + 10; //length of "resources/"
+    url = url.left(start);
 
-//    std::cout<<"node: "<<node->GetName()<<" --- URL: "<<xnatUrl<<" --- Name: "<<url.toStdString()<<std::endl;
+    QUuid uid = session->httpGet(url);
+    resourceFolders = session->httpResults(uid, ctkXnatDefaultSchemaTypes::XSI_RESOURCE);
 
-//    QUuid uid = session->httpGet(url);
-//    resourceFolders = session->httpResults(uid, ctkXnatDefaultSchemaTypes::XSI_RESOURCE);
-
-//    foreach (ctkXnatObject* obj, resourceFolders)
-//    {
-//      resourceNames << obj->name();
-//    }
-//  }
-/////////////////////////////////////////////////////////////////////////////////////
+    foreach (ctkXnatObject* obj, resourceFolders)
+    {
+      resourceNames << obj->name();
+    }
+  }
 
   // Dialog for selecting the upload destination
-  QmitkSelectXnatUploadDestinationDialog dialog(session);
+  QmitkSelectXnatUploadDestinationDialog dialog(session, resourceNames);
   dialog.setWindowTitle("Select XNAT upload destination");
+  dialog.SetXnatResourceFolderUrl(url);
   int returnValue = dialog.exec();
 
   if (returnValue == QDialog::Accepted)
@@ -174,7 +165,7 @@ void QmitkUploadToXNATAction::Run( const QList<mitk::DataNode::Pointer> &selecte
     mitk::IOUtil::Save (selectedNode->GetData(), fileName.toStdString());
 
     // Upload the file to XNAT
-    ctkXnatResource* uploadDestination = dialog.GetUploadDestination();
+    ctkXnatObject* uploadDestination = dialog.GetUploadDestination();
     if (uploadDestination != nullptr)
     {
       ctkXnatFile* file = new ctkXnatFile(uploadDestination);
@@ -184,7 +175,7 @@ void QmitkUploadToXNATAction::Run( const QList<mitk::DataNode::Pointer> &selecte
       file->save();
     }
   }
-//  dataStorageServiceTracker.close();
+  dataStorageServiceTracker.close();
 }
 
 void QmitkUploadToXNATAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)

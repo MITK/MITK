@@ -114,3 +114,80 @@ Qt::ItemFlags QmitkXnatTreeModel::flags(const QModelIndex &index) const
   else
     return defaultFlags;
 }
+
+ctkXnatObject* QmitkXnatTreeModel::InternalGetXnatObjectFromUrl(const QString & xnatObjectType, const QString & url,
+                                                                ctkXnatObject* parent)
+{
+  // 1. Find project
+  int start = url.lastIndexOf(xnatObjectType);
+  if (start == -1)
+    return nullptr;
+
+  start += xnatObjectType.length();
+  int length = url.indexOf("/",start);
+  length -= start;
+
+  parent->fetch();
+  QList<ctkXnatObject*> children = parent->children();
+  foreach (ctkXnatObject* child, children)
+  {
+    if(url.indexOf(child->resourceUri()) != -1)
+    {
+      return child;
+    }
+  }
+  return nullptr;
+}
+
+ctkXnatObject* QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString& url)
+{
+  QModelIndex index = this->index(0,0,QModelIndex());
+  ctkXnatObject* currentXnatObject = nullptr;
+  currentXnatObject = this->xnatObject(index);
+  if (currentXnatObject != nullptr)
+  {
+    // 1. Find project
+    ctkXnatObject* project = nullptr;
+    project = this->InternalGetXnatObjectFromUrl("projects/", url, currentXnatObject);
+
+    // 2. Find subject
+    ctkXnatObject* subject = nullptr;
+    if (project != nullptr)
+    {
+      currentXnatObject = project;
+      subject = this->InternalGetXnatObjectFromUrl("subjects/", url, project);
+    }
+
+    // 3. Find experiment
+    ctkXnatObject* experiment = nullptr;
+    if (subject != nullptr)
+    {
+      currentXnatObject = subject;
+      experiment = this->InternalGetXnatObjectFromUrl("experiments/", url, subject);
+    }
+
+    // 4. Find scan
+    if (experiment != nullptr)
+    {
+      currentXnatObject = this->InternalGetXnatObjectFromUrl("scans/", url, experiment);
+      currentXnatObject->fetch();
+      QList<ctkXnatObject*> scans = currentXnatObject->children();
+      foreach (ctkXnatObject* child, scans)
+      {
+        if (url.indexOf(child->resourceUri()) != -1)
+        {
+          return child;
+        }
+      }
+    }
+
+    currentXnatObject->fetch();
+    QList<ctkXnatObject*> bla = currentXnatObject->children();
+    foreach (ctkXnatObject* child, bla)
+    {
+      if (child->name() == "Resources")
+        return child;
+    }
+  }
+  return nullptr;
+}

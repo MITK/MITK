@@ -43,8 +43,13 @@ public:
 
   virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 
+  ctkXnatObject* GetXnatObjectFromUrl(const QString&);
+
   signals:
   void ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&);
+
+private:
+    ctkXnatObject *InternalGetXnatObjectFromUrl(const QString &xnatObjectType, const QString &url, ctkXnatObject *parent);
 
 };
 

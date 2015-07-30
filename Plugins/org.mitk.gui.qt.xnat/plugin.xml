@@ -32,7 +32,7 @@
   </extension>
 
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
-    <contextMenuAction nodeDescriptorName="Unknown" label="Upload to XNAT" icon="resources/xnat-icon.png" class="QmitkUploadToXNATAction" />
+    <contextMenuAction nodeDescriptorName="Unknown" label="Upload to XNAT" icon="xnat-icon" class="QmitkUploadToXNATAction" />
   </extension>
 
   <extension point="org.blueberry.ui.keywords">

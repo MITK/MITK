@@ -191,11 +191,17 @@ ctkXnatObject* QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString& url)
     }
 
     // 4. Find scan
+    ctkXnatObject* scan = nullptr;
     if (experiment != nullptr)
     {
-      currentXnatObject = this->InternalGetXnatObjectFromUrl("scans/", url, experiment);
-      currentXnatObject->fetch();
-      QList<ctkXnatObject*> scans = currentXnatObject->children();
+      currentXnatObject = experiment;
+      scan = this->InternalGetXnatObjectFromUrl("scans/", url, experiment);
+    }
+
+    if (scan != nullptr)
+    {
+      scan->fetch();
+      QList<ctkXnatObject*> scans = scan->children();
       foreach (ctkXnatObject* child, scans)
       {
         if (url.indexOf(child->resourceUri()) != -1)

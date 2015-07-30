@@ -8,5 +8,5 @@ MITK_CREATE_MODULE(
 )
 
 add_subdirectory(autoload/IO)
-add_subdirectory(MiniApps)
+add_subdirectory(cmdapps)
 add_subdirectory(test)

@@ -64,7 +64,7 @@ If you want to use ctest instead of the test driver you need to start a command 
 
 \section GeneralTestsExample An example
 
-\include Examples\FirstSteps\NewModule\test\mitkExampleDataStructureTest.cpp
+\include Examples/FirstSteps/NewModule/test/mitkExampleDataStructureTest.cpp
 
 \section GeneralTestsFurtherInfo Further information
 

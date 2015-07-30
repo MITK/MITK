@@ -108,6 +108,7 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
                          , m_Ui->m_EnableFlexibleZooming->isChecked());
   m_Preferences->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
   m_Preferences->PutBool("Display metainfo", m_Ui->m_DisplayMetaInfo->isChecked());
+  m_Preferences->PutBool("Selection on 3D View", m_Ui->m_SelectionMode->isChecked());
   m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
   m_Preferences->PutInt("Rendering Mode", m_Ui->m_RenderingMode->currentIndex());
 

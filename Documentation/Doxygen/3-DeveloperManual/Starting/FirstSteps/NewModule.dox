@@ -1,7 +1,7 @@
 /**
 \page NewModulePage How to create a new MITK Module
 
-\section NewModulePageCreateFolder 1) Create a Folder for your Module
+\section NewModulePageCreateFolder Create a Folder for your Module
 
 First, create a folder for your module within /Modules  e.g. 'NewModule'.
 You need to add the new Folder to the CMakeLists.txt in the Module directory as well as well.
@@ -23,9 +23,9 @@ Depending on your use case you might not need every directory.
 \code
 NewModule/
   autoload/
+  cmdapps/
   doc/
   include/
-  MiniApps/
   resource/
   src/
   test/
@@ -42,6 +42,10 @@ Examples would be a module registering readers/writers or providing an interface
 
 For an example of an autoload module take a look at NewModule/autoload/IO.
 
+\subsection NewModulePageCreateFolderCmdApps cmdapps
+
+This directory contains all cmdapps (command line tools) related to your module. For more information see \ref MiniAppCommandLineToolHowToPage.
+
 \subsection NewModulePageCreateFolderDoc doc
 
 This directory contains the documentation for your module.
@@ -49,10 +53,6 @@ This directory contains the documentation for your module.
 \subsection NewModulePageCreateFolderInclude include
 
 This directory contains all header files which might be included by other modules.
-
-\subsection NewModulePageCreateFolderMiniApps MiniApps
-
-This directory contains all MiniApps (command line tools) related to your module. For more information see \ref MiniAppCommandLineToolHowToPage.
 
 \subsection NewModulePageCreateFolderResource resource
 
@@ -68,7 +68,7 @@ This directory contains source and header files which should not be included by 
 This directory contains all tests for your module.
 
 
-\section NewModulePageCreateCMakeLists 2) Create CMakeLists.txt
+\section NewModulePageCreateCMakeLists Create CMakeLists.txt
 
 Within your module create a CMakeLists.txt using the MITK_CREATE_MODULE macro:
 
@@ -88,7 +88,7 @@ the resulting name is MitkNewModuleIO.
 
 \note For more information about the parameters of the new module macro see mitkFunctionCreateModule.cmake
 
-\section NewModulePageCreatefilesdotcmake 3) Create files.cmake
+\section NewModulePageCreatefilesdotcmake Create files.cmake
 
 Next, create a new file and name it files.cmake, containing the files of your module.
 
@@ -98,7 +98,7 @@ An example:
 
 If you do not add a source file here it will not be compiled, unless it is included elsewhere.
 
-\section NewModulePageCreateTestingEnvironment 4) Set up the Test environment
+\section NewModulePageCreateTestingEnvironment Set up the Test environment
 
 Providing tests for your code is a very good way to save yourself a lot of debugging time and ensure
 consistency. An example of a small test environment is provided in the NewModule example.

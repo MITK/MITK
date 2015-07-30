@@ -29,6 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/*!
+\brief Join multiple tractograms
+*/
 int FiberJoin(int argc, char* argv[])
   {
     mitkCommandLineParser parser;
@@ -36,7 +39,7 @@ int FiberJoin(int argc, char* argv[])
     parser.setTitle("Fiber Join");
     parser.setCategory("Fiber Tracking and Processing Methods");
     parser.setContributor("MBI");
-    parser.setDescription("");
+    parser.setDescription("Join multiple tractograms");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input:", "input tractograms (.fib, vtk file format)", us::Any(), false);

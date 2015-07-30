@@ -40,7 +40,7 @@ struct PrpSelListener;
 /*!
  * \ingroup org_mitk_gui_qt_preprocessing_internal
  *
- * \brief QmitkPreprocessingView
+ * \brief Viewing and modifying diffusion weighted images (gradient reduction, resampling, b-value projection, ...)
  *
  * Document your class here.
  *

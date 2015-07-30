@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkFloatArray.h>
 
 /*!
-\brief View to process fiber bundles. Supplies methods to generate images from the selected bundle and much more.
+\brief Generation of images from fiber bundles (TDI, envelopes, endpoint distribution) and extraction of principal fiber directions from tractograms.
 
 \sa QmitkFunctionality
 \ingroup Functionalities

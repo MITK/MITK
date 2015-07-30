@@ -152,8 +152,8 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
         pos.SetVnlVector(rotZ*pos.GetVnlVector());
     }
 
-    PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false);
-    PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false);
+    PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
+    PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
     unsigned long lastTick = 0;
 
     boost::progress_display disp(images.at(0)->GetVectorLength()*images.at(0)->GetLargestPossibleRegion().GetSize(2));
@@ -327,7 +327,7 @@ TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilt
             ++disp;
             unsigned long newTick = 50*disp.count()/disp.expected_count();
             for (unsigned long tick = 0; tick<(newTick-lastTick); tick++)
-                PrintToLog("*", false, false);
+                PrintToLog("*", false, false, false);
             lastTick = newTick;
         }
     }
@@ -791,8 +791,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         int numFibers = m_FiberBundleWorkingCopy->GetNumFibers();
         boost::progress_display disp(numFibers*m_Parameters.m_SignalGen.GetNumVolumes());
 
-        PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false);
-        PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false);
+        PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
+        PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
 
         for (unsigned int g=0; g<m_Parameters.m_SignalGen.GetNumVolumes(); g++)
         {
@@ -881,7 +881,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
                     ++disp;
                     unsigned long newTick = 50*disp.count()/disp.expected_count();
                     for (unsigned int tick = 0; tick<(newTick-lastTick); tick++)
-                        PrintToLog("*", false, false);
+                        PrintToLog("*", false, false, false);
                     lastTick = newTick;
                 }
 
@@ -959,6 +959,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
             PrintToLog("Acquisition type: single shot EPI", false);
         }
 
+        if (m_Parameters.m_SignalGen.m_NoiseVariance>0)
+            PrintToLog("Simulating complex Gaussian noise", false);
         if (m_Parameters.m_SignalGen.m_DoSimulateRelaxation)
             PrintToLog("Simulating signal relaxation", false);
         if (m_Parameters.m_SignalGen.m_FrequencyMap.IsNotNull())
@@ -1009,8 +1011,8 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
     DoubleDwiType::PixelType signal; signal.SetSize(m_Parameters.m_SignalGen.GetNumVolumes());
     boost::progress_display disp2(m_OutputImage->GetLargestPossibleRegion().GetNumberOfPixels());
 
-    PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false);
-    PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false);
+    PrintToLog("0%   10   20   30   40   50   60   70   80   90   100%", false, true, false);
+    PrintToLog("|----|----|----|----|----|----|----|----|----|----|\n*", false, false, false);
     int lastTick = 0;
 
     while(!it4.IsAtEnd())
@@ -1025,7 +1027,7 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
         ++disp2;
         unsigned long newTick = 50*disp2.count()/disp2.expected_count();
         for (unsigned long tick = 0; tick<(newTick-lastTick); tick++)
-            PrintToLog("*", false, false);
+            PrintToLog("*", false, false, false);
         lastTick = newTick;
 
         typename OutputImageType::IndexType index = it4.GetIndex();
@@ -1075,21 +1077,23 @@ void TractsToDWIImageFilter< PixelType >::GenerateData()
 }
 
 template< class PixelType >
-void TractsToDWIImageFilter< PixelType >::PrintToLog(string m, bool addTime, bool linebreak)
+void TractsToDWIImageFilter< PixelType >::PrintToLog(string m, bool addTime, bool linebreak, bool stdOut)
 {
     // timestamp
     if (addTime)
     {
         m_Logfile << this->GetTime() << " > ";
         m_StatusText += this->GetTime() + " > ";
-        std::cout << this->GetTime() << " > ";
+        if (stdOut)
+            std::cout << this->GetTime() << " > ";
     }
 
     // message
     if (m_Logfile.is_open())
         m_Logfile << m;
     m_StatusText += m;
-    std::cout << m;
+    if (stdOut)
+        std::cout << m;
 
     // new line
     if (linebreak)
@@ -1097,7 +1101,8 @@ void TractsToDWIImageFilter< PixelType >::PrintToLog(string m, bool addTime, boo
         if (m_Logfile.is_open())
             m_Logfile << "\n";
         m_StatusText += "\n";
-        std::cout << "\n";
+        if (stdOut)
+            std::cout << "\n";
     }
 }
 

@@ -44,11 +44,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatusBar.h>
 #include <mitkImage.h>
 #include <mitkVtkLayerController.h>
+#include <mitkDataNodePickingEventObserver.h>
+
 #include <vtkTextProperty.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
-
-#include <Interactions/mitkDataNodePickingEventObserver.h>
 
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode, const QString& name)
   : QWidget(parent, f),

@@ -273,13 +273,11 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
   bool isFigureFinished = false;
   data->GetPropertyList()->GetBoolProperty("initiallyplaced", isFigureFinished);
 
-  bool selected = false;
   bool isEditable = true;
 
-  node->GetBoolProperty("selected", selected);
   node->GetBoolProperty("planarfigure.iseditable", isEditable);
 
-  if ( !selected || !isEditable )
+  if (!isEditable)
   {
     return false;
   }

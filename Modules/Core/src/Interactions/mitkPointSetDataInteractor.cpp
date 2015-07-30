@@ -67,8 +67,8 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
 
     int lastPosition = 0;
     mitk::PointSet::PointsIterator it, end;
-    it = m_PointSet->Begin();
-    end = m_PointSet->End();
+    it = m_PointSet->Begin(timeStep);
+    end = m_PointSet->End(timeStep);
     while( it != end )
     {
       if (!m_PointSet->IndexExists(lastPosition,timeStep))
@@ -266,8 +266,8 @@ bool mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAct
     m_SumVec = m_SumVec + dirVector;
 
     mitk::PointSet::PointsIterator it, end;
-    it = m_PointSet->Begin();
-    end = m_PointSet->End();
+    it = m_PointSet->Begin(timeStep);
+    end = m_PointSet->End(timeStep);
     while( it != end )
     {
       int position = it->Index();
@@ -484,8 +484,8 @@ bool mitk::PointSetDataInteractor::FinishMove(StateMachineAction*, InteractionEv
     //search all selected elements and move them with undo-functionality.
 
     mitk::PointSet::PointsIterator it, end;
-    it = m_PointSet->Begin();
-    end = m_PointSet->End();
+    it = m_PointSet->Begin(timeStep);
+    end = m_PointSet->End(timeStep);
     while( it != end )
     {
       int position = it->Index();

@@ -74,7 +74,7 @@ Within your module create a CMakeLists.txt using the MITK_CREATE_MODULE macro:
 
 An example:
 
-\include Examples\FirstSteps\NewModule\CMakeLists.txt
+\include Examples/FirstSteps/NewModule/CMakeLists.txt
 
 If you do not choose a module name, one will be generated based on the folder name (In this case the resulting name will be MitkNewModule).
 This name has to be unique across the entire project in order to avoid collisions. It should only contain Letters (both upper- and lowercase),
@@ -82,7 +82,7 @@ no numbers, no underscores etc.
 
 An example of an autoload module that sets its own name is:
 
-\include Examples\FirstSteps\NewModule\autoload\IO\CMakeLists.txt
+\include Examples/FirstSteps/NewModule/autoload/IO/CMakeLists.txt
 
 the resulting name is MitkNewModuleIO.
 
@@ -94,7 +94,7 @@ Next, create a new file and name it files.cmake, containing the files of your mo
 
 An example:
 
-\include Examples\FirstSteps\NewModule\autoload\IO\files.cmake
+\include Examples/FirstSteps/NewModule/autoload/IO/files.cmake
 
 If you do not add a source file here it will not be compiled, unless it is included elsewhere.
 
@@ -105,15 +105,15 @@ consistency. An example of a small test environment is provided in the NewModule
 
 Again you need a CMakeLists.txt, e.g.:
 
-\include Examples\FirstSteps\NewModule\test\CMakeLists.txt
+\include Examples/FirstSteps/NewModule/test/CMakeLists.txt
 
 a files.cmake, e.g.:
 
-\include Examples\FirstSteps\NewModule\test\files.cmake
+\include Examples/FirstSteps/NewModule/test/files.cmake
 
 and an actual test, e.g.:
 
-\include Examples\FirstSteps\NewModule\test\mitkExampleDataStructureTest.cpp
+\include Examples/FirstSteps/NewModule/test/mitkExampleDataStructureTest.cpp
 
 For more information regarding tests please refer to \ref AboutTestingPage.
 

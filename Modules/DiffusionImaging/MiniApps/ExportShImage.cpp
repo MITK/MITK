@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/*!
+\brief Convert MITK spherical harmonics image type to MRtrix spherical harmonics image
+*/
 template<int shOrder>
 int StartShConversion(int argc, char* argv[])
 {
@@ -39,7 +42,7 @@ int StartShConversion(int argc, char* argv[])
 
     parser.setTitle("Export SH Image");
     parser.setCategory("Preprocessing Tools");
-    parser.setDescription(" ");
+    parser.setDescription("Convert MITK spherical harmonics image type to MRtrix spherical harmonics image");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -76,12 +79,6 @@ int StartShConversion(int argc, char* argv[])
 
         mitk::Image::Pointer image = mitk::GrabItkImageMemory(outImage.GetPointer());
         mitk::IOUtil::Save(image, outFile );
-
-//        typedef itk::ImageFileWriter< OutImageType > WriterType;
-//        WriterType::Pointer writer = WriterType::New();
-//        writer->SetFileName(outFile.c_str());
-//        writer->SetInput(outImage);
-//        writer->Update();
     }
     catch (itk::ExceptionObject e)
     {

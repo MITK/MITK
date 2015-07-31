@@ -26,24 +26,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToDWIImageFilter.h>
 #include <boost/lexical_cast.hpp>
 
-/** TODO: Proritype signal komplett speichern oder bild mit speichern. */
-/** TODO: Tarball aus images und parametern? */
-/** TODO: Artefakte auf bild in miniapp */
-
 using namespace mitk;
 
+/*!
+\brief Command line interface to Fiberfox. Simulate a diffusion-weighted image from a tractogram using the specified parameter file.
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
-    parser.setTitle("FiberFox");
+    parser.setTitle("Fiberfox");
     parser.setCategory("Fiber Tracking and Processing Methods");
     parser.setContributor("MBI");
-    parser.setDescription(" ");
+    parser.setDescription("Command line interface to Fiberfox. Simulate a diffusion-weighted image from a tractogram using the specified parameter file.");
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("out", "o", mitkCommandLineParser::OutputFile, "Output root:", "output root", us::Any(), false);
     parser.addArgument("parameters", "p", mitkCommandLineParser::InputFile, "Parameter file:", "fiberfox parameter file", us::Any(), false);
-    parser.addArgument("fiberbundle", "f", mitkCommandLineParser::String, "Fiberbundle:", "", us::Any(), false);
-    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:", "", false, true);
+    parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "Input tractogram or diffusion-weighted image.", us::Any(), false);
+    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Output additional images:", "output volume fraction images etc.", us::Any());
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -52,9 +51,9 @@ int main(int argc, char* argv[])
     string outName = us::any_cast<string>(parsedArgs["out"]);
     string paramName = us::any_cast<string>(parsedArgs["parameters"]);
 
-    string fibFile = "";
-    if (parsedArgs.count("fiberbundle"))
-        fibFile = us::any_cast<string>(parsedArgs["fiberbundle"]);
+    string input="";
+    if (parsedArgs.count("input"))
+        input = us::any_cast<string>(parsedArgs["input"]);
 
     bool verbose = false;
     if (parsedArgs.count("verbose"))
@@ -67,12 +66,32 @@ int main(int argc, char* argv[])
     if (verbose)
         parameters.SaveParameters(outName+".ffp");
 
-
-    mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
+    mitk::BaseData::Pointer inputData = mitk::IOUtil::Load(input)[0];
 
     itk::TractsToDWIImageFilter< short >::Pointer tractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
+
+    if ( dynamic_cast<mitk::FiberBundle*>(inputData.GetPointer()) )   // simulate dataset from fibers
+    {
+        tractsToDwiFilter->SetFiberBundle(dynamic_cast<mitk::FiberBundle*>(inputData.GetPointer()));
+    }
+    else if ( dynamic_cast<mitk::Image*>(inputData.GetPointer()) )  // add artifacts to existing image
+    {
+        typedef itk::VectorImage< short, 3 >    ItkDwiType;
+        mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(inputData.GetPointer());
+        ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+        mitk::CastToItkImage(diffImg, itkVectorImagePointer);
+
+        parameters.m_SignalGen.m_SignalScale = 1;
+        parameters.m_SignalGen.m_ImageRegion = itkVectorImagePointer->GetLargestPossibleRegion();
+        parameters.m_SignalGen.m_ImageSpacing = itkVectorImagePointer->GetSpacing();
+        parameters.m_SignalGen.m_ImageOrigin = itkVectorImagePointer->GetOrigin();
+        parameters.m_SignalGen.m_ImageDirection = itkVectorImagePointer->GetDirection();
+        parameters.m_SignalGen.m_Bvalue = static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue();
+        parameters.m_SignalGen.SetGradienDirections(static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer());
+
+        tractsToDwiFilter->SetInputImage(itkVectorImagePointer);
+    }
     tractsToDwiFilter->SetParameters(parameters);
-    tractsToDwiFilter->SetFiberBundle(inputTractogram);
     tractsToDwiFilter->Update();
 
     mitk::Image::Pointer image = mitk::GrabItkImageMemory( tractsToDwiFilter->GetOutput() );

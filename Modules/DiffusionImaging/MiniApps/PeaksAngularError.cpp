@@ -31,6 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+
+/*!
+\brief Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
@@ -44,7 +48,7 @@ int main(int argc, char* argv[])
 
     parser.setCategory("Preprocessing Tools");
     parser.setTitle("Peaks Angular Error");
-    parser.setDescription("");
+    parser.setDescription("Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)");
     parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

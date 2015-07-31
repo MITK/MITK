@@ -33,24 +33,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/*!
+\brief Train random forest classifier for machine learning based streamline tractography
+*/
 int main(int argc, char* argv[])
 {
     MITK_INFO << "DFTraining";
     mitkCommandLineParser parser;
 
-    parser.setTitle("Machine Learning Based Streamline Tractography");
+    parser.setTitle("Training for Machine Learning Based Streamline Tractography");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("");
+    parser.setDescription("Train random forest classifier for machine learning based streamline tractography");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("images", "i", mitkCommandLineParser::StringList, "DWIs:", "input diffusion-weighted images", us::Any(), false);
-    parser.addArgument("wmmasks", "w", mitkCommandLineParser::StringList, "WM-Masks:", "white matter mask images", us::Any());
-    parser.addArgument("tractograms", "t", mitkCommandLineParser::StringList, "Tractograms:", "input tractograms (.fib, vtk ascii file format)", us::Any(), false);
-    parser.addArgument("masks", "m", mitkCommandLineParser::StringList, "Masks:", "mask images", us::Any());
-    parser.addArgument("forest", "f", mitkCommandLineParser::OutputFile, "Forest:", "output forest", us::Any(), false);
+    parser.addArgument("tractograms", "t", mitkCommandLineParser::StringList, "Tractograms:", "input training tractograms (.fib, vtk ascii file format)", us::Any(), false);
+    parser.addArgument("forest", "f", mitkCommandLineParser::OutputFile, "Forest:", "output random forest (HDF5)", us::Any(), false);
 
-    parser.addArgument("stepsize", "s", mitkCommandLineParser::Float, "Stepsize:", "stepsize in mm (determines number of white-matter samples)", us::Any());
+    parser.addArgument("masks", "m", mitkCommandLineParser::StringList, "Masks:", "restrict trining using a binary mask image", us::Any());
+    parser.addArgument("wmmasks", "w", mitkCommandLineParser::StringList, "WM-Masks:", "if no binary white matter mask is specified, the envelope of the input tractogram is used", us::Any());
+
+    parser.addArgument("stepsize", "s", mitkCommandLineParser::Float, "Stepsize:", "resampling parameter for the input tractogram in mm (determines number of white-matter samples)", us::Any());
     parser.addArgument("gmsamples", "g", mitkCommandLineParser::Int, "Number of gray matter samples per voxel:", "Number of gray matter samples per voxel", us::Any());
     parser.addArgument("numtrees", "n", mitkCommandLineParser::Int, "Number of trees:", "number of trees", us::Any());
     parser.addArgument("max_tree_depth", "d", mitkCommandLineParser::Int, "Max. tree depth:", "maximum tree depth", us::Any());
@@ -75,7 +79,7 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("tractograms"))
         tractogramFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["tractograms"]);
 
-    int numTrees = 30;
+    int numTrees = 50;
     if (parsedArgs.count("numtrees"))
         numTrees = us::any_cast<int>(parsedArgs["numtrees"]);
 
@@ -87,11 +91,11 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("stepsize"))
         stepsize = us::any_cast<float>(parsedArgs["stepsize"]);
 
-    int max_tree_depth = 50;
+    int max_tree_depth = 25;
     if (parsedArgs.count("max_tree_depth"))
         max_tree_depth = us::any_cast<int>(parsedArgs["max_tree_depth"]);
 
-    double sample_fraction = 1.0;
+    double sample_fraction = 0.6;
     if (parsedArgs.count("sample_fraction"))
         sample_fraction = us::any_cast<float>(parsedArgs["sample_fraction"]);
 

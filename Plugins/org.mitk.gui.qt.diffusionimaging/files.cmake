@@ -43,7 +43,6 @@ set(INTERNAL_CPP_FILES
   Connectomics/QmitkConnectomicsStatisticsView.cpp
   Connectomics/QmitkNetworkHistogramCanvas.cpp
   Connectomics/QmitkRandomParcellationView.cpp
-  QmitkDwiSoftwarePhantomView.cpp
   QmitkOdfMaximaExtractionView.cpp
   QmitkFiberfoxView.cpp
   QmitkFiberProcessingView.cpp
@@ -84,7 +83,6 @@ set(UI_FILES
   src/internal/Connectomics/QmitkConnectomicsNetworkOperationsViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsStatisticsViewControls.ui
   src/internal/Connectomics/QmitkRandomParcellationViewControls.ui
-  src/internal/QmitkDwiSoftwarePhantomViewControls.ui
   src/internal/QmitkOdfMaximaExtractionViewControls.ui
   src/internal/QmitkFiberfoxViewControls.ui
   src/internal/QmitkFiberProcessingViewControls.ui
@@ -132,7 +130,6 @@ set(MOC_H_FILES
   src/internal/Connectomics/QmitkConnectomicsStatisticsView.h
   src/internal/Connectomics/QmitkNetworkHistogramCanvas.h
   src/internal/Connectomics/QmitkRandomParcellationView.h
-  src/internal/QmitkDwiSoftwarePhantomView.h
   src/internal/QmitkOdfMaximaExtractionView.h
   src/internal/QmitkFiberfoxView.h
   src/internal/QmitkFiberProcessingView.h

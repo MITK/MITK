@@ -1,4 +1,4 @@
-/*===================================================================
+﻿/*===================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
+#include <itkFiberCurvatureFilter.h>
 
 
 mitk::FiberBundle::Pointer LoadFib(std::string filename)
@@ -41,13 +42,16 @@ mitk::FiberBundle::Pointer LoadFib(std::string filename)
     return dynamic_cast<mitk::FiberBundle*>(baseData.GetPointer());
 }
 
+/*!
+\brief Modify input tractogram: fiber resampling, compression, pruning and transformation.
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
     parser.setTitle("Fiber Processing");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription(" ");
+    parser.setDescription("Modify input tractogram: fiber resampling, compression, pruning and transformation.");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
@@ -58,7 +62,7 @@ int main(int argc, char* argv[])
     parser.addArgument("compress", "c", mitkCommandLineParser::Float, "Compress:", "Compress fiber using the given error threshold (in mm)");
     parser.addArgument("minLength", "l", mitkCommandLineParser::Float, "Minimum length:", "Minimum fiber length (in mm)");
     parser.addArgument("maxLength", "m", mitkCommandLineParser::Float, "Maximum length:", "Maximum fiber length (in mm)");
-    parser.addArgument("minCurv", "a", mitkCommandLineParser::Float, "Minimum curvature radius:", "Minimum curvature radius (in mm)");
+    parser.addArgument("maxAngle", "a", mitkCommandLineParser::Float, "Maximum angle:", "Maximum angular STDEV over 1cm (in degree)");
     parser.addArgument("mirror", "p", mitkCommandLineParser::Int, "Invert coordinates:", "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
 
     parser.addArgument("rotate-x", "rx", mitkCommandLineParser::Float, "Rotate x-axis:", "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
@@ -94,9 +98,9 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("maxLength"))
         maxFiberLength = us::any_cast<float>(parsedArgs["maxLength"]);
 
-    float curvThres = -1;
-    if (parsedArgs.count("minCurv"))
-        curvThres = us::any_cast<float>(parsedArgs["minCurv"]);
+    float maxAngularDev = -1;
+    if (parsedArgs.count("maxAngle"))
+        maxAngularDev = us::any_cast<float>(parsedArgs["maxAngle"]);
 
     int axis = 0;
     if (parsedArgs.count("mirror"))
@@ -152,8 +156,16 @@ int main(int argc, char* argv[])
         if (maxFiberLength>0)
             fib->RemoveLongFibers(maxFiberLength);
 
-        if (curvThres>0)
-            fib->ApplyCurvatureThreshold(curvThres, false);
+        if (maxAngularDev>0)
+        {
+            auto filter = itk::FiberCurvatureFilter::New();
+            filter->SetInputFiberBundle(fib);
+            filter->SetAngularDeviation(maxAngularDev);
+            filter->SetDistance(10);
+            filter->SetRemoveFibers(true);
+            filter->Update();
+            fib = filter->GetOutputFiberBundle();
+        }
 
         if (smoothDist>0)
             fib->ResampleSpline(smoothDist);

@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 
 /*!
-\brief
+\brief View to perform machine learning based fiber tractography. Includes training of the random forst classifier as well as the actual tractography.
 */
 
 // Forward Qt class declarations

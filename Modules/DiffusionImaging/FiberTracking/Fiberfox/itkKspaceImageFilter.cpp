@@ -181,22 +181,25 @@ void KspaceImageFilter< TPixelType >
 
     while( !oit.IsAtEnd() )
     {
-        // dephasing time
+        // time from maximum echo
         double t= m_ReadoutScheme->GetTimeFromMaxEcho(oit.GetIndex());
 
-        // readout time
-        double tall = m_ReadoutScheme->GetRedoutTime(oit.GetIndex());
+        // time passed since k-space readout started
+        double tRead = m_ReadoutScheme->GetRedoutTime(oit.GetIndex());
 
-        // calculate eddy current decay factor (TODO: vielleichtumbauen dass hier die zeit vom letzten diffusionsgradienten an genommen wird. doku dann auch entsprechend anpassen.)
+        // time passes since application of the RF pulse
+        double tRf = m_Parameters->m_SignalGen.m_tEcho+t;
+
+        // calculate eddy current decay factor (TODO: vielleicht umbauen dass hier die zeit vom letzten diffusionsgradienten an genommen wird. doku dann auch entsprechend anpassen.)
         double eddyDecay = 0;
         if ( m_Parameters->m_Misc.m_CheckAddEddyCurrentsBox && m_Parameters->m_SignalGen.m_EddyStrength>0)
-            eddyDecay = exp(-tall/m_Parameters->m_SignalGen.m_Tau );
+            eddyDecay = exp(-tRead/m_Parameters->m_SignalGen.m_Tau );
 
         // calcualte signal relaxation factors
         std::vector< double > relaxFactor;
         if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
             for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-                relaxFactor.push_back( exp(-( m_Parameters->m_SignalGen.m_tEcho+t)/m_T2.at(i) -fabs(t)/ m_Parameters->m_SignalGen.m_tInhom)*(1.0-exp(-m_Parameters->m_SignalGen.m_tRep/m_T1.at(i))) );
+                relaxFactor.push_back( exp(-tRf/m_T2.at(i) -fabs(t)/ m_Parameters->m_SignalGen.m_tInhom)*(1.0-exp(-(m_Parameters->m_SignalGen.m_tRep + tRf)/m_T1.at(i))) );
 
         // get current k-space index (depends on the schosen k-space readout scheme)
         itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(oit.GetIndex());

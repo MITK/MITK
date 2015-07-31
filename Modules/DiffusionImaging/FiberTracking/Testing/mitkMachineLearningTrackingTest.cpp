@@ -72,7 +72,7 @@ public:
 
     void Track1()
     {
-        typedef itk::MLBSTrackingFilter<100> TrackerType;
+        typedef itk::MLBSTrackingFilter<> TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
         tracker->SetDemoMode(false);

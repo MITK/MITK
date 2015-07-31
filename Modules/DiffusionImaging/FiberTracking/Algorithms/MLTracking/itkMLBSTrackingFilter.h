@@ -50,7 +50,7 @@ namespace itk{
 /**
 * \brief Performes deterministic streamline tracking on the input tensor image.   */
 
-template< int NumImageFeatures=100 >
+template<  int ShOrder=6, int NumImageFeatures=100 >
 class MLBSTrackingFilter : public ImageToImageFilter< VectorImage< short, 3 >, Image< double, 3 > >
 {
 
@@ -105,7 +105,7 @@ public:
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
     itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
 
-    void SetForestHandler( mitk::TrackingForestHandler<> fh )   ///< Stores random forest classifier and performs actual classification
+    void SetForestHandler( mitk::TrackingForestHandler<ShOrder> fh )   ///< Stores random forest classifier and performs actual classification
     {
         m_ForestHandler = fh;
     }
@@ -155,7 +155,7 @@ public:
     int CheckCurvature(FiberType* fib, bool front);
 
     // decision forest
-    mitk::TrackingForestHandler<>       m_ForestHandler;
+    mitk::TrackingForestHandler<ShOrder>       m_ForestHandler;
     typename InputImageType::Pointer    m_InputImage;
 
 

@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
     tfh.LoadForest(forestFile);
     tfh.AddRawData(dwi);
 
-    typedef itk::MLBSTrackingFilter<100> TrackerType;
+    typedef itk::MLBSTrackingFilter<> TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();
     tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
     tracker->SetMaskImage(mask);

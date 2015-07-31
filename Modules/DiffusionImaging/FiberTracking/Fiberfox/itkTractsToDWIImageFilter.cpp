@@ -1269,7 +1269,7 @@ void TractsToDWIImageFilter< PixelType >::SimulateExtraAxonalSignal(ItkUcharImgT
             double extraAxonalVolume = m_VoxelVolume-intraAxonalVolume;    // non-fiber volume
             if (extraAxonalVolume<0)
             {
-                MITK_ERROR << "Coorupted intra-axonal signal voxel detected. Fiber volume larger voxel volume!";
+                MITK_ERROR << "Corrupted intra-axonal signal voxel detected. Fiber volume larger voxel volume!";
                 extraAxonalVolume = 0;
             }
             double interAxonalVolume = 0;

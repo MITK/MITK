@@ -81,7 +81,7 @@ public:
     std::shared_ptr< vigra::RandomForest<int> > GetForest(){ return m_Forest; }
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images from the war input DWI
-    vnl_vector_fixed<double,3> Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<double,3> Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
 
     bool IsForestValid();   ///< true is forest is not null, has more than 0 trees and the correct number of features (NumberOfSignalFeatures + 3)
 

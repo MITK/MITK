@@ -156,12 +156,12 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
           m_SegmentationBinaryImage->GetGeometry()->WorldToIndex(worldCoord, idx);
           try
           {
-            if (m_SegmentationBinaryImage->GetPixelType().GetPixelType() == itk::ImageIOBase::UCHAR)
+            if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR)
             {
               mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
               val = readAccess.GetPixelByIndexSafe(idx);
             }
-            else if (m_SegmentationBinaryImage->GetPixelType().GetPixelType() == itk::ImageIOBase::USHORT)
+            else if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT)
             {
               mitk::ImagePixelReadAccessor<unsigned short> readAccess(m_SegmentationBinaryImage);
               val = readAccess.GetPixelByIndexSafe(idx);

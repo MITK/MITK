@@ -164,7 +164,7 @@ namespace mitk {
     /**
     * \brief The Number of Tools that this class is going to support.
     */
-    int m_NumberOfTools;
+    unsigned int m_NumberOfTools;
   };
 }
 

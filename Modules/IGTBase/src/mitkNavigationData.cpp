@@ -325,7 +325,7 @@ bool mitk::Equal(const mitk::NavigationData& leftHandSide, const mitk::Navigatio
   bool returnValue = true;
 
   // Dimensionality
-  if( !mitk::Equal(rightHandSide.GetPosition(),leftHandSide.GetPosition()) )
+  if( !mitk::Equal(rightHandSide.GetPosition(), leftHandSide.GetPosition(), eps) )
   {
     if(verbose)
     {
@@ -337,7 +337,7 @@ bool mitk::Equal(const mitk::NavigationData& leftHandSide, const mitk::Navigatio
   }
 
   // Dimensionality
-  if( !mitk::Equal(rightHandSide.GetOrientation(),leftHandSide.GetOrientation()) )
+  if( !mitk::Equal(rightHandSide.GetOrientation(), leftHandSide.GetOrientation(), eps) )
   {
     if(verbose)
     {

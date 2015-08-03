@@ -69,7 +69,7 @@ if(NOT DEFINED ITK_DIR)
     )
   endif()
 
-  list(APPEND proj_DEPENDENCIES VTK)
+  # list(APPEND proj_DEPENDENCIES VTK)
 
   list(APPEND additional_cmake_args
     -DModule_ITKVtkGlue:BOOL=ON

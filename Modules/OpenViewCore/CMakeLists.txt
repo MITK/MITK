@@ -1,4 +1,4 @@
 MITK_CREATE_MODULE(
-  PACKAGE_DEPENDS Qt5|Core+Quick VTK|vtkGUISupportQt OpenGL
+  PACKAGE_DEPENDS Qt5|Core+Quick VTK OpenGL
   )
 

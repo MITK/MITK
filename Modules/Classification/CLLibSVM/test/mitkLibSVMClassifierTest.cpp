@@ -29,7 +29,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <boost/algorithm/string.hpp>
 
-
 class mitkLibSVMClassifierTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkLibSVMClassifierTestSuite);
@@ -51,16 +50,13 @@ private:
 
 public:
 
-  /* Ließt einen File und somit die Trainings- und Testdatensätze ein und
-  konvertiert den Inhalt des Files in ein 2dim Matrixpaar.
-  Hierbei wird die eingelesene Matrix zeilenweise mit Angabe eines
-  Trennungsprozentsatzes separiert in einen Trainingsmatrixdatensatz und
-  einen Testmatrixdatensatz.
-  */
+  /*Reading an file, which includes the trainingdataset and the testdataset, and convert the
+  content of the file into an 2dim matrixpair.
+  There are an delimiter, which separates the matrix into an trainingmatrix and testmatrix */
   template<typename T>
   std::pair<Eigen::Matrix<T ,Eigen::Dynamic,Eigen::Dynamic>,Eigen::Matrix<T ,Eigen::Dynamic,Eigen::Dynamic> >convertCSVToMatrix(const std::string &path, char delimiter,double range, bool isXMatrix)
   {
-    itk::CSVArray2DFileReader<T>::Pointer fr = itk::CSVArray2DFileReader<T>::New();
+    typename itk::CSVArray2DFileReader<T>::Pointer fr = itk::CSVArray2DFileReader<T>::New();
     fr->SetFileName(path);
     fr->SetFieldDelimiterCharacter(delimiter);
     fr->HasColumnHeadersOff();
@@ -73,7 +69,7 @@ public:
       cout << ex << std::endl;
     }
 
-    itk::CSVArray2DDataObject<T>::Pointer p = fr->GetOutput();
+    typename itk::CSVArray2DDataObject<T>::Pointer p = fr->GetOutput();
     unsigned int maxrowrange = p->GetMatrix().rows();
     unsigned int c = p->GetMatrix().cols();
     unsigned int percentRange = (unsigned int)(maxrowrange*range);
@@ -117,12 +113,12 @@ public:
   }
 
   /*
-  Ließt eine CSV-Datei ein und übergibt die Daten an eine Matrix, die von der Methode zuückgegeben wird.
+  Reading an csv-data and transfer the included datas into an matrix.
   */
   template<typename T>
   Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> readCsvData(const std::string &path, char delimiter)
   {
-    itk::CSVArray2DFileReader<T>::Pointer fr = itk::CSVArray2DFileReader<T>::New();
+    typename itk::CSVArray2DFileReader<T>::Pointer fr = itk::CSVArray2DFileReader<T>::New();
     fr->SetFileName(path);
     fr->SetFieldDelimiterCharacter(delimiter);
     fr->HasColumnHeadersOff();
@@ -135,7 +131,7 @@ public:
       cout << ex << std::endl;
     }
 
-    itk::CSVArray2DDataObject<T>::Pointer p = fr->GetOutput();
+    typename itk::CSVArray2DDataObject<T>::Pointer p = fr->GetOutput();
     unsigned int maxrowrange = p->GetMatrix().rows();
     unsigned int maxcols = p->GetMatrix().cols();
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix(maxrowrange,maxcols);
@@ -150,8 +146,8 @@ public:
   }
 
   /*
-  Schreibt den Inhalt des Arrays in einer eigene CSV-Datei nach dem Schema:
-  ursprung.csv:   1    2    3    0   0    4
+  Write the content of the array into an own csv-data in the following sequence:
+  root.csv:   1    2    3    0   0    4
   writen.csv:     1  1:2  2:3  3:0 4:0  5:4
   */
   template<typename T>
@@ -175,37 +171,38 @@ public:
   }
 
   /*
-  Trainiert den Classifier mit Hilfe eines Beispieldatensatzes einer Matlabdatei, inder
-  die Daten vektorkomponentenweise gaußnormalverteilt wurden.
+  Train the classifier with an exampledataset of mattlab.
+  Note: The included data are gaußan normaldistributed.
   */
   void TrainSVMClassifier_MatlabDataSet_shouldReturnTrue()
   {
-    /* Deklariert den Featurematrixdatensatz, indem die CSV-Datei in eine Matrix
-    konvertiert wird und die erste Matrix des Datenmatrixpaares die Trainingsmatrix ist
-    und die zweite Matrix des Paares die Testmatrix ist. */
+    /* Declarating an featurematrixdataset, the first matrix
+    of the matrixpair is the trainingmatrix and the second one is the testmatrix.*/
     std::pair<MatrixDoubleType,MatrixDoubleType> matrixDouble;
     matrixDouble = convertCSVToMatrix<double>(GetTestDataFilePath("Classification/FeaturematrixMatlab.csv"),';',0.5,true);
     m_TrainingMatrixX = matrixDouble.first;
     m_TestXPredict = matrixDouble.second;
 
-    /* Analog zur Featurematrix; Deklaraton des Labelmatrixdatensatzes. */
+    /* The declaration of the labelmatrixdataset is equivalent to the declaration
+    of the featurematrixdataset.*/
     std::pair<MatrixIntType,MatrixIntType> matrixInt;
     matrixInt = convertCSVToMatrix<int>(GetTestDataFilePath("Classification/LabelmatrixMatlab.csv"),';',0.5,false);
     m_TrainingLabelMatrixY = matrixInt.first;
     m_TestYPredict = matrixInt.second;
     classifier = mitk::LibSVMClassifier::New();
 
-    /* Setzet die einzelnen SVM-Parameter und gibt die Parameter auf dem Commandwindow aus.*/
+    /* Setting of the SVM-Parameters*/
     classifier->SetGamma(1/(double)(m_TrainingMatrixX.cols()));
     classifier->SetSvmType(0);
     classifier->SetKernelType(0);
 
-    /* Trainiert den Classifier, indem Trainingsdaten der Labels und Features übergeben werden.
-    Als Ergebnis erhalten wir einen Spaltenvektor, der Labels*/
+    /* Train the classifier, by giving trainingdataset for the labels and features.
+    The result in an colunmvector of the labels.*/
     classifier->Train(m_TrainingMatrixX,m_TrainingLabelMatrixY);
     Eigen::MatrixXi classes = classifier->Predict(m_TestXPredict);
 
-    /* Testet, ob berechneter Spaltenvektor mit SVM tatsächlichem Ergebnis übereinstimmt. */
+    /* Testing the matching between the calculated
+    colunmvector and the result of the SVM */
     unsigned int maxrows = classes.rows();
 
     bool isYPredictVector = false;
@@ -221,7 +218,7 @@ public:
     MITK_TEST_CONDITION(isEqual<int>(m_TestYPredict,classes),"Expected vector and occured vector match.");
   }
 
-  // Testmethode für Assertions.
+  // Method of testing for assertions.
   template<typename T>
   bool isEqual(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> expected, Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> actual)
   {
@@ -238,7 +235,7 @@ public:
     return isSimilar;
   }
 
-  // Intervalltestmethode
+  // Method of intervalltesting
   template<typename T>
   bool isIntervall(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> expected, Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> actual, double lowrange, double toprange)
   {
@@ -262,37 +259,38 @@ public:
   }
 
   /*
-  Trainiert den Classifier mit dem Datensatz von Brustkrebspatienten aus der
+  Train the classifier with the dataset of breastcancer patients from the
   LibSVM Libary
   */
   void TrainSVMClassifier_BreastCancerDataSet_shouldReturnTrue()
   {
-    /* Deklariert den Featurematrixdatensatz, indem die CSV-Datei in eine Matrix
-    konvertiert wird und die erste Matrix des Datenmatrixpaares die Trainingsmatrix ist
-    und die zweite Matrix des Paares die Testmatrix ist. */
+    /* Declarating an featurematrixdataset, the first matrix
+    of the matrixpair is the trainingmatrix and the second one is the testmatrix.*/
     std::pair<MatrixDoubleType,MatrixDoubleType> matrixDouble;
-    matrixDouble = convertCSVToMatrix<double>("C:/Users/tschlats/Desktop/FeaturematrixBreastcancer.csv",';',0.5,true);
+    matrixDouble = convertCSVToMatrix<double>(GetTestDataFilePath("Classification/FeaturematrixBreastcancer.csv"),';',0.5,true);
     m_TrainingMatrixX = matrixDouble.first;
     m_TestXPredict = matrixDouble.second;
 
-    /* Analog zur Featurematrix; Deklaraton des Labelmatrixdatensatzes. */
+    /* The declaration of the labelmatrixdataset is equivalent to the declaration
+    of the featurematrixdataset.*/
     std::pair<MatrixIntType,MatrixIntType> matrixInt;
-    matrixInt = convertCSVToMatrix<int>("C:/Users/tschlats/Desktop/LabelmatrixBreastcancer.csv",';',0.5,false);
+    matrixInt = convertCSVToMatrix<int>(GetTestDataFilePath("Classification/LabelmatrixBreastcancer.csv"),';',0.5,false);
     m_TrainingLabelMatrixY = matrixInt.first;
     m_TestYPredict = matrixInt.second;
 
-    /* Setzet die einzelnen SVM-Parameter und gibt die Parameter auf dem Commandwindow aus.*/
+    /* Setting of the SVM-Parameters*/
     classifier = mitk::LibSVMClassifier::New();
     classifier->SetGamma(1/(double)(m_TrainingMatrixX.cols()));
     classifier->SetSvmType(0);
     classifier->SetKernelType(2);
 
-    /* Trainiert den Classifier, indem Trainingsdaten der Labels und Features übergeben werden.
-    Als Ergebnis erhalten wir einen Spaltenvektor, der Labels*/
+    /* Train the classifier, by giving trainingdataset for the labels and features.
+    The result in an colunmvector of the labels.*/
     classifier->Train(m_TrainingMatrixX,m_TrainingLabelMatrixY);
     Eigen::MatrixXi classes = classifier->Predict(m_TestXPredict);
 
-    /* Testet, ob berechneter Spaltenvektor mit SVM tatsächlichem Ergebnis übereinstimmt. */
+    /* Testing the matching between the calculated colunmvector and the result
+    of the SVM */
     unsigned int maxrows = classes.rows();
 
     bool isYPredictVector = false;

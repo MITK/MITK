@@ -26,7 +26,7 @@ namespace LibSVM
 mitk::LibSVMClassifier::LibSVMClassifier():
   m_Model(nullptr),m_Parameter(nullptr)
 {
-    this->m_Parameter = new LibSVM::svm_parameter();
+  this->m_Parameter = new LibSVM::svm_parameter();
 }
 
 mitk::LibSVMClassifier::~LibSVMClassifier()
@@ -39,16 +39,17 @@ mitk::LibSVMClassifier::~LibSVMClassifier()
     LibSVM::svm_destroy_param(m_Parameter);
 }
 
-
 void mitk::LibSVMClassifier::Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y)
 {
-  LibSVM::svm_problem problem;
+  this->SetPointWiseWeight(Eigen::MatrixXd(Y.rows(),1));
+  this->UsePointWiseWeight(false);
+
   LibSVM::svm_node *xSpace;
+  LibSVM::svm_problem problem;
 
   ConvertParameter();
-
-  ReadXValues(&problem, &xSpace,X);
   ReadYValues(&problem, Y);
+  ReadXValues(&problem, &xSpace,X);
   ReadWValues(&problem);
 
   const char * error_msg = nullptr;
@@ -64,9 +65,9 @@ void mitk::LibSVMClassifier::Train(const Eigen::MatrixXd &X, const Eigen::Matrix
 
   m_Model = LibSVM::svm_train(&problem, m_Parameter);
 
-  free(problem.y);
-  free(problem.x);
-  free(xSpace);
+  // free(problem.y);
+  // free(problem.x);
+  // free(xSpace);
 }
 
 Eigen::MatrixXi mitk::LibSVMClassifier::Predict(const Eigen::MatrixXd &X)
@@ -91,19 +92,18 @@ Eigen::MatrixXi mitk::LibSVMClassifier::Predict(const Eigen::MatrixXd &X)
     xVector[noOfFeatures].index = -1;
     result(point,0) = LibSVM::svm_predict(m_Model,xVector);
   }
+
   free(xVector);
   return result;
 }
 
-
 void  mitk::LibSVMClassifier::ConvertParameter()
 {
-
   // Get the proerty                                                                      // Some defaults
   if(!this->GetPropertyList()->Get("classifier.svm.svm-type",this->m_Parameter->svm_type))        this->m_Parameter->svm_type = 0;
   if(!this->GetPropertyList()->Get("classifier.svm.kernel-type",this->m_Parameter->kernel_type))  this->m_Parameter->kernel_type = 2;
   if(!this->GetPropertyList()->Get("classifier.svm.degree",this->m_Parameter->degree))            this->m_Parameter->degree = 3;
-  if(!this->GetPropertyList()->Get("classifier.svm.gamma",this->m_Parameter->gamma))              this->m_Parameter->gamma = 0; // 1/n_features
+  if(!this->GetPropertyList()->Get("classifier.svm.gamma",this->m_Parameter->gamma))              this->m_Parameter->gamma = 0; // 1/n_features;
   if(!this->GetPropertyList()->Get("classifier.svm.coef0",this->m_Parameter->coef0))              this->m_Parameter->coef0 = 0;
   if(!this->GetPropertyList()->Get("classifier.svm.nu",this->m_Parameter->nu))                    this->m_Parameter->nu = 0.5;
   if(!this->GetPropertyList()->Get("classifier.svm.cache-size",this->m_Parameter->cache_size))    this->m_Parameter->cache_size = 100.0;
@@ -114,34 +114,33 @@ void  mitk::LibSVMClassifier::ConvertParameter()
   if(!this->GetPropertyList()->Get("classifier.svm.probability",this->m_Parameter->probability))  this->m_Parameter->probability = 0;
   if(!this->GetPropertyList()->Get("classifier.svm.nr-weight",this->m_Parameter->nr_weight))      this->m_Parameter->nr_weight = 0;
 
-//options:
-//-s svm_type : set type of SVM (default 0)
-//  0 -- C-SVC
-//  1 -- nu-SVC
-//  2 -- one-class SVM
-//  3 -- epsilon-SVR
-//  4 -- nu-SVR
-//-t kernel_type : set type of kernel function (default 2)
-//  0 -- linear: u'*v
-//  1 -- polynomial: (gamma*u'*v + coef0)^degree
-//  2 -- radial basis function: exp(-gamma*|u-v|^2)
-//  3 -- sigmoid: tanh(gamma*u'*v + coef0)
-//-d degree : set degree in kernel function (default 3)
-//-g gamma : set gamma in kernel function (default 1/num_features)
-//-r coef0 : set coef0 in kernel function (default 0)
-//-c cost : set the parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)
-//-n nu : set the parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)
-//-p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)
-//-m cachesize : set cache memory size in MB (default 100)
-//-e epsilon : set tolerance of termination criterion (default 0.001)
-//-h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)
-//-b probability_estimates: whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)
-//-wiweight: set the parameter C of class i to weight*C, for C-SVC (default 1)
+  //options:
+  //-s svm_type : set type of SVM (default 0)
+  //  0 -- C-SVC
+  //  1 -- nu-SVC
+  //  2 -- one-class SVM
+  //  3 -- epsilon-SVR
+  //  4 -- nu-SVR
+  //-t kernel_type : set type of kernel function (default 2)
+  //  0 -- linear: u'*v
+  //  1 -- polynomial: (gamma*u'*v + coef0)^degree
+  //  2 -- radial basis function: exp(-gamma*|u-v|^2)
+  //  3 -- sigmoid: tanh(gamma*u'*v + coef0)
+  //-d degree : set degree in kernel function (default 3)
+  //-g gamma : set gamma in kernel function (default 1/num_features)
+  //-r coef0 : set coef0 in kernel function (default 0)
+  //-c cost : set the parameter C of C-SVC, epsilon-SVR, and nu-SVR (default 1)
+  //-n nu : set the parameter nu of nu-SVC, one-class SVM, and nu-SVR (default 0.5)
+  //-p epsilon : set the epsilon in loss function of epsilon-SVR (default 0.1)
+  //-m cachesize : set cache memory size in MB (default 100)
+  //-e epsilon : set tolerance of termination criterion (default 0.001)
+  //-h shrinking: whether to use the shrinking heuristics, 0 or 1 (default 1)
+  //-b probability_estimates: whether to train a SVC or SVR model for probability estimates, 0 or 1 (default 0)
+  //-wiweight: set the parameter C of class i to weight*C, for C-SVC (default 1)
 
-//  this->m_Parameter->weight_label = nullptr;
-//  this->m_Parameter->weight = 1;
+  // this->m_Parameter->weight_label = nullptr;
+  // this->m_Parameter->weight = 1;
 }
-
 
 /* these are for training only */
 //int *weight_label; /* for C_SVC */
@@ -171,7 +170,6 @@ void mitk::LibSVMClassifier::SetP(double val)
 {
   this->GetPropertyList()->SetDoubleProperty("classifier.svm.p",val);
 }
-
 
 void mitk::LibSVMClassifier::SetEps(double val)
 {
@@ -290,6 +288,7 @@ void mitk::LibSVMClassifier::PrintParameter(std::ostream & str)
     str << "classifier.svm.nr-weight\t" << this->m_Parameter->nr_weight << "\n";
 }
 
+// Trying to assign from matrix to noOfPoints
 void mitk::LibSVMClassifier::ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const Eigen::MatrixXd &X)
 {
   int noOfPoints = static_cast<int>(X.rows());
@@ -319,7 +318,6 @@ void mitk::LibSVMClassifier::ReadYValues(LibSVM::svm_problem * problem, const Ei
   for (int i = 0; i < problem->l; ++i)
   {
     problem->y[i] = Y(i,0);
-
   }
 }
 
@@ -333,13 +331,13 @@ void mitk::LibSVMClassifier::ReadWValues(LibSVM::svm_problem * problem)
   {
     for (int i = 0; i < noOfPoints; ++i)
     {
-      problem->y[i] = W(i,0);
+      problem->W[i] = W(i,0);
     }
   } else
   {
     for (int i = 0; i < noOfPoints; ++i)
     {
-      problem->y[i] = 1;
+      problem->W[i] = 1;
     }
   }
 }

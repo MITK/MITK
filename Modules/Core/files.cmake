@@ -246,6 +246,8 @@ set(CPP_FILES
   IO/mitkIFileIO.cpp
   IO/mitkIFileReader.cpp
   IO/mitkIFileWriter.cpp
+  IO/mitkGeometryDataReaderService.cpp
+  IO/mitkGeometryDataWriterService.cpp
   IO/mitkImageGenerator.cpp
   IO/mitkImageVtkLegacyIO.cpp
   IO/mitkImageVtkXmlIO.cpp

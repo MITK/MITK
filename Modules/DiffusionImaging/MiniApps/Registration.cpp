@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageTimeSelector.h>
+#include <itkImageFileWriter.h>
 // ITK
 #include <itksys/SystemTools.hxx>
 #include <itkDirectory.h>
@@ -31,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkWindowedSincInterpolateImageFunction.h"
 #include "itkIdentityTransform.h"
 #include "itkResampleImageFilter.h"
+#include "itkNrrdImageIO.h"
 
 
 typedef std::vector<std::string> FileListType;
@@ -351,6 +353,7 @@ int main( int argc, char* argv[] )
 
   // Copy reference image to destination
   std::string savePathAndFileName = GetSavePath(outputPath, referenceFileName);
+
   mitk::IOUtil::SaveImage(refImage, savePathAndFileName);
 
   // Copy all derived resources also to output folder, adding _reg suffix
@@ -421,7 +424,15 @@ int main( int argc, char* argv[] )
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
       if (fileType == ".dwi")
         fileType = "dwi";
-      SaveImage(savePathAndFileName,movingImage,fileType );
+      MITK_INFO << "ORIGIN post function " << movingImage->GetGeometry()->GetOrigin();
+
+      if (movingImage->GetData() == nullptr)
+        MITK_INFO <<"POST DATA is null";
+
+
+
+
+      mitk::IOUtil::SaveImage(movingImage, savePathAndFileName);
     }
 
     if (!silent)
@@ -447,7 +458,7 @@ int main( int argc, char* argv[] )
       mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference,isBinary);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
-      SaveImage(savePathAndFileName,derivedMovingResource,fileType );
+      mitk::IOUtil::SaveImage(derivedMovingResource, savePathAndFileName);
     }
   }
 

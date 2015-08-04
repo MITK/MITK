@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkAddNewPropertyDialog.h"
+#include "mitkGetPropertyService.h"
+#include <mitkIPropertyPersistence.h>
 #include <mitkProperties.h>
 #include <QMessageBox>
 #include <cassert>
@@ -47,6 +49,9 @@ void QmitkAddNewPropertyDialog::Initialize()
 
   m_Controls.typeComboBox->addItems(types);
 
+  m_Controls.persistentLabel->setVisible(m_BaseData.IsNotNull());
+  m_Controls.persistentCheckBox->setVisible(m_BaseData.IsNotNull());
+
   connect(m_Controls.typeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(ShowAdequateValueWidget(const QString&)));
   connect(m_Controls.addButton, SIGNAL(clicked()), this, SLOT(AddNewProperty()));
   connect(m_Controls.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -70,7 +75,16 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
 
   if (m_BaseData.IsNotNull())
   {
-    m_BaseData->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), this->CreateProperty());
+    mitk::BaseProperty::Pointer property = this->CreateProperty();
+    m_BaseData->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), property);
+
+    if (m_Controls.persistentCheckBox->isChecked())
+    {
+      mitk::IPropertyPersistence* propertyPersistence = mitk::GetPropertyService<mitk::IPropertyPersistence>();
+
+      if (propertyPersistence != nullptr)
+        propertyPersistence->AddInfo(m_Controls.nameLineEdit->text().toStdString(), mitk::PropertyPersistenceInfo::New());
+    }
   }
   else
   {

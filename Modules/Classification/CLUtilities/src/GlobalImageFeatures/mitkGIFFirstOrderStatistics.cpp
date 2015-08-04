@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ITK
 #include <itkLabelStatisticsImageFilter.h>
+#include <itkMinimumMaximumImageCalculator.h>
 
 // STL
 #include <sstream>
@@ -36,13 +37,21 @@ void
   typedef itk::LabelStatisticsImageFilter<ImageType, MaskType> FilterType;
   typedef typename FilterType::HistogramType HistogramType;
   typedef typename HistogramType::IndexType HIndexType;
+  typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
 
+  typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
+  minMaxComputer->SetImage(itkImage);
+  minMaxComputer->Compute();
+  double imageRange = minMaxComputer->GetMaximum() -  minMaxComputer->GetMinimum();
+
   typename FilterType::Pointer labelStatisticsImageFilter = FilterType::New();
   labelStatisticsImageFilter->SetInput( itkImage );
   labelStatisticsImageFilter->SetLabelInput(maskImage);
+  labelStatisticsImageFilter->SetUseHistograms(true);
+  labelStatisticsImageFilter->SetHistogramParameters(256, minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
   labelStatisticsImageFilter->Update();
 
   // --------------- Range --------------------
@@ -83,6 +92,7 @@ void
   kurtosis = kurtosis / count / (std_dev * std_dev);
   skewness = skewness / count / (std_dev * std_dev * std_dev);
   mean_absolut_deviation = mean_absolut_deviation / count;
+  double coveredGrayValueRange = range / imageRange;
 
   featureList.push_back(std::make_pair("FirstOrder Range",range));
   featureList.push_back(std::make_pair("FirstOrder Uniformity",uniformity));
@@ -92,6 +102,7 @@ void
   featureList.push_back(std::make_pair("FirstOrder Kurtosis",kurtosis));
   featureList.push_back(std::make_pair("FirstOrder Skewness",skewness));
   featureList.push_back(std::make_pair("FirstOrder Mean absolute deviation",mean_absolut_deviation));
+  featureList.push_back(std::make_pair("FirstOrder Covered Image Intensity Range",coveredGrayValueRange));
 
   featureList.push_back(std::make_pair("FirstOrder Minimum",labelStatisticsImageFilter->GetMinimum(1)));
   featureList.push_back(std::make_pair("FirstOrder Maximum ",labelStatisticsImageFilter->GetMaximum(1)));

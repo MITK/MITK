@@ -53,7 +53,7 @@ void
   labelStatisticsImageFilter->Update();
 
   double volume = labelStatisticsImageFilter->GetCount(1);
-  for (int i = 0; i < VImageDimension; ++i)
+  for (int i = 0; i < (int)(VImageDimension); ++i)
   {
     volume *= itkImage->GetSpacing()[i];
   }

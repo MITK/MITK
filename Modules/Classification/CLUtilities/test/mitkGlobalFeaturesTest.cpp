@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkImageCast.h>
 #include <mitkGIFFirstOrderStatistics.h>
+#include <mitkGIFCooccurenceMatrix.h>
+#include <mitkGIFGrayLevelRunLength.h>
 
 class mitkGlobalFeaturesTestSuite : public mitk::TestFixture
 {
@@ -34,6 +36,7 @@ private:
 
   typedef itk::Image<double,3> ImageType;
   typedef itk::Image<unsigned char,3> MaskType;
+
   mitk::Image::Pointer m_Image,m_Mask,m_Mask1;
   ImageType::Pointer m_ItkImage;
   MaskType::Pointer m_ItkMask,m_ItkMask1;
@@ -59,15 +62,17 @@ public:
     mitk::Image::Pointer lmask1 = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
     mitk::CastToItkImage(lmask1,m_ItkMask1);
     m_ItkMask1->FillBuffer(0);
-    for (int x = 88-2;x < 88+3;++x)
+    int range=2;
+    for (int x = 88-range;x < 88+range+1;++x)
     {
-      for (int y=81-2;y<81+3;++y)
+      for (int y=81-range;y<81+range+1;++y)
       {
-        for (int z=13-2;z<13+3;++z)
+        for (int z=13-range;z<13+range+1;++z)
         {
           index[0] = x;
           index[1] = y;
           index[2] = z;
+          MITK_INFO << "Pixel: " << m_Image->GetPixelValueByIndex(index);
           m_ItkMask1->SetPixel(index, 1);
         }
       }
@@ -77,9 +82,8 @@ public:
 
   void TestFirstOrderStatistic()
   {
-    mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
-
     {
+      mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
       auto features = calculator->CalculateFeatures(m_Image, m_Mask);
 
       for (auto iter=features.begin(); iter!=features.end();++iter)
@@ -88,6 +92,27 @@ public:
       }
     }
     {
+      mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
+      auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
+
+      for (auto iter=features.begin(); iter!=features.end();++iter)
+      {
+        MITK_INFO << (*iter).first << " : " << (*iter).second;
+      }
+    }
+    {
+      mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
+      calculator->SetRange(1);
+      auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
+
+      for (auto iter=features.begin(); iter!=features.end();++iter)
+      {
+        MITK_INFO << (*iter).first << " : " << (*iter).second;
+      }
+    }
+    {
+      mitk::GIFCooccurenceMatrix::Pointer calculator = mitk::GIFCooccurenceMatrix::New();
+      calculator->SetRange(1);
       auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
 
       for (auto iter=features.begin(); iter!=features.end();++iter)

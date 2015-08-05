@@ -71,6 +71,7 @@ void
   double kurtosis = 0;
   double mean_absolut_deviation = 0;
   double skewness = 0;
+  double sum_prob = 0;
 
   for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
   {
@@ -78,20 +79,22 @@ void
     double prob = histogram->GetFrequency(index);
     double voxelValue = histogram->GetBinMin(0, i) +binWidth * 0.5;
 
+    sum_prob += prob;
     squared_sum += prob * voxelValue*voxelValue;
-    kurtosis += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-    skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-    mean_absolut_deviation = prob* std::abs(voxelValue - mean);
 
     prob /= count;
+    kurtosis += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
+    skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
+    mean_absolut_deviation += prob* std::abs(voxelValue - mean);
+
     uniformity += prob*prob;
     if (prob > 0)
       entropy += prob * std::log(prob);
   }
   double rms = std::sqrt(squared_sum / count);
-  kurtosis = kurtosis / count / (std_dev * std_dev);
-  skewness = skewness / count / (std_dev * std_dev * std_dev);
-  mean_absolut_deviation = mean_absolut_deviation / count;
+  kurtosis = kurtosis  / (std_dev * std_dev);
+  skewness = skewness  / (std_dev * std_dev * std_dev);
+  mean_absolut_deviation = mean_absolut_deviation;
   double coveredGrayValueRange = range / imageRange;
 
   featureList.push_back(std::make_pair("FirstOrder Range",range));

@@ -324,6 +324,38 @@ bool mitk::LevelWindowManager::isAutoTopMost()
 }
 
 
+void mitk::LevelWindowManager::RecaluclateLevelWindowForSelectedComponent(const itk::EventObject& event)
+{
+  mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
+      it != all->End();
+      ++it)
+  {
+    mitk::DataNode::Pointer node = it->Value();
+    if (node.IsNull())
+      continue;
+
+    bool isSelected = false;
+    node->GetBoolProperty("selected", isSelected);
+    if (isSelected)
+    {
+      mitk::LevelWindow selectedLevelWindow;
+      node->GetLevelWindow(selectedLevelWindow); // node is an image node because of predicates
+
+      mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+      int displayedComponent = 0;
+      if (image && (node->GetIntProperty("Image.Displayed Component", displayedComponent)))
+      { // we found a selected image with a displayed component
+        // let's recalculate the levelwindow for this.
+        selectedLevelWindow.SetAuto(image, true, true, static_cast<unsigned>(displayedComponent));
+        node->SetLevelWindow(selectedLevelWindow);
+      }
+    }
+  }
+  this->Update(event);
+  Modified();
+}
+
 void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible property of a image has changed
 {
   if (m_AutoTopMost)
@@ -475,7 +507,7 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
     }
 
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command4 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
-    command4->SetCallbackFunction(this, &LevelWindowManager::Update);
+    command4->SetCallbackFunction(this, &LevelWindowManager::RecaluclateLevelWindowForSelectedComponent);
     mitk::BaseProperty::Pointer displayedImageComponent = it->Value()->GetProperty("Image.Displayed Component");
     if( displayedImageComponent.IsNotNull() )
     {

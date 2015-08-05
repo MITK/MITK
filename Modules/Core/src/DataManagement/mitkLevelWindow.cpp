@@ -243,7 +243,8 @@ In consequence the level window maximizes contrast with minimal amount of
 computation and does do useful things if the data contains std::min or
 std:max values or has only 1 or 2 or 3 data values.
 */
-void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, bool guessByCentralSlice)
+void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, bool guessByCentralSlice,
+    unsigned selectedComponent)
 {
   if ( IsFixed() )
     return;
@@ -266,7 +267,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
     image = sliceSelector->GetOutput();
     if ( image == nullptr || !image->IsInitialized() ) return;
 
-    minValue    = image->GetStatistics()->GetScalarValueMin();
+    minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
     maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
     min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
     max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
@@ -274,7 +275,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
     {
       // guessByCentralSlice seems to have failed, lets look at all data
       image       = wholeImage;
-      minValue    = image->GetStatistics()->GetScalarValueMin();
+      minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
       maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
       min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
       max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
@@ -283,13 +284,13 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   else
   {
     const_cast<Image*>(image)->Update();
-    minValue    = image->GetStatistics()->GetScalarValueMin(0);
+    minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
     maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
     min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
     max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
     for (unsigned int i = 1; i < image->GetDimension(3); ++i)
     {
-      ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i);
+      ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i, selectedComponent);
       if (minValue > minValueTemp)
         minValue    = minValueTemp;
       ScalarType maxValueTemp = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);

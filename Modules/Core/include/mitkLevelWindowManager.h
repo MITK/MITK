@@ -65,6 +65,8 @@ namespace mitk
      *  @param removedNode != NULL a node was removed from DataStorage */
     void SetAutoTopMostImage(bool autoTopMost, const DataNode* removedNode = nullptr);
 
+    void RecaluclateLevelWindowForSelectedComponent(const itk::EventObject&);
+
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
     /** @brief Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.

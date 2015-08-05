@@ -6,7 +6,7 @@
 #include <mitkImageAccessByItk.h>
 
 // ITK
-#include <itkScalarImageToTextureFeaturesFilter.h>
+#include <itkEnhancedScalarImageToTextureFeaturesFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
 
 // STL
@@ -14,11 +14,11 @@
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFCooccurenceMatrix::FeatureListType & featureList, double range)
+  CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFCooccurenceMatrix::FeatureListType & featureList, double range)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<TPixel, VImageDimension> MaskType;
-  typedef itk::Statistics::ScalarImageToTextureFeaturesFilter<ImageType> FilterType;
+  typedef itk::Statistics::EnhancedScalarImageToTextureFeaturesFilter<ImageType> FilterType;
   typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
   typedef typename FilterType::TextureFeaturesFilterType TextureFilterType;
 
@@ -52,6 +52,23 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   requestedFeatures->push_back(TextureFilterType::ClusterShade);
   requestedFeatures->push_back(TextureFilterType::ClusterProminence);
   requestedFeatures->push_back(TextureFilterType::HaralickCorrelation);
+  requestedFeatures->push_back(TextureFilterType::Autocorrelation);
+  requestedFeatures->push_back(TextureFilterType::Contrast);
+  requestedFeatures->push_back(TextureFilterType::Dissimilarity);
+  requestedFeatures->push_back(TextureFilterType::MaximumProbability);
+  requestedFeatures->push_back(TextureFilterType::InverseVariance);
+  requestedFeatures->push_back(TextureFilterType::Homogeneity1);
+  requestedFeatures->push_back(TextureFilterType::ClusterTendency);
+  requestedFeatures->push_back(TextureFilterType::Variance);
+  requestedFeatures->push_back(TextureFilterType::SumAverage);
+  requestedFeatures->push_back(TextureFilterType::SumEntropy);
+  requestedFeatures->push_back(TextureFilterType::SumVariance);
+  requestedFeatures->push_back(TextureFilterType::DifferenceAverage);
+  requestedFeatures->push_back(TextureFilterType::DifferenceEntropy);
+  requestedFeatures->push_back(TextureFilterType::DifferenceVariance);
+  requestedFeatures->push_back(TextureFilterType::InverseDifferenceMomentNormalized);
+  requestedFeatures->push_back(TextureFilterType::InverseDifferenceNormalized);
+  requestedFeatures->push_back(TextureFilterType::InverseDifference);
 
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
@@ -73,43 +90,110 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   {
     switch (i)
     {
-      case TextureFilterType::Energy :
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Energy Means",featureMeans->ElementAt(i)));
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Energy Std.",featureStd->ElementAt(i)));
-        break;
-      case TextureFilterType::Entropy :
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Entropy Means",featureMeans->ElementAt(i)));
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Entropy Std.",featureStd->ElementAt(i)));
-        break;
-      case TextureFilterType::Correlation :
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Correlation Means",featureMeans->ElementAt(i)));
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Correlation Std.",featureStd->ElementAt(i)));
-        break;
-      case TextureFilterType::InverseDifferenceMoment :
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMoment Means",featureMeans->ElementAt(i)));
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMoment Std.",featureStd->ElementAt(i)));
-        break;
-      case TextureFilterType::Inertia :
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Inertia Means",featureMeans->ElementAt(i)));
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Inertia Std.",featureStd->ElementAt(i)));
-        break;
-      case TextureFilterType::ClusterShade :
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterShade Means",featureMeans->ElementAt(i)));
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterShade Std.",featureStd->ElementAt(i)));
-        break;
-      case TextureFilterType::ClusterProminence :
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterProminence Means",featureMeans->ElementAt(i)));
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterProminence Std.",featureStd->ElementAt(i)));
-        break;
-      case TextureFilterType::HaralickCorrelation :
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") HaralickCorrelation Means",featureMeans->ElementAt(i)));
-        featureList.push_back(std::make_pair("co-occ. ("+ strRange+") HaralickCorrelation Std.",featureStd->ElementAt(i)));
-        break;
-      default:
-        break;
+    case TextureFilterType::Energy :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Energy Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Energy Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::Entropy :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Entropy Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Entropy Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::Correlation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Correlation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Correlation Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::InverseDifferenceMoment :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMoment Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMoment Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::Inertia :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Inertia Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Inertia Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::ClusterShade :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterShade Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterShade Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::ClusterProminence :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterProminence Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterProminence Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::HaralickCorrelation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") HaralickCorrelation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") HaralickCorrelation Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::Autocorrelation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Autocorrelation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Autocorrelation Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::Contrast :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Contrast Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Contrast Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::Dissimilarity :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Dissimilarity Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Dissimilarity Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::MaximumProbability :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") MaximumProbability Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") MaximumProbability Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::InverseVariance :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseVariance Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseVariance Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::Homogeneity1 :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Homogeneity1 Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Homogeneity1 Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::ClusterTendency :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterTendency Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterTendency Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::Variance :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Variance Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Variance Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::SumAverage :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumAverage Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumAverage Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::SumEntropy :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumEntropy Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumEntropy Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::SumVariance :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumVariance Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumVariance Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::DifferenceAverage :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceAverage Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceAverage Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::DifferenceEntropy :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceEntropy Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceEntropy Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::DifferenceVariance :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceVariance Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceVariance Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::InverseDifferenceMomentNormalized :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMomentNormalized Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMomentNormalized Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::InverseDifferenceNormalized :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceNormalized Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceNormalized Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::InverseDifference :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Std.",featureStd->ElementAt(i)));
+      break;
+    default:
+      break;
     }
   }
-
 }
 
 mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrix():
@@ -145,5 +229,39 @@ mitk::GIFCooccurenceMatrix::FeatureNameListType mitk::GIFCooccurenceMatrix::GetF
   featureList.push_back("co-occ. ClusterProminence Std.");
   featureList.push_back("co-occ. HaralickCorrelation Means");
   featureList.push_back("co-occ. HaralickCorrelation Std.");
+  featureList.push_back("co-occ. Autocorrelation Means");
+  featureList.push_back("co-occ. Autocorrelation Std.");
+  featureList.push_back("co-occ. Contrast Means");
+  featureList.push_back("co-occ. Contrast Std.");
+  featureList.push_back("co-occ. Dissimilarity Means");
+  featureList.push_back("co-occ. Dissimilarity Std.");
+  featureList.push_back("co-occ. MaximumProbability Means");
+  featureList.push_back("co-occ. MaximumProbability Std.");
+  featureList.push_back("co-occ. InverseVariance Means");
+  featureList.push_back("co-occ. InverseVariance Std.");
+  featureList.push_back("co-occ. Homogeneity1 Means");
+  featureList.push_back("co-occ. Homogeneity1 Std.");
+  featureList.push_back("co-occ. ClusterTendency Means");
+  featureList.push_back("co-occ. ClusterTendency Std.");
+  featureList.push_back("co-occ. Variance Means");
+  featureList.push_back("co-occ. Variance Std.");
+  featureList.push_back("co-occ. SumAverage Means");
+  featureList.push_back("co-occ. SumAverage Std.");
+  featureList.push_back("co-occ. SumEntropy Means");
+  featureList.push_back("co-occ. SumEntropy Std.");
+  featureList.push_back("co-occ. SumVariance Means");
+  featureList.push_back("co-occ. SumVariance Std.");
+  featureList.push_back("co-occ. DifferenceAverage Means");
+  featureList.push_back("co-occ. DifferenceAverage Std.");
+  featureList.push_back("co-occ. DifferenceEntropy Means");
+  featureList.push_back("co-occ. DifferenceEntropy Std.");
+  featureList.push_back("co-occ. DifferenceVariance Means");
+  featureList.push_back("co-occ. DifferenceVariance Std.");
+  featureList.push_back("co-occ. InverseDifferenceMomentNormalized Means");
+  featureList.push_back("co-occ. InverseDifferenceMomentNormalized Std.");
+  featureList.push_back("co-occ. InverseDifferenceNormalized Means");
+  featureList.push_back("co-occ. InverseDifferenceNormalized Std.");
+  featureList.push_back("co-occ. InverseDifference Means");
+  featureList.push_back("co-occ. InverseDifference Std.");
   return featureList;
 }

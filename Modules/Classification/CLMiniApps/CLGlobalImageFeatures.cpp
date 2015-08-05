@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFCooccurenceMatrix.h>
 #include <mitkGIFGrayLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
+#include <mitkGIFVolumetricStatistics.h>
 
 typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned char, 3 >          MaskImageType;
@@ -54,9 +55,11 @@ int main(int argc, char* argv[])
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
 
   parser.addArgument("cooccurence","cooc",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
+  parser.addArgument("volume","vol",mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features",us::Any());
   parser.addArgument("run-length","rl",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
   parser.addArgument("first-order","fo",mitkCommandLineParser::String, "Use First Order Features", "calculates First order based features",us::Any());
   parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
+  parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -85,9 +88,23 @@ int main(int argc, char* argv[])
   ////////////////////////////////////////////////////////////////
   if (parsedArgs.count("first-order"))
   {
-    mitk::GIFFirstOrderStatistics firstOrderCalculator;
-    auto localResults = firstOrderCalculator.CalculateFeatures(image, mask);
+    MITK_INFO << "Start calculating first order statistics....";
+    mitk::GIFFirstOrderStatistics::Pointer firstOrderCalculator = mitk::GIFFirstOrderStatistics::New();
+    auto localResults = firstOrderCalculator->CalculateFeatures(image, mask);
     stats.insert(stats.end(), localResults.begin(), localResults.end());
+    MITK_INFO << "Finished calculating first order statistics....";
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // CAlculate Volume based Features
+  ////////////////////////////////////////////////////////////////
+  if (parsedArgs.count("volume"))
+  {
+    MITK_INFO << "Start calculating volumetric ....";
+    mitk::GIFVolumetricStatistics::Pointer volCalculator = mitk::GIFVolumetricStatistics::New();
+    auto localResults = volCalculator->CalculateFeatures(image, mask);
+    stats.insert(stats.end(), localResults.begin(), localResults.end());
+    MITK_INFO << "Finished calculating volumetric....";
   }
 
   ////////////////////////////////////////////////////////////////
@@ -99,10 +116,12 @@ int main(int argc, char* argv[])
 
     for (int i = 0; i < ranges.size(); ++i)
     {
-      mitk::GIFCooccurenceMatrix coocCalculator;
-      coocCalculator.SetRange(ranges[i]);
-      auto localResults = coocCalculator.CalculateFeatures(image, mask);
+      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
+      mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
+      coocCalculator->SetRange(ranges[i]);
+      auto localResults = coocCalculator->CalculateFeatures(image, mask);
       stats.insert(stats.end(), localResults.begin(), localResults.end());
+      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
     }
   }
 
@@ -115,10 +134,12 @@ int main(int argc, char* argv[])
 
     for (int i = 0; i < ranges.size(); ++i)
     {
-      mitk::GIFGrayLevelRunLength calculator;
-      calculator.SetRange(ranges[i]);
-      auto localResults = calculator.CalculateFeatures(image, mask);
+      MITK_INFO << "Start calculating run-length with number of bins " << ranges[i] << "....";
+      mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
+      calculator->SetRange(ranges[i]);
+      auto localResults = calculator->CalculateFeatures(image, mask);
       stats.insert(stats.end(), localResults.begin(), localResults.end());
+      MITK_INFO << "Finished calculating run-length with number of bins " << ranges[i] << "....";
     }
   }
   for (int i = 0; i < stats.size(); ++i)
@@ -129,11 +150,19 @@ int main(int argc, char* argv[])
   std::ofstream output(parsedArgs["output"].ToString(),std::ios::app);
   if ( parsedArgs.count("header") )
   {
+    if ( parsedArgs.count("description") )
+    {
+      output << "Description" << ";";
+    }
     for (int i = 0; i < stats.size(); ++i)
     {
       output << stats[i].first << ";";
     }
     output << std::endl;
+  }
+  if ( parsedArgs.count("description") )
+  {
+    output << parsedArgs["description"].ToString() << ";";
   }
   for (int i = 0; i < stats.size(); ++i)
   {

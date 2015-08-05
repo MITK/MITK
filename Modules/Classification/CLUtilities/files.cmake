@@ -10,6 +10,12 @@ set(CPP_FILES
   GlobalImageFeatures/mitkGIFCooccurenceMatrix.cpp
   GlobalImageFeatures/mitkGIFGrayLevelRunLength.cpp
   GlobalImageFeatures/mitkGIFFirstOrderStatistics.cpp
+  GlobalImageFeatures/mitkGIFVolumetricStatistics.cpp
+  GlobalImageFeatures/itkEnhancedScalarImageToRunLengthFeaturesFilter.hxx
+  GlobalImageFeatures/itkEnhancedScalarImageToRunLengthMatrixFilter.hxx
+  GlobalImageFeatures/itkEnhancedHistogramToRunLengthFeaturesFilter.hxx
+  GlobalImageFeatures/itkEnhancedHistogramToTextureFeaturesFilter.hxx
+  GlobalImageFeatures/itkEnhancedScalarImageToTextureFeaturesFilter.hxx
   mitkCLUtil.cpp
 
 )

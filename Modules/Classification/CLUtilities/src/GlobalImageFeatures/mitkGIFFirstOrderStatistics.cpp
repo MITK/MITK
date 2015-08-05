@@ -72,7 +72,7 @@ void
   double mean_absolut_deviation = 0;
   double skewness = 0;
 
-  for (int i = 0; i < histogram->GetSize(0); ++i)
+  for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
   {
     index[0] = i;
     double prob = histogram->GetFrequency(index);

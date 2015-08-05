@@ -21,6 +21,8 @@ const QString QmitkMimeTypes::DataStorageTreeItemPtrs = "application/x-qmitk-dat
 
 #include <iostream>
 
+#include <QDataStream>
+
 QList<mitk::DataNode *> QmitkMimeTypes::ToDataNodePtrList(const QByteArray &ba)
 {
   QDataStream ds(ba);

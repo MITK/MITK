@@ -1,11 +1,11 @@
 /**
 \page NewModulePage How to create a new MITK Module
 
-\section NewModulePageCreateFolder 1) Create a Folder for your Module
+\section NewModulePageCreateFolder Create a Folder for your Module
 
 First, create a folder for your module within /Modules  e.g. 'NewModule'.
 You need to add the new Folder to the CMakeLists.txt in the Module directory as well as well.
-Open /Modules/CMakeLists.txt, it should be pretty clear how to add the Module, just insert it into the set(module_dirs) section.
+Open /Modules/CMakeLists.txt, insert it into the set(module_dirs) section.
 
 \code
 set(module_dirs
@@ -14,69 +14,109 @@ set(module_dirs
 )
 \endcode
 
-Inside the folder create a new folder called "Testing", which will later contain the module tests.
-Also create subfolders for you sourceFiles, for example "NewModuleFilters" and "NewModuleSourceFiles".
+A simple example module is provided in the MITK/Examples/FirstSteps/NewModule directory, it includes a new data type
+(more information at \ref NewDataTypePage) and adds a MiniApp for that data type (more information at \ref MiniAppCommandLineToolHowToPage).
 
-\section NewModulePageCreateCMakeLists 2) Create CMakeLists.txt
-
-Within your module create the following file named CMakeLists.txt with the following content:
-
-\code
-MITK_CREATE_MODULE(NewModule #<-- module name
-  SUBPROJECTS
-  INCLUDE_DIRS NewModuleFilters NewModuleServices #<-- sub-folders of module
-  INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  DEPENDS Mitk #<-- modules on which your module depends on
-)
-
-ADD_SUBDIRECTORY(Testing) #<-- Directory for tests
-\endcode
-
-Choose a fitting module name. This name should only contain Letters (both upper- and lowercase), no numbers, no underscores etc.
-This name will be used to qualify your Module within the MITK Framework, so make sure it is unique.
-Typically, the name will be the same as name of the Folder the Module resides in.
-
-It is good practice to create subfolders in your module to structure your classes.
-Make sure to include these folders in the List of subfolders, or CMake will not find the internal Files.
-
-In the DEPENDS section, you can enter the modules that your module requires to function.
-You will not be able to use classes from modules that are not listed here.
-
-\section NewModulePageCreatefilesdotcmake 3) Create files.cmake
-
-Next, create a new file and name it files.cmake, containing the following:
+Within the module we recommend using a Unix like directory structure. This helps others finding their way around your code.
+Depending on your use case you might not need every directory.
 
 \code
-SET(CPP_FILES
-  NewModuleFilters/File1.cpp
-  NewModuleFilters/File2.cpp
-
-  NewModuleServices/Filter1.cpp
-)
+NewModule/
+  autoload/
+  cmdapps/
+  doc/
+  include/
+  resource/
+  src/
+  test/
 \endcode
 
-Add each .cpp file you create to this file.
-Also, only add you .cpp files here, not the header files!
+Subsequently a quick description of what each directory contains.
 
-\section NewModulePageCreateTEstingEnvironment 4) Set up the Test environment
+\subsection NewModulePageCreateFolderAutoload autoload
 
-We also need to set up a testing environment where you can add your tests.
-Inside your "Testing" Folder, create a new files.cmake containing the following:
+This directory should not directly contain files. Instead it contains further directories each of which is its own module.
 
-\code
-SET(MODULE_TESTS
-   mitkNewModuleTest.cpp
-)
-\endcode
+These modules provide functionality which should be available at application start, but will not be included by other modules.
+Examples would be a module registering readers/writers or providing an interface for specific hardware.
 
-Also, create a new CMakeLists.text:
+For an example of an autoload module take a look at NewModule/autoload/IO.
 
-\code
-MITK_CREATE_MODULE_TESTS()
-\endcode
+\subsection NewModulePageCreateFolderCmdApps cmdapps
 
-That's it! Enjoy your new module! After following these steps, it should look something like this:
+This directory contains all cmdapps (command line tools) related to your module. For more information see \ref MiniAppCommandLineToolHowToPage.
 
-\imageMacro{NewModule.png,"Your shiny new module!",6}
+\subsection NewModulePageCreateFolderDoc doc
+
+This directory contains the documentation for your module.
+
+\subsection NewModulePageCreateFolderInclude include
+
+This directory contains all header files which might be included by other modules.
+
+\subsection NewModulePageCreateFolderResource resource
+
+This directory contains resources needed by your module, such as xmls, images or similar.
+
+\subsection NewModulePageCreateFolderSrc src
+
+This directory contains source and header files which should not be included by other modules. Further subdivision can help keeping it organized.
+(e.g. src/DataManagement src/Algorithms)
+
+\subsection NewModulePageCreateFolderTest test
+
+This directory contains all tests for your module.
+
+
+\section NewModulePageCreateCMakeLists Create CMakeLists.txt
+
+Within your module create a CMakeLists.txt using the MITK_CREATE_MODULE macro:
+
+An example:
+
+\include Examples/FirstSteps/NewModule/CMakeLists.txt
+
+If you do not choose a module name, one will be generated based on the folder name (In this case the resulting name will be MitkNewModule).
+This name has to be unique across the entire project in order to avoid collisions. It should only contain Letters (both upper- and lowercase),
+no numbers, no underscores etc.
+
+An example of an autoload module that sets its own name is:
+
+\include Examples/FirstSteps/NewModule/autoload/IO/CMakeLists.txt
+
+the resulting name is MitkNewModuleIO.
+
+\note For more information about the parameters of the new module macro see mitkFunctionCreateModule.cmake
+
+\section NewModulePageCreatefilesdotcmake Create files.cmake
+
+Next, create a new file and name it files.cmake, containing the files of your module.
+
+An example:
+
+\include Examples/FirstSteps/NewModule/autoload/IO/files.cmake
+
+If you do not add a source file here it will not be compiled, unless it is included elsewhere.
+
+\section NewModulePageCreateTestingEnvironment Set up the Test environment
+
+Providing tests for your code is a very good way to save yourself a lot of debugging time and ensure
+consistency. An example of a small test environment is provided in the NewModule example.
+
+Again you need a CMakeLists.txt, e.g.:
+
+\include Examples/FirstSteps/NewModule/test/CMakeLists.txt
+
+a files.cmake, e.g.:
+
+\include Examples/FirstSteps/NewModule/test/files.cmake
+
+and an actual test, e.g.:
+
+\include Examples/FirstSteps/NewModule/test/mitkExampleDataStructureTest.cpp
+
+For more information regarding tests please refer to \ref AboutTestingPage.
+
+That's it! Enjoy your new module!
 
 */

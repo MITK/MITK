@@ -37,6 +37,7 @@ set(_example_dirs
   MbiLog
   QtFreeRender
   Tutorial
+  FirstSteps
 #  Overlays# depends on MitkQtWidgetsExt..
 )
 

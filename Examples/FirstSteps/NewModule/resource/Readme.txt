@@ -1,0 +1,1 @@
+This directory should contain resources, such as images, presets, xmls or similar.

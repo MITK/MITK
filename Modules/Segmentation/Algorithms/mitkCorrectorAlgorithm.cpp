@@ -28,8 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionIterator.h"
 #include "itkCastImageFilter.h"
 
-#include <mitkIOUtil.h>
-
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
 :ImageToImageFilter()
 , m_FillColor( 1 )
@@ -48,7 +46,7 @@ void ConvertBackToCorrectPixelType(itk::Image< TPixel, VDimensions> * reference,
   typedef itk::Image< TPixel, 2 >  OutputImageType;
   typedef itk::CastImageFilter< InputImageType, OutputImageType > CastImageFilterType;
 
-  typename CastImageFilterType::Pointer castImageFilter = typename CastImageFilterType::New();
+  typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
   castImageFilter->SetInput( segmentationPixelTypeImage );
   castImageFilter->Update();
   typename OutputImageType::Pointer tempItkImage = castImageFilter->GetOutput();

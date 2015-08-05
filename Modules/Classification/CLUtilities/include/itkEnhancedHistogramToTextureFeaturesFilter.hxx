@@ -223,25 +223,25 @@ namespace itk
         inverseDifference += frequency / ( 1.0 + std::abs( index[0] - index[1] ) );
       }
 
-      for (int i = 0; i < sumP.size();++i)
+      for (int i = 0; i < (int)sumP.size();++i)
       {
         double frequency = sumP[i];
         sumAverage += i * frequency;
         sumEntropy -= ( frequency > 0.0001 ) ? frequency *std::log(frequency) / log2:0;
       }
-      for (int i = 0; i < sumP.size();++i)
+      for (int i = 0; i < (int)sumP.size();++i)
       {
         double frequency = sumP[i];
         sumVariance += (i-sumAverage)*(i-sumAverage) * frequency;
       }
 
-      for (int i = 0; i < diffP.size();++i)
+      for (int i = 0; i < (int)diffP.size();++i)
       {
         double frequency = diffP[i];
         diffAverage += i * frequency;
         diffEntropy -= ( frequency > 0.0001 ) ? frequency *std::log(frequency) / log2:0;
       }
-      for (int i = 0; i < diffP.size();++i)
+      for (int i = 0; i < (int)diffP.size();++i)
       {
         double frequency = diffP[i];
         sumVariance += (i-diffAverage)*(i-diffAverage) * frequency;

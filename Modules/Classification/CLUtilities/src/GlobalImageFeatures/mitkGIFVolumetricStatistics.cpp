@@ -68,7 +68,7 @@ void
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef typename ImageType::PointType PointType;
   typename ImageType::SizeType radius;
-  for (int i=0; i < VImageDimension; ++i)
+  for (int i=0; i < (int)VImageDimension; ++i)
     radius[i] = 1;
   itk::NeighborhoodIterator<ImageType> iterator(radius,mask, mask->GetRequestedRegion());
   std::vector<PointType> borderPoints;
@@ -81,7 +81,7 @@ void
     }
 
     bool border = false;
-    for (int i = 0; i < iterator.Size(); ++i)
+    for (int i = 0; i < (int)(iterator.Size()); ++i)
     {
       if (iterator.GetPixel(i) == 0)
       {
@@ -101,10 +101,10 @@ void
 
   double longestDiameter = 0;
   unsigned long numberOfBorderPoints = borderPoints.size();
-  for (int i = 0; i < numberOfBorderPoints; ++i)
+  for (int i = 0; i < (int)numberOfBorderPoints; ++i)
   {
     auto point = borderPoints[i];
-    for (int j = i; j < numberOfBorderPoints; ++j)
+    for (int j = i; j < (int)numberOfBorderPoints; ++j)
     {
       double newDiameter=point.EuclideanDistanceTo(borderPoints[j]);
       if (newDiameter > longestDiameter)

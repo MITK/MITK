@@ -15,29 +15,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSurfaceToImageFilter.h"
-#include "mitkTimeHelper.h"
+#include <mitkImageReadAccessor.h>
 #include "mitkImageWriteAccessor.h"
+#include "mitkTimeHelper.h"
 
-#include <vtkPolyData.h>
-#include <vtkPolyDataToImageStencil.h>
-#include <vtkImageStencil.h>
 #include <vtkImageData.h>
+#include <vtkImageStencil.h>
+#include <vtkPointData.h>
 #include <vtkPolyData.h>
-#include <vtkLinearTransform.h>
-#include <vtkTriangleFilter.h>
-#include <vtkLinearExtrusionFilter.h>
-#include <vtkDataSetTriangleFilter.h>
-#include <vtkImageThreshold.h>
-#include <vtkImageMathematics.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkPolyDataToImageStencil.h>
+#include <vtkSmartPointer.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkTransform.h>
-#include <vtkSmartPointer.h>
-#include <mitkImageReadAccessor.h>
 
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
 : m_MakeOutputBinary( false ),
+  m_UShortBinaryPixelType( false ),
   m_BackgroundValue( -10000 )
 {
 }
@@ -67,7 +62,12 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
      (inputImage->GetTimeGeometry() == nullptr)) return;
 
   if (m_MakeOutputBinary)
-    output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry());
+  {
+    if (m_UShortBinaryPixelType)
+      output->Initialize(mitk::MakeScalarPixelType<unsigned short>() , *inputImage->GetTimeGeometry());
+    else
+      output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry());
+  }
   else
     output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeGeometry());
 
@@ -111,7 +111,13 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 
   unsigned int size = sizeof(unsigned char);
   if (m_MakeOutputBinary)
-    binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *this->GetImage()->GetTimeGeometry(),1,1);
+    if (m_UShortBinaryPixelType)
+    {
+      binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned short>(), *this->GetImage()->GetTimeGeometry(),1,1);
+      size = sizeof(unsigned short);
+    }
+    else
+      binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *this->GetImage()->GetTimeGeometry(),1,1);
   else
   {
     binaryImage->Initialize(this->GetImage()->GetPixelType(), *this->GetImage()->GetTimeGeometry(),1,1);
@@ -169,6 +175,14 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     vtkImageData *image = m_MakeOutputBinary
         ? binaryImage->GetVtkImageData()
         : const_cast<mitk::Image *>(this->GetImage())->GetVtkImageData(time);
+
+    // fill the image with foreground voxels:
+    unsigned char inval = 1;
+    vtkIdType count = image->GetNumberOfPoints();
+    for (vtkIdType i = 0; i < count; ++i)
+    {
+      image->GetPointData()->GetScalars()->SetTuple1(i, inval);
+    }
 
     // Create stencil and use numerical minimum of pixel type as background value
     vtkSmartPointer<vtkImageStencil> stencil = vtkSmartPointer<vtkImageStencil>::New();

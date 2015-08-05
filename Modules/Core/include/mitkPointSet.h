@@ -206,6 +206,16 @@ public:
   PointIdentifier InsertPoint( PointType point, int t = 0 );
 
   /**
+  * \brief Remove point with given id at timestep t, if existent
+  */
+  bool RemovePointIfExists( PointIdentifier id, int t = 0 );
+
+  /**
+  * \brief Remove max id point at timestep t and return iterator to precedent point
+  */
+  PointsIterator RemovePointAtEnd( int t = 0 );
+
+  /**
   * \brief Swap a point at the given position (id) with the upper point (moveUpwards=true) or with the lower point (moveUpwards=false).
   * If upper or lower index does not exist false is returned, if swap was successful true.
   */

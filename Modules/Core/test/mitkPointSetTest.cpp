@@ -45,6 +45,7 @@ class mitkPointSetTestSuite : public mitk::TestFixture
   MITK_TEST(TestSwapPointPositionDownwardsNotPossible);
   MITK_TEST(TestCreateHoleInThePointIDs);
   MITK_TEST(TestInsertPointWithPointSpecification);
+  MITK_TEST(TestRemovePointInterface);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -322,7 +323,6 @@ std::cout<<"[PASSED]"<<std::endl;
         true, ((newP10 == p10) && (newP12 == p12)));
   }
 
-
   void TestInsertPointWithPointSpecification()
   {
     //check InsertPoint with PointSpecification
@@ -343,6 +343,68 @@ std::cout<<"[PASSED]"<<std::endl;
       }
       std::cout<<"[PASSED]"<<std::endl;
      */
+  }
+
+  void TestRemovePointInterface()
+  {
+    mitk::PointSet::Pointer psClone = pointSet->Clone();
+    mitk::PointSet::Pointer refPsLastRemoved = mitk::PointSet::New();
+    mitk::Point3D point0, point1, point2, point3, point4;
+    point0.Fill(1);
+    refPsLastRemoved->InsertPoint(0, point0);
+    mitk::FillVector3D(point1, 1.0, 2.0, 3.0);
+    refPsLastRemoved->InsertPoint(1, point1);
+    point2.Fill(3);
+    point3.Fill(4);
+    refPsLastRemoved->InsertPoint(2,point2);
+    refPsLastRemoved->InsertPoint(3,point3);
+
+    mitk::PointSet::Pointer refPsMiddleRemoved = mitk::PointSet::New();
+    refPsMiddleRemoved->InsertPoint(0, point0);
+    refPsMiddleRemoved->InsertPoint(1, point1);
+    refPsMiddleRemoved->InsertPoint(3, point3);
+
+    //remove non-existent point
+    bool removed = pointSet->RemovePointIfExists( 5, 0 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove non-existent point", false, removed );
+    MITK_ASSERT_EQUAL( pointSet, psClone, "No changes made" );
+
+    //remove point from non-existent time-step
+    removed = pointSet->RemovePointIfExists( 1, 1 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove non-existent point", false, removed );
+    MITK_ASSERT_EQUAL( pointSet, psClone, "No changes made" );
+
+    //remove max id from non-existent time-step
+    mitk::PointSet::PointsIterator maxIt = pointSet->RemovePointAtEnd( 2 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove max id point from non-existent time step", true, maxIt == pointSet->End( 2 ) );
+    MITK_ASSERT_EQUAL( pointSet, psClone, "No changes made" );
+
+    //remove max id from empty point set
+    mitk::PointSet::Pointer emptyPS = mitk::PointSet::New();
+    maxIt = emptyPS->RemovePointAtEnd( 0 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove max id point from non-existent time step", true, maxIt == emptyPS->End( 0 ) );
+    int size = emptyPS->GetSize( 0 );
+    unsigned int pointSetSeriesSize = emptyPS->GetPointSetSeriesSize();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Nothing added", true, size == 0 && pointSetSeriesSize == 1);
+
+    //remove max id point
+    maxIt = pointSet->RemovePointAtEnd( 0 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Point id 4 removed", false, pointSet->IndexExists(4) );
+    MITK_ASSERT_EQUAL( pointSet, refPsLastRemoved, "No changes made" );
+
+    mitk::PointSet::PointIdentifier id = maxIt.Index();
+    mitk::PointSet::PointType refPt;
+    refPt[0] = 4.0;
+    refPt[1] = 4.0;
+    refPt[2] = 4.0;
+    mitk::PointSet::PointType pt = maxIt.Value();
+    bool equal = mitk::Equal( refPt, pt );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Returned iterator pointing at max id", true, id == 3 && equal );
+
+    //remove middle point
+    removed = pointSet->RemovePointIfExists( 2, 0 );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove point id 2", true, removed );
+    MITK_ASSERT_EQUAL( pointSet, refPsMiddleRemoved, "Point removed" );
   }
 
 };

@@ -161,9 +161,9 @@ namespace itk
 
       size.Fill( this->m_NumberOfBinsPerAxis );
       this->m_LowerBound[0] = this->m_Min;
-      this->m_LowerBound[1] = 0;this->m_MinDistance;
+      this->m_LowerBound[1] = this->m_MinDistance;
       this->m_UpperBound[0] = this->m_Max;
-      this->m_UpperBound[1] = 256;this->m_MaxDistance;
+      this->m_UpperBound[1] = this->m_MaxDistance;
       output->Initialize( size, this->m_LowerBound, this->m_UpperBound );
 
       MeasurementVectorType run( output->GetMeasurementVectorSize() );

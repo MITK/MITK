@@ -77,7 +77,7 @@ If you use the test driver, you only need to start the executable. If you start 
 
 \section GeneralTestsParameterInput Adding parameters to your test
 
-If possible, the setUp() method of the test suite should provide all necessary inputs for the respective tests. MITK provides several helper classes to generate synthetic test data, such as the mitkImageGenerator. If you have to load data from the hard disc for your test, you can use the method GetTestDataFilePath(string fileName). For an example of loading data from the MITK_DATA_DIR check the mitkIOUtilTestSuite.
+If possible, the setUp() method of the test suite should provide all necessary inputs for the respective tests. MITK provides several helper classes to generate synthetic test data, such as the mitk::ImageGenerator. If you have to load data from the hard disc for your test, you can use the method GetTestDataFilePath(string fileName). For an example of loading data from the MITK_DATA_DIR check the mitkIOUtilTestSuite.
 
 \section GeneralTestsPredefinedAssertions Predefined assertions
 

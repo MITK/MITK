@@ -170,19 +170,19 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
       }
 
       bool isPersistent = false;
-      QString persistenceKey;
+      // QString persistenceKey;
 
       if (m_PropertyPersistence != nullptr)
       {
         isPersistent = m_PropertyPersistence->HasInfo(name.toStdString());
 
-        if (isPersistent)
+        /*if (isPersistent)
         {
           persistenceKey = QString::fromStdString(m_PropertyPersistence->GetInfo(name.toStdString())->GetKey());
 
           if (persistenceKey.isEmpty())
             persistenceKey = name;
-        }
+        }*/
       }
 
       if (!description.isEmpty() || !aliases.empty() || isPersistent)
@@ -210,11 +210,25 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
           customizedDescription = "<h3 style=\"margin-bottom:10px\">" + name + "</h3>";
         }
 
-        if (isPersistent)
-          customizedDescription += "<h5 style=\"margin-top:0;margin-bottom:10px\">Persistence key: " + persistenceKey + "</h5>";
-
         if (!description.isEmpty())
-          customizedDescription += description;
+          customizedDescription += "<p>" + description + "</p>";
+
+        if (!aliases.empty() || isPersistent)
+        {
+          customizedDescription += "<div align=\"right\">";
+
+          if (!aliases.empty())
+          {
+            customizedDescription += aliases.size() > 1
+              ? "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/tags.svg\"/>"
+              : "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/tag.svg\"/>";
+          }
+
+          if (isPersistent)
+            customizedDescription += "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg\"/>";
+
+          customizedDescription += "</div>";
+        }
 
         m_Controls.description->setText(customizedDescription);
         m_Controls.description->show();

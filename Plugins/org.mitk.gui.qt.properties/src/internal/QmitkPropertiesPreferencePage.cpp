@@ -57,6 +57,7 @@ void QmitkPropertiesPreferencePage::Init(berry::IWorkbench::Pointer)
 void QmitkPropertiesPreferencePage::OnShowDescriptionsStateChanged(int state)
 {
   m_Controls.showAliasesInDescriptionCheckBox->setEnabled(state != Qt::Unchecked);
+  m_Controls.showPersistenceInDescriptionCheckBox->setEnabled(state != Qt::Unchecked);
 }
 
 bool QmitkPropertiesPreferencePage::PerformOk()

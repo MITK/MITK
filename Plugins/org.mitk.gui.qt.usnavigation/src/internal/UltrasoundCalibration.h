@@ -221,6 +221,10 @@ class UltrasoundCalibration : public QmitkAbstractView
     mitk::PointSet::Pointer m_VerificationReferencePoints;
     mitk::DataNode::Pointer m_VerificationReferencePointsDataNode;
 
+    int m_currentPoint;
+    std::vector<mitk::Point3D> m_allReferencePoints;
+    std::vector<double> m_allErrors;
+
     /**
     * \brief Pointset containing points along the needle's prohected path. Only used for visualization. The first point is the needle tip.
     */

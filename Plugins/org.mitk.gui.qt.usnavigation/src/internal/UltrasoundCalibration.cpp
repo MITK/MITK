@@ -230,12 +230,47 @@ m_VerificationReferencePoints->InsertPoint(m_VerificationReferencePoints->GetSiz
 
 void UltrasoundCalibration::OnStartVerification()
 {
-
+  m_currentPoint = 0;
+  mitk::PointSet::Pointer selectedPointSet = dynamic_cast<mitk::PointSet*>(m_Controls.m_ReferencePointsComboBox->GetSelectedNode()->GetData());
+  m_Controls.m_CurrentPointLabel->setText("Point " + QString::number(m_currentPoint) + " of " + QString::number(selectedPointSet->GetSize()));
+  m_allErrors = std::vector<double>();
+  m_allReferencePoints = std::vector<mitk::Point3D>();
+  for (int i=0; i< selectedPointSet->GetSize(); i++)
+  {m_allReferencePoints.push_back(selectedPointSet->GetPoint(i));}
 }
 
 void UltrasoundCalibration::OnAddCurrentTipPositionForVerification()
 {
+if (m_currentPoint==-1) {MITK_WARN << "Cannot add point"; return;}
+  if (m_Controls.m_VerificationPointerChoser->GetSelectedNavigationDataSource().IsNull() ||
+    (m_Controls.m_VerificationPointerChoser->GetSelectedToolID() == -1))
+  {
+  MITK_WARN << "No tool selected, aborting";
+  return;
+  }
+mitk::NavigationData::Pointer currentPointerData = m_Controls.m_VerificationPointerChoser->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_VerificationPointerChoser->GetSelectedToolID());
+mitk::Point3D currentTipPosition = currentPointerData->GetPosition();
 
+double currentError = m_allReferencePoints.at(m_currentPoint).EuclideanDistanceTo(currentTipPosition);
+MITK_INFO << "Current Error: " << currentError << " mm";
+m_allErrors.push_back(currentError);
+
+m_currentPoint++;
+if (m_currentPoint<m_allReferencePoints.size()) {m_Controls.m_CurrentPointLabel->setText("Point " + QString::number(m_currentPoint) + " of " + QString::number(m_allReferencePoints.size()));}
+else
+  {
+  m_currentPoint = -1;
+  double meanError = 0;
+  for(int i=0; i<m_allErrors.size(); i++)
+    {
+      meanError += m_allErrors.at(i);
+    }
+  meanError /= m_allErrors.size();
+
+  QString result = "Finished verification! \n Verification of " + QString::number(m_allErrors.size()) + " points, mean error: " + QString::number(meanError) + " mm";
+  m_Controls.m_ResultsTextEdit->setText(result);
+  MITK_INFO << result.toStdString();
+  }
 }
 
 void UltrasoundCalibration::OnStartCalibrationProcess()

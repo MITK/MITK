@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIBerryPreferences.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
+#include <mitkIPropertyPersistence.h>
 #include <QmitkRenderWindow.h>
 #include <QPainter>
 #include <memory>
@@ -31,16 +32,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkPropertyTreeView::VIEW_ID = "org.mitk.views.properties";
 
 QmitkPropertyTreeView::QmitkPropertyTreeView()
-  : m_Parent(NULL),
+  : m_Parent(nullptr),
     m_PropertyNameChangedTag(0),
-    m_PropertyAliases(NULL),
-    m_PropertyDescriptions(NULL),
+    m_PropertyAliases(nullptr),
+    m_PropertyDescriptions(nullptr),
+    m_PropertyPersistence(nullptr),
     m_ShowAliasesInDescription(true),
+    m_ShowPersistenceInDescription(true),
     m_DeveloperMode(false),
-    m_ProxyModel(NULL),
-    m_Model(NULL),
-    m_Delegate(NULL),
-    m_Renderer(NULL)
+    m_ProxyModel(nullptr),
+    m_Model(nullptr),
+    m_Delegate(nullptr),
+    m_Renderer(nullptr)
 {
 }
 
@@ -131,7 +134,7 @@ QString QmitkPropertyTreeView::GetPropertyNameOrAlias(const QModelIndex& index)
 
 void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, const QModelIndex&)
 {
-  if (m_PropertyDescriptions != NULL && current.isValid())
+  if (m_PropertyDescriptions != nullptr && current.isValid())
   {
     QString name = this->GetPropertyNameOrAlias(current);
 
@@ -140,7 +143,7 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
       QString alias;
       bool isTrueName = true;
 
-      if (m_PropertyAliases != NULL)
+      if (m_PropertyAliases != nullptr)
       {
         std::string trueName = m_PropertyAliases->GetPropertyName(name.toStdString());
 
@@ -158,7 +161,7 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
       QString description = QString::fromStdString(m_PropertyDescriptions->GetDescription(name.toStdString()));
       std::vector<std::string> aliases;
 
-      if (!isTrueName && m_PropertyAliases != NULL)
+      if (!isTrueName && m_PropertyAliases != nullptr)
       {
         aliases = m_PropertyAliases->GetAliases(name.toStdString(), m_SelectionClassName);
 
@@ -166,7 +169,23 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
           aliases = m_PropertyAliases->GetAliases(name.toStdString());
       }
 
-      if (!description.isEmpty() || !aliases.empty())
+      bool isPersistent = false;
+      // QString persistenceKey;
+
+      if (m_PropertyPersistence != nullptr)
+      {
+        isPersistent = m_PropertyPersistence->HasInfo(name.toStdString());
+
+        /*if (isPersistent)
+        {
+          persistenceKey = QString::fromStdString(m_PropertyPersistence->GetInfo(name.toStdString())->GetKey());
+
+          if (persistenceKey.isEmpty())
+            persistenceKey = name;
+        }*/
+      }
+
+      if (!description.isEmpty() || !aliases.empty() || isPersistent)
       {
         QString customizedDescription;
 
@@ -192,7 +211,24 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
         }
 
         if (!description.isEmpty())
-          customizedDescription += description;
+          customizedDescription += "<p>" + description + "</p>";
+
+        if (!aliases.empty() || isPersistent)
+        {
+          customizedDescription += "<div align=\"right\">";
+
+          if (!aliases.empty())
+          {
+            customizedDescription += aliases.size() > 1
+              ? "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/tags.svg\"/>"
+              : "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/tag.svg\"/>";
+          }
+
+          if (isPersistent)
+            customizedDescription += "<img height=\"32\" src=\":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg\"/>";
+
+          customizedDescription += "</div>";
+        }
 
         m_Controls.description->setText(customizedDescription);
         m_Controls.description->show();
@@ -225,27 +261,35 @@ void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences*
   bool showAliases = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES, true);
   bool showDescriptions = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS, true);
   bool showAliasesInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION, true);
+  bool showPersistenceInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_PERSISTENCE_IN_DESCRIPTION, true);
   bool developerMode = preferences->GetBool(QmitkPropertiesPreferencePage::DEVELOPER_MODE, false);
 
   bool updateAliases = showAliases != (m_PropertyAliases != NULL);
   bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != NULL);
   bool updateAliasesInDescription = showAliasesInDescription != m_ShowAliasesInDescription;
+  bool updatePersistenceInDescription = showPersistenceInDescription != m_ShowPersistenceInDescription;
   bool updateDeveloperMode = developerMode != m_DeveloperMode;
 
   if (updateAliases)
     m_PropertyAliases = showAliases
       ? mitk::GetPropertyService<mitk::IPropertyAliases>()
-      : NULL;
+      : nullptr;
 
   if (updateDescriptions)
     m_PropertyDescriptions = showDescriptions
       ? mitk::GetPropertyService<mitk::IPropertyDescriptions>()
-      : NULL;
+      : nullptr;
+
+  if (showPersistenceInDescription)
+    m_PropertyPersistence = mitk::GetPropertyService<mitk::IPropertyPersistence>();
 
   if (updateAliasesInDescription)
     m_ShowAliasesInDescription = showAliasesInDescription;
 
-  if (updateDescriptions || updateAliasesInDescription)
+  if (updatePersistenceInDescription)
+    m_ShowPersistenceInDescription = showPersistenceInDescription;
+
+  if (updateDescriptions || updateAliasesInDescription || updatePersistenceInDescription)
   {
     QModelIndexList selection = m_Controls.treeView->selectionModel()->selectedRows();
 

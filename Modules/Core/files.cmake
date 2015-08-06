@@ -94,6 +94,7 @@ set(CPP_FILES
   DataManagement/mitkIPropertyDescriptions.cpp
   DataManagement/mitkIPropertyExtensions.cpp
   DataManagement/mitkIPropertyFilters.cpp
+  DataManagement/mitkIPropertyPersistence.cpp
   DataManagement/mitkLandmarkProjectorBasedCurvedGeometry.cpp
   DataManagement/mitkLandmarkProjector.cpp
   DataManagement/mitkLevelWindow.cpp
@@ -138,6 +139,8 @@ set(CPP_FILES
   DataManagement/mitkPropertyList.cpp
   DataManagement/mitkPropertyListReplacedObserver.cpp
   DataManagement/mitkPropertyObserver.cpp
+  DataManagement/mitkPropertyPersistence.cpp
+  DataManagement/mitkPropertyPersistenceInfo.cpp
   DataManagement/mitkProportionalTimeGeometry.cpp
   DataManagement/mitkRenderingModeProperty.cpp
   DataManagement/mitkResliceMethodProperty.cpp

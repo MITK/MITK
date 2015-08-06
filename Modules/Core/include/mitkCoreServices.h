@@ -37,6 +37,7 @@ class IPropertyAliases;
 class IPropertyDescriptions;
 class IPropertyExtensions;
 class IPropertyFilters;
+class IPropertyPersistence;
 
 /**
  * @brief Access MITK core services.
@@ -94,6 +95,13 @@ public:
    * @return A non-NULL IPropertyFilters instance.
    */
   static IPropertyFilters* GetPropertyFilters(us::ModuleContext* context = us::GetModuleContext());
+
+  /**
+  * @brief Get an IPropertyPersistence instance.
+  * @param context The module context of the module getting the service.
+  * @return A non-NULL IPropertyPersistence instance.
+  */
+  static IPropertyPersistence* GetPropertyPersistence(us::ModuleContext* context = us::GetModuleContext());
 
   /**
    * @brief Get an IMimeTypeProvider instance.

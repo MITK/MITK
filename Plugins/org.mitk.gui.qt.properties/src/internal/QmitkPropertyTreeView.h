@@ -30,6 +30,7 @@ namespace mitk
 {
   class IPropertyAliases;
   class IPropertyDescriptions;
+  class IPropertyPersistence;
 }
 
 class QmitkPropertyTreeView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
@@ -71,7 +72,9 @@ private:
   std::string m_SelectionClassName;
   mitk::IPropertyAliases* m_PropertyAliases;
   mitk::IPropertyDescriptions* m_PropertyDescriptions;
+  mitk::IPropertyPersistence* m_PropertyPersistence;
   bool m_ShowAliasesInDescription;
+  bool m_ShowPersistenceInDescription;
   bool m_DeveloperMode;
   Ui::QmitkPropertyTreeView m_Controls;
   QmitkPropertyItemSortFilterProxyModel* m_ProxyModel;

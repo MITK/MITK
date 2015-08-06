@@ -22,6 +22,7 @@ const QString QmitkPropertiesPreferencePage::FILTER_PROPERTIES = "filter propert
 const QString QmitkPropertiesPreferencePage::SHOW_ALIASES = "show aliases";
 const QString QmitkPropertiesPreferencePage::SHOW_DESCRIPTIONS = "show descriptions";
 const QString QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION = "show aliases in description";
+const QString QmitkPropertiesPreferencePage::SHOW_PERSISTENCE_IN_DESCRIPTION = "show persistence in description";
 const QString QmitkPropertiesPreferencePage::DEVELOPER_MODE = "enable developer mode";
 
 QmitkPropertiesPreferencePage::QmitkPropertiesPreferencePage()
@@ -56,6 +57,7 @@ void QmitkPropertiesPreferencePage::Init(berry::IWorkbench::Pointer)
 void QmitkPropertiesPreferencePage::OnShowDescriptionsStateChanged(int state)
 {
   m_Controls.showAliasesInDescriptionCheckBox->setEnabled(state != Qt::Unchecked);
+  m_Controls.showPersistenceInDescriptionCheckBox->setEnabled(state != Qt::Unchecked);
 }
 
 bool QmitkPropertiesPreferencePage::PerformOk()
@@ -64,6 +66,7 @@ bool QmitkPropertiesPreferencePage::PerformOk()
   m_Preferences->PutBool(SHOW_ALIASES, m_Controls.showAliasesCheckBox->isChecked());
   m_Preferences->PutBool(SHOW_DESCRIPTIONS, m_Controls.showDescriptionsCheckBox->isChecked());
   m_Preferences->PutBool(SHOW_ALIASES_IN_DESCRIPTION, m_Controls.showAliasesInDescriptionCheckBox->isChecked());
+  m_Preferences->PutBool(SHOW_PERSISTENCE_IN_DESCRIPTION, m_Controls.showPersistenceInDescriptionCheckBox->isChecked());
   m_Preferences->PutBool(DEVELOPER_MODE, m_Controls.enableDeveloperModeCheckBox->isChecked());
 
   return true;
@@ -79,5 +82,6 @@ void QmitkPropertiesPreferencePage::Update()
   m_Controls.showAliasesCheckBox->setChecked(m_Preferences->GetBool(SHOW_ALIASES, true));
   m_Controls.showDescriptionsCheckBox->setChecked(m_Preferences->GetBool(SHOW_DESCRIPTIONS, true));
   m_Controls.showAliasesInDescriptionCheckBox->setChecked(m_Preferences->GetBool(SHOW_ALIASES_IN_DESCRIPTION, true));
+  m_Controls.showPersistenceInDescriptionCheckBox->setChecked(m_Preferences->GetBool(SHOW_PERSISTENCE_IN_DESCRIPTION, true));
   m_Controls.enableDeveloperModeCheckBox->setChecked(m_Preferences->GetBool(DEVELOPER_MODE, false));
 }

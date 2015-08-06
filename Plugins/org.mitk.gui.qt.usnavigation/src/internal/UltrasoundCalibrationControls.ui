@@ -562,6 +562,13 @@ p, li { white-space: pre-wrap; }
             <widget class="QmitkDataStorageComboBox" name="m_ReferencePointsComboBox"/>
            </item>
            <item>
+            <widget class="QPushButton" name="m_StartVerification">
+             <property name="text">
+              <string>Start Verification</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QLabel" name="label_18">

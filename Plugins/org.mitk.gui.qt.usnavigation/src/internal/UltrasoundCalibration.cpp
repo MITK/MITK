@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkVector.h>
 //#include <mitkPointSetWriter.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkImageGenerator.h>
 #include <mitkSceneIO.h>
 #include <mitkNodePredicateNot.h>
@@ -79,6 +80,8 @@ UltrasoundCalibration::~UltrasoundCalibration()
   if (node.IsNotNull())this->GetDataStorage()->Remove(node);*/
   mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Needle Path");
   if (node.IsNotNull())this->GetDataStorage()->Remove(node);
+
+  this->GetDataStorage()->Remove(m_VerificationReferencePointsDataNode);
 
   delete m_Timer;
 }
@@ -141,11 +144,29 @@ void UltrasoundCalibration::CreateQtPartControl( QWidget *parent )
            this, SLOT(OnDeviceSelected()) );
   connect( m_Controls.m_CombinedModalityManagerWidget, SIGNAL(SignalNoLongerReadyForNextStep()),
     this, SLOT(OnDeviceDeselected()) );
-
   connect( m_Controls.m_StartCalibrationButton, SIGNAL(clicked()), this, SLOT(OnStartCalibrationProcess()) );
-
   connect( m_Controls.m_CalibBtnRestartCalibration, SIGNAL(clicked()), this, SLOT(OnReset()) );
   connect( m_Controls.m_CalibBtnStopCalibration, SIGNAL(clicked()), this, SLOT(OnStopCalibrationProcess()) );
+
+  connect( m_Controls.m_AddReferencePoints, SIGNAL(clicked()), this, SLOT(OnAddCurrentTipPositionToReferencePoints()) );
+  connect( m_Controls.m_AddCurrentPointerTipForVerification, SIGNAL(clicked()), this, SLOT(OnAddCurrentTipPositionForVerification()) );
+  connect( m_Controls.m_StartVerification, SIGNAL(clicked()), this, SLOT(OnStartVerification()) );
+
+  //initialize data storage combo box
+  m_Controls.m_ReferencePointsComboBox->SetDataStorage(this->GetDataStorage());
+  m_Controls.m_ReferencePointsComboBox->SetAutoSelectNewItems(true);
+  m_Controls.m_ReferencePointsComboBox->SetPredicate(mitk::NodePredicateDataType::New("PointSet"));
+
+  //initialize point list widget
+  if (m_VerificationReferencePoints.IsNull()) {m_VerificationReferencePoints = mitk::PointSet::New();}
+  if (m_VerificationReferencePointsDataNode.IsNull())
+    {
+    m_VerificationReferencePointsDataNode = mitk::DataNode::New();
+    m_VerificationReferencePointsDataNode->SetName("US Verification Reference Points");
+    m_VerificationReferencePointsDataNode->SetData(m_VerificationReferencePoints);
+    this->GetDataStorage()->Add(m_VerificationReferencePointsDataNode);
+    }
+  m_Controls.m_ReferencePointsPointListWidget->SetPointSetNode(m_VerificationReferencePointsDataNode);
 }
 
 void UltrasoundCalibration::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -192,6 +213,29 @@ void UltrasoundCalibration::OnDeviceDeselected()
   m_Controls.m_TabWidget->setCurrentIndex(0);
   m_Controls.m_TabWidget->setTabEnabled(1, false);
   m_Controls.m_TabWidget->setTabEnabled(2, false);
+}
+
+void UltrasoundCalibration::OnAddCurrentTipPositionToReferencePoints()
+{
+if (m_Controls.m_VerificationPointerChoser->GetSelectedNavigationDataSource().IsNull() ||
+    (m_Controls.m_VerificationPointerChoser->GetSelectedToolID() == -1))
+  {
+  MITK_WARN << "No tool selected, aborting";
+  return;
+  }
+mitk::NavigationData::Pointer currentPointerData = m_Controls.m_VerificationPointerChoser->GetSelectedNavigationDataSource()->GetOutput(m_Controls.m_VerificationPointerChoser->GetSelectedToolID());
+mitk::Point3D currentTipPosition = currentPointerData->GetPosition();
+m_VerificationReferencePoints->InsertPoint(m_VerificationReferencePoints->GetSize(),currentTipPosition);
+}
+
+void UltrasoundCalibration::OnStartVerification()
+{
+
+}
+
+void UltrasoundCalibration::OnAddCurrentTipPositionForVerification()
+{
+
 }
 
 void UltrasoundCalibration::OnStartCalibrationProcess()

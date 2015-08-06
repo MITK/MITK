@@ -514,21 +514,39 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
     mitk::Point3D newScale = pointOp->GetPoint();
     ScalarType data[3];
     /* calculate new scale: newscale = oldscale * (oldscale + scaletoadd)/oldscale */
+    MITK_INFO << "newScale: " << newScale;
+    MITK_INFO << "GetMatrixColumn: "<< GetMatrixColumn(0).magnitude();
+    MITK_INFO << "GetMatrixColumn: "<< GetMatrixColumn(1).magnitude();
+    MITK_INFO << "GetMatrixColumn: "<< GetMatrixColumn(2).magnitude();
+
     data[0] = 1 + (newScale[0] / GetMatrixColumn(0).magnitude());
     data[1] = 1 + (newScale[1] / GetMatrixColumn(1).magnitude());
     data[2] = 1 + (newScale[2] / GetMatrixColumn(2).magnitude());
 
     mitk::Point3D center = const_cast<mitk::BoundingBox*>(m_BoundingBox.GetPointer())->GetCenter();
+    center = this->GetCenter();
+
     ScalarType pos[3];
+
     vtktransform->GetPosition(pos);
+    MITK_INFO << "center: " << center;
+    MITK_INFO << "pos: " << pos[0] << ", " << pos[1] << ", " << pos[2];
+    MITK_INFO << "data: " << data[0] << ", " << data[1] << ", " << data[2];
     vtktransform->PostMultiply();
     vtktransform->Translate(-pos[0], -pos[1], -pos[2]);
     vtktransform->Translate(-center[0], -center[1], -center[2]);
     vtktransform->PreMultiply();
     vtktransform->Scale(data[0], data[1], data[2]);
     vtktransform->PostMultiply();
-    vtktransform->Translate(+center[0], +center[1], +center[2]);
-    vtktransform->Translate(pos[0], pos[1], pos[2]);
+//    vtktransform->Translate(+center[0], +center[1], +center[2]);
+    vtktransform->Translate(pos[0]/data[0], pos[1]/data[1], pos[2]/data[2]);
+    ScalarType newOffset[3];
+    newOffset[0]= center[0]/data[0];
+    newOffset[1]= center[1]/data[1];
+    newOffset[2]= center[2]/data[2];
+    MITK_INFO << "New Offset: " << newOffset[0] <<" " << newOffset[1] << " " << newOffset[2];
+//    vtktransform->Translate(+center[0]*data[0], +center[1]*data[1], +center[2]*data[2]);
+    vtktransform->Translate(newOffset[0],newOffset[1],newOffset[2]);
     vtktransform->PreMultiply();
     break;
   }

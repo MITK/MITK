@@ -68,7 +68,11 @@ protected slots:
      */
     void OnUsageInfoBoxChanged(bool flag);
 
-  protected:
+    /**
+     * @brief OnRotationPointChanged Slot to change the point of rotation.
+     */
+    void OnRotationPointChanged(double);
+protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;
 

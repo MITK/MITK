@@ -35,6 +35,9 @@ const char* deselectedColorPropertyName     = "AffineBaseDataInteractor3D.Desele
 const char* priorPropertyName               = "AffineBaseDataInteractor3D.Prior Color";
 const char* rotationStepSizePropertyName    = "AffineBaseDataInteractor3D.Rotation Step Size";
 const char* scaleStepSizePropertyName       = "AffineBaseDataInteractor3D.Scale Step Size";
+const char* rotationPointX                  = "AffineBaseDataInteractor3D.Rotation Point X";
+const char* rotationPointY                  = "AffineBaseDataInteractor3D.Rotation Point Y";
+const char* rotationPointZ                  = "AffineBaseDataInteractor3D.Rotation Point Z";
 
 mitk::AffineBaseDataInteractor3D::AffineBaseDataInteractor3D()
 {
@@ -223,15 +226,28 @@ void mitk::AffineBaseDataInteractor3D::ScaleGeometry(mitk::Point3D newScale, mit
   PointOperation* doOp = new mitk::PointOperation(OpSCALE, newScale, 0);
   geometry->ExecuteOperation(doOp);
 
+  mitk::RenderingManager::GetInstance()->InitializeViews(this->GetDataNode()->GetData()->GetGeometry());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::AffineBaseDataInteractor3D::RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry* geometry)
 {
   mitk::Vector3D rotationAxis = geometry->GetAxisVector(rotationaxis);
-  mitk::Point3D center = geometry->GetCenter();
+  float pointX = 0.0f;
+  float pointY = 0.0f;
+  float pointZ = 0.0f;
+  mitk::Point3D pointOfRotation;
+  pointOfRotation.Fill(0.0);
+  this->GetDataNode()->GetFloatProperty(rotationPointX, pointX);
+  this->GetDataNode()->GetFloatProperty(rotationPointY, pointY);
+  this->GetDataNode()->GetFloatProperty(rotationPointZ, pointZ);
+  pointOfRotation[0] = pointX;
+  pointOfRotation[1] = pointY;
+  pointOfRotation[2] = pointZ;
 
-  mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, center, rotationAxis, angle);
+  MITK_WARN << "rotation around: " << pointOfRotation;
+
+  mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, pointOfRotation, rotationAxis, angle);
 
   geometry->ExecuteOperation(doOp);
   delete doOp;
@@ -531,7 +547,7 @@ bool mitk::AffineBaseDataInteractor3D::RotateObject (StateMachineAction*, Intera
     return false;
 }
 
-bool mitk::AffineBaseDataInteractor3D::ScaleObject(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::AffineBaseDataInteractor3D::ScaleObject(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {
   return true;
 }

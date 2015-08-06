@@ -45,6 +45,9 @@ void QmitkGeometryToolsView::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_TranslationStep, SIGNAL(valueChanged(double)), this, SLOT(OnTranslationSpinBoxChanged(double)) );
   connect( m_Controls.m_RotationStep, SIGNAL(valueChanged(double)), this, SLOT(OnRotationSpinBoxChanged(double)) );
   connect( m_Controls.m_ScaleFactor, SIGNAL(valueChanged(double)), this, SLOT(OnScaleSpinBoxChanged(double)) );
+  connect( m_Controls.m_RotationPointX, SIGNAL(valueChanged(double)), this, SLOT(OnRotationPointChanged(double)) );
+  connect( m_Controls.m_RotationPointY, SIGNAL(valueChanged(double)), this, SLOT(OnRotationPointChanged(double)) );
+  connect( m_Controls.m_RotationPointZ, SIGNAL(valueChanged(double)), this, SLOT(OnRotationPointChanged(double)) );
   connect( m_Controls.m_UsageInfoCheckBox, SIGNAL(clicked(bool)), this, SLOT(OnUsageInfoBoxChanged(bool)) );
 
   m_Controls.m_UsageInfo->hide();
@@ -93,9 +96,12 @@ void QmitkGeometryToolsView::AddInteractor()
       affineDataInteractor->SetDataNode(node);
 
       node->SetBoolProperty("pickable", true);
-      node->SetFloatProperty("AffineDataInteractor3D.Translation Step Size", m_Controls.m_TranslationStep->value());
-      node->SetFloatProperty("AffineDataInteractor3D.Rotation Step Size", m_Controls.m_RotationStep->value());
-      node->SetFloatProperty("AffineDataInteractor3D.Scale Step Size", m_Controls.m_ScaleFactor->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Translation Step Size", m_Controls.m_TranslationStep->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Step Size", m_Controls.m_RotationStep->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Scale Step Size", m_Controls.m_ScaleFactor->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Point X", m_Controls.m_RotationPointX->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Point Y", m_Controls.m_RotationPointY->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Point Z", m_Controls.m_RotationPointZ->value());
     }
   }
 }
@@ -119,7 +125,7 @@ void QmitkGeometryToolsView::OnTranslationSpinBoxChanged(double step)
   {
     if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
     {
-      node->SetFloatProperty("AffineDataInteractor3D.Translation Step Size", step);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Translation Step Size", step);
     }
   }
 }
@@ -131,7 +137,7 @@ void QmitkGeometryToolsView::OnRotationSpinBoxChanged(double step)
   {
     if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
     {
-      node->SetFloatProperty("AffineDataInteractor3D.Rotation Step Size", step);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Step Size", step);
     }
   }
 }
@@ -143,7 +149,21 @@ void QmitkGeometryToolsView::OnScaleSpinBoxChanged(double factor)
   {
     if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
     {
-      node->SetFloatProperty("AffineDataInteractor3D.Scale Step Size", factor);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Scale Step Size", factor);
+    }
+  }
+}
+
+void QmitkGeometryToolsView::OnRotationPointChanged(double /*value*/)
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  foreach( mitk::DataNode::Pointer node, nodes )
+  {
+    if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
+    {
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Point X", m_Controls.m_RotationPointX->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Point Y", m_Controls.m_RotationPointY->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Point Z", m_Controls.m_RotationPointZ->value());
     }
   }
 }

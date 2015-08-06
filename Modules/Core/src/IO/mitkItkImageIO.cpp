@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
+#include <mitkLocaleSwitch.h>
 
 #include <itkImage.h>
 #include <itkImageIOFactory.h>
@@ -28,8 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIORegion.h>
 #include <itkMetaDataObject.h>
 
-#include <mitkLocaleSwitch.h>
-
+#include <algorithm>
 
 namespace mitk {
 
@@ -304,10 +304,13 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End();
        iter != iterEnd; ++iter)
   {
-    std::string key = std::string("meta.") + iter->first;
     if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
     {
+      std::string key = iter->first;
       std::string value = dynamic_cast<itk::MetaDataObject<std::string>*>(iter->second.GetPointer())->GetMetaDataObjectValue();
+
+      std::replace(key.begin(), key.end(), '_', '.');
+
       image->SetProperty(key.c_str(), mitk::StringProperty::New(value));
     }
   }

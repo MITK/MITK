@@ -13,8 +13,8 @@
    height="64px"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="dialog-question.svg">
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="dialog-warning.svg">
   <defs
      id="defs2987" />
   <sodipodi:namedview
@@ -25,7 +25,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.75"
-     inkscape:cx="77.082463"
+     inkscape:cx="22.718827"
      inkscape:cy="79.050308"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,16 +52,13 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
-    <text
-       xml:space="preserve"
-       style="font-size:62.13568497px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"
-       x="0.93144906"
-       y="56.592827"
-       id="text2993"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan2995"
-         x="0.93144906"
-         y="56.592827"></tspan></text>
+    <g
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:62.13568497px;line-height:125%;font-family:FontAwesome;-inkscape-font-specification:FontAwesome;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="text2993">
+      <path
+         d="m 36.437555,51.010324 c 0,0.624131 -0.485435,1.14424 -1.109566,1.14424 l -6.657395,0 c -0.624131,0 -1.109566,-0.520109 -1.109566,-1.14424 l 0,-6.588047 c 0,-0.624131 0.485435,-1.14424 1.109566,-1.14424 l 6.657395,0 c 0.624131,0 1.109566,0.520109 1.109566,1.14424 l 0,6.588047 z m -0.06935,-12.96805 c -0.03467,0.450761 -0.554783,0.7975 -1.178914,0.7975 l -6.414677,0 c -0.658805,0 -1.178914,-0.346739 -1.178914,-0.7975 L 27.006245,22.196287 c 0,-0.208044 0.104022,-0.554783 0.34674,-0.728153 0.208043,-0.173369 0.520109,-0.381413 0.832174,-0.381413 l 7.628265,0 c 0.312065,0 0.624131,0.208044 0.832174,0.381413 0.242718,0.17337 0.34674,0.450762 0.34674,0.658805 L 36.368207,38.042274 Z M 35.882772,5.6568217 c -0.762827,-1.4216312 -2.253806,-2.3231534 -3.88348,-2.3231534 -1.629675,0 -3.120654,0.9015222 -3.883481,2.3231534 L 1.486232,54.477717 C 0.72340547,55.83 0.7580794,57.494349 1.5555798,58.846632 2.3530802,60.198916 3.8093854,61.03109 5.3697123,61.03109 l 53.2591587,0 c 1.560327,0 3.016632,-0.832174 3.814132,-2.184458 0.797501,-1.352283 0.832175,-3.016632 0.06935,-4.368915 L 35.882772,5.6568217 Z"
+         style=""
+         id="path15227" />
+    </g>
   </g>
 </svg>

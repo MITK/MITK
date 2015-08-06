@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "qtsingleapplication.h"
 
+#include <QDataStream>
+
 #if QT_VERSION < 0x050000
 
 #include <QDir>

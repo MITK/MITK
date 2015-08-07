@@ -25,17 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <tinyxml.h>
 
-mitk::CustomMimeType mitk::GeometryDataReaderService::GEOMETRY_DATA_MIMETYPE()
-{
-  mitk::CustomMimeType mimeType( IOMimeTypes::DEFAULT_BASE_NAME() + ".geometrydata" );
-  mimeType.AddExtension("mitkgeometry");
-  mimeType.SetCategory("Geometries");
-  mimeType.SetComment("GeometryData object");
-  return mimeType;
-}
-
 mitk::GeometryDataReaderService::GeometryDataReaderService()
-  : AbstractFileReader( GEOMETRY_DATA_MIMETYPE(), "MITK Geometry Data Reader")
+  : AbstractFileReader( IOMimeTypes::GEOMETRY_DATA_MIMETYPE(), "MITK Geometry Data Reader")
 {
   RegisterService();
 }

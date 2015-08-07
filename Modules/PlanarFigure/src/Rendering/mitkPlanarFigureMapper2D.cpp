@@ -195,9 +195,51 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
       planarFigurePlaneGeometry, rendererPlaneGeometry, renderer );
 
     pointlist.push_back(displayPoint);
+  }
 
-    if ( displayPoint[0] > rightMostPoint[0] )
-      rightMostPoint = displayPoint;
+  if (!pointlist.size())
+  {
+    return;
+  }
+
+  if (pointlist.size() == 2)
+  {
+    rightMostPoint = pointlist[1];
+
+    // The calculation of the position of the text commentary on the checkpoint line.
+    // mitk::TextOrientation::TextRigth - the text is to the right of the marker point line.
+    // mitk::TextOrientation::TextCenterBottom - the text is centered at the marker point line.
+    // mitk::TextOrientation::TextCenterTop - the text is centered on the point of the line convenience store.
+    // mitk::TextOrientation::TextLeft - the text is to the left of the line marker points.
+    mitk::TextOrientation orientation = mitk::TextOrientation::TextRigth;
+    mitk::Point2D begin = pointlist[0];
+    mitk::Point2D end = pointlist[1];
+
+    if (begin[0] > end[0])
+    {
+      orientation = mitk::TextOrientation::TextLeft;
+    }
+    else if (begin[0] == end[0])
+    {
+      if (end[1] > begin[1])
+      {
+        orientation = mitk::TextOrientation::TextCenterTop;
+      }
+      else if ((end[1] < begin[1]) || (end[1] == begin[1]))
+      {
+        orientation = mitk::TextOrientation::TextCenterBottom;
+      }
+    }
+    else
+    {
+      orientation = mitk::TextOrientation::TextRigth;
+    }
+
+    m_AnnotationOverlay->SetOrientation(orientation);
+  }
+  else
+  {
+    rightMostPoint = pointlist[0];
   }
 
   // If the planarfigure is closed, we add the first control point again.

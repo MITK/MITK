@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkILifecycleAwarePart.h>
 #include "usServiceRegistration.h"
 
-#include "QmitkCommentTextView.h"
-
 /// forward declarations
 struct QmitkMeasurementViewData;
 namespace mitk
@@ -76,11 +74,17 @@ class QmitkMeasurementView : public QmitkAbstractView
     void OnDrawSubdivisionPolygonTriggered( bool checked = false );
     void OnCopyToClipboard( bool checked = false );
 
+    void CommentDoneTriggered( bool checked = false );
+    void CommentCanselTriggered( bool checked = false );
+
   private:
 
-    const static QString TR_REF_IMAGE; 
-    const static QString TR_CLIPBOARD_COPY; 
-    const static QString TR_NO_AVAIBLE_IMAGE; 
+    const static QString TR_REF_IMAGE;
+    const static QString TR_CLIPBOARD_COPY;
+    const static QString TR_NO_AVAIBLE_IMAGE;
+    const static QString TR_COMMENT_DONE;
+    const static QString TR_COMMENT_CANCEL;
+    const static QString TR_COMMENT_TEXT;
 
     void CreateConnections();
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
@@ -90,15 +94,22 @@ class QmitkMeasurementView : public QmitkAbstractView
     void EnableCrosshairNavigation();
     void DisableCrosshairNavigation();
     void PlanarFigureInitialized();
+
     void CheckForTopMostVisibleImage(mitk::DataNode* nodeToNeglect = nullptr);
+
+    void AddInitialPoint();
+
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
 
-    QmitkMeasurementViewData* d;
+    void hideCommentTextView();
+    void showCommentTextView(const std::string& text = std::string());
 
     // holds configuration objects that have been deactivated
     std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;
 
     QmitkCommentTextView m_commentTextView;
+
+    QmitkMeasurementViewData* d;
 };
 
 #endif // QMITK_MEASUREMENT_H__INCLUDED

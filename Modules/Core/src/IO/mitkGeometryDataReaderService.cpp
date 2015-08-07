@@ -59,8 +59,6 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
       bool isImageGeometry(false);
       unsigned int frameOfReferenceID(0);
       BaseGeometry::BoundsArrayType bounds;
-      Point3D origin;
-      Vector3D spacing;
 
       if ( TIXML_SUCCESS != currentGeometryElement->QueryUnsignedAttribute("FrameOfReferenceID", &frameOfReferenceID) )
       {
@@ -149,44 +147,6 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
           }
        }
 
-      // origin + spacing
-      if (TiXmlElement* originElem = currentGeometryElement->FirstChildElement("Origin")->ToElement())
-      {
-        bool vectorComplete = true;
-        vectorComplete &= TIXML_SUCCESS == originElem->QueryDoubleAttribute("x", &origin[0]);
-        vectorComplete &= TIXML_SUCCESS == originElem->QueryDoubleAttribute("y", &origin[1]);
-        vectorComplete &= TIXML_SUCCESS == originElem->QueryDoubleAttribute("z", &origin[2]);
-
-        if (!vectorComplete)
-        {
-            MITK_ERROR << "Could not parse complete Geometry3D origin!";
-            break;
-        }
-      }
-      else
-      {
-        MITK_ERROR << "Parse error: expected Origin child below Geometry3D node";
-      }
-
-      if (TiXmlElement* spacingElem = currentGeometryElement->FirstChildElement("Spacing")->ToElement())
-      {
-        bool vectorComplete = true;
-        vectorComplete &= TIXML_SUCCESS == spacingElem->QueryDoubleAttribute("x", &spacing[0]);
-        vectorComplete &= TIXML_SUCCESS == spacingElem->QueryDoubleAttribute("y", &spacing[1]);
-        vectorComplete &= TIXML_SUCCESS == spacingElem->QueryDoubleAttribute("z", &spacing[2]);
-
-        if (!vectorComplete)
-        {
-            MITK_ERROR << "Could not parse complete Geometry3D spacing!";
-            break;
-        }
-      }
-      else
-      {
-        MITK_ERROR << "Parse error: expected Spacing child below Geometry3D node";
-      }
-
-
       // build GeometryData from matrix/offset
       AffineTransform3D::Pointer newTransform = AffineTransform3D::New();
       newTransform->SetMatrix( matrix );
@@ -199,9 +159,6 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
       newGeometry->SetIndexToWorldTransform( newTransform );
 
       newGeometry->SetBounds(bounds);
-      newGeometry->SetOrigin(origin);
-      newGeometry->SetSpacing( spacing ); // TODO parameter?!
-
 
       GeometryData::Pointer newGeometryData = GeometryData::New();
       newGeometryData->SetGeometry( newGeometry );

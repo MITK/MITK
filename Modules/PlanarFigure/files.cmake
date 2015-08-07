@@ -9,6 +9,7 @@ set(CPP_FILES
   DataManagement/mitkPlanarAngle.cpp
   DataManagement/mitkPlanarBezierCurve.cpp
   DataManagement/mitkPlanarCircle.cpp
+  DataManagement/mitkPlanarComment.cpp
   DataManagement/mitkPlanarDoubleEllipse.cpp
   DataManagement/mitkPlanarEllipse.cpp
   DataManagement/mitkPlanarCross.cpp

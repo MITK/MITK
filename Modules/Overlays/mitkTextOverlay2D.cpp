@@ -26,11 +26,18 @@ mitk::TextOverlay2D::TextOverlay2D()
   position[0] = position[1] = 0;
   SetPosition2D(position);
   SetOffsetVector(position);
+
+  m_Orientation = TextOrientation::TextRigth;
 }
 
 
 mitk::TextOverlay2D::~TextOverlay2D()
 {
+}
+
+void mitk::TextOverlay2D::SetOrientation(const TextOrientation& orientation)
+{
+  m_Orientation = orientation;
 }
 
 mitk::Overlay::Bounds mitk::TextOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer) const
@@ -63,8 +70,42 @@ mitk::TextOverlay2D::LocalStorage::LocalStorage()
   m_TextProp = vtkSmartPointer<vtkTextProperty>::New();
   m_STextActor = vtkSmartPointer<vtkTextActor>::New();
   m_STextProp = vtkSmartPointer<vtkTextProperty>::New();
-  m_TextActor->SetTextProperty( m_TextProp );
-  m_STextActor->SetTextProperty( m_STextProp );
+
+  std::string m_programPath;
+
+#ifndef _WIN32
+#include <unistd.h>
+#include <limits.h>
+
+  char buff[PATH_MAX];
+  ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
+  if (len != -1) {
+    buff[len] = '\0';
+    m_programPath = std::string(buff);
+  }
+#else
+
+  m_programPath.resize(1024);
+  DWORD pathSize = GetModuleFileNameA(nullptr, &m_programPath[0], m_programPath.size());
+  m_programPath.resize(pathSize);
+
+  std::string::size_type pos = m_programPath.rfind("\\");
+  if (pos != std::string::npos) {
+    m_programPath.erase(pos + 1, m_programPath.size());
+  }
+
+#endif
+
+  std::string fontPath = m_programPath + std::string("Fonts\\DejaVuSans.ttf");
+
+  m_TextProp->SetFontFamily(VTK_FONT_FILE);
+  m_TextProp->SetFontFile(fontPath.c_str());
+
+  m_STextProp->SetFontFamily(VTK_FONT_FILE);
+  m_STextProp->SetFontFile(fontPath.c_str());
+
+  m_TextActor->SetTextProperty(m_TextProp);
+  m_STextActor->SetTextProperty(m_STextProp);
   m_Assembly = vtkSmartPointer<vtkPropAssembly>::New();
   m_Assembly->AddPart(m_STextActor);
   m_Assembly->AddPart(m_TextActor);
@@ -104,11 +145,64 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     posT = TransformDisplayPointToViewport(posT,renderer);
     posS = TransformDisplayPointToViewport(posS,renderer);
 
-    ls->m_TextActor->SetPosition(posT[0],posT[1]);
-    ls->m_STextActor->SetPosition(posS[0],posS[1]);
+    applyTextOrientation(ls->m_TextProp, m_Orientation);
+    applyTextOrientation(ls->m_STextProp, m_Orientation);
+
+    float xt = posT[0];
+    float yt = posT[1];
+    float xs = posS[0];
+    float ys = posS[1];
+
+    calculateTextPosWithOffset(xt, yt);
+    calculateTextPosWithOffset(xs, ys);
+
+    ls->m_TextActor->SetPosition(xt, yt);
+    ls->m_STextActor->SetPosition(xs, ys);
     ls->UpdateGenerateDataTime();
   }
+}
 
+void mitk::TextOverlay2D::applyTextOrientation(vtkSmartPointer<vtkTextProperty>& textProperty, mitk::TextOrientation& orientation)
+{
+  if (orientation == mitk::TextOrientation::TextRigth)
+  {
+    textProperty->SetJustificationToLeft();
+    textProperty->SetVerticalJustificationToTop();
+  }
+  else if (orientation == mitk::TextOrientation::TextCenterBottom)
+  {
+    textProperty->SetJustificationToCentered();
+    textProperty->SetVerticalJustificationToTop();
+  }
+  else if (orientation == mitk::TextOrientation::TextCenterTop)
+  {
+    textProperty->SetJustificationToCentered();
+    textProperty->SetVerticalJustificationToBottom();
+  }
+  else if (orientation == mitk::TextOrientation::TextLeft)
+  {
+    textProperty->SetJustificationToRight();
+    textProperty->SetVerticalJustificationToTop();
+  }
+}
+
+void mitk::TextOverlay2D::calculateTextPosWithOffset(float& x, float& y)
+{
+  x += 5.0;
+  y += 5.0;
+
+  if (m_Orientation == mitk::TextOrientation::TextLeft)
+  {
+    x -= 25.0;
+  }
+  else if (m_Orientation == mitk::TextOrientation::TextCenterTop)
+  {
+    y += 7.0;
+  }
+  else if (m_Orientation == mitk::TextOrientation::TextCenterBottom)
+  {
+    y -=10.0;
+  }
 }
 
 vtkProp *mitk::TextOverlay2D::GetVtkProp(mitk::BaseRenderer *renderer) const

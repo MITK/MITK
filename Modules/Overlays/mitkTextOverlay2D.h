@@ -27,6 +27,14 @@ class vtkPropAssembly;
 
 namespace mitk {
 
+  enum TextOrientation
+  {
+    TextRigth = 0,
+    TextCenterBottom,
+    TextCenterTop,
+    TextLeft
+  };
+
 /** \brief Displays text on the renderwindow */
 class MITKOVERLAYS_EXPORT TextOverlay2D : public mitk::VtkOverlay2D {
 public:
@@ -61,6 +69,7 @@ public:
   virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
   virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds& bounds) override;
 
+  void SetOrientation(const TextOrientation& orientation);
 
 protected:
 
@@ -79,11 +88,16 @@ protected:
 
 private:
 
+  TextOrientation m_Orientation;
+
   /** \brief copy constructor */
   TextOverlay2D( const TextOverlay2D &);
 
   /** \brief assignment operator */
   TextOverlay2D &operator=(const TextOverlay2D &);
+
+  void calculateTextPosWithOffset(float& x, float& y);
+  void applyTextOrientation(vtkSmartPointer<vtkTextProperty>& textProperty, mitk::TextOrientation& orientation);
 };
 
 } // namespace mitk

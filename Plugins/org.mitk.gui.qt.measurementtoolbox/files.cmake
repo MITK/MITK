@@ -30,6 +30,7 @@ set(CACHED_RESOURCE_FILES
   resources/angle.png
   resources/arrow.png
   resources/circle.png
+  resources/comment.png
   resources/four-point-angle.png
   resources/ImageStatistic_24.png
   resources/ImageStatistic_48.png

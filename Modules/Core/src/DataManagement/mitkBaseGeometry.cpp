@@ -888,6 +888,18 @@ bool mitk::Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometr
     result = false;
   }
 
+  //Compare FrameOfReference ID
+  if (rightHandSide.GetFrameOfReferenceID() != leftHandSide.GetFrameOfReferenceID())
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] GetFrameOfReferenceID is different.";
+      MITK_INFO << "rightHandSide is " << rightHandSide.GetFrameOfReferenceID() << " : leftHandSide is " << leftHandSide.GetFrameOfReferenceID();
+    }
+    result = false;
+  }
+
+
   //Compare BoundingBoxes
   if (!mitk::Equal(*leftHandSide.GetBoundingBox(), *rightHandSide.GetBoundingBox(), eps, verbose))
   {

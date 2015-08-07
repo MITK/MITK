@@ -15,8 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkGeometryDataWriterService.h"
-#include "mitkGeometryDataReaderService.h"
 #include "mitkIOMimeTypes.h"
+
+#include "mitkGeometry3D.h"
 
 #include <tinyxml.h>
 
@@ -28,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::GeometryDataWriterService::GeometryDataWriterService()
   : AbstractFileWriter(GeometryData::GetStaticNameOfClass(),
-                       GeometryDataReaderService::GEOMETRY_DATA_MIMETYPE(),
+                       IOMimeTypes::GEOMETRY_DATA_MIMETYPE(),
                        "MITK Geometry Data Writer")
 {
   RegisterService();

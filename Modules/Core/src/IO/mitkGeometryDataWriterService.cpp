@@ -105,8 +105,6 @@ void mitk::GeometryDataWriterService::WriteSpecific(TiXmlNode* rootNode, const G
   AffineTransform3D::MatrixType matrix = transform->GetMatrix();
   AffineTransform3D::OffsetType offset = transform->GetOffset();
   
-  Point3D origin = geom3D->GetOrigin();
-  Vector3D spacing = geom3D->GetSpacing();
   bool isImageGeometry = geom3D->GetImageGeometry();
   BaseGeometry::BoundsArrayType bounds = geom3D->GetBounds();
 
@@ -117,13 +115,6 @@ void mitk::GeometryDataWriterService::WriteSpecific(TiXmlNode* rootNode, const G
   geomElem->SetAttribute("FrameOfReferenceID", geom3D->GetFrameOfReferenceID());
 
   rootNode->LinkEndChild(geomElem);
-
-  // IndexToWorldTransform: matrix, offset, center, translation, scale? (which ones are redundant?? unit tests, search slides) 
-  // BoundingBox
-  // Origin
-  // ImageGeometry
-  // Spacing
-  // FrameOfReference
 
   // coefficients are matrix[row][column]!
   TiXmlElement* matrixElem = new TiXmlElement("IndexToWorld");
@@ -160,18 +151,4 @@ void mitk::GeometryDataWriterService::WriteSpecific(TiXmlNode* rootNode, const G
   boundsMaxElem->SetDoubleAttribute("z", bounds[5]);
   boundsElem->LinkEndChild(boundsMaxElem);
   geomElem->LinkEndChild(boundsElem);
-
-  TiXmlElement* originElem = new TiXmlElement("Origin");
-  originElem->SetAttribute("type", "Point3D");
-  originElem->SetDoubleAttribute("x", origin[0]);
-  originElem->SetDoubleAttribute("y", origin[1]);
-  originElem->SetDoubleAttribute("z", origin[2]);
-  geomElem->LinkEndChild(originElem);
-
-  TiXmlElement* spacingElem = new TiXmlElement("Spacing");
-  spacingElem->SetAttribute("type", "Vector3D");
-  spacingElem->SetDoubleAttribute("x", spacing[0]);
-  spacingElem->SetDoubleAttribute("y", spacing[1]);
-  spacingElem->SetDoubleAttribute("z", spacing[2]);
-  geomElem->LinkEndChild(spacingElem);
 }

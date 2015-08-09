@@ -48,6 +48,11 @@ public:
   //virtual void Initialize();
 
 
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 2;
+  }
+
   /** \brief Line has 2 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {

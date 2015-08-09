@@ -89,23 +89,23 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
     }
   }
 
-  bool isInitiallyPlaced = this->GetProperty("initiallyplaced");
+  bool isInitiallyPlaced = this->IsFinalized();
 
+  unsigned int prevIndex = 0;
+  m_PolyLineSegmentInfo.clear();
+  m_PolyLineSegmentInfo.push_back(0);
   unsigned int i;
   ControlPointListType::iterator it;
   for ( it = subdivisionPoints.begin(), i = 0;
         it != subdivisionPoints.end();
         ++it, ++i )
   {
-    // Determine the index of the control point FOLLOWING this poly-line element
-    // (this is needed by PlanarFigureInteractor to insert new points at the correct position,
-    // namely BEFORE the next control point)
     unsigned int nextIndex;
     if ( i == 0 )
     {
       // For the FIRST polyline point, use the index of the LAST control point
       // (it will used to check if the mouse is near the very last polyline element)
-      nextIndex = m_ControlPoints.size() - 1;
+      nextIndex = 0;
     }
     else
     {
@@ -118,6 +118,10 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
         this->AppendPointToPolyLine( 0, m_ControlPoints[m_ControlPoints.size()-1] );
         break;
       }
+    }
+    if (nextIndex != prevIndex) {
+        prevIndex = nextIndex;
+        m_PolyLineSegmentInfo.push_back(i);
     }
 
     this->AppendPointToPolyLine( 0, *it );

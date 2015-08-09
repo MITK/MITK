@@ -23,7 +23,6 @@ mitk::PlanarBezierCurve::PlanarBezierCurve()
   : FEATURE_ID_LENGTH(Superclass::AddFeature("Length", "mm")),
     m_NumberOfSegments(100)
 {
-  this->ResetNumberOfControlPoints(2);
   this->SetNumberOfPolyLines(1);
   this->SetNumberOfHelperPolyLines(1);
 }
@@ -33,8 +32,9 @@ void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
 {
   double length = 0.0;
 
+  PolyLineType polyLine = GetPolyLine(0);
   for (unsigned int i = 0; i < m_NumberOfSegments; ++i)
-    length += static_cast<Point2D>(m_PolyLines[0][i]).EuclideanDistanceTo(static_cast<Point2D>(m_PolyLines[0][i + 1]));
+      length += static_cast<Point2D>(polyLine[i]).EuclideanDistanceTo(static_cast<Point2D>(polyLine[i + 1]));
 
   this->SetQuantity(FEATURE_ID_LENGTH, length);
 }
@@ -68,6 +68,10 @@ void mitk::PlanarBezierCurve::GenerateHelperPolyLine(double, unsigned int)
 void mitk::PlanarBezierCurve::GeneratePolyLine()
 {
   this->ClearPolyLines();
+
+  if (this->GetNumberOfControlPoints() < 2) {
+      return;
+  }
 
   const unsigned int numPolyLinePoints = m_NumberOfSegments + 1;
 
@@ -139,13 +143,17 @@ unsigned int mitk::PlanarBezierCurve::GetMinimumNumberOfControlPoints() const
   return 2;
 }
 
-bool mitk::PlanarBezierCurve::IsHelperToBePainted(unsigned int index)
+bool mitk::PlanarBezierCurve::IsHelperToBePainted(unsigned int index) const
 {
   return index == 0 && m_ControlPoints.size() > 2;
 }
 
 bool mitk::PlanarBezierCurve::Equals(const PlanarFigure &other) const
 {
+  if (!Superclass::Equals(other)) { // Also force polyline generation
+      return false;
+  }
+
   const mitk::PlanarBezierCurve* otherBezierCurve = dynamic_cast<const mitk::PlanarBezierCurve*>(&other);
   if ( otherBezierCurve )
   {
@@ -153,7 +161,7 @@ bool mitk::PlanarBezierCurve::Equals(const PlanarFigure &other) const
       return false;
     if( this->m_DeCasteljauPoints != otherBezierCurve->m_DeCasteljauPoints )
       return false;
-    return Superclass::Equals(other);
+    return true;
   }
   else
   {

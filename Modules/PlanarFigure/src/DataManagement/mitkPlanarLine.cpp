@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PlanarLine::PlanarLine()
 : FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) )
 {
-  // Line has two control points
-  this->ResetNumberOfControlPoints( 2 );
-
   this->SetNumberOfPolyLines( 1 );
 }
 

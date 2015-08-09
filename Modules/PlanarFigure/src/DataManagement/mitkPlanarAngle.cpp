@@ -22,9 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PlanarAngle::PlanarAngle()
 : FEATURE_ID_ANGLE( this->AddFeature( "Angle", "deg" ) )
 {
-  // Start with two control points
-  this->ResetNumberOfControlPoints( 2 );
-
   this->SetNumberOfPolyLines(1);
   this->SetNumberOfHelperPolyLines(1);
 

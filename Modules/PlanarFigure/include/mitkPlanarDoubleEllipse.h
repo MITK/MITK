@@ -32,6 +32,7 @@ namespace mitk
     unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
 
+    virtual unsigned int GetPlacementNumberOfControlPoints() const override;
     virtual unsigned int GetMaximumNumberOfControlPoints() const override;
     virtual unsigned int GetMinimumNumberOfControlPoints() const override;
     virtual bool SetControlPoint(unsigned int index, const Point2D& point, bool createIfDoesNotExist = true) override;

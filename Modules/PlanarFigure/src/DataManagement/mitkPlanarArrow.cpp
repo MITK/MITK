@@ -23,7 +23,6 @@ mitk::PlanarArrow::PlanarArrow()
 : FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) )
 {
   // Directed arrow has two control points
-  this->ResetNumberOfControlPoints( 2 );
   m_ArrowTipScaleFactor = -1.0;
 
   this->SetNumberOfPolyLines( 1 );

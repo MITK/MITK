@@ -24,10 +24,9 @@ mitk::PlanarDoubleEllipse::PlanarDoubleEllipse()
     FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
     FEATURE_ID_THICKNESS(Superclass::AddFeature("Thickness", "mm")),
     m_NumberOfSegments(64),
-    m_ConstrainCircle(true),
-    m_ConstrainThickness(true)
+    m_ConstrainCircle(false),
+    m_ConstrainThickness(false)
 {
-  this->ResetNumberOfControlPoints(4);
   this->SetNumberOfPolyLines(2);
   this->SetProperty("closed", mitk::BoolProperty::New(true));
 }
@@ -35,6 +34,10 @@ mitk::PlanarDoubleEllipse::PlanarDoubleEllipse()
 
 mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D& point)
 {
+  if (!m_FigureFinalized) {
+      return point;
+  }
+
   if (index == 2 && !m_ConstrainCircle)
   {
     Point2D centerPoint = this->GetControlPoint(0);
@@ -163,6 +166,11 @@ void mitk::PlanarDoubleEllipse::SetNumberOfSegments(unsigned int numSegments)
   }
 }
 
+unsigned int mitk::PlanarDoubleEllipse::GetPlacementNumberOfControlPoints() const
+{
+    return 4;
+}
+
 unsigned int mitk::PlanarDoubleEllipse::GetMaximumNumberOfControlPoints() const
 {
   return 4;
@@ -203,7 +211,7 @@ bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2
       outerMinorVector[0] = outerMajorVector[1];
       outerMinorVector[1] = -outerMajorVector[0];
 
-      if (!m_ConstrainCircle)
+      if (!m_ConstrainCircle && m_FigureFinalized)
       {
         outerMinorVector.Normalize();
         outerMinorVector *= centerPoint.EuclideanDistanceTo(this->GetControlPoint(2));
@@ -213,7 +221,7 @@ bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2
 
       Vector2D innerMajorVector = outerMajorVector;
 
-      if (!m_ConstrainThickness)
+      if (!m_ConstrainThickness && m_FigureFinalized)
       {
         innerMajorVector.Normalize();
         innerMajorVector *= centerPoint.EuclideanDistanceTo(this->GetControlPoint(3) - vector);
@@ -226,7 +234,6 @@ bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2
 
     case 2:
     {
-      m_ConstrainCircle = false;
       Superclass::SetControlPoint(2, point, createIfDoesNotExist);
 
       break;
@@ -234,7 +241,6 @@ bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2
 
     case 3:
     {
-      m_ConstrainThickness = false;
       Superclass::SetControlPoint(3, point, createIfDoesNotExist);
 
       break;

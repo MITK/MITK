@@ -54,6 +54,11 @@ public:
   //virtual void Initialize();
 
 
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 2;
+  }
+
   /** \brief Polygon has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {
@@ -70,6 +75,8 @@ public:
   std::vector<mitk::Point2D> CheckForLineIntersection( const Point2D& p1, const Point2D& p2 ) const;
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
+
+  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int) const override { return m_PolyLineSegmentInfo; }
 
 protected:
   PlanarPolygon();
@@ -93,6 +100,7 @@ protected:
   const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
+  PolyLineSegmentInfoType m_PolyLineSegmentInfo;
 
 private:
 

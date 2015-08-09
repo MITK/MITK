@@ -39,14 +39,15 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 4;
+  }
 
-  /** \brief Place figure in its minimal configuration (a point at least)
-   * onto the given 2D geometry.
-   *
-   * Must be implemented in sub-classes.
-   */
-  //virtual void Initialize();
-  virtual void PlaceFigure( const Point2D &point ) override;
+  unsigned int GetPlacementSelectedPointId() const override
+  {
+      return 3;
+  }
 
   /** \brief Polygon has 2 control points per definition. */
   virtual unsigned int GetMinimumNumberOfControlPoints() const override

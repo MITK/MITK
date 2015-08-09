@@ -49,6 +49,11 @@ public:
 
   bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false ) override;
 
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 2;
+  }
+
   /** \brief Circle has 2 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {
@@ -122,6 +127,7 @@ protected:
   // Feature identifiers
   const unsigned int FEATURE_ID_RADIUS;
   const unsigned int FEATURE_ID_DIAMETER;
+  const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
   //Member variables:

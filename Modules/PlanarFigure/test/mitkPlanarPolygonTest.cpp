@@ -77,7 +77,6 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
 
 
   // Test for number of measurement features
-  planarPolygon->EvaluateFeatures();
   MITK_TEST_CONDITION( planarPolygon->GetNumberOfFeatures() == 2, "Number of measurement features" );
 
   // Test for correct feature evaluation

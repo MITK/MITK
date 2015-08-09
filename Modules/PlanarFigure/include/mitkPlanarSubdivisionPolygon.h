@@ -39,19 +39,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  /** \brief Subdivision Polygon has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return 3;
-  }
-
-
-  /** \brief Polygon maximum number of control points is principally not limited. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 1000;
-  }
-
   /** \brief How many times should we generate a round of subdivisions? */
   unsigned int GetSubdivisionRounds() const
   {
@@ -67,7 +54,7 @@ public:
   * \brief Returns the id of the control-point that corresponds to the given
   * polyline-point.
   */
-  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
+  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const override;
 
 
   /** \brief Parameter w_tension defines the tension.
@@ -102,7 +89,6 @@ protected:
 
   float m_TensionParameter;
   int m_SubdivisionRounds;
-
 
 private:
 

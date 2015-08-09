@@ -10,6 +10,15 @@
   </state>
 
   <state name="FigurePlaced">
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
+     </transition>
+    
+    <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="Start" >
+      <condition name="point_is_valid" />      
+      <condition name="figure_is_finished"/>
+      <action name="finalize_figure" />
+    </transition>
+  
     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="FigurePlaced" >
       <condition name="figure_is_on_current_slice" />
       <action name="move_current_point" ID="90" />
@@ -47,7 +56,10 @@
   </state>
 
   <state name="ControlPointSelected">
-    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="ControlPointSelected" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
+     </transition>
+
+     <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="ControlPointSelected" >
       <action name="move_current_point" ID="90" /> <!-- AcMOVEPOINT -->
     </transition>
 
@@ -60,10 +72,16 @@
     <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="FigurePlaced" >
       <action name="add_initial_point" ID="11" /> <!-- AcADD -->
     </transition>
+
+    <transition event_class="InternalEvent" event_variant="Placement-Event" target="EditFigure" >
+    </transition>
   </state>
 
   <state name="EditFigure">
-    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
+     </transition>
+
+     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
       <condition name="figure_is_on_current_slice" />
       <condition name="hovering_above_figure" />
       <action name="start_hovering" />
@@ -83,7 +101,10 @@
   </state>
 
   <state name="HoveringOverFigure">
-    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
+     </transition>
+
+     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="EditFigure" > <!-- end hovering -->
       <condition name="hovering_above_figure" inverted="true" />
       <action name="hide_preview_point" />
       <action name="end_hovering" />
@@ -167,7 +188,10 @@
   </state>
   
   <state name="HoveringOverPoint">
-    <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
+     </transition>
+
+     <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="HoveringOverFigure" >
       <condition name="hovering_above_point" inverted="true" />
       <condition name="hovering_above_figure" />
       <action name="set_preview_point_position" />
@@ -223,7 +247,10 @@
   </state>
 
   <state name="HoveringAfterPointRemovedGuardState">
-    <transition event_class="InternalEvent" event_variant="Dummy-Event" target="HoveringOverFigure" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
+     </transition>
+
+     <transition event_class="InternalEvent" event_variant="Dummy-Event" target="HoveringOverFigure" >
       <!-- yes, we are still hovering above the figure -->
       <condition name="hovering_above_figure" />
     </transition>
@@ -237,7 +264,10 @@
   </state>
 
   <state name="FigurePlacedByDrag">
-    <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
+    <transition event_class="InternalEvent" event_variant="Undo-Placement-Event" target="PlaceFigure" >
+     </transition>
+
+     <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
       <!-- move the currently selected point by drag -->
       <action name="move_current_point" ID="90" />
     </transition>

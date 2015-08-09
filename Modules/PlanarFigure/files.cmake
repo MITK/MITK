@@ -20,6 +20,7 @@ set(CPP_FILES
   DataManagement/mitkPlanarSubdivisionPolygon.cpp
   DataManagement/mitkPlanarRectangle.cpp
   DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp
+  DataManagement/mitkPlanarFigureOperation.cpp
   IO/mitkPlanarFigureIOFactory.cpp
   IO/mitkPlanarFigureReader.cpp
   IO/mitkPlanarFigureWriter.cpp

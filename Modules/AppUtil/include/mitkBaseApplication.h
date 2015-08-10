@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QString>
 #include <QScopedPointer>
 #include <QSharedPointer>
+#include <QTranslator>
 
 class QCoreApplication;
 
@@ -226,6 +227,12 @@ public:
 
   void setProperty(const QString& property, const QVariant& value);
   QVariant getProperty(const QString& property) const;
+
+  void installTranslator(QTranslator*);
+
+  bool isRunning();
+
+  void sendMessage(const QByteArray);
 
 protected:
 

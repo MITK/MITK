@@ -69,15 +69,6 @@ if(NOT DEFINED ITK_DIR)
     )
   endif()
 
-  # list(APPEND proj_DEPENDENCIES VTK)
-
-  list(APPEND additional_cmake_args
-    -DModule_ITKVtkGlue:BOOL=ON
-    -DVTK_DIR:PATH=${VTK_DIR}
-  )
-
-  set(ITK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchITK-4.5.1.cmake)
-
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.7.1-20c0592.tar.gz

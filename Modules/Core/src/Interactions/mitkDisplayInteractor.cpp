@@ -59,17 +59,17 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
 }
 
 mitk::DisplayInteractor::DisplayInteractor()
-  : m_IndexToSliceModifier(4)
+  : m_Selector(true)
+  , m_IndexToSliceModifier(4)
   , m_AutoRepeat(false)
-  , m_InvertScrollDirection( false )
-  , m_InvertZoomDirection( false )
-  , m_InvertMoveDirection( false )
-  , m_InvertLevelWindowDirection( false )
+  , m_InvertScrollDirection(false)
+  , m_InvertZoomDirection(false)
+  , m_InvertMoveDirection(false)
+  , m_InvertLevelWindowDirection(false)
   , m_AlwaysReact(false)
   , m_ZoomFactor(2)
   , m_ClockRotationSpeed(5)
   , m_SelectionMode(false)
-  , m_Selector(true)
 {
   m_StartDisplayCoordinate.Fill(0);
   m_LastDisplayCoordinate.Fill(0);

@@ -797,4 +797,36 @@ QVariant BaseApplication::getProperty(const QString& property) const
   return d->getProperty(property);
 }
 
+void BaseApplication::installTranslator(QTranslator* translator)
+{
+  this->getQApplication()->installTranslator(translator);
+}
+
+bool BaseApplication::isRunning()
+{
+  QCoreApplication* qCoreApp = qApp;
+  if (!qCoreApp)
+  {
+    if (getSingleMode())
+    {
+      QmitkSingleApplication* qSingleApp = new QmitkSingleApplication(d->m_Argc, d->m_Argv, getSafeMode());
+      return qSingleApp->isRunning();
+    }
+  }
+  return false;
+}
+
+void BaseApplication::sendMessage(const QByteArray msg)
+{
+  QCoreApplication* qCoreApp = qApp;
+  if (!qCoreApp)
+  {
+    if (getSingleMode())
+    {
+      QmitkSingleApplication* qSingleApp = new QmitkSingleApplication(d->m_Argc, d->m_Argv, getSafeMode());
+      qSingleApp->sendMessage(msg);
+    }
+  }
+}
+
 }

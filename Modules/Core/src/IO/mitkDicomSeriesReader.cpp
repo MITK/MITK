@@ -49,7 +49,7 @@ void DicomSeriesReader::LoadSeriesTemplate(const DicomSeriesReader::StringContai
   typedef itk::Image<PixelType, 2> InputImageType;
 
   typedef itk::ImageFileReader<InputImageType> ReaderType;
-  ReaderType::Pointer reader = ReaderType::New();
+  typename ReaderType::Pointer reader = ReaderType::New();
   itk::GDCMImageIO::Pointer gdcmImageIO = itk::GDCMImageIO::New();
   reader->SetImageIO(gdcmImageIO);
 
@@ -1529,7 +1529,7 @@ void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBl
   image->GetGeometry()->SetSpacing( imageSpacing );
 }
 
-void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
+void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool, bool load4D, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
 {
   mitk::LocaleSwitch localeSwitch("C");
   std::locale previousCppLocale(std::cin.getloc());

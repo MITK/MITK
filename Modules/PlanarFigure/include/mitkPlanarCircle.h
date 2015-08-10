@@ -33,7 +33,7 @@ class PlaneGeometry;
 class MITKPLANARFIGURE_EXPORT PlanarCircle : public PlanarFigure
 {
 
-typedef struct MeasurementStatistics
+struct MeasurementStatistics
 {
   double Mean;
   double SD;

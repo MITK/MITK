@@ -804,28 +804,22 @@ void BaseApplication::installTranslator(QTranslator* translator)
 
 bool BaseApplication::isRunning()
 {
-  QCoreApplication* qCoreApp = qApp;
-  if (!qCoreApp)
+  QmitkSingleApplication* qCoreApp =
+      dynamic_cast<QmitkSingleApplication*>( this->getQApplication() );
+  if (qCoreApp != nullptr)
   {
-    if (getSingleMode())
-    {
-      QmitkSingleApplication* qSingleApp = new QmitkSingleApplication(d->m_Argc, d->m_Argv, getSafeMode());
-      return qSingleApp->isRunning();
-    }
+    return qCoreApp->isRunning();
   }
   return false;
 }
 
 void BaseApplication::sendMessage(const QByteArray msg)
 {
-  QCoreApplication* qCoreApp = qApp;
-  if (!qCoreApp)
+  QmitkSingleApplication* qCoreApp =
+    dynamic_cast<QmitkSingleApplication*>(this->getQApplication());
+  if (qCoreApp != nullptr)
   {
-    if (getSingleMode())
-    {
-      QmitkSingleApplication* qSingleApp = new QmitkSingleApplication(d->m_Argc, d->m_Argv, getSafeMode());
-      qSingleApp->sendMessage(msg);
-    }
+    qCoreApp->sendMessage(msg);
   }
 }
 

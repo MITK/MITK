@@ -1541,6 +1541,11 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::
       {
         int layer = 0;
         if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
+
+        bool isBinary = false;
+        nodes->at(x)->GetBoolProperty("binary", isBinary);
+        if (isBinary) continue;
+
         if(layer > maxlayer)
         {
           if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible( baseRenderer ) )
@@ -1586,35 +1591,12 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   mitk::DataNode::Pointer node;
   mitk::DataNode::Pointer topSourceNode;
   mitk::Image::Pointer image;
-  bool isBinary = false;
   node = this->GetTopLayerNode(nodes);
   int component = 0;
-  if(node.IsNotNull())
+  if (node.IsNotNull())
   {
-    node->GetBoolProperty("binary",isBinary);
-    if(isBinary)
-    {
-      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = m_DataStorage->GetSources(node, NULL, true);
-      if(!sourcenodes->empty())
-      {
-        topSourceNode = this->GetTopLayerNode(sourcenodes);
-      }
-      if(topSourceNode.IsNotNull())
-      {
-        image = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
-        topSourceNode->GetIntProperty("Image.Displayed Component", component);
-      }
-      else
-      {
-        image = dynamic_cast<mitk::Image*>(node->GetData());
-        node->GetIntProperty("Image.Displayed Component", component);
-      }
-    }
-    else
-    {
-      image = dynamic_cast<mitk::Image*>(node->GetData());
-      node->GetIntProperty("Image.Displayed Component", component);
-    }
+    image = dynamic_cast<mitk::Image*>(node->GetData());
+    node->GetIntProperty("Image.Displayed Component", component);
   }
 
   mitk::Point3D crosshairPos = this->GetCrossPosition();
@@ -1668,6 +1650,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
           << "\n" << patientId.c_str()
           << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
           << "\n" << institution.c_str();
+      } else {
+        infoStringStream[0].clear();
       }
 
       if (m_displayMetaInfo && (studyDate != "" && studyTime != "")) {
@@ -1676,6 +1660,8 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
         infoStringStream[1]
           << dd << "." << mm << "." << yy 
           << " " << hh << ":" << mi << ":" << ss;
+      } else {
+        infoStringStream[1].clear();
       }
 
       auto render_annotation = [&] (int j, int corner) {

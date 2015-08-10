@@ -27,7 +27,7 @@ class SceneReaderV1 : public SceneReader
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage ) override;
+    virtual bool LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage, LoadedNodeFileNamesMap* nodeDataFileNames = nullptr) override;
 
   protected:
 
@@ -36,19 +36,19 @@ class SceneReaderV1 : public SceneReader
     */
     DataNode::Pointer LoadBaseDataFromDataTag( TiXmlElement* dataElement,
                                                    const std::string& workingDirectory,
-                                                   bool& error );
+                                                   bool& error, LoadedNodeFileNamesMap* nodeDataFileNameMap);
 
     /**
       \brief reads all the properties from the XML document and recreates them in node
     */
-    bool DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory);
+    bool DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory, LoadedNodeFileNamesMap* nodeDataFileNameMap);
 
     /**
       \brief reads all properties assigned to a base data element and assigns the list to the base data object
 
       The baseDataNodeElem is supposed to be the <properties file="..."> element.
     */
-    bool DecorateBaseDataWithProperties(BaseData::Pointer data, TiXmlElement* baseDataNodeElem, const std::string& workingDir);
+    bool DecorateBaseDataWithProperties(DataNode* node, TiXmlElement* baseDataNodeElem, const std::string& workingDir, LoadedNodeFileNamesMap* nodeDataFileNameMap);
 
     typedef std::multimap<int, std::string> UnorderedLayers;
     typedef std::map<std::string, int> OrderedLayers;
@@ -57,7 +57,7 @@ class SceneReaderV1 : public SceneReader
     typedef std::map<std::string, DataNode*> IDToNodeMappingType;
     typedef std::map<DataNode*, std::string> NodeToIDMappingType;
 
-    void GetLayerOrder(TiXmlDocument& document, const std::string& workingDirectory, std::vector<mitk::DataNode::Pointer> DataNodes, OrderedLayers& order);
+    void GetLayerOrder(TiXmlDocument& document, const std::string& workingDirectory, std::vector<mitk::DataNode::Pointer> DataNodes, OrderedLayers& order, LoadedNodeFileNamesMap* nodeDataFileNameMap);
 
     UnorderedLayers         m_UnorderedLayers;
     OrderedLayers           m_OrderedLayers;

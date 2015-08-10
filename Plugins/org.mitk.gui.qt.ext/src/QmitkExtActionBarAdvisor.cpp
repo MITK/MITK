@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryGroupMarker.h>
 #include <berrySeparator.h>
 #include <berryWorkbenchActionConstants.h>
+#include "QmitkExtFileOpenProjectAction.h"
 
 QmitkExtActionBarAdvisor::QmitkExtActionBarAdvisor(berry::IActionBarConfigurer::Pointer configurer)
  : berry::ActionBarAdvisor(configurer)
@@ -60,14 +61,25 @@ void QmitkExtActionBarAdvisor::MakeActions(berry::IWorkbenchWindow* window)
   fileSaveAction->setShortcut(QKeySequence::Save);
   this->Register(fileSaveAction, berry::IWorkbenchCommandConstants::FILE_SAVE);
 
-  QAction* fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
-  fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save",
-                                                  QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
-  this->Register(fileSaveProjectAction, mitk::WorkbenchCommandConstants::PROJECT_SAVE);
+  mitk::SceneIO::Pointer sharedSceneIO = mitk::SceneIO::New();
 
-  QAction* closeProjectAction = new QmitkCloseProjectAction(window);
-  closeProjectAction->setIcon(QIcon::fromTheme("edit-delete",
-                                               QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
+  QmitkExtFileOpenProjectAction* fileOpenProjectAction = new QmitkExtFileOpenProjectAction(window, sharedSceneIO);
+  fileOpenProjectAction->setIcon(QIcon::fromTheme("document-open", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-open.svg")));
+  fileOpenProjectAction->setShortcut(QKeySequence::Open);
+
+  QmitkExtFileSaveProjectAction* fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window, sharedSceneIO, false);
+  fileSaveProjectAction->setIcon(QIcon::fromTheme("document-save", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
+  fileSaveProjectAction->setShortcut(QKeySequence::Save);
+
+  QmitkExtFileSaveProjectAction* fileSaveProjectAsAction = new QmitkExtFileSaveProjectAction(window, sharedSceneIO, true);
+  fileSaveProjectAsAction->setIcon(QIcon::fromTheme("document-save-as", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/document-save.svg")));
+  fileSaveProjectAsAction->setShortcut(QKeySequence("Ctrl+Shift+S"));
+
+  QmitkCloseProjectAction* closeProjectAction = new QmitkCloseProjectAction(window, sharedSceneIO);
+  closeProjectAction->setIcon(QIcon::fromTheme("edit-delete", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/edit-delete.svg")));
+
+
+  this->Register(fileSaveProjectAction, mitk::WorkbenchCommandConstants::PROJECT_SAVE);
   this->Register(closeProjectAction, mitk::WorkbenchCommandConstants::PROJECT_CLOSE);
 
   QAction* fileExitAction = new QmitkFileExitAction(window);

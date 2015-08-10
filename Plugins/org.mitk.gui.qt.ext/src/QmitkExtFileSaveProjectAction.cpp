@@ -35,19 +35,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIPreferencesService.h>
+#include <berryIPreferences.h>
 #include "berryPlatform.h"
 
+// DUPLICATED FROM QmitkFileOpenAction & QmitkExtFileOpenProjectAction
+static berry::IPreferences::Pointer GetPreferences()
+{
+    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    if (prefService)
+    {
+        return prefService->GetSystemPreferences()->Node("/General");
+    }
+    return berry::IPreferences::Pointer(0);
+}
 
-QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window)
+static QString getLastFileOpenPath()
+{
+    berry::IPreferences::Pointer prefs = GetPreferences();
+    if (prefs.IsNotNull())
+    {
+        return prefs->Get("LastProjectFileOpenPath", "");
+    }
+    return QString();
+}
+
+static void setLastFileOpenPath(const QString& path)
+{
+    berry::IPreferences::Pointer prefs = GetPreferences();
+    if (prefs.IsNotNull())
+    {
+        prefs->Put("LastProjectFileOpenPath", path);
+        prefs->Flush();
+    }
+}
+// end DUPLICATED
+
+
+QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO, bool saveAs)
   : QAction(0)
   , m_Window(nullptr)
+  , m_SceneIO(sceneIO)
+  , m_SaveAs(saveAs)
 {
   this->Init(window.GetPointer());
 }
 
-QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow* window)
+QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO, bool saveAs)
   : QAction(0)
   , m_Window(nullptr)
+  , m_SceneIO(sceneIO)
+  , m_SaveAs(saveAs)
 {
   this->Init(window);
 }
@@ -55,7 +92,7 @@ QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWi
 void QmitkExtFileSaveProjectAction::Init(berry::IWorkbenchWindow* window)
 {
   m_Window = window;
-  this->setText("&Save Project...");
+  this->setText(m_SaveAs ? "Save Project &As..." : "Save Project");
   this->setToolTip("Save content of Data Manager as a .mitk project file");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
@@ -69,8 +106,6 @@ void QmitkExtFileSaveProjectAction::Run()
     /**
      * @brief stores the last path of last saved file
      */
-    static QString m_LastPath;
-
     mitk::IDataStorageReference::Pointer dsRef;
 
     {
@@ -97,23 +132,26 @@ void QmitkExtFileSaveProjectAction::Run()
 
     mitk::DataStorage::Pointer storage = dsRef->GetDataStorage();
 
-    QString dialogTitle = "Save MITK Scene (%1)";
-    QString fileName = QFileDialog::getSaveFileName(NULL,
-                                                    dialogTitle.arg(dsRef->GetLabel()),
-                                                    m_LastPath,
-                                                    "MITK scene files (*.mitk)",
-                                                    NULL );
+    QString fileName;
+    if (m_SaveAs || m_SceneIO->GetLoadedProjectFileName().empty()) {
+        QString dialogTitle = "Save MITK Scene (%1)";
+        fileName = QFileDialog::getSaveFileName(NULL,
+            dialogTitle.arg(dsRef->GetLabel()),
+            getLastFileOpenPath(),
+            "MITK scene files (*.mitk)",
+            NULL);
+    }
+    else {
+        fileName = QString::fromStdString(m_SceneIO->GetLoadedProjectFileName());
+    }
 
-    if (fileName.isEmpty() )
-      return;
-
-    // remember the location
-    m_LastPath = fileName;
+    if (fileName.isEmpty())
+        return;
 
     if ( fileName.right(5) != ".mitk" )
       fileName += ".mitk";
 
-    mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+    setLastFileOpenPath(fileName);
 
     mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
 
@@ -122,7 +160,7 @@ void QmitkExtFileSaveProjectAction::Run()
         mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
 
-    if ( !sceneIO->SaveScene( nodesToBeSaved, storage, fileName.toStdString() ) )
+    if ( !m_SceneIO->SaveScene( nodesToBeSaved, storage, fileName.toStdString() ) )
     {
       QMessageBox::information(NULL,
                                "Scene saving",
@@ -132,7 +170,7 @@ void QmitkExtFileSaveProjectAction::Run()
     }
     mitk::ProgressBar::GetInstance()->Progress(2);
 
-    mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
+    mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = m_SceneIO->GetFailedNodes();
     if (!failedNodes->empty())
     {
       std::stringstream ss;
@@ -157,7 +195,7 @@ void QmitkExtFileSaveProjectAction::Run()
       MITK_WARN << ss.str();
     }
 
-    mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();
+    mitk::PropertyList::ConstPointer failedProperties = m_SceneIO->GetFailedProperties();
     if (!failedProperties->GetMap()->empty())
     {
       std::stringstream ss;
@@ -172,6 +210,7 @@ void QmitkExtFileSaveProjectAction::Run()
 
       MITK_WARN << ss.str();
     }
+    emit projectSaved(fileName);
   }
   catch (std::exception& e)
   {

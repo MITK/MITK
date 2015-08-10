@@ -29,45 +29,48 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMessageBox>
 
-QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window)
+
+QmitkCloseProjectAction::QmitkCloseProjectAction(berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO)
   : QAction(0)
   , m_Window(nullptr)
 {
-  this->init(window.GetPointer());
+  this->init(window.GetPointer(), sceneIO);
 }
 
-QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
-  : QAction(0)
-  , m_Window(nullptr)
-{
-  this->setIcon(icon);
-  this->init(window.GetPointer());
-}
-
-QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow* window)
-  : QAction(0)
-  , m_Window(nullptr)
-{
-  this->init(window);
-}
-
-QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon& icon, berry::IWorkbenchWindow* window)
+QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::SmartPointer<berry::IWorkbenchWindow> window, mitk::SceneIO::Pointer sceneIO)
   : QAction(0)
   , m_Window(nullptr)
 {
   this->setIcon(icon);
-  this->init(window);
+  this->init(window.GetPointer(), sceneIO);
 }
 
-void QmitkCloseProjectAction::init(berry::IWorkbenchWindow* window)
+QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO)
+  : QAction(0)
+  , m_Window(nullptr)
+{
+  this->init(window, sceneIO);
+}
+
+QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon& icon, berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO)
+  : QAction(0)
+  , m_Window(nullptr)
+{
+  this->setIcon(icon);
+  this->init(window, sceneIO);
+}
+
+void QmitkCloseProjectAction::init(berry::IWorkbenchWindow* window, mitk::SceneIO::Pointer sceneIO)
 {
   m_Window = window;
   this->setText("&Close Project...");
   this->setToolTip("Close Project will remove all data objects from the application. This will free up the memory that is used by the data.");
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
+  
+  m_SceneIO = sceneIO;
 }
 
-void QmitkCloseProjectAction::Run()
+bool QmitkCloseProjectAction::Run()
 {
   try
   {
@@ -83,7 +86,7 @@ void QmitkCloseProjectAction::Run()
     {
       MITK_WARN << "IDataStorageService service not available. Unable to close project.";
       context->ungetService(dsRef);
-      return;
+      return false;
     }
 
     mitk::IDataStorageReference::Pointer dataStorageRef = dss->GetActiveDataStorage();
@@ -97,22 +100,22 @@ void QmitkCloseProjectAction::Run()
     if (dataStorage.IsNull())
     {
       MITK_WARN << "No data storage available. Cannot close project.";
-      return;
+      return false;
     }
 
     //check if we got the default datastorage and if there is anything else then helper object in the storage
     if(dataStorageRef->IsDefault() &&
        dataStorage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))))->empty())
     {
-      return;
+      return false;
     }
 
     /* Ask, if the user is sure about that */
     QString msg = "Are you sure that you want to close the current project (%1)?\nThis will remove all data objects.";
-    if (QMessageBox::question(NULL, "Remove all data?", msg.arg(dataStorageRef->GetLabel()),
+    if (QMessageBox::question(NULL, "Remove all data?", msg.arg(m_SceneIO->GetLoadedProjectFileName().empty() ? dataStorageRef->GetLabel() : QString::fromStdString(m_SceneIO->GetLoadedProjectFileName())),
                               QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
     {
-      return;
+      return false;
     }
 
     /* Remove everything */
@@ -132,10 +135,13 @@ void QmitkCloseProjectAction::Run()
       QList<berry::IEditorReference::Pointer> editorsToClose = dsEditors;
       m_Window->GetActivePage()->CloseEditors(editorsToClose, false);
     }
+
+    emit projectClosed();
   }
   catch (std::exception& e)
   {
     MITK_ERROR << "Exception caught during closing project: " << e.what();
     QMessageBox::warning(NULL, "Error", QString("An error occurred during Close Project: %1").arg(e.what()));
   }
+  return true;
 }

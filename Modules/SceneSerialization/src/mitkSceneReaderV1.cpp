@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
 
-bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage )
+bool mitk::SceneReaderV1::LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage, LoadedNodeFileNamesMap* nodeDataFileNameMap)
 {
   assert(storage);
   bool error(false);
@@ -52,12 +52,13 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
 
   for (TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node"))
   {
-      DataNodes.push_back(LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error));
+      mitk::DataNode::Pointer newNode = LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error, nodeDataFileNameMap);
+      DataNodes.push_back(newNode);
       ProgressBar::GetInstance()->Progress();
   }
 
   OrderedLayers orderedLayers;
-  this->GetLayerOrder(document, workingDirectory, DataNodes, orderedLayers);
+  this->GetLayerOrder(document, workingDirectory, DataNodes, orderedLayers, nodeDataFileNameMap);
 
 
   // iterate all nodes
@@ -74,7 +75,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       TiXmlElement *baseDataElement = dataXmlElement->FirstChildElement("properties");
       if ( node->GetData() )
       {
-        DecorateBaseDataWithProperties( node->GetData(), baseDataElement, workingDirectory);
+        DecorateBaseDataWithProperties( node, baseDataElement, workingDirectory, nodeDataFileNameMap);
       }
       else
       {
@@ -102,7 +103,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     //        - instantiate the appropriate PropertyListDeSerializer
     //        - use them to construct PropertyList objects
     //        - add these properties to the node (if necessary, use renderwindow name)
-    bool success = DecorateNodeWithProperties(node, element, workingDirectory);
+    bool success = DecorateNodeWithProperties(node, element, workingDirectory, nodeDataFileNameMap);
     if (!success)
     {
       MITK_ERROR << "Could not load properties for node.";
@@ -213,14 +214,14 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   return !error;
 }
 
-void mitk::SceneReaderV1::GetLayerOrder(TiXmlDocument& document, const std::string& workingDirectory, std::vector<mitk::DataNode::Pointer> DataNodes, OrderedLayers& order)
+void mitk::SceneReaderV1::GetLayerOrder(TiXmlDocument& document, const std::string& workingDirectory, std::vector<mitk::DataNode::Pointer> DataNodes, OrderedLayers& order, LoadedNodeFileNamesMap* nodeDataFileNameMap)
 {
   typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
   DataNodeVector::iterator nit = DataNodes.begin();
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
   {
     DataNode::Pointer node = *nit;
-    DecorateNodeWithProperties(node, element, workingDirectory);
+    DecorateNodeWithProperties(node, element, workingDirectory, nodeDataFileNameMap);
 
     int layer;
     node->GetIntProperty("layer", layer);
@@ -242,7 +243,7 @@ void mitk::SceneReaderV1::GetLayerOrder(TiXmlDocument& document, const std::stri
   }
 }
 
-mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlElement* dataElement, const std::string& workingDirectory, bool& error )
+mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(TiXmlElement* dataElement, const std::string& workingDirectory, bool& error, LoadedNodeFileNamesMap* nodeDataFileNameMap)
 {
   DataNode::Pointer node;
 
@@ -260,6 +261,17 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
         }
         node = DataNode::New();
         node->SetData(baseData.front());
+
+        if (nodeDataFileNameMap) {
+            (*nodeDataFileNameMap)[node].baseDataFiles.clear();
+            (*nodeDataFileNameMap)[node].baseDataFiles.push_back(filename);
+
+            for (TiXmlElement* element = dataElement->FirstChildElement("additionalFile"); element != NULL; element = element->NextSiblingElement("additionalFile"))
+            {
+                (*nodeDataFileNameMap)[node].baseDataFiles.push_back(element->Attribute("file"));
+            }
+
+        }
       }
       catch (std::exception& e)
       {
@@ -284,7 +296,7 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
   return node;
 }
 
-bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory)
+bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory, LoadedNodeFileNamesMap* nodeDataFileNameMap)
 {
   assert(node);
   assert(nodeElement);
@@ -313,6 +325,9 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
     if (readProperties.IsNotNull())
     {
       propertyList->ConcatenatePropertyList( readProperties, true ); // true = replace
+      if (nodeDataFileNameMap) {
+          (*nodeDataFileNameMap)[node].nodePropertiesFiles[renderwindow] = propertiesfile;
+      }
     }
     else
     {
@@ -324,7 +339,7 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
   return !error;
 }
 
-bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data, TiXmlElement *baseDataNodeElem, const std::string &workingDir)
+bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(DataNode* node, TiXmlElement *baseDataNodeElem, const std::string &workingDir, LoadedNodeFileNamesMap* nodeDataFileNameMap)
 {
   // check given variables, initialize error variable
   assert(baseDataNodeElem);
@@ -350,7 +365,10 @@ bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data,
     // store the read-in properties to the given node or throw error otherwise
     if( inProperties.IsNotNull() )
     {
-      data->SetPropertyList( inProperties );
+      node->GetData()->SetPropertyList( inProperties );
+      if (nodeDataFileNameMap) {
+          (*nodeDataFileNameMap)[node].baseDataPropertiesFile = baseDataPropertyFile;
+      }
     }
     else
     {

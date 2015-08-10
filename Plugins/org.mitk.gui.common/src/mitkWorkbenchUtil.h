@@ -57,6 +57,8 @@ struct MITK_GUI_COMMON_PLUGIN WorkbenchUtil
    */
   static void LoadFiles(const QStringList& fileNames, berry::IWorkbenchWindow::Pointer wnd, bool openEditor = true);
 
+  static void ReinitAfterLoadFiles(berry::IWorkbenchWindow::Pointer window, bool openEditor, mitk::IDataStorageReference::Pointer dataStorageRef, const bool dsmodified);
+
   /**
      * Opens an editor on the given object.
      * <p>

@@ -40,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkDnDFrameWidget.h>
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
+#include <QmitkDataStorageFilterProxyModel.h>
 #include <QmitkCustomVariants.h>
 #include <QmitkFileSaveAction.h>
 #include <QmitkDataStorageFilterProxyModel.h>
@@ -82,6 +83,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSizePolicy>
 #include <QSortFilterProxyModel>
 #include <QSignalMapper>
+#include <QSortFilterProxyModel>
 
 #include "mitkDataNodeObject.h"
 #include "mitkIContextMenuAction.h"
@@ -161,7 +163,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT(NodeTreeViewRowsInserted ( const QModelIndex&, int, int )) );
   QObject::connect( m_NodeTreeModel, SIGNAL(rowsRemoved (const QModelIndex&, int, int))
     , this, SLOT(NodeTreeViewRowsRemoved( const QModelIndex&, int, int )) );
-  QObject::connect( m_NodeTreeView->selectionModel()
+  QObject::connect(m_NodeTreeView->selectionModel()
     , SIGNAL( selectionChanged ( const QItemSelection &, const QItemSelection & ) )
     , this
     , SLOT( NodeSelectionChanged ( const QItemSelection &, const QItemSelection & ) ) );
@@ -203,7 +205,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(globalReinitAction);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor, globalReinitAction));
 
-  QAction* saveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"),
+  QAction* saveAction = new QmitkFileSaveAction(QIcon::fromTheme("go-up", QIcon(":/org_mitk_icons/icons/tango/scalable/actions/go-up.svg")),
                                                 this->GetSite()->GetWorkbenchWindow());
   unknownDataNodeDescriptor->AddAction(saveAction);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,saveAction));
@@ -489,7 +491,7 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
         m_FilterModel->RemoveFilterPredicate(m_NodeWithNoDataFilterPredicate);
     }
   }
-
+ 
   m_GlobalReinitOnNodeDelete = prefs->GetBool("Call global reinit if node is deleted", true);
 
   m_NodeTreeView->expandAll();
@@ -537,7 +539,7 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
 void QmitkDataManagerView::OpacityChanged(int value)
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(node)
+    if (node)
   {
     float opacity = static_cast<float>(value)/100.0f;
     node->SetFloatProperty("opacity", opacity);
@@ -548,7 +550,7 @@ void QmitkDataManagerView::OpacityChanged(int value)
 void QmitkDataManagerView::OpacityActionChanged()
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(node)
+    if (node)
   {
     float opacity = 0.0;
     if(node->GetFloatProperty("opacity", opacity))
@@ -588,7 +590,7 @@ void QmitkDataManagerView::ComponentActionChanged()
 void QmitkDataManagerView::ColorChanged()
  {
    mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-   if(node)
+    if (node)
    {
     mitk::Color color;
     mitk::ColorProperty::Pointer colorProp;
@@ -613,7 +615,7 @@ void QmitkDataManagerView::ColorChanged()
 void QmitkDataManagerView::ColorActionChanged()
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(node)
+    if (node)
   {
     mitk::Color color;
     mitk::ColorProperty::Pointer colorProp;
@@ -636,7 +638,7 @@ void QmitkDataManagerView::ColorActionChanged()
 void QmitkDataManagerView::TextureInterpolationChanged()
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(node)
+    if (node)
   {
     bool textureInterpolation = false;
     node->GetBoolProperty("texture interpolation", textureInterpolation);
@@ -647,7 +649,7 @@ void QmitkDataManagerView::TextureInterpolationChanged()
 void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(node)
+    if (node)
   {
     node->SetBoolProperty("texture interpolation", checked);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -658,7 +660,7 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
 void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(!node)
+    if (!node)
     return;
 
   mitk::LookupTableProperty::Pointer lookupTableProperty =
@@ -687,7 +689,7 @@ void QmitkDataManagerView::ColormapActionToggled( bool /*checked*/ )
 void QmitkDataManagerView::ColormapMenuAboutToShow()
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(!node)
+    if (!node)
     return;
 
   mitk::LookupTableProperty::Pointer lookupTableProperty =
@@ -729,7 +731,7 @@ void QmitkDataManagerView::ColormapMenuAboutToShow()
 void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(!node)
+    if (!node)
     return;
 
   mitk::EnumerationProperty* representationProp =
@@ -857,9 +859,9 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
     {
       node = *it;
       this->GetDataStorage()->Remove(node);
-      if (m_GlobalReinitOnNodeDelete)
-          this->GlobalReinit(false);
     }
+    if (m_GlobalReinitOnNodeDelete)
+        this->GlobalReinit(false);
   }
 }
 
@@ -913,7 +915,7 @@ void QmitkDataManagerView::NodeChanged(const mitk::DataNode* /*node*/)
   // m_FilterModel->invalidate();
   // fix as proposed by R. Khlebnikov in the mitk-users mail from 02.09.2014
   QMetaObject::invokeMethod( m_FilterModel, "invalidate", Qt::QueuedConnection );
-}
+  }
 
 QItemSelectionModel *QmitkDataManagerView::GetDataNodeSelectionModel() const
 {
@@ -936,19 +938,19 @@ void QmitkDataManagerView::GlobalReinit( bool )
 void QmitkDataManagerView::NodeTreeViewRowsRemoved (
   const QModelIndex & /*parent*/, int /*start*/, int /*end*/ )
 {
-  m_CurrentRowCount = m_NodeTreeModel->rowCount();
+  m_CurrentRowCount = m_FilterModel->rowCount();
 }
 void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int, int )
 {
   m_NodeTreeView->setExpanded(parent, true);
 
   // a new row was inserted
-  if( m_CurrentRowCount == 0 && m_NodeTreeModel->rowCount() == 1 )
+  if( m_CurrentRowCount == 0 && m_FilterModel->rowCount() == 1 )
   {
     this->OpenRenderWindowPart();
-    m_CurrentRowCount = m_NodeTreeModel->rowCount();
+    m_CurrentRowCount = m_FilterModel->rowCount();
+    }
   }
-}
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*selected*/, const QItemSelection & /*deselected*/ )
 {
@@ -968,9 +970,24 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
     if ( node.IsNotNull() )
       node->SetBoolProperty("selected", true);
   }
+
   //changing the selection does NOT require any rendering processes!
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
+
+void QmitkDataManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes)
+{
+    m_NodeTreeView->clearSelection();
+
+    for (int i = 0; i < nodes.size(); ++i) {
+        QModelIndex itemIndex = m_NodeTreeModel->GetIndex(nodes[i]);
+        m_NodeTreeView->selectionModel()->select(m_FilterModel->mapFromSource(itemIndex), QItemSelectionModel::Select);
+        m_NodeTreeView->scrollTo(m_FilterModel->mapFromSource(itemIndex));
+    }
+}
+
+
+
 
 void QmitkDataManagerView::ShowIn(const QString &editorId)
 {

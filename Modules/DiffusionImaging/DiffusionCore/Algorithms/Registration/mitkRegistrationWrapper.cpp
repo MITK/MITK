@@ -26,11 +26,6 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 
   CastToItkImage(img, itkImage);
 
-
-
-  MITK_INFO << "LPR " << itkImage->GetLargestPossibleRegion();//[0] << "/" <<itkImage->GetLargestPossibleRegion()[1] << "/" <<itkImage->GetLargestPossibleRegion()[2];
-
-
   typedef itk::Euler3DTransform< double > RigidTransformType;
   RigidTransformType::Pointer rtransform = RigidTransformType::New();
   RigidTransformType::ParametersType parameters(RigidTransformType::ParametersDimension);
@@ -40,12 +35,14 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 
   rtransform->SetParameters( parameters );
 
-  mitk::Point3D origin = itkImage->GetOrigin();
-  origin[0]-=offset[0];
-  origin[1]-=offset[1];
-  origin[2]-=offset[2];
-
-  //MITK_INFO << "Apply Old Origin" << origin;
+  mitk::Point3D origin;
+  // overwrite origin only if an offset was supplied
+  if (offset[0] != 0 || offset[1] != 0 || offset[2] != 0)
+  {
+    origin[0]=offset[0];
+    origin[1]=offset[1];
+    origin[2]=offset[2];
+  }
 
   mitk::Point3D newOrigin = rtransform->GetInverseTransform()->TransformPoint(origin);
 
@@ -55,12 +52,6 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 
   itkImage->SetOrigin(newOrigin);
   itkImage->SetDirection(newDirection);
-
-  MITK_INFO << "Apply New Origin" << newOrigin;
-
-  MITK_INFO << "LPR 2" << itkImage->GetLargestPossibleRegion();
-
-  mitk::IOUtil::Save(img, "/tmp/dump3.nrrd");
 
   // Perform Resampling if reference image is provided
   if (resampleReference != NULL)
@@ -156,8 +147,6 @@ void mitk::RegistrationWrapper::ApplyTransformationToImage(mitk::Image::Pointer 
 
   MITK_INFO << "Origin final" << img->GetGeometry()->GetOrigin();
 
-  mitk::IOUtil::Save(img, "/tmp/dump.nrrd");
-
 }
 
 void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImage, mitk::Image::Pointer movingImage, RidgidTransformType transformation,double* offset, bool useSameOrigin, mitk::Image* mask)
@@ -205,18 +194,27 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   //  }
 
   // align the offsets of the two images. this is done to avoid non-overlapping initialization
-  Point3D origin = fixedImage->GetGeometry()->GetOrigin();
+  //  Point3D origin = fixedImage->GetGeometry()->GetOrigin();
+
+
+  Point3D center = fixedImage->GetGeometry()->GetCenter();
+  Point3D centerMoving = movingImage->GetGeometry()->GetCenter();
   Point3D originMoving = movingImage->GetGeometry()->GetOrigin();
+
 
   mitk::Image::Pointer tmpImage = movingImage->Clone();
   if (useSameOrigin)
   {
-    offset[0] = originMoving[0]-origin[0];
-    offset[1] = originMoving[1]-origin[1];
-    offset[2] = originMoving[2]-origin[2];
-    tmpImage->GetGeometry()->SetOrigin(origin);
-  }
 
+    offset[0] = (originMoving[0]-centerMoving[0])+center[0];
+    offset[1] = (originMoving[1]-centerMoving[1])+center[1];
+    offset[2] = (originMoving[2]-centerMoving[2])+center[2];
+    Point3D translatedOrigin;
+    translatedOrigin[0]=  offset[0];
+    translatedOrigin[1]=  offset[1];
+    translatedOrigin[2]=  offset[2];
+    tmpImage->GetGeometry()->SetOrigin(translatedOrigin);
+  }
   // Start registration
   mitk::PyramidImageRegistrationMethod::Pointer registrationMethod = mitk::PyramidImageRegistrationMethod::New();
   registrationMethod->SetFixedImage( fixedImage );
@@ -239,5 +237,4 @@ void mitk::RegistrationWrapper::GetTransformation(mitk::Image::Pointer fixedImag
   registrationMethod->SetMovingImage(tmpImage);
   registrationMethod->Update();
   registrationMethod->GetParameters(transformation); // first three: euler angles, last three translation
-  MITK_INFO << "Transformation" << transformation[0] << "/" <<transformation[1] << "/" <<transformation[2] << "/" <<transformation[3];
 }

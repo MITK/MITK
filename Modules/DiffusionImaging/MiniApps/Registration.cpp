@@ -246,7 +246,7 @@ int main( int argc, char* argv[] )
   parser.addArgument("silent", "s", mitkCommandLineParser::Bool, "Silent:" "No xml progress output.");
   parser.addArgument("resample", "r", mitkCommandLineParser::String, "Resample (x,y,z)mm:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
   parser.addArgument("binary", "b", mitkCommandLineParser::Bool, "Binary:", "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
-  parser.addArgument("correct-origin", "c", mitkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Switch when you reveive:  Joint PDF summed to zero ",us::Any());
+  parser.addArgument("correct-origin", "c", mitkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Use switch when you reveive:  Joint PDF summed to zero ",us::Any());
   parser.addArgument("sinc-int", "s", mitkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
@@ -418,13 +418,13 @@ int main( int argc, char* argv[] )
 
       // Store transformation,  apply it to morph file
       MITK_INFO << "----------Registering moving image to reference----------";
+
       mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, alignOrigin, referenceMask);
       mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, resampleReference); // , resampleImage
 
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
       if (fileType == ".dwi")
         fileType = "dwi";
-      MITK_INFO << "ORIGIN post function " << movingImage->GetGeometry()->GetOrigin();
 
       if (movingImage->GetData() == nullptr)
         MITK_INFO <<"POST DATA is null";

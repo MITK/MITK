@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QEvent>
 #include <QPushButton>
+#include <QToolButton>
 #include <QMenuBar>
 #include <QAction>
 #include <QLabel>
@@ -109,7 +110,7 @@ protected:
   void CreateSettingsWidget();
 
   /*! Reimplemented from QWidget. The paint event is a request to repaint all or part of a widget.*/
-  void paintEvent(QPaintEvent *event) override;
+  void paintEvent(QPaintEvent *event);
 
   /*! Update list of layout direction (axial, coronal, sagital or threeD). Set action of currect layout direction
   to disable and all other to enable. Normaly the user can switch here between the different layout direction, but
@@ -244,15 +245,15 @@ public:
 
 protected:
 
-  QPushButton*        m_CrosshairModeButton;
+  QToolButton*        m_CrosshairModeButton;
 
   //QAction*            m_ShowHideCrosshairVisibilityAction;
 
   /*! QPushButton for activating/deactivating full-screen mode*/
-  QPushButton*        m_FullScreenButton;
+  QToolButton*        m_FullScreenButton;
 
   /*! QPushButton for open the settings menu*/
-  QPushButton*        m_SettingsButton;
+  QToolButton*        m_SettingsButton;
 
   /*! QAction for Default layout design */
   QAction*            m_DefaultLayoutAction;
@@ -314,8 +315,6 @@ protected:
 
   bool                m_Entered;
 
-  bool                m_Hidden;
-
   private:
 
   mitk::BaseRenderer::Pointer m_Renderer;
@@ -326,6 +325,7 @@ protected:
   /// a timer for the auto rotate action
   ///
   QTimer m_AutoRotationTimer;
+  QTimer m_HideTimer;
 
   QWidget* m_Parent;
 };

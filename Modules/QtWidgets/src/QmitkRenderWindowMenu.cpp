@@ -61,7 +61,6 @@ m_LayoutDesign(0),
 m_OldLayoutDesign(0),
 m_FullScreenMode(false),
 m_Entered(false),
-m_Hidden(true),
 m_Renderer(b),
 m_MultiWidget(mw),
 m_Parent(parent)
@@ -104,7 +103,9 @@ m_Parent(parent)
   // for autorotating
   m_AutoRotationTimer.setInterval( 75 );
   connect( &m_AutoRotationTimer, SIGNAL(timeout()), this, SLOT(AutoRotateNextStep()) );
-  connect( m_Parent, SIGNAL(destroyed()), this, SLOT(deleteLater()));
+  m_HideTimer.setSingleShot(true);
+  connect( &m_HideTimer, SIGNAL(timeout()), this, SLOT(DeferredHideMenu()));
+  connect(m_Parent, SIGNAL(destroyed()), this, SLOT(deleteLater()));
 }
 
 QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
@@ -127,28 +128,30 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   connect( m_CrosshairMenu, SIGNAL( aboutToShow() ), this, SLOT(OnCrossHairMenuAboutToShow()) );
 
   // button for changing rotation mode
-  m_CrosshairModeButton = new QPushButton(this);
+  m_CrosshairModeButton = new QToolButton(this);
   m_CrosshairModeButton->setMaximumSize(15, 15);
   m_CrosshairModeButton->setIconSize(size);
-  m_CrosshairModeButton->setFlat( true );
   m_CrosshairModeButton->setMenu( m_CrosshairMenu );
   m_CrosshairModeButton->setIcon(QIcon(QPixmap(iconCrosshairMode_xpm)));
+  m_CrosshairModeButton->setPopupMode(QToolButton::InstantPopup);
+  m_CrosshairModeButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+  m_CrosshairModeButton->setAutoRaise(true);
   layout->addWidget( m_CrosshairModeButton );
 
   //fullScreenButton
-  m_FullScreenButton = new QPushButton(this);
+  m_FullScreenButton = new QToolButton(this);
   m_FullScreenButton->setMaximumSize(15, 15);
   m_FullScreenButton->setIconSize(size);
-  m_FullScreenButton->setFlat( true );
   m_FullScreenButton->setIcon(QIcon(QPixmap(iconFullScreen_xpm)));
+  m_FullScreenButton->setAutoRaise(true);
   layout->addWidget( m_FullScreenButton );
 
   //settingsButton
-  m_SettingsButton = new QPushButton(this);
+  m_SettingsButton = new QToolButton(this);
   m_SettingsButton->setMaximumSize(15, 15);
   m_SettingsButton->setIconSize(size);
-  m_SettingsButton->setFlat( true );
   m_SettingsButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
+  m_SettingsButton->setAutoRaise(true);
   layout->addWidget( m_SettingsButton );
 
   //Create Connections -- coming soon?
@@ -242,54 +245,27 @@ void QmitkRenderWindowMenu::SetLayoutIndex( unsigned int layoutIndex )
 void QmitkRenderWindowMenu::HideMenu( )
 {
   MITK_DEBUG << "menu hideEvent";
-
-  m_Hidden = true;
-
-  if( ! m_Entered )
-  {
-     //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-     //for Mac OS see bug 3192
-     //for Windows see bug 12130
-     //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC)
-    this->setWindowOpacity(0.0f);
-#else
-    this->setVisible(false);
-#endif
-  }
+  DeferredHideMenu();
 }
 
 void QmitkRenderWindowMenu::ShowMenu( )
 {
   MITK_DEBUG << "menu showMenu";
-
-  m_Hidden = false;
-  //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-  //for Mac OS see bug 3192
-  //for Windows see bug 12130
-  //... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC)
-  this->setWindowOpacity(1.0f);
-#else
-  this->setVisible(true);
-#endif
+  DeferredShowMenu();
 }
 
 
 void QmitkRenderWindowMenu::enterEvent( QEvent * /*e*/ )
 {
   MITK_DEBUG << "menu enterEvent";
+  DeferredShowMenu();
 
   m_Entered=true;
-
-  m_Hidden=false;
 }
 
 void QmitkRenderWindowMenu::DeferredHideMenu( )
 {
   MITK_DEBUG << "menu deferredhidemenu";
-  if(m_Hidden)
-  {
   //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
   //for Mac OS see bug 3192
   //for Windows see bug 12130
@@ -299,7 +275,6 @@ void QmitkRenderWindowMenu::DeferredHideMenu( )
 #else
   this->setVisible(false);
 #endif
-  }
 
 //    setVisible(false);
 //    setWindowOpacity(0.0f);
@@ -310,8 +285,8 @@ void QmitkRenderWindowMenu::leaveEvent( QEvent * /*e*/ )
 {
   MITK_DEBUG << "menu leaveEvent";
 
+  m_Entered = false;
   smoothHide();
-
 }
 
 /* This method is responsible for non fluttering of
@@ -320,14 +295,7 @@ void QmitkRenderWindowMenu::smoothHide()
 {
 
   MITK_DEBUG<< "menu leaveEvent";
-
-  m_Entered=false;
-
-  m_Hidden = true;
-
-  QTimer::singleShot(10,this,SLOT( DeferredHideMenu( ) ) );
-
-
+  m_HideTimer.start(10);
 }
 
 
@@ -443,6 +411,7 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
 {
 
   MITK_DEBUG << "deferred show menu";
+  m_HideTimer.stop();
 
   //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
   //for Mac OS see bug 3192
@@ -452,6 +421,7 @@ void QmitkRenderWindowMenu::DeferredShowMenu()
   this->setWindowOpacity(1.0f);
 #else
   this->setVisible(true);
+  this->raise();
 #endif
 }
 

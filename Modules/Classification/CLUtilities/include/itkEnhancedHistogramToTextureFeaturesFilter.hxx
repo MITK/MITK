@@ -114,7 +114,7 @@ namespace itk
         hit != inputHistogram->End(); ++hit )
       {
         AbsoluteFrequencyType frequency = hit.GetFrequency();
-        RelativeFrequencyType relativeFrequency =  frequency / totalFrequency;
+        RelativeFrequencyType relativeFrequency =  (totalFrequency > 0) ? frequency / totalFrequency : 0;
         m_RelativeFrequencyContainer.push_back(relativeFrequency);
 
         IndexType index = inputHistogram->GetIndex( hit.GetInstanceIdentifier() );
@@ -218,8 +218,16 @@ namespace itk
         clusterTendency += std::pow( ( index[0] - pixelMean ) + ( index[1] - pixelMean ), 2 ) * frequency;
         variance += std::pow( ( index[0] - pixelMean ), 2) * frequency;
 
-        inverseDifferenceMomentNormalized += frequency / ( 1.0 + ( index[0] - index[1] ) * ( index[0] - index[1] ) / numberOfPixels / numberOfPixels);
-        inverseDifferenceNormalized += frequency / ( 1.0 + std::abs( index[0] - index[1] ) / numberOfPixels );
+        if (numberOfPixels > 0)
+        {
+          inverseDifferenceMomentNormalized += frequency / ( 1.0 + ( index[0] - index[1] ) * ( index[0] - index[1] ) / numberOfPixels / numberOfPixels);
+          inverseDifferenceNormalized += frequency / ( 1.0 + std::abs( index[0] - index[1] ) / numberOfPixels );
+        }
+        else
+        {
+          inverseDifferenceMomentNormalized = 0;
+          inverseDifferenceNormalized = 0;
+        }
         inverseDifference += frequency / ( 1.0 + std::abs( index[0] - index[1] ) );
       }
 
@@ -247,8 +255,14 @@ namespace itk
         sumVariance += (i-diffAverage)*(i-diffAverage) * frequency;
       }
 
-      haralickCorrelation = ( haralickCorrelation - marginalMean * marginalMean )
-        / marginalDevSquared;
+      if (marginalDevSquared > 0)
+      {
+        haralickCorrelation = ( haralickCorrelation - marginalMean * marginalMean )
+          / marginalDevSquared;
+      } else
+      {
+        haralickCorrelation =0;
+      }
 
       MeasurementObjectType *energyOutputObject =
         static_cast< MeasurementObjectType * >( this->ProcessObject::GetOutput(0) );

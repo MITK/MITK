@@ -61,13 +61,38 @@ void
   labelStatisticsImageFilter->SetLabelInput(itkMask0);
   labelStatisticsImageFilter->Update();
   double median0 = labelStatisticsImageFilter->GetMedian(1);
-
+  double modulo0=0;
+  {
+    auto histo = labelStatisticsImageFilter->GetHistogram(1);
+    double maxFrequency=0;
+    for (auto hIter=histo->Begin();hIter!=histo->End();++hIter)
+    {
+      if (maxFrequency < hIter.GetFrequency())
+      {
+        maxFrequency = hIter.GetFrequency();
+        modulo0 = (histo->GetBinMin(0,hIter.GetInstanceIdentifier()) + histo->GetBinMax(0,hIter.GetInstanceIdentifier())) / 2.0;
+      }
+    }
+  }
   labelStatisticsImageFilter->SetLabelInput(itkMask1);
   labelStatisticsImageFilter->Update();
   double median1 = labelStatisticsImageFilter->GetMedian(1);
+  double modulo1 = 0;
+  {
+    auto histo = labelStatisticsImageFilter->GetHistogram(1);
+    double maxFrequency=0;
+    for (auto hIter=histo->Begin();hIter!=histo->End();++hIter)
+    {
+      if (maxFrequency < hIter.GetFrequency())
+      {
+        maxFrequency = hIter.GetFrequency();
+        modulo1 = (histo->GetBinMin(0,hIter.GetInstanceIdentifier()) + histo->GetBinMax(0,hIter.GetInstanceIdentifier())) / 2.0;
+      }
+    }
+  }
 
-  double offset = std::min(median0, median1);
-  double scaling = std::max(median0, median1) - offset;
+  double offset = std::min(modulo0, modulo1);
+  double scaling = std::max(modulo0, modulo1) - offset;
   if (scaling < 0.0001)
     return;
 

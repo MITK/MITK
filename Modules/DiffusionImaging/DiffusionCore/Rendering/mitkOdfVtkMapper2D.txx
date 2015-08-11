@@ -100,7 +100,7 @@ template<class T, int N>
 bool mitk::OdfVtkMapper2D<T, N>::m_toggleGlyphPlacementMode = true;
 
 template<class T, int N>
-vtkSmartPointer<vtkUnsignedCharArray> mitk::OdfVtkMapper2D<T, N>::m_colourScalars = nullptr;
+vtkSmartPointer<vtkDoubleArray> mitk::OdfVtkMapper2D<T, N>::m_colourScalars = nullptr;
 
 #define ODF_MAPPER_PI M_PI
 
@@ -279,19 +279,21 @@ void  mitk::OdfVtkMapper2D<T,N>
 
         if( (pfilter-> GetColorMode()) == 0 ) // m_ColourisationMode; VTK_COLOR_BY_INPUT=0, VTK_COLOR_BY_SOURCE=1.
         { /// \brief Colourisation of glyph like in MitkWorkbench's dti visualisation, r,g,b,a=x,y,z,fa of main direction of diffusion.
-          unsigned char rgba[4] = {0,0,0,0};
-          rgba[3] = abs(tensor.GetFractionalAnisotropy() * 255); // fa = FractionalAnisotropy => Helligkeit = Value, and alpha.
+//          unsigned char rgba[4] = {0,0,0,0};
+          double rgba[4] = {0,0,0,0};
+          rgba[3] = abs(tensor.GetFractionalAnisotropy()); //* 255); // fa = FractionalAnisotropy => Helligkeit = Value, and alpha.
           typename itk::DiffusionTensor3D<T>::EigenValuesArrayType eigenValues;
           typename itk::DiffusionTensor3D<T>::EigenVectorsMatrixType eigenVectors;
           tensor.ComputeEigenAnalysis( eigenValues, eigenVectors ); // normalized eigenvectors as rows in ascending order.
-          rgba[0] = ceil(fabs( eigenVectors(2, 0) ) * rgba[3]);
-          rgba[1] = ceil(fabs( eigenVectors(2, 1) ) * rgba[3]);
-          rgba[2] = ceil(fabs( eigenVectors(2, 2) ) * rgba[3]);
-#define __IMG_DAT_ITEM__CLIP_00_FF__(val) (val) = ( (val) < 0 ) ? ( 0 ) : ( ( (val) > 255 ) ? ( 255 ) : ( (val) ) );
-        __IMG_DAT_ITEM__CLIP_00_FF__(rgba[0]);
-        __IMG_DAT_ITEM__CLIP_00_FF__(rgba[1]);
-        __IMG_DAT_ITEM__CLIP_00_FF__(rgba[2]);
-        __IMG_DAT_ITEM__CLIP_00_FF__(rgba[3]);
+          rgba[0] = (fabs( eigenVectors(2, 0) ) * rgba[3]);
+          rgba[1] = (fabs( eigenVectors(2, 1) ) * rgba[3]);
+          rgba[2] = (fabs( eigenVectors(2, 2) ) * rgba[3]);
+//#define __IMG_DAT_ITEM__CLIP_00_FF__(val) (val) = ( (val) < 0 ) ? ( 0 ) : ( ( (val) > 255 ) ? ( 255 ) : ( (val) ) );
+#define __IMG_DAT_ITEM__CLIP_0_1__(val) (val) = ( (val) < 0.0 ) ? ( 0.0 ) : ( ( (val) > 1.0 ) ? ( 1.0 ) : ( (val) ) );
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[0]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[1]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[2]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[3]);
           m_colourScalars-> InsertNextTuple4( rgba[0], rgba[1], rgba[2], rgba[3] ); // Allocates space automaticaly.
 
           data-> AddArray( m_colourScalars );
@@ -315,29 +317,20 @@ void  mitk::OdfVtkMapper2D<T,N>
 
       if( (pfilter-> GetColorMode()) == 0 ) // m_ColourisationMode; VTK_COLOR_BY_INPUT=0, VTK_COLOR_BY_SOURCE=1.
       { /// \brief Colourisation of glyph like in MitkWorkbench's dti visualisation, r,g,b,a=x,y,z,fa of main direction of diffusion.
-        unsigned char rgba[4] = {0,0,0,0};
-        rgba[3] = abs( tensor.GetFractionalAnisotropy() * 255 ); // fa = FractionalAnisotropy => Helligkeit = Value
+        double rgba[4] = {0,0,0,0};
+        rgba[3] = abs( tensor.GetFractionalAnisotropy()); // * 255 ); // fa = FractionalAnisotropy => Helligkeit = Value
         typename itk::DiffusionTensor3D<T>::EigenValuesArrayType eigenValues;
         typename itk::DiffusionTensor3D<T>::EigenVectorsMatrixType eigenVectors;
         tensor.ComputeEigenAnalysis( eigenValues, eigenVectors ); // normalized eigenvectors as rows in ascending order.
-        rgba[0] = ceil(fabs( eigenVectors(2, 0) ) * rgba[3]);
-        rgba[1] = ceil(fabs( eigenVectors(2, 1) ) * rgba[3]);
-        rgba[2] = ceil(fabs( eigenVectors(2, 2) ) * rgba[3]);
-        __IMG_DAT_ITEM__CLIP_00_FF__(rgba[0]);
-        __IMG_DAT_ITEM__CLIP_00_FF__(rgba[1]);
-        __IMG_DAT_ITEM__CLIP_00_FF__(rgba[2]);
-        __IMG_DAT_ITEM__CLIP_00_FF__(rgba[3]);
+        rgba[0] = (fabs( eigenVectors(2, 0) ) * rgba[3]);
+        rgba[1] = (fabs( eigenVectors(2, 1) ) * rgba[3]);
+        rgba[2] = (fabs( eigenVectors(2, 2) ) * rgba[3]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[0]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[1]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[2]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[3]);
 
         m_colourScalars-> InsertNextTuple4( rgba[0], rgba[1], rgba[2], rgba[3] );
-#ifndef NDEBUG
-          {
-            std::cout << "<vorher pfilter->GetOutput()->GetClassName(): \""
-                      << pfilter->GetOutput()->GetClassName() << "\" >\n";
-            std::cout << "<pfiltet->GetOutput()->Print(std::cout)>\n";
-            pfilter->GetOutput()->Print(std::cout);
-            std::cout << "</pfilter->GetOutput()->Print(std::cout)>\n";
-          }
-#endif
         data-> CopyScalarsOn();
         data-> SetCopyAttribute(id, 1);
         data-> SetCopyScalars(id);
@@ -356,16 +349,16 @@ void  mitk::OdfVtkMapper2D<T,N>
           vtkIndent indent;
           std::cout << "<data>\n";
           data-> PrintSelf(std::cout, indent.GetNextIndent());
-          std::cout << "</data>\n<nachher pfilter>\n";
+          std::cout << "</data>\n<pfilter>\n";
           pfilter-> PrintSelf(std::cout, indent.GetNextIndent());
-
-          std::cout << "</pfilter>\n<pfilter->GetOutput()->GetClassName(): \""
-                    << pfilter->GetOutput()->GetClassName() << "\" />\n";
-          std::cout << "<pfilter->GetOutput()->Print(std::cout)>\n";
-          pfilter->GetOutput()->Print(std::cout);
-          std::cout << "</pfilter->GetOutput()->Print(std::cout)>\n";
+          std::cout << pfilter->GetOutput()->GetClassName() << "\n";
+          pfilter-> GetOutput()-> PrintSelf(std::cout, indent.GetNextIndent());
+          pfilter-> GetOutput()->GetPointData()-> PrintSelf(std::cout, indent.GetNextIndent());
+          pfilter-> GetOutput()->GetPointData()->GetScalars()-> PrintSelf(std::cout, indent.GetNextIndent());
+          std::cout << "</pfilter>";
         }
 #endif
+
       }
       else
       {
@@ -727,7 +720,7 @@ void  mitk::OdfVtkMapper2D<T,N>
             }
             else if ( m_toggleColourisationMode )
             {
-              m_colourScalars = vtkSmartPointer<vtkUnsignedCharArray>::New();
+              m_colourScalars = vtkSmartPointer<vtkDoubleArray>::New();
               m_colourScalars-> SetNumberOfComponents( 4 ); // red, green, blue and alpha are the 4 components per tuple.
               m_colourScalars-> SetName( "GLYPH_COLORS" );
               glyphGenerator-> SetColorModeToColorByInput();
@@ -922,13 +915,6 @@ void  mitk::OdfVtkMapper2D<T,N>
           localStorage-> m_OdfsMappers[iter]-> ScalarVisibilityOn();
           localStorage-> m_OdfsMappers[iter]-> SetScalarMode(3); // 0=Default, 1=UsePointData, 2=UseCellData, _3=UsePointFieldData_
           // 4=UseCellFieldData, 5=UseFieldData, rot oder weiss, manchmal schwarz danach ?... double [0;1] statt char [0;255] ?
-#ifndef NDEBUG
-{         MITK_INFO
-          << "m_OdfsMappers["<< iter <<"]-> GetScalarModeAsString(): " << localStorage-> m_OdfsMappers[iter]-> GetScalarModeAsString() << std::endl
-          << "m_OdfsMappers["<< iter <<"]-> GetColorModeAsString(): "  << localStorage-> m_OdfsMappers[iter]-> GetColorModeAsString() << std::endl
-          << "m_OdfsMappers["<< iter <<"]-> GetArrayId(): "   << localStorage-> m_OdfsMappers[iter]-> GetArrayId() << std::endl // Warum -1 ?
-          << "m_OdfsMappers["<< iter <<"]-> GetArrayName(): " << localStorage-> m_OdfsMappers[iter]-> GetArrayName() << std::endl; }
-#endif
         }
         else if ( m_toggleColourisationMode == false )
         {
@@ -936,13 +922,6 @@ void  mitk::OdfVtkMapper2D<T,N>
           localStorage-> m_OdfsMappers[iter]-> SelectColorArray("vector");
           localStorage-> m_OdfsMappers[iter]-> ScalarVisibilityOn();
           localStorage-> m_OdfsMappers[iter]-> SetScalarMode(0); // 0=Default
-#ifndef NDEBUG
-{         MITK_INFO
-          << "m_OdfsMappers["<< iter <<"]-> GetScalarModeAsString(): " << localStorage-> m_OdfsMappers[iter]-> GetScalarModeAsString() << std::endl
-          << "m_OdfsMappers["<< iter <<"]-> GetColorModeAsString(): "  << localStorage-> m_OdfsMappers[iter]-> GetColorModeAsString() << std::endl
-          << "m_OdfsMappers["<< iter <<"]-> GetArrayId(): "   << localStorage-> m_OdfsMappers[iter]-> GetArrayId() << std::endl
-          << "m_OdfsMappers["<< iter <<"]-> GetArrayName(): " << localStorage-> m_OdfsMappers[iter]-> GetArrayName() << std::endl; }
-#endif
         }
       }
 

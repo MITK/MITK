@@ -329,7 +329,7 @@ namespace itk
         + g1 * (t1*g0+t3*g1+t4*g2)
         + g2 * (t2*g0+t4*g1+t5*g2);
 
-      if ((*this)[i]<0 || (*this)[i]!=(*this)[i]) // NaN != NaN, C++11: isnan((*this)[i]).
+      if ((*this)[i]<0 || (*this)[i]!=(*this)[i])
         (*this)[i] = 0;
     }
   }
@@ -427,7 +427,7 @@ namespace itk
       }
 #endif
       if ( (*this)[i] < T(0) or (*this)[i] > T(1) or isnan((*this)[i]) ) // P∈[0;1] sanity check.
-      {
+      { // C: NaN != NaN, C++11: isnan((*this)[i]).
         MITK_DEBUG << "OrientationDistributionFunction<" << typeid(T).name() << ", " << NOdfDirections
                    << ">::InitFromEllipsoid(" << typeid(tensor).name()
                    << ") encountered a probability value out of range [0;1] and set it to zero: (*this)["

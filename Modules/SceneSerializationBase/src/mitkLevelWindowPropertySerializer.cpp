@@ -73,8 +73,8 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
       if (element->Attribute("fixed"))
         isFixed = std::string(element->Attribute("fixed")) == "true";
 
-      float level=0.0f;
-      float window=0.0f;
+      float level = 0;
+      float window = 0;
       TiXmlElement* child = element->FirstChildElement("CurrentSettings");
         if ( child->QueryFloatAttribute( "level", &level ) != TIXML_SUCCESS ) return nullptr;
         if ( child->QueryFloatAttribute( "window", &window ) != TIXML_SUCCESS ) return nullptr;

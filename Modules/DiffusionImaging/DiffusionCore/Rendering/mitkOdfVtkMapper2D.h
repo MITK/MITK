@@ -132,7 +132,7 @@ private:
     static int      m_ScaleBy;
     static float    m_IndexParam1;
     static float    m_IndexParam2;
-    static vtkSmartPointer<vtkUnsignedCharArray> m_colourScalars;
+    static vtkSmartPointer<vtkDoubleArray> m_colourScalars;
 
     int             m_ShowMaxNumber;
 

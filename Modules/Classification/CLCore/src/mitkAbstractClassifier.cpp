@@ -17,21 +17,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractClassifier.h>
 
 
-void mitk::AbstractClassifier::MethodForBuild()
+void mitk::AbstractClassifier::SetNthItems(const char * val, unsigned int idx)
 {
-    //class A
-    //void F1 (print "1")
-    //virtual void F2 (print "1")
+  std::stringstream ss;
+  ss << "itemlist." << idx;
+  this->GetPropertyList()->SetStringProperty(ss.str().c_str(),val);
+}
 
-    //class B : A
-    //void F1 (print "2")
-    //void F2 (print "2")
+std::string mitk::AbstractClassifier::GetNthItems(unsigned int idx) const
+{
+  std::stringstream ss;
+  ss << "itemlist." << idx;
+  std::string val;
+  this->GetPropertyList()->GetStringProperty(ss.str().c_str(),val);
+  return val;
+}
 
+void mitk::AbstractClassifier::SetItemList(std::vector<std::string> list)
+{
+  for(unsigned int i = 0 ; i < list.size(); ++i)
+    this->SetNthItems(list[i].c_str(),i);
+}
 
-    //A* var = new B;
-    //B* var2 = new B;
-    //A->F1()  --> 1
-    //B->F1()  --> 2
-
- //   A->F2()  --> 2  // schau in dem Objekt welcher Typ vorhanden ist.
+std::vector<std::string> mitk::AbstractClassifier::GetItemList() const
+{
+  std::vector<std::string> result;
+  for(unsigned int idx = 0 ;; idx++)
+  {
+    std::stringstream ss;
+    ss << "itemlist." << idx;
+    if(this->GetPropertyList()->GetProperty(ss.str().c_str()))
+    {
+      std::string s;
+      this->GetPropertyList()->GetStringProperty(ss.str().c_str(),s);
+      result.push_back(s);
+    }else
+      break;
+  }
+  return result;
 }

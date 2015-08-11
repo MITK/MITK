@@ -30,6 +30,7 @@ public:
   static const QString SHOW_ALIASES;
   static const QString SHOW_DESCRIPTIONS;
   static const QString SHOW_ALIASES_IN_DESCRIPTION;
+  static const QString SHOW_PERSISTENCE_IN_DESCRIPTION;
   static const QString DEVELOPER_MODE;
 
   QmitkPropertiesPreferencePage();

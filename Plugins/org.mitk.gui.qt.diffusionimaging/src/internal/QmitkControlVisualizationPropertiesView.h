@@ -93,6 +93,15 @@ protected slots:
 
   void Welcome();
 
+  /// \brief Slot function for switching tensor view between ODF q-balls and ellipsoids from tensors.
+  void OnTensorViewChanged();
+
+  /// \brief Slot function for switching colourisation mode of glyphs.
+  void OnColourisationModeChanged();
+
+  /// \brief Slot function for switching glyph placement mode.
+  void OnRandomModeChanged();
+
 protected:
 
   virtual void NodeRemoved(const mitk::DataNode* node) override;

@@ -54,6 +54,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QRgb>
 #include <itkMultiThreader.h>
 
+#include <ciso646>
+
 #define ROUND(a) ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 const std::string QmitkControlVisualizationPropertiesView::VIEW_ID = "org.mitk.views.controlvisualizationpropertiesview";
@@ -311,6 +313,9 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
         connect((QObject*) m_Controls->m_Crosshair, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
         connect((QObject*) m_Controls->m_LineWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(LineWidthChanged()));
         connect((QObject*) m_Controls->m_TubeWidth, SIGNAL(editingFinished()), (QObject*) this, SLOT(TubeRadiusChanged()));
+        connect( (QObject*) m_Controls->m_EllipsoidViewRadioButton, SIGNAL(toggled(bool)), (QObject*) this, SLOT(OnTensorViewChanged() ) );
+        connect( (QObject*) m_Controls->m_colouriseRainbowRadioButton, SIGNAL(toggled(bool)), (QObject*) this, SLOT(OnColourisationModeChanged() ) );
+        connect( (QObject*) m_Controls->m_randomModeRadioButton, SIGNAL(toggled(bool)), (QObject*) this, SLOT(OnRandomModeChanged() ) );
     }
 }
 
@@ -397,7 +402,6 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
 
             m_Controls->m_BundleControlsFrame->setVisible(true);
 
-            // ???
             if(m_CurrentPickingNode != 0 && node.GetPointer() != m_CurrentPickingNode)
                 m_Controls->m_Crosshair->setEnabled(false);
             else
@@ -427,6 +431,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
             m_Controls->m_ImageControlsFrame->setVisible(true);
             m_Controls->m_NumberGlyphsFrame->setVisible(true);
             m_Controls->m_GlyphFrame->setVisible(true);
+            m_Controls->m_NormalizationFrame->setVisible(true);
 
             if(m_NodeUsedForOdfVisualization.IsNotNull())
             {
@@ -443,13 +448,36 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged( std::vector<mi
             node->GetIntProperty("ShowMaxNumber", val);
             m_Controls->m_ShowMaxNumber->setValue(val);
 
-            m_Controls->m_NormalizationDropdown->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("Normalization"))->GetValueAsId());
+            m_Controls->m_NormalizationDropdown->
+                setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("Normalization"))->GetValueAsId());
 
             float fval;
             node->GetFloatProperty("Scaling",fval);
             m_Controls->m_ScalingFactor->setValue(fval);
 
-            m_Controls->m_AdditionalScaling->setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("ScaleBy"))->GetValueAsId());
+            m_Controls->m_AdditionalScaling->
+                setCurrentIndex(dynamic_cast<mitk::EnumerationProperty*>(node->GetProperty("ScaleBy"))->GetValueAsId());
+
+            bool switchTensorViewValue = false;
+            node->GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", switchTensorViewValue );
+            if( dynamic_cast<mitk::TensorImage*>(nodeData) )
+            {
+              m_Controls-> m_EllipsoidViewRadioButton-> setEnabled( true );
+              m_Controls-> m_EllipsoidViewRadioButton-> setChecked( switchTensorViewValue );
+            }
+            else
+            {
+              m_Controls-> m_EllipsoidViewRadioButton-> setEnabled( false );
+              m_Controls-> m_EllipsoidViewRadioButton-> setChecked( false );
+            }
+
+            bool colourisationModeBit = false;
+            node-> GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", colourisationModeBit );
+            m_Controls-> m_colouriseSimpleRadioButton-> setChecked( colourisationModeBit );
+
+            bool randomModeBit = false;
+            node-> GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", randomModeBit );
+            m_Controls-> m_randomModeRadioButton-> setChecked( randomModeBit );
 
             numOdfImages++;
         }
@@ -1026,4 +1054,66 @@ void QmitkControlVisualizationPropertiesView::Welcome()
 {
     berry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
                 GetSite()->GetWorkbenchWindow(), false);
+}
+
+void QmitkControlVisualizationPropertiesView::OnTensorViewChanged()
+{
+  if( m_NodeUsedForOdfVisualization.IsNotNull() )
+  {
+    if( m_Controls-> m_EllipsoidViewRadioButton-> isChecked() )
+    {
+      if ( m_SelectedNode and dynamic_cast<mitk::TensorImage*>( m_SelectedNode->GetData() ) )
+      {
+        m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", mitk::BoolProperty::New( true ) );
+        mitk::OdfNormalizationMethodProperty::Pointer normalizationProperty = mitk::OdfNormalizationMethodProperty::New( mitk::ODFN_MAX );
+        m_SelectedNode-> SetProperty( "Normalization", normalizationProperty ); // type OdfNormalizationMethodProperty
+        m_Controls-> m_NormalizationDropdown->
+            setCurrentIndex( dynamic_cast<mitk::EnumerationProperty*>( m_SelectedNode->GetProperty("Normalization") )-> GetValueAsId() );
+      }
+      else
+      {
+        m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", mitk::BoolProperty::New( false ) );
+        m_Controls-> m_OdfViewRadioButton-> setChecked(true);
+        m_Controls-> m_EllipsoidViewRadioButton-> setEnabled(false);
+      }
+    }
+
+    else if( m_Controls-> m_OdfViewRadioButton-> isChecked() )
+    {
+      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", mitk::BoolProperty::New( false ) );
+    }
+    mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::OnColourisationModeChanged()
+{
+  if( m_SelectedNode and m_NodeUsedForOdfVisualization.IsNotNull() )
+  {
+    if( m_Controls-> m_colouriseRainbowRadioButton-> isChecked() )
+    {
+      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", mitk::BoolProperty::New( false ) );
+    }
+    else if ( m_Controls-> m_colouriseSimpleRadioButton-> isChecked() )
+    {
+      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", mitk::BoolProperty::New( true ) );
+    }
+    mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::OnRandomModeChanged()
+{
+  if( m_SelectedNode and m_NodeUsedForOdfVisualization.IsNotNull() )
+  {
+    if( m_Controls-> m_randomModeRadioButton-> isChecked() )
+    {
+      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", mitk::BoolProperty::New( true ) );
+    }
+    else if ( m_Controls-> m_orderedModeRadioButton-> isChecked() )
+    {
+      m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", mitk::BoolProperty::New( false ) );
+    }
+    mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
+  }
 }

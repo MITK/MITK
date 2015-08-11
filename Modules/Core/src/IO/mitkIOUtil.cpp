@@ -428,7 +428,8 @@ std::string IOUtil::CreateTemporaryFile(std::ofstream& f, std::ios_base::openmod
     path = GetTempPath();
   }
 
-    path += GetDirectorySeparator() + templateName;
+  path += templateName;
+
   std::vector<char> dst_path(path.begin(), path.end());
   dst_path.push_back('\0');
 

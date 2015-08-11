@@ -13,8 +13,8 @@
    height="64px"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="dialog-warning.svg">
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="dialog-information.svg">
   <defs
      id="defs2987" />
   <sodipodi:namedview
@@ -25,7 +25,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.75"
-     inkscape:cx="77.082463"
+     inkscape:cx="22.718827"
      inkscape:cy="79.050308"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,16 +52,13 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
-    <text
-       xml:space="preserve"
-       style="font-size:75.09406281px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"
-       x="19.476904"
-       y="61.320103"
-       id="text2993"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan2995"
-         x="19.476904"
-         y="61.320103"></tspan></text>
+    <g
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:75.09406281px;line-height:125%;font-family:FontAwesome;-inkscape-font-specification:FontAwesome;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="text2993">
+      <path
+         d="m 46.296212,53.27431 c 0,-1.466681 -1.21525,-2.681931 -2.681931,-2.681931 l -2.681931,0 0,-24.137377 c 0,-1.466681 -1.215249,-2.681931 -2.68193,-2.681931 l -16.091585,0 c -1.466681,0 -2.681931,1.21525 -2.681931,2.681931 l 0,5.363862 c 0,1.466681 1.21525,2.681931 2.681931,2.681931 l 2.681931,0 0,16.091584 -2.681931,0 c -1.466681,0 -2.681931,1.21525 -2.681931,2.681931 l 0,5.363862 c 0,1.466681 1.21525,2.681931 2.681931,2.681931 l 21.455446,0 c 1.466681,0 2.681931,-1.21525 2.681931,-2.681931 l 0,-5.363862 z M 40.93235,4.9995556 c 0,-1.4666809 -1.215249,-2.6819308 -2.68193,-2.6819308 l -10.727724,0 c -1.466681,0 -2.68193,1.2152499 -2.68193,2.6819308 l 0,8.0457924 c 0,1.466681 1.215249,2.681931 2.68193,2.681931 l 10.727724,0 c 1.466681,0 2.68193,-1.21525 2.68193,-2.681931 l 0,-8.0457924 z"
+         style=""
+         id="path14127" />
+    </g>
   </g>
 </svg>

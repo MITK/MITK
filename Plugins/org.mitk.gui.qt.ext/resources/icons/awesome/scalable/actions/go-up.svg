@@ -13,8 +13,8 @@
    height="64px"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="Neues Dokument 2">
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="go-up.svg">
   <defs
      id="defs2987" />
   <sodipodi:namedview
@@ -31,7 +31,7 @@
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="622"
+     inkscape:window-width="673"
      inkscape:window-height="607"
      inkscape:window-x="161"
      inkscape:window-y="117"
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,16 +52,13 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
-    <text
-       xml:space="preserve"
-       style="font-size:72.20539093px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"
-       x="-1.4979576"
-       y="56.154041"
-       id="text2993"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan2995"
-         x="-1.4979576"
-         y="56.154041"></tspan></text>
+    <g
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:72.20539093px;line-height:125%;font-family:FontAwesome;-inkscape-font-specification:FontAwesome;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="text2993">
+      <path
+         d="m 63.414367,33.388391 c 0,-1.369969 -0.564105,-2.699644 -1.490848,-3.66668 L 35.692654,3.490846 c -0.967037,-0.9670365 -2.296712,-1.4908479 -3.66668,-1.4908479 -1.369968,0 -2.699644,0.5238114 -3.626387,1.4908479 L 2.1687224,29.721711 c -0.9670365,0.967036 -1.53114108,2.296711 -1.53114108,3.66668 0,1.369968 0.56410458,2.65935 1.53114108,3.626387 l 3.021989,3.021989 c 0.9267433,0.967036 2.2564185,1.531141 3.6263869,1.531141 1.3699687,0 2.6996437,-0.564105 3.6263867,-1.531141 l 11.846197,-11.805904 0,28.366403 c 0,2.90111 2.417591,4.714303 5.157528,4.714303 l 5.157528,0 c 2.739937,0 5.157528,-1.813193 5.157528,-4.714303 l 0,-28.366403 11.846197,11.805904 c 0.926743,0.967036 2.256418,1.531141 3.626387,1.531141 1.369968,0 2.699643,-0.564105 3.66668,-1.531141 l 3.021989,-3.021989 c 0.926743,-0.967037 1.490848,-2.256419 1.490848,-3.626387 z"
+         style=""
+         id="path10184" />
+    </g>
   </g>
 </svg>

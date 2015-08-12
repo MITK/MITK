@@ -64,6 +64,7 @@ void
   // --------------- Uniformity, Entropy --------------------
   double count = labelStatisticsImageFilter->GetCount(1);
   double std_dev = labelStatisticsImageFilter->GetSigma(1);
+  double uncorrected_std_dev = std::sqrt((count - 1) / count * labelStatisticsImageFilter->GetVariance(1));
   double mean = labelStatisticsImageFilter->GetMean(1);
   auto histogram = labelStatisticsImageFilter->GetHistogram(1);
   HIndexType index;
@@ -78,27 +79,36 @@ void
   double skewness = 0;
   double sum_prob = 0;
 
+  double Log2=log(2);
   for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
   {
     index[0] = i;
     double prob = histogram->GetFrequency(index);
+
+    if (prob < 0.1)
+      continue;
+
     double voxelValue = histogram->GetBinMin(0, i) +binWidth * 0.5;
 
     sum_prob += prob;
     squared_sum += prob * voxelValue*voxelValue;
 
     prob /= count;
-    kurtosis += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-    skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
     mean_absolut_deviation += prob* std::abs(voxelValue - mean);
+
+    kurtosis +=prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
+    skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
 
     uniformity += prob*prob;
     if (prob > 0)
-      entropy += prob * std::log(prob);
+    {
+      entropy += prob * std::log(prob) / Log2;
+    }
   }
+
   double rms = std::sqrt(squared_sum / count);
-  kurtosis = kurtosis  / (std_dev * std_dev);
-  skewness = skewness  / (std_dev * std_dev * std_dev);
+  kurtosis = kurtosis / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev*uncorrected_std_dev);
+  skewness = skewness / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev);
   mean_absolut_deviation = mean_absolut_deviation;
   double coveredGrayValueRange = range / imageRange;
 

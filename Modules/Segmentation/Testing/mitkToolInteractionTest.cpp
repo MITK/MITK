@@ -199,7 +199,7 @@ public:
 
   void EraseToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_EraseRegionTool.nrrd", "EraseRegionTool", "InteractionTestData/Interactions/SegmentationInteractor_EraseTool.xml", 0, "InteractionTestData/ReferenceData/SegmentationInteractor_AddTool.nrrd");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_EraseRegionTool.nrrd", "EraseRegionTool", "InteractionTestData/Interactions/SegmentationInteractor_EraseTool.xml", 0, "InteractionTestData/ReferenceData/SegmentationInteractor_AddContourTool.nrrd");
   }
 
   void FillToolInteractionTest()

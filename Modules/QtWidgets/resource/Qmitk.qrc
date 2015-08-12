@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/Qmitk" >
+    <qresource prefix="/Qmitk">
         <file>Binaerbilder_48.png</file>
         <file>Images_48.png</file>
         <file>PointSet_48.png</file>
@@ -10,5 +10,6 @@
         <file>mm_zoom.png</file>
         <file>mm_contrast.png</file>
         <file>mm_pan.png</file>
+        <file>LabelSetImage_48.png</file>
     </qresource>
 </RCC>

@@ -152,16 +152,25 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
 
           double val = 0.0;
 
-          mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
           itk::Index<3> idx;
           m_SegmentationBinaryImage->GetGeometry()->WorldToIndex(worldCoord, idx);
           try
           {
-            val = readAccess.GetPixelByIndexSafe(idx);
+            if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR)
+            {
+              mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
+              val = readAccess.GetPixelByIndexSafe(idx);
+            }
+            else if (m_SegmentationBinaryImage->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT)
+            {
+              mitk::ImagePixelReadAccessor<unsigned short> readAccess(m_SegmentationBinaryImage);
+              val = readAccess.GetPixelByIndexSafe(idx);
+            }
           }
           catch (mitk::Exception e)
           {
             // If value is outside the image's region ignore it
+            MITK_WARN<<e.what();
           }
 
           if (val == 0.0)

@@ -659,7 +659,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
   if (originalSegmentation)
   {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
+    typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
 
 
     //select single 3D volume if we have more than one time step

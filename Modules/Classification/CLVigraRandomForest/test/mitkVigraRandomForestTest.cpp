@@ -278,9 +278,11 @@ public:
     MITK_TEST_CONDITION(isIntervall<int>(m_TestYPredict,classes,97,99),"Testvalue is in range.");
   }
 
-  void TestThreadedDecisionForest()
+  void PredictWeightedDecisionForest_PredifinedForest_shouldReturnFalse()
   {
+      mitk::IOUtil::Load(GetTestDataFilePath("Classification/ForestMatlab.forest"));
   }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkVigraRandomForest)

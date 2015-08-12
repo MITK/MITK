@@ -51,7 +51,7 @@ void QmitkPointListModel::SetPointSetNode( mitk::DataNode* pointSetNode )
 {
   this->ObserveNewPointSet( pointSetNode );
   QAbstractListModel::beginResetModel();
-  QAbstractListModel::beginResetModel();
+  QAbstractListModel::endResetModel();
   emit SignalUpdateSelection();
 }
 

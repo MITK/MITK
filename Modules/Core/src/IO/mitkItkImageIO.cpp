@@ -39,6 +39,7 @@ ItkImageIO::ItkImageIO(const ItkImageIO& other)
   : AbstractFileIO(other)
   , m_ImageIO(dynamic_cast<itk::ImageIOBase*>(other.m_ImageIO->Clone().GetPointer()))
 {
+  this->InitializeDefaultMetaDataKeys();
 }
 
 std::vector<std::string> ItkImageIO::FixUpImageIOExtensions(const std::string& imageIOName)
@@ -103,6 +104,7 @@ ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
   }
 
   this->AbstractFileReader::SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".image.");
+  this->InitializeDefaultMetaDataKeys();
 
   std::vector<std::string> readExtensions = m_ImageIO->GetSupportedReadExtensions();
 
@@ -169,6 +171,7 @@ ItkImageIO::ItkImageIO(const CustomMimeType& mimeType, itk::ImageIOBase::Pointer
   }
 
   this->AbstractFileReader::SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".image.");
+  this->InitializeDefaultMetaDataKeys();
 
   if (rank)
   {
@@ -317,14 +320,25 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
 
       // Read properties should be persisted unless they are default properties
       // which are written anyway
-      if(key.find("NRRD.space") != std::string::npos)
+      bool isDefaultKey( false );
+
+      for( const auto &defaultKey : m_DefaultMetaDataKeys )
+      {
+        if( defaultKey.length() <= key.length() )
+        {
+          // does the start match the default key
+          if( key.substr(0,defaultKey.length()).find( defaultKey ) != std::string::npos )
+          {
+            isDefaultKey = true;
+          }
+        }
+      }
+
+      if( isDefaultKey == true )
       {
         continue;
       }
-      if(key.find("NRRD.kinds") != std::string::npos)
-      {
-        continue;
-      }
+
       mitk::CoreServices::GetPropertyPersistence()->AddInfo(key, mitk::PropertyPersistenceInfo::New(iter->first));
     }
   }
@@ -471,14 +485,17 @@ void ItkImageIO::Write()
       {
         continue;
       }
+
       std::string value = property.second->GetValueAsString();
-      if( value == mitk::BaseProperty::VALUECANNOTBECONVERTEDTOSTRING )
+
+      if( value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING )
       {
         continue;
       }
+
       std::string key = mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first)->GetKey();
 
-      itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(),key,value);
+      itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
     }
     // ***** Remove const_cast after bug 17952 is fixed ****
     ImageReadAccessor imageAccess(const_cast<mitk::Image*>(image));
@@ -522,6 +539,12 @@ AbstractFileIO::ConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
 ItkImageIO* ItkImageIO::IOClone() const
 {
   return new ItkImageIO(*this);
+}
+
+void ItkImageIO::InitializeDefaultMetaDataKeys()
+{
+  this->m_DefaultMetaDataKeys.push_back("NRRD.space");
+  this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
 }
 
 }

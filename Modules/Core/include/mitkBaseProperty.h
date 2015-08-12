@@ -71,7 +71,7 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
     /**
      * @brief Default return value if a property which can not be returned as string
      */
-    static const std::string VALUECANNOTBECONVERTEDTOSTRING;
+    static const std::string VALUE_CANNOT_BE_CONVERTED_TO_STRING;
 
   protected:
     BaseProperty();

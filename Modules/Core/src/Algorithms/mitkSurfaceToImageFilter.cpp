@@ -64,12 +64,18 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
   if (m_MakeOutputBinary)
   {
     if (m_UShortBinaryPixelType)
+    {
       output->Initialize(mitk::MakeScalarPixelType<unsigned short>() , *inputImage->GetTimeGeometry());
+    }
     else
+    {
       output->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry());
+    }
   }
   else
+  {
     output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeGeometry());
+  }
 
   output->SetPropertyList(inputImage->GetPropertyList()->Clone());
 }
@@ -111,13 +117,17 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
 
   unsigned int size = sizeof(unsigned char);
   if (m_MakeOutputBinary)
+  {
     if (m_UShortBinaryPixelType)
     {
       binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned short>(), *this->GetImage()->GetTimeGeometry(),1,1);
       size = sizeof(unsigned short);
     }
     else
+    {
       binaryImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *this->GetImage()->GetTimeGeometry(),1,1);
+    }
+  }
   else
   {
     binaryImage->Initialize(this->GetImage()->GetPixelType(), *this->GetImage()->GetTimeGeometry(),1,1);
@@ -125,7 +135,9 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   }
 
   for (unsigned int i = 0; i < binaryImage->GetDimension(); ++i)
+  {
     size *= binaryImage->GetDimension(i);
+  }
 
   mitk::ImageWriteAccessor accessor( binaryImage );
   memset( accessor.GetData(), 1, size );

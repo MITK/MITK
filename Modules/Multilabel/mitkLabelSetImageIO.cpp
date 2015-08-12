@@ -408,11 +408,11 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
   // get labels and add them as properties to the image
   char keybuffer[256];
 
-  int numberOfLayers = GetIntByKey(dictionary, "layers");
+  unsigned int numberOfLayers = GetIntByKey(dictionary, "layers");
   std::string _xmlStr;
   mitk::Label::Pointer label;
 
-  for (int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
+  for (unsigned int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
   {
     sprintf(keybuffer, "layer_%03d", layerIdx);
     int numberOfLabels = GetIntByKey(dictionary, keybuffer);
@@ -435,6 +435,7 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
       if (label->GetValue() == 0) // set exterior label is needed to hold exterior information
         output->SetExteriorLabel(label);
       labelSet->AddLabel(label);
+      labelSet->SetLayer(layerIdx);
     }
     output->AddLabelSetToLayer(layerIdx, labelSet);
   }

@@ -46,7 +46,8 @@ namespace mitk
     void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
     void OnlineTrain(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
     Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
-    Eigen::MatrixXi WeightedPredict(const Eigen::MatrixXd &X);
+    Eigen::MatrixXi PredictWeighted(const Eigen::MatrixXd &X);
+
 
     bool SupportsPointWiseWeight();
     bool SupportsPointWiseProbability();

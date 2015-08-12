@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <QPushButton>
 #include <QGridLayout>
+#include <QMessageBox>
 
 struct QmitkEditPointDialogData
 {
@@ -81,13 +82,30 @@ void QmitkEditPointDialog::OnOkButtonClicked(bool)
     MITK_WARN << "Pointset is 0.";
     this->reject();
   }
-
-  mitk::PointSet::PointType p = d->m_PointSet->GetPoint(d->m_PointId, d->m_Timestep);
-  p.SetElement( 0, d->m_XCoord->text().toDouble() );
-  p.SetElement( 1, d->m_YCoord->text().toDouble() );
-  p.SetElement( 2, d->m_ZCoord->text().toDouble() );
-  d->m_PointSet->SetPoint(d->m_PointId, p);
-
-  this->accept();
+  // check if digits of input value exceed double precision
+  if(std::log10(std::abs(d->m_XCoord->text().toDouble()))+1 > std::numeric_limits<double>::digits10)
+  {
+      MITK_WARN << "Pointset X coordinate is outside double precision range.";
+      QMessageBox::warning(0, "Warning: Invalid PointSet Input", "Warning: Pointset X coordinate is outside double precision range.");
+  }
+  else if(std::log10(std::abs(d->m_YCoord->text().toDouble()))+1 > std::numeric_limits<double>::digits10)
+  {
+      MITK_WARN << "Pointset Y coordinate is outside double precision range.";
+      QMessageBox::warning(0, "Warning: Invalid PointSet Input", "Warning: Pointset Y coordinate is outside double precision range.");
+  }
+  else if(std::log10(std::abs(d->m_ZCoord->text().toDouble()))+1 > std::numeric_limits<double>::digits10)
+  {
+      MITK_WARN << "Pointset Z coordinate is outside double precision range.";
+      QMessageBox::warning(0, "Warning: Invalid PointSet Input", "Warning: Pointset Z coordinate is outside double precision range.");
+  }
+  else
+  {
+      mitk::PointSet::PointType p = d->m_PointSet->GetPoint(d->m_PointId, d->m_Timestep);
+      p.SetElement( 0, d->m_XCoord->text().toDouble() );
+      p.SetElement( 1, d->m_YCoord->text().toDouble() );
+      p.SetElement( 2, d->m_ZCoord->text().toDouble() );
+      d->m_PointSet->SetPoint(d->m_PointId, p);
+      this->accept();
+  }
 }
 

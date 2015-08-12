@@ -74,7 +74,7 @@ private:
 
   static HelpPluginActivator* instance;
 
-  QScopedPointer<QHelpEngineWrapper> helpEngine;
+  QScopedPointer<QHelpEngineWrapper, QScopedPointerDeleteLater > helpEngine;
   QScopedPointer<QHelpEngineConfiguration> helpEngineConfiguration;
   QScopedPointer<HelpContextHandler> helpContextHandler;
 

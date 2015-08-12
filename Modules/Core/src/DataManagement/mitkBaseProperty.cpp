@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseProperty.h"
 
+const std::string mitk::BaseProperty::VALUECANNOTBECONVERTEDTOSTRING = "n/a";
 
 mitk::BaseProperty::BaseProperty()
 {
@@ -33,7 +34,7 @@ mitk::BaseProperty::~BaseProperty()
 
 std::string mitk::BaseProperty::GetValueAsString() const
 {
-  return std::string("n/a");
+  return std::string(VALUECANNOTBECONVERTEDTOSTRING);
 }
 
 mitk::BaseProperty& mitk::BaseProperty::operator=(const BaseProperty& rhs)

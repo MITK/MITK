@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkCoreServices.h>
+#include <mitkIPropertyPersistence.h>
 
 #include <itkImage.h>
 #include <itkImageIOFactory.h>
@@ -312,6 +314,18 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
       std::replace(key.begin(), key.end(), '_', '.');
 
       image->SetProperty(key.c_str(), mitk::StringProperty::New(value));
+
+      // Read properties should be persisted unless they are default properties
+      // which are written anyway
+      if(key.find("NRRD.space") != std::string::npos)
+      {
+        continue;
+      }
+      if(key.find("NRRD.kinds") != std::string::npos)
+      {
+        continue;
+      }
+      mitk::CoreServices::GetPropertyPersistence()->AddInfo(key, mitk::PropertyPersistenceInfo::New(iter->first));
     }
   }
 
@@ -448,6 +462,24 @@ void ItkImageIO::Write()
     m_ImageIO->SetIORegion(ioRegion);
     m_ImageIO->SetFileName(path);
 
+    // Handle properties
+    mitk::PropertyList::Pointer imagePropertyList = image->GetPropertyList();
+
+    for(const auto &property : *imagePropertyList->GetMap())
+    {
+      if( !mitk::CoreServices::GetPropertyPersistence()->HasInfo(property.first) )
+      {
+        continue;
+      }
+      std::string value = property.second->GetValueAsString();
+      if( value == mitk::BaseProperty::VALUECANNOTBECONVERTEDTOSTRING )
+      {
+        continue;
+      }
+      std::string key = mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first)->GetKey();
+
+      itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(),key,value);
+    }
     // ***** Remove const_cast after bug 17952 is fixed ****
     ImageReadAccessor imageAccess(const_cast<mitk::Image*>(image));
     m_ImageIO->Write(imageAccess.GetData());

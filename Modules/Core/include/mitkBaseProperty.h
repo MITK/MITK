@@ -68,6 +68,11 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
 
     virtual std::string GetValueAsString() const;
 
+    /**
+     * @brief Default return value if a property which can not be returned as string
+     */
+    static const std::string VALUECANNOTBECONVERTEDTOSTRING;
+
   protected:
     BaseProperty();
     BaseProperty(const BaseProperty& other);

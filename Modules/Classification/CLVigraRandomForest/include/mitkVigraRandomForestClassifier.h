@@ -88,8 +88,6 @@ namespace mitk
     // * THREADING
     // *-------------------
 
-    static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
-    static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
 
     struct TrainingData;
     struct PredictionData;
@@ -100,6 +98,11 @@ namespace mitk
 
     Parameter * m_Parameter;
     vigra::RandomForest<int> m_RandomForest;
+
+    static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
+    static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
+    static ITK_THREAD_RETURN_TYPE WeightedPredictCallback(void *);
+    static void WeightedPredict(PredictionData *data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P);
   };
 }
 

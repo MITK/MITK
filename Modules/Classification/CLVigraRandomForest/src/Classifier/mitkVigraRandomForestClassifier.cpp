@@ -80,17 +80,20 @@ struct mitk::VigraRandomForestClassifier::PredictionData
   PredictionData(const vigra::RandomForest<int> & refRF,
     const vigra::MultiArrayView<2, double> refFeature,
     vigra::MultiArrayView<2, int> refLabel,
-    vigra::MultiArrayView<2, double> refProb)
+    vigra::MultiArrayView<2, double> refProb,
+    vigra::MultiArrayView<2, double> refTreeWeights)
     : m_RandomForest(refRF),
     m_Feature(refFeature),
     m_Label(refLabel),
-    m_Probabilities(refProb)
+    m_Probabilities(refProb),
+    m_TreeWeights(refTreeWeights)
   {
   }
   const vigra::RandomForest<int> & m_RandomForest;
   const vigra::MultiArrayView<2, double> m_Feature;
   vigra::MultiArrayView<2, int> m_Label;
   vigra::MultiArrayView<2, double> m_Probabilities;
+  vigra::MultiArrayView<2, double> m_TreeWeights;
 };
 
 mitk::VigraRandomForestClassifier::VigraRandomForestClassifier()
@@ -176,12 +179,21 @@ Eigen::MatrixXi mitk::VigraRandomForestClassifier::Predict(const Eigen::MatrixXd
   m_OutLabel = Eigen::MatrixXi(X_in.rows(),1);
   m_OutLabel.fill(0);
 
+  // If no weights provided
+  if(m_TreeWeights.rows() != m_RandomForest.tree_count())
+  {
+    m_TreeWeights = Eigen::MatrixXd(m_RandomForest.tree_count(),1);
+    m_TreeWeights.fill(1);
+  }
+
+
   vigra::MultiArrayView<2, double> P(vigra::Shape2(m_OutProbability.rows(),m_OutProbability.cols()),m_OutProbability.data());
   vigra::MultiArrayView<2, int> Y(vigra::Shape2(m_OutLabel.rows(),m_OutLabel.cols()),m_OutLabel.data());
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
+  vigra::MultiArrayView<2, double> TW(vigra::Shape2(m_RandomForest.tree_count(),1),m_TreeWeights.data());
 
   std::auto_ptr<PredictionData> data;
-  data.reset( new PredictionData(m_RandomForest,X,Y,P));
+  data.reset( new PredictionData(m_RandomForest,X,Y,P,TW));
 
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
   threader->SetSingleMethod(this->PredictCallback,data.get());
@@ -190,64 +202,38 @@ Eigen::MatrixXi mitk::VigraRandomForestClassifier::Predict(const Eigen::MatrixXd
   return m_OutLabel;
 }
 
-Eigen::MatrixXi mitk::VigraRandomForestClassifier::WeightedPredict(const Eigen::MatrixXd &X_in)
+Eigen::MatrixXi mitk::VigraRandomForestClassifier::PredictWeighted(const Eigen::MatrixXd &X_in)
 {
+  // Initialize output Eigen matrices
   m_OutProbability = Eigen::MatrixXd(X_in.rows(),m_RandomForest.class_count());
   m_OutProbability.fill(0);
   m_OutLabel = Eigen::MatrixXi(X_in.rows(),1);
   m_OutLabel.fill(0);
 
+  // If no weights provided
+  if(m_TreeWeights.rows() != m_RandomForest.tree_count())
+  {
+    m_TreeWeights = Eigen::MatrixXd(m_RandomForest.tree_count(),1);
+    m_TreeWeights.fill(1);
+  }
+
+
   vigra::MultiArrayView<2, double> P(vigra::Shape2(m_OutProbability.rows(),m_OutProbability.cols()),m_OutProbability.data());
   vigra::MultiArrayView<2, int> Y(vigra::Shape2(m_OutLabel.rows(),m_OutLabel.cols()),m_OutLabel.data());
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
+  vigra::MultiArrayView<2, double> TW(vigra::Shape2(m_RandomForest.tree_count(),1),m_TreeWeights.data());
 
-  int isSampleWeighted = m_RandomForest.options_.predict_weighted_;
-#pragma omp parallel for
-  for(int row=0; row < vigra::rowCount(X); ++row)
-  {
-    vigra::MultiArrayView<2, double, vigra::StridedArrayTag> currentRow(rowVector(X, row));
+  std::auto_ptr<PredictionData> data;
+  data.reset( new PredictionData(m_RandomForest,X,Y,P,TW));
 
-    vigra::ArrayVector<double>::const_iterator weights;
+  itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
+  threader->SetSingleMethod(this->PredictCallback,data.get());
+  threader->SingleMethodExecute();
 
-    //totalWeight == totalVoteCount!
-    double totalWeight = 0.0;
-
-    //Let each tree classify...
-    for(int k=0; k<m_RandomForest.options_.tree_count_; ++k)
-    {
-      //get weights predicted by single tree
-      weights = m_RandomForest.trees_[k /*tree_indices_[k]*/].predict(currentRow);
-      double numberOfLeafObservations = (*(weights-1));
-
-      //update votecount.
-      for(int l=0; l<m_RandomForest.ext_param_.class_count_; ++l)
-      {
-        // Either the original weights are taken or the tree is additional weighted by the number of Observations in the leaf node.
-        double cur_w = weights[l] * (isSampleWeighted * numberOfLeafObservations + (1-isSampleWeighted));
-        cur_w = cur_w * m_TreeWeights(k,0);
-        P(row, l) += (int)cur_w;
-        //every weight in totalWeight.
-        totalWeight += cur_w;
-      }
-    }
-
-    //Normalise votes in each row by total VoteCount (totalWeight
-    for(int l=0; l< m_RandomForest.ext_param_.class_count_; ++l)
-    {
-      P(row, l) /= vigra::detail::RequiresExplicitCast<double>::cast(totalWeight);
-    }
-    int erg;
-    int maxCol = 0;
-    for (int col=0;col<m_RandomForest.class_count();++col)
-    {
-      if (m_OutProbability(row,col) > m_OutProbability(row, maxCol))
-        maxCol = col;
-    }
-    m_RandomForest.ext_param_.to_classlabel(maxCol, erg);
-    Y(row,0) = erg;
-  }
   return m_OutLabel;
 }
+
+
 
 void mitk::VigraRandomForestClassifier::SetTreeWeights(Eigen::MatrixXd weights)
 {
@@ -356,6 +342,105 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictCallback(void *
 
   return NULL;
 
+}
+
+ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::WeightedPredictCallback(void * arg)
+{
+  // Get the ThreadInfoStruct
+  typedef itk::MultiThreader::ThreadInfoStruct  ThreadInfoType;
+  ThreadInfoType * infoStruct = static_cast< ThreadInfoType * >( arg );
+  // assigne the thread id
+  const unsigned int threadId = infoStruct->ThreadID;
+
+  // Get the user defined parameters containing all
+  // neccesary informations
+  PredictionData * data = (PredictionData *)(infoStruct->UserData);
+  unsigned int numberOfRowsToCalculate = 0;
+
+  // Get number of rows to calculate
+  numberOfRowsToCalculate = data->m_Feature.shape()[0] / infoStruct->NumberOfThreads;
+
+  unsigned int start_index = numberOfRowsToCalculate * threadId;
+  unsigned int end_index = numberOfRowsToCalculate * (threadId+1);
+
+  // the 0th thread takes the residuals
+  if(threadId == infoStruct->NumberOfThreads-1) numberOfRowsToCalculate += data->m_Feature.shape()[0] % infoStruct->NumberOfThreads;
+
+  vigra::MultiArrayView<2, double> split_features;
+  vigra::MultiArrayView<2, int> split_labels;
+  vigra::MultiArrayView<2, double> split_probability;
+  {
+    vigra::TinyVector<vigra::MultiArrayIndex, 2> lowerBound(start_index,0);
+    vigra::TinyVector<vigra::MultiArrayIndex, 2> upperBound(end_index,data->m_Feature.shape(1));
+    split_features = data->m_Feature.subarray(lowerBound,upperBound);
+  }
+
+  {
+    vigra::TinyVector<vigra::MultiArrayIndex, 2> lowerBound(start_index,0);
+    vigra::TinyVector<vigra::MultiArrayIndex, 2> upperBound(end_index, data->m_Label.shape(1));
+    split_labels = data->m_Label.subarray(lowerBound,upperBound);
+  }
+
+  {
+    vigra::TinyVector<vigra::MultiArrayIndex, 2> lowerBound(start_index,0);
+    vigra::TinyVector<vigra::MultiArrayIndex, 2> upperBound(end_index,data->m_Probabilities.shape(1));
+    split_probability = data->m_Probabilities.subarray(lowerBound,upperBound);
+  }
+
+  WeightedPredict(data, split_features,split_labels,split_probability);
+
+  return NULL;
+}
+
+
+void mitk::VigraRandomForestClassifier::WeightedPredict(PredictionData * data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P)
+{
+
+  int isSampleWeighted = data->m_RandomForest.options_.predict_weighted_;
+//#pragma omp parallel for
+  for(int row=0; row < vigra::rowCount(X); ++row)
+  {
+    vigra::MultiArrayView<2, double, vigra::StridedArrayTag> currentRow(rowVector(X, row));
+
+    vigra::ArrayVector<double>::const_iterator weights;
+
+    //totalWeight == totalVoteCount!
+    double totalWeight = 0.0;
+
+    //Let each tree classify...
+    for(int k=0; k<data->m_RandomForest.options_.tree_count_; ++k)
+    {
+      //get weights predicted by single tree
+      weights = data->m_RandomForest.trees_[k /*tree_indices_[k]*/].predict(currentRow);
+      double numberOfLeafObservations = (*(weights-1));
+
+      //update votecount.
+      for(int l=0; l<data->m_RandomForest.ext_param_.class_count_; ++l)
+      {
+        // Either the original weights are taken or the tree is additional weighted by the number of Observations in the leaf node.
+        double cur_w = weights[l] * (isSampleWeighted * numberOfLeafObservations + (1-isSampleWeighted));
+        cur_w = cur_w * data->m_TreeWeights(k,0);
+        P(row, l) += (int)cur_w;
+        //every weight in totalWeight.
+        totalWeight += cur_w;
+      }
+    }
+
+    //Normalise votes in each row by total VoteCount (totalWeight
+    for(int l=0; l< data->m_RandomForest.ext_param_.class_count_; ++l)
+    {
+      P(row, l) /= vigra::detail::RequiresExplicitCast<double>::cast(totalWeight);
+    }
+    int erg;
+    int maxCol = 0;
+    for (int col=0;col<data->m_RandomForest.class_count();++col)
+    {
+      if (data->m_Probabilities(row,col) > data->m_Probabilities(row, maxCol))
+        maxCol = col;
+    }
+    data->m_RandomForest.ext_param_.to_classlabel(maxCol, erg);
+    Y(row,0) = erg;
+  }
 }
 
 void  mitk::VigraRandomForestClassifier::ConvertParameter()

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkRotationOperation.h>
+#include <mitkScaleOperation.h>
 #include <mitkSurface.h>
 
 #include <vtkCamera.h>
@@ -35,9 +36,9 @@ const char* deselectedColorPropertyName     = "AffineBaseDataInteractor3D.Desele
 const char* priorPropertyName               = "AffineBaseDataInteractor3D.Prior Color";
 const char* rotationStepSizePropertyName    = "AffineBaseDataInteractor3D.Rotation Step Size";
 const char* scaleStepSizePropertyName       = "AffineBaseDataInteractor3D.Scale Step Size";
-const char* rotationPointX                  = "AffineBaseDataInteractor3D.Rotation Point X";
-const char* rotationPointY                  = "AffineBaseDataInteractor3D.Rotation Point Y";
-const char* rotationPointZ                  = "AffineBaseDataInteractor3D.Rotation Point Z";
+const char* anchorPointX                  = "AffineBaseDataInteractor3D.Anchor Point X";
+const char* anchorPointY                  = "AffineBaseDataInteractor3D.Anchor Point Y";
+const char* anchorPointZ                  = "AffineBaseDataInteractor3D.Anchor Point Z";
 
 mitk::AffineBaseDataInteractor3D::AffineBaseDataInteractor3D()
 {
@@ -67,7 +68,6 @@ void mitk::AffineBaseDataInteractor3D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("translateObject",TranslateObject);
   CONNECT_FUNCTION("rotateObject",RotateObject);
   CONNECT_FUNCTION("scaleObject", ScaleObject);
-
 
   CONNECT_FUNCTION("translateUpKey",TranslateUpKey);
   CONNECT_FUNCTION("translateDownKey",TranslateDownKey);
@@ -223,10 +223,21 @@ bool mitk::AffineBaseDataInteractor3D::ScaleDownKey(mitk::StateMachineAction*, m
 
 void mitk::AffineBaseDataInteractor3D::ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry* geometry)
 {
-  PointOperation* doOp = new mitk::PointOperation(OpSCALE, newScale, 0);
+  mitk::Point3D anchorPoint;
+  float pointX = 0.0f;
+  float pointY = 0.0f;
+  float pointZ = 0.0f;
+  anchorPoint.Fill(0.0);
+  this->GetDataNode()->GetFloatProperty(anchorPointX, pointX);
+  this->GetDataNode()->GetFloatProperty(anchorPointY, pointY);
+  this->GetDataNode()->GetFloatProperty(anchorPointZ, pointZ);
+  anchorPoint[0] = pointX;
+  anchorPoint[1] = pointY;
+  anchorPoint[2] = pointZ;
+
+  ScaleOperation* doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
   geometry->ExecuteOperation(doOp);
 
-  mitk::RenderingManager::GetInstance()->InitializeViews(this->GetDataNode()->GetData()->GetGeometry());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -238,14 +249,12 @@ void mitk::AffineBaseDataInteractor3D::RotateGeometry(mitk::ScalarType angle, in
   float pointZ = 0.0f;
   mitk::Point3D pointOfRotation;
   pointOfRotation.Fill(0.0);
-  this->GetDataNode()->GetFloatProperty(rotationPointX, pointX);
-  this->GetDataNode()->GetFloatProperty(rotationPointY, pointY);
-  this->GetDataNode()->GetFloatProperty(rotationPointZ, pointZ);
+  this->GetDataNode()->GetFloatProperty(anchorPointX, pointX);
+  this->GetDataNode()->GetFloatProperty(anchorPointY, pointY);
+  this->GetDataNode()->GetFloatProperty(anchorPointZ, pointZ);
   pointOfRotation[0] = pointX;
   pointOfRotation[1] = pointY;
   pointOfRotation[2] = pointZ;
-
-  MITK_WARN << "rotation around: " << pointOfRotation;
 
   mitk::RotationOperation* doOp = new mitk::RotationOperation(OpROTATE, pointOfRotation, rotationAxis, angle);
 

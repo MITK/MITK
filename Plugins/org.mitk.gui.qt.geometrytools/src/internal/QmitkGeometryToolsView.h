@@ -47,6 +47,7 @@ class QmitkGeometryToolsView : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
+public slots:
 protected slots:
 
     /**
@@ -69,9 +70,14 @@ protected slots:
     void OnUsageInfoBoxChanged(bool flag);
 
     /**
-     * @brief OnRotationPointChanged Slot to change the point of rotation.
+     * @brief OnCustomPointRadioButtonToggled hide/show custom anchor point
+     *
      */
-    void OnRotationPointChanged(double);
+    void OnCustomPointRadioButtonToggled(bool status);
+
+    void OnAnchorPointChanged(double);
+    void OnOriginPointRadioButton(bool);
+    void OnCenterPointRadioButton(bool);
 protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;

@@ -143,6 +143,7 @@ set(CPP_FILES
   DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkRestorePlanePositionOperation.cpp
   DataManagement/mitkRotationOperation.cpp
+  DataManagement/mitkScaleOperation.cpp
   DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkSlicedData.cpp
   DataManagement/mitkSlicedGeometry3D.cpp

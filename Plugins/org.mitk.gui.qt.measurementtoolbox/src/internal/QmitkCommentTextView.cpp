@@ -1,7 +1,5 @@
 #include "QmitkCommentTextView.h"
 
-#include <Windows.h>
-
 QmitkCommentTextView::QmitkCommentTextView()
 {
   m_gui.setupUi(this);

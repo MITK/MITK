@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderStatistics::FeatureListType & featureList)
+  CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderStatistics::FeatureListType & featureList, mitk::GIFFirstOrderStatistics::ParameterStruct params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<int, VImageDimension> MaskType;
@@ -51,7 +51,12 @@ void
   labelStatisticsImageFilter->SetInput( itkImage );
   labelStatisticsImageFilter->SetLabelInput(maskImage);
   labelStatisticsImageFilter->SetUseHistograms(true);
-  labelStatisticsImageFilter->SetHistogramParameters(256, minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+  if (params.m_UseCtRange)
+  {
+    labelStatisticsImageFilter->SetHistogramParameters(1024.5+3096.5, -1024.5,3096.5);
+  } else {
+    labelStatisticsImageFilter->SetHistogramParameters(params.m_HistogramSize, minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+  }
   labelStatisticsImageFilter->Update();
 
   // --------------- Range --------------------
@@ -108,7 +113,7 @@ void
   featureList.push_back(std::make_pair("FirstOrder Covered Image Intensity Range",coveredGrayValueRange));
 
   featureList.push_back(std::make_pair("FirstOrder Minimum",labelStatisticsImageFilter->GetMinimum(1)));
-  featureList.push_back(std::make_pair("FirstOrder Maximum ",labelStatisticsImageFilter->GetMaximum(1)));
+  featureList.push_back(std::make_pair("FirstOrder Maximum",labelStatisticsImageFilter->GetMaximum(1)));
   featureList.push_back(std::make_pair("FirstOrder Mean",labelStatisticsImageFilter->GetMean(1)));
   featureList.push_back(std::make_pair("FirstOrder Variance",labelStatisticsImageFilter->GetVariance(1)));
   featureList.push_back(std::make_pair("FirstOrder Sum",labelStatisticsImageFilter->GetSum(1)));
@@ -117,7 +122,8 @@ void
   featureList.push_back(std::make_pair("FirstOrder No. of Voxel",labelStatisticsImageFilter->GetCount(1)));
 }
 
-mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics()
+mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics() :
+  m_HistogramSize(256), m_UseCtRange(false)
 {
 }
 
@@ -125,7 +131,11 @@ mitk::GIFFirstOrderStatistics::FeatureListType mitk::GIFFirstOrderStatistics::Ca
 {
   FeatureListType featureList;
 
-  AccessByItk_2(image, CalculateFirstOrderStatistics, mask, featureList);
+  ParameterStruct params;
+  params.m_HistogramSize = this->m_HistogramSize;
+  params.m_UseCtRange = this->m_UseCtRange;
+
+  AccessByItk_3(image, CalculateFirstOrderStatistics, mask, featureList, params);
 
   return featureList;
 }

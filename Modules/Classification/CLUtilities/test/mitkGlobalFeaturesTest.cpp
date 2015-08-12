@@ -22,12 +22,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFCooccurenceMatrix.h>
 #include <mitkGIFGrayLevelRunLength.h>
+#include <math.h>
 
 class mitkGlobalFeaturesTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkGlobalFeaturesTestSuite  );
 
-  MITK_TEST(TestFirstOrderStatistic);
+  MITK_TEST(FirstOrder_SinglePoint);
+
+  //MITK_TEST(TestFirstOrderStatistic);
   //  MITK_TEST(TestThreadedDecisionForest);
 
   CPPUNIT_TEST_SUITE_END();
@@ -56,6 +59,7 @@ public:
     MaskType::IndexType index;
     index[0]=88;index[1]=81;index[2]=13;
     m_ItkMask->SetPixel(index, 1);
+    MITK_INFO << "Pixel Value: "<<m_ItkImage->GetPixel(index);
     mitk::CastToMitkImage(m_ItkMask, m_Mask);
 
     // Create a mask with a covered region
@@ -72,7 +76,7 @@ public:
           index[0] = x;
           index[1] = y;
           index[2] = z;
-          MITK_INFO << "Pixel: " << m_Image->GetPixelValueByIndex(index);
+          //MITK_INFO << "Pixel: " << m_Image->GetPixelValueByIndex(index);
           m_ItkMask1->SetPixel(index, 1);
         }
       }
@@ -80,39 +84,44 @@ public:
     mitk::CastToMitkImage(m_ItkMask1, m_Mask1);
   }
 
+  void FirstOrder_SinglePoint()
+  {
+    mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
+    calculator->SetHistogramSize(4096);
+    calculator->SetUseCtRange(true);
+    auto features = calculator->CalculateFeatures(m_Image, m_Mask);
+
+    std::map<std::string, double> results;
+
+    for (auto iter=features.begin(); iter!=features.end();++iter)
+    {
+      results[(*iter).first]=(*iter).second;
+      MITK_INFO << (*iter).first << " : " << (*iter).second;
+    }
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The range of a single pixel should  be 0",0.0, results["FirstOrder Range"], 0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The uniformity of a single pixel should  be 1",1.0, results["FirstOrder Uniformity"], 0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The entropy of a single pixel should  be 0",0.0, results["FirstOrder Entropy"], 0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Root-Means-Square of a single pixel with (-352) should  be 352",352.0, results["FirstOrder RMS"], 0.01);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The Kurtosis of a single pixel should be undefined",results["FirstOrder Kurtosis"]==results["FirstOrder Kurtosis"], false);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("The Skewness of a single pixel should be undefined",results["FirstOrder Skewness"]==results["FirstOrder Skewness"], false);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Mean absolute deviation of a single pixel with (-352) should  be 0",0, results["FirstOrder Mean absolute deviation"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Covered image intensity range of a single pixel with (-352) should be 0",0, results["FirstOrder Covered Image Intensity Range"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Minimum of a single pixel with (-352) should be -352",-352, results["FirstOrder Minimum"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Maximum of a single pixel with (-352) should be -352",-352, results["FirstOrder Maximum"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Mean of a single pixel with (-352) should be -352",-352, results["FirstOrder Mean"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Variance (uncorrected) of a single pixel with (-352) should be 0",0, results["FirstOrder Variance"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Sum of a single pixel with (-352) should be -352",-352, results["FirstOrder Sum"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Median of a single pixel with (-352) should be -352",-352, results["FirstOrder Median"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Standard deviation (uncorrected) of a single pixel with (-352) should be -352",0, results["FirstOrder Standard deviation"], 0.0);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The number of voxels of a single pixel should be 1",1, results["FirstOrder No. of Voxel"], 0.0);
+    //  MITK_ASSERT_EQUAL(results["FirstOrder Range"]==0.0,true,"The range of a single pixel should  be 0");
+  }
+
   void TestFirstOrderStatistic()
   {
     {
       mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
-      auto features = calculator->CalculateFeatures(m_Image, m_Mask);
-
-      for (auto iter=features.begin(); iter!=features.end();++iter)
-      {
-        MITK_INFO << (*iter).first << " : " << (*iter).second;
-      }
-    }
-    {
-      mitk::GIFFirstOrderStatistics::Pointer calculator = mitk::GIFFirstOrderStatistics::New();
-      auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
-
-      for (auto iter=features.begin(); iter!=features.end();++iter)
-      {
-        MITK_INFO << (*iter).first << " : " << (*iter).second;
-      }
-    }
-    {
-      mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
-      calculator->SetRange(1);
-      auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
-
-      for (auto iter=features.begin(); iter!=features.end();++iter)
-      {
-        MITK_INFO << (*iter).first << " : " << (*iter).second;
-      }
-    }
-    {
-      mitk::GIFCooccurenceMatrix::Pointer calculator = mitk::GIFCooccurenceMatrix::New();
-      calculator->SetRange(1);
       auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
 
       for (auto iter=features.begin(); iter!=features.end();++iter)

@@ -27,12 +27,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <qmessagebox.h>
 
-static const QString const HelpText = QWidget::tr("Select an image and a surface above");
-static const QString const TR_IMAGE_DIFFERENT = QWidget::tr("Image and surface are of different size");
-static const QString const TR_SURFACE_TO_IMAGE = QMessageBox::tr("Surface To Image");
-static const QString const TR_SELECTION_NOT_CONTAIN = QMessageBox::tr("Selection does not contain an image and/or a surface");
-static const QString const TR_CONVERT_SURFACE = QMessageBox::tr("Convert Surface to binary image failed");
-
+static const QString HelpText = QWidget::tr("Select an image and a surface above");
+static const QString TR_IMAGE_DIFFERENT = QWidget::tr("Image and surface are of different size");
+static const QString TR_SURFACE_TO_IMAGE = QMessageBox::tr("Surface To Image");
+static const QString TR_SELECTION_NOT_CONTAIN = QMessageBox::tr("Selection does not contain an image and/or a surface");
+static const QString TR_CONVERT_SURFACE = QMessageBox::tr("Convert Surface to binary image failed");
 
 QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)

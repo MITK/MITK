@@ -34,7 +34,7 @@ class PlaneGeometry;
 class MITKPLANARFIGURE_EXPORT PlanarEllipse : public PlanarFigure
 {
 
-typedef struct MeasurementStatistics
+struct MeasurementStatistics
 {
   double Mean;
   double SD;

@@ -343,7 +343,7 @@ function(mitk_create_module)
       if(MSVC_VERSION)
         mitkFunctionCheckCAndCXXCompilerFlags("/WX" module_c_flags module_cxx_flags)
       else()
-        mitkFunctionCheckCAndCXXCompilerFlags(-Werror module_c_flags module_cxx_flags)
+        mitkFunctionCheckCAndCXXCompilerFlags("-Wno-reorder" module_c_flags module_cxx_flags)
 
         # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
         # versions to "static-member-init", see

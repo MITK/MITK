@@ -157,7 +157,7 @@ public:
   * \brief Returns the id of the control-point that corresponds to the given
   * polyline-point.
   */
-  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
+  virtual int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
 
 
   /** \brief Returns specified control point in world coordinates. */

@@ -84,7 +84,7 @@ QmitkExtWorkbenchWindowAdvisorHack
 
 QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
-static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = true;
+static bool USE_EXPERIMENTAL_COMMAND_CONTRIBUTIONS = false;
 
 class PartListenerForTitle: public berry::IPartListener
 {

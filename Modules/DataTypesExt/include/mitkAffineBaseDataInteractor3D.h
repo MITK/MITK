@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkAffineBaseDataInteractor3D_h_
-#define mitkAffineBaseDataInteractor3D_h_
+#ifndef mitkAffineBaseDataInteractor3D_h
+#define mitkAffineBaseDataInteractor3D_h
 
 #include <mitkDataInteractor.h>
 #include <mitkGeometry3D.h>

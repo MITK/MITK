@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <sstream>
 #include <iomanip>
-#include <mitkScaleOperation.h>
+
+#include <vtkMatrixToLinearTransform.h>
+#include <vtkMatrix4x4.h>
 
 #include "mitkBaseGeometry.h"
 #include "mitkVector.h"
 #include "mitkMatrixConvert.h"
-#include <vtkMatrixToLinearTransform.h>
-#include <vtkMatrix4x4.h>
 #include "mitkRotationOperation.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkApplyTransformMatrixOperation.h"
@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkModifiedLock.h"
 #include "mitkGeometryTransformHolder.h"
+#include "mitkScaleOperation.h"
 
 mitk::BaseGeometry::BaseGeometry() : Superclass(), mitk::OperationActor(),
 m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0), m_ImageGeometry(false), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
@@ -519,12 +520,12 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
     scalefactor[1] = 1 + (newScale[1] / GetMatrixColumn(1).magnitude());
     scalefactor[2] = 1 + (newScale[2] / GetMatrixColumn(2).magnitude());
 
-    mitk::Point3D center = scaleOp->GetScaleAnchorPoint();
+    mitk::Point3D anchor = scaleOp->GetScaleAnchorPoint();
 
     vtktransform->PostMultiply();
-    vtktransform->Translate(-center[0], -center[1], -center[2]);
+    vtktransform->Translate(-anchor[0], -anchor[1], -anchor[2]);
     vtktransform->Scale(scalefactor[0], scalefactor[1], scalefactor[2]);
-    vtktransform->Translate(center[0], center[1], center[2]);
+    vtktransform->Translate(anchor[0], anchor[1], anchor[2]);
     break;
   }
   case OpROTATE:

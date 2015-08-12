@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   The current implementation allows to translate, rotate and scale objects with the
   keyboard.
 
-  \warning Scaling is not supported for images, yet, and will not happen in coordinate origin.
+  \warning Scaling is not supported for images, yet.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
@@ -75,8 +75,21 @@ protected slots:
      */
     void OnCustomPointRadioButtonToggled(bool status);
 
+    /**
+     * @brief OnAnchorPointChanged sets the anchor point for rotation or translation.
+     */
     void OnAnchorPointChanged(double);
+
+    /**
+     * @brief OnOriginPointRadioButton sets the anchor point to the origin of the
+     * mitk::DataNode mitk::BaseGeometry.
+     */
     void OnOriginPointRadioButton(bool);
+
+    /**
+     * @brief OnCenterPointRadioButton sets the anchor point to the center of the
+     * mitk::DataNode mitk::BaseGeometry.
+     */
     void OnCenterPointRadioButton(bool);
 protected:
 

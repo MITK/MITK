@@ -35,11 +35,7 @@ namespace mitk
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-      VigraRandomForestClassifier();
-    VigraRandomForestClassifier(const VigraRandomForestClassifier & other)
-    {
-      this->m_RandomForest = other.m_RandomForest;
-    }
+    VigraRandomForestClassifier();
 
     ~VigraRandomForestClassifier();
 
@@ -52,15 +48,8 @@ namespace mitk
     bool SupportsPointWiseProbability();
     void ConvertParameter();
 
-    void SetRandomForest(const vigra::RandomForest<int> & rf)
-    {
-      m_RandomForest = rf;
-    }
-
-    const vigra::RandomForest<int> & GetRandomForest() const
-    {
-      return m_RandomForest;
-    }
+    void SetRandomForest(const vigra::RandomForest<int> & rf);
+    const vigra::RandomForest<int> & GetRandomForest() const;
 
     void UsePointWiseWeight(bool);
     void SetMaximumTreeDepth(int);
@@ -74,12 +63,6 @@ namespace mitk
     void SetTreeWeights(Eigen::MatrixXd weights);
     void SetTreeWeight(int treeId, double weight);
     Eigen::MatrixXd GetTreeWeights() const;
-
-    void SetNthItems(const char *val, unsigned int idx);
-    std::string GetNthItem(unsigned int idx);
-
-    void SetItemList(std::vector<std::string>);
-    std::vector<std::string> GetItemList();
 
     void PrintParameter(std::ostream &str = std::cout);
 

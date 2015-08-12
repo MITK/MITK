@@ -82,8 +82,8 @@ mitk::RandomForestFileIO::~RandomForestFileIO()
 {}
 
 std::vector<itk::SmartPointer<mitk::BaseData> >
-  mitk::RandomForestFileIO::
-  Read()
+mitk::RandomForestFileIO::
+Read()
 {
   mitk::VigraRandomForestClassifier::Pointer output = mitk::VigraRandomForestClassifier::New();
   std::vector<itk::SmartPointer<mitk::BaseData> > result;
@@ -110,35 +110,48 @@ std::vector<itk::SmartPointer<mitk::BaseData> >
       }
     }
 
-    //    vigra::HDF5File hdf5_file;
-    //    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
     output->SetRandomForest(m_rf);
     result.push_back(output.GetPointer());
-
-    auto treeWeight = output->GetTreeWeights();
-    treeWeight.resize(m_rf.tree_count(),1);
-    vigra::MultiArrayView<2, double> W(vigra::Shape2(treeWeight.rows(),treeWeight.cols()),treeWeight.data());
-
     vigra::HDF5File hdf5_file(this->GetInputLocation() , vigra::HDF5File::Open);
 
+
     hdf5_file.cd_mk("/_mitkOptions");
-    hdf5_file.read("treeWeights",W);
-    output->SetTreeWeights(treeWeight);
+
+    // ---------------------------------------------------------
+    // Read tree weights
+    if(hdf5_file.existsDataset("treeWeights"))
+    {
+      auto treeWeight = output->GetTreeWeights();
+      treeWeight.resize(m_rf.tree_count(),1);
+      vigra::MultiArrayView<2, double> W(vigra::Shape2(treeWeight.rows(),treeWeight.cols()),treeWeight.data());
+      hdf5_file.read("treeWeights",W);
+      output->SetTreeWeights(treeWeight);
+    }
+    // ---------------------------------------------------------
+
+    // ---------------------------------------------------------
+    // Read itemList
+    if(hdf5_file.existsDataset("itemList")){
+      std::string items_string;
+      hdf5_file.read("itemList",items_string);
+      auto itemlist = output->GetItemList();
+
+      std::string current_item = "";
+      for(auto character : items_string)
+      {
+        if(character == ';'){
+          // skip seperator and push back item
+          itemlist.push_back(current_item);
+          current_item.clear();
+        }else{
+          current_item = current_item + character;
+        }
+      }
+      output->SetItemList(itemlist);
+    }
+    // ---------------------------------------------------------
+
     hdf5_file.close();
-
-    //    if(!hdf5_file.existsAttribute(".","mitk")){
-    //      return result;
-    //    }else{
-    //      GetAttribute(mitk_isMitkDecisionTree,std::string);
-    //      if(mitk_isMitkDecisionTree.empty()) return result;
-
-    //      GetAttribute(mitk_Modalities,std::string);
-    //      std::vector<std::string> strs;
-    //      boost::split(strs, mitk_Modalities, boost::is_any_of("\t ,"));
-    //      MITK_INFO << "Import Modalities: " << mitk_Modalities;
-    //      output->SetModalities(strs);
-
-    //    }
 
     return result;
   }
@@ -178,29 +191,26 @@ void mitk::RandomForestFileIO::Write()
 
     vigra::HDF5File hdf5_file(this->GetOutputLocation() , vigra::HDF5File::Open);
 
-    auto treeWeight = mitkDC->GetTreeWeights();
     hdf5_file.cd_mk("/_mitkOptions");
+
+    // Write tree weights
+    // ---------------------------------------------------------
+    auto treeWeight = mitkDC->GetTreeWeights();
     vigra::MultiArrayView<2, double> W(vigra::Shape2(treeWeight.rows(),treeWeight.cols()),treeWeight.data());
     hdf5_file.write("treeWeights",W);
+    // ---------------------------------------------------------
+
+    // Write itemList
+    // ---------------------------------------------------------
+    auto items = mitkDC->GetItemList();
+    std::string item_stringlist;
+    for(auto entry : items)
+      item_stringlist = item_stringlist + entry + ";";
+
+    hdf5_file.write("itemList",item_stringlist);
+    // ---------------------------------------------------------
+
     hdf5_file.close();
-
-    //    vigra::rf_import_HDF5(rf,hdf5_file,this->GetInputLocation());
-    //    output->SetRandomForest(rf);
-    //    result.push_back(output.GetPointer());
-
-    //    if(!hdf5_file.existsAttribute(".","mitk")){
-    //      return result;
-    //    }else{
-    //      GetAttribute(mitk_isMitkDecisionTree,std::string);
-    //      if(mitk_isMitkDecisionTree.empty()) return result;
-
-    //      GetAttribute(mitk_Modalities,std::string);
-    //      std::vector<std::string> strs;
-    //      boost::split(strs, mitk_Modalities, boost::is_any_of("\t ,"));
-    //      MITK_INFO << "Import Modalities: " << mitk_Modalities;
-    //      output->SetModalities(strs);
-
-    //    }
   }
 }
 

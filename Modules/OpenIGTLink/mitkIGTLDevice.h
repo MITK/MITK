@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessageFactory.h"
 #include "mitkIGTLMessageQueue.h"
 #include "mitkIGTLMessage.h"
+#include "mitkIGTLMeasurements.h"
 
 
 namespace mitk {
@@ -354,6 +355,9 @@ namespace mitk {
 
       /** A message factory that provides the New() method for all msg types */
       mitk::IGTLMessageFactory::Pointer m_MessageFactory;
+
+      /** Measurement class to calculate latency and frame count */
+      mitk::IGTLMeasurements m_Measurement;
 
     private:
       /** creates worker thread that continuously polls interface for new

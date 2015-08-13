@@ -62,10 +62,18 @@ mitk::IGTLMessageProvider::~IGTLMessageProvider()
    this->InvokeEvent(StreamingStartRequiredEvent());
 }
 
+void mitk::IGTLMessageProvider::Update()
+{
+   m_Measurement.AddMeasurement(1);
+   Superclass::Update();
+}
+
 void mitk::IGTLMessageProvider::GenerateData()
 {
   if (this->m_IGTLDevice.IsNull())
     return;
+
+  m_Measurement.AddMeasurement(2);
 
   for (unsigned int index = 0; index < this->GetNumberOfIndexedInputs(); index++)
   {

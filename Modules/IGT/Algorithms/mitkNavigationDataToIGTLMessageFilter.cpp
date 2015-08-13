@@ -61,6 +61,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateData()
   default:
     break;
   }
+  m_Measurement.AddMeasurement(2);
 }
 
 

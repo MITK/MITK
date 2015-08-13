@@ -432,6 +432,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
                                                    << "message type: "
                                                    << msgType;
   }
+  m_Measurement.AddMeasurement(9);
 }
 
 

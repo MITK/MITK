@@ -101,6 +101,8 @@ void mitk::IGTLClient::Send()
   //get the latest message from the queue
   curMessage = this->m_SendQueue->PullMessage();
 
+  m_Measurement.AddMeasurement(4);
+
   // there is no message => return
   if ( curMessage.IsNull() )
     return;

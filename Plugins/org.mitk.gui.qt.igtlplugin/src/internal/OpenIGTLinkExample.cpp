@@ -190,3 +190,9 @@ void OpenIGTLinkExample::UpdatePipeline()
      previousValue = currentValue;
   }
 }
+
+void OpenIGTLinkExample::ExportButtonClicked()
+{
+   if (!m_Measurements.ExportData("MeasurementOutput.txt"))
+      MITK_ERROR("OpenIGTLinkExample") << "export did not work!!!";
+}

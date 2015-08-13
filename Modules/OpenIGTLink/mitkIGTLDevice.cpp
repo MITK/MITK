@@ -212,6 +212,9 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       receiveCheck = socket->Receive(curMessage->GetPackBodyPointer(),
          curMessage->GetPackBodySize(), 0);
 
+      // measure the time
+      m_Measurement.AddMeasurement(6);
+
       if ( receiveCheck > 0 )
       {
         int c = curMessage->Unpack(1);
@@ -233,6 +236,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         }
         else
         {
+          m_Measurement.AddMeasurement(7);
           this->m_ReceiveQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
@@ -266,6 +270,7 @@ void mitk::IGTLDevice::SendMessage(const mitk::IGTLMessage* msg)
 
 void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
+   m_Measurement.AddMeasurement(3);
   //add the message to the queue
   m_SendQueue->PushMessage(msg);
 }
@@ -286,6 +291,10 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg
 
   // Pack (serialize) and send
   msg->Pack();
+
+  // measure the time
+  m_Measurement.AddMeasurement(5);
+
   int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
 
   if (sendSuccess)
@@ -456,6 +465,7 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
 {
   //copy the next message into the given msg
   igtl::MessageBase::Pointer msg = this->m_ReceiveQueue->PullMessage();
+  m_Measurement.AddMeasurement(8);
   return msg;
 }
 

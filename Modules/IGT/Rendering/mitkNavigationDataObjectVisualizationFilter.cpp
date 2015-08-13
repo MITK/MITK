@@ -173,6 +173,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     data->Modified();
     output->SetDataValid(true); // operation was successful, therefore data of output is valid.
   }
+  m_Measurement.AddMeasurement(10);
 }
 
 

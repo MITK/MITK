@@ -77,6 +77,10 @@ HelpPluginActivator::HelpPluginActivator()
 HelpPluginActivator::~HelpPluginActivator()
 {
   instance = nullptr;
+  // bug-19229 no support for QScopedPointerDeleteLater in Qt4
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  helpEngine.take()->deleteLater();
+#endif
 }
 
 void

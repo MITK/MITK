@@ -287,7 +287,7 @@ template <typename TPixel, unsigned int VImageDimension>
 static void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double lower, double upper, unsigned int timeStep )
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
+  typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();

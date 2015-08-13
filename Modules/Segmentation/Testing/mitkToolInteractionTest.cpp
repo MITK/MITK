@@ -14,16 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
+
+#include <mitkDataNode.h>
+#include <mitkGlobalInteraction.h>
+#include <mitkInteractionTestHelper.h>
+#include <mitkIOUtil.h>
+#include <mitkLabelSetImage.h>
+#include <mitkStandaloneDataStorage.h>
 #include <mitkTestingConfig.h>
 #include <mitkTestFixture.h>
-
-#include <mitkIOUtil.h>
-#include <mitkInteractionTestHelper.h>
-#include <mitkStandaloneDataStorage.h>
+#include "mitkTestingMacros.h"
 #include <mitkToolManager.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkDataNode.h>
 
 #include <vtkDebugLeaks.h>
 
@@ -168,22 +169,22 @@ public:
 
   void AddToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_AddTool.nrrd", "AddContourTool", "InteractionTestData/Interactions/SegmentationInteractor_AddTool.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_AddContourTool.nrrd", "AddContourTool", "InteractionTestData/Interactions/SegmentationInteractor_AddTool.xml");
   }
 
   void SubtractToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_SubtractTool.nrrd", "SubtractContourTool", "InteractionTestData/Interactions/SegmentationInteractor_SubtractTool.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_SubtractContourTool.nrrd", "SubtractContourTool", "InteractionTestData/Interactions/SegmentationInteractor_SubtractTool.xml");
   }
 
   void PaintToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_PaintTool.nrrd", "DrawPaintbrushTool", "InteractionTestData/Interactions/SegmentationInteractor_PaintTool.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_DrawPaintbrushTool.nrrd", "DrawPaintbrushTool", "InteractionTestData/Interactions/SegmentationInteractor_PaintTool.xml");
   }
 
   void WipeToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_WipeTool.nrrd", "ErasePaintbrushTool", "InteractionTestData/Interactions/SegmentationInteractor_WipeTool.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_ErasePaintbrushTool.nrrd", "ErasePaintbrushTool", "InteractionTestData/Interactions/SegmentationInteractor_WipeTool.xml");
   }
 
   void RegionGrowingToolInteractionTest()
@@ -193,17 +194,17 @@ public:
 
   void CorrectionToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_CorrectionTool.nrrd", "CorrectorTool2D", "InteractionTestData/Interactions/SegmentationInteractor_CorrectionTool.xml");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_CorrectorTool2D.nrrd", "CorrectorTool2D", "InteractionTestData/Interactions/SegmentationInteractor_CorrectionTool.xml");
   }
 
   void EraseToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_EraseTool.nrrd", "EraseRegionTool", "InteractionTestData/Interactions/SegmentationInteractor_EraseTool.xml", 0, "InteractionTestData/ReferenceData/SegmentationInteractor_AddTool.nrrd");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_EraseRegionTool.nrrd", "EraseRegionTool", "InteractionTestData/Interactions/SegmentationInteractor_EraseTool.xml", 0, "InteractionTestData/ReferenceData/SegmentationInteractor_AddContourTool.nrrd");
   }
 
   void FillToolInteractionTest()
   {
-    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_FillTool.nrrd", "FillRegionTool", "InteractionTestData/Interactions/SegmentationInteractor_FillTool.xml", 0, "InteractionTestData/InputData/SegmentationInteractor_FillTool_input.nrrd");
+    RunTestWithParameters("Pic3D.nrrd", "InteractionTestData/ReferenceData/SegmentationInteractor_FillRegionTool.nrrd", "FillRegionTool", "InteractionTestData/Interactions/SegmentationInteractor_FillTool.xml", 0, "InteractionTestData/InputData/SegmentationInteractor_FillTool_input.nrrd");
   }
 
 /*############ example ###################

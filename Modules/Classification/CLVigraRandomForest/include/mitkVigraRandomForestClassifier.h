@@ -35,32 +35,22 @@ namespace mitk
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-      VigraRandomForestClassifier();
-    VigraRandomForestClassifier(const VigraRandomForestClassifier & other)
-    {
-      this->m_RandomForest = other.m_RandomForest;
-    }
+    VigraRandomForestClassifier();
 
     ~VigraRandomForestClassifier();
 
     void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
     void OnlineTrain(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
     Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
-    Eigen::MatrixXi WeightedPredict(const Eigen::MatrixXd &X);
+    Eigen::MatrixXi PredictWeighted(const Eigen::MatrixXd &X);
+
 
     bool SupportsPointWiseWeight();
     bool SupportsPointWiseProbability();
     void ConvertParameter();
 
-    void SetRandomForest(const vigra::RandomForest<int> & rf)
-    {
-      m_RandomForest = rf;
-    }
-
-    const vigra::RandomForest<int> & GetRandomForest() const
-    {
-      return m_RandomForest;
-    }
+    void SetRandomForest(const vigra::RandomForest<int> & rf);
+    const vigra::RandomForest<int> & GetRandomForest() const;
 
     void UsePointWiseWeight(bool);
     void SetMaximumTreeDepth(int);
@@ -75,12 +65,6 @@ namespace mitk
     void SetTreeWeight(int treeId, double weight);
     Eigen::MatrixXd GetTreeWeights() const;
 
-    void SetNthItems(const char *val, unsigned int idx);
-    std::string GetNthItem(unsigned int idx);
-
-    void SetItemList(std::vector<std::string>);
-    std::vector<std::string> GetItemList();
-
     void PrintParameter(std::ostream &str = std::cout);
 
   private:
@@ -88,8 +72,6 @@ namespace mitk
     // * THREADING
     // *-------------------
 
-    static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
-    static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
 
     struct TrainingData;
     struct PredictionData;
@@ -100,6 +82,11 @@ namespace mitk
 
     Parameter * m_Parameter;
     vigra::RandomForest<int> m_RandomForest;
+
+    static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
+    static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
+    static ITK_THREAD_RETURN_TYPE PredictWeightedCallback(void *);
+    static void VigraPredictWeighted(PredictionData *data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P);
   };
 }
 

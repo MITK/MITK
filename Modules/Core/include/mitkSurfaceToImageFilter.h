@@ -21,14 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkCoreExports.h"
 #include "mitkImageSource.h"
 #include "mitkSurface.h"
-//#include "mitkImage.h"
 
 class vtkPolyData;
 
 namespace mitk {
-
-//class Mesh;
-//class VectorOfContourLines;
 
 /**
  *
@@ -62,6 +58,10 @@ public:
   itkGetMacro(MakeOutputBinary, bool);
   itkBooleanMacro(MakeOutputBinary);
 
+  itkSetMacro(UShortBinaryPixelType, bool);
+  itkGetMacro(UShortBinaryPixelType, bool);
+  itkBooleanMacro(UShortBinaryPixelType);
+
   itkGetConstMacro(BackgroundValue,float);
   itkSetMacro(BackgroundValue,float);
 
@@ -88,9 +88,9 @@ protected:
   void Stencil3DImage(int time = 0);
 
   bool m_MakeOutputBinary;
+  bool m_UShortBinaryPixelType;
 
   float m_BackgroundValue;
-
 };
 
 } // namespace mitk

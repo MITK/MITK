@@ -2,6 +2,7 @@ set(CPP_FILES
   mitkLabel.cpp
   mitkLabelSet.cpp
   mitkLabelSetImage.cpp
+  mitkLabelSetImageConverter.cpp
   mitkLabelSetImageIO.cpp
   mitkLabelSetImageSerializer.cpp
   mitkLabelSetImageSource.cpp

@@ -159,10 +159,17 @@ protected:
   Eigen::MatrixXd m_OutProbability;
   bool m_IsUsingPointWiseProbability;
 
-  private:
-    void MethodForBuild();
+private:
+  void MethodForBuild();
 
 public:
+
+
+  void SetNthItems(const char *val, unsigned int idx);
+  std::string GetNthItems(unsigned int idx) const;
+
+  void SetItemList(std::vector<std::string>);
+  std::vector<std::string> GetItemList() const;
 
 #ifndef DOXYGEN_SKIP
 

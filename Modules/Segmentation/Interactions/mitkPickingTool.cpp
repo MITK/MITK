@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkConnectedThresholdImageFilter.h>
 
+#include <mitkLabelSetImage.h>
 
 namespace mitk {
 MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, PickingTool, "PickingTool");
@@ -214,8 +215,10 @@ void mitk::PickingTool::OnPointAdded()
 
     //Store result and preview
     mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput(),imageGeometry)->Clone();
+    mitk::LabelSetImage::Pointer resultLabelSetImage = mitk::LabelSetImage::New();
+    resultLabelSetImage->InitializeByLabeledImage(resultImage);
 
-    m_ResultNode->SetData( resultImage );
+    m_ResultNode->SetData(resultLabelSetImage);
 
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

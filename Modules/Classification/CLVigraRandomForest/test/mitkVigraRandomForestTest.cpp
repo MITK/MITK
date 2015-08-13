@@ -30,7 +30,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkVigraRandomForestTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkVigraRandomForestTestSuite  );
+  //  MITK_TEST(Load_RandomForestBaseDataUsingIOUtil_shouldReturnTrue);
+  //  MITK_TEST(Save_RandomForestBaseDataUsingIOUtil_shouldReturnTrue);
+
+  //  MITK_TEST(LoadWithMitkOptions_RandomForestBaseDataUsingIOUtil_shouldReturnTrue);
+  //  MITK_TEST(SaveWithMitkOptions_RandomForestBaseDataUsingIOUtil_shouldReturnTrue);
+
   MITK_TEST(TrainThreadedDecisionForest_MatlabDataSet_shouldReturnTrue);
+  MITK_TEST(PredictWeightedDecisionForest_SetWeightsToZero_shouldReturnTrue);
   MITK_TEST(TrainThreadedDecisionForest_BreastCancerDataSet_shouldReturnTrue);
   CPPUNIT_TEST_SUITE_END();
 
@@ -39,15 +46,140 @@ private:
   typedef Eigen::Matrix<double ,Eigen::Dynamic,Eigen::Dynamic> MatrixDoubleType;
   typedef Eigen::Matrix<int, Eigen::Dynamic,Eigen::Dynamic> MatrixIntType;
 
-  Eigen::MatrixXd m_TrainingMatrixX;
-  Eigen::MatrixXi m_TrainingLabelMatrixY;
-  Eigen::MatrixXd m_TestXPredict;
-  Eigen::MatrixXi m_TestYPredict;
+  std::pair<MatrixDoubleType, MatrixDoubleType> FeatureData_Cancer;
+  std::pair<MatrixIntType, MatrixIntType> LabelData_Cancer;
+
+  std::pair<MatrixDoubleType, MatrixDoubleType> FeatureData_Matlab;
+  std::pair<MatrixIntType, MatrixIntType> LabelData_Matlab;
 
   mitk::VigraRandomForestClassifier::Pointer classifier;
 
 public:
 
+  // ------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
+
+
+  void setUp()
+  {
+    FeatureData_Cancer = convertCSVToMatrix<double>(GetTestDataFilePath("Classification/FeaturematrixBreastcancer.csv"),';',0.5,true);
+    LabelData_Cancer = convertCSVToMatrix<int>(GetTestDataFilePath("Classification/LabelmatrixBreastcancer.csv"),';',0.5,false);
+    FeatureData_Matlab = convertCSVToMatrix<double>(GetTestDataFilePath("Classification/FeaturematrixMatlab.csv"),';',0.5,true);
+    LabelData_Matlab = convertCSVToMatrix<int>(GetTestDataFilePath("Classification/LabelmatrixMatlab.csv"),';',0.5,false);
+    classifier = mitk::VigraRandomForestClassifier::New();
+  }
+
+  void tearDown()
+  {
+    classifier = nullptr;
+  }
+
+  // ------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
+  /*
+  Train the classifier with an exampledataset of mattlab.
+  Note: The included data are gauﬂan normaldistributed.
+  */
+  void TrainThreadedDecisionForest_MatlabDataSet_shouldReturnTrue()
+  {
+
+    auto & Features_Training = FeatureData_Matlab.first;
+    auto & Labels_Training = LabelData_Matlab.first;
+
+    auto & Features_Testing = FeatureData_Matlab.second;
+    auto & Labels_Testing = LabelData_Matlab.second;
+
+    /* Train the classifier, by giving trainingdataset for the labels and features.
+    The result in an colunmvector of the labels.*/
+    classifier->Train(Features_Training,Labels_Training);
+    Eigen::MatrixXi classes = classifier->Predict(Features_Testing);
+
+    /* Testing the matching between the calculated colunmvector and the result of the RandomForest */
+    unsigned int testmatrix_rows = classes.rows();
+
+    unsigned int correctly_classified_rows = 0;
+    for(unsigned int i= 0; i < testmatrix_rows; i++){
+      if(classes(i,0) == Labels_Testing(i,0)){
+        correctly_classified_rows++;
+      }
+    }
+
+    MITK_TEST_CONDITION(correctly_classified_rows == testmatrix_rows, "Matlab Data correctly classified");
+  }
+
+  // ------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
+  /*
+  Train the classifier with the dataset of breastcancer patients from the
+  LibSVM Libary
+  */
+  void TrainThreadedDecisionForest_BreastCancerDataSet_shouldReturnTrue()
+  {
+
+    auto & Features_Training = FeatureData_Cancer.first;
+    auto & Features_Testing = FeatureData_Cancer.second;
+    auto & Labels_Training = LabelData_Cancer.first;
+    auto & Labels_Testing = LabelData_Cancer.second;
+
+
+    /* Train the classifier, by giving trainingdataset for the labels and features.
+    The result in an colunmvector of the labels.*/
+    classifier->Train(Features_Training,Labels_Training);
+    Eigen::MatrixXi classes = classifier->Predict(Features_Testing);
+
+    /* Testing the matching between the calculated colunmvector and the result of the RandomForest */
+    unsigned int maxrows = classes.rows();
+
+    bool isYPredictVector = false;
+    int count = 0;
+
+    for(unsigned int i= 0; i < maxrows; i++){
+      if(classes(i,0) == Labels_Testing(i,0)){
+        isYPredictVector = true;
+        count++;
+      }
+    }
+    MITK_TEST_CONDITION(isIntervall<int>(Labels_Testing,classes,98,99),"Testvalue of cancer data set is in range.");
+  }
+
+  // ------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
+
+  void PredictWeightedDecisionForest_SetWeightsToZero_shouldReturnTrue()
+  {
+
+    auto & Features_Training = FeatureData_Matlab.first;
+    auto & Features_Testing = FeatureData_Matlab.second;
+    auto & Labels_Training = LabelData_Matlab.first;
+//    auto & Labels_Testing = LabelData_Matlab.second;
+
+    classifier->Train(Features_Training,Labels_Training);
+
+    // get weights type resize it and set all weights to zero
+    auto weights = classifier->GetTreeWeights();
+    weights.resize(classifier->GetRandomForest().tree_count(),1);
+    weights.fill(0);
+
+    classifier->SetTreeWeights(weights);
+
+    // if all wieghts zero the missclassification rate mus be high
+    Eigen::MatrixXi classes = classifier->PredictWeighted(Features_Testing);
+
+    /* Testing the matching between the calculated colunmvector and the result of the RandomForest */
+    unsigned int maxrows = classes.rows();
+    unsigned int count = 0;
+
+    // check if all predictions are of class 1
+    for(unsigned int i= 0; i < maxrows; i++)
+      if(classes(i,0) == 1)
+        count++;
+
+    MITK_TEST_CONDITION( (count == maxrows) ,"Weighted prediction - weights applied (all weights = 0).");
+  }
+
+
+  // ------------------------------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------------------------------
   /*Reading an file, which includes the trainingdataset and the testdataset, and convert the
   content of the file into an 2dim matrixpair.
   There are an delimiter, which separates the matrix into an trainingmatrix and testmatrix */
@@ -76,38 +208,38 @@ public:
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> trainMatrixX(percentRange,c);
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> testMatrixXPredict(maxrowrange-percentRange,c);
 
-      for(int row = 0; row < percentRange; row++){
-        for(int col = 0; col < c; col++){
+      for(unsigned int row = 0; row < percentRange; row++){
+        for(unsigned int col = 0; col < c; col++){
           trainMatrixX(row,col) =  p->GetData(row,col);
         }
       }
 
-      for(int row = percentRange; row < maxrowrange; row++){
-        for(int col = 0; col < c; col++){
+      for(unsigned int row = percentRange; row < maxrowrange; row++){
+        for(unsigned int col = 0; col < c; col++){
           testMatrixXPredict(row-percentRange,col) =  p->GetData(row,col);
         }
       }
 
       return std::make_pair(trainMatrixX,testMatrixXPredict);
     }
-    else if(isXMatrix == false){
+    else{
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> trainLabelMatrixY(percentRange,c);
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> testMatrixYPredict(maxrowrange-percentRange,c);
 
-      for(int row = 0; row < percentRange; row++){
-        for(int col = 0; col < c; col++){
+      for(unsigned int row = 0; row < percentRange; row++){
+        for(unsigned int col = 0; col < c; col++){
           trainLabelMatrixY(row,col) =  p->GetData(row,col);
         }
       }
 
-      for(int row = percentRange; row < maxrowrange; row++){
-        for(int col = 0; col < c; col++){
+      for(unsigned int row = percentRange; row < maxrowrange; row++){
+        for(unsigned int col = 0; col < c; col++){
           testMatrixYPredict(row-percentRange,col) =  p->GetData(row,col);
         }
       }
-
       return std::make_pair(trainLabelMatrixY,testMatrixYPredict);
     }
+
   }
 
   /*
@@ -134,8 +266,8 @@ public:
     unsigned int maxcols = p->GetMatrix().cols();
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> matrix(maxrowrange,maxcols);
 
-    for(int rows = 0; rows < maxrowrange; rows++){
-      for(int cols = 0; cols < maxcols; cols++ ){
+    for(unsigned int rows = 0; rows < maxrowrange; rows++){
+      for(unsigned int cols = 0; cols < maxcols; cols++ ){
         matrix(rows,cols) = p->GetData(rows,cols);
       }
     }
@@ -168,49 +300,6 @@ public:
     }
   }
 
-  /*
-  Train the classifier with an exampledataset of mattlab.
-  Note: The included data are gauﬂan normaldistributed.
-  */
-  void TrainThreadedDecisionForest_MatlabDataSet_shouldReturnTrue()
-  {
-    /* Declarating an featurematrixdataset, the first matrix
-    of the matrixpair is the trainingmatrix and the second one is the testmatrix.*/
-    std::pair<MatrixDoubleType,MatrixDoubleType> matrixDouble;
-    matrixDouble = convertCSVToMatrix<double>(GetTestDataFilePath("Classification/FeaturematrixMatlab.csv"),';',0.5,true);
-    m_TrainingMatrixX = matrixDouble.first;
-    m_TestXPredict = matrixDouble.second;
-
-    /* The declaration of the labelmatrixdataset is equivalent to the declaration
-    of the featurematrixdataset.*/
-
-    std::pair<MatrixIntType,MatrixIntType> matrixInt;
-    matrixInt = convertCSVToMatrix<int>(GetTestDataFilePath("Classification/LabelmatrixMatlab.csv"),';',0.5,false);
-    m_TrainingLabelMatrixY = matrixInt.first;
-    m_TestYPredict = matrixInt.second;
-    classifier = mitk::VigraRandomForestClassifier::New();
-
-    /* Train the classifier, by giving trainingdataset for the labels and features.
-    The result in an colunmvector of the labels.*/
-    classifier->Train(m_TrainingMatrixX,m_TrainingLabelMatrixY);
-    Eigen::MatrixXi classes = classifier->Predict(m_TestXPredict);
-
-    /* Testing the matching between the calculated colunmvector and the result of the RandomForest */
-    unsigned int maxrows = classes.rows();
-
-    bool isYPredictVector = false;
-    int count = 0;
-
-    for(int i= 0; i < maxrows; i++){
-      if(classes(i,0) == m_TestYPredict(i,0)){
-        isYPredictVector = true;
-        count++;
-      }
-    }
-    MITK_INFO << 100*count/(double)(maxrows) << "%";
-    MITK_TEST_CONDITION(isIntervall<int>(m_TestYPredict,classes,97,99),"Testvalue is in range.");
-  }
-
   // Method for intervalltesting
   template<typename T>
   bool isIntervall(Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> expected, Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> actual, double lowrange, double toprange)
@@ -219,8 +308,8 @@ public:
     int count = 0;
     unsigned int rowRange = expected.rows();
     unsigned int colRange = expected.cols();
-    for(int i = 0; i < rowRange; i++){
-      for(int j = 0; j < colRange; j++){
+    for(unsigned int i = 0; i < rowRange; i++){
+      for(unsigned int j = 0; j < colRange; j++){
         if(expected(i,j) == actual(i,j)){
           count++;
         }
@@ -234,52 +323,7 @@ public:
     return isInIntervall;
   }
 
-  /*
-  Train the classifier with the dataset of breastcancer patients from the
-  LibSVM Libary
-  */
-  void TrainThreadedDecisionForest_BreastCancerDataSet_shouldReturnTrue()
-  {
-    /* Declarating an featurematrixdataset, the first matrix
-    of the matrixpair is the trainingmatrix and the second one is the testmatrix.*/
-    std::pair<MatrixDoubleType,MatrixDoubleType> matrixDouble;
-    matrixDouble = convertCSVToMatrix<double>(GetTestDataFilePath("Classification/FeaturematrixBreastcancer.csv"),';',0.5,true);
-    m_TrainingMatrixX = matrixDouble.first;
-    m_TestXPredict = matrixDouble.second;
 
-    /* The declaration of the labelmatrixdataset is equivalent to the declaration
-    of the featurematrixdataset.*/
-    std::pair<MatrixIntType,MatrixIntType> matrixInt;
-    matrixInt = convertCSVToMatrix<int>(GetTestDataFilePath("Classification/LabelmatrixBreastcancer.csv"),';',0.5,false);
-    m_TrainingLabelMatrixY = matrixInt.first;
-    m_TestYPredict = matrixInt.second;
-
-    classifier = mitk::VigraRandomForestClassifier::New();
-
-    /* Train the classifier, by giving trainingdataset for the labels and features.
-    The result in an colunmvector of the labels.*/
-    classifier->Train(m_TrainingMatrixX,m_TrainingLabelMatrixY);
-    Eigen::MatrixXi classes = classifier->Predict(m_TestXPredict);
-
-    /* Testing the matching between the calculated colunmvector and the result of the RandomForest */
-    unsigned int maxrows = classes.rows();
-
-    bool isYPredictVector = false;
-    int count = 0;
-
-    for(int i= 0; i < maxrows; i++){
-      if(classes(i,0) == m_TestYPredict(i,0)){
-        isYPredictVector = true;
-        count++;
-      }
-    }
-    MITK_INFO << 100*count/(double)(maxrows) << "%";
-    MITK_TEST_CONDITION(isIntervall<int>(m_TestYPredict,classes,97,99),"Testvalue is in range.");
-  }
-
-  void TestThreadedDecisionForest()
-  {
-  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkVigraRandomForest)

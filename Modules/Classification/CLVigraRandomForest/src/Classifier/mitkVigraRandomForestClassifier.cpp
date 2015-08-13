@@ -158,7 +158,7 @@ void mitk::VigraRandomForestClassifier::Train(const Eigen::MatrixXd & X_in, cons
 
   m_RandomForest.learn(X, Y,vigra::rf::visitors::VisitorBase(),splitter);
 
-  std::auto_ptr<TrainingData> data(new TrainingData(m_Parameter->TreeCount,m_RandomForest,splitter,X,Y, *m_Parameter));
+  std::unique_ptr<TrainingData> data(new TrainingData(m_Parameter->TreeCount,m_RandomForest,splitter,X,Y, *m_Parameter));
 
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
   threader->SetSingleMethod(this->TrainTreesCallback,data.get());
@@ -195,7 +195,7 @@ Eigen::MatrixXi mitk::VigraRandomForestClassifier::Predict(const Eigen::MatrixXd
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
   vigra::MultiArrayView<2, double> TW(vigra::Shape2(m_RandomForest.tree_count(),1),m_TreeWeights.data());
 
-  std::auto_ptr<PredictionData> data;
+  std::unique_ptr<PredictionData> data;
   data.reset( new PredictionData(m_RandomForest,X,Y,P,TW));
 
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
@@ -226,7 +226,7 @@ Eigen::MatrixXi mitk::VigraRandomForestClassifier::PredictWeighted(const Eigen::
   vigra::MultiArrayView<2, double> X(vigra::Shape2(X_in.rows(),X_in.cols()),X_in.data());
   vigra::MultiArrayView<2, double> TW(vigra::Shape2(m_RandomForest.tree_count(),1),m_TreeWeights.data());
 
-  std::auto_ptr<PredictionData> data;
+  std::unique_ptr<PredictionData> data;
   data.reset( new PredictionData(m_RandomForest,X,Y,P,TW));
 
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();

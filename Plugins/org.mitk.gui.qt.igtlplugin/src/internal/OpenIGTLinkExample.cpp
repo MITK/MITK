@@ -52,7 +52,11 @@ void OpenIGTLinkExample::SetFocus()
 OpenIGTLinkExample::~OpenIGTLinkExample()
 {
    this->DestroyPipeline();
-   if(m_IGTLDeviceSource.IsNotNull()) m_IGTLDeviceSource->UnRegisterMicroservice();
+
+   if (m_IGTLDeviceSource.IsNotNull())
+   {
+      m_IGTLDeviceSource->UnRegisterMicroservice();
+   }
 }
 
 void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
@@ -64,6 +68,8 @@ void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.butStart, SIGNAL(clicked()),
            this, SLOT(Start()) );
   connect( &m_Timer, SIGNAL(timeout()), this, SLOT(UpdatePipeline()));
+  connect(m_Controls.exportMeasurementsPushButton, SIGNAL(clicked()),
+     this, SLOT(ExportButtonClicked()));
 
   //Setup the pipeline
   this->CreatePipeline();
@@ -138,34 +144,42 @@ void OpenIGTLinkExample::DestroyPipeline()
 
 void OpenIGTLinkExample::Start()
 {
-  if ( this->m_Controls.butStart->text().contains("Start Pipeline") )
-  {
-    m_Timer.setInterval(this->m_Controls.visualizationUpdateRateSpinBox->value());
-    m_Timer.start();
-    this->m_Controls.butStart->setText("Stop Pipeline");
-    this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(true);
-  }
-  else
-  {
-    m_Timer.stop();
-    igtl::StopTrackingDataMessage::Pointer stopStreaming =
-        igtl::StopTrackingDataMessage::New();
-    this->m_IGTLClient->SendMessage(stopStreaming.GetPointer());
-    this->m_Controls.butStart->setText("Start Pipeline");
-    this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(false);
-  }
+   if (this->m_Controls.butStart->text().contains("Start Pipeline"))
+   {
+      m_Timer.setInterval(this->m_Controls.visualizationUpdateRateSpinBox->value());
+      m_Timer.start();
+      //this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(true);
+      this->m_Controls.butStart->setText("Stop Pipeline");
+   }
+   else
+   {
+      m_Timer.stop();
+      igtl::StopTrackingDataMessage::Pointer stopStreaming =
+         igtl::StopTrackingDataMessage::New();
+      this->m_IGTLClient->SendMessage(stopStreaming.GetPointer());
+      this->m_Controls.butStart->setText("Start Pipeline");
+      //this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(false);
+   }
 }
 
 void OpenIGTLinkExample::UpdatePipeline()
 {
-  //update the pipeline
-  m_VisFilter->Update();
+   if (this->m_Controls.visualizeCheckBox->isChecked())
+   {
+      //update the pipeline
+      m_VisFilter->Update();
 
-  //update the boundings
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+      //update the boundings
+      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
-  //Update rendering
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      //Update rendering
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+   }
+   else
+   {
+      //no visualization so we just update this filter
+      m_IGTLMsgToNavDataFilter->Update();
+   }
 
   //check if the timer interval changed
   static int previousValue = 0;

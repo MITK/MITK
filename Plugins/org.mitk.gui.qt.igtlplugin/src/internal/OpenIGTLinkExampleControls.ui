@@ -57,6 +57,20 @@
       </layout>
      </item>
      <item>
+      <widget class="QCheckBox" name="visualizeCheckBox">
+       <property name="text">
+        <string>Visualize</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="exportMeasurementsPushButton">
+       <property name="text">
+        <string>Export Measurement</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="spacer2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

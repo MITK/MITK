@@ -55,6 +55,8 @@ class OpenIGTLinkExample : public QmitkAbstractView
     void Start();
     void UpdatePipeline();
 
+    void ExportButtonClicked();
+
 
   protected:
 

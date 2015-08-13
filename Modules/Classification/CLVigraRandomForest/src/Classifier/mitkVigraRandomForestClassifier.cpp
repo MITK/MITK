@@ -227,7 +227,7 @@ Eigen::MatrixXi mitk::VigraRandomForestClassifier::PredictWeighted(const Eigen::
   data.reset( new PredictionData(m_RandomForest,X,Y,P,TW));
 
   itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
-  threader->SetSingleMethod(this->PredictCallback,data.get());
+  threader->SetSingleMethod(this->PredictWeightedCallback,data.get());
   threader->SingleMethodExecute();
 
   return m_OutLabel;
@@ -312,8 +312,10 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictCallback(void *
   unsigned int start_index = numberOfRowsToCalculate * threadId;
   unsigned int end_index = numberOfRowsToCalculate * (threadId+1);
 
-  // the 0th thread takes the residuals
-  if(threadId == infoStruct->NumberOfThreads-1) numberOfRowsToCalculate += data->m_Feature.shape()[0] % infoStruct->NumberOfThreads;
+  // the last thread takes the residuals
+  if(threadId == infoStruct->NumberOfThreads-1) {
+    end_index += data->m_Feature.shape()[0] % infoStruct->NumberOfThreads;
+  }
 
   vigra::MultiArrayView<2, double> split_features;
   vigra::MultiArrayView<2, int> split_labels;
@@ -344,7 +346,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictCallback(void *
 
 }
 
-ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::WeightedPredictCallback(void * arg)
+ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictWeightedCallback(void * arg)
 {
   // Get the ThreadInfoStruct
   typedef itk::MultiThreader::ThreadInfoStruct  ThreadInfoType;
@@ -363,8 +365,10 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::WeightedPredictCallbac
   unsigned int start_index = numberOfRowsToCalculate * threadId;
   unsigned int end_index = numberOfRowsToCalculate * (threadId+1);
 
-  // the 0th thread takes the residuals
-  if(threadId == infoStruct->NumberOfThreads-1) numberOfRowsToCalculate += data->m_Feature.shape()[0] % infoStruct->NumberOfThreads;
+  // the last thread takes the residuals
+  if(threadId == infoStruct->NumberOfThreads-1) {
+    end_index += data->m_Feature.shape()[0] % infoStruct->NumberOfThreads;
+  }
 
   vigra::MultiArrayView<2, double> split_features;
   vigra::MultiArrayView<2, int> split_labels;
@@ -387,13 +391,13 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::WeightedPredictCallbac
     split_probability = data->m_Probabilities.subarray(lowerBound,upperBound);
   }
 
-  WeightedPredict(data, split_features,split_labels,split_probability);
+  VigraPredictWeighted(data, split_features,split_labels,split_probability);
 
   return NULL;
 }
 
 
-void mitk::VigraRandomForestClassifier::WeightedPredict(PredictionData * data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P)
+void mitk::VigraRandomForestClassifier::VigraPredictWeighted(PredictionData * data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P)
 {
 
   int isSampleWeighted = data->m_RandomForest.options_.predict_weighted_;

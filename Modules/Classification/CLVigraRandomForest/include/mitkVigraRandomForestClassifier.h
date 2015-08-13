@@ -102,8 +102,8 @@ namespace mitk
 
     static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
     static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
-    static ITK_THREAD_RETURN_TYPE WeightedPredictCallback(void *);
-    static void WeightedPredict(PredictionData *data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P);
+    static ITK_THREAD_RETURN_TYPE PredictWeightedCallback(void *);
+    static void VigraPredictWeighted(PredictionData *data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P);
   };
 }
 

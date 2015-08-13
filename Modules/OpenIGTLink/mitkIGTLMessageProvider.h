@@ -143,11 +143,23 @@ namespace mitk {
     **/
     mitk::IGTLMessageSource::Pointer GetFittingSource(const char* requestedType);
 
+    /** Invokes the start streaming event. This separate method is required, because it
+     *  has to be started from the main thread. (It is used as callback function)
+     */
+    void InvokeStartStreamingEvent();
+
+     /** Invokes the stop streaming event. This separate method is required, because it
+     *  has to be started from the main thread. (It is used as callback function)
+     */
+    void InvokeStopStreamingEvent();
+
   private:
     /**
      * \brief a command that has to be executed in the main thread
      */
     ProviderCommand::Pointer m_StreamingCommand;
+
+    ProviderCommand::Pointer m_StopStreamingCommand;
 
     ///**
     // * \brief Timer thread for generating a continuous time signal for the stream

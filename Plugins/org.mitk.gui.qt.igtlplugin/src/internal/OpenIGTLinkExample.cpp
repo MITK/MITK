@@ -52,6 +52,7 @@ void OpenIGTLinkExample::SetFocus()
 OpenIGTLinkExample::~OpenIGTLinkExample()
 {
    this->DestroyPipeline();
+   if(m_IGTLDeviceSource.IsNotNull()) m_IGTLDeviceSource->UnRegisterMicroservice();
 }
 
 void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )

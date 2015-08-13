@@ -50,6 +50,8 @@ const std::string OpenIGTLinkProviderExample::VIEW_ID =
 OpenIGTLinkProviderExample::~OpenIGTLinkProviderExample()
 {
    this->DestroyPipeline();
+   if(m_IGTLMessageProvider.IsNotNull()) m_IGTLMessageProvider->UnRegisterMicroservice();
+   if(m_NavDataToIGTLMsgFilter.IsNotNull()) m_NavDataToIGTLMsgFilter->UnRegisterMicroservice();
 }
 
 void OpenIGTLinkProviderExample::SetFocus()

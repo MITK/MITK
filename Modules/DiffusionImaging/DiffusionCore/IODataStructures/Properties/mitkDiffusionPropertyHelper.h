@@ -51,6 +51,7 @@ namespace mitk
     static const std::string MEASUREMENTFRAMEPROPERTYNAME;
     static const std::string REFERENCEBVALUEPROPERTYNAME;
     static const std::string BVALUEMAPPROPERTYNAME;
+    static const std::string MODALITY;
 
     /// Public constructor, takes a mitk::Image pointer as argument
     DiffusionPropertyHelper( mitk::Image* inputImage );

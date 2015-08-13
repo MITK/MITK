@@ -20,11 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <mitkProperties.h>
 
-const std::string mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME = "meta.GradientDirections";
-const std::string mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME = "meta.OriginalGradientDirections";
-const std::string mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME = "meta.MeasurementFrame";
-const std::string mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME = "meta.ReferenceBValue";
-const std::string mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME = "BValueMap";
+const std::string mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME = "DWMRI.GradientDirections";
+const std::string mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME = "DWMRI.OriginalGradientDirections";
+const std::string mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME = "DWMRI.MeasurementFrame";
+const std::string mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME = "DWMRI.ReferenceBValue";
+const std::string mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME = "DWMRI.BValueMap";
+const std::string mitk::DiffusionPropertyHelper::MODALITY = "DWMRI.Modality";
 
 mitk::DiffusionPropertyHelper::DiffusionPropertyHelper()
 {

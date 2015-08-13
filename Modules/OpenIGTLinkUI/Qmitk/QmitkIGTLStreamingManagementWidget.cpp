@@ -63,6 +63,11 @@ void QmitkIGTLStreamingManagementWidget::RemoveObserver()
       this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
       this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
    }
+   if (this->m_IGTLMsgProvider.IsNotNull())
+   {
+      this->m_IGTLMsgProvider->RemoveObserver(m_StartStreamingTimerObserverTag);
+      this->m_IGTLMsgProvider->RemoveObserver(m_StopStreamingTimerObserverTag);
+   }
 }
 
 void QmitkIGTLStreamingManagementWidget::CreateQtPartControl(QWidget *parent)
@@ -198,6 +203,9 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
   //reset the observers
   this->RemoveObserver();
 
+  //disconnect the timer
+  disconnect(&this->m_StreamingTimer);
+
 
     this->m_IGTLMsgProvider = provider;
 
@@ -238,13 +246,25 @@ void QmitkIGTLStreamingManagementWidget::LoadSource(
     newConnectionCommand->SetCallbackFunction(
       this, &QmitkIGTLStreamingManagementWidget::OnNewConnection );
     this->m_NewConnectionObserverTag = this->m_IGTLDevice->AddObserver(
-          mitk::NewClientConnectionEvent(), newConnectionCommand);
+       mitk::NewClientConnectionEvent(), newConnectionCommand);
 
     CurCommandType::Pointer stateModifiedCommand = CurCommandType::New();
     stateModifiedCommand->SetCallbackFunction(
-      this, &QmitkIGTLStreamingManagementWidget::OnDeviceStateChanged );
+       this, &QmitkIGTLStreamingManagementWidget::OnDeviceStateChanged);
     this->m_StateModifiedObserverTag = this->m_IGTLDevice->AddObserver(
-          itk::ModifiedEvent(), stateModifiedCommand);
+       itk::ModifiedEvent(), stateModifiedCommand);
+
+    CurCommandType::Pointer startStreamingTimerCommand = CurCommandType::New();
+    startStreamingTimerCommand->SetCallbackFunction(
+       this, &QmitkIGTLStreamingManagementWidget::OnStartStreamingTimer);
+    this->m_StartStreamingTimerObserverTag = this->m_IGTLMsgProvider->AddObserver(
+       mitk::StreamingStartRequiredEvent(), startStreamingTimerCommand);
+
+    CurCommandType::Pointer stopStreamingTimerCommand = CurCommandType::New();
+    stopStreamingTimerCommand->SetCallbackFunction(
+       this, &QmitkIGTLStreamingManagementWidget::OnStopStreamingTimer);
+    this->m_StopStreamingTimerObserverTag = this->m_IGTLMsgProvider->AddObserver(
+       mitk::StreamingStopRequiredEvent(), stopStreamingTimerCommand);
 
   this->AdaptGUIToState();
 }
@@ -310,6 +330,40 @@ void QmitkIGTLStreamingManagementWidget::OnNewConnection()
 {
    emit SelectSourceAndAdaptGUISignal();
 }
+
+void QmitkIGTLStreamingManagementWidget::OnStartStreamingTimer()
+{
+   if (this->m_IGTLMsgProvider.IsNotNull())
+   {
+      //get the frame rate
+      unsigned int interval = this->m_IGTLMsgProvider->GetStreamingTime();
+      //connect the update method
+      connect(&m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
+      //start the timer
+      this->m_StreamingTimer.start(interval);
+   }
+}
+
+void QmitkIGTLStreamingManagementWidget::OnStopStreamingTimer()
+{
+   //stop the timer
+   this->m_StreamingTimer.stop();
+   //if the provider is still valid disconnect from it
+   if (this->m_IGTLMsgProvider.IsNotNull())
+   {
+      //disconnect the update method
+      disconnect(&m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
+   }
+}
+
+void QmitkIGTLStreamingManagementWidget::OnStreamingTimerTimeout()
+{
+   if (this->m_IGTLMsgSource.IsNotNull())
+   {
+      this->m_IGTLMsgProvider->Update();
+   }
+}
+
 
 void QmitkIGTLStreamingManagementWidget::SelectSourceAndAdaptGUI()
 {

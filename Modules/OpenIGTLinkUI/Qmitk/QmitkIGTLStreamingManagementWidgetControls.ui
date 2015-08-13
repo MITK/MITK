@@ -98,7 +98,7 @@
         </sizepolicy>
        </property>
        <property name="maximum">
-        <number>150</number>
+        <number>1500</number>
        </property>
        <property name="value">
         <number>10</number>

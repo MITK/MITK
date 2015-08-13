@@ -87,6 +87,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateQtPartControl(QWidget *parent)
   // set the validator for the port edit box (values must be between 1 and 65535)
   m_Controls->editPort->setValidator(new QIntValidator(1, 65535, this));
 
+  m_FPSCalculationTimer.start(1000);
+
   //connect slots with signals
   CreateConnections();
 }
@@ -106,6 +108,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateConnections()
              this, SLOT(OnBufferIncomingMessages(int)));
     connect( m_Controls->bufferOutMsgCheckBox, SIGNAL(stateChanged(int)),
              this, SLOT(OnBufferOutgoingMessages(int)));
+    connect(&m_FPSCalculationTimer, SIGNAL(timeout()),
+             this, SLOT(OnUpdateFPSLabel()));
   }
   //this is used for thread seperation, otherwise the worker thread would change the ui elements
   //which would cause an exception
@@ -330,6 +334,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived()
       MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
          << this->m_IGTLDevice->GetReceiveQueue()->GetLatestMsgInformationString();
    }
+
+   m_NumReceivedFramesSinceLastUpdate++;
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnMessageSent()
@@ -367,4 +373,12 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferOutgoingMessages(int state)
       this->m_IGTLDevice->EnableInfiniteBufferingMode(
          this->m_IGTLDevice->GetSendQueue(), (bool)state);
    }
+}
+
+void QmitkIGTLDeviceSetupConnectionWidget::OnUpdateFPSLabel()
+{
+   double fps = m_NumReceivedFramesSinceLastUpdate / 1.0;
+   QString fpsString = QString::number(fps);
+   this->m_Controls->fpsLabel->setText(fpsString);
+   m_NumReceivedFramesSinceLastUpdate = 0;
 }

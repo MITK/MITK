@@ -80,6 +80,11 @@ namespace mitk {
     */
     bool IsStreaming();
 
+    /**
+    * \brief Get method for the streaming time
+    */
+    itkGetMacro(StreamingTime, unsigned int);
+
   protected:
     IGTLMessageProvider();
     virtual ~IGTLMessageProvider();
@@ -144,22 +149,22 @@ namespace mitk {
      */
     ProviderCommand::Pointer m_StreamingCommand;
 
-    /**
-     * \brief Timer thread for generating a continuous time signal for the stream
-     *
-     * Everyt time the time is passed a time signal is invoked.
-     *
-     * \param pInfoStruct pointer to the mitkIGTLMessageProvider object
-     * \return
-     */
-    static ITK_THREAD_RETURN_TYPE TimerThread(void* pInfoStruct);
+    ///**
+    // * \brief Timer thread for generating a continuous time signal for the stream
+    // *
+    // * Everyt time the time is passed a time signal is invoked.
+    // *
+    // * \param pInfoStruct pointer to the mitkIGTLMessageProvider object
+    // * \return
+    // */
+    //static ITK_THREAD_RETURN_TYPE TimerThread(void* pInfoStruct);
 
-    int                                       m_ThreadId;
+    //int                                       m_ThreadId;
 
-    /** \brief timer thread will terminate after the next wakeup if set to true */
-    bool                                      m_StopStreamingThread;
+    ///** \brief timer thread will terminate after the next wakeup if set to true */
+    //bool                                      m_StopStreamingThread;
 
-    itk::SmartPointer<itk::MultiThreader>     m_MultiThreader;
+    //itk::SmartPointer<itk::MultiThreader>     m_MultiThreader;
 
     /** \brief the time used for streaming */
     unsigned int                              m_StreamingTime;
@@ -167,12 +172,30 @@ namespace mitk {
     /** \brief mutex for guarding m_Time */
     itk::SmartPointer<itk::FastMutexLock>     m_StreamingTimeMutex;
 
-    /** \brief mutex for guarding m_StopStreamingThread */
-    itk::SmartPointer<itk::FastMutexLock>     m_StopStreamingThreadMutex;
+    ///** \brief mutex for guarding m_StopStreamingThread */
+    //itk::SmartPointer<itk::FastMutexLock>     m_StopStreamingThreadMutex;
 
     /** \brief flag to indicate if the provider is streaming */
     bool                                      m_IsStreaming;
 
   };
+
+  /**
+  * \brief connect to this Event to get notified when a stream is requested
+  *
+  * \note It is necessary to do the following things to have streaming support: 1. listen to this
+  * event. 2. When emitted start a timer with the given interval. 3. In the timeout method of
+  * this timer call IGTLMessageProvider::Update. 4. Also listen to the StreamingStopRequiredEvent
+  * and stop the timer imdediately.
+  * */
+  itkEventMacro(StreamingStartRequiredEvent, itk::AnyEvent);
+
+  /**
+  * \brief connect to this Event to get notified when a stream shall be stopped
+  *
+  * \note It is necessary to connect to this event and stop the streaming timer when called.
+  * */
+  itkEventMacro(StreamingStopRequiredEvent, itk::AnyEvent);
+
 } // namespace mitk
 #endif /* MITKIGTLMESSAGEPROVIDER_H_HEADER_INCLUDED_ */

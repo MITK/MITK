@@ -42,7 +42,8 @@ namespace mitk
     void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
     void OnlineTrain(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
     Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
-    Eigen::MatrixXi WeightedPredict(const Eigen::MatrixXd &X);
+    Eigen::MatrixXi PredictWeighted(const Eigen::MatrixXd &X);
+
 
     bool SupportsPointWiseWeight();
     bool SupportsPointWiseProbability();
@@ -71,8 +72,6 @@ namespace mitk
     // * THREADING
     // *-------------------
 
-    static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
-    static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
 
     struct TrainingData;
     struct PredictionData;
@@ -83,6 +82,11 @@ namespace mitk
 
     Parameter * m_Parameter;
     vigra::RandomForest<int> m_RandomForest;
+
+    static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
+    static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
+    static ITK_THREAD_RETURN_TYPE PredictWeightedCallback(void *);
+    static void VigraPredictWeighted(PredictionData *data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P);
   };
 }
 

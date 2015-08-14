@@ -47,6 +47,8 @@ QmitkIGTLDeviceSetupConnectionWidget::QmitkIGTLDeviceSetupConnectionWidget(
   m_Controls = NULL;
   this->m_IGTLDevice = NULL;
   CreateQtPartControl(this);
+  m_NumSentFramesSinceLastUpdate = 0;
+  m_NumReceivedFramesSinceLastUpdate = 0;
 }
 
 
@@ -329,21 +331,21 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnNewConnection()
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived()
 {
-   if (this->m_Controls->logIncomingMsg->isChecked())
-   {
-      MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
-         << this->m_IGTLDevice->GetReceiveQueue()->GetLatestMsgInformationString();
-   }
-
-   m_NumReceivedFramesSinceLastUpdate++;
+  if (this->m_Controls->logIncomingMsg->isChecked())
+  {
+    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
+      << this->m_IGTLDevice->GetReceiveQueue()->GetLatestMsgInformationString();
+  }
+  m_NumReceivedFramesSinceLastUpdate++;
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnMessageSent()
 {
-   if (this->m_Controls->logOutgoingMsg->isChecked())
-   {
-      MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Sent a message.";
-   }
+  if (this->m_Controls->logOutgoingMsg->isChecked())
+  {
+    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Sent a message.";
+  }
+  m_NumSentFramesSinceLastUpdate++;
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnCommandReceived()
@@ -377,8 +379,10 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferOutgoingMessages(int state)
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnUpdateFPSLabel()
 {
-   double fps = m_NumReceivedFramesSinceLastUpdate / 1.0;
-   QString fpsString = QString::number(fps);
-   this->m_Controls->fpsLabel->setText(fpsString);
-   m_NumReceivedFramesSinceLastUpdate = 0;
+  double fpsIn = m_NumReceivedFramesSinceLastUpdate / 1.0;
+  double fpsOut = m_NumSentFramesSinceLastUpdate / 1.0;
+  this->m_Controls->fpsInLabel->setText(QString::number(fpsIn));
+  this->m_Controls->fpsOutLabel->setText(QString::number(fpsOut));
+  m_NumReceivedFramesSinceLastUpdate = 0;
+  m_NumSentFramesSinceLastUpdate = 0;
 }

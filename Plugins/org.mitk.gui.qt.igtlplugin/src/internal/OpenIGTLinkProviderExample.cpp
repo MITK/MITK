@@ -76,16 +76,7 @@ void OpenIGTLinkProviderExample::CreateQtPartControl( QWidget *parent )
            this, SLOT(OnOpenFile()) );
   connect( &m_VisualizerTimer, SIGNAL(timeout()),
            this, SLOT(UpdateVisualization()));
-}
 
-void OpenIGTLinkProviderExample::CreatePipeline()
-{
-   //create a navigation data player object that will play nav data from a
-   //recorded file
-   m_NavDataPlayer = mitk::NavigationDataPlayer::New();
-
-   //set the currently read navigation data set
-   m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
 
   //create a new OpenIGTLink Client
   m_IGTLServer = mitk::IGTLServer::New();
@@ -100,6 +91,16 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //register the provider so that it can be configured with the IGTL manager
   //plugin. This could be hardcoded but now I already have the fancy plugin.
   m_IGTLMessageProvider->RegisterAsMicroservice();
+}
+
+void OpenIGTLinkProviderExample::CreatePipeline()
+{
+  //create a navigation data player object that will play nav data from a
+  //recorded file
+  m_NavDataPlayer = mitk::NavigationDataPlayer::New();
+
+  //set the currently read navigation data set
+  m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
 
   //create a filter that converts navigation data into IGTL messages
   m_NavDataToIGTLMsgFilter = mitk::NavigationDataToIGTLMessageFilter::New();
@@ -114,8 +115,8 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //define the operation mode for this filter, we want to send tracking data
   //messages
   m_NavDataToIGTLMsgFilter->SetOperationMode(
-        mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
-//       mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);
+    mitk::NavigationDataToIGTLMessageFilter::ModeSendTDataMsg);
+  //       mitk::NavigationDataToIGTLMessageFilter::ModeSendTransMsg);
 
   //set the name of this filter to identify it easier
   m_NavDataToIGTLMsgFilter->SetName("Tracking Data Source From Example");
@@ -132,26 +133,26 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //create an object that will be moved respectively to the navigation data
   for (size_t i = 0; i < m_NavDataPlayer->GetNumberOfIndexedOutputs(); i++)
   {
-     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-     QString name("DemoNode IGTLProviderExmpl T");
-     name.append(QString::number(i));
-     newNode->SetName(name.toStdString());
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    QString name("DemoNode IGTLProviderExmpl T");
+    name.append(QString::number(i));
+    newNode->SetName(name.toStdString());
 
-     //create small sphere and use it as surface
-     mitk::Surface::Pointer mySphere = mitk::Surface::New();
-     vtkSphereSource *vtkData = vtkSphereSource::New();
-     vtkData->SetRadius(2.0f);
-     vtkData->SetCenter(0.0, 0.0, 0.0);
-     vtkData->Update();
-     mySphere->SetVtkPolyData(vtkData->GetOutput());
-     vtkData->Delete();
-     newNode->SetData(mySphere);
+    //create small sphere and use it as surface
+    mitk::Surface::Pointer mySphere = mitk::Surface::New();
+    vtkSphereSource *vtkData = vtkSphereSource::New();
+    vtkData->SetRadius(2.0f);
+    vtkData->SetCenter(0.0, 0.0, 0.0);
+    vtkData->Update();
+    mySphere->SetVtkPolyData(vtkData->GetOutput());
+    vtkData->Delete();
+    newNode->SetData(mySphere);
 
-     this->GetDataStorage()->Add(newNode);
+    this->GetDataStorage()->Add(newNode);
 
-     m_NavDataVisualizer->SetRepresentationObject(i, mySphere);
+    m_NavDataVisualizer->SetRepresentationObject(i, mySphere);
 
-     m_DemoNodes.append(newNode);
+    m_DemoNodes.append(newNode);
   }
 
   //connect the visualization with the navigation data player

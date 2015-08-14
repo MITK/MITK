@@ -69,11 +69,8 @@ void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
            this, SLOT(Start()) );
   connect( &m_Timer, SIGNAL(timeout()), this, SLOT(UpdatePipeline()));
   connect(m_Controls.exportMeasurementsPushButton, SIGNAL(clicked()),
-     this, SLOT(ExportButtonClicked()));
-}
+           this, SLOT(ExportButtonClicked()));
 
-void OpenIGTLinkExample::CreatePipeline()
-{
   //create a new OpenIGTLinkExample Client
   m_IGTLClient = mitk::IGTLClient::New();
   m_IGTLClient->SetName("OIGTL Example Client Device");
@@ -85,6 +82,10 @@ void OpenIGTLinkExample::CreatePipeline()
   m_IGTLDeviceSource->SetIGTLDevice(m_IGTLClient);
 
   m_IGTLDeviceSource->RegisterAsMicroservice();
+}
+
+void OpenIGTLinkExample::CreatePipeline()
+{
 
   //create a filter that converts OpenIGTLinkExample messages into navigation data
   m_IGTLMsgToNavDataFilter = mitk::IGTLMessageToNavigationDataFilter::New();

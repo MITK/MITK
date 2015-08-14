@@ -152,9 +152,20 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->bufferInMsgCheckBox->setEnabled(false);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(false);
     this->m_Controls->butConnect->setEnabled(true);
+    this->m_Controls->fpsInLabel->setEnabled(false);
+    this->m_Controls->fpsOutLabel->setEnabled(false);
+    this->m_Controls->fpsInDescrLabel->setEnabled(false);
+    this->m_Controls->fpsOutDescrLabel->setEnabled(false);
     break;
   case mitk::IGTLDevice::Ready:
-    this->m_Controls->butConnect->setText("Disconnect");
+    if (m_IGTLDevice->GetNumberOfConnections())
+    {
+      this->m_Controls->butConnect->setText("Disconnect");
+    }
+    else
+    {
+      this->m_Controls->butConnect->setText("Go Offline");
+    }
     this->m_Controls->editIP->setEnabled(false);
     this->m_Controls->editPort->setEnabled(false);
     this->m_Controls->logIncomingMsg->setEnabled(true);
@@ -162,9 +173,20 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->bufferInMsgCheckBox->setEnabled(true);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(true);
     this->m_Controls->butConnect->setEnabled(true);
+    this->m_Controls->fpsInLabel->setEnabled(true);
+    this->m_Controls->fpsOutLabel->setEnabled(true);
+    this->m_Controls->fpsInDescrLabel->setEnabled(true);
+    this->m_Controls->fpsOutDescrLabel->setEnabled(true);
     break;
   case mitk::IGTLDevice::Running:
-    this->m_Controls->butConnect->setText("Disconnect");
+    if (m_IGTLDevice->GetNumberOfConnections())
+    {
+      this->m_Controls->butConnect->setText("Disconnect");
+    }
+    else
+    {
+      this->m_Controls->butConnect->setText("Go Offline");
+    }
     this->m_Controls->editIP->setEnabled(false);
     this->m_Controls->editPort->setEnabled(false);
     this->m_Controls->logIncomingMsg->setEnabled(true);
@@ -172,6 +194,10 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->bufferInMsgCheckBox->setEnabled(true);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(true);
     this->m_Controls->butConnect->setEnabled(true);
+    this->m_Controls->fpsInLabel->setEnabled(true);
+    this->m_Controls->fpsOutLabel->setEnabled(true);
+    this->m_Controls->fpsInDescrLabel->setEnabled(true);
+    this->m_Controls->fpsOutDescrLabel->setEnabled(true);
     break;
   default:
     mitkThrow() << "Invalid Device State";

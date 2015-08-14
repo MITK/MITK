@@ -45,6 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMessage.h>
 #include <mitkImageCast.h>
 
+#include <mitkSurface.h>
+
 #include <itkCommand.h>
 
 #include "mitkDataNodeObject.h"
@@ -100,7 +102,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
       else
       {
         m_View->m_Controls.m_StatusLabel->hide();
-        bool foundFixedImage = false;
+        bool foundFixedNode = false;
         mitk::DataNode::Pointer fixedNode;
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
@@ -130,26 +132,34 @@ struct SelListenerPointBasedRegistration : ISelectionListener
               {
                 // was - compare()
                 // use contain to allow other Image types to be selected, i.e. a diffusion image
-                if (QString( node->GetData()->GetNameOfClass() ).contains("Image") )
+                if (    (QString( node->GetData()->GetNameOfClass() ).contains("Image") )
+                     || (QString( node->GetData()->GetNameOfClass() ).contains("Surface") ) )
                 {
                   // verify that the node selected by name is really an image or derived class
-                  mitk::Image* _image = dynamic_cast<mitk::Image*>(node->GetData());
-                  if (_image != NULL)
+                  mitk::BaseData* _basedata = dynamic_cast<mitk::BaseData*>( node->GetData() );
+
+                  // one of the data
+                  if (_basedata != nullptr )
                   {
-                    if( _image->GetDimension() == 4)
+                    if( _basedata->GetTimeSteps() > 3 )
                     {
                       m_View->m_Controls.m_StatusLabel->show();
-                      QMessageBox::information( NULL, "PointBasedRegistration", "Only 2D or 3D images can be processed.", QMessageBox::Ok );
+                      QMessageBox::information( NULL, "PointBasedRegistration", "Only 2D or 3D objects can be processed.", QMessageBox::Ok );
                       return;
                     }
-                    if (foundFixedImage == false)
+
+                    // for first, allow image and surfaces to be selected
+                    mitk::Image::Pointer input_image = dynamic_cast<mitk::Image*>(node->GetData());
+                    mitk::Surface::Pointer input_surface  = dynamic_cast<mitk::Surface*>(node->GetData());
+
+                    if ( ( input_image.IsNotNull() || input_surface.IsNotNull() ) &&  foundFixedNode == false )
                     {
                       fixedNode = node;
-                      foundFixedImage = true;
+                      foundFixedNode = true;
                     }
                     else
                     {
-                      // method deleted for more information see bug-18492
+                      // method deleted, for more information see bug-18492
                       // m_View->SetImagesVisible(selection);
                       m_View->FixedSelected(fixedNode);
                       m_View->MovingSelected(node);
@@ -401,60 +411,6 @@ void QmitkPointBasedRegistrationView::Deactivated()
 
 void QmitkPointBasedRegistrationView::Hidden()
 {
-  /*
-  m_Deactivated = true;
-  if (m_FixedPointSetNode.IsNotNull())
-    m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldFixedLabel));
-  m_Controls.m_FixedPointListWidget->SetPointSetNode(NULL);
-  m_Controls.m_FixedPointListWidget->DeactivateInteractor(true);
-  if (m_MovingPointSetNode.IsNotNull())
-    m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldMovingLabel));
-  m_Controls.m_MovingPointListWidget->SetPointSetNode(NULL);
-  m_Controls.m_MovingPointListWidget->DeactivateInteractor(true);
-  this->setImageColor(false);
-  if (m_MovingNode.IsNotNull())
-  {
-    m_MovingNode->SetOpacity(m_OriginalOpacity);
-  }
-  this->clearTransformationLists();
-  if (m_FixedPointSetNode.IsNotNull() && m_FixedLandmarks.IsNotNull() && m_FixedLandmarks->GetSize() == 0)
-  {
-    this->GetDataStorage()->Remove(m_FixedPointSetNode);
-  }
-  if (m_MovingPointSetNode.IsNotNull() && m_MovingLandmarks.IsNotNull() && m_MovingLandmarks->GetSize() == 0)
-  {
-    this->GetDataStorage()->Remove(m_MovingPointSetNode);
-  }
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  m_FixedNode = NULL;
-  m_MovingNode = NULL;
-  if(m_FixedLandmarks.IsNotNull())
-    m_FixedLandmarks->RemoveObserver(m_CurrentFixedLandmarksObserverID);
-  m_FixedLandmarks = NULL;
-  if(m_MovingLandmarks.IsNotNull())
-    m_MovingLandmarks->RemoveObserver(m_CurrentMovingLandmarksObserverID);
-  m_MovingLandmarks = NULL;
-  m_FixedPointSetNode = NULL;
-  m_MovingPointSetNode = NULL;
-  m_Controls.m_FixedLabel->hide();
-  m_Controls.TextLabelFixed->hide();
-  m_Controls.line2->hide();
-  m_Controls.m_FixedPointListWidget->hide();
-  m_Controls.m_MovingLabel->hide();
-  m_Controls.TextLabelMoving->hide();
-  m_Controls.line1->hide();
-  m_Controls.m_MovingPointListWidget->hide();
-  m_Controls.m_OpacityLabel->hide();
-  m_Controls.m_OpacitySlider->hide();
-  m_Controls.label->hide();
-  m_Controls.label_2->hide();
-  m_Controls.m_SwitchImages->hide();
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemovePostSelectionListener(m_SelListener);
-  m_SelListener = NULL;
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  //QmitkFunctionality::Deactivated();*/
 }
 
 
@@ -707,13 +663,8 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataNode::Pointer mov
 
 void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
 {
-//  mitk::PointSet* ps = mitk::PointSet::New();
-//  ps = dynamic_cast<mitk::PointSet*>(m_MovingPointSetNode->GetData());
-//  mitk::DataNode::Pointer tmpPtr = m_MovingPointSetNode;
-//  m_MovingLandmarks = 0;
-//  m_MovingLandmarks = (ps);
   m_MovingLandmarks = dynamic_cast<mitk::PointSet*>(m_MovingPointSetNode->GetData());
-//  m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);    //Workaround: m_MovingPointListWidget->m_PointListView->m_PointListModel loses the pointer on the pointsetnode
+
   this->checkLandmarkError();
   this->CheckCalculate();
 }
@@ -721,6 +672,7 @@ void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
 void QmitkPointBasedRegistrationView::updateFixedLandmarksList()
 {
   m_FixedLandmarks = dynamic_cast<mitk::PointSet*>(m_FixedPointSetNode->GetData());
+
   this->checkLandmarkError();
   this->CheckCalculate();
 }
@@ -732,41 +684,31 @@ void QmitkPointBasedRegistrationView::HideFixedImage(bool hide)
   {
     m_FixedNode->SetVisibility(!hide);
   }
-  if (hide)
-  {
-    //this->reinitMovingClicked();
-  }
-  if (!m_HideMovingImage && !m_HideFixedImage)
-  {
-    //this->globalReinitClicked();
-  }
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPointBasedRegistrationView::HideMovingImage(bool hide)
 {
   m_HideMovingImage = hide;
+
   if(m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetVisibility(!hide);
   }
-  if (hide)
-  {
-    //this->reinitFixedClicked();
-  }
-  if (!m_HideMovingImage && !m_HideFixedImage)
-  {
-    //this->globalReinitClicked();
-  }
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 bool QmitkPointBasedRegistrationView::CheckCalculate()
 {
-  if((m_MovingPointSetNode.IsNull())||(m_FixedPointSetNode.IsNull()||m_FixedLandmarks.IsNull()||m_MovingLandmarks.IsNull()))
-    return false;
+  if(( m_MovingPointSetNode.IsNull() )||
+     ( m_FixedPointSetNode.IsNull()||m_FixedLandmarks.IsNull()||m_MovingLandmarks.IsNull())  )
+      return false;
+
   if(m_MovingNode==m_FixedNode)
     return false;
+
   return this->checkCalculateEnabled();
 }
 

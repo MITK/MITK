@@ -54,6 +54,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
+#include <QFileDialog>
+
 
 const std::string QmitkPointBasedRegistrationView::VIEW_ID = "org.mitk.views.pointbasedregistration";
 
@@ -225,7 +227,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
 QmitkPointBasedRegistrationView::QmitkPointBasedRegistrationView(QObject * /*parent*/, const char * /*name*/)
 : QmitkFunctionality(), m_MultiWidget(NULL), m_FixedLandmarks(NULL), m_MovingLandmarks(NULL), m_MovingNode(NULL),
-m_FixedNode(NULL), m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Transformation(0), m_HideFixedImage(false), m_HideMovingImage(false),
+m_FixedNode(NULL), m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Transformation(0), m_LastTransformMatrix(nullptr), m_HideFixedImage(false), m_HideMovingImage(false),
 m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixedLandmarksObserverID(0), m_CurrentMovingLandmarksObserverID(0)
 {
   m_FixedLandmarksChangedCommand = itk::SimpleMemberCommand<QmitkPointBasedRegistrationView>::New();
@@ -456,9 +458,17 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataNode::Pointer fixe
           m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldFixedLabel));
         }
       }
+
       // get selected node
       m_FixedNode = fixedImage;
-      m_FixedNode->SetOpacity(0.5);
+
+
+      // force opacity 1.0 for surfaces, otherwise the point picking/interaction does not work properly
+      if( QString(m_FixedNode->GetData()->GetNameOfClass() ).contains("Surface") )
+        m_FixedNode->SetOpacity(1.0);
+      else
+        m_FixedNode->SetOpacity(0.5);
+
       m_FixedNode->SetVisibility(true);
       m_Controls.m_FixedLabel->setText(QString::fromStdString(m_FixedNode->GetName()));
       m_Controls.m_FixedLabel->show();
@@ -568,6 +578,13 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataNode::Pointer mov
         m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldMovingLabel));
       m_MovingNode = movingImage;
       m_MovingNode->SetVisibility(true);
+
+
+      // force opacity 1.0 for surfaces, otherwise the point picking/interaction does not work properly
+      if( QString(m_MovingNode->GetData()->GetNameOfClass() ).contains("Surface") )
+        m_Opacity = 1.0;
+
+
       m_Controls.m_MovingLabel->setText(QString::fromStdString(m_MovingNode->GetName()));
       m_Controls.m_MovingLabel->show();
       m_Controls.TextLabelMoving->show();
@@ -1085,6 +1102,11 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
       transform->SetModeToAffine();
     }
     vtkMatrix4x4 * matrix=transform->GetMatrix();
+
+    m_LastTransformMatrix = matrix->NewInstance();
+    m_LastTransformMatrix->DeepCopy( matrix );
+
+
     double determinant = fabs(matrix->Determinant());
     if((determinant < mitk::eps) || (determinant > 100) || (determinant < 0.01)
       || (determinant==itk::NumericTraits<double>::infinity())
@@ -1275,5 +1297,18 @@ void QmitkPointBasedRegistrationView::SwitchImages()
 void QmitkPointBasedRegistrationView::OnExportTransformButtonPushed()
 {
   // handle transform export
+  QString filename = QFileDialog::getSaveFileName(0, "Save transform file as plain matrix", "", ".txt");
+  QFile f( filename );
+  f.open( QIODevice::WriteOnly );
+
+  // write out text
+  QTextStream outstream(&f);
+  outstream << "# Plain text transform matrix " << "\n" << "# Saved from the PointBasedRegistration Plugin \n";
+
+  std::stringstream matrix_ss;
+  m_LastTransformMatrix->Print( matrix_ss );
+  outstream << matrix_ss.str().c_str();
+
+  f.close();
 }
 

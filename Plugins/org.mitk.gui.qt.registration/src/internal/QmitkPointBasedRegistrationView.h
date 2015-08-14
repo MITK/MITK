@@ -245,6 +245,7 @@ protected:
   mitk::Color m_FixedColor;
   mitk::Color m_MovingColor;
   int m_Transformation;
+  vtkMatrix4x4 * m_LastTransformMatrix;
   bool m_HideFixedImage;
   bool m_HideMovingImage;
   std::string m_OldFixedLabel;

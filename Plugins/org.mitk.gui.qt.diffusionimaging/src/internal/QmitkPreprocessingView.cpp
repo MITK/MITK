@@ -1513,7 +1513,7 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
     bool foundImageVolume = true;
     mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
     if (node.IsNull())
-        foundImageVolume;
+        return;
     bool foundDwiVolume( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( node ) );
 
     m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);

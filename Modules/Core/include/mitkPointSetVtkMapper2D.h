@@ -77,7 +77,7 @@ namespace mitk {
   *
   *   - \b "line width": (IntProperty 2)                      // line width of the line from one point to another
   *   - \b "point line width": (IntProperty 1)                // line width of the cross marking a point
-  *   - \b "point 2D size": (FloatProperty 6)                 // size of the glyph marking a point (in world units!)
+  *   - \b "point 2D size": (FloatProperty 6)                 // size of the glyph marking a point (diameter, in world units!)
   *   - \b "show contour": (BoolProperty false)               // enable contour rendering between points (lines)
   *   - \b "close contour": (BoolProperty false)              // if enabled, the open strip is closed (first point connected with last point)
   *   - \b "show points": (BoolProperty true)                 // show or hide points

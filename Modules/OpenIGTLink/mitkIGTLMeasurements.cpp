@@ -41,7 +41,7 @@ mitk::IGTLMeasurements::IGTLMeasurements()
       m_Measurements =
          context->GetService<mitk::IGTLMeasurementsImplementation>(serviceRefs.front());
 
-      if (m_Measurements.IsNotNull())
+      if (m_Measurements == nullptr)
       {
          m_Measurements = mitk::IGTLMeasurementsImplementation::New();
          m_Measurements->RegisterAsMicroservice();

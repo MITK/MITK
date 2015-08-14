@@ -51,17 +51,17 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
   : BaseData(other),
     m_ControlPoints(other.m_ControlPoints),
     m_SelectedControlPoint(other.m_SelectedControlPoint),
-    m_PolyLines(other.m_PolyLines),
-    m_HelperPolyLines(other.m_HelperPolyLines),
-    m_HelperPolyLinesToBePainted(other.m_HelperPolyLinesToBePainted->Clone()),
     m_PreviewControlPoint(other.m_PreviewControlPoint),
     m_PreviewControlPointVisible(other.m_PreviewControlPointVisible),
     m_FigurePlaced(other.m_FigurePlaced),
     m_FigureFinalized(other.m_FigureFinalized),
-    m_PlaneGeometry(other.m_PlaneGeometry), // do not clone since SetPlaneGeometry() doesn't clone either
+    m_HelperPolyLinesToBePainted(other.m_HelperPolyLinesToBePainted->Clone()),
+    m_PlaneGeometry(other.m_PlaneGeometry),
     m_PolyLineUpToDate(other.m_PolyLineUpToDate),
-    m_HelperLinesUpToDate(other.m_HelperLinesUpToDate),
+    m_HelperLinesUpToDate(other.m_HelperLinesUpToDate), // do not clone since SetPlaneGeometry() doesn't clone either
     m_FeaturesUpToDate(other.m_FeaturesUpToDate),
+    m_PolyLines(other.m_PolyLines),
+    m_HelperPolyLines(other.m_HelperPolyLines),
     m_Features(other.m_Features),
     m_FeaturesMTime(other.m_FeaturesMTime),
     m_DisplaySize(other.m_DisplaySize)

@@ -321,6 +321,7 @@ void QmitkPointBasedRegistrationView::CreateConnections()
   connect((QObject*)(m_Controls.m_SelectedTransformationClass),SIGNAL(activated(int)), this,SLOT(transformationChanged(int)));
   connect((QObject*)(m_Controls.m_UseICP),SIGNAL(toggled(bool)), this,SLOT(checkCalculateEnabled()));
   connect((QObject*)(m_Controls.m_UseICP),SIGNAL(toggled(bool)), this,SLOT(checkLandmarkError()));
+  connect((QObject*)(m_Controls.m_SaveLastTransformPushButton), SIGNAL(clicked()), this, SLOT(OnExportTransformButtonPushed() ) );
 }
 
 void QmitkPointBasedRegistrationView::Activated()
@@ -743,10 +744,12 @@ void QmitkPointBasedRegistrationView::UndoTransformation()
   if(!m_UndoPointsGeometryList.empty())
   {
     m_Controls.m_UndoTransformation->setEnabled(true);
+    m_Controls.m_SaveLastTransformPushButton->setEnabled(true);
   }
   else
   {
     m_Controls.m_UndoTransformation->setEnabled(false);
+    m_Controls.m_SaveLastTransformPushButton->setEnabled(false);
   }
 }
 
@@ -839,6 +842,7 @@ void QmitkPointBasedRegistrationView::clearTransformationLists()
 {
   m_Controls.m_UndoTransformation->setEnabled(false);
   m_Controls.m_RedoTransformation->setEnabled(false);
+  m_Controls.m_SaveLastTransformPushButton->setEnabled(false);
   m_Controls.m_MeanErrorLCD->hide();
   m_Controls.m_MeanError->hide();
   m_UndoGeometryList.clear();
@@ -1030,6 +1034,7 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbasedWithICP()
     movingData->GetTimeGeometry()->Update();
     m_Controls.m_UndoTransformation->setEnabled(true);
     m_Controls.m_RedoTransformation->setEnabled(false);
+    m_Controls.m_SaveLastTransformPushButton->setEnabled(true);
     m_RedoGeometryList.clear();
     m_RedoPointsGeometryList.clear();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1104,6 +1109,7 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
     movingGeometry->Compose(matrix);
     movingData->GetTimeGeometry()->Update();
     m_Controls.m_UndoTransformation->setEnabled(true);
+    m_Controls.m_SaveLastTransformPushButton->setEnabled(true);
     m_Controls.m_RedoTransformation->setEnabled(false);
     m_RedoGeometryList.clear();
     m_RedoPointsGeometryList.clear();
@@ -1266,4 +1272,8 @@ void QmitkPointBasedRegistrationView::SwitchImages()
   this->MovingSelected(newMoving);
 }
 
+void QmitkPointBasedRegistrationView::OnExportTransformButtonPushed()
+{
+  // handle transform export
+}
 

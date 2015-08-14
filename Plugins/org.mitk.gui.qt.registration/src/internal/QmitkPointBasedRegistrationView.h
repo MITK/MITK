@@ -93,43 +93,7 @@ public:
   virtual void Visible() override;
   virtual void Hidden() override;
 
-  //
-  //     #ifdef BUILD_TESTING
-  //         / **
-  //           \brief Testing entry point
-  //         * /
-  //         virtual int TestYourself();
-  //
-  //         / **
-  //            \brief Helper method for testing
-  //         * /
-  //         bool TestAllTools();
-  //
-  //
-  //   protected slots:
-  //     /**
-  //        \brief Helper method for testing
-  //     */
-  //     void RegistrationErrorDialogFound( QWidget* widget );
-  //
-  //     /**
-  //     \brief Helper method for testing
-  //     */
-  //     void ClearPointSetDialogFound( QWidget* widget );
-  //
-  //   private:
-  //     bool m_MessageBox;
-  //
-  //
-  //   public:
-  // #else
-  //     // slot function is needed, because moc ignores our #ifdefs
-  //     void RegistrationErrorDialogFound( QWidget* widget ) {}
-  //     // slot function is needed, because moc ignores our #ifdefs
-  //     void ClearPointSetDialogFound(QWidget* widget){}
-  // #endif
-
-    void DataNodeHasBeenRemoved(const mitk::DataNode* node);
+  void DataNodeHasBeenRemoved(const mitk::DataNode* node);
 
   protected slots:
 
@@ -247,6 +211,8 @@ public:
     void calculate();
 
     void SwitchImages();
+
+    void OnExportTransformButtonPushed();
 
 protected:
 

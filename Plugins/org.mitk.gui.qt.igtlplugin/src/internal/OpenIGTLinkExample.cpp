@@ -70,9 +70,6 @@ void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
   connect( &m_Timer, SIGNAL(timeout()), this, SLOT(UpdatePipeline()));
   connect(m_Controls.exportMeasurementsPushButton, SIGNAL(clicked()),
      this, SLOT(ExportButtonClicked()));
-
-  //Setup the pipeline
-  this->CreatePipeline();
 }
 
 void OpenIGTLinkExample::CreatePipeline()
@@ -97,7 +94,7 @@ void OpenIGTLinkExample::CreatePipeline()
 
   //we expect a tracking data message with three tools. Since we cannot change
   //the outputs at runtime we have to set it manually.
-  m_IGTLMsgToNavDataFilter->SetNumberOfExpectedOutputs(3);
+  m_IGTLMsgToNavDataFilter->SetNumberOfExpectedOutputs(m_Controls.channelSpinBox->value());
 
   //connect the filters with each other
   //the OpenIGTLinkExample messages will be passed to the first filter that converts
@@ -130,6 +127,8 @@ void OpenIGTLinkExample::CreatePipeline()
 
      m_DemoNodes.append(newNode);
   }
+
+  this->ResizeBoundingBox();
 }
 
 void OpenIGTLinkExample::DestroyPipeline()
@@ -144,22 +143,30 @@ void OpenIGTLinkExample::DestroyPipeline()
 
 void OpenIGTLinkExample::Start()
 {
-   if (this->m_Controls.butStart->text().contains("Start Pipeline"))
-   {
-      m_Timer.setInterval(this->m_Controls.visualizationUpdateRateSpinBox->value());
-      m_Timer.start();
-      //this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(true);
-      this->m_Controls.butStart->setText("Stop Pipeline");
-   }
-   else
-   {
-      m_Timer.stop();
-      igtl::StopTrackingDataMessage::Pointer stopStreaming =
-         igtl::StopTrackingDataMessage::New();
-      this->m_IGTLClient->SendMessage(stopStreaming.GetPointer());
-      this->m_Controls.butStart->setText("Start Pipeline");
-      //this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(false);
-   }
+  if (this->m_Controls.butStart->text().contains("Start Pipeline"))
+  {
+    static bool isFirstTime = true;
+    if (isFirstTime)
+    {
+      //Setup the pipeline
+      this->CreatePipeline();
+      isFirstTime = false;
+    }
+
+    m_Timer.setInterval(this->m_Controls.visualizationUpdateRateSpinBox->value());
+    m_Timer.start();
+    //this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(true);
+    this->m_Controls.butStart->setText("Stop Pipeline");
+  }
+  else
+  {
+    m_Timer.stop();
+    igtl::StopTrackingDataMessage::Pointer stopStreaming =
+      igtl::StopTrackingDataMessage::New();
+    this->m_IGTLClient->SendMessage(stopStreaming.GetPointer());
+    this->m_Controls.butStart->setText("Start Pipeline");
+    //this->m_Controls.visualizationUpdateRateSpinBox->setEnabled(false);
+  }
 }
 
 void OpenIGTLinkExample::UpdatePipeline()
@@ -169,8 +176,8 @@ void OpenIGTLinkExample::UpdatePipeline()
       //update the pipeline
       m_VisFilter->Update();
 
-      //update the boundings
-      mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+      ////update the boundings
+      //mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
       //Update rendering
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -195,4 +202,37 @@ void OpenIGTLinkExample::ExportButtonClicked()
 {
    if (!m_Measurements.ExportData("MeasurementOutput.txt"))
       MITK_ERROR("OpenIGTLinkExample") << "export did not work!!!";
+}
+
+/**
+* \brief To initialize the scene to the bounding box of all visible objects
+*/
+void OpenIGTLinkExample::ResizeBoundingBox()
+{
+  // get all nodes
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetAll();
+  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+
+  if (bounds.IsNull())
+  {
+    return;
+  }
+
+  //expand the bounding box in case the instruments are all at one position
+  mitk::Point3D center = bounds->GetCenterInWorld();
+  mitk::Geometry3D::BoundsArrayType extended_bounds = bounds->GetGeometryForTimeStep(0)->GetBounds();
+  for (unsigned int i = 0; i < 3; ++i)
+  {
+    if (bounds->GetExtentInWorld(i) < 500)
+    {
+      // extend the bounding box
+      extended_bounds[i * 2]     = center[i] - 500 / 2.0;
+      extended_bounds[i * 2 + 1] = center[i] + 500 / 2.0;
+    }
+  }
+  //set the extended bounds
+  bounds->GetGeometryForTimeStep(0)->SetBounds(extended_bounds);
+
+  // initialize the views to the bounding geometry
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }

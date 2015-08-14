@@ -67,6 +67,8 @@ class OpenIGTLinkProviderExample : public QmitkAbstractView
     void CreatePipeline();
     void DestroyPipeline();
 
+    void ResizeBoundingBox();
+
     Ui::OpenIGTLinkProviderExampleControls m_Controls;
     mitk::IGTLServer::Pointer m_IGTLServer;
     mitk::IGTLMessageProvider::Pointer m_IGTLMessageProvider;

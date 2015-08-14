@@ -108,8 +108,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //the navigation data player reads a file with recorded navigation data,
   //passes this data to a filter that converts it into a IGTLMessage.
   //The provider is not connected because it will search for fitting services.
-  //Once it found the filter it will automatically connect to it (this is not
-  // implemented so far, check m_StreamingConnector for more information).
+  //Once it found the filter it will automatically connect to it.
   m_NavDataToIGTLMsgFilter->ConnectTo(m_NavDataPlayer);
 
   //define the operation mode for this filter, we want to send tracking data
@@ -124,8 +123,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //register this filter as micro service. The message provider looks for
   //provided IGTLMessageSources, once it found this microservice and someone
   //requested this data type then the provider will connect with this filter
-  //automatically (this is not implemented so far, check m_StreamingConnector
-  //for more information)
+  //automatically.
   m_NavDataToIGTLMsgFilter->RegisterAsMicroservice();
 
   //also create a visualize filter to visualize the data
@@ -156,20 +154,15 @@ void OpenIGTLinkProviderExample::CreatePipeline()
      m_DemoNodes.append(newNode);
   }
 
-  //initialize the streaming connector
-  //the streaming connector is checking if the data from the filter has to be
-  //streamed. The message provider is used for sending the messages.
-//  m_StreamingConnector.Initialize(m_NavDataToIGTLMsgFilter.GetPointer(),
-//                                  m_IGTLMessageProvider);
-
-
   //connect the visualization with the navigation data player
   m_NavDataVisualizer->ConnectTo(m_NavDataPlayer);
 
   //start the player
   this->Start();
 
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+  //resize the boundaries
+  this->m_NavDataVisualizer->Update();
+  this->ResizeBoundingBox();
 }
 
 void OpenIGTLinkProviderExample::DestroyPipeline()
@@ -194,7 +187,7 @@ void OpenIGTLinkProviderExample::Start()
     this->m_Controls.butStart->setText("Stop Playing Recorded Navigation Data ");
 
     //start the visualization
-    this->m_VisualizerTimer.start(100);
+    this->m_VisualizerTimer.start(25);
   }
   else
   {
@@ -237,12 +230,48 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
 void OpenIGTLinkProviderExample::UpdateVisualization()
 {
-  //update the filter
-  this->m_NavDataVisualizer->Update();
+  if (this->m_Controls.visualizeCheckBox->isChecked())
+  {
+    //update the filter
+    this->m_NavDataVisualizer->Update();
 
-  //update the bounds
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+    ////update the bounds
+    //mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
-  //update rendering
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    //update rendering
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+/**
+* \brief To initialize the scene to the bounding box of all visible objects
+*/
+void OpenIGTLinkProviderExample::ResizeBoundingBox()
+{
+  // get all nodes
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetAll();
+  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
+
+  if (bounds.IsNull())
+  {
+    return;
+  }
+
+  //expand the bounding box in case the instruments are all at one position
+  mitk::Point3D center = bounds->GetCenterInWorld();
+  mitk::Geometry3D::BoundsArrayType extended_bounds = bounds->GetGeometryForTimeStep(0)->GetBounds();
+  for (unsigned int i = 0; i < 3; ++i)
+  {
+    if (bounds->GetExtentInWorld(i) < 500)
+    {
+      // extend the bounding box
+      extended_bounds[i * 2] = center[i] - 500 / 2.0;
+      extended_bounds[i * 2 + 1] = center[i] + 500 / 2.0;
+    }
+  }
+  //set the extended bounds
+  bounds->GetGeometryForTimeStep(0)->SetBounds(extended_bounds);
+
+  // initialize the views to the bounding geometry
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }

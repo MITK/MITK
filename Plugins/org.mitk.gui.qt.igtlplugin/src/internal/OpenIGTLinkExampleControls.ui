@@ -57,11 +57,29 @@
       </layout>
      </item>
      <item>
-      <widget class="QCheckBox" name="visualizeCheckBox">
-       <property name="text">
-        <string>Visualize</string>
-       </property>
-      </widget>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="visualizeCheckBox">
+         <property name="text">
+          <string>Visualize</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Number of expected channels:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QSpinBox" name="channelSpinBox">
+         <property name="value">
+          <number>3</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <widget class="QPushButton" name="exportMeasurementsPushButton">

@@ -413,11 +413,6 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(data.GetPointer());
 
-  // We can't derive a new control point from a polyline of a Bezier curve
-  // as all control points contribute to each polyline point.
-  if (dynamic_cast<PlanarBezierCurve*>(planarFigure) != nullptr && isFigureFinished)
-    return false;
-
   const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   mitk::AbstractTransformGeometry *abstractTransformGeometry =
     dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );

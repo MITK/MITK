@@ -33,8 +33,8 @@ void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
   double length = 0.0;
 
   PolyLineType polyLine = GetPolyLine(0);
-  for (unsigned int i = 0; i < m_NumberOfSegments; ++i)
-      length += static_cast<Point2D>(polyLine[i]).EuclideanDistanceTo(static_cast<Point2D>(polyLine[i + 1]));
+  for (unsigned int i = 1; i < polyLine.size(); ++i)
+      length += polyLine[i - 1].EuclideanDistanceTo(polyLine[i]);
 
   this->SetQuantity(FEATURE_ID_LENGTH, length);
 }
@@ -133,7 +133,7 @@ int mitk::PlanarBezierCurve::GetControlPointForPolylinePoint( int indexOfPolylin
 
 unsigned int mitk::PlanarBezierCurve::GetMaximumNumberOfControlPoints() const
 {
-  return std::numeric_limits<unsigned int>::max();
+  return IsFinalized() ? GetNumberOfControlPoints() : std::numeric_limits<unsigned int>::max();
 }
 
 unsigned int mitk::PlanarBezierCurve::GetMinimumNumberOfControlPoints() const

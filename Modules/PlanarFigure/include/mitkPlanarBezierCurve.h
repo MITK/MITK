@@ -36,7 +36,7 @@ namespace mitk
     * \brief Returns the id of the control-point that corresponds to the given
     * polyline-point.
     */
-    int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
+    int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const override;
 
 
     virtual unsigned int GetPlacementNumberOfControlPoints() const override { return 1; }
@@ -46,7 +46,7 @@ namespace mitk
 
     const unsigned int FEATURE_ID_LENGTH;
 
-    virtual bool Equals(const mitk::PlanarFigure& other)const;
+    virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
   protected:
     PlanarBezierCurve();

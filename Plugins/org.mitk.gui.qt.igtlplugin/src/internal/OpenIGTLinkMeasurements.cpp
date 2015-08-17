@@ -30,6 +30,9 @@ OpenIGTLinkMeasurements::~OpenIGTLinkMeasurements()
 
 void OpenIGTLinkMeasurements::CreateQtPartControl( QWidget *parent )
 {
+  //setup measurements
+  this->m_Measurements = mitk::IGTLMeasurements::GetInstance();
+
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
 
@@ -45,16 +48,16 @@ void OpenIGTLinkMeasurements::StartStopButtonClicked()
   if (this->m_Controls.startButton->text().contains("Start"))
   {
     //reset the measurements
-    this->m_Measurements.Reset();
+    this->m_Measurements->Reset();
     //start the measurements
-    this->m_Measurements.SetStarted(true);
+    this->m_Measurements->SetStarted(true);
     //adapt the gui
     this->m_Controls.startButton->setText("Stop");
     this->m_Controls.exportButton->setEnabled(false);
   }
   else
   {
-    this->m_Measurements.SetStarted(false);
+    this->m_Measurements->SetStarted(false);
     this->m_Controls.startButton->setText("Start");
     this->m_Controls.exportButton->setEnabled(true);
   }
@@ -62,6 +65,6 @@ void OpenIGTLinkMeasurements::StartStopButtonClicked()
 
 void OpenIGTLinkMeasurements::ExportButtonClicked()
 {
-   if (!m_Measurements.ExportData("MeasurementOutput.txt"))
+   if (!m_Measurements->ExportData("MeasurementOutput.txt"))
       MITK_ERROR("OpenIGTLinkMeasurements") << "export did not work!!!";
 }

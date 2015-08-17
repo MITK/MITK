@@ -141,7 +141,7 @@ namespace mitk
 
 
     /** Measurement class to calculate latency and frame count */
-    mitk::IGTLMeasurements m_Measurement;
+    mitk::IGTLMeasurements* m_Measurement;
   };
 } // namespace mitk
 #endif /* MITKOPENIGTLMESSAGETONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */

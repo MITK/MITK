@@ -27,77 +27,100 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-   /**
-   * \brief Is a helper class to make measurments for latency and fps
-   *
-   * \ingroup OpenIGTLink
-   */
-   class MITKOPENIGTLINK_EXPORT IGTLMeasurementsImplementation : public itk::Object
-   {
-   public:
-      mitkClassMacroItkParent(IGTLMeasurementsImplementation, itk::Object);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+   ///**
+   //* \brief Is a helper class to make measurments for latency and fps
+   //*
+   //* \ingroup OpenIGTLink
+   //*/
+   //class MITKOPENIGTLINK_EXPORT IGTLMeasurementsImplementation : public itk::Object
+   //{
+   //public:
+   //   mitkClassMacroItkParent(IGTLMeasurementsImplementation, itk::Object);
+   //   itkFactorylessNewMacro(Self)
+   //   itkCloneMacro(Self)
 
-      typedef std::list<long long>                    MeasurementList;
-      typedef std::map<unsigned int, MeasurementList> MeasurementPoints;
+   //   typedef std::list<long long>                    MeasurementList;
+   //   typedef std::map<unsigned int, MeasurementList> MeasurementPoints;
 
-      /**
-      * \brief AddMeasurementPoint
-      */
-      void AddMeasurement(unsigned int measurementPoint);
-      bool ExportData(std::string filename);
+   //   /**
+   //   * \brief AddMeasurementPoint
+   //   */
+   //   void AddMeasurement(unsigned int measurementPoint);
+   //   bool ExportData(std::string filename);
 
-      /**
-      * \brief clears all measurements
-      */
-      void Reset();
+   //   /**
+   //   * \brief clears all measurements
+   //   */
+   //   void Reset();
 
-      void SetStarted(bool started);
+   //   void SetStarted(bool started);
 
-      void RegisterAsMicroservice();
-      void UnRegisterMicroservice();
-   protected:
-      IGTLMeasurementsImplementation();
-      ~IGTLMeasurementsImplementation();
+   //   void RegisterAsMicroservice();
+   //   void UnRegisterMicroservice();
+   //protected:
+   //   IGTLMeasurementsImplementation();
+   //   ~IGTLMeasurementsImplementation();
 
-      /** \brief  */
-      MeasurementPoints                                      m_MeasurementPoints;
+   //   /** \brief  */
+   //   MeasurementPoints                                      m_MeasurementPoints;
 
-      bool m_IsStarted;
+   //   bool m_IsStarted;
 
-      us::ServiceRegistration<Self> m_ServiceRegistration;
-   };
+   //   us::ServiceRegistration<Self> m_ServiceRegistration;
+   //};
 
-   class MITKOPENIGTLINK_EXPORT IGTLMeasurements : public itk::Object
-   {
-   public:
-      mitkClassMacroItkParent(IGTLMeasurements, itk::Object);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+  /**
+  * \brief Is a helper class to make measurments for latency and fps
+  *
+  * \ingroup OpenIGTLink
+  */
+  class MITKOPENIGTLINK_EXPORT IGTLMeasurements : public itk::Object
+  {
+  public:
+    mitkClassMacroItkParent(IGTLMeasurements, itk::Object);
+    static IGTLMeasurements* GetInstance();
 
-      /**
-      * \brief AddMeasurementPoint
-      */
-      void AddMeasurement(unsigned int measurementPoint);
+    /**
+    * \brief AddMeasurementPoint
+    */
+    void AddMeasurement(unsigned int measurementPoint);
 
-      /**
-      * \brief AddMeasurementPoint
-      */
-      bool ExportData(std::string filename);
+    /**
+    * \brief AddMeasurementPoint
+    */
+    bool ExportData(std::string filename);
 
-      /**
-      * \brief clears all measurements
-      */
-      void Reset();
+    /**
+    * \brief clears all measurements
+    */
+    void Reset();
 
-      void SetStarted(bool started);
+    void SetStarted(bool started);
 
-      IGTLMeasurements();
-      ~IGTLMeasurements();
+  private:
+    // Only our module activator class should be able to instantiate
+    // a SingletonOneService object.
+    friend class IGTLModuleActivator;
 
-   protected:
-      IGTLMeasurementsImplementation::Pointer m_Measurements;
-   };
+    itkFactorylessNewMacro(Self)
+    //itkCloneMacro(Self)
+
+    IGTLMeasurements();
+    ~IGTLMeasurements();
+
+    // Disable copy constructor and assignment operator.
+    IGTLMeasurements(const IGTLMeasurements&);
+    IGTLMeasurements& operator=(const IGTLMeasurements&);
+
+    //protected:
+    //IGTLMeasurementsImplementation::Pointer m_Measurements;
+
+    typedef std::list<long long>                    MeasurementList;
+    typedef std::map<unsigned int, MeasurementList> MeasurementPoints;
+
+    MeasurementPoints                               m_MeasurementPoints;
+
+    bool m_IsStarted;
+  };
 } // namespace mitk
 #endif /* MITKIGTLMeasurements_H_HEADER_INCLUDED_ */

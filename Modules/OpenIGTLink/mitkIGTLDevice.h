@@ -357,7 +357,7 @@ namespace mitk {
       mitk::IGTLMessageFactory::Pointer m_MessageFactory;
 
       /** Measurement class to calculate latency and frame count */
-      mitk::IGTLMeasurements m_Measurement;
+      mitk::IGTLMeasurements* m_Measurement;
 
     private:
       /** creates worker thread that continuously polls interface for new

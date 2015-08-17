@@ -74,6 +74,8 @@ class OpenIGTLinkExample : public QmitkAbstractView
     QList<mitk::DataNode::Pointer> m_DemoNodes;
 
     QTimer m_Timer;
+
+    mitk::IGTLMeasurements* m_Measurement;
 };
 
 #endif // OpenIGTLinkExample_h

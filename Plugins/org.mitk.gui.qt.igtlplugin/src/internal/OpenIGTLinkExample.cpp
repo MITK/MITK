@@ -61,6 +61,9 @@ OpenIGTLinkExample::~OpenIGTLinkExample()
 
 void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
 {
+  //setup measurements
+  this->m_Measurement = mitk::IGTLMeasurements::GetInstance();
+
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
 
@@ -170,30 +173,39 @@ void OpenIGTLinkExample::Start()
 
 void OpenIGTLinkExample::UpdatePipeline()
 {
-   if (this->m_Controls.visualizeCheckBox->isChecked())
-   {
-      //update the pipeline
-      m_VisFilter->Update();
+  if (this->m_Controls.visualizeCheckBox->isChecked())
+  {
+    //update the pipeline
+    m_VisFilter->Update();
+    m_Measurement->AddMeasurement(10);
 
-      ////update the boundings
-      //mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+    ////update the boundings
+    //mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 
-      //Update rendering
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   }
-   else
-   {
-      //no visualization so we just update this filter
-      m_IGTLMsgToNavDataFilter->Update();
-   }
+    //Update rendering
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    //no visualization so we just update this filter
+    m_IGTLMsgToNavDataFilter->Update();
+    //record a timestamp if the output is new
+    static double previousTimestamp;
+    double curTimestamp = m_IGTLMsgToNavDataFilter->GetOutput()->GetIGTTimeStamp();
+    if (previousTimestamp != curTimestamp)
+    {
+      m_Measurement->AddMeasurement(9);
+      previousTimestamp = curTimestamp;
+    }
+  }
 
   //check if the timer interval changed
   static int previousValue = 0;
   int currentValue = this->m_Controls.visualizationUpdateRateSpinBox->value();
   if (previousValue != currentValue)
   {
-     m_Timer.setInterval(currentValue);
-     previousValue = currentValue;
+    m_Timer.setInterval(currentValue);
+    previousValue = currentValue;
   }
 }
 

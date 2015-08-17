@@ -28,65 +28,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::IGTLMeasurements::IGTLMeasurements()
 {
-   //get the context
-   us::ModuleContext* context = us::GetModuleContext();
-
-   std::vector<us::ServiceReference<IGTLMeasurementsImplementation>> serviceRefs =
-      context->GetServiceReferences<IGTLMeasurementsImplementation>();
-
-   //check if a service reference was found. It is also possible that several
-   //services were found. This is not checked here, just the first one is taken.
-   if (serviceRefs.size())
-   {
-      m_Measurements =
-         context->GetService<mitk::IGTLMeasurementsImplementation>(serviceRefs.front());
-
-      if (m_Measurements == nullptr)
-      {
-         m_Measurements = mitk::IGTLMeasurementsImplementation::New();
-         m_Measurements->RegisterAsMicroservice();
-      }
-   }
-   else
-   {
-      m_Measurements = mitk::IGTLMeasurementsImplementation::New();
-      m_Measurements->RegisterAsMicroservice();
-   }
 }
+
+mitk::IGTLMeasurements* mitk::IGTLMeasurements::GetInstance()
+{
+  static us::ServiceReference<mitk::IGTLMeasurements> serviceRef;
+  static us::ModuleContext* context = us::GetModuleContext();
+  if (!serviceRef)
+  {
+    // This is either the first time GetInstance() was called,
+    // or a mitk::IGTLMeasurements instance has not yet been registered.
+    serviceRef = context->GetServiceReference<mitk::IGTLMeasurements>();
+  }
+  if (serviceRef)
+  {
+    // We have a valid service reference. It always points to the service
+    // with the lowest id (usually the one which was registered first).
+    // This still might return a null pointer, if all mitk::IGTLMeasurements
+    // instances have been unregistered (during unloading of the library,
+    // for example).
+    return context->GetService(serviceRef);
+  }
+  else
+  {
+    // No mitk::IGTLMeasurements instance was registered yet.
+    return 0;
+  }
+}
+
 
 mitk::IGTLMeasurements::~IGTLMeasurements()
 {
 }
 
 void mitk::IGTLMeasurements::AddMeasurement(unsigned int measurementPoint)
-{
-   m_Measurements->AddMeasurement(measurementPoint);
-}
-
-bool mitk::IGTLMeasurements::ExportData(std::string filename)
-{
-  return m_Measurements->ExportData(filename);
-}
-
-void mitk::IGTLMeasurements::Reset()
-{
-  m_Measurements->Reset();
-}
-
-void mitk::IGTLMeasurements::SetStarted(bool started)
-{
-  m_Measurements->SetStarted(started);
-}
-
-mitk::IGTLMeasurementsImplementation::IGTLMeasurementsImplementation()
-{
-}
-
-mitk::IGTLMeasurementsImplementation::~IGTLMeasurementsImplementation()
-{
-}
-
-void mitk::IGTLMeasurementsImplementation::AddMeasurement(unsigned int measurementPoint)
 {
    long long now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
    if (m_IsStarted)
@@ -95,26 +70,7 @@ void mitk::IGTLMeasurementsImplementation::AddMeasurement(unsigned int measureme
    }
 }
 
-void mitk::IGTLMeasurementsImplementation::RegisterAsMicroservice()
-{
-   // Get Context
-   us::ModuleContext* context = us::GetModuleContext();
-
-   // Define ServiceProps
-   us::ServiceProperties props;
-   m_ServiceRegistration = context->RegisterService(this, props);
-}
-
-void mitk::IGTLMeasurementsImplementation::UnRegisterMicroservice()
-{
-   if (m_ServiceRegistration != nullptr)
-      m_ServiceRegistration.Unregister();
-   m_ServiceRegistration = 0;
-}
-
-
-
-bool mitk::IGTLMeasurementsImplementation::ExportData(std::string filename)
+bool mitk::IGTLMeasurements::ExportData(std::string filename)
 {
    //open file
    std::ostream* out = new std::ofstream(filename.c_str());
@@ -142,12 +98,13 @@ bool mitk::IGTLMeasurementsImplementation::ExportData(std::string filename)
    //for each entry of the map
    for each (auto entry in m_MeasurementPoints)
    {
-      *out << entry.second.size() << ";";
-      for each (auto timestep in entry.second)
-      {
-         *out << timestep << ";";
-      }
-      *out << "\n";
+     *out << entry.second.size() << ";";
+     *out << entry.first << ";";
+     for each (auto timestep in entry.second)
+     {
+       *out << timestep << ";";
+     }
+     *out << "\n";
    }
 
    out->flush();
@@ -158,12 +115,12 @@ bool mitk::IGTLMeasurementsImplementation::ExportData(std::string filename)
    return true;
 }
 
-void mitk::IGTLMeasurementsImplementation::Reset()
+void mitk::IGTLMeasurements::Reset()
 {
   m_MeasurementPoints.clear();
 }
 
-void mitk::IGTLMeasurementsImplementation::SetStarted(bool started)
+void mitk::IGTLMeasurements::SetStarted(bool started)
 {
   m_IsStarted = started;
 }

@@ -137,11 +137,11 @@ void mitk::IGTLServer::Send()
   //get the latest message from the queue
   curMessage = this->m_SendQueue->PullMessage();
 
-  m_Measurement.AddMeasurement(4);
-
   // there is no message => return
   if ( curMessage.IsNull() )
     return;
+
+  m_Measurement->AddMeasurement(4);
 
   //the server can be connected with several clients, therefore it has to check
   //all registered clients

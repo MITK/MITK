@@ -57,7 +57,7 @@ class OpenIGTLinkMeasurements : public QmitkAbstractView
 
     Ui::OpenIGTLinkMeasurementsControls m_Controls;
 
-    mitk::IGTLMeasurements m_Measurements;
+    mitk::IGTLMeasurements* m_Measurements;
 };
 
 #endif // OpenIGTLinkMeasurements_h

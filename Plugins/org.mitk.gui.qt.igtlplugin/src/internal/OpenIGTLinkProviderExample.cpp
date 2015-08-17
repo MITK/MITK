@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // mitk
 #include <mitkImage.h>
 #include <mitkSurface.h>
-#include <mitkIGTLMessageToNavigationDataFilter.h>
+//#include <mitkIGTLMessageToNavigationDataFilter.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkIOUtil.h>

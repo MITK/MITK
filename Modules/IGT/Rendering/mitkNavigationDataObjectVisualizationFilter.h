@@ -152,7 +152,7 @@ namespace mitk {
 
 
     /** Measurement class to calculate latency and frame count */
-    mitk::IGTLMeasurements m_Measurement;
+    mitk::IGTLMeasurements* m_Measurement;
 
   private:
     RotationMode m_RotationMode; ///< defines the rotation mode Standard or Transposed, Standard is default

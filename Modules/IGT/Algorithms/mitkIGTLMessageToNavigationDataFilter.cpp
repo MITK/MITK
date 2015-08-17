@@ -307,7 +307,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
       nd = mitk::NavigationData::New(affineTransformation, true);
     }
     //set the time stamp
-    nd->SetIGTTimeStamp(input->GetTimeStamp());
+    nd->SetIGTTimeStamp(input->GetIGTTimeStamp());
     //set the name
     nd->SetName(td->GetName());
     output->Graft(nd);
@@ -432,7 +432,6 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
                                                    << "message type: "
                                                    << msgType;
   }
-  m_Measurement.AddMeasurement(9);
 }
 
 

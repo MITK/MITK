@@ -12,4 +12,5 @@ set(CPP_FILES
   mitkIGTLMessageQueue.cpp
   mitkIGTLMessageProvider.cpp
   mitkIGTLMeasurements.cpp
+  mitkIGTLModuleActivator.cpp
 )

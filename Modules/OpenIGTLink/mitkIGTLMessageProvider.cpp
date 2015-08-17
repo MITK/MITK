@@ -372,11 +372,6 @@ mitk::IGTLMessageProvider::DisconnectFrom( mitk::IGTLMessageSource* UpstreamFilt
   }
 }
 
-void test()
-{
-
-}
-
 //ITK_THREAD_RETURN_TYPE mitk::IGTLMessageProvider::TimerThread(void* pInfoStruct)
 //{
 //  // extract this pointer from thread info structure

@@ -342,6 +342,7 @@ void QmitkIGTLStreamingManagementWidget::OnStartStreamingTimer()
       //start the timer
       this->m_StreamingTimer.start(interval);
    }
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLStreamingManagementWidget::OnStopStreamingTimer()
@@ -354,6 +355,7 @@ void QmitkIGTLStreamingManagementWidget::OnStopStreamingTimer()
       //disconnect the update method
       disconnect(&m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
    }
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLStreamingManagementWidget::OnStreamingTimerTimeout()

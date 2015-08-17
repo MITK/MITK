@@ -76,6 +76,11 @@ namespace mitk {
     void StopStreamingOfSource(mitk::IGTLMessageSource* src);
 
     /**
+    * \brief Stops the streaming of all message source.
+    */
+    void StopStreamingOfAllSources();
+
+    /**
     * \brief Returns the streaming state.
     */
     bool IsStreaming();
@@ -120,6 +125,11 @@ namespace mitk {
     * receives a new command
     **/
     virtual void OnIncomingCommand() override;
+
+    /**
+    * \brief This method is called when the IGTL device lost the connection to the other side
+    **/
+    virtual void OnLostConnection() override;
 
     /**
     *\brief Connects the input of this filter to the outputs of the given
@@ -195,6 +205,8 @@ namespace mitk {
     /** Measurement class to calculate latency and frame count */
     mitk::IGTLMeasurements m_Measurement;
 
+
+    unsigned long m_LostConnectionObserverTag;
   };
 
   /**

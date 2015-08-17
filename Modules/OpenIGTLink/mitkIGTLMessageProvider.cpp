@@ -47,6 +47,15 @@ mitk::IGTLMessageProvider::IGTLMessageProvider()
   //m_StopStreamingThreadMutex = itk::FastMutexLock::New();
   //m_ThreadId = 0;
   m_IsStreaming = false;
+
+  // Create a command object. The function will be called later from the main thread
+  this->m_StopStreamingCommand = ProviderCommand::New();
+  m_StopStreamingCommand->SetCallbackFunction(this,
+    &mitk::IGTLMessageProvider::InvokeStopStreamingEvent);
+
+  this->m_StreamingCommand = ProviderCommand::New();
+  m_StreamingCommand->SetCallbackFunction(this,
+    &mitk::IGTLMessageProvider::InvokeStartStreamingEvent);
 }
 
 mitk::IGTLMessageProvider::~IGTLMessageProvider()
@@ -131,6 +140,16 @@ void mitk::IGTLMessageProvider::CreateOutputs()
 void mitk::IGTLMessageProvider::OnIncomingMessage()
 {
 
+}
+
+void mitk::IGTLMessageProvider::OnLostConnection()
+{
+  //in case the provider is streaming at the moment we have to stop it
+  if (m_IsStreaming)
+  {
+    MITK_DEBUG("IGTLMessageProvider") << "lost connection, stop streaming";
+    this->StopStreamingOfAllSources();
+  }
 }
 
 std::string RemoveRequestPrefixes(std::string requestType)
@@ -243,12 +262,6 @@ void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
     this->m_StreamingTime = 1.0 / (double) fps * 1000.0;
     this->m_StreamingTimeMutex->Unlock();
 
-    //// Create a command object. The function will be called later from the
-    //// main thread
-    this->m_StreamingCommand = ProviderCommand::New();
-    m_StreamingCommand->SetCallbackFunction(this,
-        &mitk::IGTLMessageProvider::InvokeStartStreamingEvent);
-
     //// For streaming we need a continues time signal, since there is no timer
     //// available we start a thread that generates a timing signal
     //// This signal is invoked from the other thread the update of the pipeline
@@ -288,14 +301,19 @@ void mitk::IGTLMessageProvider::StopStreamingOfSource(IGTLMessageSource* src)
   //this->m_StopStreamingThread = true;
   //this->m_StopStreamingThreadMutex->Unlock();
 
-  //// Create a command object. The function will be called later from the
-  //// main thread
-    this->m_StopStreamingCommand = ProviderCommand::New();
-    m_StopStreamingCommand->SetCallbackFunction(this,
-        &mitk::IGTLMessageProvider::InvokeStopStreamingEvent);
+  mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
+    this->m_StopStreamingCommand);
 
-    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
-          this->m_StopStreamingCommand);
+  //does this flag needs a mutex???
+  this->m_IsStreaming = false;
+}
+
+void mitk::IGTLMessageProvider::StopStreamingOfAllSources()
+{
+  // \todo remove all inputs
+
+  mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
+    this->m_StopStreamingCommand);
 
   //does this flag needs a mutex???
   this->m_IsStreaming = false;

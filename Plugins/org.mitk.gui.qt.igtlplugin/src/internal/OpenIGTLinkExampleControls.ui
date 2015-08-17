@@ -82,13 +82,6 @@
       </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="exportMeasurementsPushButton">
-       <property name="text">
-        <string>Export Measurement</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <spacer name="spacer2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

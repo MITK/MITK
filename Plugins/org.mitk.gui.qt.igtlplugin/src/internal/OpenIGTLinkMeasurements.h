@@ -15,65 +15,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef OpenIGTLinkExample_h
-#define OpenIGTLinkExample_h
+#ifndef OpenIGTLinkMeasurements_h
+#define OpenIGTLinkMeasurements_h
 
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
 
-#include "ui_OpenIGTLinkExampleControls.h"
-#include "mitkIGTLClient.h"
-#include "mitkIGTLServer.h"
-#include "mitkIGTLDeviceSource.h"
-#include "mitkNavigationDataObjectVisualizationFilter.h"
-#include "mitkIGTLMessageToNavigationDataFilter.h"
-
-#include "qtimer.h"
+#include "ui_OpenIGTLinkMeasurementsControls.h"
+#include "mitkIGTLMeasurements.h"
 
 /**
-  \brief OpenIGTLinkExample
+  \brief OpenIGTLinkMeasurements
 
   \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class OpenIGTLinkExample : public QmitkAbstractView
+class OpenIGTLinkMeasurements : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
   public:
-    ~OpenIGTLinkExample();
+    ~OpenIGTLinkMeasurements();
 
     static const std::string VIEW_ID;
 
   protected slots:
 
-    void Start();
-    void UpdatePipeline();
+    void StartStopButtonClicked();
+    void ExportButtonClicked();
+
 
   protected:
+    virtual void SetFocus() override {};
 
     virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus() override;
+    Ui::OpenIGTLinkMeasurementsControls m_Controls;
 
-    void CreatePipeline();
-    void DestroyPipeline();
-
-    void ResizeBoundingBox();
-
-    Ui::OpenIGTLinkExampleControls m_Controls;
-    mitk::IGTLClient::Pointer m_IGTLClient;
-    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
-    mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
-    mitk::NavigationDataObjectVisualizationFilter::Pointer m_VisFilter;
-    QList<mitk::DataNode::Pointer> m_DemoNodes;
-
-    QTimer m_Timer;
+    mitk::IGTLMeasurements m_Measurements;
 };
 
-#endif // OpenIGTLinkExample_h
+#endif // OpenIGTLinkMeasurements_h

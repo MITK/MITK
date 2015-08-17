@@ -65,7 +65,17 @@ void mitk::IGTLMeasurements::AddMeasurement(unsigned int measurementPoint)
 
 bool mitk::IGTLMeasurements::ExportData(std::string filename)
 {
-   return m_Measurements->ExportData(filename);
+  return m_Measurements->ExportData(filename);
+}
+
+void mitk::IGTLMeasurements::Reset()
+{
+  m_Measurements->Reset();
+}
+
+void mitk::IGTLMeasurements::SetStarted(bool started)
+{
+  m_Measurements->SetStarted(started);
 }
 
 mitk::IGTLMeasurementsImplementation::IGTLMeasurementsImplementation()
@@ -79,7 +89,10 @@ mitk::IGTLMeasurementsImplementation::~IGTLMeasurementsImplementation()
 void mitk::IGTLMeasurementsImplementation::AddMeasurement(unsigned int measurementPoint)
 {
    long long now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-   m_MeasurementPoints[measurementPoint].push_back(now);
+   if (m_IsStarted)
+   {
+     m_MeasurementPoints[measurementPoint].push_back(now);
+   }
 }
 
 void mitk::IGTLMeasurementsImplementation::RegisterAsMicroservice()
@@ -143,4 +156,14 @@ bool mitk::IGTLMeasurementsImplementation::ExportData(std::string filename)
    setlocale(LC_ALL, oldLocale);
 
    return true;
+}
+
+void mitk::IGTLMeasurementsImplementation::Reset()
+{
+  m_MeasurementPoints.clear();
+}
+
+void mitk::IGTLMeasurementsImplementation::SetStarted(bool started)
+{
+  m_IsStarted = started;
 }

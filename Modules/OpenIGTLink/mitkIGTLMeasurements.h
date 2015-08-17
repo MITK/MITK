@@ -39,7 +39,7 @@ namespace mitk {
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-         typedef std::list<long long>          MeasurementList;
+      typedef std::list<long long>                    MeasurementList;
       typedef std::map<unsigned int, MeasurementList> MeasurementPoints;
 
       /**
@@ -47,6 +47,13 @@ namespace mitk {
       */
       void AddMeasurement(unsigned int measurementPoint);
       bool ExportData(std::string filename);
+
+      /**
+      * \brief clears all measurements
+      */
+      void Reset();
+
+      void SetStarted(bool started);
 
       void RegisterAsMicroservice();
       void UnRegisterMicroservice();
@@ -56,6 +63,8 @@ namespace mitk {
 
       /** \brief  */
       MeasurementPoints                                      m_MeasurementPoints;
+
+      bool m_IsStarted;
 
       us::ServiceRegistration<Self> m_ServiceRegistration;
    };
@@ -76,6 +85,13 @@ namespace mitk {
       * \brief AddMeasurementPoint
       */
       bool ExportData(std::string filename);
+
+      /**
+      * \brief clears all measurements
+      */
+      void Reset();
+
+      void SetStarted(bool started);
 
       IGTLMeasurements();
       ~IGTLMeasurements();

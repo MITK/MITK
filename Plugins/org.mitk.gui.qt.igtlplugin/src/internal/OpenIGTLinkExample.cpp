@@ -68,8 +68,6 @@ void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.butStart, SIGNAL(clicked()),
            this, SLOT(Start()) );
   connect( &m_Timer, SIGNAL(timeout()), this, SLOT(UpdatePipeline()));
-  connect(m_Controls.exportMeasurementsPushButton, SIGNAL(clicked()),
-           this, SLOT(ExportButtonClicked()));
 
   //create a new OpenIGTLinkExample Client
   m_IGTLClient = mitk::IGTLClient::New();
@@ -197,12 +195,6 @@ void OpenIGTLinkExample::UpdatePipeline()
      m_Timer.setInterval(currentValue);
      previousValue = currentValue;
   }
-}
-
-void OpenIGTLinkExample::ExportButtonClicked()
-{
-   if (!m_Measurements.ExportData("MeasurementOutput.txt"))
-      MITK_ERROR("OpenIGTLinkExample") << "export did not work!!!";
 }
 
 /**

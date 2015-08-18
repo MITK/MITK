@@ -216,7 +216,8 @@ if(TARGET ${TESTDRIVER})
 
   endif()
 
-  add_test(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)
-  set_property(TEST mitkPointSetLocaleTest PROPERTY LABELS MITK-Core)
+  # Deactivated until fixed (bug 16115)
+  #add_test(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)
+  #set_property(TEST mitkPointSetLocaleTest PROPERTY LABELS MITK-Core)
 
 endif() # TARGET ${TESTDRIVER}

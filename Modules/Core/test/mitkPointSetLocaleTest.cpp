@@ -39,7 +39,7 @@ bool ChangeLocale(const std::string& locale)
  }
   catch(...)
   {
-    MITK_TEST_OUTPUT(<< "Could not activate locale" << locale << "\n");
+    MITK_TEST_OUTPUT(<< "Could not activate locale " << locale << "\n");
     return false;
   }
 }

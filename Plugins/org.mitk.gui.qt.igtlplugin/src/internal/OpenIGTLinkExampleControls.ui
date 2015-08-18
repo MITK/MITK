@@ -34,17 +34,17 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="text">
-          <string>Visualization Update Rate:</string>
+          <string>Update Rate:</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QSpinBox" name="visualizationUpdateRateSpinBox">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="maximum">
           <number>200</number>
@@ -57,7 +57,7 @@
       </layout>
      </item>
      <item>
-      <layout class="QGridLayout" name="gridLayout">
+      <layout class="QGridLayout" name="gridLayout11">
        <item row="0" column="0">
         <widget class="QCheckBox" name="visualizeCheckBox">
          <property name="text">

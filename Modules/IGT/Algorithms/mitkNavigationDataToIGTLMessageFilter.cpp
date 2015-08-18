@@ -328,7 +328,8 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
 
     //copy the time stamp
     //todo find a better way to do that
-    tdMsg->SetTimeStamp((unsigned int)nd->GetIGTTimeStamp(), 0);
+    tdMsg->SetTimeStamp((unsigned int)nd->GetIGTTimeStamp(),
+                        (unsigned int)(nd->GetIGTTimeStamp() * 1000.0) % 1000);
   }
   tdMsg->Pack();
   //add the igtl message to the mitk::IGTLMessage

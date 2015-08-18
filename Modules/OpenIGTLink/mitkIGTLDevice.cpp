@@ -472,6 +472,10 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
   if (msg.IsNotNull())
   {
     m_Measurement->AddMeasurement(8);
+    unsigned int seconds = 0;
+    unsigned int frac = 0;
+    msg->GetTimeStamp(&seconds, &frac);
+    std::cout << "8: s: " << seconds << " f: " << frac << std::endl;
   }
 
   return msg;

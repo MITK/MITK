@@ -70,13 +70,13 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PointSetReaderService::Re
 
           currentTimeStep = atoi(currentTimeSeriesID->GetText());
 
+          timeGeometry->Expand( currentTimeStep + 1 ); // expand (default to identity) in any case
           TiXmlElement* geometryElem = currentTimeSeries->FirstChildElement("Geometry3D");
           if ( geometryElem )
           {
               Geometry3D::Pointer geometry = Geometry3DToXML::FromXML(geometryElem);
               if (geometry.IsNotNull())
               {
-                timeGeometry->Expand( currentTimeStep + 1 );
                 timeGeometry->SetTimeStepGeometry(geometry,currentTimeStep);
               }
               else

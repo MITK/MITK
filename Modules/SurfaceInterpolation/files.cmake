@@ -6,4 +6,5 @@ set(CPP_FILES
   mitkImageToPointCloudFilter.cpp
   mitkReduceContourSetFilter.cpp
   mitkSurfaceInterpolationController.cpp
+  mitkSurfaceBasedInterpolationController.cpp
 )

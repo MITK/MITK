@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <category
+      id="org.mitk.views.general"
+      name="MITK General"/>
+    <view id="org.mitk.views.multilabelsegmentation"
+      name="MultiLabelSegmentation"
+      icon="resources/multilabelsegmentation.png"
+      class="QmitkMultiLabelSegmentationView" />
+
+    <view id="org.mitk.views.multilabelsegmentationutilities"
+      name="MultiLabel Segmentation Utilities"
+      class="QmitkMultiLabelSegmentationUtilitiesView"
+      icon="resources/MultiLabelSegmentationUtilities_48x48.png" />
+  </extension>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePage" name="MultiLabelSegmentation" class="QmitkMultiLabelSegmentationPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords"></keywordreference>
+    </page>
+  </extension>
+
+   <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords" label="data manager"></keyword>
+  </extension>
+
+  <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
+    <contextMenuAction nodeDescriptorName="ImageMask" label="Convert to Label" icon="" class="QmitkConvertMaskToLabelAction" />
+    <contextMenuAction nodeDescriptorName="Surface" label="Convert to Label" icon="" class="QmitkConvertSurfaceToLabelAction" />
+    <contextMenuAction nodeDescriptorName="Image" label="Create Segmentation" icon="" class="QmitkCreateMultiLabelSegmentationAction" />
+    <contextMenuAction nodeDescriptorName="Image" label="Convert to Segmentation" icon="" class="QmitkConvertToMultiLabelSegmentationAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Create Preset" icon="" class="QmitkCreateMultiLabelPresetAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Load Preset" icon="" class="QmitkLoadMultiLabelPresetAction" />
+  </extension>
+
+</plugin>

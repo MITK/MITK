@@ -25,13 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 //#include "mitkProperties.h"
 //#include "mitkPlanarCircle.h"
+#include "mitkLabelSetImage.h"
 
 #include "mitkStateMachineAction.h"
 #include "mitkInteractionEvent.h"
 
 mitk::ContourTool::ContourTool(int paintingPixelValue)
 :FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
- m_PaintingPixelValue(paintingPixelValue)
+ m_PaintingPixelValue(paintingPixelValue),
+ m_CurrentLabelID(1)
 {
 }
 
@@ -130,6 +132,19 @@ bool mitk::ContourTool::OnMouseReleased( StateMachineAction*, InteractionEvent* 
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
   if ( !image || !planeGeometry ) return false;
 
+  // Check if it is a multilabel-image
+  // If yes, get the new drawing color from it.
+  // Otherwise nothing happens.
+  mitk::LabelSetImage* labelSetImage = dynamic_cast<LabelSetImage* >(image);
+  if (labelSetImage)
+  {
+    mitk::Label* label = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer());
+    m_CurrentLabelID = label->GetValue();
+  } else
+  {
+    m_CurrentLabelID = 1;
+  }
+
   const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
   if ( !image || abstractTransformGeometry ) return false;
 
@@ -149,9 +164,10 @@ bool mitk::ContourTool::OnMouseReleased( StateMachineAction*, InteractionEvent* 
 
     int timestep = positionEvent->GetSender()->GetTimeStep();
 
-    FeedbackContourTool::FillContourInSlice( projectedContour, timestep, slice, m_PaintingPixelValue );
+    mitk::ContourModelUtils::FillContourInSlice(projectedContour, timestep, slice, image, (m_PaintingPixelValue*m_CurrentLabelID));
 
-    this->WriteBackSegmentationResult(positionEvent, slice);
+    //this->WriteBackSegmentationResult(positionEvent, slice);
+    SegTool2D::WriteBackSegmentationResult(positionEvent,slice);
 
     // 4. Make sure the result is drawn again --> is visible then.
     assert( positionEvent->GetSender()->GetRenderWindow() );

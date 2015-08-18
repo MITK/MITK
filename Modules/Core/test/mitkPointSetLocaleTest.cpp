@@ -108,7 +108,7 @@ void WriterLocaleTest(mitk::Point3D & refPoint, std::string filename)
 
 }
 
-int mitkPointSetLocaleTest(int, char**)
+int mitkPointSetLocaleTest(int, char*[])
 {
   MITK_TEST_BEGIN("PointSetLocaleTest");
 

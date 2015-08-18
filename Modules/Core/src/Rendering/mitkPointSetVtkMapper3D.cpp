@@ -204,20 +204,20 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   //check if the list for the PointDataContainer is the same size as the PointsContainer. Is not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
   bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
 
-  //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
-  int pointType;
-  if(itkPointSet->GetPointData()->size() == 0 || pointDataBroken)
-    pointType = mitk::PTUNDEFINED;
-  else
-    pointType = pointDataIter.Value().pointSpec;
-
   //now add an object for each point in data
   mitk::PointSet::PointDataContainer::Iterator pointDataIter = itkPointSet->GetPointData()->Begin();
-  for (ptIdx=0, ptIdx < nbPoints, ++ptIdx) // pointDataIter moved at end of loop
+  for (ptIdx=0; ptIdx < nbPoints; ++ptIdx) // pointDataIter moved at end of loop
   {
     double currentPoint[3];
     m_WorldPositions->GetPoint(ptIdx, currentPoint);
     vtkSmartPointer<vtkPolyDataAlgorithm> source;
+
+    //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
+    int pointType;
+    if ( itkPointSet->GetPointData()->size() == 0 || pointDataBroken )
+      pointType = mitk::PTUNDEFINED;
+    else
+      pointType = pointDataIter.Value().pointSpec;
 
     switch (pointType)
     {

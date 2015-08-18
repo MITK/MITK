@@ -129,8 +129,13 @@ namespace mitk {
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
     virtual void ResetMapper( BaseRenderer* renderer ) override;
     virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
-    virtual void CreateContour();
+    virtual void CreateContour(vtkPoints* points, vtkCellArray* connections);
     virtual void CreateVTKRenderObjects();
+
+    /// All point positions, already in world coordinates
+    vtkSmartPointer<vtkPoints> m_WorldPositions;
+    /// All connections between two points (used for contour drawing)
+    vtkSmartPointer<vtkCellArray> m_PointConnections;
 
     vtkSmartPointer<vtkAppendPolyData> m_vtkSelectedPointList;
     vtkSmartPointer<vtkAppendPolyData> m_vtkUnselectedPointList;
@@ -155,6 +160,10 @@ namespace mitk {
 
     //help for contour between points
     vtkSmartPointer<vtkAppendPolyData> m_vtkTextList;
+
+    //variables to be able to log, how many inputs have been added to PolyDatas
+    unsigned int m_NumberOfSelectedAdded;
+    unsigned int m_NumberOfUnselectedAdded;
 
     //variables to check if an update of the vtk objects is needed
     ScalarType m_PointSize;

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetWriterService.h"
 #include "mitkGeometry3DToXML.h"
 #include "mitkIOMimeTypes.h"
+#include "mitkLocaleSwitch.h"
 
 #include "mitkGeometry3D.h"
 
@@ -63,16 +64,7 @@ mitk::PointSetWriterService::~PointSetWriterService()
 
 void mitk::PointSetWriterService::Write()
 {
-  OutputStream out(this);
-
-  if ( !out.good() )
-  {
-    mitkThrow() << "Stream not good.";
-  }
-
-  std::locale previousLocale(out.getloc());
-  std::locale I("C");
-  out.imbue(I);
+  mitk::LocaleSwitch localeC("C");
 
   TiXmlDocument doc;
 
@@ -94,11 +86,11 @@ void mitk::PointSetWriterService::Write()
   }
   rootNode->LinkEndChild(pointSetNode);
 
-  // write document to stream (/file)
-  out << doc;
+  //out << doc; // streaming of TinyXML write no new-lines,
+                // rendering XML files unreadable (for humans)
 
-  out.imbue(previousLocale);
-  if ( !out.good() ) // some error during output
+  LocalFile f(this);
+  if ( !doc.SaveFile( f.GetFileName() ) )
   {
     mitkThrow() << "Some error during point set writing.";
   }

@@ -203,6 +203,14 @@ if(MITK_USE_SOFA)
 endif()
 
 # -----------------------------------------
+# Special handling for VMTK
+
+if(MITK_USE_VMTK)
+  # Same as SOFA above
+  link_directories(${VMTK_LIBRARY_DIRS})
+endif()
+
+# -----------------------------------------
 # Special handling for Boost
 
 if(MITK_USE_Boost)

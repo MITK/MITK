@@ -174,10 +174,18 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
         m_SensibleMaximumThresholdValue = static_cast<double>( statistics->GetScalarValueMax() );
       }
 
-      m_CurrentLowerThresholdValue = (m_SensibleMaximumThresholdValue + m_SensibleMinimumThresholdValue) / 3.0;
-      m_CurrentUpperThresholdValue = 2.0 * m_CurrentLowerThresholdValue;
+      double range = m_SensibleMaximumThresholdValue - m_SensibleMinimumThresholdValue;
+      m_CurrentLowerThresholdValue = m_SensibleMinimumThresholdValue + range/3.0;
+      m_CurrentUpperThresholdValue = m_SensibleMinimumThresholdValue + 2*range/3.0;
 
-      IntervalBordersChanged.Send(m_SensibleMinimumThresholdValue, m_SensibleMaximumThresholdValue);
+      bool isFloatImage = false;
+      if ((originalImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
+          &&(originalImage->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT || originalImage->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE))
+      {
+        isFloatImage = true;
+      }
+
+      IntervalBordersChanged.Send(m_SensibleMinimumThresholdValue, m_SensibleMaximumThresholdValue, isFloatImage);
       ThresholdingValuesChanged.Send(m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue);
     }
   }

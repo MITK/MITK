@@ -45,7 +45,7 @@ namespace mitk
   {
   public:
 
-    Message2<double,double> IntervalBordersChanged;
+    Message3<double,double,bool> IntervalBordersChanged;
     Message2<mitk::ScalarType, mitk::ScalarType>     ThresholdingValuesChanged;
 
     mitkClassMacro(BinaryThresholdULTool, AutoSegmentationTool);

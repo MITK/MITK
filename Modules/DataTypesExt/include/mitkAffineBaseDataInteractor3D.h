@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 /**
-  * \brief Affine interaction with objects in 3D windows.
+  * \brief Affine interaction with mitk::BaseGeometry.
   *
   * \ingroup Interaction
   */
@@ -87,15 +87,18 @@ protected:
 
   virtual void RestoreNodeProperties();
 
+  /**
+   * @brief InitMembers convinience method to avoid code duplication between InitRotate() and InitTranslate().
+   * @param interactionEvent
+   */
+  bool InitMembers(InteractionEvent* interactionEvent);
+
 private:
 
   Point3D m_InitialPickedWorldPoint;
   Point2D m_InitialPickedDisplayPoint;
 
   Geometry3D::Pointer m_OriginalGeometry;
-
-  Vector3D m_ObjectNormal;
-
 };
 
 }

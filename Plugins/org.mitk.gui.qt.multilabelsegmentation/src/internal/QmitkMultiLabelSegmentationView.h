@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkMultiLabelSegmentationView_h
 
 #include <QmitkAbstractView.h>
+
+#include <mitkILifecycleAwarePart.h>
 #include "mitkSegmentationInteractor.h"
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
@@ -29,7 +31,7 @@ class QmitkRenderWindow;
  * \ingroup ToolManagerEtAl
  * \ingroup org_mitk_gui_qt_multilabelsegmentation_internal
  */
-class QmitkMultiLabelSegmentationView : public QmitkAbstractView
+class QmitkMultiLabelSegmentationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   Q_OBJECT
 
@@ -44,6 +46,13 @@ public:
 
   // GUI setup
   void CreateQtPartControl(QWidget* parent);
+
+  // ILifecycleAwarePart interface
+public:
+  void Activated();
+  void Deactivated();
+  void Visible();
+  void Hidden();
 
   virtual int GetSizeFlags(bool width);
   virtual int ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult);
@@ -160,8 +169,6 @@ protected:
     * it is needed to unregister the observer on unload.
   */
   us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
-
-
 };
 
 #endif // QmitkMultiLabelSegmentationView_h

@@ -118,13 +118,13 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   // * DATA SLECTION WIDGETS
   // *------------------------
 
-  m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
   m_Controls.m_cbReferenceNodeSelector->SetAutoSelectNewItems(true);
+  m_Controls.m_cbReferenceNodeSelector->SetPredicate(m_ReferencePredicate);
+  m_Controls.m_cbReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
 
-  m_Controls.m_cbWorkingNodeSelector->SetDataStorage(this->GetDataStorage());
-  m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
   m_Controls.m_cbWorkingNodeSelector->SetAutoSelectNewItems(true);
+  m_Controls.m_cbWorkingNodeSelector->SetPredicate(m_SegmentationPredicate);
+  m_Controls.m_cbWorkingNodeSelector->SetDataStorage(this->GetDataStorage());
 
   connect( m_Controls.m_cbReferenceNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
            this, SLOT( OnReferenceSelectionChanged( const mitk::DataNode* ) ) );
@@ -234,6 +234,26 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_cbActiveLayer->hide();
 }
 
+void QmitkMultiLabelSegmentationView::Activated()
+{
+  m_ToolManager->SetReferenceData(m_Controls.m_cbReferenceNodeSelector->GetSelectedNode());
+  m_ToolManager->SetWorkingData(m_Controls.m_cbWorkingNodeSelector->GetSelectedNode());
+}
+
+void QmitkMultiLabelSegmentationView::Deactivated()
+{
+  // Not yet implemented
+}
+
+void QmitkMultiLabelSegmentationView::Visible()
+{
+  // Not yet implemented
+}
+
+void QmitkMultiLabelSegmentationView::Hidden()
+{
+  // Not yet implemented
+}
 void QmitkMultiLabelSegmentationView::InitializeListeners()
 {
   if (m_Interactor.IsNull())
@@ -345,7 +365,6 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   bool hasValidWorkingNode = workingNode != NULL;
 
-  m_Controls.m_pbNewSegmentationSession->setEnabled(false);
   m_Controls.m_pbNewLabel->setEnabled(false);
   m_Controls.m_gbInterpolation->setEnabled(false);
   m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(false);
@@ -362,11 +381,6 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
 
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
   m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
-
-  if(hasReferenceNode)
-  {
-    m_Controls.m_pbNewSegmentationSession->setEnabled(true);
-  }
 
   if(hasValidWorkingNode)
   {

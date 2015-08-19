@@ -351,9 +351,12 @@ void mitk::LevelWindowManager::RecaluclateLevelWindowForSelectedComponent(const 
         node->SetLevelWindow(selectedLevelWindow);
       }
     }
+
+    mitk::LevelWindow levelWindow;
+    node->GetLevelWindow(levelWindow);
   }
+
   this->Update(event);
-  Modified();
 }
 
 void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible property of a image has changed

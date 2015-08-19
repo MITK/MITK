@@ -579,7 +579,11 @@ void LabelSetImageIO::LoadLabelSetImagePreset(const std::string & presetFilename
     {
 
       mitk::Label::Pointer label = mitk::LabelSetImageIO::LoadLabelFromTiXmlDocument(labelElement);
-      inputImage->GetLabelSet()->AddLabel(label);
+
+      if(label->GetValue() == 0)
+        inputImage->SetExteriorLabel(label);
+      else
+        inputImage->GetLabelSet()->AddLabel(label);
 
       labelElement = labelElement->NextSiblingElement("Label");
       if(labelElement == NULL) break;

@@ -74,7 +74,7 @@ if(NOT DEFINED ITK_DIR)
   endif()
   
   list(APPEND additional_cmake_args
-    -DModule_ITKVtkGlue:BOOL=ON
+    -DModule_ITKVtkGlue:BOOL=OFF
     -DVTK_DIR:PATH=${VTK_DIR}
   )
 

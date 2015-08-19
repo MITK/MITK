@@ -43,6 +43,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkgl.h>
 
+#include <mitkPropertyObserver.h>
+
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 {
   return static_cast<const mitk::PointSet * > ( GetDataNode()->GetData() );
@@ -380,8 +382,8 @@ void mitk::PointSetVtkMapper3D::VertexRendering()
   glDisable(GL_COLOR_MATERIAL);
   glDisable(GL_LIGHTING);
   glEnable(GL_POINT_SMOOTH);
-  glPointSize(m_PointSize);
 
+  glPointSize(m_PointSize);
   glBegin(GL_POINTS);
 
   glColor4d(color[0],color[1],color[2],opacity);
@@ -390,12 +392,13 @@ void mitk::PointSetVtkMapper3D::VertexRendering()
         pointsIter!=itkPointSet->GetPoints()->End();
         pointsIter++ )
   {
-    const itk::Point<float>& point = pointsIter->Value();
-    glVertex3f(point[0],point[1],point[2]);
+    const itk::Point<mitk::ScalarType>& point = pointsIter->Value();
+    glVertex3d(point[0],point[1],point[2]);
   }
 
   glEnd();
 
+  // reset context
   glPointSize(1.0);
   glDisable(GL_POINT_SMOOTH);
   glEnable(GL_COLOR_MATERIAL);
@@ -437,21 +440,20 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     if(contourSizeProp && m_ContourRadius!=contourSizeProp->GetValue() )
       needGenerateData = true;
 
+    // when vertex rendering is enabled the pointset is always
+    // drawn with opengl, thus we leave needGenerateData always false
     if(useVertexRendering && m_VertexRendering != useVertexRendering )
     {
-      needGenerateData = true;
+      needGenerateData = false;
       m_VertexRendering = true;
     } else if(!useVertexRendering && m_VertexRendering)
     {
       m_VertexRendering = false;
       needGenerateData = true;
-    } else if(m_VertexRendering)
-    {
-      needGenerateData = true;
     }
   }
 
-  if(needGenerateData && !m_VertexRendering)
+  if(needGenerateData)
   {
     this->CreateVTKRenderObjects();
     ls->UpdateGenerateDataTime();
@@ -494,7 +496,7 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   }
 
   // use vertex rendering
-  if(m_VertexRendering && needGenerateData)
+  if(m_VertexRendering)
   {
     VertexRendering();
     ls->UpdateGenerateDataTime();

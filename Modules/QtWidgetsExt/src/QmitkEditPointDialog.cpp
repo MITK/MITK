@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 #include <QMessageBox>
 
+static void EmitWarning(const QString& message, const QString& title);
+static bool ValidatePrecision(double value);
+static bool ValidateCoordinate(const QString& name, double value);
+
 struct QmitkEditPointDialogData
 {
   mitk::PointSet* m_PointSet;
@@ -54,7 +58,6 @@ QmitkEditPointDialog::QmitkEditPointDialog( QWidget * parent, Qt::WindowFlags f)
   layout->addWidget(d->m_ZCoord, 2,1,1,1);
   layout->addWidget(_OKButton, 3,0,2,1);
   this->setLayout(layout);
-
 }
 
 QmitkEditPointDialog::~QmitkEditPointDialog()
@@ -83,29 +86,38 @@ void QmitkEditPointDialog::OnOkButtonClicked(bool)
     this->reject();
   }
   // check if digits of input value exceed double precision
-  if(std::log10(std::abs(d->m_XCoord->text().toDouble()))+1 > std::numeric_limits<double>::digits10)
+  auto x = d->m_XCoord->text().toDouble();
+  auto y = d->m_YCoord->text().toDouble();
+  auto z = d->m_ZCoord->text().toDouble();
+
+  if (ValidateCoordinate("X", x) && ValidateCoordinate("Y", y) && ValidateCoordinate("Z", z))
   {
-      MITK_WARN << "Pointset X coordinate is outside double precision range.";
-      QMessageBox::warning(0, "Warning: Invalid PointSet Input", "Warning: Pointset X coordinate is outside double precision range.");
+    auto point = d->m_PointSet->GetPoint(d->m_PointId, d->m_Timestep);
+    point.SetElement(0, x);
+    point.SetElement(1, y);
+    point.SetElement(2, z);
+    d->m_PointSet->SetPoint(d->m_PointId, point);
+    this->accept();
   }
-  else if(std::log10(std::abs(d->m_YCoord->text().toDouble()))+1 > std::numeric_limits<double>::digits10)
-  {
-      MITK_WARN << "Pointset Y coordinate is outside double precision range.";
-      QMessageBox::warning(0, "Warning: Invalid PointSet Input", "Warning: Pointset Y coordinate is outside double precision range.");
-  }
-  else if(std::log10(std::abs(d->m_ZCoord->text().toDouble()))+1 > std::numeric_limits<double>::digits10)
-  {
-      MITK_WARN << "Pointset Z coordinate is outside double precision range.";
-      QMessageBox::warning(0, "Warning: Invalid PointSet Input", "Warning: Pointset Z coordinate is outside double precision range.");
-  }
-  else
-  {
-      mitk::PointSet::PointType p = d->m_PointSet->GetPoint(d->m_PointId, d->m_Timestep);
-      p.SetElement( 0, d->m_XCoord->text().toDouble() );
-      p.SetElement( 1, d->m_YCoord->text().toDouble() );
-      p.SetElement( 2, d->m_ZCoord->text().toDouble() );
-      d->m_PointSet->SetPoint(d->m_PointId, p);
-      this->accept();
-  }
+}
+
+void EmitWarning(const QString& message, const QString& title)
+{
+  MITK_WARN << message.toStdString();
+  QMessageBox::warning(nullptr, title, message);
+}
+
+bool ValidatePrecision(double value)
+{
+  return std::log10(std::abs(value)) + 1.0 <= std::numeric_limits<double>::digits10;
+}
+
+bool ValidateCoordinate(const QString& name, double value)
+{
+  auto hasValidPrecision = ValidatePrecision(value);
+  if (!hasValidPrecision)
+    EmitWarning(QString("Point set %1 coordinate is outside double precision range.").arg(name), "Invalid point set input");
+
+  return hasValidPrecision;
 }
 

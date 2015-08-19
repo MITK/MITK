@@ -47,8 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkSliceBasedInterpolatorWidget::QmitkSliceBasedInterpolatorWidget(QWidget* parent, const char*  /*name*/) : QWidget(parent),
 m_SliceInterpolatorController( mitk::SliceBasedInterpolationController::New() ),
 m_ToolManager(NULL),
-m_DataStorage(NULL),
 m_Activated(false),
+m_DataStorage(NULL),
 m_LastSNC(0),
 m_LastSliceIndex(0)
 {
@@ -323,7 +323,7 @@ void QmitkSliceBasedInterpolatorWidget::OnToggleWidgetActivation(bool enabled)
   unsigned int numberOfExistingTools = m_ToolManager->GetTools().size();
   for (unsigned int i = 0; i < numberOfExistingTools; i++)
   {
-    mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
+    //mitk::SegTool2D* tool = dynamic_cast<mitk::SegTool2D*>(m_ToolManager->GetToolById(i));
     //MLI TODO
     //if (tool) tool->SetEnable2DInterpolation( enabled );
   }

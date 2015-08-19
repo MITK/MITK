@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataToNavigationDataFilter.h"
 #include "mitkNavigationData.h"
 #include "mitkBaseData.h"
+#include "mitkIGTLMeasurements.h"
 
 namespace mitk {
 
@@ -148,6 +149,10 @@ namespace mitk {
     BooleanInputMap m_TransformPosition;    ///< if set to true, the filter will use the position part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
     BooleanInputMap m_TransformOrientation; ///< if set to true, the filter will use the orientation part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
     OffsetPointerMap m_OffsetList;
+
+
+    /** Measurement class to calculate latency and frame count */
+    mitk::IGTLMeasurements* m_Measurement;
 
   private:
     RotationMode m_RotationMode; ///< defines the rotation mode Standard or Transposed, Standard is default

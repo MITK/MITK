@@ -105,6 +105,8 @@ void mitk::IGTLClient::Send()
   if ( curMessage.IsNull() )
     return;
 
+  m_Measurement->AddMeasurement(4);
+
   if ( this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
   {
     MITK_INFO("IGTLDevice") << "Successfully sent the message.";

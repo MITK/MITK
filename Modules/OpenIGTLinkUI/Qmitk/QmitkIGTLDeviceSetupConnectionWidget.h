@@ -103,6 +103,7 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QWi
     void OnConnect();
     void OnPortChanged();
     void OnHostnameChanged();
+    void OnUpdateFPSLabel();
 
     /**
     * \brief Enables/Disables the buffering of incoming messages
@@ -153,6 +154,23 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLDeviceSetupConnectionWidget : public QWi
     unsigned long m_LostConnectionObserverTag;
     unsigned long m_NewConnectionObserverTag;
     unsigned long m_StateModifiedObserverTag;
+
+    /** @brief the number of received frames (messages) since the last fps calculation update
+    *
+    *   This counter is incremented every time a message is received. When the timer
+    *   m_FPSCalculationTimer is fired it is reset to 0 and the number is used to calculate the FPS
+    */
+    unsigned int m_NumReceivedFramesSinceLastUpdate;
+
+    /** @brief the number of sent frames (messages) since the last fps calculation update
+    *
+    *   This counter is incremented every time a message is sent. When the timer
+    *   m_FPSCalculationTimer is fired it is reset to 0 and the number is used to calculate the FPS
+    */
+    unsigned int m_NumSentFramesSinceLastUpdate;
+
+    /** @brief the timer used to calculate the frames per second */
+    QTimer m_FPSCalculationTimer;
 
     //############## private help methods #######################
     void DisableSourceControls();

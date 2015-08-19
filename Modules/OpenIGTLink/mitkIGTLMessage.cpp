@@ -47,10 +47,10 @@ mitk::IGTLMessage::IGTLMessage(igtl::MessageBase::Pointer message,
 void mitk::IGTLMessage::Graft( const DataObject *data )
 {
   // Attempt to cast data to an IGTLMessage
-  const Self* nd;
+  const Self* msg;
   try
   {
-    nd = dynamic_cast<const Self *>( data );
+    msg = dynamic_cast<const Self *>(data);
   }
   catch( ... )
   {
@@ -59,7 +59,7 @@ void mitk::IGTLMessage::Graft( const DataObject *data )
       << typeid(const Self *).name() );
     return;
   }
-  if (!nd)
+  if (!msg)
   {
     // pointer could not be cast back down
     itkExceptionMacro( << "mitk::IGTLMessage::Graft cannot cast "
@@ -68,10 +68,10 @@ void mitk::IGTLMessage::Graft( const DataObject *data )
     return;
   }
   // Now copy anything that is needed
-  this->SetMessage(nd->GetMessage());
-  this->SetDataValid(nd->IsDataValid());
-  this->SetIGTTimeStamp(nd->GetIGTTimeStamp());
-  this->SetName(nd->GetName());
+  this->SetMessage(msg->GetMessage());
+  this->SetDataValid(msg->IsDataValid());
+  this->SetIGTTimeStamp(msg->GetIGTTimeStamp());
+  this->SetName(msg->GetName());
 }
 
 void mitk::IGTLMessage::SetMessage(igtl::MessageBase::Pointer msg)
@@ -80,7 +80,7 @@ void mitk::IGTLMessage::SetMessage(igtl::MessageBase::Pointer msg)
   unsigned int ts = 0;
   unsigned int frac = 0;
   m_Message->GetTimeStamp(&ts, &frac);
-  this->SetIGTTimeStamp((double)ts);
+  this->SetIGTTimeStamp((double)ts + (double)frac/1000.0);
   this->SetDataValid(true);
 }
 

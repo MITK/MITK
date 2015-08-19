@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessageSource.h"
 #include "mitkNavigationData.h"
 #include "mitkNavigationDataSource.h"
+#include "mitkIGTLMeasurements.h"
 
 namespace mitk {
 
@@ -164,6 +165,9 @@ namespace mitk {
 //    unsigned int m_RingBufferSize;  ///< Stores the ringbuffer size
     unsigned int m_CurrentTimeStep; ///< Indicates the current timestamp
 //    unsigned int m_NumberForMean;   ///< Number of Navigation Data, which should be averaged
+
+    /** Measurement class to calculate latency and frame count */
+    mitk::IGTLMeasurements* m_Measurement;
   };
 } // namespace mitk
 #endif // _MITKNAVIGATIONDATATOIGTLMessageFILTER_H__

@@ -145,6 +145,16 @@ namespace mitk {
     **/
     virtual void OnIncomingCommand();
 
+    /**
+    * \brief This method is called when the IGTL device lost the connection to the other side
+    **/
+    virtual void OnLostConnection();
+
+    /**
+    * \brief Removes all observers that listen to the igtl device
+    **/
+    virtual void RemoveObservers();
+
 
     using Superclass::SetInput;
 
@@ -189,6 +199,11 @@ namespace mitk {
 
     /** the OpenIGTLink device that is used as a source for this filter object*/
     mitk::IGTLDevice::Pointer m_IGTLDevice;
+
+    /** observer tags */
+    unsigned int m_LostConnectionObserverTag;
+    unsigned int m_IncomingCommandObserverTag;
+    unsigned int m_IncomingMessageObserverTag;
   };
 } // namespace mitk
 #endif /* MITKIGTLDeviceSource_H_HEADER_INCLUDED_ */

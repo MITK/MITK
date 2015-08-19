@@ -22,9 +22,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QGridLayout>
 #include <QMessageBox>
 
-static void EmitWarning(const QString& message, const QString& title);
-static bool ValidatePrecision(double value);
-static bool ValidateCoordinate(const QString& name, double value);
+static void EmitWarning(const QString& message, const QString& title)
+{
+  MITK_WARN << message.toStdString();
+  QMessageBox::warning(nullptr, title, message);
+}
+
+static bool ValidatePrecision(double value)
+{
+  return std::log10(std::abs(value)) + 1.0 <= std::numeric_limits<double>::digits10;
+}
+
+static bool ValidateCoordinate(const QString& name, double value)
+{
+  auto hasValidPrecision = ValidatePrecision(value);
+  if (!hasValidPrecision)
+    EmitWarning(QString("Point set %1 coordinate is outside double precision range.").arg(name), "Invalid point set input");
+
+  return hasValidPrecision;
+}
 
 struct QmitkEditPointDialogData
 {
@@ -100,24 +116,3 @@ void QmitkEditPointDialog::OnOkButtonClicked(bool)
     this->accept();
   }
 }
-
-void EmitWarning(const QString& message, const QString& title)
-{
-  MITK_WARN << message.toStdString();
-  QMessageBox::warning(nullptr, title, message);
-}
-
-bool ValidatePrecision(double value)
-{
-  return std::log10(std::abs(value)) + 1.0 <= std::numeric_limits<double>::digits10;
-}
-
-bool ValidateCoordinate(const QString& name, double value)
-{
-  auto hasValidPrecision = ValidatePrecision(value);
-  if (!hasValidPrecision)
-    EmitWarning(QString("Point set %1 coordinate is outside double precision range.").arg(name), "Invalid point set input");
-
-  return hasValidPrecision;
-}
-

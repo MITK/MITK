@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef QmitkAboutDialog_h
+#define QmitkAboutDialog_h
+
 #include <ui_QmitkAboutDialogGUI.h>
 #include "MitkQtWidgetsExtExports.h"
 
@@ -40,3 +43,4 @@ private:
   Ui::QmitkAboutDialog m_GUI;
 };
 
+#endif

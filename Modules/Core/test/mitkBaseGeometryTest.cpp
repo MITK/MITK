@@ -21,19 +21,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseGeometry.h>
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "mitkOperationActor.h"
+#include <mitkOperationActor.h>
 
 #include <itkBoundingBox.h>
-#include "mitkVector.h"
+#include <mitkVector.h>
 #include <itkAffineGeometryFrame.h>
 #include <itkQuaternionRigidTransform.h>
-#include "itkScalableAffineTransform.h"
+#include <itkScalableAffineTransform.h>
 #include <itkIndex.h>
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
 
-#include "mitkRotationOperation.h"
-#include "mitkInteractionConst.h"
+#include <mitkRotationOperation.h>
+#include <mitkScaleOperation.h>
+#include <mitkInteractionConst.h>
 #include <mitkMatrixConvert.h>
 #include <mitkImageCast.h>
 
@@ -877,7 +878,7 @@ public:
     spacing[1]=anotherSpacing[1]-1.;
     spacing[2]=anotherSpacing[2]-1.;
 
-    auto  opS = new mitk::PointOperation(mitk::OpSCALE,spacing);
+    auto  opS = new mitk::ScaleOperation(mitk::OpSCALE,spacing,anotherPoint);
     dummy->ExecuteOperation(opS);
     CPPUNIT_ASSERT(mitk::Equal(anotherSpacing,dummy->GetSpacing()));
     newDummy->SetSpacing(anotherSpacing);

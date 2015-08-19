@@ -351,30 +351,74 @@ void QmitkPreferencesDialog::UpdateTree()
   QString keyword = d->m_Keyword->text().toLower();
 
   map<QString, QTreeWidgetItem*> items;
+  std::list< QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator > deferredItems;
 
-  for(QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin();
-      it != d->m_PrefPages.end(); ++it)
+  for (QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin();
+    it != d->m_PrefPages.end(); ++it)
   {
-    if(it->treeWidgetItem == nullptr)
+    if (it->treeWidgetItem == nullptr)
     {
-
-      if(it->category.isEmpty())
+      if (it->category.isEmpty())
       {
         it->treeWidgetItem = new QTreeWidgetItem(d->m_PreferencesTree);
+        it->treeWidgetItem->setText(0, it->name);
+        items[it->id] = it->treeWidgetItem;
       }
       else
       {
-        it->treeWidgetItem = new QTreeWidgetItem(items[it->category]);
+        // the parent might not be created yet
+        deferredItems.push_back(it);
       }
-      it->treeWidgetItem->setText(0, it->name);
-      items[it->id] = it->treeWidgetItem;
     }
+  }
+
+  // deal with deferred items. We do not know how many levels
+  // of parents need to be created
+  auto currentItem = deferredItems.begin();
+
+  while (currentItem != deferredItems.end())
+  {
+    auto currentItemContent = *currentItem;
+    if (items[currentItemContent->category] != nullptr)
+    {
+      currentItemContent->treeWidgetItem = new QTreeWidgetItem(items[currentItemContent->category]);
+      currentItemContent->treeWidgetItem->setText(0, currentItemContent->name);
+      items[currentItemContent->id] = currentItemContent->treeWidgetItem;
+
+      deferredItems.erase(currentItem);
+      currentItem = deferredItems.begin();
+    }
+    else
+    {
+      ++currentItem;
+    }
+  }
+
+  if (!deferredItems.empty())
+  {
+    MITK_ERROR << "Unknown preference category. They are added top-level.";
+
+    for (const auto &currentItemContent : deferredItems)
+    {
+      currentItemContent->treeWidgetItem = new QTreeWidgetItem(d->m_PreferencesTree);
+      currentItemContent->treeWidgetItem->setText(0, currentItemContent->name);
+      items[currentItemContent->id] = currentItemContent->treeWidgetItem;
+    }
+  }
+
+  // we have to iterate over the list a second time, as only
+  // now all parents and items are guaranteed to be created
+  for (QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin();
+    it != d->m_PrefPages.end(); ++it)
+  {
 
     // hide treeWidgetItem if keyword not matches
     if(!keyword.isEmpty())
     {
-      if( it->keywords.indexOf(keyword) == -1 )
+      if (it->keywords.indexOf(keyword) == -1)
+      {
         it->treeWidgetItem->setHidden(true);
+      }
       else
       {
         //#make the whole branch visible

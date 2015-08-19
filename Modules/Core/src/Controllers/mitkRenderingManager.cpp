@@ -479,6 +479,10 @@ RenderingManager
         if( Equal( newBounds[ 2 * dimension ], newBounds[ 2 * dimension + 1 ] ) )
         {
           newBounds[ 2 * dimension + 1 ] += 1;
+          if( Equal( newBounds[ 2 * dimension ], newBounds[ 2 * dimension + 1 ] ) ) // newBounds will still be equal if values are beyond double precision
+          {
+              mitkThrow()<< "One dimension of object data has zero length, please make sure you're not using numbers beyond double precision as coordinates.";
+          }
         }
       }
       modifiedGeometry->GetGeometryForTimeStep(step)->SetBounds(newBounds);

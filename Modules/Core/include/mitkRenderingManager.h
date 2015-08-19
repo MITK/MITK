@@ -149,7 +149,9 @@ public:
   //   RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
   /** Initializes the windows specified by requestType to the given
-   * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC? */
+   * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC?
+   * Throws an exception if bounding box has 0 extent due to exceeding
+   * double precision range. */
   virtual bool InitializeViews( const BaseGeometry *geometry,
     RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
   virtual bool InitializeViews( const TimeGeometry *geometry,

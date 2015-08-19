@@ -494,9 +494,9 @@ static void CheckIntersectionWithRotatedGeometry()
   {
     //Slice 0-24
     mitk::Point3D origin;
-    origin[0] = -0.98;
-    origin[1] = -113.56;
-    origin[2] = -0.64;
+    origin[0] = -45;
+    origin[1] = -105;
+    origin[2] =  35;
 
     mitk::Vector3D normal;
     mitk::FillVector3D(normal, 1.43, 0.01, 0.01 );

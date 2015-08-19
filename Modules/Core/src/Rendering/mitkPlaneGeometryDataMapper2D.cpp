@@ -40,8 +40,102 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
 
-#include <boost/icl/interval.hpp>
-#include <boost/icl/interval_set.hpp>
+///
+#include <set>
+#include <array>
+#include <algorithm>
+#include <cassert>
+
+/// Some simple interval arithmetic
+template<typename T>
+class SimpleInterval {
+public:
+  SimpleInterval(T start = T(), T end = T())
+    : _start{std::min(start, end)}
+    , _end{std::max(start, end)}
+    {
+
+    }
+
+  T start() const { return _start; }
+  T end() const { return _end; }
+
+  bool empty() const { return _start == _end; }
+
+  bool operator<(const SimpleInterval& r) const
+  {
+    return _end < r._start;
+  }
+
+private:
+  T _start, _end;
+};
+
+template<typename T>
+class IntervalSet {
+public:
+  using IntervalType = SimpleInterval<T>;
+
+  IntervalSet(IntervalType startingInterval)
+  {
+    _intervals.emplace(std::move(startingInterval));
+  }
+
+  void operator-=(const IntervalType& interval)
+  {
+    // Check the intervals for intersection
+    auto range = _intervals.equal_range(interval);
+
+    for (auto iter = range.first; iter != range.second;) {
+      auto intersectionResult = _intersectIntervals(*iter, interval);
+
+      iter = _intervals.erase(iter);
+      for (auto&& interval : intersectionResult) {
+        if (!interval.empty()) {
+          iter = _intervals.emplace_hint(iter, std::move(interval));
+          ++iter;
+        }
+      }
+    }
+  }
+
+  IntervalSet operator-(const IntervalType& interval)
+  {
+    IntervalSet result = *this;
+    result -= interval;
+    return result;
+  }
+
+  using IntervalsContainer = std::set<IntervalType>;
+
+  const IntervalsContainer& getIntervals() const
+  {
+    return _intervals;
+  }
+
+private:
+  IntervalsContainer _intervals;
+
+  std::array<IntervalType, 2> _intersectIntervals(const IntervalType& from, const IntervalType& what)
+  {
+    assert(what.end() >= from.start() && from.end() >= what.start()); // Non-intersecting intervals should never reach here
+
+    if (what.start() < from.start()) {
+      if (from.end() < what.end()) {
+        return {}; // Interval completely enclosed
+      }
+      return {IntervalType{from.end(), what.end()}, IntervalType{}};
+    }
+
+    if (from.end() < what.end()) {
+      return {IntervalType{from.start(), what.start()}, IntervalType{}};
+    }
+
+    return {IntervalType{from.start(), what.start()},
+        IntervalType{what.end(), from.end()}};
+  }
+};
+
 
 
 mitk::PlaneGeometryDataMapper2D::AllInstancesContainer mitk::PlaneGeometryDataMapper2D::s_AllInstances;
@@ -213,8 +307,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapsize, NULL);
 
 
-      boost::icl::interval_set<double> intervals;
-      intervals += boost::icl::interval<double>::closed(0, 1);
+      auto intervals = IntervalSet<double>{{0, 1}};
 
       ScalarType lineLength = point1.EuclideanDistanceTo(point2);
       DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
@@ -240,14 +333,14 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
         {
             double intersectionParam;
             if (otherPlane->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 && intersectionParam < 1) {
-                intervals -= boost::icl::interval<double>::open(intersectionParam - gapSizeParam, intersectionParam + gapSizeParam);
+                intervals -= SimpleInterval<double>{intersectionParam - gapSizeParam, intersectionParam + gapSizeParam};
           }
         }
         ++otherPlanesIt;
       }
 
-      for (const auto& interval : intervals) {
-          this->DrawLine(crossLine.GetPoint(interval.lower()), crossLine.GetPoint(interval.upper()), lines, points);
+      for (const auto& interval : intervals.getIntervals()) {
+          this->DrawLine(crossLine.GetPoint(interval.start()), crossLine.GetPoint(interval.end()), lines, points);
       }
 
       // Add the points to the dataset

@@ -13,6 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include "QmlMitkRenderWindowItem.h"
 
 #include <vtkOpenGLExtensionManager.h>
@@ -113,7 +114,7 @@ void QmlMitkRenderWindowItem::init()
     mitk::PlaneGeometryDataMapper2D::Pointer mapper = mitk::PlaneGeometryDataMapper2D::New();
     planeNode->SetMapper( mitk::BaseRenderer::Standard2D, mapper );
 
-    m_DataStorage->Add( planeNode, m_PlaneNodeParent );
+    m_DataStorage->Add( planeNode );
   }
 }
 
@@ -351,11 +352,6 @@ void QmlMitkRenderWindowItem::SetCrossHairPositioningOnClick(bool enabled)
   {
     mitk::GlobalInteraction::GetInstance()->RemoveListener( mitk::RenderWindowBase::GetSliceNavigationController() );
   }
-}
-
-void QmlMitkRenderWindowItem::SetPlaneNodeParent( mitk::DataNode::Pointer node )
-{
-  m_PlaneNodeParent = node;
 }
 
 void QmlMitkRenderWindowItem::geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry)

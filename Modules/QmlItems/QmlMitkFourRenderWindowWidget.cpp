@@ -1,3 +1,18 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "QmlMitkFourRenderWindowWidget.h"
 
@@ -82,21 +97,10 @@ void QmlMitkFourRenderWindowWidget::SetDataStorage( mitk::DataStorage::Pointer s
 {
   m_DataStorage = storage;
 
-  // TODO file bug: planes rendering 2D REQUIRES a parent node for all plane geometries! the mapper should just not care if it cannot find others!
   // TODO make this conditional, only add if not yet preset...
-  mitk::DataNode::Pointer planesNodeParent = mitk::DataNode::New();
-  m_DataStorage->Add( planesNodeParent );
-
-  m_RenderItemAxial->SetPlaneNodeParent( planesNodeParent );
   m_RenderItemAxial->GetRenderer()->SetDataStorage( m_DataStorage );
-
-  m_RenderItemSagittal->SetPlaneNodeParent( planesNodeParent );
   m_RenderItemSagittal->GetRenderer()->SetDataStorage( m_DataStorage );
-
-  m_RenderItemFrontal->SetPlaneNodeParent( planesNodeParent );
   m_RenderItemFrontal->GetRenderer()->SetDataStorage( m_DataStorage );
-
-  m_RenderItem3D->SetPlaneNodeParent( planesNodeParent );
   m_RenderItem3D->GetRenderer()->SetDataStorage( m_DataStorage );
 }
 

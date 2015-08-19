@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //mitk
 #include <mitkImage.h>
-#include <mitkAffineDataInteractor3D.h>
+#include <mitkAffineBaseDataInteractor3D.h>
 
 //micro services
 #include <usModuleRegistry.h>
@@ -45,9 +45,21 @@ void QmitkGeometryToolsView::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.m_TranslationStep, SIGNAL(valueChanged(double)), this, SLOT(OnTranslationSpinBoxChanged(double)) );
   connect( m_Controls.m_RotationStep, SIGNAL(valueChanged(double)), this, SLOT(OnRotationSpinBoxChanged(double)) );
   connect( m_Controls.m_ScaleFactor, SIGNAL(valueChanged(double)), this, SLOT(OnScaleSpinBoxChanged(double)) );
+  connect( m_Controls.m_AnchorPointX, SIGNAL(valueChanged(double)), this, SLOT(OnAnchorPointChanged(double)) );
+  connect( m_Controls.m_AnchorPointY, SIGNAL(valueChanged(double)), this, SLOT(OnAnchorPointChanged(double)) );
+  connect( m_Controls.m_AnchorPointZ, SIGNAL(valueChanged(double)), this, SLOT(OnAnchorPointChanged(double)) );
   connect( m_Controls.m_UsageInfoCheckBox, SIGNAL(clicked(bool)), this, SLOT(OnUsageInfoBoxChanged(bool)) );
 
+  connect( m_Controls.m_CustomAnchorPointRadioButton, SIGNAL(toggled(bool)), this, SLOT(OnCustomPointRadioButtonToggled(bool)) );
+
+  connect( m_Controls.m_OriginPointRadioButton, SIGNAL(clicked(bool)), this, SLOT(OnOriginPointRadioButton(bool)) );
+  connect( m_Controls.m_CenterPointRadioButton, SIGNAL(clicked(bool)), this, SLOT(OnCenterPointRadioButton(bool)) );
+
+
+
   m_Controls.m_UsageInfo->hide();
+  m_Controls.m_CustomAnchorPoint->hide();
+
 }
 
 void QmitkGeometryToolsView::OnUsageInfoBoxChanged(bool flag)
@@ -69,6 +81,41 @@ void QmitkGeometryToolsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer 
   m_Controls.m_AddInteractor->setEnabled( false );
 }
 
+void QmitkGeometryToolsView::OnCustomPointRadioButtonToggled(bool status)
+{
+  m_Controls.m_CustomAnchorPoint->setVisible(status);
+  //change the anchor point to be the custom point
+  OnAnchorPointChanged(0.0);
+}
+
+void QmitkGeometryToolsView::OnCenterPointRadioButton(bool)
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  foreach( mitk::DataNode::Pointer node, nodes )
+  {
+    if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
+    {
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point X", node->GetData()->GetGeometry()->GetCenter()[0]);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Y", node->GetData()->GetGeometry()->GetCenter()[1]);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Z", node->GetData()->GetGeometry()->GetCenter()[2]);
+    }
+  }
+}
+
+void QmitkGeometryToolsView::OnOriginPointRadioButton(bool)
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  foreach( mitk::DataNode::Pointer node, nodes )
+  {
+    if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
+    {
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point X", node->GetData()->GetGeometry()->GetOrigin()[0]);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Y", node->GetData()->GetGeometry()->GetOrigin()[1]);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Z", node->GetData()->GetGeometry()->GetOrigin()[2]);
+    }
+  }
+}
+
 
 void QmitkGeometryToolsView::AddInteractor()
 {
@@ -77,14 +124,28 @@ void QmitkGeometryToolsView::AddInteractor()
   {
     if( node.IsNotNull() )
     {
-      mitk::AffineDataInteractor3D::Pointer affineDataInteractor = mitk::AffineDataInteractor3D::New();
-      affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
-      affineDataInteractor->SetEventConfig("AffineConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+
+      mitk::AffineBaseDataInteractor3D::Pointer affineDataInteractor = mitk::AffineBaseDataInteractor3D::New();
+      if (m_Controls.m_KeyboardMode->isChecked())
+      {
+        affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+        affineDataInteractor->SetEventConfig("AffineKeyConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+      }
+      else if(m_Controls.m_MouseMode->isChecked())
+      {
+        affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+        affineDataInteractor->SetEventConfig("AffineMouseConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+      }
+
       affineDataInteractor->SetDataNode(node);
+
       node->SetBoolProperty("pickable", true);
-      node->SetFloatProperty("AffineDataInteractor3D.Translation Step Size", m_Controls.m_TranslationStep->value());
-      node->SetFloatProperty("AffineDataInteractor3D.Rotation Step Size", m_Controls.m_RotationStep->value());
-      node->SetFloatProperty("AffineDataInteractor3D.Scale Step Size", m_Controls.m_ScaleFactor->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Translation Step Size", m_Controls.m_TranslationStep->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Step Size", m_Controls.m_RotationStep->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Scale Step Size", m_Controls.m_ScaleFactor->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point X", m_Controls.m_AnchorPointX->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Y", m_Controls.m_AnchorPointY->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Z", m_Controls.m_AnchorPointZ->value());
     }
   }
 }
@@ -108,7 +169,7 @@ void QmitkGeometryToolsView::OnTranslationSpinBoxChanged(double step)
   {
     if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
     {
-      node->SetFloatProperty("AffineDataInteractor3D.Translation Step Size", step);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Translation Step Size", step);
     }
   }
 }
@@ -120,7 +181,7 @@ void QmitkGeometryToolsView::OnRotationSpinBoxChanged(double step)
   {
     if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
     {
-      node->SetFloatProperty("AffineDataInteractor3D.Rotation Step Size", step);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Rotation Step Size", step);
     }
   }
 }
@@ -132,7 +193,21 @@ void QmitkGeometryToolsView::OnScaleSpinBoxChanged(double factor)
   {
     if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
     {
-      node->SetFloatProperty("AffineDataInteractor3D.Scale Step Size", factor);
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Scale Step Size", factor);
+    }
+  }
+}
+
+void QmitkGeometryToolsView::OnAnchorPointChanged(double /*value*/)
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  foreach( mitk::DataNode::Pointer node, nodes )
+  {
+    if( node.IsNotNull() && (node->GetDataInteractor().IsNotNull()) )
+    {
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point X", m_Controls.m_AnchorPointX->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Y", m_Controls.m_AnchorPointY->value());
+      node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Z", m_Controls.m_AnchorPointZ->value());
     }
   }
 }

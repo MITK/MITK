@@ -17,11 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include <iomanip>
 
+#include <vtkMatrixToLinearTransform.h>
+#include <vtkMatrix4x4.h>
+
 #include "mitkBaseGeometry.h"
 #include "mitkVector.h"
 #include "mitkMatrixConvert.h"
-#include <vtkMatrixToLinearTransform.h>
-#include <vtkMatrix4x4.h>
 #include "mitkRotationOperation.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkApplyTransformMatrixOperation.h"
@@ -29,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkInteractionConst.h"
 #include "mitkModifiedLock.h"
 #include "mitkGeometryTransformHolder.h"
+#include "mitkScaleOperation.h"
 
 mitk::BaseGeometry::BaseGeometry() : Superclass(), mitk::OperationActor(),
 m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0), m_ImageGeometry(false), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
@@ -492,7 +494,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
     mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
     if (pointOp == nullptr)
     {
-      //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+      MITK_ERROR << "Point move operation is null!";
       return;
     }
     mitk::Point3D newPos = pointOp->GetPoint();
@@ -505,31 +507,25 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
   }
   case OpSCALE:
   {
-    mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
-    if (pointOp == nullptr)
+    mitk::ScaleOperation *scaleOp = dynamic_cast<mitk::ScaleOperation *>(operation);
+    if (scaleOp == nullptr)
     {
-      //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+      MITK_ERROR << "Scale operation is null!";
       return;
     }
-    mitk::Point3D newScale = pointOp->GetPoint();
-    ScalarType data[3];
-    /* calculate new scale: newscale = oldscale * (oldscale + scaletoadd)/oldscale */
-    data[0] = 1 + (newScale[0] / GetMatrixColumn(0).magnitude());
-    data[1] = 1 + (newScale[1] / GetMatrixColumn(1).magnitude());
-    data[2] = 1 + (newScale[2] / GetMatrixColumn(2).magnitude());
+    mitk::Point3D newScale = scaleOp->GetScaleFactor();
+    ScalarType scalefactor[3];
 
-    mitk::Point3D center = const_cast<mitk::BoundingBox*>(m_BoundingBox.GetPointer())->GetCenter();
-    ScalarType pos[3];
-    vtktransform->GetPosition(pos);
+    scalefactor[0] = 1 + (newScale[0] / GetMatrixColumn(0).magnitude());
+    scalefactor[1] = 1 + (newScale[1] / GetMatrixColumn(1).magnitude());
+    scalefactor[2] = 1 + (newScale[2] / GetMatrixColumn(2).magnitude());
+
+    mitk::Point3D anchor = scaleOp->GetScaleAnchorPoint();
+
     vtktransform->PostMultiply();
-    vtktransform->Translate(-pos[0], -pos[1], -pos[2]);
-    vtktransform->Translate(-center[0], -center[1], -center[2]);
-    vtktransform->PreMultiply();
-    vtktransform->Scale(data[0], data[1], data[2]);
-    vtktransform->PostMultiply();
-    vtktransform->Translate(+center[0], +center[1], +center[2]);
-    vtktransform->Translate(pos[0], pos[1], pos[2]);
-    vtktransform->PreMultiply();
+    vtktransform->Translate(-anchor[0], -anchor[1], -anchor[2]);
+    vtktransform->Scale(scalefactor[0], scalefactor[1], scalefactor[2]);
+    vtktransform->Translate(anchor[0], anchor[1], anchor[2]);
     break;
   }
   case OpROTATE:
@@ -537,7 +533,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
     mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
     if (rotateOp == nullptr)
     {
-      //mitk::StatusBar::GetInstance()->DisplayText("received wrong type of operation!See mitkAffineInteractor.cpp", 10000);
+      MITK_ERROR << "Rotation operation is null!";
       return;
     }
     Vector3D rotationVector = rotateOp->GetVectorOfRotation();

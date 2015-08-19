@@ -1,24 +1,27 @@
 <statemachine NAME="Affine">
     <state name="start" startstate="true" >
-        <transition event_class="InteractionPositionEvent" event_variant="ClickSelect" target="select">
+        <transition event_class="InteractionPositionEvent" event_variant="Selection" target="select">
             <condition name="isOverObject"/>
             <action name="selectObject"/>
         </transition>
     </state>
     <state name="select" >
-        <transition event_class="InteractionPositionEvent" event_variant="ClickSelect" target="start">
+        <transition event_class="InteractionPositionEvent" event_variant="Selection" target="start">
             <condition name="isOverObject" inverted="true" />
             <action name="deselectObject"/>
         </transition>
-        <transition event_class="InteractionPositionEvent" event_variant="ClickSelect" target="select">
+        <transition event_class="InteractionPositionEvent" event_variant="Selection" target="select">
             <condition name="isOverObject"/>
             <action name="selectObject"/>
         </transition>
-
+<!-- Only Mouse Mode: Deselect if mouse outside render window -->
+		<transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+            <action name="deselectObject"/>
+        </transition>
+<!-- Translation Key events -->
         <transition event_class="InteractionKeyEvent" event_variant="TranslateUpKey" target="select">
             <action name="translateUpKey"/>
         </transition>
-<!-- Translation Key events -->
         <transition event_class="InteractionKeyEvent" event_variant="TranslateDownKey" target="select">
             <action name="translateDownKey"/>
         </transition>
@@ -53,12 +56,51 @@
         <transition event_class="InteractionKeyEvent" event_variant="RotateDownModifierKey" target="select">
             <action name="rotateDownModifierKey"/>
         </transition>
-<!-- Scale Key events -->
+<!-- Scaling Key events -->
         <transition event_class="InteractionKeyEvent" event_variant="ScaleUpKey" target="select">
             <action name="scaleUpKey"/>
         </transition>
         <transition event_class="InteractionKeyEvent" event_variant="ScaleDownKey" target="select">
             <action name="scaleDownKey"/>
         </transition>
+<!-- Init Translation Mouse events -->
+        <transition event_class="InteractionPositionEvent" event_variant="InitTranslation" target="translate">
+            <action name="initTranslate"/>
+        </transition>
+<!-- Init Rotation Mouse events -->
+        <transition event_class="InteractionPositionEvent" event_variant="InitRotation" target="rotate">
+            <action name="initRotate"/>
+        </transition>
+<!-- Scaling Mouse events -->
+		<transition event_class="InteractionPositionEvent" event_variant="ObjectScaling" target="select">
+            <action name="scaleObject"/>
+        </transition>
     </state>
+	<state name="translate" >
+        <transition event_class="InteractionPositionEvent" event_variant="ObjectTranslation" target="translate">
+            <action name="translateObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndTranslation" target="start">
+            <condition name="isOverObject" inverted="true"/>
+            <action name="deselectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndTranslation" target="select">
+            <condition name="isOverObject"/>
+            <action name="selectObject"/>
+        </transition>
+    </state>
+<!-- Rotation Mouse events -->
+    <state name="rotate" >
+        <transition event_class="InteractionPositionEvent" event_variant="ObjectRotation" target="rotate">
+            <action name="rotateObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndRotation" target="start">
+            <condition name="isOverObject" inverted="true"/>
+            <action name="deselectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndRotation" target="select">
+            <condition name="isOverObject" />
+            <action name="selectObject"/>
+        </transition>
+     </state>
 </statemachine>

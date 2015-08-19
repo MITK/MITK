@@ -398,7 +398,7 @@ void QmitkPreferencesDialog::UpdateTree()
   {
     MITK_ERROR << "Unknown preference category. They are added top-level.";
 
-    for (const auto currentItemContent : deferredItems)
+    for (const auto &currentItemContent : deferredItems)
     {
       currentItemContent->treeWidgetItem = new QTreeWidgetItem(d->m_PreferencesTree);
       currentItemContent->treeWidgetItem->setText(0, currentItemContent->name);

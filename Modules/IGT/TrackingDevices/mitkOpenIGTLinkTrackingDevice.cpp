@@ -120,8 +120,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
   ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(1);
   m_OpenIGTLinkClient->SendMessage(sttMsg);
 
-  std::this_thread::sleep_for(std::chrono::seconds(WaitingTime));
-  //Sleep(WaitingTime); //wait for data to arrive
+  std::this_thread::sleep_for(std::chrono::seconds((WaitingTime/1000)));
 
   m_IGTLDeviceSource->Update();
 

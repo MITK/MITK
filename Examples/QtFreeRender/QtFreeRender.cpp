@@ -175,19 +175,14 @@ void AddDisplayPlaneSubTree()
   mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
-  m_Node = mitk::DataNode::New();
-  m_Node->SetProperty("name", mitk::StringProperty::New("Widgets"));
-  m_Node->SetProperty("helper object", mitk::BoolProperty::New(true));
-
   //AddPlanesToDataStorage
   if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_Node.IsNotNull())
   {
     if (m_DataStorage.IsNotNull())
     {
-      m_DataStorage->Add(m_Node);
-      m_DataStorage->Add(m_PlaneNode1, m_Node);
-      m_DataStorage->Add(m_PlaneNode2, m_Node);
-      m_DataStorage->Add(m_PlaneNode3, m_Node);
+      m_DataStorage->Add(m_PlaneNode1);
+      m_DataStorage->Add(m_PlaneNode2);
+      m_DataStorage->Add(m_PlaneNode3);
     }
   }
 }

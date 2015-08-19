@@ -127,6 +127,7 @@ namespace mitk {
     virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
     virtual void CreateContour();
     virtual void CreateVTKRenderObjects();
+    virtual void VertexRendering();
 
     vtkSmartPointer<vtkAppendPolyData> m_vtkSelectedPointList;
     vtkSmartPointer<vtkAppendPolyData> m_vtkUnselectedPointList;
@@ -150,6 +151,7 @@ namespace mitk {
     //variables to check if an update of the vtk objects is needed
     ScalarType m_PointSize;
     ScalarType m_ContourRadius;
+    bool m_VertexRendering;
   };
 
 

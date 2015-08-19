@@ -41,7 +41,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <stdlib.h>
 
+#include <vtkgl.h>
 
+#include <mitkPropertyObserver.h>
 
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 {
@@ -57,7 +59,8 @@ mitk::PointSetVtkMapper3D::PointSetVtkMapper3D()
  m_NumberOfSelectedAdded(0),
  m_NumberOfUnselectedAdded(0),
  m_PointSize(1.0),
- m_ContourRadius(0.5)
+ m_ContourRadius(0.5),
+ m_VertexRendering(false)
 {
   //propassembly
   m_PointsAssembly = vtkSmartPointer<vtkPropAssembly>::New();
@@ -167,14 +170,13 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       showLabel = false;
   }
 
-
   //check if the list for the PointDataContainer is the same size as the PointsContainer. Is not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
   bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
   //now add an object for each point in data
   pointDataIter = itkPointSet->GetPointData()->Begin();
   for (j=0, pointsIter=itkPointSet->GetPoints()->Begin();
-    pointsIter!=itkPointSet->GetPoints()->End();
-    pointsIter++, j++)
+       pointsIter!=itkPointSet->GetPoints()->End();
+       pointsIter++, j++)
   {
     //check for the pointtype in data and decide which geom-object to take and then add to the selected or unselected list
     int pointType;
@@ -189,78 +191,78 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
     switch (pointType)
     {
     case mitk::PTUNDEFINED:
-      {
-        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
-        sphere->SetRadius(m_PointSize);
-        itk::Point<float> point1 = pointsIter->Value();
-        sphere->SetCenter(point1[0],point1[1],point1[2]);
-        //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
+    {
+      vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+      sphere->SetRadius(m_PointSize);
+      itk::Point<float> point1 = pointsIter->Value();
+      sphere->SetCenter(point1[0],point1[1],point1[2]);
+      //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
 
-        //MouseOrientation Tool (PositionTracker)
-        if(isInputDevice)
-        {
-          sphere->SetThetaResolution(10);
-          sphere->SetPhiResolution(10);
-        }
-        else
-        {
-          sphere->SetThetaResolution(20);
-          sphere->SetPhiResolution(20);
-        }
-        source = sphere;
+      //MouseOrientation Tool (PositionTracker)
+      if(isInputDevice)
+      {
+        sphere->SetThetaResolution(10);
+        sphere->SetPhiResolution(10);
       }
+      else
+      {
+        sphere->SetThetaResolution(20);
+        sphere->SetPhiResolution(20);
+      }
+      source = sphere;
+    }
       break;
     case mitk::PTSTART:
-      {
-        vtkSmartPointer<vtkCubeSource> cube = vtkSmartPointer<vtkCubeSource>::New();
-        cube->SetXLength(m_PointSize/2);
-        cube->SetYLength(m_PointSize/2);
-        cube->SetZLength(m_PointSize/2);
-        itk::Point<float> point1 = pointsIter->Value();
-        cube->SetCenter(point1[0],point1[1],point1[2]);
-        source = cube;
-      }
+    {
+      vtkSmartPointer<vtkCubeSource> cube = vtkSmartPointer<vtkCubeSource>::New();
+      cube->SetXLength(m_PointSize/2);
+      cube->SetYLength(m_PointSize/2);
+      cube->SetZLength(m_PointSize/2);
+      itk::Point<float> point1 = pointsIter->Value();
+      cube->SetCenter(point1[0],point1[1],point1[2]);
+      source = cube;
+    }
       break;
     case mitk::PTCORNER:
-      {
-        vtkSmartPointer<vtkConeSource> cone = vtkSmartPointer<vtkConeSource>::New();
-        cone->SetRadius(m_PointSize);
-        itk::Point<float> point1 = pointsIter->Value();
-        cone->SetCenter(point1[0],point1[1],point1[2]);
-        cone->SetResolution(20);
-        source = cone;
-      }
+    {
+      vtkSmartPointer<vtkConeSource> cone = vtkSmartPointer<vtkConeSource>::New();
+      cone->SetRadius(m_PointSize);
+      itk::Point<float> point1 = pointsIter->Value();
+      cone->SetCenter(point1[0],point1[1],point1[2]);
+      cone->SetResolution(20);
+      source = cone;
+    }
       break;
     case mitk::PTEDGE:
-      {
-        vtkSmartPointer<vtkCylinderSource> cylinder = vtkSmartPointer<vtkCylinderSource>::New();
-        cylinder->SetRadius(m_PointSize);
-        itk::Point<float> point1 = pointsIter->Value();
-        cylinder->SetCenter(point1[0],point1[1],point1[2]);
-        cylinder->SetResolution(20);
-        source = cylinder;
-      }
+    {
+      vtkSmartPointer<vtkCylinderSource> cylinder = vtkSmartPointer<vtkCylinderSource>::New();
+      cylinder->SetRadius(m_PointSize);
+      itk::Point<float> point1 = pointsIter->Value();
+      cylinder->SetCenter(point1[0],point1[1],point1[2]);
+      cylinder->SetResolution(20);
+      source = cylinder;
+    }
       break;
     case mitk::PTEND:
-      {
-        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
-        sphere->SetRadius(m_PointSize);
-        //itk::Point<float> point1 = pointsIter->Value();
-        sphere->SetThetaResolution(20);
-        sphere->SetPhiResolution(20);
-        source = sphere;
-      }
+    {
+      vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+      sphere->SetRadius(m_PointSize);
+      //itk::Point<float> point1 = pointsIter->Value();
+      sphere->SetThetaResolution(20);
+      sphere->SetPhiResolution(20);
+      source = sphere;
+    }
       break;
     default:
-      {
-        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
-        sphere->SetRadius(m_PointSize);
-        itk::Point<float> point1 = pointsIter->Value();
-        sphere->SetCenter(point1[0],point1[1],point1[2]);
-        sphere->SetThetaResolution(20);
-        sphere->SetPhiResolution(20);
-        source = sphere;
-      }
+    {
+      vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
+      sphere->SetRadius(m_PointSize);
+      itk::Point<float> point1 = pointsIter->Value();
+      sphere->SetCenter(point1[0],point1[1],point1[2]);
+      sphere->SetThetaResolution(20);
+      sphere->SetPhiResolution(20);
+      source = sphere;
+    }
       break;
     }
     if (!pointDataBroken)
@@ -281,7 +283,6 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       m_vtkUnselectedPointList->AddInputConnection(source->GetOutputPort());
       ++m_NumberOfUnselectedAdded;
     }
-
     if (showLabel)
     {
       char buffer[20];
@@ -324,7 +325,6 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       pointDataIter++;
   } // end FOR
 
-
   //now according to number of elements added to selected or unselected, build up the rendering pipeline
   if (m_NumberOfSelectedAdded > 0)
   {
@@ -349,6 +349,60 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
     m_UnselectedActor->SetMapper(m_VtkUnselectedPolyDataMapper);
     m_PointsAssembly->AddPart(m_UnselectedActor);
   }
+}
+
+void mitk::PointSetVtkMapper3D::VertexRendering()
+{
+  // get and update the PointSet
+  mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
+
+  /* only update the input data, if the property tells us to */
+  bool update = true;
+  this->GetDataNode()->GetBoolProperty("updateDataOnRender", update);
+  if (update == true)
+    input->Update();
+  int timestep = this->GetTimestep();
+
+  mitk::PointSet::DataType::Pointer itkPointSet = input->GetPointSet( timestep );
+
+  // turn off standard actors
+  m_UnselectedActor->VisibilityOff();
+  m_SelectedActor->VisibilityOff();
+
+  // point size
+  m_PointSize = 2.0;
+  mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
+  if ( pointSizeProp.IsNotNull() )
+    m_PointSize = pointSizeProp->GetValue();
+
+  double* color = m_UnselectedActor->GetProperty()->GetColor();
+  double opacity = m_UnselectedActor->GetProperty()->GetOpacity();
+
+  glClearColor(0.0,0.0,0.0,0.0);
+  glDisable(GL_COLOR_MATERIAL);
+  glDisable(GL_LIGHTING);
+  glEnable(GL_POINT_SMOOTH);
+
+  glPointSize(m_PointSize);
+  glBegin(GL_POINTS);
+
+  glColor4d(color[0],color[1],color[2],opacity);
+
+  for ( auto pointsIter=itkPointSet->GetPoints()->Begin();
+        pointsIter!=itkPointSet->GetPoints()->End();
+        pointsIter++ )
+  {
+    const itk::Point<mitk::ScalarType>& point = pointsIter->Value();
+    glVertex3d(point[0],point[1],point[2]);
+  }
+
+  glEnd();
+
+  // reset context
+  glPointSize(1.0);
+  glDisable(GL_POINT_SMOOTH);
+  glEnable(GL_COLOR_MATERIAL);
+  glEnable(GL_LIGHTING);
 }
 
 
@@ -377,11 +431,26 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
     mitk::FloatProperty * pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
     mitk::FloatProperty * contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contoursize"));
 
+    bool useVertexRendering = false;
+    this->GetDataNode()->GetBoolProperty("Vertex Rendering", useVertexRendering);
+
     // only create new vtk render objects if property values were changed
     if(pointSizeProp && m_PointSize!=pointSizeProp->GetValue() )
       needGenerateData = true;
     if(contourSizeProp && m_ContourRadius!=contourSizeProp->GetValue() )
       needGenerateData = true;
+
+    // when vertex rendering is enabled the pointset is always
+    // drawn with opengl, thus we leave needGenerateData always false
+    if(useVertexRendering && m_VertexRendering != useVertexRendering )
+    {
+      needGenerateData = false;
+      m_VertexRendering = true;
+    } else if(!useVertexRendering && m_VertexRendering)
+    {
+      m_VertexRendering = false;
+      needGenerateData = true;
+    }
   }
 
   if(needGenerateData)
@@ -395,7 +464,7 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   bool showPoints = true;
   this->GetDataNode()->GetBoolProperty("show points", showPoints);
 
-  if(showPoints)
+  if(showPoints && !m_VertexRendering)
   {
     m_UnselectedActor->VisibilityOn();
     m_SelectedActor->VisibilityOn();
@@ -424,6 +493,13 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   else
   {
     m_ContourActor->VisibilityOff();
+  }
+
+  // use vertex rendering
+  if(m_VertexRendering)
+  {
+    VertexRendering();
+    ls->UpdateGenerateDataTime();
   }
 }
 
@@ -636,6 +712,7 @@ void mitk::PointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "contoursize", mitk::FloatProperty::New(0.5), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "updateDataOnRender", mitk::BoolProperty::New(true), renderer, overwrite );
+  node->AddProperty( "Vertex Rendering",mitk::BoolProperty::New(false),renderer,overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

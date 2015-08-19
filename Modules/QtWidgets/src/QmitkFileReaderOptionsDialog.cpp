@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo& loadInfo,
                                                            QWidget *parent)
-  : QDialog(parent)
+  : QDialog(parent, Qt::WindowStaysOnTopHint)
   , ui(new Ui::QmitkFileReaderOptionsDialog)
   , m_LoadInfo(loadInfo)
 

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QTHANDLENEWAPPINSTANCE_H
 #define QTHANDLENEWAPPINSTANCE_H
 
+#include <QDataStream>
 #include <QString>
 
 class QtSingleApplication;

@@ -164,7 +164,13 @@ void QmitkSliceBasedInterpolatorWidget::OnToolManagerWorkingDataModified()
   }
 
   mitk::LabelSetImage* workingImage = dynamic_cast< mitk::LabelSetImage* >( workingNode->GetData() );
-  Q_ASSERT(workingImage);
+  // TODO adapt tool manager so that this check is done there, e.g. convenience function
+//  Q_ASSERT(workingImage);
+  if (!workingImage)
+  {
+    this->setEnabled(false);
+    return;
+  }
 
   if (workingImage->GetDimension() > 4 || workingImage->GetDimension() < 3)
   {

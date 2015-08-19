@@ -343,7 +343,7 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   bool hasReferenceNode = referenceNode != NULL;
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  bool hasWorkingNode = workingNode != NULL;
+  bool hasValidWorkingNode = workingNode != NULL;
 
   m_Controls.m_pbNewSegmentationSession->setEnabled(false);
   m_Controls.m_pbNewLabel->setEnabled(false);
@@ -368,41 +368,46 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
     m_Controls.m_pbNewSegmentationSession->setEnabled(true);
   }
 
-  if(hasWorkingNode)
+  if(hasValidWorkingNode)
   {
-    m_Controls.m_pbNewLabel->setEnabled(true);
-    m_Controls.m_gbInterpolation->setEnabled(true);
-    m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(true);
-    m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(true);
-    m_Controls.m_btDeactivateTool->setEnabled(true);
-    m_Controls.m_LabelSetWidget->setEnabled(true);
-    m_Controls.m_btAddLayer->setEnabled(true);
-
+    // TODO adapt tool manager so that this check is done there, e.g. convenience function
     mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    hasValidWorkingNode = workingImage != nullptr;
+    if (hasValidWorkingNode)
+    {
+      m_Controls.m_pbNewLabel->setEnabled(true);
+      m_Controls.m_gbInterpolation->setEnabled(true);
+      m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(true);
+      m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(true);
+      m_Controls.m_btDeactivateTool->setEnabled(true);
+      m_Controls.m_LabelSetWidget->setEnabled(true);
+      m_Controls.m_btAddLayer->setEnabled(true);
 
-    int activeLayer = workingImage->GetActiveLayer();
-    int numberOfLayers = workingImage->GetNumberOfLayers();
 
-    m_Controls.m_cbActiveLayer->blockSignals(true);
-    m_Controls.m_cbActiveLayer->clear();
-    for (int lidx=0; lidx<workingImage->GetNumberOfLayers(); ++lidx)
-      m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
-    m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
-    m_Controls.m_cbActiveLayer->blockSignals(false);
+      int activeLayer = workingImage->GetActiveLayer();
+      int numberOfLayers = workingImage->GetNumberOfLayers();
 
-    m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers>1);
-    m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers>1);
-    m_Controls.m_btPreviousLayer->setEnabled(activeLayer>0);
-    m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
-    m_Controls.m_btLockExterior->setChecked(workingImage->GetLabel(0)->GetLocked());
+      m_Controls.m_cbActiveLayer->blockSignals(true);
+      m_Controls.m_cbActiveLayer->clear();
+      for (int lidx=0; lidx<workingImage->GetNumberOfLayers(); ++lidx)
+        m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
+      m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
+      m_Controls.m_cbActiveLayer->blockSignals(false);
 
-    m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 1 /*1st is exterior*/);
+      m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers>1);
+      m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers>1);
+      m_Controls.m_btPreviousLayer->setEnabled(activeLayer>0);
+      m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
+      m_Controls.m_btLockExterior->setChecked(workingImage->GetLabel(0)->GetLocked());
 
-    //MLI TODO
-    //m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithWorkingDataVisible);
+      m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 1 /*1st is exterior*/);
+
+      //MLI TODO
+      //m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithWorkingDataVisible);
+    }
   }
 
-  if(hasWorkingNode && hasReferenceNode)
+  if(hasValidWorkingNode && hasReferenceNode)
   {
     int layer = -1;
     referenceNode->GetIntProperty("layer", layer);

@@ -59,8 +59,8 @@ QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView() :
   m_Parent(NULL),
   m_IRenderWindowPart(NULL),
   m_ReferenceNode(NULL),
-  m_WorkingNode(NULL),
   m_ToolManager(NULL),
+  m_WorkingNode(NULL),
   m_MouseCursorSet(false)
 {
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
@@ -389,7 +389,7 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
 
       m_Controls.m_cbActiveLayer->blockSignals(true);
       m_Controls.m_cbActiveLayer->clear();
-      for (int lidx=0; lidx<workingImage->GetNumberOfLayers(); ++lidx)
+      for (unsigned int lidx=0; lidx<workingImage->GetNumberOfLayers(); ++lidx)
         m_Controls.m_cbActiveLayer->addItem(QString::number(lidx));
       m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
       m_Controls.m_cbActiveLayer->blockSignals(false);
@@ -659,7 +659,7 @@ void QmitkMultiLabelSegmentationView::OnLockExteriorToggled(bool checked)
   workingImage->GetLabel(0)->SetLocked(checked);
 }
 
-void QmitkMultiLabelSegmentationView::NodeAdded(const mitk::DataNode* node)
+void QmitkMultiLabelSegmentationView::NodeAdded(const mitk::DataNode*)
 {
   /*
   bool isHelperObject(false);

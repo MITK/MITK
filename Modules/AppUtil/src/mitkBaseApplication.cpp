@@ -528,7 +528,7 @@ void BaseApplication::initialize(Poco::Util::Application& self)
   QStringList preloadLibs = this->getPreloadLibraries();
   if (!preloadLibs.isEmpty())
   {
-    d->m_FWProps[ctkPluginConstants::FRAMEWORK_PRELOAD_LIBRARIES] = preloadLibs.join(QString(','));
+      d->m_FWProps[ctkPluginConstants::FRAMEWORK_PRELOAD_LIBRARIES] = preloadLibs;
   }
 
   // 8. Initialize the CppMicroServices library.

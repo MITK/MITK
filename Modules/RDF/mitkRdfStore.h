@@ -101,9 +101,17 @@ namespace mitk {
     /**
     * Queries over the triplestore with the given SPARQL query.
     * @param query A std:string which stands for a SPARQL query text.
-    * @return The result of the query will be returned as a map of keys with there values as lists of nodes.
+    * @return The result of the query will be returned as a map of keys with their values as lists of nodes.
     */
     ResultMap Query(std::string query) const;
+
+    /**
+     * Tests whether or not the specified query pattern has a solution.
+     * @param query The SPARQL query string in ASK form.
+     * @return True if query pattern has a solution, otherwise false.
+     *         Note that it also returns false in error case (error handling concept necessary).
+     */
+    bool ExecuteBooleanQuery(const std::string& query) const;
 
     /**
     * Saves the current state of the triplestore in a file. The currently supported formats are: "ntriples", "turtle"(default), "nquads".

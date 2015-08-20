@@ -44,6 +44,7 @@ namespace mitk {
     bool Contains(RdfTriple triple);
 
     ResultMap Query(std::string query) const;
+    bool ExecuteBooleanQuery(const std::string& query) const;
 
     void Save(std::string filename, std::string format = "");
     void Import(std::string url, std::string format = "");
@@ -273,6 +274,62 @@ namespace mitk {
     librdf_free_query(rdfQuery);
 
     return resultMap;
+  }
+
+  bool RdfStorePrivate::ExecuteBooleanQuery(const std::string& query) const
+  {
+    bool booleanResult = false;
+    std::string completeQuery;
+
+    for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); i++)
+    {
+      completeQuery += "PREFIX " + i->first + ": " + "<" + i->second.ToString() + "> ";
+    }
+
+    completeQuery += query;
+
+    librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
+
+    // FIXME: Better throw exception here in order to indicate that something went wrong!
+    if (!rdfQuery) return false;
+
+    librdf_query_results* results = librdf_query_execute(rdfQuery, m_Model);
+
+    if (!results)
+    {
+      librdf_free_query(rdfQuery);
+      // FIXME: Better throw exception here in order to indicate that something went wrong!
+      return false;
+    }
+
+    if (!librdf_query_results_is_boolean(results))
+    {
+      librdf_free_query_results(results);
+      librdf_free_query(rdfQuery);
+
+      // FIXME: Better throw exception here in order to indicate that something went wrong!
+      return false;
+    }
+
+    int rawResult = librdf_query_results_get_boolean(results);
+
+    if (rawResult > 0)
+    {
+      booleanResult = true;
+    }
+    else if (rawResult == 0)
+    {
+      booleanResult = false;
+    }
+    else
+    {
+      MITK_ERROR << "error while executing boolean query";
+    }
+
+    librdf_free_query_results(results);
+    librdf_free_query(rdfQuery);
+
+    return booleanResult;
   }
 
   void RdfStorePrivate::Save(std::string filename, std::string format)
@@ -522,6 +579,11 @@ namespace mitk {
   ResultMap RdfStore::Query(std::string query) const
   {
     return d->Query(query);
+  }
+
+  bool RdfStore::ExecuteBooleanQuery(const std::string& query) const
+  {
+    return d->ExecuteBooleanQuery(query);
   }
 
   void RdfStore::Save(std::string filename, std::string format)

@@ -103,7 +103,7 @@ namespace mitk {
     * @param query A std:string which stands for a SPARQL query text.
     * @return The result of the query will be returned as a map of keys with their values as lists of nodes.
     */
-    ResultMap Query(std::string query) const;
+    ResultMap Query(const std::string& query) const;
 
     /**
      * Tests whether or not the specified query pattern has a solution.

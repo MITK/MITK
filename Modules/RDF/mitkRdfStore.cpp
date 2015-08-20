@@ -43,7 +43,7 @@ namespace mitk {
     bool Remove(RdfTriple triple);
     bool Contains(RdfTriple triple);
 
-    ResultMap Query(std::string query) const;
+    ResultMap Query(const std::string& query) const;
     bool ExecuteBooleanQuery(const std::string& query) const;
 
     void Save(std::string filename, std::string format = "");
@@ -222,11 +222,11 @@ namespace mitk {
     return false;
   }
 
-  RdfStorePrivate::ResultMap RdfStorePrivate::Query(std::string sparqlQuery) const
+  RdfStorePrivate::ResultMap RdfStorePrivate::Query(const std::string& query) const
   {
     RdfStorePrivate::ResultMap resultMap;
 
-    const std::string completeQuery = this->PrependPrefixes(sparqlQuery);
+    const std::string completeQuery = this->PrependPrefixes(query);
 
     librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
 
@@ -590,7 +590,7 @@ namespace mitk {
     return d->Contains(triple);
   }
 
-  ResultMap RdfStore::Query(std::string query) const
+  ResultMap RdfStore::Query(const std::string& query) const
   {
     return d->Query(query);
   }

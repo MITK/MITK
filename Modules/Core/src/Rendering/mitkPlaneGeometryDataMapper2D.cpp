@@ -51,24 +51,25 @@ template<typename T>
 class SimpleInterval {
 public:
   SimpleInterval(T start = T(), T end = T())
-    : _start{std::min(start, end)}
-    , _end{std::max(start, end)}
+    :  m_LowerBoundary{std::min(start, end)}
+    ,  m_UpperBoundary{std::max(start, end)}
     {
 
     }
 
-  T start() const { return _start; }
-  T end() const { return _end; }
+  T GetLowerBoundary() const { return  m_LowerBoundary; }
+  T GetUpperBoundary() const { return  m_UpperBoundary; }
 
-  bool empty() const { return _start == _end; }
+  bool empty() const { return  m_LowerBoundary ==  m_UpperBoundary; }
 
-  bool operator<(const SimpleInterval& r) const
+  bool operator<(const SimpleInterval& otherInterval) const
   {
-    return _end < r._start;
+    return  this->m_UpperBoundary < otherInterval.GetLowerBoundary();
   }
 
 private:
-  T _start, _end;
+  T  m_LowerBoundary;
+  T  m_UpperBoundary;
 };
 
 template<typename T>
@@ -78,21 +79,23 @@ public:
 
   IntervalSet(IntervalType startingInterval)
   {
-    _intervals.emplace(std::move(startingInterval));
+    m_IntervalsContainer.emplace(std::move(startingInterval));
   }
 
   void operator-=(const IntervalType& interval)
   {
     // Check the intervals for intersection
-    auto range = _intervals.equal_range(interval);
+    auto range = m_IntervalsContainer.equal_range(interval);
 
-    for (auto iter = range.first; iter != range.second;) {
-      auto intersectionResult = _intersectIntervals(*iter, interval);
+    for (auto iter = range.first; iter != range.second;)
+    {
+      auto intersectionResult = IntersectIntervals(*iter, interval);
 
-      iter = _intervals.erase(iter);
-      for (auto&& interval : intersectionResult) {
+      iter = m_IntervalsContainer.erase(iter);
+      for (auto&& interval : intersectionResult)
+      {
         if (!interval.empty()) {
-          iter = _intervals.emplace_hint(iter, std::move(interval));
+          iter = m_IntervalsContainer.emplace_hint(iter, std::move(interval));
           ++iter;
         }
       }
@@ -110,29 +113,32 @@ public:
 
   const IntervalsContainer& getIntervals() const
   {
-    return _intervals;
+    return m_IntervalsContainer;
   }
 
 private:
-  IntervalsContainer _intervals;
+  IntervalsContainer m_IntervalsContainer;
 
-  std::array<IntervalType, 2> _intersectIntervals(const IntervalType& from, const IntervalType& what)
+  std::array<IntervalType, 2> IntersectIntervals(const IntervalType& firstInterval, const IntervalType& secondInterval)
   {
-    assert(what.end() >= from.start() && from.end() >= what.start()); // Non-intersecting intervals should never reach here
+    assert(secondInterval.GetUpperBoundary() >= firstInterval.GetLowerBoundary() && firstInterval.GetUpperBoundary() >= secondInterval.GetLowerBoundary()); // Non-intersecting intervals should never reach here
 
-    if (what.start() < from.start()) {
-      if (from.end() < what.end()) {
+    if (secondInterval.GetLowerBoundary() < firstInterval.GetLowerBoundary())
+    {
+      if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
+      {
         return {}; // Interval completely enclosed
       }
-      return {IntervalType{from.end(), what.end()}, IntervalType{}};
+      return{ IntervalType{ firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() }, IntervalType{} };
     }
 
-    if (from.end() < what.end()) {
-      return {IntervalType{from.start(), what.start()}, IntervalType{}};
+    if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
+    {
+      return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() }, IntervalType{} };
     }
 
-    return {IntervalType{from.start(), what.start()},
-        IntervalType{what.end(), from.end()}};
+    return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() },
+      IntervalType{ secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() } };
   }
 };
 
@@ -333,7 +339,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       }
 
       for (const auto& interval : intervals.getIntervals()) {
-          this->DrawLine(crossLine.GetPoint(interval.start()), crossLine.GetPoint(interval.end()), lines, points);
+          this->DrawLine(crossLine.GetPoint(interval.GetLowerBoundary()), crossLine.GetPoint(interval.GetUpperBoundary()), lines, points);
       }
 
       // Add the points to the dataset

@@ -155,13 +155,32 @@ void mitk::PlanarCircle::PrintSelf( std::ostream& os, itk::Indent indent) const
   Superclass::PrintSelf( os, indent );
 }
 
-bool mitk::PlanarCircle::SetCurrentControlPoint( const Point2D& point )
+std::tuple<int, int, mitk::Point2D> mitk::PlanarCircle::FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const
 {
-  if ( m_SelectedControlPoint < 0 )
-  {
-    m_SelectedControlPoint = 1;
-  }
+    double radius = (GetControlPoint(0) - GetControlPoint(1)).GetNorm();
+    mitk::Vector2D delta = point - GetControlPoint(0);
+    double distanceFromCenter = delta.GetNorm();
 
+    if (abs(radius - distanceFromCenter) < maxDistance) {
+        return std::make_tuple(0, 0, GetControlPoint(0) + delta * radius / distanceFromCenter);
+    }
+
+    return std::make_tuple(-1, -1, mitk::Point2D{});
+}
+
+int mitk::PlanarCircle::FindClosestControlPoint(const mitk::Point2D& point, double maxDistance) const
+{
+    int closestControlPoint = PlanarFigure::FindClosestControlPoint(point, maxDistance);
+
+    if (closestControlPoint >= 0) {
+        return closestControlPoint;
+    }
+
+    return std::get<cpPolyLineSegmentIndex>(FindClosestPolyLinePoint(point, maxDistance)) == -1 ? -1 : 1;
+}
+
+bool mitk::PlanarCircle::SetCurrentControlPoint(const Point2D& point)
+{
   return this->SetControlPoint( m_SelectedControlPoint, point, false);
 }
 

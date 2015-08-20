@@ -67,8 +67,6 @@ public:
   typedef std::deque< Point2D > ControlPointListType;
   typedef std::vector< PolyLineElement > PolyLineType;
 
-  typedef std::vector<unsigned long> PolyLineSegmentInfoType;
-
   /** \brief Sets the 2D geometry on which this figure will be placed.
    *
    * In most cases, this is a Geometry already owned by another object, e.g.
@@ -168,12 +166,25 @@ public:
   /** \brief Returns specified control point in 2D world coordinates. */
   Point2D GetControlPoint( unsigned int index ) const;
 
-  /**
-  * \brief Returns the id of the control-point that corresponds to the given
-  * polyline-point.
-  */
-  virtual int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
+  /** \brief The indices of information members in the tuple returned from FindClosestPolyLinePoint. 
+   *  Example usage: std::get<cpPolyLineIndex>(FindClosestPolyLinePoint(...)). */
+  enum ClosestPointTuple {
+      cpPolyLineIndex,
+      cpPolyLineSegmentIndex,
+      cpClosestPoint
+  };
 
+  /** \brief Find the point on the figure's polylines that is within maxDistance from a point.
+   *  Returns the tuple containing the index of polyline, an index of control point which is at the beginning of 
+   *  the polyline segment the closest point belongs to and the coordinates of the closest point. \sa ClosestPointTuple
+   *  Returns (-1, -1, Point2D()) if no points are found.
+   *  The default implementation returns the index of point in the polyline as the second member,
+   *  which is correct if control points are simply connected with line segments in their order (e.g. for PlanarPolygon) */
+  virtual std::tuple<int, int, mitk::Point2D> FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const;
+
+  /** \brief Find the control point that is within maxDistance from a point.
+  *  Returns the control point index or -1 if none found. */
+  virtual int FindClosestControlPoint(const mitk::Point2D& point, double maxDistance) const;
 
   /** \brief Returns specified control point in world coordinates. */
   Point3D GetWorldControlPoint( unsigned int index ) const;
@@ -185,11 +196,6 @@ public:
   /** \brief Returns the polyline that should be drawn the same size at every scale
    * (for text, angles, etc.). */
   const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight ) const;
-
-  /** \brief Returns the polyline segment information. The polyline where each value represents the index of point in the polyline
-  * For control point i, the polyline points [SegmentInfo[i], SegmentInfo[i + 1]) belong to segment [i, (i + 1) % nControlPoints]
-  * */
-  virtual const PolyLineSegmentInfoType GetPolyLineSegmentInfo(unsigned int index) const;
 
   /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
   void SetPreviewControlPoint( const Point2D& point );
@@ -354,6 +360,8 @@ protected:
   void ClearHelperPolyLines();
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const override;
+
+  static bool IsPointNearLine(const mitk::Point2D& point, const mitk::Point2D& startPoint, const mitk::Point2D& endPoint, double maxDistance, mitk::Point2D& projectedPoint);
 
   ControlPointListType m_ControlPoints;
 

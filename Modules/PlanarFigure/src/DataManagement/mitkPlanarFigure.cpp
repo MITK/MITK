@@ -251,6 +251,80 @@ mitk::Point2D mitk::PlanarFigure::GetControlPoint(unsigned int index) const
     itkExceptionMacro(<< "GetControlPoint(): Invalid index!");
 }
 
+bool mitk::PlanarFigure::IsPointNearLine(
+    const mitk::Point2D& point,
+    const mitk::Point2D& startPoint,
+    const mitk::Point2D& endPoint,
+    double maxDistance,
+    mitk::Point2D& projectedPoint
+    ) 
+{
+    mitk::Vector2D n1 = endPoint - startPoint;
+    n1.Normalize();
+
+    // Determine dot products between line vector and startpoint-point / endpoint-point vectors
+    double l1 = n1 * (point - startPoint);
+    double l2 = -n1 * (point - endPoint);
+
+    // Determine projection of specified point onto line defined by start / end point
+    mitk::Point2D crossPoint = startPoint + n1 * l1;
+    projectedPoint = crossPoint;
+
+    float dist1 = crossPoint.SquaredEuclideanDistanceTo(point);
+    float dist2 = endPoint.SquaredEuclideanDistanceTo(point);
+    float dist3 = startPoint.SquaredEuclideanDistanceTo(point);
+
+    // Point is inside encompassing rectangle IF
+    // - its distance to its projected point is small enough
+    // - it is not further outside of the line than the defined tolerance
+    if (((dist1 < maxDistance * maxDistance) && (l1 > 0.0) && (l2 > 0.0))
+        || dist2 < maxDistance * maxDistance
+        || dist3 < maxDistance * maxDistance)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+std::tuple<int, int, mitk::Point2D> mitk::PlanarFigure::FindClosestPolyLinePoint( const mitk::Point2D& point, double maxDistance ) const
+{
+    mitk::Point2D pointProjectedOntoLine;
+
+    for (unsigned short polyLineIndex = 0; polyLineIndex < GetPolyLinesSize(); ++polyLineIndex)
+    {
+        auto polyLine = GetPolyLine(polyLineIndex);
+
+        for (std::size_t polyLinePointIndex = 1; polyLinePointIndex < polyLine.size(); ++polyLinePointIndex)
+        {
+            if (IsPointNearLine(point, polyLine[polyLinePointIndex - 1], polyLine[polyLinePointIndex], maxDistance, pointProjectedOntoLine)) {
+                return std::make_tuple(static_cast<int>(polyLineIndex), static_cast<int>(polyLinePointIndex), pointProjectedOntoLine);
+            }
+        }
+
+        // For closed figures, also check last line segment
+        if (IsClosed()
+            && IsPointNearLine(point, *polyLine.rbegin(), polyLine[0], maxDistance, pointProjectedOntoLine))
+        {
+            return std::make_tuple(static_cast<int>(polyLineIndex), static_cast<int>(polyLine.size()), pointProjectedOntoLine);
+        }
+    }
+    return std::make_tuple(-1, -1, mitk::Point2D{});
+}
+
+int mitk::PlanarFigure::FindClosestControlPoint(const mitk::Point2D & point, double maxDistance) const
+{
+    int numberOfControlPoints = GetNumberOfControlPoints();
+    for (auto i = 0u; i < GetNumberOfControlPoints(); ++i)
+    {
+        if (point.SquaredEuclideanDistanceTo(GetControlPoint(i)) < maxDistance * maxDistance)
+        {
+            return static_cast<int>(i);
+        }
+    }
+
+    return -1;
+}
 
 mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint(unsigned int index) const
 {
@@ -332,12 +406,6 @@ unsigned int mitk::PlanarFigure::GetNumberOfFeatures() const
     }
 
     return m_Features.size();
-}
-
-
-int mitk::PlanarFigure::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int /*polyLineIndex*/ ) const
-{
-  return indexOfPolylinePoint;
 }
 
 
@@ -818,11 +886,6 @@ bool mitk::PlanarFigure::Equals(const mitk::PlanarFigure& other) const
   }
 
   return true;
-}
-
-const mitk::PlanarFigure::PolyLineSegmentInfoType mitk::PlanarFigure::GetPolyLineSegmentInfo(unsigned int) const
-{
-    return PolyLineSegmentInfoType();
 }
 
 bool mitk::Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType /*eps*/, bool /*verbose*/ )

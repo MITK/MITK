@@ -104,6 +104,10 @@ public:
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
+  std::tuple<int, int, mitk::Point2D> FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const override;
+
+  int FindClosestControlPoint(const mitk::Point2D& point, double maxDistance) const override;
+
 protected:
   PlanarCircle();
 
@@ -122,6 +126,7 @@ protected:
   virtual void EvaluateFeaturesInternal() override;
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
+
 
 
   // Feature identifiers

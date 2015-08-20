@@ -26,6 +26,7 @@ if(MITK_USE_VMTK)
       # URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtkVmtk-vtk6-90e0233.tar.gz
       URL file://E:/vtkVmtk-vtk6-90e0233.tar.gz
       URL_MD5 5b5323ddade08a161cb25becc36ed865
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p0 -i ${CMAKE_CURRENT_LIST_DIR}/VMTK.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

@@ -66,6 +66,17 @@ namespace mitk {
     RdfUri LibRdfUriToRdfUri(librdf_uri* uri) const;
 
     bool CheckComplete(librdf_statement* statement);
+
+  private:
+
+    /**
+     * Prepends the prefixes to the specified query string.
+     *
+     * @param query The query string.
+     * @return The query string with leading prefixes.
+     */
+    std::string PrependPrefixes(const std::string& query) const;
+
   };
 
   /****************************************************************************
@@ -214,13 +225,8 @@ namespace mitk {
   RdfStorePrivate::ResultMap RdfStorePrivate::Query(std::string sparqlQuery) const
   {
     RdfStorePrivate::ResultMap resultMap;
-    std::string completeQuery;
 
-    for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); i++)
-    {
-      completeQuery += "PREFIX " + i->first + ": " + "<" + i->second.ToString() + "> ";
-    }
-    completeQuery += sparqlQuery;
+    const std::string completeQuery = this->PrependPrefixes(sparqlQuery);
 
     librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
 
@@ -278,15 +284,7 @@ namespace mitk {
 
   bool RdfStorePrivate::ExecuteBooleanQuery(const std::string& query) const
   {
-    bool booleanResult = false;
-    std::string completeQuery;
-
-    for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); i++)
-    {
-      completeQuery += "PREFIX " + i->first + ": " + "<" + i->second.ToString() + "> ";
-    }
-
-    completeQuery += query;
+    const std::string completeQuery = this->PrependPrefixes(query);
 
     librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
 
@@ -313,6 +311,8 @@ namespace mitk {
 
     int rawResult = librdf_query_results_get_boolean(results);
 
+    bool booleanResult;
+
     if (rawResult > 0)
     {
       booleanResult = true;
@@ -323,6 +323,8 @@ namespace mitk {
     }
     else
     {
+      // FIXME: Better throw exception here in order to indicate that something went wrong!
+      booleanResult = false;
       MITK_ERROR << "error while executing boolean query";
     }
 
@@ -517,6 +519,18 @@ namespace mitk {
     if (!str.empty()) return RdfUri(str);
 
     return RdfUri();
+  }
+
+  std::string RdfStorePrivate::PrependPrefixes(const std::string& query) const
+  {
+    std::string completeQuery;
+
+    for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); i++)
+    {
+      completeQuery += "PREFIX " + i->first + ": " + "<" + i->second.ToString() + "> ";
+    }
+
+    return completeQuery += query;
   }
 
   /****************************************************************************

@@ -39,6 +39,8 @@ class mitkVectorPropertySerializerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkVectorPropertySerializerTestSuite);
     MITK_TEST(TestSerialize<int>);
     MITK_TEST(TestSerialize<double>);
+    MITK_TEST(TestSerializeIntTypedef);
+    MITK_TEST(TestSerializeDoubleTypedef);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -65,11 +67,8 @@ public:
     return vectorProperty;
   }
 
-  template < typename DATATYPE >
-  void TestSerialize()
+  void TestSerialize(mitk::BaseProperty* property)
   {
-    mitk::BaseProperty::Pointer property = MakeExampleProperty<DATATYPE>().GetPointer();
-
     std::string serializername = std::string(property->GetNameOfClass()) + "Serializer";
 
     std::list<itk::LightObject::Pointer> allSerializers = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
@@ -95,6 +94,26 @@ public:
     if (!restoredProperty) return;
 
     CPPUNIT_ASSERT( *property == *restoredProperty );
+  }
+
+  template < typename DATATYPE >
+  void TestSerialize()
+  {
+    mitk::BaseProperty::Pointer property = MakeExampleProperty<DATATYPE>().GetPointer();
+    TestSerialize(property);
+  }
+
+  void TestSerializeIntTypedef()
+  {
+    mitk::IntVectorProperty::Pointer intVectorProperty = MakeExampleProperty<int>().GetPointer();
+    TestSerialize(intVectorProperty.GetPointer());
+  }
+
+
+  void TestSerializeDoubleTypedef()
+  {
+    mitk::DoubleVectorProperty::Pointer doubleVectorProperty = MakeExampleProperty<double>().GetPointer();
+    TestSerialize(doubleVectorProperty.GetPointer());
   }
 
 }; // class

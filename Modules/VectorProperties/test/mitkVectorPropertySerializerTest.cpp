@@ -55,7 +55,7 @@ public:
   template< typename DATATYPE >
   typename mitk::VectorProperty<DATATYPE>::Pointer MakeExampleProperty()
   {
-    mitk::VectorProperty<DATATYPE>::Pointer vectorProperty = mitk::VectorProperty<DATATYPE>::New();
+    typename mitk::VectorProperty<DATATYPE>::Pointer vectorProperty = mitk::VectorProperty<DATATYPE>::New();
     std::vector<DATATYPE> data;
     data.push_back( -918273674.6172838 );
     data.push_back( 0 );

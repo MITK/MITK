@@ -113,6 +113,7 @@ public:
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* listElement) override
     {
       typename PropertyType::VectorType datalist;
+
       if ( listElement )
       {
         MITK_DEBUG << "Deserializing " << *listElement;
@@ -141,15 +142,16 @@ public:
           ++index;
         }
 
-        PropertyType::Pointer property = PropertyType::New();
+        typename PropertyType::Pointer property = PropertyType::New();
         property->SetValue( datalist );
         return property.GetPointer();
       }
       else
       {
         MITK_ERROR << "Missing <Values> tag.";
-        return nullptr;
       }
+
+      return nullptr;
     }
 
 };

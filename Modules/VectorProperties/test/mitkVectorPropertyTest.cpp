@@ -36,7 +36,7 @@ struct assertion_traits< std::vector<DATA> >   // specialization for the std::st
     {
         OStringStream ost;
         for (auto v : values)
-          ost << '"' << v << '" ';    // adds quote around the string to see whitespace
+          ost << "'" << v << "' ";    // adds quote around the string to see whitespace
         return ost.str();
     }
 };
@@ -136,7 +136,7 @@ public:
 
     std::vector<T> modifiedData(data);
     modifiedData.back() = -modifiedData.back(); // change last element
-    mitk::VectorProperty<T>::Pointer modifiedProperty = mitk::VectorProperty<T>::New();
+    typename mitk::VectorProperty<T>::Pointer modifiedProperty = mitk::VectorProperty<T>::New();
     modifiedProperty->SetValue( modifiedData );
 
     CPPUNIT_ASSERT_ASSERTION_FAIL_MESSAGE("Modified list shall be recognized by IsEqual()",
@@ -162,7 +162,7 @@ public:
     std::vector<T> data = MakeSimpleList<T>();
     prop.SetValue( data );
 
-    mitk::VectorProperty<T>::Pointer clone = prop.Clone();
+    typename mitk::VectorProperty<T>::Pointer clone = prop.Clone();
     CPPUNIT_ASSERT(clone.IsNotNull());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Result of Clone() shall equal original property", *clone, prop);
 

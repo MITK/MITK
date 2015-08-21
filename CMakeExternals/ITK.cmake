@@ -18,6 +18,10 @@ if(MITK_USE_HDF5)
   list(APPEND proj_DEPENDENCIES HDF5)
 endif()
 
+if(MITK_USE_VTK)
+  list(APPEND proj_DEPENDENCIES VTK)
+endif()
+
 set(ITK_DEPENDS ${proj})
 
 if(NOT DEFINED ITK_DIR)
@@ -68,11 +72,13 @@ if(NOT DEFINED ITK_DIR)
       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.7.1-gcc-5.patch
     )
   endif()
-  
-  list(APPEND additional_cmake_args
-    -DModule_ITKVtkGlue:BOOL=OFF
-    -DVTK_DIR:PATH=${VTK_DIR}
-  )
+
+  if(MITK_USE_VTK)
+    list(APPEND additional_cmake_args
+      -DModule_ITKVtkGlue:BOOL=ON
+      -DVTK_DIR:PATH=${VTK_DIR}
+    )
+  endif()
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}

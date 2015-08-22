@@ -57,9 +57,10 @@ class MITKSCENESERIALIZATIONBASE_EXPORT BaseDataSerializer : public itk::Object
 
       This should be overwritten by specific sub-classes.
       */
-    virtual std::string Serialize();
+    virtual std::vector<std::string> SerializeAll() { return std::vector < std::string > { Serialize() }; }
 
   protected:
+    virtual std::string Serialize();
 
     BaseDataSerializer();
     virtual ~BaseDataSerializer();

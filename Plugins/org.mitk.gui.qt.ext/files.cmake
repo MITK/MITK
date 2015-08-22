@@ -1,6 +1,7 @@
 set(SRC_CPP_FILES
   QmitkExtActionBarAdvisor.cpp
   QmitkExtWorkbenchWindowAdvisor.cpp
+  QmitkExtFileOpenProjectAction.cpp
   QmitkExtFileSaveProjectAction.cpp
   QmitkOpenDicomEditorAction.cpp
 )
@@ -20,6 +21,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
+  src/QmitkExtFileOpenProjectAction.h
   src/QmitkExtFileSaveProjectAction.h
   src/QmitkExtWorkbenchWindowAdvisor.h
 

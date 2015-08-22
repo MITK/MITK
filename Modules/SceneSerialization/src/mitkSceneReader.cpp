@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSceneReader.h"
 
-bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage )
+bool mitk::SceneReader::LoadScene(TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage, LoadedNodeFileNamesMap* nodeDataFileNameMap)
 {
   // find version node --> note version in some variable
   int fileVersion = 1;
@@ -48,7 +48,7 @@ bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& w
   {
     if (SceneReader* reader = dynamic_cast<SceneReader*>( iter->GetPointer() ) )
     {
-      if ( !reader->LoadScene( document, workingDirectory, storage ) )
+      if ( !reader->LoadScene( document, workingDirectory, storage, nodeDataFileNameMap ) )
       {
         MITK_ERROR << "There were errors while loading scene file " << workingDirectory + "/index.xml. Your data may be corrupted";
         return false;

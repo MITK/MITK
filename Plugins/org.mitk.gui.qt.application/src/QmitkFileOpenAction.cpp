@@ -33,8 +33,8 @@ public:
   void init ( berry::IWorkbenchWindow* window, QmitkFileOpenAction* action )
   {
     m_Window = window;
-    action->setText("&Open File...");
-    action->setToolTip("Open data files (images, surfaces,...)");
+    action->setText("&Import...");
+    action->setToolTip("Import data files (images, surfaces,...)");
 
     QObject::connect(action, SIGNAL(triggered(bool)), action, SLOT(Run()));
   }
@@ -110,9 +110,9 @@ void QmitkFileOpenAction::Run()
 {
 
   // Ask the user for a list of files to open
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
-                                                        d->getLastFileOpenPath(),
-                                                        QmitkIOUtil::GetFileOpenFilterString());
+  QStringList fileNames =  QFileDialog::getOpenFileNames(NULL, "Import",
+                                                         d->getLastFileOpenPath(),
+                                                         QmitkIOUtil::GetFileOpenFilterString());
 
   if (fileNames.empty())
     return;

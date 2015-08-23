@@ -213,9 +213,17 @@ if(TARGET ${TESTDRIVER})
     #mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest
     #                        ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz
     #)
+
+    mitkAddCustomModuleTest(mitkPlaneGeometryDataMapper2DTest mitkPlaneGeometryDataMapper2DTest
+                            ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
+                            -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/PlaneGeometryMapper640x480REF.png #corresponding reference screenshot
+    )
+
+
     SET_PROPERTY(TEST mitkRotatedSlice4DTest mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw
       # mitkImageVtkMapper2D_pic3dOpacity640x480
       mitkSurfaceVtkMapper2DTest mitkSurfaceVtkMapper3DTest_TextureProperty mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2D_openMeAloneTransformed640x480 #mitkSurfaceVtkMapper3DTexturedSphereTest_Football
+      mitkPlaneGeometryDataMapper2DTest
     PROPERTY RUN_SERIAL TRUE)
 
   endif()

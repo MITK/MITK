@@ -50,6 +50,7 @@ set(MODULE_TESTS
   mitkMessageTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
+  mitkPlaneGeometryDataMapper2DTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp

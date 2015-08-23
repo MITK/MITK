@@ -247,8 +247,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
         rendererWorldPlaneGeometryData->GetPlaneGeometry() );
 
   if ( worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(worldPlaneGeometry)==NULL
-       && inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(input->GetPlaneGeometry() )==NULL
-       && inputPlaneGeometry->GetReferenceGeometry() )
+       && inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(input->GetPlaneGeometry() )==NULL)
   {
     const BaseGeometry *referenceGeometry = inputPlaneGeometry->GetReferenceGeometry();
 
@@ -261,36 +260,16 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
     // Calculate the intersection line of the input plane with the world plane
     if ( worldPlaneGeometry->IntersectionLine( inputPlaneGeometry, crossLine ) )
     {
-      Point2D indexLinePoint;
-      Vector2D indexLineDirection;
+      bool hasIntersection = referenceGeometry ? CutCrossLineWithReferenceGeometry(referenceGeometry, crossLine) :
+                                                 CutCrossLineWithPlaneGeometry(inputPlaneGeometry, crossLine);
 
-      inputPlaneGeometry->Map(crossLine.GetPoint(), indexLinePoint);
-      inputPlaneGeometry->Map(crossLine.GetPoint(), crossLine.GetDirection(), indexLineDirection);
-
-      inputPlaneGeometry->WorldToIndex(indexLinePoint, indexLinePoint);
-      inputPlaneGeometry->WorldToIndex(indexLineDirection, indexLineDirection);
-
-      mitk::Point2D intersectionPoints[2];
-
-      // Then, clip this line with the (transformed) bounding box of the
-      // reference geometry.
-      int nIntersections = Line3D::RectangleLineIntersection(
-          inputPlaneGeometry->GetBounds()[0], inputPlaneGeometry->GetBounds()[2],
-          inputPlaneGeometry->GetBounds()[1], inputPlaneGeometry->GetBounds()[3],
-          indexLinePoint, indexLineDirection,
-          intersectionPoints[0], intersectionPoints[1]);
-
-      if (nIntersections < 2) {
+      if (!hasIntersection)
+      {
         return;
       }
 
-      inputPlaneGeometry->IndexToWorld(intersectionPoints[0], intersectionPoints[0]);
-      inputPlaneGeometry->IndexToWorld(intersectionPoints[1], intersectionPoints[1]);
-
-      inputPlaneGeometry->Map(intersectionPoints[0], point1);
-      inputPlaneGeometry->Map(intersectionPoints[1], point2);
-
-      crossLine.SetPoints(point1,point2);
+      point1 = crossLine.GetPoint1();
+      point2 = crossLine.GetPoint2();
 
       vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
       vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
@@ -328,23 +307,27 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
             continue;
         }
 
-        PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
+        PlaneGeometry *otherPlaneGeometry = static_cast< PlaneGeometry * >(
               static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
 
-        if (otherPlane != inputPlaneGeometry && otherPlane != worldPlaneGeometry)
+        if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)
         {
             double intersectionParam;
-            if (otherPlane->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 && intersectionParam < 1) {
-                Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
-                Point2D mappedPoint;
-                otherPlane->Map(point, mappedPoint);
-                otherPlane->WorldToIndex(mappedPoint, mappedPoint);
+            if (otherPlaneGeometry->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 &&
+                intersectionParam < 1)
+            {
+              Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
 
-                if (otherPlane->GetBounds()[0] < mappedPoint[0] && mappedPoint[0] < otherPlane->GetBounds()[1] &&
-                    otherPlane->GetBounds()[2] < mappedPoint[1] && mappedPoint[1] < otherPlane->GetBounds()[3]) {
-                    intervals -= SimpleInterval<double>{intersectionParam - gapSizeParam, intersectionParam + gapSizeParam};
-                }
-          }
+              bool intersectionPointInsideOtherPlane =
+                otherPlaneGeometry->HasReferenceGeometry() ?
+                  TestPointInReferenceGeometry(otherPlaneGeometry->GetReferenceGeometry(), point) :
+                  TestPointInPlaneGeometry(otherPlaneGeometry, point);
+
+              if (intersectionPointInsideOtherPlane)
+              {
+                intervals -= SimpleInterval<double>{intersectionParam - gapSizeParam, intersectionParam + gapSizeParam};
+              }
+            }
         }
         ++otherPlanesIt;
       }
@@ -373,7 +356,8 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       GetDataNode()->GetBoolProperty( "reslice.thickslices.showarea", showAreaOfThickSlicing );
 
       // determine the pixelSpacing in that direction
-      double thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), orthogonalVector );
+      double thickSliceDistance = SlicedGeometry3D::CalculateSpacing(
+        referenceGeometry ? referenceGeometry->GetSpacing() : inputPlaneGeometry->GetSpacing(), orthogonalVector);
 
       IntProperty *intProperty=0;
       if( GetDataNode()->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
@@ -430,7 +414,107 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
   }
 }
 
-void mitk::PlaneGeometryDataMapper2D::DrawLine( mitk::Point3D p0,mitk::Point3D p1,
+bool mitk::PlaneGeometryDataMapper2D::TestPointInPlaneGeometry(const PlaneGeometry *planeGeometry, const Point3D &point)
+{
+  Point2D mappedPoint;
+  planeGeometry->Map(point, mappedPoint);
+  planeGeometry->WorldToIndex(mappedPoint, mappedPoint);
+
+  return (planeGeometry->GetBounds()[0] < mappedPoint[0] && mappedPoint[0] < planeGeometry->GetBounds()[1] &&
+          planeGeometry->GetBounds()[2] < mappedPoint[1] && mappedPoint[1] < planeGeometry->GetBounds()[3]);
+}
+
+bool mitk::PlaneGeometryDataMapper2D::TestPointInReferenceGeometry(const BaseGeometry* referenceGeometry, const Point3D& point)
+{
+  return referenceGeometry->IsInside(point);
+}
+
+bool mitk::PlaneGeometryDataMapper2D::CutCrossLineWithPlaneGeometry(const PlaneGeometry* planeGeometry,
+                                                                    Line3D& crossLine)
+{
+  Point2D indexLinePoint;
+  Vector2D indexLineDirection;
+
+  planeGeometry->Map(crossLine.GetPoint(), indexLinePoint);
+  planeGeometry->Map(crossLine.GetPoint(), crossLine.GetDirection(), indexLineDirection);
+
+  planeGeometry->WorldToIndex(indexLinePoint, indexLinePoint);
+  planeGeometry->WorldToIndex(indexLineDirection, indexLineDirection);
+
+  mitk::Point2D intersectionPoints[2];
+
+  // Then, clip this line with the (transformed) bounding box of the
+  // reference geometry.
+  int nIntersections = Line3D::RectangleLineIntersection(planeGeometry->GetBounds()[0],
+                                                         planeGeometry->GetBounds()[2],
+                                                         planeGeometry->GetBounds()[1],
+                                                         planeGeometry->GetBounds()[3],
+                                                         indexLinePoint,
+                                                         indexLineDirection,
+                                                         intersectionPoints[0],
+                                                         intersectionPoints[1]);
+
+  if (nIntersections < 2)
+  {
+    return false;
+  }
+
+  planeGeometry->IndexToWorld(intersectionPoints[0], intersectionPoints[0]);
+  planeGeometry->IndexToWorld(intersectionPoints[1], intersectionPoints[1]);
+
+  Point3D point1, point2;
+
+  planeGeometry->Map(intersectionPoints[0], point1);
+  planeGeometry->Map(intersectionPoints[1], point2);
+  crossLine.SetPoints(point1, point2);
+
+  return true;
+}
+
+bool mitk::PlaneGeometryDataMapper2D::CutCrossLineWithReferenceGeometry(const BaseGeometry* referenceGeometry,
+                                                                        Line3D& crossLine)
+{
+  Point3D boundingBoxMin, boundingBoxMax;
+  boundingBoxMin = referenceGeometry->GetCornerPoint(0);
+  boundingBoxMax = referenceGeometry->GetCornerPoint(7);
+
+  Point3D indexLinePoint;
+  Vector3D indexLineDirection;
+
+  referenceGeometry->WorldToIndex(crossLine.GetPoint(), indexLinePoint);
+  referenceGeometry->WorldToIndex(crossLine.GetDirection(), indexLineDirection);
+
+  referenceGeometry->WorldToIndex(boundingBoxMin, boundingBoxMin);
+  referenceGeometry->WorldToIndex(boundingBoxMax, boundingBoxMax);
+
+  Point3D point1, point2;
+
+  // Then, clip this line with the (transformed) bounding box of the
+  // reference geometry.
+  int nIntersections = Line3D::BoxLineIntersection(boundingBoxMin[0],
+                                                   boundingBoxMin[1],
+                                                   boundingBoxMin[2],
+                                                   boundingBoxMax[0],
+                                                   boundingBoxMax[1],
+                                                   boundingBoxMax[2],
+                                                   indexLinePoint,
+                                                   indexLineDirection,
+                                                   point1,
+                                                   point2);
+
+  if (nIntersections < 2)
+  {
+    return false;
+  }
+
+  referenceGeometry->IndexToWorld(point1, point1);
+  referenceGeometry->IndexToWorld(point2, point2);
+  crossLine.SetPoints(point1, point2);
+
+  return true;
+}
+
+void mitk::PlaneGeometryDataMapper2D::DrawLine(mitk::Point3D p0, mitk::Point3D p1,
                                                 vtkCellArray* lines,
                                                 vtkPoints* points
                                                 )

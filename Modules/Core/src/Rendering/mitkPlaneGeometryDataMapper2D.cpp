@@ -89,7 +89,7 @@ public:
 
     for (auto iter = range.first; iter != range.second;)
     {
-      auto intersectionResult = IntersectIntervals(*iter, interval);
+      auto intersectionResult = SubtractIntervals(*iter, interval);
 
       iter = m_IntervalsContainer.erase(iter);
       for (auto&& interval : intersectionResult)
@@ -119,7 +119,7 @@ public:
 private:
   IntervalsContainer m_IntervalsContainer;
 
-  std::array<IntervalType, 2> IntersectIntervals(const IntervalType& firstInterval, const IntervalType& secondInterval)
+  std::array<IntervalType, 2> SubtractIntervals(const IntervalType& firstInterval, const IntervalType& secondInterval)
   {
     assert(secondInterval.GetUpperBoundary() >= firstInterval.GetLowerBoundary() && firstInterval.GetUpperBoundary() >= secondInterval.GetLowerBoundary()); // Non-intersecting intervals should never reach here
 

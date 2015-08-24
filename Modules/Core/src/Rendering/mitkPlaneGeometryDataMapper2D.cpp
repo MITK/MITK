@@ -127,7 +127,8 @@ private:
     {
       if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
       {
-        return {}; // Interval completely enclosed
+        std::array<IntervalType,2> empty;
+        return empty ; // Interval completely enclosed
       }
       return{ IntervalType{ firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() }, IntervalType{} };
     }

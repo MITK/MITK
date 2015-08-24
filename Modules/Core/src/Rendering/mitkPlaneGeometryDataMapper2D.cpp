@@ -46,103 +46,105 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <cassert>
 
-/// Some simple interval arithmetic
-template<typename T>
-class SimpleInterval {
-public:
-  SimpleInterval(T start = T(), T end = T())
-    :  m_LowerBoundary{std::min(start, end)}
-    ,  m_UpperBoundary{std::max(start, end)}
+namespace
+{
+  /// Some simple interval arithmetic
+  template<typename T>
+  class SimpleInterval {
+  public:
+    SimpleInterval(T start = T(), T end = T())
+      :  m_LowerBoundary{std::min(start, end)}
+      ,  m_UpperBoundary{std::max(start, end)}
     {
 
     }
 
-  T GetLowerBoundary() const { return  m_LowerBoundary; }
-  T GetUpperBoundary() const { return  m_UpperBoundary; }
+    T GetLowerBoundary() const { return  m_LowerBoundary; }
+    T GetUpperBoundary() const { return  m_UpperBoundary; }
 
-  bool empty() const { return  m_LowerBoundary ==  m_UpperBoundary; }
+    bool empty() const { return  m_LowerBoundary ==  m_UpperBoundary; }
 
-  bool operator<(const SimpleInterval& otherInterval) const
-  {
-    return  this->m_UpperBoundary < otherInterval.GetLowerBoundary();
-  }
-
-private:
-  T  m_LowerBoundary;
-  T  m_UpperBoundary;
-};
-
-template<typename T>
-class IntervalSet {
-public:
-  using IntervalType = SimpleInterval<T>;
-
-  IntervalSet(IntervalType startingInterval)
-  {
-    m_IntervalsContainer.emplace(std::move(startingInterval));
-  }
-
-  void operator-=(const IntervalType& interval)
-  {
-    // Check the intervals for intersection
-    auto range = m_IntervalsContainer.equal_range(interval);
-
-    for (auto iter = range.first; iter != range.second;)
+    bool operator<(const SimpleInterval& otherInterval) const
     {
-      auto intersectionResult = SubtractIntervals(*iter, interval);
+      return  this->m_UpperBoundary < otherInterval.GetLowerBoundary();
+    }
 
-      iter = m_IntervalsContainer.erase(iter);
-      for (auto&& interval : intersectionResult)
+  private:
+    T  m_LowerBoundary;
+    T  m_UpperBoundary;
+  };
+
+  template<typename T>
+  class IntervalSet {
+  public:
+    using IntervalType = SimpleInterval<T>;
+
+    IntervalSet(IntervalType startingInterval)
+    {
+      m_IntervalsContainer.emplace(std::move(startingInterval));
+    }
+
+    void operator-=(const IntervalType& interval)
+    {
+      // Check the intervals for intersection
+      auto range = m_IntervalsContainer.equal_range(interval);
+
+      for (auto iter = range.first; iter != range.second;)
       {
-        if (!interval.empty()) {
-          iter = m_IntervalsContainer.emplace_hint(iter, std::move(interval));
-          ++iter;
+        auto intersectionResult = SubtractIntervals(*iter, interval);
+
+        iter = m_IntervalsContainer.erase(iter);
+        for (auto&& interval : intersectionResult)
+        {
+          if (!interval.empty()) {
+            iter = m_IntervalsContainer.emplace_hint(iter, std::move(interval));
+            ++iter;
+          }
         }
       }
     }
-  }
 
-  IntervalSet operator-(const IntervalType& interval)
-  {
-    IntervalSet result = *this;
-    result -= interval;
-    return result;
-  }
-
-  using IntervalsContainer = std::set<IntervalType>;
-
-  const IntervalsContainer& getIntervals() const
-  {
-    return m_IntervalsContainer;
-  }
-
-private:
-  IntervalsContainer m_IntervalsContainer;
-
-  std::array<IntervalType, 2> SubtractIntervals(const IntervalType& firstInterval, const IntervalType& secondInterval)
-  {
-    assert(secondInterval.GetUpperBoundary() >= firstInterval.GetLowerBoundary() && firstInterval.GetUpperBoundary() >= secondInterval.GetLowerBoundary()); // Non-intersecting intervals should never reach here
-
-    if (secondInterval.GetLowerBoundary() < firstInterval.GetLowerBoundary())
+    IntervalSet operator-(const IntervalType& interval)
     {
+      IntervalSet result = *this;
+      result -= interval;
+      return result;
+    }
+
+    using IntervalsContainer = std::set<IntervalType>;
+
+    const IntervalsContainer& getIntervals() const
+    {
+      return m_IntervalsContainer;
+    }
+
+  private:
+    IntervalsContainer m_IntervalsContainer;
+
+    std::array<IntervalType, 2> SubtractIntervals(const IntervalType& firstInterval, const IntervalType& secondInterval)
+    {
+      assert(secondInterval.GetUpperBoundary() >= firstInterval.GetLowerBoundary() && firstInterval.GetUpperBoundary() >= secondInterval.GetLowerBoundary()); // Non-intersecting intervals should never reach here
+
+      if (secondInterval.GetLowerBoundary() < firstInterval.GetLowerBoundary())
+      {
+        if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
+        {
+          std::array<IntervalType,2> empty;
+          return empty ; // Interval completely enclosed
+        }
+        return{ IntervalType{ firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() }, IntervalType{} };
+      }
+
       if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
       {
-        std::array<IntervalType,2> empty;
-        return empty ; // Interval completely enclosed
+        return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() }, IntervalType{} };
       }
-      return{ IntervalType{ firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() }, IntervalType{} };
+
+      return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() },
+        IntervalType{ secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() } };
     }
-
-    if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
-    {
-      return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() }, IntervalType{} };
-    }
-
-    return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() },
-      IntervalType{ secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() } };
-  }
-};
-
+  };
+}
 
 
 mitk::PlaneGeometryDataMapper2D::AllInstancesContainer mitk::PlaneGeometryDataMapper2D::s_AllInstances;

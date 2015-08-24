@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 #include <itksys/SystemTools.hxx>
 #include <cstring>
+#include <chrono>
 
 #include <igtlTransformMessage.h>
 #include <mitkIGTLMessageCommon.h>
@@ -215,8 +216,10 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       receiveCheck = socket->Receive(curMessage->GetPackBodyPointer(),
          curMessage->GetPackBodySize(), 0);
 
+
       // measure the time
-      m_Measurement->AddMeasurement(6);
+      long long timeStamp6 = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
 
       if ( receiveCheck > 0 )
       {
@@ -226,6 +229,15 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
 //            mitkThrow() << "crc error";
           return IGTL_STATUS_CHECKSUM_ERROR;
         }
+
+        //save timestamp 6 now because we know the index
+        igtl::TrackingDataMessage* tdMsg =
+          (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+        igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+        tdMsg->GetTrackingDataElement(0,trackingData);
+        float x_pos, y_pos, z_pos;
+        trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+        m_Measurement->AddMeasurement(6,x_pos,timeStamp6); //x value is used as index
 
         //check the type of the received message
         //if it is a command push it into the command queue
@@ -239,7 +251,13 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         }
         else
         {
-          m_Measurement->AddMeasurement(7);
+          igtl::TrackingDataMessage* tdMsg =
+            (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+          igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+          tdMsg->GetTrackingDataElement(0,trackingData);
+          float x_pos, y_pos, z_pos;
+          trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+          m_Measurement->AddMeasurement(7,x_pos); //x value is used as index
           this->m_ReceiveQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
@@ -273,7 +291,13 @@ void mitk::IGTLDevice::SendMessage(const mitk::IGTLMessage* msg)
 
 void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
-  m_Measurement->AddMeasurement(3);
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(3,x_pos); //x value is used as index
   //add the message to the queue
   m_SendQueue->PushMessage(msg);
 }
@@ -296,7 +320,13 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg
   msg->Pack();
 
   // measure the time
-  m_Measurement->AddMeasurement(5);
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(5,x_pos); //x value is used as index
 
   int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
 
@@ -471,11 +501,17 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
 
   if (msg.IsNotNull())
   {
-    m_Measurement->AddMeasurement(8);
+    igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+    igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+    tdMsg->GetTrackingDataElement(0,trackingData);
+    float x_pos, y_pos, z_pos;
+    trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+    m_Measurement->AddMeasurement(8,x_pos); //x value is used as index
     unsigned int seconds = 0;
     unsigned int frac = 0;
     msg->GetTimeStamp(&seconds, &frac);
-    std::cout << "8: s: " << seconds << " f: " << frac << std::endl;
+    //std::cout << "8: s: " << seconds << " f: " << frac << std::endl;
   }
 
   return msg;

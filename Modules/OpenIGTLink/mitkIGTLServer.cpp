@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 
 #include <igtlServerSocket.h>
+#include <igtlTrackingDataMessage.h>
 #include <igtl_status.h>
 
 
@@ -141,7 +142,13 @@ void mitk::IGTLServer::Send()
   if ( curMessage.IsNull() )
     return;
 
-  m_Measurement->AddMeasurement(4);
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(4,x_pos); //x value is used as index
 
   //the server can be connected with several clients, therefore it has to check
   //all registered clients

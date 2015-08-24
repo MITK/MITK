@@ -64,7 +64,14 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateData()
   default:
     break;
   }
-  m_Measurement->AddMeasurement(2);
+  igtl::MessageBase::Pointer curMessage = this->GetOutput()->GetMessage();
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(2,x_pos); //x value is used as index
 }
 
 

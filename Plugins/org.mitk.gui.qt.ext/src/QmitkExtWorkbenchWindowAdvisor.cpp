@@ -997,40 +997,49 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
   }
 }
 
-void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
+// safe calls to the complete chain
+// berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+// to cover for all possible cases of closed pages etc.
+static void SafeHandleNavigatorView(QString view_query_name)
 {
-  // get ImageNavigatorView
-  berry::IViewPart::Pointer imageNavigatorView =
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
-  if (imageNavigatorView)
+  berry::IWorkbench* wbench = berry::PlatformUI::GetWorkbench();
+  if( wbench == nullptr )
+    return;
+
+  berry::IWorkbenchWindow::Pointer wbench_window = wbench->GetActiveWorkbenchWindow();
+  if( wbench_window.IsNull() )
+    return;
+
+  berry::IWorkbenchPage::Pointer wbench_page = wbench_window->GetActivePage();
+  if( wbench_page.IsNull() )
+    return;
+
+  auto wbench_view = wbench_page->FindView( view_query_name );
+
+  if( wbench_view.IsNotNull() )
   {
-    bool isImageNavigatorVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
-    if (isImageNavigatorVisible)
+    bool isViewVisible = wbench_page->IsPartVisible( wbench_view );
+    if( isViewVisible )
     {
-      berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
+      wbench_page->HideView( wbench_view );
       return;
     }
+
   }
-  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
-  //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+
+  wbench_page->ShowView( view_query_name );
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
+{
+  // show/hide ImageNavigatorView
+  SafeHandleNavigatorView("org.mitk.views.imagenavigator");
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onViewNavigator()
 {
-  // get viewnavigatorView
-  berry::IViewPart::Pointer viewnavigatorView =
-    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.viewnavigatorview");
-  if (viewnavigatorView)
-  {
-    bool isviewnavigatorVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(viewnavigatorView);
-    if (isviewnavigatorVisible)
-    {
-      berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(viewnavigatorView);
-      return;
-    }
-  }
-  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.viewnavigatorview");
-  //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+  // show/hide viewnavigatorView
+  SafeHandleNavigatorView("org.mitk.views.viewnavigatorview");
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()

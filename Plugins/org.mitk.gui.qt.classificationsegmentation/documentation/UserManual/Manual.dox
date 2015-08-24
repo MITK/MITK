@@ -1,0 +1,25 @@
+/**
+\page org_mitk_gui_qt_classificationsegmentation The Classificationsegmentation Plugin
+
+\imageMacro{brain.png,"Icon of Classificationsegmentation Plugin",2.00}
+
+\tableofcontents
+
+\section org_mitk_gui_qt_classificationsegmentationOverview Overview
+Segmentation of the classes:
+<ul>
+<li>CSF (value of 1)
+<li>Lesion (value of 2)
+<li>Brain (value of 3)
+</ul>
+
+using a random forest based approach.
+
+
+Credits (from the Noun Project):
+<ul>
+<li> Brain by Santiago Arias
+<li> process by Marek Polakovic
+<li> process by Takao Umehara
+</ul>
+*/

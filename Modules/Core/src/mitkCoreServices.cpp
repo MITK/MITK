@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyExtensions.h>
 #include <mitkIPropertyFilters.h>
+#include <mitkIPropertyPersistence.h>
 #include <mitkIShaderRepository.h>
 
 #include <usGetModuleContext.h>
@@ -91,6 +92,11 @@ IPropertyExtensions* CoreServices::GetPropertyExtensions(us::ModuleContext* cont
 IPropertyFilters* CoreServices::GetPropertyFilters(us::ModuleContext* context)
 {
   return GetCoreService<IPropertyFilters>(context);
+}
+
+IPropertyPersistence* CoreServices::GetPropertyPersistence(us::ModuleContext* context)
+{
+  return GetCoreService<IPropertyPersistence>(context);
 }
 
 IMimeTypeProvider* CoreServices::GetMimeTypeProvider(us::ModuleContext* context)

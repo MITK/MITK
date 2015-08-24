@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManagerProvider.h"
 
-QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
+QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* )
 :QWidget(parent),
  m_SelfCall(false),
  m_DisplayedGroups("default"),

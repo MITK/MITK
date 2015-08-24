@@ -47,6 +47,8 @@ QmitkIGTLDeviceSetupConnectionWidget::QmitkIGTLDeviceSetupConnectionWidget(
   m_Controls = NULL;
   this->m_IGTLDevice = NULL;
   CreateQtPartControl(this);
+  m_NumSentFramesSinceLastUpdate = 0;
+  m_NumReceivedFramesSinceLastUpdate = 0;
 }
 
 
@@ -87,6 +89,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateQtPartControl(QWidget *parent)
   // set the validator for the port edit box (values must be between 1 and 65535)
   m_Controls->editPort->setValidator(new QIntValidator(1, 65535, this));
 
+  m_FPSCalculationTimer.start(1000);
+
   //connect slots with signals
   CreateConnections();
 }
@@ -106,6 +110,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::CreateConnections()
              this, SLOT(OnBufferIncomingMessages(int)));
     connect( m_Controls->bufferOutMsgCheckBox, SIGNAL(stateChanged(int)),
              this, SLOT(OnBufferOutgoingMessages(int)));
+    connect(&m_FPSCalculationTimer, SIGNAL(timeout()),
+             this, SLOT(OnUpdateFPSLabel()));
   }
   //this is used for thread seperation, otherwise the worker thread would change the ui elements
   //which would cause an exception
@@ -146,9 +152,20 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->bufferInMsgCheckBox->setEnabled(false);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(false);
     this->m_Controls->butConnect->setEnabled(true);
+    this->m_Controls->fpsInLabel->setEnabled(false);
+    this->m_Controls->fpsOutLabel->setEnabled(false);
+    this->m_Controls->fpsInDescrLabel->setEnabled(false);
+    this->m_Controls->fpsOutDescrLabel->setEnabled(false);
     break;
   case mitk::IGTLDevice::Ready:
-    this->m_Controls->butConnect->setText("Disconnect");
+    if (m_IGTLDevice->GetNumberOfConnections())
+    {
+      this->m_Controls->butConnect->setText("Disconnect");
+    }
+    else
+    {
+      this->m_Controls->butConnect->setText("Go Offline");
+    }
     this->m_Controls->editIP->setEnabled(false);
     this->m_Controls->editPort->setEnabled(false);
     this->m_Controls->logIncomingMsg->setEnabled(true);
@@ -156,9 +173,20 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->bufferInMsgCheckBox->setEnabled(true);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(true);
     this->m_Controls->butConnect->setEnabled(true);
+    this->m_Controls->fpsInLabel->setEnabled(true);
+    this->m_Controls->fpsOutLabel->setEnabled(true);
+    this->m_Controls->fpsInDescrLabel->setEnabled(true);
+    this->m_Controls->fpsOutDescrLabel->setEnabled(true);
     break;
   case mitk::IGTLDevice::Running:
-    this->m_Controls->butConnect->setText("Disconnect");
+    if (m_IGTLDevice->GetNumberOfConnections())
+    {
+      this->m_Controls->butConnect->setText("Disconnect");
+    }
+    else
+    {
+      this->m_Controls->butConnect->setText("Go Offline");
+    }
     this->m_Controls->editIP->setEnabled(false);
     this->m_Controls->editPort->setEnabled(false);
     this->m_Controls->logIncomingMsg->setEnabled(true);
@@ -166,6 +194,10 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->bufferInMsgCheckBox->setEnabled(true);
     this->m_Controls->bufferOutMsgCheckBox->setEnabled(true);
     this->m_Controls->butConnect->setEnabled(true);
+    this->m_Controls->fpsInLabel->setEnabled(true);
+    this->m_Controls->fpsOutLabel->setEnabled(true);
+    this->m_Controls->fpsInDescrLabel->setEnabled(true);
+    this->m_Controls->fpsOutDescrLabel->setEnabled(true);
     break;
   default:
     mitkThrow() << "Invalid Device State";
@@ -325,19 +357,21 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnNewConnection()
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnMessageReceived()
 {
-   if (this->m_Controls->logIncomingMsg->isChecked())
-   {
-      MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
-         << this->m_IGTLDevice->GetReceiveQueue()->GetLatestMsgInformationString();
-   }
+  if (this->m_Controls->logIncomingMsg->isChecked())
+  {
+    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Received a message: "
+      << this->m_IGTLDevice->GetReceiveQueue()->GetLatestMsgInformationString();
+  }
+  m_NumReceivedFramesSinceLastUpdate++;
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnMessageSent()
 {
-   if (this->m_Controls->logOutgoingMsg->isChecked())
-   {
-      MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Sent a message.";
-   }
+  if (this->m_Controls->logOutgoingMsg->isChecked())
+  {
+    MITK_INFO("IGTLDeviceSetupConnectionWidget") << "Sent a message.";
+  }
+  m_NumSentFramesSinceLastUpdate++;
 }
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnCommandReceived()
@@ -367,4 +401,14 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnBufferOutgoingMessages(int state)
       this->m_IGTLDevice->EnableInfiniteBufferingMode(
          this->m_IGTLDevice->GetSendQueue(), (bool)state);
    }
+}
+
+void QmitkIGTLDeviceSetupConnectionWidget::OnUpdateFPSLabel()
+{
+  double fpsIn = m_NumReceivedFramesSinceLastUpdate / 1.0;
+  double fpsOut = m_NumSentFramesSinceLastUpdate / 1.0;
+  this->m_Controls->fpsInLabel->setText(QString::number(fpsIn));
+  this->m_Controls->fpsOutLabel->setText(QString::number(fpsOut));
+  m_NumReceivedFramesSinceLastUpdate = 0;
+  m_NumSentFramesSinceLastUpdate = 0;
 }

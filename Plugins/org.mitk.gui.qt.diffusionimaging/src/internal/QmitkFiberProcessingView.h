@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkFloatArray.h>
 
 /*!
-\brief View to process fiber bundles. Supplies methods to extract fibers from the bundle, join and subtract bundles and much more.
+\brief View to process fiber bundles. Supplies methods to extract fibers from the bundle, fiber resampling, mirroring, join and subtract bundles and much more.
 
 \sa QmitkFunctionality
 \ingroup Functionalities
@@ -76,6 +76,7 @@ protected slots:
   void GenerateOrComposite();
   void GenerateNotComposite();
 
+  void CopyBundles();               ///< add copies of selected bundles to data storage
   void JoinBundles();               ///< merge selected fiber bundles
   void SubstractBundles();          ///< subtract bundle A from bundle B. Not commutative! Defined by order of selection.
   void GenerateRoiImage();          ///< generate binary image of selected planar figures.

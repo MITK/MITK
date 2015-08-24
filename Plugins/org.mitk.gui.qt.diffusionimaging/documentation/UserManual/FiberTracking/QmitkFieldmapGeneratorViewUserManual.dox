@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_fieldmapgenerator Fieldmap Generator View
+\page org_mitk_views_fieldmapgenerator Fieldmap Generator
 
 This view allows the creation of artificial frequency maps used by Fiberfox to introduce distortions into diffusion weighted images. The generated images can contain a linear frequency gradient and/or multiple 3D gaussian shaped field inhomogeneities.
 

@@ -13,6 +13,7 @@ set(SRC_CPP_FILES
   QmitkBallModelParametersWidget.cpp
   QmitkAstrosticksModelParametersWidget.cpp
   QmitkPrototypeSignalParametersWidget.cpp
+  QmitkMlbstTrainingDataWidget.cpp
 
   QmitkFreeSurferParcellationHandler.cpp
   QmitkFreeSurferParcellationWidget.cpp
@@ -42,7 +43,6 @@ set(INTERNAL_CPP_FILES
   Connectomics/QmitkConnectomicsStatisticsView.cpp
   Connectomics/QmitkNetworkHistogramCanvas.cpp
   Connectomics/QmitkRandomParcellationView.cpp
-  QmitkDwiSoftwarePhantomView.cpp
   QmitkOdfMaximaExtractionView.cpp
   QmitkFiberfoxView.cpp
   QmitkFiberProcessingView.cpp
@@ -59,6 +59,7 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
   Perspectives/QmitkDIAppIVIMPerspective.cpp
   Perspectives/QmitkDiffusionDefaultPerspective.cpp
+  Perspectives/QmitkMachineLearningTractographyPerspective.cpp
 )
 
 set(UI_FILES
@@ -82,7 +83,6 @@ set(UI_FILES
   src/internal/Connectomics/QmitkConnectomicsNetworkOperationsViewControls.ui
   src/internal/Connectomics/QmitkConnectomicsStatisticsViewControls.ui
   src/internal/Connectomics/QmitkRandomParcellationViewControls.ui
-  src/internal/QmitkDwiSoftwarePhantomViewControls.ui
   src/internal/QmitkOdfMaximaExtractionViewControls.ui
   src/internal/QmitkFiberfoxViewControls.ui
   src/internal/QmitkFiberProcessingViewControls.ui
@@ -98,6 +98,7 @@ set(UI_FILES
   src/internal/QmitkDenoisingViewControls.ui
   src/internal/QmitkMLBTViewControls.ui
   src/QmitkFreeSurferParcellationWidgetControls.ui
+  src/QmitkMlbstTrainingDataWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -129,7 +130,6 @@ set(MOC_H_FILES
   src/internal/Connectomics/QmitkConnectomicsStatisticsView.h
   src/internal/Connectomics/QmitkNetworkHistogramCanvas.h
   src/internal/Connectomics/QmitkRandomParcellationView.h
-  src/internal/QmitkDwiSoftwarePhantomView.h
   src/internal/QmitkOdfMaximaExtractionView.h
   src/internal/QmitkFiberfoxView.h
   src/internal/QmitkFiberProcessingView.h
@@ -153,9 +153,11 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
   src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
   src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h
+  src/internal/Perspectives/QmitkMachineLearningTractographyPerspective.h
 
   src/QmitkFreeSurferParcellationHandler.h
   src/QmitkFreeSurferParcellationWidget.h
+  src/QmitkMlbstTrainingDataWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

@@ -312,8 +312,8 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     vec = p-lastP;    // valid only for counter > 0
 
     // compute distance to current plane
-    float diff = geo2D->Distance(point);
-    diff = diff * diff;
+    float diff = fabs(geo2D->Distance(point));
+//    diff = diff * diff;
 
     //draw markers on slices a certain distance away from the points
     //location according to the tolerance threshold (m_DistanceToPlane)
@@ -324,13 +324,13 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
       {
         ls->m_SelectedPoints->InsertNextPoint(point[0],point[1],point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_SelectedScales->InsertNextTuple3(m_Point2DSize - (2*diff),0,0);
+        ls->m_SelectedScales->InsertNextTuple3((double)m_Point2DSize*(1-diff/m_DistanceToPlane),0,0);
       }
       else
       {
         ls->m_UnselectedPoints->InsertNextPoint(point[0],point[1],point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_UnselectedScales->InsertNextTuple3(m_Point2DSize - (2*diff),0,0);
+        ls->m_UnselectedScales->InsertNextTuple3((double)m_Point2DSize*(1-diff/m_DistanceToPlane),0,0);
       }
 
       //---- LABEL -----//
@@ -594,7 +594,12 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   node->GetBoolProperty("show distant lines", m_ShowDistantLines, renderer);
   node->GetIntProperty("line width",          m_LineWidth, renderer);
   node->GetIntProperty("point line width",    m_PointLineWidth, renderer);
-  node->GetIntProperty("point 2D size",       m_Point2DSize, renderer);
+  if(!node->GetFloatProperty("point 2D size", m_Point2DSize, renderer))
+  {
+      int size = 0;
+      if(node->GetIntProperty("point 2D size", size, renderer))
+          m_Point2DSize = size;
+  }
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillShape, renderer);
   node->GetFloatProperty("Pointset.2D.distance to plane", m_DistanceToPlane, renderer );
 
@@ -695,7 +700,7 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk:
 {
   node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite );
-  node->AddProperty( "point 2D size", mitk::IntProperty::New(6), renderer, overwrite );
+  node->AddProperty( "point 2D size", mitk::FloatProperty::New(6), renderer, overwrite );
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite );

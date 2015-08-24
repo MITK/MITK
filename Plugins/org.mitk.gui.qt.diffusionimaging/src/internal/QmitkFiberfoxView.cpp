@@ -49,6 +49,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateIsDWI.h>
 #include <boost/property_tree/ptree.hpp>
+#define RAPIDXML_NO_EXCEPTIONS
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
 #include <QFileDialog>
@@ -82,15 +83,7 @@ QmitkFiberfoxWorker::QmitkFiberfoxWorker(QmitkFiberfoxView* view)
 void QmitkFiberfoxWorker::run()
 {
     try{
-        switch (m_FilterType)
-        {
-        case 0:
-            m_View->m_TractsToDwiFilter->Update();
-            break;
-        case 1:
-            m_View->m_ArtifactsToDwiFilter->Update();
-            break;
-        }
+        m_View->m_TractsToDwiFilter->Update();
     }
     catch( ... )
     {
@@ -104,7 +97,7 @@ const std::string QmitkFiberfoxView::VIEW_ID = "org.mitk.views.fiberfoxview";
 QmitkFiberfoxView::QmitkFiberfoxView()
     : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_SelectedImage( NULL )
+    , m_SelectedImageNode( NULL )
     , m_Worker(this)
     , m_ThreadIsRunning(false)
 {
@@ -112,22 +105,14 @@ QmitkFiberfoxView::QmitkFiberfoxView()
     connect(&m_Thread, SIGNAL(started()), this, SLOT(BeforeThread()));
     connect(&m_Thread, SIGNAL(started()), &m_Worker, SLOT(run()));
     connect(&m_Thread, SIGNAL(finished()), this, SLOT(AfterThread()));
-    connect(&m_Thread, SIGNAL(terminated()), this, SLOT(AfterThread()));
+    //    connect(&m_Thread, SIGNAL(terminated()), this, SLOT(AfterThread()));
     m_SimulationTimer = new QTimer(this);
 }
 
 void QmitkFiberfoxView::KillThread()
 {
     MITK_INFO << "Aborting DWI simulation.";
-    switch (m_Worker.m_FilterType)
-    {
-    case 0:
-        m_TractsToDwiFilter->SetAbortGenerateData(true);
-        break;
-    case 1:
-        m_ArtifactsToDwiFilter->SetAbortGenerateData(true);
-        break;
-    }
+    m_TractsToDwiFilter->SetAbortGenerateData(true);
     m_Controls->m_AbortSimulationButton->setEnabled(false);
     m_Controls->m_AbortSimulationButton->setText("Aborting simulation ...");
 }
@@ -155,85 +140,77 @@ void QmitkFiberfoxView::AfterThread()
     QString statusText;
     FiberfoxParameters<double> parameters;
     mitk::Image::Pointer mitkImage = mitk::Image::New();
-    switch (m_Worker.m_FilterType)
+
+    statusText = QString(m_TractsToDwiFilter->GetStatusText().c_str());
+    if (m_TractsToDwiFilter->GetAbortGenerateData())
     {
-    case 0:
+        MITK_INFO << "Simulation aborted.";
+        return;
+    }
+
+    parameters = m_TractsToDwiFilter->GetParameters();
+
+    mitkImage = mitk::GrabItkImageMemory( m_TractsToDwiFilter->GetOutput() );
+    mitkImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New(  parameters.m_SignalGen.GetGradientDirections()  ));
+    mitkImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ));
+    mitk::DiffusionPropertyHelper propertyHelper( mitkImage );
+    propertyHelper.InitializeImage();
+    parameters.m_Misc.m_ResultNode->SetData( mitkImage );
+
+    GetDataStorage()->Add(parameters.m_Misc.m_ResultNode, parameters.m_Misc.m_ParentNode);
+
+    parameters.m_Misc.m_ResultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(m_TractsToDwiFilter->GetLevelWindow()) );
+
+    if (m_Controls->m_VolumeFractionsBox->isChecked())
     {
-        statusText = QString(m_TractsToDwiFilter->GetStatusText().c_str());
-        if (m_TractsToDwiFilter->GetAbortGenerateData())
+        std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = m_TractsToDwiFilter->GetVolumeFractions();
+        for (unsigned int k=0; k<volumeFractions.size(); k++)
         {
-            MITK_INFO << "Simulation aborted.";
-            return;
+            mitk::Image::Pointer image = mitk::Image::New();
+            image->InitializeByItk(volumeFractions.at(k).GetPointer());
+            image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
+
+            mitk::DataNode::Pointer node = mitk::DataNode::New();
+            node->SetData( image );
+            node->SetName("CompartmentVolume-"+QString::number(k).toStdString());
+            GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
         }
 
-        parameters = m_TractsToDwiFilter->GetParameters();
-
-        mitkImage = mitk::GrabItkImageMemory( m_TractsToDwiFilter->GetOutput() );
-        mitkImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New(  parameters.m_SignalGen.GetGradientDirections()  ));
-        mitkImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ));
-        mitk::DiffusionPropertyHelper propertyHelper( mitkImage );
-        propertyHelper.InitializeImage();
-        parameters.m_Misc.m_ResultNode->SetData( mitkImage );
-
-        parameters.m_Misc.m_ResultNode->SetName(parameters.m_Misc.m_ParentNode->GetName()
-                                                +"_D"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(0)).toStdString()
-                                                +"-"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(1)).toStdString()
-                                                +"-"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(2)).toStdString()
-                                                +"_S"+QString::number(parameters.m_SignalGen.m_ImageSpacing[0]).toStdString()
-                +"-"+QString::number(parameters.m_SignalGen.m_ImageSpacing[1]).toStdString()
-                +"-"+QString::number(parameters.m_SignalGen.m_ImageSpacing[2]).toStdString()
-                +"_b"+QString::number(parameters.m_SignalGen.m_Bvalue).toStdString()
-                +"_"+parameters.m_Misc.m_SignalModelString
-                +parameters.m_Misc.m_ArtifactModelString);
-
-        GetDataStorage()->Add(parameters.m_Misc.m_ResultNode, parameters.m_Misc.m_ParentNode);
-
-        parameters.m_Misc.m_ResultNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New(m_TractsToDwiFilter->GetLevelWindow()) );
-
-        if (m_Controls->m_VolumeFractionsBox->isChecked())
+        if (m_TractsToDwiFilter->GetPhaseImage().IsNotNull())
         {
-            std::vector< itk::TractsToDWIImageFilter< short >::ItkDoubleImgType::Pointer > volumeFractions = m_TractsToDwiFilter->GetVolumeFractions();
-            for (unsigned int k=0; k<volumeFractions.size(); k++)
-            {
-                mitk::Image::Pointer image = mitk::Image::New();
-                image->InitializeByItk(volumeFractions.at(k).GetPointer());
-                image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
-
-                mitk::DataNode::Pointer node = mitk::DataNode::New();
-                node->SetData( image );
-                node->SetName(parameters.m_Misc.m_ParentNode->GetName()+"_CompartmentVolume-"+QString::number(k).toStdString());
-                GetDataStorage()->Add(node, parameters.m_Misc.m_ParentNode);
-            }
-        }
-        m_TractsToDwiFilter = NULL;
-        break;
-    }
-    case 1:
-    {
-        statusText = QString(m_ArtifactsToDwiFilter->GetStatusText().c_str());
-        if (m_ArtifactsToDwiFilter->GetAbortGenerateData())
-        {
-            MITK_INFO << "Simulation aborted.";
-            return;
+            mitk::Image::Pointer phaseImage = mitk::Image::New();
+            itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer itkPhase = m_TractsToDwiFilter->GetPhaseImage();
+            phaseImage = mitk::GrabItkImageMemory( itkPhase.GetPointer() );
+            mitk::DataNode::Pointer phaseNode = mitk::DataNode::New();
+            phaseNode->SetData( phaseImage );
+            phaseNode->SetName("Phase Image");
+            GetDataStorage()->Add(phaseNode, parameters.m_Misc.m_ResultNode);
         }
 
-        parameters = m_ArtifactsToDwiFilter->GetParameters().CopyParameters<double>();
+        if (m_TractsToDwiFilter->GetKspaceImage().IsNotNull())
+        {
+            mitk::Image::Pointer image = mitk::Image::New();
+            itk::TractsToDWIImageFilter< short >::DoubleDwiType::Pointer itkImage = m_TractsToDwiFilter->GetKspaceImage();
+            image = mitk::GrabItkImageMemory( itkImage.GetPointer() );
+            mitk::DataNode::Pointer node = mitk::DataNode::New();
+            node->SetData( image );
+            node->SetName("k-Space");
+            GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+        }
 
-        mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(parameters.m_Misc.m_ParentNode->GetData());
-        mitkImage = mitk::GrabItkImageMemory( m_ArtifactsToDwiFilter->GetOutput() );
-
-        mitkImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() ) );
-        mitkImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( static_cast<mitk::FloatProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() ) );
-        mitk::DiffusionPropertyHelper propertyHelper( mitkImage );
-        propertyHelper.InitializeImage();
-
-        parameters.m_Misc.m_ResultNode->SetData( mitkImage );
-        parameters.m_Misc.m_ResultNode->SetName(parameters.m_Misc.m_ParentNode->GetName()+parameters.m_Misc.m_ArtifactModelString);
-        GetDataStorage()->Add(parameters.m_Misc.m_ResultNode, parameters.m_Misc.m_ParentNode);
-        m_ArtifactsToDwiFilter = NULL;
-        break;
+        {
+            mitk::DataNode::Pointer node = mitk::DataNode::New();
+            node->SetData(m_TractsToDwiFilter->GetCoilPointset());
+            node->SetName("Coil Positions");
+            node->SetProperty("pointsize", mitk::FloatProperty::New(parameters.m_SignalGen.m_ImageSpacing[0]/4));
+            node->SetProperty("color", mitk::ColorProperty::New(0, 1, 0));
+            GetDataStorage()->Add(node, parameters.m_Misc.m_ResultNode);
+        }
     }
-    }
+    m_TractsToDwiFilter = NULL;
+
+    if (parameters.m_Misc.m_AfterSimulationMessage.size()>0)
+        QMessageBox::information( NULL, "Warning", parameters.m_Misc.m_AfterSimulationMessage.c_str());
 
     mitk::BaseData::Pointer basedata = parameters.m_Misc.m_ResultNode->GetData();
     if (basedata.IsNotNull())
@@ -249,12 +226,14 @@ void QmitkFiberfoxView::AfterThread()
             QString outputFileName(parameters.m_Misc.m_OutputPath.c_str());
             outputFileName += parameters.m_Misc.m_ResultNode->GetName().c_str();
             outputFileName.replace(QString("."), QString("_"));
+            SaveParameters(outputFileName+".ffp");
             outputFileName += ".dwi";
             QString status("Saving output image to ");
             status += outputFileName;
             m_Controls->m_SimulationStatusText->append(status);
-            mitk::IOUtil::SaveBaseData(mitkImage, outputFileName.toStdString());
+            mitk::IOUtil::Save(mitkImage, outputFileName.toStdString());
             m_Controls->m_SimulationStatusText->append("File saved successfully.");
+
         }
         catch (itk::ExceptionObject &e)
         {
@@ -272,21 +251,11 @@ void QmitkFiberfoxView::AfterThread()
 
 void QmitkFiberfoxView::UpdateSimulationStatus()
 {
-    QString statusText;
-    switch (m_Worker.m_FilterType)
-    {
-    case 0:
-        statusText = QString(m_TractsToDwiFilter->GetStatusText().c_str());
-        break;
-    case 1:
-        statusText = QString(m_ArtifactsToDwiFilter->GetStatusText().c_str());
-        break;
-    }
+    QString statusText = QString(m_TractsToDwiFilter->GetStatusText().c_str());
 
     if (QString::compare(m_SimulationStatusText,statusText)!=0)
     {
         m_Controls->m_SimulationStatusText->clear();
-        statusText = "<pre>"+statusText+"</pre>";
         m_Controls->m_SimulationStatusText->setText(statusText);
         QScrollBar *vScrollBar = m_Controls->m_SimulationStatusText->verticalScrollBar();
         vScrollBar->triggerAction(QScrollBar::SliderToMaximum);
@@ -308,13 +277,6 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkFiberfoxViewControls;
         m_Controls->setupUi( parent );
 
-        // commented out
-        m_Controls->m_DiffusionDirectionBox->setVisible(false);
-        m_Controls->label_3->setVisible(false);
-        m_Controls->m_SeparationAngleBox->setVisible(false);
-        m_Controls->label_4->setVisible(false);
-        //
-
         m_Controls->m_StickWidget1->setVisible(true);
         m_Controls->m_StickWidget2->setVisible(false);
         m_Controls->m_ZeppelinWidget1->setVisible(false);
@@ -324,10 +286,13 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
 
         m_Controls->m_BallWidget1->setVisible(true);
         m_Controls->m_BallWidget2->setVisible(false);
+        m_Controls->m_BallWidget2->SetT1(4500);
         m_Controls->m_AstrosticksWidget1->setVisible(false);
         m_Controls->m_AstrosticksWidget2->setVisible(false);
+        m_Controls->m_AstrosticksWidget2->SetT1(4500);
         m_Controls->m_DotWidget1->setVisible(false);
         m_Controls->m_DotWidget2->setVisible(false);
+        m_Controls->m_DotWidget2->SetT1(4500);
 
         m_Controls->m_PrototypeWidget1->setVisible(false);
         m_Controls->m_PrototypeWidget2->setVisible(false);
@@ -343,6 +308,7 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_PrototypeWidget4->SetMinAdc(0.003);
         m_Controls->m_PrototypeWidget4->SetMaxAdc(0.004);
 
+        m_Controls->m_Comp2FractionFrame->setVisible(false);
         m_Controls->m_Comp4FractionFrame->setVisible(false);
         m_Controls->m_DiffusionPropsMessage->setVisible(false);
         m_Controls->m_GeometryMessage->setVisible(false);
@@ -362,6 +328,9 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_SimulationStatusText->setVisible(false);
 
         m_Controls->m_FrequencyMapBox->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_Comp1VolumeFraction->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_Comp2VolumeFraction->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_Comp3VolumeFraction->SetDataStorage(this->GetDataStorage());
         m_Controls->m_Comp4VolumeFraction->SetDataStorage(this->GetDataStorage());
         m_Controls->m_MaskComboBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_TemplateComboBox->SetDataStorage(this->GetDataStorage());
@@ -380,7 +349,14 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         mitk::NodePredicateAnd::Pointer isBinaryMitkImage = mitk::NodePredicateAnd::New( isNonDiffMitkImage, isBinaryPredicate );
 
         m_Controls->m_FrequencyMapBox->SetPredicate(isNonDiffMitkImage);
+        m_Controls->m_Comp1VolumeFraction->SetPredicate(isNonDiffMitkImage);
+        m_Controls->m_Comp1VolumeFraction->SetZeroEntryText("--");
+        m_Controls->m_Comp2VolumeFraction->SetPredicate(isNonDiffMitkImage);
+        m_Controls->m_Comp2VolumeFraction->SetZeroEntryText("--");
+        m_Controls->m_Comp3VolumeFraction->SetPredicate(isNonDiffMitkImage);
+        m_Controls->m_Comp3VolumeFraction->SetZeroEntryText("--");
         m_Controls->m_Comp4VolumeFraction->SetPredicate(isNonDiffMitkImage);
+        m_Controls->m_Comp4VolumeFraction->SetZeroEntryText("--");
         m_Controls->m_MaskComboBox->SetPredicate(isBinaryMitkImage);
         m_Controls->m_MaskComboBox->SetZeroEntryText("--");
         m_Controls->m_TemplateComboBox->SetPredicate(isMitkImage);
@@ -388,7 +364,12 @@ void QmitkFiberfoxView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_FiberBundleComboBox->SetPredicate(isFiberBundle);
         m_Controls->m_FiberBundleComboBox->SetZeroEntryText("--");
 
-//        mitk::NodePredicateDimension::Pointer dimensionPredicate = mitk::NodePredicateDimension::New(3);
+         QFont font;
+         font.setFamily("Courier");
+         font.setStyleHint(QFont::Monospace);
+         font.setFixedPitch(true);
+         font.setPointSize(8);
+         m_Controls->m_SimulationStatusText->setFont(font);
 
         connect( m_SimulationTimer, SIGNAL(timeout()), this, SLOT(UpdateSimulationStatus()) );
         connect((QObject*) m_Controls->m_AbortSimulationButton, SIGNAL(clicked()), (QObject*) this, SLOT(KillThread()));
@@ -451,13 +432,14 @@ void QmitkFiberfoxView::OnFibSelected(int value)
 }
 
 template< class ScalarType >
-FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
+FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool all)
 {
     FiberfoxParameters< ScalarType > parameters;
     parameters.m_Misc.m_OutputPath = "";
     parameters.m_Misc.m_CheckAdvancedFiberOptionsBox = m_Controls->m_AdvancedOptionsBox->isChecked();
     parameters.m_Misc.m_CheckAdvancedSignalOptionsBox = m_Controls->m_AdvancedOptionsBox_2->isChecked();
     parameters.m_Misc.m_CheckOutputVolumeFractionsBox = m_Controls->m_VolumeFractionsBox->isChecked();
+    parameters.m_Misc.m_AfterSimulationMessage = "";
 
     string outputPath = m_Controls->m_SavePathEdit->text().toStdString();
     if (outputPath.compare("-")!=0)
@@ -465,6 +447,37 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_Misc.m_OutputPath = outputPath;
         parameters.m_Misc.m_OutputPath += "/";
     }
+
+
+    switch(m_Controls->m_DistributionBox->currentIndex())
+    {
+    case 0:
+        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
+        break;
+    case 1:
+        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_GAUSSIAN;
+        break;
+    default:
+        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
+    }
+    parameters.m_FiberGen.m_Variance = m_Controls->m_VarianceBox->value();
+    parameters.m_FiberGen.m_Density = m_Controls->m_FiberDensityBox->value();
+    parameters.m_FiberGen.m_Sampling = m_Controls->m_FiberSamplingBox->value();
+    parameters.m_FiberGen.m_Tension = m_Controls->m_TensionBox->value();
+    parameters.m_FiberGen.m_Continuity = m_Controls->m_ContinuityBox->value();
+    parameters.m_FiberGen.m_Bias = m_Controls->m_BiasBox->value();
+    parameters.m_FiberGen.m_Rotation[0] = m_Controls->m_XrotBox->value();
+    parameters.m_FiberGen.m_Rotation[1] = m_Controls->m_YrotBox->value();
+    parameters.m_FiberGen.m_Rotation[2] = m_Controls->m_ZrotBox->value();
+    parameters.m_FiberGen.m_Translation[0] = m_Controls->m_XtransBox->value();
+    parameters.m_FiberGen.m_Translation[1] = m_Controls->m_YtransBox->value();
+    parameters.m_FiberGen.m_Translation[2] = m_Controls->m_ZtransBox->value();
+    parameters.m_FiberGen.m_Scale[0] = m_Controls->m_XscaleBox->value();
+    parameters.m_FiberGen.m_Scale[1] = m_Controls->m_YscaleBox->value();
+    parameters.m_FiberGen.m_Scale[2] = m_Controls->m_ZscaleBox->value();
+
+    if (!all)
+        return parameters;
 
     if (m_Controls->m_MaskComboBox->GetSelectedNode().IsNotNull())
     {
@@ -476,7 +489,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_SignalGen.m_MaskImage = duplicator->GetOutput();
     }
 
-    if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData())))  // use parameters of selected DWI
+    if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( m_Controls->m_TemplateComboBox->GetSelectedNode()))  // use parameters of selected DWI
     {
         mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
 
@@ -503,6 +516,16 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_SignalGen.SetNumWeightedVolumes(m_Controls->m_NumGradientsBox->value());
         parameters.m_SignalGen.m_Bvalue = m_Controls->m_BvalueBox->value();
     }
+    else if (parameters.m_SignalGen.m_MaskImage.IsNotNull())   // use geometry of mask image
+    {
+        ItkUcharImgType::Pointer itkImg = parameters.m_SignalGen.m_MaskImage;
+        parameters.m_SignalGen.m_ImageRegion = itkImg->GetLargestPossibleRegion();
+        parameters.m_SignalGen.m_ImageSpacing = itkImg->GetSpacing();
+        parameters.m_SignalGen.m_ImageOrigin = itkImg->GetOrigin();
+        parameters.m_SignalGen.m_ImageDirection = itkImg->GetDirection();
+        parameters.m_SignalGen.SetNumWeightedVolumes(m_Controls->m_NumGradientsBox->value());
+        parameters.m_SignalGen.m_Bvalue = m_Controls->m_BvalueBox->value();
+    }
     else    // use GUI parameters
     {
         parameters.m_SignalGen.m_ImageRegion.SetSize(0, m_Controls->m_SizeX->value());
@@ -521,10 +544,14 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     }
 
     // signal relaxation
-    parameters.m_SignalGen.m_DoSimulateRelaxation = m_Controls->m_RelaxationBox->isChecked();
-    parameters.m_SignalGen.m_SimulateKspaceAcquisition = parameters.m_SignalGen.m_DoSimulateRelaxation;
-    if (parameters.m_SignalGen.m_DoSimulateRelaxation && m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull() )
+    parameters.m_SignalGen.m_DoSimulateRelaxation = false;
+    if (m_Controls->m_RelaxationBox->isChecked() && m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull() )
+    {
+        parameters.m_SignalGen.m_DoSimulateRelaxation = true;
+        parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Relaxation", BoolProperty::New(true));
         parameters.m_Misc.m_ArtifactModelString += "_RELAX";
+    }
+    parameters.m_SignalGen.m_SimulateKspaceAcquisition = parameters.m_SignalGen.m_DoSimulateRelaxation;
 
     // N/2 ghosts
     parameters.m_Misc.m_CheckAddGhostsBox = m_Controls->m_AddGhosts->isChecked();
@@ -604,13 +631,14 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_Misc.m_CheckAddEddyCurrentsBox = m_Controls->m_AddEddy->isChecked();
     if (m_Controls->m_AddEddy->isChecked())
     {
+        parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
         parameters.m_SignalGen.m_EddyStrength = m_Controls->m_EddyGradientStrength->value();
         parameters.m_Misc.m_ArtifactModelString += "_EDDY";
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Eddy-strength", DoubleProperty::New(parameters.m_SignalGen.m_EddyStrength));
     }
 
     // Motion
-    parameters.m_SignalGen.m_DoAddMotion = m_Controls->m_AddMotion->isChecked();
+    parameters.m_SignalGen.m_DoAddMotion = false;
     parameters.m_SignalGen.m_DoRandomizeMotion = m_Controls->m_RandomMotion->isChecked();
     parameters.m_SignalGen.m_Translation[0] = m_Controls->m_MaxTranslationBoxX->value();
     parameters.m_SignalGen.m_Translation[1] = m_Controls->m_MaxTranslationBoxY->value();
@@ -618,8 +646,11 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_SignalGen.m_Rotation[0] = m_Controls->m_MaxRotationBoxX->value();
     parameters.m_SignalGen.m_Rotation[1] = m_Controls->m_MaxRotationBoxY->value();
     parameters.m_SignalGen.m_Rotation[2] = m_Controls->m_MaxRotationBoxZ->value();
+    parameters.m_SignalGen.m_MotionVolumes.clear();
+    parameters.m_Misc.m_MotionVolumesBox = m_Controls->m_MotionVolumesBox->text().toStdString();
     if ( m_Controls->m_AddMotion->isChecked() && m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull() )
     {
+        parameters.m_SignalGen.m_DoAddMotion = true;
         parameters.m_Misc.m_ArtifactModelString += "_MOTION";
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Random", BoolProperty::New(parameters.m_SignalGen.m_DoRandomizeMotion));
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Translation-x", DoubleProperty::New(parameters.m_SignalGen.m_Translation[0]));
@@ -628,64 +659,109 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-x", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[0]));
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-y", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[1]));
         parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-z", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[2]));
+
+        if (parameters.m_Misc.m_MotionVolumesBox=="random")
+        {
+            for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
+                parameters.m_SignalGen.m_MotionVolumes.push_back(rand()%2);
+        }
+        else if (!parameters.m_Misc.m_MotionVolumesBox.empty())
+        {
+            for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
+                parameters.m_SignalGen.m_MotionVolumes.push_back(false);
+
+            stringstream stream(parameters.m_Misc.m_MotionVolumesBox);
+            int n;
+            while(stream >> n)
+            {
+                if (n<parameters.m_SignalGen.GetNumVolumes() && n>=0)
+                    parameters.m_SignalGen.m_MotionVolumes[n]=true;
+            }
+        }
     }
 
     // other imaging parameters
+    parameters.m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)m_Controls->m_AcquisitionTypeBox->currentIndex();
+    parameters.m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)m_Controls->m_CoilSensBox->currentIndex();
+    parameters.m_SignalGen.m_NumberOfCoils = m_Controls->m_NumCoilsBox->value();
+    parameters.m_SignalGen.m_PartialFourier = m_Controls->m_PartialFourier->value();
+    parameters.m_SignalGen.m_ReversePhase = m_Controls->m_ReversePhaseBox->isChecked();
     parameters.m_SignalGen.m_tLine = m_Controls->m_LineReadoutTimeBox->value();
     parameters.m_SignalGen.m_tInhom = m_Controls->m_T2starBox->value();
     parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
+    parameters.m_SignalGen.m_tRep = m_Controls->m_TRbox->value();
     parameters.m_SignalGen.m_DoDisablePartialVolume = m_Controls->m_EnforcePureFiberVoxelsBox->isChecked();
     parameters.m_SignalGen.m_AxonRadius = m_Controls->m_FiberRadius->value();
     parameters.m_SignalGen.m_SignalScale = m_Controls->m_SignalScaleBox->value();
-
-    // adjust echo time if needed
-    if ( parameters.m_SignalGen.m_tEcho < parameters.m_SignalGen.m_ImageRegion.GetSize(1)*parameters.m_SignalGen.m_tLine )
+    double voxelVolume = parameters.m_SignalGen.m_ImageSpacing[0]*parameters.m_SignalGen.m_ImageSpacing[1]*parameters.m_SignalGen.m_ImageSpacing[2];
+    if ( parameters.m_SignalGen.m_SignalScale*voxelVolume > itk::NumericTraits<short>::max()*0.75 )
     {
-        this->m_Controls->m_TEbox->setValue( parameters.m_SignalGen.m_ImageRegion.GetSize(1)*parameters.m_SignalGen.m_tLine );
-        parameters.m_SignalGen.m_tEcho = m_Controls->m_TEbox->value();
-        QMessageBox::information( NULL, "Warning", "Echo time is too short! Time not sufficient to read slice. Automaticall adjusted to "+QString::number(parameters.m_SignalGen.m_tEcho)+" ms");
+        parameters.m_SignalGen.m_SignalScale = itk::NumericTraits<short>::max()*0.75/voxelVolume;
+        m_Controls->m_SignalScaleBox->setValue(parameters.m_SignalGen.m_SignalScale);
+        QMessageBox::information( NULL, "Warning", "Maximum signal exceeding data type limits. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_SignalScale)+" to obtain a maximum  signal of 75% of the data type maximum. Relaxation and other effects that affect the signal intensities are not accounted for.");
     }
 
     // Noise
     parameters.m_Misc.m_CheckAddNoiseBox = m_Controls->m_AddNoise->isChecked();
+    parameters.m_SignalGen.m_NoiseVariance = 0;
     if (m_Controls->m_AddNoise->isChecked())
     {
         double noiseVariance = m_Controls->m_NoiseLevel->value();
+
+        switch (m_Controls->m_NoiseDistributionBox->currentIndex())
         {
-            switch (m_Controls->m_NoiseDistributionBox->currentIndex())
+        case 0:
+        {
+            if (noiseVariance>0)
             {
-            case 0:
+                parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
+                parameters.m_Misc.m_ArtifactModelString += "_COMPLEX-GAUSSIAN-";
+                parameters.m_SignalGen.m_NoiseVariance = m_Controls->m_NoiseLevel->value();
+                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Complex Gaussian"));
+            }
+            break;
+        }
+        case 1:
+        {
+            if (noiseVariance>0)
             {
-                parameters.m_NoiseModel = new mitk::RicianNoiseModel<ScalarType>();
+                parameters.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<ScalarType> >();
                 parameters.m_Misc.m_ArtifactModelString += "_RICIAN-";
                 parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
-                break;
+                parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
             }
-            case 1:
+            break;
+        }
+        case 2:
+        {
+            if (noiseVariance>0)
             {
-                parameters.m_NoiseModel = new mitk::ChiSquareNoiseModel<ScalarType>();
+                parameters.m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<ScalarType> >();
                 parameters.m_Misc.m_ArtifactModelString += "_CHISQUARED-";
                 parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Chi-squared"));
-                break;
+                parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
             }
-            default:
-            {
-                parameters.m_NoiseModel = new mitk::RicianNoiseModel<ScalarType>();
-                parameters.m_Misc.m_ArtifactModelString += "_RICIAN-";
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Rician"));
-            }
-            }
+            break;
         }
-        parameters.m_NoiseModel->SetNoiseVariance(noiseVariance);
-        parameters.m_Misc.m_ArtifactModelString += QString::number(noiseVariance).toStdString();
-        parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
-    }
+        default:
+        {
+            if (noiseVariance>0)
+            {
+                parameters.m_SignalGen.m_SimulateKspaceAcquisition = true;
+                parameters.m_Misc.m_ArtifactModelString += "_COMPLEX-GAUSSIAN-";
+                parameters.m_SignalGen.m_NoiseVariance = m_Controls->m_NoiseLevel->value();
+                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Distribution", StringProperty::New("Complex Gaussian"));
+            }
+            break;
+        }
+        }
 
-    // adjusting line readout time to the adapted image size needed for the DFT
-    unsigned int y = parameters.m_SignalGen.m_ImageRegion.GetSize(1);
-    y += y%2;
-    if ( y>parameters.m_SignalGen.m_ImageRegion.GetSize(1) )
-        parameters.m_SignalGen.m_tLine *= (double)parameters.m_SignalGen.m_ImageRegion.GetSize(1)/y;
+        if (noiseVariance>0)
+        {
+            parameters.m_Misc.m_ArtifactModelString += QString::number(noiseVariance).toStdString();
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Noise-Variance", DoubleProperty::New(noiseVariance));
+        }
+    }
 
     // signal models
     {
@@ -699,6 +775,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_StickWidget1->GetD());
             model->SetT2(m_Controls->m_StickWidget1->GetT2());
+            model->SetT1(m_Controls->m_StickWidget1->GetT1());
             model->m_CompartmentId = 1;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Stick";
@@ -717,6 +794,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetDiffusivity2(m_Controls->m_ZeppelinWidget1->GetD2());
             model->SetDiffusivity3(m_Controls->m_ZeppelinWidget1->GetD2());
             model->SetT2(m_Controls->m_ZeppelinWidget1->GetT2());
+            model->SetT1(m_Controls->m_ZeppelinWidget1->GetT1());
             model->m_CompartmentId = 1;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Zeppelin";
@@ -736,6 +814,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetDiffusivity2(m_Controls->m_TensorWidget1->GetD2());
             model->SetDiffusivity3(m_Controls->m_TensorWidget1->GetD3());
             model->SetT2(m_Controls->m_TensorWidget1->GetT2());
+            model->SetT1(m_Controls->m_TensorWidget1->GetT1());
             model->m_CompartmentId = 1;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Tensor";
@@ -763,6 +842,14 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             break;
         }
         }
+        if (m_Controls->m_Comp1VolumeFraction->GetSelectedNode().IsNotNull())
+        {
+            mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp1VolumeFraction->GetSelectedNode();
+            ItkDoubleImgType::Pointer comp1VolumeImage = ItkDoubleImgType::New();
+            mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
+            CastToItkImage< ItkDoubleImgType >(img, comp1VolumeImage);
+            parameters.m_FiberModelList.back()->SetVolumeFractionImage(comp1VolumeImage);
+        }
 
         // compartment 2
         switch (m_Controls->m_Compartment2Box->currentIndex())
@@ -776,6 +863,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_StickWidget2->GetD());
             model->SetT2(m_Controls->m_StickWidget2->GetT2());
+            model->SetT1(m_Controls->m_StickWidget2->GetT1());
             model->m_CompartmentId = 2;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Stick";
@@ -794,6 +882,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetDiffusivity2(m_Controls->m_ZeppelinWidget2->GetD2());
             model->SetDiffusivity3(m_Controls->m_ZeppelinWidget2->GetD2());
             model->SetT2(m_Controls->m_ZeppelinWidget2->GetT2());
+            model->SetT1(m_Controls->m_ZeppelinWidget2->GetT1());
             model->m_CompartmentId = 2;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Zeppelin";
@@ -813,6 +902,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetDiffusivity2(m_Controls->m_TensorWidget2->GetD2());
             model->SetDiffusivity3(m_Controls->m_TensorWidget2->GetD3());
             model->SetT2(m_Controls->m_TensorWidget2->GetT2());
+            model->SetT1(m_Controls->m_TensorWidget2->GetT1());
             model->m_CompartmentId = 2;
             parameters.m_FiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Tensor";
@@ -825,6 +915,14 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             break;
         }
         }
+        if (m_Controls->m_Comp2VolumeFraction->GetSelectedNode().IsNotNull() && parameters.m_FiberModelList.size()==2)
+        {
+            mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp2VolumeFraction->GetSelectedNode();
+            ItkDoubleImgType::Pointer comp1VolumeImage = ItkDoubleImgType::New();
+            mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
+            CastToItkImage< ItkDoubleImgType >(img, comp1VolumeImage);
+            parameters.m_FiberModelList.back()->SetVolumeFractionImage(comp1VolumeImage);
+        }
 
         // compartment 3
         switch (m_Controls->m_Compartment3Box->currentIndex())
@@ -836,6 +934,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_BallWidget1->GetD());
             model->SetT2(m_Controls->m_BallWidget1->GetT2());
+            model->SetT1(m_Controls->m_BallWidget1->GetT1());
             model->m_CompartmentId = 3;
             parameters.m_NonFiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Ball";
@@ -852,6 +951,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
             model->SetDiffusivity(m_Controls->m_AstrosticksWidget1->GetD());
             model->SetT2(m_Controls->m_AstrosticksWidget1->GetT2());
+            model->SetT1(m_Controls->m_AstrosticksWidget1->GetT1());
             model->SetRandomizeSticks(m_Controls->m_AstrosticksWidget1->GetRandomizeSticks());
             model->m_CompartmentId = 3;
             parameters.m_NonFiberModelList.push_back(model);
@@ -868,6 +968,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             mitk::DotModel<ScalarType>* model = new mitk::DotModel<ScalarType>();
             model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
             model->SetT2(m_Controls->m_DotWidget1->GetT2());
+            model->SetT1(m_Controls->m_DotWidget1->GetT1());
             model->m_CompartmentId = 3;
             parameters.m_NonFiberModelList.push_back(model);
             parameters.m_Misc.m_SignalModelString += "Dot";
@@ -892,176 +993,93 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
             break;
         }
         }
+        if (m_Controls->m_Comp3VolumeFraction->GetSelectedNode().IsNotNull())
+        {
+            mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp3VolumeFraction->GetSelectedNode();
+            ItkDoubleImgType::Pointer comp1VolumeImage = ItkDoubleImgType::New();
+            mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
+            CastToItkImage< ItkDoubleImgType >(img, comp1VolumeImage);
+            parameters.m_NonFiberModelList.back()->SetVolumeFractionImage(comp1VolumeImage);
+        }
 
-        // compartment 4
-        ItkDoubleImgType::Pointer comp4VolumeImage = NULL;
-        ItkDoubleImgType::Pointer comp3VolumeImage = NULL;
-        if (m_Controls->m_Compartment4Box->currentIndex()>0)
+        switch (m_Controls->m_Compartment4Box->currentIndex())
+        {
+        case 0:
+            break;
+        case 1:
+        {
+            mitk::BallModel<ScalarType>* model = new mitk::BallModel<ScalarType>();
+            model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
+            model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
+            model->SetDiffusivity(m_Controls->m_BallWidget2->GetD());
+            model->SetT2(m_Controls->m_BallWidget2->GetT2());
+            model->SetT1(m_Controls->m_BallWidget2->GetT1());
+            model->m_CompartmentId = 4;
+            parameters.m_NonFiberModelList.push_back(model);
+            parameters.m_Misc.m_SignalModelString += "Ball";
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Ball") );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_BallWidget2->GetD()) );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(model->GetT2()) );
+            break;
+        }
+        case 2:
+        {
+            mitk::AstroStickModel<ScalarType>* model = new mitk::AstroStickModel<ScalarType>();
+            model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
+            model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
+            model->SetDiffusivity(m_Controls->m_AstrosticksWidget2->GetD());
+            model->SetT2(m_Controls->m_AstrosticksWidget2->GetT2());
+            model->SetT1(m_Controls->m_AstrosticksWidget2->GetT1());
+            model->SetRandomizeSticks(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks());
+            model->m_CompartmentId = 4;
+            parameters.m_NonFiberModelList.push_back(model);
+            parameters.m_Misc.m_SignalModelString += "Astrosticks";
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Astrosticks") );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_AstrosticksWidget2->GetD()) );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(model->GetT2()) );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.RandomSticks", BoolProperty::New(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks()) );
+            break;
+        }
+        case 3:
+        {
+            mitk::DotModel<ScalarType>* model = new mitk::DotModel<ScalarType>();
+            model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
+            model->SetT2(m_Controls->m_DotWidget2->GetT2());
+            model->SetT1(m_Controls->m_DotWidget2->GetT1());
+            model->m_CompartmentId = 4;
+            parameters.m_NonFiberModelList.push_back(model);
+            parameters.m_Misc.m_SignalModelString += "Dot";
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Dot") );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(model->GetT2()) );
+            break;
+        }
+        case 4:
+        {
+            mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
+            parameters.m_SignalGen.m_DoSimulateRelaxation = false;
+            model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
+            model->SetMaxNumKernels(m_Controls->m_PrototypeWidget4->GetNumberOfSamples());
+            model->SetFaRange(m_Controls->m_PrototypeWidget4->GetMinFa(), m_Controls->m_PrototypeWidget4->GetMaxFa());
+            model->SetAdcRange(m_Controls->m_PrototypeWidget4->GetMinAdc(), m_Controls->m_PrototypeWidget4->GetMaxAdc());
+            model->m_CompartmentId = 4;
+            parameters.m_NonFiberModelList.push_back(model);
+            parameters.m_Misc.m_SignalModelString += "Prototype";
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
+            parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Prototype") );
+            break;
+        }
+        }
+        if (m_Controls->m_Comp4VolumeFraction->GetSelectedNode().IsNotNull() && parameters.m_NonFiberModelList.size()==2)
         {
             mitk::DataNode::Pointer volumeNode = m_Controls->m_Comp4VolumeFraction->GetSelectedNode();
-            if (volumeNode.IsNull())
-            {
-                QMessageBox::information( NULL, "Information", "No volume fraction image selected! Second extra-axonal compartment has been disabled for this simultation.");
-                MITK_WARN << "No volume fraction image selected! Second extra-axonal compartment has been disabled.";
-            }
-            else
-            {
-                MITK_INFO << "Rescaling volume fraction image...";
-                comp4VolumeImage = ItkDoubleImgType::New();
-                mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
-                CastToItkImage< ItkDoubleImgType >(img, comp4VolumeImage);
-
-                double max = itk::NumericTraits<double>::min();
-                double min = itk::NumericTraits<double>::max();
-
-                itk::ImageRegionIterator< ItkDoubleImgType > it(comp4VolumeImage, comp4VolumeImage->GetLargestPossibleRegion());
-                while(!it.IsAtEnd())
-                {
-                    if (parameters.m_SignalGen.m_MaskImage.IsNotNull() && parameters.m_SignalGen.m_MaskImage->GetPixel(it.GetIndex())<=0)
-                    {
-                        it.Set(0.0);
-                        ++it;
-                        continue;
-                    }
-                    if (it.Get()>900)
-                        it.Set(900);
-
-                    if (it.Get()>max)
-                        max = it.Get();
-                    if (it.Get()<min)
-                        min = it.Get();
-                    ++it;
-                }
-                itk::ShiftScaleImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer scaler = itk::ShiftScaleImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
-                scaler->SetInput(comp4VolumeImage);
-                scaler->SetShift(-min);
-                scaler->SetScale(1.0/(max-min));
-                scaler->Update();
-                comp4VolumeImage = scaler->GetOutput();
-
-//                itk::ImageFileWriter< ItkDoubleImgType >::Pointer wr = itk::ImageFileWriter< ItkDoubleImgType >::New();
-//                wr->SetInput(comp4VolumeImage);
-//                wr->SetFileName("/local/comp4.nrrd");
-//                wr->Update();
-
-                //            if (max>1 || min<0) // are volume fractions between 0 and 1?
-                //            {
-                //                itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::Pointer rescaler = itk::RescaleIntensityImageFilter<ItkDoubleImgType,ItkDoubleImgType>::New();
-                //                rescaler->SetInput(0, comp4VolumeImage);
-                //                rescaler->SetOutputMaximum(1);
-                //                rescaler->SetOutputMinimum(0);
-                //                rescaler->Update();
-                //                comp4VolumeImage = rescaler->GetOutput();
-                //            }
-
-                itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::Pointer inverter = itk::InvertIntensityImageFilter< ItkDoubleImgType, ItkDoubleImgType >::New();
-                inverter->SetMaximum(1.0);
-                inverter->SetInput(comp4VolumeImage);
-                inverter->Update();
-                comp3VolumeImage = inverter->GetOutput();
-            }
+            ItkDoubleImgType::Pointer compVolumeImage = ItkDoubleImgType::New();
+            mitk::Image* img = dynamic_cast<mitk::Image*>(volumeNode->GetData());
+            CastToItkImage< ItkDoubleImgType >(img, compVolumeImage);
+            parameters.m_NonFiberModelList.back()->SetVolumeFractionImage(compVolumeImage);
         }
-
-        if (comp4VolumeImage.IsNotNull())
-        {
-            switch (m_Controls->m_Compartment4Box->currentIndex())
-            {
-            case 0:
-                break;
-            case 1:
-            {
-                mitk::BallModel<ScalarType>* model = new mitk::BallModel<ScalarType>();
-                model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
-                model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
-                model->SetDiffusivity(m_Controls->m_BallWidget2->GetD());
-                model->SetT2(m_Controls->m_BallWidget2->GetT2());
-                model->SetVolumeFractionImage(comp4VolumeImage);
-                model->m_CompartmentId = 4;
-                parameters.m_NonFiberModelList.back()->SetVolumeFractionImage(comp3VolumeImage);
-                parameters.m_NonFiberModelList.push_back(model);
-                parameters.m_Misc.m_SignalModelString += "Ball";
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Ball") );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_BallWidget2->GetD()) );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(model->GetT2()) );
-                break;
-            }
-            case 2:
-            {
-                mitk::AstroStickModel<ScalarType>* model = new mitk::AstroStickModel<ScalarType>();
-                model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
-                model->SetBvalue(parameters.m_SignalGen.m_Bvalue);
-                model->SetDiffusivity(m_Controls->m_AstrosticksWidget2->GetD());
-                model->SetT2(m_Controls->m_AstrosticksWidget2->GetT2());
-                model->SetRandomizeSticks(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks());
-                parameters.m_NonFiberModelList.back()->SetVolumeFractionImage(comp3VolumeImage);
-                model->SetVolumeFractionImage(comp4VolumeImage);
-                model->m_CompartmentId = 4;
-                parameters.m_NonFiberModelList.push_back(model);
-                parameters.m_Misc.m_SignalModelString += "Astrosticks";
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Astrosticks") );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.D", DoubleProperty::New(m_Controls->m_AstrosticksWidget2->GetD()) );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(model->GetT2()) );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.RandomSticks", BoolProperty::New(m_Controls->m_AstrosticksWidget2->GetRandomizeSticks()) );
-                break;
-            }
-            case 3:
-            {
-                mitk::DotModel<ScalarType>* model = new mitk::DotModel<ScalarType>();
-                model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
-                model->SetT2(m_Controls->m_DotWidget2->GetT2());
-                model->SetVolumeFractionImage(comp4VolumeImage);
-                model->m_CompartmentId = 4;
-                parameters.m_NonFiberModelList.back()->SetVolumeFractionImage(comp3VolumeImage);
-                parameters.m_NonFiberModelList.push_back(model);
-                parameters.m_Misc.m_SignalModelString += "Dot";
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Dot") );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.T2", DoubleProperty::New(model->GetT2()) );
-                break;
-            }
-            case 4:
-            {
-                mitk::RawShModel<ScalarType>* model = new mitk::RawShModel<ScalarType>();
-                parameters.m_SignalGen.m_DoSimulateRelaxation = false;
-                model->SetGradientList(parameters.m_SignalGen.GetGradientDirections());
-                model->SetMaxNumKernels(m_Controls->m_PrototypeWidget4->GetNumberOfSamples());
-                model->SetFaRange(m_Controls->m_PrototypeWidget4->GetMinFa(), m_Controls->m_PrototypeWidget4->GetMaxFa());
-                model->SetAdcRange(m_Controls->m_PrototypeWidget4->GetMinAdc(), m_Controls->m_PrototypeWidget4->GetMaxAdc());
-                model->SetVolumeFractionImage(comp4VolumeImage);
-                model->m_CompartmentId = 4;
-                parameters.m_NonFiberModelList.back()->SetVolumeFractionImage(comp3VolumeImage);
-                parameters.m_NonFiberModelList.push_back(model);
-                parameters.m_Misc.m_SignalModelString += "Prototype";
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Description", StringProperty::New("Extra-axonal compartment 2") );
-                parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Compartment4.Model", StringProperty::New("Prototype") );
-                break;
-            }
-            }
-        }
-    }
-
-    parameters.m_SignalGen.m_FiberSeparationThreshold = m_Controls->m_SeparationAngleBox->value();
-    switch (m_Controls->m_DiffusionDirectionBox->currentIndex())
-    {
-    case 0:
-        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
-        break;
-    case 1:
-        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::MAIN_FIBER_DIRECTIONS;
-        break;
-    case 2:
-        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::RANDOM_DIRECTIONS;
-        parameters.m_SignalGen.m_DoAddMotion = false;
-        parameters.m_SignalGen.m_DoAddGibbsRinging = false;
-        parameters.m_SignalGen.m_KspaceLineOffset = 0.0;
-        parameters.m_SignalGen.m_FrequencyMap = NULL;
-        parameters.m_SignalGen.m_CroppingFactor = 1.0;
-        parameters.m_SignalGen.m_EddyStrength = 0;
-        break;
-    default:
-        parameters.m_SignalGen.m_DiffusionDirectionMode = SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS;
     }
 
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.SignalScale", IntProperty::New(parameters.m_SignalGen.m_SignalScale));
@@ -1079,46 +1097,12 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters()
     parameters.m_Misc.m_CheckIncludeFiducialsBox = m_Controls->m_IncludeFiducials->isChecked();
     parameters.m_Misc.m_CheckConstantRadiusBox = m_Controls->m_ConstantRadiusBox->isChecked();
 
-    switch(m_Controls->m_DistributionBox->currentIndex())
-    {
-    case 0:
-        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
-        break;
-    case 1:
-        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_GAUSSIAN;
-        break;
-    default:
-        parameters.m_FiberGen.m_Distribution = FiberGenerationParameters::DISTRIBUTE_UNIFORM;
-    }
-    parameters.m_FiberGen.m_Variance = m_Controls->m_VarianceBox->value();
-    parameters.m_FiberGen.m_Density = m_Controls->m_FiberDensityBox->value();
-    parameters.m_FiberGen.m_Sampling = m_Controls->m_FiberSamplingBox->value();
-    parameters.m_FiberGen.m_Tension = m_Controls->m_TensionBox->value();
-    parameters.m_FiberGen.m_Continuity = m_Controls->m_ContinuityBox->value();
-    parameters.m_FiberGen.m_Bias = m_Controls->m_BiasBox->value();
-    parameters.m_FiberGen.m_Rotation[0] = m_Controls->m_XrotBox->value();
-    parameters.m_FiberGen.m_Rotation[1] = m_Controls->m_YrotBox->value();
-    parameters.m_FiberGen.m_Rotation[2] = m_Controls->m_ZrotBox->value();
-    parameters.m_FiberGen.m_Translation[0] = m_Controls->m_XtransBox->value();
-    parameters.m_FiberGen.m_Translation[1] = m_Controls->m_YtransBox->value();
-    parameters.m_FiberGen.m_Translation[2] = m_Controls->m_ZtransBox->value();
-    parameters.m_FiberGen.m_Scale[0] = m_Controls->m_XscaleBox->value();
-    parameters.m_FiberGen.m_Scale[1] = m_Controls->m_YscaleBox->value();
-    parameters.m_FiberGen.m_Scale[2] = m_Controls->m_ZscaleBox->value();
-
     return parameters;
 }
 
-void QmitkFiberfoxView::SaveParameters()
+void QmitkFiberfoxView::SaveParameters(QString filename)
 {
     FiberfoxParameters<> ffParamaters = UpdateImageParameters<double>();
-
-    QString filename = QFileDialog::getSaveFileName(
-                0,
-                tr("Save Parameters"),
-                m_ParameterFile,
-                tr("Fiberfox Parameters (*.ffp)") );
-
     bool ok = true;
     bool first = true;
     bool dosampling = false;
@@ -1152,33 +1136,32 @@ void QmitkFiberfoxView::SaveParameters()
                 }
                 else if (dosampling)
                 {
-                  diffImg = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
+                    diffImg = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
 
-                  typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
-                  TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
-                  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-                  mitk::CastToItkImage(diffImg, itkVectorImagePointer);
-                  filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
-                  filter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+                    typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+                    TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
+                    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+                    mitk::CastToItkImage(diffImg, itkVectorImagePointer);
+                    filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+                    filter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
 
-                  filter->Update();
-                  tensorImage = filter->GetOutput();
+                    filter->Update();
+                    tensorImage = filter->GetOutput();
 
-                  const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
-                  QballFilterType::Pointer qballfilter = QballFilterType::New();
-                  qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
-                  qballfilter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-                  qballfilter->SetLambda(0.006);
-                  qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
-                  qballfilter->Update();
-                  itkFeatureImage = qballfilter->GetCoefficientImage();
+                    QballFilterType::Pointer qballfilter = QballFilterType::New();
+                    qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+                    qballfilter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+                    qballfilter->SetLambda(0.006);
+                    qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
+                    qballfilter->Update();
+                    itkFeatureImage = qballfilter->GetCoefficientImage();
 
-                  itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
-                  adcFilter->SetInput( itkVectorImagePointer );
-                  adcFilter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
-                  adcFilter->SetB_value( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
-                  adcFilter->Update();
-                  adcImage = adcFilter->GetOutput();
+                    itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+                    adcFilter->SetInput( itkVectorImagePointer );
+                    adcFilter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+                    adcFilter->SetB_value( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+                    adcFilter->Update();
+                    adcImage = adcFilter->GetOutput();
                 }
             }
 
@@ -1198,6 +1181,17 @@ void QmitkFiberfoxView::SaveParameters()
     m_ParameterFile = filename;
 }
 
+void QmitkFiberfoxView::SaveParameters()
+{
+    QString filename = QFileDialog::getSaveFileName(
+                0,
+                tr("Save Parameters"),
+                m_ParameterFile,
+                tr("Fiberfox Parameters (*.ffp)") );
+
+    SaveParameters(filename);
+}
+
 void QmitkFiberfoxView::LoadParameters()
 {
     QString filename = QFileDialog::getOpenFileName(0, tr("Load Parameters"), QString(itksys::SystemTools::GetFilenamePath(m_ParameterFile.toStdString()).c_str()), tr("Fiberfox Parameters (*.ffp)") );
@@ -1206,8 +1200,16 @@ void QmitkFiberfoxView::LoadParameters()
 
     m_ParameterFile = filename;
 
-    FiberfoxParameters<> parameters;
+    FiberfoxParameters<> parameters = UpdateImageParameters<double>();
     parameters.LoadParameters(filename.toStdString());
+
+    if (parameters.m_MissingTags.size()>0)
+    {
+        QString missing("Parameter file might be corrupted. The following parameters could not be read: ");
+        missing += QString(parameters.m_MissingTags.c_str());
+        missing += "\nDefault values have been assigned to the missing parameters.";
+        QMessageBox::information( NULL, "Warning!", missing);
+    }
 
     m_Controls->m_RealTimeFibers->setChecked(parameters.m_Misc.m_CheckRealTimeFibersBox);
     m_Controls->m_AdvancedOptionsBox->setChecked(parameters.m_Misc.m_CheckAdvancedFiberOptionsBox);
@@ -1247,18 +1249,27 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_FiberRadius->setValue(parameters.m_SignalGen.m_AxonRadius);
     m_Controls->m_RelaxationBox->setChecked(parameters.m_SignalGen.m_DoSimulateRelaxation);
     m_Controls->m_EnforcePureFiberVoxelsBox->setChecked(parameters.m_SignalGen.m_DoDisablePartialVolume);
+    m_Controls->m_ReversePhaseBox->setChecked(parameters.m_SignalGen.m_ReversePhase);
+    m_Controls->m_PartialFourier->setValue(parameters.m_SignalGen.m_PartialFourier);
+    m_Controls->m_TRbox->setValue(parameters.m_SignalGen.m_tRep);
+    m_Controls->m_NumCoilsBox->setValue(parameters.m_SignalGen.m_NumberOfCoils);
+    m_Controls->m_CoilSensBox->setCurrentIndex(parameters.m_SignalGen.m_CoilSensitivityProfile);
+    m_Controls->m_AcquisitionTypeBox->setCurrentIndex(parameters.m_SignalGen.m_AcquisitionType);
 
     if (parameters.m_NoiseModel!=NULL)
     {
         m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
-        if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel))
+        if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel.get()))
             m_Controls->m_NoiseDistributionBox->setCurrentIndex(0);
-        else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(parameters.m_NoiseModel))
+        else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(parameters.m_NoiseModel.get()))
             m_Controls->m_NoiseDistributionBox->setCurrentIndex(1);
         m_Controls->m_NoiseLevel->setValue(parameters.m_NoiseModel->GetNoiseVariance());
     }
     else
-        m_Controls->m_AddNoise->setChecked(false);
+    {
+        m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
+        m_Controls->m_NoiseLevel->setValue(parameters.m_SignalGen.m_NoiseVariance);
+    }
 
     m_Controls->m_VolumeFractionsBox->setChecked(parameters.m_Misc.m_CheckOutputVolumeFractionsBox);
     m_Controls->m_AdvancedOptionsBox_2->setChecked(parameters.m_Misc.m_CheckAdvancedSignalOptionsBox);
@@ -1276,14 +1287,14 @@ void QmitkFiberfoxView::LoadParameters()
     m_Controls->m_AddGibbsRinging->setChecked(parameters.m_SignalGen.m_DoAddGibbsRinging);
     m_Controls->m_AddMotion->setChecked(parameters.m_SignalGen.m_DoAddMotion);
     m_Controls->m_RandomMotion->setChecked(parameters.m_SignalGen.m_DoRandomizeMotion);
+    m_Controls->m_MotionVolumesBox->setText(QString(parameters.m_Misc.m_MotionVolumesBox.c_str()));
+
     m_Controls->m_MaxTranslationBoxX->setValue(parameters.m_SignalGen.m_Translation[0]);
     m_Controls->m_MaxTranslationBoxY->setValue(parameters.m_SignalGen.m_Translation[1]);
     m_Controls->m_MaxTranslationBoxZ->setValue(parameters.m_SignalGen.m_Translation[2]);
     m_Controls->m_MaxRotationBoxX->setValue(parameters.m_SignalGen.m_Rotation[0]);
     m_Controls->m_MaxRotationBoxY->setValue(parameters.m_SignalGen.m_Rotation[1]);
     m_Controls->m_MaxRotationBoxZ->setValue(parameters.m_SignalGen.m_Rotation[2]);
-    m_Controls->m_DiffusionDirectionBox->setCurrentIndex(parameters.m_SignalGen.m_DiffusionDirectionMode);
-    m_Controls->m_SeparationAngleBox->setValue(parameters.m_SignalGen.m_FiberSeparationThreshold);
 
     m_Controls->m_Compartment1Box->setCurrentIndex(0);
     m_Controls->m_Compartment2Box->setCurrentIndex(0);
@@ -1298,14 +1309,30 @@ void QmitkFiberfoxView::LoadParameters()
         else
             signalModel = parameters.m_NonFiberModelList.at(i-parameters.m_FiberModelList.size());
 
+        mitk::DataNode::Pointer compVolNode;
+        if ( signalModel->GetVolumeFractionImage().IsNotNull() )
+        {
+            compVolNode = mitk::DataNode::New();
+            mitk::Image::Pointer image = mitk::Image::New();
+            image->InitializeByItk(signalModel->GetVolumeFractionImage().GetPointer());
+            image->SetVolume(signalModel->GetVolumeFractionImage()->GetBufferPointer());
+
+            compVolNode->SetData( image );
+            compVolNode->SetName("Compartment volume "+QString::number(signalModel->m_CompartmentId).toStdString());
+            GetDataStorage()->Add(compVolNode);
+        }
+
         switch (signalModel->m_CompartmentId)
         {
         case 1:
         {
+            if (compVolNode.IsNotNull())
+                m_Controls->m_Comp1VolumeFraction->SetSelectedNode(compVolNode);
             if (dynamic_cast<mitk::StickModel<>*>(signalModel))
             {
                 mitk::StickModel<>* model = dynamic_cast<mitk::StickModel<>*>(signalModel);
                 m_Controls->m_StickWidget1->SetT2(model->GetT2());
+                m_Controls->m_StickWidget1->SetT1(model->GetT1());
                 m_Controls->m_StickWidget1->SetD(model->GetDiffusivity());
                 m_Controls->m_Compartment1Box->setCurrentIndex(0);
                 break;
@@ -1314,6 +1341,7 @@ void QmitkFiberfoxView::LoadParameters()
             {
                 mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
                 m_Controls->m_TensorWidget1->SetT2(model->GetT2());
+                m_Controls->m_TensorWidget1->SetT1(model->GetT1());
                 m_Controls->m_TensorWidget1->SetD1(model->GetDiffusivity1());
                 m_Controls->m_TensorWidget1->SetD2(model->GetDiffusivity2());
                 m_Controls->m_TensorWidget1->SetD3(model->GetDiffusivity3());
@@ -1335,10 +1363,13 @@ void QmitkFiberfoxView::LoadParameters()
         }
         case 2:
         {
+            if (compVolNode.IsNotNull())
+                m_Controls->m_Comp2VolumeFraction->SetSelectedNode(compVolNode);
             if (dynamic_cast<mitk::StickModel<>*>(signalModel))
             {
                 mitk::StickModel<>* model = dynamic_cast<mitk::StickModel<>*>(signalModel);
                 m_Controls->m_StickWidget2->SetT2(model->GetT2());
+                m_Controls->m_StickWidget2->SetT1(model->GetT1());
                 m_Controls->m_StickWidget2->SetD(model->GetDiffusivity());
                 m_Controls->m_Compartment2Box->setCurrentIndex(1);
                 break;
@@ -1347,6 +1378,7 @@ void QmitkFiberfoxView::LoadParameters()
             {
                 mitk::TensorModel<>* model = dynamic_cast<mitk::TensorModel<>*>(signalModel);
                 m_Controls->m_TensorWidget2->SetT2(model->GetT2());
+                m_Controls->m_TensorWidget2->SetT1(model->GetT1());
                 m_Controls->m_TensorWidget2->SetD1(model->GetDiffusivity1());
                 m_Controls->m_TensorWidget2->SetD2(model->GetDiffusivity2());
                 m_Controls->m_TensorWidget2->SetD3(model->GetDiffusivity3());
@@ -1357,10 +1389,13 @@ void QmitkFiberfoxView::LoadParameters()
         }
         case 3:
         {
+            if (compVolNode.IsNotNull())
+                m_Controls->m_Comp3VolumeFraction->SetSelectedNode(compVolNode);
             if (dynamic_cast<mitk::BallModel<>*>(signalModel))
             {
                 mitk::BallModel<>* model = dynamic_cast<mitk::BallModel<>*>(signalModel);
                 m_Controls->m_BallWidget1->SetT2(model->GetT2());
+                m_Controls->m_BallWidget1->SetT1(model->GetT1());
                 m_Controls->m_BallWidget1->SetD(model->GetDiffusivity());
                 m_Controls->m_Compartment3Box->setCurrentIndex(0);
                 break;
@@ -1369,6 +1404,7 @@ void QmitkFiberfoxView::LoadParameters()
             {
                 mitk::AstroStickModel<>* model = dynamic_cast<mitk::AstroStickModel<>*>(signalModel);
                 m_Controls->m_AstrosticksWidget1->SetT2(model->GetT2());
+                m_Controls->m_AstrosticksWidget1->SetT1(model->GetT1());
                 m_Controls->m_AstrosticksWidget1->SetD(model->GetDiffusivity());
                 m_Controls->m_AstrosticksWidget1->SetRandomizeSticks(model->GetRandomizeSticks());
                 m_Controls->m_Compartment3Box->setCurrentIndex(1);
@@ -1378,6 +1414,7 @@ void QmitkFiberfoxView::LoadParameters()
             {
                 mitk::DotModel<>* model = dynamic_cast<mitk::DotModel<>*>(signalModel);
                 m_Controls->m_DotWidget1->SetT2(model->GetT2());
+                m_Controls->m_DotWidget1->SetT1(model->GetT1());
                 m_Controls->m_Compartment3Box->setCurrentIndex(2);
                 break;
             }
@@ -1396,10 +1433,13 @@ void QmitkFiberfoxView::LoadParameters()
         }
         case 4:
         {
+            if (compVolNode.IsNotNull())
+                m_Controls->m_Comp4VolumeFraction->SetSelectedNode(compVolNode);
             if (dynamic_cast<mitk::BallModel<>*>(signalModel))
             {
                 mitk::BallModel<>* model = dynamic_cast<mitk::BallModel<>*>(signalModel);
                 m_Controls->m_BallWidget2->SetT2(model->GetT2());
+                m_Controls->m_BallWidget2->SetT1(model->GetT1());
                 m_Controls->m_BallWidget2->SetD(model->GetDiffusivity());
                 m_Controls->m_Compartment4Box->setCurrentIndex(1);
                 break;
@@ -1408,6 +1448,7 @@ void QmitkFiberfoxView::LoadParameters()
             {
                 mitk::AstroStickModel<>* model = dynamic_cast<mitk::AstroStickModel<>*>(signalModel);
                 m_Controls->m_AstrosticksWidget2->SetT2(model->GetT2());
+                m_Controls->m_AstrosticksWidget2->SetT1(model->GetT1());
                 m_Controls->m_AstrosticksWidget2->SetD(model->GetDiffusivity());
                 m_Controls->m_AstrosticksWidget2->SetRandomizeSticks(model->GetRandomizeSticks());
                 m_Controls->m_Compartment4Box->setCurrentIndex(2);
@@ -1417,6 +1458,7 @@ void QmitkFiberfoxView::LoadParameters()
             {
                 mitk::DotModel<>* model = dynamic_cast<mitk::DotModel<>*>(signalModel);
                 m_Controls->m_DotWidget2->SetT2(model->GetT2());
+                m_Controls->m_DotWidget2->SetT1(model->GetT1());
                 m_Controls->m_Compartment4Box->setCurrentIndex(3);
                 break;
             }
@@ -1434,6 +1476,32 @@ void QmitkFiberfoxView::LoadParameters()
             break;
         }
         }
+    }
+
+    if ( parameters.m_SignalGen.m_MaskImage )
+    {
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk(parameters.m_SignalGen.m_MaskImage.GetPointer());
+        image->SetVolume(parameters.m_SignalGen.m_MaskImage->GetBufferPointer());
+
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData( image );
+        node->SetName("Tissue mask");
+        GetDataStorage()->Add(node);
+        m_Controls->m_MaskComboBox->SetSelectedNode(node);
+    }
+
+    if ( parameters.m_SignalGen.m_FrequencyMap )
+    {
+        mitk::Image::Pointer image = mitk::Image::New();
+        image->InitializeByItk(parameters.m_SignalGen.m_FrequencyMap.GetPointer());
+        image->SetVolume(parameters.m_SignalGen.m_FrequencyMap->GetBufferPointer());
+
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData( image );
+        node->SetName("Frequency map");
+        GetDataStorage()->Add(node);
+        m_Controls->m_FrequencyMapBox->SetSelectedNode(node);
     }
 }
 
@@ -1484,6 +1552,7 @@ void QmitkFiberfoxView::Comp2ModelFrameVisibility(int index)
     m_Controls->m_StickWidget2->setVisible(false);
     m_Controls->m_ZeppelinWidget2->setVisible(false);
     m_Controls->m_TensorWidget2->setVisible(false);
+    m_Controls->m_Comp2FractionFrame->setVisible(false);
 
     switch (index)
     {
@@ -1491,12 +1560,15 @@ void QmitkFiberfoxView::Comp2ModelFrameVisibility(int index)
         break;
     case 1:
         m_Controls->m_StickWidget2->setVisible(true);
+        m_Controls->m_Comp2FractionFrame->setVisible(true);
         break;
     case 2:
         m_Controls->m_ZeppelinWidget2->setVisible(true);
+        m_Controls->m_Comp2FractionFrame->setVisible(true);
         break;
     case 3:
         m_Controls->m_TensorWidget2->setVisible(true);
+        m_Controls->m_Comp2FractionFrame->setVisible(true);
         break;
     }
 }
@@ -1873,10 +1945,10 @@ std::vector<itk::Vector<double,3> > QmitkFiberfoxView::MakeGradientList()
 
 void QmitkFiberfoxView::OnAddBundle()
 {
-    if (m_SelectedImage.IsNull())
+    if (m_SelectedImageNode.IsNull())
         return;
 
-    mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedImage);
+    mitk::DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(m_SelectedImageNode);
 
     mitk::FiberBundle::Pointer bundle = mitk::FiberBundle::New();
     mitk::DataNode::Pointer node = mitk::DataNode::New();
@@ -1886,7 +1958,7 @@ void QmitkFiberfoxView::OnAddBundle()
     m_SelectedBundles.push_back(node);
     UpdateGui();
 
-    GetDataStorage()->Add(node, m_SelectedImage);
+    GetDataStorage()->Add(node, m_SelectedImageNode);
 }
 
 void QmitkFiberfoxView::OnDrawROI()
@@ -1956,7 +2028,7 @@ void QmitkFiberfoxView::GenerateFibers()
             return;
     }
 
-    FiberfoxParameters<double> parameters = UpdateImageParameters<double>();
+    FiberfoxParameters<double> parameters = UpdateImageParameters<double>(false);
 
     for (unsigned int i=0; i<m_SelectedBundles.size(); i++)
     {
@@ -2038,7 +2110,7 @@ void QmitkFiberfoxView::GenerateFibers()
 
 void QmitkFiberfoxView::GenerateImage()
 {
-    if (m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNull() && m_Controls->m_TemplateComboBox->GetSelectedNode().IsNull())
+    if (m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNull() && !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( m_Controls->m_TemplateComboBox->GetSelectedNode()))
     {
         mitk::Image::Pointer image = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(
                     m_Controls->m_SizeX->value(),
@@ -2056,7 +2128,7 @@ void QmitkFiberfoxView::GenerateImage()
         mitk::LevelWindow lw; lw.SetLevelWindow(level, window);
         node->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( lw ) );
         GetDataStorage()->Add(node);
-        m_SelectedImage = node;
+        m_SelectedImageNode = node;
 
         mitk::BaseData::Pointer basedata = node->GetData();
         if (basedata.IsNotNull())
@@ -2065,45 +2137,47 @@ void QmitkFiberfoxView::GenerateImage()
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
         UpdateGui();
+        QMessageBox::information(NULL, "Template image generated", "You have selected no fiber bundle or diffusion-weighted image, which can be used to simulate a new diffusion-weighted image. A template image with the specified geometry has been generated that can be used to draw artificial fibers (see tab 'Fiber Definition').");
     }
     else if (m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull())
         SimulateImageFromFibers(m_Controls->m_FiberBundleComboBox->GetSelectedNode());
-    else if ( m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() )
+    else if ( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( m_Controls->m_TemplateComboBox->GetSelectedNode()) )
         SimulateForExistingDwi(m_Controls->m_TemplateComboBox->GetSelectedNode());
+    else
+        QMessageBox::information(NULL, "No image generated", "You have selected no fiber bundle or diffusion-weighted image, which can be used to simulate a new diffusion-weighted image.");
 }
 
 void QmitkFiberfoxView::SimulateForExistingDwi(mitk::DataNode* imageNode)
 {
-  bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(imageNode->GetData())) );
-  if ( !isDiffusionImage )
-  {
-    return;
-  }
-
-    FiberfoxParameters<short> parameters = UpdateImageParameters<short>();
-
-    if (parameters.m_NoiseModel==NULL &&
-            parameters.m_SignalGen.m_Spikes==0 &&
-            parameters.m_SignalGen.m_FrequencyMap.IsNull() &&
-            parameters.m_SignalGen.m_KspaceLineOffset<=0.000001 &&
-            !parameters.m_SignalGen.m_DoAddGibbsRinging &&
-            !(parameters.m_SignalGen.m_EddyStrength>0) &&
-            parameters.m_SignalGen.m_CroppingFactor>0.999)
+    bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(imageNode->GetData())) );
+    if ( !isDiffusionImage )
     {
-        QMessageBox::information( NULL, "Simulation cancelled", "No valid artifact enabled! Motion artifacts and relaxation effects can NOT be added to an existing diffusion weighted image.");
         return;
     }
 
-    mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(imageNode->GetData());
+    FiberfoxParameters<double> parameters = UpdateImageParameters<double>();
 
+    mitk::Image::Pointer diffImg = dynamic_cast<mitk::Image*>(imageNode->GetData());
     ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
     mitk::CastToItkImage(diffImg, itkVectorImagePointer);
 
-    m_ArtifactsToDwiFilter = itk::AddArtifactsToDwiImageFilter< short >::New();
-    m_ArtifactsToDwiFilter->SetInput(itkVectorImagePointer);
+    m_TractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
     parameters.m_Misc.m_ParentNode = imageNode;
-    m_ArtifactsToDwiFilter->SetParameters(parameters);
-    m_Worker.m_FilterType = 1;
+    parameters.m_SignalGen.m_SignalScale = 1;
+
+    parameters.m_Misc.m_ResultNode->SetName(parameters.m_Misc.m_ParentNode->GetName()
+                                            +"_D"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(0)).toStdString()
+                                            +"-"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(1)).toStdString()
+                                            +"-"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(2)).toStdString()
+                                            +"_S"+QString::number(parameters.m_SignalGen.m_ImageSpacing[0]).toStdString()
+            +"-"+QString::number(parameters.m_SignalGen.m_ImageSpacing[1]).toStdString()
+            +"-"+QString::number(parameters.m_SignalGen.m_ImageSpacing[2]).toStdString()
+            +"_b"+QString::number(parameters.m_SignalGen.m_Bvalue).toStdString()
+            +"_"+parameters.m_Misc.m_SignalModelString
+            +parameters.m_Misc.m_ArtifactModelString);
+
+    m_TractsToDwiFilter->SetParameters(parameters);
+    m_TractsToDwiFilter->SetInputImage(itkVectorImagePointer);
     m_Thread.start(QThread::LowestPriority);
 }
 
@@ -2117,6 +2191,18 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 
     m_TractsToDwiFilter = itk::TractsToDWIImageFilter< short >::New();
     parameters.m_Misc.m_ParentNode = fiberNode;
+
+    parameters.m_Misc.m_ResultNode->SetName(parameters.m_Misc.m_ParentNode->GetName()
+                                            +"_D"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(0)).toStdString()
+                                            +"-"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(1)).toStdString()
+                                            +"-"+QString::number(parameters.m_SignalGen.m_ImageRegion.GetSize(2)).toStdString()
+                                            +"_S"+QString::number(parameters.m_SignalGen.m_ImageSpacing[0]).toStdString()
+            +"-"+QString::number(parameters.m_SignalGen.m_ImageSpacing[1]).toStdString()
+            +"-"+QString::number(parameters.m_SignalGen.m_ImageSpacing[2]).toStdString()
+            +"_b"+QString::number(parameters.m_SignalGen.m_Bvalue).toStdString()
+            +"_"+parameters.m_Misc.m_SignalModelString
+            +parameters.m_Misc.m_ArtifactModelString);
+
     if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData())))
     {
         bool first = true;
@@ -2140,8 +2226,8 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
             {
                 if (first==true)
                 {
-                  ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
-                  mitk::CastToItkImage(diffImg, itkVectorImagePointer);
+                    ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+                    mitk::CastToItkImage(diffImg, itkVectorImagePointer);
 
                     typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
                     TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
@@ -2150,7 +2236,6 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
                     filter->Update();
                     tensorImage = filter->GetOutput();
 
-                    const int NumCoeffs = (shOrder*shOrder + shOrder + 2)/2 + shOrder;
                     QballFilterType::Pointer qballfilter = QballFilterType::New();
                     qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
                     qballfilter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
@@ -2186,7 +2271,6 @@ void QmitkFiberfoxView::SimulateImageFromFibers(mitk::DataNode* fiberNode)
 
     m_TractsToDwiFilter->SetParameters(parameters);
     m_TractsToDwiFilter->SetFiberBundle(fiberBundle);
-    m_Worker.m_FilterType = 0;
     m_Thread.start(QThread::LowestPriority);
 }
 
@@ -2444,12 +2528,12 @@ void QmitkFiberfoxView::UpdateGui()
         m_Controls->m_AlignOnGrid->setEnabled(true);
     }
 
-    if (m_SelectedImage.IsNotNull() || !m_SelectedBundles.empty())
+    if (m_SelectedImageNode.IsNotNull() || !m_SelectedBundles.empty())
     {
         m_Controls->m_CircleButton->setEnabled(true);
         m_Controls->m_FiberGenMessage->setVisible(false);
     }
-    if (m_SelectedImage.IsNotNull() && !m_SelectedBundles.empty())
+    if (m_SelectedImageNode.IsNotNull() && !m_SelectedBundles.empty())
         m_Controls->m_AlignOnGrid->setEnabled(true);
 
     if (!m_SelectedBundles.empty())
@@ -2486,30 +2570,30 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
     m_SelectedFiducials.clear();
     m_SelectedFiducial = NULL;
     m_SelectedBundles.clear();
-    m_SelectedImage = NULL;
+    m_SelectedImageNode = NULL;
 
     // iterate all selected objects, adjust warning visibility
     for( int i=0; i<nodes.size(); i++)
     {
         mitk::DataNode::Pointer node = nodes.at(i);
 
-//        bool isDiffusionImage(false);
-//        if ( node.IsNotNull() )
-//        {
-//          isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData()));
-//        }
+        //        bool isDiffusionImage(false);
+        //        if ( node.IsNotNull() )
+        //        {
+        //          isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData()));
+        //        }
 
-//        if ( node.IsNotNull() && isDiffusionImage )
-//        {
-//            m_SelectedDWI = node;
-//            m_SelectedImage = node;
-//            m_SelectedImages.push_back(node);
-//        }
+        //        if ( node.IsNotNull() && isDiffusionImage )
+        //        {
+        //            m_SelectedDWI = node;
+        //            m_SelectedImage = node;
+        //            m_SelectedImages.push_back(node);
+        //        }
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
             m_SelectedImages.push_back(node);
-            m_SelectedImage = node;
+            m_SelectedImageNode = node;
         }
         else if ( node.IsNotNull() && dynamic_cast<mitk::FiberBundle*>(node->GetData()) )
         {

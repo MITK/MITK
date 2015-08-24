@@ -23,11 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 #include <mitkCoreObjectFactory.h>
 
+/*!
+\brief Deterministic tensor-based streamline tractography or TEND tractography (multi tensor possible)
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input image", "input tensor image (.dti)", us::Any(), false);
+    parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input images", "input tensor images (.dti)", us::Any(), false);
     parser.addArgument("seed", "si", mitkCommandLineParser::InputFile, "Seed image", "binary seed image", us::Any(), true);
     parser.addArgument("mask", "mi", mitkCommandLineParser::InputFile, "Mask", "binary mask image", us::Any(), true);
     parser.addArgument("faImage", "fai", mitkCommandLineParser::InputFile, "FA image", "FA image", us::Any(), true);
@@ -44,7 +47,7 @@ int main(int argc, char* argv[])
 
     parser.setCategory("Fiber Tracking and Processing Methods");
     parser.setTitle("Streamline Tracking");
-    parser.setDescription("");
+    parser.setDescription("Deterministic tensor-based streamline tractography or TEND tractography (multi tensor possible)");
     parser.setContributor("MBI");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

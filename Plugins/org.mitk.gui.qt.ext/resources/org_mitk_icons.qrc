@@ -21,6 +21,8 @@
      <file>icons/awesome/scalable/status/dialog-information.svg</file>
      <file>icons/awesome/scalable/status/dialog-question.svg</file>
      <file>icons/awesome/scalable/status/dialog-warning.svg</file>
+     <file>icons/awesome/scalable/tag.svg</file>
+     <file>icons/awesome/scalable/tags.svg</file>
      <file>icons/tango/index.theme</file>
      <file>icons/tango/scalable/actions/document-open.svg</file>
      <file>icons/tango/scalable/actions/document-print.svg</file>
@@ -51,7 +53,6 @@
      <file>icons/tango/scalable/actions/media-seek-forward.svg</file>
      <file>icons/tango/scalable/actions/media-skip-backward.svg</file>
      <file>icons/tango/scalable/actions/media-skip-forward.svg</file>
-     <file>icons/tango/scalable/actions/system-log-out.svg</file>
      <file>icons/tango/scalable/categories/applications-multimedia.svg</file>
      <file>icons/tango/scalable/devices/camera-photo.svg</file>
      <file>icons/tango/scalable/devices/camera-video.svg</file>

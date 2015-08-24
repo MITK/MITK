@@ -56,6 +56,9 @@ protected:
 
   virtual std::vector<std::string> FixUpImageIOExtensions(const std::string& imageIOName);
 
+  // Fills the m_DefaultMetaDataKeys vector with default values
+  virtual void InitializeDefaultMetaDataKeys();
+
 private:
 
   ItkImageIO(const ItkImageIO& other);
@@ -63,6 +66,8 @@ private:
   ItkImageIO* IOClone() const override;
 
   itk::ImageIOBase::Pointer m_ImageIO;
+
+  std::vector< std::string > m_DefaultMetaDataKeys;
 };
 
 } // namespace mitk

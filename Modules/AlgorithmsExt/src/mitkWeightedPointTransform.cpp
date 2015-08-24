@@ -92,7 +92,7 @@ void calculateWeightMatrices( const Matrix3x3List& X,
   const vnl_matrix_fixed<double,3,3> rotation_T = rotation.GetTranspose();
 
 #pragma omp parallel for
-  for ( size_t i = 0; i < X.size(); ++i )
+  for ( int i = 0; i < static_cast<int>(X.size()); ++i )
   {
     const Matrix3x3 w = rotation * X[i] * rotation_T;
     result[i] = mitk::AnisotropicRegistrationCommon::CalculateWeightMatrix(w,Y[i]);
@@ -118,7 +118,7 @@ double ComputeWeightedFRE (  vtkPoints* X,
                            rotation );
 
 #pragma omp parallel for reduction(+:FRE)
-  for (unsigned int i = 0; i < WeightMatrices.size(); ++i)
+  for (int i = 0; i < static_cast<int>(WeightMatrices.size()); ++i)
   {
     //convert to itk data types (nessecary since itk 4 migration)
     itk::Vector<double,3> converted_MovingPoint;

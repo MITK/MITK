@@ -30,13 +30,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/*!
+\brief Extract principal fiber directions from a tractogram
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
     parser.setTitle("Fiber Direction Extraction");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription(" ");
+    parser.setDescription("Extract principal fiber directions from a tractogram");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");

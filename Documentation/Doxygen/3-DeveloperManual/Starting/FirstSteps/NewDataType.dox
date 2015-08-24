@@ -1,0 +1,52 @@
+/**
+
+\page NewDataTypePage How to create a new custom data type
+
+\tableofcontents
+
+
+\section NewDataTypePagePrerequisites Prerequisites and further reading
+
+We will use some concepts during this tutorial which we assume you are aware of, as well as taking advantage of infrastructure which needs to be set up. The following is a list of prerequisites which should be present to effectively use this tutorial.
+
+<ul>
+<li> An understanding of the general \ref DataManagementPage </li>
+<li> An understanding about the \ref ModularizationPage "modularization of MITK" </li>
+<li> We also assume you have created your own module "NewModule" ( \ref NewModulePage ) </li>
+</ul>
+
+Some concepts will only be briefly touched upon in this tutorial, for a more concise presentation of these concepts please refer to the following further reading.
+
+<ul>
+<li> A general understanding of how the \ref ReaderWriterPage concept works </li>
+<li> If you want to know more about the mitk rendering see \ref QVTKRendering </li>
+</ul>
+
+\section NewDataTypePageCreatingANewDataType Creating a new data type
+
+A new data type needs to derive from mitk::BaseData in order to be handled by the mitk::DataStorage via mitk::DataNode. An example of a very simple data type is provided in the example module. This type encapsulates a string.
+
+\include mitkExampleDataStructure.h
+
+Overloading mitk::Equal to work with your data type will enable you to write simpler, standardized tests.
+
+\section NewDataTypePageAddingReadersAndWriters Adding readers and writers
+
+In order for your data type to be read from and written to disk, you need to implement readers and writers. In order for your readers/writers to be registered and available even if your module has not been loaded (usually after just starting the application), it is advisable to implement them separately in a autoload module. The default location for this is "YourModuleName/autoload/IO".
+
+More information regarding implementing IO and MimeTypes is available at \ref ReaderWriterPage. An example MimeType is implemented for the example data structure.
+
+\include mitkExampleIOMimeTypes.h
+
+\note{ You do not need to create your own class to manage your MimeTypes. Instead they can be defined within the Reader/Writer. }
+
+\section NewDataTypePageAddingReadersAndWriters Adding a mapper
+
+If your data type needs a special way to render its data for the user, you need to implement a new mapper. More information can be found at \ref QVTKRendering.
+
+<p>
+If you meet any difficulties during this How-To, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net!
+People there are kind and will try to help you.
+If you notice that there is an error, or that the code has changed so the way shown here is no longer correct, please open a bug report a http://bugs.mitk.org .</p>
+
+*/

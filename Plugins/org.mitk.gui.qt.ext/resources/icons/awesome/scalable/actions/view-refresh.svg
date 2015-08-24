@@ -14,8 +14,8 @@
    height="64px"
    id="svg3027"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="view-list-details.svg">
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="view-refresh.svg">
   <defs
      id="defs3029">
     <radialGradient
@@ -703,7 +703,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.5"
-     inkscape:cx="31.818182"
+     inkscape:cx="4.6363638"
      inkscape:cy="32"
      inkscape:current-layer="layer1-0"
      showgrid="true"
@@ -722,7 +722,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -734,18 +734,14 @@
        id="layer1-0"
        inkscape:label="Layer 1"
        transform="translate(13.421616,-0.07400805)">
-      <text
-         xml:space="preserve"
-         style="font-size:72.24242401px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-         x="-12.512526"
-         y="58.134613"
-         id="text4359"
-         sodipodi:linespacing="125%"><tspan
-           sodipodi:role="line"
-           id="tspan4361"
-           x="-12.512526"
-           y="58.134613"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"></tspan></text>
+      <g
+         style="font-style:normal;font-weight:normal;font-size:72.24242401px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="text4359">
+        <path
+           d="m 48.401706,38.783964 c 0,-0.685336 -0.564394,-1.290044 -1.290043,-1.290044 l -7.74026,0 c -0.604708,0 -1.007846,0.362825 -1.209416,0.927219 -0.685335,1.612554 -1.169101,3.144481 -2.136634,4.716721 -3.749188,6.127705 -10.400974,9.83658 -17.57684,9.83658 -5.200487,0 -10.2397183,-2.015693 -14.0292204,-5.563312 L 9.9422904,41.88813 c 0.4837666,-0.483766 0.7659636,-1.128787 0.7659636,-1.814123 0,-1.410985 -1.1691021,-2.580087 -2.580087,-2.580087 l -18.060606,0 c -1.410985,0 -2.580087,1.169102 -2.580087,2.580087 l 0,18.060606 c 0,1.410985 1.169102,2.580087 2.580087,2.580087 0.6853355,0 1.3303572,-0.282197 1.8141234,-0.765964 l 5.200487,-5.200487 c 5.7245671,5.442371 13.3438856,8.546537 21.2050866,8.546537 14.875812,0 26.647457,-9.957521 30.074134,-24.228625 0.04031,-0.08063 0.04031,-0.20157 0.04031,-0.282197 z M 49.409552,6.5328816 c 0,-1.4109848 -1.169102,-2.5800866 -2.580086,-2.5800866 -0.685336,0 -1.330358,0.282197 -1.814124,0.7659632 l -5.240801,5.200487 C 34.049974,4.517189 26.350028,1.3727085 18.448513,1.3727085 c -14.8758113,0 -26.7683979,9.9172075 -30.235389,24.2286255 0,0.08063 0,0.201569 0,0.282197 0,0.685335 0.564394,1.290043 1.290043,1.290043 l 8.0224568,0 c 0.6047078,0 1.0078463,-0.362824 1.2094155,-0.927218 0.68533554,-1.612555 1.16910177,-3.144481 2.13663423,-4.716721 3.74918827,-6.127706 10.40097447,-9.83658 17.57683947,-9.83658 5.200487,0 10.239719,1.975379 14.069535,5.522998 l -5.563312,5.563311 c -0.483766,0.483766 -0.765963,1.128788 -0.765963,1.814124 0,1.410984 1.169102,2.580086 2.580087,2.580086 l 18.060606,0 c 1.410984,0 2.580086,-1.169102 2.580086,-2.580086 l 0,-18.0606064 z"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"
+           id="path12477" />
+      </g>
     </g>
   </g>
 </svg>

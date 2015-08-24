@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageReadAccessor.h>
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
+#include <mitkLocaleSwitch.h>
+#include <mitkCoreServices.h>
+#include <mitkIPropertyPersistence.h>
 
 #include <itkImage.h>
 #include <itkImageIOFactory.h>
@@ -28,8 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageIORegion.h>
 #include <itkMetaDataObject.h>
 
-#include <mitkLocaleSwitch.h>
-
+#include <algorithm>
 
 namespace mitk {
 
@@ -37,6 +39,7 @@ ItkImageIO::ItkImageIO(const ItkImageIO& other)
   : AbstractFileIO(other)
   , m_ImageIO(dynamic_cast<itk::ImageIOBase*>(other.m_ImageIO->Clone().GetPointer()))
 {
+  this->InitializeDefaultMetaDataKeys();
 }
 
 std::vector<std::string> ItkImageIO::FixUpImageIOExtensions(const std::string& imageIOName)
@@ -101,6 +104,7 @@ ItkImageIO::ItkImageIO(itk::ImageIOBase::Pointer imageIO)
   }
 
   this->AbstractFileReader::SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".image.");
+  this->InitializeDefaultMetaDataKeys();
 
   std::vector<std::string> readExtensions = m_ImageIO->GetSupportedReadExtensions();
 
@@ -167,6 +171,7 @@ ItkImageIO::ItkImageIO(const CustomMimeType& mimeType, itk::ImageIOBase::Pointer
   }
 
   this->AbstractFileReader::SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".image.");
+  this->InitializeDefaultMetaDataKeys();
 
   if (rank)
   {
@@ -304,11 +309,37 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End();
        iter != iterEnd; ++iter)
   {
-    std::string key = std::string("meta.") + iter->first;
     if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
     {
+      std::string key = iter->first;
       std::string value = dynamic_cast<itk::MetaDataObject<std::string>*>(iter->second.GetPointer())->GetMetaDataObjectValue();
+
+      std::replace(key.begin(), key.end(), '_', '.');
+
       image->SetProperty(key.c_str(), mitk::StringProperty::New(value));
+
+      // Read properties should be persisted unless they are default properties
+      // which are written anyway
+      bool isDefaultKey( false );
+
+      for( const auto &defaultKey : m_DefaultMetaDataKeys )
+      {
+        if( defaultKey.length() <= key.length() )
+        {
+          // does the start match the default key
+          if( key.substr(0,defaultKey.length()).find( defaultKey ) != std::string::npos )
+          {
+            isDefaultKey = true;
+          }
+        }
+      }
+
+      if( isDefaultKey == true )
+      {
+        continue;
+      }
+
+      mitk::CoreServices::GetPropertyPersistence()->AddInfo(key, mitk::PropertyPersistenceInfo::New(iter->first));
     }
   }
 
@@ -445,6 +476,27 @@ void ItkImageIO::Write()
     m_ImageIO->SetIORegion(ioRegion);
     m_ImageIO->SetFileName(path);
 
+    // Handle properties
+    mitk::PropertyList::Pointer imagePropertyList = image->GetPropertyList();
+
+    for(const auto &property : *imagePropertyList->GetMap())
+    {
+      if( !mitk::CoreServices::GetPropertyPersistence()->HasInfo(property.first) )
+      {
+        continue;
+      }
+
+      std::string value = property.second->GetValueAsString();
+
+      if( value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING )
+      {
+        continue;
+      }
+
+      std::string key = mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first)->GetKey();
+
+      itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
+    }
     // ***** Remove const_cast after bug 17952 is fixed ****
     ImageReadAccessor imageAccess(const_cast<mitk::Image*>(image));
     m_ImageIO->Write(imageAccess.GetData());
@@ -487,6 +539,12 @@ AbstractFileIO::ConfidenceLevel ItkImageIO::GetWriterConfidenceLevel() const
 ItkImageIO* ItkImageIO::IOClone() const
 {
   return new ItkImageIO(*this);
+}
+
+void ItkImageIO::InitializeDefaultMetaDataKeys()
+{
+  this->m_DefaultMetaDataKeys.push_back("NRRD.space");
+  this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
 }
 
 }

@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag 4d12a3b8)
+    set(revision_tag 5bc07082)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -45,8 +45,12 @@ if(MITK_USE_CTK)
     if(MITK_USE_DCMTK)
       list(APPEND ctk_optional_cache_args
            -DDCMTK_DIR:PATH=${DCMTK_DIR}
-           -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
           )
+      if(NOT MITK_USE_Python)
+        list(APPEND ctk_optional_cache_args
+            -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
+            )
+      endif()
       list(APPEND proj_DEPENDENCIES DCMTK)
     else()
       list(APPEND ctk_optional_cache_args
@@ -75,9 +79,9 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 135910e407bd1f5de29d2a0a9efe5f80
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
+      URL_MD5 34b94d196546fa3b2e610a37da1a163d
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -100,7 +104,7 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
-        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_5f3a03b1.tar.gz
+        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_4293694a.tar.gz
         # See bug 19073
         -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_36ab9c7c.tar.gz
       CMAKE_CACHE_ARGS

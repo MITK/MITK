@@ -22,7 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdlib.h>
 
 mitk::CompressedImageContainer::CompressedImageContainer()
-    : m_PixelType(nullptr)
+  : m_PixelType(nullptr),
+    m_ImageGeometry (nullptr)
 {
 }
 
@@ -34,6 +35,8 @@ mitk::CompressedImageContainer::~CompressedImageContainer()
   {
     free( iter->first );
   }
+
+  delete m_PixelType;
 }
 
 void mitk::CompressedImageContainer::SetImage( Image* image )

@@ -43,8 +43,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 MITK_TOOL_GUI_MACRO( , QmitkAdaptiveRegionGrowingToolGUI, "")
 
-QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent) :
-QmitkToolGUI(), m_MultiWidget(NULL), m_UseVolumeRendering(false), m_UpdateSuggestedThreshold(true), m_SuggestedThValue(0.0), m_DataStorage(NULL)
+QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent)
+  : QmitkToolGUI(),
+    m_MultiWidget(nullptr),
+    m_DataStorage(nullptr),
+    m_UseVolumeRendering(false),
+    m_UpdateSuggestedThreshold(true),
+    m_SuggestedThValue(0.0)
 {
   this->setParent(parent);
 
@@ -223,7 +228,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
             {
                 int component = 0;
                 m_InputImageNode->GetIntProperty("Image.Displayed Component", component);
-              pixelValues[pos] = image->GetPixelValueByIndex(currentIndex, 0, component);
+              mitkPixelTypeMultiplex4(mitk::FastSinglePixelAccess,image->GetChannelDescriptor().GetPixelType(),image,NULL,currentIndex,pixelValues[pos]);
+
               pos++;
             }
             else
@@ -653,7 +659,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ITKThresholding(itk::Image<TPixel, VImag
   if (originalSegmentation)
   {
     typedef itk::Image<TPixel, VImageDimension> InputImageType;
-    typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
+    typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
 
 
     //select single 3D volume if we have more than one time step

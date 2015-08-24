@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.classificationsegmentation"
+          name="Classification Segmentation"
+          class="ClassificationSegmentation"
+          icon="resources/icon_32.png" />
+  </extension>
+
+</plugin>

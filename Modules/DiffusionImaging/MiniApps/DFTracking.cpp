@@ -18,23 +18,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <metaCommand.h>
-#include "mitkCommandLineParser.h"
+#include <mitkCommandLineParser.h>
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
-//#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <fstream>
 #include <itksys/SystemTools.hxx>
 #include <mitkCoreObjectFactory.h>
 
 #include <mitkFiberBundle.h>
-#include <itkDwiNormilzationFilter.h>
-//#include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 #include <itkMLBSTrackingFilter.h>
-#include <vtkCell.h>
-#include <itkOrientationDistributionFunction.h>
-#include <itkMersenneTwisterRandomVariateGenerator.h>
+#include <mitkTrackingForestHandler.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -42,32 +37,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 const int numOdfSamples = 200;
 typedef itk::Image< itk::Vector< float, numOdfSamples > , 3 > SampledShImageType;
 
+/*!
+\brief Perform machine learning based streamline tractography
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
     parser.setTitle("Machine Learning Based Streamline Tractography");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("");
+    parser.setDescription("Perform machine learning based streamline tractography");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("image", "i", mitkCommandLineParser::String, "DWIs:", "input diffusion-weighted image", us::Any(), false);
-    parser.addArgument("forest", "f", mitkCommandLineParser::String, "Forest:", "input forest", us::Any(), false);
+    parser.addArgument("image", "i", mitkCommandLineParser::String, "DWI:", "input diffusion-weighted image", us::Any(), false);
+    parser.addArgument("forest", "f", mitkCommandLineParser::String, "Forest:", "input random forest (HDF5 file)", us::Any(), false);
     parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle", us::Any(), false);
 
-    parser.addArgument("stop", "st", mitkCommandLineParser::String, "Stop image:", "stop image", us::Any());
-    parser.addArgument("mask", "m", mitkCommandLineParser::String, "Mask image:", "mask image", us::Any());
-    parser.addArgument("seed", "s", mitkCommandLineParser::String, "Seed image:", "seed image", us::Any());
+    parser.addArgument("stop", "st", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
+    parser.addArgument("mask", "m", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
+    parser.addArgument("seed", "s", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
 
-    parser.addArgument("athres", "a", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold (in radians)", us::Any());
-    parser.addArgument("stepsize", "se", mitkCommandLineParser::Float, "Stepsize:", "stepsize", us::Any());
-    parser.addArgument("samples", "ns", mitkCommandLineParser::Int, "Samples:", "samples", us::Any());
-    parser.addArgument("samplingdist", "sd", mitkCommandLineParser::Float, "Sampling distance:", "sampling distance (in voxels)", us::Any());
-    parser.addArgument("seeds", "nse", mitkCommandLineParser::Int, "Seeds per voxel:", "seeds per voxel", us::Any());
-
-    parser.addArgument("usedirection", "ud", mitkCommandLineParser::Bool, "Use previous direction:", "use previous direction as feature", us::Any());
-    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output additional images", us::Any());
+    parser.addArgument("stepsize", "se", mitkCommandLineParser::Float, "Stepsize:", "stepsize (in voxels)", us::Any());
+    parser.addArgument("samples", "ns", mitkCommandLineParser::Int, "Samples:", "number of neighborhood samples", us::Any());
+    parser.addArgument("samplingdist", "sd", mitkCommandLineParser::Float, "Sampling distance:", "distance of neighborhood sampling points (in voxels)", us::Any());
+    parser.addArgument("seeds", "nse", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", us::Any());
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -93,23 +87,11 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("stepsize"))
         stepsize = us::any_cast<float>(parsedArgs["stepsize"]);
 
-    float athres = 0.7;
-    if (parsedArgs.count("athres"))
-        athres = us::any_cast<float>(parsedArgs["athres"]);
-
     float samplingdist = 0.25;
     if (parsedArgs.count("samplingdist"))
         samplingdist = us::any_cast<float>(parsedArgs["samplingdist"]);
 
-    bool useDirection = false;
-    if (parsedArgs.count("usedirection"))
-        useDirection = true;
-
-    bool verbose = false;
-    if (parsedArgs.count("verbose"))
-        verbose = true;
-
-    int samples = 10;
+    int samples = 30;
     if (parsedArgs.count("samples"))
         samples = us::any_cast<int>(parsedArgs["samples"]);
 
@@ -149,23 +131,19 @@ int main(int argc, char* argv[])
         mitk::CastToItkImage(img, stop);
     }
 
-    MITK_INFO << "loading forest";
-    vigra::RandomForest<int> rf;
-    vigra::rf_import_HDF5(rf, forestFile);
+    mitk::TrackingForestHandler<> tfh;
+    tfh.LoadForest(forestFile);
+    tfh.AddRawData(dwi);
 
-    typedef itk::MLBSTrackingFilter<100> TrackerType;
+    typedef itk::MLBSTrackingFilter<> TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();
     tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
-    tracker->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) );
-    tracker->SetB_Value( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) );
     tracker->SetMaskImage(mask);
     tracker->SetSeedImage(seed);
     tracker->SetStoppingRegions(stop);
     tracker->SetSeedsPerVoxel(seeds);
-    tracker->SetUseDirection(useDirection);
     tracker->SetStepSize(stepsize);
-    tracker->SetAngularThreshold(athres);
-    tracker->SetDecisionForest(&rf);
+    tracker->SetForestHandler(tfh);
     tracker->SetSamplingDistance(samplingdist);
     tracker->SetNumberOfSamples(samples);
     //tracker->SetAvoidStop(false);
@@ -175,25 +153,7 @@ int main(int argc, char* argv[])
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
     mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
 
-    mitk::IOUtil::SaveBaseData(outFib, outFile);
-
-    if (verbose)
-    {
-        MITK_INFO << "Writing images...";
-        string outName = itksys::SystemTools::GetFilenamePath(outFile)+"/"+itksys::SystemTools::GetFilenameWithoutLastExtension(outFile);
-        itk::ImageFileWriter< TrackerType::ItkDoubleImgType >::Pointer writer = itk::ImageFileWriter< TrackerType::ItkDoubleImgType >::New();
-        writer->SetFileName(outName+"_WhiteMatter.nrrd");
-        writer->SetInput(tracker->GetWmImage());
-        writer->Update();
-
-        writer->SetFileName(outName+"_NotWhiteMatter.nrrd");
-        writer->SetInput(tracker->GetNotWmImage());
-        writer->Update();
-
-        writer->SetFileName(outName+"_AvoidStop.nrrd");
-        writer->SetInput(tracker->GetAvoidStopImage());
-        writer->Update();
-    }
+    mitk::IOUtil::Save(outFib, outFile);
 
     return EXIT_SUCCESS;
 }

@@ -13,8 +13,8 @@
    height="64px"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="go-next.svg">
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="go-previous.svg">
   <defs
      id="defs2987" />
   <sodipodi:namedview
@@ -25,7 +25,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.5"
-     inkscape:cx="32"
+     inkscape:cx="4.8181818"
      inkscape:cy="32"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,18 +52,14 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
-    <text
-       xml:space="preserve"
-       style="font-size:70.07095337px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="-57.860123"
-       y="59.534283"
-       id="text2993"
-       sodipodi:linespacing="125%"
-       transform="scale(-1,1)"><tspan
-         sodipodi:role="line"
-         id="tspan2995"
-         x="-57.860123"
-         y="59.534283"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"></tspan></text>
+    <g
+       transform="scale(-1,1)"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.07095337px;line-height:125%;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="text2993">
+      <path
+         d="m -14.574104,33.766002 c 0.977552,-0.977552 0.977552,-2.541636 0,-3.519188 L -43.587858,1.2330598 c -0.977553,-0.9775524 -2.541636,-0.9775524 -3.519189,0 l -6.490947,6.4909477 c -0.977553,0.9775523 -0.977553,2.5416365 0,3.5191885 l 20.763212,20.763212 -20.763212,20.763212 c -0.977553,0.977553 -0.977553,2.541636 0,3.519189 l 6.490947,6.490948 c 0.977553,0.977552 2.541636,0.977552 3.519189,0 l 29.013754,-29.013755 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"
+         id="path9634" />
+    </g>
   </g>
 </svg>

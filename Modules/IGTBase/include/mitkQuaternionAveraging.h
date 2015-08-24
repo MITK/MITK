@@ -45,7 +45,7 @@ namespace mitk {
       Slerp       //more advanced algorithm for averaging (spherical linear interpolation), may also be used for huge differences
       };
 
-      static mitk::Quaternion CalcAverage(const std::vector<mitk::Quaternion>  quaternions, Mode mode = SimpleMean);
+      static mitk::Quaternion CalcAverage(const std::vector<Quaternion>& quaternions, Mode mode = SimpleMean);
 
     protected:
       QuaternionAveraging();

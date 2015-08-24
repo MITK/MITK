@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 #include <itkVectorImage.h>
-#include <itkVectorImageToImageAdaptor.h>
 
 
 namespace mitk
@@ -46,11 +45,6 @@ public:
   itkNewMacro(Self)
 
   typedef mitk::Label::PixelType PixelType;
-
-  typedef itk::Image< PixelType, 3 >                     LabelSetImageType;
-  typedef itk::VariableLengthVector< PixelType >         VariableVectorType;
-  typedef itk::VectorImage< PixelType, 3 >               VectorImageType;
-  typedef itk::VectorImageToImageAdaptor< PixelType, 3 > ImageAdaptorType;
 
   /**
   * \brief BeforeChangeLayerEvent (e.g. used for GUI integration)
@@ -191,9 +185,12 @@ public:
    */
   unsigned int GetTotalNumberOfLabels() const;
 
-  /**
-    * \brief  */
-  void SurfaceStamp(mitk::Surface* surface, bool forceOverwrite);
+  // This function will need to be ported to an external class
+  // it requires knowledge of pixeltype and dimension and includes
+  // too much algorithm to be sensibly part of a data class
+  ///**
+  //  * \brief  */
+  //void SurfaceStamp(mitk::Surface* surface, bool forceOverwrite);
 
   /**
     * \brief  */
@@ -221,19 +218,33 @@ public:
   unsigned int GetNumberOfLayers() const;
 
   /**
-    * \brief  */
-  VectorImageType::Pointer GetVectorImage(bool forceUpdate) const;
-
-  /**
-    * \brief  */
-  void SetVectorImage(VectorImageType::Pointer image );
-
-  /**
    * @brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one
    * @param layer a mitk::LabelSet which will be set as new layer.
    * @return the layer ID of the new layer
    */
   unsigned int AddLayer(mitk::LabelSet::Pointer layer =nullptr);
+
+  /**
+  * \brief Add a layer based on a provided mitk::Image
+  * \param layerImage is added to the vector of label images
+  * \param lset a label set that will be added to the new layer if provided
+  *\return the layer ID of the new layer
+  */
+  unsigned int AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer lset = nullptr);
+
+  /**
+  * \brief Add a LabelSet to an existing layer
+  *
+  * This will replace an existing labelSet if one exists. Throws an exceptions if you are trying
+  * to add a labelSet to a non-existing layer.
+  *
+  * If there are no labelSets for layers with an id less than layerIdx default ones will be added
+  * for them.
+  *
+  * \param layerIdx The index of the layer the LabelSet should be added to
+  * \param labelSet The LabelSet that should be added
+  */
+  void AddLabelSetToLayer(const unsigned int layerIdx, const mitk::LabelSet::Pointer labelSet);
 
   /**
    * @brief Removes the active layer and the respective mitk::LabelSet and image information.

@@ -45,7 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //Interactors
 #include <mitkPointSetDataInteractor.h>
 
-//Propertylist Test
+//Property list Test
+#include <mitkImageGenerator.h>
 
 
 
@@ -91,6 +92,9 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   baseData = mitk::Surface::New();
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a Surface object was set correctly" )
+
+  dataNode->SetData(nullptr);
+  MITK_TEST_CONDITION( nullptr == dataNode->GetData(), "Testing if base data (already set) was replaced by a NULL pointer" )
 }
 static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
 {
@@ -240,6 +244,39 @@ static void TestGetMTime(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( lastModified <= dataNode->GetMTime(), "Testing if the node timestamp is updated after property list was modified" )
 
 }
+static void TestSetDataUnderPropertyChange(void)
+{
+  mitk::Image::Pointer image = mitk::Image::New();
+  mitk::Image::Pointer additionalImage = mitk::Image::New();
+
+  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+
+  image = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(3u, 3u);
+
+  dataNode->SetData(image);
+
+  const float defaultOutlineWidth = 1.0;
+  float outlineWidth = 0;
+  dataNode->GetPropertyValue("outline width", outlineWidth);
+
+  MITK_TEST_CONDITION(mitk::Equal(outlineWidth, defaultOutlineWidth), "Testing if the SetData set the default property list")
+
+  dataNode->SetProperty("outline width", mitk::FloatProperty::New(42.0));
+  dataNode->SetData(image);
+  dataNode->GetPropertyValue("outline width", outlineWidth);
+
+  MITK_TEST_CONDITION(mitk::Equal(outlineWidth, 42.0), "Testing if the SetData does not set anything if image data is identical")
+
+  dataNode->SetData(additionalImage);
+  dataNode->GetPropertyValue("outline width", outlineWidth);
+
+  MITK_TEST_CONDITION(mitk::Equal(outlineWidth, 42.0), "Testing if the SetData does not set the default property list if image data is already set")
+
+  mitk::Surface::Pointer surface = mitk::Surface::New();
+  dataNode->SetData(surface);
+
+  MITK_TEST_CONDITION(dataNode->GetPropertyValue("outline width", outlineWidth) == false, "Testing if SetData cleared previous property list and set the default property list if data of different type has been set")
+}
 }; //mitkDataNodeTestClass
 int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
 {
@@ -266,6 +303,7 @@ int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
   mitkDataNodeTestClass::TestPropertyList(myDataNode);
   mitkDataNodeTestClass::TestSelected(myDataNode);
   mitkDataNodeTestClass::TestGetMTime(myDataNode);
+  mitkDataNodeTestClass::TestSetDataUnderPropertyChange();
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!

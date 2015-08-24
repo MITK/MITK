@@ -74,7 +74,12 @@ private:
 
   static HelpPluginActivator* instance;
 
+  // bug-19229 no support for QScopedPointerDeleteLater in Qt4
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+  QScopedPointer<QHelpEngineWrapper, QScopedPointerDeleteLater > helpEngine;
+#else
   QScopedPointer<QHelpEngineWrapper> helpEngine;
+#endif
   QScopedPointer<QHelpEngineConfiguration> helpEngineConfiguration;
   QScopedPointer<HelpContextHandler> helpContextHandler;
 

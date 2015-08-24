@@ -107,6 +107,12 @@ public:
   /**
    * \brief Set the data object (instance of BaseData, e.g., an Image)
    * managed by this DataNode
+   *
+   * Prior set properties are kept if previous data of the node already exists and has the same
+   * type as the new data to be set. Otherwise, the default properties are used.
+   * In case that previous data already exists, the property list of the data node is cleared
+   * before setting new default properties.
+   *
    * \warning the actor-mode of the vtkInteractor does not work any more, if the transform of the
    * data-tree-node is connected to the transform of the basedata via vtkTransform->SetInput.
    */

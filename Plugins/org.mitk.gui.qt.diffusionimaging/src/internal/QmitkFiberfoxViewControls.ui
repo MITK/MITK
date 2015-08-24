@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>479</width>
-    <height>2397</height>
+    <width>524</width>
+    <height>2652</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -171,6 +171,9 @@
                <property name="toolTip">
                 <string>Rotation angle (in degree) around x-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
                </property>
@@ -205,6 +208,9 @@
               <widget class="QDoubleSpinBox" name="m_YrotBox">
                <property name="toolTip">
                 <string>Rotation angle (in degree) around y-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
@@ -241,6 +247,9 @@
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the z-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>
                </property>
@@ -256,6 +265,9 @@
               <widget class="QDoubleSpinBox" name="m_YtransBox">
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the y-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>
@@ -330,6 +342,9 @@
                <property name="toolTip">
                 <string>Rotation angle (in degree) around z-axis.</string>
                </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
                <property name="minimum">
                 <double>-360.000000000000000</double>
                </property>
@@ -345,6 +360,9 @@
               <widget class="QDoubleSpinBox" name="m_XtransBox">
                <property name="toolTip">
                 <string>Translation (in mm) in direction of the x-axis.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
                </property>
                <property name="minimum">
                 <double>-1000.000000000000000</double>
@@ -1023,7 +1041,7 @@
           <string>Extra-axonal Compartments</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_14">
-          <item row="17" column="0">
+          <item row="18" column="0">
            <widget class="QFrame" name="m_Comp4FractionFrame">
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
@@ -1031,7 +1049,7 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QGridLayout" name="gridLayout_18">
+            <layout class="QGridLayout" name="gridLayout_30">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -1045,14 +1063,14 @@
               <number>0</number>
              </property>
              <item row="0" column="0">
-              <widget class="QLabel" name="m_NoiseLabel_3">
+              <widget class="QLabel" name="m_NoiseLabel_9">
                <property name="text">
                 <string>Volume Fraction:</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QmitkDataStorageComboBox" name="m_Comp4VolumeFraction">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp4VolumeFraction">
                <property name="toolTip">
                 <string/>
                </property>
@@ -1094,29 +1112,67 @@
           <item row="10" column="0">
            <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget3" native="true"/>
           </item>
-          <item row="15" column="0">
+          <item row="16" column="0">
            <widget class="QmitkDotModelParametersWidget" name="m_DotWidget2" native="true"/>
           </item>
           <item row="9" column="0">
            <widget class="QmitkDotModelParametersWidget" name="m_DotWidget1" native="true"/>
           </item>
-          <item row="11" column="0">
+          <item row="12" column="0">
            <widget class="Line" name="line_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
-          <item row="13" column="0">
+          <item row="11" column="0">
+           <widget class="QFrame" name="m_Comp3FractionFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_29">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_8">
+               <property name="text">
+                <string>Volume Fraction:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp3VolumeFraction">
+               <property name="toolTip">
+                <string>Optional! If no volume fraction map for this compartment is set, the corresponding volume fractions are calculated from the input fibers.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="14" column="0">
            <widget class="QmitkBallModelParametersWidget" name="m_BallWidget2" native="true"/>
           </item>
           <item row="7" column="0">
            <widget class="QmitkBallModelParametersWidget" name="m_BallWidget1" native="true"/>
           </item>
-          <item row="14" column="0">
+          <item row="15" column="0">
            <widget class="QmitkAstrosticksModelParametersWidget" name="m_AstrosticksWidget2" native="true"/>
           </item>
-          <item row="12" column="0">
+          <item row="13" column="0">
            <widget class="QComboBox" name="m_Compartment4Box">
             <property name="toolTip">
              <string>Select signal model for extra-axonal compartment.</string>
@@ -1148,7 +1204,7 @@
             </item>
            </widget>
           </item>
-          <item row="16" column="0">
+          <item row="17" column="0">
            <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget4" native="true"/>
           </item>
          </layout>
@@ -1315,26 +1371,7 @@
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
-             <item row="0" column="1">
-              <widget class="QSpinBox" name="m_SignalScaleBox">
-               <property name="toolTip">
-                <string>TE in milliseconds</string>
-               </property>
-               <property name="minimum">
-                <number>1</number>
-               </property>
-               <property name="maximum">
-                <number>10000</number>
-               </property>
-               <property name="singleStep">
-                <number>1</number>
-               </property>
-               <property name="value">
-                <number>100</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="m_TensorsToDWIBValueLabel_13">
                <property name="toolTip">
                 <string/>
@@ -1346,17 +1383,72 @@
                 <string/>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Echo Time &lt;span style=&quot; font-style:italic;&quot;&gt;TE&lt;/span&gt;:  &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of Channels:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="6" column="1">
+              <widget class="QSpinBox" name="m_TRbox">
+               <property name="toolTip">
+                <string>TR in milliseconds</string>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>999999999</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
+               </property>
+               <property name="value">
+                <number>4000</number>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QCheckBox" name="m_ReversePhaseBox">
+               <property name="toolTip">
+                <string>Output one image per compartment containing the corresponding volume fractions per voxel.</string>
+               </property>
+               <property name="text">
+                <string>Reverse Phase Encoding Direction</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_5">
+               <property name="text">
+                <string>Signal Scale:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="1">
+              <widget class="QSpinBox" name="m_FiberRadius">
+               <property name="toolTip">
+                <string>Fiber radius used to calculate volume fractions (in µm). Set to 0 for automatic radius estimation.</string>
+               </property>
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>1000</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
               <widget class="QDoubleSpinBox" name="m_LineReadoutTimeBox">
                <property name="toolTip">
-                <string>T2* relaxation time (in milliseconds).</string>
+                <string>Dwell time (time to read one line in k-space) in ms.</string>
                </property>
                <property name="maximum">
                 <double>100.000000000000000</double>
@@ -1369,60 +1461,34 @@
                </property>
               </widget>
              </item>
-             <item row="9" column="0">
-              <widget class="QCheckBox" name="m_VolumeFractionsBox">
+             <item row="4" column="1">
+              <widget class="QSpinBox" name="m_TEbox">
                <property name="toolTip">
-                <string>Output one image per compartment containing the corresponding volume fractions per voxel.</string>
+                <string>TE in milliseconds</string>
                </property>
-               <property name="text">
-                <string>Output Volume Fractions</string>
+               <property name="minimum">
+                <number>1</number>
                </property>
-               <property name="checked">
-                <bool>false</bool>
+               <property name="maximum">
+                <number>999999999</number>
                </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QComboBox" name="m_DiffusionDirectionBox">
-               <item>
-                <property name="text">
-                 <string>Fiber tangent</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Main fiber directions</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Random</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QCheckBox" name="m_RelaxationBox">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;TE&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;T2&lt;/span&gt; will have no effect if unchecked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <property name="singleStep">
+                <number>1</number>
                </property>
-               <property name="text">
-                <string>Simulate Signal Relaxation</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
+               <property name="value">
+                <number>100</number>
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="11" column="0">
               <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_4">
                <property name="text">
                 <string>Fiber Radius:</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_15">
+             <item row="8" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_32">
                <property name="toolTip">
                 <string/>
                </property>
@@ -1433,15 +1499,28 @@
                 <string/>
                </property>
                <property name="text">
-                <string>Line Readout Time:  </string>
+                <string>Partial Fourier:</string>
                </property>
                <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="14" column="0">
+              <widget class="QCheckBox" name="m_EnforcePureFiberVoxelsBox">
+               <property name="toolTip">
+                <string>Disable partial volume. Treat voxel content as fiber-only if at least one fiber is present.</string>
+               </property>
+               <property name="text">
+                <string>Disable Partial Volume Effects</string>
+               </property>
+               <property name="checked">
                 <bool>false</bool>
                </property>
               </widget>
              </item>
              <item row="3" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_12">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_34">
                <property name="toolTip">
                 <string/>
                </property>
@@ -1452,21 +1531,49 @@
                 <string/>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; Relaxation: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coil Sensitivity:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_3">
-               <property name="text">
-                <string>Diffusion Direction:</string>
+             <item row="8" column="1">
+              <widget class="QDoubleSpinBox" name="m_PartialFourier">
+               <property name="toolTip">
+                <string>Partial fourier factor (0.5-1)</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.500000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
+             <item row="15" column="0">
+              <widget class="QCheckBox" name="m_VolumeFractionsBox">
+               <property name="toolTip">
+                <string>Output phase image and volume fraction maps.</string>
+               </property>
+               <property name="text">
+                <string>Output Additional Images</string>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
               <widget class="QSpinBox" name="m_T2starBox">
                <property name="toolTip">
                 <string>Relaxation time due to magnetic field inhomogeneities (T2', in milliseconds).</string>
@@ -1485,8 +1592,116 @@
                </property>
               </widget>
              </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_14">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Repetition Time &lt;span style=&quot; font-style:italic;&quot;&gt;TR&lt;/span&gt;: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="m_CoilSensBox">
+               <item>
+                <property name="text">
+                 <string>Constant</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Linear</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Exponential</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_15">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>Dwell Time:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_12">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; Relaxation: &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="13" column="0">
+              <widget class="QCheckBox" name="m_RelaxationBox">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;TE&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;inhom&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;T2&lt;/span&gt; will have no effect if unchecked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>Simulate Signal Relaxation</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_33">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Echo Time &lt;span style=&quot; font-style:italic;&quot;&gt;TE&lt;/span&gt;:  &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
              <item row="1" column="1">
-              <widget class="QSpinBox" name="m_TEbox">
+              <widget class="QSpinBox" name="m_SignalScaleBox">
                <property name="toolTip">
                 <string>TE in milliseconds</string>
                </property>
@@ -1504,60 +1719,44 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_5">
-               <property name="text">
-                <string>Signal Scale:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QSpinBox" name="m_FiberRadius">
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="m_NumCoilsBox">
                <property name="toolTip">
-                <string>Fiber radius used to calculate volume fractions (in µm). Set to 0 for automatic radius estimation.</string>
+                <string>Number of coil elements used for the acquisiton.</string>
                </property>
                <property name="minimum">
-                <number>0</number>
-               </property>
-               <property name="maximum">
-                <number>1000</number>
-               </property>
-               <property name="value">
-                <number>0</number>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="text">
-                <string>Separation Angle:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="0">
-              <widget class="QCheckBox" name="m_EnforcePureFiberVoxelsBox">
-               <property name="toolTip">
-                <string>Disable partial volume. Treat voxel content as fiber-only if at least one fiber is present.</string>
-               </property>
-               <property name="text">
-                <string>Disable Partial Volume Effects</string>
-               </property>
-               <property name="checked">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QDoubleSpinBox" name="m_SeparationAngleBox">
-               <property name="decimals">
                 <number>1</number>
                </property>
                <property name="maximum">
-                <double>90.000000000000000</double>
+                <number>128</number>
+               </property>
+               <property name="singleStep">
+                <number>1</number>
                </property>
                <property name="value">
-                <double>45.000000000000000</double>
+                <number>1</number>
                </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWINumDirsLabel_6">
+               <property name="text">
+                <string>Acquisition Type:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_AcquisitionTypeBox">
+               <item>
+                <property name="text">
+                 <string>Single Shot EPI</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Spin Echo</string>
+                </property>
+               </item>
               </widget>
              </item>
             </layout>
@@ -1670,7 +1869,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>11</number>
+                <number>20</number>
                </property>
               </widget>
              </item>
@@ -1689,7 +1888,7 @@
                 <number>1</number>
                </property>
                <property name="value">
-                <number>11</number>
+                <number>20</number>
                </property>
               </widget>
              </item>
@@ -1763,6 +1962,44 @@
           <item row="4" column="0">
            <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget2" native="true"/>
           </item>
+          <item row="5" column="0">
+           <widget class="QFrame" name="m_Comp2FractionFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_27">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_7">
+               <property name="text">
+                <string>Volume Fraction:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp2VolumeFraction">
+               <property name="toolTip">
+                <string>Optional! If no volume fraction map for this compartment is set, the corresponding volume fractions are calculated from the input fibers.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -1835,6 +2072,9 @@
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a binary image to define the area of signal generation. Outside of the mask image only noise will be actively generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+            </property>
            </widget>
           </item>
           <item row="0" column="0" rowspan="2" colspan="2">
@@ -1899,6 +2139,9 @@
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a fiber bundle to generate the white matter signal from. You can either use the fiber definition tab to manually define an input fiber bundle or you can also use any existing bundle, e.g. yielded by a tractography algorithm.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+            </property>
            </widget>
           </item>
           <item row="3" column="0">
@@ -1925,6 +2168,9 @@
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The parameters for the simulation (e.g. spacing, size, diffuison-weighted gradients, b-value) are adopted from this image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+            </property>
            </widget>
           </item>
          </layout>
@@ -1948,38 +2194,28 @@
           <string>Noise and other Artifacts</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
+          <item row="12" column="0">
+           <widget class="QCheckBox" name="m_AddDistortions">
+            <property name="text">
+             <string>Add Distortions</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="m_AddSpikes">
+            <property name="text">
+             <string>Add Spikes</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
           <item row="20" column="0">
-           <widget class="Line" name="line">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="m_AddNoise">
-            <property name="text">
-             <string>Add Noise</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="21" column="0">
-           <widget class="QCheckBox" name="m_AddGibbsRinging">
-            <property name="toolTip">
-             <string>Add ringing artifacts occuring at strong edges in the image.</string>
-            </property>
-            <property name="text">
-             <string>Add Gibbs Ringing</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="0">
-           <widget class="QFrame" name="m_AliasingFrame">
+           <widget class="QFrame" name="m_EddyFrame">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -1989,7 +2225,10 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QFormLayout" name="formLayout_10">
+            <layout class="QFormLayout" name="formLayout_8">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
@@ -2006,7 +2245,7 @@
               <number>0</number>
              </property>
              <item row="0" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_27">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_26">
                <property name="toolTip">
                 <string/>
                </property>
@@ -2017,7 +2256,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>Shrink FOV (%):</string>
+                <string>Gradient:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -2025,34 +2264,119 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="m_WrapBox">
+              <widget class="QDoubleSpinBox" name="m_EddyGradientStrength">
                <property name="toolTip">
-                <string>Shrink FOV by this percentage.</string>
+                <string>Eddy current induced magnetic field gradient (in mT/m).</string>
                </property>
                <property name="decimals">
-                <number>1</number>
-               </property>
-               <property name="minimum">
-                <double>0.000000000000000</double>
+                <number>4</number>
                </property>
                <property name="maximum">
-                <double>90.000000000000000</double>
+                <double>1000.000000000000000</double>
                </property>
                <property name="singleStep">
-                <double>0.100000000000000</double>
+                <double>0.001000000000000</double>
                </property>
                <property name="value">
-                <double>25.000000000000000</double>
+                <double>0.010000000000000</double>
                </property>
               </widget>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="17" column="0">
-           <widget class="Line" name="line_4">
+          <item row="15" column="0">
+           <widget class="QCheckBox" name="m_AddMotion">
+            <property name="text">
+             <string>Add Motion Artifacts</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="Line" name="line_8">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QFrame" name="m_GhostFrame">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_6">
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_23">
+               <property name="toolTip">
+                <string/>
+               </property>
+               <property name="statusTip">
+                <string/>
+               </property>
+               <property name="whatsThis">
+                <string/>
+               </property>
+               <property name="text">
+                <string>K-Space Line Offset:</string>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QDoubleSpinBox" name="m_kOffsetBox">
+               <property name="toolTip">
+                <string>A larger offset increases the inensity of the ghost image.</string>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="maximum">
+                <double>1.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.250000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="m_AddNoise">
+            <property name="text">
+             <string>Add Noise</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -2117,193 +2441,6 @@
             </layout>
            </widget>
           </item>
-          <item row="18" column="0">
-           <widget class="QCheckBox" name="m_AddEddy">
-            <property name="toolTip">
-             <string>!!!EXPERIMENTAL!!!</string>
-            </property>
-            <property name="text">
-             <string>Add Eddy Current Effects</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="m_AddSpikes">
-            <property name="text">
-             <string>Add Spikes</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QFrame" name="m_NoiseFrame">
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QFormLayout" name="formLayout_5">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item row="1" column="0">
-              <widget class="QLabel" name="m_NoiseLabel">
-               <property name="text">
-                <string>Variance:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="m_NoiseLevel">
-               <property name="toolTip">
-                <string>Variance of selected noise distribution.</string>
-               </property>
-               <property name="decimals">
-                <number>4</number>
-               </property>
-               <property name="minimum">
-                <double>0.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>999999999.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.001000000000000</double>
-               </property>
-               <property name="value">
-                <double>50.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="m_NoiseLabel_5">
-               <property name="text">
-                <string>Distribution:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="m_NoiseDistributionBox">
-               <property name="toolTip">
-                <string>Noise distribution</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>Rician</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Chi-squared</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QCheckBox" name="m_AddGhosts">
-            <property name="text">
-             <string>Add N/2 Ghosts</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="13" column="0">
-           <widget class="QFrame" name="m_DistortionsFrame">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QFormLayout" name="formLayout_7">
-             <property name="horizontalSpacing">
-              <number>6</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_25">
-               <property name="toolTip">
-                <string/>
-               </property>
-               <property name="statusTip">
-                <string/>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>Frequency Map:</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QmitkDataStorageComboBox" name="m_FrequencyMapBox">
-               <property name="toolTip">
-                <string>Select image specifying the frequency inhomogeneities (in Hz).</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="14" column="0">
-           <widget class="Line" name="line_5">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="Line" name="line_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="11" column="0">
-           <widget class="Line" name="line_6">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
           <item row="16" column="0">
            <widget class="QFrame" name="m_MotionArtifactFrame">
             <property name="enabled">
@@ -2315,13 +2452,7 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QFormLayout" name="formLayout_11">
-             <property name="fieldGrowthPolicy">
-              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-             </property>
-             <property name="horizontalSpacing">
-              <number>6</number>
-             </property>
+            <layout class="QGridLayout" name="gridLayout_18">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -2333,6 +2464,9 @@
              </property>
              <property name="bottomMargin">
               <number>0</number>
+             </property>
+             <property name="horizontalSpacing">
+              <number>6</number>
              </property>
              <item row="0" column="0">
               <widget class="QCheckBox" name="m_RandomMotion">
@@ -2347,7 +2481,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="2">
+             <item row="3" column="0">
               <widget class="QGroupBox" name="m_RotationArtifactFrame">
                <property name="title">
                 <string>Rotation</string>
@@ -2430,6 +2564,9 @@
                   <property name="decimals">
                    <number>1</number>
                   </property>
+                  <property name="minimum">
+                   <double>-360.000000000000000</double>
+                  </property>
                   <property name="maximum">
                    <double>360.000000000000000</double>
                   </property>
@@ -2448,6 +2585,9 @@
                   </property>
                   <property name="decimals">
                    <number>1</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-360.000000000000000</double>
                   </property>
                   <property name="maximum">
                    <double>360.000000000000000</double>
@@ -2506,6 +2646,9 @@
                   <property name="decimals">
                    <number>1</number>
                   </property>
+                  <property name="minimum">
+                   <double>-360.000000000000000</double>
+                  </property>
                   <property name="maximum">
                    <double>360.000000000000000</double>
                   </property>
@@ -2520,7 +2663,7 @@
                </layout>
               </widget>
              </item>
-             <item row="2" column="0" colspan="2">
+             <item row="4" column="0">
               <widget class="QGroupBox" name="m_TranslationArtifactFrame">
                <property name="title">
                 <string>Translation</string>
@@ -2638,6 +2781,9 @@
                   <property name="decimals">
                    <number>1</number>
                   </property>
+                  <property name="minimum">
+                   <double>-1000.000000000000000</double>
+                  </property>
                   <property name="maximum">
                    <double>1000.000000000000000</double>
                   </property>
@@ -2656,6 +2802,9 @@
                   </property>
                   <property name="decimals">
                    <number>1</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-1000.000000000000000</double>
                   </property>
                   <property name="maximum">
                    <double>1000.000000000000000</double>
@@ -2676,6 +2825,9 @@
                   <property name="decimals">
                    <number>1</number>
                   </property>
+                  <property name="minimum">
+                   <double>-1000.000000000000000</double>
+                  </property>
                   <property name="maximum">
                    <double>1000.000000000000000</double>
                   </property>
@@ -2690,23 +2842,95 @@
                </layout>
               </widget>
              </item>
+             <item row="2" column="0">
+              <widget class="QFrame" name="frame_7">
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_31">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>Motion volumes:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="m_MotionVolumesBox">
+                  <property name="toolTip">
+                   <string>Type in the volume indices that should be affected by motion (e.g. &quot;0 3 7&quot; whithout quotation marks). Leave blank for motion in all volumes. Type in &quot;random&quot; to randomly select volumes for motion.</string>
+                  </property>
+                  <property name="text">
+                   <string>random</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
-          <item row="15" column="0">
-           <widget class="QCheckBox" name="m_AddMotion">
+          <item row="22" column="0">
+           <widget class="QCheckBox" name="m_AddGibbsRinging">
+            <property name="toolTip">
+             <string>Add ringing artifacts occuring at strong edges in the image.</string>
+            </property>
             <property name="text">
-             <string>Add Motion Artifacts</string>
+             <string>Add Gibbs Ringing</string>
             </property>
             <property name="checked">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="12" column="0">
-           <widget class="QCheckBox" name="m_AddDistortions">
+          <item row="2" column="0">
+           <widget class="Line" name="line_9">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="Line" name="line_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="18" column="0">
+           <widget class="Line" name="line_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="21" column="0">
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="m_AddGhosts">
             <property name="text">
-             <string>Add Distortions</string>
+             <string>Add N/2 Ghosts</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -2723,8 +2947,35 @@
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
-           <widget class="QFrame" name="m_GhostFrame">
+          <item row="11" column="0">
+           <widget class="Line" name="line_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="14" column="0">
+           <widget class="Line" name="line_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="19" column="0">
+           <widget class="QCheckBox" name="m_AddEddy">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string>Add Eddy Current Effects</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QFrame" name="m_AliasingFrame">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -2734,7 +2985,7 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QFormLayout" name="formLayout_6">
+            <layout class="QFormLayout" name="formLayout_10">
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
@@ -2751,7 +3002,7 @@
               <number>0</number>
              </property>
              <item row="0" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_23">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_27">
                <property name="toolTip">
                 <string/>
                </property>
@@ -2762,7 +3013,7 @@
                 <string/>
                </property>
                <property name="text">
-                <string>K-Space Line Offset:</string>
+                <string>Shrink FOV (%):</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
@@ -2770,29 +3021,32 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QDoubleSpinBox" name="m_kOffsetBox">
+              <widget class="QDoubleSpinBox" name="m_WrapBox">
                <property name="toolTip">
-                <string>A larger offset increases the inensity of the ghost image.</string>
+                <string>Shrink FOV by this percentage.</string>
                </property>
                <property name="decimals">
-                <number>3</number>
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>1.000000000000000</double>
+                <double>90.000000000000000</double>
                </property>
                <property name="singleStep">
-                <double>0.010000000000000</double>
+                <double>0.100000000000000</double>
                </property>
                <property name="value">
-                <double>0.250000000000000</double>
+                <double>25.000000000000000</double>
                </property>
               </widget>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="19" column="0">
-           <widget class="QFrame" name="m_EddyFrame">
+          <item row="13" column="0">
+           <widget class="QFrame" name="m_DistortionsFrame">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -2802,10 +3056,7 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QFormLayout" name="formLayout_8">
-             <property name="fieldGrowthPolicy">
-              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-             </property>
+            <layout class="QFormLayout" name="formLayout_7">
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
@@ -2821,8 +3072,8 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
-             <item row="1" column="0">
-              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_26">
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_TensorsToDWIBValueLabel_25">
                <property name="toolTip">
                 <string/>
                </property>
@@ -2833,57 +3084,98 @@
                 <string/>
                </property>
                <property name="text">
-                <string>Magnitude:</string>
+                <string>Frequency Map:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="m_EddyGradientStrength">
-               <property name="toolTip">
-                <string>Maximum magnitude of eddy current induced magnetic field inhomogeneities (in mT).</string>
-               </property>
-               <property name="decimals">
-                <number>5</number>
-               </property>
-               <property name="maximum">
-                <double>1000.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>0.001000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.005000000000000</double>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="1">
-              <widget class="QLabel" name="m_DiffusionPropsMessage_2">
-               <property name="styleSheet">
-                <string notr="true">color: rgb(255, 0, 0);</string>
-               </property>
-               <property name="text">
-                <string>Experimental!</string>
+              <widget class="QmitkDataStorageComboBox" name="m_FrequencyMapBox">
+               <property name="toolTip">
+                <string>Select image specifying the frequency inhomogeneities (in Hz).</string>
                </property>
               </widget>
              </item>
             </layout>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="Line" name="line_8">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+          <item row="1" column="0">
+           <widget class="QFrame" name="m_NoiseFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="Line" name="line_9">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
             </property>
+            <layout class="QFormLayout" name="formLayout_5">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="1" column="0">
+              <widget class="QLabel" name="m_NoiseLabel">
+               <property name="text">
+                <string>Variance:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="m_NoiseLevel">
+               <property name="toolTip">
+                <string>Variance of selected noise distribution.</string>
+               </property>
+               <property name="decimals">
+                <number>10</number>
+               </property>
+               <property name="minimum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>999999999.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.001000000000000</double>
+               </property>
+               <property name="value">
+                <double>50.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_5">
+               <property name="text">
+                <string>Distribution:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="m_NoiseDistributionBox">
+               <property name="toolTip">
+                <string>Noise distribution</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Complex Gaussian</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Rician</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -2912,11 +3204,14 @@
           <string>Intra-axonal Compartment</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_13">
-          <item row="2" column="0">
-           <widget class="QmitkZeppelinModelParametersWidget" name="m_ZeppelinWidget1" native="true"/>
-          </item>
           <item row="3" column="0">
            <widget class="QmitkTensorModelParametersWidget" name="m_TensorWidget1" native="true"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QmitkStickModelParametersWidget" name="m_StickWidget1" native="true"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget1" native="true"/>
           </item>
           <item row="0" column="0">
            <widget class="QComboBox" name="m_Compartment1Box">
@@ -2945,11 +3240,46 @@
             </item>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QmitkStickModelParametersWidget" name="m_StickWidget1" native="true"/>
+          <item row="2" column="0">
+           <widget class="QmitkZeppelinModelParametersWidget" name="m_ZeppelinWidget1" native="true"/>
           </item>
-          <item row="4" column="0">
-           <widget class="QmitkPrototypeSignalParametersWidget" name="m_PrototypeWidget1" native="true"/>
+          <item row="5" column="0">
+           <widget class="QFrame" name="m_Comp1FractionFrame">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_26">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="m_NoiseLabel_6">
+               <property name="text">
+                <string>Volume Fraction:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_Comp1VolumeFraction">
+               <property name="toolTip">
+                <string>Optional! If no volume fraction map for this compartment is set, the corresponding volume fractions are calculated from the input fibers.</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -3053,7 +3383,14 @@
   <tabstop>m_CopyBundlesButton</tabstop>
   <tabstop>m_JoinBundlesButton</tabstop>
   <tabstop>m_IncludeFiducials</tabstop>
+  <tabstop>m_FiberBundleComboBox</tabstop>
+  <tabstop>m_MaskComboBox</tabstop>
+  <tabstop>m_TemplateComboBox</tabstop>
+  <tabstop>m_SavePathEdit</tabstop>
+  <tabstop>m_OutputPathButton</tabstop>
   <tabstop>m_GenerateImageButton</tabstop>
+  <tabstop>m_AbortSimulationButton</tabstop>
+  <tabstop>m_SimulationStatusText</tabstop>
   <tabstop>m_SizeX</tabstop>
   <tabstop>m_SizeY</tabstop>
   <tabstop>m_SizeZ</tabstop>
@@ -3065,17 +3402,25 @@
   <tabstop>m_AdvancedOptionsBox_2</tabstop>
   <tabstop>m_SignalScaleBox</tabstop>
   <tabstop>m_TEbox</tabstop>
+  <tabstop>m_TRbox</tabstop>
   <tabstop>m_LineReadoutTimeBox</tabstop>
+  <tabstop>m_PartialFourier</tabstop>
   <tabstop>m_T2starBox</tabstop>
   <tabstop>m_FiberRadius</tabstop>
+  <tabstop>m_ReversePhaseBox</tabstop>
   <tabstop>m_RelaxationBox</tabstop>
   <tabstop>m_EnforcePureFiberVoxelsBox</tabstop>
   <tabstop>m_VolumeFractionsBox</tabstop>
   <tabstop>m_Compartment1Box</tabstop>
+  <tabstop>m_Comp1VolumeFraction</tabstop>
   <tabstop>m_Compartment2Box</tabstop>
+  <tabstop>m_Comp2VolumeFraction</tabstop>
   <tabstop>m_Compartment3Box</tabstop>
+  <tabstop>m_Comp3VolumeFraction</tabstop>
   <tabstop>m_Compartment4Box</tabstop>
+  <tabstop>m_Comp4VolumeFraction</tabstop>
   <tabstop>m_AddNoise</tabstop>
+  <tabstop>m_NoiseDistributionBox</tabstop>
   <tabstop>m_NoiseLevel</tabstop>
   <tabstop>m_AddSpikes</tabstop>
   <tabstop>m_SpikeNumBox</tabstop>

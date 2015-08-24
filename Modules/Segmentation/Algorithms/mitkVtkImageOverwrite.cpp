@@ -727,8 +727,8 @@ static void vtkImageResliceExecute(mitkVtkImageOverwrite *self,
   int (*interpolate)(void *&outPtr, const void *inPtr,
                      const int inExt[6], const vtkIdType inInc[3],
                      int numscalars, const double point[3],
-                     int mode, const void *background, mitkVtkImageOverwrite *self);
-  void (*setpixels)(void *&out, const void *in, int numscalars, int n);
+                     int mode, const void *background, mitkVtkImageOverwrite *self) = nullptr;
+  void (*setpixels)(void *&out, const void *in, int numscalars, int n) = nullptr;
 
   // the 'mode' species what to do with the 'pad' (out-of-bounds) area
   int mode = VTK_RESLICE_BACKGROUND;

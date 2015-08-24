@@ -62,7 +62,7 @@ public:
     mitkNewMacro1Param(Self, vtkSmartPointer<vtkPolyData>) // custom constructor
 
     // colorcoding related methods
-    void ColorFibersByCurvature();
+    void ColorFibersByCurvature(bool minMaxNorm=true);
     void ColorFibersByScalarMap(mitk::Image::Pointer, bool opacity);
     template <typename TPixel>
     void ColorFibersByScalarMap(const mitk::PixelType pixelType, mitk::Image::Pointer, bool opacity);
@@ -99,7 +99,7 @@ public:
     // fiber subset extraction
     FiberBundle::Pointer           ExtractFiberSubset(DataNode *roi, DataStorage* storage);
     std::vector<long>              ExtractFiberIdSubset(DataNode* roi, DataStorage* storage);
-    FiberBundle::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false);
+    FiberBundle::Pointer           ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert=false, bool bothEnds=true);
     FiberBundle::Pointer           RemoveFibersOutside(ItkUcharImgType* mask, bool invert=false);
 
     vtkSmartPointer<vtkPolyData>    GeneratePolyDataByIds( std::vector<long> ); // TODO: make protected

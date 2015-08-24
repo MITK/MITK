@@ -81,13 +81,16 @@ typename itk::ShCoefficientImageImporter< float, shOrder >::QballImageType::Poin
     return filter->GetQballImage();
 }
 
+/*!
+\brief Perform global fiber tractography (Gibbs tractography)
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
     parser.setTitle("Gibbs Tracking");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription(" ");
+    parser.setDescription("Perform global fiber tractography (Gibbs tractography)");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");

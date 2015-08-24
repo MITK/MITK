@@ -2,17 +2,6 @@ option(BUILD_DiffusionMiniApps "Build commandline tools for diffusion" OFF)
 
 if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 
-
-        find_package(OpenMP)
-        if(NOT OPENMP_FOUND)
-           message("OpenMP is not available.")
-        endif()
-        if(OPENMP_FOUND)
-          message(STATUS "Found OpenMP.")
-          set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-        endif()
-
   # needed include directories
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -61,9 +50,9 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
       set(dependencies_list ${dependencies})
 
       mitk_create_executable(${appname}
-      DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
+      DEPENDS MitkCore MitkDiffusionCore MitkCommandLine ${dependencies_list}
       PACKAGE_DEPENDS ITK
-      CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
+      CPP_FILES ${appname}.cpp
       )
 
       if(EXECUTABLE_IS_ENABLED)
@@ -112,8 +101,8 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 
   # This mini app does not depend on mitkDiffusionImaging at all
   mitk_create_executable(Dicom2Nrrd
-    DEPENDS MitkCore
-    CPP_FILES Dicom2Nrrd.cpp mitkCommandLineParser.cpp
+    DEPENDS MitkCore MitkCommandLine
+    CPP_FILES Dicom2Nrrd.cpp
   )
 
         # On Linux, create a shell script to start a relocatable application

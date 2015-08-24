@@ -21,14 +21,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace mitk;
 
-
+/*!
+\brief Copies transformation matrix of one image to another
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
     parser.setTitle("Copy Geometry");
     parser.setCategory("Preprocessing Tools");
-    parser.setDescription("Copies Geometry from one image unto another");
+    parser.setDescription("Copies transformation matrix of one image to another");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");

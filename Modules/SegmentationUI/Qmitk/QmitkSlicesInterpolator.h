@@ -26,6 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurfaceInterpolationController.h"
 #include "mitkToolManager.h"
 
+#include "mitkFeatureBasedEdgeDetectionFilter.h"
+#include "mitkPointCloudScoringFilter.h"
+#include "mitkClusteredPlaneSuggestionFilter.h"
+
 #include <QWidget>
 #include <map>
 
@@ -167,6 +171,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSlicesInterpolator : public QWidget
 
     void OnReinit3DInterpolation();
 
+    void OnSuggestPlaneClicked();
+
     /*
      * Will trigger interpolation for all slices in given orientation (called from popup menu of OnAcceptAllInterpolationsClicked)
      */
@@ -188,6 +194,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSlicesInterpolator : public QWidget
     void OnShowMarkers(bool);
 
     void Run3DInterpolation();
+
+    void RunPlaneSuggestion();
 
     void OnSurfaceInterpolationFinished();
 
@@ -238,6 +246,10 @@ private:
     mitk::SegmentationInterpolationController::Pointer m_Interpolator;
     mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
 
+    mitk::FeatureBasedEdgeDetectionFilter::Pointer m_EdgeDetector;
+    mitk::PointCloudScoringFilter::Pointer m_PointScorer;
+    mitk::ClusteredPlaneSuggestionFilter::Pointer m_PlaneSuggester;
+
     mitk::ToolManager::Pointer m_ToolManager;
     bool m_Initialized;
 
@@ -253,6 +265,9 @@ private:
     QPushButton* m_BtnApply2D;
     QPushButton* m_BtnApplyForAllSlices2D;
     QPushButton* m_BtnApply3D;
+
+    QPushButton* m_BtnSuggestPlane;
+
     QCheckBox* m_ChkShowPositionNodes;
     QPushButton* m_BtnReinit3DInterpolation;
 
@@ -276,6 +291,11 @@ private:
     QFuture<void> m_Future;
     QFutureWatcher<void> m_Watcher;
     QTimer* m_Timer;
+
+    QFuture<void> m_PlaneFuture;
+    QFutureWatcher<void> m_PlaneWatcher;
+
+    bool m_FirstRun;
 };
 
 #endif

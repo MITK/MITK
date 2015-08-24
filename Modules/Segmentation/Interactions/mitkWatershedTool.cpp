@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWatershedTool.h"
 
-#include "mitkBinaryThresholdTool.xpm"
 #include "mitkToolManager.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
@@ -50,8 +49,8 @@ namespace mitk {
 
 
 mitk::WatershedTool::WatershedTool() :
-  m_Level(0.),
-  m_Threshold(0.)
+  m_Threshold(0.0),
+  m_Level(0.0)
 {
 }
 

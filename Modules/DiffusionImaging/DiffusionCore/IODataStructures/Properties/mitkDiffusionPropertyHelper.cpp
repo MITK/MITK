@@ -20,11 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIterator.h>
 #include <mitkProperties.h>
 
-const std::string mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME = "meta.GradientDirections";
-const std::string mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME = "meta.OriginalGradientDirections";
-const std::string mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME = "meta.MeasurementFrame";
-const std::string mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME = "meta.ReferenceBValue";
-const std::string mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME = "BValueMap";
+const std::string mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME = "DWMRI.GradientDirections";
+const std::string mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME = "DWMRI.OriginalGradientDirections";
+const std::string mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME = "DWMRI.MeasurementFrame";
+const std::string mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME = "DWMRI.ReferenceBValue";
+const std::string mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME = "DWMRI.BValueMap";
+const std::string mitk::DiffusionPropertyHelper::MODALITY = "DWMRI.Modality";
 
 mitk::DiffusionPropertyHelper::DiffusionPropertyHelper()
 {
@@ -207,7 +208,6 @@ void mitk::DiffusionPropertyHelper::ApplyMeasurementFrame()
   {
     vnl_vector<double> vec = gdcit.Value();
     vec = vec.pre_multiply(measurementFrame);
-    MITK_INFO << gdcit.Value();
     directions->InsertElement(c, vec);
     c++;
   }
@@ -239,7 +239,6 @@ void mitk::DiffusionPropertyHelper::UpdateBValueMap()
     GradientDirectionsContainerType::ConstIterator gdcit;
     for( gdcit = directions->Begin(); gdcit != directions->End(); ++gdcit)
     {
-        MITK_INFO << gdcit.Value();
       b_ValueMap[GetB_Value(gdcit.Index())].push_back(gdcit.Index());
     }
   }
@@ -301,6 +300,10 @@ void mitk::DiffusionPropertyHelper::InitializeImage()
 
 bool mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(const mitk::DataNode* node)
 {
+    if ( node==nullptr )
+        return false;
+    if ( node->GetData()==nullptr )
+        return false;
     return IsDiffusionWeightedImage(dynamic_cast<mitk::Image *>(node->GetData()));
 }
 

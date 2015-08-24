@@ -70,7 +70,7 @@ protected slots:
     /** update labels if parameters have changed */
     void OnSeedsPerVoxelChanged(int value);
     void OnMinTractLengthChanged(int value);
-    void OnFaThresholdChanged(int value);
+    void OnFaThresholdChanged(double value);
     void OnAngularThresholdChanged(int value);
     void OnfChanged(int value);
     void OngChanged(int value);

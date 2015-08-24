@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkBinaryThresholdULTool.h"
-#include "mitkBinaryThresholdULTool.xpm"
 
 #include "mitkToolManager.h"
 
@@ -29,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageStatisticsHolder.h"
 #include "mitkImageTimeSelector.h"
 #include <itkImageRegionIterator.h>
 #include <itkBinaryThresholdImageFilter.h>
@@ -169,8 +169,9 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
 
       if (image.GetPointer() == originalImage.GetPointer())
       {
-        m_SensibleMinimumThresholdValue = static_cast<double>( originalImage->GetScalarValueMin() );
-        m_SensibleMaximumThresholdValue = static_cast<double>( originalImage->GetScalarValueMax() );
+        Image::StatisticsHolderPointer statistics = originalImage->GetStatistics();
+        m_SensibleMinimumThresholdValue = static_cast<double>( statistics->GetScalarValueMin() );
+        m_SensibleMaximumThresholdValue = static_cast<double>( statistics->GetScalarValueMax() );
       }
 
       m_CurrentLowerThresholdValue = (m_SensibleMaximumThresholdValue + m_SensibleMinimumThresholdValue) / 3.0;
@@ -286,7 +287,7 @@ template <typename TPixel, unsigned int VImageDimension>
 static void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double lower, double upper, unsigned int timeStep )
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
+  typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();

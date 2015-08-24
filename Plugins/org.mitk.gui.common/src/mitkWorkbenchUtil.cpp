@@ -282,10 +282,23 @@ berry::IEditorDescriptor::Pointer WorkbenchUtil::GetDefaultEditor(const QString&
 
 bool WorkbenchUtil::SetDepartmentLogoPreference(const QString &logoResource, ctkPluginContext *context)
 {
+  if (context == nullptr)
+  {
+    BERRY_WARN << "Plugin context invalid, unable to set custom logo.";
+    return false;
+  }
+
   // The logo must be available in the local filesystem. We check if we have not already extracted the
   // logo from the plug-in or if this plug-ins timestamp is newer then the already extracted logo timestamp.
   // If one of the conditions is true, extract it and write it to the plug-in specific storage location.
   const QString logoFileName = logoResource.mid(logoResource.lastIndexOf('/')+1);
+
+  if (logoFileName.isEmpty())
+  {
+    BERRY_WARN << "Logo file name empty, unable to set custom logo.";
+    return false;
+  }
+
   const QString logoPath = context->getDataFile("").absoluteFilePath();
 
   bool extractLogo = true;
@@ -310,17 +323,27 @@ bool WorkbenchUtil::SetDepartmentLogoPreference(const QString &logoResource, ctk
   {
     // Extract the logo from the shared library and write it to disk.
     QFile logo(logoResource);
+
+    if (!logo.exists())
+    {
+      BERRY_WARN << "Custom logo '" << logoResource << "' does not exist.";
+      return false;
+    }
+
     if (logo.open(QIODevice::ReadOnly))
     {
       QFile localLogo(logoPath + "/" + logoFileName);
+
       if (localLogo.open(QIODevice::WriteOnly))
       {
         localLogo.write(logo.readAll());
+        localLogo.flush();
       }
     }
   }
 
   logoFileInfo.refresh();
+
   if (logoFileInfo.exists())
   {
     // Get the preferences service
@@ -343,9 +366,10 @@ bool WorkbenchUtil::SetDepartmentLogoPreference(const QString &logoResource, ctk
   }
   else
   {
-    BERRY_WARN << "Custom logo at " << logoFileInfo.absoluteFilePath().toStdString() << " does not exist";
+    BERRY_WARN << "Custom logo at '" << logoFileInfo.absoluteFilePath().toStdString() << "' does not exist.";
     return false;
   }
+
   return true;
 }
 

@@ -40,7 +40,7 @@ struct PrpSelListener;
 /*!
  * \ingroup org_mitk_gui_qt_preprocessing_internal
  *
- * \brief QmitkPreprocessingView
+ * \brief Viewing and modifying diffusion weighted images (gradient reduction, resampling, b-value projection, ...)
  *
  * Document your class here.
  *
@@ -77,6 +77,8 @@ class QmitkPreprocessingView : public QmitkFunctionality
 
   virtual void Deactivated() override;
 
+  virtual void Visible() override;
+
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
   virtual void StdMultiWidgetNotAvailable() override;
 
@@ -105,6 +107,8 @@ protected slots:
   void DoUpdateInterpolationGui(int i);
   void DoRemoveGradient();
   void DoExtractGradient();
+  void DoFlipAxis();
+  void OnImageSelectionChanged();
 
 protected:
 
@@ -112,6 +116,9 @@ protected:
   void DoAKCFit();
   void DoBiExpFit();
   void DoADCAverage();
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedFlipAxis( itk::Image<TPixel, VImageDimension>* itkImage);
 
   template < typename TPixel, unsigned int VImageDimension >
   void TemplatedCropImage( itk::Image<TPixel, VImageDimension>* itkImage);
@@ -134,22 +141,20 @@ protected:
   /** Called by ExtractB0 if check-box activated, extracts all b0 images without averaging */
   void DoExtractBOWithoutAveraging();
 
-  void UpdateBValueTableWidget(int i);
+  void UpdateBValueTableWidget(int);
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+//  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   Ui::QmitkPreprocessingViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
-
-  mitk::DataNode::Pointer                           m_SelectedImageNode;
-  mitk::Image::Pointer                              m_SelectedImage;
-  std::vector< mitk::DataNode::Pointer >            m_SelectedDiffusionNodes;
-
   void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::Image::Pointer ImPtr, QString imageName, mitk::DataNode* parent);
+
+  void CleanBValueTableWidget();
+
 };
 
 

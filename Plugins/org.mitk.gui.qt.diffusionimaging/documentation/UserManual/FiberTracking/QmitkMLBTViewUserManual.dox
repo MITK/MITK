@@ -1,0 +1,51 @@
+/**
+\page org_mitk_views_mlbtview Machine Learning Based Streamline Tractography
+
+This view provides the user interface for machine-learning based streamline fiber tractography on diffusion-weighted images. It is dived in two parts: (1) training of the random-forest classifier used for tractography and (2) the actual tractography.
+
+Available sections:
+  - \ref MlbstUserManualTraining
+  - \ref MlbstUserManualTractography
+  - \ref MlbstUserManualReferences
+
+\section MlbstUserManualTraining Training
+
+Before
+
+Parameters:
+
+\li Num. Trees: Number of trees that constitute the random forest. The default of 30 works well for most cases.
+\li Max. Depth: Maximum tree depth.
+\li Non-WM Sampling Points: Number of randomly placed sampling points in each non-white-matter voxel. These sampling points are needed to train the classifier for non-fiber tissue.
+\li Sample Fraction: Fraction of randomly drawn samples used to train each tree.
+\li Step Size: The fibers are resampled with this step size. Influences the number of white-matter sampling ponts. Defaul is 0.5*min. voxel size.
+
+\section MlbstUserManualTractography Tractography
+
+Parameters and options:
+
+\li Input DWI: Input diffusion-weighted image for tractography. Minimum number of gradient directions is 28, since 6th order spherical harmonics are used to spherically interpolate the raw signal.
+\li Num. Seeds: Number of seed points per voxel. If set to 1, the seed is defined as the voxel center. If > 1 the seeds are distributet randomly inside the voxel.
+\li Step Size: The algorithm proceeds along the streamline with a fixed stepsize (in voxels). Default is 0.5*minSpacing.
+\li Angular Threshold: Sudden directional changes larger than the specified angle have a probability of 0.
+\li Num. Samples: Number of samples used to probe the local neighborhood.
+\li Sampling Distance: Maximum distance of the sampling points from the current streamline position (in voxel).
+\li Min. Length: Shorter fibers are discarded.
+\li Max. Length: Longer fibers are discarded.
+\li Num. Threads: Number of threads used for tractography. Default is the maximum number of threads. If demo mode is enabled, the number of threads is automatically set to 1.
+\li Random sampling: If checked, the neighborhood sampling points are distributed randomly in the current neighborhood, as oposed to spherically around the current position (default).
+\li Avoid premature termination: Uses the information of the neighborhood sampling points to avoid a premature fiber termination. If unchecked, no neighborhood samples are used.
+\li Secondary curvature check: If checked, a secondary curvature threshold is applied and the fiber progression stops if exceeded. This can also be done a posteriory in the Fiber Processing View.
+\li Mask Image: Binary image used to limit the tractography space. If no mask image is selected, the whole image volume is included in the tractography process. Typically select a binary brain mask here.
+\li Seed Image: Binary image used to define the seed voxels. If no image is selected, seeds are placed in all voxels.
+\li Stop Image: Binary image to define stopping regions for the tractography process. As soon as a streamline enters a region defined by this image, the streamline progression stops. Binary gray matter segmentations are a typical input here.
+\li Demo Mode: Directly visualizes the streamline progression and the sampling points. Only use this for demonstration purposes, since it is very slow.
+
+
+\section MlbstUserManualReferences References
+
+[1] Neher, P.F., Götz, M., Norajitra, T., Weber, C., Maier-Hein, K.H., 2015. A machine learning based approach to fiber tractography, in: Proceedings of International Society of Magnetic Resonance in Medicine.
+
+[2] Neher, P.F., Götz, M., Norajitra, T., Weber, C., Maier-Hein, K.H., 2015. A machine learning based approach to fiber tractography using classifier voting, in: Proceedings of Medical Image Computing and Computer-Assisted Intervention. Presented at the Medical Image Computing and Computer-Assisted Intervention.
+
+*/

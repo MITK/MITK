@@ -42,7 +42,7 @@ const std::string QmitkIGTLDeviceCommandWidget::VIEW_ID =
 
 QmitkIGTLDeviceCommandWidget::QmitkIGTLDeviceCommandWidget(
     QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_IsClient(false)
+  : QWidget(parent, f), m_IsClient(false), m_MessageReceivedObserverTag(0), m_CommandReceivedObserverTag(0), m_LostConnectionObserverTag(0), m_NewConnectionObserverTag(0), m_StateModifiedObserverTag(0)
 {
   m_Controls = NULL;
   this->m_IGTLDevice = NULL;
@@ -52,11 +52,11 @@ QmitkIGTLDeviceCommandWidget::QmitkIGTLDeviceCommandWidget(
 
 QmitkIGTLDeviceCommandWidget::~QmitkIGTLDeviceCommandWidget()
 {
-   this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
-   this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
-   this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
-   this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
-   this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
+   if (m_MessageReceivedObserverTag) this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
+   if (m_CommandReceivedObserverTag) this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
+   if (m_LostConnectionObserverTag) this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+   if (m_NewConnectionObserverTag) this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+   if (m_StateModifiedObserverTag) this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
 }
 
 void QmitkIGTLDeviceCommandWidget::CreateQtPartControl(QWidget *parent)

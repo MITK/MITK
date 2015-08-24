@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkInteractionEventObserver.h"
 #include "mitkEventStateMachine.h"
+#include <mitkLabel.h>
 
 
 namespace us {
@@ -85,7 +86,7 @@ namespace mitk
   {
   public:
 
-    typedef unsigned char DefaultSegmentationDataType;
+    typedef mitk::Label::PixelType DefaultSegmentationDataType;
 
     /**
     * \brief To let GUI process new events (e.g. qApp->processEvents() )

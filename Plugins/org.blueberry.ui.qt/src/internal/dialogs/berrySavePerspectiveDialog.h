@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDialog>
 
 class QItemSelection;
+class QSortFilterProxyModel;
 
 namespace Ui {
 class SavePerspectiveDialog;
@@ -61,6 +62,7 @@ private:
 
   Ui::SavePerspectiveDialog* ui;
   PerspectiveListModel* model;
+  QSortFilterProxyModel* proxyModel;
 
   PerspectiveRegistry& perspReg;
   SmartPointer<IPerspectiveDescriptor> persp;

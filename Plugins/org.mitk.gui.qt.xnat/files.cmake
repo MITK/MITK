@@ -4,22 +4,18 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_xnatinterface_Activator.cpp
-  QmitkXnatEditor.cpp
   QmitkXnatTreeBrowserView.cpp
-  QmitkXnatObjectEditorInput.cpp
   QmitkXnatConnectionPreferencePage.cpp
   QmitkXnatSessionManager.cpp
 )
 
 set(UI_FILES
-  src/internal/QmitkXnatEditorControls.ui
   src/internal/QmitkXnatTreeBrowserViewControls.ui
   src/internal/QmitkXnatConnectionPreferencePageControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_xnatinterface_Activator.h
-  src/internal/QmitkXnatEditor.h
   src/internal/QmitkXnatTreeBrowserView.h
   src/internal/QmitkXnatConnectionPreferencePage.h
 )

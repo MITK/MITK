@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurfaceToImageFilter.h>
 #include <mitkSurface.h>
 #include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 
 #include <qmessagebox.h>
 
@@ -59,7 +60,7 @@ void QmitkSurfaceToImageWidget::EnableButtons(bool enable)
   m_Controls.btnSurface2Image->setEnabled(enable);
 }
 
-void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
+void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
 {
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
   mitk::DataNode::Pointer imageNode = dataSelectionWidget->GetSelection(0);
@@ -123,14 +124,14 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
   resultNode->SetData( resultImage );
   resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
-  resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
+//  resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
 
   dataSelectionWidget->GetDataStorage()->Add(resultNode, dataSelectionWidget->GetSelection(0));
 
   this->EnableButtons();
 }
 
-mitk::Image::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface )
+mitk::LabelSetImage::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface )
 {
   mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
   mitk::ProgressBar::GetInstance()->Progress();
@@ -152,7 +153,9 @@ mitk::Image::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( mitk::Ima
   mitk::ProgressBar::GetInstance()->Progress();
 
   mitk::Image::Pointer resultImage = surfaceToImageFilter->GetOutput();
+  mitk::LabelSetImage::Pointer multilabelImage = mitk::LabelSetImage::New();
+  multilabelImage->InitializeByLabeledImage(resultImage);
 
-  return resultImage;
+  return multilabelImage;
 }
 

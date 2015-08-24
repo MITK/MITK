@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBallModel.h>
 #include <mitkDotModel.h>
 #include <mitkRawShModel.h>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 using namespace std;
 
@@ -47,27 +49,37 @@ public:
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
 
-    enum DiffusionDirectionMode {
-        FIBER_TANGENT_DIRECTIONS,
-        MAIN_FIBER_DIRECTIONS,
-        RANDOM_DIRECTIONS
+    enum CoilSensitivityProfile : int {
+        COIL_CONSTANT,
+        COIL_LINEAR,
+        COIL_EXPONENTIAL
+    };
+
+    enum AcquisitionType : int {
+        SingleShotEpi,
+        SpinEcho
     };
 
     SignalGenerationParameters()
-        : m_SignalScale(100)
+        : m_AcquisitionType(SignalGenerationParameters::SingleShotEpi)
+        , m_SignalScale(100)
         , m_tEcho(100)
+        , m_tRep(4000)
         , m_tLine(1)
         , m_tInhom(50)
+        , m_ReversePhase(false)
+        , m_PartialFourier(1.0)
+        , m_NoiseVariance(0.001)
+        , m_NumberOfCoils(1)
+        , m_CoilSensitivityProfile(SignalGenerationParameters::COIL_CONSTANT)
         , m_Bvalue(1000)
         , m_SimulateKspaceAcquisition(false)
         , m_AxonRadius(0)
         , m_DoDisablePartialVolume(false)
-        , m_DiffusionDirectionMode(SignalGenerationParameters::FIBER_TANGENT_DIRECTIONS)
-        , m_FiberSeparationThreshold(30)
         , m_Spikes(0)
         , m_SpikeAmplitude(1)
         , m_KspaceLineOffset(0)
-        , m_EddyStrength(0)
+        , m_EddyStrength(300)
         , m_Tau(70)
         , m_CroppingFactor(1)
         , m_DoAddGibbsRinging(false)
@@ -89,22 +101,28 @@ public:
     }
 
     /** input/output image specifications */
+    itk::ImageRegion<3>                 m_CroppedRegion;            ///< Image size with reduced FOV.
     itk::ImageRegion<3>                 m_ImageRegion;              ///< Image size.
     itk::Vector<double,3>               m_ImageSpacing;             ///< Image voxel size.
     itk::Point<double,3>                m_ImageOrigin;              ///< Image origin.
     itk::Matrix<double, 3, 3>           m_ImageDirection;           ///< Image rotation matrix.
 
     /** Other acquisitions parameters */
+    AcquisitionType                     m_AcquisitionType;          ///< determines k-space trajectory and maximum echo position(s)
     double                              m_SignalScale;              ///< Scaling factor for output signal (before noise is added).
     double                              m_tEcho;                    ///< Echo time TE.
-    double                              m_tLine;                    ///< k-space line readout time.
+    double                              m_tRep;                     ///< Echo time TR.
+    double                              m_tLine;                    ///< k-space line readout time (dwell time).
     double                              m_tInhom;                   ///< T2'
+    bool                                m_ReversePhase;             ///< If true, the phase readout direction will be inverted (-y instead of y)
+    double                              m_PartialFourier;           ///< Partial fourier factor (0.5-1)
+    double                              m_NoiseVariance;            ///< Variance of complex gaussian noise
+    int                                 m_NumberOfCoils;            ///< Number of coils in multi-coil acquisition
+    CoilSensitivityProfile              m_CoilSensitivityProfile;   ///< Choose between constant, linear or exponential sensitivity profile of the used coils
     double                              m_Bvalue;                   ///< Acquisition b-value
     bool                                m_SimulateKspaceAcquisition;///< Flag to enable/disable k-space acquisition simulation
     double                              m_AxonRadius;               ///< Determines compartment volume fractions (0 == automatic axon radius estimation)
     bool                                m_DoDisablePartialVolume;   ///< Disable partial volume effects. Each voxel is either all fiber or all non-fiber.
-    DiffusionDirectionMode              m_DiffusionDirectionMode;   ///< Determines how the main diffusion direction of the signal models is selected
-    double                              m_FiberSeparationThreshold; ///< Used for random and and mein fiber deriction DiffusionDirectionMode
 
     /** Artifacts and other effects */
     unsigned int                        m_Spikes;                   ///< Number of spikes randomly appearing in the image
@@ -117,6 +135,7 @@ public:
     bool                                m_DoSimulateRelaxation;     ///< Add T2 relaxation effects
     bool                                m_DoAddMotion;              ///< Enable motion artifacts.
     bool                                m_DoRandomizeMotion;        ///< Toggles between random and linear motion.
+    std::vector< bool >                 m_MotionVolumes;            ///< Indicates the image volumes that are affected by motion
     itk::Vector<double,3>               m_Translation;              ///< Maximum translational motion.
     itk::Vector<double,3>               m_Rotation;                 ///< Maximum rotational motion.
     ItkDoubleImgType::Pointer           m_FrequencyMap;             ///< If != NULL, distortions are added to the image using this frequency map.
@@ -202,6 +221,7 @@ public:
         , m_CheckAddSpikesBox(false)
         , m_CheckAddEddyCurrentsBox(false)
         , m_CheckAddDistortionsBox(false)
+        , m_MotionVolumesBox("random")
         , m_CheckRealTimeFibersBox(true)
         , m_CheckAdvancedFiberOptionsBox(false)
         , m_CheckConstantRadiusBox(false)
@@ -213,6 +233,7 @@ public:
     string              m_SignalModelString;                ///< Appendet to the name of the result node
     string              m_ArtifactModelString;              ///< Appendet to the name of the result node
     string              m_OutputPath;                       ///< Image is automatically saved to the specified folder after simulation is finished.
+    string              m_AfterSimulationMessage;           ///< Store messages that are displayed after the simulation has finished (e.g. warnings, automatic parameter adjustments etc.)
 
     /** member variables that store the check-state of GUI checkboxes */
     // image generation
@@ -224,6 +245,7 @@ public:
     bool                m_CheckAddSpikesBox;
     bool                m_CheckAddEddyCurrentsBox;
     bool                m_CheckAddDistortionsBox;
+    string              m_MotionVolumesBox;
     // fiber generation
     bool                m_CheckRealTimeFibersBox;
     bool                m_CheckAdvancedFiberOptionsBox;
@@ -261,10 +283,10 @@ public:
 
         if (m_NoiseModel!=NULL)
         {
-            if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel))
-                out.m_NoiseModel = new mitk::RicianNoiseModel<OutType>();
-            else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel))
-                out.m_NoiseModel = new mitk::ChiSquareNoiseModel<OutType>();
+            if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
+                out.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<OutType> >();
+            else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel.get()))
+                out.m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<OutType> >();
             out.m_NoiseModel->SetNoiseVariance(m_NoiseModel->GetNoiseVariance());
         }
 
@@ -307,11 +329,14 @@ public:
     /** Templated parameters */
     DiffusionModelListType              m_FiberModelList;       ///< Intra- and inter-axonal compartments.
     DiffusionModelListType              m_NonFiberModelList;    ///< Extra-axonal compartments.
-    NoiseModelType*                     m_NoiseModel;           ///< If != NULL, noise is added to the image.
+    std::shared_ptr< NoiseModelType >   m_NoiseModel;           ///< If != NULL, noise is added to the image.
 
     void PrintSelf();                           ///< Print parameters to stdout.
     void SaveParameters(string filename);       ///< Save image generation parameters to .ffp file.
     void LoadParameters(string filename);       ///< Load image generation parameters from .ffp file.
+    template< class ParameterType >
+    ParameterType ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential=false);
+    std::string                         m_MissingTags;
 };
 }
 

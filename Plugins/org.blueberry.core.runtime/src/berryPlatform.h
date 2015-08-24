@@ -310,7 +310,7 @@ public:
    * An empty path is returned if the platform is running without a configuration location.
    *
    * @return the location of the platform's configuration data area
-   * @deprecatedSince{next_release} Use GetConfigurationLocation() instead.
+   * @deprecatedSince{2015_05} Use GetConfigurationLocation() instead.
    */
   QT_DEPRECATED static QDir GetConfigurationPath();
 
@@ -334,7 +334,7 @@ public:
    * Returns the path of the base installation for the running platform
    *
    * @return the location of the platform's installation area or <code>null</code> if none
-   * @deprecatedSince{next_release} Use GetInstallLocation() instead.
+   * @deprecatedSince{2015_05} Use GetInstallLocation() instead.
    */
   QT_DEPRECATED static QDir GetInstallPath();
 
@@ -355,7 +355,7 @@ public:
    * An empty path is returned if the platform is running without an instance location.
    *
    * @return the location of the platform's instance data area or <code>null</code> if none
-   * @deprecatedSince{next_release} Use GetInstanceLocation() instead.
+   * @deprecatedSince{2015_05} Use GetInstanceLocation() instead.
    */
   QT_DEPRECATED static QDir GetInstancePath();
 
@@ -388,7 +388,7 @@ public:
    * @param plugin the plug-in whose state location is returned
    * @return a local file system path
    * TODO Investigate the usage of a service factory
-   * @deprecatedSince{next_release} Use GetStateLocation instead.
+   * @deprecatedSince{2015_05} Use GetStateLocation instead.
    */
   QT_DEPRECATED static bool GetStatePath(QDir& statePath, const QSharedPointer<ctkPlugin>& plugin, bool create = true);
 
@@ -420,7 +420,7 @@ public:
    * An empty path is returned if the platform is running without an user location.
    *
    * @return the location of the platform's user data area or <code>null</code> if none
-   * @deprecatedSince{next_release} Use GetUserLocation() instead.
+   * @deprecatedSince{2015_05} Use GetUserLocation() instead.
    */
   QT_DEPRECATED static QDir GetUserPath();
 

@@ -36,6 +36,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkConnectomicsNetworkMatrixWriter.h>
 #include <mitkPlanarFigureCompositeWriter.h>
 
+#include <mitkDiffusionPropertyHelper.h>
+
+#include <mitkCoreServices.h>
+#include <mitkIPropertyDescriptions.h>
+#include <mitkIPropertyPersistence.h>
+
 #include "mitkDiffusionIOMimeTypes.h"
 
 namespace mitk
@@ -78,6 +84,21 @@ namespace mitk
       m_ConnectomicsNetworkCSVWriter = new ConnectomicsNetworkCSVWriter();
       m_ConnectomicsNetworkMatrixWriter = new ConnectomicsNetworkMatrixWriter();
       m_PlanarFigureCompositeWriter = new PlanarFigureCompositeWriter();
+
+      //register relevant properties
+      //non-persistent properties
+      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::BVALUEMAPPROPERTYNAME, "This map stores which b values belong to which gradients.");
+      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME, "The original gradients used during acquisition. This property may be empty.");
+      //persistent properties
+      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME, "The reference b value the gradients are normalized to.");
+      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME, "The measurment frame used during acquisition.");
+      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME, "The gradients used during acquisition.");
+      mitk::CoreServices::GetPropertyDescriptions()->AddDescription(mitk::DiffusionPropertyHelper::MODALITY, "Defines the modality used for acquisition. DWMRI signifies diffusion weighted images.");
+
+      mitk::CoreServices::GetPropertyPersistence()->AddInfo(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME, mitk::PropertyPersistenceInfo::New("DWMRI_b-value"));
+      mitk::CoreServices::GetPropertyPersistence()->AddInfo(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME, mitk::PropertyPersistenceInfo::New("measurement frame"));
+      mitk::CoreServices::GetPropertyPersistence()->AddInfo(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME, mitk::PropertyPersistenceInfo::New("DWMRI_gradient"));
+      mitk::CoreServices::GetPropertyPersistence()->AddInfo(mitk::DiffusionPropertyHelper::MODALITY, mitk::PropertyPersistenceInfo::New("modality"));
     }
 
     void Unload(us::ModuleContext*) override

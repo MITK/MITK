@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarPolygon.h"
 #include "mitkPlanarCircle.h"
+#include "mitkPlanarBezierCurve.h"
 
 #include "mitkInteractionPositionEvent.h"
 #include "mitkInternalEvent.h"
@@ -246,21 +247,51 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
   if ( positionEvent == NULL )
     return false;
 
+  DataNode::Pointer node = this->GetDataNode();
+  BaseData::Pointer data = node->GetData();
+
+  /*
+  * Added check for "initiallyplaced" due to bug 13097:
+  *
+  * There are two possible cases in which a point can be inserted into a PlanarPolygon:
+  *
+  * 1. The figure is currently drawn -> the point will be appended at the end of the figure
+  * 2. A point is inserted at a userdefined position after the initial placement of the figure is finished
+  *
+  * In the second case we need to determine the proper insertion index. In the first case the index always has
+  * to be -1 so that the point is appended to the end.
+  *
+  * These changes are necessary because of a mac os x specific issue: If a users draws a PlanarPolygon then the
+  * next point to be added moves according to the mouse position. If then the user left clicks in order to add
+  * a point one would assume the last move position is identical to the left click position. This is actually the
+  * case for windows and linux but somehow NOT for mac. Because of the insertion logic of a new point in the
+  * PlanarFigure then for mac the wrong current selected point is determined.
+  *
+  * With this check here this problem can be avoided. However a redesign of the insertion logic should be considered
+  */
+
+  bool isFigureFinished = false;
+  data->GetPropertyList()->GetBoolProperty("initiallyplaced", isFigureFinished);
+
   bool selected = false;
   bool isEditable = true;
-  GetDataNode()->GetBoolProperty("selected", selected);
-  GetDataNode()->GetBoolProperty( "planarfigure.iseditable", isEditable );
+
+  node->GetBoolProperty("selected", selected);
+  node->GetBoolProperty("planarfigure.iseditable", isEditable);
 
   if ( !selected || !isEditable )
   {
     return false;
   }
 
-  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
-    GetDataNode()->GetData() );
+  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(data.GetPointer());
 
-  mitk::PlaneGeometry *planarFigureGeometry =
-    dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  // We can't derive a new control point from a polyline of a Bezier curve
+  // as all control points contribute to each polyline point.
+  if (dynamic_cast<PlanarBezierCurve*>(planarFigure) != nullptr && isFigureFinished)
+    return false;
+
+  const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   mitk::AbstractTransformGeometry *abstractTransformGeometry =
     dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
 
@@ -288,32 +319,10 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
   // when interacting with a PlanarPolygon. For all other types
   // new control points will always be appended
 
-  /*
-  * Added check for "initiallyplaced" due to bug 13097:
-  *
-  * There are two possible cases in which a point can be inserted into a PlanarPolygon:
-  *
-  * 1. The figure is currently drawn -> the point will be appended at the end of the figure
-  * 2. A point is inserted at a userdefined position after the initial placement of the figure is finished
-  *
-  * In the second case we need to determine the proper insertion index. In the first case the index always has
-  * to be -1 so that the point is appended to the end.
-  *
-  * These changes are necessary because of a mac os x specific issue: If a users draws a PlanarPolygon then the
-  * next point to be added moves according to the mouse position. If then the user left clicks in order to add
-  * a point one would assume the last move position is identical to the left click position. This is actually the
-  * case for windows and linux but somehow NOT for mac. Because of the insertion logic of a new point in the
-  * PlanarFigure then for mac the wrong current selected point is determined.
-  *
-  * With this check here this problem can be avoided. However a redesign of the insertion logic should be considered
-  */
-  bool isFigureFinished = false;
-  planarFigure->GetPropertyList()->GetBoolProperty( "initiallyplaced", isFigureFinished );
-
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
-  if ( dynamic_cast<mitk::PlanarPolygon*>( planarFigure ) && isFigureFinished)
+  if (dynamic_cast<mitk::PlanarPolygon*>(planarFigure) && isFigureFinished)
   {
     nextIndex = this->IsPositionOverFigure(
       positionEvent,
@@ -334,7 +343,7 @@ bool mitk::PlanarFigureInteractor::AddPoint(StateMachineAction*, InteractionEven
     point2D = planarFigure->GetPreviewControlPoint();
   }
 
-  planarFigure->AddControlPoint( point2D, nextIndex );
+  planarFigure->AddControlPoint( point2D, planarFigure->GetControlPointForPolylinePoint( nextIndex, 0 ) );
 
   if ( planarFigure->IsPreviewControlPointVisible() )
   {
@@ -489,7 +498,7 @@ bool mitk::PlanarFigureInteractor::CheckFigureHovering( const InteractionEvent* 
 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   mitk::BaseRenderer *renderer = interactionEvent->GetSender();
-  mitk::PlaneGeometry *planarFigureGeometry = dynamic_cast< PlaneGeometry * >( planarFigure->GetGeometry( 0 ) );
+  const mitk::PlaneGeometry *planarFigureGeometry = planarFigure->GetPlaneGeometry();
   mitk::AbstractTransformGeometry *abstractTransformGeometry = dynamic_cast< AbstractTransformGeometry * >( planarFigure->GetGeometry( 0 ) );
   const PlaneGeometry *projectionPlane = renderer->GetCurrentWorldPlaneGeometry();
 
@@ -774,12 +783,16 @@ bool mitk::PlanarFigureInteractor::IsPointNearLine(
   mitk::Point2D crossPoint = startPoint + n1 * l1;
   projectedPoint = crossPoint;
 
+  float dist1 = crossPoint.SquaredEuclideanDistanceTo(point);
+  float dist2 = endPoint.SquaredEuclideanDistanceTo(point);
+  float dist3 = startPoint.SquaredEuclideanDistanceTo(point);
+
   // Point is inside encompassing rectangle IF
   // - its distance to its projected point is small enough
   // - it is not further outside of the line than the defined tolerance
-  if (((crossPoint.SquaredEuclideanDistanceTo(point) < 20.0) && (l1 > 0.0) && (l2 > 0.0))
-      || endPoint.SquaredEuclideanDistanceTo(point) < 20.0
-      || startPoint.SquaredEuclideanDistanceTo(point) < 20.0)
+  if (((dist1 < 20.0) && (l1 > 0.0) && (l2 > 0.0))
+      || dist2 < 20.0
+      || dist3 < 20.0)
   {
     return true;
   }
@@ -805,7 +818,6 @@ int mitk::PlanarFigureInteractor::IsPositionOverFigure(
   Point2D polyLinePoint;
   Point2D firstPolyLinePoint;
   Point2D previousPolyLinePoint;
-
   for ( unsigned short loop=0; loop<planarFigure->GetPolyLinesSize(); ++loop )
   {
     const VertexContainerType polyLine = planarFigure->GetPolyLine( loop );
@@ -990,5 +1002,3 @@ void mitk::PlanarFigureInteractor::ConfigurationChanged()
     m_MinimumPointDistance = (ScalarType) 25.0;
   }
 }
-
-

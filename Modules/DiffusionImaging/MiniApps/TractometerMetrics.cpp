@@ -33,13 +33,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/*!
+\brief Calculates the Tractometer evaluation metrics for tractograms (http://www.tractometer.org/)
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
 
     parser.setTitle("Tractometer Metrics");
     parser.setCategory("Fiber Tracking and Processing Methods");
-    parser.setDescription("");
+    parser.setDescription("Calculates the Tractometer evaluation metrics for tractograms (http://www.tractometer.org/)");
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");

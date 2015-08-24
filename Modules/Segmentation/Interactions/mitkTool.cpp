@@ -16,15 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 #include "mitkProperties.h"
-#include "mitkImageWriteAccessor.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkImageReadAccessor.h"
+#include "mitkImageWriteAccessor.h"
+#include "mitkLabelSetImage.h"
+#include "mitkLevelWindowProperty.h"
+#include "mitkLookupTableProperty.h"
+#include "mitkProperties.h"
+#include "mitkVtkResliceInterpolationProperty.h"
 
 // us
-#include <usModuleResource.h>
 #include <usGetModuleContext.h>
+#include <usModuleResource.h>
 
+// itk
 #include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char* type)
@@ -52,7 +56,7 @@ mitk::Tool::~Tool()
 {
 }
 
-bool mitk::Tool::CanHandle(BaseData* referenceData) const
+bool mitk::Tool::CanHandle(BaseData*) const
 {
   return true;
 }
@@ -154,6 +158,7 @@ mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() con
   return m_IsSegmentationPredicate.GetPointer();
 }
 
+
 mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color )
 {
   // we NEED a reference image for size etc.
@@ -161,19 +166,27 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
 
   // actually create a new empty segmentation
   PixelType pixelType(mitk::MakeScalarPixelType<DefaultSegmentationDataType>() );
-  Image::Pointer segmentation = Image::New();
+  LabelSetImage::Pointer segmentation = LabelSetImage::New();
 
   if (original->GetDimension() == 2)
   {
     const unsigned int dimensions[] = { original->GetDimension(0), original->GetDimension(1), 1 };
     segmentation->Initialize(pixelType, 3, dimensions);
+    segmentation->AddLayer();
   }
   else
   {
-    segmentation->Initialize(pixelType, original->GetDimension(), original->GetDimensions());
+    segmentation->Initialize(original);
   }
 
-  unsigned int byteSize = sizeof(DefaultSegmentationDataType);
+  mitk::Label::Pointer label = mitk::Label::New();
+  label->SetName(organName);
+  label->SetColor(color);
+  label->SetValue(1);
+  segmentation->GetActiveLabelSet()->AddLabel(label);
+  segmentation->GetActiveLabelSet()->SetActiveLabel(1);
+
+  unsigned int byteSize = sizeof(mitk::Label::PixelType);
 
   if(segmentation->GetDimension() < 4)
   {
@@ -182,12 +195,13 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
       byteSize *= segmentation->GetDimension(dim);
     }
 
-    mitk::ImageWriteAccessor writeAccess(segmentation, segmentation->GetVolumeData(0));
+    mitk::ImageWriteAccessor writeAccess(segmentation.GetPointer(), segmentation->GetVolumeData(0));
 
     memset( writeAccess.GetData(), 0, byteSize );
   }
   else
-  {//if we have a time-resolved image we need to set memory to 0 for each time step
+  {
+    //if we have a time-resolved image we need to set memory to 0 for each time step
     for (unsigned int dim = 0; dim < 3; ++dim)
     {
       byteSize *= segmentation->GetDimension(dim);
@@ -195,7 +209,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
 
     for( unsigned int volumeNumber = 0; volumeNumber < segmentation->GetDimension(3); volumeNumber++)
     {
-      mitk::ImageWriteAccessor writeAccess(segmentation, segmentation->GetVolumeData(volumeNumber));
+      mitk::ImageWriteAccessor writeAccess(segmentation.GetPointer(), segmentation->GetVolumeData(volumeNumber));
 
       memset( writeAccess.GetData(), 0, byteSize );
     }
@@ -228,7 +242,12 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const 
 
   // visualization properties
   segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
-  segmentationNode->SetProperty( "color", ColorProperty::New(color) );
+//  segmentationNode->SetProperty( "color", ColorProperty::New(color) );
+  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+  lut->SetType(mitk::LookupTable::MULTILABEL);
+  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
+  lutProp->SetLookupTable(lut);
+  segmentationNode->SetProperty("LookupTable", lutProp);
   segmentationNode->SetProperty( "texture interpolation", BoolProperty::New(false) );
   segmentationNode->SetProperty( "layer", IntProperty::New(10) );
   segmentationNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(0.5, 1) ) );

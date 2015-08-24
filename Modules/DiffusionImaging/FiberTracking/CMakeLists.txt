@@ -6,17 +6,6 @@ mitk_check_module_dependencies(
   MISSING_DEPENDENCIES_VAR _missing_deps
 )
 
-# Enable OpenMP support
-find_package(OpenMP)
-if(NOT OPENMP_FOUND)
-   message("OpenMP is not available.")
-endif()
-if(OPENMP_FOUND)
-  message(STATUS "Found OpenMP.")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
-
 if(NOT _missing_deps)
 
   set(lut_url http://mitk.org/download/data/FibertrackingLUT.tar.gz)
@@ -54,7 +43,7 @@ endif()
 
 MITK_CREATE_MODULE(
   SUBPROJECTS MITK-DTI
-  INCLUDE_DIRS Algorithms Algorithms/MLTracking Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundle IODataStructures/PlanarFigureComposite Interactions SignalModels Rendering ${CMAKE_CURRENT_BINARY_DIR}
+  INCLUDE_DIRS Fiberfox Fiberfox/SignalModels Fiberfox/Sequences Algorithms Algorithms/MLTracking Algorithms/GibbsTracking Algorithms/StochasticTracking IODataStructures IODataStructures/FiberBundle IODataStructures/PlanarFigureComposite Interactions Rendering ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${_module_deps}
   PACKAGE_DEPENDS PUBLIC ITK|ITKFFT ITK|ITKDiffusionTensorImage Vigra HDF5
   #WARNINGS_AS_ERRORS

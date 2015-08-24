@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+/*!
+\brief Extract fibers from a tractogram using planar figure ROIs
+*/
 int main(int argc, char* argv[])
 {
     mitkCommandLineParser parser;
@@ -37,7 +40,7 @@ int main(int argc, char* argv[])
     parser.setTitle("Fiber Extraction");
     parser.setCategory("Fiber Tracking and Processing Methods");
     parser.setContributor("MBI");
-    parser.setDescription(" ");
+    parser.setDescription("Extract fibers from a tractogram using planar figure ROIs");
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input tractogram (.fib/.trk)", us::Any(), false);

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessage.h"
 #include "mitkIGTLMessageSource.h"
 #include "MitkIGTExports.h"
+#include "mitkIGTLMeasurements.h"
 
 namespace mitk
 {
@@ -137,6 +138,10 @@ namespace mitk
     * \brief Defines how the input will be copied into the output
     */
     virtual void GenerateOutputInformation() override;
+
+
+    /** Measurement class to calculate latency and frame count */
+    mitk::IGTLMeasurements* m_Measurement;
   };
 } // namespace mitk
 #endif /* MITKOPENIGTLMESSAGETONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */

@@ -3,6 +3,7 @@
 
 set(mitk_modules
   Core
+  CommandLine
   AppUtil
   DCMTesting
   RDF
@@ -66,6 +67,7 @@ set(mitk_modules
   XNAT
   TubeGraph
   BiophotonicsHardware
+  Classification
 )
 
 if(MITK_ENABLE_PIC_READER)

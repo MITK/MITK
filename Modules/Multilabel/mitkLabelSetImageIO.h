@@ -34,10 +34,6 @@ class MITKMULTILABEL_EXPORT LabelSetImageIO : public mitk::AbstractFileIO
 {
 public:
 
-  typedef LabelSetImage::PixelType            PixelType;
-  typedef LabelSetImage::LabelSetImageType    ImageType;
-  typedef LabelSetImage::VectorImageType      VectorImageType;
-
   typedef mitk::LabelSetImage InputType;
 
   LabelSetImageIO();

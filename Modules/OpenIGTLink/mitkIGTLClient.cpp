@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLClient.h"
 //#include "mitkIGTTimeStamp.h"
 //#include "mitkIGTHardwareException.h"
+#include "igtlTrackingDataMessage.h"
 #include <stdio.h>
 
 #include <itksys/SystemTools.hxx>
@@ -105,7 +106,14 @@ void mitk::IGTLClient::Send()
   if ( curMessage.IsNull() )
     return;
 
-  m_Measurement->AddMeasurement(4);
+
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(4,x_pos); //x value is used as index
 
   if ( this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
   {

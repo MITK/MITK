@@ -177,7 +177,13 @@ void OpenIGTLinkExample::UpdatePipeline()
   {
     //update the pipeline
     m_VisFilter->Update();
-    m_Measurement->AddMeasurement(10);
+    //igtl::TrackingDataMessage* tdMsg =
+    //  (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+    //igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+    //tdMsg->GetTrackingDataElement(0,trackingData);
+    //float x_pos, y_pos, z_pos;
+    //trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+    //m_Measurement->AddMeasurement(10,x_pos); //x value is used as index
 
     ////update the boundings
     //mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
@@ -196,12 +202,12 @@ void OpenIGTLinkExample::UpdatePipeline()
     static mitk::NavigationData::Pointer previousND = mitk::NavigationData::New();
     mitk::NavigationData* curND = m_IGTLMsgToNavDataFilter->GetOutput();
 
-    std::cout << "9: igt timestamp: " << curND->GetIGTTimeStamp() << std::endl;
-    std::cout << "9: timestamp: " << curND->GetTimeStamp() << std::endl;
+    //std::cout << "9: igt timestamp: " << curND->GetIGTTimeStamp() << std::endl;
+    //std::cout << "9: timestamp: " << curND->GetTimeStamp() << std::endl;
 
     if ( !mitk::Equal( *(previousND.GetPointer()), *curND ) )
     {
-      m_Measurement->AddMeasurement(9);
+      m_Measurement->AddMeasurement(9,curND->GetPosition()[0]);//x value is used as index
       //previousTimestamp = curTimestamp;
       previousND->Graft(curND);
     }

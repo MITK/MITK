@@ -82,8 +82,10 @@ namespace mitk {
 
     /**
     * \brief AddMeasurementPoint
+    * \param timestamp Sets the timestamp, if it is 0 the current system time is used.
     */
-    void AddMeasurement(unsigned int measurementPoint);
+    void AddMeasurement(unsigned int measurementPoint, unsigned int index, long long timestamp = 0);
+
 
     /**
     * \brief AddMeasurementPoint
@@ -115,7 +117,8 @@ namespace mitk {
     //protected:
     //IGTLMeasurementsImplementation::Pointer m_Measurements;
 
-    typedef std::list<long long>                    MeasurementList;
+    typedef std::pair<long long, unsigned int>      TimeStampIndexPair;
+    typedef std::list<TimeStampIndexPair>           MeasurementList;
     typedef std::map<unsigned int, MeasurementList> MeasurementPoints;
 
     MeasurementPoints                               m_MeasurementPoints;

@@ -216,7 +216,13 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
          curMessage->GetPackBodySize(), 0);
 
       // measure the time
-      m_Measurement->AddMeasurement(6);
+      igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+      igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+      tdMsg->GetTrackingDataElement(0,trackingData);
+      float x_pos, y_pos, z_pos;
+      trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+      m_Measurement->AddMeasurement(6,x_pos); //x value is used as index
 
       if ( receiveCheck > 0 )
       {
@@ -239,7 +245,13 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         }
         else
         {
-          m_Measurement->AddMeasurement(7);
+          igtl::TrackingDataMessage* tdMsg =
+            (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+          igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+          tdMsg->GetTrackingDataElement(0,trackingData);
+          float x_pos, y_pos, z_pos;
+          trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+          m_Measurement->AddMeasurement(7,x_pos); //x value is used as index
           this->m_ReceiveQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
@@ -273,7 +285,13 @@ void mitk::IGTLDevice::SendMessage(const mitk::IGTLMessage* msg)
 
 void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
-  m_Measurement->AddMeasurement(3);
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(3,x_pos); //x value is used as index
   //add the message to the queue
   m_SendQueue->PushMessage(msg);
 }
@@ -296,7 +314,13 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg
   msg->Pack();
 
   // measure the time
-  m_Measurement->AddMeasurement(5);
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(5,x_pos); //x value is used as index
 
   int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
 
@@ -471,7 +495,13 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
 
   if (msg.IsNotNull())
   {
-    m_Measurement->AddMeasurement(8);
+    igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+    igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+    tdMsg->GetTrackingDataElement(0,trackingData);
+    float x_pos, y_pos, z_pos;
+    trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+    m_Measurement->AddMeasurement(8,x_pos); //x value is used as index
     unsigned int seconds = 0;
     unsigned int frac = 0;
     msg->GetTimeStamp(&seconds, &frac);

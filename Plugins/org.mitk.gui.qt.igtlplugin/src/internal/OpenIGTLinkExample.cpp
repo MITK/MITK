@@ -177,13 +177,7 @@ void OpenIGTLinkExample::UpdatePipeline()
   {
     //update the pipeline
     m_VisFilter->Update();
-    //igtl::TrackingDataMessage* tdMsg =
-    //  (igtl::TrackingDataMessage*)(curMessage.GetPointer());
-    //igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
-    //tdMsg->GetTrackingDataElement(0,trackingData);
-    //float x_pos, y_pos, z_pos;
-    //trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
-    //m_Measurement->AddMeasurement(10,x_pos); //x value is used as index
+    if(m_VisFilter->GetOutput() != nullptr) {m_Measurement->AddMeasurement(10,m_VisFilter->GetOutput()->GetPosition()[0]);} //x value is used as index
 
     ////update the boundings
     //mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());

@@ -1,6 +1,6 @@
 --- CMakeOptions.cmake	Wed Aug 12 11:43:46 2015
 +++ CMakeOptions.cmake	Thu Aug 20 14:25:55 2015
-@@ -16,6 +16,15 @@
+@@ -16,6 +16,19 @@
  ENDIF ( NOT VTK_FOUND )
  
  #
@@ -11,6 +11,10 @@
 +  INCLUDE(${GDCM_USE_FILE})
 +ENDIF ( NOT GDCM_FOUND )
 +
++#
++# Try to find OpenCV which possibly is a dependency of ITK
++#
++FIND_PACKAGE(OpenCV)
 +
 +#
  # Try to find ITK and include its settings (otherwise complain)

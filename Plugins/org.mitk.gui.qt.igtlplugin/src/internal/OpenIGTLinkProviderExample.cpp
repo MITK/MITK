@@ -97,7 +97,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 {
   //create a navigation data player object that will play nav data from a
   //recorded file
-  m_NavDataPlayer = mitk::NavigationDataPlayer::New();
+  m_NavDataPlayer = mitk::NavigationDataSequentialPlayer::New();
 
   //set the currently read navigation data set
   m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
@@ -170,7 +170,7 @@ void OpenIGTLinkProviderExample::DestroyPipeline()
 {
    if (m_NavDataPlayer.IsNotNull())
    {
-      m_NavDataPlayer->StopPlaying();
+      //m_NavDataPlayer->StopPlaying();
    }
    foreach(mitk::DataNode::Pointer node, m_DemoNodes)
    {
@@ -184,7 +184,7 @@ void OpenIGTLinkProviderExample::Start()
   if ( this->m_Controls.butStart->text().contains("Start") )
   {
     m_NavDataPlayer->SetRepeat(true);
-    m_NavDataPlayer->StartPlaying();
+    //m_NavDataPlayer->StartPlaying();
     this->m_Controls.butStart->setText("Stop Playing Recorded Navigation Data ");
 
     //start the visualization
@@ -192,7 +192,7 @@ void OpenIGTLinkProviderExample::Start()
   }
   else
   {
-    m_NavDataPlayer->StopPlaying();
+    //m_NavDataPlayer->StopPlaying();
     this->m_Controls.butStart->setText("Start Playing Recorded Navigation Data ");
 
     //stop the visualization
@@ -203,8 +203,9 @@ void OpenIGTLinkProviderExample::Start()
 void OpenIGTLinkProviderExample::OnOpenFile(){
 
   // FIXME Filter for correct files and use correct Reader
-  QString fileName =
-      QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "XML files (*.xml)");
+  QString filter = tr("NavigationData File (*.csv *.xml)");
+  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open NavigationData Set"), "", filter);
+
   if ( fileName.isNull() ) { return; } // user pressed cancel
 
   try
@@ -231,6 +232,7 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
 void OpenIGTLinkProviderExample::UpdateVisualization()
 {
+  this->m_NavDataPlayer->GoToNextSnapshot();
   if (this->m_Controls.visualizeCheckBox->isChecked())
   {
     //update the filter

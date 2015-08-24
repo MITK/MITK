@@ -28,6 +28,8 @@ mitk::USIGTLDevice::USIGTLDevice(std::string manufacturer, std::string model,
   m_Client = mitk::IGTLClient::New();
   // TODO: Set Name
   m_Client->SetName("OIGTL Test device");
+  m_Client->SetPortNumber(m_Port);
+  m_Client->SetHostname(m_Host);
 
   m_DeviceSource = mitk::IGTLDeviceSource::New();
   m_DeviceSource->SetIGTLDevice(m_Client);

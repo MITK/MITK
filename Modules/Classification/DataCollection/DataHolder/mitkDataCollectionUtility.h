@@ -54,10 +54,8 @@ mitk::DataCollectionUtility::EnsureDataImageInCollection(mitk::DataCollection::P
     if (collection->HasElement(origin))
     {
         LabelImage::Pointer originImage = dynamic_cast<LabelImage*>(collection->GetData(origin).GetPointer());
-        MITK_INFO << "Creating new Element";
         if (!collection->HasElement(target) && originImage.IsNotNull())
         {
-            MITK_INFO << "New image necessary";
             FeatureImage::Pointer image = FeatureImage::New();
             image->SetRegions(originImage->GetLargestPossibleRegion());
             image->SetSpacing(originImage->GetSpacing());

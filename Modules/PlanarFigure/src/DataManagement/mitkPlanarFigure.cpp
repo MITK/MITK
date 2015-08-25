@@ -115,6 +115,16 @@ void mitk::PlanarFigure::CancelPlaceFigure()
   this->Modified();
 }
 
+void mitk::PlanarFigure::SetFinalized(bool finalized)
+{ 
+    m_FigureFinalized = finalized; 
+    if (finalized)  
+    {
+        this->InvokeEvent(FinalizedPlanarFigureEvent());
+    }
+    this->Modified(); 
+}
+
 bool mitk::PlanarFigure::AddControlPoint(const mitk::Point2D& point, int position)
 {
     // if we already have the maximum number of control points, do nothing

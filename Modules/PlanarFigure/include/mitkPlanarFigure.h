@@ -91,7 +91,7 @@ public:
   /** \brief True if the planar figure has been placed and finalized
   * (e.g. drawing a polygon is finished). */
   virtual bool IsFinalized() const { return m_FigureFinalized; }
-  virtual void SetFinalized(bool finalized) { m_FigureFinalized = finalized; this->Modified(); }
+  virtual void SetFinalized(bool finalized);
 
   /** \brief Place figure at the given point (in 2D index coordinates) onto
    * the given 2D geometry.
@@ -429,6 +429,7 @@ private:
 itkEventMacro(PlanarFigureEvent, itk::AnyEvent);
 itkEventMacro(StartPlacementPlanarFigureEvent, PlanarFigureEvent);
 itkEventMacro(EndPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(FinalizedPlanarFigureEvent, PlanarFigureEvent);
 itkEventMacro(CancelPlacementPlanarFigureEvent, PlanarFigureEvent);
 itkEventMacro(SelectPlanarFigureEvent, PlanarFigureEvent);
 itkEventMacro(StartInteractionPlanarFigureEvent, PlanarFigureEvent);

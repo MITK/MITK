@@ -36,7 +36,6 @@ mitk::ToolManager::ToolManager(DataStorage* storage)
     m_DataStorage(storage)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
-  this->InitializeTools();
   //ActivateTool(0); // first one is default
 }
 
@@ -87,6 +86,53 @@ void mitk::ToolManager::InitializeTools()
       tool->GeneralMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
       m_Tools.push_back( tool );
     }
+  }
+}
+
+
+void mitk::ToolManager::RegisterTool(const std::string& toolName)
+{
+  Tool* tool = 0;
+  for (ToolVectorType::const_iterator it = m_Tools.begin(); it != m_Tools.end(); ++it)
+  {
+    if (toolName == (*it)->GetNameOfClass())
+    {
+      tool = *it;
+      break;
+    }
+  }
+
+  if (!tool)
+  {
+    itk::LightObject::Pointer toolInstance = itk::ObjectFactoryBase::CreateInstance(toolName.c_str());
+    tool = dynamic_cast<Tool*>(toolInstance.GetPointer());
+    tool->InitializeStateMachine();
+    tool->SetToolManager(this); // important to call right after instantiation
+    tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnToolErrorMessage );
+    tool->GeneralMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
+    m_Tools.push_back(tool);
+  }
+}
+
+
+void mitk::ToolManager::UnregisterTool(const std::string& toolName)
+{
+  mitk::Tool* tool = 0;
+  ToolVectorType::iterator it;
+  for (it = m_Tools.begin(); it != m_Tools.end(); ++it)
+  {
+    if (toolName == (*it)->GetNameOfClass())
+    {
+      tool = *it;
+      break;
+    }
+  }
+
+  if (tool)
+  {
+    tool->ErrorMessage -= MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnToolErrorMessage );
+    tool->GeneralMessage -= MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
+    m_Tools.erase(it);
   }
 }
 

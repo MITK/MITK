@@ -474,7 +474,7 @@ int main( int argc, char* argv[] )
       merged4D->GetGeometry(i)->SetSpacing(referenceImg->GetGeometry()->GetSpacing());
       merged4D->GetGeometry(i)->SetOrigin(referenceImg->GetGeometry()->GetOrigin());
       merged4D->GetGeometry(i)->SetIndexToWorldTransform(referenceImg->GetGeometry()->GetIndexToWorldTransform());
-      merged4D->SetVolume(readAc->GetData(),i);
+      merged4D->SetVolume(readAc.GetData(),i);
     }
 
     MITK_INFO << "-- Convert to RGB";

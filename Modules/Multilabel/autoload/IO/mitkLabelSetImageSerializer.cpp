@@ -21,19 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 
-
 MITK_REGISTER_SERIALIZER(LabelSetImageSerializer)
 
-
-mitk::LabelSetImageSerializer::LabelSetImageSerializer()
+  mitk::LabelSetImageSerializer::LabelSetImageSerializer()
 {
 }
-
 
 mitk::LabelSetImageSerializer::~LabelSetImageSerializer()
 {
 }
-
 
 std::string mitk::LabelSetImageSerializer::Serialize()
 {
@@ -41,14 +37,14 @@ std::string mitk::LabelSetImageSerializer::Serialize()
   if (image == NULL)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::LabelSetImage. Cannot serialize as LabelSetImage.";
+      << " is not an mitk::LabelSetImage. Cannot serialize as LabelSetImage.";
     return "";
   }
 
   std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
   filename += "_";
   filename += m_FilenameHint;
-  filename += ".lset";
+  filename += ".nrrd";
 
   std::string fullname(m_WorkingDirectory);
   fullname += "/";
@@ -57,20 +53,19 @@ std::string mitk::LabelSetImageSerializer::Serialize()
   try
   {
     mitk::IOUtil::Save(const_cast<LabelSetImage*>(image), fullname);
-//    LabelSetImageWriter::Pointer writer = LabelSetImageWriter::New();
-//    writer->SetFileName(fullname);
-//    writer->SetInput(const_cast<LabelSetImage*>(image));
-//    writer->Write();
+    //    LabelSetImageWriter::Pointer writer = LabelSetImageWriter::New();
+    //    writer->SetFileName(fullname);
+    //    writer->SetInput(const_cast<LabelSetImage*>(image));
+    //    writer->Write();
   }
   catch (std::exception& e)
   {
     MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
-              << " to "
-              << fullname
-              << ": "
-              << e.what();
+      << " to "
+      << fullname
+      << ": "
+      << e.what();
     return "";
   }
   return filename;
 }
-

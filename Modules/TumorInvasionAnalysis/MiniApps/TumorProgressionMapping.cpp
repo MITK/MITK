@@ -123,11 +123,11 @@ public:
     RGBPixelType value;
 
     // Fill rgb image with gray values
-    for (idx[2] =0; idx[2] < dim[2]; idx[2]++)
+    for (idx[2] =0; (unsigned int)idx[2] < dim[2]; idx[2]++)
     {
-      for (idx[1] =0; idx[1] < dim[1]; idx[1]++)
+      for (idx[1] =0; (unsigned int)idx[1] < dim[1]; idx[1]++)
       {
-        for (idx[0] =0; idx[0] < dim[0]; idx[0]++)
+        for (idx[0] =0; (unsigned int)idx[0] < dim[0]; idx[0]++)
         {
           value.Fill(rescaleFilter->GetOutput()->GetPixel(idx));
           writeAcc.SetPixelByIndex(idx, value);
@@ -228,11 +228,11 @@ public:
     itk::RGBPixel<PixelType> value;
     unsigned short overlayVal=0;
     // Fill rgb image with gray values
-    for (idx[2] =0; idx[2] < dim[2]; idx[2]++)
+    for (idx[2] =0; (unsigned int)idx[2] < dim[2]; idx[2]++)
     {
-      for (idx[1] =0; idx[1] < dim[1]; idx[1]++)
+      for (idx[1] =0; (unsigned int)idx[1] < dim[1]; idx[1]++)
       {
-        for (idx[0] =0; idx[0] < dim[0]; idx[0]++)
+        for (idx[0] =0; (unsigned int)idx[0] < dim[0]; idx[0]++)
         {
           overlayVal = 255*itkOverlayImage->GetPixel(idx);
           value = writeAcc.GetPixelByIndex(idx);

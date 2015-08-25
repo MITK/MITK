@@ -68,6 +68,7 @@ set(mitk_modules
   TubeGraph
   BiophotonicsHardware
   Classification
+  TumorInvasionAnalysis
 )
 
 if(MITK_ENABLE_PIC_READER)

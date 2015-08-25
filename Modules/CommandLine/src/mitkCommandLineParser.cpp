@@ -769,7 +769,8 @@ string mitkCommandLineParser::helpText() const
 
   text = "Command Line Utility *" + Title + "* in Category *" + Category +  "*\n";
   text +=  Description +  "\n";
-  text +=  Contributor +  "\n";
+  text +=  Contributor +  "\n\n";
+  text +=  "Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.\n";
 
   // Loop over grouped argument descriptions
   map<string, vector<CommandLineParserArgumentDescription*>>::iterator it;

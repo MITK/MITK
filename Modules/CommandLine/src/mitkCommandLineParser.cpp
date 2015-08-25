@@ -765,6 +765,12 @@ string mitkCommandLineParser::helpText() const
   string text;
   vector<CommandLineParserArgumentDescription*> deprecatedArgs;
 
+
+
+  text = "Command Line Utility *" + Title + "* in Category *" + Category +  "*\n";
+  text +=  Description +  "\n";
+  text +=  Contributor +  "\n";
+
   // Loop over grouped argument descriptions
   map<string, vector<CommandLineParserArgumentDescription*>>::iterator it;
   for ( it = Internal->GroupToArgumentDescriptionListMap.begin();

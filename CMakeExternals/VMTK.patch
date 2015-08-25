@@ -1,6 +1,8 @@
---- CMakeOptions.cmake	Wed Aug 12 11:43:46 2015
-+++ CMakeOptions.cmake	Thu Aug 20 14:25:55 2015
-@@ -16,6 +16,19 @@
+diff --git a/CMakeOptions.cmake b/CMakeOptions.cmake
+index 17fc5b8..23b3f1f 100644
+--- a/CMakeOptions.cmake
++++ b/CMakeOptions.cmake
+@@ -16,6 +16,19 @@ IF ( NOT VTK_FOUND )
  ENDIF ( NOT VTK_FOUND )
  
  #

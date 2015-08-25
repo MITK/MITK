@@ -23,10 +23,9 @@ if(MITK_USE_VMTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      # URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtkVmtk-vtk6-90e0233.tar.gz
-      URL file://E:/vtkVmtk-vtk6-90e0233.tar.gz
-      URL_MD5 5b5323ddade08a161cb25becc36ed865
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p0 -i ${CMAKE_CURRENT_LIST_DIR}/VMTK.patch
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/vtkVmtk-vtk6-90e0233.tar.bz2
+      URL_MD5 c961f891868b7f91676509a9988ad76f
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VMTK.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

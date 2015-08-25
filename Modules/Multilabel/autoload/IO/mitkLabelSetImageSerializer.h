@@ -21,14 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-/**
+  /**
   \brief Serializes mitk::LabelSetImage for mitk::SceneIO
-*/
-class LabelSetImageSerializer : public BaseDataSerializer
+  */
+  class LabelSetImageSerializer : public BaseDataSerializer
   {
   public:
     mitkClassMacro( LabelSetImageSerializer, BaseDataSerializer );
-    itkNewMacro(Self);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     virtual std::string Serialize() override;
 
   protected:

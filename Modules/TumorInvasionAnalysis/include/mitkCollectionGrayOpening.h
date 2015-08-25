@@ -30,14 +30,17 @@ class MITKTUMORINVASIONANALYSIS_EXPORT CollectionGrayOpening
 public:
 
   //typedef unsigned char BinaryType;
-  typedef double BinaryType;
-  typedef itk::Image<BinaryType, 3> BinaryImage;
-
-
+  typedef itk::Image<mitk::ScalarType, 3> ImageType;
 
   CollectionGrayOpening(){}
   ~CollectionGrayOpening(){}
 
+  /**
+   * @brief PerformGrayOpening - Opening operation on a specific modality type wihtin the DataCollection. Creates a new item.
+   * @param dataCollection
+   * @param name
+   * @param suffix
+   */
   static void PerformGrayOpening(mitk::DataCollection *dataCollection, std::string name, std::string suffix);
 
 protected:

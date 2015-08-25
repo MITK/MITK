@@ -32,11 +32,10 @@ void mitk::CollectionGrayOpening::PerformGrayOpening(mitk::DataCollection *dataC
   {
     DataCollection* dataPatient = dynamic_cast<DataCollection*>(dataCollection->GetData(patient).GetPointer());
     if (dataPatient == NULL)
-      MITK_ERROR << "DilateBinaryByName - Structure of DataCollection is invalid at patient level. Data inconsistent!";
+      MITK_ERROR << "PerformGrayOpening - Structure of DataCollection is invalid at patient level. Data inconsistent!";
 
     if (dataPatient->Size() == 0)
       MITK_ERROR << "Empty Patient Collective. Probably Fatal.";
-
 
     for (size_t timeStep = 0; timeStep < dataPatient->Size(); ++timeStep)
     {
@@ -46,7 +45,7 @@ void mitk::CollectionGrayOpening::PerformGrayOpening(mitk::DataCollection *dataC
 
 
       //BinaryImage::Pointer itkImage = BinaryImage::New();
-      BinaryImage::Pointer itkImage =  BinaryImage::New();
+      ImageType::Pointer itkImage =  ImageType::New();
       Image::Pointer tmp = dataTimeStep->GetMitkImage(name).GetPointer();
       if (tmp.IsNull())
         MITK_ERROR << "null";
@@ -60,21 +59,19 @@ void mitk::CollectionGrayOpening::PerformGrayOpening(mitk::DataCollection *dataC
       elementRadius[2] = 0;
       StructuringElementType structuringElement = StructuringElementType::Box(elementRadius);
 
-      typedef itk::GrayscaleMorphologicalOpeningImageFilter <BinaryImage, BinaryImage, StructuringElementType> BinaryDilateImageFilterType;
+      typedef itk::GrayscaleMorphologicalOpeningImageFilter <ImageType, ImageType, StructuringElementType> DilateImageFilterType;
 
-      BinaryDilateImageFilterType::Pointer dilateFilter0 = BinaryDilateImageFilterType::New();
+      DilateImageFilterType::Pointer dilateFilter0 = DilateImageFilterType::New();
       dilateFilter0->SetInput(itkImage);
       dilateFilter0->SetKernel(structuringElement);
       dilateFilter0->Update();
 
-      BinaryDilateImageFilterType::Pointer dilateFilter1 = BinaryDilateImageFilterType::New();
+      DilateImageFilterType::Pointer dilateFilter1 = DilateImageFilterType::New();
       dilateFilter1->SetInput(dilateFilter0->GetOutput());
       dilateFilter1->SetKernel(structuringElement);
       dilateFilter1->Update();
 
-
       Image::Pointer dil =  GrabItkImageMemory ( dilateFilter1->GetOutput() );
-
       dataTimeStep->AddData(dil.GetPointer(), name+suffix, "");
 
     }

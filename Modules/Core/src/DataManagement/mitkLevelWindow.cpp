@@ -44,10 +44,11 @@ void mitk::LevelWindow::EnsureConsistency()
 
     if (m_LowerWindowBound == m_UpperWindowBound )
     {
-      if(m_LowerWindowBound == m_RangeMin )
-        m_UpperWindowBound++;
-      else
-        m_LowerWindowBound--;
+      m_UpperWindowBound += 0.5;
+      m_LowerWindowBound -= 0.5;
+
+      m_UpperWindowBound = std::min(m_UpperWindowBound, m_RangeMax);
+      m_LowerWindowBound = std::max(m_LowerWindowBound, m_RangeMin);
     }
   }
 }

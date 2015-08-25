@@ -37,6 +37,8 @@ namespace mitk
  * mitk::GeometryData. If multiple mitk::GeometryData objects are stored in one file,
  * these are assigned to multiple BaseData objects.
  *
+ * @sa Geometry3DToXML
+ *
  * @ingroup IO
  */
 class GeometryDataReaderService: public AbstractFileReader

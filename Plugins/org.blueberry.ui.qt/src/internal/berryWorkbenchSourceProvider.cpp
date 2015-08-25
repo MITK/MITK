@@ -66,8 +66,6 @@ WorkbenchSourceProvider::WorkbenchSourceProvider()
   , lastShowInInput(nullptr)
   , lastEditorInput(nullptr)
   , display(nullptr)
-  , lastActiveShell(nullptr)
-  , lastActiveWorkbenchWindowShell(nullptr)
 {
 }
 
@@ -94,8 +92,8 @@ WorkbenchSourceProvider::~WorkbenchSourceProvider()
   qApp->removeEventFilter(this);
   HookListener(const_cast<WorkbenchWindow*>(lastActiveWorkbenchWindow.Lock().GetPointer()), nullptr);
   lastActiveWorkbenchWindow.Reset();
-  lastActiveWorkbenchWindowShell = nullptr;
-  lastActiveShell = nullptr;
+  lastActiveWorkbenchWindowShell.Reset();
+  lastActiveShell.Reset();
   lastWindow.Reset();
 }
 
@@ -224,9 +222,9 @@ void WorkbenchSourceProvider::WindowOpened(const SmartPointer<IWorkbenchWindow>&
 
 void WorkbenchSourceProvider::HandleCheck(const SmartPointer<const Shell>& s)
 {
-  if (s != lastActiveShell)
+  if (s != lastActiveShell.Lock())
   {
-    lastActiveShell = s.GetPointer();
+    lastActiveShell = s;
     CheckActivePart();
     IWorkbenchWindow* window = nullptr;
     if (s.IsNotNull())
@@ -593,9 +591,9 @@ void WorkbenchSourceProvider::HandleShellEvent()
 //  }
 
   LogDebuggingInfo("\tWSP:lastActiveShell: " +
-                   (lastActiveShell ? lastActiveShell->GetControl()->objectName() : QString("NULL")));
+                   (!lastActiveShell.Expired() ? lastActiveShell.Lock()->GetControl()->objectName() : QString("NULL")));
   LogDebuggingInfo("\tWSP:lastActiveWorkbenchWindowShell: " +
-                   (lastActiveWorkbenchWindowShell ? lastActiveWorkbenchWindowShell->GetControl()->objectName() : QString("NULL")));
+                   (!lastActiveWorkbenchWindowShell.Expired() ? lastActiveWorkbenchWindowShell.Lock()->GetControl()->objectName() : QString("NULL")));
 
   const ISourceProvider::StateMapType currentState = GetCurrentState();
   const Shell::ConstPointer newActiveShell = currentState.value(ISources::ACTIVE_SHELL_NAME()).Cast<const Shell>();
@@ -632,8 +630,8 @@ void WorkbenchSourceProvider::HandleShellEvent()
   }
 
   // Figure out which variables have changed.
-  const bool shellChanged = newActiveShell != lastActiveShell;
-  const bool windowChanged = newActiveWorkbenchWindowShell != lastActiveWorkbenchWindowShell;
+  const bool shellChanged = newActiveShell != lastActiveShell.Lock();
+  const bool windowChanged = newActiveWorkbenchWindowShell != lastActiveWorkbenchWindowShell.Lock();
   const bool toolbarChanged = newToolbarVisibility != lastToolbarVisibility;
   const bool statusLineChanged = newStatusLineVis != lastStatusLineVisibility;
 
@@ -748,8 +746,8 @@ void WorkbenchSourceProvider::HandleShellEvent()
   }
 
   // Update the member variables.
-  lastActiveShell = newActiveShell.GetPointer();
-  lastActiveWorkbenchWindowShell = newActiveWorkbenchWindowShell.GetPointer();
+  lastActiveShell = newActiveShell;
+  lastActiveWorkbenchWindowShell = newActiveWorkbenchWindowShell;
   lastActiveWorkbenchWindow = newActiveWorkbenchWindow;
   lastToolbarVisibility = newToolbarVisibility;
   lastStatusLineVisibility = newStatusLineVis;

@@ -74,7 +74,6 @@ template < typename TFeatureImage, typename TSeedImage, typename TTensorImage>
 void ConnectednessFilter <TFeatureImage, TSeedImage, TTensorImage>::GenerateData()
 {
   const char untouchedValue = -10;
-  const char outsideValue = -5;
   const char inListValue = -30;
   // Get Inputs
   m_InputImage = dynamic_cast <TFeatureImage*> (this->ProcessObject::GetInput(0));
@@ -146,7 +145,9 @@ void ConnectednessFilter <TFeatureImage, TSeedImage, TTensorImage>::GenerateData
         neighbIt.SetLocation(seedIt.GetIndex());
         for (unsigned int i = 0; i < neighbIt.Size(); ++i)
         {
-          if (neighbIt.GetPixel(i) == outsideValue)
+          bool isInside = true;
+          neighbIt.GetPixel(i, isInside);
+          if (!isInside)
             continue;
           if (neighbIt.GetPixel(i) == 0 ) // border voxel
           {
@@ -206,7 +207,9 @@ void ConnectednessFilter <TFeatureImage, TSeedImage, TTensorImage>::GenerateData
     // if we find a lower way to a neighbor voxel, that voxel gets appended to the fifo
     for (unsigned int i = 0; i < neighbIt.Size(); ++i)
     {
-      if (neighbIt.GetPixel(i) == outsideValue || mask->GetPixel(neighbIt.GetIndex(i)) == 0)// || seed->GetPixel(neighbIt.GetIndex(i)) != 0)
+      bool isInside = true;
+      neighbIt.GetPixel(i, isInside);
+      if ( !isInside|| mask->GetPixel(neighbIt.GetIndex(i)) == 0)// || seed->GetPixel(neighbIt.GetIndex(i)) != 0)
         continue;
 
       if (i == neighbIt.Size()/2) // skip center voxel

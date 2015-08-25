@@ -6,6 +6,24 @@
 //stl stuff
 #include <sstream>
 
+#include <itkShapedNeighborhoodIterator.h>
+#include <itkSignedDanielssonDistanceMapImageFilter.h>
+
+
+mitk::CollectionStatistic::CollectionStatistic()
+  : m_GroundTruthValueToIndexMapper(NULL)
+  , m_TestValueToIndexMapper(NULL)
+{
+
+}
+
+mitk::CollectionStatistic::~CollectionStatistic()
+{
+  m_GroundTruthValueToIndexMapper = NULL;
+  m_TestValueToIndexMapper = NULL;
+}
+
+
 void mitk::CollectionStatistic::SetCollection(mitk::DataCollection::Pointer collection)
 {
   m_Collection = collection;
@@ -46,6 +64,26 @@ std::string mitk::CollectionStatistic::GetTestName()
   return m_TestName;
 }
 
+void mitk::CollectionStatistic::SetGroundTruthValueToIndexMapper(const ValueToIndexMapper* mapper)
+{
+  m_GroundTruthValueToIndexMapper = mapper;
+}
+
+const mitk::ValueToIndexMapper* mitk::CollectionStatistic::GetGroundTruthValueToIndexMapper(void) const
+{
+  return m_GroundTruthValueToIndexMapper;
+}
+
+void mitk::CollectionStatistic::SetTestValueToIndexMapper(const ValueToIndexMapper* mapper)
+{
+  m_TestValueToIndexMapper = mapper;
+}
+
+const mitk::ValueToIndexMapper* mitk::CollectionStatistic::GetTestValueToIndexMapper(void) const
+{
+  return m_TestValueToIndexMapper;
+}
+
 int mitk::CollectionStatistic::IsInSameVirtualClass(unsigned char gold, unsigned char test)
 {
   int resultClass = -1;
@@ -60,19 +98,20 @@ int mitk::CollectionStatistic::IsInSameVirtualClass(unsigned char gold, unsigned
   return resultClass;
 }
 
-unsigned char mitk::CollectionStatistic::ToGoldIndex(unsigned char value)
-{
-  return value-1;
-}
-unsigned char mitk::CollectionStatistic::ToTestIndex(unsigned char value)
-{
-  if (value == 1 || value == 5)
-    return 0;
-  else
-    return 1;
-}
 bool mitk::CollectionStatistic::Update()
 {
+  if (m_GroundTruthValueToIndexMapper == NULL)
+  {
+    MITK_ERROR << "m_GroundTruthValueToIndexMapper is NULL";
+    return false;
+  }
+
+  if (m_TestValueToIndexMapper == NULL)
+  {
+    MITK_ERROR << "m_TestValueToIndexMapper is NULL";
+    return false;
+  }
+
   typedef itk::Image<unsigned char, 3> ImageType;
   DataCollectionImageIterator<unsigned char, 3> goldIter(m_Collection, m_GroundTruthName);
   DataCollectionImageIterator<unsigned char, 3> testIter(m_Collection, m_TestName);
@@ -107,8 +146,8 @@ bool mitk::CollectionStatistic::Update()
     }
 
     ++index;
-    unsigned char goldClass = ToGoldIndex(goldIter.GetVoxel());
-    unsigned char testClass = ToTestIndex(testIter.GetVoxel());
+    unsigned char goldClass = m_GroundTruthValueToIndexMapper->operator()(goldIter.GetVoxel());
+    unsigned char testClass = m_TestValueToIndexMapper->operator()(testIter.GetVoxel());
     if (goldClass == testClass) // True Positive
     {
       m_ImageStatistic[imageIndex].m_TruePositive += 1;
@@ -151,11 +190,13 @@ bool mitk::CollectionStatistic::Update()
 
 void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, bool withHeader, std::string label)
 {
+  assert(m_ImageClassStatistic.size() > 0);
   assert(m_ImageClassStatistic[0].size() == m_ClassCount);
+
   if (withHeader)
   {
     sout << "Label;ImageName;";
-    for (int i = 0; i < m_ImageClassStatistic[0].size(); ++i)
+    for (int i = 0; i < m_ClassCount; ++i)
     {
       sout << "DICE-Class-"<< i << ";";
       sout << "Jaccard-Class-"<< i << ";";
@@ -182,12 +223,16 @@ void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, boo
     sout << "TN-WMEAN"<< ";";
     sout << "FP-WMEAN"<< ";";
     sout << "FN-WMEAN"<< ";";
-    sout << "COMPLET-TRUE/FALSE"<< ";";
+    sout << "COMPLETE-TRUE/FALSE"<< ";";
     sout << "COMPLETE-TRUES"<< ";";
     sout << "COMPLETE_FALSE"<< ";";
     sout << std::endl;
   }
   out << std::setprecision(5);
+
+
+  MITK_INFO << "m_ImageClassStatistic.size(): " << m_ImageClassStatistic.size();
+
   for (int i = 0; i < m_ImageClassStatistic.size(); ++i)
   {
     sout << label << ";"<< m_ImageNames[i]<<";";
@@ -204,7 +249,7 @@ void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, boo
 
     for (int j =0; j < m_ImageClassStatistic[i].size(); ++j)
     {
-      StatisticData stat = m_ImageClassStatistic[i][j];
+      StatisticData& stat = m_ImageClassStatistic[i][j];
       stat.m_DICE  = std::max(0.0,(2.0 * stat.m_TruePositive) / (2.0 * stat.m_TruePositive + stat.m_FalseNegative + stat.m_FalsePositive));
       stat.m_Jaccard = std::max(0.0,(1.0 * stat.m_TruePositive) / (1.0 * stat.m_TruePositive + stat.m_FalseNegative + stat.m_FalsePositive));
       stat.m_Sensitivity = std::max(0.0,(1.0 * stat.m_TruePositive) / (stat.m_TruePositive + stat.m_FalseNegative));
@@ -248,6 +293,7 @@ void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, boo
       sout << stat.m_TrueNegative<< ";";
       sout << stat.m_FalsePositive<< ";";
       sout << stat.m_FalseNegative << ";";
+      sout << stat.m_RMSD << ";";
     }
 
     meanStat.m_DICE /=  m_ImageClassStatistic[i].size();
@@ -323,5 +369,133 @@ void mitk::CollectionStatistic::Print(std::ostream& out, std::ostream& sout, boo
     sout << m_ImageStatistic[i].m_TruePositive << ";";
     sout << m_ImageStatistic[i].m_FalsePositive<< std::endl;
     out << std::endl;
+  }
+}
+
+std::vector<mitk::StatisticData> mitk::CollectionStatistic::GetStatisticData(unsigned char c) const
+{
+  std::vector<StatisticData> statistics;
+
+  for (size_t i = 0; i < m_ImageClassStatistic.size(); i++)
+  {
+    statistics.push_back(m_ImageClassStatistic[i][c]);
+  }
+
+  return statistics;
+}
+
+void mitk::CollectionStatistic::ComputeRMSD()
+{
+  assert(m_ClassCount == 2);
+  assert(m_GroundTruthValueToIndexMapper != NULL);
+  assert(m_TestValueToIndexMapper != NULL);
+
+  DataCollectionImageIterator<unsigned char, 3> groundTruthIter(m_Collection, m_GroundTruthName);
+  DataCollectionImageIterator<unsigned char, 3> testIter(m_Collection, m_TestName);
+  DataCollectionImageIterator<unsigned char, 3> maskIter(m_Collection, m_MaskName);
+
+  typedef itk::Image<unsigned char, 3> LabelImage;
+  typedef itk::Image<double, 3> ImageType;
+  typedef itk::SignedDanielssonDistanceMapImageFilter<LabelImage, ImageType, ImageType> DistanceMapFilterType;
+  typedef itk::ConstantBoundaryCondition<LabelImage> BoundaryConditionType;
+  typedef itk::ConstShapedNeighborhoodIterator<LabelImage, BoundaryConditionType> ConstNeighborhoodIteratorType;
+
+  // Build up 6-neighborhood. Diagonal voxel are maybe not considered for distance map computation.
+  // So 6-neighborhood avoids inconsistencies.
+  ConstNeighborhoodIteratorType::OffsetType offset0 = {{ 0,  0, -1}};
+  ConstNeighborhoodIteratorType::OffsetType offset1 = {{ 0,  0,  1}};
+  ConstNeighborhoodIteratorType::OffsetType offset2 = {{ 0, -1,  0}};
+  ConstNeighborhoodIteratorType::OffsetType offset3 = {{ 0,  1,  0}};
+  ConstNeighborhoodIteratorType::OffsetType offset4 = {{-1,  0,  0}};
+  ConstNeighborhoodIteratorType::OffsetType offset5 = {{ 1,  0,  0}};
+
+  const int outsideVal = 17;
+  itk::NeighborhoodIterator<LabelImage>::RadiusType radius;
+  radius.Fill(1);
+
+  BoundaryConditionType bc;
+  // if a neighborhood voxel is outside of the image region a default value is returned
+  bc.SetConstant(outsideVal);
+
+  ConstNeighborhoodIteratorType neighborhoodIter;
+
+  ImageType::Pointer distanceImage;
+  std::vector<mitk::StatisticData>* currentImageStatistics = NULL;
+
+  unsigned int distanceBorderSamples = 0;
+  double totalBorderRMSDistance = 0;
+
+  int previousImageIndex = -1;
+
+  while (!testIter.IsAtEnd())
+  {
+    int currentImageIndex = testIter.GetImageIndex();
+
+    // prepare data for next image
+    if (previousImageIndex != currentImageIndex)
+    {
+      previousImageIndex = currentImageIndex;
+
+      currentImageStatistics = &(m_ImageClassStatistic.at(currentImageIndex));
+
+      distanceBorderSamples = 0;
+      totalBorderRMSDistance = 0;
+
+      // generate distance map from gold standard image
+      DistanceMapFilterType::Pointer distanceMapFilter = DistanceMapFilterType::New();
+      distanceMapFilter->SetInput(groundTruthIter.GetImageIterator().GetImage());
+      distanceMapFilter->SetUseImageSpacing(true);
+      distanceMapFilter->Update();
+      distanceImage = distanceMapFilter->GetOutput();
+
+      neighborhoodIter = ConstNeighborhoodIteratorType(radius, testIter.GetImageIterator().GetImage(), testIter.GetImageIterator().GetImage()->GetRequestedRegion());
+      neighborhoodIter.OverrideBoundaryCondition(&bc);
+
+      // configure 6-neighborhood
+      neighborhoodIter.ActivateOffset(offset0);
+      neighborhoodIter.ActivateOffset(offset1);
+      neighborhoodIter.ActivateOffset(offset2);
+      neighborhoodIter.ActivateOffset(offset3);
+      neighborhoodIter.ActivateOffset(offset4);
+      neighborhoodIter.ActivateOffset(offset5);
+    }
+
+    unsigned char testClass = m_TestValueToIndexMapper->operator()(testIter.GetVoxel());
+
+    if ( maskIter.GetVoxel() > 0 && testClass != 0)
+    {
+      // check if it is a border voxel
+      neighborhoodIter.SetLocation(testIter.GetImageIterator().GetIndex());
+      bool border = false;
+
+      ConstNeighborhoodIteratorType::ConstIterator iter;
+      for (iter = neighborhoodIter.Begin(); !iter.IsAtEnd(); iter++)
+      {
+        if (iter.Get() == outsideVal)
+        {
+          continue;
+        }
+
+        if (m_TestValueToIndexMapper->operator()(iter.Get()) != 1 )
+        {
+          border = true;
+          break;
+        }
+      }
+
+      if (border)
+      {
+        double currentDistance = distanceImage->GetPixel(testIter.GetImageIterator().GetIndex());
+        totalBorderRMSDistance += currentDistance * currentDistance;
+        ++distanceBorderSamples;
+
+        // update immediately, so the final value is set after the iterator of the last image has reached the end
+        double rmsd = std::sqrt(totalBorderRMSDistance / (double) distanceBorderSamples);
+        currentImageStatistics->at(1).m_RMSD = rmsd;
+      }
+    }
+    ++groundTruthIter;
+    ++testIter;
+    ++maskIter;
   }
 }

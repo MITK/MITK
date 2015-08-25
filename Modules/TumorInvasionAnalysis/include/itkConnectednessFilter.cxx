@@ -123,13 +123,9 @@ void ConnectednessFilter <TFeatureImage, TSeedImage, TTensorImage>::GenerateData
   typename itk::NeighborhoodIterator<TSeedImage>::RadiusType radius;
   radius.Fill(1);
   radius[2]=1;
-  typedef itk::ConstantBoundaryCondition<TSeedImage>  BoundaryConditionType;
-  BoundaryConditionType bc;
-  // if a neighborhood voxel is outside of the image region a default value is returned
-  bc.SetConstant(outsideValue);
-  typename itk::NeighborhoodIterator<TSeedImage,BoundaryConditionType> neighbIt  ( radius, seed, seed->GetRequestedRegion() );
+
+  typename itk::NeighborhoodIterator<TSeedImage> neighbIt  ( radius, seed, seed->GetRequestedRegion() );
   typename itk::NeighborhoodIterator<TFeatureImage> medianIt  ( radius, propagationImage, propagationImage->GetRequestedRegion() );
-  neighbIt.SetBoundaryCondition(bc);
 
   // Copy Input Image values from SeedRegion values into Output Image
   // Collect border voxel indices to initialize seed list

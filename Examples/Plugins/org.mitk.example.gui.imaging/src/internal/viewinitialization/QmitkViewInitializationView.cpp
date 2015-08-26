@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNodePredicateDataType.h"
 
+#include <mitkSliceNavigationController.h>
+#include <mitkBaseRenderer.h>
 #include "QmitkDataStorageComboBox.h"
 #include "mitkCameraController.h"
 

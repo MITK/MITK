@@ -940,7 +940,8 @@ void QmitkDataManagerView::NodeTreeViewRowsRemoved (
 }
 void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int, int )
 {
-  m_NodeTreeView->setExpanded(parent, true);
+  QModelIndex viewIndex = m_FilterModel->mapFromSource(parent);
+  m_NodeTreeView->setExpanded(viewIndex, true);
 
   // a new row was inserted
   if( m_CurrentRowCount == 0 && m_NodeTreeModel->rowCount() == 1 )

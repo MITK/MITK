@@ -89,23 +89,22 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
     }
   }
 
-  bool isInitiallyPlaced = this->GetProperty("initiallyplaced");
+  bool isInitiallyPlaced = this->IsFinalized();
 
+  unsigned int prevIndex = 0;
+  m_PolyLineSegmentInfo.clear();
   unsigned int i;
   ControlPointListType::iterator it;
   for ( it = subdivisionPoints.begin(), i = 0;
         it != subdivisionPoints.end();
         ++it, ++i )
   {
-    // Determine the index of the control point FOLLOWING this poly-line element
-    // (this is needed by PlanarFigureInteractor to insert new points at the correct position,
-    // namely BEFORE the next control point)
     unsigned int nextIndex;
     if ( i == 0 )
     {
       // For the FIRST polyline point, use the index of the LAST control point
       // (it will used to check if the mouse is near the very last polyline element)
-      nextIndex = m_ControlPoints.size() - 1;
+      nextIndex = 0;
     }
     else
     {
@@ -119,10 +118,27 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
         break;
       }
     }
+    if (nextIndex != prevIndex) {
+        prevIndex = nextIndex;
+        m_PolyLineSegmentInfo.push_back(i);
+    }
 
     this->AppendPointToPolyLine( 0, *it );
   }
   subdivisionPoints.clear();
+}
+
+std::tuple<int, int, mitk::Point2D> mitk::PlanarSubdivisionPolygon::FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const
+{
+    auto closestPointInfo = Superclass::FindClosestPolyLinePoint(point, maxDistance);
+
+    auto& polyLineSegmentIndex = std::get<cpPolyLineSegmentIndex>(closestPointInfo);
+    if (polyLineSegmentIndex >= 0) {
+        polyLineSegmentIndex = std::distance(m_PolyLineSegmentInfo.begin(), 
+            std::lower_bound(m_PolyLineSegmentInfo.begin(), m_PolyLineSegmentInfo.end(), static_cast<unsigned long>(polyLineSegmentIndex)));
+    }
+
+    return closestPointInfo;
 }
 
 bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) const
@@ -141,31 +157,3 @@ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) con
      return false;
    }
  }
-
-
-int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const
-{
-  mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine( polyLineIndex );
-
-  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint > static_cast<int>(polyLine.size()))
-    return -1;
-
-  mitk::PlanarFigure::ControlPointListType::const_iterator elem;
-  mitk::PlanarFigure::ControlPointListType::const_iterator first = m_ControlPoints.cbegin();
-  mitk::PlanarFigure::ControlPointListType::const_iterator end = m_ControlPoints.cend();
-
-  mitk::PlanarFigure::PolyLineType::const_iterator polyLineIter;
-  mitk::PlanarFigure::PolyLineType::const_iterator polyLineEnd = polyLine.cend();
-  mitk::PlanarFigure::PolyLineType::const_iterator polyLineStart = polyLine.cbegin();
-  polyLineStart += indexOfPolylinePoint;
-
-  for (polyLineIter = polyLineStart; polyLineIter != polyLineEnd; ++polyLineIter)
-  {
-    elem = std::find(first, end, *polyLineIter);
-
-    if (elem != end)
-      return std::distance(first, elem);
-  }
-
-  return GetNumberOfControlPoints();
-}

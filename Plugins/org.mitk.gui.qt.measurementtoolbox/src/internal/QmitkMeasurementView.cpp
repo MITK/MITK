@@ -68,8 +68,51 @@ static T* GetService()
 struct QmitkPlanarFigureData
 {
   QmitkPlanarFigureData()
-    : m_Figure(0), m_EndPlacementObserverTag(0), m_SelectObserverTag(0), m_StartInteractionObserverTag(0), m_EndInteractionObserverTag(0)
+    : m_Figure(nullptr)
+    , m_EndPlacementObserverTag(0)
+    , m_SelectObserverTag(0)
+    , m_StartInteractionObserverTag(0)
+    , m_EndInteractionObserverTag(0)
+    , m_ModifiedTag(0)
   {
+  }
+
+  // Non-copyable
+  QmitkPlanarFigureData(const QmitkPlanarFigureData&) = delete;
+  QmitkPlanarFigureData& operator=(const QmitkPlanarFigureData& rhs) = delete;
+
+  QmitkPlanarFigureData(QmitkPlanarFigureData&& rhs)
+      : m_Figure(rhs.m_Figure)
+      , m_EndPlacementObserverTag(rhs.m_EndPlacementObserverTag)
+      , m_SelectObserverTag(rhs.m_SelectObserverTag)
+      , m_StartInteractionObserverTag(rhs.m_StartInteractionObserverTag)
+      , m_EndInteractionObserverTag(rhs.m_EndInteractionObserverTag)
+      , m_ModifiedTag(rhs.m_ModifiedTag)
+  {
+      rhs.m_Figure = nullptr; // Avoid observer removal
+  }
+
+  QmitkPlanarFigureData& operator=(QmitkPlanarFigureData&& rhs)
+  {
+      m_Figure = rhs.m_Figure;
+      m_EndPlacementObserverTag = rhs.m_EndPlacementObserverTag;
+      m_SelectObserverTag = rhs.m_SelectObserverTag;
+      m_StartInteractionObserverTag = rhs.m_StartInteractionObserverTag;
+      m_EndInteractionObserverTag = rhs.m_EndInteractionObserverTag;
+      m_ModifiedTag = rhs.m_ModifiedTag;
+      rhs.m_Figure = nullptr; // Avoid observer removal
+      return *this;
+  }
+
+  ~QmitkPlanarFigureData()
+  {
+      if (m_Figure) {
+          m_Figure->RemoveObserver(m_EndPlacementObserverTag);
+          m_Figure->RemoveObserver(m_SelectObserverTag);
+          m_Figure->RemoveObserver(m_StartInteractionObserverTag);
+          m_Figure->RemoveObserver(m_EndInteractionObserverTag);
+          m_Figure->RemoveObserver(m_ModifiedTag);
+      }
   }
 
   mitk::PlanarFigure* m_Figure;
@@ -77,6 +120,7 @@ struct QmitkPlanarFigureData
   unsigned int m_SelectObserverTag;
   unsigned int m_StartInteractionObserverTag;
   unsigned int m_EndInteractionObserverTag;
+  unsigned int m_ModifiedTag;
 };
 
 struct QmitkMeasurementViewData
@@ -101,6 +145,7 @@ struct QmitkMeasurementViewData
   unsigned int m_PolygonCounter;
   unsigned int m_BezierCurveCounter;
   unsigned int m_SubdivisionPolygonCounter;
+
   QList<mitk::DataNode::Pointer> m_CurrentSelection;
   std::map<mitk::DataNode*, QmitkPlanarFigureData> m_DataNodeToPlanarFigureData;
   mitk::DataNode::Pointer m_SelectedImageNode;
@@ -323,30 +368,35 @@ void QmitkMeasurementView::NodeAdded( const mitk::DataNode* node )
     endInteractionCommand->SetCallbackFunction( this, &QmitkMeasurementView::EnableCrosshairNavigation);
     data.m_EndInteractionObserverTag = figure->AddObserver( mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand );
 
+    // add observer for event when interaction with figure starts
+    SimpleCommandType::Pointer modifiedCommand = SimpleCommandType::New();
+    modifiedCommand->SetCallbackFunction(this, &QmitkMeasurementView::UpdateMeasurementText);
+    data.m_ModifiedTag = figure->AddObserver(itk::ModifiedEvent(), modifiedCommand);
+
     // adding to the map of tracked planarfigures
-    d->m_DataNodeToPlanarFigureData[nonConstNode] = data;
+    d->m_DataNodeToPlanarFigureData[nonConstNode] = std::move(data);
   }
   this->CheckForTopMostVisibleImage();
 }
 
 void QmitkMeasurementView::NodeChanged(const mitk::DataNode* node)
 {
-  // DETERMINE IF WE HAVE TO RENEW OUR DETAILS TEXT (ANY NODE CHANGED IN OUR SELECTION?)
-  bool renewText = false;
-  for( int i=0; i < d->m_CurrentSelection.size(); ++i )
-  {
-    if( node == d->m_CurrentSelection.at(i) )
-    {
-      renewText = true;
-      break;
-    }
-  }
-
-  if(renewText)
-  {
-    MEASUREMENT_DEBUG << "Selected nodes changed. Refreshing text.";
-    this->UpdateMeasurementText();
-  }
+//  // DETERMINE IF WE HAVE TO RENEW OUR DETAILS TEXT (ANY NODE CHANGED IN OUR SELECTION?)
+//  bool renewText = false;
+//  for( int i=0; i < d->m_CurrentSelection.size(); ++i )
+//  {
+//    if( node == d->m_CurrentSelection.at(i) )
+//    {
+//      renewText = true;
+//      break;
+//    }
+//  }
+//
+//  if(renewText)
+//  {
+//    MEASUREMENT_DEBUG << "Selected nodes changed. Refreshing text.";
+//    this->UpdateMeasurementText();
+//  }
 
   this->CheckForTopMostVisibleImage();
 }
@@ -355,7 +405,7 @@ void QmitkMeasurementView::CheckForTopMostVisibleImage(mitk::DataNode* _NodeToNe
 {
   d->m_SelectedImageNode = this->DetectTopMostVisibleImage().GetPointer();
   if( d->m_SelectedImageNode.GetPointer() == _NodeToNeglect )
-    d->m_SelectedImageNode = 0;
+    d->m_SelectedImageNode = nullptr;
 
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   mitk::NodePredicateProperty::Pointer isHelpherObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
@@ -394,22 +444,11 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   std::map<mitk::DataNode*, QmitkPlanarFigureData>::iterator it =
       d->m_DataNodeToPlanarFigureData.find(nonConstNode);
 
-  bool isFigureFinished = false;
-  bool isPlaced = false;
-
   if( it != d->m_DataNodeToPlanarFigureData.end() )
   {
-    QmitkPlanarFigureData& data = it->second;
-    // remove observers
-    data.m_Figure->RemoveObserver( data.m_EndPlacementObserverTag );
-    data.m_Figure->RemoveObserver( data.m_SelectObserverTag );
-    data.m_Figure->RemoveObserver( data.m_StartInteractionObserverTag );
-    data.m_Figure->RemoveObserver( data.m_EndInteractionObserverTag );
-
     MEASUREMENT_DEBUG << "removing from the list of tracked planar figures";
 
-    isFigureFinished = data.m_Figure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
-    if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
+    if (!it->second.m_Figure->IsFinalized()) { // if figure is not finalized, drop the datanode
       PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
     }
     d->m_DataNodeToPlanarFigureData.erase( it );
@@ -423,9 +462,8 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   for (unsigned int x = 0; x < nodes->size(); x++)
   {
     mitk::PlanarFigure* planarFigure  = dynamic_cast<mitk::PlanarFigure*>  (nodes->at(x)->GetData());
-    if (planarFigure != NULL) {
-      isFigureFinished = planarFigure->GetPropertyList()->GetBoolProperty("initiallyplaced",isPlaced);
-      if (!isFigureFinished) { // if the property does not yet exist or is false, drop the datanode
+    if (planarFigure != nullptr) {
+      if (!planarFigure->IsFinalized()) {  // if figure is not finalized, drop the datanode
         GetDataStorage()->Remove(nodes->at(x));
         if( !d->m_DataNodeToPlanarFigureData.empty() )
         {
@@ -520,7 +558,7 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
     mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
     mitk::DataStorage::SetOfObjects::ConstPointer planarFigures = this->GetDataStorage()->GetSubset( isPlanarFigure );
     // setting all planar figures which are not helper objects not selected
-    for(mitk::DataStorage::SetOfObjects::ConstIterator it=planarFigures->Begin(); it!=planarFigures->End(); it++)
+    for(mitk::DataStorage::SetOfObjects::ConstIterator it=planarFigures->Begin(); it!=planarFigures->End(); ++it)
     {
       mitk::DataNode* node = it.Value();
       bool isHelperObject(false);
@@ -539,88 +577,87 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*p
 
     // the last selected planar figure
 
-    if (_PlanarFigure && _PlanarFigure->GetPlaneGeometry())
+    if (!_PlanarFigure || !_PlanarFigure->GetPlaneGeometry()) {
+        continue;
+    }
+    QmitkRenderWindow* selectedRenderWindow = nullptr;
+    bool PlanarFigureInitializedWindow = false;
+
+    mitk::ILinkedRenderWindowPart* linkedRenderWindow = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
+    if(! linkedRenderWindow )
     {
-      QmitkRenderWindow* selectedRenderWindow = 0;
-      bool PlanarFigureInitializedWindow = false;
+      return;
+    }
 
-      mitk::ILinkedRenderWindowPart* linkedRenderWindow = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-      if(! linkedRenderWindow )
-      {
-        return;
-      }
+    QmitkRenderWindow* RenderWindow1 = linkedRenderWindow->GetQmitkRenderWindow( "axial") ;
+    QmitkRenderWindow* RenderWindow2 = linkedRenderWindow->GetQmitkRenderWindow( "sagittal") ;
+    QmitkRenderWindow* RenderWindow3 = linkedRenderWindow->GetQmitkRenderWindow( "coronal") ;
+    QmitkRenderWindow* RenderWindow4 = linkedRenderWindow->GetQmitkRenderWindow( "3d") ;
 
-      QmitkRenderWindow* RenderWindow1 = linkedRenderWindow->GetQmitkRenderWindow( "axial") ;
-      QmitkRenderWindow* RenderWindow2 = linkedRenderWindow->GetQmitkRenderWindow( "sagittal") ;
-      QmitkRenderWindow* RenderWindow3 = linkedRenderWindow->GetQmitkRenderWindow( "coronal") ;
-      QmitkRenderWindow* RenderWindow4 = linkedRenderWindow->GetQmitkRenderWindow( "3d") ;
+    if (node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+    {
+      selectedRenderWindow = RenderWindow1;
+    }
 
-      if (node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
-      {
-        selectedRenderWindow = RenderWindow1;
-      }
+    if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow2->GetRenderer()))
+    {
+      selectedRenderWindow = RenderWindow2;
+    }
 
-      if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow2->GetRenderer()))
+    if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,RenderWindow3->GetRenderer()))
+    {
+      selectedRenderWindow = RenderWindow3;
+    }
+
+    if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow4->GetRenderer()))
+    {
+      selectedRenderWindow = RenderWindow4;
+    }
+
+    const mitk::PlaneGeometry* _PlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetPlaneGeometry());
+
+    mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
+
+    mitk::PlaneGeometry::ConstPointer _Plane1 = RenderWindow1->GetRenderer()->GetCurrentWorldPlaneGeometry();
+    mitk::VnlVector normal1 = _Plane1->GetNormalVnl();
+
+    mitk::PlaneGeometry::ConstPointer _Plane2 = RenderWindow2->GetRenderer()->GetCurrentWorldPlaneGeometry();
+    mitk::VnlVector normal2 = _Plane2->GetNormalVnl();
+
+    mitk::PlaneGeometry::ConstPointer _Plane3 = RenderWindow3->GetRenderer()->GetCurrentWorldPlaneGeometry();
+    mitk::VnlVector normal3 = _Plane3->GetNormalVnl();
+
+    normal[0]  = fabs(normal[0]);  normal[1]  = fabs(normal[1]);  normal[2]  = fabs(normal[2]);
+    normal1[0] = fabs(normal1[0]); normal1[1] = fabs(normal1[1]); normal1[2] = fabs(normal1[2]);
+    normal2[0] = fabs(normal2[0]); normal2[1] = fabs(normal2[1]); normal2[2] = fabs(normal2[2]);
+    normal3[0] = fabs(normal3[0]); normal3[1] = fabs(normal3[1]); normal3[2] = fabs(normal3[2]);
+
+    double ang1 = angle(normal, normal1);
+    double ang2 = angle(normal, normal2);
+    double ang3 = angle(normal, normal3);
+
+    if(ang1 < ang2 && ang1 < ang3)
+    {
+      selectedRenderWindow = RenderWindow1;
+    }
+    else
+    {
+      if(ang2 < ang3)
       {
         selectedRenderWindow = RenderWindow2;
       }
-
-      if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,RenderWindow3->GetRenderer()))
+      else
       {
         selectedRenderWindow = RenderWindow3;
       }
-
-      if (!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow, RenderWindow4->GetRenderer()))
-      {
-        selectedRenderWindow = RenderWindow4;
-      }
-
-      const mitk::PlaneGeometry* _PlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*> (_PlanarFigure->GetPlaneGeometry());
-
-      mitk::VnlVector normal = _PlaneGeometry->GetNormalVnl();
-
-      mitk::PlaneGeometry::ConstPointer _Plane1 = RenderWindow1->GetRenderer()->GetCurrentWorldPlaneGeometry();
-      mitk::VnlVector normal1 = _Plane1->GetNormalVnl();
-
-      mitk::PlaneGeometry::ConstPointer _Plane2 = RenderWindow2->GetRenderer()->GetCurrentWorldPlaneGeometry();
-      mitk::VnlVector normal2 = _Plane2->GetNormalVnl();
-
-      mitk::PlaneGeometry::ConstPointer _Plane3 = RenderWindow3->GetRenderer()->GetCurrentWorldPlaneGeometry();
-      mitk::VnlVector normal3 = _Plane3->GetNormalVnl();
-
-      normal[0]  = fabs(normal[0]);  normal[1]  = fabs(normal[1]);  normal[2]  = fabs(normal[2]);
-      normal1[0] = fabs(normal1[0]); normal1[1] = fabs(normal1[1]); normal1[2] = fabs(normal1[2]);
-      normal2[0] = fabs(normal2[0]); normal2[1] = fabs(normal2[1]); normal2[2] = fabs(normal2[2]);
-      normal3[0] = fabs(normal3[0]); normal3[1] = fabs(normal3[1]); normal3[2] = fabs(normal3[2]);
-
-      double ang1 = angle(normal, normal1);
-      double ang2 = angle(normal, normal2);
-      double ang3 = angle(normal, normal3);
-
-      if(ang1 < ang2 && ang1 < ang3)
-      {
-        selectedRenderWindow = RenderWindow1;
-      }
-      else
-      {
-        if(ang2 < ang3)
-        {
-          selectedRenderWindow = RenderWindow2;
-        }
-        else
-        {
-          selectedRenderWindow = RenderWindow3;
-        }
-      }
-
-      // re-orient view
-      if (selectedRenderWindow)
-      {
-        const mitk::Point3D& centerP = _PlaneGeometry->GetOrigin();
-        selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(centerP, _PlaneGeometry->GetNormal());
-      }
     }
-    break;
+
+    // re-orient view
+    if (selectedRenderWindow)
+    {
+      const mitk::Point3D& centerP = _PlaneGeometry->GetOrigin();
+      selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(centerP, _PlaneGeometry->GetNormal());
+    }
   }
 
   this->RequestRenderWindowUpdate();
@@ -735,7 +772,8 @@ void QmitkMeasurementView::ActionDrawSubdivisionPolygonTriggered(bool checked)
 
   mitk::PlanarSubdivisionPolygon::Pointer figure = mitk::PlanarSubdivisionPolygon::New();
   QString qString = QString("SubdivisionPolygon%1").arg(++d->m_SubdivisionPolygonCounter);
-  this->AddFigureToDataStorage(figure, qString);
+  mitk::DataNode::Pointer node = this->AddFigureToDataStorage(figure, qString);
+  node->SetProperty("planarfigure.isextendable", mitk::BoolProperty::New(true));
 
   MEASUREMENT_DEBUG << "PlanarSubdivisionPolygon initialized...";
 }

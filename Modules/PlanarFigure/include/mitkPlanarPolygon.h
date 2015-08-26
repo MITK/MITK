@@ -54,6 +54,11 @@ public:
   //virtual void Initialize();
 
 
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 2;
+  }
+
   /** \brief Polygon has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {
@@ -93,6 +98,7 @@ protected:
   const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
+  std::vector<unsigned long> m_PolyLineSegmentInfo;
 
 private:
 

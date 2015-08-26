@@ -67,7 +67,6 @@ public:
   typedef std::deque< Point2D > ControlPointListType;
   typedef std::vector< PolyLineElement > PolyLineType;
 
-
   /** \brief Sets the 2D geometry on which this figure will be placed.
    *
    * In most cases, this is a Geometry already owned by another object, e.g.
@@ -89,6 +88,10 @@ public:
    * displayed/interacted with). */
   virtual bool IsPlaced() const { return m_FigurePlaced; };
 
+  /** \brief True if the planar figure has been placed and finalized
+  * (e.g. drawing a polygon is finished). */
+  virtual bool IsFinalized() const { return m_FigureFinalized; }
+  virtual void SetFinalized(bool finalized);
 
   /** \brief Place figure at the given point (in 2D index coordinates) onto
    * the given 2D geometry.
@@ -101,6 +104,7 @@ public:
    * Can be re-implemented in sub-classes as needed.
    */
   virtual void PlaceFigure( const Point2D& point );
+  virtual void CancelPlaceFigure();
 
   /**
   * \brief Adds / inserts new control-points
@@ -121,6 +125,15 @@ public:
 
   /** \brief Returns the current number of 2D control points defining this figure. */
   unsigned int GetNumberOfControlPoints() const;
+
+
+  /** \brief Returns the number of control points automatically filled upon
+  * figure placement.
+  *
+  * Must be implemented in sub-classes.
+  */
+  virtual unsigned int GetPlacementNumberOfControlPoints() const = 0;
+  virtual unsigned int GetPlacementSelectedPointId() const { return 1; }
 
 
   /** \brief Returns the minimum number of control points needed to represent
@@ -153,20 +166,28 @@ public:
   /** \brief Returns specified control point in 2D world coordinates. */
   Point2D GetControlPoint( unsigned int index ) const;
 
-  /**
-  * \brief Returns the id of the control-point that corresponds to the given
-  * polyline-point.
-  */
-  virtual int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
+  /** \brief The indices of information members in the tuple returned from FindClosestPolyLinePoint. 
+   *  Example usage: std::get<cpPolyLineIndex>(FindClosestPolyLinePoint(...)). */
+  enum ClosestPointTuple {
+      cpPolyLineIndex,
+      cpPolyLineSegmentIndex,
+      cpClosestPoint
+  };
 
+  /** \brief Find the point on the figure's polylines that is within maxDistance from a point.
+   *  Returns the tuple containing the index of polyline, an index of control point which is at the beginning of 
+   *  the polyline segment the closest point belongs to and the coordinates of the closest point. \sa ClosestPointTuple
+   *  Returns (-1, -1, Point2D()) if no points are found.
+   *  The default implementation returns the index of point in the polyline as the second member,
+   *  which is correct if control points are simply connected with line segments in their order (e.g. for PlanarPolygon) */
+  virtual std::tuple<int, int, mitk::Point2D> FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const;
+
+  /** \brief Find the control point that is within maxDistance from a point.
+  *  Returns the control point index or -1 if none found. */
+  virtual int FindClosestControlPoint(const mitk::Point2D& point, double maxDistance) const;
 
   /** \brief Returns specified control point in world coordinates. */
   Point3D GetWorldControlPoint( unsigned int index ) const;
-
-
-  /** \brief Returns the polyline representing the planar figure
-   * (for rendering, measurements, etc.). */
-  const PolyLineType GetPolyLine(unsigned int index);
 
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurments, etc.). */
@@ -174,8 +195,7 @@ public:
 
   /** \brief Returns the polyline that should be drawn the same size at every scale
    * (for text, angles, etc.). */
-  const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
-
+  const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight ) const;
 
   /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
   void SetPreviewControlPoint( const Point2D& point );
@@ -184,10 +204,10 @@ public:
   void ResetPreviewContolPoint();
 
   /** \brief Returns whether or not the PreviewControlPoint is visible.*/
-  bool IsPreviewControlPointVisible();
+  bool IsPreviewControlPointVisible() const;
 
   /** \brief Returns the coordinates of the PreviewControlPoint. */
-  Point2D GetPreviewControlPoint();
+  Point2D GetPreviewControlPoint() const;
 
 
 
@@ -222,10 +242,6 @@ public:
   void SetFeatureVisible( unsigned int index, bool visible );
 
 
-  /** \brief Calculates quantities of all features of this planar figure. */
-  virtual void EvaluateFeatures();
-
-
   /** \brief Intherited from parent */
   virtual void UpdateOutputInformation() override;
 
@@ -242,13 +258,13 @@ public:
   virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
   /** \brief  Returns the current number of polylines  */
-  virtual unsigned short GetPolyLinesSize();
+  virtual unsigned short GetPolyLinesSize() const;
 
   /** \brief  Returns the current number of helperpolylines  */
-  virtual unsigned short GetHelperPolyLinesSize();
+  virtual unsigned short GetHelperPolyLinesSize() const;
 
   /** \brief Returns whether a helper polyline should be painted or not */
-  virtual bool IsHelperToBePainted(unsigned int index);
+  virtual bool IsHelperToBePainted(unsigned int index) const;
 
   /** \brief Returns true if the planar figure is reset to "add points" mode
    * when a point is selected.
@@ -270,25 +286,27 @@ public:
   * the points are constrained by the image bounds. */
   virtual Point2D ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point );
 
+  /** \brief executes the given Operation */
+  virtual void ExecuteOperation(Operation* operation) override;
+
   /**
   * \brief Compare two PlanarFigure objects
   * Note: all subclasses have to implement the method on their own.
   */
   virtual bool Equals(const mitk::PlanarFigure& other) const;
 
+  /** \brief Updates modification time and set dirty flags */
+  virtual void Modified() const override;
 
 protected:
   PlanarFigure();
 
   PlanarFigure(const Self& other);
 
-  /** \brief Set the initial number of control points of the planar figure */
-  void ResetNumberOfControlPoints( int numberOfControlPoints );
-
   /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
    * of a planar figure object and returns integer ID for the feature element.
    * Should be called in sub-class constructors. */
-  virtual unsigned int AddFeature( const char *featureName, const char *unitName );
+  unsigned int AddFeature( const char *featureName, const char *unitName );
 
   /** Sets the name of the specified feature. INTERNAL METHOD. */
   void SetFeatureName( unsigned int index, const char *featureName );
@@ -314,7 +332,7 @@ protected:
   virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) = 0;
 
   /** \brief Calculates quantities of all features of this planar figure.
-   * Must be implemented in sub-classes. */
+   * Must be implemented in sub-classes */
   virtual void EvaluateFeaturesInternal() = 0;
 
   /** \brief Initializes the TimeGeometry describing the (time-resolved)
@@ -322,10 +340,10 @@ protected:
    */
   virtual void InitializeTimeGeometry( unsigned int timeSteps = 1 ) override;
 
-  /** \brief defines the number of PolyLines that will be available */
+  /** \brief defines the number of PolyLines that will be available. */
   void SetNumberOfPolyLines( unsigned int numberOfPolyLines );
 
-  /** \brief Append a point to the PolyLine # index */
+  /** \brief Append a point to the PolyLine # index. */
   void AppendPointToPolyLine( unsigned int index, PolyLineElement element );
 
   /** \brief clears the list of PolyLines. Call before re-calculating a new Polyline. */
@@ -343,16 +361,12 @@ protected:
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const override;
 
+  static bool IsPointNearLine(const mitk::Point2D& point, const mitk::Point2D& startPoint, const mitk::Point2D& endPoint, double maxDistance, mitk::Point2D& projectedPoint);
+
   ControlPointListType m_ControlPoints;
-  unsigned int m_NumberOfControlPoints;
 
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
-
-
-  std::vector<PolyLineType> m_PolyLines;
-  std::vector<PolyLineType> m_HelperPolyLines;
-  BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
 
   // this point is used to store the coordiantes an additional 'ControlPoint' that is rendered
   // when the mouse cursor is above the figure (and not a control-point) and when the
@@ -361,6 +375,9 @@ protected:
   bool m_PreviewControlPointVisible;
 
   bool m_FigurePlaced;
+  bool m_FigureFinalized;
+
+  BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
 
 private:
 
@@ -386,10 +403,12 @@ private:
   PlaneGeometry *m_PlaneGeometry;
 
 
-  bool m_PolyLineUpToDate;
-  bool m_HelperLinesUpToDate;
-  bool m_FeaturesUpToDate;
+  mutable bool m_PolyLineUpToDate;
+  mutable bool m_HelperLinesUpToDate;
+  mutable bool m_FeaturesUpToDate;
 
+  std::vector<PolyLineType> m_PolyLines;
+  std::vector<PolyLineType> m_HelperPolyLines;
 
   // Vector of features available for this geometric figure
   typedef std::vector< Feature > FeatureVectorType;
@@ -400,9 +419,27 @@ private:
   // this pair is used to store the mmInDisplayUnits (m_DisplaySize.first) and the displayHeight (m_DisplaySize.second)
   // that the helperPolyLines have been calculated for.
   // It's used to determine whether or not GetHelperPolyLine() needs to recalculate the HelperPolyLines.
-  std::pair<double, unsigned int> m_DisplaySize;
+  mutable std::pair<double, unsigned int> m_DisplaySize;
 
 };
+
+#pragma GCC visibility push(default)
+
+// Define events for PlanarFigure interaction notifications
+itkEventMacro(PlanarFigureEvent, itk::AnyEvent);
+itkEventMacro(StartPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(FinalizedPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(CancelPlacementPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(SelectPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(StartInteractionPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndInteractionPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(StartHoverPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(EndHoverPlanarFigureEvent, PlanarFigureEvent);
+itkEventMacro(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
+
+#pragma GCC visibility pop
+
 
 MITKPLANARFIGURE_EXPORT bool Equal( const mitk::PlanarFigure& leftHandSide, const mitk::PlanarFigure& rightHandSide, ScalarType eps, bool verbose );
 

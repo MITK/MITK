@@ -32,20 +32,14 @@ namespace mitk
     unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
 
-    /**
-    * \brief Returns the id of the control-point that corresponds to the given
-    * polyline-point.
-    */
-    int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
-
-
+    virtual unsigned int GetPlacementNumberOfControlPoints() const override { return 1; }
     virtual unsigned int GetMaximumNumberOfControlPoints() const override;
     virtual unsigned int GetMinimumNumberOfControlPoints() const override;
-    virtual bool IsHelperToBePainted(unsigned int index) override;
+    virtual bool IsHelperToBePainted(unsigned int index) const override;
 
     const unsigned int FEATURE_ID_LENGTH;
 
-    virtual bool Equals(const mitk::PlanarFigure& other)const override;
+    virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
   protected:
     PlanarBezierCurve();

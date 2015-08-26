@@ -75,6 +75,11 @@ public:
   itkBooleanMacro( SingleLineMode ); // No need to reimplement; calls SetSingleLineMode()
 
 
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 2;
+  }
+
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {

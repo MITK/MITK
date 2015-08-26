@@ -24,13 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::PlanarCircle::PlanarCircle()
 : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
   FEATURE_ID_DIAMETER( this->AddFeature( "Diameter", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) ),
+  FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")),
+  FEATURE_ID_AREA(this->AddFeature("Area", "mm2")),
   m_MinRadius(0),
   m_MaxRadius(100),
   m_MinMaxRadiusContraintsActive(false)
 {
   // Circle has two control points
-  this->ResetNumberOfControlPoints( 2 );
   this->SetNumberOfPolyLines( 1 );
   this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 }
@@ -38,7 +38,7 @@ mitk::PlanarCircle::PlanarCircle()
 bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &point, bool /*createIfDoesNotExist*/ )
 {
   // moving center point
-  if(index == 0)
+  if (index == 0)
   {
     const Point2D &centerPoint = GetControlPoint( 0 );
     Point2D boundaryPoint = GetControlPoint( 1 );
@@ -46,21 +46,15 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
 
     boundaryPoint[0] += vec[0];
     boundaryPoint[1] += vec[1];
-    PlanarFigure::SetControlPoint( 0, point );
     PlanarFigure::SetControlPoint( 1, boundaryPoint );
-    return true;
   }
-  else if ( index == 1 )
-  {
-    PlanarFigure::SetControlPoint( index, point );
-    return true;
-  }
-  return false;
+
+  return PlanarFigure::SetControlPoint( index, point );
 }
 
 mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
-  if ( this->GetPlaneGeometry() ==  nullptr )
+  if ( this->GetPlaneGeometry() ==  NULL )
   {
     return point;
   }
@@ -146,11 +140,13 @@ void mitk::PlanarCircle::EvaluateFeaturesInternal()
   const Point3D &p1 = this->GetWorldControlPoint( 1 );
 
   double radius = p0.EuclideanDistanceTo( p1 );
+  double circumference = 2.0 * vnl_math::pi * radius;
   double area = vnl_math::pi * radius * radius;
 
   this->SetQuantity( FEATURE_ID_RADIUS, radius );
   this->SetQuantity( FEATURE_ID_DIAMETER, 2*radius );
-  this->SetQuantity( FEATURE_ID_AREA, area );
+  this->SetQuantity(FEATURE_ID_CIRCUMFERENCE, circumference);
+  this->SetQuantity(FEATURE_ID_AREA, area);
 }
 
 
@@ -159,13 +155,32 @@ void mitk::PlanarCircle::PrintSelf( std::ostream& os, itk::Indent indent) const
   Superclass::PrintSelf( os, indent );
 }
 
-bool mitk::PlanarCircle::SetCurrentControlPoint( const Point2D& point )
+std::tuple<int, int, mitk::Point2D> mitk::PlanarCircle::FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const
 {
-  if ( m_SelectedControlPoint < 0 )
-  {
-    m_SelectedControlPoint = 1;
-  }
+    double radius = (GetControlPoint(0) - GetControlPoint(1)).GetNorm();
+    mitk::Vector2D delta = point - GetControlPoint(0);
+    double distanceFromCenter = delta.GetNorm();
 
+    if (abs(radius - distanceFromCenter) < maxDistance) {
+        return std::make_tuple(0, 0, GetControlPoint(0) + delta * radius / distanceFromCenter);
+    }
+
+    return std::make_tuple(-1, -1, mitk::Point2D{});
+}
+
+int mitk::PlanarCircle::FindClosestControlPoint(const mitk::Point2D& point, double maxDistance) const
+{
+    int closestControlPoint = PlanarFigure::FindClosestControlPoint(point, maxDistance);
+
+    if (closestControlPoint >= 0) {
+        return closestControlPoint;
+    }
+
+    return std::get<cpPolyLineSegmentIndex>(FindClosestPolyLinePoint(point, maxDistance)) == -1 ? -1 : 1;
+}
+
+bool mitk::PlanarCircle::SetCurrentControlPoint(const Point2D& point)
+{
   return this->SetControlPoint( m_SelectedControlPoint, point, false);
 }
 

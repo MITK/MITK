@@ -40,22 +40,6 @@ class BaseRenderer;
 class InteractionPositionEvent;
 class StateMachineAction;
 
-#pragma GCC visibility push(default)
-
-// Define events for PlanarFigure interaction notifications
-itkEventMacro( PlanarFigureEvent, itk::AnyEvent );
-itkEventMacro( StartPlacementPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( EndPlacementPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( SelectPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( StartInteractionPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( EndInteractionPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( StartHoverPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( EndHoverPlanarFigureEvent, PlanarFigureEvent );
-itkEventMacro( ContextMenuPlanarFigureEvent, PlanarFigureEvent );
-
-#pragma GCC visibility pop
-
-
 /**
   * \brief Interaction with mitk::PlanarFigure objects via control-points
   *
@@ -73,6 +57,8 @@ public:
 
   /** \brief Sets the minimal distance between two control points. */
   void SetMinimumPointDistance( ScalarType minimumDistance );
+
+  void FinalizeFigure();
 
 protected:
 
@@ -148,19 +134,10 @@ protected:
                                         const PlaneGeometry *planarFigureGeometry,
                                         Point2D &point2D );
 
-  bool TransformObjectToDisplay( const mitk::Point2D &point2D,
-    mitk::Point2D &displayPoint,
-    const mitk::PlaneGeometry *objectGeometry,
-    const mitk::PlaneGeometry *rendererGeometry,
-    const mitk::DisplayGeometry *displayGeometry ) const;
 
-  /** \brief Returns true if the first specified point is in proximity of the line defined
-   * the other two point; false otherwise.
-   *
-   * Proximity is defined as the rectangle around the line with pre-defined distance
-   * from the line. */
-  bool IsPointNearLine( const mitk::Point2D& point,
-    const mitk::Point2D& startPoint, const mitk::Point2D& endPoint, mitk::Point2D& projectedPoint ) const;
+  mitk::Point2D TransformDisplayToObject(const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::DisplayGeometry * displayGeometry) const;
+
+  std::pair<double, mitk::Point2D> TransformDisplayToObject(double distanceInPixels, const mitk::Point2D & displayPoint, const mitk::PlaneGeometry * objectGeometry, const mitk::PlaneGeometry * rendererGeometry, const mitk::DisplayGeometry * displayGeometry) const;
 
   /** \brief Returns true if the point contained in the passed event (in display coordinates)
    * is over the planar figure (with a pre-defined tolerance range); false otherwise. */
@@ -186,7 +163,12 @@ protected:
 
   virtual void ConfigurationChanged() override;
 
+  virtual void DataNodeChanged();
+
 private:
+    void ProcessExternalCancelPlace();
+    void ProcessExternalPlace();
+    void RemoveObservers();
 
   /** \brief to store the value of precision to pick a point */
   ScalarType m_Precision;
@@ -198,6 +180,14 @@ private:
   bool m_IsHovering;
 
   bool m_LastPointWasValid;
+
+  struct ObserverTagInfo {
+      itk::Object* object;
+      std::vector<unsigned long> observerTags;
+  } m_ObserverTagInfo;
+
+  mitk::Point2D m_StartMovePosition;
+  bool m_PointMoved;
 
   //mitk::PlanarFigure::Pointer m_PlanarFigure;
 };

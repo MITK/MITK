@@ -89,7 +89,6 @@ int mitkPlanarArrowTest(int /* argc */, char* /*argv*/[])
 
   // Test placement of PlanarArrow by control points
   mitkPlanarArrowTestClass::TestPlanarArrowPlacement( PlanarArrow );
-  PlanarArrow->EvaluateFeatures();
 
   mitk::PlanarArrow::Pointer clonedArrow = PlanarArrow->Clone();
   MITK_TEST_CONDITION_REQUIRED( clonedArrow.IsNotNull(), "Testing cloning" );

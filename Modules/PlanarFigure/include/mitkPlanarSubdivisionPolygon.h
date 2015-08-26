@@ -39,19 +39,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  /** \brief Subdivision Polygon has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return 3;
-  }
-
-
-  /** \brief Polygon maximum number of control points is principally not limited. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 1000;
-  }
-
   /** \brief How many times should we generate a round of subdivisions? */
   unsigned int GetSubdivisionRounds() const
   {
@@ -62,13 +49,6 @@ public:
   {
     m_SubdivisionRounds = subdivisionRounds;
   }
-
-  /**
-  * \brief Returns the id of the control-point that corresponds to the given
-  * polyline-point.
-  */
-  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
-
 
   /** \brief Parameter w_tension defines the tension.
    * the higher w_tension, the lower the "tension" on points.
@@ -92,6 +72,8 @@ public:
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
+  std::tuple<int, int, mitk::Point2D> FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const override;
+
 protected:
   PlanarSubdivisionPolygon();
 
@@ -102,7 +84,6 @@ protected:
 
   float m_TensionParameter;
   int m_SubdivisionRounds;
-
 
 private:
 

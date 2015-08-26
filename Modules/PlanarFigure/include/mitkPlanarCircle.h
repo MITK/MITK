@@ -49,6 +49,11 @@ public:
 
   bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false ) override;
 
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 2;
+  }
+
   /** \brief Circle has 2 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {
@@ -99,6 +104,10 @@ public:
 
   virtual bool Equals(const mitk::PlanarFigure& other) const override;
 
+  std::tuple<int, int, mitk::Point2D> FindClosestPolyLinePoint(const mitk::Point2D& point, double maxDistance) const override;
+
+  int FindClosestControlPoint(const mitk::Point2D& point, double maxDistance) const override;
+
 protected:
   PlanarCircle();
 
@@ -119,9 +128,11 @@ protected:
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const override;
 
 
+
   // Feature identifiers
   const unsigned int FEATURE_ID_RADIUS;
   const unsigned int FEATURE_ID_DIAMETER;
+  const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
   //Member variables:

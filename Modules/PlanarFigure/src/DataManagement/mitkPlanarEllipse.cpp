@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <algorithm>
 
 #include "mitkPlanarEllipse.h"
 #include "mitkPlaneGeometry.h"
@@ -23,15 +22,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 
 mitk::PlanarEllipse::PlanarEllipse()
-    : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
-      FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
+    : FEATURE_ID_RADIUS1(this->AddFeature("Radius 1", "mm")),
+      FEATURE_ID_RADIUS2(this->AddFeature("Radius 2", "mm")),
+      FEATURE_ID_CIRCUMFERENCE(this->AddFeature("Circumference", "mm")),
+      FEATURE_ID_AREA(this->AddFeature("Area", "mm2")), 
       m_MinRadius(0),
       m_MaxRadius(100),
       m_MinMaxRadiusContraintsActive(false),
       m_TreatAsCircle(true)
 {
     // Ellipse has three control points
-    this->ResetNumberOfControlPoints( 4 );
     this->SetNumberOfPolyLines( 2 );
     this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 }
@@ -72,7 +72,7 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
         Vector2D vec1 = point - centerPoint;
         Vector2D vec2;
 
-        if (index == 1 && m_TreatAsCircle )
+        if (index == 1 && !m_FigureFinalized )
         {
             float x = vec1[0];
             vec2[0] = vec1[1];
@@ -150,15 +150,11 @@ bool mitk::PlanarEllipse::SetControlPoint( unsigned int index, const Point2D &po
     return false;
 }
 
-void mitk::PlanarEllipse::PlaceFigure( const mitk::Point2D &point )
-{
-    PlanarFigure::PlaceFigure( point );
-    m_SelectedControlPoint = 1;
-}
-
 mitk::Point2D mitk::PlanarEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
-    return point;
+    if (!m_FigureFinalized) {
+        return point;
+    }
 
     Point2D indexPoint;
     this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );
@@ -262,10 +258,21 @@ void mitk::PlanarEllipse::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, un
 
 void mitk::PlanarEllipse::EvaluateFeaturesInternal()
 {
-  Point2D centerPoint = this->GetControlPoint(0);
+    // Calculate circle radius and area
+    const Point3D &p0 = this->GetWorldControlPoint(0);
+    const Point3D &p1 = this->GetWorldControlPoint(1);
+    const Point3D &p2 = this->GetWorldControlPoint(2);
 
-  this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * centerPoint.EuclideanDistanceTo(this->GetControlPoint(1)));
-  this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * centerPoint.EuclideanDistanceTo(this->GetControlPoint(2)));
+    double radius1 = p0.EuclideanDistanceTo(p1);
+    double radius2 = p0.EuclideanDistanceTo(p2);
+    double h = (radius1 - radius2) * (radius1 - radius2) / ((radius1 + radius2) * (radius1 + radius2));
+    double circumference = vnl_math::pi * (radius1 + radius2) * (1 + 3 * h / (10 + sqrt(4 - 3 * h)));
+    double area = vnl_math::pi * radius1 * radius2;
+
+    this->SetQuantity(FEATURE_ID_RADIUS1, radius1);
+    this->SetQuantity(FEATURE_ID_RADIUS2, radius2);
+    this->SetQuantity(FEATURE_ID_CIRCUMFERENCE, circumference);
+    this->SetQuantity(FEATURE_ID_AREA, area);
 }
 
 

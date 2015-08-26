@@ -25,7 +25,6 @@ mitk::PlanarRectangle::PlanarRectangle()
   FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
 {
   // Rectangle has four control points
-  this->ResetNumberOfControlPoints( 4 );
   this->SetProperty( "closed", mitk::BoolProperty::New(true) );
   this->SetNumberOfPolyLines( 1 );
 }
@@ -71,12 +70,6 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
   }
 
   return set;
-}
-
-void mitk::PlanarRectangle::PlaceFigure( const mitk::Point2D &point )
-{
-  PlanarFigure::PlaceFigure( point );
-  m_SelectedControlPoint = 3;
 }
 
 void mitk::PlanarRectangle::GeneratePolyLine()

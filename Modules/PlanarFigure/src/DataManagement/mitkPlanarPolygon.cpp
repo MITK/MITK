@@ -28,7 +28,6 @@ mitk::PlanarPolygon::PlanarPolygon()
   FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
 {
   // Polygon has at least two control points
-  this->ResetNumberOfControlPoints( 2 );
   this->SetNumberOfPolyLines( 1 );
 
   // Polygon is closed by default
@@ -61,9 +60,13 @@ void mitk::PlanarPolygon::SetClosed( bool closed )
 void mitk::PlanarPolygon::GeneratePolyLine()
 {
   this->ClearPolyLines();
+  m_PolyLineSegmentInfo.clear();
 
-  for (ControlPointListType::size_type i = 0; i < m_ControlPoints.size(); ++i)
-    this->AppendPointToPolyLine(0, this->GetControlPoint(i));
+  m_PolyLineSegmentInfo.push_back(0);
+  for (ControlPointListType::size_type i = 0; i < m_ControlPoints.size(); ++i) {
+      this->AppendPointToPolyLine(0, this->GetControlPoint(i));
+      m_PolyLineSegmentInfo.push_back(i + 1);
+  }
 }
 
 void mitk::PlanarPolygon::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
@@ -77,21 +80,19 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double circumference = 0.0;
   unsigned int i,j;
 
-  PolyLineType polyLine = m_PolyLines[0];
+  PolyLineType polyLine = GetPolyLine(0);
 
   if(polyLine.empty())
     return;
 
   for ( i = 0; i <(polyLine.size()-1); ++i )
   {
-    circumference += static_cast<Point2D>(polyLine[i]).EuclideanDistanceTo(
-      static_cast<Point2D>(polyLine[i + 1]) );
+      circumference += polyLine[i].EuclideanDistanceTo(polyLine[i + 1]);
   }
 
   if ( this->IsClosed() )
   {
-    circumference += static_cast<Point2D>(polyLine[i]).EuclideanDistanceTo(
-      static_cast<Point2D>(polyLine.front()) );
+      circumference += polyLine[i].EuclideanDistanceTo(polyLine[0]);
   }
 
   this->SetQuantity( FEATURE_ID_CIRCUMFERENCE, circumference );
@@ -233,7 +234,7 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
   std::vector<mitk::Point2D> intersectionList;
 
   ControlPointListType polyLinePoints;
-  PolyLineType tempList = m_PolyLines[0];
+  PolyLineType tempList = GetPolyLine(0);
   PolyLineType::iterator iter;
   for( iter = tempList.begin(); iter != tempList.end(); ++iter )
   {

@@ -109,7 +109,6 @@ static void TestPlanarCrossPlacement( mitk::PlanarCross::Pointer planarCross )
 
 
   // Test for number of measurement features
-  planarCross->EvaluateFeatures();
   MITK_TEST_CONDITION( planarCross->GetNumberOfFeatures() == 2, "Number of measurement features" );
 
   // Test for correct feature evaluation
@@ -163,7 +162,6 @@ static void TestPlanarCrossPlacementSingleLine(mitk::PlanarCross::Pointer planar
 
 
   // Test for number of measurement features
-  planarCross->EvaluateFeatures();
   MITK_TEST_CONDITION( planarCross->GetNumberOfFeatures() == 1, "Number of measurement features" );
 
   // Test for correct feature evaluation

@@ -49,6 +49,11 @@ public:
    */
   //virtual void Initialize();
 
+  unsigned int GetPlacementNumberOfControlPoints() const override
+  {
+      return 2;
+  }
+
   /** \brief Angle has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const override
   {

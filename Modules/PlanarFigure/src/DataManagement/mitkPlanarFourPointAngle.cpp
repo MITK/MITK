@@ -23,7 +23,6 @@ mitk::PlanarFourPointAngle::PlanarFourPointAngle()
 : FEATURE_ID_ANGLE( this->AddFeature( "Angle", "deg" ) )
 {
   // Four point angle has two control points
-  this->ResetNumberOfControlPoints( 2 );
   this->SetNumberOfPolyLines( 2 );
 }
 

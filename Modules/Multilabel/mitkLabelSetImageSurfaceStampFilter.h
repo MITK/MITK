@@ -13,8 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkLabelSetSurfaceStamp_h
-#define __mitkLabelSetSurfaceStamp_h
+#ifndef __mitkLabelSetImageSurfaceStampFilter_h
+#define __mitkLabelSetImageSurfaceStampFilter_h
 
 #include "MitkMultilabelExports.h"
 
@@ -26,11 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKMULTILABEL_EXPORT LabelSetSurfaceStamp : public ImageToImageFilter
+  class MITKMULTILABEL_EXPORT LabelSetImageSurfaceStampFilter : public ImageToImageFilter
   {
   public:
 
-    mitkClassMacro( LabelSetSurfaceStamp , ImageToImageFilter );
+    mitkClassMacro( LabelSetImageSurfaceStampFilter , ImageToImageFilter );
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
@@ -42,11 +42,11 @@ namespace mitk
     /*!
     \brief standard constructor
     */
-    LabelSetSurfaceStamp();
+    LabelSetImageSurfaceStampFilter();
     /*!
     \brief standard destructor
     */
-    ~LabelSetSurfaceStamp();
+    ~LabelSetImageSurfaceStampFilter();
     /*!
     \brief Method generating the output information of this filter (e.g. image dimension, image type, etc.).
     The interface ImageToImageFilter requires this implementation. Everything is taken from the input image.

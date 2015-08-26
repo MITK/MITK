@@ -3,6 +3,6 @@ set(MODULE_TESTS
     mitkLabelSetTest.cpp
     mitkLabelSetImageTest.cpp
     mitkLabelSetImageIOTest.cpp
-    mitkLabelSetSurfaceStampTest.cpp
+    mitkLabelSetImageSurfaceStampFilterTest.cpp
 )
 

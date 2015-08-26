@@ -14,31 +14,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkLabelSetSurfaceStamp.h"
-#include <itkBilateralImageFilter.h>
+#include "mitkLabelSetImageSurfaceStampFilter.h"
+
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 
 #include <mitkSurface.h>
 #include <mitkLabelSetImage.h>
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkCell.h>
-#include <itkQuadEdgeMesh.h>
-#include <itkTriangleMeshToBinaryImageFilter.h>
 #include <mitkLabelSetImage.h>
 #include <mitkSurfaceToImageFilter.h>
 
-mitk::LabelSetSurfaceStamp::LabelSetSurfaceStamp()
+mitk::LabelSetImageSurfaceStampFilter::LabelSetImageSurfaceStampFilter()
 {
   this->SetNumberOfIndexedInputs(1);
   this->SetNumberOfRequiredInputs(1);
 }
 
-mitk::LabelSetSurfaceStamp::~LabelSetSurfaceStamp()
+mitk::LabelSetImageSurfaceStampFilter::~LabelSetImageSurfaceStampFilter()
 {
 }
 
-void mitk::LabelSetSurfaceStamp::GenerateData()
+void mitk::LabelSetImageSurfaceStampFilter::GenerateData()
 {
   GenerateOutputInformation();
   this->SetNthOutput(0,this->GetInput(0));
@@ -62,7 +58,7 @@ void mitk::LabelSetSurfaceStamp::GenerateData()
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::LabelSetSurfaceStamp::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Surface::Pointer surface, mitk::Image::Pointer resultImage )
+void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Surface::Pointer surface, mitk::Image::Pointer resultImage )
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   mitk::LabelSetImage::Pointer LabelSetInputImage = dynamic_cast<LabelSetImage *>(GetInput());
@@ -102,7 +98,7 @@ void mitk::LabelSetSurfaceStamp::ItkImageProcessing( itk::Image<TPixel,VImageDim
   this->Modified();
 }
 
-void mitk::LabelSetSurfaceStamp::GenerateOutputInformation()
+void mitk::LabelSetImageSurfaceStampFilter::GenerateOutputInformation()
 {
   mitk::Image::Pointer inputImage  = (mitk::Image*) this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();

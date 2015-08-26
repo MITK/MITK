@@ -82,10 +82,6 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   if ( input.IsNull() )
     return ;
 
-
-  mitk::PlaneGeometry::Pointer worldPlanePlaneGeometry = dynamic_cast< mitk::PlaneGeometry*>( const_cast<mitk::PlaneGeometry*>( renderer->GetCurrentWorldPlaneGeometry() ) );
-  assert( worldPlanePlaneGeometry.IsNotNull() );
-
   vtkImageData* vtkImage = input->GetVtkImageData( this->GetCurrentTimeStep( input, renderer ) );
 
   //
@@ -94,8 +90,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   //
   Point3D point;
   Vector3D normal;
-  PlaneGeometry::ConstPointer worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
+  PlaneGeometry::ConstPointer worldPlaneGeometry = renderer->GetCurrentWorldPlaneGeometry();
 
   if ( worldPlaneGeometry.IsNotNull() )
   {
@@ -365,7 +360,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     trafo->GetScale(myscale);
     trafo->Scale(1/myscale[0],1/myscale[1],1/myscale[2]);
 
-    this->PaintCells( glyphGenerator->GetOutput(), renderer->GetCurrentWorldPlaneGeometry(), renderer->GetDisplayGeometry(), trafo, renderer, NULL/*vtkLut*/, color, lwidth, spacing );
+    this->PaintCells( glyphGenerator->GetOutput(), renderer->GetCurrentWorldPlaneGeometry(), trafo, renderer, NULL/*vtkLut*/, color, lwidth, spacing );
 
     vectorMagnitudes->Delete();
     glyphSource->Delete();
@@ -379,13 +374,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   //std::cout << "...done!" << std::endl;
 }
 
-
-
-
-
-
-
-void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const PlaneGeometry* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  /*renderer*/, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing )
+void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const PlaneGeometry* /*worldGeometry*/, vtkLinearTransform* vtktransform, mitk::BaseRenderer*  renderer, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing )
 {
   vtkPoints * points = glyphs->GetPoints();
   vtkPointData * vpointdata = glyphs->GetPointData();
@@ -446,11 +435,8 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const PlaneGeom
 
         vtk2itk( vp, p );
 
-        //convert 3D point (in mm) to 2D point on slice (also in mm)
-        worldGeometry->Map( p, p2d );
-
-        //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-        displayGeometry->WorldToDisplay( p2d, p2d );
+        //convert 3D point (in mm) to display coordinates (units )
+        renderer->WorldToDisplay( p, p2d );
 
         if ( lut != NULL )
         {

@@ -24,7 +24,6 @@
 #include <QTimer>
 #include <QDragEnterEvent>
 #include <QDropEvent>
-#include "QmitkEventAdapter.h" // TODO: INTERACTION_LEGACY
 #include "mitkMousePressEvent.h"
 #include "mitkMouseMoveEvent.h"
 #include "mitkMouseDoubleClickEvent.h"
@@ -37,10 +36,10 @@
 #include "QmitkMimeTypes.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
-    QString name,
-    mitk::VtkPropRenderer* /*renderer*/,
-    mitk::RenderingManager* renderingManager,mitk::BaseRenderer::RenderingMode::Type renderingMode) :
-    QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
+  QString name,
+  mitk::VtkPropRenderer* /*renderer*/,
+  mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode) :
+  QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
 {
   // Needed if QVTKWidget2 is used instead of QVTKWidget
   //this will be fixed in VTK source if change 18864 is accepted
@@ -48,21 +47,21 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   newform.setSamples(8);
   this->setFormat(newform);*/
 
-  if(renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
+  if (renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
   {
     GetRenderWindow()->SetMultiSamples(0);
     GetRenderWindow()->SetAlphaBitPlanes(1);
   }
-  else if(renderingMode == mitk::BaseRenderer::RenderingMode::MultiSampling)
+  else if (renderingMode == mitk::BaseRenderer::RenderingMode::MultiSampling)
   {
     GetRenderWindow()->SetMultiSamples(8);
   }
-  else if(renderingMode == mitk::BaseRenderer::RenderingMode::Standard)
+  else if (renderingMode == mitk::BaseRenderer::RenderingMode::Standard)
   {
     GetRenderWindow()->SetMultiSamples(0);
   }
 
-  Initialize(renderingManager, name.toStdString().c_str(),renderingMode); // Initialize mitkRenderWindowBase
+  Initialize(renderingManager, name.toStdString().c_str(), renderingMode); // Initialize mitkRenderWindowBase
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
@@ -103,23 +102,17 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 {
   //Get mouse position in vtk display coordinate system. me contains qt display infos...
   mitk::Point2D displayPos = GetMousePosition(me);
-  //Transform 2D coordinates in 3D world position. Used transform comes from TODO 18735
-  //TODO 18735: replace this method call by displayPos (see above)
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
-  //worldPos is the 3D vector from the origin of the world to the requested point.
 
   mitk::MousePressEvent::Pointer mPressEvent = mitk::MousePressEvent::New(m_Renderer,
                                                               displayPos,
-                                                              worldPos,
                                                               GetButtonState(me),
                                                               GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
-  { // TODO: INTERACTION_LEGACY
-    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
-    this->mousePressMitkEvent(&myevent);
+  {
     QVTKWidget::mousePressEvent(me);
   }
+
 
   if (m_ResendQtEvents)
     me->ignore();
@@ -128,15 +121,11 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
 void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 {
   mitk::Point2D displayPos = GetMousePosition(me);
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
-
-  mitk::MouseDoubleClickEvent::Pointer mPressEvent = mitk::MouseDoubleClickEvent::New(m_Renderer,displayPos, worldPos, GetButtonState(me),
+  mitk::MouseDoubleClickEvent::Pointer mPressEvent = mitk::MouseDoubleClickEvent::New(m_Renderer,displayPos, GetButtonState(me),
     GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mPressEvent.GetPointer()))
-  { // TODO: INTERACTION_LEGACY
-    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
-    this->mousePressMitkEvent(&myevent);
+  {
     QVTKWidget::mousePressEvent(me);
   }
 
@@ -147,15 +136,11 @@ void QmitkRenderWindow::mouseDoubleClickEvent( QMouseEvent *me )
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 {
   mitk::Point2D displayPos = GetMousePosition(me);
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
-
-  mitk::MouseReleaseEvent::Pointer mReleaseEvent = mitk::MouseReleaseEvent::New(m_Renderer, displayPos,worldPos, GetButtonState(me),
+  mitk::MouseReleaseEvent::Pointer mReleaseEvent = mitk::MouseReleaseEvent::New(m_Renderer, displayPos, GetButtonState(me),
       GetModifiers(me), GetEventButton(me));
 
   if (!this->HandleEvent(mReleaseEvent.GetPointer()))
-  { // TODO: INTERACTION_LEGACY
-    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
-    this->mouseReleaseMitkEvent(&myevent);
+  {
     QVTKWidget::mouseReleaseEvent(me);
   }
 
@@ -166,17 +151,14 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   mitk::Point2D displayPos = GetMousePosition(me);
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(me));
 
   this->AdjustRenderWindowMenuVisibility(me->pos());
 
-  mitk::MouseMoveEvent::Pointer mMoveEvent = mitk::MouseMoveEvent::New(m_Renderer, displayPos, worldPos, GetButtonState(me),
+  mitk::MouseMoveEvent::Pointer mMoveEvent = mitk::MouseMoveEvent::New(m_Renderer, displayPos, GetButtonState(me),
       GetModifiers(me));
 
   if (!this->HandleEvent(mMoveEvent.GetPointer()))
-  { // TODO: INTERACTION_LEGACY
-    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
-    this->mouseMoveMitkEvent(&myevent);
+  {
     QVTKWidget::mouseMoveEvent(me);
   }
 }
@@ -184,15 +166,11 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
   mitk::Point2D displayPos = GetMousePosition(we);
-  mitk::Point3D worldPos = m_Renderer->Map2DRendererPositionTo3DWorldPosition(GetMousePosition(we));
-
-  mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, displayPos,worldPos, GetButtonState(we),
+  mitk::MouseWheelEvent::Pointer mWheelEvent = mitk::MouseWheelEvent::New(m_Renderer, displayPos, GetButtonState(we),
       GetModifiers(we), GetDelta(we));
 
   if (!this->HandleEvent(mWheelEvent.GetPointer()))
-  { // TODO: INTERACTION_LEGACY
-    mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(m_Renderer, we));
-    this->wheelMitkEvent(&myevent);
+  {
     QVTKWidget::wheelEvent(we);
   }
 
@@ -207,11 +185,7 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 
   mitk::InteractionKeyEvent::Pointer keyEvent = mitk::InteractionKeyEvent::New(m_Renderer, key, modifiers);
   if (!this->HandleEvent(keyEvent.GetPointer()))
-  { // TODO: INTERACTION_LEGACY
-    QPoint cp = mapFromGlobal(QCursor::pos());
-    mitk::KeyEvent mke(QmitkEventAdapter::AdaptKeyEvent(m_Renderer, ke, cp));
-    this->keyPressMitkEvent(&mke);
-    ke->accept();
+  {
     QVTKWidget::keyPressEvent(ke);
   }
 
@@ -237,7 +211,7 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
   mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, NULL, "LeaveRenderWindow");
 
-  if (!this->HandleEvent(internalEvent.GetPointer()))
+  this->HandleEvent(internalEvent.GetPointer());
 
   if (m_MenuWidget)
     m_MenuWidget->smoothHide();
@@ -249,15 +223,6 @@ void QmitkRenderWindow::paintEvent(QPaintEvent* /*event*/)
 {
   //We are using our own interaction and thus have to call the rendering manually.
   this->GetRenderer()->GetRenderingManager()->RequestUpdate(GetRenderWindow());
-}
-
-void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
-{
-  this->resizeMitkEvent(event->size().width(), event->size().height());
-
-  QVTKWidget::resizeEvent(event);
-
-  emit resized();
 }
 
 void QmitkRenderWindow::moveEvent(QMoveEvent* event)
@@ -356,8 +321,8 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QMouseEvent* me) const
 {
   mitk::Point2D point;
   point[0] = me->x();
-  point[1] = me->y();
-  m_Renderer->GetDisplayGeometry()->ULDisplayToDisplay(point, point);
+  //We need to convert the y component, as the display and vtk have other definitions for the y direction
+  point[1] = m_Renderer->GetSizeY() - me->y();
   return point;
 }
 
@@ -365,8 +330,8 @@ mitk::Point2D QmitkRenderWindow::GetMousePosition(QWheelEvent* we) const
 {
   mitk::Point2D point;
   point[0] = we->x();
-  point[1] = we->y();
-  m_Renderer->GetDisplayGeometry()->ULDisplayToDisplay(point, point);
+  //We need to convert the y component, as the display and vtk have other definitions for the y direction
+  point[1] = m_Renderer->GetSizeY() - we->y();
   return point;
 }
 
@@ -455,7 +420,7 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
   int tkey = ke->key();
   if (tkey < 128)
   { //standard ascii letter
-    key = (char) toupper(tkey);
+    key = (char)toupper(tkey);
   }
   else
   { // special keys
@@ -524,23 +489,23 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
       break;
 
     case Qt::Key_End:
-          key = mitk::InteractionEvent::KeyEnd;
-          break;
+      key = mitk::InteractionEvent::KeyEnd;
+      break;
     case Qt::Key_Home:
-          key = mitk::InteractionEvent::KeyPos1;
-          break;
+      key = mitk::InteractionEvent::KeyPos1;
+      break;
     case Qt::Key_Insert:
-          key = mitk::InteractionEvent::KeyInsert;
-          break;
+      key = mitk::InteractionEvent::KeyInsert;
+      break;
     case Qt::Key_PageDown:
-          key = mitk::InteractionEvent::KeyPageDown;
-          break;
+      key = mitk::InteractionEvent::KeyPageDown;
+      break;
     case Qt::Key_PageUp:
-          key = mitk::InteractionEvent::KeyPageUp;
-          break;
+      key = mitk::InteractionEvent::KeyPageUp;
+      break;
     case Qt::Key_Space:
-          key = mitk::InteractionEvent::KeySpace;
-          break;
+      key = mitk::InteractionEvent::KeySpace;
+      break;
     }
   }
   return key;

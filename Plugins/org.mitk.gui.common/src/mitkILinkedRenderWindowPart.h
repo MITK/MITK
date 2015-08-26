@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class SlicesRotator;
-class SlicesSwiveller;
-
 /**
  * \ingroup org_mitk_gui_common
  *
@@ -37,21 +34,6 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
 
   ~ILinkedRenderWindowPart();
 
-  /**
-   * Get the mitk::SlicesRotator.
-   *
-   * \return A mitk::SlicesRotator instance if rotating slices is supported;
-   *         <code>NULL</code> otherwise.
-   */
-  virtual mitk::SlicesRotator* GetSlicesRotator() const = 0;
-
-  /**
-   * Get the mitk::SlicesSwiveller.
-   *
-   * \return A mitk::SlicesSwiveller instance if swivelling slices is supported;
-   *         <code>NULL</code> otherwise.
-   */
-  virtual mitk::SlicesSwiveller* GetSlicesSwiveller() const = 0;
 
   /**
    * Enable or disable the slicing planes linking the QmitkRenderWindow instances.
@@ -69,22 +51,6 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
    */
   virtual bool IsSlicingPlanesEnabled() const = 0;
 
-  /**
-   * Enable or disalbe linked navigation.
-   *
-   * \param enable If <code>true</code>, setting the selected position in one QmitkRenderWindow
-   *        affects the positions in the linked windows. If <code>false</code>, linked navigation
-   *        is disabled.
-   */
-  virtual void EnableLinkedNavigation(bool enable) = 0;
-
-  /**
-   * Get the enabled status of linked navigation.
-   *
-   * \return <code>true</code> if linked navigation is enabled; <code>false</code>
-   *         otherwise.
-   */
-  virtual bool IsLinkedNavigationEnabled() const = 0;
 };
 
 }

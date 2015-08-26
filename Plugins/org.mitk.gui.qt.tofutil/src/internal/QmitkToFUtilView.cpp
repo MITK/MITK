@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkBaseRenderer.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkToFDistanceImageToPointSetFilter.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>

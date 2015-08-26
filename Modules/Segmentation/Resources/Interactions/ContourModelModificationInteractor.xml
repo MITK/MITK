@@ -1,0 +1,22 @@
+<statemachine>
+  <state name="start" startstate="true">
+    <transition event_class="InteractionPositionEvent" event_variant="MouseMove" target="start">
+       <condition name="mouseMove"/>
+    </transition>
+    <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
+      <action name="deletePoint"/>
+      <action name="finish"/>
+    </transition>
+    <transition event_class="InteractionPositionEvent" event_variant="StartMove" target="move">
+       <condition name="checkisOverPoint"/>
+    </transition>
+  </state>
+  <state name="move">
+    <transition event_class="InteractionPositionEvent" event_variant="Move" target="move">
+       <action name="movePoint"/>
+    </transition>
+    <transition event_class="InteractionPositionEvent" event_variant="MoveEnd" target="start">
+       <action name="finish"/>
+    </transition>
+  </state>
+</statemachine>

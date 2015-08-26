@@ -38,7 +38,6 @@ namespace mitk
 
 class BaseRenderer;
 class PlaneGeometry;
-class DisplayGeometry;
 
 class MITKMAPPEREXT_EXPORT VectorImageMapper2D : public GLMapper
 {
@@ -69,7 +68,7 @@ public:
      */
     itkGetConstObjectMacro( Image, mitk::Image );
 
-    virtual void PaintCells( vtkPolyData* contour, const PlaneGeometry* worldGeometry, const DisplayGeometry* displayGeometry, vtkLinearTransform* vtktransform, BaseRenderer* renderer, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing );
+    virtual void PaintCells( vtkPolyData* contour, const PlaneGeometry* /*worldGeometry*/, vtkLinearTransform* vtktransform, BaseRenderer* renderer, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing );
 
 protected:
 

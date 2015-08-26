@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPropertyDelegate.h"
 
 #include "mitkBaseRenderer.h"
-#include "mitkFocusManager.h"
-#include "mitkGlobalInteraction.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>

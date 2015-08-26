@@ -170,7 +170,7 @@ protected:
   bool m_AutoSelectionEnabled;
 
   mitk::NodePredicateOr::Pointer m_IsOfTypeImagePredicate;
-  mitk::NodePredicateOr::Pointer m_IsBinaryPredicate;
+  mitk::NodePredicateProperty::Pointer m_IsBinaryPredicate;
   mitk::NodePredicateNot::Pointer m_IsNotBinaryPredicate;
   mitk::NodePredicateAnd::Pointer m_IsNotABinaryImagePredicate;
   mitk::NodePredicateAnd::Pointer m_IsABinaryImagePredicate;

@@ -102,10 +102,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     }
 
 
-    mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-    assert(displayGeometry.IsNotNull());
-
-    const PlaneGeometry* worldplanegeometry = dynamic_cast<const PlaneGeometry*>(renderer->GetCurrentWorldPlaneGeometry());
+    const PlaneGeometry* worldplanegeometry = (renderer->GetCurrentWorldPlaneGeometry());
 
     //apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);
@@ -134,13 +131,12 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
 
-      displayGeometry->Project(p, projected_p);
+      renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
       Vector3D diff=p-projected_p;
       if(diff.GetSquaredNorm()<4.0)
       {
         Point2D pt2d, tmp;
-        displayGeometry->Map(projected_p, pt2d);
-        displayGeometry->WorldToDisplay(pt2d, pt2d);
+        renderer->WorldToDisplay(p, pt2d);
 
         Vector2D horz,vert;
         horz[0]=5; horz[1]=0;
@@ -284,13 +280,12 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           itk2vtk(thisPoint, vtkp);
           transform->TransformPoint(vtkp, vtkp);
           vtk2itk(vtkp,p);
-          displayGeometry->Project(p, projected_p);
+          renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
           Vector3D diff=p-projected_p;
           if(diff.GetSquaredNorm()<4.0)
           {
             Point2D pt2d, tmp;
-            displayGeometry->Map(projected_p, pt2d);
-            displayGeometry->WorldToDisplay(pt2d, pt2d);
+            renderer->WorldToDisplay(p, pt2d);
 
             if (lastPoint == NULL)
             {
@@ -397,19 +392,16 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
               itk2vtk(min, vtkp);
               transform->TransformPoint(vtkp, vtkp);
               vtk2itk(vtkp,p);
-              displayGeometry->Project(p, projected_p);
-              displayGeometry->Map(projected_p, min2D);
-              displayGeometry->WorldToDisplay(min2D, min2D);
+              renderer->WorldToDisplay(p, min2D);
 
               itk2vtk(max, vtkp);
               transform->TransformPoint(vtkp, vtkp);
               vtk2itk(vtkp,p);
-              displayGeometry->Project(p, projected_p);
+              renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
               Vector3D diff=p-projected_p;
               if(diff.GetSquaredNorm()<4.0)
               {
-                displayGeometry->Map(projected_p, max2D);
-                displayGeometry->WorldToDisplay(max2D, max2D);
+                renderer->WorldToDisplay(p, max2D);
 
                 //draw the BoundingBox
                 glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
@@ -443,25 +435,23 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           {
             --end; //ensure even number of intersection-points
           }
-          double p[2];
-          Point3D pt3d;
           Point2D pt2d;
           for ( it = intersectionPoints.begin( ); it != end; ++it )
           {
             glBegin (GL_LINES);
-              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2dv(p);
+              renderer->WorldToDisplay(*it, pt2d);
+              glVertex2dv(pt2d.GetDataPointer());
               ++it;
-              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2dv(p);
+              renderer->WorldToDisplay(*it, pt2d);
+              glVertex2dv(pt2d.GetDataPointer());
             glEnd ();
           }
           if(it!=intersectionPoints.end())
           {
             glBegin (GL_LINES);
-              displayGeometry->Map(*it, pt2d); displayGeometry->WorldToDisplay(pt2d, pt2d);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2dv(p);
-              p[0] = pt2d[0]; p[1] = pt2d[1]; glVertex2dv(p);
+            renderer->WorldToDisplay(*it, pt2d);
+            glVertex2dv(pt2d.GetDataPointer());
+            glVertex2dv(pt2d.GetDataPointer());
             glEnd ();
           }
         }//fill off-plane polygon part 2

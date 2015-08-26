@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
 #include <mitkDataNode.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkImage.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkInteractionPositionEvent.h>

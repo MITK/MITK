@@ -299,9 +299,12 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
     vnl2vtk( point.GetVnlVector(), vp );
     vnl2vtk( normal.GetVnlVector(), vnormal );
 
-    mitk::DisplayGeometry::Pointer dispGeometry = renderer->GetDisplayGeometry();
-    mitk::Vector2D size = dispGeometry->GetSizeInMM();
-    mitk::Vector2D origin = dispGeometry->GetOriginInMM();
+  Point2D dispSizeInMM = renderer->GetViewportSizeInMM();
+
+  Point2D displayGeometryOriginInMM = renderer->GetOriginInMM();
+
+  mitk::Vector2D size = dispSizeInMM.GetVectorFromOrigin();
+  mitk::Vector2D origin = displayGeometryOriginInMM.GetVectorFromOrigin();
 
     //
     //  |------O------|
@@ -327,15 +330,15 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
     mitk::Point2D point1;
     point1[0] = M[0]; point1[1] = M[1];
     mitk::Point3D M3D;
-    dispGeometry->Map(point1, M3D);
+    renderer->GetCurrentWorldPlaneGeometry()->Map(point1, M3D);
 
     point1[0] = L[0]; point1[1] = L[1];
     mitk::Point3D L3D;
-    dispGeometry->Map(point1, L3D);
+    renderer->GetCurrentWorldPlaneGeometry()->Map(point1, L3D);
 
     point1[0] = O[0]; point1[1] = O[1];
     mitk::Point3D O3D;
-    dispGeometry->Map(point1, O3D);
+    renderer->GetCurrentWorldPlaneGeometry()->Map(point1, O3D);
 
     double d1 = sqrt((M3D[0]-L3D[0])*(M3D[0]-L3D[0])
                      + (M3D[1]-L3D[1])*(M3D[1]-L3D[1])

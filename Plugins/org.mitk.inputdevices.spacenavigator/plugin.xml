@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<plugin>
-  <extension point="org.mitk.core.ext.inputdevices">
-    <inputdevice id="org.mitk.inputdevices.spacenavigator" name="Space Navigator" class="mitk::SpaceNavigatorActivator">
-		<description>3D Mouse from the company 3DConnexion - Modelname: Space Navigator</description>
-	</inputdevice>
-  </extension>
-</plugin>

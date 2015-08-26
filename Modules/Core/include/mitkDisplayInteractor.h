@@ -74,40 +74,74 @@ namespace mitk
 
     virtual bool CheckPositionEvent( const InteractionEvent* interactionEvent );
 
+    virtual bool CheckRotationPossible( const InteractionEvent* interactionEvent );
+
+    virtual bool CheckSwivelPossible( const InteractionEvent* interactionEvent );
+
     /**
      * \brief Initializes an interaction, saves the pointers start position for further reference.
      */
-    virtual bool Init(StateMachineAction*, InteractionEvent*);
+    virtual void Init(StateMachineAction*, InteractionEvent*);
     /**
      * \brief Performs panning of the data set in the render window.
      */
-    virtual bool Move(StateMachineAction*, InteractionEvent*);
+    virtual void Move(StateMachineAction*, InteractionEvent*);
+
+    /**
+     * \brief Sets crosshair at clicked position*
+     */
+    virtual void SetCrosshair(StateMachineAction*, InteractionEvent*);
+
     /**
      * \brief Performs zooming relative to mouse/pointer movement.
      *
      * Behavior is determined by \see m_ZoomDirection and \see m_ZoomFactor.
      *
      */
-    virtual bool Zoom(StateMachineAction*, InteractionEvent*);
+    virtual void Zoom(StateMachineAction*, InteractionEvent*);
     /**
      * \brief Performs scrolling relative to mouse/pointer movement.
      *
      * Behavior is determined by \see m_ScrollDirection and \see m_AutoRepeat.
      *
      */
-    virtual bool Scroll(StateMachineAction*, InteractionEvent*);
+    virtual void Scroll(StateMachineAction*, InteractionEvent*);
     /**
      * \brief Scrolls one layer up
      */
-    virtual bool ScrollOneDown(StateMachineAction*, InteractionEvent*);
+    virtual void ScrollOneDown(StateMachineAction*, InteractionEvent*);
     /**
      * \brief Scrolls one layer down
      */
-    virtual bool ScrollOneUp(StateMachineAction*, InteractionEvent*);
+    virtual void ScrollOneUp(StateMachineAction*, InteractionEvent*);
     /**
      * \brief Adjusts the level windows relative to mouse/pointer movement.
      */
-    virtual bool AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
+    virtual void AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
+
+    /**
+     * \brief Starts crosshair rotation
+     */
+    virtual void StartRotation(StateMachineAction*, InteractionEvent*);
+
+
+    /**
+     * \brief Ends crosshair rotation
+     */
+    virtual void EndRotation(StateMachineAction*, InteractionEvent*);
+
+    /**
+     * \brief
+     */
+    virtual void Rotate(StateMachineAction*, InteractionEvent* event);
+
+    virtual void Swivel(StateMachineAction*, InteractionEvent* event);
+
+
+    /**
+     * \brief Updates the Statusbar information with the information about the clicked position
+     */
+    virtual void UpdateStatusbar(StateMachineAction*, InteractionEvent* event);
 
     /**
     * \brief Method to retrieve bool-value for given property from string-property
@@ -115,11 +149,13 @@ namespace mitk
     */
     bool GetBoolProperty( mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue );
 
+    // Typedefs
+    typedef std::vector<SliceNavigationController*> SNCVector;
+
   private:
-    /**
-     * \brief Coordinate of the pointer at begin of an interaction
-     */
-    mitk::Point2D m_StartDisplayCoordinate;
+
+    mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition, BaseRenderer* ren);
+
     /**
      * \brief Coordinate of the pointer at begin of an interaction translated to mm unit
      */
@@ -128,6 +164,10 @@ namespace mitk
      * \brief Coordinate of the pointer in the last step within an interaction.
      */
     mitk::Point2D m_LastDisplayCoordinate;
+    /**
+     * \brief Coordinate of the pointer in the last step within an interaction translated to mm unit
+     */
+    mitk::Point2D m_LastCoordinateInMM;
     /**
      * \brief Current coordinates of the pointer.
      */
@@ -198,6 +238,30 @@ namespace mitk
      * Factor to adjust zooming speed.
      */
     float m_ZoomFactor;
+
+    ///// Members to deal with rotating slices
+
+    /**
+     * @brief m_LinkPlanes Determines if angle between crosshair remains fixed when rotating
+     */
+    bool m_LinkPlanes;
+
+    SNCVector m_RotatableSNCs; /// all SNCs that currently have CreatedWorldGeometries, that can be rotated.
+    SNCVector m_SNCsToBeRotated; /// all SNCs that will be rotated (exceptions are the ones parallel to the one being clicked)
+
+    Point3D  m_LastCursorPosition; /// used for calculation of the rotation angle
+    Point3D  m_CenterOfRotation; /// used for calculation of the rotation angle
+
+    Point2D m_ReferenceCursor;
+
+    Vector3D m_RotationPlaneNormal;
+    Vector3D m_RotationPlaneXVector;
+    Vector3D m_RotationPlaneYVector;
+
+    Vector3D m_PreviousRotationAxis;
+    ScalarType m_PreviousRotationAngle;
+
+
   };
 }
 #endif

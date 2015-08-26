@@ -78,7 +78,10 @@ namespace mitk {
     enum InteractionScheme
     {
       PACS = 0,
-      MITK = 1
+      MITK = 1,
+      ROTATION = 2,
+      ROTATIONLINKED = 3,
+      SWIVEL = 4
     };
 
     // enum of available mouse modes for PACS interaction scheme

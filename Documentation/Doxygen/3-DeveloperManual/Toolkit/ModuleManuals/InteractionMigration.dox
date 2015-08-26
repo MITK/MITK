@@ -79,7 +79,7 @@ CONNECT_FUNCTION("stringOfActionFromXmlFile2", Action2);
 ...
 }
 
-bool Action1(StateMachineAction* , InteractionEvent*)
+void Action1(StateMachineAction* , InteractionEvent*)
 {
 ...
 }
@@ -89,10 +89,12 @@ bool Action1(StateMachineAction* , InteractionEvent*)
 where each action is implemented as a function. See \ref HowToDataInteractor .
 
 
-\subsection GuardStates Guard States
+\subsection GuardStates Guard States / Conditions
 
 Formerly there where so called guard states, which cause a transition only if certain conditions are met. These states have been removed,
 as a replacement serve the InternalEvents which can be triggered from within a data interactor. An example showing how to use them is given in \ref ExampleInternalEvent .
+
+In most cases, guard states can be eliminated by using transition conditions.
 
 \subsection IncludeFiles Register statemachine patterns and configuration w/o the build system
 

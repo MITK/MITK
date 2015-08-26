@@ -6,7 +6,6 @@
 
 #include "mitkStandaloneDataStorage.h"
 #include "mitkDataNodeFactory.h"
-#include "mitkGlobalInteraction.h"
 #include "mitkImage.h"
 
 #include "QmlMitkBigRenderLock.h"
@@ -69,8 +68,6 @@ void MitkStaticInitialization()
 {
   // TODO THIS IS BAD! Move to module activator
   static QmlMitkRenderingManagerFactory sanglier;
-
-  mitk::GlobalInteraction::GetInstance()->Initialize("global"); // unbelievable.. still necessary..
 }
 
 void SetupRenderWindowItems( QQuickItem* container, mitk::DataStorage::Pointer dataStorage )

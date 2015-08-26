@@ -20,16 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkTimeGeometry.h"
-#include "mitkDisplayGeometry.h"
 #include "mitkPlaneGeometryData.h"
-#include "mitkCameraController.h"
-#include "mitkDisplayPositionEvent.h"
-#include "mitkWheelEvent.h"
-
-//#include "mitkMapper.h"
-
 #include "mitkSliceNavigationController.h"
-#include "mitkCameraController.h"
 #include "mitkCameraRotationController.h"
 
 #include "mitkBindDispatcherInteractor.h"
@@ -54,6 +46,7 @@ namespace mitk
   class Mapper;
   class BaseLocalStorageHandler;
   class OverlayManager;
+  class KeyEvent;
 
   //##Documentation
   //## @brief Organizes the rendering process
@@ -201,8 +194,6 @@ namespace mitk
     */
     DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry* geometry));
 
-    itkGetConstObjectMacro(WorldGeometry, BaseGeometry)
-      itkGetObjectMacro(WorldGeometry, BaseGeometry)
       itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry)
       itkGetObjectMacro(WorldTimeGeometry, TimeGeometry)
 
@@ -216,37 +207,27 @@ namespace mitk
       /**
       * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometry
       */
-      DEPRECATED(const PlaneGeometry* GetCurrentWorldGeometry2D()){return GetCurrentWorldPlaneGeometry();};
+      DEPRECATED(const PlaneGeometry* GetCurrentWorldGeometry2D()){ return GetCurrentWorldPlaneGeometry(); };
 
-      //##Documentation
-      //## Calculates the bounds of the DataStorage (if it contains any valid data),
-      //## creates a geometry from these bounds and sets it as world geometry of the renderer.
-      //##
-      //## Call this method to re-initialize the renderer to the current DataStorage
-      //## (e.g. after loading an additional dataset), to ensure that the view is
-      //## aligned correctly.
-      //## \warn This is not implemented yet.
-      virtual bool SetWorldGeometryToDataStorageBounds()
+    //##Documentation
+    //## Calculates the bounds of the DataStorage (if it contains any valid data),
+    //## creates a geometry from these bounds and sets it as world geometry of the renderer.
+    //##
+    //## Call this method to re-initialize the renderer to the current DataStorage
+    //## (e.g. after loading an additional dataset), to ensure that the view is
+    //## aligned correctly.
+    //## \warn This is not implemented yet.
+    virtual bool SetWorldGeometryToDataStorageBounds()
     {
       return false;
     }
 
     //##Documentation
-    //## @brief Set/Get the DisplayGeometry (for 2D rendering)
+    //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry
+    //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
     //##
-    //## The DisplayGeometry describes which part of the PlaneGeometry m_CurrentWorldPlaneGeometry
-    //## is displayed.
-    virtual void SetDisplayGeometry(DisplayGeometry* geometry2d);
-
-    itkGetConstObjectMacro(DisplayGeometry, DisplayGeometry)
-      itkGetObjectMacro(DisplayGeometry, DisplayGeometry)
-
-      //##Documentation
-      //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry
-      //## stored in m_WorldTimeGeometry used as m_CurrentWorldPlaneGeometry
-      //##
-      //## \sa m_Slice
-      virtual void SetSlice(unsigned int slice);
+    //## \sa m_Slice
+    virtual void SetSlice(unsigned int slice);
 
     //##Documentation
     //## @brief Sets an OverlayManager which is used to add various Overlays to this
@@ -304,30 +285,17 @@ namespace mitk
     //## which is supposed to be a SliceNavigationController::GeometryTimeEvent
     virtual void SetGeometryTime(const itk::EventObject & geometryTimeEvent);
 
-    //##Documentation
-    //## @brief Get a data object containing the DisplayGeometry (for 2D rendering)
-    itkGetObjectMacro(DisplayGeometryData, PlaneGeometryData)
-      //##Documentation
-      //## @brief Get a data object containing the WorldGeometry (for 2D rendering)
-      itkGetObjectMacro(WorldGeometryData, PlaneGeometryData)
-
-      //##Documentation
-      //## @brief Get a DataNode pointing to a data object containing the WorldGeometry (3D and 2D rendering)
-      itkGetObjectMacro(WorldGeometryNode, DataNode)
-      //##Documentation
-      //## @brief Get a DataNode pointing to a data object containing the DisplayGeometry (for 2D rendering)
-      itkGetObjectMacro(DisplayGeometryNode, DataNode)
       //##Documentation
       //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldPlaneGeometry (for 2D rendering)
       itkGetObjectMacro(CurrentWorldPlaneGeometryNode, DataNode)
       /**
       * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometryNode
       */
-      DEPRECATED(DataNode* GetCurrentWorldGeometry2DNode()){return GetCurrentWorldPlaneGeometryNode();};
+      DEPRECATED(DataNode* GetCurrentWorldGeometry2DNode()){ return GetCurrentWorldPlaneGeometryNode(); };
 
-      //##Documentation
-      //## @brief Sets timestamp of CurrentWorldPlaneGeometry and DisplayGeometry and forces so reslicing in that renderwindow
-      void SendUpdateSlice();
+    //##Documentation
+    //## @brief Sets timestamp of CurrentWorldPlaneGeometry and forces so reslicing in that renderwindow
+    void SendUpdateSlice();
 
     //##Documentation
     //## @brief Get timestamp of last call of SetCurrentWorldPlaneGeometry
@@ -338,14 +306,8 @@ namespace mitk
     /**
     * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometryUpdateTime
     */
-    DEPRECATED(unsigned long GetCurrentWorldGeometry2DUpdateTime()){return GetCurrentWorldPlaneGeometryUpdateTime();};
+    DEPRECATED(unsigned long GetCurrentWorldGeometry2DUpdateTime()){ return GetCurrentWorldPlaneGeometryUpdateTime(); };
 
-      //##Documentation
-      //## @brief Get timestamp of last call of SetDisplayGeometry
-      unsigned long GetDisplayGeometryUpdateTime()
-    {
-      return m_CurrentWorldPlaneGeometryUpdateTime;
-    }
     //##Documentation
     //## @brief Get timestamp of last change of current TimeStep
     unsigned long GetTimeStepUpdateTime()
@@ -358,9 +320,8 @@ namespace mitk
     //## display x,y coordinate.
     //## @warning Has to be overwritten in subclasses for the 3D-case.
     //##
-    //## Implemented here only for 2D-rendering by using
-    //## m_DisplayGeometry
-    virtual void PickWorldPoint(const Point2D& diplayPosition, Point3D& worldPosition) const;
+    //## Implemented here only for 2D-rendering
+    virtual void PickWorldPoint(const Point2D& diplayPosition, Point3D& worldPosition) const = 0;
 
     /** \brief Determines the object (mitk::DataNode) closest to the current
     * position by means of picking
@@ -375,57 +336,28 @@ namespace mitk
     //##Documentation
     //## @brief Get the MapperSlotId to use.
     itkGetMacro(MapperID, MapperSlotId)
-    itkGetConstMacro(MapperID, MapperSlotId)
+      itkGetConstMacro(MapperID, MapperSlotId)
 
-    //##Documentation
-    //## @brief Set the MapperSlotId to use.
-    itkSetMacro(MapperID, MapperSlotId)
+      //##Documentation
+      //## @brief Set the MapperSlotId to use.
+      itkSetMacro(MapperID, MapperSlotId)
 
-    //##Documentation
-    //## @brief Has the renderer the focus?
-    itkGetMacro(Focused, bool)
-    //##Documentation
-    //## @brief Tell the renderer that it is focused. The caller is responsible for focus management,
-    //## not the renderer itself.
-    itkSetMacro(Focused, bool)
+    virtual int* GetSize () const;
+    virtual int *GetViewportSize() const;
 
-    itkGetMacro(Size, int*)
+      void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
+      itkGetObjectMacro(CameraController, CameraController)
+      itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
+      itkGetObjectMacro(CameraRotationController, CameraRotationController)
 
-    void SetSliceNavigationController(SliceNavigationController* SlicenavigationController);
-    void SetCameraController(CameraController* cameraController);
-    itkGetObjectMacro(CameraController, CameraController)
-    itkGetObjectMacro(SliceNavigationController, SliceNavigationController)
-    itkGetObjectMacro(CameraRotationController, CameraRotationController)
+      itkGetMacro(EmptyWorldGeometry, bool)
 
-    itkGetMacro(EmptyWorldGeometry, bool)
-
-    //##Documentation
-    //## @brief Tells if the displayed region is shifted and rescaled if the render window is resized.
-    itkGetMacro(KeepDisplayedRegion, bool)
-    //##Documentation
-    //## @brief Tells if the displayed region should be shifted and rescaled if the render window is resized.
-    itkSetMacro(KeepDisplayedRegion, bool)
-
-    //##Documentation
-    //## @brief Mouse event dispatchers
-    //## @note for internal use only. preliminary.
-    virtual void MousePressEvent(MouseEvent*);
-    //##Documentation
-    //## @brief Mouse event dispatchers
-    //## @note for internal use only. preliminary.
-    virtual void MouseReleaseEvent(MouseEvent*);
-    //##Documentation
-    //## @brief Mouse event dispatchers
-    //## @note for internal use only. preliminary.
-    virtual void MouseMoveEvent(MouseEvent*);
-    //##Documentation
-    //## @brief Wheel event dispatcher
-    //## @note for internal use only. preliminary.
-    virtual void WheelEvent(mitk::WheelEvent* we);
-    //##Documentation
-    //## @brief Key event dispatcher
-    //## @note for internal use only. preliminary.
-    virtual void KeyPressEvent(KeyEvent*);
+      //##Documentation
+      //## @brief Tells if the displayed region is shifted and rescaled if the render window is resized.
+      itkGetMacro(KeepDisplayedRegion, bool)
+      //##Documentation
+      //## @brief Tells if the displayed region should be shifted and rescaled if the render window is resized.
+      itkSetMacro(KeepDisplayedRegion, bool)
 
     //##Documentation
     //## @brief get the name of the Renderer
@@ -440,7 +372,7 @@ namespace mitk
     //## @note
     int GetSizeX() const
     {
-      return m_Size[0];
+      return GetSize()[0];
     }
 
     //##Documentation
@@ -448,7 +380,7 @@ namespace mitk
     //## @note
     int GetSizeY() const
     {
-      return m_Size[1];
+      return GetSize()[1];
     }
 
     const double* GetBounds() const;
@@ -470,16 +402,42 @@ namespace mitk
     */
     virtual mitk::RenderingManager* GetRenderingManager() const;
 
+    //##Documentation
+    //## @brief This method converts a display point to the 3D world index
+    //## using the geometry of the renderWindow.
+    void DisplayToWorld(const Point2D& displayPoint, Point3D& worldIndex) const;
+
+    //##Documentation
+    //## @brief This method converts a display point to the 2D world index, mapped onto the display plane
+    //## using the geometry of the renderWindow.
+    void DisplayToPlane(const Point2D& displayPoint, Point2D& planePointInMM) const;
+
+    //##Documentation
+    //## @brief This method converts a 3D world index to the display point
+    //## using the geometry of the renderWindow.
+    void WorldToDisplay(const Point3D& worldIndex, Point2D& displayPoint) const;
+
+    //##Documentation
+    //## @brief This method converts a 2D plane coordinate to the display point
+    //## using the geometry of the renderWindow.
+    void PlaneToDisplay(const Point2D& planePointInMM, Point2D& displayPoint) const;
+
+    double GetScaleFactorMMPerDisplayUnit() const;
+
+    Point2D GetDisplaySizeInMM() const;
+    Point2D GetViewportSizeInMM() const;
+
+    Point2D GetOriginInMM() const;
+
+    itkGetConstMacro(ConstrainZoomingAndPanning, bool)
+    virtual void SetConstrainZoomingAndPanning(bool constrain);
+
     /**
     * \brief Provides (1) world coordinates for a given mouse position and (2)
     * translates mousePosition to Display coordinates
+    * \deprecated Map2DRendererPositionTo3DWorldPosition is deprecated. Please use DisplayToWorld instead.
     */
-    virtual Point3D Map2DRendererPositionTo3DWorldPosition(const Point2D& mousePosition) const;
-
-    /**
-    * \deprecatedSince{2014_03} Please use Map2DRendererPositionTo3DWorldPosition(const Point2D& mousePosition) const
-    */
-    DEPRECATED(Point3D Map2DRendererPositionTo3DWorldPosition(Point2D* mousePosition) const);
+    DEPRECATED( virtual Point3D Map2DRendererPositionTo3DWorldPosition(const Point2D& mousePosition) const);
 
   protected:
 
@@ -511,19 +469,9 @@ namespace mitk
     //##Documentation
     //## @brief CameraController for 3D rendering
     //## @note preliminary.
-    CameraController::Pointer m_CameraController;
+    itk::SmartPointer<CameraController> m_CameraController;
     SliceNavigationController::Pointer m_SliceNavigationController;
     CameraRotationController::Pointer m_CameraRotationController;
-
-    //##Documentation
-    //## @brief Size of the RenderWindow.
-    int m_Size[2];
-
-    //##Documentation
-    //## @brief Contains whether the renderer that it is focused. The caller of
-    //## SetFocused is responsible for focus management, not the renderer itself.
-    //## is doubled because of mitk::FocusManager in GlobalInteraction!!! (ingmar)
-    bool m_Focused;
 
     //##Documentation
     //## @brief Sets m_CurrentWorldPlaneGeometry
@@ -531,11 +479,11 @@ namespace mitk
     /**
     * \deprecatedSince{2014_10} Please use SetCurrentWorldPlaneGeometry
     */
-    DEPRECATED(void SetCurrentWorldGeometry2D(PlaneGeometry* geometry2d)){SetCurrentWorldPlaneGeometry(geometry2d);};
+    DEPRECATED(void SetCurrentWorldGeometry2D(PlaneGeometry* geometry2d)){ SetCurrentWorldPlaneGeometry(geometry2d); };
 
-      //##Documentation
-      //## @brief Sets m_CurrentWorldGeometry
-      virtual void SetCurrentWorldGeometry(BaseGeometry* geometry);
+    //##Documentation
+    //## @brief Sets m_CurrentWorldGeometry
+    virtual void SetCurrentWorldGeometry(BaseGeometry* geometry);
 
     //##Documentation
     //## @brief This method is called during the rendering process to update or render the Overlays
@@ -543,16 +491,6 @@ namespace mitk
     void UpdateOverlays();
 
   private:
-    //TODO 18735: Why are there three world geometries and a world plane? Why should they be const and are not (see comment below)?
-    //##Documentation
-    //## Pointer to the worldgeometry, describing the maximal area to be rendered
-    //## (3D as well as 2D).
-    //## It is const, since we are not allowed to change it (it may be taken
-    //## directly from the geometry of an image-slice and thus it would be
-    //## very strange when suddenly the image-slice changes its geometry).
-    //## \sa SetWorldGeometry
-    //TODO 18735: can be deleted, because it is not used (except QmtikSlicesInterpolator, but this usage is wrong and the code cannot be reached. bug?).
-    BaseGeometry::Pointer m_WorldGeometry;
 
     itk::SmartPointer<OverlayManager> m_OverlayManager;
 
@@ -572,19 +510,11 @@ namespace mitk
     //##Documentation
     //## Pointer to the current 2D-worldgeometry. The 2D-worldgeometry
     //## describes the maximal area (2D manifold) to be rendered in case we
-    //## are doing 2D-rendering. More precisely, a subpart of this according
-    //## to m_DisplayGeometry is displayed.
+    //## are doing 2D-rendering.
     //## It is const, since we are not allowed to change it (it may be taken
     //## directly from the geometry of an image-slice and thus it would be
     //## very strange when suddenly the image-slice changes its geometry).
     PlaneGeometry::Pointer m_CurrentWorldPlaneGeometry;
-
-    //##Documentation
-    //## Pointer to the displaygeometry. The displaygeometry describes the
-    //## geometry of the \em visible area in the window controlled by the renderer
-    //## in case we are doing 2D-rendering.
-    //## It is const, since we are not allowed to change it.
-    DisplayGeometry::Pointer m_DisplayGeometry;
 
     //##Documentation
     //## Defines together with m_Slice which 2D geometry stored in m_WorldTimeGeometry
@@ -602,10 +532,6 @@ namespace mitk
     itk::TimeStamp m_CurrentWorldPlaneGeometryUpdateTime;
 
     //##Documentation
-    //## @brief timestamp of last call of SetDisplayGeometry
-    itk::TimeStamp m_DisplayGeometryUpdateTime;
-
-    //##Documentation
     //## @brief timestamp of last change of the current time step
     itk::TimeStamp m_TimeStepUpdateTime;
 
@@ -621,28 +547,13 @@ namespace mitk
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
     //##Documentation
-    //## Data object containing the m_WorldGeometry defined above.
-    PlaneGeometryData::Pointer m_WorldGeometryData;
-    //##Documentation
-    //## Data object containing the m_DisplayGeometry defined above.
-    PlaneGeometryData::Pointer m_DisplayGeometryData;
-    //##Documentation
     //## Data object containing the m_CurrentWorldPlaneGeometry defined above.
     PlaneGeometryData::Pointer m_CurrentWorldPlaneGeometryData;
 
     //##Documentation
-    //## DataNode objects containing the m_WorldGeometryData defined above.
-    DataNode::Pointer m_WorldGeometryNode;
-    //##Documentation
-    //## DataNode objects containing the m_DisplayGeometryData defined above.
-    DataNode::Pointer m_DisplayGeometryNode;
-    //##Documentation
     //## DataNode objects containing the m_CurrentWorldPlaneGeometryData defined above.
     DataNode::Pointer m_CurrentWorldPlaneGeometryNode;
 
-    //##Documentation
-    //## @brief test only
-    unsigned long m_DisplayGeometryTransformTime;
     //##Documentation
     //## @brief test only
     unsigned long m_CurrentWorldPlaneGeometryTransformTime;
@@ -664,6 +575,8 @@ namespace mitk
   protected:
 
     std::list<mitk::BaseLocalStorageHandler*> m_RegisteredLocalStorageHandlers;
+
+    bool m_ConstrainZoomingAndPanning;
 
   public:
 

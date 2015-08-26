@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkSimpleMeasurementControls.h"
 
-#include <mitkGlobalInteraction.h>
 #include <mitkPointSet.h>
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>

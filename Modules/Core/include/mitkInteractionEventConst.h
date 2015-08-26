@@ -62,6 +62,20 @@ struct MITKCORE_EXPORT InteractionEventConst
   static const std::string xmlRenderSizeX(); // = "RenderSizeX";
   static const std::string xmlRenderSizeY(); // = "RenderSizeY";
   static const std::string xmlRenderSizeZ(); // = "RenderSizeZ";
+
+  static const std::string xmlViewUpX(); // = "xmlViewUpX";
+  static const std::string xmlViewUpY(); // = "xmlViewUpY";
+  static const std::string xmlViewUpZ(); // = "xmlViewUpZ";
+
+
+  static const std::string xmlCameraPositionX(); // = "CameraPositionX";
+  static const std::string xmlCameraPositionY(); // = "CameraPositionY";
+  static const std::string xmlCameraPositionZ(); // = "CameraPositionZ";
+
+
+  static const std::string xmlCameraFocalPointX(); // = "CameraFocalPointX";
+  static const std::string xmlCameraFocalPointY(); // = "CameraFocalPointY";
+  static const std::string xmlCameraFocalPointZ(); // = "CameraFocalPointZ";
 };
 
 }     //namespace mitk

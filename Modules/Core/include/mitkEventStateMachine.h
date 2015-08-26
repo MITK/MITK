@@ -31,7 +31,7 @@
  * this macro, as is provided by e.g. mitkClassMacro
  */
 #define CONNECT_FUNCTION(a, f) \
-  ::mitk::EventStateMachine::AddActionFunction(a, ::mitk::MessageDelegate2<Self, ::mitk::StateMachineAction*, ::mitk::InteractionEvent*, bool>(this, &Self::f));
+  ::mitk::EventStateMachine::AddActionFunction(a, ::mitk::MessageDelegate2<Self, ::mitk::StateMachineAction*, ::mitk::InteractionEvent*, void>(this, &Self::f));
 
 #define CONNECT_CONDITION(a, f) \
   ::mitk::EventStateMachine::AddConditionFunction(a, ::mitk::MessageDelegate1<Self,const ::mitk::InteractionEvent*, bool>(this, &Self::f));
@@ -67,33 +67,33 @@ namespace mitk
     }
   };
 
-  /**
-   * \class TSpecificActionFunctor
-   * Specific implementation of ActionFunctor class, implements a reference to the function which is to be executed. It takes two arguments:
-   * StateMachineAction - the action by which the function call is invoked, InteractionEvent - the event that caused the transition.
-   */
-  template<class T>
-  class DEPRECATED() TSpecificActionFunctor : public TActionFunctor
-  {
-  public:
+  ///**
+  // * \class TSpecificActionFunctor
+  // * Specific implementation of ActionFunctor class, implements a reference to the function which is to be executed. It takes two arguments:
+  // * StateMachineAction - the action by which the function call is invoked, InteractionEvent - the event that caused the transition.
+  // */
+  //template<class T>
+  //class DEPRECATED() TSpecificActionFunctor : public TActionFunctor
+  //{
+  //public:
 
-    TSpecificActionFunctor(T* object, bool (T::*memberFunctionPointer)(StateMachineAction*, InteractionEvent*)) :
-        m_Object(object), m_MemberFunctionPointer(memberFunctionPointer)
-    {
-    }
+  //  TSpecificActionFunctor(T* object, bool (T::*memberFunctionPointer)(StateMachineAction*, InteractionEvent*)) :
+  //      m_Object(object), m_MemberFunctionPointer(memberFunctionPointer)
+  //  {
+  //  }
 
-    virtual ~TSpecificActionFunctor()
-    {
-    }
-    virtual bool DoAction(StateMachineAction* action, InteractionEvent* event) override
-    {
-      return (*m_Object.*m_MemberFunctionPointer)(action, event);// executes member function
-    }
+  //  virtual ~TSpecificActionFunctor()
+  //  {
+  //  }
+  //  virtual bool DoAction(StateMachineAction* action, InteractionEvent* event) override
+  //  {
+  //    return (*m_Object.*m_MemberFunctionPointer)(action, event);// executes member function
+  //  }
 
-  private:
-    T* m_Object;
-    bool (T::*m_MemberFunctionPointer)(StateMachineAction*, InteractionEvent*);
-  };
+  //private:
+  //  T* m_Object;
+  //  bool (T::*m_MemberFunctionPointer)(StateMachineAction*, InteractionEvent*);
+  //};
 
   /**
    * \class EventStateMachine
@@ -156,7 +156,7 @@ namespace mitk
     EventStateMachine();
     virtual ~EventStateMachine();
 
-    typedef MessageAbstractDelegate2<StateMachineAction*, InteractionEvent*, bool> ActionFunctionDelegate;
+    typedef MessageAbstractDelegate2<StateMachineAction*, InteractionEvent*, void> ActionFunctionDelegate;
     typedef MessageAbstractDelegate1<const InteractionEvent*, bool> ConditionFunctionDelegate;
 
     /**
@@ -190,7 +190,7 @@ namespace mitk
      * Looks up function that is associated with action and executes it.
      * To implement your own execution scheme overwrite this in your DataInteractor.
      */
-    virtual bool ExecuteAction(StateMachineAction* action, InteractionEvent* interactionEvent);
+    virtual void ExecuteAction(StateMachineAction* action, InteractionEvent* interactionEvent);
 
     /**
      * Implements filter scheme for events.
@@ -209,6 +209,21 @@ namespace mitk
      * or to enforce that the interactor only reacts when the corresponding DataNode is selected in the DataManager view..
      */
     virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
+
+
+    /** \brief Sets the specified mouse cursor.
+     *
+     * Use this in subclasses instead of using QmitkApplicationCursor directly.
+     */
+    void SetMouseCursor( const char *xpm[], int hotspotX, int hotspotY );
+
+
+    /** \brief Resets the mouse cursor (if modified by the SlicesCoordinator)
+     * to its original state.
+     *
+     * Should be used by subclasses and from external application instead
+     * of using QmitkApplicationCursor directly to avoid conflicts. */
+    void ResetMouseCursor();
 
 
     /**
@@ -246,6 +261,7 @@ namespace mitk
     ConditionDelegatesMapType m_ConditionDelegatesMap;
     StateMachineStateType m_CurrentState;
 
+    bool m_MouseCursorSet;
 
   };
 

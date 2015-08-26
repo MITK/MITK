@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkStdMultiWidget.h"
 
-#include "mitkGlobalInteraction.h"
 #include "mitkRenderingManager.h"
 
 #include <QHBoxLayout>
@@ -80,8 +79,6 @@ void Step8::SetupWidgets()
   // Part II: Setup standard interaction with the mouse
   //*************************************************************************
 
-  // Moving the cut-planes to click-point
-  multiWidget->EnableNavigationControllerEventListening();
 }
 /**
  \example Step8.cpp

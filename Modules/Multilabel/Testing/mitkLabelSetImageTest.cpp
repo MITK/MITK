@@ -39,13 +39,13 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestMergeLabel);
   // TODO check it these functionalities can be moved into a process object
-//  MITK_TEST(TestMergeLabels);
-//  MITK_TEST(TestConcatenate);
-//  MITK_TEST(TestClearBuffer);
-//  MITK_TEST(TestUpdateCenterOfMass);
-//  MITK_TEST(TestGetVectorImage);
-//  MITK_TEST(TestSetVectorImage);
-//  MITK_TEST(TestGetLayerImage);
+  //  MITK_TEST(TestMergeLabels);
+  //  MITK_TEST(TestConcatenate);
+  //  MITK_TEST(TestClearBuffer);
+  //  MITK_TEST(TestUpdateCenterOfMass);
+  //  MITK_TEST(TestGetVectorImage);
+  //  MITK_TEST(TestSetVectorImage);
+  //  MITK_TEST(TestGetLayerImage);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -74,7 +74,7 @@ public:
   {
     // LabelSet image should always has the pixel type mitk::Label::PixelType
     CPPUNIT_ASSERT_MESSAGE("LabelSetImage has wrong pixel type",
-                           m_LabelSetImage->GetPixelType() == mitk::MakeScalarPixelType<mitk::Label::PixelType>());
+      m_LabelSetImage->GetPixelType() == mitk::MakeScalarPixelType<mitk::Label::PixelType>());
 
     mitk::Image::Pointer regularImage = mitk::Image::New();
     unsigned int dimensions[3] = {256,256,312};

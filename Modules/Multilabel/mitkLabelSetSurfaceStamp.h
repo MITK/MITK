@@ -31,10 +31,10 @@ namespace mitk
   public:
 
     mitkClassMacro( LabelSetSurfaceStamp , ImageToImageFilter );
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      itkGetConstMacro(Surface,Surface::Pointer);
+    itkGetConstMacro(Surface,Surface::Pointer);
     itkSetMacro(Surface,Surface::Pointer);
     itkGetConstMacro(ForceOverwrite,bool);
     itkSetMacro(ForceOverwrite,bool);
@@ -62,7 +62,7 @@ namespace mitk
     \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.
     */
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Surface::Pointer surface);
+    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Surface::Pointer surface,  mitk::Image::Pointer resultImage );
 
     Surface::Pointer m_Surface;
     bool m_ForceOverwrite;

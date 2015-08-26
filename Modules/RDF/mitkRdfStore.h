@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <list>
 
 #include "mitkRdfTriple.h"
+#include <mitkCommon.h>
 
 namespace mitk {
   class RdfStorePrivate;
@@ -101,9 +102,27 @@ namespace mitk {
     /**
     * Queries over the triplestore with the given SPARQL query.
     * @param query A std:string which stands for a SPARQL query text.
-    * @return The result of the query will be returned as a map of keys with there values as lists of nodes.
+    * @return The result of the query will be returned as a map of keys with their values as lists of nodes.
+    * @deprecatedSince{2015_11} Use mitk::RdfStore::ExecuteTupleQuery() instead.
     */
-    ResultMap Query(std::string query) const;
+    DEPRECATED(ResultMap Query(const std::string& query) const);
+
+    /**
+    * Queries over the triplestore with the given SPARQL query.
+    * @param query A std:string which stands for a SPARQL query text.
+    * @return The result of the query will be returned as a map of keys with their values as lists of nodes.
+    */
+    ResultMap ExecuteTupleQuery(const std::string& query) const;
+
+    /**
+     * Tests whether or not the specified query pattern has a solution.
+     * @param query The SPARQL query string in ASK form.
+     * @return True if query pattern has a solution, otherwise false.
+     * @throws mitk::Exception This exception is thrown if one of the following errors occur:
+     *                         (1) failure on query object creation, (2) SPARQL syntax error,
+     *                         (3) trying to execute a non-boolean query, (4) error while retrieving execution result
+     */
+    bool ExecuteBooleanQuery(const std::string& query) const;
 
     /**
     * Saves the current state of the triplestore in a file. The currently supported formats are: "ntriples", "turtle"(default), "nquads".

@@ -35,6 +35,11 @@ class mitkRdfStoreTestSuite : public mitk::TestFixture
   MITK_TEST(TestSaveStore);
   MITK_TEST(TestImportStore);
 
+  MITK_TEST(ExecuteBooleanQuery_PatternHasSolution_ReturnsTrue);
+  MITK_TEST(ExecuteBooleanQuery_PatternDoesNotHaveSolution_ReturnsFalse);
+  MITK_TEST(ExecuteBooleanQuery_MalformedBooleanQuery_ThrowsException);
+  MITK_TEST(ExecuteBooleanQuery_NonBooleanQuery_ThrowsException);
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -46,7 +51,6 @@ public:
 
   void setUp()
   {
-    store.CleanUp();
     store.SetBaseUri(mitk::RdfUri("http://mitk.org/wiki/MITK/data/instances.rdf#"));
     store.AddPrefix("dcterms", mitk::RdfUri("http://purl.org/dc/terms/"));
     store.AddPrefix("mitk", mitk::RdfUri("http://mitk.org/wiki/MITK/data/BaseOntology.rdf#"));
@@ -56,6 +60,7 @@ public:
 
   void tearDown()
   {
+    store.CleanUp();
   }
 
   // Test functions
@@ -85,7 +90,7 @@ public:
   {
     store.Add(triple);
     std::string query = "SELECT ?x WHERE { ?x ?z ?y . }";
-    mitk::RdfStore::ResultMap queryResult = store.Query(query);
+    mitk::RdfStore::ResultMap queryResult = store.ExecuteTupleQuery(query);
     std::list<mitk::RdfNode> list = queryResult["x"];
     CPPUNIT_ASSERT(triple.GetTripleSubject() == list.back());
   }
@@ -118,6 +123,37 @@ public:
     store.Import("file:"+tmpFileName);
     CPPUNIT_ASSERT(store.Contains(triple));
   }
+
+  void ExecuteBooleanQuery_PatternHasSolution_ReturnsTrue(void)
+  {
+    store.Add(triple);
+
+    const std::string query = "ASK { <http://mitk.org/wiki/MITK/data/instances.rdf#i0012> <dcterms:title> 'TestImage' }";
+
+    CPPUNIT_ASSERT_EQUAL(true, store.ExecuteBooleanQuery(query));
+  }
+
+  void ExecuteBooleanQuery_PatternDoesNotHaveSolution_ReturnsFalse(void)
+  {
+    const std::string query = "ASK { <http://mitk.org/wiki/MITK/data/instances.rdf#i0012> <dcterms:title> 'TestImage' }";
+
+    CPPUNIT_ASSERT_EQUAL(false, store.ExecuteBooleanQuery(query));
+  }
+
+  void ExecuteBooleanQuery_MalformedBooleanQuery_ThrowsException(void)
+  {
+    const std::string query = "ASK { <http://mitk.org/wiki/MITK/data/instances.rdf#i0012> <dcterms:title> TestImage }";
+
+    CPPUNIT_ASSERT_THROW(store.ExecuteBooleanQuery(query), mitk::Exception);
+  }
+
+  void ExecuteBooleanQuery_NonBooleanQuery_ThrowsException(void)
+  {
+    const std::string query = "SELECT ?x ?y ?z WHERE { ?x ?y ?z }";
+
+    CPPUNIT_ASSERT_THROW(store.ExecuteBooleanQuery(query), mitk::Exception);
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkRdfStore)

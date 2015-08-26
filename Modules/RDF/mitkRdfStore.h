@@ -109,7 +109,9 @@ namespace mitk {
      * Tests whether or not the specified query pattern has a solution.
      * @param query The SPARQL query string in ASK form.
      * @return True if query pattern has a solution, otherwise false.
-     *         Note that it also returns false in error case (error handling concept necessary).
+     * @throws mitk::Exception This exception is thrown if one of the following errors occur:
+     *                         (1) failure on query object creation, (2) SPARQL syntax error,
+     *                         (3) trying to execute a non-boolean query, (4) error while retrieving execution result
      */
     bool ExecuteBooleanQuery(const std::string& query) const;
 

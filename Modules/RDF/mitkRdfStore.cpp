@@ -288,16 +288,17 @@ namespace mitk {
 
     librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
 
-    // FIXME: Better throw exception here in order to indicate that something went wrong!
-    if (!rdfQuery) return false;
+    if (!rdfQuery)
+    {
+      mitkThrow() << "failed to create query object";
+    }
 
     librdf_query_results* results = librdf_query_execute(rdfQuery, m_Model);
 
     if (!results)
     {
       librdf_free_query(rdfQuery);
-      // FIXME: Better throw exception here in order to indicate that something went wrong!
-      return false;
+      mitkThrow() << "SPARQL syntax error";
     }
 
     if (!librdf_query_results_is_boolean(results))
@@ -305,8 +306,7 @@ namespace mitk {
       librdf_free_query_results(results);
       librdf_free_query(rdfQuery);
 
-      // FIXME: Better throw exception here in order to indicate that something went wrong!
-      return false;
+      mitkThrow() << "unexpected result type error: tried to request a boolean result with a non-boolean query";
     }
 
     int rawResult = librdf_query_results_get_boolean(results);
@@ -323,9 +323,7 @@ namespace mitk {
     }
     else
     {
-      // FIXME: Better throw exception here in order to indicate that something went wrong!
-      booleanResult = false;
-      MITK_ERROR << "error while executing boolean query";
+      mitkThrow() << "error while retrieving result";
     }
 
     librdf_free_query_results(results);

@@ -37,8 +37,8 @@ class mitkRdfStoreTestSuite : public mitk::TestFixture
 
   MITK_TEST(ExecuteBooleanQuery_PatternHasSolution_ReturnsTrue);
   MITK_TEST(ExecuteBooleanQuery_PatternDoesNotHaveSolution_ReturnsFalse);
-  MITK_TEST(ExecuteBooleanQuery_MalformedBooleanQuery_ReturnsFalse);
-  MITK_TEST(ExecuteBooleanQuery_NotABooleanQuery_ReturnsFalse);
+  MITK_TEST(ExecuteBooleanQuery_MalformedBooleanQuery_ThrowsException);
+  MITK_TEST(ExecuteBooleanQuery_NonBooleanQuery_ThrowsException);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -140,20 +140,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(false, store.ExecuteBooleanQuery(query));
   }
 
-  // TODO: handle syntax error instead of return value 'false'
-  void ExecuteBooleanQuery_MalformedBooleanQuery_ReturnsFalse(void)
+  void ExecuteBooleanQuery_MalformedBooleanQuery_ThrowsException(void)
   {
     const std::string query = "ASK { <http://mitk.org/wiki/MITK/data/instances.rdf#i0012> <dcterms:title> TestImage }";
 
-    CPPUNIT_ASSERT_EQUAL(false, store.ExecuteBooleanQuery(query));
+    CPPUNIT_ASSERT_THROW(store.ExecuteBooleanQuery(query), mitk::Exception);
   }
 
-  // TODO: handle unexpected result type error instead of return value 'false'
-  void ExecuteBooleanQuery_NotABooleanQuery_ReturnsFalse(void)
+  void ExecuteBooleanQuery_NonBooleanQuery_ThrowsException(void)
   {
     const std::string query = "SELECT ?x ?y ?z WHERE { ?x ?y ?z }";
 
-    CPPUNIT_ASSERT_EQUAL(false, store.ExecuteBooleanQuery(query));
+    CPPUNIT_ASSERT_THROW(store.ExecuteBooleanQuery(query), mitk::Exception);
   }
 
 };

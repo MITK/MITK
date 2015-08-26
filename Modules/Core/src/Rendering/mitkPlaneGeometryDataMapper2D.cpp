@@ -86,17 +86,22 @@ namespace
 
     void operator-=(const IntervalType& interval)
     {
-      // Check the intervals for intersection
+      // equal_range will find all the intervals in the interval set which intersect with the input interval
+      //   due to the nature of operator< of SimpleInterval
       auto range = m_IntervalsContainer.equal_range(interval);
 
       for (auto iter = range.first; iter != range.second;)
       {
-        auto intersectionResult = SubtractIntervals(*iter, interval);
+        auto subtractionResult = SubtractIntervals(*iter, interval);
 
+        // Remove the old interval from the set
         iter = m_IntervalsContainer.erase(iter);
-        for (auto&& interval : intersectionResult)
+        for (auto&& interval : subtractionResult)
         {
           if (!interval.empty()) {
+            // Add the new interval to the set
+            // emplace_hint adds the element at the closest valid place before the hint iterator,
+            //   which is exactly where the new interval should be
             iter = m_IntervalsContainer.emplace_hint(iter, std::move(interval));
             ++iter;
           }
@@ -129,19 +134,18 @@ namespace
       {
         if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
         {
-          std::array<IntervalType,2> empty;
-          return empty ; // Interval completely enclosed
+          return { IntervalType{}, IntervalType{} } ; // firstInterval completely enclosed
         }
-        return{ IntervalType{ firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() }, IntervalType{} };
+        return{ IntervalType{ firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() }, IntervalType{} }; // secondInterval removes the beginning of firstInterval
       }
 
       if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
       {
-        return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() }, IntervalType{} };
+        return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() }, IntervalType{} }; // secondInterval removes the end of firstInterval
       }
 
       return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() },
-        IntervalType{ secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() } };
+        IntervalType{ secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() } }; // secondInterval is completely enclosed in firstInterval and removes the middle
     }
   };
 }

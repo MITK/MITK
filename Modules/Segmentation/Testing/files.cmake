@@ -5,7 +5,7 @@ set(MODULE_TESTS
   mitkDataNodeSegmentationTest.cpp
   mitkFeatureBasedEdgeDetectionFilterTest.cpp
   mitkImageToContourFilterTest.cpp
-#  mitkSegmentationInterpolationTest.cpp
+  mitkSegmentationInterpolationTest.cpp
   mitkOverwriteSliceFilterTest.cpp
   mitkOverwriteSliceFilterObliquePlaneTest.cpp
 #  mitkToolManagerTest.cpp

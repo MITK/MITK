@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // mitk includes
 #include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateOr.h"
 #include "mitkPlanarFigureInteractor.h"
 
 // itk includes
@@ -102,12 +103,12 @@ void QmitkImageStatisticsView::CreateConnections()
 
 void QmitkImageStatisticsView::OnDefaultBinSizeBoxChanged()
 {
-    if (m_CalculationThread!=NULL)
-        m_Controls->m_HistogramBinSizeSpinbox->setValue(m_CalculationThread->GetHistogramBinSize());
-    if (m_Controls->m_UseDefaultBinSizeBox->isChecked())
-        m_Controls->m_BinSizeFrame->setVisible(false);
-    else
-        m_Controls->m_BinSizeFrame->setVisible(true);
+  if (m_CalculationThread!=NULL)
+    m_Controls->m_HistogramBinSizeSpinbox->setValue(m_CalculationThread->GetHistogramBinSize());
+  if (m_Controls->m_UseDefaultBinSizeBox->isChecked())
+    m_Controls->m_BinSizeFrame->setVisible(false);
+  else
+    m_Controls->m_BinSizeFrame->setVisible(true);
 }
 
 void QmitkImageStatisticsView::PartClosed(const berry::IWorkbenchPartReference::Pointer& )
@@ -152,7 +153,7 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
   }
 
   if ((this->m_SelectedImage->GetTimeSteps() == 1 && timestep == 0) ||
-      this->m_SelectedImage->GetTimeSteps() > 1)
+    this->m_SelectedImage->GetTimeSteps() > 1)
   {
     // display histogram for selected timestep
     this->m_Controls->m_JSHistogram->ClearHistogram();
@@ -170,10 +171,10 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
       //this->m_Controls->m_JSHistogram->ComputeHistogram(histogram.GetPointer());
       /*else
       {
-        m_Controls->m_JSHistogram->ComputeIntensityProfile(timestep, true);
+      m_Controls->m_JSHistogram->ComputeIntensityProfile(timestep, true);
       }*/
 
-//      this->m_Controls->m_JSHistogram->SignalGraphChanged();
+      //      this->m_Controls->m_JSHistogram->SignalGraphChanged();
 
       // hacky way to make sure the protected SignalGraphChanged() is called
       if (this->m_Controls->m_JSHistogram->GetUseLineGraph())
@@ -267,9 +268,9 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
   if ( this->m_CurrentStatisticsValid )
   {
     const std::vector<mitk::ImageStatisticsCalculator::Statistics> &statistics =
-        this->m_CalculationThread->GetStatisticsData();
+      this->m_CalculationThread->GetStatisticsData();
     const unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->
-        GetPos();
+      GetPos();
 
     // Copy statistics to clipboard ("%Ln" will use the default locale for
     // number formatting)
@@ -340,7 +341,7 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
     m_Controls->m_barRadioButton->setEnabled(true);
     m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
     m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-//    m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+    //    m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
     m_Controls->m_InfoLabel->setText(QString(""));
 
     //   m_Controls->horizontalLayout_3->setEnabled(false);
@@ -357,6 +358,8 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
   {
     bool isBinary = false;
     selectedNodes.value(0)->GetBoolProperty("binary",isBinary);
+    mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+    isBinary |= isLabelSet->CheckNode(selectedNodes.value(0));
     if(isBinary)
     {
       m_Controls->m_JSHistogram->ClearHistogram();
@@ -364,7 +367,7 @@ void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Poin
       m_Controls->m_barRadioButton->setEnabled(true);
       m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-//      m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+      //      m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
       m_Controls->m_InfoLabel->setText(QString(""));
     }
     for (int i= 0; i< selectedNodes.size(); ++i)
@@ -435,7 +438,9 @@ void QmitkImageStatisticsView::UpdateStatistics()
   m_WorldMaxList.clear();
 
   // classify selected nodes
-  mitk::NodePredicateDataType::Pointer imagePredicate = mitk::NodePredicateDataType::New("Image");
+  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+  mitk::NodePredicateOr::Pointer imagePredicate = mitk::NodePredicateOr::New(isImage, isLabelSet);
 
   std::string maskName = std::string();
   std::string maskType = std::string();
@@ -454,6 +459,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
     {
       bool isMask = false;
       this->m_SelectedDataNodes.at(i)->GetPropertyValue("binary", isMask);
+      isMask |= isLabelSet->CheckNode(this->m_SelectedDataNodes.at(i));
 
       if( this->m_SelectedImageMask == NULL && isMask)
       {
@@ -518,6 +524,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       {
         bool isMask = false;
         node->GetPropertyValue("binary", isMask);
+        isMask |= isLabelSet->CheckNode(node);
 
         if( !isMask )
         {
@@ -553,7 +560,7 @@ void QmitkImageStatisticsView::UpdateStatistics()
       m_Controls->m_barRadioButton->setEnabled(true);
       m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-//      m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+      //      m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
       m_Controls->m_InfoLabel->setText(QString(""));
       return;
     }
@@ -586,9 +593,9 @@ void QmitkImageStatisticsView::UpdateStatistics()
       }
 
       m_Controls->m_SelectedMaskLabel->setText(m_Controls->m_SelectedMaskLabel->text() +
-                                               QString(" (t=") +
-                                               QString::number(maskTimeStep) +
-                                               QString(")"));
+        QString(" (t=") +
+        QString::number(maskTimeStep) +
+        QString(")"));
     }
 
     //// initialize thread and trigger it
@@ -691,7 +698,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
   m_Controls->m_barRadioButton->setEnabled(true);
   m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
   m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-//  m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+  //  m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
   m_Controls->m_InfoLabel->setText(QString(""));
 
   if(m_DataNodeSelectionChanged)
@@ -759,7 +766,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         m_Controls->m_barRadioButton->setEnabled(true);
         m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);
         m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
-//        m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
+        //        m_Controls->m_HistogramBinSizeLabel->setEnabled(true);
         if (!outOfBounds)
           m_Controls->m_InfoLabel->setText(QString(""));
         return;
@@ -773,7 +780,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       m_Controls->m_barRadioButton->setEnabled(false);
       m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
       m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
-//      m_Controls->m_HistogramBinSizeLabel->setEnabled(false);
+      //      m_Controls->m_HistogramBinSizeLabel->setEnabled(false);
 
       this->FillLinearProfileStatisticsTableView( this->m_CalculationThread->GetStatisticsImage() );
 
@@ -820,7 +827,6 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
       m_SelectedImage->GetGeometry()->IndexToWorld(index, min);
       this->m_WorldMinList.push_back(min);
     }
-
 
     this->m_Controls->m_StatisticsTable->setItem( 0, t, new QTableWidgetItem(
       QString("%1").arg(s[t].GetMean(), 0, 'f', decimals) ) );
@@ -892,40 +898,38 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
 
   // See bug 18340
   /*QString hotspotMean; hotspotMean.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMean(), 0, 'f', decimals));
-    hotspotMean += " (";
-    for (int i=0; i<s[t].GetHotspotIndex().size(); i++)
-    {
-        hotspotMean += QString::number(s[t].GetHotspotIndex()[i]);
-        if (i<s[t].GetHotspotIndex().size()-1)
-            hotspotMean += ",";
-    }
-    hotspotMean += ")";
+  hotspotMean += " (";
+  for (int i=0; i<s[t].GetHotspotIndex().size(); i++)
+  {
+  hotspotMean += QString::number(s[t].GetHotspotIndex()[i]);
+  if (i<s[t].GetHotspotIndex().size()-1)
+  hotspotMean += ",";
+  }
+  hotspotMean += ")";
 
   this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem( hotspotMean ) );
 
-
   QString hotspotMax; hotspotMax.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMax(), 0, 'f', decimals));
-    hotspotMax += " (";
-    for (int i=0; i<s[t].GetHotspotStatistics().GetMaxIndex().size(); i++)
-    {
-        hotspotMax += QString::number(s[t].GetHotspotStatistics().GetMaxIndex()[i]);
-        if (i<s[t].GetHotspotStatistics().GetMaxIndex().size()-1)
-            hotspotMax += ",";
-    }
-    hotspotMax += ")";
+  hotspotMax += " (";
+  for (int i=0; i<s[t].GetHotspotStatistics().GetMaxIndex().size(); i++)
+  {
+  hotspotMax += QString::number(s[t].GetHotspotStatistics().GetMaxIndex()[i]);
+  if (i<s[t].GetHotspotStatistics().GetMaxIndex().size()-1)
+  hotspotMax += ",";
+  }
+  hotspotMax += ")";
 
   this->m_Controls->m_StatisticsTable->setItem( 8, t, new QTableWidgetItem( hotspotMax ) );
 
-
   QString hotspotMin; hotspotMin.append(QString("%1").arg(s[t].GetHotspotStatistics().GetMin(), 0, 'f', decimals));
-    hotspotMin += " (";
-    for (int i=0; i<s[t].GetHotspotStatistics().GetMinIndex().size(); i++)
-    {
-        hotspotMin += QString::number(s[t].GetHotspotStatistics().GetMinIndex()[i]);
-        if (i<s[t].GetHotspotStatistics().GetMinIndex().size()-1)
-            hotspotMin += ",";
-    }
-    hotspotMin += ")";
+  hotspotMin += " (";
+  for (int i=0; i<s[t].GetHotspotStatistics().GetMinIndex().size(); i++)
+  {
+  hotspotMin += QString::number(s[t].GetHotspotStatistics().GetMinIndex()[i]);
+  if (i<s[t].GetHotspotStatistics().GetMinIndex().size()-1)
+  hotspotMin += ",";
+  }
+  hotspotMin += ")";
 
   this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );*/
 }
@@ -978,7 +982,7 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
     height += this->m_Controls->m_StatisticsTable->horizontalScrollBar()->height();
 
   this->m_Controls->m_StatisticsTable->setMinimumHeight(height);
-  }
+}
 
 void QmitkImageStatisticsView::InvalidateStatisticsTableView()
 {
@@ -1022,8 +1026,6 @@ void QmitkImageStatisticsView::Visible()
       AddObserver(mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), cmdTimeEvent);
   }
 
-
-
   if (m_DataNodeSelectionChanged)
   {
     if (this->IsCurrentSelectionValid())
@@ -1056,7 +1058,6 @@ void QmitkImageStatisticsView::Hidden()
     }
     m_TimeObserverTag = NULL;
   }
-
 }
 
 void QmitkImageStatisticsView::SetFocus()

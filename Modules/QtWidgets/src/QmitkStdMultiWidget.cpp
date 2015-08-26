@@ -1699,13 +1699,14 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
     mitk::ScalarType pixelValue;
 
-    mitkPixelTypeMultiplex4(
+    mitkPixelTypeMultiplex5(
       mitk::FastSinglePixelAccess,
       image->GetChannelDescriptor().GetPixelType(),
       image,
       image->GetVolumeData(baseRenderer->GetTimeStep()),
       p,
-      pixelValue);
+      pixelValue,
+      component);
 
     if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
     {

@@ -104,6 +104,8 @@ public:
      unsigned int offset = ImagePixelAccessorType::GetOffset(idx);
 
     return *(((TPixel*)m_ReadAccessor.m_AddressBegin) + offset);
+  }
+
   itk::VariableLengthVector<TPixel> GetConsecutivePixelsAsVector(const itk::Index<VDimension>& idx, int nrComponents) const
   {
     return itk::VariableLengthVector<TPixel> ((TPixel*)m_ReadAccessor.m_AddressBegin + ImagePixelAccessorType::GetOffset(idx) * m_ReadAccessor.GetImage()->GetPixelType().GetNumberOfComponents(), nrComponents);

@@ -112,6 +112,7 @@ set(MODULE_TESTS
   mitkLineTest.cpp
   mitkItkImageIOTest.cpp
   mitkRotatedSlice4DTest.cpp
+  mitkLevelWindowManagerCppUnitTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

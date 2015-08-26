@@ -45,13 +45,13 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
   worldPos[2] = 5.0;
 
   // MousePress Events
-  mitk::MousePressEvent::Pointer me1 = mitk::MousePressEvent::New(renderer, point, worldPos, buttonStates, modifiers, eventButton);
-  mitk::MousePressEvent::Pointer me2 = mitk::MousePressEvent::New(renderer, point, worldPos, buttonStates, modifiers, eventButton);
+  mitk::MousePressEvent::Pointer me1 = mitk::MousePressEvent::New(renderer, point, buttonStates, modifiers, eventButton);
+  mitk::MousePressEvent::Pointer me2 = mitk::MousePressEvent::New(renderer, point, buttonStates, modifiers, eventButton);
   point[0] = 178;
   point[1] = 170;
-  mitk::MousePressEvent::Pointer me3 = mitk::MousePressEvent::New(renderer, point, worldPos, buttonStates, modifiers, eventButton);
+  mitk::MousePressEvent::Pointer me3 = mitk::MousePressEvent::New(renderer, point, buttonStates, modifiers, eventButton);
   modifiers = mitk::InteractionEvent::ControlKey;
-  mitk::MousePressEvent::Pointer me4 = mitk::MousePressEvent::New(renderer, point, worldPos, buttonStates, modifiers, eventButton);
+  mitk::MousePressEvent::Pointer me4 = mitk::MousePressEvent::New(renderer, point, buttonStates, modifiers, eventButton);
 
 
   MITK_TEST_CONDITION_REQUIRED(
@@ -62,13 +62,13 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
       , "Checking isEqual and Constructors of mitk::InteractionEvent, mitk::MousePressEvent");
 
   // MouseReleaseEvents
-  mitk::MouseReleaseEvent::Pointer mr1 = mitk::MouseReleaseEvent::New(renderer, point, worldPos, buttonStates, modifiers, eventButton);
-  mitk::MouseReleaseEvent::Pointer mr2 = mitk::MouseReleaseEvent::New(renderer, point, worldPos, buttonStates, modifiers, eventButton);
+  mitk::MouseReleaseEvent::Pointer mr1 = mitk::MouseReleaseEvent::New(renderer, point, buttonStates, modifiers, eventButton);
+  mitk::MouseReleaseEvent::Pointer mr2 = mitk::MouseReleaseEvent::New(renderer, point, buttonStates, modifiers, eventButton);
   point[0] = 178;
   point[1] = 170;
-  mitk::MouseReleaseEvent::Pointer mr3 = mitk::MouseReleaseEvent::New(renderer, point, worldPos, buttonStates, modifiers, eventButton);
+  mitk::MouseReleaseEvent::Pointer mr3 = mitk::MouseReleaseEvent::New(renderer, point, buttonStates, modifiers, eventButton);
   eventButton = mitk::InteractionEvent::RightMouseButton;
-  mitk::MouseReleaseEvent::Pointer mr4 = mitk::MouseReleaseEvent::New(renderer, point, worldPos, buttonStates, modifiers, eventButton);
+  mitk::MouseReleaseEvent::Pointer mr4 = mitk::MouseReleaseEvent::New(renderer, point, buttonStates, modifiers, eventButton);
 
 
   MITK_TEST_CONDITION_REQUIRED(
@@ -80,12 +80,12 @@ int mitkInteractionEventTest(int /*argc*/, char* /*argv*/[])
 
 
   // MouseMoveEvents
-  mitk::MouseMoveEvent::Pointer mm1 = mitk::MouseMoveEvent::New(renderer, point, worldPos, buttonStates, modifiers);
-    point[0] = 178;
+  mitk::MouseMoveEvent::Pointer mm1 = mitk::MouseMoveEvent::New(renderer, point, buttonStates, modifiers);
+  point[0] = 178;
   point[1] = 170;
-  mitk::MouseMoveEvent::Pointer mm3 = mitk::MouseMoveEvent::New(renderer, point, worldPos, buttonStates, modifiers);
+  mitk::MouseMoveEvent::Pointer mm3 = mitk::MouseMoveEvent::New(renderer, point, buttonStates, modifiers);
   modifiers = mitk::InteractionEvent::AltKey;
-  mitk::MouseMoveEvent::Pointer mm4 = mitk::MouseMoveEvent::New(renderer, point, worldPos, buttonStates, modifiers);
+  mitk::MouseMoveEvent::Pointer mm4 = mitk::MouseMoveEvent::New(renderer, point, buttonStates, modifiers);
 
 
 

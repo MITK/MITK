@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SLICESCOORDINATOR_H_HEADER_INCLUDED_C1C55A2F
 #define SLICESCOORDINATOR_H_HEADER_INCLUDED_C1C55A2F
 
-#include <mitkStateMachine.h>
+#include <MitkCoreExports.h>
+#include <mitkCommon.h>
+#include <itkObject.h>
 #include <vector>
 
 namespace mitk {
@@ -40,28 +42,22 @@ itkEventMacro( SliceRotationEvent, itk::AnyEvent);
  * class is needed, because for rotation one has to know an axis of rotation.
  * Such an axis is most easily determined from the "other slices", which are
  * not known by a SliceNavigationController.
-
- * This class registers itself as a listener to GlobalInteraction and holds a
- * list of SliceNavigationControllers. Any functionality, such as slice
- * rotation, is done in subclasses. This separation is done for the case that
- * some other multi-slice coordination should be implemented.
  */
-class MITKCORE_EXPORT SlicesCoordinator : public StateMachine
+class MITKCORE_EXPORT SlicesCoordinator : public itk::Object
 {
 public:
+  mitkClassMacroItkParent(SlicesCoordinator,itk::Object);
+  itkFactorylessNewMacro(Self)
+
+
+
 
   typedef std::vector<SliceNavigationController*> SNCVector;
-
-  mitkClassMacro(SlicesCoordinator, StateMachine);
-  mitkNewMacro1Param(Self, const char*);
-
-
   /** Add to list of managed slices. Check if CreatedWorldGeometry of SNC is
    * managable (i.e. there is basically only one planegeometry) */
   void AddSliceController(SliceNavigationController* snc);
 
-  /** Remove one controller, which is then added as listener to
-   * GlobalInteraction */
+  /** Remove one controller from the internal list */
   void RemoveSliceController(SliceNavigationController* snc);
 
   /* Reset all Slices to central slice, no rotation */
@@ -83,7 +79,7 @@ public:
 
 protected:
   /** \brief Default Constructor */
-  SlicesCoordinator(const char* machine);
+  SlicesCoordinator();
 
   /** clear list of controllers */
   virtual ~SlicesCoordinator();
@@ -99,9 +95,6 @@ protected:
 
   /** for implementation in subclasses */
   virtual void OnSliceControllerRemoved(SliceNavigationController* snc);
-
-  /** for implementation in subclasses */
-  virtual bool ExecuteAction(Action * action, StateEvent const* stateEvent) override;
 
   SNCVector m_SliceNavigationControllers;
 

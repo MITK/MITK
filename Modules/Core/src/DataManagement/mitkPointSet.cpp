@@ -909,27 +909,31 @@ bool mitk::PointSet::PointDataType::operator ==(const mitk::PointSet::PointDataT
   return id == other.id && selected == other.selected && pointSpec == other.pointSpec;
 }
 
-bool mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose )
+bool mitk::Equal(const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose, bool checkGeometry)
 {
   if((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ) does not work with NULL pointer input.";
     return false;
   }
-  return Equal( *leftHandSide, *rightHandSide, eps, verbose);
+  return Equal( *leftHandSide, *rightHandSide, eps, verbose, checkGeometry);
 }
 
-bool mitk::Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose )
+bool mitk::Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose , bool checkGeometry)
 {
   bool result = true;
 
-
-  if( !mitk::Equal( *leftHandSide.GetGeometry(), *rightHandSide.GetGeometry(), eps, verbose) )
+  //If comparing point sets from file, you must not compare the geometries, as they are not saved. In other cases, you do need to check them.
+  if (checkGeometry)
   {
-    if(verbose)
-      MITK_INFO << "[( PointSet )] Geometries differ.";
-    result = false;
+    if( !mitk::Equal( *leftHandSide.GetGeometry(), *rightHandSide.GetGeometry(), eps, verbose) )
+    {
+      if(verbose)
+        MITK_INFO << "[( PointSet )] Geometries differ.";
+      result = false;
+    }
   }
+
 
   if ( leftHandSide.GetSize() != rightHandSide.GetSize())
   {

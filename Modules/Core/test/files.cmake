@@ -27,15 +27,12 @@ set(MODULE_TESTS
   mitkActionTest.cpp
   mitkDispatcherTest.cpp
   mitkEnumerationPropertyTest.cpp
-  mitkEventTest.cpp
   mitkFileReaderRegistryTest.cpp
   #mitkFileWriterRegistryTest.cpp
-  mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
-  mitkGlobalInteractionTest.cpp
   mitkImageCastTest.cpp
   mitkImageEqualTest.cpp
   mitkImageDataItemTest.cpp
@@ -45,7 +42,6 @@ set(MODULE_TESTS
   mitkImportItkImageTest.cpp
   mitkGrabItkImageMemoryTest.cpp
   mitkInstantiateAccessFunctionTest.cpp
-  mitkInteractorTest.cpp
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   mitkPixelTypeTest.cpp
@@ -57,21 +53,17 @@ set(MODULE_TESTS
   mitkPointSetLocaleTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetReaderTest.cpp
-  mitkPointSetInteractorTest.cpp
   mitkPointSetPointOperationsTest.cpp
   mitkProgressBarTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
-  mitkStateMachineTest.cpp
-  mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceEqualTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
   mitkTimeGeometryTest.cpp
   mitkProportionalTimeGeometryTest.cpp
-  mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp
   mitkVtkWidgetRenderingTest.cpp
   mitkVerboseLimitedLinearUndoTest.cpp
@@ -153,10 +145,7 @@ set(MODULE_CUSTOM_TESTS
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
     mitkDataNodeTest.cpp
-    mitkEventMapperTest.cpp
     mitkEventConfigTest.cpp
-    mitkNodeDependentPointSetInteractorTest.cpp
-    mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
     mitkImageVtkMapper2DTest.cpp

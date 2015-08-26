@@ -162,6 +162,7 @@ namespace mitk
     int normalDirection;
     switch(planeorientation)
     {
+    case None:
     case Axial:
       if(frontside)
       {
@@ -264,6 +265,7 @@ namespace mitk
     default:
       itkExceptionMacro("unknown PlaneOrientation");
     }
+
     if ( transform != nullptr )
     {
       origin = transform->TransformPoint( origin );
@@ -314,6 +316,7 @@ namespace mitk
     }
     switch(planeorientation)
     {
+    case None:
     case Axial:
       width  = geometry3D->GetExtent(0);
       height = geometry3D->GetExtent(1);
@@ -354,13 +357,16 @@ namespace mitk
     switch(planeorientation)
     {
     case Axial:
-      zPosition = (top ? 0.5 : geometry3D->GetExtent(2)-1+0.5);
+      zPosition = (top ? 0.5 : geometry3D->GetExtent(2)-0.5);
       break;
     case Frontal:
-      zPosition = (top ? 0.5 : geometry3D->GetExtent(1)-1+0.5);
+      zPosition = (top ? 0.5 : geometry3D->GetExtent(1)-0.5);
       break;
     case Sagittal:
-      zPosition = (top ? 0.5 : geometry3D->GetExtent(0)-1+0.5);
+      zPosition = (top ? 0.5 : geometry3D->GetExtent(0)-0.5);
+      break;
+    case None:
+      zPosition = (top ? 0 : geometry3D->GetExtent(2)-1.0);
       break;
     default:
       itkExceptionMacro("unknown PlaneOrientation");
@@ -503,21 +509,6 @@ namespace mitk
   {
     return SignedDistanceFromPlane(pt3d_mm);
   }
-
-  //Function from Geometry2D
-  //  mitk::ScalarType
-  //  PlaneGeometry::SignedDistance(const mitk::Point3D& pt3d_mm) const
-  //{
-  //  Point3D projectedPoint;
-  //  Project(pt3d_mm, projectedPoint);
-  //  Vector3D direction = pt3d_mm-projectedPoint;
-  //  ScalarType distance = direction.GetNorm();
-
-  //  if(IsAbove(pt3d_mm) == false)
-  //    distance*=-1.0;
-
-  //  return distance;
-  //}
 
   bool
     PlaneGeometry::IsAbove( const Point3D &pt3d_mm , bool considerBoundingBox) const

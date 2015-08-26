@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
 
-mitk::CameraRotationController::CameraRotationController(const char * type)
-  : BaseController(type), m_LastStepperValue(180), m_Camera(NULL), m_RenderWindow(NULL)
+mitk::CameraRotationController::CameraRotationController()
+  : BaseController(), m_LastStepperValue(180), m_Camera(NULL), m_RenderWindow(NULL)
 {
   m_Slice->SetAutoRepeat(true);
   m_Slice->SetSteps(360);
@@ -90,10 +90,4 @@ void mitk::CameraRotationController::AcquireCamera()
       }
     }
   }
-}
-
-bool mitk::CameraRotationController::ExecuteAction(
-  Action*, mitk::StateEvent const*)
-{
-  return false;
 }

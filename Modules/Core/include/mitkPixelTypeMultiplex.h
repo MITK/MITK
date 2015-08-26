@@ -112,6 +112,9 @@ See LICENSE.txt or http://www.mitk.org for details.
       function<double>( ptype,  param1, param2, param3 );\
 }\
 
+
+// we have to have a default for, else Clang 3.6.1 complains about problems if 'if evaluates to false'
+// therefore if type does not match double is assumed
 #define mitkPixelTypeMultiplex4( function, ptype, param1, param2, param3, param4 )    \
 {                                                 \
     if ( ptype.GetComponentType() == itk::ImageIOBase::CHAR )\
@@ -133,6 +136,8 @@ See LICENSE.txt or http://www.mitk.org for details.
     else if ( ptype.GetComponentType() == itk::ImageIOBase::FLOAT  )\
       function<float>( ptype,   param1, param2, param3, param4  );\
     else if ( ptype.GetComponentType() == itk::ImageIOBase::DOUBLE  )\
+      function<double>( ptype,  param1, param2, param3, param4 );\
+    else if (true)\
       function<double>( ptype,  param1, param2, param3, param4 );\
 }\
 
@@ -161,5 +166,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 }\
 
 #endif // MITKPIXELTYPEMULTIPLEX_H
+
 
 

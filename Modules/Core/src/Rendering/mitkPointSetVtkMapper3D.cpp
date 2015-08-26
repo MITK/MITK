@@ -113,7 +113,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   bool isInputDevice=false;
   if( this->GetDataNode()->GetBoolProperty("inputdevice",isInputDevice) && isInputDevice )
   {
-    if( this->GetDataNode()->GetIntProperty("BaseRendererMapperID",mapperID) && mapperID == 2)
+    if (this->GetDataNode()->GetIntProperty("BaseRendererMapperID", mapperID) && mapperID == BaseRenderer::Standard3D)
       return; //The event for the PositionTracker came from the 3d widget and  not needs to be displayed
   }
 

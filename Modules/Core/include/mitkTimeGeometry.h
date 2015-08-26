@@ -27,10 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-  /**
-  * \deprecatedSince{2013_09} GlobalInteraction is deprecated. It is replaced by mitk::Dispatcher.
-  *  Please use the new implementation described in \see DataInteractionPage .
-  */
 
   typedef mitk::ScalarType         TimePointType;
   typedef std::size_t   TimeStepType;

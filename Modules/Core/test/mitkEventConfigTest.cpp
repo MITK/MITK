@@ -73,12 +73,11 @@ int mitkEventConfigTest(int argc, char* argv[])
    * Check if Events get mapped to the proper Variants
    */
   mitk::Point2D pos;
-  mitk::Point3D worldPos;
-  mitk::MousePressEvent::Pointer mpe1 = mitk::MousePressEvent::New(NULL,pos,worldPos,mitk::InteractionEvent::MiddleMouseButton | mitk::InteractionEvent::LeftMouseButton ,mitk::InteractionEvent::ControlKey | mitk::InteractionEvent::AltKey,mitk::InteractionEvent::LeftMouseButton  );
-  mitk::MousePressEvent::Pointer standard1 = mitk::MousePressEvent::New(NULL,pos,worldPos,mitk::InteractionEvent::LeftMouseButton,mitk::InteractionEvent::NoKey ,mitk::InteractionEvent::LeftMouseButton );
-  mitk::MouseMoveEvent::Pointer mme1 = mitk::MouseMoveEvent::New(NULL,pos,worldPos,mitk::InteractionEvent::RightMouseButton | mitk::InteractionEvent::LeftMouseButton,mitk::InteractionEvent::ShiftKey );
-  mitk::MouseMoveEvent::Pointer mme2 = mitk::MouseMoveEvent::New(NULL,pos,worldPos,mitk::InteractionEvent::RightMouseButton,mitk::InteractionEvent::ShiftKey );
-  mitk::MouseWheelEvent::Pointer mwe1 = mitk::MouseWheelEvent::New(NULL,pos,worldPos,mitk::InteractionEvent::RightMouseButton,mitk::InteractionEvent::ShiftKey,-2 );
+  mitk::MousePressEvent::Pointer mpe1 = mitk::MousePressEvent::New(NULL,pos,mitk::InteractionEvent::MiddleMouseButton | mitk::InteractionEvent::LeftMouseButton ,mitk::InteractionEvent::ControlKey | mitk::InteractionEvent::AltKey,mitk::InteractionEvent::LeftMouseButton  );
+  mitk::MousePressEvent::Pointer standard1 = mitk::MousePressEvent::New(NULL,pos,mitk::InteractionEvent::LeftMouseButton,mitk::InteractionEvent::NoKey ,mitk::InteractionEvent::LeftMouseButton );
+  mitk::MouseMoveEvent::Pointer mme1 = mitk::MouseMoveEvent::New(NULL,pos,mitk::InteractionEvent::RightMouseButton | mitk::InteractionEvent::LeftMouseButton,mitk::InteractionEvent::ShiftKey );
+  mitk::MouseMoveEvent::Pointer mme2 = mitk::MouseMoveEvent::New(NULL,pos,mitk::InteractionEvent::RightMouseButton,mitk::InteractionEvent::ShiftKey );
+  mitk::MouseWheelEvent::Pointer mwe1 = mitk::MouseWheelEvent::New(NULL,pos,mitk::InteractionEvent::RightMouseButton,mitk::InteractionEvent::ShiftKey,-2 );
   mitk::InteractionKeyEvent::Pointer ke = mitk::InteractionKeyEvent::New(NULL,"l",mitk::InteractionEvent::NoKey );
 
   MITK_TEST_CONDITION_REQUIRED(
@@ -144,11 +143,11 @@ int mitkEventConfigTest(int argc, char* argv[])
 
   mitk::EventConfig newConfig3( configDescription );
 
-  mitk::MousePressEvent::Pointer mousePress1 = mitk::MousePressEvent::New(NULL,pos,worldPos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::AltKey | mitk::InteractionEvent::ControlKey ,mitk::InteractionEvent::NoButton );
-  mitk::MouseReleaseEvent::Pointer mouseRelease1 = mitk::MouseReleaseEvent::New(NULL,pos,worldPos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::ShiftKey ,mitk::InteractionEvent::NoButton );
+  mitk::MousePressEvent::Pointer mousePress1 = mitk::MousePressEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::AltKey | mitk::InteractionEvent::ControlKey ,mitk::InteractionEvent::NoButton );
+  mitk::MouseReleaseEvent::Pointer mouseRelease1 = mitk::MouseReleaseEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::ShiftKey ,mitk::InteractionEvent::NoButton );
 
   // create a second event with the same name but different modifiers...
-  mitk::MouseReleaseEvent::Pointer mouseRelease2 = mitk::MouseReleaseEvent::New(NULL,pos,worldPos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::AltKey ,mitk::InteractionEvent::NoButton );
+  mitk::MouseReleaseEvent::Pointer mouseRelease2 = mitk::MouseReleaseEvent::New(NULL,pos,mitk::InteractionEvent::NoButton,mitk::InteractionEvent::AltKey ,mitk::InteractionEvent::NoButton );
 
   MITK_TEST_CONDITION_REQUIRED(
     newConfig3.GetMappedEvent(mousePress1.GetPointer()) == "MousePressEventVariant" &&

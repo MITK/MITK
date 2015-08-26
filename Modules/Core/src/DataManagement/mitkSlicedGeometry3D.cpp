@@ -268,6 +268,9 @@ void
 
   switch ( planeorientation )
   {
+  case PlaneGeometry::None:
+    break;
+
   case PlaneGeometry::Axial:
     viewSpacing = geometry3D->GetSpacing()[2];
     slices = (unsigned int) geometry3D->GetExtent( 2 );

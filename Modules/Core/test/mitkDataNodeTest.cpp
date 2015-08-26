@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 
 #include "mitkTestingMacros.h"
-#include "mitkGlobalInteraction.h"
 
 #include <iostream>
 
@@ -283,8 +282,6 @@ int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("DataNode")
 
-  // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   // let's create an object of our class
   mitk::DataNode::Pointer myDataNode = mitk::DataNode::New();

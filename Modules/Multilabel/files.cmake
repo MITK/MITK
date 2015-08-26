@@ -11,6 +11,7 @@ set(CPP_FILES
   mitkLabelSetImageVtkMapper2D.cpp
   mitkMultilabelActivator.cpp
   mitkMultilabelObjectFactory.cpp
+  mitkLabelSetSurfaceStamp.cpp
 )
 
 set(RESOURCE_FILES

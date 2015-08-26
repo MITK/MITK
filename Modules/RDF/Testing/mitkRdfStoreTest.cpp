@@ -90,7 +90,7 @@ public:
   {
     store.Add(triple);
     std::string query = "SELECT ?x WHERE { ?x ?z ?y . }";
-    mitk::RdfStore::ResultMap queryResult = store.Query(query);
+    mitk::RdfStore::ResultMap queryResult = store.ExecuteTupleQuery(query);
     std::list<mitk::RdfNode> list = queryResult["x"];
     CPPUNIT_ASSERT(triple.GetTripleSubject() == list.back());
   }

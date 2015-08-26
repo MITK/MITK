@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRdfStore.h"
 
 #include <iostream>
-#include <mitkCommon.h>
 
 #include <redland.h>
 
@@ -43,7 +42,7 @@ namespace mitk {
     bool Remove(RdfTriple triple);
     bool Contains(RdfTriple triple);
 
-    ResultMap Query(const std::string& query) const;
+    ResultMap ExecuteTupleQuery(const std::string& query) const;
     bool ExecuteBooleanQuery(const std::string& query) const;
 
     void Save(std::string filename, std::string format = "");
@@ -222,7 +221,7 @@ namespace mitk {
     return false;
   }
 
-  RdfStorePrivate::ResultMap RdfStorePrivate::Query(const std::string& query) const
+  RdfStorePrivate::ResultMap RdfStorePrivate::ExecuteTupleQuery(const std::string& query) const
   {
     RdfStorePrivate::ResultMap resultMap;
 
@@ -590,7 +589,12 @@ namespace mitk {
 
   ResultMap RdfStore::Query(const std::string& query) const
   {
-    return d->Query(query);
+    return d->ExecuteTupleQuery(query);
+  }
+
+  ResultMap RdfStore::ExecuteTupleQuery(const std::string& query) const
+  {
+    return d->ExecuteTupleQuery(query);
   }
 
   bool RdfStore::ExecuteBooleanQuery(const std::string& query) const

@@ -85,9 +85,7 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* re
 
   m_Actor->VisibilityOn();
 
-  mitk::ContourSet::Pointer input  = const_cast<mitk::ContourSet*>(this->GetInput());
-
-  if ( renderer->GetDisplayGeometryUpdateTime() > this->GetInput()->GetMTime() )
+  if ( renderer->GetCurrentWorldPlaneGeometryUpdateTime() > 0 < this->GetInput()->GetMTime() )
   {
     m_ContourSet = vtkPolyData::New();
 

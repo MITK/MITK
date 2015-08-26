@@ -62,6 +62,24 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
     m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
   }
     break;
+
+  case ROTATION:
+  {
+    m_CurrentObserver->SetEventConfig("DisplayConfigMITKRotationUnCoupled.xml");
+  }
+    break;
+
+  case ROTATIONLINKED:
+  {
+    m_CurrentObserver->SetEventConfig("DisplayConfigMITKRotation.xml");
+  }
+    break;
+
+  case SWIVEL:
+  {
+    m_CurrentObserver->SetEventConfig("DisplayConfigMITKSwivel.xml");
+  }
+    break;
   }
   m_ActiveInteractionScheme = scheme;
   this->InvokeEvent(MouseModeChangedEvent());

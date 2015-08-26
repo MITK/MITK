@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCameraIntrinsics.h>
 #include <mitkDataStorage.h>
 #include <mitkPointSet.h>
-#include <mitkPointSetInteractor.h>
+#include <mitkPointSetDataInteractor.h>
 #include <mitkPropertyList.h>
 #include <mitkToFDistanceImageToPointSetFilter.h>
 
@@ -132,8 +132,8 @@ class MITKTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     mitk::PointSet::Pointer m_PointSet2D; ///< PointSet holding the 2D ToF image points
     mitk::DataNode::Pointer m_PointSet3DNode; ///< DataNode holding the 3D ToF coordinates
 
-    mitk::PointSetInteractor::Pointer m_PointSetInteractor; ///< PointSetInteractor used for PointSet definition
-    mitk::PointSetInteractor::Pointer m_MeasurementPointSetInteractor; ///< PointSetInteractor used for measurement
+    mitk::PointSetDataInteractor::Pointer m_PointSetInteractor; ///< PointSetInteractor used for PointSet definition
+    mitk::PointSetDataInteractor::Pointer m_MeasurementPointSetInteractor; ///< PointSetInteractor used for measurement
 
     long m_MeasurementPointSetChangedObserverTag; ///< observer tag for measurement PointSet observer
     long m_PointSetChangedObserverTag; ///< observer tag for PointSet observer

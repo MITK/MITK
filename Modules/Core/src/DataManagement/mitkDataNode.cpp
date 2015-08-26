@@ -28,8 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
 #include "mitkRenderingManager.h"
-#include "mitkGlobalInteraction.h"
-#include "mitkEventMapper.h"
 #include "mitkGenericProperty.h"
 #include "mitkImageSource.h"
 #include "mitkCoreObjectFactory.h"
@@ -55,10 +53,6 @@ mitk::BaseData* mitk::DataNode::GetData() const
   return m_Data;
 }
 
-mitk::Interactor* mitk::DataNode::GetInteractor() const
-{
-  return m_Interactor;
-}
 
 void mitk::DataNode::SetData(mitk::BaseData* baseData)
 {
@@ -89,21 +83,9 @@ void mitk::DataNode::SetData(mitk::BaseData* baseData)
 
     m_DataReferenceChangedTime.Modified();
     Modified();
-
-    // inform the interactor about the change
-    if (m_Interactor.IsNotNull())
-    {
-      m_Interactor->DataChanged();
-    }
   }
 }
 
-void mitk::DataNode::SetInteractor(mitk::Interactor* interactor)
-{
-  m_Interactor = interactor;
-  if(m_Interactor.IsNotNull())
-    m_Interactor->SetDataNode(this);
-}
 
 mitk::DataNode::DataNode() : m_Data(NULL), m_PropertyListModifiedObserverTag(0)
 {
@@ -125,12 +107,6 @@ mitk::DataNode::~DataNode()
     // remove modified event listener
     m_PropertyList->RemoveObserver(m_PropertyListModifiedObserverTag);
 
-  Interactor* interactor = this->GetInteractor();
-
-  if ( interactor )
-  {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( interactor );
-  }
   m_Mappers.clear();
   m_Data = NULL;
 }
@@ -576,34 +552,6 @@ bool mitk::DataNode::IsSelected(const mitk::BaseRenderer* renderer)
     return false;
 
   return selected;
-}
-
-void mitk::DataNode::SetInteractorEnabled( const bool& enabled )
-{
-  if ( m_Interactor.IsNull() )
-  {
-    itkWarningMacro("Interactor is NULL. Couldn't enable or disable interaction.");
-    return;
-  }
-  if ( enabled )
-    mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor.GetPointer() );
-  else
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor.GetPointer() );
-}
-
-void mitk::DataNode::EnableInteractor()
-{
-  SetInteractorEnabled( true );
-}
-
-void mitk::DataNode::DisableInteractor()
-{
-  SetInteractorEnabled( false );
-}
-
-bool mitk::DataNode::IsInteractorEnabled() const
-{
-  return mitk::GlobalInteraction::GetInstance()->InteractorRegistered( m_Interactor.GetPointer() );
 }
 
 void mitk::DataNode::SetDataInteractor(const DataInteractor::Pointer& interactor)

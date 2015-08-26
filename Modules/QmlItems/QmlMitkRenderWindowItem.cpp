@@ -35,12 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmlMitkBigRenderLock.h"
 
-#define INTERACTION_LEGACY // TODO: remove INTERACTION_LEGACY!
-
-#if defined INTERACTION_LEGACY
-  #include "InteractionLegacy/QmitkEventAdapter.h"
-  #include "mitkGlobalInteraction.h"
-#endif
 
 QmlMitkRenderWindowItem* QmlMitkRenderWindowItem::GetInstanceForVTKRenderWindow( vtkRenderWindow* rw )
 {
@@ -82,11 +76,6 @@ void QmlMitkRenderWindowItem::init()
     mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
   }
 
-  // TODO the following code needs to be moved to a multi-widget item
-  if ( mitk::RenderWindowBase::GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard2D )
-  {
-    this->SetCrossHairPositioningOnClick(true);
-  }
 
   if ( mitk::RenderWindowBase::GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard2D
       && m_DataStorage.IsNotNull() )
@@ -230,21 +219,10 @@ mitk::InteractionEvent::MouseButtons QmlMitkRenderWindowItem::GetButtonState(QWh
 void QmlMitkRenderWindowItem::mousePressEvent(QMouseEvent* me)
 {
   mitk::Point2D mousePosition = GetMousePosition(me);
-  mitk::Point3D worldPosition = mitk::RenderWindowBase::GetRenderer()->Map2DRendererPositionTo3DWorldPosition(mousePosition);
   mitk::MousePressEvent::Pointer mPressEvent =
-    mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, worldPosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
+    mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition,  GetButtonState(me), GetModifiers(me), GetEventButton(me));
 
-#if defined INTERACTION_LEGACY
-  bool modernInteractorHandledEvent =
-#endif
   mitk::RenderWindowBase::HandleEvent(mPressEvent.GetPointer());
-#if defined INTERACTION_LEGACY
-  if (!modernInteractorHandledEvent)
-  {
-    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(mitk::RenderWindowBase::GetRenderer(), me));
-    mitk::RenderWindowBase::mousePressMitkEvent(&myevent);
-  }
-#endif
 
   QVTKQuickItem::mousePressEvent(me);
 
@@ -255,21 +233,12 @@ void QmlMitkRenderWindowItem::mousePressEvent(QMouseEvent* me)
 void QmlMitkRenderWindowItem::mouseReleaseEvent(QMouseEvent* me)
 {
   mitk::Point2D mousePosition = GetMousePosition(me);
-  mitk::Point3D worldPosition = mitk::RenderWindowBase::GetRenderer()->Map2DRendererPositionTo3DWorldPosition(mousePosition);
-  mitk::MouseReleaseEvent::Pointer mReleaseEvent =
-    mitk::MouseReleaseEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, worldPosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
 
-#if defined INTERACTION_LEGACY
-  bool modernInteractorHandledEvent =
-#endif
+  mitk::MouseReleaseEvent::Pointer mReleaseEvent =
+    mitk::MouseReleaseEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
+
   mitk::RenderWindowBase::HandleEvent(mReleaseEvent.GetPointer());
-#if defined INTERACTION_LEGACY
-  if (!modernInteractorHandledEvent)
-  {
-    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(mitk::RenderWindowBase::GetRenderer(), me));
-    mitk::RenderWindowBase::mouseReleaseMitkEvent(&myevent);
-  }
-#endif
+
 
   QVTKQuickItem::mouseReleaseEvent(me);
 
@@ -280,21 +249,11 @@ void QmlMitkRenderWindowItem::mouseReleaseEvent(QMouseEvent* me)
 void QmlMitkRenderWindowItem::mouseMoveEvent(QMouseEvent* me)
 {
   mitk::Point2D mousePosition = GetMousePosition(me);
-  mitk::Point3D worldPosition = mitk::RenderWindowBase::GetRenderer()->Map2DRendererPositionTo3DWorldPosition(mousePosition);
   mitk::MouseMoveEvent::Pointer mMoveEvent =
-    mitk::MouseMoveEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, worldPosition, GetButtonState(me), GetModifiers(me));
+    mitk::MouseMoveEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me));
 
-#if defined INTERACTION_LEGACY
-  bool modernInteractorHandledEvent =
-#endif
   mitk::RenderWindowBase::HandleEvent(mMoveEvent.GetPointer());
-#if defined INTERACTION_LEGACY
-  if (!modernInteractorHandledEvent)
-  {
-    mitk::MouseEvent myevent(QmitkEventAdapter::AdaptMouseEvent(mitk::RenderWindowBase::GetRenderer(), me));
-    mitk::RenderWindowBase::mouseMoveMitkEvent(&myevent);
-  }
-#endif
+
 
   QVTKQuickItem::mouseMoveEvent(me);
 
@@ -306,21 +265,11 @@ void QmlMitkRenderWindowItem::mouseMoveEvent(QMouseEvent* me)
 void QmlMitkRenderWindowItem::wheelEvent(QWheelEvent *we)
 {
   mitk::Point2D mousePosition = GetMousePosition(we);
-  mitk::Point3D worldPosition = mitk::RenderWindowBase::GetRenderer()->Map2DRendererPositionTo3DWorldPosition(mousePosition);
   mitk::MouseWheelEvent::Pointer mWheelEvent =
-    mitk::MouseWheelEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, worldPosition, GetButtonState(we), GetModifiers(we), we->delta());
+    mitk::MouseWheelEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(we), GetModifiers(we), we->delta());
 
-#if defined INTERACTION_LEGACY
-  bool modernInteractorHandledEvent =
-#endif
   mitk::RenderWindowBase::HandleEvent(mWheelEvent.GetPointer());
-#if defined INTERACTION_LEGACY
-  if (!modernInteractorHandledEvent)
-  { // TODO: INTERACTION_LEGACY
-    mitk::WheelEvent myevent(QmitkEventAdapter::AdaptWheelEvent(mitk::RenderWindowBase::GetRenderer(), we));
-    mitk::RenderWindowBase::wheelMitkEvent(&myevent);
-  }
-#endif
+
 
   QVTKQuickItem::wheelEvent(we);
 
@@ -342,23 +291,10 @@ void QmlMitkRenderWindowItem::cleanupAfterRender()
   QmlMitkBigRenderLock::GetMutex().unlock();
 }
 
-void QmlMitkRenderWindowItem::SetCrossHairPositioningOnClick(bool enabled)
-{
-  if (enabled)
-  {
-    mitk::GlobalInteraction::GetInstance()->AddListener( mitk::RenderWindowBase::GetSliceNavigationController() );
-  }
-  else
-  {
-    mitk::GlobalInteraction::GetInstance()->RemoveListener( mitk::RenderWindowBase::GetSliceNavigationController() );
-  }
-}
 
 void QmlMitkRenderWindowItem::geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry)
 {
   QVTKQuickItem::geometryChanged(newGeometry, oldGeometry);
-
-  this->resizeMitkEvent( newGeometry.width(), newGeometry.height() );
 }
 
 vtkRenderWindow* QmlMitkRenderWindowItem::GetVtkRenderWindow()

@@ -57,11 +57,11 @@ void mitk::SetRegionTool::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
@@ -69,7 +69,7 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
 
   // 1. Get the working image
   Image::Pointer workingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
-  if ( workingSlice.IsNull() ) return false; // can't do anything without the segmentation
+  if ( workingSlice.IsNull() ) return; // can't do anything without the segmentation
 
   // if click was outside the image, don't continue
   const BaseGeometry* sliceGeometry = workingSlice->GetGeometry();
@@ -78,7 +78,7 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
   if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) )
   {
     MITK_ERROR << "point apparently not inside segmentation slice" << std::endl;
-    return false; // can't use that as a seed point
+    return; // can't use that as a seed point
   }
 
     // Convert to ipMITKSegmentationTYPE (because ipMITKSegmentationGetContour8N relys on that data type)
@@ -110,7 +110,7 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
        m_SeedPointMemoryOffset < 0 )
   {
     MITK_ERROR << "Memory offset calculation if mitk::SetRegionTool has some serious flaw! Aborting.." << std::endl;
-    return false;
+    return;
   }
 
   // 2. Determine the contour that surronds the selected "piece of the image"
@@ -169,13 +169,13 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
   {
     MITK_ERROR << "Fill/Erase was never intended to work with other than binary images." << std::endl;
     m_FillContour = false;
-    return false;
+    return;
   }
 
   if (oneContourOffset == size) // nothing found until end of slice
   {
     m_FillContour = false;
-    return false;
+    return;
   }
 
   int numberOfContourPoints( 0 );
@@ -240,48 +240,44 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
     FeedbackContourTool::SetFeedbackContourVisible(true);
     mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
-
-
   free(contourPoints);
-
-  return true;
 }
 
-bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 
   int timeStep = positionEvent->GetSender()->GetTimeStep();
 
-  if (!m_FillContour && !m_StatusFillWholeSlice) return true;
+  if (!m_FillContour && !m_StatusFillWholeSlice) return;
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return false;
+  if (!workingNode) return;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
   const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-  if ( !image || !planeGeometry || abstractTransformGeometry ) return false;
+  const PlaneGeometry* planeGeometry( (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  if ( !image || !planeGeometry || abstractTransformGeometry ) return;
 
   Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
   if ( slice.IsNull() )
   {
       MITK_ERROR << "Unable to extract slice." << std::endl;
-      return false;
+      return;
   }
 
   ContourModel* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
   ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, false, false ); // false: don't add 0.5 (done by FillContourInSlice)
   // false: don't constrain the contour to the image's inside
-  if (projectedContour.IsNull()) return false;
+  if (projectedContour.IsNull()) return;
 
   FeedbackContourTool::FillContourInSlice( projectedContour, timeStep, slice, m_PaintingPixelValue );
 
@@ -289,17 +285,15 @@ bool mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
 
   m_WholeImageContourInWorldCoordinates = NULL;
   m_SegmentationContourInWorldCoordinates = NULL;
-
-  return true;
 }
 
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
 */
-bool mitk::SetRegionTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::SetRegionTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   if (m_StatusFillWholeSlice)
   {
@@ -317,7 +311,5 @@ bool mitk::SetRegionTool::OnInvertLogic( StateMachineAction*, InteractionEvent* 
   }
 
   m_StatusFillWholeSlice = !m_StatusFillWholeSlice;
-
-  return true;
 }
 

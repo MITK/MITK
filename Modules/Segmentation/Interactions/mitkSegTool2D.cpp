@@ -262,7 +262,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
 {
   if(!positionEvent) return;
 
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  const PlaneGeometry* planeGeometry( (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
   const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
 
   if( planeGeometry && slice && !abstractTransformGeometry)

@@ -193,11 +193,6 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   // calculate the cut
   m_Slicer->Update();
 
-  // fetch geometry
-  mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-  assert( displayGeometry );
-  //  float toGL=displayGeometry->GetSizeInDisplayUnits()[1];
-
   //apply color and opacity read from the PropertyList
   ApplyColorAndOpacityProperties( renderer );
 
@@ -273,11 +268,8 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
 
       vtk2itk( vp, p );
 
-      //convert 3D point (in mm) to 2D point on slice (also in mm)
-      worldGeometry->Map( p, p2d );
-
-      //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-      displayGeometry->WorldToDisplay( p2d, p2d );
+      //convert 3D point (in mm) to display coordinates (units )
+      renderer->WorldToDisplay( p, p2d );
 
       //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
       //p2d[1]=toGL-p2d[1];
@@ -350,11 +342,8 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
 
         vtk2itk( vp, p );
 
-        //convert 3D point (in mm) to 2D point on slice (also in mm)
-        worldGeometry->Map( p, p2d );
-
-        //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-        displayGeometry->WorldToDisplay( p2d, p2d );
+        //convert 3D point (in mm) to display coordinates (units )
+        renderer->WorldToDisplay( p, p2d );
 
         //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
         //p2d[1]=toGL-p2d[1];

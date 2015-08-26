@@ -77,13 +77,13 @@ int checkUpdates(QTextStream& out)
   eventLoop.exec();
 
   QByteArray data = reply->readAll();
-  delete reply;
 
   if (data.isEmpty())
   {
     qCritical() << "A network error occured:" << reply->errorString();
     return EXIT_FAILURE;
   }
+  delete reply;
 
   QBuffer buffer(&data);
   buffer.open(QIODevice::ReadOnly);

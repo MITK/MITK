@@ -17,27 +17,14 @@ if(TARGET ${TESTDRIVER})
                           ${MITK_DATA_DIR}/Pic2DplusT.nrrd
   )
 
-  mitkAddCustomModuleTest(mitkEventMapperTest_Test1And2 mitkEventMapperTest
-                          ${MITK_DATA_DIR}/TestStateMachine1.xml
-                          ${MITK_DATA_DIR}/TestStateMachine2.xml
-  )
 
   mitkAddCustomModuleTest(mitkEventConfigTest_CreateObjectInDifferentWays mitkEventConfigTest
                           ${MITK_SOURCE_DIR}/Modules/Core/test/resource/Interactions/StatemachineConfigTest.xml
   )
 
-  mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest
-                          ${MITK_DATA_DIR}/Pic3D.nrrd
-                          ${MITK_DATA_DIR}/BallBinary30x30x30.nrrd
-  )
 
   mitkAddCustomModuleTest(mitkDataStorageTest_US4DCyl mitkDataStorageTest
                           ${MITK_DATA_DIR}/US4DCyl.nrrd
-  )
-
-  mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStateMachineFactoryTest
-                          ${MITK_DATA_DIR}/TestStateMachine1.xml
-                          ${MITK_DATA_DIR}/TestStateMachine2.xml
   )
 
   mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest

@@ -156,7 +156,7 @@ protected:
                     mitk::Point2D &anchorPoint,
                     mitk::PlaneGeometry * planarFigurePlaneGeometry,
                     const mitk::PlaneGeometry * rendererPlaneGeometry,
-                    mitk::DisplayGeometry * displayGeometry );
+                    mitk::BaseRenderer * renderer);
 
   /**
   * \brief Renders the quantities of the figure below the text annotations.
@@ -185,15 +185,13 @@ protected:
                             PlanarFigureDisplayMode lineDisplayMode,
                             mitk::PlaneGeometry * planarFigurePlaneGeometry,
                             const mitk::PlaneGeometry * rendererPlaneGeometry,
-                            mitk::DisplayGeometry * displayGeometry );
+                            mitk::BaseRenderer * renderer);
 
 
-  void TransformObjectToDisplay(
-    const mitk::Point2D &point2D,
+  void TransformObjectToDisplay(const mitk::Point2D &point2D,
     mitk::Point2D &displayPoint,
-    const mitk::PlaneGeometry *objectGeometry,
-    const mitk::PlaneGeometry *rendererGeometry,
-    const mitk::DisplayGeometry *displayGeometry );
+    const mitk::PlaneGeometry *objectGeometry, const mitk::PlaneGeometry *,
+    const mitk::BaseRenderer * renderer);
 
   void DrawMarker(
     const mitk::Point2D &point,
@@ -205,7 +203,7 @@ protected:
     PlanarFigureControlPointStyleProperty::Shape shape,
     const mitk::PlaneGeometry *objectGeometry,
     const mitk::PlaneGeometry *rendererGeometry,
-    const mitk::DisplayGeometry *displayGeometry );
+    const mitk::BaseRenderer * renderer);
 
   /**
   * \brief Actually paints the polyline defined by the figure.
@@ -215,7 +213,7 @@ protected:
     Point2D& anchorPoint,
     const PlaneGeometry* planarFigurePlaneGeometry,
     const PlaneGeometry* rendererPlaneGeometry,
-    const DisplayGeometry* displayGeometry);
+    const mitk::BaseRenderer * renderer);
 
   /**
   * \brief Internally used by RenderLines() to draw the mainlines using
@@ -225,7 +223,7 @@ protected:
     Point2D& anchorPoint,
     const PlaneGeometry* planarFigurePlaneGeometry,
     const PlaneGeometry* rendererPlaneGeometry,
-    const DisplayGeometry* displayGeometry) ;
+    const mitk::BaseRenderer * renderer);
 
   /**
   * \brief Internally used by RenderLines() to draw the helperlines using
@@ -235,7 +233,7 @@ protected:
     Point2D& anchorPoint,
     const PlaneGeometry* planarFigurePlaneGeometry,
     const PlaneGeometry* rendererPlaneGeometry,
-    const DisplayGeometry* displayGeometry) ;
+    const mitk::BaseRenderer * renderer);
 
   void InitializeDefaultPlanarFigureProperties();
 

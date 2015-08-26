@@ -20,7 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include "mitkStepper.h"
-#include "mitkStateMachine.h"
+#include "mitkEventStateMachine.h"
+#include "mitkOperationActor.h"
 #include <itkObjectFactory.h>
 
 namespace mitk {
@@ -38,16 +39,16 @@ class BaseRenderer;
 //## there is 3D+t data.
 //## @note not yet implemented
 //## @ingroup NavigationControl
-class MITKCORE_EXPORT BaseController : public StateMachine
+class MITKCORE_EXPORT BaseController : public mitk::OperationActor, public itk::Object
 {
 public:
   /** Standard class typedefs. */
-  mitkClassMacro(BaseController, StateMachine);
+  mitkClassMacroItkParent(BaseController, mitk::OperationActor);
   itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+
 
   /** Method for creation through ::New */
-  mitkNewMacro1Param(Self, const char *);
+  //mitkNewMacro(Self);
 
   //##Documentation
   //## @brief Get the Stepper through the slices
@@ -61,12 +62,15 @@ protected:
   /**
   * @brief Default Constructor
   **/
-  BaseController(const char * type = nullptr);
+  BaseController();
 
   /**
   * @brief Default Destructor
   **/
   virtual ~BaseController();
+
+
+  virtual void ExecuteOperation(Operation*) override;
 
   //## @brief Stepper through the time
   Stepper::Pointer m_Time;

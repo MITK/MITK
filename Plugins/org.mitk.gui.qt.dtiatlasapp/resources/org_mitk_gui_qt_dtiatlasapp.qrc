@@ -1,6 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
- <qresource prefix="/org.mitk.gui.qt.dtiatlasapp">
-     <file>app-icon.png</file>	 
-	 <file>mintLogo.png</file>
- </qresource>
- </RCC>

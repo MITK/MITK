@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkProgressBar.h"
-#include "mitkGlobalInteraction.h"
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
 #include "mitkInteractionConst.h"
@@ -1129,23 +1128,6 @@ void QmitkSlicesInterpolator::Enable3DInterpolation(bool on)
 
 void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
 {
-  if (m_2DInterpolationEnabled && m_LastSNC)
-  {
-    // determine which one is the current view, try to do an initial interpolation
-    mitk::BaseRenderer* renderer = m_LastSNC->GetRenderer();
-    if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
-    {
-      //TODO 18735: This cast always returns NULL, cuase GetWorldGeometry returns a Base Geometry?!?!?!
-      const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
-      if (timeGeometry)
-      {
-        mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeGeometry*>(timeGeometry), renderer->GetSlice() );
-
-        TranslateAndInterpolateChangedSlice(event, m_LastSNC);
-      }
-    }
-  }
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 
 #include "mitkTestingMacros.h"
-#include "mitkGlobalInteraction.h"
 
 #include <iostream>
 
@@ -38,9 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContourSetVtkMapper3D.h>
 #include <mitkContourVtkMapper3D.h>
 
-//Interactors
-#include <mitkContourInteractor.h>
-#include <mitkExtrudedContourInteractor.h>
+
 
 //Propertylist Test
 #include <mitkAnnotationProperty.h>
@@ -112,22 +109,6 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ContourVtkMapper3D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 }
-static void TestInteractorSetting(mitk::DataNode::Pointer dataNode)
-{
-
-  //this method tests the SetInteractor() and GetInteractor methods
-  //the Interactor base class calls the DataNode->SetInteractor method
-
-  mitk::Interactor::Pointer interactor;
-
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a NULL pointer was set correctly (Interactor)" )
-
-  interactor = mitk::ContourInteractor::New("AffineInteractions click to select", dataNode);
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a ContourInteractor was set correctly" )
-
-  interactor = mitk::ExtrudedContourInteractor::New("AffineInteractions click to select", dataNode);
-  MITK_TEST_CONDITION( interactor == dataNode->GetInteractor(), "Testing if a ExtrudedContourInteractor was set correctly" )
-}
 
 };
 
@@ -135,9 +116,6 @@ int mitkDataNodeSegmentationTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("DataNodeSegmentation")
-
-  // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   // let's create an object of our class
   mitk::DataNode::Pointer myDataNode = mitk::DataNode::New();
@@ -150,9 +128,6 @@ int mitkDataNodeSegmentationTest(int /* argc */, char* /*argv*/[])
   //test setData() Method
   mitkDataNodeSegmentationTestClass::TestDataSetting(myDataNode);
   mitkDataNodeSegmentationTestClass::TestMapperSetting(myDataNode);
-
-  //note, that no data is set to the dataNode
-  mitkDataNodeSegmentationTestClass::TestInteractorSetting(myDataNode);
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!

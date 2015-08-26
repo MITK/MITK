@@ -281,34 +281,33 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
 /**
   Just show the contour, get one point as the central point and add surrounding points to the contour.
   */
-bool mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   m_MasterContour->SetClosed(true);
-
-  return this->MouseMoved(interactionEvent, true);
+  this->MouseMoved(interactionEvent, true);
 }
 
-bool mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
- return MouseMoved(interactionEvent, false);
+ MouseMoved(interactionEvent, false);
 }
 
-bool mitk::PaintbrushTool::OnPrimaryButtonPressedMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnPrimaryButtonPressedMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
- return MouseMoved(interactionEvent, true);
+ MouseMoved(interactionEvent, true);
 }
 
 /**
   Insert the point to the feedback contour,finish to build the contour and at the same time the painting function
   */
-bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, bool leftMouseButtonPressed)
+void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, bool leftMouseButtonPressed)
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
 
@@ -352,7 +351,7 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   else
   {
     MITK_DEBUG << "." << std::flush;
-    return false;
+    return;
   }
 
   MITK_DEBUG << "Mouse at C " << indexCoordinates;
@@ -393,27 +392,23 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   assert( positionEvent->GetSender()->GetRenderWindow() );
 
   RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-
-  return true;
 }
 
 
-bool mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   //When mouse is released write segmentationresult back into image
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   CheckIfCurrentSliceHasChanged(positionEvent);
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
-
-  return true;
 }
 
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
   */
-bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent* )
+void mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
 {
     // Inversion only for 0 and 1 as painting values
     if (m_PaintingPixelValue == 1)
@@ -427,12 +422,11 @@ bool mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent*
       FeedbackContourTool::SetFeedbackContourColorDefault();
     }
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    return true;
 }
 
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
-    const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+    const PlaneGeometry* planeGeometry( (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
     const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
 

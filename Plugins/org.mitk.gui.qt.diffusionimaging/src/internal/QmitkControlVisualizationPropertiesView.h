@@ -138,8 +138,6 @@ protected:
   mitk::DataNode::Pointer m_SelectedNode;
   mitk::DataNode* m_CurrentPickingNode;
 
-  unsigned long m_SlicesRotationObserverTag1;
-  unsigned long m_SlicesRotationObserverTag2;
   unsigned long m_FiberBundleObserverTag;
   unsigned long m_FiberBundleObserveOpacityTag;
   mitk::ColorProperty::Pointer m_Color;

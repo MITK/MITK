@@ -89,10 +89,10 @@ bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent* intera
     return false;
 }
 
-bool mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   if (m_TubeGraph.IsNull())
-    return false;
+    return;
 
   this->SelectTubesByActivationModus();
 
@@ -106,14 +106,12 @@ bool mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction*, InteractionE
     StatusBar::GetInstance()->DisplayText( displayText.str().c_str() );
     //TODO!!!  this->InvokeEvent(SelectionChangedTubeGraphEvent());
   }
-
-  return true;
 }
 
-bool mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   if (m_TubeGraph.IsNull())
-    return false;
+    return;
 
   if ((m_ActivationMode != Multiple)
     && (m_ActivationMode != Points))
@@ -124,8 +122,6 @@ bool mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction*, Interactio
   }
   // show info on status bar
   StatusBar::GetInstance()->DisplayText("No tube hit!");
-
-  return true;
 }
 
 void mitk::TubeGraphDataInteractor::SetActivationMode(const ActivationMode& activationMode)

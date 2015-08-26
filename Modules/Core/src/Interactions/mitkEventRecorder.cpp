@@ -19,6 +19,9 @@
 #include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
 
+
+#include "vtkCamera.h"
+
 #include "mitkBaseRenderer.h"
 
 
@@ -38,7 +41,7 @@ static void WriteEventXMLConfig(std::ofstream& stream)
   mitk::BaseRenderer::BaseRendererMapType::iterator rendererIterator = mitk::BaseRenderer::baseRendererMap.begin();
   mitk::BaseRenderer::BaseRendererMapType::iterator end = mitk::BaseRenderer::baseRendererMap.end();
 
-  for(; rendererIterator != end; rendererIterator++)
+  for(; rendererIterator != end; ++rendererIterator)
   {
     std::string rendererName = (*rendererIterator).second->GetName();
 
@@ -52,8 +55,24 @@ static void WriteEventXMLConfig(std::ofstream& stream)
            << mitk::InteractionEventConst::xmlEventPropertyMapperID() << "=\"" << mapperID << "\" "
            << mitk::InteractionEventConst::xmlRenderSizeX() << "=\"" << (*rendererIterator).second->GetSize()[0] << "\" "
            << mitk::InteractionEventConst::xmlRenderSizeY() << "=\"" << (*rendererIterator).second->GetSize()[1] << "\" "
-           << mitk::InteractionEventConst::xmlRenderSizeZ() << "=\"" << (*rendererIterator).second->GetSize()[2] << "\" "
-           << "/>\n";
+           << mitk::InteractionEventConst::xmlRenderSizeZ() << "=\"" << (*rendererIterator).second->GetSize()[2] << "\" ";;
+
+    if ((*rendererIterator).second->GetMapperID() == mitk::BaseRenderer::Standard3D)
+    {
+      // For a 3D render window, rotation and zoom settings are determined by the vtkCamera parameters
+      // these are recorded here:
+            stream  << mitk::InteractionEventConst::xmlViewUpX() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[0] << "\" "
+              << mitk::InteractionEventConst::xmlViewUpY() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[1] << "\" "
+              << mitk::InteractionEventConst::xmlViewUpZ() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[2] << "\" "
+              << mitk::InteractionEventConst::xmlCameraFocalPointX() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[0] << "\" "
+              << mitk::InteractionEventConst::xmlCameraFocalPointY() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[1] << "\" "
+              << mitk::InteractionEventConst::xmlCameraFocalPointZ() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[2] << "\" "
+              << mitk::InteractionEventConst::xmlCameraPositionX() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetPosition()[0] << "\" "
+              << mitk::InteractionEventConst::xmlCameraPositionY() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetPosition()[1] << "\" "
+              << mitk::InteractionEventConst::xmlCameraPositionZ() << "=\""<<  (*rendererIterator).second->GetVtkRenderer()->GetActiveCamera()->GetPosition()[2] << "\" ";
+
+    }
+    stream  << "/>\n";
   }
 
   // </config>

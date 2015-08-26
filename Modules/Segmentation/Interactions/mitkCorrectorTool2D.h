@@ -76,9 +76,9 @@ class MITKSEGMENTATION_EXPORT CorrectorTool2D : public FeedbackContourTool
     virtual void Activated() override;
     virtual void Deactivated() override;
 
-    virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
-    virtual bool OnMouseMoved   ( StateMachineAction*, InteractionEvent* );
-    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
+    virtual void OnMousePressed ( StateMachineAction*, InteractionEvent* );
+    virtual void OnMouseMoved   ( StateMachineAction*, InteractionEvent* );
+    virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* );
     int m_PaintingPixelValue;
 
     Image::Pointer m_WorkingSlice;

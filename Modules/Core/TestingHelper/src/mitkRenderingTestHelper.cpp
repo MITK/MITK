@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingTestHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkRenderWindow.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkNodePredicateDataType.h>
 
@@ -61,9 +60,6 @@ mitk::RenderingTestHelper::RenderingTestHelper(int width, int height, int argc, 
 
 void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode)
 {
-  // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
-
   m_RenderWindow = mitk::RenderWindow::New(NULL ,"unnamed renderer" , NULL, renderingMode);
 
   m_DataStorage = mitk::StandaloneDataStorage::New();

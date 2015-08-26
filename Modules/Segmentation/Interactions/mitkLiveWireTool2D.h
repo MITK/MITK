@@ -78,25 +78,25 @@ class MITKSEGMENTATION_EXPORT LiveWireTool2D : public SegTool2D
     virtual void Deactivated() override;
 
     /// \brief Initialize tool
-    virtual bool OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnInitLiveWire ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Add a control point and finish current segment
-    virtual bool OnAddPoint   ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnAddPoint   ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Actual LiveWire computation
-    virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Check double click on first control point to finish the LiveWire tool
     virtual bool OnCheckPoint( const InteractionEvent* interactionEvent );
 
     /// \brief Finish LiveWire tool
-    virtual bool OnFinish( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnFinish( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Close the contour
-    virtual bool OnLastSegmentDelete( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnLastSegmentDelete( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Don't use dynamic cost map for LiveWire calculation
-    virtual bool OnMouseMoveNoDynamicCosts( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnMouseMoveNoDynamicCosts( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Finish contour interaction.
     void FinishTool();
@@ -147,7 +147,7 @@ class MITKSEGMENTATION_EXPORT LiveWireTool2D : public SegTool2D
 
     std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_WorkingContours;
     std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> > m_EditingContours;
-    std::vector< mitk::ContourModelLiveWireInteractor::Pointer > m_LiveWireInteractors;
+    std::vector< mitk::ContourModelLiveWireInteractor::Pointer > m_LiveWireNodes;
 
     template<typename TPixel, unsigned int VImageDimension>
     void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension>* inputImage, itk::Index<3> &index, itk::Index<3> &returnIndex);

@@ -494,30 +494,26 @@ void mitk::SimulationInteractor::StartInteraction(const std::string& type, Inter
   m_Impl->StartInteraction(type);
 }
 
-bool mitk::SimulationInteractor::StartPrimaryInteraction(StateMachineAction*, InteractionEvent* event)
+void mitk::SimulationInteractor::StartPrimaryInteraction(StateMachineAction*, InteractionEvent* event)
 {
   this->StartInteraction("AttachBody", dynamic_cast<InteractionPositionEvent*>(event));
-  return true;
 }
 
-bool mitk::SimulationInteractor::StartSecondaryInteraction(StateMachineAction*, InteractionEvent* event)
+void mitk::SimulationInteractor::StartSecondaryInteraction(StateMachineAction*, InteractionEvent* event)
 {
   this->StartInteraction("FixParticle", dynamic_cast<InteractionPositionEvent*>(event));
-  return true;
 }
 
-bool mitk::SimulationInteractor::StopInteraction(StateMachineAction*, InteractionEvent*)
+void mitk::SimulationInteractor::StopInteraction(StateMachineAction*, InteractionEvent*)
 {
   m_Impl->StopInteraction();
   m_Impl->DetachMouseNode();
-  return true;
 }
 
-bool mitk::SimulationInteractor::ExecuteInteraction(StateMachineAction*, InteractionEvent* event)
+void mitk::SimulationInteractor::ExecuteInteraction(StateMachineAction*, InteractionEvent* event)
 {
   m_Impl->UpdatePickRay(dynamic_cast<InteractionPositionEvent*>(event));
   m_Impl->ExecuteInteraction();
-  return true;
 }
 
 bool mitk::SimulationInteractor::IsInteractionPerformerNotNull(const InteractionEvent*)

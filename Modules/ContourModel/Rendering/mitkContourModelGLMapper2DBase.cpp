@@ -39,13 +39,6 @@ mitk::ContourModelGLMapper2DBase::ContourModelGLMapper2DBase()
 
 mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
 {
-//   RendererListType::const_iterator iter;
-//   for ( iter=m_RendererList.begin(); iter != m_RendererList.end(); ++iter)
-//   {
-//     (*iter)->GetOverlayManager()->RemoveOverlay( m_PointNumbersOverlay.GetPointer() );
-//     (*iter)->GetOverlayManager()->RemoveOverlay( m_ControlPointNumbersOverlay.GetPointer() );
-//   }
-//   m_RendererList.clear();
 }
 
 void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* renderingContour, mitk::BaseRenderer* renderer)
@@ -78,8 +71,6 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
   if ( !renderingContour->IsEmptyTimeStep(timestep) )
   {
 
-    mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-    assert(displayGeometry.IsNotNull());
 
     //apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);
@@ -109,7 +100,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
     //    ContourModel::OutputType point;
     mitk::Point3D point;
 
-    mitk::Point3D p, projected_p;
+    mitk::Point3D p;
     float vtkp[3];
     float lineWidth = 3.0;
 
@@ -162,13 +153,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
 
-      displayGeometry->Project(p, projected_p);
+      renderer->WorldToDisplay(p, pt2d);
 
-      displayGeometry->Map(projected_p, pt2d);
-      displayGeometry->WorldToDisplay(pt2d, pt2d);
-
-      Vector3D diff=p-projected_p;
-      ScalarType scalardiff = diff.GetNorm();
+      ScalarType scalardiff = fabs(renderer->GetCurrentWorldPlaneGeometry()->SignedDistance(p));
 
       //project to plane
       if(projectmode)
@@ -306,9 +293,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
       itk2vtk(point, vtkp);
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
-      displayGeometry->Project(p, projected_p);
-      displayGeometry->Map(projected_p, pt2d);
-      displayGeometry->WorldToDisplay(pt2d, pt2d);
+      renderer->WorldToDisplay(p, pt2d);
 
       glLineWidth(lineWidth);
       glBegin (GL_LINES);
@@ -328,13 +313,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel* r
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
 
-      displayGeometry->Project(p, projected_p);
+      renderer->WorldToDisplay(p, pt2d);
 
-      displayGeometry->Map(projected_p, pt2d);
-      displayGeometry->WorldToDisplay(pt2d, pt2d);
-
-      Vector3D diff=p-projected_p;
-      ScalarType scalardiff = diff.GetNorm();
+      ScalarType scalardiff = fabs(renderer->GetCurrentWorldPlaneGeometry()->SignedDistance(p));
       //----------------------------------
 
       //draw point if close to plane

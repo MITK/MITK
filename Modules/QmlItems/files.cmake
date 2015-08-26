@@ -2,7 +2,6 @@ set(CPP_FILES
   QmlMitkRenderWindowItem.cpp
   QmlMitkRenderingManager.cpp
   QmlMitkRenderingManagerFactory.cpp
-  InteractionLegacy/QmitkEventAdapter.cpp
   QmlMitkBigRenderLock.cpp
   QmlMitkFourRenderWindowWidget.cpp
 )

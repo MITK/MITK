@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCylinder.h>
 #include <mitkCuboid.h>
 #include <mitkEllipsoid.h>
-#include <mitkAffineInteractor.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkLine.h>
 #include <mitkPlaneGeometry.h>
@@ -31,6 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QBoxLayout>
 #include <QStringList>
 #include <QInputDialog>
+
+#include <mitkAffineBaseDataInteractor3D.h>
+//micro services
+#include <usModuleRegistry.h>
+#include <usGetModuleContext.h>
 
 QmitkBoundingObjectWidget::QmitkBoundingObjectWidget (QWidget* parent, Qt::WindowFlags f ):QWidget( parent, f ),
 m_DataStorage(NULL),
@@ -138,11 +141,7 @@ void QmitkBoundingObjectWidget::SelectionChanged()
 
       //remove observer
       last_node->RemoveObserver(m_lastAffineObserver);
-
-      //get and remove interactor
-      mitk::AffineInteractor::Pointer last_interactor = dynamic_cast<mitk::AffineInteractor*> (last_node->GetInteractor());
-      if (last_interactor)
-        mitk::GlobalInteraction::GetInstance()->RemoveInteractor(last_interactor);
+      last_node->SetDataInteractor(nullptr);
     }
   }
 
@@ -152,10 +151,11 @@ void QmitkBoundingObjectWidget::SelectionChanged()
 
   mitk::DataNode* new_node = it->second;
 
-  mitk::AffineInteractor::Pointer new_interactor = mitk::AffineInteractor::New("AffineInteractions ctrl-drag", new_node);
-  new_node->SetInteractor(new_interactor);
-
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(new_interactor);
+  mitk::AffineBaseDataInteractor3D::Pointer affineDataInteractor = mitk::AffineBaseDataInteractor3D::New();
+  affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+  affineDataInteractor->SetEventConfig("AffineConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+  affineDataInteractor->SetDataNode(new_node);
+  new_node->SetBoolProperty("pickable", true);
 
   //create observer for node
   itk::ReceptorMemberCommand<QmitkBoundingObjectWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkBoundingObjectWidget>::New();

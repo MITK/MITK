@@ -46,10 +46,6 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
 
   if (updateNeccesary)
   {
-    // ok, das ist aus GenerateData kopiert
-    mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-    assert(displayGeometry.IsNotNull());
-
     //apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);
 
@@ -100,13 +96,12 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
         transform->TransformPoint(vtkp, vtkp);
         vtk2itk(vtkp,p);
 
-        displayGeometry->Project(p, projected_p);
+        renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
         Vector3D diff=p-projected_p;
         if(diff.GetSquaredNorm()<1.0)
         {
           Point2D pt2d, tmp;
-          displayGeometry->Map(projected_p, pt2d);
-          displayGeometry->WorldToDisplay(pt2d, pt2d);
+          renderer->WorldToDisplay(p, pt2d);
           glVertex2f(pt2d[0], pt2d[1]);
         }
 

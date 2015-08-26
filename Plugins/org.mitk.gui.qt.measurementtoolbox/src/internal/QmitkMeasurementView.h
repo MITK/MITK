@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITK_MEASUREMENT_H__INCLUDED
 
 #include <QmitkAbstractView.h>
+#include <mitkEventConfig.h>
 #include <mitkILifecycleAwarePart.h>
+#include "usServiceRegistration.h"
 
 /// forward declarations
 struct QmitkMeasurementViewData;
@@ -85,6 +87,9 @@ class QmitkMeasurementView : public QmitkAbstractView
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
 
     QmitkMeasurementViewData* d;
+
+    // holds configuration objects that have been deactivated
+    std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;
 };
 
 #endif // QMITK_MEASUREMENT_H__INCLUDED

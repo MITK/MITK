@@ -35,7 +35,7 @@ namespace mitk
 
   public:
     mitkClassMacro(MousePressEvent,InteractionPositionEvent)
-    mitkNewMacro6Param(Self, BaseRenderer*, const Point2D& , const Point3D& , MouseButtons , ModifierKeys, MouseButtons)
+    mitkNewMacro5Param(Self, BaseRenderer*, const Point2D& , MouseButtons , ModifierKeys, MouseButtons)
 
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
@@ -47,7 +47,7 @@ namespace mitk
     virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
 
   protected:
-    MousePressEvent(BaseRenderer*, const Point2D& = Point2D(), const Point3D& = Point3D(), MouseButtons buttonStates = NoButton,
+    MousePressEvent(BaseRenderer*, const Point2D& = Point2D(),  MouseButtons buttonStates = NoButton,
                     ModifierKeys modifiers = NoKey, MouseButtons eventButton = NoButton);
     virtual ~MousePressEvent();
 

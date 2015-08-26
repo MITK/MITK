@@ -18,11 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKVTKEVENTADAPTER_H_
 
 
-// INTERACTION LEGACY
-#include <mitkKeyEvent.h>
-#include <mitkWheelEvent.h>
-#include <mitkDisplayPositionEvent.h>
-
 #include "mitkMousePressEvent.h"
 #include "mitkMouseReleaseEvent.h"
 #include "mitkMouseMoveEvent.h"
@@ -48,18 +43,6 @@ class BaseRenderer;
 class MITKCORE_EXPORT VtkEventAdapter
 {
 public:
-  /**
-  \deprecatedSince{2013_03} This method can be replaced by mitk::AdaptMousePressEvent / mitk::AdaptMouseMoveEvent / mitk::AdaptMouseReleaseEvent
-  */
- DEPRECATED(static mitk::MouseEvent AdaptMouseEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi));
- /**
-   \deprecatedSince{2013_03} This method can be replaced by mitk::AdaptMouseWheelEvent
-   */
- DEPRECATED(static mitk::WheelEvent AdaptWheelEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi));
- /**
-    \deprecatedSince{2013_03} This method can be replaced by mitk::AdaptInteractionKeyEvent
-    */
- DEPRECATED(static mitk::KeyEvent AdaptKeyEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi));
 
   /** New events compatible with the revised interaction scheme */
 

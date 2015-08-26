@@ -145,13 +145,15 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   // Standard behavior. Is executed in STANDARD mode  and PREFERINPUT mode, if preferred interactor rejects event.
   if (m_ProcessingMode == REGULAR || (m_ProcessingMode == PREFERINPUT && eventIsHandled == false))
   {
+    if (std::strcmp(p->GetNameOfClass(), "MousePressEvent") == 0)
+      RenderingManager::GetInstance()->SetRenderWindowFocus(event->GetSender()->GetRenderWindow());
     m_Interactors.sort(cmp()); // sorts interactors by layer (descending);
 
     // copy the list to prevent iterator invalidation as executing actions
     // in HandleEvent() can cause the m_Interactors list to be updated
     std::list<DataInteractor::Pointer> tmpInteractorList( m_Interactors );
     std::list<DataInteractor::Pointer>::iterator it;
-    for ( it=tmpInteractorList.begin(); it!=tmpInteractorList.end(); it++ )
+    for ( it=tmpInteractorList.begin(); it!=tmpInteractorList.end(); ++it )
     {
       DataInteractor::Pointer dataInteractor = *it;
       if ( (*it)->HandleEvent(event, dataInteractor->GetDataNode()) )

@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointOperation.h"
 #include "mitkRenderingManager.h"
 #include <mitkPointSetDataInteractor.h>
-#include <mitkEvent.h>
-#include <mitkStateEvent.h>
 #include <mitkInteractionConst.h>
 #include <mitkInternalEvent.h>
 

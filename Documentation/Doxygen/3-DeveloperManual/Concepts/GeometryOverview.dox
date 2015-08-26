@@ -30,7 +30,7 @@ To use the geometry classes in the right way you have to understand the three di
     - They can be obtained by calling BaseGeometry::WorldToIndex(), where &pt_mm is a point in worldcoordinates.\n
   -# Index coordinate system:
     - Index coordinates are discrete values that address voxels of a data object explicitly.
-		- Index coordinates are represented by  itk::Index<3> objects.
+    - Index coordinates are represented by  itk::Index<3> objects.
     - Basically they are continuous index coordinates which are rounded from half integer up.
     - E.g. (0,0) specifies the very first pixel of a 2D image, (0,1) the pixel of the next column in the same row
     - If you have world coordinates, they can be converted to discrete index coordinates by calling
@@ -44,7 +44,7 @@ is applied. An offest in a coordinate transformation will affect a transformed p
 
 An Example:\n
 If two systems are given, which differ by a offset of (1,0,0). The point A(2,2,2) in system one will correspont to point A'(3,2,2) in the second system.
-But a vector a(2,2,2) will correspond to the vector a'(2,2,2). 
+But a vector a(2,2,2) will correspond to the vector a'(2,2,2).
 
 
 \section GeometryOverviewPage_Concept The Geometry Concept
@@ -82,12 +82,7 @@ SlicedGeometry3D::InitializeEvenlySpaced (PlaneGeometry *planeGeometry, unsigned
 
 PlaneGeometry provides methods for working with 2D manifolds (i.e., simply spoken, an object that can be described using a 2D coordinate-system) in 3D space.\n
 For example it allows mapping of a 3D point on the 2D manifold using PlaneGeometry::Map(). \n
-An important subclass of PlaneGeometry is the DisplayGeometry which describes the geometry of the display (the monitor screen). Basically it represents a rectangular view on a 2D world geometry.\n
-The DisplayGeometry converts between screen and world coordinates, processes input events (e.g. mouse click) and provides methods for zooming and panning.\n
 
-\imageMacro{DisplayGeometry.png,"",9}
-
-<center><b>Display Geometry\n\n</b></center>
 Finally there is the AbstractTransformGeometry which describes a 2D manifold in 3D space, defined by a vtkAbstractTransform. It is a abstract superclass for arbitrary user defined geometries.\n
 An example is the ThinPlateSplineCurvedGeometry.\n
 

@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConfig.h"
 #include "mitkCoreObjectFactory.h"
 
-#include "mitkAffineInteractor.h"
 #include "mitkColorProperty.h"
 #include "mitkDataNode.h"
 #include "mitkEnumerationProperty.h"

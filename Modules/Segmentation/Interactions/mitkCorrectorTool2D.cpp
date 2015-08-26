@@ -88,10 +88,10 @@ void mitk::CorrectorTool2D::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
@@ -105,14 +105,12 @@ bool mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEve
   contour->AddVertex( point, timestep );
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
-
-  return true;
 }
 
-bool mitk::CorrectorTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::CorrectorTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
   ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
@@ -121,31 +119,29 @@ bool mitk::CorrectorTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent*
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-
-  return true;
 }
 
-bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
   mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return false;
+  if (!workingNode) return;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-  if ( !image || !planeGeometry ) return false;
+  const PlaneGeometry* planeGeometry( (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  if ( !image || !planeGeometry ) return;
 
   const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-  if ( !image || abstractTransformGeometry ) return false;
+  if ( !image || abstractTransformGeometry ) return;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
   m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
@@ -153,7 +149,7 @@ bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   if ( m_WorkingSlice.IsNull() )
   {
       MITK_ERROR << "Unable to extract slice." << std::endl;
-      return false;
+      return;
   }
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
@@ -192,6 +188,4 @@ bool mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   resultSlice->SetVolume(imAccess.GetData());
 
   this->WriteBackSegmentationResult(positionEvent, resultSlice);
-
-  return true;
 }

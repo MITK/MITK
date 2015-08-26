@@ -21,15 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
-#include "mitkStateEvent.h"
 #include "mitkCrosshairPositionEvent.h"
-#include "mitkPositionEvent.h"
 #include "mitkProportionalTimeGeometry.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
-#include "mitkGlobalInteraction.h"
-#include "mitkEventMapper.h"
-#include "mitkFocusManager.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
 
@@ -52,8 +47,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 namespace mitk {
-SliceNavigationController::SliceNavigationController( const char *type )
-: BaseController( type ),
+SliceNavigationController::SliceNavigationController( )
+: BaseController(),
   m_InputWorldGeometry3D( NULL ),
   m_InputWorldTimeGeometry( NULL ),
   m_CreatedWorldGeometry( NULL ),
@@ -283,7 +278,12 @@ SliceNavigationController::Update(
           break;
         }
       }
-      //else: use Axial: no "break" here!!
+      slicedWorldGeometry = SlicedGeometry3D::New();
+      slicedWorldGeometry->InitializePlanes(
+            currentGeometry, PlaneGeometry::None,
+            top, frontside, rotated );
+      slicedWorldGeometry->SetSliceNavigationController( this );
+      break;
 
     case Axial:
       slicedWorldGeometry = SlicedGeometry3D::New();
@@ -696,172 +696,4 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
   }
 }
 
-mitk::DataNode::Pointer SliceNavigationController::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition)
-{
-  mitk::DataNode::Pointer node;
-  int  maxlayer = -32768;
-  bool isHelper (false);
-  if(nodes.IsNotNull())
-  {
-    for (unsigned int x = 0; x < nodes->size(); x++)
-    {
-      nodes->at(x)->GetBoolProperty("helper object", isHelper);
-      if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
-      {
-        int layer = 0;
-        if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
-        if(layer > maxlayer)
-        {
-          if(static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(m_Renderer))
-          {
-            node = nodes->at(x);
-            maxlayer = layer;
-          }
-        }
-      }
-    }
-  }
-  return node;
-}
-// Relict from the old times, when automous decisions were accepted
-// behavior. Remains in here, because some RenderWindows do exist outside
-// of StdMultiWidgets.
-bool
-SliceNavigationController
-::ExecuteAction( Action* action, StateEvent const* stateEvent )
-{
-  bool ok = false;
-
-  const PositionEvent* posEvent = dynamic_cast< const PositionEvent * >(
-    stateEvent->GetEvent() );
-  if ( posEvent != NULL )
-  {
-    if ( m_CreatedWorldGeometry.IsNull() )
-    {
-      return true;
-    }
-    switch (action->GetActionId())
-    {
-    case AcMOVE:
-      {
-        BaseRenderer *baseRenderer = posEvent->GetSender();
-        if ( !baseRenderer )
-        {
-          baseRenderer = const_cast<BaseRenderer *>(
-            GlobalInteraction::GetInstance()->GetFocus() );
-        }
-        if ( baseRenderer )
-          if ( baseRenderer->GetMapperID() == 1 )
-          {
-            PointOperation doOp(OpMOVE, posEvent->GetWorldPosition());
-
-            this->ExecuteOperation( &doOp );
-
-            // If click was performed in this render window than we have to update the status bar information about position and pixel value.
-            if(baseRenderer == m_Renderer)
-            {
-              {
-                std::string statusText;
-                TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
-
-                mitk::DataStorage::SetOfObjects::ConstPointer nodes = baseRenderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
-                mitk::Point3D worldposition = posEvent->GetWorldPosition();
-                //int  maxlayer = -32768;
-                mitk::Image::Pointer image3D;
-                mitk::DataNode::Pointer node;
-                mitk::DataNode::Pointer topSourceNode;
-
-                bool isBinary (false);
-                int component = 0;
-
-                node = this->GetTopLayerNode(nodes,worldposition);
-                if(node.IsNotNull())
-                {
-                  node->GetBoolProperty("binary", isBinary);
-                  if(isBinary)
-                  {
-                    mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = baseRenderer->GetDataStorage()->GetSources(node, NULL, true);
-                    if(!sourcenodes->empty())
-                    {
-                      topSourceNode = this->GetTopLayerNode(sourcenodes,worldposition);
-                    }
-                    if(topSourceNode.IsNotNull())
-                    {
-                      image3D = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
-                      topSourceNode->GetIntProperty("Image.Displayed Component", component);
-                    }
-                    else
-                    {
-                      image3D = dynamic_cast<mitk::Image*>(node->GetData());
-                      node->GetIntProperty("Image.Displayed Component", component);
-                    }
-                  }
-                  else
-                  {
-                    image3D = dynamic_cast<mitk::Image*>(node->GetData());
-                    node->GetIntProperty("Image.Displayed Component", component);
-                  }
-                }
-                std::stringstream stream;
-                stream.imbue(std::locale::classic());
-
-                // get the position and gray value from the image and build up status bar text
-                if(image3D.IsNotNull())
-                {
-                  itk::Index<3> p;
-                  image3D->GetGeometry()->WorldToIndex(worldposition, p);
-                  stream.precision(2);
-                  stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";
-                  stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
-
-                  mitk::ScalarType pixelValue = 0.0;
-
-                  mitkPixelTypeMultiplex5(
-                    mitk::FastSinglePixelAccess,
-                    image3D->GetChannelDescriptor().GetPixelType(),
-                    image3D,
-                    image3D->GetVolumeData(baseRenderer->GetTimeStep()),
-                    p,
-                    pixelValue,
-                    component);
-
-                  if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
-                  {
-                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << std::scientific<< pixelValue <<"  ";
-                  }
-                  else
-                  {
-                    stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<< pixelValue <<"  ";
-                  }
-                }
-                else
-                {
-                  stream << "No image information at this position!";
-                }
-
-                statusText = stream.str();
-                mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-              }
-            }
-            ok = true;
-            break;
-          }
-      }
-    default:
-      ok = true;
-      break;
-    }
-    return ok;
-  }
-
-  const DisplayPositionEvent *displPosEvent =
-    dynamic_cast< const DisplayPositionEvent * >( stateEvent->GetEvent() );
-
-  if ( displPosEvent != NULL )
-  {
-    return true;
-  }
-
-  return false;
-}
 } // namespace

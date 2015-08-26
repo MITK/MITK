@@ -807,7 +807,6 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
     {
       renderWindow->GetRenderingManager()->InitializeViews(
           basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-      renderWindow->GetRenderingManager()->RequestUpdateAll();
     }
   }
 }

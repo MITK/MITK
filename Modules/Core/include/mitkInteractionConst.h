@@ -369,8 +369,8 @@ enum EActions
   AcMODEDESELECT = 1100,  // set interactor in not selected mode
   AcMODESELECT = 1101,  // set interactor in selected mode
   AcMODESUBSELECT = 1102,  // set interacor in sub selected mode
-  AcINFORMLISTENERS = 1200,  // GlobalInteraction
-  AcASKINTERACTORS = 1201,  // GlobalInteraction
+  AcINFORMLISTENERS = 1200,
+  AcASKINTERACTORS = 1201,
   AcCHECKGREATERONE = 1500,
   AcCHECKBOUNDINGBOX = 1510,
   AcFORCESUBINTERACTORS = 1550,

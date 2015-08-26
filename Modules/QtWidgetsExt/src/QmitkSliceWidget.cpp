@@ -18,9 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStepperAdapter.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkImage.h"
+#include "mitkCameraController.h"
 #include <mitkProportionalTimeGeometry.h>
 #include <QMenu>
 #include <QMouseEvent>
+#include <mitkCameraController.h>
 
 QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
     Qt::WindowFlags f) :
@@ -183,14 +185,14 @@ void QmitkSliceWidget::InitWidget(
     }
   }
 
-  GetRenderer()->GetDisplayGeometry()->Fit();
+  GetRenderer()->GetCameraController()->Fit();
   mitk::RenderingManager::GetInstance()->RequestUpdate(
       GetRenderer()->GetRenderWindow());
 }
 
 void QmitkSliceWidget::UpdateGL()
 {
-  GetRenderer()->GetDisplayGeometry()->Fit();
+  GetRenderer()->GetCameraController()->Fit();
   mitk::RenderingManager::GetInstance()->RequestUpdate(
       GetRenderer()->GetRenderWindow());
 }

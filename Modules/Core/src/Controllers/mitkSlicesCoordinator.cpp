@@ -22,10 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 
-SlicesCoordinator::SlicesCoordinator(const char* machine)
-: StateMachine(machine),
-  m_LinkPlanes( true ),
-  m_MouseCursorSet( false )
+SlicesCoordinator::SlicesCoordinator()
+  : m_LinkPlanes( true ),
+    m_MouseCursorSet( false )
 {
 }
 
@@ -92,11 +91,6 @@ void SlicesCoordinator::OnSliceControllerRemoved(SliceNavigationController*)
   // implement in subclasses
 }
 
-bool SlicesCoordinator::ExecuteAction(Action* a, StateEvent const* e)
-{
-  // implement in subclasses, BUT call default implementation to make these CONNECT_ACTION statements work out
-  return Superclass::ExecuteAction(a,e);
-}
 
 } // namespace
 

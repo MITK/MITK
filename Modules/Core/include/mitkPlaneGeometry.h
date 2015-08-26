@@ -88,7 +88,9 @@ namespace mitk {
     {
       Axial,
       Sagittal,
-      Frontal
+      Frontal,
+      None //This defines the PlaneGeometry for the 3D renderWindow which
+          //curiously also needs a PlaneGeometry. This should be reconsidered some time.
     };
 
     virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;

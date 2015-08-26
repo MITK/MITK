@@ -47,7 +47,6 @@ set(mitk_modules
   OpenCL
   OpenCVVideoSupport
   QtOverlays
-  InputDevices
   ToFHardware
   ToFProcessing
   ToFUI

@@ -1,3 +1,0 @@
-if(WIN32)
-MACRO_CREATE_MITK_PLUGIN(mitkWiiMote)
-endif(WIN32)

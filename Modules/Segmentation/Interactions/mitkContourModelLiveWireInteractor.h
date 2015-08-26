@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-
   /**
   \brief
 
@@ -43,22 +41,28 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor);
-    mitkNewMacro1Param(Self, DataNode*);
+    mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     virtual void SetEditingContourModelNode (mitk::DataNode* _arg);
 
     virtual void SetWorkingImage (mitk::Image* _arg);
 
+    virtual void ConnectActionsAndFunctions() override;
+
   protected:
 
-    ContourModelLiveWireInteractor(DataNode* dataNode);
+    ContourModelLiveWireInteractor();
     virtual ~ContourModelLiveWireInteractor();
 
-    virtual bool OnDeletePoint(Action*, const StateEvent*) override;
-    virtual bool OnMovePoint(Action*, const StateEvent*) override;
-    virtual bool OnCheckPointClick( Action* action, const StateEvent* stateEvent) override;
-    virtual bool OnFinishEditing( Action* action, const StateEvent* stateEvent) override;
+
+    virtual bool OnCheckPointClick( const InteractionEvent* interactionEvent ) override;
+    virtual bool IsHovering(const InteractionEvent* interactionEvent) override;
+
+    virtual void OnMovePoint(StateMachineAction *, InteractionEvent* interactionEvent) override;
+    virtual void OnDeletePoint(StateMachineAction*, InteractionEvent* interactionEvent) override;
+    virtual void OnFinishEditing(StateMachineAction*, InteractionEvent* interactionEvent) override;
 
     int SplitContourFromSelectedVertex(mitk::ContourModel* srcContour,
                                        mitk::ContourModel* destContour,

@@ -110,6 +110,15 @@ public:
    */
   RenderWindow* GetRenderWindow(unsigned int index);
 
+  /**
+   * @brief AddDisplayPlaneSubTree
+   *
+   * Creates DisplayPlanes that are shown in a 3D RenderWindow.
+   */
+  void AddDisplayPlaneSubTree();
+
+  void Set3dCameraSettings();
+
 protected:
 
 

@@ -28,14 +28,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
-#include "mitkFiberBundleInteractor.h"
 #include "mitkPlanarFigureInteractor.h"
 #include <mitkQBallImage.h>
 #include <mitkTensorImage.h>
 #include <mitkImage.h>
 #include <mitkDiffusionPropertyHelper.h>
 #include <mitkConnectomicsNetwork.h>
-#include "mitkGlobalInteraction.h"
 #include "usModuleRegistry.h"
 
 #include "mitkPlaneGeometry.h"
@@ -92,20 +90,7 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
 {
-    if(m_SlicesRotationObserverTag1 )
-    {
-        mitk::SlicesCoordinator::Pointer coordinator = m_MultiWidget->GetSlicesRotator();
-        if( coordinator.IsNotNull() )
-            coordinator->RemoveObserver(m_SlicesRotationObserverTag1);
-    }
-    if( m_SlicesRotationObserverTag2)
-    {
-        mitk::SlicesCoordinator::Pointer coordinator = m_MultiWidget->GetSlicesRotator();
-        if( coordinator.IsNotNull() )
-            coordinator->RemoveObserver(m_SlicesRotationObserverTag1);
-    }
-
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener.data());
 }
 
 void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction* action )
@@ -242,26 +227,6 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
 void QmitkControlVisualizationPropertiesView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
-    m_MultiWidget = &stdMultiWidget;
-
-    if (m_MultiWidget)
-    {
-        mitk::SlicesCoordinator* coordinator = m_MultiWidget->GetSlicesRotator();
-        if (coordinator)
-        {
-            itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command2 = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-            command2->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SliceRotation );
-            m_SlicesRotationObserverTag1 = coordinator->AddObserver( mitk::SliceRotationEvent(), command2 );
-        }
-
-        coordinator = m_MultiWidget->GetSlicesSwiveller();
-        if (coordinator)
-        {
-            itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command2 = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
-            command2->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SliceRotation );
-            m_SlicesRotationObserverTag2 = coordinator->AddObserver( mitk::SliceRotationEvent(), command2 );
-        }
-    }
 }
 
 void QmitkControlVisualizationPropertiesView::SliceRotation(const itk::EventObject&)
@@ -958,43 +923,44 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
 
 void QmitkControlVisualizationPropertiesView::SetInteractor()
 {
-    typedef std::vector<mitk::DataNode*> Container;
-    Container _NodeSet = this->GetDataManagerSelection();
-    mitk::DataNode* node = 0;
-    mitk::FiberBundle* bundle = 0;
-    mitk::FiberBundleInteractor::Pointer bundleInteractor = 0;
+    // BUG 19179
+    //    typedef std::vector<mitk::DataNode*> Container;
+    //    Container _NodeSet = this->GetDataManagerSelection();
+    //    mitk::DataNode* node = 0;
+    //    mitk::FiberBundle* bundle = 0;
+    //    mitk::FiberBundleInteractor::Pointer bundleInteractor = 0;
 
-    // finally add all nodes to the model
-    for(Container::const_iterator it=_NodeSet.begin(); it!=_NodeSet.end()
-        ; it++)
-    {
-        node = const_cast<mitk::DataNode*>(*it);
-        bundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+    //    // finally add all nodes to the model
+    //    for(Container::const_iterator it=_NodeSet.begin(); it!=_NodeSet.end()
+    //        ; it++)
+    //    {
+    //        node = const_cast<mitk::DataNode*>(*it);
+    //        bundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
 
-        if(bundle)
-        {
-            bundleInteractor = dynamic_cast<mitk::FiberBundleInteractor*>(node->GetInteractor());
+    //        if(bundle)
+    //        {
+    //            bundleInteractor = dynamic_cast<mitk::FiberBundleInteractor*>(node->GetInteractor());
 
-            if(bundleInteractor.IsNotNull())
-                mitk::GlobalInteraction::GetInstance()->RemoveInteractor(bundleInteractor);
+    //            if(bundleInteractor.IsNotNull())
+    //                mitk::GlobalInteraction::GetInstance()->RemoveInteractor(bundleInteractor);
 
-            if(!m_Controls->m_Crosshair->isChecked())
-            {
-                m_Controls->m_Crosshair->setChecked(false);
-                this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::ArrowCursor);
-                m_CurrentPickingNode = 0;
-            }
-            else
-            {
-                m_Controls->m_Crosshair->setChecked(true);
-                bundleInteractor = mitk::FiberBundleInteractor::New("FiberBundleInteractor", node);
-                mitk::GlobalInteraction::GetInstance()->AddInteractor(bundleInteractor);
-                this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::CrossCursor);
-                m_CurrentPickingNode = node;
-            }
+    //            if(!m_Controls->m_Crosshair->isChecked())
+    //            {
+    //                m_Controls->m_Crosshair->setChecked(false);
+    //                this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::ArrowCursor);
+    //                m_CurrentPickingNode = 0;
+    //            }
+    //            else
+    //            {
+    //                m_Controls->m_Crosshair->setChecked(true);
+    //                bundleInteractor = mitk::FiberBundleInteractor::New("FiberBundleInteractor", node);
+    //                mitk::GlobalInteraction::GetInstance()->AddInteractor(bundleInteractor);
+    //                this->GetActiveStdMultiWidget()->GetRenderWindow4()->setCursor(Qt::CrossCursor);
+    //                m_CurrentPickingNode = node;
+    //            }
 
-        }
-    }
+    //        }
+    //    }
 }
 
 void QmitkControlVisualizationPropertiesView::TubeRadiusChanged()

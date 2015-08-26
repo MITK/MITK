@@ -94,14 +94,9 @@ public:
 
   // -------------------  mitk::ILinkedRenderWindowPart  ----------------------
 
-  mitk::SlicesRotator* GetSlicesRotator() const override;
-  mitk::SlicesSwiveller* GetSlicesSwiveller() const override;
-
   void EnableSlicingPlanes(bool enable) override;
   bool IsSlicingPlanesEnabled() const override;
 
-  void EnableLinkedNavigation(bool enable) override;
-  bool IsLinkedNavigationEnabled() const override;
 
 protected:
 

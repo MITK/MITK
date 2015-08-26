@@ -36,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTractsToDWIImageFilter.h>
 #include <mitkTensorImage.h>
 #include <mitkILinkedRenderWindowPart.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkImageToItk.h>
 #include <mitkImageCast.h>
 #include <mitkImageGenerator.h>
@@ -2628,33 +2627,12 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
 
 void QmitkFiberfoxView::EnableCrosshairNavigation()
 {
-    MITK_DEBUG << "EnableCrosshairNavigation";
-
-    // enable the crosshair navigation
-    if (mitk::ILinkedRenderWindowPart* linkedRenderWindow =
-            dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
-    {
-        MITK_DEBUG << "enabling linked navigation";
-        linkedRenderWindow->EnableLinkedNavigation(true);
-        //        linkedRenderWindow->EnableSlicingPlanes(true);
-    }
-
     if (m_Controls->m_RealTimeFibers->isChecked())
         GenerateFibers();
 }
 
 void QmitkFiberfoxView::DisableCrosshairNavigation()
 {
-    MITK_DEBUG << "DisableCrosshairNavigation";
-
-    // disable the crosshair navigation during the drawing
-    if (mitk::ILinkedRenderWindowPart* linkedRenderWindow =
-            dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
-    {
-        MITK_DEBUG << "disabling linked navigation";
-        linkedRenderWindow->EnableLinkedNavigation(false);
-        //        linkedRenderWindow->EnableSlicingPlanes(false);
-    }
 }
 
 void QmitkFiberfoxView::NodeRemoved(const mitk::DataNode* node)

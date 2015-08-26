@@ -22,9 +22,10 @@
 #include "mitkStateMachineTransition.h"
 #include "mitkStateMachineState.h"
 #include "mitkUndoController.h"
+#include "mitkApplicationCursor.h"
 
 mitk::EventStateMachine::EventStateMachine() :
-  m_IsActive(true), m_UndoController(NULL), m_StateMachineContainer(NULL),  m_CurrentState(NULL)
+  m_IsActive(true), m_UndoController(NULL), m_StateMachineContainer(NULL),  m_CurrentState(NULL), m_MouseCursorSet(false)
 {
   if (!m_UndoController)
   {
@@ -188,20 +189,20 @@ bool mitk::EventStateMachine::CheckCondition( const StateMachineCondition& condi
   return retVal;
 }
 
-bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, InteractionEvent* event)
+void mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, InteractionEvent* event)
 {
 
   if (action == NULL)
   {
-    return false;
+    return;
   }
 
-  bool retVal = false;
+
   // Maps Action-Name to Functor and executes the Functor.
   ActionDelegatesMapType::iterator delegateIter = m_ActionDelegatesMap.find(action->GetActionName());
   if (delegateIter != m_ActionDelegatesMap.end())
   {
-    retVal = delegateIter->second->Execute(action, event);
+    delegateIter->second->Execute(action, event);
   }
   else
   {
@@ -209,7 +210,7 @@ bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, Interact
     std::map<std::string, TActionFunctor*>::iterator functionIter = m_ActionFunctionsMap.find(action->GetActionName());
     if (functionIter != m_ActionFunctionsMap.end())
     {
-      retVal = functionIter->second->DoAction(action, event);
+      functionIter->second->DoAction(action, event);
     }
     else
     {
@@ -217,7 +218,6 @@ bool mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, Interact
     }
 
   }
-  return retVal;
 }
 
 mitk::StateMachineState* mitk::EventStateMachine::GetCurrentState() const
@@ -325,4 +325,27 @@ mitk::StateMachineTransition* mitk::EventStateMachine::GetExecutableTransition( 
 void mitk::EventStateMachine::ResetToStartState()
 {
   m_CurrentState = m_StateMachineContainer->GetStartState();
+}
+
+
+void mitk::EventStateMachine::SetMouseCursor(const char *xpm[], int hotspotX, int hotspotY)
+{
+  // Remove previously set mouse cursor
+  if ( m_MouseCursorSet )
+  {
+    ApplicationCursor::GetInstance()->PopCursor();
+  }
+
+  ApplicationCursor::GetInstance()->PushCursor( xpm, hotspotX, hotspotY );
+  m_MouseCursorSet = true;
+}
+
+
+void mitk::EventStateMachine::ResetMouseCursor()
+{
+  if ( m_MouseCursorSet )
+  {
+    ApplicationCursor::GetInstance()->PopCursor();
+    m_MouseCursorSet = false;
+  }
 }

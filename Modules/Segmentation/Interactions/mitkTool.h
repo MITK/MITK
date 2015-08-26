@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
-#include "mitkStateMachine.h"
 #include "mitkToolEvents.h"
 #include "itkObjectFactoryBase.h"
 #include "itkVersion.h"
@@ -195,14 +194,14 @@ namespace mitk
     void ConnectActionsAndFunctions() override;
 
     /**
-    \brief Called when the tool gets activated (registered to mitk::GlobalInteraction).
+    \brief Called when the tool gets activated.
 
     Derived tools should call their parents implementation.
     */
     virtual void Activated();
 
     /**
-    \brief Called when the tool gets deactivated (unregistered from mitk::GlobalInteraction).
+    \brief Called when the tool gets deactivated.
 
     Derived tools should call their parents implementation.
     */

@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
-#include "mitkGlobalInteraction.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkStandaloneDataStorage.h"
 #include "vtkRenderWindow.h"
@@ -184,11 +183,8 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
 
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
   mitk::StandaloneDataStorage::Pointer ds2 = mitk::StandaloneDataStorage::New();
-  mitk::GlobalInteraction::Pointer gi = mitk::GlobalInteraction::New();
-  gi->Initialize("global");
 
   myRenderingManager->SetDataStorage(ds);
-  myRenderingManager->SetGlobalInteraction(gi);
 
   vtkRenderWindow* vtkRenWin = vtkRenderWindow::New();
   mitk::VtkPropRenderer::Pointer br = mitk::VtkPropRenderer::New("testingBR", vtkRenWin, myRenderingManager);
@@ -196,8 +192,6 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
   mitk::BaseRenderer::AddInstance(vtkRenWin,br);
   myRenderingManager->AddRenderWindow(vtkRenWin);
 
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetDataStorage() == ds, "Testing the setter and getter for internal DataStorage")
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetGlobalInteraction() ==gi, "Testing the setter and getter for internal GlobalInteraction")
 
   MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds,"Testing if internal DataStorage has been set correctly for registered BaseRenderer")
   myRenderingManager->SetDataStorage(ds2);

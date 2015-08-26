@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTool.h"
 #include "mitkImage.h"
 
-#include "mitkStateEvent.h"
 #include "mitkInteractionPositionEvent.h"
 
 #include "mitkPlanePositionManager.h"

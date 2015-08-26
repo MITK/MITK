@@ -73,7 +73,7 @@ protected:
   //##
   //## These virtual functions allow for a different beahiour in subclasses.
   //## Do implement them in every subclass of BaseGeometry. If not needed, use {}.
-  //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: DisplayGeometry class
+  //## If this class is inherited from a subclass of BaseGeometry, call {Superclass::Pre...();};, example: SlicedGeometry3D class
   virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{};
 };
 

@@ -16,12 +16,10 @@
 
 #include "mitkStandaloneDataStorage.h"
 #include "mitkDataNode.h"
-#include "mitkInteractor.h"
 #include "mitkDataInteractor.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkBaseRenderer.h"
 #include "mitkTestingMacros.h"
-#include "mitkGlobalInteraction.h"
 #include "itkLightObject.h"
 #include "mitkDispatcher.h"
 
@@ -34,9 +32,6 @@ int mitkDispatcherTest(int /*argc*/, char* /*argv*/[])
    * Test checks if these Interactors are added to the Dispatcher under different conditions,
    * and in different call order.
    */
-
-  // Global interaction must(!) be initialized if used
-  mitk  ::GlobalInteraction::GetInstance()->Initialize("global");
 
   // Here BindDispatcherInteractor and Dispatcher should be created automatically
   vtkRenderWindow* renWin = vtkRenderWindow::New();

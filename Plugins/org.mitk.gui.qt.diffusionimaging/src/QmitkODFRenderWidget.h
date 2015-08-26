@@ -36,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSphereSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCamera.h>
-#include <mitkGlobalInteraction.h>
 
 class DIFFUSIONIMAGING_EXPORT QmitkODFRenderWidget : public QWidget
 {

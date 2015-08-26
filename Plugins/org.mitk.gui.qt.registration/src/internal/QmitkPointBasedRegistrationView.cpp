@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLandmarkWarping.h"
 #include <mitkPointOperation.h>
-#include <mitkPositionEvent.h>
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
 #include "mitkNodePredicateDataType.h"

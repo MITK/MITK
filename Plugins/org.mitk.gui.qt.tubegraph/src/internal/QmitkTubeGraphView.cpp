@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"
-#include "mitkGlobalInteraction.h"
 #include "mitkNodePredicateDataType.h"
 #include "usModuleRegistry.h"
 #include "QmitkTubeGraphLabelGroupWidget.h"
@@ -59,14 +58,9 @@ void QmitkTubeGraphView::CreateQtPartControl(QWidget *parent)
   this->CreateConnections();
 }
 
-void QmitkTubeGraphView::NodeRemoved(const mitk::DataNode* node)
+void QmitkTubeGraphView::NodeRemoved(const mitk::DataNode* /*node*/)
 {
-  if (dynamic_cast<mitk::TubeGraph*> (node->GetData()))
-  {
-    //node->GetDataInteractor()->RemoveAllObservers();
 
-    //mitk::GlobalInteraction::GetInstance()->RemoveInteractor(node->GetInteractor());
-  }
 }
 
 void QmitkTubeGraphView::CreateConnections()
@@ -169,10 +163,6 @@ void QmitkTubeGraphView::UpdateActiveTubeGraphInInteractors()
       tubeGraphInteractor->SetEventConfig("TubeGraphConfig.xml", us::ModuleRegistry::GetModule("MitkTubeGraph"));
       tubeGraphInteractor->SetActivationMode(m_ActivationMode);
       tubeGraphInteractor->SetDataNode(node);
-
-      /*node->SetInteractor( tubeGraphInteractor );
-      tubeGraphInteractor->SetCurrentSelectedDataNode(m_Controls.activeGraphComboBox->GetSelectedNode());
-      mitk::GlobalInteraction::GetInstance()->AddInteractor(tubeGraphInteractor);*/
     }
   }
 
@@ -506,12 +496,6 @@ void QmitkTubeGraphView::OnSeperateSelection()
     tubeGraphInteractor->LoadStateMachine("TubeGraphInteraction.xml", us::ModuleRegistry::GetModule("TubeGraph"));
     tubeGraphInteractor->SetEventConfig("TubeGraphConfig.xml", us::ModuleRegistry::GetModule("TubeGraph"));
     tubeGraphInteractor->SetDataNode(newGraphNode);
-
-    /* mitk::TubeGraphDataInteractor::Pointer tubeGraphInteractor = mitk::TubeGraphDataInteractor::New( "TubeGraphInteraction", newGraphNode );
-    newGraphNode->SetInteractor( tubeGraphInteractor );
-    tubeGraphInteractor->SetCurrentSelectedDataNode(m_Controls.activeGraphComboBox->GetSelectedNode());
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(tubeGraphInteractor);*/
-
 
     mitk::TubeGraphProperty::Pointer newProperty = mitk::TubeGraphProperty::New();
     subGraph->SetProperty("Tube Graph.Visualization Information",newProperty);

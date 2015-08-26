@@ -38,7 +38,7 @@ mitk::SinglePointDataInteractor::~SinglePointDataInteractor()
 
 }
 
-bool mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
+void mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
@@ -82,10 +82,7 @@ bool mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachin
 
     // Request update
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-
-    return true;
   }
-  return false;
 }
 
 

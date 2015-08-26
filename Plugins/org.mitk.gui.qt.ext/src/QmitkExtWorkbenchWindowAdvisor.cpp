@@ -867,13 +867,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
   mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());
 
-#ifdef __APPLE__
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  mainWindow->setUnifiedTitleAndToolBarOnMac(true);
-  // default is false
-#endif
-#endif
-
   auto   qStatusBar = new QStatusBar();
 
   //creating a QmitkStatusBar for Output on the QStatusBar and connecting it with the MainStatusBar

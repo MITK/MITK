@@ -39,7 +39,7 @@ bool ChangeLocale(const std::string& locale)
  }
   catch(...)
   {
-    MITK_TEST_OUTPUT(<< "Could not activate locale" << locale << "\n");
+    MITK_TEST_OUTPUT(<< "Could not activate locale " << locale << "\n");
     return false;
   }
 }
@@ -73,12 +73,10 @@ void WriterLocaleTest(mitk::Point3D & refPoint, std::string filename)
   refPointSet->InsertPoint(0,refPoint);
   //SetPoint(0, refPoint);
 
-  std::ofstream tmpStream;
-  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream);
+  std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile("testPointSet_XXXXXX.mps");
 
   // write point set
   mitk::IOUtil::Save(refPointSet, tmpFilePath);
-  tmpStream.close();
 
   std::ifstream stream(tmpFilePath.c_str());
 
@@ -110,16 +108,9 @@ void WriterLocaleTest(mitk::Point3D & refPoint, std::string filename)
 
 }
 
-int mitkPointSetLocaleTest(int argc, char* argv[])
+int mitkPointSetLocaleTest(int, char*[])
 {
   MITK_TEST_BEGIN("PointSetLocaleTest");
-
-  if (argc<2) {MITK_TEST_FAILED_MSG(<<"Error: test file name is needed as second argument.");}
-
-
-  std::string filename = argv[1];
-
-  MITK_INFO << filename;
 
   //create reference point set
   mitk::PointSet::Pointer refPointSet = mitk::PointSet::New();
@@ -147,6 +138,15 @@ int mitkPointSetLocaleTest(int argc, char* argv[])
   alllocales.push_back("C");
 #endif
 
+  // write a reference file using the "C" locale once
+  ChangeLocale("C");
+  std::string referenceFilePath = mitk::IOUtil::CreateTemporaryFile("refPointSet_XXXXXX.mps");
+  MITK_INFO << "Reference PointSet in " << referenceFilePath;
+
+  // write point set
+  mitk::IOUtil::Save(refPointSet, referenceFilePath);
+
+
   unsigned int numberOfTestedGermanLocales(0);
   for (StringList::iterator iter = alllocales.begin();
        iter != alllocales.end();
@@ -155,8 +155,8 @@ int mitkPointSetLocaleTest(int argc, char* argv[])
     if ( ChangeLocale(*iter) )
     {
      ++numberOfTestedGermanLocales;
-     WriterLocaleTest(refPoint,filename);
-     ReaderLocaleTest(refPoint,filename);
+     WriterLocaleTest(refPoint, referenceFilePath);
+     ReaderLocaleTest(refPoint, referenceFilePath);
     }
   }
 

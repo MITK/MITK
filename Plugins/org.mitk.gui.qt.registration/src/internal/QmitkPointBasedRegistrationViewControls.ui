@@ -606,8 +606,6 @@
  <includes>
   <include location="local">mitkDataNode.h</include>
   <include location="local">mitkPointSet.h</include>
-  <include location="local">mitkStateEvent.h</include>
-  <include location="local">mitkEventMapper.h</include>
   <include location="local">mitkInteractionConst.h</include>
   <include location="local">mitkBaseData.h</include>
  </includes>

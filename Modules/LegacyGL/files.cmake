@@ -6,10 +6,7 @@ set(H_FILES
 )
 
 set(CPP_FILES
-  mitkPlaneGeometryDataGLMapper2D.cpp
   mitkGLMapper.cpp
-  mitkPointSetGLMapper2D.cpp
-  mitkSurfaceGLMapper2D.cpp
   mitkVtkGLMapperWrapper.cpp
   vtkGLMapperProp.cpp
 )

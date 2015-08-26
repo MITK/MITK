@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFunctionality.h>
 #include <mitkWeakPointer.h>
 #include <mitkDataNode.h>
-#include <mitkInteractor.h>
 
 namespace Ui
 {
@@ -53,6 +52,5 @@ protected slots:
 protected:
   Ui::QmitkPointSetInteractionControls * m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedPointSetNode;
-  mitk::WeakPointer<mitk::Interactor> m_SelectedPointSetInteractor;
 };
 #endif // !defined(QmitkPointSetInteraction_H__INCLUDED)

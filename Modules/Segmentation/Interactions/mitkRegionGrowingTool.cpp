@@ -116,11 +116,11 @@ void mitk::RegionGrowingTool::Deactivated()
      3.2.2 Determine initial region growing parameters from the level window settings of the image
      3.2.3 Perform a region growing (which generates a new feedback contour)
  */
-bool mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return false;
+  if (!positionEvent) return;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
@@ -212,9 +212,7 @@ bool mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
       }
     }
   }
-
   MITK_DEBUG << "end OnMousePressed" << std::endl;
-  return true;
 }
 
 /**
@@ -286,7 +284,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside( StateMachineAction*, Interac
    3.2.2 Determine initial region growing parameters from the level window settings of the image
    3.2.3 Perform a region growing (which generates a new feedback contour)
 */
-bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in OnMousePressed
@@ -340,11 +338,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, Intera
         m_FillFeedbackContour = true;
       }
     }
-
-  return true;
   }
-
-  return false;
 }
 
 /**
@@ -352,7 +346,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside( StateMachineAction*, Intera
  1. Calculate the new thresholds from mouse position (relative to first position)
  2. Perform a new region growing and update the feedback contour
 */
-bool mitk::RegionGrowingTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::RegionGrowingTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   if ( m_ReferenceSlice.IsNotNull() && m_OriginalPicSlice )
   {
@@ -374,14 +368,12 @@ bool mitk::RegionGrowingTool::OnMouseMoved( StateMachineAction*, InteractionEven
       mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
     }
   }
-
-  return true;
 }
 
 /**
  If the feedback contour should be filled, then it is done here. (Contour is NOT filled, when skeletonization is done but no nice cut was found)
 */
-bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
   if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )
@@ -408,8 +400,6 @@ bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionE
           {
             FeedbackContourTool::FillContourInSlice( projectedContour, timestep, m_WorkingSlice, m_PaintingPixelValue );
 
-            //MITK_DEBUG << "OnMouseReleased: wri<<ting back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
-
             // 4. write working slice back into image volume
             this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
           }
@@ -424,8 +414,6 @@ bool mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionE
   m_ReferenceSlice = NULL; // don't leak
   m_WorkingSlice = NULL;
   m_OriginalPicSlice = NULL;
-
-  return true;
 }
 
 /**

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkContourMapper2D.h"
 #include "mitkCommon.h"
 #include "mitkStandaloneDataStorage.h"
-#include "mitkGlobalInteraction.h"
 
 #include "mitkVtkPropRenderer.h"
 
@@ -30,9 +29,6 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   mitk::Contour::Pointer contour;
   mitk::ContourMapper2D::Pointer contourMapper;
   mitk::DataNode::Pointer node;
-
-  // Global interaction must(!) be initialized if used
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   contourMapper = mitk::ContourMapper2D::New();
   node = mitk::DataNode::New();

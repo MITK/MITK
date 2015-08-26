@@ -108,11 +108,6 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
 
-  // Get display geometry
-  mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
-  assert( displayGeometry != NULL );
-
-
   // Apply visual appearance properties from the PropertyList
   ApplyColorAndOpacityProperties( renderer );
 
@@ -139,7 +134,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   mitk::Point2D anchorPoint; anchorPoint[0] = 0; anchorPoint[1] = 1;
 
   // render the actual lines of the PlanarFigure
-  RenderLines(lineDisplayMode, planarFigure, anchorPoint, planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry);
+  RenderLines(lineDisplayMode, planarFigure, anchorPoint, planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);
 
   // position-offset of the annotations, is set in RenderAnnotations() and
   // used in RenderQuantities()
@@ -159,7 +154,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   if ( m_DrawControlPoints )
   {
     // draw the control-points
-    RenderControlPoints(planarFigure, lineDisplayMode, planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry);
+    RenderControlPoints(planarFigure, lineDisplayMode, planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);
   }
 
   // draw feature quantities (if requested) next to the anchor point,
@@ -179,7 +174,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   Point2D& anchorPoint,
   const PlaneGeometry* planarFigurePlaneGeometry,
   const PlaneGeometry* rendererPlaneGeometry,
-  const DisplayGeometry* displayGeometry)
+  const mitk::BaseRenderer * renderer)
 {
   mitk::Point2D rightMostPoint;
   rightMostPoint.Fill( itk::NumericTraits<float>::min() );
@@ -191,7 +186,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
     // Draw this 2D point as OpenGL vertex
     mitk::Point2D displayPoint;
     this->TransformObjectToDisplay( *iter, displayPoint,
-      planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry );
+      planarFigurePlaneGeometry, rendererPlaneGeometry, renderer );
 
     pointlist.push_back(displayPoint);
 
@@ -206,7 +201,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
   {
     mitk::Point2D displayPoint;
     this->TransformObjectToDisplay( vertices.begin()[0], displayPoint,
-      planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry );
+      planarFigurePlaneGeometry, rendererPlaneGeometry, renderer );
 
     pointlist.push_back( displayPoint );
   }
@@ -230,7 +225,7 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
   Point2D& anchorPoint,
   const PlaneGeometry* planarFigurePlaneGeometry,
   const PlaneGeometry* rendererPlaneGeometry,
-  const DisplayGeometry* displayGeometry)
+  const mitk::BaseRenderer * renderer)
 {
   unsigned short numberOfPolyLines = figure->GetPolyLinesSize();
   for ( unsigned short loop=0; loop<numberOfPolyLines ; ++loop )
@@ -240,7 +235,7 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
     this->PaintPolyLine( polyline,
       figure->IsClosed(),
       anchorPoint, planarFigurePlaneGeometry,
-      rendererPlaneGeometry, displayGeometry );
+      rendererPlaneGeometry, renderer );
   }
 }
 
@@ -249,7 +244,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
   Point2D& anchorPoint,
   const PlaneGeometry* planarFigurePlaneGeometry,
   const PlaneGeometry* rendererPlaneGeometry,
-  const DisplayGeometry* displayGeometry)
+  const mitk::BaseRenderer * renderer)
 {
   unsigned short numberOfHelperPolyLines = figure->GetHelperPolyLinesSize();
 
@@ -257,8 +252,8 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
   for ( unsigned int loop=0; loop<numberOfHelperPolyLines; ++loop )
   {
     const mitk::PlanarFigure::PolyLineType helperPolyLine = figure->GetHelperPolyLine(loop,
-      displayGeometry->GetScaleFactorMMPerDisplayUnit(),
-      displayGeometry->GetDisplayHeight() );
+      renderer->GetScaleFactorMMPerDisplayUnit(),
+      renderer->GetViewportSize()[1] );
 
     // Check if the current helper objects is to be painted
     if ( !figure->IsHelperToBePainted( loop ) )
@@ -269,7 +264,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
     // ... and once normally above the shadow.
     this->PaintPolyLine( helperPolyLine, false,
       anchorPoint, planarFigurePlaneGeometry,
-      rendererPlaneGeometry, displayGeometry );
+      rendererPlaneGeometry, renderer );
   }
 }
 
@@ -279,8 +274,8 @@ void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
   const mitk::Point2D &point2D,
   mitk::Point2D &displayPoint,
   const mitk::PlaneGeometry *objectGeometry,
-  const mitk::PlaneGeometry *rendererGeometry,
-  const mitk::DisplayGeometry *displayGeometry )
+  const mitk::PlaneGeometry * /*rendererGeometry*/,
+  const mitk::BaseRenderer * renderer)
 {
   mitk::Point3D point3D;
 
@@ -288,8 +283,7 @@ void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
   objectGeometry->Map( point2D, point3D );
 
   // Project 3D world point onto display geometry
-  rendererGeometry->Map( point3D, displayPoint );
-  displayGeometry->WorldToDisplay( displayPoint, displayPoint );
+  renderer->WorldToDisplay( point3D, displayPoint );
 }
 
 
@@ -303,7 +297,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
   PlanarFigureControlPointStyleProperty::Shape shape,
   const mitk::PlaneGeometry *objectGeometry,
   const mitk::PlaneGeometry *rendererGeometry,
-  const mitk::DisplayGeometry *displayGeometry )
+  const mitk::BaseRenderer * renderer)
 {
   mitk::Point2D displayPoint;
 
@@ -312,7 +306,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
 
   this->TransformObjectToDisplay(
     point, displayPoint,
-    objectGeometry, rendererGeometry, displayGeometry );
+    objectGeometry, rendererGeometry, renderer );
 
   glColor4f( markerColor[0], markerColor[1], markerColor[2], markerOpacity );
   glLineWidth( lineWidth );
@@ -607,7 +601,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints( mitk::PlanarFigure * plana
                                                       PlanarFigureDisplayMode lineDisplayMode,
                                                       mitk::PlaneGeometry * planarFigurePlaneGeometry,
                                                       const mitk::PlaneGeometry * rendererPlaneGeometry,
-                                                      mitk::DisplayGeometry * displayGeometry )
+                                                      mitk::BaseRenderer * renderer)
 {
   bool isEditable = true;
   m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
@@ -654,7 +648,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints( mitk::PlanarFigure * plana
         m_ControlPointShape,
         planarFigurePlaneGeometry,
         rendererPlaneGeometry,
-        displayGeometry );
+        renderer );
     }
 
     this->DrawMarker( planarFigure->GetControlPoint( i ),
@@ -666,7 +660,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints( mitk::PlanarFigure * plana
       m_ControlPointShape,
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
-      displayGeometry );
+      renderer );
   }
 
   if ( planarFigure->IsPreviewControlPointVisible() )
@@ -680,7 +674,7 @@ void mitk::PlanarFigureMapper2D::RenderControlPoints( mitk::PlanarFigure * plana
       m_ControlPointShape,
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
-      displayGeometry
+      renderer
       );
   }
 }
@@ -766,7 +760,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
                                               mitk::Point2D &anchorPoint,
                                               mitk::PlaneGeometry * planarFigurePlaneGeometry,
                                               const mitk::PlaneGeometry * rendererPlaneGeometry,
-                                              mitk::DisplayGeometry * displayGeometry )
+                                              mitk::BaseRenderer * renderer)
 {
   glLineStipple(1, 0x00FF);
 
@@ -797,7 +791,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
                          anchorPoint,
                          planarFigurePlaneGeometry,
                          rendererPlaneGeometry,
-                         displayGeometry );
+                         renderer );
 
     glLineWidth( m_HelperlineWidth );
 
@@ -811,7 +805,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
                            anchorPoint,
                            planarFigurePlaneGeometry,
                            rendererPlaneGeometry,
-                           displayGeometry );
+                           renderer );
 
     // cleanup
     delete[] colorVector;
@@ -847,7 +841,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
                          anchorPoint,
                          planarFigurePlaneGeometry,
                          rendererPlaneGeometry,
-                         displayGeometry );
+                         renderer );
 
     glLineWidth( m_HelperlineWidth );
 
@@ -861,7 +855,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
                            anchorPoint,
                            planarFigurePlaneGeometry,
                            rendererPlaneGeometry,
-                           displayGeometry );
+                           renderer );
 
     // cleanup
     delete[] shadow;
@@ -893,7 +887,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
       anchorPoint,
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
-      displayGeometry );
+      renderer );
 
 
     float* helperColor = m_HelperlineColor[lineDisplayMode];
@@ -920,7 +914,7 @@ void mitk::PlanarFigureMapper2D::RenderLines( PlanarFigureDisplayMode lineDispla
       anchorPoint,
       planarFigurePlaneGeometry,
       rendererPlaneGeometry,
-      displayGeometry );
+      renderer );
 
     // cleanup
     delete[] colorVector;

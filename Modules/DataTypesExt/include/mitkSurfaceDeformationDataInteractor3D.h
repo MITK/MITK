@@ -55,11 +55,11 @@ protected:
     * Initializes the movement, stores starting position.
     */
   virtual bool CheckOverObject (const InteractionEvent*);
-  virtual bool SelectObject (StateMachineAction*, InteractionEvent*);
-  virtual bool DeselectObject (StateMachineAction*, InteractionEvent*);
-  virtual bool InitDeformation (StateMachineAction*, InteractionEvent*);
-  virtual bool DeformObject (StateMachineAction*, InteractionEvent*);
-  virtual bool ScaleRadius (StateMachineAction*, InteractionEvent*);
+  virtual void SelectObject (StateMachineAction*, InteractionEvent*);
+  virtual void DeselectObject (StateMachineAction*, InteractionEvent*);
+  virtual void InitDeformation (StateMachineAction*, InteractionEvent*);
+  virtual void DeformObject (StateMachineAction*, InteractionEvent*);
+  virtual void ScaleRadius (StateMachineAction*, InteractionEvent*);
 
   enum
   {
@@ -69,7 +69,7 @@ protected:
 
  private:
 
-  bool ColorizeSurface(vtkPolyData* polyData, int timeStep, const Point3D& pickedPoint, int mode, double scalar = 0.0);
+  void ColorizeSurface(vtkPolyData* polyData, int timeStep, const Point3D& pickedPoint, int mode, double scalar = 0.0);
 
   double m_InitialPickedWorldPoint[4];
   Point3D m_InitialPickedPoint;

@@ -81,7 +81,7 @@ namespace mitk {
 
     /* destructor */
     virtual ~VtkGLMapperWrapper();
-    void Enable2DOpenGL(mitk::BaseRenderer *renderer);
+    void Enable2DOpenGL(mitk::BaseRenderer *);
     void Disable2DOpenGL();
   };
 

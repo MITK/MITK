@@ -152,7 +152,7 @@ void mitk::EventConfigPrivate::InsertMapping(const EventMapping& mapping)
 void mitk::EventConfigPrivate::CopyMapping( const EventListType eventList )
 {
   EventListType::const_iterator iter;
-  for( iter=eventList.begin(); iter!=eventList.end(); iter++ )
+  for( iter=eventList.begin(); iter!=eventList.end(); ++iter )
   {
     InsertMapping( *(iter) );
   }

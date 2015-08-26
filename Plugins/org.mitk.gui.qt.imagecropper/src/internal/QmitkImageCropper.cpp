@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCone.h>
 #include <mitkRenderingManager.h>
 #include <mitkProperties.h>
-#include <mitkGlobalInteraction.h>
 #include "mitkUndoController.h"
 #include "mitkBoundingObjectCutter.h"
 #include "mitkImageAccessByItk.h"
@@ -40,6 +39,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 
 #include <itkCommand.h>
+
+//micro services
+#include <usModuleRegistry.h>
+#include <usGetModuleContext.h>
 
 //to be moved to mitkInteractionConst.h by StateMachineEditor
 const mitk::OperationType QmitkImageCropper::OP_EXCHANGE = 717;
@@ -356,7 +359,12 @@ void QmitkImageCropper::CreateBoundingObject()
   m_CroppingObjectNode->SetProperty( "layer", mitk::IntProperty::New(99) ); // arbitrary, copied from segmentation functionality
   m_CroppingObjectNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
 
-  m_AffineInteractor = mitk::AffineInteractor::New("AffineInteractions ctrl-drag", m_CroppingObjectNode);
+  mitk::AffineBaseDataInteractor3D::Pointer affineDataInteractor = mitk::AffineBaseDataInteractor3D::New();
+  affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+  affineDataInteractor->SetEventConfig("AffineMouseConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
+  affineDataInteractor->SetDataNode(m_CroppingObjectNode);
+  m_CroppingObjectNode->SetBoolProperty("pickable", true);
+
 }
 
 void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
@@ -407,7 +415,7 @@ void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node, bool fit)
       m_CroppingObject->FitGeometry(m_ImageToCrop->GetGeometry());
     }
 
-    mitk::GlobalInteraction::GetInstance()->AddInteractor( m_AffineInteractor );
+    //mitk::GlobalInteraction::GetInstance()->AddInteractor( m_AffineInteractor );
   }
   m_CroppingObjectNode->SetVisibility(true);
 }
@@ -419,7 +427,7 @@ void QmitkImageCropper::RemoveBoundingObjectFromNode()
     if(this->GetDefaultDataStorage()->Exists(m_CroppingObjectNode))
     {
       this->GetDefaultDataStorage()->Remove(m_CroppingObjectNode);
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
+      //mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
       m_CroppingObject = NULL;
     }
     m_Controls->m_BoxButton->setText("New bounding box!");

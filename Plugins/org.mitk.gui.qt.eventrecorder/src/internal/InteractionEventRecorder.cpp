@@ -48,7 +48,11 @@ void InteractionEventRecorder::SetFocus()
 
 void InteractionEventRecorder::StartRecording()
 {
+
   MITK_INFO << "Start Recording";
+  MITK_INFO << "Performing Reinit";
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
+
   m_CurrentObserver->SetOutputFile(m_Controls.textFileName->text().toStdString());
   m_CurrentObserver->StartRecording();
 }
@@ -78,9 +82,53 @@ void InteractionEventRecorder::Play()
 void InteractionEventRecorder::OpenFile()
 {
   QString fn = QFileDialog::getOpenFileName(NULL, "Open File...",
-                                                QString(), "All Files (*)");
-      if (!fn.isEmpty())
-        this->m_Controls.textFileName->setText(fn);
+                                            QString(), "All Files (*)");
+  if (!fn.isEmpty())
+    this->m_Controls.textFileName->setText(fn);
+}
+
+void InteractionEventRecorder::RotatePlanes()
+{
+  mitk::Point3D center;
+  center.Fill(0);
+  mitk::Vector3D firstVec;
+  mitk::Vector3D secondVec;
+
+  firstVec[0] = 1.0;
+  firstVec[1] = .5;
+  firstVec[2] = .25;
+
+  secondVec[0] = 1;
+  secondVec[1] = .25;
+  secondVec[2] = 1;
+
+  // Rotate Planes to a predefined state which can later be used again in tests
+  this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->ReorientSlices( center, firstVec,secondVec );
+  this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer()->RequestUpdate();
+
+}
+
+void InteractionEventRecorder::RotateView()
+{
+  // Rotate the view in 3D to a predefined state which can later be used again in tests
+  // this simulates a prior VTK Interaction
+
+  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
+
+  if (renderWindow == NULL)
+    return;
+
+  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
+
+  if (stepper == NULL)
+    return;
+
+  unsigned int newPos = 17;
+
+
+  stepper->SetPos(newPos);
+
+  this->GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderer()->RequestUpdate();
 }
 
 void InteractionEventRecorder::CreateQtPartControl( QWidget *parent )
@@ -91,6 +139,8 @@ void InteractionEventRecorder::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.btnStartRecording, SIGNAL(clicked()), this, SLOT(StartRecording()) );
   connect( m_Controls.btnPlay, SIGNAL(clicked()), this, SLOT(Play()) );
   connect( m_Controls.btnOpenFile, SIGNAL(clicked()), this, SLOT(OpenFile()) );
+  connect( m_Controls.rotatePlanes, SIGNAL(clicked()), this, SLOT(RotatePlanes()) );
+  connect( m_Controls.rotate3D, SIGNAL(clicked()), this, SLOT(RotateView()) );
 
   m_CurrentObserver = new mitk::EventRecorder();
   // Register as listener via micro services

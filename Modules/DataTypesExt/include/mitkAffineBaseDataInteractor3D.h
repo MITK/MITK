@@ -23,6 +23,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+////create events for interactions
+#pragma GCC visibility push(default)
+itkEventMacro(AffineInteractionEvent, itk::AnyEvent)
+itkEventMacro(ScaleEvent, AffineInteractionEvent)
+itkEventMacro(RotateEvent, AffineInteractionEvent)
+itkEventMacro(TranslateEvent, AffineInteractionEvent)
+#pragma GCC visibility pop
+
 /**
   * \brief Affine interaction with mitk::BaseGeometry.
   *
@@ -60,29 +69,29 @@ protected:
     * Initializes the movement, stores starting position.
     */
   virtual bool CheckOverObject (const InteractionEvent*);
-  virtual bool SelectObject (StateMachineAction*, InteractionEvent*);
-  virtual bool DeselectObject (StateMachineAction*, InteractionEvent*);
-  virtual bool InitTranslate (StateMachineAction*, InteractionEvent*);
-  virtual bool InitRotate (StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateObject (StateMachineAction*, InteractionEvent*);
-  virtual bool RotateObject (StateMachineAction*, InteractionEvent*);
-  virtual bool ScaleObject(StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateUpKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool TranslateDownKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool TranslateLeftKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool TranslateRightKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool TranslateUpModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool TranslateDownModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void SelectObject (StateMachineAction*, InteractionEvent*);
+  virtual void DeselectObject (StateMachineAction*, InteractionEvent*);
+  virtual void InitTranslate (StateMachineAction*, InteractionEvent*);
+  virtual void InitRotate (StateMachineAction*, InteractionEvent*);
+  virtual void TranslateObject (StateMachineAction*, InteractionEvent*);
+  virtual void RotateObject (StateMachineAction*, InteractionEvent*);
+  virtual void ScaleObject(StateMachineAction*, InteractionEvent*);
+  virtual void TranslateUpKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void TranslateDownKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void TranslateLeftKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void TranslateRightKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void TranslateUpModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void TranslateDownModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  virtual bool RotateUpKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool RotateDownKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool RotateLeftKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool RotateRightKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool RotateUpModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
-  virtual bool RotateDownModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void RotateUpKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void RotateDownKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void RotateLeftKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void RotateRightKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void RotateUpModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
+  virtual void RotateDownModifierKey(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  virtual bool ScaleDownKey(mitk::StateMachineAction *, mitk::InteractionEvent* interactionEvent);
-  virtual bool ScaleUpKey(mitk::StateMachineAction *, mitk::InteractionEvent* interactionEvent);
+  virtual void ScaleDownKey(mitk::StateMachineAction *, mitk::InteractionEvent* interactionEvent);
+  virtual void ScaleUpKey(mitk::StateMachineAction *, mitk::InteractionEvent* interactionEvent);
 
 
   virtual void RestoreNodeProperties();

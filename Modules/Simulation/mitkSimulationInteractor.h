@@ -40,10 +40,10 @@ namespace mitk
     ~SimulationInteractor();
 
     void StartInteraction(const std::string& type, InteractionPositionEvent* event);
-    bool StartPrimaryInteraction(StateMachineAction* action, InteractionEvent* event);
-    bool StartSecondaryInteraction(StateMachineAction* action, InteractionEvent* event);
-    bool ExecuteInteraction(StateMachineAction* action, InteractionEvent* event);
-    bool StopInteraction(StateMachineAction* action, InteractionEvent* event);
+    void StartPrimaryInteraction(StateMachineAction* action, InteractionEvent* event);
+    void StartSecondaryInteraction(StateMachineAction* action, InteractionEvent* event);
+    void ExecuteInteraction(StateMachineAction* action, InteractionEvent* event);
+    void StopInteraction(StateMachineAction* action, InteractionEvent* event);
     bool IsInteractionPerformerNotNull(const InteractionEvent* event);
 
     class Impl;

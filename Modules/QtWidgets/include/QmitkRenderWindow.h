@@ -101,8 +101,6 @@ protected:
   virtual void moveEvent(QMoveEvent* event) override;
   // overloaded show handler
   void showEvent(QShowEvent* event) override;
-  // overloaded resize handler
-  virtual void resizeEvent(QResizeEvent* event) override;
   // overloaded paint handler
   virtual void paintEvent(QPaintEvent* event) override;
   // overloaded mouse press handler
@@ -142,8 +140,6 @@ signals:
   void SignalLayoutDesignChanged(int layoutDesignIndex);
 
   void moved();
-
-  void resized();
 
   /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
   void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode*> nodes);

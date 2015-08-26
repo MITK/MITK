@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 #include "QmitkPointListWidget.h"
-#include <mitkGlobalInteraction.h>
 
 #include <QHBoxLayout>
 #include <QFileDialog>

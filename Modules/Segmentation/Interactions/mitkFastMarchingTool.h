@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
 #include "mitkToolCommand.h"
-#include "mitkPositionEvent.h"
 
 #include "mitkMessage.h"
 
@@ -133,10 +132,10 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual void BuildITKPipeline();
 
     /// \brief Add point action of StateMachine pattern
-    virtual bool OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Delete action of StateMachine pattern
-    virtual bool OnDelete ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnDelete ( StateMachineAction*, InteractionEvent* interactionEvent );
 
     /// \brief Reset all relevant inputs of the itk pipeline.
     void Reset();

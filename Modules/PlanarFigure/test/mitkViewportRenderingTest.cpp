@@ -110,19 +110,17 @@ int mitkViewportRenderingTest(int argc, char* argv[]) {
     MITK_INFO << "Image dimension "<<imageWidth<<"x"<<imageHeight;
   }
 
-  mitk::RenderingManager::GetInstance()->InitializeViews( renderingHelper.GetDataStorage()->ComputeBoundingGeometry3D( images ) );
-
   double vLeft = left / renderWindowWidth;
   double vBottom = bottom / renderWindowHeight;
   double vRight = right / renderWindowWidth;
   double vTop = top / renderWindowHeight;
-
   // THIS HERE IS THE ACTUAL TEST PART, all the rest is setup and decoration
-  renderingHelper.GetVtkRenderer()->SetViewport( vLeft, vBottom, vRight, vTop );
 
+  mitk::RenderingManager::GetInstance()->InitializeViews( renderingHelper.GetDataStorage()->ComputeBoundingGeometry3D( images ) );
+
+  renderingHelper.GetVtkRenderer()->SetViewport( vLeft, vBottom, vRight, vTop );
   renderingHelper.SetAutomaticallyCloseRenderWindow(true); // set to false for testing the test itself
   renderingHelper.Render();
-
   //use this to generate a reference screenshot or save the file:
   bool generateReferenceScreenshot = false;
   if(generateReferenceScreenshot)

@@ -49,7 +49,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataNodeObject.h"
 #include "mitkNodePredicateData.h"
 #include "mitkPlanarFigureInteractor.h"
-#include "mitkGlobalInteraction.h"
 #include "mitkTensorImage.h"
 #include "mitkPlanarCircle.h"
 #include "mitkPlanarRectangle.h"
@@ -2137,10 +2136,6 @@ void QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage(const mitk::DataNode
         // remove uninitialized old planars
         if( m_SelectedPlanarFigureNodes->GetNode().IsNotNull() && m_CurrentFigureNodeInitialized == false )
         {
-            mitk::Interactor::Pointer oldInteractor = m_SelectedPlanarFigureNodes->GetNode()->GetInteractor();
-            if(oldInteractor.IsNotNull())
-                mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
-
             this->GetDataStorage()->Remove(m_SelectedPlanarFigureNodes->GetNode());
         }
 

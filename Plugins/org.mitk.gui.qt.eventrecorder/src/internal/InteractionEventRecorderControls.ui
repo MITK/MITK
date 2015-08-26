@@ -77,7 +77,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../../../../../bin/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_qt_eventrecorder_cached.qrc">
+        <iconset resource="../../../../../bin-MITK/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_qt_eventrecorder_cached.qrc">
          <normaloff>:/org.mitk.gui.qt.eventrecorder/resources/rec.png</normaloff>:/org.mitk.gui.qt.eventrecorder/resources/rec.png</iconset>
        </property>
       </widget>
@@ -107,7 +107,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../../../../../bin/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_qt_eventrecorder_cached.qrc">
+        <iconset resource="../../../../../bin-MITK/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_qt_eventrecorder_cached.qrc">
          <normaloff>:/org.mitk.gui.qt.eventrecorder/resources/stop_rec.png</normaloff>:/org.mitk.gui.qt.eventrecorder/resources/stop_rec.png</iconset>
        </property>
       </widget>
@@ -137,7 +137,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../../../../../bin/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_qt_eventrecorder_cached.qrc">
+        <iconset resource="../../../../../bin-MITK/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_qt_eventrecorder_cached.qrc">
          <normaloff>:/org.mitk.gui.qt.eventrecorder/resources/play.png</normaloff>:/org.mitk.gui.qt.eventrecorder/resources/play.png</iconset>
        </property>
       </widget>
@@ -156,6 +156,20 @@
       </spacer>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="rotate3D">
+     <property name="text">
+      <string>Rotate 3D View</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="rotatePlanes">
+     <property name="text">
+      <string>Rotated Planes</string>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="spacer1">
@@ -177,7 +191,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../../../../../bin/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_qt_eventrecorder_cached.qrc"/>
+  <include location="../../../../../bin-MITK/MITK-build/Plugins/org.mitk.gui.qt.eventrecorder/org_mitk_gui_qt_eventrecorder_cached.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -19,8 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkRenderWindow.h>
 
 #include <mitkInteractionConst.h>
-#include <mitkPositionEvent.h>
-#include <mitkStateEvent.h>
 #include <ctkServiceTracker.h>
 #include <berryIBerryPreferences.h>
 #include <mitkIRenderingManager.h>
@@ -122,23 +120,6 @@ mitk::Point3D SimpleRenderWindowView::GetSelectedPosition(const QString & /*id*/
 
 void SimpleRenderWindowView::SetSelectedPosition(const mitk::Point3D &pos, const QString &/*id*/)
 {
-  // create a PositionEvent with the given position and
-  // tell the slice navigation controller to move there
-
-  mitk::Point2D p2d;
-  mitk::PositionEvent event( m_RenderWindow->GetRenderer(), 0, 0, 0,
-                             mitk::Key_unknown, p2d, pos );
-  mitk::StateEvent stateEvent(mitk::EIDLEFTMOUSEBTN, &event);
-  mitk::StateEvent stateEvent2(mitk::EIDLEFTMOUSERELEASE, &event);
-
-  m_RenderWindow->GetSliceNavigationController()->HandleEvent( &stateEvent );
-
-  // just in case SNCs will develop something that depends on the mouse
-  // button being released again
-  m_RenderWindow->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
-
-  // update displays
-  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void SimpleRenderWindowView::EnableDecorations(bool enable, const QStringList &decorations)

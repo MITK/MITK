@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkToolManager.h"
-#include "mitkGlobalInteraction.h"
 #include "mitkCoreObjectFactory.h"
 
 #include <itkObjectFactoryBase.h>
@@ -31,11 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 
 mitk::ToolManager::ToolManager(DataStorage* storage)
-:m_ActiveTool(NULL),
- m_ActiveToolID(-1),
- m_RegisteredClients(0),
- m_DataStorage(storage),
- m_ExclusiveStateEventPolicy(true)
+  :m_ActiveTool(NULL),
+    m_ActiveToolID(-1),
+    m_RegisteredClients(0),
+    m_DataStorage(storage)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
   this->InitializeTools();
@@ -49,13 +47,12 @@ mitk::ToolManager::~ToolManager()
 
   if(this->GetDataStorage() != NULL)
     this->GetDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<ToolManager, const mitk::DataNode*>
-        ( this, &ToolManager::OnNodeRemoved ));
+                                                            ( this, &ToolManager::OnNodeRemoved ));
 
   if (m_ActiveTool)
   {
     m_ActiveTool->Deactivated();
     m_ActiveToolRegistration.Unregister();
-    //GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
 
     m_ActiveTool = NULL;
     m_ActiveToolID = -1; // no tool active
@@ -72,25 +69,23 @@ mitk::ToolManager::~ToolManager()
 
 void mitk::ToolManager::InitializeTools()
 {
-  if(mitk::GlobalInteraction::GetInstance()->IsInitialized())
-  {
-    m_Tools.resize(0);
-    // get a list of all known mitk::Tools
-    std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
 
-    // remember these tools
-    for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatClaimToBeATool.begin();
-      iter != thingsThatClaimToBeATool.end();
-      ++iter )
+  m_Tools.resize(0);
+  // get a list of all known mitk::Tools
+  std::list<itk::LightObject::Pointer> thingsThatClaimToBeATool = itk::ObjectFactoryBase::CreateAllInstance("mitkTool");
+
+  // remember these tools
+  for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatClaimToBeATool.begin();
+        iter != thingsThatClaimToBeATool.end();
+        ++iter )
+  {
+    if ( Tool* tool = dynamic_cast<Tool*>( iter->GetPointer() ) )
     {
-      if ( Tool* tool = dynamic_cast<Tool*>( iter->GetPointer() ) )
-      {
-        tool->InitializeStateMachine();
-        tool->SetToolManager(this); // important to call right after instantiation
-        tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnToolErrorMessage );
-        tool->GeneralMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
-        m_Tools.push_back( tool );
-      }
+      tool->InitializeStateMachine();
+      tool->SetToolManager(this); // important to call right after instantiation
+      tool->ErrorMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnToolErrorMessage );
+      tool->GeneralMessage += MessageDelegate1<mitk::ToolManager, std::string>( this, &ToolManager::OnGeneralToolMessage );
+      m_Tools.push_back( tool );
     }
   }
 }
@@ -112,8 +107,8 @@ const mitk::ToolManager::ToolVectorTypeConst mitk::ToolManager::GetTools()
   ToolVectorTypeConst resultList;
 
   for ( ToolVectorType::iterator iter = m_Tools.begin();
-    iter != m_Tools.end();
-    ++iter )
+        iter != m_Tools.end();
+        ++iter )
   {
     resultList.push_back( iter->GetPointer() );
   }
@@ -139,10 +134,10 @@ bool mitk::ToolManager::ActivateTool(int id)
     return false;
 
   if(this->GetDataStorage())
-    {
-      this->GetDataStorage()->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<ToolManager, const mitk::DataNode*>
-        ( this, &ToolManager::OnNodeRemoved ) );
-    }
+  {
+    this->GetDataStorage()->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<ToolManager, const mitk::DataNode*>
+                                                         ( this, &ToolManager::OnNodeRemoved ) );
+  }
 
   //MITK_INFO << "ToolManager::ActivateTool("<<id<<")"<<std::endl;
   //if( GetToolById(id) == NULL ) return false; // NO, invalid IDs are actually used here. Parameter -1 or anything that does not exists will deactivate all tools!
@@ -150,25 +145,23 @@ bool mitk::ToolManager::ActivateTool(int id)
   //If a tool is deactivated set the event notification policy of the global interaction to multiple again
   if (id == -1)
   {
-    GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_MULTIPLE);
-
-        // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
-        // in new interaction framework
-        for (std::map<us::ServiceReferenceU, EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();
-             it != m_DisplayInteractorConfigs.end(); ++it)
+    // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
+    // in new interaction framework
+    for (std::map<us::ServiceReferenceU, EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();
+         it != m_DisplayInteractorConfigs.end(); ++it)
+    {
+      if (it->first)
+      {
+        DisplayInteractor* displayInteractor = static_cast<DisplayInteractor*>(
+              us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+        if (displayInteractor != NULL)
         {
-          if (it->first)
-          {
-            DisplayInteractor* displayInteractor = static_cast<DisplayInteractor*>(
-                                                     us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
-            if (displayInteractor != NULL)
-            {
-              // here the regular configuration is loaded again
-              displayInteractor->SetEventConfig(it->second);
-            }
-          }
+          // here the regular configuration is loaded again
+          displayInteractor->SetEventConfig(it->second);
         }
-        m_DisplayInteractorConfigs.clear();
+      }
+    }
+    m_DisplayInteractorConfigs.clear();
   }
 
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
@@ -191,7 +184,6 @@ bool mitk::ToolManager::ActivateTool(int id)
     if (m_ActiveTool)
     {
       m_ActiveTool->Deactivated();
-      //GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
       m_ActiveToolRegistration.Unregister();
     }
 
@@ -205,29 +197,26 @@ bool mitk::ToolManager::ActivateTool(int id)
       if (m_RegisteredClients > 0)
       {
         m_ActiveTool->Activated();
-        //GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
         m_ActiveToolRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>( m_ActiveTool, us::ServiceProperties() );
         //If a tool is activated set event notification policy to one
-        if (m_ExclusiveStateEventPolicy && dynamic_cast<mitk::SegTool2D*>(m_ActiveTool))
-          GlobalInteraction::GetInstance()->SetEventNotificationPolicy(GlobalInteraction::INFORM_ONE);
 
 
-                // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts with tools
-                // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
-                m_DisplayInteractorConfigs.clear();
-                std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver = us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
-                for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
-                {
-                  DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(
-                                                                  us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
-                  if (displayInteractor != NULL)
-                  {
-                    // remember the original configuration
-                    m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
-                    // here the alternative configuration is loaded
-                    displayInteractor->SetEventConfig("DisplayConfigMITK.xml");
-                  }
-                }
+        // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts with tools
+        // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
+        m_DisplayInteractorConfigs.clear();
+        std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver = us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
+        for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+        {
+          DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(
+                us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
+          if (displayInteractor != NULL)
+          {
+            // remember the original configuration
+            m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
+            // here the alternative configuration is loaded
+            displayInteractor->SetEventConfig("DisplayConfigMITKNoCrosshair.xml");
+          }
+        }
       }
     }
   }
@@ -544,7 +533,6 @@ void mitk::ToolManager::RegisterClient()
     if ( m_ActiveTool )
     {
       m_ActiveTool->Activated();
-      //GlobalInteraction::GetInstance()->AddListener( m_ActiveTool );
       m_ActiveToolRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>( m_ActiveTool, us::ServiceProperties() );
     }
   }
@@ -561,7 +549,6 @@ void mitk::ToolManager::UnregisterClient()
     if ( m_ActiveTool )
     {
       m_ActiveTool->Deactivated();
-      //GlobalInteraction::GetInstance()->RemoveListener( m_ActiveTool );
       m_ActiveToolRegistration.Unregister();
     }
   }
@@ -571,8 +558,8 @@ int mitk::ToolManager::GetToolID( const Tool* tool )
 {
   int id(0);
   for ( ToolVectorType::iterator iter = m_Tools.begin();
-    iter != m_Tools.end();
-    ++iter, ++id )
+        iter != m_Tools.end();
+        ++iter, ++id )
   {
     if ( tool == iter->GetPointer() )
     {
@@ -588,15 +575,9 @@ void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode* node)
   //check if the data of the node is typeof Image
   /*if(dynamic_cast<mitk::Image*>(node->GetData()))
   {*/
-    //check all storage vectors
-    OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
-    OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
-    OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
+  //check all storage vectors
+  OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
+  OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
+  OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
   //}
 }
-
-void mitk::ToolManager::ActivateExclusiveStateEventPolicy(bool state)
-{
-  m_ExclusiveStateEventPolicy = state;
-}
-

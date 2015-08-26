@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToFPointSetWidget.h"
 
-#include <mitkGlobalInteraction.h>
 #include <mitkVtkLayerController.h>
 
 #include <vtkTextProperty.h>
@@ -131,7 +130,12 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
     measurementPointSet2DNode->SetVisibility(false, renderWindowHashMap.value("3d")->GetRenderer());
     measurementPointSet2DNode->SetData(m_MeasurementPointSet2D);
     dataStorage->Add(measurementPointSet2DNode);
-    m_MeasurementPointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor",measurementPointSet2DNode,2);
+    m_MeasurementPointSetInteractor = mitk::PointSetDataInteractor::New();
+    m_MeasurementPointSetInteractor->LoadStateMachine("PointSet.xml");
+    m_MeasurementPointSetInteractor->SetEventConfig("PointSetConfig.xml");
+    m_MeasurementPointSetInteractor->SetDataNode(measurementPointSet2DNode);
+    m_MeasurementPointSetInteractor->SetMaxPoints(2);
+
     // create observer for m_MeasurementPointSet2D
     itk::SimpleMemberCommand<QmitkToFPointSetWidget>::Pointer measurementPointSetChangedCommand;
     measurementPointSetChangedCommand = itk::SimpleMemberCommand<QmitkToFPointSetWidget>::New();
@@ -164,7 +168,10 @@ void QmitkToFPointSetWidget::InitializeWidget(QHash<QString, QmitkRenderWindow*>
     pointSet2DNode->SetVisibility(false, renderWindowHashMap.value("3d")->GetRenderer());
     pointSet2DNode->SetData(m_PointSet2D);
     dataStorage->Add(pointSet2DNode);
-    m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor",pointSet2DNode);
+    m_PointSetInteractor = mitk::PointSetDataInteractor::New();
+    m_PointSetInteractor->LoadStateMachine("PointSet.xml");
+    m_PointSetInteractor->SetEventConfig("PointSetConfig.xml");
+    m_PointSetInteractor->SetDataNode(pointSet2DNode);
 
     // create observer for m_MeasurementPointSet2D
     itk::SimpleMemberCommand<QmitkToFPointSetWidget>::Pointer pointSetChangedCommand;
@@ -278,13 +285,13 @@ void QmitkToFPointSetWidget::OnMeasurement()
     {
       m_Controls->pointSetButton->setChecked(false);
       // remove interactor
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
+      m_PointSetInteractor->EnableInteraction(false);
     }
     // show overlays
     m_VtkTextActor->SetVisibility(1);
     this->m_VtkTextActor->SetInput("Choose measurement points with SHIFT+Click");
     // enable interactor
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_MeasurementPointSetInteractor);
+    m_MeasurementPointSetInteractor->EnableInteraction(true);
     // initial update of measurement
     this->MeasurementPointSetChanged();
   }
@@ -293,7 +300,7 @@ void QmitkToFPointSetWidget::OnMeasurement()
     // hide overlays
     m_VtkTextActor->SetVisibility(0);
     // disable interactor
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_MeasurementPointSetInteractor);
+    m_MeasurementPointSetInteractor->EnableInteraction(false);
   }
 }
 
@@ -312,13 +319,13 @@ void QmitkToFPointSetWidget::OnPointSet()
     {
       m_Controls->measureButton->setChecked(false);
       // remove interactor
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_MeasurementPointSetInteractor);
+      m_MeasurementPointSetInteractor->EnableInteraction(false);
     }
     // show overlays
     m_VtkTextActor->SetVisibility(1);
     this->m_VtkTextActor->SetInput("Choose points with SHIFT+Click");
     // enable interactor
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+    m_PointSetInteractor->EnableInteraction(true);
     // initial update of PointSet
     this->PointSetChanged();
   }
@@ -327,7 +334,7 @@ void QmitkToFPointSetWidget::OnPointSet()
     // hide overlays
     m_VtkTextActor->SetVisibility(0);
     // disable interactor
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
+    m_PointSetInteractor->EnableInteraction(false);
   }
 }
 

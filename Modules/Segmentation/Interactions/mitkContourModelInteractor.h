@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
-#include "mitkInteractor.h"
+#include "mitkDataInteractor.h"
 #include <mitkContourModel.h>
 #include <mitkDataNode.h>
 
@@ -37,40 +37,34 @@ namespace mitk
 
 
 */
-class MITKSEGMENTATION_EXPORT ContourModelInteractor : public Interactor
+class MITKSEGMENTATION_EXPORT ContourModelInteractor : public DataInteractor
 {
   public:
 
-    mitkClassMacro(ContourModelInteractor, Interactor);
-    mitkNewMacro1Param(Self, DataNode*);
-
-
-        /**
-     * \brief calculates how good the data, this statemachine handles, is hit
-     * by the event.
-     *
-     * overwritten, cause we don't look at the boundingbox, we look at each point
-     */
-    virtual float CanHandleEvent(StateEvent const* stateEvent) const override;
+    mitkClassMacro(ContourModelInteractor, DataInteractor)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
     /**
-    *@brief If data changed then initialize according to numbers of loaded points
-    **/
-    virtual void DataChanged() override;
+     * Here actions strings from the loaded state machine pattern are mapped to functions of
+     * the DataInteractor. These functions are called when an action from the state machine pattern is executed.
+     */
+    virtual void ConnectActionsAndFunctions() override;
+
 
   protected:
 
-    ContourModelInteractor(DataNode* dataNode); // purposely hidden
+    ContourModelInteractor();
     virtual ~ContourModelInteractor();
 
 
-    virtual bool OnCheckPointClick (Action*, const StateEvent*);
-    virtual bool OnCheckContourClick   (Action*, const StateEvent*);
-    virtual bool OnDeletePoint(Action*, const StateEvent*);
-    virtual bool OnMovePoint(Action*, const StateEvent*);
-    virtual bool OnMove(Action*, const StateEvent*);
-    virtual bool OnMoveContour(Action*, const StateEvent*);
-    virtual bool OnFinishEditing(Action*, const StateEvent*);
+    virtual bool OnCheckPointClick ( const InteractionEvent* interactionEvent );
+    virtual bool IsHovering(const InteractionEvent* interactionEvent);
+
+    virtual void OnDeletePoint(StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual void OnMovePoint(StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual void OnMoveContour(StateMachineAction*, InteractionEvent* interactionEvent);
+    virtual void OnFinishEditing(StateMachineAction*, InteractionEvent* interactionEvent);
 
     mitk::Point3D m_lastMousePosition;
 

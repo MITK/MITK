@@ -63,10 +63,10 @@ class MITKSEGMENTATION_EXPORT ContourTool : public FeedbackContourTool
     virtual void Activated() override;
     virtual void Deactivated() override;
 
-    virtual bool OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent );
-    virtual bool OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
-    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
-    virtual bool OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnMousePressed( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent );
 
     void ConnectActionsAndFunctions() override;
 

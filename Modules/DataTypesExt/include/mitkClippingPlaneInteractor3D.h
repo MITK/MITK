@@ -55,16 +55,16 @@ protected:
     * Initializes the movement, stores starting position.
     */
   virtual bool CheckOverObject (const InteractionEvent *);
-  virtual bool SelectObject (StateMachineAction*, InteractionEvent*);
-  virtual bool DeselectObject (StateMachineAction*, InteractionEvent*);
-  virtual bool InitTranslate (StateMachineAction*, InteractionEvent*);
-  virtual bool InitRotate (StateMachineAction*, InteractionEvent*);
-  virtual bool TranslateObject (StateMachineAction*, InteractionEvent*);
-  virtual bool RotateObject (StateMachineAction*, InteractionEvent*);
+  virtual void SelectObject (StateMachineAction*, InteractionEvent*);
+  virtual void DeselectObject (StateMachineAction*, InteractionEvent*);
+  virtual void InitTranslate (StateMachineAction*, InteractionEvent*);
+  virtual void InitRotate (StateMachineAction*, InteractionEvent*);
+  virtual void TranslateObject (StateMachineAction*, InteractionEvent*);
+  virtual void RotateObject (StateMachineAction*, InteractionEvent*);
 
 private:
 
-  bool ColorizeSurface(BaseRenderer::Pointer renderer, double scalar = 0.0);
+  void ColorizeSurface(BaseRenderer::Pointer renderer, double scalar = 0.0);
 
   double m_InitialPickedWorldPoint[4];
   Point2D m_InitialPickedDisplayPoint;

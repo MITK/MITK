@@ -563,6 +563,8 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       PointType pt;
       pt.CastFrom(pointOp->GetPoint());
 
+      if(timeStep >= (int)this->GetTimeSteps()) this->Expand(timeStep+1);
+
       //transfer from world to index coordinates
       mitk::BaseGeometry* geometry = this->GetGeometry( timeStep );
       if (geometry == nullptr)

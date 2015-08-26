@@ -136,6 +136,30 @@ See LICENSE.txt or http://www.mitk.org for details.
       function<double>( ptype,  param1, param2, param3, param4 );\
 }\
 
+#define mitkPixelTypeMultiplex5( function, ptype, param1, param2, param3, param4, param5 )    \
+{                                                 \
+    if ( ptype.GetComponentType() == itk::ImageIOBase::CHAR )\
+      function<char>( ptype,  param1, param2, param3, param4, param5 );\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UCHAR)\
+      function<unsigned char>( ptype,   param1, param2, param3, param4, param5  );\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::SHORT )\
+      function<short>( ptype,   param1, param2, param3, param4, param5  );      \
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::USHORT )\
+      function<unsigned short>( ptype,  param1, param2, param3, param4, param5  );\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::INT )\
+      function<int>( ptype,   param1, param2, param3, param4, param5  );\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::UINT )\
+      function<unsigned int>( ptype,  param1, param2, param3, param4, param5  );\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::LONG )\
+      function<long int>( ptype,  param1, param2, param3, param4, param5  );\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::ULONG )\
+      function<unsigned long int>( ptype,   param1, param2, param3, param4, param5  );\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::FLOAT  )\
+      function<float>( ptype,   param1, param2, param3, param4, param5  );\
+    else if ( ptype.GetComponentType() == itk::ImageIOBase::DOUBLE  )\
+      function<double>( ptype,  param1, param2, param3, param4, param5 );\
+}\
+
 #endif // MITKPIXELTYPEMULTIPLEX_H
 
 

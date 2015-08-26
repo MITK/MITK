@@ -816,13 +816,14 @@ SliceNavigationController
 
                   mitk::ScalarType pixelValue = 0.0;
 
-                  mitkPixelTypeMultiplex4(
+                  mitkPixelTypeMultiplex5(
                     mitk::FastSinglePixelAccess,
                     image3D->GetChannelDescriptor().GetPixelType(),
                     image3D,
                     image3D->GetVolumeData(baseRenderer->GetTimeStep()),
                     p,
-                    pixelValue);
+                    pixelValue,
+                    component);
 
                   if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
                   {

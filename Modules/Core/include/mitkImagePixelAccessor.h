@@ -81,7 +81,8 @@ protected:
     }
 
     // Check if PixelType is correct
-    if(!(image->GetPixelType() ==  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()) )
+    if(!(image->GetPixelType() ==  mitk::MakePixelType< itk::Image<TPixel, VDimension> >()
+         || image->GetPixelType() == mitk::MakePixelType< itk::VectorImage<TPixel, VDimension> >(image->GetPixelType().GetNumberOfComponents())) )
     {
       mitkThrow() << "Invalid ImageAccessor: PixelTypes of Image and ImageAccessor are not equal";
     }

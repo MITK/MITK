@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRdfTriple.h"
 
+#include <ostream>
+
 namespace mitk {
   RdfTriple::RdfTriple()
   {

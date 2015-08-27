@@ -104,8 +104,8 @@ namespace mitk {
 
   private:
     Type m_Type;
-    RdfUri m_Datatype;
     std::string m_Value;
+    RdfUri m_Datatype;
   };
 
   MITKRDF_EXPORT std::ostream & operator<<(std::ostream &out, const mitk::RdfNode &n);

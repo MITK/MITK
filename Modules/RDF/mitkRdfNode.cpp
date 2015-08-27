@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRdfNode.h"
 
 #include <stdio.h>
+#include <ostream>
 #include <ctype.h>
 #include <stdarg.h>
 

@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // include gl to read out properties
 #include <vtkOpenGL.h>
 #include <vtkOpenGLExtensionManager.h>
+#include <vtksys/SystemTools.hxx>
 
 #if defined _MSC_VER
 #if _MSC_VER >= 1700
@@ -172,6 +173,7 @@ void mitk::RenderingTestHelper::Render()
     m_RenderWindow->GetRenderer()->PrepareRender();
 
     this->GetVtkRenderWindow()->Render();
+    this->GetVtkRenderWindow()->WaitForCompletion();
     if(m_AutomaticallyCloseRenderWindow == false)
     {
       //Use interaction to stop the test
@@ -239,7 +241,6 @@ vtkRenderWindow* mitk::RenderingTestHelper::GetVtkRenderWindow()
 bool mitk::RenderingTestHelper::CompareRenderWindowAgainstReference(int argc, char* argv[], double threshold)
 {
   this->Render();
-  m_RenderWindow->GetRenderer()->ForceImmediateUpdate();
   //retVal meanings: (see VTK/Rendering/vtkTesting.h)
   //0 = test failed
   //1 = test passed

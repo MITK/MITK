@@ -231,6 +231,7 @@ void mitk::InteractionTestHelper::PlaybackInteraction()
     (*it)->GetRenderer()->PrepareRender();
 
     (*it)->GetVtkRenderWindow()->Render();
+    (*it)->GetVtkRenderWindow()->WaitForCompletion();
   }
 
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();

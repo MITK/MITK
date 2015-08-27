@@ -182,6 +182,8 @@ namespace itk
       typename RelativeFrequencyContainerType::const_iterator rFreqIterator =
         m_RelativeFrequencyContainer.begin();
 
+      MITK_INFO << pixelMean << "  -  " << pixelVariance;
+
       for ( HistogramIterator hit = inputHistogram->Begin();
         hit != inputHistogram->End(); ++hit )
       {
@@ -318,7 +320,7 @@ namespace itk
 
       MeasurementObjectType *homogeneity1OutputObject =
         static_cast< MeasurementObjectType * >( this->ProcessObject::GetOutput(13) );
-      homogeneity1OutputObject->Set(dissimilarity);
+      homogeneity1OutputObject->Set(homogeneity1);
 
       MeasurementObjectType *clusterTendencyOutputObject =
         static_cast< MeasurementObjectType * >( this->ProcessObject::GetOutput(14) );

@@ -115,6 +115,10 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore MitkCLUtilities MitkDataCollection MitkCLImportanceWeighting
     CPP_FILES CLSurWeighting.cpp mitkCommandLineParser.cpp
   )
+  mitk_create_executable(CLImageCropper
+    DEPENDS MitkCore MitkCLUtilities MitkAlgorithmsExt
+    CPP_FILES CLImageCropper.cpp mitkCommandLineParser.cpp
+  )
 
         # On Linux, create a shell script to start a relocatable application
         if(UNIX AND NOT APPLE)

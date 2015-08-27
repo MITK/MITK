@@ -24,13 +24,102 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFGrayLevelRunLength.h>
 #include <math.h>
 
+#include <mitkImageGenerator.h>
+
+template <typename TPixelType>
+static mitk::Image::Pointer GenerateMaskImage(unsigned int dimX,
+                                              unsigned int dimY,
+                                              unsigned int dimZ,
+                                              float spacingX = 1,
+                                              float spacingY = 1,
+                                              float spacingZ = 1)
+{
+  typedef itk::Image< TPixelType, 3 > ImageType;
+  typename ImageType::RegionType imageRegion;
+  imageRegion.SetSize(0, dimX);
+  imageRegion.SetSize(1, dimY);
+  imageRegion.SetSize(2, dimZ);
+  typename ImageType::SpacingType spacing;
+  spacing[0] = spacingX;
+  spacing[1] = spacingY;
+  spacing[2] = spacingZ;
+
+  mitk::Point3D                       origin; origin.Fill(0.0);
+  itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
+
+  typename ImageType::Pointer image = ImageType::New();
+  image->SetSpacing( spacing );
+  image->SetOrigin( origin );
+  image->SetDirection( directionMatrix );
+  image->SetLargestPossibleRegion( imageRegion );
+  image->SetBufferedRegion( imageRegion );
+  image->SetRequestedRegion( imageRegion );
+  image->Allocate();
+  image->FillBuffer(1);
+
+  mitk::Image::Pointer mitkImage = mitk::Image::New();
+  mitkImage->InitializeByItk( image.GetPointer() );
+  mitkImage->SetVolume( image->GetBufferPointer() );
+  return mitkImage;
+}
+
+template <typename TPixelType>
+static mitk::Image::Pointer GenerateGradientWithDimXImage(unsigned int dimX,
+                                                          unsigned int dimY,
+                                                          unsigned int dimZ,
+                                                          float spacingX = 1,
+                                                          float spacingY = 1,
+                                                          float spacingZ = 1)
+{
+  typedef itk::Image< TPixelType, 3 > ImageType;
+  typename ImageType::RegionType imageRegion;
+  imageRegion.SetSize(0, dimX);
+  imageRegion.SetSize(1, dimY);
+  imageRegion.SetSize(2, dimZ);
+  typename ImageType::SpacingType spacing;
+  spacing[0] = spacingX;
+  spacing[1] = spacingY;
+  spacing[2] = spacingZ;
+
+  mitk::Point3D                       origin; origin.Fill(0.0);
+  itk::Matrix<double, 3, 3>           directionMatrix; directionMatrix.SetIdentity();
+
+  typename ImageType::Pointer image = ImageType::New();
+  image->SetSpacing( spacing );
+  image->SetOrigin( origin );
+  image->SetDirection( directionMatrix );
+  image->SetLargestPossibleRegion( imageRegion );
+  image->SetBufferedRegion( imageRegion );
+  image->SetRequestedRegion( imageRegion );
+  image->Allocate();
+  image->FillBuffer(0.0);
+
+  typedef itk::ImageRegionIterator<ImageType>      IteratorOutputType;
+  IteratorOutputType it(image, imageRegion);
+  it.GoToBegin();
+
+  TPixelType val = 0;
+  while(!it.IsAtEnd())
+  {
+    it.Set(val % dimX);
+    val++;
+    ++it;
+  }
+
+  mitk::Image::Pointer mitkImage = mitk::Image::New();
+  mitkImage->InitializeByItk( image.GetPointer() );
+  mitkImage->SetVolume( image->GetBufferPointer() );
+  return mitkImage;
+}
+
 class mitkGlobalFeaturesTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkGlobalFeaturesTestSuite  );
 
   MITK_TEST(FirstOrder_SinglePoint);
   MITK_TEST(FirstOrder_QubicArea);
-
+  //MITK_TEST(RunLenght_QubicArea);
+  MITK_TEST(Coocurrence_QubicArea);
   //MITK_TEST(TestFirstOrderStatistic);
   //  MITK_TEST(TestThreadedDecisionForest);
 
@@ -44,6 +133,8 @@ private:
   mitk::Image::Pointer m_Image,m_Mask,m_Mask1;
   ImageType::Pointer m_ItkImage;
   MaskType::Pointer m_ItkMask,m_ItkMask1;
+
+  mitk::Image::Pointer m_GradientImage, m_GradientMask;
 
 public:
 
@@ -83,6 +174,9 @@ public:
       }
     }
     mitk::CastToMitkImage(m_ItkMask1, m_Mask1);
+
+    m_GradientImage=GenerateGradientWithDimXImage<unsigned char>(5,5,5);
+    m_GradientMask = GenerateMaskImage<unsigned char>(5,5,5);
   }
 
   void FirstOrder_SinglePoint()
@@ -150,6 +244,70 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Skewness of a single pixel should  be 0",-0.91817318, results["FirstOrder Skewness"], 0.00001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Mean absolute deviation of a single pixel with (-352) should  be 0",219.348608, results["FirstOrder Mean absolute deviation"], 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The Covered image intensity range of a single pixel with (-352) should be 0",0.41149329, results["FirstOrder Covered Image Intensity Range"], 0.000001);
+  }
+
+  void RunLenght_QubicArea()
+  {
+    mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
+    //calculator->SetHistogramSize(4096);
+    calculator->SetUseCtRange(true);
+    calculator->SetRange(981);
+    auto features = calculator->CalculateFeatures(m_Image, m_Mask1);
+
+    std::map<std::string, double> results;
+    for (auto iter=features.begin(); iter!=features.end();++iter)
+    {
+      results[(*iter).first]=(*iter).second;
+      MITK_INFO << (*iter).first << " : " << (*iter).second;
+    }
+  }
+
+  void Coocurrence_QubicArea()
+  {
+    /*
+    * Expected Matrix: (Direction 0,0,1)
+    * |------------------------|
+    * | 20 | 0  | 0  | 0  | 0  |
+    * |------------------------|
+    * | 0  | 20 | 0  | 0  | 0  |
+    * |------------------------|
+    * | 0  | 0  | 20 | 0  | 0  |
+    * |------------------------|
+    * | 0  | 0  | 0  | 20 | 0  |
+    * |------------------------|
+    * | 0  | 0  | 0  | 0  | 20 |
+    * |------------------------|
+
+    * Expected Matrix: (Direction (1,0,0),(0,1,0))
+    * |------------------------|
+    * | 20 | 0  | 0  | 0  | 0  |
+    * |------------------------|
+    * | 20 | 0  | 0  | 0  | 0  |
+    * |------------------------|
+    * | 20 | 0  | 0  | 0  | 0  |
+    * |------------------------|
+    * | 20 | 0  | 0  | 0  | 0  |
+    * |------------------------|
+    * | 20 | 0  | 0  | 0  | 0  |
+    * |------------------------|
+    */
+
+    mitk::GIFCooccurenceMatrix::Pointer calculator = mitk::GIFCooccurenceMatrix::New();
+    //calculator->SetHistogramSize(4096);
+    //calculator->SetUseCtRange(true);
+    //calculator->SetRange(981);
+    auto features = calculator->CalculateFeatures(m_GradientImage, m_GradientMask);
+
+    std::map<std::string, double> results;
+    for (auto iter=features.begin(); iter!=features.end();++iter)
+    {
+      results[(*iter).first]=(*iter).second;
+      MITK_INFO << (*iter).first << " : " << (*iter).second;
+    }
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean energy value should be 0.2",0.2, results["co-occ. (1) Energy Means"], mitk::eps);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean entropy value should be 0.2",2.321928, results["co-occ. (1) Entropy Means"], 0.000001);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean contrast value should be 0.0",0, results["co-occ. (1) Contrast Means"], mitk::eps);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean dissimilarity value should be 0.0",0, results["co-occ. (1) Dissimilarity Means"], mitk::eps);
   }
 };
 

@@ -71,7 +71,7 @@ void
 
   if (params.m_UseCtRange)
   {
-    filter->SetPixelValueMinMax(-1024.5,3096.5);
+    filter->SetPixelValueMinMax((TPixel)(-1024.5),(TPixel)(3096.5));
     filter->SetNumberOfBinsPerAxis(3096.5+1024.5);
   } else
   {

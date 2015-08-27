@@ -308,6 +308,8 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean entropy value should be 0.2",2.321928, results["co-occ. (1) Entropy Means"], 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean contrast value should be 0.0",0, results["co-occ. (1) Contrast Means"], mitk::eps);
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean dissimilarity value should be 0.0",0, results["co-occ. (1) Dissimilarity Means"], mitk::eps);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean homogenity1 value should be 1.0",1, results["co-occ. (1) Homogeneity1 Means"], mitk::eps);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("The mean InverseDifferenceMoment value should be 1.0",1, results["co-occ. (1) InverseDifferenceMoment Means"], mitk::eps);
   }
 };
 

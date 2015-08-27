@@ -54,6 +54,7 @@ set(MODULE_TESTS
   mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetOnEmptyTest.cpp
+  mitkPointSetLocaleTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetReaderTest.cpp
   mitkPointSetInteractorTest.cpp

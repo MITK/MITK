@@ -13,8 +13,8 @@
    height="64px"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="Neues Dokument 2">
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="go-home.svg">
   <defs
      id="defs2987" />
   <sodipodi:namedview
@@ -25,7 +25,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.5"
-     inkscape:cx="32"
+     inkscape:cx="4.8181818"
      inkscape:cy="32"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,17 +52,13 @@
      id="layer1"
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
-    <text
-       xml:space="preserve"
-       style="font-size:70.07095337px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial"
-       x="-0.41637981"
-       y="55.716103"
-       id="text2993"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan2995"
-         x="-0.41637981"
-         y="55.716103"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"></tspan></text>
+    <g
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:70.07095337px;line-height:125%;font-family:Arial;-inkscape-font-specification:Arial;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       id="text2993">
+      <path
+         d="m 54.639369,34.444563 c 0,-0.0782 0,-0.156408 -0.0391,-0.234612 L 32.116563,15.675558 9.6328585,34.209951 c 0,0.0782 -0.039102,0.156408 -0.039102,0.234612 l 0,18.769006 c 0,1.368573 1.1339606,2.502534 2.5025336,2.502534 l 15.015205,0 0,-15.015205 10.010136,0 0,15.015205 15.015204,0 c 1.368574,0 2.502534,-1.133961 2.502534,-2.502534 l 0,-18.769006 z m 8.719767,-2.698044 c 0.430123,-0.508328 0.351919,-1.329472 -0.156408,-1.759595 l -8.563359,-7.116581 0,-15.9536544 c 0,-0.7038377 -0.547429,-1.251267 -1.251267,-1.251267 l -7.507602,0 c -0.703838,0 -1.251267,0.5474293 -1.251267,1.251267 l 0,7.6249084 -9.540911,-7.9768272 c -1.642288,-1.3685733 -4.30123,-1.3685733 -5.943518,0 L 1.0303977,29.986924 c -0.50832724,0.430123 -0.58653143,1.251267 -0.15640839,1.759595 l 2.42432989,2.893555 c 0.1955104,0.234612 0.5083272,0.391021 0.821144,0.430123 0.3519188,0.0391 0.6647356,-0.0782 0.9384502,-0.273715 L 32.116563,12.234574 59.175212,34.796482 c 0.234613,0.195511 0.508327,0.273715 0.821144,0.273715 0.0391,0 0.0782,0 0.117306,0 0.312817,-0.0391 0.625634,-0.195511 0.821144,-0.430123 l 2.42433,-2.893555 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:FontAwesome;-inkscape-font-specification:FontAwesome"
+         id="path8534" />
+    </g>
   </g>
 </svg>

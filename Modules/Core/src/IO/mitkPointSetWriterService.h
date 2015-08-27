@@ -21,8 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileWriter.h>
 #include <mitkPointSet.h>
 
+class TiXmlElement;
+
 namespace mitk
 {
+
+class Geometry3D;
 
 /**
  * @internal
@@ -31,6 +35,8 @@ namespace mitk
  *
  * XML-based writer for mitk::PointSet. Multiple PointSets can be written in
  * a single XML file by simply setting multiple inputs to the filter.
+ *
+ * @todo This class would merit a XML library for maintainability or a denser format for performance.
  *
  * @ingroup IO
  */
@@ -50,47 +56,10 @@ private:
 
   virtual mitk::PointSetWriterService* Clone() const override;
 
-  /**
-   * Converts an arbitrary type to a string. The type has to
-   * support the << operator. This works fine at least for integral
-   * data types as float, int, long etc.
-   * @param value the value to convert
-   * @returns the string representation of value
-   */
   template < typename T>
   std::string ConvertToString( T value );
 
-  /**
-   * Writes an XML representation of the given point set to
-   * an outstream. The XML-Header an root node is not included!
-   * @param pointSet the point set to be converted to xml
-   * @param out the stream to write to.
-   */
-  void WriteXML( const mitk::PointSet* pointSet, std::ostream& out );
-
-  /**
-   * Writes an standard xml header to the given stream.
-   * @param file the stream in which the header is written.
-   */
-  void WriteXMLHeader( std::ostream &file );
-
-  /**
-   * Write an end element tag
-   * End-Elements following character data should pass indent = false.
-   */
-  void WriteEndElement( const std::string& tag, std::ostream &file, const bool& indent = true );
-
-  /** Write a start element tag */
-  void WriteStartElement( const std::string &tag, std::ostream &file );
-
-  /** Write character data inside a tag. */
-  void WriteCharacterData( const std::string &data, std::ostream &file );
-
-  /** Writes empty spaces to the stream according to m_IndentDepth and m_Indent */
-  void WriteIndent( std::ostream& file );
-
-  unsigned int m_IndentDepth;
-  const unsigned int m_Indent;
+  TiXmlElement* ToXML( const mitk::PointSet* pointSet );
 
   static const std::string XML_POINT_SET;
   static const std::string XML_TIME_SERIES;

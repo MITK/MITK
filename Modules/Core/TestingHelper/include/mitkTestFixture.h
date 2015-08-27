@@ -35,7 +35,7 @@ namespace mitk {
  * invoke one method multiple times with different parameters.
  *
  *
- * The following simple example creates a single test withoud custom
+ * The following simple example creates a single test without custom
  * parameters:
  *
  * \code

@@ -146,10 +146,9 @@ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) con
 int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const
 {
   mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine( polyLineIndex );
-  if ( indexOfPolylinePoint > static_cast<int>(polyLine.size()) )
-  {
+
+  if (indexOfPolylinePoint < 0 || indexOfPolylinePoint > static_cast<int>(polyLine.size()))
     return -1;
-  }
 
   mitk::PlanarFigure::ControlPointListType::const_iterator elem;
   mitk::PlanarFigure::ControlPointListType::const_iterator first = m_ControlPoints.cbegin();
@@ -160,13 +159,12 @@ int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint( int indexOf
   mitk::PlanarFigure::PolyLineType::const_iterator polyLineStart = polyLine.cbegin();
   polyLineStart += indexOfPolylinePoint;
 
-  for ( polyLineIter = polyLineStart; polyLineIter != polyLineEnd; ++polyLineIter )
+  for (polyLineIter = polyLineStart; polyLineIter != polyLineEnd; ++polyLineIter)
   {
-    elem = std::find( first, end, *polyLineIter );
-    if ( elem != end )
-    {
-      return std::distance( first, elem );
-    }
+    elem = std::find(first, end, *polyLineIter);
+
+    if (elem != end)
+      return std::distance(first, elem);
   }
 
   return GetNumberOfControlPoints();

@@ -53,7 +53,9 @@ private:
 
   PointSetReaderService(const PointSetReaderService& other);
 
-  mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet,
+  mitk::BaseGeometry::Pointer ReadGeometry(TiXmlElement* parentElement);
+
+  mitk::PointSet::Pointer ReadPoints(mitk::PointSet::Pointer newPointSet,
                                     TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);
 
   virtual PointSetReaderService* Clone() const override;

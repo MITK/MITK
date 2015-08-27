@@ -115,7 +115,7 @@ struct BaseApplication::Impl
     bool argFound (false);
     for (int i = 0; i < m_Argc; ++i)
     {
-      if (QString::fromAscii(m_Argv[i]).contains("-psn"))
+      if (QString::fromLatin1(m_Argv[i]).contains("-psn"))
       {
         argFound = true;
       }

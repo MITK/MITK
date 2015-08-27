@@ -1,5 +1,15 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
- mitkRealTimeClock.cpp
+  mitkRealTimeClock.cpp
+  mitkNavigationData.cpp
+  mitkNavigationDataSet.cpp
+  mitkStaticIGTHelperFunctions.cpp
+  mitkQuaternionAveraging.cpp
+  mitkIGTMimeTypes.cpp
+  mitkIGTException.cpp
+  mitkIGTIOException.cpp
+  mitkIGTHardwareException.cpp
 )
 
 if(WIN32)

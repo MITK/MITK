@@ -14,22 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef IGTEXCEPTION_H_INCLUDED
+#define IGTEXCEPTION_H_INCLUDED
 
-#ifndef MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
-#define MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
-
-#include <mitkNavigationDataSet.h>
+#include <MitkIGTBaseExports.h>
+#include <mitkException.h>
+#include "mitkExceptionMacro.h"
 
 namespace mitk {
-  class MITKIGT_EXPORT NavigationDataSetWriterCSV
-  {
+/**Documentation
+* \brief An object of this class represents an exception of the MITK-IGT module.
+*
+* \ingroup IGT
+*/  class MITKIGTBASE_EXPORT IGTException : public mitk::Exception
+{
   public:
-    NavigationDataSetWriterCSV();
-    virtual~NavigationDataSetWriterCSV();
-
-    virtual void Write (std::string path, mitk::NavigationDataSet::Pointer );
-    virtual void Write (std::ostream* stream, mitk::NavigationDataSet::Pointer);
+    mitkExceptionClassMacro(IGTException,mitk::Exception);
   };
-}
-
-#endif // MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
+} // namespace mitk
+#endif

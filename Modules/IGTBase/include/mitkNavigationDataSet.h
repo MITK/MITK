@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNAVIGATIONDATASET_H_HEADER_INCLUDED_
 #define MITKNAVIGATIONDATASET_H_HEADER_INCLUDED_
 
-#include <MitkIGTExports.h>
+#include <MitkIGTBaseExports.h>
 #include "mitkBaseData.h"
 #include "mitkNavigationData.h"
 
@@ -30,7 +30,7 @@ namespace mitk {
   * Use mitk::NavigationDataPlayer to stream from these sets easily.
   *
   */
-  class MITKIGT_EXPORT NavigationDataSet : public BaseData
+  class MITKIGTBASE_EXPORT NavigationDataSet : public BaseData
   {
   public:
 
@@ -41,6 +41,14 @@ namespace mitk {
     * mitk::NavigationData for each tool..
     */
     typedef std::vector< std::vector<mitk::NavigationData::Pointer> >::iterator NavigationDataSetIterator;
+
+    /**
+    * \brief This iterator iterates over the distinct time steps in this set. And is const.
+    *
+    * It returns an array of the length equal to GetNumberOfTools(), containing a
+    * mitk::NavigationData for each tool..
+    */
+    typedef std::vector< std::vector<mitk::NavigationData::Pointer> >::const_iterator NavigationDataSetConstIterator;
 
     mitkClassMacro(NavigationDataSet, BaseData);
 
@@ -91,7 +99,7 @@ namespace mitk {
     * @param index Index of the timeStep for which the datas should be returned. cannot be larger than mitk::NavigationDataSet::Size()
     * @return Returns a vector that contains all tracking data for a given tool.
     */
-    virtual std::vector< mitk::NavigationData::Pointer > GetTimeStep(unsigned int index);
+    virtual std::vector< mitk::NavigationData::Pointer > GetTimeStep(unsigned int index) const;
 
     /**
     * \brief Returns the number of tools for which NavigationDatas are stored in this set.
@@ -100,7 +108,7 @@ namespace mitk {
     *
     * @return the number of tools for which NavigationDatas are stored in this set.
     */
-    unsigned int GetNumberOfTools();
+    unsigned int GetNumberOfTools() const;
 
     /**
     * \brief Returns the number of time steps stored in this NavigationDataSet.
@@ -110,27 +118,32 @@ namespace mitk {
     *
     * @return Returns the number of time steps stored in this NavigationDataSet.
     */
-    unsigned int Size();
+    unsigned int Size() const;
 
     /**
     * \brief Returns an iterator pointing to the first TimeStep.
     *
     * @return Returns an iterator pointing to the first TimeStep.
     */
-    virtual NavigationDataSetIterator Begin();
+    virtual NavigationDataSetConstIterator Begin() const;
 
     /**
     * \brief Returns an iterator pointing behind to the last TimeStep.
     *
     * @return Returns an iterator pointing behind to the last TimeStep.
     */
-    virtual NavigationDataSetIterator End();
+    virtual NavigationDataSetConstIterator End() const;
 
     // virtual methods, that need to be implemented, but aren't reasonable for NavigationData
     virtual void SetRequestedRegionToLargestPossibleRegion( ) override;
     virtual bool RequestedRegionIsOutsideOfTheBufferedRegion( ) override;
     virtual bool VerifyRequestedRegion( ) override;
     virtual void SetRequestedRegion( const itk::DataObject *data ) override;
+
+    /**
+    * \brief This overrid is probably a little hacky. See Bug 19086.
+    */
+    virtual bool IsEmpty() const override;
 
   protected:
     /**

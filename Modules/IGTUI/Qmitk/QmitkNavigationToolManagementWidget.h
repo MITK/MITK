@@ -75,6 +75,8 @@ class MITKIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
     void OnEditTool();
     void OnLoadTool();
     void OnSaveTool();
+    void OnMoveToolUp();
+    void OnMoveToolDown();
     void OnLoadStorage();
     void OnSaveStorage();
     void OnCreateStorage();

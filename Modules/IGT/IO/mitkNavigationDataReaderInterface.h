@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObject.h"
 #include "mitkCommon.h"
 #include "mitkNavigationDataSet.h"
+#include "MitkIGTExports.h"
 
 namespace mitk {
   class MITKIGT_EXPORT NavigationDataReaderInterface : public itk::Object

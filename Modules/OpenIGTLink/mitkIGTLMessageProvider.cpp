@@ -69,7 +69,10 @@ void mitk::IGTLMessageProvider::GenerateData()
   for (unsigned int index = 0; index < this->GetNumberOfIndexedInputs(); index++)
   {
     const IGTLMessage* msg = this->GetInput(index);
-    assert(msg);
+    if (msg == nullptr)
+    {
+       continue;
+    }
 
     if ( !msg->IsDataValid() )
     {

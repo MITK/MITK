@@ -114,6 +114,12 @@ protected:
 
     static void GlyphMethod(void *arg);
     bool IsPlaneRotated(mitk::BaseRenderer* renderer);
+    static bool m_toggleTensorEllipsoidView;
+    static bool m_toggleColourisationMode;
+    static bool m_toggleGlyphPlacementMode;
+
+    typedef vnl_matrix_fixed<double, 3, 3> DirectionsType;
+
 
 private:
 
@@ -126,6 +132,8 @@ private:
     static int      m_ScaleBy;
     static float    m_IndexParam1;
     static float    m_IndexParam2;
+    static vtkSmartPointer<vtkDoubleArray> m_colourScalars;
+
     int             m_ShowMaxNumber;
 
     std::vector< vtkSmartPointer<vtkPlane> >          m_Planes;

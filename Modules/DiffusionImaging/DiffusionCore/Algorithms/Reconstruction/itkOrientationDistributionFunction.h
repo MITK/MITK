@@ -139,6 +139,9 @@ public:
 
   void InitFromTensor(itk::DiffusionTensor3D<TComponent> tensor);
 
+  /** Evaluate diffusion tensor as ellipsoid. */
+  void InitFromEllipsoid(itk::DiffusionTensor3D<TComponent> tensor);
+
   /** Pre-Multiply by a Matrix as ResultingTensor = Matrix * ThisTensor. */
   Self PreMultiply( const MatrixType & m ) const;
 

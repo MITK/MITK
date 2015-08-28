@@ -26,8 +26,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkPointShell.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
 #include <cmath>
+#ifdef _MSC_VER
+  #if _MSC_VER <= 1700
+    #define fmin(a,b) ((a<=b)?(a):(b))
+    #define fmax(a,b) ((a>=b)?(a):(b))
+    #define isnan(c)  (c!=c)
+  #endif
+#endif
 
 #include <itkMatrix.h>
 #include <vnl/vnl_matrix.h>
@@ -369,9 +375,23 @@ namespace itk
       return;
     }
 
-    int exponent_a = std::ilogb(a); // check magnitude and scale towards 1 to minimize numerical condition kappa.
+    // check magnitude and scale towards 1 to minimize numerical condition kappa:
+#ifdef _MSC_VER
+  #if _MSC_VER <= 1700
+    int exponent_a = floor(std::log(a)/std::log(2));
+    int exponent_b = floor(std::log(b)/std::log(2));
+    int exponent_c = floor(std::log(c)/std::log(2));
+  #else
+    int exponent_a = std::ilogb(a);
     int exponent_b = std::ilogb(b);
     int exponent_c = std::ilogb(c);
+  #endif
+#else
+    int exponent_a = std::ilogb(a);
+    int exponent_b = std::ilogb(b);
+    int exponent_c = std::ilogb(c);
+#endif
+
     T min_exponent= fmin(exponent_a, fmin(exponent_b, exponent_c) );
     T max_exponent= fmax(exponent_c, fmax(exponent_b, exponent_a) );
     int scale_exponent = floor(0.5 * (min_exponent + max_exponent));

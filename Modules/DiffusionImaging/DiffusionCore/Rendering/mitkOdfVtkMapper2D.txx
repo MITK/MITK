@@ -281,7 +281,7 @@ void  mitk::OdfVtkMapper2D<T,N>
         { /// \brief Colourisation of glyph like in MitkWorkbench's dti visualisation, r,g,b,a=x,y,z,fa of main direction of diffusion.
 //          unsigned char rgba[4] = {0,0,0,0};
           double rgba[4] = {0,0,0,0};
-          rgba[3] = abs(tensor.GetFractionalAnisotropy()); //* 255); // fa = FractionalAnisotropy => Helligkeit = Value, and alpha.
+          rgba[3] = fabs(tensor.GetFractionalAnisotropy()); //* 255); // fa = FractionalAnisotropy => Helligkeit = Value, and alpha.
           typename itk::DiffusionTensor3D<T>::EigenValuesArrayType eigenValues;
           typename itk::DiffusionTensor3D<T>::EigenVectorsMatrixType eigenVectors;
           tensor.ComputeEigenAnalysis( eigenValues, eigenVectors ); // normalized eigenvectors as rows in ascending order.
@@ -318,7 +318,7 @@ void  mitk::OdfVtkMapper2D<T,N>
       if( (pfilter-> GetColorMode()) == 0 ) // m_ColourisationMode; VTK_COLOR_BY_INPUT=0, VTK_COLOR_BY_SOURCE=1.
       { /// \brief Colourisation of glyph like in MitkWorkbench's dti visualisation, r,g,b,a=x,y,z,fa of main direction of diffusion.
         double rgba[4] = {0,0,0,0};
-        rgba[3] = abs( tensor.GetFractionalAnisotropy()); // * 255 ); // fa = FractionalAnisotropy => Helligkeit = Value
+        rgba[3] = fabs( tensor.GetFractionalAnisotropy()); // * 255 ); // fa = FractionalAnisotropy => Helligkeit = Value
         typename itk::DiffusionTensor3D<T>::EigenValuesArrayType eigenValues;
         typename itk::DiffusionTensor3D<T>::EigenVectorsMatrixType eigenVectors;
         tensor.ComputeEigenAnalysis( eigenValues, eigenVectors ); // normalized eigenvectors as rows in ascending order.

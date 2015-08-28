@@ -24,6 +24,7 @@ IWorkbenchListener::Events
 {
   if (listener == nullptr) return;
 
+  postStartup += Delegate1(listener, &IWorkbenchListener::PostStartup);
   preShutdown += Delegate2(listener, &IWorkbenchListener::PreShutdown);
   postShutdown += Delegate1(listener, &IWorkbenchListener::PostShutdown);
 }
@@ -34,6 +35,7 @@ IWorkbenchListener::Events
 {
   if (listener == nullptr) return;
 
+  postStartup -= Delegate1(listener, &IWorkbenchListener::PostStartup);
   preShutdown -= Delegate2(listener, &IWorkbenchListener::PreShutdown);
   postShutdown -= Delegate1(listener, &IWorkbenchListener::PostShutdown);
 }

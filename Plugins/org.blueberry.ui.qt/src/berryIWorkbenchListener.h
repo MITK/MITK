@@ -40,9 +40,11 @@ struct BERRY_UI_QT IWorkbenchListener
 {
 
   struct Events {
+      typedef Message1<IWorkbench*> PostStartupEvent;
       typedef Message2<IWorkbench*, bool, bool> PreShutdownEvent;
       typedef Message1<IWorkbench*> PostShutdownEvent;
 
+      PostStartupEvent postStartup;
       PreShutdownEvent preShutdown;
       PostShutdownEvent postShutdown;
 
@@ -56,6 +58,17 @@ struct BERRY_UI_QT IWorkbenchListener
   };
 
   virtual ~IWorkbenchListener();
+
+  /**
+   * Notifies that the workbench has started up.
+   * <p>
+   * This method is called immediately after workbench startup after the workbench windows
+   * have been created.
+   * </p>
+   *
+   * @param workbench the workbench
+   */
+  virtual void PostStartup(IWorkbench*  /*workbench*/) {}
 
   /**
    * Notifies that the workbench is about to shut down.

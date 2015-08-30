@@ -297,8 +297,8 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
       otherPlanesIt = m_OtherPlaneGeometries.begin();
-      int gapsize = 32;
-      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapsize, NULL);
+      int gapSize = 32;
+      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, NULL);
 
 
       auto intervals = IntervalSet<double>{{0, 1}};
@@ -306,43 +306,46 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       ScalarType lineLength = point1.EuclideanDistanceTo(point2);
       DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
-      ScalarType gapinmm = gapsize * displayGeometry->GetScaleFactorMMPerDisplayUnit();
+      ScalarType gapInMM = gapSize * displayGeometry->GetScaleFactorMMPerDisplayUnit();
 
-      float gapSizeParam = gapinmm / lineLength;
+      float gapSizeParam = gapInMM / lineLength;
 
-      while ( otherPlanesIt != otherPlanesEnd )
+      if( gapSize != 0 )
       {
-        bool ignorePlane = false;
-        (*otherPlanesIt)->GetPropertyValue("Crosshair.Ignore", ignorePlane);
-        if (ignorePlane)
+        while ( otherPlanesIt != otherPlanesEnd )
         {
-            ++otherPlanesIt;
-            continue;
-        }
+          bool ignorePlane = false;
+          (*otherPlanesIt)->GetPropertyValue("Crosshair.Ignore", ignorePlane);
+          if (ignorePlane)
+          {
+              ++otherPlanesIt;
+              continue;
+          }
 
-        PlaneGeometry *otherPlaneGeometry = static_cast< PlaneGeometry * >(
-              static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
+          PlaneGeometry *otherPlaneGeometry = static_cast< PlaneGeometry * >(
+                static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
 
-        if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)
-        {
-            double intersectionParam;
-            if (otherPlaneGeometry->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 &&
-                intersectionParam < 1)
-            {
-              Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
-
-              bool intersectionPointInsideOtherPlane =
-                otherPlaneGeometry->HasReferenceGeometry() ?
-                  TestPointInReferenceGeometry(otherPlaneGeometry->GetReferenceGeometry(), point) :
-                  TestPointInPlaneGeometry(otherPlaneGeometry, point);
-
-              if (intersectionPointInsideOtherPlane)
+          if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)
+          {
+              double intersectionParam;
+              if (otherPlaneGeometry->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 &&
+                  intersectionParam < 1)
               {
-                intervals -= SimpleInterval<double>{intersectionParam - gapSizeParam, intersectionParam + gapSizeParam};
+                Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
+
+                bool intersectionPointInsideOtherPlane =
+                  otherPlaneGeometry->HasReferenceGeometry() ?
+                    TestPointInReferenceGeometry(otherPlaneGeometry->GetReferenceGeometry(), point) :
+                    TestPointInPlaneGeometry(otherPlaneGeometry, point);
+
+                if (intersectionPointInsideOtherPlane)
+                {
+                  intervals -= SimpleInterval<double>{intersectionParam - gapSizeParam, intersectionParam + gapSizeParam};
+                }
               }
-            }
+          }
+          ++otherPlanesIt;
         }
-        ++otherPlanesIt;
       }
 
       for (const auto& interval : intervals.getIntervals()) {

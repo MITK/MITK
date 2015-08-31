@@ -33,7 +33,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
   if(MITK_USE_Boost_LIBRARIES)
     string(REPLACE ";" "," _boost_libs "${MITK_USE_Boost_LIBRARIES}")
     foreach(_boost_lib ${MITK_USE_Boost_LIBRARIES})
-      list(APPEND _with_boost_libs ${_with_boost_libs} --with-${_boost_lib})
+      list(APPEND _with_boost_libs --with-${_boost_lib})
     endforeach()
   endif()
 

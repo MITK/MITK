@@ -46,7 +46,6 @@ set(MODULE_TESTS
   mitkMessageTest.cpp
   mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
-  mitkPlaneGeometryDataMapper2DTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
@@ -111,6 +110,7 @@ set(MODULE_TESTS
 if(MITK_ENABLE_RENDERING_TESTING)
 set(MODULE_TESTS
   ${MODULE_TESTS}
+  mitkPlaneGeometryDataMapper2DTest.cpp
   mitkPointSetDataInteractorTest.cpp #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
   mitkSurfaceVtkMapper2DTest.cpp #new rendering test in CppUnit style
 )

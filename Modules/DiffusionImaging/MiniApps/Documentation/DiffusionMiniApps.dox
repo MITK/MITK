@@ -8,6 +8,30 @@ For a detailed list of parameters call the according tool without any arguments 
 
 \section Preprocessing Preprocessing Tools
 
+
+\subsection DiffDicomLoad Diffusion Dicom Loader
+
+Loads Diffusion DICOM Files and creates NRRD or Nifty file.
+
+
+\code
+  $./MitkDiffusionDICOMLoader -i /home/dcmFolder/ -o /home/outputfile.nrrd
+  $./MitkDiffusionDICOMLoader -i /home/dcmFolder/ -o /home/outputfile.nii
+\endcode
+
+
+\subsection RegDicomLoad Regular Dicom Loader
+
+Loads DICOM Files and creates NRRD or Nifty file.
+
+\code
+  $./MitkDicom2Nrrd  -i /home/dcmFolder/ -o /home/outputfile.nrrd
+  $./MitkDicom2Nrrd -i /home/dcmFolder/ -o /home/outputfile.nii
+\endcode
+
+
+
+
 \subsection SecFolderRegistration Folder Registration
 
 Allows to register a series of images (of different modalities, including diffusion weighted) to one reference image. It allows to register derived resources (e.g. a segmentation on

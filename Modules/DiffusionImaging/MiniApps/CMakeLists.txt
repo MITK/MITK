@@ -35,7 +35,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     FileFormatConverter^^MitkFiberTracking
     TensorReconstruction^^
     TensorDerivedMapsExtraction^^
-    DICOMLoader^^
+    DiffusionDICOMLoader^^
     DFTraining^^MitkFiberTracking
     DFTracking^^MitkFiberTracking
     )

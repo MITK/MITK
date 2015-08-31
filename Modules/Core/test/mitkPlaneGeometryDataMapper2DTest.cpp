@@ -62,7 +62,8 @@ int mitkPlaneGeometryDataMapper2DTest(int argc, char* argv[])
   auto planeGeometry = static_cast<mitk::PlaneGeometryData*>(planeNode->GetData())->GetPlaneGeometry();
 
   auto transform = mitk::AffineTransform3D::New();
-  mitk::Vector3D rotationAxis{0.0};
+  mitk::Vector3D rotationAxis;
+  rotationAxis.Fill( 0.0 );
   rotationAxis[2] = 1;
   transform->Rotate3D(rotationAxis, vnl_math::pi_over_4);
 

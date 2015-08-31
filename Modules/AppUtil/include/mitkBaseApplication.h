@@ -228,6 +228,9 @@ public:
   void setProperty(const QString& property, const QVariant& value);
   QVariant getProperty(const QString& property) const;
 
+  void setQProperty(const char* property, const QVariant& value) const;
+  QVariant getQProperty(const char* property) const;
+
   void installTranslator(QTranslator*);
 
   bool isRunning();

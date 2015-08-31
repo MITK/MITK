@@ -81,7 +81,7 @@ namespace
 
     IntervalSet(IntervalType startingInterval)
     {
-      m_IntervalsContainer.emplace(std::move(startingInterval));
+      m_IntervalsContainer.insert(std::move(startingInterval));
     }
 
     void operator-=(const IntervalType& interval)
@@ -102,7 +102,7 @@ namespace
             // Add the new interval to the set
             // emplace_hint adds the element at the closest valid place before the hint iterator,
             //   which is exactly where the new interval should be
-            iter = m_IntervalsContainer.emplace_hint(iter, std::move(interval));
+            iter = m_IntervalsContainer.insert(iter, std::move(interval));
             ++iter;
           }
         }

@@ -797,6 +797,16 @@ QVariant BaseApplication::getProperty(const QString& property) const
   return d->getProperty(property);
 }
 
+void BaseApplication::setQProperty(const char* property, const QVariant& value) const
+{
+  this->getQApplication()->setProperty(property, value);
+}
+
+QVariant BaseApplication::getQProperty(const char* property) const
+{
+  return this->getQApplication()->property(property);
+}
+
 void BaseApplication::installTranslator(QTranslator* translator)
 {
   this->getQApplication()->installTranslator(translator);

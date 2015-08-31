@@ -53,8 +53,8 @@ namespace
   class SimpleInterval {
   public:
     SimpleInterval(T start = T(), T end = T())
-      :  m_LowerBoundary{std::min(start, end)}
-      ,  m_UpperBoundary{std::max(start, end)}
+      :  m_LowerBoundary(std::min(start, end))
+      ,  m_UpperBoundary(std::max(start, end))
     {
 
     }
@@ -77,7 +77,7 @@ namespace
   template<typename T>
   class IntervalSet {
   public:
-    using IntervalType = SimpleInterval<T>;
+    typedef SimpleInterval<T> IntervalType;
 
     IntervalSet(IntervalType startingInterval)
     {
@@ -116,7 +116,7 @@ namespace
       return result;
     }
 
-    using IntervalsContainer = std::set<IntervalType>;
+    typedef std::set<IntervalType> IntervalsContainer;
 
     const IntervalsContainer& getIntervals() const
     {
@@ -134,18 +134,21 @@ namespace
       {
         if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
         {
-          return { IntervalType{}, IntervalType{} } ; // firstInterval completely enclosed
+      std::array<IntervalType, 2> result = { IntervalType(), IntervalType() } ;
+      return result; // firstInterval completely enclosed
         }
-        return{ IntervalType{ firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() }, IntervalType{} }; // secondInterval removes the beginning of firstInterval
+    std::array<IntervalType, 2> result = { IntervalType( firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() ), IntervalType() };
+    return result; // secondInterval removes the beginning of firstInterval
       }
 
       if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
       {
-        return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() }, IntervalType{} }; // secondInterval removes the end of firstInterval
+      std::array<IntervalType, 2> result = { IntervalType( firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() ), IntervalType() };
+      return result; // secondInterval removes the end of firstInterval
       }
-
-      return{ IntervalType{ firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() },
-        IntervalType{ secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() } }; // secondInterval is completely enclosed in firstInterval and removes the middle
+    std::array<IntervalType, 2> result = { IntervalType( firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() ),
+      IntervalType( secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() ) };
+      return result; // secondInterval is completely enclosed in firstInterval and removes the middle
     }
   };
 }
@@ -301,7 +304,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, NULL);
 
 
-      auto intervals = IntervalSet<double>{{0, 1}};
+      auto intervals = IntervalSet<double>( SimpleInterval<double>(0, 1));
 
       ScalarType lineLength = point1.EuclideanDistanceTo(point2);
       ScalarType gapInMM = gapSize * renderer->GetScaleFactorMMPerDisplayUnit();
@@ -337,7 +340,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
 
                 if (intersectionPointInsideOtherPlane)
                 {
-                  intervals -= SimpleInterval<double>{intersectionParam - gapSizeParam, intersectionParam + gapSizeParam};
+                  intervals -= SimpleInterval<double>(intersectionParam - gapSizeParam, intersectionParam + gapSizeParam);
                 }
               }
           }

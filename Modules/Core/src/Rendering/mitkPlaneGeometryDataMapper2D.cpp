@@ -134,20 +134,20 @@ namespace
       {
         if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
         {
-      std::array<IntervalType, 2> result = { IntervalType(), IntervalType() } ;
+          std::array<IntervalType, 2> result = { { IntervalType(), IntervalType() } };
       return result; // firstInterval completely enclosed
         }
-    std::array<IntervalType, 2> result = { IntervalType( firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary() ), IntervalType() };
+        std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary()), IntervalType() } };
     return result; // secondInterval removes the beginning of firstInterval
       }
 
       if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
       {
-      std::array<IntervalType, 2> result = { IntervalType( firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() ), IntervalType() };
+        std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary()), IntervalType() } };
       return result; // secondInterval removes the end of firstInterval
       }
-    std::array<IntervalType, 2> result = { IntervalType( firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary() ),
-      IntervalType( secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary() ) };
+      std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary()),
+        IntervalType(secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary()) } };
       return result; // secondInterval is completely enclosed in firstInterval and removes the middle
     }
   };

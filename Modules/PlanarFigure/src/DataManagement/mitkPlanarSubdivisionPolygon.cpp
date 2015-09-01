@@ -146,7 +146,8 @@ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) con
 int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const
 {
   mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine( polyLineIndex );
-  if ( indexOfPolylinePoint > static_cast<int>(polyLine.size()) )
+  if ( indexOfPolylinePoint < 0
+    || indexOfPolylinePoint > static_cast<int>(polyLine.size()) )
   {
     return -1;
   }

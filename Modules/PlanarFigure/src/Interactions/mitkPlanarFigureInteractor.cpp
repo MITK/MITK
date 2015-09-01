@@ -945,7 +945,7 @@ mitk::PlanarFigureInteractor::IsMousePositionAcceptableAsNewControlPoint(
       // map the 2D coordinates of the control-point to world-coordinates
       planarFigureGeometry->Map( planarFigure->GetControlPoint( i ), previousPoint3D );
 
-      if ( renderer->GetDisplayGeometry()->Distance( previousPoint3D ) < 0.1 ) // ugly, but assert makes this work
+      if ( renderingPlane->Distance( previousPoint3D ) < 0.1 ) // ugly, but assert makes this work
       {
         mitk::Point2D previousDisplayPosition;
         // transform the world-coordinates into display-coordinates

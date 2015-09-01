@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkSurface.h"
 #include "mitkPointSet.h"
+#include "mitkGeometryData.h"
 #include "mitkIOUtil.h"
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
@@ -79,6 +80,46 @@ static mitk::PointSet::Pointer CreatePointSet()
   return ps;
 }
 
+static mitk::GeometryData::Pointer CreateGeometryDataObject()
+{
+  mitk::GeometryData::Pointer gdata = mitk::GeometryData::New();
+
+  // define Geometry3D parameters
+  mitk::AffineTransform3D::MatrixType matrix;
+  matrix[0][0] = 1.1;
+  matrix[1][1] = 2.2;
+  matrix[2][2] = 3.3;
+  mitk::AffineTransform3D::OffsetType offset;
+  mitk::FillVector3D( offset, 0.1, 0.2, 0.3 );
+  bool isImageGeometry(false);
+  unsigned int frameOfReferenceID(47);
+  mitk::BaseGeometry::BoundsArrayType bounds;
+  mitk::Point3D origin;
+  mitk::FillVector3D( origin, 5.1, 5.2, 5.3 );
+  mitk::Vector3D spacing;
+  mitk::FillVector3D( spacing, 2.1, 2.2, 2.3 );
+
+  // build GeometryData from matrix/offset/etc.
+  mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
+  newTransform->SetMatrix(matrix);
+  newTransform->SetOffset(offset);
+
+  mitk::Geometry3D::Pointer newGeometry = mitk::Geometry3D::New();
+  newGeometry->SetFrameOfReferenceID(frameOfReferenceID);
+  newGeometry->SetImageGeometry(isImageGeometry);
+
+  newGeometry->SetIndexToWorldTransform(newTransform);
+
+  newGeometry->SetBounds(bounds);
+  newGeometry->SetOrigin(origin);
+  newGeometry->SetSpacing(spacing);
+
+  mitk::GeometryData::Pointer newGeometryData = mitk::GeometryData::New();
+  gdata->SetGeometry(newGeometry);
+
+  return gdata;
+}
+
 static void FillStorage(mitk::DataStorage* storage, std::string imageName, std::string surfaceName)
 {
   mitk::Image::Pointer image = LoadImage(imageName);
@@ -116,11 +157,15 @@ static void FillStorage(mitk::DataStorage* storage, std::string imageName, std::
   psenode->SetName( "points" );
   storage->Add( psenode );
 
+  mitk::GeometryData::Pointer gdo = CreateGeometryDataObject();
+  mitk::DataNode::Pointer geomNode = mitk::DataNode::New();
+  geomNode->SetData( gdo );
+  geomNode->SetName( "geometry3d" );
+  storage->Add( geomNode );
 }
 
 static void VerifyStorage(mitk::DataStorage* storage)
 {
-  //TODO the Surface and PointSet are uncommented until the material property is saved properly
   mitk::DataNode::Pointer imagenode = storage->GetNamedNode("Pic3D");
   MITK_TEST_CONDITION_REQUIRED(imagenode.IsNotNull(),"Get previously stored image node");
 
@@ -182,6 +227,19 @@ static void VerifyStorage(mitk::DataStorage* storage)
   p = pointset->GetPoint(2);
   MITK_TEST_CONDITION_REQUIRED(p[0] == 2.0 && p[1] == -3.0 && p[2] == 22.0, "Test Pointset entry 2 after loading");
 
+  // GeometryData
+  mitk::DataNode::Pointer geomnode = storage->GetNamedNode("geometry3d");
+  MITK_TEST_CONDITION_REQUIRED(geomnode.IsNotNull(),"Get previously stored GeometryData node");
+
+  mitk::GeometryData::Pointer gdata = dynamic_cast<mitk::GeometryData*>(geomnode->GetData());
+  MITK_TEST_CONDITION_REQUIRED(gdata.IsNotNull(),"Loading test GeometryData from Datastorage");
+
+  mitk::Geometry3D::Pointer geom3D = dynamic_cast<mitk::Geometry3D*>(gdata->GetGeometry());
+  MITK_TEST_CONDITION_REQUIRED(geom3D.IsNotNull(),"Reconstructed a Geometry3D from serialization");
+  MITK_TEST_CONDITION(geom3D->GetImageGeometry() == false,"Reconstructed Geometry3D 'is image geometry'");
+  MITK_TEST_CONDITION(geom3D->GetFrameOfReferenceID() == 47,"Reconstructa Geometry3D has frame of reference '47'");
+
+  // TODO test other properties, BUT don't test too much, that shall be done in a reader/writer test!
 }
 }; // end test helper class
 

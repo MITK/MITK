@@ -309,4 +309,14 @@ std::string IOMimeTypes::POINTSET_MIMETYPE_NAME()
   return name;
 }
 
+CustomMimeType IOMimeTypes::GEOMETRY_DATA_MIMETYPE()
+{
+  mitk::CustomMimeType mimeType( DEFAULT_BASE_NAME() + ".geometrydata" );
+  mimeType.AddExtension("mitkgeometry");
+  mimeType.SetCategory("Geometries");
+  mimeType.SetComment("GeometryData object");
+  return mimeType;
+}
+
+
 }

@@ -243,7 +243,7 @@ int main( int argc, char* argv[] )
   parser.addArgument("fixed", "f", mitkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
   parser.addArgument("moving", "m", mitkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
   parser.addArgument("derived", "d", mitkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
-  parser.addArgument("silent", "s", mitkCommandLineParser::Bool, "Silent:" "No xml progress output.");
+  parser.addArgument("silent", "s", mitkCommandLineParser::Bool, "Silent:", "No xml progress output.");
   parser.addArgument("resample", "r", mitkCommandLineParser::String, "Resample (x,y,z)mm:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
   parser.addArgument("binary", "b", mitkCommandLineParser::Bool, "Binary:", "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
   parser.addArgument("correct-origin", "c", mitkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Use switch when you reveive:  Joint PDF summed to zero ",us::Any());
@@ -432,7 +432,7 @@ int main( int argc, char* argv[] )
 
 
 
-      mitk::IOUtil::SaveImage(movingImage, savePathAndFileName);
+      mitk::IOUtil::Save(movingImage, savePathAndFileName);
     }
 
     if (!silent)

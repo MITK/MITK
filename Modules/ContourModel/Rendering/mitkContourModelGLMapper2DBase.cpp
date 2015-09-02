@@ -55,11 +55,25 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel* rendering
     m_RendererList.push_back( renderer );
   }
 
-  renderer->GetOverlayManager()->AddOverlay( m_PointNumbersOverlay.GetPointer(), renderer );
-  m_PointNumbersOverlay->SetVisibility( false, renderer );
+  mitk::DataNode* dataNode = this->GetDataNode();
 
-  renderer->GetOverlayManager()->AddOverlay( m_ControlPointNumbersOverlay.GetPointer(), renderer );
-  m_ControlPointNumbersOverlay->SetVisibility( false, renderer );
+  bool showPointsNumbers = false;
+  dataNode->GetBoolProperty("contour.points.text", showPointsNumbers);
+
+  bool showControlPointsNumbers = false;
+  dataNode->GetBoolProperty("contour.controlpoints.text", showControlPointsNumbers);
+
+  if ( showPointsNumbers )
+  {
+    renderer->GetOverlayManager()->AddOverlay( m_PointNumbersOverlay.GetPointer(), renderer );
+    m_PointNumbersOverlay->SetVisibility( false, renderer );
+  }
+
+  if ( showControlPointsNumbers )
+  {
+    renderer->GetOverlayManager()->AddOverlay( m_ControlPointNumbersOverlay.GetPointer(), renderer );
+    m_ControlPointNumbersOverlay->SetVisibility( false, renderer );
+  }
 
   InternalDrawContour( renderingContour, renderer );
 }

@@ -154,6 +154,7 @@ class mitkSimpleItkPythonTestSuite : public mitk::CommonPythonTestSuite
 {
   CPPUNIT_TEST_SUITE(mitkSimpleItkPythonTestSuite);
   MITK_TEST(testSimpleItkImageTransfer);
+  MITK_TEST(testSimpleItkMultiComponentImageTransfer);
   MITK_TEST(testSimpleITKMedianFilterSnippet);
   CPPUNIT_TEST_SUITE_END();
 
@@ -166,6 +167,18 @@ public:
     CPPUNIT_ASSERT_MESSAGE ( "Is SimpleITK Python Wrapping available?",
           m_PythonService->IsSimpleItkPythonWrappingAvailable() == true );
 
+    CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.",
+          m_PythonService->CopyToPythonAsSimpleItkImage( m_Image, varName) == true );
+
+    mitk::Image::Pointer pythonImage = m_PythonService->CopySimpleItkImageFromPython(varName);
+
+    CPPUNIT_ASSERT_MESSAGE( "Compare if images are equal after transfer.",
+                            mitk::Equal(*pythonImage.GetPointer(),*m_Image.GetPointer(), mitk::eps,true) );
+  }
+
+  void testSimpleItkMultiComponentImageTransfer()
+  {
+    std::string varName("m_ImageMultiComponent");
     CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.",
           m_PythonService->CopyToPythonAsSimpleItkImage( m_Image, varName) == true );
 

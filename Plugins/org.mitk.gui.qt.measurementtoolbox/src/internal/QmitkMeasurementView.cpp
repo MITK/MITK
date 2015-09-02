@@ -781,13 +781,7 @@ void QmitkMeasurementView::CopyToClipboard( bool checked )
 mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(
         mitk::PlanarFigure* figure, const QString& name)
 {
-    // add as
     MEASUREMENT_DEBUG << "Adding new figure to datastorage...";
-    //if( d->m_SelectedImageNode.IsNull() )
-    //{
-    //  MITK_ERROR << "No reference image available";
-    //  return 0;
-    //}
 
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     newNode->SetName(name.toStdString());

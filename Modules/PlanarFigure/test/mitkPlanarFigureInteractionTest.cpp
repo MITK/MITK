@@ -44,17 +44,17 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
 {
 
   CPPUNIT_TEST_SUITE(mitkPlanarFigureInteractionTestSuite);
-  // BUG 19272
-  //MITK_TEST(AngleInteractionCreate);
-  //MITK_TEST(Angle2InteractionCreate);
-  //MITK_TEST(BezierCurveInteractionCreate);
-  //MITK_TEST(CircleInteractionCreate);
-  //MITK_TEST(DoubleEllipseInteractionCreate);
-  //MITK_TEST(PlanarFourPointAngleInteractionCreate);
-  //MITK_TEST(PlanarLineInteractionCreate);
-  //MITK_TEST(PlanarPolygonInteractionCreate);
-  //MITK_TEST(NonClosedPlanarPolygonInteractionCreate);
-  //MITK_TEST(RectangleInteractionCreate);
+  MITK_TEST(AngleInteractionCreate);
+  MITK_TEST(Angle2InteractionCreate);
+  MITK_TEST(BezierCurveInteractionCreate);
+  MITK_TEST(CircleInteractionCreate);
+  MITK_TEST(DoubleEllipseInteractionCreate);
+  MITK_TEST(PlanarFourPointAngleInteractionCreate);
+  MITK_TEST(PlanarLineInteractionCreate);
+  MITK_TEST(PlanarPolygonInteractionCreate);
+  MITK_TEST(NonClosedPlanarPolygonInteractionCreate);
+  MITK_TEST(RectangleInteractionCreate);
+  // BUG 19304
   //MITK_TEST(PlanarSubdivisionInteractionCreate);
 
   CPPUNIT_TEST_SUITE_END();
@@ -124,7 +124,7 @@ public:
   {
     mitk::PlanarFigure::Pointer figure;
     figure = mitk::PlanarAngle::New();
-    RunTest(figure, "InteractionTestData/Interactions/Angle.xml", "InteractionTestData/ReferenceData/Angle.pf");
+    RunTest(figure, "InteractionTestData/Interactions/Angle1.xml", "InteractionTestData/ReferenceData/Angle1.pf");
   }
 
   void Angle2InteractionCreate()
@@ -159,7 +159,7 @@ public:
   {
     mitk::PlanarFigure::Pointer figure;
     figure = mitk::PlanarSubdivisionPolygon::New();
-    RunTest(figure, "InteractionTestData/Interactions/SubDivision.xml", "InteractionTestData/ReferenceData/SubDivision.pf");
+    RunTest(figure, "InteractionTestData/Interactions/SubdivisionPolygon.xml", "InteractionTestData/ReferenceData/SubDivision.pf");
   }
 
   void PlanarFourPointAngleInteractionCreate()

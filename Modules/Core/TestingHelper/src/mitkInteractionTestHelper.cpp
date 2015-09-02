@@ -250,7 +250,7 @@ void mitk::InteractionTestHelper::PlaybackInteraction()
     //let dispatcher of sending renderer process the event
     m_Events.at(i)->GetSender()->GetDispatcher()->ProcessEvent(m_Events.at(i));
   }
-  if (true)
+  if (false)
   {
     it--;
     (*it)->GetVtkRenderWindow()->GetInteractor()->Start();

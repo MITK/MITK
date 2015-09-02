@@ -210,7 +210,7 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
     m_SegmentationContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
 
     // 3. Show the contour
-    FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
+    FeedbackContourTool::SetFeedbackContour( m_SegmentationContourInWorldCoordinates );
 
     FeedbackContourTool::SetFeedbackContourVisible(true);
     mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
@@ -235,7 +235,7 @@ bool mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
     m_WholeImageContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
 
     // 3. Show the contour
-    FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
+    FeedbackContourTool::SetFeedbackContour( m_SegmentationContourInWorldCoordinates );
 
     FeedbackContourTool::SetFeedbackContourVisible(true);
     mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
@@ -305,14 +305,14 @@ bool mitk::SetRegionTool::OnInvertLogic( StateMachineAction*, InteractionEvent* 
   {
     // use contour extracted from image data
     if (m_SegmentationContourInWorldCoordinates.IsNotNull())
-      FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
+      FeedbackContourTool::SetFeedbackContour( m_SegmentationContourInWorldCoordinates );
     mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
   else
   {
     // use some artificial contour
     if (m_WholeImageContourInWorldCoordinates.IsNotNull())
-      FeedbackContourTool::SetFeedbackContour( *m_WholeImageContourInWorldCoordinates );
+      FeedbackContourTool::SetFeedbackContour( m_WholeImageContourInWorldCoordinates );
     mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
   }
 

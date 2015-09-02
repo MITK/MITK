@@ -259,7 +259,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside( StateMachineAction*, Interac
 
       ContourModel::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true: sub 0.5 for ipSegmentation correction
 
-      FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
+      FeedbackContourTool::SetFeedbackContour( contourInWorldCoordinates );
       FeedbackContourTool::SetFeedbackContourVisible(true);
       mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
       m_FillFeedbackContour = true;
@@ -457,7 +457,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
   {
     ContourModel::Pointer dummyContour = ContourModel::New();
     dummyContour->Initialize();
-    FeedbackContourTool::SetFeedbackContour( *dummyContour );
+    FeedbackContourTool::SetFeedbackContour( dummyContour );
 
     if (regionGrowerResult) ipMITKSegmentationFree(regionGrowerResult);
     return NULL;
@@ -536,7 +536,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
 
     ContourModel::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
 
-    FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
+    FeedbackContourTool::SetFeedbackContour( contourInWorldCoordinates );
   }
 
   // 5. Result HAS TO BE freed by caller, contains the binary region growing result

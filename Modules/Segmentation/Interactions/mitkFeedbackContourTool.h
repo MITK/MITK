@@ -63,7 +63,7 @@ class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
     virtual ~FeedbackContourTool();
 
     ContourModel* GetFeedbackContour();
-    void SetFeedbackContour(ContourModel&);
+    void SetFeedbackContour(ContourModel::Pointer);
 
     void Disable3dRendering();
     void SetFeedbackContourVisible(bool);

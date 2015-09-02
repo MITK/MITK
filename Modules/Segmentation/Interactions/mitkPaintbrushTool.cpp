@@ -388,7 +388,7 @@ bool mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   ContourModel::Pointer displayContour = ContourModel::New();
   displayContour->Initialize();
   displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
-  SetFeedbackContour( *displayContour );
+  SetFeedbackContour( displayContour );
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
 

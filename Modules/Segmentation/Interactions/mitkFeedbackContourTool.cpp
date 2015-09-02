@@ -65,13 +65,13 @@ mitk::ContourModel* mitk::FeedbackContourTool::GetFeedbackContour()
   return m_FeedbackContour;
 }
 
-void mitk::FeedbackContourTool::SetFeedbackContour(ContourModel& contour)
+void mitk::FeedbackContourTool::SetFeedbackContour(ContourModel::Pointer contour)
 {
   // begin of temporary fix for 3m3 release
   this->Disable3dRendering();
   //end of temporary fix for 3m3 release
 
-  m_FeedbackContour = &contour;
+  m_FeedbackContour = contour;
   m_FeedbackContourNode->SetData( m_FeedbackContour );
 }
 

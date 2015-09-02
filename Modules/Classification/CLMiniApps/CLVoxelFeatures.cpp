@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLaplacianRecursiveGaussianImageFilter.h>
 #include "itkHessianRecursiveGaussianImageFilter.h"
 #include "itkUnaryFunctorImageFilter.h"
+#include <itkMultiHistogramFilter.h>
 #include "vnl/algo/vnl_symmetric_eigensystem.h"
 #include <itkSubtractImageFilter.h>
 
@@ -164,6 +165,25 @@ void
   }
 }
 
+template<typename TPixel, unsigned int VImageDimension>
+void
+  LocalHistograms(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::Image<double, VImageDimension> FloatImageType;
+  typedef itk::MultiHistogramFilter <ImageType,ImageType> MultiHistogramType;
+
+  typename MultiHistogramType::Pointer filter = MultiHistogramType::New();
+  filter->SetInput(itkImage);
+  filter->Update();
+  for (int i = 0; i < VImageDimension; ++i)
+  {
+    mitk::Image::Pointer img = mitk::Image::New();
+    mitk::CastToMitkImage(filter->GetOutput(), img);
+    out.push_back(img);
+  }
+}
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -176,6 +196,7 @@ int main(int argc, char* argv[])
   parser.addArgument("difference-of-gaussian","dog",mitkCommandLineParser::String, "Difference of Gaussian Filtering of the input images", "Difference of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("laplace-of-gauss","log",mitkCommandLineParser::String, "Laplacian of Gaussian Filtering", "Laplacian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("hessian-of-gauss","hog",mitkCommandLineParser::String, "Hessian of Gaussian Filtering", "Hessian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
+  parser.addArgument("local-histogram","lh",mitkCommandLineParser::String, "Local Histograms", "Hessian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   // Miniapp Infos
   parser.setCategory("Classification Tools");
   parser.setTitle("Global Image Feature calculator");
@@ -196,6 +217,21 @@ int main(int argc, char* argv[])
 
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   std::string filename=parsedArgs["output"].ToString();
+
+  ////////////////////////////////////////////////////////////////
+  // CAlculate Gaussian Features
+  ////////////////////////////////////////////////////////////////
+  MITK_INFO << "Check for Gaussian...";
+  if (parsedArgs.count("local-histogram"))
+  {
+    std::vector<mitk::Image::Pointer> outs;
+    AccessByItk_1(image, LocalHistograms, outs);
+    for (int i= 0; i < outs.size(); ++i)
+    {
+      std::string name = filename + "-lh"+us::any_value_to_string<int>(i)+".nii.gz";
+      mitk::IOUtil::SaveImage(outs[i], name);
+    }
+  }
 
   ////////////////////////////////////////////////////////////////
   // CAlculate Gaussian Features

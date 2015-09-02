@@ -16,6 +16,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         NativeHeadCTSegmentation^^MitkCLVigraRandomForest
         ManualSegmentationEvaluation^^MitkCLVigraRandomForest
         CLGlobalImageFeatures^^MitkCore_MitkCLUtilities
+        CLMRNormalization^^MitkCore_MitkCLUtilities_MitkCLMRUtilities
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 
@@ -99,10 +100,6 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
   mitk_create_executable(CLVoxelClassification
     DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLImportanceWeighting MitkCLVigraRandomForest
     CPP_FILES CLVoxelClassification.cpp
-  )
-  mitk_create_executable(CLMRNormalization
-    DEPENDS MitkCore MitkCLUtilities
-    CPP_FILES CLMRNormalization.cpp mitkCommandLineParser.cpp
   )
   mitk_create_executable(CLBrainMask
     DEPENDS MitkCore MitkCLUtilities

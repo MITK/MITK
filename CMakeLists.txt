@@ -1225,6 +1225,7 @@ if(MITK_APPS)
     set(target_info_list ${target_info})
     list(GET target_info_list 0 target_dir)
     list(GET target_info_list 1 option_name)
+    list(GET target_info_list 2 executable_name)
     # check if the application is enabled
     if(${option_name} OR MITK_BUILD_ALL_APPS)
       # check whether application specific configuration files will be used
@@ -1242,7 +1243,7 @@ if(MITK_APPS)
         endif()
       endif()
     # add link to the list
-    list(APPEND CPACK_CREATE_DESKTOP_LINKS "${target_dir}")
+    list(APPEND CPACK_CREATE_DESKTOP_LINKS "${executable_name}")
     endif()
   endforeach()
 

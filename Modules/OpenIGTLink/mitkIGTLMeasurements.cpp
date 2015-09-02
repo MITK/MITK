@@ -102,6 +102,7 @@ bool mitk::IGTLMeasurements::ExportData(std::string filename)
    offset = offset - offset % 1000000;
 
    //for each entry of the map
+   /* does not work under linux... TODO fix
    for each (auto entry in m_MeasurementPoints)
    {
      *out << entry.second.size() << ";";
@@ -112,6 +113,7 @@ bool mitk::IGTLMeasurements::ExportData(std::string filename)
      }
      *out << "\n";
    }
+   */
 
    out->flush();
    delete out;

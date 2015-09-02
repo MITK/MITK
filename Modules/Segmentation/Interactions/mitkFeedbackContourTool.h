@@ -95,8 +95,6 @@ class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
     */
     void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
 
-  private:
-
     ContourModel::Pointer      m_FeedbackContour;
     DataNode::Pointer m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;

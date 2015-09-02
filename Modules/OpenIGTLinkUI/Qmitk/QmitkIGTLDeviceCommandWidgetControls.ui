@@ -56,6 +56,9 @@
        <property name="toolTip">
         <string>Set the frames per second of the stream</string>
        </property>
+       <property name="maximum">
+        <number>1500</number>
+       </property>
        <property name="value">
         <number>10</number>
        </property>

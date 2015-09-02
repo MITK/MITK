@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>OpenIGTLinkProviderExampleControls</class>
- <widget class="QWidget" name="OpenIGTLinkProviderExampleControls">
+ <class>OpenIGTLinkMeasurementsControls</class>
+ <widget class="QWidget" name="OpenIGTLinkMeasurementsControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,26 +23,19 @@
    <item row="1" column="0">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="butOpenNavData">
+      <widget class="QPushButton" name="startButton">
        <property name="text">
-        <string>Open Recorded Navigation Data</string>
+        <string>Start Measurement</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="butStart">
+      <widget class="QPushButton" name="exportButton">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Start Playing Recorded Navigation Data</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="visualizeCheckBox">
-       <property name="text">
-        <string>Visualize</string>
+        <string>Export Measurement</string>
        </property>
       </widget>
      </item>

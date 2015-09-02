@@ -7,12 +7,14 @@ set(INTERNAL_CPP_FILES
   OpenIGTLinkManager.cpp
   OpenIGTLinkExample.cpp
   OpenIGTLinkProviderExample.cpp
+  OpenIGTLinkMeasurements.cpp
 )
 
 set(UI_FILES
   src/internal/OpenIGTLinkProviderExampleControls.ui
   src/internal/OpenIGTLinkExampleControls.ui
   src/internal/OpenIGTLinkManagerControls.ui
+  src/internal/OpenIGTLinkMeasurementsControls.ui
 )
 
 set(MOC_H_FILES
@@ -20,6 +22,7 @@ set(MOC_H_FILES
   src/internal/OpenIGTLinkProviderExample.h
   src/internal/OpenIGTLinkExample.h
   src/internal/OpenIGTLinkManager.h
+  src/internal/OpenIGTLinkMeasurements.h
 )
 
 # list of resource files which can be used by the plug-in

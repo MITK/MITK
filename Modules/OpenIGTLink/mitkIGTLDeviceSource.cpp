@@ -53,6 +53,7 @@ mitk::IGTLDeviceSource::~IGTLDeviceSource()
     {
       this->Disconnect();
     }
+    this->RemoveObservers();
     m_IGTLDevice = NULL;
   }
 }
@@ -79,11 +80,28 @@ void mitk::IGTLDeviceSource::GenerateData()
 //  }
 }
 
+void mitk::IGTLDeviceSource::RemoveObservers()
+{
+  if (this->m_IGTLDevice.IsNotNull())
+  {
+    this->m_IGTLDevice->RemoveObserver(m_IncomingMessageObserverTag);
+    this->m_IGTLDevice->RemoveObserver(m_IncomingCommandObserverTag);
+    this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+  }
+}
+
 void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )
 {
   MITK_DEBUG << "Setting IGTLDevice to " << igtlDevice;
   if (this->m_IGTLDevice.GetPointer() != igtlDevice)
   {
+    //check if we want to override the device
+    if (this->m_IGTLDevice.IsNotNull())
+    {
+      //the device was set previously => we need to reset the observers
+      this->RemoveObservers();
+    }
+    //set the device
     this->m_IGTLDevice = igtlDevice;
     this->CreateOutputs();
     std::stringstream name; // create a human readable name for the source
@@ -91,18 +109,22 @@ void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )
     this->SetName(name.str());
 
     //setup a observer that listens to new messages and new commands
-    typedef itk::SimpleMemberCommand<mitk::IGTLDeviceSource> CurCommandType;
-    CurCommandType::Pointer msgReceivedCommand = CurCommandType::New();
-    msgReceivedCommand->SetCallbackFunction(
-      this, &IGTLDeviceSource::OnIncomingMessage );
-    this->m_IGTLDevice->AddObserver(mitk::MessageReceivedEvent(),
-                                    msgReceivedCommand);
-    CurCommandType::Pointer cmdReceivedCommand = CurCommandType::New();
-    cmdReceivedCommand->SetCallbackFunction(
-      this, &IGTLDeviceSource::OnIncomingCommand );
-    this->m_IGTLDevice->AddObserver(mitk::CommandReceivedEvent(),
-                                    cmdReceivedCommand);
+    typedef itk::SimpleMemberCommand<IGTLDeviceSource> DeviceSrcCommand;
 
+    DeviceSrcCommand::Pointer msgReceivedCommand = DeviceSrcCommand::New();
+    msgReceivedCommand->SetCallbackFunction( this, &IGTLDeviceSource::OnIncomingMessage );
+    this->m_IncomingMessageObserverTag =
+      this->m_IGTLDevice->AddObserver(mitk::MessageReceivedEvent(), msgReceivedCommand);
+
+    DeviceSrcCommand::Pointer cmdReceivedCommand = DeviceSrcCommand::New();
+    cmdReceivedCommand->SetCallbackFunction(this, &IGTLDeviceSource::OnIncomingCommand);
+    this->m_IncomingCommandObserverTag =
+      this->m_IGTLDevice->AddObserver(mitk::CommandReceivedEvent(), cmdReceivedCommand);
+
+    DeviceSrcCommand::Pointer connectionLostCommand = DeviceSrcCommand::New();
+    connectionLostCommand->SetCallbackFunction(this, &IGTLDeviceSource::OnLostConnection);
+    this->m_LostConnectionObserverTag =
+      this->m_IGTLDevice->AddObserver(mitk::LostConnectionEvent(), connectionLostCommand);
   }
 }
 
@@ -243,6 +265,11 @@ void mitk::IGTLDeviceSource::OnIncomingMessage()
 }
 
 void mitk::IGTLDeviceSource::OnIncomingCommand()
+{
+
+}
+
+void mitk::IGTLDeviceSource::OnLostConnection()
 {
 
 }

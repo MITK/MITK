@@ -141,6 +141,8 @@ void mitk::IGTLServer::Send()
   if ( curMessage.IsNull() )
     return;
 
+  m_Measurement->AddMeasurement(4);
+
   //the server can be connected with several clients, therefore it has to check
   //all registered clients
   //sending a message to all registered clients might not be the best solution,

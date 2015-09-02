@@ -15,8 +15,9 @@ option(MITK_BUILD_APP_Diffusion "Build the MITK Diffusion executable" OFF)
 # target_libraries.cmake file setting a list named "target_libraries"
 # with required plug-in target names.
 
+# Format is "Directory Name^^CMake Option Name^^Executable Name (without file suffix)"
 set(MITK_APPS
-  CoreApp^^MITK_BUILD_APP_CoreApp
-  Workbench^^MITK_BUILD_APP_Workbench
-  Diffusion^^MITK_BUILD_APP_Diffusion
+  CoreApp^^MITK_BUILD_APP_CoreApp^^MitkCoreApp
+  Workbench^^MITK_BUILD_APP_Workbench^^MitkWorkbench
+  Diffusion^^MITK_BUILD_APP_Diffusion^^MitkDiffusion
 )

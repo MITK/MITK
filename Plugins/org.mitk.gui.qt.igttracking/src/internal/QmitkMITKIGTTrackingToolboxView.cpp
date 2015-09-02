@@ -101,9 +101,10 @@ try
   if(m_Worker) {delete m_Worker;}
   //remove the tracking volume
   this->GetDataStorage()->Remove(m_TrackingVolumeNode);
-  //remove the tool storage
+  //unregister microservices
   if(m_toolStorage) {m_toolStorage->UnRegisterMicroservice();}
   if(m_TrackingDeviceSource) {m_TrackingDeviceSource->UnRegisterMicroservice();}
+  if(m_IGTLMessageProvider.IsNotNull()){m_IGTLMessageProvider->UnRegisterMicroservice();}
   }
   catch(std::exception& e) {MITK_WARN << "Unexpected exception during clean up of tracking toolbox view: " << e.what();}
   catch(...) {MITK_WARN << "Unexpected unknown error during clean up of tracking toolbox view!";}

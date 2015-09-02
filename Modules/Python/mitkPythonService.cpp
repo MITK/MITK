@@ -795,11 +795,7 @@ bool mitk::PythonService::IsSimpleItkPythonWrappingAvailable()
 
 bool mitk::PythonService::IsOpenCvPythonWrappingAvailable()
 {
-  QString command;
-  command.append( QString("try:\n   import cv2\nexcept:\n   pass\n"));
-  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
-
-  //this->Execute( "import cv2\n", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "import cv2\n", IPythonService::SINGLE_LINE_COMMAND );
   m_OpenCVWrappingAvailable = !this->PythonErrorOccured();
 
   return m_OpenCVWrappingAvailable;

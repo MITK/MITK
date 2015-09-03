@@ -48,6 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QAction>
+#include <QClipboard>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -554,6 +555,19 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
   }
 }
 
+void QmitkXnatTreeBrowserView::OnContextMenuCopyXNATUrlToClipboard()
+{
+  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  ctkXnatObject* currentXnatObject = m_TreeModel->xnatObject(index);
+  if (currentXnatObject != nullptr)
+  {
+    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Server Address", "");
+    serverURL.append(currentXnatObject->resourceUri());
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(serverURL);
+  }
+}
+
 void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& droppedNodes, ctkXnatObject* parentObject, const QModelIndex& parentIndex)
 {
   if (parentObject == nullptr)
@@ -659,6 +673,11 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
 {
   m_ContextMenu->clear();
+  QAction* actGetXNATURL = new QAction("Copy XNAT URL to clipboard", m_ContextMenu);
+  m_ContextMenu->addAction(actGetXNATURL);
+  connect(actGetXNATURL, SIGNAL(triggered()), this, SLOT(OnContextMenuCopyXNATUrlToClipboard()));
+  m_ContextMenu->addSeparator();
+
   QModelIndex index = m_Controls.treeView->indexAt(pos);
 
   ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);

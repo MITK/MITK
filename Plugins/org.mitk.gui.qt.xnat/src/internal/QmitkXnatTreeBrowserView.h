@@ -78,6 +78,7 @@ protected slots:
   void OnContextMenuUploadFile();
   void OnContextMenuCreateNewSubject();
   void OnContextMenuCreateNewExperiment();
+  void OnContextMenuCopyXNATUrlToClipboard();
 
   void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *, const QModelIndex &parentIndex);
 

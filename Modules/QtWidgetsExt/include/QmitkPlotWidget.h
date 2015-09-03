@@ -165,7 +165,7 @@ public:
   */
   void SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol );
 
-  /**m_Skeletonize
+  /**
   * Sets the title of the given curve. The title will be shown in the legend of
   * the QwtPlot.
   * @param curveId the id of the curve for which the title should be set
@@ -179,7 +179,7 @@ public:
   */
   void SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos=QwtPlot::RightLegend, double ratio=-1);
 
-  /** m_Skeletonize
+  /**
   * Triggers a replot of the curve. Replot should be called once after
   * setting new data.
   */

@@ -24,6 +24,7 @@ if(NOT MITK_DIR)
   option(MITK_USE_Boost "Use the Boost library in MITK" OFF)
   option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
+  option(MITK_USE_VMTK "Use the Vascular Modeling Toolkit in MITK" OFF)
   option(MITK_USE_Python "Enable Python wrapping in MITK" OFF)
 
   if(MITK_USE_BLUEBERRY AND NOT MITK_USE_CTK)
@@ -58,6 +59,7 @@ if(NOT MITK_DIR)
     MITK_USE_Boost
     MITK_USE_OpenCV
     MITK_USE_SOFA
+    MITK_USE_VMTK
     MITK_USE_Python
    )
 
@@ -97,7 +99,7 @@ if(NOT MITK_DIR)
   # Create options to inject pre-build dependencies
   #-----------------------------------------------------------------------------
 
-  foreach(proj CTK DCMTK GDCM VTK ACVD ITK OpenCV SOFA CableSwig)
+  foreach(proj CTK DCMTK GDCM VTK ACVD ITK OpenCV SOFA VMTK CableSwig)
     if(MITK_USE_${proj})
       set(MITK_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
       mark_as_advanced(MITK_${proj}_DIR)

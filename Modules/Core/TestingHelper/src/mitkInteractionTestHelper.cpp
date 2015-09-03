@@ -157,6 +157,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       }
 
       rw->GetVtkRenderWindow()->Render();
+      rw->GetVtkRenderWindow()->WaitForCompletion();
 
       //connect SliceNavigationControllers to timestep changed event of TimeNavigationController
       rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);
@@ -186,19 +187,19 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
 mitk::InteractionTestHelper::~InteractionTestHelper()
 {
-      mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
+  mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
 
-      //unregister renderers
-      InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
-      InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+  //unregister renderers
+  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
+  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
 
-      for(; it != end; it++)
-      {
-          rm->GetTimeNavigationController()->Disconnect((*it)->GetSliceNavigationController());
-          (*it)->GetSliceNavigationController()->Disconnect(rm->GetTimeNavigationController());
-          mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
-      }
-      rm->RemoveAllObservers();
+  for(; it != end; it++)
+  {
+    rm->GetTimeNavigationController()->Disconnect((*it)->GetSliceNavigationController());
+    (*it)->GetSliceNavigationController()->Disconnect(rm->GetTimeNavigationController());
+    mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
+  }
+  rm->RemoveAllObservers();
 }
 
 
@@ -233,13 +234,26 @@ void mitk::InteractionTestHelper::PlaybackInteraction()
     (*it)->GetVtkRenderWindow()->Render();
     (*it)->GetVtkRenderWindow()->WaitForCompletion();
   }
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
 
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  it = m_RenderWindowList.begin();
+  for(; it != end; it++)
+  {
+    (*it)->GetVtkRenderWindow()->Render();
+    (*it)->GetVtkRenderWindow()->WaitForCompletion();
+  }
+
+  //mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   //playback all events in queue
   for (unsigned long i=0; i < m_Events.size(); ++i)
   {
     //let dispatcher of sending renderer process the event
     m_Events.at(i)->GetSender()->GetDispatcher()->ProcessEvent(m_Events.at(i));
+  }
+  if (false)
+  {
+    it--;
+    (*it)->GetVtkRenderWindow()->GetInteractor()->Start();
   }
 
 }
@@ -431,7 +445,7 @@ void mitk::InteractionTestHelper::Set3dCameraSettings()
           namedRenderer->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(viewUp);
         }
 
-      namedRenderer->GetVtkRenderWindow()->Render();
+        namedRenderer->GetVtkRenderWindow()->Render();
       }
     }
   }

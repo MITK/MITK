@@ -55,7 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
-#include <QlayoutItem>
+#include <QLayoutItem>
 #include <QMenu>
 #include <QMessageBox>
 

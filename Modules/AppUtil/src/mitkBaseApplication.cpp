@@ -477,16 +477,14 @@ QString BaseApplication::getProvisioningFilePath() const
 
 void BaseApplication::initializeQt()
 {
-  if (qApp) return;
-
   // If previously parameters have been set we have to store them
   // to hand them through to the application
-  QString appName = this->getApplicationName();
-  QString orgName = this->getOrganizationName();
-  QString orgDomain = this->getOrganizationDomain();
+  QString appName = d->m_AppName;
+  QString orgName = d->m_OrgaName;
+  QString orgDomain = d->m_OrgaDomain;
 
   // Create a QCoreApplication instance
-  this->getQApplication();
+  if (qApp == nullptr) this->getQApplication();
 
   // provide parameters to QCoreApplication
   this->setApplicationName(appName);

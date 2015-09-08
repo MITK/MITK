@@ -34,8 +34,9 @@ class MciWrapper(object):
         self.mci_filename = mci_filename
 
     def set_mco_filename(self, mco_filename):
-        """relative path of the mco file. Note that this will be relative
-        to the path the mcml executable is located"""
+        """path of the mco file.
+        This can be either a path relative to the mcml executable
+        or an absolute path."""
         self.mco_filename = mco_filename
 
     def set_nr_photons(self, nr_photons):
@@ -141,4 +142,17 @@ class SimWrapper(object):
 
 
 def get_reflectance(mco_filename):
-    pass
+    """
+    extract reflectance from mco file.
+    Attention: mco_filename specifies full path.
+
+    Returns: the reflectance
+    """
+    with open(mco_filename) as myFile:
+        for line in myFile:
+            if "Specular reflectance" in line:
+                specular_reflectance = float(line.split(' ', 1)[0])
+            if "Diffuse reflectance" in line:
+                diffuse_reflectance = float(line.split(' ', 1)[0])
+    return specular_reflectance + diffuse_reflectance
+

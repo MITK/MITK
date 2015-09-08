@@ -9,6 +9,20 @@ https://code.google.com/p/gpumcml/
 @author: wirkert
 '''
 
+import os
+import subprocess
+import contextlib
+
+
+""" helper method to change to the correct path and back again """
+@contextlib.contextmanager
+def cd(newPath):
+    savedPath = os.getcwd()
+    os.chdir(newPath)
+    yield
+    os.chdir(savedPath)
+
+
 class MciWrapper(object):
     '''
     this class provides a wrapper to the mcml monte carlo file.
@@ -20,6 +34,8 @@ class MciWrapper(object):
         self.mci_filename = mci_filename
 
     def set_mco_filename(self, mco_filename):
+        """relative path of the mco file. Note that this will be relative
+        to the path the mcml executable is located"""
         self.mco_filename = mco_filename
 
     def set_nr_photons(self, nr_photons):
@@ -101,14 +117,24 @@ class MciWrapper(object):
 class SimWrapper(object):
 
     def set_mci_filename(self, mci_filename):
-        pass
+        """the full path to the input file. E.g. ./data/my.mci
+        """
+        self.mci_filename = mci_filename
 
-    def set_mcml_executable(self):
-        pass
+    def set_mcml_executable(self, mcml_executable):
+        """ the full path of the excutable. E.g. ./mcml/mcml.exe"""
+        self.mcml_executable = mcml_executable
 
     def run_simulation(self):
         """this method runs a monte carlo simulation"""
-        pass
+        mcml_path, mcml_file = os.path.split(self.mcml_executable)
+        abs_mci_filename = os.path.abspath(self.mci_filename)
+
+        args = ("./" + mcml_file, "-A", abs_mci_filename)
+
+        with cd(mcml_path):
+            popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+            popen.wait()
 
     def __init__(self):
         pass

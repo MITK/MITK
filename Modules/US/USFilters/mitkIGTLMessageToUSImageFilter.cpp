@@ -24,18 +24,13 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
 {
   m_upstream->Update();
 
-  igtl::ImageMessage* imgMsg = (igtl::ImageMessage*)(m_upstream->GetOutput());
-
-  if (!imgMsg)
-  {
-    throw(
-        "Cast from igtl::MessageBase to igtl::ImageMessage failed! Please "
-        "check the message.");
+  mitk::IGTLMessage* msg = m_upstream->GetOutput();
+  if (!msg->IsDataValid()) {
+      return;
   }
 
-  igtl::ImageMessage::Pointer imgMsg2 = igtl::ImageMessage::New();
-  imgMsg2->Copy(imgMsg);
-  imgMsg = imgMsg2;
+  igtl::MessageBase::Pointer msgBase = msg->GetMessage();
+  igtl::ImageMessage* imgMsg = (igtl::ImageMessage*)(msgBase.GetPointer());
 
   MITK_INFO << "<ImageMessage>";
   imgMsg->Print(std::cout);

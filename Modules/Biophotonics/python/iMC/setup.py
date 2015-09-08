@@ -18,6 +18,6 @@ setup(name= 'MultiSpectralImaging',
       packages= find_packages(where='msi', exclude=['test*']),
       package_dir = {'':'msi'},
       package_data= {'data':['*.txt']},
-      install_requires= ['numpy>=1.8.2', 'SimpleITK>=0.9.0', 'scipy>=0.15.1'],
+      install_requires= ['numpy>=1.8.2', 'SimpleITK>=0.9.0', 'scipy>=0.15.1', 'pymiecoated'],
       entry_points= {} # for scritps, add later
      )

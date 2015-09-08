@@ -16,7 +16,6 @@ import msi.msimanipulations as mani
 class TestMsiManipulations(unittest.TestCase):
 
     def setUp(self):
-
         self.msi = helpers.getFakeMsi()
         self.specialmsi = helpers.getFakeMsi()
 
@@ -154,7 +153,8 @@ class TestMsiManipulations(unittest.TestCase):
         np.testing.assert_almost_equal(self.specialmsi.get_image(),
                                        desired_image_data, 15,
                        "corrected image is a division of integration times")
-        np.testing.assert_equal(flatfield.get_image(), flatfield_copy.get_image(),
+        np.testing.assert_equal(flatfield.get_image(),
+                                flatfield_copy.get_image(),
                                 "flatfield doesn't change by correction")
 
     def test_flatfield_correction_with_single_value(self):

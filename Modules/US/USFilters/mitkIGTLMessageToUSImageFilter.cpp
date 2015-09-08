@@ -24,11 +24,6 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
 {
   m_upstream->Update();
 
-  IGTLMessage* msg = m_upstream->GetOutput();
-  MITK_INFO << "<IGTLMessage>";
-  msg->Print(std::cout, 2);
-  MITK_INFO << "</IGTLMessage>";
-
   igtl::ImageMessage* imgMsg = (igtl::ImageMessage*)(m_upstream->GetOutput());
 
   if (!imgMsg)
@@ -37,6 +32,10 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
         "Cast from igtl::MessageBase to igtl::ImageMessage failed! Please "
         "check the message.");
   }
+
+  igtl::ImageMessage::Pointer imgMsg2 = igtl::ImageMessage::New();
+  imgMsg2->Copy(imgMsg);
+  imgMsg = imgMsg2;
 
   MITK_INFO << "<ImageMessage>";
   imgMsg->Print(std::cout);
@@ -48,21 +47,7 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
     throw("Can not handle non-grayscale images");
   }
 
-  int host_endian;
-  // TODO: Can this be done simpler?
-  if (htonl(47) == 47)
-  {
-    host_endian = igtl::ImageMessage::ENDIAN_BIG;
-  }
-  else
-  {
-    host_endian = igtl::ImageMessage::ENDIAN_LITTLE;
-  }
-  if (host_endian != imgMsg->GetEndian())
-  {
-    // TODO: Convert endiannes
-    throw("Can not handle messages in non-host endiannes");
-  }
+  bool big_endian = (imgMsg->GetEndian() == igtl::ImageMessage::ENDIAN_BIG);
 
   if (imgMsg->GetCoordinateSystem() != igtl::ImageMessage::COORDINATE_RAS)
   {
@@ -73,21 +58,21 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
   switch (imgMsg->GetScalarType())
   {
     case igtl::ImageMessage::TYPE_UINT8:
-      Initiate<unsigned char>(img, imgMsg);
+      Initiate<unsigned char>(img, imgMsg, big_endian);
     case igtl::ImageMessage::TYPE_INT8:
-      Initiate<char>(img, imgMsg);
+      Initiate<char>(img, imgMsg, big_endian);
     case igtl::ImageMessage::TYPE_UINT16:
-      Initiate<unsigned short>(img, imgMsg);
+      Initiate<unsigned short>(img, imgMsg, big_endian);
     case igtl::ImageMessage::TYPE_INT16:
-      Initiate<short>(img, imgMsg);
+      Initiate<short>(img, imgMsg, big_endian);
     case igtl::ImageMessage::TYPE_UINT32:
-      Initiate<unsigned int>(img, imgMsg);
+      Initiate<unsigned int>(img, imgMsg, big_endian);
     case igtl::ImageMessage::TYPE_INT32:
-      Initiate<int>(img, imgMsg);
+      Initiate<int>(img, imgMsg, big_endian);
     case igtl::ImageMessage::TYPE_FLOAT32:
-      Initiate<float>(img, imgMsg);
+      Initiate<float>(img, imgMsg, big_endian);
     case igtl::ImageMessage::TYPE_FLOAT64:
-      Initiate<double>(img, imgMsg);
+      Initiate<double>(img, imgMsg, big_endian);
     default:
       mitkThrow() << "Incompatible PixelType " << imgMsg;
   }
@@ -95,7 +80,7 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
 
 template <typename TPixel>
 void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
-                                                igtl::ImageMessage* msg)
+                                                igtl::ImageMessage* msg, bool big_endian)
 {
   typedef itk::Image<TPixel, 3> ImageType;
 
@@ -142,7 +127,25 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   region.SetIndex(index);
   output->SetRegions(region);
   output->SetSpacing(spacing);
-  memcpy((void*)output->GetBufferPointer(), msg->GetScalarPointer(), num_bytes);
+
+  if (sizeof(TPixel) != 4) {
+      throw("TODO: wrong pixel size");
+  }
+
+  TPixel* in = (TPixel*)msg->GetScalarPointer();
+  TPixel* out = (TPixel*)output->GetBufferPointer();
+  for (size_t i = 0; i < num_bytes / sizeof(TPixel); ++i) {
+      switch (sizeof(TPixel)) {
+      case 1:
+          out[i] = in[i];
+      case 2:
+          out[i] = big_endian ? be16toh(in[i]) : le16toh(in[i]);
+      case 4:
+          out[i] = big_endian ? be32toh(in[i]) : le32toh(in[i]);
+      case 8:
+          out[i] = big_endian ? be64toh(in[i]) : le64toh(in[i]);
+      }
+  }
 
   // TODO: Coordinate system
 

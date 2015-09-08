@@ -62,7 +62,7 @@ class MITKUS_EXPORT IGTLMessageToUSImageFilter : public USImageSource
   mitk::IGTLMessageSource* m_upstream;
 
   template <typename TPixel>
-  void Initiate(mitk::Image::Pointer& img, igtl::ImageMessage* msg);
+  void Initiate(mitk::Image::Pointer& img, igtl::ImageMessage* msg, bool big_endian);
 };
 
 }  // namespace mitk

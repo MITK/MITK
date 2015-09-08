@@ -1,0 +1,46 @@
+'''
+Created on Sep 8, 2015
+
+@author: wirkert
+'''
+import unittest
+import os
+import filecmp
+
+from mc.sim import *
+
+class Test(unittest.TestCase):
+
+
+    def setUp(self):
+        self.mci_filename = "temp.mci"
+        self.mco_filename = "temp.mco"
+        # create a wrapper which shall create a mci file
+        self.wrapper = MciWrapper()
+        self.wrapper.set_mci_filename(self.mci_filename)
+        self.wrapper.set_mco_filename(self.mco_filename)
+        self.wrapper.set_nr_photons(10 ** 6)
+        self.wrapper.add_layer(1.0, 2.1, 3.2, 4.3, 5.4)
+        self.wrapper.add_layer(6.5, 7.8, 8.9, 9.10, 10.11)
+        self.wrapper.add_layer(100.1001, 101.10001, 102.100001,
+                               103.1000001, 104.10000001)
+        self.wrapper.set_layer(1, 1, 1, 1, 1, 1)
+        # expected mci file
+        self.correct_mci_filename = "./mc/data/correct.mci"
+
+    def tearDown(self):
+        os.remove(self.mci_filename)
+#         os.remove(self.mco_filename)
+        pass
+
+
+    def test_mci_wrapper(self):
+        self.wrapper.create_mci_file()
+
+        self.assertTrue(os.path.isfile(self.mci_filename),
+                        "mci file was created")
+        self.assertTrue(filecmp.cmp(self.mci_filename,
+                                    self.correct_mci_filename, shallow=False),
+                        "the written mci file is the same as the stored " +
+                        "reference file")
+

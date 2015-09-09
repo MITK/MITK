@@ -14,10 +14,9 @@
 
         ===================================================================*/
 
-#include <arpa/inet.h>
-
 #include <mitkIGTLMessageToUSImageFilter.h>
 #include <igtlImageMessage.h>
+#include <itkByteSwapper.h>
 
 void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
     mitk::Image::Pointer& img)
@@ -89,11 +88,11 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
 
   int dims[3];
   msg->GetDimensions(dims);
-  size_t num_bytes = sizeof(TPixel);
+  size_t num_pixel = 1;
   for (size_t i = 0; i < 3; i++)
   {
     size[i] = dims[i];
-    num_bytes *= size[i];
+    num_pixel *= dims[i];
   }
 
   int sdims[3], offs[3];
@@ -122,24 +121,17 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   region.SetIndex(index);
   output->SetRegions(region);
   output->SetSpacing(spacing);
-
-  if (sizeof(TPixel) != 4) {
-      throw("TODO: wrong pixel size");
-  }
+  output->Allocate();
 
   TPixel* in = (TPixel*)msg->GetScalarPointer();
   TPixel* out = (TPixel*)output->GetBufferPointer();
-  for (size_t i = 0; i < num_bytes / sizeof(TPixel); ++i) {
-      switch (sizeof(TPixel)) {
-      case 1:
-          out[i] = in[i];
-      case 2:
-          out[i] = big_endian ? be16toh(in[i]) : le16toh(in[i]);
-      case 4:
-          out[i] = big_endian ? be32toh(in[i]) : le32toh(in[i]);
-      case 8:
-          out[i] = big_endian ? be64toh(in[i]) : le64toh(in[i]);
-      }
+  memcpy(out, in, num_pixel * sizeof(TPixel));
+  if (big_endian) {
+    // Even though this method is called "FromSystemToBigEndian", it also swaps "FromBigEndianToSystem".
+    // This makes sense, but might be confusing at first glance.
+    itk::ByteSwapper<TPixel>::SwapRangeFromSystemToBigEndian(out, num_pixel);
+  } else {
+    itk::ByteSwapper<TPixel>::SwapRangeFromSystemToLittleEndian(out, num_pixel);
   }
 
   // TODO: Coordinate system

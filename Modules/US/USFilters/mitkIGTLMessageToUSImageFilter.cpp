@@ -53,20 +53,28 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
   {
     case igtl::ImageMessage::TYPE_UINT8:
       Initiate<unsigned char>(img, imgMsg, big_endian);
+      break;
     case igtl::ImageMessage::TYPE_INT8:
       Initiate<char>(img, imgMsg, big_endian);
+      break;
     case igtl::ImageMessage::TYPE_UINT16:
       Initiate<unsigned short>(img, imgMsg, big_endian);
+      break;
     case igtl::ImageMessage::TYPE_INT16:
       Initiate<short>(img, imgMsg, big_endian);
+      break;
     case igtl::ImageMessage::TYPE_UINT32:
       Initiate<unsigned int>(img, imgMsg, big_endian);
+      break;
     case igtl::ImageMessage::TYPE_INT32:
       Initiate<int>(img, imgMsg, big_endian);
+      break;
     case igtl::ImageMessage::TYPE_FLOAT32:
       Initiate<float>(img, imgMsg, big_endian);
+      break;
     case igtl::ImageMessage::TYPE_FLOAT64:
       Initiate<double>(img, imgMsg, big_endian);
+      break;
     default:
       mitkThrow() << "Incompatible PixelType " << imgMsg;
   }

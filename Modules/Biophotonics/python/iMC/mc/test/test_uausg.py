@@ -12,12 +12,12 @@ from mc.usuag import Ua, UsG
 class test_ua(unittest.TestCase):
 
     def setUp(self):
-        self.ua = Ua()
-        self.ua532 = self.ua(532.*10 ** -9) / 100.
-        self.ua800 = self.ua(800.*10 ** -9) / 100.
+        self.ua_sm = Ua()
+        self.ua532 = self.ua_sm(532.*10 ** -9) / 100.
+        self.ua800 = self.ua_sm(800.*10 ** -9) / 100.
 
     def test_uA532(self):
-        self.assertTrue(3. < self.ua532 < 4., "test if calculated ua takes " +
+        self.assertTrue(3. < self.ua532 < 4., "test if calculated ua_sm takes " +
                         "reasonable values " +
                         "(according to \"Determination of optical" +
                         " properties of normal and adenomatous human colon " +
@@ -25,7 +25,7 @@ class test_ua(unittest.TestCase):
                         "techniques\")")
 
     def test_uA800(self):
-        self.assertTrue(0.05 < self.ua800 < 0.15, "test if calculated ua " +
+        self.assertTrue(0.05 < self.ua800 < 0.15, "test if calculated ua_sm " +
                         "takes reasonable values " +
                         "(according to \"Differences in" +
                         " optical properties between healthy and " +
@@ -34,9 +34,9 @@ class test_ua(unittest.TestCase):
                         "inversion technique\")")
 
     def test_saO2_makes_difference(self):
-        self.ua.saO2 = 1.0
+        self.ua_sm.saO2 = 1.0
         self.assertNotAlmostEqual(self.ua532,
-                                  self.ua(532.*10 ** -9) / 100.,
+                                  self.ua_sm(532.*10 ** -9) / 100.,
                                   msg="changing oxygenation changes result")
 
 

@@ -4,10 +4,10 @@ Created on Sep 8, 2015
 @author: wirkert
 '''
 import unittest
-import os
 import filecmp
+import os
 
-from mc.sim import *
+from mc.sim import MciWrapper, SimWrapper
 
 class Test(unittest.TestCase):
 
@@ -44,7 +44,6 @@ class Test(unittest.TestCase):
 
     def test_mci_wrapper(self):
         self.mci_wrapper.create_mci_file()
-
         self.assertTrue(os.path.isfile(self.mci_filename),
                         "mci file was created")
         self.assertTrue(filecmp.cmp(self.mci_filename,

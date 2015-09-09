@@ -43,7 +43,15 @@ class MciWrapper(object):
         self.nr_photons = nr_photons
 
     def add_layer(self, n, ua, us, g, d):
-        """adds a layer below the currently existing ones."""
+        """adds a layer below the currently existing ones.
+
+        Arguments:
+        n: Refraction index of medium
+        ua: absorption coefficient [1/m]
+        us: scattering coefficient [1/m]
+        g: anisotropy factor
+        d: thickness of layer [m]
+        """
         self.layers.append([n, ua, us, g, d])
 
     def set_layer(self, layer_nr, n, ua, us, g, d):
@@ -92,11 +100,13 @@ class MciWrapper(object):
         f.write("# n mua mus g d # One line for each layer\n")
         f.write(repr(self.n_above) + " # n for medium above.\n")
         for layer in self.layers:
+
+            # factors (/100.; *100.) to convert to mcml expected units:
             f.write(repr(layer[0]) + " " +  # n
-                    repr(layer[1]) + " " +  # ua
-                    repr(layer[2]) + " " +  # us
+                    repr(layer[1] / 100.) + " " +  # ua
+                    repr(layer[2] / 100.) + " " +  # us
                     repr(layer[3]) + " " +  # g
-                    repr(layer[4]) + "\n")  # d
+                    repr(layer[4] * 100.) + "\n")  # d
         f.write(repr(self.n_below) + " # n for medium below.\n")
         f.close()
 

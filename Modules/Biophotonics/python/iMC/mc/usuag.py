@@ -11,12 +11,14 @@ from scipy.interpolate import interp1d
 from pymiecoated import Mie
 
 
-def get_extinction_coefficients(reference_filename):
+def get_extinction_coefficients(reference_filename=None):
     """
     helper method to get reference data for eHbO2 and eHb from Scott Prahls
     reference file:
     http://omlc.org/spectra/hemoglobin/summary.html
     """
+    if reference_filename is None:
+        reference_filename = "./mc/data/haemoglobin.txt"
     # table with wavelength at 1st row,
     # HbO2 molar extinction coefficient [cm**-1/(moles/l)] at 2nd row,
     # Hb molar extinction coefficient [cm**-1/(moles/l)] at 3rd row
@@ -37,7 +39,7 @@ class Ua(object):
         self.cHb = 120.  # g*Hb/l
         self.saO2 = 0.  # %
         self.eHbO2, self.eHb = \
-            get_extinction_coefficients("./mc/data/haemoglobin.txt")
+            get_extinction_coefficients()
 
 
     def __call__(self, wavelength):

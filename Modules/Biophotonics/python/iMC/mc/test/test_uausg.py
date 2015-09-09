@@ -18,18 +18,20 @@ class test_ua(unittest.TestCase):
 
     def test_uA532(self):
         self.assertTrue(3. < self.ua532 < 4., "test if calculated ua takes " +
-                        "reasonable (according to \"Determination of optical" +
+                        "reasonable values " +
+                        "(according to \"Determination of optical" +
                         " properties of normal and adenomatous human colon " +
                         "tissues in vitro using integrating sphere " +
-                        "techniques\") values")
+                        "techniques\")")
 
     def test_uA800(self):
         self.assertTrue(0.05 < self.ua800 < 0.15, "test if calculated ua " +
-                        "takes reasonable (according to \"Differences in" +
+                        "takes reasonable values " +
+                        "(according to \"Differences in" +
                         " optical properties between healthy and " +
                         "pathological human colon tissues using a Ti:sapphire" +
                         " laser: an in vitro study using the Monte Carlo " +
-                        "inversion technique\") values")
+                        "inversion technique\")")
 
     def test_saO2_makes_difference(self):
         self.ua.saO2 = 1.0

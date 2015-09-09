@@ -88,6 +88,9 @@ protected slots:
 
   void OnUploadFromDataStorage();
 
+  void sessionTimedOutMsg();
+  void sessionTimesOutSoonMsg();
+
 protected:
 
   virtual void SetFocus() override;

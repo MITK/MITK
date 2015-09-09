@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkXnatSubjectWidget.h>
 #include <QmitkXnatExperimentWidget.h>
 #include <QmitkXnatCreateObjectDialog.h>
+#include <QTimer>
 
 // Qt
 #include <QAction>
@@ -262,6 +263,8 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
     m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
 
     connect(session, SIGNAL(progress(QUuid,double)), this, SLOT(OnProgress(QUuid,double)));
+    connect(session, SIGNAL(sessionTimedOut()), this, SLOT(sessionTimedOutMsg()));
+    connect(session, SIGNAL(sessionAboutToBeTimedOut()), this, SLOT(sessionTimesOutSoonMsg()));
   }
 }
 
@@ -926,4 +929,43 @@ void QmitkXnatTreeBrowserView::SetStatusInformation(const QString& text)
   m_Controls.groupBox->setTitle(text);
   m_Controls.progressBar->setValue(0);
   m_Controls.groupBox->show();
+}
+
+void QmitkXnatTreeBrowserView::sessionTimedOutMsg()
+{
+  ctkXnatSession* session = qobject_cast<ctkXnatSession*>(QObject::sender());
+
+  if (session == nullptr)
+    return;
+
+  ctkXnatDataModel* dataModel = session->dataModel();
+  m_TreeModel->removeDataModel(dataModel);
+  m_Controls.treeView->reset();
+  delete session;
+  session = 0;
+  m_Controls.labelError->show();
+  QMessageBox::warning(m_Controls.treeView, "Session Timeout", "The session timed out.");
+}
+
+void QmitkXnatTreeBrowserView::sessionTimesOutSoonMsg()
+{
+  ctkXnatSession* session = qobject_cast<ctkXnatSession*>(QObject::sender());
+
+  if (session == nullptr)
+    return;
+
+  QMessageBox msgBox;
+  msgBox.setIcon(QMessageBox::Warning);
+  msgBox.setWindowTitle("Session Timeout Soon");
+  msgBox.setText("The session will time out in 1 minute.\nDo you want to renew the session?");
+  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+  msgBox.setDefaultButton(QMessageBox::No);
+  msgBox.show();
+  QTimer* timer = new QTimer(this);
+  timer->start(60000);
+  this->connect(timer, SIGNAL(timeout()), &msgBox, SLOT(reject()));
+  if (msgBox.exec() == QMessageBox::Yes){
+    session->renew();
+  }
+  timer->stop();
 }

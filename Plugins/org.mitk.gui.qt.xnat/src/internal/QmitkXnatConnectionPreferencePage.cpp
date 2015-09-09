@@ -65,10 +65,10 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
   }
   catch (std::invalid_argument)
   {
-    session = 0;
+    session = nullptr;
   }
 
-  if (session != 0)
+  if (session != nullptr)
   {
     if (session->isOpen())
     {

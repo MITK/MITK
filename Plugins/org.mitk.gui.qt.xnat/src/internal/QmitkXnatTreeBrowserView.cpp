@@ -941,8 +941,7 @@ void QmitkXnatTreeBrowserView::sessionTimedOutMsg()
   ctkXnatDataModel* dataModel = session->dataModel();
   m_TreeModel->removeDataModel(dataModel);
   m_Controls.treeView->reset();
-  delete session;
-  session = 0;
+  session->close();
   m_Controls.labelError->show();
   QMessageBox::warning(m_Controls.treeView, "Session Timeout", "The session timed out.");
 }

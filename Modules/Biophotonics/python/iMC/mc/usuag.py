@@ -40,7 +40,7 @@ class Ua(object):
             get_extinction_coefficients("./mc/data/haemoglobin.txt")
 
 
-    def eval(self, wavelength):
+    def __call__(self, wavelength):
         """ determine ua [1/m] as combination of
         Haemoglobin extinction coefficients.
         For more on this equation, please refer to
@@ -74,7 +74,7 @@ class UsG(object):
         self.n_particle = 1.46
         self.n_medium = 1.36
 
-    def usg(self, wavelength):
+    def __call__(self, wavelength):
         """
         Calculate the scattering parameters relevant for monte carlo simulation.
 

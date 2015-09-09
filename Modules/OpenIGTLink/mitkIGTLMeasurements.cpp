@@ -102,11 +102,11 @@ bool mitk::IGTLMeasurements::ExportData(std::string filename)
    //offset = offset - offset % 1000000;
 
    //for each entry of the map
-   for each (auto entry in m_MeasurementPoints)
+   for (auto entry : m_MeasurementPoints)
    {
      *out << entry.second.size() << ";";
      *out << entry.first << ";";
-     for each (TimeStampIndexPair timestampIndexPair in entry.second)
+     for (TimeStampIndexPair timestampIndexPair : entry.second)
      {
        *out << ( timestampIndexPair.first ) << ";";
        *out << ( timestampIndexPair.second ) << ";";

@@ -92,8 +92,8 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   typename ImageType::RegionType::IndexType index;
   typename ImageType::SpacingType spacing;
   typename ImageType::PointType origin;
-  typename ImageType::DirectionType direction;
 
+  // Copy dimensions
   int dims[3];
   msg->GetDimensions(dims);
   size_t num_pixel = 1;
@@ -103,6 +103,7 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
     num_pixel *= dims[i];
   }
 
+  // Handle subvolume information. We want the subvolume to be the whole image for now.
   int sdims[3], offs[3];
   msg->GetSubVolume(sdims, offs);
   for (size_t i = 0; i < 3; i++)
@@ -116,6 +117,7 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
 
   index.Fill(0);
 
+  // Copy spacing
   float spc[3];
   msg->GetSpacing(spc);
   for (size_t i = 0; i < 3; i++)
@@ -144,6 +146,7 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
 
   // TODO: Coordinate system
 
+  img = mitk::Image::New();
   img->InitializeByItk(output.GetPointer());
   img->SetVolume(output->GetBufferPointer());
 
@@ -155,7 +158,10 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   }
   output->SetOrigin(origin);
 
-  output->SetDirection(direction);
+  // Output affine transformation matrix (for debugging for now)
+  igtl::Matrix4x4 affine_transformation_matrix;
+  msg->GetMatrix(affine_transformation_matrix);
+  igtl::PrintMatrix(affine_transformation_matrix);
 }
 
 mitk::IGTLMessageToUSImageFilter::IGTLMessageToUSImageFilter()

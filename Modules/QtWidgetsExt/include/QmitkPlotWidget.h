@@ -21,7 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkQtWidgetsExtExports.h"
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_intervalcurve.h>
 #include <vector>
+#include <tuple>
 #include "mitkCommon.h"
 #include <qwt_symbol.h>
 #include <qwt_legend.h>
@@ -209,7 +211,7 @@ protected:
   double* ConvertToRawArray( const XYDataVector& values, unsigned int component );
 
   QwtPlot*                    m_Plot;
-  std::vector<QwtPlotCurve*>  m_PlotCurveVector;
+  std::vector<std::tuple<QwtPlotCurve*, QwtPlotIntervalCurve*, QwtPlotIntervalCurve*> >  m_PlotCurveVector;
 };
 
 #endif

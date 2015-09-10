@@ -50,8 +50,20 @@ void QmitkPlotWidget::SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos, 
 unsigned int QmitkPlotWidget::InsertCurve(const char* title)
 {
   QwtPlotCurve* curve = new QwtPlotCurve(QwtText(title));
-  m_PlotCurveVector.push_back(curve);
-  curve->attach(m_Plot);
+  QwtPlotIntervalCurve* xErrors = new QwtPlotIntervalCurve();
+  QwtPlotIntervalCurve* yErrors = new QwtPlotIntervalCurve();
+
+  auto tuple = std::make_tuple(curve, xErrors, yErrors);
+  m_PlotCurveVector.push_back(tuple);
+
+  std::get<0>(m_PlotCurveVector.back())->attach(m_Plot);
+  std::get<1>(m_PlotCurveVector.back())->attach(m_Plot);
+  std::get<2>(m_PlotCurveVector.back())->attach(m_Plot);
+
+  // error curves should not show up on the legend
+  std::get<1>(m_PlotCurveVector.back())->setItemAttribute(QwtPlotItem::Legend, false);
+  std::get<2>(m_PlotCurveVector.back())->setItemAttribute(QwtPlotItem::Legend, false);
+
   return static_cast<unsigned int> (m_PlotCurveVector.size() - 1);
 }
 
@@ -75,7 +87,7 @@ bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget:
   }
   double* rawDataX = ConvertToRawArray( xValues );
   double* rawDataY = ConvertToRawArray( yValues );
-  m_PlotCurveVector[curveId]->setSamples(new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(xValues.size())));
+  std::get<0>(m_PlotCurveVector[curveId])->setSamples(new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(xValues.size())));
   delete[] rawDataX;
   delete[] rawDataY;
   return true;
@@ -86,7 +98,7 @@ bool QmitkPlotWidget::SetCurveData(unsigned int curveId, const XYDataVector& dat
 {
   double* rawDataX = ConvertToRawArray( data, 0 );
   double* rawDataY = ConvertToRawArray( data, 1 );
-  m_PlotCurveVector[curveId]->setData(new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(data.size())));
+  std::get<0>(m_PlotCurveVector[curveId])->setData(new QwtPointArrayData(rawDataX, rawDataY, static_cast<int>(data.size())));
   delete[] rawDataX;
   delete[] rawDataY;
   return true;
@@ -94,13 +106,13 @@ bool QmitkPlotWidget::SetCurveData(unsigned int curveId, const XYDataVector& dat
 
 void QmitkPlotWidget::SetCurvePen( unsigned int curveId, const QPen& pen )
 {
-  m_PlotCurveVector[curveId]->setPen( pen );
+  std::get<0>(m_PlotCurveVector[curveId])->setPen( pen );
 }
 
 
 void QmitkPlotWidget::SetCurveBrush( unsigned int curveId, const QBrush& brush )
 {
-  m_PlotCurveVector[curveId]->setBrush( brush );
+  std::get<0>(m_PlotCurveVector[curveId])->setBrush( brush );
 }
 
 
@@ -111,12 +123,12 @@ void QmitkPlotWidget::SetCurveTitle( unsigned int, const char* title )
 
 void QmitkPlotWidget::SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle style )
 {
-  m_PlotCurveVector[curveId]->setStyle(style);
+  std::get<0>(m_PlotCurveVector[curveId])->setStyle(style);
 }
 
 void QmitkPlotWidget::SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol )
 {
-  m_PlotCurveVector[curveId]->setSymbol(symbol);
+  std::get<0>(m_PlotCurveVector[curveId])->setSymbol(symbol);
 }
 
 void QmitkPlotWidget::Replot()

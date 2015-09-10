@@ -4,6 +4,8 @@ Created on Sep 9, 2015
 @author: wirkert
 '''
 
+import numpy as np
+
 from mc.sim import MciWrapper
 from mc.usuag import Ua, UsG
 
@@ -108,11 +110,39 @@ class Colon(object):
         # now that the layers have been updated: create file
         self._mci_wrapper.create_mci_file()
 
+    def get_layer_parameters(self):
+        """get the model parameters as two numpy arrays, one for mucosa and one
+        for submucusa"""
+        mucosa = np.array([self.ua_muc.bvf, self.ua_muc.saO2,
+                         self.usg_muc.dsp, self.usg_muc.r,
+                         self.d_muc])
+        submucosa = np.array([self.ua_sm.bvf, self.ua_sm.saO2,
+                         self.usg_sm.dsp, self.usg_sm.r,
+                         self.d_sm])
+        return mucosa, submucosa
+
+    def __str__(self):
+        """print the current model"""
+        model_string = \
+                    "mucosa    - bvf: " + "%.2f" % self.ua_muc.bvf + \
+                    "%; SaO2: " + "%.2f" % self.ua_muc.saO2 + \
+                    "%; dsp: " + "%.2f" % self.usg_muc.dsp + \
+                    "%; r: " + "%.2f" % (self.usg_muc.r * 10 ** 6) + \
+                    "um; d: " + "%.0f" % (self.d_muc * 10 ** 6) + "um\n" + \
+                    "submucosa - bvf: " + "%.2f" % (self.ua_sm.bvf) + \
+                    "%; SaO2: " + "%.2f" % (self.ua_sm.saO2) + \
+                    "%; dsp: " + "%.2f" % (self.usg_sm.dsp) + \
+                    "%; r: " + "%.2f" % (self.usg_sm.r * 10 ** 6) + \
+                    "um; d: " + "%.0f" % (self.d_sm * 10 ** 6) + "um"
+        return model_string
+
     def __init__(self):
         self.ua_muc = Ua()
         self.usg_muc = UsG()
         self.ua_sm = Ua()
         self.usg_sm = UsG()
+        self.d_muc = 500. * 10 ** -6
+        self.d_sm = 500.*10 ** -6
         self._mci_wrapper = MciWrapper()
         self.nr_photons = 10 ** 6
         self._mucosa_saO2 = 0.7

@@ -36,7 +36,9 @@ class MciWrapper(object):
     def set_mco_filename(self, mco_filename):
         """path of the mco file.
         This can be either a path relative to the mcml executable
-        or an absolute path."""
+        or an absolute path.
+        BUG: it seems that it can only be relative file name
+        """
         self.mco_filename = mco_filename
 
     def set_nr_photons(self, nr_photons):
@@ -102,11 +104,11 @@ class MciWrapper(object):
         for layer in self.layers:
 
             # factors (/100.; *100.) to convert to mcml expected units:
-            f.write(repr(layer[0]) + " " +  # n
-                    repr(layer[1] / 100.) + " " +  # ua
-                    repr(layer[2] / 100.) + " " +  # us
-                    repr(layer[3]) + " " +  # g
-                    repr(layer[4] * 100.) + "\n")  # d
+            f.write("%.3f" % layer[0] + " " +  # n
+                    "%.3f" % (layer[1] / 100.) + " " +  # ua
+                    "%.3f" % (layer[2] / 100.) + " " +  # us
+                    "%.3f" % layer[3] + " " +  # g
+                    "%.3f" % (layer[4] * 100.) + "\n")  # d
         f.write(repr(self.n_below) + " # n for medium below.\n")
         f.close()
 
@@ -140,9 +142,10 @@ class SimWrapper(object):
         """this method runs a monte carlo simulation"""
         mcml_path, mcml_file = os.path.split(self.mcml_executable)
         abs_mci_filename = os.path.abspath(self.mci_filename)
-
+        # note: the -A option makes gpumcml much faster, but is not available
+        # in original mcml. Maybe a switch should be introduced here
         args = ("./" + mcml_file, "-A", abs_mci_filename)
-
+        # switch to folder where mcml resides in and execute it.
         with cd(mcml_path):
             popen = subprocess.Popen(args, stdout=subprocess.PIPE)
             popen.wait()

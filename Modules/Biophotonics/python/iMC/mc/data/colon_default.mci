@@ -6,10 +6,11 @@ temp.mco A # output filename, ASCII/Binary
 0.002 2 # dz, dr
 500 1 1 # No. of dz, dr & da.
 
-3 # No. of layers
+4 # No. of layers
 # n mua mus g d # One line for each layer
 1.0 # n for medium above.
-1.000 0.021 0.032 4.300 540.000
-1.000 0.010 0.010 1.000 100.000
-100.100 1.011 1.021 103.100 10410.000
+1.000 0.000 0.000 1.000 1.000
+1.380 1.792 97.702 0.909 0.050
+1.360 8.958 4974.931 0.987 0.050
+1.360 16.056 535.221 0.960 0.090
 1.0 # n for medium below.

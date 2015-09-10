@@ -398,6 +398,9 @@ void mitk::VtkPropRenderer::MakeCurrent()
 
 void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mitk::Point3D& worldPoint) const
 {
+  if (this->GetRenderWindow()->GetNeverRendered() != 0)
+      return; // somebody called picking before we ever rendered; cannot have enough information yet
+
   switch (m_PickingMode)
   {
   case (WorldPointPicking) :

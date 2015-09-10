@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 
 #include <qwt_point_data.h>
+#include <qwt_interval_symbol.h>
 
 #include "QmitkPlotWidget.h"
 
@@ -98,6 +99,28 @@ bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget:
   return true;
 }
 
+bool QmitkPlotWidget::SetCurveData(unsigned int curveId, const DataVector& xValues, const DataVector& yValues,
+  const DataVector& yLowerError, const DataVector& yUpperError)
+{
+  bool success = true;
+  success = success && this->SetCurveData(curveId, xValues, yValues);
+  success = success && this->AddErrorIntervalCurve(curveId, yLowerError, yUpperError, false);
+
+  return success;
+}
+
+bool QmitkPlotWidget::SetCurveData(unsigned int curveId, const DataVector& xValues, const DataVector& yValues,
+  const DataVector& xLowerError, const DataVector& xUpperError,
+  const DataVector& yLowerError, const DataVector& yUpperError)
+{
+  bool success = true;
+  success = success && this->SetCurveData(curveId, xValues, yValues);
+  success = success && this->AddErrorIntervalCurve(curveId, xLowerError, xUpperError, true);
+  success = success && this->AddErrorIntervalCurve(curveId, yLowerError, yUpperError, false);
+
+  return success;
+}
+
 
 bool QmitkPlotWidget::SetCurveData(unsigned int curveId, const XYDataVector& data )
 {
@@ -134,6 +157,40 @@ void QmitkPlotWidget::SetCurveStyle( unsigned int curveId, const QwtPlotCurve::C
 void QmitkPlotWidget::SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol )
 {
   std::get<0>(m_PlotCurveVector[curveId])->setSymbol(symbol);
+}
+
+void QmitkPlotWidget::SetErrorPen(unsigned int curveId, const QPen& pen)
+{
+  std::get<1>(m_PlotCurveVector[curveId])->setPen(pen);
+  QwtIntervalSymbol* errorBar = new QwtIntervalSymbol(QwtIntervalSymbol::Bar);
+  errorBar->setPen(pen);
+  std::get<1>(m_PlotCurveVector[curveId])->setSymbol(errorBar);
+  std::get<2>(m_PlotCurveVector[curveId])->setPen(pen);
+  errorBar = new QwtIntervalSymbol(QwtIntervalSymbol::Bar);
+  errorBar->setPen(pen);
+  std::get<2>(m_PlotCurveVector[curveId])->setSymbol(errorBar);
+}
+
+void QmitkPlotWidget::SetErrorStyleSymbols(unsigned int curveId, bool drawSmybols)
+{
+  if (drawSmybols)
+  {
+    std::get<1>(m_PlotCurveVector[curveId])->setStyle(QwtPlotIntervalCurve::NoCurve);
+    QwtIntervalSymbol* errorBar = new QwtIntervalSymbol(QwtIntervalSymbol::Bar);
+    errorBar->setPen(std::get<1>(m_PlotCurveVector[curveId])->pen());
+    std::get<1>(m_PlotCurveVector[curveId])->setSymbol(errorBar);
+    std::get<2>(m_PlotCurveVector[curveId])->setStyle(QwtPlotIntervalCurve::NoCurve);
+    errorBar = new QwtIntervalSymbol(QwtIntervalSymbol::Bar);
+    errorBar->setPen(std::get<2>(m_PlotCurveVector[curveId])->pen());
+    std::get<2>(m_PlotCurveVector[curveId])->setSymbol(errorBar);
+  }
+  else
+  {
+    std::get<1>(m_PlotCurveVector[curveId])->setStyle(QwtPlotIntervalCurve::Tube);
+    std::get<1>(m_PlotCurveVector[curveId])->setSymbol(nullptr);
+    std::get<2>(m_PlotCurveVector[curveId])->setStyle(QwtPlotIntervalCurve::Tube);
+    std::get<2>(m_PlotCurveVector[curveId])->setSymbol(nullptr);
+  }
 }
 
 void QmitkPlotWidget::Replot()
@@ -180,3 +237,64 @@ double* QmitkPlotWidget::ConvertToRawArray( const QmitkPlotWidget::XYDataVector&
   return raw;
 }
 
+bool QmitkPlotWidget::AddErrorIntervalCurve(unsigned int curveId,
+  const DataVector& lessError, const DataVector& moreError, bool isXError)
+{
+  const QwtSeriesData< QPointF >* curveSeriesData = std::get<0>(this->m_PlotCurveVector[curveId])->data();
+
+  size_t size = curveSeriesData->size();
+
+  if (size != lessError.size() ||
+      size != moreError.size()
+    )
+  {
+    std::cerr << "Sizes of data arrays don't match." << std::endl;
+    return false;
+  }
+
+  QVector<QwtIntervalSample> samples;
+  QwtIntervalSample *sample;
+  QwtPlotIntervalCurve* curve;
+
+  if ( isXError )
+  {
+    curve = std::get<1>(m_PlotCurveVector[curveId]);
+  }
+  else
+  {
+    curve = std::get<2>(m_PlotCurveVector[curveId]);
+  }
+
+  for (unsigned int index = 0; index < size; ++index)
+  {
+    qreal xValue = curveSeriesData->sample(index).x();
+    qreal yValue = curveSeriesData->sample(index).y();
+    if (isXError)
+    {
+      sample = new QwtIntervalSample(xValue, xValue - lessError[index], xValue + moreError[index]);
+    }
+    else
+    {
+      sample = new QwtIntervalSample(xValue, yValue - lessError[index], yValue + moreError[index]);
+    }
+    samples.push_back(*sample);
+  }
+
+  curve->setSamples(samples);
+  curve->setStyle(QwtPlotIntervalCurve::NoCurve);
+
+  QwtIntervalSymbol* errorBar = new QwtIntervalSymbol(QwtIntervalSymbol::Bar);
+  errorBar->setPen(QPen(Qt::black));
+  curve->setSymbol(errorBar);
+
+  if (isXError)
+  {
+    curve->setOrientation(Qt::Horizontal);
+  }
+  else
+  {
+    curve->setOrientation(Qt::Vertical);
+  }
+
+  return true;
+}

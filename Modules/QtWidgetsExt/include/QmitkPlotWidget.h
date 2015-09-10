@@ -182,6 +182,13 @@ public:
   void SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos=QwtPlot::RightLegend, double ratio=-1);
 
   /**
+  * Set a curve's legend attribute
+  * @param curveId the id of the curve
+  * @param attribute the öegend attribute to be set
+  */
+  void SetLegendAttribute(unsigned int curveId, const QwtPlotCurve::LegendAttribute &attribute);
+
+  /**
   * Triggers a replot of the curve. Replot should be called once after
   * setting new data.
   */

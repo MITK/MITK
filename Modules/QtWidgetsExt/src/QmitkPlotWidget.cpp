@@ -47,6 +47,11 @@ void QmitkPlotWidget::SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos, 
   m_Plot->insertLegend(legend, pos, ratio);
 }
 
+void QmitkPlotWidget::SetLegendAttribute(unsigned int curveId, const QwtPlotCurve::LegendAttribute &attribute)
+{
+  std::get<0>(m_PlotCurveVector[curveId])->setLegendAttribute(attribute);
+}
+
 unsigned int QmitkPlotWidget::InsertCurve(const char* title)
 {
   QwtPlotCurve* curve = new QwtPlotCurve(QwtText(title));

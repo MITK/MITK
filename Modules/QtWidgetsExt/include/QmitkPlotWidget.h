@@ -21,7 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkQtWidgetsExtExports.h"
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_intervalcurve.h>
 #include <vector>
+#include <tuple>
 #include "mitkCommon.h"
 #include <qwt_symbol.h>
 #include <qwt_legend.h>
@@ -124,6 +126,35 @@ public:
   bool SetCurveData( unsigned int curveId, const DataVector& xValues, const DataVector& yValues );
 
   /**
+  * @brief Sets the data with errors for a previously added curve.
+  *
+  * @param curveId the id of the curve for which data should be added.
+  * @param xValues the x coordinates of the points that define the curve
+  * @param yValues the y coordinates of the points that define the curve
+  * @param yLowerError the magnitude (>0) of the error in the lesser direction of y
+  * @param yUpperError the magnitude (>0) of the error in the larger direction of y
+  * @returns whether data was added successfully or not
+  */
+  bool SetCurveData(unsigned int curveId, const DataVector& xValues, const DataVector& yValues,
+    const DataVector& yLowerError, const DataVector& yUpperError);
+
+  /**
+  * @brief Sets the data with errors for a previously added curve.
+  *
+  * @param curveId the id of the curve for which data should be added.
+  * @param xValues the x coordinates of the points that define the curve
+  * @param yValues the y coordinates of the points that define the curve
+  * @param xLowerError the magnitude (>0) of the error in the lesser direction of x
+  * @param xUpperError the magnitude (>0) of the error in the larger direction of x
+  * @param yLowerError the magnitude (>0) of the error in the lesser direction of y
+  * @param yUpperError the magnitude (>0) of the error in the larger direction of y
+  * @returns whether data was added successfully or not
+  */
+  bool SetCurveData(unsigned int curveId, const DataVector& xValues, const DataVector& yValues,
+    const DataVector& xLowerError, const DataVector& xUpperError,
+    const DataVector& yLowerError, const DataVector& yUpperError);
+
+  /**
   * Sets the data for a previously added curve. Data is provided as a vectors of pairs.
   * The pairs represent x/y coordinates of the points that define the curve.
   * @param curveId the id of the curve for which data should be added.
@@ -165,7 +196,7 @@ public:
   */
   void SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol );
 
-  /**m_Skeletonize
+  /**
   * Sets the title of the given curve. The title will be shown in the legend of
   * the QwtPlot.
   * @param curveId the id of the curve for which the title should be set
@@ -174,12 +205,33 @@ public:
   void SetCurveTitle( unsigned int curveId, const char* title );
 
   /**
+  * Defines how a curves errors should be drawn. For drawing a QPen is used.
+  * @param curveId the id of the curve for which error appearance should be changed
+  * @param pen a QPen (@see QPen) defining the line style
+  */
+  void SetErrorPen(unsigned int curveId, const QPen& pen);
+
+  /**
+  * Defines the style of errors, symbols or as a curve.
+  * @param curveId the id of the curve for which error appearance should be changed
+  * @param drawSmybols true - draw symbols, false - draw curve
+  */
+  void SetErrorStyleSymbols(unsigned int curveId, bool drawSmybols);
+
+  /**
   * Sets the legend of the plot
   *
   */
   void SetLegend(QwtLegend* legend, QwtPlot::LegendPosition pos=QwtPlot::RightLegend, double ratio=-1);
 
-  /** m_Skeletonize
+  /**
+  * Set a curve's legend attribute
+  * @param curveId the id of the curve
+  * @param attribute the öegend attribute to be set
+  */
+  void SetLegendAttribute(unsigned int curveId, const QwtPlotCurve::LegendAttribute &attribute);
+
+  /**
   * Triggers a replot of the curve. Replot should be called once after
   * setting new data.
   */
@@ -208,8 +260,22 @@ protected:
   */
   double* ConvertToRawArray( const XYDataVector& values, unsigned int component );
 
+  /**
+  * Adds an error interval curve.
+  *
+  * All errors should be absolutes. The magnitude will be used.
+  *
+  * @param curveId Which curve should the error curve be added to
+  * @param xValues Vector of x values an error bar belongs to
+  * @param values The original data value
+  * @param lessError Error in the negative direction (value - lessError)
+  * @param moreError Error in the positive direction (value + lessError)
+  * @param isXError Should the error bars be drawn horizontally
+  */
+  bool AddErrorIntervalCurve(unsigned int curveId, const DataVector& lessError, const DataVector& moreError, bool isXError);
+
   QwtPlot*                    m_Plot;
-  std::vector<QwtPlotCurve*>  m_PlotCurveVector;
+  std::vector<std::tuple<QwtPlotCurve*, QwtPlotIntervalCurve*, QwtPlotIntervalCurve*> >  m_PlotCurveVector;
 };
 
 #endif

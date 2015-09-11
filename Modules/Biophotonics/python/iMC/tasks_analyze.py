@@ -15,14 +15,13 @@ import ImageEnhance
 import luigi
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from sklearn.metrics import r2_score
 import SimpleITK as sitk
 
 from msi.io.nrrdreader import NrrdReader
 import msi.msimanipulations as msimani
 import msi.imgmani as imgmani
-import preproctasks as ppt
-import regressiontasks as rt
+import tasks_preprocessing as ppt
+import tasks_regression as rt
 import scriptpaths as sp
 
 
@@ -186,7 +185,7 @@ class CreateNiceParametricImagesTask(luigi.Task):
         plot_image = np.array(im)
         top_left_axis = axarr[0, 0]
         top_left_axis.imshow(plot_image, interpolation='nearest')
-        top_left_axis.set_title("synthetic rgb (segmented pixels balck)",
+        top_left_axis.set_title("synthetic rgb (segmented pixels black)",
                                 fontsize=5)
         top_left_axis.xaxis.set_visible(False)
         top_left_axis.yaxis.set_visible(False)
@@ -205,9 +204,11 @@ class CreateNiceParametricImagesTask(luigi.Task):
         image[0, 0, 0] = 0.; image[1, 0, 0] = 0.2
         plot_axis(axarr[0, 1], image[:, :, 0], "blood volume fraction [%]")
         image[0, 0, 1] = 0.; image[1, 0, 1] = 0.6
-        plot_axis(axarr[0, 2], image[:, :, 1], "density scattering particles [%]")
+        plot_axis(axarr[0, 2], image[:, :, 1],
+                  "density scattering particles [%]")
         image[0, 0, 2] = 175 * 10 ** -6; image[1, 0, 0] = 750 * 10 ** -6
-        plot_axis(axarr[1, 1], image[:, :, 2] * 10 ** 6, "mucosa thickness [um]")
+        plot_axis(axarr[1, 1], image[:, :, 2] * 10 ** 6,
+                  "mucosa thickness [um]")
         image[0, 0, 3] = 0.; image[1, 0, 3] = 1.
         plot_axis(axarr[1, 2], image[:, :, 3], "oxygenation [%]")
 

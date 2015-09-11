@@ -25,7 +25,7 @@ import msi.imgmani as imgmani
 ROOT_FOLDER = "/media/wirkert/data/Data/2015_05_28_ColonUCCancerAndPolyps"
 FLAT_FOLDER = "flatfields"
 DARK_FOLDER = "dark"
-FAP_IMAGE_FOLDER = "colon_images"
+DATA_FOLDER = "colon_images"
 
 
 
@@ -67,7 +67,7 @@ class MultiSpectralImageFile(luigi.Task):
     imageName = luigi.Parameter()
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(ROOT_FOLDER, FAP_IMAGE_FOLDER,
+        return luigi.LocalTarget(os.path.join(ROOT_FOLDER, DATA_FOLDER,
                                 self.imageName))
 
 
@@ -294,7 +294,7 @@ if __name__ == '__main__':
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
     for root, dirs, files in os.walk(os.path.join(ROOT_FOLDER,
-                                                  FAP_IMAGE_FOLDER)):
+                                                  DATA_FOLDER)):
         for name in files:
             main_task = CreateNiceParametricImagesTask(
                 imageName=name)

@@ -20,8 +20,8 @@ import SimpleITK as sitk
 import matplotlib.pyplot as plt
 
 import msi.msimanipulations as msimani
-import preproctasks as ppt
-import analyzetasks as at
+import tasks_preprocessing as ppt
+import tasks_analyze as at
 import scriptpaths as sp
 from msi.io.nrrdreader import NrrdReader
 from msi.imgmani import select_n_reflectances
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
     for root, dirs, files in os.walk(os.path.join(sp.ROOT_FOLDER,
-                                                  sp.FAP_IMAGE_FOLDER)):
+                                                  sp.DATA_FOLDER)):
         for name in files:
             main_task = PlotBssImagesTask(imageName=name)
             w.add(main_task)

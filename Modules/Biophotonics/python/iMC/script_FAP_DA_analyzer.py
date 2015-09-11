@@ -8,9 +8,9 @@ Created on Fri Aug 14 11:09:18 2015
 import os
 import luigi
 
-import regressiontasks as rt
-import preproctasks as ppt
-import analyzetasks as at
+import tasks_regression as rt
+import tasks_preprocessing as ppt
+import tasks_analyze as at
 import scriptpaths as sp
 
 sp.FINALS_FOLDER = "FAP_DA"
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
     for root, dirs, files in os.walk(os.path.join(sp.ROOT_FOLDER,
-                                                  sp.FAP_IMAGE_FOLDER)):
+                                                  sp.DATA_FOLDER)):
         for name in files:
             main_task = CreateNiceParametricImagesTaskDA(
                 imageName=name,

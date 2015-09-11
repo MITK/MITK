@@ -22,12 +22,12 @@ import msi.msimanipulations as msimani
 import msi.imgmani as imgmani
 from msi.normalize import NormalizeMean
 import scriptpaths as sp
-import preproctasks as ppt
+import tasks_preprocessing as ppt
 
 
 # root folder there the data lies
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/2015_08_31_new_colorcheckertest/"
-sp.FAP_IMAGE_FOLDER = "colors"
+sp.DATA_FOLDER = "colors"
 RECORDED_WAVELENGTHS = \
         np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
 
@@ -56,7 +56,7 @@ class SpectrometerFile(luigi.Task):
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
-                                              sp.FAP_IMAGE_FOLDER,
+                                              sp.DATA_FOLDER,
                                          "color_Reflection_000" +
                                          os.path.splitext(self.image_name)[0] +
                                          ".txt"))
@@ -187,7 +187,7 @@ if __name__ == '__main__':
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
     for root, dirs, files in os.walk(os.path.join(sp.ROOT_FOLDER,
-                                                  sp.FAP_IMAGE_FOLDER)):
+                                                  sp.DATA_FOLDER)):
         for name in files:
             if name.endswith(".nrrd"):
                 color_checking = PlotMeasuredSpectraForImage(image_name=name)

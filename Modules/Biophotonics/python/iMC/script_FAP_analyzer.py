@@ -12,8 +12,8 @@ import numpy as np
 import luigi
 
 import msi.imgmani as imgmani
-import analyzetasks as at
-import preproctasks as ppt
+import tasks_analyze as at
+import tasks_preprocessing as ppt
 import scriptpaths as sp
 
 sp.FINALS_FOLDER = "FAP"
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
     for root, dirs, files in os.walk(os.path.join(sp.ROOT_FOLDER,
-                                                  sp.FAP_IMAGE_FOLDER)):
+                                                  sp.DATA_FOLDER)):
         for name in files:
             main_task = at.CreateNiceParametricImagesTask(
                 imageName=name,

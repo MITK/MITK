@@ -12,7 +12,7 @@ import matplotlib
 import numpy as np
 
 import luigi
-import regressiontasks as rt
+import tasks_regression as rt
 import scriptpaths as sp
 
 sp.FINALS_FOLDER = "invertabilitytest"

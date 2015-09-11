@@ -23,7 +23,7 @@ from msi.imgmani import select_n_reflectances
 from msi.io.nrrdreader import NrrdReader
 import msi.msimanipulations as msimani
 import msi.imgmani as imgmani
-import preproctasks as ppt
+import tasks_preprocessing as ppt
 import scriptpaths as sp
 
 

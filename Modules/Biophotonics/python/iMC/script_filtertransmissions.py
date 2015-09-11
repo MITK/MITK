@@ -13,17 +13,15 @@ import matplotlib.pyplot as plt
 
 from msi.msi import Msi
 import scriptpaths as sp
-from msi.io.spectrometerreader import SpectrometerReader
+import tasks_mc as mc
 from msi.io.msiwriter import MsiWriter
 from msi.io.msireader import MsiReader
-from msi.normalize import NormalizeMean
-import msi.msimanipulations as msimani
 import msi.plot as msiPlt
 
 sp.FINALS_FOLDER = "ConvolvedSpectra"
 sp.ROOT_FOLDER = \
     "/media/wirkert/data/Data/2015_06_01_Filtertransmittance_Spectrometer/"
-sp.FAP_IMAGE_FOLDER = "spectrometer_measurements"
+sp.DATA_FOLDER = "spectrometer_measurements"
 RECORDED_WAVELENGTHS = \
         np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
 
@@ -83,49 +81,11 @@ class OxyHaemoglobinAbsorptionRaw(luigi.Task):
         writer.write(self.output().path)
 
 
-class SpectrometerFile(luigi.Task):
-    input_file = luigi.Parameter()
-
-    def output(self):
-        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
-                                              sp.FAP_IMAGE_FOLDER,
-                                              self.input_file))
-
-class FilterTransmission(luigi.Task):
-    input_file = luigi.Parameter()
-
-    def requires(self):
-        return SpectrometerFile(self.input_file)
-
-    def output(self):
-        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
-                                              sp.RESULTS_FOLDER,
-            "processed_transmission" + self.input_file + ".msi"))
-
-    def run(self):
-        reader = SpectrometerReader()
-        filter_transmission = reader.read(self.input().path)
-        # filter high and low wavelengths
-        wavelengths = filter_transmission.get_wavelengths()
-        fi_image = filter_transmission.get_image()
-        fi_image[wavelengths < 450 * 10 ** -9] = 0.0
-        fi_image[wavelengths > 720 * 10 ** -9] = 0.0
-        # filter elements farther away than +- 30nm
-        name_to_float = float(os.path.splitext(self.input_file)[0])
-        fi_image[wavelengths < (name_to_float - 30) * 10 ** -9] = 0.0
-        fi_image[wavelengths > (name_to_float + 30) * 10 ** -9] = 0.0
-        # elements < 0 are set to 0.
-        fi_image[fi_image < 0.0] = 0.0
-        # write it
-        writer = MsiWriter(filter_transmission)
-        writer.write(self.output().path)
-
-
 class PlotTransmission(luigi.Task):
     input_file = luigi.Parameter()
 
     def requires(self):
-        return FilterTransmission(self.input_file)
+        return mc.FilterTransmission(self.input_file)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -156,17 +116,6 @@ class PlotTransmission(luigi.Task):
         plt.savefig(self.output().path, dpi=500)
         plt.close(self.input_file)
 
-
-def get_transmission_data(input_path, desired_wavelengths):
-    """small helper method to get filter transmission from
-    file at input_path. The wavelengths are interpolated to the desired ones"""
-    reader = MsiReader()
-    filter_transmission = reader.read(input_path)
-    msimani.interpolate_wavelengths(filter_transmission, desired_wavelengths)
-    # normalize to one
-    normalizer = NormalizeMean()
-    normalizer.normalize(filter_transmission)
-    return filter_transmission
 
 
 # The full width at half maximum [m] of the used imaging systems filters
@@ -211,14 +160,14 @@ def old_absorption_coefficients():
 class PlotAdaptedHaemoglobinSpectra(luigi.Task):
 
     def requires(self):
-        return FilterTransmission("580.txt"), \
-            FilterTransmission("470.txt"), \
-            FilterTransmission("660.txt"), \
-            FilterTransmission("560.txt"), \
-            FilterTransmission("480.txt"), \
-            FilterTransmission("511.txt"), \
-            FilterTransmission("600.txt"), \
-            FilterTransmission("700.txt"), \
+        return mc.FilterTransmission("580.txt"), \
+            mc.FilterTransmission("470.txt"), \
+            mc.FilterTransmission("660.txt"), \
+            mc.FilterTransmission("560.txt"), \
+            mc.FilterTransmission("480.txt"), \
+            mc.FilterTransmission("511.txt"), \
+            mc.FilterTransmission("600.txt"), \
+            mc.FilterTransmission("700.txt"), \
             OxyHaemoglobinAbsorptionRaw(), \
             DeoxyHaemoglobinAbsorptionRaw()
 
@@ -239,7 +188,7 @@ class PlotAdaptedHaemoglobinSpectra(luigi.Task):
         oxy_haemoglobin_filter = np.zeros((8,))
         deoxy_haemoglobin_filter = np.zeros((8,))
         for i in range(len(oxy_haemoglobin_filter)):
-            filter_transmission = get_transmission_data(self.input()[i].path,
+            filter_transmission = mc.get_transmission_data(self.input()[i].path,
                                                         reference_wavelengths)
             # build weighted sum of absorption and filter transmission
             oxy_haemoglobin_filter[i] = np.sum(oxy_haemoglobin.get_image() *
@@ -276,7 +225,7 @@ if __name__ == '__main__':
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
     for root, dirs, files in os.walk(os.path.join(sp.ROOT_FOLDER,
-                                                  sp.FAP_IMAGE_FOLDER)):
+                                                  sp.DATA_FOLDER)):
         for name in files:
             plot_transmission_task = PlotTransmission(input_file=name)
             w.add(plot_transmission_task)

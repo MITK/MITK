@@ -14,7 +14,7 @@ import SimpleITK as sitk
 from msi.io.nrrdreader import NrrdReader
 from msi.io.nrrdwriter import NrrdWriter
 import msi.msimanipulations as msimani
-from msi.normalize import standard_normalizer
+import msi.normalize as norm
 import scriptpaths as sp
 
 
@@ -63,7 +63,7 @@ class MultiSpectralImageFile(luigi.Task):
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
-                                              sp.FAP_IMAGE_FOLDER,
+                                              sp.DATA_FOLDER,
                                 self.imageName))
 
 
@@ -163,11 +163,10 @@ class PreprocessMSI(luigi.Task):
     def requires(self):
         return CorrectImagingSetupTask(imageName=self.imageName)
 
-
     def run(self):
         reader = NrrdReader()
         image = reader.read(self.input().path)
-        standard_normalizer.normalize(image)
+        norm.standard_normalizer.normalize(image)
         touch_and_save_msi(image, self.output())
 
 

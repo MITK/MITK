@@ -163,7 +163,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
     image->SetImportVolume(readVolume->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::AsyncCopyMemory);
 
     itk::ImageIOBase::IOComponentType comptype = io->GetComponentType();
-    std::thread thr(LoadSeries, std::ref(filenames), image, comptype, command);
+    std::thread thr(LoadSeries, filenames, image, comptype, command);
     thr.detach();
   }
   else

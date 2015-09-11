@@ -39,7 +39,7 @@ namespace mitk
 {
 
 template <typename PixelType>
-void DicomSeriesReader::LoadSeriesTemplate(const DicomSeriesReader::StringContainer& filenames, Image::Pointer  image, void* command) 
+void DicomSeriesReader::LoadSeriesTemplate(const DicomSeriesReader::StringContainer filenames, Image::Pointer  image, void* command) 
 {
   const int STATUS_LOAD_SLICE = 0;
   const int STATUS_LOAD_COMPLETE = 100;

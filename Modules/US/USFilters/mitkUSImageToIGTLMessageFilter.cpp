@@ -14,8 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <arpa/inet.h>
-
 #include "mitkUSImageToIGTLMessageFilter.h"
 #include "igtlImageMessage.h"
 
@@ -80,15 +78,7 @@ void mitk::USImageToIGTLMessageFilter::GenerateData()
 
     imgMsg->SetNumComponents(pt.GetNumberOfComponents());
 
-    // TODO: Can this be done simpler?
-    if (htonl(47) == 47)
-    {
-      imgMsg->SetEndian(igtl::ImageMessage::ENDIAN_BIG);
-    }
-    else
-    {
-      imgMsg->SetEndian(igtl::ImageMessage::ENDIAN_LITTLE);
-    }
+    // TODO: Endian
 
     switch (dim)
     {

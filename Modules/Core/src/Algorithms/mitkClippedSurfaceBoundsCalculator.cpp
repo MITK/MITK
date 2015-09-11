@@ -161,16 +161,23 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
   const mitk::BaseGeometry::Pointer imageGeometry = m_Image->GetGeometry()->Clone();
   const Vector3D spacing = imageGeometry->GetSpacing();
 
-  Point3D origin = imageGeometry->GetOrigin();           //Left, bottom, front
-  for( int i = 0; i < 3; i++ )
-  {
-    origin[i] -= 0.5*spacing[i];
-  }
+  //  the cornerpoint(0) is the corner based Origin, which is original center based
+  Point3D origin = imageGeometry->GetCornerPoint(0);           //Left, bottom, front
+
+  // get center based axis vectors along the bounding box
+  const Vector3D xDirectionCenterBased = imageGeometry->GetAxisVector(0);
+  const Vector3D yDirectionCenterBased = imageGeometry->GetAxisVector(1);
+  const Vector3D zDirectionCenterBased = imageGeometry->GetAxisVector(2);
+
+  //because we want the whole inclusion of the bounding box we need one additional pixel because the axis are not corner based
+  const Vector3D onePixelInXDirectioninMM = (1/imageGeometry->GetAxisVector(0).Normalize()) * xDirectionCenterBased * spacing[0];
+  const Vector3D onePixelInYDirectioninMM = (1/imageGeometry->GetAxisVector(1).Normalize()) * yDirectionCenterBased * spacing[1];
+  const Vector3D onePixelInZDirectioninMM = (1/imageGeometry->GetAxisVector(2).Normalize()) * zDirectionCenterBased * spacing[2];
 
   //Get axis vector for the spatial directions
-  const Vector3D xDirection = imageGeometry->GetAxisVector(1);
-  const Vector3D yDirection = imageGeometry->GetAxisVector(0);
-  const Vector3D zDirection = imageGeometry->GetAxisVector(2);
+  const Vector3D xDirection = xDirectionCenterBased + onePixelInXDirectioninMM;
+  const Vector3D yDirection = yDirectionCenterBased + onePixelInYDirectioninMM;
+  const Vector3D zDirection = zDirectionCenterBased + onePixelInZDirectioninMM;
 
   const Point3D leftBottomFront = origin;
   const Point3D leftTopFront = origin + yDirection;

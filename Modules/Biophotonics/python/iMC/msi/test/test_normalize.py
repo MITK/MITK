@@ -37,3 +37,18 @@ class TestNormalize(unittest.TestCase):
         np.testing.assert_equal(self.specialmsi.get_image(),
                                 desired_matrix,
                                 "msi correctly normalized by iq")
+
+    def test_normalizeMean(self):
+        original_shape = self.specialmsi.get_image().shape  # shape should stay
+        desired_matrix = self.specialmsi.get_image() / 15.0
+        desired_matrix[2, 2, :] = self.specialmsi.get_image()[2, 2, :] / 20.0
+        # the same after normalization
+        mean_normalizer = norm.NormalizeMean()
+        mean_normalizer.normalize(self.specialmsi)
+
+        self.assertEqual(self.specialmsi.get_image().shape, original_shape,
+                         "shape not changed by normalization")
+        np.testing.assert_equal(self.specialmsi.get_image(),
+                                desired_matrix,
+                                "msi correctly normalized by mean")
+

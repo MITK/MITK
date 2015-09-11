@@ -37,8 +37,9 @@ class NormalizeMean(Normalize):
         # todo: guard if iqBand is outside of image dimension
         original_shape = msi.get_image().shape
         collapsed_image = collapse_image(msi.get_image())
-        normalized_image = collapsed_image / np.sum(collapsed_image, axis=1)
+        normalized_image = collapsed_image / \
+                np.sum(collapsed_image, axis=1)[:, None]
         msi.set_image(np.reshape(normalized_image, original_shape))
 
 
-standard_normalizer = NormalizeIQ()
+standard_normalizer = NormalizeMean()

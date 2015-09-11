@@ -31,6 +31,27 @@ mitk::USImageToIGTLMessageFilter::~USImageToIGTLMessageFilter() {}
 
 void mitk::USImageToIGTLMessageFilter::GenerateData()
 {
+    for (size_t i = 0; i < this->GetNumberOfIndexedInputs(); ++i) {
+    mitk::IGTLMessage* output = this->GetOutput(i);
+
+    igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
+    imgMsg->SetDimensions(1, 1, 1);
+    imgMsg->SetCoordinateSystem(igtl::ImageMessage::COORDINATE_LPS);
+    imgMsg->SetEndian(igtl::ImageMessage::ENDIAN_LITTLE);
+    igtl::Matrix4x4 atm;
+    memset(atm, '\0', sizeof(atm));
+    atm[0][0] = 1;
+    atm[1][1] = -1;
+    atm[2][2] = 1;
+    atm[3][3] = 1;
+    imgMsg->SetMatrix(atm);
+    imgMsg->SetNumComponents(1);
+    imgMsg->SetScalarTypeToUint8();
+
+    output->SetMessage((igtl::MessageBase::Pointer)imgMsg);
+    }
+    return;
+
   for (size_t i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);

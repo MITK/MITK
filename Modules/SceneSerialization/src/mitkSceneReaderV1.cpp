@@ -25,6 +25,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
 
+namespace
+{
+
+typedef std::pair<mitk::DataNode::Pointer, std::list<std::string> >   NodesAndParentsPair;
+
+bool NodeSortByLayerIsLessThan( const NodesAndParentsPair& left, const NodesAndParentsPair& right )
+{
+  if ( left.first.IsNotNull() && right.first.IsNotNull() )
+  {
+    int leftLayer;
+    int rightLayer;
+    if ( left.first->GetIntProperty("layer", leftLayer) && right.first->GetIntProperty("layer", rightLayer) )
+    {
+      return leftLayer < rightLayer;
+    }
+    else
+    {
+      // fall back to name sort
+      return left.first->GetName() < right.first->GetName();
+    }
+  }
+
+  // in all other cases, fall back to stupid pointer comparison
+  // this is not reasonable but at least answers the sorting
+  // question clearly
+  return left.first.GetPointer() < right.first.GetPointer();
+}
+
+}
+
 bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage )
 {
   assert(storage);
@@ -56,10 +86,6 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       ProgressBar::GetInstance()->Progress();
   }
 
-  OrderedLayers orderedLayers;
-  this->GetLayerOrder(document, workingDirectory, DataNodes, orderedLayers);
-
-
   // iterate all nodes
   // first level nodes should be <node> elements
   DataNodeVector::iterator nit = DataNodes.begin();
@@ -78,7 +104,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       }
       else
       {
-        MITK_WARN << "BaseData properties stored in scene file, but BaseData can't be read" << std::endl;
+        MITK_WARN << "BaseData properties stored in scene file, but BaseData could not be read" << std::endl;
       }
     }
 
@@ -110,14 +136,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     }
 
     // remember node for later adding to DataStorage
-
-    //node->GetIntProperty("layer", layer);
-
-    int layer;
-    OrderedLayers::iterator it = orderedLayers.find(uid);
-    layer = (*it).second;
-
-    m_OrderedNodePairs.insert( std::make_pair( layer, std::make_pair( node, std::list<std::string>() ) ) );
+    m_OrderedNodePairs.push_back( std::make_pair( node, std::list<std::string>() ) );
 
     //   4. if there are <source> elements, remember parent objects
     for( TiXmlElement* source = element->FirstChildElement("source"); source != NULL; source = source->NextSiblingElement("source") )
@@ -125,25 +144,28 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       const char* sourceUID = source->Attribute("UID");
       if (sourceUID)
       {
-        m_OrderedNodePairs[layer].second.push_back( std::string(sourceUID) );
+        m_OrderedNodePairs.back().second.push_back( std::string(sourceUID) );
       }
     }
 
     ProgressBar::GetInstance()->Progress();
-
   } // end for all <node>
 
+  // sort our nodes by their "layer" property
+  // (to be inserted in that order)
+  m_OrderedNodePairs.sort( &NodeSortByLayerIsLessThan );
+
   // remove all unknown parent UIDs
-  for (LayerPropertyMapType::iterator nodesIter = m_OrderedNodePairs.begin();
+  for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
        nodesIter != m_OrderedNodePairs.end();
        ++nodesIter)
   {
-    for (std::list<std::string>::iterator parentsIter = nodesIter->second.second.begin();
-         parentsIter != nodesIter->second.second.end();)
+    for (std::list<std::string>::iterator parentsIter = nodesIter->second.begin();
+         parentsIter != nodesIter->second.end();)
     {
       if (m_NodeForID.find( *parentsIter ) == m_NodeForID.end())
       {
-        parentsIter = nodesIter->second.second.erase( parentsIter );
+        parentsIter = nodesIter->second.erase( parentsIter );
         MITK_WARN << "Found a DataNode with unknown parents. Will add it to DataStorage without any parent objects.";
         error = true;
       }
@@ -154,42 +176,45 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     }
   }
 
-  // repeat
-  //   for all created nodes
+  // repeat the following loop ...
+  //   ... for all created nodes
   unsigned int lastMapSize(0);
   while ( lastMapSize != m_OrderedNodePairs.size()) // this is to prevent infinite loops; each iteration must at least add one node to DataStorage
   {
     lastMapSize = m_OrderedNodePairs.size();
 
-    for (LayerPropertyMapType::iterator nodesIter = m_OrderedNodePairs.begin();
+    // iterate (layer) ordered nodes backwards
+    // we insert the highest layers first
+    for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
          nodesIter != m_OrderedNodePairs.end();
          ++nodesIter)
     {
-      bool addNow(true);
+      bool addThisNode(true);
+
       // if any parent node is not yet in DataStorage, skip node for now and check later
-      for (std::list<std::string>::iterator parentsIter = nodesIter->second.second.begin();
-           parentsIter != nodesIter->second.second.end();
+      for (std::list<std::string>::iterator parentsIter = nodesIter->second.begin();
+           parentsIter != nodesIter->second.end();
            ++parentsIter)
       {
         if ( !storage->Exists( m_NodeForID[ *parentsIter ] ) )
         {
-          addNow = false;
+          addThisNode = false;
           break;
         }
       }
 
-      if (addNow)
+      if (addThisNode)
       {
         DataStorage::SetOfObjects::Pointer parents = DataStorage::SetOfObjects::New();
-        for (std::list<std::string>::iterator parentsIter = nodesIter->second.second.begin();
-             parentsIter != nodesIter->second.second.end();
-             ++parentsIter)
+        for ( std::list<std::string>::iterator parentsIter = nodesIter->second.begin();
+              parentsIter != nodesIter->second.end();
+              ++parentsIter )
         {
-          parents->push_back( m_NodeForID[ *parentsIter ] );
+           parents->push_back(m_NodeForID[*parentsIter]);
         }
 
         // if all parents are found in datastorage (or are unknown), add node to DataStorage
-        storage->Add( nodesIter->second.first, parents );
+        storage->Add(nodesIter->first, parents);
 
         // remove this node from m_OrderedNodePairs
         m_OrderedNodePairs.erase( nodesIter );
@@ -201,45 +226,16 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   }
 
   // All nodes that are still in m_OrderedNodePairs at this point are not part of a proper directed graph structure. We'll add such nodes without any parent information.
-  for (LayerPropertyMapType::iterator nodesIter = m_OrderedNodePairs.begin();
+  for (OrderedNodesList::iterator nodesIter = m_OrderedNodePairs.begin();
        nodesIter != m_OrderedNodePairs.end();
        ++nodesIter)
   {
-    storage->Add( nodesIter->second.first );
+    storage->Add( nodesIter->first );
     MITK_WARN << "Encountered node that is not part of a directed graph structure. Will be added to DataStorage without parents.";
     error = true;
   }
 
   return !error;
-}
-
-void mitk::SceneReaderV1::GetLayerOrder(TiXmlDocument& document, const std::string& workingDirectory, std::vector<mitk::DataNode::Pointer> DataNodes, OrderedLayers& order)
-{
-  typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
-  DataNodeVector::iterator nit = DataNodes.begin();
-  for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL || nit != DataNodes.end(); element = element->NextSiblingElement("node"), ++nit )
-  {
-    DataNode::Pointer node = *nit;
-    DecorateNodeWithProperties(node, element, workingDirectory);
-
-    int layer;
-    node->GetIntProperty("layer", layer);
-    std::string uid = element->Attribute("UID");
-    this->m_UnorderedLayers.insert( std::make_pair( layer, uid ) );
-  }
-
-  int lastLayer = itk::NumericTraits<int>::min();
-  UnorderedLayers::iterator it;
-  for (it = m_UnorderedLayers.begin(); it != m_UnorderedLayers.end(); it++)
-  {
-    int currentLayer = (*it).first;
-    if (currentLayer == lastLayer)
-    {
-      ++currentLayer;
-    }
-    order.insert( std::make_pair( (*it).second, currentLayer ) );
-    lastLayer = currentLayer;
-  }
 }
 
 mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlElement* dataElement, const std::string& workingDirectory, bool& error )

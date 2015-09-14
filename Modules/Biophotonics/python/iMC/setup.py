@@ -15,10 +15,10 @@ setup(name='MultiSpectralImaging',
       author='Sebastian Wirkert',
       author_email='s.wirkert@dkfz-heidelberg.de',
       license='BSD',
-      packages=find_packages(where='msi', exclude=['test*']),
-      package_dir={'':'msi'},
-      package_data={'data':['*.txt']},
+      packages=find_packages(exclude=['test*']),
+      package_dir={},
+      package_data={'data':['*.txt','*.mci','*.nrrd']},
       install_requires=['numpy>=1.8.2', 'SimpleITK>=0.9.0', 'scipy>=0.15.1',
                         'pymiecoated'],
-      entry_points={}  # for scritps, add later
+      entry_points={}  # for scripts, add later
      )

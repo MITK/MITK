@@ -100,7 +100,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("test_batch", 1)
+    main_task = VisualizeSpectraTask("d_batch", 0)
     w.add(main_task)
     w.run()
 

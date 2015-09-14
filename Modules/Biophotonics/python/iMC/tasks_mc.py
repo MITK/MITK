@@ -101,7 +101,7 @@ class CreateSpectraTask(luigi.Task):
 
     def run(self):
         start = time.time()
-        NR_ELEMENTS_IN_BATCH = 2
+        NR_ELEMENTS_IN_BATCH = 1000
         # setup simulation wrapper
         self.sim_wrapper = SimWrapper()
         self.sim_wrapper.set_mci_filename(MCI_FILENAME)
@@ -124,12 +124,19 @@ class CreateSpectraTask(luigi.Task):
         for i in range(NR_ELEMENTS_IN_BATCH):
             # randomly draw paramters for submucosa and mucosa
             muc_bvf = random.uniform(0.001, 0.4)
+            # 0.01 + i * 0.04  # 0.04  # random.uniform(0.001, 0.4)
             muc_saO2 = random.uniform(0., 1.)
+            # 0.7  # i * 0.1  # random.uniform(0., 1.)
             muc_dsp = random.uniform(0.001, 0.6)
+            # 0.01 + i * 0.06  # 0.2  # random.uniform(0.001, 0.6)
             muc_d = random.uniform(250, 735) * 10 ** -6
+            # (250 + 0.1 * i * 500) * 10 ** -6
+            # random.uniform(250, 735) * 10 ** -6
             sm_bvf = random.uniform(0.03, 0.4)
+            # 0.1  # random.uniform(0.03, 0.4)
             sm_saO2 = muc_saO2  # submocosa and mucosa oxygenation are equal
             sm_dsp = random.uniform(0.03, 0.6)
+            # 0.2  # random.uniform(0.03, 0.6)
             # set layers to these values
             self.colon_model.set_mucosa(bvf=muc_bvf, saO2=muc_saO2,
                                         dsp=muc_dsp, d=muc_d)

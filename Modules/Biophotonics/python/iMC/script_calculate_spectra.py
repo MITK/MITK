@@ -22,7 +22,7 @@ if __name__ == '__main__':
     luigi.interface.setup_interface_logging()
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    NR_BATCHES_TO_CREATE = 3
+    NR_BATCHES_TO_CREATE = 10
     for i in range(NR_BATCHES_TO_CREATE):
         main_task = mc.CreateSpectraTask("batch", i)
         w.add(main_task)

@@ -124,7 +124,7 @@ void mitk::PointSetVtkMapper3D::CreateEdgeObjectsBetweenPoints(itk::Point<float>
   transformFilter->SetTransform(aTransform);
 
   vtkSmartPointer<vtkCylinderSource> cylinder = vtkSmartPointer<vtkCylinderSource>::New();
-  cylinder->SetRadius(m_PointSize);
+  cylinder->SetRadius(m_ContourRadius);
   cylinder->SetCenter(0, 0, 0);
           
   cylinder->SetHeight(h);
@@ -183,6 +183,11 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
   if ( pointSizeProp.IsNotNull() )
     m_PointSize = pointSizeProp->GetValue();
+
+  m_ContourRadius = 2;
+  mitk::FloatProperty::Pointer contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contoursize"));
+  if (contourSizeProp.IsNotNull())
+    m_ContourRadius = contourSizeProp->GetValue();
 
   //get the property for creating a label onto every point only once
   bool showLabel = true;

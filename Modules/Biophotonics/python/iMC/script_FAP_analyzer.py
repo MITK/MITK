@@ -43,8 +43,8 @@ if __name__ == '__main__':
         for name in files:
             main_task = at.CreateNiceParametricImagesTask(
                 imageName=name,
-                file_name_prefix_training=
-                "2015August2811:59PMNoisyRandomForInvertabilityTraining")
+                batch_prefix=
+                "batch")
             w.add(main_task)
     w.run()
 

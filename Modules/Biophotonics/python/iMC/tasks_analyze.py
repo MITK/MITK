@@ -60,18 +60,18 @@ def estimate_image(image_filename, rf_filename):
 
 class EstimateTissueParametersTask(luigi.Task):
     imageName = luigi.Parameter()
-    file_name_prefix_training = luigi.Parameter()
+    batch_prefix = luigi.Parameter()
 
     def requires(self):
         return ppt.PreprocessMSI(imageName=self.imageName), \
-            rt.TrainForest(file_name_prefix_training=
-                        self.file_name_prefix_training)
+            rt.TrainForest(batch_prefix=
+                        self.batch_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
                                               sp.FINALS_FOLDER,
                                               self.imageName + "_" +
-                                              self.file_name_prefix_training +
+                                              self.batch_prefix +
                                               "estimate.nrrd"))
 
     def run(self):
@@ -83,21 +83,21 @@ class EstimateTissueParametersTask(luigi.Task):
 
 class ReprojectReflectancesTask(luigi.Task):
     imageName = luigi.Parameter()
-    file_name_prefix_training = luigi.Parameter()
+    batch_prefix = luigi.Parameter()
 
     def requires(self):
         return EstimateTissueParametersTask(imageName=self.imageName,
-                                            file_name_prefix_training=
-                                            self.file_name_prefix_training), \
-            rt.TrainForestForwardModel(file_name_prefix_training=
-                        self.file_name_prefix_training)
+                                            batch_prefix=
+                                            self.batch_prefix), \
+            rt.TrainForestForwardModel(batch_prefix=
+                        self.batch_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
                                               sp.FINALS_FOLDER,
                                               self.imageName +
                                               "_backprojection_" +
-                                              self.file_name_prefix_training +
+                                              self.batch_prefix +
                                               "estimate.nrrd"))
 
     def run(self):
@@ -130,25 +130,25 @@ def r2_evaluation(reflectances, backprojections):
 
 class CreateNiceParametricImagesTask(luigi.Task):
     imageName = luigi.Parameter()
-    file_name_prefix_training = luigi.Parameter()
+    batch_prefix = luigi.Parameter()
 
     def requires(self):
         return EstimateTissueParametersTask(imageName=self.imageName,
-                                            file_name_prefix_training=
-                                            self.file_name_prefix_training), \
+                                            batch_prefix=
+                                            self.batch_prefix), \
             ppt.CorrectImagingSetupTask(imageName=self.imageName), \
             ppt.SegmentMSI(imageName=self.imageName), \
             ppt.PreprocessMSI(imageName=self.imageName), \
             ReprojectReflectancesTask(imageName=self.imageName,
-                                      file_name_prefix_training=
-                                      self.file_name_prefix_training)
+                                      batch_prefix=
+                                      self.batch_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               self.imageName + "_" +
-                                              self.file_name_prefix_training +
+                                              self.batch_prefix +
                                               "_summary.png"))
 
     def run(self):
@@ -204,12 +204,12 @@ class CreateNiceParametricImagesTask(luigi.Task):
         image[0, 0, 0] = 0.; image[1, 0, 0] = 0.2
         plot_axis(axarr[0, 1], image[:, :, 0], "blood volume fraction [%]")
         image[0, 0, 1] = 0.; image[1, 0, 1] = 0.6
-        plot_axis(axarr[0, 2], image[:, :, 1],
+        plot_axis(axarr[0, 2], image[:, :, 2],
                   "density scattering particles [%]")
         image[0, 0, 2] = 175 * 10 ** -6; image[1, 0, 0] = 750 * 10 ** -6
-        plot_axis(axarr[1, 1], image[:, :, 2] * 10 ** 6,
+        plot_axis(axarr[1, 1], image[:, :, 4] * 10 ** 6,
                   "mucosa thickness [um]")
         image[0, 0, 3] = 0.; image[1, 0, 3] = 1.
-        plot_axis(axarr[1, 2], image[:, :, 3], "oxygenation [%]")
+        plot_axis(axarr[1, 2], image[:, :, 1], "oxygenation [%]")
 
         plt.savefig(self.output().path, dpi=1000, bbox_inches='tight')

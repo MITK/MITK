@@ -28,8 +28,6 @@ import tasks_preprocessing as ppt
 # root folder there the data lies
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/2015_08_31_new_colorcheckertest/"
 sp.DATA_FOLDER = "colors"
-RECORDED_WAVELENGTHS = \
-        np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
 
 
 def resort_wavelengths(msi):
@@ -75,7 +73,7 @@ class GetDataFromSpectrometerTask(luigi.Task):
     def run(self):
         reader = SpectrometerReader()
         image = reader.read(self.input().path)
-        msimani.interpolate_wavelengths(image, RECORDED_WAVELENGTHS)
+        msimani.interpolate_wavelengths(image, sp.RECORDED_WAVELENGTHS)
         # create folder for figure if necessary
         head, tail = os.path.split(self.output().path)
         if not os.path.exists(head):
@@ -99,7 +97,7 @@ class GetDataFromSpectrocamTask(luigi.Task):
     def run (self):
         reader = NrrdReader()
         image = reader.read(self.input()[0].path)
-        image.set_wavelengths(RECORDED_WAVELENGTHS)
+        image.set_wavelengths(sp.RECORDED_WAVELENGTHS)
         sitk_reader = sitk.ImageFileReader()
         sitk_reader.SetFileName(self.input()[1].path)
         segmentation_image = sitk_reader.Execute()
@@ -134,9 +132,9 @@ class PlotMeasuredSpectraForImage(luigi.Task):
         # get data
         reader = NrrdReader()
         data_spectrocam = reader.read(self.input()[0].path)
-        data_spectrocam.set_wavelengths(RECORDED_WAVELENGTHS)
+        data_spectrocam.set_wavelengths(sp.RECORDED_WAVELENGTHS)
         data_spectrometer = reader.read(self.input()[1].path)
-        data_spectrometer.set_wavelengths(RECORDED_WAVELENGTHS)
+        data_spectrometer.set_wavelengths(sp.RECORDED_WAVELENGTHS)
         msi = reader.read(self.input()[2].path)
         # make to subplots
         f, axarr = plt.subplots(1, 2)

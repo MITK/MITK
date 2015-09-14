@@ -33,13 +33,13 @@ class EstimateTissueParametersTaskDA(at.EstimateTissueParametersTask):
         return ppt.PreprocessMSI(imageName=self.imageName), \
             rt.TrainForestDA(imageName=self.imageName,
                         file_name_prefix_training=
-                        self.file_name_prefix_training)
+                        self.batch_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
                                               sp.FINALS_FOLDER,
                                               self.imageName + "_" +
-                                              self.file_name_prefix_training +
+                                              self.batch_prefix +
                                               "estimate.nrrd"))
 
 
@@ -49,20 +49,20 @@ class CreateNiceParametricImagesTaskDA(at.CreateNiceParametricImagesTask):
     def requires(self):
         return EstimateTissueParametersTaskDA(imageName=self.imageName,
                                             file_name_prefix_training=
-                                            self.file_name_prefix_training), \
+                                            self.batch_prefix), \
             ppt.CorrectImagingSetupTask(imageName=self.imageName), \
             ppt.SegmentMSI(imageName=self.imageName), \
             ppt.PreprocessMSI(imageName=self.imageName), \
             at.ReprojectReflectancesTask(imageName=self.imageName,
                                       file_name_prefix_training=
-                                      self.file_name_prefix_training)
+                                      self.batch_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               self.imageName + "_" +
-                                              self.file_name_prefix_training +
+                                              self.batch_prefix +
                                               "_summary.png"))
 
 

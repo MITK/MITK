@@ -14,13 +14,10 @@ from msi.imgmani import remove_masked_elements, select_n_reflectances
 class TestImgMani(unittest.TestCase):
 
     def setUp(self):
-
         self.msi = helpers.getFakeMsi()
-
         # set one pixel to special values
         self.specialValue = np.arange(self.msi.get_image().shape[-1]) * 2
         self.msi.get_image()[2, 2, :] = self.specialValue
-
         # create a segmentation which sets all elements to invalid but the
         # one pixel with the special value
         self.segmentation = np.zeros(self.msi.get_image().shape[0:-1])
@@ -76,4 +73,20 @@ class TestImgMani(unittest.TestCase):
         self.assertFalse(np.allclose(shuffled_image[:, :, 0],
                                      new_first_layer),
                          "image has been shuffled")
+
+    def test_get_bands_from_int(self):
+        new_image_bands = imgmani.get_bands(self.image, 2)
+        self.assertEqual(new_image_bands.shape, (5, 5, 1),
+                         "new image has correct shape")
+        self.assertEqual(new_image_bands[2, 2, :], self.specialValue[2],
+                         "new image has correct values")
+
+    def test_get_bands_from_array(self):
+        new_image_bands = imgmani.get_bands(self.image, np.array([0, 1, 2]))
+        self.assertEqual(new_image_bands.shape, (5, 5, 3),
+                         "new image has correct shape")
+        np.testing.assert_allclose(new_image_bands[2, 2, :],
+                                   self.specialValue[:3],
+                                   err_msg="new image has correct values")
+
 

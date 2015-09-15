@@ -35,3 +35,20 @@ def select_n_reflectances(img, n):
     perms = np.random.permutation(collapsed_image.shape[0])
     first_n_perms = perms[0:n]
     return collapsed_image[first_n_perms, :]
+
+
+def get_bands(img, bands):
+    """get the bands bands (np.array) from the multispectral image.
+    Exampele: image is 2048x2048x8. get_bands(img, [0,3] will return
+    img[:,:,[0,3]]. The advantage of this function is that the image does not
+    need to be 2d + wavelength."""
+    original_shape = img.shape
+    collapsed_image = collapse_image(img)
+    img_bands = collapsed_image[ :, bands]
+    new_nr_bands = 1
+    if hasattr(bands, "__len__"):
+        new_nr_bands = len(bands)
+    else:
+        new_nr_bands = 1
+    new_shape = original_shape[:-1] + (new_nr_bands,)
+    return np.reshape(img_bands, new_shape)

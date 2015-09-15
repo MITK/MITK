@@ -201,6 +201,12 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   if (contourSizeProp.IsNotNull())
     m_ContourRadius = contourSizeProp->GetValue();
 
+  m_ShowEdge = false;
+  mitk::BoolProperty::Pointer showEdgeProp = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("show edge"));
+  if (showEdgeProp.IsNotNull())
+    m_ShowEdge = showEdgeProp->GetValue();
+
+
   //get the property for creating a label onto every point only once
   bool showLabel = true;
   this->GetDataNode()->GetBoolProperty("show label", showLabel);
@@ -437,11 +443,14 @@ void mitk::PointSetVtkMapper3D::GenerateDataForRenderer( mitk::BaseRenderer *ren
   {
     mitk::FloatProperty * pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
     mitk::FloatProperty * contourSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("contoursize"));
+    mitk::BoolProperty * showEdgeProp = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("show edge"));
 
     // only create new vtk render objects if property values were changed
     if(pointSizeProp && m_PointSize!=pointSizeProp->GetValue() )
       needGenerateData = true;
     if(contourSizeProp && m_ContourRadius!=contourSizeProp->GetValue() )
+      needGenerateData = true;
+    if (showEdgeProp && m_ShowEdge != showEdgeProp->GetValue())
       needGenerateData = true;
   }
 

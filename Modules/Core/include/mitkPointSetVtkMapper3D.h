@@ -153,6 +153,7 @@ namespace mitk {
     //variables to check if an update of the vtk objects is needed
     ScalarType m_PointSize;
     ScalarType m_ContourRadius;
+    bool m_ShowEdge;
   };
 
 

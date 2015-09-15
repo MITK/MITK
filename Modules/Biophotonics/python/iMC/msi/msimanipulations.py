@@ -10,9 +10,13 @@ import copy
 import numpy as np
 from scipy.interpolate import interp1d
 from imgmani import collapse_image
+from msi import Msi
 
 def apply_segmentation(msi, segmentation):
     """ TODO """
+    if (isinstance(segmentation, Msi)):
+        # expects just an image, but if a Msi is passed it's also ok
+        segmentation = segmentation.get_image()
     segmentation = np.squeeze(segmentation)
     mask = (0 == segmentation)
     # mask needs to be expanded to cover all wavlengths

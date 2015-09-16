@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 #include <usServiceReference.h>
 
 #include "ui_QmitkMITKIGTNavigationToolManagerViewControls.h"
@@ -31,10 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
-class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
+class QmitkMITKIGTNavigationToolManagerView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -49,8 +47,7 @@ class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
 
     virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-    virtual void StdMultiWidgetNotAvailable() override;
+    virtual void SetFocus() override;
 
   protected slots:
 
@@ -60,8 +57,6 @@ class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
   protected:
 
     Ui::QmitkMITKIGTNavigationToolManagerViewControls* m_Controls;
-
-    QmitkStdMultiWidget* m_MultiWidget;
 
     /** Someone needs to hold the smart pointers of new storages, otherwise the objects will be lost although they are listed as microservice. */
     std::vector<mitk::NavigationToolStorage::Pointer> m_AllStoragesHandledByThisWidget;

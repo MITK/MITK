@@ -58,8 +58,8 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::SliceNavigation
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SegmentationPredicate);
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SegmentationPredicate);
+  m_Controls.dataSelectionWidget->AddDataStorageComboBox("<img width=16 height=16 src=\":/SegmentationUtilities/BooleanLabelA_32x32.png\"/>",QmitkDataSelectionWidget::SegmentationPredicate);
+  m_Controls.dataSelectionWidget->AddDataStorageComboBox("<img width=16 height=16 src=\":/SegmentationUtilities/BooleanLabelB_32x32.png\"/>",QmitkDataSelectionWidget::SegmentationPredicate);
 
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 

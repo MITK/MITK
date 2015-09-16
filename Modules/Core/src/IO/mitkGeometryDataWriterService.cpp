@@ -75,7 +75,7 @@ void mitk::GeometryDataWriterService::Write()
   const GeometryData* data = static_cast<const GeometryData*>( this->GetInput() );
 
   const Geometry3D* geom3D(NULL);
-  if ( geom3D = dynamic_cast<const Geometry3D*>( data->GetGeometry() ) )
+  if ( (geom3D = dynamic_cast<const Geometry3D*>( data->GetGeometry() )) )
   {
       TiXmlElement* geometryElement = Geometry3DToXML::ToXML( geom3D );
       rootNode->LinkEndChild( geometryElement );

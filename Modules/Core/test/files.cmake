@@ -32,6 +32,7 @@ set(MODULE_TESTS
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp
+  mitkGeometryDataIOTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkImageCastTest.cpp
   mitkImageEqualTest.cpp

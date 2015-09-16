@@ -75,6 +75,7 @@ int mitkTextOverlay3DColorRenderingTest(int argc, char* argv[])
   mitk::DataNode::Pointer datanode = mitk::DataNode::New();
   datanode->SetData(pointset);
   datanode->SetName("pointSet");
+  datanode->SetProperty( "pointsize", mitk::FloatProperty::New(2.0) );
   renderingHelper.AddNodeToStorage(datanode);
 
   //use this to generate a reference screenshot or save the file:

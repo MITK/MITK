@@ -269,8 +269,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     d->m_RenderWindows.insert("3d", d->m_StdMultiWidget->GetRenderWindow4());
 
     d->m_MouseModeToolbar->setMouseModeSwitcher( d->m_StdMultiWidget->GetMouseModeSwitcher() );
-    connect( d->m_MouseModeToolbar, SIGNAL( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ),
-      d->m_StdMultiWidget, SLOT( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ) );
 
     layout->addWidget(d->m_StdMultiWidget);
 

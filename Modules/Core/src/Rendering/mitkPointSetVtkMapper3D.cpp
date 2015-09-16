@@ -523,11 +523,6 @@ vtkProp* mitk::PointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer* /*renderer*/)
 
 void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
 {
-  if (!m_VertexRendering)
-  {
-    this->CreateVTKRenderObjects(); // they use the transform to place points!
-    this->ApplyAllProperties(renderer, m_ContourActor);
-  }
 }
 
 void mitk::PointSetVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor)

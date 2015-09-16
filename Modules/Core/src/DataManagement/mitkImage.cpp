@@ -881,9 +881,21 @@ void mitk::Image::Initialize(const mitk::PixelType& type, const mitk::TimeGeomet
   {
     TimeGeometry::Pointer cloned = geometry.Clone();
     SetTimeGeometry(cloned.GetPointer());
+
+    // make sure the image geometry flag is properly set for all time steps
+    for (TimeStepType step = 0; step < cloned->CountTimeSteps(); ++step)
+    {
+      cloned->GetGeometryForTimeStep(step)->ImageGeometryOn();
+    }
   }
   else
-    Superclass::SetGeometry(geometry.GetGeometryForTimeStep(0));
+  {
+    // make sure the image geometry coming from outside has proper value of the image geometry flag
+    BaseGeometry::Pointer cloned = geometry.GetGeometryCloneForTimeStep(0)->Clone();
+    cloned->ImageGeometryOn();
+
+    Superclass::SetGeometry( cloned );
+  }
 /* //Old //TODO_GOETZ Really necessary?
   mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBoxInWorld()->GetBounds();
   if( (bounds[0] != 0.0) || (bounds[2] != 0.0) || (bounds[4] != 0.0) )

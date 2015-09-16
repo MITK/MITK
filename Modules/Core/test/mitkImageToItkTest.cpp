@@ -44,7 +44,8 @@ static mitk::Image::Pointer GetEmptyTestImageWithGeometry(mitk::PixelType pt)
   mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
   planegeometry->InitializeStandardPlane(100, 100, right, bottom, &spacing);
   planegeometry->SetOrigin(origin);
-  // QUICK FIX
+
+  // QUICK FIX TO AVOID effects described in Bug 19327
   planegeometry->SetImageGeometry(true);
 
   //initialize image

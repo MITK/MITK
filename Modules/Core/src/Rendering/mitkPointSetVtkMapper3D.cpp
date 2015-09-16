@@ -173,7 +173,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 
   // build list of all positions for later transform in one go
   mitk::PointSet::PointsContainer::Iterator pointsIter;
-  int ptIdx;
+  unsigned int ptIdx;
 
   m_NumberOfSelectedAdded = 0;
   m_NumberOfUnselectedAdded = 0;
@@ -521,7 +521,7 @@ vtkProp* mitk::PointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer* /*renderer*/)
   return m_PointsAssembly;
 }
 
-void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* renderer)
+void mitk::PointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer* /*renderer*/)
 {
 }
 

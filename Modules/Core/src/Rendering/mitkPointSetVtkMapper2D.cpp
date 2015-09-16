@@ -307,25 +307,24 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
     vec = p - lastP;    // valid only for counter > 0
 
     // compute distance to current plane
-    float diff = fabs(geo2D->Distance(point));
-//    diff = diff * diff;
+    float dist = geo2D->Distance(point);
 
     //draw markers on slices a certain distance away from the points
     //location according to the tolerance threshold (m_DistanceToPlane)
-    if (diff < m_DistanceToPlane)
+    if(dist < m_DistanceToPlane)
     {
       // is point selected or not?
       if (pointDataIter->Value().selected)
       {
         ls->m_SelectedPoints->InsertNextPoint(point[0], point[1], point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_SelectedScales->InsertNextTuple3((double)m_Point2DSize*(1-diff/m_DistanceToPlane),0,0);
+        ls->m_SelectedScales->InsertNextTuple3(std::max(0.0f, m_Point2DSize - (2*dist)),0,0);
       }
       else
       {
         ls->m_UnselectedPoints->InsertNextPoint(point[0], point[1], point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_UnselectedScales->InsertNextTuple3((double)m_Point2DSize*(1-diff/m_DistanceToPlane),0,0);
+        ls->m_UnselectedScales->InsertNextTuple3(std::max(0.0f, m_Point2DSize - (2*dist)),0,0);
       }
 
       //---- LABEL -----//
@@ -496,7 +495,20 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer* rende
   b->SetElement(3, 1, 0);
   b->SetElement(3, 0, 0);
 
-  transform->SetMatrix(b);
+  Vector3D spacing = geo2D->GetSpacing();
+
+  // If you find a way to simplyfy the following, feel free to change!
+  b->SetElement(0, 0, b->GetElement(0, 0) / spacing[0]);
+  b->SetElement(1, 0, b->GetElement(1, 0) / spacing[0]);
+  b->SetElement(2, 0, b->GetElement(2, 0) / spacing[0]);
+  b->SetElement(1, 1, b->GetElement(1, 1) / spacing[1]);
+  b->SetElement(2, 1, b->GetElement(2, 1) / spacing[1]);
+
+  b->SetElement(0, 2, b->GetElement(0, 2) / spacing[2]);
+  b->SetElement(1, 2, b->GetElement(1, 2) / spacing[2]);
+  b->SetElement(2, 2, b->GetElement(2, 2) / spacing[2]);
+
+  transform->SetMatrix(  b );
 
   //---- UNSELECTED POINTS  -----//
 
@@ -590,11 +602,13 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   node->GetBoolProperty("show distant lines", m_ShowDistantLines, renderer);
   node->GetIntProperty("line width",          m_LineWidth, renderer);
   node->GetIntProperty("point line width",    m_PointLineWidth, renderer);
-  if(!node->GetFloatProperty("point 2D size", m_Point2DSize, renderer))
+  if ( !node->GetFloatProperty("point 2D size",       m_Point2DSize, renderer) ) // re-defined to float 2015-08-13, keep a fallback
   {
-      int size = 0;
-      if(node->GetIntProperty("point 2D size", size, renderer))
-          m_Point2DSize = size;
+    int oldPointSize = m_Point2DSize;
+    if ( node->GetIntProperty("point 2D size",       oldPointSize, renderer) )
+    {
+        m_Point2DSize = oldPointSize;
+    }
   }
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillShape, renderer);
   node->GetFloatProperty("Pointset.2D.distance to plane", m_DistanceToPlane, renderer);

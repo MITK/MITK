@@ -156,13 +156,13 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   }
 
   // whether or not to creat a "contour" - connecting lines between all the points
-  unsigned int nbPoints = itkPointSet->GetPointData()->Size();
+  int nbPoints = itkPointSet->GetPointData()->Size();
   bool makeContour = false;
   this->GetDataNode()->GetBoolProperty("show contour", makeContour);
 
   bool closeContour = false;
   this->GetDataNode()->GetBoolProperty("close contour", closeContour);
-  unsigned int contourPointLimit = 0; // NO contour
+  int contourPointLimit = 0; // NO contour
   if ( makeContour )
   {
     if ( closeContour )
@@ -173,7 +173,7 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 
   // build list of all positions for later transform in one go
   mitk::PointSet::PointsContainer::Iterator pointsIter;
-  unsigned int ptIdx;
+  int ptIdx;
 
   m_NumberOfSelectedAdded = 0;
   m_NumberOfUnselectedAdded = 0;

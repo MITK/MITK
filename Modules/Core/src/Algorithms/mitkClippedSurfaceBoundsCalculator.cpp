@@ -161,15 +161,12 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
   const mitk::BaseGeometry::Pointer imageGeometry = m_Image->GetGeometry()->Clone();
   const Vector3D spacing = imageGeometry->GetSpacing();
 
-  Point3D origin = imageGeometry->GetOrigin();           //Left, bottom, front
-  for( int i = 0; i < 3; i++ )
-  {
-    origin[i] -= 0.5*spacing[i];
-  }
+  //  the cornerpoint(0) is the corner based Origin, which is original center based
+  Point3D origin = imageGeometry->GetCornerPoint(0);           //Left, bottom, front
 
   //Get axis vector for the spatial directions
-  const Vector3D xDirection = imageGeometry->GetAxisVector(1);
-  const Vector3D yDirection = imageGeometry->GetAxisVector(0);
+  const Vector3D xDirection = imageGeometry->GetAxisVector(0);
+  const Vector3D yDirection = imageGeometry->GetAxisVector(1);
   const Vector3D zDirection = imageGeometry->GetAxisVector(2);
 
   const Point3D leftBottomFront = origin;
@@ -261,9 +258,8 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
       {
         m_MinMaxOutput[dim].first = std::min( m_MinMaxOutput[dim].first, ROUND_P(intersectionIndexPoint[dim]) );
         m_MinMaxOutput[dim].second = std::max( m_MinMaxOutput[dim].second, ROUND_P(intersectionIndexPoint[dim]) );
-
-        this->EnforceImageBounds();
       }
+      this->EnforceImageBounds();
     }
   }
 }
@@ -298,7 +294,15 @@ void mitk::ClippedSurfaceBoundsCalculator::EnforceImageBounds()
   m_MinMaxOutput[1].first = std::max( m_MinMaxOutput[1].first, 0 );
   m_MinMaxOutput[2].first = std::max( m_MinMaxOutput[2].first, 0 );
 
+  m_MinMaxOutput[0].first = std::min( m_MinMaxOutput[0].first, (int) m_Image->GetDimension(0)-1 );
+  m_MinMaxOutput[1].first = std::min( m_MinMaxOutput[1].first, (int) m_Image->GetDimension(1)-1 );
+  m_MinMaxOutput[2].first = std::min( m_MinMaxOutput[2].first, (int) m_Image->GetDimension(2)-1 );
+
   m_MinMaxOutput[0].second = std::min( m_MinMaxOutput[0].second, (int) m_Image->GetDimension(0)-1 );
   m_MinMaxOutput[1].second = std::min( m_MinMaxOutput[1].second, (int) m_Image->GetDimension(1)-1 );
   m_MinMaxOutput[2].second = std::min( m_MinMaxOutput[2].second, (int) m_Image->GetDimension(2)-1 );
+
+  m_MinMaxOutput[0].second = std::max( m_MinMaxOutput[0].second, 0 );
+  m_MinMaxOutput[1].second = std::max( m_MinMaxOutput[1].second, 0 );
+  m_MinMaxOutput[2].second = std::max( m_MinMaxOutput[2].second, 0 );
 }

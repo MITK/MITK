@@ -98,6 +98,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="createCorrelationMatrixPushButton">
+     <property name="text">
+      <string>Create Correlation Matrix</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="syntheticNetworkCreationPushButton">
      <property name="text">
       <string>Create Synthetic Networks</string>
@@ -165,6 +172,24 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="parcellationGroupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Anatomical labeling</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QmitkFreeSurferParcellationWidget" name="parcellationWidget" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -180,6 +205,14 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkFreeSurferParcellationWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkFreeSurferParcellationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -1,7 +1,8 @@
 if(NOT DEFINED DCMTK_dcmrt_LIBRARY OR DCMTK_dcmrt_LIBRARY)
   mitk_create_module(
-    DEPENDS MitkSegmentation MitkSceneSerializationBase
-    PACKAGE_DEPENDS PUBLIC DCMTK
+    INCLUDE_DIRS DataStructures Rendering
+    DEPENDS MitkSegmentation MitkSceneSerializationBase MitkLegacyIO
+    PACKAGE_DEPENDS PUBLIC Qt4 Qt5|Core DCMTK
   )
   add_subdirectory(test)
 else()

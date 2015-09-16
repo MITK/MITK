@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandardFileLocations.h>
 #include "mitkTestingMacros.h"
 #include <mitkTestFixture.h>
-#include "mitkNavigationDataReaderXML.h"
+#include <mitkIOUtil.h>
 
 #include <iostream>
 #include <sstream>
@@ -46,8 +46,8 @@ public:
   void setUp() override{
     player = mitk::NavigationDataSequentialPlayer::New();
     std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2ToolsDouble.xml");
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-    NavigationDataSet =reader->Read(file);
+
+    NavigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
   }
 
   void tearDown() override
@@ -124,8 +124,8 @@ public:
 
     // setting new NavigationDataSet with different tool count should result in an exception
     std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData.xml");
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-    MITK_TEST_FOR_EXCEPTION(mitk::IGTException, player->SetNavigationDataSet(reader->Read(file)));
+    mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
+    MITK_TEST_FOR_EXCEPTION(mitk::IGTException, player->SetNavigationDataSet(dataset));
   }
 
   void TestGoToSnapshotException()
@@ -133,8 +133,8 @@ public:
     //testing GoToSnapShot for exception
     mitk::NavigationDataSequentialPlayer::Pointer myTestPlayer2 = mitk::NavigationDataSequentialPlayer::New();
     std::string file = GetTestDataFilePath("IGT-Data/NavigationDataTestData_2Tools.xml");
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-    myTestPlayer2->SetNavigationDataSet(reader->Read(file));
+    mitk::NavigationDataSet::Pointer dataset = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(file).GetPointer());
+    myTestPlayer2->SetNavigationDataSet(dataset);
 
     bool exceptionThrown2=false;
     try

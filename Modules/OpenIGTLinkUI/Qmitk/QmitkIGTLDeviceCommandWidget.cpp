@@ -42,7 +42,7 @@ const std::string QmitkIGTLDeviceCommandWidget::VIEW_ID =
 
 QmitkIGTLDeviceCommandWidget::QmitkIGTLDeviceCommandWidget(
     QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_IsClient(false)
+  : QWidget(parent, f), m_IsClient(false), m_MessageReceivedObserverTag(0), m_CommandReceivedObserverTag(0), m_LostConnectionObserverTag(0), m_NewConnectionObserverTag(0), m_StateModifiedObserverTag(0)
 {
   m_Controls = NULL;
   this->m_IGTLDevice = NULL;
@@ -52,6 +52,11 @@ QmitkIGTLDeviceCommandWidget::QmitkIGTLDeviceCommandWidget(
 
 QmitkIGTLDeviceCommandWidget::~QmitkIGTLDeviceCommandWidget()
 {
+   if (m_MessageReceivedObserverTag) this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
+   if (m_CommandReceivedObserverTag) this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
+   if (m_LostConnectionObserverTag) this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+   if (m_NewConnectionObserverTag) this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+   if (m_StateModifiedObserverTag) this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
 }
 
 void QmitkIGTLDeviceCommandWidget::CreateQtPartControl(QWidget *parent)
@@ -79,12 +84,16 @@ void QmitkIGTLDeviceCommandWidget::CreateConnections()
              SIGNAL(currentIndexChanged(const QString &)),
              this, SLOT(OnCommandChanged(const QString &)));
   }
+  //this is used for thread seperation, otherwise the worker thread would change the ui elements
+  //which would cause an exception
+  connect(this, SIGNAL(AdaptGUIToStateSignal()), this, SLOT(AdaptGUIToState()));
 }
 
 
 void QmitkIGTLDeviceCommandWidget::OnDeviceStateChanged()
 {
-  this->AdaptGUIToState();
+   //this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceCommandWidget::AdaptGUIToState()
@@ -254,12 +263,14 @@ void QmitkIGTLDeviceCommandWidget::OnLostConnection()
   //get the IGTL device that invoked this event
 //  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
 
-  this->AdaptGUIToState();
+  //this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceCommandWidget::OnNewConnection()
 {
-  this->AdaptGUIToState();
+   //this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceCommandWidget::FillCommandsComboBox()

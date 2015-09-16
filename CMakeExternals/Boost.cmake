@@ -125,6 +125,9 @@ if(MITK_USE_Boost)
         ${_boost_address_model}
         threading=multi
         runtime-link=shared
+        # Some distributions site config breaks boost build
+        # For example on Gentoo: http://stackoverflow.com/questions/23013433/how-to-install-modular-boost
+        --ignore-site-config
         -q
     )
 

@@ -16,12 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffSliceOperation.h"
 
+#include <mitkImage.h>
+
 #include <itkCommand.h>
 
 mitk::DiffSliceOperation::DiffSliceOperation():Operation(1)
 {
   m_TimeStep = 0;
-  m_Slice = nullptr;
+  m_zlibSliceContainer = nullptr;
   m_Image = nullptr;
   m_WorldGeometry = nullptr;
   m_SliceGeometry = nullptr;
@@ -30,7 +32,7 @@ mitk::DiffSliceOperation::DiffSliceOperation():Operation(1)
 
 
 mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
-                                             vtkImageData* slice,
+                                             Image *slice,
                                              SlicedGeometry3D* sliceGeometry,
                                              unsigned int timestep,
                                              BaseGeometry* currentWorldGeometry):Operation(1)
@@ -49,10 +51,8 @@ mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
 
   m_TimeStep = timestep;
 
-  /*m_zlibSliceContainer = CompressedImageContainer::New();
-  m_zlibSliceContainer->SetImage( slice );*/
-  m_Slice = vtkSmartPointer<vtkImageData>::New();
-  m_Slice->DeepCopy(slice);
+  m_zlibSliceContainer = CompressedImageContainer::New();
+  m_zlibSliceContainer->SetImage( slice );
 
   m_Image = imageVolume;
 
@@ -73,10 +73,8 @@ mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image* imageVolume,
 
 mitk::DiffSliceOperation::~DiffSliceOperation()
 {
-
-  m_Slice = nullptr;
   m_WorldGeometry = nullptr;
-  //m_zlibSliceContainer = NULL;
+  m_zlibSliceContainer = nullptr;
 
   if (m_ImageIsValid)
   {
@@ -86,15 +84,15 @@ mitk::DiffSliceOperation::~DiffSliceOperation()
   m_Image = nullptr;
 }
 
-vtkImageData* mitk::DiffSliceOperation::GetSlice()
+mitk::Image::Pointer mitk::DiffSliceOperation::GetSlice()
 {
-  //Image::ConstPointer image = m_zlibSliceContainer->GetImage().GetPointer();
-  return m_Slice;
+  Image::Pointer image = m_zlibSliceContainer->GetImage();
+  return image;
 }
 
 bool mitk::DiffSliceOperation::IsValid()
 {
-  return m_ImageIsValid && (m_Slice.GetPointer() != nullptr) && (m_WorldGeometry.IsNotNull());//TODO improve
+  return m_ImageIsValid && m_zlibSliceContainer.IsNotNull() && (m_WorldGeometry.IsNotNull());//TODO improve
 }
 
 void mitk::DiffSliceOperation::OnImageDeleted()

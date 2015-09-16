@@ -57,13 +57,13 @@ void mitk::ConnectomicsNetwork::AddEdge(
 void mitk::ConnectomicsNetwork::AddEdge(
                                         mitk::ConnectomicsNetwork::VertexDescriptorType vertexA,
                                         mitk::ConnectomicsNetwork::VertexDescriptorType vertexB,
-                                        int sourceID, int targetID, int weight )
+                                        int sourceID, int targetID, int weight, double edge_weight )
 {
   boost::add_edge( vertexA, vertexB, m_Network );
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].sourceId = sourceID;
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].targetId = targetID;
   m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].weight = weight;
-  m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].edge_weight = 1.0;
+  m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ].edge_weight = edge_weight;
 
   SetIsModified( true );
 }
@@ -503,7 +503,14 @@ mitk::ConnectomicsNetwork::NetworkNode mitk::ConnectomicsNetwork::GetNode( Verte
 
 mitk::ConnectomicsNetwork::NetworkEdge mitk::ConnectomicsNetwork::GetEdge( VertexDescriptorType vertexA, VertexDescriptorType vertexB ) const
 {
-  return m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ];
+  if( EdgeExists(vertexA, vertexB) )
+  {
+    return m_Network[ boost::edge(vertexA, vertexB, m_Network ).first ];
+  }
+  else
+  {
+    mitkThrow() << "Edge does not exist";
+  }
 }
 
 void mitk::ConnectomicsNetwork::UpdateBounds( )

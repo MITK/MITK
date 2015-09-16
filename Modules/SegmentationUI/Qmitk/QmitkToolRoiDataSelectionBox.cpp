@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include "mitkToolManagerProvider.h"
 
-QmitkToolRoiDataSelectionBox::QmitkToolRoiDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
+QmitkToolRoiDataSelectionBox::QmitkToolRoiDataSelectionBox(QWidget* parent, mitk::DataStorage*)
 :QWidget(parent),
 m_SelfCall(false),
 m_lastSelection(mitk::DataNode::New()),
@@ -94,7 +94,7 @@ void QmitkToolRoiDataSelectionBox::OnToolManagerRoiDataModified()
   UpdateComboBoxData();
 }
 
-void QmitkToolRoiDataSelectionBox::DataStorageChanged(const mitk::DataNode* node )
+void QmitkToolRoiDataSelectionBox::DataStorageChanged(const mitk::DataNode* )
 {
   if (m_SelfCall)
     return;

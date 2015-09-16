@@ -22,19 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
-//#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <fstream>
 #include <itksys/SystemTools.hxx>
 #include <mitkCoreObjectFactory.h>
 
 #include <mitkFiberBundle.h>
-#include <itkDwiNormilzationFilter.h>
-//#include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
 #include <itkMLBSTrackingFilter.h>
-#include <vtkCell.h>
-#include <itkOrientationDistributionFunction.h>
-#include <itkMersenneTwisterRandomVariateGenerator.h>
+#include <mitkTrackingForestHandler.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -61,13 +56,10 @@ int main(int argc, char* argv[])
     parser.addArgument("seed", "s", mitkCommandLineParser::String, "Seed image:", "seed image", us::Any());
 
     parser.addArgument("athres", "a", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold (in radians)", us::Any());
-    parser.addArgument("stepsize", "se", mitkCommandLineParser::Float, "Stepsize:", "stepsize", us::Any());
+    parser.addArgument("stepsize", "se", mitkCommandLineParser::Float, "Stepsize:", "stepsize (in voxels)", us::Any());
     parser.addArgument("samples", "ns", mitkCommandLineParser::Int, "Samples:", "samples", us::Any());
     parser.addArgument("samplingdist", "sd", mitkCommandLineParser::Float, "Sampling distance:", "sampling distance (in voxels)", us::Any());
     parser.addArgument("seeds", "nse", mitkCommandLineParser::Int, "Seeds per voxel:", "seeds per voxel", us::Any());
-
-    parser.addArgument("usedirection", "ud", mitkCommandLineParser::Bool, "Use previous direction:", "use previous direction as feature", us::Any());
-    parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output additional images", us::Any());
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -100,14 +92,6 @@ int main(int argc, char* argv[])
     float samplingdist = 0.25;
     if (parsedArgs.count("samplingdist"))
         samplingdist = us::any_cast<float>(parsedArgs["samplingdist"]);
-
-    bool useDirection = false;
-    if (parsedArgs.count("usedirection"))
-        useDirection = true;
-
-    bool verbose = false;
-    if (parsedArgs.count("verbose"))
-        verbose = true;
 
     int samples = 10;
     if (parsedArgs.count("samples"))
@@ -149,23 +133,20 @@ int main(int argc, char* argv[])
         mitk::CastToItkImage(img, stop);
     }
 
-    MITK_INFO << "loading forest";
-    vigra::RandomForest<int> rf;
-    vigra::rf_import_HDF5(rf, forestFile);
+    mitk::TrackingForestHandler<> tfh;
+    tfh.LoadForest(forestFile);
+    tfh.AddRawData(dwi);
 
     typedef itk::MLBSTrackingFilter<100> TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();
     tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
-    tracker->SetGradientDirections( mitk::DiffusionPropertyHelper::GetGradientContainer(dwi) );
-    tracker->SetB_Value( mitk::DiffusionPropertyHelper::GetReferenceBValue(dwi) );
     tracker->SetMaskImage(mask);
     tracker->SetSeedImage(seed);
     tracker->SetStoppingRegions(stop);
     tracker->SetSeedsPerVoxel(seeds);
-    tracker->SetUseDirection(useDirection);
     tracker->SetStepSize(stepsize);
     tracker->SetAngularThreshold(athres);
-    tracker->SetDecisionForest(&rf);
+    tracker->SetForestHandler(tfh);
     tracker->SetSamplingDistance(samplingdist);
     tracker->SetNumberOfSamples(samples);
     //tracker->SetAvoidStop(false);
@@ -175,25 +156,7 @@ int main(int argc, char* argv[])
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
     mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
 
-    mitk::IOUtil::SaveBaseData(outFib, outFile);
-
-    if (verbose)
-    {
-        MITK_INFO << "Writing images...";
-        string outName = itksys::SystemTools::GetFilenamePath(outFile)+"/"+itksys::SystemTools::GetFilenameWithoutLastExtension(outFile);
-        itk::ImageFileWriter< TrackerType::ItkDoubleImgType >::Pointer writer = itk::ImageFileWriter< TrackerType::ItkDoubleImgType >::New();
-        writer->SetFileName(outName+"_WhiteMatter.nrrd");
-        writer->SetInput(tracker->GetWmImage());
-        writer->Update();
-
-        writer->SetFileName(outName+"_NotWhiteMatter.nrrd");
-        writer->SetInput(tracker->GetNotWmImage());
-        writer->Update();
-
-        writer->SetFileName(outName+"_AvoidStop.nrrd");
-        writer->SetInput(tracker->GetAvoidStopImage());
-        writer->Update();
-    }
+    mitk::IOUtil::Save(outFib, outFile);
 
     return EXIT_SUCCESS;
 }

@@ -192,13 +192,7 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     wmImage->SetBufferedRegion( wmImage->GetLargestPossibleRegion() );
     wmImage->SetRequestedRegion( wmImage->GetLargestPossibleRegion() );
     wmImage->Allocate();
-
-    itk::ImageRegionIterator<FloatImageType> ot(wmImage, wmImage->GetLargestPossibleRegion() );
-    while (!ot.IsAtEnd())
-    {
-        ot.Set(1);
-        ++ot;
-    }
+    wmImage->FillBuffer(1);
 
     /* init TractographyFilter */
     TrackingFilterType::Pointer trackingFilter = TrackingFilterType::New();
@@ -211,15 +205,14 @@ void QmitkStochasticFiberTrackingView::DoFiberTracking()
     trackingFilter->SetMaxLikelihoodCacheSize(m_Controls->m_MaxCacheSizeSlider->value()*1000);
     trackingFilter->SetMaxTractLength(m_Controls->m_MaxTractLengthSlider->value());
 
-    //itk::Image< char, 3 >
-    mitk::ImageToItk< itk::Image< unsigned char, 3 > >::Pointer binaryImageToItk1 = mitk::ImageToItk< itk::Image< unsigned char, 3 > >::New();
-    binaryImageToItk1->SetInput( m_SeedRoi );
-    binaryImageToItk1->Update();
+
+    BinaryImageType::Pointer mask = BinaryImageType::New();
+    mitk::CastToItkImage(m_SeedRoi, mask);
 
     vtkSmartPointer<vtkPoints> vPoints = vtkSmartPointer<vtkPoints>::New();
     vtkSmartPointer<vtkCellArray> vCellArray = vtkSmartPointer<vtkCellArray>::New();
 
-    itk::ImageRegionConstIterator< BinaryImageType > it(binaryImageToItk1->GetOutput(), binaryImageToItk1->GetOutput()->GetRequestedRegion());
+    itk::ImageRegionConstIterator< BinaryImageType > it(mask, mask->GetRequestedRegion());
     it.GoToBegin();
     mitk::BaseGeometry* geom = m_DiffusionImage->GetGeometry();
 

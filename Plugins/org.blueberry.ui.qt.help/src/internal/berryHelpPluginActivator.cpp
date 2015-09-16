@@ -132,6 +132,9 @@ HelpPluginActivator::stop(ctkPluginContext* /*context*/)
     PlatformUI::GetWorkbench()->RemoveWindowListener(wndListener.data());
   }
   wndListener.reset();
+
+  helpEngineConfiguration.reset();
+  helpEngine.reset();
 }
 
 HelpPluginActivator *HelpPluginActivator::getInstance()

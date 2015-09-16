@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_streamlinetracking Streamline Tracking View
+\page org_mitk_views_streamlinetracking Deterministic Streamline Tractography
 
 This view provides the user interface for basic streamline fiber tractography on diffusion tensor images (single and multi-tensor tracking). FACT and TEND tracking methods are available.
 

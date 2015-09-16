@@ -1,80 +1,58 @@
 /**
 \page GeneralTests General: Tests in MITK
 
-Two types of standardizes automated tests are provided by MITK. These types are <B> unit tests </B> and <B> rendering tests </B>. This section will describe unit testing in MITK, while more information on rendering tests can be found in the section \ref RenderingTests.
+\tableofcontents
 
--# \ref GeneralTestsSection1 "Basic Information on Unit Testing"
--# \ref GeneralTestsSection2 "Adding a Unit Test to MITK"
- -# \ref GeneralTestsSection2_1 "Structure your test method"
--# \ref GeneralTestsSection3 "Run a Unit Test with MITK"
--# \ref GeneralTestsSection4 "MITK Testing Macros"
+\section GeneralTestsIntroduction Testing in MITK
 
-\section GeneralTestsSection1 Basic Information on Unit Testing
+The basic idea about unit testing is to write a test for every class (unit) of your software. The test should then run all methods of the tested class and check if the results are correct. MITK uses CppUnit, which provides a framework for efficient and fast test writing.
 
-The basic idea about unit testing is to write a test for every class (unit) of your software. The test should then run all methods of the tested class and check if the results are correct. Thus, the testing environment for MITK allows for simple implementation of corresponding test methods for MITK classes. 
+The following sections will explain how to write your own tests with MITK and how to run them. A specific type of <B>unit test</B> are <B>rendering tests</B>. These are explained in more detail in the section \ref RenderingTests.
 
-The build system of MITK generates a test driver which includes all tests that have been added to the project. Alternativly you can run MITK tests by using the program ctest. This is the way all MITK tests run on the continous dart clients of MITK. The results of these runs can be found at http://cdash.mitk.org.
+\section GeneralTestsAdding Adding a test to your module
 
-The following sections will explain how to write your own tests with MITK and how to run them. The last section will describe the testing macros of MITK in detail.
+Generally code you want to test using unit tests will be located in a module. For an overview of the directory structure see \ref NewModulePageCreateFolder and how to add the files comprising your test compare \ref NewModulePageCreateTestingEnvironment
 
-\section GeneralTestsSection2 Adding a Unit Test to MITK
+\subsection GeneralTestsAddingFramework The testing framework
 
-To add a test, you simply need to create a new file "mitkMyTest.cpp" in the folder "Testing" of the software module to which you want to add the test. The file must contain such a method: \code int mitkMyTest(int argc, char* argv[]) \endcode This method is automatically called by the test driver. A header file to this cpp file is not needed. An example for a simple test method is shown next.
+In order to create a test you need to create a new class deriving from mitk::TestFixture. While a purist approach would be to create a new mitk::TestFixture for each method of your class (resulting in as many test source files as your class has methods), we usually follow a more pragmatic approach within MITK. In most cases we suggest having one test source file per class. If your class source file is called mitkGreatClass.cpp we suggest the name mitkGreatClassTest.cpp for your test source file. For very complex and long classes splitting this into several tests may be advisable.
 
+In order to use CppUnit via MITK you will need to include the corresponding files and register your test:
 \code
-int mitkMyTest(int argc, char* argv[])
-{
-  MITK_TEST_BEGIN("MyTest");
-  MITK_TEST_CONDITION_REQUIRED(true,"Here we test our condition");
-  MITK_TEST_END();
-}
+  #include <mitkTestingMacros.h>
+  #include <mitkTestFixture.h>
+  …
+  MITK_TEST_SUITE_REGISTRATION(mitkImageEqual)
 \endcode
 
-Additionaly you've to add the test file to the files.cmake of your testing directory. In the files.cmake you'll find a command "SET(MODULE_TESTS [...])", this is where you've to add the filename of your test. This will add your test to the test driver. A possible files.cmake where a test have already been added is shown next. 
+\subsection GeneralTestsAddingHow How to structure your test
+
+You should derive from mitk::TestFixture. A suggested name for your test class would be <CLASS_TO_BE_TESTED>TestSuite.
+
+You then create a suite and register your test methods. A suggested naming convention for test methods is <METHOD_TO_BE_TESTED>_<INPUT_PARAMETERS/CONDITION>_<EXPECTED_RESULT>
+
+An example:
 \code
-SET(MODULE_TESTS
-  mitkMyTest.cpp
-  [...]
-)
-\endcode
-Finally you only have to run cmake one your project and then compile the test driver. Don't forget to turn "BUILD_TESTING" on, when running cmake.
-
-\subsection GeneralTestsSection2_1 Structure your test method
-
-When implementing more complex test methods you might want to structure them, e.g. by using sub methods. This is also possible. You can create a test class and add static methods which can then be called in your main test method. This is a simple way to keep a clear structure in your test file. An example for such a structured test file is shown next.
-
-\code
-//first: your test class with static methods, if it comes before the main test method
-//       like shown here, you still don't need a header and you can keep your code as
-//       simple as possible
-class mitkMyTestClass
-{
-public:
-
-  static void TestInstantiation()
+  class mitkImageEqualTestSuite : public mitk::TestFixture
   {
-  //do your instantiation test here
+    CPPUNIT_TEST_SUITE(mitkImageEqualTestSuite);
+    MITK_TEST(Equal_CloneAndOriginal_ReturnsTrue);
+    MITK_TEST(Equal_InputIsNull_ReturnsFalse);
+    MITK_TEST(Equal_DifferentImageGeometry_ReturnsFalse);
+    MITK_TEST(Equal_DifferentPixelTypes_ReturnsFalse);
+    …
+    CPPUNIT_TEST_SUITE_END();
+    …
   }
-  
-  static void TestMethod1()
-  {
-  //do a test of method 1 here
-  }
-};//do not forget the semicolon at this place!
-
-//secondly: your main test method
-int mitkMyTest(int argc, char* argv[])
-{
-  MITK_TEST_BEGIN("MyTest");
-  mitkMyTestClass.TestInstantiation();
-  mitkMyTestClass.TestMethod1();
-  MITK_TEST_END();
-}
 \endcode
 
-\section GeneralTestsSection3 Run a Unit Test with MITK
+You also need to provide a setUp() and a tearDown() function. These will be called before/after each test and should be used to make sure that each test method works independently and on freshly initialized members. That way you avoid only testing whether a function works after another function has already been called.
 
-After building and compiling MITK, there are two ways to run your test. Firstly, you can run your test using the executable test driver. Secondly, you can use the external program ctest. 
+For an example test see \ref GeneralTestsExample
+
+\section GeneralTestsRunning Running your test
+
+The build system of MITK generates a test driver which includes all tests that have been added to the project. Alternatively you can run MITK tests by using the program ctest. This is the way all MITK tests run on the continuous dart clients of MITK. The results of these runs can be found at http://cdash.mitk.org.
 
 If you use the test driver, you only need to start the executable. If you start it without parameters, it will then give you an overview of all tests which are included in this test driver and you can choose one by typing a number. 
 
@@ -84,10 +62,11 @@ Alternatively you can give your test driver the name of your test as parameter. 
 
 If you want to use ctest instead of the test driver you need to start a command line, go to the binary directory of MITK and call ctest. To avoid errors, check if your path variable contains all relevant paths to start MITK.
 
-\section GeneralTestsSection4 MITK Testing Macros
+\section GeneralTestsExample An example
 
-MITK offers testing macros to simplify testing, e.g. to test your testing conditions. These macros can be found in the header mitkTestingMacros.h .
+\include Examples\FirstSteps\NewModule\test\mitkExampleDataStructureTest.cpp
 
+\section GeneralTestsFurtherInfo Further information
 
-
+More examples can be found in the corresponding <a href="http://www.mitk.org/images/5/5d/BugSquashingSeminars%24CppUnitFrameworkSeminar.pdf"> bugsquashing presentation</a>.
 */

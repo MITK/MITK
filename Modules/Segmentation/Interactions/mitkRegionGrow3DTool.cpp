@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkConnectedAdaptiveThresholdImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageStatisticsHolder.h"
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 
@@ -100,8 +101,9 @@ void mitk::RegionGrow3DTool::Activated()
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData());
       if (image.IsNotNull())
       {
-       m_RoiMin = image->GetScalarValueMin();
-       m_RoiMax = image->GetScalarValueMax();
+        Image::StatisticsHolderPointer statistics = image->GetStatistics();
+        m_RoiMin = statistics->GetScalarValueMin();
+        m_RoiMax = statistics->GetScalarValueMax();
       }
     }
     else
@@ -117,8 +119,8 @@ void mitk::RegionGrow3DTool::Deactivated()
     ds->Remove(m_PointSetNode);
     ds->Remove(m_FeedbackNode);
   }
-  m_FeedbackNode->SetData(NULL);
-  m_FeedbackNode->SetLevelWindow(NULL);
+  m_FeedbackNode->SetData(nullptr);
+  m_FeedbackNode->SetLevelWindow(LevelWindow());
   m_FeedbackNode->SetVisibility(false);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -382,7 +384,7 @@ void mitk::RegionGrow3DTool::SetupPreviewNodeFor( DataNode* nodeToProceed)
       int layer(50);
       nodeToProceed->GetIntProperty("layer", layer);
       m_FeedbackNode->SetIntProperty("layer", layer+1);
-      m_FeedbackNode->SetLevelWindow(NULL);
+      m_FeedbackNode->SetLevelWindow(LevelWindow());
 
       if (DataStorage* storage = m_ToolManager->GetDataStorage())
       {
@@ -408,8 +410,9 @@ void mitk::RegionGrow3DTool::UpdatePreview()
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData());
     if (image.IsNotNull())
     {
-      m_RoiMin = image->GetScalarValueMin();
-      m_RoiMax = image->GetScalarValueMax();
+      Image::StatisticsHolderPointer statistics = image->GetStatistics();
+      m_RoiMin = statistics->GetScalarValueMin();
+      m_RoiMax = statistics->GetScalarValueMax();
     }
     return;
   }

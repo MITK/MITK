@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.pointsetinteractionmultispectrum"
+          name="Point Set Interaction Multispectrum"
+          class="PointSetInteractionMultispectrum"
+          icon="resources/icon.xpm" />
+  </extension>
+
+</plugin>

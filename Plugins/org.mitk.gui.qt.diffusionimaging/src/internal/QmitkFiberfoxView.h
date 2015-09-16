@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionSignalModel.h>
 #include <mitkRicianNoiseModel.h>
 #include <itkTractsToDWIImageFilter.h>
-#include <itkAddArtifactsToDwiImageFilter.h>
 #include <mitkTensorModel.h>
 #include <mitkBallModel.h>
 #include <mitkStickModel.h>
@@ -67,7 +66,6 @@ class QmitkFiberfoxWorker : public QObject
 public:
 
     QmitkFiberfoxWorker(QmitkFiberfoxView* view);
-    int m_FilterType;
 
 public slots:
 
@@ -99,8 +97,9 @@ public:
     typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType  GradientDirectionContainerType;
     typedef itk::Vector<double,3>           GradientType;
     typedef vector<GradientType>            GradientListType;
-    typedef itk::VectorImage< short, 3 >                                    ItkDwiType;
+    typedef itk::VectorImage< short, 3 >    ItkDwiType;
     typedef itk::Image<double, 3>           ItkDoubleImgType;
+    typedef itk::Image<float, 3>            ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>    ItkUcharImgType;
 
     template<int ndirs> vector<itk::Vector<double,3> > MakeGradientList();
@@ -164,13 +163,14 @@ protected:
 
     void SimulateForExistingDwi(mitk::DataNode* imageNode);     ///< add artifacts to existing diffusion weighted image
     void SimulateImageFromFibers(mitk::DataNode* fiberNode);    ///< simulate new diffusion weighted image
-    template< class ScalarType > FiberfoxParameters< ScalarType > UpdateImageParameters();  ///< update fiberfox paramater object (template parameter defines noise model type)
+    template< class ScalarType > FiberfoxParameters< ScalarType > UpdateImageParameters(bool all=true);  ///< update fiberfox paramater object (template parameter defines noise model type)
     void UpdateGui();                                           ///< enable/disbale buttons etc. according to current datamanager selection
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
     void EnableCrosshairNavigation();               ///< enable crosshair navigation if planar figure interaction ends
     void DisableCrosshairNavigation();              ///< disable crosshair navigation if planar figure interaction starts
     void NodeAdded( const mitk::DataNode* node ) override;   ///< add observers
     void NodeRemoved(const mitk::DataNode* node) override;   ///< remove observers
+    void SaveParameters(QString filename);
 
     /** structure to keep track of planar figures and observers */
     struct QmitkPlanarFigureData
@@ -194,7 +194,7 @@ protected:
 
     std::map<mitk::DataNode*, QmitkPlanarFigureData>    m_DataNodeToPlanarFigureData;   ///< map each planar figure uniquely to a QmitkPlanarFigureData
     mitk::DataNode::Pointer                             m_SelectedFiducial;             ///< selected planar ellipse
-    mitk::DataNode::Pointer                             m_SelectedImage;
+    mitk::DataNode::Pointer                             m_SelectedImageNode;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles;
     vector< mitk::DataNode::Pointer >                   m_SelectedBundles2;
     vector< mitk::DataNode::Pointer >                   m_SelectedFiducials;
@@ -212,7 +212,6 @@ protected:
 
     /** Image filters that do all the simulations. */
     itk::TractsToDWIImageFilter< short >::Pointer           m_TractsToDwiFilter;
-    itk::AddArtifactsToDwiImageFilter< short >::Pointer     m_ArtifactsToDwiFilter;
 
     friend class QmitkFiberfoxWorker;
 };

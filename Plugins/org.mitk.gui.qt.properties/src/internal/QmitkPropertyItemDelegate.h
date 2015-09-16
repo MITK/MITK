@@ -23,7 +23,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkWeakPointer.h>
 
 class QComboBox;
+class QLineEdit;
+class QToolButton;
 class QResizeEvent;
+
+class QmitkColorWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  explicit QmitkColorWidget(QWidget* parent = nullptr);
+  ~QmitkColorWidget();
+
+  QColor GetColor() const;
+  void SetColor(QColor color);
+
+signals:
+  void ColorPicked();
+
+  private slots:
+  void OnButtonClicked();
+  void OnLineEditEditingFinished();
+
+private:
+  QColor m_Color;
+  QLineEdit* m_LineEdit;
+  QToolButton* m_Button;
+};
 
 class QmitkComboBoxListView : public QListView
 {
@@ -59,6 +85,7 @@ public:
 private slots:
   void OnComboBoxCurrentIndexChanged(int index);
   void OnSpinBoxEditingFinished();
+  void OnColorPicked();
 
 private:
   std::string GetPropertyName(const QModelIndex& index) const;

@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class vtkActor;
 class vtkCellArray;
-class vtkBitArray;
-class vtkGlyph3DMapper;
 class vtkPropAssembly;
 class vtkAppendPolyData;
 class vtkPolyData;
@@ -131,6 +129,7 @@ namespace mitk {
     virtual void ApplyAllProperties(mitk::BaseRenderer* renderer, vtkActor* actor);
     virtual void CreateContour(vtkPoints* points, vtkCellArray* connections);
     virtual void CreateVTKRenderObjects();
+    virtual void VertexRendering();
 
     /// All point positions, already in world coordinates
     vtkSmartPointer<vtkPoints> m_WorldPositions;
@@ -142,13 +141,9 @@ namespace mitk {
 
     vtkSmartPointer<vtkPoints> m_VtkPoints;
     vtkSmartPointer<vtkCellArray> m_VtkPointConnections;
-    vtkSmartPointer<vtkBitArray> m_VtkPointSelectionMask;
-    vtkSmartPointer<vtkBitArray> m_VtkPointNotSelectionMask;
 
     vtkSmartPointer<vtkTransformPolyDataFilter> m_VtkPointsTransformer;
 
-    vtkSmartPointer<vtkGlyph3DMapper> m_VtkSelectedGlyphMapper;
-    vtkSmartPointer<vtkGlyph3DMapper> m_VtkUnselectedGlyphMapper;
     vtkSmartPointer<vtkPolyDataMapper> m_VtkSelectedPolyDataMapper;
     vtkSmartPointer<vtkPolyDataMapper> m_VtkUnselectedPolyDataMapper;
 
@@ -168,6 +163,7 @@ namespace mitk {
     //variables to check if an update of the vtk objects is needed
     ScalarType m_PointSize;
     ScalarType m_ContourRadius;
+    bool m_VertexRendering;
   };
 
 

@@ -27,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtConcurrentRun>
 #include <QFutureWatcher>
 #include <QTimer>
+#include <QmitkMlbstTrainingDataWidget.h>
+#include <memory>
+#include <QGridLayout>
 
 /*!
 \brief
@@ -72,30 +75,30 @@ public:
   void ToggleDemoMode(int state);
   void PauseTracking();
   void AbortTracking();
+  void AddTrainingWidget();
+  void RemoveTrainingWidget();
 
 protected:
 
   void StartTracking();
   void StartTraining();
-
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  void UpdateGui();
 
   Ui::QmitkMLBTViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;
 
   mitk::TrackingForestHandler<> m_ForestHandler;
-  std::vector< mitk::Image::Pointer > m_SelectedDiffImages;
-  std::vector< mitk::FiberBundle::Pointer > m_SelectedFB;
-  std::vector< ItkUcharImgType::Pointer > m_MaskImages;
-  std::vector< ItkUcharImgType::Pointer > m_WhiteMatterImages;
 
   QFutureWatcher<void> m_TrainingWatcher;
   QFutureWatcher<void> m_TrackingWatcher;
   bool m_TrackingThreadIsRunning;
   TrackerType::Pointer tracker;
-  QTimer*   m_TrackingTimer;
+  std::shared_ptr<QTimer>   m_TrackingTimer;
   mitk::DataNode::Pointer m_TractogramNode;
+  mitk::DataNode::Pointer m_SamplingPointsNode;
+  mitk::DataNode::Pointer m_AlternativePointsNode;
+
+  std::vector< std::shared_ptr<QmitkMlbstTrainingDataWidget> > m_TrainingWidgets;
 
 private:
 

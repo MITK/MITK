@@ -21,11 +21,72 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFloatPropertyExtension.h>
 #include <mitkIntPropertyExtension.h>
 #include <mitkIPropertyExtensions.h>
+#include <QApplication>
+#include <QColorDialog>
 #include <QComboBox>
+#include <QHBoxLayout>
+#include <QLineEdit>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QSpinBox>
+#include <QToolButton>
 #include <algorithm>
+
+QmitkColorWidget::QmitkColorWidget(QWidget* parent)
+  : QWidget(parent),
+    m_LineEdit(new QLineEdit),
+    m_Button(new QToolButton)
+{
+  m_LineEdit->setText(m_Color.name());
+  m_Button->setText("...");
+
+  QHBoxLayout* layout = new QHBoxLayout;
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+
+  layout->addWidget(m_LineEdit);
+  layout->addWidget(m_Button);
+
+  this->setFocusProxy(m_LineEdit);
+  this->setLayout(layout);
+
+  connect(m_LineEdit, SIGNAL(editingFinished()), this, SLOT(OnLineEditEditingFinished()));
+  connect(m_Button, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
+}
+
+QmitkColorWidget::~QmitkColorWidget()
+{
+}
+
+QColor QmitkColorWidget::GetColor() const
+{
+  return m_Color;
+}
+
+void QmitkColorWidget::SetColor(QColor color)
+{
+  m_Color = color;
+  m_LineEdit->setText(color.name());
+}
+
+void QmitkColorWidget::OnLineEditEditingFinished()
+{
+  if (!QColor::isValidColor(m_LineEdit->text()))
+    m_LineEdit->setText("#000000");
+
+  m_Color.setNamedColor(m_LineEdit->text());
+}
+
+void QmitkColorWidget::OnButtonClicked()
+{
+  QColor color = QColorDialog::getColor(m_Color, QApplication::activeWindow());
+
+  if (color.isValid())
+  {
+    this->SetColor(color);
+    emit ColorPicked();
+  }
+}
 
 QmitkComboBoxListView::QmitkComboBoxListView(QComboBox* comboBox)
   : m_ComboBox(comboBox)
@@ -188,6 +249,15 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
 
       return comboBox;
     }
+
+    if (data.type() == QVariant::Color)
+    {
+      QmitkColorWidget* colorWidget = new QmitkColorWidget(parent);
+
+      connect(colorWidget, SIGNAL(ColorPicked()), this, SLOT(OnColorPicked()));
+
+      return colorWidget;
+    }
   }
 
   return QStyledItemDelegate::createEditor(parent, option, index);
@@ -225,6 +295,14 @@ void QmitkPropertyItemDelegate::OnSpinBoxEditingFinished()
   emit closeEditor(spinBox);
 }
 
+void QmitkPropertyItemDelegate::OnColorPicked()
+{
+  QmitkColorWidget* colorWidget = qobject_cast<QmitkColorWidget*>(sender());
+
+  emit commitData(colorWidget);
+  emit closeEditor(colorWidget);
+}
+
 void QmitkPropertyItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
   QVariant data = index.data();
@@ -249,6 +327,11 @@ void QmitkPropertyItemDelegate::setEditorData(QWidget* editor, const QModelIndex
   {
     QComboBox* comboBox = qobject_cast<QComboBox*>(editor);
     comboBox->setCurrentIndex(comboBox->findText(index.data().toString()));
+  }
+  if (data.type() == QVariant::Color)
+  {
+    QmitkColorWidget* colorWidget = qobject_cast<QmitkColorWidget*>(editor);
+    colorWidget->SetColor(data.value<QColor>());
   }
   else
   {
@@ -282,6 +365,11 @@ void QmitkPropertyItemDelegate::setModelData(QWidget* editor, QAbstractItemModel
   {
     QComboBox* comboBox = qobject_cast<QComboBox*>(editor);
     model->setData(index, comboBox->currentText());
+  }
+  else if (data.type() == QVariant::Color)
+  {
+    QmitkColorWidget* colorWidget = qobject_cast<QmitkColorWidget*>(editor);
+    model->setData(index, colorWidget->GetColor());
   }
   else
   {

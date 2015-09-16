@@ -69,7 +69,7 @@ void mitk::PointSetGLMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
   node->GetBoolProperty("show distant lines", m_ShowDistantLines);
   node->GetIntProperty("line width",          m_LineWidth);
   node->GetIntProperty("point line width",    m_PointLineWidth);
-  node->GetIntProperty("point 2D size",       m_Point2DSize);
+  node->GetFloatProperty("point 2D size",       m_Point2DSize);
 }
 
 
@@ -232,13 +232,13 @@ void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
     }
 
     //check if there is an point 2D size property
-    if (dynamic_cast<mitk::IntProperty*>(node->GetPropertyList(renderer)->GetProperty("point 2D size")) != NULL)
+    if (dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList(renderer)->GetProperty("point 2D size")) != NULL)
     {
-      m_Point2DSize = dynamic_cast<mitk::IntProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("point 2D size"))->GetValue();
+      m_Point2DSize = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetPropertyList(renderer)->GetProperty("point 2D size"))->GetValue();
     }
-    else if (dynamic_cast<mitk::IntProperty*>(node->GetPropertyList(NULL)->GetProperty("point 2D size")) != NULL)
+    else if (dynamic_cast<mitk::FloatProperty*>(node->GetPropertyList(NULL)->GetProperty("point 2D size")) != NULL)
     {
-      m_Point2DSize = dynamic_cast<mitk::IntProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("point 2D size"))->GetValue();
+      m_Point2DSize = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetPropertyList(NULL)->GetProperty("point 2D size"))->GetValue();
     }
 
     Point3D p;                      // currently visited point
@@ -500,7 +500,7 @@ void mitk::PointSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::
 {
   node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite ); // width of the line from one point to another
   node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite ); //width of the cross marking a point
-  node->AddProperty( "point 2D size", mitk::IntProperty::New(8), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
+  node->AddProperty( "point 2D size", mitk::FloatProperty::New(8), renderer, overwrite ); // length of the cross marking a point // length of an edge of the box marking a point
   node->AddProperty( "show contour", mitk::BoolProperty::New(false), renderer, overwrite ); // contour of the line between points
   node->AddProperty( "close contour", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "show points", mitk::BoolProperty::New(true), renderer, overwrite ); //show or hide points

@@ -13,6 +13,10 @@ set(SRC_CPP_FILES
   QmitkBallModelParametersWidget.cpp
   QmitkAstrosticksModelParametersWidget.cpp
   QmitkPrototypeSignalParametersWidget.cpp
+  QmitkMlbstTrainingDataWidget.cpp
+
+  QmitkFreeSurferParcellationHandler.cpp
+  QmitkFreeSurferParcellationWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -56,6 +60,7 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
   Perspectives/QmitkDIAppIVIMPerspective.cpp
   Perspectives/QmitkDiffusionDefaultPerspective.cpp
+  Perspectives/QmitkMachineLearningTractographyPerspective.cpp
 )
 
 set(UI_FILES
@@ -94,6 +99,8 @@ set(UI_FILES
   src/internal/QmitkDiffusionRegistrationViewControls.ui
   src/internal/QmitkDenoisingViewControls.ui
   src/internal/QmitkMLBTViewControls.ui
+  src/QmitkFreeSurferParcellationWidgetControls.ui
+  src/QmitkMlbstTrainingDataWidgetControls.ui
 )
 
 set(MOC_H_FILES
@@ -149,6 +156,11 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
   src/internal/Perspectives/QmitkDIAppIVIMPerspective.h
   src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h
+  src/internal/Perspectives/QmitkMachineLearningTractographyPerspective.h
+
+  src/QmitkFreeSurferParcellationHandler.h
+  src/QmitkFreeSurferParcellationWidget.h
+  src/QmitkMlbstTrainingDataWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

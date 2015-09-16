@@ -39,7 +39,7 @@ diff -urNb vigra-Version-1-10-0/config/VigraConfig.cmake.in Vigra/config/VigraCo
 +
 diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_common.hxx Vigra/include/vigra/random_forest/rf_common.hxx
 --- vigra-Version-1-10-0/include/vigra/random_forest/rf_common.hxx	2013-11-18 17:48:16.000000000 +0100
-+++ Vigra/include/vigra/random_forest/rf_common.hxx	2015-03-03 10:45:19.423056174 +0100
++++ Vigra/include/vigra/random_forest/rf_common.hxx	2015-07-08 18:55:16.000000000 +0200
 @@ -558,6 +558,7 @@
      int                     is_weighted_;     // class_weights_ are used
      double                  precision_;       // termination criterion for regression loss
@@ -151,7 +151,7 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_common.hxx Vigra/
      bool used() const
 diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx Vigra/include/vigra/random_forest/rf_decisionTree.hxx
 --- vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx	2013-11-18 17:48:16.000000000 +0100
-+++ Vigra/include/vigra/random_forest/rf_decisionTree.hxx	2015-03-03 10:49:22.264260358 +0100
++++ Vigra/include/vigra/random_forest/rf_decisionTree.hxx	2015-07-08 18:55:16.000000000 +0200
 @@ -90,6 +90,8 @@
      ProblemSpec<> ext_param_;
      unsigned int classCount_;
@@ -241,7 +241,7 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_decisionTree.hxx 
  
 diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_nodeproxy.hxx Vigra/include/vigra/random_forest/rf_nodeproxy.hxx
 --- vigra-Version-1-10-0/include/vigra/random_forest/rf_nodeproxy.hxx	2013-11-18 17:48:16.000000000 +0100
-+++ Vigra/include/vigra/random_forest/rf_nodeproxy.hxx	2015-03-03 10:13:57.693725000 +0100
++++ Vigra/include/vigra/random_forest/rf_nodeproxy.hxx	2015-07-08 18:55:16.000000000 +0200
 @@ -50,7 +50,11 @@
  namespace vigra
  {
@@ -257,12 +257,12 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_nodeproxy.hxx Vig
  {
 diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_split.hxx Vigra/include/vigra/random_forest/rf_split.hxx
 --- vigra-Version-1-10-0/include/vigra/random_forest/rf_split.hxx	2013-11-18 17:48:16.000000000 +0100
-+++ Vigra/include/vigra/random_forest/rf_split.hxx	2015-03-03 10:49:01.164155728 +0100
++++ Vigra/include/vigra/random_forest/rf_split.hxx	2015-07-08 18:55:16.000000000 +0200
 @@ -108,6 +108,11 @@
          \ref SplitBase::findBestSplit() or \ref SplitBase::makeTerminalNode().
      **/
  
-+      virtual int GetMaximumTreeDepth() 
++      virtual int GetMaximumTreeDepth() const
 +      {
 +        return ext_param_.max_tree_depth;
 +      }
@@ -272,20 +272,108 @@ diff -urNb vigra-Version-1-10-0/include/vigra/random_forest/rf_split.hxx Vigra/i
      {
 diff -urNb vigra-Version-1-10-0/include/vigra/random_forest.hxx Vigra/include/vigra/random_forest.hxx
 --- vigra-Version-1-10-0/include/vigra/random_forest.hxx	2013-11-18 17:48:16.000000000 +0100
-+++ Vigra/include/vigra/random_forest.hxx	2015-03-03 10:13:57.693725000 +0100
-@@ -584,6 +584,7 @@
++++ Vigra/include/vigra/random_forest.hxx	2015-07-15 14:08:18.548277915 +0200
+@@ -165,6 +165,7 @@
+     ProblemSpec_t                               ext_param_;
+     /*mutable ArrayVector<int>                    tree_indices_;*/
+     rf::visitors::OnlineLearnVisitor            online_visitor_;
++    bool                                        multithreadPrediction;  // enable/disable multithreaded predictProbabilities and predictLabels
+ 
+ 
+     void reset()
+@@ -584,6 +585,18 @@
      {
          vigra_precondition(features.shape(0) == labels.shape(0),
              "RandomForest::predictLabels(): Label array has wrong size.");
++        if (multithreadPrediction)
++        {
 +#pragma omp parallel for
++            for(int k=0; k<features.shape(0); ++k)
++            {
++                vigra_precondition(!detail::contains_nan(rowVector(features, k)),
++                    "RandomForest::predictLabels(): NaN in feature matrix.");
++                labels(k,0) = detail::RequiresExplicitCast<T>::cast(predictLabel(rowVector(features, k), rf_default()));
++            }
++        }
++        else
++        {
          for(int k=0; k<features.shape(0); ++k)
          {
              vigra_precondition(!detail::contains_nan(rowVector(features, k)),
-@@ -1261,6 +1262,7 @@
+@@ -591,6 +604,7 @@
+             labels(k,0) = detail::RequiresExplicitCast<T>::cast(predictLabel(rowVector(features, k), rf_default()));
+         }
+     }
++    }
+ 
+     /** \brief predict multiple labels with given features
+      *
+@@ -1261,6 +1275,60 @@
      }
      */
      //Classify for each row.
++    if (multithreadPrediction)
++    {
 +#pragma omp parallel for
++        for(int row=0; row < rowCount(features); ++row)
++        {
++            MultiArrayView<2, U, StridedArrayTag> currentRow(rowVector(features, row));
++
++            // when the features contain an NaN, the instance doesn't belong to any class
++            // => indicate this by returning a zero probability array.
++            if(detail::contains_nan(currentRow))
++            {
++                rowVector(prob, row).init(0.0);
++                continue;
++            }
++
++            ArrayVector<double>::const_iterator weights;
++
++            //totalWeight == totalVoteCount!
++            double totalWeight = 0.0;
++
++            //Let each tree classify...
++            for(int k=0; k<options_.tree_count_; ++k)
++            {
++                //get weights predicted by single tree
++                weights = trees_[k /*tree_indices_[k]*/].predict(currentRow);
++
++                //update votecount.
++                int weighted = options_.predict_weighted_;
++                for(int l=0; l<ext_param_.class_count_; ++l)
++                {
++                    double cur_w = weights[l] * (weighted * (*(weights-1))
++                                               + (1-weighted));
++                    prob(row, l) += (T)cur_w;
++                    //every weight in totalWeight.
++                    totalWeight += cur_w;
++                }
++                if(stop.after_prediction(weights,
++                                         k,
++                                         rowVector(prob, row),
++                                         totalWeight))
++                {
++                    break;
++                }
++            }
++
++            //Normalise votes in each row by total VoteCount (totalWeight
++            for(int l=0; l< ext_param_.class_count_; ++l)
++            {
++                prob(row, l) /= detail::RequiresExplicitCast<T>::cast(totalWeight);
++            }
++        }
++    }
++    else
++    {
      for(int row=0; row < rowCount(features); ++row)
      {
          MultiArrayView<2, U, StridedArrayTag> currentRow(rowVector(features, row));
+@@ -1309,6 +1377,7 @@
+             prob(row, l) /= detail::RequiresExplicitCast<T>::cast(totalWeight);
+         }
+     }
++    }
+ 
+ }
+ 

@@ -30,9 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkSurface.h>
 #include <mitkIGTLMessageToNavigationDataFilter.h>
-#include <mitkNavigationDataReaderXML.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkIOUtil.h>
 
 // vtk
 #include <vtkSphereSource.h>
@@ -49,9 +49,7 @@ const std::string OpenIGTLinkProviderExample::VIEW_ID =
 
 OpenIGTLinkProviderExample::~OpenIGTLinkProviderExample()
 {
-  this->GetDataStorage()->Remove(m_DemoNodeT1);
-  this->GetDataStorage()->Remove(m_DemoNodeT2);
-  this->GetDataStorage()->Remove(m_DemoNodeT3);
+   this->DestroyPipeline();
 }
 
 void OpenIGTLinkProviderExample::SetFocus()
@@ -74,6 +72,13 @@ void OpenIGTLinkProviderExample::CreateQtPartControl( QWidget *parent )
 
 void OpenIGTLinkProviderExample::CreatePipeline()
 {
+   //create a navigation data player object that will play nav data from a
+   //recorded file
+   m_NavDataPlayer = mitk::NavigationDataPlayer::New();
+
+   //set the currently read navigation data set
+   m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
+
   //create a new OpenIGTLink Client
   m_IGTLServer = mitk::IGTLServer::New();
   m_IGTLServer->SetName("OIGTL Provider Example Device");
@@ -91,6 +96,14 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //create a filter that converts navigation data into IGTL messages
   m_NavDataToIGTLMsgFilter = mitk::NavigationDataToIGTLMessageFilter::New();
 
+  //connect the filters with each other
+  //the navigation data player reads a file with recorded navigation data,
+  //passes this data to a filter that converts it into a IGTLMessage.
+  //The provider is not connected because it will search for fitting services.
+  //Once it found the filter it will automatically connect to it (this is not
+  // implemented so far, check m_StreamingConnector for more information).
+  m_NavDataToIGTLMsgFilter->ConnectTo(m_NavDataPlayer);
+
   //define the operation mode for this filter, we want to send tracking data
   //messages
   m_NavDataToIGTLMsgFilter->SetOperationMode(
@@ -107,48 +120,33 @@ void OpenIGTLinkProviderExample::CreatePipeline()
   //for more information)
   m_NavDataToIGTLMsgFilter->RegisterAsMicroservice();
 
-  //create a navigation data player object that will play nav data from a
-  //recorded file
-  m_NavDataPlayer = mitk::NavigationDataPlayer::New();
-
-  //set the currently read navigation data set
-  m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
-
-  //connect the filters with each other
-  //the navigation data player reads a file with recorded navigation data,
-  //passes this data to a filter that converts it into a IGTLMessage.
-  //The provider is not connected because it will search for fitting services.
-  //Once it found the filter it will automatically connect to it (this is not
-  // implemented so far, check m_StreamingConnector for more information).
-  m_NavDataToIGTLMsgFilter->ConnectTo(m_NavDataPlayer);
+  //also create a visualize filter to visualize the data
+  m_NavDataVisualizer = mitk::NavigationDataObjectVisualizationFilter::New();
 
   //create an object that will be moved respectively to the navigation data
-  m_DemoNodeT1 = mitk::DataNode::New();
-  m_DemoNodeT1->SetName("DemoNode IGTLProviderExmpl T1");
-  m_DemoNodeT2 = mitk::DataNode::New();
-  m_DemoNodeT2->SetName("DemoNode IGTLProviderExmpl T2");
-  m_DemoNodeT3 = mitk::DataNode::New();
-  m_DemoNodeT3->SetName("DemoNode IGTLProviderExmpl T3");
+  for (size_t i = 0; i < m_NavDataPlayer->GetNumberOfIndexedOutputs(); i++)
+  {
+     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+     QString name("DemoNode IGTLProviderExmpl T");
+     name.append(QString::number(i));
+     newNode->SetName(name.toStdString());
 
-  //create small sphere and use it as surface
-  mitk::Surface::Pointer mySphere = mitk::Surface::New();
-  vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius(2.0f);
-  vtkData->SetCenter(0.0, 0.0, 0.0);
-  vtkData->Update();
-  mySphere->SetVtkPolyData(vtkData->GetOutput());
-  vtkData->Delete();
-  m_DemoNodeT1->SetData(mySphere);
+     //create small sphere and use it as surface
+     mitk::Surface::Pointer mySphere = mitk::Surface::New();
+     vtkSphereSource *vtkData = vtkSphereSource::New();
+     vtkData->SetRadius(2.0f);
+     vtkData->SetCenter(0.0, 0.0, 0.0);
+     vtkData->Update();
+     mySphere->SetVtkPolyData(vtkData->GetOutput());
+     vtkData->Delete();
+     newNode->SetData(mySphere);
 
-  mitk::Surface::Pointer mySphere2 = mySphere->Clone();
-  m_DemoNodeT2->SetData(mySphere2);
-  mitk::Surface::Pointer mySphere3 = mySphere->Clone();
-  m_DemoNodeT3->SetData(mySphere3);
+     this->GetDataStorage()->Add(newNode);
 
-  // add node to DataStorage
-  this->GetDataStorage()->Add(m_DemoNodeT1);
-  this->GetDataStorage()->Add(m_DemoNodeT2);
-  this->GetDataStorage()->Add(m_DemoNodeT3);
+     m_NavDataVisualizer->SetRepresentationObject(i, mySphere);
+
+     m_DemoNodes.append(newNode);
+  }
 
   //initialize the streaming connector
   //the streaming connector is checking if the data from the filter has to be
@@ -156,11 +154,8 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 //  m_StreamingConnector.Initialize(m_NavDataToIGTLMsgFilter.GetPointer(),
 //                                  m_IGTLMessageProvider);
 
-  //also create a visualize filter to visualize the data
-  m_NavDataVisualizer = mitk::NavigationDataObjectVisualizationFilter::New();
-  m_NavDataVisualizer->SetRepresentationObject(0, mySphere);
-  m_NavDataVisualizer->SetRepresentationObject(1, mySphere2);
-  m_NavDataVisualizer->SetRepresentationObject(2, mySphere3);
+
+  //connect the visualization with the navigation data player
   m_NavDataVisualizer->ConnectTo(m_NavDataPlayer);
 
   //start the player
@@ -171,8 +166,15 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 
 void OpenIGTLinkProviderExample::DestroyPipeline()
 {
-  m_NavDataPlayer->StopPlaying();
-  this->GetDataStorage()->Remove(m_DemoNodeT1);
+   if (m_NavDataPlayer.IsNotNull())
+   {
+      m_NavDataPlayer->StopPlaying();
+   }
+   foreach(mitk::DataNode::Pointer node, m_DemoNodes)
+   {
+      this->GetDataStorage()->Remove(node);
+   }
+   this->m_DemoNodes.clear();
 }
 
 void OpenIGTLinkProviderExample::Start()
@@ -197,7 +199,6 @@ void OpenIGTLinkProviderExample::Start()
 }
 
 void OpenIGTLinkProviderExample::OnOpenFile(){
-  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
 
   // FIXME Filter for correct files and use correct Reader
   QString fileName =
@@ -206,7 +207,7 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
   try
   {
-    m_NavDataSet = reader->Read(fileName.toStdString());
+    m_NavDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(fileName.toStdString()).GetPointer());
   }
   catch ( const mitk::Exception &e )
   {

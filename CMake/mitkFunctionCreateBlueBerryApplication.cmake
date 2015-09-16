@@ -209,5 +209,5 @@ endif()
 endfunction()
 
 function(FunctionCreateBlueBerryApplication)
-  message(SEND_ERROR "The function FunctionCreateBlueBerryApplication was renamed to mitkFunctionCreateBlueBerryApplication in MITK 2015.03")
+  message(SEND_ERROR "The function FunctionCreateBlueBerryApplication was renamed to mitkFunctionCreateBlueBerryApplication in MITK 2015.05")
 endfunction()

@@ -75,7 +75,7 @@ void mitk::AnisotropicRegistrationCommon::PropagateMatrices( const MatrixList &s
  const vnl_matrix_fixed < double, 3, 3 > rotationT = rotation.GetTranspose();
 
 #pragma omp parallel for
-  for ( size_t i = 0; i < src.size(); ++i )
+  for ( int i = 0; i < static_cast<int>(src.size()); ++i )
   {
     dst[i] = rotation * src[i] * rotationT;
     }

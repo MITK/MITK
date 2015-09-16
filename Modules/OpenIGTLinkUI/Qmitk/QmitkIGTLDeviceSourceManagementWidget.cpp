@@ -42,7 +42,7 @@ const std::string QmitkIGTLDeviceSourceManagementWidget::VIEW_ID =
 
 QmitkIGTLDeviceSourceManagementWidget::QmitkIGTLDeviceSourceManagementWidget(
     QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_IsClient(false)
+  : QWidget(parent, f), m_IsClient(false), m_MessageReceivedObserverTag(0), m_CommandReceivedObserverTag(0), m_LostConnectionObserverTag(0), m_NewConnectionObserverTag(0), m_StateModifiedObserverTag(0)
 {
   m_Controls = NULL;
   this->m_IGTLDevice = NULL;
@@ -52,6 +52,11 @@ QmitkIGTLDeviceSourceManagementWidget::QmitkIGTLDeviceSourceManagementWidget(
 
 QmitkIGTLDeviceSourceManagementWidget::~QmitkIGTLDeviceSourceManagementWidget()
 {
+   if (m_MessageReceivedObserverTag) this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
+   if (m_CommandReceivedObserverTag) this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
+   if (m_LostConnectionObserverTag) this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+   if (m_NewConnectionObserverTag) this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+   if (m_StateModifiedObserverTag) this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::CreateQtPartControl(QWidget *parent)
@@ -75,11 +80,14 @@ void QmitkIGTLDeviceSourceManagementWidget::CreateConnections()
     connect( m_Controls->butSend, SIGNAL(clicked()),
              this, SLOT(OnSendMessage()));
   }
+  //this is used for thread seperation, otherwise the worker thread would change the ui elements
+  //which would cause an exception
+  connect(this, SIGNAL(AdaptGUIToStateSignal()), this, SLOT(AdaptGUIToState()));
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnDeviceStateChanged()
 {
-  this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::AdaptGUIToState()
@@ -133,11 +141,11 @@ void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
   //reset the observers
   if ( this->m_IGTLDevice.IsNotNull() )
   {
-    this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
-    this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
+    if (m_MessageReceivedObserverTag) this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
+    if (m_CommandReceivedObserverTag) this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
+    if (m_LostConnectionObserverTag) this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+    if (m_NewConnectionObserverTag) this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+    if (m_StateModifiedObserverTag) this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
   }
 
   if(sourceToLoad.IsNotNull())
@@ -219,89 +227,20 @@ void QmitkIGTLDeviceSourceManagementWidget::OnSendMessage()
 
 void QmitkIGTLDeviceSourceManagementWidget::OnMessageReceived()
 {
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
 
-//  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
-//  {
-//    MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a message: "
-//        << dev->GetReceiveQueue()->GetLatestMsgInformationString();
-//  }
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnCommandReceived()
 {
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
 
-//  if ( this->m_Controls->logSendReceiveMsg->isChecked() )
-//  {
-//    MITK_INFO("IGTLDeviceSourceManagementWidget") << "Received a command: "
-//        << dev->GetCommandQueue()->GetLatestMsgInformationString();
-//  }
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnLostConnection()
 {
-  this->AdaptGUIToState();
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
-
-//  unsigned int numConnections = dev->GetNumberOfConnections();
-
-//  if ( numConnections == 0 )
-//  {
-//    if ( this->m_IsClient )
-//    {
-//      //Setup connection groupbox
-//      m_Controls->editIP->setEnabled(true);
-//      m_Controls->editPort->setEnabled(true);
-//      m_Controls->butConnect->setText("Connect");
-//      m_Controls->logSendReceiveMsg->setEnabled(false);
-//      m_Controls->bufferMsgCheckBox->setEnabled(false);
-//      //send string messages groupbox
-//      m_Controls->editSend->setEnabled(false);
-//      m_Controls->butSend->setEnabled(false);
-//      //send command messages groupbox
-//      m_Controls->butSendCommand->setEnabled(false);
-//      m_Controls->fpsSpinBox->setEnabled(false);
-//      m_Controls->commandsComboBox->setEnabled(false);
-//    }
-//    else
-//    {
-//      //send string messages groupbox
-//      m_Controls->editSend->setEnabled(false);
-//      m_Controls->butSend->setEnabled(false);
-//      //send command messages groupbox
-//      m_Controls->butSendCommand->setEnabled(false);
-//      m_Controls->fpsSpinBox->setEnabled(false);
-//      m_Controls->commandsComboBox->setEnabled(false);
-//    }
-//  }
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceSourceManagementWidget::OnNewConnection()
 {
-  this->AdaptGUIToState();
-//  //get the IGTL device that invoked this event
-//  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
-
-//  unsigned int numConnections = dev->GetNumberOfConnections();
-
-//  if ( numConnections != 0 )
-//  {
-//    //Setup connection groupbox
-//    m_Controls->editIP->setEnabled(false);
-//    m_Controls->editPort->setEnabled(false);
-//    m_Controls->butConnect->setText("Disconnect");
-//    m_Controls->logSendReceiveMsg->setEnabled(true);
-//    m_Controls->bufferMsgCheckBox->setEnabled(true);
-//    //send string messages groupbox
-//    m_Controls->editSend->setEnabled(true);
-//    m_Controls->butSend->setEnabled(true);
-//    //send command messages groupbox
-//    m_Controls->butSendCommand->setEnabled(true);
-////      m_Controls->fpsSpinBox->setEnabled(false);
-//    m_Controls->commandsComboBox->setEnabled(true);
-//  }
+  emit AdaptGUIToStateSignal();
 }

@@ -91,12 +91,14 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBoxWithSelectNone : public Qmitk
      */
     virtual void SetSelectedNode(const mitk::DataNode::Pointer& node);
 
+    using QmitkDataStorageComboBox::RemoveNode;
     /**
      * \brief Removes a node from the ComboBox at a specified index (if the index exists).
      * Gets called when a DataStorage Remove Event was thrown.
      */
     virtual void RemoveNode(int index) override;
 
+    using QmitkDataStorageComboBox::SetNode;
     /**
      * \brief Set a DataNode in the ComboBox at the specified index (if the index exists).
      * Internally the method just calls InsertNode(unsigned int)

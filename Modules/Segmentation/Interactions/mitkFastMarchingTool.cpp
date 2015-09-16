@@ -39,13 +39,13 @@ mitk::FastMarchingTool::FastMarchingTool()
 :FeedbackContourTool("PressMoveReleaseAndPointSetting"),
 m_NeedUpdate(true),
 m_CurrentTimeStep(0),
+m_PositionEvent(0),
 m_LowerThreshold(0),
 m_UpperThreshold(200),
 m_StoppingValue(100),
 m_Sigma(1.0),
 m_Alpha(-0.5),
-m_Beta(3.0),
-m_PositionEvent(0)
+m_Beta(3.0)
 {
 }
 
@@ -374,7 +374,7 @@ bool mitk::FastMarchingTool::OnAddPoint( StateMachineAction*, InteractionEvent* 
 }
 
 
-bool mitk::FastMarchingTool::OnDelete( StateMachineAction*, InteractionEvent* interactionEvent )
+bool mitk::FastMarchingTool::OnDelete( StateMachineAction*, InteractionEvent*)
 {
   // delete last seed point
   if(!(this->m_SeedContainer->empty()))

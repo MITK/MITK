@@ -73,7 +73,7 @@ QmitkBooleanOperationsWidget::~QmitkBooleanOperationsWidget()
 {
 }
 
-void QmitkBooleanOperationsWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
+void QmitkBooleanOperationsWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
 {
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
 

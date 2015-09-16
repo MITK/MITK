@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 #include "mitkStatusBar.h"
 #include "mitkImage.h"
+#include "mitkPixelTypeMultiplex.h"
+#include "mitkImagePixelReadAccessor.h"
 
 #include "mitkApplyTransformMatrixOperation.h"
 
@@ -811,7 +813,16 @@ SliceNavigationController
                   stream.precision(2);
                   stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";
                   stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
-                  mitk::ScalarType pixelValue = image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep(), component);
+
+                  mitk::ScalarType pixelValue = 0.0;
+
+                  mitkPixelTypeMultiplex4(
+                    mitk::FastSinglePixelAccess,
+                    image3D->GetChannelDescriptor().GetPixelType(),
+                    image3D,
+                    image3D->GetVolumeData(baseRenderer->GetTimeStep()),
+                    p,
+                    pixelValue);
 
                   if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
                   {

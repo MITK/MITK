@@ -20,9 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandardFileLocations.h>
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
-
-#include <mitkNavigationDataReaderXML.h>
-#include <mitkNavigationDataSetWriterXML.h>
+#include <mitkIOUtil.h>
 
 //for exceptions
 #include "mitkIGTException.h"
@@ -46,9 +44,9 @@ public:
 
   void setUp() override
   {
-    mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
     std::string path = GetTestDataFilePath("IGT-Data/RecordedNavigationData.xml");
-    m_NavigationDataSet = reader->Read(path);
+    m_NavigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(path).GetPointer());
+
 
     m_Player = mitk::NavigationDataSequentialPlayer::New();
     m_Player->SetNavigationDataSet(m_NavigationDataSet);

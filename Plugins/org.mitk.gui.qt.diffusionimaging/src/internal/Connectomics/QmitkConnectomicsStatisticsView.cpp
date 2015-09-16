@@ -24,27 +24,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ####### Qt includes #######
 #include <QMessageBox>
+#include <QStringList>
 
 // ####### ITK includes #######
 #include <itkRGBAPixel.h>
 
 // ####### MITK includes #######
-
+#include <mbilog.h>
 #include <mitkConnectomicsConstantsManager.h>
 #include <mitkConnectomicsStatisticsCalculator.h>
+#include <mitkConnectomicsRenderingProperties.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageAccessByItk.h"
 
+#include <string>
+
 const std::string QmitkConnectomicsStatisticsView::VIEW_ID = "org.mitk.views.connectomicsstatistics";
 
 QmitkConnectomicsStatisticsView::QmitkConnectomicsStatisticsView()
 : QmitkFunctionality()
-, m_Controls( 0 )
-, m_MultiWidget( NULL )
-, m_currentIndex( 0 )
+, m_Controls( nullptr )
+, m_MultiWidget( nullptr )
 {
 }
 
@@ -52,31 +55,27 @@ QmitkConnectomicsStatisticsView::~QmitkConnectomicsStatisticsView()
 {
 }
 
-
 void QmitkConnectomicsStatisticsView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
   if ( !m_Controls )
-  {
-    // create GUI widgets from the Qt Designer's .ui file
+  {// create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkConnectomicsStatisticsViewControls;
-    m_Controls->setupUi( parent );
-
+    m_Controls-> setupUi( parent );
+    connect( m_Controls-> networkBalloonsNodeLabelsComboBox, SIGNAL( currentIndexChanged( int ) ),
+             this, SLOT( OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( ) ) );
   }
-
-  this->WipeDisplay();
+  this-> WipeDisplay();
 }
-
 
 void QmitkConnectomicsStatisticsView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
   m_MultiWidget = &stdMultiWidget;
 }
 
-
 void QmitkConnectomicsStatisticsView::StdMultiWidgetNotAvailable()
 {
-  m_MultiWidget = NULL;
+  m_MultiWidget = nullptr;
 }
 
 void QmitkConnectomicsStatisticsView::WipeDisplay()
@@ -86,9 +85,9 @@ void QmitkConnectomicsStatisticsView::WipeDisplay()
   m_Controls->inputImageOneNameLabel->setVisible( false );
   m_Controls->inputImageOneLabel->setVisible( false );
   m_Controls->networkStatisticsPlainTextEdit->clear();
-  m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(   NULL );
-  m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       NULL );
-  m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( NULL );
+  m_Controls->betweennessNetworkHistogramCanvas->SetHistogram(  nullptr );
+  m_Controls->degreeNetworkHistogramCanvas->SetHistogram(       nullptr );
+  m_Controls->shortestPathNetworkHistogramCanvas->SetHistogram( nullptr );
   m_Controls->betweennessNetworkHistogramCanvas->update();
   m_Controls->degreeNetworkHistogramCanvas->update();
   m_Controls->shortestPathNetworkHistogramCanvas->update();
@@ -98,6 +97,58 @@ void QmitkConnectomicsStatisticsView::WipeDisplay()
   m_Controls->betweennessNetworkHistogramCanvas->Replot();
   m_Controls->degreeNetworkHistogramCanvas->Replot();
   m_Controls->shortestPathNetworkHistogramCanvas->Replot();
+  m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::clear();
+  m_Controls-> networkBalloonsPlainTextEdit-> clear();
+}
+
+void QmitkConnectomicsStatisticsView::OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged( )
+{
+  std::vector<mitk::DataNode*> nodes = this-> GetDataManagerSelection();
+
+  if( nodes.size() != 1 ) { return; }
+
+  mitk::DataNode::Pointer node = *nodes.begin();
+
+  if( node.IsNotNull() )
+    {
+    mitk::ConnectomicsNetwork* network =
+      dynamic_cast< mitk::ConnectomicsNetwork* >( node-> GetData() );
+
+    if( network )
+      {
+      std::string tempCurrentText = m_Controls-> networkBalloonsNodeLabelsComboBox->
+        QComboBox::currentText().toStdString(); // get text of currently selected item.
+
+      if( tempCurrentText.size() > 3 && tempCurrentText.rfind( ":" ) != tempCurrentText.npos )
+      { // update chosenNode property.
+        tempCurrentText = tempCurrentText.substr( tempCurrentText.rfind( ":" ) + 2 );
+        node-> SetProperty( mitk::connectomicsRenderingNodeChosenNodeName.c_str(),
+                            mitk::StringProperty::New( tempCurrentText.c_str() ) );
+        this-> m_MultiWidget-> ForceImmediateUpdate(); //RequestUpdate() is too slow.
+      }
+
+      std::stringstream balloonTextStream;
+      node-> Update();
+
+      if( node-> GetProperty( mitk::connectomicsRenderingBalloonTextName.c_str() ) != nullptr &&
+          node-> GetProperty( mitk::connectomicsRenderingBalloonNodeStatsName.c_str() ) != nullptr &&
+          tempCurrentText != "-1" )
+      {
+        balloonTextStream << node-> GetProperty( mitk::connectomicsRenderingBalloonTextName.c_str() )
+                             -> GetValueAsString()
+                          << node-> GetProperty( mitk::connectomicsRenderingBalloonNodeStatsName.c_str() )
+                             -> GetValueAsString() << std::endl;
+        QString balloonQString ( balloonTextStream.str().c_str() );
+        // setPlainText() overwrites, insertPlainText() appends.
+        m_Controls-> networkBalloonsPlainTextEdit-> setPlainText( balloonQString );
+      }
+      if( tempCurrentText == "-1" )
+      {
+        m_Controls-> networkBalloonsPlainTextEdit-> setPlainText( "" );
+      }
+    }
+  }
+  return;
 }
 
 void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
@@ -138,6 +189,7 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
           this->WipeDisplay();
           return;
         }
+
         m_Controls->lblWarning->setVisible( false );
         m_Controls->inputImageOneNameLabel->setText(node->GetName().c_str());
         m_Controls->inputImageOneNameLabel->setVisible( true );
@@ -172,7 +224,7 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
           statisticsStream << "# Central Points: " << calculator->GetNumberOfCentralPoints() << "\n";
 
           QString statisticsString( statisticsStream.str().c_str() );
-          m_Controls->networkStatisticsPlainTextEdit->setPlainText( statisticsString );
+          m_Controls-> networkStatisticsPlainTextEdit-> setPlainText( statisticsString );
         }
 
         mitk::ConnectomicsNetwork::Pointer connectomicsNetwork( network );
@@ -186,6 +238,22 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
           m_Controls->degreeNetworkHistogramCanvas->DrawProfiles();
           m_Controls->shortestPathNetworkHistogramCanvas->DrawProfiles();
         }
+
+        // For the balloon overlay:
+        if( node-> GetProperty( mitk::connectomicsRenderingBalloonAllNodeLabelsName.c_str() ) != nullptr )
+          { // QComboBox with node label names and numbers.
+            QString allNodesLabel = node->
+                GetProperty( mitk::connectomicsRenderingBalloonAllNodeLabelsName.c_str() )->
+                GetValueAsString().c_str();
+            QStringList allNodesLabelList = allNodesLabel.simplified().split( "," );
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+            allNodesLabelList.sort( Qt::CaseInsensitive );
+#else
+            allNodesLabelList.sort();
+#endif
+            m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::addItem( "no node chosen: -1" );
+            m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::addItems( allNodesLabelList );
+          }
       }
     } // end network section
 

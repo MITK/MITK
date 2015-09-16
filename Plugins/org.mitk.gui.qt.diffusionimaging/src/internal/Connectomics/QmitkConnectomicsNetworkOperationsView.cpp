@@ -462,7 +462,6 @@ void QmitkConnectomicsNetworkOperationsView::OnModularizePushButtonClicked()
         MappingType::iterator iter = mapping.begin();
         MappingType::iterator end =  mapping.end();
 
-        int loop( 0 );
         while( iter != end )
         {
           MBI_DEBUG << "Vertex " << iter->first << " belongs to module " << iter->second ;

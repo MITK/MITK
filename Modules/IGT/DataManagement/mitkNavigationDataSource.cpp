@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSource.h"
 #include "mitkUIDGenerator.h"
 
+
 //Microservices
 #include <usGetModuleContext.h>
 #include <usModule.h>

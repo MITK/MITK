@@ -3,6 +3,7 @@ set(MODULE_TESTS
   mitkContourTest.cpp
   mitkContourModelSetToImageFilterTest.cpp
   mitkDataNodeSegmentationTest.cpp
+  mitkFeatureBasedEdgeDetectionFilterTest.cpp
   mitkImageToContourFilterTest.cpp
 #  mitkSegmentationInterpolationTest.cpp
   mitkOverwriteSliceFilterTest.cpp

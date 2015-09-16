@@ -40,6 +40,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
+  org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.dtiatlasapp:OFF
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
@@ -52,6 +53,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.measurementtoolbox:OFF
   org.mitk.gui.qt.moviemaker:OFF
   org.mitk.gui.qt.pointsetinteraction:OFF
+  org.mitk.gui.qt.pointsetinteractionmultispectrum:OFF
   org.mitk.gui.qt.python:OFF
   org.mitk.gui.qt.registration:OFF
   org.mitk.gui.qt.remeshing:OFF
@@ -66,4 +68,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
+  org.mitk.gui.qt.spectrocamrecorder:OFF
+  org.mitk.gui.qt.classificationsegmentation:OFF
 )

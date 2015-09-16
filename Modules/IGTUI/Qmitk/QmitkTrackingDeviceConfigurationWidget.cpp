@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVirtualTrackingDevice.h>
 #include <mitkNDITrackingDevice.h>
 #include <mitkOptitrackTrackingDevice.h>
+#include <mitkOpenIGTLinkTrackingDevice.h>
 #include <mitkIGTException.h>
 #include <mitkSerialCommunication.h>
 #include <mitkProgressBar.h>
@@ -424,6 +425,14 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
   {
     // Create the Virtual Tracking Device
     returnValue = mitk::VirtualTrackingDevice::New();
+  }
+  else if (m_Controls->m_trackingDeviceChooser->currentIndex()==5) //OpenIGTLink
+  {
+    // Create the Virtual Tracking Device
+    mitk::OpenIGTLinkTrackingDevice::Pointer OIGTLDevice = mitk::OpenIGTLinkTrackingDevice::New();
+    OIGTLDevice->SetPortNumber(m_Controls->m_OpenIGTLinkPort->text().toInt());
+    OIGTLDevice->SetHostname(m_Controls->m_OpenIGTLinkHostname->text().toStdString());
+    returnValue = OIGTLDevice;
   }
   return returnValue;
  }

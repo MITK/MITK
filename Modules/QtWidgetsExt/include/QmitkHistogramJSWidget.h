@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 #include <itkPolyLineParametricPath.h>
+#include <mitkImageStatisticsCalculator.h>
 #include <QmitkWebPage.h>
 
 /**
@@ -117,7 +118,7 @@ public:
   * Sets m_IntensityProfile and m_UseLineGraph to true.
   * The SignalDataChanged is called, to update the information, which is displayed in the webframe.
   */
-  void ComputeIntensityProfile(unsigned int timeStep = 0);
+  void ComputeIntensityProfile(unsigned int timeStep = 0, bool computeStatistics = false );
 
   /**
   * \brief Clears the Histogram.
@@ -155,6 +156,11 @@ public:
   */
   bool GetIntensityProfile();
 
+  mitk::ImageStatisticsCalculator::Statistics& GetStatistics()
+  {
+    return m_Statistics;
+  };
+
   /**
   * \brief Setter for reference image.
   *
@@ -186,6 +192,8 @@ private:
   * or holds the distances of current intensity profile.
   */
   QList<QVariant> m_Measurement;
+
+  mitk::ImageStatisticsCalculator::Statistics m_Statistics;
 
   /**
   * \brief Reference image.

@@ -28,7 +28,7 @@ public:
   typedef IsoDoseLevel::DoseValueType DoseValueType;
 
   EqualDoseFunctor(const DoseValueType& refValue) : m_refValue(refValue)
-  {};
+  {}
 
   bool operator () (const IsoDoseLevel* level)
   {
@@ -52,7 +52,7 @@ mitk::IsoDoseLevelSet::IsoDoseLevelSet(const IsoDoseLevelSet & other)
   {
     this->m_IsoLevels = other.m_IsoLevels;
   }
-};
+}
 
 const mitk::IsoDoseLevel& mitk::IsoDoseLevelSet::GetIsoDoseLevel(IsoLevelIndexType index) const
 {
@@ -64,7 +64,7 @@ const mitk::IsoDoseLevel& mitk::IsoDoseLevelSet::GetIsoDoseLevel(IsoLevelIndexTy
   {
     mitkThrow() << "Try to access non existing dose iso level.";
   }
-};
+}
 
 const mitk::IsoDoseLevel& mitk::IsoDoseLevelSet::GetIsoDoseLevel(DoseValueType value) const
 {
@@ -78,7 +78,7 @@ const mitk::IsoDoseLevel& mitk::IsoDoseLevelSet::GetIsoDoseLevel(DoseValueType v
   {
     mitkThrow() << "Try to access non existing dose iso level.";
   }
-};
+}
 
 void mitk::IsoDoseLevelSet::SetIsoDoseLevel(const IsoDoseLevel* level)
 {
@@ -92,19 +92,19 @@ void mitk::IsoDoseLevelSet::SetIsoDoseLevel(const IsoDoseLevel* level)
   this->m_IsoLevels.push_back(level->Clone());
 
   std::sort(this->m_IsoLevels.begin(), this->m_IsoLevels.end(),lesserIsoDoseLevel);
-};
+}
 
 bool mitk::IsoDoseLevelSet::DoseLevelExists(IsoLevelIndexType index) const
 {
   return index < this->m_IsoLevels.size();
-};
+}
 
 
 bool mitk::IsoDoseLevelSet::DoseLevelExists(DoseValueType value) const
 {
   auto pos = std::find_if(this->m_IsoLevels.begin(), this->m_IsoLevels.end(), EqualDoseFunctor(value));
   return pos != this->m_IsoLevels.end();
-};
+}
 
 void mitk::IsoDoseLevelSet::DeleteIsoDoseLevel(DoseValueType value)
 {
@@ -114,7 +114,7 @@ void mitk::IsoDoseLevelSet::DeleteIsoDoseLevel(DoseValueType value)
   {
     this->m_IsoLevels.erase(pos);
   }
-};
+}
 
 void mitk::IsoDoseLevelSet::DeleteIsoDoseLevel(IsoLevelIndexType index)
 {
@@ -122,24 +122,24 @@ void mitk::IsoDoseLevelSet::DeleteIsoDoseLevel(IsoLevelIndexType index)
   {
     this->m_IsoLevels.erase(this->m_IsoLevels.begin()+index);
   }
-};
+}
 
 mitk::IsoDoseLevelSet::ConstIterator mitk::IsoDoseLevelSet::Begin(void) const
 {
   return ConstIterator(this->m_IsoLevels.begin());
-};
+}
 
 mitk::IsoDoseLevelSet::ConstIterator mitk::IsoDoseLevelSet::End(void) const
 {
   return ConstIterator(this->m_IsoLevels.end());
-};
+}
 
 mitk::IsoDoseLevelSet::IsoLevelIndexType mitk::IsoDoseLevelSet::Size(void) const
 {
   return this->m_IsoLevels.size();
-};
+}
 
 void mitk::IsoDoseLevelSet::Reset(void)
 {
   this->m_IsoLevels.clear();
-};
+}

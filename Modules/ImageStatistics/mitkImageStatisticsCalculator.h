@@ -297,7 +297,7 @@ public:
   void SetHistogramBinSize( double size);
 
   /** \brief Get bin size for histogram resolution.*/
-  unsigned int GetHistogramBinSize();
+  double GetHistogramBinSize();
 
   /** \brief Sets the radius for the hotspot */
   void SetHotspotRadiusInMM (double hotspotRadiusInMM);

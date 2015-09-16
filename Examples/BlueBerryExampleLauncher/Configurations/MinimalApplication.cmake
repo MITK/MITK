@@ -13,5 +13,5 @@ The following features are demonstrated:
 <li> creating a perspective </li>
 </ul>
 
-See the main <a href=\"http://docs.mitk.org/nightly-qt4/BlueBerryExampleMinimalApplication.html\">documentation</a> for details."
+See the main <a href=\"http://docs.mitk.org/nightly/BlueBerryExampleMinimalApplication.html\">documentation</a> for details."
 )

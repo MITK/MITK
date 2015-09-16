@@ -292,6 +292,22 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   mitk::ImageReadAccessor racc(image);
   void* array = (void*) racc.GetData();
 
+  mitk::Vector3D xDirection;
+  mitk::Vector3D yDirection;
+  mitk::Vector3D zDirection;
+  const vnl_matrix_fixed<ScalarType, 3, 3> &transform =
+      image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix();
+
+  // ToDo: Check if this is a collumn or row vector from the matrix.
+  // right now it works but not sure for rotated geometries
+  mitk::FillVector3D(xDirection, transform[0][0], transform[0][1], transform[0][2]);
+  mitk::FillVector3D(yDirection, transform[1][0], transform[1][1], transform[1][2]);
+  mitk::FillVector3D(zDirection, transform[2][0], transform[2][1], transform[2][2]);
+
+  xDirection.Normalize();
+  yDirection.Normalize();
+  zDirection.Normalize();
+
   // default pixeltype: unsigned short
   NPY_TYPES npy_type  = NPY_USHORT;
   std::string sitk_type = "sitkUInt8";
@@ -359,6 +375,17 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
                   .arg(QString::number(origin[0]))
                   .arg(QString::number(origin[1]))
                   .arg(QString::number(origin[2])) );
+  command.append( QString("%1.SetDirection([%2,%3,%4,%5,%6,%7,%8,%9,%10])\n").arg(varName)
+                  .arg(QString::number(xDirection[0]))
+                  .arg(QString::number(xDirection[1]))
+                  .arg(QString::number(xDirection[2]))
+                  .arg(QString::number(yDirection[0]))
+                  .arg(QString::number(yDirection[1]))
+                  .arg(QString::number(yDirection[2]))
+                  .arg(QString::number(zDirection[0]))
+                  .arg(QString::number(zDirection[1]))
+                  .arg(QString::number(zDirection[2]))
+                  );
   // directly access the cpp api from the lib
   command.append( QString("_SimpleITK._SetImageFromArray(%1_numpy_array,%1)\n").arg(varName) );
   command.append( QString("del %1_numpy_array").arg(varName) );
@@ -385,7 +412,9 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   command.append( QString("%1_numpy_array = sitk.GetArrayFromImage(%1)\n").arg(varName) );
   command.append( QString("%1_spacing = numpy.asarray(%1.GetSpacing())\n").arg(varName) );
   command.append( QString("%1_origin = numpy.asarray(%1.GetOrigin())\n").arg(varName) );
-  command.append( QString("%1_dtype = %1_numpy_array.dtype.name").arg(varName) );
+  command.append( QString("%1_dtype = %1_numpy_array.dtype.name\n").arg(varName) );
+  command.append( QString("%1_direction = numpy.asarray(%1.GetDirection())").arg(varName) );
+
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
@@ -395,6 +424,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_numpy_array").arg(varName).toStdString().c_str() );
   PyArrayObject* py_spacing = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_spacing").arg(varName).toStdString().c_str() );
   PyArrayObject* py_origin = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_origin").arg(varName).toStdString().c_str() );
+  PyArrayObject* py_direction = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_direction").arg(varName).toStdString().c_str() );
 
   size_t sz = sizeof(short);
   mitk::PixelType pixelType = MakeScalarPixelType<short>();
@@ -453,12 +483,40 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
   origin[2] = ds[2];
   mitkImage->GetGeometry()->SetOrigin(origin);
 
+
+  itk::Matrix<double,3,3> py_transform;
+
+  ds = (double*)py_direction->data;
+  py_transform[0][0] = ds[0];
+  py_transform[0][1] = ds[1];
+  py_transform[0][2] = ds[2];
+
+  py_transform[1][0] = ds[3];
+  py_transform[1][1] = ds[4];
+  py_transform[1][2] = ds[5];
+
+  py_transform[2][0] = ds[6];
+  py_transform[2][1] = ds[7];
+  py_transform[2][2] = ds[8];
+
+  mitk::AffineTransform3D::Pointer affineTransform = mitkImage->GetGeometry()->GetIndexToWorldTransform();
+
+  itk::Matrix<double,3,3> transform = py_transform * affineTransform->GetMatrix();
+
+  affineTransform->SetMatrix(transform);
+
+  mitkImage->GetGeometry()->SetIndexToWorldTransform(affineTransform);
+
+     // mitk::AffineTransform3D::New();
+  //mitkImage->GetGeometry()->SetIndexToWorldTransform();
+
   // cleanup
   command.clear();
   command.append( QString("del %1_numpy_array\n").arg(varName) );
   command.append( QString("del %1_dtype\n").arg(varName) );
   command.append( QString("del %1_spacing\n").arg(varName) );
-  command.append( QString("del %1_origin").arg(varName) );
+  command.append( QString("del %1_origin\n").arg(varName) );
+  command.append( QString("del %1_direction").arg(varName) );
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 

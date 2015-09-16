@@ -213,7 +213,6 @@ namespace mitk
                                 refROI->DisplayColor[0],
                                 refROI->DisplayColor[1],
                                 refROI->DisplayColor[2]));
-
     }
     while(roiContourSeqObject.gotoNextItem().good());
 
@@ -223,23 +222,15 @@ namespace mitk
     {
       mitk::DataNode::Pointer node = mitk::DataNode::New();
       node->SetData(ROISequenceVector.at(i).ContourModelSet);
-      node->SetProperty("name",
-                     ROISequenceVector.at(i).ContourModelSet->GetProperty("name"));
-      node->SetProperty("color",
-                     ROISequenceVector.at(i).ContourModelSet->GetProperty("contour.color"));
-      node->SetProperty("contour.color",
-                     ROISequenceVector.at(i).ContourModelSet->GetProperty("contour.color"));
+      node->SetProperty("name", ROISequenceVector.at(i).ContourModelSet->GetProperty("name"));
+      node->SetProperty("color",ROISequenceVector.at(i).ContourModelSet->GetProperty("contour.color"));
+      node->SetProperty("contour.color",ROISequenceVector.at(i).ContourModelSet->GetProperty("contour.color"));
+      node->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+      node->SetVisibility(true, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+      node->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
+      node->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+      node->SetVisibility(true, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
-      /*The StructureSets should only be visible in the axial-view and the
-        3D-view because in the other views they are just points and lines*/
-      node->SetVisibility(true, mitk::BaseRenderer::GetInstance
-              ( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
-      node->SetVisibility(false, mitk::BaseRenderer::GetInstance
-              ( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
-      node->SetVisibility(false, mitk::BaseRenderer::GetInstance
-              ( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
-      node->SetVisibility(true, mitk::BaseRenderer::GetInstance
-              ( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
       nodes.push_back(node);
     }
 

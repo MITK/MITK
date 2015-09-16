@@ -62,8 +62,8 @@ Image< Vector< PixelType, 3 >, 3 > >
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-            /** Runtime information support. */
-            itkTypeMacro(FiniteDiffOdfMaximaExtractionFilter, ImageToImageFilter)
+    /** Runtime information support. */
+    itkTypeMacro(FiniteDiffOdfMaximaExtractionFilter, ImageToImageFilter)
 
             typedef typename Superclass::InputImageType           CoefficientImageType;
     typedef typename CoefficientImageType::RegionType     CoefficientImageRegionType;
@@ -87,6 +87,9 @@ Image< Vector< PixelType, 3 >, 3 > >
     itkSetMacro( AngularThreshold, double)                  ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)       ///< only voxels inside the binary mask are processed
     itkSetMacro( NormalizationMethod, NormalizationMethods) ///< normalization method of ODF peaks
+    itkSetMacro( FlipX, bool)                               ///< flip peaks in x direction
+    itkSetMacro( FlipY, bool)                               ///< flip peaks in y direction
+    itkSetMacro( FlipZ, bool)                               ///< flip peaks in z direction
 
     // output
     itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                ///< vector field (peak sizes rescaled for visualization purposes)
@@ -127,12 +130,15 @@ Image< Vector< PixelType, 3 >, 3 > >
     double                                      m_AngularThreshold;     ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
     const int                                   m_NumCoeffs;            ///< number of spherical harmonics coefficients
 
-    mitk::FiberBundle::Pointer               m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
+    mitk::FiberBundle::Pointer                m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
     ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;///< container for output peaks
     ItkUcharImgType::Pointer                  m_NumDirectionsImage;     ///< number of peaks per voxel
     ItkUcharImgType::Pointer                  m_MaskImage;              ///< only voxels inside the binary mask are processed
 
     Toolkit                                   m_Toolkit;
+    bool                                        m_FlipX;
+    bool                                        m_FlipY;
+    bool                                        m_FlipZ;
 };
 
 }

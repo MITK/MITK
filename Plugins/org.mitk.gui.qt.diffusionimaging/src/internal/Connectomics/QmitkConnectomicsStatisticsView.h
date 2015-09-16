@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkConnectomicsStatisticsViewControls.h"
 
@@ -54,7 +55,9 @@ public:
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
   virtual void StdMultiWidgetNotAvailable() override;
 
-  protected slots:
+protected slots:
+
+  void OnNetworkBalloonsNodeLabelsComboBoxCurrentIndexChanged(  );
 
 protected:
 
@@ -67,17 +70,12 @@ protected:
 
 
   // ####### Variables #######
-
-
   Ui::QmitkConnectomicsStatisticsViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
 
   /// Cache for histograms
   mitk::ConnectomicsHistogramCache histogramCache;
-
-  // The selected synthetic network type
-  int m_currentIndex;
 };
 
 

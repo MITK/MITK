@@ -156,17 +156,17 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     RenderAnnotations(renderer, name, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
   }
 
+  if ( m_DrawControlPoints )
+  {
+    // draw the control-points
+    RenderControlPoints(planarFigure, lineDisplayMode, planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry);
+  }
+
   // draw feature quantities (if requested) next to the anchor point,
   // but under the name (that is where 'annotationOffset' is used)
   if ( m_DrawQuantities )
   {
     RenderQuantities(planarFigure, renderer, anchorPoint, annotationOffset, globalOpacity, lineDisplayMode);
-  }
-
-  if ( m_DrawControlPoints )
-  {
-    // draw the control-points
-    RenderControlPoints(planarFigure, lineDisplayMode, planarFigurePlaneGeometry, rendererPlaneGeometry, displayGeometry);
   }
 
   glLineWidth( 1.0f );

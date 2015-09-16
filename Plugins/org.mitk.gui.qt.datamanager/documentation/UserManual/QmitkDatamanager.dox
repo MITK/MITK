@@ -75,7 +75,18 @@ There are different types of representations how to show the Data-Element inside
 <li> The opacity can be changed with a slide control
 <li> In case of images a texture interpolation can be switched on or off. The texture interpolation smoothes the image, so that no single pixels are visible anymore.
 <li> In case of surfaces the surface representation can be changed between points, wireframe or surface.
-<li> Global reinit updates all windows to contain all the current data. Reinit updates a single data item fits the windows to contain this data item.
+<li> Global reinit updates all windows to contain all the current data:
+
+     -  The orientation of the worldgeometry, which basically defines the rendering space, is set to the standard coordinate system, i.e. [(0,0,1);(0,1,0);(0,0,1)]
+     -  The size of the worldgeometry is calculated, so that it includes all loaded data (depends on size and position of your data)
+     -  The spacing is set to the smallest existing spacing regarding your data
+
+     Reinit updates a single data item and fits the windows to contain only this data item:
+
+     -  The orientation of the worldgeometry, is aligned according to the orientation of the currently selected datanode
+     -  The size of the worldgeometry is set to the size of the currently selected datanode
+     -  The spacing is set to the spacing of the currently selected datanode
+
 </ul>
 
 \imageMacro{QmitkDatamanager_ImageProperties.png,"Screenshot2: Properties for images",10.56}

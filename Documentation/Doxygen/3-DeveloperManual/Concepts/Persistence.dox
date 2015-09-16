@@ -57,7 +57,7 @@ However, integration into a MITK scene file is not possible with Qt::settings.
 
 \section PersistenceBlueberry Persistence Features of Blueberry
 
-In blueberry, the view states can be saved and restored which is described here: <a href="http://mitk.org/Article_Save_and_Restore_your_View_State">MITK.org: Save and Restore your View State</a>. Additionally, there is a possibility to make the preferences of a view persistent, which is documented in the <a href="http://docs.mitk.org/nightly-qt4/structberry_1_1IPreferencesService.html">class API documentation of the persistence service</a>.
+In blueberry, the view states can be saved and restored which is described here: <a href="http://mitk.org/Article_Save_and_Restore_your_View_State">MITK.org: Save and Restore your View State</a>. Additionally, there is a possibility to make the preferences of a view persistent, which is documented in the <a href="http://docs.mitk.org/nightly/structberry_1_1IPreferencesService.html">class API documentation of the persistence service</a>.
 
 \section PersistenceConfigurationService Configuration Service
 

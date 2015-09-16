@@ -113,10 +113,10 @@ void mitk::IGTLServer::Receive()
     //already disconnected. Therefore, it is necessary to remove this socket
     //from the registered clients list
     status = this->ReceivePrivate(*it);
-    if ( status == IGTL_STATUS_NOT_PRESENT )
+    if (status == IGTL_STATUS_NOT_PRESENT)
     {
       //remember this socket for later, it is not a good idea to remove it
-      //from the list directly because we iterator over the list at this point
+      //from the list directly because we iterate over the list at this point
       socketsToBeRemoved.push_back(*it);
       MITK_WARN("IGTLServer") << "Lost connection to a client socket. ";
     }

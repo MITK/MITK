@@ -80,7 +80,7 @@ public:
   void SetHistogramBinSize( double size);
   /*!
   /brief Get bin size for histogram resolution.*/
-  unsigned int GetHistogramBinSize();
+  double GetHistogramBinSize();
   /*!
   /brief Returns the histogram of the currently selected time step. */
   HistogramType::Pointer GetTimeStepHistogram(unsigned int t = 0);

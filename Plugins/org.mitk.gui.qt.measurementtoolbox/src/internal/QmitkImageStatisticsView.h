@@ -106,6 +106,9 @@ protected:
   /** \brief  Writes the calculated statistics to the GUI */
   void FillStatisticsTableView( const std::vector<mitk::ImageStatisticsCalculator::Statistics> &s,
     const mitk::Image *image );
+
+  void FillLinearProfileStatisticsTableView( const mitk::Image *image );
+
   /** \brief  Removes statistics from the GUI */
   void InvalidateStatisticsTableView();
 

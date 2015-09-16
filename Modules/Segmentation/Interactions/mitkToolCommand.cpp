@@ -21,7 +21,7 @@ mitk::ToolCommand::ToolCommand() : m_ProgressValue(0), m_StopProcessing(false)
 {
 }
 
-void mitk::ToolCommand::Execute(itk::Object *caller, const itk::EventObject & event)
+void mitk::ToolCommand::Execute(itk::Object*, const itk::EventObject& event)
 {
 
   if (typeid(event) == typeid(itk::IterationEvent))

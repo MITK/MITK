@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"
-
+#include "MitkIGTExports.h"
 #include <iostream>
 
 #include <mitkRealTimeClock.h>

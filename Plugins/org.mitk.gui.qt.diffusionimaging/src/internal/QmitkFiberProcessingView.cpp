@@ -99,6 +99,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
 
         connect(m_Controls->m_JoinBundles, SIGNAL(clicked()), this, SLOT(JoinBundles()) );
         connect(m_Controls->m_SubstractBundles, SIGNAL(clicked()), this, SLOT(SubstractBundles()) );
+        connect(m_Controls->m_CopyBundle, SIGNAL(clicked()), this, SLOT(CopyBundles()) );
 
         connect(m_Controls->m_ExtractFibersButton, SIGNAL(clicked()), this, SLOT(Extract()));
         connect(m_Controls->m_RemoveButton, SIGNAL(clicked()), this, SLOT(Remove()));
@@ -163,9 +164,9 @@ void QmitkFiberProcessingView::Modify()
 void QmitkFiberProcessingView::WeightFibers()
 {
     float weight = this->m_Controls->m_BundleWeightBox->value();
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         fib->SetFiberWeights(weight);
     }
 
@@ -218,23 +219,23 @@ void QmitkFiberProcessingView::Extract()
         {
         {
         case 0:
-            ExtractWithMask(true, false);
-            break;
+                ExtractWithMask(true, false);
+                break;
         }
         {
         case 1:
-            ExtractWithMask(true, true);
-            break;
+                ExtractWithMask(true, true);
+                break;
         }
         {
         case 2:
-            ExtractWithMask(false, false);
-            break;
+                ExtractWithMask(false, false);
+                break;
         }
         {
         case 3:
-            ExtractWithMask(false, true);
-            break;
+                ExtractWithMask(false, true);
+                break;
         }
         }
         break;
@@ -246,9 +247,9 @@ void QmitkFiberProcessingView::PruneBundle()
 {
     int minLength = this->m_Controls->m_PruneFibersMinBox->value();
     int maxLength = this->m_Controls->m_PruneFibersMaxBox->value();
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         if (!fib->RemoveShortFibers(minLength))
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
         else if (!fib->RemoveLongFibers(maxLength))
@@ -262,9 +263,9 @@ void QmitkFiberProcessingView::ApplyCurvatureThreshold()
     int angle = this->m_Controls->m_CurvSpinBox->value();
     int dist = this->m_Controls->m_CurvDistanceSpinBox->value();
     std::vector< DataNode::Pointer > nodes = m_SelectedFB;
-    for (int i=0; i<nodes.size(); i++)
+    for (auto node : nodes)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(nodes.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
 
         itk::FiberCurvatureFilter::Pointer filter = itk::FiberCurvatureFilter::New();
         filter->SetInputFiberBundle(fib);
@@ -274,26 +275,18 @@ void QmitkFiberProcessingView::ApplyCurvatureThreshold()
         filter->Update();
         mitk::FiberBundle::Pointer newFib = filter->GetOutputFiberBundle();
         if (newFib->GetNumFibers()>0)
-        {
-            nodes.at(i)->SetVisibility(false);
-            DataNode::Pointer newNode = DataNode::New();
-            newNode->SetData(newFib);
-            newNode->SetName(nodes.at(i)->GetName()+"_Curvature");
-            GetDefaultDataStorage()->Add(newNode, nodes.at(i));
-        }
+            node->SetData(newFib);
         else
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
-//        if (!fib->ApplyCurvatureThreshold(mm, this->m_Controls->m_RemoveCurvedFibersBox->isChecked()))
-//            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberProcessingView::RemoveDir()
 {
-    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         vnl_vector_fixed<double,3> dir;
         dir[0] = m_Controls->m_ExtractDirX->value();
         dir[1] = m_Controls->m_ExtractDirY->value();
@@ -309,10 +302,10 @@ void QmitkFiberProcessingView::RemoveWithMask(bool removeInside)
         return;
 
     mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
-        QString name(m_SelectedFB.at(i)->GetName().c_str());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+        QString name(node->GetName().c_str());
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage(mitkMask, mask);
@@ -322,16 +315,9 @@ void QmitkFiberProcessingView::RemoveWithMask(bool removeInside)
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
             continue;
         }
-        DataNode::Pointer newNode = DataNode::New();
-        newNode->SetData(newFib);
-        if (removeInside)
-            name += "_Inside";
-        else
-            name += "_Outside";
-        newNode->SetName(name.toStdString());
-        GetDefaultDataStorage()->Add(newNode);
-        m_SelectedFB.at(i)->SetVisibility(false);
+        node->SetData(newFib);
     }
+    RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
@@ -340,14 +326,14 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
         return;
 
     mitk::Image::Pointer mitkMask = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
-    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
-        QString name(m_SelectedFB.at(i)->GetName().c_str());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+        QString name(node->GetName().c_str());
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage(mitkMask, mask);
-        mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, onlyEnds, invert);
+        mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert, m_Controls->m_BothEnds->isChecked());
         if (newFib->GetNumFibers()<=0)
         {
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
@@ -376,7 +362,7 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
 
         newNode->SetName(name.toStdString());
         GetDefaultDataStorage()->Add(newNode);
-        m_SelectedFB.at(i)->SetVisibility(false);
+        node->SetVisibility(false);
     }
 }
 
@@ -462,9 +448,9 @@ void QmitkFiberProcessingView::WritePfToImage(mitk::DataNode::Pointer node, mitk
     else if (dynamic_cast<mitk::PlanarFigureComposite*>(node->GetData()))
     {
         DataStorage::SetOfObjects::ConstPointer children = GetDataStorage()->GetDerivations(node);
-        for (int j=0; j<children->size(); j++)
+        for (unsigned int i=0; i<children->Size(); i++)
         {
-            WritePfToImage(children->ElementAt(j), image);
+            WritePfToImage(children->at(i), image);
         }
     }
 }
@@ -831,12 +817,12 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_ExtractFibersButton->setEnabled(false);
     m_Controls->m_ModifyButton->setEnabled(false);
 
+    m_Controls->m_CopyBundle->setEnabled(false);
     m_Controls->m_JoinBundles->setEnabled(false);
     m_Controls->m_SubstractBundles->setEnabled(false);
 
     // disable alle frames
     m_Controls->m_BundleWeightFrame->setVisible(false);
-    m_Controls->m_ExtractionBoxMask->setVisible(false);
     m_Controls->m_ExtactionFramePF->setVisible(false);
     m_Controls->m_RemoveDirectionFrame->setVisible(false);
     m_Controls->m_RemoveLengthFrame->setVisible(false);
@@ -845,6 +831,7 @@ void QmitkFiberProcessingView::UpdateGui()
     m_Controls->m_CompressFibersFrame->setVisible(false);
     m_Controls->m_ColorFibersFrame->setVisible(false);
     m_Controls->m_MirrorFibersFrame->setVisible(false);
+    m_Controls->m_MaskExtractionFrame->setVisible(false);
 
     bool pfSelected = !m_SelectedPF.empty();
     bool fibSelected = !m_SelectedFB.empty();
@@ -859,7 +846,7 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_ExtactionFramePF->setVisible(true);
         break;
     case 1:
-        m_Controls->m_ExtractionBoxMask->setVisible(true);
+        m_Controls->m_MaskExtractionFrame->setVisible(true);
         break;
     }
 
@@ -899,6 +886,8 @@ void QmitkFiberProcessingView::UpdateGui()
         break;
     case 3:
         m_Controls->m_MirrorFibersFrame->setVisible(true);
+        if (m_SelectedSurfaces.size()>0)
+            m_Controls->m_ModifyButton->setEnabled(true);
         break;
     case 4:
         m_Controls->m_BundleWeightFrame->setVisible(true);
@@ -907,12 +896,13 @@ void QmitkFiberProcessingView::UpdateGui()
     // are fiber bundles selected?
     if ( fibSelected )
     {
+        m_Controls->m_CopyBundle->setEnabled(true);
         m_Controls->m_ModifyButton->setEnabled(true);
         m_Controls->m_PlanarFigureButtonsFrame->setEnabled(true);
         m_Controls->m_FibLabel->setText(QString(m_SelectedFB.at(0)->GetName().c_str()));
 
         // one bundle and one planar figure needed to extract fibers
-        if (pfSelected)
+        if (pfSelected && m_Controls->m_ExtractionMethodBox->currentIndex()==0)
         {
             m_Controls->m_InputData->setTitle("Input Data");
             m_Controls->m_PfLabel->setText(QString(m_SelectedPF.at(0)->GetName().c_str()));
@@ -928,10 +918,18 @@ void QmitkFiberProcessingView::UpdateGui()
             m_Controls->m_SubstractBundles->setEnabled(true);
         }
 
-        if (maskSelected)
+        if (maskSelected && m_Controls->m_ExtractionMethodBox->currentIndex()==1)
         {
-            m_Controls->m_RemoveButton->setEnabled(true);
+            m_Controls->m_InputData->setTitle("Input Data");
+            m_Controls->m_PfLabel->setText(QString(m_MaskImageNode->GetName().c_str()));
             m_Controls->m_ExtractFibersButton->setEnabled(true);
+        }
+
+        if (maskSelected && (m_Controls->m_RemovalMethodBox->currentIndex()==3 || m_Controls->m_RemovalMethodBox->currentIndex()==4) )
+        {
+            m_Controls->m_InputData->setTitle("Input Data");
+            m_Controls->m_PfLabel->setText(QString(m_MaskImageNode->GetName().c_str()));
+            m_Controls->m_RemoveButton->setEnabled(true);
         }
     }
 
@@ -997,7 +995,7 @@ void QmitkFiberProcessingView::OnSelectionChanged( std::vector<mitk::DataNode*> 
             m_SelectedSurfaces.push_back(dynamic_cast<mitk::Surface*>(node->GetData()));
     }
 
-    if (m_SelectedFB.empty())
+    if (m_SelectedFB.empty() && m_SelectedSurfaces.empty())
     {
         int maxLayer = 0;
         itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer nodes = this->GetDefaultDataStorage()->GetAll();
@@ -1121,8 +1119,8 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure()
         node = mitk::DataNode::New();
         node->SetData(extFB);
         QString name(fiberBundles.at(i)->GetName().c_str());
-        name += "_";
-        name += planarFigure->GetName().c_str();
+        name += "*";
+        //name += planarFigure->GetName().c_str();
         node->SetName(name.toStdString());
         fiberBundles.at(i)->SetVisibility(false);
         GetDataStorage()->Add(node);
@@ -1185,34 +1183,64 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::DataNode::Pointer
     else
         GetDataStorage()->Add(pfc);
 
-    for (int i=0; i<children.size(); i++)
+    for (auto child : children)
     {
-        if (dynamic_cast<PlanarFigure*>(children.at(i)->GetData()))
+        if (dynamic_cast<PlanarFigure*>(child->GetData()))
         {
             mitk::DataNode::Pointer newChild;
             newChild = mitk::DataNode::New();
-            newChild->SetData(dynamic_cast<PlanarFigure*>(children.at(i)->GetData()));
-            newChild->SetName( children.at(i)->GetName() );
+            newChild->SetData(dynamic_cast<PlanarFigure*>(child->GetData()));
+            newChild->SetName( child->GetName() );
+            newChild->SetBoolProperty("planarfigure.3drendering", true);
+            newChild->SetBoolProperty("planarfigure.3drendering.fill", true);
 
             GetDataStorage()->Add(newChild, pfc);
-            GetDataStorage()->Remove(children.at(i));
+            GetDataStorage()->Remove(child);
         }
-        else if (dynamic_cast<PlanarFigureComposite*>(children.at(i)->GetData()))
+        else if (dynamic_cast<PlanarFigureComposite*>(child->GetData()))
         {
             mitk::DataNode::Pointer newChild;
             newChild = mitk::DataNode::New();
-            newChild->SetData(dynamic_cast<PlanarFigureComposite*>(children.at(i)->GetData()));
-            newChild->SetName( children.at(i)->GetName() );
+            newChild->SetData(dynamic_cast<PlanarFigureComposite*>(child->GetData()));
+            newChild->SetName( child->GetName() );
 
             std::vector< mitk::DataNode::Pointer > grandChildVector;
-            mitk::DataStorage::SetOfObjects::ConstPointer grandchildren = GetDataStorage()->GetDerivations(children.at(i));
+            mitk::DataStorage::SetOfObjects::ConstPointer grandchildren = GetDataStorage()->GetDerivations(child);
             for( mitk::DataStorage::SetOfObjects::const_iterator it = grandchildren->begin(); it != grandchildren->end(); ++it )
                 grandChildVector.push_back(*it);
 
             AddCompositeToDatastorage(newChild, grandChildVector, pfc);
-            GetDataStorage()->Remove(children.at(i));
+            GetDataStorage()->Remove(child);
         }
     }
+    UpdateGui();
+}
+
+void QmitkFiberProcessingView::CopyBundles()
+{
+    if ( m_SelectedFB.empty() ){
+        QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
+        MITK_WARN("QmitkFiberProcessingView") << "Select at least one fiber bundle!";
+        return;
+    }
+
+    for (auto node : m_SelectedFB)
+    {
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+        mitk::FiberBundle::Pointer newFib = fib->GetDeepCopy();
+
+        node->SetVisibility(false);
+        QString name("");
+        name += QString(m_SelectedFB.at(0)->GetName().c_str());
+        name += "_copy";
+
+        mitk::DataNode::Pointer fbNode = mitk::DataNode::New();
+        fbNode->SetData(newFib);
+        fbNode->SetName(name.toStdString());
+        fbNode->SetVisibility(true);
+        GetDataStorage()->Add(fbNode);
+    }
+    UpdateGui();
 }
 
 void QmitkFiberProcessingView::JoinBundles()
@@ -1239,6 +1267,7 @@ void QmitkFiberProcessingView::JoinBundles()
     fbNode->SetName(name.toStdString());
     fbNode->SetVisibility(true);
     GetDataStorage()->Add(fbNode);
+    UpdateGui();
 }
 
 void QmitkFiberProcessingView::SubstractBundles()
@@ -1272,14 +1301,15 @@ void QmitkFiberProcessingView::SubstractBundles()
     fbNode->SetName(name.toStdString());
     fbNode->SetVisibility(true);
     GetDataStorage()->Add(fbNode);
+    UpdateGui();
 }
 
 void QmitkFiberProcessingView::ResampleSelectedBundles()
 {
     double factor = this->m_Controls->m_SmoothFibersBox->value();
-    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         fib->ResampleSpline(factor);
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1288,9 +1318,9 @@ void QmitkFiberProcessingView::ResampleSelectedBundles()
 void QmitkFiberProcessingView::CompressSelectedBundles()
 {
     double factor = this->m_Controls->m_ErrorThresholdBox->value();
-    for (unsigned int i=0; i<m_SelectedFB.size(); i++)
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         fib->Compress(factor);
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1304,55 +1334,50 @@ void QmitkFiberProcessingView::DoImageColorCoding()
         return;
     }
 
-    for(unsigned int i=0; i<m_SelectedFB.size(); i++ )
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         fib->ColorFibersByScalarMap(dynamic_cast<mitk::Image*>(m_Controls->m_ColorMapBox->GetSelectedNode()->GetData()), m_Controls->m_FiberOpacityBox->isChecked());
     }
-
-    if(m_MultiWidget)
-        m_MultiWidget->RequestUpdate();
+    RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
 void QmitkFiberProcessingView::DoCurvatureColorCoding()
 {
-    for(unsigned int i=0; i<m_SelectedFB.size(); i++ )
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         fib->ColorFibersByCurvature();
     }
-
-    if(m_MultiWidget)
-        m_MultiWidget->RequestUpdate();
+    RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkFiberProcessingView::MirrorFibers()
 {
     unsigned int axis = this->m_Controls->m_MirrorFibersBox->currentIndex();
-    for (int i=0; i<m_SelectedFB.size(); i++)
+    for (auto node : m_SelectedFB)
     {
-        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(m_SelectedFB.at(i)->GetData());
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+        if (m_SelectedImage.IsNotNull())
+            fib->SetReferenceGeometry(m_SelectedImage->GetGeometry());
         fib->MirrorFibers(axis);
     }
 
-    if (m_SelectedSurfaces.size()>0)
-    {
-        for (int i=0; i<m_SelectedSurfaces.size(); i++)
-        {
-            mitk::Surface::Pointer surf = m_SelectedSurfaces.at(i);
-            vtkSmartPointer<vtkPolyData> poly = surf->GetVtkPolyData();
-            vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
 
-            for (int i=0; i<poly->GetNumberOfPoints(); i++)
-            {
-                double* point = poly->GetPoint(i);
-                point[axis] *= -1;
-                vtkNewPoints->InsertNextPoint(point);
-            }
-            poly->SetPoints(vtkNewPoints);
-            surf->CalculateBoundingBox();
+    for (auto surf : m_SelectedSurfaces)
+    {
+        vtkSmartPointer<vtkPolyData> poly = surf->GetVtkPolyData();
+        vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
+
+        for (int i=0; i<poly->GetNumberOfPoints(); i++)
+        {
+            double* point = poly->GetPoint(i);
+            point[axis] *= -1;
+            vtkNewPoints->InsertNextPoint(point);
         }
+        poly->SetPoints(vtkNewPoints);
+        surf->CalculateBoundingBox();
     }
 
     RenderingManager::GetInstance()->RequestUpdateAll();

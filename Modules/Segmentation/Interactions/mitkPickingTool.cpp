@@ -238,6 +238,7 @@ void mitk::PickingTool::OnPointAdded()
     newNode->SetData(m_ResultNode->GetData());
 
     GetDataStorage()->Add(newNode, this->GetReferenceData());
+    m_WorkingData->SetVisibility(false);
 
     m_ResultNode->SetData(NULL);
 

@@ -409,7 +409,7 @@ void mitk::FiberBundle::ColorFibersByOrientation()
     m_UpdateTime2D.Modified();
 }
 
-void mitk::FiberBundle::ColorFibersByCurvature()
+void mitk::FiberBundle::ColorFibersByCurvature(bool minMaxNorm)
 {
     double window = 5;
 
@@ -488,7 +488,7 @@ void mitk::FiberBundle::ColorFibersByCurvature()
             meanV.normalize();
 
             double dev = 0;
-            for (int c=0; c<vectors.size(); c++)
+            for (unsigned int c=0; c<vectors.size(); c++)
             {
                 double angle = dot_product(meanV, vectors.at(c));
                 if (angle>1.0)
@@ -508,7 +508,6 @@ void mitk::FiberBundle::ColorFibersByCurvature()
                 max = dev;
         }
     }
-    MITK_INFO << min << " - " << max;
     unsigned int count = 0;
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
@@ -517,8 +516,10 @@ void mitk::FiberBundle::ColorFibersByCurvature()
         for (int j=0; j<numPoints; j++)
         {
             double color[3];
-            //double dev = (values.at(count)-min)/(max-min);
-            double dev = values.at(count)*values.at(count);
+            double dev = values.at(count);
+            if (minMaxNorm)
+                dev = (dev-min)/(max-min);
+            //            double dev = values.at(count)*values.at(count);
             lookupTable->GetColor(dev, color);
 
             rgba[0] = (unsigned char) (255.0 * color[0]);
@@ -641,7 +642,7 @@ void mitk::FiberBundle::GenerateFiberIds()
 
 }
 
-mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert)
+mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds)
 {
     vtkSmartPointer<vtkPolyData> polyData = m_FiberPolyData;
     if (anyPoint)
@@ -748,13 +749,52 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                 itk::Index<3> idxEnd;
                 mask->TransformPhysicalPointToIndex(itkEnd, idxEnd);
 
-                if ( mask->GetPixel(idxStart)>0 && mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart) && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
+                if (invert)
                 {
-                    for (int j=0; j<numPointsOriginal; j++)
+                    if (bothEnds)
                     {
-                        double* p = pointsOriginal->GetPoint(j);
-                        vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-                        container->GetPointIds()->InsertNextId(id);
+                        if ( !mask->GetPixel(idxStart)>0 && !mask->GetPixel(idxEnd)>0 )
+                        {
+                            for (int j=0; j<numPointsOriginal; j++)
+                            {
+                                double* p = pointsOriginal->GetPoint(j);
+                                vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                                container->GetPointIds()->InsertNextId(id);
+                            }
+                        }
+                    }
+                    else if ( !mask->GetPixel(idxStart)>0 || !mask->GetPixel(idxEnd)>0 )
+                    {
+                        for (int j=0; j<numPointsOriginal; j++)
+                        {
+                            double* p = pointsOriginal->GetPoint(j);
+                            vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                            container->GetPointIds()->InsertNextId(id);
+                        }
+                    }
+                }
+                else
+                {
+                    if (bothEnds)
+                    {
+                        if ( mask->GetPixel(idxStart)>0 && mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart) && mask->GetLargestPossibleRegion().IsInside(idxEnd) )
+                        {
+                            for (int j=0; j<numPointsOriginal; j++)
+                            {
+                                double* p = pointsOriginal->GetPoint(j);
+                                vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                                container->GetPointIds()->InsertNextId(id);
+                            }
+                        }
+                    }
+                    else if ( (mask->GetPixel(idxStart)>0 && mask->GetLargestPossibleRegion().IsInside(idxStart)) || (mask->GetPixel(idxEnd)>0 && mask->GetLargestPossibleRegion().IsInside(idxEnd)) )
+                    {
+                        for (int j=0; j<numPointsOriginal; j++)
+                        {
+                            double* p = pointsOriginal->GetPoint(j);
+                            vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                            container->GetPointIds()->InsertNextId(id);
+                        }
                     }
                 }
             }
@@ -846,7 +886,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::RemoveFibersOutside(ItkUcharImgTyp
     newPolyData->SetPoints(vtkNewPoints);
     newPolyData->SetLines(vtkNewCells);
     mitk::FiberBundle::Pointer newFib = mitk::FiberBundle::New(newPolyData);
-    newFib->ResampleSpline(minSpacing/2);
+    newFib->Compress(0.1);
     return newFib;
 }
 
@@ -883,7 +923,7 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
             MITK_INFO << "AND";
             result = this->ExtractFiberIdSubset(children->ElementAt(0), storage);
             std::vector<long>::iterator it;
-            for (int i=1; i<children->Size(); ++i)
+            for (unsigned int i=1; i<children->Size(); ++i)
             {
                 std::vector<long> inRoi = this->ExtractFiberIdSubset(children->ElementAt(i), storage);
 
@@ -899,7 +939,7 @@ std::vector<long> mitk::FiberBundle::ExtractFiberIdSubset(DataNode *roi, DataSto
             MITK_INFO << "OR";
             result = ExtractFiberIdSubset(children->ElementAt(0), storage);
             std::vector<long>::iterator it;
-            for (int i=1; i<children->Size(); ++i)
+            for (unsigned int i=1; i<children->Size(); ++i)
             {
                 it = result.end();
                 std::vector<long> inRoi = ExtractFiberIdSubset(children->ElementAt(i), storage);
@@ -1140,7 +1180,10 @@ void mitk::FiberBundle::SetFiberWeights(float newWeight)
 void mitk::FiberBundle::SetFiberWeights(vtkSmartPointer<vtkFloatArray> weights)
 {
     if (m_NumFibers!=weights->GetSize())
+    {
+        MITK_INFO << "Weights array not equal to number of fibers!";
         return;
+    }
 
     for (int i=0; i<weights->GetSize(); i++)
         m_FiberWeights->SetValue(i, weights->GetValue(i));

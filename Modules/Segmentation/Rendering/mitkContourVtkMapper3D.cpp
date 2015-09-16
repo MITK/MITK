@@ -107,7 +107,6 @@ void mitk::ContourVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer* rende
     vtkIdType lastPointIndex = 0;
 
     mitk::Contour::PointsContainerPointer contourPoints = input->GetPoints();
-    mitk::Contour::PointsContainerIterator pointsIt = contourPoints->Begin();
 
     double vtkpoint[3];
 

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSet.h"
 #include "mitkPointSetSource.h"
 #include "mitkNavigationData.h"
+#include "MitkIGTExports.h"
 
 namespace mitk {
 

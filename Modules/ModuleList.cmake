@@ -3,6 +3,7 @@
 
 set(mitk_modules
   Core
+  CommandLine
   AppUtil
   DCMTesting
   RDF
@@ -61,9 +62,12 @@ set(mitk_modules
   IGTUI
   VtkShaders
   DicomRT
+  RTUI
   IOExt
   XNAT
   TubeGraph
+  BiophotonicsHardware
+  Classification
 )
 
 if(MITK_ENABLE_PIC_READER)

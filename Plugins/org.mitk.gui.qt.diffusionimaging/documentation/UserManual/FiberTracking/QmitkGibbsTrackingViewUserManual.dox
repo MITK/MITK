@@ -1,7 +1,7 @@
 /**
-\page org_mitk_views_gibbstracking Gibbs Tracking View
+\page org_mitk_views_gibbstracking Global Gibbs Tractography
 
-This view provides the user interface for the Gibbs Tracking algorithm, a global fiber tracking algorithm, originally proposed by Reisert et.al. [1].
+This view provides the user interface for the global Gibbs tractography algorithm, a global fiber tracking algorithm, originally proposed by Reisert et.al. [1].
 
 \tableofcontents
 

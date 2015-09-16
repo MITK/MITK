@@ -47,7 +47,6 @@ public:
   mitkClassMacro( PointCloudScoringFilter, UnstructuredGridToUnstructuredGridFilter)
 
   itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
 
   /** Number of Points of the scored UnstructuredGrid. These points are far away
    * from their neighbours */
@@ -72,10 +71,6 @@ protected:
   virtual ~PointCloudScoringFilter();
 
 private:
-
-  /** The output UnstructuredGrid containing the scored points, which are far
-   * aways from their neighbours */
-  mitk::UnstructuredGrid::Pointer m_OutpGrid;
 
   /** The Point IDs and their distance to their neighbours */
   std::vector< ScorePair > m_FilteredScores;

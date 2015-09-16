@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_odfmaximaextraction Peak Extraction View
+\page org_mitk_views_odfmaximaextraction ODF Peak Extraction
 
 This view provides the user interface to extract the peaks of tensors and the spherical harmonic representation of Q-Balls.
 

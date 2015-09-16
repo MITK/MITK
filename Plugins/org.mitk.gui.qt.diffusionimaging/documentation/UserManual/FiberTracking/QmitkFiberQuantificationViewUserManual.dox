@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_fiberquantification Fiber Processing View
+\page org_mitk_views_fiberquantification Fiber Quantification
 
 This view provides tools to derive additional information from exsisting fiber bundles and to quantify them:
 

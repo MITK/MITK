@@ -52,6 +52,7 @@ public:
 
   const mitk::ContourSet* GetInput(void);
 
+  using Superclass::SetInput;
   virtual void SetInput(const mitk::ContourSet *contourSet);
 
 protected:

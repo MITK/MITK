@@ -28,8 +28,8 @@ const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.Qm
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)
   : QWidget(parent)
-  , m_Controls(nullptr)
   , m_LocalIndexer(new ctkDICOMIndexer(parent))
+  , m_Controls(nullptr)
 {
     CreateQtPartControl(this);
 }
@@ -212,6 +212,11 @@ void QmitkDicomLocalStorageWidget::OnViewButtonClicked()
     QStringList filesForSeries = m_LocalDatabase->filesForSeries(uid);
     QHash<QString, QVariant> eventProperty;
     eventProperty.insert("FilesForSeries", filesForSeries);
+    if(!filesForSeries.isEmpty())
+    {
+      QString modality = m_LocalDatabase->fileValue(filesForSeries.at(0),"0008,0060");
+      eventProperty.insert("Modality", modality);
+    }
     emit SignalDicomToDataManager(eventProperty);
   }
 }

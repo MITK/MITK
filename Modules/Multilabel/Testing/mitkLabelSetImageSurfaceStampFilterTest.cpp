@@ -52,9 +52,6 @@ public:
     mitk::Label::PixelType value2 = 2;
     label2->SetValue(value2);
 
-    m_LabelSetImage->GetActiveLabelSet()->AddLabel(label1);
-    m_LabelSetImage->GetActiveLabelSet()->AddLabel(label2);
-
     m_Surface =  mitk::IOUtil::LoadSurface(GetTestDataFilePath("BallBinary30x30x30Reference.vtp"));
   }
 
@@ -71,18 +68,13 @@ public:
     filter->SetForceOverwrite(true);
     filter->SetInput(m_LabelSetImage);
     filter->Update();
-    mitk::LabelSetImage::Pointer result = dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
-    mitk::IOUtil::Save(result,"d:/tmp/output.nrrd");
+    mitk::LabelSetImage::Pointer result =dynamic_cast<mitk::LabelSetImage*>(m_LabelSetImage.GetPointer());//dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
+    //result->DisconnectPipeline();
+    //mitk::LabelSetImage::Pointer result =dynamic_cast<mitk::LabelSetImage*>(m_LabelSetImage->Clone().GetPointer());//dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
 
     mitk::LabelSetImage::Pointer expectedResult =  dynamic_cast<mitk::LabelSetImage*>(mitk::IOUtil::LoadBaseData(GetTestDataFilePath("Multilabel/StampResultBasedOnEmptyML.nrrd")).GetPointer());
-    mitk::LabelSetImage::Pointer expectedResult2 =  dynamic_cast<mitk::LabelSetImage*>(mitk::IOUtil::LoadBaseData(GetTestDataFilePath("Multilabel/StampResultBasedOnEmptyML.nrrd")).GetPointer());
-    mitk::IOUtil::Save(expectedResult,"d:/tmp/output2.nrrd");
 
-    mitk::Image::Pointer p1 = dynamic_cast<mitk::Image*>(expectedResult.GetPointer());
-    mitk::Image::Pointer p2 = dynamic_cast<mitk::Image*>(expectedResult2.GetPointer());
-
-    MITK_INFO << "Equality: " << mitk::Equal(p1, p2,10,true);
-    MITK_ASSERT_EQUAL(expectedResult, result, "Result after stamping should be equal to the saved version");
+    MITK_ASSERT_EQUAL(result, expectedResult, "Result after stamping should be equal to the saved version");
   }
 
   // Reduce contours with nth point

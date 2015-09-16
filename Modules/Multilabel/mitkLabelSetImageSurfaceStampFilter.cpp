@@ -36,7 +36,7 @@ mitk::LabelSetImageSurfaceStampFilter::~LabelSetImageSurfaceStampFilter()
 
 void mitk::LabelSetImageSurfaceStampFilter::GenerateData()
 {
-  GenerateOutputInformation();
+  //GenerateOutputInformation();
   this->SetNthOutput(0,this->GetInput(0));
 
   mitk::Image::Pointer inputImage = this->GetInput(0);
@@ -55,6 +55,7 @@ void mitk::LabelSetImageSurfaceStampFilter::GenerateData()
   mitk::Image::Pointer resultImage = surfaceToImageFilter->GetOutput();
 
   AccessByItk_2(inputImage, ItkImageProcessing, m_Surface, resultImage);
+  inputImage->DisconnectPipeline();
 }
 
 template<typename TPixel, unsigned int VImageDimension>

@@ -6,6 +6,7 @@ set(CPP_FILES
   mitkLabelSetImageIO.cpp
   mitkLabelSetImageSerializer.cpp
   mitkLabelSetImageSource.cpp
+  mitkLabelSetImageSurfaceStampFilter.cpp
   mitkLabelSetImageToSurfaceFilter.cpp
   mitkLabelSetImageToSurfaceThreadedFilter.cpp
   mitkLabelSetImageVtkMapper2D.cpp

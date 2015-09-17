@@ -38,7 +38,7 @@ namespace mitk {
  */
 class USNavigationStepTimer : public itk::Object {
 public:
-  mitkClassMacro(USNavigationStepTimer, itk::Object)
+  mitkClassMacroItkParent(USNavigationStepTimer, itk::Object)
   itkNewMacro(USNavigationStepTimer)
 
   /**

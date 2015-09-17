@@ -44,7 +44,7 @@ class PointSet;
 class USTargetPlacementQualityCalculator : public itk::Object
 {
 public:
-  mitkClassMacro(USTargetPlacementQualityCalculator, itk::Object)
+  mitkClassMacroItkParent(USTargetPlacementQualityCalculator, itk::Object)
   itkNewMacro(Self)
 
   /**

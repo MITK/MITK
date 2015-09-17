@@ -51,7 +51,7 @@ class BaseGeometry;
 class USNavigationTargetUpdateFilter : public itk::Object
 {
 public:
-  mitkClassMacro(USNavigationTargetUpdateFilter, itk::Object)
+  mitkClassMacroItkParent(USNavigationTargetUpdateFilter, itk::Object)
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 

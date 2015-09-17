@@ -43,7 +43,7 @@ class PointSet;
  */
 class USNavigationTargetIntersectionFilter : public itk::Object {
 public:
-  mitkClassMacro(USNavigationTargetIntersectionFilter, itk::Object)
+  mitkClassMacroItkParent(USNavigationTargetIntersectionFilter, itk::Object)
   itkNewMacro(Self)
 
   itkSetMacro(TargetSurface, itk::SmartPointer<mitk::Surface>)

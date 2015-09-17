@@ -43,7 +43,7 @@ namespace mitk {
 class USNavigationCombinedModalityPersistence : public itk::Object
 {
 public:
-  mitkClassMacro(USNavigationCombinedModalityPersistence, itk::Object)
+  mitkClassMacroItkParent(USNavigationCombinedModalityPersistence, itk::Object)
   itkNewMacro(Self)
 protected:
   /**

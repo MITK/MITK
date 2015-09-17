@@ -44,7 +44,7 @@ namespace mitk {
  */
 class USNavigationExperimentLogging : public itk::Object {
 public:
-  mitkClassMacro(USNavigationExperimentLogging, itk::Object)
+  mitkClassMacroItkParent(USNavigationExperimentLogging, itk::Object)
   itkNewMacro(USNavigationExperimentLogging)
 
   /**

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QtPlugin>
 
 #include "OpenIGTLinkProviderExample.h"
+#include "OpenIGTLinkImageProviderExample.h"
 #include "OpenIGTLinkExample.h"
 #include "OpenIGTLinkManager.h"
 #include "OpenIGTLinkMeasurements.h"
@@ -28,6 +29,7 @@ namespace mitk {
 
 void org_mitk_gui_qt_igtlplugin_Activator::start(ctkPluginContext* context)
 {
+  BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkImageProviderExample, context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkProviderExample, context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkExample, context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkManager, context)

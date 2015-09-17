@@ -20,6 +20,12 @@
           icon="resources/provider.png" />
   </extension>
   <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.OpenIGTLinkImageProviderExample"
+          name="OpenIGTLinkImageProviderExample"
+          class="OpenIGTLinkImageProviderExample"
+          icon="resources/example.png" />
+  </extension>
+  <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.OpenIGTLinkMeasurements"
           name="OpenIGTLinkMeasurements"
           class="OpenIGTLinkMeasurements"

@@ -14,30 +14,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSImageToIGTLMessageFilter.h"
+#include "mitkImageToIGTLMessageFilter.h"
 #include "igtlImageMessage.h"
 
-mitk::USImageToIGTLMessageFilter::USImageToIGTLMessageFilter()
+mitk::ImageToIGTLMessageFilter::ImageToIGTLMessageFilter()
 {
   mitk::IGTLMessage::Pointer output = mitk::IGTLMessage::New();
   this->SetNumberOfRequiredOutputs(1);
   this->SetNthOutput(0, output.GetPointer());
   this->SetNumberOfRequiredInputs(1);
-
-  m_CurrentTimeStep = 0;
 }
 
-mitk::USImageToIGTLMessageFilter::~USImageToIGTLMessageFilter() {}
-
-void mitk::USImageToIGTLMessageFilter::GenerateData()
+void mitk::ImageToIGTLMessageFilter::GenerateData()
 {
-    MITK_INFO << "GenerateData()";
-    for (size_t i = 0; i < this->GetNumberOfIndexedInputs(); ++i) {
+  MITK_INFO << "GenerateData()";
+
+
+
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)
+  {
     mitk::IGTLMessage* output = this->GetOutput(i);
+    assert(output);
 
     igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
-    imgMsg->SetDimensions(1, 1, 1);
-    imgMsg->SetCoordinateSystem(igtl::ImageMessage::COORDINATE_LPS);
+
+    // TODO: Actually use the data of this->GetInput(i) (itk::Image*)
+
+    imgMsg->SetDimensions(256, 256, 1);
+    imgMsg->SetCoordinateSystem(igtl::ImageMessage::COORDINATE_RAS);
     imgMsg->SetEndian(igtl::ImageMessage::ENDIAN_LITTLE);
     igtl::Matrix4x4 atm;
     memset(atm, '\0', sizeof(atm));
@@ -49,15 +53,28 @@ void mitk::USImageToIGTLMessageFilter::GenerateData()
     imgMsg->SetNumComponents(1);
     imgMsg->SetScalarTypeToUint8();
 
-    output->SetMessage((igtl::MessageBase::Pointer)imgMsg);
+    imgMsg->AllocatePack();
+    imgMsg->AllocateScalars();
+
+    unsigned char* buf = (unsigned char*) imgMsg->GetScalarPointer();
+    for (int i = 0; i < 256; ++i) {
+        for (int j = 0; j < 256; ++j) {
+            buf[256*i + j] = (i + j) % 256;
+        }
     }
-    return;
+
+    imgMsg->Pack();
+
+    output->SetMessage(imgMsg.GetPointer());
+  }
+
+  return;
 
   for (size_t i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
-    const mitk::USImage* input = this->GetInput(i);
+    const mitk::Image* input = this->GetInput(i);
     assert(input);
 
     int dim = input->GetDimension();
@@ -72,8 +89,8 @@ void mitk::USImageToIGTLMessageFilter::GenerateData()
     // need to convert
     imgMsg->SetCoordinateSystem(igtl::ImageMessage::COORDINATE_RAS);
 
-    mitk::USImageMetadata::Pointer md = input->GetMetadata();
-    imgMsg->SetDeviceName(md->GetProbeName().c_str());
+//    mitk::ImageMetadata::Pointer md = input->GetMetadata();
+//    imgMsg->SetDeviceName(md->GetProbeName().c_str());
 
     const mitk::PixelType pt = input->GetPixelType(0);
     switch (pt.GetComponentType())
@@ -135,37 +152,37 @@ void mitk::USImageToIGTLMessageFilter::GenerateData()
   }
 }
 
-void mitk::USImageToIGTLMessageFilter::SetInput(const USImage* im)
+void mitk::ImageToIGTLMessageFilter::SetInput(const mitk::Image* img)
 {
-  this->ProcessObject::SetNthInput(0, const_cast<USImage*>(im));
+  this->ProcessObject::SetNthInput(0, const_cast<Image*>(img));
   this->CreateOutputsForAllInputs();
 }
 
-void mitk::USImageToIGTLMessageFilter::SetInput(unsigned int idx, const USImage* im)
+void mitk::ImageToIGTLMessageFilter::SetInput(unsigned int idx,
+                                                      const Image* img)
 {
-  this->ProcessObject::SetNthInput(idx, const_cast<USImage*>(im));
+  this->ProcessObject::SetNthInput(idx, const_cast<Image*>(img));
   this->CreateOutputsForAllInputs();
 }
 
-const mitk::USImage* mitk::USImageToIGTLMessageFilter::GetInput(void)
-{
-  if (this->GetNumberOfInputs() < 1)
-  {
-    return NULL;
-  }
-  return static_cast<const USImage*>(this->ProcessObject::GetInput(0));
-}
-
-const mitk::USImage* mitk::USImageToIGTLMessageFilter::GetInput(unsigned int idx)
+const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(unsigned int idx)
 {
   if (this->GetNumberOfInputs() < idx + 1)
   {
     return NULL;
   }
-  return static_cast<const USImage*>(this->ProcessObject::GetInput(idx));
+  return static_cast<const Image*>(this->ProcessObject::GetInput(idx));
 }
 
-void mitk::USImageToIGTLMessageFilter::CreateOutputsForAllInputs()
+void mitk::ImageToIGTLMessageFilter::ConnectTo(mitk::ImageSource* upstream)
+{
+    for (DataObjectPointerArraySizeType i = 0; i < upstream->GetNumberOfOutputs(); i++)
+    {
+      this->SetInput(i, upstream->GetOutput(i));
+    }
+}
+
+void mitk::ImageToIGTLMessageFilter::CreateOutputsForAllInputs()
 {
   // create one message output for all image inputs
   this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
@@ -178,9 +195,16 @@ void mitk::USImageToIGTLMessageFilter::CreateOutputsForAllInputs()
     }
     this->Modified();
   }
-}
 
-void mitk::USImageToIGTLMessageFilter::ConnectTo(mitk::USImageSource* upstream)
-{
-  this->SetInput(static_cast<USImage*>(upstream->GetNextImage().GetPointer()));
+
+  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
+  {
+    if (this->GetOutput(idx) == NULL)
+    {
+      DataObjectPointer newOutput = this->MakeOutput(idx);
+      this->SetNthOutput(idx, newOutput);
+    }
+    this->Modified();
+  }
+
 }

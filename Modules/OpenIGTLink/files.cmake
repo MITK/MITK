@@ -13,4 +13,6 @@ set(CPP_FILES
   mitkIGTLMessageProvider.cpp
   mitkIGTLMeasurements.cpp
   mitkIGTLModuleActivator.cpp
+
+  Filters/mitkImageToIGTLMessageFilter.cpp
 )

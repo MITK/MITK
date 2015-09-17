@@ -72,6 +72,7 @@ void QmitkXnatSessionManager::CreateXnatSession()
   profile.setDefault(true);
 
   m_Session = new ctkXnatSession(profile);
+  m_Session->setUseSystemProxyConfiguration(true);
 
   m_SessionRegistration = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->RegisterService(m_Session);
 }

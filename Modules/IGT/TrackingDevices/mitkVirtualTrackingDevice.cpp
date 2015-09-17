@@ -23,12 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <time.h>
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
+#include <random>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(),
-  m_AllTools(), m_ToolsMutex(NULL), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20)
+m_AllTools(), m_ToolsMutex(NULL), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20), m_GaussianNoiseEnabled(false),
+m_MeanDistributionParam(0.0), m_DeviationDistributionParam(1.0)
 {
   m_Data = mitk::DeviceDataVirtualTracker;
   m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -400.0;  // initialize bounds to -400 ... +400 (mm) cube
@@ -247,6 +249,17 @@ void mitk::VirtualTrackingDevice::TrackTools()
         pos = currentTool->GetSpline()->EvaluateSpline(t);
         mitk::Point3D mp;
         mitk::itk2vtk(pos, mp); // convert from SplineType::PointType to mitk::Point3D
+
+    //Add Gaussian Noise to Tracking Coordinates if enabled
+    if (this->m_GaussianNoiseEnabled)
+    {
+      std::random_device rd;
+      std::mt19937 generator(rd());
+      std::normal_distribution<double> dist(this->m_MeanDistributionParam, this->m_DeviationDistributionParam);
+      double noise = dist(generator);
+      mp = mp + noise;
+    }
+
         currentTool->SetPosition(mp);
         // Currently, a constant speed is used. TODO: use tool velocity setting
         t += 0.001;
@@ -315,4 +328,31 @@ mitk::VirtualTrackingDevice::ControlPointType mitk::VirtualTrackingDevice::GetRa
   pos[2] = m_Bounds[4] + (m_Bounds[5] - m_Bounds[4]) * (rand() / (RAND_MAX + 1.0));  // Z
 
   return pos;
+}
+
+
+void mitk::VirtualTrackingDevice::EnableGaussianNoise()
+{
+  this->m_GaussianNoiseEnabled = true;
+}
+
+void mitk::VirtualTrackingDevice::DisableGaussianNoise()
+{
+  this->m_GaussianNoiseEnabled = false;
+}
+
+void mitk::VirtualTrackingDevice::SetParamsForGaussianNoise(double meanDistribution, double deviationDistribution)
+{
+  this->m_MeanDistributionParam = meanDistribution;
+  this->m_DeviationDistributionParam = deviationDistribution;
+}
+
+double mitk::VirtualTrackingDevice::GetDeviationDistribution()
+{
+  return m_DeviationDistributionParam;
+}
+
+double mitk::VirtualTrackingDevice::GetMeanDistribution()
+{
+  return m_MeanDistributionParam;
 }

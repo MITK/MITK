@@ -216,6 +216,9 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_OptitrackCalibrationFile.*/
     void SetOptitrackCalibrationFileClicked();
 
+    /* @brief Enables or disables the Gaussian Noise for the VirtualTrackingDevice dependent on the State of the according Checkbox */
+    void EnableGaussianNoise();
+
   private:
     PERSISTENCE_GET_SERVICE_METHOD_MACRO
 };

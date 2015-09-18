@@ -296,7 +296,37 @@ bool mitk::USDevice::Activate()
     if ( bmodeControls.IsNotNull() ) { bmodeControls->Initialize(); }
   }
 
+  ProvideViaOIGTL();
+
   return m_DeviceState == State_Activated;
+}
+
+void mitk::USDevice::ProvideViaOIGTL() {
+    // create a new OpenIGTLink Client
+    m_IGTLServer = mitk::IGTLServer::New();
+    m_IGTLServer->SetName("OIGTL Video provider");
+
+    // create a new OpenIGTLink Device source
+    m_IGTLMessageProvider = mitk::IGTLMessageProvider::New();
+
+    // set the OpenIGTLink server as the source for the device source
+    m_IGTLMessageProvider->SetIGTLDevice(m_IGTLServer);
+
+    // register the provider so that it can be configured with the IGTL manager
+    // plugin. This could be hardcoded but now I already have the fancy plugin.
+    m_IGTLMessageProvider->RegisterAsMicroservice();
+
+    m_ImageToIGTLMsgFilter = mitk::ImageToIGTLMessageFilter::New();
+    m_ImageToIGTLMsgFilter->ConnectTo(this);
+
+    // set the name of this filter to identify it easier
+    m_ImageToIGTLMsgFilter->SetName(this->GetName());
+
+    // register this filter as micro service. The message provider looks for
+    // provided IGTLMessageSources, once it found this microservice and someone
+    // requested this data type then the provider will connect with this filter
+    // automatically.
+    m_ImageToIGTLMsgFilter->RegisterAsMicroservice();
 }
 
 void mitk::USDevice::Deactivate()
@@ -310,10 +340,16 @@ void mitk::USDevice::Deactivate()
 
   if ( ! OnDeactivation() ) { return; }
 
+  DisableOIGTL();
   m_DeviceState = State_Connected;
 
   this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, false);
   this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, this->GetServicePropertyLabel());
+}
+
+void mitk::USDevice::DisableOIGTL() {
+    m_IGTLMessageProvider->UnRegisterMicroservice();
+    m_ImageToIGTLMsgFilter->UnRegisterMicroservice();
 }
 
 void mitk::USDevice::SetIsFreezed(bool freeze)

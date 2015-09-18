@@ -56,6 +56,11 @@ class MITKOPENIGTLINK_EXPORT ImageToIGTLMessageFilter : public IGTLMessageSource
   virtual void SetInput(unsigned int idx, const Image* img);
 
   /**
+  * \brief Returns the input of this filter
+  */
+  const mitk::Image* GetInput();
+
+  /**
    * \brief Returns the input of this filter
    */
   const mitk::Image* GetInput(unsigned int idx);
@@ -85,6 +90,8 @@ class MITKOPENIGTLINK_EXPORT ImageToIGTLMessageFilter : public IGTLMessageSource
   * \brief create output objects for all inputs
   */
   virtual void CreateOutputsForAllInputs();
+
+  mitk::ImageSource* m_Upstream;
 };
 }  // namespace mitk
 

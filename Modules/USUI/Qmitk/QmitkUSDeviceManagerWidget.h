@@ -27,7 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QListWidgetItem>
 
 
-
 /**
 * @brief This Widget is used to manage available Ultrasound Devices.
 *
@@ -69,11 +68,6 @@ class MITKUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
     \brief Called, when the button "Activate Device" was clicked.
     */
     void OnClickedActivateDevice();
-
-    /*
-    \brief Called, when the button "Provide via OpenIGTLink" was clicked.
-    */
-    void OnClickedOIGTL();
 
     /*
     \brief Called, when the button "Disconnect Device" was clicked.

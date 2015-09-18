@@ -99,37 +99,6 @@ void QmitkUSDeviceManagerWidget::OnClickedActivateDevice()
   OnDeviceSelectionChanged(m_Controls->m_ConnectedDevices->GetSelectedServiceReference());
 }
 
-void QmitkUSDeviceManagerWidget::OnClickedOIGTL()
-{
-    mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
-    if (device.IsNull()) { return; }
-
-    if (device->GetIsActive())
-    {
-        device->Deactivate();
-        device->Disconnect();
-    }
-    else
-    {
-        QApplication::setOverrideCursor(Qt::WaitCursor);
-        if (device->GetDeviceState() < mitk::USDevice::State_Connected ) { device->Connect(); }
-        if (device->GetIsConnected()) { device->Activate(); }
-        QApplication::restoreOverrideCursor();
-
-        if (! device->GetIsActive())
-        {
-            QMessageBox::warning(this, "Activation failed", "Could not activate device. Check logging for details.");
-        }
-        else
-        {
-            emit DeviceActivated();
-        }
-    }
-
-    // Manually reevaluate Button logic
-    OnDeviceSelectionChanged(m_Controls->m_ConnectedDevices->GetSelectedServiceReference());
-}
-
 void QmitkUSDeviceManagerWidget::OnClickedDisconnectDevice(){
   mitk::USDevice::Pointer device = m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
   if (device.IsNull()) { return; }

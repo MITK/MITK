@@ -29,6 +29,7 @@ mitk::ImageToIGTLMessageFilter::ImageToIGTLMessageFilter()
 
 void mitk::ImageToIGTLMessageFilter::GenerateData()
 {
+    MITK_INFO << "ImageToIGTLMessageFilter.GenerateData()";
   for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
@@ -189,15 +190,22 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
 
 void mitk::ImageToIGTLMessageFilter::SetInput(const mitk::Image* img)
 {
-  this->ProcessObject::SetNthInput(0, const_cast<Image*>(img));
+  this->ProcessObject::SetNthInput(0, const_cast<mitk::Image*>(img));
   this->CreateOutputsForAllInputs();
 }
 
 void mitk::ImageToIGTLMessageFilter::SetInput(unsigned int idx,
                                               const Image* img)
 {
-  this->ProcessObject::SetNthInput(idx, const_cast<Image*>(img));
+  this->ProcessObject::SetNthInput(idx, const_cast<mitk::Image*>(img));
   this->CreateOutputsForAllInputs();
+}
+
+const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput( void )
+{
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+  return static_cast<const mitk::Image*>(this->ProcessObject::GetInput(0));
 }
 
 const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(unsigned int idx)
@@ -206,11 +214,12 @@ const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(unsigned int idx)
   {
     return NULL;
   }
-  return static_cast<const Image*>(this->ProcessObject::GetInput(idx));
+  return static_cast<const mitk::Image*>(this->ProcessObject::GetInput(idx));
 }
 
 void mitk::ImageToIGTLMessageFilter::ConnectTo(mitk::ImageSource* upstream)
 {
+    MITK_INFO << "Upstream is " << upstream;
   for (DataObjectPointerArraySizeType i = 0; i < upstream->GetNumberOfOutputs();
        i++)
   {

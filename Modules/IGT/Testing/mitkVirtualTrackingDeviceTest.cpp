@@ -42,6 +42,13 @@ class mitkVirtualTrackingDeviceTestSuite : public mitk::TestFixture
   MITK_TEST(GetToolCount_SeveralToolsAdded);
   MITK_TEST(GetTool);
   MITK_TEST(SettingAndGettingCorrectBounds);
+  MITK_TEST(SetToolSpeed_InvalidSpeed_Error);
+  MITK_TEST(SetToolSpeed_InvalidToolNumber_Error);
+  MITK_TEST(GetSplineCordLength_ValidToolIndex);
+  MITK_TEST(GetSplineCordLength_InvaldiToolIndex_Error);
+  MITK_TEST(StartTracking_NewPositionsProduced);
+  MITK_TEST(SetParamsForGaussianNoise_GetCorrrectParams);
+
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -53,12 +60,12 @@ public:
 
   void setUp()
   {
-   m_TestTracker = mitk::VirtualTrackingDevice::New();
+    m_TestTracker = mitk::VirtualTrackingDevice::New();
   }
 
   void tearDown()
   {
-
+    m_TestTracker->CloseConnection();
   }
 
   void NewVirtualTrackingDevice_IsCreated()
@@ -125,6 +132,58 @@ public:
     CPPUNIT_ASSERT_EQUAL(bounds[3], m_TestTracker->GetBounds()[3]);
     CPPUNIT_ASSERT_EQUAL(bounds[4], m_TestTracker->GetBounds()[4]);
     CPPUNIT_ASSERT_EQUAL(bounds[5], m_TestTracker->GetBounds()[5]);
+  }
+
+  void SetToolSpeed_InvalidSpeed_Error()
+  {
+    m_TestTracker->AddTool("Tool1");
+    CPPUNIT_ASSERT_THROW(m_TestTracker->SetToolSpeed(0, -1), std::invalid_argument);
+  }
+
+  void SetToolSpeed_InvalidToolNumber_Error()
+  {
+    m_TestTracker->AddTool("Tool1");
+    CPPUNIT_ASSERT_THROW(m_TestTracker->SetToolSpeed(1, 0.1), std::invalid_argument);
+  }
+
+  void GetSplineCordLength_ValidToolIndex()
+  {
+    m_TestTracker->AddTool("Tool1");
+    mitk::ScalarType lengthBefore = m_TestTracker->GetSplineChordLength(0);
+    m_TestTracker->OpenConnection();
+    m_TestTracker->StartTracking();
+    m_TestTracker->StopTracking();
+    CPPUNIT_ASSERT_EQUAL(lengthBefore, m_TestTracker->GetSplineChordLength(0));
+  }
+
+  void GetSplineCordLength_InvaldiToolIndex_Error()
+  {
+    CPPUNIT_ASSERT_THROW(m_TestTracker->GetSplineChordLength(0), std::invalid_argument);
+  }
+
+  void StartTracking_NewPositionsProduced()
+  {
+    m_TestTracker->AddTool("Tool1");
+    mitk::Point3D posBefore;
+    mitk::Point3D posAfter;
+    mitk::TrackingTool::Pointer tool = m_TestTracker->GetToolByName("Tool1");
+    tool->GetPosition(posBefore);
+    tool->GetPosition(posAfter);
+    CPPUNIT_ASSERT_EQUAL(posBefore, posAfter);
+    m_TestTracker->OpenConnection();
+    m_TestTracker->StartTracking();
+    itksys::SystemTools::Delay(500);  //wait for tracking thread to start generating positions
+    tool->GetPosition(posAfter);
+    CPPUNIT_ASSERT(posBefore != posAfter);
+  }
+
+  void SetParamsForGaussianNoise_GetCorrrectParams()
+  {
+    double meanDistribution = 2.5;
+    double deviationDistribution = 1.2;
+    m_TestTracker->SetParamsForGaussianNoise(meanDistribution, deviationDistribution);
+    CPPUNIT_ASSERT_EQUAL(meanDistribution, m_TestTracker->GetMeanDistribution());
+    CPPUNIT_ASSERT_EQUAL(deviationDistribution, m_TestTracker->GetDeviationDistribution());
   }
 
 };

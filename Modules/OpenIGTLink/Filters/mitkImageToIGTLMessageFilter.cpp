@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkImageToIGTLMessageFilter.h"
+#include "mitkImageReadAccessor.h"
+#include "itkByteSwapper.h"
 #include "igtlImageMessage.h"
 
 mitk::ImageToIGTLMessageFilter::ImageToIGTLMessageFilter()
@@ -27,128 +29,161 @@ mitk::ImageToIGTLMessageFilter::ImageToIGTLMessageFilter()
 
 void mitk::ImageToIGTLMessageFilter::GenerateData()
 {
-  MITK_INFO << "GenerateData()";
-
-
-
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
 
+    const mitk::Image* img = this->GetInput(i);
+
+    int dims = img->GetDimension();
+    if (dims > 3)
+    {
+      MITK_ERROR << "Can not handle more than three dimensions";
+      continue;
+    }
+
+    if (img->GetNumberOfChannels() != 1)
+    {
+      MITK_ERROR << "Can not handle more than one channel";
+      continue;
+    }
+
     igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
 
-    // TODO: Actually use the data of this->GetInput(i) (itk::Image*)
-
-    imgMsg->SetDimensions(256, 256, 1);
+    // TODO: Which kind of coordinate system does MITK really use?
     imgMsg->SetCoordinateSystem(igtl::ImageMessage::COORDINATE_RAS);
-    imgMsg->SetEndian(igtl::ImageMessage::ENDIAN_LITTLE);
-    igtl::Matrix4x4 atm;
-    memset(atm, '\0', sizeof(atm));
-    atm[0][0] = 1;
-    atm[1][1] = -1;
-    atm[2][2] = 1;
-    atm[3][3] = 1;
-    imgMsg->SetMatrix(atm);
-    imgMsg->SetNumComponents(1);
-    imgMsg->SetScalarTypeToUint8();
 
+    // We could do this based on the host endiannes, but that's weird.
+    // We instead use little endian, as most modern systems are little endian,
+    // so there will probably not be an endian swap involved.
+    imgMsg->SetEndian(igtl::ImageMessage::ENDIAN_LITTLE);
+
+    // Set number of components.
+    mitk::PixelType type = img->GetPixelType();
+    imgMsg->SetNumComponents(type.GetNumberOfComponents());
+
+    // Set scalar type.
+    switch (type.GetComponentType())
+    {
+      case itk::ImageIOBase::CHAR:
+        imgMsg->SetScalarTypeToInt8();
+        break;
+      case itk::ImageIOBase::UCHAR:
+        imgMsg->SetScalarTypeToUint8();
+        break;
+      case itk::ImageIOBase::SHORT:
+        imgMsg->SetScalarTypeToInt16();
+        break;
+      case itk::ImageIOBase::USHORT:
+        imgMsg->SetScalarTypeToUint16();
+        break;
+      case itk::ImageIOBase::INT:
+        imgMsg->SetScalarTypeToInt32();
+        break;
+      case itk::ImageIOBase::UINT:
+        imgMsg->SetScalarTypeToUint32();
+        break;
+      case itk::ImageIOBase::LONG:
+        // OIGTL doesn't formally support 64bit int scalars, but if they are
+        // ever added,
+        // they will have the identifier 8 assigned.
+        imgMsg->SetScalarType(8);
+        break;
+      case itk::ImageIOBase::ULONG:
+        // OIGTL doesn't formally support 64bit uint scalars, but if they are
+        // ever added,
+        // they will have the identifier 9 assigned.
+        imgMsg->SetScalarType(9);
+        break;
+      case itk::ImageIOBase::FLOAT:
+        // The igtl library has no method for this. Correct type is 10.
+        imgMsg->SetScalarType(10);
+        break;
+      case itk::ImageIOBase::DOUBLE:
+        // The igtl library has no method for this. Correct type is 11.
+        imgMsg->SetScalarType(11);
+        break;
+      default:
+        MITK_ERROR << "Can not handle pixel component type "
+                   << type.GetComponentType();
+        return;
+    }
+
+    // Set transformation matrix.
+    const vtkMatrix4x4* matrix = img->GetGeometry()->GetVtkMatrix();
+
+    float matF[4][4];
+    for (size_t i = 0; i < 4; ++i)
+    {
+      for (size_t j = 0; j < 4; ++j)
+      {
+        matF[i][j] = *matrix[i][j];
+      }
+    }
+    imgMsg->SetMatrix(matF);
+
+    // Set dimensions.
+    int sizes[3];
+    for (size_t j = 0; j < 3; ++j)
+    {
+      sizes[j] = img->GetDimension(j);
+    }
+    imgMsg->SetDimensions(sizes);
+
+    // Allocate and copy data.
     imgMsg->AllocatePack();
     imgMsg->AllocateScalars();
 
-    unsigned char* buf = (unsigned char*) imgMsg->GetScalarPointer();
-    for (int i = 0; i < 256; ++i) {
-        for (int j = 0; j < 256; ++j) {
-            buf[256*i + j] = (i + j) % 256;
-        }
+    size_t num_pixel = sizes[0] * sizes[1] * sizes[2];
+    void* out = imgMsg->GetScalarPointer();
+    {
+      // Scoped, so that readAccess will be released ASAP.
+      mitk::ImageReadAccessor readAccess(img, img->GetChannelData(0));
+      const void* in = readAccess.GetData();
+
+      memcpy(out, in, num_pixel * type.GetSize());
+    }
+
+    // We want to byte swap to little endian. We would like to just
+    // swap by number of bytes for each component, but itk::ByteSwapper
+    // is templated over element type, not over element size. So we need to
+    // switch on the size and use types of the same size.
+    size_t num_scalars = num_pixel * type.GetNumberOfComponents();
+    switch (type.GetComponentType())
+    {
+      case itk::ImageIOBase::CHAR:
+      case itk::ImageIOBase::UCHAR:
+        // No endian conversion necessary.
+        break;
+      case itk::ImageIOBase::SHORT:
+      case itk::ImageIOBase::USHORT:
+        itk::ByteSwapper<short>::SwapRangeFromSystemToLittleEndian((short*)out,
+                                                                   num_scalars);
+        break;
+      case itk::ImageIOBase::INT:
+      case itk::ImageIOBase::UINT:
+        itk::ByteSwapper<int>::SwapRangeFromSystemToLittleEndian((int*)out,
+                                                                 num_scalars);
+        break;
+      case itk::ImageIOBase::LONG:
+      case itk::ImageIOBase::ULONG:
+        itk::ByteSwapper<long>::SwapRangeFromSystemToLittleEndian((long*)out,
+                                                                  num_scalars);
+        break;
+      case itk::ImageIOBase::FLOAT:
+        itk::ByteSwapper<float>::SwapRangeFromSystemToLittleEndian((float*)out,
+                                                                   num_scalars);
+        break;
+      case itk::ImageIOBase::DOUBLE:
+        itk::ByteSwapper<double>::SwapRangeFromSystemToLittleEndian(
+            (double*)out, num_scalars);
+        break;
     }
 
     imgMsg->Pack();
 
     output->SetMessage(imgMsg.GetPointer());
-  }
-
-  return;
-
-  for (size_t i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
-  {
-    mitk::IGTLMessage* output = this->GetOutput(i);
-    assert(output);
-    const mitk::Image* input = this->GetInput(i);
-    assert(input);
-
-    int dim = input->GetDimension();
-
-    if (dim > 3)
-    {
-      mitkThrow() << "Too many dimensions";
-    }
-
-    igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
-    // TODO: Find out, if MITK uses RAS or LPS or something else entirely and we
-    // need to convert
-    imgMsg->SetCoordinateSystem(igtl::ImageMessage::COORDINATE_RAS);
-
-//    mitk::ImageMetadata::Pointer md = input->GetMetadata();
-//    imgMsg->SetDeviceName(md->GetProbeName().c_str());
-
-    const mitk::PixelType pt = input->GetPixelType(0);
-    switch (pt.GetComponentType())
-    {
-      case itk::ImageIOBase::UCHAR:
-        imgMsg->SetScalarType(igtl::ImageMessage::TYPE_UINT8);
-      case itk::ImageIOBase::CHAR:
-        imgMsg->SetScalarType(igtl::ImageMessage::TYPE_INT8);
-      case itk::ImageIOBase::USHORT:
-        imgMsg->SetScalarType(igtl::ImageMessage::TYPE_UINT16);
-      case itk::ImageIOBase::SHORT:
-        imgMsg->SetScalarType(igtl::ImageMessage::TYPE_INT16);
-      case itk::ImageIOBase::UINT:
-        imgMsg->SetScalarType(igtl::ImageMessage::TYPE_UINT32);
-      case itk::ImageIOBase::INT:
-        imgMsg->SetScalarType(igtl::ImageMessage::TYPE_INT32);
-      case itk::ImageIOBase::FLOAT:
-        imgMsg->SetScalarType(igtl::ImageMessage::TYPE_FLOAT32);
-      case itk::ImageIOBase::DOUBLE:
-        imgMsg->SetScalarType(igtl::ImageMessage::TYPE_FLOAT64);
-      default:
-        mitkThrow() << "Incompatible PixelType " << pt.GetPixelTypeAsString();
-    }
-
-    imgMsg->SetNumComponents(pt.GetNumberOfComponents());
-
-    // TODO: Endian
-
-    switch (dim)
-    {
-      case 2:
-        imgMsg->SetDimensions(input->GetDimension(0), input->GetDimension(1),
-                              1);
-      case 3:
-        imgMsg->SetDimensions((int*)input->GetDimensions());
-      default:
-        mitkThrow() << "Too few dimensions";
-    }
-
-    // TODO: Origin, Geometry, spacing…
-    mitk::SlicedGeometry3D* geometry = input->GetSlicedGeometry();
-
-    Vector3D x = geometry->GetAxisVector(0);
-    Vector3D y = geometry->GetAxisVector(1);
-    Vector3D z = geometry->GetAxisVector(2);
-
-    float t[3] = {(float)x[0], (float)x[1], (float)x[2]};
-    float s[3] = {(float)y[0], (float)y[1], (float)y[2]};
-    float n[3] = {(float)z[0], (float)z[1], (float)z[2]};
-
-    imgMsg->SetNormals(t, s, n);
-
-    mitk::Vector3D spacing = geometry->GetSpacing();
-    imgMsg->SetSpacing(spacing[0], spacing[1], spacing[2]);
-
-    Point3D origin = geometry->GetOrigin();
-    float forigin[3] = {(float)origin[0], (float)origin[1], (float)origin[2]};
-    imgMsg->SetOrigin(forigin);
   }
 }
 
@@ -159,7 +194,7 @@ void mitk::ImageToIGTLMessageFilter::SetInput(const mitk::Image* img)
 }
 
 void mitk::ImageToIGTLMessageFilter::SetInput(unsigned int idx,
-                                                      const Image* img)
+                                              const Image* img)
 {
   this->ProcessObject::SetNthInput(idx, const_cast<Image*>(img));
   this->CreateOutputsForAllInputs();
@@ -176,10 +211,11 @@ const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(unsigned int idx)
 
 void mitk::ImageToIGTLMessageFilter::ConnectTo(mitk::ImageSource* upstream)
 {
-    for (DataObjectPointerArraySizeType i = 0; i < upstream->GetNumberOfOutputs(); i++)
-    {
-      this->SetInput(i, upstream->GetOutput(i));
-    }
+  for (DataObjectPointerArraySizeType i = 0; i < upstream->GetNumberOfOutputs();
+       i++)
+  {
+    this->SetInput(i, upstream->GetOutput(i));
+  }
 }
 
 void mitk::ImageToIGTLMessageFilter::CreateOutputsForAllInputs()
@@ -196,7 +232,6 @@ void mitk::ImageToIGTLMessageFilter::CreateOutputsForAllInputs()
     this->Modified();
   }
 
-
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
   {
     if (this->GetOutput(idx) == NULL)
@@ -206,5 +241,4 @@ void mitk::ImageToIGTLMessageFilter::CreateOutputsForAllInputs()
     }
     this->Modified();
   }
-
 }

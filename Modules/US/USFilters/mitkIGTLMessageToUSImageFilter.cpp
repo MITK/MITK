@@ -24,16 +24,13 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
   m_upstream->Update();
 
   mitk::IGTLMessage* msg = m_upstream->GetOutput();
-  if (!msg->IsDataValid()) {
-      return;
+  if (!msg->IsDataValid())
+  {
+    return;
   }
 
   igtl::MessageBase::Pointer msgBase = msg->GetMessage();
   igtl::ImageMessage* imgMsg = (igtl::ImageMessage*)(msgBase.GetPointer());
-
-  MITK_INFO << "<ImageMessage>";
-  imgMsg->Print(std::cout);
-  MITK_INFO << "</ImageMessage>";
 
   if (imgMsg->GetNumComponents() != 1)
   {
@@ -82,7 +79,8 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
 
 template <typename TPixel>
 void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
-                                                igtl::ImageMessage* msg, bool big_endian)
+                                                igtl::ImageMessage* msg,
+                                                bool big_endian)
 {
   typedef itk::Image<TPixel, 3> ImageType;
 
@@ -103,7 +101,8 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
     num_pixel *= dims[i];
   }
 
-  // Handle subvolume information. We want the subvolume to be the whole image for now.
+  // Handle subvolume information. We want the subvolume to be the whole image
+  // for now.
   int sdims[3], offs[3];
   msg->GetSubVolume(sdims, offs);
   for (size_t i = 0; i < 3; i++)
@@ -136,11 +135,15 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   TPixel* in = (TPixel*)msg->GetScalarPointer();
   TPixel* out = (TPixel*)output->GetBufferPointer();
   memcpy(out, in, num_pixel * sizeof(TPixel));
-  if (big_endian) {
-    // Even though this method is called "FromSystemToBigEndian", it also swaps "FromBigEndianToSystem".
+  if (big_endian)
+  {
+    // Even though this method is called "FromSystemToBigEndian", it also swaps
+    // "FromBigEndianToSystem".
     // This makes sense, but might be confusing at first glance.
     itk::ByteSwapper<TPixel>::SwapRangeFromSystemToBigEndian(out, num_pixel);
-  } else {
+  }
+  else
+  {
     itk::ByteSwapper<TPixel>::SwapRangeFromSystemToLittleEndian(out, num_pixel);
   }
 

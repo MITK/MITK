@@ -231,14 +231,4 @@ void mitk::ImageToIGTLMessageFilter::CreateOutputsForAllInputs()
     }
     this->Modified();
   }
-
-  for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
-  {
-    if (this->GetOutput(idx) == NULL)
-    {
-      DataObjectPointer newOutput = this->MakeOutput(idx);
-      this->SetNthOutput(idx, newOutput);
-    }
-    this->Modified();
-  }
 }

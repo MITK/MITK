@@ -355,5 +355,5 @@ mitk::TimeGeometry::Pointer
     timeGeometry->AppendTimeStepClone(templateGeometry,bounds[1],bounds[0]);
   }
 
-  return timeGeometry;
+  return timeGeometry.GetPointer();
 };

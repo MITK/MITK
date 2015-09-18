@@ -144,8 +144,8 @@ public:
       AddSaveAndRestoreScenario(OneEmptyNode);
       AddSaveAndRestoreScenario(OneEmptyNamedNode);
       AddSaveAndRestoreScenario(ManyTopLevelNodes);
-      //AddSaveAndRestoreScenario(LineOfManyOnlyChildren);
-      //AddSaveAndRestoreScenario(ComplicatedFamilySituation);
+      AddSaveAndRestoreScenario(LineOfManyOnlyChildren);
+      AddSaveAndRestoreScenario(ComplicatedFamilySituation);
   }
 
 

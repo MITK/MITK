@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include "mitkSceneIO.h"
 #include "mitkSceneIOTestScenarioProvider.h"
+#include "mitkDataStorageCompare.h"
 
 /**
   \brief Test cases for SceneIO.
@@ -130,7 +131,15 @@ public:
         mitk::DataStorage::Pointer restoredStorage;
         CPPUNIT_ASSERT_NO_THROW(restoredStorage = reader->LoadScene(archiveFilename));
         CPPUNIT_ASSERT_MESSAGE(std::string("Comparing restored test scenario '") + scenario.key + "'",
-            true // TODO test something!
+            mitk::DataStorageCompare(originalStorage,
+                                     restoredStorage,
+                                     mitk::DataStorageCompare::CMP_Hierarchy
+                                     //mitk::DataStorageCompare::CMP_Data |
+                                     //mitk::DataStorageCompare::CMP_Properties |
+                                     //mitk::DataStorageCompare::CMP_Mappers |
+                                     //mitk::DataStorageCompare::CMP_Interactors
+                                     // mappers and interactors skipped for now
+                                     ).CompareVerbose()
             );
       }
     }

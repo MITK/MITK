@@ -17,9 +17,7 @@ setup(name='MultiSpectralImaging',
       license='BSD',
       packages=find_packages(exclude=['test*']),
       package_dir={},
-      package_data={'data':['*.txt','*.mci','*.nrrd']},
-      install_requires=['numpy>=1.8.2', 'scipy>=0.15.1',
-                        'pymiecoated>=0.1.1'],
-      easy_install=['SimpleITK'],
+      package_data={'data':['*.txt', '*.mci', '*.nrrd']},
+      install_requires=['numpy>=1.8.2', 'scipy>=0.15.1','SimpleITK>=0.9.0'],
       entry_points={}  # for scripts, add later
      )

@@ -30,10 +30,8 @@ class MITKUS_EXPORT USIGTLDevice : public mitk::USDevice
 {
  public:
   mitkClassMacro(USIGTLDevice, mitk::USDevice);
-  // To open a device (Manufacturer, Model, Host, Port)
+  // To open a device (Manufacturer, Model, Hostname, Port)
   mitkNewMacro4Param(Self, std::string, std::string, std::string, int);
-  // To open a device (Manufacturer, Model)
-  mitkNewMacro2Param(Self, std::string, std::string);
 
   virtual std::string GetDeviceClass();
   virtual USImageSource::Pointer GetUSImageSource();
@@ -50,11 +48,11 @@ class MITKUS_EXPORT USIGTLDevice : public mitk::USDevice
   virtual bool OnDeactivation();
 
  private:
-  mitk::IGTLClient::Pointer m_Client;
-  mitk::IGTLDeviceSource::Pointer m_DeviceSource;
-  mitk::IGTLMessageToUSImageFilter::Pointer m_Filter;
   std::string m_Host;
   int m_Port;
+  mitk::IGTLDevice::Pointer m_Device;
+  mitk::IGTLDeviceSource::Pointer m_DeviceSource;
+  mitk::IGTLMessageToUSImageFilter::Pointer m_Filter;
 };
 
 }  // namespace mitk

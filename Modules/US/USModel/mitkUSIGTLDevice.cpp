@@ -16,23 +16,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkUSIGTLDevice.h>
 
-mitk::USIGTLDevice::USIGTLDevice(std::string manufacturer, std::string model)
-  : USIGTLDevice(manufacturer, model, "localhost", 18944)
-{
-}
-
 mitk::USIGTLDevice::USIGTLDevice(std::string manufacturer, std::string model,
                                  std::string host, int port)
   : mitk::USDevice(manufacturer, model), m_Host(host), m_Port(port)
 {
-  m_Client = mitk::IGTLClient::New();
-  // TODO: Set Name
-  m_Client->SetName("OIGTL Test device");
-  m_Client->SetPortNumber(m_Port);
-  m_Client->SetHostname(m_Host);
+  if (port == 0)
+  {
+    m_Device = mitk::IGTLServer::New();
+  }
+  else
+  {
+    m_Device = mitk::IGTLClient::New();
+    m_Device->SetPortNumber(m_Port);
+  }
+  m_Device->SetHostname(m_Host);
+  m_Device->SetName(manufacturer + " - " + model);
 
   m_DeviceSource = mitk::IGTLDeviceSource::New();
-  m_DeviceSource->SetIGTLDevice(m_Client);
+  m_DeviceSource->SetIGTLDevice(m_Device);
   m_DeviceSource->RegisterAsMicroservice();
 
   m_Filter = mitk::IGTLMessageToUSImageFilter::New();
@@ -49,19 +50,19 @@ mitk::USImageSource::Pointer mitk::USIGTLDevice::GetUSImageSource()
 
 bool mitk::USIGTLDevice::OnInitialization() { return true; }
 
-bool mitk::USIGTLDevice::OnConnection() { return m_Client->OpenConnection(); }
+bool mitk::USIGTLDevice::OnConnection() { return m_Device->OpenConnection(); }
 
 bool mitk::USIGTLDevice::OnDisconnection()
 {
-  return m_Client->CloseConnection();
+  return m_Device->CloseConnection();
 }
 
 bool mitk::USIGTLDevice::OnActivation()
 {
-  return m_Client->StartCommunication();
+  return m_Device->StartCommunication();
 }
 
 bool mitk::USIGTLDevice::OnDeactivation()
 {
-  return m_Client->StopCommunication();
+  return m_Device->StopCommunication();
 }

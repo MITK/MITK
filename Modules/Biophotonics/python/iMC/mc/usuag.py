@@ -8,8 +8,8 @@ import math
 import numpy as np
 
 from scipy.interpolate import interp1d
-from pymiecoated import Mie
 
+import mc.bhmie_herbert_kaiser_july2012 as bhmie
 
 def get_extinction_coefficients(reference_filename=None):
     """
@@ -95,16 +95,19 @@ class UsG(object):
             scattering coefficient us [1/m] and anisotropy factor g
         """
         # create derived parameters
-        sizeParameter = 2 * math.pi * self.r / wavelength
+        sizeParameter = 2. * math.pi * self.r / wavelength
         nRelative = self.n_particle / self.n_medium
         # %% execute mie and create derived parameters
-        mie = Mie(x=sizeParameter, m=complex(nRelative, 0.0))
-        # 0.0 complex for no attenuation
-        A = math.pi * self.r ** 2  # geometrical cross sectional area
-        cs = mie.qsca() * A  # scattering cross section
-        # scattering coefficient [m-1]
-        us = self.dsp / (4 / 3 * self.r ** 3 * math.pi) * cs
-        # g  = 0.77+0.18*(1.-math.exp(-(wavelength*10**9-378.7)/111.1))
-        g = float(mie.asy())
-
+        s1, s2, qext, qsca, qback, gsca = bhmie.bhmie(sizeParameter,
+                                                      nRelative, 900)
+        vol_s = 4.*math.pi / 3.*(self.r ** 3)
+        N_s = self.dsp / vol_s
+        sigma_s = qsca * math.pi * (self.r ** 2)
+        us = N_s * sigma_s
+        g = gsca
+#         A = math.pi * self.r ** 2  # geometrical cross sectional area
+#         cs = qsca * A  # scattering cross section
+#         # scattering coefficient [m-1]
+#         us = self.dsp / (4. / 3. * self.r ** 3. * math.pi) * cs
+#         g = gsca
         return us, g

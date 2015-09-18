@@ -164,7 +164,6 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   // Output affine transformation matrix (for debugging for now)
   igtl::Matrix4x4 affine_transformation_matrix;
   msg->GetMatrix(affine_transformation_matrix);
-  igtl::PrintMatrix(affine_transformation_matrix);
 }
 
 mitk::IGTLMessageToUSImageFilter::IGTLMessageToUSImageFilter()

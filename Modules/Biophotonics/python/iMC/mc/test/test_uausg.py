@@ -43,10 +43,10 @@ class test_ua(unittest.TestCase):
 class test_us(unittest.TestCase):
 
     def setUp(self):
-        usg = UsG()
-        usg.dsp = 0.015
-        self.usg470 = usg(470.*10 ** -9)
-        self.usg700 = usg(700.*10 ** -9)
+        self.usg = UsG()
+        self.usg.dsp = 0.015
+        self.usg470 = self.usg(470.*10 ** -9)
+        self.usg700 = self.usg(700.*10 ** -9)
 
     def test_us470nm(self):
         reduced_us470nm = self.usg470[0] * (1 - self.usg470[1]) / 100.
@@ -65,3 +65,21 @@ class test_us(unittest.TestCase):
                         "Human Colon Tissue\")." +
                         " Calculated value is " + str(reduced_us700nm) +
                         "1 / cm")
+
+    def test_from_book(self):
+        """see if our result matches the one from
+        Biomedical Optics
+        Principles and Imaging
+        S. 23"""
+        self.usg.r = 579. * 10 ** -9 / 2.
+        self.usg.n_particle = 1.57
+        self.usg.n_medium = 1.33
+        self.usg.dsp = 0.002
+        us, g = self.usg(400. * 10 ** -9)
+
+        self.assertAlmostEqual(us * 10 ** -2, 100.,
+                               msg="scattering coefficient matches book " + \
+                               "example")
+        self.assertAlmostEqual(g, 0.916,
+                               msg="anisotropy factor matches book example")
+

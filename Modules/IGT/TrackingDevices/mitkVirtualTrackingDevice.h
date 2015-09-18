@@ -156,6 +156,32 @@ namespace mitk
     */
     void SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond);
 
+  /**
+  * \brief enable addition of Gaussian Noise to tracking coordinates
+  */
+  void EnableGaussianNoise();
+
+  /**
+  * \brief disable addition of Gaussian Noise to Trackin coordinates
+  */
+  void DisableGaussianNoise();
+
+  /**
+  * \brief sets the mean distribution and the standard deviation for the Gaussian Noise
+  *
+  */
+  void SetParamsForGaussianNoise(double meanDistribution, double deviationDistribution);
+
+  /**
+  * \brief returns the mean distribution for the Gaussian Noise
+  */
+  double GetMeanDistribution();
+
+  /**
+  * \brief returns the deviation distribution for the Gaussian Noise
+  */
+  double GetDeviationDistribution();
+
   protected:
     VirtualTrackingDevice();
     ~VirtualTrackingDevice();
@@ -186,6 +212,9 @@ namespace mitk
     unsigned int m_NumberOfControlPoints;           ///< number of control points for the random path generation
 
     mitk::ScalarType m_Bounds[6];                   ///< bounding box of the tracking volume stored as {xMin, xMax, yMin, yMax, zMin, zMax}
+  bool m_GaussianNoiseEnabled;    ///< adding Gaussian Noise to tracking coordinates or not, false by default
+  double m_MeanDistributionParam;    /// mean distribution for Gaussion Noise, 0.0 by default
+  double m_DeviationDistributionParam;  ///< deviation distribution for Gaussian Noise, 1.0 by default
   };
 }//mitk
 #endif /* MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_ */

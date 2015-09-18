@@ -60,13 +60,6 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0" colspan="2">
-      <widget class="QPushButton" name="m_BtnOIGTL">
-       <property name="text">
-        <string>Provide over OpenIGTLink</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
   </layout>

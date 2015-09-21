@@ -77,7 +77,7 @@ class VisualizeSpectraTask(luigi.Task):
             folded_reflectance_image = Msi()
             folded_reflectance_image.set_image(folded_reflectance)
             folded_reflectance_image.set_wavelengths(RECORDED_WAVELENGTHS)
-            normalizer = norm.NormalizeMean()
+            normalizer = norm.standard_normalizer
             normalizer.normalize(folded_reflectance_image)
             msi.plot.plot(folded_reflectance_image, axarr[1])
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("d_batch", 0)
+    main_task = VisualizeSpectraTask("10_saO2_spectra", 0)
     w.add(main_task)
     w.run()
 

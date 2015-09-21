@@ -107,7 +107,7 @@ QString handleNewAppInstance(QtSingleApplication* singleApp, int argc, char** ar
   {
     QStringList args;
     bool newInstance = false;
-    for (int i = 0; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
       args << argv[i];
       if (args.back().endsWith(newInstanceArg))

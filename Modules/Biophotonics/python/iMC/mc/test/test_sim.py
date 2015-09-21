@@ -7,7 +7,8 @@ import unittest
 import filecmp
 import os
 
-from mc.sim import MciWrapper, SimWrapper
+from mc.sim import MciWrapper, SimWrapper, \
+                   get_total_reflectance, get_diffuse_reflectance
 
 class Test(unittest.TestCase):
 
@@ -59,5 +60,60 @@ class Test(unittest.TestCase):
             sim_wrapper.set_mci_filename(self.mci_filename)
             sim_wrapper.set_mcml_executable(self.path_to_gpumcml)
             sim_wrapper.run_simulation()
+            self.assertTrue(os.path.isfile(os.path.join(mcml_path,
+                                                        self.mco_filename)),
+                        "mco file was created")
+
+
+    def test_mci_wrapper_book_example(self):
+        """see if our result matches the one from
+        Biomedical Optics
+        Principles and Imaging
+        page 55 (Table 3.1)"""
+        # create a book_p55_mci which shall create a mci file
+        book_p55_mci = MciWrapper()
+        book_p55_mci.set_mci_filename(self.mci_filename)
+        book_p55_mci.set_mco_filename(self.mco_filename)
+        book_p55_mci.set_nr_photons(500000)
+        book_p55_mci.add_layer(1, 1000, 9000, 0.75, 0.0002)
+
+        mcml_path, mcml_file = os.path.split(self.path_to_gpumcml)
+        if os.path.isfile(self.path_to_gpumcml):
+            book_p55_mci.create_mci_file()
+            sim_wrapper = SimWrapper()
+            sim_wrapper.set_mci_filename(self.mci_filename)
+            sim_wrapper.set_mcml_executable(self.path_to_gpumcml)
+            sim_wrapper.run_simulation()
             self.assertTrue(os.path.isfile(mcml_path + "/" + self.mco_filename),
                         "mco file was created")
+            refl = get_diffuse_reflectance(os.path.join(mcml_path, self.mco_filename))
+            self.assertAlmostEqual(refl, 0.09734, 3,
+                                   "correct reflectance determined " + \
+                                   "according to book table 3.1")
+
+
+    def test_mci_wrapper_book_example_2(self):
+        """see if our result matches the one from
+        Biomedical Optics
+        Principles and Imaging
+        page 56 (Table 3.2)"""
+        # create a book_p56_mci which shall create a mci file
+        book_p56_mci = MciWrapper()
+        book_p56_mci.set_mci_filename(self.mci_filename)
+        book_p56_mci.set_mco_filename(self.mco_filename)
+        book_p56_mci.set_nr_photons(500000)
+        book_p56_mci.add_layer(1.5, 1000, 9000, 0., 1)
+
+        mcml_path, mcml_file = os.path.split(self.path_to_gpumcml)
+        if os.path.isfile(self.path_to_gpumcml):
+            book_p56_mci.create_mci_file()
+            sim_wrapper = SimWrapper()
+            sim_wrapper.set_mci_filename(self.mci_filename)
+            sim_wrapper.set_mcml_executable(self.path_to_gpumcml)
+            sim_wrapper.run_simulation()
+            self.assertTrue(os.path.isfile(mcml_path + "/" + self.mco_filename),
+                        "mco file was created")
+            refl = get_total_reflectance(os.path.join(mcml_path, self.mco_filename))
+            self.assertAlmostEqual(refl, 0.26, delta=0.01,
+                                   msg="correct reflectance determined " + \
+                                   "according to book table 3.2")

@@ -154,7 +154,20 @@ class SimWrapper(object):
         pass
 
 
-def get_reflectance(mco_filename):
+def get_diffuse_reflectance(mco_filename):
+    """
+    extract reflectance from mco file.
+    Attention: mco_filename specifies full path.
+
+    Returns: the reflectance
+    """
+    with open(mco_filename) as myFile:
+        for line in myFile:
+            if "Diffuse reflectance" in line:
+                return float(line.split(' ', 1)[0])
+
+
+def get_specular_reflectance(mco_filename):
     """
     extract reflectance from mco file.
     Attention: mco_filename specifies full path.
@@ -164,8 +177,16 @@ def get_reflectance(mco_filename):
     with open(mco_filename) as myFile:
         for line in myFile:
             if "Specular reflectance" in line:
-                specular_reflectance = float(line.split(' ', 1)[0])
-            if "Diffuse reflectance" in line:
-                diffuse_reflectance = float(line.split(' ', 1)[0])
-    return specular_reflectance + diffuse_reflectance
+                return float(line.split(' ', 1)[0])
+
+
+def get_total_reflectance(mco_filename):
+    """
+    extract reflectance from mco file.
+    Attention: mco_filename specifies full path.
+
+    Returns: the reflectance
+    """
+    return get_diffuse_reflectance(mco_filename) + \
+            get_specular_reflectance(mco_filename)
 

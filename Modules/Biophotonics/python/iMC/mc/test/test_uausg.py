@@ -70,16 +70,17 @@ class test_us(unittest.TestCase):
         """see if our result matches the one from
         Biomedical Optics
         Principles and Imaging
-        S. 23"""
+        page 23"""
         self.usg.r = 579. * 10 ** -9 / 2.
         self.usg.n_particle = 1.57
         self.usg.n_medium = 1.33
-        self.usg.dsp = 0.002
+        self.usg.dsp = 0.002 * 1.0 * 10 ** 3 / (1.05 * 10 ** 3)
         us, g = self.usg(400. * 10 ** -9)
 
-        self.assertAlmostEqual(us * 10 ** -2, 100.,
+
+        self.assertAlmostEqual(us * 10 ** -2, 100., places=1,
                                msg="scattering coefficient matches book " + \
                                "example")
-        self.assertAlmostEqual(g, 0.916,
+        self.assertAlmostEqual(g, 0.916, places=3,
                                msg="anisotropy factor matches book example")
 

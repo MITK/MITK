@@ -95,13 +95,14 @@ class UsG(object):
             scattering coefficient us [1/m] and anisotropy factor g
         """
         # create derived parameters
-        sizeParameter = 2. * math.pi * self.r / wavelength
-        nRelative = self.n_particle / self.n_medium
+#         sizeParameter = 2. * math.pi * self.r / wavelength
+#         nRelative = self.n_particle / self.n_medium
         # %% execute mie and create derived parameters
-        s1, s2, qext, qsca, qback, gsca = bhmie.bhmie(sizeParameter,
-                                                      nRelative, 900)
+        s1, s2, qext, qsca, qback, gsca = bhmie.bhmie(self.r, wavelength,
+                                                      self.n_particle,
+                                                      self.n_medium, 900)
         vol_s = 4.*math.pi / 3.*(self.r ** 3)
-        N_s = self.dsp / vol_s
+        N_s = self.dsp * 1.0 / (vol_s)
         sigma_s = qsca * math.pi * (self.r ** 2)
         us = N_s * sigma_s
         g = gsca

@@ -5,12 +5,14 @@ Created on Thu Aug 13 11:13:31 2015
 @author: wirkert
 """
 
+import copy
 
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import imgmani
+import msimanipulations as msimani
 
 def plot(msi, axes=None):
     """
@@ -55,28 +57,25 @@ def plot_images(msi):
 
 
 
-# TODO: write this function
-# def plotMeanError(msi, axes=None):
-#     """
-#     create a plot for the Msi with x axes being the wavelengths and
-#     y-axes being the corresponding mean image values
-#     (e.g. reflectances, absorptions). Plotts also variantion bands
-#     Takes image masks into account:
-#     doesn't plot a spectrum containing masked elements
-#     """
-#     if axes is None:
-#         axes = plt.gca()
-#
-#     sortedIndices = sorted(range(len(msi.get_wavelengths())),
-#                            key=lambda k: msi.get_wavelengths()[k])
-#     sortedWavelenghts = msi.get_wavelengths()[sortedIndices]
-#     # reshape to collapse all but last dimension (which contains reflectances)
-#     collapsedImage = imgmani.collapse_image(msi.get_image())
-#     # todo: simply use np.ma.compress_rows
-#
-#     # print "filtered ", filteredImage.shape
-#     i = 0
-#     for i in range(collapsedImage.shape[0]):
-#         if (collapsedImage[i, 0] is not np.ma.masked):
-#             axes.plot(sortedWavelenghts,
-#                       collapsedImage[i, :][sortedIndices], "-o")
+def plotMeanError(msi, axes=None):
+    """
+    create a plot for the Msi with x axes being the wavelengths and
+    y-axes being the corresponding mean image values
+    (e.g. reflectances, absorptions). Plots also standard deviation bands
+    Takes image masks into account:
+    doesn't plot a spectrum containing masked elements
+    """
+    if axes is None:
+        axes = plt.gca()
+    # sort the wavelengths
+    sortedIndices = sorted(range(len(msi.get_wavelengths())),
+                           key=lambda k: msi.get_wavelengths()[k])
+    sortedWavelenghts = msi.get_wavelengths()[sortedIndices]
+    # copy the msi, since it will be altered (mean will be built)
+    msi_copy = copy.deepcopy(msi)
+    msimani.calculate_mean_spectrum(msi_copy)
+    # calculate std
+    std_curve = np.std(msi_copy.get_image(), axis=0)
+    # plot as errorbar
+    axes.errorbar(sortedWavelenghts, msi_copy.get_image()[sortedIndices],
+            yerr=std_curve, fmt='-o')

@@ -17,13 +17,13 @@ import numpy as np
 import pickle
 import time
 import logging
-import random
 import luigi
 import copy
+import random
 
 import scriptpaths as sp
 from mc.tissuemodels import Colon
-from mc.sim import SimWrapper, get_reflectance
+from mc.sim import SimWrapper, get_diffuse_reflectance
 from msi.io.spectrometerreader import SpectrometerReader
 from msi.io.msiwriter import MsiWriter
 from msi.io.msireader import MsiReader
@@ -229,11 +229,12 @@ class CreateSpectraTask(luigi.Task):
             muc_d = random.uniform(250, 735) * 10 ** -6
             # (250 + 0.1 * i * 500) * 10 ** -6
             # random.uniform(250, 735) * 10 ** -6
+            # 500
             sm_bvf = random.uniform(0.03, 0.4)
             # 0.1  # random.uniform(0.03, 0.4)
             sm_saO2 = muc_saO2  # submocosa and mucosa oxygenation are equal
             sm_dsp = random.uniform(0.03, 0.6)
-            # 0.2  # random.uniform(0.03, 0.6)
+            # 0.3  # random.uniform(0.03, 0.6)
             # set layers to these values
             self.colon_model.set_mucosa(bvf=muc_bvf, saO2=muc_saO2,
                                         dsp=muc_dsp, d=muc_d)
@@ -270,7 +271,7 @@ class CreateSpectraTask(luigi.Task):
         self.colon_model.create_mci_file()
         if os.path.isfile(PATH_TO_MCML + EXEC_MCML):
             self.sim_wrapper.run_simulation()
-            return get_reflectance(PATH_TO_MCML + MCO_FILENAME)
+            return get_diffuse_reflectance(PATH_TO_MCML + MCO_FILENAME)
         else:
             raise IOError("path to gpumcml not valid")
 

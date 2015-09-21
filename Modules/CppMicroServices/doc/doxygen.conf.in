@@ -2080,7 +2080,7 @@ DOT_NUM_THREADS        = @US_DOXYGEN_DOT_NUM_THREADS@
 # The default value is: Helvetica.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_FONTNAME           = FreeSans.ttf
+DOT_FONTNAME           = Helvetica
 
 # The DOT_FONTSIZE tag can be used to set the size (in points) of the font of
 # dot graphs.

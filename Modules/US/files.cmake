@@ -17,7 +17,6 @@ USModel/mitkUSDevicePersistence.cpp
 USFilters/mitkUSImageLoggingFilter.cpp
 USFilters/mitkUSImageSource.cpp
 USFilters/mitkUSImageVideoSource.cpp
-USFilters/mitkUSImageToIGTLMessageFilter.cpp
 USFilters/mitkIGTLMessageToUSImageFilter.cpp
 
 ## Control Interfaces

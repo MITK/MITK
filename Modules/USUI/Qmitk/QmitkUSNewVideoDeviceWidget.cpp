@@ -97,8 +97,8 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
   }
   else if (m_Controls->m_RadioOIGTLClientSource->isChecked())
   {
-    std::string host = m_Controls->m_ClientHost->text().toStdString();
-    int port = m_Controls->m_ClientPort->value();
+    std::string host = m_Controls->m_OIGTLClientHost->text().toStdString();
+    int port = m_Controls->m_OIGTLClientPort->value();
 
     mitk::USIGTLDevice::Pointer device =
         mitk::USIGTLDevice::New("OIGTL", "Testdevice", host, port);
@@ -108,7 +108,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
   }
   else
   {
-    std::string host = m_Controls->m_ServerHost->text().toStdString();
+    std::string host = m_Controls->m_OIGTLServerHost->text().toStdString();
 
     mitk::USIGTLDevice::Pointer device =
         mitk::USIGTLDevice::New("OIGTL", "Testdevice", host, 0);
@@ -157,11 +157,13 @@ void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection()
       m_Controls->m_RadioFileSource->isChecked());
   m_Controls->m_DeviceSelector->setEnabled(
       m_Controls->m_RadioDeviceSource->isChecked());
-  m_Controls->m_ClientHost->setEnabled(
+  m_Controls->m_OIGTLClientHost->setEnabled(
       m_Controls->m_RadioOIGTLClientSource->isChecked());
-  m_Controls->m_ClientPort->setEnabled(
+  m_Controls->m_OIGTLClientPort->setEnabled(
       m_Controls->m_RadioOIGTLClientSource->isChecked());
-  m_Controls->m_ServerHost->setEnabled(
+  m_Controls->m_OIGTLServerHost->setEnabled(
+      m_Controls->m_RadioOIGTLServerSource->isChecked());
+  m_Controls->m_OIGTLServerPort->setEnabled(
       m_Controls->m_RadioOIGTLServerSource->isChecked());
 }
 

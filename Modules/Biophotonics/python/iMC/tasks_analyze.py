@@ -28,9 +28,9 @@ import scriptpaths as sp
 def plot_axis(axis, image, title):
     im2 = axis.imshow(image, interpolation='nearest', alpha=1.0)
     axis.set_title(title, fontsize=5)
-    divider_dsp = make_axes_locatable(axis)
-    cax_dsp = divider_dsp.append_axes("right", size="10%", pad=0.05)
-    cbar = plt.colorbar(im2, cax=cax_dsp)
+    divider = make_axes_locatable(axis)
+    cax = divider.append_axes("right", size="10%", pad=0.05)
+    cbar = plt.colorbar(im2, cax=cax)
     cbar.ax.tick_params(labelsize=5)
     axis.xaxis.set_visible(False)
     axis.yaxis.set_visible(False)
@@ -201,7 +201,7 @@ class CreateNiceParametricImagesTask(luigi.Task):
         plot_axis(bottom_left_axis, r2_image, "r2 score (cut off at 0).\n" +
                      "median r2_score = " + str(r2_median))
         # plot parametric maps
-        image[0, 0, 0] = 0.; image[1, 0, 0] = 0.2
+        image[0, 0, 0] = 0.; image[1, 0, 0] = 0.4
         plot_axis(axarr[0, 1], image[:, :, 0], "blood volume fraction [%]")
         image[0, 0, 1] = 0.; image[1, 0, 1] = 0.6
         plot_axis(axarr[0, 2], image[:, :, 2],

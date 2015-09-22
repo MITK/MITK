@@ -101,7 +101,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     int port = m_Controls->m_OIGTLClientPort->value();
 
     mitk::USIGTLDevice::Pointer device =
-        mitk::USIGTLDevice::New("OIGTL", "Testdevice", host, port);
+        mitk::USIGTLDevice::New("OIGTL", "OIGTL Provider Client", host, port);
     device->Initialize();
     emit Finished();
     return;
@@ -111,7 +111,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     std::string host = m_Controls->m_OIGTLServerHost->text().toStdString();
 
     mitk::USIGTLDevice::Pointer device =
-        mitk::USIGTLDevice::New("OIGTL", "Testdevice", host, 0);
+        mitk::USIGTLDevice::New("OIGTL", "OIGTL Provider Server", host, 0);
     device->Initialize();
     emit Finished();
     return;

@@ -38,14 +38,18 @@ if __name__ == '__main__':
 
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
-    for root, dirs, files in os.walk(os.path.join(sp.ROOT_FOLDER,
-                                                  sp.DATA_FOLDER)):
-        for name in files:
-            main_task = at.CreateNiceParametricImagesTask(
-                imageName=name,
-                batch_prefix=
-                "batch")
-            w.add(main_task)
+    image_file_folder = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER)
+    onlyfiles = [ f for f in os.listdir(image_file_folder) if
+                 os.path.isfile(os.path.join(image_file_folder, f)) ]
+    only_long_exposed_files = [ f for f in onlyfiles if
+                 f.endswith("_long.nrrd") ]
+#     main_task = ppt.PreprocessMSI(imageName="FAP7_long.nrrd")
+    for long_exposed_file in only_long_exposed_files:
+        main_task = at.CreateNiceParametricImagesTask(
+            imageName=long_exposed_file,
+            batch_prefix=
+            "batch")
+        w.add(main_task)
     w.run()
 
 

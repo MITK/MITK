@@ -14,9 +14,9 @@ import luigi
 import scriptpaths as sp
 import tasks_preprocessing as pre
 import msi.imgmani as imgmani
-import msi.msimanipulations as msimani
 from msi.io.nrrdreader import NrrdReader
-from msi.plot import plotMeanError
+import msi.plot as msiplt
+from msi.msi import Msi
 
 # general output path config
 sp.ROOT_FOLDER = \
@@ -38,9 +38,12 @@ class WhiteSegmentationFile(luigi.Task):
     imageName = luigi.Parameter()
 
     def output(self):
+        white_seg_imagename = \
+            self.imageName.replace(".nrrd",
+                                   "_white_segmentation.nrrd")
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                       sp.DATA_FOLDER,
-                        self.imageName + ".segmentation.nrrd"))
+                        white_seg_imagename))
 
 
 
@@ -48,8 +51,9 @@ class PlotAmbientLight(luigi.Task):
     imageName = luigi.Parameter()
 
     def requires(self):
-        return pre.CorrectImagingSetupTask(self.imageName), \
-            WhiteSegmentationFile(imageName=self.imageName)
+        return pre.MultiSpectralImageFile(self.imageName), \
+            pre.PreprocessFlatfields(), \
+            WhiteSegmentationFile(imageName=self.imageName),
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -61,12 +65,17 @@ class PlotAmbientLight(luigi.Task):
     def run(self):
         reader = NrrdReader()
         msi = reader.read(self.input()[0].path)
-        msi.set_wavelengths(sp.RECORDED_WAVELENGTHS)
-        segmentation = reader.read(self.input()[1].path)
-        msimani.apply_segmentation(msi, segmentation)
-        plotMeanError(msi)
+        flatfield = reader.read(self.input()[1].path)
+        segmentation = reader.read(self.input()[-1].path)
+        af = pre.get_ambient_factor(flatfield, msi, segmentation)
+        af_msi = Msi()
+        af_msi.set_image(af)
+        af_msi.set_wavelengths(sp.RECORDED_WAVELENGTHS)
+        pre.resort_wavelengths(af_msi)
+        plt.figure()
+        msiplt.plot(af_msi)
         plt.grid()
-        plt.gca().set_ylim([0., 1.5])
+        plt.gca().set_ylim([0.6, 1.2])
         plt.savefig(self.output().path, dpi=250)
 
 
@@ -77,6 +86,8 @@ if __name__ == '__main__':
     luigi.interface.setup_interface_logging()
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    main_task = PlotAmbientLight(imageName="FAP7.nrrd")
-    w.add(main_task)
+    image_nrs = np.arange(1, 25, 1)
+    for i in image_nrs:
+        main_task = PlotAmbientLight(imageName="FAP" + str(i) + ".nrrd")
+        w.add(main_task)
     w.run()

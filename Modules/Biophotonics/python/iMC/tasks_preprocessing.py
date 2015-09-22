@@ -67,6 +67,52 @@ class MultiSpectralImageFile(luigi.Task):
                                 self.imageName))
 
 
+class ShortExposiorMSI(luigi.Task):
+    """
+    the unaltered file c.f. hard disk
+    """
+    imageName = luigi.Parameter()
+
+    def output(self):
+        assert(self.imageName.endswith("_long.nrrd"))
+        short_exposior_imagename = self.imageName.replace("_long.nrrd", ".nrrd")
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                              sp.DATA_FOLDER,
+                                short_exposior_imagename))
+
+
+class WhiteSegmentation(luigi.Task):
+    """
+    the unaltered file c.f. hard disk
+    """
+    imageName = luigi.Parameter()
+
+    def output(self):
+        assert(self.imageName.endswith("_long.nrrd"))
+        white_seg_imagename = \
+            self.imageName.replace("_long.nrrd",
+                                   "_white_segmentation.nrrd")
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                              sp.DATA_FOLDER,
+                                white_seg_imagename))
+
+
+def get_ambient_factor(flatfield, short_exposior, segmentation):
+    """calculate the changes to the flatfield introduced by the organ."""
+    flatfield_copy = copy.deepcopy(flatfield)
+    se_copy = copy.deepcopy(short_exposior)
+    msimani.apply_segmentation(flatfield_copy, segmentation)
+    msimani.apply_segmentation(se_copy, segmentation)
+    # calculate Fwb(x1,y1)
+    msimani.calculate_mean_spectrum(se_copy)
+    # calculate Fspace(x1,y1)
+    msimani.calculate_mean_spectrum(flatfield_copy)
+    # calculate Famb
+    ambient_factor = se_copy.get_image() / flatfield_copy.get_image()
+    return ambient_factor
+
+
+
 class CorrectImagingSetupTask(luigi.Task):
     """unfortunately filter were ordered weirdly. this task is to
     do all the fiddeling to get it right again"""
@@ -75,7 +121,9 @@ class CorrectImagingSetupTask(luigi.Task):
     def requires(self):
         return MultiSpectralImageFile(imageName=self.imageName), \
             PreprocessFlatfields(), \
-            PreprocessDark()
+            PreprocessDark(), \
+            ShortExposiorMSI(imageName=self.imageName), \
+            WhiteSegmentation(imageName=self.imageName)
 
 
     def output(self):
@@ -86,8 +134,17 @@ class CorrectImagingSetupTask(luigi.Task):
 
     def run(self):
         """sort wavelengths and normalize by respective integration times"""
+        # read inputs
         reader = NrrdReader()
         msi = reader.read(self.input()[0].path)
+        flatfield = reader.read(self.input()[1].path)
+        dark = reader.read(self.input()[2].path)
+        se_msi = reader.read(self.input()[3].path)
+        white_seg = reader.read(self.input()[4].path)
+        # calculate and apply ambient factor
+        f_ab = get_ambient_factor(flatfield, se_msi, white_seg)
+        flatfield.set_image(flatfield.get_image() * f_ab)
+        # add integration times for proper image correction
         if "long" in self.input()[0].path:
             msi.add_property({'integration times':
                 np.array([150., 250., 117., 160., 150., 175., 82., 70.])})
@@ -95,11 +152,12 @@ class CorrectImagingSetupTask(luigi.Task):
             msi.add_property(
                     {'integration times':
                      np.array([30., 50., 47., 32., 30., 35., 35., 60.])})
-        flatfield = reader.read(self.input()[1].path)
+
         flatfield.add_property({'integration times':
                      np.array([30., 50., 47., 32., 30., 35., 35., 60.])})
-        dark = reader.read(self.input()[2].path)
+        # correct image by flatfield and dark image
         msimani.image_correction(msi, flatfield, dark)
+        # correct for differently sorted filters if necessary
         resort_wavelengths(msi)
         touch_and_save_msi(msi, self.output())
 

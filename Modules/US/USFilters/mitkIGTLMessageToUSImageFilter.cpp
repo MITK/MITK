@@ -32,18 +32,12 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
   igtl::MessageBase::Pointer msgBase = msg->GetMessage();
   igtl::ImageMessage* imgMsg = (igtl::ImageMessage*)(msgBase.GetPointer());
 
-  if (imgMsg->GetNumComponents() != 1)
-  {
-    // TODO: Handle non-grayscale images
-    throw("Can not handle non-grayscale images");
-  }
-
   bool big_endian = (imgMsg->GetEndian() == igtl::ImageMessage::ENDIAN_BIG);
 
   if (imgMsg->GetCoordinateSystem() != igtl::ImageMessage::COORDINATE_RAS)
   {
     // TODO: Which coordinate system does MITK use?
-    throw("Can not handle messages with LAS coordinate system");
+    mitkThrow() << "Can not handle messages with LAS coordinate system";
   }
 
   switch (imgMsg->GetScalarType())
@@ -146,8 +140,6 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   {
     itk::ByteSwapper<TPixel>::SwapRangeFromSystemToLittleEndian(out, num_pixel);
   }
-
-  // TODO: Coordinate system
 
   img = mitk::Image::New();
   img->InitializeByItk(output.GetPointer());

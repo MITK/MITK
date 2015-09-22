@@ -328,7 +328,7 @@ bool mitk::USDevice::Activate()
     }
   }
 
-  ProvideViaOIGTL();
+  this->ProvideViaOIGTL();
 
   return m_DeviceState == State_Activated;
 }

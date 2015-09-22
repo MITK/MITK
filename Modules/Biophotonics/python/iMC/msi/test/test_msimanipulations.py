@@ -87,6 +87,13 @@ class TestMsiManipulations(unittest.TestCase):
         self.assertEqual(self.msi.get_image().shape, old_shape,
                         "shape did not change from normalizing")
 
+    def test_normalize_integration_times_none_given(self):
+        msi_copy = copy.deepcopy(self.msi)
+        mani.normalize_integration_times(msi_copy)
+        np.testing.assert_equal(msi_copy.get_image(), self.msi.get_image(),
+                                "nothing change by normalizing without" + \
+                                "integration times given")
+
     def test_dark_correction(self):
         desired_image_data = copy.copy(self.msi.get_image())
         desired_image_data -= 1

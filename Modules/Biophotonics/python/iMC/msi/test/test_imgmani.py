@@ -27,7 +27,10 @@ class TestImgMani(unittest.TestCase):
         self.image = self.msi.get_image()
 
     def tearDown(self):
-        pass
+        self.msi = None
+        self.specialValue = None
+        self.segmentation = None
+        self.image = None
 
     def test_collapse_image(self):
         image = self.image

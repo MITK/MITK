@@ -56,11 +56,24 @@ class MITKUS_EXPORT IGTLMessageToUSImageFilter : public USImageSource
 
   using Superclass::GetNextRawImage;
 
+  /**
+   * \brief Copies the data from the next OIGTL message to an mitk::Image.
+   *
+   * \param img the image to fill with the data from the OIGTL message.
+   */
   virtual void GetNextRawImage(mitk::Image::Pointer& img);
 
  private:
   mitk::IGTLMessageSource* m_upstream;
 
+  /**
+   * \brief Templated method to copy the data of the OIGTL message to the image, depending
+   * on the pixel type contained in the message.
+   *
+   * \param img the image to fill with the data from msg
+   * \param msg the OIGTL message to copy the data from
+   * \param big_endian whether the data is in big endian byte order
+   */
   template <typename TPixel>
   void Initiate(mitk::Image::Pointer& img, igtl::ImageMessage* msg, bool big_endian);
 };

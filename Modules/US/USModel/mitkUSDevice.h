@@ -311,7 +311,15 @@ class USControlInterfaceDoppler;
     mitk::Image::Pointer m_Image;
     mitk::Image::Pointer m_OutputImage;
 
+    /**
+    * \brief Registers an OpenIGTLink device as a microservice so that we can send the images of
+    * this device via the network.
+    */
     void ProvideViaOIGTL();
+
+    /**
+    * \brief Deregisters the microservices for OpenIGTLink.
+    */
     void DisableOIGTL();
 
     mitk::IGTLServer::Pointer m_IGTLServer;

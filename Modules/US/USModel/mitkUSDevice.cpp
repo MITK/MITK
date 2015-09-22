@@ -388,6 +388,8 @@ void mitk::USDevice::Deactivate()
 
 void mitk::USDevice::DisableOIGTL()
 {
+    // TODO: This seems not to be enough cleanup to catch all cases. For example, if the device is disconnected
+    // from the OIGTL GUI, this won't get cleaned up correctly.
   m_IGTLServer->CloseConnection();
   m_IGTLMessageProvider->UnRegisterMicroservice();
   m_ImageToIGTLMsgFilter->UnRegisterMicroservice();

@@ -26,8 +26,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+/**
+* \brief A mitk::USIGTLDevice is a USDevice to receive images over an OpenIGTLink
+* connection. It registers an OIGTL device as a Microservice to receive image messages
+* and transforms them to mitk::Images. It can act both as a server (listening for
+* incoming connections) and as a client (connecting to an existing OIGTL server).
+*
+* \ingroup US
+*/
 class MITKUS_EXPORT USIGTLDevice : public mitk::USDevice
 {
+
+
  public:
   mitkClassMacro(USIGTLDevice, mitk::USDevice);
   // To open a device (Manufacturer, Model, Hostname, Port, IsServer)

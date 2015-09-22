@@ -17,18 +17,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUSIGTLDevice.h>
 
 mitk::USIGTLDevice::USIGTLDevice(std::string manufacturer, std::string model,
-                                 std::string host, int port)
+                                 std::string host, int port, bool server)
   : mitk::USDevice(manufacturer, model), m_Host(host), m_Port(port)
 {
-  if (port == 0)
+  if (server)
   {
     m_Device = mitk::IGTLServer::New();
   }
   else
   {
     m_Device = mitk::IGTLClient::New();
-    m_Device->SetPortNumber(m_Port);
   }
+  m_Device->SetPortNumber(m_Port);
   m_Device->SetHostname(m_Host);
   m_Device->SetName(manufacturer + " - " + model);
 

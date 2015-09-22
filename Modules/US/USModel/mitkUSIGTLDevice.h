@@ -30,15 +30,14 @@ class MITKUS_EXPORT USIGTLDevice : public mitk::USDevice
 {
  public:
   mitkClassMacro(USIGTLDevice, mitk::USDevice);
-  // To open a device (Manufacturer, Model, Hostname, Port)
-  mitkNewMacro4Param(Self, std::string, std::string, std::string, int);
+  // To open a device (Manufacturer, Model, Hostname, Port, IsServer)
+  mitkNewMacro4Param(Self, std::string, std::string, std::string, int, bool);
 
   virtual std::string GetDeviceClass();
   virtual USImageSource::Pointer GetUSImageSource();
 
   USIGTLDevice(std::string manufacturer, std::string model, std::string host,
-               int port);
-  USIGTLDevice(std::string manufacturer, std::string model);
+               int port, server bool);
 
  protected:
   virtual bool OnInitialization();

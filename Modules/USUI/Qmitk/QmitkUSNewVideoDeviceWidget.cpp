@@ -100,20 +100,27 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     std::string host = m_Controls->m_OIGTLClientHost->text().toStdString();
     int port = m_Controls->m_OIGTLClientPort->value();
 
+    // Create a new USIGTLDevice. The last parameter tells the device that it should be a client.
     mitk::USIGTLDevice::Pointer device =
-        mitk::USIGTLDevice::New("OIGTL", "OIGTL Provider Client", host, port);
+        mitk::USIGTLDevice::New("OIGTL", "Provider Client", host, port, false);
     device->Initialize();
     emit Finished();
+    // The rest of this method does stuff that is specific to USVideoDevices,
+    // which we don't need. So we return directly.
     return;
   }
   else
   {
     std::string host = m_Controls->m_OIGTLServerHost->text().toStdString();
+    int port = m_Controls->m_OIGTLServerPort->value();
 
+    // Create a new USIGTLDevice. The last parameter tells the device that it should be a server.
     mitk::USIGTLDevice::Pointer device =
-        mitk::USIGTLDevice::New("OIGTL", "OIGTL Provider Server", host, 0);
+        mitk::USIGTLDevice::New("OIGTL", "Provider Server", host, port, true);
     device->Initialize();
     emit Finished();
+    // The rest of this method does stuff that is specific to USVideoDevices,
+    // which we don't need. So we return directly.
     return;
   }
 

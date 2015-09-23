@@ -161,10 +161,14 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk
   {
     resultImage = mitkImage;
 
-    // check the data pointer, for that, we need to ignore the lock of the mitkImage
-    mitk::ImageReadAccessor read_probe( mitk::Image::Pointer(mitkImage), nullptr, mitk::ImageAccessorBase::IgnoreLock );
-    if( itkimage->GetBufferPointer() == read_probe.GetData() )
-      return resultImage;
+    // test the pointer equality with read accessor only if mitk Image is intialized, otherwise an Exception is thrown by the ReadAccessor
+    if( mitkImage->IsInitialized() )
+    {
+      // check the data pointer, for that, we need to ignore the lock of the mitkImage
+      mitk::ImageReadAccessor read_probe( mitk::Image::Pointer(mitkImage), nullptr, mitk::ImageAccessorBase::IgnoreLock );
+      if( itkimage->GetBufferPointer() == read_probe.GetData() )
+        return resultImage;
+    }
 
   }
   else

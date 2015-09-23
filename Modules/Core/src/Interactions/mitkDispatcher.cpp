@@ -73,6 +73,10 @@ void mitk::Dispatcher::RemoveDataInteractor(const DataNode* dataNode)
     {
       it = m_Interactors.erase(it);
     }
+    else if ((*it)->GetDataNode() == nullptr)
+    {
+      it = m_Interactors.erase(it);
+    }
     else
     {
       ++it;

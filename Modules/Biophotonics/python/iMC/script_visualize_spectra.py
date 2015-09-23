@@ -62,7 +62,8 @@ class VisualizeSpectraTask(luigi.Task):
         f.close()
         f, axarr = plt.subplots(1, 2)
 
-        for i in range(batch.reflectances.shape[0]):
+        nr_refls = batch.reflectances.shape[0]
+        for i in range(nr_refls):
             axarr[0].plot(batch.wavelengths, batch.reflectances[i])
             plt.grid()
             folded_reflectance = np.zeros_like(RECORDED_WAVELENGTHS)
@@ -79,7 +80,10 @@ class VisualizeSpectraTask(luigi.Task):
             folded_reflectance_image.set_wavelengths(RECORDED_WAVELENGTHS)
             normalizer = norm.standard_normalizer
             normalizer.normalize(folded_reflectance_image)
-            msi.plot.plot(folded_reflectance_image, axarr[1])
+            plt_color = (1. / float(nr_refls) * i,
+               0.,
+               1. - (1. / float(nr_refls) * i))
+            msi.plot.plot(folded_reflectance_image, axarr[1], color=plt_color)
 
         # tidy up and save plot
         major_ticks = np.arange(450, 720, 50) * 10 ** -9
@@ -100,7 +104,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("10_saO2_spectra", 0)
+    main_task = VisualizeSpectraTask("10_dsp_spectra_g_hack", 0)
     w.add(main_task)
     w.run()
 

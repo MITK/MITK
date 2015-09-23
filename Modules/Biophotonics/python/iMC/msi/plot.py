@@ -14,7 +14,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import imgmani
 import msimanipulations as msimani
 
-def plot(msi, axes=None):
+def plot(msi, axes=None, color=None):
     """
     create a plot for the Msi with x axes being the wavelengths and
     y-axes being the corresponding image values (e.g. reflectances, absorptions)
@@ -36,7 +36,7 @@ def plot(msi, axes=None):
     for i in range(collapsedImage.shape[0]):
         if (collapsedImage[i, 0] is not np.ma.masked):
             axes.plot(sortedWavelenghts,
-                      collapsedImage[i, :][sortedIndices], "-o")
+                      collapsedImage[i, :][sortedIndices], "-o", color=color)
 
 
 def plot_images(msi):

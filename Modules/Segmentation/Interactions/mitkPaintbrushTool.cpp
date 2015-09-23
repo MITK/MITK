@@ -384,10 +384,24 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   }
 
   // visualize contour
-  ContourModel::Pointer displayContour = ContourModel::New();
-  displayContour->Initialize();
-  displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
-  SetFeedbackContour( *displayContour );
+  ContourModel::Pointer displayContour = this->GetFeedbackContour();
+  displayContour->Clear();
+
+  ContourModel::Pointer tmp = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+
+  // copy transformed contour into display contour
+  it =  tmp->Begin();
+  end = tmp->End();
+
+  while(it != end)
+  {
+    Point3D point = (*it)->Coordinates;
+
+    displayContour->AddVertex( point, timestep );
+    it++;
+  }
+
+  m_FeedbackContourNode->GetData()->Modified();
 
   assert( positionEvent->GetSender()->GetRenderWindow() );
 

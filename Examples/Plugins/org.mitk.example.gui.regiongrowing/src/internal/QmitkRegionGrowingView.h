@@ -63,7 +63,6 @@ class QmitkRegionGrowingView : public QmitkAbstractView, public mitk::IRenderWin
 
     virtual void SetFocus() override;
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 

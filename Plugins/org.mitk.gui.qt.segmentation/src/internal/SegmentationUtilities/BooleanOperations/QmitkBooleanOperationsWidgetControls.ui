@@ -27,6 +27,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>Subtracts first segmentation from the second one</string>
+       </property>
        <property name="text">
         <string>Difference</string>
        </property>
@@ -65,6 +68,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>Keeps just the overlapping areas of two the segmentations</string>
+       </property>
        <property name="text">
         <string>Intersection</string>
        </property>
@@ -102,6 +108,9 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Combines the two segmentations</string>
        </property>
        <property name="text">
         <string>Union</string>

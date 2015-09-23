@@ -7,5 +7,7 @@
      <file>SurfaceToImage_48x48.png</file>
      <file>SegmentationUtilities_48x48.png</file>
      <file>CTKWidgets_48x48.png</file>
+     <file>BooleanLabelA_32x32.png</file>
+     <file>BooleanLabelB_32x32.png</file>
   </qresource>
 </RCC>

@@ -31,6 +31,9 @@ namespace mitk {
 ImageVtkLegacyIO::ImageVtkLegacyIO()
   : AbstractFileIO(Image::GetStaticNameOfClass(), IOMimeTypes::VTK_IMAGE_LEGACY_MIMETYPE(), "VTK Legacy Image")
 {
+  Options defaultOptions;
+  defaultOptions["Save as binary file"] = false;
+  this->SetDefaultWriterOptions(defaultOptions);
   this->RegisterService();
 }
 
@@ -80,6 +83,11 @@ void ImageVtkLegacyIO::Write()
   // The legacy vtk image writer cannot write to streams
   LocalFile localFile(this);
   writer->SetFileName(localFile.GetFileName().c_str());
+
+  if (us::any_cast<bool> (GetWriterOption("Save as binary file")))
+  {
+    writer->SetFileTypeToBinary();
+  }
 
   ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
   writer->SetInputData(const_cast<vtkImageData*>(vtkReadAccessor.GetVtkImageData()));

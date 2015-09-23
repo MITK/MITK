@@ -63,9 +63,8 @@ class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
     virtual ~FeedbackContourTool();
 
     ContourModel* GetFeedbackContour();
-    void SetFeedbackContour(ContourModel&);
+    void SetFeedbackContour(ContourModel::Pointer);
 
-    void Disable3dRendering();
     void SetFeedbackContourVisible(bool);
 
     /// Provide values from 0.0 (black) to 1.0 (full color)
@@ -95,8 +94,6 @@ class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
       \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
     */
     void FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue = 1 );
-
-  private:
 
     ContourModel::Pointer      m_FeedbackContour;
     DataNode::Pointer m_FeedbackContourNode;

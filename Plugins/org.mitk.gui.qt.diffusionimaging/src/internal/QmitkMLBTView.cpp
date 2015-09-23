@@ -329,6 +329,12 @@ void QmitkMLBTView::SaveForest()
 
 void QmitkMLBTView::StartTrainingThread()
 {
+    if (!this->IsTrainingInputValid())
+    {
+        QMessageBox::warning(nullptr, "Training aborted", "Training could not be started. Not all necessary datasets were selected.");
+        return;
+    }
+
     QFuture<void> future = QtConcurrent::run( this, &QmitkMLBTView::StartTraining );
     m_TrainingWatcher.setFuture(future);
     m_Controls->m_StartTrainingButton->setEnabled(false);
@@ -353,12 +359,6 @@ void QmitkMLBTView::StartTraining()
 
     for (auto w : m_TrainingWidgets)
     {
-        if ( w->GetImage().IsNull() || w->GetFibers().IsNull() )
-        {
-            QMessageBox::information(nullptr, "Warning", "Training could not be started. Not all necessary datasets were selected.");
-            return;
-        }
-
         m_SelectedDiffImages.push_back(dynamic_cast<mitk::Image*>(w->GetImage()->GetData()));
         m_SelectedFB.push_back(dynamic_cast<mitk::FiberBundle*>(w->GetFibers()->GetData()));
 
@@ -411,4 +411,15 @@ void QmitkMLBTView::Activated()
 
 }
 
+bool QmitkMLBTView::IsTrainingInputValid(void) const
+{
+  for (auto widget : m_TrainingWidgets)
+  {
+    if (widget->GetImage().IsNull() || widget->GetFibers().IsNull())
+    {
+      return false;
+    }
+  }
 
+  return true;
+}

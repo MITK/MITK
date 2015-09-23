@@ -760,16 +760,16 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
     stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";
     stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
 
-
     mitk::ScalarType pixelValue;
 
-    mitkPixelTypeMultiplex4(
+    mitkPixelTypeMultiplex5(
           mitk::FastSinglePixelAccess,
           image3D->GetChannelDescriptor().GetPixelType(),
           image3D,
           image3D->GetVolumeData(posEvent->GetSender()->GetTimeStep()),
           p,
-          pixelValue);
+          pixelValue,
+          component);
 
 
 

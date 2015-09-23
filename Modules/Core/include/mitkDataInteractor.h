@@ -67,6 +67,13 @@ namespace mitk
     void SetDataNode(NodeType);
 
     /**
+     * @brief DeletedNode - Call when node associated with this interactor is deleted
+     * Behavior differs from SetDataNode(nullptr), here no Modified is called, since this would cause deadlocks/infinite loops.
+     */
+    virtual void DeletedNode();
+
+
+    /**
      * @brief Returns the mode the DataInteractor currently is in. See in mitkDispatcher the description of m_ProcessingMode for further details.
      */
     ProcessEventMode GetMode() const;
@@ -103,6 +110,7 @@ namespace mitk
      *  \note Is also called when the DataNode is set to NULL.
      */
     virtual void DataNodeChanged();
+
 
     /**
      * @brief NotifyStart Sends StartInteraction event via the mitk::DataNode

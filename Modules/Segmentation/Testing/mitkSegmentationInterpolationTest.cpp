@@ -18,10 +18,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 
+// other
+#include <mitkImage.h>
+#include <mitkIOUtil.h>
+#include <mitkSegmentationInterpolationController.h>
+
 class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 {
     CPPUNIT_TEST_SUITE(mitkSegmentationInterpolationTestSuite);
+    MITK_TEST(Equal_TestFeedbackAndReferenceFeedback_ReturnsTrue);
     CPPUNIT_TEST_SUITE_END();
+
+private:
+
+    // Load data into these
+    mitk::Image::Pointer m_ReferenceImage;
+    mitk::Image::Pointer m_AxialBase;
+    mitk::Surface::Pointer m_AxialFeedback;
+    mitk::Image::Pointer m_AxialInterpolated;
+
+    mitk::SegmentationInterpolationController::Pointer m_InterpolationController;
+
+public:
+
+    void setUp() override
+    {
+        m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+        CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
+        m_AxialBase = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/AxialBase.nrrd"));
+        CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialBase.nrrd]", m_AxialBase.IsNotNull());
+        m_AxialFeedback = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SegmentationInterpolation/AxialFeedback.vtp"));
+        CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialFeedback.nrrd]", m_AxialFeedback.IsNotNull());
+        m_AxialInterpolated = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/AxialInterpolated.nrrd"));
+        CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialInterpolated.nrrd]", m_AxialInterpolated.IsNotNull());
+
+        m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();
+        m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
+    }
+
+    void tearDown() override
+    {
+        m_ReferenceImage = nullptr;
+        m_AxialBase = nullptr;
+        m_AxialFeedback = nullptr;
+        m_AxialInterpolated = nullptr;
+    }
+
+    void Equal_Axial_TestFeedbackAndReferenceFeedback_ReturnsTrue()
+    {
+        // Create Feedback from base segmentation
+        m_InterpolationController->SetSegmentationVolume(m_AxialBase);
+        m_InterpolationController->Interpolate(); // HIER GEHTS WEITER
+    }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkSegmentationInterpolation);

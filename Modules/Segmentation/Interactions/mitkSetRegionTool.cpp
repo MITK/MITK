@@ -45,6 +45,7 @@ void mitk::SetRegionTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
   CONNECT_FUNCTION( "Release", OnMouseReleased);
   CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
+  CONNECT_FUNCTION( "Move",OnMouseMoved);
 }
 
 void mitk::SetRegionTool::Activated()
@@ -313,3 +314,6 @@ void mitk::SetRegionTool::OnInvertLogic( StateMachineAction*, InteractionEvent* 
   m_StatusFillWholeSlice = !m_StatusFillWholeSlice;
 }
 
+void mitk::SetRegionTool::OnMouseMoved(mitk::StateMachineAction *, mitk::InteractionEvent *)
+{
+}

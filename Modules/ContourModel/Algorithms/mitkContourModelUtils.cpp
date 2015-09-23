@@ -85,7 +85,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(Ima
 
 
 
-mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
+mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ))
 {
   if ( !sliceGeometry || !contourIn2D ) return nullptr;
 

@@ -153,24 +153,6 @@ class Colon(AbstractColon):
         # set the layer thickness
         self.d_sm = d
 
-    def create_mci_file(self):
-        # set additional values
-        self._mci_wrapper.set_nr_photons(self.nr_photons)
-        # calculate values for mucosa
-        us_muc, g_muc = self.usg_muc(self.wavelength)
-        self._mci_wrapper.set_layer(1, 1.38, self.ua_muc(self.wavelength),
-                                    us_muc, g_muc, self.d_muc)
-        # calculate values for submucosa
-        us_sm, g_sm = self.usg_sm(self.wavelength)
-        self._mci_wrapper.set_layer(2, 1.36, self.ua_sm (self.wavelength),
-                                    us_sm, g_sm, self.d_sm)
-        # shorter version for setting muscle layer
-        ua_mus = calc_ua_muscle(self.wavelength)
-        us_mus = calc_us_muscle(self.wavelength)
-        self._mci_wrapper.set_layer(3, 1.36, ua_mus, us_mus,
-                                    0.96, 900. * 10 ** -6)
-        # now that the layers have been updated: create file
-        self._mci_wrapper.create_mci_file()
 
     def get_layer_parameters(self):
         """get the model parameters as two numpy arrays, one for mucosa and one

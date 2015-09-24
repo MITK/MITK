@@ -61,7 +61,7 @@ class Colon(object):
         if d is None:
             d = 500. * 10 ** -6
         if r is None:
-            r = 0.4 * 10.** -6
+            r = 0.4 * 10.** -6 / 2.
         # build obejct for absorption coefficient determination
         self.ua_muc.bvf = bvf
         self.ua_muc.saO2 = saO2
@@ -78,7 +78,7 @@ class Colon(object):
         if dsp is None:
             dsp = 0.3
         if r is None:
-            r = 2 * 10.** -6
+            r = 2 * 10.** -6 / 2.
         if d is None:
             d = 500. * 10 ** -6
         # build object for absorption coefficient determination

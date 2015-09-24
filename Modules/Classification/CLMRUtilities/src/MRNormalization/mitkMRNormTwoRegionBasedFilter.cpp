@@ -33,7 +33,7 @@ mitk::MRNormTwoRegionsBasedFilter::MRNormTwoRegionsBasedFilter() :
   m_Area2(MRNormTwoRegionsBasedFilter::MEDIAN)
 {
   this->SetNumberOfIndexedInputs(3);
-  this->SetNumberOfRequiredInputs(3);
+  this->SetNumberOfRequiredInputs(1);
 }
 
 mitk::MRNormTwoRegionsBasedFilter::~MRNormTwoRegionsBasedFilter()

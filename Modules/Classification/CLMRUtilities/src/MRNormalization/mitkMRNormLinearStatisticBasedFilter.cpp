@@ -31,8 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::MRNormLinearStatisticBasedFilter::MRNormLinearStatisticBasedFilter() :
   m_CenterMode(MRNormLinearStatisticBasedFilter::MEDIAN)
 {
-  this->SetNumberOfIndexedInputs(2);
-  this->SetNumberOfRequiredInputs(2);
+  this->SetNumberOfIndexedInputs(3);
+  this->SetNumberOfRequiredInputs(3);
 }
 
 mitk::MRNormLinearStatisticBasedFilter::~MRNormLinearStatisticBasedFilter()

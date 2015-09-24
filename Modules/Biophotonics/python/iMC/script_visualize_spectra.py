@@ -60,11 +60,19 @@ class VisualizeSpectraTask(luigi.Task):
         f = file(self.input()[8].path, "r")
         batch = pickle.load(f)
         f.close()
-        f, axarr = plt.subplots(1, 2)
+        f, axarr = plt.subplots(2, 1)
+        # axis to plot the original data c.f. the mcml simulation
+        org_ax = axarr[0]
+        # axis for plotting the folded spectrum + normalization
+        fold_ax = axarr[1]
 
         nr_refls = batch.reflectances.shape[0]
         for i in range(nr_refls):
-            axarr[0].plot(batch.wavelengths, batch.reflectances[i])
+            plt_color = (1. / float(nr_refls) * i,
+               0.,
+               1. - (1. / float(nr_refls) * i))
+            org_ax.plot(batch.wavelengths, batch.reflectances[i], '-o',
+                        color=plt_color)
             plt.grid()
             folded_reflectance = np.zeros_like(RECORDED_WAVELENGTHS)
             for j in range(len(RECORDED_WAVELENGTHS)):
@@ -80,20 +88,17 @@ class VisualizeSpectraTask(luigi.Task):
             folded_reflectance_image.set_wavelengths(RECORDED_WAVELENGTHS)
             normalizer = norm.standard_normalizer
             normalizer.normalize(folded_reflectance_image)
-            plt_color = (1. / float(nr_refls) * i,
-               0.,
-               1. - (1. / float(nr_refls) * i))
-            msi.plot.plot(folded_reflectance_image, axarr[1], color=plt_color)
+            msi.plot.plot(folded_reflectance_image, fold_ax, color=plt_color)
 
         # tidy up and save plot
         major_ticks = np.arange(450, 720, 50) * 10 ** -9
         minor_ticks = np.arange(450, 720, 10) * 10 ** -9
-        axarr[0].set_xticks(major_ticks)
-        axarr[0].set_xticks(minor_ticks, minor=True)
-        axarr[1].set_xticks(major_ticks)
-        axarr[1].set_xticks(minor_ticks, minor=True)
-        axarr[0].grid()
-        axarr[1].grid()
+        org_ax.set_xticks(major_ticks)
+        org_ax.set_xticks(minor_ticks, minor=True)
+        fold_ax.set_xticks(major_ticks)
+        fold_ax.set_xticks(minor_ticks, minor=True)
+        org_ax.grid()
+        fold_ax.grid()
         plt.savefig(self.output().path, dpi=500)
 
 
@@ -104,7 +109,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("10_dsp_spectra_g_hack", 0)
+    main_task = VisualizeSpectraTask("10_bvf_debug_g_us_hack_high_d", 0)
     w.add(main_task)
     w.run()
 

@@ -15,6 +15,8 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         RandomForestTraining^^MitkCLVigraRandomForest
         NativeHeadCTSegmentation^^MitkCLVigraRandomForest
         ManualSegmentationEvaluation^^MitkCLVigraRandomForest
+        CLGlobalImageFeatures^^MitkCore_MitkCLUtilities
+        CLMRNormalization^^MitkCore_MitkCLUtilities_MitkCLMRUtilities
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 
@@ -86,10 +88,10 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore
     CPP_FILES CLPolyToNrrd.cpp mitkCommandLineParser.cpp
   )
-  mitk_create_executable(CLGlobalImageFeatures
-    DEPENDS MitkCore MitkCLUtilities
-    CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp
-  )
+  #mitk_create_executable(CLGlobalImageFeatures
+  #  DEPENDS MitkCore MitkCLUtilities
+  #  CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp
+  #)
   mitk_create_executable(CLVoxelFeatures
     DEPENDS MitkCore MitkCLUtilities
     CPP_FILES CLVoxelFeatures.cpp mitkCommandLineParser.cpp
@@ -99,10 +101,6 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLImportanceWeighting MitkCLVigraRandomForest
     CPP_FILES CLVoxelClassification.cpp
   )
-  mitk_create_executable(CLMRNormalization
-    DEPENDS MitkCore MitkCLUtilities
-    CPP_FILES CLMRNormalization.cpp mitkCommandLineParser.cpp
-  )
   mitk_create_executable(CLBrainMask
     DEPENDS MitkCore MitkCLUtilities
     CPP_FILES CLBrainMask.cpp mitkCommandLineParser.cpp
@@ -110,6 +108,14 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
   mitk_create_executable(CLImageConverter
     DEPENDS MitkCore
     CPP_FILES CLImageConverter.cpp mitkCommandLineParser.cpp
+  )
+  mitk_create_executable(CLSurWeighting
+    DEPENDS MitkCore MitkCLUtilities MitkDataCollection MitkCLImportanceWeighting
+    CPP_FILES CLSurWeighting.cpp mitkCommandLineParser.cpp
+  )
+  mitk_create_executable(CLImageCropper
+    DEPENDS MitkCore MitkCLUtilities MitkAlgorithmsExt
+    CPP_FILES CLImageCropper.cpp mitkCommandLineParser.cpp
   )
 
         # On Linux, create a shell script to start a relocatable application

@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
   parser.addArgument("first-order","fo",mitkCommandLineParser::String, "Use First Order Features", "calculates First order based features",us::Any());
   parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
+  parser.addArgument("same-space","sp",mitkCommandLineParser::String,"Bool","Set the spacing of all images to equal. Otherwise an error will be thrown. ",us::Any());
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -77,10 +78,37 @@ int main(int argc, char* argv[])
   {
     return EXIT_SUCCESS;
   }
+
+  MITK_INFO << "Version: "<< 1.3;
+
   bool useCooc = parsedArgs.count("cooccurence");
 
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+
+  bool fixDifferentSpaces = parsedArgs.count("same-space");
+  if ( ! mitk::Equal(mask->GetGeometry(0)->GetOrigin(), image->GetGeometry(0)->GetOrigin()))
+  {
+    MITK_INFO << "Not equal Origins";
+    if (fixDifferentSpaces)
+    {
+      image->GetGeometry(0)->SetOrigin(mask->GetGeometry(0)->GetOrigin());
+    } else
+    {
+      return -1;
+    }
+  }
+  if ( ! mitk::Equal(mask->GetGeometry(0)->GetSpacing(), image->GetGeometry(0)->GetSpacing()))
+  {
+    MITK_INFO << "Not equal Sapcings";
+    if (fixDifferentSpaces)
+    {
+      image->GetGeometry(0)->SetSpacing(mask->GetGeometry(0)->GetSpacing());
+    } else
+    {
+      return -1;
+    }
+  }
 
   mitk::AbstractGlobalImageFeature::FeatureListType stats;
   ////////////////////////////////////////////////////////////////

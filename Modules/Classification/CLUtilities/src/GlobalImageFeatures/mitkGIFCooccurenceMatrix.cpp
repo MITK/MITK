@@ -37,8 +37,13 @@ void
     {
       offset[i] *= range;
     }
+    //offset[0]=0;
+    //offset[1]=0;
+    //offset[2]=1;
+
     newOffset->push_back(offset);
     oldOffsetsIterator++;
+    //break;
   }
   filter->SetOffsets(newOffset);
 
@@ -77,7 +82,9 @@ void
   filter->SetInput(itkImage);
   filter->SetMaskImage(maskImage);
   filter->SetRequestedFeatures(requestedFeatures);
-  filter->SetPixelValueMinMax(minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+  filter->SetPixelValueMinMax(minMaxComputer->GetMinimum()-0.5,minMaxComputer->GetMaximum()+0.5);
+  //filter->SetPixelValueMinMax(-1024,3096);
+  //filter->SetNumberOfBinsPerAxis(5);
   filter->Update();
 
   auto featureMeans = filter->GetFeatureMeans ();

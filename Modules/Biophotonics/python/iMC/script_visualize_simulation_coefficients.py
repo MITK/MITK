@@ -42,7 +42,7 @@ if __name__ == '__main__':
 #     usg.n_particle = 1.40
     wavelengths = np.arange(400, 700, 10) * 10 ** -9
 
-    plt_range = np.array([0.4 / 2. * 10 ** -6])
+    plt_range = np.linspace(0.4, 0.74, 1) * 10 ** -6  # np.array([0.4 * 10 ** -6])
     # np.linspace(2., 3., 10) * 10 ** -6
     # np.array([579. / 2. * 10 ** -9])
     # np.linspace(0.1, 0.74, 10) * 10 ** -6
@@ -51,7 +51,6 @@ if __name__ == '__main__':
         usg.r = d / 2.
         us = [usg(w)[0] for w in wavelengths]
         g = [usg(w)[1] for w in wavelengths]
-        g = np.array(g) / np.array(g) * 0.92
         # plot stuff
         # from blue to red: the color of the plotted curves
         plt_color = (1. / float(len(plt_range)) * i,

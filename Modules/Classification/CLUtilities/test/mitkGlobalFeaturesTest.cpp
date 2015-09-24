@@ -296,6 +296,7 @@ public:
     //calculator->SetHistogramSize(4096);
     //calculator->SetUseCtRange(true);
     //calculator->SetRange(981);
+  calculator->SetDirection(1);
     auto features = calculator->CalculateFeatures(m_GradientImage, m_GradientMask);
 
     std::map<std::string, double> results;

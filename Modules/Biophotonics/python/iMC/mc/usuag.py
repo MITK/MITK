@@ -54,7 +54,7 @@ class Ua(object):
             / 64500. * self.bvf
 
 
-class UsG(object):
+class UsgMie(object):
 
     def __init__(self):
         """

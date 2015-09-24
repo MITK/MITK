@@ -9,7 +9,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-from mc.usuag import UsG
+from mc.usuag import UsgMie
 
 if __name__ == '__main__':
     # set up plots
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     aniplt.set_xscale('log')
     aniplt.set_title("anisotropy")
     # set up simulation
-    usg = UsG()
+    usg = UsgMie()
     usg.dsp = 0.04
 #     usg.n_medium = 1.33
 #     usg.n_particle = 1.40

@@ -6,7 +6,7 @@ Created on Sep 8, 2015
 
 import unittest
 
-from mc.usuag import Ua, UsG
+from mc.usuag import Ua, UsgMie
 
 
 class test_ua(unittest.TestCase):
@@ -43,7 +43,7 @@ class test_ua(unittest.TestCase):
 class test_us(unittest.TestCase):
 
     def setUp(self):
-        self.usg = UsG()
+        self.usg = UsgMie()
         self.usg.dsp = 0.015
         self.usg470 = self.usg(470.*10 ** -9)
         self.usg700 = self.usg(700.*10 ** -9)

@@ -7,7 +7,7 @@ Created on Sep 9, 2015
 import numpy as np
 
 from mc.sim import MciWrapper
-from mc.usuag import Ua, UsG
+from mc.usuag import Ua, UsgMie
 
 
 def calc_us_muscle(wavelength):
@@ -107,7 +107,7 @@ class AbstractColon(object):
         self._mci_wrapper.add_layer(1.36, 0, 0, 1, 900. * 10 ** -6)
 
 
-class Colon(AbstractColon):
+class ColonRowe(AbstractColon):
     '''
     Initializes a three layer colon tissue model as e.g. used by
     Rowe et al. "Modelling and validation of spectral reflectance for the colon"
@@ -147,7 +147,7 @@ class Colon(AbstractColon):
         self.ua_sm.bvf = bvf
         self.ua_sm.saO2 = saO2
         # and one for scattering coefficient
-        self.usg_sm = UsG()
+        self.usg_sm = UsgMie()
         self.usg_sm.dsp = dsp
         self.usg_sm.r = r
         # set the layer thickness
@@ -181,4 +181,4 @@ class Colon(AbstractColon):
         return model_string
 
     def __init__(self):
-        super(Colon, self).__init__(Ua(), UsG(), Ua(), UsG())
+        super(ColonRowe, self).__init__(Ua(), UsgMie(), Ua(), UsgMie())

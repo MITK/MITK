@@ -7,7 +7,7 @@ import unittest
 import filecmp
 import os
 
-from mc.tissuemodels import Colon
+from mc.tissuemodels import ColonRowe
 
 class TestTissueModels(unittest.TestCase):
 
@@ -24,7 +24,7 @@ class TestTissueModels(unittest.TestCase):
 
     def test_colon_model(self):
         # create nice colon model
-        colon = Colon()
+        colon = ColonRowe()
         colon.set_mci_filename(self.mci_filename)
         colon.set_mco_filename(self.mco_filename)
         colon.wavelength = 500. * 10 ** -9

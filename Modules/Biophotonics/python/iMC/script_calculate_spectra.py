@@ -7,6 +7,7 @@ Created on Sep 9, 2015
 
 import logging
 
+import numpy as np
 import luigi
 
 import scriptpaths as sp
@@ -22,9 +23,9 @@ if __name__ == '__main__':
     luigi.interface.setup_interface_logging()
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    NR_BATCHES_TO_CREATE = 10
-    for i in range(NR_BATCHES_TO_CREATE):
-        main_task = mc.CreateSpectraTask("batch", i)
+    BATCH_NUMBERS = np.arange(0, 10, 1)
+    for i in BATCH_NUMBERS:
+        main_task = mc.CreateSpectraTask("new_batch_mie_correction", i)
         w.add(main_task)
         w.run()
 

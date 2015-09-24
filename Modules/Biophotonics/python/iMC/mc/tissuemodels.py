@@ -36,10 +36,9 @@ def calc_ua_muscle(wavelength):
     return ua(wavelength)
 
 
-class Colon(object):
+class AbstractColon(object):
     '''
-    Initializes a three layer colon tissue model as e.g. used by
-    Rowe et al. "Modelling and validation of spectral reflectance for the colon"
+    Initializes a three layer colon tissue model"
     '''
 
     def set_mci_filename(self, mci_filename):
@@ -50,6 +49,69 @@ class Colon(object):
 
     def set_wavelength(self, wavelength):
         self.wavelength = wavelength
+
+    def create_mci_file(self):
+        # set additional values
+        self._mci_wrapper.set_nr_photons(self.nr_photons)
+        # calculate values for mucosa
+        us_muc, g_muc = self.usg_muc(self.wavelength)
+        self._mci_wrapper.set_layer(1, 1.38, self.ua_muc(self.wavelength),
+                                    us_muc, g_muc, self.d_muc)
+        # calculate values for submucosa
+        us_sm, g_sm = self.usg_sm(self.wavelength)
+        self._mci_wrapper.set_layer(2, 1.36, self.ua_sm (self.wavelength),
+                                    us_sm, g_sm, self.d_sm)
+        # shorter version for setting muscle layer
+        ua_mus = calc_ua_muscle(self.wavelength)
+        us_mus = calc_us_muscle(self.wavelength)
+        self._mci_wrapper.set_layer(3, 1.36, ua_mus, us_mus,
+                                    0.96, 900. * 10 ** -6)
+        # now that the layers have been updated: create file
+        self._mci_wrapper.create_mci_file()
+
+    def get_layer_parameters(self):
+        """ Overwrite this method!
+        get the model parameters as two numpy arrays, one for mucosa and one
+        for submucusa"""
+        mucosa = np.array([])
+        submucosa = np.array([])
+        return mucosa, submucosa
+
+    def __str__(self):
+        """ Overwrite this method!
+        print the current model"""
+        model_string = \
+                    ""
+        return model_string
+
+    def __init__(self, ua_muc, usg_muc, ua_sm, usg_sm):
+        self._mci_wrapper = MciWrapper()
+        self.nr_photons = 10 ** 6
+        self.ua_muc = ua_muc
+        self.usg_muc = usg_muc
+        self.ua_sm = ua_sm
+        self.usg_sm = usg_sm
+        self.d_muc = 500. * 10 ** -6
+        self.d_sm = 500.*10 ** -6
+        self._mci_wrapper = MciWrapper()
+        self.nr_photons = 10 ** 6
+        self._mucosa_saO2 = 0.7
+        # initially create layers. these will be overwritten as soon
+        # as create_mci_file is called.
+        self._mci_wrapper.add_layer(1.0, 0, 0, 1, 0.01)  # layer 0: air
+        # layer 1: mucosa
+        self._mci_wrapper.add_layer(1.38, 0, 0, 1, 500. * 10 ** -6)
+        # layer 2: submucosa
+        self._mci_wrapper.add_layer(1.36, 0, 0, 1, 500. * 10 ** -6)
+        # layer 3: muscle
+        self._mci_wrapper.add_layer(1.36, 0, 0, 1, 900. * 10 ** -6)
+
+
+class Colon(AbstractColon):
+    '''
+    Initializes a three layer colon tissue model as e.g. used by
+    Rowe et al. "Modelling and validation of spectral reflectance for the colon"
+    '''
 
     def set_mucosa(self, bvf=None, saO2=None, dsp=None, r=None, d=None):
         if bvf is None:
@@ -74,7 +136,7 @@ class Colon(object):
         if bvf is None:
             bvf = 0.1
         if saO2 is None:
-            saO2 = self._mucosa_saO2
+            saO2 = self.ua_muc.saO2
         if dsp is None:
             dsp = 0.3
         if r is None:
@@ -137,21 +199,4 @@ class Colon(object):
         return model_string
 
     def __init__(self):
-        self.ua_muc = Ua()
-        self.usg_muc = UsG()
-        self.ua_sm = Ua()
-        self.usg_sm = UsG()
-        self.d_muc = 500. * 10 ** -6
-        self.d_sm = 500.*10 ** -6
-        self._mci_wrapper = MciWrapper()
-        self.nr_photons = 10 ** 6
-        self._mucosa_saO2 = 0.7
-        # initially create layers. these will be overwritten as soon
-        # as create_mci_file is called.
-        self._mci_wrapper.add_layer(1.0, 0, 0, 1, 0.01)  # layer 0: air
-        # layer 1: mucosa
-        self._mci_wrapper.add_layer(1.38, 0, 0, 1, 500. * 10 ** -6)
-        # layer 2: submucosa
-        self._mci_wrapper.add_layer(1.36, 0, 0, 1, 500. * 10 ** -6)
-        # layer 3: muscle
-        self._mci_wrapper.add_layer(1.36, 0, 0, 1, 900. * 10 ** -6)
+        super(Colon, self).__init__(Ua(), UsG(), Ua(), UsG())

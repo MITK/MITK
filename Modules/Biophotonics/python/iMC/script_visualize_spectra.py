@@ -115,7 +115,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("standard_spectrum_jacques_bili_test_2nm", 0, 10)
+    main_task = VisualizeSpectraTask("standard_spectrum_jacques_bili_ranges_2nm", 0, 10)
     w.add(main_task)
     w.run()
 

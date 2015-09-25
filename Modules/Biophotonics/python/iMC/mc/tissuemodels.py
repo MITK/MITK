@@ -113,14 +113,14 @@ class ColonRowe(AbstractColon):
     Rowe et al. "Modelling and validation of spectral reflectance for the colon"
     '''
 
-    def set_mucosa(self, bvf=None, saO2=None, bc=None,
+    def set_mucosa(self, bvf=None, saO2=None, cBili=None,
                    dsp=None, r=None, d=None):
         if bvf is None:
             bvf = 0.02
         if saO2 is None:
             saO2 = 0.7
-        if bc is None:
-            bc = 20.
+        if cBili is None:
+            cBili = 0.0123
         if dsp is None:
             dsp = 0.015
         if d is None:
@@ -130,7 +130,7 @@ class ColonRowe(AbstractColon):
         # build obejct for absorption coefficient determination
         self.ua_muc.bvf = bvf
         self.ua_muc.saO2 = saO2
-        self.ua_muc.bc = bc
+        self.ua_muc.cBili = cBili
         # and one for scattering coefficient
         self.usg_muc.dsp = dsp
         self.usg_muc.r = r
@@ -160,7 +160,7 @@ class ColonRowe(AbstractColon):
     def get_layer_parameters(self):
         """get the model parameters as two numpy arrays, one for mucosa and one
         for submucusa"""
-        mucosa = np.array([self.ua_muc.bvf, self.ua_muc.saO2, self.ua.muc.bc,
+        mucosa = np.array([self.ua_muc.bvf, self.ua_muc.saO2, self.ua.muc.cBili,
                          self.usg_muc.dsp, self.usg_muc.r,
                          self.d_muc])
         submucosa = np.array([self.ua_sm.bvf, self.ua_sm.saO2,
@@ -173,7 +173,7 @@ class ColonRowe(AbstractColon):
         model_string = \
                     "mucosa    - bvf: " + "%.2f" % self.ua_muc.bvf + \
                     "%; SaO2: " + "%.2f" % self.ua_muc.saO2 + \
-                    "%; bc: " + "%.1f" % self.ua.muc.bc + \
+                    "%; bilirubin: " + "%.1f" % (self.ua_muc.cBili * 100) + \
                     "ug/dl; dsp: " + "%.2f" % self.usg_muc.dsp + \
                     "%; r: " + "%.2f" % (self.usg_muc.r * 10 ** 6) + \
                     "um; d: " + "%.0f" % (self.d_muc * 10 ** 6) + "um\n" + \
@@ -191,17 +191,16 @@ class ColonRowe(AbstractColon):
 
 class ColonJacques(AbstractColon):
     '''
-    Initializes a three layer colon tissue model as e.g. used by
-    Rowe et al. "Modelling and validation of spectral reflectance for the colon"
+    Initializes a three layer colon tissue model
     '''
 
-    def set_mucosa(self, bvf=None, saO2=None, bc=None, a_mie=None, a_ray=None, d=None):
+    def set_mucosa(self, bvf=None, saO2=None, cBili=None, a_mie=None, a_ray=None, d=None):
         if bvf is None:
             bvf = 0.02
         if saO2 is None:
             saO2 = 0.7
-        if bc is None:
-            bc = 20.
+        if cBili is None:
+            cBili = 0.0123
         if a_mie is None:
             a_mie = 10. * 100
         if d is None:
@@ -211,7 +210,7 @@ class ColonJacques(AbstractColon):
         # build obejct for absorption coefficient determination
         self.ua_muc.bvf = bvf
         self.ua_muc.saO2 = saO2
-        self.ua_muc.bc = bc
+        self.ua_muc.cBili = cBili
         # and one for scattering coefficient
         self.usg_muc.a_mie = a_mie
         self.usg_muc.a_ray = a_ray
@@ -240,7 +239,7 @@ class ColonJacques(AbstractColon):
     def get_layer_parameters(self):
         """get the model parameters as two numpy arrays, one for mucosa and one
         for submucusa"""
-        mucosa = np.array([self.ua_muc.bvf, self.ua_muc.saO2, self.ua_muc.bc,
+        mucosa = np.array([self.ua_muc.bvf, self.ua_muc.saO2, self.ua_muc.cBili,
                          self.usg_muc.a_mie, self.usg_muc.a_ray,
                          self.usg_muc.b_mie,
                          self.d_muc])
@@ -254,8 +253,8 @@ class ColonJacques(AbstractColon):
         model_string = \
                     "mucosa    - bvf: " + "%.2f" % self.ua_muc.bvf + \
                     "%; SaO2: " + "%.2f" % self.ua_muc.saO2 + \
-                    "%; bc: " + "%.1f" % self.ua_muc.bc + \
-                    "ug/dl; a_mie: " + "%.2f" % (self.usg_muc.a_mie / 100.) + \
+                    "%; bilirubin: " + "%.1f" % (self.ua_muc.cBili * 100) + \
+                    "mg/dl; a_mie: " + "%.2f" % (self.usg_muc.a_mie / 100.) + \
                     "cm^-1; a_ray: " + "%.2f" % (self.usg_muc.a_ray / 100.) + \
                     "cm^-1; b_mie: " + "%.3f" % self.usg_muc.b_mie + \
                     "; d: " + "%.0f" % (self.d_muc * 10 ** 6) + "um\n" + \

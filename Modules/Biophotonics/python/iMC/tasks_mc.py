@@ -228,15 +228,15 @@ class CreateSpectraTask(luigi.Task):
         # use this to create a certain range of parameters
         bvf_ranges = np.linspace(0.01, 0.4, self.nr_samples)
         saO2_ranges = np.linspace(0.0, 1., self.nr_samples)
-        # beta carotin:
-        bc_ranges = np.linspace(0.0, 50., self.nr_samples)
+        # bilirubin in range 0. - 10. mg/dl:
+        bili_ranges = np.linspace(0.0, 5., self.nr_samples) * 0.01
         a_mie_ranges = np.linspace(1.0 / 100., 10. / 100.,
                                    self.nr_samples) * 100.
         a_ray_ranges = np.linspace(1., 60., self.nr_samples) * 100.
         d_ranges = np.linspace(250, 735, self.nr_samples) * 10 ** -6
         bvf_ranges = np.array([0.04])
         saO2_ranges = np.array([0.7])
-        bc_ranges = np.array([20.8])
+        # bili_ranges = np.array([1.23])
         a_mie_ranges = np.array([5.0]) * 100.
         a_ray_ranges = np.array([0.0]) * 100.
         bvf_sm_ranges = np.array([0.1])
@@ -244,16 +244,16 @@ class CreateSpectraTask(luigi.Task):
         d_ranges = np.array([500]) * 10 ** -6
         plt_range = itertools.product(bvf_ranges,
                                       saO2_ranges,
-                                      bc_ranges,
+                                      bili_ranges,
                                       a_mie_ranges,
                                       a_ray_ranges,
                                       d_ranges,
                                       bvf_sm_ranges, dsp_sm_range)
 
-        for i, (bvf, saO2, bc, a_mie, a_ray, d, bvf_sm, dsp_sm) \
+        for i, (bvf, saO2, bili, a_mie, a_ray, d, bvf_sm, dsp_sm) \
                                                     in enumerate(plt_range):
 
-            self.colon_model.set_mucosa(bvf=bvf, saO2=saO2, bc=bc,
+            self.colon_model.set_mucosa(bvf=bvf, saO2=saO2, cBili=bili,
                                         a_mie=a_mie,
                                         a_ray=a_ray,
                                         d=d)

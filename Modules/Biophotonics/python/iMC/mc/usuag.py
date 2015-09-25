@@ -78,9 +78,10 @@ class Ua(object):
         self.saO2 = 0.  # %
         self.eHbO2, self.eHb = \
             get_haemoglobin_extinction_coefficients()
-        # ug / dl
+
         self.cBetaCarotinUgProDl = 20.8
-        self.cBilirubinMgProDl = 1.23
+        # g / l
+        self.cBili = 0.0123
         self.eBc = get_beta_carotin_extinction_coefficients()
         self.eBili = get_bilirubin_extinction_coefficients()
 
@@ -95,10 +96,9 @@ class Ua(object):
             (self.saO2 * self.eHbO2(wavelength) +
             (1 - self.saO2) * self.eHb(wavelength)) \
             / 64500. * self.bvf
-        ua_bilirubin = math.log(10) * self.cBilirubinMgProDl * \
-            0.01 / 574.65 * \
-            self.eBili(wavelength) * self.bvf * 0.55
-        # second line is to convert from mg/dl to g/ mole
+        ua_bilirubin = math.log(10) * self.cBili / 574.65 * \
+            self.eBili(wavelength)
+        # second line is to convert from ug/dl to g/ mole
         ua_beta_carotin = math.log(10) * self.cBetaCarotinUgProDl * \
             0.01 / 536.8726 * 10 ** -3 * \
             self.eBc(wavelength) * self.bvf * 0.55  # 55 % of blood is plasma

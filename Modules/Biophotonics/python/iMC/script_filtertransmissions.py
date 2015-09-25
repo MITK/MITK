@@ -26,7 +26,7 @@ RECORDED_WAVELENGTHS = \
         np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
 
 
-def get_extinction_coefficients(reference_filename):
+def get_haemoglobin_extinction_coefficients(reference_filename):
     # table with wavelength at 1st row,
     # HbO2 molar extinction coefficient [cm**-1/(moles/l)] at 2nd row,
     # Hb molar extinction coefficient [cm**-1/(moles/l)] at 3rd row
@@ -60,7 +60,7 @@ class DeoxyHaemoglobinAbsorptionRaw(luigi.Task):
             "deoxy_haemoglobin.msi"))
 
     def run(self):
-        eHbO2, eHb = get_extinction_coefficients(self.input().path)
+        eHbO2, eHb = get_haemoglobin_extinction_coefficients(self.input().path)
         writer = MsiWriter(eHb)
         writer.write(self.output().path)
 
@@ -76,7 +76,7 @@ class OxyHaemoglobinAbsorptionRaw(luigi.Task):
             "oxy_haemoglobin.msi"))
 
     def run(self):
-        eHbO2, eHb = get_extinction_coefficients(self.input().path)
+        eHbO2, eHb = get_haemoglobin_extinction_coefficients(self.input().path)
         writer = MsiWriter(eHbO2)
         writer.write(self.output().path)
 

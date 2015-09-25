@@ -7,7 +7,7 @@ Created on Sep 9, 2015
 import numpy as np
 
 from mc.sim import MciWrapper
-from mc.usuag import Ua, UsgMie
+from mc.usuag import Ua, UsgMie, UsgJacques
 
 
 def calc_us_muscle(wavelength):
@@ -113,11 +113,14 @@ class ColonRowe(AbstractColon):
     Rowe et al. "Modelling and validation of spectral reflectance for the colon"
     '''
 
-    def set_mucosa(self, bvf=None, saO2=None, dsp=None, r=None, d=None):
+    def set_mucosa(self, bvf=None, saO2=None, bc=None,
+                   dsp=None, r=None, d=None):
         if bvf is None:
             bvf = 0.02
         if saO2 is None:
             saO2 = 0.7
+        if bc is None:
+            bc = 20.
         if dsp is None:
             dsp = 0.015
         if d is None:
@@ -127,6 +130,7 @@ class ColonRowe(AbstractColon):
         # build obejct for absorption coefficient determination
         self.ua_muc.bvf = bvf
         self.ua_muc.saO2 = saO2
+        self.ua_muc.bc = bc
         # and one for scattering coefficient
         self.usg_muc.dsp = dsp
         self.usg_muc.r = r
@@ -153,11 +157,10 @@ class ColonRowe(AbstractColon):
         # set the layer thickness
         self.d_sm = d
 
-
     def get_layer_parameters(self):
         """get the model parameters as two numpy arrays, one for mucosa and one
         for submucusa"""
-        mucosa = np.array([self.ua_muc.bvf, self.ua_muc.saO2,
+        mucosa = np.array([self.ua_muc.bvf, self.ua_muc.saO2, self.ua.muc.bc,
                          self.usg_muc.dsp, self.usg_muc.r,
                          self.d_muc])
         submucosa = np.array([self.ua_sm.bvf, self.ua_sm.saO2,
@@ -170,7 +173,8 @@ class ColonRowe(AbstractColon):
         model_string = \
                     "mucosa    - bvf: " + "%.2f" % self.ua_muc.bvf + \
                     "%; SaO2: " + "%.2f" % self.ua_muc.saO2 + \
-                    "%; dsp: " + "%.2f" % self.usg_muc.dsp + \
+                    "%; bc: " + "%.1f" % self.ua.muc.bc + \
+                    "ug/dl; dsp: " + "%.2f" % self.usg_muc.dsp + \
                     "%; r: " + "%.2f" % (self.usg_muc.r * 10 ** 6) + \
                     "um; d: " + "%.0f" % (self.d_muc * 10 ** 6) + "um\n" + \
                     "submucosa - bvf: " + "%.2f" % (self.ua_sm.bvf) + \
@@ -182,3 +186,86 @@ class ColonRowe(AbstractColon):
 
     def __init__(self):
         super(ColonRowe, self).__init__(Ua(), UsgMie(), Ua(), UsgMie())
+
+
+
+class ColonJacques(AbstractColon):
+    '''
+    Initializes a three layer colon tissue model as e.g. used by
+    Rowe et al. "Modelling and validation of spectral reflectance for the colon"
+    '''
+
+    def set_mucosa(self, bvf=None, saO2=None, bc=None, a_mie=None, a_ray=None, d=None):
+        if bvf is None:
+            bvf = 0.02
+        if saO2 is None:
+            saO2 = 0.7
+        if bc is None:
+            bc = 20.
+        if a_mie is None:
+            a_mie = 10. * 100
+        if d is None:
+            d = 500. * 10 ** -6
+        if a_ray is None:
+            a_ray = 0.
+        # build obejct for absorption coefficient determination
+        self.ua_muc.bvf = bvf
+        self.ua_muc.saO2 = saO2
+        self.ua_muc.bc = bc
+        # and one for scattering coefficient
+        self.usg_muc.a_mie = a_mie
+        self.usg_muc.a_ray = a_ray
+        self.d_muc = d
+
+    def set_submucosa(self, bvf=None, saO2=None, dsp=None, r=None, d=None):
+        if bvf is None:
+            bvf = 0.1
+        if saO2 is None:
+            saO2 = self.ua_muc.saO2
+        if dsp is None:
+            dsp = 0.3
+        if r is None:
+            r = 2 * 10.** -6 / 2.
+        if d is None:
+            d = 500. * 10 ** -6
+        # build object for absorption coefficient determination
+        self.ua_sm.bvf = bvf
+        self.ua_sm.saO2 = saO2
+        # and one for scattering coefficient
+        self.usg_sm.dsp = dsp
+        self.usg_sm.r = r
+        # set the layer thickness
+        self.d_sm = d
+
+    def get_layer_parameters(self):
+        """get the model parameters as two numpy arrays, one for mucosa and one
+        for submucusa"""
+        mucosa = np.array([self.ua_muc.bvf, self.ua_muc.saO2, self.ua_muc.bc,
+                         self.usg_muc.a_mie, self.usg_muc.a_ray,
+                         self.usg_muc.b_mie,
+                         self.d_muc])
+        submucosa = np.array([self.ua_sm.bvf, self.ua_sm.saO2,
+                         self.usg_sm.dsp, self.usg_sm.r,
+                         self.d_sm])
+        return mucosa, submucosa
+
+    def __str__(self):
+        """print the current model"""
+        model_string = \
+                    "mucosa    - bvf: " + "%.2f" % self.ua_muc.bvf + \
+                    "%; SaO2: " + "%.2f" % self.ua_muc.saO2 + \
+                    "%; bc: " + "%.1f" % self.ua_muc.bc + \
+                    "ug/dl; a_mie: " + "%.2f" % (self.usg_muc.a_mie / 100.) + \
+                    "cm^-1; a_ray: " + "%.2f" % (self.usg_muc.a_ray / 100.) + \
+                    "cm^-1; b_mie: " + "%.3f" % self.usg_muc.b_mie + \
+                    "; d: " + "%.0f" % (self.d_muc * 10 ** 6) + "um\n" + \
+                    "submucosa - bvf: " + "%.2f" % (self.ua_sm.bvf) + \
+                    "%; SaO2: " + "%.2f" % (self.ua_sm.saO2) + \
+                    "%; dsp: " + "%.2f" % (self.usg_sm.dsp) + \
+                    "%; r: " + "%.2f" % (self.usg_sm.r * 10 ** 6) + \
+                    "um; d: " + "%.0f" % (self.d_sm * 10 ** 6) + "um"
+        return model_string
+
+    def __init__(self):
+        super(ColonJacques, self).__init__(Ua(), UsgJacques(), Ua(), UsgMie())
+

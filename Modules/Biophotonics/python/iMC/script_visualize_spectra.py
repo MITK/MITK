@@ -26,6 +26,7 @@ sp.ROOT_FOLDER = \
         "/media/wirkert/data/Data/2015_06_01_Filtertransmittance_Spectrometer"
 sp.FINALS_FOLDER = "ConvolvedSpectra"
 sp.DATA_FOLDER = "spectrometer_measurements"
+SPECTRAL_PLOTS = "spectral_plots"
 
 # the wavelengths recorded by our camera
 RECORDED_WAVELENGTHS = \
@@ -38,6 +39,7 @@ RECORDED_WAVELENGTHS = \
 class VisualizeSpectraTask(luigi.Task):
     batch_prefix = luigi.Parameter()
     batch_nr = luigi.IntParameter()
+    nr_samples = luigi.IntParameter()
 
     def requires(self):
         return mc.FilterTransmission("580.txt"), \
@@ -48,11 +50,13 @@ class VisualizeSpectraTask(luigi.Task):
             mc.FilterTransmission("511.txt"), \
             mc.FilterTransmission("600.txt"), \
             mc.FilterTransmission("700.txt"), \
-            mc.CreateSpectraTask(self.batch_prefix, self.batch_nr)
+            mc.CreateSpectraTask(self.batch_prefix, self.batch_nr,
+                                 self.nr_samples)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
+                                              SPECTRAL_PLOTS,
             "plotted_spectra_" +
             self.batch_prefix + "_" + str(self.batch_nr) + ".png"))
 
@@ -93,8 +97,10 @@ class VisualizeSpectraTask(luigi.Task):
         # tidy up and save plot
         major_ticks = np.arange(450, 720, 50) * 10 ** -9
         minor_ticks = np.arange(450, 720, 10) * 10 ** -9
+        org_ax.set_title(self.batch_prefix)
         org_ax.set_xticks(major_ticks)
         org_ax.set_xticks(minor_ticks, minor=True)
+        fold_ax.set_title("response to camera filter sensitivities")
         fold_ax.set_xticks(major_ticks)
         fold_ax.set_xticks(minor_ticks, minor=True)
         org_ax.grid()
@@ -109,7 +115,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("10_bvf_debug_g_us_hack_high_d", 0)
+    main_task = VisualizeSpectraTask("standard_spectrum_jacques_bili_test_2nm", 0, 10)
     w.add(main_task)
     w.run()
 

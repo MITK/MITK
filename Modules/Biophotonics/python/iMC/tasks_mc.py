@@ -20,9 +20,10 @@ import logging
 import luigi
 import copy
 import random
+import itertools
 
 import scriptpaths as sp
-from mc.tissuemodels import Colon
+from mc.tissuemodels import ColonRowe, ColonJacques
 from mc.sim import SimWrapper, get_diffuse_reflectance
 from msi.io.spectrometerreader import SpectrometerReader
 from msi.io.msiwriter import MsiWriter
@@ -189,6 +190,7 @@ class CameraBatch(luigi.Task):
 class CreateSpectraTask(luigi.Task):
     batch_prefix = luigi.Parameter()
     batch_nr = luigi.IntParameter()
+    nr_samples = luigi.IntParameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -198,58 +200,79 @@ class CreateSpectraTask(luigi.Task):
 
     def run(self):
         start = time.time()
-        NR_ELEMENTS_IN_BATCH = 1000
         # setup simulation wrapper
         self.sim_wrapper = SimWrapper()
         self.sim_wrapper.set_mci_filename(MCI_FILENAME)
         self.sim_wrapper.set_mcml_executable(PATH_TO_MCML + EXEC_MCML)
         # setup colon model
-        self.colon_model = Colon()
+        self.colon_model = ColonJacques()
         self.colon_model.nr_photons = 10 ** 6
         self.colon_model.set_mci_filename(self.sim_wrapper.mci_filename)
         self.colon_model.set_mco_filename(MCO_FILENAME)
         # setup array in which data shall be stored
         batch = Batch()
-        batch.reflectances = np.zeros((NR_ELEMENTS_IN_BATCH, len(WAVELENGTHS)))
-        batch.mucosa = np.zeros((NR_ELEMENTS_IN_BATCH,
-                            len(self.colon_model.get_layer_parameters()[0])))
-        batch.submucosa = np.zeros((NR_ELEMENTS_IN_BATCH,
-                            len(self.colon_model.get_layer_parameters()[1])))
-        batch.nr_photons = self.colon_model.nr_photons
+        batch.reflectances = []
+        batch.mucosa = []
+        batch.submucosa = []
         batch.wavelengths = WAVELENGTHS
-        # now generate NR_ELEMENTS_IN_BATCH different colon spectra
-        for i in range(NR_ELEMENTS_IN_BATCH):
-            # randomly draw paramters for submucosa and mucosa
-            muc_bvf = random.uniform(0.001, 0.4)
-            # 0.01 + i * 0.04  # 0.04  # random.uniform(0.001, 0.4)
-            muc_saO2 = random.uniform(0., 1.)
-            # 0.7  # i * 0.1  # random.uniform(0., 1.)
-            muc_dsp = random.uniform(0.001, 0.6)
-            # 0.01 + i * 0.06  # 0.2  # random.uniform(0.001, 0.6)
-            muc_d = random.uniform(250, 735) * 10 ** -6
-            # (250 + 0.1 * i * 500) * 10 ** -6
-            # random.uniform(250, 735) * 10 ** -6
-            # 500
-            sm_bvf = random.uniform(0.03, 0.4)
-            # 0.1  # random.uniform(0.03, 0.4)
-            sm_saO2 = muc_saO2  # submocosa and mucosa oxygenation are equal
-            sm_dsp = random.uniform(0.03, 0.6)
-            # 0.3  # random.uniform(0.03, 0.6)
-            # set layers to these values
-            self.colon_model.set_mucosa(bvf=muc_bvf, saO2=muc_saO2,
-                                        dsp=muc_dsp, d=muc_d)
-            self.colon_model.set_submucosa(bvf=sm_bvf, saO2=sm_saO2,
-                                        dsp=sm_dsp)
+
+        # use this to create plot from Jacques Fig 17,
+        # Optical properties of biological tissues: a review
+#         a_mie_range = np.linspace(5., 20., 4)
+#         a_ray_1 = np.zeros_like(a_mie_range)
+#         a_ray_range = np.linspace(5., 60., 7)
+#         a_mie_2 = np.ones_like(a_ray_range) * 20.
+#         plt_range = np.concatenate([zip(a_mie_range, a_ray_1),
+#                                    zip(a_mie_2, a_ray_range)])
+
+        # use this to create a certain range of parameters
+        bvf_ranges = np.linspace(0.01, 0.4, self.nr_samples)
+        saO2_ranges = np.linspace(0.0, 1., self.nr_samples)
+        # beta carotin:
+        bc_ranges = np.linspace(0.0, 50., self.nr_samples)
+        a_mie_ranges = np.linspace(1.0 / 100., 10. / 100.,
+                                   self.nr_samples) * 100.
+        a_ray_ranges = np.linspace(1., 60., self.nr_samples) * 100.
+        d_ranges = np.linspace(250, 735, self.nr_samples) * 10 ** -6
+        bvf_ranges = np.array([0.04])
+        saO2_ranges = np.array([0.7])
+        bc_ranges = np.array([20.8])
+        a_mie_ranges = np.array([5.0]) * 100.
+        a_ray_ranges = np.array([0.0]) * 100.
+        bvf_sm_ranges = np.array([0.1])
+        dsp_sm_range = np.array([0.3])
+        d_ranges = np.array([500]) * 10 ** -6
+        plt_range = itertools.product(bvf_ranges,
+                                      saO2_ranges,
+                                      bc_ranges,
+                                      a_mie_ranges,
+                                      a_ray_ranges,
+                                      d_ranges,
+                                      bvf_sm_ranges, dsp_sm_range)
+
+        for i, (bvf, saO2, bc, a_mie, a_ray, d, bvf_sm, dsp_sm) \
+                                                    in enumerate(plt_range):
+
+            self.colon_model.set_mucosa(bvf=bvf, saO2=saO2, bc=bc,
+                                        a_mie=a_mie,
+                                        a_ray=a_ray,
+                                        d=d)
+            self.colon_model.set_submucosa(bvf=bvf_sm, saO2=saO2,
+                                        dsp=dsp_sm)
             # map the wavelengths array to reflectance list
             reflectances = map(self.wavelength_to_reflectance, WAVELENGTHS)
             # store in batch_nr
             mucosa, submucosa = self.colon_model.get_layer_parameters()
-            batch.mucosa[i] = mucosa
-            batch.submucosa[i] = submucosa
-            batch.reflectances[i] = np.asarray(reflectances)
+            batch.mucosa.append(mucosa)
+            batch.submucosa.append(submucosa)
+            batch.reflectances.append(np.asarray(reflectances))
             # success!
             logging.info("successfully ran simulation " + str(i) + " for\n" +
                          str(self.colon_model))
+        # convert the lists in batch to np arrays
+        batch.mucosa = np.array(batch.mucosa)
+        batch.submucosa = np.array(batch.submucosa)
+        batch.reflectances = np.array(batch.reflectances)
         # clean up temporarily created files
         os.remove(MCI_FILENAME)
         created_mco_file = PATH_TO_MCML + "/" + MCO_FILENAME

@@ -11,7 +11,7 @@ from scipy.interpolate import interp1d
 
 import mc.bhmie_herbert_kaiser_july2012 as bhmie
 
-def get_extinction_coefficients(reference_filename=None):
+def get_haemoglobin_extinction_coefficients(reference_filename=None):
     """
     helper method to get reference data for eHbO2 and eHb from Scott Prahls
     reference file:
@@ -32,6 +32,44 @@ def get_extinction_coefficients(reference_filename=None):
     return eHbO2, eHb
 
 
+def get_beta_carotin_extinction_coefficients(reference_filename=None):
+    """
+    Reference data taken from
+    http://omlc.org/spectra/PhotochemCAD/data/041-abs.txt
+    """
+    if reference_filename is None:
+        reference_filename = "./mc/data/beta_carotin.txt"
+    # table with wavelength at 1st row,
+    # beta carotin molar extinction coefficient [cm**-1/(M)]
+    betaLUT = np.loadtxt(reference_filename, skiprows=2)
+    # we calculate everything in [m] instead of [nm] and [1/cm]
+    betaLUT[:, 0] = betaLUT[:, 0] * 10 ** -9
+    betaLUT[:, 1:] = betaLUT[:, 1:] * 10 ** 2
+    # get the data into an interpolation map
+    eBc = interp1d(betaLUT[:, 0], betaLUT[:, 1], bounds_error=False,
+                  fill_value=0.)
+    return eBc
+
+
+def get_bilirubin_extinction_coefficients(reference_filename=None):
+    """
+    Reference data taken from
+    http://omlc.org/spectra/PhotochemCAD/data/041-abs.txt
+    """
+    if reference_filename is None:
+        reference_filename = "./mc/data/bilirubin.txt"
+    # table with wavelength at 1st row,
+    # beta carotin molar extinction coefficient [cm**-1/(M)]
+    biliLUT = np.loadtxt(reference_filename, skiprows=2)
+    # we calculate everything in [m] instead of [nm] and [1/cm]
+    biliLUT[:, 0] = biliLUT[:, 0] * 10 ** -9
+    biliLUT[:, 1:] = biliLUT[:, 1:] * 10 ** 2
+    # get the data into an interpolation map
+    eBili = interp1d(biliLUT[:, 0], biliLUT[:, 1], bounds_error=False,
+                  fill_value=0.)
+    return eBili
+
+
 class Ua(object):
 
     def __init__(self):
@@ -39,7 +77,12 @@ class Ua(object):
         self.cHb = 120.  # g*Hb/l
         self.saO2 = 0.  # %
         self.eHbO2, self.eHb = \
-            get_extinction_coefficients()
+            get_haemoglobin_extinction_coefficients()
+        # ug / dl
+        self.cBetaCarotinUgProDl = 20.8
+        self.cBilirubinMgProDl = 1.23
+        self.eBc = get_beta_carotin_extinction_coefficients()
+        self.eBili = get_bilirubin_extinction_coefficients()
 
 
     def __call__(self, wavelength):
@@ -48,10 +91,66 @@ class Ua(object):
         For more on this equation, please refer to
         http://omlc.org/spectra/hemoglobin/
         """
-        return math.log(10) * self.cHb * \
+        ua_haemoglobin = math.log(10) * self.cHb * \
             (self.saO2 * self.eHbO2(wavelength) +
-             (1 - self.saO2) * self.eHb(wavelength)) \
+            (1 - self.saO2) * self.eHb(wavelength)) \
             / 64500. * self.bvf
+        ua_bilirubin = math.log(10) * self.cBilirubinMgProDl * \
+            0.01 / 574.65 * \
+            self.eBili(wavelength) * self.bvf * 0.55
+        # second line is to convert from mg/dl to g/ mole
+        ua_beta_carotin = math.log(10) * self.cBetaCarotinUgProDl * \
+            0.01 / 536.8726 * 10 ** -3 * \
+            self.eBc(wavelength) * self.bvf * 0.55  # 55 % of blood is plasma
+
+        return  ua_haemoglobin + ua_bilirubin + ua_beta_carotin
+
+
+
+
+class UsgJacques(object):
+
+    def __init__(self):
+        """
+        To be set externally:
+
+        a':
+        """
+        self.a_ray = 0. / 100.
+        self.a_mie = 20. / 100.
+        self.b_mie = 1.091
+
+    def __call__(self, wavelength):
+        """
+        Calculate the scattering parameters relevant for monte carlo simulation.
+
+        Uses equation (2) from: Optical properties of biological tissues:
+        a Review
+
+        Args
+        ____
+        wavelength:
+            wavelength of the incident light [m]
+
+        Returns:
+        ____
+        (us, g)
+            scattering coefficient us [1/m] and anisotropy factor g
+        """
+
+        norm_wavelength = (wavelength / (500 * 10 ** -9))
+
+        us_ray = self.a_ray * norm_wavelength ** (-4)
+        us_mie = self.a_mie * norm_wavelength ** (-self.b_mie)
+
+        us = (us_ray + us_mie)  # * 100. to convert to m^-1
+        # actually we calculated the reduced scattering coefficent, so
+        # assume g is 0
+        g = 0
+
+        return us, g
+
+
 
 
 class UsgMie(object):
@@ -112,3 +211,4 @@ class UsgMie(object):
 #         us = self.dsp / (4. / 3. * self.r ** 3. * math.pi) * cs
 #         g = gsca
         return us, g
+

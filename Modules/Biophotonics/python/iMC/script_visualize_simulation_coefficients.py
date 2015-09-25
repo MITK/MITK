@@ -9,26 +9,31 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-from mc.usuag import UsgMie
+from mc.usuag import UsgMie, UsgJacques
 
 if __name__ == '__main__':
+    wavelengths = np.arange(350, 1350, 10) * 10 ** -9
+
     # set up plots
-    f, axarr = plt.subplots(1, 4)
+    f, axarr = plt.subplots(4, 1)
     usplt = axarr[0]
     usplt.grid()
-    usplt.set_xlabel("wavelengths [nm]")
+    usplt.set_xlabel("wavelength [nm]")
     usplt.set_ylabel("us [cm-1]")
+    usplt.set_yscale('log')
     usplt.set_title("scattering coefficient")
+    usplt.set_xticks(np.arange(450, 720, 20))
     gplt = axarr[1]
     gplt.grid()
-    gplt.set_xlabel("wavelengths [nm]")
+    gplt.set_xlabel("wavelength [nm]")
     gplt.set_ylabel("g")
     gplt.set_title("anisotropy factor")
     usrplt = axarr[2]
     usrplt.grid()
-    usrplt.set_xlabel("wavelengths [nm]")
+    usrplt.set_xlabel("wavelength [nm]")
     usrplt.set_ylabel("us' [cm-1]")
     usrplt.set_title("reduced scattering coefficient")
+    usrplt.set_xticks(np.arange(450, 720, 20))
     aniplt = axarr[3]
     aniplt.grid()
     aniplt.set_xlabel("x = ka = size parameter")
@@ -36,19 +41,20 @@ if __name__ == '__main__':
     aniplt.set_xscale('log')
     aniplt.set_title("anisotropy")
     # set up simulation
-    usg = UsgMie()
-    usg.dsp = 0.04
+    usg = UsgJacques()
 #     usg.n_medium = 1.33
 #     usg.n_particle = 1.40
-    wavelengths = np.arange(400, 700, 10) * 10 ** -9
 
-    plt_range = np.linspace(0.4, 0.74, 1) * 10 ** -6  # np.array([0.4 * 10 ** -6])
-    # np.linspace(2., 3., 10) * 10 ** -6
-    # np.array([579. / 2. * 10 ** -9])
-    # np.linspace(0.1, 0.74, 10) * 10 ** -6
-    for i, d in enumerate(plt_range):
+    a_mie_range = np.linspace(5., 20., 4)  # 100
+    a_ray_1 = np.zeros_like(a_mie_range)
+    a_ray_range = np.linspace(5., 60., 7)  # * 100
+    a_mie_2 = np.ones_like(a_ray_range)  # * 20. * 100
+    plt_range = np.concatenate([zip(a_mie_range, a_ray_1),
+                               zip(a_mie_2, a_ray_range)])
+    for i, p in enumerate(plt_range):
         # set and calculate values
-        usg.r = d / 2.
+        usg.a_mie = p[0]
+        usg.a_ray = p[1]
         us = [usg(w)[0] for w in wavelengths]
         g = [usg(w)[1] for w in wavelengths]
         # plot stuff
@@ -57,11 +63,17 @@ if __name__ == '__main__':
                0.,
                1. - (1. / float(len(plt_range)) * i))
         # plot scattering coefficient
-        usplt.plot(wavelengths * 10 ** 9, np.array(us) / 100., color=plt_color)
-        # plot anisotropy factor
-        gplt.plot(wavelengths * 10 ** 9, g, color=plt_color)
-        # plot reduced scattering coefficient
-        usrplt.plot(wavelengths * 10 ** 9, np.array(us) * (1.0 - np.array(g)) / 100.,
+        usplt.plot(wavelengths * 10 ** 9, np.array(us) / 100.,
+                    '-o',
                     color=plt_color)
-        aniplt.plot(2. * math.pi * usg.r / wavelengths * usg.n_medium, g)
+        # plot anisotropy factor
+        gplt.plot(wavelengths * 10 ** 9, g,
+                  '-o',
+                  color=plt_color)
+        # plot reduced scattering coefficient
+        usrplt.plot(wavelengths * 10 ** 9,
+                    np.array(us) * (1.0 - np.array(g)) / 100.,
+                    '-o',
+                    color=plt_color)
+        # aniplt.plot(2. * math.pi * usg.r / wavelengths * usg.n_medium, g)
     plt.show()

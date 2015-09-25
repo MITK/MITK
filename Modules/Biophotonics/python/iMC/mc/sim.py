@@ -105,8 +105,8 @@ class MciWrapper(object):
 
             # factors (/100.; *100.) to convert to mcml expected units:
             f.write("%.3f" % layer[0] + " " +  # n
-                    "%.3f" % (layer[1] / 100.) + " " +  # ua
-                    "%.3f" % (layer[2] / 100.) + " " +  # us
+                    "%.5f" % (layer[1] / 100.) + " " +  # ua
+                    "%.5f" % (layer[2] / 100.) + " " +  # us
                     "%.3f" % layer[3] + " " +  # g
                     "%.3f" % (layer[4] * 100.) + "\n")  # d
         f.write(repr(self.n_below) + " # n for medium below.\n")

@@ -237,6 +237,8 @@ bool mitk::USDevice::Initialize()
 
 bool mitk::USDevice::Connect()
 {
+  MITK_DEBUG << "mitk::USDevice::Connect() called";
+
   if (this->GetIsConnected())
   {
     MITK_INFO("mitkUSDevice") << "Tried to connect an ultrasound device that "

@@ -44,7 +44,7 @@ bool mitk::IGTLClient::OpenConnection()
   if (this->GetState() != Setup)
   {
     mitkThrowException(mitk::Exception) <<
-      "Can only try to open the connection if in setup mode";
+      "Can only try to open the connection if in setup mode. State was " << this->GetState();
     return false;
   }
 
@@ -54,6 +54,7 @@ bool mitk::IGTLClient::OpenConnection()
   if (portNumber == -1 || hostname.size() <= 0)
   {
     //port number or hostname was not correct
+    MITK_WARN << "Port number or hostname was not correct";
     return false;
   }
 
@@ -92,6 +93,10 @@ void mitk::IGTLClient::Receive()
     //inform observers about loosing the connection to this socket
     this->InvokeEvent(LostConnectionEvent());
     MITK_WARN("IGTLClient") << "Lost connection to server socket.";
+  }
+  else
+  {
+    MITK_INFO << "Received IGT Message with status: " << status;
   }
 }
 

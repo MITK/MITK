@@ -1,33 +1,39 @@
 /*===================================================================
 
-        The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
-        Copyright (c) German Cancer Research Center,
-        Division of Medical and Biological Informatics.
-        All rights reserved.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-        This software is distributed WITHOUT ANY WARRANTY; without
-        even the implied warranty of MERCHANTABILITY or FITNESS FOR
-        A PARTICULAR PURPOSE.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
-        See LICENSE.txt or http://www.mitk.org for details.
+See LICENSE.txt or http://www.mitk.org for details.
 
-        ===================================================================*/
+===================================================================*/
 
 #include <mitkIGTLMessageToUSImageFilter.h>
 #include <igtlImageMessage.h>
 #include <itkByteSwapper.h>
 
 void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
-    mitk::Image::Pointer& img)
+  mitk::Image::Pointer& img)
 {
   m_upstream->Update();
 
   mitk::IGTLMessage* msg = m_upstream->GetOutput();
-  if (!msg->IsDataValid())
+
+  //MITK_INFO << "This (" << this << ") got IGTLMessageInfo: [msg_name = " << msg->GetName() << "] [obj_name = " << msg->GetObjectName()
+  //<<"] [valid = " << msg->IsDataValid() << "] [timestamp = " << msg ->GetTimeStamp() << "]";
+  //groehl: fixed possible nullpointer issue
+  if (msg != nullptr && !msg->IsDataValid())
   {
     return;
   }
+
+  MITK_INFO << "Data was VALID!";
 
   igtl::MessageBase::Pointer msgBase = msg->GetMessage();
   igtl::ImageMessage* imgMsg = (igtl::ImageMessage*)(msgBase.GetPointer());
@@ -42,39 +48,39 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
 
   switch (imgMsg->GetScalarType())
   {
-    case igtl::ImageMessage::TYPE_UINT8:
-      Initiate<unsigned char>(img, imgMsg, big_endian);
-      break;
-    case igtl::ImageMessage::TYPE_INT8:
-      Initiate<char>(img, imgMsg, big_endian);
-      break;
-    case igtl::ImageMessage::TYPE_UINT16:
-      Initiate<unsigned short>(img, imgMsg, big_endian);
-      break;
-    case igtl::ImageMessage::TYPE_INT16:
-      Initiate<short>(img, imgMsg, big_endian);
-      break;
-    case igtl::ImageMessage::TYPE_UINT32:
-      Initiate<unsigned int>(img, imgMsg, big_endian);
-      break;
-    case igtl::ImageMessage::TYPE_INT32:
-      Initiate<int>(img, imgMsg, big_endian);
-      break;
-    case igtl::ImageMessage::TYPE_FLOAT32:
-      Initiate<float>(img, imgMsg, big_endian);
-      break;
-    case igtl::ImageMessage::TYPE_FLOAT64:
-      Initiate<double>(img, imgMsg, big_endian);
-      break;
-    default:
-      mitkThrow() << "Incompatible PixelType " << imgMsg;
+  case igtl::ImageMessage::TYPE_UINT8:
+    Initiate<unsigned char>(img, imgMsg, big_endian);
+    break;
+  case igtl::ImageMessage::TYPE_INT8:
+    Initiate<char>(img, imgMsg, big_endian);
+    break;
+  case igtl::ImageMessage::TYPE_UINT16:
+    Initiate<unsigned short>(img, imgMsg, big_endian);
+    break;
+  case igtl::ImageMessage::TYPE_INT16:
+    Initiate<short>(img, imgMsg, big_endian);
+    break;
+  case igtl::ImageMessage::TYPE_UINT32:
+    Initiate<unsigned int>(img, imgMsg, big_endian);
+    break;
+  case igtl::ImageMessage::TYPE_INT32:
+    Initiate<int>(img, imgMsg, big_endian);
+    break;
+  case igtl::ImageMessage::TYPE_FLOAT32:
+    Initiate<float>(img, imgMsg, big_endian);
+    break;
+  case igtl::ImageMessage::TYPE_FLOAT64:
+    Initiate<double>(img, imgMsg, big_endian);
+    break;
+  default:
+    mitkThrow() << "Incompatible PixelType " << imgMsg;
   }
 }
 
 template <typename TPixel>
 void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
-                                                igtl::ImageMessage* msg,
-                                                bool big_endian)
+  igtl::ImageMessage* msg,
+  bool big_endian)
 {
   typedef itk::Image<TPixel, 3> ImageType;
 
@@ -145,6 +151,8 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   img->InitializeByItk(output.GetPointer());
   img->SetVolume(output->GetBufferPointer());
 
+  MITK_INFO << "Received image. Dimensions: " << img->GetDimensions() << " Channels: " << img->GetNumberOfChannels() << "\n";
+
   float iorigin[3];
   msg->GetOrigin(iorigin);
   for (size_t i = 0; i < 3; i++)
@@ -161,10 +169,11 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
 mitk::IGTLMessageToUSImageFilter::IGTLMessageToUSImageFilter()
   : m_upstream(nullptr)
 {
+  MITK_INFO << "Instantiated this (" << this << ") mitkIGTMessageToUSImageFilter\n";
 }
 
 void mitk::IGTLMessageToUSImageFilter::SetNumberOfExpectedOutputs(
-    unsigned int numOutputs)
+  unsigned int numOutputs)
 {
   if (numOutputs > 1)
   {
@@ -173,7 +182,8 @@ void mitk::IGTLMessageToUSImageFilter::SetNumberOfExpectedOutputs(
 }
 
 void mitk::IGTLMessageToUSImageFilter::ConnectTo(
-    mitk::IGTLMessageSource* UpstreamFilter)
+  mitk::IGTLMessageSource* UpstreamFilter)
 {
+  MITK_INFO << "Connected this (" << this << ") mitkIGTLMessageToUSImageFilter to MessageSource (" << UpstreamFilter << ")\n";
   m_upstream = UpstreamFilter;
 }

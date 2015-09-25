@@ -143,10 +143,12 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   int r =
      socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(), 0);
 
+  MITK_INFO << "Server received r = " << r;
+
   if (r == 0) //connection error
   {
     // an error was received, therefor the communication with this socket
-    // must be stopped
+    // must be stoppedy
     return IGTL_STATUS_NOT_PRESENT;
   }
   else if (r == -1 ) //timeout
@@ -156,8 +158,14 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   }
   else if (r == headerMsg->GetPackSize())
   {
+    MITK_INFO << "Is Pack Size";
     // Deserialize the header and check the CRC
+    // ERROR HERE: This probably means the header data is corrupted...
     int crcCheck = headerMsg->Unpack(1);
+
+    MITK_INFO << "CRC Check: " << crcCheck << " Bool: " << ((crcCheck & igtl::MessageHeader::UNPACK_HEADER) == true);
+    MITK_INFO << "headerMsg: " << headerMsg;
+
     if (crcCheck & igtl::MessageHeader::UNPACK_HEADER)
     {
       // Allocate a time stamp
@@ -220,17 +228,16 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       // measure the time
       long long timeStamp6 = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
-
       if ( receiveCheck > 0 )
       {
         int c = curMessage->Unpack(1);
         if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
         {
-//            mitkThrow() << "crc error";
           return IGTL_STATUS_CHECKSUM_ERROR;
         }
 
         //save timestamp 6 now because we know the index
+        // Here again, is a explicit conversion to TrackingDataMessage ONLY... Why?
         igtl::TrackingDataMessage* tdMsg =
           (igtl::TrackingDataMessage*)(curMessage.GetPointer());
         igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
@@ -261,6 +268,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
           this->m_ReceiveQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
+        MITK_INFO << "GOT TO THE END!!";
         return IGTL_STATUS_OK;
       }
       else
@@ -273,6 +281,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
     else
     {
       //CRC check failed
+      MITK_ERROR << "CRC Check failed";
       return IGTL_STATUS_CHECKSUM_ERROR;
     }
   }
@@ -280,6 +289,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   {
     //Message size information and actual data size don't match.
     //this state is not suppossed to be reached, return unknown error
+    MITK_ERROR << "IGTL status unknown";
     return IGTL_STATUS_UNKNOWN_ERROR;
   }
 }
@@ -491,7 +501,7 @@ bool mitk::IGTLDevice::SendRTSMessage(const char* type)
 
 void mitk::IGTLDevice::Connect()
 {
-
+  MITK_DEBUG << "mitk::IGTLDevice::Connect();";
 }
 
 igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()

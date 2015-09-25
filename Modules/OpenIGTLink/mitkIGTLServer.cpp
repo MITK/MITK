@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <igtlServerSocket.h>
 #include <igtlTrackingDataMessage.h>
+#include <igtlImageMessage.h>
 #include <igtl_status.h>
 
 
@@ -121,6 +122,14 @@ void mitk::IGTLServer::Receive()
       socketsToBeRemoved.push_back(*it);
       MITK_WARN("IGTLServer") << "Lost connection to a client socket. ";
     }
+    else if(status != 1)
+    {
+      MITK_WARN("IGTLServer") << "ERROR IGTL Message with status: " << status;
+    }
+    else
+    {
+      MITK_INFO("IGTLServer") << "It works..";
+    }
   }
   if ( socketsToBeRemoved.size() > 0 )
   {
@@ -141,6 +150,8 @@ void mitk::IGTLServer::Send()
   // there is no message => return
   if ( curMessage.IsNull() )
     return;
+
+  //Why always cast to TrackingDataMessage?
 
   igtl::TrackingDataMessage* tdMsg =
       (igtl::TrackingDataMessage*)(curMessage.GetPointer());
@@ -164,6 +175,7 @@ void mitk::IGTLServer::Send()
   {
     //maybe there should be a check here if the current socket is still active
     this->SendMessagePrivate(curMessage.GetPointer(), *it);
+    MITK_INFO("IGTLServer") << "Sent IGTL Message";
   }
 }
 

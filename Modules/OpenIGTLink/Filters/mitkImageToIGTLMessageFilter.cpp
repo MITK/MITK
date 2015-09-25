@@ -38,15 +38,23 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     const mitk::Image* img = this->GetInput(i);
 
     int dims = img->GetDimension();
+    int chn = img->GetNumberOfChannels();
+
+    MITK_INFO << "Sending image. Dimensions: " << dims << " Channels: " << chn << "\n";
+
+    if (dims < 1)
+    {
+      MITK_ERROR << "Can not handle dimensionless images";
+    }
     if (dims > 3)
     {
       MITK_ERROR << "Can not handle more than three dimensions";
       continue;
     }
 
-    if (img->GetNumberOfChannels() != 1)
+    if (chn != 1)
     {
-      MITK_ERROR << "Can not handle more than one channel";
+      MITK_ERROR << "Can not handle anything but one channel. Image contained " << chn;
       continue;
     }
 
@@ -155,7 +163,7 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     {
       case itk::ImageIOBase::CHAR:
       case itk::ImageIOBase::UCHAR:
-        // No endian conversion necessary.
+        // No endian conversion necessary, because a char is exactly one byte!
         break;
       case itk::ImageIOBase::SHORT:
       case itk::ImageIOBase::USHORT:
@@ -219,7 +227,7 @@ const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(unsigned int idx)
 
 void mitk::ImageToIGTLMessageFilter::ConnectTo(mitk::ImageSource* upstream)
 {
-    MITK_INFO << "Upstream is " << upstream;
+    MITK_INFO << "Image source for this (" << this << ") mitkImageToIGTLMessageFilter is " << upstream;
   for (DataObjectPointerArraySizeType i = 0; i < upstream->GetNumberOfOutputs();
        i++)
   {

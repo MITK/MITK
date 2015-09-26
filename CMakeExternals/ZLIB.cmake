@@ -4,7 +4,7 @@
 if(MITK_USE_ZLIB)
 
   set(proj ZLIB)
-  set(${proj}_DEPENDENCIES )
+  set(proj_DEPENDENCIES )
   set(ZLIB_DEPENDS ${proj})
 
   if(NOT DEFINED ZLIB_DIR)
@@ -32,7 +32,7 @@ if(MITK_USE_ZLIB)
         -DZLIB_INSTALL_INCLUDE_DIR:STRING=include/mitk_zlib
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
-      DEPENDS ${ZLIB_DEPENDENCIES}
+      DEPENDS ${proj_DEPENDENCIES}
       )
     set(ZLIB_DIR ${ep_prefix})
     set(ZLIB_INCLUDE_DIR ${ZLIB_DIR}/include/mitk_zlib)

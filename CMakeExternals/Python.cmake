@@ -12,7 +12,8 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
   set(MITK_PYTHON_PATCH_VERSION 3)
   set(PYTHON_SOURCE_PACKAGE Python-${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}.${MITK_PYTHON_PATCH_VERSION})
   set(proj ${PYTHON_SOURCE_PACKAGE})
-  set(Python_DEPENDS ${proj})
+  set(proj_DEPENDENCIES )
+  set(${proj}_DEPENDS ${proj})
 
   if(NOT DEFINED Python_DIR)
 
@@ -27,11 +28,12 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       BUILD_COMMAND ""
       INSTALL_COMMAND ""
     )
-
+  else()
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()
 
   set(proj Python)
-  set(Python_DEPENDENCIES ZLIB ${PYTHON_SOURCE_PACKAGE})
+  set(proj_DEPENDENCIES ZLIB ${PYTHON_SOURCE_PACKAGE})
   set(Python_DEPENDS ${proj})
 
   if(NOT DEFINED Python_DIR)
@@ -155,7 +157,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
       DEPENDS
-        ${Python_DEPENDENCIES}
+        ${proj_DEPENDENCIES}
     )
 
     # set versions, override

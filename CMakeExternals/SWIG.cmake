@@ -8,7 +8,7 @@ if(MITK_USE_SWIG)
 
   set(SWIG_TARGET_VERSION 3.0.2)
   set(proj SWIG)
-  set(SWIG_DEPENDENCIES PCRE)
+  set(proj_DEPENDENCIES PCRE)
   set(SWIG_DEPENDS ${proj})
 
   if(NOT SWIG_DIR)
@@ -57,7 +57,7 @@ if(MITK_USE_SWIG)
                             --with-pcre-prefix=${PCRE_DIR}
                             --without-octave
                             --with-python=${PYTHON_EXECUTABLE}
-        DEPENDS ${SWIG_DEPENDENCIES}
+        DEPENDS ${proj_DEPENDENCIES}
         )
 
       ExternalProject_Get_Property(${proj} install_dir)
@@ -65,5 +65,7 @@ if(MITK_USE_SWIG)
       set(SWIG_EXECUTABLE ${install_dir}/bin/swig)
 
     endif()
+  else()
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()
 endif()

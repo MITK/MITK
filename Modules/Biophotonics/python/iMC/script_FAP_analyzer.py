@@ -48,7 +48,7 @@ if __name__ == '__main__':
         main_task = at.CreateNiceParametricImagesTask(
             imageName=long_exposed_file,
             batch_prefix=
-            "batch")
+            "new_batch_jacques_and_billi")
         w.add(main_task)
     w.run()
 

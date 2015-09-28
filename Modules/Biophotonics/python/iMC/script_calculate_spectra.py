@@ -25,7 +25,7 @@ if __name__ == '__main__':
     w = luigi.worker.Worker(scheduler=sch)
     BATCH_NUMBERS = np.arange(0, 10, 1)
     for i in BATCH_NUMBERS:
-        main_task = mc.CreateSpectraTask("new_batch_mie_correction", i)
+        main_task = mc.CreateSpectraTask("new_batch_jacques_and_billi", i, 1000)
         w.add(main_task)
         w.run()
 

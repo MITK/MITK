@@ -201,15 +201,14 @@ class CreateNiceParametricImagesTask(luigi.Task):
         plot_axis(bottom_left_axis, r2_image, "r2 score (cut off at 0).\n" +
                      "median r2_score = " + str(r2_median))
         # plot parametric maps
-        image[0, 0, 0] = 0.; image[1, 0, 0] = 0.4
         plot_axis(axarr[0, 1], image[:, :, 0], "blood volume fraction [%]")
-        image[0, 0, 1] = 0.; image[1, 0, 1] = 0.6
-        plot_axis(axarr[0, 2], image[:, :, 2],
-                  "density scattering particles [%]")
-        image[0, 0, 2] = 175 * 10 ** -6; image[1, 0, 0] = 750 * 10 ** -6
-        plot_axis(axarr[1, 1], image[:, :, 4] * 10 ** 6,
-                  "mucosa thickness [um]")
-        image[0, 0, 3] = 0.; image[1, 0, 3] = 1.
-        plot_axis(axarr[1, 2], image[:, :, 1], "oxygenation [%]")
+        image[0, 0, 1] = 0.; image[1, 0, 1] = 1.
+        plot_axis(axarr[0, 2], image[:, :, 1],
+                  "oxygenation [%]")
+        # image[0, 0, 2] = 175 * 10 ** -6; image[1, 0, 0] = 750 * 10 ** -6
+        plot_axis(axarr[1, 1], image[:, :, 2] * 100,
+                  "bilirubin concentration [mg/dl]")
+        plot_axis(axarr[1, 2], image[:, :, 3] / 100.,
+                  "mie scatter parameter [1/cm]")
 
         plt.savefig(self.output().path, dpi=1000, bbox_inches='tight')

@@ -226,33 +226,39 @@ class CreateSpectraTask(luigi.Task):
 #                                    zip(a_mie_2, a_ray_range)])
 
         # use this to create a certain range of parameters
-        bvf_ranges = np.linspace(0.01, 0.4, self.nr_samples)
-        saO2_ranges = np.linspace(0.0, 1., self.nr_samples)
+        bvf_ranges = np.random.uniform(0.01, 0.4, self.nr_samples)
+        saO2_ranges = np.random.uniform(0.0, 1., self.nr_samples)
         # bilirubin in range 0. - 10. mg/dl:
-        bili_ranges = np.linspace(0.0, 5., self.nr_samples) * 0.01
-        a_mie_ranges = np.linspace(1.0 / 100., 10. / 100.,
+        bili_ranges = np.random.uniform(0.0, 8., self.nr_samples) * 0.01
+        a_mie_ranges = np.random.uniform(5.0, 20.,
                                    self.nr_samples) * 100.
-        a_ray_ranges = np.linspace(1., 60., self.nr_samples) * 100.
-        d_ranges = np.linspace(250, 735, self.nr_samples) * 10 ** -6
-        bvf_ranges = np.array([0.04])
-        saO2_ranges = np.array([0.7])
+        a_ray_ranges = np.random.uniform(0., 60., self.nr_samples) * 100.
+        d_ranges = np.random.uniform(250, 735, self.nr_samples) * 10 ** -6
+        # bvf_ranges = np.array([0.04])
+        # saO2_ranges = np.array([0.7])
         # bili_ranges = np.array([1.23])
-        a_mie_ranges = np.array([5.0]) * 100.
-        a_ray_ranges = np.array([0.0]) * 100.
-        bvf_sm_ranges = np.array([0.1])
-        dsp_sm_range = np.array([0.3])
-        d_ranges = np.array([500]) * 10 ** -6
-        plt_range = itertools.product(bvf_ranges,
-                                      saO2_ranges,
-                                      bili_ranges,
-                                      a_mie_ranges,
-                                      a_ray_ranges,
-                                      d_ranges,
-                                      bvf_sm_ranges, dsp_sm_range)
+#         a_mie_ranges = np.array([5.0]) * 100.
+#         a_ray_ranges = np.array([0.0]) * 100.
+#         d_ranges = np.array([500]) * 10 ** -6
+#         plt_range = itertools.product(bvf_ranges,
+#                                       saO2_ranges,
+#                                       bili_ranges,
+#                                       a_mie_ranges,
+#                                       a_ray_ranges,
+#                                       d_ranges,
+#                                       bvf_sm_ranges, dsp_sm_range)
+        plt_range = itertools.izip(bvf_ranges,
+                                    saO2_ranges,
+                                    bili_ranges,
+                                    a_mie_ranges,
+                                    a_ray_ranges,
+                                    d_ranges)
 
-        for i, (bvf, saO2, bili, a_mie, a_ray, d, bvf_sm, dsp_sm) \
+        for i, (bvf, saO2, bili, a_mie, a_ray, d) \
                                                     in enumerate(plt_range):
 
+            bvf_sm = 0.1
+            dsp_sm = 0.3
             self.colon_model.set_mucosa(bvf=bvf, saO2=saO2, cBili=bili,
                                         a_mie=a_mie,
                                         a_ray=a_ray,

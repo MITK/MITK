@@ -222,7 +222,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       // Receive transform data from the socket
       int receiveCheck = 0;
       receiveCheck = socket->Receive(curMessage->GetPackBodyPointer(),
-         curMessage->GetPackBodySize(), 0);
+         curMessage->GetPackBodySize(), 1);
 
 
       // measure the time

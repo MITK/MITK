@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
-mitk::IGTLClient::IGTLClient() :
-IGTLDevice()
+mitk::IGTLClient::IGTLClient(bool ReadFully) :
+IGTLDevice(ReadFully)
 {
 }
 

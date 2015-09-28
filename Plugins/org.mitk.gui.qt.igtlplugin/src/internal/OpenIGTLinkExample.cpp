@@ -73,7 +73,7 @@ void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
   connect( &m_Timer, SIGNAL(timeout()), this, SLOT(UpdatePipeline()));
 
   //create a new OpenIGTLinkExample Client
-  m_IGTLClient = mitk::IGTLClient::New();
+  m_IGTLClient = mitk::IGTLClient::New(false);
   m_IGTLClient->SetName("OIGTL Example Client Device");
 
   //create a new OpenIGTLinkExample Device source

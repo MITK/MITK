@@ -22,11 +22,11 @@ mitk::USIGTLDevice::USIGTLDevice(std::string manufacturer, std::string model,
 {
   if (server)
   {
-    m_Device = mitk::IGTLServer::New();
+    m_Device = mitk::IGTLServer::New(true);
   }
   else
   {
-    m_Device = mitk::IGTLClient::New();
+    m_Device = mitk::IGTLClient::New(true);
   }
   m_Device->SetPortNumber(m_Port);
   m_Device->SetHostname(m_Host);

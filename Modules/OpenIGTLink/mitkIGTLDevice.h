@@ -66,6 +66,8 @@ namespace mitk {
     public:
       mitkClassMacroItkParent(IGTLDevice, itk::Object)
 
+      IGTLDevice(bool ReadFully);
+
       /**
        * \brief Type for state variable.
        * The IGTLDevice is always in one of these states.
@@ -179,6 +181,11 @@ namespace mitk {
        * \brief Sets the name of this device
        */
       itkSetMacro(Name, std::string);
+
+      /**
+      * \brief Advises this IGTL Device to always block until the whole message is read.
+      */
+      itkSetMacro(ReadFully, bool);
 
       /**
        * \brief Returns a const reference to the receive queue
@@ -369,6 +376,8 @@ namespace mitk {
       int m_ReceiveThreadID;
       /** ID of connecting thread */
       int m_ConnectThreadID;
+      /** Always try to read the full message. */
+      bool m_ReadFully;
     };
 
     /**

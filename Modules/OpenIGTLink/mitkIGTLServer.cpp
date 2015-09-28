@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtl_status.h>
 
 
-mitk::IGTLServer::IGTLServer() :
-IGTLDevice()
+mitk::IGTLServer::IGTLServer(bool ReadFully) :
+IGTLDevice(ReadFully)
 {
 }
 

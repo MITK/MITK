@@ -338,7 +338,7 @@ bool mitk::USDevice::Activate()
 void mitk::USDevice::ProvideViaOIGTL()
 {
   // create a new OpenIGTLink Server
-  m_IGTLServer = mitk::IGTLServer::New();
+  m_IGTLServer = mitk::IGTLServer::New(true);
   m_IGTLServer->SetName(this->GetName());
 
   // create a new OpenIGTLink Device source

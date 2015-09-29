@@ -82,8 +82,8 @@ void mitk::IGTLMessage::SetMessage(igtl::MessageBase::Pointer msg)
   m_Message->GetTimeStamp(&ts, &frac);
   this->SetIGTTimeStamp((double)ts + (double)frac/1000.0);
   this->SetDataValid(true);
-  MITK_INFO << "Created: [msg_name = " << this->GetName() << "] [obj_name = " << this->GetObjectName()
-    << "] [valid = " << this->IsDataValid() << "] [timestamp = " << this->GetIGTTimeStamp() << "]";
+  //MITK_INFO << "Created: [msg_name = " << this->GetName() << "] [obj_name = " << this->GetObjectName()
+   // << "] [valid = " << this->IsDataValid() << "] [timestamp = " << this->GetIGTTimeStamp() << "]";
 }
 
 bool mitk::IGTLMessage::IsDataValid() const

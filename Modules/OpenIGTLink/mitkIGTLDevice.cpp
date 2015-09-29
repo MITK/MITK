@@ -30,9 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //remove later
 #include <igtlTrackingDataMessage.h>
 
-#include <igtlTrackingDataMessage.h>
-
-static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 1;
+static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 100;
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -143,7 +141,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   int r =
      socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(), 0);
 
-  MITK_INFO << "Server received r = " << r;
+  //MITK_INFO << "Server received r = " << r;
 
   if (r == 0) //connection error
   {
@@ -158,13 +156,12 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   }
   else if (r == headerMsg->GetPackSize())
   {
-    MITK_INFO << "Is Pack Size";
     // Deserialize the header and check the CRC
     // ERROR HERE: This probably means the header data is corrupted...
     int crcCheck = headerMsg->Unpack(1);
 
-    MITK_INFO << "CRC Check: " << crcCheck << " Bool: " << ((crcCheck & igtl::MessageHeader::UNPACK_HEADER) == true);
-    MITK_INFO << "headerMsg: " << headerMsg;
+    //MITK_INFO << "CRC Check: " << crcCheck << " Bool: " << ((crcCheck & igtl::MessageHeader::UNPACK_HEADER) == true);
+    //MITK_INFO << "headerMsg: " << headerMsg;
 
     if (crcCheck & igtl::MessageHeader::UNPACK_HEADER)
     {
@@ -210,8 +207,8 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       if ( curMessage.IsNull() )
       {
         socket->Skip(headerMsg->GetBodySizeToRead(), 0);
-        MITK_ERROR("IGTLDevice") << "The received type is not supported. Please "
-                                    "add it to the message factory.";
+      //  MITK_ERROR("IGTLDevice") << "The received type is not supported. Please "
+      //                              "add it to the message factory.";
         return IGTL_STATUS_NOT_FOUND;
       }
 
@@ -268,7 +265,6 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
           this->m_ReceiveQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
-        MITK_INFO << "GOT TO THE END!!";
         return IGTL_STATUS_OK;
       }
       else

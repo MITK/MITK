@@ -124,7 +124,7 @@ void mitk::IGTLServer::Receive()
     }
     else if(status != 1)
     {
-      MITK_WARN("IGTLServer") << "ERROR IGTL Message with status: " << status;
+      MITK_WARN("IGTLServer") << "IGTL Message with status: " << status;
     }
     else
     {
@@ -175,7 +175,7 @@ void mitk::IGTLServer::Send()
   {
     //maybe there should be a check here if the current socket is still active
     this->SendMessagePrivate(curMessage.GetPointer(), *it);
-    MITK_INFO("IGTLServer") << "Sent IGTL Message";
+    MITK_DEBUG("IGTLServer") << "Sent IGTL Message";
   }
 }
 

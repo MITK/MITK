@@ -96,7 +96,7 @@ void mitk::IGTLClient::Receive()
   }
   else
   {
-    MITK_INFO << "Received IGT Message with status: " << status;
+    // MITK_INFO << "Received IGT Message with status: " << status;
   }
 }
 

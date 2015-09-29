@@ -29,7 +29,7 @@ mitk::ImageToIGTLMessageFilter::ImageToIGTLMessageFilter()
 
 void mitk::ImageToIGTLMessageFilter::GenerateData()
 {
-    MITK_INFO << "ImageToIGTLMessageFilter.GenerateData()";
+    // MITK_INFO << "ImageToIGTLMessageFilter.GenerateData()";
   for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
@@ -40,7 +40,7 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     int dims = img->GetDimension();
     int chn = img->GetNumberOfChannels();
 
-    MITK_INFO << "Sending image. Dimensions: " << dims << " Channels: " << chn << "\n";
+    // MITK_INFO << "Sending image. Dimensions: " << dims << " Channels: " << chn << "\n";
 
     if (dims < 1)
     {

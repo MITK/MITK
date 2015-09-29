@@ -25,15 +25,10 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
 
   mitk::IGTLMessage* msg = m_upstream->GetOutput();
 
-  //MITK_INFO << "This (" << this << ") got IGTLMessageInfo: [msg_name = " << msg->GetName() << "] [obj_name = " << msg->GetObjectName()
-  //<<"] [valid = " << msg->IsDataValid() << "] [timestamp = " << msg ->GetTimeStamp() << "]";
-  //groehl: fixed possible nullpointer issue
   if (msg != nullptr && !msg->IsDataValid())
   {
     return;
   }
-
-  MITK_INFO << "Data was VALID!";
 
   igtl::MessageBase::Pointer msgBase = msg->GetMessage();
   igtl::ImageMessage* imgMsg = (igtl::ImageMessage*)(msgBase.GetPointer());
@@ -151,7 +146,7 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   img->InitializeByItk(output.GetPointer());
   img->SetVolume(output->GetBufferPointer());
 
-  MITK_INFO << "Received image. Dimensions: " << img->GetDimensions() << " Channels: " << img->GetNumberOfChannels() << "\n";
+  //MITK_INFO << "Received image. Dimensions: " << img->GetDimensions() << " Channels: " << img->GetNumberOfChannels() << "\n";
 
   float iorigin[3];
   msg->GetOrigin(iorigin);
@@ -169,7 +164,7 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
 mitk::IGTLMessageToUSImageFilter::IGTLMessageToUSImageFilter()
   : m_upstream(nullptr)
 {
-  MITK_INFO << "Instantiated this (" << this << ") mitkIGTMessageToUSImageFilter\n";
+  MITK_DEBUG << "Instantiated this (" << this << ") mitkIGTMessageToUSImageFilter\n";
 }
 
 void mitk::IGTLMessageToUSImageFilter::SetNumberOfExpectedOutputs(
@@ -184,6 +179,6 @@ void mitk::IGTLMessageToUSImageFilter::SetNumberOfExpectedOutputs(
 void mitk::IGTLMessageToUSImageFilter::ConnectTo(
   mitk::IGTLMessageSource* UpstreamFilter)
 {
-  MITK_INFO << "Connected this (" << this << ") mitkIGTLMessageToUSImageFilter to MessageSource (" << UpstreamFilter << ")\n";
+  MITK_DEBUG << "Connected this (" << this << ") mitkIGTLMessageToUSImageFilter to MessageSource (" << UpstreamFilter << ")\n";
   m_upstream = UpstreamFilter;
 }

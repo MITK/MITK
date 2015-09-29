@@ -60,7 +60,6 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
       }
 
     }
-
   //now update image
   if ( m_Image->IsInitialized() )
   {

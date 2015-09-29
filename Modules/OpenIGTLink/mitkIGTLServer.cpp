@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtl_status.h>
 
 
-mitk::IGTLServer::IGTLServer() :
-IGTLDevice()
+mitk::IGTLServer::IGTLServer(bool ReadFully) :
+IGTLDevice(ReadFully)
 {
 }
 
@@ -96,7 +96,7 @@ void mitk::IGTLServer::Connect()
     this->m_RegisteredClients.push_back(socket);
     //inform observers about this new client
     this->InvokeEvent(NewClientConnectionEvent());
-    MITK_INFO("IGTLServer") << "Connected to a new client.";
+    MITK_INFO("IGTLServer") << "Connected to a new client: " << socket;
   }
 }
 
@@ -125,10 +125,6 @@ void mitk::IGTLServer::Receive()
     else if(status != 1)
     {
       MITK_WARN("IGTLServer") << "IGTL Message with status: " << status;
-    }
-    else
-    {
-      MITK_INFO("IGTLServer") << "It works..";
     }
   }
   if ( socketsToBeRemoved.size() > 0 )

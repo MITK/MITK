@@ -30,11 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 //remove later
 #include <igtlTrackingDataMessage.h>
 
-static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 100;
 
+//TODO: Which timeout is acceptable and also needed to transmit image data? Is there a maximum data limit?
+static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 100;
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
-mitk::IGTLDevice::IGTLDevice() :
+mitk::IGTLDevice::IGTLDevice(bool ReadFully) :
 //  m_Data(mitk::DeviceDataUnspecified),
   m_State(mitk::IGTLDevice::Setup),
   m_Name("Unspecified Device"),
@@ -43,6 +44,7 @@ mitk::IGTLDevice::IGTLDevice() :
   m_PortNumber(-1),
   m_MultiThreader(nullptr), m_SendThreadID(0), m_ReceiveThreadID(0), m_ConnectThreadID(0)
 {
+  m_ReadFully = ReadFully;
   m_StopCommunicationMutex = itk::FastMutexLock::New();
   m_StateMutex = itk::FastMutexLock::New();
 //  m_LatestMessageMutex = itk::FastMutexLock::New();
@@ -219,7 +221,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       // Receive transform data from the socket
       int receiveCheck = 0;
       receiveCheck = socket->Receive(curMessage->GetPackBodyPointer(),
-         curMessage->GetPackBodySize(), 1);
+         curMessage->GetPackBodySize(), m_ReadFully);
 
 
       // measure the time

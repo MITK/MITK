@@ -79,7 +79,7 @@ void OpenIGTLinkProviderExample::CreateQtPartControl( QWidget *parent )
 
 
   //create a new OpenIGTLink Client
-  m_IGTLServer = mitk::IGTLServer::New();
+  m_IGTLServer = mitk::IGTLServer::New(false);
   m_IGTLServer->SetName("OIGTL Provider Example Device");
 
   //create a new OpenIGTLink Device source

@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
-mitk::IGTLClient::IGTLClient() :
-IGTLDevice()
+mitk::IGTLClient::IGTLClient(bool ReadFully) :
+IGTLDevice(ReadFully)
 {
 }
 
@@ -68,8 +68,7 @@ bool mitk::IGTLClient::OpenConnection()
   //check the response
   if ( response != 0 )
   {
-    mitkThrowException(mitk::Exception) <<
-      "The client could not connect to " << hostname << " port: " << portNumber;
+    MITK_ERROR << "The client could not connect to " << hostname << " port: " << portNumber;
     return false;
   }
 
@@ -94,10 +93,6 @@ void mitk::IGTLClient::Receive()
     this->InvokeEvent(LostConnectionEvent());
     MITK_WARN("IGTLClient") << "Lost connection to server socket.";
   }
-  else
-  {
-    // MITK_INFO << "Received IGT Message with status: " << status;
-  }
 }
 
 void mitk::IGTLClient::Send()
@@ -120,11 +115,7 @@ void mitk::IGTLClient::Send()
   trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
   m_Measurement->AddMeasurement(4,x_pos); //x value is used as index
 
-  if ( this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
-  {
-    MITK_INFO("IGTLDevice") << "Successfully sent the message.";
-  }
-  else
+  if (!this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
   {
     MITK_WARN("IGTLDevice") << "Could not send the message.";
   }

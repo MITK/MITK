@@ -71,8 +71,8 @@ protected:
   //API objects for communication, used to get the right geometry
   Usgfw2Lib::IUsgImageProperties* m_ImageProperties;
   Usgfw2Lib::IUsgDepth* m_DepthProperties;
-  double m_OldDepth;
-  int m_upDateCounter;
+  long m_OldnXPelsPerUnit;
+  long m_OldnYPelsPerUnit;
 
 
   mitk::Image::Pointer                        m_Image;

@@ -53,15 +53,7 @@ void mitk::BoundingObject::FitGeometry(mitk::BaseGeometry* aGeometry3D)
 
   GetGeometry()->SetIdentity();
   GetGeometry()->Compose(aGeometry3D->GetIndexToWorldTransform());
-
-  // Since aGeometry (which should actually be const), is an imagegeometry and boundingObject is NOT an image,
-  // we have to adjust the Origin by shifting it half pixel
-  mitk::Point3D myOrigin = aGeometry3D->GetCenter();
-  myOrigin[0] -= (aGeometry3D->GetSpacing()[0] / 2.0);
-  myOrigin[1] -= (aGeometry3D->GetSpacing()[1] / 2.0);
-  myOrigin[2] -= (aGeometry3D->GetSpacing()[2] / 2.0);
-
-  GetGeometry()->SetOrigin(myOrigin);
+  GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
 
   mitk::Vector3D size;
   for(unsigned int i=0; i < 3; ++i)

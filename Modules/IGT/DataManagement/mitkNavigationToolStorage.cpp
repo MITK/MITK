@@ -43,7 +43,11 @@ void mitk::NavigationToolStorage::SetName(std::string n)
   {
   m_Name = n;
   m_props[ US_PROPKEY_STORAGE_NAME ] = m_Name;
-  m_ServiceRegistration.SetProperties(m_props);
+  }
+
+ void mitk::NavigationToolStorage::UpdateMicroservice()
+  {
+  if (m_ServiceRegistration) {m_ServiceRegistration.SetProperties(m_props);}
   }
 
 

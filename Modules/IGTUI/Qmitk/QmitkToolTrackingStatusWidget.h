@@ -133,6 +133,8 @@ private:
 
   QmitkToolTrackingStatusWidget::Style m_Style;
 
+  mitk::NavigationToolStorage::Pointer m_previewToolStorage; ///>Tool Storage which is used for preview when tracking is not active...
+
   void RemoveGuiLabels();
 
   /** @brief Adds an empty label which tells the user that currently no tool is availiable. */

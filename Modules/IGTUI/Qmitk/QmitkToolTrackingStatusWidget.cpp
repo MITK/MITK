@@ -94,31 +94,31 @@ void QmitkToolTrackingStatusWidget::CreateQtPartControl(QWidget *parent)
 }
 
 void QmitkToolTrackingStatusWidget::OnServiceEvent(const us::ServiceEvent event){
-  MITK_INFO << "OnServiceEvent" << event.GetType();
-//  switch (event.GetType())
-//  {
-//    case us::ServiceEvent::MODIFIED:
-//      emit(ServiceModified(event.GetServiceReference()));
 
-//      // Change service; add a new entry if service wasn't on list before
-//      if ( ! this->ChangeServiceOnList(event.GetServiceReference()) )
-//      {
-//        this->AddServiceToList(event.GetServiceReference());
-//      }
-//      break;
-//    case us::ServiceEvent::REGISTERED:
-//      emit(ServiceRegistered(event.GetServiceReference()));
-//      AddServiceToList(event.GetServiceReference());
-//      break;
-//    case us::ServiceEvent::UNREGISTERING:
-//      emit(ServiceUnregistering(event.GetServiceReference()));
-//      RemoveServiceFromList(event.GetServiceReference());
-//      break;
-//    case us::ServiceEvent::MODIFIED_ENDMATCH:
-//      emit(ServiceModifiedEndMatch(event.GetServiceReference()));
-//      RemoveServiceFromList(event.GetServiceReference());
-//      break;
-//  }
+  if ((event.GetType() == us::ServiceEvent::MODIFIED) && (m_previewToolStorage.IsNotNull())) {this->PreShowTools(m_previewToolStorage);}
+ /* switch (event.GetType())
+  {
+    case us::ServiceEvent::MODIFIED:
+      emit(ServiceModified(event.GetServiceReference()));
+      // Change service; add a new entry if service wasn't on list before
+      if ( ! this->ChangeServiceOnList(event.GetServiceReference()) )
+      {
+        this->AddServiceToList(event.GetServiceReference());
+      }
+      break;
+    case us::ServiceEvent::REGISTERED:
+      emit(ServiceRegistered(event.GetServiceReference()));
+      AddServiceToList(event.GetServiceReference());
+      break;
+    case us::ServiceEvent::UNREGISTERING:
+      emit(ServiceUnregistering(event.GetServiceReference()));
+      RemoveServiceFromList(event.GetServiceReference());
+      break;
+    case us::ServiceEvent::MODIFIED_ENDMATCH:
+      emit(ServiceModifiedEndMatch(event.GetServiceReference()));
+      RemoveServiceFromList(event.GetServiceReference());
+      break;
+  }*/
 }
 
 void QmitkToolTrackingStatusWidget::CreateConnections()
@@ -130,13 +130,17 @@ void QmitkToolTrackingStatusWidget::CreateConnections()
 void QmitkToolTrackingStatusWidget::SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas)
 {
   m_NavigationDatas = navDatas;
+  m_previewToolStorage = NULL;
 }
 
 
 void QmitkToolTrackingStatusWidget::AddNavigationData(mitk::NavigationData::Pointer nd)
 {
   if(m_NavigationDatas == NULL)
+    {
     m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
+    m_previewToolStorage = NULL;
+    }
 
   m_NavigationDatas->push_back(nd);
 }
@@ -230,6 +234,8 @@ void QmitkToolTrackingStatusWidget::PreShowTools(mitk::NavigationToolStorage::Po
     if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(label);
     else m_Controls->m_GridLayout->addWidget(label);
   }
+
+  m_previewToolStorage = toolStorage;
 }
 
 

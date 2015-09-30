@@ -19,57 +19,66 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 
 // other
+#include <mitkExtractSliceFilter.h>
 #include <mitkImage.h>
 #include <mitkIOUtil.h>
 #include <mitkSegmentationInterpolationController.h>
 
 class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 {
-    CPPUNIT_TEST_SUITE(mitkSegmentationInterpolationTestSuite);
-    MITK_TEST(Equal_TestFeedbackAndReferenceFeedback_ReturnsTrue);
-    CPPUNIT_TEST_SUITE_END();
+  CPPUNIT_TEST_SUITE(mitkSegmentationInterpolationTestSuite);
+  MITK_TEST(Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue);
+  CPPUNIT_TEST_SUITE_END();
 
 private:
 
-    // Load data into these
-    mitk::Image::Pointer m_ReferenceImage;
-    mitk::Image::Pointer m_AxialBase;
-    mitk::Surface::Pointer m_AxialFeedback;
-    mitk::Image::Pointer m_AxialInterpolated;
+  // Load data into these
+  mitk::Image::Pointer m_ReferenceImage;
+  mitk::Image::Pointer m_AxialBase;
+  mitk::Surface::Pointer m_AxialFeedback;
+  mitk::Image::Pointer m_AxialInterpolated;
 
-    mitk::SegmentationInterpolationController::Pointer m_InterpolationController;
+  // Plane indices
+  int m_AxialPlaneIndex;
+
+  mitk::SegmentationInterpolationController::Pointer m_InterpolationController;
 
 public:
 
-    void setUp() override
-    {
-        m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
-        CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
-        m_AxialBase = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/AxialBase.nrrd"));
-        CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialBase.nrrd]", m_AxialBase.IsNotNull());
-        m_AxialFeedback = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SegmentationInterpolation/AxialFeedback.vtp"));
-        CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialFeedback.nrrd]", m_AxialFeedback.IsNotNull());
-        m_AxialInterpolated = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/AxialInterpolated.nrrd"));
-        CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialInterpolated.nrrd]", m_AxialInterpolated.IsNotNull());
+  void setUp() override
+  {
+    m_AxialPlaneIndex = 22;
 
-        m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();
-        m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
-    }
+    m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
+    m_AxialBase = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/AxialBase.nrrd"));
+    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialBase.nrrd]", m_AxialBase.IsNotNull());
+    m_AxialFeedback = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SegmentationInterpolation/AxialFeedback.vtp"));
+    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialFeedback.nrrd]", m_AxialFeedback.IsNotNull());
+    m_AxialInterpolated = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/AxialInterpolated.nrrd"));
+    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialInterpolated.nrrd]", m_AxialInterpolated.IsNotNull());
 
-    void tearDown() override
-    {
-        m_ReferenceImage = nullptr;
-        m_AxialBase = nullptr;
-        m_AxialFeedback = nullptr;
-        m_AxialInterpolated = nullptr;
-    }
+    m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();
+    m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
+  }
 
-    void Equal_Axial_TestFeedbackAndReferenceFeedback_ReturnsTrue()
-    {
-        // Create Feedback from base segmentation
-        m_InterpolationController->SetSegmentationVolume(m_AxialBase);
-        m_InterpolationController->Interpolate(); // HIER GEHTS WEITER
-    }
+  void tearDown() override
+  {
+    m_ReferenceImage = nullptr;
+    m_AxialBase = nullptr;
+    m_AxialFeedback = nullptr;
+    m_AxialInterpolated = nullptr;
+  }
+
+  void Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue()
+  {
+    // Create Interpolation from base segmentation
+    m_InterpolationController->SetSegmentationVolume(m_AxialBase);
+    mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(m_ReferenceImage->GetSlicedGeometry()->GetPlaneGeometry(m_AxialPlaneIndex));
+    mitk::Image::Pointer resultTestInterpolation = m_InterpolationController->Interpolate(0, m_AxialPlaneIndex, plane, 0);
+    MITK_ASSERT_EQUAL(resultTestInterpolation, m_AxialInterpolated, "The created interpolation should fit the reference interpolation.");
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkSegmentationInterpolation);

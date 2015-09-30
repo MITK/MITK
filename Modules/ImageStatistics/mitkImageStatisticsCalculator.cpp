@@ -493,10 +493,6 @@ double ImageStatisticsCalculator::GetHotspotRadiusInMM()
     this->m_HistogramBinSize = size;
   }
 
-  unsigned int ImageStatisticsCalculator::GetHistogramBinSize()
-  {
-    return this->m_HistogramBinSize;
-  }
 
   void ImageStatisticsCalculator::SetCalculateHotspot(bool on)
   {

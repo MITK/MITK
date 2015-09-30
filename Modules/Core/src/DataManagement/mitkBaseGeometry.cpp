@@ -256,7 +256,17 @@ bool mitk::BaseGeometry::Is2DConvertable()
 mitk::Point3D mitk::BaseGeometry::GetCenter() const
 {
   assert(m_BoundingBox.IsNotNull());
-  return this->GetIndexToWorldTransform()->TransformPoint(m_BoundingBox->GetCenter());
+  Point3D c = m_BoundingBox->GetCenter();
+  if (m_ImageGeometry)
+  {
+    //Get Center returns the middel of min and max pixel index. In corner based images, this is the right position.
+    //In center based images (imageGeometry == true), the index needs to be shifted back.
+    c[0] -= 0.5;
+    c[1] -= 0.5;
+    c[2] -= 0.5;
+  }
+  this->IndexToWorld(c, c);
+  return c;
 }
 
 double mitk::BaseGeometry::GetDiagonalLength2() const

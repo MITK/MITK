@@ -102,6 +102,8 @@ protected:
 
 private:
 
+  bool IsTrainingInputValid(void) const;
+
  };
 
 

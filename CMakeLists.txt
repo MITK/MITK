@@ -319,7 +319,6 @@ foreach(_buildConfigFile ${_buildConfigFiles})
 endforeach()
 
 set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-mark_as_advanced(MITK_BUILD_CONFIGURATION)
 set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
 
 mitkFunctionEnableBuildConfiguration()

@@ -113,7 +113,6 @@ bool mitk::IGTLMeasurements::ExportData(std::string filename)
      }
      *out << "\n";
    }
-   */
 
    out->flush();
    delete out;

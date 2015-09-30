@@ -178,11 +178,16 @@ void mitk::IGTLServer::Send()
 void mitk::IGTLServer::StopCommunicationWithSocket(
     SocketListType& toBeRemovedSockets)
 {
-  auto it    = toBeRemovedSockets.begin();
+  auto it = toBeRemovedSockets.begin();
   auto itEnd = toBeRemovedSockets.end();
-  for (; it != itEnd; ++it )
+  while (true)
   {
     this->StopCommunicationWithSocket(*it);
+
+    if ((*it) == (*itEnd))
+      break;
+
+    it++;
   }
 }
 
@@ -191,17 +196,21 @@ void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
   auto it    = this->m_RegisteredClients.begin();
   auto itEnd = this->m_RegisteredClients.end();
 
-  for (; it != itEnd; ++it )
+  while (true)
   {
     if ( (*it) == client )
     {
-      //close the socket
+  //    //close the socket
       (*it)->CloseSocket();
       //and remove it from the list
       this->m_RegisteredClients.remove(*it);
       break;
     }
+    if ((*it) == (*itEnd))
+      break;
+    it++;
   }
+
   MITK_INFO("IGTLServer") << "Removed client socket from server client list.";
 }
 

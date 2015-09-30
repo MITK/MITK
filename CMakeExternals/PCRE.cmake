@@ -5,11 +5,12 @@ if(MITK_USE_PCRE)
   if(DEFINED PCRE_DIR AND NOT EXISTS ${PCRE_DIR})
       message(FATAL_ERROR "PCRE_DIR variable is defined but corresponds to non-existing directory")
    endif()
-  if(NOT PCRE_DIR)
 
-    set(proj PCRE)
-    set(${proj}_DEPENDENCIES "")
-    set(${proj}_DEPENDS ${proj})
+  set(proj PCRE)
+  set(${proj}_DEPENDENCIES "")
+  set(${proj}_DEPENDS ${proj})
+
+  if(NOT PCRE_DIR)
 
     if(UNIX)
       # Some other projects (e.g. Swig) require a pcre-config script which is not

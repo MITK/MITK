@@ -2,10 +2,12 @@
 # ZLIB
 #------------------------------------------------------------------
 if(MITK_USE_ZLIB)
+
+  set(proj ZLIB)
+  set(${proj}_DEPENDENCIES )
+  set(ZLIB_DEPENDS ${proj})
+
   if(NOT DEFINED ZLIB_DIR)
-    set(proj ZLIB)
-    set(${proj}_DEPENDENCIES )
-    set(ZLIB_DEPENDS ${proj})
 
     set(additional_cmake_args )
     if(CTEST_USE_LAUNCHERS)

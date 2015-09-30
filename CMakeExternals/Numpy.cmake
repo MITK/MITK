@@ -7,10 +7,11 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     message(FATAL_ERROR "Numpy_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
+  set(proj Numpy)
+  set(${proj}_DEPENDENCIES Python)
+  set(Numpy_DEPENDS ${proj})
+
   if( NOT DEFINED Numpy_DIR )
-    set(proj Numpy)
-    set(${proj}_DEPENDENCIES Python)
-    set(Numpy_DEPENDS ${proj})
 
     # setup build environment and disable fortran, blas and lapack
     set(_numpy_env

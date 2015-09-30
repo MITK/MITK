@@ -7,14 +7,14 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     message(FATAL_ERROR "Python_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
+  set(MITK_PYTHON_MAJOR_VERSION 2)
+  set(MITK_PYTHON_MINOR_VERSION 7)
+  set(MITK_PYTHON_PATCH_VERSION 3)
+  set(PYTHON_SOURCE_PACKAGE Python-${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}.${MITK_PYTHON_PATCH_VERSION})
+  set(proj ${PYTHON_SOURCE_PACKAGE})
+  set(Python_DEPENDS ${proj})
+
   if(NOT DEFINED Python_DIR)
-
-    set(MITK_PYTHON_MAJOR_VERSION 2)
-    set(MITK_PYTHON_MINOR_VERSION 7)
-    set(MITK_PYTHON_PATCH_VERSION 3)
-
-    set(PYTHON_SOURCE_PACKAGE Python-${MITK_PYTHON_MAJOR_VERSION}.${MITK_PYTHON_MINOR_VERSION}.${MITK_PYTHON_PATCH_VERSION})
-    set(proj ${PYTHON_SOURCE_PACKAGE})
 
     # download the source code
     ExternalProject_Add(${proj}
@@ -28,9 +28,13 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       INSTALL_COMMAND ""
     )
 
-    set(proj Python)
-    set(Python_DEPENDENCIES ZLIB ${PYTHON_SOURCE_PACKAGE})
-    set(Python_DEPENDS ${proj})
+  endif()
+
+  set(proj Python)
+  set(Python_DEPENDENCIES ZLIB ${PYTHON_SOURCE_PACKAGE})
+  set(Python_DEPENDS ${proj})
+
+  if(NOT DEFINED Python_DIR)
 
     set(additional_cmake_cache_args )
     list(APPEND additional_cmake_cache_args

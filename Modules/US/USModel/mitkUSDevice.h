@@ -25,6 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkUSExports.h>
 #include "mitkUSImageSource.h"
 
+// MitkIGTL
+#include "mitkIGTLMessageProvider.h"
+#include "mitkIGTLServer.h"
+#include "mitkIGTLDeviceSource.h"
+#include "mitkImageToIGTLMessageFilter.h"
+
 // MITK
 #include <mitkCommon.h>
 #include <mitkMessage.h>
@@ -304,6 +310,21 @@ class USControlInterfaceDoppler;
 
     mitk::Image::Pointer m_Image;
     mitk::Image::Pointer m_OutputImage;
+
+    /**
+    * \brief Registers an OpenIGTLink device as a microservice so that we can send the images of
+    * this device via the network.
+    */
+    void ProvideViaOIGTL();
+
+    /**
+    * \brief Deregisters the microservices for OpenIGTLink.
+    */
+    void DisableOIGTL();
+
+    mitk::IGTLServer::Pointer m_IGTLServer;
+    mitk::IGTLMessageProvider::Pointer m_IGTLMessageProvider;
+    mitk::ImageToIGTLMessageFilter::Pointer m_ImageToIGTLMsgFilter;
 
     bool m_IsFreezed;
 

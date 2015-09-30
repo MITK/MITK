@@ -41,7 +41,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(IGTLServer, IGTLDevice)
-    itkFactorylessNewMacro(Self)
+    mitkNewMacro1Param(Self, bool)
     itkCloneMacro(Self)
 
     typedef std::list<igtl::Socket::Pointer> SocketListType;
@@ -72,7 +72,7 @@ namespace mitk
 
   protected:
     /** Constructor */
-    IGTLServer();
+    IGTLServer(bool ReadFully);
     /** Destructor */
     virtual ~IGTLServer();
 

@@ -21,11 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 
 #include <igtlServerSocket.h>
+#include <igtlTrackingDataMessage.h>
+#include <igtlImageMessage.h>
 #include <igtl_status.h>
 
 
-mitk::IGTLServer::IGTLServer() :
-IGTLDevice()
+mitk::IGTLServer::IGTLServer(bool ReadFully) :
+IGTLDevice(ReadFully)
 {
 }
 
@@ -94,7 +96,7 @@ void mitk::IGTLServer::Connect()
     this->m_RegisteredClients.push_back(socket);
     //inform observers about this new client
     this->InvokeEvent(NewClientConnectionEvent());
-    MITK_INFO("IGTLServer") << "Connected to a new client.";
+    MITK_INFO("IGTLServer") << "Connected to a new client: " << socket;
   }
 }
 
@@ -120,6 +122,10 @@ void mitk::IGTLServer::Receive()
       socketsToBeRemoved.push_back(*it);
       MITK_WARN("IGTLServer") << "Lost connection to a client socket. ";
     }
+    else if(status != 1)
+    {
+      MITK_WARN("IGTLServer") << "IGTL Message with status: " << status;
+    }
   }
   if ( socketsToBeRemoved.size() > 0 )
   {
@@ -141,7 +147,15 @@ void mitk::IGTLServer::Send()
   if ( curMessage.IsNull() )
     return;
 
-  m_Measurement->AddMeasurement(4);
+  //Why always cast to TrackingDataMessage?
+
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(4,x_pos); //x value is used as index
 
   //the server can be connected with several clients, therefore it has to check
   //all registered clients
@@ -157,6 +171,7 @@ void mitk::IGTLServer::Send()
   {
     //maybe there should be a check here if the current socket is still active
     this->SendMessagePrivate(curMessage.GetPointer(), *it);
+    MITK_DEBUG("IGTLServer") << "Sent IGTL Message";
   }
 }
 

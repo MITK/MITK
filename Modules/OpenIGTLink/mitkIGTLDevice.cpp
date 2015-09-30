@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 #include <itksys/SystemTools.hxx>
 #include <cstring>
+#include <chrono>
 
 #include <igtlTransformMessage.h>
 #include <mitkIGTLMessageCommon.h>
@@ -29,13 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 //remove later
 #include <igtlTrackingDataMessage.h>
 
-#include <igtlTrackingDataMessage.h>
 
-static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 1;
-
+//TODO: Which timeout is acceptable and also needed to transmit image data? Is there a maximum data limit?
+static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 100;
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
-mitk::IGTLDevice::IGTLDevice() :
+mitk::IGTLDevice::IGTLDevice(bool ReadFully) :
 //  m_Data(mitk::DeviceDataUnspecified),
   m_State(mitk::IGTLDevice::Setup),
   m_Name("Unspecified Device"),
@@ -44,6 +44,7 @@ mitk::IGTLDevice::IGTLDevice() :
   m_PortNumber(-1),
   m_MultiThreader(nullptr), m_SendThreadID(0), m_ReceiveThreadID(0), m_ConnectThreadID(0)
 {
+  m_ReadFully = ReadFully;
   m_StopCommunicationMutex = itk::FastMutexLock::New();
   m_StateMutex = itk::FastMutexLock::New();
 //  m_LatestMessageMutex = itk::FastMutexLock::New();
@@ -142,10 +143,12 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   int r =
      socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(), 0);
 
+  //MITK_INFO << "Server received r = " << r;
+
   if (r == 0) //connection error
   {
     // an error was received, therefor the communication with this socket
-    // must be stopped
+    // must be stoppedy
     return IGTL_STATUS_NOT_PRESENT;
   }
   else if (r == -1 ) //timeout
@@ -156,7 +159,12 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   else if (r == headerMsg->GetPackSize())
   {
     // Deserialize the header and check the CRC
+    // ERROR HERE: This probably means the header data is corrupted...
     int crcCheck = headerMsg->Unpack(1);
+
+    //MITK_INFO << "CRC Check: " << crcCheck << " Bool: " << ((crcCheck & igtl::MessageHeader::UNPACK_HEADER) == true);
+    //MITK_INFO << "headerMsg: " << headerMsg;
+
     if (crcCheck & igtl::MessageHeader::UNPACK_HEADER)
     {
       // Allocate a time stamp
@@ -201,8 +209,8 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       if ( curMessage.IsNull() )
       {
         socket->Skip(headerMsg->GetBodySizeToRead(), 0);
-        MITK_ERROR("IGTLDevice") << "The received type is not supported. Please "
-                                    "add it to the message factory.";
+      //  MITK_ERROR("IGTLDevice") << "The received type is not supported. Please "
+      //                              "add it to the message factory.";
         return IGTL_STATUS_NOT_FOUND;
       }
 
@@ -213,19 +221,29 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
       // Receive transform data from the socket
       int receiveCheck = 0;
       receiveCheck = socket->Receive(curMessage->GetPackBodyPointer(),
-         curMessage->GetPackBodySize(), 0);
+         curMessage->GetPackBodySize(), m_ReadFully);
+
 
       // measure the time
-      m_Measurement->AddMeasurement(6);
+      long long timeStamp6 = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
       if ( receiveCheck > 0 )
       {
         int c = curMessage->Unpack(1);
         if ( !(c & igtl::MessageHeader::UNPACK_BODY) )
         {
-//            mitkThrow() << "crc error";
           return IGTL_STATUS_CHECKSUM_ERROR;
         }
+
+        //save timestamp 6 now because we know the index
+        // Here again, is a explicit conversion to TrackingDataMessage ONLY... Why?
+        igtl::TrackingDataMessage* tdMsg =
+          (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+        igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+        tdMsg->GetTrackingDataElement(0,trackingData);
+        float x_pos, y_pos, z_pos;
+        trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+        m_Measurement->AddMeasurement(6,x_pos,timeStamp6); //x value is used as index
 
         //check the type of the received message
         //if it is a command push it into the command queue
@@ -239,7 +257,13 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         }
         else
         {
-          m_Measurement->AddMeasurement(7);
+          igtl::TrackingDataMessage* tdMsg =
+            (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+          igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+          tdMsg->GetTrackingDataElement(0,trackingData);
+          float x_pos, y_pos, z_pos;
+          trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+          m_Measurement->AddMeasurement(7,x_pos); //x value is used as index
           this->m_ReceiveQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
@@ -255,6 +279,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
     else
     {
       //CRC check failed
+      MITK_ERROR << "CRC Check failed";
       return IGTL_STATUS_CHECKSUM_ERROR;
     }
   }
@@ -262,6 +287,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   {
     //Message size information and actual data size don't match.
     //this state is not suppossed to be reached, return unknown error
+    MITK_ERROR << "IGTL status unknown";
     return IGTL_STATUS_UNKNOWN_ERROR;
   }
 }
@@ -273,7 +299,13 @@ void mitk::IGTLDevice::SendMessage(const mitk::IGTLMessage* msg)
 
 void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
-  m_Measurement->AddMeasurement(3);
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(3,x_pos); //x value is used as index
   //add the message to the queue
   m_SendQueue->PushMessage(msg);
 }
@@ -296,7 +328,13 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg
   msg->Pack();
 
   // measure the time
-  m_Measurement->AddMeasurement(5);
+  igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+  tdMsg->GetTrackingDataElement(0,trackingData);
+  float x_pos, y_pos, z_pos;
+  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+  m_Measurement->AddMeasurement(5,x_pos); //x value is used as index
 
   int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
 
@@ -461,7 +499,7 @@ bool mitk::IGTLDevice::SendRTSMessage(const char* type)
 
 void mitk::IGTLDevice::Connect()
 {
-
+  MITK_DEBUG << "mitk::IGTLDevice::Connect();";
 }
 
 igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
@@ -471,11 +509,17 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
 
   if (msg.IsNotNull())
   {
-    m_Measurement->AddMeasurement(8);
+    igtl::TrackingDataMessage* tdMsg =
+      (igtl::TrackingDataMessage*)(msg.GetPointer());
+    igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+    tdMsg->GetTrackingDataElement(0,trackingData);
+    float x_pos, y_pos, z_pos;
+    trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+    m_Measurement->AddMeasurement(8,x_pos); //x value is used as index
     unsigned int seconds = 0;
     unsigned int frac = 0;
     msg->GetTimeStamp(&seconds, &frac);
-    std::cout << "8: s: " << seconds << " f: " << frac << std::endl;
+    //std::cout << "8: s: " << seconds << " f: " << frac << std::endl;
   }
 
   return msg;

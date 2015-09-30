@@ -3,7 +3,7 @@ MITK_CREATE_MODULE(
   INCLUDE_DIRS USControlInterfaces USFilters USModel
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   PACKAGE_DEPENDS Poco
-  DEPENDS MitkOpenCVVideoSupport MitkQtWidgetsExt MitkIGTBase
+  DEPENDS MitkOpenCVVideoSupport MitkQtWidgetsExt MitkIGTBase MitkOpenIGTLink
   WARNINGS_AS_ERRORS
 )
 

@@ -167,8 +167,8 @@ void IGTNavigationToolCalibration::OnRunSingleRefToolCalibrationClicked()
 
       MITK_INFO << "Computed calibration: ";
       MITK_INFO << "Translation Vector: " << ToolTipTransform->GetPosition();
-      MITK_INFO << "Quaternion: [" << ToolTipTransform->GetOrientation() <<"]";
-      MITK_INFO<<"Euler Angles: [" << ToolTipTransform->GetOrientation().rotation_euler_angles() <<"]";
+      MITK_INFO << "Quaternion: (" << ToolTipTransform->GetOrientation() <<")";
+      MITK_INFO<<"Euler Angles [rad]: (" << ToolTipTransform->GetOrientation().rotation_euler_angles() <<")";
       MITK_INFO<<"Matrix:";
       vnl_matrix_fixed<double,3,3> rotMatrix =ToolTipTransform->GetOrientation().rotation_matrix_transpose();
       MITK_INFO<<rotMatrix[0][0]<<" "<<rotMatrix[0][1]<<" "<<rotMatrix[0][2]<<std::endl;
@@ -367,9 +367,9 @@ void IGTNavigationToolCalibration::UpdateManualToolTipCalibrationView()
   std::stringstream translation;
   std::stringstream orientation;
   translation<<m_ToolToCalibrate->GetToolTipPosition();
-  orientation<<"Quaternion: [" << m_ToolToCalibrate->GetToolTipOrientation() <<"]"<<std::endl;
+  orientation<<"Quaternion: (" << m_ToolToCalibrate->GetToolTipOrientation() <<")"<<std::endl;
   orientation<<std::endl;
-  orientation<<"Euler Angles: [" << m_ToolToCalibrate->GetToolTipOrientation().rotation_euler_angles() <<"]"<<std::endl;
+  orientation<<"Euler Angles [rad]: (" << m_ToolToCalibrate->GetToolTipOrientation().rotation_euler_angles() <<")"<<std::endl;
   orientation<<std::endl;
   orientation<<"Matrix:"<<std::endl;
   vnl_matrix_fixed<double,3,3> rotMatrix =m_ToolToCalibrate->GetToolTipOrientation().rotation_matrix_transpose();

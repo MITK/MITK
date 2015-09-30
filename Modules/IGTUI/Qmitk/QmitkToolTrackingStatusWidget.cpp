@@ -93,32 +93,9 @@ void QmitkToolTrackingStatusWidget::CreateQtPartControl(QWidget *parent)
   m_Context->AddServiceListener(this, &QmitkToolTrackingStatusWidget::OnServiceEvent, m_Filter);
 }
 
-void QmitkToolTrackingStatusWidget::OnServiceEvent(const us::ServiceEvent event){
-
+void QmitkToolTrackingStatusWidget::OnServiceEvent(const us::ServiceEvent event)
+{
   if ((event.GetType() == us::ServiceEvent::MODIFIED) && (m_previewToolStorage.IsNotNull())) {this->PreShowTools(m_previewToolStorage);}
- /* switch (event.GetType())
-  {
-    case us::ServiceEvent::MODIFIED:
-      emit(ServiceModified(event.GetServiceReference()));
-      // Change service; add a new entry if service wasn't on list before
-      if ( ! this->ChangeServiceOnList(event.GetServiceReference()) )
-      {
-        this->AddServiceToList(event.GetServiceReference());
-      }
-      break;
-    case us::ServiceEvent::REGISTERED:
-      emit(ServiceRegistered(event.GetServiceReference()));
-      AddServiceToList(event.GetServiceReference());
-      break;
-    case us::ServiceEvent::UNREGISTERING:
-      emit(ServiceUnregistering(event.GetServiceReference()));
-      RemoveServiceFromList(event.GetServiceReference());
-      break;
-    case us::ServiceEvent::MODIFIED_ENDMATCH:
-      emit(ServiceModifiedEndMatch(event.GetServiceReference()));
-      RemoveServiceFromList(event.GetServiceReference());
-      break;
-  }*/
 }
 
 void QmitkToolTrackingStatusWidget::CreateConnections()

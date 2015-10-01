@@ -115,52 +115,63 @@ m_Controls.m_WidgetActiveDevices->setVisible(false);
 
 void UltrasoundSupport::UpdateImage()
 {
-//Update device
-m_Device->Modified();
-m_Device->Update();
+  //Update device
+  m_Device->Modified();
+  m_Device->Update();
 
-//Only update the view if the image is shown
-if(m_Controls.m_ShowImageStream->isChecked())
-{
-  //Update data node
-  mitk::Image::Pointer curOutput = m_Device->GetOutput();
-  m_Node->SetData(curOutput);
-
-  // if the geometry changed: reinitialize the ultrasound image
-  if((m_OldGeometry.IsNotNull()) &&
-     (curOutput->GetGeometry() != NULL) &&
-     (!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
-    )
+  //Only update the view if the image is shown
+  if(m_Controls.m_ShowImageStream->isChecked())
   {
-    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-    if ( (renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()) )
+    //Update data node
+    mitk::Image::Pointer curOutput = m_Device->GetOutput();
+    if(curOutput->IsEmpty())
     {
-      renderWindow->GetRenderingManager()->InitializeViews(
-      curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-      renderWindow->GetRenderingManager()->RequestUpdateAll();
+      m_Node->SetName("No Data received yet ...");
+      //create a noise image for correct initialization of level window, etc.
+      mitk::Image::Pointer randomImage = mitk::ImageGenerator::GenerateRandomImage<float>(32, 32, 1, 1, 1, 1, 1, 255,0);
+      m_Node->SetData(randomImage);
+      curOutput->SetGeometry(randomImage->GetGeometry());
     }
-    m_CurrentImageWidth = curOutput->GetDimension(0);
-    m_CurrentImageHeight = curOutput->GetDimension(1);
-    m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(curOutput->GetGeometry());
+    else
+    {
+      m_Node->SetName("US Support Viewing Stream");
+      m_Node->SetData(curOutput);
+    }
+    // if the geometry changed: reinitialize the ultrasound image
+    if((m_OldGeometry.IsNotNull()) &&
+       (curOutput->GetGeometry() != NULL) &&
+       (!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
+      )
+    {
+      mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+      if ( (renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()) )
+      {
+        renderWindow->GetRenderingManager()->InitializeViews(
+        curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+        renderWindow->GetRenderingManager()->RequestUpdateAll();
+      }
+      m_CurrentImageWidth = curOutput->GetDimension(0);
+      m_CurrentImageHeight = curOutput->GetDimension(1);
+      m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(curOutput->GetGeometry());
+    }
+
   }
 
-}
-
-//Update frame counter
-m_FrameCounterPipeline ++;
-if (m_FrameCounterPipeline >= 10)
+  //Update frame counter
+  m_FrameCounterPipeline ++;
+  if (m_FrameCounterPipeline >= 10)
   {
-  //compute framerate of pipeline update
-  int nMilliseconds = m_Clock.restart();
-  int fps = 10000.0f / (nMilliseconds );
-  m_FPSPipeline = fps;
-  m_FrameCounterPipeline = 0;
+    //compute framerate of pipeline update
+    int nMilliseconds = m_Clock.restart();
+    int fps = 10000.0f / (nMilliseconds );
+    m_FPSPipeline = fps;
+    m_FrameCounterPipeline = 0;
 
-  //display lowest framerate in UI
-  int lowestFPS=m_FPSPipeline;
-  if (m_Controls.m_Update2DView->isChecked() && (m_FPS2d<lowestFPS)) {lowestFPS = m_FPS2d;}
-  if (m_Controls.m_Update3DView->isChecked() && (m_FPS3d<lowestFPS)) {lowestFPS = m_FPS3d;}
-  m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(lowestFPS) +" FPS");
+    //display lowest framerate in UI
+    int lowestFPS=m_FPSPipeline;
+    if (m_Controls.m_Update2DView->isChecked() && (m_FPS2d<lowestFPS)) {lowestFPS = m_FPS2d;}
+    if (m_Controls.m_Update3DView->isChecked() && (m_FPS3d<lowestFPS)) {lowestFPS = m_FPS3d;}
+    m_Controls.m_FramerateLabel->setText("Current Framerate: "+ QString::number(lowestFPS) +" FPS");
   }
 }
 
@@ -211,62 +222,64 @@ void UltrasoundSupport::OnClickedFreezeButton()
   }
 if ( m_Device->GetIsFreezed() )
 {
-m_Device->SetIsFreezed(false);
-m_Controls.m_FreezeButton->setText("Freeze");
+  m_Device->SetIsFreezed(false);
+  m_Controls.m_FreezeButton->setText("Freeze");
 }
 else
 {
-m_Device->SetIsFreezed(true);
-m_Controls.m_FreezeButton->setText("Start Viewing Again");
+  m_Device->SetIsFreezed(true);
+  m_Controls.m_FreezeButton->setText("Start Viewing Again");
 }
 }
 
 void UltrasoundSupport::OnChangedActiveDevice()
 {
-//clean up and stop timer
-StopTimers();
-this->RemoveControlWidgets();
-this->GetDataStorage()->Remove(m_Node);
-m_Node->ReleaseData();
+  //clean up and stop timer
+  StopTimers();
+  this->RemoveControlWidgets();
+  this->GetDataStorage()->Remove(m_Node);
+  m_Node->ReleaseData();
 
-//get current device, abort if it is invalid
-m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
-if (m_Device.IsNull())
-{
-m_Controls.tabWidget->setTabEnabled(1, false);
-return;
-}
-
-//create the widgets for this device and enable the widget tab
-this->CreateControlWidgets();
-m_Controls.tabWidget->setTabEnabled(1, true);
-
-//show node if the option is enabled
-if(m_Controls.m_ShowImageStream->isChecked())
-{this->GetDataStorage()->Add(m_Node);}
-
-//start timer
-if(m_Controls.m_RunImageTimer->isChecked())
+  //get current device, abort if it is invalid
+  m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
+  if (m_Device.IsNull())
   {
-  int intervalPipeline = (1000 / m_Controls.m_FrameRatePipeline->value());
-  int interval2D = (1000 / m_Controls.m_FrameRate2d->value());
-  int interval3D = (1000 / m_Controls.m_FrameRate3d->value());
-  SetTimerIntervals(intervalPipeline,interval2D,interval3D);
-  StartTimers();
-  m_Controls.m_TimerWidget->setEnabled(true);
+    m_Controls.tabWidget->setTabEnabled(1, false);
+    return;
   }
-else
+
+  //create the widgets for this device and enable the widget tab
+  this->CreateControlWidgets();
+  m_Controls.tabWidget->setTabEnabled(1, true);
+
+  //show node if the option is enabled
+  if(m_Controls.m_ShowImageStream->isChecked())
   {
-  m_Controls.m_TimerWidget->setEnabled(false);
+    this->GetDataStorage()->Add(m_Node);
+  }
+
+  //start timer
+  if(m_Controls.m_RunImageTimer->isChecked())
+  {
+    int intervalPipeline = (1000 / m_Controls.m_FrameRatePipeline->value());
+    int interval2D = (1000 / m_Controls.m_FrameRate2d->value());
+    int interval3D = (1000 / m_Controls.m_FrameRate3d->value());
+    SetTimerIntervals(intervalPipeline,interval2D,interval3D);
+    StartTimers();
+    m_Controls.m_TimerWidget->setEnabled(true);
+  }
+  else
+  {
+    m_Controls.m_TimerWidget->setEnabled(false);
   }
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
 {
-m_Controls.m_NewVideoDeviceWidget->setVisible(false);
-m_Controls.m_DeviceManagerWidget->setVisible(true);
-m_Controls.m_Headline->setText("Ultrasound Devices:");
-m_Controls.m_WidgetActiveDevices->setVisible(true);
+  m_Controls.m_NewVideoDeviceWidget->setVisible(false);
+  m_Controls.m_DeviceManagerWidget->setVisible(true);
+  m_Controls.m_Headline->setText("Ultrasound Devices:");
+  m_Controls.m_WidgetActiveDevices->setVisible(true);
 }
 
 void UltrasoundSupport::CreateControlWidgets()

@@ -326,6 +326,9 @@ namespace mitk {
       */
       void SetState(IGTLDeviceState state);
 
+      /** Adds tracking measurements to the given message. */
+      void AddTrackingMeasurements(const int index, const igtl::MessageBase::Pointer msg, const long long timestamp);
+
       IGTLDevice();
       virtual ~IGTLDevice();
 
@@ -367,6 +370,7 @@ namespace mitk {
       mitk::IGTLMeasurements* m_Measurement;
 
     private:
+
       /** creates worker thread that continuously polls interface for new
       messages */
       itk::MultiThreader::Pointer m_MultiThreader;

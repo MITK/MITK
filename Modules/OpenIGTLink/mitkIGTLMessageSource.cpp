@@ -50,7 +50,7 @@ mitk::IGTLMessage* mitk::IGTLMessageSource::GetOutput()
 {
   if (this->GetNumberOfIndexedOutputs() < 1)
   {
-    MITK_WARN << "IGTLMessage was null!";
+    MITK_WARN << "IGTLMessageSource contained no outputs. Returning nullptr.";
     return nullptr;
   }
 

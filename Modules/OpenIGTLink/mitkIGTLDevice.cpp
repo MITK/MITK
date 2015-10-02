@@ -68,7 +68,6 @@ mitk::IGTLDevice::IGTLDevice(bool ReadFully) :
   this->m_Measurement = mitk::IGTLMeasurements::GetInstance();
 }
 
-
 mitk::IGTLDevice::~IGTLDevice()
 {
   /* stop communication and disconnect from igtl device */
@@ -105,7 +104,6 @@ mitk::IGTLDevice::IGTLDeviceState mitk::IGTLDevice::GetState() const
   return m_State;
 }
 
-
 void mitk::IGTLDevice::SetState( IGTLDeviceState state )
 {
   itkDebugMacro("setting  m_State to " << state);
@@ -122,7 +120,6 @@ void mitk::IGTLDevice::SetState( IGTLDeviceState state )
   m_StateMutex->Unlock();
   this->Modified();
 }
-
 
 bool mitk::IGTLDevice::TestConnection()
 {
@@ -161,9 +158,6 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
     // Deserialize the header and check the CRC
     // ERROR HERE: This probably means the header data is corrupted...
     int crcCheck = headerMsg->Unpack(1);
-
-    //MITK_INFO << "CRC Check: " << crcCheck << " Bool: " << ((crcCheck & igtl::MessageHeader::UNPACK_HEADER) == true);
-    //MITK_INFO << "headerMsg: " << headerMsg;
 
     if (crcCheck & igtl::MessageHeader::UNPACK_HEADER)
     {
@@ -371,9 +365,6 @@ void mitk::IGTLDevice::RunCommunication(void (IGTLDevice::*ComFunction)(void), i
   return;
 }
 
-
-
-
 bool mitk::IGTLDevice::StartCommunication()
 {
   if (this->GetState() != Ready)
@@ -577,6 +568,7 @@ ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartConnecting(void* pInfoStruct
 
 void mitk::IGTLDevice::AddTrackingMeasurements(const int index, const igtl::MessageBase::Pointer msg, const long long timeStamp)
 {
+  //Apparently this is the only "elegant" way to do a class check.. or is it???
   if (dynamic_cast<igtl::TrackingDataMessage*>(msg.GetPointer()) != nullptr)
   {
     igtl::TrackingDataMessage* tdMsg =

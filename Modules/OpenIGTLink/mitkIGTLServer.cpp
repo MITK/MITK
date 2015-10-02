@@ -25,15 +25,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtlImageMessage.h>
 #include <igtl_status.h>
 
-
 mitk::IGTLServer::IGTLServer(bool ReadFully) :
 IGTLDevice(ReadFully)
 {
+  m_ListMutex = itk::FastMutexLock::New();
 }
 
 mitk::IGTLServer::~IGTLServer()
 {
-
+  m_ListMutex->Delete();
 }
 
 bool mitk::IGTLServer::OpenConnection()
@@ -47,7 +47,7 @@ bool mitk::IGTLServer::OpenConnection()
 
   int portNumber = this->GetPortNumber();
 
-  if (portNumber == -1 )
+  if (portNumber == -1)
   {
     //port number was not correct
     return false;
@@ -61,7 +61,7 @@ bool mitk::IGTLServer::OpenConnection()
     CreateServer(portNumber);
 
   //check the response
-  if ( response != 0 )
+  if (response != 0)
   {
     mitkThrowException(mitk::Exception) <<
       "The server could not be created. Port: " << portNumber;
@@ -77,7 +77,9 @@ bool mitk::IGTLServer::OpenConnection()
 bool mitk::IGTLServer::CloseConnection()
 {
   //remove all registered clients
-  SocketListType allRegisteredSockets = m_RegisteredClients;
+  m_ListMutex->Lock();
+  SocketListType allRegisteredSockets(m_RegisteredClients);
+  m_ListMutex->Unlock();
   this->StopCommunicationWithSocket(allRegisteredSockets);
 
   return mitk::IGTLDevice::CloseConnection();
@@ -90,10 +92,12 @@ void mitk::IGTLServer::Connect()
   socket =
     ((igtl::ServerSocket*)(this->m_Socket.GetPointer()))->WaitForConnection(1);
   //if there is a new connection the socket is not null
-  if ( socket.IsNotNull() )
+  if (socket.IsNotNull())
   {
     //add the new client socket to the list of registered clients
+    m_ListMutex->Lock();
     this->m_RegisteredClients.push_back(socket);
+    m_ListMutex->Unlock();
     //inform observers about this new client
     this->InvokeEvent(NewClientConnectionEvent());
     MITK_INFO("IGTLServer") << "Connected to a new client: " << socket;
@@ -108,8 +112,9 @@ void mitk::IGTLServer::Receive()
   //the server can be connected with several clients, therefore it has to check
   //all registered clients
   SocketListIteratorType it;
+  m_ListMutex->Lock();
   auto it_end = this->m_RegisteredClients.end();
-  for ( it = this->m_RegisteredClients.begin(); it != it_end; ++it )
+  for (it = this->m_RegisteredClients.begin(); it != it_end; ++it)
   {
     //it is possible that ReceivePrivate detects that the current socket is
     //already disconnected. Therefore, it is necessary to remove this socket
@@ -122,12 +127,13 @@ void mitk::IGTLServer::Receive()
       socketsToBeRemoved.push_back(*it);
       MITK_WARN("IGTLServer") << "Lost connection to a client socket. ";
     }
-    else if(status != 1)
+    else if (status != 1)
     {
       MITK_WARN("IGTLServer") << "IGTL Message with status: " << status;
     }
   }
-  if ( socketsToBeRemoved.size() > 0 )
+  m_ListMutex->Unlock();
+  if (socketsToBeRemoved.size() > 0)
   {
     //remove the sockets that are not connected anymore
     this->StopCommunicationWithSocket(socketsToBeRemoved);
@@ -144,7 +150,7 @@ void mitk::IGTLServer::Send()
   curMessage = this->m_SendQueue->PullMessage();
 
   // there is no message => return
-  if ( curMessage.IsNull() )
+  if (curMessage.IsNull())
     return;
 
   AddTrackingMeasurements(4, curMessage, 0);
@@ -156,52 +162,46 @@ void mitk::IGTLServer::Send()
   //the data would be send to the appropriate client and to noone else.
   //(I know it is no excuse but PLUS is doing exactly the same, they broadcast
   //everything)
+  m_ListMutex->Lock();
   SocketListIteratorType it;
   auto it_end =
-      this->m_RegisteredClients.end();
-  for ( it = this->m_RegisteredClients.begin(); it != it_end; ++it )
+    this->m_RegisteredClients.end();
+  for (it = this->m_RegisteredClients.begin(); it != it_end; ++it)
   {
     //maybe there should be a check here if the current socket is still active
     this->SendMessagePrivate(curMessage.GetPointer(), *it);
     MITK_DEBUG("IGTLServer") << "Sent IGTL Message";
   }
+  m_ListMutex->Unlock();
 }
 
 void mitk::IGTLServer::StopCommunicationWithSocket(
-    SocketListType& toBeRemovedSockets)
+  SocketListType& toBeRemovedSockets)
 {
-  auto it = toBeRemovedSockets.begin();
-  auto itEnd = toBeRemovedSockets.end();
-  while (true)
-  {
-    this->StopCommunicationWithSocket(*it);
-
-    if ((*it) == (*itEnd))
-      break;
-
-    it++;
-  }
+  for (auto i = toBeRemovedSockets.begin(); i != toBeRemovedSockets.end(); i++)
+    this->StopCommunicationWithSocket(*i);
 }
 
 void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
 {
-  auto it    = this->m_RegisteredClients.begin();
-  auto itEnd = this->m_RegisteredClients.end();
-
-  while (true)
+  m_ListMutex->Lock();
+  auto i = m_RegisteredClients.begin();
+  auto end = m_RegisteredClients.end();
+  while (i != end)
   {
-    if ( (*it) == client )
+    if ((*i) == client)
     {
-  //    //close the socket
-      (*it)->CloseSocket();
+      //    //close the socket
+      (*i)->CloseSocket();
       //and remove it from the list
-      this->m_RegisteredClients.remove(*it);
-      break;
+      i = this->m_RegisteredClients.erase(i);
     }
-    if ((*it) == (*itEnd))
-      break;
-    it++;
+    else
+    {
+      ++i;
+    }
   }
+  m_ListMutex->Unlock();
 
   MITK_INFO("IGTLServer") << "Removed client socket from server client list.";
 }

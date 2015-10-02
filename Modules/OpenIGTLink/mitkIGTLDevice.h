@@ -349,6 +349,7 @@ namespace mitk {
       itk::FastMutexLock::Pointer m_ConnectingFinishedMutex;
       /** mutex to control access to m_State */
       itk::FastMutexLock::Pointer m_StateMutex;
+
       /** the hostname or ip of the device */
       std::string m_Hostname;
       /** the port number of the device */

@@ -219,7 +219,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::ComplicatedFamilyS
 }
 
 
-mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() const
+mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Image() const
 {
   mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
 
@@ -244,6 +244,13 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() c
     node->SetData(image3Ddouble);
     storage->Add(node);
   }
+
+  return storage;
+}
+
+mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Surface() const
+{
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
 
   { // Surface
     vtkSmartPointer<vtkPoints> points1 = vtkSmartPointer<vtkPoints>::New();
@@ -291,6 +298,12 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() c
     storage->Add(node);
   }
 
+  return storage;
+}
+
+mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::PointSet() const
+{
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
 
   { // PointSet
     mitk::PointSet::Pointer ps = mitk::PointSet::New();
@@ -364,7 +377,6 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::GeometryData() con
     node->SetData(geometryData);
     storage->Add(node);
   }
-
 
   return storage;
 }

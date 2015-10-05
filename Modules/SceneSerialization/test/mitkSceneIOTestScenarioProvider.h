@@ -139,9 +139,19 @@ private:
   DataStorage::Pointer ComplicatedFamilySituation() const;
 
   /**
-    Basic core types (Image, Surface, PointSet).
+    Basic core type Image.
   */
-  DataStorage::Pointer BasicCoreTypes() const;
+  DataStorage::Pointer Image() const;
+
+  /**
+    Basic core type Surface.
+  */
+  DataStorage::Pointer Surface() const;
+
+  /**
+    Basic core type PointSet.
+  */
+  DataStorage::Pointer PointSet() const;
 
   /**
     GeometryData object (separate for specific precision).
@@ -166,7 +176,9 @@ public:
     AddSaveAndRestoreScenario(ManyTopLevelNodes);
     AddSaveAndRestoreScenario(LineOfManyOnlyChildren);
     AddSaveAndRestoreScenario(ComplicatedFamilySituation);
-    AddSaveAndRestoreScenario(BasicCoreTypes);
+    AddSaveAndRestoreScenario(Image);
+    AddSaveAndRestoreScenario(Surface);
+    AddSaveAndRestoreScenario(PointSet);
     AddSaveAndRestoreScenario(GeometryData);
 
     //AddScenario("GeometryData", &mitk::SceneIOTestScenarioProvider::GeometryData, true, std::string(), false, mitk::eps);

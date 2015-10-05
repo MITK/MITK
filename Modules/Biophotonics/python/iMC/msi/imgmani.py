@@ -52,3 +52,16 @@ def get_bands(img, bands):
         new_nr_bands = 1
     new_shape = original_shape[:-1] + (new_nr_bands,)
     return np.reshape(img_bands, new_shape)
+
+
+def sortout_bands(img, bands):
+    """delete bands bands (np.array) from the multispectral image.
+    Example: image is 2048x2048x8. sortout_bands(img, [0,3] will return
+    img[:,:,[1,2,4,5,6,7]]. The advantage of this function is that the image does not
+    need to be 2d + wavelength.
+
+    TODO SW: Test"""
+    all_bands = np.arange(img.shape[-1])
+    bands_to_get = np.setdiff1d(all_bands, bands)
+    return get_bands(img, bands_to_get)
+

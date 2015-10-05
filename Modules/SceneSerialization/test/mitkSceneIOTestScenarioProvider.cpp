@@ -16,6 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSceneIOTestScenarioProvider.h"
 
+#include "mitkPointSet.h"
+#include "mitkImage.h"
+#include "mitkImageGenerator.h"
+#include "mitkSurface.h"
+
 // --------------- SceneIOTestScenarioProvider::Scenario ---------------
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Scenario::BuildDataStorage() const
@@ -204,4 +209,54 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::ComplicatedFamilyS
 
   return storage;
 }
+
+
+mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() const
+{
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+
+  { // Image of ints
+    mitk::Image::Pointer image3Dints = mitk::ImageGenerator::GenerateRandomImage<int>(10, 5, 7, // dim
+                                                                                      1, 0.5, 0.5,// spacing
+                                                                                      1, // time steps
+                                                                                      3000, -1000); // random max / min
+    mitk::DataNode::Pointer node = DataNode::New();
+    node->SetName("Image-Int");
+    node->SetData(image3Dints);
+    storage->Add(node);
+  }
+
+  { // Image of doubles
+    mitk::Image::Pointer image3Ddouble = mitk::ImageGenerator::GenerateRandomImage<double>(5, 10, 8, // dim
+                                                                                      1, 0.5, 0.5,// spacing
+                                                                                      2, // time steps
+                                                                                      3000, -1000); // random max / min
+    mitk::DataNode::Pointer node = DataNode::New();
+    node->SetName("Image-Double");
+    node->SetData(image3Ddouble);
+    storage->Add(node);
+  }
+
+  return storage;
+
+
+  { // PointSet
+    mitk::PointSet::Pointer ps = mitk::PointSet::New();
+    mitk::PointSet::PointType p;
+    mitk::FillVector3D(p, 1.0, -2.0, 33.0);
+    ps->SetPoint(0, p);
+    mitk::FillVector3D(p, 100.0, -200.0, 3300.0);
+    ps->SetPoint(1, p);
+    mitk::FillVector3D(p, 2.0, -3.0, 22.0);
+    ps->SetPoint(2, p, mitk::PTCORNER); // add point spec
+
+    mitk::DataNode::Pointer node = DataNode::New();
+    node->SetName("PointSet");
+    node->SetData(ps);
+    storage->Add(node);
+  }
+
+  return storage;
+}
+
 

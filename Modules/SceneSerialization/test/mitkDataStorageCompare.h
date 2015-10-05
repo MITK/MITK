@@ -89,6 +89,9 @@ private:
   bool CompareMappers(bool verbose);
   bool CompareInteractors(bool verbose);
 
+  bool AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose = false);
+  bool IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, bool verbose = false);
+
   Tests m_TestAspects;
   DataStorage::ConstPointer m_ReferenceDS;
   DataStorage::ConstPointer m_TestDS;

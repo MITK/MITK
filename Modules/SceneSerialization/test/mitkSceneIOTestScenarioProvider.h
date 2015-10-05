@@ -130,6 +130,12 @@ private:
   */
   DataStorage::Pointer ComplicatedFamilySituation() const;
 
+  /**
+    Basic core types (Image, Surface, PointSet).
+  */
+  DataStorage::Pointer BasicCoreTypes() const;
+
+
 public:
 
   // Helper to simplify writing the registration
@@ -139,13 +145,14 @@ public:
   // adds a test to the bottom of the list
   SceneIOTestScenarioProvider()
   {
-      /// declare all your test cases here!
-      AddSaveAndRestoreScenario(EmptyStorage);
-      AddSaveAndRestoreScenario(OneEmptyNode);
-      AddSaveAndRestoreScenario(OneEmptyNamedNode);
-      AddSaveAndRestoreScenario(ManyTopLevelNodes);
-      AddSaveAndRestoreScenario(LineOfManyOnlyChildren);
-      AddSaveAndRestoreScenario(ComplicatedFamilySituation);
+    /// declare all your test cases here!
+    AddSaveAndRestoreScenario(EmptyStorage);
+    AddSaveAndRestoreScenario(OneEmptyNode);
+    AddSaveAndRestoreScenario(OneEmptyNamedNode);
+    AddSaveAndRestoreScenario(ManyTopLevelNodes);
+    AddSaveAndRestoreScenario(LineOfManyOnlyChildren);
+    AddSaveAndRestoreScenario(ComplicatedFamilySituation);
+    AddSaveAndRestoreScenario(BasicCoreTypes);
   }
 
 

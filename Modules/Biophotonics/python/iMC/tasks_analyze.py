@@ -16,6 +16,7 @@ import luigi
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import SimpleITK as sitk
+from sklearn.preprocessing import Imputer
 
 from msi.io.nrrdreader import NrrdReader
 import msi.msimanipulations as msimani
@@ -46,7 +47,10 @@ def estimate_image(image_filename, rf_filename):
     rf = pickle.load(rf_file)
     # estimate parameters
     collapsed_msi = imgmani.collapse_image(msi.get_image())
-    estimated_parameters = rf.predict(collapsed_msi)
+    # in case of nan values: take mean reflection of band
+    imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
+    imp.fit(collapsed_msi)
+    estimated_parameters = rf.predict(imp.transform(collapsed_msi))
     # restore shape
     estimated_paramters_as_image = np.reshape(
             estimated_parameters, (msi.get_image().shape[0],

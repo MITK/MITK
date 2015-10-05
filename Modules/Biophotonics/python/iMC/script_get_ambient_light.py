@@ -31,7 +31,7 @@ def resort_wavelengths(msi):
     msi.set_image(np.reshape(collapsed_image, msi.get_image().shape))
 
 # rebind this method since in this recoding the wavelengths got messed up
-pre.resort_wavelengths = resort_wavelengths
+sp.resort_wavelengths = resort_wavelengths
 
 
 class WhiteSegmentationFile(luigi.Task):
@@ -71,7 +71,7 @@ class PlotAmbientLight(luigi.Task):
         af_msi = Msi()
         af_msi.set_image(af)
         af_msi.set_wavelengths(sp.RECORDED_WAVELENGTHS)
-        pre.resort_wavelengths(af_msi)
+        sp.resort_wavelengths(af_msi)
         plt.figure()
         msiplt.plot(af_msi)
         plt.grid()

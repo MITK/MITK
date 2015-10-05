@@ -17,3 +17,12 @@ MC_DATA_FOLDER = "mc_data"
 
 RECORDED_WAVELENGTHS = \
         np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
+
+# some hacky functions to adapt to certain measurement scenarios:
+
+def resort_wavelengths(msi):
+    """ as a standard, no resorting takes place. rebind this method
+    if wavelengths need sorting """
+    return msi
+
+bands_to_sortout = []

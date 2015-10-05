@@ -36,6 +36,9 @@ def extract_mc_data(batch):
     # added here
     standard_normalizer.normalize(fake_msi)
     batch.reflectances = fake_msi.get_image()
+    # in case there are bands to sort out, discard them here
+    batch.reflectances = imgmani.sortout_bands(batch.reflectances,
+                                              sp.bands_to_sortout)
     # scaled_reflectances = preprocessing.scale(reflectances)
     return batch.mucosa, batch.reflectances
 

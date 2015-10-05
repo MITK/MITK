@@ -42,7 +42,7 @@ def resort_wavelengths(msi):
     msi.set_image(np.reshape(collapsed_image, msi.get_image().shape))
 
 # rebind this method since in this recording the wavelengths got messed up
-ppt.resort_wavelengths = resort_wavelengths
+sp.resort_wavelengths = resort_wavelengths
 
 
 def plot_axis(axis, image, title):

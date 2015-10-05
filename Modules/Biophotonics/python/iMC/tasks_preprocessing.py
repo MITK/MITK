@@ -14,6 +14,7 @@ import SimpleITK as sitk
 from msi.io.nrrdreader import NrrdReader
 from msi.io.nrrdwriter import NrrdWriter
 import msi.msimanipulations as msimani
+import msi.imgmani as imgmani
 import msi.normalize as norm
 import scriptpaths as sp
 
@@ -37,10 +38,7 @@ def smooth(msi):
     msi.set_image(img_array)
 
 
-def resort_wavelengths(msi):
-    """ as a standard, no resorting takes place. rebind this method
-    if wavelengths need sorting """
-    return msi
+
 
 
 def touch_and_save_msi(msi, outfile):
@@ -158,7 +156,7 @@ class CorrectImagingSetupTask(luigi.Task):
         # correct image by flatfield and dark image
         msimani.image_correction(msi, flatfield, dark)
         # correct for differently sorted filters if necessary
-        resort_wavelengths(msi)
+        sp.resort_wavelengths(msi)
         touch_and_save_msi(msi, self.output())
 
 
@@ -224,6 +222,8 @@ class PreprocessMSI(luigi.Task):
     def run(self):
         reader = NrrdReader()
         image = reader.read(self.input().path)
+        image.set_image(imgmani.sortout_bands(image.get_image(),
+                                              sp.bands_to_sortout))
         norm.standard_normalizer.normalize(image)
         touch_and_save_msi(image, self.output())
 

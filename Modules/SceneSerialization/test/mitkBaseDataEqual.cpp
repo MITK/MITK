@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkSurface.h"
 #include "mitkPointSet.h"
+#include "mitkGeometryData.h"
 
 #include "usServiceProperties.h"
 #include "usModuleContext.h"
@@ -90,6 +91,11 @@ void mitk::BaseDataEqual::RegisterCoreEquals()
     us::ServiceProperties pointsetProperties;
     pointsetProperties["basedata"] = std::string(PointSet::GetStaticNameOfClass());
     us::GetModuleContext()->RegisterService<BaseDataEqual>(&pointsetEqual, pointsetProperties);
+
+    static BaseDataEqualT<GeometryData> geometryDataEqual;
+    us::ServiceProperties geometryDataProperties;
+    geometryDataProperties["basedata"] = std::string(GeometryData::GetStaticNameOfClass());
+    us::GetModuleContext()->RegisterService<BaseDataEqual>(&geometryDataEqual, geometryDataProperties);
 
     comparatorsCreated = true;
   }

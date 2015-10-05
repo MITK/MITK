@@ -27,7 +27,7 @@ namespace mitk
 */
 class BaseDataEqual
 {
-protected:
+private:
 
   /// Gets to compare only non-nullptr objects
   virtual bool InternalAreEqual(const BaseData& left, const BaseData& right, double eps = mitk::eps, bool verbose = false) = 0;
@@ -44,6 +44,7 @@ public:
 template <class T>
 class BaseDataEqualT : public BaseDataEqual
 {
+
   virtual bool InternalAreEqual(const BaseData& left, const BaseData& right, double eps = mitk::eps, bool verbose = false)
   {
     const T& leftT = dynamic_cast<const T&>(left);

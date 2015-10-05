@@ -134,11 +134,12 @@ public:
             mitk::DataStorageCompare(originalStorage,
                                      restoredStorage,
                                      mitk::DataStorageCompare::CMP_Hierarchy |
-                                     mitk::DataStorageCompare::CMP_Data
+                                     mitk::DataStorageCompare::CMP_Data,
                                      //mitk::DataStorageCompare::CMP_Properties |
                                      //mitk::DataStorageCompare::CMP_Mappers |
                                      //mitk::DataStorageCompare::CMP_Interactors
                                      // mappers and interactors skipped for now
+                                     scenario.comparisonPrecision
                                      ).CompareVerbose()
             );
       }

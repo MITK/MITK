@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage* reference,
                                              const mitk::DataStorage* test,
-                                             Tests flags)
+                                             Tests flags,
+                                             double eps)
 : m_TestAspects(flags)
 , m_ReferenceDS(reference)
 , m_TestDS(test)
@@ -33,6 +34,7 @@ mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage* reference,
 , m_MappersPassed(false)
 , m_InteractorsPassed(false)
 , m_AspectsFailed(0)
+, m_Eps(eps)
 {
   BaseDataEqual::RegisterCoreEquals();
 }
@@ -55,7 +57,7 @@ bool mitk::DataStorageCompare::Compare(bool verbose)
 
   if ( m_TestAspects & CMP_Data )
   {
-    m_DataPassed = CompareData(verbose);
+    m_DataPassed = CompareData(m_Eps, verbose);
     if (!m_DataPassed) ++m_AspectsFailed;
   }
 
@@ -225,7 +227,7 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   return numberOfMisMatches == 0;
 }
 
-bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose)
+bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, double eps, bool verbose)
 {
   if (reference == nullptr && test == nullptr)
     return true;
@@ -245,10 +247,10 @@ bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, co
   }
 
   // two real nodes, need to really compare
-  return IsDataEqual(reference->GetData(), test->GetData(), verbose);
+  return IsDataEqual(reference->GetData(), test->GetData(), eps, verbose);
 }
 
-bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, bool verbose)
+bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, double eps, bool verbose)
 {
   // early-out for nullptrs
   if (reference == nullptr && test == nullptr)
@@ -307,7 +309,7 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
   }
 }
 
-bool mitk::DataStorageCompare::CompareData(bool verbose)
+bool mitk::DataStorageCompare::CompareData(double eps, bool verbose)
 {
   int numberOfMisMatches = 0;
 
@@ -324,7 +326,7 @@ bool mitk::DataStorageCompare::CompareData(bool verbose)
       // go on an compare those two
       auto testEntry = m_TestNodesByHierarchy.find(key);
       mitk::DataNode::Pointer testNode = testEntry->second;
-      if ( ! AreNodesEqual(refNode, testNode, verbose) )
+      if ( ! AreNodesEqual(refNode, testNode, eps, verbose) )
       {
         ++numberOfMisMatches;
         if ( verbose )

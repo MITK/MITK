@@ -38,11 +38,13 @@ mitk::SceneIOTestScenarioProvider::Scenario::Scenario(const std::string& _key,
     SceneIOTestScenarioProvider::BuilderMethodPointer _providerMethod,
     bool _isSerializable,
     const std::string& _referenceArchiveFilename,
-    bool _isReferenceLoadable)
+    bool _isReferenceLoadable,
+    double _comparisonPrecision)
 : key(_key)
 , serializable(_isSerializable)
 , referenceArchiveFilename(_referenceArchiveFilename)
 , referenceArchiveLoadable(_isReferenceLoadable)
+, comparisonPrecision(_comparisonPrecision)
 , m_ScenarioProvider(_scenarioProvider)
 , m_ProviderMethod(_providerMethod)
 {
@@ -60,9 +62,10 @@ void mitk::SceneIOTestScenarioProvider::AddScenario(const std::string& key,
                                                     BuilderMethodPointer creator,
                                                     bool isSerializable,
                                                     const std::string& referenceArchiveFilename,
-                                                    bool isReferenceLoadable)
+                                                    bool isReferenceLoadable,
+                                                    double comparisonPrecision)
 {
-  Scenario newScenario(key, this, creator, isSerializable, referenceArchiveFilename, isReferenceLoadable);
+  Scenario newScenario(key, this, creator, isSerializable, referenceArchiveFilename, isReferenceLoadable, comparisonPrecision);
   m_Scenarios.push_back(newScenario);
 }
 
@@ -305,6 +308,13 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() c
     storage->Add(node);
   }
 
+  return storage;
+}
+
+mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::GeometryData() const
+{
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+
   { // GeometryData
     mitk::GeometryData::Pointer gdata = mitk::GeometryData::New();
 
@@ -317,7 +327,15 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() c
     mitk::FillVector3D(offset, 0.1, 0.2, 0.3);
     bool isImageGeometry(false);
     unsigned int frameOfReferenceID(47);
+
     mitk::BaseGeometry::BoundsArrayType bounds;
+    bounds[0] = std::numeric_limits<mitk::ScalarType>::min();
+    bounds[1] = -52.723;
+    bounds[2] = -0.002;
+    bounds[3] = 918273645.18293746;
+    bounds[4] = -0.002;
+    bounds[5] = +52.723;
+
     mitk::Point3D origin;
     mitk::FillVector3D(origin, 5.1, 5.2, 5.3);
     mitk::Vector3D spacing;
@@ -350,5 +368,6 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() c
 
   return storage;
 }
+
 
 

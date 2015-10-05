@@ -44,6 +44,7 @@ public:
     bool serializable; ///< Do we expect that this can be stored in a .mitk file?
     std::string referenceArchiveFilename; ///< Absolute filename with a reference .mitk file.
     bool referenceArchiveLoadable; ///< Do we expect that the reference can be loaded without errors?
+    double comparisonPrecision; ///< Precision used for floating point comparisons after save/load cycle (eps).
 
     /// Construct the DataStorage for this scenario.
     DataStorage::Pointer BuildDataStorage() const;
@@ -55,13 +56,15 @@ public:
       \param _isSerializable Do we expect that this can be stored in a .mitk file?
       \param _referenceArchiveFilename Absolute filename with a reference .mitk file.
       \param _isReferenceLoadable Do we expect that the reference can be loaded without errors?
+      \param _comparisonPrecision Precision used for floating point comparisions after save/load cycle (eps).
     */
     Scenario(const std::string& _key,
         const SceneIOTestScenarioProvider* _scenarioProvider,
         SceneIOTestScenarioProvider::BuilderMethodPointer _providerMethod,
         bool _isSerializable,
         const std::string& _referenceArchiveFilename,
-        bool _isReferenceLoadable);
+        bool _isReferenceLoadable,
+        double _comparisonPrecision);
 
   private:
 
@@ -82,7 +85,12 @@ private:
   /// Configures how many items count as many for some tests.
   unsigned int m_HowMuchIsMany = 100;
 
-  void AddScenario(const std::string& key, BuilderMethodPointer creator, bool isSerializable, const std::string& referenceArchiveFilename = std::string(), bool isReferenceLoadable = false);
+  void AddScenario(const std::string& key,
+                   BuilderMethodPointer creator,
+                   bool isSerializable,
+                   const std::string& referenceArchiveFilename = std::string(),
+                   bool isReferenceLoadable = false,
+                   double comparisionPrecision = mitk::eps);
 
   /**
     An empty storage.
@@ -135,6 +143,12 @@ private:
   */
   DataStorage::Pointer BasicCoreTypes() const;
 
+  /**
+    GeometryData object (separate for specific precision).
+  */
+  DataStorage::Pointer GeometryData() const;
+
+
 
 public:
 
@@ -153,6 +167,9 @@ public:
     AddSaveAndRestoreScenario(LineOfManyOnlyChildren);
     AddSaveAndRestoreScenario(ComplicatedFamilySituation);
     AddSaveAndRestoreScenario(BasicCoreTypes);
+    AddSaveAndRestoreScenario(GeometryData);
+
+    //AddScenario("GeometryData", &mitk::SceneIOTestScenarioProvider::GeometryData, true, std::string(), false, mitk::eps);
   }
 
 

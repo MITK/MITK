@@ -74,7 +74,8 @@ public:
 
   DataStorageCompare(const DataStorage* reference,
                      const DataStorage* test,
-                     Tests flags = CMP_All);
+                     Tests flags = CMP_All,
+                     double eps = mitk::eps);
 
   bool CompareVerbose();
   bool Compare(bool verbose = false);
@@ -84,14 +85,15 @@ public:
 private:
 
   bool CompareHierarchy(bool verbose);
-  bool CompareData(bool verbose);
+  bool CompareData(double eps, bool verbose);
   bool CompareProperties(bool verbose);
   bool CompareMappers(bool verbose);
   bool CompareInteractors(bool verbose);
 
-  bool AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose = false);
-  bool IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, bool verbose = false);
+  bool AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, double eps = mitk::eps, bool verbose = false);
+  bool IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, double eps = mitk::eps, bool verbose = false);
 
+  double m_Eps;
   Tests m_TestAspects;
   DataStorage::ConstPointer m_ReferenceDS;
   DataStorage::ConstPointer m_TestDS;

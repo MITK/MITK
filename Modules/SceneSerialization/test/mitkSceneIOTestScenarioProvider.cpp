@@ -21,6 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageGenerator.h"
 #include "mitkSurface.h"
 
+#include <vtkPolyData.h>
+#include <vtkPolygon.h>
+#include <vtkCellArray.h>
+
 // --------------- SceneIOTestScenarioProvider::Scenario ---------------
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Scenario::BuildDataStorage() const
@@ -236,6 +240,53 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() c
     node->SetData(image3Ddouble);
     storage->Add(node);
   }
+
+  { // Surface
+    vtkSmartPointer<vtkPoints> points1 = vtkSmartPointer<vtkPoints>::New();
+    points1->InsertNextPoint(0.0, 0.0, 0.0);
+    points1->InsertNextPoint(1.0, 0.0, 0.0);
+    points1->InsertNextPoint(0.0, 1.0, 0.0);
+    points1->InsertNextPoint(1.0, 1.0, 0.0);
+
+    vtkSmartPointer<vtkPolygon> polygon1 = vtkSmartPointer<vtkPolygon>::New();
+    polygon1->GetPointIds()->SetNumberOfIds(4);
+    polygon1->GetPointIds()->SetId(0, 0);
+    polygon1->GetPointIds()->SetId(1, 1);
+    polygon1->GetPointIds()->SetId(2, 2);
+    polygon1->GetPointIds()->SetId(3, 3);
+
+    vtkSmartPointer<vtkPolygon> polygon2 = vtkSmartPointer<vtkPolygon>::New();
+    polygon2->GetPointIds()->SetNumberOfIds(4);
+    polygon2->GetPointIds()->SetId(0, 3);
+    polygon2->GetPointIds()->SetId(1, 2);
+    polygon2->GetPointIds()->SetId(2, 0);
+    polygon2->GetPointIds()->SetId(3, 1);
+
+    //generate polydatas
+    vtkSmartPointer<vtkCellArray> polygonArray1 = vtkSmartPointer<vtkCellArray>::New();
+    polygonArray1->InsertNextCell(polygon1);
+
+    vtkSmartPointer<vtkPolyData> polydata1 = vtkSmartPointer<vtkPolyData>::New();
+    polydata1->SetPoints(points1);
+    polydata1->SetPolys(polygonArray1);
+
+    vtkSmartPointer<vtkCellArray> polygonArray2 = vtkSmartPointer<vtkCellArray>::New();
+    polygonArray2->InsertNextCell(polygon2);
+
+    vtkSmartPointer<vtkPolyData> polyDataTwo = vtkSmartPointer<vtkPolyData>::New();
+    polyDataTwo->SetPoints(points1);
+    polyDataTwo->SetPolys(polygonArray2);
+
+    //generate surfaces
+    mitk::Surface::Pointer surface = mitk::Surface::New();
+    surface->SetVtkPolyData(polydata1);
+
+    mitk::DataNode::Pointer node = DataNode::New();
+    node->SetName("Surface");
+    node->SetData(surface);
+    storage->Add(node);
+  }
+
 
   { // PointSet
     mitk::PointSet::Pointer ps = mitk::PointSet::New();

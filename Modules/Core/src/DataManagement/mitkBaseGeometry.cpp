@@ -927,8 +927,7 @@ bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mi
 bool mitk::Equal(const mitk::BaseGeometry::TransformType& leftHandSide, const mitk::BaseGeometry::TransformType& rightHandSide, ScalarType eps, bool verbose)
 {
   //Compare IndexToWorldTransform Matrix
-  if (!mitk::MatrixEqualElementWise(leftHandSide.GetMatrix(),
-    rightHandSide.GetMatrix()))
+  if (!mitk::MatrixEqualElementWise(leftHandSide.GetMatrix(), rightHandSide.GetMatrix(), eps))
   {
     if (verbose)
     {

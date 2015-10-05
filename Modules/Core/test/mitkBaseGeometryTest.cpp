@@ -106,6 +106,7 @@ class mitkBaseGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(Equal_DifferentSpacing_ReturnsFalse);
   MITK_TEST(Equal_InputIsNull_ReturnsFalse);
   MITK_TEST(Equal_DifferentBoundingBox_ReturnsFalse);
+  MITK_TEST(Equal_Transforms_MinorDifferences_And_Eps);
   //other Functions
   MITK_TEST(TestComposeTransform);
   MITK_TEST(TestComposeVtkMatrix);
@@ -508,6 +509,25 @@ public:
     anotherDummyGeometry->SetBounds(bounds);
 
     MITK_ASSERT_NOT_EQUAL( aDummyGeometry, anotherDummyGeometry , "Different bounding box");
+  }
+
+  void Equal_Transforms_MinorDifferences_And_Eps()
+  {
+    // Verifies that the eps parameter is evaluated properly
+    // when comparing two mitk::BaseGeometry::TransformTypes
+    aMatrix.SetIdentity();
+    anotherMatrix.SetIdentity();
+
+    aMatrix(0,1)       = 0.0002; aTransform->SetMatrix( aMatrix );
+    anotherMatrix(0,1) = 0.0002; anotherTransform->SetMatrix( anotherMatrix );
+    anotherTransform->SetMatrix( aMatrix );
+    CPPUNIT_ASSERT_MESSAGE( "Exact same transforms are mitk::Equal() for eps=mitk::eps", mitk::Equal(aTransform, anotherTransform, mitk::eps, true) );
+    CPPUNIT_ASSERT_MESSAGE( "Exact same transforms are mitk::Equal() for eps=vnl_math::eps", mitk::Equal(aTransform, anotherTransform, vnl_math::eps, true) );
+
+    anotherMatrix(0,1) = 0.0002 + mitk::eps; anotherTransform->SetMatrix( anotherMatrix );
+    CPPUNIT_ASSERT_MESSAGE( "Transforms of diff mitk::eps are !mitk::Equal() for eps=vnl_math::eps", !mitk::Equal(aTransform, anotherTransform, vnl_math::eps, true) );
+    CPPUNIT_ASSERT_MESSAGE( "Transforms of diff mitk::eps are !mitk::Equal() for eps=mitk::eps-1%", !mitk::Equal(aTransform, anotherTransform, mitk::eps * 0.99, true) );
+    CPPUNIT_ASSERT_MESSAGE( "Transforms of diff mitk::eps _are_ mitk::Equal() for eps=mitk::eps+1%", mitk::Equal(aTransform, anotherTransform, mitk::eps * 1.01, true) );
   }
 
   void TestComposeTransform(){

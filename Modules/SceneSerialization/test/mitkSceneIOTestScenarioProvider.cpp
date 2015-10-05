@@ -237,9 +237,6 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() c
     storage->Add(node);
   }
 
-  return storage;
-
-
   { // PointSet
     mitk::PointSet::Pointer ps = mitk::PointSet::New();
     mitk::PointSet::PointType p;

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkImageGenerator.h"
 #include "mitkSurface.h"
+#include "mitkGeometryData.h"
 
 #include <vtkPolyData.h>
 #include <vtkPolygon.h>
@@ -303,6 +304,49 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::BasicCoreTypes() c
     node->SetData(ps);
     storage->Add(node);
   }
+
+  { // GeometryData
+    mitk::GeometryData::Pointer gdata = mitk::GeometryData::New();
+
+    // define Geometry3D parameters
+    mitk::AffineTransform3D::MatrixType matrix;
+    matrix[0][0] = 1.1;
+    matrix[1][1] = 2.2;
+    matrix[2][2] = 3.3;
+    mitk::AffineTransform3D::OffsetType offset;
+    mitk::FillVector3D(offset, 0.1, 0.2, 0.3);
+    bool isImageGeometry(false);
+    unsigned int frameOfReferenceID(47);
+    mitk::BaseGeometry::BoundsArrayType bounds;
+    mitk::Point3D origin;
+    mitk::FillVector3D(origin, 5.1, 5.2, 5.3);
+    mitk::Vector3D spacing;
+    mitk::FillVector3D(spacing, 2.1, 2.2, 2.3);
+
+    // build GeometryData from matrix/offset/etc.
+    mitk::AffineTransform3D::Pointer newTransform = mitk::AffineTransform3D::New();
+    newTransform->SetMatrix(matrix);
+    newTransform->SetOffset(offset);
+
+    mitk::Geometry3D::Pointer newGeometry = mitk::Geometry3D::New();
+    newGeometry->SetFrameOfReferenceID(frameOfReferenceID);
+    newGeometry->SetImageGeometry(isImageGeometry);
+
+    newGeometry->SetIndexToWorldTransform(newTransform);
+
+    newGeometry->SetBounds(bounds);
+    newGeometry->SetOrigin(origin);
+    newGeometry->SetSpacing(spacing);
+
+    mitk::GeometryData::Pointer geometryData = mitk::GeometryData::New();
+    geometryData->SetGeometry(newGeometry);
+
+    mitk::DataNode::Pointer node = DataNode::New();
+    node->SetName("GeometryData");
+    node->SetData(geometryData);
+    storage->Add(node);
+  }
+
 
   return storage;
 }

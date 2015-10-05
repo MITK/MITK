@@ -15,7 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPointSetWriterService.h"
+#include "mitkGeometry3DToXML.h"
 #include "mitkIOMimeTypes.h"
+#include "mitkLocaleSwitch.h"
+
+#include "mitkGeometry3D.h"
+
+#include <tinyxml.h>
 
 #include <iostream>
 #include <fstream>
@@ -42,50 +48,49 @@ mitk::PointSetWriterService::PointSetWriterService()
   : AbstractFileWriter(PointSet::GetStaticNameOfClass(),
                        CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE()),
                        "MITK Point Set Writer")
-  , m_IndentDepth(0)
-  , m_Indent(2)
 {
   RegisterService();
 }
 
 mitk::PointSetWriterService::PointSetWriterService(const mitk::PointSetWriterService& other)
   : AbstractFileWriter(other)
-  , m_IndentDepth(other.m_IndentDepth)
-  , m_Indent(other.m_Indent)
 {
 }
 
 mitk::PointSetWriterService::~PointSetWriterService()
-{}
+{
+
+}
 
 void mitk::PointSetWriterService::Write()
 {
-  OutputStream out(this);
+  mitk::LocaleSwitch localeC("C");
 
-  if ( !out.good() )
+  TiXmlDocument doc;
+
+  TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
+  doc.LinkEndChild(decl);
+
+  TiXmlElement* rootNode = new TiXmlElement(XML_POINT_SET_FILE);
+  doc.LinkEndChild(rootNode);
+
+  TiXmlElement* versionNode = new TiXmlElement(XML_FILE_VERSION);
+  TiXmlText* versionText = new TiXmlText(VERSION_STRING );
+  versionNode->LinkEndChild(versionText);
+  rootNode->LinkEndChild( versionNode );
+
+  TiXmlElement* pointSetNode = ToXML( static_cast<const PointSet*>(this->GetInput()) );
+  if (!pointSetNode)
   {
-    mitkThrow() << "Stream not good.";
+    mitkThrow() << "Serialization error during PointSet writing.";
   }
+  rootNode->LinkEndChild(pointSetNode);
 
-  std::locale previousLocale(out.getloc());
-  std::locale I("C");
-  out.imbue(I);
+  //out << doc; // streaming of TinyXML write no new-lines,
+                // rendering XML files unreadable (for humans)
 
-  //
-  // Here the actual xml writing begins
-  //
-  WriteXMLHeader( out );
-  WriteStartElement( XML_POINT_SET_FILE, out );
-  WriteStartElement( XML_FILE_VERSION, out );
-  out << VERSION_STRING;
-  WriteEndElement( XML_FILE_VERSION, out, false );
-
-  WriteXML( static_cast<const PointSet*>(this->GetInput()), out );
-
-  WriteEndElement( XML_POINT_SET_FILE, out );
-
-  out.imbue(previousLocale);
-  if ( !out.good() ) // some error during output
+  LocalFile f(this);
+  if ( !doc.SaveFile( f.GetFileName() ) )
   {
     mitkThrow() << "Some error during point set writing.";
   }
@@ -96,54 +101,74 @@ mitk::PointSetWriterService*mitk::PointSetWriterService::Clone() const
   return new PointSetWriterService(*this);
 }
 
-void mitk::PointSetWriterService::WriteXML( const mitk::PointSet* pointSet, std::ostream& out )
+TiXmlElement* mitk::PointSetWriterService::ToXML( const mitk::PointSet* pointSet )
 {
-  WriteStartElement( XML_POINT_SET, out );
+  // the following is rather bloated and could be expressed in more compact XML
+  // (e.g. using attributes instead of tags for x/y/z). The current format is
+  // kept to be compatible with the previous writer.
+  TiXmlElement* pointSetElement = new TiXmlElement( XML_POINT_SET );
   unsigned int timecount = pointSet->GetTimeSteps();
 
   for(unsigned int i=0; i< timecount; i++)
   {
-    WriteStartElement( XML_TIME_SERIES, out );
+    TiXmlElement* timeSeriesElement = new TiXmlElement( XML_TIME_SERIES );
+    pointSetElement->LinkEndChild(timeSeriesElement);
 
-    WriteStartElement( XML_TIME_SERIES_ID, out );
-    out << ConvertToString( i );
-    WriteEndElement( XML_TIME_SERIES_ID, out, false );
+    TiXmlElement* timeSeriesIDElement = new TiXmlElement( XML_TIME_SERIES_ID );
+    timeSeriesElement->LinkEndChild(timeSeriesIDElement);
+    TiXmlText* timeSeriesIDText = new TiXmlText(ConvertToString(i));
+    timeSeriesIDElement->LinkEndChild(timeSeriesIDText);
 
-    mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet(i)->GetPoints();
-    mitk::PointSet::PointsContainer::Iterator it;
+    PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet(i)->GetPoints();
+    PointSet::PointsContainer::Iterator it;
+
+    Geometry3D* geometry = dynamic_cast<Geometry3D*>( pointSet->GetGeometry(i) );
+    if (geometry == nullptr)
+    {
+      MITK_WARN << "Writing a PointSet with something other that a Geometry3D. This is not foreseen and not handled.";
+      // we'll continue anyway, this imitates previous behavior
+    }
+    else
+    {
+      TiXmlElement* geometryElement = Geometry3DToXML::ToXML( geometry );
+      timeSeriesElement->LinkEndChild(geometryElement);
+    }
 
     for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
     {
-      WriteStartElement( XML_POINT, out );
+      TiXmlElement* pointElement = new TiXmlElement(XML_POINT);
+      timeSeriesElement->LinkEndChild(pointElement);
 
-      WriteStartElement( XML_ID, out );
-      out << ConvertToString( it->Index() );
-      WriteEndElement( XML_ID, out, false );
+      TiXmlElement* pointIDElement = new TiXmlElement(XML_ID);
+      TiXmlText* pointIDText = new TiXmlText( ConvertToString( it->Index() ) );
+      pointIDElement->LinkEndChild(pointIDText);
+      pointElement->LinkEndChild(pointIDElement);
 
       mitk::PointSet::PointType point = it->Value();
 
-      WriteStartElement( XML_SPEC, out );
-      out << ConvertToString( pointSet->GetSpecificationTypeInfo(it->Index(), i) );
-      WriteEndElement( XML_SPEC, out, false );
+      TiXmlElement* pointSpecElement = new TiXmlElement(XML_SPEC);
+      TiXmlText* pointSpecText = new TiXmlText( ConvertToString( pointSet->GetSpecificationTypeInfo(it->Index(), i) ) );
+      pointSpecElement->LinkEndChild(pointSpecText);
+      pointElement->LinkEndChild(pointSpecElement);
 
-      WriteStartElement( XML_X, out );
-      out << ConvertToString( point[ 0 ] );
-      WriteEndElement( XML_X, out, false );
+      TiXmlElement* pointXElement = new TiXmlElement(XML_X);
+      TiXmlText* pointXText = new TiXmlText( ConvertToString( point[0] ) );
+      pointXElement->LinkEndChild(pointXText);
+      pointElement->LinkEndChild(pointXElement);
 
-      WriteStartElement( XML_Y, out );
-      out << ConvertToString( point[ 1 ] );
-      WriteEndElement( XML_Y, out, false );
+      TiXmlElement* pointYElement = new TiXmlElement(XML_Y);
+      TiXmlText* pointYText = new TiXmlText( ConvertToString( point[1] ) );
+      pointYElement->LinkEndChild(pointYText);
+      pointElement->LinkEndChild(pointYElement);
 
-      WriteStartElement( XML_Z, out );
-      out << ConvertToString( point[ 2 ] );
-      WriteEndElement( XML_Z, out, false );
-
-      WriteEndElement( XML_POINT, out );
+      TiXmlElement* pointZElement = new TiXmlElement(XML_Z);
+      TiXmlText* pointZText = new TiXmlText( ConvertToString( point[2] ) );
+      pointZElement->LinkEndChild(pointZText);
+      pointElement->LinkEndChild(pointZElement);
     }
-    WriteEndElement( XML_TIME_SERIES, out );
   }
 
-  WriteEndElement( XML_POINT_SET, out );
+  return pointSetElement;
 }
 
 template < typename T>
@@ -153,7 +178,7 @@ std::string mitk::PointSetWriterService::ConvertToString( T value )
   std::locale I("C");
   o.imbue(I);
 
-  if ( o << value )
+  if ( o << std::setprecision(12) << value )
   {
     return o.str();
   }
@@ -161,34 +186,4 @@ std::string mitk::PointSetWriterService::ConvertToString( T value )
   {
     return "conversion error";
   }
-}
-
-void mitk::PointSetWriterService::WriteXMLHeader( std::ostream &file )
-{
-  file << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>";
-}
-
-void mitk::PointSetWriterService::WriteStartElement( const std::string& tag, std::ostream &file )
-{
-  file << std::endl;
-  WriteIndent( file );
-  file << '<' << tag << '>';
-  m_IndentDepth++;
-}
-
-void mitk::PointSetWriterService::WriteEndElement( const std::string& tag, std::ostream &file, const bool& indent )
-{
-  m_IndentDepth--;
-  if ( indent )
-  {
-    file << std::endl;
-    WriteIndent( file );
-  }
-  file << '<' << '/' << tag << '>';
-}
-
-void mitk::PointSetWriterService::WriteIndent( std::ostream& file )
-{
-  std::string spaces( m_IndentDepth * m_Indent, ' ' );
-  file << spaces;
 }

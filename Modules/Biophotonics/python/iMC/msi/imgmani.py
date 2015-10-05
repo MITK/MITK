@@ -48,8 +48,6 @@ def get_bands(img, bands):
     new_nr_bands = 1
     if hasattr(bands, "__len__"):
         new_nr_bands = len(bands)
-    else:
-        new_nr_bands = 1
     new_shape = original_shape[:-1] + (new_nr_bands,)
     return np.reshape(img_bands, new_shape)
 

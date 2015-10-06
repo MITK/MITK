@@ -49,38 +49,23 @@ bool mitk::DataStorageCompare::Compare(bool verbose)
   DescribeHierarchyOfNodes(m_ReferenceDS, m_RefNodesByHierarchy);
   DescribeHierarchyOfNodes(m_TestDS, m_TestNodesByHierarchy);
 
+  m_HierarchyPassed = false;
+  m_DataPassed = false;
+  m_PropertiesPassed = false;
+  m_MappersPassed = false;
+  m_InteractorsPassed = false;
+  m_AspectsFailed = 0;
+
   if ( m_TestAspects & CMP_Hierarchy )
-  {
     m_HierarchyPassed = CompareHierarchy(verbose);
-    if (!m_HierarchyPassed) ++m_AspectsFailed;
-  }
 
-  if ( m_TestAspects & CMP_Data )
-  {
-    m_DataPassed = CompareData(m_Eps, verbose);
-    if (!m_DataPassed) ++m_AspectsFailed;
-  }
+  if ( m_TestAspects != CMP_Nothing )
+    CompareDataNodes(verbose);
 
-  if ( m_TestAspects & CMP_Properties )
-  {
-    m_PropertiesPassed = CompareProperties(verbose);
-    if (!m_PropertiesPassed) ++m_AspectsFailed;
-  }
-
-  if ( m_TestAspects & CMP_Mappers )
-  {
-    m_MappersPassed = CompareMappers(verbose);
-    if (!m_MappersPassed) ++m_AspectsFailed;
-  }
-
-  if ( m_TestAspects & CMP_Interactors )
-  {
-    m_InteractorsPassed = CompareInteractors(verbose);
-    if (!m_InteractorsPassed) ++m_AspectsFailed;
-  }
-
-
-  // ...
+  if ((m_TestAspects & CMP_Data) && !m_DataPassed) ++m_AspectsFailed;
+  if ((m_TestAspects & CMP_Properties) && !m_PropertiesPassed) ++m_AspectsFailed;
+  if ((m_TestAspects & CMP_Mappers) && !m_MappersPassed) ++m_AspectsFailed;
+  if ((m_TestAspects & CMP_Interactors) && !m_InteractorsPassed) ++m_AspectsFailed;
 
   if (verbose)
       Report();
@@ -227,7 +212,7 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   return numberOfMisMatches == 0;
 }
 
-bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, double eps, bool verbose)
+bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose)
 {
   if (reference == nullptr && test == nullptr)
     return true;
@@ -246,11 +231,19 @@ bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, co
     return false;
   }
 
+  if (m_TestAspects & CMP_Data)
+    m_DataPassed = IsDataEqual(reference->GetData(), test->GetData(), verbose);
+
+  if (m_TestAspects & CMP_Properties)
+    m_PropertiesPassed = ArePropertyListsEqual(reference, test, verbose);
+
+  // .. add interactors/mappers
+
   // two real nodes, need to really compare
-  return IsDataEqual(reference->GetData(), test->GetData(), eps, verbose);
+  return m_AspectsFailed == 0;
 }
 
-bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, double eps, bool verbose)
+bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, bool verbose)
 {
   // early-out for nullptrs
   if (reference == nullptr && test == nullptr)
@@ -300,7 +293,7 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
       MITK_ERROR << "Service lookup error, cannot get comparator for class " << reference->GetNameOfClass();
     }
 
-    return comparator->AreEqual(reference, test, eps, verbose);
+    return comparator->AreEqual(reference, test, m_Eps, verbose);
   }
   catch (std::exception& e)
   {
@@ -309,7 +302,12 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
   }
 }
 
-bool mitk::DataStorageCompare::CompareData(double eps, bool verbose)
+bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose)
+{
+  return false;
+}
+
+bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
 {
   int numberOfMisMatches = 0;
 
@@ -326,12 +324,12 @@ bool mitk::DataStorageCompare::CompareData(double eps, bool verbose)
       // go on an compare those two
       auto testEntry = m_TestNodesByHierarchy.find(key);
       mitk::DataNode::Pointer testNode = testEntry->second;
-      if ( ! AreNodesEqual(refNode, testNode, eps, verbose) )
+      if ( ! AreNodesEqual(refNode, testNode, verbose) )
       {
         ++numberOfMisMatches;
         if ( verbose )
         {
-          MITK_WARN << "### Data mismatch problem";
+          MITK_WARN << "### DataNode mismatch problem";
           MITK_WARN << "  Node '" << key << "' did not compare to equal (see warnings above).";
         }
       }
@@ -341,7 +339,7 @@ bool mitk::DataStorageCompare::CompareData(double eps, bool verbose)
       ++numberOfMisMatches;
       if (verbose)
       {
-        MITK_WARN << "### Data mismatch problem";
+        MITK_WARN << "### DataNode mismatch problem";
         MITK_WARN << "  Reference storage has " << timesInReference << " node(s), test storage " << timesInTest;
         MITK_WARN << "  This does not match or we don't know how to figure out comparison partners";
       }
@@ -364,22 +362,3 @@ bool mitk::DataStorageCompare::CompareData(double eps, bool verbose)
 
   return numberOfMisMatches == 0;
 }
-
-
-bool mitk::DataStorageCompare::CompareProperties(bool verbose)
-{
-  return false;
-}
-
-
-bool mitk::DataStorageCompare::CompareMappers(bool verbose)
-{
-  return false;
-}
-
-
-bool mitk::DataStorageCompare::CompareInteractors(bool verbose)
-{
-  return false;
-}
-

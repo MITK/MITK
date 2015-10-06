@@ -85,13 +85,11 @@ public:
 private:
 
   bool CompareHierarchy(bool verbose);
-  bool CompareData(double eps, bool verbose);
-  bool CompareProperties(bool verbose);
-  bool CompareMappers(bool verbose);
-  bool CompareInteractors(bool verbose);
+  bool CompareDataNodes(bool verbose);
 
-  bool AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, double eps = mitk::eps, bool verbose = false);
-  bool IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, double eps = mitk::eps, bool verbose = false);
+  bool AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose = false);
+  bool IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, bool verbose = false);
+  bool ArePropertyListsEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose = false);
 
   double m_Eps;
   Tests m_TestAspects;

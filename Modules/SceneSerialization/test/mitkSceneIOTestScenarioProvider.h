@@ -83,7 +83,7 @@ private:
   ScenarioList m_Scenarios;
 
   /// Configures how many items count as many for some tests.
-  unsigned int m_HowMuchIsMany = 100;
+  unsigned int m_HowMuchIsMany = 50;
 
   void AddScenario(const std::string& key,
                    BuilderMethodPointer creator,

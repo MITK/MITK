@@ -89,7 +89,8 @@ private:
 
   bool AreNodesEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose = false);
   bool IsDataEqual(const mitk::BaseData* reference, const mitk::BaseData* test, bool verbose = false);
-  bool ArePropertyListsEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose = false);
+  bool ArePropertyListsEqual(const mitk::DataNode& reference, const mitk::DataNode& test, bool verbose = false);
+  bool ArePropertyListsEqual(const mitk::PropertyList& reference, const mitk::PropertyList& test, bool verbose = false);
 
   double m_Eps;
   Tests m_TestAspects;

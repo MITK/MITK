@@ -28,11 +28,11 @@ mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage* reference,
 : m_TestAspects(flags)
 , m_ReferenceDS(reference)
 , m_TestDS(test)
-, m_HierarchyPassed(false)
-, m_DataPassed(false)
-, m_PropertiesPassed(false)
-, m_MappersPassed(false)
-, m_InteractorsPassed(false)
+, m_HierarchyPassed(true)
+, m_DataPassed(true)
+, m_PropertiesPassed(true)
+, m_MappersPassed(true)
+, m_InteractorsPassed(true)
 , m_AspectsFailed(0)
 , m_Eps(eps)
 {
@@ -49,11 +49,11 @@ bool mitk::DataStorageCompare::Compare(bool verbose)
   DescribeHierarchyOfNodes(m_ReferenceDS, m_RefNodesByHierarchy);
   DescribeHierarchyOfNodes(m_TestDS, m_TestNodesByHierarchy);
 
-  m_HierarchyPassed = false;
-  m_DataPassed = false;
-  m_PropertiesPassed = false;
-  m_MappersPassed = false;
-  m_InteractorsPassed = false;
+  m_HierarchyPassed = true;
+  m_DataPassed = true;
+  m_PropertiesPassed = true;
+  m_MappersPassed = true;
+  m_InteractorsPassed = true;
   m_AspectsFailed = 0;
 
   if ( m_TestAspects & CMP_Hierarchy )
@@ -232,10 +232,10 @@ bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, co
   }
 
   if (m_TestAspects & CMP_Data)
-    m_DataPassed = IsDataEqual(reference->GetData(), test->GetData(), verbose);
+    m_DataPassed &= IsDataEqual(reference->GetData(), test->GetData(), verbose);
 
   if (m_TestAspects & CMP_Properties)
-    m_PropertiesPassed = ArePropertyListsEqual(reference, test, verbose);
+    m_PropertiesPassed &= ArePropertyListsEqual(*reference, *test, verbose);
 
   // .. add interactors/mappers
 
@@ -302,9 +302,80 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
   }
 }
 
-bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode* reference, const mitk::DataNode* test, bool verbose)
+
+bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode& reference, const mitk::DataNode& test, bool verbose)
 {
-  return false;
+  DataNode::PropertyListKeyNames refListNames = reference.GetPropertyListNames();
+  DataNode::PropertyListKeyNames testListNames = test.GetPropertyListNames();
+  // add the empty names to treat all lists equally
+  refListNames.push_back("");
+  testListNames.push_back("");
+
+  // verify that list names are identical
+  bool error = false;
+  if (refListNames.size() != testListNames.size())
+  {
+    for (auto name : refListNames)
+      if (std::find(testListNames.begin(), testListNames.end(), name) == testListNames.end())
+      {
+        MITK_WARN << "Propertylist '" << name << "' from reference node (" << reference.GetName() << ") not found in test node.";
+        error = true;
+      }
+
+    for (auto name : testListNames)
+      if (std::find(refListNames.begin(), refListNames.end(), name) == refListNames.end())
+      {
+        MITK_WARN << "Propertylist '" << name << "' did not exist in reference node (" << reference.GetName() << "), but is present in test node.";
+        error = true;
+      }
+
+    if (error)
+      return false;
+  }
+
+  // compare each list
+  for (auto name : refListNames)
+  {
+    if (!ArePropertyListsEqual( *(reference.GetPropertyList(name)), *(test.GetPropertyList(name)), verbose ))
+    {
+      MITK_WARN << "Property mismatch while comparing propertylist '" << name <<"'. See messages above.";
+      error = true;
+    }
+  }
+
+  return !error;
+}
+
+bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::PropertyList& reference, const mitk::PropertyList& test, bool verbose)
+{
+  const mitk::PropertyList::PropertyMap* refMap = reference.GetMap();
+
+  bool error = false;
+
+  for (auto refEntry : *refMap)
+  {
+    std::string propertyKey = refEntry.first;
+    BaseProperty::Pointer refProperty = refEntry.second;
+    BaseProperty::Pointer testProperty = test.GetProperty(propertyKey);
+
+    if ( testProperty.IsNull() )
+    {
+      MITK_WARN << "Property '" << propertyKey << "' not found in test, only in reference.";
+      error = true;
+    }
+    else
+    {
+      if (!(*refProperty == *testProperty))
+      {
+        MITK_WARN << "Property '" << propertyKey << "' does not match original.";
+        MITK_WARN << "Reference was: " << refProperty->GetValueAsString();
+        MITK_WARN << "Test was:" << testProperty->GetValueAsString();
+        error = true;
+      }
+    }
+  }
+
+  return !error;
 }
 
 bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)

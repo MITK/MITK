@@ -424,16 +424,14 @@ bool mitk::LevelWindow::IsFixed() const
 
 bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {
-  if ( m_RangeMin == levWin.GetRangeMin() &&
-    m_RangeMax == levWin.GetRangeMax() &&
-    m_LowerWindowBound == levWin.GetLowerWindowBound() && m_UpperWindowBound == levWin.GetUpperWindowBound() &&
-    m_DefaultLowerBound == levWin.GetDefaultLowerBound() && m_DefaultUpperBound == levWin.GetDefaultUpperBound() && m_Fixed == levWin.IsFixed() ) {
-
-      return true;
-    }
-  else {
-    return false;
-  }
+  return ( fabs( m_RangeMin - levWin.GetRangeMin() ) < mitk::sqrteps &&
+       fabs(m_RangeMax - levWin.GetRangeMax()) < mitk::sqrteps &&
+       fabs(m_LowerWindowBound - levWin.GetLowerWindowBound()) < mitk::sqrteps &&
+       fabs(m_UpperWindowBound - levWin.GetUpperWindowBound()) < mitk::sqrteps &&
+       fabs(m_DefaultLowerBound - levWin.GetDefaultLowerBound()) < mitk::sqrteps &&
+       fabs(m_DefaultUpperBound - levWin.GetDefaultUpperBound()) < mitk::sqrteps &&
+       m_Fixed == levWin.IsFixed()
+       );
 }
 
 bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const

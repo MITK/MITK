@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorageCompare.h"
 #include "mitkBaseDataEqual.h"
 
+#include "mitkBaseRenderer.h"
+#include "mitkMapper.h"
+
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
 #include "usLDAPFilter.h"
@@ -237,6 +240,9 @@ bool mitk::DataStorageCompare::AreNodesEqual(const mitk::DataNode* reference, co
   if (m_TestAspects & CMP_Properties)
     m_PropertiesPassed &= ArePropertyListsEqual(*reference, *test, verbose);
 
+  if (m_TestAspects & CMP_Mappers)
+    m_MappersPassed &= AreMappersEqual(*reference, *test, verbose);
+
   // .. add interactors/mappers
 
   // two real nodes, need to really compare
@@ -378,6 +384,71 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::PropertyList& r
   return !error;
 }
 
+bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode& reference, const mitk::DataNode& test, bool verbose)
+{
+  bool error = false;
+
+  mitk::Mapper* refMapper2D = reference.GetMapper( mitk::BaseRenderer::Standard2D );
+  mitk::Mapper* testMapper2D = test.GetMapper( mitk::BaseRenderer::Standard2D );
+
+  if (refMapper2D == nullptr && testMapper2D == nullptr)
+  {
+      ; // ok
+  }
+  else if (refMapper2D != nullptr && testMapper2D == nullptr)
+  {
+    MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass()
+              << "' in reference, is 'nullptr"
+              << "' in test (DataNode '" << reference.GetName() << "')";
+    error = true;
+  }
+  else if (refMapper2D == nullptr && testMapper2D != nullptr)
+  {
+    MITK_WARN << "Mapper for 2D was 'nullptr"
+              << "' in reference, is '" << testMapper2D->GetNameOfClass()
+              << "' in test (DataNode '" << reference.GetName() << "')";
+    error = true;
+  } // else both are valid pointers, we just compare the type
+  else if (refMapper2D->GetNameOfClass() != testMapper2D->GetNameOfClass())
+  {
+    MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass()
+              << "' in reference, is '" << testMapper2D->GetNameOfClass()
+              << "' in test (DataNode '" << reference.GetName() << "')";
+    error = true;
+  }
+
+  mitk::Mapper* refMapper3D = reference.GetMapper( mitk::BaseRenderer::Standard3D );
+  mitk::Mapper* testMapper3D = test.GetMapper( mitk::BaseRenderer::Standard3D );
+
+  if (refMapper3D == nullptr && testMapper3D == nullptr)
+  {
+      ; // ok
+  }
+  else if (refMapper3D != nullptr && testMapper3D == nullptr)
+  {
+    MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass()
+              << "' in reference, is 'nullptr"
+              << "' in test (DataNode '" << reference.GetName() << "')";
+    error = true;
+  }
+  else if (refMapper3D == nullptr && testMapper3D != nullptr)
+  {
+    MITK_WARN << "Mapper for 3D was 'nullptr"
+              << "' in reference, is '" << testMapper3D->GetNameOfClass()
+              << "' in test (DataNode '" << reference.GetName() << "')";
+    error = true;
+  } // else both are valid pointers, we just compare the type
+  else if (refMapper3D->GetNameOfClass() != testMapper3D->GetNameOfClass())
+  {
+    MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass()
+              << "' in reference, is '" << testMapper3D->GetNameOfClass()
+              << "' in test (DataNode '" << reference.GetName() << "')";
+    error = true;
+  }
+
+  return !error;
+}
+
 bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
 {
   int numberOfMisMatches = 0;
@@ -414,20 +485,6 @@ bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
         MITK_WARN << "  Reference storage has " << timesInReference << " node(s), test storage " << timesInTest;
         MITK_WARN << "  This does not match or we don't know how to figure out comparison partners";
       }
-    }
-  }
-
-  // TODO factor this out? Should describe data only.
-  // can we get that to a higher level and include only
-  // problematic data? think about error reporting
-  if (verbose && numberOfMisMatches > 0)
-  {
-    MITK_INFO << "Dumping test storage because there were errors:";
-    for (auto entry : m_TestNodesByHierarchy)
-    {
-      const std::string& key = entry.first;
-      const mitk::DataNode::Pointer& node = entry.second;
-      MITK_INFO << "  Test node '" << node->GetName() << "', hierarchy : " << key;
     }
   }
 

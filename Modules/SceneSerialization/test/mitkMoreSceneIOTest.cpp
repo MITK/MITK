@@ -26,7 +26,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
   \brief Test cases for SceneIO.
 
-  Notes on tests for SceneIO (topics to test, details to keep in mind, methods to use):
+  Tests for SceneIO.
+
+  Currently contains:
+  - I/O tests: write some Storage, read it, compare
+
+  Should be enhanced with:
+  - tests about the interface of SceneIO, providing invalid arguments etc.
+  - testing the error reporting (needs rework, however)
+
+  Original notes on tests for SceneIO (topics to test, details to keep in mind, methods to use):
+  (this list is a notepad that should be emptied while completing tests)
   - SaveScene interface topics:
     - all input nodes must be in storage
     - no nullptrs (in input parameters, nullptrs as nodes or data can be ok)
@@ -43,35 +53,9 @@ See LICENSE.txt or http://www.mitk.org for details.
     - why do they return C pointers??
     - failed properties are not meaningful, they lack association with a data node (even if it could be deduced from the input data storage)
     - don't test that too much, this is worth re-thinking
-  - I/O tests
-    - reproduction of input storage (general):
-      - write to a valid path, non-existing archive
-      - create a rich input data storage (several cases, see below)
-      - read the created archive, compare the output to the original input
-        - check if implementing mitk::Equal(DataStorage, DataStorage) is a viable option
-        - all nodes must be present, no additional ones
-          - data: shall be nullptr as in input or same data type.
-            - comparisons of data need to be specific and needs to be extendable for new types
-          - geometry of data: shall be equal except for MTimes
-          - interactors: will be nullptr! clarify in doc? perhaps clear to everybody..
-          - renderer/mapper: will be reset to defaults! clarify? consider in new implementation?
-          - properties: all property lists for all render windows shall be re-created
-            - for each propertylist, all properties shall be re-created
-              - name, type, value
-              - smartpointerproperties??
-        - the hierachy between nodes shall be re-created correctly
-          - multiple parents are possible and shall be tested!
-        - data storage could be compared: calculate bounds, get group tags
+  - I/O tests:
+    - data storage could be compared: calculate bounds, get group tags
     - reproduction of specific storage situations:
-      - empty storage
-      - long flat list
-      - long degenerated tree
-      - tree with depth of 10 and nodes with multiple parents from:
-        - higher hierarchy levels, from sibling trees
-        - one higher, one same hierarchy level
-        - all other nodes :-)
-        - review restrictions of DataStorage, check its limits
-      - empty data members
       - very long property names (empty ones possible?)
       - empty or very long node names
 
@@ -87,9 +71,9 @@ See LICENSE.txt or http://www.mitk.org for details.
         - describe render setups (2D cuts, 3D perspectives)? better standardize one 2D, one 3D view
       - load scene in test, render re-loaded scene, compare
 
-  - Tests scenarios and comparisons should be kept out of
-    this test for SceneIO because they should be re-used for
-    a possible re-write!
+  - (ok) Tests scenarios and comparisons should be kept out of
+         this test for SceneIO because they should be re-used for
+         a possible re-write!
 
 */
 class mitkMoreSceneIOTestSuite : public mitk::TestFixture
@@ -97,7 +81,6 @@ class mitkMoreSceneIOTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE(mitkMoreSceneIOTestSuite);
   MITK_TEST(Test_SceneIOInterfaces);
   MITK_TEST(Test_ReconstructionOfScenes);
-  MITK_TEST(Test_RenderingOfHistoricScenes);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::SceneIOTestScenarioProvider m_TestCaseProvider;
@@ -133,22 +116,21 @@ public:
         CPPUNIT_ASSERT_MESSAGE(std::string("Comparing restored test scenario '") + scenario.key + "'",
             mitk::DataStorageCompare(originalStorage,
                                      restoredStorage,
+                                     // TODO make those flags part of the scenario object
+                                     // TODO make known/expected failures also part of the
+                                     //      scenario object (but this needs a way to describe them, first)
                                      mitk::DataStorageCompare::CMP_Hierarchy |
                                      mitk::DataStorageCompare::CMP_Data |
-                                     mitk::DataStorageCompare::CMP_Properties,
-                                     //mitk::DataStorageCompare::CMP_Mappers |
+                                     mitk::DataStorageCompare::CMP_Properties |
+                                     // mappers tested although SceneIO leaves default mappers
+                                     mitk::DataStorageCompare::CMP_Mappers,
                                      //mitk::DataStorageCompare::CMP_Interactors
-                                     // mappers and interactors skipped for now
+                                     // interactors skipped for now
                                      scenario.comparisonPrecision
                                      ).CompareVerbose()
             );
       }
     }
-  }
-
-  void Test_RenderingOfHistoricScenes()
-  {
-    CPPUNIT_ASSERT_MESSAGE("Test elsewhere? Structure of rendering tests could impose that", true);
   }
 
 }; // class

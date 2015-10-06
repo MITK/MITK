@@ -56,7 +56,7 @@ private:
    * Gets called by AreEqual() which already verifies that left and right are
    * valid objects (not nullptr) and are of the same type!
    */
-  virtual bool InternalAreEqual(const BaseData& left, const BaseData& right, double eps = mitk::eps, bool verbose = false) = 0;
+  virtual bool InternalAreEqual(const BaseData& left, const BaseData& right, ScalarType eps = mitk::eps, bool verbose = false) = 0;
 
   /**
    * \brief Helper to AreEqual(), tests GetNameOfClass().
@@ -77,7 +77,7 @@ public:
    * \param eps precision for float value comparisons.
    * \param verbose when true, failing comparisons will print messages to logging/console.
    */
-  bool AreEqual(const BaseData* left, const BaseData* right, double eps = mitk::eps, bool verbose = false);
+  bool AreEqual(const BaseData* left, const BaseData* right, ScalarType eps = mitk::eps, bool verbose = false);
 
   /**
    * \brief Register core type comparators that come with mitk::Equal() functions.
@@ -97,26 +97,60 @@ class BaseDataEqualT : public BaseDataEqual
 {
 private:
 
-  virtual bool InternalAreEqual(const BaseData& left, const BaseData& right, double eps = mitk::eps, bool verbose = false)
+  virtual bool InternalAreEqual(const BaseData& left, const BaseData& right, ScalarType eps = mitk::eps, bool verbose = false)
   {
     try
     {
       const T& leftT = dynamic_cast<const T&>(left);
       const T& rightT = dynamic_cast<const T&>(right);
 
-      // mitk::Equal(Surface&) implemented as non-const
-      T& leftNonConstT = const_cast<T&>(leftT);
-      T& rightNonConstT = const_cast<T&>(rightT);
-
-      return mitk::Equal(leftNonConstT, rightNonConstT, eps, verbose);
+      return mitk::Equal(leftT, rightT, eps, verbose);
     }
     catch (const std::exception& e)
     {
-      MITK_ERROR << "Bad cast in BaseDataEqualT<>::InternalAreEqual()";
-      return false;
+      MITK_ERROR << "Bad cast in BaseDataEqualT<>::InternalAreEqual()" << e.what();
     }
+
+    return false;
   }
 };
+
+/**
+ * \brief Implementation of BaseDataEqual that uses a non-const version of mitk:Equal() for comparisons.
+ *
+ * See base class for details!
+ *
+ * This version is currently used for mitk::Surface only, which is unable to compare
+ * two const versions of Surface.
+ *
+ * \sa BaseDataEqual
+ */
+template <class T>
+class BaseDataEqualTNonConst : public BaseDataEqual
+{
+private:
+
+  virtual bool InternalAreEqual(const BaseData& left, const BaseData& right, ScalarType eps = mitk::eps, bool verbose = false)
+  {
+    try
+    {
+      const T& leftT = dynamic_cast<const T&>(left);
+      const T& rightT = dynamic_cast<const T&>(right);
+
+      T& leftTNonConst = const_cast<T&>(leftT);
+      T& rightTNonConst  = const_cast<T&>(rightT);
+
+      return mitk::Equal(leftTNonConst, rightTNonConst, eps, verbose);
+    }
+    catch (const std::exception& e)
+    {
+      MITK_ERROR << "Bad cast in BaseDataEqualTNonConst<>::InternalAreEqual(): " << e.what();
+    }
+
+    return false;
+  }
+};
+
 
 } // namespace
 

@@ -63,7 +63,7 @@ protected:
 * @param verbose Flag indicating if the method should give a detailed console output.
 * @return True if every comparison is true, false in any other case.
 */
-MITKCORE_EXPORT bool Equal( mitk::GeometryData& leftHandSide, mitk::GeometryData& rightHandSide, mitk::ScalarType eps, bool verbose);
+MITKCORE_EXPORT bool Equal( const mitk::GeometryData& leftHandSide, const mitk::GeometryData& rightHandSide, mitk::ScalarType eps, bool verbose);
 
 } // namespace mitk
 #endif /* MITKGEOMETRYDATA_H_HEADER_INCLUDED_C19C01E2 */

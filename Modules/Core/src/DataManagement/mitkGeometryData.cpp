@@ -61,7 +61,7 @@ void mitk::GeometryData::CopyInformation(const itk::DataObject *)
 {
 }
 
-bool mitk::Equal( mitk::GeometryData& leftHandSide, mitk::GeometryData& rightHandSide, mitk::ScalarType eps, bool verbose)
+bool mitk::Equal( const mitk::GeometryData& leftHandSide, const mitk::GeometryData& rightHandSide, mitk::ScalarType eps, bool verbose)
 {
   unsigned int timeStepsLeft = leftHandSide.GetTimeGeometry()->CountTimeSteps();
   unsigned int timeStepsRight = rightHandSide.GetTimeGeometry()->CountTimeSteps();

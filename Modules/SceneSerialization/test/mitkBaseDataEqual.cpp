@@ -14,18 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkBaseDataEqual.h"
-
 #include "mitkImage.h"
 #include "mitkSurface.h"
 #include "mitkPointSet.h"
 #include "mitkGeometryData.h"
 
+// this include after all specific type includes! (for mitk::Equal)
+#include "mitkBaseDataEqual.h"
+
 #include "usServiceProperties.h"
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
 
-bool mitk::BaseDataEqual::AreEqual(const BaseData* left, const BaseData* right, double eps, bool verbose)
+bool mitk::BaseDataEqual::AreEqual(const BaseData* left, const BaseData* right, ScalarType eps, bool verbose)
 {
   // Do basic tests that are valid for all types here.
   // Let specializations only implement a meaningful
@@ -72,6 +73,7 @@ bool mitk::BaseDataEqual::AreSameClasses(const BaseData* left, const BaseData* r
   return true;
 }
 
+
 void mitk::BaseDataEqual::RegisterCoreEquals()
 {
   static bool comparatorsCreated = false;
@@ -82,7 +84,7 @@ void mitk::BaseDataEqual::RegisterCoreEquals()
     imageProperties["basedata"] = std::string(Image::GetStaticNameOfClass());
     us::GetModuleContext()->RegisterService<BaseDataEqual>(&imageEqual, imageProperties);
 
-    static BaseDataEqualT<Surface> surfaceEqual;
+    static BaseDataEqualTNonConst<Surface> surfaceEqual;
     us::ServiceProperties surfaceProperties;
     surfaceProperties["basedata"] =std::string(Surface::GetStaticNameOfClass());
     us::GetModuleContext()->RegisterService<BaseDataEqual>(&surfaceEqual, surfaceProperties);

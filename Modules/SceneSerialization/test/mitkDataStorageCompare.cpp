@@ -203,12 +203,12 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   // by a programmer.
   if (verbose && numberOfMisMatches > 0)
   {
-    MITK_INFO << "Dumping test storage because there were errors:";
+    MITK_WARN << "Dumping test storage because there were errors:";
     for (auto entry : m_TestNodesByHierarchy)
     {
       const std::string& key = entry.first;
       const mitk::DataNode::Pointer& node = entry.second;
-      MITK_INFO << "  Test node '" << node->GetName() << "', hierarchy : " << key;
+      MITK_WARN << "  Test node '" << node->GetName() << "', hierarchy : " << key;
     }
   }
 

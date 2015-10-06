@@ -22,6 +22,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+/**
+  \brief Provides DataStorages that serve as test scenarios.
+
+  This class provides the structure Scenario to describe a
+  single test scenario for SceneIO and similar objects.
+  A single scenario consists of
+  - a DataStorage (in reality a method that constructs one)
+  - an identifier / name
+  - some flags that describe the scenario
+
+  \warning Probably we should split the scenario and
+           its description (== our expectations) at some
+           time. This will be necessary once that we have
+           two SceneIO mechanisms that differ in their
+           capabilities.
+*/
 class SceneIOTestScenarioProvider
 {
 public:
@@ -85,6 +101,9 @@ private:
   /// Configures how many items count as many for some tests.
   unsigned int m_HowMuchIsMany = 50;
 
+  /**
+    Registers one scenario with its description and a method for DataStorage creations.
+  */
   void AddScenario(const std::string& key,
                    BuilderMethodPointer creator,
                    bool isSerializable,
@@ -159,11 +178,9 @@ private:
   DataStorage::Pointer GeometryData() const;
 
   /**
-    Properties of all kinds, special names etc.
+    Properties for various render windows, containing no or long names or values.
   */
   DataStorage::Pointer SpecialProperties() const;
-
-
 
 public:
 

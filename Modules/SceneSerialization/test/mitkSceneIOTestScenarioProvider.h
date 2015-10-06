@@ -158,6 +158,11 @@ private:
   */
   DataStorage::Pointer GeometryData() const;
 
+  /**
+    Properties of all kinds, special names etc.
+  */
+  DataStorage::Pointer SpecialProperties() const;
+
 
 
 public:
@@ -176,10 +181,12 @@ public:
     AddSaveAndRestoreScenario(ManyTopLevelNodes);
     AddSaveAndRestoreScenario(LineOfManyOnlyChildren);
     AddSaveAndRestoreScenario(ComplicatedFamilySituation);
+
     AddSaveAndRestoreScenario(Image);
     AddSaveAndRestoreScenario(Surface);
     AddSaveAndRestoreScenario(PointSet);
     AddSaveAndRestoreScenario(GeometryData);
+    AddSaveAndRestoreScenario(SpecialProperties);
 
     //AddScenario("GeometryData", &mitk::SceneIOTestScenarioProvider::GeometryData, true, std::string(), false, mitk::eps);
   }

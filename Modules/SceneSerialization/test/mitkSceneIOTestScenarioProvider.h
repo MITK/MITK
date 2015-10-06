@@ -99,7 +99,7 @@ private:
   ScenarioList m_Scenarios;
 
   /// Configures how many items count as many for some tests.
-  unsigned int m_HowMuchIsMany = 50;
+  int m_HowMuchIsMany = 50;
 
   /**
     Registers one scenario with its description and a method for DataStorage creations.
@@ -185,7 +185,7 @@ private:
 public:
 
   // Helper to simplify writing the registration
-  #define AddSaveAndRestoreScenario(name) AddScenario(#name, &mitk::SceneIOTestScenarioProvider:: ## name, true);
+  #define AddSaveAndRestoreScenario(name) AddScenario(#name, &mitk::SceneIOTestScenarioProvider::name, true);
 
   // this one in the header so it is clearly visible when someone
   // adds a test to the bottom of the list

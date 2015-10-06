@@ -84,14 +84,14 @@ void mitk::SceneIOTestScenarioProvider::AddScenario(const std::string& key,
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::EmptyStorage() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
   return storage;
 }
 
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::OneEmptyNode() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   mitk::DataNode::Pointer node = DataNode::New();
   storage->Add(node);
@@ -102,7 +102,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::OneEmptyNode() con
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::OneEmptyNamedNode() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   mitk::DataNode::Pointer node = DataNode::New();
   node->SetName("Urmel");
@@ -114,7 +114,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::OneEmptyNamedNode(
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::ManyTopLevelNodes() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   for ( auto i = 0; i < m_HowMuchIsMany; ++i ) {
     mitk::DataNode::Pointer node = DataNode::New();
@@ -130,7 +130,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::ManyTopLevelNodes(
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::LineOfManyOnlyChildren() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   mitk::DataNode::Pointer parent;
   for ( auto i = 0; i < m_HowMuchIsMany; ++i ) {
@@ -179,7 +179,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::LineOfManyOnlyChil
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::ComplicatedFamilySituation() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   // constructing a hierarchy with multiple levels
   // and a couple of multiple parent relations.
@@ -233,7 +233,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::ComplicatedFamilyS
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Image() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   { // Image of ints
     mitk::Image::Pointer image3Dints = mitk::ImageGenerator::GenerateRandomImage<int>(10, 5, 7, // dim
@@ -262,7 +262,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Image() const
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Surface() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   { // Surface
     vtkSmartPointer<vtkPoints> points1 = vtkSmartPointer<vtkPoints>::New();
@@ -315,7 +315,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::Surface() const
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::PointSet() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   { // PointSet
     mitk::PointSet::Pointer ps = mitk::PointSet::New();
@@ -338,7 +338,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::PointSet() const
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::GeometryData() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   { // GeometryData
     mitk::GeometryData::Pointer gdata = mitk::GeometryData::New();
@@ -395,7 +395,7 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::GeometryData() con
 
 mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::SpecialProperties() const
 {
-  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New();
+  mitk::DataStorage::Pointer storage = StandaloneDataStorage::New().GetPointer();
 
   mitk::DataNode::Pointer node = DataNode::New();
   node->SetName("Camion");

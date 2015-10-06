@@ -28,7 +28,8 @@ mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage* reference,
                                              const mitk::DataStorage* test,
                                              Tests flags,
                                              double eps)
-: m_TestAspects(flags)
+: m_Eps(eps)
+, m_TestAspects(flags)
 , m_ReferenceDS(reference)
 , m_TestDS(test)
 , m_HierarchyPassed(true)
@@ -37,7 +38,6 @@ mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage* reference,
 , m_MappersPassed(true)
 , m_InteractorsPassed(true)
 , m_AspectsFailed(0)
-, m_Eps(eps)
 {
   BaseDataEqual::RegisterCoreEquals();
 }
@@ -366,16 +366,20 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::PropertyList& r
 
     if ( testProperty.IsNull() )
     {
-      MITK_WARN << "Property '" << propertyKey << "' not found in test, only in reference.";
+      if (verbose)
+        MITK_WARN << "Property '" << propertyKey << "' not found in test, only in reference.";
       error = true;
     }
     else
     {
       if (!(*refProperty == *testProperty))
       {
-        MITK_WARN << "Property '" << propertyKey << "' does not match original.";
-        MITK_WARN << "Reference was: " << refProperty->GetValueAsString();
-        MITK_WARN << "Test was:" << testProperty->GetValueAsString();
+        if (verbose)
+        {
+          MITK_WARN << "Property '" << propertyKey << "' does not match original.";
+          MITK_WARN << "Reference was: " << refProperty->GetValueAsString();
+          MITK_WARN << "Test was:" << testProperty->GetValueAsString();
+        }
         error = true;
       }
     }
@@ -397,23 +401,32 @@ bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode& reference, 
   }
   else if (refMapper2D != nullptr && testMapper2D == nullptr)
   {
-    MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass()
-              << "' in reference, is 'nullptr"
-              << "' in test (DataNode '" << reference.GetName() << "')";
+    if (verbose)
+    {
+      MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass()
+                << "' in reference, is 'nullptr"
+                << "' in test (DataNode '" << reference.GetName() << "')";
+    }
     error = true;
   }
   else if (refMapper2D == nullptr && testMapper2D != nullptr)
   {
-    MITK_WARN << "Mapper for 2D was 'nullptr"
-              << "' in reference, is '" << testMapper2D->GetNameOfClass()
-              << "' in test (DataNode '" << reference.GetName() << "')";
+    if (verbose)
+    {
+      MITK_WARN << "Mapper for 2D was 'nullptr"
+                << "' in reference, is '" << testMapper2D->GetNameOfClass()
+                << "' in test (DataNode '" << reference.GetName() << "')";
+    }
     error = true;
   } // else both are valid pointers, we just compare the type
   else if (refMapper2D->GetNameOfClass() != testMapper2D->GetNameOfClass())
   {
-    MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass()
-              << "' in reference, is '" << testMapper2D->GetNameOfClass()
-              << "' in test (DataNode '" << reference.GetName() << "')";
+    if (verbose)
+    {
+      MITK_WARN << "Mapper for 2D was '" << refMapper2D->GetNameOfClass()
+                << "' in reference, is '" << testMapper2D->GetNameOfClass()
+                << "' in test (DataNode '" << reference.GetName() << "')";
+    }
     error = true;
   }
 
@@ -426,23 +439,32 @@ bool mitk::DataStorageCompare::AreMappersEqual(const mitk::DataNode& reference, 
   }
   else if (refMapper3D != nullptr && testMapper3D == nullptr)
   {
-    MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass()
-              << "' in reference, is 'nullptr"
-              << "' in test (DataNode '" << reference.GetName() << "')";
+    if (verbose)
+    {
+      MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass()
+                << "' in reference, is 'nullptr"
+                << "' in test (DataNode '" << reference.GetName() << "')";
+    }
     error = true;
   }
   else if (refMapper3D == nullptr && testMapper3D != nullptr)
   {
-    MITK_WARN << "Mapper for 3D was 'nullptr"
-              << "' in reference, is '" << testMapper3D->GetNameOfClass()
-              << "' in test (DataNode '" << reference.GetName() << "')";
+    if (verbose)
+    {
+      MITK_WARN << "Mapper for 3D was 'nullptr"
+                << "' in reference, is '" << testMapper3D->GetNameOfClass()
+                << "' in test (DataNode '" << reference.GetName() << "')";
+    }
     error = true;
   } // else both are valid pointers, we just compare the type
   else if (refMapper3D->GetNameOfClass() != testMapper3D->GetNameOfClass())
   {
-    MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass()
-              << "' in reference, is '" << testMapper3D->GetNameOfClass()
-              << "' in test (DataNode '" << reference.GetName() << "')";
+    if (verbose)
+    {
+      MITK_WARN << "Mapper for 3D was '" << refMapper3D->GetNameOfClass()
+                << "' in reference, is '" << testMapper3D->GetNameOfClass()
+                << "' in test (DataNode '" << reference.GetName() << "')";
+    }
     error = true;
   }
 
@@ -469,7 +491,7 @@ bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
       if ( ! AreNodesEqual(refNode, testNode, verbose) )
       {
         ++numberOfMisMatches;
-        if ( verbose )
+        if (verbose)
         {
           MITK_WARN << "### DataNode mismatch problem";
           MITK_WARN << "  Node '" << key << "' did not compare to equal (see warnings above).";

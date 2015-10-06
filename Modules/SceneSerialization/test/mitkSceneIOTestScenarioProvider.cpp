@@ -412,6 +412,16 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::SpecialProperties(
 
   // not working (NaN etc.)
   //node->SetProperty("NotAFloat", FloatProperty::New( sqrt(-1.0) ) );
+  node->SetProperty("sqrt(2)", FloatProperty::New( -sqrt(2.0) ) );
+  node->SetProperty("sqrt(3)", FloatProperty::New( sqrt(3.0) ) );
+
+  // funny: most values work fine, just min double produces serialization precision errors
+  node->SetProperty("sqrt(4)", DoubleProperty::New( -sqrt(4.0) ) );
+  node->SetProperty("sqrt(5)", DoubleProperty::New( sqrt(5.0) ) );
+  node->SetProperty("maxd", DoubleProperty::New( std::numeric_limits<double>::max() ) );
+  node->SetProperty("zero", DoubleProperty::New( 0.0 ) );
+  node->SetProperty("minzero", DoubleProperty::New( -0.0 ) );
+  //node->SetProperty("mind", DoubleProperty::New( std::numeric_limits<double>::min() ) );
 
   storage->Add(node);
 

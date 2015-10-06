@@ -51,6 +51,7 @@ QmitkMLBTView::QmitkMLBTView()
     , m_MultiWidget( NULL )
 {
     m_TrackingTimer = std::make_shared<QTimer>(this);
+    m_LastLoadedForestName = "(none)";
 }
 
 // Destructor
@@ -129,7 +130,8 @@ void QmitkMLBTView::UpdateGui()
 {
     if (m_ForestHandler.IsForestValid())
     {
-        m_Controls->statusLabel->setText("Random forest available");
+        std::string label_text="Random forest available: "+m_LastLoadedForestName;
+        m_Controls->statusLabel->setText( QString(label_text.c_str()) );
         m_Controls->m_SaveForestButton->setEnabled(true);
         m_Controls->m_StartTrackingButton->setEnabled(true);
     }
@@ -198,6 +200,9 @@ void QmitkMLBTView::LoadForest()
         return;
 
     m_ForestHandler.LoadForest( filename.toStdString() );
+    QFileInfo fi( filename );
+    m_LastLoadedForestName = QString( fi.baseName() + fi.completeSuffix() ).toStdString();
+
     UpdateGui();
 }
 

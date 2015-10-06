@@ -104,6 +104,8 @@ private:
 
   bool IsTrainingInputValid(void) const;
 
+  std::string m_LastLoadedForestName;
+
  };
 
 

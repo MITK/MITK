@@ -201,7 +201,7 @@ void QmitkMLBTView::LoadForest()
 
     m_ForestHandler.LoadForest( filename.toStdString() );
     QFileInfo fi( filename );
-    m_LastLoadedForestName = QString( fi.baseName() + fi.completeSuffix() ).toStdString();
+    m_LastLoadedForestName = QString( fi.baseName() + "." + fi.completeSuffix() ).toStdString();
 
     UpdateGui();
 }

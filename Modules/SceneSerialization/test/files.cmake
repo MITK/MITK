@@ -4,6 +4,7 @@ set(MODULE_TESTS
 
 set(MODULE_CUSTOM_TESTS
   mitkSceneIOTest.cpp
+  mitkSceneIOCompatibilityTest.cpp
 )
 
 set(MODULE_CPP_FILES

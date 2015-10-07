@@ -139,7 +139,7 @@ public:
   virtual void CopyInformation(const itk::DataObject *data) override;
 
   /**
-   * \brief return the keys of all PropertyLists.
+   * \brief The "names" used for (renderer-specific) PropertyLists in GetPropertyList(string).
    *
    * All possible values for the "renderer" parameters of
    * the diverse GetProperty/List() methods.

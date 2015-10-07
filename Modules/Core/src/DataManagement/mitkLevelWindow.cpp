@@ -422,16 +422,16 @@ bool mitk::LevelWindow::IsFixed() const
   return m_Fixed;
 }
 
-bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
+bool mitk::LevelWindow::operator==(const mitk::LevelWindow& other) const
 {
-  return ( fabs( m_RangeMin - levWin.GetRangeMin() ) < mitk::sqrteps &&
-       fabs(m_RangeMax - levWin.GetRangeMax()) < mitk::sqrteps &&
-       fabs(m_LowerWindowBound - levWin.GetLowerWindowBound()) < mitk::sqrteps &&
-       fabs(m_UpperWindowBound - levWin.GetUpperWindowBound()) < mitk::sqrteps &&
-       fabs(m_DefaultLowerBound - levWin.GetDefaultLowerBound()) < mitk::sqrteps &&
-       fabs(m_DefaultUpperBound - levWin.GetDefaultUpperBound()) < mitk::sqrteps &&
-       m_Fixed == levWin.IsFixed()
-       );
+  return
+       mitk::Equal(this->m_RangeMin, other.m_RangeMin, mitk::sqrteps)
+    && mitk::Equal(this->m_RangeMax, other.m_RangeMax, mitk::sqrteps)
+    && mitk::Equal(this->m_LowerWindowBound, other.m_LowerWindowBound, mitk::sqrteps)
+    && mitk::Equal(this->m_UpperWindowBound, other.m_UpperWindowBound, mitk::sqrteps)
+    && mitk::Equal(this->m_DefaultLowerBound, other.m_DefaultLowerBound, mitk::sqrteps)
+    && mitk::Equal(this->m_DefaultUpperBound, other.m_DefaultUpperBound, mitk::sqrteps)
+    && m_Fixed == other.m_Fixed;
 }
 
 bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const

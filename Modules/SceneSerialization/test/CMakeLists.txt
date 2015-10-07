@@ -15,6 +15,10 @@ if(TARGET ${TESTDRIVER})
     mitkAddCustomModuleTest(mitkSceneIOCompatibility_NoRainbowCT mitkSceneIOCompatibilityTest
                             ${MITK_DATA_DIR}/RenderingTestData/SceneFiles/rainbows-post-17547.mitk # scene to load
                             -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rainbows-post-17547.png) # reference rendering
+
+    mitkAddCustomModuleTest(mitkSceneIOCompatibility_SurfaceIntLineWidth mitkSceneIOCompatibilityTest
+                            ${MITK_DATA_DIR}/RenderingTestData/SceneFiles/surface-pre-18528.mitk # scene to load
+                            -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/surface-pre-18528.png) # reference rendering
   endif()
 
   endif()

@@ -146,6 +146,8 @@ void QmitkPreprocessingView::CreateConnections()
     if ( m_Controls )
     {
         m_Controls->m_NormalizationMaskBox->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_NormalizationMaskBox->SetZeroEntryText("--");
+
         m_Controls->m_SelctedImageComboBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_MergeDwiBox->SetDataStorage(this->GetDataStorage());
 

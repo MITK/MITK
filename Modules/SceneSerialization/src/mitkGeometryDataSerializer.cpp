@@ -58,9 +58,9 @@ std::string mitk::GeometryDataSerializer::Serialize()
     // in case of success, return only the relative filename part
     return filename;
   }
-  catch (const std::exception&)
+  catch (const std::exception& e)
   {
-      MITK_ERROR << "Unable to find I/O for GeometryData object";
+      MITK_ERROR << "Unable to serialize GeometryData object: "<< e.what();
   }
 
   // when failed, return empty string

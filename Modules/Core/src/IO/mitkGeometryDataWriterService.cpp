@@ -80,6 +80,10 @@ void mitk::GeometryDataWriterService::Write()
       TiXmlElement* geometryElement = Geometry3DToXML::ToXML( geom3D );
       rootNode->LinkEndChild( geometryElement );
   }
+  else
+  {
+      MITK_WARN << "Geometry type not supported by serialization. Written file may be missing information.";
+  }
 
   // Write out document
   out << doc;

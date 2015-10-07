@@ -119,7 +119,10 @@ namespace mitk
     SocketListType m_RegisteredClients;
 
     /** mutex to control access to m_RegisteredClients */
-    itk::FastMutexLock::Pointer m_ListMutex;
+    itk::FastMutexLock::Pointer m_ReceiveListMutex;
+
+    /** mutex to control access to m_RegisteredClients */
+    itk::FastMutexLock::Pointer m_SentListMutex;
   };
 } // namespace mitk
 #endif /* MITKIGTLSERVER_H */

@@ -29,7 +29,7 @@ mitk::ImageToIGTLMessageFilter::ImageToIGTLMessageFilter()
 
 void mitk::ImageToIGTLMessageFilter::GenerateData()
 {
-    // MITK_INFO << "ImageToIGTLMessageFilter.GenerateData()";
+  // MITK_INFO << "ImageToIGTLMessageFilter.GenerateData()";
   for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
@@ -75,48 +75,48 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     // Set scalar type.
     switch (type.GetComponentType())
     {
-      case itk::ImageIOBase::CHAR:
-        imgMsg->SetScalarTypeToInt8();
-        break;
-      case itk::ImageIOBase::UCHAR:
-        imgMsg->SetScalarTypeToUint8();
-        break;
-      case itk::ImageIOBase::SHORT:
-        imgMsg->SetScalarTypeToInt16();
-        break;
-      case itk::ImageIOBase::USHORT:
-        imgMsg->SetScalarTypeToUint16();
-        break;
-      case itk::ImageIOBase::INT:
-        imgMsg->SetScalarTypeToInt32();
-        break;
-      case itk::ImageIOBase::UINT:
-        imgMsg->SetScalarTypeToUint32();
-        break;
-      case itk::ImageIOBase::LONG:
-        // OIGTL doesn't formally support 64bit int scalars, but if they are
-        // ever added,
-        // they will have the identifier 8 assigned.
-        imgMsg->SetScalarType(8);
-        break;
-      case itk::ImageIOBase::ULONG:
-        // OIGTL doesn't formally support 64bit uint scalars, but if they are
-        // ever added,
-        // they will have the identifier 9 assigned.
-        imgMsg->SetScalarType(9);
-        break;
-      case itk::ImageIOBase::FLOAT:
-        // The igtl library has no method for this. Correct type is 10.
-        imgMsg->SetScalarType(10);
-        break;
-      case itk::ImageIOBase::DOUBLE:
-        // The igtl library has no method for this. Correct type is 11.
-        imgMsg->SetScalarType(11);
-        break;
-      default:
-        MITK_ERROR << "Can not handle pixel component type "
-                   << type.GetComponentType();
-        return;
+    case itk::ImageIOBase::CHAR:
+      imgMsg->SetScalarTypeToInt8();
+      break;
+    case itk::ImageIOBase::UCHAR:
+      imgMsg->SetScalarTypeToUint8();
+      break;
+    case itk::ImageIOBase::SHORT:
+      imgMsg->SetScalarTypeToInt16();
+      break;
+    case itk::ImageIOBase::USHORT:
+      imgMsg->SetScalarTypeToUint16();
+      break;
+    case itk::ImageIOBase::INT:
+      imgMsg->SetScalarTypeToInt32();
+      break;
+    case itk::ImageIOBase::UINT:
+      imgMsg->SetScalarTypeToUint32();
+      break;
+    case itk::ImageIOBase::LONG:
+      // OIGTL doesn't formally support 64bit int scalars, but if they are
+      // ever added,
+      // they will have the identifier 8 assigned.
+      imgMsg->SetScalarType(8);
+      break;
+    case itk::ImageIOBase::ULONG:
+      // OIGTL doesn't formally support 64bit uint scalars, but if they are
+      // ever added,
+      // they will have the identifier 9 assigned.
+      imgMsg->SetScalarType(9);
+      break;
+    case itk::ImageIOBase::FLOAT:
+      // The igtl library has no method for this. Correct type is 10.
+      imgMsg->SetScalarType(10);
+      break;
+    case itk::ImageIOBase::DOUBLE:
+      // The igtl library has no method for this. Correct type is 11.
+      imgMsg->SetScalarType(11);
+      break;
+    default:
+      MITK_ERROR << "Can not handle pixel component type "
+        << type.GetComponentType();
+      return;
     }
 
     // Set transformation matrix.
@@ -169,33 +169,33 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     size_t num_scalars = num_pixel * type.GetNumberOfComponents();
     switch (type.GetComponentType())
     {
-      case itk::ImageIOBase::CHAR:
-      case itk::ImageIOBase::UCHAR:
-        // No endian conversion necessary, because a char is exactly one byte!
-        break;
-      case itk::ImageIOBase::SHORT:
-      case itk::ImageIOBase::USHORT:
-        itk::ByteSwapper<short>::SwapRangeFromSystemToLittleEndian((short*)out,
-                                                                   num_scalars);
-        break;
-      case itk::ImageIOBase::INT:
-      case itk::ImageIOBase::UINT:
-        itk::ByteSwapper<int>::SwapRangeFromSystemToLittleEndian((int*)out,
-                                                                 num_scalars);
-        break;
-      case itk::ImageIOBase::LONG:
-      case itk::ImageIOBase::ULONG:
-        itk::ByteSwapper<long>::SwapRangeFromSystemToLittleEndian((long*)out,
-                                                                  num_scalars);
-        break;
-      case itk::ImageIOBase::FLOAT:
-        itk::ByteSwapper<float>::SwapRangeFromSystemToLittleEndian((float*)out,
-                                                                   num_scalars);
-        break;
-      case itk::ImageIOBase::DOUBLE:
-        itk::ByteSwapper<double>::SwapRangeFromSystemToLittleEndian(
-            (double*)out, num_scalars);
-        break;
+    case itk::ImageIOBase::CHAR:
+    case itk::ImageIOBase::UCHAR:
+      // No endian conversion necessary, because a char is exactly one byte!
+      break;
+    case itk::ImageIOBase::SHORT:
+    case itk::ImageIOBase::USHORT:
+      itk::ByteSwapper<short>::SwapRangeFromSystemToLittleEndian((short*)out,
+        num_scalars);
+      break;
+    case itk::ImageIOBase::INT:
+    case itk::ImageIOBase::UINT:
+      itk::ByteSwapper<int>::SwapRangeFromSystemToLittleEndian((int*)out,
+        num_scalars);
+      break;
+    case itk::ImageIOBase::LONG:
+    case itk::ImageIOBase::ULONG:
+      itk::ByteSwapper<long>::SwapRangeFromSystemToLittleEndian((long*)out,
+        num_scalars);
+      break;
+    case itk::ImageIOBase::FLOAT:
+      itk::ByteSwapper<float>::SwapRangeFromSystemToLittleEndian((float*)out,
+        num_scalars);
+      break;
+    case itk::ImageIOBase::DOUBLE:
+      itk::ByteSwapper<double>::SwapRangeFromSystemToLittleEndian(
+        (double*)out, num_scalars);
+      break;
     }
 
     imgMsg->Pack();
@@ -211,13 +211,13 @@ void mitk::ImageToIGTLMessageFilter::SetInput(const mitk::Image* img)
 }
 
 void mitk::ImageToIGTLMessageFilter::SetInput(unsigned int idx,
-                                              const Image* img)
+  const Image* img)
 {
   this->ProcessObject::SetNthInput(idx, const_cast<mitk::Image*>(img));
   this->CreateOutputsForAllInputs();
 }
 
-const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput( void )
+const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
@@ -235,9 +235,9 @@ const mitk::Image* mitk::ImageToIGTLMessageFilter::GetInput(unsigned int idx)
 
 void mitk::ImageToIGTLMessageFilter::ConnectTo(mitk::ImageSource* upstream)
 {
-    MITK_INFO << "Image source for this (" << this << ") mitkImageToIGTLMessageFilter is " << upstream;
+  MITK_INFO << "Image source for this (" << this << ") mitkImageToIGTLMessageFilter is " << upstream;
   for (DataObjectPointerArraySizeType i = 0; i < upstream->GetNumberOfOutputs();
-       i++)
+    i++)
   {
     this->SetInput(i, upstream->GetOutput(i));
   }

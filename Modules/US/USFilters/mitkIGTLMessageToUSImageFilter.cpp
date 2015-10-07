@@ -117,7 +117,7 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
 
   for (size_t i = 0; i < 4; ++i)
     for (size_t j = 0; j < 4; ++j)
-      vtkMatrix->SetElement(i, j,matF[i][j]);
+      vtkMatrix->SetElement(i, j, matF[i][j]);
 
   float spacingMsg[3];
 

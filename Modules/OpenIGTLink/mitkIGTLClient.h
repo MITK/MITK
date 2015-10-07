@@ -40,7 +40,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(IGTLClient, IGTLDevice)
-    itkFactorylessNewMacro(Self)
+    mitkNewMacro1Param(Self, bool)
     itkCloneMacro(Self)
 
     /**
@@ -61,7 +61,7 @@ namespace mitk
 
   protected:
     /** Constructor */
-    IGTLClient();
+    IGTLClient(bool ReadFully);
     /** Destructor */
     virtual ~IGTLClient();
 

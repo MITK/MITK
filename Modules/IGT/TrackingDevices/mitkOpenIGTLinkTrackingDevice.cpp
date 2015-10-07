@@ -38,7 +38,7 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice(): mitk::TrackingDevi
   //set the type of this tracking device
   this->m_Data = mitk::DeviceDataOpenIGTLinkTrackingDeviceConnection;
 
-  m_OpenIGTLinkClient = mitk::IGTLClient::New();
+  m_OpenIGTLinkClient = mitk::IGTLClient::New(false);
   m_OpenIGTLinkClient->EnableInfiniteBufferingMode(m_OpenIGTLinkClient->GetReceiveQueue(),false);
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
 
@@ -120,8 +120,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
   ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(1);
   m_OpenIGTLinkClient->SendMessage(sttMsg);
 
-  std::this_thread::sleep_for(std::chrono::seconds(WaitingTime));
-  //Sleep(WaitingTime); //wait for data to arrive
+  std::this_thread::sleep_for(std::chrono::seconds((WaitingTime/1000)));
 
   m_IGTLDeviceSource->Update();
 

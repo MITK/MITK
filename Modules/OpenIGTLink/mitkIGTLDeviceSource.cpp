@@ -256,6 +256,8 @@ void mitk::IGTLDeviceSource::RegisterAsMicroservice()
   props[ US_PROPKEY_IGTLDEVICENAME ] = m_Name;
   props[ US_PROPKEY_DEVICETYPE ] = m_Type;
   m_ServiceRegistration = context->RegisterService(this, props);
+
+  MITK_INFO << "Registered new DeviceSource as microservice: " << uidGen.GetUID();
 }
 
 

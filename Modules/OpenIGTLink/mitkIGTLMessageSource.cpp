@@ -49,7 +49,10 @@ mitk::IGTLMessageSource::~IGTLMessageSource()
 mitk::IGTLMessage* mitk::IGTLMessageSource::GetOutput()
 {
   if (this->GetNumberOfIndexedOutputs() < 1)
+  {
+    MITK_WARN << "IGTLMessageSource contained no outputs. Returning nullptr.";
     return nullptr;
+  }
 
   return static_cast<IGTLMessage*>(this->ProcessObject::GetPrimaryOutput());
 }

@@ -25,6 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkUSExports.h>
 #include "mitkUSImageSource.h"
 
+// MitkIGTL
+#include "mitkIGTLMessageProvider.h"
+#include "mitkIGTLServer.h"
+#include "mitkIGTLDeviceSource.h"
+#include "mitkImageToIGTLMessageFilter.h"
+
 // MITK
 #include <mitkCommon.h>
 #include <mitkMessage.h>
@@ -43,14 +49,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSImageMetadata.h"
 
 namespace itk {
-template<class T> class SmartPointer;
+  template<class T> class SmartPointer;
 }
 
 namespace mitk {
-class USAbstractControlInterface;
-class USControlInterfaceBMode;
-class USControlInterfaceProbes;
-class USControlInterfaceDoppler;
+  class USAbstractControlInterface;
+  class USControlInterfaceBMode;
+  class USControlInterfaceProbes;
+  class USControlInterfaceDoppler;
 
   /**
   * \brief A device holds information about it's model, make and the connected probes. It is the
@@ -112,20 +118,20 @@ class USControlInterfaceDoppler;
 
       PropertyKeys()
         : US_INTERFACE_NAME("org.mitk.services.UltrasoundDevice"),
-          US_PROPKEY_MANUFACTURER(US_INTERFACE_NAME + ".manufacturer"),
-          US_PROPKEY_NAME(US_INTERFACE_NAME + ".name"),
-          US_PROPKEY_COMMENT(US_INTERFACE_NAME + ".comment"),
-          US_PROPKEY_LABEL(US_INTERFACE_NAME + ".label"),
-          US_PROPKEY_ISCONNECTED(US_INTERFACE_NAME + ".isConnected"),
-          US_PROPKEY_ISACTIVE(US_INTERFACE_NAME + ".isActive"),
-          US_PROPKEY_CLASS(US_INTERFACE_NAME + ".class"),
-          US_PROPKEY_PROBES_SELECTED(US_INTERFACE_NAME + ".probes.selected"),
-          US_PROPKEY_BMODE_FREQUENCY(US_INTERFACE_NAME + ".bmode.frequency"),
-          US_PROPKEY_BMODE_POWER(US_INTERFACE_NAME + ".bmode.power"),
-          US_PROPKEY_BMODE_DEPTH(US_INTERFACE_NAME + ".bmode.depth"),
-          US_PROPKEY_BMODE_GAIN(US_INTERFACE_NAME + ".bmode.gain"),
-          US_PROPKEY_BMODE_REJECTION(US_INTERFACE_NAME + ".bmode.rejection"),
-          US_PROPKEY_BMODE_DYNAMIC_RANGE(US_INTERFACE_NAME + ".bmode.dynamicRange")
+        US_PROPKEY_MANUFACTURER(US_INTERFACE_NAME + ".manufacturer"),
+        US_PROPKEY_NAME(US_INTERFACE_NAME + ".name"),
+        US_PROPKEY_COMMENT(US_INTERFACE_NAME + ".comment"),
+        US_PROPKEY_LABEL(US_INTERFACE_NAME + ".label"),
+        US_PROPKEY_ISCONNECTED(US_INTERFACE_NAME + ".isConnected"),
+        US_PROPKEY_ISACTIVE(US_INTERFACE_NAME + ".isActive"),
+        US_PROPKEY_CLASS(US_INTERFACE_NAME + ".class"),
+        US_PROPKEY_PROBES_SELECTED(US_INTERFACE_NAME + ".probes.selected"),
+        US_PROPKEY_BMODE_FREQUENCY(US_INTERFACE_NAME + ".bmode.frequency"),
+        US_PROPKEY_BMODE_POWER(US_INTERFACE_NAME + ".bmode.power"),
+        US_PROPKEY_BMODE_DEPTH(US_INTERFACE_NAME + ".bmode.depth"),
+        US_PROPKEY_BMODE_GAIN(US_INTERFACE_NAME + ".bmode.gain"),
+        US_PROPKEY_BMODE_REJECTION(US_INTERFACE_NAME + ".bmode.rejection"),
+        US_PROPKEY_BMODE_DYNAMIC_RANGE(US_INTERFACE_NAME + ".bmode.dynamicRange")
       {}
     };
 
@@ -135,10 +141,10 @@ class USControlInterfaceDoppler;
      */
     mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&)
 
-    /**
-     * \return keys for the microservice properties of ultrasound devices
-     */
-    static mitk::USDevice::PropertyKeys GetPropertyKeys();
+      /**
+       * \return keys for the microservice properties of ultrasound devices
+       */
+       static mitk::USDevice::PropertyKeys GetPropertyKeys();
 
     /**
     * \brief Default getter for the custom control interface.
@@ -290,9 +296,9 @@ class USControlInterfaceDoppler;
     void SetComment(std::string comment);
 
     itkGetMacro(DeviceState, DeviceStates)
-    itkGetMacro(ServiceProperties, us::ServiceProperties)
+      itkGetMacro(ServiceProperties, us::ServiceProperties)
 
-    void GrabImage();
+      void GrabImage();
 
   protected:
     itkSetMacro(Image, mitk::Image::Pointer);
@@ -304,6 +310,21 @@ class USControlInterfaceDoppler;
 
     mitk::Image::Pointer m_Image;
     mitk::Image::Pointer m_OutputImage;
+
+    /**
+    * \brief Registers an OpenIGTLink device as a microservice so that we can send the images of
+    * this device via the network.
+    */
+    void ProvideViaOIGTL();
+
+    /**
+    * \brief Deregisters the microservices for OpenIGTLink.
+    */
+    void DisableOIGTL();
+
+    mitk::IGTLServer::Pointer m_IGTLServer;
+    mitk::IGTLMessageProvider::Pointer m_IGTLMessageProvider;
+    mitk::ImageToIGTLMessageFilter::Pointer m_ImageToIGTLMsgFilter;
 
     bool m_IsFreezed;
 

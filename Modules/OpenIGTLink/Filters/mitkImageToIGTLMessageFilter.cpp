@@ -120,17 +120,25 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     }
 
     // Set transformation matrix.
-    const vtkMatrix4x4* matrix = img->GetGeometry()->GetVtkMatrix();
+    vtkMatrix4x4* matrix = img->GetGeometry()->GetVtkMatrix();
 
     float matF[4][4];
     for (size_t i = 0; i < 4; ++i)
     {
       for (size_t j = 0; j < 4; ++j)
       {
-        matF[i][j] = *matrix[i][j];
+        matF[i][j] = matrix->GetElement(i, j);
       }
     }
     imgMsg->SetMatrix(matF);
+
+    float spacing[3];
+    auto spacingImg = img->GetGeometry()->GetSpacing();
+
+    for (int i = 0; i < 3; ++i)
+      spacing[i] = spacingImg[i];
+
+    imgMsg->SetSpacing(spacing);
 
     // Set dimensions.
     int sizes[3];

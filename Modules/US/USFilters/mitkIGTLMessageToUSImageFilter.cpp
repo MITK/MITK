@@ -111,15 +111,20 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
 
   index.Fill(0);
 
-  // Copy spacing
-  float spc[3];
-  msg->GetSpacing(spc);
-  for (size_t i = 0; i < 3; i++)
-  {
-    spacing[i] = spc[i];
-  }
+  float matF[4][4];
+  msg->GetMatrix(matF);
+  vtkMatrix4x4* vtkMatrix = vtkMatrix4x4::New();
 
-  spacing.Fill(1);
+  for (size_t i = 0; i < 4; ++i)
+    for (size_t j = 0; j < 4; ++j)
+      vtkMatrix->SetElement(i, j,matF[i][j]);
+
+  float spacingMsg[3];
+
+  msg->GetSpacing(spacingMsg);
+
+  for (int i = 0; i < 3; ++i)
+    spacing[i] = spacingMsg[i];
 
   region.SetSize(size);
   region.SetIndex(index);
@@ -145,8 +150,8 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   img = mitk::Image::New();
   img->InitializeByItk(output.GetPointer());
   img->SetVolume(output->GetBufferPointer());
-
-  //MITK_INFO << "Received image. Dimensions: " << img->GetDimensions() << " Channels: " << img->GetNumberOfChannels() << "\n";
+  img->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(vtkMatrix);
+  vtkMatrix->Delete();
 
   float iorigin[3];
   msg->GetOrigin(iorigin);
@@ -155,10 +160,6 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
     origin[i] = iorigin[i];
   }
   output->SetOrigin(origin);
-
-  // Output affine transformation matrix (for debugging for now)
-  igtl::Matrix4x4 affine_transformation_matrix;
-  msg->GetMatrix(affine_transformation_matrix);
 }
 
 mitk::IGTLMessageToUSImageFilter::IGTLMessageToUSImageFilter()

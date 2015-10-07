@@ -119,6 +119,13 @@ int testIndexAndWorldConsistency(mitk::Geometry3D* geometry3d)
   geometry3d->WorldToIndex(center, centerContIndex);
   mitk::BoundingBox::ConstPointer boundingBox = geometry3d->GetBoundingBox();
   mitk::BoundingBox::PointType centerBounds = boundingBox->GetCenter();
+  //itk assumes corner based geometry. If our geometry is center based (imageGoe == true), everything needs to be shifted
+  if (geometry3d->GetImageGeometry())
+  {
+   centerBounds[0] -= 0.5;
+    centerBounds[1] -= 0.5;
+    centerBounds[2] -= 0.5;
+  }
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(centerContIndex,centerBounds), "");
 
   MITK_TEST_OUTPUT( << " Testing GetCenter()==IndexToWorld(BoundingBox.GetCenter): ");

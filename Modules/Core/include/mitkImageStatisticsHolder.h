@@ -50,15 +50,15 @@ public:
     virtual const HistogramType* GetScalarHistogram(int t=0, unsigned int =0);
 
     //##Documentation
-    //## \brief Get the minimum for scalar images
+    //## \brief Get the minimum for scalar images. Recomputation performed only when necessary.
     virtual ScalarType GetScalarValueMin(int t=0, unsigned int component=0);
 
     //##Documentation
-    //## \brief Get the maximum for scalar images
+    //## \brief Get the maximum for scalar images. Recomputation performed only when necessary.
     virtual ScalarType GetScalarValueMax(int t=0, unsigned int component=0);
 
     //##Documentation
-    //## \brief Get the second smallest value for scalar images
+    //## \brief Get the second smallest value for scalar images. Recomputation performed only when necessary.
     virtual ScalarType GetScalarValue2ndMin(int t=0, unsigned int component=0);
 
     //##Documentation

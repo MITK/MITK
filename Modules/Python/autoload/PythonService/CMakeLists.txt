@@ -1,0 +1,8 @@
+MITK_CREATE_MODULE( PythonService
+  INCLUDE_DIRS
+    PRIVATE src/PythonService
+  DEPENDS PUBLIC MitkPython
+#  PACKAGE_DEPENDS
+#    PRIVATE
+  AUTOLOAD_WITH MitkCore
+) 

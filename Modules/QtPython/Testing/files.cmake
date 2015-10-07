@@ -1,5 +1,5 @@
 set(MODULE_TESTS
-  mitkPythonTest.cpp
+  #mitkPythonTest.cpp
 )
 
 #TODO: temporarily disabled untill segfault is fixed (bug-19152)

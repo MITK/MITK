@@ -6,12 +6,15 @@ if(MITK_USE_OpenCV)
 endif()
 
 mitk_create_module(
-  DEPENDS MitkCore MitkQtWidgets
+  DEPENDS MitkCore MitkQtWidgets MitkPython
   PACKAGE_DEPENDS
     PUBLIC Qt4|QtGui Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
     PRIVATE PythonLibs VTK|vtkPython+vtkWrappingPythonCore ${OpenCV_DEP}
 )
 
-add_subdirectory(autoload/PythonService)
+# temporarily disabled, bug-19153
+if(UNIX)
+  add_subdirectory(Testing)
+endif()
 
 endif()

@@ -60,7 +60,6 @@ public:
 
   QmitkAdaptiveRegionGrowingToolGUI(QWidget* parent=0);
 
-
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
   virtual void CreateConnections();
 
@@ -79,7 +78,7 @@ public:
    * @param binaryImage Name of the binary image
    * @param surface Name of the surface
    */
-  void SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, /*std::string vesselTree,*/ std::string surface);
+  void SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, /*std::string vesselTree,*/ std::string surface, std::string maskedSegmentation );
 
   /**
    * @brief Method to enable/disable controls for region growing
@@ -196,6 +195,7 @@ private:
   std::string m_NAMEFORLABLEDSEGMENTATIONIMAGE;
   std::string m_NAMEFORBINARYIMAGE;
   std::string m_NAMEFORSURFACE;
+  std::string m_NAMEFORMASKEDSEGMENTATION;
 
   mitk::ScalarType m_LOWERTHRESHOLD; //Hounsfield value
   mitk::ScalarType m_UPPERTHRESHOLD; //Hounsfield value

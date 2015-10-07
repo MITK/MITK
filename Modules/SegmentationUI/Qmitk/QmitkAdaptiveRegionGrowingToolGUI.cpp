@@ -234,7 +234,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
             }
             else
             {
-              pixelValues[pos] = -10000000;
+              pixelValues[pos] = std::numeric_limits< long >::min();
               pos++;
             }
           }
@@ -242,17 +242,31 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
       }
 
       //Now calculation mean of the pixelValues
+      //Now calculation mean of the pixelValues
       unsigned int numberOfValues(0);
       for (auto & pixelValue : pixelValues)
       {
-        if(pixelValue > -10000000)
+        if(pixelValue > std::numeric_limits< long >::min())
         {
           m_SeedPointValueMean += pixelValue;
           numberOfValues++;
         }
       }
-
       m_SeedPointValueMean = m_SeedPointValueMean/numberOfValues;
+
+      mitk::ScalarType var = 0;
+      if ( numberOfValues > 1 )
+      {
+        for (auto & pixelValue : pixelValues)
+        {
+          if(pixelValue > std::numeric_limits< mitk::ScalarType >::min())
+          {
+            var += ( pixelValue - m_SeedPointValueMean )*( pixelValue - m_SeedPointValueMean );
+          }
+        }
+        var /= numberOfValues - 1;
+      }
+      mitk::ScalarType stdDev = sqrt( var );
 
       /*
        * Here the upper- and lower threshold is calculated:
@@ -268,9 +282,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       if (m_CurrentRGDirectionIsUpwards)
       {
-        m_LOWERTHRESHOLD = m_SeedPointValueMean;
-        if (m_SeedpointValue < m_SeedPointValueMean)
-          m_LOWERTHRESHOLD = m_SeedpointValue;
+        m_LOWERTHRESHOLD = m_SeedPointValueMean - stdDev;
         m_UPPERTHRESHOLD = m_SeedpointValue + windowSize;
         if (m_UPPERTHRESHOLD > max)
           m_UPPERTHRESHOLD = max;

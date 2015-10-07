@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurfaceVtkMapper2D.h"
 
-// mitk includes
+// MITK includes
 #include "mitkVtkPropRenderer.h"
 #include <mitkCoreServices.h>
 #include <mitkDataNode.h>
@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 #include <mitkVtkScalarModeProperty.h>
 
-// vtk includes
+// VTK includes
 #include <vtkActor.h>
 #include <vtkArrowSource.h>
 #include <vtkAssembly.h>
@@ -262,14 +262,30 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   }
 }
 
-void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer *renderer)
+void mitk::SurfaceVtkMapper2D::FixupLegacyProperties(PropertyList* properties)
 {
-  const DataNode *node = GetDataNode();
+  // Before bug 18528, "line width" was an IntProperty, now it is a FloatProperty
+  float lineWidth = 1.0f;
+  if ( !properties->GetFloatProperty("line width", lineWidth) )
+  {
+    int legacyLineWidth = lineWidth;
+    if ( properties->GetIntProperty("line width", legacyLineWidth) )
+    {
+      properties->ReplaceProperty("line width", FloatProperty::New(static_cast<float>(legacyLineWidth)));
+    }
+  }
+}
+
+void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
+{
+  const DataNode * node = GetDataNode();
 
   if (node == NULL)
   {
     return;
   }
+
+  FixupLegacyProperties(node->GetPropertyList(renderer));
 
   float lineWidth = 1.0f;
   node->GetFloatProperty("line width", lineWidth, renderer);

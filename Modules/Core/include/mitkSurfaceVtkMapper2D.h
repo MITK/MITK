@@ -189,6 +189,19 @@ namespace mitk
     virtual void ResetMapper(BaseRenderer *renderer) override;
 
     /**
+     * @brief Updates legacy properties to current behavior/interpretation.
+     * @param renderer The respective renderer of the mitkRenderWindow.
+     *
+     * Whenever a mapper decides to change its property types or its
+     * interpretation of certain values, it should add something to this
+     * method and call it before methods like ApplyProperties();
+     *
+     * This is particularly helpful when dealing with data from
+     * archive/scene files that were created before changes.
+     */
+    virtual void FixupLegacyProperties(PropertyList* properties);
+
+    /**
        * @brief ApplyAllProperties Pass all the properties to VTK.
        * @param renderer The respective renderer of the mitkRenderWindow.
        */

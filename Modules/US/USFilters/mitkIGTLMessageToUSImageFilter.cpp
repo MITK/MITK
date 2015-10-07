@@ -38,7 +38,7 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
   if (imgMsg->GetCoordinateSystem() != igtl::ImageMessage::COORDINATE_RAS)
   {
     // TODO: Which coordinate system does MITK use?
-    mitkThrow() << "Can not handle messages with LAS coordinate system";
+    mitkThrow() << "Can not handle messages with LPS coordinate system";
   }
 
   switch (imgMsg->GetScalarType())

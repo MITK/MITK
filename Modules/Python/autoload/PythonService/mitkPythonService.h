@@ -20,14 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkLightObject.h>
 #include <ctkAbstractPythonManager.h>
 #include "mitkSurface.h"
-#include <MitkPythonServiceExports.h>
 
 namespace mitk
 {
   ///
   /// implementation of the IPythonService using ctkabstractpythonmanager
   /// \see IPythonService
-  class MITKPYTHONSERVICE_EXPORT PythonService: public itk::LightObject, public mitk::IPythonService
+  class PythonService: public itk::LightObject, public mitk::IPythonService
   {
   public:
       ///

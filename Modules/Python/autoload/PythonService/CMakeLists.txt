@@ -5,4 +5,4 @@ MITK_CREATE_MODULE( PythonService
 #  PACKAGE_DEPENDS
 #    PRIVATE
   AUTOLOAD_WITH MitkCore
-) 
+)

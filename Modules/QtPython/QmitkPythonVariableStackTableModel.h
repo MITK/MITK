@@ -21,14 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVariant>
 #include <QModelIndex>
 #include "mitkIPythonService.h"
-#include <MitkPythonExports.h>
+#include <MitkQtPythonExports.h>
 #include <usServiceReference.h>
 
 ///
 /// implements a table model to show the variables of the Python "__main__" dictionary
 /// furthermore implements dragging and dropping of datanodes (conversion from and to python)
 ///
-class MITKPYTHON_EXPORT QmitkPythonVariableStackTableModel : public QAbstractTableModel, public mitk::PythonCommandObserver
+class MITKQTPYTHON_EXPORT QmitkPythonVariableStackTableModel : public QAbstractTableModel, public mitk::PythonCommandObserver
 {
   Q_OBJECT
 

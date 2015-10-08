@@ -301,5 +301,26 @@ namespace mitk {
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
   }; // end class TimeGeometry
+
+  /**
+  * @brief Equal A function comparing two instances of TimeGeometry for being identical.
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * The function compares two instances of TimeGeometries in all their aspects.
+  *
+  * The parameter eps is a tolerance value for all methods which are internally used for comparison.
+  * If you want to use different tolerance values for different parts of the geometry, feel free to use
+  * the other comparison methods and write your own implementation of Equal.
+  *
+  * @param rightHandSide Compare this against leftHandSide.
+  * @param leftHandSide Compare this against rightHandSide.
+  * @param eps Tolerance for comparison. You can use mitk::eps in most cases.
+  * @param verbose Flag indicating if the user wants detailed console output or not.
+  *
+  * @return True, if all comparison are true. False in any other case.
+  */
+  MITKCORE_EXPORT bool Equal(const mitk::TimeGeometry& leftHandSide, const mitk::TimeGeometry& rightHandSide, ScalarType eps, bool verbose);
+
 } // end namespace MITK
 #endif // TimeGeometry_h

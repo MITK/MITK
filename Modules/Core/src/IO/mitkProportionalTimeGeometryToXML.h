@@ -14,11 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkGeometry3DToXML_h
-#define mitkGeometry3DToXML_h
+#ifndef mitkProportionalTimeGeometryToXML_h
+#define mitkProportionalTimeGeometryToXML_h
 
 // MITK
-#include "mitkGeometry3D.h"
+#include "mitkProportionalTimeGeometry.h"
 
 class TiXmlElement;
 
@@ -28,29 +28,29 @@ namespace mitk
 /**
  * @internal
  *
- * @brief Helper for Geometry3D related I/O classes.
+ * @brief Helper for ProportionalTimeGeometry related I/O classes.
  *
- * Creates TinyXML elements (blocks) that describe a Geometry3D.
- * Also offers a method to read such blocks and create a corresponding Geometry3D.
+ * Creates TinyXML elements (blocks) that describe a ProportionalTimeGeometry.
+ * Also offers a method to read such blocks and create a corresponding ProportionalTimeGeometry.
  *
- * @sa GeometryDataReaderService, GeometryDataWriterService, PointSetWriterService, PointSetReaderService
+ * @sa GeometryDataWriterService, GeometryDataReaderService, Geometry3DToXML
  *
  * @ingroup IO
  */
-class Geometry3DToXML
+class ProportionalTimeGeometryToXML
 {
 public:
 
   /**
    * @brief Serialize given geometry to XML.
    */
-  static TiXmlElement* ToXML( const Geometry3D* geometry);
+  static TiXmlElement* ToXML( const ProportionalTimeGeometry* geometry);
 
   /**
-   * @brief Create a Geometry3D from XML.
+   * @brief Create a ProportionalTimeGeometry from XML.
    * Interprets only the format created by ToXML().
    */
-  static Geometry3D::Pointer FromXML( TiXmlElement* node );
+  static ProportionalTimeGeometry::Pointer FromXML( TiXmlElement* node );
 };
 
 }

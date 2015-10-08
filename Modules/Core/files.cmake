@@ -267,6 +267,7 @@ set(CPP_FILES
   IO/mitkPixelType.cpp
   IO/mitkPointSetReaderService.cpp
   IO/mitkPointSetWriterService.cpp
+  IO/mitkProportionalTimeGeometryToXML.cpp
   IO/mitkRawImageFileReader.cpp
   IO/mitkStandardFileLocations.cpp
   IO/mitkSurfaceStlIO.cpp

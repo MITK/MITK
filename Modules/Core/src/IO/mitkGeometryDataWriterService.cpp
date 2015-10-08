@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometryDataWriterService.h"
 #include "mitkIOMimeTypes.h"
 
-#include "mitkGeometry3DToXML.h"
+#include "mitkProportionalTimeGeometryToXML.h"
 
 #include <tinyxml.h>
 
@@ -74,11 +74,15 @@ void mitk::GeometryDataWriterService::Write()
 
   const GeometryData* data = static_cast<const GeometryData*>( this->GetInput() );
 
-  const Geometry3D* geom3D(NULL);
-  if ( (geom3D = dynamic_cast<const Geometry3D*>( data->GetGeometry() )) )
+  const ProportionalTimeGeometry* timeGeometry(NULL);
+  if ( (timeGeometry = dynamic_cast<const ProportionalTimeGeometry*>( data->GetTimeGeometry() )) )
   {
-      TiXmlElement* geometryElement = Geometry3DToXML::ToXML( geom3D );
-      rootNode->LinkEndChild( geometryElement );
+    TiXmlElement* timeGeometryElement = ProportionalTimeGeometryToXML::ToXML( timeGeometry );
+    rootNode->LinkEndChild( timeGeometryElement );
+  }
+  else
+  {
+    MITK_WARN << "Serializing GeometryData that does not have a valid ProportionalTimeGeometry! Not implemented!";
   }
 
   // Write out document

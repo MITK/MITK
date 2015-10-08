@@ -228,7 +228,7 @@ void mitk::ProportionalTimeGeometry::Initialize (BaseGeometry* geometry, TimeSte
   m_StepDuration = 1.0;
   if (timeSteps < 2)
   {
-    m_FirstTimePoint = -std::numeric_limits<double>::max();
+    m_FirstTimePoint = -std::numeric_limits<mitk::TimePointType>::max();
     m_StepDuration = std::numeric_limits<mitk::TimePointType>().infinity();
   }
 

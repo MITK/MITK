@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataCollectionImageIterator.h"
 #include "mitkDataCollectionUtilities.h"
 #include "mitkIOUtil.h"
+#include "mitkCLUtil.h"
 #include <fstream>
 // To initialize random number generator
 #include <time.h>
@@ -196,10 +197,10 @@ void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollecti
 
     // Count Healthy/ Tumor voxels
     // i.o. to decide how many of each are taken
-    unsigned int totalTumor = 0;
-    unsigned int totalHealthyClose = 0;
-    unsigned int totalHealthyNonClose= 0;
-    unsigned int totalHealthy= 0;
+    double totalTumor = 0;
+    double totalHealthyClose = 0;
+    double totalHealthyNonClose= 0;
+    double totalHealthy= 0;
 
     while (!brainMaskIter.IsAtEnd())
     {
@@ -253,10 +254,10 @@ void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollecti
     }
 
     // DEBUG count occurances to compare
-    unsigned int potentialClose = 0;
-    unsigned int selectedClose = 0;
-    unsigned int tumor = 0;
-    unsigned int healthy = 0;
+    double potentialClose = 0;
+    double selectedClose = 0;
+    double tumor = 0;
+    double healthy = 0;
     while (!brainMaskIter.IsAtEnd())
     {
       weightsIter.SetVoxel(0);
@@ -280,20 +281,32 @@ void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollecti
         { // choose healty tissue voxels for training
           if (gtvIter.GetVoxel() == 0 &&  ((excludeHealthyIter.GetVoxel() == 0 && targetDil.GetVoxel()==1 )))
           {
-           if ((float)rand()/(float)(RAND_MAX)  < thHealthyClose)
+            if (!m_WeightSamples && ((float)rand()/(float)(RAND_MAX)  < thHealthyClose))
             {
               targetIter.SetVoxel(brainMaskIter.GetVoxel()+targetIter.GetVoxel());
               weightsIter.SetVoxel(1);
               ++healthy;
             }
+            else
+            {
+              targetIter.SetVoxel(brainMaskIter.GetVoxel()+targetIter.GetVoxel());
+              weightsIter.SetVoxel(thHealthyClose);
+              healthy+=thHealthyClose;
+            }
           }
           else if (((targetDil.GetVoxel()==0 && excludeHealthyIter.GetVoxel() == 0 )))
           {
-            if ((float)rand()/(float)(RAND_MAX)  < thHealthyAny)
+            if (!m_WeightSamples && ( (float)rand()/(float)(RAND_MAX)  < thHealthyAny))
             {
               targetIter.SetVoxel(brainMaskIter.GetVoxel()+targetIter.GetVoxel());
               weightsIter.SetVoxel(1);
               ++healthy;
+            }
+            else
+            {
+              targetIter.SetVoxel(brainMaskIter.GetVoxel()+targetIter.GetVoxel());
+              weightsIter.SetVoxel(thHealthyAny);
+              healthy+=thHealthyAny;
             }
           }
           else if ((gtvIter.GetVoxel() == 0 &&  excludeHealthyIter.GetVoxel() == 1) )
@@ -342,6 +355,96 @@ void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollecti
 
 }
 
+void mitk::TumorInvasionClassification::PrepareResponseSamples(mitk::DataCollection *collection)
+{
+  srand (time(NULL));
+  MITK_INFO << "PrepareResponseSamples: Selecting training voxels.";
+
+  EnsureDataImageInCollection(collection, m_TumorID, "WEIGHTS");
+
+  CollectionDilation::DilateBinaryByName(collection,m_TargetID,10,4,"TRAIN");
+  DataCollectionImageIterator<unsigned char,3> gtvIter(collection, m_TumorID);
+  DataCollectionImageIterator<unsigned char,3> brainMaskIter(collection, m_MaskID);
+  DataCollectionImageIterator<unsigned char,3> targetIter(collection, m_TargetID);
+  DataCollectionImageIterator<unsigned char,3> dilIter(collection, m_TargetID+"TRAIN");
+
+
+  // Count Non-Involved/Responsive/Rezidiv Voxels
+
+  double nonInvolved = 0;
+  double responsive = 0;
+  double rezidiv= 0;
+
+  while (!brainMaskIter.IsAtEnd())
+  {
+    if (brainMaskIter.GetVoxel() != 0 && dilIter.GetVoxel() !=0)
+    {
+      if (targetIter.GetVoxel() == 0 && gtvIter.GetVoxel() == 0 )
+      {
+        targetIter.SetVoxel(1);
+        ++nonInvolved;
+      }
+
+      if (targetIter.GetVoxel() == 0 && gtvIter.GetVoxel() == 1)
+      {
+        targetIter.SetVoxel(3);
+        ++responsive;
+      }
+
+      if (targetIter.GetVoxel() == 1  && gtvIter.GetVoxel() == 0 )
+      {
+        targetIter.SetVoxel(2);
+        ++rezidiv;
+      }
+    }
+    else
+      targetIter.SetVoxel(0);
+
+    ++brainMaskIter;
+    ++targetIter;
+    ++gtvIter;
+    ++dilIter;
+  }
+  brainMaskIter.ToBegin();
+  targetIter.ToBegin();
+  gtvIter.ToBegin();
+  dilIter.ToBegin();
+
+  // weight for groups
+
+  double wNonInvolved = 10000.0 / nonInvolved;
+  double wResponsive = 10000.0 / responsive;
+  double wRezidiv = 10000.0 / rezidiv;
+
+
+  std::cout << "Weights are " << wNonInvolved << "/ " << wResponsive << " / " << wRezidiv << std::endl;
+
+  // Assign weight for each voxel
+  DataCollectionImageIterator<double,3> weightsIter(collection, "WEIGHTS");
+
+  while (!brainMaskIter.IsAtEnd())
+  {
+    if (brainMaskIter.GetVoxel() != 0 && dilIter.GetVoxel() !=0)
+    {
+      if (targetIter.GetVoxel() == 1)
+        weightsIter.SetVoxel(wNonInvolved);
+
+      if (targetIter.GetVoxel() == 2)
+        weightsIter.SetVoxel(wRezidiv);
+
+      if (targetIter.GetVoxel() == 3)
+        weightsIter.SetVoxel(wResponsive);
+
+    }
+
+    ++dilIter;
+    ++brainMaskIter;
+    ++targetIter;
+    ++weightsIter;
+  }
+
+}
+
 void mitk::TumorInvasionClassification::LearnProgressionFeatures(mitk::DataCollection *collection, std::vector<std::string> modalitiesList,size_t forestSize , size_t treeDepth )
 {
   auto trainDataX = mitk::DCUtilities::DC3dDToMatrixXd(collection, modalitiesList, m_TargetID);
@@ -351,6 +454,14 @@ void mitk::TumorInvasionClassification::LearnProgressionFeatures(mitk::DataColle
     m_Forest.SetMaximumTreeDepth(treeDepth);
 
   m_Forest.SetTreeCount(forestSize);
+
+  if (m_WeightSamples)
+  {
+    auto trainDataW = mitk::DCUtilities::DC3dDToMatrixXd(collection, "WEIGHTS", m_TargetID);
+    m_Forest.SetPointWiseWeight(trainDataW);
+    m_Forest.UsePointWiseWeight(true);
+  }
+
 
   MITK_INFO << "Start Training:";
   try
@@ -362,6 +473,7 @@ void mitk::TumorInvasionClassification::LearnProgressionFeatures(mitk::DataColle
   {
     MITK_INFO << "Exception while training forest: " << e.what();
   }
+  std::cout << "Training finished" << std::endl;
 }
 
 
@@ -374,6 +486,21 @@ void mitk::TumorInvasionClassification::PredictInvasion(mitk::DataCollection *co
     auto testDataX = mitk::DCUtilities::DC3dDToMatrixXd(collection,modalitiesList, m_MaskID);
     auto testDataNewY = m_Forest.Predict(testDataX);
     mitk::DCUtilities::MatrixToDC3d(testDataNewY, collection, m_ResultID, m_MaskID);
+
+    Eigen::MatrixXd Probs = m_Forest.GetPointWiseProbabilities();
+
+
+    Eigen::MatrixXd prob0 = Probs.col(0);
+    Eigen::MatrixXd prob1 = Probs.col(1);
+
+    mitk::DCUtilities::MatrixToDC3d(prob0, collection,"prob0", m_MaskID);
+    mitk::DCUtilities::MatrixToDC3d(prob1, collection,"prob1", m_MaskID);
+    if (Probs.cols() >= 3)
+    {
+      Eigen::MatrixXd prob2 = Probs.col(2);
+      mitk::DCUtilities::MatrixToDC3d(prob2, collection, "prob2", m_MaskID);
+    }
+
   }
   else
     MITK_ERROR << "TumorInvasionClassification::PredictInvasion - provided collection is NULL.";

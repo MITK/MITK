@@ -14,6 +14,7 @@ if(BUILD_TumorIvasionAnalysisMiniApps OR MITK_BUILD_ALL_APPS)
     set( tumorinvasionminiapps
         BasicDistanceMaps^^
         MriNormalization^^
+        MriOtsuNormalization^^
         #Resampling^^
         HistogramAdaption^^
         TumorProgressionMapping^^

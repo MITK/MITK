@@ -34,6 +34,7 @@ set(MODULE_TESTS
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp
+  mitkGeometryDataIOTest.cpp
   mitkGeometryDataToSurfaceFilterTest.cpp
   mitkGlobalInteractionTest.cpp
   mitkImageCastTest.cpp
@@ -54,6 +55,7 @@ set(MODULE_TESTS
   mitkPointSetEqualTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetOnEmptyTest.cpp
+  mitkPointSetLocaleTest.cpp
   mitkPointSetWriterTest.cpp
   mitkPointSetReaderTest.cpp
   mitkPointSetInteractorTest.cpp

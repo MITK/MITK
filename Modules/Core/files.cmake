@@ -243,9 +243,12 @@ set(CPP_FILES
   IO/mitkFileWriter.cpp
   IO/mitkFileWriterRegistry.cpp
   IO/mitkFileWriterSelector.cpp
+  IO/mitkGeometry3DToXML.cpp
   IO/mitkIFileIO.cpp
   IO/mitkIFileReader.cpp
   IO/mitkIFileWriter.cpp
+  IO/mitkGeometryDataReaderService.cpp
+  IO/mitkGeometryDataWriterService.cpp
   IO/mitkImageGenerator.cpp
   IO/mitkImageVtkLegacyIO.cpp
   IO/mitkImageVtkXmlIO.cpp

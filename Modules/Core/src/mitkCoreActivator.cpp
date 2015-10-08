@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMimeTypeProvider.h>
 #include <mitkPointSetReaderService.h>
 #include <mitkPointSetWriterService.h>
+#include <mitkGeometryDataReaderService.h>
+#include <mitkGeometryDataWriterService.h>
 #include <mitkRawImageFileReader.h>
 #include <mitkSurfaceStlIO.h>
 #include <mitkSurfaceVtkLegacyIO.h>
@@ -309,6 +311,8 @@ void MitkCoreActivator::Load(us::ModuleContext* context)
   // Add custom Reader / Writer Services
   m_FileReaders.push_back(new mitk::PointSetReaderService());
   m_FileWriters.push_back(new mitk::PointSetWriterService());
+  m_FileReaders.push_back(new mitk::GeometryDataReaderService());
+  m_FileWriters.push_back(new mitk::GeometryDataWriterService());
   m_FileReaders.push_back(new mitk::DicomSeriesReaderService());
   m_FileReaders.push_back(new mitk::RawImageFileReaderService());
 

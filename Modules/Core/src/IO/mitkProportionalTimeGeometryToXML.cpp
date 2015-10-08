@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProportionalTimeGeometryToXML.h"
 
-#include "mitkGeometry3DToXml.h"
+#include "mitkGeometry3DToXML.h"
 
 #include <tinyxml.h>
 

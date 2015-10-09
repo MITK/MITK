@@ -280,6 +280,38 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
   return node;
 }
 
+void mitk::SceneReaderV1::ClearNodePropertyListWithExceptions(DataNode& node, PropertyList& propertyList)
+{
+  // Basically call propertyList.Clear(), but implement exceptions (see bug 19354)
+  BaseData* data = node.GetData();
+
+  PropertyList::Pointer propertiesToKeep = PropertyList::New();
+
+  if (dynamic_cast<Image*>(data))
+  {
+    /*
+      Older scene files (before changes of bug 17547) could contain
+      a RenderingMode property with value "LevelWindow_Color".
+      Since bug 17547 this value has been removed and replaced by
+      the default value LookupTable_LevelWindow_Color.
+
+      This new default value does only result in "black-to-white"
+      CT images (or others) if there is a corresponding lookup
+      table. Such a lookup table is provided as a default value
+      by the Image mapper. Since that value was never present in
+      older scene files, we do well in not removing the new
+      default value here. Otherwise the mapper would fall back
+      to another default which is all the colors of the rainbow :-(
+    */
+    BaseProperty::Pointer lutProperty = propertyList.GetProperty("LookupTable");
+    propertiesToKeep->SetProperty("LookupTable", lutProperty);
+  }
+
+  propertyList.Clear();
+
+  propertyList.ConcatenatePropertyList(propertiesToKeep);
+}
+
 bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory)
 {
   assert(node);
@@ -295,8 +327,7 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElemen
     std::string renderwindow( renderwindowa ? renderwindowa : "" );
 
     PropertyList::Pointer propertyList = node->GetPropertyList(renderwindow); // DataNode implementation always returns a propertylist
-    // clear all properties from node that might be set by DataNodeFactory during loading
-    propertyList->Clear();
+    ClearNodePropertyListWithExceptions(*node, *propertyList);
 
     // use deserializer to construct new properties
     PropertyListDeserializer::Pointer deserializer = PropertyListDeserializer::New();

@@ -76,9 +76,9 @@ See LICENSE.txt or http://www.mitk.org for details.
          a possible re-write!
 
 */
-class mitkMoreSceneIOTestSuite : public mitk::TestFixture
+class mitkSceneIOTest2Suite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(mitkMoreSceneIOTestSuite);
+  CPPUNIT_TEST_SUITE(mitkSceneIOTest2Suite);
   MITK_TEST(Test_SceneIOInterfaces);
   MITK_TEST(Test_ReconstructionOfScenes);
   CPPUNIT_TEST_SUITE_END();
@@ -135,4 +135,9 @@ public:
 
 }; // class
 
-MITK_TEST_SUITE_REGISTRATION(mitkMoreSceneIO)
+int mitkSceneIOTest2(int /*argc*/, char* /*argv*/[])
+{
+  CppUnit::TextUi::TestRunner runner;
+  runner.addTest(mitkSceneIOTest2Suite::suite());
+  return runner.run() ? 0 : 1;
+}

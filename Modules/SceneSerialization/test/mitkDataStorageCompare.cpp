@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDataStorageCompare.h"
-#include "mitkBaseDataEqual.h"
+#include "mitkBaseDataCompare.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkMapper.h"

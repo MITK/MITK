@@ -10,6 +10,6 @@ set(MODULE_CUSTOM_TESTS
 set(MODULE_CPP_FILES
   mitkSceneIOTestScenarioProvider.cpp
   mitkDataStorageCompare.cpp
-  mitkBaseDataEqual.cpp
+  mitkBaseDataCompare.cpp
 )
 

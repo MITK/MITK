@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometryData.h"
 
 // this include after all specific type includes! (for mitk::Equal)
-#include "mitkBaseDataEqual.h"
+#include "mitkBaseDataCompare.h"
 
 #include "usServiceProperties.h"
 #include "usModuleContext.h"

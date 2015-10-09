@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometryDataReaderService.h"
 #include "mitkIOMimeTypes.h"
 #include "mitkGeometry3DToXML.h"
+#include "mitkProportionalTimeGeometryToXML.h"
 
 // STL
 #include <mitkLocaleSwitch.h>
@@ -49,27 +50,56 @@ std::vector< itk::SmartPointer<mitk::BaseData> > mitk::GeometryDataReaderService
   {
     TiXmlHandle docHandle( &doc );
 
-    for( TiXmlElement* currentGeometryElement = docHandle.FirstChild("GeometryData").FirstChild("Geometry3D").ToElement();
-         currentGeometryElement != NULL;
-         currentGeometryElement = currentGeometryElement->NextSiblingElement())
+    for( TiXmlElement* geomDataElement = docHandle.FirstChildElement("GeometryData").ToElement();
+         geomDataElement != nullptr;
+         geomDataElement = geomDataElement->NextSiblingElement())
     {
-      Geometry3D::Pointer geometry = Geometry3DToXML::FromXML(currentGeometryElement);
-      if (geometry.IsNotNull())
+      for( TiXmlElement* currentElement = geomDataElement->FirstChildElement();
+           currentElement != nullptr;
+           currentElement = currentElement->NextSiblingElement())
       {
-        GeometryData::Pointer newGeometryData = GeometryData::New();
-        newGeometryData->SetGeometry( geometry );
-
-        result.push_back( newGeometryData.GetPointer() );
-      }
-      else
-      {
-          MITK_ERROR << "Invalid <Geometry3D> tag encountered. Skipping.";
-      }
-    }
+        // different geometries could have been serialized from a GeometryData
+        // object:
+        std::string tagName = currentElement->Value();
+        if (tagName == "Geometry3D")
+        {
+          Geometry3D::Pointer restoredGeometry = Geometry3DToXML::FromXML(currentElement);
+          if (restoredGeometry.IsNotNull())
+          {
+            GeometryData::Pointer newGeometryData = GeometryData::New();
+            newGeometryData->SetGeometry( restoredGeometry );
+            result.push_back( newGeometryData.GetPointer() );
+          }
+          else
+          {
+            MITK_ERROR << "Invalid <Geometry3D> tag encountered. Skipping.";
+          }
+        }
+        else if (tagName == "ProportionalTimeGeometry")
+        {
+          ProportionalTimeGeometry::Pointer restoredTimeGeometry = ProportionalTimeGeometryToXML::FromXML(currentElement);
+          if (restoredTimeGeometry.IsNotNull())
+          {
+            GeometryData::Pointer newGeometryData = GeometryData::New();
+            newGeometryData->SetTimeGeometry( restoredTimeGeometry );
+            result.push_back( newGeometryData.GetPointer() );
+          }
+          else
+          {
+            MITK_ERROR << "Invalid <ProportionalTimeGeometry> tag encountered. Skipping.";
+          }
+        }
+      } // for child of <GeometryData>
+    } // for <GeometryData>
   }
   else
   {
     mitkThrow() << "Parsing error at line " << doc.ErrorRow() << ", col " << doc.ErrorCol() << ": " << doc.ErrorDesc();
+  }
+
+  if (result.empty())
+  {
+    mitkThrow() << "Did not read a single GeometryData object from input.";
   }
 
   return result;

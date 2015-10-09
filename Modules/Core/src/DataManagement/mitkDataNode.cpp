@@ -185,6 +185,17 @@ void mitk::DataNode::SetRequestedRegion( const itk::DataObject * /*data*/)
 {
 }
 
+mitk::DataNode::PropertyListKeyNames mitk::DataNode::GetPropertyListNames() const
+{
+  PropertyListKeyNames result;
+
+  for (auto entries : m_MapOfPropertyLists)
+    result.push_back( entries.first );
+
+  return result;
+}
+
+
 void mitk::DataNode::CopyInformation(const itk::DataObject * /*data*/)
 {
 }

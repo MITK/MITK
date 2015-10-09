@@ -184,48 +184,42 @@ mitk::DataStorage::Pointer mitk::SceneIOTestScenarioProvider::ComplicatedFamilyS
   // constructing a hierarchy with multiple levels
   // and a couple of multiple parent relations.
 
-  // Source image : http://4.bp.blogspot.com/_57lEz2uo9yw/TTGWNhjsWPI/AAAAAAAAA5M/yMauv61ULXc/s1600/web-technology-family-tree-large.jpg
+  // Anybody, feel free to make this something
+  // meaningful and/or visualize it :-)
 
-  // The red tree
+  DefNode0(Color)
+  DefNode0(White)
 
-  // two real ones
-  DefNode0(Cpp)
-  DefNode0(Basic)
+  DefNode1(Color, Green)
+  DefNode1(Color, Election)
+  DefNode1(Color, Red)
 
-  // descendants
-  DefNode1(Cpp, Java)
-  DefNode1(Cpp, Perl)
-  DefNode1(Cpp, CSharp)
+  DefNode1(Green, Yellow)
 
-  DefNode1(Java, JSP)
+  DefNode1(Election, Looser)
+  DefNode1(Election, FreeBeer)
+  DefNode1(Election, Winner)
 
-  DefNode1(Perl, PHP)
-  DefNode1(Perl, Ruby)
-  DefNode1(Perl, Python)
+  DefNode1(Looser, Tears)
+  DefNode1(Looser, Anger)
 
-  DefNode1(PHP, OOPHP)
-  DefNode1(PHP, PHPLibs)
+  DefNode1(FreeBeer, OpenSource);
 
-  DefNode1(Ruby, RubyRails);
+  DefNode1(White, Sweet)
 
-  DefNode1(Basic, VBNet)
+  DefNode2(White, Sweet, Sugar)
+  DefNode2(Red, Sweet, Tomatoe)
+  DefNode2(Tomatoe, Sugar, Ketchup)
 
-  // interesting ones
-  DefNode2(Basic, VBNet, VBScript)
-  DefNode2(CSharp, VBNet, ASPNet)
-  DefNode2(ASPNet, VBScript, ClassicASP)
+  DefNode1(Ketchup, BBQSauce)
+  DefNode1(Tomatoe, ATLAS)
 
-  DefNode1(ClassicASP, SHTML_SSI)
-  DefNode1(ASPNet, ATLAS)
+  DefNode0(Fish)
+  DefNode0(OperatingSystem)
+  DefNode1(Fish, Bird)
+  DefNode1(Bird, Penguin)
 
-  // some green items
-  DefNode0(ECMAScript)
-  DefNode0(XHTML)
-  DefNode1(ECMAScript, JavaScript)
-  DefNode1(JavaScript, DHTML)
-
-  // finally
-  DefNode3(DHTML, XHTML, RubyRails, Ajax)
+  DefNode3(Penguin, OperatingSystem, OpenSource, Linux)
 
   return storage;
 }

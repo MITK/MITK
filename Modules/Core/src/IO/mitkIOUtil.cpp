@@ -333,8 +333,10 @@ struct IOUtil::Impl
 std::string IOUtil::GetProgramPath()
 {
   char path[512];
+  char oem[512];
   std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
-  return std::string(path, index);
+  CharToOemA(path, oem);
+  return std::string(oem, strlen(oem));
 }
 #elif defined(US_PLATFORM_APPLE)
 #include <mach-o/dyld.h>

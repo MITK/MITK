@@ -126,19 +126,30 @@ std::string mitk::DataStorageCompare::GenerateHierarchyDescriptor(mitk::DataNode
   std::string thisNodesDescriptor = GenerateNodeDescriptor(node);
   mitk::DataStorage::SetOfObjects::ConstPointer parents = storage->GetSources(node, nullptr, true); // direct sources without filter
 
-  if (!parents->empty())
+  // construct descriptors for parents
+  std::vector<std::string> parentDescriptors;
+
+  for (auto parent : *parents)
+    parentDescriptors.push_back( GenerateHierarchyDescriptor(parent, storage) );
+
+  // sort descriptors (we don't want to rely on potentially random order of parents)
+  std::sort(parentDescriptors.begin(), parentDescriptors.end());
+
+  // construct a string from all sorted parent descriptors
+  if (!parentDescriptors.empty())
   {
     thisNodesDescriptor += " <(";
-    for (auto parent : *parents)
+    for (auto descriptor : parentDescriptors)
     {
-      if (parent != parents->front()) // join by '+'
+      if (descriptor != parentDescriptors.front()) // join by '+'
       {
         thisNodesDescriptor += " + ";
       }
-      thisNodesDescriptor += GenerateHierarchyDescriptor(parent, storage);
+      thisNodesDescriptor += descriptor;
     }
     thisNodesDescriptor += ")";
   }
+
 
   return thisNodesDescriptor;
 }

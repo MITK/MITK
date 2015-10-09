@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkBaseDataEqual_h_included
-#define mitkBaseDataEqual_h_included
+#ifndef mitkBaseDataCompare_h_included
+#define mitkBaseDataCompare_h_included
 
 #include "mitkBaseData.h"
 
@@ -39,14 +39,14 @@ namespace mitk
  *
  * To re-use what already has been implemented in various mitk::Equal()
  * functions, this interface is accompanied by a template class
- * BaseDataEqualT which makes use of an existing mitk::Equal() method.
+ * BaseDataCompareT which makes use of an existing mitk::Equal() method.
  *
  * \warning Current convention: service instances are described by a "basedata" property
  *          that contains the GetNameOfClass() string of the BaseData type that can be
  *          compared by this instance. mitk::DataStorageCompare uses this convention.
  *
  */
-class BaseDataEqual
+class BaseDataCompare
 {
 private:
 
@@ -86,14 +86,14 @@ public:
 };
 
 /**
- * \brief Implementation of BaseDataEqual that uses mitk:Equal() for comparisons.
+ * \brief Implementation of BaseDataCompare that uses mitk:Equal() for comparisons.
  *
  * See base class for details!
  *
- * \sa BaseDataEqual
+ * \sa BaseDataCompare
  */
 template <class T>
-class BaseDataEqualT : public BaseDataEqual
+class BaseDataCompareT : public BaseDataCompare
 {
 private:
 
@@ -108,7 +108,7 @@ private:
     }
     catch (const std::exception& e)
     {
-      MITK_ERROR << "Bad cast in BaseDataEqualT<>::InternalAreEqual()" << e.what();
+      MITK_ERROR << "Bad cast in BaseDataCompareT<>::InternalAreEqual()" << e.what();
     }
 
     return false;
@@ -116,17 +116,17 @@ private:
 };
 
 /**
- * \brief Implementation of BaseDataEqual that uses a non-const version of mitk:Equal() for comparisons.
+ * \brief Implementation of BaseDataCompare that uses a non-const version of mitk:Equal() for comparisons.
  *
  * See base class for details!
  *
  * This version is currently used for mitk::Surface only, which is unable to compare
  * two const versions of Surface.
  *
- * \sa BaseDataEqual
+ * \sa BaseDataCompare
  */
 template <class T>
-class BaseDataEqualTNonConst : public BaseDataEqual
+class BaseDataCompareTNonConst : public BaseDataCompare
 {
 private:
 
@@ -144,7 +144,7 @@ private:
     }
     catch (const std::exception& e)
     {
-      MITK_ERROR << "Bad cast in BaseDataEqualTNonConst<>::InternalAreEqual(): " << e.what();
+      MITK_ERROR << "Bad cast in BaseDataCompareTNonConst<>::InternalAreEqual(): " << e.what();
     }
 
     return false;

@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
 
-bool mitk::BaseDataEqual::AreEqual(const BaseData* left, const BaseData* right, ScalarType eps, bool verbose)
+bool mitk::BaseDataCompare::AreEqual(const BaseData* left, const BaseData* right, ScalarType eps, bool verbose)
 {
   // Do basic tests that are valid for all types here.
   // Let specializations only implement a meaningful
@@ -42,7 +42,7 @@ bool mitk::BaseDataEqual::AreEqual(const BaseData* left, const BaseData* right, 
   return false;
 }
 
-bool mitk::BaseDataEqual::AreSameClasses(const BaseData* left, const BaseData* right, bool verbose)
+bool mitk::BaseDataCompare::AreSameClasses(const BaseData* left, const BaseData* right, bool verbose)
 {
   if (left == nullptr && right == nullptr)
     return true;
@@ -74,30 +74,30 @@ bool mitk::BaseDataEqual::AreSameClasses(const BaseData* left, const BaseData* r
 }
 
 
-void mitk::BaseDataEqual::RegisterCoreEquals()
+void mitk::BaseDataCompare::RegisterCoreEquals()
 {
   static bool comparatorsCreated = false;
   if (!comparatorsCreated)
   {
-    static BaseDataEqualT<Image> imageEqual;
+    static BaseDataCompareT<Image> imageEqual;
     us::ServiceProperties imageProperties;
     imageProperties["basedata"] = std::string(Image::GetStaticNameOfClass());
-    us::GetModuleContext()->RegisterService<BaseDataEqual>(&imageEqual, imageProperties);
+    us::GetModuleContext()->RegisterService<BaseDataCompare>(&imageEqual, imageProperties);
 
-    static BaseDataEqualTNonConst<Surface> surfaceEqual;
+    static BaseDataCompareTNonConst<Surface> surfaceEqual;
     us::ServiceProperties surfaceProperties;
     surfaceProperties["basedata"] =std::string(Surface::GetStaticNameOfClass());
-    us::GetModuleContext()->RegisterService<BaseDataEqual>(&surfaceEqual, surfaceProperties);
+    us::GetModuleContext()->RegisterService<BaseDataCompare>(&surfaceEqual, surfaceProperties);
 
-    static BaseDataEqualT<PointSet> pointsetEqual;
+    static BaseDataCompareT<PointSet> pointsetEqual;
     us::ServiceProperties pointsetProperties;
     pointsetProperties["basedata"] = std::string(PointSet::GetStaticNameOfClass());
-    us::GetModuleContext()->RegisterService<BaseDataEqual>(&pointsetEqual, pointsetProperties);
+    us::GetModuleContext()->RegisterService<BaseDataCompare>(&pointsetEqual, pointsetProperties);
 
-    static BaseDataEqualT<GeometryData> geometryDataEqual;
+    static BaseDataCompareT<GeometryData> geometryDataEqual;
     us::ServiceProperties geometryDataProperties;
     geometryDataProperties["basedata"] = std::string(GeometryData::GetStaticNameOfClass());
-    us::GetModuleContext()->RegisterService<BaseDataEqual>(&geometryDataEqual, geometryDataProperties);
+    us::GetModuleContext()->RegisterService<BaseDataCompare>(&geometryDataEqual, geometryDataProperties);
 
     comparatorsCreated = true;
   }

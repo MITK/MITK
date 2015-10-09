@@ -39,7 +39,7 @@ mitk::DataStorageCompare::DataStorageCompare(const mitk::DataStorage* reference,
 , m_InteractorsPassed(true)
 , m_AspectsFailed(0)
 {
-  BaseDataEqual::RegisterCoreEquals();
+  BaseDataCompare::RegisterCoreEquals();
 }
 
 bool mitk::DataStorageCompare::CompareVerbose()
@@ -280,7 +280,7 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
   try
   {
     std::string ldapFilter = std::string("(basedata=") + reference->GetNameOfClass() + "*)";
-    std::vector<us::ServiceReference<BaseDataEqual>> comparators = us::GetModuleContext()->GetServiceReferences<BaseDataEqual>(ldapFilter);
+    std::vector<us::ServiceReference<BaseDataCompare>> comparators = us::GetModuleContext()->GetServiceReferences<BaseDataCompare>(ldapFilter);
     if (comparators.empty())
     {
       // bad, no comparator found, cannot compare
@@ -293,7 +293,7 @@ bool mitk::DataStorageCompare::IsDataEqual(const mitk::BaseData* reference, cons
       // bad, multiple comparators, need to add ranking or something
     }
 
-    BaseDataEqual* comparator = us::GetModuleContext()->GetService<BaseDataEqual>( comparators.front() );
+    BaseDataCompare* comparator = us::GetModuleContext()->GetService<BaseDataCompare>( comparators.front() );
     if (!comparator)
     {
       MITK_ERROR << "Service lookup error, cannot get comparator for class " << reference->GetNameOfClass();

@@ -103,7 +103,7 @@ class Ua(object):
             536.8726 * 10 ** -5 * \
             self.eBc(wavelength)
 
-        return  ua_haemoglobin + ua_bilirubin + ua_beta_carotin
+        return  ua_haemoglobin  # + ua_bilirubin + ua_beta_carotin
 
 
 

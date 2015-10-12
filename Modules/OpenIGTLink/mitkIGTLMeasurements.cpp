@@ -56,70 +56,69 @@ mitk::IGTLMeasurements* mitk::IGTLMeasurements::GetInstance()
   }
 }
 
-
 mitk::IGTLMeasurements::~IGTLMeasurements()
 {
 }
 
 void mitk::IGTLMeasurements::AddMeasurement(unsigned int measurementPoint, unsigned int index, long long timestamp)
 {
-  if (timestamp==0) {timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();}
-   if (m_IsStarted)
-   {
-     m_MeasurementPoints[measurementPoint].push_back(TimeStampIndexPair(timestamp,index));
-   }
+  if (timestamp == 0) { timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count(); }
+  if (m_IsStarted)
+  {
+    m_MeasurementPoints[measurementPoint].push_back(TimeStampIndexPair(timestamp, index));
+  }
 }
 
 bool mitk::IGTLMeasurements::ExportData(std::string filename)
 {
-   //open file
-   std::ostream* out = new std::ofstream(filename.c_str());
+  //open file
+  std::ostream* out = new std::ofstream(filename.c_str());
 
-   //save old locale
-   char * oldLocale;
-   oldLocale = setlocale(LC_ALL, nullptr);
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale(LC_ALL, nullptr);
 
-   //define own locale
-   std::locale C("C");
-   setlocale(LC_ALL, "C");
+  //define own locale
+  std::locale C("C");
+  setlocale(LC_ALL, "C");
 
-   //write header
-   unsigned int numberOfMeasurementPoints = (unsigned int)m_MeasurementPoints.size();
-   *out << numberOfMeasurementPoints << "\n";
+  //write header
+  unsigned int numberOfMeasurementPoints = (unsigned int)m_MeasurementPoints.size();
+  *out << numberOfMeasurementPoints << "\n";
 
-   if (numberOfMeasurementPoints == 0)
-   {
-      delete out;
-      return false;
-   }
+  if (numberOfMeasurementPoints == 0)
+  {
+    delete out;
+    return false;
+  }
 
-   out->precision(15); // rounding precision because we don't want to loose data.
+  out->precision(15); // rounding precision because we don't want to loose data.
 
-   //define an offset that will be subtracted from all timestamps in order to save space
-   long long offset = m_MeasurementPoints.begin()->second.front().first;
-   //the offset shall be the first entry in the map but without its last 6 digits
-   //timestamp is given in microseconds (?)
-   //offset = offset - offset % 1000000;
+  //define an offset that will be subtracted from all timestamps in order to save space
+  long long offset = m_MeasurementPoints.begin()->second.front().first;
+  //the offset shall be the first entry in the map but without its last 6 digits
+  //timestamp is given in microseconds (?)
+  //offset = offset - offset % 1000000;
 
-   //for each entry of the map
-   for (auto entry : m_MeasurementPoints)
-   {
-     *out << entry.second.size() << ";";
-     *out << entry.first << ";";
-     for (TimeStampIndexPair timestampIndexPair : entry.second)
-     {
-       *out << ( timestampIndexPair.first ) << ";";
-       *out << ( timestampIndexPair.second ) << ";";
-     }
-     *out << "\n";
-   }
+  //for each entry of the map
+  for (auto entry : m_MeasurementPoints)
+  {
+    *out << entry.second.size() << ";";
+    *out << entry.first << ";";
+    for (TimeStampIndexPair timestampIndexPair : entry.second)
+    {
+      *out << (timestampIndexPair.first) << ";";
+      *out << (timestampIndexPair.second) << ";";
+    }
+    *out << "\n";
+  }
 
-   out->flush();
-   delete out;
-   //switch back to old locale
-   setlocale(LC_ALL, oldLocale);
+  out->flush();
+  delete out;
+  //switch back to old locale
+  setlocale(LC_ALL, oldLocale);
 
-   return true;
+  return true;
 }
 
 void mitk::IGTLMeasurements::Reset()

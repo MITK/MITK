@@ -254,11 +254,9 @@ int mitkNavigationDataToIGTLMessageFilterTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("NavigationDataToIGTLMessageFilter");
 
-  //COMP: This test is not suitable for now. Suitable tests will follow soon.
-
-  //NavigationDataToIGTLMessageFilterContructor_DefaultCall_IsNotEmpty();
-  //TestModeQTransMsg();
-  //TestModeTransMsg();
+  NavigationDataToIGTLMessageFilterContructor_DefaultCall_IsNotEmpty();
+  TestModeQTransMsg();
+  TestModeTransMsg();
 
   MITK_TEST_END();
 }

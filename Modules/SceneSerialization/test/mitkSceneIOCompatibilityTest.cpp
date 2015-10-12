@@ -32,7 +32,7 @@ int mitkSceneIOCompatibilityTest(int argc, char* argv[])
   // Compare rendering to reference image.
   MITK_TEST_BEGIN("mitkSceneIOCompatibilityTest")
 
-  mitk::RenderingTestHelper renderingHelper(150, 150, argc, argv);
+  mitk::RenderingTestHelper renderingHelper(200, 200, argc, argv);
 
   // Usage of CompareRenderWindowAgainstReference: See documentation of mitkRenderingTestHelper
   MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true,

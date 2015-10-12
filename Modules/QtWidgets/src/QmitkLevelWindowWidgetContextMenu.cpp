@@ -133,8 +133,8 @@ void QmitkLevelWindowWidgetContextMenu::setDefaultScaleRange()
 void QmitkLevelWindowWidgetContextMenu::changeScaleRange()
 {
   QmitkLevelWindowRangeChangeDialog changeRange(this);
-  changeRange.setLowerLimit((int)m_LevelWindow.GetRangeMin());
-  changeRange.setUpperLimit((int)m_LevelWindow.GetRangeMax());
+  changeRange.setLowerLimit((mitk::ScalarType)m_LevelWindow.GetRangeMin());
+  changeRange.setUpperLimit((mitk::ScalarType)m_LevelWindow.GetRangeMax());
   if(changeRange.exec())
   {
     m_LevelWindow.SetRangeMinMax(changeRange.getLowerLimit(), changeRange.getUpperLimit());

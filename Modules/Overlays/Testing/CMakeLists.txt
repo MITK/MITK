@@ -4,11 +4,9 @@ if(TARGET ${TESTDRIVER})
 
   if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in ubuntu, yet, we build them only for other systems or if the user explicitly sets the variable MITK_ENABLE_RENDERING_TESTING
 
-  if (NOT APPLE)
   mitkAddCustomModuleTest(mitkLabelOverlay3DRendering2DTest mitkLabelOverlay3DRendering2DTest #OverlayTest
                           -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering2DTest.png #corresponding reference screenshot
   )
-  endif()
 
   #mitkAddCustomModuleTest(mitkLabelOverlay3DRendering3DTest mitkLabelOverlay3DRendering3DTest #OverlayTest
   #                        -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/mitkLabelOverlay3DRendering3DTest.png #corresponding reference screenshot

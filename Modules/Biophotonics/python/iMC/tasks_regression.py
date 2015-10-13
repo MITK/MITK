@@ -30,15 +30,15 @@ import tasks_mc as mc
 
 def extract_mc_data(batch):
     batch = pickle.load(open(batch, 'r'))
+    # in case there are bands to sort out, discard them here
+    batch.reflectances = imgmani.sortout_bands(batch.reflectances,
+                                              sp.bands_to_sortout)
     # create fake msi to be able to use normalizer
     fake_msi = Msi(image=batch.reflectances)
     # if normalizer which requires wavelengths is needed these have to be
     # added here
     standard_normalizer.normalize(fake_msi)
     batch.reflectances = fake_msi.get_image()
-    # in case there are bands to sort out, discard them here
-    batch.reflectances = imgmani.sortout_bands(batch.reflectances,
-                                              sp.bands_to_sortout)
     # scaled_reflectances = preprocessing.scale(reflectances)
     return batch.mucosa, batch.reflectances
 
@@ -145,7 +145,6 @@ class TrainForestForwardModel(luigi.Task):
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
-                                              sp.FINALS_FOLDER,
                                               "rf_forward_" +
                                               self.batch_prefix))
 

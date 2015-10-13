@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkVectorProperty_h
 
 // MITK
-#include "MitkVectorPropertiesExports.h"
-#include "mitkBaseProperty.h"
+#include <MitkCoreExports.h>
+#include <mitkBaseProperty.h>
 
 // STL
 #include <vector>
@@ -53,7 +53,7 @@ struct VectorPropertyDataType {
   comments in code).
 */
 template <typename DATATYPE>
-class MITKVECTORPROPERTIES_EXPORT VectorProperty : public BaseProperty
+class MITKCORE_EXPORT VectorProperty : public BaseProperty
 {
 public:
 

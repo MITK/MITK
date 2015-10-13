@@ -64,7 +64,6 @@ set(mitk_modules
   IOExt
   XNAT
   TubeGraph
-  VectorProperties
 )
 
 if(MITK_ENABLE_PIC_READER)

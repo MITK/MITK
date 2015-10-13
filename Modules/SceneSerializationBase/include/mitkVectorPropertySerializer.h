@@ -43,7 +43,7 @@ namespace mitk {
   should usually suffice.
 */
 template< typename DATATYPE >
-class VectorPropertySerializer : public BasePropertySerializer
+class MITKSCENESERIALIZATIONBASE_EXPORT VectorPropertySerializer : public BasePropertySerializer
 {
 public:
 

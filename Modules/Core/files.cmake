@@ -158,6 +158,7 @@ set(CPP_FILES
   DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkVector.cpp
+  DataManagement/mitkVectorProperty.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp
   DataManagement/mitkVtkRepresentationProperty.cpp
   DataManagement/mitkVtkResliceInterpolationProperty.cpp

@@ -28,5 +28,6 @@ set(CPP_FILES
   mitkUIntPropertySerializer.cpp
   mitkUShortPropertySerializer.cpp
   mitkVector3DPropertySerializer.cpp
+  mitkVectorPropertySerializer.cpp
 )
 

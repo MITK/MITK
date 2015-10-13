@@ -120,7 +120,6 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
   if (allSerializers.size() < 1)
   {
     MITK_ERROR << "No serializer found for " << property->GetNameOfClass() << ". Skipping object";
-    m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
   }
   if (allSerializers.size() > 1)
   {
@@ -140,23 +139,31 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
         if (valueelement)
         {
           keyelement->LinkEndChild( valueelement );
-          // \TODO: put 'return keyelement;' here?
-        }
-        else
-        {
-          m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
         }
       }
       catch (std::exception& e)
       {
         MITK_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
-        m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
         // \TODO: log only if all potential serializers fail?
       }
       break;
     }
+    else
+    {
+      MITK_ERROR << "Found a serializer called '" << (*iter)->GetNameOfClass() << "' that does not implement the BasePropertySerializer interface.";
+      continue;
+    }
   }
-  return keyelement;
+
+  if (keyelement->NoChildren())
+  {
+    m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
+    return nullptr;
+  }
+  else
+  {
+    return keyelement;
+  }
 }
 
 mitk::PropertyList* mitk::PropertyListSerializer::GetFailedProperties()

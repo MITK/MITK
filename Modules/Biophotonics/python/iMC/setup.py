@@ -19,6 +19,6 @@ setup(name='MultiSpectralImaging',
       package_dir={},
       package_data={'data':['*.txt', '*.mci', '*.nrrd']},
       install_requires=['numpy>=1.8.2', 'scipy>=0.15.1', 'SimpleITK>=0.9.0',
-                        'skimage'],
+                        'skimage', 'pypng'],
       entry_points={}  # for scripts, add later
      )

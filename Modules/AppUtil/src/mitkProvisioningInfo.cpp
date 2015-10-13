@@ -54,8 +54,14 @@ QList<QUrl> ProvisioningInfo::getPluginsToStart() const
 
 void ProvisioningInfo::readProvisioningFile(const std::string& filePath)
 {
-  QFile file(QFile::decodeName(filePath.c_str()));
-  file.open(QFile::ReadOnly);
+  QFile file(QString(filePath.c_str()));
+  if (!file.open(QFile::ReadOnly)) {
+    MITK_INFO << "Error open file!";
+    MITK_INFO << file.errorString().toStdString();
+
+    return;
+  }
+
   QTextStream fileStream(&file);
   QRegExp sep("\\s+");
   QString line;

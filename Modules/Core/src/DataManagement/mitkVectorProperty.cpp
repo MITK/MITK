@@ -45,12 +45,36 @@ itk::LightObject::Pointer VectorProperty<DATATYPE>::InternalClone() const
 template <typename DATATYPE>
 std::string VectorProperty<DATATYPE>::GetValueAsString() const
 {
-  std::stringstream value_collector;
-  for ( int i = 0; i < m_PropertyContent.size(); i++ )
+  const size_t displayBlockLength = 3;
+  size_t beginningElementsCount = displayBlockLength;
+  size_t endElementsCount = displayBlockLength;
+
+  if (m_PropertyContent.size() <= 2 * displayBlockLength)
   {
-      value_collector << m_PropertyContent[i] << ",";
+    beginningElementsCount = m_PropertyContent.size();
+    endElementsCount = 0;
   }
-  return value_collector.str();
+
+  // return either a block of all items
+  // if the total number of maximum 2*displayBlockLength
+  //
+  // or return the first and last "displayBlockLength"
+  // number of items separated by "[...]";
+  std::stringstream string_collector;
+  for ( size_t i = 0; i < beginningElementsCount; i++ )
+    string_collector << m_PropertyContent[i] << "\n";
+  if (endElementsCount)
+    string_collector << "[... " << m_PropertyContent.size() - 2*displayBlockLength << " more]\n";
+  for ( size_t i = m_PropertyContent.size() - endElementsCount; i < m_PropertyContent.size(); ++i )
+    string_collector << m_PropertyContent[i] << "\n";
+
+  std::string return_value = string_collector.str();
+
+  // remove last '\n'
+  if (!return_value.empty())
+    return_value.erase( return_value.size() - 1 );
+
+  return return_value;
 }
 
 

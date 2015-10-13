@@ -87,7 +87,14 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self)
 
-  /// Returns the property value as a std::string
+  /// Returns the property value as a std::string.
+  ///
+  /// Since VectorProperty potentially holds many
+  /// elements, it implements this function in a way
+  /// that only the first and the last couple of
+  /// elements really appear in the string.
+  /// Missing central elements are indicated by
+  /// an ellipsis ("...")
   virtual std::string GetValueAsString() const override;
 
   /// returns a const reference to the contained vector

@@ -28,7 +28,8 @@ import msi.normalize as norm
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2014_12_08_Neil_Pig_Oxygenation_Experiments/organized_recordings"
-sp.FINALS_FOLDER = "Oxy"
+sp.DATA_FOLDER = "colon_images3"
+sp.FINALS_FOLDER = "Oxy3"
 
 def resort_wavelengths(msi):
     """Neil organized his wavelengths differently.
@@ -53,7 +54,10 @@ class NeilCreateOxyImageTask(luigi.Task):
         return NeilEstimateTissueParametersTask(image_prefix=self.image_prefix,
                                             batch_prefix=
                                             self.batch_prefix), \
-            NeilCorrectImagingSetupTask(image_prefix=self.image_prefix)
+            NeilCorrectImagingSetupTask(image_prefix=self.image_prefix), \
+            NeilReprojectReflectancesTask(image_prefix=self.image_prefix,
+                                      batch_prefix=
+                                      self.batch_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -125,6 +129,32 @@ class NeilEstimateTissueParametersTask(luigi.Task):
         sitk.WriteImage(sitk_image, self.output().path)
 
 
+class NeilReprojectReflectancesTask(luigi.Task):
+    image_prefix = luigi.Parameter()
+    batch_prefix = luigi.Parameter()
+
+    def requires(self):
+        return NeilEstimateTissueParametersTask(image_prefix=self.image_prefix,
+                                            batch_prefix=
+                                            self.batch_prefix), \
+            rt.TrainForestForwardModel(batch_prefix=
+                        self.batch_prefix)
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
+                                              sp.FINALS_FOLDER,
+                                              self.image_prefix +
+                                              "_backprojection_" +
+                                              self.batch_prefix +
+                                              "estimate.nrrd"))
+
+    def run(self):
+        sitk_image = at.estimate_image(self.input()[0].path, self.input()[1].path)
+        outFile = self.output().open('w')
+        outFile.close()
+        sitk.WriteImage(sitk_image, self.output().path)
+
+
 class NeilPreprocessMSI(luigi.Task):
     image_prefix = luigi.Parameter()
 
@@ -154,6 +184,7 @@ class NeilCorrectImagingSetupTask(luigi.Task):
     def requires(self):
         return MultiSpectralImageFromPNGFiles(image_prefix=self.image_prefix), \
             FlatfieldFromPNGFiles()
+
 
 
     def output(self):
@@ -242,7 +273,7 @@ if __name__ == '__main__':
         main_task = NeilCreateOxyImageTask(
             image_prefix=f,
             batch_prefix=
-            "new_batch_jacques_and_billi")
+            "jacques_no_billi_generic_scattering_")
         w.add(main_task)
     w.run()
 

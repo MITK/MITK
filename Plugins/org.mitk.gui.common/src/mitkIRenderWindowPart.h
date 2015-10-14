@@ -65,7 +65,8 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   static const QString DECORATION_BORDER; // = "border"
   static const QString DECORATION_LOGO; // = "logo"
   static const QString DECORATION_MENU; // = "menu"
-  static const QString DECORATION_BACKGROUND; // = "background;
+  static const QString DECORATION_BACKGROUND; // = "background"
+  static const QString DECORATION_CORNER_ANNOTATION; // = "corner annotation"
 
   virtual ~IRenderWindowPart();
 

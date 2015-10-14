@@ -132,6 +132,8 @@ public:
 
   void SetCornerAnnotationVisibility(bool visibility);
 
+  bool IsCornerAnnotationVisible(void) const;
+
 protected:
 
   void UpdateAllWidgets();

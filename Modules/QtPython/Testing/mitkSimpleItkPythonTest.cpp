@@ -191,6 +191,12 @@ public:
 
   void testSimpleITKMedianFilterSnippet()
   {
+    std::string code =
+        "import SimpleITK as sitk\n"
+        "filter = sitk.MedianImageFilter()\n"
+        "filter.SetRadius(1)\n"
+        "mitkImage_new = filter.Execute(mitkImage)";
+
     // simple itk median filter in cpp
     sitk::MedianImageFilter medianFilter;
     medianFilter.SetRadius(1);
@@ -202,7 +208,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.", m_PythonService->CopyToPythonAsSimpleItkImage(m_Image, "mitkImage") == true );
 
-    m_PythonService->Execute( m_Snippets["medianfilter"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+    m_PythonService->Execute( code, mitk::IPythonService::MULTI_LINE_COMMAND );
     CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
 
     mitk::Image::Pointer pythonImage = m_PythonService->CopySimpleItkImageFromPython("mitkImage_new");

@@ -22,13 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkDecimatePro.h>
 
 #include <mitkCommonPythonTest.h>
+#include <QmitkPythonSnippets.h>
 
 class mitkVtkPythonTestSuite : public mitk::CommonPythonTestSuite
 {
   CPPUNIT_TEST_SUITE(mitkVtkPythonTestSuite);
   MITK_TEST(testSurfaceTransfer);
   MITK_TEST(testVtkCreateConePythonSnippet);
-  MITK_TEST(testVtkDecimateProPythonSnippet);
+  //MITK_TEST(testVtkDecimateProPythonSnippet);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -48,6 +49,13 @@ public:
 
   void testVtkCreateConePythonSnippet()
   {
+    std::string code =
+        "import vtk\n"
+        "coneSrc = vtk.vtkConeSource()\n"
+        "coneSrc.SetResolution(60)\n"
+        "coneSrc.SetCenter(-2,0,0)\n"
+        "coneSrc.Update()\n"
+        "cone = coneSrc.GetOutput()";
     // cone in cpp
     mitk::Surface::Pointer mitkSurface = mitk::Surface::New();
     vtkSmartPointer<vtkConeSource> coneSrc = vtkSmartPointer<vtkConeSource>::New();
@@ -59,7 +67,7 @@ public:
     // run python code
     CPPUNIT_ASSERT_MESSAGE ( "Is VTK Python Wrapping available?", m_PythonService->IsVtkPythonWrappingAvailable() == true );
 
-    m_PythonService->Execute( m_Snippets["vtk: create cone"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+    m_PythonService->Execute( code, mitk::IPythonService::MULTI_LINE_COMMAND );
     CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
 
     mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython("cone");
@@ -69,6 +77,15 @@ public:
 
   void testVtkDecimateProPythonSnippet()
   {
+    std::string code =
+        "import vtk\n"
+        "deci = vtk.vtkDecimatePro()\n"
+        "deci.SetInputData( mitkSurface )\n"
+        "deci.SetTargetReduction(0.9)\n"
+        "deci.PreserveTopologyOn()\n"
+        "deci.Update()\n"
+        "mitkSurface_new = deci.GetOutput()\n";
+
     // decimate pro in cpp
     mitk::Surface::Pointer mitkSurface = mitk::Surface::New();
     vtkSmartPointer<vtkDecimatePro> deci = vtkSmartPointer<vtkDecimatePro>::New();
@@ -83,7 +100,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE( "Valid surface copied to python import should return true.", m_PythonService->CopyToPythonAsVtkPolyData( m_Surface, "mitkSurface") == true );
 
-    m_PythonService->Execute( m_Snippets["vtk.vtkDecimatePro"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+    m_PythonService->Execute( code, mitk::IPythonService::MULTI_LINE_COMMAND );
     CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
 
     mitk::Surface::Pointer pythonSurface = m_PythonService->CopyVtkPolyDataFromPython("mitkSurface_new");

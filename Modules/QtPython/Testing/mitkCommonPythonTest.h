@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceReference.h>
 //#include <mitkPythonService.h>
 #include <mitkIPythonService.h>
-#include <QmitkPythonSnippets.h>
+//#include <QmitkPythonSnippets.h>
 
 namespace mitk
 {
@@ -40,7 +40,7 @@ protected:
     mitk::Image::Pointer m_Image;
     mitk::Image::Pointer m_Image2D;
     mitk::Surface::Pointer m_Surface;
-    QMap<QString, QString> m_Snippets;
+    //QMap<QString, QString> m_Snippets;
 
 public:
 
@@ -57,7 +57,7 @@ public:
     m_Image2D = mitk::IOUtil::LoadImage(GetTestDataFilePath("Png2D-bw.png"));
     m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("binary.stl"));
 
-    QmitkPythonSnippets::LoadStringMap(QmitkPythonSnippets::DEFAULT_SNIPPET_FILE,m_Snippets);
+    //QmitkPythonSnippets::LoadStringMap(QmitkPythonSnippets::DEFAULT_SNIPPET_FILE,m_Snippets);
   }
 
   void tearDown()

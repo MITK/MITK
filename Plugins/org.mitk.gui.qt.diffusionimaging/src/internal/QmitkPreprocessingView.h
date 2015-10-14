@@ -130,6 +130,9 @@ protected:
   void TemplatedUpdateGui( itk::Image<TPixel, VImageDimension>* itkImage);
 
   template < typename TPixel, unsigned int VImageDimension >
+  void TemplatedUpdateGui( itk::VectorImage<TPixel, VImageDimension>* itkImage);
+
+  template < typename TPixel, unsigned int VImageDimension >
   void TemplatedResampleImage( itk::Image<TPixel, VImageDimension>* itkImage);
 
   template < typename TPixel, unsigned int VImageDimension >

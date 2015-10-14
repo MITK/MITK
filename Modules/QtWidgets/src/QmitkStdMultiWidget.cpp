@@ -632,6 +632,11 @@ void QmitkStdMultiWidget::SetCornerAnnotationVisibility(bool visibility)
   }
 }
 
+bool QmitkStdMultiWidget::IsCornerAnnotationVisible(void) const
+{
+  return m_CornerAnnotations[0]->GetVisibility() > 0;
+}
+
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(unsigned int number)
 {
   switch (number) {

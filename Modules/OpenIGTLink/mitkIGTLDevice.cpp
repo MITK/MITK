@@ -341,7 +341,7 @@ void mitk::IGTLDevice::RunCommunication(void (IGTLDevice::*ComFunction)(void), i
       localStopCommunication = m_StopCommunication;
       this->m_StopCommunicationMutex->Unlock();
 
-      // time to relax
+      // time to relax, this sets the maximum ever possible framerate to 1000 Hz
       itksys::SystemTools::Delay(1);
     }
   }

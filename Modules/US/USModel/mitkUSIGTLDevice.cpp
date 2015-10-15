@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUSIGTLDevice.h>
 
 mitk::USIGTLDevice::USIGTLDevice(std::string manufacturer, std::string model,
-                                 std::string host, int port, bool server)
+  std::string host, int port, bool server)
   : mitk::USDevice(manufacturer, model), m_Host(host), m_Port(port)
 {
   if (server)

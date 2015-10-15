@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Start Predict" << std::endl;
     classifier.PredictInvasion(testCollection, features);
 
-    if (outputFolder != "") {
+    if (false && outputFolder != "") {
         std::cout << "Saving files to " << outputFolder << std::endl;
         mitk::CollectionWriter::ExportCollectionToFolder(trainCollection,
                                                         "/tmp/dumple");

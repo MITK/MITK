@@ -172,6 +172,139 @@ void mitk::TumorInvasionClassification::SelectTrainingSamples(mitk::DataCollecti
     MITK_INFO << "Training with Samples #Tumor " << tumor << " / healthy # "<< healthy;
   }
     break;
+  case 2:
+  {
+    MITK_INFO << " Selection Mode " << mode << " Weighted with ratio";
+
+    EnsureDataImageInCollection(collection, m_TumorID, "WEIGHTS");
+
+    CollectionDilation::DilateBinaryByName(collection,m_TargetID,1,0,"EXCLUDE");
+    CollectionDilation::ErodeBinaryByName(collection,m_TargetID,1,0,"ERODE");
+    CollectionDilation::DilateBinaryByName(collection,m_TargetID+"EXCLUDE",m_TargetDil2D,m_TargetDil3D,"TRAIN");
+    DataCollectionImageIterator<unsigned char,3> gtvIter(collection, m_TumorID);
+    DataCollectionImageIterator<unsigned char,3> brainMaskIter(collection, m_MaskID);
+    DataCollectionImageIterator<unsigned char,3> targetIter(collection, m_TargetID);
+    DataCollectionImageIterator<unsigned char,3> targetDil(collection, m_TargetID+"EXCLUDETRAIN");
+    DataCollectionImageIterator<unsigned char,3> excludeTumorIter(collection, m_TargetID+"ERODE");
+    DataCollectionImageIterator<unsigned char,3> excludeHealthyIter(collection, m_TargetID+"EXCLUDE");
+
+    DataCollectionImageIterator<double,3> weightsIter(collection, "WEIGHTS");
+
+    // Count Healthy/ Tumor voxels
+    // i.o. to decide how many of each are taken
+    double totalTumor = 0;
+    double totalHealthyClose = 0;
+    double totalHealthyNonClose= 0;
+    double totalHealthy= 0;
+
+    while (!brainMaskIter.IsAtEnd())
+    {
+      if (brainMaskIter.GetVoxel() != 0)
+      {
+        if (targetIter.GetVoxel() == 1 && gtvIter.GetVoxel() == 0  && excludeTumorIter.GetVoxel() == 1)
+          ++totalTumor;
+
+        if (excludeHealthyIter.GetVoxel() == 0 && targetDil.GetVoxel()==1 && gtvIter.GetVoxel() == 0)
+          ++totalHealthyClose;
+
+        if (excludeHealthyIter.GetVoxel() == 0  && gtvIter.GetVoxel() == 0 && targetDil.GetVoxel()==0)
+          ++totalHealthyNonClose; // healthy but not close
+
+        if (excludeHealthyIter.GetVoxel() == 0  && gtvIter.GetVoxel() == 0 && targetIter.GetVoxel()==0)
+          ++totalHealthy; // healthy
+      }
+      ++brainMaskIter;
+      ++targetIter;
+      ++targetDil;
+      ++gtvIter;
+      ++excludeHealthyIter;
+      ++excludeTumorIter;
+    }
+    brainMaskIter.ToBegin();
+    targetIter.ToBegin();
+    targetDil.ToBegin();
+    gtvIter.ToBegin();
+    excludeHealthyIter.ToBegin();
+    excludeTumorIter.ToBegin();
+
+
+    // Compute probabilities thresholds for choosing a close healthy voxel / any healthy voxel
+    ScalarType wHealthyClose =  10000.0 / totalHealthyClose;
+    ScalarType wHealthyAny = 5000.0 / totalHealthyNonClose;
+    ScalarType wTumor = (m_ClassRatio * (10000.0+5000.0)) / totalTumor ;
+
+    // DEBUG count occurances to compare
+    double potentialClose = 0;
+    double selectedClose = 0;
+    double tumor = 0;
+    double healthy = 0;
+    while (!brainMaskIter.IsAtEnd())
+    {
+      weightsIter.SetVoxel(0);
+      if (brainMaskIter.GetVoxel() != 0)
+      {
+        if (targetIter.GetVoxel() == 1)
+        { // choose tumor voxels for training
+          if (gtvIter.GetVoxel() == 0 && excludeTumorIter.GetVoxel() == 1) // tumor always
+          {
+            targetIter.SetVoxel(brainMaskIter.GetVoxel()+targetIter.GetVoxel());
+            weightsIter.SetVoxel(wTumor);
+            ++tumor;
+          }
+          else if (gtvIter.GetVoxel() == 0 )
+          {
+            weightsIter.SetVoxel(0); //.1);
+            targetIter.SetVoxel(0); //2);
+          }
+        }
+        else
+        { // choose healty tissue voxels for training
+          if (gtvIter.GetVoxel() == 0 &&  ((excludeHealthyIter.GetVoxel() == 0 && targetDil.GetVoxel()==1 )))
+          {
+              targetIter.SetVoxel(brainMaskIter.GetVoxel()+targetIter.GetVoxel());
+              weightsIter.SetVoxel(wHealthyClose);
+              healthy+=wHealthyClose;
+          }
+          else if (((targetDil.GetVoxel()==0 && excludeHealthyIter.GetVoxel() == 0 )))
+          {
+              targetIter.SetVoxel(brainMaskIter.GetVoxel()+targetIter.GetVoxel());
+              weightsIter.SetVoxel(wHealthyAny);
+              healthy+=wHealthyAny;
+          }
+          else if ((gtvIter.GetVoxel() == 0 &&  excludeHealthyIter.GetVoxel() == 1) )
+          {
+            targetIter.SetVoxel( 0);//brainMaskIter.GetVoxel()+targetIter.GetVoxel());
+            weightsIter.SetVoxel(0);//.1);
+          }
+          else
+          {
+            targetIter.SetVoxel(0);
+            weightsIter.SetVoxel(0);
+          }
+        }
+      }
+      else
+      {
+        targetIter.SetVoxel(0);
+        weightsIter.SetVoxel(0);
+      }
+
+      if (gtvIter.GetVoxel() != 0)
+        targetIter.SetVoxel(0);
+
+      ++brainMaskIter;
+      ++targetIter;
+      ++gtvIter;
+      ++targetDil;
+      ++excludeHealthyIter;
+      ++excludeTumorIter;
+      ++weightsIter;
+    }
+    MITK_INFO << "Training with Samples #Tumor " << tumor << " / healthy # "<< healthy;
+    MITK_INFO << "Potential Close" << potentialClose;
+    MITK_INFO << "Selected Close" << selectedClose;
+  }
+    break;
   default:
   {
     MITK_INFO << " Selection Mode " << mode << " Exclude voxels in border regions, healthy: 50% vicinity / 50% far away";
@@ -500,7 +633,6 @@ void mitk::TumorInvasionClassification::PredictInvasion(mitk::DataCollection *co
       Eigen::MatrixXd prob2 = Probs.col(2);
       mitk::DCUtilities::MatrixToDC3d(prob2, collection, "prob2", m_MaskID);
     }
-
   }
   else
     MITK_ERROR << "TumorInvasionClassification::PredictInvasion - provided collection is NULL.";

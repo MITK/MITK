@@ -41,8 +41,6 @@ void
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<int, VImageDimension> MaskType;
   typedef itk::LabelStatisticsImageFilter<ImageType, MaskType> FilterType;
-  typedef typename FilterType::HistogramType HistogramType;
-  typedef typename HistogramType::IndexType HIndexType;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);

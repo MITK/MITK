@@ -23,8 +23,9 @@ def remove_masked_elements(img):
     # if one reflectance is masked msis are defined to have all refl.
     # masked. Thus we can just have a look at the first column
     one_column = collapsed_image[:, 0]
-    masked_elems = np.where(one_column.mask)
-    collapsed_image = np.delete(collapsed_image, masked_elems, 0)
+    if (isinstance(one_column, np.ma.masked_array)):
+        masked_elems = np.where(one_column.mask)
+        collapsed_image = np.delete(collapsed_image, masked_elems, 0)
     return collapsed_image
 
 

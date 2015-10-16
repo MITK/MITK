@@ -64,10 +64,9 @@ mitk::BaseProperty* mitk::Overlay::GetProperty(const std::string& propertyKey, c
     std::map<const mitk::BaseRenderer*, mitk::PropertyList::Pointer>::const_iterator it;
     //check for the renderer specific property
     it = m_MapOfPropertyLists.find(renderer);
-    if (it != m_MapOfPropertyLists.end()) //found
+    if (it != m_MapOfPropertyLists.cend()) //found
     {
-      mitk::BaseProperty::Pointer property;
-      property = it->second->GetProperty(propertyKey);
+      mitk::BaseProperty::Pointer property = it->second->GetProperty(propertyKey);
       if (property.IsNotNull())//found an enabled property in the render specific list
         return property;
       else //found a renderer specific list, but not the desired property
@@ -81,8 +80,7 @@ mitk::BaseProperty* mitk::Overlay::GetProperty(const std::string& propertyKey, c
   }
   else //no specific renderer given; use the renderer independent one
   {
-    mitk::BaseProperty::Pointer property;
-    property = m_PropertyList->GetProperty(propertyKey);
+    mitk::BaseProperty::Pointer property = m_PropertyList->GetProperty(propertyKey);
     if (property.IsNotNull())
       return property;
   }

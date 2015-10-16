@@ -133,7 +133,7 @@ bool mitk::StandaloneDataStorage::Exists(const mitk::DataNode* node) const
 
 void mitk::StandaloneDataStorage::RemoveFromRelation(const mitk::DataNode* node, AdjacencyList& relation)
 {
-  for (AdjacencyList::const_iterator mapIter = relation.begin(); mapIter != relation.end(); ++mapIter)  // for each node in the relation
+  for (AdjacencyList::const_iterator mapIter = relation.cbegin(); mapIter != relation.cend(); ++mapIter)  // for each node in the relation
     if (mapIter->second.IsNotNull())      // if node has a relation list
     {
       SetOfObjects::Pointer s = const_cast<SetOfObjects*>(mapIter->second.GetPointer());   // search for node to be deleted in the relation list
@@ -158,7 +158,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
   mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
   /* Fill resultset with all objects that are managed by the StandaloneDataStorage object */
   unsigned int index = 0;
-  for (AdjacencyList::const_iterator it = m_SourceNodes.begin(); it != m_SourceNodes.end(); ++it)
+  for (AdjacencyList::const_iterator it = m_SourceNodes.cbegin(); it != m_SourceNodes.cend(); ++it)
     if (it->first.IsNull())
       continue;
     else
@@ -177,7 +177,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   if (onlyDirectlyRelated)
   {
     AdjacencyList::const_iterator it = relation.find(node); // get parents of current node
-    if ((it == relation.end()) || (it->second.IsNull())) // node not found in list or no set of parents
+    if ((it == relation.cend()) || (it->second.IsNull())) // node not found in list or no set of parents
       return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return an empty set
     else
       return this->FilterSetOfObjects(it->second, condition);
@@ -197,7 +197,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
     openlist.pop_back();                      // remove last element, because it gets processed now
     resultset.push_back(current);             // add current element to resultset
     AdjacencyList::const_iterator it = relation.find(current); // get parents of current node
-    if (   (it == relation.end())             // if node not found in list
+    if (   (it == relation.cend())             // if node not found in list
         || (it->second.IsNull())              // or no set of parents available
         || (it->second->Size() == 0))         // or empty set of parents
       continue;                               // then continue with next node in open list
@@ -205,8 +205,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
       for (SetOfObjects::ConstIterator parentIt = it->second->Begin(); parentIt != it->second->End(); ++parentIt) // for each parent of current node
       {
         mitk::DataNode::ConstPointer p = parentIt.Value().GetPointer();
-        if (   !(std::find(resultset.begin(), resultset.end(), p) != resultset.end())   // if it is not already in resultset
-            && !(std::find(openlist.begin(), openlist.end(), p) != openlist.end()))     // and not already in openlist
+        if (   !(std::find(resultset.cbegin(), resultset.cend(), p) != resultset.end())   // if it is not already in resultset
+            && !(std::find(openlist.cbegin(), openlist.cend(), p) != openlist.cend()))     // and not already in openlist
           openlist.push_back(p);                                                        // then add it to openlist, so that it can be processed
       }
   }
@@ -215,13 +215,13 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
   if (condition != NULL)
   {
-    for (std::vector<mitk::DataNode::ConstPointer>::iterator resultIt = resultset.begin(); resultIt != resultset.end(); resultIt++)
+    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin(); resultIt != resultset.cend(); resultIt++)
       if ((*resultIt != node) && (condition->CheckNode(*resultIt) == true))
         realResultset->InsertElement(realResultset->Size(), mitk::DataNode::Pointer(const_cast<mitk::DataNode*>((*resultIt).GetPointer())));
   }
   else
   {
-    for (std::vector<mitk::DataNode::ConstPointer>::iterator resultIt = resultset.begin(); resultIt != resultset.end(); resultIt++)
+    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin(); resultIt != resultset.cend(); resultIt++)
       if (*resultIt != node)
         realResultset->InsertElement(realResultset->Size(), mitk::DataNode::Pointer(const_cast<mitk::DataNode*>((*resultIt).GetPointer())));
   }

@@ -171,7 +171,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     this->PrepareMapperQueue();
 
   //go through the generated list and let the sorted mappers paint
-  for (MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
+  for ( auto it = m_MappersMap.cbegin(); it != m_MappersMap.cend(); it++)
   {
     Mapper * mapper = (*it).second;
     mapper->MitkRender(this, type);
@@ -233,10 +233,10 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
 
   for (DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin(); it != allObjects->End(); ++it)
   {
-    DataNode::Pointer node = it->Value();
+    const DataNode::Pointer node = it->Value();
     if (node.IsNull())
       continue;
-    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+    const mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
 
     if (mapper.IsNull())
       continue;
@@ -438,7 +438,7 @@ mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition, Point3D &world
     it != allObjects->End();
     ++it)
   {
-    DataNode *node = it->Value();
+    const DataNode *node = it->Value();
     if (node == NULL)
       continue;
 

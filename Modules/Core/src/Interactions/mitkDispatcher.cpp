@@ -151,9 +151,9 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
 
     // copy the list to prevent iterator invalidation as executing actions
     // in HandleEvent() can cause the m_Interactors list to be updated
-    std::list<DataInteractor::Pointer> tmpInteractorList( m_Interactors );
-    std::list<DataInteractor::Pointer>::iterator it;
-    for ( it=tmpInteractorList.begin(); it!=tmpInteractorList.end(); ++it )
+    const std::list<DataInteractor::Pointer> tmpInteractorList( m_Interactors );
+    std::list<DataInteractor::Pointer>::const_iterator it;
+    for ( it=tmpInteractorList.cbegin(); it!=tmpInteractorList.cend(); ++it )
     {
       DataInteractor::Pointer dataInteractor = *it;
       if ( (*it)->HandleEvent(event, dataInteractor->GetDataNode()) )
@@ -171,10 +171,10 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
   }
 
   /* Notify InteractionEventObserver  */
-  std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver =
+  const std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver =
       m_EventObserverTracker->GetServiceReferences();
-  for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin();
-       it != listEventObserver.end(); ++it)
+  for (std::vector<us::ServiceReference<InteractionEventObserver> >::const_iterator it = listEventObserver.cbegin();
+       it != listEventObserver.cend(); ++it)
   {
     InteractionEventObserver* interactionEventObserver = m_EventObserverTracker->GetService(*it);
     if (interactionEventObserver != NULL)

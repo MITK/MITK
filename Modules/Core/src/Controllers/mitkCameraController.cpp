@@ -300,6 +300,9 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
       //Transform the camera to the current position (transveral, coronal and saggital plane).
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
     }
+
+    this->Modified();
+
   }
 }
 

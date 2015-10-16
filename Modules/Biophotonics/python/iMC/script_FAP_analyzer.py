@@ -24,6 +24,10 @@ def resort_wavelengths(msi):
     collapsed_image = collapsed_image[:, [2, 1, 0, 3, 4, 5, 6, 7]]
     msi.set_image(np.reshape(collapsed_image, msi.get_image().shape))
 
+# lets sortout the 470 and 480 band in order to prevent disturbances caused
+# by bilirubin
+sp.bands_to_sortout = np.array([1, 4])
+
 # rebind this method since in this recoding the wavelengths got messed up
 sp.resort_wavelengths = resort_wavelengths
 
@@ -47,7 +51,7 @@ if __name__ == '__main__':
         main_task = at.CreateNiceParametricImagesTask(
             imageName=long_exposed_file,
             batch_prefix=
-            "new_batch_jacques_and_billi")
+            "jacques_no_billi_generic_scattering_")
         w.add(main_task)
     w.run()
 

@@ -250,9 +250,9 @@ class SegmentMSI(luigi.Task):
         msi_image = reader.read(self.input()[0].path).get_image()
         preprocessed_msi_image = reader.read(self.input()[1].path).get_image()
         max_low_wavelengths = \
-            np.max(preprocessed_msi_image[:, :, [0, 1, 3, 4, 5]], axis=-1)
+            np.max(preprocessed_msi_image[:, :, [0, 2, 3]], axis=-1)
         min_high_wavelengths = \
-            np.min(preprocessed_msi_image[:, :, [2, 6, 7]], axis=-1)
+            np.min(preprocessed_msi_image[:, :, [1, 4, 5]], axis=-1)
 
         # do "blood test"
         segmentation = max_low_wavelengths < min_high_wavelengths

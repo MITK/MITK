@@ -79,9 +79,9 @@ class Ua(object):
         self.eHbO2, self.eHb = \
             get_haemoglobin_extinction_coefficients()
 
-        self.cBetaCarotinUgProDl = 2000.
+        self.cBetaCarotinUgProDl = 0.  # 2000.
         # g / l
-        self.cBili = 1.23 * 10 ** -2
+        self.cBili = 0.  # 1.23 * 10 ** -2
         self.eBc = get_beta_carotin_extinction_coefficients()
         self.eBili = get_bilirubin_extinction_coefficients()
 
@@ -103,9 +103,29 @@ class Ua(object):
             536.8726 * 10 ** -5 * \
             self.eBc(wavelength)
 
-        return  ua_haemoglobin  # + ua_bilirubin + ua_beta_carotin
+        return  ua_haemoglobin + ua_bilirubin + ua_beta_carotin
 
 
+class UaMuscle():
+    """helper class for setting ua in muscle layer.
+    for ua_sm in the muscle layer we don't use mie theory but the
+    approximation presented in
+    Rowe et al.
+    "Modelling and validation of spectral reflectance for the colon"
+    calculated to retrieve an absorption of 11.2 cm-1 at 515nm
+    """
+
+
+    def __init__(self):
+        self.ua = Ua()
+
+
+    def __call__(self, wavelength):
+        A = 1.7923385088285804
+        self.ua.bvf = 0.1 * A
+        self.ua.saO2 = 0.7
+        self.ua.cHb = 120.
+        return self.ua(wavelength)
 
 
 class UsgJacques(object):
@@ -210,5 +230,24 @@ class UsgMie(object):
 #         # scattering coefficient [m-1]
 #         us = self.dsp / (4. / 3. * self.r ** 3. * math.pi) * cs
 #         g = gsca
+        return us, g
+
+
+
+class UsGMuscle(object):
+    """helper object for setting us in muscle layer.
+    for us in the muscle layer we don't use mie theory but the
+    approximation presented in
+    Rowe et al.
+    "Modelling and validation of spectral reflectance for the colon"
+    """
+
+    def __init__(self):
+        pass
+
+
+    def __call__(self, wavelength):
+        us = 168.52 * (wavelength * 10 ** 9) ** -0.332 / (1. - 0.96) * 100.
+        g = 0.96
         return us, g
 

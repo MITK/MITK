@@ -23,8 +23,9 @@ import random
 import itertools
 
 import scriptpaths as sp
-from mc.tissuemodels import ColonRowe, ColonJacques
+from mc.tissuemodels import ColonJacques
 from mc.sim import SimWrapper, get_diffuse_reflectance
+# from mc.batches import Batch, join_batches
 from msi.io.spectrometerreader import SpectrometerReader
 from msi.io.msiwriter import MsiWriter
 from msi.io.msireader import MsiReader
@@ -80,32 +81,6 @@ class FilterTransmission(luigi.Task):
         # write it
         writer = MsiWriter(filter_transmission)
         writer.write(self.output().path)
-
-
-class Batch(object):
-    """summarizes a batch of simulated mc spectra"""
-
-    def __init__(self):
-        self.reflectances = np.array([])
-        self.mucosa = np.array([])
-        self.submucosa = np.array([])
-        self.nr_photons = np.array([])
-        self.wavelengths = np.array([])
-
-
-
-def join_batches(batch_1, batch_2):
-    """helper method to join two batches"""
-    joined_batch = copy.copy(batch_1)
-    np.append(joined_batch.reflectances, batch_2.reflectances, axis=0)
-    np.append(joined_batch.mucosa, batch_2.mucosa, axis=0)
-    np.append(joined_batch.submucosa, batch_2.submucosa, axis=0)
-    # next two should be the same for two batches from the same experiment
-    np.testing.assert_almost_equal(joined_batch.wavelengths,
-                                          batch_2.wavelengths)
-    np.testing.assert_almost_equal(joined_batch.nr_photons,
-                                          batch_2.nr_photons)
-    return joined_batch
 
 
 class JoinBatches(luigi.Task):
@@ -190,7 +165,8 @@ class CameraBatch(luigi.Task):
 class CreateSpectraTask(luigi.Task):
     batch_prefix = luigi.Parameter()
     batch_nr = luigi.IntParameter()
-    nr_samples = luigi.IntParameter()
+    # the batch which should be created.
+    batch = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,

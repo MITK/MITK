@@ -25,7 +25,7 @@ import itertools
 import scriptpaths as sp
 from mc.tissuemodels import ColonJacques
 from mc.sim import SimWrapper, get_diffuse_reflectance
-# from mc.batches import Batch, join_batches
+from mc.batches import Batch, join_batches
 from msi.io.spectrometerreader import SpectrometerReader
 from msi.io.msiwriter import MsiWriter
 from msi.io.msireader import MsiReader

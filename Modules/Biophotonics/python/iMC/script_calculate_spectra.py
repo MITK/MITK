@@ -12,6 +12,7 @@ import luigi
 
 import scriptpaths as sp
 import tasks_mc
+import mc.factories as mcfac
 
 # general output path config
 sp.ROOT_FOLDER = \
@@ -27,7 +28,8 @@ if __name__ == '__main__':
     for i in BATCH_NUMBERS:
         main_task = tasks_mc.CreateSpectraTask("generic_tissue",
                                          i,
-                                         1000)
+                                         10,
+                                         mcfac.GenericMcFactory())
         w.add(main_task)
         w.run()
 

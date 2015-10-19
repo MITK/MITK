@@ -165,6 +165,7 @@ class CreateSpectraTask(luigi.Task):
     batch_prefix = luigi.Parameter()
     batch_nr = luigi.IntParameter()
     nr_samples = luigi.IntParameter()
+    factory = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -179,12 +180,11 @@ class CreateSpectraTask(luigi.Task):
         self.sim_wrapper.set_mci_filename(MCI_FILENAME)
         self.sim_wrapper.set_mcml_executable(PATH_TO_MCML + EXEC_MCML)
         # setup model
-        factory = GenericMcFactory()
-        self.tissue_model = factory.create_tissue_model()
+        self.tissue_model = self.factory.create_tissue_model()
         self.tissue_model.set_mci_filename(self.sim_wrapper.mci_filename)
         self.tissue_model.set_mco_filename(MCO_FILENAME)
         # setup array in which data shall be stored
-        batch = factory.create_batch_to_simulate()
+        batch = self.factory.create_batch_to_simulate()
         batch.create_parameters(self.nr_samples)
 
         for i in range(batch.nr_elements()):

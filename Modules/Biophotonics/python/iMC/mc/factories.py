@@ -5,7 +5,7 @@ Created on Oct 15, 2015
 '''
 
 from mc.tissuemodels import AbstractTissue, GenericTissue
-from mc.batches import AbstractBatch, GenericBatch
+from mc.batches import AbstractBatch, GenericBatch, VisualizationBatch
 
 
 class AbstractMcFactory(object):
@@ -33,6 +33,19 @@ class GenericMcFactory(AbstractMcFactory):
     def create_batch_to_simulate(self):
         return GenericBatch()
 
+    def __init__(self):
+        '''
+        Constructor
+        '''
+
+
+class VisualizationMcFactory(AbstractMcFactory):
+
+    def create_tissue_model(self):
+        return GenericTissue()
+
+    def create_batch_to_simulate(self):
+        return VisualizationBatch()
 
     def __init__(self):
         '''

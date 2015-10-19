@@ -17,6 +17,7 @@ import luigi
 import scriptpaths as sp
 import tasks_mc
 import mc.plot
+import mc.factories as mcfac
 
 
 # general output path config
@@ -40,7 +41,8 @@ class VisualizeSpectraTask(luigi.Task):
 
     def requires(self):
         return tasks_mc.CreateSpectraTask(self.batch_prefix, self.batch_nr,
-                                    self.nr_samples), \
+                                    self.nr_samples,
+                                    mcfac.VisualizationMcFactory()), \
                tasks_mc.CameraBatch(self.batch_prefix)
 
     def output(self):
@@ -88,7 +90,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("generic_tissue",
+    main_task = VisualizeSpectraTask("visualization_standard",
                                      0, 10)
     w.add(main_task)
     w.run()

@@ -7,7 +7,6 @@ Created on Oct 15, 2015
 import copy
 
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 
 
 class AbstractBatch(object):
@@ -93,6 +92,40 @@ class GenericBatch(AbstractBatch):
         desired_d = 2000. * 10 ** -6
         for l in self.layers:
             l[:, -1] = l[:, -1] / total_d * desired_d
+
+
+class VisualizationBatch(AbstractBatch):
+    """batch used for visualization of different spectra. Feel free to adapt
+    for your visualization purposes."""
+
+    def append_one_layer(self, bvf, saO2, a_mie, a_ray, d, nr_samples):
+        """helper function to create parameters for one layer"""
+        samples = np.zeros((nr_samples, 5))
+        # scale samples to correct ranges
+        samples[:, 0] = bvf
+        samples[:, 1] = saO2
+        samples[:, 2] = a_mie
+        samples[:, 3] = a_ray
+        # d will be normalized later to 2mm total depth
+        samples[:, 4] = d
+        # append as last layer
+        self.layers.append(samples)
+
+    def create_parameters(self, nr_samples):
+        # bvf = np.linspace(0.0, 1., nr_samples)
+        # saO2 = np.linspace(0., 1., nr_samples)
+        # d = np.linspace(175, 735, nr_samples) * 10 ** -6
+        # create three layers with random samples
+        self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
+                              nr_samples)
+        self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
+                              nr_samples)
+        self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
+                              nr_samples)
+        # create empty reflectances matrix
+        self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))
+        # set all weights to 1
+        self.weights = np.ones(nr_samples, dtype=float)
 
 
 def join_batches(batch_1, batch_2):

@@ -1,7 +1,8 @@
+
 import numpy as np
 
-
 from imgmani import collapse_image
+
 
 class Normalize():
 
@@ -34,7 +35,6 @@ class NormalizeMean(Normalize):
         pass
 
     def normalize(self, msi):
-        # todo: guard if iqBand is outside of image dimension
         original_shape = msi.get_image().shape
         collapsed_image = collapse_image(msi.get_image())
         normalized_image = collapsed_image / \

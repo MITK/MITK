@@ -28,7 +28,7 @@ if __name__ == '__main__':
     for i in BATCH_NUMBERS:
         main_task = tasks_mc.CreateSpectraTask("generic_tissue",
                                          i,
-                                         10,
+                                         1000,
                                          mcfac.GenericMcFactory())
         w.add(main_task)
         w.run()

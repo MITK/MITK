@@ -59,13 +59,11 @@ class VisualizeSpectraTask(luigi.Task):
         camera_batch = pickle.load(f)
         f.close()
 
-
         f, axarr = plt.subplots(2, 1)
         # axis to plot the original data c.f. the mcml simulation
         org_ax = axarr[0]
         # axis for plotting the folded spectrum + normalization
         fold_ax = axarr[1]
-
         mc.plot.plot(batch, org_ax)
         mc.plot.plot(camera_batch, fold_ax)
 

@@ -9,8 +9,6 @@ import numpy as np
 
 from scipy.interpolate import interp1d
 
-import mc.bhmie_herbert_kaiser_july2012 as bhmie
-
 def get_haemoglobin_extinction_coefficients(reference_filename=None):
     """
     helper method to get reference data for eHbO2 and eHb from Scott Prahls
@@ -114,11 +112,8 @@ class UaMuscle():
     "Modelling and validation of spectral reflectance for the colon"
     calculated to retrieve an absorption of 11.2 cm-1 at 515nm
     """
-
-
     def __init__(self):
         self.ua = Ua()
-
 
     def __call__(self, wavelength):
         A = 1.7923385088285804
@@ -169,69 +164,6 @@ class UsgJacques(object):
         g = 0
 
         return us, g
-
-
-
-
-class UsgMie(object):
-
-    def __init__(self):
-        """
-        To be set externally:
-
-        r:
-            radius of the particle [m]
-        dsp:
-            volume fraction of scattering particles
-        n_particle:
-            refractive index of the particle that the light wave is scattered on
-            (default value is the refractive index of collagen)
-        n_medium:
-            refractive index of the surronding medium
-            (default is that of colonic mucosal tissue)
-        """
-        self.r = 0.4 * 10 ** -6
-        self.dsp = 0.1
-        self.n_particle = 1.46
-        self.n_medium = 1.36
-
-    def __call__(self, wavelength):
-        """
-        Calculate the scattering parameters relevant for monte carlo simulation.
-
-        Needs pymiecoated: https://code.google.com/p/pymiecoated/
-        Also see http://omlc.org/education/ece532/class3/musdefinition.html
-        for an explanation on how the scattering coefficient is derived
-
-        Args
-        ____
-        wavelength:
-            wavelength of the incident light [m]
-
-        Returns:
-        ____
-        (us, g)
-            scattering coefficient us [1/m] and anisotropy factor g
-        """
-        # create derived parameters
-#         sizeParameter = 2. * math.pi * self.r / wavelength
-#         nRelative = self.n_particle / self.n_medium
-        # %% execute mie and create derived parameters
-        s1, s2, qext, qsca, qback, gsca = bhmie.bhmie(self.r, wavelength,
-                                                      self.n_particle,
-                                                      self.n_medium, 900)
-        vol_s = 4.*math.pi / 3.*(self.r ** 3)
-        N_s = self.dsp * 1.0 / (vol_s)
-        sigma_s = qsca * math.pi * (self.r ** 2)
-        us = N_s * sigma_s
-        g = gsca
-#         A = math.pi * self.r ** 2  # geometrical cross sectional area
-#         cs = qsca * A  # scattering cross section
-#         # scattering coefficient [m-1]
-#         us = self.dsp / (4. / 3. * self.r ** 3. * math.pi) * cs
-#         g = gsca
-        return us, g
-
 
 
 class UsGMuscle(object):

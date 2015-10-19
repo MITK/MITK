@@ -11,7 +11,7 @@ import numpy as np
 import luigi
 
 import scriptpaths as sp
-import tasks_mc as mc
+import tasks_mc
 
 # general output path config
 sp.ROOT_FOLDER = \
@@ -23,9 +23,11 @@ if __name__ == '__main__':
     luigi.interface.setup_interface_logging()
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    BATCH_NUMBERS = np.arange(1, 100, 1)
+    BATCH_NUMBERS = np.arange(0, 10, 1)
     for i in BATCH_NUMBERS:
-        main_task = mc.CreateSpectraTask("jacques_no_billi_generic_scattering", i, 1000)
+        main_task = tasks_mc.CreateSpectraTask("generic_tissue",
+                                         i,
+                                         1000)
         w.add(main_task)
         w.run()
 

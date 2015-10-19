@@ -15,24 +15,21 @@ import matplotlib.pyplot as plt
 import luigi
 
 import scriptpaths as sp
-import tasks_mc as mc
-from tasks_mc import WAVELENGTHS
-import msi.plot
-from msi.msi import Msi
-import msi.normalize as norm
+import tasks_mc
+import mc.plot
+
 
 # general output path config
 sp.ROOT_FOLDER = \
         "/media/wirkert/data/Data/2015_06_01_Filtertransmittance_Spectrometer"
 sp.FINALS_FOLDER = "ConvolvedSpectra"
 sp.DATA_FOLDER = "spectrometer_measurements"
+sp.MC_DATA_FOLDER = "processed"
 SPECTRAL_PLOTS = "spectral_plots"
 
 # the wavelengths recorded by our camera
 RECORDED_WAVELENGTHS = \
         np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
-
-
 
 
 
@@ -42,16 +39,9 @@ class VisualizeSpectraTask(luigi.Task):
     nr_samples = luigi.IntParameter()
 
     def requires(self):
-        return mc.FilterTransmission("580.txt"), \
-            mc.FilterTransmission("470.txt"), \
-            mc.FilterTransmission("660.txt"), \
-            mc.FilterTransmission("560.txt"), \
-            mc.FilterTransmission("480.txt"), \
-            mc.FilterTransmission("511.txt"), \
-            mc.FilterTransmission("600.txt"), \
-            mc.FilterTransmission("700.txt"), \
-            mc.CreateSpectraTask(self.batch_prefix, self.batch_nr,
-                                 self.nr_samples)
+        return tasks_mc.CreateSpectraTask(self.batch_prefix, self.batch_nr,
+                                    self.nr_samples), \
+               tasks_mc.CameraBatch(self.batch_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -61,38 +51,21 @@ class VisualizeSpectraTask(luigi.Task):
             self.batch_prefix + "_" + str(self.batch_nr) + ".png"))
 
     def run(self):
-        f = file(self.input()[8].path, "r")
+        f = file(self.input()[0].path, "r")
         batch = pickle.load(f)
+        f = file(self.input()[1].path, "r")
+        camera_batch = pickle.load(f)
         f.close()
+
+
         f, axarr = plt.subplots(2, 1)
         # axis to plot the original data c.f. the mcml simulation
         org_ax = axarr[0]
         # axis for plotting the folded spectrum + normalization
         fold_ax = axarr[1]
 
-        nr_refls = batch.reflectances.shape[0]
-        for i in range(nr_refls):
-            plt_color = (1. / float(nr_refls) * i,
-               0.,
-               1. - (1. / float(nr_refls) * i))
-            org_ax.plot(batch.wavelengths, batch.reflectances[i], '-o',
-                        color=plt_color)
-            plt.grid()
-            folded_reflectance = np.zeros_like(RECORDED_WAVELENGTHS)
-            for j in range(len(RECORDED_WAVELENGTHS)):
-                filter_transmission = mc.get_transmission_data(
-                                                        self.input()[j].path,
-                                                        WAVELENGTHS)
-                # build weighted sum of absorption and filter transmission
-                folded_reflectance[j] = np.sum(
-                                            filter_transmission.get_image() *
-                                            batch.reflectances[i, :])
-            folded_reflectance_image = Msi()
-            folded_reflectance_image.set_image(folded_reflectance)
-            folded_reflectance_image.set_wavelengths(RECORDED_WAVELENGTHS)
-            normalizer = norm.standard_normalizer
-            normalizer.normalize(folded_reflectance_image)
-            msi.plot.plot(folded_reflectance_image, fold_ax, color=plt_color)
+        mc.plot.plot(batch, org_ax)
+        mc.plot.plot(camera_batch, fold_ax)
 
         # tidy up and save plot
         major_ticks = np.arange(450, 720, 50) * 10 ** -9
@@ -115,8 +88,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask(
-            "billy_experiment_superduperhigh_betacarotine_in_total_mucosa_no_oxy",
+    main_task = VisualizeSpectraTask("generic_tissue",
                                      0, 10)
     w.add(main_task)
     w.run()

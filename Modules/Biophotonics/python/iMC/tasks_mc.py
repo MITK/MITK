@@ -18,14 +18,11 @@ import pickle
 import time
 import logging
 import luigi
-import copy
-import random
-import itertools
 
 import scriptpaths as sp
-from mc.tissuemodels import ColonJacques
 from mc.sim import SimWrapper, get_diffuse_reflectance
-from mc.batches import Batch, join_batches
+from mc.batches import join_batches
+from mc.factories import GenericMcFactory
 from msi.io.spectrometerreader import SpectrometerReader
 from msi.io.msiwriter import MsiWriter
 from msi.io.msireader import MsiReader
@@ -35,7 +32,6 @@ from msi.msi import Msi
 from msi.normalize import standard_normalizer
 
 # experiment configuration
-WAVELENGTHS = np.arange(450, 720, 2) * 10 ** -9
 MCI_FILENAME = "./temp.mci"
 MCO_FILENAME = "temp.mco"
 # this path definitly needs to be adapted by you
@@ -108,6 +104,9 @@ class JoinBatches(luigi.Task):
         joined_batch = reduce(join_batches, batches)
         # write it
         joined_batch_file = open(self.output().path, 'w')
+        # there seems to be a bug in pickle. thus, unfortunately the generator
+        # has to be removed before saving
+        joined_batch.generator = None
         pickle.dump(joined_batch, joined_batch_file)
 
 
@@ -142,7 +141,7 @@ class CameraBatch(luigi.Task):
         for j in range(len(sp.RECORDED_WAVELENGTHS)):
             filter_transmission = get_transmission_data(
                                                     self.input()[j].path,
-                                                    WAVELENGTHS)
+                                                    batch.wavelengths)
             # build weighted sum of absorption and filter transmission
             folded_reflectance[:, j] = np.sum(
                                         filter_transmission.get_image() *
@@ -165,8 +164,7 @@ class CameraBatch(luigi.Task):
 class CreateSpectraTask(luigi.Task):
     batch_prefix = luigi.Parameter()
     batch_nr = luigi.IntParameter()
-    # the batch which should be created.
-    batch = luigi.Parameter()
+    nr_samples = luigi.IntParameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -180,83 +178,27 @@ class CreateSpectraTask(luigi.Task):
         self.sim_wrapper = SimWrapper()
         self.sim_wrapper.set_mci_filename(MCI_FILENAME)
         self.sim_wrapper.set_mcml_executable(PATH_TO_MCML + EXEC_MCML)
-        # setup colon model
-        self.colon_model = ColonJacques()
-        self.colon_model.nr_photons = 10 ** 6
-        self.colon_model.set_mci_filename(self.sim_wrapper.mci_filename)
-        self.colon_model.set_mco_filename(MCO_FILENAME)
+        # setup model
+        factory = GenericMcFactory()
+        self.tissue_model = factory.create_tissue_model()
+        self.tissue_model.set_mci_filename(self.sim_wrapper.mci_filename)
+        self.tissue_model.set_mco_filename(MCO_FILENAME)
         # setup array in which data shall be stored
-        batch = Batch()
-        batch.reflectances = []
-        batch.mucosa = []
-        batch.submucosa = []
-        batch.wavelengths = WAVELENGTHS
+        batch = factory.create_batch_to_simulate()
+        batch.create_parameters(self.nr_samples)
 
-        # use this to create plot from Jacques Fig 17,
-        # Optical properties of biological tissues: a review
-#         a_mie_range = np.linspace(5., 20., 4)
-#         a_ray_1 = np.zeros_like(a_mie_range)
-#         a_ray_range = np.linspace(5., 60., 7)
-#         a_mie_2 = np.ones_like(a_ray_range) * 20.
-#         plt_range = np.concatenate([zip(a_mie_range, a_ray_1),
-#                                    zip(a_mie_2, a_ray_range)])
+        for i in range(batch.nr_elements()):
+            self.tissue_model.set_batch_element(batch, i)
 
-        # use this to create a certain range of parameters
-        bvf_ranges = np.random.uniform(0.01, 0.4, self.nr_samples)
-        saO2_ranges = np.random.uniform(0.0, 1., self.nr_samples)
-#         bilirubin in range 0. - 10. mg/dl:
-        bili_ranges = np.random.uniform(0.0, 8., self.nr_samples) * 0.01 * 0.
-        a_mie_ranges = np.random.uniform(5.0, 20.,
-                                  self.nr_samples) * 100.
-        a_ray_ranges = np.random.uniform(0., 60., self.nr_samples) * 100.
-        d_ranges = np.random.uniform(250, 735, self.nr_samples) * 10 ** -6
-        bvf_sm_ranges = np.random.uniform(0.01, 0.4, self.nr_samples)
-        dsp_sm_ranges = np.random.uniform(0.01, 0.6, self.nr_samples)
-
-
-#         bvf_ranges = np.array([0.04])
-#         saO2_ranges = np.array([0.3])
-#         bili_ranges = np.array([1.23]) / 100.
-#         a_mie_ranges = np.array([5.0]) * 100.
-#         a_ray_ranges = np.array([0.0]) * 100.
-#         d_ranges = np.array([500]) * 10 ** -6
-#         plt_range = itertools.product(bvf_ranges,
-#                                       saO2_ranges,
-#                                       bili_ranges,
-#                                       a_mie_ranges,
-#                                       a_ray_ranges,
-#                                       d_ranges,
-#                                       bvf_sm_ranges, dsp_sm_range)
-        plt_range = itertools.izip(bvf_ranges,
-                                    saO2_ranges,
-                                    bili_ranges,
-                                    a_mie_ranges,
-                                    a_ray_ranges,
-                                    d_ranges,
-                                    bvf_sm_ranges, dsp_sm_ranges)
-
-        for i, (bvf, saO2, bili, a_mie, a_ray, d, bvf_sm, dsp_sm) \
-                                                    in enumerate(plt_range):
-
-            self.colon_model.set_mucosa(bvf=bvf, saO2=saO2, cBili=bili,
-                                        a_mie=a_mie,
-                                        a_ray=a_ray,
-                                        d=d)
-            self.colon_model.set_submucosa(bvf=bvf_sm, saO2=saO2,
-                                        dsp=dsp_sm)
             # map the wavelengths array to reflectance list
-            reflectances = map(self.wavelength_to_reflectance, WAVELENGTHS)
+            reflectances = map(self.wavelength_to_reflectance,
+                               batch.wavelengths)
             # store in batch_nr
-            mucosa, submucosa = self.colon_model.get_layer_parameters()
-            batch.mucosa.append(mucosa)
-            batch.submucosa.append(submucosa)
-            batch.reflectances.append(np.asarray(reflectances))
+            batch.reflectances[i, :] = np.asarray(reflectances)
             # success!
             logging.info("successfully ran simulation " + str(i) + " for\n" +
-                         str(self.colon_model))
+                         str(self.tissue_model))
         # convert the lists in batch to np arrays
-        batch.mucosa = np.array(batch.mucosa)
-        batch.submucosa = np.array(batch.submucosa)
         batch.reflectances = np.array(batch.reflectances)
         # clean up temporarily created files
         os.remove(MCI_FILENAME)
@@ -264,7 +206,10 @@ class CreateSpectraTask(luigi.Task):
         if os.path.isfile(created_mco_file):
             os.remove(created_mco_file)
         # save the created output
-        f = self.output().open('w')
+        f = open(self.output().path, 'w')
+        # there seems to be a bug in pickle. thus, unfortunately the generator
+        # has to be removed before saving
+        batch.generator = None
         pickle.dump(batch, f)
         f.close()
 
@@ -275,8 +220,8 @@ class CreateSpectraTask(luigi.Task):
     def wavelength_to_reflectance(self, wavelength):
         """helper function to determine the reflectance for a given
         wavelength using the current model and simulation """
-        self.colon_model.set_wavelength(wavelength)
-        self.colon_model.create_mci_file()
+        self.tissue_model.set_wavelength(wavelength)
+        self.tissue_model.create_mci_file()
         if os.path.isfile(PATH_TO_MCML + EXEC_MCML):
             self.sim_wrapper.run_simulation()
             return get_diffuse_reflectance(PATH_TO_MCML + MCO_FILENAME)

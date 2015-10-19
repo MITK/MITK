@@ -4,7 +4,8 @@ Created on Oct 15, 2015
 @author: wirkert
 '''
 
-from mc.tissuemodels import AbstractTissue
+from mc.tissuemodels import AbstractTissue, GenericTissue
+from mc.batches import AbstractBatch, GenericBatch
 
 
 class AbstractMcFactory(object):
@@ -19,7 +20,21 @@ class AbstractMcFactory(object):
     def create_batch_to_simulate(self):
         return AbstractBatch()
 
-    def __init__(self, params):
+    def __init__(self):
+        '''
+        Constructor
+        '''
+
+class GenericMcFactory(AbstractMcFactory):
+
+    def create_tissue_model(self):
+        return GenericTissue()
+
+    def create_batch_to_simulate(self):
+        return GenericBatch()
+
+
+    def __init__(self):
         '''
         Constructor
         '''

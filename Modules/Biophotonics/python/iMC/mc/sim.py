@@ -44,7 +44,7 @@ class MciWrapper(object):
     def set_nr_photons(self, nr_photons):
         self.nr_photons = nr_photons
 
-    def add_layer(self, n, ua, us, g, d):
+    def add_layer(self, n=None, ua=None, us=None, g=None, d=None):
         """adds a layer below the currently existing ones.
 
         Arguments:
@@ -54,6 +54,17 @@ class MciWrapper(object):
         g: anisotropy factor
         d: thickness of layer [m]
         """
+        if n is None:
+            n = 1.
+        if ua  is None:
+            ua = 0.
+        if us is None:
+            us = 0.
+        if g is None:
+            g = 1.
+        if d is None:
+            d = 500.*10 ** -6
+
         self.layers.append([n, ua, us, g, d])
 
     def set_layer(self, layer_nr, n, ua, us, g, d):

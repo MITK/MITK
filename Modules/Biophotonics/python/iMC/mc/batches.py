@@ -9,14 +9,15 @@ import copy
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
+
 class AbstractBatch(object):
     """summarizes a batch of simulated mc spectra"""
 
     def __init__(self):
         self.reflectances = np.array([])
         self.layers = []  # list of np arrays, one for each layer
-        self.nr_photons = np.array([])
-        self.wavelengths = np.array([])
+        self.nr_photons = 10 ** 6
+        self.wavelengths = np.arange(450, 720, 2) * 10 ** -9
         # by default random uniform samples will be generated
         self.generator = np.random.random_sample
 
@@ -25,20 +26,18 @@ class AbstractBatch(object):
         to create the resulting reflectances"""
         pass
 
+    def nr_elements(self):
+        return self.layers[0].shape[0]
+
     def join(self, other_batch):
         """helper method to join two batches"""
-        joined_batch = copy.copy(self)
+        joined_batch = copy.deepcopy(self)
 
         f = lambda x, y: np.append(x, y, axis=0)
 
-        joined_batch.layers = map(f, joined_batch.layers, other_batch.layers)
+        joined_batch.layers = map(f, self.layers, other_batch.layers)
         joined_batch.reflectances = f(joined_batch.reflectances,
                                        other_batch.reflectances)
-
-        np.append(joined_batch.reflectances, other_batch.reflectances, axis=0)
-        np.append(joined_batch.l1, other_batch.l1, axis=0)
-        np.append(joined_batch.l2, other_batch.l2, axis=0)
-        np.append(joined_batch.l3, other_batch.l3, axis=0)
         # next two should be the same for two batches from the same experiment
         np.testing.assert_almost_equal(joined_batch.wavelengths,
                                               other_batch.wavelengths)
@@ -47,40 +46,51 @@ class AbstractBatch(object):
         return joined_batch
 
 
-class GenericBatch(object):
+def scale(elements, mini, maxi):
+    """helper function, setting elements between 0 and 1 to mini, maxi instead
+    """
+    elements = elements * (maxi - mini)
+    elements += mini
+    return elements
+
+
+class GenericBatch(AbstractBatch):
     """generic three layer batch """
 
     def __init__(self):
-        super(AbstractBatch, self).__init__()
+        super(GenericBatch, self).__init__()
 
     def append_one_layer(self, saO2, nr_samples):
         """helper function to create parameters for one layer"""
         samples = self.generator((nr_samples, 5))
         # scale samples to correct ranges
-        bvf_scaler = MinMaxScaler(feature_range=(0., 0.4), copy=False)
-        a_mie_scaler = MinMaxScaler(feature_range=(5., 30.) * 100., copy=False)
-        a_ray_scaler = MinMaxScaler(feature_range=(0., 60.) * 100., copy=False)
-        d_scaler = MinMaxScaler(feature_range=(0., 2000.), copy=False)
-        bvf_scaler.fit_transform(samples[:, 0])
         # saO2 is the same for each layer, since the blood "diffuses" in tissue
-        samples[:, 1] = saO2
-        a_mie_scaler.fit_transform(samples[:, 2])
-        a_ray_scaler.fit_transform(samples[:, 3])
-        d_scaler.fit_transform(samples[:, 4])
+        samples[:, 1] = saO2  # saO2
+        samples[:, 2] = scale(samples[:, 2], 5.* 100., 30.* 100.)  # a_mie
+        samples[:, 3] = scale(samples[:, 3], 0.* 100., 60.* 100.)  # a_ray
+        # d will be normalized later to 2mm total depth
+        samples[:, 4] = scale(samples[:, 4], 0.01, 1.)  # d
         # append as last layer
         self.layers.append(samples)
 
     def create_parameters(self, nr_samples):
-
+        """Create generic three layer batch with a total diameter of 2mm.
+        saO2 is the same in all layers, but all other parameters vary randomly
+        within each layer"""
         saO2 = self.generator(nr_samples)
         # create three layers with random samples
         self.append_one_layer(saO2, nr_samples)
         self.append_one_layer(saO2, nr_samples)
         self.append_one_layer(saO2, nr_samples)
+        # create empty reflectances matrix
+        self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))
+        # set all weights to 1
+        self.weights = np.ones(nr_samples, dtype=float)
 
-        total_d = reduce(lambda d1, d2: d1[:, -1] + d2[:, -1], self.layers)
-        desired_d = 2000. * 10 ** -6
         # "normalize" d to 2mm
+        ds = map(lambda x: x[:, -1], self.layers)
+        total_d = reduce(lambda x, y: x + y, ds)
+        desired_d = 2000. * 10 ** -6
         for l in self.layers:
             l[:, -1] = l[:, -1] / total_d * desired_d
 

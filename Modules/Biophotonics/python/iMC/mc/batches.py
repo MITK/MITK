@@ -45,12 +45,6 @@ class AbstractBatch(object):
         return joined_batch
 
 
-def scale(elements, mini, maxi):
-    """helper function, setting elements between 0 and 1 to mini, maxi instead
-    """
-    elements = elements * (maxi - mini)
-    elements += mini
-    return elements
 
 
 class GenericBatch(AbstractBatch):
@@ -61,14 +55,19 @@ class GenericBatch(AbstractBatch):
 
     def append_one_layer(self, saO2, nr_samples):
         """helper function to create parameters for one layer"""
-        samples = self.generator((nr_samples, 5))
+
+        # scales data to lie between maxi and mini instead of 0 and 1
+        scale = lambda x, mini, maxi: x * (maxi - mini) + mini
+
+        samples = self.generator(size=(nr_samples, 5))
         # scale samples to correct ranges
+        samples[:, 0] = scale(samples[:, 0], 0., 1.00)
         # saO2 is the same for each layer, since the blood "diffuses" in tissue
         samples[:, 1] = saO2  # saO2
         samples[:, 2] = scale(samples[:, 2], 5.* 100., 30.* 100.)  # a_mie
         samples[:, 3] = scale(samples[:, 3], 0.* 100., 60.* 100.)  # a_ray
         # d will be normalized later to 2mm total depth
-        samples[:, 4] = scale(samples[:, 4], 0.01, 1.)  # d
+        samples[:, 4] = scale(samples[:, 4], 0.0, 1.)  # d
         # append as last layer
         self.layers.append(samples)
 
@@ -76,7 +75,7 @@ class GenericBatch(AbstractBatch):
         """Create generic three layer batch with a total diameter of 2mm.
         saO2 is the same in all layers, but all other parameters vary randomly
         within each layer"""
-        saO2 = self.generator(nr_samples)
+        saO2 = self.generator(size=nr_samples)
         # create three layers with random samples
         self.append_one_layer(saO2, nr_samples)
         self.append_one_layer(saO2, nr_samples)
@@ -92,6 +91,38 @@ class GenericBatch(AbstractBatch):
         desired_d = 2000. * 10 ** -6
         for l in self.layers:
             l[:, -1] = l[:, -1] / total_d * desired_d
+
+
+class GaussianBatch(GenericBatch):
+    """three layer batch with gaussian sampled tissue parameters"""
+
+    def __init__(self):
+        super(GaussianBatch, self).__init__()
+        self.generator = np.random.normal
+
+    def append_one_layer(self, saO2, nr_samples):
+        """helper function to create parameters for one layer"""
+        # rescale gaussian
+        scale = lambda x, u, sigma: x * sigma + u
+        samples = self.generator(size=(nr_samples, 5))
+        # scale samples to correct ranges
+        # bvf
+        samples[:, 0] = np.clip(scale(samples[:, 0], 0.04, 0.02), 0. , 1.)
+        # saO2 is the same for each layer, since the blood "diffuses" in tissue
+        samples[:, 1] = np.clip(scale(saO2, 0.7, 0.1), 0., 1.)
+        # a_mie
+        samples[:, 2] = np.clip(scale(samples[:, 2], 10.* 100., 5.* 100.),
+                                5. *100,
+                                30.* 100)
+        # a_ray
+        samples[:, 3] = np.clip(scale(samples[:, 3], 5.* 100., 2.* 100.),
+                                0.*100., 60.*100.)
+        # d will be normalized later to 2mm total depth
+        samples[:, 4] = np.clip(scale(samples[:, 4], 0.5, 0.2), 0., 1.)
+
+        # append as last layer
+        self.layers.append(samples)
+
 
 
 class VisualizationBatch(AbstractBatch):
@@ -115,8 +146,10 @@ class VisualizationBatch(AbstractBatch):
         # bvf = np.linspace(0.0, 1., nr_samples)
         # saO2 = np.linspace(0., 1., nr_samples)
         # d = np.linspace(175, 735, nr_samples) * 10 ** -6
+        # a_mie = np.linspace(5., 30., nr_samples) * 100
+        a_ray = np.linspace(0., 60., nr_samples) * 100
         # create three layers with random samples
-        self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
+        self.append_one_layer(0.04, 0.7, 30.*100., a_ray, 500 * 10 ** -6,
                               nr_samples)
         self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
                               nr_samples)

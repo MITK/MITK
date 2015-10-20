@@ -6,7 +6,7 @@ Created on Oct 19, 2015
 
 import numpy as np
 
-class LinearSaO2Regression(object):
+class LinearSaO2Unmixing(object):
     '''
     classdocs
     '''
@@ -88,15 +88,9 @@ class LinearSaO2Regression(object):
         # sortout not selected features
         H_sel = self.H[self.selected_features, :]
         X_sel = X[:, self.selected_features]
-        # compose solution matrix
-        lsq_solution_matrix = np.dot(np.linalg.inv(np.dot(H_sel.T, H_sel)),
-                                     H_sel.T)
-        # do linear regression
-        lsq_solution = np.dot(lsq_solution_matrix, X_sel.T).T
-        # guarantee that we have matrix (relevant if X is only one sample)
-        lsq_solution = np.array(lsq_solution, ndmin=2)
+        # do least squares estimation
+        oxy_test, deoxy, s = np.linalg.lstsq(H_sel, X_sel.T)[0]
         # calculate oxygenation = oxygenated blood / total blood
-        saO2 = lsq_solution[:, 0] / (lsq_solution[:, 0] +
-                                     lsq_solution[:, 1])
+        saO2 = oxy_test / (oxy_test + deoxy)
 
-        return saO2
+        return np.clip(saO2, 0., 1.)

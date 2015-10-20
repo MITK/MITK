@@ -43,8 +43,8 @@ void mitk::OverlayManager::AddBaseRenderer(mitk::BaseRenderer* renderer)
   inSet = m_BaseRendererSet.insert(renderer);
   if(inSet.second)
   {
-    OverlaySet::iterator it;
-    for ( it=m_OverlaySet.begin() ; it != m_OverlaySet.end(); it++ )
+    OverlaySet::const_iterator it;
+    for ( it=m_OverlaySet.cbegin() ; it != m_OverlaySet.cend(); it++ )
     {
       if((*it)->IsForceInForeground())
         (*it)->AddToRenderer(renderer,m_ForegroundRenderer[renderer]);
@@ -60,16 +60,16 @@ void mitk::OverlayManager::RemoveBaseRenderer(mitk::BaseRenderer* renderer)
     return;
 
   vtkRenderer* forgroundRenderer = m_ForegroundRenderer[renderer];
-  OverlaySet::iterator it;
-  for ( it=m_OverlaySet.begin() ; it != m_OverlaySet.end(); it++ )
+  OverlaySet::const_iterator it;
+  for ( it=m_OverlaySet.cbegin() ; it != m_OverlaySet.cend(); ++it )
   {
     (*it)->RemoveFromBaseRenderer(renderer);
     if(forgroundRenderer)
       (*it)->RemoveFromRenderer(renderer,forgroundRenderer);
   }
 
-  BaseRendererSet::iterator i = m_BaseRendererSet.find(renderer);
-  if( i == m_BaseRendererSet.end() )
+  BaseRendererSet::const_iterator i = m_BaseRendererSet.find(renderer);
+  if( i == m_BaseRendererSet.cend() )
     return;
 
   m_BaseRendererSet.erase(i);
@@ -79,8 +79,8 @@ void mitk::OverlayManager::RemoveBaseRenderer(mitk::BaseRenderer* renderer)
 
 void mitk::OverlayManager::RemoveAllBaseRenderers()
 {
-  BaseRendererSet::iterator it;
-  for ( it=m_BaseRendererSet.begin() ; it != m_BaseRendererSet.end(); it++)
+  BaseRendererSet::const_iterator it;
+  for ( it=m_BaseRendererSet.cbegin() ; it != m_BaseRendererSet.cend(); ++it)
   {
     this->RemoveBaseRenderer(*it);
   }
@@ -92,8 +92,8 @@ void mitk::OverlayManager::AddOverlay(const Overlay::Pointer& overlay, bool Forc
   inSet = m_OverlaySet.insert(overlay);
   if(inSet.second)
   {
-    BaseRendererSet::iterator it;
-    for ( it=m_BaseRendererSet.begin() ; it != m_BaseRendererSet.end(); it++ )
+    BaseRendererSet::const_iterator it;
+    for ( it=m_BaseRendererSet.cbegin() ; it != m_BaseRendererSet.cend(); it++ )
     {
       if(ForceInForeground)
       {
@@ -124,12 +124,12 @@ void mitk::OverlayManager::AddOverlay(const Overlay::Pointer& overlay, BaseRende
 
 void mitk::OverlayManager::RemoveOverlay(const Overlay::Pointer &overlay)
 {
-  OverlaySet::iterator overlayIt = m_OverlaySet.find(overlay);
-  if( overlayIt == m_OverlaySet.end() )
+  OverlaySet::const_iterator overlayIt = m_OverlaySet.find(overlay);
+  if( overlayIt == m_OverlaySet.cend() )
     return;
 
-  BaseRendererSet::iterator it;
-  for ( it=m_BaseRendererSet.begin() ; it != m_BaseRendererSet.end(); it++)
+  BaseRendererSet::const_iterator it;
+  for ( it=m_BaseRendererSet.cbegin() ; it != m_BaseRendererSet.cend(); it++)
   {
     overlay->RemoveFromBaseRenderer(*it);
     vtkRenderer* forgroundRenderer = m_ForegroundRenderer[*it];
@@ -143,13 +143,13 @@ void mitk::OverlayManager::RemoveOverlay(const Overlay::Pointer &overlay)
 void mitk::OverlayManager::RemoveAllOverlays()
 {
   while(!m_OverlaySet.empty())
-    RemoveOverlay(*m_OverlaySet.begin());
+    RemoveOverlay(*m_OverlaySet.cbegin());
 }
 
 void mitk::OverlayManager::UpdateOverlays(mitk::BaseRenderer* baseRenderer)
 {
-  OverlaySet::iterator it;
-  for ( it=m_OverlaySet.begin() ; it != m_OverlaySet.end(); it++ )
+  OverlaySet::const_iterator it;
+  for ( it=m_OverlaySet.cbegin() ; it != m_OverlaySet.cend(); it++ )
   {
     (*it)->Update(baseRenderer);
   }
@@ -175,9 +175,9 @@ void mitk::OverlayManager::SetLayouter(Overlay *overlay, const std::string &iden
 
 void mitk::OverlayManager::UpdateLayouts(mitk::BaseRenderer *renderer)
 {
-  LayouterMap layouters = m_LayouterMap[renderer];
-  LayouterMap::iterator it;
-  for ( it=layouters.begin() ; it != layouters.end(); it++ )
+  const LayouterMap layouters = m_LayouterMap[renderer];
+  LayouterMap::const_iterator it;
+  for ( it=layouters.cbegin() ; it != layouters.cend(); it++ )
   {
     (it->second)->PrepareLayout();
   }

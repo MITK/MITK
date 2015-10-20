@@ -193,8 +193,8 @@ namespace mitk
   {
     if (m_RenderWindowList.erase(renderWindow))
     {
-      RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
-      if (callbacks_it != this->m_RenderWindowCallbacksList.end())
+      RenderWindowCallbacksList::const_iterator callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
+      if (callbacks_it != this->m_RenderWindowCallbacksList.cend())
       {
         renderWindow->RemoveObserver(callbacks_it->second.commands[0u]);
         renderWindow->RemoveObserver(callbacks_it->second.commands[1u]);
@@ -202,9 +202,9 @@ namespace mitk
         this->m_RenderWindowCallbacksList.erase(callbacks_it);
       }
 
-      RenderWindowVector::iterator rw_it = std::find(m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow);
+      RenderWindowVector::const_iterator rw_it = std::find(m_AllRenderWindows.cbegin(), m_AllRenderWindows.cend(), renderWindow);
 
-      if (rw_it != m_AllRenderWindows.end())
+      if (rw_it != m_AllRenderWindows.cend())
       {
         // Decrease reference count for proper destruction
         (*rw_it)->UnRegister(NULL);
@@ -231,7 +231,7 @@ namespace mitk
     // sense that the window does exist within the application, but that
     // renderWindow has been temporarily removed from this RenderingManager for
     // performance reasons.
-    if (m_RenderWindowList.find(renderWindow) == m_RenderWindowList.end())
+    if (m_RenderWindowList.find(renderWindow) == m_RenderWindowList.cend())
     {
       return;
     }
@@ -256,7 +256,7 @@ namespace mitk
     // sense that the window does exist within the application, but that
     // renderWindow has been temporarily removed from this RenderingManager for
     // performance reasons.
-    if (m_RenderWindowList.find(renderWindow) == m_RenderWindowList.end())
+    if (m_RenderWindowList.find(renderWindow) == m_RenderWindowList.cend())
     {
       return;
     }
@@ -267,7 +267,7 @@ namespace mitk
     m_UpdatePending = false;
 
     // Immediately repaint this window (implementation platform specific)
-    // If the size is 0 it crahses
+    // If the size is 0 it crashes
     int *size = renderWindow->GetSize();
     if (0 != size[0] && 0 != size[1])
     {
@@ -287,8 +287,8 @@ namespace mitk
     RenderingManager
     ::RequestUpdateAll(RequestType type)
   {
-    RenderWindowList::iterator it;
-    for (it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it)
+    RenderWindowList::const_iterator it;
+    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {
       int id = BaseRenderer::GetInstance(it->first)->GetMapperID();
       if ((type == REQUEST_UPDATE_ALL)
@@ -304,8 +304,8 @@ namespace mitk
     RenderingManager
     ::ForceImmediateUpdateAll(RequestType type)
   {
-    RenderWindowList::iterator it;
-    for (it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it)
+    RenderWindowList::const_iterator it;
+    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {
       int id = BaseRenderer::GetInstance(it->first)->GetMapperID();
       if ((type == REQUEST_UPDATE_ALL)
@@ -397,8 +397,8 @@ namespace mitk
     }
 
     timeGeometry = modifiedGeometry;
-    RenderWindowList::iterator it;
-    for (it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it)
+    RenderWindowList::const_iterator it;
+    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {
       mitk::BaseRenderer *baseRenderer =
         mitk::BaseRenderer::GetInstance(it->first);
@@ -436,8 +436,8 @@ namespace mitk
     RenderingManager
     ::InitializeViews(RequestType type)
   {
-    RenderWindowList::iterator it;
-    for (it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it)
+    RenderWindowList::const_iterator it;
+    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {
       mitk::BaseRenderer *baseRenderer =
         mitk::BaseRenderer::GetInstance(it->first);
@@ -567,9 +567,9 @@ namespace mitk
     m_UpdatePending = false;
 
     // Satisfy all pending update requests
-    RenderWindowList::iterator it;
+    RenderWindowList::const_iterator it;
     int i = 0;
-    for (it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it, ++i)
+    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it, ++i)
     {
       if (it->second == RENDERING_REQUESTED)
       {
@@ -649,7 +649,7 @@ namespace mitk
     ::IsRendering() const
   {
     RenderWindowList::const_iterator it;
-    for (it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it)
+    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {
       if (it->second == RENDERING_INPROGRESS)
       {
@@ -663,8 +663,8 @@ namespace mitk
     RenderingManager
     ::AbortRendering()
   {
-    RenderWindowList::iterator it;
-    for (it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it)
+    RenderWindowList::const_iterator it;
+    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {
       if (it->second == RENDERING_INPROGRESS)
       {
@@ -692,8 +692,8 @@ namespace mitk
     RenderingManager
     ::ExecutePendingHighResRenderingRequest()
   {
-    RenderWindowList::iterator it;
-    for (it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it)
+    RenderWindowList::const_iterator it;
+    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {
       BaseRenderer *renderer = BaseRenderer::GetInstance(it->first);
 
@@ -805,8 +805,8 @@ namespace mitk
     {
       m_DataStorage = storage;
 
-      RenderingManager::RenderWindowVector::iterator iter;
-      for (iter = m_AllRenderWindows.begin(); iter < m_AllRenderWindows.end(); iter++)
+      RenderingManager::RenderWindowVector::const_iterator iter;
+      for (iter = m_AllRenderWindows.cbegin(); iter < m_AllRenderWindows.cend(); iter++)
       {
         mitk::BaseRenderer::GetInstance((*iter))->SetDataStorage(m_DataStorage.GetPointer());
       }
@@ -820,7 +820,7 @@ namespace mitk
 
   void RenderingManager::SetRenderWindowFocus(vtkRenderWindow *focusWindow)
   {
-    if (!focusWindow || (m_RenderWindowList.find(focusWindow) != m_RenderWindowList.end()))
+    if (!focusWindow || (m_RenderWindowList.find(focusWindow) != m_RenderWindowList.cend()))
     {
       m_FocusedRenderWindow = focusWindow;
       return;

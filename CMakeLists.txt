@@ -781,9 +781,6 @@ if(NOT MSVC_VERSION)
     #-Wold-style-cast
     #-Wsign-promo
 
-    # the following two lines should be removed after ITK-3097 has
-    # been resolved, see also MITK bug 15279
-    -Wno-unused-local-typedefs
     -Wno-array-bounds
 
     -fdiagnostics-show-option

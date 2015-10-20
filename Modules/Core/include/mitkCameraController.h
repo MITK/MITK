@@ -63,6 +63,11 @@ public:
    void Fit();
 
    /**
+    * @brief Set the desired zoom-level to the absolute value given.
+    */
+   void SetScaleFactorInMMPerDisplayUnit( ScalarType scale );
+
+   /**
     * @brief MoveCameraToPoint Move camera so that the point on the plane is in the view center.
     * @param planePoint
     */

@@ -193,8 +193,8 @@ namespace mitk
   {
     if (m_RenderWindowList.erase(renderWindow))
     {
-      RenderWindowCallbacksList::const_iterator callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
-      if (callbacks_it != this->m_RenderWindowCallbacksList.cend())
+      RenderWindowCallbacksList::iterator callbacks_it = this->m_RenderWindowCallbacksList.find(renderWindow);
+      if (callbacks_it != this->m_RenderWindowCallbacksList.end())
       {
         renderWindow->RemoveObserver(callbacks_it->second.commands[0u]);
         renderWindow->RemoveObserver(callbacks_it->second.commands[1u]);
@@ -202,7 +202,7 @@ namespace mitk
         this->m_RenderWindowCallbacksList.erase(callbacks_it);
       }
 
-      RenderWindowVector::const_iterator rw_it = std::find(m_AllRenderWindows.cbegin(), m_AllRenderWindows.cend(), renderWindow);
+      RenderWindowVector::iterator rw_it = std::find(m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow);
 
       if (rw_it != m_AllRenderWindows.cend())
       {

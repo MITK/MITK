@@ -322,3 +322,14 @@ void mitk::CameraController::Fit()
     MoveCameraToPoint(planePoint);
   }
 }
+
+void mitk::CameraController::SetScaleFactorInMMPerDisplayUnit( ScalarType scale )
+{
+  if ( this->GetRenderer()->GetMapperID() != BaseRenderer::Standard2D )
+  {
+    return;
+  }
+
+  this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(
+    this->GetRenderer()->GetViewportSize()[1] * scale * 0.5 );
+}

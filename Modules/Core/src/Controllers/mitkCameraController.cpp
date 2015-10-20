@@ -193,6 +193,8 @@ void mitk::CameraController::MoveCameraToPoint(const mitk::Point2D& planePoint)
 {
   Point2D moveToPoint = planePoint;
   AdjustCameraToPlane(moveToPoint);
+
+  this->Modified();
 }
 
 void mitk::CameraController::MoveBy(const mitk::Vector2D &moveVectorInMM)
@@ -300,9 +302,6 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
       //Transform the camera to the current position (transversal, coronal and sagittal plane).
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
     }
-
-    this->Modified();
-
   }
 }
 
@@ -332,4 +331,7 @@ void mitk::CameraController::SetScaleFactorInMMPerDisplayUnit( ScalarType scale 
 
   this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(
     this->GetRenderer()->GetViewportSize()[1] * scale * 0.5 );
+
+  this->Modified();
+
 }

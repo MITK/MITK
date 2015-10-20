@@ -874,7 +874,28 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
       this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
         "NA" ) );
     }
+
+    //statistics of higher order should have 5 decimal places because they used to be very small
+    this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetSkewness(), 0, 'f', 5) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 8, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetKurtosis(), 0, 'f', 5) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetUniformity(), 0, 'f', 5) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 10, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetEntropy(), 0, 'f', 5) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 11, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetMPP(), 0, 'f', decimals) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 12, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetUPP(), 0, 'f', 5) ) );
+
   }
+
 
   this->m_Controls->m_StatisticsTable->resizeColumnsToContents();
   int height = STAT_TABLE_BASE_HEIGHT;
@@ -971,6 +992,26 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
   this->m_Controls->m_StatisticsTable->setItem( 5, 0, new QTableWidgetItem( QString("%1").arg(stats.GetN()) ) );
 
   this->m_Controls->m_StatisticsTable->setItem( 6, 0, new QTableWidgetItem( "NA" ) );
+
+  //statistics of higher order should have 5 decimal places because they used to be very small
+  this->m_Controls->m_StatisticsTable->setItem( 7, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetSkewness(), 0, 'f', 5 ) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 8, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetKurtosis(), 0, 'f', 5) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 9, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetUniformity(), 0, 'f', 5) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 10, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetEntropy(), 0, 'f', 5) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 11, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetMPP(), 0, 'f', decimals) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 12, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetUPP(), 0, 'f', 5) ) );
+
 
   this->m_Controls->m_StatisticsTable->resizeColumnsToContents();
   int height = STAT_TABLE_BASE_HEIGHT;

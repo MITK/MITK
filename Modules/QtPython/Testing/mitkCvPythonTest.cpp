@@ -44,12 +44,13 @@ public:
   //TODO opencv median filter, add cpp test code
   void testOpenCVMedianFilter()
   {
+    std::string code = "mitkImage_new = cv2.medianBlur(mitkImage, 3)";
     // simple itk median filter in python
     CPPUNIT_ASSERT_MESSAGE ( "Is OpenCV Python Wrapping available?", m_PythonService->IsOpenCvPythonWrappingAvailable() == true );
 
     CPPUNIT_ASSERT_MESSAGE( "Valid image copied to python import should return true.", m_PythonService->CopyToPythonAsCvImage(m_Image2D, "mitkImage") == true );
 
-    m_PythonService->Execute( m_Snippets["opencv median filter"].toStdString(), mitk::IPythonService::MULTI_LINE_COMMAND );
+    m_PythonService->Execute( code, mitk::IPythonService::MULTI_LINE_COMMAND );
 
     CPPUNIT_ASSERT_MESSAGE( "Python execute error occured.", !m_PythonService->PythonErrorOccured());
   }

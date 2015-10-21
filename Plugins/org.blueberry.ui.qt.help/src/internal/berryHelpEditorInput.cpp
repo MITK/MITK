@@ -73,7 +73,9 @@ void HelpEditorInput::SaveState(const SmartPointer<IMemento>& memento) const
 
 bool HelpEditorInput::operator==(const berry::Object* o) const
 {
-  if (const HelpEditorInput* input = dynamic_cast<const HelpEditorInput*>(o))
+  const HelpEditorInput* input = dynamic_cast<const HelpEditorInput*>(o);
+
+  if (input)
     return this->url == input->url;
 
   return false;

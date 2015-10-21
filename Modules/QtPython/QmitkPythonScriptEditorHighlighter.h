@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkPythonScriptEditorHighlighter_h
 
 #include <QSyntaxHighlighter>
-#include <MitkPythonExports.h>
+#include <MitkQtPythonExports.h>
 
 ///
 /// A script highlighter for Python Scripts
-class MITKPYTHON_EXPORT QmitkPythonScriptEditorHighlighter : public QSyntaxHighlighter
+class MITKQTPYTHON_EXPORT QmitkPythonScriptEditorHighlighter : public QSyntaxHighlighter
 {
   Q_OBJECT
 

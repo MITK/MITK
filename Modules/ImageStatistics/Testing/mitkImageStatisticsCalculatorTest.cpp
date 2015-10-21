@@ -22,6 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <mitkStandaloneDataStorage.h>
 
+#include <mitkIOUtil.h>
+#include <mitkImageGenerator.h>
+#include <mitkImagePixelWriteAccessor.h>
+
 /**
  * \brief Test class for mitkImageStatisticsCalculator
  *
@@ -45,6 +49,9 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestCase10);
   MITK_TEST(TestCase11);
   MITK_TEST(TestCase12);
+  MITK_TEST(TestImageMaskingEmpty);
+  MITK_TEST(TestImageMaskingNonEmpty);
+  MITK_TEST(TestRecomputeOnModifiedMask);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -65,6 +72,9 @@ public:
   void TestCase10();
   void TestCase11();
   void TestCase12();
+  void TestImageMaskingEmpty();
+  void TestImageMaskingNonEmpty();
+  void TestRecomputeOnModifiedMask();
 
 private:
 
@@ -74,6 +84,10 @@ private:
   // calculate statistics for the given image and planarpolygon
   const mitk::ImageStatisticsCalculator::Statistics ComputeStatistics( mitk::Image::Pointer image,
                                                                        mitk::PlanarFigure::Pointer polygon );
+
+  // calculate statistics for the given image and planarpolygon
+  const mitk::ImageStatisticsCalculator::Statistics ComputeStatistics( mitk::Image::Pointer image,
+                                                                       mitk::Image::Pointer image_mask );
 
   void VerifyStatistics(const mitk::ImageStatisticsCalculator::Statistics& stats,
                         double testMean, double testSD);
@@ -365,6 +379,69 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
   this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 212.66, 73.32);
 }
 
+void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingEmpty()
+{
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageWithReference<unsigned char>( m_Image, 0 );
+
+  this->VerifyStatistics( ComputeStatistics( m_Image, mask_image ), 0.0, 0.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
+{
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageWithReference<unsigned char>( m_Image, 0 );
+
+  std::vector< itk::Index<3U> > activated_indices;
+  itk::Index<3U> index = {{10, 8, 0}};
+  activated_indices.push_back( index );
+
+  index[0] = 9;  index[1] = 8; index[2] =  0;
+  activated_indices.push_back( index );
+
+  index[0] = 9;  index[1] = 7; index[2] =  0;
+  activated_indices.push_back( index );
+
+  index[0] = 10;  index[1] = 7; index[2] =  0;
+  activated_indices.push_back( index );
+
+  std::vector< itk::Index<3U> >::const_iterator indexIter = activated_indices.begin();
+
+  // activate voxel in the mask image
+  mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
+  while( indexIter != activated_indices.end() )
+  {
+    writeAccess.SetPixelByIndex( (*indexIter++), 1);
+  }
+
+  this->VerifyStatistics( ComputeStatistics( m_Image, mask_image ), 127.5, 147.22);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
+{
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageWithReference<unsigned char>( m_Image, 0 );
+
+  mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
+  statisticsCalculator->SetImage( m_Image );
+  statisticsCalculator->SetImageMask( mask_image );
+  statisticsCalculator->SetMaskingModeToImage();
+
+  statisticsCalculator->ComputeStatistics();
+  this->VerifyStatistics( statisticsCalculator->GetStatistics(), 0.0, 0.0);
+
+  // activate voxel in the mask image
+  itk::Index<3U> test_index = {11, 8, 0};
+  mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
+  writeAccess.SetPixelByIndex( test_index, 1);
+
+  mask_image->Modified();
+
+  statisticsCalculator->ComputeStatistics();
+  const mitk::ImageStatisticsCalculator::Statistics stat = statisticsCalculator->GetStatistics();
+
+  this->VerifyStatistics( stat, 128.0, 0.0);
+  MITK_TEST_CONDITION( stat.GetN() == 1, "Calculated mask voxel count '" << stat.GetN() << "'  is equal to the desired value '" << 1 << "'" );
+
+}
+
 const mitk::ImageStatisticsCalculator::Statistics
 mitkImageStatisticsCalculatorTestSuite::ComputeStatistics( mitk::Image::Pointer image, mitk::PlanarFigure::Pointer polygon )
 {
@@ -377,6 +454,20 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics( mitk::Image::Pointer 
 
   return statisticsCalculator->GetStatistics();
 }
+
+const mitk::ImageStatisticsCalculator::Statistics
+mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::Pointer image, mitk::Image::Pointer image_mask )
+{
+  mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
+  statisticsCalculator->SetImage( image );
+  statisticsCalculator->SetImageMask( image_mask );
+  statisticsCalculator->SetMaskingModeToImage();
+
+  statisticsCalculator->ComputeStatistics();
+
+  return statisticsCalculator->GetStatistics();
+}
+
 
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(const mitk::ImageStatisticsCalculator::Statistics& stats,
                                                               double testMean, double testSD)

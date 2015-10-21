@@ -87,10 +87,12 @@ public:
     }
 
     /**
-     * \brief Generates gradient image with the defined size and spacing
+     * \brief Generates an image of a same geometry as the one given as reference
+
+       The image buffer is filled to the fill_value given as parameter
      */
     template <typename TPixelType>
-    static mitk::Image::Pointer GenerateImageWithReference( mitk::Image::Pointer reference,
+    static mitk::Image::Pointer GenerateImageFromReference( mitk::Image::Pointer reference,
                                                             TPixelType fill_value )
     {
       mitk::Image::Pointer output = mitk::Image::New();

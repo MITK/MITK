@@ -19,6 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <dcvrdt.h>
 
 #define BOOST_DATE_TIME_NO_LIB
+//Prevent unnecessary/unwanted auto link in this compilation when activating boost libraries in the MITK superbuild
+//It is necessary because BOOST_ALL_DYN_LINK overwrites BOOST_DATE_TIME_NO_LIB
+#if defined(BOOST_ALL_DYN_LINK)
+  #undef BOOST_ALL_DYN_LINK
+#endif
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 

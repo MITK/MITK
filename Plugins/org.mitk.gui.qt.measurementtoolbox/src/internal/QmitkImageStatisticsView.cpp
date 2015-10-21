@@ -274,14 +274,20 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
 
     // Copy statistics to clipboard ("%Ln" will use the default locale for
     // number formatting)
-    QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t V (mm³)\n" );
-    clipboard = clipboard.append("%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7")
+    QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t Skewness \t Kurtosis \t Uniformity \t Entropy \t MPP \t UPP \t V (mm³) \n" );
+    clipboard = clipboard.append("%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7 \t %8 \t %9 \t %10 \t %11 \t %12 \t %13")
       .arg(statistics[t].GetMean(), 0, 'f', 10)
       .arg(statistics[t].GetSigma(), 0, 'f', 10)
       .arg(statistics[t].GetRMS(), 0, 'f', 10)
       .arg(statistics[t].GetMax(), 0, 'f', 10)
       .arg(statistics[t].GetMin(), 0, 'f', 10)
       .arg(statistics[t].GetN())
+      .arg(statistics[t].GetSkewness(), 0, 'f', 10)
+      .arg(statistics[t].GetKurtosis(), 0, 'f', 10)
+      .arg(statistics[t].GetUniformity(), 0, 'f', 10)
+      .arg(statistics[t].GetEntropy(), 0, 'f', 10)
+      .arg(statistics[t].GetMPP(), 0, 'f', 10)
+      .arg(statistics[t].GetUPP(), 0, 'f', 10)
       .arg( m_Controls->m_StatisticsTable->item(6, 0)->data(Qt::DisplayRole).toDouble(), 0, 'f', 10);
 
     QApplication::clipboard()->setText(

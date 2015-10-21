@@ -845,6 +845,9 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableVolumeRendering(bool enable)
     node->SetBoolProperty("volumerendering", enable);
   }
 
+  double val = this->m_Controls.m_PreviewSlider->value();
+  this->ChangeLevelWindow( val );
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

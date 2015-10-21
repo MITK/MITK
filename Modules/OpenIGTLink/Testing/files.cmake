@@ -1,5 +1,5 @@
 set(MODULE_TESTS
    mitkOpenIGTLinkClientServerTest.cpp
-   mitkOpenIGTLinkGeneralTest.cpp
+   mitkOpenIGTLinkImageFactoryTest.cpp
    mitkOpenIGTLinkIGTLImageMessageFilterTest.cpp
 )

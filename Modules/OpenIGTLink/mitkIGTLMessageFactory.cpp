@@ -111,7 +111,7 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
 
   this->AddMessageNewMethod("GET_IMAGE", (PointerToMessageBaseNew)&igtl::GetImageMessage::New);
   this->AddMessageNewMethod("GET_TRANS", (PointerToMessageBaseNew)&igtl::GetTransformMessage::New);
-  //  this->AddMessageNewMethod("GET_POS", (PointerToMessageBaseNew)&igtl::GetPositionMessage::New); //not available???
+  //this->AddMessageNewMethod("GET_POS", (PointerToMessageBaseNew)&igtl::GetPositionMessage::New); //not available???
   this->AddMessageNewMethod("GET_STATUS", (PointerToMessageBaseNew)&igtl::GetStatusMessage::New);
   this->AddMessageNewMethod("GET_CAPABIL", (PointerToMessageBaseNew)&igtl::GetCapabilityMessage::New);
 
@@ -135,10 +135,10 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
   this->AddMessageNewMethod("GET_POINT", (PointerToMessageBaseNew)&igtl::GetPointMessage::New);
   this->AddMessageNewMethod("GET_TRAJ", (PointerToMessageBaseNew)&igtl::GetTrajectoryMessage::New);
   //  this->AddMessageNewMethod("GET_TDATA",      (PointerToMessageBaseNew)&igtl::GetTrackingDataMessage::New); //not available???
-  //  this->AddMessageNewMethod("GET_QTDATA",     (PointerToMessageBaseNew)&igtl::GetQuaternionTrackingDataMessage::New);
-  //  this->AddMessageNewMethod("GET_SENSOR",     (PointerToMessageBaseNew)&igtl::GetSensorMessage::New);
-  //  this->AddMessageNewMethod("GET_STRING",     (PointerToMessageBaseNew)&igtl::GetStringMessage::New);
-  //  this->AddMessageNewMethod("GET_NDARRAY",    (PointerToMessageBaseNew)&igtl::GetNDArrayMessage::New);
+  //  this->AddMessageNewMethod("GET_QTDATA",     (PointerToMessageBaseNew)&igtl::GetQuaternionTrackingDataMessage::New); //not available???
+  //  this->AddMessageNewMethod("GET_SENSOR",     (PointerToMessageBaseNew)&igtl::GetSensorMessage::New); //not available???
+  //  this->AddMessageNewMethod("GET_STRING",     (PointerToMessageBaseNew)&igtl::GetStringMessage::New); //not available???
+  //  this->AddMessageNewMethod("GET_NDARRAY",    (PointerToMessageBaseNew)&igtl::GetNDArrayMessage::New); //not available???
   this->AddMessageNewMethod("GET_BIND", (PointerToMessageBaseNew)&igtl::GetBindMessage::New);
   this->AddMessageNewMethod("GET_POLYDATA", (PointerToMessageBaseNew)&igtl::GetPolyDataMessage::New);
 

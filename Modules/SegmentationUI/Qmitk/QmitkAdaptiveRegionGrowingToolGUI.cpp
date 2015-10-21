@@ -490,7 +490,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   typename InputImageType::Pointer inputImageItk;
   mitk::CastToItkImage< InputImageType >( resultImage, inputImageItk );
   //volume rendering preview masking
-  ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
+  typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput( inputImageItk );
   thresholdFilter->SetInsideValue( 1 );
   thresholdFilter->SetOutsideValue( 0 );
@@ -867,10 +867,10 @@ void QmitkAdaptiveRegionGrowingToolGUI::UpdateVolumeRenderingThreshold(int thVal
     return;
   }
 
-  InputImageType::Pointer itkGrownImage;
+  typename InputImageType::Pointer itkGrownImage;
   mitk::CastToItkImage( grownImage, itkGrownImage );
 
-  ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
+  typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
   thresholdFilter->SetInput( itkGrownImage );
   thresholdFilter->SetInPlace( false );
 
@@ -892,7 +892,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::UpdateVolumeRenderingThreshold(int thVal
   }
   thresholdFilter->UpdateLargestPossibleRegion();
 
-  MaskImageFilterType::Pointer maskFilter = MaskImageFilterType::New();
+  typename MaskImageFilterType::Pointer maskFilter = MaskImageFilterType::New();
   maskFilter->SetInput( itkGrownImage );
   maskFilter->SetInPlace( false );
   maskFilter->SetMaskImage( thresholdFilter->GetOutput() );

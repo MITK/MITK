@@ -191,11 +191,11 @@ namespace mitk
       void Reset(unsigned int dimension = 2);
 
       mitkSetGetConstMacro(Label, unsigned int)
-      mitkSetGetConstMacro(N, unsigned int)
-      mitkSetGetConstMacro(Min, double)
-      mitkSetGetConstMacro(Max, double)
-      mitkSetGetConstMacro(Mean, double)
-      mitkSetGetConstMacro(Median, double)
+        mitkSetGetConstMacro(N, unsigned int)
+        mitkSetGetConstMacro(Min, double)
+        mitkSetGetConstMacro(Max, double)
+        mitkSetGetConstMacro(Mean, double)
+        mitkSetGetConstMacro(Median, double)
 
         double GetVariance() const;
       /** \brief Set variance
@@ -223,15 +223,15 @@ namespace mitk
       void SetSigma( const double );
 
       mitkSetGetConstMacro(RMS, double)
-      mitkSetGetConstMacro(MinIndex, vnl_vector<int>)
-      mitkSetGetConstMacro(MaxIndex, vnl_vector<int>)
-      mitkSetGetConstMacro(HotspotIndex, vnl_vector<int>)
+        mitkSetGetConstMacro(MinIndex, vnl_vector<int>)
+        mitkSetGetConstMacro(MaxIndex, vnl_vector<int>)
+        mitkSetGetConstMacro(HotspotIndex, vnl_vector<int>)
 
-      mitkSetGetConstMacro(Skewness, double)
-      mitkSetGetConstMacro(Kurtosis, double)
-      mitkSetGetConstMacro(Uniformity, double)
-      mitkSetGetConstMacro(Entropy, double)
-      mitkSetGetConstMacro(UPP, double);
+        mitkSetGetConstMacro(Skewness, double)
+        mitkSetGetConstMacro(Kurtosis, double)
+        mitkSetGetConstMacro(Uniformity, double)
+        mitkSetGetConstMacro(Entropy, double)
+        mitkSetGetConstMacro(UPP, double);
       mitkSetGetConstMacro(MPP, double);
 
     private:
@@ -315,7 +315,7 @@ namespace mitk
     void SetHistogramBinSize( double size);
 
     /** \brief Get bin size for histogram resolution.*/
-  double GetHistogramBinSize();
+    double GetHistogramBinSize();
 
     /** \brief Sets the radius for the hotspot */
     void SetHotspotRadiusInMM (double hotspotRadiusInMM);
@@ -402,7 +402,6 @@ namespace mitk
     template < typename TPixel, unsigned int VImageDimension >
     void  GetMinAndMaxValue(double &minimum, double &maximum, int &counter, double &sigma, const itk::Image< TPixel, VImageDimension > *InputImage,
       itk::Image< unsigned short, VImageDimension > *MaskImageType);
-
 
     /** \brief If the passed vector matches any of the three principal axes
     * of the passed geometry, the ínteger value corresponding to the axis
@@ -591,15 +590,16 @@ namespace mitk
 
     double m_HistogramBinSize;    ///Bin size for histogram resoluion.
     bool m_UseDefaultBinSize;
+    bool m_UseBinSizeBasedOnVOIRegion;
     double m_HotspotRadiusInMM;
     bool m_CalculateHotspot;
     bool m_HotspotRadiusInMMChanged;
     bool m_HotspotMustBeCompletelyInsideImage;
 
 
-private:
+  private:
 
-  unsigned int calcNumberOfBins(mitk::ScalarType min, mitk::ScalarType max);
+    unsigned int calcNumberOfBins(mitk::ScalarType min, mitk::ScalarType max);
 
 
   };

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageCast.h"
 #include "mitkExtractImageFilter.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkITKImageImport.h"
 
 #include <mitkExtendedStatisticsImageFilter.h>
 #include <mitkExtendedLabelStatisticsImageFilter.h>
@@ -29,13 +30,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkChangeInformationImageFilter.h>
 #include <itkExtractImageFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
+#include <itkStatisticsImageFilter.h>
+#include <itkLabelStatisticsImageFilter.h>
+#include <itkMaskImageFilter.h>
+#include <itkImageFileWriter.h>
+#include <itkRescaleIntensityImageFilter.h>
 
 #include <itkMaskImageFilter.h>
 
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
-#include <itkImageRegionConstIteratorWithIndex.h>
-#include <itkImageRegionIteratorWithIndex.h>
 
 #include <itkCastImageFilter.h>
 #include <itkVTKImageImport.h>
@@ -97,6 +101,9 @@ namespace mitk
     m_EmptyStatistics.Reset();
   }
 
+  ImageStatisticsCalculator::~ImageStatisticsCalculator()
+  {
+  }
 
 
   void ImageStatisticsCalculator::SetUseDefaultBinSize(bool useDefault)
@@ -104,19 +111,17 @@ namespace mitk
     m_UseDefaultBinSize = useDefault;
   }
 
-  ImageStatisticsCalculator::~ImageStatisticsCalculator()
-  {
-  }
+
 
 
   ImageStatisticsCalculator::Statistics::Statistics(bool withHotspotStatistics)
-  :m_HotspotStatistics(withHotspotStatistics ? new Statistics(false) : nullptr)
+    :m_HotspotStatistics(withHotspotStatistics ? new Statistics(false) : nullptr)
   {
     Reset();
   }
 
   ImageStatisticsCalculator::Statistics::Statistics(const Statistics& other)
-  :m_HotspotStatistics( nullptr)
+    :m_HotspotStatistics( nullptr)
   {
     this->SetLabel( other.GetLabel() );
     this->SetN( other.GetN() );
@@ -347,21 +352,13 @@ namespace mitk
 
     if ( m_ImageMask != imageMask )
     {
-      if ( m_Image->GetTimeSteps() != imageMask->GetTimeSteps() )
-      {
-        itkExceptionMacro( << "Image and image mask need to have equal number of time steps!" );
-      }
+      m_ImageMask = imageMask;
+      this->Modified();
 
-      if ( m_ImageMask != imageMask )
+      for ( unsigned int t = 0; t < m_Image->GetTimeSteps(); ++t )
       {
-        m_ImageMask = imageMask;
-        this->Modified();
-
-        for ( unsigned int t = 0; t < m_Image->GetTimeSteps(); ++t )
-        {
-          m_MaskedImageStatisticsTimeStampVector[t].Modified();
-          m_MaskedImageStatisticsCalculationTriggerVector[t] = true;
-        }
+        m_MaskedImageStatisticsTimeStampVector[t].Modified();
+        m_MaskedImageStatisticsCalculationTriggerVector[t] = true;
       }
     }
   }
@@ -464,35 +461,33 @@ namespace mitk
     return m_DoIgnorePixelValue;
   }
 
-double ImageStatisticsCalculator::GetHistogramBinSize()
-{
-  return this->m_HistogramBinSize;
-}
-
-void ImageStatisticsCalculator::SetHotspotRadiusInMM(double value)
-{
-  if ( m_HotspotRadiusInMM != value )
-  {
-    m_HotspotRadiusInMM = value;
-    if(m_CalculateHotspot)
-    {
-      m_HotspotRadiusInMMChanged = true;
-      //MITK_INFO <<"Hotspot radius changed, new convolution required";
-    }
-    this->Modified();
-  }
-}
-
-double ImageStatisticsCalculator::GetHotspotRadiusInMM()
-{
-  return m_HotspotRadiusInMM;
-}
-
-  void ImageStatisticsCalculator::SetHistogramBinSize( double size)
+  void ImageStatisticsCalculator::SetHistogramBinSize(double size)
   {
     this->m_HistogramBinSize = size;
   }
+  double ImageStatisticsCalculator::GetHistogramBinSize()
+  {
+    return this->m_HistogramBinSize;
+  }
 
+  void ImageStatisticsCalculator::SetHotspotRadiusInMM(double value)
+  {
+    if ( m_HotspotRadiusInMM != value )
+    {
+      m_HotspotRadiusInMM = value;
+      if(m_CalculateHotspot)
+      {
+        m_HotspotRadiusInMMChanged = true;
+        //MITK_INFO <<"Hotspot radius changed, new convolution required";
+      }
+      this->Modified();
+    }
+  }
+
+  double ImageStatisticsCalculator::GetHotspotRadiusInMM()
+  {
+    return m_HotspotRadiusInMM;
+  }
 
   void ImageStatisticsCalculator::SetCalculateHotspot(bool on)
   {
@@ -916,23 +911,27 @@ double ImageStatisticsCalculator::GetHotspotRadiusInMM()
     {
     case MASKING_MODE_NONE:
       {
+        m_InternalImage = timeSliceImage;
         m_InternalImageMask2D = nullptr;
         m_InternalImageMask3D = nullptr;
-        if( m_InternalImage->GetDimension() == 3 )
+        if(m_DoIgnorePixelValue)
         {
-          if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
-            CastToItkImage( timeSliceImage, m_InternalImageMask3D );
-          else
-            CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask3D  );
-          m_InternalImageMask3D->FillBuffer(1);
-        }
-        if( m_InternalImage->GetDimension() == 2 )
-        {
-          if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
-            CastToItkImage( timeSliceImage, m_InternalImageMask2D );
-          else
-            CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask2D );
-          m_InternalImageMask2D->FillBuffer(1);
+          if( m_InternalImage->GetDimension() == 3 )
+          {
+            if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
+              CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+            else
+              CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask3D  );
+            m_InternalImageMask3D->FillBuffer(1);
+          }
+          if( m_InternalImage->GetDimension() == 2 )
+          {
+            if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
+              CastToItkImage( timeSliceImage, m_InternalImageMask2D );
+            else
+              CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask2D );
+            m_InternalImageMask2D->FillBuffer(1);
+          }
         }
         break;
       }
@@ -1003,12 +1002,13 @@ double ImageStatisticsCalculator::GetHotspotRadiusInMM()
 
         // Find principal direction of PlanarFigure in input image
         unsigned int axis;
-        if ( !this->GetPrincipalAxis( imageGeometry, planarFigureGeometry->GetNormal(), axis ) )
+        if ( !this->GetPrincipalAxis( imageGeometry,
+          planarFigureGeometry->GetNormal(), axis ) )
         {
           throw std::runtime_error( "Non-aligned planar figures not supported!" );
         }
-
         m_PlanarFigureAxis = axis;
+
         // Find slice number corresponding to PlanarFigure in input image
         MaskImage3DType::IndexType index;
         imageGeometry->WorldToIndex( planarFigureGeometry->GetOrigin(), index );
@@ -1085,10 +1085,10 @@ double ImageStatisticsCalculator::GetHotspotRadiusInMM()
   }
 
 
-unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, mitk::ScalarType max)
-{
-  return std::ceil( ( (max - min ) / m_HistogramBinSize) );
-}
+  unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, mitk::ScalarType max)
+  {
+    return std::ceil( ( (max - min ) / m_HistogramBinSize) );
+  }
 
 
   template < typename TPixel, unsigned int VImageDimension >
@@ -1207,16 +1207,25 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
 
     statisticsContainer->push_back( statistics );
 
-    histogramContainer->push_back( statisticsFilter->GetHistogram() );
-  unsigned int numberOfBins = 200; // default number of bins
-  if (m_UseDefaultBinSize)
-  {
-    m_HistogramBinSize = std::ceil( (statistics.GetMax() - statistics.GetMin() + 1)/numberOfBins );
-  }
-  else
-  {
-    numberOfBins = calcNumberOfBins(statistics.GetMin(), statistics.GetMax());
-  }
+    // Calculate histogram
+    // calculate bin size or number of bins
+    unsigned int numberOfBins = 200; // default number of bins
+    if (m_UseDefaultBinSize)
+    {
+      m_HistogramBinSize = std::ceil( (statistics.GetMax() - statistics.GetMin() + 1)/numberOfBins );
+    }
+    else
+    {
+      numberOfBins = calcNumberOfBins(statistics.GetMin(), statistics.GetMax());
+    }
+    typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
+    histogramGenerator->SetInput( image );
+    histogramGenerator->SetMarginalScale( 100 );
+    histogramGenerator->SetNumberOfBins( numberOfBins );
+    histogramGenerator->SetHistogramMin( statistics.GetMin() );
+    histogramGenerator->SetHistogramMax( statistics.GetMax() );
+    histogramGenerator->Compute();
+    histogramContainer->push_back( histogramGenerator->GetOutput() );
   }
 
   template < typename TPixel, unsigned int VImageDimension >
@@ -1332,21 +1341,21 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     adaptMaskFilter->SetOutputOrigin( image->GetOrigin() );
     adaptMaskFilter->SetOutputOffset( offset );
 
-  typename MaskImageType::Pointer adaptedMaskImage;
-  try
-  {
-    adaptMaskFilter->Update();
-    adaptedMaskImage = adaptMaskFilter->GetOutput();
-  }
-  catch( const itk::ExceptionObject &e)
-  {
-    mitkThrow() << "Attempt to adapt shifted origin of the mask image failed due to ITK Exception: \n" << e.what();
-  }
+    typename MaskImageType::Pointer adaptedMaskImage;
+    try
+    {
+      adaptMaskFilter->Update();
+      adaptedMaskImage = adaptMaskFilter->GetOutput();
+    }
+    catch( const itk::ExceptionObject &e)
+    {
+      mitkThrow() << "Attempt to adapt shifted origin of the mask image failed due to ITK Exception: \n" << e.what();
+    }
 
 
     // Make sure that mask region is contained within image region
-  if ( adaptedMaskImage.IsNotNull() &&
-       !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
+    if ( adaptedMaskImage.IsNotNull() &&
+      !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
     {
       itkWarningMacro( << "Mask region needs to be inside of image region! (Image region: "
         << image->GetLargestPossibleRegion() << "; Mask region: " << adaptedMaskImage->GetLargestPossibleRegion() << ")" );
@@ -1379,34 +1388,59 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
       adaptedImage = image;
     }
 
-    double maximum = 0;
-    double minimum = 0;
-    double sig = 0;
-    int counter = 0;
+    // Initialize Filter
+    typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
+    typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
+    statisticsFilter->SetInput( adaptedImage );
 
-    //Find the min and max values for the Roi to set the range for the histogram
-    GetMinAndMaxValue( minimum, maximum, counter, sig, image, maskImage);
-    double diff = maximum - minimum;
-    if(maximum - minimum <= 10)
+    try
     {
-      diff = 100;
+      statisticsFilter->Update();
     }
-  //}
-//     unsigned int numberOfBins = 200; // default number of bins
-//     if (m_UseDefaultBinSize)
-//     {
-//       m_HistogramBinSize = std::ceil( static_cast<double>((statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1)/numberOfBins) );
-//     }
-//     else
-//     {
-//       numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
-//     }
+    catch( const itk::ExceptionObject& e)
+    {
+      mitkThrow() << "Image statistics initialization computation failed with ITK Exception: \n " << e.what();
+    }
+
+    // Calculate bin size or number of bins
+    unsigned int numberOfBins = 200; // default number of bins
+    double maximum = 0.0;
+    double minimum = 0.0;
+
+    if (m_UseBinSizeBasedOnVOIRegion)
+    {
+      maximum = statisticsFilter->GetMaximum();
+      minimum = statisticsFilter->GetMinimum();
+
+      if (m_UseDefaultBinSize)
+      {
+        m_HistogramBinSize = std::ceil( static_cast<double>((statisticsFilter->GetMaximum() - statisticsFilter->GetMinimum() + 1)/numberOfBins) );
+      }
+      else
+      {
+        numberOfBins = calcNumberOfBins(statisticsFilter->GetMinimum(), statisticsFilter->GetMaximum());
+      }
+    }
+    else
+    {
+      double sig = 0.0;
+      int counter = 0;
+
+      //Find the min and max values for the Roi to set the range for the histogram
+      GetMinAndMaxValue( minimum, maximum, counter, sig, image, maskImage);
+      numberOfBins = maximum - minimum;
+      if(maximum - minimum <= 10)
+      {
+        numberOfBins = 100;
+      }
+    }
+
 
     typename  LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( adaptedImage );
     labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
     labelStatisticsFilter->UseHistogramsOn();
-    labelStatisticsFilter->SetHistogramParameters( diff, floor(minimum), ceil(maximum) );   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
+    labelStatisticsFilter->SetHistogramParameters( numberOfBins, floor(minimum), ceil(maximum) );   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
 
     // Add progress listening
     typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;
@@ -1425,15 +1459,7 @@ unsigned int ImageStatisticsCalculator::calcNumberOfBins(mitk::ScalarType min, m
     labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
 
     // Execute the filter
-    try
-    {
-      labelStatisticsFilter->Update();
-    }
-    catch( const itk::ExceptionObject& e)
-    {
-      mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
-    }
-
+    labelStatisticsFilter->Update();
 
     this->InvokeEvent( itk::EndEvent() );
 

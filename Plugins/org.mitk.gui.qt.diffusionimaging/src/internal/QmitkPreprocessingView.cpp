@@ -146,7 +146,6 @@ void QmitkPreprocessingView::CreateConnections()
     if ( m_Controls )
     {
         m_Controls->m_NormalizationMaskBox->SetDataStorage(this->GetDataStorage());
-        m_Controls->m_NormalizationMaskBox->SetZeroEntryText("--");
 
         m_Controls->m_SelctedImageComboBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_MergeDwiBox->SetDataStorage(this->GetDataStorage());
@@ -191,6 +190,8 @@ void QmitkPreprocessingView::CreateConnections()
         connect( (QObject*)(m_Controls->m_ExtractGradientButton), SIGNAL(clicked()), this, SLOT(DoExtractGradient()) );
         connect( (QObject*)(m_Controls->m_FlipAxis), SIGNAL(clicked()), this, SLOT(DoFlipAxis()) );
         connect( (QObject*)(m_Controls->m_SelctedImageComboBox), SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnImageSelectionChanged()) );
+
+        m_Controls->m_NormalizationMaskBox->SetZeroEntryText("--");
 
     }
 }
@@ -1543,7 +1544,7 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
     bool multiComponentVolume = (image->GetPixelType().GetNumberOfComponents() > 1);
 
-    bool foundSingleImageVolume = foundImageVolume && (!multiComponentVolume);
+    bool foundSingleImageVolume = foundDwiVolume || (foundImageVolume && (!multiComponentVolume));
 
     m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
     m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);

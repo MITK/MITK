@@ -381,14 +381,14 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
 
 void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingEmpty()
 {
-  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageWithReference<unsigned char>( m_Image, 0 );
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_Image, 0 );
 
   this->VerifyStatistics( ComputeStatistics( m_Image, mask_image ), 0.0, 0.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
 {
-  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageWithReference<unsigned char>( m_Image, 0 );
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_Image, 0 );
 
   std::vector< itk::Index<3U> > activated_indices;
   itk::Index<3U> index = {{10, 8, 0}};
@@ -417,7 +417,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
 
 void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
 {
-  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageWithReference<unsigned char>( m_Image, 0 );
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_Image, 0 );
 
   mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
   statisticsCalculator->SetImage( m_Image );

@@ -450,7 +450,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
   //initialize slider
   m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
-  mitk::ScalarType max = m_LOWERTHRESHOLD+resultImage->GetStatistics()->GetScalarValueMax();
+
+  mitk::ScalarType max = m_SeedpointValue + resultImage->GetStatistics()->GetScalarValueMax();
   if (max < m_UPPERTHRESHOLD)
     m_Controls.m_PreviewSlider->setMaximum(max);
   else

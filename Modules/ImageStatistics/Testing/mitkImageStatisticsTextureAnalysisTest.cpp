@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImage.h"
 #include "mitkExtendedLabelStatisticsImageFilter.h"
 #include "mitkExtendedStatisticsImageFilter.h"
+#include "mitkNumericConstants.h"
 
 /**
  \section Testing of Skewness and Kurtosis
@@ -95,7 +96,6 @@ public:
     return image;
   }
 
-
   LabelStatisticsFilterType::Pointer  TestInstanceFortheMaskedStatisticsFilter(ImageType::Pointer image, ImageType::Pointer maskImage)
   {
     LabelStatisticsFilterType::Pointer labelStatisticsFilter;
@@ -137,7 +137,7 @@ public:
 
     MITK_TEST_CONDITION( isKurtosisUpperlimitCorrect && isKurtosisLowerlimitCorrect,"expectedKurtosis: " << expectedKurtosis << " actual Value: " << labelStatisticsFilter->GetKurtosis( 1 ) );
 
-    MITK_TEST_CONDITION( expectedMPP == labelStatisticsFilter->GetMPP( 1 ), "expected MPP: " << expectedMPP << " actual Value: " << labelStatisticsFilter->GetMPP( 1 ) );
+    MITK_TEST_CONDITION( ( expectedMPP - labelStatisticsFilter->GetMPP( 1 ) ) < 1, "expected MPP: " << expectedMPP << " actual Value: " << labelStatisticsFilter->GetMPP( 1 ) );
   }
 
   //test for Entropy,Uniformity and UPP for masked Images
@@ -172,7 +172,7 @@ public:
 
     MITK_TEST_CONDITION( isKurtosisUpperlimitCorrect && isKurtosisLowerlimitCorrect,"expectedKurtosis: " << expectedKurtosis << " actual Value: " << StatisticsFilter->GetKurtosis() );
 
-    MITK_TEST_CONDITION( expectedMPP == StatisticsFilter->GetMPP(), "expected MPP: " << expectedMPP << " actual Value: " << StatisticsFilter->GetMPP() );
+    MITK_TEST_CONDITION( ( expectedMPP - StatisticsFilter->GetMPP() ) < mitk::eps, "expected MPP: " << expectedMPP << " actual Value: " << StatisticsFilter->GetMPP() );
   }
 
   //test for Entropy,Uniformity and UPP for unmasked Images

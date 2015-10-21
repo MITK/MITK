@@ -257,7 +257,7 @@ namespace itk
         Subregion = Superclass::GetRegion(*it);
 
         int count( GetCount(*it) );
-        if ( count == 0 || sigma == 0)
+        if ( count == 0 || sigma < mitk::eps)
         {
           throw std::logic_error( "Empty segmentation" );
         }

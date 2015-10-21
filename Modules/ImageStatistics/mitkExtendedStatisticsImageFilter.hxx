@@ -213,7 +213,7 @@ namespace itk
     RealType mpp(0.0);
     RealType currentPixel(0.0);
 
-    if (  sigma == 0 )
+    if (  sigma < mitk::eps )
     {
       throw std::logic_error( "Empty segmentation" );
     }

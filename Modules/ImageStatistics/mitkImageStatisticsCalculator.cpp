@@ -87,6 +87,7 @@ namespace mitk
     m_PlanarFigureCoordinate1 (0),
     m_HistogramBinSize(1.0),
     m_UseDefaultBinSize(true),
+    m_UseBinSizeBasedOnVOIRegion(false),
     m_HotspotRadiusInMM(6.2035049089940),   // radius of a 1cm3 sphere in mm
     m_CalculateHotspot(false),
     m_HotspotRadiusInMMChanged(false),

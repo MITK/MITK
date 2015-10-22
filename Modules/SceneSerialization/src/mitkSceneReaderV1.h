@@ -44,6 +44,19 @@ class SceneReaderV1 : public SceneReader
     bool DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory);
 
     /**
+      \brief Clear a default property list and handle some exceptions.
+
+      Called after assigning a BaseData object to a fresh DataNode via SetData().
+      This call to SetData() would create default properties that have not been
+      there when saving the scene. Since they can produce problems, we clear the
+      list and use only those properties that we read from the scene file.
+
+      This method also handles some exceptions for backwards compatibility.
+      Those exceptions are documented directly in the code of the method.
+    */
+    void ClearNodePropertyListWithExceptions(DataNode& node, PropertyList& propertyList);
+
+    /**
       \brief reads all properties assigned to a base data element and assigns the list to the base data object
 
       The baseDataNodeElem is supposed to be the <properties file="..."> element.

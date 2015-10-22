@@ -21,15 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDropEvent>
 #include <QMimeData>
 #include <QUrl>
-#include "mitkPythonService.h"
+#include "mitkIPythonService.h"
 #include <usModuleContext.h>
 #include <usServiceReference.h>
 #include <usGetModuleContext.h>
 
 struct QmitkCtkPythonShellData
 {
-    mitk::PythonService* m_PythonService;
-    us::ServiceReference<mitk::PythonService> m_PythonServiceRef;
+    mitk::IPythonService* m_PythonService;
+    us::ServiceReference<mitk::IPythonService> m_PythonServiceRef;
 };
 
 QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
@@ -38,7 +38,7 @@ QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
   MITK_DEBUG("QmitkCtkPythonShell") << "retrieving  IPythonService";
   us::ModuleContext* context = us::GetModuleContext();
   d->m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();
-  d->m_PythonService = dynamic_cast<mitk::PythonService*> ( context->GetService<mitk::IPythonService>(d->m_PythonServiceRef) );
+  d->m_PythonService = dynamic_cast<mitk::IPythonService*> ( context->GetService<mitk::IPythonService>(d->m_PythonServiceRef) );
 
   MITK_DEBUG("QmitkCtkPythonShell") << "checking  IPythonService";
   Q_ASSERT( d->m_PythonService );
@@ -47,6 +47,7 @@ QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
   this->initialize( d->m_PythonService->GetPythonManager() );
 
   MITK_DEBUG("QmitkCtkPythonShell") << "m_PythonService initialized";
+  mitk::IPythonService::ForceLoadModule();
 }
 
 QmitkCtkPythonShell::~QmitkCtkPythonShell()

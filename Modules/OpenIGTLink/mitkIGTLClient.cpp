@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLClient.h"
 //#include "mitkIGTTimeStamp.h"
 //#include "mitkIGTHardwareException.h"
+#include "igtlTrackingDataMessage.h"
 #include <stdio.h>
 
 #include <itksys/SystemTools.hxx>
@@ -28,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
-mitk::IGTLClient::IGTLClient() :
-IGTLDevice()
+mitk::IGTLClient::IGTLClient(bool ReadFully) :
+IGTLDevice(ReadFully)
 {
 }
 
@@ -43,7 +44,7 @@ bool mitk::IGTLClient::OpenConnection()
   if (this->GetState() != Setup)
   {
     mitkThrowException(mitk::Exception) <<
-      "Can only try to open the connection if in setup mode";
+      "Can only try to open the connection if in setup mode. State was " << this->GetState();
     return false;
   }
 
@@ -53,6 +54,7 @@ bool mitk::IGTLClient::OpenConnection()
   if (portNumber == -1 || hostname.size() <= 0)
   {
     //port number or hostname was not correct
+    MITK_WARN << "Port number or hostname was not correct";
     return false;
   }
 
@@ -66,8 +68,7 @@ bool mitk::IGTLClient::OpenConnection()
   //check the response
   if ( response != 0 )
   {
-    mitkThrowException(mitk::Exception) <<
-      "The client could not connect to " << hostname << " port: " << portNumber;
+    MITK_ERROR << "The client could not connect to " << hostname << " port: " << portNumber;
     return false;
   }
 
@@ -105,13 +106,9 @@ void mitk::IGTLClient::Send()
   if ( curMessage.IsNull() )
     return;
 
-  m_Measurement->AddMeasurement(4);
+  AddTrackingMeasurements(4, curMessage, 0);
 
-  if ( this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
-  {
-    MITK_INFO("IGTLDevice") << "Successfully sent the message.";
-  }
-  else
+  if (!this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
   {
     MITK_WARN("IGTLDevice") << "Could not send the message.";
   }

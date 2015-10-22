@@ -21,14 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include "QmitkPythonVariableStackTableModel.h"
 #include <mitkIPythonService.h>
-#include <MitkPythonExports.h>
+#include <MitkQtPythonExports.h>
 
 ///
 /// implements the table view for the variable stack
 /// purpose of this class: 1. Setup the view correctly, 2. Implement the double click to write back results
 /// to the datastorage
 ///
-class MITKPYTHON_EXPORT QmitkPythonVariableStackTableView : public QTableView
+class MITKQTPYTHON_EXPORT QmitkPythonVariableStackTableView : public QTableView
 {
   Q_OBJECT
 

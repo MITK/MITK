@@ -19,12 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 #include <QMap>
-#include <MitkPythonExports.h>
+#include <MitkQtPythonExports.h>
 struct QmitkPythonSnippetsData;
 
 ///
 /// a widget that holds snippets and serializes the snippets to a certain places
-class MITKPYTHON_EXPORT QmitkPythonSnippets: public QWidget
+class MITKQTPYTHON_EXPORT QmitkPythonSnippets: public QWidget
 {
   Q_OBJECT
 

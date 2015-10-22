@@ -85,6 +85,25 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     ls->m_STextProp->SetFontSize(GetFontSize());
     ls->m_STextProp->SetOpacity(opacity);
 
+    std::string fontFamilyAsString;
+    if ( GetStringProperty( "font.family", fontFamilyAsString ) == false )
+    {
+      fontFamilyAsString = "Arial";
+    }
+    ls->m_TextProp->SetFontFamilyAsString( fontFamilyAsString.c_str() );
+    ls->m_STextProp->SetFontFamilyAsString( fontFamilyAsString.c_str() );
+
+    bool boldFont(false);
+    GetBoolProperty( "font.bold", boldFont );
+    ls->m_TextProp->SetBold( boldFont );
+    ls->m_STextProp->SetBold( boldFont );
+
+    bool italicFont(false);
+    GetBoolProperty( "font.italic", italicFont );
+    ls->m_TextProp->SetBold( italicFont );
+    ls->m_STextProp->SetBold( italicFont );
+
+
     bool drawShadow;
     GetBoolProperty("drawShadow", drawShadow);
     ls->m_TextProp->SetShadow(false);

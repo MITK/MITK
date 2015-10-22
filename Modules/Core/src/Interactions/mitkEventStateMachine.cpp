@@ -144,8 +144,8 @@ bool mitk::EventStateMachine::HandleEvent(InteractionEvent* event, DataNode* dat
     m_CurrentState = transition->GetNextState();
 
     // iterate over all actions in this transition and execute them
-    ActionVectorType actions = transition->GetActions();
-    for (ActionVectorType::iterator it = actions.begin(); it != actions.end(); ++it)
+    const ActionVectorType actions = transition->GetActions();
+    for (ActionVectorType::const_iterator it = actions.cbegin(); it != actions.cend(); ++it)
     {
       try
       {
@@ -176,8 +176,8 @@ void mitk::EventStateMachine::ConnectActionsAndFunctions()
 bool mitk::EventStateMachine::CheckCondition( const StateMachineCondition& condition, const InteractionEvent* event)
 {
   bool retVal = false;
-  ConditionDelegatesMapType::iterator delegateIter = m_ConditionDelegatesMap.find(condition.GetConditionName());
-  if (delegateIter != m_ConditionDelegatesMap.end())
+  ConditionDelegatesMapType::const_iterator delegateIter = m_ConditionDelegatesMap.find(condition.GetConditionName());
+  if (delegateIter != m_ConditionDelegatesMap.cend())
   {
     retVal = delegateIter->second->Execute(event);
   }
@@ -199,16 +199,16 @@ void mitk::EventStateMachine::ExecuteAction(StateMachineAction* action, Interact
 
 
   // Maps Action-Name to Functor and executes the Functor.
-  ActionDelegatesMapType::iterator delegateIter = m_ActionDelegatesMap.find(action->GetActionName());
-  if (delegateIter != m_ActionDelegatesMap.end())
+  ActionDelegatesMapType::const_iterator delegateIter = m_ActionDelegatesMap.find(action->GetActionName());
+  if (delegateIter != m_ActionDelegatesMap.cend())
   {
     delegateIter->second->Execute(action, event);
   }
   else
   {
     // try the legacy system
-    std::map<std::string, TActionFunctor*>::iterator functionIter = m_ActionFunctionsMap.find(action->GetActionName());
-    if (functionIter != m_ActionFunctionsMap.end())
+    std::map<std::string, TActionFunctor*>::const_iterator functionIter = m_ActionFunctionsMap.find(action->GetActionName());
+    if (functionIter != m_ActionFunctionsMap.cend())
     {
       functionIter->second->DoAction(action, event);
     }
@@ -247,7 +247,7 @@ mitk::StateMachineTransition* mitk::EventStateMachine::GetExecutableTransition( 
   std::map<std::string, bool> conditionsMap;
 
   // Get a list of all transitions that match the given event
-  mitk::StateMachineState::TransitionVector transitionList =
+  const mitk::StateMachineState::TransitionVector transitionList =
     m_CurrentState->GetTransitionList( event->GetNameOfClass(), MapToEventVariant(event) );
 
   // if there are not transitions, we can return NULL here.
@@ -256,23 +256,23 @@ mitk::StateMachineTransition* mitk::EventStateMachine::GetExecutableTransition( 
     return NULL;
   }
 
-  StateMachineState::TransitionVector::iterator transitionIter;
-  ConditionVectorType::iterator conditionIter;
-  for( transitionIter=transitionList.begin(); transitionIter!=transitionList.end(); ++transitionIter )
+  StateMachineState::TransitionVector::const_iterator transitionIter;
+  ConditionVectorType::const_iterator conditionIter;
+  for( transitionIter=transitionList.cbegin(); transitionIter!=transitionList.cend(); ++transitionIter )
   {
     bool allConditionsFulfilled(true);
 
     // Get all conditions for the current transition
-    ConditionVectorType conditions = (*transitionIter)->GetConditions();
-    for (conditionIter = conditions.begin(); conditionIter != conditions.end(); ++conditionIter)
+    const ConditionVectorType conditions = (*transitionIter)->GetConditions();
+    for (conditionIter = conditions.cbegin(); conditionIter != conditions.cend(); ++conditionIter)
     {
       bool currentConditionFulfilled(false);
 
       // sequentially check all conditions that we have evaluated above
-      std::string conditionName = (*conditionIter).GetConditionName();
+      const std::string conditionName = (*conditionIter).GetConditionName();
 
       // Check if the condition has already been evaluated
-      if ( conditionsMap.find(conditionName) == conditionsMap.end() )
+      if ( conditionsMap.find(conditionName) == conditionsMap.cend() )
       {
         // if the condition has not been evaluated yet, do it now and store
         // the result in the map

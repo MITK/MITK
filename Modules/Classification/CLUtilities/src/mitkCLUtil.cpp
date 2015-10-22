@@ -299,7 +299,6 @@ void mitk::CLUtil::itkFitStructuringElement(TStructuringElement & se, Morphologi
 template<typename TImageType>
 void mitk::CLUtil::itkClosingBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int factor, MorphologicalDimensions d)
 {
-  typedef TImageType ImageType;
   typedef itk::BinaryBallStructuringElement<typename TImageType::PixelType, 3> BallType;
   typedef itk::BinaryMorphologicalClosingImageFilter<TImageType, TImageType, BallType> FilterType;
 
@@ -319,7 +318,6 @@ void mitk::CLUtil::itkClosingBinary(TImageType * sourceImage, mitk::Image::Point
 template<typename TImageType>
 void mitk::CLUtil::itkDilateBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int factor, MorphologicalDimensions d)
 {
-  typedef TImageType ImageType;
   typedef itk::BinaryBallStructuringElement<typename TImageType::PixelType, 3> BallType;
   typedef typename itk::BinaryDilateImageFilter<TImageType, TImageType, BallType> BallDilateFilterType;
 
@@ -339,7 +337,6 @@ void mitk::CLUtil::itkDilateBinary(TImageType * sourceImage, mitk::Image::Pointe
 template<typename TImageType>
 void mitk::CLUtil::itkErodeBinary(TImageType * sourceImage, mitk::Image::Pointer& resultImage, int factor, MorphologicalDimensions d)
 {
-  typedef TImageType ImageType;
   typedef itk::BinaryBallStructuringElement<typename TImageType::PixelType, 3> BallType;
   typedef typename itk::BinaryErodeImageFilter<TImageType, TImageType, BallType> BallErodeFilterType;
 

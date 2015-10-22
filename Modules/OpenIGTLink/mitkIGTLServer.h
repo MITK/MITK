@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKIGTLSERVER_H
 #define MITKIGTLSERVER_H
 
@@ -22,10 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkOpenIGTLinkExports.h>
 
-
 namespace mitk
 {
-
   /**
   * \brief Superclass for OpenIGTLink server
   *
@@ -41,10 +38,10 @@ namespace mitk
   {
   public:
     mitkClassMacro(IGTLServer, IGTLDevice)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      mitkNewMacro1Param(Self, bool)
+      itkCloneMacro(Self)
 
-    typedef std::list<igtl::Socket::Pointer> SocketListType;
+      typedef std::list<igtl::Socket::Pointer> SocketListType;
     typedef SocketListType::iterator SocketListIteratorType;
 
     /**
@@ -72,7 +69,7 @@ namespace mitk
 
   protected:
     /** Constructor */
-    IGTLServer();
+    IGTLServer(bool ReadFully);
     /** Destructor */
     virtual ~IGTLServer();
 
@@ -120,6 +117,12 @@ namespace mitk
      * \brief A list with all registered clients
      */
     SocketListType m_RegisteredClients;
+
+    /** mutex to control access to m_RegisteredClients */
+    itk::FastMutexLock::Pointer m_ReceiveListMutex;
+
+    /** mutex to control access to m_RegisteredClients */
+    itk::FastMutexLock::Pointer m_SentListMutex;
   };
 } // namespace mitk
 #endif /* MITKIGTLSERVER_H */

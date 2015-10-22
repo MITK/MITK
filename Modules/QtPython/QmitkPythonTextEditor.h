@@ -20,12 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTextEdit>
 #include <QDragEnterEvent>
 #include <QDropEvent>
-#include <MitkPythonExports.h>
+#include <MitkQtPythonExports.h>
 struct QmitkPythonTextEditorData;
 
 ///
 /// this is a python text editor with syntax highlightning
-class MITKPYTHON_EXPORT QmitkPythonTextEditor : public QWidget
+class MITKQTPYTHON_EXPORT QmitkPythonTextEditor : public QWidget
 {
   Q_OBJECT
 

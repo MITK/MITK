@@ -158,7 +158,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->fpsOutDescrLabel->setEnabled(false);
     break;
   case mitk::IGTLDevice::Ready:
-    if (m_IGTLDevice->GetNumberOfConnections())
+    if (m_IsClient)
     {
       this->m_Controls->butConnect->setText("Disconnect");
     }
@@ -179,7 +179,7 @@ void QmitkIGTLDeviceSetupConnectionWidget::AdaptGUIToState()
     this->m_Controls->fpsOutDescrLabel->setEnabled(true);
     break;
   case mitk::IGTLDevice::Running:
-    if (m_IGTLDevice->GetNumberOfConnections())
+    if (m_IsClient)
     {
       this->m_Controls->butConnect->setText("Disconnect");
     }
@@ -289,8 +289,8 @@ void QmitkIGTLDeviceSetupConnectionWidget::DisableSourceControls()
 
 void QmitkIGTLDeviceSetupConnectionWidget::OnConnect()
 {
-  if(m_Controls->butConnect->text() == "Connect" ||
-     m_Controls->butConnect->text() == "Go Online" )
+
+  if (m_IGTLDevice->GetState() == mitk::IGTLDevice::Setup)
   {
     QString port = m_Controls->editPort->text();
     m_IGTLDevice->SetPortNumber(port.toInt());
@@ -325,10 +325,14 @@ void QmitkIGTLDeviceSetupConnectionWidget::OnConnect()
                              "Please check the hostname and port.";
     }
   }
-  else
+  else if (m_IGTLDevice->GetState() == mitk::IGTLDevice::Ready || m_IGTLDevice->GetState() == mitk::IGTLDevice::Running)
   {
     m_IGTLDevice->CloseConnection();
     MITK_INFO("QmitkIGTLDeviceSetupConnectionWidget") << "Closed connection";
+  }
+  else
+  {
+    mitkThrow() << "Invalid state of IGTLDevice";
   }
   this->AdaptGUIToState();
 }

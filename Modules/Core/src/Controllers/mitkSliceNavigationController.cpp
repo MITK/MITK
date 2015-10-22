@@ -158,7 +158,7 @@ void SliceNavigationController::SetViewDirectionToDefault()
   m_ViewDirection = m_DefaultViewDirection;
 }
 
-const char* SliceNavigationController::GetViewDirectionAsString()
+const char* SliceNavigationController::GetViewDirectionAsString() const
 {
     const char* viewDirectionString;
     switch(m_ViewDirection)
@@ -200,6 +200,8 @@ void SliceNavigationController::Update()
     }
   }
 }
+
+
 void
 SliceNavigationController::Update(
   SliceNavigationController::ViewDirection viewDirection,

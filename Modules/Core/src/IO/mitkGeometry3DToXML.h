@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkPointSetToXML_h
-#define mitkPointSetToXML_h
+#ifndef mitkGeometry3DToXML_h
+#define mitkGeometry3DToXML_h
 
 // MITK
 #include "mitkGeometry3D.h"
@@ -33,7 +33,7 @@ namespace mitk
  * Creates TinyXML elements (blocks) that describe a Geometry3D.
  * Also offers a method to read such blocks and create a corresponding Geometry3D.
  *
- * @sa PointSetWriterService, PointSetReaderService
+ * @sa GeometryDataReaderService, GeometryDataWriterService, PointSetWriterService, PointSetReaderService
  *
  * @ingroup IO
  */

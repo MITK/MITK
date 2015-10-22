@@ -489,7 +489,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
     m_IGTLConversionFilter->RegisterAsMicroservice();
 
     //create server and message provider
-    m_IGTLServer = mitk::IGTLServer::New();
+    m_IGTLServer = mitk::IGTLServer::New(false);
     m_IGTLServer->SetName("Tracking Toolbox IGTL Server");
     m_IGTLMessageProvider = mitk::IGTLMessageProvider::New();
     m_IGTLMessageProvider->SetIGTLDevice(m_IGTLServer);

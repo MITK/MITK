@@ -66,6 +66,8 @@ namespace mitk {
     public:
       mitkClassMacroItkParent(IGTLDevice, itk::Object)
 
+      IGTLDevice(bool ReadFully);
+
       /**
        * \brief Type for state variable.
        * The IGTLDevice is always in one of these states.
@@ -179,6 +181,11 @@ namespace mitk {
        * \brief Sets the name of this device
        */
       itkSetMacro(Name, std::string);
+
+      /**
+      * \brief Advises this IGTL Device to always block until the whole message is read.
+      */
+      itkSetMacro(ReadFully, bool);
 
       /**
        * \brief Returns a const reference to the receive queue
@@ -319,6 +326,9 @@ namespace mitk {
       */
       void SetState(IGTLDeviceState state);
 
+      /** Adds tracking measurements to the given message. */
+      void AddTrackingMeasurements(const int index, const igtl::MessageBase::Pointer msg, const long long timestamp);
+
       IGTLDevice();
       virtual ~IGTLDevice();
 
@@ -339,6 +349,7 @@ namespace mitk {
       itk::FastMutexLock::Pointer m_ConnectingFinishedMutex;
       /** mutex to control access to m_State */
       itk::FastMutexLock::Pointer m_StateMutex;
+
       /** the hostname or ip of the device */
       std::string m_Hostname;
       /** the port number of the device */
@@ -360,6 +371,7 @@ namespace mitk {
       mitk::IGTLMeasurements* m_Measurement;
 
     private:
+
       /** creates worker thread that continuously polls interface for new
       messages */
       itk::MultiThreader::Pointer m_MultiThreader;
@@ -369,6 +381,8 @@ namespace mitk {
       int m_ReceiveThreadID;
       /** ID of connecting thread */
       int m_ConnectThreadID;
+      /** Always try to read the full message. */
+      bool m_ReadFully;
     };
 
     /**

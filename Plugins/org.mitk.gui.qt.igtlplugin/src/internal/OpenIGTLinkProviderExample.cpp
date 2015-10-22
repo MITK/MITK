@@ -79,7 +79,7 @@ void OpenIGTLinkProviderExample::CreateQtPartControl( QWidget *parent )
 
 
   //create a new OpenIGTLink Client
-  m_IGTLServer = mitk::IGTLServer::New();
+  m_IGTLServer = mitk::IGTLServer::New(false);
   m_IGTLServer->SetName("OIGTL Provider Example Device");
 
   //create a new OpenIGTLink Device source
@@ -97,7 +97,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 {
   //create a navigation data player object that will play nav data from a
   //recorded file
-  m_NavDataPlayer = mitk::NavigationDataPlayer::New();
+  m_NavDataPlayer = mitk::NavigationDataSequentialPlayer::New();
 
   //set the currently read navigation data set
   m_NavDataPlayer->SetNavigationDataSet(m_NavDataSet);
@@ -170,7 +170,7 @@ void OpenIGTLinkProviderExample::DestroyPipeline()
 {
    if (m_NavDataPlayer.IsNotNull())
    {
-      m_NavDataPlayer->StopPlaying();
+      //m_NavDataPlayer->StopPlaying();
    }
    foreach(mitk::DataNode::Pointer node, m_DemoNodes)
    {
@@ -184,15 +184,18 @@ void OpenIGTLinkProviderExample::Start()
   if ( this->m_Controls.butStart->text().contains("Start") )
   {
     m_NavDataPlayer->SetRepeat(true);
-    m_NavDataPlayer->StartPlaying();
+    //m_NavDataPlayer->StartPlaying();
     this->m_Controls.butStart->setText("Stop Playing Recorded Navigation Data ");
 
     //start the visualization
-    this->m_VisualizerTimer.start(25);
+    double fps = m_Controls.m_updateRate->value();
+    double millisecondsPerFrame = 1 / fps * 1000;
+
+    this->m_VisualizerTimer.start(millisecondsPerFrame);
   }
   else
   {
-    m_NavDataPlayer->StopPlaying();
+    //m_NavDataPlayer->StopPlaying();
     this->m_Controls.butStart->setText("Start Playing Recorded Navigation Data ");
 
     //stop the visualization
@@ -203,8 +206,9 @@ void OpenIGTLinkProviderExample::Start()
 void OpenIGTLinkProviderExample::OnOpenFile(){
 
   // FIXME Filter for correct files and use correct Reader
-  QString fileName =
-      QFileDialog::getOpenFileName(NULL, "Open Navigation Data Set", "", "XML files (*.xml)");
+  QString filter = tr("NavigationData File (*.csv *.xml)");
+  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open NavigationData Set"), "", filter);
+
   if ( fileName.isNull() ) { return; } // user pressed cancel
 
   try
@@ -231,6 +235,7 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
 void OpenIGTLinkProviderExample::UpdateVisualization()
 {
+  this->m_NavDataPlayer->GoToNextSnapshot();
   if (this->m_Controls.visualizeCheckBox->isChecked())
   {
     //update the filter

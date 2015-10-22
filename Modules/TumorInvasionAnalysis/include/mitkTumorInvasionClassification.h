@@ -59,6 +59,20 @@ public:
    */
   void SelectTrainingSamples(DataCollection* collection, unsigned int mode = 0);
 
+
+  /**
+   * @brief PrepareResponseSamples
+   *
+   * Selects healthy/tumor tissue samples to be included into training, and weights them to achieve a given ratio.
+   * \warn This modifies the target data items in the data collection.
+   * Afterwards the target data is encoded as follows:
+   * 0 - excluded (e.g. out of brainmask)
+   * 1 - no involvement (healthy all the time)
+   * 2 - formerly healthy, now tumor (rezivid)
+   * 3 - formerly tumor, now necroses (responsive)
+   */
+  void PrepareResponseSamples(DataCollection* collection);
+
   /**
    * @brief LearnProgressionFeatures
    *

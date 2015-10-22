@@ -7,10 +7,11 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
     message(FATAL_ERROR "Numpy_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
+  set(proj Numpy)
+  set(proj_DEPENDENCIES Python)
+  set(Numpy_DEPENDS ${proj})
+
   if( NOT DEFINED Numpy_DIR )
-    set(proj Numpy)
-    set(${proj}_DEPENDENCIES Python)
-    set(Numpy_DEPENDS ${proj})
 
     # setup build environment and disable fortran, blas and lapack
     set(_numpy_env
@@ -90,7 +91,7 @@ if( MITK_USE_Python AND NOT MITK_USE_SYSTEM_PYTHON )
       INSTALL_COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -P ${_install_step}
 
       DEPENDS
-        ${${proj}_DEPENDENCIES}
+        ${proj_DEPENDENCIES}
     )
 
     set(Numpy_DIR ${MITK_PYTHON_SITE_DIR}/numpy)

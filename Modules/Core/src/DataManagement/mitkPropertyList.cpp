@@ -27,7 +27,7 @@ mitk::BaseProperty* mitk::PropertyList::GetProperty(const std::string& propertyK
     PropertyMap::const_iterator it;
 
     it=m_Properties.find( propertyKey );
-    if(it!=m_Properties.end())
+    if(it!=m_Properties.cend())
       return it->second;
     else
         return nullptr;
@@ -46,7 +46,7 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
   auto it( m_Properties.find( propertyKey ) );
 
   // Is a property with key @a propertyKey contained in the list?
-  if( it != m_Properties.end() )
+  if( it != m_Properties.cend() )
   {
     // yes
     //is the property contained in the list identical to the new one?
@@ -85,7 +85,7 @@ void mitk::PropertyList::ReplaceProperty(const std::string& propertyKey, BasePro
   auto it( m_Properties.find( propertyKey ) );
 
   // Is a property with key @a propertyKey contained in the list?
-  if( it != m_Properties.end() )
+  if( it != m_Properties.cend() )
   {
     it->second=nullptr;
     m_Properties.erase(it);
@@ -104,8 +104,8 @@ mitk::PropertyList::PropertyList()
 mitk::PropertyList::PropertyList(const mitk::PropertyList& other)
   : itk::Object()
 {
-  for (auto i = other.m_Properties.begin();
-       i != other.m_Properties.end(); ++i)
+  for (auto i = other.m_Properties.cbegin();
+       i != other.m_Properties.cend(); ++i)
   {
     m_Properties.insert(std::make_pair(i->first, i->second->Clone()));
   }
@@ -123,8 +123,8 @@ mitk::PropertyList::~PropertyList()
  */
 unsigned long mitk::PropertyList::GetMTime() const
 {
-  for ( auto it = m_Properties.begin() ;
-        it != m_Properties.end();
+  for ( auto it = m_Properties.cbegin() ;
+        it != m_Properties.cend();
         ++it )
   {
     if( it->second.IsNull() )
@@ -145,8 +145,7 @@ unsigned long mitk::PropertyList::GetMTime() const
 
 bool mitk::PropertyList::DeleteProperty(const std::string& propertyKey)
 {
-  PropertyMap::iterator it;
-  it=m_Properties.find( propertyKey );
+  PropertyMap::iterator it = m_Properties.find( propertyKey );
 
   if(it!=m_Properties.end())
   {
@@ -183,8 +182,8 @@ void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool repla
   {
     const PropertyMap* propertyMap = pList->GetMap();
 
-    for ( auto iter = propertyMap->begin(); // m_PropertyList is created in the constructor, so we don't check it here
-          iter != propertyMap->end();
+    for ( auto iter = propertyMap->cbegin(); // m_PropertyList is created in the constructor, so we don't check it here
+          iter != propertyMap->cend();
           ++iter )
     {
       const std::string key = iter->first;

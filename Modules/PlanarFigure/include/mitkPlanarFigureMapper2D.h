@@ -271,6 +271,11 @@ private:
   bool m_DrawDashed;
   bool m_DrawHelperDashed;
 
+  std::string m_AnnotationFontFamily;
+  bool m_DrawAnnotationBold;
+  bool m_DrawAnnotationItalic;
+  int  m_AnnotationSize;
+
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;
   float m_ShadowWidthFactor;

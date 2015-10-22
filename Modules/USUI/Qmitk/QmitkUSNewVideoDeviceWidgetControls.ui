@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>285</width>
+    <width>330</width>
     <height>595</height>
    </rect>
   </property>
@@ -23,7 +23,16 @@
    <property name="fieldGrowthPolicy">
     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item row="0" column="0" colspan="2">
@@ -96,8 +105,8 @@
      <property name="title">
       <string>Video Source:</string>
      </property>
-     <layout class="QFormLayout" name="formLayout_3">
-      <item row="1" column="0">
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
        <widget class="QRadioButton" name="m_RadioDeviceSource">
         <property name="text">
          <string>From Device:</string>
@@ -107,7 +116,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="0" column="1">
        <widget class="QSpinBox" name="m_DeviceSelector">
         <property name="minimum">
          <number>0</number>
@@ -120,14 +129,14 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="1" column="0">
        <widget class="QRadioButton" name="m_RadioFileSource">
         <property name="text">
          <string>From File:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="1" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLineEdit" name="m_FilePathSelector">
@@ -143,6 +152,80 @@
          <widget class="QToolButton" name="m_OpenFileButton">
           <property name="text">
            <string>...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="m_RadioOIGTLServerSource">
+        <property name="text">
+         <string>OIGTL Server</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLineEdit" name="m_OIGTLServerHost">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>localhost</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="m_OIGTLServerPort">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="value">
+           <number>18944</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="0">
+       <widget class="QRadioButton" name="m_RadioOIGTLClientSource">
+        <property name="text">
+         <string>OIGTL Client</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLineEdit" name="m_OIGTLClientHost">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>localhost</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="m_OIGTLClientPort">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="value">
+           <number>18944</number>
           </property>
          </widget>
         </item>
@@ -169,6 +252,32 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item row="3" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="m_BtnDone">
+       <property name="text">
+        <string>Add Video Device</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/accept.png</normaloff>:/USUI/accept.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_BtnCancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/restart.png</normaloff>:/USUI/restart.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="5" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_2">
@@ -266,32 +375,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="3" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="m_BtnDone">
-       <property name="text">
-        <string>Add Video Device</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/USUI.qrc">
-         <normaloff>:/USUI/accept.png</normaloff>:/USUI/accept.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="m_BtnCancel">
-       <property name="text">
-        <string>Cancel</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/USUI.qrc">
-         <normaloff>:/USUI/restart.png</normaloff>:/USUI/restart.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>

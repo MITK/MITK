@@ -6,16 +6,16 @@ if(MITK_USE_SWIG)
     message(FATAL_ERROR "SWIG_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
+  set(SWIG_TARGET_VERSION 3.0.2)
+  set(proj SWIG)
+  set(proj_DEPENDENCIES PCRE)
+  set(SWIG_DEPENDS ${proj})
+
   if(NOT SWIG_DIR)
 
     # We don't "install" SWIG in the common install prefix,
     # since it is only used as a tool during the MITK super-build
     # to generate the Python wrappings for some projects.
-
-    set(SWIG_TARGET_VERSION 3.0.2)
-    set(proj SWIG)
-    set(SWIG_DEPENDENCIES PCRE)
-    set(SWIG_DEPENDS ${proj})
 
     # binary SWIG for windows
     if(WIN32)
@@ -57,7 +57,7 @@ if(MITK_USE_SWIG)
                             --with-pcre-prefix=${PCRE_DIR}
                             --without-octave
                             --with-python=${PYTHON_EXECUTABLE}
-        DEPENDS ${SWIG_DEPENDENCIES}
+        DEPENDS ${proj_DEPENDENCIES}
         )
 
       ExternalProject_Get_Property(${proj} install_dir)
@@ -65,5 +65,7 @@ if(MITK_USE_SWIG)
       set(SWIG_EXECUTABLE ${install_dir}/bin/swig)
 
     endif()
+  else()
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   endif()
 endif()

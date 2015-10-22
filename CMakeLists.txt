@@ -319,7 +319,6 @@ foreach(_buildConfigFile ${_buildConfigFiles})
 endforeach()
 
 set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-mark_as_advanced(MITK_BUILD_CONFIGURATION)
 set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
 
 mitkFunctionEnableBuildConfiguration()
@@ -781,9 +780,6 @@ if(NOT MSVC_VERSION)
     #-Wold-style-cast
     #-Wsign-promo
 
-    # the following two lines should be removed after ITK-3097 has
-    # been resolved, see also MITK bug 15279
-    -Wno-unused-local-typedefs
     -Wno-array-bounds
 
     -fdiagnostics-show-option

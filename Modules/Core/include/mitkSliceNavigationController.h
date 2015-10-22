@@ -234,7 +234,7 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
     itkGetEnumMacro(DefaultViewDirection, ViewDirection);
 
 
-    const char* GetViewDirectionAsString();
+    const char* GetViewDirectionAsString() const;
 
     virtual void SetViewDirectionToDefault();
 

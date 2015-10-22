@@ -65,9 +65,9 @@ int mitk::NavigationDataReaderCSV::getNumberOfToolsInLine(std::string line)
 {
   std::vector<std::string> tokens=splitLine(line);
  int size = tokens.size();
- int NumOfTools = (size-1)/8;
+ int NumOfTools = (size)/9;
 
- if ( (size-1)%8 != 0 )
+ if ( (size)%9 != 0 )
  {
    MITK_ERROR("mitkNavigationDataReader") << "Illegal csv-file! Unexpected number of columns found! Assuming " << NumOfTools << " tools!";
  }
@@ -135,8 +135,8 @@ std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataReaderCSV::parseL
   for (int n = 0; n < NumOfTools; n++)
   {
     mitk::NavigationData::Pointer nd;
-    int offset = n * 8;
-    nd = CreateNd(parts[0], parts[offset + 1], parts[offset + 2], parts[offset + 3], parts[offset + 4], parts[offset + 5], parts[offset + 6], parts[offset + 7], parts[offset + 8]);
+    int offset = n * 9;
+    nd = CreateNd(parts[offset], parts[offset + 1], parts[offset + 2], parts[offset + 3], parts[offset + 4], parts[offset + 5], parts[offset + 6], parts[offset + 7], parts[offset + 8]);
     result.push_back(nd);
   }
   return result;

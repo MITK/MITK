@@ -278,6 +278,8 @@ private:
   float m_HelperlineWidth;
   //float m_PointWidth;
 
+  float m_DevicePixelRatio;
+
   PlanarFigureControlPointStyleProperty::Shape m_ControlPointShape;
 
   float m_LineColor[3][3];

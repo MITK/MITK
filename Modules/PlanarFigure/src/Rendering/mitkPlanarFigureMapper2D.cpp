@@ -390,6 +390,8 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_OutlineWidth = 4.0;
   m_HelperlineWidth = 2.0;
 
+  m_DevicePixelRatio = 1.0;
+
   m_ControlPointShape = PlanarFigureControlPointStyleProperty::Square;
 
   this->SetColorProperty( m_LineColor, PF_DEFAULT, 1.0, 1.0, 1.0 );
@@ -471,6 +473,9 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetFloatProperty( "planarfigure.shadow.widthmodifier", m_ShadowWidthFactor );
   node->GetFloatProperty( "planarfigure.outline.width", m_OutlineWidth );
   node->GetFloatProperty( "planarfigure.helperline.width", m_HelperlineWidth );
+
+  node->GetFloatProperty( "planarfigure.devicepixelratio", m_DevicePixelRatio );
+
 
   PlanarFigureControlPointStyleProperty::Pointer styleProperty =
     dynamic_cast< PlanarFigureControlPointStyleProperty* >( node->GetProperty( "planarfigure.controlpointshape" ) );
@@ -691,13 +696,21 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
                                  m_LineColor[lineDisplayMode][1],
                                  m_LineColor[lineDisplayMode][2] );
   m_AnnotationOverlay->SetOpacity( globalOpacity );
-  m_AnnotationOverlay->SetFontSize( 12 );
+  m_AnnotationOverlay->SetFontSize( 12*m_DevicePixelRatio );
   m_AnnotationOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
   m_AnnotationOverlay->SetVisibility( true, renderer );
 
   mitk::Point2D offset;
   offset.Fill(5);
-  m_AnnotationOverlay->SetPosition2D( anchorPoint );
+
+  mitk::Point2D scaledAnchorPoint;
+  scaledAnchorPoint[0] = anchorPoint[0]*m_DevicePixelRatio;
+  scaledAnchorPoint[1] = anchorPoint[1]*m_DevicePixelRatio;
+
+  offset[0] = offset[0]*m_DevicePixelRatio;
+  offset[1] = offset[1]*m_DevicePixelRatio;
+
+  m_AnnotationOverlay->SetPosition2D( scaledAnchorPoint );
   m_AnnotationOverlay->SetOffsetVector(offset);
 
   m_AnnotationOverlay->Update( renderer );
@@ -738,7 +751,7 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFi
                                m_LineColor[lineDisplayMode][2] );
 
   m_QuantityOverlay->SetOpacity( globalOpacity );
-  m_QuantityOverlay->SetFontSize( 12 );
+  m_QuantityOverlay->SetFontSize( 12*m_DevicePixelRatio );
   m_QuantityOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
   m_QuantityOverlay->SetVisibility( true, renderer );
 
@@ -746,7 +759,15 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( mitk::PlanarFigure * planarFi
   mitk::Point2D offset;
   offset.Fill(5);
   offset[1]+=annotationOffset;
-  m_QuantityOverlay->SetPosition2D( anchorPoint );
+
+  mitk::Point2D scaledAnchorPoint;
+  scaledAnchorPoint[0] = anchorPoint[0]*m_DevicePixelRatio;
+  scaledAnchorPoint[1] = anchorPoint[1]*m_DevicePixelRatio;
+
+  offset[0] = offset[0]*m_DevicePixelRatio;
+  offset[1] = offset[1]*m_DevicePixelRatio;
+
+  m_QuantityOverlay->SetPosition2D( scaledAnchorPoint );
   m_QuantityOverlay->SetOffsetVector(offset);
 
   m_QuantityOverlay->Update(renderer);

@@ -60,6 +60,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("figure_is_finished", CheckFigureFinished);
   CONNECT_CONDITION("reset_on_point_select_needed", CheckResetOnPointSelect);
   CONNECT_CONDITION("points_can_be_added_or_removed", CheckFigureIsExtendable);
+  CONNECT_CONDITION("figure_can_be_deleted", CheckFigureIsDeletable);
 
 
   CONNECT_FUNCTION( "finalize_figure", FinalizeFigure);
@@ -220,6 +221,15 @@ bool mitk::PlanarFigureInteractor::CheckFigureIsExtendable( const InteractionEve
 
   return isExtendable;
 }
+
+bool mitk::PlanarFigureInteractor::CheckFigureIsDeletable(const InteractionEvent* /*interactionEvent*/)
+{
+  bool isDeletable( true );
+  GetDataNode()->GetBoolProperty("planarfigure.isdeletable", isDeletable);
+
+  return isDeletable;
+}
+
 
 void mitk::PlanarFigureInteractor::DeselectPoint(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {

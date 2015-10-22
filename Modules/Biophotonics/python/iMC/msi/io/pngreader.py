@@ -46,7 +46,13 @@ class PngReader(Reader):
 
 def toImage(f):
     reader = png.Reader(f)
-    pngdata = reader.asDirect()[2]
+    column_count, row_count, pngdata, params = reader.asDirect()
+    plane_count = params['planes']
     image_2d = np.vstack(itertools.imap(np.uint16, pngdata))
-    return image_2d
+    # this is needed for rgb images. probably better would be a mean in case
+    # we convert "real" rgb data. This is just for rgb images which
+    # contain the same values for r,g and b for every pixel.
+    image_3d = np.reshape(image_2d,
+                         (row_count, column_count, plane_count))
+    return image_3d[:, :, 0]
 

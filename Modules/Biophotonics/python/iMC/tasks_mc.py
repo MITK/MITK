@@ -28,8 +28,6 @@ from msi.io.msiwriter import MsiWriter
 from msi.io.msireader import MsiReader
 from msi.normalize import NormalizeMean
 import msi.msimanipulations as msimani
-from msi.msi import Msi
-from msi.normalize import standard_normalizer
 
 # experiment configuration
 MCI_FILENAME = "./temp.mci"
@@ -116,15 +114,7 @@ class CameraBatch(luigi.Task):
     batch_prefix = luigi.Parameter()
 
     def requires(self):
-        return FilterTransmission("580.txt"), \
-            FilterTransmission("470.txt"), \
-            FilterTransmission("660.txt"), \
-            FilterTransmission("560.txt"), \
-            FilterTransmission("480.txt"), \
-            FilterTransmission("511.txt"), \
-            FilterTransmission("600.txt"), \
-            FilterTransmission("700.txt"), \
-            JoinBatches(self.batch_prefix)
+        return JoinBatches(self.batch_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -132,33 +122,14 @@ class CameraBatch(luigi.Task):
             self.batch_prefix + "_all_camera.imc"))
 
     def run(self):
-        f = file(self.input()[-1].path, "r")
+        f = file(self.input().path, "r")
         batch = pickle.load(f)
         f.close()
-        # folded reflectances are of shape: nr_sampels x nr_camera_wavelengths
-#         folded_reflectance = np.zeros((batch.reflectances.shape[0],
-#                                        len(sp.RECORDED_WAVELENGTHS)))
-#         for j in range(len(sp.RECORDED_WAVELENGTHS)):
-#             filter_transmission = get_transmission_data(
-#                                                     self.input()[j].path,
-#                                                     batch.wavelengths)
-#             # build weighted sum of absorption and filter transmission
-#             folded_reflectance[:, j] = np.sum(
-#                                         filter_transmission.get_image() *
-#                                         batch.reflectances, axis=1)
-#         # put the correctly folded reflectances in a temporary msi to
-#         # be able to use normalization
-#         folded_reflectance_image = Msi()
-#         folded_reflectance_image.set_image(folded_reflectance)
-#         folded_reflectance_image.set_wavelengths(sp.RECORDED_WAVELENGTHS)
-#         standard_normalizer.normalize(folded_reflectance_image)
         # camera batch creation:
         camera_batch = batch
         mcmani.fold_by_sliding_average(camera_batch, 4)
         mcmani.interpolate_wavelengths(camera_batch,
-                                       np.arange(470, 690, 10) * 10 ** -9)
-#         camera_batch.wavelengths = sp.RECORDED_WAVELENGTHS
-#         camera_batch.reflectances = folded_reflectance_image.get_image()
+                                       sp.RECORDED_WAVELENGTHS)
         # write it
         joined_batch_file = open(self.output().path, 'w')
         pickle.dump(camera_batch, joined_batch_file)

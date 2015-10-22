@@ -4,7 +4,6 @@ Created on Oct 19, 2015
 @author: wirkert
 '''
 
-import pickle
 
 from tabulate import tabulate  # do sudo pip install tabulate
 import numpy as np
@@ -23,8 +22,14 @@ def get_data_from_batch(filenameprefix):
             representing the oxygenation values """
     reflectances = np.load(filenameprefix + "_reflectances.npy")
     saO2 = np.load(filenameprefix + "_saO2.npy")
+    # add noise to reflectances
+    noises = np.random.normal(loc=0., scale=0.3, size=reflectances.shape)
+    reflectances += noises * reflectances
+    reflectances = np.clip(reflectances, 0.00001, 1.)
+    # normalize reflectances
     normalizer = Normalizer(norm='l1')
     reflectances = normalizer.transform(reflectances)
+    # transform to absorption
     absorptions = -np.log(reflectances)
     return absorptions, saO2
 
@@ -32,9 +37,13 @@ def get_data_from_batch(filenameprefix):
 if __name__ == '__main__':
     # first load training and testing data
     X_train, oxy_train = get_data_from_batch("/media/wirkert/data/Data/temp/" +
-        "hard_train")
+        "gaussian_train")
+
+    X_gaussian_train, oxy_gaussian_train = get_data_from_batch("/media/wirkert/data/Data/temp/" +
+        "gaussian_train")
+
     X_test, oxy_test = get_data_from_batch("/media/wirkert/data/Data/temp/" +
-        "hard_test")
+        "gaussian_test")
 
     # do standard linear unmixing
     linear_unmixing = LinearSaO2Unmixing()
@@ -54,6 +63,8 @@ if __name__ == '__main__':
     # train forest
     rf = GridSearchCV(RandomForestRegressor(50, max_depth=10, n_jobs=-1),
                       param_grid, cv=kf, n_jobs=-1)
+    rf = RandomForestRegressor(50, max_depth=11, min_samples_leaf=5,
+                                n_jobs=-1)
     rf.fit(X_train, oxy_train)
     predicted_oxy_rf = rf.predict(X_test)
 
@@ -85,3 +96,5 @@ if __name__ == '__main__':
     f = lambda x: np.percentile(np.abs(x - oxy_test), 75, axis=0)
     print "lin unmixing, lin regression, rf regression"
     print f(predicted_oxy_lu), f(predicted_oxy_lr), f(predicted_oxy_rf)
+
+

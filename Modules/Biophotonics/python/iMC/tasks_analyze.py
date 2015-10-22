@@ -8,22 +8,21 @@ Created on Aug 27, 2015
 
 import os
 import numpy as np
-import pickle
 import Image
 import ImageEnhance
+import pickle
 
 import luigi
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import SimpleITK as sitk
-from sklearn.preprocessing import Imputer
 
 from msi.io.nrrdreader import NrrdReader
 import msi.msimanipulations as msimani
-import msi.imgmani as imgmani
 import tasks_preprocessing as ppt
 import tasks_regression as rt
 import scriptpaths as sp
+from regression.estimation import estimate_image
 
 
 def plot_axis(axis, image, title):
@@ -37,29 +36,6 @@ def plot_axis(axis, image, title):
     axis.yaxis.set_visible(False)
 
     return im2, cbar
-
-
-def estimate_image(image_filename, rf_filename):
-    reader = NrrdReader()
-    msi = reader.read(image_filename)
-    # load random forest
-    rf_file = open(rf_filename, 'r')
-    rf = pickle.load(rf_file)
-    # estimate parameters
-    collapsed_msi = imgmani.collapse_image(msi.get_image())
-    # in case of nan values: take mean reflection of band
-    imp = Imputer(missing_values='NaN', strategy='mean', axis=0)
-    imp.fit(collapsed_msi)
-    estimated_parameters = rf.predict(imp.transform(collapsed_msi))
-    # restore shape
-    estimated_paramters_as_image = np.reshape(
-            estimated_parameters, (msi.get_image().shape[0],
-                                   msi.get_image().shape[1],
-                                   estimated_parameters.shape[1]))
-    # save as sitk nrrd.
-    sitk_img = sitk.GetImageFromArray(estimated_paramters_as_image,
-                                 isVector=True)
-    return sitk_img
 
 
 class EstimateTissueParametersTask(luigi.Task):
@@ -79,7 +55,13 @@ class EstimateTissueParametersTask(luigi.Task):
                                               "estimate.nrrd"))
 
     def run(self):
-        sitk_image = estimate_image(self.input()[0].path, self.input()[1].path)
+        reader = NrrdReader()
+        msi = reader.read(self.input()[0].path)
+        # load random forest
+        e_file = open(self.input()[1].path, 'r')
+        e = pickle.load(e_file)
+
+        sitk_image = estimate_image(msi, e)
         outFile = self.output().open('w')
         outFile.close()
         sitk.WriteImage(sitk_image, self.output().path)
@@ -105,7 +87,12 @@ class ReprojectReflectancesTask(luigi.Task):
                                               "estimate.nrrd"))
 
     def run(self):
-        sitk_image = estimate_image(self.input()[0].path, self.input()[1].path)
+        reader = NrrdReader()
+        msi = reader.read(self.input()[0].path)
+        # load random forest
+        e_file = open(self.input()[1].path, 'r')
+        e = pickle.load(e_file)
+        sitk_image = estimate_image(msi, e)
         outFile = self.output().open('w')
         outFile.close()
         sitk.WriteImage(sitk_image, self.output().path)

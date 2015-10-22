@@ -22,16 +22,10 @@ import mc.factories as mcfac
 
 # general output path config
 sp.ROOT_FOLDER = \
-        "/media/wirkert/data/Data/2015_06_01_Filtertransmittance_Spectrometer"
-sp.FINALS_FOLDER = "ConvolvedSpectra"
+        "/media/wirkert/data/Data/2015_11_12_IPCAI"
 sp.DATA_FOLDER = "spectrometer_measurements"
 sp.MC_DATA_FOLDER = "processed"
 SPECTRAL_PLOTS = "spectral_plots"
-
-# the wavelengths recorded by our camera
-RECORDED_WAVELENGTHS = \
-        np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
-
 
 
 class VisualizeSpectraTask(luigi.Task):
@@ -88,7 +82,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("visualization_standard",
+    main_task = VisualizeSpectraTask("visualization_a_mie",
                                      0, 10)
     w.add(main_task)
     w.run()

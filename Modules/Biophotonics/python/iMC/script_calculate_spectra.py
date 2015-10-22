@@ -24,7 +24,7 @@ if __name__ == '__main__':
     luigi.interface.setup_interface_logging()
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    BATCH_NUMBERS = np.arange(0, 10, 1)
+    BATCH_NUMBERS = np.arange(0, 100, 1)
     for i in BATCH_NUMBERS:
         main_task = tasks_mc.CreateSpectraTask("generic_tissue",
                                          i,

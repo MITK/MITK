@@ -35,6 +35,7 @@ class vtkCellPicker;
 class vtkTextActor;
 class vtkTextProperty;
 class vtkAssemblyPath;
+class vtkAssemblyPaths;
 
 namespace mitk
 {
@@ -172,6 +173,9 @@ protected:
   static void RenderingCallback(
     vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
 
+  virtual void UpdatePaths(); //apply transformations and properties recursively
+  vtkAssemblyPaths* Paths;
+  vtkTimeStamp PathTime;
 
 private:
 
@@ -205,9 +209,6 @@ private:
   vtkRenderer * m_TextRenderer;
   typedef std::map<unsigned int,vtkTextActor*> TextMapType;
   TextMapType m_TextCollection;
-
-  DataStorage::SetOfObjects::ConstPointer m_PickingObjects;
-  DataStorage::SetOfObjects::const_iterator m_PickingObjectsIterator;
 };
 } // namespace mitk
 

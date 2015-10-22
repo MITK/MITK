@@ -41,7 +41,7 @@ namespace mitk
 
     virtual unsigned int GetMaximumNumberOfControlPoints() const override;
     virtual unsigned int GetMinimumNumberOfControlPoints() const override;
-    virtual bool IsHelperToBePainted(unsigned int index) override;
+    virtual bool IsHelperToBePainted(unsigned int index) const override;
 
     const unsigned int FEATURE_ID_LENGTH;
 

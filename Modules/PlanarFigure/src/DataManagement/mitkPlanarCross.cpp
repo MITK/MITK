@@ -45,7 +45,7 @@ void mitk::PlanarCross::SetSingleLineMode( bool singleLineMode )
 
 bool mitk::PlanarCross::GetSingleLineMode() const
 {
-  mitk::BoolProperty* singleLineMode = dynamic_cast< mitk::BoolProperty* >(
+  const mitk::BoolProperty* singleLineMode = dynamic_cast< mitk::BoolProperty* >(
     this->GetProperty( "SingleLineMode" ).GetPointer() );
 
   if ( singleLineMode != nullptr )
@@ -73,7 +73,7 @@ bool mitk::PlanarCross::ResetOnPointSelect()
   case 0:
     {
       // Control point 0 selected: exchange points 0 and 1
-      Point2D tmpPoint = this->GetControlPoint( 0 );
+      const Point2D tmpPoint = this->GetControlPoint( 0 );
       this->SetControlPoint( 0, this->GetControlPoint( 1 ) );
       this->SetControlPoint( 1, tmpPoint );
       // FALLS THROUGH!
@@ -166,10 +166,10 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       Vector2D n1 = p2 - p1;
       n1.Normalize();
 
-      Vector2D v1 = point - p1;
-      double dotProduct = n1 * v1;
-      Point2D crossPoint = p1 + n1 * dotProduct;;
-      Vector2D crossVector = point - crossPoint;
+      const Vector2D v1 = point - p1;
+      const double dotProduct = n1 * v1;
+      const Point2D crossPoint = p1 + n1 * dotProduct;;
+      const Vector2D crossVector = point - crossPoint;
 
       if ( dotProduct < 0.0 )
       {
@@ -203,16 +203,16 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       Vector2D n1 = p2 - p1;
       n1.Normalize();
 
-      Vector2D v1 = point - p3;
-      double dotProduct1 = n1 * v1;
+      const Vector2D v1 = point - p3;
+      const double dotProduct1 = n1 * v1;
 
-      Point2D pointOnLine = point - n1 * dotProduct1;
+      const Point2D pointOnLine = point - n1 * dotProduct1;
 
       // Project new point onto line [p1, p2]
-      Vector2D v2 = pointOnLine - p1;
+      const Vector2D v2 = pointOnLine - p1;
       double dotProduct2 = n1 * v2;
 
-      Point2D crossingPoint = p1 + n1 * dotProduct2;
+      const Point2D crossingPoint = p1 + n1 * dotProduct2;
 
       // Determine whether the projected point on the line, or the crossing point should be
       // used (according to the second constraint in the comment above)
@@ -274,10 +274,10 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   Vector2D n1 = p2 - p1;
   n1.Normalize();
 
-  Vector2D v1 = p3 - p1;
-  Point2D crossPoint = p1 + n1 * (n1 * v1);
+  const Vector2D v1 = p3 - p1;
+  const Point2D crossPoint = p1 + n1 * (n1 * v1);
 
-  Vector2D v2 = crossPoint - p3;
+  const Vector2D v2 = crossPoint - p3;
   if ( v2.GetNorm() < 1.0 )
   {
     // If third point is on the first line, draw orthogonal "infinite" line

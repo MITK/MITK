@@ -77,7 +77,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double circumference = 0.0;
   unsigned int i,j;
 
-  PolyLineType polyLine = m_PolyLines[0];
+  const PolyLineType polyLine = m_PolyLines[0];
 
   if(polyLine.empty())
     return;
@@ -104,28 +104,28 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   if ( this->IsClosed() && (this->GetPlaneGeometry() != nullptr) )
   {
     // does PlanarPolygon overlap/intersect itself?
-    unsigned int numberOfPoints = polyLine.size();
+    const unsigned int numberOfPoints = polyLine.size();
     if( numberOfPoints >= 4)
     {
       for ( i = 0; i < (numberOfPoints - 1); ++i )
       {
         // line 1
-        Point2D p0 = polyLine[i];
-        Point2D p1 = polyLine[i + 1];
+        const Point2D p0 = polyLine[i];
+        const Point2D p1 = polyLine[i + 1];
 
         // check for intersection with all other lines
         for (j = i+1; j < (numberOfPoints - 1); ++j )
         {
-          Point2D p2 = polyLine[j];
-          Point2D p3 = polyLine[j + 1];
+          const Point2D p2 = polyLine[j];
+          const Point2D p3 = polyLine[j + 1];
           intersection = CheckForLineIntersection(p0,p1,p2,p3);
           if (intersection) break;
         }
         if (intersection) break; // only because the inner loop might have changed "intersection"
 
         // last line from p_x to p_0
-        Point2D p2 = polyLine.front();
-        Point2D p3 = polyLine.back();
+        const Point2D p2 = polyLine.front();
+        const Point2D p3 = polyLine.back();
 
         intersection = CheckForLineIntersection(p0,p1,p2,p3);
         if (intersection) break;
@@ -135,8 +135,8 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
     // calculate area
     for ( i = 0; i < polyLine.size(); ++i )
     {
-      Point2D p0 = polyLine[i];
-      Point2D p1 = polyLine[ (i + 1) % polyLine.size() ];
+      const Point2D p0 = polyLine[i];
+      const Point2D p1 = polyLine[ (i + 1) % polyLine.size() ];
 
       area += p0[0] * p1[1] - p1[0] * p0[1];
     }
@@ -180,19 +180,19 @@ bool mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, con
 
   // Store the values for fast access and easy
   // equations-to-code conversion
-  double x1 = p1[0], x2 = p2[0], x3 = p3[0], x4 = p4[0];
-  double y1 = p1[1], y2 = p2[1], y3 = p3[1], y4 = p4[1];
+  const double x1 = p1[0], x2 = p2[0], x3 = p3[0], x4 = p4[0];
+  const double y1 = p1[1], y2 = p2[1], y3 = p3[1], y4 = p4[1];
 
-  double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+  const double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
   // If d is zero, there is no intersection
   //if (d < mitk::eps) return false;
   if (d == 0) return false;
 
   // Get the x and y
-  double pre = (x1*y2 - y1*x2);
-  double post = (x3*y4 - y3*x4);
-  double x = ( pre * (x3 - x4) - (x1 - x2) * post ) / d;
-  double y = ( pre * (y3 - y4) - (y1 - y2) * post ) / d;
+  const double pre = (x1*y2 - y1*x2);
+  const double post = (x3*y4 - y3*x4);
+  const double x = ( pre * (x3 - x4) - (x1 - x2) * post ) / d;
+  const double y = ( pre * (y3 - y4) - (y1 - y2) * post ) / d;
 
   double tolerance = 0.001;
   // Check if the x coordinates are within both lines, including tolerance
@@ -233,17 +233,16 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
   std::vector<mitk::Point2D> intersectionList;
 
   ControlPointListType polyLinePoints;
-  PolyLineType tempList = m_PolyLines[0];
-  PolyLineType::iterator iter;
-  for( iter = tempList.begin(); iter != tempList.end(); ++iter )
+  const PolyLineType tempList = m_PolyLines[0];
+  for( auto iter = tempList.cbegin(); iter != tempList.cend(); ++iter )
   {
     polyLinePoints.push_back(*iter);
   }
 
   for ( ControlPointListType::size_type i=0; i<polyLinePoints.size()-1; i++ )
   {
-    mitk::Point2D pnt1 = polyLinePoints[i];
-    mitk::Point2D pnt2 = polyLinePoints[i+1];
+    const mitk::Point2D pnt1 = polyLinePoints[i];
+    const mitk::Point2D pnt2 = polyLinePoints[i+1];
     mitk::Point2D intersection;
 
     if ( mitk::PlanarPolygon::CheckForLineIntersection( p1, p2, pnt1, pnt2, intersection ) )
@@ -254,9 +253,9 @@ std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const 
 
   if ( this->IsClosed() )
   {
-    mitk::Point2D intersection, lastControlPoint, firstControlPoint;
-    lastControlPoint = polyLinePoints.back();
-    firstControlPoint = polyLinePoints.front();
+    mitk::Point2D intersection;
+    const mitk::Point2D lastControlPoint = polyLinePoints.back();
+    const mitk::Point2D firstControlPoint = polyLinePoints.front();
 
     if ( mitk::PlanarPolygon::CheckForLineIntersection( lastControlPoint,
       firstControlPoint, p1, p2, intersection ) )

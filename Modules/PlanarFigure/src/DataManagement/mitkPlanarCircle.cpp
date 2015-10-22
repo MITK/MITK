@@ -42,7 +42,7 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
   {
     const Point2D &centerPoint = GetControlPoint( 0 );
     Point2D boundaryPoint = GetControlPoint( 1 );
-    vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
+    const vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
 
     boundaryPoint[0] += vec[0];
     boundaryPoint[1] += vec[1];
@@ -68,7 +68,7 @@ mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int inde
   Point2D indexPoint;
   this->GetPlaneGeometry()->WorldToIndex( point, indexPoint );
 
-  BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
+  const BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
   if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
   if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
   if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
@@ -82,10 +82,9 @@ mitk::Point2D mitk::PlanarCircle::ApplyControlPointConstraints(unsigned int inde
     if( index != 0)
     {
       const Point2D &centerPoint = this->GetControlPoint(0);
-      double euclideanDinstanceFromCenterToPoint1 = centerPoint.EuclideanDistanceTo(point);
+      const double euclideanDinstanceFromCenterToPoint1 = centerPoint.EuclideanDistanceTo(point);
 
-      Vector2D vectorProjectedPoint;
-      vectorProjectedPoint = point - centerPoint;
+      Vector2D vectorProjectedPoint = point - centerPoint;
       vectorProjectedPoint.Normalize();
 
       if( euclideanDinstanceFromCenterToPoint1 > m_MaxRadius )
@@ -116,12 +115,12 @@ void mitk::PlanarCircle::GeneratePolyLine()
   const Point2D &centerPoint = GetControlPoint( 0 );
   const Point2D &boundaryPoint = GetControlPoint( 1 );
 
-  double radius = centerPoint.EuclideanDistanceTo( boundaryPoint );
+  const double radius = centerPoint.EuclideanDistanceTo( boundaryPoint );
 
   // Generate poly-line with 64 segments
   for ( int t = 0; t < 64; ++t )
   {
-    double alpha = (double) t * vnl_math::pi / 32.0;
+    const double alpha = (double) t * vnl_math::pi / 32.0;
 
     // construct the new polyline point ...
     Point2D polyLinePoint;
@@ -145,8 +144,8 @@ void mitk::PlanarCircle::EvaluateFeaturesInternal()
   const Point3D &p0 = this->GetWorldControlPoint( 0 );
   const Point3D &p1 = this->GetWorldControlPoint( 1 );
 
-  double radius = p0.EuclideanDistanceTo( p1 );
-  double area = vnl_math::pi * radius * radius;
+  const double radius = p0.EuclideanDistanceTo( p1 );
+  const double area = vnl_math::pi * radius * radius;
 
   this->SetQuantity( FEATURE_ID_RADIUS, radius );
   this->SetQuantity( FEATURE_ID_DIAMETER, 2*radius );

@@ -46,6 +46,8 @@ public:
 
   void setUp()
   {
+    // Workaround to fix microservice loading issues!!!
+    mitk::IPythonService::ForceLoadModule();
     //get the context of the python module
     us::Module* module = us::ModuleRegistry::GetModule("MitkPythonService");
     us::ModuleContext* context = module->GetModuleContext();

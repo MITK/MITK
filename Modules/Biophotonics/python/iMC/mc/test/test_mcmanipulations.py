@@ -17,6 +17,12 @@ class Test(unittest.TestCase):
         a = np.arange(0, 30, 3)
         b = np.arange(30, 60, 3)
         self.test_batch.reflectances = np.vstack((a, b))
+        layer1 = np.arange(0, 10, 1)
+        layer1 = layer1[:, np.newaxis]
+        layer2 = np.arange(0, 10, 1)
+        layer2 = layer2[:, np.newaxis]
+        layer2 = np.vstack((layer2, layer2))
+        self.test_batch.layers = [layer1, layer2]
         self.test_batch.wavelengths = np.arange(0, 10, 1)
 
     def test_sliding_average(self):
@@ -36,6 +42,15 @@ class Test(unittest.TestCase):
         np.testing.assert_almost_equal(self.test_batch.reflectances, expected,
                                        err_msg="test if interpolation " +
                                        "works fine on batches")
+
+    def test_select_n(self):
+        mcmani.select_n(self.test_batch, 1)
+        self.assertEqual(self.test_batch.reflectances.shape[0], 1,
+                         "1 reflectances selected")
+        self.assertEqual(self.test_batch.layers[0].shape[0], 1,
+                         "1 elements selected from layer 1")
+        self.assertEqual(self.test_batch.layers[1].shape[0], 1,
+                         "1 elements selected from layer 2")
 
 
 if __name__ == "__main__":

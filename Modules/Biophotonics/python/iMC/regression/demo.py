@@ -15,6 +15,7 @@ from sklearn.preprocessing import Normalizer
 from sklearn.metrics import r2_score
 
 from linear import LinearSaO2Unmixing
+from domain_adaptation import estimate_logistic_regressor, resample
 
 def get_data_from_batch(filenameprefix):
     """returns (X,y): X are absorptions represented by an array of shape
@@ -23,7 +24,7 @@ def get_data_from_batch(filenameprefix):
     reflectances = np.load(filenameprefix + "_reflectances.npy")
     saO2 = np.load(filenameprefix + "_saO2.npy")
     # add noise to reflectances
-    noises = np.random.normal(loc=0., scale=0.3, size=reflectances.shape)
+    noises = np.random.normal(loc=0., scale=0.15, size=reflectances.shape)
     reflectances += noises * reflectances
     reflectances = np.clip(reflectances, 0.00001, 1.)
     # normalize reflectances
@@ -37,25 +38,31 @@ def get_data_from_batch(filenameprefix):
 if __name__ == '__main__':
     # first load training and testing data
     X_train, oxy_train = get_data_from_batch("/media/wirkert/data/Data/temp/" +
-        "gaussian_train")
-
+        "hard_train")
     X_gaussian_train, oxy_gaussian_train = get_data_from_batch("/media/wirkert/data/Data/temp/" +
         "gaussian_train")
-
     X_test, oxy_test = get_data_from_batch("/media/wirkert/data/Data/temp/" +
         "gaussian_test")
+
+    # do domain adaptation
+    lr = estimate_logistic_regressor(X_train, X_gaussian_train)
+    weights = lr.predict_proba(X_train)[:, 1] / lr.predict_proba(X_train)[:, 0]
 
     # do standard linear unmixing
     linear_unmixing = LinearSaO2Unmixing()
     predicted_oxy_lu = linear_unmixing.predict(X_test)
 
     # learn linear regression from data
-    linear_regression = LinearRegression()
-    linear_regression.fit(X_train, oxy_train)
+    X_train, oxy_train, weights = resample(X_train, oxy_train, weights)
+    # do weighting of samples
+    X_train_w = X_train  # * np.sqrt(weights)[:, None]
+    oxy_train_w = oxy_train  # * np.sqrt(weights)
+    linear_regression = LinearRegression(fit_intercept=False)
+    linear_regression.fit(X_train, oxy_train_w)
     predicted_oxy_lr = linear_regression.predict(X_test)
 
     # use the random forest regressor
-    kf = KFold(X_train.shape[0], 3, shuffle=True)
+    kf = KFold(X_train.shape[0], 5, shuffle=True)
     param_grid = [
       {"n_estimators": np.array([50]),
        "max_depth": np.arange(5, 15, 2),

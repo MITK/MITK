@@ -25,16 +25,32 @@ def estimate_logistic_regressor(X_s, X_t):
     nr_t = X_t.shape[0]
     source_labels = np.zeros(nr_s)
     target_labels = np.ones(nr_t)
-    allReflectances = np.concatenate((X_s, X_t))
-    allLabels = np.concatenate((source_labels, target_labels))
+    X_all = np.concatenate((X_s, X_t))
+    all_labels = np.concatenate((source_labels, target_labels))
 
     # train logistic regression
-    kf = KFold(allReflectances.shape[0], 5, shuffle=True)
+    kf = KFold(X_all.shape[0], 5, shuffle=True)
     # todo include intercept scaling paramter
     param_grid = [
       {'C': np.logspace(-3, 6, 10), 'fit_intercept':['True', 'False']} ]
     best_lr = GridSearchCV(LogisticRegression(class_weight="auto"),
                            param_grid, cv=kf, n_jobs=-1)
-    best_lr.fit(allReflectances, allLabels)
+    best_lr.fit(X_all, all_labels)
 
     return best_lr.best_estimator_
+
+def resample(X, y, w, nr_samples=None):
+    """bootstrapping: resample with replacement according to weights
+
+    Returns:
+        (X_new, w_new): the chosen samples and the new weights.
+            by design these new weights are all equal to 1."""
+    if (nr_samples is None):
+        nr_samples = X.shape[0]
+    w = w / np.sum(w)  # normalize
+    # create index array with samples to draw:
+    total_nr_samples = X.shape[0]  # nr total samples
+    chosen_samples = np.random.choice(total_nr_samples,
+                                      size=nr_samples,
+                                      replace=True, p=w)
+    return X[chosen_samples, :], np.atleast_2d(y)[chosen_samples, :], np.ones(nr_samples)

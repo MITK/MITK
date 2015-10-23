@@ -98,31 +98,77 @@ class GaussianBatch(GenericBatch):
 
     def __init__(self):
         super(GaussianBatch, self).__init__()
-        self.generator = np.random.normal
 
     def append_one_layer(self, saO2, nr_samples):
         """helper function to create parameters for one layer"""
+        # scales data to lie between maxi and mini instead of 0 and 1
+        scale = lambda x, mini, maxi: x * (maxi - mini) + mini
         # rescale gaussian
-        scale = lambda x, u, sigma: x * sigma + u
+        scale_gaussian = lambda x, u, sigma: x * sigma + u
         samples = self.generator(size=(nr_samples, 5))
         # scale samples to correct ranges
         # bvf
-        samples[:, 0] = np.clip(scale(samples[:, 0], 0.04, 0.02), 0. , 1.)
+        samples[:, 0] = np.random.normal(size=nr_samples)
+        samples[:, 0] = np.clip(scale_gaussian(samples[:, 0], 0.04, 0.02),
+                                       0.,
+                                       1.)
         # saO2 is the same for each layer, since the blood "diffuses" in tissue
-        samples[:, 1] = np.clip(scale(saO2, 0.7, 0.1), 0., 1.)
+        samples[:, 1] = scale(saO2, 0., 1.)
         # a_mie
-        samples[:, 2] = np.clip(scale(samples[:, 2], 10.* 100., 5.* 100.),
-                                5. *100,
-                                30.* 100)
+        samples[:, 2] = scale(samples[:, 2], 5. *100, 30.* 100)
         # a_ray
-        samples[:, 3] = np.clip(scale(samples[:, 3], 5.* 100., 2.* 100.),
-                                0.*100., 60.*100.)
+        samples[:, 3] = scale(samples[:, 3], 0.*100., 60.*100.)
         # d will be normalized later to 2mm total depth
-        samples[:, 4] = np.clip(scale(samples[:, 4], 0.5, 0.2), 0., 1.)
-
+        samples[:, 4] = scale(samples[:, 4], 0., 1.)
         # append as last layer
         self.layers.append(samples)
 
+
+
+class ColonMuscleBatch(AbstractBatch):
+    """generic three layer batch """
+
+    def __init__(self):
+        super(ColonMuscleBatch, self).__init__()
+
+    def append_one_layer(self, saO2, d_ranges, nr_samples):
+        """helper function to create parameters for one layer"""
+        # scales data to lie between maxi and mini instead of 0 and 1
+        scale = lambda x, mini, maxi: x * (maxi - mini) + mini
+        # rescale gaussian
+        scale_gaussian = lambda x, u, sigma: x * sigma + u
+        samples = self.generator(size=(nr_samples, 5))
+        # scale samples to correct ranges
+        # bvf
+        samples[:, 0] = np.random.normal(size=nr_samples)
+        samples[:, 0] = np.clip(scale_gaussian(samples[:, 0], 0.04, 0.02),
+                                       0.,
+                                       1.)
+        # saO2 is the same for each layer, since the blood "diffuses" in tissue
+        samples[:, 1] = saO2  # saO2
+        samples[:, 2] = scale(samples[:, 2], 5.* 100., 30.* 100.)  # a_mie
+        samples[:, 3] = scale(samples[:, 3], 0.* 100., 60.* 100.) * 0.  # a_ray
+        # d
+        samples[:, 4] = scale(samples[:, 4], d_ranges[0], d_ranges[1])  # d
+        # append as last layer
+        self.layers.append(samples)
+
+    def create_parameters(self, nr_samples):
+        """Create generic three layer batch with a total diameter of 2mm.
+        saO2 is the same in all layers, but all other parameters vary randomly
+        within each layer"""
+        saO2 = self.generator(size=nr_samples)
+        # create three layers with random samples
+        # muscle
+        self.append_one_layer(saO2, (900.*10 ** -6, 900.*10 ** -6), nr_samples)
+        # submucosa
+        self.append_one_layer(saO2, (500.*10 ** -6, 500.*10 ** -6), nr_samples)
+        # mucosa
+        self.append_one_layer(saO2, (600.*10 ** -6, 600.*10 ** -6), nr_samples)
+        # create empty reflectances matrix
+        self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))
+        # set all weights to 1
+        self.weights = np.ones(nr_samples, dtype=float)
 
 
 class VisualizationBatch(AbstractBatch):

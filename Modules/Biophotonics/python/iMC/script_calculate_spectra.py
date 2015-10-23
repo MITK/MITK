@@ -16,8 +16,8 @@ import mc.factories as mcfac
 
 # general output path config
 sp.ROOT_FOLDER = \
-        "/media/wirkert/data/Data/2015_06_01_Filtertransmittance_Spectrometer"
-
+        "/media/wirkert/data/Data/2015_11_12_IPCAI_in_silico"
+sp.RESULTS_FOLDER = "mc_data"
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
@@ -26,10 +26,11 @@ if __name__ == '__main__':
     w = luigi.worker.Worker(scheduler=sch)
     BATCH_NUMBERS = np.arange(0, 100, 1)
     for i in BATCH_NUMBERS:
-        main_task = tasks_mc.CreateSpectraTask("generic_tissue",
+        main_task = tasks_mc.CreateSpectraTask(
+                                        "colon_muscle_tissue_train",
                                          i,
                                          1000,
-                                         mcfac.GenericMcFactory())
+                                         mcfac.ColonMuscleMcFactory())
         w.add(main_task)
         w.run()
 

@@ -5,7 +5,6 @@ Created on Oct 21, 2015
 '''
 
 import numpy as np
-from sklearn.preprocessing import Imputer
 import SimpleITK as sitk
 
 import msi.imgmani as imgmani
@@ -38,3 +37,7 @@ def estimate_image(msi, regressor):
     sitk_img = sitk.GetImageFromArray(estimated_paramters_as_image,
                                  isVector=True)
     return sitk_img
+
+def standard_score(estimator, X, y):
+    """our standard scoring method is the median absolute error"""
+    return np.median(np.abs(estimator.predict(X) - y))

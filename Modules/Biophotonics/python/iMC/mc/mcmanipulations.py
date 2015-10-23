@@ -29,3 +29,14 @@ def interpolate_wavelengths(batch, new_wavelengths):
                             batch.reflectances, assume_sorted=False)
     batch.reflectances = interpolator(new_wavelengths)
     batch.wavelengths = new_wavelengths
+
+
+
+def select_n(batch, n):
+    """ randomly select n elements from batch. TODO: Test """
+    perms = np.random.permutation(batch.reflectances.shape[0])
+    first_n_perms = perms[0:n]
+    batch.reflectances = batch.reflectances[first_n_perms, :]
+    for i, l in enumerate(batch.layers):
+        batch.layers[i] = np.atleast_2d(l)[first_n_perms, :]
+    return batch

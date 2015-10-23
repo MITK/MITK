@@ -147,121 +147,153 @@ namespace mitk
       planeorientation, zPosition, frontside, rotated);
   }
 
-  void
-    PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width,
-    ScalarType height, const AffineTransform3D* transform,
-    PlaneGeometry::PlaneOrientation planeorientation, ScalarType zPosition,
-    bool frontside, bool rotated )
+  void PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width,
+                 ScalarType height, const AffineTransform3D* transform,
+                 PlaneGeometry::PlaneOrientation planeorientation, ScalarType zPosition,
+                 bool frontside, bool rotated )
   {
     Superclass::Initialize();
 
     //construct standard view
+
+    //TODO ------------------------------
+    // We define at the moment "frontside" as: axial from above, coronal from front (nose), saggital from right.
+    // Double check with medics [ ].
+
+    // We define the orientation in patient's view, e.g. LAI is in a axial cut (parallel to the triangle ear-ear-nose):
+    // first axis: To the left ear of the patient
+    // seecond axis: To the nose of the patient
+    // third axis: To the legs of the patient.
+
+    // Options are: L/R left/right; A/P anterior/posterior; I/S inferior/superior (AKA caudal/cranial).
+    // We note on all cases in the following switch block r.h. for right handed or l.h. for left handed to describe the
+    // different cases. However, which system is chosen is defined at the end of the switch block.
+
+    //careful: the vectors right and bottom are relative to the plane and do NOT describe e.g. the right side of the patient.
     Point3D origin;
-    VnlVector rightDV(3), bottomDV(3);
-    origin.Fill(0);
-    int normalDirection;
-    switch(planeorientation)
+    VnlVector rightDV(3), bottomDV(3); // Bottom means downwards, DV means Direction Vector. Both relative to the image!
+    origin.Fill(0); /// Origin of this plane is by default a zero vector and implicitly in the top-left corner:
+        /// This is different to all definitions in MITK, except the QT mouse clicks.
+        // But it is like this here and we don't want to change a running system.
+        // Just be aware, that IN THIS FUNCTION we define the origin at the top left (e.g. your screen).
+    int normalDirection; // NormalDirection defines which axis (i.e. column index in the transform matrix)
+       // is up/down direction of the plane.
+
+    switch(planeorientation) // Switch through our limited choice of planes:
     {
-    case None:
+    case None: /// Orientation 'None' shall be done like the axial plane orientation, for whatever reasons.
     case Axial:
+      if(frontside) // Radiologist's view from below. A cut along the triangle ear-ear-nose.
+      {
+  if(rotated==false)  // Origin in the top-left corner, x=[1; 0; 0], y=[0; 1; 0], z=[0; 0; 1], origin=[0,0,zpos]: LAI (r.h.)
+         //
+  {                 // 0--right-->
+       //  | Picture of a finite, rectangular plane...
+      //   | (insert LOL-CAT-scan here)!
+           //    v
+
+    FillVector3D(origin,   0,  0, zPosition);
+    FillVector3D(rightDV,  1,  0,         0);
+    FillVector3D(bottomDV, 0,  1,         0);
+  }
+  else // Origin rotated to the bottom-right corner, x=[-1; 0; 0], y=[0; -1; 0], z=[0; 0; 1], origin=[w,h,zpos]: RPI (r.h.)
+  {   // Caveat emptor:  Still  using  top-left  as  origin  of  index  coordinate  system!
+    FillVector3D(origin,   width,  height, zPosition);
+    FillVector3D(rightDV,     -1,       0,         0);
+    FillVector3D(bottomDV,     0,      -1,         0);
+  }
+      }
+      else // 'Backside, not frontside.' Neuro-Surgeons's view from above patient.
+      {
+  if(rotated==false) // x=[-1; 0; 0], y=[0; 1; 0], z=[0; 0; 1], origin=[w,0,zpos]:  RAS (r.h.)
+  {
+    FillVector3D(origin,   width,  0, zPosition);
+    FillVector3D(rightDV,     -1,  0,         0);
+    FillVector3D(bottomDV,     0,  1,         0);
+  }
+  else // Origin in the bottom-left corner, x=[1; 0; 0], y=[0; -1; 0], z=[0; 0; 1], origin=[0,h,zpos]:  LPS (r.h.)
+  {
+    FillVector3D(origin,   0,  height, zPosition);
+    FillVector3D(rightDV,  1,       0,         0);
+    FillVector3D(bottomDV, 0,      -1,         0);
+  }
+      }
+      normalDirection = 2; // That is S=Superior=z=third_axis=middlefinger in righthanded LPS-system.
+      break;
+    case Frontal: // Frontal is known as Coronal in mitk. Plane cuts through patient's ear-ear-heel-heel
       if(frontside)
       {
-        if(rotated==false)
-        {
-          FillVector3D(origin,   0,  0, zPosition);
-          FillVector3D(rightDV,  1,  0,         0);
-          FillVector3D(bottomDV, 0,  1,         0);
-        }
-        else
-        {
-          FillVector3D(origin,   width,  height, zPosition);
-          FillVector3D(rightDV,     -1,       0,         0);
-          FillVector3D(bottomDV,     0,      -1,         0);
-        }
+  if(rotated==false) // x=[1; 0; 0], y=[0; 0; 1], z=[0; 1; 0], origin=[0,zpos,0]: LAI (r.h.)
+  {
+    FillVector3D(origin,   0, zPosition, 0);
+    FillVector3D(rightDV,  1, 0,         0);
+    FillVector3D(bottomDV, 0, 0,         1);
+  }
+  else // x=[-1;0;0], y=[0;0;-1], z=[0;1;0], origin=[w,zpos,h]:  RAS  (r.h.)
+  {
+    FillVector3D(origin,   width, zPosition, height);
+    FillVector3D(rightDV,     -1,         0,      0);
+    FillVector3D(bottomDV,     0,         0,     -1);
+  }
       }
       else
       {
-        if(rotated==false)
-        {
-          FillVector3D(origin,   width,  0, zPosition);
-          FillVector3D(rightDV,     -1,  0,         0);
-          FillVector3D(bottomDV,     0,  1,         0);
-        }
-        else
-        {
-          FillVector3D(origin,   0,  height, zPosition);
-          FillVector3D(rightDV,  1,       0,         0);
-          FillVector3D(bottomDV, 0,      -1,         0);
-        }
+  if(rotated==false) //  x=[-1;0;0], y=[0;0;1], z=[0;1;0], origin=[w,zpos,0]: RPI (r.h.)
+  {
+    FillVector3D(origin,    width, zPosition,  0);
+    FillVector3D(rightDV,      -1,         0,  0);
+    FillVector3D(bottomDV,      0,         0,  1);
+  }
+  else //  x=[1;0;0], y=[0;1;0], z=[0;0;-1], origin=[0,zpos,h]: LPS (r.h.)
+  {
+    FillVector3D(origin,   0, zPosition,  height);
+    FillVector3D(rightDV,  1,         0,       0);
+    FillVector3D(bottomDV, 0,         0,      -1);
+  }
       }
-      normalDirection = 2;
+      normalDirection = 1; // Normal vector = posterior direction.
       break;
-    case Frontal:
+    case Sagittal: // Sagittal=Medial plane, the symmetry-plane mirroring your face.
       if(frontside)
       {
-        if(rotated==false)
-        {
-          FillVector3D(origin,   0, zPosition, 0);
-          FillVector3D(rightDV,  1, 0,         0);
-          FillVector3D(bottomDV, 0, 0,         1);
-        }
-        else
-        {
-          FillVector3D(origin,   width, zPosition, height);
-          FillVector3D(rightDV,     -1,         0,      0);
-          FillVector3D(bottomDV,     0,         0,     -1);
-        }
+  if(rotated==false) //  x=[0;1;0], y=[0;0;1], z=[1;0;0], origin=[zpos,0,0]:  LAI (r.h.)
+  {
+    FillVector3D(origin,   zPosition, 0, 0);
+    FillVector3D(rightDV,  0,         1, 0);
+    FillVector3D(bottomDV, 0,         0, 1);
+  }
+  else //  x=[0;-1;0], y=[0;0;-1], z=[1;0;0], origin=[zpos,w,h]:  LPS (r.h.)
+  {
+    FillVector3D(origin,   zPosition, width, height);
+    FillVector3D(rightDV,          0,    -1,      0);
+    FillVector3D(bottomDV,         0,     0,     -1);
+  }
       }
       else
       {
-        if(rotated==false)
-        {
-          FillVector3D(origin,    width, zPosition,  0);
-          FillVector3D(rightDV,      -1,         0,  0);
-          FillVector3D(bottomDV,      0,         0,  1);
-        }
-        else
-        {
-          FillVector3D(origin,   0, zPosition,  height);
-          FillVector3D(rightDV,  1,         0,       0);
-          FillVector3D(bottomDV, 0,         0,      -1);
-        }
+  if(rotated==false) //  x=[0;-1;0], y=[0;0;1], z=[1;0;0], origin=[zpos,w,0]:  RPI  (r.h.)
+  {
+    FillVector3D(origin,   zPosition,  width, 0);
+    FillVector3D(rightDV,          0,     -1, 0);
+    FillVector3D(bottomDV,         0,      0, 1);
+  }
+  else //  x=[0;1;0], y=[0;0;-1], z=[1;0;0], origin=[zpos,0,h]:  RAS (r.h.)
+  {
+    FillVector3D(origin,   zPosition,  0, height);
+    FillVector3D(rightDV,          0,  1,      0);
+    FillVector3D(bottomDV,         0,  0,     -1);
+  }
       }
-      normalDirection = 1;
+      normalDirection = 0; // Normal vector = Lateral direction: Left in a LPS-system.
       break;
-    case Sagittal:
-      if(frontside)
-      {
-        if(rotated==false)
-        {
-          FillVector3D(origin,   zPosition, 0, 0);
-          FillVector3D(rightDV,  0,         1, 0);
-          FillVector3D(bottomDV, 0,         0, 1);
-        }
-        else
-        {
-          FillVector3D(origin,   zPosition, width, height);
-          FillVector3D(rightDV,          0,    -1,      0);
-          FillVector3D(bottomDV,         0,     0,     -1);
-        }
-      }
-      else
-      {
-        if(rotated==false)
-        {
-          FillVector3D(origin,   zPosition,  width, 0);
-          FillVector3D(rightDV,          0,     -1, 0);
-          FillVector3D(bottomDV,         0,      0, 1);
-        }
-        else
-        {
-          FillVector3D(origin,   zPosition,  0, height);
-          FillVector3D(rightDV,          0,  1,      0);
-          FillVector3D(bottomDV,         0,  0,     -1);
-        }
-      }
-      normalDirection = 0;
-      break;
+
+      // <2015-10-23, Esther Wild and Martin Hettich:> We found a problem:
+      // Till now this function only covers 4 cases: RPI, LAI, LPS, RAS;
+      // And we scroll the standard planes along each axis in these cases. --> 3*4 = 12.
+      // So far only 4 of 48 possible coordinate orientations and
+      // therefore 12 of 144 cases of standard planes are treated here.
+      // TODO: To handle r.h./l.h. systems correctly: check and correct normal vector and BoundingBox.
+
     default:
       itkExceptionMacro("unknown PlaneOrientation");
     }
@@ -273,20 +305,18 @@ namespace mitk
       bottomDV = transform->TransformVector( bottomDV );
     }
 
-    ScalarType bounds[6]= { 0, width, 0, height, 0, 1 };
+    ScalarType bounds[6]= { 0, width, 0, height, 0, 1 }; // TODO: check signs according to l.h./r.h. system.
     this->SetBounds( bounds );
 
     if ( transform == nullptr )
     {
-      this->SetMatrixByVectors( rightDV, bottomDV );
+      this->SetMatrixByVectors( rightDV, bottomDV ); // TODO: Spacing = 1 or -1 ?
     }
     else
     {
-      this->SetMatrixByVectors(
-        rightDV, bottomDV,
-        transform->GetMatrix().GetVnlMatrix()
-        .get_column(normalDirection).magnitude()
-        );
+      this->SetMatrixByVectors( rightDV, bottomDV,
+  transform->GetMatrix().GetVnlMatrix().get_column(normalDirection).magnitude() );
+  // TODO: check signs according to l.h./r.h. system.
     }
 
     this->SetOrigin(origin);
@@ -310,9 +340,9 @@ namespace mitk
     if(geometry3D->GetImageGeometry())
     {
       FillVector3D( originVector,
-        originVector[0] - 0.5,
-        originVector[1] - 0.5,
-        originVector[2] - 0.5 );
+  originVector[0] - 0.5,
+  originVector[1] - 0.5,
+  originVector[2] - 0.5 );
     }
     switch(planeorientation)
     {
@@ -682,54 +712,54 @@ namespace mitk
     {
     case OpORIENT:
       {
-        mitk::PlaneOperation *planeOp = dynamic_cast< mitk::PlaneOperation * >( operation );
-        if ( planeOp == nullptr )
-        {
-          return;
-        }
+  mitk::PlaneOperation *planeOp = dynamic_cast< mitk::PlaneOperation * >( operation );
+  if ( planeOp == nullptr )
+  {
+    return;
+  }
 
-        Point3D center = planeOp->GetPoint();
+  Point3D center = planeOp->GetPoint();
 
-        Vector3D orientationVector = planeOp->GetNormal();
-        Vector3D defaultVector;
-        FillVector3D( defaultVector, 0.0, 0.0, 1.0 );
+  Vector3D orientationVector = planeOp->GetNormal();
+  Vector3D defaultVector;
+  FillVector3D( defaultVector, 0.0, 0.0, 1.0 );
 
-        Vector3D rotationAxis = itk::CrossProduct( orientationVector, defaultVector );
-        //double rotationAngle = acos( orientationVector[2] / orientationVector.GetNorm() );
+  Vector3D rotationAxis = itk::CrossProduct( orientationVector, defaultVector );
+  //double rotationAngle = acos( orientationVector[2] / orientationVector.GetNorm() );
 
-        double rotationAngle = atan2( (double) rotationAxis.GetNorm(), (double) (orientationVector * defaultVector) );
-        rotationAngle *= 180.0 / vnl_math::pi;
+  double rotationAngle = atan2( (double) rotationAxis.GetNorm(), (double) (orientationVector * defaultVector) );
+  rotationAngle *= 180.0 / vnl_math::pi;
 
-        transform->PostMultiply();
-        transform->Identity();
-        transform->Translate( center[0], center[1], center[2] );
-        transform->RotateWXYZ( rotationAngle, rotationAxis[0], rotationAxis[1], rotationAxis[2] );
-        transform->Translate( -center[0], -center[1], -center[2] );
-        break;
+  transform->PostMultiply();
+  transform->Identity();
+  transform->Translate( center[0], center[1], center[2] );
+  transform->RotateWXYZ( rotationAngle, rotationAxis[0], rotationAxis[1], rotationAxis[2] );
+  transform->Translate( -center[0], -center[1], -center[2] );
+  break;
       }
     case OpRESTOREPLANEPOSITION:
       {
-        RestorePlanePositionOperation *op = dynamic_cast< mitk::RestorePlanePositionOperation* >(operation);
-        if(op == nullptr)
-        {
-          return;
-        }
+  RestorePlanePositionOperation *op = dynamic_cast< mitk::RestorePlanePositionOperation* >(operation);
+  if(op == nullptr)
+  {
+    return;
+  }
 
-        AffineTransform3D::Pointer transform2 = AffineTransform3D::New();
-        Matrix3D matrix;
-        matrix.GetVnlMatrix().set_column(0, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(0));
-        matrix.GetVnlMatrix().set_column(1, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(1));
-        matrix.GetVnlMatrix().set_column(2, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(2));
-        transform2->SetMatrix(matrix);
-        Vector3D offset = op->GetTransform()->GetOffset();
-        transform2->SetOffset(offset);
+  AffineTransform3D::Pointer transform2 = AffineTransform3D::New();
+  Matrix3D matrix;
+  matrix.GetVnlMatrix().set_column(0, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+  matrix.GetVnlMatrix().set_column(1, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+  matrix.GetVnlMatrix().set_column(2, op->GetTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+  transform2->SetMatrix(matrix);
+  Vector3D offset = op->GetTransform()->GetOffset();
+  transform2->SetOffset(offset);
 
-        this->SetIndexToWorldTransform(transform2);
-        ScalarType bounds[6] = {0, op->GetWidth(), 0, op->GetHeight(), 0 ,1 };
-        this->SetBounds(bounds);
-        this->Modified();
-        transform->Delete();
-        return;
+  this->SetIndexToWorldTransform(transform2);
+  ScalarType bounds[6] = {0, op->GetWidth(), 0, op->GetHeight(), 0 ,1 };
+  this->SetBounds(bounds);
+  this->Modified();
+  transform->Delete();
+  return;
       }
     default:
       Superclass::ExecuteOperation( operation );
@@ -787,18 +817,18 @@ namespace mitk
     {
       extent = GetExtent(0);
       if(width>extent)
-        newextentInMM = GetExtentInMM(0)/width*extent;
+  newextentInMM = GetExtentInMM(0)/width*extent;
       else
-        newextentInMM = GetExtentInMM(0)*extent/width;
+  newextentInMM = GetExtentInMM(0)*extent/width;
       SetExtentInMM(0, newextentInMM);
     }
     if(GetExtent(1)>0)
     {
       extent = GetExtent(1);
       if(width>extent)
-        newextentInMM = GetExtentInMM(1)/height*extent;
+  newextentInMM = GetExtentInMM(1)/height*extent;
       else
-        newextentInMM = GetExtentInMM(1)*extent/height;
+  newextentInMM = GetExtentInMM(1)*extent/height;
       SetExtentInMM(1, newextentInMM);
     }
     SetBounds(bounds);

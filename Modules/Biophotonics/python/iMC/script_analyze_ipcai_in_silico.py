@@ -16,7 +16,7 @@ import numpy as np
 import luigi
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import Normalizer
-from sklearn.linear_model import LinearRegression, LassoCV, LarsCV, ElasticNetCV, BayesianRidge, ARDRegression
+from sklearn.linear_model import LassoCV
 
 
 import tasks_mc
@@ -25,13 +25,14 @@ import mc.mcmanipulations as mcmani
 from regression.linear import LinearSaO2Unmixing
 from regression.domain_adaptation import estimate_logistic_regressor, resample
 from regression.estimation import standard_score
+from sklearn.linear_model.base import LinearRegression
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_silico"
 sp.FINALS_FOLDER = "Images"
 sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-w_standard = 0.15  # for this evaluation we add 15% noise
+w_standard = 0.01  # for this evaluation we add 15% noise
 
 def extract_batch_data(batch, nr_samples=None, w_percent=None):
     working_batch = copy.deepcopy(batch)
@@ -46,7 +47,8 @@ def extract_batch_data(batch, nr_samples=None, w_percent=None):
     y = working_batch.layers[0][:, 1]
     # add noise to reflectances
     if not np.isclose(w_percent, 0.):
-        noises = np.random.normal(loc=0., scale=w_percent, size=reflectances.shape)
+        noises = np.random.normal(loc=0., scale=w_percent,
+                                  size=reflectances.shape)
         reflectances += noises * reflectances
     reflectances = np.clip(reflectances, 0.00001, 1.)
     # normalize reflectances
@@ -62,18 +64,15 @@ def extract_batch_data(batch, nr_samples=None, w_percent=None):
 
 class IPCAICreateInSilicoPlots(luigi.Task):
 
-#     def requires(self):
-#         return tasks_mc.CameraBatch(self.batch_prefix)
     def requires(self):
         return TrainingSamplePlots(), NoisePlots()
-
 
     def run(self):
         pass
 
 
 EvaluationStruct = namedtuple("EvaluationStruct",
-                              "regressor data median prctile25 prctile75 color alpha")
+                              "name regressor data color alpha")
 
 
 class TrainingSamplePlots(luigi.Task):
@@ -97,11 +96,10 @@ class TrainingSamplePlots(luigi.Task):
         X_test, y_test = extract_batch_data(batch_test, w_percent=w_standard)
         X_train, y_train = extract_batch_data(batch_train, w_percent=w_standard)
         # setup structures to save test data
-        evaluation_setups = [EvaluationStruct(LinearSaO2Unmixing(), [],
-                                              [], [], [],
-                                              "red", 0.25),
-                     EvaluationStruct(LassoCV(), [], [], [], [],
-                                      "green", 0.5)]
+        evaluation_setups = [
+                    EvaluationStruct("classic", LinearSaO2Unmixing(),
+                                     [], "red", 0.25),
+                    EvaluationStruct("lasso", LassoCV(), [], "yellow", 0.5)]
         # do  validation
         nr_training_samples = np.arange(10, 1005, 10).astype(int)
         # not very pythonic, don't care
@@ -117,21 +115,18 @@ class TrainingSamplePlots(luigi.Task):
                     lr.fit(X_j, y_j)
                     # save results
                     median_sets.append(standard_score(lr, X_test, y_test))
-                median_sets = np.array(median_sets)
-                e.median.append(np.median(median_sets))
-                e.prctile25.append(np.percentile(median_sets, 25))
-                e.prctile75.append(np.percentile(median_sets, 75))
+                e.data.append(np.array(median_sets))
         # make a nice plot for results
         plt.figure()
         legend_handles = []
         for e in evaluation_setups:
             plt.fill_between(nr_training_samples,
-                             np.array(e.prctile25) * 100.,
-                             np.array(e.prctile75) * 100.,
+                             np.percentile(e.data[0], 25) * 100.,
+                             np.percentile(e.data[0], 75) * 100.,
                              edgecolor=e.color, facecolor=e.color,
                              alpha=e.alpha)
             h, = plt.plot(nr_training_samples,
-                          np.array(e.median) * 100., color=e.color,
+                          np.median(e.data[0]) * 100., color=e.color,
                           label=e.regressor.__class__.__name__ +
                             " final error: " + "{0:.2f}".format(e.median[-1] *
                                                                 100.))
@@ -168,11 +163,11 @@ class NoisePlots(luigi.Task):
         f = open(self.input()[1].path, "r")
         batch_test = pickle.load(f)
         # setup structures to save test data
-        evaluation_setups = [EvaluationStruct(LinearSaO2Unmixing(), [],
-                                              [], [], [],
-                                              "red", 0.25),
-                     EvaluationStruct(LassoCV(), [], [], [], [],
-                                      "green", 0.5)]
+        evaluation_setups = [
+                    EvaluationStruct("classic", LinearSaO2Unmixing(), [],
+                                     "red", 0.25),
+                    EvaluationStruct("lasso", LassoCV(), [],
+                                     "yellow", 0.5)]
         # iterate over different levels of noise
         noise_levels = np.arange(0.00, 1.01, 0.01)
         for w in noise_levels:
@@ -185,22 +180,19 @@ class NoisePlots(luigi.Task):
                 lr.fit(X_train, y_train)
                 y_pred = lr.predict(X_test)
                 # save results
-                abs_errors = np.abs(y_pred - y_test)
-                # save results
-                e.median.append(np.median(abs_errors))
-                e.prctile25.append(np.percentile(abs_errors, 25))
-                e.prctile75.append(np.percentile(abs_errors, 75))
+                errors = np.abs(y_pred - y_test)
+                e.data.append(errors)
         # make a nice plot for results
         plt.figure()
         legend_handles = []
         for e in evaluation_setups:
             plt.fill_between(np.array(noise_levels) * 100.,
-                             np.array(e.prctile25) * 100.,
-                             np.array(e.prctile75) * 100.,
+                             np.percentile(e.data[0], 25) * 100.,
+                             np.percentile(e.data[0], 75) * 100.,
                              edgecolor=e.color, facecolor=e.color,
                              alpha=e.alpha)
             h, = plt.plot(np.array(noise_levels) * 100.,
-                          np.array(e.median) * 100., color=e.color,
+                          np.median(e.data[0]) * 100., color=e.color,
                           label=e.regressor.__class__.__name__)
             legend_handles.append(h)
         minor_ticks = np.arange(0, 100, 5)
@@ -246,32 +238,37 @@ class DAPlots(luigi.Task):
         X_da_test, y_da_test = extract_batch_data(batch_da_test,
                                                   w_percent=w_standard)
         # setup structures to save test data
-        evaluation_setups = [EvaluationStruct(LinearSaO2Unmixing(), [],
-                                              [], [], [],
-                                              "red", 0.25, "classic"),
-                     EvaluationStruct(LassoCV(), [],
-                                      [], [], [],
-                                      "green", 0.5, "lasso"),
-                     EvaluationStruct(LassoCV(), [],
-                                      [], [], [],
-                                      "green", 0.5, "lasso+DA")]
+        evaluation_setups = [
+                    EvaluationStruct("classic", LinearSaO2Unmixing(), [],
+                                     "red", 0.25),
+                    EvaluationStruct("lasso", LassoCV(), [],
+                                     "yellow", 0.5),
+                    EvaluationStruct("lasso+da", LassoCV(), [],
+                                     "green", 0.5),
+                    EvaluationStruct("lasso no cov shift", LassoCV(), [],
+                                     "gray", 0.5)]
         # estimate weights for domain adaptation
         lr = estimate_logistic_regressor(X_train, X_da_train)
         weights = lr.predict_proba(X_train)[:, 1] / lr.predict_proba(X_train)[:, 0]
         # resample from X according da weighting result
         X_resampled, y_resampled, weights = resample(X_train, y_train, weights)
         for e in evaluation_setups:
-            lr = e.regressor
-            lr.fit(X_train, y_train)
-            y_pred = lr.predict(X_da_test)
+            # train
+            if e.name is  "lasso+da":
+                e.regressor.fit(X_resampled, y_resampled)
+            elif e.name is "lasso no cov shift":
+                e.regressor.fit(X_da_train, y_da_train)
+            else:
+                e.regressor.fit(X_train, y_train)
+            # evaluate
+            y_pred = e.regressor.predict(X_da_test)
             # save results
-            e.data.append(y_pred - y_da_test)
+            e.data.append(np.abs(y_pred - y_da_test))
 
-
-        # collect data
+        # collect data for boxplot
         boxplot_data = []
         for e in evaluation_setups:
-            boxplot_data.append(100. * np.abs(np.array(e.data)))
+            boxplot_data.append(100. * e.data[0])
         # make a nice plot for results
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -282,16 +279,16 @@ class DAPlots(luigi.Task):
             box.set(color="black", linewidth=2)
             # change fill color
             box.set(facecolor=e.color, alpha=0.5)
-
         # change color and linewidth of the whiskers
         x_tick_labels = []
-        for whisker, cap, median, flier in itertools.izip(bp['whiskers'], bp['caps'],
-                              bp['medians'], evaluation_setups, bp['fliers']):
+        for e, whisker, cap, median, flier in itertools.izip(
+                    evaluation_setups,
+                    bp['whiskers'], bp['caps'], bp['medians'], bp['fliers']):
             whisker.set(color="black", linewidth=2)
             cap.set(color="black", linewidth=2)
             median.set(color="black", linewidth=2)
             flier.set(marker='o', color=e.color, alpha=0.5)
-            x_tick_labels.append(e.regressor.__class__.__name__)
+            x_tick_labels.append(e.name)
         ax.set_xticklabels(x_tick_labels)
         ax.get_xaxis().tick_bottom()
         ax.get_yaxis().tick_left()

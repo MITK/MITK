@@ -53,4 +53,8 @@ def resample(X, y, w, nr_samples=None):
     chosen_samples = np.random.choice(total_nr_samples,
                                       size=nr_samples,
                                       replace=True, p=w)
-    return X[chosen_samples, :], np.atleast_2d(y)[chosen_samples, :], np.ones(nr_samples)
+    if y.ndim == 1:
+        y_chosen = y[chosen_samples]
+    else:
+        y_chosen = y[chosen_samples, :]
+    return X[chosen_samples, :], y_chosen, np.ones(nr_samples)

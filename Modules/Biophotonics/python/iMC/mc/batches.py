@@ -65,7 +65,7 @@ class GenericBatch(AbstractBatch):
         # saO2 is the same for each layer, since the blood "diffuses" in tissue
         samples[:, 1] = saO2  # saO2
         samples[:, 2] = scale(samples[:, 2], 5.* 100., 30.* 100.)  # a_mie
-        samples[:, 3] = scale(samples[:, 3], 0.* 100., 60.* 100.)  # a_ray
+        samples[:, 3] = scale(samples[:, 3], 0.* 100., 60.* 100.) * 0  # a_ray
         # d will be normalized later to 2mm total depth
         samples[:, 4] = scale(samples[:, 4], 0.0, 1.)  # d
         # append as last layer
@@ -117,7 +117,7 @@ class GaussianBatch(GenericBatch):
         # a_mie
         samples[:, 2] = scale(samples[:, 2], 5. *100, 30.* 100)
         # a_ray
-        samples[:, 3] = scale(samples[:, 3], 0.*100., 60.*100.)
+        samples[:, 3] = scale(samples[:, 3], 0.*100., 60.*100.) * 0.
         # d will be normalized later to 2mm total depth
         samples[:, 4] = scale(samples[:, 4], 0., 1.)
         # append as last layer

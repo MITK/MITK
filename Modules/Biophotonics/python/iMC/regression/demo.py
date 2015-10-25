@@ -38,9 +38,9 @@ def get_data_from_batch(filenameprefix):
 if __name__ == '__main__':
     # first load training and testing data
     X_train, oxy_train = get_data_from_batch("/media/wirkert/data/Data/temp/" +
-        "hard_train")
+        "hard_train_2")
     X_gaussian_train, oxy_gaussian_train = get_data_from_batch("/media/wirkert/data/Data/temp/" +
-        "gaussian_train")
+        "gaussian_train_2")
     X_test, oxy_test = get_data_from_batch("/media/wirkert/data/Data/temp/" +
         "gaussian_test")
 

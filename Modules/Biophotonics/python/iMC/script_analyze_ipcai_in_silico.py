@@ -25,14 +25,14 @@ import mc.mcmanipulations as mcmani
 from regression.linear import LinearSaO2Unmixing
 from regression.domain_adaptation import estimate_logistic_regressor, resample
 from regression.estimation import standard_score
-from sklearn.linear_model.base import LinearRegression
+from sklearn.ensemble.forest import RandomForestRegressor
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_silico"
 sp.FINALS_FOLDER = "Images"
 sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-w_standard = 0.01  # for this evaluation we add 15% noise
+w_standard = 0.0  # for this evaluation we add 15% noise
 
 def extract_batch_data(batch, nr_samples=None, w_percent=None):
     working_batch = copy.deepcopy(batch)
@@ -210,7 +210,7 @@ class NoisePlots(luigi.Task):
 class DAPlots(luigi.Task):
 
     def requires(self):
-        return tasks_mc.CameraBatch("generic_tissue_train"), \
+        return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
                 tasks_mc.CameraBatch("generic_tissue_test"), \
                 tasks_mc.CameraBatch("colon_muscle_tissue_train"), \
                 tasks_mc.CameraBatch("colon_muscle_tissue_test")
@@ -296,6 +296,7 @@ class DAPlots(luigi.Task):
         plt.title("performance under covariance shift")
         plt.xlabel("method")
         plt.ylabel("absolute error [%]")
+        plt.ylim((0, 20))
         plt.savefig(self.output().path + "_temp.png", dpi=500,
                     bbox_inches='tight')
 

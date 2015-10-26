@@ -15,8 +15,8 @@ import numpy as np
 import luigi
 import matplotlib.pyplot as plt
 import SimpleITK as sitk
-from sklearn.preprocessing import Normalizer
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble.forest import RandomForestRegressor
+from scipy.ndimage.filters import gaussian_filter
 
 import tasks_analyze as at
 import tasks_preprocessing as pre
@@ -30,7 +30,7 @@ import msi.imgmani as imgmani
 import msi.normalize as norm
 from regression.estimation import estimate_image
 from regression.linear import LinearSaO2Unmixing
-from sklearn.ensemble.forest import RandomForestRegressor
+from regression.preprocessing import preprocess
 
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
@@ -94,6 +94,8 @@ class IPCAICreateOxyImageTask(luigi.Task):
         image[np.isinf(image)] = 0.
         image[image > 1.] = 1.
         image[image < 0.] = 0.
+#         image[0, 0] = 0.
+#         image[0, 1] = 1.
         at.plot_axis(axarr[1], image[:, :],
                   "oxygenation [%]")
         plt.savefig(self.output().path, dpi=1000, bbox_inches='tight')
@@ -122,33 +124,11 @@ class IPCAIEstimateTissueParametersTask(luigi.Task):
         e_file = open(self.input()[1].path, 'r')
         e = pickle.load(e_file)
         # estimate
-        # e = LinearSaO2Unmixing()
         sitk_image = estimate_image(msi, e)
         # save data
         outFile = self.output().open('w')
         outFile.close()
         sitk.WriteImage(sitk_image, self.output().path)
-
-
-def extract_batch_data(filename):
-    # get data
-    f = open(filename, "r")
-    batch = pickle.load(f)
-    reflectances = batch.reflectances
-    y = batch.layers[0][:, 1]
-    # add noise to reflectances
-    noises = np.random.normal(loc=0., scale=0.1, size=reflectances.shape)
-    reflectances += noises * reflectances
-    reflectances = np.clip(reflectances, 0.00001, 1.)
-    # normalize reflectances
-    normalizer = Normalizer(norm='l1')
-    reflectances = normalizer.transform(reflectances)
-    # reflectances to absorption
-    absorptions = -np.log(reflectances)
-    X = absorptions
-    # get rid of sorted out bands
-    X = np.delete(X, sp.bands_to_sortout, axis=1)
-    return X, y
 
 
 class IPCAITrainRegressor(luigi.Task):
@@ -166,10 +146,13 @@ class IPCAITrainRegressor(luigi.Task):
 
     def run(self):
         # extract data from the batch
-        X, y = extract_batch_data(self.input().path)
+        f = open(self.input().path, "r")
+        batch_train = pickle.load(f)
+        X, y = preprocess(batch_train, w_percent=0.05)
         # train regressor
-        reg = RandomForestRegressor(max_depth=30, min_samples_leaf=5)
+        reg = RandomForestRegressor(max_depth=30, min_samples_leaf=5, n_jobs=-1)
         reg.fit(X, y)
+        reg = LinearSaO2Unmixing()
         # save regressor
         f = self.output().open('w')
         pickle.dump(reg, f)
@@ -190,12 +173,22 @@ class IPCAIPreprocessMSI(luigi.Task):
 
     def run(self):
         reader = NrrdReader()
-        image = reader.read(self.input().path)
-        image.set_image(imgmani.sortout_bands(image.get_image(),
+        msi = reader.read(self.input().path)
+        # sortout unwanted bands
+        msi.set_image(imgmani.sortout_bands(msi.get_image(),
                                               sp.bands_to_sortout))
-        norm.standard_normalizer.normalize(image)
-        image.set_image(-np.log(image.get_image()))
-        pre.touch_and_save_msi(image, self.output())
+        # zero values would lead to infinity logarithm, thus clip.
+        msi.set_image(np.clip(msi.get_image(), 0.00001, 2. ** 64))
+        # normalize to get rid of lighting intensity
+        norm.standard_normalizer.normalize(msi)
+        # transform to absorption
+        msi.set_image(-np.log(msi.get_image()))
+        # normalize by l2 for stability
+        norm.standard_normalizer.normalize(msi, "l2")
+        # apply gaussian smoothing for error reduction
+        filtered_image = gaussian_filter(msi.get_image().astype(np.float), 2)
+        msi.set_image(filtered_image)
+        pre.touch_and_save_msi(msi, self.output())
 
 
 class IPCAICorrectImagingSetupTask(luigi.Task):
@@ -290,7 +283,7 @@ if __name__ == '__main__':
         main_task = IPCAICreateOxyImageTask(
             image_prefix=f,
             batch_prefix=
-            "generic_tissue")
+            "generic_tissue_no_aray_train")
         w.add(main_task)
     w.run()
 

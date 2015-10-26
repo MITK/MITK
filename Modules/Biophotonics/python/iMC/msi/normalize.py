@@ -1,5 +1,7 @@
 
 import numpy as np
+from sklearn.preprocessing import Normalizer
+
 
 from imgmani import collapse_image
 
@@ -34,11 +36,11 @@ class NormalizeMean(Normalize):
     def __init__(self):
         pass
 
-    def normalize(self, msi):
+    def normalize(self, msi, norm="l1"):
         original_shape = msi.get_image().shape
         collapsed_image = collapse_image(msi.get_image())
-        normalized_image = collapsed_image / \
-                np.sum(collapsed_image, axis=1)[:, None]
+        normalizer = Normalizer(norm=norm)
+        normalized_image = normalizer.transform(collapsed_image)
         msi.set_image(np.reshape(normalized_image, original_shape))
 
 

@@ -21,6 +21,7 @@ from sklearn.linear_model import LassoCV
 
 import tasks_mc
 import scriptpaths as sp
+from regression.preprocessing import preprocess
 import mc.mcmanipulations as mcmani
 from regression.linear import LinearSaO2Unmixing
 from regression.domain_adaptation import estimate_logistic_regressor, resample
@@ -38,46 +39,7 @@ sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
 sp.FINALS_FOLDER = "Images"
 sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-w_standard = 0.05  # for this evaluation we add 15% noise
-
-def extract_batch_data(batch, nr_samples=None, w_percent=None, magnification=None):
-    working_batch = copy.deepcopy(batch)
-    if w_percent is None:
-        w_percent = 0.
-    if magnification is not None:
-        r_new = batch.reflectances
-        layers_new = working_batch.layers
-        for i in range(magnification - 1):
-            r_new = np.vstack((r_new, batch.reflectances))
-            for i in range(len(layers_new)):
-                layers_new[i] = np.vstack((layers_new[i], batch.layers[i]))
-        working_batch.reflectances = r_new
-        working_batch.layers = layers_new
-
-    # extract nr_samples samples from data
-    if nr_samples is None:
-        nr_samples = working_batch.nr_elements()
-    mcmani.select_n(working_batch, nr_samples)
-    # get reflectance and oxygenation
-    reflectances = working_batch.reflectances
-    y = working_batch.layers[0][:, 1]
-    # add noise to reflectances
-    if not np.isclose(w_percent, 0.):
-        noises = np.random.normal(loc=0., scale=w_percent,
-                                  size=reflectances.shape)
-        reflectances += noises * reflectances
-    reflectances = np.clip(reflectances, 0.00001, 1.)
-    # normalize reflectances
-    normalizer = Normalizer(norm='l1')
-    reflectances = normalizer.transform(reflectances)
-    # reflectances to absorption
-    absorptions = -np.log(reflectances)
-    X = absorptions
-    # get rid of sorted out bands
-    normalizer = Normalizer(norm='l2')
-    X = np.delete(X, sp.bands_to_sortout, axis=1)
-    X = normalizer.transform(X)
-    return X, y
+w_standard = 0.05  # for this evaluation we add 5% noise
 
 
 class IPCAICreateInSilicoPlots(luigi.Task):
@@ -110,8 +72,8 @@ class TrainingSamplePlots(luigi.Task):
         f = open(self.input()[1].path, "r")
         batch_test = pickle.load(f)
         # setup testing function and data
-        X_test, y_test = extract_batch_data(batch_test, w_percent=w_standard)
-        X_train, y_train = extract_batch_data(batch_train, w_percent=w_standard)
+        X_test, y_test = preprocess(batch_test, w_percent=w_standard)
+        X_train, y_train = preprocess(batch_train, w_percent=w_standard)
         # setup structures to save test data
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(),
@@ -201,9 +163,9 @@ class NoisePlots(luigi.Task):
         noise_levels = np.arange(0.00, 1.01, 0.01)
         for w in noise_levels:
             # setup testing function
-            X_test, y_test = extract_batch_data(batch_test, w_percent=w)
+            X_test, y_test = preprocess(batch_test, w_percent=w)
             # extract noisy data
-            X_train, y_train = extract_batch_data(batch_train, w_percent=w)
+            X_train, y_train = preprocess(batch_train, w_percent=w)
             for e in evaluation_setups:
                 lr = e.regressor
                 lr.fit(X_train, y_train)
@@ -277,11 +239,11 @@ class DAPlots(luigi.Task):
         batch_da_train = pickle.load(f)
         f = open(self.input()[3].path, "r")
         batch_da_test = pickle.load(f)
-        X_test, y_test = extract_batch_data(batch_test, w_percent=w_standard)
-        X_train, y_train = extract_batch_data(batch_train, w_percent=w_standard)
-        X_da_train, y_da_train = extract_batch_data(batch_da_train,
+        X_test, y_test = preprocess(batch_test, w_percent=w_standard)
+        X_train, y_train = preprocess(batch_train, w_percent=w_standard)
+        X_da_train, y_da_train = preprocess(batch_da_train,
                                                     w_percent=w_standard)
-        X_da_test, y_da_test = extract_batch_data(batch_da_test,
+        X_da_test, y_da_test = preprocess(batch_da_test,
                                                   w_percent=w_standard)
 
 #         transformer = PCA(n_components=10)
@@ -318,8 +280,7 @@ class DAPlots(luigi.Task):
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(), [],
                                      "red", 0.25)
-                    , EvaluationStruct("lasso", LassoCV(), [],
-                                     "yellow", 0.5)
+                    , EvaluationStruct("lasso", LassoCV(), [], "yellow", 0.5)
                     # , EvaluationStruct("svm weighting", svm, [], "blue", 0.5)
                     , EvaluationStruct("rf", rf, [], "green", 0.5)
                     , EvaluationStruct("rf no cov shift", rf, [], "blue", 0.5)

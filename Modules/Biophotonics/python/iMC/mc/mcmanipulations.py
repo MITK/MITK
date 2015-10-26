@@ -31,6 +31,15 @@ def interpolate_wavelengths(batch, new_wavelengths):
     batch.wavelengths = new_wavelengths
 
 
+def sortout_bands(batch, bands_to_sortout=None):
+    """ TODO: Documentation and test """
+    if bands_to_sortout is not None:
+        # get rid of sorted out bands
+        batch.reflectances = np.delete(batch.reflectances,
+                                              bands_to_sortout, axis=1)
+        batch.wavelengths = np.delete(batch.wavelengths,
+                                              bands_to_sortout, axis=1)
+
 
 def select_n(batch, n):
     """ randomly select n elements from batch. TODO: Test """

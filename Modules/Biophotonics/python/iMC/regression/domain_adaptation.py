@@ -29,7 +29,7 @@ def estimate_logistic_regressor(X_s, X_t):
     all_labels = np.concatenate((source_labels, target_labels))
 
     # train logistic regression
-    kf = KFold(X_all.shape[0], 5, shuffle=True)
+    kf = KFold(X_all.shape[0], 10, shuffle=True)
     # todo include intercept scaling paramter
     param_grid = [
       {'C': np.logspace(-3, 6, 10), 'fit_intercept':['True', 'False']} ]

@@ -26,18 +26,34 @@ from regression.linear import LinearSaO2Unmixing
 from regression.domain_adaptation import estimate_logistic_regressor, resample
 from regression.estimation import standard_score
 from sklearn.ensemble.forest import RandomForestRegressor
+import sklearn.svm
+import sklearn.grid_search
+import sklearn.cross_validation
+import pyRULSIF
+from sklearn.decomposition import PCA
+import sklearn.preprocessing
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_silico"
 sp.FINALS_FOLDER = "Images"
 sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-w_standard = 0.0  # for this evaluation we add 15% noise
+w_standard = 0.1  # for this evaluation we add 15% noise
 
-def extract_batch_data(batch, nr_samples=None, w_percent=None):
+def extract_batch_data(batch, nr_samples=None, w_percent=None, magnification=None):
     working_batch = copy.deepcopy(batch)
     if w_percent is None:
         w_percent = 0.
+    if magnification is not None:
+        r_new = batch.reflectances
+        layers_new = working_batch.layers
+        for i in range(magnification - 1):
+            r_new = np.vstack((r_new, batch.reflectances))
+            for i in range(len(layers_new)):
+                layers_new[i] = np.vstack((layers_new[i], batch.layers[i]))
+        working_batch.reflectances = r_new
+        working_batch.layers = layers_new
+
     # extract nr_samples samples from data
     if nr_samples is None:
         nr_samples = working_batch.nr_elements()
@@ -58,7 +74,9 @@ def extract_batch_data(batch, nr_samples=None, w_percent=None):
     absorptions = -np.log(reflectances)
     X = absorptions
     # get rid of sorted out bands
+    normalizer = Normalizer(norm='l2')
     X = np.delete(X, sp.bands_to_sortout, axis=1)
+    X = normalizer.transform(X)
     return X, y
 
 
@@ -101,7 +119,7 @@ class TrainingSamplePlots(luigi.Task):
                                      [], "red", 0.25),
                     EvaluationStruct("lasso", LassoCV(), [], "yellow", 0.5)]
         # do  validation
-        nr_training_samples = np.arange(10, 1005, 10).astype(int)
+        nr_training_samples = np.arange(10, 1010, 10).astype(int)
         # not very pythonic, don't care
         for n in nr_training_samples:
             print "nr samples ", str(n)
@@ -147,8 +165,8 @@ class TrainingSamplePlots(luigi.Task):
 class NoisePlots(luigi.Task):
 
     def requires(self):
-        return tasks_mc.CameraBatch("generic_tissue_train"), \
-                tasks_mc.CameraBatch("generic_tissue_test")
+        return tasks_mc.CameraBatch("colon_muscle_tissue_train"), \
+                tasks_mc.CameraBatch("colon_muscle_tissue_test")
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -167,7 +185,7 @@ class NoisePlots(luigi.Task):
                     EvaluationStruct("classic", LinearSaO2Unmixing(), [],
                                      "red", 0.25),
                     EvaluationStruct("lasso", LassoCV(), [],
-                                     "yellow", 0.5)]
+                                     "green", 0.5)]
         # iterate over different levels of noise
         noise_levels = np.arange(0.00, 1.01, 0.01)
         for w in noise_levels:
@@ -186,14 +204,17 @@ class NoisePlots(luigi.Task):
         plt.figure()
         legend_handles = []
         for e in evaluation_setups:
+            p25 = lambda x: np.percentile(x, 25) * 100.
+            p75 = lambda x: np.percentile(x, 75) * 100.
+            m = lambda x: np.median(x) * 100.
             plt.fill_between(np.array(noise_levels) * 100.,
-                             np.percentile(e.data[0], 25) * 100.,
-                             np.percentile(e.data[0], 75) * 100.,
+                             map(p25, e.data),
+                             map(p75, e.data),
                              edgecolor=e.color, facecolor=e.color,
                              alpha=e.alpha)
             h, = plt.plot(np.array(noise_levels) * 100.,
-                          np.median(e.data[0]) * 100., color=e.color,
-                          label=e.regressor.__class__.__name__)
+                          map(m, e.data), color=e.color,
+                          label=e.name)
             legend_handles.append(h)
         minor_ticks = np.arange(0, 100, 5)
         plt.gca().set_xticks(minor_ticks, minor=True)
@@ -211,7 +232,7 @@ class DAPlots(luigi.Task):
 
     def requires(self):
         return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
-                tasks_mc.CameraBatch("generic_tissue_test"), \
+                tasks_mc.CameraBatch("generic_tissue_no_aray_test"), \
                 tasks_mc.CameraBatch("colon_muscle_tissue_train"), \
                 tasks_mc.CameraBatch("colon_muscle_tissue_test")
 
@@ -237,7 +258,35 @@ class DAPlots(luigi.Task):
                                                     w_percent=w_standard)
         X_da_test, y_da_test = extract_batch_data(batch_da_test,
                                                   w_percent=w_standard)
+
+#         transformer = PCA(n_components=10)
+#         transformer = sklearn.preprocessing.StandardScaler()
+#         transformer.fit(X_train)
+#         X_train = transformer.fit_transform(X_train)
+#         X_test = transformer.transform(X_test)
+#         X_da_test = transformer.transform(X_da_test)
+#         X_da_train = transformer.transform(X_da_train)
+
         # setup structures to save test data
+        # train logistic regression
+        kf = sklearn.cross_validation.KFold(X_train.shape[0], 10, shuffle=True)
+        # todo include intercept scaling paramter
+        param_grid_svm = [
+          {'C': np.logspace(-6, 6, 1),
+           'kernel':['rbf', 'linear'],
+           'gamma': np.logspace(-6, 6, 1)} ]
+        svm = sklearn.grid_search.GridSearchCV(sklearn.svm.SVR(),
+                               param_grid_svm, cv=kf, n_jobs=-1)
+        # use the random forest regressor
+        param_grid_rf = [
+          {"n_estimators": np.array([50]),
+           "max_depth": np.arange(5, 30, 2),
+           "min_samples_leaf": np.array([5, 7, 10, 15])}]
+        rf = sklearn.grid_search.GridSearchCV(RandomForestRegressor(50,
+                                                    max_depth=10, n_jobs=-1),
+                  param_grid_rf, cv=kf, n_jobs=-1)
+        # svm = sklearn.svm.SVR(kernel='linear', C=0.0000001)
+
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(), [],
                                      "red", 0.25),
@@ -246,18 +295,48 @@ class DAPlots(luigi.Task):
                     EvaluationStruct("lasso+da", LassoCV(), [],
                                      "green", 0.5),
                     EvaluationStruct("lasso no cov shift", LassoCV(), [],
-                                     "gray", 0.5)]
+                                     "gray", 0.5)  #
+                    # , EvaluationStruct("svm weighting", svm, [], "blue", 0.5)
+                    , EvaluationStruct("rf", rf, [],
+                                     "blue", 0.5)
+                    ]
         # estimate weights for domain adaptation
         lr = estimate_logistic_regressor(X_train, X_da_train)
         weights = lr.predict_proba(X_train)[:, 1] / lr.predict_proba(X_train)[:, 0]
+        # X_train = X_train[:X_da_train.shape[0], :]
+        # y_train = y_train[:X_da_train.shape[0]]
+
+#         PE, weights, s = pyRULSIF.R_ULSIF(X_da_train.T, X_train.T, 0, 0.,
+#                          pyRULSIF.sigma_list(X_da_train.T, X_train.T),
+#                          pyRULSIF.lambda_list(), X_da_train.shape[0],
+#                          5)
         # resample from X according da weighting result
+#
+#         batch_temp = copy.deepcopy(batch_train)
+#         batch_temp2 = copy.deepcopy(batch_train)
+#         batch_temp.reflectances = X_train[0:4, :]
+#
+#         normalizer = Normalizer(norm='l1')
+#         reflectances = batch_train.reflectances
+#         reflectances = normalizer.transform(reflectances)
+#         batch_temp2.reflectances = -np.log(reflectances[0:4, :])
+#         f, axarr = plt.subplots(2, 1)
+#         from mc.plot import plot
+#         plot(batch_temp, axarr[0])
+#         plot(batch_temp2, axarr[1])
+#         plt.show()
+
         X_resampled, y_resampled, weights = resample(X_train, y_train, weights)
+
         for e in evaluation_setups:
             # train
             if e.name is  "lasso+da":
                 e.regressor.fit(X_resampled, y_resampled)
             elif e.name is "lasso no cov shift":
                 e.regressor.fit(X_da_train, y_da_train)
+            elif e.name is "rf":
+                e.regressor.fit(X_train, y_train)
+                print e.regressor.best_estimator_
             else:
                 e.regressor.fit(X_train, y_train)
             # evaluate
@@ -296,7 +375,7 @@ class DAPlots(luigi.Task):
         plt.title("performance under covariance shift")
         plt.xlabel("method")
         plt.ylabel("absolute error [%]")
-        plt.ylim((0, 20))
+        plt.ylim((0, 40))
         plt.savefig(self.output().path + "_temp.png", dpi=500,
                     bbox_inches='tight')
 

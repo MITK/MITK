@@ -88,7 +88,7 @@ namespace mitk {
     {
       Axial,
       Sagittal,
-      Frontal,
+      Frontal, // also known as "Coronal" in mitk.
       None //This defines the PlaneGeometry for the 3D renderWindow which
           //curiously also needs a PlaneGeometry. This should be reconsidered some time.
     };
@@ -161,11 +161,23 @@ namespace mitk {
     * (default: axial) with respect to \a transform (default: identity)
     * given width and height in units.
     *
+    * \a Rotated means rotated by 180 degrees (1/2 rotation) within the plane.
+    * Rotation by 90 degrees (1/4 rotation) is not implemented as of now.
+    *
+    * \a Frontside/Backside:
+    * Viewed from below = frontside in the axial case;
+    * (radiologist's view versus neuro-surgeon's view, see:
+    * http://www.itk.org/Wiki/images/e/ed/DICOM-OrientationDiagram-Radiologist-vs-NeuroSurgeon.png )
+    * Viewed from front = frontside in the coronal case;
+    * Viewed from left = frontside in the sagittal case.
+    *
+    * \a Cave/Caution: Currently only RPI, LAI, LPS and RAS in the three standard planes are covered,
+    * i.e. 12 cases of 144:  3 standard planes * 48 coordinate orientations = 144 cases.
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-      const AffineTransform3D* transform = nullptr,
-      PlaneOrientation planeorientation = Axial,
-      ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
+                                         const AffineTransform3D* transform = nullptr,
+                                         PlaneOrientation planeorientation = Axial,
+                                         ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
 
     /**
     * \brief Initialize plane with orientation \a planeorientation

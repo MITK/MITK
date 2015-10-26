@@ -38,7 +38,7 @@ sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
 sp.FINALS_FOLDER = "Images"
 sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-w_standard = 0.1  # for this evaluation we add 15% noise
+w_standard = 0.05  # for this evaluation we add 15% noise
 
 def extract_batch_data(batch, nr_samples=None, w_percent=None, magnification=None):
     working_batch = copy.deepcopy(batch)
@@ -87,7 +87,6 @@ class IPCAICreateInSilicoPlots(luigi.Task):
 
     def run(self):
         pass
-
 
 EvaluationStruct = namedtuple("EvaluationStruct",
                               "name regressor data color alpha")
@@ -165,8 +164,8 @@ class TrainingSamplePlots(luigi.Task):
 class NoisePlots(luigi.Task):
 
     def requires(self):
-        return tasks_mc.CameraBatch("colon_muscle_tissue_train"), \
-                tasks_mc.CameraBatch("colon_muscle_tissue_test")
+        return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
+                tasks_mc.CameraBatch("generic_tissue_no_aray_test")
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -180,12 +179,24 @@ class NoisePlots(luigi.Task):
         batch_train = pickle.load(f)
         f = open(self.input()[1].path, "r")
         batch_test = pickle.load(f)
+
         # setup structures to save test data
+        kf = sklearn.cross_validation.KFold(batch_train.reflectances.shape[0],
+                                            10, shuffle=True)
+        param_grid_rf = [
+          {"n_estimators": np.array([50]),
+           "max_depth": np.array([30]),  # np.arange(30, 35, 2),
+           "min_samples_leaf": np.array([5])}]
+        rf = sklearn.grid_search.GridSearchCV(RandomForestRegressor(50,
+                                                    max_depth=10, n_jobs=-1),
+                  param_grid_rf, cv=kf, n_jobs=-1)
+
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(), [],
                                      "red", 0.25),
-                    EvaluationStruct("lasso", LassoCV(), [],
-                                     "green", 0.5)]
+                    EvaluationStruct("lasso", LassoCV(), [], "yellow", 0.5)
+                    , EvaluationStruct("rf", rf, [], "green", 0.5)
+                    ]
         # iterate over different levels of noise
         noise_levels = np.arange(0.00, 1.01, 0.01)
         for w in noise_levels:
@@ -196,6 +207,8 @@ class NoisePlots(luigi.Task):
             for e in evaluation_setups:
                 lr = e.regressor
                 lr.fit(X_train, y_train)
+                if e.name is "rf":
+                    print lr.best_estimator_
                 y_pred = lr.predict(X_test)
                 # save results
                 errors = np.abs(y_pred - y_test)
@@ -219,6 +232,18 @@ class NoisePlots(luigi.Task):
         minor_ticks = np.arange(0, 100, 5)
         plt.gca().set_xticks(minor_ticks, minor=True)
         plt.gca().set_yticks(minor_ticks, minor=True)
+
+        plt.gca().annotate('error: ' +
+                           "{0:.2f}".format(
+                                        np.median(evaluation_setups[-1].data[0])
+                                        * 100) + "%",
+                           xy=(0, 0.3), xytext=(10, 35), size=10, va="center",
+                           ha="center", bbox=dict(boxstyle="round4",
+                                                  fc="g", alpha=0.5),
+                           arrowprops=dict(arrowstyle="-|>",
+                                  connectionstyle="arc3,rad=-0.2",
+                                  fc="w"),
+                    )
         plt.grid()
         plt.legend(handles=legend_handles)
         plt.title("dependency on noise")
@@ -285,20 +310,19 @@ class DAPlots(luigi.Task):
         rf = sklearn.grid_search.GridSearchCV(RandomForestRegressor(50,
                                                     max_depth=10, n_jobs=-1),
                   param_grid_rf, cv=kf, n_jobs=-1)
+        # do not do cv for now to save some time.
+        rf = RandomForestRegressor(50, max_depth=30, min_samples_leaf=5,
+                                   n_jobs=-1)
         # svm = sklearn.svm.SVR(kernel='linear', C=0.0000001)
 
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(), [],
-                                     "red", 0.25),
-                    EvaluationStruct("lasso", LassoCV(), [],
-                                     "yellow", 0.5),
-                    EvaluationStruct("lasso+da", LassoCV(), [],
-                                     "green", 0.5),
-                    EvaluationStruct("lasso no cov shift", LassoCV(), [],
-                                     "gray", 0.5)  #
+                                     "red", 0.25)
+                    , EvaluationStruct("lasso", LassoCV(), [],
+                                     "yellow", 0.5)
                     # , EvaluationStruct("svm weighting", svm, [], "blue", 0.5)
-                    , EvaluationStruct("rf", rf, [],
-                                     "blue", 0.5)
+                    , EvaluationStruct("rf", rf, [], "green", 0.5)
+                    , EvaluationStruct("rf no cov shift", rf, [], "blue", 0.5)
                     ]
         # estimate weights for domain adaptation
         lr = estimate_logistic_regressor(X_train, X_da_train)
@@ -332,11 +356,11 @@ class DAPlots(luigi.Task):
             # train
             if e.name is  "lasso+da":
                 e.regressor.fit(X_resampled, y_resampled)
-            elif e.name is "lasso no cov shift":
+            elif e.name is "lasso no cov shift" or e.name is "rf no cov shift":
                 e.regressor.fit(X_da_train, y_da_train)
             elif e.name is "rf":
                 e.regressor.fit(X_train, y_train)
-                print e.regressor.best_estimator_
+                # print e.regressor.best_estimator_
             else:
                 e.regressor.fit(X_train, y_train)
             # evaluate
@@ -351,22 +375,22 @@ class DAPlots(luigi.Task):
         # make a nice plot for results
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        bp = ax.boxplot(boxplot_data, patch_artist=True)
+        bp = ax.boxplot(boxplot_data, showfliers=False,
+                        showmeans=True, patch_artist=True)
         # nicen it up
         for e, box in zip(evaluation_setups, bp['boxes']):
             # change outline color
             box.set(color="black", linewidth=2)
             # change fill color
-            box.set(facecolor=e.color, alpha=0.5)
+            box.set(facecolor=e.color, alpha=e.alpha)
         # change color and linewidth of the whiskers
         x_tick_labels = []
-        for e, whisker, cap, median, flier in itertools.izip(
+        for e, whisker, cap, median in itertools.izip(
                     evaluation_setups,
-                    bp['whiskers'], bp['caps'], bp['medians'], bp['fliers']):
+                    bp['whiskers'], bp['caps'], bp['medians']):
             whisker.set(color="black", linewidth=2)
             cap.set(color="black", linewidth=2)
             median.set(color="black", linewidth=2)
-            flier.set(marker='o', color=e.color, alpha=0.5)
             x_tick_labels.append(e.name)
         ax.set_xticklabels(x_tick_labels)
         ax.get_xaxis().tick_bottom()
@@ -375,7 +399,7 @@ class DAPlots(luigi.Task):
         plt.title("performance under covariance shift")
         plt.xlabel("method")
         plt.ylabel("absolute error [%]")
-        plt.ylim((0, 40))
+        # plt.ylim((0, 40))
         plt.savefig(self.output().path + "_temp.png", dpi=500,
                     bbox_inches='tight')
 

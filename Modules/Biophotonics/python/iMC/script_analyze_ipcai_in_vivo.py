@@ -30,6 +30,7 @@ import msi.imgmani as imgmani
 import msi.normalize as norm
 from regression.estimation import estimate_image
 from regression.linear import LinearSaO2Unmixing
+from sklearn.ensemble.forest import RandomForestRegressor
 
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
@@ -136,7 +137,7 @@ def extract_batch_data(filename):
     reflectances = batch.reflectances
     y = batch.layers[0][:, 1]
     # add noise to reflectances
-    noises = np.random.normal(loc=0., scale=0.3, size=reflectances.shape)
+    noises = np.random.normal(loc=0., scale=0.1, size=reflectances.shape)
     reflectances += noises * reflectances
     reflectances = np.clip(reflectances, 0.00001, 1.)
     # normalize reflectances
@@ -167,11 +168,11 @@ class IPCAITrainRegressor(luigi.Task):
         # extract data from the batch
         X, y = extract_batch_data(self.input().path)
         # train regressor
-        linear_regressor = LinearRegression()
-        linear_regressor.fit(X, y)
+        reg = RandomForestRegressor(max_depth=30, min_samples_leaf=5)
+        reg.fit(X, y)
         # save regressor
         f = self.output().open('w')
-        pickle.dump(linear_regressor, f)
+        pickle.dump(reg, f)
         f.close()
 
 

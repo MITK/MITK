@@ -27,10 +27,10 @@ if __name__ == '__main__':
     BATCH_NUMBERS = np.arange(0, 100, 1)
     for i in BATCH_NUMBERS:
         main_task = tasks_mc.CreateSpectraTask(
-                                        "generic_tissue_no_aray_train",
+                                        "colon_muscle_tissue_test",
                                          i,
                                          1000,
-                                         mcfac.GenericMcFactory())
+                                         mcfac.ColonMuscleMcFactory())
         w.add(main_task)
         w.run()
 

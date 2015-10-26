@@ -161,7 +161,8 @@ namespace mitk {
     * (default: axial) with respect to \a transform (default: identity)
     * given width and height in units.
     *
-    * \a Rotated means rotated by 180 degrees (1/2 Rotation) within the plane.
+    * \a Rotated means rotated by 180 degrees (1/2 rotation) within the plane.
+    * Rotation by 90 degrees (1/4 rotation) is not implemented as of now.
     *
     * \a Frontside/Backside:
     * Viewed from below = frontside in the axial case;
@@ -170,7 +171,7 @@ namespace mitk {
     * Viewed from front = frontside in the coronal case;
     * Viewed from left = frontside in the sagittal case.
     *
-    * Cave: Currently only RPI, LAI, LPS and RAS in the three standard planes are covered,
+    * \a Cave/Caution: Currently only RPI, LAI, LPS and RAS in the three standard planes are covered,
     * i.e. 12 cases of 144:  3 standard planes * 48 coordinate orientations = 144 cases.
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,

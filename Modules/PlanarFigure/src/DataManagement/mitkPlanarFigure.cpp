@@ -240,12 +240,12 @@ void mitk::PlanarFigure::ResetPreviewContolPoint()
   m_PreviewControlPointVisible = false;
 }
 
-mitk::Point2D mitk::PlanarFigure::GetPreviewControlPoint()
+mitk::Point2D mitk::PlanarFigure::GetPreviewControlPoint() const
 {
   return m_PreviewControlPoint;
 }
 
-bool mitk::PlanarFigure::IsPreviewControlPointVisible()
+bool mitk::PlanarFigure::IsPreviewControlPointVisible() const
 {
   return m_PreviewControlPointVisible;
 }
@@ -603,13 +603,13 @@ unsigned short mitk::PlanarFigure::GetPolyLinesSize()
 }
 
 
-unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize()
+unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize() const
 {
   return m_HelperPolyLines.size();
 }
 
 
-bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index)
+bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index) const
 {
   return m_HelperPolyLinesToBePainted->GetElement( index );
 }

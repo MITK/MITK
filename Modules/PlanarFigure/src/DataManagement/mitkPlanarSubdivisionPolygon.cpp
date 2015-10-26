@@ -50,7 +50,7 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       // Indices
       unsigned int index, indexPrev, indexNext, indexNextNext;
 
-      unsigned int numberOfPoints = subdivisionPoints.size();
+      const unsigned int numberOfPoints = subdivisionPoints.size();
 
       Point2D newPoint;
 
@@ -72,11 +72,11 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
       }
 
       ControlPointListType mergedSubdivisionPoints;
-      ControlPointListType::iterator it, itNew;
+      ControlPointListType::const_iterator it, itNew;
 
 
-      for ( it = subdivisionPoints.begin() , itNew = newSubdivisionPoints.begin();
-            it != subdivisionPoints.end();
+      for ( it = subdivisionPoints.cbegin() , itNew = newSubdivisionPoints.cbegin();
+            it != subdivisionPoints.cend();
             ++it, ++itNew )
       {
         mergedSubdivisionPoints.push_back( *it );
@@ -89,12 +89,12 @@ void mitk::PlanarSubdivisionPolygon::GeneratePolyLine()
     }
   }
 
-  bool isInitiallyPlaced = this->GetProperty("initiallyplaced");
+  const bool isInitiallyPlaced = this->GetProperty("initiallyplaced");
 
   unsigned int i;
-  ControlPointListType::iterator it;
-  for ( it = subdivisionPoints.begin(), i = 0;
-        it != subdivisionPoints.end();
+  ControlPointListType::const_iterator it;
+  for ( it = subdivisionPoints.cbegin(), i = 0;
+        it != subdivisionPoints.cend();
         ++it, ++i )
   {
     // Determine the index of the control point FOLLOWING this poly-line element
@@ -145,7 +145,7 @@ bool mitk::PlanarSubdivisionPolygon::Equals(const mitk::PlanarFigure& other) con
 
 int mitk::PlanarSubdivisionPolygon::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const
 {
-  mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine( polyLineIndex );
+  const mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine( polyLineIndex );
 
   if (indexOfPolylinePoint < 0 || indexOfPolylinePoint > static_cast<int>(polyLine.size()))
     return -1;

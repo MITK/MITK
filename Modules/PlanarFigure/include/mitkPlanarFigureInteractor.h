@@ -101,6 +101,8 @@ protected:
 
   bool CheckFigureIsExtendable( const InteractionEvent* interactionEvent );
 
+  bool CheckFigureIsDeletable( const InteractionEvent* interactionEvent );
+
 
   ////////  Actions ////////
 

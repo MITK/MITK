@@ -31,15 +31,15 @@ static mitk::Point2D GetCenterPoint(const mitk::PlanarFigure::PolyLineType& poly
   centerPoint[0] = 0;
   centerPoint[1] = 0;
 
-  auto polyLineEnd = polyLine.end();
+  auto polyLineEnd = polyLine.cend();
 
-  for (auto polyLineIter = polyLine.begin(); polyLineIter != polyLineEnd; ++polyLineIter)
+  for (auto polyLineIter = polyLine.cbegin(); polyLineIter != polyLineEnd; ++polyLineIter)
   {
     centerPoint[0] += static_cast<mitk::Point2D>(*polyLineIter)[0];
     centerPoint[1] += static_cast<mitk::Point2D>(*polyLineIter)[1];
   }
 
-  size_t numPoints = polyLine.size();
+  const size_t numPoints = polyLine.size();
 
   centerPoint[0] /= numPoints;
   centerPoint[1] /= numPoints;
@@ -54,11 +54,11 @@ static mitk::Point2D GetCenterPoint(mitk::PlanarFigure* planarFigure)
   centerPoint[0] = 0;
   centerPoint[1] = 0;
 
-  size_t numPolyLines = planarFigure->GetPolyLinesSize();
+  const size_t numPolyLines = planarFigure->GetPolyLinesSize();
 
   for (size_t i = 0; i < numPolyLines; ++i)
   {
-    mitk::Point2D polyLineCenterPoint = GetCenterPoint(planarFigure->GetPolyLine(i));
+    const mitk::Point2D polyLineCenterPoint = GetCenterPoint(planarFigure->GetPolyLine(i));
 
     centerPoint[0] += polyLineCenterPoint[0];
     centerPoint[1] += polyLineCenterPoint[1];
@@ -70,9 +70,11 @@ static mitk::Point2D GetCenterPoint(mitk::PlanarFigure* planarFigure)
   return centerPoint;
 }
 
-static mitk::Vector3D GetBendDirection(const mitk::PlaneGeometry* planeGeometry, const mitk::Point2D& centerPoint2d, const mitk::Vector2D& bendDirection2d)
+static mitk::Vector3D GetBendDirection( const mitk::PlaneGeometry* planeGeometry,
+                                        const mitk::Point2D& centerPoint2d,
+                                        const mitk::Vector2D& bendDirection2d )
 {
-  mitk::Point2D point2d = centerPoint2d + bendDirection2d;
+  const mitk::Point2D point2d = centerPoint2d + bendDirection2d;
 
   mitk::Point3D point3d;
   planeGeometry->Map(point2d, point3d);
@@ -139,17 +141,17 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
   Vector3D planeNormal = planeGeometry->GetNormal();
   planeNormal.Normalize();
 
-  Point2D centerPoint2d = GetCenterPoint(input);
+  const Point2D centerPoint2d = GetCenterPoint(input);
 
   Point3D centerPoint3d;
   planeGeometry->Map(centerPoint2d, centerPoint3d);
 
-  Vector3D bendDirection3d = m_BendAngle != 0
+  const Vector3D bendDirection3d = m_BendAngle != 0
     ? ::GetBendDirection(planeGeometry, centerPoint2d, m_BendDirection)
     : Vector3D();
 
-  ScalarType radius = m_Length * (360 / m_BendAngle) / (2 * vnl_math::pi);
-  Vector3D scaledBendDirection3d = bendDirection3d * radius;
+  const ScalarType radius = m_Length * (360 / m_BendAngle) / (2 * vnl_math::pi);
+  const Vector3D scaledBendDirection3d = bendDirection3d * radius;
 
   Vector3D bendAxis = itk::CrossProduct(planeNormal, bendDirection3d);
   bendAxis.Normalize();
@@ -160,8 +162,8 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
 
   for (size_t i = 0; i < numPolyLines; ++i)
   {
-    PolyLine polyLine = input->GetPolyLine(i);
-    size_t numPoints = polyLine.size();
+    const PolyLine polyLine = input->GetPolyLine(i);
+    const size_t numPoints = polyLine.size();
 
     if (numPoints < 2)
       mitkThrow() << "Poly line " << i << " of primary input consists of less than two points!";
@@ -177,13 +179,13 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
       crossSection.push_back(point);
     }
 
-    ScalarType segmentLength = m_Length / m_NumberOfSegments;
+    const ScalarType segmentLength = m_Length / m_NumberOfSegments;
     Vector3D translation = planeNormal * segmentLength;
 
-    bool bend = std::abs(m_BendAngle) > mitk::eps;
-    bool twist = std::abs(m_TwistAngle) > mitk::eps;
+    const bool bend = std::abs(m_BendAngle) > mitk::eps;
+    const bool twist = std::abs(m_TwistAngle) > mitk::eps;
 
-    ScalarType twistAngle = twist
+    const ScalarType twistAngle = twist
       ? m_TwistAngle / m_NumberOfSegments * vnl_math::pi / 180
       : 0;
 
@@ -226,7 +228,7 @@ void mitk::ExtrudePlanarFigureFilter::GenerateData()
 
       for (size_t k = 0; k < numPoints; ++k)
       {
-        mitk::Point3D transformedPoint = transform->TransformPoint(crossSection[k]);
+        const mitk::Point3D transformedPoint = transform->TransformPoint(crossSection[k]);
         points->InsertNextPoint(transformedPoint.GetDataPointer());
       }
     }

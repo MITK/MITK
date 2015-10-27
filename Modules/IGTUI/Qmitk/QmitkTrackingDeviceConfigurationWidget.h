@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkTrackingDeviceConfigurationWidgetControls.h"
 #include "mitkTrackingDevice.h"
 #include <mitkIPersistenceService.h>
+#include "mitkTrackingDeviceTypeCollection.h"
 
 class QmitkTrackingDeviceConfigurationWidgetConnectionWorker;
 class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker;
@@ -221,6 +222,9 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
   private:
     PERSISTENCE_GET_SERVICE_METHOD_MACRO
+
+    mitk::TrackingDeviceTypeCollection m_DeviceTypeCollection;
+
 };
 
 //###################################################################################################

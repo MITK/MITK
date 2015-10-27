@@ -33,11 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/Path.h>
 
 
-
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
+  , m_DeviceTypeCollection()
 {
   //initialize worker thread
   m_TestConnectionWorker = new QmitkTrackingDeviceConfigurationWidgetConnectionWorker();
@@ -62,6 +62,8 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
 
   //restore old UI settings
   LoadUISettings();
+
+  m_DeviceTypeCollection.RegisterAsMicroservice();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::SetGUIStyle(QmitkTrackingDeviceConfigurationWidget::Style style)

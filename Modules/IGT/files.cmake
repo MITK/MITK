@@ -24,6 +24,7 @@ set(CPP_FILES
   DataManagement/mitkNavigationToolStorage.cpp
   DataManagement/mitkTrackingDeviceSourceConfigurator.cpp
   DataManagement/mitkTrackingDeviceSource.cpp
+  DataManagement/mitkTrackingDeviceTypeCollection.cpp
 
   ExceptionHandling/mitkIGTException.cpp
   ExceptionHandling/mitkIGTHardwareException.cpp
@@ -59,6 +60,12 @@ set(CPP_FILES
   TrackingDevices/mitkOptitrackTrackingTool.cpp
   TrackingDevices/mitkOpenIGTLinkTrackingDevice.cpp
   TrackingDevices/mitkOpenIGTLinkTrackingTool.cpp
+  TrackingDevices/mitkNDIPolarisTypeInformation.cpp
+  TrackingDevices/mitkVirtualTrackerTypeInformation.cpp
+)
+
+set(H_FILES
+  DataManagement/mitkTrackingDeviceTypeInformation.h
 )
 
 set(RESOURCE_FILES

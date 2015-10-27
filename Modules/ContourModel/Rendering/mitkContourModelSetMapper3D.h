@@ -102,6 +102,7 @@ namespace mitk {
     virtual vtkSmartPointer<vtkPolyData> CreateVtkPolyDataFromContour(mitk::ContourModel* inputContour,mitk::BaseRenderer* renderer);
 
     virtual void ApplyContourProperties(mitk::BaseRenderer* renderer);
+    virtual void ApplyContourModelSetProperties(BaseRenderer *renderer);
   };
 }
 #endif

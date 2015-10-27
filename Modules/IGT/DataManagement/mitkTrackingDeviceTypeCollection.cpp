@@ -100,6 +100,10 @@ mitk::TrackingDeviceTypeInformation* mitk::TrackingDeviceTypeCollection::GetTrac
   {
     device = "Optitrack";
   }
+  else if (mitk::TrackingDeviceType::OpenIGTLinkTrackingDeviceConnection == type)
+  {
+    device = "Open IGT Link";
+  }
   else
   {
     return nullptr;

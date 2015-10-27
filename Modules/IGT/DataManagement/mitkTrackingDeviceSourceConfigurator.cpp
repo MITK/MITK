@@ -130,21 +130,6 @@ std::string mitk::TrackingDeviceSourceConfigurator::GetErrorMessage()
 
 //############################ internal help methods ########################################
 
-
-//mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateOpenIGTLinkTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools)
-//{
-//  mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
-//  mitk::OpenIGTLinkTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::OpenIGTLinkTrackingDevice*>(trackingDevice.GetPointer());
-//  thisDevice->DiscoverTools();
-//  if (thisDevice->GetToolCount() != navigationTools->GetToolCount())
-//    {
-//    this->m_ErrorMessage = "The number of tools in the connected device differs from the tool storage, cannot add tools.";
-//    return NULL;
-//    }
-//  returnValue->SetTrackingDevice(thisDevice);
-//  return returnValue;
-//}
-
 mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourceConfigurator::CreateNavigationDataObjectVisualizationFilter(mitk::TrackingDeviceSource::Pointer trackingDeviceSource, mitk::NavigationToolStorage::Pointer navigationTools)
   {
   mitk::NavigationDataObjectVisualizationFilter::Pointer returnValue = mitk::NavigationDataObjectVisualizationFilter::New();

@@ -65,6 +65,7 @@ set(CPP_FILES
   TrackingDevices/mitkNPOptitrackTrackingTypeInformation.cpp
   TrackingDevices/mitkVirtualTrackerTypeInformation.cpp
   TrackingDevices/mitkMicronTrackerTypeInformation.cpp
+  TrackingDevices/mitkOpenIGTLinkTypeInformation.cpp
 )
 
 set(H_FILES

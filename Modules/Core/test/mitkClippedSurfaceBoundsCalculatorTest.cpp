@@ -522,7 +522,7 @@ static void CheckIntersectionWithRotatedGeometry()
     MITK_TEST_CONDITION(minMax.first == 0 && minMax.second == 24, "Check if plane is on slices 0-24");
   }
 
-
+  delete calculator;
 }
 
 
@@ -735,6 +735,7 @@ static void CheckIntersectionWithRotatedGeometry90()
       MITK_INFO << "min: " << minMax.first << " max: " << minMax.second;
     }
 
+    delete calculator;
 }
 
 

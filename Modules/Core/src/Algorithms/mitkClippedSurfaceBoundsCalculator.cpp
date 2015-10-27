@@ -159,7 +159,6 @@ void mitk::ClippedSurfaceBoundsCalculator::CalculateIntersectionPoints(const mit
   // SEE HEADER DOCUMENTATION for explanation
 
   const mitk::BaseGeometry::Pointer imageGeometry = m_Image->GetGeometry()->Clone();
-  const Vector3D spacing = imageGeometry->GetSpacing();
 
   //  the cornerpoint(0) is the corner based Origin, which is original center based
   Point3D origin = imageGeometry->GetCornerPoint(0);           //Left, bottom, front

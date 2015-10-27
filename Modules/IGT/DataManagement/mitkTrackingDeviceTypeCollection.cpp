@@ -88,6 +88,10 @@ mitk::TrackingDeviceTypeInformation* mitk::TrackingDeviceTypeCollection::GetTrac
   {
     device = "Virtual Tracker";
   }
+  else if (mitk::TrackingDeviceType::ClaronMicron == type)
+  {
+    device = "MicronTracker";
+  }
   else
   {
     return nullptr;

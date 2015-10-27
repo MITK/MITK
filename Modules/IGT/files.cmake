@@ -60,6 +60,7 @@ set(CPP_FILES
   TrackingDevices/mitkOptitrackTrackingTool.cpp
   TrackingDevices/mitkOpenIGTLinkTrackingDevice.cpp
   TrackingDevices/mitkOpenIGTLinkTrackingTool.cpp
+  TrackingDevices/mitkNDIAuroraTypeInformation.cpp
   TrackingDevices/mitkNDIPolarisTypeInformation.cpp
   TrackingDevices/mitkVirtualTrackerTypeInformation.cpp
   TrackingDevices/mitkMicronTrackerTypeInformation.cpp

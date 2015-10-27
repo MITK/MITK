@@ -80,6 +80,10 @@ mitk::TrackingDeviceTypeInformation* mitk::TrackingDeviceTypeCollection::GetTrac
 
   std::string device;
 
+  if (mitk::TrackingDeviceType::NDIAurora == type)
+  {
+    device = "Aurora";
+  }
   if (mitk::TrackingDeviceType::NDIPolaris == type)
   {
     device = "Polaris";

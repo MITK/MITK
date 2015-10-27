@@ -146,13 +146,13 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::DICOMGDCMImageFrameList
 mitk::DICOMITKSeriesGDCMReader
-::FromDICOMDatasetList(const DICOMDatasetList& input)
+::FromDICOMDatasetList(const DICOMDatasetList& input) const
 {
   DICOMGDCMImageFrameList output;
   output.reserve(input.size());
 
-  for(auto inputIter = input.begin();
-      inputIter != input.end();
+  for(auto inputIter = input.cbegin();
+      inputIter != input.cend();
       ++inputIter)
   {
     DICOMGDCMImageFrameInfo* gfi = dynamic_cast<DICOMGDCMImageFrameInfo*>(*inputIter);
@@ -165,13 +165,13 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::DICOMDatasetList
 mitk::DICOMITKSeriesGDCMReader
-::ToDICOMDatasetList(const DICOMGDCMImageFrameList& input)
+::ToDICOMDatasetList(const DICOMGDCMImageFrameList& input) const
 {
   DICOMDatasetList output;
   output.reserve(input.size());
 
-  for(auto inputIter = input.begin();
-      inputIter != input.end();
+  for(auto inputIter = input.cbegin();
+      inputIter != input.cend();
       ++inputIter)
   {
     DICOMDatasetAccess* da = inputIter->GetPointer();
@@ -184,13 +184,13 @@ mitk::DICOMITKSeriesGDCMReader
 
 mitk::DICOMImageFrameList
 mitk::DICOMITKSeriesGDCMReader
-::ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input)
+::ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input) const
 {
   DICOMImageFrameList output;
   output.reserve(input.size());
 
-  for(auto inputIter = input.begin();
-      inputIter != input.end();
+  for(auto inputIter = input.cbegin();
+      inputIter != input.cend();
       ++inputIter)
   {
     DICOMImageFrameInfo::Pointer fi = (*inputIter)->GetFrameInfo();
@@ -206,8 +206,8 @@ mitk::DICOMITKSeriesGDCMReader
 ::InternalPrintConfiguration(std::ostream& os) const
 {
   unsigned int sortIndex(1);
-  for(auto sorterIter = m_Sorter.begin();
-      sorterIter != m_Sorter.end();
+  for(auto sorterIter = m_Sorter.cbegin();
+      sorterIter != m_Sorter.cend();
       ++sortIndex, ++sorterIter)
   {
     os << "Sorting step " << sortIndex << ":" << std::endl;
@@ -392,11 +392,11 @@ mitk::DICOMITKSeriesGDCMReader
   timeStart("Output");
   unsigned int o = this->GetNumberOfOutputs();
   this->SetNumberOfOutputs( o + m_SortingResultInProgress.size() ); // Condense3DBlocks may already have added outputs!
-  for (auto blockIter = m_SortingResultInProgress.begin();
-       blockIter != m_SortingResultInProgress.end();
+  for (auto blockIter = m_SortingResultInProgress.cbegin();
+       blockIter != m_SortingResultInProgress.cend();
        ++o, ++blockIter)
   {
-    DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
+    const DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
     assert(!gdcmFrameInfoList.empty());
 
     // reverse frames if necessary
@@ -457,8 +457,8 @@ mitk::DICOMITKSeriesGDCMReader
 
     MITK_DEBUG << "--------------------------------------------------------------------------------";
     MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " (" << datasetList.size() << " datasets): ";
-    for (auto oi = datasetList.begin();
-        oi != datasetList.end();
+    for (auto oi = datasetList.cbegin();
+        oi != datasetList.cend();
         ++oi)
     {
       MITK_DEBUG << "  INPUT     : " << (*oi)->GetFilenameIfAvailable();
@@ -472,8 +472,8 @@ mitk::DICOMITKSeriesGDCMReader
     {
       DICOMDatasetList blockResult = sorter->GetOutput(b);
 
-      for (auto oi = blockResult.begin();
-          oi != blockResult.end();
+      for (auto oi = blockResult.cbegin();
+          oi != blockResult.cend();
           ++oi)
       {
         MITK_DEBUG << "  OUTPUT(" << b << ") :" << (*oi)->GetFilenameIfAvailable();
@@ -549,8 +549,9 @@ mitk::DICOMITKSeriesGDCMReader
   bool hasTilt = tiltInfo.IsRegularGantryTilt();
 
   ITKDICOMSeriesReaderHelper::StringContainer filenames;
-  for (auto frameIter = frames.begin();
-      frameIter != frames.end();
+  filenames.reserve( frames.size() );
+  for (auto frameIter = frames.cbegin();
+      frameIter != frames.cend();
       ++frameIter)
   {
     filenames.push_back( (*frameIter)->Filename );
@@ -563,7 +564,7 @@ mitk::DICOMITKSeriesGDCMReader
     mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo );
     block.SetMitkImage( mitkImage );
   }
-  catch (std::exception& e)
+  catch ( const std::exception& e )
   {
     success = false;
     MITK_ERROR << "Exception during image loading: " << e.what();

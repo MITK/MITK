@@ -176,28 +176,7 @@ std::string mitk::TrackingDeviceSourceConfigurator::GetErrorMessage()
 //  return returnValue;
 //  }
 
-//mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateVirtualTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools)
-//  {
-//  mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
-//  mitk::VirtualTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::VirtualTrackingDevice*>(trackingDevice.GetPointer());
-//  m_ToolCorrespondencesInToolStorage = std::vector<int>();
 
-//  //add the tools to the tracking device
-//  for (int i=0; i<navigationTools->GetToolCount(); i++)
-//      {
-//        mitk::NavigationTool::Pointer thisNavigationTool = m_NavigationTools->GetTool(i);
-//        m_ToolCorrespondencesInToolStorage.push_back(i);
-//        bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str());
-//        if (!toolAddSuccess)
-//          {
-//          //todo error handling
-//          this->m_ErrorMessage = "Can't add tool, is the toolfile valid?";
-//          return NULL;
-//          }
-//      }
-//  returnValue->SetTrackingDevice(thisDevice);
-//  return returnValue;
-//  }
 
 mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourceConfigurator::CreateNavigationDataObjectVisualizationFilter(mitk::TrackingDeviceSource::Pointer trackingDeviceSource, mitk::NavigationToolStorage::Pointer navigationTools)
   {

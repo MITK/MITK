@@ -96,6 +96,10 @@ mitk::TrackingDeviceTypeInformation* mitk::TrackingDeviceTypeCollection::GetTrac
   {
     device = "MicronTracker";
   }
+  else if (mitk::TrackingDeviceType::NPOptitrack == type)
+  {
+    device = "Optitrack";
+  }
   else
   {
     return nullptr;

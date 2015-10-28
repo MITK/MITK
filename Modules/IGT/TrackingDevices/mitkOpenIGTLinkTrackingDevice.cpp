@@ -155,7 +155,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
   case QTDATA:
     return DiscoverToolsFromQTData(dynamic_cast<igtl::QuaternionTrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
   case TRANSFORM:
-    return DiscoverToolsFromTransform(dynamic_cast<igtl::TransformMessage*>(receivedMessage->GetMessage().GetPointer()));
+    return DiscoverToolsFromTransform();
   default:
     MITK_INFO << "Server does not send tracking data. Received data is not of a compatible type. Received type: " << msgType;
     return false;
@@ -164,6 +164,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
 
 bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer tdMsg)
 {
+  MITK_INFO << "Start discovering tools by TDATA messages";
   if (!tdMsg)
   {
     MITK_WARN << "Message was not a TrackingDataMessage, aborting!";
@@ -187,6 +188,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataM
 
 bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg)
 {
+  MITK_INFO << "Start discovering tools by QTDATA messages";
   if (!msg)
   {
     MITK_WARN << "Message was not a QuaternionTrackingDataMessage, aborting!";
@@ -220,10 +222,53 @@ void mitk::OpenIGTLinkTrackingDevice::AddNewToolForName(std::string name, int i)
   InternalAddTool(newTool);
 }
 
-bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform(igtl::TransformMessage::Pointer msg)
+bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform()
 {
-  MITK_INFO << "Received TRANSFORM Message";
-  return false;
+  MITK_INFO << "Start discovering tools by TRANSFORM messages";
+  std::map<std::string, int> toolNameMap;
+  bool condition = false;
+  while (!condition)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    m_IGTLDeviceSource->Update();
+    igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
+    if (msg == nullptr || msg.IsNull())
+    {
+      MITK_INFO << "Received message could not be casted to TransformMessage. Skipping..";
+      continue;
+    }
+
+    condition = true;
+    int count = toolNameMap[msg->GetDeviceName()];
+    if (count == 0)
+    {
+      MITK_WARN << "ADDED NEW TOOL TO TOOLCHAIN: " << msg->GetDeviceName() << " - 1";
+      toolNameMap[msg->GetDeviceName()] = 1;
+    }
+    else
+    {
+      toolNameMap[msg->GetDeviceName()]++;
+      MITK_WARN << "INCREMENTED TOOL COUNT IN TOOLCHAIN: " << msg->GetDeviceName() << " - " << toolNameMap[msg->GetDeviceName()];
+    }
+
+    for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
+    {
+      if (it->second < 2)
+      {
+        condition = false;
+        break;
+      }
+    }
+  }
+
+  int i = 0;
+  for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
+  {
+    AddNewToolForName(it->first, i++);
+  }
+  //TODO InternalAddTool for all tools
+
+  return true;
 }
 
 void mitk::OpenIGTLinkTrackingDevice::UpdateTools()

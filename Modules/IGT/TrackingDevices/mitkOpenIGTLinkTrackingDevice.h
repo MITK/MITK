@@ -152,7 +152,7 @@ namespace mitk
 
     bool DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
 
-    bool DiscoverToolsFromTransform(igtl::TransformMessage::Pointer msg);
+    bool DiscoverToolsFromTransform();
 
     void AddNewToolForName(std::string name, int i);
   };

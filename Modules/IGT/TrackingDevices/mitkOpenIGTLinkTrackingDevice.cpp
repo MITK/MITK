@@ -151,11 +151,11 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
   switch (type)
   {
   case TDATA:
-    return DiscoverToolsFromTData((igtl::TrackingDataMessage*)(receivedMessage->GetMessage().GetPointer()));
+    return DiscoverToolsFromTData(dynamic_cast<igtl::TrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
   case QTDATA:
-    return DiscoverToolsFromQTData((igtl::QuaternionTrackingDataMessage*)(receivedMessage->GetMessage().GetPointer()));
+    return DiscoverToolsFromQTData(dynamic_cast<igtl::QuaternionTrackingDataMessage*>(receivedMessage->GetMessage().GetPointer()));
   case TRANSFORM:
-    return DiscoverToolsFromTransform((igtl::TransformMessage*)(receivedMessage->GetMessage().GetPointer()));
+    return DiscoverToolsFromTransform(dynamic_cast<igtl::TransformMessage*>(receivedMessage->GetMessage().GetPointer()));
   default:
     MITK_INFO << "Server does not send tracking data. Received data is not of a compatible type. Received type: " << msgType;
     return false;
@@ -166,7 +166,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataM
 {
   if (!tdMsg)
   {
-    MITK_WARN << "Cannot cast message object as expected, aborting!";
+    MITK_WARN << "Message was not a TrackingDataMessage, aborting!";
     return false;
   }
 
@@ -187,6 +187,11 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataM
 
 bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg)
 {
+  if (!msg)
+  {
+    MITK_WARN << "Message was not a QuaternionTrackingDataMessage, aborting!";
+    return false;
+  }
   int numberOfTools = msg->GetNumberOfQuaternionTrackingDataElements();
   MITK_INFO << "Found " << numberOfTools << " tools";
   for (int i = 0; i < numberOfTools; i++)

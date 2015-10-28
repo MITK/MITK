@@ -931,7 +931,7 @@ p, li { white-space: pre-wrap; }
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page_4">
+           <widget class="QWidget" name="virtual_tracker_page">
             <layout class="QVBoxLayout" name="verticalLayout_22">
              <item>
               <widget class="QLabel" name="Optitrack_label_2">
@@ -1034,7 +1034,7 @@ p, li { white-space: pre-wrap; }
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="page_5">
+           <widget class="QWidget" name="open_igt_link_page">
             <layout class="QVBoxLayout" name="verticalLayout_24">
              <item>
               <widget class="QLabel" name="Optitrack_label_3">

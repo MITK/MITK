@@ -174,11 +174,11 @@ protected:
     vtkObject *caller, unsigned long eid, void *clientdata, void *calldata );
 
   virtual void UpdatePaths(); //apply transformations and properties recursively
-  vtkAssemblyPaths* Paths;
-  vtkTimeStamp PathTime;
 
 private:
 
+  vtkAssemblyPaths* Paths;
+  vtkTimeStamp PathTime;
 
   // prepare all mitk::mappers for rendering
   void PrepareMapperQueue();

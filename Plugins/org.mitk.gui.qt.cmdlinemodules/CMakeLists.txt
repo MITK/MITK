@@ -8,3 +8,21 @@ mitk_create_plugin(
     PUBLIC  CTK|CTKWidgets
     PRIVATE CTK|CTKCommandLineModulesFrontendQtGui+CTKCommandLineModulesBackendLocalProcess Qt4|QtUiTools Qt5|UiTools+XmlPatterns
 )
+
+# Copy CTK Qt (designer) plugins to a Qt default path in the MITK bin
+if(MITK_USE_CTK)
+  if(EXISTS ${CTK_QTDESIGNERPLUGINS_DIR})
+    set(_bindir ${MITK_BINARY_DIR}/bin)
+
+    set(_releasedir)
+    set(_debugdir)
+    if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
+      set(_releasedir "Release/")
+      set(_debugdir "Debug/")
+    endif()
+
+    file(COPY "${CTK_QTDESIGNERPLUGINS_DIR}/designer/${_releasedir}" DESTINATION ${_bindir}/${_releasedir}designer/)
+    file(COPY "${CTK_QTDESIGNERPLUGINS_DIR}/designer/${_debugdir}" DESTINATION ${_bindir}/${_debugdir}designer/)
+
+  endif()
+endif()

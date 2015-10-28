@@ -25,6 +25,7 @@ namespace mitk
     //, m_Widget(nullptr)
   {
     m_DeviceName = "Virtual Tracker";
+    m_TrackingDeviceData.push_back(DeviceDataVirtualTracker);
   }
 
   VirtualTrackerTypeInformation::~VirtualTrackerTypeInformation()

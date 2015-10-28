@@ -24,6 +24,10 @@ namespace mitk
   NDIPAuroraTypeInformation::NDIPAuroraTypeInformation()
   {
     m_DeviceName = "Aurora";
+    m_TrackingDeviceData.push_back(DeviceDataAuroraCompact);
+    m_TrackingDeviceData.push_back(DeviceDataAuroraPlanarCube);
+    m_TrackingDeviceData.push_back(DeviceDataAuroraPlanarDome);
+    m_TrackingDeviceData.push_back(DeviceDataAuroraTabletop);
   }
 
   NDIPAuroraTypeInformation::~NDIPAuroraTypeInformation()

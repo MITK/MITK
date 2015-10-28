@@ -25,6 +25,10 @@ namespace mitk
     //, m_Widget(nullptr)
   {
     m_DeviceName = "Polaris";
+    m_TrackingDeviceData.push_back(DeviceDataPolarisOldModel);
+    m_TrackingDeviceData.push_back(DeviceDataPolarisSpectra);
+    m_TrackingDeviceData.push_back(DeviceDataSpectraExtendedPyramid);
+    m_TrackingDeviceData.push_back(DeviceDataPolarisVicra);
   }
 
   NDIPolarisTypeInformation::~NDIPolarisTypeInformation()

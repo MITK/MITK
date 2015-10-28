@@ -23,6 +23,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+  //############## NP Optitrack device data ############
+  static TrackingDeviceData DeviceDataNPOptitrack = {TRACKING_DEVICE_IDENTIFIER_OPTITRACK, "Optitrack", "cube", "X"};
+
   class MITKIGT_EXPORT NPOptitrackTrackingTypeInformation : public TrackingDeviceTypeInformation
   {
     public:

@@ -28,6 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  //############## other device data ##################
+//  static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl","X"};
+//  static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", "", "X"};
   class MITKIGT_EXPORT TrackingDeviceTypeInformation
   {
     public:
@@ -42,6 +45,9 @@ namespace mitk
           std::vector<int>* toolCorrespondencesInToolStorage) = 0;
 
       std::string m_DeviceName;
+
+      // In this vector, all TrackingDeviceData which belong to this type are stored.
+      std::vector<TrackingDeviceData> m_TrackingDeviceData;
       //QWidget* m_Widget = nullptr;
 
   };

@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkMicronTrackerTypeInformation_h
-#define mitkMicronTrackerTypeInformation_h
+#ifndef mitkUnspecifiedTrackingTypeInformation_h
+#define mitkUnspecifiedTrackingTypeInformation_h
 
 #include <MitkIGTExports.h>
 
@@ -23,20 +23,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  static TrackingDeviceData DeviceDataUnspecified = {mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED, "Unspecified System", "cube","X"};
+  // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
+  static TrackingDeviceData DeviceDataInvalid = {mitk::TRACKING_DEVICE_IDENTIFIER_INVALID, "Invalid Tracking System", "", "X"};
 
-  static TrackingDeviceData DeviceDataMicronTrackerH40 = {TRACKING_DEVICE_IDENTIFIER_MICRON, "Micron Tracker H40", "ClaronMicron.stl", "X"};
-
-  class MITKIGT_EXPORT MicronTrackerTypeInformation : public TrackingDeviceTypeInformation
+  class MITKIGT_EXPORT UnspecifiedTrackingTypeInformation : public TrackingDeviceTypeInformation
   {
     public:
-      MicronTrackerTypeInformation();
-      virtual ~MicronTrackerTypeInformation();
+
+      explicit UnspecifiedTrackingTypeInformation();
+      virtual ~UnspecifiedTrackingTypeInformation();
 
       virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
                                                                        mitk::NavigationToolStorage::Pointer navigationTools,
-                                                                       std::string* errorMessage,
-                                                                       std::vector<int>* toolCorrespondencesInToolStorage) override;
+                                                                       std::string* errorMessage, std::vector<int>*) { return nullptr; }
   };
 } // namespace mitk
 
-#endif //mitkMicronTrackerTypeInformation_h
+#endif //mitkUnspecifiedTrackingTypeInformation_h

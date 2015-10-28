@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  static TrackingDeviceData DeviceDataOpenIGTLinkTrackingDeviceConnection = {TRACKING_DEVICE_IDENTIFIER_OPENIGTLINK, "OpenIGTLink Tracking Device", "cube","X"};
+
   class MITKIGT_EXPORT OpenIGTLinkTypeInformation : public TrackingDeviceTypeInformation
   {
     public:

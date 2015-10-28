@@ -23,6 +23,7 @@ namespace mitk
   OpenIGTLinkTypeInformation::OpenIGTLinkTypeInformation()
   {
     m_DeviceName = "Open IGT Link";
+    m_TrackingDeviceData.push_back(DeviceDataOpenIGTLinkTrackingDeviceConnection);
   }
 
   OpenIGTLinkTypeInformation::~OpenIGTLinkTypeInformation()

@@ -81,52 +81,6 @@ namespace mitk
   * a default cube of 400x400 px. You can define additional magic strings in the TrackingVolumeGenerator.
   */
 
-  //############## NDI Aurora device data #############
-  static TrackingDeviceData DeviceDataAuroraCompact = {NDIAurora, "Aurora Compact", "NDIAuroraCompactFG_Dome.stl", "A"};
-  static TrackingDeviceData DeviceDataAuroraPlanarCube = {NDIAurora, "Aurora Planar (Cube)", "NDIAurora.stl", "9"};
-  static TrackingDeviceData DeviceDataAuroraPlanarDome = {NDIAurora, "Aurora Planar (Dome)","NDIAuroraPlanarFG_Dome.stl", "A"};
-  static TrackingDeviceData DeviceDataAuroraTabletop = {NDIAurora, "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl", "A"};
-  // The following entry is for the tabletop prototype, which had an lower barrier of 8cm. The new version has a lower barrier of 12cm.
-  //static TrackingDeviceData DeviceDataAuroraTabletopPrototype = {NDIAurora, "Aurora Tabletop Prototype", "NDIAuroraTabletopFG_Prototype_Dome.stl"};
-
-  //############## NDI Polaris device data ############
-  static TrackingDeviceData DeviceDataPolarisOldModel = {NDIPolaris, "Polaris (Old Model)", "NDIPolarisOldModel.stl", "0"};
-  //full hardware code of polaris spectra: 5-240000-153200-095000+057200+039800+056946+024303+029773+999999+99999924
-  static TrackingDeviceData DeviceDataPolarisSpectra = {NDIPolaris, "Polaris Spectra", "NDIPolarisSpectra.stl", "5-2"};
-  //full hardware code of polaris spectra (extended pyramid): 5-300000-153200-095000+057200+039800+056946+024303+029773+999999+07350024
-  static TrackingDeviceData DeviceDataSpectraExtendedPyramid = {NDIPolaris, "Polaris Spectra (Extended Pyramid)", "NDIPolarisSpectraExtendedPyramid.stl","5-3"};
-  static TrackingDeviceData DeviceDataPolarisVicra = {NDIPolaris, "Polaris Vicra", "NDIPolarisVicra.stl","7"};
-
-  //############## NP Optitrack device data ############
-  static TrackingDeviceData DeviceDataNPOptitrack = {NPOptitrack, "Optitrack", "cube", "X"};
-
-  //############## other device data ##################
-  static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl","X"};
-  static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", "", "X"};
-  static TrackingDeviceData DeviceDataVirtualTracker = {VirtualTracker, "Virtual Tracker", "cube","X"};
-  static TrackingDeviceData DeviceDataMicronTrackerH40 = {ClaronMicron, "Micron Tracker H40", "ClaronMicron.stl", "X"};
-  static TrackingDeviceData DeviceDataUnspecified = {TrackingSystemNotSpecified, "Unspecified System", "cube","X"};
-  static TrackingDeviceData DeviceDataOpenIGTLinkTrackingDeviceConnection = {OpenIGTLinkTrackingDeviceConnection, "OpenIGTLink Tracking Device", "cube","X"};
-  // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
-  static TrackingDeviceData DeviceDataInvalid = {TrackingSystemInvalid, "Invalid Tracking System", "", "X"};
-
-  //This list should hold all devices defined above!
-  static TrackingDeviceData TrackingDeviceList[] = {DeviceDataAuroraPlanarCube, DeviceDataAuroraPlanarDome, DeviceDataAuroraCompact,
-  DeviceDataAuroraTabletop, DeviceDataMicronTrackerH40, DeviceDataPolarisSpectra, DeviceDataPolarisVicra, DeviceDataNPOptitrack,
-  DeviceDataDaVinci, DeviceDataMicroBird, DeviceDataVirtualTracker, DeviceDataUnspecified, DeviceDataSpectraExtendedPyramid, DeviceDataInvalid, DeviceDataPolarisOldModel,
-  DeviceDataOpenIGTLinkTrackingDeviceConnection};
-
-  /**
-  * /brief Returns all devices compatibel to the given Line of Devices
-  */
-  MITKIGT_EXPORT std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType Type);
-
-  /**
-  * /brief Returns the first TracingDeviceData mathing a given line. Useful for backward compatibility
-  * with the old way to manage Devices
-  */
-  MITKIGT_EXPORT TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType Type);
-
   /**
   * /brief Returns the device Data set matching the model name or the invalid device, if none was found
   */

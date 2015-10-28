@@ -70,6 +70,7 @@ set(CPP_FILES
 
 set(H_FILES
   DataManagement/mitkTrackingDeviceTypeInformation.h
+  TrackingDevices/mitkUnspecifiedTrackingTypeInformation.h
 )
 
 set(RESOURCE_FILES

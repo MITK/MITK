@@ -17,8 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDeviceTypeCollection.h"
 #include "mitkUIDGenerator.h"
 
-#include "mitkNDIPolarisTypeInformation.h"
-#include "mitkVirtualTrackerTypeInformation.h"
+#include "mitkUnspecifiedTrackingTypeInformation.h"
 
 //Microservices
 #include <usGetModuleContext.h>
@@ -32,10 +31,8 @@ const std::string mitk::TrackingDeviceTypeCollection::US_PROPKEY_ID = US_INTERFA
 const std::string mitk::TrackingDeviceTypeCollection::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
 mitk::TrackingDeviceTypeCollection::TrackingDeviceTypeCollection()
-  : m_TypeInformations()
+  : m_TrackingDeviceTypeInformations()
 {
-  this->RegisterTrackingDeviceType(new mitk::NDIPolarisTypeInformation());
-  this->RegisterTrackingDeviceType(new mitk::VirtualTrackerTypeInformation());
 }
 
 mitk::TrackingDeviceTypeCollection::~TrackingDeviceTypeCollection()
@@ -70,52 +67,68 @@ void mitk::TrackingDeviceTypeCollection::RegisterTrackingDeviceType(TrackingDevi
 {
   if (typeInformation != nullptr)
   {
-    m_TypeInformations.push_back(typeInformation);
+    m_TrackingDeviceTypeInformations.push_back(typeInformation);
   }
 }
 
 mitk::TrackingDeviceTypeInformation* mitk::TrackingDeviceTypeCollection::GetTrackingDeviceTypeInformation(mitk::TrackingDeviceType type)
 {
-  MITK_INFO << "Calling TrackingDeviceTypeCollection::GetTrackingDeviceTypeInformation";
-
-  std::string device;
-
-  if (mitk::TrackingDeviceType::NDIAurora == type)
+  for (auto deviceType : m_TrackingDeviceTypeInformations)
   {
-    device = "Aurora";
-  }
-  if (mitk::TrackingDeviceType::NDIPolaris == type)
-  {
-    device = "Polaris";
-  }
-  else if (mitk::TrackingDeviceType::VirtualTracker == type)
-  {
-    device = "Virtual Tracker";
-  }
-  else if (mitk::TrackingDeviceType::ClaronMicron == type)
-  {
-    device = "MicronTracker";
-  }
-  else if (mitk::TrackingDeviceType::NPOptitrack == type)
-  {
-    device = "Optitrack";
-  }
-  else if (mitk::TrackingDeviceType::OpenIGTLinkTrackingDeviceConnection == type)
-  {
-    device = "Open IGT Link";
-  }
-  else
-  {
-    return nullptr;
-  }
-
-  for (auto item : m_TypeInformations)
-  {
-    if (item->m_DeviceName == device)
+    if (deviceType->m_DeviceName == type)
     {
-      return item;
+      return deviceType;
     }
   }
 
   return nullptr;
+}
+
+std::vector<mitk::TrackingDeviceData> mitk::TrackingDeviceTypeCollection::GetDeviceDataForLine(TrackingDeviceType type)
+{
+  for (auto deviceType : m_TrackingDeviceTypeInformations)
+  {
+    if (deviceType->m_DeviceName == type)
+    {
+      return deviceType->m_TrackingDeviceData;
+    }
+  }
+
+  return std::vector<TrackingDeviceData>();
+}
+
+mitk::TrackingDeviceData mitk::TrackingDeviceTypeCollection::GetFirstCompatibleDeviceDataForLine(TrackingDeviceType type)
+{
+  if (GetDeviceDataForLine(type).empty())
+  {
+    return mitk::DeviceDataInvalid;
+  }
+
+  return GetDeviceDataForLine(type).front();
+}
+
+mitk::TrackingDeviceData mitk::TrackingDeviceTypeCollection::GetDeviceDataByName(const std::string& modelName)
+{
+  for (auto deviceType : m_TrackingDeviceTypeInformations)
+  {
+    for (auto deviceData : deviceType->m_TrackingDeviceData)
+    {
+      if (deviceData.Model == modelName)
+      {
+        return deviceData;
+      }
+    }
+  }
+
+  return mitk::DeviceDataInvalid;
+}
+
+std::vector<std::string> mitk::TrackingDeviceTypeCollection::GetTrackingDeviceTypeNames()
+{
+  std::vector<std::string> names;
+  for (auto deviceType : m_TrackingDeviceTypeInformations)
+  {
+    names.push_back(deviceType->m_DeviceName);
+  }
+  return names;
 }

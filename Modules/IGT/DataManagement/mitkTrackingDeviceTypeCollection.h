@@ -68,13 +68,31 @@ namespace mitk {
 
       TrackingDeviceTypeInformation* GetTrackingDeviceTypeInformation(TrackingDeviceType type);
 
+      std::vector<std::string> GetTrackingDeviceTypeNames();
+
+      /**
+      * /brief Returns all devices compatibel to the given Line of Devices
+      */
+      std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType type);
+
+      /**
+      * /brief Returns the first TracingDeviceData mathing a given line. Useful for backward compatibility
+      * with the old way to manage Devices
+      */
+      TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType type);
+
+      /**
+      * /brief Returns the device Data set matching the model name or the invalid device, if none was found
+      */
+      TrackingDeviceData GetDeviceDataByName(const std::string& modelName);
+
     private:
+
+      std::string m_Name;
 
       us::ServiceRegistration<TrackingDeviceTypeCollection> m_ServiceRegistration;
 
-      std::vector<TrackingDeviceTypeInformation*> m_TypeInformations;
-
-      std::string m_Name;
+      std::vector<TrackingDeviceTypeInformation*> m_TrackingDeviceTypeInformations;
 
   };
 } // namespace mitk

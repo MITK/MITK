@@ -53,7 +53,8 @@ namespace mitk
     public:
 
       mitkClassMacro( DICOMGDCMTagScanner, DICOMTagCache );
-      itkNewMacro( DICOMGDCMTagScanner );
+      itkFactorylessNewMacro( DICOMGDCMTagScanner );
+      itkCloneMacro(Self);
 
       /**
         \brief Add this tag to the scanning process.

@@ -193,7 +193,9 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
     igtl::PositionMessage::Pointer posMsg = igtl::PositionMessage::New();
     posMsg->SetPosition(pos[0], pos[1], pos[2]);
     posMsg->SetQuaternion(ori[0], ori[1], ori[2], ori[3]);
-    posMsg->SetTimeStamp((unsigned int)input->GetIGTTimeStamp(), 0);
+    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+    timestamp->SetTime(input->GetTimeStamp().GetMTime() / 1000, input->GetTimeStamp().GetMTime() % 1000);
+    posMsg->SetTimeStamp(timestamp);
     posMsg->SetDeviceName(input->GetName());
     posMsg->Pack();
 
@@ -227,7 +229,9 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
     igtl::TransformMessage::Pointer transMsg = igtl::TransformMessage::New();
     transMsg->SetMatrix(igtlTransform);
     transMsg->SetPosition(position[0], position[1], position[2]);
-    transMsg->SetTimeStamp((unsigned int)input->GetIGTTimeStamp(), 0);
+    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+    timestamp->SetTime(input->GetTimeStamp().GetMTime() / 1000, input->GetTimeStamp().GetMTime() % 1000);
+    transMsg->SetTimeStamp(timestamp);
     transMsg->SetDeviceName(input->GetName());
     transMsg->Pack();
 
@@ -269,7 +273,9 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
 
     //copy the time stamp
     //todo find a better way to do that
-    qtdMsg->SetTimeStamp((unsigned int)nd->GetIGTTimeStamp(), 0);
+    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+    timestamp->SetTime(nd->GetTimeStamp().GetMTime() / 1000, nd->GetTimeStamp().GetMTime() % 1000);
+    MITK_INFO << timestamp;
   }
   qtdMsg->Pack();
 
@@ -335,8 +341,10 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
 
     //copy the time stamp
     //todo find a better way to do that
-    tdMsg->SetTimeStamp((unsigned int)nd->GetIGTTimeStamp(),
-                        (unsigned int)(nd->GetIGTTimeStamp() * 1000.0) % 1000);
+    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+    timestamp->SetTime(nd->GetTimeStamp().GetMTime() / 1000, nd->GetTimeStamp().GetMTime() % 1000);
+    tdMsg->SetTimeStamp(timestamp);
+
   }
   tdMsg->Pack();
   //add the igtl message to the mitk::IGTLMessage

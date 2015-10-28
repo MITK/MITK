@@ -414,6 +414,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
   //check if the IGTL message has the proper type
   if( strcmp(msgType, "TRANSFORM") == 0 )
   {
+    MITK_INFO << "Transform";
     this->GenerateTransformData();
   }
   else if( strcmp(msgType, "TDATA") == 0 )

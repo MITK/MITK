@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTLDeviceSource.h>
 #include <mitkIGTLMessageToNavigationDataFilter.h>
 #include <itkMultiThreader.h>
+#include <igtlQuaternionTrackingDataMessage.h>
+#include <igtlTrackingDataMessage.h>
+#include <igtlTransformMessage.h>
 
 
 namespace mitk
@@ -140,6 +143,20 @@ namespace mitk
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
 
     std::vector<OpenIGTLinkTrackingTool::Pointer> m_AllTools; ///< vector holding all tools
+
+    private:
+      enum TrackingMessageType
+      {
+        TDATA, TRANSFORM, QTDATA, UNKNOWN
+      };
+
+      mitk::OpenIGTLinkTrackingDevice::TrackingMessageType GetMessageTypeFromString(const char* messageTypeString);
+
+      bool DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer msg);
+
+      bool DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg);
+
+      bool DiscoverToolsFromTransform(igtl::TransformMessage::Pointer msg);
   };
 }//mitk
 #endif /* MITKOpenIGTLinkTRACKINGDEVICE_H_HEADER_INCLUDED_ */

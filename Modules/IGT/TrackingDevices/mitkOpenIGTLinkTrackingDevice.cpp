@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <itkMutexLockHolder.h>
 #include <itkCommand.h>
-#include <igtlTrackingDataMessage.h>
 
 //sleep headers
 #include <chrono>
@@ -94,7 +93,7 @@ bool mitk::OpenIGTLinkTrackingDevice::InternalAddTool(OpenIGTLinkTrackingTool::P
 }
 
 
-bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
+bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
 {
   if (m_OpenIGTLinkClient->GetPortNumber() == -1)
     {
@@ -120,13 +119,25 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
   ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(1);
   m_OpenIGTLinkClient->SendMessage(sttMsg);
 
-  std::this_thread::sleep_for(std::chrono::seconds((WaitingTime/1000)));
+  mitk::IGTLMessage::Pointer receivedMessage;
 
-  m_IGTLDeviceSource->Update();
+  std::chrono::high_resolution_clock::time_point time = std::chrono::high_resolution_clock::now();
+  std::chrono::milliseconds d = std::chrono::milliseconds(waitingTime);
+
+  while (!(receivedMessage.IsNotNull() && receivedMessage->IsDataValid()))
+  {
+    m_IGTLDeviceSource->Update();
+    receivedMessage = m_IGTLDeviceSource->GetOutput();
+
+    if ((time + d) < std::chrono::high_resolution_clock::now())
+      break;
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+
 
   //check the tracking stream for the number and type of tools
   //igtl::MessageBase::Pointer receivedMessage = m_OpenIGTLinkClient->GetNextMessage();
-  mitk::IGTLMessage::Pointer receivedMessage = m_IGTLDeviceSource->GetOutput();
   if (receivedMessage.IsNull())
     {
     MITK_WARN << "No message was received. Is there really a server?";
@@ -140,43 +151,64 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int WaitingTime)
 
   const char* msgType = receivedMessage->GetIGTLMessageType();
 
-  if( !(strcmp(msgType,"TDATA") == 0) )
-    {
-    MITK_INFO << "Server does not send tracking data. Received data is not of the type TDATA. Received type: " << msgType;
-    return true;
-    }
+  mitk::OpenIGTLinkTrackingDevice::TrackingMessageType type = GetMessageTypeFromString(msgType);
 
+  switch (type)
+  {
+  case TDATA:
+    return DiscoverToolsFromTData((igtl::TrackingDataMessage*)(receivedMessage->GetMessage().GetPointer()));
+  case QTDATA:
+    return DiscoverToolsFromQTData((igtl::QuaternionTrackingDataMessage*)(receivedMessage->GetMessage().GetPointer()));
+  case TRANSFORM:
+    return DiscoverToolsFromTransform((igtl::TransformMessage*)(receivedMessage->GetMessage().GetPointer()));
+  default:
+    MITK_INFO << "Server does not send tracking data. Received data is not of a compatible type. Received type: " << msgType;
+    return false;
+  }
+}
 
-  igtl::TrackingDataMessage* tdMsg = (igtl::TrackingDataMessage*)(receivedMessage->GetMessage().GetPointer());
-
-  if(!tdMsg)
-    {
-     MITK_WARN << "Cannot cast message object as expected, aborting!";
-     return false;
-    }
+bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer tdMsg)
+{
+  if (!tdMsg)
+  {
+    MITK_WARN << "Cannot cast message object as expected, aborting!";
+    return false;
+  }
 
   int numberOfTools = tdMsg->GetNumberOfTrackingDataElements();
   MITK_INFO << "Found " << numberOfTools << " tools";
-  for(int i=0; i<numberOfTools; i++)
-    {
+  for (int i = 0; i<numberOfTools; i++)
+  {
     mitk::OpenIGTLinkTrackingTool::Pointer newTool = mitk::OpenIGTLinkTrackingTool::New();
     igtl::TrackingDataElement::Pointer currentTrackingData;
-    tdMsg->GetTrackingDataElement(i,currentTrackingData);
+    tdMsg->GetTrackingDataElement(i, currentTrackingData);
     std::string name = currentTrackingData->GetName();
     if (name == "") //if no name was given create a default name
-      {
+    {
       std::stringstream defaultName;
       defaultName << "OpenIGTLinkTool#" << i;
       name = defaultName.str();
-      }
+    }
     MITK_INFO << "Added tool " << name << " to tracking device.";
     newTool->SetToolName(name);
-    this->InternalAddTool(newTool);
-    }
+    InternalAddTool(newTool);
+  }
 
   m_IGTLDeviceSource->StopCommunication();
-  this->SetState(Ready);
+  SetState(Ready);
   return true;
+}
+
+bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg)
+{
+  MITK_INFO << "Received QTDATA Message";
+  return false;
+}
+
+bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform(igtl::TransformMessage::Pointer msg)
+{
+  MITK_INFO << "Received TRANSFORM Message";
+  return false;
 }
 
 void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
@@ -337,4 +369,24 @@ bool mitk::OpenIGTLinkTrackingDevice::CloseConnection()
 std::vector<mitk::OpenIGTLinkTrackingTool::Pointer> mitk::OpenIGTLinkTrackingDevice::GetAllTools()
 {
   return this->m_AllTools;
+}
+
+mitk::OpenIGTLinkTrackingDevice::TrackingMessageType mitk::OpenIGTLinkTrackingDevice::GetMessageTypeFromString(const char* messageTypeString)
+{
+  if (strcmp(messageTypeString, "TDATA") == 0)
+  {
+    return mitk::OpenIGTLinkTrackingDevice::TrackingMessageType::TDATA;
+  }
+  else if (strcmp(messageTypeString, "QTDATA") == 0)
+  {
+    return mitk::OpenIGTLinkTrackingDevice::TrackingMessageType::QTDATA;
+  }
+  else if (strcmp(messageTypeString, "TRANSFORM") == 0)
+  {
+    return mitk::OpenIGTLinkTrackingDevice::TrackingMessageType::TRANSFORM;
+  }
+  else
+  {
+    return mitk::OpenIGTLinkTrackingDevice::TrackingMessageType::UNKNOWN;
+  }
 }

@@ -174,19 +174,10 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataM
   MITK_INFO << "Found " << numberOfTools << " tools";
   for (int i = 0; i < numberOfTools; i++)
   {
-    mitk::OpenIGTLinkTrackingTool::Pointer newTool = mitk::OpenIGTLinkTrackingTool::New();
     igtl::TrackingDataElement::Pointer currentTrackingData;
     tdMsg->GetTrackingDataElement(i, currentTrackingData);
     std::string name = currentTrackingData->GetName();
-    if (name == "") //if no name was given create a default name
-    {
-      std::stringstream defaultName;
-      defaultName << "OpenIGTLinkTool#" << i;
-      name = defaultName.str();
-    }
-    MITK_INFO << "Added tool " << name << " to tracking device.";
-    newTool->SetToolName(name);
-    InternalAddTool(newTool);
+    AddNewToolForName(name, i);
   }
 
   m_IGTLDeviceSource->StopCommunication();
@@ -196,8 +187,32 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataM
 
 bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg)
 {
-  MITK_INFO << "Received QTDATA Message";
-  return false;
+  int numberOfTools = msg->GetNumberOfQuaternionTrackingDataElements();
+  MITK_INFO << "Found " << numberOfTools << " tools";
+  for (int i = 0; i < numberOfTools; i++)
+  {
+    igtl::QuaternionTrackingDataElement::Pointer currentTrackingData;
+    msg->GetQuaternionTrackingDataElement(i, currentTrackingData);
+    std::string name = currentTrackingData->GetName();
+    AddNewToolForName(name, i);
+  }
+  m_IGTLDeviceSource->StopCommunication();
+  SetState(Ready);
+  return true;
+}
+
+void mitk::OpenIGTLinkTrackingDevice::AddNewToolForName(std::string name, int i)
+{
+  mitk::OpenIGTLinkTrackingTool::Pointer newTool = mitk::OpenIGTLinkTrackingTool::New();
+  if (name == "") //if no name was given create a default name
+  {
+    std::stringstream defaultName;
+    defaultName << "OpenIGTLinkTool#" << i;
+    name = defaultName.str();
+  }
+  MITK_INFO << "Added tool " << name << " to tracking device.";
+  newTool->SetToolName(name);
+  InternalAddTool(newTool);
 }
 
 bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform(igtl::TransformMessage::Pointer msg)

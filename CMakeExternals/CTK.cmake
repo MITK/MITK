@@ -65,6 +65,7 @@ if(MITK_USE_CTK)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
+      URL_MD5 34b94d196546fa3b2e610a37da1a163d
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
       URL_MD5 2c04925496e6818706ccffa8a71afaae

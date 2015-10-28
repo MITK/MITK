@@ -18,20 +18,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include "igtlMessageBase.h"
 
-
-
-void mitk::IGTLMessageQueue::PushMessage( igtl::MessageBase::Pointer message )
+void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer message)
 {
   this->m_Mutex->Lock();
-  if ( this->m_BufferingType == IGTLMessageQueue::Infinit )
+  if (this->m_BufferingType == IGTLMessageQueue::Infinit)
   {
-    this->m_Queue.push_back( message );
+    this->m_Queue.push_back(message);
   }
   else //NoBuffering
   {
     this->m_Queue.clear();
-    this->m_Queue.push_back( message );
+    this->m_Queue.push_back(message);
   }
+
   this->m_Mutex->Unlock();
 }
 
@@ -39,7 +38,7 @@ igtl::MessageBase::Pointer mitk::IGTLMessageQueue::PullMessage()
 {
   this->m_Mutex->Lock();
   igtl::MessageBase::Pointer ret = nullptr;
-  if ( this->m_Queue.size() > 0 )
+  if (this->m_Queue.size() > 0)
   {
     ret = this->m_Queue.front();
     this->m_Queue.pop_front();
@@ -53,7 +52,7 @@ std::string mitk::IGTLMessageQueue::GetNextMsgInformationString()
 {
   this->m_Mutex->Lock();
   std::stringstream s;
-  if ( this->m_Queue.size() > 0 )
+  if (this->m_Queue.size() > 0)
   {
     s << "Device Type: " << this->m_Queue.front()->GetDeviceType() << std::endl;
     s << "Device Name: " << this->m_Queue.front()->GetDeviceName() << std::endl;
@@ -70,7 +69,7 @@ std::string mitk::IGTLMessageQueue::GetNextMsgDeviceType()
 {
   this->m_Mutex->Lock();
   std::stringstream s;
-  if ( this->m_Queue.size() > 0 )
+  if (this->m_Queue.size() > 0)
   {
     s << this->m_Queue.front()->GetDeviceType();
   }
@@ -86,7 +85,7 @@ std::string mitk::IGTLMessageQueue::GetLatestMsgInformationString()
 {
   this->m_Mutex->Lock();
   std::stringstream s;
-  if ( this->m_Queue.size() > 0 )
+  if (this->m_Queue.size() > 0)
   {
     s << "Device Type: " << this->m_Queue.back()->GetDeviceType() << std::endl;
     s << "Device Name: " << this->m_Queue.back()->GetDeviceName() << std::endl;
@@ -103,7 +102,7 @@ std::string mitk::IGTLMessageQueue::GetLatestMsgDeviceType()
 {
   this->m_Mutex->Lock();
   std::stringstream s;
-  if ( this->m_Queue.size() > 0 )
+  if (this->m_Queue.size() > 0)
   {
     s << this->m_Queue.back()->GetDeviceType();
   }
@@ -123,7 +122,7 @@ int mitk::IGTLMessageQueue::GetSize()
 void mitk::IGTLMessageQueue::EnableInfiniteBuffering(bool enable)
 {
   this->m_Mutex->Lock();
-  if ( enable )
+  if (enable)
     this->m_BufferingType = IGTLMessageQueue::Infinit;
   else
     this->m_BufferingType = IGTLMessageQueue::NoBuffering;

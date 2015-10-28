@@ -112,7 +112,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
   std::string message = "STT_TDATA";
   igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message);
   //TODO: Fix this to dynamically get this from GUI
-  ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(20);
+  ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(60);
   m_OpenIGTLinkClient->SendMessage(sttMsg);
 
   mitk::IGTLMessage::Pointer receivedMessage;
@@ -165,7 +165,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
 bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataMessage::Pointer tdMsg)
 {
   MITK_INFO << "Start discovering tools by TDATA messages";
-  if (!tdMsg)
+  if (tdMsg == nullptr)
   {
     MITK_WARN << "Message was not a TrackingDataMessage, aborting!";
     return false;
@@ -189,7 +189,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTData(igtl::TrackingDataM
 bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromQTData(igtl::QuaternionTrackingDataMessage::Pointer msg)
 {
   MITK_INFO << "Start discovering tools by QTDATA messages";
-  if (!msg)
+  if (msg == nullptr)
   {
     MITK_WARN << "Message was not a QuaternionTrackingDataMessage, aborting!";
     return false;

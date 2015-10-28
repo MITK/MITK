@@ -33,13 +33,30 @@ from regression.linear import LinearSaO2Unmixing
 from regression.preprocessing import preprocess
 
 
-sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
-            "2015_11_12_IPCAI_in_vivo"
-sp.DATA_FOLDER = "colon_images"
-sp.FINALS_FOLDER = "Oxy"
-sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-sp.bands_to_sortout = np.array([])  # [0, 1, 2, 20, 19, 18, 17, 16])
+sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
+            "2014_12_08_Neil_Pig_Oxygenation_Experiments/organized_recordings"
+sp.DATA_FOLDER = "colon_images_selection"
+sp.FINALS_FOLDER = "Oxy_selection"
+
+# sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
+
+new_order = [1, 5, 3, 0, 6, 7, 2, 4]
+
+def resort_image_wavelengths(collapsed_image):
+    return collapsed_image[:, new_order]
+
+def resort_wavelengths(msi):
+    """Neil organized his wavelengths differently.
+    This function fixes this."""
+    collapsed_image = imgmani.collapse_image(msi.get_image())
+    collapsed_image = resort_image_wavelengths(collapsed_image)
+    msi.set_image(np.reshape(collapsed_image, msi.get_image().shape))
+
+# rebind this method since in this recoding the wavelengths got messed up
+sp.resort_wavelengths = resort_wavelengths
+
+sp.bands_to_sortout = np.array([7])  # [0, 1, 2, 20, 19, 18, 17, 16])
 
 
 
@@ -94,8 +111,8 @@ class IPCAICreateOxyImageTask(luigi.Task):
         image[np.isinf(image)] = 0.
         image[image > 1.] = 1.
         image[image < 0.] = 0.
-#         image[0, 0] = 0.
-#         image[0, 1] = 1.
+        image[0, 0] = 0.
+        image[0, 1] = 1.
         at.plot_axis(axarr[1], image[:, :],
                   "oxygenation [%]")
         plt.savefig(self.output().path, dpi=1000, bbox_inches='tight')
@@ -148,16 +165,21 @@ class IPCAITrainRegressor(luigi.Task):
         # extract data from the batch
         f = open(self.input().path, "r")
         batch_train = pickle.load(f)
-        X, y = preprocess(batch_train, w_percent=0.05)
+        # TODO: fix hack by sorting always to ascending wavelengths
+        batch_train.reflectances = resort_image_wavelengths(
+                                                    batch_train.reflectances)
+        batch_train.wavelengths = batch_train.wavelengths[new_order]
+        X, y = preprocess(batch_train,
+                          w_percent=0.05, bands_to_sortout=sp.bands_to_sortout)
+
         # train regressor
         reg = RandomForestRegressor(max_depth=30, min_samples_leaf=5, n_jobs=-1)
         reg.fit(X, y)
-        reg = LinearSaO2Unmixing()
+        # reg = LinearSaO2Unmixing()
         # save regressor
         f = self.output().open('w')
         pickle.dump(reg, f)
         f.close()
-
 
 
 class IPCAIPreprocessMSI(luigi.Task):
@@ -229,7 +251,7 @@ class FlatfieldFromPNGFiles(luigi.Task):
         reader = PngReader()
         msi = reader.read(os.path.join(sp.ROOT_FOLDER,
                                        sp.FLAT_FOLDER,
-                                       "image sample "))
+                                       "TestImage_141211_10.19.22_"))
         writer = NrrdWriter(msi)
         seg_reader = NrrdReader()
         segmentation = seg_reader.read(os.path.join(sp.ROOT_FOLDER,
@@ -238,7 +260,6 @@ class FlatfieldFromPNGFiles(luigi.Task):
         msimani.apply_segmentation(msi, segmentation)
         msimani.calculate_mean_spectrum(msi)
         writer.write(self.output().path)
-
 
 
 class MultiSpectralImageFromPNGFiles(luigi.Task):
@@ -259,9 +280,6 @@ class MultiSpectralImageFromPNGFiles(luigi.Task):
         writer.write(self.output().path)
 
 
-
-
-
 if __name__ == '__main__':
 
     # root folder there the data lies
@@ -276,8 +294,8 @@ if __name__ == '__main__':
                  os.path.isfile(os.path.join(image_file_folder, f)) ]
     # each complete stack has elements F0 - F7
     only_colon_images = [ f for f in onlyfiles if
-                 f.endswith("670nm.png") ]
-    files_prefixes = [ f[:-9] for f in only_colon_images]
+                 f.endswith("_F7.png") ]
+    files_prefixes = [ f[:-5] for f in only_colon_images]
 
     for f in files_prefixes:
         main_task = IPCAICreateOxyImageTask(

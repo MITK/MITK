@@ -27,7 +27,7 @@ if __name__ == '__main__':
     BATCH_NUMBERS = np.arange(0, 100, 1)
     for i in BATCH_NUMBERS:
         main_task = tasks_mc.CreateSpectraTask(
-                                        "colon_muscle_tissue_test",
+                                        "colon_muscle_tissue_d_ranges_test",
                                          i,
                                          1000,
                                          mcfac.ColonMuscleMcFactory())

@@ -33,6 +33,7 @@ import sklearn.cross_validation
 import pyRULSIF
 from sklearn.decomposition import PCA
 import sklearn.preprocessing
+from sklearn.linear_model.base import LinearRegression
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_silico"
@@ -123,6 +124,103 @@ class TrainingSamplePlots(luigi.Task):
                     dpi=500, bbox_inches='tight')
 
 
+class WrongNoisePlots(luigi.Task):
+
+    def requires(self):
+        return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
+                tasks_mc.CameraBatch("generic_tissue_no_aray_test")
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                 sp.RESULTS_FOLDER,
+                                 sp.FINALS_FOLDER,
+                                 "noise_wrong_plot.png"))
+
+
+    def run(self):
+        # get data
+        f = open(self.input()[0].path, "r")
+        batch_train = pickle.load(f)
+        f = open(self.input()[1].path, "r")
+        batch_test = pickle.load(f)
+
+        # setup structures to save test data
+        kf = sklearn.cross_validation.KFold(batch_train.reflectances.shape[0],
+                                            10, shuffle=True)
+        param_grid_rf = [
+          {"n_estimators": np.array([50]),
+           "max_depth": np.array([30]),  # np.arange(30, 35, 2),
+           "min_samples_leaf": np.array([5])}]
+        rf = sklearn.grid_search.GridSearchCV(RandomForestRegressor(50,
+                                                    max_depth=10, n_jobs=-1),
+                  param_grid_rf, cv=kf, n_jobs=-1)
+
+        evaluation_setups = [
+                        EvaluationStruct("classic", LinearSaO2Unmixing(), [],
+                                         "red", 0.25)
+                        , EvaluationStruct("lasso", LassoCV(), [],
+                                           "yellow", 0.5)
+
+                        , EvaluationStruct("rf", rf, [], "green", 0.5)
+                    ]
+        # iterate over different levels of noise
+        noise_levels = np.arange(0.00, 1.00, 0.02)
+        for w in noise_levels:
+            # setup testing function
+            X_test, y_test = preprocess(batch_test, w_percent=w)
+            # extract noisy data
+            X_train, y_train = preprocess(batch_train, w_percent=0.1)
+            for e in evaluation_setups:
+                lr = e.regressor
+                lr.fit(X_train, y_train)
+                if e.name is "rf":
+                    print lr.best_estimator_
+                y_pred = lr.predict(X_test)
+                # save results
+                errors = np.abs(y_pred - y_test)
+                e.data.append(errors)
+        # make a nice plot for results
+        plt.figure()
+        legend_handles = []
+        for e in evaluation_setups:
+            p25 = lambda x: np.percentile(x, 25) * 100.
+            p75 = lambda x: np.percentile(x, 75) * 100.
+            m = lambda x: np.median(x) * 100.
+            plt.fill_between(np.array(noise_levels) * 100.,
+                             map(p25, e.data),
+                             map(p75, e.data),
+                             edgecolor=e.color, facecolor=e.color,
+                             alpha=e.alpha)
+            h, = plt.plot(np.array(noise_levels) * 100.,
+                          map(m, e.data), color=e.color,
+                          label=e.name)
+            legend_handles.append(h)
+        minor_ticks = np.arange(0, 80, 5)
+        plt.gca().set_xticks(minor_ticks, minor=True)
+        plt.gca().set_yticks(minor_ticks, minor=True)
+
+        plt.gca().annotate('error: ' +
+                           "{0:.2f}".format(
+                                        np.median(evaluation_setups[-1].data[0])
+                                        * 100) + "%",
+                           xy=(0, 0.3), xytext=(10, 35), size=10, va="center",
+                           ha="center", bbox=dict(boxstyle="round4",
+                                                  fc="g", alpha=0.5),
+                           arrowprops=dict(arrowstyle="-|>",
+                                  connectionstyle="arc3,rad=-0.2",
+                                  fc="w"),
+                    )
+        plt.grid()
+        plt.legend(handles=legend_handles)
+        plt.title("dependency on wrong training noise [w_training = 10%]")
+        plt.xlabel("noise added [sigma %]")
+        plt.ylabel("absolute error [%]")
+        plt.ylim((0, 80))
+        plt.savefig(self.output().path + "_temp.png", dpi=500,
+                    bbox_inches='tight')
+
+
+
 class NoisePlots(luigi.Task):
 
     def requires(self):
@@ -160,7 +258,7 @@ class NoisePlots(luigi.Task):
                     , EvaluationStruct("rf", rf, [], "green", 0.5)
                     ]
         # iterate over different levels of noise
-        noise_levels = np.arange(0.00, 1.01, 0.01)
+        noise_levels = np.arange(0.00, 1.02, 0.02)
         for w in noise_levels:
             # setup testing function
             X_test, y_test = preprocess(batch_test, w_percent=w)
@@ -191,7 +289,7 @@ class NoisePlots(luigi.Task):
                           map(m, e.data), color=e.color,
                           label=e.name)
             legend_handles.append(h)
-        minor_ticks = np.arange(0, 100, 5)
+        minor_ticks = np.arange(0, 80, 5)
         plt.gca().set_xticks(minor_ticks, minor=True)
         plt.gca().set_yticks(minor_ticks, minor=True)
 
@@ -209,8 +307,9 @@ class NoisePlots(luigi.Task):
         plt.grid()
         plt.legend(handles=legend_handles)
         plt.title("dependency on noise")
-        plt.xlabel("approach")
+        plt.xlabel("noise added [sigma %]")
         plt.ylabel("absolute error [%]")
+        plt.ylim((0, 80))
         plt.savefig(self.output().path + "_temp.png", dpi=500,
                     bbox_inches='tight')
 
@@ -220,8 +319,8 @@ class DAPlots(luigi.Task):
     def requires(self):
         return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
                 tasks_mc.CameraBatch("generic_tissue_no_aray_test"), \
-                tasks_mc.CameraBatch("colon_muscle_tissue_train"), \
-                tasks_mc.CameraBatch("colon_muscle_tissue_test")
+                tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_train"), \
+                tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_test")
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -279,11 +378,14 @@ class DAPlots(luigi.Task):
 
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(), [],
-                                     "red", 0.25)
-                    , EvaluationStruct("lasso", LassoCV(), [], "yellow", 0.5)
+                                     "red", 0.5)
+                    , EvaluationStruct("lr", LinearRegression(),
+                                       [], "yellow", 0.5)
                     # , EvaluationStruct("svm weighting", svm, [], "blue", 0.5)
                     , EvaluationStruct("rf", rf, [], "green", 0.5)
                     , EvaluationStruct("rf no cov shift", rf, [], "blue", 0.5)
+                    , EvaluationStruct("lr no cov shift", LinearRegression(),
+                                       [], "blue", 0.5)
                     ]
         # estimate weights for domain adaptation
         lr = estimate_logistic_regressor(X_train, X_da_train)
@@ -317,7 +419,7 @@ class DAPlots(luigi.Task):
             # train
             if e.name is  "lasso+da":
                 e.regressor.fit(X_resampled, y_resampled)
-            elif e.name is "lasso no cov shift" or e.name is "rf no cov shift":
+            elif e.name is "lr no cov shift" or e.name is "rf no cov shift":
                 e.regressor.fit(X_da_train, y_da_train)
             elif e.name is "rf":
                 e.regressor.fit(X_train, y_train)
@@ -356,6 +458,7 @@ class DAPlots(luigi.Task):
         ax.set_xticklabels(x_tick_labels)
         ax.get_xaxis().tick_bottom()
         ax.get_yaxis().tick_left()
+        ax.axvline(x=3.5, linestyle="--", color="black", linewidth=2)
         plt.grid()
         plt.title("performance under covariance shift")
         plt.xlabel("method")

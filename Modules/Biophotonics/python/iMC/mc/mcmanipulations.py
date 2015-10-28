@@ -38,7 +38,7 @@ def sortout_bands(batch, bands_to_sortout=None):
         batch.reflectances = np.delete(batch.reflectances,
                                               bands_to_sortout, axis=1)
         batch.wavelengths = np.delete(batch.wavelengths,
-                                              bands_to_sortout, axis=1)
+                                              bands_to_sortout)
 
 
 def select_n(batch, n):

@@ -160,11 +160,11 @@ class ColonMuscleBatch(AbstractBatch):
         saO2 = self.generator(size=nr_samples)
         # create three layers with random samples
         # muscle
-        self.append_one_layer(saO2, (900.*10 ** -6, 900.*10 ** -6), nr_samples)
+        self.append_one_layer(saO2, (600.*10 ** -6, 1010.*10 ** -6), nr_samples)
         # submucosa
-        self.append_one_layer(saO2, (500.*10 ** -6, 500.*10 ** -6), nr_samples)
+        self.append_one_layer(saO2, (415.*10 ** -6, 847.*10 ** -6), nr_samples)
         # mucosa
-        self.append_one_layer(saO2, (600.*10 ** -6, 600.*10 ** -6), nr_samples)
+        self.append_one_layer(saO2, (395.*10 ** -6, 603.*10 ** -6), nr_samples)
         # create empty reflectances matrix
         self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))
         # set all weights to 1

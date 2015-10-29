@@ -2,6 +2,7 @@
 # ordered according to their dependencies.
 
 set(mitk_modules
+  Logging
   Core
   CommandLine
   AppUtil
@@ -65,7 +66,6 @@ set(mitk_modules
   IOExt
   XNAT
   TubeGraph
-  Logging
 )
 
 if(MITK_ENABLE_PIC_READER)

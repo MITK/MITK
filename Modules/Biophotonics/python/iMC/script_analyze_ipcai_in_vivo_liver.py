@@ -10,6 +10,7 @@ import os
 import Image
 import ImageEnhance
 import pickle
+import time
 
 import numpy as np
 import luigi
@@ -31,17 +32,19 @@ import msi.normalize as norm
 from regression.estimation import estimate_image
 from regression.linear import LinearSaO2Unmixing
 from regression.preprocessing import preprocess, normalize
+from msi.io.tiffreader import TiffReader
 
 
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
-            "2014_12_08_Neil_Pig_Oxygenation_Experiments/organized_recordings"
-sp.DATA_FOLDER = "colon_images_selection"
-sp.FINALS_FOLDER = "Oxy_selection"
+            "2015_11_12_IPCAI_in_vivo"
+sp.DATA_FOLDER = "liver_images"
+sp.FINALS_FOLDER = "liver_oxy"
+sp.FLAT_FOLDER = "flatfields_liver"
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-new_order = [1, 5, 3, 0, 6, 7, 2, 4]
+new_order = [0, 1, 2, 3, 4, 5, 6, 7]
 
 def resort_image_wavelengths(collapsed_image):
     return collapsed_image[:, new_order]
@@ -56,7 +59,7 @@ def resort_wavelengths(msi):
 # rebind this method since in this recoding the wavelengths got messed up
 sp.resort_wavelengths = resort_wavelengths
 
-sp.bands_to_sortout = np.array([7])  # [0, 1, 2, 20, 19, 18, 17, 16])
+sp.bands_to_sortout = np.array([])  # [0, 1, 2, 20, 19, 18, 17, 16])
 
 
 
@@ -141,7 +144,11 @@ class IPCAIEstimateTissueParametersTask(luigi.Task):
         e_file = open(self.input()[1].path, 'r')
         e = pickle.load(e_file)
         # estimate
+        start = time.time()
         sitk_image = estimate_image(msi, e)
+        end = time.time()
+        print "time necessary for estimating image parameters: ", \
+            str(end - start), "s"
         # save data
         outFile = self.output().open('w')
         outFile.close()
@@ -165,13 +172,17 @@ class IPCAITrainRegressor(luigi.Task):
         # extract data from the batch
         f = open(self.input().path, "r")
         batch_train = pickle.load(f)
+        # TODO: fix hack by sorting always to ascending wavelengths
+        batch_train.reflectances = resort_image_wavelengths(
+                                                    batch_train.reflectances)
+        batch_train.wavelengths = batch_train.wavelengths[new_order]
         X, y = preprocess(batch_train,
                           w_percent=0.1, bands_to_sortout=sp.bands_to_sortout)
 
         # train regressor
         reg = RandomForestRegressor(max_depth=30, n_estimators=10,
                                     min_samples_leaf=5, n_jobs=-1)
-        reg = LinearSaO2Unmixing()
+        # reg = LinearSaO2Unmixing()
         reg.fit(normalize(X), y)
         # reg = LinearSaO2Unmixing()
         # save regressor
@@ -214,7 +225,7 @@ class IPCAICorrectImagingSetupTask(luigi.Task):
     image_prefix = luigi.Parameter()
 
     def requires(self):
-        return MultiSpectralImageFromPNGFiles(image_prefix=self.image_prefix), \
+        return MultiSpectralImageFromTiffFiles(image_prefix=self.image_prefix), \
             FlatfieldFromPNGFiles()
 
     def output(self):
@@ -231,7 +242,6 @@ class IPCAICorrectImagingSetupTask(luigi.Task):
         flatfield = reader.read(self.input()[1].path)
         # correct image by flatfield
         msimani.flatfield_correction(msi, flatfield)
-        sp.resort_wavelengths(msi)
         pre.touch_and_save_msi(msi, self.output())
 
 
@@ -247,18 +257,22 @@ class FlatfieldFromPNGFiles(luigi.Task):
         reader = PngReader()
         msi = reader.read(os.path.join(sp.ROOT_FOLDER,
                                        sp.FLAT_FOLDER,
-                                       "TestImage_141211_10.19.22_"))
+                                       "Flatfield9cm_I000x_F"))
         writer = NrrdWriter(msi)
+        msi.set_image(msi.get_image().astype(float))
         seg_reader = NrrdReader()
         segmentation = seg_reader.read(os.path.join(sp.ROOT_FOLDER,
                                            sp.FLAT_FOLDER,
                                            "segmentation.nrrd"))
-        msimani.apply_segmentation(msi, segmentation)
-        msimani.calculate_mean_spectrum(msi)
+        # msimani.apply_segmentation(msi, segmentation)
+        # msimani.calculate_mean_spectrum(msi)
+        # apply gaussian smoothing for error reduction
+        img = gaussian_filter(msi.get_image(), sigma=(5, 5, 0), order=0)
+        msi.set_image(img)
         writer.write(self.output().path)
 
 
-class MultiSpectralImageFromPNGFiles(luigi.Task):
+class MultiSpectralImageFromTiffFiles(luigi.Task):
     image_prefix = luigi.Parameter()
 
     def output(self):
@@ -268,7 +282,7 @@ class MultiSpectralImageFromPNGFiles(luigi.Task):
                                 ".nrrd"))
 
     def run(self):
-        reader = PngReader()
+        reader = TiffReader()
         msi = reader.read(os.path.join(sp.ROOT_FOLDER,
                                        sp.DATA_FOLDER,
                                        self.image_prefix))
@@ -290,8 +304,8 @@ if __name__ == '__main__':
                  os.path.isfile(os.path.join(image_file_folder, f)) ]
     # each complete stack has elements F0 - F7
     only_colon_images = [ f for f in onlyfiles if
-                 f.endswith("_F7.png") ]
-    files_prefixes = [ f[:-5] for f in only_colon_images]
+                 f.startswith("1_") ]
+    files_prefixes = [ f[:-28] for f in only_colon_images]
 
     for f in files_prefixes:
         main_task = IPCAICreateOxyImageTask(

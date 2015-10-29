@@ -189,13 +189,13 @@ class VisualizationBatch(AbstractBatch):
         self.layers.append(samples)
 
     def create_parameters(self, nr_samples):
-        # bvf = np.linspace(0.0, 1., nr_samples)
+        bvf = np.linspace(0.0, .1, nr_samples)
         # saO2 = np.linspace(0., 1., nr_samples)
         # d = np.linspace(175, 735, nr_samples) * 10 ** -6
         # a_mie = np.linspace(5., 30., nr_samples) * 100
-        a_ray = np.linspace(0., 60., nr_samples) * 100
+        # a_ray = np.linspace(0., 60., nr_samples) * 100
         # create three layers with random samples
-        self.append_one_layer(0.04, 0.7, 30.*100., a_ray, 500 * 10 ** -6,
+        self.append_one_layer(bvf, 0.7, 30.*100., 0., 500 * 10 ** -6,
                               nr_samples)
         self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
                               nr_samples)

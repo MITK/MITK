@@ -4,10 +4,17 @@ Created on Oct 21, 2015
 @author: wirkert
 '''
 
+import math
+
 import numpy as np
 import SimpleITK as sitk
 
+
 import msi.imgmani as imgmani
+
+
+def SAMDistance(x, y):
+    return math.acos(np.dot(x, y) / (np.linalg.norm(x) * np.linalg.norm(y)))
 
 
 def estimate_image(msi, regressor):

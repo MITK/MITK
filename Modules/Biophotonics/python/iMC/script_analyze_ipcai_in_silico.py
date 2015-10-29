@@ -8,39 +8,35 @@ Created on Fri Aug 14 11:09:18 2015
 
 import os
 import pickle
-import copy
 from collections import namedtuple
 import itertools
 
 import numpy as np
 import luigi
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import Normalizer
-from sklearn.linear_model import LassoCV
-
-
-import tasks_mc
-import scriptpaths as sp
-from regression.preprocessing import preprocess
-import mc.mcmanipulations as mcmani
-from regression.linear import LinearSaO2Unmixing
-from regression.domain_adaptation import estimate_logistic_regressor, resample
-from regression.estimation import standard_score
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble.forest import RandomForestRegressor
 import sklearn.svm
 import sklearn.grid_search
 import sklearn.cross_validation
-import pyRULSIF
-from sklearn.decomposition import PCA
-import sklearn.preprocessing
-from sklearn.linear_model.base import LinearRegression
+from sklearn.linear_model import *
+import scipy.io
+
+import tasks_mc
+import scriptpaths as sp
+from regression.preprocessing import preprocess, normalize
+from regression.linear import LinearSaO2Unmixing
+from regression.domain_adaptation import estimate_weights, resample
+from regression.estimation import standard_score, SAMDistance
+
+
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_silico"
 sp.FINALS_FOLDER = "Images"
 sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-w_standard = 0.05  # for this evaluation we add 5% noise
+w_standard = 0.0  # for this evaluation we add 5% noise
 
 
 class IPCAICreateInSilicoPlots(luigi.Task):
@@ -317,9 +313,9 @@ class NoisePlots(luigi.Task):
 class DAPlots(luigi.Task):
 
     def requires(self):
-        return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
+        return tasks_mc.CameraBatch("full_bvf_ranges_100_0"), \
                 tasks_mc.CameraBatch("generic_tissue_no_aray_test"), \
-                tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_train"), \
+                tasks_mc.CameraBatch("zero_to_ten_bvf_ranges_100_0"), \
                 tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_test")
 
     def output(self):
@@ -345,6 +341,11 @@ class DAPlots(luigi.Task):
         X_da_test, y_da_test = preprocess(batch_da_test,
                                                   w_percent=w_standard)
 
+#
+#         scipy.io.savemat('/home/wirkert/workspace/matlab/domain_adaptation/GMKLIEP_demo/x_nu', mdict={'arr': normalize(X_da_train)})
+#         scipy.io.savemat('/home/wirkert/workspace/matlab/domain_adaptation/GMKLIEP_demo/x_de', mdict={'arr': normalize(X_train)})
+
+
 #         transformer = PCA(n_components=10)
 #         transformer = sklearn.preprocessing.StandardScaler()
 #         transformer.fit(X_train)
@@ -358,9 +359,9 @@ class DAPlots(luigi.Task):
         kf = sklearn.cross_validation.KFold(X_train.shape[0], 10, shuffle=True)
         # todo include intercept scaling paramter
         param_grid_svm = [
-          {'C': np.logspace(-6, 6, 1),
+          {'C': np.logspace(-2, 8, 11),
            'kernel':['rbf', 'linear'],
-           'gamma': np.logspace(-6, 6, 1)} ]
+           'gamma': np.logspace(-6, 3, 10)} ]
         svm = sklearn.grid_search.GridSearchCV(sklearn.svm.SVR(),
                                param_grid_svm, cv=kf, n_jobs=-1)
         # use the random forest regressor
@@ -379,17 +380,30 @@ class DAPlots(luigi.Task):
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(), [],
                                      "red", 0.5)
-                    , EvaluationStruct("lr", LinearRegression(),
-                                       [], "yellow", 0.5)
+                    , EvaluationStruct("lr", LinearRegression(), [],
+                                       "yellow", 0.5)
+#                     , EvaluationStruct("logr", logr, [],
+#                                        "yellow", 0.5)
+#                     , EvaluationStruct("svr", svm, [],
+#                                        "yellow", 0.5)
+#                     , EvaluationStruct("knn",
+#                                        KNeighborsRegressor(algorithm="ball_tree",
+#                                                            metric="pyfunc",
+#                                             metric_params={"func":SAMDistance}),
+#                                        [], "yellow", 0.5)
                     # , EvaluationStruct("svm weighting", svm, [], "blue", 0.5)
                     , EvaluationStruct("rf", rf, [], "green", 0.5)
+                    , EvaluationStruct("weighted rf", rf, [], "green", 0.5)
                     , EvaluationStruct("rf no cov shift", rf, [], "blue", 0.5)
                     , EvaluationStruct("lr no cov shift", LinearRegression(),
                                        [], "blue", 0.5)
                     ]
         # estimate weights for domain adaptation
-        lr = estimate_logistic_regressor(X_train, X_da_train)
-        weights = lr.predict_proba(X_train)[:, 1] / lr.predict_proba(X_train)[:, 0]
+        weights = estimate_weights(normalize(X_train),
+                                         normalize(X_da_train))
+
+        p90_weights = np.percentile(weights, 90)
+        weights[weights > p90_weights] = p90_weights
         # X_train = X_train[:X_da_train.shape[0], :]
         # y_train = y_train[:X_da_train.shape[0]]
 
@@ -413,21 +427,35 @@ class DAPlots(luigi.Task):
 #         plot(batch_temp2, axarr[1])
 #         plt.show()
 
-        X_resampled, y_resampled, weights = resample(X_train, y_train, weights)
+        X_resampled, y_resampled, weights = resample(normalize(X_train),
+                                                      y_train, weights)
 
         for e in evaluation_setups:
             # train
-            if e.name is  "lasso+da":
-                e.regressor.fit(X_resampled, y_resampled)
-            elif e.name is "lr no cov shift" or e.name is "rf no cov shift":
-                e.regressor.fit(X_da_train, y_da_train)
+            if e.name is "lr no cov shift" or e.name is "rf no cov shift":
+                e.regressor.fit(normalize(X_da_train), y_da_train)
+                # evaluate
+                y_pred = e.regressor.predict(normalize(X_da_test))
+            elif e.name is "weighted rf":
+                e.regressor.fit(normalize(X_resampled), y_resampled)
+                y_pred = e.regressor.predict(normalize(X_da_test))
             elif e.name is "rf":
-                e.regressor.fit(X_train, y_train)
+                e.regressor.fit(normalize(X_train), y_train)
+                # evaluate
+                y_pred = e.regressor.predict(normalize(X_da_test))
                 # print e.regressor.best_estimator_
-            else:
+            elif e.name is "svr":
+                e.regressor.fit(normalize(X_train), y_train)
+                # evaluate
+                y_pred = e.regressor.predict(normalize(X_da_test))
+                print e.regressor.best_estimator_
+            elif e.name is "knn":
                 e.regressor.fit(X_train, y_train)
-            # evaluate
-            y_pred = e.regressor.predict(X_da_test)
+                y_pred = e.regressor.predict(X_da_test)
+            else:
+                e.regressor.fit(normalize(X_train), y_train)
+                # evaluate
+                y_pred = e.regressor.predict(normalize(X_da_test))
             # save results
             e.data.append(np.abs(y_pred - y_da_test))
 
@@ -458,7 +486,8 @@ class DAPlots(luigi.Task):
         ax.set_xticklabels(x_tick_labels)
         ax.get_xaxis().tick_bottom()
         ax.get_yaxis().tick_left()
-        ax.axvline(x=3.5, linestyle="--", color="black", linewidth=2)
+        ax.axvline(x=len(evaluation_setups) - 1.5,
+                   linestyle="--", color="black", linewidth=2)
         plt.grid()
         plt.title("performance under covariance shift")
         plt.xlabel("method")

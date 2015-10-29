@@ -39,13 +39,17 @@ def preprocess(batch, nr_samples=None, w_percent=None, magnification=None,
                                   size=reflectances.shape)
         reflectances += noises * reflectances
     reflectances = np.clip(reflectances, 0.00001, 1.)
+    X = reflectances
+    return X, y
+
+def normalize(X):
     # normalize reflectances
     normalizer = Normalizer(norm='l1')
-    reflectances = normalizer.transform(reflectances)
+    X = normalizer.transform(X)
     # reflectances to absorption
-    absorptions = -np.log(reflectances)
+    absorptions = -np.log(X)
     X = absorptions
     # get rid of sorted out bands
     normalizer = Normalizer(norm='l2')
     X = normalizer.transform(X)
-    return X, y
+    return X

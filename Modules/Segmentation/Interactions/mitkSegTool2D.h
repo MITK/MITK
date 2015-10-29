@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDiffSliceOperation.h>
 
-
 namespace mitk
 {
 
@@ -94,6 +93,9 @@ class MITKSEGMENTATION_EXPORT SegTool2D : public Tool
     SegTool2D(); // purposely hidden
     SegTool2D(const char*); // purposely hidden
     virtual ~SegTool2D();
+
+    virtual void Activated() override;
+    virtual void Deactivated() override;
 
     struct SliceInformation
     {

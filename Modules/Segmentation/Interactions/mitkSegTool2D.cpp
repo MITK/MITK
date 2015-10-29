@@ -51,6 +51,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAbstractTransformGeometry.h"
 
+#include <AutoplanLogging.h>
+
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 bool mitk::SegTool2D::m_SurfaceInterpolationEnabled = true;
@@ -70,6 +72,21 @@ mitk::SegTool2D::~SegTool2D()
 }
 
 bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*)
+
+void mitk::SegTool2D::Activated()
+{
+  AUTOPLAN_INFO << this->GetName() << ": Activated";
+  Superclass::Activated();
+}
+
+void mitk::SegTool2D::Deactivated()
+{
+  AUTOPLAN_INFO << this->GetName() << ": Deactivated";
+  Superclass::Deactivated();
+}
+
+bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*dataNode)
+
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( interactionEvent );
 
@@ -79,8 +96,6 @@ bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*
                       );
   return isValidEvent;
 }
-
-
 
 bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const PlaneGeometry* plane, int& affectedDimension, int& affectedSlice )
 {

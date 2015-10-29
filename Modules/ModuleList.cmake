@@ -65,6 +65,7 @@ set(mitk_modules
   IOExt
   XNAT
   TubeGraph
+  Logging
 )
 
 if(MITK_ENABLE_PIC_READER)

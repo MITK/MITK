@@ -56,5 +56,5 @@ namespace Logger {
   static bool tcplog = false;
   static std::string iphost, ipport, logsPath;
 
-  static void reinitLogger();
+  extern void reinitLogger();
 }

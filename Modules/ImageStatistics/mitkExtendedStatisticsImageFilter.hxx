@@ -279,7 +279,7 @@ namespace itk
     RealType entropy( 0.0 );
     RealType upp( 0.0 );
 
-    typename  const HistogramGeneratorType::HistogramType* histogramForEntropy = GetHistogram();
+    const typename HistogramGeneratorType::HistogramType* histogramForEntropy = GetHistogram();
 
     for (int i = 0; i < histogramForEntropy->Size(); i++)
     {

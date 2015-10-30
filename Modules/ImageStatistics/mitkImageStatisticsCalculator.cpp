@@ -1130,7 +1130,19 @@ namespace mitk
     statisticsFilter->SetBinSize( 100 );
 
     unsigned long observerTag = statisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
-    statisticsFilter->Update();
+    try
+    {
+      statisticsFilter->Update();
+    }
+    catch (const itk::ExceptionObject& e)
+    {
+      mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
+    }
+    catch( const std::exception& e )
+    {
+      //mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
+    }
+
     statisticsFilter->RemoveObserver( observerTag );
     this->InvokeEvent( itk::EndEvent() );
 
@@ -1352,6 +1364,10 @@ namespace mitk
     {
       mitkThrow() << "Attempt to adapt shifted origin of the mask image failed due to ITK Exception: \n" << e.what();
     }
+    catch( const std::exception& e )
+    {
+      //mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
+    }
 
 
     // Make sure that mask region is contained within image region
@@ -1401,6 +1417,10 @@ namespace mitk
     catch( const itk::ExceptionObject& e)
     {
       mitkThrow() << "Image statistics initialization computation failed with ITK Exception: \n " << e.what();
+    }
+    catch( const std::exception& e )
+    {
+      //mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
     }
 
     // Calculate bin size or number of bins
@@ -1460,12 +1480,23 @@ namespace mitk
     labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
 
     // Execute the filter
-    labelStatisticsFilter->Update();
+    try
+    {
+      labelStatisticsFilter->Update();
+    }
+    catch( const itk::ExceptionObject& e)
+    {
+      mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
+    }
+    catch( const std::exception& e )
+    {
+      //mitkThrow() << "Image statistics calculation failed due to following ITK Exception: \n " << e.what();
+    }
 
     this->InvokeEvent( itk::EndEvent() );
 
-  if( observerTag )
-    labelStatisticsFilter->RemoveObserver( observerTag );
+    if( observerTag )
+      labelStatisticsFilter->RemoveObserver( observerTag );
 
     // Find all relevant labels of mask (other than 0)
     std::list< int > relevantLabels = labelStatisticsFilter->GetRelevantLabels();

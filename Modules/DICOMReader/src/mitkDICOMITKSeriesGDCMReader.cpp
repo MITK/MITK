@@ -576,18 +576,14 @@ void mitk::DICOMITKSeriesGDCMReader::EnsureMandatorySortersArePresent(
   unsigned int decimalPlacesForOrientation )
 {
   DICOMTagBasedSorter::Pointer splitter = DICOMTagBasedSorter::New();
-  splitter->AddDistinguishingTag( DICOMTag( 0x0028, 0x0010 ) ); // Number of Rows
-  splitter->AddDistinguishingTag( DICOMTag( 0x0028, 0x0011 ) ); // Number of Columns
-  splitter->AddDistinguishingTag( DICOMTag( 0x0028, 0x0030 ),
-    new mitk::DICOMTagBasedSorter::CutDecimalPlaces( decimalPlacesForOrientation ) ); // Pixel Spacing
-  splitter->AddDistinguishingTag( DICOMTag( 0x0018, 0x1164 ),
-    new mitk::DICOMTagBasedSorter::CutDecimalPlaces( decimalPlacesForOrientation ) ); // Imager Pixel Spacing
-  splitter->AddDistinguishingTag( DICOMTag( 0x0020, 0x0037 ),
-    new mitk::DICOMTagBasedSorter::CutDecimalPlaces( decimalPlacesForOrientation ) ); // Image Orientation (Patient)
-  splitter->AddDistinguishingTag( DICOMTag( 0x0018, 0x0050 ),
-    new mitk::DICOMTagBasedSorter::CutDecimalPlaces( decimalPlacesForOrientation ) ); // Slice Thickness
-  splitter->AddDistinguishingTag( DICOMTag( 0x0028, 0x0008 ) );                       // Number of Frames
-  this->AddSortingElement( splitter, true );                                          // true = at front
+  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0010) ); // Number of Rows
+  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0011) ); // Number of Columns
+  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0030) ); // Pixel Spacing
+  splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
+  splitter->AddDistinguishingTag( DICOMTag(0x0020, 0x0037), new mitk::DICOMTagBasedSorter::CutDecimalPlaces(decimalPlacesForOrientation) ); // Image Orientation (Patient)
+  splitter->AddDistinguishingTag( DICOMTag(0x0018, 0x0050) ); // Slice Thickness
+  splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0008) ); // Number of Frames
+  this->AddSortingElement( splitter, true ); // true = at front
 
   if ( m_EquiDistantBlocksSorter.IsNull() )
   {

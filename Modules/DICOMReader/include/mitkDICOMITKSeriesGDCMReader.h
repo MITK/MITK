@@ -202,7 +202,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     mitkClassMacro( DICOMITKSeriesGDCMReader, DICOMFileReader );
     mitkCloneMacro( DICOMITKSeriesGDCMReader );
-    itkNewMacro( DICOMITKSeriesGDCMReader );
+    itkFactorylessNewMacro( DICOMITKSeriesGDCMReader );
     mitkNewMacro1Param( DICOMITKSeriesGDCMReader, unsigned int );
 
     /**

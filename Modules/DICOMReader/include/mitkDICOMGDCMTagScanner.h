@@ -45,7 +45,7 @@ namespace mitk
        - via GetTagValue()
 
     When used in a process where multiple classes will access the scan
-    results, care should be taken that all the tags and files of interst
+    results, care should be taken that all the tags and files of interest
     are communicated to DICOMGDCMTagScanner before requesting the results!
   */
   class MITKDICOMREADER_EXPORT DICOMGDCMTagScanner : public DICOMTagCache
@@ -53,7 +53,8 @@ namespace mitk
     public:
 
       mitkClassMacro( DICOMGDCMTagScanner, DICOMTagCache );
-      itkNewMacro( DICOMGDCMTagScanner );
+      itkFactorylessNewMacro( DICOMGDCMTagScanner );
+      itkCloneMacro(Self);
 
       /**
         \brief Add this tag to the scanning process.

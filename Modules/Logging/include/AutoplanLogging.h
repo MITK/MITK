@@ -1,6 +1,6 @@
 #pragma once
 
-// #define BOOST_LOG_DYN_LINK
+#define BOOST_LOG_DYN_LINK 1
 
 // boost
 #include <boost/smart_ptr/shared_ptr.hpp>

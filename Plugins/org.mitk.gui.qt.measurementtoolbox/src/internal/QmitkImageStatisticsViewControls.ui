@@ -165,7 +165,7 @@
          <bool>false</bool>
         </property>
         <property name="rowCount">
-         <number>7</number>
+         <number>13</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -241,6 +241,36 @@
           <string>V (mm³)</string>
          </property>
         </row>
+        <row>
+         <property name="text">
+          <string>Skewness</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>Kurtosis</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>Uniformity</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>Entropy</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>MPP</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>UPP</string>
+         </property>
+        </row>
         <column>
          <property name="text">
           <string>0</string>
@@ -254,7 +284,16 @@
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -399,7 +438,16 @@
             <enum>QFrame::Raised</enum>
            </property>
            <layout class="QGridLayout" name="gridLayout">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <property name="spacing">
@@ -480,7 +528,16 @@
          <property name="spacing">
           <number>0</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>

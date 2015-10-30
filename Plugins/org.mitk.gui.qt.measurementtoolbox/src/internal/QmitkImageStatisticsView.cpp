@@ -274,14 +274,20 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
 
     // Copy statistics to clipboard ("%Ln" will use the default locale for
     // number formatting)
-    QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t V (mm³)\n" );
-    clipboard = clipboard.append("%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7")
+    QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t Skewness \t Kurtosis \t Uniformity \t Entropy \t MPP \t UPP \t V (mm³) \n" );
+    clipboard = clipboard.append("%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7 \t %8 \t %9 \t %10 \t %11 \t %12 \t %13")
       .arg(statistics[t].GetMean(), 0, 'f', 10)
       .arg(statistics[t].GetSigma(), 0, 'f', 10)
       .arg(statistics[t].GetRMS(), 0, 'f', 10)
       .arg(statistics[t].GetMax(), 0, 'f', 10)
       .arg(statistics[t].GetMin(), 0, 'f', 10)
       .arg(statistics[t].GetN())
+      .arg(statistics[t].GetSkewness(), 0, 'f', 10)
+      .arg(statistics[t].GetKurtosis(), 0, 'f', 10)
+      .arg(statistics[t].GetUniformity(), 0, 'f', 10)
+      .arg(statistics[t].GetEntropy(), 0, 'f', 10)
+      .arg(statistics[t].GetMPP(), 0, 'f', 10)
+      .arg(statistics[t].GetUPP(), 0, 'f', 10)
       .arg( m_Controls->m_StatisticsTable->item(6, 0)->data(Qt::DisplayRole).toDouble(), 0, 'f', 10);
 
     QApplication::clipboard()->setText(
@@ -874,7 +880,28 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
       this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
         "NA" ) );
     }
+
+    //statistics of higher order should have 5 decimal places because they used to be very small
+    this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetSkewness(), 0, 'f', 5) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 8, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetKurtosis(), 0, 'f', 5) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetUniformity(), 0, 'f', 5) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 10, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetEntropy(), 0, 'f', 5) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 11, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetMPP(), 0, 'f', decimals) ) );
+
+    this->m_Controls->m_StatisticsTable->setItem( 12, t, new QTableWidgetItem(
+      QString("%1").arg(s[t].GetUPP(), 0, 'f', 5) ) );
+
   }
+
 
   this->m_Controls->m_StatisticsTable->resizeColumnsToContents();
   int height = STAT_TABLE_BASE_HEIGHT;
@@ -971,6 +998,26 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( const mitk:
   this->m_Controls->m_StatisticsTable->setItem( 5, 0, new QTableWidgetItem( QString("%1").arg(stats.GetN()) ) );
 
   this->m_Controls->m_StatisticsTable->setItem( 6, 0, new QTableWidgetItem( "NA" ) );
+
+  //statistics of higher order should have 5 decimal places because they used to be very small
+  this->m_Controls->m_StatisticsTable->setItem( 7, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetSkewness(), 0, 'f', 5 ) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 8, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetKurtosis(), 0, 'f', 5) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 9, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetUniformity(), 0, 'f', 5) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 10, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetEntropy(), 0, 'f', 5) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 11, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetMPP(), 0, 'f', decimals) ) );
+
+  this->m_Controls->m_StatisticsTable->setItem( 12, 0, new QTableWidgetItem(
+    QString("%1").arg(stats.GetUPP(), 0, 'f', 5) ) );
+
 
   this->m_Controls->m_StatisticsTable->resizeColumnsToContents();
   int height = STAT_TABLE_BASE_HEIGHT;

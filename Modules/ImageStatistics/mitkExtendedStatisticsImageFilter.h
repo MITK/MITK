@@ -113,7 +113,7 @@ namespace itk
       /**
       * \brief Return the computed Histogram.
       */
-      typename const HistogramGeneratorType::HistogramType*
+      const typename HistogramGeneratorType::HistogramType*
         GetHistogram()
       {
         return m_HistogramGenerator->GetOutput();

@@ -48,6 +48,7 @@ namespace itk
     typedef typename Superclass::RealType                           RealType;
     typedef typename Superclass::PixelType                          PixelType;
     typedef typename Superclass::MapIterator                        MapIterator;
+    typedef  itk::Statistics::Histogram<double> HistogramType;
 
     itkFactorylessNewMacro( Self );
     itkCloneMacro( Self );

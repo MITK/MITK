@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkExtendedLabelStatisticsImageFilter.h"
 
 #include "itkImageRegionConstIteratorWithIndex.h"
+#include "itkImageRegionConstIterator.h"
 #include <mbilog.h>
 #include <mitkLogMacros.h>
 #include "mitkNumericConstants.h"
@@ -206,7 +207,7 @@ namespace itk
         it != m_RelevantLabels.cend();
         ++it, ++i )
       {
-        HistogramType::ConstPointer histogramForEntropy = GetHistogram(*it);
+        HistogramType::Pointer histogramForEntropy = this->GetHistogram(*it);
         for (int i = 0; i < histogramForEntropy->Size(); i++)
         {
           partialProbability = histogramForEntropy->GetFrequency(i,0) / double ( histogramForEntropy->GetTotalFrequency() ) ;
@@ -252,17 +253,17 @@ namespace itk
         it != m_RelevantLabels.cend();
         ++it )
       {
-        RealType sigma = GetSigma( *it );
-        RealType mean  = GetMean( *it );
+        RealType sigma = this->GetSigma( *it );
+        RealType mean  = this->GetMean( *it );
         Subregion = Superclass::GetRegion(*it);
 
-        int count( GetCount(*it) );
+        int count( this->GetCount(*it) );
         if ( count == 0 || sigma < mitk::eps)
         {
           throw std::logic_error( "Empty segmentation" );
         }
 
-        if ( fabs( sigma ) < typename mitk::sqrteps )
+        if ( fabs( sigma ) < mitk::sqrteps )
         {
           throw std::logic_error( "Sigma == 0" );
         }
@@ -308,7 +309,7 @@ namespace itk
 
     ComputeSkewnessKurtosisAndMPP();
 
-    if(GetUseHistograms())
+    if(this->GetUseHistograms())
     {
       ComputeEntropyUniformityAndUPP();
     }

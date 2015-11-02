@@ -10,6 +10,9 @@ mitk_create_plugin(
 )
 
 # Copy CTK Qt (designer) plugins to a Qt default path in the MITK bin
+# this has been implemented as a fix for bug 19379
+# The Qt plugins provided by CTK were not found in the plugin paths
+# when running in the build tree
 if(MITK_USE_CTK)
   if(EXISTS ${CTK_QTDESIGNERPLUGINS_DIR})
 

@@ -40,6 +40,7 @@ typedef itk::Image< unsigned char, 3 >          MaskImageType;
 
 int main(int argc, char* argv[])
 {
+  MITK_INFO << "Start";
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
@@ -66,22 +67,24 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  int mode = us::any_cast<int>(parsedArgs["mode"]);
+  MITK_INFO << "Mode access";
+  int mode = 5;//us::any_cast<int>(parsedArgs["mode"]);
 
+  MITK_INFO << "Read images";
   mitk::Image::Pointer mask1;
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   mitk::Image::Pointer mask0 = mitk::IOUtil::LoadImage(parsedArgs["mask0"].ToString());
   if (mode > 3)
   {
-    mitk::Image::Pointer mask1 = mitk::IOUtil::LoadImage(parsedArgs["mask1"].ToString());
+    mask1 = mitk::IOUtil::LoadImage(parsedArgs["mask1"].ToString());
   }
   mitk::MRNormLinearStatisticBasedFilter::Pointer oneRegion = mitk::MRNormLinearStatisticBasedFilter::New();
   mitk::MRNormTwoRegionsBasedFilter::Pointer twoRegion = mitk::MRNormTwoRegionsBasedFilter::New();
   mitk::Image::Pointer output;
 
-  oneRegion->SetInput(image);
+  //oneRegion->SetInput(image);
   twoRegion->SetInput(image);
-  oneRegion->SetMask(mask0);
+  //oneRegion->SetMask(mask0);
   twoRegion->SetMask1(mask0);
   twoRegion->SetMask2(mask1);
 

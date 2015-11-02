@@ -17,6 +17,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         ManualSegmentationEvaluation^^MitkCLVigraRandomForest
         CLGlobalImageFeatures^^MitkCore_MitkCLUtilities
         CLMRNormalization^^MitkCore_MitkCLUtilities_MitkCLMRUtilities
+        CLStaple^^MitkCore_MitkCLUtilities
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 

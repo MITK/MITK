@@ -6,10 +6,10 @@ body{
 }
 
 h1{
-  margin:0px 0px;
-  padding: 0px 0px;
-  font-family:"Times New Roman", Times, serif;  
-  color:#333;
+  margin: 0px;
+  padding: 0px;
+  font-family: "Open Sans", sans-serif;
+  color: rgb(255, 255, 255);
 }
 
 img{border:none;}
@@ -18,32 +18,46 @@ img{border:none;}
   width:100%;
   min-height:1060px;
   height:100%;
-  padding-top:15px;
-  background-color:#888888;
-  background-image:url(pics/background.jpg);
-  background-repeat:repeat-x;
+  padding-top: 1%;
+  background: linear-gradient(to bottom, rgba(45, 92, 136, 1) 0%, rgba(45, 92, 126, 1) 5.49%, rgb(255, 255, 255) 5.5%, rgba(45, 92, 126, 0.15) 100%);
 }
 
 #welcome{
-  min-width:150px;
-  max-width:690px;
-  margin: 0 auto;
-  padding-left:5px;
-  font-family:"Times New Roman", Times, serif;
-  color:#333;
+    min-width: 500px;
+    max-width: 700px;
+    height: 120px;
+    margin: 0px auto;
+    padding:5px;
+    color: #000;
 }
 
 #welcomeText{
-  margin-top:15px;
+  margin-top: 2%;
+  font-family: "Open Sans", sans-serif;
   margin-bottom:15px;
   z-index:1;
 }
 
-#bttnField{
-  min-width:150px;
-  max-width:690px;
-  margin: 0 auto;
-  padding-left:5px;
+#manualButtonField {
+  min-width:500px;
+  max-width:700px;
+  height: 200px;
+  margin: auto;
+}
+
+#popupAnchor{
+  margin: auto;
+}
+
+#generatedButtonField{
+  min-width:500px;
+  max-width:700px;
+  height: 220px;
+  margin: auto;
+}
+
+.fontDefinition {
+    font-family: "Open Sans", sans-serif;
 }
 
 .bttnWrap{
@@ -56,61 +70,84 @@ img{border:none;}
   z-index:2;
 }
 
-.modBttn{
-  margin-bottom:8px;
-  border: solid 2px #000;
- -webkit-box-shadow: 5px 5px 6px rgba(0,0,0,0.6);
+.genericButton{
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 92px;
+    width: 100px;
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+    border: 2px solid rgba(45, 92, 136, 0.5);
+    border-radius: 10px 10px 10px 10px;
+    margin: 20px;
+    transform: translateZ(0);
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+    backface-visibility: hidden;
+    transition-duration: 0.3s;
+    transition-property: transform;
 }
 
-.modBttn:hover{
-  border: solid 2px #FFF;
-  cursor:pointer;
- -webkit-box-shadow: none;
+.genericButton:hover, .genericButton:focus, .genericButton:active {
+    transform: scale(1.15);
+    border: 2px solid rgba(45, 92, 136, 1);
 }
 
-.modBttnHover{
-  margin-bottom:8px;
-  border: solid 2px #FFF;
-  cursor:pointer;
- -webkit-box-shadow: none;
+.welcomTutorialButton {
+    background-image: url(qrc:/org.mitk.gui.qt.welcomescreen/pics/WelcomeMITK.png);
 }
 
-.txtLink{
-  font-family:"Times New Roman", Times, serif;
-  font-size:16px;
-  font-weight:bold;
-  text-decoration:none;
-  cursor:pointer;
-  color:#333;
+.textLink{
+    font-family: "Open Sans", sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    color: #2d5a88;
+    padding-left: 10px;
 }
 
-.txtLink:hover{
-  text-decoration:underline;
+.textLink:hover{
+    text-decoration: underline;
 }
 
-.popUpLink{
-  font-family:"Times New Roman", Times, serif;
-  font-size:14px;
-  font-weight:normal;
-  line-height:16px;
-  color:#333;
+.mitk-logo {
+    background-image: url(qrc:/org.mitk.gui.qt.welcomescreen/pics/button_mitk.png);
+    background-size: 100px;
+    display: inline-block;
+    height: 92px;
+    width: 100px;
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+    border: 2px solid rgba(45, 92, 136, 0.5);
+    border-radius: 10px 10px 10px 10px;
+    margin: 20px;
+    transform: translateZ(0);
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+    backface-visibility: hidden;
+    transition-duration: 0.3s;
+    transition-property: transform;
 }
 
-.popUpLink:hover{
-  text-decoration:underline;
-  cursor:pointer;
+.mitk-logo:hover, .mitk-logo:focus, .mitk-logo:active {
+    transform: scale(1.15);
+    border: 2px solid rgba(45, 92, 136, 1);
 }
 
 #popup{
-  position:fixed;
+  position:relative;
+  margin-left: auto;
+  margin-right: auto;
   max-width:690px;
   min-width:150px;
   background-color:#000000;
   opacity: 0.8;
   -webkit-border-radius: 1em;
-  z-index:3;
-  font-family:Arial, Helvetica, sans-serif;  
+  font-family: "Open Sans", sans-serif;
   color:#FFF;
+  z-index:2;
 }
 
 #bttnClose{
@@ -138,7 +175,7 @@ img{border:none;}
   margin-left:10px;
   margin-right:10px;
   line-height:21px;
-  font-family:Arial, Helvetica, sans-serif;  
+  font-family: "Open Sans", sans-serif;
   font-weight:normal;
   font-size:14px;
   text-align:left;
@@ -153,22 +190,18 @@ img{border:none;}
   text-align:left;
 }
 
-.moduleLink{
-  font-family:Arial, Helvetica, sans-serif;  
-  color:#FFF;
+.popUpLink{
+  font-family: "Open Sans", sans-serif;
+  font-size:14px;
+  font-weight:normal;
+  line-height:16px;
+  padding-left: 10px;
+  color:#333;
 }
 
-.expPic{
-  margin-top:-126px;  
+.popUpLink:hover{
+  text-decoration:underline;
+  cursor:pointer;
 }
 
 .clearfloat{clear:both;}
-
-
-
-
-
-
-
-
-

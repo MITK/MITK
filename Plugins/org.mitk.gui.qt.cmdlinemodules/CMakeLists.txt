@@ -12,7 +12,12 @@ mitk_create_plugin(
 # Copy CTK Qt (designer) plugins to a Qt default path in the MITK bin
 if(MITK_USE_CTK)
   if(EXISTS ${CTK_QTDESIGNERPLUGINS_DIR})
-    set(_bindir ${MITK_BINARY_DIR}/bin)
+
+    if(MACOSX_BUNDLE_NAMES)
+      set(_bindir ${MITK_BINARY_DIR}/bin/MitkWorkbench.app/Contents/MacOS/)
+    else()
+      set(_bindir ${MITK_BINARY_DIR}/bin)
+    endif()
 
     set(_releasedir)
     set(_debugdir)

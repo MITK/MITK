@@ -134,6 +134,7 @@ class UsgJacques(object):
         self.a_ray = 0. / 100.
         self.a_mie = 20. / 100.
         self.b_mie = 1.091
+        self.g = 0.
 
     def __call__(self, wavelength):
         """
@@ -158,12 +159,12 @@ class UsgJacques(object):
         us_ray = self.a_ray * norm_wavelength ** (-4)
         us_mie = self.a_mie * norm_wavelength ** (-self.b_mie)
 
-        us = (us_ray + us_mie)  # * 100. to convert to m^-1
+        us_prime = (us_ray + us_mie)  # * 100. to convert to m^-1
         # actually we calculated the reduced scattering coefficent, so
         # assume g is 0
-        g = 0
+        us = us_prime / (1 - self.g)
 
-        return us, g
+        return us, self.g
 
 
 class UsGMuscle(object):

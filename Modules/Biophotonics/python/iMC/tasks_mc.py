@@ -127,7 +127,7 @@ class CameraBatch(luigi.Task):
         f.close()
         # camera batch creation:
         camera_batch = batch
-        mcmani.fold_by_sliding_average(camera_batch, 11)
+        mcmani.fold_by_sliding_average(camera_batch, 5)
         mcmani.interpolate_wavelengths(camera_batch,
                                        sp.RECORDED_WAVELENGTHS)
         # write it
@@ -163,15 +163,18 @@ class CreateSpectraTask(luigi.Task):
 
         for i in range(batch.nr_elements()):
             self.tissue_model.set_batch_element(batch, i)
-
+            logging.info("running simulation " + str(i) + " for\n" +
+                         str(self.tissue_model))
+            start = time.time()
             # map the wavelengths array to reflectance list
             reflectances = map(self.wavelength_to_reflectance,
                                batch.wavelengths)
+            end = time.time()
             # store in batch_nr
             batch.reflectances[i, :] = np.asarray(reflectances)
             # success!
-            logging.info("successfully ran simulation " + str(i) + " for\n" +
-                         str(self.tissue_model))
+            logging.info("successfully ran simulation in " +
+                         "{:.2f}".format(end - start) + " seconds")
         # convert the lists in batch to np arrays
         batch.reflectances = np.array(batch.reflectances)
         # clean up temporarily created files

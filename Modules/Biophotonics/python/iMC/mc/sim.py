@@ -10,9 +10,10 @@ https://code.google.com/p/gpumcml/
 '''
 
 import os
-import subprocess
 import contextlib
+import logging
 
+import subprocess32
 
 """ helper method to change to the correct path and back again """
 @contextlib.contextmanager
@@ -158,8 +159,12 @@ class SimWrapper(object):
         args = ("./" + mcml_file, "-A", abs_mci_filename)
         # switch to folder where mcml resides in and execute it.
         with cd(mcml_path):
-            popen = subprocess.Popen(args, stdout=subprocess.PIPE)
-            popen.wait()
+            try:
+                popen = subprocess32.Popen(args, stdout=subprocess32.PIPE)
+                popen.wait(timeout=100)
+            except:
+                logging.error("couldn't run simulation")
+                # popen.kill()
 
     def __init__(self):
         pass

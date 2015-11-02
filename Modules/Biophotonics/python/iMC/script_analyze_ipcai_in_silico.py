@@ -10,8 +10,8 @@ import os
 import pickle
 from collections import namedtuple
 import itertools
+import time
 
-import numpy as np
 import luigi
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsRegressor
@@ -20,15 +20,15 @@ import sklearn.svm
 import sklearn.grid_search
 import sklearn.cross_validation
 from sklearn.linear_model import *
+from sklearn.decomposition import PCA
 import scipy.io
 
 import tasks_mc
 import scriptpaths as sp
-from regression.preprocessing import preprocess, normalize
+from regression.preprocessing import preprocess
 from regression.linear import LinearSaO2Unmixing
-from regression.domain_adaptation import estimate_weights, resample
-from regression.estimation import standard_score, SAMDistance
-
+from regression.domain_adaptation import *
+from regression.estimation import standard_score
 
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
@@ -36,7 +36,7 @@ sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
 sp.FINALS_FOLDER = "Images"
 sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
-w_standard = 0.0  # for this evaluation we add 5% noise
+w_standard = 0.05  # for this evaluation we add 5% noise
 
 
 class IPCAICreateInSilicoPlots(luigi.Task):
@@ -54,8 +54,8 @@ EvaluationStruct = namedtuple("EvaluationStruct",
 class TrainingSamplePlots(luigi.Task):
 
     def requires(self):
-        return tasks_mc.CameraBatch("generic_tissue_train"), \
-                tasks_mc.CameraBatch("generic_tissue_test")
+        return tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_train"), \
+                tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_test")
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -74,38 +74,28 @@ class TrainingSamplePlots(luigi.Task):
         # setup structures to save test data
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(),
-                                     [], "red", 0.25),
-                    EvaluationStruct("lasso", LassoCV(), [], "yellow", 0.5)]
+                                     [], "red", 0.5),
+                    EvaluationStruct("random forest", RandomForestRegressor(50, max_depth=30, min_samples_leaf=5,
+                                   n_jobs=-1), [], "green", 0.5)]
         # do  validation
-        nr_training_samples = np.arange(10, 1010, 10).astype(int)
+        nr_training_samples = np.arange(10, 11000, 50).astype(int)
         # not very pythonic, don't care
         for n in nr_training_samples:
             print "nr samples ", str(n)
-            nr_sets = X_train.shape[0] / n
             for e in evaluation_setups:
-                median_sets = []
-                for j in range(nr_sets):
-                    X_j = X_train[j * n:(j * n) + n, :]
-                    y_j = y_train[j * n:(j * n) + n]
-                    lr = e.regressor
-                    lr.fit(X_j, y_j)
-                    # save results
-                    median_sets.append(standard_score(lr, X_test, y_test))
-                e.data.append(np.array(median_sets))
+                X_j = X_train[0:n]
+                y_j = y_train[0:n]
+                lr = e.regressor
+                lr.fit(X_j, y_j)
+                # save results
+                e.data.append(standard_score(lr, X_test, y_test) * 100.)
         # make a nice plot for results
         plt.figure()
         legend_handles = []
         for e in evaluation_setups:
-            plt.fill_between(nr_training_samples,
-                             np.percentile(e.data[0], 25) * 100.,
-                             np.percentile(e.data[0], 75) * 100.,
-                             edgecolor=e.color, facecolor=e.color,
-                             alpha=e.alpha)
             h, = plt.plot(nr_training_samples,
-                          np.median(e.data[0]) * 100., color=e.color,
-                          label=e.regressor.__class__.__name__ +
-                            " final error: " + "{0:.2f}".format(e.median[-1] *
-                                                                100.))
+                          e.data, color=e.color,
+                          label=e.regressor.__class__.__name__)
             legend_handles.append(h)
         minor_ticks_x = np.arange(0, 1000, 50)
         minor_ticks_y = np.arange(5, 16, 0.5)
@@ -310,13 +300,71 @@ class NoisePlots(luigi.Task):
                     bbox_inches='tight')
 
 
+
+class WeightsCalculation(luigi.Task):
+
+    def requires(self):
+        return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
+               tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_train")
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                 sp.RESULTS_FOLDER,
+                                 sp.FINALS_FOLDER,
+                                 "weights.npy"))
+
+    def run(self):
+        # get data
+        f = open(self.input()[0].path, "r")
+        batch_train = pickle.load(f)
+        f = open(self.input()[1].path, "r")
+        batch_da_train = pickle.load(f)
+        X_train, y_train = preprocess(batch_train, w_percent=w_standard,
+                                      magnification=10)
+        X_da_train, y_da_train = preprocess(batch_da_train,
+                                            w_percent=w_standard, magnification=10)
+        X_ws, y_ws = preprocess(batch_train, w_percent=w_standard)
+        weights = estimate_weights_random_forests(X_train, X_da_train, X_ws)
+
+        bvfs = batch_train.layers[0][:, 0]
+        saO2s = batch_train.layers[0][:, 1]
+        a_mies = batch_train.layers[0][:, 2]
+        ds = batch_train.layers[0][:, 4]
+
+        correct_high_weights = np.logical_and(bvfs < 0.10, ds < 1000 * 10 ** -6, ds > 600 * 10 ** -6)
+
+        plt.figure()
+        plt.hist(bvfs, weights=weights, alpha=0.5, label="found_bvfs")
+        plt.hist(bvfs[correct_high_weights], alpha=0.5, label="true_bvfs")
+        plt.title("weight distr bvf")
+        plt.legend(loc='upper right')
+        plt.figure()
+        plt.hist(saO2s, weights=weights, alpha=0.5, label="found_saO2s")
+        plt.hist(saO2s[correct_high_weights], alpha=0.5, label="true_saO2s")
+        plt.title("weight distr saO2")
+        plt.legend(loc='upper right')
+        plt.figure()
+        plt.hist(a_mies, weights=weights, alpha=0.5, label="found_a_mies")
+        plt.hist(a_mies[correct_high_weights], alpha=0.5, label="true_a_mies")
+        plt.title("weight distr a_mie")
+        plt.legend(loc='upper right')
+        plt.figure()
+        plt.hist(ds, weights=weights, alpha=0.5, label="found_ds")
+        plt.hist(ds[correct_high_weights], alpha=0.5, label="true_ds")
+        plt.title("weight distr d")
+        plt.legend(loc='upper right')
+        plt.show()
+
+        np.save(self.output().path, weights)
+
+
 class DAPlots(luigi.Task):
 
     def requires(self):
-        return tasks_mc.CameraBatch("full_bvf_ranges_100_0"), \
-                tasks_mc.CameraBatch("generic_tissue_no_aray_test"), \
-                tasks_mc.CameraBatch("zero_to_ten_bvf_ranges_100_0"), \
-                tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_test")
+        return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
+                tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_train"), \
+                tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_train"), \
+                WeightsCalculation()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -329,136 +377,134 @@ class DAPlots(luigi.Task):
         f = open(self.input()[0].path, "r")
         batch_train = pickle.load(f)
         f = open(self.input()[1].path, "r")
-        batch_test = pickle.load(f)
-        f = open(self.input()[2].path, "r")
         batch_da_train = pickle.load(f)
-        f = open(self.input()[3].path, "r")
+        f = open(self.input()[2].path, "r")
         batch_da_test = pickle.load(f)
-        X_test, y_test = preprocess(batch_test, w_percent=w_standard)
+        weights = np.load(self.input()[3].path)
         X_train, y_train = preprocess(batch_train, w_percent=w_standard)
         X_da_train, y_da_train = preprocess(batch_da_train,
                                                     w_percent=w_standard)
         X_da_test, y_da_test = preprocess(batch_da_test,
                                                   w_percent=w_standard)
-
-#
-#         scipy.io.savemat('/home/wirkert/workspace/matlab/domain_adaptation/GMKLIEP_demo/x_nu', mdict={'arr': normalize(X_da_train)})
-#         scipy.io.savemat('/home/wirkert/workspace/matlab/domain_adaptation/GMKLIEP_demo/x_de', mdict={'arr': normalize(X_train)})
-
-
-#         transformer = PCA(n_components=10)
-#         transformer = sklearn.preprocessing.StandardScaler()
-#         transformer.fit(X_train)
-#         X_train = transformer.fit_transform(X_train)
-#         X_test = transformer.transform(X_test)
-#         X_da_test = transformer.transform(X_da_test)
-#         X_da_train = transformer.transform(X_da_train)
-
+        scipy.io.savemat('/home/wirkert/workspace/matlab/domain_adaptation/GMKLIEP_demo/x_nu', mdict={'arr': X_da_train})
+        scipy.io.savemat('/home/wirkert/workspace/matlab/domain_adaptation/GMKLIEP_demo/x_de', mdict={'arr': X_train})
+        scipy.io.savemat('/home/wirkert/workspace/matlab/domain_adaptation/GMKLIEP_demo/bvf_de', mdict={'arr': batch_train.layers[0][:, 0]})
         # setup structures to save test data
-        # train logistic regression
         kf = sklearn.cross_validation.KFold(X_train.shape[0], 10, shuffle=True)
-        # todo include intercept scaling paramter
         param_grid_svm = [
-          {'C': np.logspace(-2, 8, 11),
-           'kernel':['rbf', 'linear'],
-           'gamma': np.logspace(-6, 3, 10)} ]
-        svm = sklearn.grid_search.GridSearchCV(sklearn.svm.SVR(),
+          {'C': np.logspace(1, 8, 8),
+           'kernel':['rbf'],
+           'gamma': np.logspace(-3, 3, 7),
+           'nu':np.array([0.2, 0.5, 0.7])} ]
+        svm = sklearn.grid_search.GridSearchCV(sklearn.svm.NuSVR(),
                                param_grid_svm, cv=kf, n_jobs=-1)
+        svm = sklearn.svm.SVR(kernel="rbf", degree=3, C=100., gamma=10.)
         # use the random forest regressor
         param_grid_rf = [
           {"n_estimators": np.array([50]),
-           "max_depth": np.arange(5, 30, 2),
-           "min_samples_leaf": np.array([5, 7, 10, 15])}]
+           "max_depth": np.array([30]),  # np.arange(5, 40, 2),
+           "max_features": np.array([8]),  # np.array(range(X_train.shape[1] - 1)) + 1,
+           "min_weight_fraction_leaf": np.array([0.01, 0.03, 0.05, 0.07, 0.1, 0.2])}]  # , 7, 10, 15])}]
         rf = sklearn.grid_search.GridSearchCV(RandomForestRegressor(50,
-                                                    max_depth=10, n_jobs=-1),
+                                                    max_depth=15, n_jobs=-1),
                   param_grid_rf, cv=kf, n_jobs=-1)
         # do not do cv for now to save some time.
-        rf = RandomForestRegressor(50, max_depth=30, min_samples_leaf=5,
-                                   n_jobs=-1)
-        # svm = sklearn.svm.SVR(kernel='linear', C=0.0000001)
+        rf = RandomForestRegressor(20, max_depth=10,  # min_weight_fraction_leaf=0.05,
+                                    n_jobs=-1)
+
 
         evaluation_setups = [
                     EvaluationStruct("classic", LinearSaO2Unmixing(), [],
                                      "red", 0.5)
                     , EvaluationStruct("lr", LinearRegression(), [],
                                        "yellow", 0.5)
-#                     , EvaluationStruct("logr", logr, [],
-#                                        "yellow", 0.5)
-#                     , EvaluationStruct("svr", svm, [],
-#                                        "yellow", 0.5)
-#                     , EvaluationStruct("knn",
-#                                        KNeighborsRegressor(algorithm="ball_tree",
-#                                                            metric="pyfunc",
-#                                             metric_params={"func":SAMDistance}),
-#                                        [], "yellow", 0.5)
-                    # , EvaluationStruct("svm weighting", svm, [], "blue", 0.5)
+                    , EvaluationStruct("knn",
+                                        KNeighborsRegressor(),
+                                        [], "yellow", 0.5)
                     , EvaluationStruct("rf", rf, [], "green", 0.5)
-                    , EvaluationStruct("weighted rf", rf, [], "green", 0.5)
-                    , EvaluationStruct("rf no cov shift", rf, [], "blue", 0.5)
-                    , EvaluationStruct("lr no cov shift", LinearRegression(),
-                                       [], "blue", 0.5)
+                    , EvaluationStruct("svr", svm, [], "yellow", 0.5)
+#                    , EvaluationStruct("weighted rf", rf, [], "green", 0.5)
+                    , EvaluationStruct("weighted svm", svm, [], "yellow", 0.5)
+                     , EvaluationStruct("svm no cov shift", svm, [], "blue", 0.5)
                     ]
-        # estimate weights for domain adaptation
-        weights = estimate_weights(normalize(X_train),
-                                         normalize(X_da_train))
 
-        p90_weights = np.percentile(weights, 90)
-        weights[weights > p90_weights] = p90_weights
-        # X_train = X_train[:X_da_train.shape[0], :]
-        # y_train = y_train[:X_da_train.shape[0]]
 
-#         PE, weights, s = pyRULSIF.R_ULSIF(X_da_train.T, X_train.T, 0, 0.,
-#                          pyRULSIF.sigma_list(X_da_train.T, X_train.T),
-#                          pyRULSIF.lambda_list(), X_da_train.shape[0],
-#                          5)
-        # resample from X according da weighting result
-#
-#         batch_temp = copy.deepcopy(batch_train)
-#         batch_temp2 = copy.deepcopy(batch_train)
-#         batch_temp.reflectances = X_train[0:4, :]
-#
-#         normalizer = Normalizer(norm='l1')
-#         reflectances = batch_train.reflectances
-#         reflectances = normalizer.transform(reflectances)
-#         batch_temp2.reflectances = -np.log(reflectances[0:4, :])
-#         f, axarr = plt.subplots(2, 1)
-#         from mc.plot import plot
-#         plot(batch_temp, axarr[0])
-#         plot(batch_temp2, axarr[1])
-#         plt.show()
+        bvfs = batch_train.layers[0][:, 0]
+        saO2s = batch_train.layers[0][:, 1]
+        a_mies = batch_train.layers[0][:, 2]
+        ds = batch_train.layers[0][:, -1]
 
-        X_resampled, y_resampled, weights = resample(normalize(X_train),
-                                                      y_train, weights)
+#         weights = scipy.io.loadmat("/media/wirkert/data/Data/2015_11_12_IPCAI_in_silico/weights_LHSS.mat")
+#         weights = weights['r']
+#         weights = scipy.io.loadmat("/media/wirkert/data/Data/2015_11_12_IPCAI_in_silico/weights.mat")
+#         weights = weights['wh_x_de']
+#         weights = np.squeeze(weights)
+
+        f, axarr = plt.subplots(X_train.shape[1], 1)
+
+#         X_train, y_train, weights = resample(X_train, y_train, weights, 5000)
+#         pca = PCA(copy=True, n_components=5, whiten=True)
+#         pca.fit(X_train)
+#         X_train = pca.transform(X_train)
+#         X_da_train = pca.transform(X_da_train)
+#         X_da_test = pca.transform(X_da_test)
+        for i in range(X_train.shape[1]):
+            y, binEdges = np.histogram(X_train[:, i], weights=weights)
+            bincenters = 0.5 * (binEdges[1:] + binEdges[:-1])
+            axarr[i].plot(bincenters, y, '-+', label="adapted")
+
+            y, binEdges = np.histogram(X_train[:, i])
+            bincenters = 0.5 * (binEdges[1:] + binEdges[:-1])
+            axarr[i].plot(bincenters, y, '-o', label="original")
+
+            y, binEdges = np.histogram(X_da_train[:, i])
+            bincenters = 0.5 * (binEdges[1:] + binEdges[:-1])
+            axarr[i].plot(bincenters, y, '-*', label="searched")
+
+            axarr[i].set_title("feature " + str(i) + " distribution")
+        plt.legend(loc="best")
+        # plt.tight_layout(h_pad=.5)
+#        plt.show()
+
+#         for i in range(10):
+#             relevant_elements = np.logical_and(bvfs > 0.01 * i,
+#                                                bvfs < 0.01 * (i + 1))
+#             relevant_saO2s = saO2s[relevant_elements]
+#             relevant_weights = weights[relevant_elements]
+#             plt.figure()
+#             plt.hist(relevant_saO2s)  # , weights=relevant_weights)
+#             plt.savefig(self.output().path + "saO2_distribution_" + str(i) +
+#                         ".png")
+
 
         for e in evaluation_setups:
             # train
-            if e.name is "lr no cov shift" or e.name is "rf no cov shift":
-                e.regressor.fit(normalize(X_da_train), y_da_train)
-                # evaluate
-                y_pred = e.regressor.predict(normalize(X_da_test))
-            elif e.name is "weighted rf":
-                e.regressor.fit(normalize(X_resampled), y_resampled)
-                y_pred = e.regressor.predict(normalize(X_da_test))
-            elif e.name is "rf":
-                e.regressor.fit(normalize(X_train), y_train)
-                # evaluate
-                y_pred = e.regressor.predict(normalize(X_da_test))
-                # print e.regressor.best_estimator_
-            elif e.name is "svr":
-                e.regressor.fit(normalize(X_train), y_train)
-                # evaluate
-                y_pred = e.regressor.predict(normalize(X_da_test))
-                print e.regressor.best_estimator_
-            elif e.name is "knn":
-                e.regressor.fit(X_train, y_train)
-                y_pred = e.regressor.predict(X_da_test)
+            start = time.time()
+            if "no cov shift" in e.name:
+                e.regressor.fit(X_da_train[0:-1], y_da_train[0:-1])
+            elif "weighted" in e.name:
+                # print "number of used samples", np.sum(weights > 0.4)
+                # rw = weights > 1.
+                # e.regressor.fit(X_train[rw, :], y_train[rw])
+                e.regressor.fit(X_train, y_train, weights)
+                # tree.export_graphviz(rf.estimators_[0], out_file='tree.dot')
             else:
-                e.regressor.fit(normalize(X_train), y_train)
-                # evaluate
-                y_pred = e.regressor.predict(normalize(X_da_test))
+                e.regressor.fit(X_train, y_train)
+            # print some interesting statistics
+            end = time.time()
+            print "time to train", e.name, ":", str(end - start), "s"
+            if isinstance(e.regressor, sklearn.grid_search.GridSearchCV):
+                print e.regressor.best_estimator_
+
+            # evaluate
+            start = time.time()
+            y_pred = e.regressor.predict(X_da_test)
+            end = time.time()
+            print "time to evaluate ", str(X_da_test.shape[0]), "samples: ", \
+                str(end - start), "s"
+
             # save results
             e.data.append(np.abs(y_pred - y_da_test))
-
         # collect data for boxplot
         boxplot_data = []
         for e in evaluation_setups:

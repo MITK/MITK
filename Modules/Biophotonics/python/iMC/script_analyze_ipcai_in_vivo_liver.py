@@ -177,13 +177,13 @@ class IPCAITrainRegressor(luigi.Task):
                                                     batch_train.reflectances)
         batch_train.wavelengths = batch_train.wavelengths[new_order]
         X, y = preprocess(batch_train,
-                          w_percent=0.1, bands_to_sortout=sp.bands_to_sortout)
+                          w_percent=0.05, bands_to_sortout=sp.bands_to_sortout)
 
         # train regressor
-        reg = RandomForestRegressor(max_depth=30, n_estimators=10,
-                                    min_samples_leaf=5, n_jobs=-1)
+        reg = RandomForestRegressor(max_depth=10, n_estimators=10,
+                                    n_jobs=-1)
         # reg = LinearSaO2Unmixing()
-        reg.fit(normalize(X), y)
+        reg.fit(X, y)
         # reg = LinearSaO2Unmixing()
         # save regressor
         f = self.output().open('w')

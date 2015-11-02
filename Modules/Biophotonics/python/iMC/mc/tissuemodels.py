@@ -71,10 +71,13 @@ class GenericTissue(AbstractTissue):
                            l[element, 1],  # sao2
                            l[element, 2],  # a_mie
                            l[element, 3],  # a_ray
-                           l[element, 4])  # d
+                           l[element, 4],  # d
+                           l[element, 5],  # n
+                           l[element, 6])  # g
 
     def set_layer(self, layer_nr=0,
-                  bvf=None, saO2=None, a_mie=None, a_ray=None, d=None):
+                  bvf=None, saO2=None, a_mie=None, a_ray=None, d=None,
+                  n=None, g=None):
         """Helper function to set one layer."""
         if bvf is None:
             bvf = 0.02
@@ -86,13 +89,19 @@ class GenericTissue(AbstractTissue):
             d = 500. * 10 ** -6
         if a_ray is None:
             a_ray = 0.
+        if n is None:
+            n = 1.38
+        if g is None:
+            g = 0.
         # build obejct for absorption coefficient determination
         self.uas[layer_nr].bvf = bvf
         self.uas[layer_nr].saO2 = saO2
         # and one for scattering coefficient
         self.usgs[layer_nr].a_mie = a_mie
         self.usgs[layer_nr].a_ray = a_ray
+        self.usgs[layer_nr].g = g
         self.ds[layer_nr] = d
+        self.ns[layer_nr] = n
 
     def __str__(self):
         """print the current model"""
@@ -104,7 +113,9 @@ class GenericTissue(AbstractTissue):
                     "%; a_mie: " + "%.2f" % (self.usgs[i].a_mie / 100.) + \
                     "cm^-1; a_ray: " + "%.2f" % (self.usgs[i].a_ray / 100.) + \
                     "cm^-1; b_mie: " + "%.3f" % self.usgs[i].b_mie + \
-                    "; d: " + "%.0f" % (self.ds[i] * 10 ** 6) + "um\n"
+                    "; d: " + "%.0f" % (self.ds[i] * 10 ** 6) + "um" + \
+                    "; n: " + "%.2f" % (self.ns[i]) + \
+                    "; g: " + "%.2f" % (self.usgs[i].g) + "\n"
             model_string += layer_string
         return model_string
 

@@ -6,6 +6,7 @@ Created on Sep 9, 2015
 
 
 import logging
+import datetime
 
 import numpy as np
 import luigi
@@ -20,18 +21,29 @@ sp.ROOT_FOLDER = \
 sp.RESULTS_FOLDER = "mc_data"
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(filename='in_silico' + str(datetime.datetime.now()) +
+                         '.log', level=logging.INFO)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    logger = logging.getLogger()
+    logger.addHandler(ch)
     luigi.interface.setup_interface_logging()
+
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    BATCH_NUMBERS = np.arange(0, 100, 1)
+    BATCH_NUMBERS = np.arange(0, 10, 1)
     for i in BATCH_NUMBERS:
-        main_task = tasks_mc.CreateSpectraTask(
-                                        "zero_to_ten_bvf_ranges_100",
-                                         i,
-                                         100,
-                                         mcfac.VisualizationMcFactory())
+        main_task = tasks_mc.CreateSpectraTask("ipcai_generic", i, 1000,
+                                               mcfac.GenericMcFactory())
         w.add(main_task)
         w.run()
-
+        main_task = tasks_mc.CreateSpectraTask("ipcai_colon_muscle", i, 1000,
+                                               mcfac.ColonMuscleMcFactory())
+        w.add(main_task)
+        w.run()
+        main_task = tasks_mc.CreateSpectraTask("ipcai_generic_", i +
+                                               np.max(BATCH_NUMBERS), 1000,
+                                               mcfac.GenericMcFactory())
+        w.add(main_task)
+        w.run()
 

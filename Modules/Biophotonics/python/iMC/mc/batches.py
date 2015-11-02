@@ -59,7 +59,7 @@ class GenericBatch(AbstractBatch):
         # scales data to lie between maxi and mini instead of 0 and 1
         scale = lambda x, mini, maxi: x * (maxi - mini) + mini
 
-        samples = self.generator(size=(nr_samples, 5))
+        samples = self.generator(size=(nr_samples, 7))
         # scale samples to correct ranges
         samples[:, 0] = scale(samples[:, 0], 0., 1.00)
         # saO2 is the same for each layer, since the blood "diffuses" in tissue
@@ -68,6 +68,8 @@ class GenericBatch(AbstractBatch):
         samples[:, 3] = scale(samples[:, 3], 0.* 100., 60.* 100.) * 0  # a_ray
         # d will be normalized later to 2mm total depth
         samples[:, 4] = scale(samples[:, 4], 0.0, 1.)  # d
+        samples[:, 5] = scale(samples[:, 5], 1.33, 1.54)  # n
+        samples[:, 6] = scale(samples[:, 6], 0.80, 0.95)  # g
         # append as last layer
         self.layers.append(samples)
 
@@ -84,13 +86,12 @@ class GenericBatch(AbstractBatch):
         self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))
         # set all weights to 1
         self.weights = np.ones(nr_samples, dtype=float)
-
         # "normalize" d to 2mm
-        ds = map(lambda x: x[:, -1], self.layers)
+        ds = map(lambda x: x[:, 4], self.layers)
         total_d = reduce(lambda x, y: x + y, ds)
         desired_d = 2000. * 10 ** -6
         for l in self.layers:
-            l[:, -1] = l[:, -1] / total_d * desired_d
+            l[:, 4] = l[:, 4] / total_d * desired_d
 
 
 class GaussianBatch(GenericBatch):
@@ -105,7 +106,7 @@ class GaussianBatch(GenericBatch):
         scale = lambda x, mini, maxi: x * (maxi - mini) + mini
         # rescale gaussian
         scale_gaussian = lambda x, u, sigma: x * sigma + u
-        samples = self.generator(size=(nr_samples, 5))
+        samples = self.generator(size=(nr_samples, 7))
         # scale samples to correct ranges
         # bvf
         samples[:, 0] = np.random.normal(size=nr_samples)
@@ -120,6 +121,8 @@ class GaussianBatch(GenericBatch):
         samples[:, 3] = scale(samples[:, 3], 0.*100., 60.*100.) * 0.
         # d will be normalized later to 2mm total depth
         samples[:, 4] = scale(samples[:, 4], 0., 1.)
+        samples[:, 5] = scale(samples[:, 5], 1.33, 1.54)  # n
+        samples[:, 6] = scale(samples[:, 6], 0.80, 0.95)  # g
         # append as last layer
         self.layers.append(samples)
 
@@ -131,25 +134,22 @@ class ColonMuscleBatch(AbstractBatch):
     def __init__(self):
         super(ColonMuscleBatch, self).__init__()
 
-    def append_one_layer(self, saO2, d_ranges, nr_samples):
+    def append_one_layer(self, saO2, n, d_ranges, nr_samples):
         """helper function to create parameters for one layer"""
         # scales data to lie between maxi and mini instead of 0 and 1
         scale = lambda x, mini, maxi: x * (maxi - mini) + mini
-        # rescale gaussian
-        scale_gaussian = lambda x, u, sigma: x * sigma + u
-        samples = self.generator(size=(nr_samples, 5))
+        samples = self.generator(size=(nr_samples, 7))
         # scale samples to correct ranges
         # bvf
-        samples[:, 0] = np.random.normal(size=nr_samples)
-        samples[:, 0] = np.clip(scale_gaussian(samples[:, 0], 0.04, 0.02),
-                                       0.,
-                                       1.)
+        samples[:, 0] = scale(samples[:, 0], 0., 0.1)
         # saO2 is the same for each layer, since the blood "diffuses" in tissue
         samples[:, 1] = saO2  # saO2
         samples[:, 2] = scale(samples[:, 2], 5.* 100., 30.* 100.)  # a_mie
         samples[:, 3] = scale(samples[:, 3], 0.* 100., 60.* 100.) * 0.  # a_ray
         # d
         samples[:, 4] = scale(samples[:, 4], d_ranges[0], d_ranges[1])  # d
+        samples[:, 5] = n
+        samples[:, 6] = scale(samples[:, 6], 0.80, 0.95)  # g
         # append as last layer
         self.layers.append(samples)
 
@@ -158,13 +158,14 @@ class ColonMuscleBatch(AbstractBatch):
         saO2 is the same in all layers, but all other parameters vary randomly
         within each layer"""
         saO2 = self.generator(size=nr_samples)
+        n = np.ones_like(saO2)
         # create three layers with random samples
         # muscle
-        self.append_one_layer(saO2, (600.*10 ** -6, 1010.*10 ** -6), nr_samples)
+        self.append_one_layer(saO2, n * 1.36, (600.*10 ** -6, 1010.*10 ** -6), nr_samples)
         # submucosa
-        self.append_one_layer(saO2, (415.*10 ** -6, 847.*10 ** -6), nr_samples)
+        self.append_one_layer(saO2, n * 1.36, (415.*10 ** -6, 847.*10 ** -6), nr_samples)
         # mucosa
-        self.append_one_layer(saO2, (395.*10 ** -6, 603.*10 ** -6), nr_samples)
+        self.append_one_layer(saO2, n * 1.38, (395.*10 ** -6, 603.*10 ** -6), nr_samples)
         # create empty reflectances matrix
         self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))
         # set all weights to 1
@@ -175,9 +176,13 @@ class VisualizationBatch(AbstractBatch):
     """batch used for visualization of different spectra. Feel free to adapt
     for your visualization purposes."""
 
-    def append_one_layer(self, bvf, saO2, a_mie, a_ray, d, nr_samples):
+    def __init__(self):
+        super(VisualizationBatch, self).__init__()
+        # self.wavelengths = np.arange(470, 680, 10) * 10 ** -9
+
+    def append_one_layer(self, bvf, saO2, a_mie, a_ray, d, n, g, nr_samples):
         """helper function to create parameters for one layer"""
-        samples = np.zeros((nr_samples, 5))
+        samples = np.zeros((nr_samples, 7))
         # scale samples to correct ranges
         samples[:, 0] = bvf
         samples[:, 1] = saO2
@@ -185,21 +190,28 @@ class VisualizationBatch(AbstractBatch):
         samples[:, 3] = a_ray
         # d will be normalized later to 2mm total depth
         samples[:, 4] = d
+        samples[:, 5] = n
+        samples[:, 6] = g
         # append as last layer
         self.layers.append(samples)
 
     def create_parameters(self, nr_samples):
-        bvf = np.linspace(0.0, .1, nr_samples)
+        # bvf = np.linspace(0.0, .1, nr_samples)
         # saO2 = np.linspace(0., 1., nr_samples)
         # d = np.linspace(175, 735, nr_samples) * 10 ** -6
         # a_mie = np.linspace(5., 30., nr_samples) * 100
         # a_ray = np.linspace(0., 60., nr_samples) * 100
+        # n = np.linspace(1.33, 1.54, nr_samples)
+        g = np.linspace(0, 0.95, nr_samples)
         # create three layers with random samples
-        self.append_one_layer(bvf, 0.7, 30.*100., 0., 500 * 10 ** -6,
+        self.append_one_layer(0.04, 0.7, 30.*100., 0., 500 * 10 ** -6,
+                              1.38, g,
                               nr_samples)
         self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
+                              1.36, g,
                               nr_samples)
         self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
+                              1.36, g,
                               nr_samples)
         # create empty reflectances matrix
         self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))

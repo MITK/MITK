@@ -15,32 +15,29 @@ def preprocess(batch, nr_samples=None, w_percent=None, magnification=None,
                bands_to_sortout=None):
     working_batch = copy.deepcopy(batch)
     mcmani.sortout_bands(working_batch, bands_to_sortout)
-    if w_percent is None:
-        w_percent = 0.
-    if magnification is not None:
-        r_new = batch.reflectances
-        layers_new = working_batch.layers
-        for i in range(magnification - 1):
-            r_new = np.vstack((r_new, batch.reflectances))
-            for i in range(len(layers_new)):
-                layers_new[i] = np.vstack((layers_new[i], batch.layers[i]))
-        working_batch.reflectances = r_new
-        working_batch.layers = layers_new
-
     # extract nr_samples samples from data
     if nr_samples is not None:
         mcmani.select_n(working_batch, nr_samples)
     # get reflectance and oxygenation
-    reflectances = working_batch.reflectances
+    X = working_batch.reflectances
     y = working_batch.layers[0][:, 1]
+    y = y[:, np.newaxis]
+    # do data magnification
+    if magnification is not None:
+        X_temp = X
+        y_temp = y
+        for i in range(magnification - 1):
+            X = np.vstack((X, X_temp))
+            y = np.vstack((y, y_temp))
     # add noise to reflectances
-    if not np.isclose(w_percent, 0.):
+    if w_percent is not None:
         noises = np.random.normal(loc=0., scale=w_percent,
-                                  size=reflectances.shape)
-        reflectances += noises * reflectances
-    reflectances = np.clip(reflectances, 0.00001, 1.)
-    X = reflectances
-    return X, y
+                                  size=X.shape)
+        X += noises * X
+    X = np.clip(X, 0.00001, 1.)
+    # do normalizations
+    X = normalize(X)
+    return X, np.squeeze(y)
 
 def normalize(X):
     # normalize reflectances

@@ -364,6 +364,18 @@ if(MITK_USE_SOFA)
   set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
 endif()
 
+# loggin needs regex and log libraries
+list(FIND MITK_USE_Boost_LIBRARIES regex _result)
+if(_result LESS 0)
+  message("> Adding 'regex' to MITK_USE_Boost_LIBRARIES.")
+  list(APPEND MITK_USE_Boost_LIBRARIES regex)
+endif()
+list(FIND MITK_USE_Boost_LIBRARIES log _result)
+if(_result LESS 0)
+  message("> Adding 'log' to MITK_USE_Boost_LIBRARIES.")
+  list(APPEND MITK_USE_Boost_LIBRARIES log)
+endif()
+
 # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
 if(MITK_USE_Qt5 AND MITK_USE_Python)
   set(minimum_required_python_qt5_version "5.3.0")

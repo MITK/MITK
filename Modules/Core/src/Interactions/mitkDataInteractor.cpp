@@ -53,6 +53,8 @@ void mitk::DataInteractor::SetDataNode(DataNode::Pointer dataNode)
   DataNodeChanged();
 }
 
+
+
 int mitk::DataInteractor::GetLayer() const
 {
   int layer = -1;
@@ -106,4 +108,9 @@ void mitk::DataInteractor::NotifyResultReady()
 
 void mitk::DataInteractor::DataNodeChanged()
 {
+}
+
+void mitk::DataInteractor::DeletedNode()
+{
+  m_DataNode = nullptr;
 }

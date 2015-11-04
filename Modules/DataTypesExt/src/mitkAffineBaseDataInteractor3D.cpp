@@ -266,22 +266,25 @@ mitk::BaseGeometry* mitk::AffineBaseDataInteractor3D::GetUpdatedTimeGeometry(mit
 void mitk::AffineBaseDataInteractor3D::DataNodeChanged()
 {
   mitk::DataNode::Pointer newInputNode = this->GetDataNode();
-  //add default properties
-  newInputNode->AddProperty( selectedColorPropertyName, mitk::ColorProperty::New(0.0,1.0,0.0) );
-  newInputNode->AddProperty( deselectedColorPropertyName, mitk::ColorProperty::New(0.0,0.0,1.0) );
-  newInputNode->AddProperty( translationStepSizePropertyName, mitk::FloatProperty::New(1.0f) );
-  newInputNode->AddProperty( rotationStepSizePropertyName, mitk::FloatProperty::New(1.0f) );
-  newInputNode->AddProperty( scaleStepSizePropertyName, mitk::FloatProperty::New(0.1f) );
-
-  //save the previous color of the node, in order to restore it after the interactor is destroyed
-  mitk::ColorProperty::Pointer priorColor = dynamic_cast<mitk::ColorProperty*>(newInputNode->GetProperty("color"));
-  if ( priorColor.IsNotNull() )
+  if (newInputNode.IsNotNull())
   {
+    //add default properties
+    newInputNode->AddProperty( selectedColorPropertyName, mitk::ColorProperty::New(0.0,1.0,0.0) );
+    newInputNode->AddProperty( deselectedColorPropertyName, mitk::ColorProperty::New(0.0,0.0,1.0) );
+    newInputNode->AddProperty( translationStepSizePropertyName, mitk::FloatProperty::New(1.0f) );
+    newInputNode->AddProperty( rotationStepSizePropertyName, mitk::FloatProperty::New(1.0f) );
+    newInputNode->AddProperty( scaleStepSizePropertyName, mitk::FloatProperty::New(0.1f) );
+
+    //save the previous color of the node, in order to restore it after the interactor is destroyed
+    mitk::ColorProperty::Pointer priorColor = dynamic_cast<mitk::ColorProperty*>(newInputNode->GetProperty("color"));
+    if ( priorColor.IsNotNull() )
+    {
       mitk::ColorProperty::Pointer tmpCopyOfPriorColor = mitk::ColorProperty::New();
       tmpCopyOfPriorColor->SetColor( priorColor->GetColor() );
       newInputNode->AddProperty( priorPropertyName, tmpCopyOfPriorColor );
+    }
+    newInputNode->SetColor(0.0,0.0,1.0);
   }
-  newInputNode->SetColor(0.0,0.0,1.0);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -359,9 +362,9 @@ bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent* interaction
   m_InitialPickedWorldPoint = positionEvent->GetPositionInWorld();
 
   // Get the timestep to also support 3D+t
-   int timeStep = 0;
-   if ((interactionEvent->GetSender()) != NULL)
-     timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  int timeStep = 0;
+  if ((interactionEvent->GetSender()) != NULL)
+    timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of current Geometry3D of the plane
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
@@ -432,10 +435,10 @@ void mitk::AffineBaseDataInteractor3D::RotateObject (StateMachineAction*, Intera
 
     int* size = currentVtkRenderer->GetSize();
     double l2 =
-      (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) *
-      (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) +
-      (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]) *
-      (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]);
+        (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) *
+        (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) +
+        (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]) *
+        (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]);
 
     double rotationAngle = 360.0 * sqrt(l2 / (size[0] * size[0] + size[1] * size[1]));
 

@@ -598,9 +598,6 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
     }
   }
 
-
-
-
   unsigned int* dimensions = new unsigned int[nr_dimensions];
   // fill backwards , nd data saves dimensions in opposite direction
   for( unsigned i = 0; i < nr_dimensions; ++i )
@@ -674,36 +671,106 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
 bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::string& stdvarName )
 {
+
   QString varName = QString::fromStdString( stdvarName );
-
-  bool convert = false;
-  if(image->GetDimension() != 2)
-  {
-    MITK_ERROR << "Only 2D images allowed for OpenCV images";
-    return convert;
-  }
-
-  // try to save mitk image
-  QString fileName = this->GetTempDataFileName( ".bmp" );
-  fileName = QDir::fromNativeSeparators( fileName );
-  MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
-  if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
-  {
-    MITK_ERROR << "Temporary file " << fileName.toStdString() << " could not be created.";
-    return convert;
-  }
-
   QString command;
+  unsigned int* imgDim = image->GetDimensions();
+  int npy_nd = 1;
 
-  command.append( QString("%1 = cv2.imread(\"%2\")\n") .arg( varName ).arg( fileName ) );
+  // access python module
+  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  // global dictionary
+  PyObject *pyDict = PyModule_GetDict(pyMod);
+  mitk::PixelType pixelType = image->GetPixelType();
+  PyObject* npyArray = NULL;
+  mitk::ImageReadAccessor racc(image);
+  void* array = (void*) racc.GetData();
+
+
+
+
+  // save the total number of elements here (since the numpy array is one dimensional)
+  npy_intp* npy_dims = new npy_intp[1];
+  npy_dims[0] = imgDim[0];
+
+  /**
+   * Build a string in the format [1024,1028,1]
+   * to describe the dimensionality. This is needed for simple itk
+   * to know the dimensions of the image
+   */
+  QString dimensionString;
+  dimensionString.append(QString("["));
+  dimensionString.append(QString::number(imgDim[0]));
+  // ToDo: check if we need this
+  for (unsigned i = 1; i < 3; ++i)
+    // always three because otherwise the 3d-geometry gets destroyed
+    // (relevant for backtransformation of simple itk image to mitk.
+  {
+    dimensionString.append(QString(","));
+    dimensionString.append(QString::number(imgDim[i]));
+    npy_dims[0] *= imgDim[i];
+  }
+  dimensionString.append("]");
+
+
+  // the next line is necessary for vectorimages
+  npy_dims[0] *= pixelType.GetNumberOfComponents();
+
+  // default pixeltype: unsigned short
+  NPY_TYPES npy_type  = NPY_USHORT;
+  if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
+    npy_type = NPY_DOUBLE;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT ) {
+    npy_type = NPY_FLOAT;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT) {
+    npy_type = NPY_SHORT;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR ) {
+    npy_type = NPY_BYTE;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::INT ) {
+    npy_type = NPY_INT;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG ) {
+    npy_type = NPY_LONG;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR ) {
+    npy_type = NPY_UBYTE;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT ) {
+    npy_type = NPY_UINT;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG ) {
+    npy_type = NPY_LONG;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT ) {
+    npy_type = NPY_USHORT;
+  }
+  else {
+    MITK_WARN << "not a recognized pixeltype";
+    return false;
+  }
+
+  // creating numpy array
+  import_array1 (true);
+  npyArray = PyArray_SimpleNewFromData(npy_nd,npy_dims,npy_type,array);
+
+  // add temp array it to the python dictionary to access it in python code
+  const int status = PyDict_SetItemString( pyDict,QString("%1_numpy_array")
+                                           .arg(varName).toStdString().c_str(),
+                                           npyArray );
+  // sanity check
+  if ( status != 0 )
+    return false;
+
+  command.append( QString("import numpy as np\n"));
+  command.append( QString("%1_array_tmp=%1_numpy_array.reshape(%2,%3,%4)\n").arg( varName,
+                                                                     QString::number(imgDim[1]),
+                                                                     QString::number(imgDim[0]),
+                                                                     QString::number(pixelType.GetNumberOfComponents())));
+
+  command.append( QString("%1 = %1_array_tmp[:,...,::-1]\n").arg(varName));
+  command.append( QString("del %1_numpy_array\n").arg(varName) );
+  command.append( QString("del %1_array_tmp").arg(varName) );
+
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
-  QFile file(fileName);
-  file.remove();
-  convert = true;
-  return convert;
+  this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+
+  return true;
 }
 
 mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::string& stdvarName )

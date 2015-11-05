@@ -19,16 +19,16 @@
 class mitkOpenIGTLinkClientServerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkOpenIGTLinkClientServerTestSuite);
-  MITK_TEST(Test_OpenAndCloseAndThenReopenAndCloseServer_Successful);
-  /*MITK_TEST(Test_ConnectingOneClientAndOneServer_Successful);
+  MITK_TEST(Test_JustIGTLImpl_OpenAndCloseAndThenReopenAndCloseServer_Successful);
+  MITK_TEST(Test_ConnectingOneClientAndOneServer_Successful);
   MITK_TEST(Test_ConnectingMultipleClientsToOneServer_Successful);
   MITK_TEST(Test_DisconnectionServerFirst_Successful);
   MITK_TEST(Test_SendingMessageFromServerToOneClient_Successful);
-  MITK_TEST(Test_SendingMessageFromServerToMultipleClients_Successful);*/
+  MITK_TEST(Test_SendingMessageFromServerToMultipleClients_Successful);
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  const int PORT = 85353;
+  int PORT = 35352;
   const std::string HOSTNAME = "localhost";
   const std::string SERVER_DEVICE_NAME = "Test Server";
   const std::string CLIENT_ONE_DEVICE_NAME = "Test Client 1";
@@ -49,6 +49,9 @@ public:
     m_Server = mitk::IGTLServer::New(true);
     m_Client_One = mitk::IGTLClient::New(true);
     m_Client_Two = mitk::IGTLClient::New(true);
+
+    //TODO: Delete this line. This is a workaround for BUG 19426 http://bugs.mitk.org/show_bug.cgi?id=19426
+    PORT++;
 
     m_Server->SetObjectName(SERVER_DEVICE_NAME);
     m_Server->SetPortNumber(PORT);
@@ -92,19 +95,19 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The received message did not contain the correct status message.", m_Message == rhs);
   };
 
-  void Test_OpenAndCloseAndThenReopenAndCloseServer_Successful()
+  void Test_JustIGTLImpl_OpenAndCloseAndThenReopenAndCloseServer_Successful()
   {
     igtl::ServerSocket::Pointer server = igtl::ServerSocket::New();
     igtl::ClientSocket::Pointer client = igtl::ClientSocket::New();
 
-    server->CreateServer(44668);
-    client->ConnectToServer("localhost", 44668);
+    server->CreateServer(PORT);
+    client->ConnectToServer("localhost", PORT);
 
     client->CloseSocket();
     server->CloseSocket();
 
-    server->CreateServer(44668);
-    client->ConnectToServer("localhost", 44668);
+    server->CreateServer(++PORT);
+    client->ConnectToServer("localhost", PORT);
 
     client->CloseSocket();
     server->CloseSocket();

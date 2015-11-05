@@ -50,21 +50,15 @@ public:
     m_Client_One = mitk::IGTLClient::New(true);
     m_Client_Two = mitk::IGTLClient::New(true);
 
-    //TODO: Delete this line. This is a workaround for BUG 19426 http://bugs.mitk.org/show_bug.cgi?id=19426
-    PORT++;
-
     m_Server->SetObjectName(SERVER_DEVICE_NAME);
-    m_Server->SetPortNumber(PORT);
     m_Server->SetHostname(HOSTNAME);
     m_Server->SetName(SERVER_DEVICE_NAME);
 
     m_Client_One->SetObjectName(CLIENT_ONE_DEVICE_NAME);
-    m_Client_One->SetPortNumber(PORT);
     m_Client_One->SetHostname(HOSTNAME);
     m_Client_One->SetName(CLIENT_ONE_DEVICE_NAME);
 
     m_Client_Two->SetObjectName(CLIENT_TWO_DEVICE_NAME);
-    m_Client_Two->SetPortNumber(PORT);
     m_Client_Two->SetHostname(HOSTNAME);
     m_Client_Two->SetName(CLIENT_TWO_DEVICE_NAME);
   }
@@ -97,6 +91,11 @@ public:
 
   void Test_JustIGTLImpl_OpenAndCloseAndThenReopenAndCloseServer_Successful()
   {
+    //TODO: Delete this line. This is a workaround for BUG 19426 http://bugs.mitk.org/show_bug.cgi?id=19426
+    m_Server->SetPortNumber(PORT);
+    m_Client_One->SetPortNumber(PORT);
+    m_Client_Two->SetPortNumber(PORT);
+
     igtl::ServerSocket::Pointer server = igtl::ServerSocket::New();
     igtl::ClientSocket::Pointer client = igtl::ClientSocket::New();
 
@@ -118,6 +117,11 @@ public:
 
   void Test_ConnectingOneClientAndOneServer_Successful()
   {
+    //TODO: Delete this line. This is a workaround for BUG 19426 http://bugs.mitk.org/show_bug.cgi?id=19426
+    m_Server->SetPortNumber(PORT + 2);
+    m_Client_One->SetPortNumber(PORT + 2);
+    m_Client_Two->SetPortNumber(PORT + 2);
+
     CPPUNIT_ASSERT_MESSAGE("Could not open Connection with Server", m_Server->OpenConnection());
     CPPUNIT_ASSERT_MESSAGE("Could not connect to Server with first client", m_Client_One->OpenConnection());
 
@@ -127,6 +131,11 @@ public:
 
   void Test_ConnectingMultipleClientsToOneServer_Successful()
   {
+    //TODO: Delete this line. This is a workaround for BUG 19426 http://bugs.mitk.org/show_bug.cgi?id=19426
+    m_Server->SetPortNumber(PORT + 3);
+    m_Client_One->SetPortNumber(PORT + 3);
+    m_Client_Two->SetPortNumber(PORT + 3);
+
     CPPUNIT_ASSERT_MESSAGE("Could not open Connection with Server", m_Server->OpenConnection());
     m_Server->StartCommunication();
 
@@ -143,6 +152,11 @@ public:
 
   void Test_DisconnectionServerFirst_Successful()
   {
+    //TODO: Delete this line. This is a workaround for BUG 19426 http://bugs.mitk.org/show_bug.cgi?id=19426
+    m_Server->SetPortNumber(PORT + 4);
+    m_Client_One->SetPortNumber(PORT + 4);
+    m_Client_Two->SetPortNumber(PORT + 4);
+
     CPPUNIT_ASSERT_MESSAGE("Could not open Connection with Server", m_Server->OpenConnection());
     m_Server->StartCommunication();
     CPPUNIT_ASSERT_MESSAGE("Could not connect to Server with first client", m_Client_One->OpenConnection());
@@ -157,6 +171,11 @@ public:
 
   void Test_SendingMessageFromServerToOneClient_Successful()
   {
+    //TODO: Delete this line. This is a workaround for BUG 19426 http://bugs.mitk.org/show_bug.cgi?id=19426
+    m_Server->SetPortNumber(PORT + 5);
+    m_Client_One->SetPortNumber(PORT + 5);
+    m_Client_Two->SetPortNumber(PORT + 5);
+
     CPPUNIT_ASSERT_MESSAGE("Server not connected to Client.", m_Server->OpenConnection());
     CPPUNIT_ASSERT_MESSAGE("Client 1 not connected to Server.", m_Client_One->OpenConnection());
     m_Server->StartCommunication();
@@ -186,6 +205,11 @@ public:
 
   void Test_SendingMessageFromServerToMultipleClients_Successful()
   {
+    //TODO: Delete this line. This is a workaround for BUG 19426 http://bugs.mitk.org/show_bug.cgi?id=19426
+    m_Server->SetPortNumber(PORT + 6);
+    m_Client_One->SetPortNumber(PORT + 6);
+    m_Client_Two->SetPortNumber(PORT + 6);
+
     CPPUNIT_ASSERT_MESSAGE("Server not connected to Client.", m_Server->OpenConnection());
     m_Server->StartCommunication();
     CPPUNIT_ASSERT_MESSAGE("Client 1 not connected to Server.", m_Client_One->OpenConnection());

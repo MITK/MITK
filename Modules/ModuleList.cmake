@@ -14,6 +14,7 @@ set(mitk_modules
   AlgorithmsExt
   MapperExt
   DICOMReader
+  DICOMReaderServices
   DICOMTesting
   Qt4Qt5TestModule
   SceneSerializationBase

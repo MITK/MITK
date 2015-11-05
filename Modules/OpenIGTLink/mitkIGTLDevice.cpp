@@ -73,8 +73,9 @@ mitk::IGTLDevice::~IGTLDevice()
   if (GetState() == Running)
   {
     this->StopCommunication();
+    this->CloseConnection();
   }
-  if (GetState() == Ready)
+  else if (GetState() == Ready)
   {
     this->CloseConnection();
   }

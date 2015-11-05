@@ -13,15 +13,18 @@
 
 //IGTL
 #include "igtlStatusMessage.h"
+#include "igtlClientSocket.h"
+#include "igtlServerSocket.h"
 
 class mitkOpenIGTLinkClientServerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkOpenIGTLinkClientServerTestSuite);
-  MITK_TEST(Test_ConnectingOneClientAndOneServer_Successful);
+  MITK_TEST(Test_OpenAndCloseAndThenReopenAndCloseServer_Successful);
+  /*MITK_TEST(Test_ConnectingOneClientAndOneServer_Successful);
   MITK_TEST(Test_ConnectingMultipleClientsToOneServer_Successful);
   MITK_TEST(Test_DisconnectionServerFirst_Successful);
   MITK_TEST(Test_SendingMessageFromServerToOneClient_Successful);
-  MITK_TEST(Test_SendingMessageFromServerToMultipleClients_Successful);
+  MITK_TEST(Test_SendingMessageFromServerToMultipleClients_Successful);*/
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -66,10 +69,10 @@ public:
   void tearDown() override
   {
     m_Message.clear();
-    m_Server = NULL;
-    m_Client_One = NULL;
-    m_Client_Two = NULL;
-    m_MessageFactory = NULL;
+    m_Server = nullptr;
+    m_Client_One = nullptr;
+    m_Client_Two = nullptr;
+    m_MessageFactory = nullptr;
   }
 
   void testMessagesEqual(igtl::MessageBase::Pointer sentMessage, igtl::MessageBase::Pointer receivedMessage)
@@ -89,6 +92,27 @@ public:
     CPPUNIT_ASSERT_MESSAGE("The received message did not contain the correct status message.", m_Message == rhs);
   };
 
+  void Test_OpenAndCloseAndThenReopenAndCloseServer_Successful()
+  {
+    igtl::ServerSocket::Pointer server = igtl::ServerSocket::New();
+    igtl::ClientSocket::Pointer client = igtl::ClientSocket::New();
+
+    server->CreateServer(44668);
+    client->ConnectToServer("localhost", 44668);
+
+    client->CloseSocket();
+    server->CloseSocket();
+
+    server->CreateServer(44668);
+    client->ConnectToServer("localhost", 44668);
+
+    client->CloseSocket();
+    server->CloseSocket();
+
+    server = nullptr;
+    client = nullptr;
+  }
+
   void Test_ConnectingOneClientAndOneServer_Successful()
   {
     CPPUNIT_ASSERT_MESSAGE("Could not open Connection with Server", m_Server->OpenConnection());
@@ -102,8 +126,10 @@ public:
   {
     CPPUNIT_ASSERT_MESSAGE("Could not open Connection with Server", m_Server->OpenConnection());
     m_Server->StartCommunication();
+
     CPPUNIT_ASSERT_MESSAGE("Could not connect to Server with first client", m_Client_One->OpenConnection());
     CPPUNIT_ASSERT_MESSAGE("Could not start communication with first client", m_Client_One->StartCommunication());
+
     CPPUNIT_ASSERT_MESSAGE("Could not connect to Server with second client", m_Client_Two->OpenConnection());
     CPPUNIT_ASSERT_MESSAGE("Could not start communication with second client", m_Client_Two->StartCommunication());
 

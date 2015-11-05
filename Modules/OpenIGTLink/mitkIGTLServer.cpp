@@ -34,8 +34,8 @@ IGTLDevice(ReadFully)
 
 mitk::IGTLServer::~IGTLServer()
 {
-  m_ReceiveListMutex = NULL;
-  m_SentListMutex = NULL;
+  m_ReceiveListMutex = nullptr;
+  m_SentListMutex = nullptr;
 }
 
 bool mitk::IGTLServer::OpenConnection()
@@ -202,6 +202,7 @@ void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
       (*i)->CloseSocket();
       //and remove it from the list
       i = this->m_RegisteredClients.erase(i);
+      break;
     }
     else
     {

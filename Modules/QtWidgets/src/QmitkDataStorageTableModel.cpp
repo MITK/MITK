@@ -165,7 +165,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
       if (role == Qt::DisplayRole)
       {
 
-        data = nodeDescriptor->GetClassName();
+          data = nodeDescriptor->GetNameOfClass();
       }
       // show some nice icons for datatype
       else if(role == Qt::DecorationRole)

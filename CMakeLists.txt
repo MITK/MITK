@@ -666,12 +666,6 @@ if(NOT MITK_FAST_TESTING)
   endif()
 endif()
 
-# MITK_VERSION
-set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}")
-if(MITK_VERSION_PATCH STREQUAL "99")
-  set(MITK_VERSION_STRING "${MITK_VERSION_STRING}-${MITK_REVISION_SHORTID}")
-endif()
-
 if(NOT UNIX AND NOT MINGW)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
 endif()
@@ -695,6 +689,12 @@ set(MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME 1)
 
 mitkFunctionGetVersion(${MITK_SOURCE_DIR} MITK)
 mitkFunctionGetVersionDescription(${MITK_SOURCE_DIR} MITK)
+
+# MITK_VERSION
+set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}")
+if(MITK_VERSION_PATCH STREQUAL "99")
+  set(MITK_VERSION_STRING "${MITK_VERSION_STRING}-${MITK_REVISION_SHORTID}")
+endif()
 
 #-----------------------------------------------------------------------------
 # Installation preparation

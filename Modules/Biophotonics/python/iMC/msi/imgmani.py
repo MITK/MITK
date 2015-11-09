@@ -40,7 +40,7 @@ def select_n_reflectances(img, n):
 
 def get_bands(img, bands):
     """get the bands bands (np.array) from the multispectral image.
-    Exampele: image is 2048x2048x8. get_bands(img, [0,3] will return
+    Example: image is 2048x2048x8. get_bands(img, [0,3] will return
     img[:,:,[0,3]]. The advantage of this function is that the image does not
     need to be 2d + wavelength."""
     original_shape = img.shape

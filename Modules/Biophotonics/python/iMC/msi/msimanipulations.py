@@ -8,8 +8,11 @@ Created on Thu Aug 13 13:42:00 2015
 import logging
 import copy
 import numpy as np
+
 from scipy.interpolate import interp1d
+
 from imgmani import collapse_image
+import imgmani
 from msi import Msi
 
 def apply_segmentation(msi, segmentation):
@@ -98,25 +101,11 @@ def image_correction(msi, flatfield, dark):
     flatfield_correction(msi, flatfield_copy)
 
 
-#
-# def filterByFWHM(msi, FWHM):
-#    """
-#    This method is meant for reference data (as e.g. provided by spectrometer
-#    or internet sources) to adapt to imaging filters FWHMs
-#    """
-#    # to account for the FWHM of the used filters, compute convolution
-#    # see http://en.wikipedia.org/wiki/Full_width_at_half_maximum
-#    filterResponse = norm(loc = 0, scale = FWHM / 2.355)
-#    x = np.arange(-60, 60, 2) * 10**-9
-#    filterResponse_table = filterResponse.pdf(x)
-#
-#    # TODO verify if this normalization is correct!
-#    filterResponse_table = filterResponse_table / sum(filterResponse_table)
-#
-#    collapsedImage = collapseImage(msi)
-#    # todo: this is not yet correct!!
-#
-#    for i in range(collapsedImage.shape[0]):
-#        if (collapsedImage[i,:].all() is not np.ma.masked):
-#            collapsedImage[i,:] = np.convolve(collapsedImage[i,:],
-#                filterResponse_table, 'same')
+def get_bands(msi, bands):
+    """
+    TODO SW: document and test
+    """
+    msi.set_image(imgmani.get_bands(msi.get_image(), bands))
+    if msi.get_wavelengths() is not None:
+        msi.set_wavelengths(msi.get_wavelengths()[bands])
+

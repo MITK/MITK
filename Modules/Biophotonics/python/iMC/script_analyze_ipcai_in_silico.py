@@ -35,17 +35,11 @@ sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_silico"
 sp.FINALS_FOLDER = "Images"
 sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
+sp.MC_DATA_FOLDER = "mc_data2"
 
-w_standard = 0.05  # for this evaluation we add 5% noise
+w_standard = 0.1  # for this evaluation we add 5% noise
 
 
-class IPCAICreateInSilicoPlots(luigi.Task):
-
-    def requires(self):
-        return TrainingSamplePlots(), NoisePlots()
-
-    def run(self):
-        pass
 
 EvaluationStruct = namedtuple("EvaluationStruct",
                               "name regressor data color alpha")
@@ -53,15 +47,17 @@ EvaluationStruct = namedtuple("EvaluationStruct",
 
 class TrainingSamplePlots(luigi.Task):
 
+    which = luigi.Parameter()
+
     def requires(self):
-        return tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_train"), \
-                tasks_mc.CameraBatch("colon_muscle_tissue_d_ranges_test")
+        return tasks_mc.CameraBatch("ipcai_" + self.which + "_train"), \
+                tasks_mc.CameraBatch("ipcai_" + self.which + "_test")
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                  sp.RESULTS_FOLDER,
                                  sp.FINALS_FOLDER,
-                                 "samples_plot.png"))
+                                 "samples_plot_" + self.which + ".png"))
     def run(self):
         # get data
         f = open(self.input()[0].path, "r")
@@ -73,15 +69,17 @@ class TrainingSamplePlots(luigi.Task):
         X_train, y_train = preprocess(batch_train, w_percent=w_standard)
         # setup structures to save test data
         evaluation_setups = [
-                    EvaluationStruct("classic", LinearSaO2Unmixing(),
+                    EvaluationStruct("Linear Beer-Lambert", LinearSaO2Unmixing(),
                                      [], "red", 0.5),
-                    EvaluationStruct("random forest", RandomForestRegressor(50, max_depth=30, min_samples_leaf=5,
+                    EvaluationStruct("Proposed", RandomForestRegressor(10,
+                                                            max_depth=10,
+                                                            min_samples_leaf=1,
                                    n_jobs=-1), [], "green", 0.5)]
         # do  validation
-        nr_training_samples = np.arange(10, 11000, 50).astype(int)
+        nr_training_samples = np.arange(10, 10010, 50).astype(int)
         # not very pythonic, don't care
         for n in nr_training_samples:
-            print "nr samples ", str(n)
+            print "number samples ", str(n)
             for e in evaluation_setups:
                 X_j = X_train[0:n]
                 y_j = y_train[0:n]
@@ -95,32 +93,35 @@ class TrainingSamplePlots(luigi.Task):
         for e in evaluation_setups:
             h, = plt.plot(nr_training_samples,
                           e.data, color=e.color,
-                          label=e.regressor.__class__.__name__)
+                          label=e.name)
             legend_handles.append(h)
-        minor_ticks_x = np.arange(0, 1000, 50)
-        minor_ticks_y = np.arange(5, 16, 0.5)
-        plt.gca().set_xticks(minor_ticks_x, minor=True)
-        plt.gca().set_yticks(minor_ticks_y, minor=True)
+        # minor_ticks_x = np.arange(0, 1000, 50)
+        # minor_ticks_y = np.arange(5, 16, 0.5)
+        # plt.gca().set_xticks(minor_ticks_x, minor=True)
+        # plt.gca().set_yticks(minor_ticks_y, minor=True)
         plt.grid()
         plt.legend(handles=legend_handles)
-        plt.title("dependency on training samples")
-        plt.xlabel("nr training samples")
+        plt.title("dependency on number of training samples")
+        plt.xlabel("number of training samples")
         plt.ylabel("absolute error [%]")
-        plt.savefig(self.output().path + "_temp.png",
+        plt.ylim((4, 18))
+        plt.savefig(self.output().path,
                     dpi=500, bbox_inches='tight')
 
 
 class WrongNoisePlots(luigi.Task):
 
+    which = luigi.Parameter()
+
     def requires(self):
-        return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
-                tasks_mc.CameraBatch("generic_tissue_no_aray_test")
+        return tasks_mc.CameraBatch("ipcai_" + self.which + "_train"), \
+                tasks_mc.CameraBatch("ipcai_" + self.which + "_test")
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                  sp.RESULTS_FOLDER,
                                  sp.FINALS_FOLDER,
-                                 "noise_wrong_plot.png"))
+                                 "noise_wrong_plot_" + self.which + ".png"))
 
 
     def run(self):
@@ -131,23 +132,12 @@ class WrongNoisePlots(luigi.Task):
         batch_test = pickle.load(f)
 
         # setup structures to save test data
-        kf = sklearn.cross_validation.KFold(batch_train.reflectances.shape[0],
-                                            10, shuffle=True)
-        param_grid_rf = [
-          {"n_estimators": np.array([50]),
-           "max_depth": np.array([30]),  # np.arange(30, 35, 2),
-           "min_samples_leaf": np.array([5])}]
-        rf = sklearn.grid_search.GridSearchCV(RandomForestRegressor(50,
-                                                    max_depth=10, n_jobs=-1),
-                  param_grid_rf, cv=kf, n_jobs=-1)
+        rf = RandomForestRegressor(10, max_depth=10, n_jobs=-1)
 
         evaluation_setups = [
-                        EvaluationStruct("classic", LinearSaO2Unmixing(), [],
+                        EvaluationStruct("Linear Beer-Lambert", LinearSaO2Unmixing(), [],
                                          "red", 0.25)
-                        , EvaluationStruct("lasso", LassoCV(), [],
-                                           "yellow", 0.5)
-
-                        , EvaluationStruct("rf", rf, [], "green", 0.5)
+                        , EvaluationStruct("Proposed", rf, [], "green", 0.5)
                     ]
         # iterate over different levels of noise
         noise_levels = np.arange(0.00, 1.00, 0.02)
@@ -159,8 +149,6 @@ class WrongNoisePlots(luigi.Task):
             for e in evaluation_setups:
                 lr = e.regressor
                 lr.fit(X_train, y_train)
-                if e.name is "rf":
-                    print lr.best_estimator_
                 y_pred = lr.predict(X_test)
                 # save results
                 errors = np.abs(y_pred - y_test)
@@ -168,6 +156,7 @@ class WrongNoisePlots(luigi.Task):
         # make a nice plot for results
         plt.figure()
         legend_handles = []
+        median0 = 0
         for e in evaluation_setups:
             p25 = lambda x: np.percentile(x, 25) * 100.
             p75 = lambda x: np.percentile(x, 75) * 100.
@@ -181,6 +170,8 @@ class WrongNoisePlots(luigi.Task):
                           map(m, e.data), color=e.color,
                           label=e.name)
             legend_handles.append(h)
+            if e.name is "Proposed":
+                median0 = m(e.data[0])
         minor_ticks = np.arange(0, 80, 5)
         plt.gca().set_xticks(minor_ticks, minor=True)
         plt.gca().set_yticks(minor_ticks, minor=True)
@@ -189,7 +180,8 @@ class WrongNoisePlots(luigi.Task):
                            "{0:.2f}".format(
                                         np.median(evaluation_setups[-1].data[0])
                                         * 100) + "%",
-                           xy=(0, 0.3), xytext=(10, 35), size=10, va="center",
+                           xy=(0, median0), xytext=(10, 35), size=10,
+                           va="center",
                            ha="center", bbox=dict(boxstyle="round4",
                                                   fc="g", alpha=0.5),
                            arrowprops=dict(arrowstyle="-|>",
@@ -199,25 +191,27 @@ class WrongNoisePlots(luigi.Task):
         plt.grid()
         plt.legend(handles=legend_handles)
         plt.title("dependency on wrong training noise [w_training = 10%]")
-        plt.xlabel("noise added [sigma %]")
+        plt.xlabel("noise added for testing [sigma %]")
         plt.ylabel("absolute error [%]")
         plt.ylim((0, 80))
-        plt.savefig(self.output().path + "_temp.png", dpi=500,
+        plt.savefig(self.output().path, dpi=500,
                     bbox_inches='tight')
 
 
 
 class NoisePlots(luigi.Task):
 
+    which = luigi.Parameter()
+
     def requires(self):
-        return tasks_mc.CameraBatch("generic_tissue_no_aray_train"), \
-                tasks_mc.CameraBatch("generic_tissue_no_aray_test")
+        return tasks_mc.CameraBatch("ipcai_" + self.which + "_train"), \
+                tasks_mc.CameraBatch("ipcai_" + self.which + "_test")
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                  sp.RESULTS_FOLDER,
                                  sp.FINALS_FOLDER,
-                                 "noise_plot.png"))
+                                 "noise_plot_" + self.which + ".png"))
 
     def run(self):
         # get data
@@ -227,21 +221,12 @@ class NoisePlots(luigi.Task):
         batch_test = pickle.load(f)
 
         # setup structures to save test data
-        kf = sklearn.cross_validation.KFold(batch_train.reflectances.shape[0],
-                                            10, shuffle=True)
-        param_grid_rf = [
-          {"n_estimators": np.array([50]),
-           "max_depth": np.array([30]),  # np.arange(30, 35, 2),
-           "min_samples_leaf": np.array([5])}]
-        rf = sklearn.grid_search.GridSearchCV(RandomForestRegressor(50,
-                                                    max_depth=10, n_jobs=-1),
-                  param_grid_rf, cv=kf, n_jobs=-1)
+        rf = RandomForestRegressor(10, max_depth=10, n_jobs=-1)
 
         evaluation_setups = [
-                    EvaluationStruct("classic", LinearSaO2Unmixing(), [],
-                                     "red", 0.25),
-                    EvaluationStruct("lasso", LassoCV(), [], "yellow", 0.5)
-                    , EvaluationStruct("rf", rf, [], "green", 0.5)
+                    EvaluationStruct("Linear Beer-Lambert",
+                                     LinearSaO2Unmixing(), [], "red", 0.25)
+                    , EvaluationStruct("Proposed", rf, [], "green", 0.5)
                     ]
         # iterate over different levels of noise
         noise_levels = np.arange(0.00, 1.02, 0.02)
@@ -253,8 +238,6 @@ class NoisePlots(luigi.Task):
             for e in evaluation_setups:
                 lr = e.regressor
                 lr.fit(X_train, y_train)
-                if e.name is "rf":
-                    print lr.best_estimator_
                 y_pred = lr.predict(X_test)
                 # save results
                 errors = np.abs(y_pred - y_test)
@@ -275,6 +258,8 @@ class NoisePlots(luigi.Task):
                           map(m, e.data), color=e.color,
                           label=e.name)
             legend_handles.append(h)
+            if e.name is "Proposed":
+                median0 = m(e.data[0])
         minor_ticks = np.arange(0, 80, 5)
         plt.gca().set_xticks(minor_ticks, minor=True)
         plt.gca().set_yticks(minor_ticks, minor=True)
@@ -283,7 +268,7 @@ class NoisePlots(luigi.Task):
                            "{0:.2f}".format(
                                         np.median(evaluation_setups[-1].data[0])
                                         * 100) + "%",
-                           xy=(0, 0.3), xytext=(10, 35), size=10, va="center",
+                           xy=(0, median0), xytext=(10, 35), size=10, va="center",
                            ha="center", bbox=dict(boxstyle="round4",
                                                   fc="g", alpha=0.5),
                            arrowprops=dict(arrowstyle="-|>",
@@ -296,7 +281,7 @@ class NoisePlots(luigi.Task):
         plt.xlabel("noise added [sigma %]")
         plt.ylabel("absolute error [%]")
         plt.ylim((0, 80))
-        plt.savefig(self.output().path + "_temp.png", dpi=500,
+        plt.savefig(self.output().path, dpi=500,
                     bbox_inches='tight')
 
 
@@ -409,7 +394,7 @@ class DAPlots(luigi.Task):
                                                     max_depth=15, n_jobs=-1),
                   param_grid_rf, cv=kf, n_jobs=-1)
         # do not do cv for now to save some time.
-        rf = RandomForestRegressor(20, max_depth=10,  # min_weight_fraction_leaf=0.05,
+        rf = RandomForestRegressor(10, max_depth=10,  # min_weight_fraction_leaf=0.05,
                                     n_jobs=-1)
 
 
@@ -548,7 +533,11 @@ if __name__ == '__main__':
     luigi.interface.setup_interface_logging()
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    main_task = DAPlots()
-    w.add(main_task)
+    w.add(WrongNoisePlots(which="colon_muscle"))
+    w.add(WrongNoisePlots(which="generic"))
+    w.add(TrainingSamplePlots(which="colon_muscle"))
+    w.add(TrainingSamplePlots(which="generic"))
+    w.add(NoisePlots(which="colon_muscle"))
+    w.add(NoisePlots(which="generic"))
     w.run()
 

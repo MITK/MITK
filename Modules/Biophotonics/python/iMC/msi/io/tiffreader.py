@@ -6,10 +6,7 @@ Created on Sep 28, 2015
 
 
 import os
-import itertools
 
-# PIL always rescales the image, thus PIL and skimage (which uses PIL) cannot
-# be used
 import Image
 import numpy as np
 
@@ -19,7 +16,7 @@ from msi.msi import Msi
 
 class TiffReader(Reader):
     """
-    Assumes bitdepth 16bit.
+    Assumes bitdepth 16bit on a 12bit camera.
     TODO SW: document and test"""
 
     def __init__(self):
@@ -27,7 +24,7 @@ class TiffReader(Reader):
 
 
     def read(self, fileToRead):
-        """ read the msi from pngs.
+        """ read the msi from tiffs.
         The fileToRead is a string prefix, all files starting with this
         prefix will be summarized to one msi"""
 

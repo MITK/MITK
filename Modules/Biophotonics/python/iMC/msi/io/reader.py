@@ -6,6 +6,11 @@ Created on Fri Aug  7 13:39:16 2015
 """
 
 class Reader:
+    """
+    This should be redone. Reader could take care
+    of everything but reading in one image wavelength.
+    This should be specialized for tiffs, pngs, ...
+    """
 
     def __init__(self):
         pass

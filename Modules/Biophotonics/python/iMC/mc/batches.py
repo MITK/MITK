@@ -92,6 +92,7 @@ class GenericBatch(AbstractBatch):
         desired_d = 2000. * 10 ** -6
         for l in self.layers:
             l[:, 4] = l[:, 4] / total_d * desired_d
+            l[l[:,4]<25*10**-6,:] = 25*10**-6
 
 
 class GaussianBatch(GenericBatch):

@@ -5,6 +5,8 @@ Created on Oct 21, 2015
 '''
 
 import math
+import logging
+import time
 
 import numpy as np
 import SimpleITK as sitk
@@ -30,7 +32,11 @@ def estimate_image(msi, regressor):
     collapsed_msi[np.isnan(collapsed_msi)] = 0.
     collapsed_msi[np.isinf(collapsed_msi)] = 0.
 
+    start = time.time()
     estimated_parameters = regressor.predict(collapsed_msi)
+    end = time.time()
+    logging.info("time necessary for estimating image parameters: " +
+        str(end - start) + "s")
     # restore shape
     feature_dimension = 1
     if len(estimated_parameters.shape) > 1:

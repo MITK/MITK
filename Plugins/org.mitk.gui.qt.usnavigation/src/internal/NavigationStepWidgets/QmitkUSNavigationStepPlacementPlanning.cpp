@@ -348,6 +348,7 @@ void QmitkUSNavigationStepPlacementPlanning::OnSetCombinedModality()
 
 void QmitkUSNavigationStepPlacementPlanning::OnFreeze(bool freeze)
 {
+  if (freeze) this->GetCombinedModality()->SetIsFreezed(true);
   if ( freeze )
   {
     // load state machine and event config for data interactor
@@ -362,6 +363,8 @@ void QmitkUSNavigationStepPlacementPlanning::OnFreeze(bool freeze)
   {
     m_PointMarkInteractor->SetDataNode(0);
   }
+
+  if (!freeze) this->GetCombinedModality()->SetIsFreezed(false);
 }
 
 void QmitkUSNavigationStepPlacementPlanning::OnPlaceTargetButtonClicked()

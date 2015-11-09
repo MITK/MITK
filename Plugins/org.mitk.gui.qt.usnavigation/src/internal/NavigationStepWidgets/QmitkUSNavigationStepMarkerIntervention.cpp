@@ -455,10 +455,11 @@ void QmitkUSNavigationStepMarkerIntervention::OnBackToLastTargetClicked()
 
 void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
 {
+  if (freezed) this->GetCombinedModality()->SetIsFreezed(true);
   if ( freezed )
   {
     // load state machine and event config for data interactor
-    m_PointMarkInteractor->LoadStateMachine("USPointMarkInteractions.xml", us::ModuleRegistry::GetModule("USNavigationPlugin"));
+    m_PointMarkInteractor->LoadStateMachine("USPointMarkInteractions.xml", us::ModuleRegistry::GetModule("MitkUS"));
     m_PointMarkInteractor->SetEventConfig("globalConfig.xml");
 
     if ( m_CurrentTargetIndex < 1)
@@ -481,6 +482,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
   {
     m_PointMarkInteractor->SetDataNode(0);
   }
+  if (!freezed) this->GetCombinedModality()->SetIsFreezed(false);
 }
 
 void QmitkUSNavigationStepMarkerIntervention::OnShowPlanningView(bool show)

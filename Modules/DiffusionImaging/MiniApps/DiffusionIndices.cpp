@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMultiThreader.h>
 #include <mitkIOUtil.h>
 
+using namespace std;
+
 /**
  * Calculate indices derived from Qball or tensor images
  */

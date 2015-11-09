@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionIterator.h"
 #include <mitkCommandLineParser.h>
 
+using namespace std;
 
 typedef itk::Image<unsigned char,3 > SeedImage;
 typedef itk::Image<mitk::ScalarType ,3 > FeatureImage;

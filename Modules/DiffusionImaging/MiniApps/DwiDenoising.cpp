@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkProperties.h>
 
+using namespace std;
+
 typedef mitk::Image DiffusionImageType;
 typedef itk::Image<short, 3> ImageType;
 

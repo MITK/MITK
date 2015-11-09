@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 
+using namespace std;
+
 template<int shOrder>
 int StartPeakExtraction(int argc, char* argv[])
 {

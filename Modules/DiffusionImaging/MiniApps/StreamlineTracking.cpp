@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommandLineParser.h"
 #include <mitkCoreObjectFactory.h>
 
+using namespace std;
+
 /*!
 \brief Deterministic tensor-based streamline tractography or TEND tractography (multi tensor possible)
 */

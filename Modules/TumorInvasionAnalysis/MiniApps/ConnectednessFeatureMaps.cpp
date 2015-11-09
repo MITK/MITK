@@ -29,6 +29,8 @@
 #include "itkBinaryErodeImageFilter.h"
 #include "itkFlatStructuringElement.h"
 
+using namespace std;
+
 typedef itk::Image<unsigned char,3> BinaryType;
 typedef itk::Image<mitk::ScalarType,3> ResultType;
 typedef itk::Image< itk::DiffusionTensor3D<float>, 3 > ItkTensorImage;

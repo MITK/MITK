@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+using namespace std;
+
 /*!
 \brief Convert MITK spherical harmonics image type to MRtrix spherical harmonics image
 */

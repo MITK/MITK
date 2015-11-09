@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkResampleImageFilter.h"
 #include "itkResampleDwiImageFilter.h"
 
+using namespace std;
+
 typedef itk::Image<double, 3> InputImageType;
 typedef itk::Image<unsigned char, 3> BinaryImageType;
 

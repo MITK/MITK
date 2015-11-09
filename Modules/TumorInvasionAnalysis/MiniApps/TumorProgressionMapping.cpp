@@ -51,6 +51,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <typeExtension.h>
 
+using namespace std;
+
 typedef unsigned short PixelType;
 typedef double InputPixelType;
 typedef itk::Image<itk::RGBPixel<PixelType>, 2 > RGB2DImage;

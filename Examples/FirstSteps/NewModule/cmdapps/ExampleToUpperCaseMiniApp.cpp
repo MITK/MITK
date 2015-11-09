@@ -48,7 +48,7 @@ int main( int argc, char* argv[] )
   parser.addArgument(
     "verbose", "v", mitkCommandLineParser::Bool, "Verbose Output", "Whether to produce verbose output" );
 
-  map<string, us::Any> parsedArgs = parser.parseArguments( argc, argv );
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments( argc, argv );
   if ( parsedArgs.size() == 0 )
     return EXIT_FAILURE;
 

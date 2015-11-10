@@ -56,7 +56,7 @@ std::vector<itk::SmartPointer<BaseData> > AutoSelectingDICOMReaderService::Read(
     const mitk::DICOMImageBlockDescriptor& desc = reader->GetOutput(i);
     mitk::BaseData::Pointer data = desc.GetMitkImage();
 
-    std::string nodeName = "Unamed_DICOM";
+    std::string nodeName = "Unnamed_DICOM";
 
     std::string studyDescription = desc.GetPropertyAsString("studyDescription");
     std::string seriesDescription = desc.GetPropertyAsString("seriesDescription");

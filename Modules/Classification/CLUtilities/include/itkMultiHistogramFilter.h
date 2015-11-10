@@ -18,6 +18,12 @@ namespace itk
       itkNewMacro (Self);
       itkTypeMacro(MultiHistogramFilter, ImageToImageFilter);
 
+      itkSetMacro(Delta, double);
+      itkGetConstMacro(Delta, double);
+
+      itkSetMacro(Offset, double);
+      itkGetConstMacro(Offset, double);
+
     protected:
       MultiHistogramFilter();
       ~MultiHistogramFilter(){};
@@ -31,6 +37,9 @@ namespace itk
     private:
       MultiHistogramFilter(const Self &); // purposely not implemented
       void operator=(const Self &); // purposely not implemented
+
+      double m_Delta;
+      double m_Offset;
   };
 }
 

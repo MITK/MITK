@@ -167,7 +167,7 @@ void
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-  LocalHistograms(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out)
+  LocalHistograms(itk::Image<TPixel, VImageDimension>* itkImage, std::vector<mitk::Image::Pointer> &out, double offset, double delta)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<double, VImageDimension> FloatImageType;
@@ -175,6 +175,8 @@ void
 
   typename MultiHistogramType::Pointer filter = MultiHistogramType::New();
   filter->SetInput(itkImage);
+  filter->SetOffset(offset);
+  filter->SetDelta(delta);
   filter->Update();
   for (int i = 0; i < VImageDimension; ++i)
   {
@@ -196,7 +198,7 @@ int main(int argc, char* argv[])
   parser.addArgument("difference-of-gaussian","dog",mitkCommandLineParser::String, "Difference of Gaussian Filtering of the input images", "Difference of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("laplace-of-gauss","log",mitkCommandLineParser::String, "Laplacian of Gaussian Filtering", "Laplacian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("hessian-of-gauss","hog",mitkCommandLineParser::String, "Hessian of Gaussian Filtering", "Hessian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
-  parser.addArgument("local-histogram","lh",mitkCommandLineParser::String, "Local Histograms", "Hessian of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
+  parser.addArgument("local-histogram", "lh", mitkCommandLineParser::String, "Local Histograms", "Calculate the local histogram based feature. Specify Offset and Delta, for exampel -3;0.6 ", us::Any());
   // Miniapp Infos
   parser.setCategory("Classification Tools");
   parser.setTitle("Global Image Feature calculator");
@@ -221,15 +223,23 @@ int main(int argc, char* argv[])
   ////////////////////////////////////////////////////////////////
   // CAlculate Gaussian Features
   ////////////////////////////////////////////////////////////////
-  MITK_INFO << "Check for Gaussian...";
+  MITK_INFO << "Check for Local Histogram...";
   if (parsedArgs.count("local-histogram"))
   {
     std::vector<mitk::Image::Pointer> outs;
-    AccessByItk_1(image, LocalHistograms, outs);
-    for (int i= 0; i < outs.size(); ++i)
+    auto ranges = splitDouble(parsedArgs["local-histogram"].ToString(), ';');
+    if (ranges.size() < 2)
     {
-      std::string name = filename + "-lh"+us::any_value_to_string<int>(i)+".nii.gz";
-      mitk::IOUtil::SaveImage(outs[i], name);
+      MITK_INFO << "Missing Delta and Offset for Local Histogram";
+    }
+    else
+    {
+      AccessByItk_3(image, LocalHistograms, outs, ranges[0], ranges[1]);
+      for (int i = 0; i < outs.size(); ++i)
+      {
+        std::string name = filename + "-lh" + us::any_value_to_string<int>(i)+".nii.gz";
+        mitk::IOUtil::SaveImage(outs[i], name);
+      }
     }
   }
 

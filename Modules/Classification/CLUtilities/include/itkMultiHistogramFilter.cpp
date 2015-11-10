@@ -7,7 +7,8 @@
 #include <itkImageIterator.h>
 
 template< class TInputImageType, class TOuputImageType>
-itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MultiHistogramFilter()
+itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MultiHistogramFilter():
+  m_Offset(-3.0), m_Delta(0.6)
 {
   this->SetNumberOfRequiredOutputs(11);
   this->SetNumberOfRequiredInputs(0);
@@ -22,8 +23,8 @@ template< class TInputImageType, class TOuputImageType>
 void
   itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::GenerateData()
 {
-  double offset = -3.0;
-  double delta = 0.6;
+  double offset = m_Offset;// -3.0;
+  double delta = m_Delta;// 0.6;
 
   typedef itk::NeighborhoodIterator<TInputImageType> IteratorType;
   typedef itk::ConstNeighborhoodIterator<TInputImageType> ConstIteratorType;

@@ -6,12 +6,12 @@
 
 \section EnableDisableCrosshair How to disable/re-enable/modify Display Interaction using Microservices
 
-Display Interaction is implemented as EventObservers that are registers as Microservices. This allows them to be queried and modified from
-anywhere in the code. Application scenarios are e.g. you want to disable certain interaction during a task, to avoid any conflicting actions,
-or adapt the behavior to a special tool that is selected.
-One example in the MITK Workbench are the measurement tools. They are desinged to operate on a single slice, such that we do not want the user
-to scroll or move the crosshair once he started a measurement. Once he finished the measurement the usual interaction should be restored.
-The following code demonstares how this is done.
+Display Interaction is implemented as EventObservers that are registered as Microservices. This allows them to be queried and modified from
+anywhere in the code. Application scenarios are e.g. wanting to disable certain interaction during a task, to avoid any conflicting actions,
+or to adapt the behavior to a special tool that is selected.
+One example in the MITK Workbench are the measurement tools. They are designed to operate on a single slice, such that we do not want the user
+to scroll or move the cross-hair once he started a measurement. Once he finished the measurement the usual interaction should be restored.
+The following code demonstrates how this is done.
 
 
 To change the mitk::DisplayInteractors behavior, we first need to set up MicroService capabilities in the module by adding:
@@ -38,7 +38,7 @@ Furthermore, following includes are needed for the code snipped to work:
 
 
 The first code snipped queries the us for the DisplayInteractor and then exchanges its configuration for a minimal version, that does not allow
-scrolling or crosshair actions. The original configuration is stored in a member that allows restoration of the original behavior once
+scrolling or cross-hair actions. The original configuration is stored in a member that allows restoration of the original behavior once
 we're done with our action.
 
 \code

@@ -64,30 +64,30 @@ namespace mitk {
     */
     virtual TimeStepType     CountTimeSteps() const;
     /**
-    * \brief Returns the first time point for which the object is valid.
+    * \brief Returns the first time point for which the time geometry instance is valid.
     *
     * Returns the first valid time point for this geometry. It is the lower time bound of
     * the first step. The time point is given in ms.
     */
     virtual TimePointType    GetMinimumTimePoint () const;
     /**
-    * \brief Returns the last time point for which the object is valid
+    * \brief Returns the last time point for which the time geometry instance is valid
     *
-    * Gives the last time point for which a valid geometrie is saved in
+    * Gives the last time point for which a valid geometry is saved in
     * this time geometry. It is the upper time bound of the last step.
     * The time point is given in ms.
     */
     virtual TimePointType    GetMaximumTimePoint () const;
 
     /**
-    * \brief Returns the first time point for which the object is valid.
+    * \brief Returns the first time point for which the time geometry instance is valid.
     *
     * Returns the first valid time point for the given TimeStep. The time point
     * is given in ms.
     */
     virtual TimePointType    GetMinimumTimePoint(TimeStepType step) const;
     /**
-    * \brief Returns the last time point for which the object is valid
+    * \brief Returns the last time point for which the time geometry instance is valid
     *
     * Gives the last time point for the Geometry specified by the given TimeStep. The time point is given in ms.
     */
@@ -105,7 +105,7 @@ namespace mitk {
     virtual TimeBounds GetTimeBounds(TimeStepType step) const;
 
     /**
-    * \brief Tests if a given time point is covered by this object
+    * \brief Tests if a given time point is covered by this time geometry instance
     *
     * Returns true if a geometry can be returned for the given time
     * point (so it is within GetTimeBounds() and fails if not.
@@ -137,8 +137,8 @@ namespace mitk {
     * the new time step indicates the same geometry as the time point.
     * The associated time step is the last step which lower time bound
     * is smaller or equal then the time point.
-    * If a negativ invalid time point is given always time step 0 is
-    * returned. If an positiv invalid time step is given an invalid
+    * If a negative invalid time point is given always time step 0 is
+    * returned. If an positive invalid time step is given an invalid
     * time step will be returned.
     */
     virtual TimeStepType   TimePointToTimeStep (TimePointType timePoint) const;

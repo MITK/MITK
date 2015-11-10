@@ -30,12 +30,12 @@ typedef std::vector<std::string> DICOMFilePathList;
   All files will be checked if they are DICOM files. All DICOM files will be added to the result and
   returned.
   @remark The helper does no sorting of any kind.*/
-DICOMFilePathList MITKDICOMREADER_EXPORT GetDICOMFilesInSameDirectory(const std::string& filePath);
+DICOMFilePathList GetDICOMFilesInSameDirectory(const std::string& filePath);
 
 /** All passed files will be checked if they are DICOM files.
 All DICOM files will be added to the result and returned.
 @remark The helper does no sorting of any kind.*/
-DICOMFilePathList MITKDICOMREADER_EXPORT FilterForDICOMFiles(const DICOMFilePathList& fileList);
+DICOMFilePathList FilterForDICOMFiles(const DICOMFilePathList& fileList);
 }
 
 #endif // MITKDICOMFILESHELPER_H

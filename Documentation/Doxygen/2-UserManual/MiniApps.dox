@@ -31,6 +31,8 @@ Click 'Window' -> 'Preferences', and select 'Command Line Modules'. You can add 
 Click 'OK' button.
 The configured command line tools are now available via the drop-down box of the Command Line Modules tab.
 
+\warning The build configuration of your MiniApp should match the build configuration of your MITK application. This is especially relevant for developers. Combining a Release application and Debug MiniApp or vice versa might not work.
+
 \section MiniAppExplainPageAvailableList Available MiniApps
 
 \li \subpage DiffusionMiniApps

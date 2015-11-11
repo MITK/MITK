@@ -191,17 +191,19 @@ QmitkRenderWindow* QmitkSimpleExampleView::GetSelectedRenderWindow() const
 
 void QmitkSimpleExampleView::OnTakeHighResolutionScreenshot()
 {
-  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  QString filter;
+  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", QDir::currentPath(), m_PNGExtension + ";;" + m_JPGExtension, &filter);
 
   vtkRenderer* renderer = this->GetSelectedRenderWindow()->GetRenderer()->GetVtkRenderer();
   if (renderer == NULL)
     return;
-  this->TakeScreenshot(renderer, 4, fileName);
+  this->TakeScreenshot(renderer, 4, fileName, filter);
 }
 
 void QmitkSimpleExampleView::OnTakeScreenshot()
 {
-  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  QString filter;
+  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", QDir::currentPath(), m_PNGExtension + ";;" + m_JPGExtension, &filter);
 
   QmitkRenderWindow* renWin = this->GetSelectedRenderWindow();
   if (renWin == NULL)
@@ -210,11 +212,11 @@ void QmitkSimpleExampleView::OnTakeScreenshot()
   vtkRenderer* renderer = renWin->GetRenderer()->GetVtkRenderer();
   if (renderer == NULL)
     return;
-  this->TakeScreenshot(renderer, 1, fileName);
+  this->TakeScreenshot(renderer, 1, fileName, filter);
 }
 
 
-void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName)
+void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName, QString filter)
 {
   if ((renderer == NULL) ||(magnificationFactor < 1) || fileName.isEmpty())
     return;
@@ -222,25 +224,39 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int 
   bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );
   renderer->GetRenderWindow()->DoubleBufferOff();
 
-  vtkImageWriter* fileWriter;
+  vtkImageWriter* fileWriter = nullptr;
 
   QFileInfo fi(fileName);
-  QString suffix = fi.suffix();
-  if (suffix.compare("png", Qt::CaseInsensitive) == 0)
+  QString suffix = fi.suffix().toLower();
+
+  if (suffix.isEmpty() || (suffix != "png" && suffix != "jpg" && suffix != "jpeg"))
   {
-    fileWriter = vtkPNGWriter::New();
+    if (filter == m_PNGExtension)
+    {
+      suffix = "png";
+    }
+    else if (filter == m_JPGExtension)
+    {
+      suffix = "jpg";
+    }
+    fileName += "." + suffix;
   }
-  else  // default is jpeg
+
+  if (suffix.compare("jpg", Qt::CaseInsensitive) == 0 || suffix.compare("jpeg", Qt::CaseInsensitive) == 0)
   {
     vtkJPEGWriter* w = vtkJPEGWriter::New();
     w->SetQuality(100);
     w->ProgressiveOff();
     fileWriter = w;
   }
+  else //default is png
+  {
+    fileWriter = vtkPNGWriter::New();
+  }
+
   vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
   magnifier->SetInput(renderer);
   magnifier->SetMagnification(magnificationFactor);
-  //magnifier->Update();
   fileWriter->SetInputConnection(magnifier->GetOutputPort());
   fileWriter->SetFileName(fileName.toLatin1());
 

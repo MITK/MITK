@@ -53,10 +53,14 @@ void mitk::LevelWindow::EnsureConsistency()
 }
 
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
-  : m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
-  m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
-  m_DefaultLowerBound( -2048.0 ), m_DefaultUpperBound( 4096.0 ),
-  m_Fixed( false ), m_IsFloatingImage(false)
+  : m_LowerWindowBound( level - window / 2.0 ),
+  m_UpperWindowBound( level + window / 2.0 ),
+  m_RangeMin( -2048.0 ),
+  m_RangeMax( 4096.0 ),
+  m_DefaultLowerBound( -2048.0 ),
+  m_DefaultUpperBound( 4096.0 ),
+  m_IsFloatingImage(false),
+  m_Fixed( false )
 {
   SetDefaultLevelWindow(level, window);
   SetLevelWindow(level, window, true);
@@ -69,8 +73,8 @@ mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
   , m_RangeMax( levWin.GetRangeMax() )
   , m_DefaultLowerBound( levWin.GetDefaultLowerBound() )
   , m_DefaultUpperBound( levWin.GetDefaultUpperBound() )
+  , m_IsFloatingImage(levWin.IsFloatingValues())
   , m_Fixed( levWin.GetFixed() )
-  , m_IsFloatingImage( levWin.IsFloatingValues() )
 {
 }
 

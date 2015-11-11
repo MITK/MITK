@@ -806,6 +806,14 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
   mitkImage->SetChannel(py_data->data);
 
+  command.clear();
+
+  command.append( QString("del %1_shape\n").arg(varName) );
+  command.append( QString("del %1_np_array").arg(varName));
+
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+
   return mitkImage;
 }
 

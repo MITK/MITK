@@ -43,6 +43,37 @@ void
 
   typename FilterType::Pointer filter = FilterType::New();
 
+  typename FilterType::OffsetVector::Pointer newOffset = FilterType::OffsetVector::New();
+  auto oldOffsets = filter->GetOffsets();
+  auto oldOffsetsIterator = oldOffsets->Begin();
+  while (oldOffsetsIterator != oldOffsets->End())
+  {
+    bool continueOuterLoop = false;
+    typename FilterType::OffsetType offset = oldOffsetsIterator->Value();
+    for (unsigned int i = 0; i < VImageDimension; ++i)
+    {
+      if (params.m_Direction == i + 2 && offset[i] != 0)
+      {
+        continueOuterLoop = true;
+      }
+    }
+    if (params.m_Direction == 1)
+    {
+      offset[0] = 0;
+      offset[1] = 0;
+      offset[2] = 1;
+      newOffset->push_back(offset);
+      break;
+    }
+
+    oldOffsetsIterator++;
+    if (continueOuterLoop)
+      continue;
+    newOffset->push_back(offset);
+  }
+  filter->SetOffsets(newOffset);
+
+
   // All features are required
   typename FilterType::FeatureNameVectorPointer requestedFeatures = FilterType::FeatureNameVector::New();
   requestedFeatures->push_back(TextureFilterType::ShortRunEmphasis);
@@ -148,7 +179,7 @@ void
 }
 
 mitk::GIFGrayLevelRunLength::GIFGrayLevelRunLength():
-  m_Range(1.0), m_UseCtRange(false)
+m_Range(1.0), m_UseCtRange(false), m_Direction(0)
 {
 }
 
@@ -159,6 +190,7 @@ mitk::GIFGrayLevelRunLength::FeatureListType mitk::GIFGrayLevelRunLength::Calcul
   ParameterStruct params;
   params.m_UseCtRange=m_UseCtRange;
   params.m_Range = m_Range;
+  params.m_Direction = m_Direction;
 
   AccessByItk_3(image, CalculateGrayLevelRunLengthFeatures, mask, featureList,params);
 

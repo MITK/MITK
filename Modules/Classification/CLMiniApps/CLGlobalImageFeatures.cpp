@@ -60,7 +60,8 @@ int main(int argc, char* argv[])
   parser.addArgument("first-order","fo",mitkCommandLineParser::String, "Use First Order Features", "calculates First order based features",us::Any());
   parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
-  parser.addArgument("same-space","sp",mitkCommandLineParser::String,"Bool","Set the spacing of all images to equal. Otherwise an error will be thrown. ",us::Any());
+  parser.addArgument("same-space", "sp", mitkCommandLineParser::String, "Bool", "Set the spacing of all images to equal. Otherwise an error will be thrown. ", us::Any());
+  parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -110,6 +111,12 @@ int main(int argc, char* argv[])
     }
   }
 
+  int direction = 0;
+  if (parsedArgs.count("direction"))
+  {
+    direction = splitDouble(parsedArgs["direction"].ToString(), ';')[0];
+  }
+
   mitk::AbstractGlobalImageFeature::FeatureListType stats;
   ////////////////////////////////////////////////////////////////
   // CAlculate First Order Features
@@ -147,6 +154,7 @@ int main(int argc, char* argv[])
       MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
       mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
       coocCalculator->SetRange(ranges[i]);
+      coocCalculator->SetDirection(direction);
       auto localResults = coocCalculator->CalculateFeatures(image, mask);
       stats.insert(stats.end(), localResults.begin(), localResults.end());
       MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
@@ -165,6 +173,7 @@ int main(int argc, char* argv[])
       MITK_INFO << "Start calculating run-length with number of bins " << ranges[i] << "....";
       mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
       calculator->SetRange(ranges[i]);
+
       auto localResults = calculator->CalculateFeatures(image, mask);
       stats.insert(stats.end(), localResults.begin(), localResults.end());
       MITK_INFO << "Finished calculating run-length with number of bins " << ranges[i] << "....";

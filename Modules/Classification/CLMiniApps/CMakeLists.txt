@@ -19,6 +19,8 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLMRNormalization^^MitkCore_MitkCLUtilities_MitkCLMRUtilities
         CLStaple^^MitkCore_MitkCLUtilities
         CLVoxelFeatures^^MitkCore_MitkCLUtilities
+        CLDicom2Nrrd^^MitkCore
+        CLPolyToNrrd^^MitkCore
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 
@@ -82,14 +84,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     endforeach()
 
   # This mini app does not depend on mitkDiffusionImaging at all
-  mitk_create_executable(CLDicom2Nrrd
-    DEPENDS MitkCore
-    CPP_FILES CLDicom2Nrrd.cpp mitkCommandLineParser.cpp
-  )
-  mitk_create_executable(CLPolyToNrrd
-    DEPENDS MitkCore
-    CPP_FILES CLPolyToNrrd.cpp mitkCommandLineParser.cpp
-  )
+
   #mitk_create_executable(CLGlobalImageFeatures
   #  DEPENDS MitkCore MitkCLUtilities
   #  CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp

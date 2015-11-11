@@ -32,12 +32,17 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   auto oldOffsetsIterator = oldOffsets->Begin();
   while(oldOffsetsIterator != oldOffsets->End())
   {
+    bool continueOuterLoop = false;
     typename FilterType::OffsetType offset = oldOffsetsIterator->Value();
     for (unsigned int i = 0; i < VImageDimension; ++i)
     {
       offset[i] *= config.range;
+      if (config.direction == i + 2 && offset[i] != 0)
+      {
+        continueOuterLoop = true;
+      }
     }
-    if (config.direction = 1)
+    if (config.direction == 1)
     {
       offset[0] = 0;
       offset[1] = 0;
@@ -46,8 +51,12 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
       break;
     }
 
-    newOffset->push_back(offset);
+
     oldOffsetsIterator++;
+    if (continueOuterLoop)
+      continue;
+    newOffset->push_back(offset);
+
   }
   filter->SetOffsets(newOffset);
 

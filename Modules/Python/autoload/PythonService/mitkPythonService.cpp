@@ -671,7 +671,6 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 
 bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::string& stdvarName )
 {
-
   QString varName = QString::fromStdString( stdvarName );
   QString command;
   unsigned int* imgDim = image->GetDimensions();
@@ -685,9 +684,6 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
   PyObject* npyArray = NULL;
   mitk::ImageReadAccessor racc(image);
   void* array = (void*) racc.GetData();
-
-
-
 
   // save the total number of elements here (since the numpy array is one dimensional)
   npy_intp* npy_dims = new npy_intp[1];
@@ -775,36 +771,40 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
 
 mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::string& stdvarName )
 {
+  typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
+  typedef itk::Image< UCRGBPixelType > UCRGBImageType;
+
+  // access python module
+  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  // global dictionarry
+  PyObject *pyDict = PyModule_GetDict(pyMod);
+  mitk::Image::Pointer mitkImage = mitk::Image::New();
+  QString command;
   QString varName = QString::fromStdString( stdvarName );
 
-  mitk::Image::Pointer mitkImage;
-  QString command;
-  QString fileName = GetTempDataFileName( ".bmp" );
-  fileName = QDir::fromNativeSeparators( fileName );
-
-  MITK_DEBUG("PythonService") << "run python command to save image with opencv to " << fileName.toStdString();
-
-  command.append( QString( "cv2.imwrite(\"%1\", %2)\n").arg( fileName ).arg( varName ) );
+  command.append( QString("import numpy as np\n"));
+  command.append( QString("%1_shape=np.asarray(%1.shape)\n").arg(varName) );
+  command.append( QString("%1_np_array=%1[:,...,::-1]\n").arg(varName));
+  command.append( QString("%1_np_array=%1_np_array.reshape(%1.shape[0] * %1.shape[1] * %1.shape[2])").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  try
-  {
-      MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK image";
-      mitkImage = mitk::IOUtil::LoadImage( fileName.toStdString() );
-  }
-  catch(std::exception& e)
-  {
-    MITK_ERROR << e.what();
-  }
+  PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_np_array").arg(varName).toStdString().c_str() );
+  PyArrayObject* shape = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_shape").arg(varName).toStdString().c_str() );
 
-  QFile file(fileName);
-  if( file.exists() )
-  {
-      MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
-      file.remove();
-  }
+  size_t* d = (size_t*)shape->data;
+
+  unsigned int dimensions[3];
+  dimensions[0] = d[1];
+  dimensions[1] = d[0];
+  dimensions[2] = d[2];
+
+  unsigned int nr_dimensions = 2;
+  mitk::PixelType pixelType = MakePixelType<UCRGBImageType>();
+
+  mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
+  mitkImage->SetChannel(py_data->data);
 
   return mitkImage;
 }

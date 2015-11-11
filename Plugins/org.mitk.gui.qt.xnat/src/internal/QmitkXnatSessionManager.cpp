@@ -73,6 +73,7 @@ void QmitkXnatSessionManager::CreateXnatSession()
   profile.setDefault(true);
 
   m_Session = new ctkXnatSession(profile);
+
   if (nodeConnectionPref->Get("Proxy Server Address", "").length() != 0)
   {
     QNetworkProxy proxy;

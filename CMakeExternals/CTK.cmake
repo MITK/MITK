@@ -102,7 +102,7 @@ if(MITK_USE_CTK)
         -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
         # See bug 19073
         -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_36ab9c7c.tar.gz
-        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_4293694a.tar.gz
+        -DqRestAPI_URL:STRING=https://www.dropbox.com/s/ecrg9mc7ytw40li/qRestAPI_db64f424.tar.gz
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS

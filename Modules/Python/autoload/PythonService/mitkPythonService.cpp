@@ -753,7 +753,10 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
     return false;
 
   command.append( QString("import numpy as np\n"));
-  command.append( QString("%1_array_tmp=%1_numpy_array.reshape(%2,%3,%4)\n").arg( varName,
+  //command.append( QString("if '%1' in globals():\n").arg(varName));
+  //command.append( QString("  del %1\n").arg(varName));
+  command.append( QString("%1_array_tmp=%1_numpy_array.copy()\n").arg(varName));
+  command.append( QString("%1_array_tmp=%1_array_tmp.reshape(%2,%3,%4)\n").arg( varName,
                                                                      QString::number(imgDim[1]),
                                                                      QString::number(imgDim[0]),
                                                                      QString::number(pixelType.GetNumberOfComponents())));
@@ -800,7 +803,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   command.append( QString("%1_dtype=%1.dtype.name\n").arg(varName) );
   command.append( QString("%1_shape=np.asarray(%1.shape)\n").arg(varName) );
   command.append( QString("%1_np_array=%1[:,...,::-1]\n").arg(varName));
-  command.append( QString("%1_np_array=%1_np_array.reshape(%1.shape[0] * %1.shape[1] * %1.shape[2])").arg(varName) );
+  command.append( QString("%1_np_array=np.reshape(%1_np_array,%1.shape[0] * %1.shape[1] * %1.shape[2])").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
@@ -875,7 +878,13 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   }
 
   mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
-  mitkImage->SetChannel(py_data->data);
+  //mitkImage->SetChannel(py_data->data);
+
+  {
+    mitk::ImageWriteAccessor ra(mitkImage);
+    char* data = (char*)(ra.GetData());
+    memcpy(data, (void*)py_data->data, dimensions[0] * dimensions[1] * pixelType.GetSize());
+  }
 
   command.clear();
 

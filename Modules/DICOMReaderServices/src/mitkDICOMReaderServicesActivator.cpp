@@ -17,12 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMReaderServicesActivator.h"
 
 #include "mitkAutoSelectingDICOMReaderService.h"
+#include "mitkClassicDICOMSeriesReaderService.h"
 
 namespace mitk {
 
   void DICOMReaderServicesActivator::Load(us::ModuleContext*)
   {
     m_AutoSelectingDICOMReader.reset(new AutoSelectingDICOMReaderService());
+    m_ClassicDICOMSeriesReader.reset(new ClassicDICOMSeriesReaderService());
   }
 
   void DICOMReaderServicesActivator::Unload(us::ModuleContext*)

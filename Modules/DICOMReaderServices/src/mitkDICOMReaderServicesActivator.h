@@ -35,6 +35,7 @@ public:
 private:
 
   std::unique_ptr<IFileReader> m_AutoSelectingDICOMReader;
+  std::unique_ptr<IFileReader> m_ClassicDICOMSeriesReader;
 };
 
 }

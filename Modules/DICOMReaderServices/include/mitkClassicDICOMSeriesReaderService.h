@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKAUTOSELECTINGDICOMREADERSERVICE_H
-#define MITKAUTOSELECTINGDICOMREADERSERVICE_H
+#ifndef MITKCLASSICDICOMSERIESREADERSERVICE_H
+#define MITKCLASSICDICOMSERIESREADERSERVICE_H
 
 #include <mitkBaseDICOMReaderService.h>
 
@@ -25,10 +25,10 @@ namespace mitk {
   Service wrapper that auto selects (using the mitk::DICOMFileReaderSelector) the best DICOMFileReader from
   the DICOMReader module.
   */
-class AutoSelectingDICOMReaderService : public BaseDICOMReaderService
+class ClassicDICOMSeriesReaderService : public BaseDICOMReaderService
 {
 public:
-  AutoSelectingDICOMReaderService();
+  ClassicDICOMSeriesReaderService();
 
 protected:
   /** Returns the reader instance that should be used. The descission may be based
@@ -36,10 +36,10 @@ protected:
   virtual mitk::DICOMFileReader::Pointer GetReader(const mitk::StringList& relevantFiles) const override;
 
 private:
+  virtual ClassicDICOMSeriesReaderService* Clone() const override;
 
-  virtual AutoSelectingDICOMReaderService* Clone() const override;
 };
 
 }
 
-#endif // MITKDICOMSERIESREADERSERVICE_H
+#endif // MITKCLASSICDICOMSERIESREADERSERVICE_H

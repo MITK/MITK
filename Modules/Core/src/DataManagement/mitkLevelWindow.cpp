@@ -453,9 +453,9 @@ bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
     mitk::Equal(this->m_RangeMin, levWin.m_RangeMin, mitk::sqrteps)
     && mitk::Equal(this->m_RangeMax, levWin.m_RangeMax, mitk::sqrteps)
     && mitk::Equal(this->m_DefaultLowerBound, levWin.m_DefaultLowerBound, mitk::sqrteps)
-    && mitk::Equal(this->m_DefaultUpperBound, levWin.GetDefaultUpperBound(), mitk::sqrteps)
-    && mitk::Equal(this->m_LowerWindowBound, levWin.GetLowerWindowBound(), mitk::sqrteps)
-    && mitk::Equal(this->m_UpperWindowBound, levWin.GetUpperWindowBound(), mitk::sqrteps)
+    && mitk::Equal(this->m_DefaultUpperBound, levWin.m_DefaultUpperBound, mitk::sqrteps)
+    && mitk::Equal(this->m_LowerWindowBound, levWin.m_LowerWindowBound, mitk::sqrteps)
+    && mitk::Equal(this->m_UpperWindowBound, levWin.m_UpperWindowBound, mitk::sqrteps)
     && m_Fixed == levWin.IsFixed()
     && m_IsFloatingImage == levWin.IsFloatingValues();
 }

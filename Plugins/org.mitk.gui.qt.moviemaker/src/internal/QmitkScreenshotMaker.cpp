@@ -104,7 +104,10 @@ void QmitkScreenshotMaker::GenerateScreenshot()
 {
     if (m_LastFile.size()==0)
         m_LastFile = QDir::currentPath()+"/screenshot.png";
-    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", m_LastFile, "PNG file (*.png);;JPEG file (*.jpg)");
+
+    QString filter;
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", m_LastFile, m_PNGExtension + ";;" + m_JPGExtension, &filter);
+
     if (fileName.size()>0)
         m_LastFile = fileName;
 
@@ -113,7 +116,7 @@ void QmitkScreenshotMaker::GenerateScreenshot()
 
     if (baserenderer == nullptr)
         return;
-    this->TakeScreenshot(baserenderer->GetVtkRenderer(), 1, fileName);
+    this->TakeScreenshot(baserenderer->GetVtkRenderer(), 1, fileName, filter);
 }
 
 void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
@@ -198,10 +201,13 @@ void QmitkScreenshotMaker::Generate3DHighresScreenshot()
 {
     if (m_LastFile.size()==0)
         m_LastFile = QDir::currentPath()+"/3D_screenshot.png";
-    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", m_LastFile, "PNG file (*.png);;JPEG file (*.jpg)");
+
+    QString filter;
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", m_LastFile, m_PNGExtension + ";;" + m_JPGExtension, &filter);
+
     if (fileName.size()>0)
         m_LastFile = fileName;
-    GenerateHR3DAtlasScreenshots(fileName);
+    GenerateHR3DAtlasScreenshots(fileName, filter);
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -262,14 +268,14 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName)
+void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName, QString filter)
 {
     // only works correctly for 3D RenderWindow
     m_MultiWidget->SetCornerAnnotationVisibility(false);
     vtkRenderer* renderer = m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer();
     if (renderer == nullptr)
         return;
-    this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName);
+    this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName, filter);
     m_MultiWidget->SetCornerAnnotationVisibility(true);
 }
 
@@ -350,7 +356,7 @@ void QmitkScreenshotMaker::StdMultiWidgetNotAvailable()
     m_Parent->setEnabled(false);
 }
 
-void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName)
+void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName, QString filter)
 {
     if ((renderer == nullptr) ||(magnificationFactor < 1) || fileName.isEmpty())
         return;
@@ -358,22 +364,36 @@ void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int ma
     bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );
     renderer->GetRenderWindow()->DoubleBufferOff();
 
-    vtkImageWriter* fileWriter;
+    vtkImageWriter* fileWriter = nullptr;
 
     QFileInfo fi(fileName);
-    QString suffix = fi.suffix();
-    if (suffix.compare("jpg", Qt::CaseInsensitive) == 0)
-    {
-        vtkJPEGWriter* w = vtkJPEGWriter::New();
-        w->SetQuality(100);
-        w->ProgressiveOff();
-        fileWriter = w;
+    QString suffix = fi.suffix().toLower();
 
-    }
-    else  // default is png
+    if (suffix.isEmpty() || (suffix != "png" && suffix != "jpg" && suffix != "jpeg"))
     {
-        fileWriter = vtkPNGWriter::New();
+      if (filter == m_PNGExtension)
+      {
+        suffix = "png";
+      }
+      else if (filter == m_JPGExtension)
+      {
+        suffix = "jpg";
+      }
+      fileName += "." + suffix;
     }
+
+    if (suffix.compare("jpg", Qt::CaseInsensitive) == 0 || suffix.compare("jpeg", Qt::CaseInsensitive) == 0)
+    {
+      vtkJPEGWriter* w = vtkJPEGWriter::New();
+      w->SetQuality(100);
+      w->ProgressiveOff();
+      fileWriter = w;
+    }
+    else //default is png
+    {
+      fileWriter = vtkPNGWriter::New();
+    }
+
     vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
     magnifier->SetInput(renderer);
     magnifier->SetMagnification(magnificationFactor);

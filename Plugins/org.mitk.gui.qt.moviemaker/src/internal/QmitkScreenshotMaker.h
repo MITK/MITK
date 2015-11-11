@@ -111,7 +111,7 @@ private:
   void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
 
   vtkCamera* GetCam();
-  void GenerateHR3DAtlasScreenshots(QString fileName);
+  void GenerateHR3DAtlasScreenshots(QString fileName, QString filter = "");
   void GenerateMultiplanarScreenshots(QString fileName);
 
   /*!
@@ -119,13 +119,15 @@ private:
   \param magnificationFactor specifying the quality of the screenshot (the magnification of the actual RenderWindow size)
   \param fileName file location and name where the screenshot should be saved
   */
-  void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName);
+  void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName, QString filter = "");
 
   QColor m_BackgroundColor;
 
   mitk::DataNode* m_SelectedNode;
   QString           m_LastPath;
   QString           m_LastFile;
+  QString           m_PNGExtension = "PNG File (*.png)";
+  QString           m_JPGExtension = "JPEG File (*.jpg)";
 };
 #endif // !defined(QMITK_ScreenshotMaker_H__INCLUDED)
 

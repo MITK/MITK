@@ -147,7 +147,7 @@ namespace mitk {
     /**!
     * \brief sets level/window to optimize the contrast of the given Image
     */
-    void SetAuto(const Image* image, bool tryPicTags = true, bool guessByCentralSlice = true);
+    void SetAuto(const Image* image, bool tryPicTags = true, bool guessByCentralSlice = true, unsigned selectedComponent=0);
 
     /**!
     * \brief sets level/window to the min/max greyvalues of the given Image

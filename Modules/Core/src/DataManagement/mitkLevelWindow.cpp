@@ -433,7 +433,7 @@ bool mitk::LevelWindow::IsFixed() const
   return m_Fixed;
 }
 
-bool mitk::LevelWindow::operator==(const mitk::LevelWindow& other) const
+bool mitk::LevelWindow::IsFloatingValues() const
 {
   return m_IsFloatingImage;
 }
@@ -446,16 +446,14 @@ void mitk::LevelWindow::SetFloatingValues(bool value)
 bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {
   return
-       mitk::Equal(this->m_RangeMin, other.m_RangeMin, mitk::sqrteps)
-    && mitk::Equal(this->m_RangeMax, other.m_RangeMax, mitk::sqrteps)
-    m_DefaultLowerBound == levWin.GetDefaultLowerBound() && m_DefaultUpperBound == levWin.GetDefaultUpperBound() && m_Fixed == levWin.IsFixed() &&
-    m_IsFloatingImage == levWin.IsFloatingValues() ) {
-    && mitk::Equal(this->m_DefaultLowerBound, other.m_DefaultLowerBound, mitk::sqrteps)
-  }
-    && m_Fixed == other.m_Fixed;
-  else {
-    return false;
-  }
+    mitk::Equal(this->m_RangeMin, levWin.m_RangeMin, mitk::sqrteps)
+    && mitk::Equal(this->m_RangeMax, levWin.m_RangeMax, mitk::sqrteps)
+    && mitk::Equal(this->m_DefaultLowerBound, levWin.m_DefaultLowerBound, mitk::sqrteps)
+    && mitk::Equal(this->m_DefaultUpperBound, levWin.GetDefaultUpperBound(), mitk::sqrteps)
+    && mitk::Equal(this->m_LowerWindowBound, levWin.GetLowerWindowBound(), mitk::sqrteps)
+    && mitk::Equal(this->m_UpperWindowBound, levWin.GetUpperWindowBound(), mitk::sqrteps)
+    && m_Fixed == levWin.IsFixed()
+    && m_IsFloatingImage == levWin.IsFloatingValues();
 }
 
 bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const

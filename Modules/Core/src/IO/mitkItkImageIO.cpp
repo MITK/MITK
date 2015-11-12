@@ -36,8 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-const std::string PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
-const std::string PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
+const char * const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
+const char * const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
 
 ItkImageIO::ItkImageIO(const ItkImageIO& other)
   : AbstractFileIO(other)

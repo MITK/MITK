@@ -223,7 +223,9 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
   private:
     PERSISTENCE_GET_SERVICE_METHOD_MACRO
 
-    mitk::TrackingDeviceTypeCollection m_DeviceTypeCollection;
+    mitk::TrackingDeviceTypeCollection* m_DeviceTypeCollection;
+
+    QWidget* GetConfigurationWidgetForDeviceType(const mitk::TrackingDeviceType& type);
 
 };
 

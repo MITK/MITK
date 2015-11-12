@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkIOUtil.h>
 
+#include "mitkUnspecifiedTrackingTypeInformation.h"
+#include "mitkTrackingDeviceTypeCollection.h"
 
 
 mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
@@ -41,10 +43,16 @@ mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
   m_Data = mitk::DeviceDataUnspecified;
 }
 
-
 void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Pointer tracker)
 {
-  this->m_Data = mitk::GetFirstCompatibleDeviceDataForLine(tracker->GetType());
+  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = us::GetModuleContext()->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
+  if (refs.empty())
+  {
+    MITK_ERROR << "No tracking device service found!";
+  }
+  mitk::TrackingDeviceTypeCollection* deviceTypeCollection = us::GetModuleContext()->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
+
+  this->m_Data = deviceTypeCollection->GetFirstCompatibleDeviceDataForLine(tracker->GetType());
 }
 
 void mitk::TrackingVolumeGenerator::GenerateData()
@@ -97,7 +105,14 @@ void mitk::TrackingVolumeGenerator::GenerateData()
 
 void mitk::TrackingVolumeGenerator::SetTrackingDeviceType(mitk::TrackingDeviceType deviceType)
 {
-  m_Data = mitk::GetFirstCompatibleDeviceDataForLine(deviceType);
+  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = us::GetModuleContext()->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
+  if (refs.empty())
+  {
+    MITK_ERROR << "No tracking device service found!";
+  }
+  mitk::TrackingDeviceTypeCollection* deviceTypeCollection = us::GetModuleContext()->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
+
+  m_Data = deviceTypeCollection->GetFirstCompatibleDeviceDataForLine(deviceType);
 }
 
 mitk::TrackingDeviceType mitk::TrackingVolumeGenerator::GetTrackingDeviceType() const

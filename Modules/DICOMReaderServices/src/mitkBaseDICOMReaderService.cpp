@@ -45,7 +45,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
   for (unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i)
   {
     const mitk::DICOMImageBlockDescriptor& desc = reader->GetOutput(i);
-    mitk::BaseData::Pointer data = desc.GetMitkImage();
+    mitk::BaseData::Pointer data = desc.GetMitkImage().GetPointer();
 
     std::string nodeName = "Unnamed_DICOM";
 

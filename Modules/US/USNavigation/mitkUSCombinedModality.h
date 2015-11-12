@@ -252,5 +252,4 @@ namespace mitk {
     us::ServiceProperties                   m_ServiceProperties;
   };
 } // namespace mitk
-
 #endif // MITKUSCombinedModality_H_HEADER_INCLUDED_

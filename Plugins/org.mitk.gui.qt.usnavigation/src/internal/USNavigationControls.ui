@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+  <class>USNavigationControls</class>
+  <widget class="QWidget" name="USNavigationControls">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>360</width>
+        <height>330</height>
+      </rect>
+    </property>
+    <property name="minimumSize">
+      <size>
+        <width>0</width>
+        <height>0</height>
+      </size>
+    </property>
+    <property name="windowTitle">
+      <string>QmitkTemplate</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+        <widget class="QTabWidget" name="m_TabWidget">
+          <property name="currentIndex">
+            <number>0</number>
+          </property>
+          <widget class="QWidget" name="Devices">
+            <attribute name="title">
+              <string>Devices</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+                <widget class="QLabel" name="label_3">
+                  <property name="font">
+                    <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                      <underline>true</underline>
+                    </font>
+                  </property>
+                  <property name="text">
+                    <string>Step 1:</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="label_4">
+                  <property name="text">
+                    <string>
+                      &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+                      &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+                      p, li { white-space: pre-wrap; }
+                      &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+                      &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Please select an ultrasound device and a tracking device from the list above. These devices will be used to perform the procedure. Both devices must be active to appear on their respective List. Optionally, you may load a calibration file along with the ultrasound device.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                    </string>
+                  </property>
+                  <property name="wordWrap">
+                    <bool>true</bool>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <spacer name="verticalSpacer">
+                  <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                    <size>
+                      <width>20</width>
+                      <height>10</height>
+                    </size>
+                  </property>
+                </spacer>
+              </item>
+              <item>
+                <widget class="QLabel" name="label_13">
+                  <property name="font">
+                    <font>
+                      <pointsize>14</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                    </font>
+                  </property>
+                  <property name="text">
+                    <string>Device Selection:</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QmitkUSNavigationStepCombinedModality" name="m_CombinedModalitySelectionWidget" native="true"/>
+              </item>
+              <item>
+                <widget class="QPushButton" name="m_BtnSelectDevices">
+                  <property name="enabled">
+                    <bool>false</bool>
+                  </property>
+                  <property name="minimumSize">
+                    <size>
+                      <width>0</width>
+                      <height>50</height>
+                    </size>
+                  </property>
+                  <property name="text">
+                    <string>Select Combined Modality</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <spacer name="spacer1">
+                  <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                    <enum>QSizePolicy::Expanding</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                    <size>
+                      <width>20</width>
+                      <height>220</height>
+                    </size>
+                  </property>
+                </spacer>
+              </item>
+            </layout>
+          </widget>
+          <widget class="QWidget" name="tab">
+            <attribute name="title">
+              <string>Zoning</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+                <widget class="QLabel" name="label_14">
+                  <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                    </sizepolicy>
+                  </property>
+                  <property name="font">
+                    <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                      <underline>true</underline>
+                    </font>
+                  </property>
+                  <property name="text">
+                    <string>Step 2:</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="label_15">
+                  <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                    </sizepolicy>
+                  </property>
+                  <property name="text">
+                    <string>
+                      &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+                      &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+                      p, li { white-space: pre-wrap; }
+                      &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+                      &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Mark risk struktures by navigating to them with the ultrasound probe. Once located, press freeze. Mark the structures by clicking in the center, moving the mouse till the size is acceptable and clicking again to fix the size. You may then change the zone's color and size. Repeat until satisfied. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                    </string>
+                  </property>
+                  <property name="wordWrap">
+                    <bool>true</bool>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <spacer name="verticalSpacer_4">
+                  <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeType">
+                    <enum>QSizePolicy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                    <size>
+                      <width>20</width>
+                      <height>10</height>
+                    </size>
+                  </property>
+                </spacer>
+              </item>
+              <item>
+                <widget class="QPushButton" name="m_BtnFreeze">
+                  <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                    </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                    <size>
+                      <width>0</width>
+                      <height>50</height>
+                    </size>
+                  </property>
+                  <property name="text">
+                    <string>Freeze Image</string>
+                  </property>
+                  <property name="checkable">
+                    <bool>true</bool>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="label">
+                  <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                    </sizepolicy>
+                  </property>
+                  <property name="text">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:11pt; font-weight:600;&quot;&gt;Current Zones:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QmitkUSZoneManagementWidget" name="m_ZonesWidget" native="true">
+                  <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                    </sizepolicy>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QPushButton" name="m_BtnStartIntervention">
+                  <property name="minimumSize">
+                    <size>
+                      <width>0</width>
+                      <height>50</height>
+                    </size>
+                  </property>
+                  <property name="font">
+                    <font>
+                      <pointsize>12</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                    </font>
+                  </property>
+                  <property name="text">
+                    <string>Start Intervention</string>
+                  </property>
+                </widget>
+              </item>
+            </layout>
+          </widget>
+          <widget class="QWidget" name="tab_4">
+            <attribute name="title">
+              <string>Intervention</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+                <widget class="QLabel" name="label_10">
+                  <property name="font">
+                    <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                      <underline>true</underline>
+                    </font>
+                  </property>
+                  <property name="text">
+                    <string>Step 3:</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QLabel" name="label_11">
+                  <property name="text">
+                    <string>
+                      &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+                      &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+                      p, li { white-space: pre-wrap; }
+                      &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+                      &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;When all the previous steps are completed, click &amp;quot;Start Intervention&amp;quot; to proceed. When done, click &amp;quot;Stop Intervention&amp;quot; to finsih. No further input is required at this stage. You may stop the intervention to go back and change parameters at any time.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                    </string>
+                  </property>
+                  <property name="wordWrap">
+                    <bool>true</bool>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QPushButton" name="m_BtnReset">
+                  <property name="minimumSize">
+                    <size>
+                      <width>0</width>
+                      <height>50</height>
+                    </size>
+                  </property>
+                  <property name="text">
+                    <string>Stop and Reset</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QPushButton" name="m_BtnNeedleView">
+                  <property name="minimumSize">
+                    <size>
+                      <width>0</width>
+                      <height>50</height>
+                    </size>
+                  </property>
+                  <property name="text">
+                    <string>NeedleView</string>
+                  </property>
+                  <property name="checkable">
+                    <bool>true</bool>
+                  </property>
+                  <property name="checked">
+                    <bool>false</bool>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <widget class="QGroupBox" name="m_RangeBox">
+                  <property name="title">
+                    <string>Zone Range</string>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <spacer name="verticalSpacer_3">
+                  <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                    <size>
+                      <width>20</width>
+                      <height>40</height>
+                    </size>
+                  </property>
+                </spacer>
+              </item>
+            </layout>
+          </widget>
+        </widget>
+      </item>
+    </layout>
+  </widget>
+  <layoutdefault spacing="6" margin="11"/>
+  <customwidgets>
+    <customwidget>
+      <class>QmitkUSZoneManagementWidget</class>
+      <extends>QWidget</extends>
+      <header>src/internal/Widgets/QmitkUSZoneManagementWidget.h</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>QmitkUSNavigationStepCombinedModality</class>
+      <extends>QWidget</extends>
+      <header>src/internal/NavigationStepWidgets/QmitkUSNavigationStepCombinedModality.h</header>
+      <container>1</container>
+    </customwidget>
+  </customwidgets>
+  <resources/>
+  <connections/>
+</ui>

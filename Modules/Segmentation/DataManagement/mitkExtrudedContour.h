@@ -42,6 +42,12 @@ namespace mitk {
 //## The m_Contour is extruded in the direction m_Vector until
 //## reaching m_ClippingGeometry.
 //## @ingroup Data
+
+/**
+* \deprecatedSince{2015_05} ExtrudedContour is deprecated. It will be removed in the next release.
+*  Becomes obsolete. Refer to http://docs.mitk.org/nightly/InteractionMigration.html .
+*/
+
 class MITKSEGMENTATION_EXPORT ExtrudedContour : public BoundingObject
 {
 public:

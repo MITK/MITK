@@ -28,7 +28,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
 
 mitk::NavigationDataRecorder::~NavigationDataRecorder()
 {
-  mitk::IGTTimeStamp::GetInstance()->Stop(this);
+  //mitk::IGTTimeStamp::GetInstance()->Stop(this); //commented out because of bug 18952
 }
 
 void mitk::NavigationDataRecorder::GenerateData()

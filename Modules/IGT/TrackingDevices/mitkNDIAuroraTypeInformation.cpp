@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  NDIPAuroraTypeInformation::NDIPAuroraTypeInformation()
+  NDIAuroraTypeInformation::NDIAuroraTypeInformation()
   {
     m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_AURORA;
     m_TrackingDeviceData.push_back(DeviceDataAuroraCompact);
@@ -30,12 +30,12 @@ namespace mitk
     m_TrackingDeviceData.push_back(DeviceDataAuroraTabletop);
   }
 
-  NDIPAuroraTypeInformation::~NDIPAuroraTypeInformation()
+  NDIAuroraTypeInformation::~NDIAuroraTypeInformation()
   {
 
   }
 
-  mitk::TrackingDeviceSource::Pointer NDIPAuroraTypeInformation::CreateTrackingDeviceSource(
+  mitk::TrackingDeviceSource::Pointer NDIAuroraTypeInformation::CreateTrackingDeviceSource(
       mitk::TrackingDevice::Pointer trackingDevice,
       mitk::NavigationToolStorage::Pointer navigationTools,
       std::string* errorMessage,

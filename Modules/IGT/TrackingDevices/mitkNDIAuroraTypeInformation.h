@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKIGT_EXPORT NDIPAuroraTypeInformation : public TrackingDeviceTypeInformation
+
+
   //############## NDI Aurora device data #############
   static TrackingDeviceData DeviceDataAuroraCompact = {TRACKING_DEVICE_IDENTIFIER_AURORA, "Aurora Compact", "NDIAuroraCompactFG_Dome.stl", "A"};
   static TrackingDeviceData DeviceDataAuroraPlanarCube = {TRACKING_DEVICE_IDENTIFIER_AURORA, "Aurora Planar (Cube)", "NDIAurora.stl", "9"};
@@ -32,10 +33,12 @@ namespace mitk
   // The following entry is for the tabletop prototype, which had an lower barrier of 8cm. The new version has a lower barrier of 12cm.
   //static TrackingDeviceData DeviceDataAuroraTabletopPrototype = {NDIAurora, "Aurora Tabletop Prototype", "NDIAuroraTabletopFG_Prototype_Dome.stl"};
 
+
+  class MITKIGT_EXPORT NDIAuroraTypeInformation : public TrackingDeviceTypeInformation
   {
     public:
-      NDIPAuroraTypeInformation();
-      virtual ~NDIPAuroraTypeInformation();
+      NDIAuroraTypeInformation();
+      virtual ~NDIAuroraTypeInformation();
 
       virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
                                                                        mitk::NavigationToolStorage::Pointer navigationTools,

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 #include <itkCommand.h>
 #include <igtlTrackingDataMessage.h>
+#include <mitkOpenIGTLinkTypeInformation.h>
 
 //sleep headers
 #include <chrono>

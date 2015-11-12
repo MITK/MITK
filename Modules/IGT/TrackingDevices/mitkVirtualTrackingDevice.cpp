@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 #include <random>
 
+#include <mitkVirtualTrackerTypeInformation.h>
+
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 

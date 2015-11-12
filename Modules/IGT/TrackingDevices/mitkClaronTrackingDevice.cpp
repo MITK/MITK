@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <iostream>
 #include <itkMutexLockHolder.h>
+#include <mitkMicronTrackerTypeInformation.h>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 

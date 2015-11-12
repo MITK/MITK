@@ -34,9 +34,10 @@ namespace mitk
       explicit UnspecifiedTrackingTypeInformation();
       virtual ~UnspecifiedTrackingTypeInformation();
 
-      virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
-                                                                       mitk::NavigationToolStorage::Pointer navigationTools,
-                                                                       std::string* errorMessage, std::vector<int>*) { return nullptr; }
+      virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer,
+                                                                       mitk::NavigationToolStorage::Pointer,
+                                                                       std::string*,
+                                                                       std::vector<int>*) { return nullptr; }
   };
 } // namespace mitk
 

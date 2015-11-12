@@ -77,7 +77,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     myNavigationTool->SetDataNode(myNode);
     myNavigationTool->SetIdentifier("ClaronTool#1");
     myNavigationTool->SetSerialNumber("0815");
-    myNavigationTool->SetTrackingDeviceType(mitk::ClaronMicron);
+    myNavigationTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_MICRON);
     myNavigationTool->SetType(mitk::NavigationTool::Fiducial);
 
     //create second tool
@@ -94,7 +94,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     myNavigationTool2->SetDataNode(myNode2);
     myNavigationTool2->SetIdentifier("AuroraTool#1");
     myNavigationTool2->SetSerialNumber("0816");
-    myNavigationTool2->SetTrackingDeviceType(mitk::NDIAurora);
+    myNavigationTool2->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_AURORA);
     myNavigationTool2->SetType(mitk::NavigationTool::Instrument);
 
     //create navigation tool storage

@@ -23,7 +23,7 @@ namespace mitk
 {
   NDIPAuroraTypeInformation::NDIPAuroraTypeInformation()
   {
-    m_DeviceName = "Aurora";
+    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_AURORA;
     m_TrackingDeviceData.push_back(DeviceDataAuroraCompact);
     m_TrackingDeviceData.push_back(DeviceDataAuroraPlanarCube);
     m_TrackingDeviceData.push_back(DeviceDataAuroraPlanarDome);

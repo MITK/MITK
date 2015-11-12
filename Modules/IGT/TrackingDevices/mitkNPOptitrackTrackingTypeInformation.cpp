@@ -22,7 +22,7 @@ namespace mitk
 {
   NPOptitrackTrackingTypeInformation::NPOptitrackTrackingTypeInformation()
   {
-    m_DeviceName = "Optitrack";
+    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_OPTITRACK;
     m_TrackingDeviceData.push_back(DeviceDataNPOptitrack);
   }
 

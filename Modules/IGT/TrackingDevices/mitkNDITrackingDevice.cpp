@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <itkMutexLockHolder.h>
 
+#include <mitkUnspecifiedTrackingTypeInformation.h>
+
+#include <mitkNDIPolarisTypeInformation.h>
+#include <mitkNDIAuroraTypeInformation.h>
+
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
@@ -433,11 +438,11 @@ bool mitk::NDITrackingDevice::OpenConnection()
   if (returnvalue != NDIOKAY)
     {mitkThrowException(mitk::IGTHardwareException) << "Could not initialize the tracking device";}
 
-  if (this->GetType() == mitk::TrackingSystemNotSpecified)  // if the type of tracking device is not specified, try to query the connected device
+  if (this->GetType() == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED)  // if the type of tracking device is not specified, try to query the connected device
   {
     mitk::TrackingDeviceType deviceType;
     returnvalue = m_DeviceProtocol->VER(deviceType);
-    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TrackingSystemNotSpecified))
+    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED))
       {mitkThrowException(mitk::IGTHardwareException) << "Could not determine tracking device type. Please set manually and try again.";}
     this->SetType(deviceType);
   }
@@ -504,7 +509,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
       {
         (*it)->SetPortHandle(portHandle.c_str());
         /* now write the SROM file of the tool to the tracking system using PVWR */
-    if (this->m_Data.Line == NDIPolaris)
+    if (this->m_Data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS)
         {
           returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
           if (returnvalue != NDIOKAY)
@@ -534,7 +539,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
 
 
   /*POLARIS: set the illuminator activation rate */
-  if (this->m_Data.Line == NDIPolaris)
+  if (this->m_Data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS)
   {
     returnvalue = m_DeviceProtocol->IRATE(this->m_IlluminationActivationRate);
     if (returnvalue != NDIOKAY)
@@ -602,7 +607,7 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
 {
   if (this->GetState() != Setup)
   {
-    return mitk::TrackingSystemNotSpecified;
+    return mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
   }
 
   m_SerialCommunication = mitk::SerialCommunication::New();
@@ -626,7 +631,7 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
   if (m_SerialCommunication->OpenConnection() == 0) // error
   {
     m_SerialCommunication = nullptr;
-    return mitk::TrackingSystemNotSpecified;
+    return mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
   }
 
   /* Reset Tracking device by sending a serial break for 500ms */
@@ -658,10 +663,10 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
 
     mitk::TrackingDeviceType deviceType;
     returnvalue = m_DeviceProtocol->VER(deviceType);
-    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TrackingSystemNotSpecified))
+    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED))
     {
       m_SerialCommunication = nullptr;
-      return mitk::TrackingSystemNotSpecified;
+      return mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
     }
     m_SerialCommunication = nullptr;
     return deviceType;

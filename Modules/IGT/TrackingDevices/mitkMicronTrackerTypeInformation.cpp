@@ -22,7 +22,7 @@ namespace mitk
 {
   MicronTrackerTypeInformation::MicronTrackerTypeInformation()
   {
-    m_DeviceName = "MicronTracker";
+    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_MICRON;
     m_TrackingDeviceData.push_back(DeviceDataMicronTrackerH40);
   }
 

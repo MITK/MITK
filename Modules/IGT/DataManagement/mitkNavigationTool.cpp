@@ -23,7 +23,7 @@ mitk::NavigationTool::NavigationTool() : m_Identifier("None"),
                                          m_Type(mitk::NavigationTool::Unknown),
                                          m_CalibrationFile("none"),
                                          m_SerialNumber(""),
-                                         m_TrackingDeviceType(mitk::TrackingSystemNotSpecified),
+                                         m_TrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED),
                                          m_ToolRegistrationLandmarks(mitk::PointSet::New()),
                                          m_ToolCalibrationLandmarks(mitk::PointSet::New()),
                                          m_ToolTipOrientation(mitk::Quaternion(0,0,0,1))

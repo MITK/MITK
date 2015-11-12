@@ -24,7 +24,7 @@ namespace mitk
     //: m_DeviceName("Polaris")
     //, m_Widget(nullptr)
   {
-    m_DeviceName = "Polaris";
+    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS;
     m_TrackingDeviceData.push_back(DeviceDataPolarisOldModel);
     m_TrackingDeviceData.push_back(DeviceDataPolarisSpectra);
     m_TrackingDeviceData.push_back(DeviceDataSpectraExtendedPyramid);

@@ -110,7 +110,7 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
   //Serial Number
     thisTool->AddProperty("serial number",mitk::StringProperty::New(Tool->GetSerialNumber().c_str()));
   //Tracking Device
-    thisTool->AddProperty("tracking device type",mitk::IntProperty::New(Tool->GetTrackingDeviceType()));
+    thisTool->AddProperty("tracking device type",mitk::StringProperty::New(Tool->GetTrackingDeviceType()));
   //Tool Type
     thisTool->AddProperty("tracking tool type",mitk::IntProperty::New(Tool->GetType()));
   //Calibration File Name

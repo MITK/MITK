@@ -31,7 +31,7 @@ int mitkNDIPolarisHardwareTest(int argc , char* argv[])
 
   //create a polaris tracking device
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();
-  myNDITrackingDevice->SetType(mitk::NDIPolaris);
+  myNDITrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS);
 
 #ifdef WIN32
   //set port

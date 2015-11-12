@@ -16,12 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNDIProtocol.h"
 #include "mitkNDITrackingDevice.h"
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
 #include <string>
 #include <algorithm>
 #include <sstream>
 #include <itksys/SystemTools.hxx>
 #include <stdio.h>
-
 
 mitk::NDIProtocol::NDIProtocol()
 : itk::Object(), m_TrackingDevice(nullptr), m_UseCRC(true)
@@ -1222,11 +1223,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::VER(mitk::TrackingDeviceType& t)
     upperCaseReply.resize(reply.size());
     std::transform (reply.begin(), reply.end(), upperCaseReply.begin(), toupper);  // convert reply to uppercase to ease finding
     if (upperCaseReply.find("POLARIS") != std::string::npos)
-      t = mitk::NDIPolaris;
+      t = mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS;
     else if (upperCaseReply.find("AURORA") != std::string::npos)
-      t = mitk::NDIAurora;
+      t = mitk::TRACKING_DEVICE_IDENTIFIER_AURORA;
     else
-      t = mitk::TrackingSystemNotSpecified;
+      t = mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
     // check for "VICRA", "SPECTRA", "ACCEDO"
     /* do not check for remaining reply, do not check for CRC, just delete remaining reply */
     itksys::SystemTools::Delay(500); // wait until reply should be finished

@@ -104,24 +104,14 @@ m_Controls->m_RegistrationLandmarksList->EnableEditButton(false);
 
 void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)
 {
-switch(type)
-{
-  case mitk::NDIAurora:
-  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);break;
-  case mitk::NDIPolaris:
-  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
-  case mitk::ClaronMicron:
-  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
-  case mitk::NPOptitrack:
-  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
-  case mitk::VirtualTracker:
-  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);break;
-  case mitk::OpenIGTLinkTrackingDeviceConnection:
-  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(5);break;
-  default:
-  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);
-}
-m_Controls->m_TrackingDeviceTypeChooser->setEnabled(changeable);
+  int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(type));
+
+  if (index >= 0)
+  {
+    m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
+  }
+
+  m_Controls->m_TrackingDeviceTypeChooser->setEnabled(changeable);
 }
 
 mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool()
@@ -169,13 +159,7 @@ m_CreatedTool->SetIdentifier(m_Controls->m_IdentifierEdit->text().toLatin1().dat
 m_CreatedTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toLatin1().data());
 
 //Tracking Device
-if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Aurora") m_CreatedTool->SetTrackingDeviceType(mitk::NDIAurora);
-else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Polaris") m_CreatedTool->SetTrackingDeviceType(mitk::NDIPolaris);
-else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="CT MicronTracker") m_CreatedTool->SetTrackingDeviceType(mitk::ClaronMicron);
-else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NP Optitrack") m_CreatedTool->SetTrackingDeviceType(mitk::NPOptitrack);
-else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Virtual Tracker") m_CreatedTool->SetTrackingDeviceType(mitk::VirtualTracker);
-else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="Open IGT Link") m_CreatedTool->SetTrackingDeviceType(mitk::OpenIGTLinkTrackingDeviceConnection);
-else m_CreatedTool->SetTrackingDeviceType(mitk::TrackingSystemNotSpecified);
+m_CreatedTool->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->currentText().toStdString());
 
 //ToolType
 if (m_Controls->m_ToolTypeChooser->currentText()=="Instrument") m_CreatedTool->SetType(mitk::NavigationTool::Instrument);
@@ -228,23 +212,13 @@ m_Controls->m_ToolNameEdit->setText(QString(DefaultTool->GetDataNode()->GetName(
 m_Controls->m_IdentifierEdit->setText(QString(DefaultTool->GetIdentifier().c_str()));
 m_Controls->m_SerialNumberEdit->setText(QString(DefaultTool->GetSerialNumber().c_str()));
 m_AdvancedWidget->SetDefaultTooltip( DefaultTool->GetToolTipTransform() );
-switch(DefaultTool->GetTrackingDeviceType())
+int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(DefaultTool->GetTrackingDeviceType()));
+
+if (index >= 0)
 {
-case mitk::NDIAurora:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);break;
-case mitk::NDIPolaris:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
-case mitk::ClaronMicron:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
-case mitk::NPOptitrack:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(3);break;
-case mitk::VirtualTracker:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(4);break;
-case mitk::OpenIGTLinkTrackingDeviceConnection:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(5);break;
-default:
-m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
+  m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
 }
+
 m_Controls->m_CalibrationFileName->setText(QString(DefaultTool->GetCalibrationFile().c_str()));
 m_Controls->m_Surface_Use_Other->setChecked(true);
 switch(DefaultTool->GetType())

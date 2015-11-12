@@ -42,7 +42,7 @@ static void TestInvalidClaronTrackingDevice()
 
   //create invalid tool 1
   mitk::NavigationTool::Pointer firstTool = mitk::NavigationTool::New();
-  firstTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  firstTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_MICRON);
   mitk::DataNode::Pointer firstNode = mitk::DataNode::New();
   firstNode->SetName("Tool1");
   firstTool->SetDataNode(firstNode);
@@ -50,7 +50,7 @@ static void TestInvalidClaronTrackingDevice()
 
   //create invalid tool 2
   mitk::NavigationTool::Pointer secondTool = mitk::NavigationTool::New();
-  secondTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  secondTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_MICRON);
   mitk::DataNode::Pointer secondNode = mitk::DataNode::New();
   secondNode->SetName("Tool2");
   secondTool->SetDataNode(secondNode);
@@ -67,7 +67,7 @@ static void TestInvalidClaronTrackingDevice()
 
   MITK_TEST_OUTPUT(<<"Testing simple claron tracking device with another 2 invalid tools");
 
-  secondTool->SetTrackingDeviceType(mitk::NDIAurora);
+  secondTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_AURORA);
   claronStorage = mitk::NavigationToolStorage::New();
   claronStorage->AddTool(secondTool);
 
@@ -100,7 +100,7 @@ static void TestValidClaronTrackingDevice()
 
   //create valid tool 1
   mitk::NavigationTool::Pointer firstTool = mitk::NavigationTool::New();
-  firstTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  firstTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_MICRON);
   mitk::DataNode::Pointer firstNode = mitk::DataNode::New();
   firstNode->SetName("Tool1");
   firstTool->SetDataNode(firstNode);
@@ -110,7 +110,7 @@ static void TestValidClaronTrackingDevice()
 
   //create valid tool 2
   mitk::NavigationTool::Pointer secondTool = mitk::NavigationTool::New();
-  secondTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  secondTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_MICRON);
   mitk::DataNode::Pointer secondNode = mitk::DataNode::New();
   secondNode->SetName("Tool2");
   secondTool->SetDataNode(secondNode);
@@ -142,7 +142,7 @@ static void TestAdditionalMethods()
 
   //create valid tool 1
   mitk::NavigationTool::Pointer firstTool = mitk::NavigationTool::New();
-  firstTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  firstTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_MICRON);
   mitk::DataNode::Pointer firstNode = mitk::DataNode::New();
   firstNode->SetName("Tool1");
   firstTool->SetDataNode(firstNode);
@@ -152,7 +152,7 @@ static void TestAdditionalMethods()
 
   //create valid tool 2
   mitk::NavigationTool::Pointer secondTool = mitk::NavigationTool::New();
-  secondTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  secondTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_MICRON);
   mitk::DataNode::Pointer secondNode = mitk::DataNode::New();
   secondNode->SetName("Tool2");
   secondTool->SetDataNode(secondNode);

@@ -58,19 +58,19 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetState()==mitk::TrackingDevice::Setup,"Mode should be initialized to SETUP");
 
   // Test method SetType()
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TrackingSystemNotSpecified,"Type should be initialized to 'not specified'");
-  trackingDeviceTestClass->SetType( mitk::NDIAurora );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::NDIAurora,"Type should be NDIAurora, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::NDIPolaris );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::NDIPolaris,"Type should be NDIPolaris, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::ClaronMicron );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::ClaronMicron,"Type should be ClaronMicron, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::AscensionMicroBird );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::AscensionMicroBird,"Type should be AscensionMicroBird, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::VirtualTracker);
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::VirtualTracker,"Type should be VirtualTracker, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::IntuitiveDaVinci );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::IntuitiveDaVinci,"Type should be IntuitiveDaVinci, as it has just been set");
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED,"Type should be initialized to 'not specified'");
+  trackingDeviceTestClass->SetType( mitk::TRACKING_DEVICE_IDENTIFIER_AURORA );
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_AURORA,"Type should be NDIAurora, as it has just been set");
+  trackingDeviceTestClass->SetType( mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS );
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS,"Type should be NDIPolaris, as it has just been set");
+  trackingDeviceTestClass->SetType( mitk::TRACKING_DEVICE_IDENTIFIER_MICRON );
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_MICRON,"Type should be ClaronMicron, as it has just been set");
+  trackingDeviceTestClass->SetType( mitk::TRACKING_DEVICE_IDENTIFIER_MICROBIRD );
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_MICROBIRD,"Type should be AscensionMicroBird, as it has just been set");
+  trackingDeviceTestClass->SetType( mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL);
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL,"Type should be VirtualTracker, as it has just been set");
+  trackingDeviceTestClass->SetType( mitk::TRACKING_DEVICE_IDENTIFIER_DAVINCI );
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_DAVINCI,"Type should be IntuitiveDaVinci, as it has just been set");
 
   // Test method StopTracking()
   trackingDeviceTestClass->StartTracking();

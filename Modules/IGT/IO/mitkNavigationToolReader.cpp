@@ -89,8 +89,8 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   returnValue->SetSerialNumber(serial);
 
   //Tracking Device
-  int device_type;
-  node->GetIntProperty("tracking device type",device_type);
+  mitk::TrackingDeviceType device_type;
+  node->GetStringProperty("tracking device type",device_type);
   returnValue->SetTrackingDeviceType(static_cast<mitk::TrackingDeviceType>(device_type));
 
   //Tool Type

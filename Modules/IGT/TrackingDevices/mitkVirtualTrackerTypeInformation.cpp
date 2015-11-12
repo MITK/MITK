@@ -24,7 +24,7 @@ namespace mitk
     //: m_DeviceName("Polaris")
     //, m_Widget(nullptr)
   {
-    m_DeviceName = "Virtual Tracker";
+    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL;
     m_TrackingDeviceData.push_back(DeviceDataVirtualTracker);
   }
 

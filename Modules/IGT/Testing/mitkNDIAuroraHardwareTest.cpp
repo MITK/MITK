@@ -31,7 +31,7 @@ int mitkNDIAuroraHardwareTest(int  argc , char* argv[])
 
    //create an aurora tracking device
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();
-  myNDITrackingDevice->SetType(mitk::NDIAurora);
+  myNDITrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_AURORA);
 
 #ifdef WIN32
   //set port

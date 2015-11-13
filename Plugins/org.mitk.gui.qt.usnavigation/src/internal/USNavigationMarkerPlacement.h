@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTextOverlay2D.h>
 
 namespace itk {
-template<class T> class SmartPointer;
+  template<class T> class SmartPointer;
 }
 
 namespace mitk {
@@ -39,7 +39,7 @@ namespace mitk {
 }
 
 namespace Ui {
-class USNavigationMarkerPlacement;
+  class USNavigationMarkerPlacement;
 }
 
 class QmitkUSAbstractNavigationStep;
@@ -60,7 +60,7 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
 {
   Q_OBJECT
 
-protected slots:
+    protected slots:
   /**
    * \brief Called periodically to update the rendering.
    * The standard multi widget is changed to fit the navigation process once it

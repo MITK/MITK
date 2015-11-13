@@ -25,42 +25,41 @@ namespace itk {
 
 namespace mitk
 {
-
-/**
- * \brief Simple interactor for getting just one position on mouse click.
- */
-class USPointMarkInteractor : public DataInteractor
-{
-public:
-  mitkClassMacro(USPointMarkInteractor, DataInteractor)
-  itkNewMacro(Self)
-
-  typedef Message1<DataNode*> PointMarkInteractorEvent;
-  PointMarkInteractorEvent CoordinatesChangedEvent;
-
-protected:
-  static void UpdateSurface(itk::SmartPointer<mitk::DataNode>);
-
-  USPointMarkInteractor();
-  virtual ~USPointMarkInteractor();
-
   /**
-   * \brief Connects the functions from the state machine to methods of this class.
+   * \brief Simple interactor for getting just one position on mouse click.
    */
-  virtual void ConnectActionsAndFunctions();
+  class USPointMarkInteractor : public DataInteractor
+  {
+  public:
+    mitkClassMacro(USPointMarkInteractor, DataInteractor)
+      itkNewMacro(Self)
 
-  /**
-   * \brief Sets empty surface as data for the new data node.
-   * This is necessary as data nodes without data do not work
-   * with data interactors.
-   */
-  virtual void DataNodeChanged();
+      typedef Message1<DataNode*> PointMarkInteractorEvent;
+    PointMarkInteractorEvent CoordinatesChangedEvent;
 
-  /**
-   * \brief Set current position as origin to the data node.
-   */
-  bool AddPoint(StateMachineAction* , InteractionEvent*);
-};
+  protected:
+    static void UpdateSurface(itk::SmartPointer<mitk::DataNode>);
+
+    USPointMarkInteractor();
+    virtual ~USPointMarkInteractor();
+
+    /**
+     * \brief Connects the functions from the state machine to methods of this class.
+     */
+    virtual void ConnectActionsAndFunctions();
+
+    /**
+     * \brief Sets empty surface as data for the new data node.
+     * This is necessary as data nodes without data do not work
+     * with data interactors.
+     */
+    virtual void DataNodeChanged();
+
+    /**
+     * \brief Set current position as origin to the data node.
+     */
+    void AddPoint(StateMachineAction*, InteractionEvent*);
+  };
 } // namespace mitk
 
 #endif // MITKUSPOINTMARKINTERACTOR_H

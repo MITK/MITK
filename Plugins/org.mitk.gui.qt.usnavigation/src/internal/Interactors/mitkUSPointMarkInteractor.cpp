@@ -39,22 +39,21 @@ void mitk::USPointMarkInteractor::ConnectActionsAndFunctions()
 void mitk::USPointMarkInteractor::DataNodeChanged()
 {
   mitk::DataNode::Pointer dataNode = this->GetDataNode();
-  if ( dataNode.IsNotNull() && dataNode->GetData() == 0 )
+  if (dataNode.IsNotNull() && dataNode->GetData() == 0)
   {
     dataNode->SetData(mitk::Surface::New());
   }
 }
 
-bool mitk::USPointMarkInteractor::AddPoint(mitk::StateMachineAction* , mitk::InteractionEvent* interactionEvent)
+void mitk::USPointMarkInteractor::AddPoint(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   // cast InteractionEvent to a position event in order to read out the mouse position
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL) { return false; }
-
+  if (positionEvent == NULL); //{ return false; }
   // set origin of the data node to the mouse click position
   this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(positionEvent->GetPositionInWorld());
 
   CoordinatesChangedEvent.Send(this->GetDataNode());
 
-  return true;
+  //return true;
 }

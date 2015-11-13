@@ -22,28 +22,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "../Interactors/mitkUSZonesInteractor.h"
 #include "usModuleRegistry.h"
 #include "usModule.h"
-#include "mitkGlobalInteraction.h"
+//#include "mitkGlobalInteraction.h"
 #include "mitkSurface.h"
 
 #include <QLatin1Char>
 
 QmitkUSZoneManagementWidget::QmitkUSZoneManagementWidget(QWidget *parent) :
-    QWidget(parent), m_ZonesDataModel(new QmitkUSZonesDataModel(this)),
-    m_Interactor(mitk::USZonesInteractor::New()),
-    m_StateMachineFileName("USZoneInteractions.xml"),
-    ui(new Ui::QmitkUSZoneManagementWidget), m_CurMaxNumOfZones(0)
+QWidget(parent), m_ZonesDataModel(new QmitkUSZonesDataModel(this)),
+m_Interactor(mitk::USZonesInteractor::New()),
+m_StateMachineFileName("USZoneInteractions.xml"),
+ui(new Ui::QmitkUSZoneManagementWidget), m_CurMaxNumOfZones(0)
 {
   ui->setupUi(this);
 
   ui->CurrentZonesTable->setModel(m_ZonesDataModel);
   ui->CurrentZonesTable->setItemDelegateForColumn(2, new QmitkUSZoneManagementColorDialogDelegate(this));
 
-  connect (ui->CurrentZonesTable->selectionModel(), SIGNAL(selectionChanged(const QItemSelection& , const QItemSelection&)),
-           this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
-  connect (m_ZonesDataModel, SIGNAL(rowsInserted(const QModelIndex&, int, int )),
-           this, SLOT(OnRowInsertion(QModelIndex,int,int)));
-  connect (m_ZonesDataModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
-           this, SLOT(OnDataChanged(const QModelIndex&, const QModelIndex&)));
+  connect(ui->CurrentZonesTable->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+    this, SLOT(OnSelectionChanged(const QItemSelection&, const QItemSelection&)));
+  connect(m_ZonesDataModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+    this, SLOT(OnRowInsertion(QModelIndex, int, int)));
+  connect(m_ZonesDataModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+    this, SLOT(OnDataChanged(const QModelIndex&, const QModelIndex&)));
 
   // load state machine and event config for data interactor
   m_Interactor->LoadStateMachine(m_StateMachineFileName, us::ModuleRegistry::GetModule("MitkUS"));
@@ -54,7 +54,7 @@ QmitkUSZoneManagementWidget::~QmitkUSZoneManagementWidget()
 {
   delete ui;
 
-  if ( m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull() ) { m_DataStorage->Remove(m_BaseNode); }
+  if (m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull()) { m_DataStorage->Remove(m_BaseNode); }
 }
 
 void QmitkUSZoneManagementWidget::SetStateMachineFilename(const std::string& filename)
@@ -65,15 +65,15 @@ void QmitkUSZoneManagementWidget::SetStateMachineFilename(const std::string& fil
 
 void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage, const char* baseNodeName)
 {
-  if ( dataStorage.IsNull() )
+  if (dataStorage.IsNull())
   {
     MITK_ERROR("QWidget")("QmitkUSZoneManagementWidget")
-        << "DataStorage must not be null.";
+      << "DataStorage must not be null.";
     mitkThrow() << "DataStorage must not be null.";
   }
 
   mitk::DataNode::Pointer baseNode = dataStorage->GetNamedNode(baseNodeName);
-  if ( baseNode.IsNull() )
+  if (baseNode.IsNull())
   {
     baseNode = mitk::DataNode::New();
     baseNode->SetName(baseNodeName);
@@ -90,14 +90,14 @@ void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer data
 
 void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::DataNode::Pointer baseNode)
 {
-  if ( dataStorage.IsNull() || baseNode.IsNull() )
+  if (dataStorage.IsNull() || baseNode.IsNull())
   {
     MITK_ERROR("QWidget")("QmitkUSZoneManagementWidget")
-        << "DataStorage and BaseNode must not be null.";
+      << "DataStorage and BaseNode must not be null.";
     mitkThrow() << "DataStorage and BaseNode must not be null.";
   }
 
-  if ( ! baseNode->GetData() ) { baseNode->SetData(mitk::Surface::New()); }
+  if (!baseNode->GetData()) { baseNode->SetData(mitk::Surface::New()); }
 
   m_ZonesDataModel->SetDataStorage(dataStorage, baseNode);
 
@@ -107,14 +107,14 @@ void QmitkUSZoneManagementWidget::SetDataStorage(mitk::DataStorage::Pointer data
 
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkUSZoneManagementWidget::GetZoneNodes()
 {
-  if ( m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull() )
+  if (m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull())
   {
     return m_DataStorage->GetDerivations(m_BaseNode);
   }
   else
   {
     MITK_WARN("QWidget")("QmitkUSZoneManagementWidget")
-        << "Data storage or base node is null. Returning empty zone nodes set.";
+      << "Data storage or base node is null. Returning empty zone nodes set.";
     return mitk::DataStorage::SetOfObjects::New().GetPointer();
   }
 }
@@ -122,10 +122,10 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkUSZoneManagementWidget::GetZo
 void QmitkUSZoneManagementWidget::RemoveSelectedRows()
 {
   QItemSelectionModel* selectionModel = ui->CurrentZonesTable->selectionModel();
-  if ( ! selectionModel->hasSelection() )
+  if (!selectionModel->hasSelection())
   {
     MITK_WARN("QWidget")("QmitkUSZoneManagementWidget")
-        << "RemoveSelectedRows() called without any row being selected.";
+      << "RemoveSelectedRows() called without any row being selected.";
     return;
   }
 
@@ -144,10 +144,10 @@ void QmitkUSZoneManagementWidget::RemoveSelectedRows()
 
 void QmitkUSZoneManagementWidget::OnStartAddingZone()
 {
-  if ( m_DataStorage.IsNull() )
+  if (m_DataStorage.IsNull())
   {
     MITK_ERROR("QWidget")("QmitkUSZoneManagementWidget")
-        << "DataStorage must be set before adding the first zone.";
+      << "DataStorage must be set before adding the first zone.";
     mitkThrow() << "DataStorage must be set before adding the first zone.";
   }
 
@@ -158,7 +158,7 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
 
   mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
   // zone number is added to zone name (padding one zero)
-  dataNode->SetName((QString("Zone ")+QString("%1").arg(m_CurMaxNumOfZones+1, 2, 10, QLatin1Char('0'))).toStdString());
+  dataNode->SetName((QString("Zone ") + QString("%1").arg(m_CurMaxNumOfZones + 1, 2, 10, QLatin1Char('0'))).toStdString());
   dataNode->SetColor(0.9, 0.9, 0);
   m_DataStorage->Add(dataNode, m_BaseNode);
   m_Interactor->SetDataNode(dataNode);
@@ -166,10 +166,10 @@ void QmitkUSZoneManagementWidget::OnStartAddingZone()
 
 void QmitkUSZoneManagementWidget::OnAbortAddingZone()
 {
-  if ( m_DataStorage.IsNull() )
+  if (m_DataStorage.IsNull())
   {
     MITK_ERROR("QWidget")("QmitkUSZoneManagementWidget")
-        << "DataStorage must be set before aborting adding a zone.";
+      << "DataStorage must be set before aborting adding a zone.";
     mitkThrow() << "DataStorage must be set before aborting adding a zone.";
   }
 
@@ -179,7 +179,7 @@ void QmitkUSZoneManagementWidget::OnAbortAddingZone()
 void QmitkUSZoneManagementWidget::OnResetZones()
 {
   // remove all zone nodes from the data storage
-  if ( m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull() )
+  if (m_DataStorage.IsNotNull() && m_BaseNode.IsNotNull())
   {
     m_DataStorage->Remove(m_DataStorage->GetDerivations(m_BaseNode));
   }
@@ -189,7 +189,7 @@ void QmitkUSZoneManagementWidget::OnResetZones()
 
 void QmitkUSZoneManagementWidget::OnSelectionChanged(const QItemSelection & selected, const QItemSelection & /*deselected*/)
 {
-  bool somethingSelected = ! selected.empty() && m_ZonesDataModel->rowCount() > 0;
+  bool somethingSelected = !selected.empty() && m_ZonesDataModel->rowCount() > 0;
   ui->ZoneSizeLabel->setEnabled(somethingSelected);
   ui->ZoneSizeSlider->setEnabled(somethingSelected);
   ui->DeleteZoneButton->setEnabled(somethingSelected);
@@ -197,19 +197,19 @@ void QmitkUSZoneManagementWidget::OnSelectionChanged(const QItemSelection & sele
   if (somethingSelected)
   {
     ui->ZoneSizeSlider->setValue(
-          m_ZonesDataModel->data(m_ZonesDataModel->index(selected.at(0).top(), 1)).toInt());
+      m_ZonesDataModel->data(m_ZonesDataModel->index(selected.at(0).top(), 1)).toInt());
   }
 }
 
 void QmitkUSZoneManagementWidget::OnZoneSizeSliderValueChanged(int value)
 {
   QItemSelectionModel* selection = ui->CurrentZonesTable->selectionModel();
-  if ( ! selection->hasSelection() ) { return; }
+  if (!selection->hasSelection()) { return; }
 
   m_ZonesDataModel->setData(m_ZonesDataModel->index(selection->selectedRows().at(0).row(), 1), value);
 }
 
-void QmitkUSZoneManagementWidget::OnRowInsertion( const QModelIndex & /*parent*/, int /*start*/, int end )
+void QmitkUSZoneManagementWidget::OnRowInsertion(const QModelIndex & /*parent*/, int /*start*/, int end)
 {
   // increase zone number for unique names for every zone
   m_CurMaxNumOfZones++;
@@ -221,11 +221,11 @@ void QmitkUSZoneManagementWidget::OnRowInsertion( const QModelIndex & /*parent*/
 void QmitkUSZoneManagementWidget::OnDataChanged(const QModelIndex& topLeft, const QModelIndex& /*bottomRight*/)
 {
   QItemSelectionModel* selection = ui->CurrentZonesTable->selectionModel();
-  if ( ! selection->hasSelection() || selection->selectedRows().size() < 1 ) { return; }
+  if (!selection->hasSelection() || selection->selectedRows().size() < 1) { return; }
 
-  if ( selection->selectedRows().at(0) == topLeft )
+  if (selection->selectedRows().at(0) == topLeft)
   {
     ui->ZoneSizeSlider->setValue(
-          m_ZonesDataModel->data(m_ZonesDataModel->index(topLeft.row(), 1)).toInt());
+      m_ZonesDataModel->data(m_ZonesDataModel->index(topLeft.row(), 1)).toInt());
   }
 }

@@ -27,20 +27,20 @@ const char* mitk::USZonesInteractor::DATANODE_PROPERTY_CREATED = "zone.created";
 
 void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
 {
-  if ( ! dataNode->GetData())
+  if (!dataNode->GetData())
   {
     MITK_WARN("USZonesInteractor")("DataInteractor")
-        << "Cannot update surface for node as no data is set to the node.";
+      << "Cannot update surface for node as no data is set to the node.";
     return;
   }
 
   mitk::Point3D origin = dataNode->GetData()->GetGeometry()->GetOrigin();
 
   float radius;
-  if ( ! dataNode->GetFloatProperty(DATANODE_PROPERTY_SIZE, radius) )
+  if (!dataNode->GetFloatProperty(DATANODE_PROPERTY_SIZE, radius))
   {
     MITK_WARN("USZonesInteractor")("DataInteractor")
-        << "Cannut update surface for node as no radius is specified in the node properties.";
+      << "Cannut update surface for node as no radius is specified in the node properties.";
     return;
   }
 
@@ -48,8 +48,8 @@ void mitk::USZonesInteractor::UpdateSurface(mitk::DataNode::Pointer dataNode)
 
   // create a vtk sphere with given radius
   vtkSphereSource *vtkData = vtkSphereSource::New();
-  vtkData->SetRadius( radius );
-  vtkData->SetCenter(0,0,0);
+  vtkData->SetRadius(radius);
+  vtkData->SetCenter(0, 0, 0);
   vtkData->SetPhiResolution(20);
   vtkData->SetThetaResolution(20);
   vtkData->Update();
@@ -84,24 +84,23 @@ void mitk::USZonesInteractor::ConnectActionsAndFunctions()
 void mitk::USZonesInteractor::DataNodeChanged()
 {
   mitk::DataNode::Pointer dataNode = this->GetDataNode();
-  if ( dataNode.IsNotNull() && dataNode->GetData() == 0 )
+  if (dataNode.IsNotNull() && dataNode->GetData() == 0)
   {
     dataNode->SetData(mitk::Surface::New());
   }
 }
 
-bool mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction* , mitk::InteractionEvent* interactionEvent)
+void mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   // cast InteractionEvent to a position event in order to read out the mouse position
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL) { return false; }
-
+  if (positionEvent == NULL); // { return false; }
   mitk::DataNode::Pointer dataNode = this->GetDataNode();
   dataNode->SetBoolProperty(DATANODE_PROPERTY_CREATED, false);
 
   // make sure that data node contains data
   mitk::BaseData::Pointer dataNodeData = this->GetDataNode()->GetData();
-  if ( dataNodeData.IsNull() )
+  if (dataNodeData.IsNull())
   {
     dataNodeData = mitk::Surface::New();
     this->GetDataNode()->SetData(dataNodeData);
@@ -110,19 +109,18 @@ bool mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction* , mitk::Intera
   // set origin of the data node to the mouse click position
   dataNodeData->GetGeometry()->SetOrigin(positionEvent->GetPositionInWorld());
   MITK_INFO("USNavigationLogging") << "Critical Structure added on position " << positionEvent->GetPointerPositionOnScreen() << " (Image Coordinates); "
-            << positionEvent->GetPositionInWorld() << " (World Coordinates)";
+    << positionEvent->GetPositionInWorld() << " (World Coordinates)";
 
-  dataNode->SetFloatProperty("opacity", 0.60f );
+  dataNode->SetFloatProperty("opacity", 0.60f);
 
-  return true;
+  //return true;
 }
 
-bool mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction* , mitk::InteractionEvent* interactionEvent)
+void mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   // cast InteractionEvent to a position event in order to read out the mouse position
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL) { return false; }
-
+  if (positionEvent == NULL); //{ return false; }
   mitk::DataNode::Pointer curNode = this->GetDataNode();
   mitk::Point3D mousePosition = positionEvent->GetPositionInWorld();
 
@@ -131,21 +129,21 @@ bool mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction* , mitk::Int
 
   mitk::USZonesInteractor::UpdateSurface(curNode);
 
-  return true;
+  //return true;
 }
 
-bool mitk::USZonesInteractor::EndCreation(mitk::StateMachineAction* , mitk::InteractionEvent* /*interactionEvent*/)
+void mitk::USZonesInteractor::EndCreation(mitk::StateMachineAction*, mitk::InteractionEvent* /*interactionEvent*/)
 {
   this->GetDataNode()->SetBoolProperty(DATANODE_PROPERTY_CREATED, true);
-  return true;
+  //return true;
 }
 
-bool mitk::USZonesInteractor::AbortCreation(mitk::StateMachineAction* , mitk::InteractionEvent*)
+void mitk::USZonesInteractor::AbortCreation(mitk::StateMachineAction*, mitk::InteractionEvent*)
 {
   this->GetDataNode()->SetData(mitk::Surface::New());
 
   // update the RenderWindow to remove the surface
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-  return true;
+  //return true;
 }

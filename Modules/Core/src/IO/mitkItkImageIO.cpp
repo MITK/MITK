@@ -325,31 +325,46 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   MITK_INFO << slicedGeometry->GetCornerPoint(true,true,true);
 
   // re-initialize TimeGeometry
-  itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData = dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(PROPERTY_KEY_TIMEGEOMETRY_TYPE));
-
   TimeGeometry::Pointer timeGeometry;
 
-  if (timeGeometryTypeData.IsNotNull() && timeGeometryTypeData->GetMetaDataObjectValue() == ArbitraryTimeGeometry::GetStaticNameOfClass())
+  if (dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TYPE))
   {
-    MITK_INFO << "used time geometry: " << ArbitraryTimeGeometry::GetStaticNameOfClass() << std::endl;
-    typedef std::vector<TimePointType> TimePointVector;
-    TimePointVector timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS));
-    if (timePoints.size() - 1 != image->GetDimension(3))
-    {
-      MITK_ERROR << "Stored timepoints (" << timePoints.size() - 1 << ") and size of image time dimension (" << image->GetDimension(3) << ") do not match. Switch to ProportionalTimeGeometry fallback" << std::endl;
-    }
-    else
-    {
-      ArbitraryTimeGeometry::Pointer arbitraryTimeGeometry = ArbitraryTimeGeometry::New();
-      TimePointVector::const_iterator pos = timePoints.begin();
-      TimePointVector::const_iterator prePos = pos++;
+      itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData =
+          dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(
+          PROPERTY_KEY_TIMEGEOMETRY_TYPE));
 
-      for (; pos != timePoints.end(); ++prePos, ++pos)
+      if (timeGeometryTypeData->GetMetaDataObjectValue() == ArbitraryTimeGeometry::GetStaticNameOfClass())
       {
-        arbitraryTimeGeometry->AppendTimeStepClone(slicedGeometry,*pos,*prePos);
+          MITK_INFO << "used time geometry: " << ArbitraryTimeGeometry::GetStaticNameOfClass() << std::endl;
+          typedef std::vector<TimePointType> TimePointVector;
+          TimePointVector timePoints;
+
+          if (dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS))
+          {
+              timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(
+                  PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS));
+          }
+
+          if (timePoints.size() - 1 != image->GetDimension(3))
+          {
+              MITK_ERROR << "Stored timepoints (" << timePoints.size() - 1 <<
+                  ") and size of image time dimension (" << image->GetDimension(3) <<
+                  ") do not match. Switch to ProportionalTimeGeometry fallback" << std::endl;
+          }
+          else
+          {
+              ArbitraryTimeGeometry::Pointer arbitraryTimeGeometry = ArbitraryTimeGeometry::New();
+              TimePointVector::const_iterator pos = timePoints.begin();
+              TimePointVector::const_iterator prePos = pos++;
+
+              for (; pos != timePoints.end(); ++prePos, ++pos)
+              {
+                  arbitraryTimeGeometry->AppendTimeStepClone(slicedGeometry, *pos, *prePos);
+              }
+
+              timeGeometry = arbitraryTimeGeometry;
+          }
       }
-      timeGeometry = arbitraryTimeGeometry;
-    }
   }
 
   if (timeGeometry.IsNull())

@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodeDisplacementFilter.h"
 #include "mitkUSCombinedModality.h"
 #include "mitkOverlay2DLayouter.h"
+#include <mitkIOUtil.h>
 
 #include "IO/mitkUSNavigationStepTimer.h"
 #include "IO/mitkUSNavigationExperimentLogging.h"
@@ -378,15 +379,8 @@ void USNavigationMarkerPlacement::OnFinishExperiment()
   m_NavigationDataRecorder->StopRecording();
 
   // Write data to csv and xml file
-  mitk::NavigationDataSetWriterXML* writer;
-  writer->SetOutputLocation(QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.xml").toStdString().c_str());
-  writer->SetInput(m_NavigationDataRecorder->GetNavigationDataSet());
-  writer->Write();
-
-  mitk::NavigationDataSetWriterCSV* writerCSV;
-  writerCSV->SetOutputLocation(QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.csv").toStdString().c_str());
-  writerCSV->SetInput(m_NavigationDataRecorder->GetNavigationDataSet());
-  writerCSV->Write();
+  mitk::IOUtil::SaveBaseData(m_NavigationDataRecorder->GetNavigationDataSet(), (QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.xml").toStdString().c_str()));
+  mitk::IOUtil::SaveBaseData(m_NavigationDataRecorder->GetNavigationDataSet(), (QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.csv").toStdString().c_str()));
 
   //write logged navigation data messages to separate file
   std::stringstream csvNavigationMessagesFilename;

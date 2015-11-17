@@ -4,7 +4,7 @@ MACRO_CREATE_MITK_CTK_PLUGIN(
   EXPORT_DIRECTIVE USNAVIGATION_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   PACKAGE_DEPENDS CTK Poco
-  MODULE_DEPENDS MitkUSUI MitkUSNavigation MitkIGTUI MitkSceneSerialization MitkContourModel MitkIGTIO
+  MODULE_DEPENDS MitkUSUI MitkUSNavigation MitkIGTUI MitkSceneSerialization MitkContourModel
 )
 
 #usFunctionAddResources(TARGET ${PLUGIN_TARGET}

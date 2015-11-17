@@ -27,8 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.h"
 
 #include "mitkIRenderingManager.h"
-#include <mitkNavigationDataSetWriterCSV.h>
-#include <mitkNavigationDataSetWriterXML.h>
 #include "mitkNodeDisplacementFilter.h"
 #include "mitkUSCombinedModality.h"
 #include "mitkOverlay2DLayouter.h"

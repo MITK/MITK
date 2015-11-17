@@ -1562,11 +1562,16 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::
 
 void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* text) 
 {
+  // empty or NULL string breaks renderer
+  // and white square appears
+  if ((text == NULL) || (text[0] == 0)) {
+    text = " ";
+  }
   cornerText[i]->SetText(corner, text);
   cornerText[i]->SetMaximumFontSize(14);
-  textProp[i]->SetColor( 1.0, 1.0, 1.0 );
+  textProp[i]->SetColor(1.0, 1.0, 1.0);
   textProp[i]->SetFontFamilyToArial();
-  cornerText[i]->SetTextProperty( textProp[i] );
+  cornerText[i]->SetTextProperty(textProp[i]);
 }
 
 void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)

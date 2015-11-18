@@ -435,6 +435,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnBackToLastTargetClicked()
   if (m_ReachedTargetsNodes.size() > m_CurrentTargetIndex)
   {
     this->GetDataStorage()->Remove(m_ReachedTargetsNodes.last());
+    MITK_INFO("QmitkUSAbstractNavigationStep")("QmitkUSNavigationStepMarkerIntervention") << "Removed Target " << m_ReachedTargetsNodes.size();
     m_ReachedTargetsNodes.pop_back();
   }
 

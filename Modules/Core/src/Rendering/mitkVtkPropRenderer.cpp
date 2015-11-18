@@ -55,6 +55,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkMutexLock.h>
 
 mitk::VtkPropRenderer::VtkPropRenderer(const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm, mitk::BaseRenderer::RenderingMode::Type renderingMode)
   : BaseRenderer(name, renWin, rm, renderingMode),

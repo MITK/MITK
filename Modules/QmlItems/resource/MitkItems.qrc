@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>components/DataToolbar.qml</file>
+        <file>components/MultiToolbar.qml</file>
+        <file>components/VectorIcon.qml</file>
+        <file>fonts/font-awesome/fontawesome-webfont.ttf</file>
+        <file>MitkDataManager.qml</file>
+        <file>MitkStdMultiItem.qml</file>
+        <file>MitkProperties.qml</file>
+        <file>components/Checkbox.qml</file>
+        <file>components/Combobox.qml</file>
+    </qresource>
+</RCC>

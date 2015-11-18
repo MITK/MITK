@@ -162,7 +162,7 @@ if(MITK_USE_Boost)
 endif()
 
 # We need this later for a DCMTK workaround
-set(_dcmtk_dir_orig "@DCMTK_DIR@")
+set(_dcmtk_dir_orig "@DCMTK_ROOT@")
 
 # -----------------------------------------
 # External dependencies from the superbuild

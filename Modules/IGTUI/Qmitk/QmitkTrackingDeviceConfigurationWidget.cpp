@@ -236,6 +236,7 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
 {
   //show the correspondig widget
 
+
   const std::string selectedDeviceType = m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
 
   m_Controls->m_TrackingSystemWidget->setCurrentWidget(this->GetConfigurationWidgetForDeviceType(selectedDeviceType));
@@ -245,6 +246,25 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
 
   //reset output
   ResetOutput();
+
+  us::ModuleContext* context = us::GetModuleContext();
+
+  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
+
+  if (refs.empty())
+  {
+    MITK_ERROR << "No tracking device service found!";
+  }
+
+  m_DeviceTypeCollection = context->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
+
+  for (auto name : m_DeviceTypeCollection->GetTrackingDeviceTypeNames())
+  {
+    if(m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(name)) == -1)
+    {
+      m_Controls->m_TrackingDeviceChooser->addItem(QString::fromStdString(name));
+    }
+  }
 
   //print output and do further initializations
   if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS) // NDI Polaris

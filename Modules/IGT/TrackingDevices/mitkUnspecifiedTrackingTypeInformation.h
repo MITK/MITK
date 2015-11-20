@@ -32,7 +32,7 @@ namespace mitk
     public:
 
       explicit UnspecifiedTrackingTypeInformation();
-      virtual ~UnspecifiedTrackingTypeInformation();
+      virtual ~UnspecifiedTrackingTypeInformation(){};
 
       virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer,
                                                                        mitk::NavigationToolStorage::Pointer,

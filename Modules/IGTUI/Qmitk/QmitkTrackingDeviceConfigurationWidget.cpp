@@ -541,7 +541,7 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
   #ifdef WIN32
     prefix ="COM";
     tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
-    if (selectedDeviceType == mitk::TRACKINGDEVICE_IDENTIFIER_POLARIS) //Polaris
+    if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS) //Polaris
     {
       tempTrackingDevice->SetIlluminationActivationRate(GetPolarisFrameRate());
     }
@@ -798,12 +798,12 @@ void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc(
       if (i<10) devName = QString("COM%1").arg(i);
       else devName = QString("\\\\.\\COM%1").arg(i); // prepend "\\.\ to COM ports >9, to be able to allow connection"
       mitk::TrackingDeviceType scannedPort = ScanPort(devName);
-      if (mitk::TRACKINGDEVICE_IDENTIFIER_POLARIS == scannedPort)
+      if (mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS == scannedPort)
       {
         result += "<br>" + devName + ": " + "NDI Polaris";
         PolarisPort = i;
       }
-      else if (mitk::TRACKINGDEVICE_IDENTIFIER_AURORA == scannedPort)
+      else if (mitk::TRACKING_DEVICE_IDENTIFIER_AURORA == scannedPort)
       {
         result += "<br>" + devName + ": " + "NDI Aurora";
         AuroraPort = i;

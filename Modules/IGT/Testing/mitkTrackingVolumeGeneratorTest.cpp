@@ -81,17 +81,6 @@ public:
     MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
   }
 
-  static void TestIntuitiveDaVinciTrackingVolume()
-  {
-    MITK_TEST_OUTPUT(<< "---- Testing Intuitive Da Vinci Tracking Volume ----");
-    mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
-    myTVGenerator->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_DAVINCI);
-    MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TRACKING_DEVICE_IDENTIFIER_DAVINCI),"loading Da Vinci Volume data:");
-    myTVGenerator->Update();
-    mitk::Surface::Pointer volume = myTVGenerator->GetOutput();
-    MITK_TEST_CONDITION((volume->IsEmptyTimeStep(0) == false),"Output contains data");
-  }
-
   static void TestInvalidInputBehaviour()
   {
     MITK_TEST_OUTPUT(<< "---- Testing Invalid Inputs (errors should occure) ----");
@@ -161,7 +150,6 @@ int mitkTrackingVolumeGeneratorTest(int /* argc */, char* /*argv*/[])
   mitkTrackingVolumeGeneratorTestClass::TestClaronTrackingVolume();
   mitkTrackingVolumeGeneratorTestClass::TestNDIAuroraTrackingVolume();
   mitkTrackingVolumeGeneratorTestClass::TestNDIPolarisTrackingVolume();
-  mitkTrackingVolumeGeneratorTestClass::TestIntuitiveDaVinciTrackingVolume();
   mitkTrackingVolumeGeneratorTestClass::TestInvalidInputBehaviour();
   mitkTrackingVolumeGeneratorTestClass::TestSetTrackingDevice();
   mitkTrackingVolumeGeneratorTestClass::TestSetTrackingDeviceData();

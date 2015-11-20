@@ -69,8 +69,6 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_MICROBIRD,"Type should be AscensionMicroBird, as it has just been set");
   trackingDeviceTestClass->SetType( mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL);
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL,"Type should be VirtualTracker, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::TRACKING_DEVICE_IDENTIFIER_DAVINCI );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TRACKING_DEVICE_IDENTIFIER_DAVINCI,"Type should be IntuitiveDaVinci, as it has just been set");
 
   // Test method StopTracking()
   trackingDeviceTestClass->StartTracking();

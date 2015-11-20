@@ -28,7 +28,6 @@ namespace mitk
   static const std::string TRACKING_DEVICE_IDENTIFIER_AURORA = "NDI Aurora"; ///< Aurora: electromagnetic Tracker from NDI
   static const std::string TRACKING_DEVICE_IDENTIFIER_POLARIS ="NDI Polaris"; ///< Polaris: optical Tracker from NDI
   static const std::string TRACKING_DEVICE_IDENTIFIER_MICRON = "Claron Micron"; ///< Micron Tracker: optical Tracker from Claron
-  static const std::string TRACKING_DEVICE_IDENTIFIER_DAVINCI ="Intuitive DaVinci"; ///< Intuitive Surgical: DaVinci Telemanipulator API Interface
   static const std::string TRACKING_DEVICE_IDENTIFIER_MICROBIRD = "Ascension MicroBird"; ///< Ascension microBird / PCIBird family
   static const std::string TRACKING_DEVICE_IDENTIFIER_VIRTUAL = "Virtual Tracker"; ///< Virtual Tracking device class that produces random tracking coordinates
   static const std::string TRACKING_DEVICE_IDENTIFIER_OPTITRACK = "NP Optitrack"; ///< NaturalPoint: Optitrack optical Tracking System

@@ -36,21 +36,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkWarpScalar.h"
 
 QmitkUSNavigationStepTumourSelection::QmitkUSNavigationStepTumourSelection(QWidget* parent) :
-  QmitkUSAbstractNavigationStep(parent),
-  m_SecurityDistance(0),
-  m_Interactor(mitk::USZonesInteractor::New()),
-  m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
-  m_StateMachineFilename("USZoneInteractions.xml"),
-  m_ReferenceSensorIndex(1),
-  m_ListenerChangeNode(this, &QmitkUSNavigationStepTumourSelection::TumourNodeChanged),
-  m_targetSelectionOptional(false),
-  ui(new Ui::QmitkUSNavigationStepTumourSelection)
+QmitkUSAbstractNavigationStep(parent),
+m_SecurityDistance(0),
+m_Interactor(mitk::USZonesInteractor::New()),
+m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
+m_StateMachineFilename("USZoneInteractions.xml"),
+m_ReferenceSensorIndex(1),
+m_ListenerChangeNode(this, &QmitkUSNavigationStepTumourSelection::TumourNodeChanged),
+m_targetSelectionOptional(false),
+ui(new Ui::QmitkUSNavigationStepTumourSelection)
 {
   ui->setupUi(this);
 
-  connect( ui->freezeImageButton, SIGNAL(SignalFreezed(bool)), this, SLOT(OnFreeze(bool)) );
-  connect( ui->tumourSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnTumourSizeChanged(int)) );
-  connect( ui->deleteTumourButton, SIGNAL(clicked()), this, SLOT(OnDeleteButtonClicked()) );
+  connect(ui->freezeImageButton, SIGNAL(SignalFreezed(bool)), this, SLOT(OnFreeze(bool)));
+  connect(ui->tumourSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnTumourSizeChanged(int)));
+  connect(ui->deleteTumourButton, SIGNAL(clicked()), this, SLOT(OnDeleteButtonClicked()));
 
   m_SphereColor = mitk::Color();
   //default color: green
@@ -60,12 +60,12 @@ QmitkUSNavigationStepTumourSelection::QmitkUSNavigationStepTumourSelection(QWidg
 }
 void QmitkUSNavigationStepTumourSelection::SetTumorColor(mitk::Color c)
 {
-m_SphereColor = c;
+  m_SphereColor = c;
 }
 
-void QmitkUSNavigationStepTumourSelection::SetTargetSelectionOptional (bool t)
+void QmitkUSNavigationStepTumourSelection::SetTargetSelectionOptional(bool t)
 {
-m_targetSelectionOptional = t;
+  m_targetSelectionOptional = t;
 }
 
 QmitkUSNavigationStepTumourSelection::~QmitkUSNavigationStepTumourSelection()
@@ -78,7 +78,7 @@ bool QmitkUSNavigationStepTumourSelection::OnStartStep()
   m_TumourNode = this->GetNamedDerivedNodeAndCreate(
     USNavigationMarkerPlacement::DATANAME_TUMOUR,
     QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
-  m_TumourNode->SetColor(m_SphereColor[0],m_SphereColor[1],m_SphereColor[2]);
+  m_TumourNode->SetColor(m_SphereColor[0], m_SphereColor[1], m_SphereColor[2]);
 
   // load state machine and event config for data interactor
   m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("MitkUS"));
@@ -109,10 +109,10 @@ bool QmitkUSNavigationStepTumourSelection::OnStopStep()
   m_NodeDisplacementFilter->ResetNodes();
 
   mitk::DataStorage::Pointer dataStorage = this->GetDataStorage(false);
-  if ( dataStorage.IsNotNull() )
+  if (dataStorage.IsNotNull())
   {
     // remove target surface node from data storage, if available there
-    if ( m_TargetSurfaceNode.IsNotNull() ) { dataStorage->Remove(m_TargetSurfaceNode); }
+    if (m_TargetSurfaceNode.IsNotNull()) { dataStorage->Remove(m_TargetSurfaceNode); }
 
     dataStorage->ChangedNodeEvent.RemoveListener(m_ListenerChangeNode);
     dataStorage->Remove(m_TumourNode);
@@ -159,7 +159,7 @@ bool QmitkUSNavigationStepTumourSelection::OnActivateStep()
   m_NodeDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
 
   //target selection is optional
-  if (m_targetSelectionOptional) {emit SignalReadyForNextStep();}
+  if (m_targetSelectionOptional) { emit SignalReadyForNextStep(); }
 
   return true;
 }
@@ -169,7 +169,7 @@ bool QmitkUSNavigationStepTumourSelection::OnDeactivateStep()
   m_Interactor->SetDataNode(0);
 
   bool value;
-  if ( m_TumourNode.IsNotNull() && ! ( m_TumourNode->GetBoolProperty("zone.created", value) && value ) )
+  if (m_TumourNode.IsNotNull() && !(m_TumourNode->GetBoolProperty("zone.created", value) && value))
   {
     m_TumourNode->SetData(0);
   }
@@ -186,26 +186,7 @@ void QmitkUSNavigationStepTumourSelection::OnUpdate()
 
   m_NavigationDataSource->Update();
 
-  bool valid;
-  if ( m_ReferenceSensorName.empty() )
-  {
-    valid = m_NavigationDataSource->GetOutput(1)->IsDataValid();
-  }
-  else
-  {
-    mitk::NavigationData::Pointer navData = m_NavigationDataSource->GetOutput(m_ReferenceSensorName);
-    if ( navData.IsNotNull() )
-    {
-      valid = navData->IsDataValid();
-    }
-    else
-    {
-      valid = false;
-      MITK_WARN("QmitkUSAbstractNavigationStep")("QmitkUSNavigationStepTumourSelection")
-        << "Cannot update tracking status of the reference sensor as no output with the given name '"
-        << m_ReferenceSensorName << "' exists.";
-    }
-  }
+  bool valid = m_NavigationDataSource->GetOutput(m_ReferenceSensorIndex)->IsDataValid();
 
   if (valid)
   {
@@ -216,14 +197,14 @@ void QmitkUSNavigationStepTumourSelection::OnUpdate()
   else
   {
     ui->bodyMarkerTrackingStatusLabel->setStyleSheet(
-          "background-color: #ff7878; margin-right: 1em; margin-left: 1em; border: 1px solid grey");
+      "background-color: #ff7878; margin-right: 1em; margin-left: 1em; border: 1px solid grey");
     ui->bodyMarkerTrackingStatusLabel->setText("Body marker is not inside the tracking volume.");
   }
 
   ui->freezeImageButton->setEnabled(valid);
 
   bool created;
-  if ( m_TumourNode.IsNull() || ! m_TumourNode->GetBoolProperty("zone.created", created) || ! created )
+  if (m_TumourNode.IsNull() || !m_TumourNode->GetBoolProperty("zone.created", created) || !created)
   {
     ui->tumourSearchExplanationLabel->setEnabled(valid);
   }
@@ -231,23 +212,23 @@ void QmitkUSNavigationStepTumourSelection::OnUpdate()
 
 void QmitkUSNavigationStepTumourSelection::OnSettingsChanged(const itk::SmartPointer<mitk::DataNode> settingsNode)
 {
-  if ( settingsNode.IsNull() ) { return; }
+  if (settingsNode.IsNull()) { return; }
 
   float securityDistance;
-  if ( settingsNode->GetFloatProperty("settings.security-distance", securityDistance) )
+  if (settingsNode->GetFloatProperty("settings.security-distance", securityDistance))
   {
     m_SecurityDistance = securityDistance;
   }
 
   std::string stateMachineFilename;
-  if ( settingsNode->GetStringProperty("settings.interaction-concept", stateMachineFilename) && stateMachineFilename != m_StateMachineFilename )
+  if (settingsNode->GetStringProperty("settings.interaction-concept", stateMachineFilename) && stateMachineFilename != m_StateMachineFilename)
   {
     m_StateMachineFilename = stateMachineFilename;
     m_Interactor->LoadStateMachine(stateMachineFilename, us::ModuleRegistry::GetModule("MitkUS"));
   }
 
   std::string referenceSensorName;
-  if ( settingsNode->GetStringProperty("settings.reference-name-selected", referenceSensorName) )
+  if (settingsNode->GetStringProperty("settings.reference-name-selected", referenceSensorName))
   {
     m_ReferenceSensorName = referenceSensorName;
   }
@@ -272,9 +253,9 @@ void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
   ui->tumourSelectionExplanation1Label->setEnabled(freezed);
   ui->tumourSelectionExplanation2Label->setEnabled(freezed);
 
-  if ( freezed )
+  if (freezed)
   {
-    if ( ! m_TumourNode->GetData() )
+    if (!m_TumourNode->GetData())
     {
       // load state machine and event config for data interactor
       m_Interactor->LoadStateMachine(m_StateMachineFilename, us::ModuleRegistry::GetModule("MitkUS"));
@@ -288,7 +269,7 @@ void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
   else
   {
     bool value;
-    if ( m_TumourNode->GetBoolProperty("zone.created", value) && value )
+    if (m_TumourNode->GetBoolProperty("zone.created", value) && value)
     {
       ui->freezeImageButton->setEnabled(false);
       ui->tumourSearchExplanationLabel->setEnabled(false);
@@ -301,7 +282,7 @@ void QmitkUSNavigationStepTumourSelection::OnFreeze(bool freezed)
 void QmitkUSNavigationStepTumourSelection::OnSetCombinedModality()
 {
   mitk::USCombinedModality::Pointer combinedModality = this->GetCombinedModality(false);
-  if ( combinedModality.IsNotNull() )
+  if (combinedModality.IsNotNull())
   {
     m_NavigationDataSource = combinedModality->GetNavigationDataSource();
   }
@@ -340,9 +321,9 @@ void QmitkUSNavigationStepTumourSelection::TumourNodeChanged(const mitk::DataNod
   ui->tumourSizeSlider->setValue(static_cast<int>(size));
 
   bool created;
-  if ( dataNode->GetBoolProperty("zone.created", created) && created )
+  if (dataNode->GetBoolProperty("zone.created", created) && created)
   {
-    if ( ui->freezeImageButton->isChecked() )
+    if (ui->freezeImageButton->isChecked())
     {
       m_NodeDisplacementFilter->AddNode(const_cast<mitk::DataNode*>(dataNode));
 
@@ -379,10 +360,10 @@ mitk::Surface::Pointer QmitkUSNavigationStepTumourSelection::CreateTargetSurface
   mitk::Surface::Pointer tumourSurface = dynamic_cast<mitk::Surface*>(m_TumourNode->GetData());
 
   if (tumourSurface.IsNull())
-    {
+  {
     MITK_WARN << "No target selected, cannot create surface!";
     return mitk::Surface::New(); //return a empty surface in this case...
-    }
+  }
 
   // make a deep copy of the tumour surface polydata
   vtkSmartPointer<vtkPolyData> tumourSurfaceVtk = vtkSmartPointer<vtkPolyData>::New();
@@ -394,7 +375,7 @@ mitk::Surface::Pointer QmitkUSNavigationStepTumourSelection::CreateTargetSurface
   scalars->SetNumberOfTuples(numberOfPoints);
 
   // set scalars for warp filter
-  for(vtkIdType i = 0; i < numberOfPoints; ++i) { scalars->SetTuple1(i, m_SecurityDistance * 10); }
+  for (vtkIdType i = 0; i < numberOfPoints; ++i) { scalars->SetTuple1(i, m_SecurityDistance * 10); }
   tumourSurfaceVtk->GetPointData()->SetScalars(scalars);
 
   vtkSmartPointer<vtkWarpScalar> warpScalar = vtkSmartPointer<vtkWarpScalar>::New();
@@ -423,22 +404,22 @@ itk::SmartPointer<mitk::NodeDisplacementFilter> QmitkUSNavigationStepTumourSelec
 
 void QmitkUSNavigationStepTumourSelection::UpdateReferenceSensorName()
 {
-  if ( m_NavigationDataSource.IsNull() ) { return; }
+  if (m_NavigationDataSource.IsNull()) { return; }
 
-  if ( ! m_ReferenceSensorName.empty() )
+  if (!m_ReferenceSensorName.empty())
   {
     try
     {
       m_ReferenceSensorIndex = m_NavigationDataSource->GetOutputIndex(m_ReferenceSensorName);
     }
-    catch ( const std::exception &e )
+    catch (const std::exception &e)
     {
       MITK_WARN("QmitkUSAbstractNavigationStep")("QmitkUSNavigationStepTumourSelection")
         << "Cannot get index for reference sensor name: " << e.what();
     }
   }
 
-  if ( this->GetNavigationStepState() >= QmitkUSAbstractNavigationStep::State_Active )
+  if (this->GetNavigationStepState() >= QmitkUSAbstractNavigationStep::State_Active)
   {
     m_NodeDisplacementFilter->SelectInput(m_ReferenceSensorIndex);
   }

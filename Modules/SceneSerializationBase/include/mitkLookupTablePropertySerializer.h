@@ -35,7 +35,7 @@ namespace mitk
   Then the serializer for this class must be called GreenDataSerializer
   \endverbatim
 */
-class LookupTablePropertySerializer : public BasePropertySerializer
+class MITKSCENESERIALIZATIONBASE_EXPORT LookupTablePropertySerializer : public BasePropertySerializer
 {
   public:
   

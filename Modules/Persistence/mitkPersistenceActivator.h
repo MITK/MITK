@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkPersistenceActivator_h
 #define mitkPersistenceActivator_h
 
-#define MBILOG_ENABLE_DEBUG
-
 // Microservices
 #include <usModuleActivator.h>
 #include "mitkPersistenceService.h"

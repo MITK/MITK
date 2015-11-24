@@ -143,17 +143,17 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   float globalOpacity = 1.0;
   node->GetFloatProperty("opacity", globalOpacity);
 
+  if ( m_DrawControlPoints )
+  {
+    // draw the control-points
+    RenderControlPoints(planarFigure, lineDisplayMode, planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);
+  }
+
   // draw name near the anchor point (point located on the right)
   const std::string name = node->GetName();
   if ( m_DrawName && !name.empty() )
   {
     RenderAnnotations(renderer, name, anchorPoint, globalOpacity, lineDisplayMode, annotationOffset);
-  }
-
-  if ( m_DrawControlPoints )
-  {
-    // draw the control-points
-    RenderControlPoints(planarFigure, lineDisplayMode, planarFigurePlaneGeometry, rendererPlaneGeometry, renderer);
   }
 
   // draw feature quantities (if requested) next to the anchor point,
@@ -382,6 +382,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_DrawName = true;
   m_DrawDashed = false;
   m_DrawHelperDashed = false;
+  m_AnnotationsShadow = false;
 
   m_ShadowWidthFactor = 1.2;
   m_LineWidth = 1.0;
@@ -402,6 +403,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   this->SetFloatProperty( m_MarkerlineOpacity, PF_DEFAULT, 1.0 );
   this->SetColorProperty( m_MarkerColor, PF_DEFAULT, 1.0, 1.0, 1.0 );
   this->SetFloatProperty( m_MarkerOpacity, PF_DEFAULT, 0.0 );
+  this->SetColorProperty( m_AnnotationColor, PF_DEFAULT, 1.0, 1.0, 1.0 );
 
   this->SetColorProperty( m_LineColor, PF_HOVER, 1.0, 0.7, 0.0 );
   this->SetFloatProperty( m_LineOpacity, PF_HOVER, 1.0 );
@@ -413,6 +415,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   this->SetFloatProperty( m_MarkerlineOpacity, PF_HOVER, 1.0 );
   this->SetColorProperty( m_MarkerColor, PF_HOVER, 1.0, 0.6, 0.0 );
   this->SetFloatProperty( m_MarkerOpacity, PF_HOVER, 0.2 );
+  this->SetColorProperty( m_AnnotationColor, PF_HOVER, 1.0, 0.7, 0.0 );
 
   this->SetColorProperty( m_LineColor, PF_SELECTED, 1.0, 0.0, 0.0 );
   this->SetFloatProperty( m_LineOpacity, PF_SELECTED, 1.0 );
@@ -424,6 +427,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   this->SetFloatProperty( m_MarkerlineOpacity, PF_SELECTED, 1.0 );
   this->SetColorProperty( m_MarkerColor, PF_SELECTED, 1.0, 0.6, 0.0 );
   this->SetFloatProperty( m_MarkerOpacity, PF_SELECTED, 1.0 );
+  this->SetColorProperty( m_AnnotationColor, PF_SELECTED, 1.0, 0.0, 0.0 );
 }
 
 
@@ -477,6 +481,10 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty("planarfigure.annotations.font.bold", m_DrawAnnotationBold );
   node->GetBoolProperty("planarfigure.annotations.font.italic", m_DrawAnnotationItalic );
   node->GetIntProperty("planarfigure.annotations.font.size", m_AnnotationSize );
+  if( !node->GetBoolProperty("planarfigure.annotations.shadow", m_AnnotationsShadow ) )
+  {
+    node->GetBoolProperty("planarfigure.drawshadow", m_AnnotationsShadow );
+  }
 
 
   PlanarFigureControlPointStyleProperty::Pointer styleProperty =
@@ -510,6 +518,13 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetFloatProperty( "planarfigure.default.markerline.opacity", m_MarkerlineOpacity[PF_DEFAULT] );
   node->GetColor( m_MarkerColor[PF_DEFAULT], NULL, "planarfigure.default.marker.color" );
   node->GetFloatProperty( "planarfigure.default.marker.opacity", m_MarkerOpacity[PF_DEFAULT] );
+  if ( !node->GetColor( m_AnnotationColor[PF_DEFAULT], NULL, "planarfigure.default.annotation.color" ) )
+  {
+    if ( !node->GetColor( m_LineColor[PF_DEFAULT], NULL, "planarfigure.default.line.color" ) )
+    {
+      node->GetColor( m_LineColor[PF_DEFAULT], NULL, "color" );
+    }
+  }
 
   //Set hover color and opacity
   node->GetColor( m_LineColor[PF_HOVER], NULL, "planarfigure.hover.line.color" );
@@ -522,6 +537,13 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetFloatProperty( "planarfigure.hover.markerline.opacity", m_MarkerlineOpacity[PF_HOVER] );
   node->GetColor( m_MarkerColor[PF_HOVER], NULL, "planarfigure.hover.marker.color" );
   node->GetFloatProperty( "planarfigure.hover.marker.opacity", m_MarkerOpacity[PF_HOVER] );
+  if ( !node->GetColor( m_AnnotationColor[PF_HOVER], NULL, "planarfigure.hover.annotation.color" ) )
+  {
+    if ( !node->GetColor( m_LineColor[PF_HOVER], NULL, "planarfigure.hover.line.color" ) )
+    {
+      node->GetColor( m_LineColor[PF_HOVER], NULL, "color" );
+    }
+  }
 
   //Set selected color and opacity
   node->GetColor( m_LineColor[PF_SELECTED], NULL, "planarfigure.selected.line.color" );
@@ -534,6 +556,14 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetFloatProperty( "planarfigure.selected.markerline.opacity", m_MarkerlineOpacity[PF_SELECTED] );
   node->GetColor( m_MarkerColor[PF_SELECTED], NULL, "planarfigure.selected.marker.color" );
   node->GetFloatProperty( "planarfigure.selected.marker.opacity", m_MarkerOpacity[PF_SELECTED] );
+  if ( !node->GetColor( m_AnnotationColor[PF_SELECTED], NULL, "planarfigure.selected.annotation.color" ) )
+  {
+    if ( !node->GetColor( m_LineColor[PF_SELECTED], NULL, "planarfigure.selected.line.color" ) )
+    {
+      node->GetColor( m_LineColor[PF_SELECTED], NULL, "color" );
+    }
+  }
+
 
   //adapt opacity values to global "opacity" property
   for( unsigned int i = 0; i < PF_COUNT; ++i )
@@ -700,12 +730,12 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
                                                     double &annotationOffset )
 {
   m_AnnotationOverlay->SetText( name );
-  m_AnnotationOverlay->SetColor( m_LineColor[lineDisplayMode][0],
-                                 m_LineColor[lineDisplayMode][1],
-                                 m_LineColor[lineDisplayMode][2] );
+  m_AnnotationOverlay->SetColor( m_AnnotationColor[lineDisplayMode][0],
+                                 m_AnnotationColor[lineDisplayMode][1],
+                                 m_AnnotationColor[lineDisplayMode][2] );
   m_AnnotationOverlay->SetOpacity( globalOpacity );
   m_AnnotationOverlay->SetFontSize( m_AnnotationSize*m_DevicePixelRatio );
-  m_AnnotationOverlay->SetBoolProperty( "drawShadow", m_DrawShadow );
+  m_AnnotationOverlay->SetBoolProperty( "drawShadow", m_AnnotationsShadow );
   m_AnnotationOverlay->SetVisibility( true, renderer );
   m_AnnotationOverlay->SetStringProperty( "font.family", m_AnnotationFontFamily );
   m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
@@ -757,9 +787,9 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
     }
   }
 
-  m_QuantityOverlay->SetColor( m_LineColor[lineDisplayMode][0],
-                               m_LineColor[lineDisplayMode][1],
-                               m_LineColor[lineDisplayMode][2] );
+  m_QuantityOverlay->SetColor( m_AnnotationColor[lineDisplayMode][0],
+                               m_AnnotationColor[lineDisplayMode][1],
+                               m_AnnotationColor[lineDisplayMode][2] );
 
   m_QuantityOverlay->SetOpacity( globalOpacity );
   m_QuantityOverlay->SetFontSize( m_AnnotationSize*m_DevicePixelRatio );

@@ -33,6 +33,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/Path.h>
 
 
+#include "QmitkNDIAuroraWidget.h"
+#include "QmitkNDIPolarisWidget.h"
+#include "QmitkMicronTrackerWidget.h"
+#include "QmitkNPOptitrackWidget.h"
+#include "QmitkVirtualTrackerWidget.h"
+#include "QmitkOpenIGTLinkWidget.h"
+
+
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
@@ -52,21 +60,7 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   m_MTCalibrationFile = "";
   m_AdvancedUserControl = true;
 
-  us::ModuleContext* context = us::GetModuleContext();
-
-  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
-
-  if (refs.empty())
-  {
-    MITK_ERROR << "No tracking device service found!";
-  }
-
-  m_DeviceTypeCollection = context->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
-
-  for (auto name : m_DeviceTypeCollection->GetTrackingDeviceTypeNames())
-  {
-    m_Controls->m_TrackingDeviceChooser->addItem(QString::fromStdString(name));
-  }
+  RefreshTrackingDeviceCollection();
 
   //initialize a few UI elements
   this->m_TrackingDeviceConfigurated = false;
@@ -81,6 +75,7 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
 
   //restore old UI settings
   LoadUISettings();
+
 }
 
 void QmitkTrackingDeviceConfigurationWidget::SetGUIStyle(QmitkTrackingDeviceConfigurationWidget::Style style)
@@ -93,49 +88,49 @@ switch(style)
     //m_Controls->dummyLayout->addItem(m_Controls->mainLayout);
     m_Controls->dummyLayout->addWidget(m_Controls->widget_title_label);
     m_Controls->dummyLayout->addWidget(m_Controls->choose_tracking_device_label);
-    m_Controls->dummyLayout->addWidget(m_Controls->polaris_label);
-    m_Controls->dummyLayout->addWidget(m_Controls->aurora_label);
+    //zzz    m_Controls->dummyLayout->addWidget(m_Controls->polaris_label);
+//yyy    m_Controls->dummyLayout->addWidget(m_Controls->aurora_label);
     //m_Controls->dummyLayout->addWidget(m_Controls->aurora_label);
-    m_Controls->dummyLayout->addWidget(m_Controls->microntracker_label);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionMicronTracker);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextMicronTracker);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextAurora);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionAurora);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextPolaris);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionPolaris);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_polarisTrackingModeBox);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionOptitrack);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextOptitrack);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackExp);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackThr);
-    m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackLed);
-    m_Controls->dummyLayout->addWidget(m_Controls->Optitrack_label);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->microntracker_label);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionMicronTracker);
+    //zzz    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextMicronTracker);
+    //yyy    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextAurora);
+    //yyy    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionAurora);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextPolaris);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionPolaris);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_polarisTrackingModeBox);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionOptitrack);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextOptitrack);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackExp);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackThr);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->m_OptitrackLed);
+    //zzz   m_Controls->dummyLayout->addWidget(m_Controls->Optitrack_label);
     m_Controls->dummyLayout->addWidget(m_Controls->m_finishedLine);
     m_Controls->dummyLayout->addWidget(m_Controls->line);
     m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);
     m_Controls->dummyLayout->addItem(m_Controls->horizontalLayout_4);
     m_Controls->mainLayout->removeItem(m_Controls->horizontalLayout_4);
     m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);
-    m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_2);
-    m_Controls->verticalLayout_3->removeItem(m_Controls->verticalSpacer_2);
-    m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_9);
-    m_Controls->horizontalLayout_9->removeItem(m_Controls->horizontalSpacer_9);
-    m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_3);
-    m_Controls->horizontalLayout_11->removeItem(m_Controls->horizontalSpacer_3);
-    m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_3);
-    m_Controls->verticalLayout_7->removeItem(m_Controls->verticalSpacer_3);
-    m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_4);
-    m_Controls->verticalLayout_10->removeItem(m_Controls->verticalSpacer_4);
-    m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_10);
-    m_Controls->verticalLayout_10->removeItem(m_Controls->horizontalSpacer_10);
+    //zzz   m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_2);
+    //zzz    m_Controls->verticalLayout_3->removeItem(m_Controls->verticalSpacer_2);
+    //zzz    m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_9);
+    //zzz   m_Controls->horizontalLayout_9->removeItem(m_Controls->horizontalSpacer_9);
+    //yyy   m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_3);
+    //yyym_Controls->horizontalLayout_11->removeItem(m_Controls->horizontalSpacer_3);
+    //yyy m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_3);
+    //yyy m_Controls->verticalLayout_7->removeItem(m_Controls->verticalSpacer_3);
+    //zzz   m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_4);
+    //zzz   m_Controls->verticalLayout_10->removeItem(m_Controls->verticalSpacer_4);
+    //zzz   m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_10);
+    //zzz  m_Controls->verticalLayout_10->removeItem(m_Controls->horizontalSpacer_10);
 
     //set height to min
-    m_Controls->m_outputTextPolaris->setMinimumHeight(0);
-    m_Controls->m_outputTextPolaris->setMaximumHeight(0);
-    m_Controls->m_outputTextMicronTracker->setMinimumHeight(0);
-    m_Controls->m_outputTextMicronTracker->setMaximumHeight(0);
-    m_Controls->m_outputTextAurora->setMinimumHeight(0);
-    m_Controls->m_outputTextAurora->setMaximumHeight(0);
+    //zzz   m_Controls->m_outputTextPolaris->setMinimumHeight(0);
+    //zzz   m_Controls->m_outputTextPolaris->setMaximumHeight(0);
+    //zzz   m_Controls->m_outputTextMicronTracker->setMinimumHeight(0);
+    //zzz   m_Controls->m_outputTextMicronTracker->setMaximumHeight(0);
+    //yyy m_Controls->m_outputTextAurora->setMinimumHeight(0);
+    //yyy m_Controls->m_outputTextAurora->setMaximumHeight(0);
     m_Controls->m_finishedButton->setMinimumHeight(0);
     m_Controls->m_finishedButton->setMaximumHeight(0);
     m_Controls->m_resetButton->setMinimumHeight(0);
@@ -192,17 +187,18 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_TrackingDeviceChooser), SIGNAL(currentIndexChanged(int)), this, SLOT(TrackingDeviceChanged()) );
-    connect( (QObject*)(m_Controls->m_testConnectionPolaris), SIGNAL(clicked()), this, SLOT(TestConnection()) );
-    connect( (QObject*)(m_Controls->m_testConnectionAurora), SIGNAL(clicked()), this, SLOT(TestConnection()) );
-    connect( (QObject*)(m_Controls->m_testConnectionMicronTracker), SIGNAL(clicked()), this, SLOT(TestConnection()) );
-    connect( (QObject*)(m_Controls->m_testConnectionOptitrack), SIGNAL(clicked()), this, SLOT(TestConnection()) );
+    connect( (QObject*)(m_Controls->m_RefreshTrackingDeviceCollection), SIGNAL(clicked()), this, SLOT(RefreshTrackingDeviceCollection()));
+    //zzz   connect( (QObject*)(m_Controls->m_testConnectionPolaris), SIGNAL(clicked()), this, SLOT(TestConnection()) );
+    //yyy connect( (QObject*)(m_Controls->m_testConnectionAurora), SIGNAL(clicked()), this, SLOT(TestConnection()) );
+    //zzz   connect( (QObject*)(m_Controls->m_testConnectionMicronTracker), SIGNAL(clicked()), this, SLOT(TestConnection()) );
+    //zzz   connect( (QObject*)(m_Controls->m_testConnectionOptitrack), SIGNAL(clicked()), this, SLOT(TestConnection()) );
     connect( (QObject*)(m_Controls->m_resetButton), SIGNAL(clicked()), this, SLOT(ResetByUser()) );
     connect( (QObject*)(m_Controls->m_finishedButton), SIGNAL(clicked()), this, SLOT(Finished()) );
-    connect( (QObject*)(m_Controls->m_AutoScanPolaris), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
-    connect( (QObject*)(m_Controls->m_AutoScanAurora), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
-    connect( (QObject*)(m_Controls->m_SetMTCalibrationFile), SIGNAL(clicked()), this, SLOT(SetMTCalibrationFileClicked()) );
-    connect( (QObject*)(m_Controls->m_SetOptitrackCalibrationFile), SIGNAL(clicked()), this, SLOT(SetOptitrackCalibrationFileClicked()) );
-    connect( (QObject*)(m_Controls->m_EnableGaussianNoise), SIGNAL(clicked()), this, SLOT(EnableGaussianNoise()) );
+    //zzz  connect( (QObject*)(m_Controls->m_AutoScanPolaris), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
+    //yyy connect( (QObject*)(m_Controls->m_AutoScanAurora), SIGNAL(clicked()), this, SLOT(AutoScanPorts()) );
+    //zzz  connect( (QObject*)(m_Controls->m_SetMTCalibrationFile), SIGNAL(clicked()), this, SLOT(SetMTCalibrationFileClicked()) );
+    //zzz  connect( (QObject*)(m_Controls->m_SetOptitrackCalibrationFile), SIGNAL(clicked()), this, SLOT(SetOptitrackCalibrationFileClicked()) );
+    //zzz  connect( (QObject*)(m_Controls->m_EnableGaussianNoise), SIGNAL(clicked()), this, SLOT(EnableGaussianNoise()) );
 
     //slots for the worker thread
     connect(m_ScanPortsWorker, SIGNAL(PortsScanned(int,int,QString,int,int)), this, SLOT(AutoScanPortsFinished(int,int,QString,int,int)) );
@@ -216,19 +212,19 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
 
     //set a few UI components depending on Windows / Linux
     #ifdef WIN32
-    m_Controls->portTypeLabelPolaris->setVisible(false);
-    m_Controls->portTypePolaris->setVisible(false);
-    m_Controls->portTypeLabelAurora->setVisible(false);
-    m_Controls->portTypeAurora->setVisible(false);
+    //zzz  m_Controls->portTypeLabelPolaris->setVisible(false);
+    //zzz   m_Controls->portTypePolaris->setVisible(false);
+    //yyy  m_Controls->portTypeLabelAurora->setVisible(false);
+    //yyy  m_Controls->portTypeAurora->setVisible(false);
     #else
-    m_Controls->comPortLabelAurora->setText("Port Nr:");
-    m_Controls->m_comPortLabelPolaris->setText("Port Nr:");
-    m_Controls->m_portSpinBoxAurora->setPrefix("");
-    m_Controls->m_portSpinBoxPolaris->setPrefix("");
+    //yyy  m_Controls->comPortLabelAurora->setText("Port Nr:");
+    //zzz   m_Controls->m_comPortLabelPolaris->setText("Port Nr:");
+    //yyy   m_Controls->m_portSpinBoxAurora->setPrefix("");
+    //zzz   m_Controls->m_portSpinBoxPolaris->setPrefix("");
     #endif
 
     //disable unused UI component
-    m_Controls->m_polarisTrackingModeBox->setVisible(false); //don't delete this component, because it is used in the MBI part of MITK
+    //zzz   m_Controls->m_polarisTrackingModeBox->setVisible(false); //don't delete this component, because it is used in the MBI part of MITK
   }
 }
 
@@ -246,25 +242,6 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
 
   //reset output
   ResetOutput();
-
-  us::ModuleContext* context = us::GetModuleContext();
-
-  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
-
-  if (refs.empty())
-  {
-    MITK_ERROR << "No tracking device service found!";
-  }
-
-  m_DeviceTypeCollection = context->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
-
-  for (auto name : m_DeviceTypeCollection->GetTrackingDeviceTypeNames())
-  {
-    if(m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(name)) == -1)
-    {
-      m_Controls->m_TrackingDeviceChooser->addItem(QString::fromStdString(name));
-    }
-  }
 
   //print output and do further initializations
   if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS) // NDI Polaris
@@ -287,7 +264,7 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
       mitk::ClaronTrackingDevice::Pointer tempDevice = mitk::ClaronTrackingDevice::New();
       m_MTCalibrationFile = tempDevice->GetCalibrationDir();
       Poco::Path myPath = Poco::Path(m_MTCalibrationFile.c_str());
-      m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
+      //zzz    m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
     }
   }
   else if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_OPTITRACK)
@@ -300,6 +277,45 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   }
   emit TrackingDeviceSelectionChanged();
 }
+
+void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
+{
+  us::ModuleContext* context = us::GetModuleContext();
+  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
+
+  if (refs.empty())
+  {
+    MITK_ERROR << "No tracking device service found!";
+  }
+
+  m_DeviceTypeCollection = context->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
+
+  for (auto name : m_DeviceTypeCollection->GetTrackingDeviceTypeNames())
+  {
+    //if the device is not included yet, add name to comboBox and widget to stackedWidget
+    if (m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(name)) == -1)
+    {
+      m_Controls->m_TrackingDeviceChooser->addItem(QString::fromStdString(name));
+    }
+  }
+
+  if (stackedPagesVector.empty())
+  {
+    stackedPagesVector.push_back(new QmitkNDIAuroraWidget);
+    stackedPagesVector.push_back(new QmitkNDIPolarisWidget);
+    stackedPagesVector.push_back(new QmitkMicronTrackerWidget);
+    stackedPagesVector.push_back(new QmitkNPOptitrackWidget);
+    stackedPagesVector.push_back(new QmitkVirtualTrackerWidget);
+    stackedPagesVector.push_back(new QmitkOpenIGTLinkWidget);
+
+    for (auto widget : stackedPagesVector)
+    {
+      m_Controls->m_TrackingSystemWidget->addWidget(widget);
+    }
+
+  }
+}
+
 
 void QmitkTrackingDeviceConfigurationWidget::EnableUserReset(bool enable)
 {
@@ -370,8 +386,8 @@ void QmitkTrackingDeviceConfigurationWidget::AutoScanPortsFinished(int PolarisPo
     if (PortTypePolaris!=-1) {m_Controls->portTypePolaris->setCurrentIndex(PortTypePolaris);}
     if (PortTypeAurora!=-1)  {m_Controls->portTypeAurora->setCurrentIndex(PortTypeAurora);}
   #endif
-  m_Controls->m_portSpinBoxPolaris->setValue(PolarisPort);
-  m_Controls->m_portSpinBoxAurora->setValue(AuroraPort);
+    //zzz  m_Controls->m_portSpinBoxPolaris->setValue(PolarisPort);
+  //yyy m_Controls->m_portSpinBoxAurora->setValue(AuroraPort);
   AddOutput(result.toStdString());
   this->setEnabled(true);
   emit ProgressFinished();
@@ -385,7 +401,7 @@ void QmitkTrackingDeviceConfigurationWidget::SetMTCalibrationFileClicked()
     {
     m_MTCalibrationFile = filename;
     Poco::Path myPath = Poco::Path(m_MTCalibrationFile.c_str());
-    m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
+    //zzz    m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
     }
 }
 
@@ -397,22 +413,22 @@ void QmitkTrackingDeviceConfigurationWidget::SetOptitrackCalibrationFileClicked(
     {
     m_OptitrackCalibrationFile = filename;
     Poco::Path myPath = Poco::Path(m_OptitrackCalibrationFile.c_str());
-    m_Controls->m_OptitrackCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
+    //zzz    m_Controls->m_OptitrackCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
     }
 }
 
 void QmitkTrackingDeviceConfigurationWidget::EnableGaussianNoise()
 {
-  if (m_Controls->m_EnableGaussianNoise->isChecked())
-  {
-    m_Controls->m_MeanDistributionParam->setEnabled(true);
-    m_Controls->m_DeviationDistributionParam->setEnabled(true);
-  }
-  else
-  {
-    m_Controls->m_MeanDistributionParam->setEnabled(false);
-    m_Controls->m_DeviationDistributionParam->setEnabled(false);
-  }
+  //zzz  if (m_Controls->m_EnableGaussianNoise->isChecked())
+  //zzz {
+  //zzz   m_Controls->m_MeanDistributionParam->setEnabled(true);
+  //zzz   m_Controls->m_DeviationDistributionParam->setEnabled(true);
+  //zzz }
+  //zzz else
+  //zzz {
+  //zzz  m_Controls->m_MeanDistributionParam->setEnabled(false);
+  //zzz  m_Controls->m_DeviationDistributionParam->setEnabled(false);
+  //zzz}
 }
 
 //######################### internal help methods #######################################
@@ -420,22 +436,22 @@ void QmitkTrackingDeviceConfigurationWidget::ResetOutput()
 {
   m_output.str("");
   m_output <<"<body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7pt; font-weight:400; font-style:normal;\" bgcolor=black><span style=\"color:#ffffff;\"><u>output:</u>";
-  m_Controls->m_outputTextAurora->setHtml(QString(m_output.str().c_str()));
-  m_Controls->m_outputTextPolaris->setHtml(QString(m_output.str().c_str()));
-  m_Controls->m_outputTextMicronTracker->setHtml(QString(m_output.str().c_str()));
+  //yyy  m_Controls->m_outputTextAurora->setHtml(QString(m_output.str().c_str()));
+  //zzz  m_Controls->m_outputTextPolaris->setHtml(QString(m_output.str().c_str()));
+  //zzz m_Controls->m_outputTextMicronTracker->setHtml(QString(m_output.str().c_str()));
 }
 void QmitkTrackingDeviceConfigurationWidget::AddOutput(std::string s)
 {
   //print output
   m_output << s;
-  m_Controls->m_outputTextAurora->setHtml(QString(m_output.str().c_str()));
-  m_Controls->m_outputTextPolaris->setHtml(QString(m_output.str().c_str()));
-  m_Controls->m_outputTextMicronTracker->setHtml(QString(m_output.str().c_str()));
-  m_Controls->m_outputTextOptitrack->setHtml(QString(m_output.str().c_str()));
-  m_Controls->m_outputTextPolaris->verticalScrollBar()->setValue(m_Controls->m_outputTextPolaris->verticalScrollBar()->maximum());
-  m_Controls->m_outputTextAurora->verticalScrollBar()->setValue(m_Controls->m_outputTextAurora->verticalScrollBar()->maximum());
-  m_Controls->m_outputTextMicronTracker->verticalScrollBar()->setValue(m_Controls->m_outputTextMicronTracker->verticalScrollBar()->maximum());
-  m_Controls->m_outputTextOptitrack->verticalScrollBar()->setValue(m_Controls->m_outputTextOptitrack->verticalScrollBar()->maximum());
+  //yyy m_Controls->m_outputTextAurora->setHtml(QString(m_output.str().c_str()));
+  //zzz  m_Controls->m_outputTextPolaris->setHtml(QString(m_output.str().c_str()));
+  //zzz  m_Controls->m_outputTextMicronTracker->setHtml(QString(m_output.str().c_str()));
+  //zzz m_Controls->m_outputTextOptitrack->setHtml(QString(m_output.str().c_str()));
+  //zzz m_Controls->m_outputTextPolaris->verticalScrollBar()->setValue(m_Controls->m_outputTextPolaris->verticalScrollBar()->maximum());
+  //yyy m_Controls->m_outputTextAurora->verticalScrollBar()->setValue(m_Controls->m_outputTextAurora->verticalScrollBar()->maximum());
+  //zzz m_Controls->m_outputTextMicronTracker->verticalScrollBar()->setValue(m_Controls->m_outputTextMicronTracker->verticalScrollBar()->maximum());
+  //zzz m_Controls->m_outputTextOptitrack->verticalScrollBar()->setValue(m_Controls->m_outputTextOptitrack->verticalScrollBar()->maximum());
   repaint();
 }
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructTrackingDevice()
@@ -447,16 +463,16 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
   //#### Step 1: configure tracking device:
   if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS)//NDI Polaris
       {
-      if(m_Controls->m_radioPolaris5D->isChecked()) //5D Tracking
-        {
+        //zzz     if(m_Controls->m_radioPolaris5D->isChecked()) //5D Tracking
+        //zzz       {
         //not yet in the open source part so we'll only get NULL here.
-        returnValue = ConfigureNDI5DTrackingDevice();
-        }
-      else //6D Tracking
-        {
-        returnValue = ConfigureNDI6DTrackingDevice();
-        returnValue->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS);
-        }
+        //zzz      returnValue = ConfigureNDI5DTrackingDevice();
+        //zzz      }
+        //zzz    else //6D Tracking
+        //zzz       {
+           returnValue = ConfigureNDI6DTrackingDevice();
+           returnValue->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS);
+        //zzz       }
       }
   else if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_AURORA)//NDI Aurora
         {
@@ -482,24 +498,24 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructT
     returnValue = ConfigureOptitrackTrackingDevice();
     returnValue->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_OPTITRACK);
   }
-  else if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL) //Virtual Tracker
+  else if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL || selectedDeviceType == "Virtual Tracker MBI") //Virtual Tracker
   {
     // Create the Virtual Tracking Device
     returnValue = mitk::VirtualTrackingDevice::New();
-    if (m_Controls->m_EnableGaussianNoise->isChecked())
-    {
-      mitk::VirtualTrackingDevice::Pointer device = mitk::VirtualTrackingDevice::New();
-      device->EnableGaussianNoise();
-      device->SetParamsForGaussianNoise(m_Controls->m_MeanDistributionParam->value(), m_Controls->m_DeviationDistributionParam->value());
-      returnValue = device;
-    }
+    //zzz   if (m_Controls->m_EnableGaussianNoise->isChecked())
+    //zzz   {
+    //zzz    mitk::VirtualTrackingDevice::Pointer device = mitk::VirtualTrackingDevice::New();
+    //zzz    device->EnableGaussianNoise();
+    //zzz   device->SetParamsForGaussianNoise(m_Controls->m_MeanDistributionParam->value(), m_Controls->m_DeviationDistributionParam->value());
+    //zzz   returnValue = device;
+    //zzz  }
   }
   else if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_OPENIGTLINK) //OpenIGTLink
   {
     // Create the Virtual Tracking Device
     mitk::OpenIGTLinkTrackingDevice::Pointer OIGTLDevice = mitk::OpenIGTLinkTrackingDevice::New();
-    OIGTLDevice->SetPortNumber(m_Controls->m_OpenIGTLinkPort->text().toInt());
-    OIGTLDevice->SetHostname(m_Controls->m_OpenIGTLinkHostname->text().toStdString());
+    //zzz   OIGTLDevice->SetPortNumber(m_Controls->m_OpenIGTLinkPort->text().toInt());
+    //zzz   OIGTLDevice->SetHostname(m_Controls->m_OpenIGTLinkHostname->text().toStdString());
     returnValue = OIGTLDevice;
   }
   return returnValue;
@@ -517,9 +533,9 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureO
   tempTrackingDevice->SetCalibrationPath(m_OptitrackCalibrationFile);
 
   //Set the camera parameters
-  tempTrackingDevice->SetExp(m_Controls->m_OptitrackExp->value());
-  tempTrackingDevice->SetLed(m_Controls->m_OptitrackLed->value());
-  tempTrackingDevice->SetThr(m_Controls->m_OptitrackThr->value());
+  //zzz tempTrackingDevice->SetExp(m_Controls->m_OptitrackExp->value());
+  //zzz tempTrackingDevice->SetLed(m_Controls->m_OptitrackLed->value());
+  //zzz tempTrackingDevice->SetThr(m_Controls->m_OptitrackThr->value());
 
   mitk::TrackingDevice::Pointer returnValue = static_cast<mitk::TrackingDevice*>(tempTrackingDevice);
   return returnValue;
@@ -533,8 +549,9 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 
   //get port
   int port = 0;
-  if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_AURORA) port = m_Controls->m_portSpinBoxAurora->value();
-  else port = m_Controls->m_portSpinBoxPolaris->value();
+  //yyy if (selectedDeviceType == mitk::TRACKING_DEVICE_IDENTIFIER_AURORA) port = m_Controls->m_portSpinBoxAurora->value();
+  //yyy else
+  //zzz   port = m_Controls->m_portSpinBoxPolaris->value();
 
   //build prefix (depends on linux/win)
   QString prefix = "";
@@ -581,10 +598,12 @@ bool QmitkTrackingDeviceConfigurationWidget::GetTrackingDeviceConfigured()
 mitk::IlluminationActivationRate QmitkTrackingDeviceConfigurationWidget::GetPolarisFrameRate()
 {
   mitk::IlluminationActivationRate frameRate;
-  QString comboBox = m_Controls->m_frameRateComboBoxPolaris->currentText();
-  if(comboBox == "20 Hz") frameRate = mitk::Hz20;
-  else if(comboBox == "30 Hz") frameRate = mitk::Hz30;
-  else if(comboBox == "60 Hz") frameRate = mitk::Hz60;
+  //zzz QString comboBox = m_Controls->m_frameRateComboBoxPolaris->currentText();
+  //zzz if(comboBox == "20 Hz") frameRate = mitk::Hz20;
+  //zzz else if(comboBox == "30 Hz") frameRate = mitk::Hz30;
+  //zzz  else if(comboBox == "60 Hz") frameRate = mitk::Hz60;
+  //zzz  return frameRate;
+  frameRate = mitk::Hz60;
   return frameRate;
 }
 
@@ -611,10 +630,10 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
   if ( this->GetPeristenceService() ) // now save the settings using the persistence service
   {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
-    propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
-    propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
-    propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
-    propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
+    //zzz   propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
+    //yyy  propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
+    //zzz  propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
+    //yyy  propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
     propList->Set("MTCalibrationFile",m_MTCalibrationFile);
     propList->Set("SelectedDevice",selectedDeviceType.toStdString());
   }
@@ -623,10 +642,10 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
     QSettings settings;
     settings.beginGroup(QString::fromStdString(id));
     settings.setValue("trackingDeviceChooser", QVariant(selectedDeviceType));
-    settings.setValue("portSpinBoxAurora", QVariant(m_Controls->m_portSpinBoxAurora->value()));
-    settings.setValue("portSpinBoxPolaris", QVariant(m_Controls->m_portSpinBoxPolaris->value()));
-    settings.setValue("portTypePolaris", QVariant(m_Controls->portTypePolaris->currentIndex()));
-    settings.setValue("portTypeAurora", QVariant(m_Controls->portTypeAurora->currentIndex()));
+    //yyy  settings.setValue("portSpinBoxAurora", QVariant(m_Controls->m_portSpinBoxAurora->value()));
+    //zzz   settings.setValue("portSpinBoxPolaris", QVariant(m_Controls->m_portSpinBoxPolaris->value()));
+    //zzz   settings.setValue("portTypePolaris", QVariant(m_Controls->portTypePolaris->currentIndex()));
+    //yyy  settings.setValue("portTypeAurora", QVariant(m_Controls->portTypeAurora->currentIndex()));
     settings.setValue("mTCalibrationFile", QVariant(QString::fromStdString(m_MTCalibrationFile)));
     settings.endGroup();
   }
@@ -654,10 +673,10 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
       MITK_ERROR << "Loaded data from persistence service is invalid (SelectedDevice:" <<selectedDevice<<"): aborted to restore data!";
       return;
     }
-    m_Controls->m_portSpinBoxPolaris->setValue(portPolarisWin);
-    m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
-    m_Controls->portTypePolaris->setCurrentIndex(portTypePolaris);
-    m_Controls->portTypeAurora->setCurrentIndex(portTypeAurora);
+    //zzz   m_Controls->m_portSpinBoxPolaris->setValue(portPolarisWin);
+    //yyy  m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
+    //zzz  m_Controls->portTypePolaris->setCurrentIndex(portTypePolaris);
+    //yyy  m_Controls->portTypeAurora->setCurrentIndex(portTypeAurora);
     MITK_INFO << "Successfully restored UI settings";
   }
   else
@@ -667,10 +686,10 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     settings.beginGroup(QString::fromStdString(id));
 
     selectedDevice = settings.value("trackingDeviceChooser", "").toString().toStdString();
-    m_Controls->m_portSpinBoxAurora->setValue(settings.value("portSpinBoxAurora", 0).toInt());
-    m_Controls->m_portSpinBoxPolaris->setValue(settings.value("portSpinBoxPolaris", 0).toInt());
-    m_Controls->portTypePolaris->setCurrentIndex(settings.value("portTypePolaris", 0).toInt());
-    m_Controls->portTypeAurora->setCurrentIndex(settings.value("portTypeAurora", 0).toInt());
+    //yyy   m_Controls->m_portSpinBoxAurora->setValue(settings.value("portSpinBoxAurora", 0).toInt());
+    //zzz   m_Controls->m_portSpinBoxPolaris->setValue(settings.value("portSpinBoxPolaris", 0).toInt());
+    //zzz  m_Controls->portTypePolaris->setCurrentIndex(settings.value("portTypePolaris", 0).toInt());
+    //yyy   m_Controls->portTypeAurora->setCurrentIndex(settings.value("portTypeAurora", 0).toInt());
     m_MTCalibrationFile = settings.value("mTCalibrationFile", "").toString().toStdString();
 
     settings.endGroup();
@@ -696,39 +715,44 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
   }
 
   // TODO: load corresponding widget
+
+
   m_Controls->m_TrackingSystemWidget->setCurrentWidget(this->GetConfigurationWidgetForDeviceType(selectedDeviceChecked));
 
-  m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString::fromStdString(m_MTCalibrationFile));
+  //zzz m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString::fromStdString(m_MTCalibrationFile));
 }
 
 // TODO: remove this auxiliary device-to-configuration-widget-mapping for existing QStackedWidget
 QWidget* QmitkTrackingDeviceConfigurationWidget::GetConfigurationWidgetForDeviceType(const mitk::TrackingDeviceType& type)
 {
+
   QWidget* currentWidget = nullptr;
+
+    RefreshTrackingDeviceCollection();
 
   if (type == mitk::TRACKING_DEVICE_IDENTIFIER_AURORA)
   {
-    currentWidget = m_Controls->aurora_page;
+    currentWidget = stackedPagesVector.at(0);
   }
   else if (type == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS)
   {
-    currentWidget = m_Controls->polaris_page;
+    currentWidget = stackedPagesVector.at(1);
   }
   else if (type == mitk::TRACKING_DEVICE_IDENTIFIER_MICRON)
   {
-    currentWidget = m_Controls->microntracker_page;
+    currentWidget = stackedPagesVector.at(2);
   }
   else if (type == mitk::TRACKING_DEVICE_IDENTIFIER_OPTITRACK)
   {
-    currentWidget = m_Controls->optitrack_page;
+    currentWidget = stackedPagesVector.at(3);
   }
-  else if (type == mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL)
+  else if (type == mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL || type == "Virtual Tracker MBI")
   {
-    currentWidget = m_Controls->virtual_tracker_page;
+    currentWidget = stackedPagesVector.at(4);
   }
   else if (type == mitk::TRACKING_DEVICE_IDENTIFIER_OPENIGTLINK)
   {
-    currentWidget = m_Controls->open_igt_link_page;
+    currentWidget = stackedPagesVector.at(5);
   }
 
   return currentWidget;

@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 
-//#include <QWidget>
 #include "mitkTrackingDevice.h"
 #include "mitkTrackingDeviceSource.h"
 #include "mitkNavigationToolStorage.h"

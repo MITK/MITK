@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPersistenceService.h>
 #include "mitkTrackingDeviceTypeCollection.h"
 
+
 class QmitkTrackingDeviceConfigurationWidgetConnectionWorker;
 class QmitkTrackingDeviceConfigurationWidgetScanPortsWorker;
 
@@ -169,6 +170,10 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
               It then sets the correct widget for the selected tracking device.*/
     void TrackingDeviceChanged();
 
+    /* @brief This method is called when the user clicks on "Refresh Selection" (m_RefreshTrackingDeviceCollection).
+    It then sets the correct widget for the selected tracking device.*/
+    void RefreshTrackingDeviceCollection();
+
     /* @brief This method is called when the user presses the button "test connection". The method will then create a temporary tracking device,
      *        try to open a connection and start tracking. The user can see the result of the connection test on the small output window.
      */
@@ -227,6 +232,8 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 
     QWidget* GetConfigurationWidgetForDeviceType(const mitk::TrackingDeviceType& type);
 
+
+    std::vector<QWidget*> stackedPagesVector;
 };
 
 //###################################################################################################

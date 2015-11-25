@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt includes
 #include <qclipboard.h>
 #include <qscrollbar.h>
+#include <QVector>
 
 // berry includes
 #include <berryIWorkbenchPage.h>
@@ -269,29 +270,85 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
   {
     const std::vector<mitk::ImageStatisticsCalculator::Statistics> &statistics =
       this->m_CalculationThread->GetStatisticsData();
-    const unsigned int t = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->
-      GetPos();
 
-    // Copy statistics to clipboard ("%Ln" will use the default locale for
-    // number formatting)
-    QString clipboard( "Mean \t StdDev \t RMS \t Max \t Min \t N \t Skewness \t Kurtosis \t Uniformity \t Entropy \t MPP \t UPP \t V (mm³) \n" );
-    clipboard = clipboard.append("%L1 \t %L2 \t %L3 \t %L4 \t %L5 \t %L6 \t %L7 \t %8 \t %9 \t %10 \t %11 \t %12 \t %13")
-      .arg(statistics[t].GetMean(), 0, 'f', 10)
-      .arg(statistics[t].GetSigma(), 0, 'f', 10)
-      .arg(statistics[t].GetRMS(), 0, 'f', 10)
-      .arg(statistics[t].GetMax(), 0, 'f', 10)
-      .arg(statistics[t].GetMin(), 0, 'f', 10)
-      .arg(statistics[t].GetN())
-      .arg(statistics[t].GetSkewness(), 0, 'f', 10)
-      .arg(statistics[t].GetKurtosis(), 0, 'f', 10)
-      .arg(statistics[t].GetUniformity(), 0, 'f', 10)
-      .arg(statistics[t].GetEntropy(), 0, 'f', 10)
-      .arg(statistics[t].GetMPP(), 0, 'f', 10)
-      .arg(statistics[t].GetUPP(), 0, 'f', 10)
-      .arg( m_Controls->m_StatisticsTable->item(6, 0)->data(Qt::DisplayRole).toDouble(), 0, 'f', 10);
+    // Set time borders for for loop ;)
+    unsigned int startT, endT;
+    if(this->m_Controls->m_CheckBox4dCompleteTable->checkState()==Qt::CheckState::Unchecked)
+    {
+        startT = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->
+          GetPos();
+        endT = startT+1;
+    }
+    else
+    {
+        startT = 0;
+        endT = statistics.size();
+    }
+    QVector< QVector<QString> > statisticsTable;
+    QStringList headline;
 
-    QApplication::clipboard()->setText(
-      clipboard, QClipboard::Clipboard );
+    // Create Headline
+    headline << " "
+             << "Mean"
+             << "StdDev"
+             << "RMS"
+             << "Max"
+             << "Min"
+             << "NumberOfVoxels"
+             << "Skewness"
+             << "Kurtosis"
+             << "Uniformity"
+             << "Entropy"
+             << "MPP"
+             << "UPP"
+             << "V [mm³]";
+
+    for(int i=0;i<headline.size();i++)
+    {
+        QVector<QString> row;
+        row.append(headline.at(i));
+        statisticsTable.append(row);
+    }
+
+    // Fill Table
+    for(unsigned int t=startT;t<endT;t++)
+    {
+        // Copy statistics to clipboard ("%Ln" will use the default locale for
+        // number formatting)
+        QStringList value;
+        value << QString::number(t)
+              << QString::number(statistics[t].GetMean())
+              << QString::number(statistics[t].GetSigma())
+              << QString::number(statistics[t].GetRMS())
+              << QString::number(statistics[t].GetMax())
+              << QString::number(statistics[t].GetMin())
+              << QString::number(statistics[t].GetN())
+              << QString::number(statistics[t].GetSkewness())
+              << QString::number(statistics[t].GetKurtosis())
+              << QString::number(statistics[t].GetUniformity())
+              << QString::number(statistics[t].GetEntropy())
+              << QString::number(statistics[t].GetMPP())
+              << QString::number(statistics[t].GetUPP())
+              << QString::number(m_Controls->m_StatisticsTable->item(6, 0)->data(Qt::DisplayRole).toDouble());
+
+         for(int z=0;z<value.size();z++)
+         {
+             statisticsTable[z].append(value.at(z));
+         }
+    }
+
+    // Create output string
+    QString clipboard;
+    for(int i=0;i<statisticsTable.size();i++)
+    {
+        for(int t=0;t<statisticsTable.at(i).size();t++)
+        {
+            clipboard.append(statisticsTable.at(i).at(t));
+            clipboard.append("\t");
+        }
+        clipboard.append("\n");
+    }
+    QApplication::clipboard()->setText(clipboard, QClipboard::Clipboard);
   }
   else
   {
@@ -805,6 +862,16 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setColumnCount(image->GetTimeSteps());
   this->m_Controls->m_StatisticsTable->horizontalHeader()->setVisible(image->GetTimeSteps() > 1);
 
+  // Set Checkbox for complete copy of statistic table
+  if(image->GetTimeSteps()>1)
+  {
+    this->m_Controls->m_CheckBox4dCompleteTable->setEnabled(true);
+  }
+  else
+  {
+    this->m_Controls->m_CheckBox4dCompleteTable->setEnabled(false);
+    this->m_Controls->m_CheckBox4dCompleteTable->setChecked(false);
+  }
   int decimals = 2;
 
   mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();

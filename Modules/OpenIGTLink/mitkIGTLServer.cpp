@@ -202,6 +202,7 @@ void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
       (*i)->CloseSocket();
       //and remove it from the list
       i = this->m_RegisteredClients.erase(i);
+      MITK_INFO("IGTLServer") << "Removed client socket from server client list.";
       break;
     }
     else
@@ -211,9 +212,7 @@ void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
   }
   m_SentListMutex->Unlock();
   m_ReceiveListMutex->Unlock();
-
-  MITK_INFO("IGTLServer") << "Removed client socket from server client list.";
-}
+  }
 
 unsigned int mitk::IGTLServer::GetNumberOfConnections()
 {

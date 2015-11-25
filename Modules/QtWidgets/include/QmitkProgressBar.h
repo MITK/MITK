@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkProgressBarImplementation.h>
 #include <QProgressBar>
+#include <QTimer>
 
 /**
  * \ingroup QmitkModule
@@ -65,6 +66,10 @@ signals:
   void SignalProgress(unsigned int steps);
   void SignalSetPercentageVisible(bool visible);
 
+public slots:
+
+  void SlotOnTimeout();
+
 protected slots:
 
   virtual void SlotAddStepsToDo(unsigned int steps);
@@ -81,6 +86,8 @@ private:
 
   unsigned int m_Progress;
 
+  QTimer* m_timer;
+  bool m_pulce;
 };
 
 #endif /* define QMITKPROGRESSBAR_H */

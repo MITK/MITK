@@ -28,8 +28,14 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 void QmitkProgressBar::Reset()
 {
-  this->reset();
-  this->hide();
+  if (m_pulce)
+  {
+    QMetaObject::invokeMethod(m_timer, "stop");
+  }
+
+  QMetaObject::invokeMethod(this, "reset");
+  QMetaObject::invokeMethod(this, "hide");
+
   m_TotalSteps = 0;
   m_Progress = 0;
 }
@@ -69,6 +75,11 @@ QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char *  /*name*/)
   this->hide();
   this->SetPercentageVisible(true);
 
+  m_pulce = false;
+
+  m_timer = new QTimer();
+  connect(m_timer, SIGNAL(timeout()), this, SLOT(SlotOnTimeout()));
+
   connect( this, SIGNAL(SignalAddStepsToDo(unsigned int)), this, SLOT(SlotAddStepsToDo(unsigned int)) );
   connect( this, SIGNAL(SignalProgress(unsigned int)), this, SLOT(SlotProgress(unsigned int)) );
   connect( this, SIGNAL(SignalSetPercentageVisible(bool)), this, SLOT(SlotSetPercentageVisible(bool)) );
@@ -87,7 +98,20 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
   this->setValue(m_Progress);
 
   if (m_Progress >= m_TotalSteps)
-    Reset();
+  {
+    if (!m_pulce)
+    {
+      Reset();
+    }
+    else
+    {
+      if (m_Progress >= m_TotalSteps)
+      {
+        m_Progress = 0;
+        m_TotalSteps = 100;
+      }
+    }
+  }
   else
   {
      this->show();
@@ -103,12 +127,28 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
 void QmitkProgressBar::SlotAddStepsToDo(unsigned int steps)
 {
   m_TotalSteps += steps;
+
   this->setMaximum(m_TotalSteps);
   this->setValue(m_Progress);
   if (m_TotalSteps > 0)
   {
     this->show();
   }
+  else
+  {
+    m_pulce = true;
+
+    setRange(0, 0);
+    setValue(0);
+
+    m_timer->start(100);
+
+    m_TotalSteps = 100;
+
+    show();
+  }
+
+  QApplication::processEvents();
 
   // Update views if repaint has been requested in the meanwhile
   // (because Qt event loop is not reached while progress bar is updating,
@@ -121,4 +161,12 @@ void QmitkProgressBar::SlotSetPercentageVisible(bool visible)
   this->setTextVisible(visible);
 }
 
+void QmitkProgressBar::SlotOnTimeout()
+{
+  int progressPos = value();
+  progressPos += 10;
 
+  Progress(progressPos);
+
+  QApplication::processEvents();
+}

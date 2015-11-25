@@ -200,15 +200,29 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   m_IsPropertyModifiedTagSet = true;
 
   /* search image than belongs to the property */
-  mitk::NodePredicateProperty::Pointer p = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
-  mitk::DataNode* n = m_DataStorage->GetNode(p);
-  if (n == NULL)
+  typedef mitk::DataStorage::SetOfObjects NodeSetType;
+  NodeSetType::ConstPointer nodes = m_DataStorage->GetAll();
+  NodeSetType::ConstIterator it = nodes->Begin();
+  mitk::DataNode::Pointer propNode = 0;
+  while ( it != nodes->End() )
+  {
+    mitk::DataNode::Pointer node = it.Value();
+    mitk::LevelWindowProperty::Pointer prop = dynamic_cast< mitk::LevelWindowProperty* >( propNode->GetProperty( "levelwindow" ) );
+    if ( prop == m_LevelWindowProperty )
+    {
+      propNode = node;
+      break;
+    }
+    ++it;
+  }
+
+  if ( propNode.IsNull() )
   {
     mitkThrow() << "No Image in DataStorage that belongs to LevelWindow property" << m_LevelWindowProperty;
   }
 
-  m_CurrentImage = dynamic_cast<mitk::Image*>(n->GetData());
-  n->SetBoolProperty( "imageForLevelWindow", true );
+  m_CurrentImage = dynamic_cast<mitk::Image*>( propNode->GetData() );
+  propNode->SetBoolProperty( "imageForLevelWindow", true );
   this->Modified();
 }
 

@@ -180,12 +180,11 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
 
   //remove imageForLevelWindow from old node
   mitk::NodePredicateProperty::Pointer oldPred = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
-  mitk::DataNode* oldNode = m_DataStorage->GetNode( oldPred );
-  if ( oldNode == NULL)
+  mitk::DataNode::Pointer oldNode = m_DataStorage->GetNode( oldPred );
+  if ( oldNode.IsNotNull() )
   {
-    mitkThrow() << "No Image in DataStorage that belongs to LevelWindow property" << m_LevelWindowProperty;
+    oldNode->SetBoolProperty( "imageForLevelWindow", false );
   }
-  oldNode->SetBoolProperty( "imageForLevelWindow", false );
 
   if (m_IsPropertyModifiedTagSet)  // remove listener for old property
   {

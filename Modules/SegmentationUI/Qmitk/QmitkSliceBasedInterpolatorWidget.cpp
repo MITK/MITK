@@ -601,7 +601,7 @@ void QmitkSliceBasedInterpolatorWidget::UpdateVisibleSuggestion()
     mitk::BaseRenderer* renderer = m_LastSNC->GetRenderer();
     if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
     {
-      const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldGeometry() );
+      const mitk::TimeGeometry* timeGeometry = dynamic_cast<const mitk::TimeGeometry*>( renderer->GetWorldTimeGeometry() );
       if (timeGeometry)
       {
         mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeGeometry*>(timeGeometry), renderer->GetSlice() );

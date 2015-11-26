@@ -520,9 +520,9 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetFloatProperty( "planarfigure.default.marker.opacity", m_MarkerOpacity[PF_DEFAULT] );
   if ( !node->GetColor( m_AnnotationColor[PF_DEFAULT], NULL, "planarfigure.default.annotation.color" ) )
   {
-    if ( !node->GetColor( m_LineColor[PF_DEFAULT], NULL, "planarfigure.default.line.color" ) )
+    if ( !node->GetColor( m_AnnotationColor[PF_DEFAULT], NULL, "planarfigure.default.line.color" ) )
     {
-      node->GetColor( m_LineColor[PF_DEFAULT], NULL, "color" );
+      node->GetColor( m_AnnotationColor[PF_DEFAULT], NULL, "color" );
     }
   }
 
@@ -539,9 +539,9 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetFloatProperty( "planarfigure.hover.marker.opacity", m_MarkerOpacity[PF_HOVER] );
   if ( !node->GetColor( m_AnnotationColor[PF_HOVER], NULL, "planarfigure.hover.annotation.color" ) )
   {
-    if ( !node->GetColor( m_LineColor[PF_HOVER], NULL, "planarfigure.hover.line.color" ) )
+    if ( !node->GetColor( m_AnnotationColor[PF_HOVER], NULL, "planarfigure.hover.line.color" ) )
     {
-      node->GetColor( m_LineColor[PF_HOVER], NULL, "color" );
+      node->GetColor( m_AnnotationColor[PF_HOVER], NULL, "color" );
     }
   }
 
@@ -558,9 +558,9 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetFloatProperty( "planarfigure.selected.marker.opacity", m_MarkerOpacity[PF_SELECTED] );
   if ( !node->GetColor( m_AnnotationColor[PF_SELECTED], NULL, "planarfigure.selected.annotation.color" ) )
   {
-    if ( !node->GetColor( m_LineColor[PF_SELECTED], NULL, "planarfigure.selected.line.color" ) )
+    if ( !node->GetColor( m_AnnotationColor[PF_SELECTED], NULL, "planarfigure.selected.line.color" ) )
     {
-      node->GetColor( m_LineColor[PF_SELECTED], NULL, "color" );
+      node->GetColor( m_AnnotationColor[PF_SELECTED], NULL, "color" );
     }
   }
 

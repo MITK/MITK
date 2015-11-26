@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
 #include "mitkLegacyAdaptors.h"
+#include "mitkLabelSetImage.h"
 
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 
@@ -114,6 +115,19 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
     return;
   }
 
+  // Get the current working color
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  if (!workingNode) return false;
+
+  Image* image = dynamic_cast<Image*>(workingNode->GetData());
+  LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image);
+  int activeColor = 1;
+  if (labelImage != 0)
+  {
+    activeColor = labelImage->GetActiveLabel()->GetValue();
+  }
+
+
   // 2. Determine the contour that surronds the selected "piece of the image"
 
   // find a contour seed point
@@ -146,13 +160,13 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
       if ( data[oneContourOffset] > 0 ) break;
     }
   }
-  else if ( data[oneContourOffset] == 1 ) // initial seed 1
+  else if ( data[oneContourOffset] == activeColor ) // initial seed 1
   {
     unsigned int lastValidPixel = size-1; // initialization, will be changed lateron
     bool inSeg = true;    // inside segmentation?
     for ( ; oneContourOffset < size; ++oneContourOffset )
     {
-      if ( ( data[oneContourOffset] == 0 ) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
+      if ( ( data[oneContourOffset] != activeColor ) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
       {
         inSeg = false;
         lastValidPixel = oneContourOffset - 1; // store the last pixel position inside a filled region
@@ -165,12 +179,6 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
 
     }
     oneContourOffset = lastValidPixel;
-  }
-  else
-  {
-    MITK_ERROR << "Fill/Erase was never intended to work with other than binary images." << std::endl;
-    m_FillContour = false;
-    return;
   }
 
   if (oneContourOffset == size) // nothing found until end of slice
@@ -280,7 +288,16 @@ void mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
   // false: don't constrain the contour to the image's inside
   if (projectedContour.IsNull()) return;
 
-  FeedbackContourTool::FillContourInSlice( projectedContour, timeStep, slice, m_PaintingPixelValue );
+  LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image);
+  int activeColor = 1;
+  if (labelImage != 0)
+  {
+    activeColor = labelImage->GetActiveLabel()->GetValue();
+  }
+
+  mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, slice, image, m_PaintingPixelValue*activeColor);
+
+  //FeedbackContourTool::FillContourInSlice( projectedContour, timeStep, slice, m_PaintingPixelValue );
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 

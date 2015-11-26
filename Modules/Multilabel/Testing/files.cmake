@@ -3,5 +3,6 @@ set(MODULE_TESTS
     mitkLabelSetTest.cpp
     mitkLabelSetImageTest.cpp
     #mitkLabelSetImageIOTest.cpp # Deactivated. Not supported yet - requires low level writer access.
+    mitkLabelSetImageSurfaceStampFilterTest.cpp
 )
 

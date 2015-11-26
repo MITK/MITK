@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/multilabelsegmentation" >
+    <file>multilabelsegmentation.png</file>
+    <file>NewLabel_48x48.png</file>
+    <file>NewSegmentationSession_48x48.png</file>
+  </qresource>
+</RCC>

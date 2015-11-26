@@ -62,7 +62,7 @@ namespace mitk
     \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.
     */
     template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Surface::Pointer surface,  mitk::Image::Pointer resultImage );
+    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer resultImage );
 
     Surface::Pointer m_Surface;
     bool m_ForceOverwrite;

@@ -54,12 +54,12 @@ void mitk::LabelSetImageSurfaceStampFilter::GenerateData()
   surfaceToImageFilter->Update();
   mitk::Image::Pointer resultImage = surfaceToImageFilter->GetOutput();
 
-  AccessByItk_2(inputImage, ItkImageProcessing, m_Surface, resultImage);
+  AccessByItk_1(inputImage, ItkImageProcessing, resultImage);
   inputImage->DisconnectPipeline();
 }
 
 template<typename TPixel, unsigned int VImageDimension>
-void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Surface::Pointer surface, mitk::Image::Pointer resultImage )
+void mitk::LabelSetImageSurfaceStampFilter::ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer resultImage )
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   mitk::LabelSetImage::Pointer LabelSetInputImage = dynamic_cast<LabelSetImage *>(GetInput());

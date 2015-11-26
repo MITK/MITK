@@ -9,6 +9,7 @@ set(CPP_FILES
   mitkLabelSetImageToSurfaceThreadedFilter.cpp
   mitkLabelSetImageVtkMapper2D.cpp
   mitkMultilabelObjectFactory.cpp
+  mitkLabelSetIOHelper.cpp
 )
 
 set(RESOURCE_FILES

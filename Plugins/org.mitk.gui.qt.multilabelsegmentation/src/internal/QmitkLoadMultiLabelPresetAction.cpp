@@ -16,12 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkLoadMultiLabelPresetAction.h"
 
 #include "mitkLabelSetImage.h"
+#include "mitkLabelSetIOHelper.h"
 #include "mitkRenderingManager.h"
-//#include "mitkLabelSetImageIO.h"
 
+#include "QFileDialog"
 #include "QInputDialog"
 #include "QMessageBox"
-#include "QFileDialog"
+
 #include "tinyxml.h"
 
 QmitkLoadMultiLabelPresetAction::QmitkLoadMultiLabelPresetAction()
@@ -34,23 +35,24 @@ QmitkLoadMultiLabelPresetAction::~QmitkLoadMultiLabelPresetAction()
 
 void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
-//  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
-//  {
+  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
+  {
 
-//    if (referenceNode.IsNull()) return;
+    if (referenceNode.IsNull()) return;
 
-//    mitk::LabelSetImage::Pointer referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
-//    assert(referenceImage);
+    mitk::LabelSetImage::Pointer referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
+    assert(referenceImage);
 
-//    std::string sName = referenceNode->GetName();
-//    QString qName;
-//    qName.sprintf("%s.lsetp",sName.c_str());
-//    QString filename = QFileDialog::getOpenFileName(NULL,"Load file",QString(),"LabelSet Preset(*.lsetp)");
-//    if ( filename.isEmpty() )
-//      return;
+    std::string sName = referenceNode->GetName();
+    QString qName;
+    qName.sprintf("%s.lsetp",sName.c_str());
+    QString filename = QFileDialog::getOpenFileName(NULL,"Load file",QString(),"LabelSet Preset(*.lsetp)");
+    if ( filename.isEmpty() )
+      return;
 
-//    mitk::LabelSetImageIO::LoadLabelSetImagePreset(filename.toStdString(), referenceImage);
-//  }
+    std::string fileName = filename.toStdString();
+    mitk::LabelSetIOHelper::LoadLabelSetImagePreset(fileName, referenceImage);
+  }
 }
 
 void QmitkLoadMultiLabelPresetAction::SetDataStorage(mitk::DataStorage* dataStorage)

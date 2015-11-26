@@ -17,13 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkVirtualTrackerWidget.h"
 #include "QmitkTrackingDeviceConfigurationWidget.h"
 
+#include <mitkVirtualTrackingDevice.h>
+
 #include <QFileDialog>
 #include <QMessageBox>
 
 const std::string QmitkVirtualTrackerWidget::VIEW_ID = "org.mitk.views.VirtualTrackerWidget";
 
 QmitkVirtualTrackerWidget::QmitkVirtualTrackerWidget(QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f)
+  : QmitkAbstractTrackingDeviceWidget(parent, f)
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
@@ -49,11 +51,40 @@ void QmitkVirtualTrackerWidget::CreateConnections()
 {
   if (m_Controls)
   {
-    //connect( (QObject*)(m_Controls->connectButton), SIGNAL(clicked()), this, SLOT(OnConnect()) );
+    connect((QObject*)(m_Controls->m_EnableGaussianNoise), SIGNAL(clicked()), this, SLOT(EnableGaussianNoise()));
   }
 }
 
-void QmitkVirtualTrackerWidget::OnConnect()
+mitk::TrackingDevice::Pointer QmitkVirtualTrackerWidget::ConstructTrackingDevice()
 {
-  emit TrackingDeviceConnected();
+  // Create the Virtual Tracking Device
+  mitk::VirtualTrackingDevice::Pointer returnValue = mitk::VirtualTrackingDevice::New();
+  if (m_Controls->m_EnableGaussianNoise->isChecked())
+  {
+    returnValue->EnableGaussianNoise();
+    returnValue->SetParamsForGaussianNoise(m_Controls->m_MeanDistributionParam->value(), m_Controls->m_DeviationDistributionParam->value());
+  }
+  return returnValue;
+}
+
+void QmitkVirtualTrackerWidget::StoreUISettings()
+{
+}
+
+void QmitkVirtualTrackerWidget::LoadUISettings()
+{
+}
+
+void QmitkVirtualTrackerWidget::EnableGaussianNoise()
+{
+  if (m_Controls->m_EnableGaussianNoise->isChecked())
+  {
+    m_Controls->m_MeanDistributionParam->setEnabled(true);
+    m_Controls->m_DeviationDistributionParam->setEnabled(true);
+  }
+  else
+  {
+    m_Controls->m_MeanDistributionParam->setEnabled(false);
+    m_Controls->m_DeviationDistributionParam->setEnabled(false);
+  }
 }

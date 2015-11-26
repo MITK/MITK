@@ -21,55 +21,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkIGTUIExports.h"
 #include "ui_QmitkMicronTrackerWidget.h"
 
+#include "QmitkAbstractTrackingDeviceWidget.h"
+
 //itk headers
 
- /** Documentation:
-  *   \brief Simple and fast access to a pre-configured TrackingDeviceSource.
-  *
-  *   This widget creates a fully configured, connected and started TrackingDeviceSource.
-  *   Clicking "Connect" requires to specify a NavigationToolStorage that holds all tools to be used
-  *   in the application. Corresponding surfaces are added to the DataStorage that has to be set for
-  *   the widget.
-  *
-  *   Inputs: DataStorage
-  *   Outputs: TrackingDeviceSource, NavigationToolStorage
-  *   Signals: TrackingDeviceConnected, TrackingDeviceDisconnected
-  *
-  *   \ingroup IGTUI
-  */
-class MITKIGTUI_EXPORT QmitkMicronTrackerWidget : public QWidget
+/** Documentation:
+ *   \brief Simple and fast access to a pre-configured TrackingDeviceSource.
+ *
+ *   This widget creates a fully configured, connected and started TrackingDeviceSource.
+ *   Clicking "Connect" requires to specify a NavigationToolStorage that holds all tools to be used
+ *   in the application. Corresponding surfaces are added to the DataStorage that has to be set for
+ *   the widget.
+ *
+ *   Inputs: DataStorage
+ *   Outputs: TrackingDeviceSource, NavigationToolStorage
+ *   Signals: TrackingDeviceConnected, TrackingDeviceDisconnected
+ *
+ *   \ingroup IGTUI
+ */
+class MITKIGTUI_EXPORT QmitkMicronTrackerWidget : public QmitkAbstractTrackingDeviceWidget
 {
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 
-  public:
-    static const std::string VIEW_ID;
+public:
+  static const std::string VIEW_ID;
 
-    QmitkMicronTrackerWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkMicronTrackerWidget();
+  QmitkMicronTrackerWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  ~QmitkMicronTrackerWidget();
 
-  signals:
-    /*!
-    \brief signal emitted when TrackingDevice was successfully connected
-    */
-    void TrackingDeviceConnected();
+signals:
 
+  protected slots :
 
-  protected slots:
-    /*!
-    \brief Asks the user to specify a tool file and finally connects the TrackingDeviceSource
-    */
-    void OnConnect();
+protected:
 
-  protected:
+  /// \brief Creation of the connections
+  virtual void CreateConnections();
 
-    /// \brief Creation of the connections
-    virtual void CreateConnections();
+  virtual void CreateQtPartControl(QWidget *parent);
 
-    virtual void CreateQtPartControl(QWidget *parent);
+  std::string m_MTCalibrationFile;
 
+  Ui::QmitkMicronTrackerWidget* m_Controls;
 
-    Ui::QmitkMicronTrackerWidget* m_Controls;
+  /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
+  void SetMTCalibrationFileClicked();
 
-    std::string m_ErrorMessage; ///< current problem description
+public:
+  virtual void ResetOutput();
+  virtual void AddOutput(std::string s);
+  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+
+  virtual void StoreUISettings();
+  virtual void LoadUISettings();
+  virtual bool IsDeviceInstalled();
 };
 #endif

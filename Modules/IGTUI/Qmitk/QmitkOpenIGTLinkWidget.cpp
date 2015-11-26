@@ -20,10 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <mitkOpenIGTLinkTrackingDevice.h>
+
 const std::string QmitkOpenIGTLinkWidget::VIEW_ID = "org.mitk.views.OpenIGTLinkWidget";
 
 QmitkOpenIGTLinkWidget::QmitkOpenIGTLinkWidget(QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f)
+  : QmitkAbstractTrackingDeviceWidget(parent, f)
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
@@ -45,15 +47,19 @@ void QmitkOpenIGTLinkWidget::CreateQtPartControl(QWidget *parent)
   }
 }
 
-void QmitkOpenIGTLinkWidget::CreateConnections()
+mitk::TrackingDevice::Pointer QmitkOpenIGTLinkWidget::ConstructTrackingDevice()
 {
-  if (m_Controls)
-  {
-    //connect( (QObject*)(m_Controls->connectButton), SIGNAL(clicked()), this, SLOT(OnConnect()) );
-  }
+  // Create the Virtual Tracking Device
+  mitk::OpenIGTLinkTrackingDevice::Pointer OIGTLDevice = mitk::OpenIGTLinkTrackingDevice::New();
+  OIGTLDevice->SetPortNumber(m_Controls->m_OpenIGTLinkPort->text().toInt());
+  OIGTLDevice->SetHostname(m_Controls->m_OpenIGTLinkHostname->text().toStdString());
+  return OIGTLDevice;
 }
 
-void QmitkOpenIGTLinkWidget::OnConnect()
+void QmitkOpenIGTLinkWidget::StoreUISettings()
 {
-  emit TrackingDeviceConnected();
+}
+
+void QmitkOpenIGTLinkWidget::LoadUISettings()
+{
 }

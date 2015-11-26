@@ -45,9 +45,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingDeviceTypeCollection.h>
 #include <mitkUnspecifiedTrackingTypeInformation.h>
 
+//All Tracking devices, which should be avaiable by default
 #include "mitkNDIAuroraTypeInformation.h"
 #include "mitkNDIPolarisTypeInformation.h"
 #include "mitkVirtualTrackerTypeInformation.h"
+#include "mitkMicronTrackerTypeInformation.h"
+#include "mitkNPOptitrackTrackingTypeInformation.h"
+#include "mitkOpenIGTLinkTypeInformation.h"
 
 // vtk
 #include <vtkSphereSource.h>
@@ -93,9 +97,12 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 
   m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIAuroraTypeInformation());
   m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIPolarisTypeInformation());
+  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::MicronTrackerTypeInformation());
+  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NPOptitrackTrackingTypeInformation());
   m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::VirtualTrackerTypeInformation());
-
+  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::OpenIGTLinkTypeInformation());
   m_DeviceTypeCollection.RegisterAsMicroservice();
+
 }
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
@@ -185,7 +192,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Worker->moveToThread(m_WorkerThread);
 
     //initialize widgets
-    m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
     m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
 

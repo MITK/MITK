@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkOpenIGTLinkWidget_H
-#define QmitkOpenIGTLinkWidget_H
+#ifndef QmitkNDIAbstractDeviceWidget_H
+#define QmitkNDIAbstractDeviceWidget_H
 
 #include <QWidget>
 #include "MitkIGTUIExports.h"
-#include "ui_QmitkOpenIGTLinkWidget.h"
-
 #include "QmitkAbstractTrackingDeviceWidget.h"
+
+#include "QmitkTrackingDeviceConfigurationWidgetScanPortsWorker.h";
 
 //itk headers
 
@@ -39,29 +39,43 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  *   \ingroup IGTUI
  */
-class MITKIGTUI_EXPORT QmitkOpenIGTLinkWidget : public QmitkAbstractTrackingDeviceWidget
+class MITKIGTUI_EXPORT QmitkNDIAbstractDeviceWidget : public QmitkAbstractTrackingDeviceWidget
 {
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 
 public:
   static const std::string VIEW_ID;
 
-  QmitkOpenIGTLinkWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-  ~QmitkOpenIGTLinkWidget();
+  QmitkNDIAbstractDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  ~QmitkNDIAbstractDeviceWidget();
+
+  virtual void AddOutput(std::string s) = 0;
 
 signals:
+  void PortsScanned(int Port, QString result, int PortType);
 
-  protected slots :
+  protected slots:
+
+  /* @brief Scans the serial ports automatically for a connected tracking device. If the method finds a device
+  *        it selects the right type and sets the corresponding port in the widget.
+  */
+  void AutoScanPorts();
+
+  /** This slot is called when the port scanning is finished. */
+  void AutoScanPortsFinished(int Port, QString result, int PortType);
 
 protected:
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  /// \brief Creation of the connections
+  virtual void CreateConnections();
 
-  Ui::QmitkOpenIGTLinkWidget* m_Controls;
-public:
-  virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+  virtual void CreateQtPartControl(QWidget *parent){};
 
-  virtual void StoreUISettings();
-  virtual void LoadUISettings();
+  QThread* m_ScanPortsWorkerThread;
+  QmitkTrackingDeviceConfigurationWidgetScanPortsWorker* m_ScanPortsWorker;
+
+  virtual void SetPortValueToGUI(int portValue) = 0;
+  virtual void SetPortTypeToGUI(int portType) = 0;
 };
+
 #endif

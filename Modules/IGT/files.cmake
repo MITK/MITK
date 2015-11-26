@@ -88,7 +88,6 @@ set(RESOURCE_FILES
   NDIPolarisVicra.stl
 )
 
-
 if(MITK_USE_MICRON_TRACKER)
   set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkClaronInterface.cpp)
 else()

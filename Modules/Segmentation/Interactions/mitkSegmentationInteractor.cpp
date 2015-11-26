@@ -26,7 +26,7 @@ void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
 {
   Superclass::ConnectActionsAndFunctions();
 
-  CONNECT_FUNCTION("change_active_label", ChangeActiveLabel);
+  //CONNECT_FUNCTION("change_active_label", ChangeActiveLabel);
 }
 
 bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction*, InteractionEvent* interactionEvent)

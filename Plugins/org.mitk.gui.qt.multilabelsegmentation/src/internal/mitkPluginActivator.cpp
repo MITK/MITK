@@ -64,4 +64,6 @@ ctkPluginContext* mitk::PluginActivator::getContext()
   return m_Context;
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_EXPORT_PLUGIN2(org_mitk_gui_qt_multilabelsegmentation, mitk::PluginActivator)
+#endif

@@ -823,7 +823,7 @@ void QmitkLabelSetWidget::InitializeTableWidget()
   tableWidged->setColumnWidth(LOCKED_COL,25);
   tableWidged->setColumnWidth(COLOR_COL,25);
   tableWidged->setColumnWidth(VISIBLE_COL,25);
-  tableWidged->horizontalHeader()->setResizeMode( 0, QHeaderView::Stretch );
+  tableWidged->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
   tableWidged->setContextMenuPolicy(Qt::CustomContextMenu);
   tableWidged->horizontalHeader()->hide();
   tableWidged->setSortingEnabled ( false );

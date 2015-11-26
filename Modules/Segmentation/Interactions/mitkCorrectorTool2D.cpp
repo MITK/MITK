@@ -192,6 +192,4 @@ void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   SegTool2D::WritePreviewOnWorkingImage(erg1, algorithm->GetOutput(), image, workingColorId,0);
   SegTool2D::WriteBackSegmentationResult(positionEvent,erg1);
   //this->WriteBackSegmentationResult(positionEvent, resultSlice);
-
-  return true;
 }

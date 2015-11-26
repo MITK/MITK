@@ -117,7 +117,7 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
 
   // Get the current working color
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return false;
+  if (!workingNode) return;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
   LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image);

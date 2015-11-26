@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkLabelSetImageWriter_h
 #define __mitkLabelSetImageWriter_h
 
-#include "MitkMultilabelIOExports.h"
 #include <mitkAbstractFileIO.h>
 #include <mitkLabelSetImage.h>
 
@@ -29,7 +28,7 @@ namespace mitk
   */
   // The export macro should be removed. Currently, the unit
   // tests directly instantiate this class.
-  class MITKMULTILABELIO_EXPORT LabelSetImageIO : public mitk::AbstractFileIO
+  class LabelSetImageIO : public mitk::AbstractFileIO
   {
   public:
 

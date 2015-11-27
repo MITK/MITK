@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 #include <Poco/Path.h>
+#include <QSettings>
+
 
 const std::string QmitkMicronTrackerWidget::VIEW_ID = "org.mitk.views.NDIMicronTrackerWidget";
 
@@ -94,10 +96,45 @@ mitk::TrackingDevice::Pointer QmitkMicronTrackerWidget::ConstructTrackingDevice(
 
 void QmitkMicronTrackerWidget::StoreUISettings()
 {
+  std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+  if (this->GetPeristenceService()) // now save the settings using the persistence service
+  {
+    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    propList->Set("MTCalibrationFile",m_MTCalibrationFile);
+  }
+  else // QSettings as a fallback if the persistence service is not available
+  {
+    QSettings settings;
+    settings.beginGroup(QString::fromStdString(id));
+    settings.setValue("mTCalibrationFile", QVariant(QString::fromStdString(m_MTCalibrationFile)));
+    settings.endGroup();
+  }
 }
 
 void QmitkMicronTrackerWidget::LoadUISettings()
 {
+  std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+
+  if (this->GetPeristenceService())
+  {
+    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    if (propList.IsNull())
+    {
+      MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;
+    }
+
+    propList->Get("MTCalibrationFile",m_MTCalibrationFile);
+  }
+  else
+  {
+    // QSettings as a fallback if the persistence service is not available
+    QSettings settings;
+    settings.beginGroup(QString::fromStdString(id));
+    m_MTCalibrationFile = settings.value("mTCalibrationFile", "").toString().toStdString();
+
+    settings.endGroup();
+  }
+  m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString::fromStdString(m_MTCalibrationFile));
 }
 
 bool QmitkMicronTrackerWidget::IsDeviceInstalled()

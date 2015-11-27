@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <mitkNDITrackingDevice.h>
 
+#include <QSettings>
+
 const std::string QmitkNDIPolarisWidget::VIEW_ID = "org.mitk.views.NDIPolarisWidget";
 
 QmitkNDIPolarisWidget::QmitkNDIPolarisWidget(QWidget* parent, Qt::WindowFlags f)
@@ -81,19 +83,10 @@ void QmitkNDIPolarisWidget::AddOutput(std::string s)
 
 mitk::TrackingDevice::Pointer QmitkNDIPolarisWidget::ConstructTrackingDevice()
 {
-  if (m_Controls->m_radioPolaris5D->isChecked()) //5D Tracking
-  {
-    //not yet in the open source part so we'll only get NULL here.
-    MITK_WARN << "5D Tracking not implemented yet! Returning nullptr.";
-    return nullptr;
-  }
-  else //6D Tracking
-  {
     mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
 
     //get port
     int port = 0;
-
     port = m_Controls->m_portSpinBoxPolaris->value();
 
     //build prefix (depends on linux/win)
@@ -114,15 +107,65 @@ mitk::TrackingDevice::Pointer QmitkNDIPolarisWidget::ConstructTrackingDevice()
     tempTrackingDevice->SetBaudRate(mitk::SerialCommunication::BaudRate115200);//set baud rate
     tempTrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS);
     return static_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
-  }
 }
 
 void QmitkNDIPolarisWidget::StoreUISettings()
 {
+  std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+  if (this->GetPeristenceService()) // now save the settings using the persistence service
+  {
+    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
+    propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
+    propList->Set("PolarisFrameRate", GetPolarisFrameRate());
+  }
+  else // QSettings as a fallback if the persistence service is not available
+  {
+    QSettings settings;
+    settings.beginGroup(QString::fromStdString(id));
+    settings.setValue("portSpinBoxPolaris", QVariant(m_Controls->m_portSpinBoxPolaris->value()));
+    settings.setValue("portTypePolaris", QVariant(m_Controls->portTypePolaris->currentIndex()));
+    settings.setValue("PolarisFrameRate", QVariant(GetPolarisFrameRate()));
+    settings.endGroup();
+  }
 }
 
 void QmitkNDIPolarisWidget::LoadUISettings()
 {
+  std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+  if (this->GetPeristenceService())
+  {
+    int port = 0;
+    int portType = 0;
+    int polarisFrameRate = 0;
+
+    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    if (propList.IsNull())
+    {
+      MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;
+    }
+
+    propList->Get("PolarisPortWin", port);
+    propList->Get("PortTypePolaris", portType);
+    propList->Get("PolarisFrameRate", polarisFrameRate);
+    this->SetPortTypeToGUI(portType);
+    this->SetPortValueToGUI(port);
+    m_Controls->m_frameRateComboBoxPolaris->setCurrentIndex((int)(polarisFrameRate/30));
+  }
+  else
+  {
+    // QSettings as a fallback if the persistence service is not available
+    QSettings settings;
+    settings.beginGroup(QString::fromStdString(id));
+
+    m_Controls->m_portSpinBoxPolaris->setValue(settings.value("portSpinBoxPolaris", 0).toInt());
+    m_Controls->portTypePolaris->setCurrentIndex(settings.value("portTypePolaris", 0).toInt());
+    //framerates 20,30,60 --> divided by 30 = 0,1,2 --> index of combobox
+    m_Controls->m_frameRateComboBoxPolaris->setCurrentIndex((int)(settings.value("PolarisFrameRate", 0).toInt()/30));
+
+    settings.endGroup();
+  }
+
 }
 
 mitk::IlluminationActivationRate QmitkNDIPolarisWidget::GetPolarisFrameRate()

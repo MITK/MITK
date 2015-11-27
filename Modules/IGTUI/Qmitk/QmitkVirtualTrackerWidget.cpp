@@ -67,14 +67,6 @@ mitk::TrackingDevice::Pointer QmitkVirtualTrackerWidget::ConstructTrackingDevice
   return static_cast<mitk::TrackingDevice::Pointer>(returnValue); //static_cast necessary for compiling with Linux
 }
 
-void QmitkVirtualTrackerWidget::StoreUISettings()
-{
-}
-
-void QmitkVirtualTrackerWidget::LoadUISettings()
-{
-}
-
 void QmitkVirtualTrackerWidget::EnableGaussianNoise()
 {
   if (m_Controls->m_EnableGaussianNoise->isChecked())

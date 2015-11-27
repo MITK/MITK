@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
 
 const std::string QmitkNDIAuroraWidget::VIEW_ID = "org.mitk.views.NDIAuroraWidget";
 
@@ -101,10 +102,54 @@ mitk::TrackingDevice::Pointer QmitkNDIAuroraWidget::ConstructTrackingDevice()
 }
 
 void QmitkNDIAuroraWidget::StoreUISettings()
-{}
+{
+  std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+  if (this->GetPeristenceService()) // now save the settings using the persistence service
+  {
+    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
+    propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
+  }
+  else // QSettings as a fallback if the persistence service is not available
+  {
+    QSettings settings;
+    settings.beginGroup(QString::fromStdString(id));
+    settings.setValue("portSpinBoxAurora", QVariant(m_Controls->m_portSpinBoxAurora->value()));
+    settings.setValue("portTypeAurora", QVariant(m_Controls->portTypeAurora->currentIndex()));
+    settings.endGroup();
+  }
+}
 
 void QmitkNDIAuroraWidget::LoadUISettings()
-{}
+{
+  std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
+  if (this->GetPeristenceService())
+  {
+    int port = 0;
+    int portType = 0;
+    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    if (propList.IsNull())
+    {
+      MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;
+    }
+
+    propList->Get("AuroraPortWin", port);
+    propList->Get("PortTypeAurora", portType);
+    this->SetPortTypeToGUI(portType);
+    this->SetPortValueToGUI(port);
+  }
+  else
+  {
+    // QSettings as a fallback if the persistence service is not available
+    QSettings settings;
+    settings.beginGroup(QString::fromStdString(id));
+
+    m_Controls->m_portSpinBoxAurora->setValue(settings.value("portSpinBoxAurora", 0).toInt());
+    m_Controls->portTypeAurora->setCurrentIndex(settings.value("portTypeAurora", 0).toInt());
+
+    settings.endGroup();
+  }
+}
 
 void QmitkNDIAuroraWidget::SetPortValueToGUI(int portValue){
   m_Controls->m_portSpinBoxAurora->setValue(portValue);

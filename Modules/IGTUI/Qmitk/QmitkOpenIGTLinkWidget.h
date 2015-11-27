@@ -61,7 +61,5 @@ protected:
 public:
   virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
 
-  virtual void StoreUISettings();
-  virtual void LoadUISettings();
 };
 #endif

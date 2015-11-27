@@ -122,6 +122,8 @@ protected:
   void StoreUISettings();
   void LoadUISettings();
 
+  QmitkAbstractTrackingDeviceWidget* GetCurrentWidget();
+
   protected slots:
   /* @brief This method is called when the user changes the selection of the trackingdevice (m_trackingDeviceChooser).
             It then sets the correct widget for the selected tracking device.*/

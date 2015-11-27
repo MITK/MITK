@@ -5,35 +5,82 @@ Created on Oct 19, 2015
 '''
 
 import numpy as np
+from scipy.interpolate import interp1d
+
+from mc.usuag import get_haemoglobin_extinction_coefficients
 
 class LinearSaO2Unmixing(object):
     '''
     classdocs
     '''
 
-    def __init__(self):
-        # oxygenated haemoglobin extinction coefficients
-        eHbO2 = np.array([ \
-               50104  ,
-               33209.2,
-               319.6  ,
-               32613.2,
-               26629.2,
-               20035.2,
-               3200
-               , 290
-               ])
-        # deoxygenated haemoglobin extinction coefficients
-        eHb = np.array([
-              37020   ,
-              16156.4 ,
-              3226.56 ,
-              53788   ,
-              14550   ,
-              25773.6 ,
-              14677.2
-              , 1794.28
-              ])
+    def __init__(self, use_LCTF=False):
+        eHb02 = 0
+        eHb = 0
+        if use_LCTF:
+            # oxygenated haemoglobin extinction coefficients
+            eHbO2 = np.array([34772.8,
+                   27840.93333,
+                   23748.8    ,
+                   21550.8    ,
+                   21723.46667,
+                   28064.8    ,
+                   39131.73333,
+                   45402.93333,
+                   42955.06667,
+                   40041.73333,
+                   42404.4    ,
+                   36333.6    ,
+                   22568.26667,
+                   6368.933333,
+                   1882.666667,
+                   1019.333333,
+                   664.6666667,
+                   473.3333333,
+                   376.5333333,
+                   327.2      ,
+                   297.0666667],)
+            # deoxygenated haemoglobin extinction coefficients
+            eHb = [18031.73333 ,
+                   15796.8     ,
+                   17365.33333 ,
+                   21106.53333 ,
+                   26075.06667 ,
+                   32133.2     ,
+                   39072.66667 ,
+                   46346.8     ,
+                   51264       ,
+                   50757.33333 ,
+                   45293.33333 ,
+                   36805.46667 ,
+                   26673.86667 ,
+                   17481.73333 ,
+                   10210.13333 ,
+                   7034        ,
+                   5334.533333 ,
+                   4414.706667 ,
+                   3773.96     ,
+                   3257.266667 ,
+                   2809.866667]
+        else:
+            window_size = 6
+            eHbO2_map, eHb_map = get_haemoglobin_extinction_coefficients()
+            parse_wavelengths = np.arange(450, 720, 2) * 10 ** -9
+            eHbO2_parsed = eHbO2_map(parse_wavelengths)
+            eHb_parsed = eHb_map(parse_wavelengths)
+            eHbO2 = np.convolve(eHbO2_parsed,
+                                np.ones(window_size, dtype=float) /
+                           float(window_size), mode="same")
+            eHb = np.convolve(eHb_parsed,
+                                np.ones(window_size, dtype=float) /
+                           float(window_size), mode="same")
+
+        eHbO2_map2 = interp1d(parse_wavelengths, eHbO2)
+        eHb_map2 = interp1d(parse_wavelengths, eHb)
+        wavelengths = np.arange(470, 680, 10) * 10 ** -9
+
+        eHbO2 = eHbO2_map2(wavelengths)
+        eHb = eHb_map2(wavelengths)
 
         nr_total_wavelengths = len(eHb)
         # to account for scattering losses we allow a constant offset

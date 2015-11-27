@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 int mitkTrackingTypesTest(int /* argc */, char* /*argv*/[])
 {
+//bug-19404-RefactorTrackingDevices Commented out because of compile errors
 //  MITK_TEST_BEGIN("TrackingTypes");
 
 //  std:: vector<mitk::TrackingDeviceData> ResultSet = mitk::GetDeviceDataForLine(mitk::TRACKING_DEVICE_IDENTIFIER_INVALID);

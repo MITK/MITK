@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qscrollbar.h>
 #include <qthread.h>
 
+#include <mitkIPersistenceService.h>
+
 #include "QmitkTrackingDeviceConfigurationWidgetConnectionWorker.h";
 
 //itk headers
@@ -70,7 +72,7 @@ signals:
   void TestConnection();
 
 protected:
-
+  PERSISTENCE_GET_SERVICE_METHOD_MACRO
   /// \brief Creation of the connections
   virtual void CreateConnections();
   virtual void CreateQtPartControl(QWidget *parent){};

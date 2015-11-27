@@ -84,14 +84,6 @@ mitk::TrackingDevice::Pointer QmitkNPOptitrackWidget::ConstructTrackingDevice()
   return tempTrackingDevice;
 }
 
-void QmitkNPOptitrackWidget::StoreUISettings()
-{
-}
-
-void QmitkNPOptitrackWidget::LoadUISettings()
-{
-}
-
 bool QmitkNPOptitrackWidget::IsDeviceInstalled()
 {
   return mitk::OptitrackTrackingDevice::New()->IsDeviceInstalled();

@@ -67,14 +67,6 @@ mitk::TrackingDevice::Pointer QmitkVirtualTrackerWidget::ConstructTrackingDevice
   return returnValue;
 }
 
-void QmitkVirtualTrackerWidget::StoreUISettings()
-{
-}
-
-void QmitkVirtualTrackerWidget::LoadUISettings()
-{
-}
-
 void QmitkVirtualTrackerWidget::EnableGaussianNoise()
 {
   if (m_Controls->m_EnableGaussianNoise->isChecked())

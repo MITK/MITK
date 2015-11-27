@@ -76,6 +76,7 @@ protected:
 
   virtual void SetPortValueToGUI(int portValue) = 0;
   virtual void SetPortTypeToGUI(int portType) = 0;
+
 };
 
 #endif

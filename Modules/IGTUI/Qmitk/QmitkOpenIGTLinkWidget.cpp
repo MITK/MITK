@@ -55,11 +55,3 @@ mitk::TrackingDevice::Pointer QmitkOpenIGTLinkWidget::ConstructTrackingDevice()
   OIGTLDevice->SetHostname(m_Controls->m_OpenIGTLinkHostname->text().toStdString());
   return OIGTLDevice;
 }
-
-void QmitkOpenIGTLinkWidget::StoreUISettings()
-{
-}
-
-void QmitkOpenIGTLinkWidget::LoadUISettings()
-{
-}

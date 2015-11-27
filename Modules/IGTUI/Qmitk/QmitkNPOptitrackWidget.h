@@ -72,8 +72,6 @@ public:
   virtual void AddOutput(std::string s);
   virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
 
-  virtual void StoreUISettings();
-  virtual void LoadUISettings();
   virtual bool IsDeviceInstalled();
 };
 #endif

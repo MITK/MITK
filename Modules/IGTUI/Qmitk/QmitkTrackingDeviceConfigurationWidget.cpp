@@ -60,14 +60,13 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   AddOutput("<br>First Element selected"); //Order from Collection List
 
   m_Controls->m_TrackingDeviceChooser->setCurrentIndex(0);
-  const std::string selectedDeviceType = m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
-  m_Controls->m_TrackingSystemWidget->setCurrentWidget(m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDeviceType));
+  m_Controls->m_TrackingSystemWidget->setCurrentWidget(GetCurrentWidget());
 
   //reset a few things
   ResetOutput();
 
   //restore old UI settings
-  //zzz  LoadUISettings();
+  LoadUISettings();
 }
 
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
@@ -98,10 +97,7 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
 void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
 {
   //show the correspondig widget
-
-  const std::string selectedDeviceType = m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
-
-  m_Controls->m_TrackingSystemWidget->setCurrentWidget(m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDeviceType));
+  m_Controls->m_TrackingSystemWidget->setCurrentWidget(GetCurrentWidget());
 
   //the new trackingdevice is not configurated yet
   m_TrackingDeviceConfigurated = false;
@@ -110,9 +106,9 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   ResetOutput();
 
   AddOutput("<br>");
-  AddOutput(selectedDeviceType);
+  AddOutput(m_Controls->m_TrackingDeviceChooser->currentText().toStdString());
   AddOutput(" selected");
-  if (!m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDeviceType)->IsDeviceInstalled())
+  if (!GetCurrentWidget()->IsDeviceInstalled())
   {
     AddOutput("<br>ERROR: not installed!");
   }
@@ -175,25 +171,17 @@ void QmitkTrackingDeviceConfigurationWidget::ResetByUser()
 //######################### internal help methods #######################################
 void QmitkTrackingDeviceConfigurationWidget::ResetOutput()
 {
-  const std::string selectedDeviceType = m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
-  QmitkAbstractTrackingDeviceWidget* currentWidget = m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDeviceType);
-  currentWidget->ResetOutput();
+  GetCurrentWidget()->ResetOutput();
+  GetCurrentWidget()->repaint();
 }
 void QmitkTrackingDeviceConfigurationWidget::AddOutput(std::string s)
 {
-  const std::string selectedDeviceType = m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
-  QmitkAbstractTrackingDeviceWidget* currentWidget = m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDeviceType);
-  currentWidget->AddOutput(s);
-  currentWidget->repaint();
+  GetCurrentWidget()->AddOutput(s);
+  GetCurrentWidget()->repaint();
 }
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructTrackingDevice()
 {
-  mitk::TrackingDevice::Pointer returnValue;
-  const std::string selectedDeviceType = m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
-  QmitkAbstractTrackingDeviceWidget* currentWidget = m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDeviceType);
-  returnValue = currentWidget->ConstructTrackingDevice();
-
-  return returnValue;
+  return GetCurrentWidget()->ConstructTrackingDevice();
 }
 
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
@@ -216,34 +204,38 @@ void QmitkTrackingDeviceConfigurationWidget::ConfigurationFinished()
 void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-  const QString selectedDeviceType = m_Controls->m_TrackingDeviceChooser->currentText();
+
+  std::string selectedDevice = m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
+
+  //Save settings for every widget
+  //Don't use m_DeviceTypeCollection here, it's already unregistered, when deconstructor is called...
+  for (int i = 0; i < m_Controls->m_TrackingDeviceChooser->count(); i++)
+  {
+    m_DeviceWidgetCollection.GetTrackingDeviceWidget(m_Controls->m_TrackingDeviceChooser->itemText(i).toStdString())->StoreUISettings();
+  }
 
   if (this->GetPeristenceService()) // now save the settings using the persistence service
   {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
-    //zzz   propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
-    //yyy  propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
-    //zzz  propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
-    //yyy  propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
-    //zzzpropList->Set("MTCalibrationFile",m_MTCalibrationFile);
-    propList->Set("SelectedDevice", selectedDeviceType.toStdString());
+    propList->Set("SelectedDevice", selectedDevice);
   }
   else // QSettings as a fallback if the persistence service is not available
   {
     QSettings settings;
     settings.beginGroup(QString::fromStdString(id));
-    settings.setValue("trackingDeviceChooser", QVariant(selectedDeviceType));
-    //yyy  settings.setValue("portSpinBoxAurora", QVariant(m_Controls->m_portSpinBoxAurora->value()));
-    //zzz   settings.setValue("portSpinBoxPolaris", QVariant(m_Controls->m_portSpinBoxPolaris->value()));
-    //zzz   settings.setValue("portTypePolaris", QVariant(m_Controls->portTypePolaris->currentIndex()));
-    //yyy  settings.setValue("portTypeAurora", QVariant(m_Controls->portTypeAurora->currentIndex()));
-    //zzz settings.setValue("mTCalibrationFile", QVariant(QString::fromStdString(m_MTCalibrationFile)));
+    settings.setValue("trackingDeviceChooser", QVariant(QString::fromStdString(selectedDevice)));
     settings.endGroup();
   }
 }
 
 void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 {
+  //Load settings for every widget
+  for (auto name : m_DeviceTypeCollection->GetTrackingDeviceTypeNames())
+  {
+    m_DeviceWidgetCollection.GetTrackingDeviceWidget(name)->LoadUISettings();
+  }
+
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
   std::string selectedDevice;
   if (this->GetPeristenceService())
@@ -253,23 +245,15 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     {
       MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;
     }
-    int portPolarisWin, portAuroraWin, portTypePolaris, portTypeAurora;
-    propList->Get("PolarisPortWin", portPolarisWin);
-    propList->Get("AuroraPortWin", portAuroraWin);
-    propList->Get("PortTypePolaris", portTypePolaris);
-    propList->Get("PortTypeAurora", portTypeAurora);
-    //zzz propList->Get("MTCalibrationFile",m_MTCalibrationFile);
-    propList->Get("SelectedDevice", selectedDevice);
+
+    propList->Get("SelectedDevice", m_Controls->m_TrackingDeviceChooser->currentText().toStdString());
 
     if (selectedDevice.empty())
     {
       MITK_ERROR << "Loaded data from persistence service is invalid (SelectedDevice:" << selectedDevice << "): aborted to restore data!";
       return;
     }
-    //zzz   m_Controls->m_portSpinBoxPolaris->setValue(portPolarisWin);
-    //yyy  m_Controls->m_portSpinBoxAurora->setValue(portAuroraWin);
-    //zzz  m_Controls->portTypePolaris->setCurrentIndex(portTypePolaris);
-    //yyy  m_Controls->portTypeAurora->setCurrentIndex(portTypeAurora);
+
     MITK_INFO << "Successfully restored UI settings";
   }
   else
@@ -279,23 +263,17 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     settings.beginGroup(QString::fromStdString(id));
 
     selectedDevice = settings.value("trackingDeviceChooser", "").toString().toStdString();
-    //yyy   m_Controls->m_portSpinBoxAurora->setValue(settings.value("portSpinBoxAurora", 0).toInt());
-    //zzz   m_Controls->m_portSpinBoxPolaris->setValue(settings.value("portSpinBoxPolaris", 0).toInt());
-    //zzz  m_Controls->portTypePolaris->setCurrentIndex(settings.value("portTypePolaris", 0).toInt());
-    //yyy   m_Controls->portTypeAurora->setCurrentIndex(settings.value("portTypeAurora", 0).toInt());
-    //zzz m_MTCalibrationFile = settings.value("mTCalibrationFile", "").toString().toStdString();
 
     settings.endGroup();
   }
 
   //the selected device requires some checks because a device that is not installed should not be restored to avoids bugs
-  std::string selectedDeviceChecked = selectedDevice;
-  if (!m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDeviceChecked)->IsDeviceInstalled())
+  if (!m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDevice)->IsDeviceInstalled())
   {
-    selectedDeviceChecked = mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS;
+    selectedDevice = mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS;
   } //Default: Polaris...
 
-  const int index = m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(selectedDeviceChecked));
+  const int index = m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(selectedDevice));
 
   if (index >= 0)
   {
@@ -307,9 +285,10 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     return;
   }
 
-  // TODO: load corresponding widget
+  m_Controls->m_TrackingSystemWidget->setCurrentWidget(GetCurrentWidget());
+}
 
-  m_Controls->m_TrackingSystemWidget->setCurrentWidget(m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDeviceChecked));
-
-  //zzz m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString::fromStdString(m_MTCalibrationFile));
+QmitkAbstractTrackingDeviceWidget* QmitkTrackingDeviceConfigurationWidget::GetCurrentWidget()
+{
+  return m_DeviceWidgetCollection.GetTrackingDeviceWidget(m_Controls->m_TrackingDeviceChooser->currentText().toStdString());
 }

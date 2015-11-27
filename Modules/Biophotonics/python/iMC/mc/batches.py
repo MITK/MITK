@@ -45,8 +45,6 @@ class AbstractBatch(object):
         return joined_batch
 
 
-
-
 class GenericBatch(AbstractBatch):
     """generic three layer batch """
 
@@ -92,7 +90,7 @@ class GenericBatch(AbstractBatch):
         desired_d = 2000. * 10 ** -6
         for l in self.layers:
             l[:, 4] = l[:, 4] / total_d * desired_d
-            l[l[:,4]<25*10**-6,:] = 25*10**-6
+            l[l[:, 4] < 25 * 10 ** -6, :] = 25 * 10 ** -6
 
 
 class GaussianBatch(GenericBatch):
@@ -128,9 +126,54 @@ class GaussianBatch(GenericBatch):
         self.layers.append(samples)
 
 
+class LessGenericBatch(AbstractBatch):
+    """less generic three layer batch. This only varies blood volume fraction
+    w.r.t. the ColonMuscleBatch. Let's see if DA works in this case."""
+
+    def __init__(self):
+        super(LessGenericBatch, self).__init__()
+
+    def append_one_layer(self, saO2, n, d_ranges, nr_samples):
+        """helper function to create parameters for one layer"""
+        # scales data to lie between maxi and mini instead of 0 and 1
+        scale = lambda x, mini, maxi: x * (maxi - mini) + mini
+        samples = self.generator(size=(nr_samples, 7))
+        # scale samples to correct ranges
+        # bvf
+        samples[:, 0] = scale(samples[:, 0], 0., 1.)
+        # saO2 is the same for each layer, since the blood "diffuses" in tissue
+        samples[:, 1] = saO2  # saO2
+        samples[:, 2] = scale(samples[:, 2], 5.* 100., 30.* 100.)  # a_mie
+        samples[:, 3] = scale(samples[:, 3], 0.* 100., 60.* 100.) * 0.  # a_ray
+        # d
+        samples[:, 4] = scale(samples[:, 4], d_ranges[0], d_ranges[1])  # d
+        samples[:, 5] = n
+        samples[:, 6] = scale(samples[:, 6], 0.80, 0.95)  # g
+        # append as last layer
+        self.layers.append(samples)
+
+    def create_parameters(self, nr_samples):
+        """Create generic three layer batch with a total diameter of 2mm.
+        saO2 is the same in all layers, but all other parameters vary randomly
+        within each layer"""
+        saO2 = self.generator(size=nr_samples)
+        n = np.ones_like(saO2)
+        # create three layers with random samples
+        # muscle
+        self.append_one_layer(saO2, n * 1.36, (600.*10 ** -6, 1010.*10 ** -6), nr_samples)
+        # submucosa
+        self.append_one_layer(saO2, n * 1.36, (415.*10 ** -6, 847.*10 ** -6), nr_samples)
+        # mucosa
+        self.append_one_layer(saO2, n * 1.38, (395.*10 ** -6, 603.*10 ** -6), nr_samples)
+        # create empty reflectances matrix
+        self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))
+        # set all weights to 1
+        self.weights = np.ones(nr_samples, dtype=float)
+
+
 
 class ColonMuscleBatch(AbstractBatch):
-    """generic three layer batch """
+    """three layer batch simulating colonic tissue"""
 
     def __init__(self):
         super(ColonMuscleBatch, self).__init__()
@@ -203,16 +246,16 @@ class VisualizationBatch(AbstractBatch):
         # a_mie = np.linspace(5., 30., nr_samples) * 100
         # a_ray = np.linspace(0., 60., nr_samples) * 100
         # n = np.linspace(1.33, 1.54, nr_samples)
-        g = np.linspace(0, 0.95, nr_samples)
+        # g = np.linspace(0, 0.95, nr_samples)
         # create three layers with random samples
-        self.append_one_layer(0.04, 0.7, 30.*100., 0., 500 * 10 ** -6,
-                              1.38, g,
+        self.append_one_layer(0.02, 0.1, 30.*100., 0., 500 * 10 ** -6,
+                              1.38, 0.9,
                               nr_samples)
         self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
-                              1.36, g,
+                              1.36, 0.9,
                               nr_samples)
         self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
-                              1.36, g,
+                              1.36, 0.9,
                               nr_samples)
         # create empty reflectances matrix
         self.reflectances = np.zeros((nr_samples, len(self.wavelengths)))

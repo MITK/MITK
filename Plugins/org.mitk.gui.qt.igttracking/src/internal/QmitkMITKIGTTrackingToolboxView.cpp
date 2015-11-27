@@ -416,7 +416,6 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
   //enable/disable Buttons
   DisableOptionsButtons();
   DisableTrackingConfigurationButtons();
-  m_Controls->m_configurationWidget->ConfigurationFinished();
 
   m_Controls->m_TrackingControlLabel->setText("Status: connected");
   m_Controls->m_ConnectDisconnectButton->setText("Disconnect");
@@ -448,7 +447,6 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString
   m_Controls->m_StartStopTrackingButton->setEnabled(false);
   EnableOptionsButtons();
   EnableTrackingConfigurationButtons();
-  m_Controls->m_configurationWidget->Reset();
   m_Controls->m_TrackingControlLabel->setText("Status: disconnected");
   m_Controls->m_ConnectDisconnectButton->setText("Connect");
   m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");

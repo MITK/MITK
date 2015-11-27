@@ -73,6 +73,12 @@ QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget(
 {
   StoreUISettings();
   m_DeviceWidgetCollection.UnRegisterMicroservice();
+  delete m_auroraWidget;
+  delete m_polarisWidget;
+  delete m_microntrackerWidget;
+  delete m_optitrackWidget;
+  delete m_virtualtrackerWidget;
+  delete m_openIGTLinkWidget;
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)

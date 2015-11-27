@@ -31,7 +31,12 @@ namespace mitk
   {
     public:
 
-      explicit UnspecifiedTrackingTypeInformation();
+      UnspecifiedTrackingTypeInformation()
+      {
+        m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
+        m_TrackingDeviceData.push_back(DeviceDataUnspecified);
+        m_TrackingDeviceData.push_back(DeviceDataInvalid);
+      };
       virtual ~UnspecifiedTrackingTypeInformation(){};
 
       virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer,

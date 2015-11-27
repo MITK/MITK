@@ -21,6 +21,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkIGTConfig.h>
 
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
+#include "mitkTrackingDeviceTypeCollection.h"
+#include "mitkUnspecifiedTrackingTypeInformation.h"
+
+//All Tracking devices, which should be avaiable by default
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
+#include "mitkVirtualTrackerTypeInformation.h"
+#include "mitkMicronTrackerTypeInformation.h"
+#include "mitkNPOptitrackTrackingTypeInformation.h"
+#include "mitkOpenIGTLinkTypeInformation.h"
+
 
 static void TestInstantiation()
 {
@@ -177,6 +194,14 @@ static void TestAdditionalMethods()
 
 int mitkTrackingDeviceSourceConfiguratorTest(int /* argc */, char* /*argv*/[])
 {
+  mitk::TrackingDeviceTypeCollection deviceTypeCollection;
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIAuroraTypeInformation());
+  deviceTypeCollection.RegisterAsMicroservice();
+
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::VirtualTrackerTypeInformation());
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIPolarisTypeInformation());
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::MicronTrackerTypeInformation());
+
   MITK_TEST_BEGIN("TrackingDeviceConfigurator");
 
   TestInstantiation();

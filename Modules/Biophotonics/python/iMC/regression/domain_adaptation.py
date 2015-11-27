@@ -10,6 +10,7 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.linear_model.logistic import LogisticRegressionCV
 from sklearn.ensemble.forest import RandomForestClassifier
 
+
 def prepare_data_for_weights_estimation(X_s, X_t):
     nr_s = X_s.shape[0]
     nr_t = X_t.shape[0]
@@ -18,6 +19,7 @@ def prepare_data_for_weights_estimation(X_s, X_t):
     X_all = np.concatenate((X_s, X_t))
     all_labels = np.concatenate((source_labels, target_labels))
     return X_all, all_labels
+
 
 def estimate_weights_random_forests(X_s, X_t, X_w):
 
@@ -32,8 +34,10 @@ def estimate_weights_random_forests(X_s, X_t, X_w):
     rf = GridSearchCV(RandomForestClassifier(50, max_depth=10,
                                              class_weight="auto", n_jobs=-1),
               param_grid_rf, cv=kf, n_jobs=-1)
+    rf = RandomForestClassifier(100, max_depth=6, min_samples_leaf=200,
+                                class_weight="auto", n_jobs=-1)
     rf.fit(X_all, all_labels)
-    print "best parameters for rf weights determination: ", rf.best_estimator_
+    # print "best parameters for rf weights determination: ", rf.best_estimator_
     probas = rf.predict_proba(X_w)
     weights = probas[:, 1] / probas[:, 0]
     return weights

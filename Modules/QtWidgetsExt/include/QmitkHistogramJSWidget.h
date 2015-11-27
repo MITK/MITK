@@ -181,7 +181,7 @@ private:
   * \brief List of frequencies.
   *
   * A QList which holds the frequencies of the current histogram
-  * or holds the intesities of current intensity profile.
+  * or holds the intensities of current intensity profile.
   */
   QList<QVariant> m_Frequency;
 

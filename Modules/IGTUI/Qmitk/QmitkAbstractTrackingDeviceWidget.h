@@ -73,8 +73,8 @@ signals:
 
 protected:
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
-  /// \brief Creation of the connections
-  virtual void CreateConnections();
+    /// \brief Creation of the connections
+    virtual void CreateConnections();
   virtual void CreateQtPartControl(QWidget *parent){};
 
   QmitkTrackingDeviceConfigurationWidgetConnectionWorker* m_TestConnectionWorker;

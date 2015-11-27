@@ -83,30 +83,30 @@ void QmitkNDIPolarisWidget::AddOutput(std::string s)
 
 mitk::TrackingDevice::Pointer QmitkNDIPolarisWidget::ConstructTrackingDevice()
 {
-    mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
+  mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
 
-    //get port
-    int port = 0;
-    port = m_Controls->m_portSpinBoxPolaris->value();
+  //get port
+  int port = 0;
+  port = m_Controls->m_portSpinBoxPolaris->value();
 
-    //build prefix (depends on linux/win)
-    QString prefix = "";
+  //build prefix (depends on linux/win)
+  QString prefix = "";
 #ifdef WIN32
-    prefix = "COM";
-    tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
-    tempTrackingDevice->SetIlluminationActivationRate(GetPolarisFrameRate());
+  prefix = "COM";
+  tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
+  tempTrackingDevice->SetIlluminationActivationRate(GetPolarisFrameRate());
 #else
-    prefix = m_Controls->portTypePolaris->currentText();
-    tempTrackingDevice->SetIlluminationActivationRate(GetPolarisFrameRate());
+  prefix = m_Controls->portTypePolaris->currentText();
+  tempTrackingDevice->SetIlluminationActivationRate(GetPolarisFrameRate());
 #endif
 
-    //build port name string
-    QString portName = prefix + QString::number(port);
+  //build port name string
+  QString portName = prefix + QString::number(port);
 
-    tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
-    tempTrackingDevice->SetBaudRate(mitk::SerialCommunication::BaudRate115200);//set baud rate
-    tempTrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS);
-    return static_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
+  tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
+  tempTrackingDevice->SetBaudRate(mitk::SerialCommunication::BaudRate115200);//set baud rate
+  tempTrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS);
+  return static_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
 }
 
 void QmitkNDIPolarisWidget::StoreUISettings()
@@ -115,7 +115,7 @@ void QmitkNDIPolarisWidget::StoreUISettings()
   if (this->GetPeristenceService()) // now save the settings using the persistence service
   {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
-    propList->Set("PolarisPortWin",m_Controls->m_portSpinBoxPolaris->value());
+    propList->Set("PolarisPortWin", m_Controls->m_portSpinBoxPolaris->value());
     propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
     propList->Set("PolarisFrameRate", GetPolarisFrameRate());
   }
@@ -150,7 +150,7 @@ void QmitkNDIPolarisWidget::LoadUISettings()
     propList->Get("PolarisFrameRate", polarisFrameRate);
     this->SetPortTypeToGUI(portType);
     this->SetPortValueToGUI(port);
-    m_Controls->m_frameRateComboBoxPolaris->setCurrentIndex((int)(polarisFrameRate/30));
+    m_Controls->m_frameRateComboBoxPolaris->setCurrentIndex((int)(polarisFrameRate / 30));
   }
   else
   {
@@ -161,11 +161,10 @@ void QmitkNDIPolarisWidget::LoadUISettings()
     m_Controls->m_portSpinBoxPolaris->setValue(settings.value("portSpinBoxPolaris", 0).toInt());
     m_Controls->portTypePolaris->setCurrentIndex(settings.value("portTypePolaris", 0).toInt());
     //framerates 20,30,60 --> divided by 30 = 0,1,2 --> index of combobox
-    m_Controls->m_frameRateComboBoxPolaris->setCurrentIndex((int)(settings.value("PolarisFrameRate", 0).toInt()/30));
+    m_Controls->m_frameRateComboBoxPolaris->setCurrentIndex((int)(settings.value("PolarisFrameRate", 0).toInt() / 30));
 
     settings.endGroup();
   }
-
 }
 
 mitk::IlluminationActivationRate QmitkNDIPolarisWidget::GetPolarisFrameRate()

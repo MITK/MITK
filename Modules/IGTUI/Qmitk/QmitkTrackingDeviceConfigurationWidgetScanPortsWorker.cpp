@@ -28,53 +28,53 @@ void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc(
   QString result = "<br>Found Devices:";
   int resultSize = result.size(); //remember size of result: if it stays the same no device were found
   mitk::TrackingDeviceType scannedPort;
-  #ifdef WIN32
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(19);
+#ifdef WIN32
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(19);
 
-    QString devName;
-    for (unsigned int i = 1; i < 20; ++i)
+  QString devName;
+  for (unsigned int i = 1; i < 20; ++i)
+  {
+    QString statusOutput = "Scanning Port #" + QString::number(i);
+    MITK_INFO << statusOutput.toStdString().c_str();
+    if (i < 10) devName = QString("COM%1").arg(i);
+    else devName = QString("\\\\.\\COM%1").arg(i); // prepend "\\.\ to COM ports >9, to be able to allow connection"
+    scannedPort = ScanPort(devName);
+    if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID || scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED))
     {
-      QString statusOutput = "Scanning Port #" + QString::number(i);
-      MITK_INFO << statusOutput.toStdString().c_str();
-      if (i<10) devName = QString("COM%1").arg(i);
-      else devName = QString("\\\\.\\COM%1").arg(i); // prepend "\\.\ to COM ports >9, to be able to allow connection"
-      scannedPort = ScanPort(devName);
-      if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID || scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED))
-      {
-        result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
-        Port = i;
-      }
-      mitk::ProgressBar::GetInstance()->Progress();
+      result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
+      Port = i;
     }
-  #else //linux systems
-    for(unsigned int i = 1; i < 6; ++i)
+    mitk::ProgressBar::GetInstance()->Progress();
+  }
+#else //linux systems
+  for(unsigned int i = 1; i < 6; ++i)
+  {
+    QString devName = QString("/dev/ttyS%1").arg(i);
+    mitk::TrackingDeviceType scannedPort = ScanPort(devName);
+    if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID))
     {
-      QString devName = QString("/dev/ttyS%1").arg(i);
-      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
-      if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID))
-      {
-        result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
-        Port = i;
-        PortType = 1;
-      }
+      result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
+      Port = i;
+      PortType = 1;
     }
+  }
 
-    for(unsigned int i = 0; i <7; ++i)
+  for(unsigned int i = 0; i <7; ++i)
+  {
+    QString devName = QString("/dev/ttyUSB%1").arg(i);
+    mitk::TrackingDeviceType scannedPort = ScanPort(devName);
+    if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID))
     {
-      QString devName = QString("/dev/ttyUSB%1").arg(i);
-      mitk::TrackingDeviceType scannedPort = ScanPort(devName);
-      if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID))
-      {
-        result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
-        Port = i;
-        PortType = 0;
-      }
+      result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
+      Port = i;
+      PortType = 0;
     }
-  #endif
+  }
+#endif
 
-  if ( result.size() == resultSize) result += "<br>none";
+  if (result.size() == resultSize) result += "<br>none";
 
-  emit PortsScanned(Port,result,PortType);
+  emit PortsScanned(Port, result, PortType);
 }
 
 mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPort(QString port)
@@ -83,8 +83,11 @@ mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::
   tracker->SetDeviceName(port.toStdString());
   mitk::TrackingDeviceType returnValue = mitk::TRACKING_DEVICE_IDENTIFIER_INVALID;
   try
-  {returnValue = tracker->TestConnection();}
+  {
+    returnValue = tracker->TestConnection();
+  }
   catch (mitk::IGTException)
-  {}//do nothing: there is simply no device on this port
+  {
+  }//do nothing: there is simply no device on this port
   return returnValue;
 }

@@ -67,33 +67,7 @@ public:
    */
   mitk::TrackingDevice::Pointer GetTrackingDevice();
 
-  /* @brief Resets the UI to allow the user for configurating a new tracking device.
-   */
-  void Reset();
-
-  /** @brief External call to disable this widget when configuration is finished. This is also called by the "finished" button,
-    *        but if you disable the advanced user control you might want to call this when the configuration is finished.
-    *        If you want to configure a new device call the Reset() funktion later.
-    */
-  void ConfigurationFinished();
-
-  /** @return Returns true if the tracking device is completely configured (you can get it by calling GetTrackingDevice() in this case).
-   *          Returns false if configuration is not finished.
-   */
-  bool GetTrackingDeviceConfigured();
-
 signals:
-
-  /* @brief This signal is sent if the user has finished the configuration of the tracking device.
-   *        The device is now availiable if the method GetTrackingDevice() is called. The tracking
-   *        device you'll get is completly configurated but no tools are added yet.
-   */
-  void TrackingDeviceConfigurationFinished();
-
-  /* @brief This signal is sent if the UI was reseted and the user is required to configurate
-   *        a new tracking device.
-   */
-  void TrackingDeviceConfigurationReseted();
 
   /* @brief This signal is sent if the tracking device was changed. */
   void TrackingDeviceSelectionChanged();
@@ -108,8 +82,6 @@ protected:
   Ui::QmitkTrackingDeviceConfigurationWidgetControls* m_Controls;
 
   mitk::TrackingDevice::Pointer m_TrackingDevice;
-
-  bool m_TrackingDeviceConfigurated;
 
   // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port
   typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;
@@ -132,18 +104,6 @@ protected:
   /* @brief This method is called when the user clicks on "Refresh Selection" (m_RefreshTrackingDeviceCollection).
   It then sets the correct widget for the selected tracking device.*/
   void RefreshTrackingDeviceCollection();
-
-  /* @brief This method is called when the user presses the button "finished". A new tracking device will be created in this case and will then
-   *        then be availiable by calling GetTrackingDevice(). Also a signal TrackingDeviceConfigurationFinished() will be emitted. After this the
-   *        UI will be disablet until the widget is reseted to configure a new tracking device.
-   */
-  void Finished();
-
-  /* @brief This method is called when the user presses the button "reset". He can configure a new tracking device then. The signal
-   *        TrackingDeviceConfigurationReseted() will be emitted if this method is called. The method GetTrackingDevice() will return
-   *        NULL until a new tracking device is configured.
-   */
-  void ResetByUser();
 
 private:
   PERSISTENCE_GET_SERVICE_METHOD_MACRO

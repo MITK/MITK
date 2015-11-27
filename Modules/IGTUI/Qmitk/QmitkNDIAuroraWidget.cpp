@@ -107,7 +107,7 @@ void QmitkNDIAuroraWidget::StoreUISettings()
   if (this->GetPeristenceService()) // now save the settings using the persistence service
   {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
-    propList->Set("AuroraPortWin",m_Controls->m_portSpinBoxAurora->value());
+    propList->Set("AuroraPortWin", m_Controls->m_portSpinBoxAurora->value());
     propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
   }
   else // QSettings as a fallback if the persistence service is not available

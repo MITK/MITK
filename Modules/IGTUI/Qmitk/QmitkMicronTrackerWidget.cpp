@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/Path.h>
 #include <QSettings>
 
-
 const std::string QmitkMicronTrackerWidget::VIEW_ID = "org.mitk.views.NDIMicronTrackerWidget";
 
 QmitkMicronTrackerWidget::QmitkMicronTrackerWidget(QWidget* parent, Qt::WindowFlags f)
@@ -100,7 +99,7 @@ void QmitkMicronTrackerWidget::StoreUISettings()
   if (this->GetPeristenceService()) // now save the settings using the persistence service
   {
     mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
-    propList->Set("MTCalibrationFile",m_MTCalibrationFile);
+    propList->Set("MTCalibrationFile", m_MTCalibrationFile);
   }
   else // QSettings as a fallback if the persistence service is not available
   {
@@ -123,7 +122,7 @@ void QmitkMicronTrackerWidget::LoadUISettings()
       MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;
     }
 
-    propList->Get("MTCalibrationFile",m_MTCalibrationFile);
+    propList->Get("MTCalibrationFile", m_MTCalibrationFile);
   }
   else
   {

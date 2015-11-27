@@ -56,7 +56,6 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   RefreshTrackingDeviceCollection();
 
   //initialize a few UI elements
-  this->m_TrackingDeviceConfigurated = false;
   AddOutput("<br>First Element selected"); //Order from Collection List
 
   m_Controls->m_TrackingDeviceChooser->setCurrentIndex(0);
@@ -105,9 +104,6 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   //show the correspondig widget
   m_Controls->m_TrackingSystemWidget->setCurrentWidget(GetCurrentWidget());
 
-  //the new trackingdevice is not configurated yet
-  m_TrackingDeviceConfigurated = false;
-
   //reset output
   ResetOutput();
 
@@ -149,31 +145,6 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
   }
 }
 
-void QmitkTrackingDeviceConfigurationWidget::Finished()
-{
-  m_TrackingDevice = ConstructTrackingDevice();
-  m_Controls->m_TrackingSystemWidget->setEnabled(false);
-  m_Controls->m_TrackingDeviceChooser->setEnabled(false);
-  m_Controls->choose_tracking_device_label->setEnabled(false);
-  this->m_TrackingDeviceConfigurated = true;
-  emit TrackingDeviceConfigurationFinished();
-}
-
-void QmitkTrackingDeviceConfigurationWidget::Reset()
-{
-  m_TrackingDevice = NULL;
-  m_Controls->m_TrackingSystemWidget->setEnabled(true);
-  m_Controls->m_TrackingDeviceChooser->setEnabled(true);
-  m_Controls->choose_tracking_device_label->setEnabled(true);
-  this->m_TrackingDeviceConfigurated = false;
-  emit TrackingDeviceConfigurationReseted();
-}
-
-void QmitkTrackingDeviceConfigurationWidget::ResetByUser()
-{
-  Reset();
-}
-
 //######################### internal help methods #######################################
 void QmitkTrackingDeviceConfigurationWidget::ResetOutput()
 {
@@ -195,16 +166,6 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackin
   m_TrackingDevice = ConstructTrackingDevice();
   if (m_TrackingDevice.IsNull() || !m_TrackingDevice->IsDeviceInstalled()) return NULL;
   else return this->m_TrackingDevice;
-}
-
-bool QmitkTrackingDeviceConfigurationWidget::GetTrackingDeviceConfigured()
-{
-  return this->m_TrackingDeviceConfigurated;
-}
-
-void QmitkTrackingDeviceConfigurationWidget::ConfigurationFinished()
-{
-  Finished();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()

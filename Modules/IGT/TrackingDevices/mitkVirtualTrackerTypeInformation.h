@@ -23,18 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  static TrackingDeviceData DeviceDataVirtualTracker = {TRACKING_DEVICE_IDENTIFIER_VIRTUAL, "Virtual Tracker", "cube","X"};
+  static TrackingDeviceData DeviceDataVirtualTracker = { TRACKING_DEVICE_IDENTIFIER_VIRTUAL, "Virtual Tracker", "cube", "X" };
 
   class MITKIGT_EXPORT VirtualTrackerTypeInformation : public TrackingDeviceTypeInformation
   {
-    public:
-      VirtualTrackerTypeInformation();
-      virtual ~VirtualTrackerTypeInformation();
+  public:
+    VirtualTrackerTypeInformation();
+    virtual ~VirtualTrackerTypeInformation();
 
-      virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
-                                                                       mitk::NavigationToolStorage::Pointer navigationTools,
-                                                                       std::string* errorMessage,
-                                                                       std::vector<int>* toolCorrespondencesInToolStorage) override;
+    virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
+      mitk::NavigationToolStorage::Pointer navigationTools,
+      std::string* errorMessage,
+      std::vector<int>* toolCorrespondencesInToolStorage) override;
   };
 } // namespace mitk
 

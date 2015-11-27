@@ -63,7 +63,7 @@ set(UI_FILES
   Qmitk/QmitkMicronTrackerWidget.ui
   Qmitk/QmitkNPOptitrackWidget.ui
   Qmitk/QmitkVirtualTrackerWidget.ui
- Qmitk/QmitkOpenIGTLinkWidget.ui
+  Qmitk/QmitkOpenIGTLinkWidget.ui
 )
 
 set(MOC_H_FILES

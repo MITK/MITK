@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 int mitkTrackingTypesTest(int /* argc */, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("TrackingTypes");
+//  MITK_TEST_BEGIN("TrackingTypes");
 
 //  std:: vector<mitk::TrackingDeviceData> ResultSet = mitk::GetDeviceDataForLine(mitk::TRACKING_DEVICE_IDENTIFIER_INVALID);
 //  MITK_TEST_CONDITION(ResultSet.size() == 1,"Test correct retrieval of DeviceData: Number of results");

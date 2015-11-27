@@ -81,7 +81,7 @@ mitk::TrackingDevice::Pointer QmitkNPOptitrackWidget::ConstructTrackingDevice()
   tempTrackingDevice->SetThr(m_Controls->m_OptitrackThr->value());
 
   tempTrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_OPTITRACK);
-  return tempTrackingDevice;
+  return static_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
 }
 
 bool QmitkNPOptitrackWidget::IsDeviceInstalled()

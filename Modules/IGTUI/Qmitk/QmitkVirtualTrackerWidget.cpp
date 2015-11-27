@@ -64,7 +64,7 @@ mitk::TrackingDevice::Pointer QmitkVirtualTrackerWidget::ConstructTrackingDevice
     returnValue->EnableGaussianNoise();
     returnValue->SetParamsForGaussianNoise(m_Controls->m_MeanDistributionParam->value(), m_Controls->m_DeviationDistributionParam->value());
   }
-  return returnValue;
+  return static_cast<mitk::TrackingDevice::Pointer>(returnValue); //static_cast necessary for compiling with Linux
 }
 
 void QmitkVirtualTrackerWidget::EnableGaussianNoise()

@@ -113,7 +113,7 @@ mitk::TrackingDevice::Pointer QmitkNDIPolarisWidget::ConstructTrackingDevice()
     tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
     tempTrackingDevice->SetBaudRate(mitk::SerialCommunication::BaudRate115200);//set baud rate
     tempTrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS);
-    return tempTrackingDevice;
+    return static_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
   }
 }
 

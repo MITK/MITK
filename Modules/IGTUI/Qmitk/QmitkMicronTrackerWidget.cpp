@@ -89,7 +89,7 @@ mitk::TrackingDevice::Pointer QmitkMicronTrackerWidget::ConstructTrackingDevice(
   }
   else
     AddOutput("<br>Warning: Calibration file is not set!");
-  return newDevice;
+  return static_cast<mitk::TrackingDevice::Pointer>(newDevice);
 }
 
 void QmitkMicronTrackerWidget::StoreUISettings()

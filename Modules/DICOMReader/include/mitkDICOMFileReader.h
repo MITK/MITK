@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMImageBlockDescriptor.h"
 
+#include <unordered_map>
+
 namespace mitk
 {
 
@@ -103,6 +105,8 @@ class MITKDICOMREADER_EXPORT DICOMFileReader : public itk::Object
 
     virtual bool operator==(const DICOMFileReader& other) const = 0;
 
+    virtual void SetAdditionalTagsOfInterest( const std::unordered_map<const char*, DICOMTag>& tagList );
+
   protected:
 
     DICOMFileReader();
@@ -121,6 +125,8 @@ class MITKDICOMREADER_EXPORT DICOMFileReader : public itk::Object
     /// Configuration description for human reader, to be implemented by sub-classes
     virtual void InternalPrintConfiguration(std::ostream& os) const = 0;
 
+    virtual std::unordered_map<const char*, DICOMTag> GetAdditionalTagsOfInterest() const;
+
   private:
 
     StringList m_InputFilenames;
@@ -128,6 +134,8 @@ class MITKDICOMREADER_EXPORT DICOMFileReader : public itk::Object
 
     std::string m_ConfigLabel;
     std::string m_ConfigDescription;
+
+    std::unordered_map<const char*, DICOMTag> m_AdditionalTagsOfInterest;
 };
 
 }

@@ -120,7 +120,7 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
   }
 }
 
-static void TestMitkImagesAreLoaded(DICOMFileReader* reader)
+static void TestMitkImagesAreLoaded( DICOMFileReader* reader, const std::unordered_map<const char*, mitk::DICOMTag>& requestedTags )
 {
   StringList inputFiles = GetInputFilenames();
   reader->SetInputFiles( inputFiles );
@@ -134,7 +134,18 @@ static void TestMitkImagesAreLoaded(DICOMFileReader* reader)
     const DICOMImageBlockDescriptor block = reader->GetOutput(o);
 
     const DICOMImageFrameList& outputFiles = block.GetImageFrameList();
-    mitk::Image::Pointer mitkImage = block.GetMitkImage();
+    const mitk::Image::Pointer mitkImage = block.GetMitkImage();
+
+
+    for ( auto iter = requestedTags.cbegin();
+          iter != requestedTags.cend();
+          ++iter)
+    {
+      std::string dummy;
+      MITK_TEST_CONDITION( mitkImage->GetProperty( iter->first ).IsNotNull(),
+                           "Requested Tag is available as Property in Image" );
+    }
+
 
     MITK_DEBUG << "-------------------------------------------";
     MITK_DEBUG << "Output " << o << " at " << (void*) mitkImage.GetPointer();

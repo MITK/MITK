@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //#define MBILOG_ENABLE_DEBUG
-//#define ENABLE_TIMING
+#define ENABLE_TIMING
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
@@ -380,6 +380,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
     block.SetTagCache( this->GetTagCache() ); // important: this must be before SetImageFrameList(), because
                                               // SetImageFrameList will trigger reading of lots of interesting
                                               // tags!
+    block.SetAdditionalTagsOfInterest( GetAdditionalTagsOfInterest() );
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 
@@ -660,6 +661,15 @@ mitk::DICOMTagList mitk::DICOMITKSeriesGDCMReader::GetTagsOfInterest() const
   tags = DICOMImageBlockDescriptor::GetTagsOfInterest();
   completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
 
+
+  const std::unordered_map<const char*, mitk::DICOMTag> tagList = GetAdditionalTagsOfInterest();
+  for ( auto iter = tagList.cbegin();
+        iter != tagList.cend();
+        ++iter
+      )
+  {
+   completeList.push_back( iter->second ) ;
+  }
 
   return completeList;
 }

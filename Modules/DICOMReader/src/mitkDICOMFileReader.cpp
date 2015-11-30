@@ -196,3 +196,17 @@ mitk::DICOMFileReader
   itk::GDCMImageIO::Pointer io = itk::GDCMImageIO::New();
   return io->CanReadFile( filename.c_str() );
 }
+
+
+std::unordered_map<const char*, mitk::DICOMTag> mitk::DICOMFileReader::GetAdditionalTagsOfInterest() const
+{
+  return m_AdditionalTagsOfInterest;
+}
+
+
+void mitk::DICOMFileReader::SetAdditionalTagsOfInterest(const std::unordered_map<const char*, mitk::DICOMTag>& tagList)
+{
+  m_AdditionalTagsOfInterest = tagList;
+}
+
+

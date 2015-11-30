@@ -37,13 +37,13 @@ namespace mitk
     public:
 
       /// absolute filename
-      std::string Filename;
+      const std::string Filename;
       /// frame number, starting with 0
-      unsigned int FrameNo;
+      const unsigned int FrameNo;
 
       mitkClassMacroItkParent( DICOMImageFrameInfo, itk::LightObject )
 
-      itkNewMacro( DICOMImageFrameInfo );
+      itkFactorylessNewMacro( DICOMImageFrameInfo );
       mitkNewMacro1Param( DICOMImageFrameInfo, const std::string&);
       mitkNewMacro2Param( DICOMImageFrameInfo, const std::string&, unsigned int );
 

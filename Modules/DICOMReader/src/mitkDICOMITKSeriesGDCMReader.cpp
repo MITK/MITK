@@ -329,7 +329,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
 
   timeStart( "Sorting frames" );
   unsigned int sorterIndex = 0;
-  for ( auto sorterIter = m_Sorter.begin(); sorterIter != m_Sorter.end(); ++sorterIndex, ++sorterIter )
+  for ( auto sorterIter = m_Sorter.cbegin(); sorterIter != m_Sorter.cend(); ++sorterIndex, ++sorterIter )
   {
     std::stringstream ss;
     ss << "Sorting step " << sorterIndex;
@@ -631,7 +631,7 @@ mitk::DICOMTagCache::Pointer mitk::DICOMITKSeriesGDCMReader::GetTagCache() const
   return m_TagCache;
 }
 
-void mitk::DICOMITKSeriesGDCMReader::SetTagCache( DICOMTagCache::Pointer tagCache )
+void mitk::DICOMITKSeriesGDCMReader::SetTagCache( const DICOMTagCache::Pointer& tagCache )
 {
   m_TagCache = tagCache;
 }
@@ -646,19 +646,20 @@ mitk::DICOMTagList mitk::DICOMITKSeriesGDCMReader::GetTagsOfInterest() const
     assert( sorterIter->IsNotNull() );
 
     const DICOMTagList tags = ( *sorterIter )->GetTagsOfInterest();
-    completeList.insert( completeList.end(), tags.begin(), tags.end() );
+    completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
   }
 
   // check our own forced sorters
   DICOMTagList tags = m_EquiDistantBlocksSorter->GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
 
   tags = m_NormalDirectionConsistencySorter->GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
 
   // add the tags for DICOMImageBlockDescriptor
   tags = DICOMImageBlockDescriptor::GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
+
 
   return completeList;
 }

@@ -85,7 +85,7 @@ class MITKDICOMREADER_EXPORT DICOMFileReader : public itk::Object
     virtual DICOMTagList GetTagsOfInterest() const = 0;
 
     /// A way to provide external knowledge about files and tag values is appreciated.
-    virtual void SetTagCache(DICOMTagCache::Pointer) = 0;
+    virtual void SetTagCache( const DICOMTagCache::Pointer& ) = 0;
 
     /// Short label/name to describe this reader
     void SetConfigurationLabel(const std::string&);

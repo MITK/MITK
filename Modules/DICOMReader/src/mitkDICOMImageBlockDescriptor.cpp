@@ -241,8 +241,8 @@ mitk::DICOMImageBlockDescriptor
 ::AllSlicesAreLoaded() const
 {
   bool allLoaded = true;
-  for (auto iter = m_SliceIsLoaded.begin();
-       iter != m_SliceIsLoaded.end();
+  for (auto iter = m_SliceIsLoaded.cbegin();
+       iter != m_SliceIsLoaded.cend();
        ++iter)
   {
     allLoaded &= *iter;
@@ -269,8 +269,8 @@ mitk::DICOMImageBlockDescriptor
     return SpacingUnknown;
   }
 
-  std::string pixelSpacing = this->GetPixelSpacing();
-  std::string imagerPixelSpacing = this->GetImagerPixelSpacing();
+  const std::string pixelSpacing = this->GetPixelSpacing();
+  const std::string imagerPixelSpacing = this->GetImagerPixelSpacing();
 
   if (pixelSpacing.empty())
   {
@@ -332,11 +332,11 @@ void
 mitk::DICOMImageBlockDescriptor
 ::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX, ScalarType& spacingY) const
 {
-  std::string pixelSpacing = this->GetPixelSpacing();
+  const std::string pixelSpacing = this->GetPixelSpacing();
   // preference for "in patient" pixel spacing
   if ( !DICOMStringToSpacing( pixelSpacing, spacingX, spacingY ) )
   {
-    std::string imagerPixelSpacing = this->GetImagerPixelSpacing();
+    const std::string imagerPixelSpacing = this->GetImagerPixelSpacing();
     // fallback to "on detector" spacing
     if ( !DICOMStringToSpacing( imagerPixelSpacing, spacingX, spacingY ) )
     {
@@ -366,7 +366,7 @@ mitk::DICOMImageBlockDescriptor
 ::GetPropertyAsString(const std::string& key) const
 {
   this->UpdateImageDescribingProperties();
-  mitk::BaseProperty::Pointer property = m_PropertyList->GetProperty(key);
+  const mitk::BaseProperty::Pointer property = m_PropertyList->GetProperty(key);
   if (property.IsNotNull())
   {
     return property->GetValueAsString();
@@ -473,9 +473,9 @@ mitk::DICOMImageBlockDescriptor
   // first part: add some tags that describe individual slices
   // these propeties are defined at analysis time (see UpdateImageDescribingProperties())
 
-  std::string propertyKeySliceLocation = "dicom.image.0020.1041";
-  std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";
-  std::string propertyKeySOPInstanceUID = "dicom.image.0008.0018";
+  const std::string propertyKeySliceLocation = "dicom.image.0020.1041";
+  const std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";
+  const std::string propertyKeySOPInstanceUID = "dicom.image.0008.0018";
 
   mitkImage->SetProperty( propertyKeySliceLocation.c_str(), this->GetProperty("sliceLocationForSlices") );
   mitkImage->SetProperty( propertyKeyInstanceNumber.c_str(), this->GetProperty("instanceNumberForSlices") );
@@ -507,12 +507,12 @@ mitk::DICOMImageBlockDescriptor
       BoolProperty::New( this->GetFlag("3D+t",false) ));
 
   // level window
-  std::string windowCenter = this->GetPropertyAsString("windowCenter");
-  std::string windowWidth  = this->GetPropertyAsString("windowWidth");
+  const std::string windowCenter = this->GetPropertyAsString("windowCenter");
+  const std::string windowWidth  = this->GetPropertyAsString("windowWidth");
   try
   {
-    double level = stringtodouble( windowCenter );
-    double window = stringtodouble( windowWidth );
+    const double level = stringtodouble( windowCenter );
+    const double window = stringtodouble( windowWidth );
     mitkImage->SetProperty("levelwindow", LevelWindowProperty::New(LevelWindow(level,window)) );
   }
   catch (...)
@@ -520,7 +520,7 @@ mitk::DICOMImageBlockDescriptor
     // nothing, no levelwindow to be predicted...
   }
 
-  std::string modality = this->GetPropertyAsString( "modality" );
+  const std::string modality = this->GetPropertyAsString( "modality" );
   mitkImage->SetProperty("modality", StringProperty::New( modality ));
 
   mitkImage->SetProperty("dicom.pixel.PhotometricInterpretation", this->GetProperty("photometricInterpretation") );
@@ -606,8 +606,8 @@ mitk::DICOMImageBlockDescriptor
 
 #define printPropertyRange(label, property_name) \
 { \
-  std::string first = this->GetPropertyAsString( #property_name "First"); \
-  std::string last = this->GetPropertyAsString( #property_name "Last"); \
+  const std::string first = this->GetPropertyAsString( #property_name "First"); \
+  const std::string last = this->GetPropertyAsString( #property_name "Last"); \
   if (!first.empty() || !last.empty()) \
   { \
     if (first == last) \
@@ -623,7 +623,7 @@ mitk::DICOMImageBlockDescriptor
 
 #define printProperty(label, property_name) \
 { \
-  std::string first = this->GetPropertyAsString( #property_name ); \
+  const std::string first = this->GetPropertyAsString( #property_name ); \
   if (!first.empty()) \
   { \
     os << "  " label ": '" << first << "'" << std::endl; \
@@ -680,15 +680,15 @@ mitk::DICOMImageBlockDescriptor
 #define storeTagValueToProperty(tag_name, tag_g, tag_e) \
 { \
   const DICOMTag t(tag_g, tag_e); \
-  std::string tagValue = m_TagCache->GetTagValue( firstFrame, t ); \
+  const std::string tagValue = m_TagCache->GetTagValue( firstFrame, t ); \
   const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty(#tag_name, StringProperty::New( tagValue ) ); \
 }
 
 #define storeTagValueRangeToProperty(tag_name, tag_g, tag_e) \
 { \
   const DICOMTag t(tag_g, tag_e); \
-  std::string tagValueFirst = m_TagCache->GetTagValue( firstFrame, t ); \
-  std::string tagValueLast = m_TagCache->GetTagValue( lastFrame, t ); \
+  const std::string tagValueFirst = m_TagCache->GetTagValue( firstFrame, t ); \
+  const std::string tagValueLast = m_TagCache->GetTagValue( lastFrame, t ); \
   const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty(#tag_name "First", StringProperty::New( tagValueFirst ) ); \
   const_cast<DICOMImageBlockDescriptor*>(this)->SetProperty(#tag_name "Last", StringProperty::New( tagValueLast ) ); \
 }
@@ -708,8 +708,8 @@ mitk::DICOMImageBlockDescriptor
       return;
     }
 
-    DICOMImageFrameInfo::Pointer firstFrame = m_ImageFrameList.front();
-    DICOMImageFrameInfo::Pointer lastFrame = m_ImageFrameList.back();
+    const DICOMImageFrameInfo::Pointer firstFrame = m_ImageFrameList.front();
+    const DICOMImageFrameInfo::Pointer lastFrame = m_ImageFrameList.back();
 
     // see macros above
     storeTagValueToProperty(seriesNumber,0x0020,0x0011)
@@ -733,9 +733,9 @@ mitk::DICOMImageBlockDescriptor
 
     // some per-image attributes
     // frames are just numbered starting from 0. timestep 1 (the second time-step) has frames starting at (number-of-frames-per-timestep)
-    std::string propertyKeySliceLocation = "dicom.image.0020.1041";
-    std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";
-    std::string propertyKeySOPInstanceNumber = "dicom.image.0008.0018";
+//     std::string propertyKeySliceLocation = "dicom.image.0020.1041";
+//     std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";
+//     std::string propertyKeySOPInstanceNumber = "dicom.image.0008.0018";
 
     StringLookupTable sliceLocationForSlices;
     StringLookupTable instanceNumberForSlices;
@@ -751,16 +751,16 @@ mitk::DICOMImageBlockDescriptor
          frameIter != m_ImageFrameList.end();
          ++slice, ++frameIter)
     {
-      std::string sliceLocation = m_TagCache->GetTagValue( *frameIter, tagSliceLocation );
+      const std::string sliceLocation = m_TagCache->GetTagValue( *frameIter, tagSliceLocation );
       sliceLocationForSlices.SetTableValue(slice, sliceLocation);
 
-      std::string instanceNumber = m_TagCache->GetTagValue( *frameIter, tagInstanceNumber );
+      const std::string instanceNumber = m_TagCache->GetTagValue( *frameIter, tagInstanceNumber );
       instanceNumberForSlices.SetTableValue(slice, instanceNumber);
 
-      std::string sopInstanceUID = m_TagCache->GetTagValue( *frameIter, tagSOPInstanceNumber );
+      const std::string sopInstanceUID = m_TagCache->GetTagValue( *frameIter, tagSOPInstanceNumber );
       SOPInstanceUIDForSlices.SetTableValue(slice, sopInstanceUID);
 
-      std::string filename = (*frameIter)->Filename;
+      const std::string filename = (*frameIter)->Filename;
       filenamesForSlices.SetTableValue(slice, filename);
 
       MITK_DEBUG << "Tag info for slice " << slice

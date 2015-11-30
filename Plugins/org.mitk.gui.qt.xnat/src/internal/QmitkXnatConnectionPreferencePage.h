@@ -64,6 +64,8 @@ public:
     ///
     virtual void ToggleConnection();
 
+  virtual void onUseNetworkProxy(bool);
+
 protected:
 
   Ui::QmitkXnatConnectionPreferencePageControls m_Controls;

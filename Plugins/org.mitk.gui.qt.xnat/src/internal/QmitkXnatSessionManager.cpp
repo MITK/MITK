@@ -22,8 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIPreferences.h"
 #include "mitkLogMacros.h"
 
-#include <QMessageBox>
 #include <QApplication>
+#include <QMessageBox>
+#include <QNetworkProxy>
 
 #include "ctkXnatSession.h"
 #include "ctkXnatException.h"
@@ -72,7 +73,23 @@ void QmitkXnatSessionManager::CreateXnatSession()
   profile.setDefault(true);
 
   m_Session = new ctkXnatSession(profile);
-  m_Session->setUseSystemProxyConfiguration(true);
+
+  if (nodeConnectionPref->Get("Proxy Server Address", "").length() != 0)
+  {
+    QNetworkProxy proxy;
+    proxy.setType(QNetworkProxy::HttpProxy);
+    proxy.setHostName(nodeConnectionPref->Get("Proxy Server Address", ""));
+    proxy.setPort(nodeConnectionPref->Get("Proxy Port", "").toUShort());
+
+    if (nodeConnectionPref->Get("Proxy Username", "").length() != 0 &&
+        nodeConnectionPref->Get("Proxy Password", "").length() != 0)
+    {
+      proxy.setUser(nodeConnectionPref->Get("Proxy Username", ""));
+      proxy.setPassword(nodeConnectionPref->Get("Proxy Password", ""));
+    }
+    // Setting the proxy
+    m_Session->setHttpNetworkProxy(proxy);
+  }
 
   m_SessionRegistration = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->RegisterService(m_Session);
 }

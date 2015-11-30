@@ -173,12 +173,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     //connections for the tracking device configuration widget
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableOptionsButtons()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableTrackingConfigurationButtons()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableTrackingControls()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableOptionsButtons()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingConfigurationButtons()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingControls()));
+
 
     //connect worker thread
     connect(m_Worker, SIGNAL(AutoDetectToolsFinished(bool,QString)), this, SLOT(OnAutoDetectToolsFinished(bool,QString)) );

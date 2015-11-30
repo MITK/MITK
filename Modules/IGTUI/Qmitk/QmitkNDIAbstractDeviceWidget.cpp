@@ -53,7 +53,6 @@ void QmitkNDIAbstractDeviceWidget::AutoScanPorts()
   this->setEnabled(false);
   AddOutput("<br>Scanning...");
   m_ScanPortsWorkerThread->start();
-  emit ProgressStarted();
 }
 
 void QmitkNDIAbstractDeviceWidget::AutoScanPortsFinished(int Port, QString result, int PortType)
@@ -67,5 +66,4 @@ void QmitkNDIAbstractDeviceWidget::AutoScanPortsFinished(int Port, QString resul
   SetPortValueToGUI(Port);
   AddOutput(result.toStdString());
   this->setEnabled(true);
-  emit ProgressFinished();
 }

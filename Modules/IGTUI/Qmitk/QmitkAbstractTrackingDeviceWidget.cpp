@@ -36,7 +36,6 @@ void QmitkAbstractTrackingDeviceWidget::TestConnectionFinished(bool connected, Q
   AddOutput(output.toStdString());
   MITK_INFO << "Test connection: " << connected;
   this->setEnabled(true);
-  emit ProgressFinished();
 }
 
 void QmitkAbstractTrackingDeviceWidget::TestConnection()
@@ -46,7 +45,6 @@ void QmitkAbstractTrackingDeviceWidget::TestConnection()
   mitk::TrackingDevice::Pointer testTrackingDevice = ConstructTrackingDevice();
   m_TestConnectionWorker->SetTrackingDevice(testTrackingDevice);
   m_TestConnectionWorkerThread->start();
-  emit ProgressStarted();
 }
 
 void QmitkAbstractTrackingDeviceWidget::CreateConnections() {

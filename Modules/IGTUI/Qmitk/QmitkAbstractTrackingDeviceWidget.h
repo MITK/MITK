@@ -56,11 +56,6 @@ public:
   virtual ~QmitkAbstractTrackingDeviceWidget();
 
 signals:
-  /* @brief This signal is sent if a progress which was started before ends.*/
-  void ProgressFinished();
-  /* @brief This signal is sent if an internal thread (caused by an action of the user) was started. The widget is blocked until the progress ends.*/
-  void ProgressStarted();
-
   void ConnectionTested(bool connected, QString output);
 
   protected slots:

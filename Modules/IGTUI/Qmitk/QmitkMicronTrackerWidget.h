@@ -51,7 +51,9 @@ public:
 
 signals:
 
-  protected slots :
+protected slots :
+  /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
+  void SetMTCalibrationFileClicked();
 
 protected:
 
@@ -64,8 +66,7 @@ protected:
 
   Ui::QmitkMicronTrackerWidget* m_Controls;
 
-  /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_MTCalibrationFile.*/
-  void SetMTCalibrationFileClicked();
+
 
 public:
   virtual void ResetOutput();

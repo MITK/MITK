@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 
 #include <vnl/vnl_cross.h>
+#include <cmath>
+#include <ciso646> // tell MSVC to accept alternate operator representation i.e. to be C95 standard compliant.
 
 namespace mitk
 {
@@ -36,27 +38,66 @@ namespace mitk
   {
   }
 
-  PlaneGeometry::PlaneGeometry(const PlaneGeometry& other)
-    : Superclass(other),
-      m_ReferenceGeometry( other.m_ReferenceGeometry )
+  PlaneGeometry::PlaneGeometry( const PlaneGeometry& other )
+    : Superclass( other ), m_ReferenceGeometry( other.m_ReferenceGeometry )
   {
   }
 
-  void
-  PlaneGeometry::EnsurePerpendicularNormal(mitk::AffineTransform3D *transform)
+  void PlaneGeometry::EnsurePerpendicularNormal( mitk::AffineTransform3D *transform )
   {
-    //ensure row(2) of transform to be perpendicular to plane, keep length.
+    /** \brief ensure column(2) of indexToWorldTransform-matrix to be perpendicular to plane, keep length. */
+
     VnlVector normal = vnl_cross_3d( transform->GetMatrix().GetVnlMatrix().get_column(0),
                                      transform->GetMatrix().GetVnlMatrix().get_column(1) );
+    normal.normalize(); // Now normal is a righthand normal unit vector, perpendicular to the plane.
 
-    normal.normalize();
     ScalarType len = transform->GetMatrix().GetVnlMatrix().get_column(2).two_norm();
-
-    if (len==0){ len = 1; }
+    if (len==0) { len = 1; }
     normal *= len;
-    Matrix3D matrix = transform->GetMatrix();
-    matrix.GetVnlMatrix().set_column(2, normal);
-    transform->SetMatrix( matrix );
+
+    // Now lets compare:
+    vnl_vector_fixed<double, 3> zed = transform->GetMatrix().GetVnlMatrix().get_column(2);
+    double zedsMagnitude = zed.magnitude();
+
+    /** If det(matrix)<0, multiply normal vector by (-1) to keep geometry lefthanded. */
+    if( vnl_determinant( transform->GetMatrix().GetVnlMatrix()) < 0 )
+    {
+      MITK_DEBUG << "EnsurePerpendicularNormal(): Lefthanded geometry preserved, rh-normal: [ " << normal << " ],";
+      normal *= (-1.0);
+      MITK_DEBUG << "lh-normal: [ " << normal << " ], original vector zed is: [ " << zed << " ]";
+    }
+    // float epsilon is already precise enough here:
+    double feps = std::numeric_limits<float>::epsilon();
+
+    // Respect numerics. Higham, N., 2002, Accuracy and Stability of Numerical Algorithms,
+    // SIAM, page 37, 2nd edition:
+    feps = feps * zedsMagnitude * 2;
+
+    /** Check if normal (3. column) was perpendicular: If not, replace with calculated normal vector: */
+    if( normal != zed )
+    {
+      vnl_vector_fixed<double, 3> parallel;
+      for ( unsigned int i = 0; i<3 ; ++i )
+      {
+        parallel[i] = normal[i] / zed[i]; // Remember linear algebra: checking for parallelity.
+      }
+      // Checking if really not paralell i.e. non-colinear vectors by comparing these floating point numbers:
+      if(     (parallel[0]+feps < parallel[1] or feps+parallel[1] < parallel[0])
+          and (parallel[0]+feps < parallel[2] or feps+parallel[2] < parallel[0]) )
+      {
+        MITK_WARN << "EnsurePerpendicularNormal(): Plane geometry was _/askew/_, so here it got rectified by substituting"
+                  << " the 3rd column of the indexToWorldMatrix with an appropriate normal vector: [ " << normal
+                  << " ], original vector zed was: [ " << zed << " ].";
+
+        Matrix3D matrix = transform->GetMatrix();
+        matrix.GetVnlMatrix().set_column( 2, normal );
+        transform->SetMatrix( matrix );
+      }
+    }
+    else
+    {
+      // Nothing to do, 3rd column of indexToWorldTransformMatrix already was perpendicular.
+    }
   }
 
   void PlaneGeometry::CheckIndexToWorldTransform(mitk::AffineTransform3D* transform)
@@ -143,6 +184,7 @@ namespace mitk
     InitializeStandardPlane(width, height, transform.GetPointer(), planeorientation, zPosition, frontside, rotated);
   }
 
+
   void
   PlaneGeometry::InitializeStandardPlane( mitk::ScalarType width, mitk::ScalarType height,
                                           const AffineTransform3D* transform /* = nullptr */,
@@ -153,49 +195,67 @@ namespace mitk
   {
     Superclass::Initialize();
 
-    //construct standard view
+    /// construct standard view.
 
-    // We define at the moment "frontside" as: axial from above, coronal from front (nose), saggital from right.
-    // TODO: Double check with medics [ ].
+    // We define at the moment "frontside" as: axial from above,
+    // coronal from front (nose), saggital from right.
+    // TODO: Double check with medicals doctors or radiologists [ ].
 
-    // We define the orientation in patient's view, e.g. LAI is in a axial cut (parallel to the triangle ear-ear-nose):
+    // We define the orientation in patient's view, e.g. LAI is in a axial cut
+    // (parallel to the triangle ear-ear-nose):
     // first axis: To the left ear of the patient
     // seecond axis: To the nose of the patient
     // third axis: To the legs of the patient.
 
-    // Options are: L/R left/right; A/P anterior/posterior; I/S inferior/superior (AKA caudal/cranial).
-    // We note on all cases in the following switch block r.h. for right handed or l.h. for left handed to describe the
-    // different cases. However, which system is chosen is defined at the end of the switch block.
+    // Options are: L/R left/right; A/P anterior/posterior; I/S inferior/superior
+    // (AKA caudal/cranial).
+    // We note on all cases in the following switch block r.h. for right handed
+    // or l.h. for left handed to describe the different cases.
+    // However, which system is chosen is defined at the end of the switch block.
 
-    // Cave/careful: the vectors right and bottom are relative to the plane
+    // CAVE / be careful: the vectors right and bottom are relative to the plane
     // and do NOT describe e.g. the right side of the patient.
 
     Point3D origin;
-    VnlVector rightDV(3), bottomDV(3); // Bottom means downwards, DV means Direction Vector. Both relative to the image!
-    origin.Fill(0); /// Origin of this plane is by default a zero vector and implicitly in the top-left corner:
-    /// This is different to all definitions in MITK, except the QT mouse clicks.
-    //  But it is like this here and we don't want to change a running system.
-    //  Just be aware, that IN THIS FUNCTION we define the origin at the top left (e.g. your screen).
+    /** Bottom means downwards, DV means Direction Vector. Both relative to the image! */
+    VnlVector rightDV(3), bottomDV(3);
+    /** Origin of this plane is by default a zero vector and implicitly in the top-left corner: */
+    origin.Fill(0);
+    /** This is different to all definitions in MITK, except the QT mouse clicks.
+    *   But it is like this here and we don't want to change a running system.
+    *   Just be aware, that IN THIS FUNCTION we define the origin at the top left (e.g. your screen). */
 
-    int normalDirection; // NormalDirection defines which axis (i.e. column index in the transform matrix)
-                         // is perpendicular to the plane.
+    /** NormalDirection defines which axis (i.e. column index in the transform matrix)
+    * is perpendicular to the plane: */
+    int normalDirection;
 
     switch(planeorientation) // Switch through our limited choice of standard planes:
     {
-      case None: /// Orientation 'None' shall be done like the axial plane orientation, for whatever reasons.
+      case None:
+        /** Orientation 'None' shall be done like the axial plane orientation,
+         *  for whatever reasons. */
       case Axial:
         if(frontside) // Radiologist's view from below. A cut along the triangle ear-ear-nose.
         {
-          if(rotated==false) /// Origin in the top-left corner, x=[1; 0; 0], y=[0; 1; 0], z=[0; 0; 1], origin=[0,0,zpos]: LAI (r.h.)
-          {    /**  0--right-->
-                *   | Picture of a finite, rectangular plane...
-                *   | (insert LOL/CAT-scan here).
-                *   v */
+          if(rotated==false)
+            /** Origin in the top-left corner, x=[1; 0; 0], y=[0; 1; 0], z=[0; 0; 1],
+            *   origin=[0,0,zpos]: LAI (r.h.)
+            *
+            *  0---rightDV---->                            |
+            *  |                                           |
+            *  |  Picture of a finite, rectangular plane   |
+            *  |  ( insert LOLCAT-scan here ^_^ )          |
+            *  |                                           |
+            *  v  _________________________________________|
+            *
+            */
+          {
             FillVector3D(origin,   0,  0, zPosition);
             FillVector3D(rightDV,  1,  0,         0);
             FillVector3D(bottomDV, 0,  1,         0);
           }
-          else // Origin rotated to the bottom-right corner, x=[-1; 0; 0], y=[0; -1; 0], z=[0; 0; 1], origin=[w,h,zpos]: RPI (r.h.)
+          else  // Origin rotated to the bottom-right corner, x=[-1; 0; 0], y=[0; -1; 0], z=[0; 0; 1],
+               // origin=[w,h,zpos]: RPI (r.h.)
           {   // Caveat emptor:  Still  using  top-left  as  origin  of  index  coordinate  system!
             FillVector3D(origin,   width,  height, zPosition);
             FillVector3D(rightDV,     -1,       0,         0);
@@ -210,7 +270,8 @@ namespace mitk
             FillVector3D(rightDV,     -1,  0,         0);
             FillVector3D(bottomDV,     0,  1,         0);
           }
-          else // Origin in the bottom-left corner, x=[1; 0; 0], y=[0; -1; 0], z=[0; 0; 1], origin=[0,h,zpos]:  LPS (r.h.)
+          else // Origin in the bottom-left corner, x=[1; 0; 0], y=[0; -1; 0], z=[0; 0; 1],
+              // origin=[0,h,zpos]:  LPS (r.h.)
           {
             FillVector3D(origin,   0,  height, zPosition);
             FillVector3D(rightDV,  1,       0,         0);
@@ -220,7 +281,8 @@ namespace mitk
         normalDirection = 2; // That is S=Superior=z=third_axis=middlefinger in righthanded LPS-system.
       break;
 
-      case Frontal: // Frontal is known as Coronal in mitk. Plane cuts through patient's ear-ear-heel-heel
+      // Frontal is known as Coronal in mitk. Plane cuts through patient's ear-ear-heel-heel:
+      case Frontal:
         if(frontside)
         {
           if(rotated==false) // x=[1; 0; 0], y=[0; 0; 1], z=[0; 1; 0], origin=[0,zpos,0]: LAI (r.h.)
@@ -288,42 +350,41 @@ namespace mitk
         normalDirection = 0; // Normal vector = Lateral direction: Left in a LPS-system.
       break;
 
-        // <2015-10-23, Esther Wild and Martin Hettich:> We found a problem:
-        // Till now this function only covers 4 cases: RPI, LAI, LPS, RAS;
-        // And we scroll the standard planes along each axis in these cases. --> 3*4 = 12.
-        // So far only 4 of 48 possible coordinate orientations and
-        // therefore 12 of 144 cases of standard planes are treated here.
-        //
-        // TODO: To handle r.h./l.h. systems correctly: check and correct normal vector and BoundingBox.
-        // TODO: Also see bugs.mitk.org #11477, #18662, #19347.
-
       default:
         itkExceptionMacro("unknown PlaneOrientation");
     }
 
+    /// Checking if lefthanded or righthanded:
+    mitk::ScalarType lhOrRhSign=(+1);
     if ( transform != nullptr )
     {
+      lhOrRhSign = ( (0 < vnl_determinant( transform->GetMatrix().GetVnlMatrix() )) ? (+1) : (-1) );
+
+      MITK_DEBUG << "mitk::PlaneGeometry::InitializeStandardPlane(): lhOrRhSign, normalDirection, NameOfClass, ObjectName = "
+                 << lhOrRhSign << ", " << normalDirection << ", " << transform->GetNameOfClass()
+                 << ", " << transform->GetObjectName() << ".";
+
       origin = transform->TransformPoint( origin );
       rightDV = transform->TransformVector( rightDV );
       bottomDV = transform->TransformVector( bottomDV );
+
+      /// Signing normal vector according to l.h./r.h. coordinate system:
+      this->SetMatrixByVectors( rightDV,
+                                bottomDV,
+                                transform->GetMatrix().GetVnlMatrix().get_column(normalDirection).magnitude() * lhOrRhSign );
+    }
+    else if ( transform == nullptr )
+    {
+      this->SetMatrixByVectors( rightDV, bottomDV );
     }
 
-    ScalarType bounds[6]= { 0, width, 0, height, 0, 1 }; // TODO: check signs according to l.h./r.h. system.
+    ScalarType bounds[6]= { 0, width, 0, height, 0, 1};
+
     this->SetBounds( bounds );
 
-    if ( transform == nullptr )
-    {
-      this->SetMatrixByVectors( rightDV, bottomDV ); // TODO: Spacing = 1 or -1 ?
-    }
-    else
-    {
-      this->SetMatrixByVectors( rightDV, bottomDV,
-                                transform->GetMatrix().GetVnlMatrix().get_column(normalDirection).magnitude() );
-      // TODO: check signs according to l.h./r.h. system.
-    }
-
-    this->SetOrigin(origin);
+    this->SetOrigin( origin );
   }
+
 
   void
   PlaneGeometry::InitializeStandardPlane( const BaseGeometry *geometry3D,

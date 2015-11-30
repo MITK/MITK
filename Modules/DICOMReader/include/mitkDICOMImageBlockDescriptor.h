@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkGantryTiltInformation.h"
 
+#include <unordered_map>
+
 namespace mitk
 {
 
@@ -129,6 +131,16 @@ class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
 
     void SetTagCache(DICOMTagCache* privateCache);
 
+    /**
+    * \brief Set a list of DICOM-Tags that will be copied into the property of the mitk::Image.
+    *
+    * This method can be used to specify a list of DICOM-tags that shall be available after the loading.
+    * The content of the DICOM tags will be stored in a StringLookupTable on the mitk::Image,
+    * where the property-key equals the key in the unordered_map.
+    */
+    void SetAdditionalTagsOfInterest(const std::unordered_map<const char*, DICOMTag>& tagList);
+
+
     /// Print information about this image block to given stream
     void Print(std::ostream& os, bool filenameDetails) const;
 
@@ -143,8 +155,8 @@ class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
     void UpdateImageDescribingProperties() const;
 
     double stringtodouble(const std::string& str) const;
-
     DICOMImageFrameList m_ImageFrameList;
+
     Image::Pointer m_MitkImage;
     BoolList m_SliceIsLoaded;
     ReaderImplementationLevel m_ReaderImplementationLevel;
@@ -156,6 +168,8 @@ class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
     mitk::WeakPointer<DICOMTagCache> m_TagCache;
 
     mutable bool m_PropertiesOutOfDate;
+
+    std::unordered_map<const char*, DICOMTag> m_AdditionalTagList;
 };
 
 }

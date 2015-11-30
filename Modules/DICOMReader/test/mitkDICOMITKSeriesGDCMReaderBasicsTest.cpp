@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
+#include <unordered_map>
+
+
 using mitk::DICOMTag;
 
 int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
@@ -32,6 +35,14 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(gdcmReader.IsNotNull(), "DICOMITKSeriesGDCMReader can be instantiated.");
 
   mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
+
+  std::unordered_map<const char*, mitk::DICOMTag> additionalTags;
+  additionalTags.insert( { "Test1", DICOMTag(0x0008, 0x005)} );
+  additionalTags.insert( { "Test2", DICOMTag(0x0008, 0x008)} );
+  additionalTags.insert( { "Test3", DICOMTag(0x0008, 0x0060)} );
+  additionalTags.insert( { "Test4" ,DICOMTag(0x0008, 0x1070)} );
+
+  gdcmReader->SetAdditionalTagsOfInterest( additionalTags );
 
   // check the Set/GetInput function
   mitk::DICOMFileReaderTestHelper::TestInputFilenames( gdcmReader );
@@ -75,12 +86,15 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   tagSorter->SetSortCriterion( sorting );
 
   gdcmReader->AddSortingElement( tagSorter );
+
+  gdcmReader->SetAdditionalTagsOfInterest( additionalTags );
+
   mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
   gdcmReader->PrintOutputs(std::cout, true);
 
   // really load images
-  mitk::DICOMFileReaderTestHelper::TestMitkImagesAreLoaded( gdcmReader );
+  mitk::DICOMFileReaderTestHelper::TestMitkImagesAreLoaded( gdcmReader, additionalTags );
 
   MITK_TEST_END();
 }

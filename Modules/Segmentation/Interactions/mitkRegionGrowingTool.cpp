@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverwriteDirectedPlaneImageFilter.h"
 #include "mitkExtractDirectedPlaneImageFilterNew.h"
 
+#include "mitkIOUtil.h"
+
 // us
 #include <usModule.h>
 #include <usModuleResource.h>
@@ -122,59 +124,67 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
   //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
   if (!positionEvent) return;
 
+  MITK_DEBUG << "OnMousePressed";
+
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   //ToolLogger::SetVerboseness(3);
 
-  MITK_DEBUG << "OnMousePressed" << std::endl;
-
-  MITK_DEBUG << "OnMousePressed: FeedbackContourTool says ok" << std::endl;
-
   // 1. Find out which slice the user clicked, find out which slice of the toolmanager's reference and working image corresponds to that
   if (positionEvent)
   {
-    MITK_DEBUG << "OnMousePressed: got positionEvent" << std::endl;
 
+    // ReferenceSlice is from the underlying image, WorkingSlice from the active segmentation (can be empty), should work with 4D data
     m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice( positionEvent );
     m_WorkingSlice   = FeedbackContourTool::GetAffectedWorkingSlice( positionEvent );
 
+    // CAST TO ITK
+
     if ( m_WorkingSlice.IsNotNull() ) // can't do anything without the segmentation
     {
-      MITK_DEBUG << "OnMousePressed: got working slice" << std::endl;
+      MITK_DEBUG << "OnMousePressed: got working slice";
 
-      // 2. Determine if the user clicked inside or outside of the segmentation
-      const BaseGeometry* workingSliceGeometry = m_WorkingSlice->GetGeometry();
-      Point3D mprojectedPointIn2D;
-      workingSliceGeometry->WorldToIndex( positionEvent->GetPositionInWorld(), mprojectedPointIn2D);
-      itk::Index<2> projectedPointInWorkingSlice2D;
-      projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
-      projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
+      // 2. Determine if the user clicked inside or outside of the segmentation (i.e. the whole volume)
+      mitk::BaseGeometry::Pointer workingSliceGeometry;
+      workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+      mitk::Point3D indexInWorkingSlice;
+      workingSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), indexInWorkingSlice);
 
-      if ( workingSliceGeometry->IsIndexInside( projectedPointInWorkingSlice2D ) )
+//      Point3D projectedPointIn3D;
+//      workingSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), projectedPointIn3D);
+//      // need itk::Index for IsIndexInside method, switch from center-based to corner-based (or vice versa, not sure)
+//      itk::Index<3> projectedPointInWorkingSlice2D;
+//      projectedPointInWorkingSlice2D[0] = static_cast<int>( mprojectedPointIn2D[0] - 0.5 );
+//      projectedPointInWorkingSlice2D[1] = static_cast<int>( mprojectedPointIn2D[1] - 0.5 );
+
+      if ( workingSliceGeometry->IsIndexInside(indexInWorkingSlice) )
       {
-        MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << projectedPointInWorkingSlice2D << ") IS in working slice" << std::endl;
+        MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << indexInWorkingSlice << ") is inside working slice";
 
-        // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
-        itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
-        CastToItkImage( m_WorkingSlice, correctPixelTypeImage );
-        assert (correctPixelTypeImage.IsNotNull() );
+//        // Convert to ipMITKSegmentationTYPE (because getting pixels relys on that data type)
+//        itk::Image< ipMITKSegmentationTYPE, 2 >::Pointer correctPixelTypeImage;
+//        CastToItkImage( m_WorkingSlice, correctPixelTypeImage );
+//        assert (correctPixelTypeImage.IsNotNull() );
 
-        // possible bug in CastToItkImage ?
-        // direction maxtrix is wrong/broken/not working after CastToItkImage, leading to a failed assertion in
-        // mitk/Core/DataStructures/mitkSlicedGeometry3D.cpp, 479:
-        // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
-        // solution here: we overwrite it with an unity matrix
-        itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
-        imageDirection.SetIdentity();
-        correctPixelTypeImage->SetDirection(imageDirection);
+//        // possible bug in CastToItkImage ?
+//        // direction maxtrix is wrong/broken/not working after CastToItkImage, leading to a failed assertion in
+//        // mitk/Core/DataStructures/mitkSlicedGeometry3D.cpp, 479:
+//        // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
+//        // solution here: we overwrite it with an unity matrix
+//        itk::Image< ipMITKSegmentationTYPE, 2 >::DirectionType imageDirection;
+//        imageDirection.SetIdentity();
+//        correctPixelTypeImage->SetDirection(imageDirection);
 
-        Image::Pointer temporarySlice = Image::New();
-        //  temporarySlice = ImportItkImage( correctPixelTypeImage );
-        CastToMitkImage( correctPixelTypeImage, temporarySlice );
+//        Image::Pointer temporarySlice = Image::New();
+//        //  temporarySlice = ImportItkImage( correctPixelTypeImage );
+//        CastToMitkImage( correctPixelTypeImage, temporarySlice );
 
-        mitkIpPicDescriptor* workingPicSlice = mitkIpPicNew();
-        CastToIpPicDescriptor(temporarySlice, workingPicSlice);
+//        mitkIpPicDescriptor* workingPicSlice = mitkIpPicNew();
+//        CastToIpPicDescriptor(temporarySlice, workingPicSlice);
+
+        // 3. determine the pixel value under the last click to see if we need to add or subtract
+        bool inside = m_WorkingSlice->GetData()
 
         int initialWorkingOffset = projectedPointInWorkingSlice2D[1] * workingPicSlice->n[0] + projectedPointInWorkingSlice2D[0];
 

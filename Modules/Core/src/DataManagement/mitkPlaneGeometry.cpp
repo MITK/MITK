@@ -378,7 +378,7 @@ namespace mitk
       this->SetMatrixByVectors( rightDV, bottomDV );
     }
 
-    ScalarType bounds[6]= { 0, width, 0, height, 0, 1};
+    ScalarType bounds[6]= { 0, width, 0, height, 0, 1 };
 
     this->SetBounds( bounds );
 
@@ -508,6 +508,9 @@ namespace mitk
     VnlVector downDV  = downVector;  downDV.normalize();
     VnlVector normal  = vnl_cross_3d(rightVector, downVector);
     normal.normalize();
+    // Crossproduct vnl_cross_3d is always righthanded, but that is okay here
+    // because in this method we create a new IndexToWorldTransform and
+    // spacing could still make it lefthanded.
 
     if(spacing!=nullptr)
     {
@@ -547,6 +550,10 @@ namespace mitk
     }
     downVectorVnl = vnl_cross_3d( normal.GetVnlVector(), rightVectorVnl );
     downVectorVnl.normalize();
+    // Crossproduct vnl_cross_3d is always righthanded, but I <m.hettich@dkfz.de>
+    // don't understand this function so I cannot tell if this is a problem like bug #11477.
+    // docs.mitk.org said (rightVectorVnl, downVectorVnl) was undefined but valid,
+    // therefore I am satisfied in my review of vector cross product usage in PlaneGeometry.
 
     InitializeStandardPlane( rightVectorVnl, downVectorVnl );
 
@@ -560,6 +567,9 @@ namespace mitk
     VnlVector normal = vnl_cross_3d(rightVector, downVector);
     normal.normalize();
     normal *= thickness;
+    // Crossproduct vnl_cross_3d is always righthanded, but that is okay here
+    // because in this method we create a new IndexToWorldTransform and
+    // a negative thickness could still make it lefthanded.
 
     AffineTransform3D::Pointer transform = AffineTransform3D::New();
     Matrix3D matrix;

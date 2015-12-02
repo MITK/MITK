@@ -374,32 +374,64 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
     SetAutoTopMostImage(true);
     return;
   }
+
+  mitk::DataNode::Pointer firstVisible = NULL;
+  mitk::DataNode::Pointer former = NULL;
   mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin();
        it != all->End();
        ++it)
   {
     mitk::DataNode::Pointer node = it->Value();
-    if (node.IsNull())
-      continue;
 
-    node->SetBoolProperty( "imageForLevelWindow", false );
-
-    if (node->IsVisible(NULL) == false)
-      continue;
-
-    mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
-    if (levelWindowProperty.IsNull())
+    if ( node.IsNull() )
     {
       continue;
     }
 
-    m_LevelWindowProperty = levelWindowProperty;
-    m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
-    node->SetBoolProperty( "imageForLevelWindow", true );
+    mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( node->GetProperty( "levelwindow" ) );
+    if ( lvlProp.IsNull() )
+    {
+      continue;
+    }
 
-    return;
+    if ( node->IsVisible(NULL) && firstVisible.IsNull() )
+    {
+      firstVisible = node;
+    }
+
+    bool prop = false;
+    node->GetBoolProperty( "imageForLevelWindow", prop );
+
+    if ( prop )
+    {
+      former = node;
+
+      if ( node->IsVisible(NULL) )
+      {
+        mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( node->GetProperty( "levelwindow" ) );
+
+        m_LevelWindowProperty = lvlProp;
+        m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
+
+        Modified();
+
+        return;
+      }
+    }
   }
+
+  if ( firstVisible.IsNotNull() )
+  {
+    mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( firstVisible->GetProperty( "levelwindow" ) );
+    this->SetLevelWindowProperty( lvlProp );
+  }
+  else if ( former.IsNotNull() )
+  {
+    mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( former->GetProperty( "levelwindow" ) );
+    this->SetLevelWindowProperty( lvlProp );
+  }
+
   Modified();
 }
 

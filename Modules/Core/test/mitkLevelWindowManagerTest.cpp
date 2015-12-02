@@ -224,7 +224,6 @@ public:
     manager->SetDataStorage(ds);
 
     //add multiple objects to the data storage => multiple observers should be created
-    //mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
     mitk::DataNode::Pointer node3 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
     mitk::DataNode::Pointer node2 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
     mitk::DataNode::Pointer node1 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
@@ -233,23 +232,6 @@ public:
     node3->SetIntProperty( "layer" , 1 );
     node2->SetIntProperty( "layer" , 2 );
     node1->SetIntProperty( "layer" , 3 );
-
-    /*node1->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow1 );
-    node2->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow2 );
-    node3->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow3 );*/
-
-    /*mitk::LevelWindowProperty::Pointer prop1 = mitk::LevelWindowProperty::New();
-    node1->SetProperty( "levelWindow", prop1 );
-
-    mitk::LevelWindowProperty::Pointer prop2 = mitk::LevelWindowProperty::New();
-    node2->SetProperty( "levelWindow", prop2 );
-
-    mitk::LevelWindowProperty::Pointer prop3 = mitk::LevelWindowProperty::New();
-    node3->SetProperty( "levelWindow", prop3 );*/
-
-    /*node1->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow1 );
-    node2->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow2 );
-    node3->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow3 );*/
 
     manager->SetAutoTopMostImage( true );
 

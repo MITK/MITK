@@ -71,6 +71,14 @@ namespace itk
     }
 
     /**
+    * \brief Return the computed Median
+    */
+    double GetMedian() const
+    {
+        return -99999;
+    }
+
+    /**
     * \brief Return the computed Kurtosis.
     */
     double GetKurtosis() const

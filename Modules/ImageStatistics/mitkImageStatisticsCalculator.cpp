@@ -1162,7 +1162,7 @@ namespace mitk
     statistics.SetMin(statisticsFilter->GetMinimum());
     statistics.SetMax(statisticsFilter->GetMaximum());
     statistics.SetMean(statisticsFilter->GetMean());
-    statistics.SetMedian(0.0);
+    statistics.SetMedian(statisticsFilter->GetMedian());
     statistics.SetVariance(statisticsFilter->GetVariance());
     statistics.SetSkewness(statisticsFilter->GetSkewness());
     statistics.SetKurtosis(statisticsFilter->GetKurtosis());
@@ -1518,6 +1518,7 @@ namespace mitk
         statistics.SetMin(labelStatisticsFilter->GetMinimum( *it ));
         statistics.SetMax(labelStatisticsFilter->GetMaximum( *it ));
         statistics.SetMean(labelStatisticsFilter->GetMean( *it ));
+        statistics.SetMedian(labelStatisticsFilter->GetMedian( *it));
         statistics.SetMedian(labelStatisticsFilter->GetMedian( *it ));
         statistics.SetVariance(labelStatisticsFilter->GetVariance( *it ));
         statistics.SetSigma(labelStatisticsFilter->GetSigma( *it ));

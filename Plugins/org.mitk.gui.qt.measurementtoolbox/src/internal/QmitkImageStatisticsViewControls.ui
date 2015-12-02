@@ -165,7 +165,7 @@
          <bool>false</bool>
         </property>
         <property name="rowCount">
-         <number>13</number>
+         <number>14</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -189,7 +189,7 @@
          <bool>true</bool>
         </attribute>
         <attribute name="verticalHeaderVisible">
-         <bool>true</bool>
+         <bool>false</bool>
         </attribute>
         <attribute name="verticalHeaderCascadingSectionResizes">
          <bool>false</bool>
@@ -209,6 +209,11 @@
         <row>
          <property name="text">
           <string>Mean</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>Median</string>
          </property>
         </row>
         <row>

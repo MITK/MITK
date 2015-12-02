@@ -309,6 +309,7 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
     // Create Headline
     headline << " "
              << "Mean"
+             << "Median"
              << "StdDev"
              << "RMS"
              << "Max"
@@ -337,6 +338,7 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
         QStringList value;
         value << QString::number(t)
               << QString::number(statistics[t].GetMean())
+              << QString::number(statistics[t].GetMedian())
               << QString::number(statistics[t].GetSigma())
               << QString::number(statistics[t].GetRMS())
               << QString::number(statistics[t].GetMax())
@@ -929,9 +931,10 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     this->m_Controls->m_StatisticsTable->setItem( 0, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetMean(), 0, 'f', decimals) ) );
     this->m_Controls->m_StatisticsTable->setItem( 1, t, new QTableWidgetItem(
-        QString("%1").arg(s[t].GetSigma(), 0, 'f', decimals) ) );
-
+        QString("%1").arg(s[t].GetMedian(), 0, 'f', decimals) ) );
     this->m_Controls->m_StatisticsTable->setItem( 2, t, new QTableWidgetItem(
+        QString("%1").arg(s[t].GetSigma(), 0, 'f', decimals) ) );
+    this->m_Controls->m_StatisticsTable->setItem( 3, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetRMS(), 0, 'f', decimals) ) );
 
     QString max; max.append(QString("%1").arg(s[t].GetMax(), 0, 'f', decimals));
@@ -943,7 +946,7 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
         max += ",";
     }
     max += ")";
-    this->m_Controls->m_StatisticsTable->setItem( 3, t, new QTableWidgetItem( max ) );
+    this->m_Controls->m_StatisticsTable->setItem( 4, t, new QTableWidgetItem( max ) );
 
     QString min; min.append(QString("%1").arg(s[t].GetMin(), 0, 'f', decimals));
     min += " (";
@@ -954,9 +957,9 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
         min += ",";
     }
     min += ")";
-    this->m_Controls->m_StatisticsTable->setItem( 4, t, new QTableWidgetItem( min ) );
+    this->m_Controls->m_StatisticsTable->setItem( 5, t, new QTableWidgetItem( min ) );
 
-    this->m_Controls->m_StatisticsTable->setItem( 5, t, new QTableWidgetItem(
+    this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetN()) ) );
 
     const mitk::BaseGeometry *geometry = image->GetGeometry();
@@ -964,32 +967,32 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     {
       const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
       double volume = spacing[0] * spacing[1] * spacing[2] * (double) s[t].GetN();
-      this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
+      this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem(
           QString("%1").arg(volume, 0, 'f', decimals) ) );
     }
     else
     {
-      this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
+      this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem(
           "NA" ) );
     }
 
     //statistics of higher order should have 5 decimal places because they used to be very small
-    this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem(
+    this->m_Controls->m_StatisticsTable->setItem( 8, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetSkewness(), 0, 'f', 5) ) );
 
-    this->m_Controls->m_StatisticsTable->setItem( 8, t, new QTableWidgetItem(
+    this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetKurtosis(), 0, 'f', 5) ) );
 
-    this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem(
+    this->m_Controls->m_StatisticsTable->setItem( 10, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetUniformity(), 0, 'f', 5) ) );
 
-    this->m_Controls->m_StatisticsTable->setItem( 10, t, new QTableWidgetItem(
+    this->m_Controls->m_StatisticsTable->setItem( 11, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetEntropy(), 0, 'f', 5) ) );
 
-    this->m_Controls->m_StatisticsTable->setItem( 11, t, new QTableWidgetItem(
+    this->m_Controls->m_StatisticsTable->setItem( 12, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetMPP(), 0, 'f', decimals) ) );
 
-    this->m_Controls->m_StatisticsTable->setItem( 12, t, new QTableWidgetItem(
+    this->m_Controls->m_StatisticsTable->setItem( 13, t, new QTableWidgetItem(
         QString("%1").arg(s[t].GetUPP(), 0, 'f', 5) ) );
 
   }
@@ -1070,6 +1073,7 @@ std::vector<QString> QmitkImageStatisticsView::CalculateStatisticsForPlanarFigur
   mitk::ImageStatisticsCalculator::Statistics &stats = m_Controls->m_JSHistogram->GetStatistics();
 
   result.push_back(QString("%1").arg(stats.GetMean(), 0, 'f', decimals));
+  result.push_back(QString("%1").arg(stats.GetMedian(), 0, 'f', decimals));
 
   double stdDev = sqrt( stats.GetVariance() );
   result.push_back( QString("%1").arg( stdDev, 0, 'f', decimals));

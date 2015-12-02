@@ -86,6 +86,12 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
     virtual void OnMouseMoved   ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
 
+    template <typename TPixel, unsigned int imageDimension>
+    void IsInsideSegmentation(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, bool result);
+
+    template<typename TPixel, unsigned int imageDimension>
+    void StartRegionGrowing(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> seedPoint, ScalarType lowerThreshold, ScalarType upperThreshold);
+
     mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep=0);
 
     Image::Pointer m_ReferenceSlice;

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkLabelSetIOHelper_h
 
 #include <itkSmartPointer.h>
+#include <MitkMultilabelExports.h>
 
 class TiXmlElement;
 
@@ -33,7 +34,7 @@ class Label;
  * This class provides static functions for converting mitk::Label into XML and also allows the serialization
  * of mitk::LabelSet as presets
  */
-class LabelSetIOHelper
+class MITKMULTILABEL_EXPORT LabelSetIOHelper
 {
 
 public:

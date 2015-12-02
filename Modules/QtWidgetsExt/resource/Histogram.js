@@ -107,10 +107,18 @@ var vis = svg.append("svg")
 /*
  * Predefinition of the lines.
  */
+
 var line = d3.svg.line()
   .interpolate("linear")
   .x(function(d,i) {
-    return xScale(histogramData.measurement[i]-binSize/2);
+    if (!histogramData.useLineGraph)
+    {
+      return xScale(histogramData.measurement[i]-binSize/2);
+    }
+    else if (histogramData.useLineGraph)
+    {
+      return xScale(histogramData.measurement[i]);
+    }
   })
   .y(function(d) {
     return yScale(d);

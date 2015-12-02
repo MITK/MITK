@@ -493,10 +493,18 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   m_ToolManager->ActivateTool(-1);
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  assert(workingNode);
+  if (!workingNode)
+  {
+    QMessageBox::information(m_Parent, "New Segmentation Session", "Please load and select a patient image before starting some action.");
+    return;
+  }
 
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-  assert(workingImage);
+  if (!workingImage)
+  {
+    QMessageBox::information(m_Parent, "New Segmentation Session", "Please load and select a patient image before starting some action.");
+    return;
+  }
 
   QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent );
   dialog->SetSuggestionList( mitk::OrganNamesHandling::GetDefaultOrganColorString() );

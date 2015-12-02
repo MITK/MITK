@@ -39,19 +39,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkIOUtil.h>
 #include <mitkLog.h>
-#include <usGetModuleContext.h>
 #include <usModule.h>
-#include <usModuleContext.h>
 #include <mitkTrackingDeviceTypeCollection.h>
 #include <mitkUnspecifiedTrackingTypeInformation.h>
-
-//All Tracking devices, which should be avaiable by default
 #include "mitkNDIAuroraTypeInformation.h"
-#include "mitkNDIPolarisTypeInformation.h"
-#include "mitkVirtualTrackerTypeInformation.h"
-#include "mitkMicronTrackerTypeInformation.h"
-#include "mitkNPOptitrackTrackingTypeInformation.h"
-#include "mitkOpenIGTLinkTypeInformation.h"
 
 // vtk
 #include <vtkSphereSource.h>
@@ -60,13 +51,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTException.h>
 #include <mitkIGTIOException.h>
 
+//for Microservice
+#include "mitkPluginActivator.h"
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include "usServiceReference.h"
+
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
 
 QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   : QmitkFunctionality()
   , m_Controls(nullptr)
   , m_MultiWidget(nullptr)
-  , m_DeviceTypeCollection()
+  , m_DeviceTypeCollection(nullptr)
 {
   m_TrackingLoggingTimer = new QTimer(this);
   m_TrackingRenderTimer = new QTimer(this);
@@ -75,6 +72,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_connected = false;
   m_logging = false;
   m_loggedFrames = 0;
+
 
   //create filename for autosaving of tool storage
   QString loggingPathWithoutFilename = QString(mitk::LoggingBackend::GetLogFile().c_str());
@@ -95,13 +93,22 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_WorkerThread = new QThread();
   m_Worker = new QmitkMITKIGTTrackingToolboxViewWorker();
 
-  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIAuroraTypeInformation());
-  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIPolarisTypeInformation());
-  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::MicronTrackerTypeInformation());
-  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::NPOptitrackTrackingTypeInformation());
-  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::VirtualTrackerTypeInformation());
-  m_DeviceTypeCollection.RegisterTrackingDeviceType(new mitk::OpenIGTLinkTypeInformation());
-  m_DeviceTypeCollection.RegisterAsMicroservice();
+  ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
+  if (pluginContext)
+  {
+    QString interfaceName = QString::fromStdString(us_service_interface_iid<mitk::TrackingDeviceTypeCollection>());
+    QList<ctkServiceReference> _ServiceReference = pluginContext->getServiceReferences(interfaceName);
+
+    if (_ServiceReference.size() > 0)
+    {
+      m_DeviceTypeCollection = pluginContext->getService<mitk::TrackingDeviceTypeCollection>(_ServiceReference.at(0));
+    }
+    else
+    {
+      MITK_INFO << "NO Tracking Device Collection!";
+    }
+
+  }
 
 }
 
@@ -135,7 +142,6 @@ try
 this->AutoSaveToolStorage();
 this->StoreUISettings();
 
-m_DeviceTypeCollection.UnRegisterMicroservice();
 }
 
 void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
@@ -218,7 +224,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     }
     else
     {
-      Compatibles = m_DeviceTypeCollection.GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
+      Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
     }
     m_Controls->m_VolumeSelectionBox->clear();
     for(std::size_t i = 0; i < Compatibles.size(); i++)
@@ -361,11 +367,11 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   }
 
   //parse tracking device data
-  mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
+  mitk::TrackingDeviceData data = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Unspecified System");
   QString qstr =  m_Controls->m_VolumeSelectionBox->currentText();
   if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
     std::string str = qstr.toStdString();
-    data = m_DeviceTypeCollection.GetDeviceDataByName(str); //Data will be set later, after device generation
+    data = m_DeviceTypeCollection->GetDeviceDataByName(str); //Data will be set later, after device generation
   }
 
   //initialize worker thread
@@ -579,7 +585,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   }
   else
   {
-    Type = mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
+    Type = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
     MessageBox("Error: This tracking device is not included in this project. Please make sure that the device is installed and activated in your MITK build.");
     m_Controls->m_TrackingToolsGoupBox->setEnabled(false);
     m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
@@ -587,7 +593,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   }
 
   // Code to enable/disable device specific buttons
-  if (Type == mitk::TRACKING_DEVICE_IDENTIFIER_AURORA) //Aurora
+  if (Type == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) //Aurora
   {
     m_Controls->m_AutoDetectTools->setVisible(true);
     m_Controls->m_AddSingleTool->setEnabled(false);
@@ -599,7 +605,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   }
 
   // Code to select appropriate tracking volume for current type
-  std::vector<mitk::TrackingDeviceData> Compatibles = m_DeviceTypeCollection.GetDeviceDataForLine(Type);
+  std::vector<mitk::TrackingDeviceData> Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine(Type);
   m_Controls->m_VolumeSelectionBox->clear();
   for(std::size_t i = 0; i < Compatibles.size(); i++)
   {
@@ -616,7 +622,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
 
   std::string str = qstr.toStdString();
 
-  mitk::TrackingDeviceData data = m_DeviceTypeCollection.GetDeviceDataByName(str);
+  mitk::TrackingDeviceData data = m_DeviceTypeCollection->GetDeviceDataByName(str);
   m_TrackingDeviceData = data;
 
   volumeGenerator->SetTrackingDeviceData(data);
@@ -647,7 +653,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::TRACKING_DEVICE_IDENTIFIER_AURORA)
+  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName())
   {
     DisableTrackingConfigurationButtons();
     m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eAutoDetectTools);
@@ -1110,7 +1116,7 @@ void QmitkMITKIGTTrackingToolboxView::DisableTrackingControls()
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(true);
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::TRACKING_DEVICE_IDENTIFIER_AURORA) m_Controls->m_AddSingleTool->setEnabled(true);
+  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) m_Controls->m_AddSingleTool->setEnabled(true);
   m_Controls->m_LoadTools->setEnabled(true);
   m_Controls->m_ResetTools->setEnabled(true);
 }
@@ -1118,7 +1124,7 @@ void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(false);
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::TRACKING_DEVICE_IDENTIFIER_AURORA) m_Controls->m_AddSingleTool->setEnabled(false);
+  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) m_Controls->m_AddSingleTool->setEnabled(false);
   m_Controls->m_LoadTools->setEnabled(false);
   m_Controls->m_ResetTools->setEnabled(false);
 }
@@ -1311,7 +1317,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
     mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
     newTool->SetSerialNumber(dynamic_cast<mitk::NDIPassiveTool*>(currentDevice->GetTool(i))->GetSerialNumber());
     newTool->SetIdentifier(toolname.str());
-    newTool->SetTrackingDeviceType(mitk::TRACKING_DEVICE_IDENTIFIER_AURORA);
+    newTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     mitk::Surface::Pointer mySphere = mitk::Surface::New();
     vtkSphereSource *vtkData = vtkSphereSource::New();

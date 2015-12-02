@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QtConcurrentMap>
 #include "QmitkNDIToolDelegate.h"
 
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
+
 /* VIEW MANAGEMENT */
 QmitkNDIConfigurationWidget::QmitkNDIConfigurationWidget(QWidget* parent)
 : QWidget(parent), m_Controls(NULL), m_Tracker(NULL), m_Source(NULL),
@@ -115,12 +118,12 @@ void QmitkNDIConfigurationWidget::OnConnect()
   if (okay)
   {
     // show/hide options according to connected device
-    if(m_Tracker->GetType() == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS)
+    if(m_Tracker->GetType() == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName())
     {
       this->HideAuroraOptionsGroupbox(true);
       this->HidePolarisOptionsGroupbox(false);
     }
-    else if(m_Tracker->GetType() == mitk::TRACKING_DEVICE_IDENTIFIER_AURORA)
+    else if (m_Tracker->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName())
     {
       this->HidePolarisOptionsGroupbox(true);
       this->HideAuroraOptionsGroupbox(false);
@@ -391,12 +394,12 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
     }
     result += tmpComPort + ": ";
 
-    if (mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS == it.value())
+    if (mitk::NDIPolarisTypeInformation::GetTrackingDeviceName() == it.value())
     {
       result += "NDI Polaris<BR/>\n";
       m_Controls->m_ComPortSelector->addItem(tmpComPort);
     }
-    else if (mitk::TRACKING_DEVICE_IDENTIFIER_AURORA == it.value())
+    else if (mitk::NDIAuroraTypeInformation::GetTrackingDeviceName() == it.value())
     {
       result += "NDI Aurora<BR/>\n";
       m_Controls->m_ComPortSelector->addItem(tmpComPort);

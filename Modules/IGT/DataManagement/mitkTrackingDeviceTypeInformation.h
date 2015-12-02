@@ -28,16 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-//############## other device data ##################
-// The following TrackingDeviceData instances don't have TrackingDeviceTypeInformation implementations yet
-// static TrackingDeviceData DeviceDataDaVinci = {IntuitiveDaVinci, "Intuitive DaVinci", "IntuitiveDaVinci.stl","X"};
-// static TrackingDeviceData DeviceDataMicroBird = {AscensionMicroBird, "Ascension MicroBird", "", "X"};
-
   class MITKIGT_EXPORT TrackingDeviceTypeInformation
   {
     public:
 
-      //TrackingDeviceTypeInformation();
       virtual ~TrackingDeviceTypeInformation() { }
 
       virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(
@@ -46,10 +40,15 @@ namespace mitk
           std::string* errorMessage,
           std::vector<int>* toolCorrespondencesInToolStorage) = 0;
 
-      std::string m_DeviceName;
+      std::string GetTrackingDeviceName(){ return m_DeviceName; }
 
       // In this vector, all TrackingDeviceData which belong to this type are stored.
       std::vector<TrackingDeviceData> m_TrackingDeviceData;
+
+  protected:
+      std::string m_DeviceName;
+
+
 
   };
 } // namespace mitk

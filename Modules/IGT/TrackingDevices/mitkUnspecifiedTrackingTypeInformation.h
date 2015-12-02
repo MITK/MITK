@@ -23,26 +23,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  static TrackingDeviceData DeviceDataUnspecified = {mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED, "Unspecified System", "cube","X"};
-  // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
-  static TrackingDeviceData DeviceDataInvalid = {mitk::TRACKING_DEVICE_IDENTIFIER_INVALID, "Invalid Tracking System", "", "X"};
 
   class MITKIGT_EXPORT UnspecifiedTrackingTypeInformation : public TrackingDeviceTypeInformation
   {
     public:
 
-      UnspecifiedTrackingTypeInformation()
-      {
-        m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
-        m_TrackingDeviceData.push_back(DeviceDataUnspecified);
-        m_TrackingDeviceData.push_back(DeviceDataInvalid);
-      };
-      virtual ~UnspecifiedTrackingTypeInformation(){};
+      UnspecifiedTrackingTypeInformation();
+      virtual ~UnspecifiedTrackingTypeInformation();
 
       virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer,
-                                                                       mitk::NavigationToolStorage::Pointer,
-                                                                       std::string*,
-                                                                       std::vector<int>*) { return nullptr; }
+        mitk::NavigationToolStorage::Pointer,
+        std::string*,
+        std::vector<int>*);
+
+      static std::string GetTrackingDeviceName();
+      static std::vector<TrackingDeviceData> GetTrackingDeviceData();
+      static TrackingDeviceData GetTrackingDeviceData(std::string model);
   };
 } // namespace mitk
 

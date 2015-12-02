@@ -20,15 +20,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  std::string NDIPolarisTypeInformation::GetTrackingDeviceName()
+  {
+    return "NDI Polaris"; ///< Polaris: optical Tracker from NDI;
+  }
+
+
+  std::vector<TrackingDeviceData> NDIPolarisTypeInformation::GetTrackingDeviceData()
+  {
+
+    //############## NDI Polaris device data ############
+    TrackingDeviceData DeviceDataPolarisOldModel = { NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris (Old Model)", "NDIPolarisOldModel.stl", "0" };
+    //full hardware code of polaris spectra: 5-240000-153200-095000+057200+039800+056946+024303+029773+999999+99999924
+    TrackingDeviceData DeviceDataPolarisSpectra = { NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Spectra", "NDIPolarisSpectra.stl", "5-2" };
+    //full hardware code of polaris spectra (extended pyramid): 5-300000-153200-095000+057200+039800+056946+024303+029773+999999+07350024
+    TrackingDeviceData DeviceDataSpectraExtendedPyramid = { NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Spectra (Extended Pyramid)", "NDIPolarisSpectraExtendedPyramid.stl", "5-3" };
+    TrackingDeviceData DeviceDataPolarisVicra = { NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Vicra", "NDIPolarisVicra.stl", "7" };
+
+
+    std::vector<TrackingDeviceData> _TrackingDeviceData;
+    _TrackingDeviceData.push_back(DeviceDataPolarisOldModel);
+    _TrackingDeviceData.push_back(DeviceDataSpectraExtendedPyramid);
+    _TrackingDeviceData.push_back(DeviceDataPolarisSpectra);
+    _TrackingDeviceData.push_back(DeviceDataPolarisVicra);
+
+    return _TrackingDeviceData;
+  }
+
+  TrackingDeviceData NDIPolarisTypeInformation::GetTrackingDeviceData(std::string model)
+  {
+    for (auto data : GetTrackingDeviceData())
+    {
+      if (data.Model == model)
+        return data;
+    }
+    return TrackingDeviceData();
+  }
+
+
   NDIPolarisTypeInformation::NDIPolarisTypeInformation()
     //: m_DeviceName("Polaris")
     //, m_Widget(nullptr)
   {
-    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS;
-    m_TrackingDeviceData.push_back(DeviceDataPolarisOldModel);
-    m_TrackingDeviceData.push_back(DeviceDataPolarisSpectra);
-    m_TrackingDeviceData.push_back(DeviceDataSpectraExtendedPyramid);
-    m_TrackingDeviceData.push_back(DeviceDataPolarisVicra);
+    m_DeviceName = NDIPolarisTypeInformation::GetTrackingDeviceName();
+    m_TrackingDeviceData = NDIPolarisTypeInformation::GetTrackingDeviceData();
   }
 
   NDIPolarisTypeInformation::~NDIPolarisTypeInformation()

@@ -25,6 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAbstractTrackingDeviceWidget.h"
 
+//All Tracking devices, which should be available by default
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
+#include "mitkVirtualTrackerTypeInformation.h"
+#include "mitkMicronTrackerTypeInformation.h"
+#include "mitkNPOptitrackTrackingTypeInformation.h"
+#include "mitkOpenIGTLinkTypeInformation.h"
+
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
@@ -45,12 +53,12 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   m_virtualtrackerWidget = new QmitkVirtualTrackerWidget;
   m_openIGTLinkWidget = new QmitkOpenIGTLinkWidget;
 
-  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::TRACKING_DEVICE_IDENTIFIER_AURORA, m_auroraWidget);
-  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS, m_polarisWidget);
-  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::TRACKING_DEVICE_IDENTIFIER_MICRON, m_microntrackerWidget);
-  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::TRACKING_DEVICE_IDENTIFIER_OPTITRACK, m_optitrackWidget);
-  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL, m_virtualtrackerWidget);
-  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::TRACKING_DEVICE_IDENTIFIER_OPENIGTLINK, m_openIGTLinkWidget);
+  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), m_auroraWidget);
+  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName(), m_polarisWidget);
+  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName(), m_microntrackerWidget);
+  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), m_optitrackWidget);
+  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), m_virtualtrackerWidget);
+  m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::OpenIGTLinkTypeInformation::GetTrackingDeviceName(), m_openIGTLinkWidget);
   m_DeviceWidgetCollection.RegisterAsMicroservice();
 
   RefreshTrackingDeviceCollection();
@@ -235,9 +243,9 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
   }
 
   //the selected device requires some checks because a device that is not installed should not be restored to avoids bugs
-  if (!m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDevice)->IsDeviceInstalled())
+  if (m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDevice)==nullptr || !m_DeviceWidgetCollection.GetTrackingDeviceWidget(selectedDevice)->IsDeviceInstalled())
   {
-    selectedDevice = mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS;
+    selectedDevice = mitk::NDIPolarisTypeInformation::GetTrackingDeviceName();
   } //Default: Polaris...
 
   const int index = m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(selectedDevice));

@@ -20,10 +20,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  std::string MicronTrackerTypeInformation::GetTrackingDeviceName()
+  {
+    return "Claron Micron";
+  }
+
+
+    std::vector<TrackingDeviceData> MicronTrackerTypeInformation::GetTrackingDeviceData()
+  {
+
+    TrackingDeviceData DeviceDataMicronTrackerH40 = { MicronTrackerTypeInformation::GetTrackingDeviceName(), "Micron Tracker H40", "ClaronMicron.stl", "X" };
+
+
+    std::vector<TrackingDeviceData> _TrackingDeviceData;
+    _TrackingDeviceData.push_back(DeviceDataMicronTrackerH40);
+    return _TrackingDeviceData;
+  }
+
+  TrackingDeviceData MicronTrackerTypeInformation::GetTrackingDeviceData(std::string model)
+  {
+    for (auto data : GetTrackingDeviceData())
+    {
+      if (data.Model == model)
+        return data;
+    }
+    return TrackingDeviceData();
+  }
+
+
   MicronTrackerTypeInformation::MicronTrackerTypeInformation()
   {
-    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_MICRON;
-    m_TrackingDeviceData.push_back(DeviceDataMicronTrackerH40);
+    m_DeviceName = MicronTrackerTypeInformation::GetTrackingDeviceName();
+    m_TrackingDeviceData = MicronTrackerTypeInformation::GetTrackingDeviceData();
   }
 
   MicronTrackerTypeInformation::~MicronTrackerTypeInformation()

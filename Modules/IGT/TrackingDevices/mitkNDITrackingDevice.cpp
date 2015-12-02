@@ -42,7 +42,7 @@ m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_Tools
 m_SerialCommunication(nullptr), m_SerialCommunicationMutex(nullptr), m_DeviceProtocol(nullptr),
 m_MultiThreader(nullptr), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(nullptr), m_MarkerPoints()
 {
-  m_Data = mitk::DeviceDataUnspecified;
+  m_Data = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Unspecified System");
   m_6DTools.clear();
   m_SerialCommunicationMutex = itk::FastMutexLock::New();
   m_DeviceProtocol = NDIProtocol::New();
@@ -438,11 +438,11 @@ bool mitk::NDITrackingDevice::OpenConnection()
   if (returnvalue != NDIOKAY)
     {mitkThrowException(mitk::IGTHardwareException) << "Could not initialize the tracking device";}
 
-  if (this->GetType() == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED)  // if the type of tracking device is not specified, try to query the connected device
+  if (this->GetType() == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName())  // if the type of tracking device is not specified, try to query the connected device
   {
     mitk::TrackingDeviceType deviceType;
     returnvalue = m_DeviceProtocol->VER(deviceType);
-    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED))
+    if ((returnvalue != NDIOKAY) || (deviceType == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()))
       {mitkThrowException(mitk::IGTHardwareException) << "Could not determine tracking device type. Please set manually and try again.";}
     this->SetType(deviceType);
   }
@@ -509,7 +509,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
       {
         (*it)->SetPortHandle(portHandle.c_str());
         /* now write the SROM file of the tool to the tracking system using PVWR */
-    if (this->m_Data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS)
+    if (this->m_Data.Line == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName())
         {
           returnvalue = m_DeviceProtocol->PVWR(&portHandle, (*it)->GetSROMData(), (*it)->GetSROMDataLength());
           if (returnvalue != NDIOKAY)
@@ -539,7 +539,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
 
 
   /*POLARIS: set the illuminator activation rate */
-  if (this->m_Data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS)
+  if (this->m_Data.Line == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName())
   {
     returnvalue = m_DeviceProtocol->IRATE(this->m_IlluminationActivationRate);
     if (returnvalue != NDIOKAY)
@@ -607,7 +607,7 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
 {
   if (this->GetState() != Setup)
   {
-    return mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
+    return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
   }
 
   m_SerialCommunication = mitk::SerialCommunication::New();
@@ -631,7 +631,7 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
   if (m_SerialCommunication->OpenConnection() == 0) // error
   {
     m_SerialCommunication = nullptr;
-    return mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
+    return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
   }
 
   /* Reset Tracking device by sending a serial break for 500ms */
@@ -663,10 +663,10 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
 
     mitk::TrackingDeviceType deviceType;
     returnvalue = m_DeviceProtocol->VER(deviceType);
-    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED))
+    if ((returnvalue != NDIOKAY) || (deviceType == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()))
     {
       m_SerialCommunication = nullptr;
-      return mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED;
+      return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
     }
     m_SerialCommunication = nullptr;
     return deviceType;
@@ -1240,21 +1240,21 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
     // if i>0 then we have a return statement <LF> infront
     if (i>0)
       currentVolume = currentVolume.substr(1, currentVolume.size());
-    if (currentVolume.compare(0,1,mitk::DeviceDataPolarisOldModel.HardwareCode)==0)
-      volumes->push_back(mitk::DeviceDataPolarisOldModel.Model);
-    if (currentVolume.compare(0,3,mitk::DeviceDataPolarisSpectra.HardwareCode)==0)
-      volumes->push_back(mitk::DeviceDataPolarisSpectra.Model);
-    if (currentVolume.compare(1,3,mitk::DeviceDataSpectraExtendedPyramid.HardwareCode)==0)
+    if (currentVolume.compare(0, 1, NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris (Old Model)").HardwareCode) == 0)
+      volumes->push_back(NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris (Old Model)").Model);
+    if (currentVolume.compare(0, 3, NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra").HardwareCode) == 0)
+      volumes->push_back(NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra").Model);
+    if (currentVolume.compare(1, 3, NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra (Extended Pyramid)").HardwareCode) == 0)
     {
       currentVolume = currentVolume.substr(1,currentVolume.size());
-      volumes->push_back(mitk::DeviceDataSpectraExtendedPyramid.Model);
+      volumes->push_back(NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra (Extended Pyramid)").Model);
     }
-    if (currentVolume.compare(0,1,mitk::DeviceDataPolarisVicra.HardwareCode)==0)
-      volumes->push_back(mitk::DeviceDataPolarisVicra.Model);
-    else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarCube.HardwareCode)==0)
-      volumes->push_back(mitk::DeviceDataAuroraPlanarCube.Model);//alias cube
-    else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarDome.HardwareCode)==0)
-      volumes->push_back(mitk::DeviceDataAuroraPlanarDome.Model);
+    if (currentVolume.compare(0, 1, NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Vicra").HardwareCode) == 0)
+      volumes->push_back(NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Vicra").Model);
+    else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Cube)").HardwareCode) == 0)
+      volumes->push_back(mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Cube)").Model);//alias cube
+    else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Dome)").HardwareCode) == 0)
+      volumes->push_back(mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Dome)").Model);
 
     //fill volumesDimensions
     for (unsigned int index = 0; index < 10; index++)

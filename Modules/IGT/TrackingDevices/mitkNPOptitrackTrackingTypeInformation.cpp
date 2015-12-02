@@ -20,10 +20,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  std::string NPOptitrackTrackingTypeInformation::GetTrackingDeviceName()
+  {
+    return "NP Optitrack";
+  }
+
+
+  std::vector<TrackingDeviceData> NPOptitrackTrackingTypeInformation::GetTrackingDeviceData()
+  {
+
+    //############## NP Optitrack device data ############
+    TrackingDeviceData DeviceDataNPOptitrack = { NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), "Optitrack", "cube", "X" };
+
+    std::vector<TrackingDeviceData> _TrackingDeviceData;
+    _TrackingDeviceData.push_back(DeviceDataNPOptitrack);
+
+    return _TrackingDeviceData;
+  }
+
+  TrackingDeviceData NPOptitrackTrackingTypeInformation::GetTrackingDeviceData(std::string model)
+  {
+    for (auto data : GetTrackingDeviceData())
+    {
+      if (data.Model == model)
+        return data;
+    }
+    return TrackingDeviceData();
+  }
+
   NPOptitrackTrackingTypeInformation::NPOptitrackTrackingTypeInformation()
   {
-    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_OPTITRACK;
-    m_TrackingDeviceData.push_back(DeviceDataNPOptitrack);
+    m_DeviceName = NPOptitrackTrackingTypeInformation::GetTrackingDeviceName();
+    m_TrackingDeviceData = NPOptitrackTrackingTypeInformation::GetTrackingDeviceData();
   }
 
   NPOptitrackTrackingTypeInformation::~NPOptitrackTrackingTypeInformation()

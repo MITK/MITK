@@ -21,13 +21,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  std::string NDIAuroraTypeInformation::GetTrackingDeviceName()
+  {
+    return "NDI Aurora";
+  }
+
+
+  std::vector<TrackingDeviceData> NDIAuroraTypeInformation::GetTrackingDeviceData()
+  {
+    TrackingDeviceData DeviceDataAuroraCompact = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Compact", "NDIAuroraCompactFG_Dome.stl", "A" };
+    TrackingDeviceData DeviceDataAuroraPlanarCube = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Cube)", "NDIAurora.stl", "9" };
+    TrackingDeviceData DeviceDataAuroraPlanarDome = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Dome)", "NDIAuroraPlanarFG_Dome.stl", "A" };
+    TrackingDeviceData DeviceDataAuroraTabletop = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl", "A" };
+
+
+    std::vector<TrackingDeviceData> _TrackingDeviceData;
+    _TrackingDeviceData.push_back(DeviceDataAuroraCompact);
+    _TrackingDeviceData.push_back(DeviceDataAuroraPlanarCube);
+    _TrackingDeviceData.push_back(DeviceDataAuroraPlanarDome);
+    _TrackingDeviceData.push_back(DeviceDataAuroraTabletop);
+
+    return _TrackingDeviceData;
+  }
+
+  TrackingDeviceData NDIAuroraTypeInformation::GetTrackingDeviceData(std::string model)
+  {
+    for (auto data : GetTrackingDeviceData())
+    {
+      if (data.Model == model)
+        return data;
+    }
+    return TrackingDeviceData();
+  }
+
   NDIAuroraTypeInformation::NDIAuroraTypeInformation()
   {
-    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_AURORA;
-    m_TrackingDeviceData.push_back(DeviceDataAuroraCompact);
-    m_TrackingDeviceData.push_back(DeviceDataAuroraPlanarCube);
-    m_TrackingDeviceData.push_back(DeviceDataAuroraPlanarDome);
-    m_TrackingDeviceData.push_back(DeviceDataAuroraTabletop);
+
+    m_DeviceName = NDIAuroraTypeInformation::GetTrackingDeviceName();
+    m_TrackingDeviceData = NDIAuroraTypeInformation::GetTrackingDeviceData();
+    //############## NDI Aurora device data #############
+
   }
 
   NDIAuroraTypeInformation::~NDIAuroraTypeInformation()

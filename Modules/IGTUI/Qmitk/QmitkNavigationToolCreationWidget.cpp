@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <mitkNavigationData.h>
 #include <mitkRenderingManager.h>
+#include "mitkTrackingDeviceTypeCollection.h"
 
 //qt headers
 #include <qfiledialog.h>
@@ -47,6 +48,8 @@ m_AdvancedWidget->setWindowTitle("Tool Creation Advanced Options");
 m_AdvancedWidget->setModal(false);
 CreateQtPartControl(this);
 CreateConnections();
+
+RefreshTrackingDeviceCollection();
 }
 
 QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
@@ -312,4 +315,25 @@ void QmitkNavigationToolCreationWidget::InitializeUIToolLandmarkLists()
 m_calLandmarkNode = mitk::DataNode::New();
 m_regLandmarkNode = mitk::DataNode::New();
 FillUIToolLandmarkLists(mitk::PointSet::New(),mitk::PointSet::New());
+}
+
+void QmitkNavigationToolCreationWidget::RefreshTrackingDeviceCollection()
+{
+  us::ModuleContext* context = us::GetModuleContext();
+  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
+  if (refs.empty())
+  {
+    MITK_WARN << "No tracking device service found!";
+    return;
+  }
+  mitk::TrackingDeviceTypeCollection* _DeviceTypeCollection = context->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
+
+  for (auto name : _DeviceTypeCollection->GetTrackingDeviceTypeNames())
+  {
+    //if the device is not included yet, add name to comboBox and widget to stackedWidget
+    if (m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(name)) == -1)
+    {
+      m_Controls->m_TrackingDeviceTypeChooser->addItem(QString::fromStdString(name));
+    }
+  }
 }

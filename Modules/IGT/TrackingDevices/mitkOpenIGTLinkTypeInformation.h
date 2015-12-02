@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  static TrackingDeviceData DeviceDataOpenIGTLinkTrackingDeviceConnection = {TRACKING_DEVICE_IDENTIFIER_OPENIGTLINK, "OpenIGTLink Tracking Device", "cube","X"};
-
   class MITKIGT_EXPORT OpenIGTLinkTypeInformation : public TrackingDeviceTypeInformation
   {
     public:
@@ -34,6 +32,10 @@ namespace mitk
       virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
                                                                        mitk::NavigationToolStorage::Pointer navigationTools,
                                                                        std::string* errorMessage, std::vector<int>*) override;
+
+      static std::string GetTrackingDeviceName();
+      static std::vector<TrackingDeviceData> GetTrackingDeviceData();
+      static TrackingDeviceData GetTrackingDeviceData(std::string model);
   };
 } // namespace mitk
 

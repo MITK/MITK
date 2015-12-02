@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <mitkNDITrackingDevice.h>
 
+#include "mitkNDIPolarisTypeInformation.h"
+
 #include <QSettings>
 
 const std::string QmitkNDIPolarisWidget::VIEW_ID = "org.mitk.views.NDIPolarisWidget";
@@ -105,7 +107,7 @@ mitk::TrackingDevice::Pointer QmitkNDIPolarisWidget::ConstructTrackingDevice()
 
   tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
   tempTrackingDevice->SetBaudRate(mitk::SerialCommunication::BaudRate115200);//set baud rate
-  tempTrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_POLARIS);
+  tempTrackingDevice->SetType(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName());
   return static_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
 }
 

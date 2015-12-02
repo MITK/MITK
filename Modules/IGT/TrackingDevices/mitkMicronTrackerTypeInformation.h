@@ -24,8 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-  static TrackingDeviceData DeviceDataMicronTrackerH40 = {TRACKING_DEVICE_IDENTIFIER_MICRON, "Micron Tracker H40", "ClaronMicron.stl", "X"};
-
   class MITKIGT_EXPORT MicronTrackerTypeInformation : public TrackingDeviceTypeInformation
   {
     public:
@@ -36,6 +34,10 @@ namespace mitk
                                                                        mitk::NavigationToolStorage::Pointer navigationTools,
                                                                        std::string* errorMessage,
                                                                        std::vector<int>* toolCorrespondencesInToolStorage) override;
+
+      static std::string GetTrackingDeviceName();
+      static std::vector<TrackingDeviceData> GetTrackingDeviceData();
+      static TrackingDeviceData GetTrackingDeviceData(std::string model);
   };
 } // namespace mitk
 

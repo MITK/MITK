@@ -20,12 +20,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
+  std::string VirtualTrackerTypeInformation::GetTrackingDeviceName()
+  {
+    return "Virtual Tracker";
+  }
+
+
+  std::vector<TrackingDeviceData> VirtualTrackerTypeInformation::GetTrackingDeviceData()
+  {
+    static TrackingDeviceData DeviceDataVirtualTracker = { VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Virtual Tracker", "cube", "X" };
+
+    std::vector<TrackingDeviceData> _TrackingDeviceData;
+
+    _TrackingDeviceData.push_back(DeviceDataVirtualTracker);
+
+    return _TrackingDeviceData;
+  }
+
+  TrackingDeviceData VirtualTrackerTypeInformation::GetTrackingDeviceData(std::string model)
+  {
+    for (auto data : GetTrackingDeviceData())
+    {
+      if (data.Model == model)
+        return data;
+    }
+    return TrackingDeviceData();
+  }
+
   VirtualTrackerTypeInformation::VirtualTrackerTypeInformation()
     //: m_DeviceName("Polaris")
     //, m_Widget(nullptr)
   {
-    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL;
-    m_TrackingDeviceData.push_back(DeviceDataVirtualTracker);
+    m_DeviceName = VirtualTrackerTypeInformation::GetTrackingDeviceName();
+    m_TrackingDeviceData = VirtualTrackerTypeInformation::GetTrackingDeviceData();
   }
 
   VirtualTrackerTypeInformation::~VirtualTrackerTypeInformation()

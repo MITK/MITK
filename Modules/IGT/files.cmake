@@ -66,11 +66,13 @@ set(CPP_FILES
   TrackingDevices/mitkVirtualTrackerTypeInformation.cpp
   TrackingDevices/mitkMicronTrackerTypeInformation.cpp
   TrackingDevices/mitkOpenIGTLinkTypeInformation.cpp
+  TrackingDevices/mitkUnspecifiedTrackingTypeInformation.cpp
+
+  autoload/mitkIGTActivator.cpp
 )
 
 set(H_FILES
   DataManagement/mitkTrackingDeviceTypeInformation.h
-  TrackingDevices/mitkUnspecifiedTrackingTypeInformation.h
 )
 
 set(RESOURCE_FILES

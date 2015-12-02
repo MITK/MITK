@@ -20,10 +20,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  std::string OpenIGTLinkTypeInformation::GetTrackingDeviceName()
+  {
+    return "Open IGT Link Tracking Device Connection";
+  }
+
+
+  std::vector<TrackingDeviceData> OpenIGTLinkTypeInformation::GetTrackingDeviceData()
+  {
+    TrackingDeviceData DeviceDataOpenIGTLinkTrackingDeviceConnection = { OpenIGTLinkTypeInformation::GetTrackingDeviceName(), "OpenIGTLink Tracking Device", "cube", "X" };
+
+
+    std::vector<TrackingDeviceData> _TrackingDeviceData;
+    _TrackingDeviceData.push_back(DeviceDataOpenIGTLinkTrackingDeviceConnection);
+
+    return _TrackingDeviceData;
+  }
+
+  TrackingDeviceData OpenIGTLinkTypeInformation::GetTrackingDeviceData(std::string model)
+  {
+    for (auto data : GetTrackingDeviceData())
+    {
+      if (data.Model == model)
+        return data;
+    }
+    return TrackingDeviceData();
+  }
+
   OpenIGTLinkTypeInformation::OpenIGTLinkTypeInformation()
   {
-    m_DeviceName = mitk::TRACKING_DEVICE_IDENTIFIER_OPENIGTLINK;
-    m_TrackingDeviceData.push_back(DeviceDataOpenIGTLinkTrackingDeviceConnection);
+    m_DeviceName = OpenIGTLinkTypeInformation::GetTrackingDeviceName();
+    m_TrackingDeviceData = OpenIGTLinkTypeInformation::GetTrackingDeviceData();
   }
 
   OpenIGTLinkTypeInformation::~OpenIGTLinkTypeInformation()

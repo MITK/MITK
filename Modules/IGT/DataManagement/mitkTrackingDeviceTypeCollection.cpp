@@ -75,7 +75,7 @@ mitk::TrackingDeviceTypeInformation* mitk::TrackingDeviceTypeCollection::GetTrac
 {
   for (auto deviceType : m_TrackingDeviceTypeInformations)
   {
-    if (deviceType->m_DeviceName == type)
+    if (deviceType->GetTrackingDeviceName() == type)
     {
       return deviceType;
     }
@@ -88,7 +88,7 @@ std::vector<mitk::TrackingDeviceData> mitk::TrackingDeviceTypeCollection::GetDev
 {
   for (auto deviceType : m_TrackingDeviceTypeInformations)
   {
-    if (deviceType->m_DeviceName == type)
+    if (deviceType->GetTrackingDeviceName() == type)
     {
       return deviceType->m_TrackingDeviceData;
     }
@@ -101,7 +101,7 @@ mitk::TrackingDeviceData mitk::TrackingDeviceTypeCollection::GetFirstCompatibleD
 {
   if (GetDeviceDataForLine(type).empty())
   {
-    return mitk::DeviceDataInvalid;
+    return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Invalid Tracking System");
   }
 
   return GetDeviceDataForLine(type).front();
@@ -120,7 +120,7 @@ mitk::TrackingDeviceData mitk::TrackingDeviceTypeCollection::GetDeviceDataByName
     }
   }
 
-  return mitk::DeviceDataInvalid;
+  return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Invalid Tracking System");
 }
 
 std::vector<std::string> mitk::TrackingDeviceTypeCollection::GetTrackingDeviceTypeNames()
@@ -128,7 +128,7 @@ std::vector<std::string> mitk::TrackingDeviceTypeCollection::GetTrackingDeviceTy
   std::vector<std::string> names;
   for (auto deviceType : m_TrackingDeviceTypeInformations)
   {
-    names.push_back(deviceType->m_DeviceName);
+    names.push_back(deviceType->GetTrackingDeviceName());
   }
   return names;
 }

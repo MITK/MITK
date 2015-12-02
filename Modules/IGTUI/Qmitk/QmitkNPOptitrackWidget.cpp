@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Poco/Path.h>
 
 #include <mitkOptitrackTrackingDevice.h>
+#include "mitkNPOptitrackTrackingTypeInformation.h"
 
 const std::string QmitkNPOptitrackWidget::VIEW_ID = "org.mitk.views.NPOptitrackWidget";
 
@@ -80,7 +81,7 @@ mitk::TrackingDevice::Pointer QmitkNPOptitrackWidget::ConstructTrackingDevice()
   tempTrackingDevice->SetLed(m_Controls->m_OptitrackLed->value());
   tempTrackingDevice->SetThr(m_Controls->m_OptitrackThr->value());
 
-  tempTrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_OPTITRACK);
+  tempTrackingDevice->SetType(mitk::NPOptitrackTrackingTypeInformation::GetTrackingDeviceName());
   return static_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
 }
 

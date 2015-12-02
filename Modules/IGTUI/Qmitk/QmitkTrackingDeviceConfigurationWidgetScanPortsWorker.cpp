@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNDITrackingDevice.h>
 #include <mitkIGTException.h>
 
+#include "mitkUnspecifiedTrackingTypeInformation.h"
+
 void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc()
 {
   int Port = -1;
@@ -39,7 +41,7 @@ void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc(
     if (i < 10) devName = QString("COM%1").arg(i);
     else devName = QString("\\\\.\\COM%1").arg(i); // prepend "\\.\ to COM ports >9, to be able to allow connection"
     scannedPort = ScanPort(devName);
-    if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID || scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED))
+    if (!(scannedPort == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()))
     {
       result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
       Port = i;
@@ -81,7 +83,7 @@ mitk::TrackingDeviceType QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::
 {
   mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();
   tracker->SetDeviceName(port.toStdString());
-  mitk::TrackingDeviceType returnValue = mitk::TRACKING_DEVICE_IDENTIFIER_INVALID;
+  mitk::TrackingDeviceType returnValue = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
   try
   {
     returnValue = tracker->TestConnection();

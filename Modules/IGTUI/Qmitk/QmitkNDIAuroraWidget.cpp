@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include "mitkNDIAuroraTypeInformation.h"
 
 const std::string QmitkNDIAuroraWidget::VIEW_ID = "org.mitk.views.NDIAuroraWidget";
 
@@ -97,7 +98,7 @@ mitk::TrackingDevice::Pointer QmitkNDIAuroraWidget::ConstructTrackingDevice()
 
   tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
   tempTrackingDevice->SetBaudRate(mitk::SerialCommunication::BaudRate115200);//set baud rate
-  tempTrackingDevice->SetType(mitk::TRACKING_DEVICE_IDENTIFIER_AURORA);
+  tempTrackingDevice->SetType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
   return static_cast<mitk::TrackingDevice::Pointer>(tempTrackingDevice);
 }
 

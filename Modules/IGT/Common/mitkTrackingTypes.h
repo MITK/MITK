@@ -25,16 +25,6 @@ namespace mitk
 {
   typedef std::string TrackingDeviceType;
 
-  static const std::string TRACKING_DEVICE_IDENTIFIER_AURORA = "NDI Aurora"; ///< Aurora: electromagnetic Tracker from NDI
-  static const std::string TRACKING_DEVICE_IDENTIFIER_POLARIS ="NDI Polaris"; ///< Polaris: optical Tracker from NDI
-  static const std::string TRACKING_DEVICE_IDENTIFIER_MICRON = "Claron Micron"; ///< Micron Tracker: optical Tracker from Claron
-  static const std::string TRACKING_DEVICE_IDENTIFIER_MICROBIRD = "Ascension MicroBird"; ///< Ascension microBird / PCIBird family
-  static const std::string TRACKING_DEVICE_IDENTIFIER_VIRTUAL = "Virtual Tracker"; ///< Virtual Tracking device class that produces random tracking coordinates
-  static const std::string TRACKING_DEVICE_IDENTIFIER_OPTITRACK = "NP Optitrack"; ///< NaturalPoint: Optitrack optical Tracking System
-  static const std::string TRACKING_DEVICE_IDENTIFIER_OPENIGTLINK = "Open IGT Link Tracking Device Connection"; ///< Device which is connected via open igt link
-  static const std::string TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED = "Tracking System Not Specified"; ///< entry for not specified or initialized tracking system
-  static const std::string TRACKING_DEVICE_IDENTIFIER_INVALID = "Tracking System Invalid"; ///< entry for invalid state (mainly for testing)
-
   /**
    * /brief This structure defines key variables of a device model and type.
    * It is specifically used to find out which models belong to which vendor, and what volume

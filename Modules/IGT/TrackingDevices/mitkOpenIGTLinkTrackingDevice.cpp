@@ -37,7 +37,7 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice(): mitk::TrackingDevice()
 {
   //set the type of this tracking device
-  this->m_Data = mitk::OpenIGTLinkTypeInformation::GetTrackingDeviceData("OpenIGTLink Tracking Device");
+  this->m_Data = mitk::OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection();
 
   m_OpenIGTLinkClient = mitk::IGTLClient::New(false);
   m_OpenIGTLinkClient->EnableInfiniteBufferingMode(m_OpenIGTLinkClient->GetReceiveQueue(),false);

@@ -26,34 +26,21 @@ namespace mitk
     return "Tracking System Not Specified";
   }
 
-  std::vector<TrackingDeviceData> UnspecifiedTrackingTypeInformation::GetTrackingDeviceData()
+  TrackingDeviceData UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified()
   {
-    TrackingDeviceData DeviceDataUnspecified = { UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Unspecified System", "cube", "X" };
-    // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
-    TrackingDeviceData DeviceDataInvalid = { "Tracking System Invalid", "Invalid Tracking System", "", "X" };
-
-    std::vector<TrackingDeviceData> _TrackingDeviceData;
-    _TrackingDeviceData.push_back(DeviceDataUnspecified);
-    _TrackingDeviceData.push_back(DeviceDataInvalid);
-
-    return _TrackingDeviceData;
+    return{ UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Unspecified System", "cube", "X" };
   }
-
-  TrackingDeviceData UnspecifiedTrackingTypeInformation::GetTrackingDeviceData(std::string model)
+  // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
+  TrackingDeviceData UnspecifiedTrackingTypeInformation::GetDeviceDataInvalid()
   {
-    for (auto data : GetTrackingDeviceData())
-    {
-      if (data.Model == model)
-        return data;
-    }
-    return TrackingDeviceData();
+    return{ "Tracking System Invalid", "Invalid Tracking System", "", "X" };
   }
 
   UnspecifiedTrackingTypeInformation::UnspecifiedTrackingTypeInformation()
   {
     m_DeviceName = UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
-    m_TrackingDeviceData = UnspecifiedTrackingTypeInformation::GetTrackingDeviceData();
-    //############## NDI Aurora device data #############
+    m_TrackingDeviceData.push_back(GetDeviceDataUnspecified());
+    m_TrackingDeviceData.push_back(GetDeviceDataInvalid());
   }
 
   UnspecifiedTrackingTypeInformation::~UnspecifiedTrackingTypeInformation()

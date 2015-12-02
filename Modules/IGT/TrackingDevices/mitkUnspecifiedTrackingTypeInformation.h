@@ -23,22 +23,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   class MITKIGT_EXPORT UnspecifiedTrackingTypeInformation : public TrackingDeviceTypeInformation
   {
-    public:
+  public:
 
-      UnspecifiedTrackingTypeInformation();
-      virtual ~UnspecifiedTrackingTypeInformation();
+    UnspecifiedTrackingTypeInformation();
+    virtual ~UnspecifiedTrackingTypeInformation();
 
-      virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer,
-        mitk::NavigationToolStorage::Pointer,
-        std::string*,
-        std::vector<int>*);
+    virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer,
+      mitk::NavigationToolStorage::Pointer,
+      std::string*,
+      std::vector<int>*);
 
-      static std::string GetTrackingDeviceName();
-      static std::vector<TrackingDeviceData> GetTrackingDeviceData();
-      static TrackingDeviceData GetTrackingDeviceData(std::string model);
+    static std::string GetTrackingDeviceName();
+    static TrackingDeviceData GetDeviceDataUnspecified();
+    static TrackingDeviceData GetDeviceDataInvalid();
   };
 } // namespace mitk
 

@@ -25,21 +25,22 @@ namespace mitk
 {
   class MITKIGT_EXPORT NDIAuroraTypeInformation : public TrackingDeviceTypeInformation
   {
-    public:
-      NDIAuroraTypeInformation();
-      virtual ~NDIAuroraTypeInformation();
+  public:
+    NDIAuroraTypeInformation();
+    virtual ~NDIAuroraTypeInformation();
 
-      virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
-                                                                       mitk::NavigationToolStorage::Pointer navigationTools,
-                                                                       std::string* errorMessage,
-                                                                       std::vector<int>* toolCorrespondencesInToolStorage) override;
+    virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice,
+      mitk::NavigationToolStorage::Pointer navigationTools,
+      std::string* errorMessage,
+      std::vector<int>* toolCorrespondencesInToolStorage) override;
 
-      static std::string GetTrackingDeviceName();
-      static std::vector<TrackingDeviceData> GetTrackingDeviceData();
-      static TrackingDeviceData GetTrackingDeviceData(std::string model);
+    static std::string GetTrackingDeviceName();
 
+    static TrackingDeviceData GetDeviceDataAuroraCompact();
+    static TrackingDeviceData GetDeviceDataAuroraPlanarCube();
+    static TrackingDeviceData GetDeviceDataAuroraPlanarDome();
+    static TrackingDeviceData GetDeviceDataAuroraTabletop();
   };
-
 } // namespace mitk
 
 #endif //mitkNDIAuroraTypeInformation_h

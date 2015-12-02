@@ -25,19 +25,18 @@ namespace mitk
 {
   class MITKIGT_EXPORT NPOptitrackTrackingTypeInformation : public TrackingDeviceTypeInformation
   {
-    public:
+  public:
 
-      NPOptitrackTrackingTypeInformation();
-      virtual ~NPOptitrackTrackingTypeInformation();
+    NPOptitrackTrackingTypeInformation();
+    virtual ~NPOptitrackTrackingTypeInformation();
 
-      virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(TrackingDevice::Pointer trackingDevice,
-                                                                       NavigationToolStorage::Pointer navigationTools,
-                                                                       std::string* errorMessage,
-                                                                       std::vector<int>* toolCorrespondencesInToolStorage) override;
+    virtual TrackingDeviceSource::Pointer CreateTrackingDeviceSource(TrackingDevice::Pointer trackingDevice,
+      NavigationToolStorage::Pointer navigationTools,
+      std::string* errorMessage,
+      std::vector<int>* toolCorrespondencesInToolStorage) override;
 
-      static std::string GetTrackingDeviceName();
-      static std::vector<TrackingDeviceData> GetTrackingDeviceData();
-      static TrackingDeviceData GetTrackingDeviceData(std::string model);
+    static std::string GetTrackingDeviceName();
+    static TrackingDeviceData GetDeviceDataNPOptitrack();
   };
 } // namespace mitk
 

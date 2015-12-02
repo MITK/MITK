@@ -34,7 +34,7 @@ mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(),
 m_AllTools(), m_ToolsMutex(NULL), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20), m_GaussianNoiseEnabled(false),
 m_MeanDistributionParam(0.0), m_DeviationDistributionParam(1.0)
 {
-  m_Data = mitk::VirtualTrackerTypeInformation::GetTrackingDeviceData("Virtual Tracker");
+  m_Data = mitk::VirtualTrackerTypeInformation::GetDeviceDataVirtualTracker();
   m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -400.0;  // initialize bounds to -400 ... +400 (mm) cube
   m_Bounds[1] = m_Bounds[3] = m_Bounds[5] =  400.0;
   m_ToolsMutex = itk::FastMutexLock::New();

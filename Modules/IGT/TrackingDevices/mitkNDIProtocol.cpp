@@ -1759,17 +1759,17 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
         }
         //analyze volume here
 
-        if (currentVolume.compare(0, 1, mitk::NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris (Old Model)").HardwareCode) == 0)
+        if (currentVolume.compare(0, 1, mitk::NDIPolarisTypeInformation::GetDeviceDataPolarisOldModel().HardwareCode) == 0)
           MITK_INFO<<"Standard volume supported \n";
-        else if (currentVolume.compare(0, 3, mitk::NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra").HardwareCode) == 0)
+        else if (currentVolume.compare(0, 3, mitk::NDIPolarisTypeInformation::GetDeviceDataPolarisSpectra().HardwareCode) == 0)
           MITK_INFO<<"Spectra pyramid volume supported \n";
-        else if (currentVolume.compare(0, 3, mitk::NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra (Extended Pyramid)").HardwareCode)==0)
+        else if (currentVolume.compare(0, 3, mitk::NDIPolarisTypeInformation::GetDeviceDataSpectraExtendedPyramid().HardwareCode)==0)
           MITK_INFO<<"Spectra extended pyramid volume supported \n";
-        else if (currentVolume.compare(0, 1, mitk::NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Vicra").HardwareCode) == 0)
+        else if (currentVolume.compare(0, 1, mitk::NDIPolarisTypeInformation::GetDeviceDataPolarisVicra().HardwareCode) == 0)
           MITK_INFO<<"Vicra volume supported \n";
-        else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Cube)").HardwareCode) == 0)
+        else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarCube().HardwareCode) == 0)
           MITK_INFO<<"Cube volume supported \n";
-        else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Dome)").HardwareCode) == 0)
+        else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarDome().HardwareCode) == 0)
           MITK_INFO<<"Dome volume supported \n";
         else
           MITK_WARN<<"Message not understood!\n";

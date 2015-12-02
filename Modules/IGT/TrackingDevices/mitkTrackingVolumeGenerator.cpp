@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
 {
-  m_Data = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Unspecified System");
+  m_Data = mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified();
 }
 
 void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Pointer tracker)

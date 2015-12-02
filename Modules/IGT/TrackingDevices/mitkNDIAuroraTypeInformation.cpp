@@ -26,53 +26,44 @@ namespace mitk
     return "NDI Aurora";
   }
 
-
-  std::vector<TrackingDeviceData> NDIAuroraTypeInformation::GetTrackingDeviceData()
+  TrackingDeviceData NDIAuroraTypeInformation::GetDeviceDataAuroraCompact()
   {
-    TrackingDeviceData DeviceDataAuroraCompact = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Compact", "NDIAuroraCompactFG_Dome.stl", "A" };
-    TrackingDeviceData DeviceDataAuroraPlanarCube = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Cube)", "NDIAurora.stl", "9" };
-    TrackingDeviceData DeviceDataAuroraPlanarDome = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Dome)", "NDIAuroraPlanarFG_Dome.stl", "A" };
-    TrackingDeviceData DeviceDataAuroraTabletop = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl", "A" };
-
-
-    std::vector<TrackingDeviceData> _TrackingDeviceData;
-    _TrackingDeviceData.push_back(DeviceDataAuroraCompact);
-    _TrackingDeviceData.push_back(DeviceDataAuroraPlanarCube);
-    _TrackingDeviceData.push_back(DeviceDataAuroraPlanarDome);
-    _TrackingDeviceData.push_back(DeviceDataAuroraTabletop);
-
-    return _TrackingDeviceData;
+    return{ NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Compact", "NDIAuroraCompactFG_Dome.stl", "A" };
   }
 
-  TrackingDeviceData NDIAuroraTypeInformation::GetTrackingDeviceData(std::string model)
+  TrackingDeviceData NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarCube()
   {
-    for (auto data : GetTrackingDeviceData())
-    {
-      if (data.Model == model)
-        return data;
-    }
-    return TrackingDeviceData();
+    return{ NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Cube)", "NDIAurora.stl", "9" };
+  }
+
+  TrackingDeviceData NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarDome()
+  {
+    return{ NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Dome)", "NDIAuroraPlanarFG_Dome.stl", "A" };
+  }
+
+  TrackingDeviceData NDIAuroraTypeInformation::GetDeviceDataAuroraTabletop()
+  {
+    return{ NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl", "A" };
   }
 
   NDIAuroraTypeInformation::NDIAuroraTypeInformation()
   {
-
     m_DeviceName = NDIAuroraTypeInformation::GetTrackingDeviceName();
-    m_TrackingDeviceData = NDIAuroraTypeInformation::GetTrackingDeviceData();
-    //############## NDI Aurora device data #############
-
+    m_TrackingDeviceData.push_back(GetDeviceDataAuroraCompact());
+    m_TrackingDeviceData.push_back(GetDeviceDataAuroraPlanarCube());
+    m_TrackingDeviceData.push_back(GetDeviceDataAuroraPlanarDome());
+    m_TrackingDeviceData.push_back(GetDeviceDataAuroraTabletop());
   }
 
   NDIAuroraTypeInformation::~NDIAuroraTypeInformation()
   {
-
   }
 
   mitk::TrackingDeviceSource::Pointer NDIAuroraTypeInformation::CreateTrackingDeviceSource(
-      mitk::TrackingDevice::Pointer trackingDevice,
-      mitk::NavigationToolStorage::Pointer navigationTools,
-      std::string* errorMessage,
-      std::vector<int>* toolCorrespondencesInToolStorage)
+    mitk::TrackingDevice::Pointer trackingDevice,
+    mitk::NavigationToolStorage::Pointer navigationTools,
+    std::string* errorMessage,
+    std::vector<int>* toolCorrespondencesInToolStorage)
   {
     MITK_DEBUG << "Creating Aurora tracking device.";
     mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
@@ -102,19 +93,19 @@ namespace mitk
     mitk::NavigationToolStorage::Pointer newToolStorageInRightOrder = mitk::NavigationToolStorage::New();
     std::vector<int> alreadyFoundTools = std::vector<int>();
     *toolCorrespondencesInToolStorage = std::vector<int>();
-    for (unsigned int i=0; i<thisDevice->GetToolCount(); i++)
+    for (unsigned int i = 0; i < thisDevice->GetToolCount(); i++)
     {
       bool toolFound = false;
-      for (int j=0; j<navigationTools->GetToolCount(); j++)
+      for (int j = 0; j < navigationTools->GetToolCount(); j++)
       {
         //check if the serial number is the same to identify the tool
         if ((dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i)))->GetSerialNumber() == navigationTools->GetTool(j)->GetSerialNumber())
         {
           //check if this tool was already added to make sure that every tool is only added once (in case of same serial numbers)
           bool toolAlreadyAdded = false;
-          for(unsigned int k=0; k<alreadyFoundTools.size(); k++) if (alreadyFoundTools.at(k) == j) toolAlreadyAdded = true;
+          for (unsigned int k = 0; k < alreadyFoundTools.size(); k++) if (alreadyFoundTools.at(k) == j) toolAlreadyAdded = true;
 
-          if(!toolAlreadyAdded)
+          if (!toolAlreadyAdded)
           {
             //add tool in right order
             newToolStorageInRightOrder->AddTool(navigationTools->GetTool(j));
@@ -122,7 +113,7 @@ namespace mitk
             //adapt name of tool
             dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
             //set tip of tool
-            dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolTip(navigationTools->GetTool(j)->GetToolTipPosition(),navigationTools->GetTool(j)->GetToolTipOrientation());
+            dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolTip(navigationTools->GetTool(j)->GetToolTipPosition(), navigationTools->GetTool(j)->GetToolTipOrientation());
             //rember that this tool was already found
             alreadyFoundTools.push_back(j);
 
@@ -142,7 +133,7 @@ namespace mitk
     navigationTools->DeleteAllTools();
 
     //and add only the detected tools in the right order
-    for (int i=0; i<newToolStorageInRightOrder->GetToolCount(); i++)
+    for (int i = 0; i < newToolStorageInRightOrder->GetToolCount(); i++)
     {
       navigationTools->AddTool(newToolStorageInRightOrder->GetTool(i));
     }
@@ -152,4 +143,3 @@ namespace mitk
     return returnValue;
   }
 }
-

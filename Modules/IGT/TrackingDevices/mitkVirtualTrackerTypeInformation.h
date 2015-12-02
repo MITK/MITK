@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   class MITKIGT_EXPORT VirtualTrackerTypeInformation : public TrackingDeviceTypeInformation
   {
   public:
@@ -36,8 +35,7 @@ namespace mitk
       std::vector<int>* toolCorrespondencesInToolStorage) override;
 
     static std::string GetTrackingDeviceName();
-    static std::vector<TrackingDeviceData> GetTrackingDeviceData();
-    static TrackingDeviceData GetTrackingDeviceData(std::string model);
+    static TrackingDeviceData GetDeviceDataVirtualTracker();
   };
 } // namespace mitk
 

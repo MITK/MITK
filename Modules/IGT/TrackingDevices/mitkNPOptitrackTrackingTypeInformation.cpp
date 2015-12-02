@@ -25,45 +25,26 @@ namespace mitk
     return "NP Optitrack";
   }
 
-
-  std::vector<TrackingDeviceData> NPOptitrackTrackingTypeInformation::GetTrackingDeviceData()
+  TrackingDeviceData NPOptitrackTrackingTypeInformation::GetDeviceDataNPOptitrack()
   {
-
-    //############## NP Optitrack device data ############
-    TrackingDeviceData DeviceDataNPOptitrack = { NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), "Optitrack", "cube", "X" };
-
-    std::vector<TrackingDeviceData> _TrackingDeviceData;
-    _TrackingDeviceData.push_back(DeviceDataNPOptitrack);
-
-    return _TrackingDeviceData;
-  }
-
-  TrackingDeviceData NPOptitrackTrackingTypeInformation::GetTrackingDeviceData(std::string model)
-  {
-    for (auto data : GetTrackingDeviceData())
-    {
-      if (data.Model == model)
-        return data;
-    }
-    return TrackingDeviceData();
+    return{ NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), "Optitrack", "cube", "X" };
   }
 
   NPOptitrackTrackingTypeInformation::NPOptitrackTrackingTypeInformation()
   {
     m_DeviceName = NPOptitrackTrackingTypeInformation::GetTrackingDeviceName();
-    m_TrackingDeviceData = NPOptitrackTrackingTypeInformation::GetTrackingDeviceData();
+    m_TrackingDeviceData.push_back(GetDeviceDataNPOptitrack());
   }
 
   NPOptitrackTrackingTypeInformation::~NPOptitrackTrackingTypeInformation()
   {
-
   }
 
   TrackingDeviceSource::Pointer NPOptitrackTrackingTypeInformation::CreateTrackingDeviceSource(
-      TrackingDevice::Pointer trackingDevice,
-      NavigationToolStorage::Pointer navigationTools,
-      std::string* errorMessage,
-      std::vector<int>* toolCorrespondencesInToolStorage)
+    TrackingDevice::Pointer trackingDevice,
+    NavigationToolStorage::Pointer navigationTools,
+    std::string* errorMessage,
+    std::vector<int>* toolCorrespondencesInToolStorage)
   {
     mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
     mitk::OptitrackTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::OptitrackTrackingDevice*>(trackingDevice.GetPointer());
@@ -73,7 +54,7 @@ namespace mitk
     thisDevice->OpenConnection();
 
     //add the tools to the tracking device
-    for (int i=0; i<navigationTools->GetToolCount(); i++)
+    for (int i = 0; i < navigationTools->GetToolCount(); i++)
     {
       mitk::NavigationTool::Pointer thisNavigationTool = navigationTools->GetTool(i);
       toolCorrespondencesInToolStorage->push_back(i);

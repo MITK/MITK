@@ -42,7 +42,7 @@ m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_Tools
 m_SerialCommunication(nullptr), m_SerialCommunicationMutex(nullptr), m_DeviceProtocol(nullptr),
 m_MultiThreader(nullptr), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(nullptr), m_MarkerPoints()
 {
-  m_Data = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Unspecified System");
+  m_Data = mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified();
   m_6DTools.clear();
   m_SerialCommunicationMutex = itk::FastMutexLock::New();
   m_DeviceProtocol = NDIProtocol::New();
@@ -1240,21 +1240,21 @@ bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes,
     // if i>0 then we have a return statement <LF> infront
     if (i>0)
       currentVolume = currentVolume.substr(1, currentVolume.size());
-    if (currentVolume.compare(0, 1, NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris (Old Model)").HardwareCode) == 0)
-      volumes->push_back(NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris (Old Model)").Model);
-    if (currentVolume.compare(0, 3, NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra").HardwareCode) == 0)
-      volumes->push_back(NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra").Model);
-    if (currentVolume.compare(1, 3, NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra (Extended Pyramid)").HardwareCode) == 0)
+    if (currentVolume.compare(0, 1, NDIPolarisTypeInformation::GetDeviceDataPolarisOldModel().HardwareCode) == 0)
+      volumes->push_back(NDIPolarisTypeInformation::GetDeviceDataPolarisOldModel().Model);
+    if (currentVolume.compare(0, 3, NDIPolarisTypeInformation::GetDeviceDataPolarisSpectra().HardwareCode) == 0)
+      volumes->push_back(NDIPolarisTypeInformation::GetDeviceDataPolarisSpectra().Model);
+    if (currentVolume.compare(1, 3, NDIPolarisTypeInformation::GetDeviceDataSpectraExtendedPyramid().HardwareCode) == 0)
     {
       currentVolume = currentVolume.substr(1,currentVolume.size());
-      volumes->push_back(NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Spectra (Extended Pyramid)").Model);
+      volumes->push_back(NDIPolarisTypeInformation::GetDeviceDataSpectraExtendedPyramid().Model);
     }
-    if (currentVolume.compare(0, 1, NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Vicra").HardwareCode) == 0)
-      volumes->push_back(NDIPolarisTypeInformation::GetTrackingDeviceData("Polaris Vicra").Model);
-    else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Cube)").HardwareCode) == 0)
-      volumes->push_back(mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Cube)").Model);//alias cube
-    else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Dome)").HardwareCode) == 0)
-      volumes->push_back(mitk::NDIAuroraTypeInformation::GetTrackingDeviceData("Aurora Planar (Dome)").Model);
+    if (currentVolume.compare(0, 1, NDIPolarisTypeInformation::GetDeviceDataPolarisVicra().HardwareCode) == 0)
+      volumes->push_back(NDIPolarisTypeInformation::GetDeviceDataPolarisVicra().Model);
+    else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarCube().HardwareCode) == 0)
+      volumes->push_back(mitk::NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarCube().Model);//alias cube
+    else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarDome().HardwareCode) == 0)
+      volumes->push_back(mitk::NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarDome().Model);
 
     //fill volumesDimensions
     for (unsigned int index = 0; index < 10; index++)

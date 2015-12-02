@@ -25,44 +25,25 @@ namespace mitk
     return "Open IGT Link Tracking Device Connection";
   }
 
-
-  std::vector<TrackingDeviceData> OpenIGTLinkTypeInformation::GetTrackingDeviceData()
-  {
-    TrackingDeviceData DeviceDataOpenIGTLinkTrackingDeviceConnection = { OpenIGTLinkTypeInformation::GetTrackingDeviceName(), "OpenIGTLink Tracking Device", "cube", "X" };
-
-
-    std::vector<TrackingDeviceData> _TrackingDeviceData;
-    _TrackingDeviceData.push_back(DeviceDataOpenIGTLinkTrackingDeviceConnection);
-
-    return _TrackingDeviceData;
-  }
-
-  TrackingDeviceData OpenIGTLinkTypeInformation::GetTrackingDeviceData(std::string model)
-  {
-    for (auto data : GetTrackingDeviceData())
-    {
-      if (data.Model == model)
-        return data;
-    }
-    return TrackingDeviceData();
+  TrackingDeviceData OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection(){
+    return{ OpenIGTLinkTypeInformation::GetTrackingDeviceName(), "OpenIGTLink Tracking Device", "cube", "X" };
   }
 
   OpenIGTLinkTypeInformation::OpenIGTLinkTypeInformation()
   {
     m_DeviceName = OpenIGTLinkTypeInformation::GetTrackingDeviceName();
-    m_TrackingDeviceData = OpenIGTLinkTypeInformation::GetTrackingDeviceData();
+    m_TrackingDeviceData.push_back(GetDeviceDataOpenIGTLinkTrackingDeviceConnection());
   }
 
   OpenIGTLinkTypeInformation::~OpenIGTLinkTypeInformation()
   {
-
   }
 
   mitk::TrackingDeviceSource::Pointer OpenIGTLinkTypeInformation::CreateTrackingDeviceSource(
-      mitk::TrackingDevice::Pointer trackingDevice,
-      mitk::NavigationToolStorage::Pointer navigationTools,
-      std::string* errorMessage,
-      std::vector<int>* /*toolCorrespondencesInToolStorage*/)
+    mitk::TrackingDevice::Pointer trackingDevice,
+    mitk::NavigationToolStorage::Pointer navigationTools,
+    std::string* errorMessage,
+    std::vector<int>* /*toolCorrespondencesInToolStorage*/)
   {
     mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
     mitk::OpenIGTLinkTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::OpenIGTLinkTrackingDevice*>(trackingDevice.GetPointer());
@@ -75,6 +56,4 @@ namespace mitk
     returnValue->SetTrackingDevice(thisDevice);
     return returnValue;
   }
-
 }
-

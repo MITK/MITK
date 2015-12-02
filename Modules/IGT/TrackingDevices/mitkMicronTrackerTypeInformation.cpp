@@ -25,65 +25,45 @@ namespace mitk
     return "Claron Micron";
   }
 
-
-    std::vector<TrackingDeviceData> MicronTrackerTypeInformation::GetTrackingDeviceData()
+  TrackingDeviceData MicronTrackerTypeInformation::GetDeviceDataMicronTrackerH40()
   {
-
-    TrackingDeviceData DeviceDataMicronTrackerH40 = { MicronTrackerTypeInformation::GetTrackingDeviceName(), "Micron Tracker H40", "ClaronMicron.stl", "X" };
-
-
-    std::vector<TrackingDeviceData> _TrackingDeviceData;
-    _TrackingDeviceData.push_back(DeviceDataMicronTrackerH40);
-    return _TrackingDeviceData;
+    return{ MicronTrackerTypeInformation::GetTrackingDeviceName(), "Micron Tracker H40", "ClaronMicron.stl", "X" };
   }
-
-  TrackingDeviceData MicronTrackerTypeInformation::GetTrackingDeviceData(std::string model)
-  {
-    for (auto data : GetTrackingDeviceData())
-    {
-      if (data.Model == model)
-        return data;
-    }
-    return TrackingDeviceData();
-  }
-
 
   MicronTrackerTypeInformation::MicronTrackerTypeInformation()
   {
     m_DeviceName = MicronTrackerTypeInformation::GetTrackingDeviceName();
-    m_TrackingDeviceData = MicronTrackerTypeInformation::GetTrackingDeviceData();
+    m_TrackingDeviceData.push_back(GetDeviceDataMicronTrackerH40());
   }
 
   MicronTrackerTypeInformation::~MicronTrackerTypeInformation()
   {
-
   }
 
   mitk::TrackingDeviceSource::Pointer MicronTrackerTypeInformation::CreateTrackingDeviceSource(
-      mitk::TrackingDevice::Pointer trackingDevice,
-      mitk::NavigationToolStorage::Pointer navigationTools,
-      std::string* errorMessage,
-      std::vector<int>* toolCorrespondencesInToolStorage)
+    mitk::TrackingDevice::Pointer trackingDevice,
+    mitk::NavigationToolStorage::Pointer navigationTools,
+    std::string* errorMessage,
+    std::vector<int>* toolCorrespondencesInToolStorage)
   {
     mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
     mitk::ClaronTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::ClaronTrackingDevice*>(trackingDevice.GetPointer());
     *toolCorrespondencesInToolStorage = std::vector<int>();
     //add the tools to the tracking device
-    for (int i=0; i<navigationTools->GetToolCount(); i++)
+    for (int i = 0; i < navigationTools->GetToolCount(); i++)
     {
       mitk::NavigationTool::Pointer thisNavigationTool = navigationTools->GetTool(i);
       toolCorrespondencesInToolStorage->push_back(i);
-      bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str(),thisNavigationTool->GetCalibrationFile().c_str());
+      bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str(), thisNavigationTool->GetCalibrationFile().c_str());
       if (!toolAddSuccess)
       {
         //todo error handling
         errorMessage->append("Can't add tool, is the toolfile valid?");
         return NULL;
       }
-      thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(),thisNavigationTool->GetToolTipOrientation());
+      thisDevice->GetTool(i)->SetToolTip(thisNavigationTool->GetToolTipPosition(), thisNavigationTool->GetToolTipOrientation());
     }
     returnValue->SetTrackingDevice(thisDevice);
     return returnValue;
   }
 }
-

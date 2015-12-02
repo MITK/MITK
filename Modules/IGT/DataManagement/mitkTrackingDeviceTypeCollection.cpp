@@ -101,7 +101,7 @@ mitk::TrackingDeviceData mitk::TrackingDeviceTypeCollection::GetFirstCompatibleD
 {
   if (GetDeviceDataForLine(type).empty())
   {
-    return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Invalid Tracking System");
+    return mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataInvalid();
   }
 
   return GetDeviceDataForLine(type).front();
@@ -120,7 +120,7 @@ mitk::TrackingDeviceData mitk::TrackingDeviceTypeCollection::GetDeviceDataByName
     }
   }
 
-  return mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Invalid Tracking System");
+  return mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataInvalid();
 }
 
 std::vector<std::string> mitk::TrackingDeviceTypeCollection::GetTrackingDeviceTypeNames()

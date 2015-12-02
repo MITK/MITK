@@ -367,7 +367,7 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   }
 
   //parse tracking device data
-  mitk::TrackingDeviceData data = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceData("Unspecified System");
+  mitk::TrackingDeviceData data = mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified();
   QString qstr =  m_Controls->m_VolumeSelectionBox->currentText();
   if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
     std::string str = qstr.toStdString();

@@ -109,7 +109,7 @@ void
   double rms = std::sqrt(squared_sum / count);
   kurtosis = kurtosis / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev*uncorrected_std_dev);
   skewness = skewness / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev);
-  mean_absolut_deviation = mean_absolut_deviation;
+  //mean_absolut_deviation = mean_absolut_deviation;
   double coveredGrayValueRange = range / imageRange;
 
   featureList.push_back(std::make_pair("FirstOrder Range",range));

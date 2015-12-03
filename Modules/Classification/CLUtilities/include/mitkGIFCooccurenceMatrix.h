@@ -29,18 +29,18 @@ namespace mitk
 
       itkGetConstMacro(Range,double);
       itkSetMacro(Range, double);
-    itkGetConstMacro(Direction, int);
-    itkSetMacro(Direction, int);
+    itkGetConstMacro(Direction, unsigned int);
+    itkSetMacro(Direction, unsigned int);
 
     struct GIFCooccurenceMatrixConfiguration
     {
       double range;
-      int direction;
+      unsigned int direction;
     };
 
     private:
-      double m_Range;
-    int m_Direction;
+    double m_Range;
+    unsigned int m_Direction;
   };
 
 }

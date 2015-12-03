@@ -55,7 +55,6 @@ void mitk::MRNormLinearStatisticBasedFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* output = this->GetOutput();
   mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
 
   input->SetRequestedRegionToLargestPossibleRegion();

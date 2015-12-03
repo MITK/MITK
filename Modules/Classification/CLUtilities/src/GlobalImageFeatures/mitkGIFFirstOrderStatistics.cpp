@@ -63,7 +63,7 @@ void
   double range = labelStatisticsImageFilter->GetMaximum(1) - labelStatisticsImageFilter->GetMinimum(1);
   // --------------- Uniformity, Entropy --------------------
   double count = labelStatisticsImageFilter->GetCount(1);
-  double std_dev = labelStatisticsImageFilter->GetSigma(1);
+  //double std_dev = labelStatisticsImageFilter->GetSigma(1);
   double uncorrected_std_dev = std::sqrt((count - 1) / count * labelStatisticsImageFilter->GetVariance(1));
   double mean = labelStatisticsImageFilter->GetMean(1);
   auto histogram = labelStatisticsImageFilter->GetHistogram(1);

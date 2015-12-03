@@ -54,7 +54,7 @@ public:
 
 //#ifndef DOXYGEN_SKIP
 
-  virtual void SetRequestedRegionToLargestPossibleRegion(){}
+  virtual void SetRequestedRegionToLargestPossibleRegion() override {};
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion(){return true;}
   virtual bool VerifyRequestedRegion(){return false;}
   virtual void SetRequestedRegion(const itk::DataObject * /*data*/){}

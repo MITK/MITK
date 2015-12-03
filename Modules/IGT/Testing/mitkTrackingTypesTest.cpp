@@ -47,26 +47,30 @@ int mitkTrackingTypesTest(int /* argc */, char* /*argv*/[])
   deviceTypeCollection->RegisterTrackingDeviceType(new mitk::UnspecifiedTrackingTypeInformation());
   deviceTypeCollection->RegisterAsMicroservice();
 
-  std::vector<mitk::TrackingDeviceData> ResultSet = deviceTypeCollection->GetDeviceDataForLine(mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED);
+  std::vector<mitk::TrackingDeviceData> ResultSet = deviceTypeCollection->GetDeviceDataForLine(mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName());
   MITK_TEST_CONDITION(ResultSet.size() == 2,"Test correct retrieval of DeviceData: Number of results");
-  MITK_TEST_CONDITION(ResultSet[0].Line == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED, "Test correct retrieval of DeviceData: Correct device");
-  MITK_TEST_CONDITION(ResultSet[1].Line == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID, "Test correct retrieval of DeviceData: Correct device");
+  MITK_TEST_CONDITION(ResultSet[0].Model == "Unspecified System", "Test correct retrieval of DeviceData: Correct device");
+  MITK_TEST_CONDITION(ResultSet[1].Model == "Invalid Tracking System", "Test correct retrieval of DeviceData: Correct device");
+  MITK_TEST_CONDITION(ResultSet[0].Line == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Test correct retrieval of DeviceData: Correct device");
+  MITK_TEST_CONDITION(ResultSet[1].Line == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Test correct retrieval of DeviceData: Correct device");
 
-  std::vector<mitk::TrackingDeviceData> ResultSet2 = deviceTypeCollection->GetDeviceDataForLine(mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL);
+
+  std::vector<mitk::TrackingDeviceData> ResultSet2 = deviceTypeCollection->GetDeviceDataForLine(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName());
   MITK_TEST_CONDITION(ResultSet2.size() == 1, "Test correct retrieval of DeviceData: Number of results");
-  MITK_TEST_CONDITION(ResultSet2[0].Line == mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL, "Test correct retrieval of DeviceData: Correct device");
+  MITK_TEST_CONDITION(ResultSet2[0].Line == mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Test correct retrieval of DeviceData: Correct device");
+  MITK_TEST_CONDITION(ResultSet2[0].Model == mitk::VirtualTrackerTypeInformation::GetDeviceDataVirtualTracker().Model, "Test correct retrieval of DeviceData: Correct device");
 
-  mitk::TrackingDeviceData data = deviceTypeCollection->GetFirstCompatibleDeviceDataForLine(mitk::TRACKING_DEVICE_IDENTIFIER_INVALID);
-  MITK_TEST_CONDITION(data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID,"Test correct retrieval of first compatible model");
+  mitk::TrackingDeviceData data = deviceTypeCollection->GetFirstCompatibleDeviceDataForLine(mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName());
+  MITK_TEST_CONDITION(data.Line == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Test correct retrieval of first compatible model");
   data = deviceTypeCollection->GetDeviceDataByName("Invalid Tracking System");
-  MITK_TEST_CONDITION(data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID, "Test GetDeviceDataByName");
+  MITK_TEST_CONDITION(data.Line == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Test GetDeviceDataByName");
   data = deviceTypeCollection->GetDeviceDataByName("Unspecified System");
-  MITK_TEST_CONDITION(data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_UNSPECIFIED, "Test GetDeviceDataByName");
+  MITK_TEST_CONDITION(data.Line == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Test GetDeviceDataByName");
 
-  data = deviceTypeCollection->GetFirstCompatibleDeviceDataForLine(mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL);
-  MITK_TEST_CONDITION(data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL, "Test correct retrieval of first compatible model");
+  data = deviceTypeCollection->GetFirstCompatibleDeviceDataForLine(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName());
+  MITK_TEST_CONDITION(data.Line == mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Test correct retrieval of first compatible model");
   data = deviceTypeCollection->GetDeviceDataByName("Virtual Tracker");
-  MITK_TEST_CONDITION(data.Line == mitk::TRACKING_DEVICE_IDENTIFIER_VIRTUAL, "Test GetDeviceDataByName");
+  MITK_TEST_CONDITION(data.Line == mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Test GetDeviceDataByName");
 
   MITK_TEST_END();
 

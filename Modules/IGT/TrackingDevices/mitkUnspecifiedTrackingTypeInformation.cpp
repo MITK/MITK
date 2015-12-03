@@ -33,7 +33,7 @@ namespace mitk
   // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
   TrackingDeviceData UnspecifiedTrackingTypeInformation::GetDeviceDataInvalid()
   {
-    return{ "Tracking System Invalid", "Invalid Tracking System", "", "X" };
+    return{ UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Invalid Tracking System", "", "X" };
   }
 
   UnspecifiedTrackingTypeInformation::UnspecifiedTrackingTypeInformation()

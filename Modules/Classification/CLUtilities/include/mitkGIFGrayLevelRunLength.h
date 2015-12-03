@@ -32,20 +32,20 @@ namespace mitk
     itkGetConstMacro(UseCtRange, bool);
     itkSetMacro(UseCtRange, bool);
 
-    itkGetConstMacro(Direction, int);
-    itkSetMacro(Direction, int);
+    itkGetConstMacro(Direction, unsigned int);
+    itkSetMacro(Direction, unsigned int);
 
     struct ParameterStruct
     {
       bool  m_UseCtRange;
       double m_Range;
-      int m_Direction;
+      unsigned int m_Direction;
     };
 
   private:
     double m_Range;
     bool m_UseCtRange;
-    int m_Direction;
+    unsigned int m_Direction;
   };
 }
 #endif //mitkGIFGrayLevelRunLength_h

@@ -74,7 +74,7 @@ namespace mitk {
     mitkClassMacroItkParent(ImageDataItem, itk::LightObject);
 
     itkCloneMacro(ImageDataItem);
-    virtual itk::LightObject::Pointer InternalClone() const;
+    virtual itk::LightObject::Pointer InternalClone() const override;
 
 
     ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc,

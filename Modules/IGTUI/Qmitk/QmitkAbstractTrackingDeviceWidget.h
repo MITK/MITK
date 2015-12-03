@@ -31,16 +31,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 //itk headers
 
 /** Documentation:
- *   \brief Simple and fast access to a pre-configured TrackingDeviceSource.
+ *   \brief Abstract class to configure a tracking device.
+ *           Inherited widgets should be registered in the Microservice (TrackingDeviceCollectionWidget),
+ *           If done so, they will be included in the QmitkTrackingDeviceConfigurationWidget of the Tracking Toolbox.
  *
- *   This widget creates a fully configured, connected and started TrackingDeviceSource.
- *   Clicking "Connect" requires to specify a NavigationToolStorage that holds all tools to be used
- *   in the application. Corresponding surfaces are added to the DataStorage that has to be set for
- *   the widget.
- *
- *   Inputs: DataStorage
- *   Outputs: TrackingDeviceSource, NavigationToolStorage
- *   Signals: TrackingDeviceConnected, TrackingDeviceDisconnected
+ *          Each implementation of this class must have a method to construct a tracking Device (ConstructTrackingDevice).
+ *           You might want to use own buttons etc., please connect them in CreateConnections / CreateQtPartControl (e.g. see QmitkVitrualTrackerWidget).
+ *          You can Load and Store previous settings of your GUI elements (e.g. see QmitkNDIPolarisWidget).
+ *          Also, you can add an output textbox to your widget to display information about your device status. It's optional, see e.g. QmitkNDIAuroraWidget.
+ *          Some Devices need the information if drivers are installed on your computer. If this is necessary for your device to avoid crashes,
+ *          please override IsDeviceInstalled. The default return value is true otherwise.
  *
  *   \ingroup IGTUI
  */

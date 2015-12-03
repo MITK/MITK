@@ -26,19 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 //itk headers
 
 /** Documentation:
- *   \brief Simple and fast access to a pre-configured TrackingDeviceSource.
- *
- *   This widget creates a fully configured, connected and started TrackingDeviceSource.
- *   Clicking "Connect" requires to specify a NavigationToolStorage that holds all tools to be used
- *   in the application. Corresponding surfaces are added to the DataStorage that has to be set for
- *   the widget.
- *
- *   Inputs: DataStorage
- *   Outputs: TrackingDeviceSource, NavigationToolStorage
- *   Signals: TrackingDeviceConnected, TrackingDeviceDisconnected
- *
- *   \ingroup IGTUI
- */
+*   \brief Abstract class of a configuration widget for NDI Devices.
+*          For implementations see NDIAuroraWidget or NDIPolarisWidget.
+*
+*   \ingroup IGTUI
+*/
 class MITKIGTUI_EXPORT QmitkNDIAbstractDeviceWidget : public QmitkAbstractTrackingDeviceWidget
 {
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

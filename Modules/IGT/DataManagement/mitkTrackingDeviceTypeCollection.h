@@ -27,73 +27,77 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceRegistration.h>
 
 namespace mitk {
-  /**Documentation
-  * \brief
+  /** Documentation:
+  *   \brief This class is a collection for information of all Tracking Device Types (derived from abstract TrackingDeviceTypeInformation)
+  *   The Collection is avaiable via Microservice.
+  *   If you want to add your own tracking device (e.g. to the Tracking Toolbox), you should register
+  *   information about your tracking device in this collection using the RegisterTrackingDeviceType function.
   *
-  * \ingroup IGT
+  *   The Microservice provides all compatible TrackingDeviceDatas for a requested tracking device type or a list of all available Tracking Devices.
+  *
+  *   \ingroup IGTUI
   */
   class MITKIGT_EXPORT TrackingDeviceTypeCollection
   {
-    public:
+  public:
 
-      TrackingDeviceTypeCollection();
-      ~TrackingDeviceTypeCollection();
+    TrackingDeviceTypeCollection();
+    ~TrackingDeviceTypeCollection();
 
-      /**
-      *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
-      * To unregister, call UnregisterMicroservice().
-      */
-      virtual void RegisterAsMicroservice();
+    /**
+    *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
+    * To unregister, call UnregisterMicroservice().
+    */
+    virtual void RegisterAsMicroservice();
 
-      /**
-      *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
-      */
-      virtual void UnRegisterMicroservice();
+    /**
+    *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
+    */
+    virtual void UnRegisterMicroservice();
 
-      /**
-      *\brief Returns the id that this device is registered with. The id will only be valid, if the
-      * NavigationDataSource has been registered using RegisterAsMicroservice().
-      */
-      std::string GetMicroserviceID();
+    /**
+    *\brief Returns the id that this device is registered with. The id will only be valid, if the
+    * NavigationDataSource has been registered using RegisterAsMicroservice().
+    */
+    std::string GetMicroserviceID();
 
-      /**
-      *\brief These Constants are used in conjunction with Microservices
-      */
-      static const std::string US_INTERFACE_NAME;
-      static const std::string US_PROPKEY_DEVICENAME;
-      static const std::string US_PROPKEY_ID;
-      static const std::string US_PROPKEY_ISACTIVE; //NOT IMPLEMENTED YET!
+    /**
+    *\brief These Constants are used in conjunction with Microservices
+    */
+    static const std::string US_INTERFACE_NAME;
+    static const std::string US_PROPKEY_DEVICENAME;
+    static const std::string US_PROPKEY_ID;
+    static const std::string US_PROPKEY_ISACTIVE; //NOT IMPLEMENTED YET!
 
-      void RegisterTrackingDeviceType(TrackingDeviceTypeInformation* typeInformation);
+    void RegisterTrackingDeviceType(TrackingDeviceTypeInformation* typeInformation);
 
-      TrackingDeviceTypeInformation* GetTrackingDeviceTypeInformation(TrackingDeviceType type);
+    TrackingDeviceTypeInformation* GetTrackingDeviceTypeInformation(TrackingDeviceType type);
 
-      std::vector<std::string> GetTrackingDeviceTypeNames();
+    std::vector<std::string> GetTrackingDeviceTypeNames();
 
-      /**
-      * /brief Returns all devices compatibel to the given Line of Devices
-      */
-      std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType type);
+    /**
+    * /brief Returns all devices compatibel to the given Line of Devices
+    */
+    std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType type);
 
-      /**
-      * /brief Returns the first TracingDeviceData mathing a given line. Useful for backward compatibility
-      * with the old way to manage Devices
-      */
-      TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType type);
+    /**
+    * /brief Returns the first TracingDeviceData mathing a given line. Useful for backward compatibility
+    * with the old way to manage Devices
+    */
+    TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType type);
 
-      /**
-      * /brief Returns the device Data set matching the model name or the invalid device, if none was found
-      */
-      TrackingDeviceData GetDeviceDataByName(const std::string& modelName);
+    /**
+    * /brief Returns the device Data set matching the model name or the invalid device, if none was found
+    */
+    TrackingDeviceData GetDeviceDataByName(const std::string& modelName);
 
-    private:
+  private:
 
-      std::string m_Name;
+    std::string m_Name;
 
-      us::ServiceRegistration<TrackingDeviceTypeCollection> m_ServiceRegistration;
+    us::ServiceRegistration<TrackingDeviceTypeCollection> m_ServiceRegistration;
 
-      std::vector<TrackingDeviceTypeInformation*> m_TrackingDeviceTypeInformations;
-
+    std::vector<TrackingDeviceTypeInformation*> m_TrackingDeviceTypeInformations;
   };
 } // namespace mitk
 MITK_DECLARE_SERVICE_INTERFACE(mitk::TrackingDeviceTypeCollection, "org.mitk.services.TrackingDeviceTypeCollection")

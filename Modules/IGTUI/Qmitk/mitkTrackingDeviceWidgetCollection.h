@@ -29,10 +29,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkAbstractTrackingDeviceWidget.h"
 
 namespace mitk {
-  /**Documentation
-  * \brief
-  *
-  * \ingroup IGT
+  /** Documentation:
+  *   \brief This class is a collection for all TrackingDeviceWidgets (derived from AbstractTrackingDeviceWidget)
+  *   The Collection is avaiable via Microservice.
+  *   If you want to add your own tracking device to the Tracking Toolbox, you should register your widget configuring your device
+  *   to this collection using the RegisterTrackingDeviceWidget function.
+  *   \ingroup IGTUI
   */
   class MITKIGTUI_EXPORT TrackingDeviceWidgetCollection
   {

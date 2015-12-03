@@ -23,6 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** Documentation:
+  *   \brief Type information for unspecified or invalid tracking devices. This is often used as default or for testing.
+  *
+  *   \ingroup IGTUI
+  */
   class MITKIGT_EXPORT UnspecifiedTrackingTypeInformation : public TrackingDeviceTypeInformation
   {
   public:

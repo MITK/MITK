@@ -23,6 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** Documentation:
+  *   \brief Type information for NDI Polaris
+  *
+  *   \ingroup IGTUI
+  */
   class MITKIGT_EXPORT NDIPolarisTypeInformation : public TrackingDeviceTypeInformation
   {
   public:

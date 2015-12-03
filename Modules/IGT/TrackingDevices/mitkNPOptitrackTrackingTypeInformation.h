@@ -23,6 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** Documentation:
+  *   \brief Type information for NP Optitrack
+  *
+  *   \ingroup IGTUI
+  */
   class MITKIGT_EXPORT NPOptitrackTrackingTypeInformation : public TrackingDeviceTypeInformation
   {
   public:

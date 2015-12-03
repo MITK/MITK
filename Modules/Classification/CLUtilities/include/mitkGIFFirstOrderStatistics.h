@@ -44,9 +44,20 @@ namespace mitk
 
     itkGetConstMacro(Range,double);
     itkSetMacro(Range, double);
+    itkGetConstMacro(HistogramSize,int);
+    itkSetMacro(HistogramSize, int);
+    itkGetConstMacro(UseCtRange,bool);
+    itkSetMacro(UseCtRange, bool);
+
+    struct ParameterStruct {
+      int m_HistogramSize;
+      bool m_UseCtRange;
+    };
 
   private:
     double m_Range;
+    int m_HistogramSize;
+    bool m_UseCtRange;
   };
 }
 #endif //mitkGIFFirstOrderStatistics_h

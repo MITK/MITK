@@ -30,7 +30,7 @@ namespace itk
 
       virtual void GenerateData();
 
-      DataObject::Pointer MakeOutput(unsigned int idx);
+      DataObject::Pointer MakeOutput(unsigned int /*idx*/);
 
       void CreateOutputImage(InputImagePointer input, OutputImagePointer output);
 

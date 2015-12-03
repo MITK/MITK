@@ -78,7 +78,7 @@ void
 
 template< class TInputImageType, class TOuputImageType>
 itk::DataObject::Pointer
-  itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MakeOutput(unsigned int idx)
+  itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MakeOutput(unsigned int /*idx*/)
 {
   DataObject::Pointer output;
   output = ( TOuputImageType::New() ).GetPointer();

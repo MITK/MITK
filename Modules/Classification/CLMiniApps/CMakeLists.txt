@@ -15,6 +15,12 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         RandomForestTraining^^MitkCLVigraRandomForest
         NativeHeadCTSegmentation^^MitkCLVigraRandomForest
         ManualSegmentationEvaluation^^MitkCLVigraRandomForest
+        CLGlobalImageFeatures^^MitkCore_MitkCLUtilities
+        CLMRNormalization^^MitkCore_MitkCLUtilities_MitkCLMRUtilities
+        CLStaple^^MitkCore_MitkCLUtilities
+        CLVoxelFeatures^^MitkCore_MitkCLUtilities
+        CLDicom2Nrrd^^MitkCore
+        CLPolyToNrrd^^MitkCore
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 
@@ -78,22 +84,12 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     endforeach()
 
   # This mini app does not depend on mitkDiffusionImaging at all
-  mitk_create_executable(CLDicom2Nrrd
-    DEPENDS MitkCore
-    CPP_FILES CLDicom2Nrrd.cpp mitkCommandLineParser.cpp
-  )
-  mitk_create_executable(CLPolyToNrrd
-    DEPENDS MitkCore
-    CPP_FILES CLPolyToNrrd.cpp mitkCommandLineParser.cpp
-  )
-  mitk_create_executable(CLGlobalImageFeatures
-    DEPENDS MitkCore MitkCLUtilities
-    CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp
-  )
-  mitk_create_executable(CLVoxelFeatures
-    DEPENDS MitkCore MitkCLUtilities
-    CPP_FILES CLVoxelFeatures.cpp mitkCommandLineParser.cpp
-  )
+
+  #mitk_create_executable(CLGlobalImageFeatures
+  #  DEPENDS MitkCore MitkCLUtilities
+  #  CPP_FILES CLGlobalImageFeatures.cpp mitkCommandLineParser.cpp
+  #)
+
   mitk_create_executable(CLSimpleVoxelClassification
     DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLVigraRandomForest MitkCommandLine
     CPP_FILES CLSimpleVoxelClassification.cpp
@@ -103,10 +99,6 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLImportanceWeighting MitkCLVigraRandomForest
     CPP_FILES CLVoxelClassification.cpp
   )
-  mitk_create_executable(CLMRNormalization
-    DEPENDS MitkCore MitkCLUtilities
-    CPP_FILES CLMRNormalization.cpp mitkCommandLineParser.cpp
-  )
   mitk_create_executable(CLBrainMask
     DEPENDS MitkCore MitkCLUtilities
     CPP_FILES CLBrainMask.cpp mitkCommandLineParser.cpp
@@ -114,6 +106,14 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
   mitk_create_executable(CLImageConverter
     DEPENDS MitkCore
     CPP_FILES CLImageConverter.cpp mitkCommandLineParser.cpp
+  )
+  mitk_create_executable(CLSurWeighting
+    DEPENDS MitkCore MitkCLUtilities MitkDataCollection MitkCLImportanceWeighting
+    CPP_FILES CLSurWeighting.cpp mitkCommandLineParser.cpp
+  )
+  mitk_create_executable(CLImageCropper
+    DEPENDS MitkCore MitkCLUtilities MitkAlgorithmsExt
+    CPP_FILES CLImageCropper.cpp mitkCommandLineParser.cpp
   )
 
         # On Linux, create a shell script to start a relocatable application

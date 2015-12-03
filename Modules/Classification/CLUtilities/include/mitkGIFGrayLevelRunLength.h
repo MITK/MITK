@@ -7,32 +7,45 @@
 
 namespace mitk
 {
-
   class MITKCLUTILITIES_EXPORT GIFGrayLevelRunLength : public AbstractGlobalImageFeature
   {
-    public:
-      mitkClassMacro(GIFGrayLevelRunLength,AbstractGlobalImageFeature)
+  public:
+    mitkClassMacro(GIFGrayLevelRunLength,AbstractGlobalImageFeature)
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
       GIFGrayLevelRunLength();
 
-      /**
-      * \brief Calculates the Cooccurence-Matrix based features for this class.
-      */
-      virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature);
+    /**
+    * \brief Calculates the Cooccurence-Matrix based features for this class.
+    */
+    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature);
 
-      /**
-      * \brief Returns a list of the names of all features that are calculated from this class
-      */
-      virtual FeatureNameListType GetFeatureNames();
+    /**
+    * \brief Returns a list of the names of all features that are calculated from this class
+    */
+    virtual FeatureNameListType GetFeatureNames();
 
-      itkGetConstMacro(Range,double);
-      itkSetMacro(Range, double);
+    itkGetConstMacro(Range,double);
+    itkSetMacro(Range, double);
 
-    private:
+    itkGetConstMacro(UseCtRange, bool);
+    itkSetMacro(UseCtRange, bool);
+
+    itkGetConstMacro(Direction, int);
+    itkSetMacro(Direction, int);
+
+    struct ParameterStruct
+    {
+      bool  m_UseCtRange;
       double m_Range;
-  };
+      int m_Direction;
+    };
 
+  private:
+    double m_Range;
+    bool m_UseCtRange;
+    int m_Direction;
+  };
 }
 #endif //mitkGIFGrayLevelRunLength_h

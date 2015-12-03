@@ -17,7 +17,6 @@ set(CPP_FILES
 
   Common/mitkIGTTimeStamp.cpp
   Common/mitkSerialCommunication.cpp
-  Common/mitkTrackingTypes.cpp
 
   DataManagement/mitkNavigationDataSource.cpp
   DataManagement/mitkNavigationTool.cpp
@@ -73,6 +72,7 @@ set(CPP_FILES
 
 set(H_FILES
   DataManagement/mitkTrackingDeviceTypeInformation.h
+  Common/mitkTrackingTypes.h
 )
 
 set(RESOURCE_FILES

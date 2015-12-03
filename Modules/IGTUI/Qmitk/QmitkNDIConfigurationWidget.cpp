@@ -394,14 +394,10 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
     }
     result += tmpComPort + ": ";
 
-    if (mitk::NDIPolarisTypeInformation::GetTrackingDeviceName() == it.value())
+    if (mitk::NDIPolarisTypeInformation::GetTrackingDeviceName() == it.value() || mitk::NDIAuroraTypeInformation::GetTrackingDeviceName() == it.value())
     {
-      result += "NDI Polaris<BR/>\n";
-      m_Controls->m_ComPortSelector->addItem(tmpComPort);
-    }
-    else if (mitk::NDIAuroraTypeInformation::GetTrackingDeviceName() == it.value())
-    {
-      result += "NDI Aurora<BR/>\n";
+      result += QString::fromStdString(it.value());
+      result += "<BR/>\n";
       m_Controls->m_ComPortSelector->addItem(tmpComPort);
     }
     else

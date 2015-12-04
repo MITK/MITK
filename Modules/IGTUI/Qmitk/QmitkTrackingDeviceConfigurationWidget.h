@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDeviceTypeCollection.h"
 #include "mitkTrackingDeviceWidgetCollection.h"
 
+
 //standard tracking devices, which always should be avaiable
 #include "QmitkNDIAuroraWidget.h"
 #include "QmitkNDIPolarisWidget.h"
@@ -96,19 +97,21 @@ protected:
 
   QmitkAbstractTrackingDeviceWidget* GetCurrentWidget();
 
+  /* @brief This method is called when the user clicks on "Refresh Selection" (m_RefreshTrackingDeviceCollection).
+  It then sets the correct widget for the selected tracking device.*/
+  void RefreshTrackingDeviceCollection();
+
   protected slots:
   /* @brief This method is called when the user changes the selection of the trackingdevice (m_trackingDeviceChooser).
             It then sets the correct widget for the selected tracking device.*/
   void TrackingDeviceChanged();
 
-  /* @brief This method is called when the user clicks on "Refresh Selection" (m_RefreshTrackingDeviceCollection).
-  It then sets the correct widget for the selected tracking device.*/
-  void RefreshTrackingDeviceCollection();
-
 private:
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
 
     mitk::TrackingDeviceTypeCollection* m_DeviceTypeCollection;
+
+  mitk::TrackingDeviceWidgetCollection* m_DeviceWidgetCollection;
 
   QmitkNDIAuroraWidget* m_auroraWidget;
   QmitkNDIPolarisWidget* m_polarisWidget;
@@ -116,8 +119,6 @@ private:
   QmitkNPOptitrackWidget* m_optitrackWidget;
   QmitkVirtualTrackerWidget* m_virtualtrackerWidget;
   QmitkOpenIGTLinkWidget* m_openIGTLinkWidget;
-
-  mitk::TrackingDeviceWidgetCollection m_DeviceWidgetCollection;
 };
 
 #endif

@@ -34,6 +34,8 @@ set(CPP_FILES
   Qmitk/QmitkTrackingDeviceConfigurationWidgetConnectionWorker.cpp
   Qmitk/QmitkNDIAbstractDeviceWidget.cpp
   Qmitk/QmitkAbstractTrackingDeviceWidget.cpp
+
+    autoload/mitkIGTUIActivator.cpp
 )
 
 set(UI_FILES

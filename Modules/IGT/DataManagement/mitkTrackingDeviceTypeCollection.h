@@ -57,7 +57,7 @@ namespace mitk {
 
     /**
     *\brief Returns the id that this device is registered with. The id will only be valid, if the
-    * NavigationDataSource has been registered using RegisterAsMicroservice().
+    * Collection has been registered using RegisterAsMicroservice().
     */
     std::string GetMicroserviceID();
 

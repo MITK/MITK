@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTool.h"
+
+#include "mitkDisplayInteractor.h"
 #include "mitkProperties.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
@@ -113,12 +115,46 @@ void mitk::Tool::SetToolManager(ToolManager* manager)
 
 void mitk::Tool::Activated()
 {
+  // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts with tools
+  // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
+  m_DisplayInteractorConfigs.clear();
+  std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver = us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
+  for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+  {
+    DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(
+                                                    us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    if (displayInteractor != NULL)
+    {
+      // remember the original configuration
+      m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
+      // here the alternative configuration is loaded
+      displayInteractor->SetEventConfig("DisplayConfigMITK.xml");
+    }
+  }
 }
 
 void mitk::Tool::Deactivated()
 {
   // ToDo: reactivate this feature!
   //StateMachine::ResetStatemachineToStartState(); // forget about the past
+
+  // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
+  // in new interaction framework
+  for (std::map<us::ServiceReferenceU, EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();
+       it != m_DisplayInteractorConfigs.end(); ++it)
+  {
+    if (it->first)
+    {
+      DisplayInteractor* displayInteractor = static_cast<DisplayInteractor*>(
+                                               us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+      if (displayInteractor != NULL)
+      {
+        // here the regular configuration is loaded again
+        displayInteractor->SetEventConfig(it->second);
+      }
+    }
+  }
+  m_DisplayInteractorConfigs.clear();
 }
 
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)

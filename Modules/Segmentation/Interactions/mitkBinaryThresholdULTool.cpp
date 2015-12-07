@@ -82,6 +82,8 @@ const char* mitk::BinaryThresholdULTool::GetName() const
 
 void mitk::BinaryThresholdULTool::Activated()
 {
+  Superclass::Activated();
+
   m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::BinaryThresholdULTool>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
 
   m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
@@ -115,6 +117,8 @@ void mitk::BinaryThresholdULTool::Deactivated()
     // don't care
   }
   m_ThresholdFeedbackNode->SetData(NULL);
+
+  Superclass::Deactivated();
 }
 
 void mitk::BinaryThresholdULTool::SetThresholdValues(double lower, double upper)

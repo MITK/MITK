@@ -243,13 +243,14 @@ void mitk::FastMarchingTool::Activated()
 
 void mitk::FastMarchingTool::Deactivated()
 {
-  Superclass::Deactivated();
   m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
   m_ToolManager->GetDataStorage()->Remove( this->m_SeedsAsPointSetNode );
   this->ClearSeeds();
   m_ResultImageNode = NULL;
   m_SeedsAsPointSetNode = NULL;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  Superclass::Deactivated();
 }
 
 void mitk::FastMarchingTool::Initialize()

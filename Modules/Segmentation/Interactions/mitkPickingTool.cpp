@@ -93,6 +93,8 @@ us::ModuleResource mitk::PickingTool::GetIconResource() const
 
 void mitk::PickingTool::Activated()
 {
+  Superclass::Activated();
+
   DataStorage* dataStorage = this->GetDataStorage();
   m_WorkingData = this->GetWorkingData();
 
@@ -106,10 +108,12 @@ void mitk::PickingTool::Activated()
 
 void mitk::PickingTool::Deactivated()
 {
-   m_PointSet->Clear();
+  m_PointSet->Clear();
   //remove from data storage and disable interaction
   GetDataStorage()->Remove(m_PointSetNode);
-  GetDataStorage()->Remove( m_ResultNode);
+  GetDataStorage()->Remove(m_ResultNode);
+
+  Superclass::Deactivated();
 }
 
 mitk::DataNode* mitk::PickingTool::GetReferenceData(){

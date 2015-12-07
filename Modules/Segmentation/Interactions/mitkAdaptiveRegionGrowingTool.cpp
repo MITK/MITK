@@ -81,6 +81,8 @@ us::ModuleResource mitk::AdaptiveRegionGrowingTool::GetIconResource() const
 
 void mitk::AdaptiveRegionGrowingTool::Activated()
 {
+  Superclass::Activated();
+
   if (!GetDataStorage()->Exists(m_PointSetNode))
     GetDataStorage()->Add(m_PointSetNode, GetWorkingData());
 }
@@ -89,6 +91,8 @@ void mitk::AdaptiveRegionGrowingTool::Deactivated()
 {
   m_PointSet->Clear();
   GetDataStorage()->Remove(m_PointSetNode);
+
+  Superclass::Deactivated();
 }
 
 mitk::DataNode* mitk::AdaptiveRegionGrowingTool::GetReferenceData(){

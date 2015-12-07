@@ -56,6 +56,8 @@ mitk::OtsuTool3D::~OtsuTool3D()
 
 void mitk::OtsuTool3D::Activated()
 {
+  Superclass::Activated();
+
   if (m_ToolManager)
   {
     m_OriginalImage = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData(0)->GetData());
@@ -90,6 +92,8 @@ void mitk::OtsuTool3D::Deactivated()
   m_BinaryPreviewNode = NULL;
   m_ToolManager->GetDataStorage()->Remove( this->m_MaskedImagePreviewNode);
   m_MaskedImagePreviewNode = NULL;
+
+  Superclass::Deactivated();
 }
 
 const char** mitk::OtsuTool3D::GetXPM() const

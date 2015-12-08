@@ -31,19 +31,10 @@ if __name__ == '__main__':
 
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    BATCH_NUMBERS = np.arange(0, 10, 1)
+    BATCH_NUMBERS = np.arange(0, 100, 1)
     for i in BATCH_NUMBERS:
-        main_task = tasks_mc.CreateSpectraTask("ipcai_generic", i, 1000,
-                                               mcfac.GenericMcFactory())
-        w.add(main_task)
-        w.run()
-        main_task = tasks_mc.CreateSpectraTask("ipcai_colon_muscle", i, 1000,
-                                               mcfac.ColonMuscleMcFactory())
-        w.add(main_task)
-        w.run()
-        main_task = tasks_mc.CreateSpectraTask("ipcai_generic_", i +
-                                               np.max(BATCH_NUMBERS), 1000,
-                                               mcfac.GenericMcFactory())
+        main_task = tasks_mc.CreateSpectraTask("ipcai_less_generic", i, 1000,
+                                               mcfac.LessGenericMcFactory())
         w.add(main_task)
         w.run()
 

@@ -11,14 +11,14 @@ from sklearn.preprocessing import Normalizer
 
 import mc.mcmanipulations as mcmani
 
-def preprocess(batch, nr_samples=None, w_percent=None, magnification=None,
+def preprocess2(batch, nr_samples=None, w_percent=None, magnification=None,
                bands_to_sortout=None):
+
     working_batch = copy.deepcopy(batch)
     mcmani.sortout_bands(working_batch, bands_to_sortout)
     # get reflectance and oxygenation
     X = working_batch.reflectances
-    y = working_batch.layers[0][:, 1]
-    y = y[:, np.newaxis]
+    y = working_batch.layers[0][:, [0, 1]]
 
     # remove nan
     no_nan = ~np.isnan(X).any(axis=1)
@@ -50,6 +50,15 @@ def preprocess(batch, nr_samples=None, w_percent=None, magnification=None,
     # do normalizations
     X = normalize(X)
     return X, np.squeeze(y)
+
+
+
+def preprocess(batch, nr_samples=None, w_percent=None, magnification=None,
+               bands_to_sortout=None):
+    X, y = preprocess2(batch, nr_samples, w_percent, magnification,
+                       bands_to_sortout)
+
+    return X, y[:, 1]
 
 
 def normalize(X):

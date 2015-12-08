@@ -31,7 +31,7 @@ import msi.imgmani as imgmani
 import msi.normalize as norm
 from regression.estimation import estimate_image
 from regression.linear import LinearSaO2Unmixing
-from regression.preprocessing import preprocess, normalize
+from regression.preprocessing import preprocess2, normalize
 from msi.io.tiffreader import TiffReader
 
 
@@ -41,6 +41,7 @@ sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
 sp.DATA_FOLDER = "liver_images"
 sp.FINALS_FOLDER = "liver_oxy"
 sp.FLAT_FOLDER = "flatfields_liver"
+sp.MC_DATA_FOLDER = "mc_data2"
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
@@ -71,7 +72,9 @@ class IPCAICreateOxyImageTask(luigi.Task):
         return IPCAIEstimateTissueParametersTask(image_prefix=self.image_prefix,
                                             batch_prefix=
                                             self.batch_prefix), \
+            MultiSpectralImageFromTiffFiles(image_prefix=self.image_prefix), \
             IPCAICorrectImagingSetupTask(image_prefix=self.image_prefix)
+
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -88,37 +91,72 @@ class IPCAICreateOxyImageTask(luigi.Task):
         image = param_image.get_image()
         # read the multispectral image
         msi = nrrdReader.read(self.input()[1].path)
+        msi_original = nrrdReader.read(self.input()[2].path)
 
-        f, axarr = plt.subplots(1, 2)
+        plt.figure()
+
+
+        # filter dark spots
+        segmentation = np.max(msi.get_image(), axis=-1) < 100.
+        # filter bright spots
+        segmentation = np.logical_or(segmentation,
+                                     (np.max(msi.get_image(), axis=-1) > 2000.))
+
 
         # create artificial rgb
-        rgb_image = msi.get_image()[:, :, [2, 3, 1]]
+        msimani.apply_segmentation(msi_original, ~segmentation)
+        rgb_image = msi_original.get_image()[:, :, [2, 3, 1]]
         rgb_image /= np.max(rgb_image)
         rgb_image *= 255.
         rgb_image = rgb_image.astype(np.uint8)
         im = Image.fromarray(rgb_image, 'RGB')
         enh_brightness = ImageEnhance.Brightness(im)
-        im = enh_brightness.enhance(2.)
+        im = enh_brightness.enhance(1.)
         plot_image = np.array(im)
-        top_left_axis = axarr[0]
+        top_left_axis = plt.gca()
         top_left_axis.imshow(plot_image, interpolation='nearest')
-        top_left_axis.set_title("synthetic rgb",
+        top_left_axis.set_title("synthetic rgb (specular pixels black)",
                                 fontsize=5)
         top_left_axis.xaxis.set_visible(False)
         top_left_axis.yaxis.set_visible(False)
+        plt.savefig(self.output().path, dpi=1000, bbox_inches='tight')
 
         plt.set_cmap("jet")
 
+        plt.figure()
         # plot parametric maps
-        image[np.isnan(image)] = 0.
-        image[np.isinf(image)] = 0.
-        image[image > 1.] = 1.
-        image[image < 0.] = 0.
-        image[0, 0] = 0.
-        image[0, 1] = 1.
-        at.plot_axis(axarr[1], image[:, :],
-                  "oxygenation [%]")
-        plt.savefig(self.output().path, dpi=1000, bbox_inches='tight')
+        # oxy_image = image[:, :, 1]  # image[500:1000, 1500:2500, 1]
+        oxy_image = np.ma.masked_array(image[:, :, 1], segmentation)
+        oxy_image[np.isnan(oxy_image)] = 0.
+        oxy_image[np.isinf(oxy_image)] = 0.
+        oxy_image[oxy_image > 1.] = 1.
+        oxy_image[oxy_image < 0.] = 0.
+        oxy_mean = np.mean(oxy_image)
+        oxy_image[0, 0] = 0.
+        oxy_image[0, 1] = 1.
+        at.plot_axis(plt.gca(), oxy_image[:, :] * 100,
+                  "oxygenation [%]. Mean " +
+                  "{0:.1f}".format((oxy_mean * 100.)) + "%")
+        plt.savefig(self.output().path + "_oxy.png", dpi=1000, bbox_inches='tight')
+
+        bvf_image = np.ma.masked_array(image[:, :, 0], segmentation)
+        bvf_image[np.isnan(bvf_image)] = 0.
+        bvf_image[np.isinf(bvf_image)] = 0.
+        bvf_image[bvf_image > 1.] = 1.
+        bvf_image[bvf_image < 0.] = 0.
+        bvf_mean = np.mean(bvf_image)
+        bvf_image[0, 0] = 0.
+        bvf_image[1, 1] = 0.1
+        at.plot_axis(plt.gca(), bvf_image[:, :] * 100,
+                  "blood volume fraction [%]. Mean " + "{0:.1f}".format((bvf_mean * 100.)) + "%")
+        plt.savefig(self.output().path + "_bvf.png", dpi=1000, bbox_inches='tight')
+
+        fd = open(os.path.join(sp.ROOT_FOLDER, sp.RESULTS_FOLDER,
+                                   sp.FINALS_FOLDER,
+                                   'results_summary.csv'), 'a')
+        fd.write(self.image_prefix + ", " + str(int(oxy_mean * 100)) +
+                 "," + "{0:.1f}".format((bvf_mean * 100.)) + "\n")
+        fd.close()
 
 
 class IPCAIEstimateTissueParametersTask(luigi.Task):
@@ -176,8 +214,8 @@ class IPCAITrainRegressor(luigi.Task):
         batch_train.reflectances = resort_image_wavelengths(
                                                     batch_train.reflectances)
         batch_train.wavelengths = batch_train.wavelengths[new_order]
-        X, y = preprocess(batch_train,
-                          w_percent=0.05, bands_to_sortout=sp.bands_to_sortout)
+        X, y = preprocess2(batch_train,
+                          w_percent=0.1, bands_to_sortout=sp.bands_to_sortout)
 
         # train regressor
         reg = RandomForestRegressor(max_depth=10, n_estimators=10,
@@ -311,7 +349,7 @@ if __name__ == '__main__':
         main_task = IPCAICreateOxyImageTask(
             image_prefix=f,
             batch_prefix=
-            "colon_muscle_tissue_d_ranges_test")
+            "ipcai_colon_muscle_train")
         w.add(main_task)
     w.run()
 

@@ -21,9 +21,9 @@ sp.ROOT_FOLDER = "/media/wirkert/data/Data/2015_xxxx_plot_one_spectrum"
 
 # the wavelengths recorded by our camera
 RECORDED_WAVELENGTHS = \
-        np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
-PARAMS = np.array([0.05,  # bvf
-                   0.0,  # SaO2
+        np.arange(450, 720, 2) * 10 ** -9
+PARAMS = np.array([0.1,  # bvf
+                   0.7,  # SaO2
                    0.0,  # billirubin
                    500.,  # a_mie
                    0.0,  # a_ray
@@ -46,7 +46,7 @@ class PlotOneSpectrum(luigi.Task):
 
         msi = Msi(refl)
         msi.set_wavelengths(RECORDED_WAVELENGTHS)
-        norm.standard_normalizer.normalize(msi)
+        # norm.standard_normalizer.normalize(msi)
 
         plot(msi)
         plt.gca().set_xlabel("wavelength")

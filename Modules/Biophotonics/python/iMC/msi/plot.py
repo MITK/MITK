@@ -78,7 +78,7 @@ def plotMeanError(msi, axes=None):
     std_curve = np.ma.std(image, axis=0)
     msimani.calculate_mean_spectrum(msi_copy)
     # calculate std
-    print "percentual std: " + str(std_curve / msi_copy.get_image())
+    print "percentual std: " + str(std_curve / msi_copy.get_image() * 100.)
     # plot as errorbar
     axes.errorbar(sortedWavelenghts, msi_copy.get_image()[sortedIndices],
             yerr=std_curve, fmt='-o')

@@ -11,9 +11,11 @@ import pickle
 import numpy as np
 
 import matplotlib.pyplot as plt
+import matplotlib
 
 import luigi
 
+from regression.preprocessing import preprocess2, normalize
 import scriptpaths as sp
 import tasks_mc
 import mc.plot
@@ -26,7 +28,9 @@ sp.ROOT_FOLDER = \
 sp.DATA_FOLDER = "spectrometer_measurements"
 sp.MC_DATA_FOLDER = "processed"
 SPECTRAL_PLOTS = "spectral_plots"
+sp.RECORDED_WAVELENGTHS = np.arange(470, 690, 10) * 10 ** -9
 
+# matplotlib.rcParams.update({'font.size': 18})
 
 class VisualizeSpectraTask(luigi.Task):
     batch_prefix = luigi.Parameter()
@@ -53,26 +57,25 @@ class VisualizeSpectraTask(luigi.Task):
         camera_batch = pickle.load(f)
         f.close()
 
-        f, axarr = plt.subplots(2, 1)
+        batch.wavelengths *= 10 ** 9
+        # X, y = preprocess2(camera_batch, w_percent=0.1)
+        # camera_batch.reflectances = X
+
+        # f, axarr = plt.subplots(2, 1)
         # axis to plot the original data c.f. the mcml simulation
-        org_ax = axarr[0]
+
         # axis for plotting the folded spectrum + normalization
-        fold_ax = axarr[1]
-        mc.plot.plot(batch, org_ax)
-        mc.plot.plot(camera_batch, fold_ax)
+
+        mc.plot.plot(batch)
 
         # tidy up and save plot
-        major_ticks = np.arange(450, 720, 50) * 10 ** -9
-        minor_ticks = np.arange(450, 720, 10) * 10 ** -9
-        org_ax.set_title(self.batch_prefix)
-        org_ax.set_xticks(major_ticks)
-        org_ax.set_xticks(minor_ticks, minor=True)
-        fold_ax.set_title("response to camera filter sensitivities")
-        fold_ax.set_xticks(major_ticks)
-        fold_ax.set_xticks(minor_ticks, minor=True)
-        org_ax.grid()
-        fold_ax.grid()
-        plt.savefig(self.output().path, dpi=500)
+        plt.grid()
+        plt.ylabel("r", fontsize=30)
+        plt.xlabel("$\lambda$ [nm]", fontsize=30)
+        # org_ax.axes.xaxis.set_ticklabels([])
+        # org_ax.xaxis.set_visible(False)
+        plt.show()
+        # plt.savefig(self.output().path, dpi=250)
 
 
 
@@ -82,8 +85,8 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    main_task = VisualizeSpectraTask("vizualization_generic",
-                                     0, 10)
+    main_task = VisualizeSpectraTask("paper2",
+                                     0, 1)
     w.add(main_task)
     w.run()
 

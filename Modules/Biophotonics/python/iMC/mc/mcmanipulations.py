@@ -26,7 +26,8 @@ def interpolate_wavelengths(batch, new_wavelengths):
     performs simple linear interpolation. Neither existing nor new wavelengths
     need to be sorted. """
     interpolator = interp1d(batch.wavelengths,
-                            batch.reflectances, assume_sorted=False)
+                            batch.reflectances, assume_sorted=False,
+                            bounds_error=False)
     batch.reflectances = interpolator(new_wavelengths)
     batch.wavelengths = new_wavelengths
 

@@ -127,7 +127,7 @@ class CameraBatch(luigi.Task):
         f.close()
         # camera batch creation:
         camera_batch = batch
-        mcmani.fold_by_sliding_average(camera_batch, 5)
+        mcmani.fold_by_sliding_average(camera_batch, 6)
         mcmani.interpolate_wavelengths(camera_batch,
                                        sp.RECORDED_WAVELENGTHS)
         # write it

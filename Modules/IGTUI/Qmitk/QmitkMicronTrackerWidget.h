@@ -53,6 +53,8 @@ protected:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  virtual QmitkMicronTrackerWidget* Clone(QWidget* parent) const;
+
   std::string m_MTCalibrationFile;
 
   Ui::QmitkMicronTrackerWidget* m_Controls;

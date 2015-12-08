@@ -48,6 +48,8 @@ protected:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  virtual QmitkOpenIGTLinkWidget* Clone(QWidget* parent) const;
+
   Ui::QmitkOpenIGTLinkWidget* m_Controls;
 public:
   virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();

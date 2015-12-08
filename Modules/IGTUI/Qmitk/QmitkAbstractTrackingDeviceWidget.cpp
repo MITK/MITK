@@ -53,4 +53,13 @@ void QmitkAbstractTrackingDeviceWidget::CreateConnections() {
 
   //move the worker to the thread
   m_TestConnectionWorker->moveToThread(m_TestConnectionWorkerThread);
-};
+}
+
+QmitkAbstractTrackingDeviceWidget* QmitkAbstractTrackingDeviceWidget::CloneForQt(QWidget* parent) const
+{
+  QmitkAbstractTrackingDeviceWidget* clonedWidget = this->Clone(parent);
+  clonedWidget->create();
+  clonedWidget->CreateConnections(); // initialize the Qt stuff of the widget
+
+  return clonedWidget;
+}

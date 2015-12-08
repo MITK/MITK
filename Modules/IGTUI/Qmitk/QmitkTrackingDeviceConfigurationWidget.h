@@ -26,15 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDeviceTypeCollection.h"
 #include "mitkTrackingDeviceWidgetCollection.h"
 
-
-//standard tracking devices, which always should be avaiable
-#include "QmitkNDIAuroraWidget.h"
-#include "QmitkNDIPolarisWidget.h"
-#include "QmitkMicronTrackerWidget.h"
-#include "QmitkNPOptitrackWidget.h"
-#include "QmitkVirtualTrackerWidget.h"
-#include "QmitkOpenIGTLinkWidget.h"
-
 //itk headers
 
 /** Documentation:
@@ -113,12 +104,6 @@ private:
 
   mitk::TrackingDeviceWidgetCollection* m_DeviceWidgetCollection;
 
-  QmitkNDIAuroraWidget* m_auroraWidget;
-  QmitkNDIPolarisWidget* m_polarisWidget;
-  QmitkMicronTrackerWidget* m_microntrackerWidget;
-  QmitkNPOptitrackWidget* m_optitrackWidget;
-  QmitkVirtualTrackerWidget* m_virtualtrackerWidget;
-  QmitkOpenIGTLinkWidget* m_openIGTLinkWidget;
 };
 
 #endif

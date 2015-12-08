@@ -55,3 +55,15 @@ mitk::TrackingDevice::Pointer QmitkOpenIGTLinkWidget::ConstructTrackingDevice()
   OIGTLDevice->SetHostname(m_Controls->m_OpenIGTLinkHostname->text().toStdString());
   return static_cast<mitk::TrackingDevice::Pointer>(OIGTLDevice);
 }
+
+QmitkOpenIGTLinkWidget* QmitkOpenIGTLinkWidget::Clone(QWidget* parent) const
+{
+  QmitkOpenIGTLinkWidget* clonedWidget = new QmitkOpenIGTLinkWidget(parent);
+  clonedWidget->CreateQtPartControl(parent);
+  clonedWidget->CreateConnections();
+
+  clonedWidget->m_Controls->m_OpenIGTLinkPort->setText(m_Controls->m_OpenIGTLinkPort->text());
+  clonedWidget->m_Controls->m_OpenIGTLinkHostname->setText(m_Controls->m_OpenIGTLinkHostname->text());
+
+  return clonedWidget;
+}

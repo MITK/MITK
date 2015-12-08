@@ -53,6 +53,8 @@ protected:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  virtual QmitkVirtualTrackerWidget* Clone(QWidget* parent) const;
+
   Ui::QmitkVirtualTrackerWidget* m_Controls;
 
 public:

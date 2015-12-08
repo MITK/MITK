@@ -67,8 +67,6 @@ void QmitkNDIPolarisWidget::CreateConnections()
     m_Controls->m_portSpinBoxPolaris->setPrefix("");
 #endif
 
-    //disable unused UI component
-    m_Controls->m_polarisTrackingModeBox->setVisible(false); //don't delete this component, because it is used in the MBI part of MITK
   }
 }
 
@@ -184,4 +182,16 @@ void QmitkNDIPolarisWidget::SetPortValueToGUI(int portValue){
 }
 void QmitkNDIPolarisWidget::SetPortTypeToGUI(int portType){
   m_Controls->portTypePolaris->setCurrentIndex(portType);
+}
+
+QmitkNDIPolarisWidget* QmitkNDIPolarisWidget::Clone(QWidget* parent) const
+{
+  QmitkNDIPolarisWidget* clonedWidget = new QmitkNDIPolarisWidget(parent);
+  clonedWidget->CreateQtPartControl(parent);
+  clonedWidget->CreateConnections();
+
+  clonedWidget->SetPortTypeToGUI(m_Controls->portTypePolaris->currentIndex());
+  clonedWidget->SetPortValueToGUI(m_Controls->m_portSpinBoxPolaris->value());
+  clonedWidget->m_Controls->m_frameRateComboBoxPolaris->setCurrentIndex(m_Controls->m_frameRateComboBoxPolaris->currentIndex());
+  return clonedWidget;
 }

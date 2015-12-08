@@ -55,6 +55,13 @@ public:
 
   virtual ~QmitkAbstractTrackingDeviceWidget();
 
+    /**
+  * \brief Return pointer to copy of the object.
+  * Internally use of QmitkUSAbstractCustomWidget::Clone() with additionaly
+  * setting an internal flag that the object was really cloned.
+  */
+  QmitkAbstractTrackingDeviceWidget* CloneForQt(QWidget* parent = 0) const;
+
 signals:
   void ConnectionTested(bool connected, QString output);
 
@@ -74,6 +81,11 @@ protected:
 
   QmitkTrackingDeviceConfigurationWidgetConnectionWorker* m_TestConnectionWorker;
   QThread* m_TestConnectionWorkerThread;
+
+  /**
+  * \brief Subclass must implement this method to return a pointer to a copy of the object.
+  */
+  virtual QmitkAbstractTrackingDeviceWidget* Clone(QWidget* parent = 0) const = 0;
 
 public:
   virtual void ResetOutput(){};

@@ -152,3 +152,14 @@ void QmitkMicronTrackerWidget::SetMTCalibrationFileClicked()
     m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
   }
 }
+
+QmitkMicronTrackerWidget* QmitkMicronTrackerWidget::Clone(QWidget* parent) const
+{
+  QmitkMicronTrackerWidget* clonedWidget = new QmitkMicronTrackerWidget(parent);
+  clonedWidget->CreateQtPartControl(parent);
+  clonedWidget->CreateConnections();
+  clonedWidget->m_MTCalibrationFile = m_MTCalibrationFile;
+  m_Controls->m_MTCalibrationFile->setText("Calibration File: " + QString::fromStdString(m_MTCalibrationFile));
+
+  return clonedWidget;
+}

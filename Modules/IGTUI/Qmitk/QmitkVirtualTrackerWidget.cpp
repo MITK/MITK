@@ -80,3 +80,15 @@ void QmitkVirtualTrackerWidget::EnableGaussianNoise()
     m_Controls->m_DeviationDistributionParam->setEnabled(false);
   }
 }
+
+QmitkVirtualTrackerWidget* QmitkVirtualTrackerWidget::Clone(QWidget* parent) const
+{
+  QmitkVirtualTrackerWidget* clonedWidget = new QmitkVirtualTrackerWidget(parent);
+  clonedWidget->CreateQtPartControl(parent);
+  clonedWidget->CreateConnections();
+
+  clonedWidget->m_Controls->m_EnableGaussianNoise->setEnabled(m_Controls->m_EnableGaussianNoise->isEnabled());
+  clonedWidget->m_Controls->m_MeanDistributionParam->setValue(m_Controls->m_MeanDistributionParam->value());
+  clonedWidget->m_Controls->m_DeviationDistributionParam->setValue(m_Controls->m_DeviationDistributionParam->value());
+  return clonedWidget;
+}

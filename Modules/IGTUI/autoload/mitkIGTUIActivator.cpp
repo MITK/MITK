@@ -16,26 +16,55 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIGTUIActivator.h"
 
+//All Tracking devices, which should be available by default
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
+#include "mitkVirtualTrackerTypeInformation.h"
+#include "mitkMicronTrackerTypeInformation.h"
+#include "mitkNPOptitrackTrackingTypeInformation.h"
+#include "mitkOpenIGTLinkTypeInformation.h"
+
+//standard tracking devices, which always should be avaiable
+#include "QmitkNDIAuroraWidget.h"
+#include "QmitkNDIPolarisWidget.h"
+#include "QmitkMicronTrackerWidget.h"
+#include "QmitkNPOptitrackWidget.h"
+#include "QmitkVirtualTrackerWidget.h"
+#include "QmitkOpenIGTLinkWidget.h"
+
 namespace mitk {
 
   IGTUIActivator::IGTUIActivator()
   {
+    MITK_INFO << "                                Konst.....................";
+    m_DeviceWidgetCollection.RegisterAsMicroservice();
+    //Add widgets of standard tracking devices
+    m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), new QmitkNDIAuroraWidget);
+    m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName(), new QmitkNDIPolarisWidget);
+    m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName(), new QmitkMicronTrackerWidget);
+    m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), new QmitkNPOptitrackWidget);
+    m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), new QmitkVirtualTrackerWidget);
+    m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::OpenIGTLinkTypeInformation::GetTrackingDeviceName(), new QmitkOpenIGTLinkWidget);
 
   }
 
   IGTUIActivator::~IGTUIActivator()
   {
-
+    MITK_INFO << "                                Dekonst.....................";
+  m_DeviceWidgetCollection.UnRegisterMicroservice();
   }
 
 void IGTUIActivator::Load(us::ModuleContext* context)
 {
-  m_DeviceWidgetCollection.RegisterAsMicroservice();
+
+  MITK_INFO << "                                load.....................";
 }
 
 void IGTUIActivator::Unload(us::ModuleContext*)
 {
-  m_DeviceWidgetCollection.UnRegisterMicroservice();
+
+  MITK_INFO << "                                unload.....................";
+
 }
 
 }

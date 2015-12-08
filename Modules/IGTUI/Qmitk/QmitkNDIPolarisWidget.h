@@ -59,6 +59,8 @@ protected:
   virtual void SetPortValueToGUI(int portValue);
   virtual void SetPortTypeToGUI(int portType);
 
+  virtual QmitkNDIPolarisWidget* Clone(QWidget* parent) const;
+
 public:
   virtual void ResetOutput();
   virtual void AddOutput(std::string s);

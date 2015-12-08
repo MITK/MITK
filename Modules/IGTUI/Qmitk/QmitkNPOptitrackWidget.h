@@ -54,6 +54,8 @@ protected:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  virtual QmitkNPOptitrackWidget* Clone(QWidget* parent) const;
+
   std::string m_OptitrackCalibrationFile;
 
   Ui::QmitkNPOptitrackWidget* m_Controls;

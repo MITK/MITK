@@ -158,3 +158,14 @@ void QmitkNDIAuroraWidget::SetPortValueToGUI(int portValue){
 void QmitkNDIAuroraWidget::SetPortTypeToGUI(int portType){
   m_Controls->portTypeAurora->setCurrentIndex(portType);
 }
+
+QmitkNDIAuroraWidget* QmitkNDIAuroraWidget::Clone(QWidget* parent) const
+{
+  QmitkNDIAuroraWidget* clonedWidget = new QmitkNDIAuroraWidget(parent);
+  clonedWidget->CreateQtPartControl(parent);
+  clonedWidget->CreateConnections();
+
+  clonedWidget->SetPortTypeToGUI(m_Controls->portTypeAurora->currentIndex());
+  clonedWidget->SetPortValueToGUI(m_Controls->m_portSpinBoxAurora->value());
+  return clonedWidget;
+}

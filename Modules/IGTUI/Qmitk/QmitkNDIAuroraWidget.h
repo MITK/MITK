@@ -56,6 +56,8 @@ protected:
   virtual void SetPortValueToGUI(int portValue);
   virtual void SetPortTypeToGUI(int portType);
 
+  virtual QmitkNDIAuroraWidget* Clone(QWidget* parent) const;
+
   Ui::QmitkNDIAuroraWidget* m_Controls;
 };
 

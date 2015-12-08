@@ -101,3 +101,18 @@ void QmitkNPOptitrackWidget::SetOptitrackCalibrationFileClicked()
     m_Controls->m_OptitrackCalibrationFile->setText("Calibration File: " + QString(myPath.getFileName().c_str()));
   }
 }
+
+QmitkNPOptitrackWidget* QmitkNPOptitrackWidget::Clone(QWidget* parent) const
+{
+  QmitkNPOptitrackWidget* clonedWidget = new QmitkNPOptitrackWidget(parent);
+  clonedWidget->CreateQtPartControl(parent);
+  clonedWidget->CreateConnections();
+
+  clonedWidget->m_OptitrackCalibrationFile = this->m_OptitrackCalibrationFile;
+  clonedWidget->m_Controls->m_OptitrackCalibrationFile->setText(m_Controls->m_OptitrackCalibrationFile->text());
+
+  clonedWidget->m_Controls->m_OptitrackExp->setValue(m_Controls->m_OptitrackExp->value());
+  clonedWidget->m_Controls->m_OptitrackLed->setValue(m_Controls->m_OptitrackLed->value());
+  clonedWidget->m_Controls->m_OptitrackThr->setValue(m_Controls->m_OptitrackThr->value());
+  return clonedWidget;
+}

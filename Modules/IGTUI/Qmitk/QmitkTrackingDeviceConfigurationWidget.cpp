@@ -32,6 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMicronTrackerTypeInformation.h"
 #include "mitkNPOptitrackTrackingTypeInformation.h"
 #include "mitkOpenIGTLinkTypeInformation.h"
+//standard tracking devices, which always should be avaiable
+#include "QmitkNDIAuroraWidget.h"
+#include "QmitkNDIPolarisWidget.h"
+#include "QmitkMicronTrackerWidget.h"
+#include "QmitkNPOptitrackWidget.h"
+#include "QmitkVirtualTrackerWidget.h"
+#include "QmitkOpenIGTLinkWidget.h"
 
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
@@ -54,19 +61,12 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   m_DeviceWidgetCollection = context->GetService<mitk::TrackingDeviceWidgetCollection>(refs.front());
 
   //Add widgets of standard tracking devices
-  m_auroraWidget = new QmitkNDIAuroraWidget;
-  m_polarisWidget = new QmitkNDIPolarisWidget;
-  m_microntrackerWidget = new QmitkMicronTrackerWidget;
-  m_optitrackWidget = new QmitkNPOptitrackWidget;
-  m_virtualtrackerWidget = new QmitkVirtualTrackerWidget;
-  m_openIGTLinkWidget = new QmitkOpenIGTLinkWidget;
-
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), m_auroraWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName(), m_polarisWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName(), m_microntrackerWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), m_optitrackWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), m_virtualtrackerWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::OpenIGTLinkTypeInformation::GetTrackingDeviceName(), m_openIGTLinkWidget);
+  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), new QmitkNDIAuroraWidget);
+  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName(), new QmitkNDIPolarisWidget);
+  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName(), new QmitkMicronTrackerWidget);
+  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), new QmitkNPOptitrackWidget);
+  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), new QmitkVirtualTrackerWidget);
+  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::OpenIGTLinkTypeInformation::GetTrackingDeviceName(), new QmitkOpenIGTLinkWidget);
 
   RefreshTrackingDeviceCollection();
 
@@ -86,14 +86,6 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
 {
   StoreUISettings();
-  m_DeviceWidgetCollection->UnRegisterMicroservice();
-
-  delete m_auroraWidget;
-  delete m_polarisWidget;
-  delete m_microntrackerWidget;
-  delete m_optitrackWidget;
-  delete m_virtualtrackerWidget;
-  delete m_openIGTLinkWidget;
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)

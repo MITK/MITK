@@ -228,7 +228,7 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
       MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;
     }
 
-    propList->Get("SelectedDevice", m_Controls->m_TrackingDeviceChooser->currentText().toStdString());
+    propList->Get("SelectedDevice", selectedDevice);
 
     if (selectedDevice.empty())
     {

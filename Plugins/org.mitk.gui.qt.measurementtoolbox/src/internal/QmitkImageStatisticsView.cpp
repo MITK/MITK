@@ -350,7 +350,7 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
               << QString::number(statistics[t].GetEntropy())
               << QString::number(statistics[t].GetMPP())
               << QString::number(statistics[t].GetUPP())
-              << QString::number(m_Controls->m_StatisticsTable->item(6, 0)->data(Qt::DisplayRole).toDouble());
+              << QString::number(m_Controls->m_StatisticsTable->item(7, 0)->data(Qt::DisplayRole).toDouble());
 
          for(int z=0;z<value.size();z++)
          {

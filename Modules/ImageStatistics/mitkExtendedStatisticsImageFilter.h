@@ -39,7 +39,7 @@ namespace itk
   *
   * As the StatisticsImageFilter stores the statistics in the outputs 1 to 6 by the
   * StatisticsImageFilter, the skewness, kurtosis,MPP,UPP,Uniformity and Entropy are stored in the outputs
-  * 7 to 12 by this filter.
+  * 7 to 13 by this filter.
   */
   template< class TInputImage >
   class ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
@@ -75,7 +75,7 @@ namespace itk
     */
     double GetMedian() const
     {
-        return -99999;
+        return this->GetMedianOutput()->Get();
     }
 
     /**
@@ -142,15 +142,16 @@ namespace itk
     * brief Calls AfterThreadedGenerateData() of the superclass and the main methods
     */
     void AfterThreadedGenerateData();
-    void CalculteHistogram();
+    void CalculateHistogram();
+
     /**
-    * \brief Compute Entropy,uniformity,MPP,UPP.
+    * \brief Compute Entropy,uniformity,MPP,UPP, Median.
     *
-    * The Entropy,uniformity,MPP and UPP will be calculated with the Sigma, Hisotgram and Mean Value of the
+    * The Entropy,uniformity,MPP, Median and UPP will be calculated with the Sigma, Histogram and Mean Value of the
     * itkStatisticsImageFilter which comes out of the threadedGenerateData().
     */
     void ComputeSkewnessKurtosisAndMPP();
-    void ComputeEntropyUniformityAndUPP();
+    void ComputeEntropyUniformityMedianAndUPP();
 
   /**
     * \brief Histogram.
@@ -185,6 +186,10 @@ namespace itk
     RealObjectType* GetUPPOutput();
 
     const RealObjectType* GetUPPOutput() const;
+
+    RealObjectType* GetMedianOutput();
+
+    const RealObjectType* GetMedianOutput() const;
 
     virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx );
 

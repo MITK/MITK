@@ -77,7 +77,7 @@ protected:
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
     /// \brief Creation of the connections
     virtual void CreateConnections();
-  virtual void CreateQtPartControl(QWidget *parent){};
+  virtual void CreateQtPartControl(QWidget*){};
 
   QmitkTrackingDeviceConfigurationWidgetConnectionWorker* m_TestConnectionWorker;
   QThread* m_TestConnectionWorkerThread;
@@ -89,7 +89,7 @@ protected:
 
 public:
   virtual void ResetOutput(){};
-  virtual void AddOutput(std::string s){};
+  virtual void AddOutput(std::string){};
   virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice() = 0;
 
   virtual void StoreUISettings(){};

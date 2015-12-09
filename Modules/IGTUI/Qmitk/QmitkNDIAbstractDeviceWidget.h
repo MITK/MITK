@@ -61,7 +61,7 @@ protected:
   /// \brief Creation of the connections
   virtual void CreateConnections();
 
-  virtual void CreateQtPartControl(QWidget *parent){};
+  virtual void CreateQtPartControl(QWidget*){};
 
   QThread* m_ScanPortsWorkerThread;
   QmitkTrackingDeviceConfigurationWidgetScanPortsWorker* m_ScanPortsWorker;

@@ -32,11 +32,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkVirtualTrackerWidget.h"
 #include "QmitkOpenIGTLinkWidget.h"
 
-namespace mitk {
+namespace mitk
+{
 
   IGTUIActivator::IGTUIActivator()
   {
-    MITK_INFO << "                                Konst.....................";
+  }
+
+  IGTUIActivator::~IGTUIActivator()
+  {
+  }
+
+  void IGTUIActivator::Load(us::ModuleContext*)
+  {
     m_DeviceWidgetCollection.RegisterAsMicroservice();
     //Add widgets of standard tracking devices
     m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), new QmitkNDIAuroraWidget);
@@ -45,27 +53,12 @@ namespace mitk {
     m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), new QmitkNPOptitrackWidget);
     m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), new QmitkVirtualTrackerWidget);
     m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::OpenIGTLinkTypeInformation::GetTrackingDeviceName(), new QmitkOpenIGTLinkWidget);
-
   }
 
-  IGTUIActivator::~IGTUIActivator()
+  void IGTUIActivator::Unload(us::ModuleContext*)
   {
-    MITK_INFO << "                                Dekonst.....................";
-  m_DeviceWidgetCollection.UnRegisterMicroservice();
+    m_DeviceWidgetCollection.UnRegisterMicroservice();
   }
-
-void IGTUIActivator::Load(us::ModuleContext* context)
-{
-
-  MITK_INFO << "                                load.....................";
-}
-
-void IGTUIActivator::Unload(us::ModuleContext*)
-{
-
-  MITK_INFO << "                                unload.....................";
-
-}
 
 }
 

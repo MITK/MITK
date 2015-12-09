@@ -14,37 +14,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkIGTActivator_H
-#define mitkIGTActivator_H
+#ifndef mitkIGTUIActivator_H
+#define mitkIGTUIActivator_H
 
 #include <usModuleActivator.h>
-#include <mitkTrackingDeviceTypeCollection.h>
+#include <mitkTrackingDeviceWidgetCollection.h>
 
-#include <memory>
-
-#include "mitkTrackingTypes.h"
-
-namespace mitk {
+namespace mitk
+{
 
   /** Documentation:
   *   \brief  The load function of this class is executed every time, the module is loaded.
   *           Attention: no static variables of any class in IGT Module are initialized at this moment!
   *   \ingroup IGT
   */
-class IGTExtActivator : public us::ModuleActivator
-{
-public:
-  IGTExtActivator();
-  virtual ~IGTExtActivator();
-  void Load(us::ModuleContext*context) override;
-  void Unload(us::ModuleContext* context) override;
+  class IGTUIActivator : public us::ModuleActivator
+  {
+    public:
+      IGTUIActivator();
+      virtual ~IGTUIActivator();
+      void Load(us::ModuleContext*) override;
+      void Unload(us::ModuleContext*) override;
 
-private:
+    private:
+      TrackingDeviceWidgetCollection m_DeviceWidgetCollection;
 
-  TrackingDeviceTypeCollection m_DeviceTypeCollection;
-
-};
-
+  };
 }
 
-#endif // mitkIGTActivator_H
+#endif // mitkIGTUIActivator_H

@@ -66,8 +66,6 @@ set(CPP_FILES
   TrackingDevices/mitkMicronTrackerTypeInformation.cpp
   TrackingDevices/mitkOpenIGTLinkTypeInformation.cpp
   TrackingDevices/mitkUnspecifiedTrackingTypeInformation.cpp
-
-  autoload/mitkIGTActivator.cpp
 )
 
 set(H_FILES

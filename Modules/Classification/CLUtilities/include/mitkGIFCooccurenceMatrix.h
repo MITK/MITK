@@ -20,18 +20,27 @@ namespace mitk
       /**
       * \brief Calculates the Cooccurence-Matrix based features for this class.
       */
-      virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature);
+      virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
 
       /**
       * \brief Returns a list of the names of all features that are calculated from this class
       */
-      virtual FeatureNameListType GetFeatureNames();
+      virtual FeatureNameListType GetFeatureNames() override;
 
       itkGetConstMacro(Range,double);
       itkSetMacro(Range, double);
+    itkGetConstMacro(Direction, unsigned int);
+    itkSetMacro(Direction, unsigned int);
+
+    struct GIFCooccurenceMatrixConfiguration
+    {
+      double range;
+      unsigned int direction;
+    };
 
     private:
-      double m_Range;
+    double m_Range;
+    unsigned int m_Direction;
   };
 
 }

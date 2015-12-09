@@ -23,7 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseData.h"
 
+#ifndef Q_MOC_RUN
 #include <boost/graph/adjacency_list.hpp>
+#endif
 
 namespace mitk {
 

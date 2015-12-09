@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkResampleImageFilter.h"
 #include "itkNrrdImageIO.h"
 
+using namespace std;
 
 typedef std::vector<std::string> FileListType;
 typedef itk::Image<double, 3> InputImageType;

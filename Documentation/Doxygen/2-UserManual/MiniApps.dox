@@ -3,14 +3,15 @@
 
 \section MiniAppExplainPageDescription What are MiniApps
 
-MiniApps are small compilations of command line tools. Each of these tools is designed to fulfill one simple task,
+MiniApps are small command line tools. Generally the purpose of each of these tools is designed to fulfill one simple task,
 e.g. resample an image or extract image statistics of a given region of interest (ROI).
 
 They are intended to provide command line access to a variety of features of MITK, thus facilitating batched processing of data.
 
 \section MiniAppExplainPageUsage Usage
 
-The MiniApps are built in a self-describing way, that is they follow the usual print out about parameters when called without any argumments, e.g.
+Each MiniApp should provide information about its usage. If it is called without parameters it will output help information about expected inputs, outputs and parameters.
+Below you can see the help output of the MitkGibbsTracking MiniApp:
 
 \code
 $./MitkGibbsTracking
@@ -23,7 +24,22 @@ $./MitkGibbsTracking
  -f, --noFlip, do not flip input image to match MITK coordinate convention (optional)
 \endcode
 
-They also follow the <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">Slicer Execution Model</a> in describing themselves via xml:
+\section MiniAppExplainPageWorkbenchIntegration Integrating a command line tool into MITK Workbench
+
+The executable file has be to be announced in MITK Workbench. This can be done in Preferences window:
+Click 'Window' -> 'Preferences', and select 'Command Line Modules'. You can add directories containing executable files or you can select single executable files.
+Click 'OK' button.
+The configured command line tools are now available via the drop-down box of the Command Line Modules tab.
+
+\warning The build configuration of your MiniApp should match the build configuration of your MITK application. This is especially relevant for developers. Combining a Release application and Debug MiniApp or vice versa might not work.
+
+\section MiniAppExplainPageAvailableList Available MiniApps
+
+\li \subpage DiffusionMiniApps
+
+\section MiniAppExplainPageTechnicalInformation Technical Information
+
+MiniApps follow the <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">Slicer Execution Model</a> in describing themselves via xml:
 
 \code
 $./GibbsTracking --xml
@@ -39,9 +55,5 @@ $./GibbsTracking --xml
 \endcode
 
 \note Full conformity is still a work in progress.
-
-\section MiniAppExplainPageAvailableList Available MiniApps
-
-\li \subpage DiffusionMiniApps
 
 */

@@ -27,20 +27,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkRegionOfInterestImageFilter.h>
 #include <mitkProportionalTimeGeometry.h>
 
-
 mitk::AutoCropImageFilter::AutoCropImageFilter()
-: m_BackgroundValue(0),
+  : m_BackgroundValue(0),
   m_MarginFactor(1.0),
   m_TimeSelector(nullptr),
   m_OverrideCroppingRegion(false)
 {
 }
 
-
 mitk::AutoCropImageFilter::~AutoCropImageFilter()
 {
 }
-
 
 template < typename TPixel, unsigned int VImageDimension>
 void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep)
@@ -133,7 +130,6 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   // GenerateInputRequestedRegion (there we just set the time)
   input->SetRequestedRegion(&m_InputRequestedRegion);
 
-
   // PART II: initialize output image
   unsigned int dimension = input->GetDimension();
   auto dimensions = new unsigned int [dimension];
@@ -178,7 +174,6 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   // re-initialize the slicedGeometry with the correct planeGeometry
   // in order to get a fully initialized SlicedGeometry3D
   slicedGeometry->InitializeEvenlySpaced( plane, inputGeometry->GetSpacing()[2], output->GetSlicedGeometry()->GetSlices() );
-
 
   mitk::TimeGeometry* timeSlicedGeometry = output->GetTimeGeometry();
   mitk::ProportionalTimeGeometry* propTimeGeometry = dynamic_cast<ProportionalTimeGeometry*>(timeSlicedGeometry);
@@ -242,10 +237,10 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       if (m_RegionIndex[i] >= static_cast<RegionType::IndexValueType>(inputMitk->GetDimension(i)))
       {
         itkExceptionMacro("Cropping index is not inside the image. "
-                       << std::endl << "Index:"
-                       << std::endl << m_CroppingRegion.GetIndex()
-                       << std::endl << "Size:"
-                       << std::endl << m_CroppingRegion.GetSize());
+          << std::endl << "Index:"
+          << std::endl << m_CroppingRegion.GetIndex()
+          << std::endl << "Size:"
+          << std::endl << m_CroppingRegion.GetSize());
       }
 
       if (m_RegionIndex[i] + m_RegionSize[i] >= inputMitk->GetDimension(i))
@@ -295,7 +290,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 
     for(unsigned int idx = 0; idx < timeSteps; ++idx)
     {
-       // if 4D image, update time step and itk image
+      // if 4D image, update time step and itk image
       if( idx > 0)
       {
         m_TimeSelector->SetTimeNr( idx );
@@ -345,7 +340,6 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
     m_CroppingRegion = origRegion;
   }
 }
-
 
 void mitk::AutoCropImageFilter::GenerateInputRequestedRegion()
 {

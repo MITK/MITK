@@ -14,7 +14,7 @@
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFCooccurenceMatrix::FeatureListType & featureList, double range)
+CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFCooccurenceMatrix::FeatureListType & featureList, mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrixConfiguration config)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<TPixel, VImageDimension> MaskType;
@@ -32,13 +32,31 @@ void
   auto oldOffsetsIterator = oldOffsets->Begin();
   while(oldOffsetsIterator != oldOffsets->End())
   {
+    bool continueOuterLoop = false;
     typename FilterType::OffsetType offset = oldOffsetsIterator->Value();
     for (unsigned int i = 0; i < VImageDimension; ++i)
     {
-      offset[i] *= range;
+      offset[i] *= config.range;
+      if (config.direction == i + 2 && offset[i] != 0)
+      {
+        continueOuterLoop = true;
+      }
     }
-    newOffset->push_back(offset);
+    if (config.direction == 1)
+    {
+      offset[0] = 0;
+      offset[1] = 0;
+      offset[2] = 1;
+      newOffset->push_back(offset);
+      break;
+    }
+
+
     oldOffsetsIterator++;
+    if (continueOuterLoop)
+      continue;
+    newOffset->push_back(offset);
+
   }
   filter->SetOffsets(newOffset);
 
@@ -77,14 +95,16 @@ void
   filter->SetInput(itkImage);
   filter->SetMaskImage(maskImage);
   filter->SetRequestedFeatures(requestedFeatures);
-  filter->SetPixelValueMinMax(minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+  filter->SetPixelValueMinMax(minMaxComputer->GetMinimum()-0.5,minMaxComputer->GetMaximum()+0.5);
+  //filter->SetPixelValueMinMax(-1024,3096);
+  //filter->SetNumberOfBinsPerAxis(5);
   filter->Update();
 
   auto featureMeans = filter->GetFeatureMeans ();
   auto featureStd = filter->GetFeatureStandardDeviations();
 
   std::ostringstream  ss;
-  ss << range;
+  ss << config.range;
   std::string strRange = ss.str();
   for (std::size_t i = 0; i < featureMeans->size(); ++i)
   {
@@ -197,7 +217,7 @@ void
 }
 
 mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrix():
-  m_Range(1.0)
+m_Range(1.0), m_Direction(0)
 {
 }
 
@@ -205,7 +225,11 @@ mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::Calculat
 {
   FeatureListType featureList;
 
-  AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,m_Range);
+  GIFCooccurenceMatrixConfiguration config;
+  config.direction = m_Direction;
+  config.range = m_Range;
+
+  AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
   return featureList;
 }

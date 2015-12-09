@@ -45,6 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 
+using namespace std;
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;

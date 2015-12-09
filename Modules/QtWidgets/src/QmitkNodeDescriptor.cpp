@@ -32,7 +32,7 @@ QmitkNodeDescriptor::QmitkNodeDescriptor( const QString& _ClassName, const QStri
   m_Separator->setSeparator(true);
 }
 
-QString QmitkNodeDescriptor::GetClassName() const
+QString QmitkNodeDescriptor::GetNameOfClass() const
 {
   return m_ClassName;
 }

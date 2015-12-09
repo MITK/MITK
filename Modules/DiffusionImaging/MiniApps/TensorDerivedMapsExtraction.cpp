@@ -34,6 +34,8 @@
 #include <itkNrrdImageIO.h>
 #include <itkDiffusionTensor3D.h>
 
+using namespace std;
+
 typedef short DiffusionPixelType;
 typedef double TTensorPixelType;
 

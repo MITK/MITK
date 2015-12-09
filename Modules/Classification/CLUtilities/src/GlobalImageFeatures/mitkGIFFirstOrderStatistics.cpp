@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderStatistics::FeatureListType & featureList)
+  CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderStatistics::FeatureListType & featureList, mitk::GIFFirstOrderStatistics::ParameterStruct params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<int, VImageDimension> MaskType;
@@ -51,14 +51,20 @@ void
   labelStatisticsImageFilter->SetInput( itkImage );
   labelStatisticsImageFilter->SetLabelInput(maskImage);
   labelStatisticsImageFilter->SetUseHistograms(true);
-  labelStatisticsImageFilter->SetHistogramParameters(256, minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+  if (params.m_UseCtRange)
+  {
+    labelStatisticsImageFilter->SetHistogramParameters(1024.5+3096.5, -1024.5,3096.5);
+  } else {
+    labelStatisticsImageFilter->SetHistogramParameters(params.m_HistogramSize, minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+  }
   labelStatisticsImageFilter->Update();
 
   // --------------- Range --------------------
   double range = labelStatisticsImageFilter->GetMaximum(1) - labelStatisticsImageFilter->GetMinimum(1);
   // --------------- Uniformity, Entropy --------------------
   double count = labelStatisticsImageFilter->GetCount(1);
-  double std_dev = labelStatisticsImageFilter->GetSigma(1);
+  //double std_dev = labelStatisticsImageFilter->GetSigma(1);
+  double uncorrected_std_dev = std::sqrt((count - 1) / count * labelStatisticsImageFilter->GetVariance(1));
   double mean = labelStatisticsImageFilter->GetMean(1);
   auto histogram = labelStatisticsImageFilter->GetHistogram(1);
   HIndexType index;
@@ -71,27 +77,39 @@ void
   double kurtosis = 0;
   double mean_absolut_deviation = 0;
   double skewness = 0;
+  double sum_prob = 0;
 
+  double Log2=log(2);
   for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
   {
     index[0] = i;
     double prob = histogram->GetFrequency(index);
+
+    if (prob < 0.1)
+      continue;
+
     double voxelValue = histogram->GetBinMin(0, i) +binWidth * 0.5;
 
+    sum_prob += prob;
     squared_sum += prob * voxelValue*voxelValue;
-    kurtosis += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-    skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-    mean_absolut_deviation = prob* std::abs(voxelValue - mean);
 
     prob /= count;
+    mean_absolut_deviation += prob* std::abs(voxelValue - mean);
+
+    kurtosis +=prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
+    skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
+
     uniformity += prob*prob;
     if (prob > 0)
-      entropy += prob * std::log(prob);
+    {
+      entropy += prob * std::log(prob) / Log2;
+    }
   }
+
   double rms = std::sqrt(squared_sum / count);
-  kurtosis = kurtosis / count / (std_dev * std_dev);
-  skewness = skewness / count / (std_dev * std_dev * std_dev);
-  mean_absolut_deviation = mean_absolut_deviation / count;
+  kurtosis = kurtosis / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev*uncorrected_std_dev);
+  skewness = skewness / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev);
+  //mean_absolut_deviation = mean_absolut_deviation;
   double coveredGrayValueRange = range / imageRange;
 
   featureList.push_back(std::make_pair("FirstOrder Range",range));
@@ -105,7 +123,7 @@ void
   featureList.push_back(std::make_pair("FirstOrder Covered Image Intensity Range",coveredGrayValueRange));
 
   featureList.push_back(std::make_pair("FirstOrder Minimum",labelStatisticsImageFilter->GetMinimum(1)));
-  featureList.push_back(std::make_pair("FirstOrder Maximum ",labelStatisticsImageFilter->GetMaximum(1)));
+  featureList.push_back(std::make_pair("FirstOrder Maximum",labelStatisticsImageFilter->GetMaximum(1)));
   featureList.push_back(std::make_pair("FirstOrder Mean",labelStatisticsImageFilter->GetMean(1)));
   featureList.push_back(std::make_pair("FirstOrder Variance",labelStatisticsImageFilter->GetVariance(1)));
   featureList.push_back(std::make_pair("FirstOrder Sum",labelStatisticsImageFilter->GetSum(1)));
@@ -114,7 +132,8 @@ void
   featureList.push_back(std::make_pair("FirstOrder No. of Voxel",labelStatisticsImageFilter->GetCount(1)));
 }
 
-mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics()
+mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics() :
+  m_HistogramSize(256), m_UseCtRange(false)
 {
 }
 
@@ -122,7 +141,11 @@ mitk::GIFFirstOrderStatistics::FeatureListType mitk::GIFFirstOrderStatistics::Ca
 {
   FeatureListType featureList;
 
-  AccessByItk_2(image, CalculateFirstOrderStatistics, mask, featureList);
+  ParameterStruct params;
+  params.m_HistogramSize = this->m_HistogramSize;
+  params.m_UseCtRange = this->m_UseCtRange;
+
+  AccessByItk_3(image, CalculateFirstOrderStatistics, mask, featureList, params);
 
   return featureList;
 }

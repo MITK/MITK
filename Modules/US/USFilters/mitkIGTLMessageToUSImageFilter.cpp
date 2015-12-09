@@ -24,9 +24,12 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
   m_upstream->Update();
 
   mitk::IGTLMessage* msg = m_upstream->GetOutput();
-
-  if (msg != nullptr && !msg->IsDataValid())
+  MITK_INFO << msg->GetIGTLMessageType();
+  MITK_INFO << (std::strcmp(msg->GetIGTLMessageType(), "IMAGE") != 0);
+  MITK_INFO << (msg != nullptr && (!msg->IsDataValid() || std::strcmp(msg->GetIGTLMessageType(), "IMAGE") != 0));
+  if (msg != nullptr && (!msg->IsDataValid() || std::strcmp(msg->GetIGTLMessageType(), "IMAGE") != 0))
   {
+    img = m_previousImage;
     return;
   }
 
@@ -150,7 +153,8 @@ void mitk::IGTLMessageToUSImageFilter::Initiate(mitk::Image::Pointer& img,
   img = mitk::Image::New();
   img->InitializeByItk(output.GetPointer());
   img->SetVolume(output->GetBufferPointer());
-  img->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(vtkMatrix);
+  //img->GetGeometry()->SetIndexToWorldTransformByVtkMatrix(vtkMatrix);
+  m_previousImage = img;
   vtkMatrix->Delete();
 
   float iorigin[3];

@@ -5,7 +5,7 @@
 \tableofcontents
 
 This page will give you an overview of creating your own command line tool that can be integrated into a MiniApp.
-If you don't know about MiniApps, you can read what MiniApps are at the \ref MiniAppExplainPage page.
+If you don't know about MiniApps, you can read about their purpose and use at \ref MiniAppExplainPage page.
 
 \section MiniAppCommandLineToolHowToPageDescription What's a MiniApp command line tool?
 
@@ -14,30 +14,18 @@ Additionally, a command line tool provides a XML representation of the configure
 
 \section MiniAppCommandLineToolHowToPageSetUp Setting up a command line tool
 
-This section describes the most important code parts of a command line tool using the \ref TensorReconstruction command line tool as an example.
+This section describes the most important code parts of a command line tool using the ExampleToUpperCaseMiniApp.cpp as an example. See \ref NewModulePage for a suggested structure of a new module and its MiniApps.
 
-First the main function of the command line tool is specified. This function is registered at the MiniAppManager via the macro defined in \ref MiniAppManager.h
+Each MiniApp contains its own main function.
 
-\code
-int TensorReconstruction(int argc, char* argv[])
-{
+\snippet ExampleToUpperCaseMiniApp.cpp main
 
-}
+Within the main function the first thing should be to configure the accepted arguments. This can be done using the mitkCommandLineParser.
 
-RegisterDiffusionMiniApp(TensorReconstruction);
-\endcode
+Our example accepts an input filename an output filename and an optional flag for verbose processing.
 
-Within the body of the main function the accepted arguments of the command line tool are specified via the addArgument method of the ctkCommandLineParser located in DiffusionImaging/MiniApps directory.
-
-The \ref TensorReconstruction command line tool requires an input file, an output file, and optionally accepts a threshold of type integer.
-
-\code
-ctkCommandLineParser parser;
-parser.setArgumentPrefix("--", "-");
-parser.addArgument("input", "i", ctkCommandLineParser::InputFile, "Input file", "input raw dwi (.dwi or .fsl/.fslgz)", us::Any(), false);
-parser.addArgument("outFile", "o", ctkCommandLineParser::OutputFile, "Output file", "output file", us::Any(), false);
-parser.addArgument("b0Threshold", "t", ctkCommandLineParser::Int, "b0 threshold", "baseline image intensity threshold", 0, true);
-\endcode
+\snippet ExampleToUpperCaseMiniApp.cpp create parser
+\snippet ExampleToUpperCaseMiniApp.cpp add arguments
 
 Following argument types are available for the addArgument method:
 \li String
@@ -47,30 +35,45 @@ Following argument types are available for the addArgument method:
 \li Float
 \li InputDirectory
 \li InputFile
+\li InputImage
 \li OutputDirectory
 \li OutputFile
 
 The distinction between InputFile/OutputFile and InputDirectory/OutputDirectory respectively ensures that the appropriate UI widget is chosen.
 The label string passed to the addArgument method is the label for the corresponding UI widget.
 
-After specification of allowed arguments the parser's parseArguments method is called. This method returns a mapping of long argument names and their values.
+After specification of allowed arguments the parser's parseArguments method is called.
 
+\snippet ExampleToUpperCaseMiniApp.cpp parse the arguments
+
+After all arguments have been parsed we can do the actual processing. In this case we read the file, convert the contained text to upper case and
+write the new data to the specified output location.
+
+\snippet ExampleToUpperCaseMiniApp.cpp do processing
+
+\subsection MiniAppCommandLineToolHowToPageSetUpExampleHelpOutput Example Help Output
+
+Running the ExampleToUpperCaseMiniApp without an argument or with wrong ones:
 \code
-map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
-if (parsedArgs.size() == 0)
-  return EXIT_FAILURE;
+./ExampleToUpperCaseMiniApp
 \endcode
 
-The following code snippet shows how argument values can be accessed and converted:
+... will emit the following help text:
 
-\code
-std::string inFileName = us::any_cast<string>(parsedArgs["input"]);
-std::string outFileName = us::any_cast<string>(parsedArgs["outFile"]);
+\verbatim
+Command Line Utility *To Upper Case* in Category *MITK-Examples*
+An example MiniApp that converts the contents of a test file to upper case.
+MBI
 
-int threshold = 0;
-if (parsedArgs.count("b0Threshold"))
-  threshold = us::any_cast<int>(parsedArgs["b0Threshold"]);
-\endcode
+Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.
+
+Optional parameters
+  -v, --verbose, Whether to produce verbose output (optional)
+
+Required I/O parameters
+  -i, --input, input file (.txt/.example)
+  -o, --output, where to save the output (.txt/.example)
+\endverbatim
 
 \section MiniAppCommandLineToolHowToPageXMLRepresentation Retrieving XML argument description
 
@@ -79,121 +82,59 @@ According to the specified command line arguments, a XML representation of the a
 In order to use the XML representation for automatic user interface generation additional information has to be provided for the parser.
 Please provide category, title, description and contributor as shown in code snippet below for the \ref TensorReconstruction command line tool:
 
-\code
-parser.setCategory("Preprocessing Tools");
-parser.setTitle("Tensor Reconstruction");
-parser.setDescription("Takes a .dwi, .fsl/.fslgz file as input and saves the computed reconstructed tensor to the specified file. It also allows for a threshold to be set, to exclude low b values from the reconstruction process.");
-parser.setContributor("MBI");
-\endcode
+\snippet ExampleToUpperCaseMiniApp.cpp create parser
 
 Note that in the generated UI the parameter widgets are contained in a group box. There is a default label ("Parameters") and a default description ("Groupbox containing parameters.") specified. The label of such a parameter group and the description can be set via the parser's changeParameterGroup method.
 The method must be called before adding the arguments.
 
-Running the \ref TensorReconstruction command line tool for MITK Diffusion MiniApp with argument "--xml" ...
+See \ref MiniAppExplainPageWorkbenchIntegration for information how to access your MiniApp from within the application instead of calling it directly from the command line.
+
+\subsection MiniAppCommandLineToolHowToPageXMLRepresentationExampleXMLOutput Example XML Output
+
+Running the ExampleToUpperCaseMiniApp with argument "--xml" ...
 \code
-./MitkDiffusionMiniApps TensorReconstruction --xml
+./ExampleToUpperCaseMiniApp --xml
 \endcode
 
 ... will emit following XML description:
 
-\code
-<executable>
-  <category>Preprocessing Tools</category>
-  <title>Tensor Reconstruction</title>
-  <description>Takes a .dwi, .fsl/.fslgz file as input and saves the computed reconstructed tensor to the specified file. It also allows for a threshold to be set, to exclude low b values from the reconstruction process.</description>
+\verbatim
+ <executable>
+  <category>MITK-Examples</category>
+  <title>To Upper Case</title>
+  <description>An example MiniApp that converts the contents of a test file to upper case.</description>
   <contributor>MBI</contributor>
   <parameters>
-    <label>Parameters</label>
-    <description>Groupbox containing parameters.</description>
+   <label>Parameters</label>
+   <description>Parameters</description>
     <file>
-      <name>input</name>
-      <label>Input file</label>
-      <description>input raw dwi (.dwi or .fsl/.fslgz)</description>
-      <longflag>input</longflag>
-      <flag>i</flag>
-      <channel>input</channel>
+     <name>input</name>
+     <description>input file (.txt/.example)</description>
+     <label>Input file</label>
+     <longflag>input</longflag>
+     <flag>i</flag>
+     <channel>input</channel>
     </file>
     <file>
-      <name>outFile</name>
-      <label>Output file</label>
-      <description>output file</description>
-      <longflag>outFile</longflag>
-      <flag>o</flag>
-      <channel>output</channel>
+     <name>output</name>
+     <description>where to save the output (.txt/.example)</description>
+     <label>Output file</label>
+     <longflag>output</longflag>
+     <flag>o</flag>
+     <channel>output</channel>
     </file>
-    <integer>
-      <name>b0Threshold</name>
-      <label>b0 threshold</label>
-      <description>baseline image intensity threshold</description>
-      <longflag>b0Threshold</longflag>
-      <flag>t</flag>
-    </integer>
+    <boolean>
+     <name>verbose</name>
+     <description>Whether to produce verbose output</description>
+     <label>Verbose Output</label>
+     <longflag>verbose</longflag>
+     <flag>v</flag>
+    </boolean>
   </parameters>
-</executable>
-\endcode
+ </executable>
+\endverbatim
 
 This XML description is used for automatic user interface generation in MITK Workbench. The generated user interface is depicted in the following screenshot:
-\imageMacro{generated_ui_tensor_reconstruction.png, "Generated UI of TensorReconstruction command line tool in MITK Workbench", 10}
-
-\section MiniAppCommandLineToolHowToPageWorkbenchIntegration Integrating a command line tool into MITK Workbench
-
-At current state of development MiniApps are not fully supported by the MITK Workbench.
-Nevertheless, there's a workaround for integrating command line tools via the Command Line Modules plug-in:
-
-Create an executable file (e.g. sh-file using Linux OS or bat-file using Windows OS) in the directory where your MiniApp binary is located.
-The sh-file for the \ref TensorReconstruction command line tool has following content:
-
-\code
-#!/bin/bash
-if [[ $1 == "--xml" || $1 == "--XML" ]];
-then
-  echo '
-    <executable>
-      <category>Preprocessing Tools</category>
-      <title>Tensor Reconstruction</title>
-      <description>Takes a .dwi, .fsl/.fslgz file as input and saves the computed reconstructed tensor to the specified file. It also allows for a threshold to be set, to exclude low b values from the reconstruction process.</description>
-      <contributor>MBI</contributor>
-      <parameters>
-        <label>Parameters</label>
-        <description>Groupbox containing parameters.</description>
-        <file>
-          <name>input</name>
-          <label>Input file</label>
-          <description>input raw dwi (.dwi or .fsl/.fslgz)</description>
-          <longflag>input</longflag>
-          <flag>i</flag>
-          <channel>input</channel>
-        </file>
-        <file>
-          <name>outFile</name>
-          <label>Output file</label>
-          <description>output file</description>
-          <longflag>outFile</longflag>
-          <flag>o</flag>
-          <channel>output</channel>
-        </file>
-        <integer>
-          <name>b0Threshold</name>
-          <label>b0 threshold</label>
-          <description>baseline image intensity threshold</description>
-          <longflag>b0Threshold</longflag>
-          <flag>t</flag>
-        </integer>
-      </parameters>
-    </executable>
-  '
-else
-  BASEDIR=$(dirname $0)
-  echo "Calling parameters" $*
-  $BASEDIR/MitkDiffusionMiniApps TensorReconstruction  $*
-fi
-\endcode
-
-For each command line tool the including MiniApp binary, the concrete command line tool name, and its XML output have to be specified.
-
-The executable file has be to be anncounced in MITK Workbench. This can be done in Preferences window:
-Click 'Window' -> 'Preferences', and select 'Command Line Modules'. You can add directories containing executable files or you can select single executable files.
-Click 'OK' button.
-The configured command line tools are now available via the drop-down box of the Command Line Modules tab.
+\imageMacro{generated_ui_example.png, "Generated UI of example command line tool in MITK Workbench", 10}
 
 */

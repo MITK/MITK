@@ -56,7 +56,7 @@ public:
   ///
   /// Returns a name for this class of DataNodes (e.g. "Image", "Image Mask", etc.)
   ///
-  virtual QString GetClassName() const;
+  virtual QString GetNameOfClass() const;
   ///
   /// Returns an Icon for this class of DataNodes
   ///

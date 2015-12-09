@@ -23,6 +23,8 @@
 
 #include "itkSignedDanielssonDistanceMapImageFilter.h"
 
+using namespace std;
+
 typedef itk::Image<unsigned char,3> BinaryType;
 typedef itk::Image<mitk::ScalarType,3> ResultType;
 

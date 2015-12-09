@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+using namespace std;
 
 /*!
 \brief Calculate angular error between two sets of directions stored in multiple 3D vector images where each pixel corresponds to a vector (itk::Image< itk::Vector< float, 3>, 3 >)

@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkMergeDiffusionImagesFilter.h"
 #include <mitkIOUtil.h>
 
+using namespace std;
+
 static mitk::StringList& GetInputFilenames()
 {
   static mitk::StringList inputs;

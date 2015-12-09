@@ -44,6 +44,11 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
           boolString = "true";
         element->SetAttribute("fixed", boolString.c_str());
 
+        std::string boolStringFltImage("false");
+        if (lw.IsFloatingValues() == true)
+          boolStringFltImage = "true";
+        element->SetAttribute("isFloatingImage", boolStringFltImage.c_str());
+
         auto  child = new TiXmlElement("CurrentSettings");
         element->LinkEndChild( child );
           child->SetDoubleAttribute("level", lw.GetLevel());
@@ -72,6 +77,9 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
       bool isFixed(false);
       if (element->Attribute("fixed"))
         isFixed = std::string(element->Attribute("fixed")) == "true";
+      bool isFloatingImage(false);
+      if (element->Attribute("isFloatingImage"))
+        isFloatingImage = std::string(element->Attribute("isFloatingImage")) == "true";
 
       double level = 0;
       double window = 0;
@@ -91,13 +99,12 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
         if ( child->QueryDoubleAttribute( "min", &minRange ) != TIXML_SUCCESS ) return nullptr;
         if ( child->QueryDoubleAttribute( "max", &maxRange ) != TIXML_SUCCESS ) return nullptr;
 
-
-
       LevelWindow lw;
       lw.SetRangeMinMax( minRange, maxRange );
       lw.SetDefaultLevelWindow( defaultLevel, defaultWindow );
       lw.SetLevelWindow( level, window );
       lw.SetFixed( isFixed );
+      lw.SetFloatingValues(isFloatingImage);
 
       return LevelWindowProperty::New( lw ).GetPointer();
     }

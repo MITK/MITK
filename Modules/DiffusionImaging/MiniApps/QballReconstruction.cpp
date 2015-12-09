@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 
 using namespace mitk;
+using namespace std;
 
 /**
  * Perform Q-ball reconstruction using a spherical harmonics basis

@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include <itkImageRegionIterator.h>
 
+using namespace std;
+
 int main(int argc, char *argv[]) {
     // Setup CLI Module parsable interface
     mitkCommandLineParser parser;

@@ -270,6 +270,7 @@ private:
   bool m_DrawName;
   bool m_DrawDashed;
   bool m_DrawHelperDashed;
+  bool m_AnnotationsShadow;
 
   std::string m_AnnotationFontFamily;
   bool m_DrawAnnotationBold;
@@ -297,6 +298,7 @@ private:
   float m_MarkerlineOpacity[3];
   float m_MarkerColor[3][3];
   float m_MarkerOpacity[3];
+  float m_AnnotationColor[3][3];
 
   // Bool flag that represents whether or not the DataNode has been modified.
   bool m_NodeModified;

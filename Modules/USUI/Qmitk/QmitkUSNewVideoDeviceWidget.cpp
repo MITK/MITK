@@ -25,10 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // itk headers
 
 const std::string QmitkUSNewVideoDeviceWidget::VIEW_ID =
-    "org.mitk.views.QmitkUSNewVideoDeviceWidget";
+"org.mitk.views.QmitkUSNewVideoDeviceWidget";
 
 QmitkUSNewVideoDeviceWidget::QmitkUSNewVideoDeviceWidget(QWidget* parent,
-                                                         Qt::WindowFlags f)
+  Qt::WindowFlags f)
   : QWidget(parent, f)
 {
   m_Controls = NULL;
@@ -55,19 +55,19 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
   if (m_Controls)
   {
     connect(m_Controls->m_BtnDone, SIGNAL(clicked()), this,
-            SLOT(OnClickedDone()));
+      SLOT(OnClickedDone()));
     connect(m_Controls->m_BtnCancel, SIGNAL(clicked()), this,
-            SLOT(OnClickedCancel()));
+      SLOT(OnClickedCancel()));
     connect(m_Controls->m_RadioDeviceSource, SIGNAL(clicked()), this,
-            SLOT(OnDeviceTypeSelection()));
+      SLOT(OnDeviceTypeSelection()));
     connect(m_Controls->m_RadioFileSource, SIGNAL(clicked()), this,
-            SLOT(OnDeviceTypeSelection()));
+      SLOT(OnDeviceTypeSelection()));
     connect(m_Controls->m_RadioOIGTLClientSource, SIGNAL(clicked()), this,
-            SLOT(OnDeviceTypeSelection()));
+      SLOT(OnDeviceTypeSelection()));
     connect(m_Controls->m_RadioOIGTLServerSource, SIGNAL(clicked()), this,
-            SLOT(OnDeviceTypeSelection()));
+      SLOT(OnDeviceTypeSelection()));
     connect(m_Controls->m_OpenFileButton, SIGNAL(clicked()), this,
-            SLOT(OnOpenFileButtonClicked()));
+      SLOT(OnOpenFileButtonClicked()));
   }
 }
 
@@ -82,17 +82,17 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
   if (m_Controls->m_RadioDeviceSource->isChecked())
   {
     newDevice = mitk::USVideoDevice::New(
-        m_Controls->m_DeviceSelector->value(),
-        m_Controls->m_Manufacturer->text().toStdString(),
-        m_Controls->m_Model->text().toStdString());
+      m_Controls->m_DeviceSelector->value(),
+      m_Controls->m_Manufacturer->text().toStdString(),
+      m_Controls->m_Model->text().toStdString());
     newDevice->SetComment(m_Controls->m_Comment->text().toStdString());
   }
   else if (m_Controls->m_RadioFileSource->isChecked())
   {
     newDevice = mitk::USVideoDevice::New(
-        m_Controls->m_FilePathSelector->text().toStdString(),
-        m_Controls->m_Manufacturer->text().toStdString(),
-        m_Controls->m_Model->text().toStdString());
+      m_Controls->m_FilePathSelector->text().toStdString(),
+      m_Controls->m_Manufacturer->text().toStdString(),
+      m_Controls->m_Model->text().toStdString());
     newDevice->SetComment(m_Controls->m_Comment->text().toStdString());
   }
   else if (m_Controls->m_RadioOIGTLClientSource->isChecked())
@@ -102,7 +102,8 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
 
     // Create a new USIGTLDevice. The last parameter tells the device that it should be a client.
     mitk::USIGTLDevice::Pointer device =
-        mitk::USIGTLDevice::New("OIGTL", "Provider Client", host, port, false);
+      mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
+      m_Controls->m_Model->text().toStdString(), host, port, false);
     device->Initialize();
     emit Finished();
     // The rest of this method does stuff that is specific to USVideoDevices,
@@ -116,7 +117,8 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
 
     // Create a new USIGTLDevice. The last parameter tells the device that it should be a server.
     mitk::USIGTLDevice::Pointer device =
-        mitk::USIGTLDevice::New("OIGTL", "Provider Server", host, port, true);
+      mitk::USIGTLDevice::New(m_Controls->m_Manufacturer->text().toStdString(),
+      m_Controls->m_Model->text().toStdString(), host, port, true);
     device->Initialize();
     emit Finished();
     // The rest of this method does stuff that is specific to USVideoDevices,
@@ -126,8 +128,8 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
 
   // get USImageVideoSource from new device
   mitk::USImageVideoSource::Pointer imageSource =
-      dynamic_cast<mitk::USImageVideoSource*>(
-          newDevice->GetUSImageSource().GetPointer());
+    dynamic_cast<mitk::USImageVideoSource*>(
+    newDevice->GetUSImageSource().GetPointer());
   if (!imageSource)
   {
     MITK_ERROR << "There is no USImageVideoSource at the current device.";
@@ -161,17 +163,17 @@ void QmitkUSNewVideoDeviceWidget::OnClickedCancel()
 void QmitkUSNewVideoDeviceWidget::OnDeviceTypeSelection()
 {
   m_Controls->m_FilePathSelector->setEnabled(
-      m_Controls->m_RadioFileSource->isChecked());
+    m_Controls->m_RadioFileSource->isChecked());
   m_Controls->m_DeviceSelector->setEnabled(
-      m_Controls->m_RadioDeviceSource->isChecked());
+    m_Controls->m_RadioDeviceSource->isChecked());
   m_Controls->m_OIGTLClientHost->setEnabled(
-      m_Controls->m_RadioOIGTLClientSource->isChecked());
+    m_Controls->m_RadioOIGTLClientSource->isChecked());
   m_Controls->m_OIGTLClientPort->setEnabled(
-      m_Controls->m_RadioOIGTLClientSource->isChecked());
+    m_Controls->m_RadioOIGTLClientSource->isChecked());
   m_Controls->m_OIGTLServerHost->setEnabled(
-      m_Controls->m_RadioOIGTLServerSource->isChecked());
+    m_Controls->m_RadioOIGTLServerSource->isChecked());
   m_Controls->m_OIGTLServerPort->setEnabled(
-      m_Controls->m_RadioOIGTLServerSource->isChecked());
+    m_Controls->m_RadioOIGTLServerSource->isChecked());
 }
 
 void QmitkUSNewVideoDeviceWidget::OnOpenFileButtonClicked()
@@ -194,11 +196,11 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
 {
   // If no VideoDevice is given, throw an exception
   if (device->GetDeviceClass().compare("org.mitk.modules.us.USVideoDevice") !=
-      0)
+    0)
   {
     // TODO Alert if bad path
     mitkThrow() << "NewVideoDeviceWidget recieved an incompatible device type "
-                   "to edit. Type was: " << device->GetDeviceClass();
+      "to edit. Type was: " << device->GetDeviceClass();
   }
   m_TargetDevice = static_cast<mitk::USVideoDevice*>(device.GetPointer());
   m_Active = true;
@@ -213,11 +215,11 @@ void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 /////////////////////// HOUSEHOLDING CODE ///////////////////////////////
 
 QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(
-    mitk::USDevice::Pointer device)
+  mitk::USDevice::Pointer device)
 {
   QListWidgetItem* result = new QListWidgetItem;
   std::string text =
-      device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
+    device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
   result->setText(text.c_str());
   return result;
 }

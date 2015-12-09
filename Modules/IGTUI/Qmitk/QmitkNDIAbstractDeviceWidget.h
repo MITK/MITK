@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkIGTUIExports.h"
 #include "QmitkAbstractTrackingDeviceWidget.h"
 
-#include "QmitkTrackingDeviceConfigurationWidgetScanPortsWorker.h";
+#include "QmitkTrackingDeviceConfigurationWidgetScanPortsWorker.h"
 
 //itk headers
 

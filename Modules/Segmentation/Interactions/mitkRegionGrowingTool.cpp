@@ -52,6 +52,7 @@ MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, RegionGrowingTool, "Region growing tool
 
 mitk::RegionGrowingTool::RegionGrowingTool()
     :FeedbackContourTool("PressMoveRelease"),
+      m_SeedValue(0),
       m_LowerThreshold(200),
       m_UpperThreshold(200),
       m_InitialLowerThreshold(200),
@@ -113,21 +114,80 @@ void mitk::RegionGrowingTool::Deactivated()
 }
 
 template <typename TPixel, unsigned int imageDimension>
-void mitk::RegionGrowingTool::IsInsideSegmentation(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, bool result)
+void mitk::RegionGrowingTool::GetPixelNeighborhood(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, ScalarType* result, unsigned int neighborhood)
+{
+    // maybe assert that image dimension is only 2 or 3?
+    int neighborhoodInt = (int) neighborhood;
+    TPixel averageValue(0);
+    unsigned int numberOfPixels = (2*neighborhood + 1) * (2*neighborhood + 1);
+    if (imageDimension == 3)
+    {
+        numberOfPixels *= (2*neighborhood + 1);
+    }
+
+    MITK_INFO << "Getting neighborhood of " << numberOfPixels << " pixels around " << index;
+
+    itk::Index<imageDimension> currentIndex;
+
+    for (int i = (0 - neighborhoodInt); i <= neighborhoodInt; ++i)
+    {
+        currentIndex[0] = index[0] + i;
+
+        for (int j = (0 - neighborhoodInt); j <= neighborhoodInt; ++j)
+        {
+            currentIndex[1] = index[1] + j;
+
+            if (imageDimension == 3)
+            {
+                for (int k = (0 - neighborhoodInt); k <= neighborhoodInt; ++k)
+                {
+                    currentIndex[2] = index[2] + k;
+
+                    if (itkImage->GetLargestPossibleRegion().IsInside(currentIndex))
+                    {
+                        averageValue += itkImage->GetPixel(currentIndex);
+                    }
+                    else
+                    {
+                        numberOfPixels -= 1;
+                    }
+                }
+            }
+            else
+            {
+                if (itkImage->GetLargestPossibleRegion().IsInside(currentIndex))
+                {
+                    averageValue += itkImage->GetPixel(currentIndex);
+                }
+                else
+                {
+                    numberOfPixels -= 1;
+                }
+            }
+        }
+    }
+
+    *result = (ScalarType) averageValue;
+    *result /= numberOfPixels;
+}
+
+template <typename TPixel, unsigned int imageDimension>
+void mitk::RegionGrowingTool::IsInsideSegmentation(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, bool* result)
 {
     if (itkImage->GetPixel(index) > 0)
     {
-        result = true;
+        *result = true;
     }
     else
     {
-        result = false;
+        *result = false;
     }
 }
 
 template<typename TPixel, unsigned int imageDimension>
 void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> seedIndex, ScalarType lowerThreshold, ScalarType upperThreshold)
 {
+    MITK_INFO << "Starting region growing at index " << seedIndex << " with lower threshold " << lowerThreshold << " and upper threshold " << upperThreshold;
     typedef itk::Image<TPixel, imageDimension> InputImageType;
 //    typedef typename InputImageType::IndexType IndexType;
     typedef itk::ConnectedThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
@@ -155,14 +215,16 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
 
     // store result and preview
     mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput(), m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep()))->Clone();
+    mitk::IOUtil::Save(resultImage, "/home/jenspetersen/Desktop/result.nrrd");
     //  mitk::LabelSetImage::Pointer resultLabelSetImage = mitk::LabelSetImage::New();
     //  resultLabelSetImage->InitializeByLabeledImage(resultImage);
     //  m_ResultNode->SetData(resultLabelSetImage);
-    mitk::ImageToContourModelFilter::Pointer contourExtractor;
+    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
     contourExtractor->SetInput(resultImage);
     contourExtractor->Update();
-    ContourModel::Pointer resultContour = contourExtractor->GetOutput();
-    FeedbackContourTool::SetFeedbackContour(resultContour);
+    ContourModel::Pointer resultContourInIndexCoordinates = contourExtractor->GetOutput();
+    ContourModel::Pointer resultContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice(m_ReferenceSlice->GetGeometry(), resultContourInIndexCoordinates);
+    FeedbackContourTool::SetFeedbackContour(resultContourInWorldCoordinates);
     FeedbackContourTool::SetFeedbackContourVisible(true);
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
 }
@@ -213,6 +275,14 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
             indexInWorkingSlice2D[0] = indexInWorkingSlice[0];
             indexInWorkingSlice2D[1] = indexInWorkingSlice[1];
 
+            mitk::BaseGeometry::Pointer referenceSliceGeometry;
+            referenceSliceGeometry = m_ReferenceSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+            itk::Index<3> indexInReferenceSlice;
+            itk::Index<2> indexInReferenceSlice2D;
+            referenceSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), indexInReferenceSlice);
+            indexInReferenceSlice2D[0] = indexInReferenceSlice[0];
+            indexInReferenceSlice2D[1] = indexInReferenceSlice[1];
+
             //                  Point3D projectedPointIn3D;
             //                  workingSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), projectedPointIn3D);
             //                  // need itk::Index for IsIndexInside method, switch from center-based to corner-based (or vice versa, not sure)
@@ -246,16 +316,36 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
                 //        CastToIpPicDescriptor(temporarySlice, workingPicSlice);
 
                 // 3. determine the pixel value under the last click to see if we need to add or subtract
-                bool inside(false);
-                AccessFixedDimensionByItk_2(m_WorkingSlice, IsInsideSegmentation, 2, indexInWorkingSlice2D, inside);
+                bool inside(true);
+                AccessFixedDimensionByItk_2(m_WorkingSlice, IsInsideSegmentation, 2, indexInWorkingSlice2D, &inside);
 
                 if (inside)
                 {
 //                    OnMousePressedInside();
+                    MITK_INFO << "Inside segmentation";
                     return;
                 }
                 else
                 {
+                    MITK_INFO << "Outside of segmentation";
+
+                    // Get seed neighborhood
+                    ScalarType averageValue(0);
+                    AccessFixedDimensionByItk_3(m_ReferenceSlice, GetPixelNeighborhood, 2, indexInReferenceSlice2D, &averageValue, 1);
+                    m_SeedValue = averageValue;
+                    MITK_INFO << "Seed value is " << m_SeedValue;
+
+                    // Get level window settings
+                    LevelWindow lw(0, 500); // default window 0 to 500, can we do something smarter here?
+                    m_ToolManager->GetReferenceData(0)->GetLevelWindow(lw); // will fill lw if levelwindow property is present, otherwise won't touch it.
+                    ScalarType currentVisibleWindow = lw.GetWindow();
+                    MITK_INFO << "Level window width is " << currentVisibleWindow;
+                    m_InitialLowerThreshold = m_SeedValue - currentVisibleWindow / 20.0; // again, 20 is arbitrary, is there a better alternative?
+                    m_InitialUpperThreshold = m_SeedValue + currentVisibleWindow / 20.0;
+                    m_LowerThreshold = m_InitialLowerThreshold;
+                    m_UpperThreshold = m_InitialUpperThreshold;
+
+                    // Perform region growing
                     AccessFixedDimensionByItk_3(m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, m_LowerThreshold, m_UpperThreshold)
                 }
 

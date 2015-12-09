@@ -53,7 +53,7 @@ void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc(
   {
     QString devName = QString("/dev/ttyS%1").arg(i);
     mitk::TrackingDeviceType scannedPort = ScanPort(devName);
-    if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID))
+    if (!(scannedPort == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()))
     {
       result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
       Port = i;
@@ -65,7 +65,7 @@ void QmitkTrackingDeviceConfigurationWidgetScanPortsWorker::ScanPortsThreadFunc(
   {
     QString devName = QString("/dev/ttyUSB%1").arg(i);
     mitk::TrackingDeviceType scannedPort = ScanPort(devName);
-    if (!(scannedPort == mitk::TRACKING_DEVICE_IDENTIFIER_INVALID))
+    if (!(scannedPort == mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName()))
     {
       result += "<br>" + devName + ": " + QString::fromStdString(scannedPort);
       Port = i;

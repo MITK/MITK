@@ -275,9 +275,6 @@ static void EnsureDataImageInCollection(mitk::DataCollection::Pointer collection
 void
   mitk::LRDensityEstimation::WeightsForAll(mitk::DataCollection::Pointer train, mitk::DataCollection::Pointer test)
 {
-  typedef itk::Image<unsigned char, 3> MaskImageType;
-  typedef itk::Image<double , 3> FeatureImageType;
-
   /// Ensuring that weighting image is present in data set.
   EnsureDataImageInCollection(train, m_TrainMask, m_WeightName);
 

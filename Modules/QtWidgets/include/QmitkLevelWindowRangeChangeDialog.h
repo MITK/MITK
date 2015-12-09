@@ -32,13 +32,13 @@ public:
 
   QmitkLevelWindowRangeChangeDialog(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
-  int getLowerLimit();
+  double getLowerLimit();
 
-  int getUpperLimit();
+  double getUpperLimit();
 
-  void setLowerLimit( int rangeMin );
+  void setLowerLimit( double rangeMin );
 
-  void setUpperLimit( int rangeMax );
+  void setUpperLimit( double rangeMax );
 
 protected slots:
 

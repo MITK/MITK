@@ -228,7 +228,7 @@ void mitk::ProportionalTimeGeometry::Initialize (BaseGeometry* geometry, TimeSte
   m_StepDuration = 1.0;
   if (timeSteps < 2)
   {
-    m_FirstTimePoint = -std::numeric_limits<double>::max();
+    m_FirstTimePoint = -std::numeric_limits<mitk::TimePointType>::max();
     m_StepDuration = std::numeric_limits<mitk::TimePointType>().infinity();
   }
 
@@ -269,4 +269,20 @@ void mitk::ProportionalTimeGeometry::PrintSelf(std::ostream& os, itk::Indent ind
     os << "NULL" << std::endl;
   else
     GetGeometryForTimeStep(0)->Print(os, indent);
+}
+
+bool mitk::Equal(const ProportionalTimeGeometry& leftHandSide, const ProportionalTimeGeometry& rightHandSide, ScalarType eps, bool verbose)
+{
+  bool result = mitk::Equal( static_cast<const TimeGeometry&>(leftHandSide),
+                             static_cast<const TimeGeometry&>(rightHandSide),
+                             eps,
+                             verbose);
+
+  if (!result) // early out if base class already is unhappy
+    return false;
+
+  // base class test already covers all aspects that could differ
+  // no need to test anything more.
+
+  return result;
 }

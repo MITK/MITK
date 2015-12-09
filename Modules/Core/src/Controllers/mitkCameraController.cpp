@@ -42,11 +42,11 @@ mitk::ScalarType mitk::CameraController::ComputeMaxParallelScale()
   double dispHeight = this->GetRenderer()->GetViewportSize()[1]; //in pixel!
   double dispWidth = this->GetRenderer()->GetViewportSize()[0];
 
-  //To get the right zooming factor, we need to set the (half) heigth to the vtk camera using SetParallelScale.
+  //To get the right zooming factor, we need to set the (half) height to the vtk camera using SetParallelScale.
   //However, it could be, that our picture is so wide or the display so small, that we cannot take the height of the picture.
   //For a wide picture, we have to take the width and adapt the width so that our image fits to the screen.
   //But we can only set the height. Therefore, if the width is the limiting factor, we need to get the ratio of scaling
-  //for the width and multiply it with the height, so that we hav a modified height and set this one. Belive us, we figured it out...
+  //for the width and multiply it with the height, so that we have a modified height and set this one. Believe us, we figured it out...
   if ((dispWidth / widthInMM) < (dispHeight / heightInMM))
   {
     heightInMM = widthInMM / dispWidth * dispHeight;
@@ -193,6 +193,8 @@ void mitk::CameraController::MoveCameraToPoint(const mitk::Point2D& planePoint)
 {
   Point2D moveToPoint = planePoint;
   AdjustCameraToPlane(moveToPoint);
+
+  this->Modified();
 }
 
 void mitk::CameraController::MoveBy(const mitk::Vector2D &moveVectorInMM)
@@ -262,7 +264,7 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 1, 0); //set the view-up for the camera
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(_planePoint[0], _planePoint[1], 900000);
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(_planePoint[0], _planePoint[1], 0);
-      //Transform the camera to the current position (transveral, coronal and saggital plane).
+      //Transform the camera to the current position (transversal, coronal and sagittal plane).
       //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
       //(Without not all three planes would be visible).
       vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
@@ -297,7 +299,7 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
       matrix->SetElement(3, 3, 1.0);
 
       trans->SetMatrix(matrix);
-      //Transform the camera to the current position (transveral, coronal and saggital plane).
+      //Transform the camera to the current position (transversal, coronal and sagittal plane).
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
     }
   }
@@ -318,4 +320,18 @@ void mitk::CameraController::Fit()
     planePoint[1] = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(1)*0.5;
     MoveCameraToPoint(planePoint);
   }
+}
+
+void mitk::CameraController::SetScaleFactorInMMPerDisplayUnit( ScalarType scale )
+{
+  if ( this->GetRenderer()->GetMapperID() != BaseRenderer::Standard2D )
+  {
+    return;
+  }
+
+  this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(
+    this->GetRenderer()->GetViewportSize()[1] * scale * 0.5 );
+
+  this->Modified();
+
 }

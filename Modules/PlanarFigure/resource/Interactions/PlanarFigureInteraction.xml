@@ -78,6 +78,7 @@
 
     <transition event_class="InteractionKeyEvent" event_variant="StdDelete" target="Start" > <!-- delete figure -->
       <condition name="figure_is_selected" />
+      <condition name="figure_can_be_deleted" />
       <action name="delete_figure" />
     </transition>
   </state>

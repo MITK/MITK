@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 #include "mitkGeometry3D.h"
+#include "mitkProportionalTimeGeometry.h"
 #include "mitkGeometryData.h"
 
 #include "mitkIOUtil.h"
@@ -40,13 +41,16 @@ class mitkGeometryDataIOTestSuite : public mitk::TestFixture
     MITK_TEST(StoreSpacing);
     MITK_TEST(StoreBounds);
     MITK_TEST(StoreTransform);
+    MITK_TEST(StoreProportionalTimeGeometry);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::GeometryData::Pointer m_GeometryData;
   mitk::Geometry3D::Pointer m_Geom3D;
+  mitk::ProportionalTimeGeometry::Pointer m_TimeGeometry;
 
   mitk::GeometryData::Pointer m_ReadGeometryData;
   mitk::Geometry3D::Pointer m_ReadGeom3D;
+  mitk::ProportionalTimeGeometry::Pointer m_ReadProportionalTimeGeom;
 
 public:
 
@@ -58,6 +62,9 @@ public:
     m_GeometryData->SetGeometry( m_Geom3D ); // does copy!? doc says otherwise
     // --> we reference and use the clone, not the original!
     m_Geom3D = static_cast<mitk::Geometry3D*>( m_GeometryData->GetGeometry() );
+
+    m_TimeGeometry = dynamic_cast<mitk::ProportionalTimeGeometry*> (m_GeometryData->GetTimeGeometry());
+    CPPUNIT_ASSERT(m_TimeGeometry.IsNotNull());
   }
 
   void tearDown() override
@@ -66,12 +73,12 @@ public:
     m_Geom3D = nullptr;
     m_ReadGeometryData = nullptr;
     m_ReadGeom3D = nullptr;
+    m_ReadProportionalTimeGeom = nullptr;
   }
 
   void StoreDefaultGeometry3D()
   {
-    // TODO
-    //m_Geom3D-> this and that
+    // m_Geom3D already prepared in setUp()
     ASSERT_Geometry3D_WriteReadLoop_Works();
   }
 
@@ -158,37 +165,87 @@ public:
     ASSERT_Geometry3D_WriteReadLoop_Works();
   }
 
+  void WriteAndRead_m_GeometryData()
+  {
+    // temp path
+    std::string tmpPath = mitk::IOUtil::CreateTemporaryDirectory("GeomDataIOTest_XXXXXX");
+
+    // let IOUtil find a good file extension
+    std::string filename("geometrydata_geometry3d");
+    std::string extension( mitk::IOMimeTypes::GEOMETRY_DATA_MIMETYPE().GetExtensions().front() );
+
+    // don't specify the extension, expect that there is no other writer
+    // TODO Other than documented, Save does not add the extension. Anything missing in my MIMETYPE??
+    CPPUNIT_ASSERT_NO_THROW( mitk::IOUtil::Save( m_GeometryData, tmpPath + "/" + filename + "." + extension ) );
+
+    // read into member
+    std::vector<mitk::BaseData::Pointer> loadedData = mitk::IOUtil::Load( tmpPath + "/" + filename + "." + extension );
+    CPPUNIT_ASSERT_MESSAGE("IOUtil could read something (and just one)", loadedData.size() == 1 );
+
+    m_ReadGeometryData = dynamic_cast< mitk::GeometryData* >( loadedData.front().GetPointer() );
+    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ GeometryData", m_ReadGeometryData.IsNotNull() );
+
+    m_ReadGeom3D = dynamic_cast< mitk::Geometry3D* >( m_ReadGeometryData->GetGeometry() );
+    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ Geometry3D", m_ReadGeom3D.IsNotNull() );
+
+    m_ReadProportionalTimeGeom = dynamic_cast< mitk::ProportionalTimeGeometry* >( m_ReadGeometryData->GetTimeGeometry() );
+    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ ProportionalTimeGeometry", m_ReadProportionalTimeGeom.IsNotNull() );
+  }
+
   void ASSERT_Geometry3D_WriteReadLoop_Works()
   {
-      // temp path
-      std::string tmpPath = mitk::IOUtil::CreateTemporaryDirectory("GeomDataIOTest_XXXXXX");
+    WriteAndRead_m_GeometryData();
+    // Doc of mitk::Equal for BaseGeometry says
+    // "The function compares the spacing, origin, axis vectors, extents, the matrix of the
+    //  IndexToWorldTransform(element wise), the bounding(element wise) and the ImageGeometry flag."
+    // This seems pretty much everything that we can have in a Geometry3D..
+    CPPUNIT_ASSERT_MESSAGE("Geometry3D > file > Geometry3D keeps geometry", mitk::Equal(*m_Geom3D, *m_ReadGeom3D, 0.000001, true));
+    // Tolerance: Storing huge values 9.18274e+008 does not work at the precision of mitk::eps
+    //            So the author of this test judged above tolerance sufficient. If more is
+    //            required we need to inspect in more detail.
+  }
 
-      // let IOUtil find a good file extension
-      std::string filename("geometrydata_geometry3d");
-      std::string extension( mitk::IOMimeTypes::GEOMETRY_DATA_MIMETYPE().GetExtensions().front() );
+  void StoreProportionalTimeGeometry()
+  {
+    // Set Time Geometry
+    m_TimeGeometry->ClearAllGeometries(); // remove default filling from setUp();
 
-      // don't specify the extension, expect that there is no other writer
-      // TODO Other than documented, Save does not add the extension. Anything missing in my MIMETYPE??
-      CPPUNIT_ASSERT_NO_THROW( mitk::IOUtil::Save( m_GeometryData, tmpPath + "/" + filename + "." + extension ) );
+    for (int t = 0; t < 4; ++t)
+    {
+      // add new time steps
+      mitk::Geometry3D::Pointer timestepGeometry = mitk::Geometry3D::New();
+      vtkSmartPointer<vtkMatrix4x4> vtk_matrix = vtkSmartPointer<vtkMatrix4x4>::New();
+      for ( int i = 0; i != 4; ++i )
+      {
+        for ( int j = 0; j != 4; ++j )
+        {
+          (*vtk_matrix)[i][j] = t + (i + j) / 8.0; // just insignificant values
+        }
+      }
 
-      // read into member
-      std::vector<mitk::BaseData::Pointer> loadedData = mitk::IOUtil::Load( tmpPath + "/" + filename + "." + extension );
-      CPPUNIT_ASSERT_MESSAGE("IOUtil could read something (and just one)", loadedData.size() == 1 );
+      if (t % 2 == 0) // invert every second one
+        vtk_matrix->Invert();
 
-      m_ReadGeometryData = dynamic_cast< mitk::GeometryData* >( loadedData.front().GetPointer() );
-      CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ GeometryData", m_ReadGeometryData.IsNotNull() );
+      timestepGeometry->SetIndexToWorldTransformByVtkMatrix(vtk_matrix);
+      m_TimeGeometry->SetTimeStepGeometry(timestepGeometry, t);
+    }
 
-      m_ReadGeom3D = dynamic_cast< mitk::Geometry3D* >( m_ReadGeometryData->GetGeometry() );
-      CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ Geometry3D", m_ReadGeom3D.IsNotNull() );
+    // time steps are handled as ScalarType, so use some negative values
+    m_TimeGeometry->SetFirstTimePoint(-5017.20);
+    m_TimeGeometry->SetStepDuration(2743.83);
 
-      // Doc of mitk::Equal for BaseGeometry says
-      // "The function compares the spacing, origin, axis vectors, extents, the matrix of the
-      //  IndexToWorldTransform(element wise), the bounding(element wise) and the ImageGeometry flag."
-      // This seems pretty much everything that we can have in a Geometry3D..
-      CPPUNIT_ASSERT_MESSAGE("Geometry3D > file > Geometry3D keeps geometry", mitk::Equal(*m_Geom3D, *m_ReadGeom3D, 0.000001, true));
-      // Tolerance: Storing huge values 9.18274e+008 does not work at the precision of mitk::eps
-      //            So the author of this test judged above tolerance sufficient. If more is
-      //            required we need to inspect in more detail.
+    // fill m_GeometryData with something that has multiple time steps
+    ASSERT_ProportionalTimeGeometry_WriteReadLoop_Works();
+  }
+
+  void ASSERT_ProportionalTimeGeometry_WriteReadLoop_Works()
+  {
+    WriteAndRead_m_GeometryData();
+
+    CPPUNIT_ASSERT_MESSAGE("ProportionalTimeGeometry > file > ProportionalTimeGeometry keeps geometry", mitk::Equal(*m_TimeGeometry, *m_ReadProportionalTimeGeom, 0.000001, true));
+    // Tolerance: Storing huge values 9.18274e+008 does not work at the precision of mitk::eps
+    //            So the author of this test judged above tolerance sufficient. If more is
+    //            required we need to inspect in more detail.
   }
 
 }; // class

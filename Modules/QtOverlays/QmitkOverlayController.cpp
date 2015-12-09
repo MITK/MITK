@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRenderWindow.h"
 #include "QmitkOverlay.h"
+#include "QmitkOverlayContainerWidget.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -66,7 +67,7 @@ void QmitkOverlayController::InitializeOverlayLayout()
 void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos )
 {
   // create a new QWidget as Tool & FramelessWindowHint
-  m_PositionedOverlays[ pos ] = new QWidget( m_RenderWindow, Qt::Tool | Qt::FramelessWindowHint );
+  m_PositionedOverlays[ pos ] = new QmitkOverlayContainerWidget( m_RenderWindow, Qt::Tool | Qt::FramelessWindowHint );
 
   // autoFillBackGround(false) and WA_TranslucentBackground = true are needed to have a translucent background
   // transparency does NOT work under Win-XP 32-Bit --> paint black background

@@ -155,6 +155,7 @@ set(CPP_FILES
   DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkVector.cpp
+  DataManagement/mitkVectorProperty.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp
   DataManagement/mitkVtkRepresentationProperty.cpp
   DataManagement/mitkVtkResliceInterpolationProperty.cpp
@@ -241,6 +242,7 @@ set(CPP_FILES
   IO/mitkPixelType.cpp
   IO/mitkPointSetReaderService.cpp
   IO/mitkPointSetWriterService.cpp
+  IO/mitkProportionalTimeGeometryToXML.cpp
   IO/mitkRawImageFileReader.cpp
   IO/mitkStandardFileLocations.cpp
   IO/mitkSurfaceStlIO.cpp

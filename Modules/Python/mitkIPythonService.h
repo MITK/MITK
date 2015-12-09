@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSurface.h"
 #include <vector>
 
+
+class ctkAbstractPythonManager;
+
 namespace mitk
 {
     ///
@@ -129,6 +132,9 @@ namespace mitk
         ///
         /// \see CopyCvImageFromPython()
         virtual mitk::Surface::Pointer CopyVtkPolyDataFromPython( const std::string& varName ) = 0;
+
+       /// \return the ctk abstract python manager instance
+       virtual ctkAbstractPythonManager* GetPythonManager() = 0;
 
         ///
         /// nothing to do here

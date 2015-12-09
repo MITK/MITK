@@ -50,6 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextProperty.h>
 #include <vtkProp.h>
 #include <vtkAssemblyPath.h>
+#include <vtkAssemblyPaths.h>
 #include <vtkAssemblyNode.h>
 #include <vtkMapper.h>
 #include <vtkSmartPointer.h>
@@ -171,7 +172,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     this->PrepareMapperQueue();
 
   //go through the generated list and let the sorted mappers paint
-  for (MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
+  for ( auto it = m_MappersMap.cbegin(); it != m_MappersMap.cend(); it++)
   {
     Mapper * mapper = (*it).second;
     mapper->MitkRender(this, type);
@@ -233,10 +234,10 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
 
   for (DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin(); it != allObjects->End(); ++it)
   {
-    DataNode::Pointer node = it->Value();
+    const DataNode::Pointer node = it->Value();
     if (node.IsNull())
       continue;
-    mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+    const mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
 
     if (mapper.IsNull())
       continue;
@@ -438,7 +439,7 @@ mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition, Point3D &world
     it != allObjects->End();
     ++it)
   {
-    DataNode *node = it->Value();
+    const DataNode *node = it->Value();
     if (node == NULL)
       continue;
 
@@ -510,61 +511,34 @@ void mitk::VtkPropRenderer::InitPathTraversal()
 {
   if (m_DataStorage.IsNotNull())
   {
-    m_PickingObjects = m_DataStorage->GetAll();
-    m_PickingObjectsIterator = m_PickingObjects->begin();
+    this->UpdatePaths();
+    this->Paths->InitTraversal();
   }
 }
 
-int mitk::VtkPropRenderer::GetNumberOfPaths()
+void mitk::VtkPropRenderer::UpdatePaths()
 {
   if (m_DataStorage.IsNull()) {
-    return 0;
+    return;
   }
 
-  int nPaths = 0;
-  DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
-  for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter) {
-    Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
-    if (mapper)
+  if (this->GetMTime() > this->PathTime ||
+      (this->Paths != NULL && this->Paths->GetMTime() > this->PathTime))
+  {
+    if (this->Paths)
     {
-      VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
-      if (vtkmapper)
-      {
-        vtkProp* prop = vtkmapper->GetVtkProp(this);
-        if (prop && prop->GetVisibility())
-        {
-          ++nPaths;
-        }
-      }
+      this->Paths->Delete();
+      this->Paths = 0;
     }
-  }
 
-  return nPaths;
-}
+    // Create the list to hold all the paths
+    this->Paths = vtkAssemblyPaths::New();
 
-vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
-{
-  if (m_DataStorage.IsNull())
-  {
-    return NULL;
-  }
-
-  if (m_PickingObjectsIterator == m_PickingObjects->end())
-  {
-    return NULL;
-  }
-
-  vtkAssemblyPath* returnPath = vtkAssemblyPath::New();
-
-  bool success = false;
-
-  while (!success)
-  {
-    // loop until AddNode can be called successfully
-    const DataNode* node = *m_PickingObjectsIterator;
-    if (node)
+    DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
+    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter)
     {
-      Mapper* mapper = node->GetMapper(BaseRenderer::Standard3D);
+      vtkAssemblyPath* returnPath = vtkAssemblyPath::New();
+      Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
       if (mapper)
       {
         VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
@@ -575,25 +549,24 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
           {
             // add to assembly path
             returnPath->AddNode(prop, prop->GetMatrix());
-            success = true;
           }
         }
       }
     }
 
-    ++m_PickingObjectsIterator;
+    this->PathTime.Modified();
+  }
+}
 
-    if (m_PickingObjectsIterator == m_PickingObjects->end()) break;
-  }
+int mitk::VtkPropRenderer::GetNumberOfPaths()
+{
+  this->UpdatePaths();
+  return this->Paths->GetNumberOfItems();
+}
 
-  if (success)
-  {
-    return returnPath;
-  }
-  else
-  {
-    return NULL;
-  }
+vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
+{
+  return this->Paths ? this->Paths->GetNextItem() : 0;
 }
 
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)

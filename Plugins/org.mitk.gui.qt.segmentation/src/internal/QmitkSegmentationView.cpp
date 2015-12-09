@@ -433,7 +433,7 @@ void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
          FireNodeSelected(const_cast<mitk::DataNode*>(node));
       }
    }
-   if (!isHelperObject)
+   if (isBinary && !isHelperObject)
    {
       itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
       command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);

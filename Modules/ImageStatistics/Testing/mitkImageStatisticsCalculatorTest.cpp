@@ -373,9 +373,16 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics( mitk::Image::Pointer 
   statisticsCalculator->SetMaskingModeToPlanarFigure();
   statisticsCalculator->SetPlanarFigure( polygon );
 
-  statisticsCalculator->ComputeStatistics();
+  try
+  {
+    statisticsCalculator->ComputeStatistics();
+    return statisticsCalculator->GetStatistics();
+  }
+  catch( ... )
+  {
+  }
 
-  return statisticsCalculator->GetStatistics();
+  return mitk::ImageStatisticsCalculator::Statistics();
 }
 
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(const mitk::ImageStatisticsCalculator::Statistics& stats,

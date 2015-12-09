@@ -70,6 +70,7 @@ public:
   typedef mitk::Geometry3D::Pointer Geometry3DPointer;
   typedef std::vector< itk::SmartPointer< Mapper > > MapperVector;
   typedef std::map<std::string, mitk::PropertyList::Pointer> MapOfPropertyLists;
+  typedef std::vector<MapOfPropertyLists::key_type> PropertyListKeyNames;
   typedef std::set<std::string> GroupTagList;
 
   /**
@@ -134,6 +135,14 @@ public:
   virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
   virtual void CopyInformation(const itk::DataObject *data) override;
+
+  /**
+   * \brief The "names" used for (renderer-specific) PropertyLists in GetPropertyList(string).
+   *
+   * All possible values for the "renderer" parameters of
+   * the diverse GetProperty/List() methods.
+   */
+  PropertyListKeyNames GetPropertyListNames() const;
 
   /**
    * \brief Set the property (instance of BaseProperty) with key \a propertyKey in the PropertyList

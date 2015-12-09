@@ -54,5 +54,16 @@ protected:
   virtual ~GeometryData();
 };
 
+/**
+* @brief Equal Compare two GeometryData objects for equality, returns true if found equal.
+* @ingroup MITKTestingAPI
+* @param rightHandSide GeometryData to compare.
+* @param leftHandSide GeometryData to compare.
+* @param eps Epsilon to use for floating point comparison. Most of the time mitk::eps will be sufficient.
+* @param verbose Flag indicating if the method should give a detailed console output.
+* @return True if every comparison is true, false in any other case.
+*/
+MITKCORE_EXPORT bool Equal( const mitk::GeometryData& leftHandSide, const mitk::GeometryData& rightHandSide, mitk::ScalarType eps, bool verbose);
+
 } // namespace mitk
 #endif /* MITKGEOMETRYDATA_H_HEADER_INCLUDED_C19C01E2 */

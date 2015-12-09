@@ -49,9 +49,9 @@ std::string
 mitk::DICOMGDCMImageFrameInfo
 ::GetTagValueAsString(const DICOMTag& tag) const
 {
-  auto mappedValue = m_TagForValue.find( gdcm::Tag(tag.GetGroup(), tag.GetElement()) );
+  const auto mappedValue = m_TagForValue.find( gdcm::Tag(tag.GetGroup(), tag.GetElement()) );
 
-  if (mappedValue != m_TagForValue.end())
+  if (mappedValue != m_TagForValue.cend())
   {
     if (mappedValue->second != nullptr)
     {

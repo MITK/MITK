@@ -85,6 +85,8 @@ static FileListType CreateFileList(std::string folder , std::string postfix)
       filename = folder + filename;
       if (!itksys::SystemTools::FileExists( filename.c_str()))
         continue;
+      if (filename.length() <= postfix.length() )
+        continue;
       if (filename.substr(filename.length() -postfix.length() ) == postfix)
         fileList.push_back(filename);
     }

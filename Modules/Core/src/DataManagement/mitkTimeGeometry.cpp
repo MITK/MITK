@@ -178,3 +178,104 @@ itk::LightObject::Pointer mitk::TimeGeometry::InternalClone() const
   rval->m_BoundingBox = m_BoundingBox->DeepCopy();
   return parent;
 }
+
+
+bool mitk::Equal(const TimeGeometry& leftHandSide, const TimeGeometry& rightHandSide, ScalarType eps, bool verbose)
+{
+  bool result = true;
+
+  // Compare BoundingBoxInWorld
+  if (!mitk::Equal( *(leftHandSide.GetBoundingBoxInWorld()), *(rightHandSide.GetBoundingBoxInWorld()), eps, verbose ) )
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( TimeGeometry )] BoundingBoxInWorld differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetBoundingBoxInWorld() << " : leftHandSide is " << leftHandSide.GetBoundsInWorld() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  if (!mitk::Equal( leftHandSide.CountTimeSteps(), rightHandSide.CountTimeSteps(), eps, verbose ) )
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( TimeGeometry )] CountTimeSteps differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.CountTimeSteps() << " : leftHandSide is " << leftHandSide.CountTimeSteps() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  if (!mitk::Equal( leftHandSide.GetMinimumTimePoint(), rightHandSide.GetMinimumTimePoint(), eps, verbose ) )
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( TimeGeometry )] MinimumTimePoint differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMinimumTimePoint() << " : leftHandSide is " << leftHandSide.GetMinimumTimePoint() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  if (!mitk::Equal( leftHandSide.GetMaximumTimePoint(), rightHandSide.GetMaximumTimePoint(), eps, verbose ) )
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( TimeGeometry )] MaximumTimePoint differs.";
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMaximumTimePoint() << " : leftHandSide is " << leftHandSide.GetMaximumTimePoint() << " and tolerance is " << eps;
+    }
+    result = false;
+  }
+
+  if (!result)
+    return false; // further tests require that both parts have identical number of time steps
+
+  for (mitk::TimeStepType t = 0; t < leftHandSide.CountTimeSteps(); ++t)
+  {
+    if (!mitk::Equal( leftHandSide.TimeStepToTimePoint(t), rightHandSide.TimeStepToTimePoint(t), eps, verbose ) )
+    {
+      if (verbose)
+      {
+        MITK_INFO << "[( TimeGeometry )] TimeStepToTimePoint(" << t << ") differs.";
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.TimeStepToTimePoint(t) << " : leftHandSide is " << leftHandSide.TimeStepToTimePoint(t) << " and tolerance is " << eps;
+      }
+      result = false;
+    }
+
+    BaseGeometry::Pointer leftGeometry = leftHandSide.GetGeometryForTimeStep(t);
+    BaseGeometry::Pointer rightGeometry = rightHandSide.GetGeometryForTimeStep(t);
+
+    if (leftGeometry.IsNotNull() && rightGeometry.IsNull()) continue; // identical
+    if (leftGeometry.IsNull())
+    {
+      if (verbose)
+      {
+        MITK_INFO << "[( TimeGeometry )] TimeStepToTimePoint(" << t << ") differs.";
+        MITK_INFO << "rightHandSide is an object : leftHandSide is nullptr";
+      }
+      result = false;
+      continue; // next geometry
+    }
+
+    if (rightGeometry.IsNull())
+    {
+      if (verbose)
+      {
+        MITK_INFO << "[( TimeGeometry )] TimeStepToTimePoint(" << t << ") differs.";
+        MITK_INFO << "rightHandSide is nullptr : leftHandSide is an object";
+      }
+      result = false;
+      continue; // next geometry
+    }
+
+    if (!mitk::Equal(*leftGeometry, *rightGeometry, eps, verbose))
+    {
+      if (verbose)
+      {
+        MITK_INFO << "[( TimeGeometry )] GetGeometryForTimeStep(" << t << ") differs.";
+      }
+      result = false;
+    }
+
+  } // end for each t
+
+  return result;
+}

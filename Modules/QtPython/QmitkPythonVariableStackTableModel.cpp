@@ -90,7 +90,6 @@ bool QmitkPythonVariableStackTableModel::dropMimeData ( const QMimeData * data, 
               exportAsCvImage = ret == QMessageBox::Yes;
               if(exportAsCvImage)
               {
-                varName = MITK_IMAGE_VAR_NAME;
                 m_PythonService->CopyToPythonAsCvImage( mitkImage, varName.toStdString() );
                 ++i;
               }

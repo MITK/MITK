@@ -138,8 +138,13 @@ class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
     * The content of the DICOM tags will be stored in a StringLookupTable on the mitk::Image,
     * where the property-key equals the key in the unordered_map.
     */
-    void SetAdditionalTagsOfInterest(const std::unordered_map<const char*, DICOMTag>& tagList);
+    void SetAdditionalTagsOfInterest( const std::unordered_map<const char*, DICOMTag>& tagList );
 
+    typedef std::function<mitk::BaseProperty::Pointer(const StringLookupTable&) > TagLookupTableToPropertyFunctor;
+    void SetTagLookupTableToPropertyFunctor( TagLookupTableToPropertyFunctor );
+
+
+    mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor GetTagLookupTableToPropertyFunctor() const;
 
     /// Print information about this image block to given stream
     void Print(std::ostream& os, bool filenameDetails) const;
@@ -153,6 +158,8 @@ class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
     Image::Pointer FixupSpacing(Image* mitkImage);
     Image::Pointer DescribeImageWithProperties(Image* mitkImage);
     void UpdateImageDescribingProperties() const;
+
+    static mitk::BaseProperty::Pointer GetPropertyForDICOMValues(const StringLookupTable& stringLookupTable);
 
     double stringtodouble(const std::string& str) const;
     DICOMImageFrameList m_ImageFrameList;
@@ -170,6 +177,8 @@ class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
     mutable bool m_PropertiesOutOfDate;
 
     std::unordered_map<const char*, DICOMTag> m_AdditionalTagList;
+
+    TagLookupTableToPropertyFunctor m_PropertyFunctor;
 };
 
 }

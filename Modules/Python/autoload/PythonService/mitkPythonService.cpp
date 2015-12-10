@@ -371,7 +371,10 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
       sitk_type = "sitkUInt16";
     }
   }
-  else if ( ioPixelType == itk::ImageIOBase::VECTOR)
+  else if ( ioPixelType == itk::ImageIOBase::VECTOR ||
+            ioPixelType == itk::ImageIOBase::RGB ||
+            ioPixelType == itk::ImageIOBase::RGBA
+          )
   {
     if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
       npy_type = NPY_DOUBLE;
@@ -530,9 +533,46 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
     {
       mitkThrow()<< "unknown scalar PixelType";
     }
-  }
-  else
-  {
+  } else if(nr_Components == 3) {
+    typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
+    typedef itk::RGBPixel< unsigned short > USRGBPixelType;
+    typedef itk::RGBPixel< float > FloatRGBPixelType;
+    typedef itk::RGBPixel< double > DoubleRGBPixelType;
+    typedef itk::Image< UCRGBPixelType > UCRGBImageType;
+    typedef itk::Image< USRGBPixelType > USRGBImageType;
+    typedef itk::Image< FloatRGBPixelType > FloatRGBImageType;
+    typedef itk::Image< DoubleRGBPixelType > DoubleRGBImageType;
+
+    if( dtype.compare("float64") == 0   ) {
+      pixelType = MakePixelType<DoubleRGBImageType>();
+    } else if( dtype.compare("float32") == 0 ) {
+      pixelType = MakePixelType<FloatRGBImageType>();
+    } else if( dtype.compare("uint8") == 0 ) {
+      pixelType = MakePixelType<UCRGBImageType>();
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<USRGBImageType>();
+    }
+  } else if( (nr_Components == 4)) {
+    typedef itk::RGBAPixel< unsigned char > UCRGBAPixelType;
+    typedef itk::RGBAPixel< unsigned short > USRGBAPixelType;
+    typedef itk::RGBAPixel< float > FloatRGBAPixelType;
+    typedef itk::RGBAPixel< double > DoubleRGBAPixelType;
+    typedef itk::Image< UCRGBAPixelType > UCRGBAImageType;
+    typedef itk::Image< USRGBAPixelType > USRGBAImageType;
+    typedef itk::Image< FloatRGBAPixelType > FloatRGBAImageType;
+    typedef itk::Image< DoubleRGBAPixelType > DoubleRGBAImageType;
+
+    if( dtype.compare("float64") == 0   ) {
+      pixelType = MakePixelType<DoubleRGBAImageType>();
+    } else if( dtype.compare("float32") == 0 ) {
+      pixelType = MakePixelType<FloatRGBAImageType>();
+    } else if( dtype.compare("uint8") == 0 ) {
+      pixelType = MakePixelType<UCRGBAImageType>();
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<USRGBAImageType>();
+    }
+
+  } else {
     if( dtype.compare("float64") == 0   ) {
       pixelType = MakePixelType<double, itk::Vector<double,3> >(nr_Components);
     } else if( dtype.compare("float32") == 0 ) {
@@ -547,18 +587,18 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
       pixelType = MakePixelType<long, itk::Vector<long,3> >(nr_Components);
     } else if( dtype.compare("uint8") == 0 ) {
       pixelType = MakePixelType<unsigned char, itk::Vector<unsigned char,3> >(nr_Components);
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<unsigned short, itk::Vector<unsigned short,3> >(nr_Components);
     } else if( dtype.compare("uint32") == 0 ) {
       pixelType = MakePixelType<unsigned int, itk::Vector<unsigned int,3> >(nr_Components);
     } else if( dtype.compare("uint64") == 0 ) {
       pixelType = MakePixelType<unsigned long, itk::Vector<unsigned long,3> >(nr_Components);
-    } else if( dtype.compare("uint16") == 0 ) {
-      pixelType = MakePixelType<unsigned short, itk::Vector<unsigned short,3> >(nr_Components);
-    }
-    else
-    {
+    }  else {
       mitkThrow()<< "unknown vectorial PixelType";
     }
   }
+
+
 
 
   unsigned int* dimensions = new unsigned int[nr_dimensions];

@@ -141,10 +141,19 @@ class MITKDICOMREADER_EXPORT DICOMImageBlockDescriptor
     void SetAdditionalTagsOfInterest( const std::unordered_map<const char*, DICOMTag>& tagList );
 
     typedef std::function<mitk::BaseProperty::Pointer(const StringLookupTable&) > TagLookupTableToPropertyFunctor;
+
+    /**
+    * \brief Set a functor that defines how the slice-specific tag-values are stored in a Property.
+    *
+    * This method sets a functor that is given a StringLookupTable that contains the values of one DICOM tag
+    * mapped to the slice index.
+    * The functor is supposed to store these values in an mitk Property.
+    *
+    * By default, the StringLookupTable is stored in a StringLookupTableProperty except if all values are
+    * identical. In this case, the unique value is stored only once in a StringProperty.
+    */
     void SetTagLookupTableToPropertyFunctor( TagLookupTableToPropertyFunctor );
 
-
-    mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor GetTagLookupTableToPropertyFunctor() const;
 
     /// Print information about this image block to given stream
     void Print(std::ostream& os, bool filenameDetails) const;

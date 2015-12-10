@@ -106,8 +106,25 @@ public:
 
   virtual bool operator==( const DICOMFileReader& other ) const = 0;
 
+  /**
+  * \brief Set a list of DICOM-Tags that will be copied into the property of the mitk::Image.
+  *
+  * This method can be used to specify a list of DICOM-tags that shall be available after the loading.
+  * The content of the DICOM tags will be stored in a StringLookupTable on the mitk::Image,
+  * where the property-key equals the key in the unordered_map.
+  */
   virtual void SetAdditionalTagsOfInterest( const std::unordered_map<const char*, DICOMTag>& tagList );
 
+  /**
+  * \brief Set a functor that defines how the slice-specific tag-values are stored in a Property.
+  *
+  * This method sets a functor that is given a StringLookupTable that contains the values of one DICOM tag
+  * mapped to the slice index.
+  * The functor is supposed to store these values in an mitk Property.
+  *
+  * By default, the StringLookupTable is stored in a StringLookupTableProperty except if all values are
+  * identical. In this case, the unique value is stored only once in a StringProperty.
+  */
   virtual void SetTagLookupTableToPropertyFunctor(
     mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor functor );
 

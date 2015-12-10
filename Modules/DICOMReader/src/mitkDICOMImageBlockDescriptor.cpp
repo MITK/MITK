@@ -805,9 +805,3 @@ void mitk::DICOMImageBlockDescriptor::SetTagLookupTableToPropertyFunctor( TagLoo
     m_PropertyFunctor = functor;
   }
 }
-
-mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor
-  mitk::DICOMImageBlockDescriptor::GetTagLookupTableToPropertyFunctor() const
-{
-  return m_PropertyFunctor;
-}

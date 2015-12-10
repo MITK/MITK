@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkAbstractTrackingDeviceWidget.h";
+#include "QmitkAbstractTrackingDeviceWidget.h"
 
 QmitkAbstractTrackingDeviceWidget::QmitkAbstractTrackingDeviceWidget(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {

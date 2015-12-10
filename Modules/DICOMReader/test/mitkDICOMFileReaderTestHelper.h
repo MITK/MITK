@@ -120,7 +120,9 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
   }
 }
 
-static void TestMitkImagesAreLoaded( DICOMFileReader* reader, const std::unordered_map<const char*, mitk::DICOMTag>& requestedTags )
+static void TestMitkImagesAreLoaded( DICOMFileReader* reader,
+                                     const std::unordered_map<const char*, mitk::DICOMTag>& requestedTags,
+                                     const std::unordered_map<const char*, const char*>& expectedProperties )
 {
   StringList inputFiles = GetInputFilenames();
   reader->SetInputFiles( inputFiles );
@@ -135,15 +137,15 @@ static void TestMitkImagesAreLoaded( DICOMFileReader* reader, const std::unorder
 
     const DICOMImageFrameList& outputFiles = block.GetImageFrameList();
     const mitk::Image::Pointer mitkImage = block.GetMitkImage();
+    auto iter2 = expectedProperties.cbegin();
 
-
-    for ( auto iter = requestedTags.cbegin();
-          iter != requestedTags.cend();
-          ++iter)
+    for ( auto iter = requestedTags.cbegin(); iter != requestedTags.cend(); ++iter, ++iter2 )
     {
-      std::string dummy;
-      MITK_TEST_CONDITION( mitkImage->GetProperty( iter->first ).IsNotNull(),
+      mitk::BaseProperty* property = mitkImage->GetProperty( iter->first ).GetPointer();
+      MITK_TEST_CONDITION( property != nullptr,
                            "Requested Tag is available as Property in Image" );
+
+      MITK_INFO << iter->first << " / " << property->GetNameOfClass();
     }
 
 
@@ -152,6 +154,11 @@ static void TestMitkImagesAreLoaded( DICOMFileReader* reader, const std::unorder
     MITK_DEBUG << "  Number of files: " << outputFiles.size();
     MITK_DEBUG << "  Dimensions: " << mitkImage->GetDimension(0) << " " << mitkImage->GetDimension(1) << " " << mitkImage->GetDimension(2);
   }
+}
+
+static mitk::BaseProperty::Pointer DummyTagToPropertyFunctor( const mitk::StringLookupTable& )
+{
+  return mitk::BaseProperty::Pointer();
 }
 
 

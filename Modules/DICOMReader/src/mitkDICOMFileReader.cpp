@@ -204,9 +204,21 @@ std::unordered_map<const char*, mitk::DICOMTag> mitk::DICOMFileReader::GetAdditi
 }
 
 
-void mitk::DICOMFileReader::SetAdditionalTagsOfInterest(const std::unordered_map<const char*, mitk::DICOMTag>& tagList)
+void mitk::DICOMFileReader::SetAdditionalTagsOfInterest(
+  const std::unordered_map<const char*, mitk::DICOMTag>& tagList )
 {
   m_AdditionalTagsOfInterest = tagList;
 }
 
 
+void mitk::DICOMFileReader::SetTagLookupTableToPropertyFunctor(
+  mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor functor )
+{
+  m_TagLookupTableToPropertyFunctor = functor;
+}
+
+mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor
+  mitk::DICOMFileReader::GetTagLookupTableToPropertyFunctor() const
+{
+  return m_TagLookupTableToPropertyFunctor;
+}

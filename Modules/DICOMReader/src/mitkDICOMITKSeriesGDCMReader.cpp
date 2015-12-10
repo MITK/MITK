@@ -381,6 +381,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
                                               // SetImageFrameList will trigger reading of lots of interesting
                                               // tags!
     block.SetAdditionalTagsOfInterest( GetAdditionalTagsOfInterest() );
+    block.SetTagLookupTableToPropertyFunctor( GetTagLookupTableToPropertyFunctor() );
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 

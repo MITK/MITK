@@ -86,8 +86,6 @@ protected:
   void StoreUISettings();
   void LoadUISettings();
 
-  QmitkAbstractTrackingDeviceWidget* GetCurrentWidget();
-
   /* @brief This method is called when the user clicks on "Refresh Selection" (m_RefreshTrackingDeviceCollection).
   It then sets the correct widget for the selected tracking device.*/
   void RefreshTrackingDeviceCollection();
@@ -99,6 +97,10 @@ protected:
 
 private:
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
+
+  std::string GetCurrentDeviceName(void) const;
+
+  QmitkAbstractTrackingDeviceWidget* GetWidget(const std::string& deviceName) const;
 
   /**
    * @brief Mapping of device type identifier and index of the configuration widget in QStackedWidget.

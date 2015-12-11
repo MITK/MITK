@@ -90,16 +90,21 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
 
 void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
 {
+  const std::string currentDevice = this->GetCurrentDeviceName();
+
   //show the correspondig widget
-  m_Controls->m_TrackingSystemWidget->setCurrentWidget(GetCurrentWidget());
+  m_Controls->m_TrackingSystemWidget->setCurrentIndex(m_DeviceToWidgetIndexMap[currentDevice]);
 
   //reset output
   ResetOutput();
 
   AddOutput("<br>");
-  AddOutput(m_Controls->m_TrackingDeviceChooser->currentText().toStdString());
+  AddOutput(currentDevice);
   AddOutput(" selected");
-  if (GetCurrentWidget() == nullptr || !GetCurrentWidget()->IsDeviceInstalled())
+
+  QmitkAbstractTrackingDeviceWidget* widget = GetWidget(currentDevice);
+
+  if (widget == nullptr || !widget->IsDeviceInstalled())
   {
     AddOutput("<br>ERROR: not installed!");
   }
@@ -165,14 +170,17 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
     }
   }
 
-  m_Controls->m_TrackingDeviceChooser->setCurrentIndex(0);
-  m_Controls->m_TrackingSystemWidget->setCurrentIndex(0);
+  if (!m_DeviceToWidgetIndexMap.empty())
+  {
+    m_Controls->m_TrackingDeviceChooser->setCurrentIndex(0);
+    m_Controls->m_TrackingSystemWidget->setCurrentIndex(0);
+  }
 }
 
 //######################### internal help methods #######################################
 void QmitkTrackingDeviceConfigurationWidget::ResetOutput()
 {
-  QmitkAbstractTrackingDeviceWidget* currentWidget = GetCurrentWidget();
+  QmitkAbstractTrackingDeviceWidget* currentWidget = this->GetWidget(this->GetCurrentDeviceName());
 
   if (currentWidget == nullptr)
   {
@@ -182,9 +190,10 @@ void QmitkTrackingDeviceConfigurationWidget::ResetOutput()
   currentWidget->ResetOutput();
   currentWidget->repaint();
 }
+
 void QmitkTrackingDeviceConfigurationWidget::AddOutput(std::string s)
 {
-  QmitkAbstractTrackingDeviceWidget* currentWidget = GetCurrentWidget();
+  QmitkAbstractTrackingDeviceWidget* currentWidget = this->GetWidget(this->GetCurrentDeviceName());
 
   if (currentWidget == nullptr)
   {
@@ -194,9 +203,10 @@ void QmitkTrackingDeviceConfigurationWidget::AddOutput(std::string s)
   currentWidget->AddOutput(s);
   currentWidget->repaint();
 }
+
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructTrackingDevice()
 {
-  QmitkAbstractTrackingDeviceWidget* currentWidget = GetCurrentWidget();
+  QmitkAbstractTrackingDeviceWidget* currentWidget = this->GetWidget(this->GetCurrentDeviceName());
 
   if (currentWidget == nullptr)
   {
@@ -217,13 +227,13 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
 
-  std::string selectedDevice = m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
+  std::string selectedDevice = this->GetCurrentDeviceName();
 
   //Save settings for every widget
   //Don't use m_DeviceTypeCollection here, it's already unregistered, when deconstructor is called...
-  for (int count = 0; count < m_Controls->m_TrackingSystemWidget->count(); count++)
+  for (int index = 0; index < m_Controls->m_TrackingSystemWidget->count(); index++)
   {
-    QmitkAbstractTrackingDeviceWidget* widget = dynamic_cast<QmitkAbstractTrackingDeviceWidget*>(m_Controls->m_TrackingSystemWidget->widget(count));
+    QmitkAbstractTrackingDeviceWidget* widget = dynamic_cast<QmitkAbstractTrackingDeviceWidget*>(m_Controls->m_TrackingSystemWidget->widget(index));
 
     if (widget != nullptr)
     {
@@ -250,7 +260,7 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
  *
  * Precondition:
  * Make sure that QStackedWidget is already initialized,
- * e.g. by calling RefreshTrackingDeviceCollection().
+ * e.g. by calling RefreshTrackingDeviceCollection() before.
  */
 void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 {
@@ -331,15 +341,20 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
   m_Controls->m_TrackingSystemWidget->setCurrentIndex(m_DeviceToWidgetIndexMap[selectedDevice]);
 }
 
-QmitkAbstractTrackingDeviceWidget* QmitkTrackingDeviceConfigurationWidget::GetCurrentWidget()
+std::string QmitkTrackingDeviceConfigurationWidget::GetCurrentDeviceName(void) const
 {
-  const auto& deviceIterator = m_DeviceToWidgetIndexMap.find(m_Controls->m_TrackingDeviceChooser->currentText().toStdString());
+  return m_Controls->m_TrackingDeviceChooser->currentText().toStdString();
+}
+
+QmitkAbstractTrackingDeviceWidget* QmitkTrackingDeviceConfigurationWidget::GetWidget(const std::string& deviceName) const
+{
+  const auto& deviceIterator = m_DeviceToWidgetIndexMap.find(deviceName);
 
   if (deviceIterator != m_DeviceToWidgetIndexMap.end())
   {
-    QWidget* currentWidget = m_Controls->m_TrackingSystemWidget->widget(deviceIterator->second);
+    QWidget* widget = m_Controls->m_TrackingSystemWidget->widget(deviceIterator->second);
 
-    return dynamic_cast<QmitkAbstractTrackingDeviceWidget*>(currentWidget);
+    return dynamic_cast<QmitkAbstractTrackingDeviceWidget*>(widget);
   }
 
   return nullptr;

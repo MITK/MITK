@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vnl/vnl_cross.h>
 #include <cmath>
-#include <ciso646> // tell MSVC to accept alternate operator representation i.e. to be C95 standard compliant.
+
 
 namespace mitk
 {
@@ -45,7 +45,7 @@ namespace mitk
 
   void PlaneGeometry::EnsurePerpendicularNormal( mitk::AffineTransform3D *transform )
   {
-    /** \brief ensure column(2) of indexToWorldTransform-matrix to be perpendicular to plane, keep length. */
+    /** \brief ensure column(2) of indexToWorldTransform-matrix to be perpendicular to plane, keep length and handedness. */
 
     VnlVector normal = vnl_cross_3d( transform->GetMatrix().GetVnlMatrix().get_column(0),
                                      transform->GetMatrix().GetVnlMatrix().get_column(1) );
@@ -55,9 +55,8 @@ namespace mitk
     if (len==0) { len = 1; }
     normal *= len;
 
-    // Now lets compare:
+    // Get the existing normal vector zed:
     vnl_vector_fixed<double, 3> zed = transform->GetMatrix().GetVnlMatrix().get_column(2);
-    double zedsMagnitude = zed.magnitude();
 
     /** If det(matrix)<0, multiply normal vector by (-1) to keep geometry lefthanded. */
     if( vnl_determinant( transform->GetMatrix().GetVnlMatrix()) < 0 )
@@ -66,11 +65,15 @@ namespace mitk
       normal *= (-1.0);
       MITK_DEBUG << "lh-normal: [ " << normal << " ], original vector zed is: [ " << zed << " ]";
     }
-    // float epsilon is already precise enough here:
-    double feps = std::numeric_limits<float>::epsilon();
 
-    // Respect numerics. Higham, N., 2002, Accuracy and Stability of Numerical Algorithms,
+
+    // Now lets compare and only replace if necessary and only then warn the user:
+
+    // float epsilon is precise enough here, but we need to respect numerical condition:
+    // Higham, N., 2002, Accuracy and Stability of Numerical Algorithms,
     // SIAM, page 37, 2nd edition:
+    double feps = std::numeric_limits<float>::epsilon();
+    double zedsMagnitude = zed.two_norm();
     feps = feps * zedsMagnitude * 2;
 
     /** Check if normal (3. column) was perpendicular: If not, replace with calculated normal vector: */
@@ -82,10 +85,10 @@ namespace mitk
         parallel[i] = normal[i] / zed[i]; // Remember linear algebra: checking for parallelity.
       }
       // Checking if really not paralell i.e. non-colinear vectors by comparing these floating point numbers:
-      if(     (parallel[0]+feps < parallel[1] or feps+parallel[1] < parallel[0])
-          and (parallel[0]+feps < parallel[2] or feps+parallel[2] < parallel[0]) )
+      if(    (parallel[0]+feps < parallel[1] || feps+parallel[1] < parallel[0])
+          && (parallel[0]+feps < parallel[2] || feps+parallel[2] < parallel[0]) )
       {
-        MITK_WARN << "EnsurePerpendicularNormal(): Plane geometry was _/askew/_, so here it got rectified by substituting"
+        MITK_WARN << "EnsurePerpendicularNormal(): Plane geometry was _/askew/_, so here it gets rectified by substituting"
                   << " the 3rd column of the indexToWorldMatrix with an appropriate normal vector: [ " << normal
                   << " ], original vector zed was: [ " << zed << " ].";
 
@@ -96,7 +99,7 @@ namespace mitk
     }
     else
     {
-      // Nothing to do, 3rd column of indexToWorldTransformMatrix already was perpendicular.
+      // Nothing to do, 3rd column of indexToWorldTransformMatrix already was perfectly perpendicular.
     }
   }
 
@@ -371,7 +374,7 @@ namespace mitk
       /// Signing normal vector according to l.h./r.h. coordinate system:
       this->SetMatrixByVectors( rightDV,
                                 bottomDV,
-                                transform->GetMatrix().GetVnlMatrix().get_column(normalDirection).magnitude() * lhOrRhSign );
+                                transform->GetMatrix().GetVnlMatrix().get_column(normalDirection).two_norm() * lhOrRhSign );
     }
     else if ( transform == nullptr )
     {
@@ -479,8 +482,8 @@ namespace mitk
   PlaneGeometry::InitializeStandardPlane( const VnlVector& rightVector,
                                           const VnlVector &downVector, const Vector3D *spacing )
   {
-    ScalarType width  = rightVector.magnitude();
-    ScalarType height = downVector.magnitude();
+    ScalarType width  = rightVector.two_norm();
+    ScalarType height = downVector.two_norm();
 
     InitializeStandardPlane( width, height, rightVector, downVector, spacing );
   }

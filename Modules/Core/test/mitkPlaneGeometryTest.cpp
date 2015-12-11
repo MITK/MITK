@@ -84,8 +84,8 @@ public:
   }
 
   void tearDown() override
-      {
-      }
+  {
+  }
 
   // This test verifies inheritance behaviour, this test will fail if the behaviour changes in the future
   void TestInheritance()
@@ -154,8 +154,6 @@ public:
     transform->SetMatrix(matrix);
 
     planegeometry->InitializeStandardPlane( width, height, transform ); // Crux of the matter.
-    MITK_INFO << "IndexToWorldMatrix after InitializeStandardPlane()\n"
-               << planegeometry->GetIndexToWorldTransform()->GetMatrix();
     CPPUNIT_ASSERT_MESSAGE("Testing if IndexToWorldMatrix is correct after InitializeStandardPlane( width, height, transform ) ",
                            mitk::MatrixEqualElementWise( planegeometry->GetIndexToWorldTransform()->GetMatrix(), matrix ) );
 
@@ -170,7 +168,6 @@ public:
     p_expectedResult[2] = 0.;
 
     ((mitk::BaseGeometry::Pointer) planegeometry)->IndexToWorld(p_index, p_world); // Crux of the matter.
-    MITK_INFO << "Index-point [10.; 10.; 0.] in world coordinates: " << p_world;
     CPPUNIT_ASSERT_MESSAGE( "Testing if IndexToWorld(a,b) function works correctly with lefthanded matrix ",
                             mitk::Equal(p_world, p_expectedResult, testEps ) );
   }

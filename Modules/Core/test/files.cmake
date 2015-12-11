@@ -103,6 +103,7 @@ set(MODULE_TESTS
   mitkImageToSurfaceFilterTest.cpp
   mitkEqualTest.cpp
   mitkLineTest.cpp
+  mitkArbitraryTimeGeometryTest
   mitkItkImageIOTest.cpp
   mitkRotatedSlice4DTest.cpp
   mitkLevelWindowManagerCppUnitTest.cpp

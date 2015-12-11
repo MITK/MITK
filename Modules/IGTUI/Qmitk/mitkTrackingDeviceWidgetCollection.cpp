@@ -71,16 +71,16 @@ void mitk::TrackingDeviceWidgetCollection::RegisterTrackingDeviceWidget(Tracking
       if (m_TrackingDeviceWidgets.at(i).first == type)
         return;
     }
-    m_TrackingDeviceWidgets.push_back(std::make_pair(type, (widget->CloneForQt())));
+    m_TrackingDeviceWidgets.push_back(std::make_pair(type, widget));
   }
 }
 
-QmitkAbstractTrackingDeviceWidget* mitk::TrackingDeviceWidgetCollection::GetTrackingDeviceWidget(TrackingDeviceType type)
+QmitkAbstractTrackingDeviceWidget* mitk::TrackingDeviceWidgetCollection::GetTrackingDeviceWidgetClone(TrackingDeviceType type)
 {
   for (int i = 0; i < m_TrackingDeviceWidgets.size(); i++)
   {
     if (m_TrackingDeviceWidgets.at(i).first == type)
-      return (m_TrackingDeviceWidgets.at(i).second);
+      return (m_TrackingDeviceWidgets.at(i).second->CloneForQt());
   }
   return nullptr;
 }

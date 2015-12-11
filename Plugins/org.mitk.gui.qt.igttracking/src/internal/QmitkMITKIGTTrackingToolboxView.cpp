@@ -142,6 +142,8 @@ try
 this->AutoSaveToolStorage();
 this->StoreUISettings();
 
+m_DeviceTypeCollection = nullptr;
+
 }
 
 void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )

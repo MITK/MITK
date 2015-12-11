@@ -44,37 +44,17 @@ const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.vi
 
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
-  , m_DeviceTypeCollection(nullptr)
-  , m_DeviceWidgetCollection(nullptr)
+  , m_DeviceToWidgetIndexMap()
 {
   //initializations
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
-
-  us::ModuleContext* context = us::GetModuleContext();
-  std::vector<us::ServiceReference<mitk::TrackingDeviceWidgetCollection> > refs = context->GetServiceReferences<mitk::TrackingDeviceWidgetCollection>();
-  if (refs.empty())
-  {
-    MITK_ERROR << "No tracking device service found!";
-  }
-  m_DeviceWidgetCollection = context->GetService<mitk::TrackingDeviceWidgetCollection>(refs.front());
-
-  //Add widgets of standard tracking devices
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), new QmitkNDIAuroraWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName(), new QmitkNDIPolarisWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName(), new QmitkMicronTrackerWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), new QmitkNPOptitrackWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), new QmitkVirtualTrackerWidget);
-  m_DeviceWidgetCollection->RegisterTrackingDeviceWidget(mitk::OpenIGTLinkTypeInformation::GetTrackingDeviceName(), new QmitkOpenIGTLinkWidget);
 
   RefreshTrackingDeviceCollection();
 
   //initialize a few UI elements
   AddOutput("<br>First Element selected"); //Order from Collection List
-
-  m_Controls->m_TrackingDeviceChooser->setCurrentIndex(0);
-  m_Controls->m_TrackingSystemWidget->setCurrentWidget(GetCurrentWidget());
 
   //reset a few things
   ResetOutput();
@@ -86,6 +66,8 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
 {
   StoreUISettings();
+  m_Controls = nullptr;
+  m_TrackingDevice = nullptr;
 }
 
 void QmitkTrackingDeviceConfigurationWidget::CreateQtPartControl(QWidget *parent)
@@ -127,57 +109,107 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
 
 void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
 {
-  us::ModuleContext* context = us::GetModuleContext();
-  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
-  if (refs.empty())
+  // clean-up of stacked widget, drop-down box and map
+  for (auto& item : m_DeviceToWidgetIndexMap)
   {
-    MITK_ERROR << "No tracking device service found!";
+    m_Controls->m_TrackingSystemWidget->removeWidget(m_Controls->m_TrackingSystemWidget->widget(item.second));
+    MITK_INFO << "removing widget for device '" << item.first << "'";
   }
-  m_DeviceTypeCollection = context->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
 
-  for (auto name : m_DeviceTypeCollection->GetTrackingDeviceTypeNames())
+  m_Controls->m_TrackingDeviceChooser->clear();
+
+  m_DeviceToWidgetIndexMap.clear();
+
+
+  // get tracking device type service
+  us::ModuleContext* context = us::GetModuleContext();
+  std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > deviceRefs =
+    context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
+
+  if (deviceRefs.empty())
+  {
+    MITK_ERROR << "No tracking device type service found!";
+  }
+
+  mitk::TrackingDeviceTypeCollection* deviceTypeCollection =
+    context->GetService<mitk::TrackingDeviceTypeCollection>(deviceRefs.front());
+
+
+  // get tracking device configuration widget service
+  std::vector<us::ServiceReference<mitk::TrackingDeviceWidgetCollection> > widgetRefs =
+    context->GetServiceReferences<mitk::TrackingDeviceWidgetCollection>();
+
+  if (widgetRefs.empty())
+  {
+    MITK_ERROR << "No tracking device configuration widget service found!";
+  }
+
+  mitk::TrackingDeviceWidgetCollection* deviceWidgetCollection =
+    context->GetService<mitk::TrackingDeviceWidgetCollection>(widgetRefs.front());
+
+
+  for (auto name : deviceTypeCollection->GetTrackingDeviceTypeNames())
   {
     //if the device is not included yet, add name to comboBox and widget to stackedWidget
     if (m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(name)) == -1)
     {
       m_Controls->m_TrackingDeviceChooser->addItem(QString::fromStdString(name));
-      QWidget* current = m_DeviceWidgetCollection->GetTrackingDeviceWidget(name);
+      QWidget* current = deviceWidgetCollection->GetTrackingDeviceWidgetClone(name);
       if (current == nullptr)
       {
         MITK_WARN << "No widget for tracking device type " << name << " available. Please implement and register it!";
-        current = new QWidget;
+        current = new QWidget();
       }
-      m_Controls->m_TrackingSystemWidget->addWidget(current);
+
+      m_DeviceToWidgetIndexMap[name] = m_Controls->m_TrackingSystemWidget->addWidget(current);
     }
   }
+
+  m_Controls->m_TrackingDeviceChooser->setCurrentIndex(0);
+  m_Controls->m_TrackingSystemWidget->setCurrentWidget(0);
 }
 
 //######################### internal help methods #######################################
 void QmitkTrackingDeviceConfigurationWidget::ResetOutput()
 {
-  if (GetCurrentWidget() == nullptr)
+  QmitkAbstractTrackingDeviceWidget* currentWidget = GetCurrentWidget();
+
+  if (currentWidget == nullptr)
+  {
     return;
-  GetCurrentWidget()->ResetOutput();
-  GetCurrentWidget()->repaint();
+  }
+
+  currentWidget->ResetOutput();
+  currentWidget->repaint();
 }
 void QmitkTrackingDeviceConfigurationWidget::AddOutput(std::string s)
 {
-  if (GetCurrentWidget() == nullptr)
+  QmitkAbstractTrackingDeviceWidget* currentWidget = GetCurrentWidget();
+
+  if (currentWidget == nullptr)
+  {
     return;
-  GetCurrentWidget()->AddOutput(s);
-  GetCurrentWidget()->repaint();
+  }
+
+  currentWidget->AddOutput(s);
+  currentWidget->repaint();
 }
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConstructTrackingDevice()
 {
-  if (GetCurrentWidget() == nullptr)
+  QmitkAbstractTrackingDeviceWidget* currentWidget = GetCurrentWidget();
+
+  if (currentWidget == nullptr)
+  {
     return nullptr;
-  return GetCurrentWidget()->ConstructTrackingDevice();
+  }
+
+  return currentWidget->ConstructTrackingDevice();
 }
 
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
 {
   m_TrackingDevice = ConstructTrackingDevice();
-  if (m_TrackingDevice.IsNull() || !m_TrackingDevice->IsDeviceInstalled()) return NULL;
+  if (m_TrackingDevice.IsNull() || !m_TrackingDevice->IsDeviceInstalled()) return nullptr;
   else return this->m_TrackingDevice;
 }
 
@@ -189,10 +221,14 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
 
   //Save settings for every widget
   //Don't use m_DeviceTypeCollection here, it's already unregistered, when deconstructor is called...
-  for (int i = 0; i < m_Controls->m_TrackingDeviceChooser->count(); i++)
+  for (int count = 0; count < m_Controls->m_TrackingSystemWidget->count(); count++)
   {
-    if (m_DeviceWidgetCollection->GetTrackingDeviceWidget(m_Controls->m_TrackingDeviceChooser->itemText(i).toStdString()) != nullptr)
-      m_DeviceWidgetCollection->GetTrackingDeviceWidget(m_Controls->m_TrackingDeviceChooser->itemText(i).toStdString())->StoreUISettings();
+    QmitkAbstractTrackingDeviceWidget* widget = dynamic_cast<QmitkAbstractTrackingDeviceWidget*>(m_Controls->m_TrackingSystemWidget->widget(count));
+
+    if (widget != nullptr)
+    {
+      widget->StoreUISettings();
+    }
   }
 
   if (this->GetPeristenceService()) // now save the settings using the persistence service
@@ -209,13 +245,24 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
   }
 }
 
+/**
+ * @brief QmitkTrackingDeviceConfigurationWidget::LoadUISettings
+ *
+ * Precondition:
+ * Make sure that QStackedWidget is already initialized,
+ * e.g. by calling RefreshTrackingDeviceCollection().
+ */
 void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 {
   //Load settings for every widget
-  for (auto name : m_DeviceTypeCollection->GetTrackingDeviceTypeNames())
+  for (int index = 0; index < m_Controls->m_TrackingSystemWidget->count(); index++)
   {
-    if (m_DeviceWidgetCollection->GetTrackingDeviceWidget(name) != nullptr)
-      m_DeviceWidgetCollection->GetTrackingDeviceWidget(name)->LoadUISettings();
+    QmitkAbstractTrackingDeviceWidget* widget = dynamic_cast<QmitkAbstractTrackingDeviceWidget*>(m_Controls->m_TrackingSystemWidget->widget(index));
+
+    if (widget != nullptr)
+    {
+      widget->LoadUISettings();
+    }
   }
 
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
@@ -249,11 +296,25 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     settings.endGroup();
   }
 
-  //the selected device requires some checks because a device that is not installed should not be restored to avoids bugs
-  if (m_DeviceWidgetCollection->GetTrackingDeviceWidget(selectedDevice) == nullptr || !m_DeviceWidgetCollection->GetTrackingDeviceWidget(selectedDevice)->IsDeviceInstalled())
+  // The selected device requires some checks because a device that is not installed should not be restored to avoid bugs.
+  // Use NDI Polaris as default if there's no widget registered for selected device or there's a widget for it but no device installed.
+
+  const auto& deviceIterator = m_DeviceToWidgetIndexMap.find(selectedDevice);
+
+  if (deviceIterator != m_DeviceToWidgetIndexMap.end())
+  {
+    QmitkAbstractTrackingDeviceWidget* widget =
+      dynamic_cast<QmitkAbstractTrackingDeviceWidget*>(m_Controls->m_TrackingSystemWidget->widget(deviceIterator->second));
+
+    if (widget == nullptr || (widget != nullptr && !widget->IsDeviceInstalled()))
+    {
+      selectedDevice = mitk::NDIPolarisTypeInformation::GetTrackingDeviceName();
+    }
+  }
+  else
   {
     selectedDevice = mitk::NDIPolarisTypeInformation::GetTrackingDeviceName();
-  } //Default: Polaris...
+  }
 
   const int index = m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(selectedDevice));
 
@@ -267,10 +328,19 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
     return;
   }
 
-  m_Controls->m_TrackingSystemWidget->setCurrentWidget(GetCurrentWidget());
+  m_Controls->m_TrackingSystemWidget->setCurrentIndex(m_DeviceToWidgetIndexMap[selectedDevice]);
 }
 
 QmitkAbstractTrackingDeviceWidget* QmitkTrackingDeviceConfigurationWidget::GetCurrentWidget()
 {
-  return m_DeviceWidgetCollection->GetTrackingDeviceWidget(m_Controls->m_TrackingDeviceChooser->currentText().toStdString());
+  const auto& deviceIterator = m_DeviceToWidgetIndexMap.find(m_Controls->m_TrackingDeviceChooser->currentText().toStdString());
+
+  if (deviceIterator != m_DeviceToWidgetIndexMap.end())
+  {
+    QWidget* currentWidget = m_Controls->m_TrackingSystemWidget->widget(deviceIterator->second);
+
+    return dynamic_cast<QmitkAbstractTrackingDeviceWidget*>(currentWidget);
+  }
+
+  return nullptr;
 }

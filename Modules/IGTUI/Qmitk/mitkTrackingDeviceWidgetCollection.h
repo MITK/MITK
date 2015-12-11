@@ -70,7 +70,7 @@ namespace mitk {
 
     void RegisterTrackingDeviceWidget(TrackingDeviceType type, QmitkAbstractTrackingDeviceWidget* widget);
 
-    QmitkAbstractTrackingDeviceWidget* GetTrackingDeviceWidget(TrackingDeviceType type);
+    QmitkAbstractTrackingDeviceWidget* GetTrackingDeviceWidgetClone(TrackingDeviceType type);
 
   private:
 

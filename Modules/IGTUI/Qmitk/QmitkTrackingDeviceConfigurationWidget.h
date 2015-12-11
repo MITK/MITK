@@ -100,9 +100,10 @@ protected:
 private:
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
 
-    mitk::TrackingDeviceTypeCollection* m_DeviceTypeCollection;
-
-  mitk::TrackingDeviceWidgetCollection* m_DeviceWidgetCollection;
+  /**
+   * @brief Mapping of device type identifier and index of the configuration widget in QStackedWidget.
+   */
+  std::map<std::string, int> m_DeviceToWidgetIndexMap;
 
 };
 

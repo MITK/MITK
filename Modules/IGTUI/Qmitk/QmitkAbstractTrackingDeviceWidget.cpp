@@ -23,12 +23,12 @@ QmitkAbstractTrackingDeviceWidget::QmitkAbstractTrackingDeviceWidget(QWidget* pa
   CreateQtPartControl(this);
   CreateConnections();
   m_ErrorMessage = "";
-};
+}
 
 QmitkAbstractTrackingDeviceWidget::~QmitkAbstractTrackingDeviceWidget(){
   if (m_TestConnectionWorker) delete m_TestConnectionWorker;
   if (m_TestConnectionWorkerThread) delete m_TestConnectionWorkerThread;
-};
+}
 
 void QmitkAbstractTrackingDeviceWidget::TestConnectionFinished(bool connected, QString output)
 {

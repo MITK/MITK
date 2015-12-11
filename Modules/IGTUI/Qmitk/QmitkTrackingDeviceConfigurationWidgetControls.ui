@@ -92,13 +92,6 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QPushButton" name="m_RefreshTrackingDeviceCollection">
-             <property name="text">
-              <string>Refresh Selection</string>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
          <item>
@@ -171,8 +164,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>63</width>
-            <height>26</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">

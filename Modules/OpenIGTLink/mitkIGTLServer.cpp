@@ -34,8 +34,8 @@ IGTLDevice(ReadFully)
 
 mitk::IGTLServer::~IGTLServer()
 {
-  m_ReceiveListMutex->Delete();
-  m_SentListMutex->Delete();
+  m_ReceiveListMutex = nullptr;
+  m_SentListMutex = nullptr;
 }
 
 bool mitk::IGTLServer::OpenConnection()

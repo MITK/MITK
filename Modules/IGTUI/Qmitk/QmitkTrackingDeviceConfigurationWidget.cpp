@@ -166,7 +166,7 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
   }
 
   m_Controls->m_TrackingDeviceChooser->setCurrentIndex(0);
-  m_Controls->m_TrackingSystemWidget->setCurrentWidget(0);
+  m_Controls->m_TrackingSystemWidget->setCurrentIndex(0);
 }
 
 //######################### internal help methods #######################################

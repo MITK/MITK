@@ -267,6 +267,7 @@ bool
 {
   DICOMTag acquisitionDateTag(0x0008, 0x0022);
   DICOMTag acquisitionTimeTag(0x0008, 0x0032);
+
   DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
   filescanner->SetInputFiles(filenamesOfTimeStep);
   filescanner->AddTag( acquisitionDateTag );
@@ -341,19 +342,40 @@ mitk::TimeGeometry::Pointer
   mitk::ITKDICOMSeriesReaderHelper::
   GenerateTimeGeometry(const BaseGeometry* templateGeometry, const TimeBoundsList& boundsList)
 {
-  ArbitraryTimeGeometry::Pointer timeGeometry = ArbitraryTimeGeometry::New();
-  timeGeometry->ClearAllGeometries();
+  TimeGeometry::Pointer timeGeometry;
 
+  double check = 0.0;
   for (TimeBoundsList::size_type pos = 0; pos < boundsList.size(); ++pos)
   {
-    TimeBounds bounds = boundsList[pos];
-    if (pos+1 < boundsList.size())
-    {
-      bounds[1] = boundsList[pos+1][0];
-    }
-
-    timeGeometry->AppendTimeStepClone(templateGeometry,bounds[1],bounds[0]);
+    check += boundsList[pos][0];
+    check += boundsList[pos][1];
   }
 
-  return timeGeometry.GetPointer();
+  if (check == 0.0)
+  { //if all bounds are zero we assume that the bounds could not be correctly determined
+    //and as a fallback generate a time geometry in the old mitk style
+    ProportionalTimeGeometry::Pointer newTimeGeometry = ProportionalTimeGeometry::New();
+    newTimeGeometry->Initialize(templateGeometry, boundsList.size());
+    timeGeometry = newTimeGeometry.GetPointer();
+  }
+  else
+  {
+    ArbitraryTimeGeometry::Pointer newTimeGeometry = ArbitraryTimeGeometry::New();
+    newTimeGeometry->ClearAllGeometries();
+    newTimeGeometry->ReserveSpaceForGeometries(boundsList.size());
+
+    for (TimeBoundsList::size_type pos = 0; pos < boundsList.size(); ++pos)
+    {
+      TimeBounds bounds = boundsList[pos];
+      if (pos + 1 < boundsList.size())
+      {
+        bounds[1] = boundsList[pos + 1][0];
+      }
+
+      newTimeGeometry->AppendTimeStepClone(templateGeometry, bounds[1], bounds[0]);
+    }
+    timeGeometry = newTimeGeometry.GetPointer();
+  }
+
+  return timeGeometry;
 };

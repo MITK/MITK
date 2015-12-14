@@ -38,20 +38,20 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
 
   std::unordered_map<const char*, const char*> expectedPropertyTypes;
   std::unordered_map<const char*, mitk::DICOMTag> additionalTags;
-  additionalTags.insert( { "Test1", DICOMTag(0x0008, 0x005)} );
-  expectedPropertyTypes.insert( { "Test1", "StringProperty" } );
+  additionalTags.insert( std::make_pair( "Test1", DICOMTag( 0x0008, 0x005 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test1", "StringProperty" ) );
 
-  additionalTags.insert( { "Test2", DICOMTag(0x0008, 0x008)} );
-  expectedPropertyTypes.insert( { "Test2", "StringProperty" } );
+  additionalTags.insert( std::make_pair( "Test2", DICOMTag( 0x0008, 0x008 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test2", "StringProperty" ) );
 
-  additionalTags.insert( { "Test3", DICOMTag(0x0008, 0x0060)} );
-  expectedPropertyTypes.insert( { "Test3", "StringProperty" } );
+  additionalTags.insert( std::make_pair( "Test3", DICOMTag( 0x0008, 0x0060 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test3", "StringProperty" ) );
 
-  additionalTags.insert( { "Test4" ,DICOMTag(0x0008, 0x1070)} );
-  expectedPropertyTypes.insert( { "Test4", "StringProperty" } );
+  additionalTags.insert( std::make_pair( "Test4", DICOMTag( 0x0008, 0x1070 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test4", "StringProperty" ) );
 
-  additionalTags.insert( { "Test5" ,DICOMTag(0x0020, 0x1041)} );
-  expectedPropertyTypes.insert( { "Test5", "StringLookupTableProperty" } );
+  additionalTags.insert( std::make_pair( "Test5", DICOMTag( 0x0020, 0x1041 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test5", "StringLookupTableProperty" ) );
 
   gdcmReader->SetAdditionalTagsOfInterest( additionalTags );
 

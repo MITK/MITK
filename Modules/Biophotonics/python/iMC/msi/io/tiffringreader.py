@@ -5,7 +5,7 @@ Created on Nov 2, 2015
 '''
 
 import os
-import itertools
+import logging
 
 # PIL always rescales the image, thus PIL and skimage (which uses PIL) cannot
 # be used
@@ -14,6 +14,7 @@ import numpy as np
 
 from msi.io.reader import Reader
 from msi.msi import Msi
+import msi.msimanipulations as msimani
 
 
 class TiffRingReader(Reader):
@@ -34,7 +35,8 @@ class TiffRingReader(Reader):
         path, file_name = os.path.split(fileToRead)
         files = os.listdir(path)
         files_in_folder = [os.path.join(path, f) for f in files if
-                           os.path.isfile(os.path.join(path, f))]
+                           os.path.isfile(os.path.join(path, f)) and
+                           f.endswith('.tiff')]
 
         files_in_folder.sort()
         position = files_in_folder.index(fileToRead)
@@ -44,11 +46,23 @@ class TiffRingReader(Reader):
         image = reduce(lambda x, y: np.dstack((x, y)), image_array)
 
         msi = Msi(image)
-        return msi
 
+        segmentation = None
+        try:
+            segmentation_array = [toSegmentation(f) \
+                                  for f in files_in_folder[position:position + n]]
+            segmentation = reduce(lambda x, y: x & y, segmentation_array)
+
+        except:
+            logging.info("didn't find segmentation for all images")
+        return msi, segmentation
 
 def toImage(f):
     im = Image.open(f)
     im_array = np.array(im)
     im_array = im_array >> 4
     return im_array
+
+def toSegmentation(f):
+    seg = np.load(f + ".seg.npy")
+    return seg

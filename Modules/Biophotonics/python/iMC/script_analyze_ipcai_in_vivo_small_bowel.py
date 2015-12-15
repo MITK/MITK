@@ -40,8 +40,8 @@ from sklearn.linear_model.base import LinearRegression
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_vivo"
-sp.DATA_FOLDER = "small_bowel_selection2"
-sp.FINALS_FOLDER = "small_bowel_selection2"
+sp.DATA_FOLDER = "small_bowel_images"
+sp.FINALS_FOLDER = "small_bowel_images"
 sp.FLAT_FOLDER = "flatfields_liver"
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
@@ -90,12 +90,13 @@ class IPCAICreateOxyImageTask(luigi.Task):
         full_image_name = os.path.join(sp.ROOT_FOLDER,
                                        sp.DATA_FOLDER,
                                        self.image_name)
-        msi = tiff_ring_reader.read(full_image_name, nr_filters)
+        msi, segmentation = tiff_ring_reader.read(full_image_name, nr_filters)
         # read the segmentation
-        seg_path = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER,
-                                "segmentation_" + self.image_name + ".nrrd")
-        segmentation = nrrd_reader.read(seg_path)
-        segmentation = segmentation.get_image()
+#
+#         seg_path = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER,
+#                                 "segmentation_" + self.image_name + ".nrrd")
+#         segmentation = nrrd_reader.read(seg_path)
+#         segmentation = segmentation.get_image()
         # read the regressor
         e_file = open(self.input()[0].path, 'r')
         e = pickle.load(e_file)
@@ -152,7 +153,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         print "4"
         # plot parametric maps
         oxy_image = image[:, :]
-        oxy_image = np.ma.masked_array(image[:, :, 1], (segmentation < 1))
+        oxy_image = np.ma.masked_array(image[:, :], (segmentation < 1))
         oxy_image[np.isnan(oxy_image)] = 0.
         oxy_image[np.isinf(oxy_image)] = 0.
         oxy_image[oxy_image > 1.] = 1.
@@ -188,6 +189,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
 #                  ", " + "{0:.1f}".format((bvf_mean * 100.)) + "\n")
 #         fd.close()
         print "5"
+        plt.close("all")
 
 
 
@@ -217,8 +219,8 @@ class IPCAITrainRegressor(luigi.Task):
                           w_percent=0.1, bands_to_sortout=sp.bands_to_sortout)
 
         # train regressor
-        reg = RandomForestRegressor(max_depth=10, n_estimators=10,
-                                    n_jobs=-1)
+        reg = RandomForestRegressor(10, min_samples_leaf=10, max_depth=9,
+                                   n_jobs=-1)
         # reg = KNeighborsRegressor(algorithm="auto")
         # reg = LinearRegression()
         # reg = sklearn.svm.SVR(kernel="rbf", degree=3, C=100., gamma=10.)
@@ -279,10 +281,10 @@ if __name__ == '__main__':
     onlyfiles = [ f for f in os.listdir(image_file_folder) if
                  os.path.isfile(os.path.join(image_file_folder, f)) ]
     onlyfiles.sort()
-    only_first_files = [ f for f in onlyfiles if
-             f.endswith("F0.tiff") ]
+    onlyfiles = [ f for f in onlyfiles if
+             f.endswith(".tiff") ]
 
-    for f in only_first_files:
+    for f in onlyfiles:
         main_task = IPCAICreateOxyImageTask(
             image_name=f,
             batch_prefix=

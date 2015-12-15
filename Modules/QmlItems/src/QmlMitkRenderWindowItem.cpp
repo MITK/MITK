@@ -94,13 +94,13 @@ void QmlMitkRenderWindowItem::createPlaneNode()
     switch (this->GetRenderer()->GetSliceNavigationController()->GetDefaultViewDirection())
     {
         case mitk::SliceNavigationController::Axial:
-            planeNode->SetColor(1.0, 0.0, 0.0);
-            break;
-        case mitk::SliceNavigationController::Frontal:
-            planeNode->SetColor(0.0, 1.0, 0.0);
+            planeNode->SetColor(0.88, 0.35, 0.27);
             break;
         case mitk::SliceNavigationController::Sagittal:
-            planeNode->SetColor(0.0, 0.0, 1.0);
+            planeNode->SetColor(0.25, 0.7, 0.35);
+            break;
+        case mitk::SliceNavigationController::Frontal:
+            planeNode->SetColor(0.01, 0.31, 0.67);
             break;
         default:
             planeNode->SetColor(1.0, 1.0, 0.0);
@@ -282,6 +282,7 @@ int QmlMitkRenderWindowItem::getViewType()
 void QmlMitkRenderWindowItem::mousePressEvent(QMouseEvent* me)
 {
     mitk::Point2D mousePosition = GetMousePosition(me);
+    mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
     
     mitk::MousePressEvent::Pointer mPressEvent =
     mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
@@ -293,6 +294,7 @@ void QmlMitkRenderWindowItem::mousePressEvent(QMouseEvent* me)
 void QmlMitkRenderWindowItem::mouseReleaseEvent(QMouseEvent* me)
 {
     mitk::Point2D mousePosition = GetMousePosition(me);
+    mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
     
     mitk::MouseReleaseEvent::Pointer mReleaseEvent =
     mitk::MouseReleaseEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));

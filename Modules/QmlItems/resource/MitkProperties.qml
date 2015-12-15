@@ -26,6 +26,8 @@ Item
 
 	Rectangle
 	{
+		id: attributes
+
 		anchors.fill: parent
 		color: "#2E2E2E"
 
@@ -121,6 +123,16 @@ Item
 			{
 				properties.mode = currentIndex
 			}
+		}
+
+		Mitk.TransferFunction
+		{
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.top: opt_mode.bottom
+			anchors.topMargin: 10
+			height: 185
+			enabled: cb_volumerendering.checked
 		}
 	}
 

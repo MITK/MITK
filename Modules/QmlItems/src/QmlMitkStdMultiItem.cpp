@@ -21,6 +21,7 @@
 #include <mitkDataNode.h>
 #include <mitkIOUtil.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkLine.h>
 
 QmlMitkStdMultiItem* QmlMitkStdMultiItem::instance = nullptr;
 mitk::DataStorage::Pointer QmlMitkStdMultiItem::storage = nullptr;
@@ -96,12 +97,65 @@ void QmlMitkStdMultiItem::addPlanes()
     QmlMitkStdMultiItem::storage->Add(this->m_planeSagittal);
 }
 
+void QmlMitkStdMultiItem::moveCrossToPosition(const mitk::Point3D& newPosition)
+{
+    this->m_viewerAxial->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+    this->m_viewerFrontal->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+    this->m_viewerSagittal->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+    
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+const mitk::Point3D QmlMitkStdMultiItem::getCrossPosition() const
+{
+    const mitk::PlaneGeometry *plane1 = this->m_viewerAxial->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+    const mitk::PlaneGeometry *plane2 = this->m_viewerFrontal->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+    const mitk::PlaneGeometry *plane3 = this->m_viewerSagittal->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+    
+    mitk::Line3D line;
+    if ( (plane1 != NULL) && (plane2 != NULL)
+        && (plane1->IntersectionLine( plane2, line )) )
+    {
+        mitk::Point3D point;
+        if ( (plane3 != NULL)
+            && (plane3->IntersectionPoint( line, point )) )
+        {
+            return point;
+        }
+    }
+    // TODO BUG POSITIONTRACKER;
+    mitk::Point3D p;
+    return p;
+    //return m_LastLeftClickPositionSupplier->GetCurrentPoint();
+}
+
+
+QmlMitkRenderWindowItem* QmlMitkStdMultiItem::getViewerAxial()
+{
+    return this->m_viewerAxial;
+}
+
+QmlMitkRenderWindowItem* QmlMitkStdMultiItem::getViewerCoronal()
+{
+    return this->m_viewerFrontal;
+}
+
+QmlMitkRenderWindowItem* QmlMitkStdMultiItem::getViewerSagittal()
+{
+    return this->m_viewerSagittal;
+}
+
+QmlMitkRenderWindowItem* QmlMitkStdMultiItem::getViewerOriginal()
+{
+    return this->m_viewerOriginal;
+}
+
 void QmlMitkStdMultiItem::create(QQmlEngine &engine, mitk::DataStorage::Pointer storage)
 {
     QmlMitkStdMultiItem::storage = storage;
     
     qmlRegisterType<QmlMitkStdMultiItem>("Mitk.Views", 1, 0, "MultiItem");
     qmlRegisterType<QmlMitkRenderWindowItem>("Mitk.Views", 1, 0, "ViewItem");
-    QQmlComponent component(&engine, QUrl(QStringLiteral("qrc:/MitkStdMultiItem.qml")));
+    QQmlComponent component(&engine, QUrl("qrc:/views/MitkStdMultiItem.qml"));
 }
 

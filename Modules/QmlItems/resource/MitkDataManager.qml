@@ -116,8 +116,6 @@ Item
 			highlightMoveDuration: 0
 			highlightResizeDuration: 0
 
-			focus: true
-
 			onCurrentIndexChanged:
 			{
 				dataManager.index = list.currentIndex

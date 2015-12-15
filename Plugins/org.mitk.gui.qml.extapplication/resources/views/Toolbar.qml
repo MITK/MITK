@@ -79,7 +79,7 @@ Rectangle
       {
         if(toggle)
         {
-          dataManager.width = 220
+          dataManager.width = 240
         }
         else
         {
@@ -106,7 +106,7 @@ Rectangle
       {
         if(toggle)
         {
-          mitkproperties.width = 220
+          mitkproperties.width = 320
         }
         else
         {

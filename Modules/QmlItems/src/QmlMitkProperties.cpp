@@ -19,6 +19,7 @@
 #include <mitkImage.h>
 #include <mitkDataNode.h>
 #include <QmlMitkRenderingManager.h>
+#include <QmlMitkTransferFunctionItem.h>
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -41,6 +42,8 @@ void QmlMitkProperties::setRendering(bool state)
     {
         this->m_node->SetBoolProperty("volumerendering", state);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        
+        QmlMitkTransferFunctionItem::instance->OnUpdateCanvas();
     }
     
     emit this->renderingChanged();
@@ -171,6 +174,6 @@ void QmlMitkProperties::create(QQmlEngine &engine)
 {
     qmlRegisterType<QmlMitkProperties>("Mitk.Views", 1, 0, "Properties");
     
-    QQmlComponent component(&engine, QUrl(QStringLiteral("qrc:/MitkProperties.qml")));
+    QQmlComponent component(&engine, QUrl("qrc:/MitkProperties.qml"));
 }
 

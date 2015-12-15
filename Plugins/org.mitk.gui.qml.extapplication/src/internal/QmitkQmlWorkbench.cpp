@@ -30,6 +30,9 @@
 #include <QmlMitkStdMultiItem.h>
 #include <QmlMitkDatamanager.h>
 #include <QmlMitkProperties.h>
+#include <QmlMitkSliderLevelWindowItem.h>
+#include <QmlMitkTransferFunctionItem.h>
+#include <QmlMitkImageNavigator.h>
 
 #include <QmitkIOUtil.h>
 
@@ -68,9 +71,13 @@ void QmlMitkWorkbench::initialize(QQmlEngine &engine)
 {
     QmlMitkWorkbench::storage = mitk::StandaloneDataStorage::New().GetPointer();
     
+    QmlMitkSliderLevelWindowItem::create(engine, storage);
     QmlMitkStdMultiItem::create(engine, storage);
     QmlMitkDatamanager::create(engine, storage);
+    
+    QmlMitkTransferFunctionItem::create();
     QmlMitkProperties::create(engine);
+    QmlMitkImageNavigator::create(engine);
     
     qmlRegisterType<QmlMitkWorkbench>("Mitk.Views", 1, 0, "Workbench");
 }

@@ -53,12 +53,14 @@ Text
         
         onEntered:
         {
-            root.toolArea.text = root.tooltip;
+            if(root.toolArea)
+                root.toolArea.text = root.tooltip;
         }
 
         onExited:
         {
-            root.toolArea.text = "";
+            if(root.toolArea)
+                root.toolArea.text = "";
         }
     }
 }

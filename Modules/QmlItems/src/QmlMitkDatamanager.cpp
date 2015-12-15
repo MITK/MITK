@@ -26,6 +26,7 @@
 #include <QModelIndex>
 
 #include <QmlMitkProperties.h>
+#include <QmlMitkTransferFunctionItem.h>
 
 QmlMitkDatamanager* QmlMitkDatamanager::instance = nullptr;
 QmitkDataStorageListModel* QmlMitkDatamanager::model = nullptr;
@@ -57,7 +58,17 @@ void QmlMitkDatamanager::setIndex(int index)
     {
         QModelIndex modelIndex = QmlMitkDatamanager::model->index(this->m_index);
         mitk::DataNode::Pointer node = QmlMitkDatamanager::model->getNode(modelIndex);
-        QmlMitkProperties::instance->notify(node);
+        
+        if(dynamic_cast<mitk::Image*>(node->GetData()) && dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>=3 )
+        {
+            QmlMitkProperties::instance->notify(node);
+            QmlMitkTransferFunctionItem::instance->SetDataNode(node);
+        }
+        else
+        {
+            QmlMitkProperties::instance->setEnabled(false);
+            emit QmlMitkProperties::instance->sync();
+        }
     }
     else
     {
@@ -83,7 +94,7 @@ void QmlMitkDatamanager::reinitNode()
         basedata->GetTimeGeometry()->IsValid() )
     {
         mitk::RenderingManager::GetInstance()->InitializeViews(basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-    }    
+    }
 }
 
 void QmlMitkDatamanager::globalReinit()
@@ -112,6 +123,6 @@ void QmlMitkDatamanager::create(QQmlEngine &engine, mitk::DataStorage::Pointer s
     QQmlContext* context = engine.rootContext();
     context->setContextProperty("dataStorage", QmlMitkDatamanager::model);
     
-    QQmlComponent component(&engine, QUrl(QStringLiteral("qrc:/MitkDataManager.qml")));
+    QQmlComponent component(&engine, QUrl("qrc:/views/MitkDataManager.qml"));
 }
 

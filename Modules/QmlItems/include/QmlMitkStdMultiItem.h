@@ -52,10 +52,17 @@ public:
     ~QmlMitkStdMultiItem();
     
     void registerViewerItem(QmlMitkRenderWindowItem* viewerItem);
+    void moveCrossToPosition(const mitk::Point3D& newPosition);
     void addPlanes();
+    const mitk::Point3D getCrossPosition() const;
+    
+    QmlMitkRenderWindowItem* getViewerAxial();
+    QmlMitkRenderWindowItem* getViewerSagittal();
+    QmlMitkRenderWindowItem* getViewerCoronal();
+    QmlMitkRenderWindowItem* getViewerOriginal();
     
     static void create(QQmlEngine &engine, mitk::DataStorage::Pointer storage);
-public slots:
+    public slots:
     void init();
     void togglePlanes();
 };

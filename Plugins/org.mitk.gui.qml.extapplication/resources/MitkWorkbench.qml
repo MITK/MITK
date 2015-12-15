@@ -44,10 +44,20 @@ Window
 
 			anchors.left: parent.left
 			anchors.top: toolbar.bottom
-			anchors.bottom: footer.top
+			anchors.bottom: sliderNavigator.top
 			tooltipArea: footer
 
-			width: 220
+			width: 240
+		}
+
+		MitkImageNavigator
+		{
+			id: sliderNavigator
+
+			anchors.left: parent.left
+			anchors.bottom: footer.top
+			width: 240
+			height: 120
 		}
 
 		MitkProperties

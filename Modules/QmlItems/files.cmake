@@ -10,6 +10,13 @@ set(CPP_FILES
   QmlMitkStdMultiItem.cpp
   QmlMitkDatamanager.cpp
   QmlMitkProperties.cpp
+  QmlMitkSliderLevelWindowItem.cpp
+  QmlMitkTransferFunctionCanvas.cpp
+  QmlMitkPiecewiseFunctionCanvas.cpp
+  QmlMitkColorTransferFunctionCanvas.cpp
+  QmlMitkTransferFunctionItem.cpp
+  QmlMitkImageNavigator.cpp
+  QmlMitkSliderNavigatorItem.cpp
 )
 
 set(MOC_H_FILES
@@ -20,6 +27,13 @@ set(MOC_H_FILES
   include/QmlMitkStdMultiItem.h
   include/QmlMitkDatamanager.h
   include/QmlMitkProperties.h
+  include/QmlMitkSliderLevelWindowItem.h
+  include/QmlMitkTransferFunctionCanvas.h
+  include/QmlMitkPiecewiseFunctionCanvas.h
+  include/QmlMitkColorTransferFunctionCanvas.h
+  include/QmlMitkTransferFunctionItem.h
+  include/QmlMitkImageNavigator.h
+  include/QmlMitkSliderNavigatorItem.h
 )
 
 set(UI_FILES

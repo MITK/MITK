@@ -854,6 +854,7 @@ void
         // Clear the slice stack and adjust it according to the center of
         // rotation and plane position (see documentation of ReinitializePlanes)
         this->ReinitializePlanes( center, planeOp->GetPoint() );
+        planeGeometry->SetSpacing(this->GetSpacing());
 
         if ( m_SliceNavigationController )
         {
@@ -897,6 +898,7 @@ void
 
         // Apply changes on first slice to whole slice stack
         this->ReinitializePlanes( center, planeOp->GetPoint() );
+        planeGeometry->SetSpacing(this->GetSpacing());
 
         if ( m_SliceNavigationController )
         {

@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //#define MBILOG_ENABLE_DEBUG
-//#define ENABLE_TIMING
+#define ENABLE_TIMING
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
@@ -329,7 +329,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
 
   timeStart( "Sorting frames" );
   unsigned int sorterIndex = 0;
-  for ( auto sorterIter = m_Sorter.begin(); sorterIter != m_Sorter.end(); ++sorterIndex, ++sorterIter )
+  for ( auto sorterIter = m_Sorter.cbegin(); sorterIter != m_Sorter.cend(); ++sorterIndex, ++sorterIter )
   {
     std::stringstream ss;
     ss << "Sorting step " << sorterIndex;
@@ -380,6 +380,8 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
     block.SetTagCache( this->GetTagCache() ); // important: this must be before SetImageFrameList(), because
                                               // SetImageFrameList will trigger reading of lots of interesting
                                               // tags!
+    block.SetAdditionalTagsOfInterest( GetAdditionalTagsOfInterest() );
+    block.SetTagLookupTableToPropertyFunctor( GetTagLookupTableToPropertyFunctor() );
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 
@@ -631,7 +633,7 @@ mitk::DICOMTagCache::Pointer mitk::DICOMITKSeriesGDCMReader::GetTagCache() const
   return m_TagCache;
 }
 
-void mitk::DICOMITKSeriesGDCMReader::SetTagCache( DICOMTagCache::Pointer tagCache )
+void mitk::DICOMITKSeriesGDCMReader::SetTagCache( const DICOMTagCache::Pointer& tagCache )
 {
   m_TagCache = tagCache;
 }
@@ -646,19 +648,29 @@ mitk::DICOMTagList mitk::DICOMITKSeriesGDCMReader::GetTagsOfInterest() const
     assert( sorterIter->IsNotNull() );
 
     const DICOMTagList tags = ( *sorterIter )->GetTagsOfInterest();
-    completeList.insert( completeList.end(), tags.begin(), tags.end() );
+    completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
   }
 
   // check our own forced sorters
   DICOMTagList tags = m_EquiDistantBlocksSorter->GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
 
   tags = m_NormalDirectionConsistencySorter->GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
 
   // add the tags for DICOMImageBlockDescriptor
   tags = DICOMImageBlockDescriptor::GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
+
+
+  const std::unordered_map<const char*, mitk::DICOMTag> tagList = GetAdditionalTagsOfInterest();
+  for ( auto iter = tagList.cbegin();
+        iter != tagList.cend();
+        ++iter
+      )
+  {
+   completeList.push_back( iter->second ) ;
+  }
 
   return completeList;
 }

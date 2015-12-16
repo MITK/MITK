@@ -371,7 +371,10 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
       sitk_type = "sitkUInt16";
     }
   }
-  else if ( ioPixelType == itk::ImageIOBase::VECTOR)
+  else if ( ioPixelType == itk::ImageIOBase::VECTOR ||
+            ioPixelType == itk::ImageIOBase::RGB ||
+            ioPixelType == itk::ImageIOBase::RGBA
+          )
   {
     if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
       npy_type = NPY_DOUBLE;
@@ -530,9 +533,46 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
     {
       mitkThrow()<< "unknown scalar PixelType";
     }
-  }
-  else
-  {
+  } else if(nr_Components == 3) {
+    typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
+    typedef itk::RGBPixel< unsigned short > USRGBPixelType;
+    typedef itk::RGBPixel< float > FloatRGBPixelType;
+    typedef itk::RGBPixel< double > DoubleRGBPixelType;
+    typedef itk::Image< UCRGBPixelType > UCRGBImageType;
+    typedef itk::Image< USRGBPixelType > USRGBImageType;
+    typedef itk::Image< FloatRGBPixelType > FloatRGBImageType;
+    typedef itk::Image< DoubleRGBPixelType > DoubleRGBImageType;
+
+    if( dtype.compare("float64") == 0   ) {
+      pixelType = MakePixelType<DoubleRGBImageType>();
+    } else if( dtype.compare("float32") == 0 ) {
+      pixelType = MakePixelType<FloatRGBImageType>();
+    } else if( dtype.compare("uint8") == 0 ) {
+      pixelType = MakePixelType<UCRGBImageType>();
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<USRGBImageType>();
+    }
+  } else if( (nr_Components == 4)) {
+    typedef itk::RGBAPixel< unsigned char > UCRGBAPixelType;
+    typedef itk::RGBAPixel< unsigned short > USRGBAPixelType;
+    typedef itk::RGBAPixel< float > FloatRGBAPixelType;
+    typedef itk::RGBAPixel< double > DoubleRGBAPixelType;
+    typedef itk::Image< UCRGBAPixelType > UCRGBAImageType;
+    typedef itk::Image< USRGBAPixelType > USRGBAImageType;
+    typedef itk::Image< FloatRGBAPixelType > FloatRGBAImageType;
+    typedef itk::Image< DoubleRGBAPixelType > DoubleRGBAImageType;
+
+    if( dtype.compare("float64") == 0   ) {
+      pixelType = MakePixelType<DoubleRGBAImageType>();
+    } else if( dtype.compare("float32") == 0 ) {
+      pixelType = MakePixelType<FloatRGBAImageType>();
+    } else if( dtype.compare("uint8") == 0 ) {
+      pixelType = MakePixelType<UCRGBAImageType>();
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<USRGBAImageType>();
+    }
+
+  } else {
     if( dtype.compare("float64") == 0   ) {
       pixelType = MakePixelType<double, itk::Vector<double,3> >(nr_Components);
     } else if( dtype.compare("float32") == 0 ) {
@@ -547,19 +587,16 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
       pixelType = MakePixelType<long, itk::Vector<long,3> >(nr_Components);
     } else if( dtype.compare("uint8") == 0 ) {
       pixelType = MakePixelType<unsigned char, itk::Vector<unsigned char,3> >(nr_Components);
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<unsigned short, itk::Vector<unsigned short,3> >(nr_Components);
     } else if( dtype.compare("uint32") == 0 ) {
       pixelType = MakePixelType<unsigned int, itk::Vector<unsigned int,3> >(nr_Components);
     } else if( dtype.compare("uint64") == 0 ) {
       pixelType = MakePixelType<unsigned long, itk::Vector<unsigned long,3> >(nr_Components);
-    } else if( dtype.compare("uint16") == 0 ) {
-      pixelType = MakePixelType<unsigned short, itk::Vector<unsigned short,3> >(nr_Components);
-    }
-    else
-    {
+    }  else {
       mitkThrow()<< "unknown vectorial PixelType";
     }
   }
-
 
   unsigned int* dimensions = new unsigned int[nr_dimensions];
   // fill backwards , nd data saves dimensions in opposite direction
@@ -635,69 +672,228 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::string& stdvarName )
 {
   QString varName = QString::fromStdString( stdvarName );
-
-  bool convert = false;
-  if(image->GetDimension() != 2)
-  {
-    MITK_ERROR << "Only 2D images allowed for OpenCV images";
-    return convert;
-  }
-
-  // try to save mitk image
-  QString fileName = this->GetTempDataFileName( ".bmp" );
-  fileName = QDir::fromNativeSeparators( fileName );
-  MITK_DEBUG("PythonService") << "Saving temporary file " << fileName.toStdString();
-  if( !mitk::IOUtil::SaveImage(image, fileName.toStdString()) )
-  {
-    MITK_ERROR << "Temporary file " << fileName.toStdString() << " could not be created.";
-    return convert;
-  }
-
   QString command;
+  unsigned int* imgDim = image->GetDimensions();
+  int npy_nd = 1;
 
-  command.append( QString("%1 = cv2.imread(\"%2\")\n") .arg( varName ).arg( fileName ) );
+  // access python module
+  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  // global dictionary
+  PyObject *pyDict = PyModule_GetDict(pyMod);
+  mitk::PixelType pixelType = image->GetPixelType();
+  PyObject* npyArray = NULL;
+  mitk::ImageReadAccessor racc(image);
+  void* array = (void*) racc.GetData();
+
+  // save the total number of elements here (since the numpy array is one dimensional)
+  npy_intp* npy_dims = new npy_intp[1];
+  npy_dims[0] = imgDim[0];
+
+  /**
+   * Build a string in the format [1024,1028,1]
+   * to describe the dimensionality. This is needed for simple itk
+   * to know the dimensions of the image
+   */
+  QString dimensionString;
+  dimensionString.append(QString("["));
+  dimensionString.append(QString::number(imgDim[0]));
+  // ToDo: check if we need this
+  for (unsigned i = 1; i < 3; ++i)
+    // always three because otherwise the 3d-geometry gets destroyed
+    // (relevant for backtransformation of simple itk image to mitk.
+  {
+    dimensionString.append(QString(","));
+    dimensionString.append(QString::number(imgDim[i]));
+    npy_dims[0] *= imgDim[i];
+  }
+  dimensionString.append("]");
+
+
+  // the next line is necessary for vectorimages
+  npy_dims[0] *= pixelType.GetNumberOfComponents();
+
+  // default pixeltype: unsigned short
+  NPY_TYPES npy_type  = NPY_USHORT;
+  if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
+    npy_type = NPY_DOUBLE;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT ) {
+    npy_type = NPY_FLOAT;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT) {
+    npy_type = NPY_SHORT;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR ) {
+    npy_type = NPY_BYTE;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::INT ) {
+    npy_type = NPY_INT;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG ) {
+    npy_type = NPY_LONG;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR ) {
+    npy_type = NPY_UBYTE;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT ) {
+    npy_type = NPY_UINT;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG ) {
+    npy_type = NPY_LONG;
+  } else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT ) {
+    npy_type = NPY_USHORT;
+  }
+  else {
+    MITK_WARN << "not a recognized pixeltype";
+    return false;
+  }
+
+  // creating numpy array
+  import_array1 (true);
+  npyArray = PyArray_SimpleNewFromData(npy_nd,npy_dims,npy_type,array);
+
+  // add temp array it to the python dictionary to access it in python code
+  const int status = PyDict_SetItemString( pyDict,QString("%1_numpy_array")
+                                           .arg(varName).toStdString().c_str(),
+                                           npyArray );
+  // sanity check
+  if ( status != 0 )
+    return false;
+
+  command.append( QString("import numpy as np\n"));
+  //command.append( QString("if '%1' in globals():\n").arg(varName));
+  //command.append( QString("  del %1\n").arg(varName));
+  command.append( QString("%1_array_tmp=%1_numpy_array.copy()\n").arg(varName));
+  command.append( QString("%1_array_tmp=%1_array_tmp.reshape(%2,%3,%4)\n").arg( varName,
+                                                                     QString::number(imgDim[1]),
+                                                                     QString::number(imgDim[0]),
+                                                                     QString::number(pixelType.GetNumberOfComponents())));
+
+  command.append( QString("%1 = %1_array_tmp[:,...,::-1]\n").arg(varName));
+  command.append( QString("del %1_numpy_array\n").arg(varName) );
+  command.append( QString("del %1_array_tmp").arg(varName) );
+
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
-  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  MITK_DEBUG("PythonService") << "Removing file " << fileName.toStdString();
-  QFile file(fileName);
-  file.remove();
-  convert = true;
-  return convert;
+  this->Execute( command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
+
+  return true;
 }
 
 mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::string& stdvarName )
 {
+  typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
+  typedef itk::RGBPixel< unsigned short > USRGBPixelType;
+  typedef itk::RGBPixel< float > FloatRGBPixelType;
+  typedef itk::RGBPixel< double > DoubleRGBPixelType;
+  typedef itk::Image< UCRGBPixelType > UCRGBImageType;
+  typedef itk::Image< USRGBPixelType > USRGBImageType;
+  typedef itk::Image< FloatRGBPixelType > FloatRGBImageType;
+  typedef itk::Image< DoubleRGBPixelType > DoubleRGBImageType;
+  typedef itk::RGBAPixel< unsigned char > UCRGBAPixelType;
+  typedef itk::RGBAPixel< unsigned short > USRGBAPixelType;
+  typedef itk::RGBAPixel< float > FloatRGBAPixelType;
+  typedef itk::RGBAPixel< double > DoubleRGBAPixelType;
+  typedef itk::Image< UCRGBAPixelType > UCRGBAImageType;
+  typedef itk::Image< USRGBAPixelType > USRGBAImageType;
+  typedef itk::Image< FloatRGBAPixelType > FloatRGBAImageType;
+  typedef itk::Image< DoubleRGBAPixelType > DoubleRGBAImageType;
+
+  // access python module
+  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  // global dictionarry
+  PyObject *pyDict = PyModule_GetDict(pyMod);
+  mitk::Image::Pointer mitkImage = mitk::Image::New();
+  QString command;
   QString varName = QString::fromStdString( stdvarName );
 
-  mitk::Image::Pointer mitkImage;
-  QString command;
-  QString fileName = GetTempDataFileName( ".bmp" );
-  fileName = QDir::fromNativeSeparators( fileName );
-
-  MITK_DEBUG("PythonService") << "run python command to save image with opencv to " << fileName.toStdString();
-
-  command.append( QString( "cv2.imwrite(\"%1\", %2)\n").arg( fileName ).arg( varName ) );
+  command.append( QString("import numpy as np\n"));
+  command.append( QString("%1_dtype=%1.dtype.name\n").arg(varName) );
+  command.append( QString("%1_shape=np.asarray(%1.shape)\n").arg(varName) );
+  command.append( QString("%1_np_array=%1[:,...,::-1]\n").arg(varName));
+  command.append( QString("%1_np_array=np.reshape(%1_np_array,%1.shape[0] * %1.shape[1] * %1.shape[2])").arg(varName) );
 
   MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
   this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
-  try
+  PyObject* py_dtype = PyDict_GetItemString(pyDict,QString("%1_dtype").arg(varName).toStdString().c_str() );
+  std::string dtype = PyString_AsString(py_dtype);
+  PyArrayObject* py_data = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_np_array").arg(varName).toStdString().c_str() );
+  PyArrayObject* shape = (PyArrayObject*) PyDict_GetItemString(pyDict,QString("%1_shape").arg(varName).toStdString().c_str() );
+
+  size_t* d = (size_t*)shape->data;
+
+  unsigned int dimensions[3];
+  dimensions[0] = d[1];
+  dimensions[1] = d[0];
+  dimensions[2] = d[2];
+
+  unsigned int nr_dimensions = 2;
+  mitk::PixelType pixelType = MakePixelType<UCRGBImageType>();
+
+  // get number of components
+  unsigned int nr_Components = (unsigned int) d[2];
+
+  if (nr_Components == 1)
   {
-      MITK_DEBUG("PythonService") << "Loading temporary file " << fileName.toStdString() << " as MITK image";
-      mitkImage = mitk::IOUtil::LoadImage( fileName.toStdString() );
-  }
-  catch(std::exception& e)
-  {
-    MITK_ERROR << e.what();
+    if( dtype.compare("float64") == 0   ) {
+      pixelType = MakePixelType<double, double >(nr_Components);
+    } else if( dtype.compare("float32") == 0 ) {
+      pixelType = MakePixelType<float, float >(nr_Components);
+    } else if( dtype.compare("int16") == 0) {
+      pixelType = MakePixelType<short, short >(nr_Components);
+    } else if( dtype.compare("int8") == 0 ) {
+      pixelType = MakePixelType<char, char >(nr_Components);
+    } else if( dtype.compare("int32") == 0 ) {
+      pixelType = MakePixelType<int, int >(nr_Components);
+    } else if( dtype.compare("int64") == 0 ) {
+      pixelType = MakePixelType<long, long >(nr_Components);
+    } else if( dtype.compare("uint8") == 0 ) {
+      pixelType = MakePixelType<unsigned char, unsigned char >(nr_Components);
+    } else if( dtype.compare("uint32") == 0 ) {
+      pixelType = MakePixelType<unsigned int, unsigned int >(nr_Components);
+    } else if( dtype.compare("uint64") == 0 ) {
+      pixelType = MakePixelType<unsigned long, unsigned long >(nr_Components);
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<unsigned short, unsigned short >(nr_Components);
+    }
+    else
+    {
+      mitkThrow()<< "unknown scalar PixelType";
+    }
+  } else if(nr_Components == 3) {
+    if( dtype.compare("float64") == 0   ) {
+      pixelType = MakePixelType<DoubleRGBImageType>();
+    } else if( dtype.compare("float32") == 0 ) {
+      pixelType = MakePixelType<FloatRGBImageType>();
+    } else if( dtype.compare("uint8") == 0 ) {
+      pixelType = MakePixelType<UCRGBImageType>();
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<USRGBImageType>();
+    }
+  } else if( (nr_Components == 4)) {
+    if( dtype.compare("float64") == 0   ) {
+      pixelType = MakePixelType<DoubleRGBAImageType>();
+    } else if( dtype.compare("float32") == 0 ) {
+      pixelType = MakePixelType<FloatRGBAImageType>();
+    } else if( dtype.compare("uint8") == 0 ) {
+      pixelType = MakePixelType<UCRGBAImageType>();
+    } else if( dtype.compare("uint16") == 0 ) {
+      pixelType = MakePixelType<USRGBAImageType>();
+    }
+  } else {
+    mitkThrow()<< "unknown scalar PixelType";
   }
 
-  QFile file(fileName);
-  if( file.exists() )
+  mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
+  //mitkImage->SetChannel(py_data->data);
+
   {
-      MITK_DEBUG("PythonService") << "Removing temporary file " << fileName.toStdString();
-      file.remove();
+    mitk::ImageWriteAccessor ra(mitkImage);
+    char* data = (char*)(ra.GetData());
+    memcpy(data, (void*)py_data->data, dimensions[0] * dimensions[1] * pixelType.GetSize());
   }
+
+  command.clear();
+
+  command.append( QString("del %1_shape\n").arg(varName) );
+  command.append( QString("del %1_dtype\n").arg(varName) );
+  command.append( QString("del %1_np_array").arg(varName));
+
+  MITK_DEBUG("PythonService") << "Issuing python command " << command.toStdString();
+  this->Execute(command.toStdString(), IPythonService::MULTI_LINE_COMMAND );
 
   return mitkImage;
 }

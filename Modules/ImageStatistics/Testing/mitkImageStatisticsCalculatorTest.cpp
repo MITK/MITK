@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 #include <mitkPlanarPolygon.h>
-#include <mitkClassicDICOMSeriesReader.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <mitkStandaloneDataStorage.h>
 
@@ -102,16 +101,8 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
   }
 
   MITK_TEST_OUTPUT(<< "Loading test image '" << filename << "'")
-  mitk::StringList files;
-  files.push_back( filename );
 
-  mitk::ClassicDICOMSeriesReader::Pointer reader = mitk::ClassicDICOMSeriesReader::New();
-  reader->SetInputFiles( files );
-  reader->AnalyzeInputFiles();
-  reader->LoadImages();
-  MITK_TEST_CONDITION_REQUIRED( reader->GetNumberOfOutputs() == 1, "Loaded one result from file" );
-
-  m_Image = reader->GetOutput(0).GetMitkImage();
+  m_Image = mitk::IOUtil::LoadImage(filename);
   MITK_TEST_CONDITION_REQUIRED( m_Image.IsNotNull(), "Loaded an mitk::Image" );
 
   m_Geometry = m_Image->GetSlicedGeometry()->GetPlaneGeometry(0);

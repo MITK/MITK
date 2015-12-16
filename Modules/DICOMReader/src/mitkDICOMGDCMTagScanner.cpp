@@ -83,7 +83,7 @@ void mitk::DICOMGDCMTagScanner::AddTag( const DICOMTag& tag )
 
 void mitk::DICOMGDCMTagScanner::AddTags( const DICOMTagList& tags )
 {
-  for ( auto tagIter = tags.begin(); tagIter != tags.end(); ++tagIter )
+  for ( auto tagIter = tags.cbegin(); tagIter != tags.cend(); ++tagIter )
   {
     this->AddTag( *tagIter );
   }

@@ -442,7 +442,7 @@ void mitk::DataNode::SetFloatProperty( const char* propertyKey, float floatValue
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
 }
 
-void mitk::DataNode::SetDoubleProperty(const char *propertyKey, float doubleValue, const mitk::BaseRenderer *renderer)
+void mitk::DataNode::SetDoubleProperty(const char *propertyKey, double doubleValue, const mitk::BaseRenderer *renderer)
 {
   if (dynamic_cast<FloatProperty*>(this->GetProperty(propertyKey, renderer)) != NULL)
   {

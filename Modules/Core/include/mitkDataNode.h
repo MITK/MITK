@@ -506,7 +506,7 @@ public:
    * \brief Convenience method for setting double properties (instances of
    * DoubleProperty)
    */
-  void SetDoubleProperty(const char* propertyKey, float doubleValue, const mitk::BaseRenderer* renderer=nullptr);
+  void SetDoubleProperty(const char* propertyKey, double doubleValue, const mitk::BaseRenderer* renderer=nullptr);
 
   /**
    * \brief Convenience method for setting string properties (instances of

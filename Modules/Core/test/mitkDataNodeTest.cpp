@@ -185,6 +185,12 @@ static void TestPropertyList(mitk::DataNode::Pointer dataNode)
   double yd = 0;
   dataNode->GetDoubleProperty("float", yd);
   MITK_TEST_CONDITION(mitk::Equal(yd, static_cast<double>(y)), "Testing GetDoubleProperty");
+
+  double d = sqrt(2.0);
+  dataNode->SetDoubleProperty("double", d);
+  double read_d;
+  MITK_TEST_CONDITION(dataNode->GetDoubleProperty("double", read_d), "Testing GetDoubleProperty");
+  MITK_TEST_CONDITION(d == read_d, "Testing Set/GetDoubleProperty"); // Equal does not the same thing
   dataNode->SetStringProperty("string", "MITK");
   std::string s = "GANZVIELPLATZ";
   dataNode->GetStringProperty("string", s);

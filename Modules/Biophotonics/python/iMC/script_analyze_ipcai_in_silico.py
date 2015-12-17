@@ -266,7 +266,7 @@ class DomainNoisePlot(luigi.Task):
 
     def requires(self):
         return tasks_mc.CameraBatch("ipcai_colon_muscle_train"), \
-                tasks_mc.CameraBatch("ipcai_generic_test")
+                tasks_mc.CameraBatch("ipcai_generic")
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -443,7 +443,8 @@ class WeightsCalculation(luigi.Task):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                  sp.RESULTS_FOLDER,
                                  sp.FINALS_FOLDER,
-                                 "weights.npy"))
+                                 "weights_" + self.source_domain + "to" +
+                                 self.target_domain + ".npy"))
 
     def run(self):
         # get data
@@ -494,10 +495,15 @@ class WeightsCalculation(luigi.Task):
 
 
 class NewDAPlot(luigi.Task):
+    source_train_set = luigi.Parameter()
+    target_train_set = luigi.Parameter()
+    target_test_set = luigi.Parameter()
+
     def requires(self):
-        return tasks_mc.CameraBatch("ipcai_generic"), \
-                tasks_mc.CameraBatch("ipcai_colon_muscle_test"), \
-                WeightsCalculation("ipcai_generic", "ipcai_colon_muscle_test")
+        return tasks_mc.CameraBatch(self.source_train_set), \
+               tasks_mc.CameraBatch(self.target_test_set), \
+               tasks_mc.CameraBatch(self.target_train_set), \
+               WeightsCalculation(self.source_train_set, self.target_train_set)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -512,19 +518,26 @@ class NewDAPlot(luigi.Task):
         f = open(self.input()[1].path, "r")
         batch_test = pickle.load(f)
         f = open(self.input()[2].path, "r")
+        batch_target_train = pickle.load(f)
+        f = open(self.input()[3].path, "r")
         weights = np.load(f)
 
         evaluation_setups = [
-                    EvaluationStruct("Linear Beer-Lambert",
-                                     LinearSaO2Unmixing(), [], "red", 0.25)
+                    EvaluationStruct("Proposed no DS",
+                                     rf, [], "red", 0.25)
                     , EvaluationStruct("Proposed", rf, [], "yellow", 0.5)
                     , EvaluationStruct("Proposed DA", rf, [], "green", 0.5)
+                    , EvaluationStruct("Proposed Fake", rf, [], "black", 0.1)
                     ]
 
         X_train, y_train = preprocess(batch_train, w_percent=w_standard)
         X_da_test, y_da_test = preprocess(batch_test, w_percent=w_standard)
-        X_train_sampled, y_train_sampled, weights_sampled = \
-            resample(X_train, y_train, weights, 8000)
+        X_target_train, y_target_train = preprocess(batch_target_train,
+                                                    w_percent=w_standard)
+#         X_train_sampled, y_train_sampled, weights_sampled = \
+#             resample(X_train, y_train, weights, 8000)
+
+
         f, axarr = plt.subplots(X_train.shape[1], 1)
         for i in range(X_train.shape[1]):
             y, binEdges = np.histogram(X_train[:, i], weights=weights)
@@ -540,12 +553,12 @@ class NewDAPlot(luigi.Task):
                                        X_train.shape[0] / X_da_test.shape[0])
             bincenters = 0.5 * (binEdges[1:] + binEdges[:-1])
             axarr[i].plot(bincenters, y, '-*', label="searched")
-
-            y, binEdges = np.histogram(X_train_sampled[:, i],
-                                    weights=np.ones(X_train_sampled.shape[0]) *
-                                    X_train.shape[0] / X_train_sampled.shape[0])
-            bincenters = 0.5 * (binEdges[1:] + binEdges[:-1])
-            axarr[i].plot(bincenters, y, '-^', label="sampled")
+#
+#             y, binEdges = np.histogram(X_train_sampled[:, i],
+#                                     weights=np.ones(X_train_sampled.shape[0]) *
+#                                     X_train.shape[0] / X_train_sampled.shape[0])
+#             bincenters = 0.5 * (binEdges[1:] + binEdges[:-1])
+#             axarr[i].plot(bincenters, y, '-^', label="sampled")
 
             axarr[i].xaxis.set_visible(False)
             axarr[i].yaxis.set_visible(False)
@@ -560,12 +573,24 @@ class NewDAPlot(luigi.Task):
         for w in noise_levels:
             # setup testing function
             X_test, y_test = preprocess(batch_test, w_percent=w)
+
             # extract noisy data
             X_train, y_train = preprocess(batch_train, w_percent=w)
+
+            X_fake_train, y_fake_train = preprocess2(batch_train,
+                                                 w_percent=w)
+            correct_bvf_train = y_fake_train[:, 0] < 0.1
+            X_fake_train = X_fake_train[correct_bvf_train, :]
+            y_fake_train = y_fake_train[correct_bvf_train, 1]
+
             for e in evaluation_setups:
                 lr = e.regressor
                 if "DA" in e.name:
                     lr.fit(X_train, y_train, weights)
+                elif "DS" in e.name:
+                    lr.fit(X_target_train, y_target_train)
+                elif "Fake" in e.name:
+                    lr.fit(X_fake_train, y_fake_train)
                 else:
                     lr.fit(X_train, y_train)
                 y_pred = lr.predict(X_test)
@@ -588,8 +613,7 @@ class NewDAPlot(luigi.Task):
                           map(m, e.data), color=e.color,
                           label=e.name)
             legend_handles.append(h)
-            if e.name is "Proposed":
-                median0 = m(e.data[0])
+            median0 = m(e.data[0])
         minor_ticks = np.arange(0, 15, 5)
         plt.gca().set_xticks(minor_ticks, minor=True)
         plt.gca().set_yticks(minor_ticks, minor=True)
@@ -632,6 +656,8 @@ if __name__ == '__main__':
     w.add(DomainNoisePlot())
     w.add(NoisePlotsBVF(which="colon_muscle"))
     # w.add(NoisePlots(which="generic"))
-    w.add(NewDAPlot())
+    w.add(NewDAPlot(source_train_set="ipcai_less_generic",
+                    target_train_set="ipcai_colon_muscle_train",
+                    target_test_set="ipcai_colon_muscle_test"))
     w.run()
 

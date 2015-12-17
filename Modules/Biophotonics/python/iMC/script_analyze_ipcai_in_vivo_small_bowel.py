@@ -18,8 +18,6 @@ import luigi
 import matplotlib.pyplot as plt
 import SimpleITK as sitk
 from sklearn.ensemble.forest import RandomForestRegressor
-from sklearn.neighbors import KNeighborsRegressor
-import sklearn.svm
 from scipy.ndimage.filters import gaussian_filter
 
 import tasks_analyze as at
@@ -41,7 +39,7 @@ from sklearn.linear_model.base import LinearRegression
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_vivo"
 sp.DATA_FOLDER = "small_bowel_images"
-sp.FINALS_FOLDER = "small_bowel_images"
+sp.FINALS_FOLDER = "small_bowel_images_colorbar20_80"
 sp.FLAT_FOLDER = "flatfields_liver"
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
@@ -78,7 +76,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
                                               sp.FINALS_FOLDER,
                                               self.image_name + "_" +
                                               self.batch_prefix +
-                                              "_summary.png"))
+                                              "_summary.png.png"))
 
     def run(self):
         nrrd_reader = NrrdReader()
@@ -91,6 +89,9 @@ class IPCAICreateOxyImageTask(luigi.Task):
                                        sp.DATA_FOLDER,
                                        self.image_name)
         msi, segmentation = tiff_ring_reader.read(full_image_name, nr_filters)
+        segmentation = np.logical_and(segmentation,
+                                     (np.max(msi.get_image(),
+                                             axis=-1) < 1000.))
         # read the segmentation
 #
 #         seg_path = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER,
@@ -147,25 +148,27 @@ class IPCAICreateOxyImageTask(luigi.Task):
         top_left_axis.xaxis.set_visible(False)
         top_left_axis.yaxis.set_visible(False)
 
-        plt.savefig(self.output().path, dpi=500, bbox_inches='tight')
-        plt.figure()
         plt.set_cmap("jet")
         print "4"
         # plot parametric maps
         oxy_image = image[:, :]
+        segmentation[0, 0] = 1
+        segmentation[0, 1] = 1
         oxy_image = np.ma.masked_array(image[:, :], (segmentation < 1))
         oxy_image[np.isnan(oxy_image)] = 0.
         oxy_image[np.isinf(oxy_image)] = 0.
-        oxy_image[oxy_image > 1.] = 1.
-        oxy_image[oxy_image < 0.] = 0.
         oxy_mean = np.mean(oxy_image)
-        oxy_image[0, 0] = 0.
-        oxy_image[0, 1] = 1.
+        oxy_image[0, 0] = 0.2
+        oxy_image[0, 1] = 0.8
+        oxy_image = np.clip(oxy_image, 0.2, 0.8)
+#         oxy_image[oxy_image > 0.8] = 0.8
+#         oxy_image[oxy_image < 0.2] = 0.2
+
         at.plot_axis(plt.gca(), oxy_image[:, :],
                   "oxygenation [%]. Mean " +
                   "{0:.1f}".format((oxy_mean * 100.)) + "%")
 
-        plt.savefig(self.output().path + "_oxy.png", dpi=500, bbox_inches='tight')
+        plt.savefig(self.output().path, dpi=500, bbox_inches='tight')
 #         plt.figure()
 #         bvf_image = np.ma.masked_array(image[:, :, 0], (segmentation < 1))
 #         # bvf_image = image[:, :, 0]

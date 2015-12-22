@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <gdcmGlobal.h>
 #include <gdcmDicts.h>
 
+#include <boost/algorithm/string.hpp>
+
 #include "mitkLogMacros.h"
 
 mitk::DICOMTag
@@ -124,78 +126,62 @@ mitk::DICOMTag
   os << "(" << toHexString(m_Group) << "," << toHexString(m_Element) << ") " << this->GetName();
 }
 
-void
-mitk::DICOMStringToOrientationVectors(const std::string& s, Vector3D& right, Vector3D& up, bool& successful)
+void mitk::DICOMStringToOrientationVectors( const std::string& s,
+                                            Vector3D& right,
+                                            Vector3D& up,
+                                            bool& successful )
 {
-  successful = true;
+  successful = false;
 
-  std::istringstream orientationReader(s);
-  std::istringstream converter;
-  std::string coordinate;
-  unsigned int dim(0);
-  while( std::getline( orientationReader, coordinate, '\\' ) && dim < 6 )
+  try
   {
-    converter.str(coordinate);
-    converter.clear();
-    if (dim<3)
+    std::vector<std::string> strs;
+    boost::split( strs, s, boost::is_any_of( "\\" ) );
+    if ( strs.size() == 6 )
     {
-      if ( !(converter >> right[dim++] && converter.eof() ))
+      int i = 0;
+      for ( ; i < 3; ++i )
       {
-        // conversion error
-        break;
+        right[i] = stod( strs[i] );
       }
-    }
-    else
-    {
-      if ( !(converter >> up[dim++ - 3] && converter.eof() ))
+      for ( ; i < 6; ++i )
       {
-        // conversion error
-        break;
+        up[i - 3] = stod( strs[i] );
       }
+      successful = true;
     }
   }
-
-  if (dim != 0 && dim != 6)
+  catch ( const std::exception& /*e*/ )
   {
-    successful = false;
-  }
-  else if (dim == 0)
-  {
-    // fill with defaults
-    right.Fill(0.0);
+    right.Fill( 0.0 );
     right[0] = 1.0;
 
-    up.Fill(0.0);
+    up.Fill( 0.0 );
     up[1] = 1.0;
 
     successful = false;
   }
 }
 
+
 bool
 mitk::DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarType& spacingY)
 {
   bool successful = false;
 
-  std::istringstream spacingReader(s);
-  std::istringstream converter;
-  std::string spacing;
-  if ( std::getline( spacingReader, spacing, '\\' ) )
+  try
   {
-    converter.str(spacing);
-    converter.clear();
-    if (converter >> spacingY && converter.eof())
+    std::vector<std::string> strs;
+    boost::split( strs, s, boost::is_any_of( "\\" ) );
+    if ( strs.size() > 1 )
     {
-      if ( std::getline( spacingReader, spacing, '\\' ) )
-      {
-        converter.str(spacing);
-        converter.clear();
-        if (converter >> spacingX && converter.eof())
-        {
-          successful = true;
-        }
-      }
+      spacingY = stod( strs[0] );
+      spacingX = stod( strs[1] );
+      successful = true;
     }
+  }
+  catch ( const std::exception& /*e*/ )
+  {
   }
 
   return successful;
@@ -208,29 +194,21 @@ mitk::DICOMStringToPoint3D(const std::string& s, bool& successful)
   Point3D p;
   successful = true;
 
-  std::istringstream originReader(s);
-  std::istringstream converter;
-  std::string coordinate;
-  unsigned int dim(0);
-  while( std::getline( originReader, coordinate, '\\' ) && dim < 3)
+  try
   {
-    converter.str(coordinate);
-    converter.clear();
-    if ( ! (converter >> p[dim++] && converter.eof() ) )
-    { // conversion failed
-      successful = false;
-      break;
+    std::vector<std::string> strs;
+    boost::split( strs, s, boost::is_any_of( "\\" ) );
+    if ( strs.size() == 3 )
+    {
+      for( int i=0; i<3; ++i )
+      {
+        p[i] = stod( strs[i] );
+      }
     }
   }
-
-  if (dim != 0 && dim != 3)
+  catch ( const std::exception& /*e*/ )
   {
-    successful = false;
-  }
-  else if (dim == 0)
-  {
-    successful = false;
-    p.Fill(0.0); // assume default (0,0,0)
+    p.Fill(0.0);
   }
 
   return p;

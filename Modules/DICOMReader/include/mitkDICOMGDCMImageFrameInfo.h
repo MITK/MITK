@@ -37,11 +37,11 @@ namespace mitk
     public:
 
       mitkClassMacroItkParent(DICOMGDCMImageFrameInfo, itk::LightObject);
-      itkNewMacro( DICOMGDCMImageFrameInfo );
+      itkFactorylessNewMacro( DICOMGDCMImageFrameInfo );
       mitkNewMacro1Param( DICOMGDCMImageFrameInfo, const std::string&);
       mitkNewMacro2Param( DICOMGDCMImageFrameInfo, const std::string&, unsigned int );
-      mitkNewMacro1Param( DICOMGDCMImageFrameInfo, DICOMImageFrameInfo::Pointer);
-      mitkNewMacro2Param( DICOMGDCMImageFrameInfo, DICOMImageFrameInfo::Pointer, gdcm::Scanner::TagToValue const&);
+      mitkNewMacro1Param( DICOMGDCMImageFrameInfo, const DICOMImageFrameInfo::Pointer& );
+      mitkNewMacro2Param( DICOMGDCMImageFrameInfo, const DICOMImageFrameInfo::Pointer&, gdcm::Scanner::TagToValue const&);
 
       virtual ~DICOMGDCMImageFrameInfo();
 
@@ -58,8 +58,8 @@ namespace mitk
 
       DICOMImageFrameInfo::Pointer m_FrameInfo;
 
-      DICOMGDCMImageFrameInfo(DICOMImageFrameInfo::Pointer frameinfo);
-      DICOMGDCMImageFrameInfo(DICOMImageFrameInfo::Pointer frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping);
+      DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo);
+      DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping);
       DICOMGDCMImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);
 
       const gdcm::Scanner::TagToValue m_TagForValue;

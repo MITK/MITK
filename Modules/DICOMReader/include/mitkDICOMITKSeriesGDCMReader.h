@@ -303,7 +303,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     /// \brief Sorting step as described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy
     SortingBlockList InternalExecuteSortingStep(
         unsigned int sortingStepIndex,
-        DICOMDatasetSorter::Pointer sorter,
+        const DICOMDatasetSorter::Pointer& sorter,
         const SortingBlockList& input);
 
     /// \brief Loads the mitk::Image by means of an itk::ImageSeriesReader

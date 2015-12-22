@@ -83,7 +83,7 @@ mitk::DICOMFileReader
 
 void
 mitk::DICOMFileReader
-::SetInputFiles(StringList filenames)
+::SetInputFiles( const StringList& filenames)
 {
   m_InputFilenames = filenames;
 }

@@ -67,7 +67,7 @@ public:
   virtual bool CanHandleFile( const std::string& filename ) = 0;
 
   /// This input files
-  void SetInputFiles( StringList filenames );
+  void SetInputFiles( const StringList& filenames );
   /// This input files
   const StringList& GetInputFiles() const;
 

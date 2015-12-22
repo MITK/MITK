@@ -45,13 +45,12 @@ void
 mitk::DICOMFileReaderSelector
 ::AddConfigsFromResources(const std::string& path)
 {
-  std::vector<us::ModuleResource> configs = us::GetModuleContext()->GetModule()->FindResources(path, "*.xml", false);
+  const std::vector<us::ModuleResource> configs =
+    us::GetModuleContext()->GetModule()->FindResources( path, "*.xml", false );
 
-  for (std::vector<us::ModuleResource>::iterator iter = configs.begin();
-       iter != configs.end();
-       ++iter)
+  for ( auto iter = configs.cbegin(); iter != configs.cend(); ++iter )
   {
-    us::ModuleResource& resource = *iter;
+    us::ModuleResource resource = *iter;
     if (resource.IsValid())
     {
       us::ModuleResourceStream stream(resource);
@@ -194,9 +193,7 @@ mitk::DICOMFileReaderSelector
   gdcmScanner->SetInputFiles( m_InputFilenames );
 
   // let all readers analyze the file set
-  for (ReaderList::iterator rIter = m_Readers.begin();
-       rIter != m_Readers.end();
-       ++rIter)
+  for ( auto rIter = m_Readers.cbegin(); rIter != m_Readers.cend(); ++rIter )
   {
     gdcmScanner->AddTags( (*rIter)->GetTagsOfInterest() );
   }
@@ -205,9 +202,7 @@ mitk::DICOMFileReaderSelector
 
   // let all readers analyze the file set
   unsigned int readerIndex(0);
-  for (ReaderList::iterator rIter = m_Readers.begin();
-       rIter != m_Readers.end();
-       ++readerIndex, ++rIter)
+  for ( auto rIter = m_Readers.cbegin(); rIter != m_Readers.cend(); ++readerIndex, ++rIter )
   {
     (*rIter)->SetInputFiles( m_InputFilenames );
     (*rIter)->SetTagCache( gdcmScanner.GetPointer() );
@@ -222,7 +217,7 @@ mitk::DICOMFileReaderSelector
         return *rIter;
       }
     }
-    catch (std::exception& e)
+    catch ( const std::exception& e )
     {
       MITK_ERROR << "Reader " << readerIndex << " (" << (*rIter)->GetConfigurationLabel() << ") threw exception during file analysis, ignoring this reader. Exception: " << e.what();
     }
@@ -238,11 +233,9 @@ mitk::DICOMFileReaderSelector
   readerIndex = 0;
   unsigned int bestReaderIndex(0);
   // select the reader with the minimum number of mitk::Images as output
-  for (ReaderList::iterator rIter = workingCandidates.begin();
-       rIter != workingCandidates.end();
-       ++readerIndex, ++rIter)
+  for ( auto rIter = workingCandidates.cbegin(); rIter != workingCandidates.cend(); ++readerIndex, ++rIter )
   {
-    unsigned int thisReadersNumberOfOutputs = (*rIter)->GetNumberOfOutputs();
+    const unsigned int thisReadersNumberOfOutputs = (*rIter)->GetNumberOfOutputs();
     if (   thisReadersNumberOfOutputs > 0  // we don't count readers that don't actually produce output
         && thisReadersNumberOfOutputs < minimumNumberOfOutputs )
     {

@@ -442,13 +442,13 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   // first part: add some tags that describe individual slices
   // these propeties are defined at analysis time (see UpdateImageDescribingProperties())
 
-  const std::string propertyKeySliceLocation  = "dicom.image.0020.1041";
-  const std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";
-  const std::string propertyKeySOPInstanceUID = "dicom.image.0008.0018";
+  const char* propertyKeySliceLocation  = "dicom.image.0020.1041";
+  const char* propertyKeyInstanceNumber = "dicom.image.0020.0013";
+  const char* propertyKeySOPInstanceUID = "dicom.image.0008.0018";
 
-  mitkImage->SetProperty( propertyKeySliceLocation.c_str(), this->GetProperty( "sliceLocationForSlices" ) );
-  mitkImage->SetProperty( propertyKeyInstanceNumber.c_str(), this->GetProperty( "instanceNumberForSlices" ) );
-  mitkImage->SetProperty( propertyKeySOPInstanceUID.c_str(), this->GetProperty( "SOPInstanceUIDForSlices" ) );
+  mitkImage->SetProperty( propertyKeySliceLocation, this->GetProperty( "sliceLocationForSlices" ) );
+  mitkImage->SetProperty( propertyKeyInstanceNumber, this->GetProperty( "instanceNumberForSlices" ) );
+  mitkImage->SetProperty( propertyKeySOPInstanceUID, this->GetProperty( "SOPInstanceUIDForSlices" ) );
   mitkImage->SetProperty( "files", this->GetProperty( "filenamesForSlices" ) );
 
   for ( auto iter = m_AdditionalTagList.cbegin(); iter != m_AdditionalTagList.cend(); ++iter )

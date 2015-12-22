@@ -290,7 +290,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     /// \brief See \ref DICOMITKSeriesGDCMReader_Internals
     DICOMImageFrameList ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input) const;
 
-    typedef std::list<DICOMGDCMImageFrameList> SortingBlockList;
+    typedef std::vector<DICOMGDCMImageFrameList> SortingBlockList;
     /**
       \brief "Hook" for sub-classes, see \ref DICOMITKSeriesGDCMReader_Condensing
       \return REMAINING blocks

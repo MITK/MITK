@@ -34,4 +34,6 @@ set(RESOURCE_FILES
   configurations/3D/slicelocation.xml
 
   configurations/3DnT/classicreader.xml
+  configurations/3DnT/imageposition_byacquisition.xml
+  configurations/3DnT/imageposition_bytriggertime.xml
 )

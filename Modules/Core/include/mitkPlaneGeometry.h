@@ -195,6 +195,10 @@ namespace mitk {
     *
     * The vectors are normalized and multiplied by the respective spacing before
     * they are set in the matrix.
+    *
+    * This overloaded version of InitializeStandardPlane() creates only righthanded
+    * coordinate orientations, unless spacing contains 1 or 3 negative entries.
+    *
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const Vector3D& rightVector, const Vector3D& downVector,
@@ -207,6 +211,10 @@ namespace mitk {
     *
     * The vectors are normalized and multiplied by the respective spacing
     * before they are set in the matrix.
+    *
+    * This overloaded version of InitializeStandardPlane() creates only righthanded
+    * coordinate orientations, unless spacing contains 1 or 3 negative entries.
+    *
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const VnlVector& rightVector, const VnlVector& downVector,
@@ -238,7 +246,7 @@ namespace mitk {
     * \brief Initialize plane by origin and normal (size is 1.0 mm in
     * all directions, direction of right-/down-vector valid but
     * undefined).
-    *
+    * \warning This function can only produce righthanded coordinate orientation, not lefthanded.
     */
     virtual void InitializePlane(const Point3D& origin, const Vector3D& normal);
 
@@ -247,6 +255,8 @@ namespace mitk {
     *
     * \warning The vectors are set into the matrix as they are,
     * \em without normalization!
+    * This function creates a righthanded IndexToWorldTransform,
+    * only a negative thickness could still make it lefthanded.
     */
     void SetMatrixByVectors(const VnlVector& rightVector,
       const VnlVector& downVector, ScalarType thickness = 1.0);

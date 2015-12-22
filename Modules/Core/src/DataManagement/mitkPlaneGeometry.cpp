@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTransform.h>
 
 #include <vnl/vnl_cross.h>
-#include <cmath>
-
 
 namespace mitk
 {
@@ -513,7 +511,7 @@ namespace mitk
     normal.normalize();
     // Crossproduct vnl_cross_3d is always righthanded, but that is okay here
     // because in this method we create a new IndexToWorldTransform and
-    // spacing could still make it lefthanded.
+    // spacing with 1 or 3 negative components could still make it lefthanded.
 
     if(spacing!=nullptr)
     {
@@ -553,10 +551,7 @@ namespace mitk
     }
     downVectorVnl = vnl_cross_3d( normal.GetVnlVector(), rightVectorVnl );
     downVectorVnl.normalize();
-    // Crossproduct vnl_cross_3d is always righthanded, but I <m.hettich@dkfz.de>
-    // don't understand this function so I cannot tell if this is a problem like bug #11477.
-    // docs.mitk.org said (rightVectorVnl, downVectorVnl) was undefined but valid,
-    // therefore I am satisfied in my review of vector cross product usage in PlaneGeometry.
+    // Crossproduct vnl_cross_3d is always righthanded.
 
     InitializeStandardPlane( rightVectorVnl, downVectorVnl );
 

@@ -23,13 +23,13 @@ def fold_by_sliding_average(batch, window_size):
 
 def interpolate_wavelengths(batch, new_wavelengths):
     """ interpolate image data to fit new_wavelengths. Current implementation
-    performs simple linear interpolation. Neither existing nor new wavelengths
+    performs simple linear interpolation. Neither existing nor new _wavelengths
     need to be sorted. """
-    interpolator = interp1d(batch.wavelengths,
+    interpolator = interp1d(batch._wavelengths,
                             batch.reflectances, assume_sorted=False,
                             bounds_error=False)
     batch.reflectances = interpolator(new_wavelengths)
-    batch.wavelengths = new_wavelengths
+    batch._wavelengths = new_wavelengths
 
 
 def sortout_bands(batch, bands_to_sortout=None):
@@ -38,7 +38,7 @@ def sortout_bands(batch, bands_to_sortout=None):
         # get rid of sorted out bands
         batch.reflectances = np.delete(batch.reflectances,
                                               bands_to_sortout, axis=1)
-        batch.wavelengths = np.delete(batch.wavelengths,
+        batch._wavelengths = np.delete(batch._wavelengths,
                                               bands_to_sortout)
 
 

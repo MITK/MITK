@@ -51,13 +51,13 @@ def resort_image_wavelengths(collapsed_image):
     return collapsed_image[:, new_order]
 
 def resort_wavelengths(msi):
-    """Neil organized his wavelengths differently.
+    """Neil organized his _wavelengths differently.
     This function fixes this."""
     collapsed_image = imgmani.collapse_image(msi.get_image())
     collapsed_image = resort_image_wavelengths(collapsed_image)
     msi.set_image(np.reshape(collapsed_image, msi.get_image().shape))
 
-# rebind this method since in this recoding the wavelengths got messed up
+# rebind this method since in this recoding the _wavelengths got messed up
 sp.resort_wavelengths = resort_wavelengths
 
 sp.bands_to_sortout = np.array([])  # [0, 1, 2, 20, 19, 18, 17, 16])
@@ -210,10 +210,10 @@ class IPCAITrainRegressor(luigi.Task):
         # extract data from the batch
         f = open(self.input().path, "r")
         batch_train = pickle.load(f)
-        # TODO: fix hack by sorting always to ascending wavelengths
+        # TODO: fix hack by sorting always to ascending _wavelengths
         batch_train.reflectances = resort_image_wavelengths(
                                                     batch_train.reflectances)
-        batch_train.wavelengths = batch_train.wavelengths[new_order]
+        batch_train._wavelengths = batch_train._wavelengths[new_order]
         X, y = preprocess2(batch_train,
                           w_percent=0.1, bands_to_sortout=sp.bands_to_sortout)
 
@@ -273,7 +273,7 @@ class IPCAICorrectImagingSetupTask(luigi.Task):
                                 "_image_setup_corrected.nrrd"))
 
     def run(self):
-        """sort wavelengths and normalize by respective integration times"""
+        """sort _wavelengths and normalize by respective integration times"""
         # read inputs
         reader = NrrdReader()
         msi = reader.read(self.input()[0].path)

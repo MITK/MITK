@@ -23,7 +23,7 @@ class Test(unittest.TestCase):
         layer2 = layer2[:, np.newaxis]
         layer2 = np.vstack((layer2, layer2))
         self.test_batch.layers = [layer1, layer2]
-        self.test_batch.wavelengths = np.arange(0, 10, 1)
+        self.test_batch._wavelengths = np.arange(0, 10, 1)
 
     def test_sliding_average(self):
         # by design folding should not alter elements (only at boundaries,

@@ -57,7 +57,7 @@ class VisualizeSpectraTask(luigi.Task):
         camera_batch = pickle.load(f)
         f.close()
 
-        batch.wavelengths *= 10 ** 9
+        batch._wavelengths *= 10 ** 9
         # X, y = preprocess2(camera_batch, w_percent=0.1)
         # camera_batch.reflectances = X
 

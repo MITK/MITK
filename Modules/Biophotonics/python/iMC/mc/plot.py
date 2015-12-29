@@ -36,7 +36,7 @@ def plot(batch, axes=None):
     if axes is None:
         axes = plt.gca()
 
-    f = PlotFunctor(axes, batch.wavelengths, batch.reflectances.shape[0])
+    f = PlotFunctor(axes, batch._wavelengths, batch.reflectances.shape[0])
 
     np.apply_along_axis(f,
                         axis=1,

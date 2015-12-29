@@ -15,6 +15,9 @@ class AbstractTissue(object):
     Initializes a abstract tissue model"
     '''
 
+    def set_nr_photons(self, nr_photons):
+        self._mci_wrapper.set_nr_photons(nr_photons)
+
     def set_mci_filename(self, mci_filename):
         self._mci_wrapper.set_mci_filename(mci_filename)
 
@@ -58,25 +61,25 @@ class AbstractTissue(object):
 
 class GenericTissue(AbstractTissue):
     '''
-    Initializes a three layer generic tissue model
+    Initializes a n-layer generic tissue model
     '''
 
-    def set_batch_element(self, batch, element):
+    def set_batch_element(self, df, element):
         """take the element element of the batch and set the tissue to
         resemble the structure specified by this"""
-        self._mci_wrapper.set_nr_photons(batch.nr_photons)
-        for i, l in enumerate(batch.layers):
+        layers = [l for l in df.columns.levels[0] if "layer" in l]
+        for i, l in enumerate(layers):
             self.set_layer(i,
-                           l[element, 0],  # bvf
-                           l[element, 1],  # sao2
-                           l[element, 2],  # a_mie
-                           l[element, 3],  # a_ray
-                           l[element, 4],  # d
-                           l[element, 5],  # n
-                           l[element, 6])  # g
+                           df[l, "vhb"][element],
+                           df[l, "sao2"][element],
+                           df[l, "a_mie"][element],
+                           df[l, "b_mie"][element],
+                           df[l, "d"][element],
+                           df[l, "n"][element],
+                           df[l, "g"][element])
 
     def set_layer(self, layer_nr=0,
-                  bvf=None, saO2=None, a_mie=None, a_ray=None, d=None,
+                  bvf=None, saO2=None, a_mie=None, b_mie=None, d=None,
                   n=None, g=None):
         """Helper function to set one layer."""
         if bvf is None:
@@ -87,8 +90,8 @@ class GenericTissue(AbstractTissue):
             a_mie = 10. * 100
         if d is None:
             d = 500. * 10 ** -6
-        if a_ray is None:
-            a_ray = 0.
+        if b_mie is None:
+            b_mie = 1.286
         if n is None:
             n = 1.38
         if g is None:
@@ -98,7 +101,8 @@ class GenericTissue(AbstractTissue):
         self.uas[layer_nr].saO2 = saO2
         # and one for scattering coefficient
         self.usgs[layer_nr].a_mie = a_mie
-        self.usgs[layer_nr].a_ray = a_ray
+        self.usgs[layer_nr].a_ray = 0.
+        self.usgs[layer_nr].b_mie = b_mie
         self.usgs[layer_nr].g = g
         self.ds[layer_nr] = d
         self.ns[layer_nr] = n
@@ -108,8 +112,8 @@ class GenericTissue(AbstractTissue):
         model_string = ""
         for i, ua in enumerate(self.uas):
             layer_string = "layer " + str(i) + \
-                     "    - bvf: " + "%.2f" % self.uas[i].bvf + \
-                    "%; SaO2: " + "%.2f" % self.uas[i].saO2 + \
+                     "    - vhb: " + "%.2f" % self.uas[i].bvf + \
+                    "%; sao2: " + "%.2f" % self.uas[i].saO2 + \
                     "%; a_mie: " + "%.2f" % (self.usgs[i].a_mie / 100.) + \
                     "cm^-1; a_ray: " + "%.2f" % (self.usgs[i].a_ray / 100.) + \
                     "cm^-1; b_mie: " + "%.3f" % self.usgs[i].b_mie + \

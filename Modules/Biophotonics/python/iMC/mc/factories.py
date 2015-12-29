@@ -5,8 +5,7 @@ Created on Oct 15, 2015
 '''
 
 from mc.tissuemodels import AbstractTissue, GenericTissue
-from mc.batches import AbstractBatch, GenericBatch, VisualizationBatch, \
-    GaussianBatch, ColonMuscleBatch, LessGenericBatch
+from mc.batches import AbstractBatch, GenericBatch, ColonMuscleBatch
 
 
 class AbstractMcFactory(object):
@@ -33,16 +32,6 @@ class GenericMcFactory(AbstractMcFactory):
 
     def create_batch_to_simulate(self):
         return GenericBatch()
-
-    def __init__(self):
-        '''
-        Constructor
-        '''
-
-class GaussianMcFactory(GenericMcFactory):
-
-    def create_batch_to_simulate(self):
-        return GaussianBatch()
 
     def __init__(self):
         '''

@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGeometry3D.h"
 #include "mitkThinPlateSplineCurvedGeometry.h"
 #include "mitkSlicedGeometry3D.h"
+#include "mitkAffineTransform3D.h"
+#include "mitkBaseGeometry.h"
 
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
@@ -47,6 +49,7 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestAxialInitialization);
   MITK_TEST(TestFrontalInitialization);
   MITK_TEST(TestSaggitalInitialization);
+  MITK_TEST(TestLefthandedCoordinateSystem);
 
   // Currently commented out, see See bug 15990
   // MITK_TEST(testPlaneGeometryInitializeOrder);
@@ -114,6 +117,62 @@ public:
     CPPUNIT_ASSERT_MESSAGE("PlaneGeometry should not be castable to AbstractTransofrmGeometry", atg.IsNull());
   }
 
+
+  void TestLefthandedCoordinateSystem()
+  {
+    /**
+     * @brief This method tests InitializeStandardPlane() and IndexToWorld()
+     * with a left-handed coordinate orientation or indexToWorldMatrix.
+     *
+     * Of course this test does not use standard Parameters, which are right-handed.
+     * See also discussion of bug #11477: http://bugs.mitk.org/show_bug.cgi?id=11477
+     */
+    planegeometry = mitk::PlaneGeometry::New();
+    width  = 100;
+    widthInMM  = 5;
+    height = 200;
+    heightInMM = 3;
+    thicknessInMM = 1.0;
+    mitk::FillVector3D(right,  widthInMM,          0, 0);
+    mitk::FillVector3D(bottom,         0, heightInMM, 0);
+    // This one negative sign results in lefthanded coordinate orientation and det(matrix) < 0.
+    mitk::FillVector3D(normal,         0,          0, -thicknessInMM);
+
+    mitk::AffineTransform3D::Pointer transform = mitk::AffineTransform3D::New();
+
+    mitk::AffineTransform3D::MatrixType matrix;
+    mitk::AffineTransform3D::MatrixType::InternalMatrixType& vnl_matrix = matrix.GetVnlMatrix();
+
+    vnl_matrix.set_column(0, right);
+    vnl_matrix.set_column(1, bottom);
+    vnl_matrix.set_column(2, normal);
+
+    // making sure that we didn't screw up this special test case or else fail deadly:
+    assert( vnl_determinant(vnl_matrix) < 0.0 );
+
+    transform->SetIdentity();
+    transform->SetMatrix(matrix);
+
+    planegeometry->InitializeStandardPlane( width, height, transform ); // Crux of the matter.
+    CPPUNIT_ASSERT_MESSAGE("Testing if IndexToWorldMatrix is correct after InitializeStandardPlane( width, height, transform ) ",
+                           mitk::MatrixEqualElementWise( planegeometry->GetIndexToWorldTransform()->GetMatrix(), matrix ) );
+
+    mitk::Point3D p_index;
+    p_index[0] = 10.;
+    p_index[1] = 10.;
+    p_index[2] = 0.;
+    mitk::Point3D p_world;
+    mitk::Point3D p_expectedResult;
+    p_expectedResult[0] = 50.;
+    p_expectedResult[1] = 30.;
+    p_expectedResult[2] = 0.;
+
+    ((mitk::BaseGeometry::Pointer) planegeometry)->IndexToWorld(p_index, p_world); // Crux of the matter.
+    CPPUNIT_ASSERT_MESSAGE( "Testing if IndexToWorld(a,b) function works correctly with lefthanded matrix ",
+                            mitk::Equal(p_world, p_expectedResult, testEps ) );
+  }
+
+
   // See bug 1210
   // Test does not use standard Parameters
   void TestCase1210()
@@ -125,15 +184,16 @@ public:
 
     mitk::FillVector3D(origin, 4.5,              7.3, 11.2);
     mitk::FillVector3D(right,
-      1.015625, 1.015625, 1.1999969482421875
-      );
+        1.015625, 1.015625, 1.1999969482421875
+    );
 
     mitk::FillVector3D(down,
-      1.4012984643248170709237295832899161312802619418765e-45, 0, 0
-      );
+        1.4012984643248170709237295832899161312802619418765e-45, 0, 0
+    );
     mitk::FillVector3D(spacing,
-      0, 1.4713633875410579244699160624544119378442750389703e-43, 9.2806360452222355258639080851310540729807238879469e-32
-      );
+                       0, 1.4713633875410579244699160624544119378442750389703e-43,
+                       9.2806360452222355258639080851310540729807238879469e-32
+    );
 
     std::cout << "Testing InitializeStandardPlane(rightVector, downVector, spacing = NULL): "<<std::endl;
     CPPUNIT_ASSERT_NO_THROW(planegeometry->InitializeStandardPlane(right, down, &spacing));
@@ -158,24 +218,24 @@ public:
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
     }
-    */
+     */
   }
 
   /**
-  * @brief This method tests method IntersectionPoint
-  *
-  * See also bug #7151. (ref 2 this test: iggy)
-  * This test was written due to incorrect calculation of the intersection point
-  * between a given line and plane. This only occured when the pointdistance of
-  * the line was less than 1.
-  * Test Behavour:
-  * ==============
-  * we have a given line and a given plane.
-  * we let the line intersect the plane.
-  * when testing several positions on the line the resulting intersection point must be the same
-  * we test a position where the distance between the correspoinding points is < 0 and another position where the distance is > 0.
-  *
-  */
+   * @brief This method tests method IntersectionPoint
+   *
+   * See also bug #7151. (ref 2 this test: iggy)
+   * This test was written due to incorrect calculation of the intersection point
+   * between a given line and plane. This only occured when the pointdistance of
+   * the line was less than 1.
+   * Test Behavour:
+   * ==============
+   * we have a given line and a given plane.
+   * we let the line intersect the plane.
+   * when testing several positions on the line the resulting intersection point must be the same
+   * we test a position where the distance between the correspoinding points is < 0 and another position where the distance is > 0.
+   *
+   */
   // Test does not use standard Parameters
   void TestIntersectionPoint()
   {
@@ -240,10 +300,10 @@ public:
   }
 
   /**
-  * @brief This method tests method ProjectPointOntoPlane.
-  *
-  * See also bug #3409.
-  */
+   * @brief This method tests method ProjectPointOntoPlane.
+   *
+   * See also bug #3409.
+   */
   // Test does not use standard Parameters
   void TestProjectPointOntoPlane()
   {
@@ -369,32 +429,50 @@ public:
     geometry2D3->SetOrigin(myOrigin);
     geometry2D3->SetIndexToWorldTransform(myTransform);
 
-    CPPUNIT_ASSERT_MESSAGE("Origin of Geometry 1 matches that of Geometry 2.", mitk::Equal(geometry2D1->GetOrigin(), geometry2D2->GetOrigin()));
-    CPPUNIT_ASSERT_MESSAGE("Origin of Geometry 1 match those of Geometry 3.", mitk::Equal(geometry2D1->GetOrigin(), geometry2D3->GetOrigin()));
-    CPPUNIT_ASSERT_MESSAGE("Origin of Geometry 2 match those of Geometry 3.", mitk::Equal(geometry2D2->GetOrigin(), geometry2D3->GetOrigin()));
+    CPPUNIT_ASSERT_MESSAGE("Origin of Geometry 1 matches that of Geometry 2.",
+ mitk::Equal(geometry2D1->GetOrigin(), geometry2D2->GetOrigin()));
+    CPPUNIT_ASSERT_MESSAGE("Origin of Geometry 1 match those of Geometry 3.",
+ mitk::Equal(geometry2D1->GetOrigin(), geometry2D3->GetOrigin()));
+    CPPUNIT_ASSERT_MESSAGE("Origin of Geometry 2 match those of Geometry 3.",
+ mitk::Equal(geometry2D2->GetOrigin(), geometry2D3->GetOrigin()));
 
-    CPPUNIT_ASSERT_MESSAGE("Spacing of Geometry 1 match those of Geometry 2.", mitk::Equal(geometry2D1->GetSpacing(), geometry2D2->GetSpacing()));
-    CPPUNIT_ASSERT_MESSAGE("Spacing of Geometry 1 match those of Geometry 3.", mitk::Equal(geometry2D1->GetSpacing(), geometry2D3->GetSpacing()));
-    CPPUNIT_ASSERT_MESSAGE("Spacing of Geometry 2 match those of Geometry 3.", mitk::Equal(geometry2D2->GetSpacing(), geometry2D3->GetSpacing()));
+    CPPUNIT_ASSERT_MESSAGE("Spacing of Geometry 1 match those of Geometry 2.",
+ mitk::Equal(geometry2D1->GetSpacing(), geometry2D2->GetSpacing()));
+    CPPUNIT_ASSERT_MESSAGE("Spacing of Geometry 1 match those of Geometry 3.",
+ mitk::Equal(geometry2D1->GetSpacing(), geometry2D3->GetSpacing()));
+    CPPUNIT_ASSERT_MESSAGE("Spacing of Geometry 2 match those of Geometry 3.",
+ mitk::Equal(geometry2D2->GetSpacing(), geometry2D3->GetSpacing()));
 
-    CPPUNIT_ASSERT_MESSAGE("Transformation of Geometry 1 match those of Geometry 2.", compareMatrix(geometry2D1->GetIndexToWorldTransform()->GetMatrix(), geometry2D2->GetIndexToWorldTransform()->GetMatrix()));
-    CPPUNIT_ASSERT_MESSAGE("Transformation of Geometry 1 match those of Geometry 3.", compareMatrix(geometry2D1->GetIndexToWorldTransform()->GetMatrix(), geometry2D3->GetIndexToWorldTransform()->GetMatrix()));
-    CPPUNIT_ASSERT_MESSAGE("Transformation of Geometry 2 match those of Geometry 3.", compareMatrix(geometry2D2->GetIndexToWorldTransform()->GetMatrix(), geometry2D3->GetIndexToWorldTransform()->GetMatrix()));
+    CPPUNIT_ASSERT_MESSAGE("Transformation of Geometry 1 match those of Geometry 2.",
+ compareMatrix(geometry2D1->GetIndexToWorldTransform()->GetMatrix(), geometry2D2->GetIndexToWorldTransform()->GetMatrix()));
+    CPPUNIT_ASSERT_MESSAGE("Transformation of Geometry 1 match those of Geometry 3.",
+ compareMatrix(geometry2D1->GetIndexToWorldTransform()->GetMatrix(), geometry2D3->GetIndexToWorldTransform()->GetMatrix()));
+    CPPUNIT_ASSERT_MESSAGE("Transformation of Geometry 2 match those of Geometry 3.",
+ compareMatrix(geometry2D2->GetIndexToWorldTransform()->GetMatrix(), geometry2D3->GetIndexToWorldTransform()->GetMatrix()));
   }
 
   void TestInitializeStandardPlane()
   {
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: width", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: height", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: depth", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: width",
+ mitk::Equal(planegeometry->GetExtent(0),width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: height",
+ mitk::Equal(planegeometry->GetExtent(1),height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: depth",
+ mitk::Equal(planegeometry->GetExtent(2),1, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: width in mm", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: heght in mm", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: depth in mm", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: width in mm",
+ mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: heght in mm",
+ mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: depth in mm",
+ mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
 
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorRight", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorBottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorNormal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorRight",
+ mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorBottom",
+ mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with default Spacing: AxisVectorNormal",
+ mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
 
     mitk::Vector3D spacing;
     thicknessInMM = 1.5;
@@ -402,17 +480,26 @@ public:
     mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
     planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector(), &spacing);
 
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: width", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: height", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: depth", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: width",
+ mitk::Equal(planegeometry->GetExtent(0),width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: height",
+ mitk::Equal(planegeometry->GetExtent(1),height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: depth",
+ mitk::Equal(planegeometry->GetExtent(2),1, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: width in mm", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: height in mm", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: depth in mm", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: width in mm",
+ mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: height in mm",
+ mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: depth in mm",
+ mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps) );
 
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorRight", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorBottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
-    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorNormal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorRight",
+ mitk::Equal(planegeometry->GetAxisVector(0), right, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorBottom",
+ mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps) );
+    CPPUNIT_ASSERT_MESSAGE("Testing correct Standard Plane initialization with custom Spacing: AxisVectorNormal",
+ mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps) );
 
     ;
   }
@@ -422,8 +509,10 @@ public:
     normal.Normalize();
     normal *= thicknessInMM;
     planegeometry->SetExtentInMM(2, thicknessInMM);
-    CPPUNIT_ASSERT_MESSAGE("Testing SetExtentInMM(2, ...), querying by GetExtentInMM(2): ", mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing SetExtentInMM(2, ...), querying by GetAxisVector(2) and comparing to normal: ", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing SetExtentInMM(2, ...), querying by GetExtentInMM(2): ",
+ mitk::Equal(planegeometry->GetExtentInMM(2),thicknessInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing SetExtentInMM(2, ...), querying by GetAxisVector(2) and comparing to normal: ",
+ mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
 
     planegeometry->SetOrigin(origin);
     CPPUNIT_ASSERT_MESSAGE("Testing SetOrigin", mitk::Equal(planegeometry->GetOrigin(), origin, testEps));
@@ -467,7 +556,7 @@ public:
     mitk::Point2D dummy;
     planegeometry->WorldToIndex(point, dummy);
     planegeometry->IndexToWorld(dummy, dummy);
-    CPPUNIT_ASSERT_MESSAGE("Testing consistancy of index and world coordinates.", dummy == point);
+    CPPUNIT_ASSERT_MESSAGE("Testing consistency of index and world coordinates.", dummy == point);
 
     CPPUNIT_ASSERT_MESSAGE("Testing width of rotated version: ", mitk::Equal(planegeometry->GetExtentInMM(0),widthInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing height of rotated version: ", mitk::Equal(planegeometry->GetExtentInMM(1),heightInMM, testEps));
@@ -478,35 +567,44 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of rotated version: normal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
-      mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0), testEps));
+        mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0), testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
-      mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1), testEps));
+        mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1), testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
-      mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps));
+        mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps));
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
 
     width  *= 2;
     height *= 3;
     planegeometry->SetSizeInUnits(width, height);
-    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: ", mitk::Equal(planegeometry->GetExtent(0),width, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: ", mitk::Equal(planegeometry->GetExtent(1),height, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: ", mitk::Equal(planegeometry->GetExtent(2),1, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: ",
+ mitk::Equal(planegeometry->GetExtent(0),width, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: ",
+ mitk::Equal(planegeometry->GetExtent(1),height, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing SetSizeInUnits() of rotated version: "
+, mitk::Equal(planegeometry->GetExtent(2),1, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing width (in mm) of version with changed size in units: ", mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing height (in mm) of version with changed size in units: ", mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in mm) of version with changed size in units: ", mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing width (in mm) of version with changed size in units: ",
+ mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing height (in mm) of version with changed size in units: ",
+ mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in mm) of version with changed size in units: ",
+ mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: right ", mitk::Equal(planegeometry->GetAxisVector(0), right, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: bottom", mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: normal", mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: right ",
+ mitk::Equal(planegeometry->GetAxisVector(0), right, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: bottom",
+ mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of version with changed size in units: normal",
+ mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
-      mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0), testEps));
+        mitk::Equal(planegeometry->GetAxisVector(0).GetNorm(),planegeometry->GetExtentInMM(0), testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
-      mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1), testEps));
+        mitk::Equal(planegeometry->GetAxisVector(1).GetNorm(),planegeometry->GetExtentInMM(1), testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector(direction).GetNorm() != planegeometry->GetExtentInMM(direction) of rotated version: ",
-      mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps));
+        mitk::Equal(planegeometry->GetAxisVector(2).GetNorm(),planegeometry->GetExtentInMM(2), testEps));
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
   }
@@ -583,11 +681,11 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of sagitally initialized version: ", mitk::Equal(planegeometry->GetCornerPoint(0), backsidecornerpoint0, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of backsidedly, axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
-      mitk::Equal(planegeometry->GetExtent(0), width, testEps));
+        mitk::Equal(planegeometry->GetExtent(0), width, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of backsidedly, axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
-      mitk::Equal(planegeometry->GetExtent(1), height, testEps));
+        mitk::Equal(planegeometry->GetExtent(1), height, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of backsidedly, axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
-      mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
+        mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in mm) of backsidedly, axially initialized version: ", mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in mm) of backsidedly, axially initialized version: ", mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps));
@@ -689,28 +787,29 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Testing origin of axially initialized version: ", mitk::Equal(planegeometry->GetOrigin(), origin));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of axially initialized version: ", mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0));
+    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of axially initialized version: ",
+                           mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0));
 
     CPPUNIT_ASSERT_MESSAGE("Testing width (in units) of axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
-      mitk::Equal(planegeometry->GetExtent(0), width, testEps));
+        mitk::Equal(planegeometry->GetExtent(0), width, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing height (in units) of axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
-      mitk::Equal(planegeometry->GetExtent(1), height, testEps));
+        mitk::Equal(planegeometry->GetExtent(1), height, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing thickness (in units) of axially initialized version (should be same as in mm due to unit spacing, except for thickness, which is always 1): ",
-      mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
+        mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing width (in mm) of axially initialized version: ",
-      mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
+        mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing height  (in mm) of axially initialized version: ",
-      mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps));
+        mitk::Equal(planegeometry->GetExtentInMM(1), heightInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing thickness (in mm) of axially initialized version: ",
-      mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps));
+        mitk::Equal(planegeometry->GetExtentInMM(2), thicknessInMM, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of axially initialized version: ",
-      mitk::Equal(planegeometry->GetAxisVector(0), right, testEps));
+        mitk::Equal(planegeometry->GetAxisVector(0), right, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of axially initialized version: ",
-      mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps));
+        mitk::Equal(planegeometry->GetAxisVector(1), bottom, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of axially initialized version: ",
-      mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
+        mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps));
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
   }
@@ -799,8 +898,8 @@ private:
   }
 
   /**
-  * This function tests for correct mapping and is called several times from other tests
-  **/
+   * This function tests for correct mapping and is called several times from other tests
+   **/
   void mappingTests2D(const mitk::PlaneGeometry* planegeometry, const mitk::ScalarType& width, const mitk::ScalarType& height, const mitk::ScalarType& widthInMM, const mitk::ScalarType& heightInMM, const mitk::Point3D& origin, const mitk::Vector3D& right, const mitk::Vector3D& bottom)
   {
     std::cout << "Testing mapping Map(pt2d_mm(x=widthInMM/2.3,y=heightInMM/2.5), pt3d_mm) and compare with expected: ";

@@ -26,8 +26,6 @@ class AbstractBatch(object):
         return self.df.shape[0]
 
 
-
-
 class GenericBatch(AbstractBatch):
     """generic 3-layer batch with each layer having the same oxygenation """
 
@@ -134,8 +132,6 @@ class LessGenericBatch(AbstractBatch):
                               nr_samples)
 
 
-
-
 class ColonMuscleBatch(GenericBatch):
     """three layer batch simulating colonic tissue"""
 
@@ -183,6 +179,28 @@ class ColonMuscleBatch(GenericBatch):
         # mucosa
         self.append_one_layer(saO2, n * 1.38, (395.*10 ** -6, 603.*10 ** -6),
                               nr_samples)
+
+
+class ColonMuscleMeanScatteringBatch(ColonMuscleBatch):
+    """three layer batch simulating colonic tissue"""
+
+    def __init__(self):
+        super(ColonMuscleMeanScatteringBatch, self).__init__()
+
+    def append_one_layer(self, saO2, n, d_ranges, nr_samples):
+        """helper function to create parameters for one layer"""
+
+        # create as generic batch
+        super(ColonMuscleMeanScatteringBatch, self).append_one_layer(saO2,
+                                                                     n,
+                                                                     d_ranges,
+                                                                     nr_samples)
+        self._nr_layers -= 1  # we're not finished
+
+        # restrict exponential scattering to mean value for soft tissue.
+        self.df["layer" + str(self._nr_layers), "b_mie"] = 1.286
+
+        self._nr_layers += 1
 
 # class VisualizationBatch(AbstractBatch):
 #     """batch used for visualization of different spectra. Feel free to adapt

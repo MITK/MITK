@@ -4,49 +4,36 @@ Created on Oct 19, 2015
 @author: wirkert
 '''
 
-import numpy as np
 from scipy.interpolate import interp1d
+import pandas as pd
 
 
-def fold_by_sliding_average(batch, window_size):
+def fold_by_sliding_average(df, window_size):
     """take a batch and apply a sliding average with given window size to
     the reflectances.
     window_size is elements to the left and to the right.
     There will be some boundary effect on the edges."""
-    sliding_average = lambda x: np.convolve(x,
-                                            np.ones(window_size, dtype=float) /
-                                            float(window_size), mode="same")
-    batch.reflectances = np.apply_along_axis(sliding_average,
-                                             axis=1,
-                                             arr=batch.reflectances)
+    # next line does the folding.
+    df.reflectances = pd.rolling_mean(df.reflectances.T, window_size,
+                                           center=True).T
+    # let's get rid of NaN columns which are created at the boundaries
+    df.dropna(axis="columns", inplace=True)
 
 
-def interpolate_wavelengths(batch, new_wavelengths):
+def interpolate_wavelengths(df, new_wavelengths):
     """ interpolate image data to fit new_wavelengths. Current implementation
     performs simple linear interpolation. Neither existing nor new _wavelengths
     need to be sorted. """
-    interpolator = interp1d(batch._wavelengths,
-                            batch.reflectances, assume_sorted=False,
+    # build an interpolator using the inormation provided by the dataframes
+    # reflectance column
+    interpolator = interp1d(df.reflectances.columns.astype(float),
+                            df.reflectances.as_matrix(), assume_sorted=False,
                             bounds_error=False)
-    batch.reflectances = interpolator(new_wavelengths)
-    batch._wavelengths = new_wavelengths
+    # use this to create new reflectances
+    new_reflectances = interpolator(new_wavelengths)
+    # build a new dataframe out of this information and set the original df
+    # to the new information. This seems hacky, can't it be done easier?
+    df.drop(df["reflectances"].columns, axis=1, level=1, inplace=True)
+    for i, nw in enumerate(new_wavelengths):
+        df["reflectances", nw] = new_reflectances[:, i]
 
-
-def sortout_bands(batch, bands_to_sortout=None):
-    """ TODO: Documentation and test """
-    if bands_to_sortout is not None:
-        # get rid of sorted out bands
-        batch.reflectances = np.delete(batch.reflectances,
-                                              bands_to_sortout, axis=1)
-        batch._wavelengths = np.delete(batch._wavelengths,
-                                              bands_to_sortout)
-
-
-def select_n(batch, n):
-    """ randomly select n elements from batch. TODO: Test """
-    perms = np.random.permutation(batch.reflectances.shape[0])
-    first_n_perms = perms[0:n]
-    batch.reflectances = batch.reflectances[first_n_perms, :]
-    for i, l in enumerate(batch.layers):
-        batch.layers[i] = np.atleast_2d(l)[first_n_perms, :]
-    return batch

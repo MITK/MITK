@@ -5,7 +5,8 @@ Created on Oct 15, 2015
 '''
 
 from mc.tissuemodels import AbstractTissue, GenericTissue
-from mc.batches import AbstractBatch, GenericBatch, ColonMuscleBatch
+from mc.batches import AbstractBatch, GenericBatch, LessGenericBatch
+from mc.batches import ColonMuscleBatch, ColonMuscleMeanScatteringBatch
 
 
 class AbstractMcFactory(object):
@@ -24,6 +25,7 @@ class AbstractMcFactory(object):
         '''
         Constructor
         '''
+
 
 class GenericMcFactory(AbstractMcFactory):
 
@@ -59,6 +61,18 @@ class ColonMuscleMcFactory(GenericMcFactory):
         '''
         Constructor
         '''
+
+
+class ColonMuscleMeanScatteringFactory(GenericMcFactory):
+
+    def create_batch_to_simulate(self):
+        return ColonMuscleMeanScatteringBatch()
+
+    def __init__(self):
+        '''
+        Constructor
+        '''
+
 
 class VisualizationMcFactory(AbstractMcFactory):
 

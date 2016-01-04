@@ -31,10 +31,10 @@ PARAMS = np.array([0.1,  # bvf
                    500. * 10 ** -6])  # d_muc
 
 class PlotOneSpectrum(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
-        return rt.TrainForestForwardModel(self.batch_prefix)
+        return rt.TrainForestForwardModel(self.df_prefix)
 
 
     def run(self):

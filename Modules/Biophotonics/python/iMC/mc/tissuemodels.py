@@ -64,7 +64,7 @@ class GenericTissue(AbstractTissue):
     Initializes a n-layer generic tissue model
     '''
 
-    def set_batch_element(self, df, element):
+    def set_dataframe_element(self, df, element):
         """take the element element of the batch and set the tissue to
         resemble the structure specified by this"""
         layers = [l for l in df.columns.levels[0] if "layer" in l]

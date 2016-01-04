@@ -4,35 +4,28 @@ Created on Oct 26, 2015
 @author: wirkert
 '''
 
-import copy
-
 import numpy as np
 from sklearn.preprocessing import Normalizer
 
-import mc.mcmanipulations as mcmani
 
-def preprocess2(batch, nr_samples=None, w_percent=None, magnification=None,
+def preprocess2(df, nr_samples=None, w_percent=None, magnification=None,
                bands_to_sortout=None):
 
-    working_batch = copy.deepcopy(batch)
-    mcmani.sortout_bands(working_batch, bands_to_sortout)
-    # get reflectance and oxygenation
-    X = working_batch.reflectances
-    y = working_batch.layers[0][:, [0, 1]]
+    df.drop(bands_to_sortout, axis=1, level=1, inplace=True)
 
+    # first set 0 reflectances to nan
+    df["reflectances"] = df["reflectances"].replace(to_replace=0.,
+                                                    value=np.nan)
     # remove nan
-    no_nan = ~np.isnan(X).any(axis=1)
-    X = X[no_nan, :]
-    y = y[no_nan, :]
-    # remove zero
-    no_zero = ~(X <= 0).any(axis=1)
-    X = X[no_zero, :]
-    y = y[no_zero, :]
+    df.dropna(inplace=True)
 
     # extract nr_samples samples from data
     if nr_samples is not None:
-        X = X[0:nr_samples]
-        y = y[0:nr_samples]
+        df = df.sample(nr_samples)
+
+    # get reflectance and oxygenation
+    X = df.reflectances
+    y = df.layer0[["sao2", "vhb"]]
 
     # do data magnification
     if magnification is not None:
@@ -49,7 +42,7 @@ def preprocess2(batch, nr_samples=None, w_percent=None, magnification=None,
     X = np.clip(X, 0.00001, 1.)
     # do normalizations
     X = normalize(X)
-    return X, np.squeeze(y)
+    return X, y
 
 
 
@@ -58,7 +51,7 @@ def preprocess(batch, nr_samples=None, w_percent=None, magnification=None,
     X, y = preprocess2(batch, nr_samples, w_percent, magnification,
                        bands_to_sortout)
 
-    return X, y[:, 1]
+    return X, y["sao2"]
 
 
 def normalize(X):

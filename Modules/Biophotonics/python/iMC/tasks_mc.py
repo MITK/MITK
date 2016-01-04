@@ -5,27 +5,19 @@ Created on Sep 10, 2015
 '''
 
 
-'''
-Created on Aug 31, 2015
-
-@author: wirkert
-'''
-
 
 import os
-import pickle
+
+import pandas as pd
 import luigi
 
 import scriptpaths as sp
-import mc.mcmanipulations as mcmani
+import mc.dfmanipulations as dfmani
 from msi.io.spectrometerreader import SpectrometerReader
 from msi.io.msiwriter import MsiWriter
 from msi.io.msireader import MsiReader
 from msi.normalize import NormalizeMean
 import msi.msimanipulations as msimani
-
-
-
 
 
 class SpectrometerFile(luigi.Task):
@@ -68,13 +60,13 @@ class FilterTransmission(luigi.Task):
 
 
 class JoinBatches(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
-                                              self.batch_prefix + "_" +
-                                              "all" + ".imc"))
+                                              self.df_prefix + "_" +
+                                              "all" + ".txt"))
 
     def run(self):
         path = os.path.join(sp.ROOT_FOLDER, sp.MC_DATA_FOLDER)
@@ -82,49 +74,37 @@ class JoinBatches(luigi.Task):
         files = [ f for f in os.listdir(path) \
                  if os.path.isfile(os.path.join(path, f)) ]
         # from these get only those who start with correct batch prefix
-        batch_file_names = \
-                [ f for f in files if f.startswith(self.batch_prefix)]
-        batch_files = \
-                [open(os.path.join(path, f), 'r') for f in batch_file_names]
+        df_file_names = \
+                [ os.path.join(path, f) for f in files if f.startswith(self.df_prefix)]
         # load these files
-        batches = [pickle.load(f) for f in batch_files]
+        dfs = [pd.read_csv(f, header=[0, 1]) for f in df_file_names]
         # now join them to one batch
-        joined_batch = reduce(join_batches, batches)
+        joined_df = pd.concat(dfs, ignore_index=True)
         # write it
-        joined_batch_file = open(self.output().path, 'w')
-        # there seems to be a bug in pickle. thus, unfortunately the _generator
-        # has to be removed before saving
-        joined_batch._generator = None
-        pickle.dump(joined_batch, joined_batch_file)
+        joined_df.to_csv(self.output().path, index=False)
 
 
 class CameraBatch(luigi.Task):
     """takes a batch of reference data and converts it to the spectra
     processed by the camera"""
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
-        return JoinBatches(self.batch_prefix)
+        return JoinBatches(self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
-            self.batch_prefix + "_all_camera.imc"))
+            self.df_prefix + "_all_camera.txt"))
 
     def run(self):
-        f = file(self.input().path, "r")
-        batch = pickle.load(f)
-        f.close()
+        # load dataframe
+        df = pd.read_csv(self.input().path, header=[0, 1])
         # camera batch creation:
-        camera_batch = batch
-        mcmani.fold_by_sliding_average(camera_batch, 6)
-        mcmani.interpolate_wavelengths(camera_batch,
-                                       sp.RECORDED_WAVELENGTHS)
+        dfmani.fold_by_sliding_average(df, 6)
+        dfmani.interpolate_wavelengths(df, sp.RECORDED_WAVELENGTHS)
         # write it
-        joined_batch_file = open(self.output().path, 'w')
-        pickle.dump(camera_batch, joined_batch_file)
-
-
+        df.to_csv(self.output().path, index=False)
 
 
 def get_transmission_data(input_path, desired_wavelengths):

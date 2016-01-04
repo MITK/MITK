@@ -26,8 +26,8 @@ NR_PHOTONS = 10 ** 6
 
 # general output path config
 sp.ROOT_FOLDER = \
-        "/media/wirkert/data/Data/2015_11_12_IPCAI_in_silico"
-sp.RESULTS_FOLDER = "mc_data_after_revision"
+        "/media/wirkert/data/Data/2016_02_22_IPCAI_revision_in_silico"
+sp.RESULTS_FOLDER = "mc_data"
 
 # experiment configuration
 MCI_FILENAME = "./temp.mci"
@@ -38,7 +38,7 @@ EXEC_MCML = "gpumcml.sm_20"
 
 
 class CreateSpectraTask(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
     batch_nr = luigi.IntParameter()
     nr_samples = luigi.IntParameter()
     factory = luigi.Parameter()
@@ -46,7 +46,7 @@ class CreateSpectraTask(luigi.Task):
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
-                                              self.batch_prefix + "_" +
+                                              self.df_prefix + "_" +
                                               str(self.batch_nr) + ".txt"))
 
     def run(self):
@@ -71,7 +71,7 @@ class CreateSpectraTask(luigi.Task):
 
         # for each instance of our tissue model
         for i in range(df.shape[0]):
-            self.tissue_model.set_batch_element(df, i)
+            self.tissue_model.set_dataframe_element(df, i)
             logging.info("running simulation " + str(i) + " for\n" +
                          str(self.tissue_model))
             start = time.time()
@@ -110,11 +110,10 @@ class CreateSpectraTask(luigi.Task):
             raise IOError("path to gpumcml not valid")
 
 
-
 if __name__ == '__main__':
-    logging.basicConfig(filename='calculate_spectra' +
+    logging.basicConfig(filename='log/calculate_spectra_' +
                         str(datetime.datetime.now()) +
-                         '.log', level=logging.INFO)
+                        '.log', level=logging.INFO)
     ch = logging.StreamHandler()
     ch.setLevel(logging.INFO)
     logger = logging.getLogger()
@@ -125,7 +124,7 @@ if __name__ == '__main__':
     w = luigi.worker.Worker(scheduler=sch)
     BATCH_NUMBERS = np.arange(0, NR_BATCHES, 1)
     for i in BATCH_NUMBERS:
-        colon_task = CreateSpectraTask("ipcai_revision_colon", i,
+        colon_task = CreateSpectraTask("ipcai_revision_colon_train", i,
                                        NR_ELEMENTS_IN_BATCH,
                                        mcfac.ColonMuscleMcFactory())
         generic_task = CreateSpectraTask("ipcai_revision_generic", i,

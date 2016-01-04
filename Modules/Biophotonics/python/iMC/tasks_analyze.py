@@ -27,31 +27,31 @@ from regression.estimation import estimate_image
 
 def plot_axis(axis, image, title):
     im2 = axis.imshow(image, interpolation='nearest', alpha=1.0)
-    axis.set_title(title, fontsize=5)
-    divider = make_axes_locatable(axis)
-    cax = divider.append_axes("right", size="10%", pad=0.05)
-    cbar = plt.colorbar(im2, cax=cax)
-    cbar.ax.tick_params(labelsize=5)
+    # axis.set_title(title, fontsize=5)
+    # divider = make_axes_locatable(axis)
+    # cax = divider.append_axes("right", size="10%", pad=0.05)
+    # cbar = plt.colorbar(im2, cax=cax)
+    # cbar.ax.tick_params(labelsize=5)
     axis.xaxis.set_visible(False)
     axis.yaxis.set_visible(False)
 
-    return im2, cbar
+    return im2  # , cbar
 
 
 class EstimateTissueParametersTask(luigi.Task):
     imageName = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
         return ppt.PreprocessMSI(imageName=self.imageName), \
             rt.TrainForest(batch_prefix=
-                        self.batch_prefix)
+                        self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
                                               sp.FINALS_FOLDER,
                                               self.imageName + "_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "estimate.nrrd"))
 
     def run(self):
@@ -69,21 +69,21 @@ class EstimateTissueParametersTask(luigi.Task):
 
 class ReprojectReflectancesTask(luigi.Task):
     imageName = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
         return EstimateTissueParametersTask(imageName=self.imageName,
                                             batch_prefix=
-                                            self.batch_prefix), \
+                                            self.df_prefix), \
             rt.TrainForestForwardModel(batch_prefix=
-                        self.batch_prefix)
+                        self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
                                               sp.FINALS_FOLDER,
                                               self.imageName +
                                               "_backprojection_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "estimate.nrrd"))
 
     def run(self):
@@ -121,25 +121,25 @@ def r2_evaluation(reflectances, backprojections):
 
 class CreateNiceParametricImagesTask(luigi.Task):
     imageName = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
         return EstimateTissueParametersTask(imageName=self.imageName,
                                             batch_prefix=
-                                            self.batch_prefix), \
+                                            self.df_prefix), \
             ppt.CorrectImagingSetupTask(imageName=self.imageName), \
             ppt.SegmentMSI(imageName=self.imageName), \
             ppt.PreprocessMSI(imageName=self.imageName), \
             ReprojectReflectancesTask(imageName=self.imageName,
                                       batch_prefix=
-                                      self.batch_prefix)
+                                      self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               self.imageName + "_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "_summary.png"))
 
     def run(self):

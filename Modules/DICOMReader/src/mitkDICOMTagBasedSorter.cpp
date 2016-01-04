@@ -592,5 +592,5 @@ mitk::DICOMTagBasedSorter::ParameterizedDatasetSort
   assert(right);
   assert(m_SortCriterion.IsNotNull());
 
-  return m_SortCriterion->IsLeftBeforeRight(left, right) == false;
+  return m_SortCriterion->IsLeftBeforeRight(left, right);
 }

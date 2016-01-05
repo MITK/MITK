@@ -114,6 +114,35 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="m_AddInteractor">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Do image processing</string>
+     </property>
+     <property name="text">
+      <string>Add Interactor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="18" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="10" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="enabled">
@@ -263,22 +292,6 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QPushButton" name="m_AddInteractor">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="toolTip">
-      <string>Do image processing</string>
-     </property>
-     <property name="text">
-      <string>Add Interactor</string>
-     </property>
-    </widget>
-   </item>
    <item row="14" column="0" rowspan="3" colspan="2">
     <widget class="QWidget" name="m_UsageInfo" native="true">
      <layout class="QGridLayout" name="gridLayout">
@@ -300,7 +313,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
           </property>
          </widget>
         </item>
@@ -310,7 +323,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_shift.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_shift.png</pixmap>
           </property>
          </widget>
         </item>
@@ -327,7 +340,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
           </property>
          </widget>
         </item>
@@ -344,7 +357,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_right.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_right.png</pixmap>
           </property>
          </widget>
         </item>
@@ -354,7 +367,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_left.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_left.png</pixmap>
           </property>
          </widget>
         </item>
@@ -364,7 +377,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
           </property>
          </widget>
         </item>
@@ -388,7 +401,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
           </property>
          </widget>
         </item>
@@ -398,7 +411,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_ctrl.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_ctrl.png</pixmap>
           </property>
          </widget>
         </item>
@@ -415,7 +428,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_ctrl.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_ctrl.png</pixmap>
           </property>
          </widget>
         </item>
@@ -425,7 +438,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
           </property>
          </widget>
         </item>
@@ -449,7 +462,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
           </property>
          </widget>
         </item>
@@ -459,7 +472,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
           </property>
          </widget>
         </item>
@@ -469,7 +482,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_down.png</pixmap>
           </property>
          </widget>
         </item>
@@ -479,7 +492,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_shift.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_shift.png</pixmap>
           </property>
          </widget>
         </item>
@@ -489,7 +502,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_up.png</pixmap>
           </property>
          </widget>
         </item>
@@ -506,7 +519,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_left.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_left.png</pixmap>
           </property>
          </widget>
         </item>
@@ -523,7 +536,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_plus.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_plus.png</pixmap>
           </property>
          </widget>
         </item>
@@ -533,7 +546,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../../../mitk-super-master-release/MITK-build/Plugins/org.mitk.gui.qt.geometrytools/org_mitk_gui_qt_geometrytools_cached.qrc">:/org.mitk.gui.qt.geometrytools/resources/key_dash.png</pixmap>
+           <pixmap>:/org.mitk.gui.qt.geometrytools/resources/key_dash.png</pixmap>
           </property>
          </widget>
         </item>
@@ -550,17 +563,14 @@
     </widget>
    </item>
    <item row="17" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="QPushButton" name="m_GizmoButton">
+     <property name="text">
+      <string>Exerimental: 3D gizmo on selected node</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
-    </spacer>
+    </widget>
    </item>
   </layout>
  </widget>

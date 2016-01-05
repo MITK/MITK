@@ -23,6 +23,7 @@ set(mitk_modules
   ImageStatistics
   LegacyAdaptors
   SceneSerialization
+  Gizmo
   GraphAlgorithms
   Multilabel
   ContourModel

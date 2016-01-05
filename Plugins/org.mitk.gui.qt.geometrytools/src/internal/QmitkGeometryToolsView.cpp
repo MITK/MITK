@@ -30,6 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleRegistry.h>
 #include <usGetModuleContext.h>
 
+// Gizmo
+#include <mitkGizmo.h>
+
+// Qt
+#include <QMessageBox>
+
 const std::string QmitkGeometryToolsView::VIEW_ID = "org.mitk.views.geometrytools";
 
 void QmitkGeometryToolsView::SetFocus()
@@ -54,6 +60,8 @@ void QmitkGeometryToolsView::CreateQtPartControl( QWidget *parent )
 
   connect( m_Controls.m_OriginPointRadioButton, SIGNAL(clicked(bool)), this, SLOT(OnOriginPointRadioButton(bool)) );
   connect( m_Controls.m_CenterPointRadioButton, SIGNAL(clicked(bool)), this, SLOT(OnCenterPointRadioButton(bool)) );
+
+  connect( m_Controls.m_GizmoButton, SIGNAL(clicked()), this, SLOT(OnGizmoToggle()) );
 
 
 
@@ -209,5 +217,39 @@ void QmitkGeometryToolsView::OnAnchorPointChanged(double /*value*/)
       node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Y", m_Controls.m_AnchorPointY->value());
       node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Z", m_Controls.m_AnchorPointZ->value());
     }
+  }
+}
+
+void QmitkGeometryToolsView::OnGizmoToggle()
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (nodes.size() == 1)
+  {
+    mitk::DataNode::Pointer selectedNode = nodes.first();
+
+    if (selectedNode->GetDataInteractor().IsNotNull())
+    {
+      selectedNode->SetDataInteractor(nullptr);
+    } else
+    {
+      mitk::Gizmo::AddGizmoToNode(selectedNode, GetDataStorage());
+
+      /*
+      mitk::GizmoInteractor3D::Pointer interactor = mitk::GizmoInteractor3D::New();
+      interactor->LoadStateMachine("Gizmo3D.xml", us::ModuleRegistry::GetModule("MitkGizmo"));
+      interactor->SetEventConfig("Gizmo3D.xml", us::ModuleRegistry::GetModule("MitkGizmo"));
+
+      interactor->SetDataNode(selectedNode);
+      interactor->SetGizmoNode(gizmoNode);
+      */
+
+      //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
+  else
+  {
+      QMessageBox::warning((QWidget*)parent(),
+                           "3D Gizmo",
+                           "You need to select exactly one data node to use the 3D gizmo");
   }
 }

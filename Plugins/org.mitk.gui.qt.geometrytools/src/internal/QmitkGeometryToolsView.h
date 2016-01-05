@@ -102,6 +102,10 @@ protected:
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::QmitkGeometryToolsViewControls m_Controls;
+
+protected slots:
+
+    void OnGizmoToggle();
 };
 
 #endif // QmitkGeometryToolsView_h

@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkGizmo.h"
+#include "mitkGizmoInteractor3D.h"
 
 // MITK includes
 #include <mitkRenderingManager.h>
@@ -24,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // VTK includes
 #include <vtkConeSource.h>
+#include <vtkSphereSource.h>
 #include <vtkCylinderSource.h>
 #include <vtkAppendPolyData.h>
 #include <vtkTransformPolyDataFilter.h>
@@ -34,14 +36,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK includes
 #include <itkCommand.h>
 
-void mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage* storage)
+// MicroServices
+#include <usGetModuleContext.h>
+
+mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage* storage)
 {
   assert(node);
   if (node->GetData() == nullptr ||
       node->GetData()->GetGeometry() == nullptr)
   {
-    return;
+    return nullptr;
   }
+  //--------------------------------------------------------------
+  // Add visual gizmo that follows the node to be manipulated
+  //--------------------------------------------------------------
 
   auto gizmo = Gizmo::New();
   auto gizmoNode = DataNode::New();
@@ -55,6 +63,7 @@ void mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage* storage)
   gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New(2));
 
   // Hide by default, show in all 3D windows
+  gizmoNode->SetProperty("helper object", BoolProperty::New(true));
   gizmoNode->SetProperty("visible", BoolProperty::New(false));
   auto rwList = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   for (auto& rw : rwList)
@@ -71,8 +80,21 @@ void mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage* storage)
 
   gizmo->FollowGeometry(node->GetData()->GetGeometry());
 
+  //--------------------------------------------------------------
+  // Add interaction to the gizmo
+  //--------------------------------------------------------------
+
+  mitk::GizmoInteractor3D::Pointer interactor = mitk::GizmoInteractor3D::New();
+  interactor->LoadStateMachine("Gizmo3DStates.xml", us::GetModuleContext()->GetModule());
+  //interactor->SetEventConfig("Gizmo3D.xml", us::ModuleRegistry::GetModule("MitkGizmo"));
+
+  interactor->SetGizmoNode(gizmoNode);
+  interactor->SetManipulatedObjectNode(node);
+
   assert(storage);
   storage->Add(gizmoNode);
+
+  return gizmoNode;
 }
 
 mitk::Gizmo::Gizmo()
@@ -110,16 +132,28 @@ mitk::Gizmo::~Gizmo()
 }
 
 namespace {
+
+void AssignScalarValueTo(vtkPolyData* polydata, char value)
+{
+  vtkSmartPointer<vtkCharArray> pointData = vtkSmartPointer<vtkCharArray>::New();
+
+  int numberOfPoints = polydata->GetNumberOfPoints();
+  pointData->SetNumberOfComponents(1);
+  pointData->SetNumberOfTuples(numberOfPoints);
+  pointData->FillComponent(0,value);
+  polydata->GetPointData()->SetScalars(pointData);
+}
+
 vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
                                        const mitk::Vector3D& axis,
                                        double halflength,
-                                       char vertexValue)
+                                       char vertexValueAxis,
+                                       char vertexValueRing)
 {
   const double shaftRadius = 1;
   const double arrowHeight = shaftRadius * 6;
 
-  vtkSmartPointer<vtkAppendPolyData> appender = vtkSmartPointer<vtkAppendPolyData>::New();
-
+  vtkSmartPointer<vtkAppendPolyData> appenderAxis = vtkSmartPointer<vtkAppendPolyData>::New();
   for (double sign = -1.0; sign < 3.0; sign += 2)
   {
     vtkSmartPointer<vtkConeSource> cone = vtkConeSource::New();
@@ -134,7 +168,7 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
     cone->SetResolution(40);
     cone->CappingOn();
     cone->Update();
-    appender->AddInputData(cone->GetOutput());
+    appenderAxis->AddInputData(cone->GetOutput());
   }
 
   vtkSmartPointer<vtkCylinderSource> shaft = vtkCylinderSource::New();
@@ -164,26 +198,23 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
   shaftTf->SetInputConnection(shaft->GetOutputPort());
   shaftTf->SetTransform(ringTrans);
   shaftTf->Update();
-  appender->AddInputData(shaftTf->GetOutput());
+  appenderAxis->AddInputData(shaftTf->GetOutput());
+  appenderAxis->Update();
+  AssignScalarValueTo(appenderAxis->GetOutput(), vertexValueAxis);
 
   vtkSmartPointer<vtkTransformPolyDataFilter> ringTf =
       vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   ringTf->SetInputConnection(ring->GetOutputPort());
   ringTf->SetTransform(ringTrans);
   ringTf->Update();
+  AssignScalarValueTo( ringTf->GetOutput(), vertexValueRing );
 
-  appender->AddInputData(ringTf->GetOutput());
-  appender->Update();
-  vtkSmartPointer<vtkPolyData> result = appender->GetOutput();
+  vtkSmartPointer<vtkAppendPolyData> appenderGlobal = vtkSmartPointer<vtkAppendPolyData>::New();
+  appenderGlobal->AddInputData( appenderAxis->GetOutput() );
+  appenderGlobal->AddInputData( ringTf->GetOutput() );
+  appenderGlobal->Update();
 
-  vtkSmartPointer<vtkCharArray> pointData = vtkSmartPointer<vtkCharArray>::New();
-
-  int numberOfPoints = result->GetNumberOfPoints();
-  pointData->SetNumberOfComponents(1);
-  pointData->SetNumberOfTuples(numberOfPoints);
-  pointData->FillComponent(0,vertexValue);
-  result->GetPointData()->SetScalars(pointData);
-
+  vtkSmartPointer<vtkPolyData> result = appenderGlobal->GetOutput();
   return result;
 }
 
@@ -195,9 +226,18 @@ vtkSmartPointer<vtkPolyData> mitk::Gizmo::BuildGizmo()
   longestAxis = std::max( longestAxis, m_Scaling[2] );
 
   vtkSmartPointer<vtkAppendPolyData> appender = vtkSmartPointer<vtkAppendPolyData>::New();
-  appender->AddInputData( BuildAxis(m_Center, m_AxisX, longestAxis, 0) );
-  appender->AddInputData( BuildAxis(m_Center, m_AxisY, longestAxis, 1) );
-  appender->AddInputData( BuildAxis(m_Center, m_AxisZ, longestAxis, 2) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisX, longestAxis, MoveAlongAxisX, RotateAroundAxisX) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisY, longestAxis, MoveAlongAxisY, RotateAroundAxisY) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisZ, longestAxis, MoveAlongAxisZ, RotateAroundAxisZ) );
+
+  auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
+  sphereSource->SetCenter(m_Center[0], m_Center[1], m_Center[2]);
+  sphereSource->SetRadius(longestAxis * 0.05);
+  sphereSource->Update();
+  AssignScalarValueTo( sphereSource->GetOutput(), MoveFreely );
+  
+  appender->AddInputData( sphereSource->GetOutput() );
+
   appender->Update();
   return appender->GetOutput();
 }
@@ -232,4 +272,44 @@ void mitk::Gizmo::OnFollowedGeometryModified()
     }
 
     UpdateRepresentation();
+}
+
+mitk::Gizmo::HandleType mitk::Gizmo::GetHandleFromPointID(vtkIdType id)
+{
+
+#define CheckHandleType(type) \
+  if (static_cast<int>(dataValue) == static_cast<int>(type)) \
+    return type;
+
+  assert(GetVtkPolyData());
+  assert(GetVtkPolyData()->GetPointData());
+  assert(GetVtkPolyData()->GetPointData()->GetScalars());
+  // TODO check if id exists.. what otherwise?
+  double dataValue = GetVtkPolyData()->GetPointData()->GetScalars()->GetTuple1(id);
+
+  CheckHandleType(MoveFreely);
+  CheckHandleType(MoveAlongAxisX);
+  CheckHandleType(MoveAlongAxisY);
+  CheckHandleType(MoveAlongAxisZ);
+  CheckHandleType(RotateAroundAxisX);
+  CheckHandleType(RotateAroundAxisY);
+  CheckHandleType(RotateAroundAxisZ);
+  return NoHandle;
+}
+
+std::string mitk::Gizmo::HandleTypeToString(HandleType type)
+{
+#define CheckHandleType(candidateType) \
+  if (type == candidateType) \
+    return std::string(#candidateType);
+
+  CheckHandleType(MoveFreely);
+  CheckHandleType(MoveAlongAxisX);
+  CheckHandleType(MoveAlongAxisY);
+  CheckHandleType(MoveAlongAxisZ);
+  CheckHandleType(RotateAroundAxisX);
+  CheckHandleType(RotateAroundAxisY);
+  CheckHandleType(RotateAroundAxisZ);
+  CheckHandleType(NoHandle);
+  return "InvalidHandleType";
 }

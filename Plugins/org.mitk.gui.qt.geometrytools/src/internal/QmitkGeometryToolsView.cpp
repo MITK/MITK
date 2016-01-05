@@ -222,29 +222,20 @@ void QmitkGeometryToolsView::OnAnchorPointChanged(double /*value*/)
 
 void QmitkGeometryToolsView::OnGizmoToggle()
 {
+  // if active --> deactivate, finished
+  if (m_GizmoNode.IsNotNull())
+  { // TODO should/could this be reformulated to end up in a function of mitk::Gizmo?
+      m_GizmoNode->GetDataInteractor()->SetDataNode(nullptr);
+      GetDataStorage()->Remove(m_GizmoNode);
+      m_GizmoNode = nullptr;
+      return;
+  }
+
+  // if inactive, add interactor
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.size() == 1)
   {
-    mitk::DataNode::Pointer selectedNode = nodes.first();
-
-    if (selectedNode->GetDataInteractor().IsNotNull())
-    {
-      selectedNode->SetDataInteractor(nullptr);
-    } else
-    {
-      mitk::Gizmo::AddGizmoToNode(selectedNode, GetDataStorage());
-
-      /*
-      mitk::GizmoInteractor3D::Pointer interactor = mitk::GizmoInteractor3D::New();
-      interactor->LoadStateMachine("Gizmo3D.xml", us::ModuleRegistry::GetModule("MitkGizmo"));
-      interactor->SetEventConfig("Gizmo3D.xml", us::ModuleRegistry::GetModule("MitkGizmo"));
-
-      interactor->SetDataNode(selectedNode);
-      interactor->SetGizmoNode(gizmoNode);
-      */
-
-      //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
+    m_GizmoNode = mitk::Gizmo::AddGizmoToNode(nodes.first(), GetDataStorage());
   }
   else
   {

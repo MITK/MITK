@@ -19,16 +19,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkGizmo_h
 
 #include <mitkSurface.h>
+#include <mitkDataNode.h>
+
 #include <MitkGizmoExports.h>
 
 namespace mitk {
 
-class DataNode;
 class DataStorage;
 
+// TODO LUT for colors of gizmo!
+// TODO state machine and input for geometry modifications
+// TODO geometry modifications
+// TODO sizing of gizmo (good to see with differently sized data, good to pick)
+// ..?
 class MITKGIZMO_EXPORT Gizmo : public Surface
 {
 public:
+
+  enum HandleType
+  {
+      MoveFreely,
+      MoveAlongAxisX,
+      MoveAlongAxisY,
+      MoveAlongAxisZ,
+      RotateAroundAxisX,
+      RotateAroundAxisY,
+      RotateAroundAxisZ,
+      NoHandle
+  };
+
+  static std::string HandleTypeToString(HandleType type);
+
   mitkClassMacro(Gizmo, Surface);
   itkNewMacro(Gizmo);
 
@@ -53,7 +74,10 @@ public:
 
   void OnFollowedGeometryModified();
 
-  static void AddGizmoToNode(DataNode* node, DataStorage* storage);
+  HandleType GetHandleFromPointID(vtkIdType id);
+
+  //! \return DataNode::Pointer containing the node used for vizualization of our gizmo
+  static DataNode::Pointer AddGizmoToNode(DataNode* node, DataStorage* storage);
 
 protected:
   Gizmo();

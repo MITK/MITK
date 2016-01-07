@@ -27,14 +27,20 @@ namespace mitk {
 
 class DataStorage;
 
+// TODO rotation
 // TODO LUT for colors of gizmo!
-// TODO state machine and input for geometry modifications
-// TODO geometry modifications
 // TODO sizing of gizmo (good to see with differently sized data, good to pick)
 // ..?
 class MITKGIZMO_EXPORT Gizmo : public Surface
 {
 public:
+
+  enum AxisType
+  {
+      AxisX,
+      AxisY,
+      AxisZ
+  };
 
   enum HandleType
   {

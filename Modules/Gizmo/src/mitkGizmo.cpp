@@ -86,7 +86,7 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
 
   mitk::GizmoInteractor3D::Pointer interactor = mitk::GizmoInteractor3D::New();
   interactor->LoadStateMachine("Gizmo3DStates.xml", us::GetModuleContext()->GetModule());
-  //interactor->SetEventConfig("Gizmo3D.xml", us::ModuleRegistry::GetModule("MitkGizmo"));
+  interactor->SetEventConfig("Gizmo3DConfig.xml", us::ModuleRegistry::GetModule("MitkGizmo"));
 
   interactor->SetGizmoNode(gizmoNode);
   interactor->SetManipulatedObjectNode(node);

@@ -50,14 +50,30 @@ protected:
 
   virtual void ConnectActionsAndFunctions() override;
 
-  bool PickHandle(const InteractionEvent*);
-
+  bool HasPickedHandle(const InteractionEvent*);
+  void DecideInteraction(StateMachineAction*, InteractionEvent* interactionEvent);
+  void MoveAlongAxis(StateMachineAction*, InteractionEvent* interactionEvent);
+  void RotateAroundAxis(StateMachineAction*, InteractionEvent* interactionEvent);
+  void MoveFreely(StateMachineAction*, InteractionEvent* interactionEvent);
+  void ApplyTranslationToManipulatedObject(const Vector3D& projectedMovement);
 private:
 
     Gizmo::Pointer m_Gizmo;
     DataNode::Pointer m_ManipulatedObject;
 
     vtkSmartPointer<vtkPointPicker> m_PointPicker;
+
+    Gizmo::HandleType m_PickedHandle;
+    Gizmo::AxisType m_RelevantAxis;
+
+    Point2D m_InitialClickPosition2D;
+    double m_InitialClickPosition2DZ;
+    Point3D m_InitialClickPosition3D;
+    Point2D m_InitialGizmoCenter2D;
+    Point3D m_InitialGizmoCenter3D;
+    double m_InitialGizmoCenter2DZ;
+    Vector3D m_AxisOfMovement;
+    BaseGeometry::Pointer m_InitialManipulatedObjectGeometry;
 };
 
 }

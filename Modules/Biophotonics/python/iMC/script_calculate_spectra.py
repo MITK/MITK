@@ -124,13 +124,10 @@ if __name__ == '__main__':
     w = luigi.worker.Worker(scheduler=sch)
     BATCH_NUMBERS = np.arange(0, NR_BATCHES, 1)
     for i in BATCH_NUMBERS:
-        colon_task = CreateSpectraTask("ipcai_revision_colon_train", i,
+        colon_task = CreateSpectraTask("ipcai_revision_colon_mean_scattering",
+                                       i,
                                        NR_ELEMENTS_IN_BATCH,
-                                       mcfac.ColonMuscleMcFactory())
-        generic_task = CreateSpectraTask("ipcai_revision_generic", i,
-                                         NR_ELEMENTS_IN_BATCH,
-                                         mcfac.GenericMcFactory())
+                                       mcfac.ColonMuscleMeanScatteringFactory())
         w.add(colon_task)
-        w.add(generic_task)
         w.run()
 

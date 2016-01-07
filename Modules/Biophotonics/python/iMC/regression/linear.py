@@ -100,7 +100,7 @@ class LinearSaO2Unmixing(object):
         """
         self.selected_features = selected_features
 
-    def fit(self, X, y):
+    def fit(self, X, y, weights=None):
         """only implemented to fit to the standard sklearn framework."""
         pass
 

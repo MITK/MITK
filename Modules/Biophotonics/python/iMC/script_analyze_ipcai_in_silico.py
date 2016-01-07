@@ -36,13 +36,14 @@ sns.set_style("whitegrid")
 # setup standard random forest
 rf = RandomForestRegressor(10, min_samples_leaf=10, max_depth=9, n_jobs=-1)
 EvaluationStruct = namedtuple("EvaluationStruct",
-                              "name regressor color alpha")
+                              "name regressor")
 # standard evaluation setup
 standard_evaluation_setups = [EvaluationStruct("Linear Beer-Lambert",
-                                               LinearSaO2Unmixing(),
-                                               sns.xkcd_rgb["pale red"], 0.5)
-    , EvaluationStruct("Proposed", rf,
-                       sns.xkcd_rgb["medium green"], 0.5)]
+                                               LinearSaO2Unmixing())
+                              , EvaluationStruct("Proposed", rf)]
+
+# color palette
+my_colors = [sns.xkcd_rgb["pale red"], sns.xkcd_rgb["medium green"]]
 
 # standard noise levels
 noise_levels = np.arange(0.00, 0.18, 0.02)
@@ -60,8 +61,10 @@ class TrainingSamplePlot(luigi.Task):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
-                                              "sample_plot_train_" + self.which_train +
-                                              "_test_" + self.which_test + ".png"))
+                                              "sample_plot_train_" +
+                                              self.which_train +
+                                              "_test_" + self.which_test +
+                                              ".png"))
 
     def run(self):
         # get data
@@ -95,7 +98,7 @@ class TrainingSamplePlot(luigi.Task):
             df = pd.concat([df, current_df], ignore_index=True)
             logging.info(
                     "Finished training classifier with {0} samples".format(
-                        str(n)))
+                            str(n)))
 
         df = df.groupby("Number Samples").describe()
         # get the error description in the rows:
@@ -103,13 +106,14 @@ class TrainingSamplePlot(luigi.Task):
         # get rid of multiindex by dropping "Error" level
         df.columns = df.columns.droplevel(0)
 
+        plt.figure()
         plt.plot(df.index, df["50%"], color=sns.xkcd_rgb["medium green"])
 
         # tidy up the plot
         plt.xlabel("number of training samples")
         plt.ylabel("absolute error [%]")
-        plt.ylim((0, 15))
-        plt.xlim((0, 15))
+        plt.ylim((0, 20))
+        plt.xlim((0, 15000))
 
         # finally save the figure
         plt.savefig(self.output().path, dpi=500,
@@ -128,8 +132,10 @@ class VhbPlot(luigi.Task):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
-                                              "vhb_noise_plot_train_" + self.which_train +
-                                              "_test_" + self.which_test + ".png"))
+                                              "vhb_noise_plot_train_" +
+                                              self.which_train +
+                                              "_test_" + self.which_test +
+                                              ".png"))
 
     @staticmethod
     def preprocess_vhb(batch, nr_samples=None, w_percent=None,
@@ -147,12 +153,11 @@ class VhbPlot(luigi.Task):
 
         # for vhb we only evaluate the proposed method since the linear
         # beer-lambert is not applicable
-        evaluation_setups = [EvaluationStruct("Proposed", rf,
-                                              sns.xkcd_rgb["medium green"],
-                                              0.5)]
-        standard_plotting(df_train, noise_levels, df_test, noise_levels,
-                          evaluation_setups=evaluation_setups,
-                          preprocessing=self.preprocess_vhb,
+        evaluation_setups = [EvaluationStruct("Proposed", rf)]
+        df = evaluate_data(df_train, noise_levels, df_test, noise_levels,
+                           evaluation_setups=evaluation_setups,
+                           preprocessing=self.preprocess_vhb, )
+        standard_plotting(df, color_palette = sns.xkcd_rgb["medium green"],
                           xytext_position=(2, 3))
         plt.ylim((0, 4))
 
@@ -173,15 +178,18 @@ class NoisePlot(luigi.Task):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
-                                              "noise_plot_train_" + self.which_train +
-                                              "_test_" + self.which_test + ".png"))
+                                              "noise_plot_train_" +
+                                              self.which_train +
+                                              "_test_" + self.which_test +
+                                              ".png"))
 
     def run(self):
         # get data
         df_train = pd.read_csv(self.input()[0].path, header=[0, 1])
         df_test = pd.read_csv(self.input()[1].path, header=[0, 1])
 
-        standard_plotting(df_train, noise_levels, df_test, noise_levels)
+        df = evaluate_data(df_train, noise_levels, df_test, noise_levels)
+        standard_plotting(df)
 
         # finally save the figure
         plt.savefig(self.output().path, dpi=500,
@@ -200,8 +208,10 @@ class WrongNoisePlot(luigi.Task):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
-                                              "wrong_noise_plot_train_" + self.which_train +
-                                              "_test_" + self.which_test + ".png"))
+                                              "wrong_noise_plot_train_" +
+                                              self.which_train +
+                                              "_test_" + self.which_test +
+                                              ".png"))
 
     def run(self):
         # get data
@@ -209,8 +219,9 @@ class WrongNoisePlot(luigi.Task):
         df_test = pd.read_csv(self.input()[1].path, header=[0, 1])
 
         # do same as in NoisePlot but with standard noise input
-        standard_plotting(df_train, np.ones_like(noise_levels) * w_standard,
-                          df_test, noise_levels)
+        df = evaluate_data(df_train, np.ones_like(noise_levels) * w_standard,
+                           df_test, noise_levels)
+        standard_plotting(df)
 
         # finally save the figure
         plt.savefig(self.output().path, dpi=500,
@@ -225,6 +236,10 @@ def evaluate_data(df_train, w_train, df_test, w_test,
         evaluation_setups = standard_evaluation_setups
     if preprocessing is None:
         preprocessing = preprocess
+    if "weights" in df_train:
+        weights = df_train["weights"].as_matrix().squeeze()
+    else:
+        weights = np.ones(df_train.shape[0])
 
     # create a new dataframe which will hold all the generated errors
     df = pd.DataFrame()
@@ -235,7 +250,7 @@ def evaluate_data(df_train, w_train, df_test, w_test,
         X_train, y_train = preprocessing(df_train, w_percent=one_w_train)
         for e in evaluation_setups:
             regressor = e.regressor
-            regressor.fit(X_train, y_train)
+            regressor.fit(X_train, y_train, weights)
             y_pred = regressor.predict(X_test)
             # save results to a dataframe
             errors = np.abs(y_pred - y_test)
@@ -249,41 +264,36 @@ def evaluate_data(df_train, w_train, df_test, w_test,
     return df
 
 
-def standard_plotting(df_train, w_train, df_test, w_test,
-                      evaluation_setups=None, preprocessing=None,
-                      xytext_position=None):
-    if evaluation_setups is None:
-        evaluation_setups = standard_evaluation_setups
+def standard_plotting(df, color_palette=None, xytext_position=None):
+    if color_palette is None:
+        color_palette = my_colors
     if xytext_position is None:
         xytext_position = (2, 15)
 
     plt.figure()
 
-    # evaluate the data which is used to generate the plot
-    df = evaluate_data(df_train, w_train, df_test, w_test,
-                       evaluation_setups, preprocessing)
-
     # group it by method and noise level and get description on the errors
-    df = df.groupby(['Method', 'noise added [sigma %]']).describe()
+    df_statistics = df.groupby(['Method', 'noise added [sigma %]']).describe()
     # get the error description in the rows:
-    df = df.unstack(-1)
+    df_statistics = df_statistics.unstack(-1)
     # get rid of multiindex by dropping "Error" level
-    df.columns = df.columns.droplevel(0)
+    df_statistics.columns = df_statistics.columns.droplevel(0)
 
     # iterate over methods to plot linegraphs with error tube
     # probably this can be done nicer, but no idea how exactly
-    for e in evaluation_setups:
-        df_method = df.loc[e.name]
+
+    for color, method in zip(
+            color_palette, df_statistics.index.get_level_values("Method").unique()):
+        df_method = df_statistics.loc[method]
         plt.plot(df_method.index, df_method["50%"],
-                 color=e.color, label=e.name)
-        plt.fill_between(df_method.index,
-                         df_method["25%"], df_method["75%"],
-                         facecolor=e.color, edgecolor=e.color,
-                         alpha=e.alpha)
+                 color=color, label=method)
+        plt.fill_between(df_method.index, df_method["25%"], df_method["75%"],
+                         facecolor=color, edgecolor=color,
+                         alpha=0.5)
     plt.xlabel("noise added [sigma %]")
     plt.ylabel("absolute error [%]")
     # add annotation:
-    median_proposed = df.T["Proposed", 0].loc["50%"]
+    median_proposed = df_statistics.T["Proposed", 0].loc["50%"]
     plt.gca().annotate('error: ' +
                        "{0:.1f}".format(median_proposed) + "%",
                        xy=(0, median_proposed), xytext=xytext_position,

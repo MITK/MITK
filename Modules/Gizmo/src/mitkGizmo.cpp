@@ -102,10 +102,6 @@ mitk::Gizmo::Gizmo()
 {
   m_Center.Fill(0);
 
-  m_Center[0] = 58;
-  m_Center[1] = 24;
-  m_Center[2] = 0;
-
   m_AxisX.Fill(0); m_AxisX[0] = 1;
   m_AxisY.Fill(0); m_AxisY[1] = 1;
   m_AxisZ.Fill(0); m_AxisZ[2] = 1;
@@ -235,7 +231,7 @@ vtkSmartPointer<vtkPolyData> mitk::Gizmo::BuildGizmo()
   sphereSource->SetRadius(longestAxis * 0.05);
   sphereSource->Update();
   AssignScalarValueTo( sphereSource->GetOutput(), MoveFreely );
-  
+
   appender->AddInputData( sphereSource->GetOutput() );
 
   appender->Update();

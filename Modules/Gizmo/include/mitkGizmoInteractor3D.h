@@ -56,6 +56,7 @@ protected:
   void RotateAroundAxis(StateMachineAction*, InteractionEvent* interactionEvent);
   void MoveFreely(StateMachineAction*, InteractionEvent* interactionEvent);
   void ApplyTranslationToManipulatedObject(const Vector3D& projectedMovement);
+  void ApplyRotationToManipulatedObject(double angle);
 private:
 
     Gizmo::Pointer m_Gizmo;
@@ -73,6 +74,7 @@ private:
     Point3D m_InitialGizmoCenter3D;
     double m_InitialGizmoCenter2DZ;
     Vector3D m_AxisOfMovement;
+    Vector3D m_AxisOfRotation;
     BaseGeometry::Pointer m_InitialManipulatedObjectGeometry;
 };
 

@@ -34,6 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorObserver.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 mitk::GizmoInteractor3D::GizmoInteractor3D()
 {
     m_PointPicker = vtkSmartPointer<vtkPointPicker>::New();
@@ -154,19 +157,23 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
       case Gizmo::RotateAroundAxisX:
         m_RelevantAxis = Gizmo::AxisX;
         m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(0);
+        m_AxisOfRotation = -m_AxisOfMovement;
         break;
       case Gizmo::MoveAlongAxisY:
       case Gizmo::RotateAroundAxisY:
         m_RelevantAxis = Gizmo::AxisY;
-          m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(1);
+        m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(1);
+        m_AxisOfRotation = m_AxisOfMovement;
         break;
       case Gizmo::MoveAlongAxisZ:
       case Gizmo::RotateAroundAxisZ:
         m_RelevantAxis = Gizmo::AxisZ;
-          m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(2);
+        m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(2);
+        m_AxisOfRotation = -m_AxisOfMovement;
         break;
     }
     m_AxisOfMovement.Normalize();
+    m_AxisOfRotation.Normalize();
 
     // test whether we go really into that direction or into the opposite one
     Vector3D intendedAxis = m_InitialClickPosition3D - m_InitialGizmoCenter3D;
@@ -236,7 +243,25 @@ void mitk::GizmoInteractor3D::MoveAlongAxis(StateMachineAction*, InteractionEven
 
 void mitk::GizmoInteractor3D::RotateAroundAxis(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-    std::cout << "Rotate around axis " << m_RelevantAxis << std::endl;
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
+  {
+    return;
+  }
+
+  Vector2D originalVector = m_InitialClickPosition2D - m_InitialGizmoCenter2D;
+  Vector2D currentVector = positionEvent->GetPointerPositionOnScreen() - m_InitialGizmoCenter2D;
+
+  originalVector.Normalize();
+  currentVector.Normalize();
+
+  double angle_rad = std::atan2(originalVector[1], originalVector[0]) -
+                     std::atan2(currentVector[1], currentVector[0]);
+
+  double angle_deg = angle_rad * 180 / M_PI;
+
+  ApplyRotationToManipulatedObject(angle_deg);
+  positionEvent->GetSender()->ForceImmediateUpdate();
 }
 
 void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -269,3 +294,18 @@ void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D
 
   m_ManipulatedObject->GetData()->GetGeometry()->SetIndexToWorldTransform( manipulatedGeometry );
 }
+
+void mitk::GizmoInteractor3D::ApplyRotationToManipulatedObject(double angle)
+{
+  assert(m_ManipulatedObject.IsNotNull());
+
+  auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
+
+  mitk::RotationOperation* op = new mitk::RotationOperation(OpROTATE,
+                                                            m_InitialGizmoCenter3D,
+                                                            m_AxisOfRotation,
+                                                            angle);
+  manipulatedGeometry->ExecuteOperation(op);
+  m_ManipulatedObject->GetData()->SetGeometry(manipulatedGeometry);
+}
+

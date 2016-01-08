@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkBaseRenderer.h>
 #include <mitkVtkInterpolationProperty.h>
+#include <mitkLookupTableProperty.h>
 
 // VTK includes
 #include <vtkConeSource.h>
@@ -63,13 +64,38 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   auto gizmoNode = DataNode::New();
   gizmoNode->SetName("Gizmo");
   gizmoNode->SetData(gizmo);
-  gizmoNode->SetProperty("material.ambientCoefficient", FloatProperty::New(0));
-  gizmoNode->SetProperty("material.diffuseCoefficient", FloatProperty::New(1));
-  gizmoNode->SetProperty("material.specularCoefficient", FloatProperty::New(0.2));
-  gizmoNode->SetProperty("material.interpolation", VtkInterpolationProperty::New(2)); // PHONG
+  //gizmoNode->SetProperty("material.ambientCoefficient", FloatProperty::New(0));
+  //gizmoNode->SetProperty("material.diffuseCoefficient", FloatProperty::New(1));
+  //gizmoNode->SetProperty("material.specularCoefficient", FloatProperty::New(0.2));
+  //gizmoNode->SetProperty("material.interpolation", VtkInterpolationProperty::New(2)); // PHONG
   gizmoNode->SetProperty("scalar visibility", BoolProperty::New(true));
   gizmoNode->SetProperty("ScalarsRangeMinimum", DoubleProperty::New(0));
-  gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New(2));
+  gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New(6));
+
+  double colorMoveFreely[] = {1,0,0,1}; // RGBA
+  double colorAxisX[] = {0.753,0,0,1}; // colors copied from QmitkStdMultiWidget to
+  double colorAxisY[] = {0,0.69,0,1};  // look alike
+  double colorAxisZ[] = {0,0.502,1,1};
+
+  // build a nice color table
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetNumberOfTableValues(7);
+  lut->SetTableRange(0,6);
+  lut->SetTableValue(MoveFreely, colorMoveFreely);
+  lut->SetTableValue(MoveAlongAxisX, colorAxisX);
+  lut->SetTableValue(MoveAlongAxisY, colorAxisY);
+  lut->SetTableValue(MoveAlongAxisZ, colorAxisZ);
+  lut->SetTableValue(RotateAroundAxisX, colorAxisX);
+  lut->SetTableValue(RotateAroundAxisY, colorAxisY);
+  lut->SetTableValue(RotateAroundAxisZ, colorAxisZ);
+
+  mitk::LookupTable::Pointer mlut = mitk::LookupTable::New();
+  mlut->SetVtkLookupTable(lut);
+
+  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
+  lutProp->SetLookupTable(mlut);
+  gizmoNode->SetProperty("LookupTable", lutProp);
+
 
   // Hide by default, show in all 3D windows
   gizmoNode->SetProperty("helper object", BoolProperty::New(true));

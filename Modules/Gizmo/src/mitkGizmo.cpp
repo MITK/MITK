@@ -96,7 +96,6 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   lutProp->SetLookupTable(mlut);
   gizmoNode->SetProperty("LookupTable", lutProp);
 
-
   // Hide by default, show in all 3D windows
   gizmoNode->SetProperty("helper object", BoolProperty::New(true));
   gizmoNode->SetProperty("visible", BoolProperty::New(false));
@@ -331,8 +330,13 @@ void mitk::Gizmo::FollowGeometry(BaseGeometry* geom)
   auto observer = itk::SimpleMemberCommand<Gizmo>::New();
   observer->SetCallbackFunction(this, &Gizmo::OnFollowedGeometryModified);
 
+  if (m_FollowedGeometry.IsNotNull())
+  {
+    m_FollowedGeometry->RemoveObserver(m_FollowerTag);
+  }
+
   m_FollowedGeometry = geom;
-  m_FollowedGeometry->AddObserver(itk::ModifiedEvent(), observer);
+  m_FollowerTag = m_FollowedGeometry->AddObserver(itk::ModifiedEvent(), observer);
 
   // initial adjustment
   OnFollowedGeometryModified();

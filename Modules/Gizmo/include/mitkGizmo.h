@@ -27,8 +27,6 @@ namespace mitk {
 
 class DataStorage;
 
-// TODO LUT for colors of gizmo!
-// TODO sizing of gizmo (good to see with differently sized data, good to pick)
 //! A geometry manipulation "gizmo".
 //!
 //! This class represents the principal axes of some arbitrary BaseGeometry.
@@ -135,6 +133,8 @@ private:
   Vector3D m_Radius;
 
   BaseGeometry::Pointer m_FollowedGeometry;
+  //! ITK tag for the observing of m_FollowedGeometry
+  unsigned long m_FollowerTag;
 };
 
 }

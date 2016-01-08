@@ -36,8 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSceneIO.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkIGTLServer.h>
-#include <mitkIGTLClient.h>
 
 // us
 #include <usServiceReference.h>
@@ -147,6 +145,9 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
 
   // PLUS Calibration
   connect(m_Controls.m_ReceiveImageToProbeTransform, SIGNAL(clicked()), this, SLOT(OnReceiveImageToProbeTransform()));
+  connect(m_Controls.m_StartStreaming, SIGNAL(clicked()), this, SLOT(OnStartStreaming()));
+  connect(&m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
+  connect(m_Controls.m_StopPlusCalibration, SIGNAL(clicked()), this, SLOT(OnStopPlusCalibration()));
 
   //connect( m_Controls.m_CombinedModalityManagerWidget, SIGNAL(SignalCombinedModalitySelected(mitk::USCombinedModality::Pointer)),
   //  this, SLOT(OnSelectDevice(mitk::USCombinedModality::Pointer)) );
@@ -343,40 +344,138 @@ void UltrasoundCalibration::OnStartPlusCalibration()
   m_Controls.m_TabWidget->setTabEnabled(4, true);
   m_Controls.m_TabWidget->setCurrentIndex(4);
   m_Controls.m_ReceiveImageToProbeTransform->setEnabled(true);
+  m_Controls.m_StartStreaming->setEnabled(false);
 
-  //TODO: setup server to send UltrasoundImages to PLUS
-  /*mitk::IGTLServer::Pointer usServer = mitk::IGTLServer::New(true);
-  usServer->SetName("EchoTrack Image Source");
-  usServer->SetHostname("127.0.0.1");
-  usServer->SetPortNumber(18944);
+  m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
+  if (m_CombinedModality.IsNull()) { return; } //something went wrong, there is no combined modality
 
-  mitk::IGTLDeviceSource::Pointer usDeviceSource = mitk::IGTLDeviceSource::New();
-  usDeviceSource->SetIGTLDevice(usServer);*/
+  //setup server to send UltrasoundImages to PLUS
+  mitk::IGTLServer::Pointer m_USServer = mitk::IGTLServer::New(true);
+  m_USServer->SetName("EchoTrack Image Source");
+  m_USServer->SetHostname("127.0.0.1");
+  m_USServer->SetPortNumber(18944);
 
-  //TODO: setup server to send TrackingData to PLUS
+  m_USMessageProvider = mitk::IGTLMessageProvider::New();
+  m_USMessageProvider->SetIGTLDevice(m_USServer);
+  m_USMessageProvider->SetFPS(5);
+
+  m_USImageToIGTLMessageFilter = mitk::ImageToIGTLMessageFilter::New();
+  m_USImageToIGTLMessageFilter->ConnectTo(m_CombinedModality->GetUltrasoundDevice());
+  m_USImageToIGTLMessageFilter->SetName("USImage Filter");
+
+  //setup server to send TrackingData to PLUS
+  m_TrackingServer = mitk::IGTLServer::New(true);
+  m_TrackingServer->SetName("EchoTrack Tracking Source");
+  m_TrackingServer->SetHostname("127.0.0.1");
+  m_TrackingServer->SetPortNumber(18945);
+
+  m_TrackingMessageProvider = mitk::IGTLMessageProvider::New();
+  m_TrackingMessageProvider->SetIGTLDevice(m_TrackingServer);
+  m_TrackingMessageProvider->SetFPS(5);
+
+  m_TrackingToIGTLMessageFilter = mitk::NavigationDataToIGTLMessageFilter::New();
+  m_TrackingToIGTLMessageFilter->ConnectTo(m_CombinedModality->GetTrackingDevice());
+  m_TrackingToIGTLMessageFilter->SetName("Tracker Filter");
+
+  typedef itk::SimpleMemberCommand< UltrasoundCalibration > CurCommandType;
+
+  CurCommandType::Pointer newConnectionCommand = CurCommandType::New();
+  newConnectionCommand->SetCallbackFunction(
+    this, &UltrasoundCalibration::OnNewConnection);
+  this->m_NewConnectionObserverTag = this->m_TrackingServer->AddObserver(
+    mitk::NewClientConnectionEvent(), newConnectionCommand);
+
+  //Open connections of both servers
+  if (m_USServer->OpenConnection())
+  {
+    MITK_INFO << "US Server opened its connection successfully";
+    m_USServer->StartCommunication();
+  }
+  else
+  {
+    MITK_INFO << "US Server could not open its connection";
+  }
+  if (m_TrackingServer->OpenConnection())
+  {
+    MITK_INFO << "Tracking Server opened its connection successfully";
+    m_TrackingServer->StartCommunication();
+  }
+  else
+  {
+    MITK_INFO << "Tracking Server could not open its connection";
+  }
+}
+
+void UltrasoundCalibration::OnStopPlusCalibration()
+{
+  //closing all server and clients when PlusCalibration is finished
+  if (m_USMessageProvider->IsStreaming())
+  {
+    m_USMessageProvider->StopStreamingOfSource(m_USImageToIGTLMessageFilter);
+  }
+  if (m_TrackingMessageProvider->IsStreaming())
+  {
+    m_TrackingMessageProvider->StopStreamingOfSource(m_TrackingToIGTLMessageFilter);
+  }
+  if (m_USServer.IsNotNull())
+  {
+    m_USServer->CloseConnection();
+  }
+  if (m_TrackingServer.IsNotNull())
+  {
+    m_TrackingServer->CloseConnection();
+  }
+  if (m_TransformClient.IsNotNull())
+  {
+    m_TransformClient->CloseConnection();
+  }
+
+  //switch active tab to first page of calibration
+  m_Controls.m_TabWidget->setTabEnabled(4, false);
+  m_Controls.m_TabWidget->setCurrentIndex(0);
+}
+
+void UltrasoundCalibration::OnNewConnection()
+{
+  m_Controls.m_StartStreaming->setEnabled(true);
+}
+
+void UltrasoundCalibration::OnStreamingTimerTimeout()
+{
+  m_USMessageProvider->Update();
+  m_TrackingMessageProvider->Update();
+}
+
+void UltrasoundCalibration::OnStartStreaming()
+{
+  m_USMessageProvider->StartStreamingOfSource(m_USImageToIGTLMessageFilter, 5);
+  m_TrackingMessageProvider->StartStreamingOfSource(m_TrackingToIGTLMessageFilter, 5);
+  m_Controls.m_StartStreaming->setEnabled(false);
+  unsigned int interval = this->m_USMessageProvider->GetStreamingTime();
+  this->m_StreamingTimer.start((1.0 / 5.0 * 1000.0));
 }
 
 void UltrasoundCalibration::OnReceiveImageToProbeTransform()
 {
-  mitk::IGTLClient::Pointer igtlClient = mitk::IGTLClient::New(true);
-  igtlClient->SetHostname("127.0.0.1");
-  igtlClient->SetPortNumber(18946);
-  mitk::IGTLDeviceSource::Pointer deviceSource = mitk::IGTLDeviceSource::New();
-  deviceSource->SetIGTLDevice(igtlClient);
-  deviceSource->Connect();
-  if (deviceSource->IsConnected()){
+  m_TransformClient = mitk::IGTLClient::New(true);
+  m_TransformClient->SetHostname("127.0.0.1");
+  m_TransformClient->SetPortNumber(18946);
+  m_TransformDeviceSource = mitk::IGTLDeviceSource::New();
+  m_TransformDeviceSource->SetIGTLDevice(m_TransformClient);
+  m_TransformDeviceSource->Connect();
+  if (m_TransformDeviceSource->IsConnected()){
     MITK_INFO << "successfully connected";
-    deviceSource->StartCommunication();
-    if (deviceSource->IsCommunicating())
+    m_TransformDeviceSource->StartCommunication();
+    if (m_TransformDeviceSource->IsCommunicating())
     {
       MITK_INFO << "communication started";
       mitk::IGTLMessage::Pointer receivedMessage;
       while (!(receivedMessage.IsNotNull() && receivedMessage->IsDataValid()))
       {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        deviceSource->Update();
-        receivedMessage = deviceSource->GetOutput();
-        igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(deviceSource->GetOutput()->GetMessage().GetPointer());
+        m_TransformDeviceSource->Update();
+        receivedMessage = m_TransformDeviceSource->GetOutput();
+        igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_TransformDeviceSource->GetOutput()->GetMessage().GetPointer());
         if (msg == nullptr || msg.IsNull())
         {
           MITK_INFO << "Received message could not be casted to TransformMessage. Skipping..";
@@ -385,6 +484,9 @@ void UltrasoundCalibration::OnReceiveImageToProbeTransform()
         else
         {
           MITK_INFO << "Message: " << msg;
+          igtl::Matrix4x4 transformPLUS;
+          msg->GetMatrix(transformPLUS);
+          MITK_INFO << "Transform: " << transformPLUS;
           break;
         }
       }

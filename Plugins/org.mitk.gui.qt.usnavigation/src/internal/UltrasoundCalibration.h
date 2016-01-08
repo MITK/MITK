@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkNeedleProjectionFilter.h>
 #include <mitkPointSetDifferenceStatisticsCalculator.h>
+#include <mitkIGTLClient.h>
+#include <mitkNavigationDataToIGTLMessageFilter.h>
 
 // Microservices
 #include "ui_UltrasoundCalibrationControls.h"
@@ -135,9 +137,26 @@ public:
   */
   void OnStartCalibrationProcess();
 
+  /**
+  *\brief Method to use the PLUS-Toolkoit for Calibration of EchoTrack
+  */
   void OnStartPlusCalibration();
 
+  void OnStopPlusCalibration();
+
+  /**
+  *\ brief Starts the Streaming of USImage and Navigation Data when PLUS is connected
+  */
+  void OnStartStreaming();
+
+  void OnNewConnection();
+
+  /**
+  \*brief Get the ImageToProbeTransform from the PLU-Toolkit once Calibration with PLUS is done
+  */
   void OnReceiveImageToProbeTransform();
+
+  void OnStreamingTimerTimeout();
 
   /**
   *
@@ -188,6 +207,23 @@ protected:
   mitk::DataNode::Pointer m_Node;
   mitk::DataNode::Pointer m_CalibNode;
   mitk::DataNode::Pointer m_WorldNode;
+
+  //IGTL Servers and Devices needed for the communication with PLUS
+  mitk::IGTLServer::Pointer m_USServer;
+  mitk::IGTLMessageProvider::Pointer m_USMessageProvider;
+  mitk::ImageToIGTLMessageFilter::Pointer m_USImageToIGTLMessageFilter;
+
+  mitk::IGTLServer::Pointer m_TrackingServer;
+  mitk::IGTLMessageProvider::Pointer m_TrackingMessageProvider;
+  mitk::NavigationDataToIGTLMessageFilter::Pointer m_TrackingToIGTLMessageFilter;
+
+  mitk::IGTLClient::Pointer m_TransformClient;
+  mitk::IGTLDeviceSource::Pointer m_TransformDeviceSource;
+
+  QTimer m_StreamingTimer;
+
+  unsigned long m_NewConnectionObserverTag;
+  unsigned long m_LostConnectionObserverTag;
 
   /**
   * \brief The current Ultrasound Image.

@@ -52,6 +52,7 @@ void mitk::GizmoInteractor3D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("MoveAlongAxis", MoveAlongAxis);
   CONNECT_FUNCTION("RotateAroundAxis", RotateAroundAxis);
   CONNECT_FUNCTION("MoveFreely", MoveFreely);
+  CONNECT_FUNCTION("ScaleEqually", ScaleEqually);
 }
 
 void mitk::GizmoInteractor3D::SetGizmoNode(DataNode* node)
@@ -149,14 +150,17 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
     {
       case Gizmo::MoveAlongAxisX:
       case Gizmo::RotateAroundAxisX:
+      case Gizmo::ScaleX:
         m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(0);
         break;
       case Gizmo::MoveAlongAxisY:
       case Gizmo::RotateAroundAxisY:
+      case Gizmo::ScaleY:
         m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(1);
         break;
       case Gizmo::MoveAlongAxisZ:
       case Gizmo::RotateAroundAxisZ:
+      case Gizmo::ScaleZ:
         m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(2);
         break;
     }
@@ -215,6 +219,11 @@ void mitk::GizmoInteractor3D::DecideInteraction(StateMachineAction* action, Inte
     case Gizmo::MoveFreely:
       decision = InternalEvent::New(interactionEvent->GetSender(), this,
                                     "MoveFreely");
+    case Gizmo::ScaleX:
+    case Gizmo::ScaleY:
+    case Gizmo::ScaleZ:
+      decision = InternalEvent::New(interactionEvent->GetSender(), this,
+                                    "ScaleEqually");
       break;
   }
 
@@ -285,6 +294,23 @@ void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* 
   positionEvent->GetSender()->ForceImmediateUpdate();
 }
 
+void mitk::GizmoInteractor3D::ScaleEqually(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if(positionEvent == NULL)
+  {
+    return;
+  }
+
+  Point2D currentPosition2D = positionEvent->GetPointerPositionOnScreen();
+  double relativeSize = (currentPosition2D - m_InitialGizmoCenter2D).GetNorm()
+                      / (m_InitialClickPosition2D - m_InitialGizmoCenter2D).GetNorm();
+
+  ApplyEqualScalingToManipulatedObject(relativeSize);
+  positionEvent->GetSender()->ForceImmediateUpdate();
+}
+
+
 void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D& translation)
 {
   assert(m_ManipulatedObjectGeometry.IsNotNull());
@@ -294,6 +320,20 @@ void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D
   manipulatedGeometry->Translate(translation);
 
   m_ManipulatedObjectGeometry->SetIndexToWorldTransform( manipulatedGeometry );
+}
+
+void mitk::GizmoInteractor3D::ApplyEqualScalingToManipulatedObject(double scalingFactor)
+{
+  assert(m_ManipulatedObjectGeometry.IsNotNull());
+  auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
+
+  ScaleOperation* op = new ScaleOperation(OpSCALE,
+                                          scalingFactor - 1.0,
+                                          m_InitialGizmoCenter3D);
+
+  manipulatedGeometry->ExecuteOperation(op);
+  m_ManipulatedObjectGeometry->SetIdentity();
+  m_ManipulatedObjectGeometry->Compose( manipulatedGeometry->GetIndexToWorldTransform() );
 }
 
 void mitk::GizmoInteractor3D::ApplyRotationToManipulatedObject(double angle_deg)

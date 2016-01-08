@@ -9,11 +9,18 @@
         <transition event_class="InternalEvent" event_variant="StartTranslationAlongAxis" target="translation_along_axis"/>
         <transition event_class="InternalEvent" event_variant="StartRotationAroundAxis" target="rotation_around_axis"/>
         <transition event_class="InternalEvent" event_variant="MoveFreely" target="free_moving"/>
+        <transition event_class="InternalEvent" event_variant="ScaleEqually" target="equal_scaling"/>
     </state>
     <state name="translation_along_axis">
         <transition event_class="MouseReleaseEvent" event_variant="InteractionEndEvent" target="start"/>
         <transition event_class="MouseMoveEvent" event_variant="InteractionMoveEvent" target="translation_along_axis">
             <action name ="MoveAlongAxis"/>
+        </transition>
+    </state>
+    <state name="equal_scaling">
+        <transition event_class="MouseReleaseEvent" event_variant="InteractionEndEvent" target="start"/>
+        <transition event_class="MouseMoveEvent" event_variant="InteractionMoveEvent" target="equal_scaling">
+            <action name ="ScaleEqually"/>
         </transition>
     </state>
     <state name="rotation_around_axis">

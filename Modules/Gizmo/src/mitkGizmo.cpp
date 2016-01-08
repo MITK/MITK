@@ -70,7 +70,7 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   //gizmoNode->SetProperty("material.interpolation", VtkInterpolationProperty::New(2)); // PHONG
   gizmoNode->SetProperty("scalar visibility", BoolProperty::New(true));
   gizmoNode->SetProperty("ScalarsRangeMinimum", DoubleProperty::New(0));
-  gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New(6));
+  gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New(10));
 
   double colorMoveFreely[] = {1,0,0,1}; // RGBA
   double colorAxisX[] = {0.753,0,0,1}; // colors copied from QmitkStdMultiWidget to
@@ -79,8 +79,8 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
 
   // build a nice color table
   vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-  lut->SetNumberOfTableValues(7);
-  lut->SetTableRange(0,6);
+  lut->SetNumberOfTableValues(10);
+  lut->SetTableRange(0,9);
   lut->SetTableValue(MoveFreely, colorMoveFreely);
   lut->SetTableValue(MoveAlongAxisX, colorAxisX);
   lut->SetTableValue(MoveAlongAxisY, colorAxisY);
@@ -88,6 +88,9 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   lut->SetTableValue(RotateAroundAxisX, colorAxisX);
   lut->SetTableValue(RotateAroundAxisY, colorAxisY);
   lut->SetTableValue(RotateAroundAxisZ, colorAxisZ);
+  lut->SetTableValue(ScaleX, colorAxisX);
+  lut->SetTableValue(ScaleY, colorAxisY);
+  lut->SetTableValue(ScaleZ, colorAxisZ);
 
   mitk::LookupTable::Pointer mlut = mitk::LookupTable::New();
   mlut->SetVtkLookupTable(lut);
@@ -180,7 +183,8 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
                                        const mitk::Vector3D& axis,
                                        double halflength,
                                        char vertexValueAxis,
-                                       char vertexValueRing)
+                                       char vertexValueRing,
+                                       char vertexValueScale)
 {
   const double shaftRadius = 1;
   const double arrowHeight = shaftRadius * 6;
@@ -204,6 +208,7 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
     cone->SetResolution(tubeSides);
     cone->CappingOn();
     cone->Update();
+    AssignScalarValueTo(cone->GetOutput(), vertexValueScale);
     axisSource->AddInputData(cone->GetOutput());
   }
 
@@ -225,10 +230,10 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
   shaftSource->SetVaryRadiusToVaryRadiusOff();
   shaftSource->SetRadius(shaftRadius);
   shaftSource->Update();
+  AssignScalarValueTo(shaftSource->GetOutput(), vertexValueAxis);
 
   axisSource->AddInputData(shaftSource->GetOutput());
   axisSource->Update();
-  AssignScalarValueTo(axisSource->GetOutput(), vertexValueAxis);
 
   // build the ring orthogonal to the axis (as another tube)
   vtkSmartPointer<vtkPolyData> ringSkeleton = vtkSmartPointer<vtkPolyData>::New();
@@ -309,9 +314,12 @@ vtkSmartPointer<vtkPolyData> mitk::Gizmo::BuildGizmo()
   longestAxis = std::max( longestAxis, m_Radius[2] );
 
   vtkSmartPointer<vtkAppendPolyData> appender = vtkSmartPointer<vtkAppendPolyData>::New();
-  appender->AddInputData( BuildAxis(m_Center, m_AxisX, longestAxis, MoveAlongAxisX, RotateAroundAxisX) );
-  appender->AddInputData( BuildAxis(m_Center, m_AxisY, longestAxis, MoveAlongAxisY, RotateAroundAxisY) );
-  appender->AddInputData( BuildAxis(m_Center, m_AxisZ, longestAxis, MoveAlongAxisZ, RotateAroundAxisZ) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisX, longestAxis,
+                                    MoveAlongAxisX, RotateAroundAxisX, ScaleX) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisY, longestAxis,
+                                    MoveAlongAxisY, RotateAroundAxisY, ScaleY) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisZ, longestAxis,
+                                    MoveAlongAxisZ, RotateAroundAxisZ, ScaleZ) );
 
   auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
   sphereSource->SetCenter(m_Center[0], m_Center[1], m_Center[2]);
@@ -382,6 +390,9 @@ mitk::Gizmo::HandleType mitk::Gizmo::GetHandleFromPointID(vtkIdType id)
   CheckHandleType(RotateAroundAxisX);
   CheckHandleType(RotateAroundAxisY);
   CheckHandleType(RotateAroundAxisZ);
+  CheckHandleType(ScaleX);
+  CheckHandleType(ScaleY);
+  CheckHandleType(ScaleZ);
   return NoHandle;
 }
 

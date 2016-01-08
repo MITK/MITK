@@ -79,6 +79,10 @@ private:
   //! in function of mouse movement.
   void MoveAlongAxis(StateMachineAction*, InteractionEvent* interactionEvent);
 
+  //! State machine action: Scale the manipulated object equally along all axes
+  //! in function of mouse movement.
+  void ScaleEqually(StateMachineAction*, InteractionEvent* interactionEvent);
+
   //! State machine action: Rotates the manipulated object around the picked axis
   //! in function of mouse movement.
   void RotateAroundAxis(StateMachineAction*, InteractionEvent* interactionEvent);
@@ -90,9 +94,11 @@ private:
   //! Applies a calculated translation vector to the manipulated object.
   void ApplyTranslationToManipulatedObject(const Vector3D& projectedMovement);
 
+  //! Applies a calculated scaling factor the manipulated object.
+  void ApplyEqualScalingToManipulatedObject(double scalingFactor);
+
   //! Applies a calculated rotation angle to the manipulated object.
   void ApplyRotationToManipulatedObject(double angle_deg);
-
   //! the Gizmo used for visual feedback and picking
   Gizmo::Pointer m_Gizmo;
 

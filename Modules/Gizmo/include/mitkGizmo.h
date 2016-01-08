@@ -68,6 +68,9 @@ public:
       RotateAroundAxisX,
       RotateAroundAxisY,
       RotateAroundAxisZ,
+      ScaleX,
+      ScaleY,
+      ScaleZ,
       NoHandle //< to indicate picking failure
   };
 

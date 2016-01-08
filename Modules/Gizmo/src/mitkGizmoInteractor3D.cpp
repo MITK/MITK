@@ -34,9 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorObserver.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 mitk::GizmoInteractor3D::GizmoInteractor3D()
 {
     m_PointPicker = vtkSmartPointer<vtkPointPicker>::New();
@@ -49,10 +46,8 @@ mitk::GizmoInteractor3D::~GizmoInteractor3D()
 
 void mitk::GizmoInteractor3D::ConnectActionsAndFunctions()
 {
-  // **Conditions** that can be used in the state machine, to ensure that certain conditions are met, before actually executing an action
   CONNECT_CONDITION("PickedHandle", HasPickedHandle);
 
-  // **Function** in the statmachine patterns also referred to as **Actions**
   CONNECT_FUNCTION("DecideInteraction", DecideInteraction);
   CONNECT_FUNCTION("MoveAlongAxis", MoveAlongAxis);
   CONNECT_FUNCTION("RotateAroundAxis", RotateAroundAxis);
@@ -61,18 +56,21 @@ void mitk::GizmoInteractor3D::ConnectActionsAndFunctions()
 
 void mitk::GizmoInteractor3D::SetGizmoNode(DataNode* node)
 {
-  // the gizmo
   DataInteractor::SetDataNode(node);
 
-  m_Gizmo = dynamic_cast<mitk::Gizmo*>(node->GetData());
+  m_Gizmo = dynamic_cast<Gizmo*>(node->GetData());
 
+  // setup picking from just this object
   m_PointPicker->GetPickList()->RemoveAllItems();
   m_PointPicker->PickFromListOff();
 }
 
 void mitk::GizmoInteractor3D::SetManipulatedObjectNode(DataNode* node)
 {
-  m_ManipulatedObject = node;
+  if (node && node->GetData())
+  {
+    m_ManipulatedObjectGeometry = node->GetData()->GetGeometry();
+  }
 }
 
 bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactionEvent)
@@ -90,7 +88,7 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
     return false;
   }
 
-  if (m_ManipulatedObject.IsNull())
+  if (m_ManipulatedObjectGeometry.IsNull())
   {
     return false;
   }
@@ -102,7 +100,7 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
 
   if ( !m_PointPicker->GetPickFromList() )
   {
-    auto mapper = GetDataNode()->GetMapper(mitk::BaseRenderer::Standard3D);
+    auto mapper = GetDataNode()->GetMapper(BaseRenderer::Standard3D);
     auto vtk_mapper = dynamic_cast<VtkMapper*>(mapper);
     if ( vtk_mapper )
     { // doing this each time is bizarre
@@ -126,6 +124,9 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
 
   if (m_PickedHandle != Gizmo::NoHandle)
   {
+    // if something relevant was picked, we calculate a number of
+    // important points and axes for the upcoming geometry manipulations
+
     // note initial state
     m_InitialClickPosition2D = positionEvent->GetPointerPositionOnScreen();
     m_InitialClickPosition3D = positionEvent->GetPositionInWorld();
@@ -142,45 +143,46 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
     m_InitialGizmoCenter3D = m_Gizmo->GetCenter();
     positionEvent->GetSender()->WorldToDisplay( m_InitialGizmoCenter3D, m_InitialGizmoCenter2D );
 
-    m_InitialManipulatedObjectGeometry = m_ManipulatedObject->GetData()->GetGeometry()->Clone();
-
-    renderer->SetWorldPoint(m_InitialGizmoCenter3D[0],
-                            m_InitialGizmoCenter3D[1],
-                            m_InitialGizmoCenter3D[2],
-                            0);
-    renderer->WorldToDisplay();
-    m_InitialGizmoCenter2DZ = renderer->GetDisplayPoint()[2];
+    m_InitialManipulatedObjectGeometry = m_ManipulatedObjectGeometry->Clone();
 
     switch (m_PickedHandle)
     {
       case Gizmo::MoveAlongAxisX:
       case Gizmo::RotateAroundAxisX:
-        m_RelevantAxis = Gizmo::AxisX;
         m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(0);
-        m_AxisOfRotation = -m_AxisOfMovement;
         break;
       case Gizmo::MoveAlongAxisY:
       case Gizmo::RotateAroundAxisY:
-        m_RelevantAxis = Gizmo::AxisY;
         m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(1);
-        m_AxisOfRotation = m_AxisOfMovement;
         break;
       case Gizmo::MoveAlongAxisZ:
       case Gizmo::RotateAroundAxisZ:
-        m_RelevantAxis = Gizmo::AxisZ;
         m_AxisOfMovement = m_InitialManipulatedObjectGeometry->GetAxisVector(2);
-        m_AxisOfRotation = -m_AxisOfMovement;
         break;
     }
     m_AxisOfMovement.Normalize();
-    m_AxisOfRotation.Normalize();
+    m_AxisOfRotation = m_AxisOfMovement;
 
-    // test whether we go really into that direction or into the opposite one
+    // for translation: test whether the user clicked into the "object's real" axis direction
+    //                  or into the other one
     Vector3D intendedAxis = m_InitialClickPosition3D - m_InitialGizmoCenter3D;
 
     if ( intendedAxis * m_AxisOfMovement < 0 )
     {
       m_AxisOfMovement *= -1.0;
+    }
+
+    // for rotation: test whether the axis of rotation is more looking in the direction
+    //               of the camera or in the opposite
+    vtkCamera* camera = renderer->GetActiveCamera();
+    vtkVector3d cameraDirection( camera->GetDirectionOfProjection() );
+
+    double angle_rad = vtkMath::AngleBetweenVectors( cameraDirection.GetData(),
+                                                     m_AxisOfRotation.GetDataPointer() );
+
+    if ( angle_rad < vtkMath::Pi() / 2.0 )
+    {
+        m_AxisOfRotation *= -1.0;
     }
 
     return true;
@@ -255,12 +257,10 @@ void mitk::GizmoInteractor3D::RotateAroundAxis(StateMachineAction*, InteractionE
   originalVector.Normalize();
   currentVector.Normalize();
 
-  double angle_rad = std::atan2(originalVector[1], originalVector[0]) -
-                     std::atan2(currentVector[1], currentVector[0]);
+  double angle_rad = std::atan2(currentVector[1], currentVector[0]) -
+                     std::atan2(originalVector[1], originalVector[0]);
 
-  double angle_deg = angle_rad * 180 / M_PI;
-
-  ApplyRotationToManipulatedObject(angle_deg);
+  ApplyRotationToManipulatedObject(vtkMath::DegreesFromRadians(angle_rad));
   positionEvent->GetSender()->ForceImmediateUpdate();
 }
 
@@ -274,6 +274,7 @@ void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* 
 
   Point2D currentPosition2D = positionEvent->GetPointerPositionOnScreen();
 
+  // re-use the initial z value to really move parallel to the camera plane
   auto renderer = positionEvent->GetSender()->GetVtkRenderer();
   renderer->SetDisplayPoint(currentPosition2D[0], currentPosition2D[1], m_InitialClickPosition2DZ);
   renderer->DisplayToWorld();
@@ -286,26 +287,27 @@ void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* 
 
 void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D& translation)
 {
-  assert(m_ManipulatedObject.IsNotNull());
+  assert(m_ManipulatedObjectGeometry.IsNotNull());
 
   auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->GetIndexToWorldTransform()->Clone();
 
   manipulatedGeometry->Translate(translation);
 
-  m_ManipulatedObject->GetData()->GetGeometry()->SetIndexToWorldTransform( manipulatedGeometry );
+  m_ManipulatedObjectGeometry->SetIndexToWorldTransform( manipulatedGeometry );
 }
 
-void mitk::GizmoInteractor3D::ApplyRotationToManipulatedObject(double angle)
+void mitk::GizmoInteractor3D::ApplyRotationToManipulatedObject(double angle_deg)
 {
-  assert(m_ManipulatedObject.IsNotNull());
+  assert(m_ManipulatedObjectGeometry.IsNotNull());
 
   auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
 
-  mitk::RotationOperation* op = new mitk::RotationOperation(OpROTATE,
-                                                            m_InitialGizmoCenter3D,
-                                                            m_AxisOfRotation,
-                                                            angle);
+  RotationOperation* op = new RotationOperation(OpROTATE,
+                                                m_InitialGizmoCenter3D,
+                                                m_AxisOfRotation,
+                                                angle_deg);
   manipulatedGeometry->ExecuteOperation(op);
-  m_ManipulatedObject->GetData()->SetGeometry(manipulatedGeometry);
+  m_ManipulatedObjectGeometry->SetIdentity();
+  m_ManipulatedObjectGeometry->Compose( manipulatedGeometry->GetIndexToWorldTransform() );
 }
 

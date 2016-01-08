@@ -224,7 +224,7 @@ void QmitkGeometryToolsView::OnGizmoToggle()
 {
   // if active --> deactivate, finished
   if (m_GizmoNode.IsNotNull())
-  { // TODO should/could this be reformulated to end up in a function of mitk::Gizmo?
+  {
       m_GizmoNode->GetDataInteractor()->SetDataNode(nullptr);
       GetDataStorage()->Remove(m_GizmoNode);
       m_GizmoNode = nullptr;

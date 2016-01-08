@@ -32,12 +32,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPointData.h>
 #include <vtkCharArray.h>
 #include <vtkRenderWindow.h>
+#include <vtkPoints.h>
+#include <vtkCellArray.h>
+#include <vtkTubeFilter.h>
+#include <vtkMath.h>
+#include <vtkPolyDataNormals.h>
 
 // ITK includes
 #include <itkCommand.h>
 
 // MicroServices
 #include <usGetModuleContext.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage* storage)
 {
@@ -53,6 +61,7 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
 
   auto gizmo = Gizmo::New();
   auto gizmoNode = DataNode::New();
+  gizmoNode->SetName("Gizmo");
   gizmoNode->SetData(gizmo);
   gizmoNode->SetProperty("material.ambientCoefficient", FloatProperty::New(0));
   gizmoNode->SetProperty("material.diffuseCoefficient", FloatProperty::New(1));
@@ -91,8 +100,10 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   interactor->SetGizmoNode(gizmoNode);
   interactor->SetManipulatedObjectNode(node);
 
-  assert(storage);
-  storage->Add(gizmoNode);
+  if (storage)
+  {
+    storage->Add(gizmoNode);
+  }
 
   return gizmoNode;
 }
@@ -106,7 +117,7 @@ mitk::Gizmo::Gizmo()
   m_AxisY.Fill(0); m_AxisY[1] = 1;
   m_AxisZ.Fill(0); m_AxisZ[2] = 1;
 
-  m_Scaling.Fill(1);
+  m_Radius.Fill(1);
 
   UpdateRepresentation();
 }
@@ -114,9 +125,9 @@ mitk::Gizmo::Gizmo()
 void mitk::Gizmo::UpdateRepresentation()
 {
   /* bounding box around the unscaled bounding object */
-  ScalarType bounds[6]={-m_Scaling[0]*1.2,+m_Scaling[0]*1.2,
-                        -m_Scaling[1]*1.2,+m_Scaling[1]*1.2,
-                        -m_Scaling[2]*1.2,+m_Scaling[2]*1.2};
+  ScalarType bounds[6]={-m_Radius[0]*1.2,+m_Radius[0]*1.2,
+                        -m_Radius[1]*1.2,+m_Radius[1]*1.2,
+                        -m_Radius[2]*1.2,+m_Radius[2]*1.2};
   GetGeometry()->SetBounds(bounds);
   GetTimeGeometry()->Update();
 
@@ -148,8 +159,12 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
 {
   const double shaftRadius = 1;
   const double arrowHeight = shaftRadius * 6;
+  const int tubeSides = 15;
 
-  vtkSmartPointer<vtkAppendPolyData> appenderAxis = vtkSmartPointer<vtkAppendPolyData>::New();
+  // poly data appender to collect cones and tube that make up the axis
+  vtkSmartPointer<vtkAppendPolyData> axisSource = vtkSmartPointer<vtkAppendPolyData>::New();
+
+  // build two cones at the end of axis
   for (double sign = -1.0; sign < 3.0; sign += 2)
   {
     vtkSmartPointer<vtkConeSource> cone = vtkConeSource::New();
@@ -161,56 +176,103 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
                        sign * axis[2]);
     cone->SetRadius(shaftRadius * 3);
     cone->SetHeight(arrowHeight);
-    cone->SetResolution(40);
+    cone->SetResolution(tubeSides);
     cone->CappingOn();
     cone->Update();
-    appenderAxis->AddInputData(cone->GetOutput());
+    axisSource->AddInputData(cone->GetOutput());
   }
 
-  vtkSmartPointer<vtkCylinderSource> shaft = vtkCylinderSource::New();
-  shaft->SetRadius(shaftRadius);
-  shaft->SetHeight(halflength * 2.2);
-  shaft->SetResolution(40);
-  shaft->CappingOff();
-  shaft->Update();
+  // build the axis itself (as a tube around the line defining the axis)
+  vtkSmartPointer<vtkPolyData> shaftSkeleton = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkPoints> shaftPoints = vtkSmartPointer<vtkPoints>::New();
+  shaftPoints->InsertPoint(0, (center - axis * halflength * 1.1).GetDataPointer());
+  shaftPoints->InsertPoint(1, (center + axis * halflength * 1.1).GetDataPointer());
+  shaftSkeleton->SetPoints(shaftPoints);
 
-  vtkSmartPointer<vtkCylinderSource> ring = vtkCylinderSource::New();
-  ring->SetRadius(halflength);
-  ring->SetHeight(2 * shaftRadius);
-  ring->SetResolution(100);
-  ring->CappingOff();
-  ring->Update();
+  vtkSmartPointer<vtkCellArray> shaftLines = vtkSmartPointer<vtkCellArray>::New();
+  vtkIdType shaftLinePoints[] = {0,1};
+  shaftLines->InsertNextCell(2, shaftLinePoints);
+  shaftSkeleton->SetLines(shaftLines);
 
-  // TODO use Y axis and parameter axis, then calculate angle and turn around crossproduct axis
-  vtkSmartPointer<vtkTransform> ringTrans = vtkSmartPointer<vtkTransform>::New();
-  ringTrans->Translate(center[0], center[1], center[2]);
-  if ( axis[0] > 0 ) // hmm... not really right
-    ringTrans->RotateZ(90);
-  if ( axis[2] > 0 )
-    ringTrans->RotateX(90);
+  vtkSmartPointer<vtkTubeFilter> shaftSource = vtkSmartPointer<vtkTubeFilter>::New();
+  shaftSource->SetInputData(shaftSkeleton);
+  shaftSource->SetNumberOfSides(tubeSides);
+  shaftSource->SetVaryRadiusToVaryRadiusOff();
+  shaftSource->SetRadius(shaftRadius);
+  shaftSource->Update();
 
-  vtkSmartPointer<vtkTransformPolyDataFilter> shaftTf =
-      vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-  shaftTf->SetInputConnection(shaft->GetOutputPort());
-  shaftTf->SetTransform(ringTrans);
-  shaftTf->Update();
-  appenderAxis->AddInputData(shaftTf->GetOutput());
-  appenderAxis->Update();
-  AssignScalarValueTo(appenderAxis->GetOutput(), vertexValueAxis);
+  axisSource->AddInputData(shaftSource->GetOutput());
+  axisSource->Update();
+  AssignScalarValueTo(axisSource->GetOutput(), vertexValueAxis);
 
-  vtkSmartPointer<vtkTransformPolyDataFilter> ringTf =
-      vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-  ringTf->SetInputConnection(ring->GetOutputPort());
-  ringTf->SetTransform(ringTrans);
-  ringTf->Update();
-  AssignScalarValueTo( ringTf->GetOutput(), vertexValueRing );
+  // build the ring orthogonal to the axis (as another tube)
+  vtkSmartPointer<vtkPolyData> ringSkeleton = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer<vtkPoints> ringPoints = vtkSmartPointer<vtkPoints>::New();
+  ringPoints->SetDataTypeToDouble(); // just some decision (see cast below)
+  unsigned int numberOfRingPoints = 100;
+  vtkSmartPointer<vtkCellArray> ringLines = vtkSmartPointer<vtkCellArray>::New();
+  ringLines->InsertNextCell(numberOfRingPoints+1);
+  mitk::Vector3D ringPointer;
+  for (unsigned int segment = 0; segment < numberOfRingPoints; ++segment)
+  {
+    ringPointer[0] = 0;
+    ringPointer[1] = std::cos( (double)(segment)/(double)numberOfRingPoints * 2.0 * vtkMath::Pi() );
+    ringPointer[2] = std::sin( (double)(segment)/(double)numberOfRingPoints * 2.0 * vtkMath::Pi() );
 
+    ringPoints->InsertPoint(segment, (ringPointer * halflength).GetDataPointer());
+
+    ringLines->InsertCellPoint(segment);
+  }
+  ringLines->InsertCellPoint(0);
+
+  // transform ring points (copied from vtkConeSource)
+  vtkSmartPointer<vtkTransform> t = vtkSmartPointer<vtkTransform>::New();
+  t->Translate(center.GetDataPointer());
+  double vMag = vtkMath::Norm(axis.GetDataPointer());
+  if ( axis[0] < 0.0 ) {
+      // flip x -> -x to avoid instability
+      t->RotateWXYZ(180.0, (axis[0] - vMag) / 2.0,
+                    axis[1] / 2.0, axis[2] / 2.0);
+      t->RotateWXYZ(180.0, 0, 1, 0);
+  } else {
+      t->RotateWXYZ(180.0, (axis[0] + vMag) / 2.0,
+                    axis[1] / 2.0, axis[2] / 2.0);
+  }
+
+  double thisPoint[3];
+  for ( int i = 0; i < numberOfRingPoints; ++i )
+  {
+      ringPoints->GetPoint(i, thisPoint);
+      t->TransformPoint(thisPoint, thisPoint);
+      ringPoints->SetPoint(i, thisPoint);
+  }
+
+  ringSkeleton->SetPoints(ringPoints);
+  ringSkeleton->SetLines(ringLines);
+
+  vtkSmartPointer<vtkTubeFilter> ringSource = vtkSmartPointer<vtkTubeFilter>::New();
+  ringSource->SetInputData(ringSkeleton);
+  ringSource->SetNumberOfSides(tubeSides);
+  ringSource->SetVaryRadiusToVaryRadiusOff();
+  ringSource->SetRadius(shaftRadius);
+  ringSource->Update();
+  AssignScalarValueTo( ringSource->GetOutput(), vertexValueRing );
+
+  // assemble axis and ring
   vtkSmartPointer<vtkAppendPolyData> appenderGlobal = vtkSmartPointer<vtkAppendPolyData>::New();
-  appenderGlobal->AddInputData( appenderAxis->GetOutput() );
-  appenderGlobal->AddInputData( ringTf->GetOutput() );
+  appenderGlobal->AddInputData( axisSource->GetOutput() );
+  appenderGlobal->AddInputData( ringSource->GetOutput() );
   appenderGlobal->Update();
 
-  vtkSmartPointer<vtkPolyData> result = appenderGlobal->GetOutput();
+  // make everything shiny by adding normals
+  vtkSmartPointer<vtkPolyDataNormals> normalsSource = vtkSmartPointer<vtkPolyDataNormals>::New();
+  normalsSource->SetInputConnection( appenderGlobal->GetOutputPort() );
+  normalsSource->ComputePointNormalsOn();
+  normalsSource->ComputeCellNormalsOff();
+  normalsSource->SplittingOn();
+  normalsSource->Update();
+
+  vtkSmartPointer<vtkPolyData> result = normalsSource->GetOutput();
   return result;
 }
 
@@ -218,8 +280,8 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
 
 vtkSmartPointer<vtkPolyData> mitk::Gizmo::BuildGizmo()
 {
-  double longestAxis = std::max( m_Scaling[0], m_Scaling[1] );
-  longestAxis = std::max( longestAxis, m_Scaling[2] );
+  double longestAxis = std::max( m_Radius[0], m_Radius[1] );
+  longestAxis = std::max( longestAxis, m_Radius[2] );
 
   vtkSmartPointer<vtkAppendPolyData> appender = vtkSmartPointer<vtkAppendPolyData>::New();
   appender->AddInputData( BuildAxis(m_Center, m_AxisX, longestAxis, MoveAlongAxisX, RotateAroundAxisX) );
@@ -264,7 +326,7 @@ void mitk::Gizmo::OnFollowedGeometryModified()
 
     for ( int dim = 0; dim < 3; ++dim )
     {
-      m_Scaling[dim] = 0.5 * m_FollowedGeometry->GetExtentInMM(dim);
+      m_Radius[dim] = 0.5 * m_FollowedGeometry->GetExtentInMM(dim);
     }
 
     UpdateRepresentation();

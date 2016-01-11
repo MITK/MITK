@@ -91,6 +91,9 @@ private:
   //! in function of mouse movement.
   void MoveFreely(StateMachineAction*, InteractionEvent* interactionEvent);
 
+  //! Add the final transformation operations to the undo stack
+  void FeedUndoStack(StateMachineAction*, InteractionEvent* interactionEvent);
+
   //! Applies a calculated translation vector to the manipulated object.
   void ApplyTranslationToManipulatedObject(const Vector3D& projectedMovement);
 
@@ -99,6 +102,7 @@ private:
 
   //! Applies a calculated rotation angle to the manipulated object.
   void ApplyRotationToManipulatedObject(double angle_deg);
+
   //! the Gizmo used for visual feedback and picking
   Gizmo::Pointer m_Gizmo;
 
@@ -120,6 +124,9 @@ private:
 
   Vector3D m_AxisOfMovement; //< Axis along which we move when translating
   Vector3D m_AxisOfRotation; //< Axis around which we turn when rotating
+
+  std::unique_ptr<Operation> m_FinalDoOperation; //< Operation for the undo-stack
+  std::unique_ptr<Operation> m_FinalUndoOperation; //< Operation for the undo-stack
 
   //! A copy of the origin geometry, to avoid accumulation of tiny errors
   BaseGeometry::Pointer m_InitialManipulatedObjectGeometry;

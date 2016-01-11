@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <mitkVtkMapper.h>
 #include <mitkInternalEvent.h>
+#include <mitkOperationEvent.h>
+#include <mitkUndoController.h>
 
 #include <vtkVector.h>
 #include <vtkVectorOperators.h>
@@ -53,6 +55,7 @@ void mitk::GizmoInteractor3D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("RotateAroundAxis", RotateAroundAxis);
   CONNECT_FUNCTION("MoveFreely", MoveFreely);
   CONNECT_FUNCTION("ScaleEqually", ScaleEqually);
+  CONNECT_FUNCTION("FeedUndoStack", FeedUndoStack);
 }
 
 void mitk::GizmoInteractor3D::SetGizmoNode(DataNode* node)
@@ -315,12 +318,18 @@ void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D
 {
   assert(m_ManipulatedObjectGeometry.IsNotNull());
 
-  auto manipulatedGeometry =
-      m_InitialManipulatedObjectGeometry->GetIndexToWorldTransform()->Clone();
+  auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
 
   manipulatedGeometry->Translate(translation);
+  m_FinalDoOperation = std::make_unique<PointOperation>(OpMOVE, translation);
+  if (m_UndoEnabled)
+  {
+    m_FinalUndoOperation = std::make_unique<PointOperation>(OpMOVE, -translation);
+  }
 
-  m_ManipulatedObjectGeometry->SetIndexToWorldTransform( manipulatedGeometry );
+  manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
+  m_ManipulatedObjectGeometry->SetIdentity();
+  m_ManipulatedObjectGeometry->Compose( manipulatedGeometry->GetIndexToWorldTransform() );
 }
 
 void mitk::GizmoInteractor3D::ApplyEqualScalingToManipulatedObject(double scalingFactor)
@@ -328,11 +337,17 @@ void mitk::GizmoInteractor3D::ApplyEqualScalingToManipulatedObject(double scalin
   assert(m_ManipulatedObjectGeometry.IsNotNull());
   auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
 
-  ScaleOperation* op = new ScaleOperation(OpSCALE,
-                                          scalingFactor - 1.0,
-                                          m_InitialGizmoCenter3D);
+  m_FinalDoOperation = std::make_unique<ScaleOperation>(OpSCALE,
+                                                        scalingFactor - 1.0,
+                                                        m_InitialGizmoCenter3D);
+  if (m_UndoEnabled)
+  {
+    m_FinalUndoOperation = std::make_unique<ScaleOperation>(OpSCALE,
+                                                            -(scalingFactor - 1.0),
+                                                            m_InitialGizmoCenter3D);
+  }
 
-  manipulatedGeometry->ExecuteOperation(op);
+  manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
   m_ManipulatedObjectGeometry->SetIdentity();
   m_ManipulatedObjectGeometry->Compose( manipulatedGeometry->GetIndexToWorldTransform() );
 }
@@ -343,12 +358,32 @@ void mitk::GizmoInteractor3D::ApplyRotationToManipulatedObject(double angle_deg)
 
   auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
 
-  RotationOperation* op = new RotationOperation(OpROTATE,
-                                                m_InitialGizmoCenter3D,
-                                                m_AxisOfRotation,
-                                                angle_deg);
-  manipulatedGeometry->ExecuteOperation(op);
+  m_FinalDoOperation = std::make_unique<RotationOperation>(OpROTATE,
+                                                           m_InitialGizmoCenter3D,
+                                                           m_AxisOfRotation,
+                                                           angle_deg);
+  if (m_UndoEnabled)
+  {
+    m_FinalUndoOperation = std::make_unique<RotationOperation>(OpROTATE,
+                                                               m_InitialGizmoCenter3D,
+                                                               m_AxisOfRotation,
+                                                               -angle_deg);
+  }
+
+  manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());
   m_ManipulatedObjectGeometry->SetIdentity();
   m_ManipulatedObjectGeometry->Compose( manipulatedGeometry->GetIndexToWorldTransform() );
 }
 
+void mitk::GizmoInteractor3D::FeedUndoStack(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  if (m_UndoEnabled)
+  {
+    OperationEvent *operationEvent = new OperationEvent(m_ManipulatedObjectGeometry,
+                                                        m_FinalDoOperation.release(),
+                                                        m_FinalUndoOperation.release(),
+                                                        "Direct geometry manipulation");
+    mitk::OperationEvent::IncCurrGroupEventId(); // save each modification individually
+    m_UndoController->SetOperationEvent(operationEvent);
+  }
+}

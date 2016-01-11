@@ -287,7 +287,7 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
   }
 
   double thisPoint[3];
-  for ( int i = 0; i < numberOfRingPoints; ++i )
+  for ( unsigned int i = 0; i < numberOfRingPoints; ++i )
   {
     ringPoints->GetPoint(i, thisPoint);
     t->TransformPoint(thisPoint, thisPoint);
@@ -420,6 +420,7 @@ mitk::Gizmo::HandleType mitk::Gizmo::GetHandleFromPointID(vtkIdType id)
   CheckHandleType(ScaleY);
   CheckHandleType(ScaleZ);
   return NoHandle;
+#undef CheckHandleType
 }
 
 std::string mitk::Gizmo::HandleTypeToString(HandleType type)
@@ -440,4 +441,5 @@ std::string mitk::Gizmo::HandleTypeToString(HandleType type)
   CheckHandleType(ScaleZ);
   CheckHandleType(NoHandle);
   return "InvalidHandleType";
+#undef CheckHandleType
 }

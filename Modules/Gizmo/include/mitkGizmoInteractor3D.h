@@ -28,6 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkSmartPointer.h>
 #include <vtkCellPicker.h>
 
+// System includes
+#include <memory>
+
 #include "MitkGizmoExports.h"
 
 namespace mitk

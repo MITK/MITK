@@ -76,7 +76,7 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
   else if (dynamic_cast<igtl::ImageMessage*>(msg.GetPointer()) != nullptr)
   {
     igtl::ImageMessage::Pointer imageMsg = dynamic_cast<igtl::ImageMessage*>(msg.GetPointer());
-    int* dim;
+    int* dim = new int[3];
     imageMsg->GetDimensions(dim);
     if (dim[2] > 1)
     {

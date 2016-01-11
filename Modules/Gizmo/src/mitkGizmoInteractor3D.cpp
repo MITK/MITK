@@ -293,6 +293,7 @@ void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* 
   vtkVector3d worldPointVTK(renderer->GetWorldPoint());
   Point3D worldPointITK(worldPointVTK.GetData());
   Vector3D movementITK( worldPointITK - m_InitialClickPosition3D );
+
   ApplyTranslationToManipulatedObject(movementITK);
   positionEvent->GetSender()->ForceImmediateUpdate();
 }
@@ -319,8 +320,6 @@ void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D
   assert(m_ManipulatedObjectGeometry.IsNotNull());
 
   auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
-
-  manipulatedGeometry->Translate(translation);
   m_FinalDoOperation = std::make_unique<PointOperation>(OpMOVE, translation);
   if (m_UndoEnabled)
   {
@@ -380,10 +379,13 @@ void mitk::GizmoInteractor3D::FeedUndoStack(StateMachineAction*, InteractionEven
   if (m_UndoEnabled)
   {
     OperationEvent *operationEvent = new OperationEvent(m_ManipulatedObjectGeometry,
+                                                        // OperationEvent will destroy operations!
+                                                        // --> release() and not get()
                                                         m_FinalDoOperation.release(),
                                                         m_FinalUndoOperation.release(),
                                                         "Direct geometry manipulation");
-    mitk::OperationEvent::IncCurrGroupEventId(); // save each modification individually
+    mitk::OperationEvent::IncCurrObjectEventId(); // save each modification individually
+    mitk::OperationEvent::ExecuteIncrement();
     m_UndoController->SetOperationEvent(operationEvent);
   }
 }

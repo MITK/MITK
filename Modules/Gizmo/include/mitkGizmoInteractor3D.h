@@ -41,6 +41,8 @@ namespace mitk
 //! - the "gizmo node" represents the manipulated object's primary axes _and_ is
 //!   used to take user input (most importantly: to have a picking target)
 //!
+//! The interactor fills the undo/redo stack with operations on the modified geometry.
+//!
 //! \sa Gizmo
 class MITKGIZMO_EXPORT GizmoInteractor3D: public DataInteractor
 {

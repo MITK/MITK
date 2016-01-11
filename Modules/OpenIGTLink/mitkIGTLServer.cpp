@@ -153,7 +153,7 @@ void mitk::IGTLServer::Send()
   igtl::MessageBase::Pointer curMessage;
 
   //get the latest message from the queue
-  curMessage = this->m_SendQueue->PullMessage();
+  curMessage = this->m_MessageQueue->PullSendMessage();
 
   // there is no message => return
   if (curMessage.IsNull())
@@ -212,7 +212,7 @@ void mitk::IGTLServer::StopCommunicationWithSocket(igtl::Socket* client)
   }
   m_SentListMutex->Unlock();
   m_ReceiveListMutex->Unlock();
-  }
+}
 
 unsigned int mitk::IGTLServer::GetNumberOfConnections()
 {

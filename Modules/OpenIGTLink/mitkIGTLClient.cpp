@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
-
 mitk::IGTLClient::IGTLClient(bool ReadFully) :
 IGTLDevice(ReadFully)
 {
@@ -36,7 +35,6 @@ IGTLDevice(ReadFully)
 
 mitk::IGTLClient::~IGTLClient()
 {
-
 }
 
 bool mitk::IGTLClient::OpenConnection()
@@ -66,7 +64,7 @@ bool mitk::IGTLClient::OpenConnection()
     ConnectToServer(hostname.c_str(), portNumber);
 
   //check the response
-  if ( response != 0 )
+  if (response != 0)
   {
     MITK_ERROR << "The client could not connect to " << hostname << " port: " << portNumber;
     return false;
@@ -86,7 +84,7 @@ void mitk::IGTLClient::Receive()
   //try to receive a message, if the socket is not present anymore stop the
   //communication
   unsigned int status = this->ReceivePrivate(this->m_Socket);
-  if ( status == IGTL_STATUS_NOT_PRESENT )
+  if (status == IGTL_STATUS_NOT_PRESENT)
   {
     this->StopCommunicationWithSocket(this->m_Socket);
     //inform observers about loosing the connection to this socket
@@ -100,15 +98,15 @@ void mitk::IGTLClient::Send()
   igtl::MessageBase::Pointer curMessage;
 
   //get the latest message from the queue
-  curMessage = this->m_SendQueue->PullMessage();
+  curMessage = this->m_MessageQueue->PullSendMessage();
 
   // there is no message => return
-  if ( curMessage.IsNull() )
+  if (curMessage.IsNull())
     return;
 
   AddTrackingMeasurements(4, curMessage, 0);
 
-  if (!this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
+  if (!this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket))
   {
     MITK_WARN("IGTLDevice") << "Could not send the message.";
   }

@@ -59,9 +59,7 @@ m_MultiThreader(nullptr), m_SendThreadID(0), m_ReceiveThreadID(0), m_ConnectThre
   //  m_LatestMessage = igtl::MessageBase::New();
 
   m_MessageFactory = mitk::IGTLMessageFactory::New();
-  m_SendQueue = mitk::IGTLMessageQueue::New();
-  m_ReceiveQueue = mitk::IGTLMessageQueue::New();
-  m_CommandQueue = mitk::IGTLMessageQueue::New();
+  m_MessageQueue = mitk::IGTLMessageQueue::New();
 
   //setup measurements
   this->m_Measurement = mitk::IGTLMeasurements::GetInstance();
@@ -188,7 +186,7 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         std::strstr(curDevType, "STP_") != nullptr ||
         std::strstr(curDevType, "RTS_") != nullptr)
       {
-        this->m_CommandQueue->PushMessage(headerMsg);
+        this->m_MessageQueue->PushCommandMessage(headerMsg);
         this->InvokeEvent(CommandReceivedEvent());
         return IGTL_STATUS_OK;
       }
@@ -236,13 +234,13 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         //member variables that are not stored in the header message
         if (std::strstr(curDevType, "STT_") != nullptr)
         {
-          this->m_CommandQueue->PushMessage(curMessage);
+          this->m_MessageQueue->PushCommandMessage(curMessage);
           this->InvokeEvent(CommandReceivedEvent());
         }
         else
         {
           AddTrackingMeasurements(7, curMessage, timeStamp6);
-          this->m_ReceiveQueue->PushMessage(curMessage);
+          this->m_MessageQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
         return IGTL_STATUS_OK;
@@ -279,7 +277,7 @@ void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
   AddTrackingMeasurements(3, msg, 0);
   //add the message to the queue
-  m_SendQueue->PushMessage(msg);
+  m_MessageQueue->PushSendMessage(msg);
 }
 
 unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg,
@@ -464,28 +462,45 @@ void mitk::IGTLDevice::Connect()
   MITK_DEBUG << "mitk::IGTLDevice::Connect();";
 }
 
-igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
+igtl::ImageMessage::Pointer mitk::IGTLDevice::GetNextImage2dMessage()
 {
-  //copy the next message into the given msg
-  igtl::MessageBase::Pointer msg = this->m_ReceiveQueue->PullMessage();
+  return this->m_MessageQueue->PullImage2dMessage();
+}
+
+igtl::ImageMessage::Pointer mitk::IGTLDevice::GetNextImage3dMessage()
+{
+  return this->m_MessageQueue->PullImage3dMessage();
+}
+
+igtl::TransformMessage::Pointer mitk::IGTLDevice::GetNextTransformMessage()
+{
+  return this->m_MessageQueue->PullTransformMessage();
+}
+
+igtl::TrackingDataMessage::Pointer mitk::IGTLDevice::GetNextTrackingDataMessage()
+{
+  igtl::TrackingDataMessage::Pointer msg = this->m_MessageQueue->PullTrackingMessage();
 
   if (msg.IsNotNull())
   {
-    AddTrackingMeasurements(8, msg, 0);
-    unsigned int seconds = 0;
-    unsigned int frac = 0;
-    msg->GetTimeStamp(&seconds, &frac);
-    //std::cout << "8: s: " << seconds << " f: " << frac << std::endl;
+    AddTrackingMeasurements(8, dynamic_cast<igtl::MessageBase*>(msg.GetPointer()), 0);
   }
-
   return msg;
+}
+
+igtl::StringMessage::Pointer mitk::IGTLDevice::GetNextStringMessage()
+{
+  return this->m_MessageQueue->PullStringMessage();
+}
+
+igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMiscMessage()
+{
+  return this->m_MessageQueue->PullMiscMessage();
 }
 
 igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextCommand()
 {
-  //copy the next command into the given msg
-  igtl::MessageBase::Pointer msg = this->m_CommandQueue->PullMessage();
-  return msg;
+  return m_MessageQueue->PullCommandMessage();
 }
 
 void mitk::IGTLDevice::EnableInfiniteBufferingMode(

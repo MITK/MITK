@@ -31,9 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //itk
 #include <itkCommand.h>
 
-
 const std::string mitk::IGTLDeviceSource::US_PROPKEY_IGTLDEVICENAME =
-    mitk::IGTLMessageSource::US_INTERFACE_NAME + ".igtldevicename";
+mitk::IGTLMessageSource::US_INTERFACE_NAME + ".igtldevicename";
 
 mitk::IGTLDeviceSource::IGTLDeviceSource()
   : mitk::IGTLMessageSource(), m_IGTLDevice(NULL)
@@ -66,18 +65,18 @@ void mitk::IGTLDeviceSource::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextMessage();
-  if ( msgIn.IsNotNull() )
+  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextMiscMessage();
+  if (msgIn.IsNotNull())
   {
     assert(msgIn);
 
     msgOut->SetMessage(msgIn);
     msgOut->SetName(msgIn->GetDeviceName());
   }
-//  else
-//  {
-//    MITK_ERROR("IGTLDeviceSource") << "Could not get the latest message.";
-//  }
+  //  else
+  //  {
+  //    MITK_ERROR("IGTLDeviceSource") << "Could not get the latest message.";
+  //  }
 }
 
 void mitk::IGTLDeviceSource::RemoveObservers()
@@ -90,7 +89,7 @@ void mitk::IGTLDeviceSource::RemoveObservers()
   }
 }
 
-void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )
+void mitk::IGTLDeviceSource::SetIGTLDevice(mitk::IGTLDevice* igtlDevice)
 {
   MITK_DEBUG << "Setting IGTLDevice to " << igtlDevice;
   if (this->m_IGTLDevice.GetPointer() != igtlDevice)
@@ -112,7 +111,7 @@ void mitk::IGTLDeviceSource::SetIGTLDevice( mitk::IGTLDevice* igtlDevice )
     typedef itk::SimpleMemberCommand<IGTLDeviceSource> DeviceSrcCommand;
 
     DeviceSrcCommand::Pointer msgReceivedCommand = DeviceSrcCommand::New();
-    msgReceivedCommand->SetCallbackFunction( this, &IGTLDeviceSource::OnIncomingMessage );
+    msgReceivedCommand->SetCallbackFunction(this, &IGTLDeviceSource::OnIncomingMessage);
     this->m_IncomingMessageObserverTag =
       this->m_IGTLDevice->AddObserver(mitk::MessageReceivedEvent(), msgReceivedCommand);
 
@@ -156,7 +155,7 @@ void mitk::IGTLDeviceSource::Connect()
   if (m_IGTLDevice.IsNull())
   {
     throw std::invalid_argument("mitk::IGTLDeviceSource: "
-                                "No OpenIGTLink device set");
+      "No OpenIGTLink device set");
   }
   if (this->IsConnected())
   {
@@ -169,7 +168,7 @@ void mitk::IGTLDeviceSource::Connect()
   catch (mitk::Exception &e)
   {
     throw std::runtime_error(std::string("mitk::IGTLDeviceSource: Could not open"
-            "connection to OpenIGTLink device. Error: ") + e.GetDescription());
+      "connection to OpenIGTLink device. Error: ") + e.GetDescription());
   }
 }
 
@@ -177,32 +176,32 @@ void mitk::IGTLDeviceSource::StartCommunication()
 {
   if (m_IGTLDevice.IsNull())
     throw std::invalid_argument("mitk::IGTLDeviceSource: "
-                                "No OpenIGTLink device set");
+    "No OpenIGTLink device set");
   if (m_IGTLDevice->GetState() == mitk::IGTLDevice::Running)
     return;
   if (m_IGTLDevice->StartCommunication() == false)
     throw std::runtime_error("mitk::IGTLDeviceSource: "
-                             "Could not start communication");
+    "Could not start communication");
 }
 
 void mitk::IGTLDeviceSource::Disconnect()
 {
   if (m_IGTLDevice.IsNull())
     throw std::invalid_argument("mitk::IGTLDeviceSource: "
-                                "No OpenIGTLink device set");
+    "No OpenIGTLink device set");
   if (m_IGTLDevice->CloseConnection() == false)
     throw std::runtime_error("mitk::IGTLDeviceSource: Could not close connection"
-                             " to OpenIGTLink device");
+    " to OpenIGTLink device");
 }
 
 void mitk::IGTLDeviceSource::StopCommunication()
 {
   if (m_IGTLDevice.IsNull())
     throw std::invalid_argument("mitk::IGTLDeviceSource: "
-                                "No OpenIGTLink device set");
+    "No OpenIGTLink device set");
   if (m_IGTLDevice->StopCommunication() == false)
     throw std::runtime_error("mitk::IGTLDeviceSource: "
-                             "Could not stop communicating");
+    "Could not stop communicating");
 }
 
 void mitk::IGTLDeviceSource::UpdateOutputInformation()
@@ -211,9 +210,9 @@ void mitk::IGTLDeviceSource::UpdateOutputInformation()
   Superclass::UpdateOutputInformation();
 }
 
-void mitk::IGTLDeviceSource::SetInput( unsigned int idx, const IGTLMessage* msg )
+void mitk::IGTLDeviceSource::SetInput(unsigned int idx, const IGTLMessage* msg)
 {
-  if ( msg == NULL ) // if an input is set to NULL, remove it
+  if (msg == NULL) // if an input is set to NULL, remove it
   {
     this->RemoveInput(idx);
   }
@@ -222,7 +221,7 @@ void mitk::IGTLDeviceSource::SetInput( unsigned int idx, const IGTLMessage* msg 
     // ProcessObject is not const-correct so a const_cast is required here
     this->ProcessObject::SetNthInput(idx, const_cast<IGTLMessage*>(msg));
   }
-//  this->CreateOutputsForAllInputs();
+  //  this->CreateOutputsForAllInputs();
 }
 
 bool mitk::IGTLDeviceSource::IsConnected()
@@ -231,7 +230,7 @@ bool mitk::IGTLDeviceSource::IsConnected()
     return false;
 
   return (m_IGTLDevice->GetState() == mitk::IGTLDevice::Ready) ||
-         (m_IGTLDevice->GetState() == mitk::IGTLDevice::Running);
+    (m_IGTLDevice->GetState() == mitk::IGTLDevice::Running);
 }
 
 bool mitk::IGTLDeviceSource::IsCommunicating()
@@ -250,33 +249,29 @@ void mitk::IGTLDeviceSource::RegisterAsMicroservice()
   // Define ServiceProps
   us::ServiceProperties props;
   mitk::UIDGenerator uidGen =
-      mitk::UIDGenerator ("org.mitk.services.IGTLDeviceSource.id_", 16);
-  props[ US_PROPKEY_ID ] = uidGen.GetUID();
-  props[ US_PROPKEY_DEVICENAME ] = this->GetName();
-  props[ US_PROPKEY_IGTLDEVICENAME ] = m_Name;
-  props[ US_PROPKEY_DEVICETYPE ] = m_Type;
+    mitk::UIDGenerator("org.mitk.services.IGTLDeviceSource.id_", 16);
+  props[US_PROPKEY_ID] = uidGen.GetUID();
+  props[US_PROPKEY_DEVICENAME] = this->GetName();
+  props[US_PROPKEY_IGTLDEVICENAME] = m_Name;
+  props[US_PROPKEY_DEVICETYPE] = m_Type;
   m_ServiceRegistration = context->RegisterService(this, props);
 
   MITK_INFO << "Registered new DeviceSource as microservice: " << uidGen.GetUID();
 }
 
-
 void mitk::IGTLDeviceSource::OnIncomingMessage()
 {
-
 }
 
 void mitk::IGTLDeviceSource::OnIncomingCommand()
 {
-
 }
 
 void mitk::IGTLDeviceSource::OnLostConnection()
 {
-
 }
 
-const mitk::IGTLMessage* mitk::IGTLDeviceSource::GetInput( void ) const
+const mitk::IGTLMessage* mitk::IGTLDeviceSource::GetInput(void) const
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
@@ -284,9 +279,8 @@ const mitk::IGTLMessage* mitk::IGTLDeviceSource::GetInput( void ) const
   return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(0));
 }
 
-
 const mitk::IGTLMessage*
-mitk::IGTLDeviceSource::GetInput( unsigned int idx ) const
+mitk::IGTLDeviceSource::GetInput(unsigned int idx) const
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
@@ -294,27 +288,25 @@ mitk::IGTLDeviceSource::GetInput( unsigned int idx ) const
   return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(idx));
 }
 
-
 const mitk::IGTLMessage*
 mitk::IGTLDeviceSource::GetInput(std::string msgName) const
 {
   const DataObjectPointerArray& inputs = const_cast<Self*>(this)->GetInputs();
   for (DataObjectPointerArray::const_iterator it = inputs.begin();
-       it != inputs.end(); ++it)
+    it != inputs.end(); ++it)
     if (std::string(msgName) ==
-        (static_cast<IGTLMessage*>(it->GetPointer()))->GetName())
+      (static_cast<IGTLMessage*>(it->GetPointer()))->GetName())
       return static_cast<IGTLMessage*>(it->GetPointer());
   return NULL;
 }
 
-
 itk::ProcessObject::DataObjectPointerArraySizeType
-mitk::IGTLDeviceSource::GetInputIndex( std::string msgName )
+mitk::IGTLDeviceSource::GetInputIndex(std::string msgName)
 {
   DataObjectPointerArray outputs = this->GetInputs();
   for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
     if (msgName ==
-        (static_cast<IGTLMessage*>(outputs.at(i).GetPointer()))->GetName())
+      (static_cast<IGTLMessage*>(outputs.at(i).GetPointer()))->GetName())
       return i;
   throw std::invalid_argument("output name does not exist");
 }

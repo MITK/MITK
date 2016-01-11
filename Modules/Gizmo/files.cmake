@@ -1,11 +1,9 @@
 set(H_FILES
-  src/mitkGizmoActivator.h
   include/mitkGizmo.h
   include/mitkGizmoInteractor3D.h
 )
 
 set(CPP_FILES
-  mitkGizmoActivator.cpp
   mitkGizmo.cpp
   mitkGizmoInteractor3D.cpp
 )

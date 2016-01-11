@@ -24,9 +24,7 @@ void mitk::IGTLMessageToUSImageFilter::GetNextRawImage(
   m_upstream->Update();
 
   mitk::IGTLMessage* msg = m_upstream->GetOutput();
-  MITK_INFO << msg->GetIGTLMessageType();
-  MITK_INFO << (std::strcmp(msg->GetIGTLMessageType(), "IMAGE") != 0);
-  MITK_INFO << (msg != nullptr && (!msg->IsDataValid() || std::strcmp(msg->GetIGTLMessageType(), "IMAGE") != 0));
+
   if (msg != nullptr && (!msg->IsDataValid() || std::strcmp(msg->GetIGTLMessageType(), "IMAGE") != 0))
   {
     img = m_previousImage;

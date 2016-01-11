@@ -37,7 +37,7 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDev
   this->m_Data = mitk::DeviceDataOpenIGTLinkTrackingDeviceConnection;
 
   m_OpenIGTLinkClient = mitk::IGTLClient::New(false);
-  m_OpenIGTLinkClient->EnableInfiniteBufferingMode(m_OpenIGTLinkClient->GetReceiveQueue(), false);
+  m_OpenIGTLinkClient->EnableInfiniteBufferingMode(m_OpenIGTLinkClient->GetMessageQueue(), false);
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
 
   m_IGTLDeviceSource = mitk::IGTLDeviceSource::New();

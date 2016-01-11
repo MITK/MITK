@@ -42,12 +42,18 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
 {
   this->m_Mutex->Lock();
 
+  std::stringstream infolog;
+
+  infolog << "Received message of type ";
+
   if (dynamic_cast<igtl::TrackingDataMessage*>(msg.GetPointer()) != nullptr)
   {
     if (this->m_BufferingType == IGTLMessageQueue::Infinit)
       m_TrackingDataQueue.clear();
 
     this->m_TrackingDataQueue.push_back(dynamic_cast<igtl::TrackingDataMessage*>(msg.GetPointer()));
+
+    infolog << "TDATA";
   }
   else if (dynamic_cast<igtl::TransformMessage*>(msg.GetPointer()) != nullptr)
   {
@@ -55,6 +61,8 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
       m_TransformQueue.clear();
 
     this->m_TransformQueue.push_back(dynamic_cast<igtl::TransformMessage*>(msg.GetPointer()));
+
+    infolog << "TRANSFORM";
   }
   else if (dynamic_cast<igtl::StringMessage*>(msg.GetPointer()) != nullptr)
   {
@@ -62,6 +70,8 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
       m_StringQueue.clear();
 
     this->m_StringQueue.push_back(dynamic_cast<igtl::StringMessage*>(msg.GetPointer()));
+
+    infolog << "STRING";
   }
   else if (dynamic_cast<igtl::ImageMessage*>(msg.GetPointer()) != nullptr)
   {
@@ -74,6 +84,8 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
         m_Image3dQueue.clear();
 
       this->m_Image3dQueue.push_back(dynamic_cast<igtl::ImageMessage*>(msg.GetPointer()));
+
+      infolog << "IMAGE3D";
     }
     else
     {
@@ -81,6 +93,8 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
         m_Image2dQueue.clear();
 
       this->m_Image2dQueue.push_back(dynamic_cast<igtl::ImageMessage*>(msg.GetPointer()));
+
+      infolog << "IMAGE2D";
     }
   }
   else
@@ -89,9 +103,13 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
       m_MiscQueue.clear();
 
     this->m_MiscQueue.push_back(msg);
+
+    infolog << "OTHER";
   }
 
   m_Latest_Message = msg;
+
+  MITK_INFO << infolog.str();
 
   this->m_Mutex->Unlock();
 }

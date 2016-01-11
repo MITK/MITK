@@ -22,49 +22,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUSDevice.h>
 #include <mitkIGTLClient.h>
 #include <mitkIGTLDeviceSource.h>
+#include <mitkIGTL2DImageDeviceSource.h>
 #include <mitkIGTLMessageToUSImageFilter.h>
 
 namespace mitk
 {
+  /**
+  * \brief A mitk::USIGTLDevice is a USDevice to receive images over an OpenIGTLink
+  * connection. It registers an OIGTL device as a Microservice to receive image messages
+  * and transforms them to mitk::Images. It can act both as a server (listening for
+  * incoming connections) and as a client (connecting to an existing OIGTL server).
+  *
+  * \ingroup US
+  */
+  class MITKUS_EXPORT USIGTLDevice : public mitk::USDevice
+  {
+  public:
+    mitkClassMacro(USIGTLDevice, mitk::USDevice);
+    // To open a device (Manufacturer, Model, Hostname, Port, IsServer)
+    mitkNewMacro5Param(Self, std::string, std::string, std::string, int, bool);
 
-/**
-* \brief A mitk::USIGTLDevice is a USDevice to receive images over an OpenIGTLink
-* connection. It registers an OIGTL device as a Microservice to receive image messages
-* and transforms them to mitk::Images. It can act both as a server (listening for
-* incoming connections) and as a client (connecting to an existing OIGTL server).
-*
-* \ingroup US
-*/
-class MITKUS_EXPORT USIGTLDevice : public mitk::USDevice
-{
+    virtual std::string GetDeviceClass();
+    virtual USImageSource::Pointer GetUSImageSource();
 
+    USIGTLDevice(std::string manufacturer, std::string model, std::string host,
+      int port, bool server);
 
- public:
-  mitkClassMacro(USIGTLDevice, mitk::USDevice);
-  // To open a device (Manufacturer, Model, Hostname, Port, IsServer)
-  mitkNewMacro5Param(Self, std::string, std::string, std::string, int, bool);
+  protected:
+    virtual bool OnInitialization();
+    virtual bool OnConnection();
+    virtual bool OnDisconnection();
+    virtual bool OnActivation();
+    virtual bool OnDeactivation();
 
-  virtual std::string GetDeviceClass();
-  virtual USImageSource::Pointer GetUSImageSource();
-
-  USIGTLDevice(std::string manufacturer, std::string model, std::string host,
-               int port, bool server);
-
- protected:
-  virtual bool OnInitialization();
-  virtual bool OnConnection();
-  virtual bool OnDisconnection();
-  virtual bool OnActivation();
-  virtual bool OnDeactivation();
-
- private:
-  std::string m_Host;
-  int m_Port;
-  mitk::IGTLDevice::Pointer m_Device;
-  mitk::IGTLDeviceSource::Pointer m_DeviceSource;
-  mitk::IGTLMessageToUSImageFilter::Pointer m_Filter;
-};
-
+  private:
+    std::string m_Host;
+    int m_Port;
+    mitk::IGTLDevice::Pointer m_Device;
+    mitk::IGTLDeviceSource::Pointer m_DeviceSource;
+    mitk::IGTLMessageToUSImageFilter::Pointer m_Filter;
+  };
 }  // namespace mitk
 
 #endif  // MITKIGTLDevice_H_HEADER_INCLUDED_

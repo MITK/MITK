@@ -99,14 +99,14 @@ public:
     igtl::ServerSocket::Pointer server = igtl::ServerSocket::New();
     igtl::ClientSocket::Pointer client = igtl::ClientSocket::New();
 
-    CPPUNIT_ASSERT(server->CreateServer(PORT)==0);
-    CPPUNIT_ASSERT(client->ConnectToServer("localhost", PORT)==0);
+    CPPUNIT_ASSERT(server->CreateServer(PORT) == 0);
+    CPPUNIT_ASSERT(client->ConnectToServer("localhost", PORT) == 0);
 
     client->CloseSocket();
     server->CloseSocket();
 
-    CPPUNIT_ASSERT(server->CreateServer(PORT)==0);
-    CPPUNIT_ASSERT(client->ConnectToServer("localhost", PORT)==0);
+    CPPUNIT_ASSERT(server->CreateServer(PORT) == 0);
+    CPPUNIT_ASSERT(client->ConnectToServer("localhost", PORT) == 0);
 
     client->CloseSocket();
     server->CloseSocket();
@@ -168,7 +168,7 @@ public:
     m_Server->SendMessage(sentMessage);
     igtl::MessageBase::Pointer receivedMessage;
     int steps = 0;
-    while ((receivedMessage = m_Client_One->GetReceiveQueue()->PullMessage()) == nullptr)
+    while ((receivedMessage = m_Client_One->GetMessageQueue()->PullMiscMessage()) == nullptr)
     {
       std::this_thread::sleep_for(std::chrono::milliseconds(5));
       if (++steps > 20)
@@ -208,11 +208,11 @@ public:
     {
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-      igtl::MessageBase::Pointer tmpMessage1 = m_Client_One->GetReceiveQueue()->PullMessage();
+      igtl::MessageBase::Pointer tmpMessage1 = m_Client_One->GetMessageQueue()->PullMiscMessage();
       if (tmpMessage1.IsNotNull())
         receivedMessage1 = tmpMessage1;
 
-      igtl::MessageBase::Pointer tmpMessage2 = m_Client_Two->GetReceiveQueue()->PullMessage();
+      igtl::MessageBase::Pointer tmpMessage2 = m_Client_Two->GetMessageQueue()->PullMiscMessage();
       if (tmpMessage2.IsNotNull())
         receivedMessage2 = tmpMessage2;
 

@@ -139,9 +139,11 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
 
   //MITK_INFO << "Server received r = " << r;
 
+  MITK_INFO << "Received r = " << r;
+
   if (r == 0) //connection error
   {
-    // an error was received, therefor the communication with this socket
+    // an error was received, therefore the communication with this socket
     // must be stoppedy
     return IGTL_STATUS_NOT_PRESENT;
   }

@@ -45,6 +45,10 @@ class DataStorage;
 //!
 //! The radius determines the size of the axes and the rings around them.
 //!
+//! A nice overview of similar / alternative representations can be found in
+//! "Schmidt R, Singh K, and Balakrishnan R. Sketching and Composing Widgets for 3D Manipulation.
+//!  EUROGRAPHICS 2008"
+//!
 //! \sa GizmoInteractor3D
 class MITKGIZMO_EXPORT Gizmo : public Surface
 {
@@ -112,7 +116,8 @@ public:
 
   //! Convenience creation of a gizmo for given node
   //! \param node The node holding the geometry to be visualized
-  //! \param storage The DataStorage where a node holding the gizmo shall be added to (ignored when nullptr)
+  //! \param storage The DataStorage where a node holding the gizmo
+  //!                shall be added to (ignored when nullptr)
   //!
   //! \return DataNode::Pointer containing the node used for vizualization of our gizmo
   static DataNode::Pointer AddGizmoToNode(DataNode* node, DataStorage* storage);

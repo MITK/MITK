@@ -36,8 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::GizmoInteractor3D::GizmoInteractor3D()
 {
-    m_PointPicker = vtkSmartPointer<vtkPointPicker>::New();
-    m_PointPicker->SetTolerance(0.005);
+    m_Picker = vtkSmartPointer<vtkCellPicker>::New();
+    m_Picker->SetTolerance(0.005);
 }
 
 mitk::GizmoInteractor3D::~GizmoInteractor3D()
@@ -62,8 +62,8 @@ void mitk::GizmoInteractor3D::SetGizmoNode(DataNode* node)
   m_Gizmo = dynamic_cast<Gizmo*>(node->GetData());
 
   // setup picking from just this object
-  m_PointPicker->GetPickList()->RemoveAllItems();
-  m_PointPicker->PickFromListOff();
+  m_Picker->GetPickList()->RemoveAllItems();
+  m_Picker->PickFromListOff();
 }
 
 void mitk::GizmoInteractor3D::SetManipulatedObjectNode(DataNode* node)
@@ -76,7 +76,7 @@ void mitk::GizmoInteractor3D::SetManipulatedObjectNode(DataNode* node)
 
 bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactionEvent)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
   {
     return false;
@@ -99,22 +99,22 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
     return false;
   }
 
-  if ( !m_PointPicker->GetPickFromList() )
+  if ( !m_Picker->GetPickFromList() )
   {
     auto mapper = GetDataNode()->GetMapper(BaseRenderer::Standard3D);
     auto vtk_mapper = dynamic_cast<VtkMapper*>(mapper);
     if ( vtk_mapper )
     { // doing this each time is bizarre
-      m_PointPicker->AddPickList(vtk_mapper->GetVtkProp(interactionEvent->GetSender()));
-      m_PointPicker->PickFromListOn();
+      m_Picker->AddPickList(vtk_mapper->GetVtkProp(interactionEvent->GetSender()));
+      m_Picker->PickFromListOn();
     }
   }
 
   auto displayPosition = positionEvent->GetPointerPositionOnScreen();
-  m_PointPicker->Pick( displayPosition[0], displayPosition[1], 0,
+  m_Picker->Pick( displayPosition[0], displayPosition[1], 0,
                        interactionEvent->GetSender()->GetVtkRenderer() );
 
-  vtkIdType pickedPointID = m_PointPicker->GetPointId();
+  vtkIdType pickedPointID = m_Picker->GetPointId();
   if (pickedPointID == -1)
   {
       return false;
@@ -122,7 +122,6 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
 
   // _something_ picked
   m_PickedHandle = m_Gizmo->GetHandleFromPointID(pickedPointID);
-
   if (m_PickedHandle != Gizmo::NoHandle)
   {
     // if something relevant was picked, we calculate a number of
@@ -197,7 +196,8 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
   }
 }
 
-void mitk::GizmoInteractor3D::DecideInteraction(StateMachineAction* action, InteractionEvent* interactionEvent)
+void mitk::GizmoInteractor3D::DecideInteraction(StateMachineAction* action,
+                                                InteractionEvent* interactionEvent)
 {
   assert(m_PickedHandle != Gizmo::NoHandle);
 
@@ -219,6 +219,7 @@ void mitk::GizmoInteractor3D::DecideInteraction(StateMachineAction* action, Inte
     case Gizmo::MoveFreely:
       decision = InternalEvent::New(interactionEvent->GetSender(), this,
                                     "MoveFreely");
+      break;
     case Gizmo::ScaleX:
     case Gizmo::ScaleY:
     case Gizmo::ScaleZ:
@@ -232,19 +233,17 @@ void mitk::GizmoInteractor3D::DecideInteraction(StateMachineAction* action, Inte
 
 void mitk::GizmoInteractor3D::MoveAlongAxis(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
   {
     return;
   }
 
   Vector2D axisVector2D = m_InitialClickPosition2D - m_InitialGizmoCenter2D;
-
-  Vector2D axisVector2DNormalized = axisVector2D;
-  axisVector2DNormalized.Normalize();
+  axisVector2D.Normalize();
 
   Vector2D movement2D = positionEvent->GetPointerPositionOnScreen() - m_InitialClickPosition2D;
-  double relativeMovement = movement2D * axisVector2DNormalized; // projection
+  double relativeMovement = movement2D * axisVector2D; // projection
 
   Vector3D movement3D = relativeMovement * m_AxisOfMovement;
 
@@ -252,9 +251,10 @@ void mitk::GizmoInteractor3D::MoveAlongAxis(StateMachineAction*, InteractionEven
   positionEvent->GetSender()->ForceImmediateUpdate();
 }
 
-void mitk::GizmoInteractor3D::RotateAroundAxis(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::GizmoInteractor3D::RotateAroundAxis(StateMachineAction*,
+                                               InteractionEvent* interactionEvent)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
   {
     return;
@@ -275,7 +275,7 @@ void mitk::GizmoInteractor3D::RotateAroundAxis(StateMachineAction*, InteractionE
 
 void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
   {
     return;
@@ -296,7 +296,7 @@ void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* 
 
 void mitk::GizmoInteractor3D::ScaleEqually(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
   {
     return;
@@ -315,7 +315,8 @@ void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D
 {
   assert(m_ManipulatedObjectGeometry.IsNotNull());
 
-  auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->GetIndexToWorldTransform()->Clone();
+  auto manipulatedGeometry =
+      m_InitialManipulatedObjectGeometry->GetIndexToWorldTransform()->Clone();
 
   manipulatedGeometry->Translate(translation);
 

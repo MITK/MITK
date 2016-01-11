@@ -64,10 +64,9 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   auto gizmoNode = DataNode::New();
   gizmoNode->SetName("Gizmo");
   gizmoNode->SetData(gizmo);
-  //gizmoNode->SetProperty("material.ambientCoefficient", FloatProperty::New(0));
-  //gizmoNode->SetProperty("material.diffuseCoefficient", FloatProperty::New(1));
-  //gizmoNode->SetProperty("material.specularCoefficient", FloatProperty::New(0.2));
-  //gizmoNode->SetProperty("material.interpolation", VtkInterpolationProperty::New(2)); // PHONG
+  gizmoNode->SetProperty("color", ColorProperty::New(0.3,0.3,0.3)); // a little lighter than the
+                                                                    // "plane widgets" of
+                                                                    // QmitkStdMultiWidget
   gizmoNode->SetProperty("scalar visibility", BoolProperty::New(true));
   gizmoNode->SetProperty("ScalarsRangeMinimum", DoubleProperty::New(0));
   gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New(10));
@@ -197,7 +196,8 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
   for (double sign = -1.0; sign < 3.0; sign += 2)
   {
     vtkSmartPointer<vtkConeSource> cone = vtkConeSource::New();
-    cone->SetCenter(center[0] + sign * axis[0] * (halflength * 1.1 + arrowHeight * 0.5), // arrow tips at 110% of radius
+                                                  // arrow tips at 110% of radius
+    cone->SetCenter(center[0] + sign * axis[0] * (halflength * 1.1 + arrowHeight * 0.5),
                     center[1] + sign * axis[1] * (halflength * 1.1 + arrowHeight * 0.5),
                     center[2] + sign * axis[2] * (halflength * 1.1 + arrowHeight * 0.5));
     cone->SetDirection(sign * axis[0],
@@ -380,7 +380,6 @@ mitk::Gizmo::HandleType mitk::Gizmo::GetHandleFromPointID(vtkIdType id)
   assert(GetVtkPolyData());
   assert(GetVtkPolyData()->GetPointData());
   assert(GetVtkPolyData()->GetPointData()->GetScalars());
-  // TODO check if id exists.. what otherwise?
   double dataValue = GetVtkPolyData()->GetPointData()->GetScalars()->GetTuple1(id);
 
   CheckHandleType(MoveFreely);
@@ -409,6 +408,9 @@ std::string mitk::Gizmo::HandleTypeToString(HandleType type)
   CheckHandleType(RotateAroundAxisX);
   CheckHandleType(RotateAroundAxisY);
   CheckHandleType(RotateAroundAxisZ);
+  CheckHandleType(ScaleX);
+  CheckHandleType(ScaleY);
+  CheckHandleType(ScaleZ);
   CheckHandleType(NoHandle);
   return "InvalidHandleType";
 }

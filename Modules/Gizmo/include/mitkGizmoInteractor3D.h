@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // VTK includes
 #include <vtkSmartPointer.h>
-#include <vtkPointPicker.h>
+#include <vtkCellPicker.h>
 
 #include "MitkGizmoExports.h"
 
@@ -105,8 +105,8 @@ private:
   //! The manipulated object's geometry
   BaseGeometry::Pointer m_ManipulatedObjectGeometry;
 
-  //! For point picking on the vtkPolyData representing the gizmo
-  vtkSmartPointer<vtkPointPicker> m_PointPicker;
+  //! For picking on the vtkPolyData representing the gizmo
+  vtkSmartPointer<vtkCellPicker> m_Picker;
 
   //! Part of the gizmo that was clicked initially
   Gizmo::HandleType m_PickedHandle;

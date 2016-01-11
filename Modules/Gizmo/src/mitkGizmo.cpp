@@ -149,6 +149,15 @@ mitk::Gizmo::Gizmo()
   UpdateRepresentation();
 }
 
+mitk::Gizmo::~Gizmo()
+{
+  if ( m_FollowedGeometry.IsNotNull() )
+  {
+    m_FollowedGeometry->RemoveObserver(m_FollowerTag);
+  }
+}
+
+
 void mitk::Gizmo::UpdateRepresentation()
 {
   /* bounding box around the unscaled bounding object */
@@ -159,10 +168,6 @@ void mitk::Gizmo::UpdateRepresentation()
   GetTimeGeometry()->Update();
 
   SetVtkPolyData( BuildGizmo() );
-}
-
-mitk::Gizmo::~Gizmo()
-{
 }
 
 namespace {

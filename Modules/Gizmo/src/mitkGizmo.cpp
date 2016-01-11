@@ -69,17 +69,18 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
                                                                     // QmitkStdMultiWidget
   gizmoNode->SetProperty("scalar visibility", BoolProperty::New(true));
   gizmoNode->SetProperty("ScalarsRangeMinimum", DoubleProperty::New(0));
-  gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New(10));
+  gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New((int)NoHandle));
 
   double colorMoveFreely[] = {1,0,0,1}; // RGBA
   double colorAxisX[] = {0.753,0,0,1}; // colors copied from QmitkStdMultiWidget to
   double colorAxisY[] = {0,0.69,0,1};  // look alike
   double colorAxisZ[] = {0,0.502,1,1};
+  double colorInactive[] = {0.7,0.7,0.7,1};
 
   // build a nice color table
   vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-  lut->SetNumberOfTableValues(10);
-  lut->SetTableRange(0,9);
+  lut->SetNumberOfTableValues((int)NoHandle+1);
+  lut->SetTableRange(0,(int)NoHandle);
   lut->SetTableValue(MoveFreely, colorMoveFreely);
   lut->SetTableValue(MoveAlongAxisX, colorAxisX);
   lut->SetTableValue(MoveAlongAxisY, colorAxisY);
@@ -90,6 +91,7 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   lut->SetTableValue(ScaleX, colorAxisX);
   lut->SetTableValue(ScaleY, colorAxisY);
   lut->SetTableValue(ScaleZ, colorAxisZ);
+  lut->SetTableValue(NoHandle, colorInactive);
 
   mitk::LookupTable::Pointer mlut = mitk::LookupTable::New();
   mlut->SetVtkLookupTable(lut);
@@ -136,7 +138,10 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
 }
 
 mitk::Gizmo::Gizmo()
-: Surface()
+: Surface(),
+  m_AllowTranslation(true),
+  m_AllowRotation(true),
+  m_AllowScaling(true)
 {
   m_Center.Fill(0);
 
@@ -186,6 +191,7 @@ void AssignScalarValueTo(vtkPolyData* polydata, char value)
 vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
                                        const mitk::Vector3D& axis,
                                        double halflength,
+                                       bool drawRing,
                                        char vertexValueAxis,
                                        char vertexValueRing,
                                        char vertexValueScale)
@@ -240,6 +246,10 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
   axisSource->AddInputData(shaftSource->GetOutput());
   axisSource->Update();
 
+  vtkSmartPointer<vtkTubeFilter> ringSource; // used after if block, so declare it here
+  if (drawRing)
+  {
+
   // build the ring orthogonal to the axis (as another tube)
   vtkSmartPointer<vtkPolyData> ringSkeleton = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkPoints> ringPoints = vtkSmartPointer<vtkPoints>::New();
@@ -264,39 +274,45 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
   vtkSmartPointer<vtkTransform> t = vtkSmartPointer<vtkTransform>::New();
   t->Translate(center.GetDataPointer());
   double vMag = vtkMath::Norm(axis.GetDataPointer());
-  if ( axis[0] < 0.0 ) {
-      // flip x -> -x to avoid instability
-      t->RotateWXYZ(180.0, (axis[0] - vMag) / 2.0,
-                    axis[1] / 2.0, axis[2] / 2.0);
-      t->RotateWXYZ(180.0, 0, 1, 0);
-  } else {
-      t->RotateWXYZ(180.0, (axis[0] + vMag) / 2.0,
+  if ( axis[0] < 0.0 )
+  {
+    // flip x -> -x to avoid instability
+    t->RotateWXYZ(180.0, (axis[0] - vMag) / 2.0,
+                  axis[1] / 2.0, axis[2] / 2.0);
+    t->RotateWXYZ(180.0, 0, 1, 0);
+  } else
+  {
+    t->RotateWXYZ(180.0, (axis[0] + vMag) / 2.0,
                     axis[1] / 2.0, axis[2] / 2.0);
   }
 
   double thisPoint[3];
   for ( int i = 0; i < numberOfRingPoints; ++i )
   {
-      ringPoints->GetPoint(i, thisPoint);
-      t->TransformPoint(thisPoint, thisPoint);
-      ringPoints->SetPoint(i, thisPoint);
+    ringPoints->GetPoint(i, thisPoint);
+    t->TransformPoint(thisPoint, thisPoint);
+    ringPoints->SetPoint(i, thisPoint);
   }
 
   ringSkeleton->SetPoints(ringPoints);
   ringSkeleton->SetLines(ringLines);
 
-  vtkSmartPointer<vtkTubeFilter> ringSource = vtkSmartPointer<vtkTubeFilter>::New();
+  ringSource = vtkSmartPointer<vtkTubeFilter>::New();
   ringSource->SetInputData(ringSkeleton);
   ringSource->SetNumberOfSides(tubeSides);
   ringSource->SetVaryRadiusToVaryRadiusOff();
   ringSource->SetRadius(shaftRadius);
   ringSource->Update();
   AssignScalarValueTo( ringSource->GetOutput(), vertexValueRing );
+  }
 
   // assemble axis and ring
   vtkSmartPointer<vtkAppendPolyData> appenderGlobal = vtkSmartPointer<vtkAppendPolyData>::New();
   appenderGlobal->AddInputData( axisSource->GetOutput() );
-  appenderGlobal->AddInputData( ringSource->GetOutput() );
+  if (drawRing)
+  {
+    appenderGlobal->AddInputData( ringSource->GetOutput() );
+  }
   appenderGlobal->Update();
 
   // make everything shiny by adding normals
@@ -319,12 +335,18 @@ vtkSmartPointer<vtkPolyData> mitk::Gizmo::BuildGizmo()
   longestAxis = std::max( longestAxis, m_Radius[2] );
 
   vtkSmartPointer<vtkAppendPolyData> appender = vtkSmartPointer<vtkAppendPolyData>::New();
-  appender->AddInputData( BuildAxis(m_Center, m_AxisX, longestAxis,
-                                    MoveAlongAxisX, RotateAroundAxisX, ScaleX) );
-  appender->AddInputData( BuildAxis(m_Center, m_AxisY, longestAxis,
-                                    MoveAlongAxisY, RotateAroundAxisY, ScaleY) );
-  appender->AddInputData( BuildAxis(m_Center, m_AxisZ, longestAxis,
-                                    MoveAlongAxisZ, RotateAroundAxisZ, ScaleZ) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisX, longestAxis, m_AllowRotation,
+                                    m_AllowTranslation ? MoveAlongAxisX : NoHandle,
+                                    m_AllowRotation ? RotateAroundAxisX : NoHandle,
+                                    m_AllowScaling ? ScaleX : NoHandle) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisY, longestAxis, m_AllowRotation,
+                                    m_AllowTranslation ? MoveAlongAxisY : NoHandle,
+                                    m_AllowRotation ? RotateAroundAxisY : NoHandle,
+                                    m_AllowScaling ? ScaleY : NoHandle) );
+  appender->AddInputData( BuildAxis(m_Center, m_AxisZ, longestAxis, m_AllowRotation,
+                                    m_AllowTranslation ? MoveAlongAxisZ : NoHandle,
+                                    m_AllowRotation ? RotateAroundAxisZ : NoHandle,
+                                    m_AllowScaling ? ScaleZ : NoHandle) );
 
   auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
   sphereSource->SetCenter(m_Center[0], m_Center[1], m_Center[2]);

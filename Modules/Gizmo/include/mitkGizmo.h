@@ -99,6 +99,18 @@ public:
   itkGetMacro(Radius, Vector3D);
   itkSetMacro(Radius, Vector3D);
 
+  itkGetMacro(AllowTranslation, bool);
+  itkSetMacro(AllowTranslation, bool);
+  itkBooleanMacro(AllowTranslation);
+
+  itkGetMacro(AllowRotation, bool);
+  itkSetMacro(AllowRotation, bool);
+  itkBooleanMacro(AllowRotation);
+
+  itkGetMacro(AllowScaling, bool);
+  itkSetMacro(AllowScaling, bool);
+  itkBooleanMacro(AllowScaling);
+
   //! Updates the representing surface object after changes to center, axes, or radius.
   void UpdateRepresentation();
 
@@ -139,6 +151,10 @@ private:
   Vector3D m_AxisY;
   Vector3D m_AxisZ;
   Vector3D m_Radius;
+
+  bool m_AllowTranslation;
+  bool m_AllowRotation;
+  bool m_AllowScaling;
 
   BaseGeometry::Pointer m_FollowedGeometry;
   //! ITK tag for the observing of m_FollowedGeometry

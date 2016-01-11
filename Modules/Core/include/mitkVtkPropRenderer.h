@@ -35,7 +35,9 @@ class vtkCellPicker;
 class vtkTextActor;
 class vtkTextProperty;
 class vtkAssemblyPath;
-class vtkAssemblyPaths;
+
+#include <vtkAssemblyPaths.h>
+#include <vtkSmartPointer.h>
 
 namespace mitk
 {
@@ -177,8 +179,8 @@ protected:
 
 private:
 
-  vtkAssemblyPaths* Paths;
-  vtkTimeStamp PathTime;
+  vtkSmartPointer<vtkAssemblyPaths> m_Paths;
+  vtkTimeStamp m_PathTime;
 
   // prepare all mitk::mappers for rendering
   void PrepareMapperQueue();

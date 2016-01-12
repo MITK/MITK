@@ -315,23 +315,9 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
   for(int i=0; i<m_NavigationToolStorage->GetToolCount(); i++)
     {
       QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetDataNode()->GetName().c_str())+ " ";
-      switch (m_NavigationToolStorage->GetTool(i)->GetTrackingDeviceType())
-        {
-        case mitk::ClaronMicron:
-              currentTool += "(MicronTracker/"; break;
-        case mitk::NDIAurora:
-              currentTool += "(NDI Aurora/"; break;
-        case mitk::NDIPolaris:
-              currentTool += "(NDI Polaris/"; break;
-        case mitk::NPOptitrack:
-              currentTool += "(NP Optitrack/"; break;
-        case mitk::VirtualTracker:
-              currentTool += "(Virtual Tracker/"; break;
-        case mitk::OpenIGTLinkTrackingDeviceConnection:
-              currentTool += "(Open IGT Link/"; break;
-        default:
-              currentTool += "(unknown tracking system/"; break;
-        }
+
+      currentTool += "(" + QString::fromStdString(m_NavigationToolStorage->GetTool(i)->GetTrackingDeviceType()) + "/";
+
       switch (m_NavigationToolStorage->GetTool(i)->GetType())
         {
         case mitk::NavigationTool::Instrument:

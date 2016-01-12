@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <QtConcurrentMap>
 #include "QmitkNDIToolDelegate.h"
 
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
+
 /* VIEW MANAGEMENT */
 QmitkNDIConfigurationWidget::QmitkNDIConfigurationWidget(QWidget* parent)
 : QWidget(parent), m_Controls(NULL), m_Tracker(NULL), m_Source(NULL),
@@ -115,12 +118,12 @@ void QmitkNDIConfigurationWidget::OnConnect()
   if (okay)
   {
     // show/hide options according to connected device
-    if(m_Tracker->GetType() == mitk::NDIPolaris)
+    if(m_Tracker->GetType() == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName())
     {
       this->HideAuroraOptionsGroupbox(true);
       this->HidePolarisOptionsGroupbox(false);
     }
-    else if(m_Tracker->GetType() == mitk::NDIAurora)
+    else if (m_Tracker->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName())
     {
       this->HidePolarisOptionsGroupbox(true);
       this->HideAuroraOptionsGroupbox(false);
@@ -205,20 +208,8 @@ QString QmitkNDIConfigurationWidget::GetStatusText()
   if (m_Tracker.IsNull())
     return QString("Not connected");
 
-  QString devName;
-  switch (m_Tracker->GetType())
-  {
-  case mitk::NDIAurora:
-    devName = "NDI Aurora";
-    break;
-  case mitk::NDIPolaris:
-    devName = "NDI Polaris";
-    break;
-  case mitk::TrackingSystemNotSpecified:
-  default:
-    devName = "unknown tracking device";
-    break;
-  }
+  QString devName = QString::fromStdString(m_Tracker->GetType());
+
   if (m_Tracker->GetState() == mitk::TrackingDevice::Ready)
     return QString("Connected to %1 on %2. Device is ready.").arg(devName).arg(m_Tracker->GetDeviceName());
   if (m_Tracker->GetState() == mitk::TrackingDevice::Tracking)
@@ -403,17 +394,14 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
     }
     result += tmpComPort + ": ";
 
-    switch (it.value())
+    if (mitk::NDIPolarisTypeInformation::GetTrackingDeviceName() == it.value() || mitk::NDIAuroraTypeInformation::GetTrackingDeviceName() == it.value())
     {
-    case mitk::NDIPolaris:
-      result += "NDI Polaris<BR/>\n";
+      result += QString::fromStdString(it.value());
+      result += "<BR/>\n";
       m_Controls->m_ComPortSelector->addItem(tmpComPort);
-      break;
-    case mitk::NDIAurora:
-      result += "NDI Aurora<BR/>\n";
-      m_Controls->m_ComPortSelector->addItem(tmpComPort);
-      break;
-    default:
+    }
+    else
+    {
       result += "No NDI tracking device found<BR/>\n";
     }
   }

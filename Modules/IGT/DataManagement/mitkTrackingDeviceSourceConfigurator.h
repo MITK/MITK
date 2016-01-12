@@ -95,13 +95,7 @@ namespace mitk {
     std::string m_ErrorMessage;
     std::vector<int> m_ToolCorrespondencesInToolStorage;
 
-    mitk::TrackingDeviceSource::Pointer CreateNDIPolarisTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
-    mitk::TrackingDeviceSource::Pointer CreateNDIAuroraTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
-    mitk::TrackingDeviceSource::Pointer CreateMicronTrackerTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
-    mitk::TrackingDeviceSource::Pointer CreateNPOptitrackTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
-    mitk::TrackingDeviceSource::Pointer CreateVirtualTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
-    mitk::TrackingDeviceSource::Pointer CreateOpenIGTLinkTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
-  mitk::NavigationDataObjectVisualizationFilter::Pointer CreateNavigationDataObjectVisualizationFilter(mitk::TrackingDeviceSource::Pointer trackingDeviceSource, mitk::NavigationToolStorage::Pointer navigationTools);
+    mitk::NavigationDataObjectVisualizationFilter::Pointer CreateNavigationDataObjectVisualizationFilter(mitk::TrackingDeviceSource::Pointer trackingDeviceSource, mitk::NavigationToolStorage::Pointer navigationTools);
 
   };
 } // namespace mitk

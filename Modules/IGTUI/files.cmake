@@ -21,6 +21,19 @@ set(CPP_FILES
 
   Qmitk/QmitkNavigationDataPlayerControlWidget.cpp
   Qmitk/QmitkNavigationDataSequentialPlayerControlWidget.cpp
+
+  Qmitk/QmitkNDIAuroraWidget.cpp
+  Qmitk/QmitkNDIPolarisWidget.cpp
+  Qmitk/QmitkMicronTrackerWidget.cpp
+  Qmitk/QmitkNPOptitrackWidget.cpp
+  Qmitk/QmitkVirtualTrackerWidget.cpp
+  Qmitk/QmitkOpenIGTLinkWidget.cpp
+
+  Qmitk/mitkTrackingDeviceWidgetCollection.cpp
+  Qmitk/QmitkTrackingDeviceConfigurationWidgetScanPortsWorker.cpp
+  Qmitk/QmitkTrackingDeviceConfigurationWidgetConnectionWorker.cpp
+  Qmitk/QmitkNDIAbstractDeviceWidget.cpp
+  Qmitk/QmitkAbstractTrackingDeviceWidget.cpp
 )
 
 set(UI_FILES
@@ -44,6 +57,13 @@ set(UI_FILES
 
   Qmitk/QmitkNavigationDataPlayerControlWidget.ui
   Qmitk/QmitkNavigationDataSequentialPlayerControlWidget.ui
+
+  Qmitk/QmitkNDIAuroraWidget.ui
+  Qmitk/QmitkNDIPolarisWidget.ui
+  Qmitk/QmitkMicronTrackerWidget.ui
+  Qmitk/QmitkNPOptitrackWidget.ui
+  Qmitk/QmitkVirtualTrackerWidget.ui
+  Qmitk/QmitkOpenIGTLinkWidget.ui
 )
 
 set(MOC_H_FILES
@@ -69,10 +89,20 @@ set(MOC_H_FILES
 
   Qmitk/QmitkNavigationDataPlayerControlWidget.h
   Qmitk/QmitkNavigationDataSequentialPlayerControlWidget.h
+
+  Qmitk/QmitkNDIAuroraWidget.h
+  Qmitk/QmitkNDIPolarisWidget.h
+  Qmitk/QmitkMicronTrackerWidget.h
+  Qmitk/QmitkNPOptitrackWidget.h
+  Qmitk/QmitkVirtualTrackerWidget.h
+  Qmitk/QmitkOpenIGTLinkWidget.h
+
+  Qmitk/QmitkTrackingDeviceConfigurationWidgetScanPortsWorker.h
+  Qmitk/QmitkTrackingDeviceConfigurationWidgetConnectionWorker.h
+  Qmitk/QmitkNDIAbstractDeviceWidget.h
+  Qmitk/QmitkAbstractTrackingDeviceWidget.h
 )
 
 set(QRC_FILES
   resources/IGTUI.qrc
 )
-
-

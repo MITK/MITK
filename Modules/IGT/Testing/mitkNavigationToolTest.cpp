@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkSpatialObject.h>
 
+#include "mitkNDIAuroraTypeInformation.h"
+
 class mitkNavigationToolTestClass
   {
   public:
@@ -51,7 +53,7 @@ class mitkNavigationToolTestClass
     //notice: cannot test Get/SetTrackingTool because this class cannot be instantiated alone
     myNavigationTool->SetCalibrationFile("Test.srom");
     myNavigationTool->SetSerialNumber("0815");
-    myNavigationTool->SetTrackingDeviceType(mitk::NDIAurora);
+    myNavigationTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
 
     mitk::PointSet::Pointer CalLandmarks = mitk::PointSet::New();
     mitk::Point3D testPt1;
@@ -73,7 +75,7 @@ class mitkNavigationToolTestClass
     MITK_TEST_CONDITION(myNavigationTool->GetSpatialObject()==mySpatialObject,"Testing getter and setter of itk spatial object.");
     MITK_TEST_CONDITION(myNavigationTool->GetCalibrationFile()=="none","Testing getter and setter of calibration file."); //should be none, because file does not exist
     MITK_TEST_CONDITION(myNavigationTool->GetSerialNumber()=="0815","Testing getter and setter of serial number.");
-    MITK_TEST_CONDITION(myNavigationTool->GetTrackingDeviceType()==mitk::NDIAurora,"Testing getter and setter of tracking device type.");
+    MITK_TEST_CONDITION(myNavigationTool->GetTrackingDeviceType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), "Testing getter and setter of tracking device type.");
     MITK_TEST_CONDITION(myNavigationTool->GetToolName()=="TestNodeName","Testing method GetToolName().");
     MITK_TEST_CONDITION(myNavigationTool->GetToolCalibrationLandmarks()->GetPoint(0)[0] == 1.0,"Testing method GetToolCalibrationLandmarks()");
     MITK_TEST_CONDITION(myNavigationTool->GetToolRegistrationLandmarks()->GetPoint(0)[0] == 4.0,"Testing method GetToolRegistrationLandmarks()");

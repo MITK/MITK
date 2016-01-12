@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <itkMutexLockHolder.h>
 #include <itkCommand.h>
+#include <mitkOpenIGTLinkTypeInformation.h>
 
 //sleep headers
 #include <chrono>
@@ -34,7 +35,7 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDevice()
 {
   //set the type of this tracking device
-  this->m_Data = mitk::DeviceDataOpenIGTLinkTrackingDeviceConnection;
+  this->m_Data = mitk::OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection();
 
   m_OpenIGTLinkClient = mitk::IGTLClient::New(false);
   m_OpenIGTLinkClient->EnableInfiniteBufferingMode(m_OpenIGTLinkClient->GetReceiveQueue(), false);

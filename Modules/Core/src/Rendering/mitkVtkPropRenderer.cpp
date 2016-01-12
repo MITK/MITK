@@ -50,7 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkTextProperty.h>
 #include <vtkProp.h>
 #include <vtkAssemblyPath.h>
-#include <vtkAssemblyPaths.h>
 #include <vtkAssemblyNode.h>
 #include <vtkMapper.h>
 #include <vtkSmartPointer.h>
@@ -512,7 +511,7 @@ void mitk::VtkPropRenderer::InitPathTraversal()
   if (m_DataStorage.IsNotNull())
   {
     this->UpdatePaths();
-    this->Paths->InitTraversal();
+    this->m_Paths->InitTraversal();
   }
 }
 
@@ -522,51 +521,47 @@ void mitk::VtkPropRenderer::UpdatePaths()
     return;
   }
 
-  if (this->GetMTime() > this->PathTime ||
-      (this->Paths != NULL && this->Paths->GetMTime() > this->PathTime))
+  if (GetMTime() > m_PathTime ||
+      (m_Paths != nullptr && m_Paths->GetMTime() > m_PathTime))
   {
-    if (this->Paths)
-    {
-      this->Paths->Delete();
-      this->Paths = 0;
-    }
-
     // Create the list to hold all the paths
-    this->Paths = vtkAssemblyPaths::New();
+    m_Paths = vtkSmartPointer<vtkAssemblyPaths>::New();
 
     DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
-    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin(); iter != objects->end(); ++iter)
+    for (DataStorage::SetOfObjects::const_iterator iter = objects->begin();
+         iter != objects->end();
+         ++iter)
     {
-      vtkAssemblyPath* returnPath = vtkAssemblyPath::New();
+      vtkSmartPointer<vtkAssemblyPath> onePath = vtkSmartPointer<vtkAssemblyPath>::New();
       Mapper* mapper = (*iter)->GetMapper(BaseRenderer::Standard3D);
       if (mapper)
       {
         VtkMapper* vtkmapper = dynamic_cast<VtkMapper*>(mapper);
-        if (vtkmapper)
         {
           vtkProp* prop = vtkmapper->GetVtkProp(this);
           if (prop && prop->GetVisibility())
           {
             // add to assembly path
-            returnPath->AddNode(prop, prop->GetMatrix());
+            onePath->AddNode(prop, prop->GetMatrix());
+            m_Paths->AddItem(onePath);
           }
         }
       }
     }
 
-    this->PathTime.Modified();
+    m_PathTime.Modified();
   }
 }
 
 int mitk::VtkPropRenderer::GetNumberOfPaths()
 {
-  this->UpdatePaths();
-  return this->Paths->GetNumberOfItems();
+  UpdatePaths();
+  return m_Paths->GetNumberOfItems();
 }
 
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 {
-  return this->Paths ? this->Paths->GetNextItem() : 0;
+  return m_Paths ? m_Paths->GetNextItem() : 0;
 }
 
 void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow* /*renWin*/)

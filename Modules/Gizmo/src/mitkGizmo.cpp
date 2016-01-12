@@ -102,7 +102,7 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
 
   // Hide by default, show in all 3D windows
   gizmoNode->SetProperty("helper object", BoolProperty::New(true));
-  gizmoNode->SetProperty("visible", BoolProperty::New(false));
+  gizmoNode->SetProperty("visible", BoolProperty::New(true));
   auto rwList = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
   for (auto& rw : rwList)
   {
@@ -122,7 +122,7 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   // Add interaction to the gizmo
   //--------------------------------------------------------------
 
-  mitk::GizmoInteractor3D::Pointer interactor = mitk::GizmoInteractor3D::New();
+  mitk::GizmoInteractor::Pointer interactor = mitk::GizmoInteractor::New();
   interactor->LoadStateMachine("Gizmo3DStates.xml", us::GetModuleContext()->GetModule());
   interactor->SetEventConfig("Gizmo3DConfig.xml", us::ModuleRegistry::GetModule("MitkGizmo"));
 
@@ -329,10 +329,16 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
 
 } // unnamed namespace
 
-vtkSmartPointer<vtkPolyData> mitk::Gizmo::BuildGizmo()
+double mitk::Gizmo::GetLongestRadius() const
 {
   double longestAxis = std::max( m_Radius[0], m_Radius[1] );
   longestAxis = std::max( longestAxis, m_Radius[2] );
+  return longestAxis;
+}
+
+vtkSmartPointer<vtkPolyData> mitk::Gizmo::BuildGizmo()
+{
+  double longestAxis = GetLongestRadius();
 
   vtkSmartPointer<vtkAppendPolyData> appender = vtkSmartPointer<vtkAppendPolyData>::New();
   appender->AddInputData( BuildAxis(m_Center, m_AxisX, longestAxis, m_AllowRotation,
@@ -397,17 +403,11 @@ void mitk::Gizmo::OnFollowedGeometryModified()
     UpdateRepresentation();
 }
 
-mitk::Gizmo::HandleType mitk::Gizmo::GetHandleFromPointID(vtkIdType id)
+mitk::Gizmo::HandleType mitk::Gizmo::GetHandleFromPointDataValue(double value)
 {
-
 #define CheckHandleType(type) \
-  if (static_cast<int>(dataValue) == static_cast<int>(type)) \
+  if (static_cast<int>(value) == static_cast<int>(type)) \
     return type;
-
-  assert(GetVtkPolyData());
-  assert(GetVtkPolyData()->GetPointData());
-  assert(GetVtkPolyData()->GetPointData()->GetScalars());
-  double dataValue = GetVtkPolyData()->GetPointData()->GetScalars()->GetTuple1(id);
 
   CheckHandleType(MoveFreely);
   CheckHandleType(MoveAlongAxisX);
@@ -421,6 +421,15 @@ mitk::Gizmo::HandleType mitk::Gizmo::GetHandleFromPointID(vtkIdType id)
   CheckHandleType(ScaleZ);
   return NoHandle;
 #undef CheckHandleType
+}
+
+mitk::Gizmo::HandleType mitk::Gizmo::GetHandleFromPointID(vtkIdType id)
+{
+  assert(GetVtkPolyData());
+  assert(GetVtkPolyData()->GetPointData());
+  assert(GetVtkPolyData()->GetPointData()->GetScalars());
+  double dataValue = GetVtkPolyData()->GetPointData()->GetScalars()->GetTuple1(id);
+  return GetHandleFromPointDataValue(dataValue);
 }
 
 std::string mitk::Gizmo::HandleTypeToString(HandleType type)

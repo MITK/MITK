@@ -54,6 +54,8 @@ public:
     //! "Resets" the mapper, setting its result to invisible.
     void ResetMapper(mitk::BaseRenderer* renderer) override;
 
+    vtkPolyData* GetVtkPolyData(mitk::BaseRenderer* renderer);
+
 private:
 
     //! Provide the mapping input as a specific RawMesh_C

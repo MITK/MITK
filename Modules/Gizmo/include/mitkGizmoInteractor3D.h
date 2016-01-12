@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+class InteractionPositionEvent;
+
 //! Data interactor to manipulate the geometry of an object via interaction
 //! with a mitk::Gizmo visualization.
 //!
@@ -47,11 +49,11 @@ namespace mitk
 //! The interactor fills the undo/redo stack with operations on the modified geometry.
 //!
 //! \sa Gizmo
-class MITKGIZMO_EXPORT GizmoInteractor3D: public DataInteractor
+class MITKGIZMO_EXPORT GizmoInteractor: public DataInteractor
 {
 public:
 
-  mitkClassMacro(GizmoInteractor3D, DataInteractor);
+  mitkClassMacro(GizmoInteractor, DataInteractor);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
@@ -66,8 +68,8 @@ public:
 
 private:
 
-  GizmoInteractor3D();
-  virtual ~GizmoInteractor3D();
+  GizmoInteractor();
+  virtual ~GizmoInteractor();
 
   //! Setup the relation between the XML state machine and this object's methods.
   virtual void ConnectActionsAndFunctions() override;
@@ -108,6 +110,9 @@ private:
   //! Applies a calculated rotation angle to the manipulated object.
   void ApplyRotationToManipulatedObject(double angle_deg);
 
+  Gizmo::HandleType PickFrom2D(const InteractionPositionEvent* positionEvent);
+  Gizmo::HandleType PickFrom3D(const InteractionPositionEvent* positionEvent);
+
   //! the Gizmo used for visual feedback and picking
   Gizmo::Pointer m_Gizmo;
 
@@ -115,7 +120,7 @@ private:
   BaseGeometry::Pointer m_ManipulatedObjectGeometry;
 
   //! For picking on the vtkPolyData representing the gizmo
-  vtkSmartPointer<vtkCellPicker> m_Picker;
+  std::map<BaseRenderer*, vtkSmartPointer<vtkCellPicker>> m_Picker;
 
   //! Part of the gizmo that was clicked initially
   Gizmo::HandleType m_PickedHandle;

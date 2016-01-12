@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkGizmoInteractor3D.h"
+#include "mitkGizmoMapper2D.h"
 
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>
@@ -36,17 +37,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorObserver.h>
 
-mitk::GizmoInteractor3D::GizmoInteractor3D()
-{
-    m_Picker = vtkSmartPointer<vtkCellPicker>::New();
-    m_Picker->SetTolerance(0.005);
-}
-
-mitk::GizmoInteractor3D::~GizmoInteractor3D()
+mitk::GizmoInteractor::GizmoInteractor()
 {
 }
 
-void mitk::GizmoInteractor3D::ConnectActionsAndFunctions()
+mitk::GizmoInteractor::~GizmoInteractor()
+{
+}
+
+void mitk::GizmoInteractor::ConnectActionsAndFunctions()
 {
   CONNECT_CONDITION("PickedHandle", HasPickedHandle);
 
@@ -58,18 +57,17 @@ void mitk::GizmoInteractor3D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("FeedUndoStack", FeedUndoStack);
 }
 
-void mitk::GizmoInteractor3D::SetGizmoNode(DataNode* node)
+void mitk::GizmoInteractor::SetGizmoNode(DataNode* node)
 {
   DataInteractor::SetDataNode(node);
 
   m_Gizmo = dynamic_cast<Gizmo*>(node->GetData());
 
   // setup picking from just this object
-  m_Picker->GetPickList()->RemoveAllItems();
-  m_Picker->PickFromListOff();
+  m_Picker.clear();
 }
 
-void mitk::GizmoInteractor3D::SetManipulatedObjectNode(DataNode* node)
+void mitk::GizmoInteractor::SetManipulatedObjectNode(DataNode* node)
 {
   if (node && node->GetData())
   {
@@ -77,7 +75,7 @@ void mitk::GizmoInteractor3D::SetManipulatedObjectNode(DataNode* node)
   }
 }
 
-bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactionEvent)
+bool mitk::GizmoInteractor::HasPickedHandle(const InteractionEvent* interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -102,29 +100,16 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
     return false;
   }
 
-  if ( !m_Picker->GetPickFromList() )
+  if (interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D)
   {
-    auto mapper = GetDataNode()->GetMapper(BaseRenderer::Standard3D);
-    auto vtk_mapper = dynamic_cast<VtkMapper*>(mapper);
-    if ( vtk_mapper )
-    { // doing this each time is bizarre
-      m_Picker->AddPickList(vtk_mapper->GetVtkProp(interactionEvent->GetSender()));
-      m_Picker->PickFromListOn();
-    }
+    m_PickedHandle = PickFrom2D(positionEvent);
+  }
+  else
+  {
+    m_PickedHandle = PickFrom3D(positionEvent);
   }
 
-  auto displayPosition = positionEvent->GetPointerPositionOnScreen();
-  m_Picker->Pick( displayPosition[0], displayPosition[1], 0,
-                       interactionEvent->GetSender()->GetVtkRenderer() );
 
-  vtkIdType pickedPointID = m_Picker->GetPointId();
-  if (pickedPointID == -1)
-  {
-      return false;
-  }
-
-  // _something_ picked
-  m_PickedHandle = m_Gizmo->GetHandleFromPointID(pickedPointID);
   if (m_PickedHandle != Gizmo::NoHandle)
   {
     // if something relevant was picked, we calculate a number of
@@ -201,7 +186,7 @@ bool mitk::GizmoInteractor3D::HasPickedHandle(const InteractionEvent* interactio
   }
 }
 
-void mitk::GizmoInteractor3D::DecideInteraction(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::GizmoInteractor::DecideInteraction(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   assert(m_PickedHandle != Gizmo::NoHandle);
 
@@ -237,7 +222,7 @@ void mitk::GizmoInteractor3D::DecideInteraction(StateMachineAction*, Interaction
   interactionEvent->GetSender()->GetDispatcher()->QueueEvent(decision);
 }
 
-void mitk::GizmoInteractor3D::MoveAlongAxis(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::GizmoInteractor::MoveAlongAxis(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -254,10 +239,10 @@ void mitk::GizmoInteractor3D::MoveAlongAxis(StateMachineAction*, InteractionEven
   Vector3D movement3D = relativeMovement * m_AxisOfMovement;
 
   ApplyTranslationToManipulatedObject(movement3D);
-  positionEvent->GetSender()->ForceImmediateUpdate();
+  RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 }
 
-void mitk::GizmoInteractor3D::RotateAroundAxis(StateMachineAction*,
+void mitk::GizmoInteractor::RotateAroundAxis(StateMachineAction*,
                                                InteractionEvent* interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
@@ -276,10 +261,10 @@ void mitk::GizmoInteractor3D::RotateAroundAxis(StateMachineAction*,
                      std::atan2(originalVector[1], originalVector[0]);
 
   ApplyRotationToManipulatedObject(vtkMath::DegreesFromRadians(angle_rad));
-  positionEvent->GetSender()->ForceImmediateUpdate();
+  RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 }
 
-void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::GizmoInteractor::MoveFreely(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -298,10 +283,10 @@ void mitk::GizmoInteractor3D::MoveFreely(StateMachineAction*, InteractionEvent* 
   Vector3D movementITK( worldPointITK - m_InitialClickPosition3D );
 
   ApplyTranslationToManipulatedObject(movementITK);
-  positionEvent->GetSender()->ForceImmediateUpdate();
+  RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 }
 
-void mitk::GizmoInteractor3D::ScaleEqually(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::GizmoInteractor::ScaleEqually(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   auto positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
@@ -314,11 +299,11 @@ void mitk::GizmoInteractor3D::ScaleEqually(StateMachineAction*, InteractionEvent
                       / (m_InitialClickPosition2D - m_InitialGizmoCenter2D).GetNorm();
 
   ApplyEqualScalingToManipulatedObject(relativeSize);
-  positionEvent->GetSender()->ForceImmediateUpdate();
+  RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 }
 
 
-void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D& translation)
+void mitk::GizmoInteractor::ApplyTranslationToManipulatedObject(const Vector3D& translation)
 {
   assert(m_ManipulatedObjectGeometry.IsNotNull());
 
@@ -334,7 +319,7 @@ void mitk::GizmoInteractor3D::ApplyTranslationToManipulatedObject(const Vector3D
   m_ManipulatedObjectGeometry->Compose( manipulatedGeometry->GetIndexToWorldTransform() );
 }
 
-void mitk::GizmoInteractor3D::ApplyEqualScalingToManipulatedObject(double scalingFactor)
+void mitk::GizmoInteractor::ApplyEqualScalingToManipulatedObject(double scalingFactor)
 {
   assert(m_ManipulatedObjectGeometry.IsNotNull());
   auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
@@ -355,7 +340,7 @@ void mitk::GizmoInteractor3D::ApplyEqualScalingToManipulatedObject(double scalin
   m_ManipulatedObjectGeometry->Compose( manipulatedGeometry->GetIndexToWorldTransform() );
 }
 
-void mitk::GizmoInteractor3D::ApplyRotationToManipulatedObject(double angle_deg)
+void mitk::GizmoInteractor::ApplyRotationToManipulatedObject(double angle_deg)
 {
   assert(m_ManipulatedObjectGeometry.IsNotNull());
 
@@ -378,7 +363,7 @@ void mitk::GizmoInteractor3D::ApplyRotationToManipulatedObject(double angle_deg)
   m_ManipulatedObjectGeometry->Compose( manipulatedGeometry->GetIndexToWorldTransform() );
 }
 
-void mitk::GizmoInteractor3D::FeedUndoStack(StateMachineAction*, InteractionEvent*)
+void mitk::GizmoInteractor::FeedUndoStack(StateMachineAction*, InteractionEvent*)
 {
   if (m_UndoEnabled)
   {
@@ -392,4 +377,75 @@ void mitk::GizmoInteractor3D::FeedUndoStack(StateMachineAction*, InteractionEven
     mitk::OperationEvent::ExecuteIncrement();
     m_UndoController->SetOperationEvent(operationEvent);
   }
+}
+
+mitk::Gizmo::HandleType mitk::GizmoInteractor::PickFrom2D(const InteractionPositionEvent* positionEvent)
+{
+  BaseRenderer* renderer = positionEvent->GetSender();
+
+  auto mapper = GetDataNode()->GetMapper(BaseRenderer::Standard2D);
+  auto gizmo_mapper = dynamic_cast<GizmoMapper2D*>(mapper);  auto& picker = m_Picker[renderer];
+
+  if ( picker == nullptr )
+  {
+    picker = vtkSmartPointer<vtkCellPicker>::New();
+    picker->SetTolerance(0.005);
+
+    if ( gizmo_mapper )
+    { // doing this each time is bizarre
+      picker->AddPickList(gizmo_mapper->GetVtkProp(renderer));
+      picker->PickFromListOn();
+    }
+  }
+
+  auto displayPosition = positionEvent->GetPointerPositionOnScreen();
+  picker->Pick( displayPosition[0], displayPosition[1], 0,
+                positionEvent->GetSender()->GetVtkRenderer() );
+
+  vtkIdType pickedPointID = picker->GetPointId();
+  if (pickedPointID == -1)
+  {
+      return Gizmo::NoHandle;
+  }
+
+  vtkPolyData* polydata = gizmo_mapper->GetVtkPolyData(renderer);
+
+  if (polydata && polydata->GetPointData() && polydata->GetPointData()->GetScalars())
+  {
+    double dataValue = polydata->GetPointData()->GetScalars()->GetTuple1(pickedPointID);
+    return m_Gizmo->GetHandleFromPointDataValue(dataValue);
+  }
+
+  return Gizmo::NoHandle;
+}
+
+mitk::Gizmo::HandleType mitk::GizmoInteractor::PickFrom3D(const InteractionPositionEvent* positionEvent)
+{
+  BaseRenderer* renderer = positionEvent->GetSender();
+  auto& picker = m_Picker[renderer];
+  if ( picker == nullptr )
+  {
+    picker = vtkSmartPointer<vtkCellPicker>::New();
+    picker->SetTolerance(0.005);
+    auto mapper = GetDataNode()->GetMapper(BaseRenderer::Standard3D);
+    auto vtk_mapper = dynamic_cast<VtkMapper*>(mapper);
+    if ( vtk_mapper )
+    { // doing this each time is bizarre
+      picker->AddPickList(vtk_mapper->GetVtkProp(renderer));
+      picker->PickFromListOn();
+    }
+  }
+
+  auto displayPosition = positionEvent->GetPointerPositionOnScreen();
+  picker->Pick( displayPosition[0], displayPosition[1], 0,
+                positionEvent->GetSender()->GetVtkRenderer() );
+
+  vtkIdType pickedPointID = picker->GetPointId();
+  if (pickedPointID == -1)
+  {
+      return Gizmo::NoHandle;
+  }
+
+  // _something_ picked
+  return m_Gizmo->GetHandleFromPointID(pickedPointID);
 }

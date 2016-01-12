@@ -84,32 +84,35 @@ public:
   mitkClassMacro(Gizmo, Surface);
   itkNewMacro(Gizmo);
 
-  itkGetMacro(Center, Point3D);
+  itkGetConstMacro(Center, Point3D);
   itkSetMacro(Center, Point3D);
 
-  itkGetMacro(AxisX, Vector3D);
+  itkGetConstMacro(AxisX, Vector3D);
   itkSetMacro(AxisX, Vector3D);
 
-  itkGetMacro(AxisY, Vector3D);
+  itkGetConstMacro(AxisY, Vector3D);
   itkSetMacro(AxisY, Vector3D);
 
-  itkGetMacro(AxisZ, Vector3D);
+  itkGetConstMacro(AxisZ, Vector3D);
   itkSetMacro(AxisZ, Vector3D);
 
-  itkGetMacro(Radius, Vector3D);
+  itkGetConstMacro(Radius, Vector3D);
   itkSetMacro(Radius, Vector3D);
 
-  itkGetMacro(AllowTranslation, bool);
+  itkGetConstMacro(AllowTranslation, bool);
   itkSetMacro(AllowTranslation, bool);
   itkBooleanMacro(AllowTranslation);
 
-  itkGetMacro(AllowRotation, bool);
+  itkGetConstMacro(AllowRotation, bool);
   itkSetMacro(AllowRotation, bool);
   itkBooleanMacro(AllowRotation);
 
-  itkGetMacro(AllowScaling, bool);
+  itkGetConstMacro(AllowScaling, bool);
   itkSetMacro(AllowScaling, bool);
   itkBooleanMacro(AllowScaling);
+
+  //! Return the longest of the three axes.
+  double GetLongestRadius() const;
 
   //! Updates the representing surface object after changes to center, axes, or radius.
   void UpdateRepresentation();
@@ -125,6 +128,11 @@ public:
   //! Can be used after picking a vertex id to determine what part of the
   //! gizmo has been picked.
   HandleType GetHandleFromPointID(vtkIdType id);
+
+  //! Determine the nature of the the given vertex data value.
+  //! Can be used after picking a vertex data value to determine what part of the
+  //! gizmo has been picked.
+  mitk::Gizmo::HandleType GetHandleFromPointDataValue(double value);
 
   //! Convenience creation of a gizmo for given node
   //! \param node The node holding the geometry to be visualized
@@ -143,7 +151,6 @@ protected:
 
   //! Creates a vtkPolyData representing the parameters defining the gizmo.
   vtkSmartPointer<vtkPolyData> BuildGizmo();
-
 private:
 
   Point3D m_Center;

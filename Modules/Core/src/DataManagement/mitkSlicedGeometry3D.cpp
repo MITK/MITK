@@ -689,6 +689,10 @@ void
 void
   mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
 {
+  PlaneGeometry::Pointer geometry2D;
+  ApplyTransformMatrixOperation *applyMatrixOp;
+  Point3D center;
+
   switch ( operation->GetOperationType() )
   {
   case OpNOTHING:
@@ -1010,9 +1014,9 @@ void
     // The other slices will be re-generated on demand
 
     // Save first slice
-    PlaneGeometry::Pointer geometry2D = m_PlaneGeometries[0];
+    geometry2D = m_PlaneGeometries[0];
 
-    ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
+    applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
 
     // Apply transformation to first plane
     geometry2D->ExecuteOperation( applyMatrixOp );
@@ -1020,7 +1024,7 @@ void
     // Generate a ApplyTransformMatrixOperation using the dataset center instead of
     // the supplied rotation center. The supplied center is instead used to adjust the
     // slice stack afterwards (see OpROTATE).
-    Point3D center = m_ReferenceGeometry->GetCenter();
+    center = m_ReferenceGeometry->GetCenter();
 
     // Clear the slice stack and adjust it according to the center of
     // the dataset and the supplied rotation center (see documentation of
@@ -1029,6 +1033,9 @@ void
 
     BaseGeometry::ExecuteOperation( applyMatrixOp );
     break;
+
+  default: // let handle by base class if we don't do anything
+    BaseGeometry::ExecuteOperation( operation );
   }
 
   this->Modified();

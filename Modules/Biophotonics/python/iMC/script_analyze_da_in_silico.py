@@ -147,7 +147,7 @@ class GeneratingDistributionPlot(luigi.Task):
         g.add_legend()
 
         # finally save the figure
-        plt.savefig(self.output().path + ".png", dpi=500,
+        plt.savefig(self.output().path, dpi=500,
                     bbox_inches='tight')
 
 
@@ -228,6 +228,61 @@ class FeatureDistributionPlot(luigi.Task):
         plt.savefig(self.output().path, dpi=500)
 
 
+class DAvNormalPlot(luigi.Task):
+    which_train = luigi.Parameter()
+    which_test = luigi.Parameter()
+    which_train_no_covariance_shift = luigi.Parameter()
+
+    def requires(self):
+        return WeightedBatch(self.which_train, self.which_test), \
+               tasks_mc.CameraBatch(self.which_test), \
+               tasks_mc.CameraBatch(self.which_train_no_covariance_shift)
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                              sp.RESULTS_FOLDER,
+                                              sp.FINALS_FOLDER,
+                                              "da_v_normal_train_" +
+                                              self.which_train +
+                                              "_test_" + self.which_test +
+                                              ".png"))
+
+    def run(self):
+        # get data
+        df_train = pd.read_csv(self.input()[0].path, header=[0, 1])
+        df_test = pd.read_csv(self.input()[1].path, header=[0, 1])
+        df_train_no_covariance_shift = pd.read_csv(self.input()[2].path,
+                                                   header=[0, 1])
+
+        evaluation_setups = [EvaluationStruct("Proposed", rf)]
+        # evaluate the different methods
+        df_adapted = evaluate_data(df_train, noise_levels,
+                                   df_test, noise_levels,
+                                   evaluation_setups=evaluation_setups)
+        df_adapted["data"] = "adapted"
+        df_no_adaptation = evaluate_data(
+                df_train.drop("weights", axis=1), noise_levels,
+                df_test, noise_levels,
+                evaluation_setups=evaluation_setups)
+        df_no_adaptation["data"] = "source"
+        df_no_covariance_shift = evaluate_data(
+                df_train_no_covariance_shift, noise_levels,
+                df_test, noise_levels,
+                evaluation_setups=evaluation_setups)
+        df_no_covariance_shift["data"] = "target"
+        df = pd.concat([df_adapted, df_no_adaptation, df_no_covariance_shift])
+
+        # plot it
+        sns.boxplot(data=df, x="noise added [sigma %]", y="Errors", hue="data",
+                    hue_order=["source", "adapted", "target"], fliersize=0)
+        # tidy up plot
+        plt.ylim((0, 40))
+        plt.legend(loc='upper left')
+
+        # finally save the figure
+        plt.savefig(self.output().path, dpi=500)
+
+
 def format_dataframe_for_distribution_plotting(df, weights=None):
     if weights is None:
         weights = np.ones(df.shape[0])
@@ -281,9 +336,11 @@ if __name__ == '__main__':
     w.add(FeatureDistributionPlot(which_source=source_domain,
                                   which_target=target_domain))
     # also plot distributions for equal domains to check for errors in data
-    w.add(FeatureDistributionPlot(which_source="ipcai_revision_colon_train",
-                                  which_target="ipcai_revision_colon_test"))
+    w.add(FeatureDistributionPlot(which_source="ipcai_revision_colon_mean_scattering_train",
+                                  which_target="ipcai_revision_colon_mean_scattering_test"))
     # plot how the generating model data (e.g. sao2 and vhb) is distributed
     w.add(GeneratingDistributionPlot(which_source=source_domain,
                                      which_target=target_domain))
+    w.add(DAvNormalPlot(which_train=source_domain, which_test=target_domain,
+                which_train_no_covariance_shift="ipcai_revision_colon_train"))
     w.run()

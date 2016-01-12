@@ -152,9 +152,14 @@ public:
   void OnNewConnection();
 
   /**
-  \*brief Get the ImageToProbeTransform from the PLU-Toolkit once Calibration with PLUS is done
+  \*brief Get the ImageToProbeTransform from the PLUS-Toolkit once Calibration with fCal is done
   */
-  void OnReceiveImageToProbeTransform();
+  void OnGetImageToProbeTransform();
+
+  /**
+  \*brief Use the ImageToProbeTransform received from PLUS to calculate the Calibration for EchoTrack
+  */
+  void CalculateCalibration(igtl::Matrix4x4& imageToProbe);
 
   void OnStreamingTimerTimeout();
 

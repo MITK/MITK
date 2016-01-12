@@ -144,7 +144,7 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_BtnReset, SIGNAL(clicked()), this, SLOT(OnReset()));                 // Reset Pointsets
 
   // PLUS Calibration
-  connect(m_Controls.m_ReceiveImageToProbeTransform, SIGNAL(clicked()), this, SLOT(OnReceiveImageToProbeTransform()));
+  connect(m_Controls.m_GetImageToProbeTransform, SIGNAL(clicked()), this, SLOT(OnGetImageToProbeTransform()));
   connect(m_Controls.m_StartStreaming, SIGNAL(clicked()), this, SLOT(OnStartStreaming()));
   connect(&m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
   connect(m_Controls.m_StopPlusCalibration, SIGNAL(clicked()), this, SLOT(OnStopPlusCalibration()));
@@ -340,12 +340,6 @@ void UltrasoundCalibration::OnStartCalibrationProcess()
 
 void UltrasoundCalibration::OnStartPlusCalibration()
 {
-  //Switch active tab to PLUS Calibration page
-  m_Controls.m_TabWidget->setTabEnabled(4, true);
-  m_Controls.m_TabWidget->setCurrentIndex(4);
-  m_Controls.m_ReceiveImageToProbeTransform->setEnabled(true);
-  m_Controls.m_StartStreaming->setEnabled(false);
-
   m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
   if (m_CombinedModality.IsNull()) { return; } //something went wrong, there is no combined modality
 
@@ -404,6 +398,12 @@ void UltrasoundCalibration::OnStartPlusCalibration()
   {
     MITK_INFO << "Tracking Server could not open its connection";
   }
+
+  //Switch active tab to PLUS Calibration page
+  m_Controls.m_TabWidget->setTabEnabled(4, true);
+  m_Controls.m_TabWidget->setCurrentIndex(4);
+  m_Controls.m_GetImageToProbeTransform->setEnabled(true);
+  m_Controls.m_StartStreaming->setEnabled(false);
 }
 
 void UltrasoundCalibration::OnStopPlusCalibration()
@@ -429,10 +429,8 @@ void UltrasoundCalibration::OnStopPlusCalibration()
   {
     m_TransformClient->CloseConnection();
   }
-
-  //switch active tab to first page of calibration
   m_Controls.m_TabWidget->setTabEnabled(4, false);
-  m_Controls.m_TabWidget->setCurrentIndex(0);
+  this->OnStopCalibrationProcess();
 }
 
 void UltrasoundCalibration::OnNewConnection()
@@ -455,7 +453,7 @@ void UltrasoundCalibration::OnStartStreaming()
   this->m_StreamingTimer.start((1.0 / 5.0 * 1000.0));
 }
 
-void UltrasoundCalibration::OnReceiveImageToProbeTransform()
+void UltrasoundCalibration::OnGetImageToProbeTransform()
 {
   m_TransformClient = mitk::IGTLClient::New(true);
   m_TransformClient->SetHostname("127.0.0.1");
@@ -470,6 +468,8 @@ void UltrasoundCalibration::OnReceiveImageToProbeTransform()
     {
       MITK_INFO << "communication started";
       mitk::IGTLMessage::Pointer receivedMessage;
+      bool condition = false;
+      igtl::Matrix4x4 transformPLUS;
       while (!(receivedMessage.IsNotNull() && receivedMessage->IsDataValid()))
       {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -483,12 +483,22 @@ void UltrasoundCalibration::OnReceiveImageToProbeTransform()
         }
         else
         {
-          MITK_INFO << "Message: " << msg;
-          igtl::Matrix4x4 transformPLUS;
-          msg->GetMatrix(transformPLUS);
-          MITK_INFO << "Transform: " << transformPLUS;
-          break;
+          if (std::strcmp(msg->GetDeviceName(), "ImageToProbe") != 0)
+          {
+            MITK_INFO << "Was not Image to Probe Transform. Skipping...";
+            continue;
+          }
+          else
+          {
+            msg->GetMatrix(transformPLUS);
+            condition = true;
+            break;
+          }
         }
+      }
+      if (condition)
+      {
+        this->CalculateCalibration(transformPLUS);
       }
     }
     else
@@ -496,6 +506,46 @@ void UltrasoundCalibration::OnReceiveImageToProbeTransform()
       MITK_INFO << " no connection ZONK!!";
     }
   }
+}
+
+void UltrasoundCalibration::CalculateCalibration(igtl::Matrix4x4& imageToProbe)
+{
+  mitk::AffineTransform3D::Pointer imageToTrackerTransform = mitk::AffineTransform3D::New();
+  itk::Matrix<mitk::ScalarType, 3, 3> rotationFloat = itk::Matrix<mitk::ScalarType, 3, 3>();
+  itk::Vector<mitk::ScalarType, 3> translationFloat = itk::Vector<mitk::ScalarType, 3>();
+
+  rotationFloat[0][0] = imageToProbe[0][0];
+  rotationFloat[0][1] = imageToProbe[0][1];
+  rotationFloat[0][2] = imageToProbe[0][2];
+  rotationFloat[1][0] = imageToProbe[1][0];
+  rotationFloat[1][1] = imageToProbe[1][1];
+  rotationFloat[1][2] = imageToProbe[1][2];
+  rotationFloat[2][0] = imageToProbe[2][0];
+  rotationFloat[2][1] = imageToProbe[2][1];
+  rotationFloat[2][2] = imageToProbe[2][2];
+  translationFloat[0] = imageToProbe[0][3];
+  translationFloat[1] = imageToProbe[1][3];
+  translationFloat[2] = imageToProbe[2][3];
+
+  imageToTrackerTransform->SetTranslation(translationFloat);
+  imageToTrackerTransform->SetMatrix(rotationFloat);
+
+  MITK_INFO << "PLUS Transform converted to MITK AffineTransform" << imageToTrackerTransform;
+
+  mitk::NavigationData* probe = m_CombinedModality->GetTrackingDevice()->GetOutput("Probe");
+  if (probe == NULL)
+  {
+    MITK_WARN << "Probe is absent, something went wrong";
+    return;
+  }
+
+  mitk::AffineTransform3D::Pointer probeToTrackerTransform = mitk::AffineTransform3D::New();
+  probeToTrackerTransform = probe->GetAffineTransform3D();
+  MITK_INFO << "ProbeToTracker Transform" << probeToTrackerTransform;
+
+  imageToTrackerTransform->Compose(probeToTrackerTransform);
+
+  MITK_INFO << "Composed Transform: " << imageToTrackerTransform;
 }
 
 void UltrasoundCalibration::OnStopCalibrationProcess()

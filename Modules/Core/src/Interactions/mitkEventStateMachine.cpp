@@ -233,7 +233,7 @@ bool mitk::EventStateMachine::FilterEvents(InteractionEvent* interactionEvent, D
     return false;
   }
   bool visible = false;
-  if (dataNode->GetPropertyList()->GetBoolProperty("visible", visible) == false)
+  if (dataNode->GetBoolProperty("visible", visible, interactionEvent->GetSender()) == false)
   { //property doesn't exist
     return false;
   }

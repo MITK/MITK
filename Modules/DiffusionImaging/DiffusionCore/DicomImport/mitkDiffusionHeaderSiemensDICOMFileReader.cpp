@@ -25,39 +25,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static bool GetTagFromHierarchy( std::vector< gdcm::Tag > hierarchy, const gdcm::Tag& t_tag, const gdcm::DataSet& dataset, gdcm::DataSet& target)
 {
+  if( hierarchy.empty() )
+    return false;
+
   const gdcm::DataElement& de = dataset.GetDataElement( hierarchy.at(0) );
   const auto seq = de.GetValueAsSQ();
 
-  if( seq->FindDataElement( hierarchy.at(1) ) )
+  // last level of hierarchy, retrieve the first apperance
+  if( hierarchy.size() == 1 )
   {
-    for( gdcm::SequenceOfItems::SizeType i=1; i< seq->GetNumberOfItems(); i++ )
+    gdcm::Item& item2 = seq->GetItem(1);
+    gdcm::DataSet& nestedds2 = item2.GetNestedDataSet();
+
+    const gdcm::DataElement& nde2 = nestedds2.GetDataElement( t_tag );
+
+    if( !nde2.IsEmpty() )
     {
-      gdcm::Item& item = seq->GetItem(i);
-      gdcm::DataSet &nestedds = item.GetNestedDataSet();
-
-      const gdcm::DataElement& nde = nestedds.GetDataElement( hierarchy.at(1) );
-      const auto nseq = nde.GetValueAsSQ();
-
-      gdcm::Item& item2 = nseq->GetItem(1);
-      gdcm::DataSet& nestedds2 = item2.GetNestedDataSet();
-
-      const gdcm::DataElement& nde2 = nestedds2.GetDataElement( t_tag );
-
-      if( !nde2.IsEmpty() )
-      {
-        MITK_INFO << "Have some valid element";
-
-        target = nestedds2;
-        return true;
-
-      }
-
-
+      target = nestedds2;
+      return true;
+    }
+    else
+    {
+      return false;
     }
   }
+  else
+  {
+    if( seq->FindDataElement( hierarchy.at(1) ) )
+    {
+      for( gdcm::SequenceOfItems::SizeType i=1; i< seq->GetNumberOfItems(); i++ )
+      {
+        gdcm::Item& item = seq->GetItem(i);
+        gdcm::DataSet &nestedds = item.GetNestedDataSet();
 
-  return false;
+        // recursive call
+        return GetTagFromHierarchy( std::vector< gdcm::Tag >( hierarchy.begin() + 1, hierarchy.end() ), t_tag, nestedds, target);
+      }
+    }
 
+    return false;
+  }
 
 }
 

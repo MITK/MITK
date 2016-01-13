@@ -71,6 +71,10 @@ class MITKSEGMENTATION_EXPORT FeedbackContourTool : public SegTool2D
     void SetFeedbackContourColor( float r, float g, float b );
     void SetFeedbackContourColorDefault();
 
+    void Deactivated() override;
+
+    void Activated() override;
+
     /**
       \brief Projects a contour onto an image point by point. Converts from world to index coordinates.
 

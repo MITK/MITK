@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGizmoInteractor3D.h"
 #include "mitkGizmoMapper2D.h"
 
+// MITK includes
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkRotationOperation.h>
@@ -27,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkOperationEvent.h>
 #include <mitkUndoController.h>
 
+// VTK includes
 #include <vtkVector.h>
 #include <vtkVectorOperators.h>
 #include <vtkMath.h>

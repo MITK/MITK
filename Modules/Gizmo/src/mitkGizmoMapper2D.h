@@ -27,7 +27,16 @@ namespace mitk
 // forward declaration
 class Gizmo;
 
-//! 2D Mapper for mitk::Gimzo
+//! 2D Mapper for mitk::Gimzo.
+//!
+//! Paints a similar representation as for 2D (see mitk::Gizmo itself).
+//! The three axes of the manipulated object are visualized. They are
+//! pickable and will report "move along axis" or "scale" when clicked
+//! at the arrow shafts or the arrow tips.
+//!
+//! For usability, we removed the circles for rotation because they
+//! would most often coincide with the arrows, thus distinction is
+//! complicated.
 class GizmoMapper2D : public mitk::VtkMapper
 {
 public:
@@ -54,6 +63,8 @@ public:
     //! "Resets" the mapper, setting its result to invisible.
     void ResetMapper(mitk::BaseRenderer* renderer) override;
 
+    //! Return the internal vtkPolyData for given renderer.
+    //! This serves for picking by the associated interactor class.
     vtkPolyData* GetVtkPolyData(mitk::BaseRenderer* renderer);
 
 private:
@@ -63,6 +74,9 @@ private:
 
     //! Update the vtkProp, i.e. the contours of a slice through our RawMesh_C.
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+
+    //! Apply visual properties
+    void ApplyProperties(BaseRenderer* renderer);
 
     //! (RenderWindow) Instance specific data.
     class LocalStorage : public Mapper::BaseLocalStorage

@@ -29,11 +29,13 @@ mitk::Mapper::Pointer mitk::GizmoObjectFactory::CreateMapper(mitk::DataNode* nod
 {
   mitk::Mapper::Pointer newMapper = NULL;
 
-  if ( (dynamic_cast<mitk::Gizmo*>(node->GetData()) != NULL) ) {
-      if ( id == mitk::BaseRenderer::Standard2D ) {
-          newMapper = mitk::GizmoMapper2D::New();
-          newMapper->SetDataNode(node);
-      }
+  if ( (dynamic_cast<mitk::Gizmo*>(node->GetData()) != NULL) )
+  {
+    if ( id == mitk::BaseRenderer::Standard2D )
+    {
+      newMapper = mitk::GizmoMapper2D::New();
+      newMapper->SetDataNode(node);
+    }
   }
 
   return newMapper;
@@ -41,6 +43,10 @@ mitk::Mapper::Pointer mitk::GizmoObjectFactory::CreateMapper(mitk::DataNode* nod
 
 void mitk::GizmoObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
+  if ( (dynamic_cast<mitk::Gizmo*>(node->GetData()) != NULL) )
+  {
+    GizmoMapper2D::SetDefaultProperties(node);
+  }
 }
 
 struct RegisterGizmoObjectFactory

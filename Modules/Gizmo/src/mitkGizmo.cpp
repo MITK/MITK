@@ -64,58 +64,6 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   auto gizmoNode = DataNode::New();
   gizmoNode->SetName("Gizmo");
   gizmoNode->SetData(gizmo);
-  gizmoNode->SetProperty("color", ColorProperty::New(0.3,0.3,0.3)); // a little lighter than the
-                                                                    // "plane widgets" of
-                                                                    // QmitkStdMultiWidget
-  gizmoNode->SetProperty("scalar visibility", BoolProperty::New(true));
-  gizmoNode->SetProperty("ScalarsRangeMinimum", DoubleProperty::New(0));
-  gizmoNode->SetProperty("ScalarsRangeMaximum", DoubleProperty::New((int)NoHandle));
-
-  double colorMoveFreely[] = {1,0,0,1}; // RGBA
-  double colorAxisX[] = {0.753,0,0,1}; // colors copied from QmitkStdMultiWidget to
-  double colorAxisY[] = {0,0.69,0,1};  // look alike
-  double colorAxisZ[] = {0,0.502,1,1};
-  double colorInactive[] = {0.7,0.7,0.7,1};
-
-  // build a nice color table
-  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-  lut->SetNumberOfTableValues((int)NoHandle+1);
-  lut->SetTableRange(0,(int)NoHandle);
-  lut->SetTableValue(MoveFreely, colorMoveFreely);
-  lut->SetTableValue(MoveAlongAxisX, colorAxisX);
-  lut->SetTableValue(MoveAlongAxisY, colorAxisY);
-  lut->SetTableValue(MoveAlongAxisZ, colorAxisZ);
-  lut->SetTableValue(RotateAroundAxisX, colorAxisX);
-  lut->SetTableValue(RotateAroundAxisY, colorAxisY);
-  lut->SetTableValue(RotateAroundAxisZ, colorAxisZ);
-  lut->SetTableValue(ScaleX, colorAxisX);
-  lut->SetTableValue(ScaleY, colorAxisY);
-  lut->SetTableValue(ScaleZ, colorAxisZ);
-  lut->SetTableValue(NoHandle, colorInactive);
-
-  mitk::LookupTable::Pointer mlut = mitk::LookupTable::New();
-  mlut->SetVtkLookupTable(lut);
-
-  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
-  lutProp->SetLookupTable(mlut);
-  gizmoNode->SetProperty("LookupTable", lutProp);
-
-  // Hide by default, show in all 3D windows
-  gizmoNode->SetProperty("helper object", BoolProperty::New(true));
-  gizmoNode->SetProperty("visible", BoolProperty::New(true));
-  auto rwList = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
-  for (auto& rw : rwList)
-  {
-    auto renderer = BaseRenderer::GetInstance(rw);
-    if (renderer != nullptr)
-    {
-      if (renderer->GetMapperID() == BaseRenderer::Standard3D)
-      {
-        gizmoNode->SetProperty("visible", BoolProperty::New(true), renderer);
-      }
-    }
-  }
-
   gizmo->FollowGeometry(node->GetData()->GetGeometry());
 
   //--------------------------------------------------------------

@@ -56,6 +56,7 @@ void mitk::GizmoMapper2D::ResetMapper(mitk::BaseRenderer* renderer)
 
 namespace {
 
+//! Helper method: will assign given value to all points in given polydata object.
 void AssignScalarValueTo(vtkPolyData* polydata, char value)
 {
     vtkSmartPointer<vtkCharArray> pointData = vtkSmartPointer<vtkCharArray>::New();
@@ -68,8 +69,10 @@ void AssignScalarValueTo(vtkPolyData* polydata, char value)
 
 }
 
-vtkSmartPointer<vtkPolyData> Create2DDisk(mitk::Vector3D cameraDirection,
-                                          mitk::Vector3D viewRight,
+//! Helper method: will create a vtkPolyData representing a disk
+//! around center, inside the plane defined by viewRight and viewUp,
+//! and with the given radius.
+vtkSmartPointer<vtkPolyData> Create2DDisk(mitk::Vector3D viewRight,
                                           mitk::Vector3D viewUp,
                                           mitk::Point3D center,
                                           double radius)
@@ -101,7 +104,11 @@ vtkSmartPointer<vtkPolyData> Create2DDisk(mitk::Vector3D cameraDirection,
   return disk;
 }
 
-
+//! Helper method: will create a vtkPolyData representing a 2D arrow
+//! that is oriented from arrowStart to arrowTip, orthogonal
+//! to camera direction. The arrow tip will contain scalar values
+//! of vertexValueScale, the arrow shaft will contain scalar values
+//! of vertexValueMove. Those values are used for picking during interaction.
 vtkSmartPointer<vtkPolyData> Create2DArrow(mitk::Vector3D cameraDirection,
                                            mitk::Point3D arrowStart,
                                            mitk::Point3D arrowTip,
@@ -116,9 +123,11 @@ vtkSmartPointer<vtkPolyData> Create2DArrow(mitk::Vector3D cameraDirection,
 
   vtkSmartPointer<vtkPolyData> arrow = vtkSmartPointer<vtkPolyData>::New();
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+  // shaft : points 0, 1
   points->InsertPoint(0, arrowStart.GetDataPointer());
   points->InsertPoint(1, (arrowStart + arrowDirection * (1.0 - triangleFraction)).GetDataPointer());
 
+  // tip : points 2, 3, 4
   points->InsertPoint(2, arrowTip.GetDataPointer());
   points->InsertPoint(3, (arrowStart
                           + (1.0-triangleFraction) * arrowDirection
@@ -128,16 +137,19 @@ vtkSmartPointer<vtkPolyData> Create2DArrow(mitk::Vector3D cameraDirection,
                           - arrowOrthogonal * (0.5 * triangleFraction * arrowDirection.GetNorm())).GetDataPointer());
   arrow->SetPoints(points);
 
+  // define line connection for shaft
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
   vtkIdType shaftLinePoints[] = {0,1};
   lines->InsertNextCell(2, shaftLinePoints);
   arrow->SetLines(lines);
 
+  // define polygon for triangle
   vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
   vtkIdType tipLinePoints[] = {2,3,4};
   polys->InsertNextCell(3, tipLinePoints);
   arrow->SetPolys(polys);
 
+  // assign scalar values
   vtkSmartPointer<vtkCharArray> pointData = vtkSmartPointer<vtkCharArray>::New();
   pointData->SetNumberOfComponents(1);
   pointData->SetNumberOfTuples(5);
@@ -175,17 +187,25 @@ void mitk::GizmoMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 
   ls->m_LastUpdateTime.Modified();
 
+  // some special handling around visibility: let two properties steer
+  // visibility in 2D instead of many renderer specific "visible" properties
+  bool visible2D = true;
+  this->GetDataNode()->GetBoolProperty("show in 2D", visible2D);
+  if ( !visible2D && renderer->GetMapperID() == BaseRenderer::Standard2D )
+  {
+    ls->m_Actor->VisibilityOff();
+    return;
+  }
+  else
+  {
+    ls->m_Actor->VisibilityOn();
+  }
+
   auto camera = renderer->GetVtkRenderer()->GetActiveCamera();
 
   auto plane = renderer->GetCurrentWorldGeometry2D();
 
-  Point3D viewCenter;
-  camera->GetFocalPoint(viewCenter.GetDataPointer());
-
-  Point3D gizmoCenter3D = gizmo->GetCenter();
-  Point3D gizmoCenterView = plane->ProjectPointOntoPlane(gizmoCenter3D);
-
-  double diagonal = std::min( renderer->GetSizeX(), renderer->GetSizeY() );
+  Point3D gizmoCenterView = plane->ProjectPointOntoPlane(gizmo->GetCenter());
 
   Vector3D viewUp;
   camera->GetViewUp(viewUp.GetDataPointer());
@@ -195,13 +215,15 @@ void mitk::GizmoMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 
   auto appender = vtkSmartPointer<vtkAppendPolyData>::New();
 
+  double diagonal = std::min( renderer->GetSizeX(), renderer->GetSizeY() );
   double arrowLength = 0.1 * diagonal; // fixed in relation to window size
-  auto disk = Create2DDisk(cameraDirection, viewRight, viewUp,
+  auto disk = Create2DDisk(viewRight, viewUp,
                            gizmoCenterView - cameraDirection,
                            0.1 * arrowLength);
   AssignScalarValueTo(disk, Gizmo::MoveFreely);
   appender->AddInputData(disk);
 
+  // loop over directions -1 and +1 for arrows
   for (double direction = -1.0; direction < 2.0; direction += 2.0)
   {
     auto axisX = Create2DArrow(cameraDirection, gizmoCenterView,
@@ -233,6 +255,13 @@ void mitk::GizmoMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
   }
 
   ls->m_VtkPolyDataMapper->SetInputConnection( appender->GetOutputPort() );
+
+  ApplyProperties(renderer);
+}
+
+void mitk::GizmoMapper2D::ApplyProperties(BaseRenderer* renderer)
+{
+  LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
 
   float lineWidth = 3.0f;
   ls->m_Actor->GetProperty()->SetLineWidth(lineWidth);
@@ -270,3 +299,46 @@ void mitk::GizmoMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
   }
 }
 
+void mitk::GizmoMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer /*= nullptr*/, bool overwrite /*= false*/)
+{
+  node->SetProperty("color", ColorProperty::New(0.3,0.3,0.3)); // a little lighter than the
+                                                                    // "plane widgets" of
+                                                                    // QmitkStdMultiWidget
+  node->SetProperty("scalar visibility", BoolProperty::New(true));
+  node->SetProperty("ScalarsRangeMinimum", DoubleProperty::New(0));
+  node->SetProperty("ScalarsRangeMaximum", DoubleProperty::New((int)Gizmo::NoHandle));
+
+  double colorMoveFreely[] = {1,0,0,1}; // RGBA
+  double colorAxisX[] = {0.753,0,0,1}; // colors copied from QmitkStdMultiWidget to
+  double colorAxisY[] = {0,0.69,0,1};  // look alike
+  double colorAxisZ[] = {0,0.502,1,1};
+  double colorInactive[] = {0.7,0.7,0.7,1};
+
+  // build a nice color table
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetNumberOfTableValues((int)Gizmo::NoHandle+1);
+  lut->SetTableRange(0,(int)Gizmo::NoHandle);
+  lut->SetTableValue(Gizmo::MoveFreely, colorMoveFreely);
+  lut->SetTableValue(Gizmo::MoveAlongAxisX, colorAxisX);
+  lut->SetTableValue(Gizmo::MoveAlongAxisY, colorAxisY);
+  lut->SetTableValue(Gizmo::MoveAlongAxisZ, colorAxisZ);
+  lut->SetTableValue(Gizmo::RotateAroundAxisX, colorAxisX);
+  lut->SetTableValue(Gizmo::RotateAroundAxisY, colorAxisY);
+  lut->SetTableValue(Gizmo::RotateAroundAxisZ, colorAxisZ);
+  lut->SetTableValue(Gizmo::ScaleX, colorAxisX);
+  lut->SetTableValue(Gizmo::ScaleY, colorAxisY);
+  lut->SetTableValue(Gizmo::ScaleZ, colorAxisZ);
+  lut->SetTableValue(Gizmo::NoHandle, colorInactive);
+
+  mitk::LookupTable::Pointer mlut = mitk::LookupTable::New();
+  mlut->SetVtkLookupTable(lut);
+
+  mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
+  lutProp->SetLookupTable(mlut);
+  node->SetProperty("LookupTable", lutProp);
+
+  node->SetProperty("helper object", BoolProperty::New(true));
+  node->SetProperty("visible", BoolProperty::New(true));
+  node->SetProperty("show in 2D", BoolProperty::New(true));
+  // no "show in 3D" because this would require a specialized mapper for gizmos in 3D
+}

@@ -46,6 +46,11 @@ class InteractionPositionEvent;
 //! - the "gizmo node" represents the manipulated object's primary axes _and_ is
 //!   used to take user input (most importantly: to have a picking target)
 //!
+//! To determine what parts of the object are clicked during interaction,
+//! the mappers (2D: custom mapper, 3D: regular surface mapper) are asked
+//! for their VTK objects, picking is performed, and the picked point is
+//! forwarded to the gizmo object for interpretation.
+//!
 //! The interactor fills the undo/redo stack with operations on the modified geometry.
 //!
 //! \sa Gizmo
@@ -110,7 +115,11 @@ private:
   //! Applies a calculated rotation angle to the manipulated object.
   void ApplyRotationToManipulatedObject(double angle_deg);
 
+  //! Pick a gizmo handle from a 2D event (passing by the 2D mapper)
   Gizmo::HandleType PickFrom2D(const InteractionPositionEvent* positionEvent);
+
+  //! Pick a gizmo handle from a 3D event
+  //! (passing by the general surface mapper and the gizmo object)
   Gizmo::HandleType PickFrom3D(const InteractionPositionEvent* positionEvent);
 
   //! the Gizmo used for visual feedback and picking

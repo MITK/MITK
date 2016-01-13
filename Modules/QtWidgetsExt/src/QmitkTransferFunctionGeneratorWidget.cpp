@@ -101,7 +101,7 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
 
   MITK_INFO << "Saving Transferfunction under path: " << presetFileName.toStdString();
 
-  if ( mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( presetFileName.toStdString().c_str(),  tf ))
+  if ( mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( presetFileName.toLatin1(),  tf ))
   {
     QFontMetrics metrics(m_InfoPreset->font());
     QString text = metrics.elidedText(presetFileName, Qt::ElideMiddle, m_InfoPreset->width());
@@ -121,7 +121,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
 
   MITK_INFO << "Loading Transferfunction from path: " << presetFileName.toStdString();
 
-  mitk::TransferFunction::Pointer tf = mitk::TransferFunctionPropertySerializer::DeserializeTransferFunction(presetFileName.toStdString().c_str());
+  mitk::TransferFunction::Pointer tf = mitk::TransferFunctionPropertySerializer::DeserializeTransferFunction(presetFileName.toLatin1());
 
   if(tf.IsNotNull())
   {

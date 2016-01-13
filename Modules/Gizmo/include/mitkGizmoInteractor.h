@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkGizmoInteractor3D_h
-#define mitkGizmoInteractor3D_h
+#ifndef mitkGizmoInteractor_h
+#define mitkGizmoInteractor_h
 
 #include "mitkGizmo.h"
 

@@ -2,12 +2,12 @@ set(H_FILES
   src/mitkGizmoMapper2D.h
   src/mitkGizmoObjectFactory.h
   include/mitkGizmo.h
-  include/mitkGizmoInteractor3D.h
+  include/mitkGizmoInteractor.h
 )
 
 set(CPP_FILES
   mitkGizmo.cpp
-  mitkGizmoInteractor3D.cpp
+  mitkGizmoInteractor.cpp
   mitkGizmoObjectFactory.cpp
   mitkGizmoMapper2D.cpp
 )

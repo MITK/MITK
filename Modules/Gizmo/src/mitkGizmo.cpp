@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkGizmo.h"
-#include "mitkGizmoInteractor3D.h"
+#include "mitkGizmoInteractor.h"
 
 // MITK includes
 #include <mitkRenderingManager.h>

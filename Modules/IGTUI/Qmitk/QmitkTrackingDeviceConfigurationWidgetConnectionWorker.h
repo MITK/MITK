@@ -35,7 +35,8 @@ class MITKIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidgetConnectionWorker : 
 {
   Q_OBJECT;
 public:
-
+  QmitkTrackingDeviceConfigurationWidgetConnectionWorker(){};
+  ~QmitkTrackingDeviceConfigurationWidgetConnectionWorker(){};
   void SetTrackingDevice(mitk::TrackingDevice::Pointer t);
 
 public slots:

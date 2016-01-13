@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseRenderer.h>
 #include <mitkVtkInterpolationProperty.h>
 #include <mitkLookupTableProperty.h>
+#include <mitkNodePredicateDataType.h>
 
 // VTK includes
 #include <vtkConeSource.h>
@@ -45,8 +46,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MicroServices
 #include <usGetModuleContext.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+bool mitk::Gizmo::HasGizmoAttached(DataNode* node, DataStorage* storage)
+{
+  auto typeCondition = TNodePredicateDataType<Gizmo>::New();
+  auto gizmoChildren = storage->GetDerivations(node, typeCondition);
+  return !gizmoChildren->empty();
+}
+
+bool mitk::Gizmo::RemoveGizmoFromNode(DataNode* node, DataStorage* storage)
+{
+  if (node == nullptr || storage == nullptr)
+  {
+    return false;
+  }
+
+  auto typeCondition = TNodePredicateDataType<Gizmo>::New();
+  auto gizmoChildren = storage->GetDerivations(node, typeCondition);
+
+  for (auto& gizmoChild : *gizmoChildren)
+  {
+    storage->Remove(gizmoChild);
+  }
+  return !gizmoChildren->empty();
+}
 
 mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage* storage)
 {
@@ -79,7 +101,7 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
 
   if (storage)
   {
-    storage->Add(gizmoNode);
+    storage->Add(gizmoNode, node);
   }
 
   return gizmoNode;

@@ -30,9 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleRegistry.h>
 #include <usGetModuleContext.h>
 
-// Gizmo
-#include <mitkGizmo.h>
-
 // Qt
 #include <QMessageBox>
 
@@ -60,10 +57,6 @@ void QmitkGeometryToolsView::CreateQtPartControl( QWidget *parent )
 
   connect( m_Controls.m_OriginPointRadioButton, SIGNAL(clicked(bool)), this, SLOT(OnOriginPointRadioButton(bool)) );
   connect( m_Controls.m_CenterPointRadioButton, SIGNAL(clicked(bool)), this, SLOT(OnCenterPointRadioButton(bool)) );
-
-  connect( m_Controls.m_GizmoButton, SIGNAL(clicked()), this, SLOT(OnGizmoToggle()) );
-
-
 
   m_Controls.m_UsageInfo->hide();
   m_Controls.m_CustomAnchorPoint->hide();
@@ -217,30 +210,5 @@ void QmitkGeometryToolsView::OnAnchorPointChanged(double /*value*/)
       node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Y", m_Controls.m_AnchorPointY->value());
       node->SetFloatProperty("AffineBaseDataInteractor3D.Anchor Point Z", m_Controls.m_AnchorPointZ->value());
     }
-  }
-}
-
-void QmitkGeometryToolsView::OnGizmoToggle()
-{
-  // if active --> deactivate, finished
-  if (m_GizmoNode.IsNotNull())
-  {
-      m_GizmoNode->GetDataInteractor()->SetDataNode(nullptr);
-      GetDataStorage()->Remove(m_GizmoNode);
-      m_GizmoNode = nullptr;
-      return;
-  }
-
-  // if inactive, add interactor
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.size() == 1)
-  {
-    m_GizmoNode = mitk::Gizmo::AddGizmoToNode(nodes.first(), GetDataStorage());
-  }
-  else
-  {
-      QMessageBox::warning((QWidget*)parent(),
-                           "3D Gizmo",
-                           "You need to select exactly one data node to use the 3D gizmo");
   }
 }

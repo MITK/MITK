@@ -142,6 +142,21 @@ public:
   //! \return DataNode::Pointer containing the node used for vizualization of our gizmo
   static DataNode::Pointer AddGizmoToNode(DataNode* node, DataStorage* storage);
 
+  //! Convenience removal of gizmo from given node
+  //! \param node The node being currently manipulated
+  //! \param storage The DataStorage where the gizmo has been added to
+  //!
+  //! \return true if the gizmo has been found and removed successfully
+  //!
+  //! Make sure to pass the same parameters here that you provided to a
+  //! previous call to AddGizmoToNode.
+  //!
+  //! \return DataNode::Pointer containing the node used for vizualization of our gizmo
+  static bool RemoveGizmoFromNode(DataNode* node, DataStorage* storage);
+
+  //! \return whether given node in given storage has a gizmo attached.
+  static bool HasGizmoAttached(mitk::DataNode* node, DataStorage* storage);
+
 protected:
   Gizmo();
   virtual ~Gizmo();
@@ -151,6 +166,7 @@ protected:
 
   //! Creates a vtkPolyData representing the parameters defining the gizmo.
   vtkSmartPointer<vtkPolyData> BuildGizmo();
+
 private:
 
   Point3D m_Center;

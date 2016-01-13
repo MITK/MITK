@@ -6,5 +6,6 @@
         <file>InvertShowSelectedNode_48.png</file>
         <file>ShowDataInfo_48.png</file>
         <file>ShowSelectedNode_48.png</file>
+        <file>ToggleGizmoNode_48.png</file>
     </qresource>
 </RCC>

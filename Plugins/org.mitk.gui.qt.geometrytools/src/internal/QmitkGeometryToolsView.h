@@ -92,10 +92,6 @@ protected slots:
      */
     void OnCenterPointRadioButton(bool);
 
-protected slots:
-
-    void OnGizmoToggle();
-
 protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;
@@ -107,8 +103,6 @@ protected:
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::QmitkGeometryToolsViewControls m_Controls;
-
-    mitk::DataNode::Pointer m_GizmoNode;
 };
 
 #endif // QmitkGeometryToolsView_h

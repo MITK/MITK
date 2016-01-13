@@ -173,6 +173,13 @@ public slots:
   /// Opens the editor with the given id using the current data storage
   void ShowIn(const QString& editorId);
 
+  /// Turn direct manipulation gizmo on/off on selected object
+  void ToggleGizmoOnSelectedNode(bool on);
+
+  /// Invoked when context menu context changes.
+  /// Updated check status of gizmo action
+  void ToggleGizmoOnSelectedNodeChanged();
+
 protected:
 
   ///
@@ -236,6 +243,8 @@ protected:
   QPushButton* m_ColorButton;
   /// TextureInterpolation action
   QAction* m_TextureInterpolation;
+  /// Gizmo toggling action
+  QAction* m_GizmoToggleAction;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
   /// Lookuptable selection action

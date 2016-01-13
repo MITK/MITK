@@ -3,5 +3,5 @@ MITK_CREATE_MODULE( IGTUIConfigurationWidgetRegistry
     PRIVATE src/ConfigurationWidgetRegistry
   DEPENDS PRIVATE MitkIGTUI
   WARNINGS_AS_ERRORS
-  AUTOLOAD_WITH MitkCore
+  AUTOLOAD_WITH MitkIGTUI
 )

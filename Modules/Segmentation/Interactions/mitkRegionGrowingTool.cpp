@@ -42,6 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include "mitkImageAccessByItk.h"
 #include <itkConnectedThresholdImageFilter.h>
+#include <itkNeighborhoodIterator.h>
+#include <itkImageRegionIteratorWithIndex.h>
 #include "mitkITKImageImport.h"
 
 namespace mitk {
@@ -185,20 +187,22 @@ void mitk::RegionGrowingTool::IsInsideSegmentation(itk::Image<TPixel, imageDimen
 }
 
 template<typename TPixel, unsigned int imageDimension>
-void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> seedIndex, ScalarType lowerThreshold, ScalarType upperThreshold)
+void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimension>* inputImage, itk::Index<imageDimension> seedIndex, ScalarType thresholds[2], itk::Image<DefaultSegmentationDataType, imageDimension>* outputImage)
 {
-    MITK_INFO << "Starting region growing at index " << seedIndex << " with lower threshold " << lowerThreshold << " and upper threshold " << upperThreshold;
+    MITK_INFO << "Starting region growing at index " << seedIndex << " with lower threshold " << thresholds[0] << " and upper threshold " << thresholds[1];
+
     typedef itk::Image<TPixel, imageDimension> InputImageType;
-//    typedef typename InputImageType::IndexType IndexType;
-    typedef itk::ConnectedThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
+    typedef itk::Image<DefaultSegmentationDataType, imageDimension> OutputImageType;
+
+    typedef itk::ConnectedThresholdImageFilter<InputImageType, OutputImageType> RegionGrowingFilterType;
     typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
 
     // perform region growing in desired segmented region
-    regionGrower->SetInput(itkImage);
+    regionGrower->SetInput(inputImage);
     regionGrower->AddSeed(seedIndex);
 
-    regionGrower->SetLower(lowerThreshold);
-    regionGrower->SetUpper(upperThreshold);
+    regionGrower->SetLower(thresholds[0]);
+    regionGrower->SetUpper(thresholds[1]);
 
     try
     {
@@ -206,27 +210,70 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
     }
     catch(const itk::ExceptionObject&)
     {
-        return; // can't work
+        return; // this needs more work
     }
     catch( ... )
     {
         return;
     }
 
-    // store result and preview
-    mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput(), m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep()))->Clone();
-    mitk::IOUtil::Save(resultImage, "/home/jenspetersen/Desktop/result.nrrd");
-    //  mitk::LabelSetImage::Pointer resultLabelSetImage = mitk::LabelSetImage::New();
-    //  resultLabelSetImage->InitializeByLabeledImage(resultImage);
-    //  m_ResultNode->SetData(resultLabelSetImage);
-    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
-    contourExtractor->SetInput(resultImage);
-    contourExtractor->Update();
-    ContourModel::Pointer resultContourInIndexCoordinates = contourExtractor->GetOutput();
-    ContourModel::Pointer resultContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice(m_ReferenceSlice->GetGeometry(), resultContourInIndexCoordinates);
-    FeedbackContourTool::SetFeedbackContour(resultContourInWorldCoordinates);
-    FeedbackContourTool::SetFeedbackContourVisible(true);
-    mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
+    OutputImageType* resultImage = regionGrower->GetOutput();
+
+    // smooth result
+    typedef itk::NeighborhoodIterator<OutputImageType> NeighborhoodIteratorType;
+    typedef itk::ImageRegionIterator<OutputImageType> ImageIteratorType;
+
+    typename NeighborhoodIteratorType::RadiusType radius;
+    radius.Fill(2); // for now
+
+    NeighborhoodIteratorType neighborhoodIterator(radius, resultImage, resultImage->GetRequestedRegion());
+    ImageIteratorType imageIterator(resultImage, resultImage->GetRequestedRegion());
+
+    for (neighborhoodIterator.GoToBegin(), imageIterator.Begin(); !neighborhoodIterator.IsAtEnd(); ++neighborhoodIterator, ++imageIterator)
+    {
+        // This might need to be adapted for  multilabel segmentations
+        DefaultSegmentationDataType voteYes(0);
+        DefaultSegmentationDataType voteNo(0);
+
+        for (unsigned int i = 0; i < neighborhoodIterator.Size(); ++i)
+        {
+            if (neighborhoodIterator.GetPixel(i) > 0)
+            {
+                voteYes += 1;
+            }
+            else
+            {
+                voteNo += 1;
+            }
+        }
+
+        if (voteYes > voteNo)
+        {
+            imageIterator.Set(1);
+        }
+        else
+        {
+            imageIterator.Set(0);
+        }
+    }
+
+    outputImage = resultImage->Clone();
+
+//    mitk::Image::Pointer resultImageMitk = mitk::ImportItkImage(resultImage, m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep()))->Clone();
+//    mitk::IOUtil::Save(resultImageMitk, "/home/jenspetersen/Desktop/result.nrrd");
+
+//    //  mitk::LabelSetImage::Pointer resultLabelSetImage = mitk::LabelSetImage::New();
+//    //  resultLabelSetImage->InitializeByLabeledImage(resultImage);
+//    //  m_ResultNode->SetData(resultLabelSetImage);
+
+//    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
+//    contourExtractor->SetInput(resultImageMitk);
+//    contourExtractor->Update();
+//    ContourModel::Pointer resultContourInIndexCoordinates = contourExtractor->GetOutput();
+//    ContourModel::Pointer resultContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice(m_ReferenceSlice->GetGeometry(), resultContourInIndexCoordinates);
+//    FeedbackContourTool::SetFeedbackContour(resultContourInWorldCoordinates);
+//    FeedbackContourTool::SetFeedbackContourVisible(true);
+//    mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
 }
 
 /**
@@ -344,9 +391,14 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
                     m_InitialUpperThreshold = m_SeedValue + currentVisibleWindow / 20.0;
                     m_LowerThreshold = m_InitialLowerThreshold;
                     m_UpperThreshold = m_InitialUpperThreshold;
+                    ScalarType thresholds[2] = {m_LowerThreshold, m_UpperThreshold};
+                    itk::Image<DefaultSegmentationDataType, 2>* result;
 
                     // Perform region growing
-                    AccessFixedDimensionByItk_3(m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, m_LowerThreshold, m_UpperThreshold)
+                    AccessFixedDimensionByItk_3(m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, thresholds, result);
+
+                    mitk::Image::Pointer resultImageMitk = mitk::ImportItkImage(result, m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep()))->Clone();
+                    mitk::IOUtil::Save(resultImageMitk, "/home/jenspetersen/Desktop/result.nrrd");
                 }
 
 

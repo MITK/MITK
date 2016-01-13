@@ -86,6 +86,9 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
     virtual void OnMouseMoved   ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
 
+    /**
+     * \brief Template to calculate average pixel value around index using a ring of thickness neighborhood
+     */
     template <typename TPixel, unsigned int imageDimension>
     void GetPixelNeighborhood(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, ScalarType* result, unsigned int neighborhood=1);
 
@@ -93,7 +96,7 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
     void IsInsideSegmentation(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, bool* result);
 
     template<typename TPixel, unsigned int imageDimension>
-    void StartRegionGrowing(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> seedPoint, ScalarType lowerThreshold, ScalarType upperThreshold);
+    void StartRegionGrowing(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> seedPoint, ScalarType thresholds[2], itk::Image<DefaultSegmentationDataType, imageDimension>* outputImage);
 
     mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep=0);
 

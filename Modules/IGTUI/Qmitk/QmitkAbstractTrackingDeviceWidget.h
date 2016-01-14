@@ -35,15 +35,15 @@ See LICENSE.txt or http://www.mitk.org for details.
  *         Inherited widgets should be registered in the Microservice (TrackingDeviceCollectionWidget),
  *         If done so, they will be included in the QmitkTrackingDeviceConfigurationWidget of the Tracking Toolbox.
  *
- *         Each implementation of this class must have a method to construct a tracking Device (ConstructTrackingDevice).
- *         Please create the UI elements in a function like CreateQtPartControl (e.g. see QmitkVitrualTrackerWidget).
- *         You might want to use own buttons etc., please connect them in a private CreateConnections (e.g. see QmitkVitrualTrackerWidget).
- *         Due to initialization of qt during autoloading of the IGT module, you constructor should be as slim as possible and only contain a call
- *         of the QmitkAbstractTrackingDeviceWidget constructor and simple variable initialization.
- *         For the initialization, you must write an Iniltialize() function, which must include a call of InitializeSuperclassWidget() and should contain
- *         calls of your private CreateConnections / CreateQtPartControl (if you implemented these).
- *         For integration into the TrackingToolbox, a clone function is needed. Here, a new widget should be created, Initialize() needs to be called,
- *         and all settings of your widget should be copied.
+ *         - Each implementation of this class must have a method to construct a tracking Device (ConstructTrackingDevice).
+ *         - Please create the UI elements in a function like CreateQtPartControl (e.g. see QmitkVitrualTrackerWidget).
+ *         - You might want to use own buttons etc., please connect them in a private CreateConnections (e.g. see QmitkVitrualTrackerWidget).
+ *         - Due to initialization of qt during autoloading of the IGT module, you constructor should be as slim as possible and only contain a call
+ *           of the QmitkAbstractTrackingDeviceWidget constructor and simple variable initialization.
+ *         - For the initialization, you must write an Iniltialize() function, which must include a call of InitializeSuperclassWidget() and should contain
+ *           calls of your private CreateConnections / CreateQtPartControl (if you implemented these).
+ *         - For integration into the TrackingToolbox, a clone function is needed. Here, a new widget should be created, Initialize() needs to be called,
+ *           and all settings of your widget should be copied.
  *
  *         You can Load and Store previous settings of your GUI elements (e.g. see QmitkNDIPolarisWidget).
  *         Also, you can add an output textbox to your widget to display information about your device status. It's optional, see e.g. QmitkNDIAuroraWidget.

@@ -152,14 +152,14 @@ public:
   void OnNewConnection();
 
   /**
-  \*brief Get the ImageToProbeTransform from the PLUS-Toolkit once Calibration with fCal is done
+  \*brief Get the Calibration from the PLUS-Toolkit once Calibration with fCal is done
   */
-  void OnGetImageToProbeTransform();
+  void OnGetPlusCalibration();
 
   /**
-  \*brief Use the ImageToProbeTransform received from PLUS to calculate the Calibration for EchoTrack
+  \*brief Convert the recieved igtl::Matrix into an mitk::AffineTransform3D which can be used to calibrate the CombinedModality
   */
-  void CalculateCalibration(igtl::Matrix4x4& imageToProbe);
+  void ProcessPlusCalibration(igtl::Matrix4x4& imageToTracker);
 
   void OnStreamingTimerTimeout();
 

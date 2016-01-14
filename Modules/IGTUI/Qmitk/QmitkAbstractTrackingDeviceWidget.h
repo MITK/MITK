@@ -76,7 +76,7 @@ public:
   */
   virtual void Initialize() = 0;
 
-  const bool IsInitialized() const { return isInitialized; };
+  const bool IsInitialized() const { return isInitialized; }
 
 signals:
   void ConnectionTested(bool connected, QString output);

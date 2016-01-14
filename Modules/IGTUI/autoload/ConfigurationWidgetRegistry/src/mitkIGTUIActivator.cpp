@@ -34,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   IGTUIActivator::IGTUIActivator()
   {
   }
@@ -59,7 +58,6 @@ namespace mitk
   {
     m_DeviceWidgetCollection.UnRegisterMicroservice();
   }
-
 }
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::IGTUIActivator)

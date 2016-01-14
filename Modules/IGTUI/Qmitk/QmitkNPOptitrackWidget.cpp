@@ -30,9 +30,13 @@ QmitkNPOptitrackWidget::QmitkNPOptitrackWidget(QWidget* parent, Qt::WindowFlags 
   : QmitkAbstractTrackingDeviceWidget(parent, f)
 {
   m_Controls = NULL;
+}
+
+void QmitkNPOptitrackWidget::Initialize()
+{
+  InitializeSuperclassWidget();
   CreateQtPartControl(this);
   CreateConnections();
-  m_ErrorMessage = "";
 }
 
 QmitkNPOptitrackWidget::~QmitkNPOptitrackWidget()
@@ -105,9 +109,7 @@ void QmitkNPOptitrackWidget::SetOptitrackCalibrationFileClicked()
 QmitkNPOptitrackWidget* QmitkNPOptitrackWidget::Clone(QWidget* parent) const
 {
   QmitkNPOptitrackWidget* clonedWidget = new QmitkNPOptitrackWidget(parent);
-  clonedWidget->CreateQtPartControl(parent);
-  clonedWidget->CreateConnections();
-
+  clonedWidget->Initialize();
   clonedWidget->m_OptitrackCalibrationFile = this->m_OptitrackCalibrationFile;
   clonedWidget->m_Controls->m_OptitrackCalibrationFile->setText(m_Controls->m_OptitrackCalibrationFile->text());
 

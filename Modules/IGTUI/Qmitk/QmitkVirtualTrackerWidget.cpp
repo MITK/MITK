@@ -28,9 +28,13 @@ QmitkVirtualTrackerWidget::QmitkVirtualTrackerWidget(QWidget* parent, Qt::Window
   : QmitkAbstractTrackingDeviceWidget(parent, f)
 {
   m_Controls = NULL;
+}
+
+void QmitkVirtualTrackerWidget::Initialize()
+{
+  InitializeSuperclassWidget();
   CreateQtPartControl(this);
   CreateConnections();
-  m_ErrorMessage = "";
 }
 
 QmitkVirtualTrackerWidget::~QmitkVirtualTrackerWidget()
@@ -84,8 +88,7 @@ void QmitkVirtualTrackerWidget::EnableGaussianNoise()
 QmitkVirtualTrackerWidget* QmitkVirtualTrackerWidget::Clone(QWidget* parent) const
 {
   QmitkVirtualTrackerWidget* clonedWidget = new QmitkVirtualTrackerWidget(parent);
-  clonedWidget->CreateQtPartControl(parent);
-  clonedWidget->CreateConnections();
+  clonedWidget->Initialize();
 
   clonedWidget->m_Controls->m_EnableGaussianNoise->setEnabled(m_Controls->m_EnableGaussianNoise->isEnabled());
   clonedWidget->m_Controls->m_MeanDistributionParam->setValue(m_Controls->m_MeanDistributionParam->value());

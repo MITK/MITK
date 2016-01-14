@@ -25,7 +25,8 @@ namespace mitk
 
   /** Documentation:
   *   \brief  The load function of this class is executed every time, the module is loaded.
-  *           Attention: no static variables of any class in IGT Module are initialized at this moment!
+  *           Attention: don't do any qt initialization during autoload. keep it as simple as possible! And be careful with static variables,
+  *                      they might not be initialized yet...
   *   \ingroup IGT
   */
   class IGTUIActivator : public us::ModuleActivator

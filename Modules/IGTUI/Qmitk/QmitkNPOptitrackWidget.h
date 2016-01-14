@@ -40,6 +40,8 @@ public:
   QmitkNPOptitrackWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkNPOptitrackWidget();
 
+  virtual void Initialize();
+
 signals:
 
   protected slots :
@@ -47,13 +49,13 @@ signals:
     /* @brief Opens a file dialog. The users sets the calibration file which location is then stored in the member m_OptitrackCalibrationFile.*/
     void SetOptitrackCalibrationFileClicked();
 
-protected:
+private:
 
   /// \brief Creation of the connections
-  virtual void CreateConnections();
+  void CreateConnections();
 
-  virtual void CreateQtPartControl(QWidget *parent);
-
+  void CreateQtPartControl(QWidget *parent);
+protected:
   virtual QmitkNPOptitrackWidget* Clone(QWidget* parent) const;
 
   std::string m_OptitrackCalibrationFile;

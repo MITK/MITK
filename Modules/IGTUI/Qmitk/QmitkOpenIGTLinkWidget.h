@@ -40,19 +40,19 @@ public:
   QmitkOpenIGTLinkWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkOpenIGTLinkWidget();
 
+  virtual void Initialize();
+
 signals:
 
   protected slots :
 
+private:
+  void CreateQtPartControl(QWidget *parent);
 protected:
-
-  virtual void CreateQtPartControl(QWidget *parent);
-
   virtual QmitkOpenIGTLinkWidget* Clone(QWidget* parent) const;
 
   Ui::QmitkOpenIGTLinkWidget* m_Controls;
 public:
   virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();
-
 };
 #endif

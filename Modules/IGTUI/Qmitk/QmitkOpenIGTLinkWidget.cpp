@@ -28,9 +28,12 @@ QmitkOpenIGTLinkWidget::QmitkOpenIGTLinkWidget(QWidget* parent, Qt::WindowFlags 
   : QmitkAbstractTrackingDeviceWidget(parent, f)
 {
   m_Controls = NULL;
+}
+
+void QmitkOpenIGTLinkWidget::Initialize()
+{
+  InitializeSuperclassWidget();
   CreateQtPartControl(this);
-  CreateConnections();
-  m_ErrorMessage = "";
 }
 
 QmitkOpenIGTLinkWidget::~QmitkOpenIGTLinkWidget()
@@ -59,8 +62,7 @@ mitk::TrackingDevice::Pointer QmitkOpenIGTLinkWidget::ConstructTrackingDevice()
 QmitkOpenIGTLinkWidget* QmitkOpenIGTLinkWidget::Clone(QWidget* parent) const
 {
   QmitkOpenIGTLinkWidget* clonedWidget = new QmitkOpenIGTLinkWidget(parent);
-  clonedWidget->CreateQtPartControl(parent);
-  clonedWidget->CreateConnections();
+  clonedWidget->Initialize();
 
   clonedWidget->m_Controls->m_OpenIGTLinkPort->setText(m_Controls->m_OpenIGTLinkPort->text());
   clonedWidget->m_Controls->m_OpenIGTLinkHostname->setText(m_Controls->m_OpenIGTLinkHostname->text());

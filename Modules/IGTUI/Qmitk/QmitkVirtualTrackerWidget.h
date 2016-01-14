@@ -40,19 +40,21 @@ public:
   QmitkVirtualTrackerWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkVirtualTrackerWidget();
 
+  virtual void Initialize();
+
 signals:
 
   protected slots :
     /* @brief Enables or disables the Gaussian Noise for the VirtualTrackingDevice dependent on the State of the according Checkbox */
     void EnableGaussianNoise();
 
-protected:
+private:
 
   /// \brief Creation of the connections
-  virtual void CreateConnections();
+  void CreateConnections();
 
-  virtual void CreateQtPartControl(QWidget *parent);
-
+  void CreateQtPartControl(QWidget *parent);
+protected:
   virtual QmitkVirtualTrackerWidget* Clone(QWidget* parent) const;
 
   Ui::QmitkVirtualTrackerWidget* m_Controls;

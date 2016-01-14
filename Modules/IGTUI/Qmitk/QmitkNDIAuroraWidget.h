@@ -39,13 +39,14 @@ public:
   QmitkNDIAuroraWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkNDIAuroraWidget();
 
-protected:
+  virtual void Initialize();
 
+private:
   /// \brief Creation of the connections
-  virtual void CreateConnections();
+  void CreateConnections();
 
-  virtual void CreateQtPartControl(QWidget *parent);
-
+  void CreateQtPartControl(QWidget *parent);
+protected:
   virtual void ResetOutput();
   virtual void AddOutput(std::string s);
   virtual mitk::TrackingDevice::Pointer ConstructTrackingDevice();

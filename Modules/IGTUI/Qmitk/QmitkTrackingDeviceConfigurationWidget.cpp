@@ -125,7 +125,6 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
 
   m_DeviceToWidgetIndexMap.clear();
 
-
   // get tracking device type service
   us::ModuleContext* context = us::GetModuleContext();
   std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > deviceRefs =
@@ -139,7 +138,6 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
   mitk::TrackingDeviceTypeCollection* deviceTypeCollection =
     context->GetService<mitk::TrackingDeviceTypeCollection>(deviceRefs.front());
 
-
   // get tracking device configuration widget service
   std::vector<us::ServiceReference<mitk::TrackingDeviceWidgetCollection> > widgetRefs =
     context->GetServiceReferences<mitk::TrackingDeviceWidgetCollection>();
@@ -151,7 +149,6 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
 
   mitk::TrackingDeviceWidgetCollection* deviceWidgetCollection =
     context->GetService<mitk::TrackingDeviceWidgetCollection>(widgetRefs.front());
-
 
   for (auto name : deviceTypeCollection->GetTrackingDeviceTypeNames())
   {

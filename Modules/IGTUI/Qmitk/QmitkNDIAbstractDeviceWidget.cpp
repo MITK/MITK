@@ -29,10 +29,12 @@ QmitkNDIAbstractDeviceWidget::QmitkNDIAbstractDeviceWidget(QWidget* parent, Qt::
   //initialize worker thread
   m_ScanPortsWorker = new QmitkTrackingDeviceConfigurationWidgetScanPortsWorker();
   m_ScanPortsWorkerThread = new QThread();
+}
 
-  CreateQtPartControl(this);
+void QmitkNDIAbstractDeviceWidget::InitializeNDIWidget()
+{
+  InitializeSuperclassWidget();
   CreateConnections();
-  m_ErrorMessage = "";
 }
 
 QmitkNDIAbstractDeviceWidget::~QmitkNDIAbstractDeviceWidget()

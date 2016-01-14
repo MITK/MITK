@@ -31,9 +31,13 @@ QmitkNDIPolarisWidget::QmitkNDIPolarisWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkNDIAbstractDeviceWidget(parent, f)
 {
   m_Controls = NULL;
+}
+
+void QmitkNDIPolarisWidget::Initialize()
+{
+  InitializeNDIWidget();
   CreateQtPartControl(this);
   CreateConnections();
-  m_ErrorMessage = "";
 }
 
 QmitkNDIPolarisWidget::~QmitkNDIPolarisWidget()
@@ -66,9 +70,8 @@ void QmitkNDIPolarisWidget::CreateConnections()
     m_Controls->m_comPortLabelPolaris->setText("Port Nr:");
     m_Controls->m_portSpinBoxPolaris->setPrefix("");
 #endif
-
   }
-}
+  }
 
 void QmitkNDIPolarisWidget::ResetOutput()
 {
@@ -187,8 +190,7 @@ void QmitkNDIPolarisWidget::SetPortTypeToGUI(int portType){
 QmitkNDIPolarisWidget* QmitkNDIPolarisWidget::Clone(QWidget* parent) const
 {
   QmitkNDIPolarisWidget* clonedWidget = new QmitkNDIPolarisWidget(parent);
-  clonedWidget->CreateQtPartControl(parent);
-  clonedWidget->CreateConnections();
+  clonedWidget->Initialize();
 
   clonedWidget->SetPortTypeToGUI(m_Controls->portTypePolaris->currentIndex());
   clonedWidget->SetPortValueToGUI(m_Controls->m_portSpinBoxPolaris->value());

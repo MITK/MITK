@@ -39,16 +39,18 @@ public:
   QmitkNDIPolarisWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkNDIPolarisWidget();
 
+  virtual void Initialize();
+
 signals:
 
   protected slots :
 
-protected:
-
+private:
   /// \brief Creation of the connections
-  virtual void CreateConnections();
+  void CreateConnections();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent);
+protected:
 
   /** @return Returns the frame rate set in the m_frameRatePolaris ComboBox
   */

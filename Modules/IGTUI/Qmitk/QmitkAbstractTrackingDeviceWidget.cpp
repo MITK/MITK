@@ -18,11 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkAbstractTrackingDeviceWidget::QmitkAbstractTrackingDeviceWidget(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
+  isInitialized = false;
+}
+
+void QmitkAbstractTrackingDeviceWidget::InitializeSuperclassWidget()
+{
   m_TestConnectionWorkerThread = new QThread();
   m_TestConnectionWorker = new QmitkTrackingDeviceConfigurationWidgetConnectionWorker();
-  CreateQtPartControl(this);
   CreateConnections();
   m_ErrorMessage = "";
+  isInitialized = true;
 }
 
 QmitkAbstractTrackingDeviceWidget::~QmitkAbstractTrackingDeviceWidget(){
@@ -58,8 +63,9 @@ void QmitkAbstractTrackingDeviceWidget::CreateConnections() {
 QmitkAbstractTrackingDeviceWidget* QmitkAbstractTrackingDeviceWidget::CloneForQt(QWidget* parent) const
 {
   QmitkAbstractTrackingDeviceWidget* clonedWidget = this->Clone(parent);
+  if (!clonedWidget->IsInitialized())
+    MITK_ERROR << "Your cloned widget is not initialized!";
   clonedWidget->create();
-  clonedWidget->CreateConnections(); // initialize the Qt stuff of the widget
 
   return clonedWidget;
 }

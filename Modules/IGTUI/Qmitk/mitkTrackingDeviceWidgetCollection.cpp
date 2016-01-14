@@ -80,7 +80,15 @@ QmitkAbstractTrackingDeviceWidget* mitk::TrackingDeviceWidgetCollection::GetTrac
   for (int i = 0; i < m_TrackingDeviceWidgets.size(); i++)
   {
     if (m_TrackingDeviceWidgets.at(i).first == type)
+    {
+      if (!(m_TrackingDeviceWidgets.at(i).second->IsInitialized()))
+      {
+        m_TrackingDeviceWidgets.at(i).second->Initialize();
+        if (!(m_TrackingDeviceWidgets.at(i).second->IsInitialized())) //still not initialized?
+          MITK_ERROR << "Something went wrong with initialization of your tracking device widget!";
+      }
       return (m_TrackingDeviceWidgets.at(i).second->CloneForQt());
+    }
   }
   return nullptr;
 }

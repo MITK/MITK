@@ -41,6 +41,8 @@ public:
   QmitkNDIAbstractDeviceWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkNDIAbstractDeviceWidget();
 
+  virtual void Initialize() = 0;
+
   virtual void AddOutput(std::string s) = 0;
 
 signals:
@@ -56,19 +58,17 @@ signals:
   /** This slot is called when the port scanning is finished. */
   void AutoScanPortsFinished(int Port, QString result, int PortType);
 
-protected:
-
+private:
   /// \brief Creation of the connections
-  virtual void CreateConnections();
-
-  virtual void CreateQtPartControl(QWidget*){};
+  void CreateConnections();
+protected:
+  void InitializeNDIWidget();
 
   QThread* m_ScanPortsWorkerThread;
   QmitkTrackingDeviceConfigurationWidgetScanPortsWorker* m_ScanPortsWorker;
 
   virtual void SetPortValueToGUI(int portValue) = 0;
   virtual void SetPortTypeToGUI(int portType) = 0;
-
 };
 
 #endif

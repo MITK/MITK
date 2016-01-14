@@ -29,9 +29,13 @@ QmitkNDIAuroraWidget::QmitkNDIAuroraWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkNDIAbstractDeviceWidget(parent, f)
 {
   m_Controls = NULL;
+}
+
+void QmitkNDIAuroraWidget::Initialize()
+{
+  InitializeNDIWidget();
   CreateQtPartControl(this);
   CreateConnections();
-  m_ErrorMessage = "";
 }
 
 QmitkNDIAuroraWidget::~QmitkNDIAuroraWidget()
@@ -162,8 +166,7 @@ void QmitkNDIAuroraWidget::SetPortTypeToGUI(int portType){
 QmitkNDIAuroraWidget* QmitkNDIAuroraWidget::Clone(QWidget* parent) const
 {
   QmitkNDIAuroraWidget* clonedWidget = new QmitkNDIAuroraWidget(parent);
-  clonedWidget->CreateQtPartControl(parent);
-  clonedWidget->CreateConnections();
+  clonedWidget->Initialize();
 
   clonedWidget->SetPortTypeToGUI(m_Controls->portTypeAurora->currentIndex());
   clonedWidget->SetPortValueToGUI(m_Controls->m_portSpinBoxAurora->value());

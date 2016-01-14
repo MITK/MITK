@@ -54,20 +54,6 @@ namespace mitk {
     */
     virtual void UnRegisterMicroservice();
 
-    /**
-    *\brief Returns the id that this device is registered with. The id will only be valid, if the
-    * NavigationDataSource has been registered using RegisterAsMicroservice().
-    */
-    std::string GetMicroserviceID();
-
-    /**
-    *\brief These Constants are used in conjunction with Microservices
-    */
-    static const std::string US_INTERFACE_NAME;
-    static const std::string US_PROPKEY_DEVICENAME;
-    static const std::string US_PROPKEY_ID;
-    static const std::string US_PROPKEY_ISACTIVE; //NOT IMPLEMENTED YET!
-
     void RegisterTrackingDeviceWidget(TrackingDeviceType type, QmitkAbstractTrackingDeviceWidget* widget);
 
     QmitkAbstractTrackingDeviceWidget* GetTrackingDeviceWidgetClone(TrackingDeviceType type);

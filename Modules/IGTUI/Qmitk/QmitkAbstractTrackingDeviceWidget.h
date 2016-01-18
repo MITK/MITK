@@ -140,7 +140,7 @@ private:
   /**
   * \warning Don't touch this variable if you don't know what you are doing!
   */
-  bool isInitialized = false;
+  bool isInitialized;
 };
 
 #endif

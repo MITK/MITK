@@ -16,14 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkVirtualTrackingDevice.h>
 #include <mitkInternalTrackingTool.h>
+#include <mitkIOUtil.h>
 
 #include <mitkNavigationData.h>
 #include <mitkTrackingDeviceSource.h>
 #include "mitkNavigationDataDisplacementFilter.h"
 #include <mitkNavigationDataRecorder.h>
 #include <mitkNavigationDataPlayer.h>
-#include <mitkNavigationDataReaderXML.h>
-#include <mitkNavigationDataSetWriterXML.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -141,11 +140,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //if your application crashes during recording no data
   //will be lost it is all stored to disc
 
-  //The writer needs a filename. Otherwise the output
-  //is redirected to the console.
-  mitk::NavigationDataSetWriterXML writer;
-  writer.Write(filename.str(),recorder->GetNavigationDataSet());
-
+  //The IO-System needs a filename. Otherwise the output
+  //is redirected to the console. See MITK-Concepts page for more details on IO in MITK
+  mitk::IOUtil::SaveBaseData(recorder->GetNavigationDataSet(), filename.str());
   //*************************************************************************
   // Part IV: Play the data with the NavigationDataPlayer
   //*************************************************************************
@@ -159,8 +156,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
 
-  mitk::NavigationDataReaderXML::Pointer reader = mitk::NavigationDataReaderXML::New();
-  mitk::NavigationDataSet::Pointer naviDataSet = reader->Read(filename.str());
+  mitk::NavigationDataSet::Pointer naviDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(filename.str()).GetPointer());
   player->SetNavigationDataSet(naviDataSet);
 
   player->StartPlaying(); //this starts the player

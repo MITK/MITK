@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkIGTTimeStamp.h>
 #include <fstream>
-#include "mitkNavigationDataReaderXML.h"
 
 #include "mitkIGTException.h"
 

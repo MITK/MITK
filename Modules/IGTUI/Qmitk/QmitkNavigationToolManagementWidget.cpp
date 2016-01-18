@@ -105,6 +105,8 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
       connect( (QObject*)(m_Controls->m_AddTool), SIGNAL(clicked()), this, SLOT(OnAddTool()) );
       connect( (QObject*)(m_Controls->m_DeleteTool), SIGNAL(clicked()), this, SLOT(OnDeleteTool()) );
       connect( (QObject*)(m_Controls->m_EditTool), SIGNAL(clicked()), this, SLOT(OnEditTool()) );
+      connect( (QObject*)(m_Controls->m_MoveToolUp), SIGNAL(clicked()), this, SLOT(OnMoveToolUp()) );
+      connect( (QObject*)(m_Controls->m_MoveToolDown), SIGNAL(clicked()), this, SLOT(OnMoveToolDown()) );
       connect( (QObject*)(m_Controls->m_LoadStorage), SIGNAL(clicked()), this, SLOT(OnLoadStorage()) );
       connect( (QObject*)(m_Controls->m_SaveStorage), SIGNAL(clicked()), this, SLOT(OnSaveStorage()) );
       connect( (QObject*)(m_Controls->m_LoadTool), SIGNAL(clicked()), this, SLOT(OnLoadTool()) );
@@ -143,6 +145,25 @@ void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorag
 //##################################################################################
 //############################## slots: main widget ################################
 //##################################################################################
+
+void QmitkNavigationToolManagementWidget::OnMoveToolUp()
+{
+    std::string currentIdentifier = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetIdentifier();
+    int NewNumber = m_Controls->m_ToolList->currentIndex().row() - 1;
+    if (NewNumber<0) {MITK_WARN << "Cannot move tool up because it is on the top!";}
+    else {m_NavigationToolStorage->AssignToolNumber(currentIdentifier,NewNumber);}
+    UpdateToolTable();
+}
+
+void QmitkNavigationToolManagementWidget::OnMoveToolDown()
+{
+    std::string currentIdentifier = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetIdentifier();
+    int NewNumber = m_Controls->m_ToolList->currentIndex().row() + 1;
+    if (NewNumber>=m_NavigationToolStorage->GetToolCount()) {MITK_WARN << "Cannot move tool down because it is the last tool in this storage!";}
+    else {m_NavigationToolStorage->AssignToolNumber(currentIdentifier,NewNumber);}
+    UpdateToolTable();
+}
+
 
 void QmitkNavigationToolManagementWidget::OnAddTool()
   {
@@ -305,6 +326,8 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
               currentTool += "(NP Optitrack/"; break;
         case mitk::VirtualTracker:
               currentTool += "(Virtual Tracker/"; break;
+        case mitk::OpenIGTLinkTrackingDeviceConnection:
+              currentTool += "(Open IGT Link/"; break;
         default:
               currentTool += "(unknown tracking system/"; break;
         }

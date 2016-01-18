@@ -16,21 +16,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataSetWriterCSV.h"
 #include <fstream>
+#include <mitkIGTMimeTypes.h>
 
-void mitk::NavigationDataSetWriterCSV::Write (std::string path, mitk::NavigationDataSet::Pointer data)
+mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV() : AbstractFileWriter(NavigationDataSet::GetStaticNameOfClass(),
+  mitk::IGTMimeTypes::NAVIGATIONDATASETCSV_MIMETYPE(),
+  "MITK NavigationDataSet Reader (CSV)")
 {
-  MITK_INFO << "Writing navigation data set to file: " << path;
-  std::ofstream stream;
-  stream.open (path.c_str(), std::ios_base::trunc);
-
-  // Pass to Stream Handler
-  Write(&stream, data);
-  stream.close();
+  RegisterService();
 }
 
-void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::NavigationDataSet::Pointer data)
+mitk::NavigationDataSetWriterCSV::~NavigationDataSetWriterCSV()
+{}
+
+mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV(const mitk::NavigationDataSetWriterCSV& other) : AbstractFileWriter(other)
 {
-  //save old locale
+}
+
+mitk::NavigationDataSetWriterCSV* mitk::NavigationDataSetWriterCSV::Clone() const
+{
+  return new NavigationDataSetWriterCSV(*this);
+}
+
+void mitk::NavigationDataSetWriterCSV::Write()
+{
+  std::ostream* out = GetOutputStream();
+  if (out == nullptr)
+  {
+    out = new std::ofstream(GetOutputLocation().c_str());
+  }
+  mitk::NavigationDataSet::ConstPointer data = dynamic_cast<const NavigationDataSet*> (this->GetInput());
+
+    //save old locale
   char * oldLocale;
   oldLocale = setlocale( LC_ALL, nullptr );
 
@@ -40,7 +56,7 @@ void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::Naviga
 
   //write header
   unsigned int numberOfTools = data->GetNumberOfTools();
-  for (unsigned int index = 0; index < numberOfTools; index++){ *stream << "TimeStamp_Tool" << index <<
+  for (unsigned int index = 0; index < numberOfTools; index++){ *out << "TimeStamp_Tool" << index <<
                                                                            ";Valid_Tool" << index <<
                                                                            ";X_Tool" << index <<
                                                                            ";Y_Tool" << index <<
@@ -49,9 +65,9 @@ void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::Naviga
                                                                            ";QY_Tool" << index <<
                                                                            ";QZ_Tool" << index <<
                                                                            ";QR_Tool" << index << ";";}
-  *stream << "\n";
+  *out << "\n";
 
-  stream->precision(15); // rounding precision because we don't want to loose data.
+  out->precision(15); // rounding precision because we don't want to loose data.
 
   //write data
   MITK_INFO << "Number of timesteps: " << data->Size();
@@ -61,7 +77,7 @@ void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::Naviga
     for (unsigned int toolIndex = 0; toolIndex < numberOfTools; toolIndex++)
     {
       mitk::NavigationData::Pointer nd = NavigationDatasOfCurrentStep.at(toolIndex);
-      *stream          << nd->GetTimeStamp() << ";"
+      *out             << nd->GetTimeStamp() << ";"
                        << nd->IsDataValid() << ";"
                        << nd->GetPosition()[0] << ";"
                        << nd->GetPosition()[1] << ";"
@@ -71,15 +87,11 @@ void mitk::NavigationDataSetWriterCSV::Write (std::ostream* stream, mitk::Naviga
                        << nd->GetOrientation()[2] << ";"
                        << nd->GetOrientation()[3] << ";";
     }
-    *stream << "\n";
+    *out << "\n";
   }
 
+  out->flush();
+  delete out;
   //switch back to old locale
   setlocale( LC_ALL, oldLocale );
 }
-
-mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV()
-{}
-
-mitk::NavigationDataSetWriterCSV::~NavigationDataSetWriterCSV()
-{}

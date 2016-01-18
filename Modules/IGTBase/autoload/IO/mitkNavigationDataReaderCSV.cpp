@@ -14,18 +14,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// MITK
 #include "mitkNavigationDataReaderCSV.h"
+#include <mitkIGTMimeTypes.h>
+
+// STL
 #include <fstream>
 
-mitk::NavigationDataReaderCSV::NavigationDataReaderCSV()
-{
 
+mitk::NavigationDataReaderCSV::NavigationDataReaderCSV() : AbstractFileReader(
+  mitk::IGTMimeTypes::NAVIGATIONDATASETCSV_MIMETYPE(),
+  "MITK NavigationData Reader (CSV)")
+{
+  RegisterService();
+}
+
+mitk::NavigationDataReaderCSV::NavigationDataReaderCSV(const mitk::NavigationDataReaderCSV& other) : AbstractFileReader(other)
+{
 }
 
 mitk::NavigationDataReaderCSV::~NavigationDataReaderCSV()
 {
-
 }
+
+mitk::NavigationDataReaderCSV* mitk::NavigationDataReaderCSV::Clone() const
+{
+  return new NavigationDataReaderCSV(*this);
+}
+
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderCSV::Read()
+{
+  std::vector<std::string> fileContent = GetFileContentLineByLine(GetInputLocation());
+  int NumOfTools = getNumberOfToolsInLine(fileContent[0]);
+
+  mitk::NavigationDataSet::Pointer returnValue = mitk::NavigationDataSet::New(NumOfTools);
+  std::vector<mitk::BaseData::Pointer> result;
+  result.push_back(returnValue.GetPointer());
+
+  // start from line 1 to leave out header
+  for (unsigned int i = 1; i<fileContent.size(); i++)
+  {
+    returnValue->AddNavigationDatas(parseLine(fileContent[i], NumOfTools));
+  }
+
+  return result;
+}
+
 
 int mitk::NavigationDataReaderCSV::getNumberOfToolsInLine(std::string line)
 {
@@ -106,24 +140,6 @@ std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataReaderCSV::parseL
     result.push_back(nd);
   }
   return result;
-}
-
-
-mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderCSV::Read(std::string fileName)
-{
-  std::vector<std::string> fileContent = GetFileContentLineByLine(fileName);
-  int NumOfTools = getNumberOfToolsInLine(fileContent[0]);
-
-  mitk::NavigationDataSet::Pointer returnValue = mitk::NavigationDataSet::New(NumOfTools);
-
-  // start from line 1 to leave out header
-  for (int i = 1; i<fileContent.size(); i++ )
-    {
-      returnValue->AddNavigationDatas( parseLine( fileContent[i], NumOfTools) );
-    }
-
-
-  return returnValue;
 }
 
 

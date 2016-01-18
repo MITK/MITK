@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkStatusBar.h>
-#include <mitkNavigationDataSetWriterXML.h>
+#include <mitkIOUtil.h>
 
 //itk headers
 #include <itksys/SystemTools.hxx>
@@ -166,7 +166,7 @@ void QmitkIGTLoggerWidget::StopRecording()
   try
   {
     // write NavigationDataSet on StopRecording
-    mitk::NavigationDataSetWriterXML().Write(m_CmpFilename.toStdString(), m_Recorder->GetNavigationDataSet());
+    mitk::IOUtil::SaveBaseData(m_Recorder->GetNavigationDataSet(), m_CmpFilename.toStdString());
   }
   catch(const std::exception &e)
   {

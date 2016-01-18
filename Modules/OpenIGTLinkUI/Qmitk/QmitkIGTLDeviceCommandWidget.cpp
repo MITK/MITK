@@ -52,6 +52,11 @@ QmitkIGTLDeviceCommandWidget::QmitkIGTLDeviceCommandWidget(
 
 QmitkIGTLDeviceCommandWidget::~QmitkIGTLDeviceCommandWidget()
 {
+   this->m_IGTLDevice->RemoveObserver(m_MessageReceivedObserverTag);
+   this->m_IGTLDevice->RemoveObserver(m_CommandReceivedObserverTag);
+   this->m_IGTLDevice->RemoveObserver(m_LostConnectionObserverTag);
+   this->m_IGTLDevice->RemoveObserver(m_NewConnectionObserverTag);
+   this->m_IGTLDevice->RemoveObserver(m_StateModifiedObserverTag);
 }
 
 void QmitkIGTLDeviceCommandWidget::CreateQtPartControl(QWidget *parent)
@@ -79,12 +84,16 @@ void QmitkIGTLDeviceCommandWidget::CreateConnections()
              SIGNAL(currentIndexChanged(const QString &)),
              this, SLOT(OnCommandChanged(const QString &)));
   }
+  //this is used for thread seperation, otherwise the worker thread would change the ui elements
+  //which would cause an exception
+  connect(this, SIGNAL(AdaptGUIToStateSignal()), this, SLOT(AdaptGUIToState()));
 }
 
 
 void QmitkIGTLDeviceCommandWidget::OnDeviceStateChanged()
 {
-  this->AdaptGUIToState();
+   //this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceCommandWidget::AdaptGUIToState()
@@ -254,12 +263,14 @@ void QmitkIGTLDeviceCommandWidget::OnLostConnection()
   //get the IGTL device that invoked this event
 //  mitk::IGTLDevice* dev = (mitk::IGTLDevice*)caller;
 
-  this->AdaptGUIToState();
+  //this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceCommandWidget::OnNewConnection()
 {
-  this->AdaptGUIToState();
+   //this->AdaptGUIToState();
+   emit AdaptGUIToStateSignal();
 }
 
 void QmitkIGTLDeviceCommandWidget::FillCommandsComboBox()

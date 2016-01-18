@@ -23,7 +23,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2015.05.0)
+  project(MITK VERSION 2015.05.2)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -1143,10 +1143,13 @@ if(MITK_USE_BLUEBERRY)
   include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
   set(mitk_apps_fullpath )
   foreach(mitk_app ${MITK_APPS})
-    string(FIND ${mitk_app} "MITK_BUILD_APP_" _index)
-    string(SUBSTRING ${mitk_app} ${_index} -1 _var)
-    if(${_var})
-      list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${mitk_app}")
+    # extract option_name
+    string(REPLACE "^^" "\\;" target_info ${mitk_app})
+    set(target_info_list ${target_info})
+    list(GET target_info_list 0 directory_name)
+    list(GET target_info_list 1 option_name)
+    if(${option_name})
+      list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${directory_name}^^${option_name}")
     endif()
   endforeach()
 
@@ -1225,6 +1228,7 @@ if(MITK_APPS)
     set(target_info_list ${target_info})
     list(GET target_info_list 0 target_dir)
     list(GET target_info_list 1 option_name)
+    list(GET target_info_list 2 executable_name)
     # check if the application is enabled
     if(${option_name} OR MITK_BUILD_ALL_APPS)
       # check whether application specific configuration files will be used
@@ -1242,7 +1246,7 @@ if(MITK_APPS)
         endif()
       endif()
     # add link to the list
-    list(APPEND CPACK_CREATE_DESKTOP_LINKS "${target_dir}")
+    list(APPEND CPACK_CREATE_DESKTOP_LINKS "${executable_name}")
     endif()
   endforeach()
 

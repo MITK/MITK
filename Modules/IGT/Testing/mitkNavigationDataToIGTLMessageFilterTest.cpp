@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNavigationDataToIGTLMessageFilter.h"
 #include "mitkNavigationDataSequentialPlayer.h"
-#include "mitkNavigationDataReaderXML.h"
 #include <mitkIGTConfig.h>
 #include <mitkTestingMacros.h>
 #include <igtlPositionMessage.h>

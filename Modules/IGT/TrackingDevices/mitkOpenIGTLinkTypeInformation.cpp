@@ -26,7 +26,8 @@ namespace mitk
   }
 
   TrackingDeviceData OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection(){
-    return{ OpenIGTLinkTypeInformation::GetTrackingDeviceName(), "OpenIGTLink Tracking Device", "cube", "X" };
+    TrackingDeviceData data = { OpenIGTLinkTypeInformation::GetTrackingDeviceName(), "OpenIGTLink Tracking Device", "cube", "X" };
+    return data;
   }
 
   OpenIGTLinkTypeInformation::OpenIGTLinkTypeInformation()

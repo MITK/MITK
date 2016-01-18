@@ -27,7 +27,8 @@ namespace mitk
 
   TrackingDeviceData NPOptitrackTrackingTypeInformation::GetDeviceDataNPOptitrack()
   {
-    return{ NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), "Optitrack", "cube", "X" };
+    TrackingDeviceData data = { NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), "Optitrack", "cube", "X" };
+    return data;
   }
 
   NPOptitrackTrackingTypeInformation::NPOptitrackTrackingTypeInformation()

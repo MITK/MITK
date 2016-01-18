@@ -28,22 +28,26 @@ namespace mitk
 
   TrackingDeviceData NDIAuroraTypeInformation::GetDeviceDataAuroraCompact()
   {
-    return{ NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Compact", "NDIAuroraCompactFG_Dome.stl", "A" };
+    TrackingDeviceData data = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Compact", "NDIAuroraCompactFG_Dome.stl", "A" };
+    return data;
   }
 
   TrackingDeviceData NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarCube()
   {
-    return{ NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Cube)", "NDIAurora.stl", "9" };
+    TrackingDeviceData data = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Cube)", "NDIAurora.stl", "9" };
+    return data;
   }
 
   TrackingDeviceData NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarDome()
   {
-    return{ NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Dome)", "NDIAuroraPlanarFG_Dome.stl", "A" };
+    TrackingDeviceData data = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Planar (Dome)", "NDIAuroraPlanarFG_Dome.stl", "A" };
+    return data;
   }
 
   TrackingDeviceData NDIAuroraTypeInformation::GetDeviceDataAuroraTabletop()
   {
-    return{ NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl", "A" };
+    TrackingDeviceData data = { NDIAuroraTypeInformation::GetTrackingDeviceName(), "Aurora Tabletop", "NDIAuroraTabletopFG_Dome.stl", "A" };
+    return data;
   }
 
   NDIAuroraTypeInformation::NDIAuroraTypeInformation()

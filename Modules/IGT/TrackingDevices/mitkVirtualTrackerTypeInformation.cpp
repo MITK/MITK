@@ -27,7 +27,8 @@ namespace mitk
 
   TrackingDeviceData VirtualTrackerTypeInformation::GetDeviceDataVirtualTracker()
   {
-    return{ VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Virtual Tracker", "cube", "X" };
+    TrackingDeviceData data = { VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Virtual Tracker", "cube", "X" };
+    return data;
   }
 
   VirtualTrackerTypeInformation::VirtualTrackerTypeInformation()

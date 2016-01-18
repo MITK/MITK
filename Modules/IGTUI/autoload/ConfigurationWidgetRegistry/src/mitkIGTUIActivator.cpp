@@ -56,7 +56,14 @@ namespace mitk
 
   void IGTUIActivator::Unload(us::ModuleContext*)
   {
-    m_DeviceWidgetCollection.UnRegisterMicroservice();
+    try
+    {
+      m_DeviceWidgetCollection.UnRegisterMicroservice();
+    }
+    catch (std::exception& e)
+    {
+      MITK_WARN << "Unable to unregister IGTUI DeviceWidgetCollection Microservice: " << e.what();
+    }
   }
 }
 

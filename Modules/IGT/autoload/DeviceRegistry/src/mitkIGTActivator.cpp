@@ -48,7 +48,14 @@ namespace mitk
 
   void IGTActivator::Unload(us::ModuleContext*)
   {
-    m_DeviceTypeCollection.UnRegisterMicroservice();
+    try
+    {
+      m_DeviceTypeCollection.UnRegisterMicroservice();
+    }
+    catch (std::exception& e)
+    {
+      MITK_WARN << "Unable to unregister IGT DeviceTypeCollection Microservice: "<<e.what();
+    }
   }
 
 }

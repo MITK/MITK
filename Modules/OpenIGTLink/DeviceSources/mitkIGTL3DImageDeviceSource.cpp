@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkIGTL2DImageDeviceSource.h"
+#include "mitkIGTL3DImageDeviceSource.h"
 
 #include "mitkIGTLMessage.h"
 
@@ -27,17 +27,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 //itk
 #include <itkCommand.h>
 
-mitk::IGTL2DImageDeviceSource::IGTL2DImageDeviceSource()
+mitk::IGTL3DImageDeviceSource::IGTL3DImageDeviceSource()
   : mitk::IGTLDeviceSource()
 {
   this->SetName("IGTLDeviceSource (2D Images)");
 }
 
-mitk::IGTL2DImageDeviceSource::~IGTL2DImageDeviceSource()
+mitk::IGTL3DImageDeviceSource::~IGTL3DImageDeviceSource()
 {
 }
 
-void mitk::IGTL2DImageDeviceSource::GenerateData()
+void mitk::IGTL3DImageDeviceSource::GenerateData()
 {
   if (m_IGTLDevice.IsNull())
     return;
@@ -45,12 +45,10 @@ void mitk::IGTL2DImageDeviceSource::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextImage2dMessage();
+  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextImage3dMessage();
   if (msgIn.IsNotNull())
   {
     assert(msgIn);
-
-    MITK_INFO << "Received valid image";
 
     msgOut->SetMessage(msgIn);
     msgOut->SetName(msgIn->GetDeviceName());

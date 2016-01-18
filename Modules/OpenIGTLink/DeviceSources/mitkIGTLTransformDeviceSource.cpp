@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkIGTL2DImageDeviceSource.h"
+#include "mitkIGTLTransformDeviceSource.h"
 
 #include "mitkIGTLMessage.h"
 
@@ -27,17 +27,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 //itk
 #include <itkCommand.h>
 
-mitk::IGTL2DImageDeviceSource::IGTL2DImageDeviceSource()
+mitk::IGTLTransformDeviceSource::IGTLTransformDeviceSource()
   : mitk::IGTLDeviceSource()
 {
-  this->SetName("IGTLDeviceSource (2D Images)");
+  this->SetName("IGTLDeviceSource (Transforms)");
 }
 
-mitk::IGTL2DImageDeviceSource::~IGTL2DImageDeviceSource()
+mitk::IGTLTransformDeviceSource::~IGTLTransformDeviceSource()
 {
 }
 
-void mitk::IGTL2DImageDeviceSource::GenerateData()
+void mitk::IGTLTransformDeviceSource::GenerateData()
 {
   if (m_IGTLDevice.IsNull())
     return;
@@ -45,7 +45,7 @@ void mitk::IGTL2DImageDeviceSource::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextImage2dMessage();
+  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextTransformMessage();
   if (msgIn.IsNotNull())
   {
     assert(msgIn);

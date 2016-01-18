@@ -32,6 +32,10 @@ mitk::USIGTLDevice::USIGTLDevice(std::string manufacturer, std::string model,
   m_Device->SetHostname(m_Host);
   m_Device->SetName(manufacturer + " - " + model);
 
+  m_TransformDeviceSource = mitk::IGTLTransformDeviceSource::New();
+  m_TransformDeviceSource->SetIGTLDevice(m_Device);
+  m_TransformDeviceSource->RegisterAsMicroservice();
+
   m_DeviceSource = mitk::IGTL2DImageDeviceSource::New();
   m_DeviceSource->SetIGTLDevice(m_Device);
   m_DeviceSource->RegisterAsMicroservice();

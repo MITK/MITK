@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef IGTL2DIMAGEDEVICESOURCE_H_HEADER_INCLUDED_
-#define IGTL2DIMAGEDEVICESOURCE_H_HEADER_INCLUDED_
+#ifndef IGTL3DIMAGEDEVICESOURCE_H_HEADER_INCLUDED_
+#define IGTL3DIMAGEDEVICESOURCE_H_HEADER_INCLUDED_
 
 #include "mitkIGTLDeviceSource.h"
 
@@ -30,16 +30,16 @@ namespace mitk {
   * one single output.
   *
   */
-  class MITKOPENIGTLINK_EXPORT IGTL2DImageDeviceSource : public IGTLDeviceSource
+  class MITKOPENIGTLINK_EXPORT IGTL3DImageDeviceSource : public IGTLDeviceSource
   {
   public:
-    mitkClassMacro(IGTL2DImageDeviceSource, IGTLDeviceSource);
+    mitkClassMacro(IGTL3DImageDeviceSource, IGTLDeviceSource);
     itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
   protected:
-    IGTL2DImageDeviceSource();
-    virtual ~IGTL2DImageDeviceSource();
+    IGTL3DImageDeviceSource();
+    virtual ~IGTL3DImageDeviceSource();
 
     /**
     * \brief filter execute method

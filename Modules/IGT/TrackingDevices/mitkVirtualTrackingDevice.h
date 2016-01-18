@@ -105,7 +105,7 @@ namespace mitk
     * The tool will have a random path on which it will move around. The path is created with a
     * spline function and random control points inside the tracking volume.
     *
-    * \param tool  The tool which will be added.
+    * \param toolName  The tool which will be added.
     * \return Returns true if the tool has been added, false otherwise.
     */
     TrackingTool* AddTool(const char* toolName);

@@ -23,6 +23,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
+
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
+#include "mitkTrackingDeviceTypeCollection.h"
+#include "mitkUnspecifiedTrackingTypeInformation.h"
+
+//All Tracking devices, which should be avaiable by default
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
+#include "mitkVirtualTrackerTypeInformation.h"
+#include "mitkMicronTrackerTypeInformation.h"
+#include "mitkNPOptitrackTrackingTypeInformation.h"
+#include "mitkOpenIGTLinkTypeInformation.h"
 /**
 * Create new class and derive it from TrackingDevice
 */
@@ -50,6 +67,14 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("TrackingDevice");
 
+  mitk::TrackingDeviceTypeCollection deviceTypeCollection;
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIAuroraTypeInformation());
+  deviceTypeCollection.RegisterAsMicroservice();
+
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::VirtualTrackerTypeInformation());
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIPolarisTypeInformation());
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::MicronTrackerTypeInformation());
+
   // Test instantiation of TrackingDevice
   TrackingDeviceTestClass::Pointer trackingDeviceTestClass = TrackingDeviceTestClass::New();
   MITK_TEST_CONDITION(trackingDeviceTestClass.IsNotNull(),"Test instatiation");
@@ -58,24 +83,34 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetState()==mitk::TrackingDevice::Setup,"Mode should be initialized to SETUP");
 
   // Test method SetType()
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TrackingSystemNotSpecified,"Type should be initialized to 'not specified'");
-  trackingDeviceTestClass->SetType( mitk::NDIAurora );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::NDIAurora,"Type should be NDIAurora, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::NDIPolaris );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::NDIPolaris,"Type should be NDIPolaris, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::ClaronMicron );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::ClaronMicron,"Type should be ClaronMicron, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::AscensionMicroBird );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::AscensionMicroBird,"Type should be AscensionMicroBird, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::VirtualTracker);
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::VirtualTracker,"Type should be VirtualTracker, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::IntuitiveDaVinci );
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::IntuitiveDaVinci,"Type should be IntuitiveDaVinci, as it has just been set");
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(),"Type should be initialized to 'not specified'");
+  trackingDeviceTestClass->SetType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), "Type should be NDIAurora, as it has just been set");
+  trackingDeviceTestClass->SetType(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName());
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType() == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName(), "Type should be NDIPolaris, as it has just been set");
+  trackingDeviceTestClass->SetType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType() == mitk::MicronTrackerTypeInformation::GetTrackingDeviceName(), "Type should be ClaronMicron, as it has just been set");
+  trackingDeviceTestClass->SetType(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName());
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetType() == mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Type should be VirtualTracker, as it has just been set");
 
   // Test method StopTracking()
   trackingDeviceTestClass->StartTracking();
   trackingDeviceTestClass->StopTracking();
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetState()== mitk::TrackingDevice::Ready,"Type should be NDIAurora, as it has just been set");
+
+  MITK_TEST_CONDITION(deviceTypeCollection.GetTrackingDeviceTypeInformation(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName())->GetTrackingDeviceName()
+    == mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Test GetTrackingDeviceTypeInformation");
+
+  MITK_TEST_CONDITION(deviceTypeCollection.GetTrackingDeviceTypeInformation(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName())->m_TrackingDeviceData[0].Model
+    == "Virtual Tracker", "Test GetTrackingDeviceTypeInformation");
+
+  std::vector<std::string> names = deviceTypeCollection.GetTrackingDeviceTypeNames();
+  MITK_TEST_CONDITION(names[0] == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), "Test collection name list");
+  MITK_TEST_CONDITION(names[1] == mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), "Test collection name list");
+  MITK_TEST_CONDITION(names[2] == mitk::NDIPolarisTypeInformation::GetTrackingDeviceName(), "Test collection name list");
+  MITK_TEST_CONDITION(names[3] == mitk::MicronTrackerTypeInformation::GetTrackingDeviceName(), "Test collection name list");
+
+
 
   MITK_TEST_END();
 }

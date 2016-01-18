@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <iostream>
 #include <itkMutexLockHolder.h>
+#include <mitkMicronTrackerTypeInformation.h>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -29,7 +30,7 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 mitk::ClaronTrackingDevice::ClaronTrackingDevice(): mitk::TrackingDevice()
 {
   //set the type of this tracking device
-  this->m_Data = mitk::DeviceDataMicronTrackerH40;
+  this->m_Data = mitk::MicronTrackerTypeInformation::GetDeviceDataMicronTrackerH40();
 
   this->m_MultiThreader = itk::MultiThreader::New();
   m_ThreadID = 0;

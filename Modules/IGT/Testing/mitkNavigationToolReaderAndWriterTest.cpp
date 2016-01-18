@@ -34,6 +34,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <sstream>
 #include <fstream>
 
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkMicronTrackerTypeInformation.h"
+
 mitk::Surface::Pointer m_testSurface;
 
 static void TestInstantiation()
@@ -64,7 +67,7 @@ static void TestWrite()
   myNavigationTool->SetDataNode(myNode);
   myNavigationTool->SetIdentifier("ClaronTool#1");
   myNavigationTool->SetSerialNumber("0815");
-  myNavigationTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  myNavigationTool->SetTrackingDeviceType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
   myNavigationTool->SetType(mitk::NavigationTool::Fiducial);
 
   //now create a writer and write it to the harddisc
@@ -88,7 +91,7 @@ static void TestRead()
 
   MITK_TEST_CONDITION_REQUIRED(readTool->GetType()==mitk::NavigationTool::Fiducial,"Testing Tool Type");
 
-  MITK_TEST_CONDITION_REQUIRED(readTool->GetTrackingDeviceType()==mitk::ClaronMicron,"Testing Tracking Device Type");
+  MITK_TEST_CONDITION_REQUIRED(readTool->GetTrackingDeviceType() == mitk::MicronTrackerTypeInformation::GetTrackingDeviceName(), "Testing Tracking Device Type");
 
   MITK_TEST_CONDITION_REQUIRED(readTool->GetSerialNumber()=="0815","Testing Serial Number");
 
@@ -114,7 +117,7 @@ static void TestWrite2()
   myNavigationTool->SetDataNode(myNode);
   myNavigationTool->SetIdentifier("AuroraTool#1");
   myNavigationTool->SetSerialNumber("0816");
-  myNavigationTool->SetTrackingDeviceType(mitk::NDIAurora);
+  myNavigationTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
   myNavigationTool->SetType(mitk::NavigationTool::Instrument);
 
   //now create a writer and write it to the harddisc
@@ -139,7 +142,7 @@ static void TestRead2()
   //Test if the tool type is the same
   MITK_TEST_CONDITION_REQUIRED(readTool->GetType()==mitk::NavigationTool::Instrument,"Testing Tool Type");
 
-  MITK_TEST_CONDITION_REQUIRED(readTool->GetTrackingDeviceType()==mitk::NDIAurora,"Testing Tracking Device Type");
+  MITK_TEST_CONDITION_REQUIRED(readTool->GetTrackingDeviceType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName(), "Testing Tracking Device Type");
 
   MITK_TEST_CONDITION_REQUIRED(readTool->GetSerialNumber()=="0816","Testing Serial Number");
 
@@ -177,7 +180,7 @@ static void TestWriteInvalidFilename()
   myNavigationTool->SetDataNode(myNode);
   myNavigationTool->SetIdentifier("AuroraTool#1");
   myNavigationTool->SetSerialNumber("0816");
-  myNavigationTool->SetTrackingDeviceType(mitk::NDIAurora);
+  myNavigationTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
   myNavigationTool->SetType(mitk::NavigationTool::Instrument);
 
   //now create a writer and write it to the harddisc

@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKPLUGINACTIVATOR_H
-#define MITKPLUGINACTIVATOR_H
+#ifndef MITKPLUGINACTIVATORIGT_H
+#define MITKPLUGINACTIVATORIGT_H
 
 #include <ctkPluginActivator.h>
 
@@ -36,8 +36,14 @@ public:
   void start(ctkPluginContext* context) override;
   void stop(ctkPluginContext* context) override;
 
+  static ctkPluginContext* GetContext();
+
+private:
+  static ctkPluginContext* m_Context;
+
+
 }; // PluginActivator
 
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif // MITKPLUGINACTIVATORIGT_H

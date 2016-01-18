@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QTimer>
 #include <QMessageBox>
 
+#include "mitkNDIPolarisTypeInformation.h"
+
 
 const std::string QmitkIGTTutorialView::VIEW_ID = "org.mitk.views.igttutorial";
 
@@ -89,7 +91,7 @@ void QmitkIGTTutorialView::OnStartIGT()
       mitk::NDITrackingDevice::Pointer tracker = mitk::NDITrackingDevice::New();  //instantiate
       tracker->SetPortNumber(mitk::SerialCommunication::COM4); //set the comport
       tracker->SetBaudRate(mitk::SerialCommunication::BaudRate115200); //set the baud rate
-      tracker->SetType(mitk::NDIPolaris); //set the type there you can choose between Polaris and Aurora
+      tracker->SetType(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName()); //set the type there you can choose between Polaris and Aurora
 
       //The tools represent the sensors of the tracking device. In this case we have one pointer tool.
       //The TrackingDevice object it self fills the tool with data. So we have to add the tool to the

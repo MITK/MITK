@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_oigtlPlugin org.mitk.oigtlPlugin
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup org_mitk_oigtlPlugin_internal Internal
+  \ingroup org_mitk_oigtlPlugin
+
+  \brief This subcategory includes the internal classes of the org.mitk.oigtlPlugin plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

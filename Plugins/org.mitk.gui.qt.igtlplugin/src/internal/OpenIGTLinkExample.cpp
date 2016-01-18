@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -41,7 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 //igtl
 #include "igtlStringMessage.h"
 #include "igtlTrackingDataMessage.h"
-
 
 const std::string OpenIGTLinkExample::VIEW_ID = "org.mitk.views.OpenIGTLinkExample";
 
@@ -87,7 +85,6 @@ void OpenIGTLinkExample::CreateQtPartControl( QWidget *parent )
 
 void OpenIGTLinkExample::CreatePipeline()
 {
-
   //create a filter that converts OpenIGTLinkExample messages into navigation data
   m_IGTLMsgToNavDataFilter = mitk::IGTLMessageToNavigationDataFilter::New();
 
@@ -122,8 +119,6 @@ void OpenIGTLinkExample::CreatePipeline()
      mySphere->SetVtkPolyData(vtkData->GetOutput());
      vtkData->Delete();
      newNode->SetData(mySphere);
-
-     this->GetDataStorage()->Add(newNode);
 
      m_VisFilter->SetRepresentationObject(i, mySphere);
 

@@ -65,12 +65,15 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="hostnameTextEdit">
+        <widget class="QLineEdit" name="textEditHostname">
          <property name="minimumSize">
           <size>
            <width>0</width>
            <height>0</height>
           </size>
+         </property>
+         <property name="text">
+          <string>localhost</string>
          </property>
         </widget>
        </item>
@@ -86,7 +89,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="portSpinBox">
+        <widget class="QSpinBox" name="spinBoxPort">
          <property name="minimum">
           <number>1</number>
          </property>
@@ -101,14 +104,14 @@
       </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="connectButton">
+      <widget class="QPushButton" name="buttonConnect">
        <property name="text">
         <string>Connect To Server</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="receiveButton">
+      <widget class="QPushButton" name="buttonReceive">
        <property name="text">
         <string>Start Receiving</string>
        </property>

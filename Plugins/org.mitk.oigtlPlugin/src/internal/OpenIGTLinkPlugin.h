@@ -23,11 +23,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_OpenIGTLinkPluginControls.h"
 
+#include "qtimer.h"
+
 //OIGTL
 #include "mitkIGTLClient.h"
 #include "mitkIGTL2DImageDeviceSource.h"
 #include "mitkIGTL3DImageDeviceSource.h"
 #include "mitkIGTLTransformDeviceSource.h"
+
+//mitk
+#include "mitkNavigationDataObjectVisualizationFilter.h"
+#include "mitkIGTLMessageToNavigationDataFilter.h"
+#include "mitkIGTLMessageToUSImageFilter.h"
+#include <mitkSurface.h>
+#include <mitkDataNode.h>
+
+//vtk
+#include <vtkSphereSource.h>
 
 /**
   \brief OpenIGTLinkPlugin
@@ -53,6 +65,8 @@ public:
 
   void ReceivingButtonClicked();
 
+  void UpdatePipeline();
+
 protected:
 
   enum State{
@@ -74,6 +88,21 @@ protected:
   mitk::IGTLTransformDeviceSource::Pointer m_IGTLTransformDeviceSource;
 
   mitk::IGTLClient::Pointer m_IGTLClient;
+
+  QTimer m_Timer;
+
+  mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMessageToNavigationDataFilter;
+  mitk::NavigationDataObjectVisualizationFilter::Pointer m_NavigationDataObjectVisualizationFilter;
+  mitk::IGTLMessageToUSImageFilter::Pointer m_ImageFilter3D;
+  mitk::IGTLMessageToUSImageFilter::Pointer m_ImageFilter2D;
+
+  mitk::DataNode::Pointer m_Image2dNode;
+
+private:
+
+  void StateChanged(State newState);
+
+  State m_State;
 };
 
 #endif // OpenIGTLinkPlugin_h

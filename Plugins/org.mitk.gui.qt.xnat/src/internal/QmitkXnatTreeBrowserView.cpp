@@ -68,13 +68,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Poco
 #include <Poco/Zip/Decompress.h>
 
-const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
+const QString QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
 m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
 m_TreeModel(new QmitkXnatTreeModel()),
 m_Tracker(0),
-m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", ""))
+m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Download Path", ""))
 {
   m_DataStorageServiceTracker.open();
 
@@ -290,9 +290,10 @@ void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
 
 void QmitkXnatTreeBrowserView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  QDir downloadPath (prefs->Get("Download Path", ""));
-  if (downloadPath.exists())
-    m_DownloadPath = downloadPath.absolutePath();
+  QString downloadPath = prefs->Get("Download Path", "");
+  QDir downloadDir (downloadPath);
+  if (downloadPath.length() != 0 && downloadDir.exists())
+    m_DownloadPath = downloadPath;
 }
 
 void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bool loadData)
@@ -306,7 +307,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
     // The path to the downloaded file
     QString filePath;
     QDir downloadPath (m_DownloadPath);
-    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Server Address", "");
+    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Server Address", "");
     bool isDICOM (false);
 
     // If a scan was selected, downloading the contained DICOM folder as ZIP
@@ -571,7 +572,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCopyXNATUrlToClipboard()
   ctkXnatObject* currentXnatObject = m_TreeModel->xnatObject(index);
   if (currentXnatObject != nullptr)
   {
-    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Server Address", "");
+    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Server Address", "");
     serverURL.append(currentXnatObject->resourceUri());
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(serverURL);

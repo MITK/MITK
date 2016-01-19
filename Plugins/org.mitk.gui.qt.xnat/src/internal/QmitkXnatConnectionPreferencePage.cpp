@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkXnatConnectionPreferencePage.h"
+#include "QmitkXnatTreeBrowserView.h"
 
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 
@@ -50,7 +51,7 @@ void QmitkXnatConnectionPreferencePage::Init(berry::IWorkbench::Pointer)
 void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
 {
   IPreferencesService* prefService = Platform::GetPreferencesService();
-  berry::IPreferences::Pointer _XnatConnectionPreferencesNode = prefService->GetSystemPreferences()->Node("/XnatConnection");
+  berry::IPreferences::Pointer _XnatConnectionPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkXnatTreeBrowserView::VIEW_ID);
   m_XnatConnectionPreferencesNode = _XnatConnectionPreferencesNode;
 
   m_Controls.setupUi(parent);
@@ -251,7 +252,10 @@ void QmitkXnatConnectionPreferencePage::onUseNetworkProxy(bool status)
 
 void QmitkXnatConnectionPreferencePage::OnDownloadPathButtonClicked()
 {
-  m_Controls.inXnatDownloadPath->setText(QFileDialog::getExistingDirectory());
+  QString dir = QFileDialog::getExistingDirectory();
+  if (!dir.endsWith("/") || !dir.endsWith("\\"))
+    dir.append("/");
+  m_Controls.inXnatDownloadPath->setText(dir);
 }
 
 void QmitkXnatConnectionPreferencePage::ToggleConnection()

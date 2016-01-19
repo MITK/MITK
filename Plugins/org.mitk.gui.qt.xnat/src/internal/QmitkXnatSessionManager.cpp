@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkXnatSessionManager.h"
+#include "QmitkXnatTreeBrowserView.h"
 
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 
@@ -60,7 +61,7 @@ void QmitkXnatSessionManager::OpenXnatSession()
 void QmitkXnatSessionManager::CreateXnatSession()
 {
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node("/XnatConnection");
+  berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node(QmitkXnatTreeBrowserView::VIEW_ID);
 
   QUrl url(nodeConnectionPref->Get("Server Address", ""));
   url.setPort(nodeConnectionPref->Get("Port", "").toInt());

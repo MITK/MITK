@@ -35,7 +35,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 #include <ctkServiceTracker.h>
 
+#include <berryIBerryPreferences.h>
+
 class QMenu;
+
 
 /*!
 \brief QmitkXnatTreeBrowserView
@@ -103,6 +106,9 @@ private slots:
   void OnCreateResourceFolder();
 
 private:
+
+  void OnPreferencesChanged(const berry::IBerryPreferences*) override;
+
   void InternalFileDownload(const QModelIndex& index, bool loadData);
   void InternalDICOMDownload(ctkXnatObject* obj, QDir &DICOMDirPath);
   void InternalFileUpload(ctkXnatFile *file);

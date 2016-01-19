@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIPreferencesService.h"
 #include "berryPlatform.h"
 
+#include <QFileDialog>
 #include <QLabel>
 #include <QPushButton>
 #include <QLineEdit>
@@ -93,6 +94,8 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
   connect(m_Controls.inXnatDownloadPath, SIGNAL(editingFinished()), this, SLOT(DownloadPathChanged()));
 
   connect(m_Controls.cbUseNetworkProxy, SIGNAL(toggled(bool)), this, SLOT(onUseNetworkProxy(bool)));
+
+  connect(m_Controls.btnDownloadPath, SIGNAL(clicked()), this, SLOT(OnDownloadPathButtonClicked()));
 
   m_Controls.groupBoxProxySettings->setVisible(m_Controls.cbUseNetworkProxy->isChecked());
 
@@ -244,6 +247,11 @@ void QmitkXnatConnectionPreferencePage::DownloadPathChanged()
 void QmitkXnatConnectionPreferencePage::onUseNetworkProxy(bool status)
 {
   m_Controls.groupBoxProxySettings->setVisible(status);
+}
+
+void QmitkXnatConnectionPreferencePage::OnDownloadPathButtonClicked()
+{
+  m_Controls.inXnatDownloadPath->setText(QFileDialog::getExistingDirectory());
 }
 
 void QmitkXnatConnectionPreferencePage::ToggleConnection()

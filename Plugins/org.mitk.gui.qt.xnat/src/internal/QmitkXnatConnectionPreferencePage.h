@@ -58,6 +58,7 @@ public:
   protected slots:
     virtual void UrlChanged();
     virtual void DownloadPathChanged();
+  void OnDownloadPathButtonClicked();
 
     ///
     /// Toggles the Connection in the Service Registry from opened to closed or the other way around.

@@ -37,6 +37,11 @@ std::string mitk::PointSetSerializer::Serialize()
               << " is not an mitk::PointSet. Cannot serialize as pointset.";
     return "";
   }
+  
+  if (ps->GetSize() == 0)
+  {
+    return std::string();
+  }
 
   std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
   filename += "_";

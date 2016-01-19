@@ -77,7 +77,7 @@ class TrainingSamplePlot(luigi.Task):
         # create a new dataframe which will hold all the generated errors
         df = pd.DataFrame()
 
-        nr_training_samples = np.arange(10, 15060, 50).astype(int)
+        nr_training_samples = np.arange(10, 10010, 50).astype(int)
         # not very pythonic, don't care
         for n in nr_training_samples:
             X_test, y_test = preprocess(df_test, w_percent=w_standard)
@@ -157,7 +157,7 @@ class VhbPlot(luigi.Task):
         df = evaluate_data(df_train, noise_levels, df_test, noise_levels,
                            evaluation_setups=evaluation_setups,
                            preprocessing=self.preprocess_vhb, )
-        standard_plotting(df, color_palette = sns.xkcd_rgb["medium green"],
+        standard_plotting(df, color_palette=[sns.xkcd_rgb["medium green"]],
                           xytext_position=(2, 3))
         plt.ylim((0, 4))
 
@@ -236,7 +236,7 @@ def evaluate_data(df_train, w_train, df_test, w_test,
         evaluation_setups = standard_evaluation_setups
     if preprocessing is None:
         preprocessing = preprocess
-    if "weights" in df_train:
+    if ("weights" in df_train) and df_train["weights"].size > 0:
         weights = df_train["weights"].as_matrix().squeeze()
     else:
         weights = np.ones(df_train.shape[0])
@@ -320,17 +320,15 @@ if __name__ == '__main__':
     logger.addHandler(ch)
     luigi.interface.setup_interface_logging()
 
+    train = "ipcai_revision_colon_mean_scattering_train"
+    test = "ipcai_revision_colon_mean_scattering_test"
+
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
-    w.add(TrainingSamplePlot(which_train="ipcai_revision_colon_train",
-                             which_test="ipcai_revision_colon_test"))
-    w.add(NoisePlot(which_train="ipcai_revision_colon_train",
-                    which_test="ipcai_revision_colon_test"))
-    w.add(WrongNoisePlot(which_train="ipcai_revision_colon_train",
-                         which_test="ipcai_revision_colon_test"))
+    w.add(TrainingSamplePlot(which_train=train, which_test=test))
+    w.add(NoisePlot(which_train=train, which_test=test))
+    w.add(WrongNoisePlot(which_train=train, which_test=test))
     # Set a different testing domain to evaluate domain sensitivity
-    w.add(NoisePlot(which_train="ipcai_revision_colon_train",
-                    which_test="ipcai_revision_generic"))
-    w.add(VhbPlot(which_train="ipcai_revision_colon_train",
-                  which_test="ipcai_revision_colon_test"))
+    w.add(NoisePlot(which_train=train, which_test="ipcai_revision_generic"))
+    w.add(VhbPlot(which_train=train, which_test=test))
     w.run()

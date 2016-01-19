@@ -65,12 +65,12 @@ sp.bands_to_sortout = np.array([0, 1, 2, 3, 4, 5, 6 , 7, 8, 22, 23, 24, 25, 26, 
 
 class IPCAICreateOxyImageTask(luigi.Task):
     folder_name = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
         return IPCAIEstimateTissueParametersTask(folder_name=self.folder_name,
                                             batch_prefix=
-                                            self.batch_prefix), \
+                                            self.df_prefix), \
             MultiSpectralImageFromPNGFiles(folder_name=self.folder_name)
 
     def output(self):
@@ -78,7 +78,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               self.folder_name + "_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "_summary.png"))
 
     def run(self):
@@ -205,18 +205,18 @@ class IPCAICreateOxyImageTask(luigi.Task):
 
 class IPCAIEstimateTissueParametersTask(luigi.Task):
     folder_name = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
         return IPCAIPreprocessMSI(folder_name=self.folder_name), \
             IPCAITrainRegressor(batch_prefix=
-                        self.batch_prefix)
+                        self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
                                               sp.FINALS_FOLDER,
                                               self.folder_name + "_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "estimate.nrrd"))
 
     def run(self):
@@ -234,17 +234,17 @@ class IPCAIEstimateTissueParametersTask(luigi.Task):
 
 
 class IPCAITrainRegressor(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               "reg_" +
-                                              self.batch_prefix))
+                                              self.df_prefix))
 
     def requires(self):
-        return tasks_mc.CameraBatch(self.batch_prefix)
+        return tasks_mc.CameraBatch(self.df_prefix)
 
     def run(self):
         # extract data from the batch

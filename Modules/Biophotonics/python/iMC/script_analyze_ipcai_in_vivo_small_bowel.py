@@ -39,15 +39,17 @@ from sklearn.linear_model.base import LinearRegression
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
             "2015_11_12_IPCAI_in_vivo"
 sp.DATA_FOLDER = "small_bowel_images"
-sp.FINALS_FOLDER = "small_bowel_images_colorbar20_80"
+sp.FINALS_FOLDER = "small_bowel_images_jet"
 sp.FLAT_FOLDER = "flatfields_liver"
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
 new_order = [0, 1, 2, 3, 4, 5, 6, 7]
 
+
 def resort_image_wavelengths(collapsed_image):
     return collapsed_image[:, new_order]
+
 
 def resort_wavelengths(msi):
     """Neil organized his _wavelengths differently.
@@ -65,17 +67,18 @@ sp.bands_to_sortout = np.array([])  # [0, 1, 2, 20, 19, 18, 17, 16])
 
 class IPCAICreateOxyImageTask(luigi.Task):
     image_name = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
-        return IPCAITrainRegressor(batch_prefix=self.batch_prefix), \
+        return IPCAITrainRegressor(df_prefix=self.df_prefix), \
                 FlatfieldFromPNGFiles()
+
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               self.image_name + "_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "_summary.png.png"))
 
     def run(self):
@@ -158,9 +161,9 @@ class IPCAICreateOxyImageTask(luigi.Task):
         oxy_image[np.isnan(oxy_image)] = 0.
         oxy_image[np.isinf(oxy_image)] = 0.
         oxy_mean = np.mean(oxy_image)
-        oxy_image[0, 0] = 0.2
-        oxy_image[0, 1] = 0.8
-        oxy_image = np.clip(oxy_image, 0.2, 0.8)
+        oxy_image[0, 0] = 0.0
+        oxy_image[0, 1] = 1.
+#        oxy_image = np.clip(oxy_image, 0.2, 0.8)
 #         oxy_image[oxy_image > 0.8] = 0.8
 #         oxy_image[oxy_image < 0.2] = 0.2
 
@@ -195,20 +198,18 @@ class IPCAICreateOxyImageTask(luigi.Task):
         plt.close("all")
 
 
-
-
 class IPCAITrainRegressor(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               "reg_" +
-                                              self.batch_prefix))
+                                              self.df_prefix))
 
     def requires(self):
-        return tasks_mc.CameraBatch(self.batch_prefix)
+        return tasks_mc.CameraBatch(self.df_prefix)
 
     def run(self):
         # extract data from the batch
@@ -263,7 +264,6 @@ class FlatfieldFromPNGFiles(luigi.Task):
         writer.write(self.output().path)
 
 
-
 if __name__ == '__main__':
 
     # root folder there the data lies
@@ -281,17 +281,14 @@ if __name__ == '__main__':
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
     image_file_folder = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER)
-    onlyfiles = [ f for f in os.listdir(image_file_folder) if
-                 os.path.isfile(os.path.join(image_file_folder, f)) ]
+    onlyfiles = [f for f in os.listdir(image_file_folder) if
+                 os.path.isfile(os.path.join(image_file_folder, f))]
     onlyfiles.sort()
-    onlyfiles = [ f for f in onlyfiles if
-             f.endswith(".tiff") ]
+    onlyfiles = [f for f in onlyfiles if f.endswith(".tiff") ]
 
     for f in onlyfiles:
-        main_task = IPCAICreateOxyImageTask(
-            image_name=f,
-            batch_prefix=
-            "ipcai_colon_muscle_train")
+        main_task = IPCAICreateOxyImageTask(image_name=f,
+                                    df_prefix="ipcai_colon_muscle_train")
         w.add(main_task)
     w.run()
 

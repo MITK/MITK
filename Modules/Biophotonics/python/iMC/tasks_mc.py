@@ -54,9 +54,12 @@ class FilterTransmission(luigi.Task):
         fi_image[wavelengths > (name_to_float + 30) * 10 ** -9] = 0.0
         # elements < 0 are set to 0.
         fi_image[fi_image < 0.0] = 0.0
-        # write it
-        writer = MsiWriter(filter_transmission)
-        writer.write(self.output().path)
+
+        # write it to a dataframe
+        df = pd.DataFrame()
+        df["wavelengths"] = wavelengths
+        df["reflectances"] = fi_image
+        df.to_csv(self.output().path, index=False)
 
 
 class JoinBatches(luigi.Task):
@@ -74,8 +77,8 @@ class JoinBatches(luigi.Task):
         files = [ f for f in os.listdir(path) \
                  if os.path.isfile(os.path.join(path, f)) ]
         # from these get only those who start with correct batch prefix
-        df_file_names = \
-                [ os.path.join(path, f) for f in files if f.startswith(self.df_prefix)]
+        df_file_names = [os.path.join(path, f) for f in files
+                         if f.startswith(self.df_prefix)]
         # load these files
         dfs = [pd.read_csv(f, header=[0, 1]) for f in df_file_names]
         # now join them to one batch
@@ -86,7 +89,7 @@ class JoinBatches(luigi.Task):
 
 class CameraBatch(luigi.Task):
     """takes a batch of reference data and converts it to the spectra
-    processed by the camera"""
+    processed by a camera with the specified wavelengths assuming a 10nm FWHM"""
     df_prefix = luigi.Parameter()
 
     def requires(self):
@@ -95,7 +98,8 @@ class CameraBatch(luigi.Task):
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
-            self.df_prefix + "_all_camera.txt"))
+                                              self.df_prefix +
+                                              "_all_camera.txt"))
 
     def run(self):
         # load dataframe
@@ -105,6 +109,26 @@ class CameraBatch(luigi.Task):
         dfmani.interpolate_wavelengths(df, sp.RECORDED_WAVELENGTHS)
         # write it
         df.to_csv(self.output().path, index=False)
+
+
+class SpectroCamBatch(luigi.Task):
+    """
+    Same as CameraBatch in purpose but adapts the batch to our very specific
+    SpectroCam set-up.
+    """
+    df_prefix = luigi.Parameter()
+
+    def requires(self):
+        return JoinBatches(self.df_prefix)
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                              sp.RESULTS_FOLDER,
+                                              self.df_prefix +
+                                              "_all_spectrocam.txt"))
+
+    def run(self):
+        pass
 
 
 def get_transmission_data(input_path, desired_wavelengths):

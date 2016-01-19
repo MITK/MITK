@@ -118,17 +118,17 @@ def train(x, y):
 
 
 class TrainForest(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               "rf_" +
-                                              self.batch_prefix))
+                                              self.df_prefix))
 
     def requires(self):
-        return mc.CameraBatch(self.batch_prefix)
+        return mc.CameraBatch(self.df_prefix)
 
     def run(self):
         train_params, train_refl = extract_mc_data(self.input().path)
@@ -140,16 +140,16 @@ class TrainForest(luigi.Task):
 
 
 class TrainForestForwardModel(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               "rf_forward_" +
-                                              self.batch_prefix))
+                                              self.df_prefix))
 
     def requires(self):
-        return mc.CameraBatch(self.batch_prefix)
+        return mc.CameraBatch(self.df_prefix)
 
 
     def run(self):
@@ -162,27 +162,27 @@ class TrainForestForwardModel(luigi.Task):
 
 
 class DataAugmentation(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               "augmented_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "_params" +
                                               ".npy")), \
                luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               "augmented_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "reflectances" +
                                               ".npy"))
 
     def requires(self):
-        return TrainForestForwardModel(self.batch_prefix), \
-            ParameterFile(self.batch_prefix)
+        return TrainForestForwardModel(self.df_prefix), \
+            ParameterFile(self.df_prefix)
 
     def run(self):
         # n samples shall be created
@@ -214,17 +214,17 @@ class DataAugmentation(luigi.Task):
 
 
 class TrainForestAugmentedData(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               "rf_augmented_" +
-                                              self.batch_prefix))
+                                              self.df_prefix))
 
     def requires(self):
-        return DataAugmentation(self.batch_prefix)
+        return DataAugmentation(self.df_prefix)
 
     def run(self):
         train_params, train_refl = extract_mc_data(self.input()[0].path,
@@ -240,20 +240,20 @@ class TrainForestAugmentedData(luigi.Task):
 
 class CalculateWeightsFromSegmentation(luigi.Task):
     imageName = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               "weights_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "_image_" + self.imageName +
                                               ".npy"))
 
     def requires(self):
-        return ParameterFile(self.batch_prefix), \
-            ReflectanceFile(self.batch_prefix), \
+        return ParameterFile(self.df_prefix), \
+            ReflectanceFile(self.df_prefix), \
             ppt.PreprocessMSI(imageName=self.imageName), \
             ppt.SegmentMSI(imageName=self.imageName)
 
@@ -274,7 +274,7 @@ class CalculateWeightsFromSegmentation(luigi.Task):
 
 class TrainForestDA(luigi.Task):
     imageName = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -282,12 +282,12 @@ class TrainForestDA(luigi.Task):
                                               sp.FINALS_FOLDER,
                                               "rf_" +
                                               self.imageName + "_" +
-                                              self.batch_prefix))
+                                              self.df_prefix))
 
     def requires(self):
-        return mc.CameraBatch(self.batch_prefix), \
+        return mc.CameraBatch(self.df_prefix), \
             CalculateWeightsFromSegmentation(imageName=self.imageName,
-                    file_name_prefix_training=self.batch_prefix)
+                    file_name_prefix_training=self.df_prefix)
 
     def run(self):
         train_params, train_refl = extract_mc_data(self.input()[0].path)

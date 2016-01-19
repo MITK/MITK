@@ -579,6 +579,15 @@ void QmitkXnatTreeBrowserView::OnContextMenuCopyXNATUrlToClipboard()
   }
 }
 
+void QmitkXnatTreeBrowserView::OnContextMenuRefreshItem()
+{
+  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  if (index.isValid())
+  {
+    this->m_TreeModel->refresh(index);
+  }
+}
+
 void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& droppedNodes, ctkXnatObject* parentObject, const QModelIndex& parentIndex)
 {
   if (parentObject == nullptr)
@@ -684,6 +693,12 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
 {
   m_ContextMenu->clear();
+
+  QAction* actRefreshItem = new QAction("Refresh", m_ContextMenu);
+  m_ContextMenu->addAction(actRefreshItem);
+  connect(actRefreshItem, SIGNAL(triggered()), this, SLOT(OnContextMenuRefreshItem()));
+  m_ContextMenu->popup(QCursor::pos());
+
   QAction* actGetXNATURL = new QAction("Copy XNAT URL to clipboard", m_ContextMenu);
   m_ContextMenu->addAction(actGetXNATURL);
   connect(actGetXNATURL, SIGNAL(triggered()), this, SLOT(OnContextMenuCopyXNATUrlToClipboard()));

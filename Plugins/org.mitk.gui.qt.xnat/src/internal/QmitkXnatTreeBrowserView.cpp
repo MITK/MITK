@@ -288,6 +288,13 @@ void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
   m_Controls.progressBar->setValue(currentProgress);
 }
 
+void QmitkXnatTreeBrowserView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+{
+  QDir downloadPath (prefs->Get("Download Path", ""));
+  if (downloadPath.exists())
+    m_DownloadPath = downloadPath.absolutePath();
+}
+
 void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bool loadData)
 {
   if (!index.isValid())

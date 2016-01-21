@@ -14,6 +14,7 @@ import logging
 import datetime
 
 import numpy as np
+import pandas as pd
 import luigi
 import matplotlib.pyplot as plt
 import SimpleITK as sitk
@@ -23,6 +24,7 @@ from scipy.ndimage.filters import gaussian_filter
 import tasks_analyze as at
 import tasks_mc
 import scriptpaths as sp
+from msi.msi import Msi
 from msi.io.pngreader import PngReader
 from msi.io.nrrdreader import NrrdReader
 from msi.io.nrrdwriter import NrrdWriter
@@ -41,10 +43,24 @@ sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
 sp.DATA_FOLDER = "small_bowel_images"
 sp.FINALS_FOLDER = "small_bowel_images_jet"
 sp.FLAT_FOLDER = "flatfields_liver"
+sp.DARK_FOLDER = "/media/wirkert/data/Data/" + \
+                 "2016_01_19_Flatfield_and_Dark_Laparoscope/Dark"
+
+AVERAGE_FOLDER = "average_intensity"
+AVERAGE_FINALS_FOLDER = "finals"
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
 new_order = [0, 1, 2, 3, 4, 5, 6, 7]
+
+
+def get_image_files_from_folder(folder):
+    # small helper function to get all the image files in a folder
+    image_files = [f for f in os.listdir(folder) if
+                   os.path.isfile(os.path.join(folder, f))]
+    image_files.sort()
+    image_files = [f for f in image_files if f.endswith(".tiff")]
+    return image_files
 
 
 def resort_image_wavelengths(collapsed_image):
@@ -64,14 +80,14 @@ sp.resort_wavelengths = resort_wavelengths
 sp.bands_to_sortout = np.array([])  # [0, 1, 2, 20, 19, 18, 17, 16])
 
 
-
 class IPCAICreateOxyImageTask(luigi.Task):
     image_name = luigi.Parameter()
     df_prefix = luigi.Parameter()
 
     def requires(self):
         return IPCAITrainRegressor(df_prefix=self.df_prefix), \
-                FlatfieldFromPNGFiles()
+               Flatfield(), \
+               SingleMultispectralImage(image=self.image_name)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -88,19 +104,12 @@ class IPCAICreateOxyImageTask(luigi.Task):
         flat = nrrd_reader.read(self.input()[1].path)
         # read the msi
         nr_filters = len(sp.RECORDED_WAVELENGTHS)
-        full_image_name = os.path.join(sp.ROOT_FOLDER,
-                                       sp.DATA_FOLDER,
-                                       self.image_name)
-        msi, segmentation = tiff_ring_reader.read(full_image_name, nr_filters)
+        msi, segmentation = tiff_ring_reader.read(self.input[2].path,
+                                                  nr_filters)
         segmentation = np.logical_and(segmentation,
-                                     (np.max(msi.get_image(),
-                                             axis=-1) < 1000.))
-        # read the segmentation
-#
-#         seg_path = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER,
-#                                 "segmentation_" + self.image_name + ".nrrd")
-#         segmentation = nrrd_reader.read(seg_path)
-#         segmentation = segmentation.get_image()
+                                      (np.max(msi.get_image(),
+                                              axis=-1) < 1000.))
+
         # read the regressor
         e_file = open(self.input()[0].path, 'r')
         e = pickle.load(e_file)
@@ -237,7 +246,17 @@ class IPCAITrainRegressor(luigi.Task):
         f.close()
 
 
-class FlatfieldFromPNGFiles(luigi.Task):
+class SingleMultispectralImage(luigi.Task):
+
+    image = luigi.Parameter()
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER, \
+                                              self.image))
+
+
+class Flatfield(luigi.Task):
+    flatfield_folder = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -246,21 +265,64 @@ class FlatfieldFromPNGFiles(luigi.Task):
                                 ".nrrd"))
 
     def run(self):
-        reader = PngReader()
-        msi = reader.read(os.path.join(sp.ROOT_FOLDER,
-                                       sp.FLAT_FOLDER,
-                                       "Flatfield9cm_I000x_F"))
+        tiff_ring_reader = TiffRingReader()
+        nr_filters = len(sp.RECORDED_WAVELENGTHS)
+
+        # analyze all the first image files
+        image_files = get_image_files_from_folder(self.flatfield_folder)
+        image_files = filter(lambda image_name: "F0" in image_name, image_files)
+
+        # helper function to take maximum of two images
+        def maximum_of_two_images(image_name_1, image_name_2):
+            image_1 = tiff_ring_reader.read(image_name_1,
+                                            nr_filters)[0].get_image()
+            image_2 = tiff_ring_reader.read(image_name_2,
+                                            nr_filters)[0].get_image()
+            return np.maximum(image_1, image_2)
+
+        # now reduce to maximum of all the single images
+        flat_maximum = reduce(lambda x, y: maximum_of_two_images(x, y),
+                              image_files)
+        msi = Msi(image=flat_maximum)
+        msi.set_wavelengths(sp.RECORDED_WAVELENGTHS)
+
+        # write flatfield as nrrd
         writer = NrrdWriter(msi)
-        msi.set_image(msi.get_image().astype(float))
-        seg_reader = NrrdReader()
-        segmentation = seg_reader.read(os.path.join(sp.ROOT_FOLDER,
-                                           sp.FLAT_FOLDER,
-                                           "segmentation.nrrd"))
-        # msimani.apply_segmentation(msi, segmentation)
-        # msimani.calculate_mean_spectrum(msi)
-        # apply gaussian smoothing for error reduction
-        img = gaussian_filter(msi.get_image(), sigma=(5, 5, 0), order=0)
-        msi.set_image(img)
+        writer.write(self.output().path)
+
+
+class Dark(luigi.Task):
+    dark_folder = luigi.Parameter()
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                              sp.RESULTS_FOLDER,
+                                "dark" +
+                                ".nrrd"))
+
+    def run(self):
+        tiff_ring_reader = TiffRingReader()
+        nr_filters = len(sp.RECORDED_WAVELENGTHS)
+
+        # analyze all the first image files
+        image_files = get_image_files_from_folder(self.dark_folder)
+        image_files = filter(lambda image_name: "F0" in image_name, image_files)
+
+        # returns the mean dark image vector of all inputted dark image
+        # overly complicated TODO SW: make this simple code readable.
+        dark_means = map(lambda image_name:
+                            msimani.calculate_mean_spectrum(
+                                tiff_ring_reader.read(os.path.join(self.dark_folder, image_name),
+                                                      nr_filters)[0]),
+                         image_files)
+        dark_means_sum = reduce(lambda x, y: x+y.get_image(), dark_means, 0)
+        final_dark_mean = dark_means_sum / len(dark_means)
+
+        msi = Msi(image=final_dark_mean)
+        msi.set_wavelengths(sp.RECORDED_WAVELENGTHS)
+
+        # write flatfield as nrrd
+        writer = NrrdWriter(msi)
         writer.write(self.output().path)
 
 
@@ -281,14 +343,12 @@ if __name__ == '__main__':
     # run over all subfolders (non-recursively)
     # to collect the data and generate the results
     image_file_folder = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER)
-    onlyfiles = [f for f in os.listdir(image_file_folder) if
-                 os.path.isfile(os.path.join(image_file_folder, f))]
-    onlyfiles.sort()
-    onlyfiles = [f for f in onlyfiles if f.endswith(".tiff") ]
+    onlyfiles = get_image_files_from_folder(image_file_folder)
 
     for f in onlyfiles:
         main_task = IPCAICreateOxyImageTask(image_name=f,
                                     df_prefix="ipcai_colon_muscle_train")
         w.add(main_task)
+
     w.run()
 

@@ -88,6 +88,7 @@ void QmitkDicomLocalStorageWidget::OnStartDicomImport(const QStringList& dicomDa
 void QmitkDicomLocalStorageWidget::OnFinishedImport()
 {
     m_ProgressDialog->setValue(m_ProgressDialog->maximum());
+    m_ProgressDialog->close();
 }
 
 void QmitkDicomLocalStorageWidget::OnDeleteButtonClicked()

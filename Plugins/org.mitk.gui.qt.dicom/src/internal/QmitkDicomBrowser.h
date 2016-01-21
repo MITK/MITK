@@ -136,7 +136,6 @@ protected:
 
     ctkFileDialog* m_ImportDialog;
     Ui::QmitkDicomBrowserControls m_Controls;
-    QThread m_Thread;
     QmitkDicomDirectoryListener* m_DicomDirectoryListener;
     QmitkStoreSCPLauncherBuilder m_Builder;
     QmitkStoreSCPLauncher* m_StoreSCPLauncher;

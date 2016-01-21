@@ -15,6 +15,7 @@ from imgmani import collapse_image
 import imgmani
 from msi import Msi
 
+
 def apply_segmentation(msi, segmentation):
     """ TODO """
     if (isinstance(segmentation, Msi)):
@@ -29,6 +30,7 @@ def apply_segmentation(msi, segmentation):
         wholeMask[:, :, i] = mask
 
     msi.set_mask(wholeMask)
+    return msi
 
 
 def calculate_mean_spectrum(msi):
@@ -38,6 +40,8 @@ def calculate_mean_spectrum(msi):
     # reshape to collapse all but last dimension (which contains reflectances)
     collapsedImage = collapse_image(msi.get_image())
     msi.set_image(np.mean(collapsedImage, axis=0))
+    # returns the same msi.
+    return msi
 
 
 def interpolate_wavelengths(msi, newWavelengths):
@@ -47,6 +51,7 @@ def interpolate_wavelengths(msi, newWavelengths):
     interpolator = interp1d(msi.get_wavelengths(), msi.get_image(), assume_sorted=False)
     msi.set_image(interpolator(newWavelengths))
     msi.set_wavelengths(newWavelengths)
+    return msi
 
 
 def normalize_integration_times(msi):
@@ -54,7 +59,7 @@ def normalize_integration_times(msi):
     if ('integration times' not in msi.get_properties()):
         logging.warn("warning: trying to normalize integration times for "
             "image without the integration time property")
-        return
+        return msi
 
     original_shape = msi.get_image().shape
     collapsed_image = collapse_image(msi.get_image())
@@ -63,6 +68,7 @@ def normalize_integration_times(msi):
 
     msi.add_property({'integration times':
         np.ones_like(msi.get_properties()['integration times'])})
+    return msi
 
 
 def dark_correction(msi, dark):
@@ -71,7 +77,7 @@ def dark_correction(msi, dark):
     The dark msi should either be of the same shape
     as msi or 1xnr_wavelengths (see tests)."""
     msi.set_image(msi.get_image() - dark.get_image())
-
+    return msi
 
 def flatfield_correction(msi, flatfield):
     """ divide by flatfield to remove dependencies on light source form and
@@ -85,7 +91,7 @@ def flatfield_correction(msi, flatfield):
     normalize_integration_times(msi)
 
     msi.set_image(msi.get_image() / flatfield_copy.get_image())
-
+    return msi
 
 def image_correction(msi, flatfield, dark):
     """ do the usual image correction:
@@ -99,6 +105,7 @@ def image_correction(msi, flatfield, dark):
     flatfield_copy = copy.copy(flatfield)
     dark_correction(flatfield_copy, dark)
     flatfield_correction(msi, flatfield_copy)
+    return msi
 
 
 def get_bands(msi, bands):
@@ -108,4 +115,5 @@ def get_bands(msi, bands):
     msi.set_image(imgmani.get_bands(msi.get_image(), bands))
     if msi.get_wavelengths() is not None:
         msi.set_wavelengths(msi.get_wavelengths()[bands])
+    return msi
 

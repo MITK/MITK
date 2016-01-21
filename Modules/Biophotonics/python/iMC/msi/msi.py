@@ -22,6 +22,13 @@ class Msi():
         self._image = image
         self._properties = properties
 
+        if self._image.size > 0 and "wavelengths" not in \
+                properties.keys():
+            self._properties["wavelengths"] = np.arange(self._image.shape[-1])
+
+        if self._image.shape[-1] != len(self._properties["wavelengths"]):
+            raise RuntimeError("dimension of image and wavelength mismatch")
+
     def get_image(self):
         return self._image
 
@@ -31,13 +38,14 @@ class Msi():
     def get_wavelengths(self):
         """ shortcut to get the wavelengths property
         The wavelengths are given in [m] units and need not be sorted. """
-        if ('wavelengths' not in self._properties):
+        if 'wavelengths' not in self.get_properties():
             return None
         return self._properties['wavelengths']
 
     def set_wavelengths(self, wavelengths):
         """ shortcut to set the wavelengths property """
-        self._properties['wavelengths'] = wavelengths
+        w_prop = {"wavelengths":wavelengths}
+        self.add_property(w_prop)
 
     def get_properties(self):
         return self._properties
@@ -51,11 +59,9 @@ class Msi():
         type MaskedArray. If the image was already masked, the existing
         masked will be "or ed" with the new mask. mask is a boolean array of
         the same shape as self.get_image()"""
-
-
         if not isinstance(self.get_image(), np.ma.MaskedArray):
             self.set_image(np.ma.masked_array(self.get_image(), mask,
-                          fill_value=1e+20))
+                          fill_value=999999))
         else:
             self.get_image()[mask] = np.ma.masked
 
@@ -68,7 +74,6 @@ class Msi():
         if isinstance(other, Msi):
             samesame = np.array_equal(other.get_image(), self.get_image())
             return samesame
-
         return NotImplemented
 
     def __ne__(self, other):

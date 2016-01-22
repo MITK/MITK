@@ -432,12 +432,16 @@ void UltrasoundCalibration::OnStopPlusCalibration()
     m_TransformClient->CloseConnection();
   }
   m_Controls.m_TabWidget->setTabEnabled(4, false);
+  m_Controls.m_GotCalibrationLabel->setText("");
+  m_Controls.m_ConnectionStatus->setText("");
   this->OnStopCalibrationProcess();
 }
 
 void UltrasoundCalibration::OnNewConnection()
 {
   m_Controls.m_StartStreaming->setEnabled(true);
+  m_Controls.m_ConnectionStatus->setStyleSheet("QLabel { color : green; }");
+  m_Controls.m_ConnectionStatus->setText("Connection successfull you can now start streaming");
 }
 
 void UltrasoundCalibration::OnStreamingTimerTimeout()
@@ -451,6 +455,7 @@ void UltrasoundCalibration::OnStartStreaming()
   m_USMessageProvider->StartStreamingOfSource(m_USImageToIGTLMessageFilter, 5);
   m_TrackingMessageProvider->StartStreamingOfSource(m_TrackingToIGTLMessageFilter, 5);
   m_Controls.m_StartStreaming->setEnabled(false);
+  m_Controls.m_ConnectionStatus->setText("");
   unsigned int interval = this->m_USMessageProvider->GetStreamingTime();
   this->m_StreamingTimer.start((1.0 / 5.0 * 1000.0));
 }
@@ -463,7 +468,8 @@ void UltrasoundCalibration::OnGetPlusCalibration()
   m_TransformDeviceSource = mitk::IGTLDeviceSource::New();
   m_TransformDeviceSource->SetIGTLDevice(m_TransformClient);
   m_TransformDeviceSource->Connect();
-  if (m_TransformDeviceSource->IsConnected()){
+  if (m_TransformDeviceSource->IsConnected())
+  {
     MITK_INFO << "successfully connected";
     m_TransformDeviceSource->StartCommunication();
     if (m_TransformDeviceSource->IsCommunicating())
@@ -502,11 +508,23 @@ void UltrasoundCalibration::OnGetPlusCalibration()
       {
         this->ProcessPlusCalibration(transformPLUS);
       }
+      else
+      {
+        m_Controls.m_GotCalibrationLabel->setStyleSheet("QLabel { color : red; }");
+        m_Controls.m_GotCalibrationLabel->setText("Something went wrong. Please try again");
+      }
     }
     else
     {
       MITK_INFO << " no connection ZONK!!";
+      m_Controls.m_GotCalibrationLabel->setStyleSheet("QLabel { color : red; }");
+      m_Controls.m_GotCalibrationLabel->setText("Something went wrong. Please try again");
     }
+  }
+  else
+  {
+    m_Controls.m_GotCalibrationLabel->setStyleSheet("QLabel { color : red; }");
+    m_Controls.m_GotCalibrationLabel->setText("Something went wrong. Please try again");
   }
 }
 
@@ -536,6 +554,8 @@ void UltrasoundCalibration::ProcessPlusCalibration(igtl::Matrix4x4& imageToTrack
 
   m_CombinedModality->SetCalibration(imageToTrackerTransform);
   m_Controls.m_SavePlusCalibration->setEnabled(true);
+  m_Controls.m_GotCalibrationLabel->setStyleSheet("QLabel { color : green; }");
+  m_Controls.m_GotCalibrationLabel->setText("Recieved Calibration from PLUS you can now save it");
 }
 
 void UltrasoundCalibration::OnStopCalibrationProcess()
@@ -766,6 +786,7 @@ void UltrasoundCalibration::OnSaveEvaluation()
 
 void UltrasoundCalibration::OnSaveCalibration()
 {
+  m_Controls.m_GotCalibrationLabel->setText("");
   QString filename = QFileDialog::getSaveFileName(QApplication::activeWindow(),
     "Save Calibration",
     "",

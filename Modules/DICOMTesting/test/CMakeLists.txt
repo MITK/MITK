@@ -17,7 +17,7 @@ mitkAddCustomModuleTest(mitkDICOMPreloadedVolumeTest_Slice mitkDICOMPreloadedVol
 
 set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VerifyDICOMMitkImageDump)
 
-set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen)
+set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen_DICOMReader)
 set(MR_HEART_DIR ${MITK_DATA_DIR}/3D+t-Heart)
 set(CT_TILT_HEAD_DIR ${MITK_DATA_DIR}/TiltHead)
 set(CT_TILT_DIR ${MITK_DATA_DIR}/TiltedData)

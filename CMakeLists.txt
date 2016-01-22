@@ -252,7 +252,7 @@ endif()
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
 
 mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Util XML Zip)
-mitkFunctionAddExternalProject(NAME Boost       OFF DOC "Use the Boost C++ library")
+mitkFunctionAddExternalProject(NAME Boost       ON  DOC "Use the Boost C++ library")
 mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
 mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
 

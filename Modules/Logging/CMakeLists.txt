@@ -7,4 +7,5 @@ MITK_CREATE_MODULE(
   PACKAGE_DEPENDS
     PUBLIC Boost
   ${module_options}
+  EXPORT_DEFINE "LOG_EXPORTS"
 )

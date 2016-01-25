@@ -38,138 +38,200 @@
 #include <berryPlatform.h>
 #endif
 
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(my_logger, boost::log::sources::severity_logger< boost::log::trivial::severity_level >)
+#ifdef _WIN32
+#ifdef LOG_EXPORTS
+#define DllExport __declspec(dllexport)
+#else
+#define DllExport __declspec(dllexport)
+#endif
+#else
+#define DllExport __attribute__((visibility("default")))
+#endif
 
-#define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(my_logger::get(), boost::log::trivial::info)
-#define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(my_logger::get(), boost::log::trivial::error)
-#define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(my_logger::get(), boost::log::trivial::trace)
-#define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(my_logger::get(), boost::log::trivial::debug)
-#define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(my_logger::get(), boost::log::trivial::warning)
-#define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(my_logger::get(), boost::log::trivial::fatal)
+//extern boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg;
+
+#define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::info)
+#define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::error)
+#define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::trace)
+#define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug)
+#define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::warning)
+#define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::fatal)
 
 namespace Logger {
   typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_file_backend > file_sink;
-  typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > tcp_sink;
+  typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > ostream_sink;
 
-  static bool consolelog = true;
-  static bool filelog = true;
-  static bool tcplog = false;
-  static std::string iphost, ipport, logsPath;
+  class DllExport Options {
+    private:
+      Options()
+      {
+        // defaults
+        consolelog = true;
+        filelog = true;
+        tcplog = false;
+        datastoragelog = true;
 
-  inline void reinitLogger()
-  {
-    boost::log::core::get()->flush();
-    boost::log::core::get()->remove_all_sinks();
+      };
+      Options(Options const&);
+      void operator=(Options const&);
+    public:
+      static Options& get();
+      bool consolelog;
+      bool filelog;
+      bool tcplog;
 
-#ifdef BERRY_LOG
-    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-    berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/ru.samsmu.log");
-    if (prefs){
-      iphost = prefs->Get("logstashIpAddress", "").toStdString();
-      ipport = prefs->Get("logstashPort", "").toStdString();
-      logsPath = prefs->Get("logsPath", "").toStdString();
+      bool datastoragelog; // true for test
 
-      consolelog = prefs->GetBool("consoleLog", true);
-      filelog = prefs->GetBool("fileLog", true);
-      tcplog = prefs->GetBool("tcpLog", false);
-    }
-#endif
+      boost::shared_ptr< std::stringstream > dataStream;
+      boost::shared_ptr< boost::log::sinks::text_ostream_backend > dataBackend;
 
-    /// Just return if everything is disabled
-    if (!(consolelog || filelog || tcplog)) return;
+      std::string iphost, ipport, logsPath;
+  };
 
-#ifdef BERRY_LOG
-    if (iphost.empty()) {
-      iphost = "127.0.0.1";
-      prefs->Put("logstashIpAddress", "127.0.0.1");
-    }
-    if (ipport.empty()) {
-      ipport = "666";
-      prefs->Put("logstashPort", "666");
-    }
-#endif
+  class DllExport Log {
+  private:
+    Log()
+    {
+      reinitLogger();
+    };
+    Log(Log const&);
+    void operator=(Log const&);
+  public:
+    boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg;
+    static Log& get();
 
-    boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg = my_logger::get();
+    void reinitLogger() const
+    {
+      boost::log::core::get()->flush();
+      boost::log::core::get()->remove_all_sinks();
 
-    if (filelog) {
-      if (logsPath.empty()) {
-#ifdef _WIN32
-        char* ifAppData = getenv("LOCALAPPDATA");
-        if (ifAppData != nullptr) {
-          logsPath = std::string(ifAppData) + "\\SamSMU\\logs\\";
-          logsPath = boost::locale::conv::to_utf<char>(logsPath, "windows-1251");
-        }
-        else {
-          logsPath = ".";
-        }
-#else
-        char* ifHome = getenv("HOME");
-        if (ifHome != nullptr) {
-          logsPath = std::string(ifHome) + "/.local/share/SamSMU/logs/";
-        }
-        else {
-          logsPath = ".";
-        }
-#endif
+  #ifdef BERRY_LOG
+      berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+      berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/ru.samsmu.log");
+      if (prefs){
+        Options::get().iphost = prefs->Get("logstashIpAddress", "").toStdString();
+        Options::get().ipport = prefs->Get("logstashPort", "").toStdString();
+        Options::get().logsPath = prefs->Get("logsPath", "").toStdString();
 
-#ifdef BERRY_LOG
-        prefs->Put("logsPath", logsPath.c_str());
-#endif
+        Options::get().consolelog = prefs->GetBool("consoleLog", true);
+        Options::get().filelog = prefs->GetBool("fileLog", true);
+        Options::get().tcplog = prefs->GetBool("tcpLog", false);
       }
-      boost::shared_ptr< file_sink > sink(new file_sink(
-        boost::log::keywords::file_name = "%Y%m%d_%H%M%S_%5N.xml",
-        boost::log::keywords::rotation_size = 16384
-        ));
-      sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
-        boost::log::keywords::target = logsPath,                    /*< the target directory >*/
-        boost::log::keywords::max_size = 16 * 1024 * 1024,          /*< maximum total size of the stored files, in bytes >*/
-        boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
-        ));
+  #endif
 
-      sink->set_formatter(
-        boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\">%3%</record>")
-        % boost::log::expressions::attr< unsigned int >("RecordID")
-        % boost::log::expressions::attr< boost::posix_time::ptime >("TimeStamp")
-        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
-        );
+      /// Just return if everything is disabled
+      if (!(Options::get().get().consolelog || Options::get().filelog || Options::get().tcplog || Options::get().datastoragelog)) return;
 
-      auto write_header = [](boost::log::sinks::text_file_backend::stream_type& file) {
-        file << "<?xml version=\"1.0\"?>\n<log>\n";
-      };
-      auto write_footer = [](boost::log::sinks::text_file_backend::stream_type& file) {
-        file << "</log>\n";
-      };
-      /// Set header and footer writing functors
-      sink->locked_backend()->set_open_handler(write_header);
-      sink->locked_backend()->set_close_handler(write_footer);
+  #ifdef BERRY_LOG
+      if (Options::get().iphost.empty()) {
+        Options::get().iphost = "127.0.0.1";
+        prefs->Put("logstashIpAddress", "127.0.0.1");
+      }
+      if (Options::get().ipport.empty()) {
+        Options::get().ipport = "666";
+        prefs->Put("logstashPort", "666");
+      }
+  #endif
 
-      /// Add the sink to the core
-      boost::log::core::get()->add_sink(sink);
+      if (Options::get().filelog) {
+        if (Options::get().logsPath.empty()) {
+  #ifdef _WIN32
+          char* ifAppData = getenv("LOCALAPPDATA");
+          if (ifAppData != nullptr) {
+            Options::get().logsPath = std::string(ifAppData) + "\\SamSMU\\logs\\";
+            Options::get().logsPath = boost::locale::conv::to_utf<char>(Options::get().logsPath, "windows-1251");
+          }
+          else {
+            Options::get().logsPath = ".";
+          }
+  #else
+          char* ifHome = getenv("HOME");
+          if (ifHome != nullptr) {
+            Options::get().logsPath = std::string(ifHome) + "/.local/share/SamSMU/logs/";
+          }
+          else {
+            Options::get().logsPath = ".";
+          }
+  #endif
+
+  #ifdef BERRY_LOG
+          prefs->Put("logsPath", Options::get().logsPath.c_str());
+  #endif
+        }
+        boost::shared_ptr< file_sink > sink(new file_sink(
+          boost::log::keywords::file_name = "%Y%m%d_%H%M%S_%5N.xml",
+          boost::log::keywords::rotation_size = 16384
+          ));
+        sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
+          boost::log::keywords::target = Options::get().logsPath,           /*< the target directory >*/
+          boost::log::keywords::max_size = 16 * 1024 * 1024,          /*< maximum total size of the stored files, in bytes >*/
+          boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
+          ));
+
+        sink->set_formatter(
+          boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\">%3%</record>")
+          % boost::log::expressions::attr< unsigned int >("RecordID")
+          % boost::log::expressions::attr< boost::posix_time::ptime >("TimeStamp")
+          % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
+          );
+
+        auto write_header = [](boost::log::sinks::text_file_backend::stream_type& file) {
+          file << "<?xml version=\"1.0\"?>\n<log>\n";
+        };
+        auto write_footer = [](boost::log::sinks::text_file_backend::stream_type& file) {
+          file << "</log>\n";
+        };
+        /// Set header and footer writing functors
+        sink->locked_backend()->set_open_handler(write_header);
+        sink->locked_backend()->set_close_handler(write_footer);
+
+        /// Add the sink to the core
+        boost::log::core::get()->add_sink(sink);
+      }
+
+      if (Options::get().tcplog) {
+        boost::shared_ptr< boost::log::sinks::text_ostream_backend > backend =
+          boost::make_shared< boost::log::sinks::text_ostream_backend >();
+
+        boost::shared_ptr< boost::asio::ip::tcp::iostream > stream =
+          boost::make_shared< boost::asio::ip::tcp::iostream >();
+
+        stream->connect(Options::get().iphost, Options::get().ipport);
+
+        backend->add_stream(stream);
+        backend->auto_flush(true);
+
+        boost::shared_ptr< ostream_sink > sink2(new ostream_sink(backend));
+        boost::log::core::get()->add_sink(sink2);
+      }
+
+      if (Options::get().datastoragelog) {
+        Options::get().dataBackend =
+          boost::make_shared< boost::log::sinks::text_ostream_backend >();
+
+        Options::get().dataStream =
+          boost::make_shared< std::stringstream >();
+
+        Options::get().dataBackend->add_stream(Options::get().dataStream);
+
+        boost::shared_ptr< ostream_sink > sink3(new ostream_sink(Options::get().dataBackend));
+        boost::log::core::get()->add_sink(sink3);
+      }
+
+      if (Options::get().consolelog) {
+        boost::log::add_console_log(std::cout, boost::log::keywords::format = ">> %Message%");
+      }
+
+      boost::log::core::get()->add_global_attribute("TimeStamp", boost::log::attributes::local_clock());
+      boost::log::core::get()->add_global_attribute("RecordID", boost::log::attributes::counter< unsigned int >());
+
+      boost::log::add_common_attributes();
     }
 
-    if (tcplog) {
-      boost::shared_ptr< boost::log::sinks::text_ostream_backend > backend =
-        boost::make_shared< boost::log::sinks::text_ostream_backend >();
-
-      boost::shared_ptr< boost::asio::ip::tcp::iostream > stream =
-        boost::make_shared< boost::asio::ip::tcp::iostream >();
-
-      stream->connect(iphost, ipport);
-
-      backend->add_stream(stream);
-      backend->auto_flush(true);
-
-      boost::shared_ptr< tcp_sink > sink2(new tcp_sink(backend));
-      boost::log::core::get()->add_sink(sink2);
+    std::string getData() const
+    {
+      Options::get().dataBackend->flush();
+      return Options::get().dataStream->str();
     }
-
-    if (consolelog) {
-      boost::log::add_console_log(std::cout, boost::log::keywords::format = ">> %Message%");
-    }
-
-    boost::log::core::get()->add_global_attribute("TimeStamp", boost::log::attributes::local_clock());
-    boost::log::core::get()->add_global_attribute("RecordID", boost::log::attributes::counter< unsigned int >());
-
-    boost::log::add_common_attributes();
-  }
+  };
 }

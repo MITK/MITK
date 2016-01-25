@@ -42,6 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itksys/SystemTools.hxx"
 
+#include "AutoplanLogging.h"
+
 mitk::SceneIO::SceneIO()
   :m_WorkingDirectory(""),
   m_UnzipErrors(0)
@@ -333,9 +335,47 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         }
       }
 
+      DataStorage::SetOfObjects::Pointer v = DataStorage::SetOfObjects::New();
+      v->insert(v->begin(), sceneNodes->begin(), sceneNodes->end());
+
+      AUTOPLAN_INFO << "checking for init variables";
+      if (Logger::Options::get().datastoragelog && Logger::Options::get().dataBackend) {
+        AUTOPLAN_INFO << "init variables found";
+
+        bool logNodePresent = false;
+        itk::SmartPointer<DataNode> logNode;
+        std::string log;
+
+        for (auto node : v->CastToSTLContainer()) {  
+          node->GetStringProperty("log", log);
+          if (!log.empty()) {
+            logNodePresent = true;
+            logNode = node;
+          }
+        }
+
+        std::string logData = Logger::Log::get().getData();
+
+        AUTOPLAN_INFO << "New log:" << log + logData.c_str();
+
+        StringProperty::Pointer myLog =
+          StringProperty::New(log + logData.c_str());
+
+        if (!logNodePresent) {
+          logNode = DataNode::New();
+          logNode->SetName("Log");
+        }
+
+        logNode->SetProperty("log", myLog);
+
+        if (!logNodePresent) {
+          v->push_back(logNode);
+        }
+      }
+
       // write out objects, dependencies and properties
-      for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
-        iter != sceneNodes->end();
+      for (DataStorage::SetOfObjects::const_iterator iter = v->begin();
+        iter != v->end();
         ++iter)
       {
         DataNode* node = iter->GetPointer();

@@ -10,45 +10,61 @@ import os
 import Image
 import ImageEnhance
 import pickle
-import time
+import logging
+import datetime
 
 import numpy as np
+import pandas as pd
 import luigi
 import matplotlib.pyplot as plt
 import SimpleITK as sitk
 from sklearn.ensemble.forest import RandomForestRegressor
-from scipy.ndimage.filters import gaussian_filter
+import seaborn as sns
 
 import tasks_analyze as at
-import tasks_preprocessing as pre
 import tasks_mc
 import scriptpaths as sp
-from msi.io.pngreader import PngReader
+from msi.msi import Msi
 from msi.io.nrrdreader import NrrdReader
 from msi.io.nrrdwriter import NrrdWriter
 import msi.msimanipulations as msimani
 import msi.imgmani as imgmani
 import msi.normalize as norm
 from regression.estimation import estimate_image
-from regression.linear import LinearSaO2Unmixing
-from regression.preprocessing import preprocess2, normalize
-from msi.io.tiffreader import TiffReader
+from regression.preprocessing import preprocess, preprocess2
+from msi.io.tiffringreader import TiffRingReader
 
 
+sp.ROOT_FOLDER = "/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo"
+sp.DATA_FOLDER = "all_liver_images"
+sp.FINALS_FOLDER = "liver_all"
+sp.FLAT_FOLDER = "/media/wirkert/data/Data/" + \
+                 "2016_01_19_Flatfield_and_Dark_Laparoscope/Flatfields"
+sp.DARK_FOLDER = "/media/wirkert/data/Data/" + \
+                 "2016_01_19_Flatfield_and_Dark_Laparoscope/Dark"
 
-sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
-            "2015_11_12_IPCAI_in_vivo"
-sp.DATA_FOLDER = "liver_images"
-sp.FINALS_FOLDER = "liver_oxy"
-sp.FLAT_FOLDER = "flatfields_liver"
-sp.MC_DATA_FOLDER = "mc_data2"
+AVERAGE_FOLDER = "average_intensity"
+AVERAGE_FINALS_FOLDER = "finals"
+
+sns.set_style("whitegrid")
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
 new_order = [0, 1, 2, 3, 4, 5, 6, 7]
 
+
+def get_image_files_from_folder(folder):
+    # small helper function to get all the image files in a folder
+    image_files = [f for f in os.listdir(folder) if
+                   os.path.isfile(os.path.join(folder, f))]
+    image_files.sort()
+    image_files = [f for f in image_files if f.endswith(".tiff")]
+    return image_files
+
+
 def resort_image_wavelengths(collapsed_image):
     return collapsed_image[:, new_order]
+
 
 def resort_wavelengths(msi):
     """Neil organized his _wavelengths differently.
@@ -60,137 +76,207 @@ def resort_wavelengths(msi):
 # rebind this method since in this recoding the _wavelengths got messed up
 sp.resort_wavelengths = resort_wavelengths
 
-sp.bands_to_sortout = np.array([])  # [0, 1, 2, 20, 19, 18, 17, 16])
+sp.bands_to_sortout = np.array([])
 
 
+class ResultsFile(luigi.Task):
 
-class IPCAICreateOxyImageTask(luigi.Task):
-    image_prefix = luigi.Parameter()
-    df_prefix = luigi.Parameter()
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, sp.RESULTS_FOLDER,
+                                              sp.FINALS_FOLDER, "results.csv"))
 
-    def requires(self):
-        return IPCAIEstimateTissueParametersTask(image_prefix=self.image_prefix,
-                                            batch_prefix=
-                                            self.df_prefix), \
-            MultiSpectralImageFromTiffFiles(image_prefix=self.image_prefix), \
-            IPCAICorrectImagingSetupTask(image_prefix=self.image_prefix)
 
+class OxyOverTimeTask(luigi.Task):
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
-                                              self.image_prefix + "_" +
-                                              self.df_prefix +
-                                              "_summary.png"))
+                                              "oxy_over_time.pdf"))
+
+    def requires(self):
+        return ResultsFile()
 
     def run(self):
-        nrrdReader = NrrdReader()
-        # read in the parametric image
-        param_image = nrrdReader.read(self.input()[0].path)
-        image = param_image.get_image()
-        # read the multispectral image
-        msi = nrrdReader.read(self.input()[1].path)
-        msi_original = nrrdReader.read(self.input()[2].path)
+        df = pd.read_csv(self.input().path, index_col=0)
+        # determine times from start:
+        image_name_strings = df["image name"].values
+        time_strings = map(lambda s: s[
+            s.find("2014-08-03_")+11:s.find("2014-08-03_")+19],
+                           image_name_strings)
+        time_in_s = map(lambda s: int(s[0:2]) * 3600 +
+                                  int(s[3:5]) * 60 +
+                                  int(s[6:]), time_strings)
+        df["time since drug delivery [s]"] = np.array(time_in_s) - time_in_s[0]
 
-        plt.figure()
+        # print oxy over time as scatterplot.
+        ax = df.plot.scatter(x="time since drug delivery [s]",
+                             y="oxygenation mean [%]")
+        ax.set_xlim((-1, 70))
 
+        plt.axvline(x=0, ymin=0, ymax=1, linewidth=2)
+        plt.axvline(x=56, ymin=0, ymax=1, linewidth=2)
+        ax.annotate('drug delivery', xy=(0, ax.get_ylim()[1]),
+                    xycoords='data', xytext=(0, 0),
+                    textcoords='offset points')
+        ax.annotate('porcine death', xy=(56, ax.get_ylim()[1]),
+                    xycoords='data', xytext=(0, 0),
+                    textcoords='offset points')
 
-        # filter dark spots
-        segmentation = np.max(msi.get_image(), axis=-1) < 100.
-        # filter bright spots
-        segmentation = np.logical_or(segmentation,
-                                     (np.max(msi.get_image(), axis=-1) > 2000.))
+        df.to_csv(self.input().path)
 
-
-        # create artificial rgb
-        msimani.apply_segmentation(msi_original, ~segmentation)
-        rgb_image = msi_original.get_image()[:, :, [2, 3, 1]]
-        rgb_image /= np.max(rgb_image)
-        rgb_image *= 255.
-        rgb_image = rgb_image.astype(np.uint8)
-        im = Image.fromarray(rgb_image, 'RGB')
-        enh_brightness = ImageEnhance.Brightness(im)
-        im = enh_brightness.enhance(1.)
-        plot_image = np.array(im)
-        top_left_axis = plt.gca()
-        top_left_axis.imshow(plot_image, interpolation='nearest')
-        top_left_axis.set_title("synthetic rgb (specular pixels black)",
-                                fontsize=5)
-        top_left_axis.xaxis.set_visible(False)
-        top_left_axis.yaxis.set_visible(False)
-        plt.savefig(self.output().path, dpi=1000, bbox_inches='tight')
-
-        plt.set_cmap("jet")
-
-        plt.figure()
-        # plot parametric maps
-        # oxy_image = image[:, :, 1]  # image[500:1000, 1500:2500, 1]
-        oxy_image = np.ma.masked_array(image[:, :, 1], segmentation)
-        oxy_image[np.isnan(oxy_image)] = 0.
-        oxy_image[np.isinf(oxy_image)] = 0.
-        oxy_image[oxy_image > 1.] = 1.
-        oxy_image[oxy_image < 0.] = 0.
-        oxy_mean = np.mean(oxy_image)
-        oxy_image[0, 0] = 0.
-        oxy_image[0, 1] = 1.
-        at.plot_axis(plt.gca(), oxy_image[:, :] * 100,
-                  "oxygenation [%]. Mean " +
-                  "{0:.1f}".format((oxy_mean * 100.)) + "%")
-        plt.savefig(self.output().path + "_oxy.png", dpi=1000, bbox_inches='tight')
-
-        bvf_image = np.ma.masked_array(image[:, :, 0], segmentation)
-        bvf_image[np.isnan(bvf_image)] = 0.
-        bvf_image[np.isinf(bvf_image)] = 0.
-        bvf_image[bvf_image > 1.] = 1.
-        bvf_image[bvf_image < 0.] = 0.
-        bvf_mean = np.mean(bvf_image)
-        bvf_image[0, 0] = 0.
-        bvf_image[1, 1] = 0.1
-        at.plot_axis(plt.gca(), bvf_image[:, :] * 100,
-                  "blood volume fraction [%]. Mean " + "{0:.1f}".format((bvf_mean * 100.)) + "%")
-        plt.savefig(self.output().path + "_bvf.png", dpi=1000, bbox_inches='tight')
-
-        fd = open(os.path.join(sp.ROOT_FOLDER, sp.RESULTS_FOLDER,
-                                   sp.FINALS_FOLDER,
-                                   'results_summary.csv'), 'a')
-        fd.write(self.image_prefix + ", " + str(int(oxy_mean * 100)) +
-                 "," + "{0:.1f}".format((bvf_mean * 100.)) + "\n")
-        fd.close()
+        # save
+        plt.savefig(self.output().path,
+                    dpi=250, bbox_inches='tight', mode="pdf")
 
 
-class IPCAIEstimateTissueParametersTask(luigi.Task):
-    image_prefix = luigi.Parameter()
+class IPCAICreateOxyImageTask(luigi.Task):
+    image_name = luigi.Parameter()
     df_prefix = luigi.Parameter()
 
     def requires(self):
-        return IPCAIPreprocessMSI(image_prefix=self.image_prefix), \
-            IPCAITrainRegressor(batch_prefix=
-                        self.df_prefix)
+        return IPCAITrainRegressor(df_prefix=self.df_prefix), \
+               Flatfield(flatfield_folder=sp.FLAT_FOLDER), \
+               SingleMultispectralImage(image=self.image_name)
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                              sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
-                                              self.image_prefix + "_" +
+                                              self.image_name + "_" +
                                               self.df_prefix +
-                                              "estimate.nrrd"))
+                                              "_summary" + ".png"))
 
     def run(self):
-        # load data
-        reader = NrrdReader()
-        msi = reader.read(self.input()[0].path)
-        e_file = open(self.input()[1].path, 'r')
+        nrrd_reader = NrrdReader()
+        tiff_ring_reader = TiffRingReader()
+        # read the flatfield
+        flat = nrrd_reader.read(self.input()[1].path)
+        # read the msi
+        nr_filters = len(sp.RECORDED_WAVELENGTHS)
+        msi, segmentation = tiff_ring_reader.read(self.input()[2].path,
+                                                  nr_filters)
+
+        # only take into account not saturated pixels.
+        segmentation = np.max(msi.get_image(), axis=-1) < 2000.
+
+        # read the regressor
+        e_file = open(self.input()[0].path, 'r')
         e = pickle.load(e_file)
+
+        # correct image setup
+        position_filter_nr_in_string = self.image_name.find(" 2014") - 1
+        filter_nr = int(self.image_name[
+                position_filter_nr_in_string:position_filter_nr_in_string+1])
+        original_order = np.arange(nr_filters)
+        new_image_order = np.concatenate((
+                                original_order[nr_filters - filter_nr:],
+                                original_order[:nr_filters - filter_nr]))
+        # resort msi to restore original order
+        msimani.get_bands(msi, new_image_order)
+        # correct by flatfield
+        msimani.flatfield_correction(msi, flat)
+
+        # create artificial rgb
+        rgb_image = msi.get_image()[:, :, [2, 3, 1]]
+        rgb_image /= np.max(rgb_image)
+        rgb_image *= 255.
+
+        # preprocess the image
+        # sortout unwanted bands
+        print "1"
+        msi.set_image(imgmani.sortout_bands(msi.get_image(),
+                                            sp.bands_to_sortout))
+        # zero values would lead to infinity logarithm, thus clip.
+        msi.set_image(np.clip(msi.get_image(), 0.00001, 2. ** 64))
+        # normalize to get rid of lighting intensity
+        norm.standard_normalizer.normalize(msi)
+        # transform to absorption
+        msi.set_image(-np.log(msi.get_image()))
+        # normalize by l2 for stability
+        norm.standard_normalizer.normalize(msi, "l2")
+        print "2"
         # estimate
-        start = time.time()
-        sitk_image = estimate_image(msi, e)
-        end = time.time()
-        print "time necessary for estimating image parameters: ", \
-            str(end - start), "s"
-        # save data
-        outFile = self.output().open('w')
-        outFile.close()
-        sitk.WriteImage(sitk_image, self.output().path)
+        sitk_image, time = estimate_image(msi, e)
+        image = sitk.GetArrayFromImage(sitk_image)
+
+        plt.figure()
+        print "3"
+        rgb_image = rgb_image.astype(np.uint8)
+        im = Image.fromarray(rgb_image, 'RGB')
+        enh_brightness = ImageEnhance.Brightness(im)
+        im = enh_brightness.enhance(5.)
+        plot_image = np.array(im)
+        top_left_axis = plt.gca()
+        top_left_axis.imshow(plot_image, interpolation='nearest')
+        top_left_axis.xaxis.set_visible(False)
+        top_left_axis.yaxis.set_visible(False)
+
+        plt.set_cmap("jet")
+        print "4"
+        # plot parametric maps
+        oxy_image = image[:, :]
+        segmentation[0, 0] = 1
+        segmentation[0, 1] = 1
+        oxy_image = np.ma.masked_array(image[:, :], ~segmentation)
+        oxy_image[np.isnan(oxy_image)] = 0.
+        oxy_image[np.isinf(oxy_image)] = 0.
+        oxy_mean = np.mean(oxy_image)
+        oxy_image[0, 0] = 0.0
+        oxy_image[0, 1] = 1.
+#        oxy_image = np.clip(oxy_image, 0.2, 0.8)
+#         oxy_image[oxy_image > 0.8] = 0.8
+#         oxy_image[oxy_image < 0.2] = 0.2
+
+        at.plot_axis(plt.gca(), oxy_image[:, :],
+                  "oxygenation [%]. Mean " +
+                  "{0:.1f}".format((oxy_mean * 100.)) + "%")
+
+        df_image_results = pd.DataFrame(data=np.expand_dims([self.image_name,
+                                                             oxy_mean * 100.,
+                                                             time], 0),
+                                        columns=["image name",
+                                                 "oxygenation mean [%]",
+                                                 "time to estimate"])
+
+        results_file = os.path.join(sp.ROOT_FOLDER, sp.RESULTS_FOLDER,
+                                    sp.FINALS_FOLDER, "results.csv")
+        if os.path.isfile(results_file):
+            df_results = pd.read_csv(results_file, index_col=0)
+            df_results = pd.concat((df_results, df_image_results)).reset_index(
+                drop=True
+            )
+        else:
+            df_results = df_image_results
+
+        df_results.to_csv(results_file)
+
+        plt.savefig(self.output().path,
+                    dpi=250, bbox_inches='tight')
+#         plt.figure()
+#         bvf_image = np.ma.masked_array(image[:, :, 0], (segmentation < 1))
+#         # bvf_image = image[:, :, 0]
+#         bvf_image[np.isnan(bvf_image)] = 0.
+#         bvf_image[np.isinf(bvf_image)] = 0.
+#         bvf_image[bvf_image > 1.] = 1.
+#         bvf_image[bvf_image < 0.] = 0.
+#         bvf_mean = np.mean(bvf_image)
+#         bvf_image[0, 0] = 0.
+#         bvf_image[1, 1] = 0.1
+#         at.plot_axis(plt.gca(), bvf_image[:, :] * 100,
+#                   "blood volume fraction [%]. Mean " + "{0:.1f}".format((bvf_mean * 100.)) + "%")
+#
+#         plt.savefig(self.output().path + "_bvf.png", dpi=500, bbox_inches='tight')
+        print "4.5"
+
+#         fd = open(os.path.join(sp.ROOT_FOLDER, sp.RESULTS_FOLDER,
+#                                    sp.FINALS_FOLDER,
+#                                    'results_summary.csv'), 'a')
+#         fd.write(self.image_name + ", " + str(int(oxy_mean * 100)) +
+#                  ", " + "{0:.1f}".format((bvf_mean * 100.)) + "\n")
+#         fd.close()
+        print "5"
+        plt.close("all")
 
 
 class IPCAITrainRegressor(luigi.Task):
@@ -208,82 +294,41 @@ class IPCAITrainRegressor(luigi.Task):
 
     def run(self):
         # extract data from the batch
-        f = open(self.input().path, "r")
-        batch_train = pickle.load(f)
-        # TODO: fix hack by sorting always to ascending _wavelengths
-        batch_train.reflectances = resort_image_wavelengths(
-                                                    batch_train.reflectances)
-        batch_train._wavelengths = batch_train._wavelengths[new_order]
-        X, y = preprocess2(batch_train,
-                          w_percent=0.1, bands_to_sortout=sp.bands_to_sortout)
+        df_train = pd.read_csv(self.input().path, header=[0, 1])
+        df_snrs = pd.read_csv("/media/wirkert/data/Data/" +
+                              "2016_01_08_Calibration_Measurements/processed/" +
+                              "Carets_Laparoscope/finals/" +
+                              "snr_for_bands.txt", index_col=0)
 
+        X, y = preprocess(df_train, snr=df_snrs["SNR"].values,
+                          movement_noise_sigma=0.1,
+                          bands_to_sortout=sp.bands_to_sortout)
         # train regressor
-        reg = RandomForestRegressor(max_depth=10, n_estimators=10,
+        reg = RandomForestRegressor(10, min_samples_leaf=10, max_depth=9,
                                     n_jobs=-1)
+        # reg = KNeighborsRegressor(algorithm="auto")
+        # reg = LinearRegression()
+        # reg = sklearn.svm.SVR(kernel="rbf", degree=3, C=100., gamma=10.)
         # reg = LinearSaO2Unmixing()
         reg.fit(X, y)
         # reg = LinearSaO2Unmixing()
         # save regressor
-        f = self.output().open('w')
-        pickle.dump(reg, f)
-        f.close()
+        regressor_file = self.output().open('w')
+        pickle.dump(reg, regressor_file)
+        regressor_file.close()
 
 
-class IPCAIPreprocessMSI(luigi.Task):
-    image_prefix = luigi.Parameter()
+class SingleMultispectralImage(luigi.Task):
 
-    def output(self):
-        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
-                                              sp.RESULTS_FOLDER,
-                                  self.image_prefix + "_preprocessed.nrrd"))
-
-    def requires(self):
-        return IPCAICorrectImagingSetupTask(image_prefix=self.image_prefix)
-
-    def run(self):
-        reader = NrrdReader()
-        msi = reader.read(self.input().path)
-        # sortout unwanted bands
-        msi.set_image(imgmani.sortout_bands(msi.get_image(),
-                                              sp.bands_to_sortout))
-        # zero values would lead to infinity logarithm, thus clip.
-        msi.set_image(np.clip(msi.get_image(), 0.00001, 2. ** 64))
-        # normalize to get rid of lighting intensity
-        norm.standard_normalizer.normalize(msi)
-        # transform to absorption
-        msi.set_image(-np.log(msi.get_image()))
-        # normalize by l2 for stability
-        norm.standard_normalizer.normalize(msi, "l2")
-        pre.touch_and_save_msi(msi, self.output())
-
-
-class IPCAICorrectImagingSetupTask(luigi.Task):
-    """corrects for dark image
-    and flatfield"""
-    image_prefix = luigi.Parameter()
-
-    def requires(self):
-        return MultiSpectralImageFromTiffFiles(image_prefix=self.image_prefix), \
-            FlatfieldFromPNGFiles()
+    image = luigi.Parameter()
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
-                                              sp.RESULTS_FOLDER,
-                                self.image_prefix +
-                                "_image_setup_corrected.nrrd"))
-
-    def run(self):
-        """sort _wavelengths and normalize by respective integration times"""
-        # read inputs
-        reader = NrrdReader()
-        msi = reader.read(self.input()[0].path)
-        flatfield = reader.read(self.input()[1].path)
-        # correct image by flatfield
-        msimani.flatfield_correction(msi, flatfield)
-        pre.touch_and_save_msi(msi, self.output())
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER, \
+                                              self.image))
 
 
-class FlatfieldFromPNGFiles(luigi.Task):
+class Flatfield(luigi.Task):
+    flatfield_folder = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -292,38 +337,62 @@ class FlatfieldFromPNGFiles(luigi.Task):
                                 ".nrrd"))
 
     def run(self):
-        reader = PngReader()
-        msi = reader.read(os.path.join(sp.ROOT_FOLDER,
-                                       sp.FLAT_FOLDER,
-                                       "Flatfield9cm_I000x_F"))
+        tiff_ring_reader = TiffRingReader()
+        nr_filters = len(sp.RECORDED_WAVELENGTHS)
+
+        # analyze all the first image files
+        image_files = get_image_files_from_folder(self.flatfield_folder)
+        image_files = filter(lambda image_name: "F0" in image_name, image_files)
+
+        # helper function to take maximum of two images
+        def maximum_of_two_images(image_1, image_name_2):
+            image_2 = tiff_ring_reader.read(os.path.join(self.flatfield_folder,
+                                                         image_name_2),
+                                            nr_filters)[0].get_image()
+            return np.maximum(image_1, image_2)
+
+        # now reduce to maximum of all the single images
+        flat_maximum = reduce(lambda x, y: maximum_of_two_images(x, y),
+                              image_files, 0)
+        msi = Msi(image=flat_maximum)
+        msi.set_wavelengths(sp.RECORDED_WAVELENGTHS)
+
+        # write flatfield as nrrd
         writer = NrrdWriter(msi)
-        msi.set_image(msi.get_image().astype(float))
-        seg_reader = NrrdReader()
-        segmentation = seg_reader.read(os.path.join(sp.ROOT_FOLDER,
-                                           sp.FLAT_FOLDER,
-                                           "segmentation.nrrd"))
-        # msimani.apply_segmentation(msi, segmentation)
-        # msimani.calculate_mean_spectrum(msi)
-        # apply gaussian smoothing for error reduction
-        img = gaussian_filter(msi.get_image(), sigma=(5, 5, 0), order=0)
-        msi.set_image(img)
         writer.write(self.output().path)
 
 
-class MultiSpectralImageFromTiffFiles(luigi.Task):
-    image_prefix = luigi.Parameter()
+class Dark(luigi.Task):
+    dark_folder = luigi.Parameter()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
-                                self.image_prefix +
+                                "dark" +
                                 ".nrrd"))
 
     def run(self):
-        reader = TiffReader()
-        msi = reader.read(os.path.join(sp.ROOT_FOLDER,
-                                       sp.DATA_FOLDER,
-                                       self.image_prefix))
+        tiff_ring_reader = TiffRingReader()
+        nr_filters = len(sp.RECORDED_WAVELENGTHS)
+
+        # analyze all the first image files
+        image_files = get_image_files_from_folder(self.dark_folder)
+        image_files = filter(lambda image_name: "F0" in image_name, image_files)
+
+        # returns the mean dark image vector of all inputted dark image
+        # overly complicated TODO SW: make this simple code readable.
+        dark_means = map(lambda image_name:
+                            msimani.calculate_mean_spectrum(
+                                tiff_ring_reader.read(os.path.join(self.dark_folder, image_name),
+                                                      nr_filters)[0]),
+                         image_files)
+        dark_means_sum = reduce(lambda x, y: x+y.get_image(), dark_means, 0)
+        final_dark_mean = dark_means_sum / len(dark_means)
+
+        msi = Msi(image=final_dark_mean)
+        msi.set_wavelengths(sp.RECORDED_WAVELENGTHS)
+
+        # write flatfield as nrrd
         writer = NrrdWriter(msi)
         writer.write(self.output().path)
 
@@ -331,25 +400,31 @@ class MultiSpectralImageFromTiffFiles(luigi.Task):
 if __name__ == '__main__':
 
     # root folder there the data lies
+    logging.basicConfig(filename='liver' + str(datetime.datetime.now()) +
+                        '.log', level=logging.INFO)
     luigi.interface.setup_interface_logging()
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    logger = logging.getLogger()
+    logger.addHandler(ch)
+
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    # run over all subfolders (non-recursively)
-    # to collect the data and generate the results
     image_file_folder = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER)
-    onlyfiles = [ f for f in os.listdir(image_file_folder) if
-                 os.path.isfile(os.path.join(image_file_folder, f)) ]
-    # each complete stack has elements F0 - F7
-    only_colon_images = [ f for f in onlyfiles if
-                 f.startswith("1_") ]
-    files_prefixes = [ f[:-28] for f in only_colon_images]
+    onlyfiles = get_image_files_from_folder(image_file_folder)
 
-    for f in files_prefixes:
-        main_task = IPCAICreateOxyImageTask(
-            image_prefix=f,
-            batch_prefix=
-            "ipcai_colon_muscle_train")
+    first_invivo_image_files = filter(lambda image_name: "0 2014" in image_name,
+                                      onlyfiles)
+
+    for f in first_invivo_image_files:
+        main_task = IPCAICreateOxyImageTask(image_name=f,
+                df_prefix="ipcai_revision_colon_mean_scattering_train")
         w.add(main_task)
+
+    w.run()
+
+    oxygenation_over_time_task = OxyOverTimeTask()
+    w.add(oxygenation_over_time_task)
     w.run()
 

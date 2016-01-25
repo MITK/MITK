@@ -36,8 +36,8 @@ from msi.io.tiffringreader import TiffRingReader
 
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo"
-sp.DATA_FOLDER = "liver_all"
-sp.FINALS_FOLDER = "liver_all"
+sp.DATA_FOLDER = "small_bowel_images"
+sp.FINALS_FOLDER = "small_bowel_images_jet_new_scattering"
 sp.FLAT_FOLDER = "/media/wirkert/data/Data/" + \
                  "2016_01_19_Flatfield_and_Dark_Laparoscope/Flatfields"
 sp.DARK_FOLDER = "/media/wirkert/data/Data/" + \
@@ -106,10 +106,10 @@ class OxyOverTimeTask(luigi.Task):
         time_in_s = map(lambda s: int(s[0:2]) * 3600 +
                                   int(s[3:5]) * 60 +
                                   int(s[6:]), time_strings)
-        df["time since first frame"] = np.array(time_in_s) - time_in_s[0]
+        df["time since first frame [s]"] = np.array(time_in_s) - time_in_s[0]
 
         # print oxy over time as scatterplot.
-        ax = df.plot.scatter(x="time since first frame",
+        ax = df.plot.scatter(x="time since first frame [s]",
                              y="oxygenation mean [%]")
         ax.set_xlim((0, 600))
 
@@ -120,10 +120,10 @@ class OxyOverTimeTask(luigi.Task):
                     xycoords='data', xytext=(-15, 0),
                     textcoords='offset points')
         ax.annotate('second clip', xy=(104, ax.get_ylim()[1]),
-                    xycoords='data', xytext=(-15, 0),
+                    xycoords='data', xytext=(0, 0),
                     textcoords='offset points')
         ax.annotate('third clip', xy=(204, ax.get_ylim()[1]),
-                    xycoords='data', xytext=(-15, 0),
+                    xycoords='data', xytext=(0, 0),
                     textcoords='offset points')
 
         df.to_csv(self.input().path)

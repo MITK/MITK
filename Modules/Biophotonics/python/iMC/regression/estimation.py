@@ -35,8 +35,9 @@ def estimate_image(msi, regressor):
     start = time.time()
     estimated_parameters = regressor.predict(collapsed_msi)
     end = time.time()
+    estimation_time = end - start
     logging.info("time necessary for estimating image parameters: " +
-        str(end - start) + "s")
+        str(estimation_time) + "s")
     # restore shape
     feature_dimension = 1
     if len(estimated_parameters.shape) > 1:
@@ -49,7 +50,7 @@ def estimate_image(msi, regressor):
     # save as sitk nrrd.
     sitk_img = sitk.GetImageFromArray(estimated_paramters_as_image,
                                  isVector=True)
-    return sitk_img
+    return sitk_img, estimation_time
 
 def standard_score(estimator, X, y):
     """our standard scoring method is the median absolute error"""

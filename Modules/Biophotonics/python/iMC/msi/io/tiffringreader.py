@@ -7,14 +7,12 @@ Created on Nov 2, 2015
 import os
 import logging
 
-# PIL always rescales the image, thus PIL and skimage (which uses PIL) cannot
-# be used
 import Image
+import scipy
 import numpy as np
 
 from msi.io.reader import Reader
 from msi.msi import Msi
-import msi.msimanipulations as msimani
 
 
 class TiffRingReader(Reader):
@@ -41,28 +39,38 @@ class TiffRingReader(Reader):
         files_in_folder.sort()
         position = files_in_folder.index(fileToRead)
         # take n images from found position
-        image_array = [toImage(f)
+        image_array = [to_image(f)
                        for f in files_in_folder[position:position + n]]
         image = reduce(lambda x, y: np.dstack((x, y)), image_array)
+
+        # in case of 1 dimensional image: add a fake last dimension, since
+        # we always assume the last dimension to be the wavelength domain.
+        # TODO SW: Test this and implement for other readers
+        if n is 1:
+            image = np.expand_dims(image, -1)
 
         msi = Msi(image)
 
         segmentation = None
         try:
-            segmentation_array = [toSegmentation(f) \
-                                  for f in files_in_folder[position:position + n]]
+            segmentation_array = [to_segmentation(f)
+                                  for f in
+                                  files_in_folder[position:position + n]]
             segmentation = reduce(lambda x, y: x & y, segmentation_array)
-
+            segmentation = scipy.misc.imresize(segmentation, 0.5,
+                                               interp="bilinear")
         except:
             logging.info("didn't find segmentation for all images")
         return msi, segmentation
 
-def toImage(f):
+
+def to_image(f):
     im = Image.open(f)
     im_array = np.array(im)
-    im_array = im_array >> 4
-    return im_array
+    im_array >>= 4
+    return scipy.misc.imresize(im_array, 0.5, interp="bilinear", mode="F")
 
-def toSegmentation(f):
+
+def to_segmentation(f):
     seg = np.load(f + ".seg.npy")
     return seg

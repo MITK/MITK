@@ -19,7 +19,6 @@ class NrrdReader(Reader):
     def __init__(self):
         pass
 
-
     def read(self, fileToRead):
         """ read the nrrd image.
         TODO: properties are not correctly extracted from nrrd."""

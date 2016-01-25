@@ -8,8 +8,9 @@ import numpy as np
 
 import msi.msimanipulations as msimani
 import msi.imgmani as imgmani
-import helpers
+import msi.test.helpers as helpers
 from msi.imgmani import remove_masked_elements, select_n_reflectances
+
 
 class TestImgMani(unittest.TestCase):
 

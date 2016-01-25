@@ -7,10 +7,10 @@ import unittest
 import numpy as np
 
 import msi.normalize as norm
-import helpers
+import msi.test.helpers as helpers
+
 
 class TestNormalize(unittest.TestCase):
-
 
     def setUp(self):
         self.specialmsi = helpers.getFakeMsi()
@@ -20,7 +20,6 @@ class TestNormalize(unittest.TestCase):
 
     def tearDown(self):
         pass
-
 
     def test_normalizeIQ(self):
         original_shape = self.specialmsi.get_image().shape  # shape should stay

@@ -19,35 +19,34 @@ import luigi
 import matplotlib.pyplot as plt
 import SimpleITK as sitk
 from sklearn.ensemble.forest import RandomForestRegressor
-from scipy.ndimage.filters import gaussian_filter
+import seaborn as sns
 
 import tasks_analyze as at
 import tasks_mc
 import scriptpaths as sp
 from msi.msi import Msi
-from msi.io.pngreader import PngReader
 from msi.io.nrrdreader import NrrdReader
 from msi.io.nrrdwriter import NrrdWriter
 import msi.msimanipulations as msimani
 import msi.imgmani as imgmani
 import msi.normalize as norm
 from regression.estimation import estimate_image
-from regression.linear import LinearSaO2Unmixing
 from regression.preprocessing import preprocess, preprocess2
 from msi.io.tiffringreader import TiffRingReader
-from sklearn.linear_model.base import LinearRegression
 
 
-sp.ROOT_FOLDER = "/media/wirkert/data/Data/" + \
-            "2015_11_12_IPCAI_in_vivo"
-sp.DATA_FOLDER = "small_bowel_images"
-sp.FINALS_FOLDER = "small_bowel_images_jet"
-sp.FLAT_FOLDER = "flatfields_liver"
+sp.ROOT_FOLDER = "/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo"
+sp.DATA_FOLDER = "liver_all"
+sp.FINALS_FOLDER = "liver_all"
+sp.FLAT_FOLDER = "/media/wirkert/data/Data/" + \
+                 "2016_01_19_Flatfield_and_Dark_Laparoscope/Flatfields"
 sp.DARK_FOLDER = "/media/wirkert/data/Data/" + \
                  "2016_01_19_Flatfield_and_Dark_Laparoscope/Dark"
 
 AVERAGE_FOLDER = "average_intensity"
 AVERAGE_FINALS_FOLDER = "finals"
+
+sns.set_style("whitegrid")
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
@@ -77,7 +76,61 @@ def resort_wavelengths(msi):
 # rebind this method since in this recoding the _wavelengths got messed up
 sp.resort_wavelengths = resort_wavelengths
 
-sp.bands_to_sortout = np.array([])  # [0, 1, 2, 20, 19, 18, 17, 16])
+sp.bands_to_sortout = np.array([])
+
+
+class ResultsFile(luigi.Task):
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, sp.RESULTS_FOLDER,
+                                              sp.FINALS_FOLDER, "results.csv"))
+
+
+class OxyOverTimeTask(luigi.Task):
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                              sp.RESULTS_FOLDER,
+                                              sp.FINALS_FOLDER,
+                                              "oxy_over_time.pdf"))
+
+    def requires(self):
+        return ResultsFile()
+
+    def run(self):
+        df = pd.read_csv(self.input().path, index_col=0)
+
+        # determine times from start:
+        image_name_strings = df["image name"].values
+        time_strings = map(lambda s: s[27:35], image_name_strings)
+        time_in_s = map(lambda s: int(s[0:2]) * 3600 +
+                                  int(s[3:5]) * 60 +
+                                  int(s[6:]), time_strings)
+        df["time since first frame"] = np.array(time_in_s) - time_in_s[0]
+
+        # print oxy over time as scatterplot.
+        ax = df.plot.scatter(x="time since first frame",
+                             y="oxygenation mean [%]")
+        ax.set_xlim((0, 600))
+
+        plt.axvline(x=44, ymin=0, ymax=1, linewidth=2)
+        plt.axvline(x=104, ymin=0, ymax=1, linewidth=2)
+        plt.axvline(x=204, ymin=0, ymax=1, linewidth=2)
+        ax.annotate('first clip', xy=(44, ax.get_ylim()[1]),
+                    xycoords='data', xytext=(-15, 0),
+                    textcoords='offset points')
+        ax.annotate('second clip', xy=(104, ax.get_ylim()[1]),
+                    xycoords='data', xytext=(-15, 0),
+                    textcoords='offset points')
+        ax.annotate('third clip', xy=(204, ax.get_ylim()[1]),
+                    xycoords='data', xytext=(-15, 0),
+                    textcoords='offset points')
+
+        df.to_csv(self.input().path)
+
+        # save
+        plt.savefig(self.output().path,
+                    dpi=250, bbox_inches='tight', mode="pdf")
 
 
 class IPCAICreateOxyImageTask(luigi.Task):
@@ -86,7 +139,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
 
     def requires(self):
         return IPCAITrainRegressor(df_prefix=self.df_prefix), \
-               Flatfield(), \
+               Flatfield(flatfield_folder=sp.FLAT_FOLDER), \
                SingleMultispectralImage(image=self.image_name)
 
     def output(self):
@@ -95,17 +148,20 @@ class IPCAICreateOxyImageTask(luigi.Task):
                                               sp.FINALS_FOLDER,
                                               self.image_name + "_" +
                                               self.df_prefix +
-                                              "_summary.png.png"))
+                                              "_summary" + ".png"))
 
     def run(self):
+        df_results = pd.DataFrame()
+
         nrrd_reader = NrrdReader()
         tiff_ring_reader = TiffRingReader()
         # read the flatfield
         flat = nrrd_reader.read(self.input()[1].path)
         # read the msi
         nr_filters = len(sp.RECORDED_WAVELENGTHS)
-        msi, segmentation = tiff_ring_reader.read(self.input[2].path,
+        msi, segmentation = tiff_ring_reader.read(self.input()[2].path,
                                                   nr_filters)
+        # only take into account not saturated pixels.
         segmentation = np.logical_and(segmentation,
                                       (np.max(msi.get_image(),
                                               axis=-1) < 1000.))
@@ -145,7 +201,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         norm.standard_normalizer.normalize(msi, "l2")
         print "2"
         # estimate
-        sitk_image = estimate_image(msi, e)
+        sitk_image, time = estimate_image(msi, e)
         image = sitk.GetArrayFromImage(sitk_image)
 
         plt.figure()
@@ -166,7 +222,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         oxy_image = image[:, :]
         segmentation[0, 0] = 1
         segmentation[0, 1] = 1
-        oxy_image = np.ma.masked_array(image[:, :], (segmentation < 1))
+        oxy_image = np.ma.masked_array(image[:, :], ~segmentation)
         oxy_image[np.isnan(oxy_image)] = 0.
         oxy_image[np.isinf(oxy_image)] = 0.
         oxy_mean = np.mean(oxy_image)
@@ -180,7 +236,27 @@ class IPCAICreateOxyImageTask(luigi.Task):
                   "oxygenation [%]. Mean " +
                   "{0:.1f}".format((oxy_mean * 100.)) + "%")
 
-        plt.savefig(self.output().path, dpi=500, bbox_inches='tight')
+        df_image_results = pd.DataFrame(data=np.expand_dims([self.image_name,
+                                                             oxy_mean * 100.,
+                                                             time], 0),
+                                        columns=["image name",
+                                                 "oxygenation mean [%]",
+                                                 "time to estimate"])
+
+        results_file = os.path.join(sp.ROOT_FOLDER, sp.RESULTS_FOLDER,
+                                    sp.FINALS_FOLDER, "results.csv")
+        if os.path.isfile(results_file):
+            df_results = pd.read_csv(results_file, index_col=0)
+            df_results = pd.concat((df_results, df_image_results)).reset_index(
+                drop=True
+            )
+        else:
+            df_results = df_image_results
+
+        df_results.to_csv(results_file)
+
+        plt.savefig(self.output().path,
+                    dpi=250, bbox_inches='tight')
 #         plt.figure()
 #         bvf_image = np.ma.masked_array(image[:, :, 0], (segmentation < 1))
 #         # bvf_image = image[:, :, 0]
@@ -222,28 +298,28 @@ class IPCAITrainRegressor(luigi.Task):
 
     def run(self):
         # extract data from the batch
-        f = open(self.input().path, "r")
-        batch_train = pickle.load(f)
-        # TODO: fix hack by sorting always to ascending _wavelengths
-        batch_train.reflectances = resort_image_wavelengths(
-                                                    batch_train.reflectances)
-        batch_train._wavelengths = batch_train._wavelengths[new_order]
-        X, y = preprocess2(batch_train,
-                          w_percent=0.1, bands_to_sortout=sp.bands_to_sortout)
+        df_train = pd.read_csv(self.input().path, header=[0, 1])
+        df_snrs = pd.read_csv("/media/wirkert/data/Data/" +
+                              "2016_01_08_Calibration_Measurements/processed/" +
+                              "Carets_Laparoscope/finals/" +
+                              "snr_for_bands.txt", index_col=0)
 
+        X, y = preprocess(df_train, snr=df_snrs["SNR"].values,
+                          movement_noise_sigma=0.1,
+                          bands_to_sortout=sp.bands_to_sortout)
         # train regressor
         reg = RandomForestRegressor(10, min_samples_leaf=10, max_depth=9,
-                                   n_jobs=-1)
+                                    n_jobs=-1)
         # reg = KNeighborsRegressor(algorithm="auto")
         # reg = LinearRegression()
         # reg = sklearn.svm.SVR(kernel="rbf", degree=3, C=100., gamma=10.)
         # reg = LinearSaO2Unmixing()
-        reg.fit(X, y[:, 1])
+        reg.fit(X, y)
         # reg = LinearSaO2Unmixing()
         # save regressor
-        f = self.output().open('w')
-        pickle.dump(reg, f)
-        f.close()
+        regressor_file = self.output().open('w')
+        pickle.dump(reg, regressor_file)
+        regressor_file.close()
 
 
 class SingleMultispectralImage(luigi.Task):
@@ -273,16 +349,15 @@ class Flatfield(luigi.Task):
         image_files = filter(lambda image_name: "F0" in image_name, image_files)
 
         # helper function to take maximum of two images
-        def maximum_of_two_images(image_name_1, image_name_2):
-            image_1 = tiff_ring_reader.read(image_name_1,
-                                            nr_filters)[0].get_image()
-            image_2 = tiff_ring_reader.read(image_name_2,
+        def maximum_of_two_images(image_1, image_name_2):
+            image_2 = tiff_ring_reader.read(os.path.join(self.flatfield_folder,
+                                                         image_name_2),
                                             nr_filters)[0].get_image()
             return np.maximum(image_1, image_2)
 
         # now reduce to maximum of all the single images
         flat_maximum = reduce(lambda x, y: maximum_of_two_images(x, y),
-                              image_files)
+                              image_files, 0)
         msi = Msi(image=flat_maximum)
         msi.set_wavelengths(sp.RECORDED_WAVELENGTHS)
 
@@ -340,15 +415,20 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    # run over all subfolders (non-recursively)
-    # to collect the data and generate the results
     image_file_folder = os.path.join(sp.ROOT_FOLDER, sp.DATA_FOLDER)
     onlyfiles = get_image_files_from_folder(image_file_folder)
 
-    for f in onlyfiles:
+    first_invivo_image_files = filter(lambda image_name: "F0" in image_name,
+                                      onlyfiles)
+
+    for f in first_invivo_image_files:
         main_task = IPCAICreateOxyImageTask(image_name=f,
-                                    df_prefix="ipcai_colon_muscle_train")
+                df_prefix="ipcai_revision_colon_mean_scattering_train")
         w.add(main_task)
 
+    w.run()
+
+    oxygenation_over_time_task = OxyOverTimeTask()
+    w.add(oxygenation_over_time_task)
     w.run()
 

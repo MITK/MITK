@@ -22,7 +22,6 @@ class TiffReader(Reader):
     def __init__(self):
         pass
 
-
     def read(self, fileToRead):
         """ read the msi from tiffs.
         The fileToRead is a string prefix, all files starting with this
@@ -33,7 +32,7 @@ class TiffReader(Reader):
         files_to_read = [os.path.join(path, f) for f in files
                          if file_prefix[2:] in f]
         files_to_read.sort()
-        image_array = [toImage(f)
+        image_array = [to_image(f)
                        for f in files_to_read]
         image = reduce(lambda x, y: np.dstack((x, y)), image_array)
 
@@ -41,9 +40,9 @@ class TiffReader(Reader):
         return msi
 
 
-def toImage(f):
+def to_image(f):
     im = Image.open(f)
     im_array = np.array(im)
-    im_array = im_array >> 4
+    im_array >>= 4
     return im_array
 

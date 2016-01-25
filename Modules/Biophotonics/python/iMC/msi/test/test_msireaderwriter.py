@@ -7,12 +7,12 @@ import unittest
 import os
 import numpy as np
 
-import helpers
+import msi.test.helpers as helpers
 from msi.io.msiwriter import MsiWriter
 from msi.io.msireader import MsiReader
 
-class Test(unittest.TestCase):
 
+class Test(unittest.TestCase):
 
     def setUp(self):
         self.msi = helpers.getFakeMsi()
@@ -21,7 +21,6 @@ class Test(unittest.TestCase):
     def tearDown(self):
         # remove the hopefully written file
         os.remove(self.test_file_path)
-
 
     def test_read_and_write(self):
         reader = MsiReader()

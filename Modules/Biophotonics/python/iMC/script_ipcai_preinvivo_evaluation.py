@@ -149,6 +149,37 @@ class DetermineSNR(luigi.Task):
         df.to_csv(self.output().path)
 
 
+class DetermineSNRForBands(luigi.Task):
+    images = luigi.Parameter()
+    folder = luigi.Parameter()
+    segmentation = luigi.Parameter()
+    invivo_images = luigi.Parameter()
+    invivo_folder = luigi.Parameter()
+
+    def requires(self):
+        return DetermineSNR(images=self.images,
+                            folder=self.folder,
+                            segmentation=self.segmentation), \
+               IPCAIAverageIntensities(images=self.invivo_images,
+                                       folder=self.invivo_folder)
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
+                                              sp.RESULTS_FOLDER,
+                                              os.path.split(self.folder)[1],
+                                              "finals",
+                                              "snr_for_bands.txt"))
+
+    def run(self):
+        df_snr = pd.read_csv(self.input()[0].path, index_col=0)
+        df_invivo = pd.read_csv(self.input()[1].path, index_col=0)
+
+        lf = LogFit(df_snr["mean image intensity"], df_snr["SNR"])
+        df_invivo["SNR"] = lf.fit(df_invivo["mean"])
+
+        df_invivo.to_csv(self.output().path)
+
+
 class PlotSNR(luigi.Task):
     images = luigi.Parameter()
     folder = luigi.Parameter()
@@ -224,7 +255,7 @@ class PlotSNR(luigi.Task):
                     textcoords='offset points')
         plt.title("camera SNR and mean intensities of filter bands")
 
-        plt.savefig(self.output().path + ".pdf", format="pdf")
+        plt.savefig(self.output().path, format="pdf")
 
 
 class ImageIntensityToErrorMap(luigi.Task):
@@ -352,18 +383,27 @@ if __name__ == '__main__':
     first_invivo_image_files = filter(lambda image_name: "F0" in image_name,
                                       average_invivo_image_files)
 
-
-    # do calculations for image intensity variation using lots of images at
+    # plot snr for image intensity variation using lots of images at
     # different intensities c.f. a color checker board.
     intensity_patch_files = get_image_files_from_folder(
             LAPAROSCOPE_CARET_IMAGE_FOLDER)
-    image_intensity_task = PlotSNR(
+    plot_snr_task = PlotSNR(
             images=intensity_patch_files,
             folder=LAPAROSCOPE_CARET_IMAGE_FOLDER,
             segmentation=CARET_SEGMENTATION,
             invivo_images=first_invivo_image_files,
             invivo_folder=AVERAGE_IMAGE_FOLDER)
-    w.add(image_intensity_task)
+    w.add(plot_snr_task)
+    # the results of this task will be used by the in-vivo evaluation to
+    # set the snr of specific bands to the correct value
+    snr_for_bands_task = DetermineSNRForBands(
+            images=intensity_patch_files,
+            folder=LAPAROSCOPE_CARET_IMAGE_FOLDER,
+            segmentation=CARET_SEGMENTATION,
+            invivo_images=first_invivo_image_files,
+            invivo_folder=AVERAGE_IMAGE_FOLDER)
+    w.add(snr_for_bands_task)
 
+    # run both tasks
     w.run()
 

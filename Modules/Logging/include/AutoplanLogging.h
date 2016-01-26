@@ -129,7 +129,7 @@ namespace Logger
 
         if (Options::get().filelog) {
           if (Options::get().logsPath.empty()) {
-    #ifdef _WIN32
+#ifdef _WIN32
             char* ifAppData = getenv("LOCALAPPDATA");
             if (ifAppData != nullptr) {
               Options::get().logsPath = std::string(ifAppData) + "\\SamSMU\\logs\\";
@@ -138,7 +138,7 @@ namespace Logger
             else {
               Options::get().logsPath = ".";
             }
-    #else
+#else
             char* ifHome = getenv("HOME");
             if (ifHome != nullptr) {
               Options::get().logsPath = std::string(ifHome) + "/.local/share/SamSMU/logs/";
@@ -146,11 +146,11 @@ namespace Logger
             else {
               Options::get().logsPath = ".";
             }
-    #endif
+#endif
 
-    #ifdef BERRY_LOG
+#ifdef BERRY_LOG
             prefs->Put("logsPath", Options::get().logsPath.c_str());
-    #endif
+#endif
           }
           boost::shared_ptr< file_sink > sink(new file_sink(
             boost::log::keywords::file_name = "%Y%m%d_%H%M%S_%5N.xml",

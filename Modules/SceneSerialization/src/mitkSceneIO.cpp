@@ -337,12 +337,15 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
       bool logNodePresent = false;
       itk::SmartPointer<DataNode> logNode;
-      if (Logger::Options::get().datastoragelog && Logger::Log::get().getDataBackend()) {
+      if (Logger::Options::get().datastoragelog && Logger::Log::get().getDataBackend())
+      {
         std::string log;
 
-        for (auto node : sceneNodes->CastToSTLConstContainer()) {
+        for (auto node : sceneNodes->CastToSTLConstContainer())
+        {
           node->GetStringProperty("log", log);
-          if (!log.empty()) {
+          if (!log.empty())
+          {
             logNodePresent = true;
             logNode = node;
           }
@@ -352,7 +355,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         StringProperty::Pointer myLog =
           StringProperty::New(log + logData.c_str());
 
-        if (!logNodePresent) {
+        if (!logNodePresent)
+        {
           logNode = DataNode::New();
           logNode->SetName("Log");
         }
@@ -360,7 +364,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         logNode->SetProperty("log", myLog);
       }
 
-      auto serialize = [&](DataNode::Pointer node) {
+      auto serialize = [&](DataNode::Pointer node)
+      {
         if (node)
         {
           TiXmlElement* nodeElement = new TiXmlElement("node");
@@ -452,9 +457,12 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         serialize(node);
       } // end for all nodes
 
-      if (!logNodePresent)
+      if (Logger::Options::get().datastoragelog && Logger::Log::get().getDataBackend())
       {
-        serialize(logNode);
+        if (!logNodePresent)
+        {
+          serialize(logNode);
+        }
       }
     } // end if sceneNodes
 

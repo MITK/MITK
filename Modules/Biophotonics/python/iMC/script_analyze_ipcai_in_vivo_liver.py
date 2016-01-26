@@ -48,6 +48,9 @@ AVERAGE_FINALS_FOLDER = "finals"
 
 sns.set_style("whitegrid")
 
+font = {'family' : 'normal',
+        'size'   : 30}
+
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
 new_order = [0, 1, 2, 3, 4, 5, 6, 7]
@@ -86,13 +89,13 @@ class ResultsFile(luigi.Task):
                                               sp.FINALS_FOLDER, "results.csv"))
 
 
-class OxyOverTimeTask(luigi.Task):
+class OxyAndVhbOverTimeTask(luigi.Task):
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
-                                              "oxy_over_time.pdf"))
+                                              "liver_oxy_over_time.pdf"))
 
     def requires(self):
         return ResultsFile()
@@ -111,22 +114,51 @@ class OxyOverTimeTask(luigi.Task):
 
         # print oxy over time as scatterplot.
         ax = df.plot.scatter(x="time since drug delivery [s]",
-                             y="oxygenation mean [%]")
+                             y="oxygenation mean [%]",
+                             s=100,
+                             fontsize=30)
         ax.set_xlim((-1, 70))
 
         plt.axvline(x=0, ymin=0, ymax=1, linewidth=2)
         plt.axvline(x=56, ymin=0, ymax=1, linewidth=2)
         ax.annotate('drug delivery', xy=(0, ax.get_ylim()[1]),
                     xycoords='data', xytext=(0, 0),
+                    fontsize=30,
                     textcoords='offset points')
         ax.annotate('porcine death', xy=(56, ax.get_ylim()[1]),
-                    xycoords='data', xytext=(0, 0),
+                    xycoords='data', xytext=(-100, 0),
+                    fontsize=30,
                     textcoords='offset points')
+        ax.yaxis.label.set_size(30)
+        ax.xaxis.label.set_size(30)
 
         df.to_csv(self.input().path)
 
-        # save
+        # create and save vhb plot
         plt.savefig(self.output().path,
+                    dpi=250, bbox_inches='tight', mode="pdf")
+
+        # print vhb over time as scatterplot.
+        ax = df.plot.scatter(x="time since drug delivery [s]",
+                             y="blood volume fraction mean [%]",
+                             s=100,
+                             fontsize=30)
+        ax.set_xlim((-1, 70))
+
+        plt.axvline(x=0, ymin=0, ymax=1, linewidth=2)
+        plt.axvline(x=56, ymin=0, ymax=1, linewidth=2)
+        ax.annotate('drug delivery', xy=(0, ax.get_ylim()[1]),
+                    xycoords='data', xytext=(0, 0),
+                    fontsize=30,
+                    textcoords='offset points')
+        ax.annotate('porcine death', xy=(56, ax.get_ylim()[1]),
+                    xycoords='data', xytext=(-100, 0),
+                    fontsize=30,
+                    textcoords='offset points')
+        ax.yaxis.label.set_size(30)
+        ax.xaxis.label.set_size(30)
+
+        plt.savefig(self.output().path + "_vhb_mean.pdf",
                     dpi=250, bbox_inches='tight', mode="pdf")
 
 
@@ -145,7 +177,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
                                               sp.FINALS_FOLDER,
                                               self.image_name + "_" +
                                               self.df_prefix +
-                                              "_summary" + ".png"))
+                                              "_oxy_summary" + ".png"))
 
     def run(self):
         nrrd_reader = NrrdReader()
@@ -215,28 +247,46 @@ class IPCAICreateOxyImageTask(luigi.Task):
         plt.set_cmap("jet")
         print "4"
         # plot parametric maps
-        oxy_image = image[:, :]
+        # first oxygenation
+        plt.figure()
+        oxy_image = image[:, :, 0]
         segmentation[0, 0] = 1
         segmentation[0, 1] = 1
-        oxy_image = np.ma.masked_array(image[:, :], ~segmentation)
+        oxy_image = np.ma.masked_array(oxy_image, ~segmentation)
         oxy_image[np.isnan(oxy_image)] = 0.
         oxy_image[np.isinf(oxy_image)] = 0.
         oxy_mean = np.mean(oxy_image)
         oxy_image[0, 0] = 0.0
         oxy_image[0, 1] = 1.
-#        oxy_image = np.clip(oxy_image, 0.2, 0.8)
-#         oxy_image[oxy_image > 0.8] = 0.8
-#         oxy_image[oxy_image < 0.2] = 0.2
-
-        at.plot_axis(plt.gca(), oxy_image[:, :],
+        at.plot_axis(plt.gca(), oxy_image,
                   "oxygenation [%]. Mean " +
                   "{0:.1f}".format((oxy_mean * 100.)) + "%")
+        plt.savefig(self.output().path,
+                    dpi=250, bbox_inches='tight')
+        # second blood volume fraction
+        plt.figure()
+        vhb_image = image[:, :, 1]
+        vhb_image = np.ma.masked_array(vhb_image, ~segmentation)
+        vhb_image[np.isnan(vhb_image)] = 0.
+        vhb_image[np.isinf(vhb_image)] = 0.
+        vhb_image[0, 0] = 0.0
+        vhb_image[0, 1] = 0.05
+        vhb_image = np.clip(vhb_image, 0.0, 0.05)
+        vhb_mean = np.mean(vhb_image)
+        at.plot_axis(plt.gca(), vhb_image,
+                  "vhb [%]. Mean " +
+                  "{0:.1f}".format((vhb_mean * 100.)) + "%")
+        plt.savefig(self.output().path + "vhb.png",
+                    dpi=250, bbox_inches='tight')
 
+        # store results summary in dataframe
         df_image_results = pd.DataFrame(data=np.expand_dims([self.image_name,
                                                              oxy_mean * 100.,
+                                                             vhb_mean * 100.,
                                                              time], 0),
                                         columns=["image name",
                                                  "oxygenation mean [%]",
+                                                 "blood volume fraction mean [%]",
                                                  "time to estimate"])
 
         results_file = os.path.join(sp.ROOT_FOLDER, sp.RESULTS_FOLDER,
@@ -251,8 +301,6 @@ class IPCAICreateOxyImageTask(luigi.Task):
 
         df_results.to_csv(results_file)
 
-        plt.savefig(self.output().path,
-                    dpi=250, bbox_inches='tight')
 #         plt.figure()
 #         bvf_image = np.ma.masked_array(image[:, :, 0], (segmentation < 1))
 #         # bvf_image = image[:, :, 0]
@@ -300,7 +348,7 @@ class IPCAITrainRegressor(luigi.Task):
                               "Carets_Laparoscope/finals/" +
                               "snr_for_bands.txt", index_col=0)
 
-        X, y = preprocess(df_train, snr=df_snrs["SNR"].values,
+        X, y = preprocess2(df_train, snr=df_snrs["SNR"].values,
                           movement_noise_sigma=0.1,
                           bands_to_sortout=sp.bands_to_sortout)
         # train regressor
@@ -424,7 +472,7 @@ if __name__ == '__main__':
 
     w.run()
 
-    oxygenation_over_time_task = OxyOverTimeTask()
+    oxygenation_over_time_task = OxyAndVhbOverTimeTask()
     w.add(oxygenation_over_time_task)
     w.run()
 

@@ -79,6 +79,7 @@ def dark_correction(msi, dark):
     msi.set_image(msi.get_image() - dark.get_image())
     return msi
 
+
 def flatfield_correction(msi, flatfield):
     """ divide by flatfield to remove dependencies on light source form and
     imaging system.
@@ -92,6 +93,7 @@ def flatfield_correction(msi, flatfield):
 
     msi.set_image(msi.get_image() / flatfield_copy.get_image())
     return msi
+
 
 def image_correction(msi, flatfield, dark):
     """ do the usual image correction:

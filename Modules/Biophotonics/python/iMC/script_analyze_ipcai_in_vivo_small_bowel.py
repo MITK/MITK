@@ -20,6 +20,7 @@ import matplotlib.pyplot as plt
 import SimpleITK as sitk
 from sklearn.ensemble.forest import RandomForestRegressor
 import seaborn as sns
+import matplotlib
 
 import tasks_analyze as at
 import tasks_mc
@@ -47,6 +48,12 @@ AVERAGE_FOLDER = "average_intensity"
 AVERAGE_FINALS_FOLDER = "finals"
 
 sns.set_style("whitegrid")
+sns.set_context("talk")
+
+font = {'family' : 'normal',
+        'size'   : 18}
+
+matplotlib.rc('font', **font)
 
 # sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
 
@@ -92,7 +99,7 @@ class OxyOverTimeTask(luigi.Task):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
-                                              "oxy_over_time.pdf"))
+                                              "colon_oxy_over_time.pdf"))
 
     def requires(self):
         return ResultsFile()
@@ -109,22 +116,29 @@ class OxyOverTimeTask(luigi.Task):
         df["time since first frame [s]"] = np.array(time_in_s) - time_in_s[0]
 
         # print oxy over time as scatterplot.
+        plt.figure()
         ax = df.plot.scatter(x="time since first frame [s]",
-                             y="oxygenation mean [%]")
+                             y="oxygenation mean [%]", fontsize=16,
+                             s=50)
         ax.set_xlim((0, 600))
 
         plt.axvline(x=44, ymin=0, ymax=1, linewidth=2)
         plt.axvline(x=104, ymin=0, ymax=1, linewidth=2)
         plt.axvline(x=204, ymin=0, ymax=1, linewidth=2)
         ax.annotate('first clip', xy=(44, ax.get_ylim()[1]),
-                    xycoords='data', xytext=(-15, 0),
+                    fontsize=18,
+                    xycoords='data', xytext=(-40, 0),
                     textcoords='offset points')
         ax.annotate('second clip', xy=(104, ax.get_ylim()[1]),
-                    xycoords='data', xytext=(0, 0),
+                    fontsize=18,
+                    xycoords='data', xytext=(-15, 0),
                     textcoords='offset points')
         ax.annotate('third clip', xy=(204, ax.get_ylim()[1]),
+                    fontsize=18,
                     xycoords='data', xytext=(0, 0),
                     textcoords='offset points')
+        ax.yaxis.label.set_size(22)
+        ax.xaxis.label.set_size(22)
 
         df.to_csv(self.input().path)
 
@@ -140,7 +154,8 @@ class IPCAICreateOxyImageTask(luigi.Task):
     def requires(self):
         return IPCAITrainRegressor(df_prefix=self.df_prefix), \
                Flatfield(flatfield_folder=sp.FLAT_FOLDER), \
-               SingleMultispectralImage(image=self.image_name)
+               SingleMultispectralImage(image=self.image_name), \
+               Dark(dark_folder=sp.DARK_FOLDER)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -157,6 +172,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         tiff_ring_reader = TiffRingReader()
         # read the flatfield
         flat = nrrd_reader.read(self.input()[1].path)
+        dark = nrrd_reader.read(self.input()[3].path)
         # read the msi
         nr_filters = len(sp.RECORDED_WAVELENGTHS)
         msi, segmentation = tiff_ring_reader.read(self.input()[2].path,
@@ -179,7 +195,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         # resort msi to restore original order
         msimani.get_bands(msi, new_image_order)
         # correct by flatfield
-        msimani.flatfield_correction(msi, flat)
+        msimani.image_correction(msi, flat, dark)
 
         # create artificial rgb
         rgb_image = msi.get_image()[:, :, [2, 3, 1]]

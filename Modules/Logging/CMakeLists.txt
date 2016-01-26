@@ -1,11 +1,3 @@
-set(module_options NO_INIT GCC_DEFAULT_VISIBILITY)
-if(MITK_WIN32_FORCE_STATIC)
-  list(APPEND module_options FORCE_STATIC)
-endif()
-
 MITK_CREATE_MODULE(
-  PACKAGE_DEPENDS
-    PUBLIC Boost
-  ${module_options}
-  EXPORT_DEFINE "LOG_EXPORTS"
+  PACKAGE_DEPENDS PUBLIC Boost
 )

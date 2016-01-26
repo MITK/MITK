@@ -297,7 +297,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       typedef std::map< DataNode*, std::string > UIDMapType;
       typedef std::map< DataNode*, std::list<std::string> > SourcesMapType;
 
-      UIDMapType nodeUIDs;              // for dependencies: ID of each node
+      UIDMapType nodeUIDs;       // for dependencies: ID of each node
       SourcesMapType sourceUIDs; // for dependencies: IDs of a node's parent nodes
 
       UIDGenerator nodeUIDGen("OBJECT_");
@@ -335,18 +335,12 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         }
       }
 
-      DataStorage::SetOfObjects::Pointer v = DataStorage::SetOfObjects::New();
-      v->insert(v->begin(), sceneNodes->begin(), sceneNodes->end());
-
-      AUTOPLAN_INFO << "checking for init variables";
-      if (Logger::Options::get().datastoragelog && Logger::Options::get().dataBackend) {
-        AUTOPLAN_INFO << "init variables found";
-
-        bool logNodePresent = false;
-        itk::SmartPointer<DataNode> logNode;
+      bool logNodePresent = false;
+      itk::SmartPointer<DataNode> logNode;
+      if (Logger::Options::get().datastoragelog && Logger::Log::get().getDataBackend()) {
         std::string log;
 
-        for (auto node : v->CastToSTLContainer()) {  
+        for (auto node : sceneNodes->CastToSTLConstContainer()) {
           node->GetStringProperty("log", log);
           if (!log.empty()) {
             logNodePresent = true;
@@ -355,9 +349,6 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         }
 
         std::string logData = Logger::Log::get().getData();
-
-        AUTOPLAN_INFO << "New log:" << log + logData.c_str();
-
         StringProperty::Pointer myLog =
           StringProperty::New(log + logData.c_str());
 
@@ -367,56 +358,46 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         }
 
         logNode->SetProperty("log", myLog);
-
-        if (!logNodePresent) {
-          v->push_back(logNode);
-        }
       }
 
-      // write out objects, dependencies and properties
-      for (DataStorage::SetOfObjects::const_iterator iter = v->begin();
-        iter != v->end();
-        ++iter)
-      {
-        DataNode* node = iter->GetPointer();
-
+      auto serialize = [&](DataNode::Pointer node) {
         if (node)
         {
           TiXmlElement* nodeElement = new TiXmlElement("node");
-          std::string filenameHint( node->GetName() );
+          std::string filenameHint(node->GetName());
           filenameHint = itksys::SystemTools::MakeCindentifier(filenameHint.c_str()); // escape filename <-- only allow [A-Za-z0-9_], replace everything else with _
 
           // store dependencies
           UIDMapType::iterator searchUIDIter = nodeUIDs.find(node);
-          if ( searchUIDIter != nodeUIDs.end() )
+          if (searchUIDIter != nodeUIDs.end())
           {
             // store this node's ID
-            nodeElement->SetAttribute("UID", searchUIDIter->second.c_str() );
+            nodeElement->SetAttribute("UID", searchUIDIter->second.c_str());
           }
 
           SourcesMapType::iterator searchSourcesIter = sourceUIDs.find(node);
-          if ( searchSourcesIter != sourceUIDs.end() )
+          if (searchSourcesIter != sourceUIDs.end())
           {
             // store all source IDs
-            for ( std::list<std::string>::iterator sourceUIDIter = searchSourcesIter->second.begin();
+            for (std::list<std::string>::iterator sourceUIDIter = searchSourcesIter->second.begin();
               sourceUIDIter != searchSourcesIter->second.end();
-              ++sourceUIDIter )
+              ++sourceUIDIter)
             {
               TiXmlElement* uidElement = new TiXmlElement("source");
-              uidElement->SetAttribute("UID", sourceUIDIter->c_str() );
-              nodeElement->LinkEndChild( uidElement );
+              uidElement->SetAttribute("UID", sourceUIDIter->c_str());
+              nodeElement->LinkEndChild(uidElement);
             }
           }
 
           // store basedata
-          if ( BaseData* data = node->GetData() )
+          if (BaseData* data = node->GetData())
           {
             //std::string filenameHint( node->GetName() );
             bool error(false);
-            TiXmlElement* dataElement( SaveBaseData( data, filenameHint, error ) ); // returns a reference to a file
+            TiXmlElement* dataElement(SaveBaseData(data, filenameHint, error)); // returns a reference to a file
             if (error)
             {
-              m_FailedNodes->push_back( node );
+              m_FailedNodes->push_back(node);
             }
             
             if (dataElement == nullptr)
@@ -426,13 +407,13 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
             // store basedata properties
             PropertyList* propertyList = data->GetPropertyList();
-            if (propertyList && !propertyList->IsEmpty() )
+            if (propertyList && !propertyList->IsEmpty())
             {
-              TiXmlElement* baseDataPropertiesElement( SavePropertyList( propertyList, filenameHint + "-data") ); // returns a reference to a file
-              dataElement->LinkEndChild( baseDataPropertiesElement );
+              TiXmlElement* baseDataPropertiesElement(SavePropertyList(propertyList, filenameHint + "-data")); // returns a reference to a file
+              dataElement->LinkEndChild(baseDataPropertiesElement);
             }
 
-            nodeElement->LinkEndChild( dataElement );
+            nodeElement->LinkEndChild(dataElement);
           }
 
           // store all renderwindow specific propertylists
@@ -450,12 +431,12 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
           // don't forget the renderwindow independent list
           PropertyList* propertyList = node->GetPropertyList();
-          if ( propertyList && !propertyList->IsEmpty() )
+          if (propertyList && !propertyList->IsEmpty())
           {
-            TiXmlElement* propertiesElement( SavePropertyList( propertyList, filenameHint + "-node") ); // returns a reference to a file
-            nodeElement->LinkEndChild( propertiesElement );
+            TiXmlElement* propertiesElement(SavePropertyList(propertyList, filenameHint + "-node")); // returns a reference to a file
+            nodeElement->LinkEndChild(propertiesElement);
           }
-          document.LinkEndChild( nodeElement );
+          document.LinkEndChild(nodeElement);
         }
         else
         {
@@ -463,7 +444,18 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         }
 
         ProgressBar::GetInstance()->Progress();
+      };
+
+      // write out objects, dependencies and properties
+      for (auto node : sceneNodes->CastToSTLConstContainer())
+      {
+        serialize(node);
       } // end for all nodes
+
+      if (!logNodePresent)
+      {
+        serialize(logNode);
+      }
     } // end if sceneNodes
 
     std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );

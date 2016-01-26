@@ -376,6 +376,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
             
             if (dataElement == nullptr)
             {
+              ProgressBar::GetInstance()->Progress();
               continue;
             }
 

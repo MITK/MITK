@@ -90,13 +90,13 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
      * \brief Template to calculate average pixel value around index using a ring of thickness neighborhood
      */
     template <typename TPixel, unsigned int imageDimension>
-    void GetPixelNeighborhood(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, ScalarType* result, unsigned int neighborhood=1);
+    void GetNeighborhoodAverage(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, ScalarType* result, unsigned int neighborhood=1);
 
     template <typename TPixel, unsigned int imageDimension>
     void IsInsideSegmentation(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, bool* result);
 
     template<typename TPixel, unsigned int imageDimension>
-    void StartRegionGrowing(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> seedPoint, ScalarType thresholds[2], itk::Image<DefaultSegmentationDataType, imageDimension>* outputImage);
+    void StartRegionGrowing(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> seedPoint, ScalarType thresholds[2], mitk::Image::Pointer& outputImage);
 
     mitkIpPicDescriptor* PerformRegionGrowingAndUpdateContour(int timestep=0);
 

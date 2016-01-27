@@ -116,7 +116,7 @@ void mitk::RegionGrowingTool::Deactivated()
 }
 
 template <typename TPixel, unsigned int imageDimension>
-void mitk::RegionGrowingTool::GetPixelNeighborhood(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, ScalarType* result, unsigned int neighborhood)
+void mitk::RegionGrowingTool::GetNeighborhoodAverage(itk::Image<TPixel, imageDimension>* itkImage, itk::Index<imageDimension> index, ScalarType* result, unsigned int neighborhood)
 {
     // maybe assert that image dimension is only 2 or 3?
     int neighborhoodInt = (int) neighborhood;
@@ -187,7 +187,7 @@ void mitk::RegionGrowingTool::IsInsideSegmentation(itk::Image<TPixel, imageDimen
 }
 
 template<typename TPixel, unsigned int imageDimension>
-void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimension>* inputImage, itk::Index<imageDimension> seedIndex, ScalarType thresholds[2], itk::Image<DefaultSegmentationDataType, imageDimension>* outputImage)
+void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimension>* inputImage, itk::Index<imageDimension> seedIndex, ScalarType thresholds[2], mitk::Image::Pointer& outputImage)
 {
     MITK_INFO << "Starting region growing at index " << seedIndex << " with lower threshold " << thresholds[0] << " and upper threshold " << thresholds[1];
 
@@ -217,9 +217,9 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
         return;
     }
 
-    OutputImageType* resultImage = regionGrower->GetOutput();
+    typename OutputImageType::Pointer resultImage = regionGrower->GetOutput();
 
-    // smooth result
+    // Smooth result: Every pixel is replaced by the majority of the neighborhood
     typedef itk::NeighborhoodIterator<OutputImageType> NeighborhoodIteratorType;
     typedef itk::ImageRegionIterator<OutputImageType> ImageIteratorType;
 
@@ -231,7 +231,7 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
 
     for (neighborhoodIterator.GoToBegin(), imageIterator.Begin(); !neighborhoodIterator.IsAtEnd(); ++neighborhoodIterator, ++imageIterator)
     {
-        // This might need to be adapted for  multilabel segmentations
+        // This might need to be adapted for multilabel segmentations
         DefaultSegmentationDataType voteYes(0);
         DefaultSegmentationDataType voteNo(0);
 
@@ -257,23 +257,13 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
         }
     }
 
-    outputImage = resultImage->Clone();
+    if (resultImage.IsNull())
+    {
+        MITK_INFO << "Rregion growing result is empty.";
+    }
 
-//    mitk::Image::Pointer resultImageMitk = mitk::ImportItkImage(resultImage, m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep()))->Clone();
-//    mitk::IOUtil::Save(resultImageMitk, "/home/jenspetersen/Desktop/result.nrrd");
+    outputImage = mitk::GrabItkImageMemory(resultImage);
 
-//    //  mitk::LabelSetImage::Pointer resultLabelSetImage = mitk::LabelSetImage::New();
-//    //  resultLabelSetImage->InitializeByLabeledImage(resultImage);
-//    //  m_ResultNode->SetData(resultLabelSetImage);
-
-//    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
-//    contourExtractor->SetInput(resultImageMitk);
-//    contourExtractor->Update();
-//    ContourModel::Pointer resultContourInIndexCoordinates = contourExtractor->GetOutput();
-//    ContourModel::Pointer resultContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice(m_ReferenceSlice->GetGeometry(), resultContourInIndexCoordinates);
-//    FeedbackContourTool::SetFeedbackContour(resultContourInWorldCoordinates);
-//    FeedbackContourTool::SetFeedbackContourVisible(true);
-//    mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
 }
 
 /**
@@ -378,7 +368,7 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
 
                     // Get seed neighborhood
                     ScalarType averageValue(0);
-                    AccessFixedDimensionByItk_3(m_ReferenceSlice, GetPixelNeighborhood, 2, indexInReferenceSlice2D, &averageValue, 1);
+                    AccessFixedDimensionByItk_3(m_ReferenceSlice, GetNeighborhoodAverage, 2, indexInReferenceSlice2D, &averageValue, 1);
                     m_SeedValue = averageValue;
                     MITK_INFO << "Seed value is " << m_SeedValue;
 
@@ -392,13 +382,30 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
                     m_LowerThreshold = m_InitialLowerThreshold;
                     m_UpperThreshold = m_InitialUpperThreshold;
                     ScalarType thresholds[2] = {m_LowerThreshold, m_UpperThreshold};
-                    itk::Image<DefaultSegmentationDataType, 2>* result;
+                    mitk::Image::Pointer resultImage = mitk::Image::New();
 
                     // Perform region growing
-                    AccessFixedDimensionByItk_3(m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, thresholds, result);
+                    AccessFixedDimensionByItk_3(m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, thresholds, resultImage);
+                    resultImage->SetGeometry(workingSliceGeometry);
 
-                    mitk::Image::Pointer resultImageMitk = mitk::ImportItkImage(result, m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep()))->Clone();
-                    mitk::IOUtil::Save(resultImageMitk, "/home/jenspetersen/Desktop/result.nrrd");
+                    // Extract contour
+                    if (resultImage.IsNotNull())
+                    {
+                        mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
+                        contourExtractor->SetInput(resultImage);
+                        contourExtractor->Update();
+                        ContourModel::Pointer resultContour = contourExtractor->GetOutput();
+//                        resultContour = FeedbackContourTool::BackProjectContourFrom2DSlice(workingSliceGeometry, resultContour);
+
+                        // Show contour
+                        if (resultContour.IsNotNull())
+                        {
+                            FeedbackContourTool::SetFeedbackContour(resultContour);
+                            FeedbackContourTool::SetFeedbackContourVisible(true);
+//                            mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
+                            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+                        }
+                    }
                 }
 
 
@@ -598,10 +605,24 @@ void mitk::RegionGrowingTool::OnMouseMoved( StateMachineAction*, InteractionEven
 /**
  If the feedback contour should be filled, then it is done here. (Contour is NOT filled, when skeletonization is done but no nice cut was found)
 */
-void mitk::RegionGrowingTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+//    mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+
+//    if (m_WorkingSlice.IsNotNull() && m_FillFeedbackContour)
+//    {
+//        ContourModel::Pointer feedbackContour(FeedbackContourTool::GetFeedbackContour());
+
+//        if (feedbackContour.IsNotNull())
+//        {
+//            FeedbackContourTool::FillContourInSlice(feedbackContour, positionEvent->GetSender()->GetTimeStep(), m_WorkingSlice, m_PaintingPixelValue);
+//            mitk::IOUtil::Save(m_WorkingSlice, "/home/jenspetersen/Desktop/result2.nrrd");
+//            this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
+//        }
+//    }
+
     // 1. If we have a working slice, use the contour to fill a new piece on segmentation on it (or erase a piece that was selected by ipMITKSegmentationGetCutPoints)
-    if ( m_WorkingSlice.IsNotNull() && m_OriginalPicSlice )
+    if ( m_WorkingSlice.IsNotNull())
     {
         mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
         //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());

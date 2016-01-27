@@ -284,6 +284,7 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
 void mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
 {
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  m_WorkingSlice->GetGeometry()->WorldToIndex( positionEvent->GetPositionInWorld(), m_LastPosition );
 
   if (!positionEvent) return;
 
@@ -375,13 +376,39 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
     it++;
   }
 
-
   if (leftMouseButtonPressed)
   {
-    FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
-    m_WorkingNode->SetData(m_WorkingSlice);
-    m_WorkingNode->Modified();
+    mitk::Point3D direction;
+    direction[0] = indexCoordinates[0] - m_LastPosition[0];
+    direction[1] = indexCoordinates[1] - m_LastPosition[1];
+    direction[2] = indexCoordinates[2] - m_LastPosition[2];
+
+    direction[0] = direction.GetVnlVector().normalize()[0];
+    direction[1] = direction.GetVnlVector().normalize()[1];
+    direction[2] = direction.GetVnlVector().normalize()[2];
+
+    double dist = indexCoordinates.EuclideanDistanceTo(m_LastPosition);
+
+    double radius = static_cast<double>(m_Size) / 2.0;
+    size_t steps = (size_t)(dist / radius);
+
+    for ( size_t i = 0; i <= steps ; ++i )
+    {
+      for (ContourModel::VertexIterator it = contour->Begin(); it != contour->End(); ++it)
+      {
+        Point3D& point = (*it)->Coordinates;
+
+        point[0] -= direction[0] * radius ;
+        point[1] -= direction[1] * radius ;
+      }
+
+      FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+      m_WorkingNode->SetData(m_WorkingSlice);
+      m_WorkingNode->Modified();
+    }
   }
+
+  m_LastPosition = indexCoordinates;
 
   // visualize contour
   ContourModel::Pointer displayContour = this->GetFeedbackContour();

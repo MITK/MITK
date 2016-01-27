@@ -144,6 +144,8 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 {
   mitk::LocaleSwitch localeSwitch("C");
 
+  AUTOPLAN_INFO << "Loading MITK file: " << filename;
+
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
   if ( storage.IsNull() )
@@ -234,6 +236,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
                               const std::string& filename)
 {
+  AUTOPLAN_INFO << "Saving MITK file: " << filename;
   if (!sceneNodes)
   {
     MITK_ERROR << "No set of nodes given. Not possible to save scene.";

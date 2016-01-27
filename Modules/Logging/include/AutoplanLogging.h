@@ -114,7 +114,7 @@ namespace Logger
 #endif
 
         /// Just return if everything is disabled
-        if (!(Options::get().get().consolelog || Options::get().filelog || Options::get().tcplog || Options::get().datastoragelog)) return;
+        if (!(Options::get().consolelog || Options::get().filelog || Options::get().tcplog || Options::get().datastoragelog)) return;
 
 #ifdef BERRY_LOG
         if (Options::get().iphost.empty()) {
@@ -161,7 +161,6 @@ namespace Logger
             boost::log::keywords::max_size = 16 * 1024 * 1024,          /*< maximum total size of the stored files, in bytes >*/
             boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
             ));
-
           sink->set_formatter(
             boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\">%3%</record>")
             % boost::log::expressions::attr< unsigned int >("RecordID")

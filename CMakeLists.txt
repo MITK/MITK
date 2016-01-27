@@ -252,7 +252,6 @@ endif()
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
 
 mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Util XML Zip)
-mitkFunctionAddExternalProject(NAME Boost       ON  DOC "Use the Boost C++ library")
 mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
 mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
 
@@ -284,6 +283,7 @@ mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 # These are "hard" dependencies and always set to ON
 mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
+mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
@@ -329,17 +329,10 @@ mitkFunctionFindWhitelists(MITK)
 # -----------------------------------------
 # Custom dependency logic
 
-if(MITK_USE_Boost)
-  option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
-  set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
-endif()
+option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
+set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
 if(MITK_USE_SOFA)
-  # SOFA requires boost library
-  if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
-    message("> Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
-    set(MITK_USE_Boost ON CACHE BOOL "" FORCE)
-  endif()
   # SOFA requires boost system library
   list(FIND MITK_USE_Boost_LIBRARIES system _result)
   if(_result LESS 0)
@@ -886,10 +879,8 @@ if(MITK_USE_SOFA)
   link_directories(${SOFA_LIBRARY_DIRS})
 endif()
 
-if(MITK_USE_Boost)
-  # Same as SOFA above
-  link_directories(${Boost_LIBRARY_DIRS})
-endif()
+# Same as SOFA above
+link_directories(${Boost_LIBRARY_DIRS})
 
 if(MITK_USE_OpenIGTLink)
   # Same as SOFA above

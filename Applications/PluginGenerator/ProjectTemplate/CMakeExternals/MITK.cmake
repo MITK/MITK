@@ -21,7 +21,6 @@ if(NOT MITK_DIR)
   option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
   option(MITK_USE_DCMTK "Use DCMTK in MITK" ON)
   option(MITK_USE_QT "Use Nokia's Qt library in MITK" ON)
-  option(MITK_USE_Boost "Use the Boost library in MITK" OFF)
   option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
   option(MITK_USE_VMTK "Use the Vascular Modeling Toolkit in MITK" OFF)
@@ -56,7 +55,6 @@ if(NOT MITK_DIR)
     MITK_USE_CTK
     MITK_USE_DCMTK
     MITK_USE_QT
-    MITK_USE_Boost
     MITK_USE_OpenCV
     MITK_USE_SOFA
     MITK_USE_VMTK
@@ -109,12 +107,10 @@ if(NOT MITK_DIR)
     endif()
   endforeach()
 
-  if(MITK_USE_Boost)
-    set(MITK_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
-    mark_as_advanced(MITK_BOOST_ROOT)
-    if(MITK_BOOST_ROOT)
-      list(APPEND additional_mitk_cmakevars "-DBOOST_ROOT:PATH=${MITK_BOOST_ROOT}")
-    endif()
+  set(MITK_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
+  mark_as_advanced(MITK_BOOST_ROOT)
+  if(MITK_BOOST_ROOT)
+    list(APPEND additional_mitk_cmakevars "-DBOOST_ROOT:PATH=${MITK_BOOST_ROOT}")
   endif()
 
   set(MITK_SOURCE_DIR "" CACHE PATH "MITK source code location. If empty, MITK will be cloned from MITK_GIT_REPOSITORY")

@@ -1,7 +1,7 @@
 MITK_CREATE_MODULE(
   DEPENDS MitkSceneSerializationBase
   PACKAGE_DEPENDS
-    PUBLIC SOFA Boost
+    PUBLIC SOFA
     PRIVATE GLUT GLEW
 )
 

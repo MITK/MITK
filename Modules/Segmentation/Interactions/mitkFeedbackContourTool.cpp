@@ -66,6 +66,7 @@ void mitk::FeedbackContourTool::Deactivated()
   {
     storage->Remove( m_FeedbackContourNode );
     m_FeedbackContour->Clear();
+    SetFeedbackContourVisible(false);
   }
 }
 

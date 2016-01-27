@@ -202,6 +202,12 @@ namespace Logger
           dataBackend->add_stream(dataStream);
 
           boost::shared_ptr< ostream_sink > sink3(new ostream_sink(dataBackend));
+          sink3->set_formatter(
+            boost::log::expressions::format("%1% > %2%")
+            % boost::log::expressions::attr< boost::posix_time::ptime >("TimeStamp")
+            % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
+            );
+
           boost::log::core::get()->add_sink(sink3);
         }
 

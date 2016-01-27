@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <itkMutexLockHolder.h>
 #include <itkCommand.h>
+#include "mitkIGTLTransformDeviceSource.h"
 
 //sleep headers
 #include <chrono>
@@ -36,11 +37,10 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDev
   //set the type of this tracking device
   this->m_Data = mitk::DeviceDataOpenIGTLinkTrackingDeviceConnection;
 
-  m_OpenIGTLinkClient = mitk::IGTLClient::New(false);
-  m_OpenIGTLinkClient->EnableInfiniteBufferingMode(m_OpenIGTLinkClient->GetMessageQueue(), false);
+  m_OpenIGTLinkClient = mitk::IGTLClient::New(true);
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
 
-  m_IGTLDeviceSource = mitk::IGTLDeviceSource::New();
+  m_IGTLDeviceSource = mitk::IGTLTransformDeviceSource::New();
   m_IGTLDeviceSource->SetIGTLDevice(m_OpenIGTLinkClient);
 }
 
@@ -229,7 +229,8 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform()
   bool condition = false;
   while (!condition)
   {
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    //TODO: Fix this.. :/
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
     m_IGTLDeviceSource->Update();
     igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
     if (msg == nullptr || msg.IsNull())
@@ -253,7 +254,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform()
 
     for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
     {
-      if (it->second < 2)
+      if (it->second < 5)
       {
         condition = false;
         break;

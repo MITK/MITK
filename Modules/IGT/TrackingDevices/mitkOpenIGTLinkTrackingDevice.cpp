@@ -281,18 +281,20 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
   }
 
   m_IGTLMsgToNavDataFilter->Update();
-  for (int i = 0; i < this->GetToolCount(); i++)
+
+  mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput();
+  const char* name = currentNavData->GetName();
+  MITK_WARN << name;
+
+  for (int i = 0; i < m_AllTools.size(); i++)
   {
-    mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput(i);
-    m_AllTools.at(i)->SetDataValid(currentNavData->IsDataValid());
-    m_AllTools.at(i)->SetPosition(currentNavData->GetPosition());
-    m_AllTools.at(i)->SetOrientation(currentNavData->GetOrientation());
-    m_AllTools.at(i)->SetIGTTimeStamp(currentNavData->GetIGTTimeStamp());
-
-    mitk::Point3D pos;
-    m_AllTools.at(i)->GetPosition(pos);
-
-    //MITK_INFO << "Updated Tool " << i << " Pos: " << pos;
+    if (strcmp(m_AllTools.at(i)->GetToolName(), name) == 0)
+    {
+      m_AllTools.at(i)->SetDataValid(currentNavData->IsDataValid());
+      m_AllTools.at(i)->SetPosition(currentNavData->GetPosition());
+      m_AllTools.at(i)->SetOrientation(currentNavData->GetOrientation());
+      m_AllTools.at(i)->SetIGTTimeStamp(currentNavData->GetIGTTimeStamp());
+    }
   }
 }
 

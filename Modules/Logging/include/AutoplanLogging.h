@@ -35,11 +35,6 @@
 
 #include <MitkLoggingExports.h>
 
-/// BERRY_LOG indicates that logger will write berry properties
-#ifdef BERRY_LOG
-#include <berryPlatform.h>
-#endif
-
 #define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::info)
 #define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::error)
 #define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::trace)
@@ -59,9 +54,9 @@ namespace Logger
       Options(Options const&);
       void operator=(Options const&);
 
+    public:
       std::string iphost, ipport, logsPath;
 
-    public:
       bool consolelog;
       bool filelog;
       bool tcplog;
@@ -73,7 +68,7 @@ namespace Logger
       std::string getIpport() const;
       std::string getLogsPath() const;
 
-      friend class Log;
+      //friend class Log;
   };
 
   class MITKLOGGING_EXPORT Log
@@ -99,60 +94,10 @@ namespace Logger
         boost::log::core::get()->flush();
         boost::log::core::get()->remove_all_sinks();
 
-#ifdef BERRY_LOG
-        berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-        berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/ru.samsmu.log");
-        if (prefs){
-          Options::get().iphost = prefs->Get("logstashIpAddress", "").toStdString();
-          Options::get().ipport = prefs->Get("logstashPort", "").toStdString();
-          Options::get().logsPath = prefs->Get("logsPath", "").toStdString();
-
-          Options::get().consolelog = prefs->GetBool("consoleLog", true);
-          Options::get().filelog = prefs->GetBool("fileLog", true);
-          Options::get().tcplog = prefs->GetBool("tcpLog", false);
-          Options::get().datastoragelog = prefs->GetBool("dataLog", false);
-        }
-#endif
-
         /// Just return if everything is disabled
         if (!(Options::get().consolelog || Options::get().filelog || Options::get().tcplog || Options::get().datastoragelog)) return;
 
-#ifdef BERRY_LOG
-        if (Options::get().iphost.empty()) {
-          Options::get().iphost = "127.0.0.1";
-          prefs->Put("logstashIpAddress", "127.0.0.1");
-        }
-        if (Options::get().ipport.empty()) {
-          Options::get().ipport = "666";
-          prefs->Put("logstashPort", "666");
-        }
-#endif
-
         if (Options::get().filelog) {
-          if (Options::get().logsPath.empty()) {
-#ifdef _WIN32
-            char* ifAppData = getenv("LOCALAPPDATA");
-            if (ifAppData != nullptr) {
-              Options::get().logsPath = std::string(ifAppData) + "\\SamSMU\\logs\\";
-              Options::get().logsPath = boost::locale::conv::to_utf<char>(Options::get().logsPath, "windows-1251");
-            }
-            else {
-              Options::get().logsPath = ".";
-            }
-#else
-            char* ifHome = getenv("HOME");
-            if (ifHome != nullptr) {
-              Options::get().logsPath = std::string(ifHome) + "/.local/share/SamSMU/logs/";
-            }
-            else {
-              Options::get().logsPath = ".";
-            }
-#endif
-
-#ifdef BERRY_LOG
-            prefs->Put("logsPath", Options::get().logsPath.c_str());
-#endif
-          }
           boost::shared_ptr< file_sink > sink(new file_sink(
             boost::log::keywords::file_name = "%Y%m%d_%H%M%S_%5N.xml",
             boost::log::keywords::rotation_size = 16384

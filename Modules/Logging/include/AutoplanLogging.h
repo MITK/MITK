@@ -221,6 +221,8 @@ namespace Logger
         boost::log::add_common_attributes();
       }
 
+      static std::string getLastDateTime(std::string str);
       std::string getData() const;
+      std::string getDataFromDate(std::string dateTime) const;
   };
 }

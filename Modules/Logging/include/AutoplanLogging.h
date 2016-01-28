@@ -110,6 +110,7 @@ namespace Logger
           Options::get().consolelog = prefs->GetBool("consoleLog", true);
           Options::get().filelog = prefs->GetBool("fileLog", true);
           Options::get().tcplog = prefs->GetBool("tcpLog", false);
+          Options::get().datastoragelog = prefs->GetBool("dataLog", false);
         }
 #endif
 

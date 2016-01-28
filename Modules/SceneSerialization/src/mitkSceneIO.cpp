@@ -340,29 +340,38 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
       bool logNodePresent = false;
       itk::SmartPointer<DataNode> logNode;
+      std::string logData;
       if (Logger::Options::get().datastoragelog && Logger::Log::get().getDataBackend())
       {
         std::string log;
 
         for (auto node : sceneNodes->CastToSTLConstContainer())
         {
-          node->GetStringProperty("log", log);
-          if (!log.empty())
-          {
-            logNodePresent = true;
+          if (node->GetName() == "AutoplanLog") {
             logNode = node;
+            logNodePresent = true;
+            auto preopertyList = node->GetPropertyList();
+            preopertyList->GetStringProperty("log", log);
+            if (!log.empty())
+            {
+              auto lastDateTime = Logger::Log::getLastDateTime(log);
+              logData = Logger::Log::get().getDataFromDate(lastDateTime);
+            }
+            else {
+              logData = Logger::Log::get().getData();
+            }
+            break;
           }
         }
-
-        std::string logData = Logger::Log::get().getData();
-        StringProperty::Pointer myLog =
-          StringProperty::New(log + logData.c_str());
-
         if (!logNodePresent)
         {
           logNode = DataNode::New();
-          logNode->SetName("Log");
+          logNode->SetName("AutoplanLog");
+          logData = Logger::Log::get().getData();
         }
+
+        StringProperty::Pointer myLog =
+          StringProperty::New(log + logData.c_str());
 
         logNode->SetProperty("log", myLog);
       }

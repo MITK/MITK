@@ -12,7 +12,7 @@ namespace Logger {
     consolelog = true;
     filelog = true;
     tcplog = false;
-    datastoragelog = true;
+    datastoragelog = false;
 
   };
 

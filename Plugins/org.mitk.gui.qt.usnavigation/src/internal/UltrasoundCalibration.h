@@ -64,6 +64,8 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  void OnUSDepthChanged(const std::string&, const std::string&);
+
   protected slots:
 
   /**
@@ -176,6 +178,14 @@ public:
 
   void OnDeciveServiceEvent(const ctkServiceEvent event);
 
+  void OnDetSpacingClicked();
+
+  void OnFreezeClicked();
+
+  void OnAddSpacingPoint();
+
+  void OnCalculateSpacing();
+
 protected:
 
   virtual void SetFocus();
@@ -229,6 +239,10 @@ protected:
 
   unsigned long m_NewConnectionObserverTag;
   unsigned long m_LostConnectionObserverTag;
+
+  // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
+  mitk::Vector3D m_Spacing;
+  bool m_OverrideSpacing;
 
   /**
   * \brief The current Ultrasound Image.
@@ -316,6 +330,13 @@ protected:
   double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
 
   void ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform);
+
+  mitk::PointSet::Pointer m_SpacingPoints;
+  mitk::DataNode::Pointer m_SpacingNode;
+  int m_SpacingPointsCount;
+
+private:
+  mitk::MessageDelegate2<UltrasoundCalibration, const std::string&, const std::string&> m_USDeviceChanged;
 };
 
 #endif // UltrasoundCalibration_h

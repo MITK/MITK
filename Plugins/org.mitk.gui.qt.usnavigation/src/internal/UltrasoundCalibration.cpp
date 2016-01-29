@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSceneIO.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include "mitkIRenderingManager.h"
 
 // us
 #include <usServiceReference.h>
@@ -57,7 +58,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string UltrasoundCalibration::VIEW_ID = "org.mitk.views.ultrasoundcalibration";
 
-UltrasoundCalibration::UltrasoundCalibration()
+UltrasoundCalibration::UltrasoundCalibration() :
+m_USDeviceChanged(this, &UltrasoundCalibration::OnUSDepthChanged)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 
@@ -107,6 +109,7 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   m_Controls.m_TabWidget->setTabEnabled(1, false);
   m_Controls.m_TabWidget->setTabEnabled(2, false);
   m_Controls.m_TabWidget->setTabEnabled(4, false);
+  m_Controls.m_TabWidget->setTabEnabled(5, false);
 
   // Pointset for Calibration Points
   m_CalibPointsTool = mitk::PointSet::New();
@@ -127,6 +130,8 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   // Tracking Status Widgets
   m_Controls.m_CalibTrackingStatus->ShowStatusLabels();
   m_Controls.m_EvalTrackingStatus->ShowStatusLabels();
+
+  m_OverrideSpacing = false;
 
   // General & Device Selection
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(Update()));
@@ -149,6 +154,12 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   connect(&m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
   connect(m_Controls.m_StopPlusCalibration, SIGNAL(clicked()), this, SLOT(OnStopPlusCalibration()));
   connect(m_Controls.m_SavePlusCalibration, SIGNAL(clicked()), this, SLOT(OnSaveCalibration()));
+
+  //Determine Spacing for Calibration of USVideoDevice
+  connect(m_Controls.m_DetSpacing, SIGNAL(clicked()), this, SLOT(OnDetSpacingClicked()));
+  connect(m_Controls.m_SpacingBtnFreeze, SIGNAL(clicked()), this, SLOT(OnFreezeClicked()));
+  connect(m_Controls.m_SpacingAddPoint, SIGNAL(clicked()), this, SLOT(OnAddSpacingPoint()));
+  connect(m_Controls.m_CalculateSpacing, SIGNAL(clicked()), this, SLOT(OnCalculateSpacing()));
 
   //connect( m_Controls.m_CombinedModalityManagerWidget, SIGNAL(SignalCombinedModalitySelected(mitk::USCombinedModality::Pointer)),
   //  this, SLOT(OnSelectDevice(mitk::USCombinedModality::Pointer)) );
@@ -215,6 +226,7 @@ void UltrasoundCalibration::OnDeviceSelected()
 
     // Construct Pipeline
     //this->m_NeedleProjectionFilter->SetInput(0, m_Tracker->GetOutput(0));
+    combinedModality->GetUltrasoundDevice()->AddPropertyChangedListener(m_USDeviceChanged);
 
     m_Controls.m_StartCalibrationButton->setEnabled(true);
     m_Controls.m_StartPlusCalibrationButton->setEnabled(true);
@@ -229,6 +241,7 @@ void UltrasoundCalibration::OnDeviceDeselected()
   m_Controls.m_TabWidget->setTabEnabled(1, false);
   m_Controls.m_TabWidget->setTabEnabled(2, false);
   m_Controls.m_TabWidget->setTabEnabled(4, false);
+  m_Controls.m_TabWidget->setTabEnabled(5, false);
 }
 
 void UltrasoundCalibration::OnAddCurrentTipPositionToReferencePoints()
@@ -550,8 +563,6 @@ void UltrasoundCalibration::ProcessPlusCalibration(igtl::Matrix4x4& imageToTrack
   imageToTrackerTransform->SetTranslation(translationFloat);
   imageToTrackerTransform->SetMatrix(rotationFloat);
 
-  MITK_INFO << "PLUS Transform converted to MITK AffineTransform: " << imageToTrackerTransform;
-
   m_CombinedModality->SetCalibration(imageToTrackerTransform);
   m_Controls.m_SavePlusCalibration->setEnabled(true);
   m_Controls.m_GotCalibrationLabel->setStyleSheet("QLabel { color : green; }");
@@ -855,6 +866,10 @@ void UltrasoundCalibration::Update()
   mitk::Image::Pointer m_Image = m_CombinedModality->GetOutput();
   if (m_Image.IsNotNull() && m_Image->IsInitialized())
   {
+    if (m_OverrideSpacing)
+    {
+      m_Image->GetGeometry()->SetSpacing(m_Spacing);
+    }
     m_Node->SetData(m_Image);
   }
 
@@ -862,7 +877,7 @@ void UltrasoundCalibration::Update()
   m_NeedleProjectionFilter->Update();
 
   //only update 2d window because it is faster
-  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+  //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 
 void UltrasoundCalibration::SwitchFreeze()
@@ -990,5 +1005,112 @@ void UltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer poi
     itk::Point<double> current_point_transformed = itk::Point<double>();
     current_point_transformed = transform->TransformPoint(pointSet->GetPoint(i)[0], pointSet->GetPoint(i)[1], pointSet->GetPoint(i)[2]);
     pointSet->SetPoint(i, current_point_transformed);
+  }
+}
+
+void UltrasoundCalibration::OnDetSpacingClicked()
+{
+  //Switch active tab to SpacingTab
+  m_Controls.m_TabWidget->setTabEnabled(5, true);
+  m_Controls.m_TabWidget->setCurrentIndex(5);
+  m_Controls.m_SpacingBtnFreeze->setEnabled(true);
+  m_Controls.m_SpacingAddPoint->setEnabled(false);
+  m_Controls.m_CalculateSpacing->setEnabled(false);
+
+  m_SpacingPointsCount = 0;
+
+  if (m_SpacingPoints.IsNull())
+  {
+    m_SpacingPoints = mitk::PointSet::New();
+  }
+
+  if (m_SpacingNode.IsNull())
+  {
+    m_SpacingNode = mitk::DataNode::New();
+    m_SpacingNode->SetName("Spacing Points");
+    m_SpacingNode->SetData(this->m_SpacingPoints);
+    this->GetDataStorage()->Add(m_SpacingNode);
+  }
+}
+
+void UltrasoundCalibration::OnFreezeClicked()
+{
+  if (m_CombinedModality->GetIsFreezed())
+  { //device was already frozen so we need to delete all Spacing points because they need to be collected all at once
+    // no need to check if all four points are already collected, because if thats the case you can no longer click the Freeze Button
+    m_SpacingPoints->Clear();
+    m_Controls.m_SpacingPointsList->clear();
+    m_SpacingPointsCount = 0;
+    m_Controls.m_SpacingAddPoint->setEnabled(false);
+  }
+  else
+  {
+    m_Controls.m_SpacingAddPoint->setEnabled(true);
+  }
+  SwitchFreeze();
+}
+
+void UltrasoundCalibration::OnAddSpacingPoint()
+{
+  mitk::Point3D point = this->GetRenderWindowPart()->GetSelectedPosition();
+
+  MITK_INFO << "Got selected position";
+  this->m_SpacingPoints->InsertPoint(m_SpacingPointsCount, point);
+
+  MITK_INFO << "Added point to Point Set";
+  QString text = text.number(m_SpacingPointsCount + 1);
+  text = "Point " + text;
+
+  MITK_INFO << " Point name: ";
+  this->m_Controls.m_SpacingPointsList->addItem(text);
+
+  m_SpacingPointsCount++;
+
+  if (m_SpacingPointsCount == 4) //now we have all 4 points needed
+  {
+    m_Controls.m_SpacingAddPoint->setEnabled(false);
+    m_Controls.m_CalculateSpacing->setEnabled(true);
+    m_Controls.m_SpacingAddPoint->setEnabled(false);
+  }
+}
+
+void UltrasoundCalibration::OnCalculateSpacing()
+{
+  mitk::Point3D horizontalOne = m_SpacingPoints->GetPoint(0);
+  mitk::Point3D horizontalTwo = m_SpacingPoints->GetPoint(1);
+  mitk::Point3D verticalOne = m_SpacingPoints->GetPoint(2);
+  mitk::Point3D verticalTwo = m_SpacingPoints->GetPoint(3);
+
+  //Get the distances between the points in the image
+  double xDistance = horizontalOne.EuclideanDistanceTo(horizontalTwo);
+  double yDistance = verticalOne.EuclideanDistanceTo(verticalTwo);
+
+  //Calculate the spacing of the image and fill a vector with it
+  double xSpacing = 30 / xDistance;
+  double ySpacing = 20 / yDistance;
+
+  m_Spacing[0] = xSpacing;
+  m_Spacing[1] = ySpacing;
+  m_Spacing[2] = 1;
+
+  MITK_INFO << m_Spacing;
+
+  //Make sure the new spacing is applied to the USVideoDeviceImages
+  m_OverrideSpacing = true;
+
+  //Now that the spacing is set clear all stuff and return to Calibration
+  m_SpacingPoints->Clear();
+  m_Controls.m_SpacingPointsList->clear();
+  m_SpacingPointsCount = 0;
+  SwitchFreeze();
+  m_Controls.m_TabWidget->setCurrentIndex(1);
+}
+
+void UltrasoundCalibration::OnUSDepthChanged(const std::string& key, const std::string&)
+{
+  //whenever depth of USImage is changed the spacing should no longer be overwritten
+  if (key == mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH)
+  {
+    m_OverrideSpacing = false;
   }
 }

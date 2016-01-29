@@ -167,7 +167,7 @@ namespace Logger
       }
 
       static std::string getLastDateTime(std::string str);
-      void resetData();
+      void resetData() const;
       std::string getData() const;
       std::string getDataFromDate(std::string dateTime) const;
   };

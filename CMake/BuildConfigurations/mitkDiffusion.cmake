@@ -1,7 +1,6 @@
 message(STATUS "Configuring MITK Diffusion Release Build")
 
 # Enable non-optional external dependencies
-set(MITK_USE_Boost ON CACHE BOOL "MITK Use Boost Library" FORCE)
 set(MITK_USE_Vigra ON CACHE BOOL "MITK Use Vigra Library" FORCE)
 set(MITK_USE_HDF5 ON CACHE BOOL "MITK Use HDF5 Library" FORCE)
 

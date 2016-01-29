@@ -95,12 +95,10 @@ foreach(proj ${nice_external_projects})
   endif()
 endforeach()
 
-if(MITK_USE_Boost)
-  set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
-  mark_as_advanced(EXTERNAL_BOOST_ROOT)
-  if(EXTERNAL_BOOST_ROOT)
-    set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
-  endif()
+set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
+mark_as_advanced(EXTERNAL_BOOST_ROOT)
+if(EXTERNAL_BOOST_ROOT)
+  set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
 endif()
 
 # Setup file for setting custom ctest vars

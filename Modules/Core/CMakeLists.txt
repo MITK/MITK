@@ -19,6 +19,7 @@ MITK_CREATE_MODULE(
     # factories from ITK which are registered "automatically" via a factory manager.
     PRIVATE ITK
     PUBLIC  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL+vtkRenderingVolumeOpenGL+vtkRenderingFreeTypeOpenGL+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
+    PUBLIC  Boost
   WARNINGS_AS_ERRORS
   SUBPROJECTS MITK-Core
   # Do not automatically create CppMicroServices initialization code.

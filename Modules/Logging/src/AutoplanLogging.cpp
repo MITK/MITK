@@ -114,6 +114,11 @@ namespace Logger {
     return nullptr;
   }
 
+  void Log::resetData()
+  {
+    dataStream->clear();
+  }
+
   std::string Log::getData() const
   {
     dataBackend->flush();

@@ -35,6 +35,7 @@
 #include "mitkCameraController.h"
 
 #include "QmlMitkStdMultiItem.h"
+#include <QQuickWindow>
 
 QmlMitkRenderWindowItem* QmlMitkRenderWindowItem::instance = nullptr;
 
@@ -181,17 +182,19 @@ void QmlMitkRenderWindowItem::SetDataStorage(mitk::DataStorage::Pointer storage)
 
 mitk::Point2D QmlMitkRenderWindowItem::GetMousePosition(QMouseEvent* me) const
 {
+    qreal ratio = this->window()->effectiveDevicePixelRatio();
     mitk::Point2D point;
-    point[0] = me->x();
-    point[1] = me->y();
+    point[0] = me->x()*ratio;
+    point[1] = me->y()*ratio;
     return point;
 }
 
 mitk::Point2D QmlMitkRenderWindowItem::GetMousePosition(QWheelEvent* we) const
 {
+    qreal ratio = this->window()->effectiveDevicePixelRatio();
     mitk::Point2D point;
-    point[0] = we->x();
-    point[1] = we->y();
+    point[0] = we->x()*ratio;
+    point[1] = we->y()*ratio;
     return point;
 }
 

@@ -67,8 +67,6 @@ namespace Logger
       std::string getIphost() const;
       std::string getIpport() const;
       std::string getLogsPath() const;
-
-      //friend class Log;
   };
 
   class MITKLOGGING_EXPORT Log
@@ -158,7 +156,8 @@ namespace Logger
         }
 
         if (Options::get().consolelog) {
-          boost::log::add_console_log(std::cout, boost::log::keywords::format = ">> %Message%");
+          boost::log::add_console_log(std::cout, 
+            boost::log::keywords::format = "[%TimeStamp%] %Message%");
         }
 
         boost::log::core::get()->add_global_attribute("TimeStamp", boost::log::attributes::local_clock());

@@ -178,8 +178,6 @@ public:
 
   void OnDeciveServiceEvent(const ctkServiceEvent event);
 
-  void OnDetSpacingClicked();
-
   void OnFreezeClicked();
 
   void OnAddSpacingPoint();

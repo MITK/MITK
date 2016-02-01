@@ -108,8 +108,17 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
 
   m_Controls.m_ToolBox->setItemEnabled(1, false);
   m_Controls.m_ToolBox->setItemEnabled(2, false);
-  m_Controls.m_ToolBox->setItemEnabled(4, false);
-  m_Controls.m_ToolBox->setItemEnabled(5, false);
+
+  m_Controls.m_SpacingBtnFreeze->setEnabled(true);
+  m_Controls.m_SpacingAddPoint->setEnabled(false);
+  m_Controls.m_CalculateSpacing->setEnabled(false);
+
+  m_SpacingPointsCount = 0;
+  m_SpacingPoints = mitk::PointSet::New();
+  m_SpacingNode = mitk::DataNode::New();
+  m_SpacingNode->SetName("Spacing Points");
+  m_SpacingNode->SetData(this->m_SpacingPoints);
+  this->GetDataStorage()->Add(m_SpacingNode);
 
   // Pointset for Calibration Points
   m_CalibPointsTool = mitk::PointSet::New();
@@ -135,7 +144,7 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
 
   // General & Device Selection
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(Update()));
-  connect(m_Controls.m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnTabSwitch(int)));
+  //connect(m_Controls.m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnTabSwitch(int)));
   // Calibration
   connect(m_Controls.m_CalibBtnFreeze, SIGNAL(clicked()), this, SLOT(SwitchFreeze()));       // Freeze
   connect(m_Controls.m_CalibBtnAddPoint, SIGNAL(clicked()), this, SLOT(OnAddCalibPoint()));    // Tracking & Image Points (Calibration)
@@ -156,7 +165,6 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_SavePlusCalibration, SIGNAL(clicked()), this, SLOT(OnSaveCalibration()));
 
   //Determine Spacing for Calibration of USVideoDevice
-  connect(m_Controls.m_DetSpacing, SIGNAL(clicked()), this, SLOT(OnDetSpacingClicked()));
   connect(m_Controls.m_SpacingBtnFreeze, SIGNAL(clicked()), this, SLOT(OnFreezeClicked()));
   connect(m_Controls.m_SpacingAddPoint, SIGNAL(clicked()), this, SLOT(OnAddSpacingPoint()));
   connect(m_Controls.m_CalculateSpacing, SIGNAL(clicked()), this, SLOT(OnCalculateSpacing()));
@@ -230,6 +238,8 @@ void UltrasoundCalibration::OnDeviceSelected()
 
     m_Controls.m_StartCalibrationButton->setEnabled(true);
     m_Controls.m_StartPlusCalibrationButton->setEnabled(true);
+    m_Controls.m_ToolBox->setItemEnabled(1, true);
+    m_Controls.m_ToolBox->setItemEnabled(2, true);
   }
 }
 
@@ -240,8 +250,6 @@ void UltrasoundCalibration::OnDeviceDeselected()
   m_Controls.m_ToolBox->setCurrentIndex(0);
   m_Controls.m_ToolBox->setItemEnabled(1, false);
   m_Controls.m_ToolBox->setItemEnabled(2, false);
-  m_Controls.m_ToolBox->setItemEnabled(4, false);
-  m_Controls.m_ToolBox->setItemEnabled(5, false);
 }
 
 void UltrasoundCalibration::OnAddCurrentTipPositionToReferencePoints()
@@ -414,8 +422,8 @@ void UltrasoundCalibration::OnStartPlusCalibration()
   }
 
   //Switch active tab to PLUS Calibration page
-  m_Controls.m_ToolBox->setItemEnabled(4, true);
-  m_Controls.m_ToolBox->setCurrentIndex(4);
+  m_Controls.m_ToolBox->setItemEnabled(1, true);
+  m_Controls.m_ToolBox->setCurrentIndex(1);
   m_Controls.m_GetCalibrationFromPLUS->setEnabled(true);
   m_Controls.m_StartStreaming->setEnabled(false);
   m_Controls.m_SavePlusCalibration->setEnabled(false);
@@ -424,13 +432,19 @@ void UltrasoundCalibration::OnStartPlusCalibration()
 void UltrasoundCalibration::OnStopPlusCalibration()
 {
   //closing all server and clients when PlusCalibration is finished
-  if (m_USMessageProvider->IsStreaming())
+  if (m_USMessageProvider.IsNotNull())
   {
-    m_USMessageProvider->StopStreamingOfSource(m_USImageToIGTLMessageFilter);
+    if (m_USMessageProvider->IsStreaming())
+    {
+      m_USMessageProvider->StopStreamingOfSource(m_USImageToIGTLMessageFilter);
+    }
   }
-  if (m_TrackingMessageProvider->IsStreaming())
+  if (m_TrackingMessageProvider.IsNotNull())
   {
-    m_TrackingMessageProvider->StopStreamingOfSource(m_TrackingToIGTLMessageFilter);
+    if (m_TrackingMessageProvider->IsStreaming())
+    {
+      m_TrackingMessageProvider->StopStreamingOfSource(m_TrackingToIGTLMessageFilter);
+    }
   }
   if (m_USServer.IsNotNull())
   {
@@ -444,9 +458,9 @@ void UltrasoundCalibration::OnStopPlusCalibration()
   {
     m_TransformClient->CloseConnection();
   }
-  m_Controls.m_ToolBox->setItemEnabled(4, false);
   m_Controls.m_GotCalibrationLabel->setText("");
   m_Controls.m_ConnectionStatus->setText("");
+  MITK_INFO << "Stopped all servers and clients";
   this->OnStopCalibrationProcess();
 }
 
@@ -564,6 +578,7 @@ void UltrasoundCalibration::ProcessPlusCalibration(igtl::Matrix4x4& imageToTrack
   imageToTrackerTransform->SetMatrix(rotationFloat);
 
   m_CombinedModality->SetCalibration(imageToTrackerTransform);
+  m_Controls.m_ToolBox->setItemEnabled(2, true);
   m_Controls.m_SavePlusCalibration->setEnabled(true);
   m_Controls.m_GotCalibrationLabel->setStyleSheet("QLabel { color : green; }");
   m_Controls.m_GotCalibrationLabel->setText("Recieved Calibration from PLUS you can now save it");
@@ -1008,31 +1023,6 @@ void UltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer poi
   }
 }
 
-void UltrasoundCalibration::OnDetSpacingClicked()
-{
-  //Switch active tab to SpacingTab
-  m_Controls.m_ToolBox->setItemEnabled(5, true);
-  m_Controls.m_ToolBox->setCurrentIndex(5);
-  m_Controls.m_SpacingBtnFreeze->setEnabled(true);
-  m_Controls.m_SpacingAddPoint->setEnabled(false);
-  m_Controls.m_CalculateSpacing->setEnabled(false);
-
-  m_SpacingPointsCount = 0;
-
-  if (m_SpacingPoints.IsNull())
-  {
-    m_SpacingPoints = mitk::PointSet::New();
-  }
-
-  if (m_SpacingNode.IsNull())
-  {
-    m_SpacingNode = mitk::DataNode::New();
-    m_SpacingNode->SetName("Spacing Points");
-    m_SpacingNode->SetData(this->m_SpacingPoints);
-    this->GetDataStorage()->Add(m_SpacingNode);
-  }
-}
-
 void UltrasoundCalibration::OnFreezeClicked()
 {
   if (m_CombinedModality->GetIsFreezed())
@@ -1103,7 +1093,6 @@ void UltrasoundCalibration::OnCalculateSpacing()
   m_Controls.m_SpacingPointsList->clear();
   m_SpacingPointsCount = 0;
   SwitchFreeze();
-  m_Controls.m_ToolBox->setCurrentIndex(1);
 }
 
 void UltrasoundCalibration::OnUSDepthChanged(const std::string& key, const std::string&)

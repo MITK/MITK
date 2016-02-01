@@ -94,7 +94,7 @@ UltrasoundCalibration::~UltrasoundCalibration()
 
 void UltrasoundCalibration::SetFocus()
 {
-  m_Controls.m_TabWidget->setFocus();
+  m_Controls.m_ToolBox->setFocus();
 }
 
 void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
@@ -106,10 +106,10 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
 
   m_Timer = new QTimer(this);
 
-  m_Controls.m_TabWidget->setTabEnabled(1, false);
-  m_Controls.m_TabWidget->setTabEnabled(2, false);
-  m_Controls.m_TabWidget->setTabEnabled(4, false);
-  m_Controls.m_TabWidget->setTabEnabled(5, false);
+  m_Controls.m_ToolBox->setItemEnabled(1, false);
+  m_Controls.m_ToolBox->setItemEnabled(2, false);
+  m_Controls.m_ToolBox->setItemEnabled(4, false);
+  m_Controls.m_ToolBox->setItemEnabled(5, false);
 
   // Pointset for Calibration Points
   m_CalibPointsTool = mitk::PointSet::New();
@@ -135,7 +135,7 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
 
   // General & Device Selection
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(Update()));
-  connect(m_Controls.m_TabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabSwitch(int)));
+  connect(m_Controls.m_ToolBox, SIGNAL(currentChanged(int)), this, SLOT(OnTabSwitch(int)));
   // Calibration
   connect(m_Controls.m_CalibBtnFreeze, SIGNAL(clicked()), this, SLOT(SwitchFreeze()));       // Freeze
   connect(m_Controls.m_CalibBtnAddPoint, SIGNAL(clicked()), this, SLOT(OnAddCalibPoint()));    // Tracking & Image Points (Calibration)
@@ -203,7 +203,7 @@ void UltrasoundCalibration::OnTabSwitch(int index)
   switch (index)
   {
   case 0:
-    if (m_Controls.m_TabWidget->isTabEnabled(1) || m_Controls.m_TabWidget->isTabEnabled(2))
+    if (m_Controls.m_ToolBox->isItemEnabled(1) || m_Controls.m_ToolBox->isItemEnabled(2))
     {
       this->OnStopCalibrationProcess();
     }
@@ -237,11 +237,11 @@ void UltrasoundCalibration::OnDeviceDeselected()
 {
   m_Controls.m_StartCalibrationButton->setEnabled(false);
   m_Controls.m_StartPlusCalibrationButton->setEnabled(false);
-  m_Controls.m_TabWidget->setCurrentIndex(0);
-  m_Controls.m_TabWidget->setTabEnabled(1, false);
-  m_Controls.m_TabWidget->setTabEnabled(2, false);
-  m_Controls.m_TabWidget->setTabEnabled(4, false);
-  m_Controls.m_TabWidget->setTabEnabled(5, false);
+  m_Controls.m_ToolBox->setCurrentIndex(0);
+  m_Controls.m_ToolBox->setItemEnabled(1, false);
+  m_Controls.m_ToolBox->setItemEnabled(2, false);
+  m_Controls.m_ToolBox->setItemEnabled(4, false);
+  m_Controls.m_ToolBox->setItemEnabled(5, false);
 }
 
 void UltrasoundCalibration::OnAddCurrentTipPositionToReferencePoints()
@@ -348,8 +348,8 @@ void UltrasoundCalibration::OnStartCalibrationProcess()
   this->ShowNeedlePath();
 
   // Switch active tab to Calibration page
-  m_Controls.m_TabWidget->setTabEnabled(1, true);
-  m_Controls.m_TabWidget->setCurrentIndex(1);
+  m_Controls.m_ToolBox->setItemEnabled(1, true);
+  m_Controls.m_ToolBox->setCurrentIndex(1);
 }
 
 void UltrasoundCalibration::OnStartPlusCalibration()
@@ -414,8 +414,8 @@ void UltrasoundCalibration::OnStartPlusCalibration()
   }
 
   //Switch active tab to PLUS Calibration page
-  m_Controls.m_TabWidget->setTabEnabled(4, true);
-  m_Controls.m_TabWidget->setCurrentIndex(4);
+  m_Controls.m_ToolBox->setItemEnabled(4, true);
+  m_Controls.m_ToolBox->setCurrentIndex(4);
   m_Controls.m_GetCalibrationFromPLUS->setEnabled(true);
   m_Controls.m_StartStreaming->setEnabled(false);
   m_Controls.m_SavePlusCalibration->setEnabled(false);
@@ -444,7 +444,7 @@ void UltrasoundCalibration::OnStopPlusCalibration()
   {
     m_TransformClient->CloseConnection();
   }
-  m_Controls.m_TabWidget->setTabEnabled(4, false);
+  m_Controls.m_ToolBox->setItemEnabled(4, false);
   m_Controls.m_GotCalibrationLabel->setText("");
   m_Controls.m_ConnectionStatus->setText("");
   this->OnStopCalibrationProcess();
@@ -584,9 +584,9 @@ void UltrasoundCalibration::OnStopCalibrationProcess()
   this->GetDataStorage()->Remove(m_WorldNode);
   m_WorldNode = 0;
 
-  m_Controls.m_TabWidget->setCurrentIndex(0);
-  m_Controls.m_TabWidget->setTabEnabled(1, false);
-  m_Controls.m_TabWidget->setTabEnabled(2, false);
+  m_Controls.m_ToolBox->setCurrentIndex(0);
+  m_Controls.m_ToolBox->setItemEnabled(1, false);
+  m_Controls.m_ToolBox->setItemEnabled(2, false);
 }
 
 void UltrasoundCalibration::OnDeciveServiceEvent(const ctkServiceEvent event)
@@ -696,7 +696,7 @@ void UltrasoundCalibration::OnCalibration()
 
   // Save to US-Device
   m_CombinedModality->SetCalibration(m_Transformation);
-  m_Controls.m_TabWidget->setTabEnabled(2, true);
+  m_Controls.m_ToolBox->setItemEnabled(2, true);
 
   // Save to NeedleProjectionFilter
   m_NeedleProjectionFilter->SetTargetPlane(m_Transformation);
@@ -1011,8 +1011,8 @@ void UltrasoundCalibration::ApplyTransformToPointSet(mitk::PointSet::Pointer poi
 void UltrasoundCalibration::OnDetSpacingClicked()
 {
   //Switch active tab to SpacingTab
-  m_Controls.m_TabWidget->setTabEnabled(5, true);
-  m_Controls.m_TabWidget->setCurrentIndex(5);
+  m_Controls.m_ToolBox->setItemEnabled(5, true);
+  m_Controls.m_ToolBox->setCurrentIndex(5);
   m_Controls.m_SpacingBtnFreeze->setEnabled(true);
   m_Controls.m_SpacingAddPoint->setEnabled(false);
   m_Controls.m_CalculateSpacing->setEnabled(false);
@@ -1103,7 +1103,7 @@ void UltrasoundCalibration::OnCalculateSpacing()
   m_Controls.m_SpacingPointsList->clear();
   m_SpacingPointsCount = 0;
   SwitchFreeze();
-  m_Controls.m_TabWidget->setCurrentIndex(1);
+  m_Controls.m_ToolBox->setCurrentIndex(1);
 }
 
 void UltrasoundCalibration::OnUSDepthChanged(const std::string& key, const std::string&)

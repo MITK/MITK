@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>340</width>
-    <height>640</height>
+    <width>658</width>
+    <height>928</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,19 +24,16 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTabWidget" name="m_TabWidget">
+    <widget class="QToolBox" name="m_ToolBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="currentIndex">
-      <number>1</number>
-     </property>
-     <widget class="QWidget" name="t1devices">
-      <attribute name="title">
-       <string>Devices</string>
+     <widget class="QWidget" name="m_config" native="true">
+      <attribute name="label">
+       <string>Config</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -64,12 +61,15 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="t2calibration">
-      <property name="enabled">
-       <bool>true</bool>
+     <widget class="QWidget" name="m_Calibration" native="true">
+      <property name="toolTipDuration">
+       <number>0</number>
       </property>
-      <attribute name="title">
-       <string>Calibration</string>
+      <property name="accessibleName">
+       <string/>
+      </property>
+      <attribute name="label">
+       <string>Point Based</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
@@ -274,9 +274,9 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
-      <attribute name="title">
-       <string>Evaluation</string>
+     <widget class="QWidget" name="m_PointBasedEvaluation" native="true">
+      <attribute name="label">
+       <string>Point Based Evaluation</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -487,9 +487,9 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>Verification</string>
+     <widget class="QWidget" name="m_ReferenceDevice" native="true">
+      <attribute name="label">
+       <string>Reference Device</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
@@ -519,8 +519,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>179</width>
-            <height>82</height>
+            <width>616</width>
+            <height>339</height>
            </rect>
           </property>
           <attribute name="label">
@@ -564,8 +564,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>140</width>
-            <height>220</height>
+            <width>622</width>
+            <height>312</height>
            </rect>
           </property>
           <attribute name="label">
@@ -649,12 +649,9 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="t5PlusCalib">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <attribute name="title">
-       <string>PLUS Calibration</string>
+     <widget class="QWidget" name="m_PlusCalibration" native="true">
+      <attribute name="label">
+       <string>PLUS Connection</string>
       </attribute>
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
@@ -831,11 +828,8 @@ p, li { white-space: pre-wrap; }
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="t6Spacing">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <attribute name="title">
+     <widget class="QWidget" name="m_Spacing" native="true">
+      <attribute name="label">
        <string>Spacing</string>
       </attribute>
       <widget class="QListWidget" name="m_SpacingPointsList">

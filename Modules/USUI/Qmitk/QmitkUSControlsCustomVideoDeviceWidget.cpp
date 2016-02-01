@@ -51,7 +51,7 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
   m_ControlInterface = dynamic_cast<mitk::USVideoDeviceCustomControls*>
     (this->GetDevice()->GetControlInterfaceCustom().GetPointer());
 
-  if ( m_ControlInterface.IsNotNull() )
+  if (m_ControlInterface.IsNotNull())
   {
     mitk::USImageVideoSource::USImageCropping cropping = m_ControlInterface->GetCropArea();
     ui->crop_left->setValue(cropping.left);
@@ -62,7 +62,7 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
   else
   {
     MITK_WARN("QmitkUSAbstractCustomWidget")("QmitkUSControlsCustomVideoDeviceWidget")
-        << "Did not get a custom video device control interface.";
+      << "Did not get a custom video device control interface.";
   }
 
   ui->crop_left->setEnabled(m_ControlInterface.IsNotNull());
@@ -75,15 +75,17 @@ void QmitkUSControlsCustomVideoDeviceWidget::Initialize()
 {
   ui->setupUi(this);
 
-  connect( ui->crop_left, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( ui->crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( ui->crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
-  connect( ui->crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()) );
+  connect(ui->crop_left, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
+  connect(ui->crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
+  connect(ui->crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
+  connect(ui->crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
+  connect(ui->m_UsDepth, SIGNAL(valueChanged(int)), this, SLOT(OnDepthChanged()));
+  connect(ui->m_ProbeIdentifier, SIGNAL(textChanged(const QString &)), this, SLOT(OnProbeChanged()));
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
 {
-  if ( m_ControlInterface.IsNull() ) { return; }
+  if (m_ControlInterface.IsNull()) { return; }
 
   mitk::USImageVideoSource::USImageCropping cropping;
   cropping.left = ui->crop_left->value();
@@ -113,6 +115,19 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
     msgBox.exec();
     MITK_WARN << "User tried to crop beyond limits of the image";
   }
+}
+
+void QmitkUSControlsCustomVideoDeviceWidget::OnDepthChanged()
+{
+  double depth = ui->m_UsDepth->value();
+  m_ControlInterface->SetNewDepth(depth);
+}
+
+void QmitkUSControlsCustomVideoDeviceWidget::OnProbeChanged()
+{
+  QString qtProbename = ui->m_ProbeIdentifier->text();
+  std::string probename = qtProbename.toStdString();
+  m_ControlInterface->SetNewProbeIdentifier(probename);
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::BlockSignalAndSetValue(QSpinBox* target, int value)

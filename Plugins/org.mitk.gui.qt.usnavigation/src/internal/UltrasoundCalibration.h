@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkNeedleProjectionFilter.h>
 #include <mitkPointSetDifferenceStatisticsCalculator.h>
+#include <mitkIGTLClient.h>
+#include <mitkNavigationDataToIGTLMessageFilter.h>
 
 // Microservices
 #include "ui_UltrasoundCalibrationControls.h"
@@ -46,231 +48,293 @@ See LICENSE.txt or http://www.mitk.org for details.
 
   \sa QmitkFunctionality
   \ingroup ${plugin_target}_internal
-*/
+  */
 class UltrasoundCalibration : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    UltrasoundCalibration();
-    ~UltrasoundCalibration();
+  UltrasoundCalibration();
+  ~UltrasoundCalibration();
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent);
+
+  void OnUSDepthChanged(const std::string&, const std::string&);
 
   protected slots:
 
-    /**
-    * \brief Triggered, whenever the user switches Tabs
-    *
-    */
-    void OnTabSwitch(int index);
+  /**
+  * \brief Triggered, whenever the user switches Tabs
+  *
+  */
+  void OnTabSwitch(int index);
 
-    /**
-    * \brief Triggered, when the user has clicked "select Devices".
-    *
-    */
-    //void OnSelectDevice(mitk::USCombinedModality::Pointer);
-    void OnDeviceSelected();
-    void OnDeviceDeselected();
+  /**
+  * \brief Triggered, when the user has clicked "select Devices".
+  *
+  */
+  //void OnSelectDevice(mitk::USCombinedModality::Pointer);
+  void OnDeviceSelected();
+  void OnDeviceDeselected();
 
-    /**
-    * \brief Triggered, when the user clicks "Add Point"
-    *
-    */
-    void OnAddCalibPoint();
+  /**
+  * \brief Triggered, when the user clicks "Add Point"
+  *
+  */
+  void OnAddCalibPoint();
 
-    /**
-    * \brief Triggered, when the user clicks "Calibrate"
-    *
-    */
-    void OnCalibration();
+  /**
+  * \brief Triggered, when the user clicks "Calibrate"
+  *
+  */
+  void OnCalibration();
 
-    /**
-    * \brief Triggered, when the user clicks "Add Target Points".
-    *
-    * Adds an image point and an tracking point to their respective evaluation pointsets
-    */
-    void OnAddEvalTargetPoint();
+  /**
+  * \brief Triggered, when the user clicks "Add Target Points".
+  *
+  * Adds an image point and an tracking point to their respective evaluation pointsets
+  */
+  void OnAddEvalTargetPoint();
 
-    /**
-    * \brief Triggered, when the user clicks "Add Point".
-    *
-    * Adds a projected point to the projected point evaluation set.
-    */
-    void OnAddEvalProjectedPoint();
+  /**
+  * \brief Triggered, when the user clicks "Add Point".
+  *
+  * Adds a projected point to the projected point evaluation set.
+  */
+  void OnAddEvalProjectedPoint();
 
-    /**
-    * \brief Triggered when the user clicks "Save Results" in the Evaluation tab.
-    */
-    void OnSaveEvaluation();
+  /**
+  * \brief Triggered when the user clicks "Save Results" in the Evaluation tab.
+  */
+  void OnSaveEvaluation();
 
-    /**
-    * \brief Triggered when the user clicks "Save Calibration" in the Calibration tab.
-    */
-    void OnSaveCalibration();
+  /**
+  * \brief Triggered when the user clicks "Save Calibration" in the Calibration tab.
+  */
+  void OnSaveCalibration();
 
-    /**
-    * \brief Triggered when the user clicks "Run Next Round". Also used as a reset mechanism.
-    */
-    void OnReset();
+  /**
+  * \brief Triggered when the user clicks "Run Next Round". Also used as a reset mechanism.
+  */
+  void OnReset();
 
-    /**
-    * \brief Triggered in regular intervals by a timer, when live view is enabled.
-    *
-    */
-    void Update();
+  /**
+  * \brief Triggered in regular intervals by a timer, when live view is enabled.
+  *
+  */
+  void Update();
 
-    /**
-    * \brief Freezes or unfreezes the image.
-    */
-    void SwitchFreeze();
+  /**
+  * \brief Freezes or unfreezes the image.
+  */
+  void SwitchFreeze();
 
-    /**
-    *
-    */
-    void OnStartCalibrationProcess();
+  /**
+  *
+  */
+  void OnStartCalibrationProcess();
 
-    /**
-    *
-    */
-    void OnStopCalibrationProcess();
+  /**
+  *\brief Method to use the PLUS-Toolkoit for Calibration of EchoTrack
+  */
+  void OnStartPlusCalibration();
 
-    void OnAddCurrentTipPositionToReferencePoints();
+  void OnStopPlusCalibration();
 
-    void OnStartVerification();
+  /**
+  *\ brief Starts the Streaming of USImage and Navigation Data when PLUS is connected
+  */
+  void OnStartStreaming();
 
-    void OnAddCurrentTipPositionForVerification();
+  void OnNewConnection();
 
-    void OnDeciveServiceEvent(const ctkServiceEvent event);
+  /**
+  \*brief Get the Calibration from the PLUS-Toolkit once Calibration with fCal is done
+  */
+  void OnGetPlusCalibration();
 
-  protected:
+  /**
+  \*brief Convert the recieved igtl::Matrix into an mitk::AffineTransform3D which can be used to calibrate the CombinedModality
+  */
+  void ProcessPlusCalibration(igtl::Matrix4x4& imageToTracker);
 
-    virtual void SetFocus();
+  void OnStreamingTimerTimeout();
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes );
+  /**
+  *
+  */
+  void OnStopCalibrationProcess();
 
-    Ui::UltrasoundCalibrationControls m_Controls;
+  void OnAddCurrentTipPositionToReferencePoints();
 
-    /**
-    * \brief Internal function that activates display of the needle path.
-    */
-    void ShowNeedlePath();
+  void OnStartVerification();
 
-    /**
-     * \brief Clears all member attributes which are holding intermediate results for the calibration.
-     */
-    void ClearTemporaryMembers();
+  void OnAddCurrentTipPositionForVerification();
 
-    /**
-    * \brief The combined modality used for imaging and tracking.
-    */
-    mitk::USCombinedModality::Pointer m_CombinedModality;
+  void OnDeciveServiceEvent(const ctkServiceEvent event);
 
-    /**
-    * \brief NavigationDataSource used for tracking data.
-    * This will be gotten by the combined modality.
-    */
-    mitk::NavigationDataSource::Pointer m_Tracker;
+  void OnFreezeClicked();
 
-    QTimer *m_Timer;
+  void OnAddSpacingPoint();
 
-    mitk::DataNode::Pointer m_Node;
-    mitk::DataNode::Pointer m_CalibNode;
-    mitk::DataNode::Pointer m_WorldNode;
+  void OnCalculateSpacing();
 
-    /**
-    * \brief The current Ultrasound Image.
-    */
-    mitk::Image::Pointer m_Image;
-    /**
-    * \brief Current point when the image was last frozen.
-    */
-    mitk::Point3D m_FreezePoint;
+protected:
 
-    /**
-    * \brief Pointset containing all tool points.
-    */
-    mitk::PointSet::Pointer m_CalibPointsImage;
-    /**
-    * \brief Pointset containing corresponding points on the image.
-    */
-    mitk::PointSet::Pointer m_CalibPointsTool;
-    /**
-    * \brief Pointset containing Projected Points (aka "where we thought the needle was gonna land")
-    */
-    mitk::PointSet::Pointer m_EvalPointsProjected;
-    /**
-    * \brief Pointset containing the evaluated points on the image.
-    */
-    mitk::PointSet::Pointer m_EvalPointsImage;
-    /**
-    * \brief Pointset containing tracked evaluation points.
-    */
-    mitk::PointSet::Pointer m_EvalPointsTool;
+  virtual void SetFocus();
 
-    /**
-    * \brief Pointset containing tracked evaluation points.
-    */
-    mitk::PointSet::Pointer m_VerificationReferencePoints;
-    mitk::DataNode::Pointer m_VerificationReferencePointsDataNode;
+  /// \brief called by QmitkFunctionality when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+    const QList<mitk::DataNode::Pointer>& nodes);
 
-    int m_currentPoint;
-    std::vector<mitk::Point3D> m_allReferencePoints;
-    std::vector<double> m_allErrors;
+  Ui::UltrasoundCalibrationControls m_Controls;
 
-    /**
-    * \brief Pointset containing points along the needle's prohected path. Only used for visualization. The first point is the needle tip.
-    */
-    //mitk::PointSet::Pointer m_NeedlePathPoints;
+  /**
+  * \brief Internal function that activates display of the needle path.
+  */
+  void ShowNeedlePath();
 
-    /**
-    * \brief Creates a Pointset that projects the needle's path
-    */
-    mitk::NeedleProjectionFilter::Pointer m_NeedleProjectionFilter;
-    /**
-    * \brief Total number of calibration points set.
-    */
-    int m_CalibPointsCount;
+  /**
+   * \brief Clears all member attributes which are holding intermediate results for the calibration.
+   */
+  void ClearTemporaryMembers();
 
-    QString m_CurrentDepth;
+  /**
+  * \brief The combined modality used for imaging and tracking.
+  */
+  mitk::USCombinedModality::Pointer m_CombinedModality;
 
-    /**
-    * \brief StatisticsRegarding Projection Accuracy.
-    * (Compares m_EvalPointsProjected to m_EvalPointsImage)
-    */
-    mitk::PointSetDifferenceStatisticsCalculator::Pointer m_ProjectionStatistics;
-    /**
-    * \brief StatisticsRegarding Evaluation Accuracy.
-    * (Compares m_EvalPointsTool to m_EvalPointsImage)
-    */
-    mitk::PointSetDifferenceStatisticsCalculator::Pointer m_EvaluationStatistics;
-    /**
-    * \brief StatisticsRegarding Calibration Accuracy.
-    * (Compares m_CalibPointsTool to a transformed copy of m_CalibPointsImage).
-    */
-    mitk::PointSetDifferenceStatisticsCalculator::Pointer m_CalibrationStatistics;
+  /**
+  * \brief NavigationDataSource used for tracking data.
+  * This will be gotten by the combined modality.
+  */
+  mitk::NavigationDataSource::Pointer m_Tracker;
 
-    /**
-    * \brief Result of the Calibration.
-    */
-    mitk::AffineTransform3D::Pointer m_Transformation;
+  QTimer *m_Timer;
 
-    /**
-    * This method is copied from PointSetModifier which is part of MBI. It should be replaced
-    * by external method call as soon as this functionality will be available in MITK.
-    */
-    vtkSmartPointer<vtkPolyData> ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet);
+  mitk::DataNode::Pointer m_Node;
+  mitk::DataNode::Pointer m_CalibNode;
+  mitk::DataNode::Pointer m_WorldNode;
 
-    double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
+  //IGTL Servers and Devices needed for the communication with PLUS
+  mitk::IGTLServer::Pointer m_USServer;
+  mitk::IGTLMessageProvider::Pointer m_USMessageProvider;
+  mitk::ImageToIGTLMessageFilter::Pointer m_USImageToIGTLMessageFilter;
 
-    void ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform);
+  mitk::IGTLServer::Pointer m_TrackingServer;
+  mitk::IGTLMessageProvider::Pointer m_TrackingMessageProvider;
+  mitk::NavigationDataToIGTLMessageFilter::Pointer m_TrackingToIGTLMessageFilter;
+
+  mitk::IGTLClient::Pointer m_TransformClient;
+  mitk::IGTLDeviceSource::Pointer m_TransformDeviceSource;
+
+  QTimer m_StreamingTimer;
+
+  unsigned long m_NewConnectionObserverTag;
+  unsigned long m_LostConnectionObserverTag;
+
+  // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
+  mitk::Vector3D m_Spacing;
+  bool m_OverrideSpacing;
+
+  /**
+  * \brief The current Ultrasound Image.
+  */
+  mitk::Image::Pointer m_Image;
+  /**
+  * \brief Current point when the image was last frozen.
+  */
+  mitk::Point3D m_FreezePoint;
+
+  /**
+  * \brief Pointset containing all tool points.
+  */
+  mitk::PointSet::Pointer m_CalibPointsImage;
+  /**
+  * \brief Pointset containing corresponding points on the image.
+  */
+  mitk::PointSet::Pointer m_CalibPointsTool;
+  /**
+  * \brief Pointset containing Projected Points (aka "where we thought the needle was gonna land")
+  */
+  mitk::PointSet::Pointer m_EvalPointsProjected;
+  /**
+  * \brief Pointset containing the evaluated points on the image.
+  */
+  mitk::PointSet::Pointer m_EvalPointsImage;
+  /**
+  * \brief Pointset containing tracked evaluation points.
+  */
+  mitk::PointSet::Pointer m_EvalPointsTool;
+
+  /**
+  * \brief Pointset containing tracked evaluation points.
+  */
+  mitk::PointSet::Pointer m_VerificationReferencePoints;
+  mitk::DataNode::Pointer m_VerificationReferencePointsDataNode;
+
+  int m_currentPoint;
+  std::vector<mitk::Point3D> m_allReferencePoints;
+  std::vector<double> m_allErrors;
+
+  /**
+  * \brief Pointset containing points along the needle's prohected path. Only used for visualization. The first point is the needle tip.
+  */
+  //mitk::PointSet::Pointer m_NeedlePathPoints;
+
+  /**
+  * \brief Creates a Pointset that projects the needle's path
+  */
+  mitk::NeedleProjectionFilter::Pointer m_NeedleProjectionFilter;
+  /**
+  * \brief Total number of calibration points set.
+  */
+  int m_CalibPointsCount;
+
+  QString m_CurrentDepth;
+
+  /**
+  * \brief StatisticsRegarding Projection Accuracy.
+  * (Compares m_EvalPointsProjected to m_EvalPointsImage)
+  */
+  mitk::PointSetDifferenceStatisticsCalculator::Pointer m_ProjectionStatistics;
+  /**
+  * \brief StatisticsRegarding Evaluation Accuracy.
+  * (Compares m_EvalPointsTool to m_EvalPointsImage)
+  */
+  mitk::PointSetDifferenceStatisticsCalculator::Pointer m_EvaluationStatistics;
+  /**
+  * \brief StatisticsRegarding Calibration Accuracy.
+  * (Compares m_CalibPointsTool to a transformed copy of m_CalibPointsImage).
+  */
+  mitk::PointSetDifferenceStatisticsCalculator::Pointer m_CalibrationStatistics;
+
+  /**
+  * \brief Result of the Calibration.
+  */
+  mitk::AffineTransform3D::Pointer m_Transformation;
+
+  /**
+  * This method is copied from PointSetModifier which is part of MBI. It should be replaced
+  * by external method call as soon as this functionality will be available in MITK.
+  */
+  vtkSmartPointer<vtkPolyData> ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet);
+
+  double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
+
+  void ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform);
+
+  mitk::PointSet::Pointer m_SpacingPoints;
+  mitk::DataNode::Pointer m_SpacingNode;
+  int m_SpacingPointsCount;
+
+private:
+  mitk::MessageDelegate2<UltrasoundCalibration, const std::string&, const std::string&> m_USDeviceChanged;
 };
 
 #endif // UltrasoundCalibration_h

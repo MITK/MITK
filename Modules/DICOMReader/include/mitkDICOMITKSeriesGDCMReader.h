@@ -306,12 +306,6 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     virtual bool LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const;
 
-    /**
-      \brief Shear the loaded mitk::Image to "correct" a spatial error introduced by itk::ImageSeriesReader
-      See \ref DICOMITKSeriesGDCMReader_GantryTilt for details.
-    */
-    Image::Pointer FixupSpacing(Image* mitkImage, const DICOMImageBlockDescriptor& block) const;
-
     /// \brief Describe this reader's confidence for given SOP class UID
   static ReaderImplementationLevel GetReaderImplementationLevel(const std::string sopClassUID);
   private:

@@ -345,7 +345,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
   private:
 
-    itk::MutexLock::Pointer m_LocaleMutex;
+    static itk::MutexLock::Pointer s_LocaleMutex;
 
     mutable std::stack<std::string> m_ReplacedCLocales;
     mutable std::stack<std::locale> m_ReplacedCinLocales;

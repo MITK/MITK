@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMGDCMTagScanner.h"
 
 #include <itkTimeProbesCollectorBase.h>
+itk::MutexLock::Pointer mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex = itk::MutexLock::New();
 
 #include <gdcmUIDs.h>
 
@@ -33,8 +34,6 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPl
 , m_DecimalPlacesForOrientation( decimalPlacesForOrientation )
 {
   this->EnsureMandatorySortersArePresent( decimalPlacesForOrientation );
-
-  m_LocaleMutex = itk::MutexLock::New();
 }
 
 
@@ -200,7 +199,7 @@ std::string mitk::DICOMITKSeriesGDCMReader::GetActiveLocale() const
 
 void mitk::DICOMITKSeriesGDCMReader::PushLocale() const
 {
-  m_LocaleMutex->Lock();
+  s_LocaleMutex->Lock();
 
   std::string currentCLocale = setlocale( LC_NUMERIC, nullptr );
   m_ReplacedCLocales.push( currentCLocale );
@@ -211,12 +210,12 @@ void mitk::DICOMITKSeriesGDCMReader::PushLocale() const
   std::locale l( "C" );
   std::cin.imbue( l );
 
-  m_LocaleMutex->Unlock();
+  s_LocaleMutex->Unlock();
 }
 
 void mitk::DICOMITKSeriesGDCMReader::PopLocale() const
 {
-  m_LocaleMutex->Lock();
+  s_LocaleMutex->Lock();
 
   if ( !m_ReplacedCLocales.empty() )
   {
@@ -238,7 +237,7 @@ void mitk::DICOMITKSeriesGDCMReader::PopLocale() const
     MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
   }
 
-  m_LocaleMutex->Unlock();
+  s_LocaleMutex->Unlock();
 }
 
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList

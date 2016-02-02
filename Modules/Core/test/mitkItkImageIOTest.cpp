@@ -45,6 +45,8 @@ class mitkItkImageIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestImageWriterSimple);
   MITK_TEST(TestWrite3DImageWithOnePlane);
   MITK_TEST(TestWrite3DImageWithTwoPlanes);
+  MITK_TEST(TestWrite3DplusT_ArbitraryTG);
+  MITK_TEST(TestWrite3DplusT_ProportionalTG);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -77,6 +79,16 @@ public:
   void TestImageWriterPng3()
   {
     TestImageWriter("RenderingTestData/rgbaImage.png");
+  }
+
+  void TestWrite3DplusT_ArbitraryTG()
+  {
+    TestImageWriter("3D+t-ITKIO-TestData/LinearModel_4D_arbitrary_time_geometry.nrrd");
+  }
+
+  void TestWrite3DplusT_ProportionalTG()
+  {
+    TestImageWriter("3D+t-ITKIO-TestData/LinearModel_4D_prop_time_geometry.nrrd");
   }
 
   void TestImageWriterSimple()

@@ -18,7 +18,7 @@ import mc.factories as mcfac
 from mc.sim import SimWrapper, get_diffuse_reflectance
 
 # parameter setting
-NR_BATCHES = 100
+NR_BATCHES = 1
 NR_ELEMENTS_IN_BATCH = 1000
 # the wavelengths to be simulated
 WAVELENGHTS = np.arange(450, 720, 2) * 10 ** -9
@@ -124,10 +124,10 @@ if __name__ == '__main__':
     w = luigi.worker.Worker(scheduler=sch)
     BATCH_NUMBERS = np.arange(0, NR_BATCHES, 1)
     for i in BATCH_NUMBERS:
-        colon_task = CreateSpectraTask("ipcai_revision_colon_mean_scattering",
+        colon_task = CreateSpectraTask("ipcai_visualization_batch",
                                        i,
                                        NR_ELEMENTS_IN_BATCH,
-                                       mcfac.ColonMuscleMeanScatteringFactory())
+                                       mcfac.VisualizationMcFactory())
         w.add(colon_task)
         w.run()
 

@@ -5,6 +5,8 @@ Created on Fri Aug 14 11:09:18 2015
 @author: wirkert
 """
 
+import seaborn as sns
+
 # import everything as done in IPCAI in silico evaluation
 from script_analyze_ipcai_in_silico import *
 # additionally we need the weights estimation functionality

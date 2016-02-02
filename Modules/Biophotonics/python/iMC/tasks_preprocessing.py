@@ -38,9 +38,6 @@ def smooth(msi):
     msi.set_image(img_array)
 
 
-
-
-
 def touch_and_save_msi(msi, outfile):
     """ saves msi as a nrrd to outfile.
     if the directory / file does not exist it will be created """

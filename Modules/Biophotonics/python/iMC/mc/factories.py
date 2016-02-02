@@ -8,6 +8,7 @@ from mc.tissuemodels import AbstractTissue, GenericTissue
 from mc.batches import AbstractBatch
 from mc.batches import GenericBatch, LessGenericBatch, GenericMeanScatteringBatch
 from mc.batches import ColonMuscleBatch, ColonMuscleMeanScatteringBatch
+from mc.batches import VisualizationBatch
 
 
 class AbstractMcFactory(object):

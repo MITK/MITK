@@ -22,7 +22,7 @@ sp.FINALS_FOLDER = "invertabilitytest"
 
 
 class TestInvertability(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
     file_name_prefix_testing = luigi.Parameter()
 
     def output(self):
@@ -37,9 +37,9 @@ class TestInvertability(luigi.Task):
         return rt.ParameterFile(self.file_name_prefix_testing), \
             rt.ReflectanceFile(self.file_name_prefix_testing), \
             rt.TrainForest(file_name_prefix_training=
-                           self.batch_prefix), \
+                           self.df_prefix), \
             rt.TrainForestAugmentedData(file_name_prefix_training=
-                           self.batch_prefix)
+                           self.df_prefix)
 
 
     def run(self):

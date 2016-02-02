@@ -37,7 +37,7 @@ from msi.io.tiffringreader import TiffRingReader
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo"
 sp.DATA_FOLDER = "all_liver_images"
-sp.FINALS_FOLDER = "liver_all"
+sp.FINALS_FOLDER = "liver_all_SNR10"
 sp.FLAT_FOLDER = "/media/wirkert/data/Data/" + \
                  "2016_01_19_Flatfield_and_Dark_Laparoscope/Flatfields"
 sp.DARK_FOLDER = "/media/wirkert/data/Data/" + \
@@ -115,7 +115,7 @@ class OxyAndVhbOverTimeTask(luigi.Task):
         # print oxy over time as scatterplot.
         ax = df.plot.scatter(x="time since drug delivery [s]",
                              y="oxygenation mean [%]",
-                             s=100,
+                             s=100, alpha=0.5,
                              fontsize=30)
         ax.set_xlim((-1, 70))
 
@@ -141,7 +141,7 @@ class OxyAndVhbOverTimeTask(luigi.Task):
         # print vhb over time as scatterplot.
         ax = df.plot.scatter(x="time since drug delivery [s]",
                              y="blood volume fraction mean [%]",
-                             s=100,
+                             s=100, alpha=0.5,
                              fontsize=30)
         ax.set_xlim((-1, 70))
 
@@ -169,7 +169,8 @@ class IPCAICreateOxyImageTask(luigi.Task):
     def requires(self):
         return IPCAITrainRegressor(df_prefix=self.df_prefix), \
                Flatfield(flatfield_folder=sp.FLAT_FOLDER), \
-               SingleMultispectralImage(image=self.image_name)
+               SingleMultispectralImage(image=self.image_name), \
+               Dark(dark_folder=sp.DARK_FOLDER)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
@@ -184,6 +185,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         tiff_ring_reader = TiffRingReader()
         # read the flatfield
         flat = nrrd_reader.read(self.input()[1].path)
+        dark = nrrd_reader.read(self.input()[3].path)
         # read the msi
         nr_filters = len(sp.RECORDED_WAVELENGTHS)
         msi, segmentation = tiff_ring_reader.read(self.input()[2].path,
@@ -207,7 +209,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         # resort msi to restore original order
         msimani.get_bands(msi, new_image_order)
         # correct by flatfield
-        msimani.flatfield_correction(msi, flat)
+        msimani.image_correction(msi, flat, dark)
 
         # create artificial rgb
         rgb_image = msi.get_image()[:, :, [2, 3, 1]]
@@ -270,8 +272,8 @@ class IPCAICreateOxyImageTask(luigi.Task):
         vhb_image[np.isnan(vhb_image)] = 0.
         vhb_image[np.isinf(vhb_image)] = 0.
         vhb_image[0, 0] = 0.0
-        vhb_image[0, 1] = 0.05
-        vhb_image = np.clip(vhb_image, 0.0, 0.05)
+        vhb_image[0, 1] = 0.1
+        vhb_image = np.clip(vhb_image, 0.0, 0.1)
         vhb_mean = np.mean(vhb_image)
         at.plot_axis(plt.gca(), vhb_image,
                   "vhb [%]. Mean " +
@@ -348,9 +350,8 @@ class IPCAITrainRegressor(luigi.Task):
                               "Carets_Laparoscope/finals/" +
                               "snr_for_bands.txt", index_col=0)
 
-        X, y = preprocess2(df_train, snr=df_snrs["SNR"].values,
-                          movement_noise_sigma=0.1,
-                          bands_to_sortout=sp.bands_to_sortout)
+        X, y = preprocess2(df_train, snr=10.,
+                           bands_to_sortout=sp.bands_to_sortout)
         # train regressor
         reg = RandomForestRegressor(10, min_samples_leaf=10, max_depth=9,
                                     n_jobs=-1)

@@ -244,7 +244,7 @@ class IPCAITrainRegressor(luigi.Task):
                                               self.df_prefix))
 
     def requires(self):
-        return tasks_mc.CameraBatch(self.df_prefix)
+        return tasks_mc.SpectroCamBatch(self.df_prefix)
 
     def run(self):
         # extract data from the batch

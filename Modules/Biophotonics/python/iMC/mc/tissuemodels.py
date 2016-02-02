@@ -112,8 +112,8 @@ class GenericTissue(AbstractTissue):
         model_string = ""
         for i, ua in enumerate(self.uas):
             layer_string = "layer " + str(i) + \
-                     "    - vhb: " + "%.2f" % self.uas[i].bvf + \
-                    "%; sao2: " + "%.2f" % self.uas[i].saO2 + \
+                     "    - vhb: " + "%.1f" % self.uas[i].bvf * 100. + \
+                    "%; sao2: " + "%.1f" % self.uas[i].saO2 * 100. + \
                     "%; a_mie: " + "%.2f" % (self.usgs[i].a_mie / 100.) + \
                     "cm^-1; a_ray: " + "%.2f" % (self.usgs[i].a_ray / 100.) + \
                     "cm^-1; b_mie: " + "%.3f" % self.usgs[i].b_mie + \

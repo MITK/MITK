@@ -33,22 +33,22 @@ sp.RECORDED_WAVELENGTHS = np.arange(470, 690, 10) * 10 ** -9
 # matplotlib.rcParams.update({'font.size': 18})
 
 class VisualizeSpectraTask(luigi.Task):
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
     batch_nr = luigi.IntParameter()
     nr_samples = luigi.IntParameter()
 
     def requires(self):
-        return tasks_mc.CreateSpectraTask(self.batch_prefix, self.batch_nr,
+        return tasks_mc.CreateSpectraTask(self.df_prefix, self.batch_nr,
                                     self.nr_samples,
                                     mcfac.VisualizationMcFactory()), \
-               tasks_mc.CameraBatch(self.batch_prefix)
+               tasks_mc.CameraBatch(self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               SPECTRAL_PLOTS,
             "plotted_spectra_" +
-            self.batch_prefix + "_" + str(self.batch_nr) + ".png"))
+            self.df_prefix + "_" + str(self.batch_nr) + ".png"))
 
     def run(self):
         f = file(self.input()[0].path, "r")

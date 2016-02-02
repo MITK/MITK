@@ -48,23 +48,23 @@ sp.bands_to_sortout = np.array([7])
 
 class NeilCreateOxyImageTask(luigi.Task):
     image_prefix = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
         return NeilEstimateTissueParametersTask(image_prefix=self.image_prefix,
                                             batch_prefix=
-                                            self.batch_prefix), \
+                                            self.df_prefix), \
             NeilCorrectImagingSetupTask(image_prefix=self.image_prefix), \
             NeilReprojectReflectancesTask(image_prefix=self.image_prefix,
                                       batch_prefix=
-                                      self.batch_prefix)
+                                      self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER,
                                               sp.RESULTS_FOLDER,
                                               sp.FINALS_FOLDER,
                                               self.image_prefix + "_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "_summary.png"))
 
     def run(self):
@@ -107,18 +107,18 @@ class NeilCreateOxyImageTask(luigi.Task):
 
 class NeilEstimateTissueParametersTask(luigi.Task):
     image_prefix = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
         return NeilPreprocessMSI(image_prefix=self.image_prefix), \
             rt.TrainForest(batch_prefix=
-                        self.batch_prefix)
+                        self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
                                               sp.FINALS_FOLDER,
                                               self.image_prefix + "_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "estimate.nrrd"))
 
     def run(self):
@@ -131,21 +131,21 @@ class NeilEstimateTissueParametersTask(luigi.Task):
 
 class NeilReprojectReflectancesTask(luigi.Task):
     image_prefix = luigi.Parameter()
-    batch_prefix = luigi.Parameter()
+    df_prefix = luigi.Parameter()
 
     def requires(self):
         return NeilEstimateTissueParametersTask(image_prefix=self.image_prefix,
                                             batch_prefix=
-                                            self.batch_prefix), \
+                                            self.df_prefix), \
             rt.TrainForestForwardModel(batch_prefix=
-                        self.batch_prefix)
+                        self.df_prefix)
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sp.ROOT_FOLDER, "processed",
                                               sp.FINALS_FOLDER,
                                               self.image_prefix +
                                               "_backprojection_" +
-                                              self.batch_prefix +
+                                              self.df_prefix +
                                               "estimate.nrrd"))
 
     def run(self):

@@ -11,7 +11,6 @@ from sklearn.preprocessing import Normalizer
 def preprocess2(df, nr_samples=None, snr=None, movement_noise_sigma=None,
                 magnification=None, bands_to_sortout=None):
 
-
     # first set 0 reflectances to nan
     df["reflectances"] = df["reflectances"].replace(to_replace=0.,
                                                     value=np.nan)
@@ -24,7 +23,7 @@ def preprocess2(df, nr_samples=None, snr=None, movement_noise_sigma=None,
 
     # get reflectance and oxygenation
     X = df.reflectances
-    if bands_to_sortout.size > 0:
+    if bands_to_sortout is not None and bands_to_sortout.size > 0:
         X.drop(X.columns[bands_to_sortout], axis=1, inplace=True)
         snr = np.delete(snr, bands_to_sortout)
     X = X.values
@@ -49,7 +48,7 @@ def preprocess2(df, nr_samples=None, snr=None, movement_noise_sigma=None,
     if movement_noise_sigma is not None:
         nr_bands = X.shape[1]
         nr_samples = X.shape[0]
-        # we assume pretty high correlation between neighboring bands
+        # we assume no correlation between neighboring bands
         CORRELATION_COEFFICIENT = 0.0
         movement_variance = movement_noise_sigma ** 2
         movement_variances = np.ones(nr_bands) * movement_variance

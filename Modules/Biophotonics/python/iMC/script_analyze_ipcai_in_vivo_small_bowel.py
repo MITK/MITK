@@ -19,7 +19,6 @@ import luigi
 import matplotlib.pyplot as plt
 import SimpleITK as sitk
 from sklearn.ensemble.forest import RandomForestRegressor
-import seaborn as sns
 import matplotlib
 
 import tasks_analyze as at
@@ -32,13 +31,14 @@ import msi.msimanipulations as msimani
 import msi.imgmani as imgmani
 import msi.normalize as norm
 from regression.estimation import estimate_image
+from regression.linear import LinearSaO2Unmixing
 from regression.preprocessing import preprocess, preprocess2
 from msi.io.tiffringreader import TiffRingReader
 
 
 sp.ROOT_FOLDER = "/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo"
 sp.DATA_FOLDER = "small_bowel_images"
-sp.FINALS_FOLDER = "small_bowel_images_jet_new_scattering"
+sp.FINALS_FOLDER = "small_bowel_images_jet_new_scattering_SN10_more_brighness"
 sp.FLAT_FOLDER = "/media/wirkert/data/Data/" + \
                  "2016_01_19_Flatfield_and_Dark_Laparoscope/Flatfields"
 sp.DARK_FOLDER = "/media/wirkert/data/Data/" + \
@@ -47,11 +47,9 @@ sp.DARK_FOLDER = "/media/wirkert/data/Data/" + \
 AVERAGE_FOLDER = "average_intensity"
 AVERAGE_FINALS_FOLDER = "finals"
 
-sns.set_style("whitegrid")
-sns.set_context("talk")
 
 font = {'family' : 'normal',
-        'size'   : 18}
+        'size'   : 25}
 
 matplotlib.rc('font', **font)
 
@@ -109,36 +107,47 @@ class OxyOverTimeTask(luigi.Task):
 
         # determine times from start:
         image_name_strings = df["image name"].values
-        time_strings = map(lambda s: s[27:35], image_name_strings)
+        time_strings = map(lambda s: s[
+            s.find("2015-10-08_")+11:s.find("2015-10-08_")+19],
+                           image_name_strings)
         time_in_s = map(lambda s: int(s[0:2]) * 3600 +
                                   int(s[3:5]) * 60 +
                                   int(s[6:]), time_strings)
         df["time since first frame [s]"] = np.array(time_in_s) - time_in_s[0]
-
+        df["time since applying first clip [s]"] = df["time since first frame [s]"] - 4
         # print oxy over time as scatterplot.
         plt.figure()
-        ax = df.plot.scatter(x="time since first frame [s]",
-                             y="oxygenation mean [%]", fontsize=16,
-                             s=50)
-        ax.set_xlim((0, 600))
+        ax = df.plot.scatter(x="time since applying first clip [s]",
+                             y="oxygenation mean [%]", fontsize=30,
+                             s=50, alpha=0.5)
+        ax.set_xlim((-5, 600))
 
-        plt.axvline(x=44, ymin=0, ymax=1, linewidth=2)
-        plt.axvline(x=104, ymin=0, ymax=1, linewidth=2)
-        plt.axvline(x=204, ymin=0, ymax=1, linewidth=2)
-        ax.annotate('first clip', xy=(44, ax.get_ylim()[1]),
+        plt.axvline(x=0, ymin=0, ymax=1, linewidth=2)
+        plt.axvline(x=39, ymin=0, ymax=1, linewidth=2)
+        plt.axvline(x=100, ymin=0, ymax=1, linewidth=2)
+        plt.axvline(x=124, ymin=0, ymax=1, linewidth=2)
+        ax.annotate('1', xy=(0, ax.get_ylim()[1]),
                     fontsize=18,
-                    xycoords='data', xytext=(-40, 0),
+                    color="blue",
+                    xycoords='data', xytext=(-5, 0),
                     textcoords='offset points')
-        ax.annotate('second clip', xy=(104, ax.get_ylim()[1]),
+        ax.annotate('2', xy=(39, ax.get_ylim()[1]),
                     fontsize=18,
-                    xycoords='data', xytext=(-15, 0),
+                    color="blue",
+                    xycoords='data', xytext=(-5, 0),
                     textcoords='offset points')
-        ax.annotate('third clip', xy=(204, ax.get_ylim()[1]),
+        ax.annotate('3', xy=(100, ax.get_ylim()[1]),
                     fontsize=18,
-                    xycoords='data', xytext=(0, 0),
+                    color="blue",
+                    xycoords='data', xytext=(-5, 0),
                     textcoords='offset points')
-        ax.yaxis.label.set_size(22)
-        ax.xaxis.label.set_size(22)
+        ax.annotate('4', xy=(124, ax.get_ylim()[1]),
+                    fontsize=18,
+                    color="blue",
+                    xycoords='data', xytext=(-5, 0),
+                    textcoords='offset points')
+
+        plt.grid()
 
         df.to_csv(self.input().path)
 
@@ -225,7 +234,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         rgb_image = rgb_image.astype(np.uint8)
         im = Image.fromarray(rgb_image, 'RGB')
         enh_brightness = ImageEnhance.Brightness(im)
-        im = enh_brightness.enhance(5.)
+        im = enh_brightness.enhance(10.)
         plot_image = np.array(im)
         top_left_axis = plt.gca()
         top_left_axis.imshow(plot_image, interpolation='nearest')
@@ -310,7 +319,7 @@ class IPCAITrainRegressor(luigi.Task):
                                               self.df_prefix))
 
     def requires(self):
-        return tasks_mc.CameraBatch(self.df_prefix)
+        return tasks_mc.SpectroCamBatch(self.df_prefix)
 
     def run(self):
         # extract data from the batch
@@ -320,8 +329,7 @@ class IPCAITrainRegressor(luigi.Task):
                               "Carets_Laparoscope/finals/" +
                               "snr_for_bands.txt", index_col=0)
 
-        X, y = preprocess(df_train, snr=df_snrs["SNR"].values,
-                          movement_noise_sigma=0.1,
+        X, y = preprocess(df_train, snr=10.,
                           bands_to_sortout=sp.bands_to_sortout)
         # train regressor
         reg = RandomForestRegressor(10, min_samples_leaf=10, max_depth=9,

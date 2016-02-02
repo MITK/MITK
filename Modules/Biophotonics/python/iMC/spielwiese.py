@@ -5,6 +5,7 @@ Created on Oct 19, 2015
 '''
 
 import pickle
+import os
 
 import skimage.restoration as res
 import numpy as np
@@ -28,48 +29,15 @@ def save_as_np(filename, prefix):
 
 if __name__ == '__main__':
 
-    r = NrrdReader()
+    image_file_folder = "/media/wirkert/data/Data/2015_11_12_IPCAI_in_silico/mc_data2"
 
-    msi = r.read("/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo/processed/" +
-           "image sample .nrrd")
-    seg = r.read("/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo/" +
-                 "noise_segmentation.nrrd")
+    onlyfiles = [ os.path.join(image_file_folder, f) for f in os.listdir(image_file_folder) if
+                 os.path.isfile(os.path.join(image_file_folder, f)) ]
+    onlyfiles.sort()
 
-    image = msi.get_image()
-
-#     sitk_reader = sitk.ImageFileReader()
-#     sitk_reader.SetFileName("/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo/processed/" +
-#            "image sample .nrrd")
-#     sitk_image = sitk_reader.Execute()
-#
-#
-#     gaussian = sitk.SmoothingRecursiveGaussianImageFilter()
-#     gaussian.SetSigma(100.)
-#     smooth_image = gaussian.Execute(sitk_image)
-
-    filtered_image = gaussian_filter(image.astype(np.float), 2)
-    msi.set_image(filtered_image)
-    msimani.apply_segmentation(msi, seg)
-    msi.set_wavelengths(np.arange(470, 680, 10))
-    msiplot.plotMeanError(msi)
-#     plt.show()
-#
-#     image_res = res.denoise_tv_chambolle(image.astype(np.float),
-#                                          weight=1000, n_iter_max=100,
-#                                          multichannel=True)
-
-    w = NrrdWriter(msi)
-    w.write("/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo/test.nrrd")
-
-#     img = sitk.GetImageFromArray(smooth_image, isVector=True)
-#     sitk.WriteImage(img, "/media/wirkert/data/Data/2015_11_12_IPCAI_in_vivo/test.nrrd")
-
-#     save_as_np("/media/wirkert/data/Data/" +
-#         "2015_11_12_IPCAI_in_silico/processed/" +
-#         "generic_tissue_train_all_camera.imc",
-#         "hard_train_2")
-#
-#     save_as_np("/media/wirkert/data/Data/" +
-#         "2015_11_12_IPCAI_in_silico/processed/" +
-#         "generic_tissue_gaussian_all_camera.imc",
-#         "gaussian_train_2")
+    for f in onlyfiles:
+        file = open(f)
+        b = pickle.load(file)
+        print f
+        print np.sum(b.reflectances <= 0)
+        print np.sum(np.isnan(b.reflectances))

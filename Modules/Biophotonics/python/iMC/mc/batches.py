@@ -91,7 +91,6 @@ class LessGenericBatch(AbstractBatch):
     def __init__(self):
         super(LessGenericBatch, self).__init__()
 
-
     def append_one_layer(self, saO2, n, d_ranges, nr_samples):
         """helper function to create parameters for one layer"""
 
@@ -181,6 +180,26 @@ class ColonMuscleBatch(GenericBatch):
                               nr_samples)
 
 
+class GenericMeanScatteringBatch(GenericBatch):
+    """three layer batch simulating colonic tissue"""
+
+    def __init__(self):
+        super(GenericMeanScatteringBatch, self).__init__()
+
+    def append_one_layer(self, saO2, nr_samples):
+        """helper function to create parameters for one layer"""
+
+        # create as generic batch
+        super(GenericMeanScatteringBatch, self).append_one_layer(saO2,
+                                                                 nr_samples)
+        self._nr_layers -= 1  # we're not finished
+
+        # restrict exponential scattering to mean value for soft tissue.
+        self.df["layer" + str(self._nr_layers), "b_mie"] = 1.286
+
+        self._nr_layers += 1
+
+
 class ColonMuscleMeanScatteringBatch(ColonMuscleBatch):
     """three layer batch simulating colonic tissue"""
 
@@ -202,44 +221,42 @@ class ColonMuscleMeanScatteringBatch(ColonMuscleBatch):
 
         self._nr_layers += 1
 
-# class VisualizationBatch(AbstractBatch):
-#     """batch used for visualization of different spectra. Feel free to adapt
-#     for your visualization purposes."""
-#
-#     def __init__(self):
-#         super(VisualizationBatch, self).__init__()
-#         # self._wavelengths = np.arange(470, 680, 10) * 10 ** -9
-#
-#     def append_one_layer(self, bvf, saO2, a_mie, a_ray, d, n, g, nr_samples):
-#         """helper function to create parameters for one layer"""
-#         samples = np.zeros((nr_samples, 7))
-#         # scale samples to correct ranges
-#         samples[:, 0] = bvf
-#         samples[:, 1] = saO2
-#         samples[:, 2] = a_mie
-#         samples[:, 3] = a_ray
-#         # d will be normalized later to 2mm total depth
-#         samples[:, 4] = d
-#         samples[:, 5] = n
-#         samples[:, 6] = g
-#         # append as last layer
-#         self.layers.append(samples)
-#
-#     def create_parameters(self, nr_samples):
-#         # bvf = np.linspace(0.0, .1, nr_samples)
-#         # saO2 = np.linspace(0., 1., nr_samples)
-#         # d = np.linspace(175, 735, nr_samples) * 10 ** -6
-#         # a_mie = np.linspace(5., 30., nr_samples) * 100
-#         # a_ray = np.linspace(0., 60., nr_samples) * 100
-#         # n = np.linspace(1.33, 1.54, nr_samples)
-#         # g = np.linspace(0, 0.95, nr_samples)
-#         # create three layers with random samples
-#         self.append_one_layer(0.02, 0.1, 30.*100., 0., 500 * 10 ** -6,
-#                               1.38, 0.9,
-#                               nr_samples)
-#         self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
-#                               1.36, 0.9,
-#                               nr_samples)
-#         self.append_one_layer(0.04, 0.7, 5.0 * 100, 0.*100, 500 * 10 ** -6,
-#                               1.36, 0.9,
-#                               nr_samples)
+
+class VisualizationBatch(AbstractBatch):
+    """batch used for visualization of different spectra. Feel free to adapt
+    for your visualization purposes."""
+
+    def __init__(self):
+        super(VisualizationBatch, self).__init__()
+
+    def append_one_layer(self, vhb, sao2, a_mie, b_mie, d, n, g, nr_samples):
+        """helper function to create parameters for one layer"""
+
+        # create layer elements
+        self.df["layer" + str(self._nr_layers), "vhb"] = vhb
+        self.df["layer" + str(self._nr_layers), "sao2"] = sao2
+        self.df["layer" + str(self._nr_layers), "a_mie"] = a_mie
+        self.df["layer" + str(self._nr_layers), "b_mie"] = b_mie
+        self.df["layer" + str(self._nr_layers), "d"] = d
+        self.df["layer" + str(self._nr_layers), "n"] = n
+        self.df["layer" + str(self._nr_layers), "g"] = g
+        self._nr_layers += 1
+
+    def create_parameters(self, nr_samples):
+        # bvf = np.linspace(0.0, .1, nr_samples)
+        # saO2 = np.linspace(0., 1., nr_samples)
+        # d = np.linspace(175, 735, nr_samples) * 10 ** -6
+        # a_mie = np.linspace(5., 30., nr_samples) * 100
+        # a_ray = np.linspace(0., 60., nr_samples) * 100
+        # n = np.linspace(1.33, 1.54, nr_samples)
+        # g = np.linspace(0, 0.95, nr_samples)
+        # create three layers with random samples
+        self.append_one_layer([0.1, 0.02], [0.7, 0.1], 18.9*100., 1.286,
+                              500 * 10 ** -6, 1.38, 0.9,
+                              nr_samples)
+        self.append_one_layer(0.04, 0.7, 18.9*100., 1.286, 500 * 10 ** -6,
+                              1.36, 0.9,
+                              nr_samples)
+        self.append_one_layer(0.04, 0.7, 18.9*100., 1.286, 500 * 10 ** -6,
+                              1.36, 0.9,
+                              nr_samples)

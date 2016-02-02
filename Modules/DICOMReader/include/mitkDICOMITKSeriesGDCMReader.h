@@ -17,20 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDICOMITKSeriesGDCMReader_h
 #define mitkDICOMITKSeriesGDCMReader_h
 
+#include <stack>
+#include "itkMutexLock.h"
 #include "mitkDICOMFileReader.h"
 #include "mitkDICOMDatasetSorter.h"
-
 #include "mitkDICOMGDCMImageFrameInfo.h"
 #include "mitkEquiDistantBlocksSorter.h"
 #include "mitkNormalDirectionConsistencySorter.h"
-
-#include "mitkITKDICOMSeriesReaderHelper.h"
-
 #include "MitkDICOMReaderExports.h"
 
-#include <stack>
-
-#include "itkMutexLock.h"
 
 namespace itk
 {

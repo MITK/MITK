@@ -17,16 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#define MBILOG_ENABLE_DEBUG
 #define ENABLE_TIMING
 
+#include <itkTimeProbesCollectorBase.h>
+#include <gdcmUIDs.h>
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkGantryTiltInformation.h"
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMGDCMTagScanner.h"
 
-#include <itkTimeProbesCollectorBase.h>
 itk::MutexLock::Pointer mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex = itk::MutexLock::New();
 
-#include <gdcmUIDs.h>
 
 mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPlacesForOrientation )
 : DICOMFileReader()

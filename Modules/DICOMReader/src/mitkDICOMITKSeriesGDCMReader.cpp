@@ -119,7 +119,7 @@ bool mitk::DICOMITKSeriesGDCMReader::GetFixTiltByShearing() const
   return m_FixTiltByShearing;
 }
 
-void mitk::DICOMITKSeriesGDCMReader::SetAcceptTwoSlicesGroups( bool accept )
+void mitk::DICOMITKSeriesGDCMReader::SetAcceptTwoSlicesGroups( bool accept ) const
 {
   m_EquiDistantBlocksSorter->SetAcceptTwoSlicesGroups( accept );
 }
@@ -131,7 +131,7 @@ bool mitk::DICOMITKSeriesGDCMReader::GetAcceptTwoSlicesGroups() const
 
 
 mitk::DICOMGDCMImageFrameList
-  mitk::DICOMITKSeriesGDCMReader::FromDICOMDatasetList( const DICOMDatasetList& input ) const
+  mitk::DICOMITKSeriesGDCMReader::FromDICOMDatasetList( const DICOMDatasetList& input )
 {
   DICOMGDCMImageFrameList output;
   output.reserve( input.size() );
@@ -147,7 +147,7 @@ mitk::DICOMGDCMImageFrameList
 }
 
 mitk::DICOMDatasetList
-  mitk::DICOMITKSeriesGDCMReader::ToDICOMDatasetList( const DICOMGDCMImageFrameList& input ) const
+  mitk::DICOMITKSeriesGDCMReader::ToDICOMDatasetList( const DICOMGDCMImageFrameList& input )
 {
   DICOMDatasetList output;
   output.reserve( input.size() );
@@ -163,7 +163,7 @@ mitk::DICOMDatasetList
 }
 
 mitk::DICOMImageFrameList
-  mitk::DICOMITKSeriesGDCMReader::ToDICOMImageFrameList( const DICOMGDCMImageFrameList& input ) const
+  mitk::DICOMITKSeriesGDCMReader::ToDICOMImageFrameList( const DICOMGDCMImageFrameList& input )
 {
   DICOMImageFrameList output;
   output.reserve( input.size() );
@@ -192,7 +192,7 @@ void mitk::DICOMITKSeriesGDCMReader::InternalPrintConfiguration( std::ostream& o
 }
 
 
-std::string mitk::DICOMITKSeriesGDCMReader::GetActiveLocale() const
+std::string mitk::DICOMITKSeriesGDCMReader::GetActiveLocale()
 {
   return setlocale( LC_NUMERIC, nullptr );
 }
@@ -448,7 +448,7 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
 }
 
 mitk::ReaderImplementationLevel
-  mitk::DICOMITKSeriesGDCMReader::GetReaderImplementationLevel( const std::string sopClassUID ) const
+  mitk::DICOMITKSeriesGDCMReader::GetReaderImplementationLevel( const std::string sopClassUID )
 {
   if ( sopClassUID.empty() )
   {
@@ -598,13 +598,13 @@ void mitk::DICOMITKSeriesGDCMReader::EnsureMandatorySortersArePresent(
   }
 }
 
-void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffsetToAdaptive( double fractionOfInterSliceDistance )
+void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffsetToAdaptive( double fractionOfInterSliceDistance ) const
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
   m_EquiDistantBlocksSorter->SetToleratedOriginOffsetToAdaptive( fractionOfInterSliceDistance );
 }
 
-void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffset( double millimeters )
+void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffset( double millimeters ) const
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
   m_EquiDistantBlocksSorter->SetToleratedOriginOffset( millimeters );

@@ -233,18 +233,18 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     /**
       \brief Controls whether groups of only two images are accepted when ensuring consecutive slices via EquiDistantBlocksSorter.
     */
-    void SetAcceptTwoSlicesGroups(bool accept);
+    void SetAcceptTwoSlicesGroups(bool accept) const;
     bool GetAcceptTwoSlicesGroups() const;
 
     /**
       \brief See \ref DICOMITKSeriesGDCMReader_ForcedConfiguration.
     */
-    void SetToleratedOriginOffsetToAdaptive(double fractionOfInterSliceDistanct = 0.3);
+    void SetToleratedOriginOffsetToAdaptive(double fractionOfInterSliceDistanct = 0.3) const;
 
     /**
       \brief See \ref DICOMITKSeriesGDCMReader_ForcedConfiguration.
     */
-    void SetToleratedOriginOffset(double millimeters = 0.005);
+    void SetToleratedOriginOffset(double millimeters = 0.005) const;
 
     double GetToleratedOriginError() const;
     bool IsToleratedOriginOffsetAbsolute() const;
@@ -260,7 +260,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     virtual void InternalPrintConfiguration(std::ostream& os) const override;
 
     /// \brief Return active C locale
-    std::string GetActiveLocale() const;
+  static std::string GetActiveLocale();
     /**
       \brief Remember current locale on stack, activate "C" locale.
       "C" locale is required for correct parsing of numbers by itk::ImageSeriesReader
@@ -279,11 +279,11 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     DICOMITKSeriesGDCMReader& operator=(const DICOMITKSeriesGDCMReader& other);
 
     /// \brief See \ref DICOMITKSeriesGDCMReader_Internals
-    DICOMDatasetList ToDICOMDatasetList(const DICOMGDCMImageFrameList& input) const;
+  static DICOMDatasetList ToDICOMDatasetList(const DICOMGDCMImageFrameList& input);
     /// \brief See \ref DICOMITKSeriesGDCMReader_Internals
-    DICOMGDCMImageFrameList FromDICOMDatasetList(const DICOMDatasetList& input) const;
+  static DICOMGDCMImageFrameList FromDICOMDatasetList(const DICOMDatasetList& input);
     /// \brief See \ref DICOMITKSeriesGDCMReader_Internals
-    DICOMImageFrameList ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input) const;
+  static DICOMImageFrameList ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input);
 
     typedef std::list<DICOMGDCMImageFrameList> SortingBlockList;
     /**
@@ -296,7 +296,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     void SetTagCache( const DICOMTagCache::Pointer& ) override;
 
     /// \brief Sorting step as described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy
-    SortingBlockList InternalExecuteSortingStep(
+  static SortingBlockList InternalExecuteSortingStep(
         unsigned int sortingStepIndex,
         DICOMDatasetSorter::Pointer sorter,
         const SortingBlockList& input);
@@ -313,7 +313,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     Image::Pointer FixupSpacing(Image* mitkImage, const DICOMImageBlockDescriptor& block) const;
 
     /// \brief Describe this reader's confidence for given SOP class UID
-    ReaderImplementationLevel GetReaderImplementationLevel(const std::string sopClassUID) const;
+  static ReaderImplementationLevel GetReaderImplementationLevel(const std::string sopClassUID);
   private:
 
     /// \brief Creates the required sorting steps described in \ref DICOMITKSeriesGDCMReader_ForcedConfiguration

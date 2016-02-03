@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVectorProperty.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace mitk {
 
 /**
@@ -79,6 +81,7 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self)
 
+  //! Build an XML version of this property
   virtual TiXmlElement* Serialize() override
   {
     auto listElement = new TiXmlElement( "Values" );
@@ -92,12 +95,9 @@ public:
         std::stringstream indexS;
         indexS << index++;
 
-        std::stringstream valueS;
-        valueS.precision(16);
-        valueS <<  listEntry;
         auto entryElement = new TiXmlElement("Value");
         entryElement->SetAttribute("idx", indexS.str());
-        entryElement->SetAttribute("value", valueS.str());
+        entryElement->SetAttribute("value", boost::lexical_cast<std::string>(listEntry));
         listElement->LinkEndChild( entryElement );
       }
 
@@ -109,50 +109,53 @@ public:
     }
   }
 
+  //! Construct a property from an XML serialization
+  virtual BaseProperty::Pointer Deserialize(TiXmlElement* listElement) override
+  {
+    typename PropertyType::VectorType datalist;
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* listElement) override
+    if ( listElement )
     {
-      typename PropertyType::VectorType datalist;
+      MITK_DEBUG << "Deserializing " << *listElement;
 
-      if ( listElement )
+      unsigned int index(0);
+      std::string valueString;
+      DATATYPE value;
+      for ( TiXmlElement* valueElement = listElement->FirstChildElement("Value");
+            valueElement;
+            valueElement = valueElement->NextSiblingElement("Value") )
       {
-        MITK_DEBUG << "Deserializing " << *listElement;
-
-        unsigned int index(0);
-        std::string valueString;
-        DATATYPE value;
-        for ( TiXmlElement* valueElement = listElement->FirstChildElement("Value");
-              valueElement;
-              valueElement = valueElement->NextSiblingElement("Value") )
+        if ( valueElement->QueryValueAttribute("value", &valueString) != TIXML_SUCCESS )
         {
-          if ( valueElement->QueryValueAttribute("value", &valueString) != TIXML_SUCCESS )
-          {
-              MITK_ERROR << "Missing value attribute in <Values> list";
-            return nullptr;
-          }
-
-          std::istringstream ss(valueString);
-          if ( !(ss >> value ) )
-          {
-            MITK_ERROR << "Could not make sense of '" << valueString << "'";
-            return nullptr;
-          }
-
-          datalist.push_back(value);
-          ++index;
+            MITK_ERROR << "Missing value attribute in <Values> list";
+          return nullptr;
         }
 
-        typename PropertyType::Pointer property = PropertyType::New();
-        property->SetValue( datalist );
-        return property.GetPointer();
-      }
-      else
-      {
-        MITK_ERROR << "Missing <Values> tag.";
+        try
+        {
+          value = boost::lexical_cast<DATATYPE>(valueString);
+        }
+        catch (boost::bad_lexical_cast& e)
+        {
+          MITK_ERROR << "Could not parse '" << valueString << "' as number: " << e.what();
+          return nullptr;
+        }
+
+        datalist.push_back(value);
+        ++index;
       }
 
-      return nullptr;
+      typename PropertyType::Pointer property = PropertyType::New();
+      property->SetValue( datalist );
+      return property.GetPointer();
     }
+    else
+    {
+      MITK_ERROR << "Missing <Values> tag.";
+    }
+
+    return nullptr;
+  }
 
 };
 

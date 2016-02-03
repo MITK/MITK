@@ -19,6 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVectorProperty.h"
 #include "mitkBasePropertySerializer.h"
+#include <boost/lexical_cast.hpp>
+
+#include <limits>
+#include <math.h>
+
+#include "mitkEqual.h"
 
 /**
  \brief Test for VectorPropertySerializer.
@@ -62,12 +68,21 @@ public:
     data.push_back( -918273674.6172838 );
     data.push_back( 0 );
     data.push_back( +6172838.918273674 );
+    data.push_back( sqrt(2) );
+    if (std::numeric_limits<DATATYPE>::has_infinity)
+    {
+         data.push_back( std::numeric_limits<DATATYPE>::infinity() );
+         data.push_back( -std::numeric_limits<DATATYPE>::infinity() );
+    }
+    // do NOT test NaN: cannot be == to itself, so cannot be tested like the others
+    // NaN is covered in a different test (FloatToStringTest at the time of writing this)
+    //data.push_back( std::numeric_limits<DATATYPE>::quiet_NaN() );
     vectorProperty->SetValue( data );
 
     return vectorProperty;
   }
 
-  void TestSerialize(mitk::BaseProperty* property)
+  mitk::BaseProperty::Pointer TestSerialize(mitk::BaseProperty* property)
   {
     std::string serializername = std::string(property->GetNameOfClass()) + "Serializer";
 
@@ -76,7 +91,7 @@ public:
 
     mitk::BasePropertySerializer* serializer = dynamic_cast<mitk::BasePropertySerializer*>(allSerializers.begin()->GetPointer());
     CPPUNIT_ASSERT( serializer != nullptr );
-    if ( !serializer ) return;
+    if ( !serializer ) return nullptr;
 
     serializer->SetProperty(property);
     TiXmlElement* serialization(nullptr);
@@ -87,20 +102,33 @@ public:
     {
     }
     CPPUNIT_ASSERT( serialization != nullptr );
-    if (!serialization) return;
+    if (!serialization) return nullptr;
 
     mitk::BaseProperty::Pointer restoredProperty = serializer->Deserialize( serialization );
     CPPUNIT_ASSERT(restoredProperty.IsNotNull());
-    if (!restoredProperty) return;
-
-    CPPUNIT_ASSERT( *property == *restoredProperty );
+    return restoredProperty;
   }
 
   template < typename DATATYPE >
   void TestSerialize()
   {
-    mitk::BaseProperty::Pointer property = MakeExampleProperty<DATATYPE>().GetPointer();
-    TestSerialize(property);
+    auto property = MakeExampleProperty<DATATYPE>();
+    mitk::BaseProperty::Pointer restored_property = TestSerialize(property);
+
+    typename mitk::VectorProperty<DATATYPE>::Pointer restored_vector_property =
+        dynamic_cast<mitk::VectorProperty<DATATYPE>*>(restored_property.GetPointer());
+    CPPUNIT_ASSERT(restored_vector_property.IsNotNull());
+
+    auto orig_vector = property->GetValue();
+    auto restored_vector = restored_vector_property->GetValue();
+
+    CPPUNIT_ASSERT_EQUAL( orig_vector.size(), restored_vector.size() );
+    for (unsigned int i = 0; i < orig_vector.size(); ++i)
+    {
+      // compare using Equal, i.e. with tolerance of mitk::eps
+      CPPUNIT_ASSERT_MESSAGE(std::string("Verifying element ") + boost::lexical_cast<std::string>(i),
+                             mitk::Equal(orig_vector[i], restored_vector[i]) );
+    }
   }
 
   void TestSerializeIntTypedef()

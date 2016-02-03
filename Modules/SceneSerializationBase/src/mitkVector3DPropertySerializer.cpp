@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasePropertySerializer.h"
 
 #include "mitkProperties.h"
+#include "mitkStringsToNumbers.h"
 
 namespace mitk
 {
@@ -38,9 +39,9 @@ class Vector3DPropertySerializer : public BasePropertySerializer
       {
         auto  element = new TiXmlElement("vector");
         Vector3D point = prop->GetValue();
-        element->SetDoubleAttribute("x", point[0]);
-        element->SetDoubleAttribute("y", point[1]);
-        element->SetDoubleAttribute("z", point[2]);
+        element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]));
+        element->SetAttribute("y", boost::lexical_cast<std::string>(point[1]));
+        element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]));
         return element;
       }
       else return nullptr;
@@ -50,10 +51,20 @@ class Vector3DPropertySerializer : public BasePropertySerializer
     {
       if (!element) return nullptr;
 
+      std::string v_str[3];
+      if ( element->QueryStringAttribute( "x", &v_str[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryStringAttribute( "y", &v_str[1] ) != TIXML_SUCCESS ) return nullptr;
+      if ( element->QueryStringAttribute( "z", &v_str[2] ) != TIXML_SUCCESS ) return nullptr;
       Vector3D v;
-      if ( element->QueryDoubleAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return nullptr;
-      if ( element->QueryDoubleAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return nullptr;
-      if ( element->QueryDoubleAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return nullptr;
+      try
+      {
+        StringsToNumbers<double>(3, v_str, v);
+      }
+      catch ( boost::bad_lexical_cast& e )
+      {
+        MITK_ERROR << "Could not parse string '" << v_str << "'as number: " << e.what();
+        return nullptr;
+      }
 
      return Vector3DProperty::New( v ).GetPointer();
     }

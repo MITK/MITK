@@ -270,7 +270,18 @@ void QmitkRigidRegistrationView::FillPresetComboBox( const std::list< std::strin
 
 void QmitkRigidRegistrationView::PresetSelectionChanged()
 {
-  this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(true);
+  // first item is blank == no preset selected
+  bool validPresetSelected = (this->m_Controls.m_RigidRegistrationPresetBox->currentIndex() > 0);
+
+  if (validPresetSelected)
+  {
+    this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(true);
+  }
+  else
+  {
+    this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(false);
+  }
+
 }
 
 void QmitkRigidRegistrationView::LoadSelectedPreset()

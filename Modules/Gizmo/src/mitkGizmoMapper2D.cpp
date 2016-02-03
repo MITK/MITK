@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkConeSource.h>
 #include <vtkCamera.h>
 #include <vtkVectorOperators.h>
-#include <vtkAppendPolydata.h>
+#include <vtkAppendPolyData.h>
 #include <vtkCharArray.h>
 #include <vtkPointData.h>
 #include <vtkCellArray.h>
@@ -203,7 +203,7 @@ void mitk::GizmoMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 
   auto camera = renderer->GetVtkRenderer()->GetActiveCamera();
 
-  auto plane = renderer->GetCurrentWorldGeometry2D();
+  auto plane = renderer->GetCurrentWorldPlaneGeometry();
 
   Point3D gizmoCenterView = plane->ProjectPointOntoPlane(gizmo->GetCenter());
 
@@ -256,10 +256,10 @@ void mitk::GizmoMapper2D::GenerateDataForRenderer(mitk::BaseRenderer* renderer)
 
   ls->m_VtkPolyDataMapper->SetInputConnection( appender->GetOutputPort() );
 
-  ApplyProperties(renderer);
+  ApplyVisualProperties(renderer);
 }
 
-void mitk::GizmoMapper2D::ApplyProperties(BaseRenderer* renderer)
+void mitk::GizmoMapper2D::ApplyVisualProperties(BaseRenderer* renderer)
 {
   LocalStorage* ls = m_LSH.GetLocalStorage(renderer);
 
@@ -299,14 +299,14 @@ void mitk::GizmoMapper2D::ApplyProperties(BaseRenderer* renderer)
   }
 }
 
-void mitk::GizmoMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer /*= nullptr*/, bool overwrite /*= false*/)
+void mitk::GizmoMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer /*= nullptr*/, bool /*= false*/)
 {
   node->SetProperty("color", ColorProperty::New(0.3,0.3,0.3)); // a little lighter than the
                                                                     // "plane widgets" of
                                                                     // QmitkStdMultiWidget
-  node->SetProperty("scalar visibility", BoolProperty::New(true));
-  node->SetProperty("ScalarsRangeMinimum", DoubleProperty::New(0));
-  node->SetProperty("ScalarsRangeMaximum", DoubleProperty::New((int)Gizmo::NoHandle));
+  node->SetProperty("scalar visibility", BoolProperty::New(true), renderer);
+  node->SetProperty("ScalarsRangeMinimum", DoubleProperty::New(0), renderer);
+  node->SetProperty("ScalarsRangeMaximum", DoubleProperty::New((int)Gizmo::NoHandle), renderer);
 
   double colorMoveFreely[] = {1,0,0,1}; // RGBA
   double colorAxisX[] = {0.753,0,0,1}; // colors copied from QmitkStdMultiWidget to
@@ -335,10 +335,10 @@ void mitk::GizmoMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseR
 
   mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();
   lutProp->SetLookupTable(mlut);
-  node->SetProperty("LookupTable", lutProp);
+  node->SetProperty("LookupTable", lutProp, renderer);
 
-  node->SetProperty("helper object", BoolProperty::New(true));
-  node->SetProperty("visible", BoolProperty::New(true));
-  node->SetProperty("show in 2D", BoolProperty::New(true));
+  node->SetProperty("helper object", BoolProperty::New(true), renderer);
+  node->SetProperty("visible", BoolProperty::New(true), renderer);
+  node->SetProperty("show in 2D", BoolProperty::New(true), renderer);
   // no "show in 3D" because this would require a specialized mapper for gizmos in 3D
 }

@@ -76,7 +76,7 @@ private:
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
     //! Apply visual properties
-    void ApplyProperties(BaseRenderer* renderer);
+    void ApplyVisualProperties(BaseRenderer* renderer);
 
     //! (RenderWindow) Instance specific data.
     class LocalStorage : public Mapper::BaseLocalStorage

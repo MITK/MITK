@@ -46,6 +46,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MicroServices
 #include <usGetModuleContext.h>
 
+namespace {
+const char* PROPERTY_KEY_ORIGINAL_OBJECT_OPACITY = "gizmo.originalObjectOpacity";
+}
+
 bool mitk::Gizmo::HasGizmoAttached(DataNode* node, DataStorage* storage)
 {
   auto typeCondition = TNodePredicateDataType<Gizmo>::New();
@@ -67,6 +71,17 @@ bool mitk::Gizmo::RemoveGizmoFromNode(DataNode* node, DataStorage* storage)
   {
     storage->Remove(gizmoChild);
   }
+
+  //--------------------------------------------------------------
+  // Restore original opacity if we changed it
+  //--------------------------------------------------------------
+  float originalOpacity = 1.0;
+  if (node->GetFloatProperty(PROPERTY_KEY_ORIGINAL_OBJECT_OPACITY, originalOpacity))
+  {
+      node->SetOpacity(originalOpacity);
+      node->GetPropertyList()->DeleteProperty(PROPERTY_KEY_ORIGINAL_OBJECT_OPACITY);
+  }
+
   return !gizmoChildren->empty();
 }
 
@@ -98,6 +113,20 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
 
   interactor->SetGizmoNode(gizmoNode);
   interactor->SetManipulatedObjectNode(node);
+
+  //--------------------------------------------------------------
+  // Note current opacity for later restore and lower it
+  //--------------------------------------------------------------
+
+  float currentNodeOpacity = 1.0;
+  if (node->GetOpacity(currentNodeOpacity, nullptr))
+  {
+    if (currentNodeOpacity > 0.5f)
+    {
+      node->SetFloatProperty(PROPERTY_KEY_ORIGINAL_OBJECT_OPACITY, currentNodeOpacity);
+      node->SetOpacity(0.5f);
+    }
+  }
 
   if (storage)
   {

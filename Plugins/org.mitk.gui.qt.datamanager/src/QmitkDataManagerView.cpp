@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkEnumerationProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
-#include "mitkGizmo.h"
 #include <mitkNodePredicateAnd.h>
 #include <mitkITKImageImport.h>
 #include <mitkIDataStorageService.h>
@@ -221,16 +220,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ReinitSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(reinitAction);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,reinitAction));
-
-  m_GizmoToggleAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/ToggleGizmoNode_48.png"),
-      "Direct manipulation", this);
-  m_GizmoToggleAction->setCheckable(true);
-  surfaceDataNodeDescriptor->AddAction(m_GizmoToggleAction, false);
-
-  QObject::connect( m_GizmoToggleAction, SIGNAL( changed() )
-    , this, SLOT( ToggleGizmoOnSelectedNodeChanged() ) );
-  QObject::connect(m_GizmoToggleAction, SIGNAL(triggered(bool)),
-                  this, SLOT(ToggleGizmoOnSelectedNode(bool)) );
 
   // find contextMenuAction extension points and add them to the node descriptor
   berry::IExtensionRegistry* extensionPointService = berry::Platform::GetExtensionRegistry();
@@ -1000,35 +989,5 @@ mitk::IRenderWindowPart* QmitkDataManagerView::OpenRenderWindowPart(bool activat
   else
   {
     return this->GetRenderWindowPart(QmitkAbstractView::BRING_TO_FRONT | QmitkAbstractView::OPEN);
-  }
-}
-
-void QmitkDataManagerView::ToggleGizmoOnSelectedNodeChanged()
-{
-  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_FilterModel->mapToSource(m_NodeTreeView->selectionModel()->currentIndex()));
-  if(node)
-  {
-    bool hasGizmo = mitk::Gizmo::HasGizmoAttached(node, GetDataStorage());
-    m_GizmoToggleAction->setChecked(hasGizmo);
-  }
-}
-
-void QmitkDataManagerView::ToggleGizmoOnSelectedNode(bool currentlyOn)
-{
-  auto selection = this->GetCurrentSelection();
-  if (selection.size() == 1)
-  {
-    if (!currentlyOn)
-    {
-      mitk::Gizmo::AddGizmoToNode(selection.first(), GetDataStorage());
-    }
-    else
-    {
-      if (!mitk::Gizmo::RemoveGizmoFromNode(selection.first(), GetDataStorage()))
-      {
-        MITK_WARN << "ToggleGizmoAction did not find any gizmo although action was checked."
-                     " Did user remove it manually?";
-      }
-    }
   }
 }

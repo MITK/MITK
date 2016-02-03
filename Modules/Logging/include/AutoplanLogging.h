@@ -35,12 +35,12 @@
 
 #include <MitkLoggingExports.h>
 
-#define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::info)
-#define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::error)
-#define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::trace)
-#define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::debug)
-#define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::warning)
-#define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().getLog(), boost::log::trivial::fatal)
+#define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::info)
+#define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::error)
+#define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::trace)
+#define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug)
+#define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::warning)
+#define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::fatal)
 
 namespace Logger
 {
@@ -79,9 +79,8 @@ namespace Logger
       boost::shared_ptr< std::stringstream > dataStream;
       boost::shared_ptr< boost::log::sinks::text_ostream_backend > dataBackend;
 
-      boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg;
     public:
-      boost::log::sources::severity_logger< boost::log::trivial::severity_level > getLog() const;
+      boost::log::sources::severity_logger< boost::log::trivial::severity_level > lg;
       boost::shared_ptr< std::stringstream > getDataStream() const;
       boost::shared_ptr< boost::log::sinks::text_ostream_backend > getDataBackend() const;
 

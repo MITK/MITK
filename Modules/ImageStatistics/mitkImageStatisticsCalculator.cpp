@@ -1128,6 +1128,8 @@ namespace mitk
     typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
     statisticsFilter->SetInput( image );
     statisticsFilter->SetBinSize( 100 );
+    statisticsFilter->SetCoordinateTolerance( 0.001 );
+    statisticsFilter->SetDirectionTolerance( 0.001 );
 
     unsigned long observerTag = statisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
     try
@@ -1353,6 +1355,9 @@ namespace mitk
     adaptMaskFilter->SetInput( maskImage );
     adaptMaskFilter->SetOutputOrigin( image->GetOrigin() );
     adaptMaskFilter->SetOutputOffset( offset );
+    adaptMaskFilter->SetCoordinateTolerance( 0.001 );
+    adaptMaskFilter->SetDirectionTolerance( 0.001 );
+
 
     typename MaskImageType::Pointer adaptedMaskImage;
     try
@@ -1397,6 +1402,8 @@ namespace mitk
       typename ExtractImageFilterType::Pointer extractImageFilter = ExtractImageFilterType::New();
       extractImageFilter->SetInput( image );
       extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
+      extractImageFilter->SetCoordinateTolerance( 0.001 );
+      extractImageFilter->SetDirectionTolerance( 0.001 );
       extractImageFilter->Update();
       adaptedImage = extractImageFilter->GetOutput();
     }
@@ -1457,9 +1464,11 @@ namespace mitk
     }
 
 
-    typename  LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
+    typename LabelStatisticsFilterType::Pointer labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( adaptedImage );
     labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
+    labelStatisticsFilter->SetCoordinateTolerance( 0.001 );
+    labelStatisticsFilter->SetDirectionTolerance( 0.001 );
     labelStatisticsFilter->UseHistogramsOn();
     labelStatisticsFilter->SetHistogramParameters( numberOfBins, floor(minimum), ceil(maximum) );   //statisticsFilter->GetMinimum() statisticsFilter->GetMaximum()
 
@@ -1539,6 +1548,8 @@ namespace mitk
         masker->SetOutsideValue( outsideValue );
         masker->SetInput1(adaptedImage);
         masker->SetInput2(adaptedMaskImage);
+        masker->SetCoordinateTolerance( 0.001 );
+        masker->SetDirectionTolerance( 0.001 );
         masker->Update();
         // get index of minimum and maximum
         typedef itk::MinimumMaximumImageCalculator< ImageType > MinMaxFilterType;
@@ -1993,6 +2004,9 @@ namespace mitk
       labelStatisticsFilter = LabelStatisticsFilterType::New();
       labelStatisticsFilter->SetInput( inputImage );
       labelStatisticsFilter->SetLabelInput( hotspotMaskITK );
+      labelStatisticsFilter->SetCoordinateTolerance( 0.001 );
+      labelStatisticsFilter->SetDirectionTolerance( 0.001 );
+
       labelStatisticsFilter->Update();
 
       Statistics hotspotStatistics;

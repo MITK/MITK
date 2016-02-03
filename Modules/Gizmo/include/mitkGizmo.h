@@ -161,8 +161,8 @@ protected:
   Gizmo();
   virtual ~Gizmo();
 
-  Gizmo(const Gizmo&) = delete;
-  Gizmo& operator=(const Gizmo&) = delete;
+  Gizmo(const Gizmo&);// = delete;
+  Gizmo& operator=(const Gizmo&);// = delete;
 
   //! Creates a vtkPolyData representing the parameters defining the gizmo.
   vtkSmartPointer<vtkPolyData> BuildGizmo();

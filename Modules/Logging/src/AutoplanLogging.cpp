@@ -48,12 +48,6 @@ namespace Logger {
     reinitLogger();
   }
 
-
-  boost::log::sources::severity_logger<boost::log::trivial::severity_level> Log::getLog() const
-  {
-    return lg;
-  }
-
   boost::shared_ptr< std::stringstream > Log::getDataStream() const
   {
     return dataStream;

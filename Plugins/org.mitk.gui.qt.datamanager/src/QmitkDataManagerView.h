@@ -236,8 +236,6 @@ protected:
   QPushButton* m_ColorButton;
   /// TextureInterpolation action
   QAction* m_TextureInterpolation;
-  /// Gizmo toggling action
-  QAction* m_GizmoToggleAction;
   /// SurfaceRepresentation action
   QAction* m_SurfaceRepresentation;
   /// Lookuptable selection action

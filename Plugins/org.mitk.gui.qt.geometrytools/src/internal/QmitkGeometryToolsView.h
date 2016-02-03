@@ -91,7 +91,6 @@ protected slots:
      * mitk::DataNode mitk::BaseGeometry.
      */
     void OnCenterPointRadioButton(bool);
-
 protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;

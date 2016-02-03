@@ -36,7 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 #include <mitkIRenderingManager.h>
 #include <mitkImageCast.h>
-
 //## Qmitk
 #include <QmitkDnDFrameWidget.h>
 #include <QmitkIOUtil.h>

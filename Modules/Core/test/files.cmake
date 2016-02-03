@@ -29,6 +29,7 @@ set(MODULE_TESTS
   mitkEnumerationPropertyTest.cpp
   mitkFileReaderRegistryTest.cpp
   #mitkFileWriterRegistryTest.cpp
+  mitkFloatToStringTest.cpp
   mitkGenericPropertyTest.cpp
   mitkGeometry3DTest.cpp
   mitkGeometry3DEqualTest.cpp

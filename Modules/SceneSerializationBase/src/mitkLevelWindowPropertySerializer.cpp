@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLevelWindowProperty.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace mitk
 {
 
@@ -51,18 +53,18 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
 
         auto  child = new TiXmlElement("CurrentSettings");
         element->LinkEndChild( child );
-          child->SetDoubleAttribute("level", lw.GetLevel());
-          child->SetDoubleAttribute("window", lw.GetWindow());
+          child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetLevel()));
+          child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetWindow()));
 
                       child = new TiXmlElement("DefaultSettings");
         element->LinkEndChild( child );
-          child->SetDoubleAttribute("level", lw.GetDefaultLevel());
-          child->SetDoubleAttribute("window", lw.GetDefaultWindow());
+          child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetDefaultLevel()));
+          child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetDefaultWindow()));
 
                       child = new TiXmlElement("CurrentRange");
         element->LinkEndChild( child );
-          child->SetDoubleAttribute("min", lw.GetRangeMin());
-          child->SetDoubleAttribute("max", lw.GetRangeMax());
+          child->SetAttribute("min", boost::lexical_cast<std::string>(lw.GetRangeMin()));
+          child->SetAttribute("max", boost::lexical_cast<std::string>(lw.GetRangeMax()));
 
 
         return element;
@@ -81,31 +83,41 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
       if (element->Attribute("isFloatingImage"))
         isFloatingImage = std::string(element->Attribute("isFloatingImage")) == "true";
 
-      double level = 0;
-      double window = 0;
+      std::string level_string;
+      std::string window_string;
       TiXmlElement* child = element->FirstChildElement("CurrentSettings");
-        if ( child->QueryDoubleAttribute( "level", &level ) != TIXML_SUCCESS ) return nullptr;
-        if ( child->QueryDoubleAttribute( "window", &window ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryStringAttribute( "level", &level_string ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryStringAttribute( "window", &window_string ) != TIXML_SUCCESS ) return nullptr;
 
-      double defaultLevel;
-      double defaultWindow;
+      std::string defaultLevel_string;
+      std::string defaultWindow_string;
                     child = element->FirstChildElement("DefaultSettings");
-        if ( child->QueryDoubleAttribute( "level", &defaultLevel ) != TIXML_SUCCESS ) return nullptr;
-        if ( child->QueryDoubleAttribute( "window", &defaultWindow ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryStringAttribute( "level", &defaultLevel_string ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryStringAttribute( "window", &defaultWindow_string ) != TIXML_SUCCESS ) return nullptr;
 
-      double minRange;
-      double maxRange;
+      std::string minRange_string;
+      std::string maxRange_string;
                     child = element->FirstChildElement("CurrentRange");
-        if ( child->QueryDoubleAttribute( "min", &minRange ) != TIXML_SUCCESS ) return nullptr;
-        if ( child->QueryDoubleAttribute( "max", &maxRange ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryStringAttribute( "min", &minRange_string ) != TIXML_SUCCESS ) return nullptr;
+        if ( child->QueryStringAttribute( "max", &maxRange_string ) != TIXML_SUCCESS ) return nullptr;
 
       LevelWindow lw;
-      lw.SetRangeMinMax( minRange, maxRange );
-      lw.SetDefaultLevelWindow( defaultLevel, defaultWindow );
-      lw.SetLevelWindow( level, window );
-      lw.SetFixed( isFixed );
-      lw.SetFloatingValues(isFloatingImage);
-
+      try
+      {
+        lw.SetRangeMinMax( boost::lexical_cast<double>(minRange_string),
+                           boost::lexical_cast<double>(maxRange_string) );
+        lw.SetDefaultLevelWindow( boost::lexical_cast<double>(defaultLevel_string),
+                                  boost::lexical_cast<double>(defaultWindow_string) );
+        lw.SetLevelWindow( boost::lexical_cast<double>(level_string),
+                           boost::lexical_cast<double>(window_string) );
+        lw.SetFixed( isFixed );
+        lw.SetFloatingValues(isFloatingImage);
+      }
+      catch ( boost::bad_lexical_cast& e )
+      {
+        MITK_ERROR << "Could not parse string as number: " << e.what();
+        return nullptr;
+      }
       return LevelWindowProperty::New( lw ).GetPointer();
     }
 

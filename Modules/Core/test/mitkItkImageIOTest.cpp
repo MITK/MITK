@@ -45,6 +45,8 @@ class mitkItkImageIOTestSuite : public mitk::TestFixture
   MITK_TEST(TestImageWriterSimple);
   MITK_TEST(TestWrite3DImageWithOnePlane);
   MITK_TEST(TestWrite3DImageWithTwoPlanes);
+  MITK_TEST(TestWrite3DplusT_ArbitraryTG);
+  MITK_TEST(TestWrite3DplusT_ProportionalTG);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -77,6 +79,16 @@ public:
   void TestImageWriterPng3()
   {
     TestImageWriter("RenderingTestData/rgbaImage.png");
+  }
+
+  void TestWrite3DplusT_ArbitraryTG()
+  {
+    TestImageWriter("3D+t-ITKIO-TestData/LinearModel_4D_arbitrary_time_geometry.nrrd");
+  }
+
+  void TestWrite3DplusT_ProportionalTG()
+  {
+    TestImageWriter("3D+t-ITKIO-TestData/LinearModel_4D_prop_time_geometry.nrrd");
   }
 
   void TestImageWriterSimple()
@@ -197,6 +209,85 @@ public:
   }
 
   /**
+  *  test for writing NRRDs
+  */
+  void TestNRRDWriting(const mitk::Image* image)
+  {
+    CPPUNIT_ASSERT_MESSAGE("Internal error. Passed reference image is null.", image);
+
+      std::ofstream tmpStream;
+      std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.nrrd");
+      tmpStream.close();
+
+      try
+      {
+        mitk::IOUtil::Save(image, tmpFilePath);
+
+        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(tmpFilePath);
+        CPPUNIT_ASSERT_MESSAGE("Image stored in NRRD format was succesfully loaded again", compareImage.IsNotNull());
+
+        /*It would make sence to check the images as well (see commented cppunit assert),
+          but currently there seems to be a problem (exception) with most of the test images
+          (partly it seems to be a problem when try to access the pixel content by AccessByItk_1
+          in mitk::CompareImageDataFilter.
+          This problem should be dealt with in Bug 19533 - mitkITKImageIOTest needs improvement */
+        //CPPUNIT_ASSERT_MESSAGE("Images are equal.", mitk::Equal(*image, *compareImage, mitk::eps, true));
+        CPPUNIT_ASSERT_MESSAGE("TimeGeometries are equal.", mitk::Equal(*(image->GetTimeGeometry()), *(compareImage->GetTimeGeometry()), mitk::eps, true));
+
+        remove(tmpFilePath.c_str());
+      }
+      catch (...)
+      {
+        std::remove(tmpFilePath.c_str());
+        CPPUNIT_FAIL("Exception during NRRD file writing");
+      }
+  }
+
+  /**
+  *  test for writing MHDs
+  */
+  void TestMHDWriting(const mitk::Image* image)
+  {
+    CPPUNIT_ASSERT_MESSAGE("Internal error. Passed reference image is null.", image);
+
+    std::ofstream tmpStream;
+      std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.mhd");
+      tmpStream.close();
+
+      std::string tmpFilePathWithoutExt = tmpFilePath.substr(0, tmpFilePath.size() - 4);
+
+      try
+      {
+        mitk::IOUtil::Save(image, tmpFilePath);
+
+        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(tmpFilePath);
+        CPPUNIT_ASSERT_MESSAGE("Image stored in MHD format was succesfully loaded again! ", compareImage.IsNotNull());
+
+
+        CPPUNIT_ASSERT_MESSAGE(".mhd file exists", itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".mhd").c_str()));
+        CPPUNIT_ASSERT_MESSAGE(".raw or .zraw exists", itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".raw").c_str()) ||
+          itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".zraw").c_str()));
+
+        /*It would make sence to check the images as well (see commented cppunit assert),
+        but currently there seems to be a problem (exception) with most of the test images
+        (partly it seems to be a problem when try to access the pixel content by AccessByItk_1
+        in mitk::CompareImageDataFilter.
+        This problem should be dealt with in Bug 19533 - mitkITKImageIOTest needs improvement */
+        //CPPUNIT_ASSERT_MESSAGE("Images are equal.", mitk::Equal(*image, *compareImage, mitk::eps, true));
+        CPPUNIT_ASSERT_MESSAGE("TimeGeometries are equal.", mitk::Equal(*(image->GetTimeGeometry()), *(compareImage->GetTimeGeometry()), 5e-4, true));
+
+        // delete
+        remove(tmpFilePath.c_str());
+        remove((tmpFilePathWithoutExt + ".raw").c_str());
+        remove((tmpFilePathWithoutExt + ".zraw").c_str());
+      }
+      catch (...)
+      {
+        CPPUNIT_FAIL("Exception during.mhd file writing");
+      }
+  }
+
+  /**
   *  test for "ImageWriter".
   *
   *  argc and argv are the command line parameters which were passed to
@@ -206,7 +297,6 @@ public:
   */
   void TestImageWriter(std::string sourcefile)
   {
-
     sourcefile = GetTestDataFilePath(sourcefile);
 
     // load image
@@ -228,57 +318,11 @@ public:
     // write ITK .mhd image (2D and 3D only)
     if( image->GetDimension() <= 3 )
     {
-      std::ofstream tmpStream;
-      std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.mhd");
-      tmpStream.close();
-
-      std::string tmpFilePathWithoutExt = tmpFilePath.substr(0, tmpFilePath.size() - 4);
-
-      try
-      {
-        mitk::IOUtil::Save(image, tmpFilePath);
-
-        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(tmpFilePath);
-        CPPUNIT_ASSERT_MESSAGE("Image stored in MHD format was succesfully loaded again! ", compareImage.IsNotNull());
-
-
-        CPPUNIT_ASSERT_MESSAGE(".mhd file exists", itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".mhd").c_str()));
-        CPPUNIT_ASSERT_MESSAGE(".raw or .zraw exists", itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".raw").c_str()) ||
-          itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".zraw").c_str()));
-
-        // delete
-        remove(tmpFilePath.c_str());
-        remove((tmpFilePathWithoutExt + ".raw").c_str());
-        remove((tmpFilePathWithoutExt + ".zraw").c_str());
-      }
-      catch (...)
-      {
-        CPPUNIT_FAIL("Exception during.mhd file writing");
-      }
+      TestMHDWriting(image);
     }
 
     //testing more component image writing as nrrd files
-
-    {
-      std::ofstream tmpStream;
-      std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.nrrd");
-      tmpStream.close();
-
-      try
-      {
-        mitk::IOUtil::Save(image, tmpFilePath);
-
-        mitk::Image::Pointer compareImage = mitk::IOUtil::LoadImage(tmpFilePath);
-        CPPUNIT_ASSERT_MESSAGE("Image stored in NRRD format was succesfully loaded again", compareImage.IsNotNull());
-
-        remove(tmpFilePath.c_str());
-      }
-      catch(...)
-      {
-        std::remove(tmpFilePath.c_str());
-        CPPUNIT_FAIL("Exception during.mhd file writing");
-      }
-    }
+    TestNRRDWriting(image);
 
     std::ofstream tmpStream;
     std::string tmpFilePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX");

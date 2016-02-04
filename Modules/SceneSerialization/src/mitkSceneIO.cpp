@@ -414,7 +414,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
             if (dataElement == nullptr)
             {
               ProgressBar::GetInstance()->Progress();
-              continue;
+              return;
             }
 
             // store basedata properties

@@ -419,7 +419,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
             
             if (dataElement == nullptr)
             {
-              continue;
+              return;
             }
 
             // store basedata properties

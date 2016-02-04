@@ -729,6 +729,12 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations( mitk::BaseRenderer * rendere
                                                     const PlanarFigureDisplayMode lineDisplayMode,
                                                     double &annotationOffset )
 {
+  if ( anchorPoint[0] < mitk::eps
+    || anchorPoint[1] < mitk::eps )
+  {
+    return;
+  }
+
   m_AnnotationOverlay->SetText( name );
   m_AnnotationOverlay->SetColor( m_AnnotationColor[lineDisplayMode][0],
                                  m_AnnotationColor[lineDisplayMode][1],
@@ -768,6 +774,13 @@ void mitk::PlanarFigureMapper2D::RenderQuantities( const mitk::PlanarFigure * pl
                                                    float globalOpacity,
                                                    const PlanarFigureDisplayMode lineDisplayMode )
 {
+
+  if ( anchorPoint[0] < mitk::eps
+    || anchorPoint[1] < mitk::eps )
+  {
+    return;
+  }
+
   std::stringstream quantityString;
   quantityString.setf( ios::fixed, ios::floatfield );
   quantityString.precision( 1 );

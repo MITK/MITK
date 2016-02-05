@@ -32,9 +32,8 @@ if(NOT DEFINED GDCM_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.4.1.tar.bz2
-     URL_MD5 1120f9a5ebcef7df6933ca83545f514d
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/GDCM-2.4.1.patch
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.6.3.tar.bz2
+     URL_MD5 52d398f48e672f1949914f6b3e2d528c
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}

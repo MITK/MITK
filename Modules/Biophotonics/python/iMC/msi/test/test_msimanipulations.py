@@ -13,6 +13,7 @@ import numpy as np
 from msi.test import helpers
 import msi.msimanipulations as mani
 
+
 class TestMsiManipulations(unittest.TestCase):
 
     def setUp(self):

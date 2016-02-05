@@ -57,7 +57,7 @@ class MciWrapper(object):
         """
         if n is None:
             n = 1.
-        if ua  is None:
+        if ua is None:
             ua = 0.
         if us is None:
             us = 0.
@@ -65,7 +65,6 @@ class MciWrapper(object):
             g = 1.
         if d is None:
             d = 500.*10 ** -6
-
         self.layers.append([n, ua, us, g, d])
 
     def set_layer(self, layer_nr, n, ua, us, g, d):
@@ -127,6 +126,7 @@ class MciWrapper(object):
     def __init__(self):
         # set standard parameters
         self.file_version = 1.0
+        self.nr_photons = 10**6
         self.nr_runs = 1
         self.dz = 0.002
         self.dr = 2

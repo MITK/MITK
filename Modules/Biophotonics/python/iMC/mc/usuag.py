@@ -5,9 +5,14 @@ Created on Sep 8, 2015
 '''
 
 import math
-import numpy as np
+import os
 
+import numpy as np
 from scipy.interpolate import interp1d
+
+
+this_dir, this_filename = os.path.split(__file__)
+DATA_PATH = os.path.join(this_dir, "data")
 
 def get_haemoglobin_extinction_coefficients(reference_filename=None):
     """
@@ -16,7 +21,7 @@ def get_haemoglobin_extinction_coefficients(reference_filename=None):
     http://omlc.org/spectra/hemoglobin/summary.html
     """
     if reference_filename is None:
-        reference_filename = "./mc/data/haemoglobin.txt"
+        reference_filename = os.path.join(DATA_PATH, "haemoglobin.txt")
     # table with wavelength at 1st row,
     # HbO2 molar extinction coefficient [cm**-1/(moles/l)] at 2nd row,
     # Hb molar extinction coefficient [cm**-1/(moles/l)] at 3rd row
@@ -36,7 +41,7 @@ def get_beta_carotin_extinction_coefficients(reference_filename=None):
     http://omlc.org/spectra/PhotochemCAD/data/041-abs.txt
     """
     if reference_filename is None:
-        reference_filename = "./mc/data/beta_carotin.txt"
+        reference_filename = os.path.join(DATA_PATH, "beta_carotin.txt")
     # table with wavelength at 1st row,
     # beta carotin molar extinction coefficient [cm**-1/(M)]
     betaLUT = np.loadtxt(reference_filename, skiprows=2)
@@ -55,7 +60,7 @@ def get_bilirubin_extinction_coefficients(reference_filename=None):
     http://omlc.org/spectra/PhotochemCAD/data/041-abs.txt
     """
     if reference_filename is None:
-        reference_filename = "./mc/data/bilirubin.txt"
+        reference_filename = os.path.join(DATA_PATH, "bilirubin.txt")
     # table with wavelength at 1st row,
     # beta carotin molar extinction coefficient [cm**-1/(M)]
     biliLUT = np.loadtxt(reference_filename, skiprows=2)
@@ -101,7 +106,7 @@ class Ua(object):
             536.8726 * 10 ** -5 * \
             self.eBc(wavelength)
 
-        return  ua_haemoglobin + ua_bilirubin + ua_beta_carotin
+        return ua_haemoglobin + ua_bilirubin + ua_beta_carotin
 
 
 class UaMuscle():
@@ -131,9 +136,9 @@ class UsgJacques(object):
 
         a':
         """
-        self.a_ray = 0. / 100.
-        self.a_mie = 20. / 100.
-        self.b_mie = 1.091
+        self.a_ray = 0. * 100.
+        self.a_mie = 20. * 100.
+        self.b_mie = 1.286
         self.g = 0.
 
     def __call__(self, wavelength):
@@ -153,7 +158,6 @@ class UsgJacques(object):
         (us, g)
             scattering coefficient us [1/m] and anisotropy factor g
         """
-
         norm_wavelength = (wavelength / (500 * 10 ** -9))
 
         us_ray = self.a_ray * norm_wavelength ** (-4)

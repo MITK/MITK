@@ -19,17 +19,19 @@ class SpectrometerReader(Reader):
         # our spectrometer like to follow german standards in files, we need
         # to switch to english ones
         transformed=""
-        replacements = {',': '.', '\r\n': '\n'}
+        replacements = {',': '.', '\r\n': ''}
         with open(file_to_read) as infile:
             for line in infile:
                 for src, target in replacements.iteritems():
                     line = line.replace(src, target)
                 transformed = "\n".join([transformed, line])
 
-        for num, line in enumerate(transformed, 1):
+        for num, line in enumerate(transformed.splitlines(), 1):
             if ">>>>>Begin Spectral Data<<<<<" in line:
                 break
-        data_vector = np.fromstring(file_to_read, skiprows=num)
+        string_only_spectrum = "\n".join(transformed.splitlines()[num:])
+        data_vector = np.fromstring(string_only_spectrum,
+                                    sep="\t").reshape(-1, 2)
         msi = Msi(data_vector[:, 1],
                   {'wavelengths': data_vector[:, 0] * 10 ** -9})
         return msi

@@ -49,8 +49,7 @@ def interpolate_wavelengths(msi, newWavelengths):
     performs simple linear interpolation. Neither existing nor new wavelengths
     need to be sorted. """
     interpolator = interp1d(msi.get_wavelengths(), msi.get_image(), assume_sorted=False)
-    msi.set_image(interpolator(newWavelengths))
-    msi.set_wavelengths(newWavelengths)
+    msi.set_image(interpolator(newWavelengths), wavelengths=newWavelengths)
     return msi
 
 

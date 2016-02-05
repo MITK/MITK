@@ -27,7 +27,66 @@ class AbstractBatch(object):
 
 
 class GenericBatch(AbstractBatch):
-    """generic 3-layer batch with each layer having the same oxygenation """
+    """generic n-layer batch with each layer having the same oxygenation """
+
+    def __init__(self):
+        super(GenericBatch, self).__init__()
+
+    def append_one_layer(self, saO2, nr_samples):
+        """helper function to create parameters for one layer"""
+
+        # scales data to lie between maxi and mini instead of 0 and 1
+        scale = lambda x, mini, maxi: x * (maxi - mini) + mini
+        # shortcut to random generator
+        gen = np.random.random_sample
+        gen_n = np.random.normal
+
+        # create layer elements
+        self.df["layer" + str(self._nr_layers), "vhb"] = \
+            scale(gen(nr_samples), 0, 1.)
+        self.df["layer" + str(self._nr_layers), "sao2"] = \
+            saO2
+        self.df["layer" + str(self._nr_layers), "a_mie"] = \
+            np.clip(gen_n(loc=18.9, scale=10.2, size=nr_samples),
+                    0.1, np.inf) * 100  # to 1/m
+        self.df["layer" + str(self._nr_layers), "b_mie"] = \
+            np.clip(gen_n(loc=1.286, scale=0.521, size=nr_samples), 0, np.inf)
+        self.df["layer" + str(self._nr_layers), "d"] = \
+            scale(gen(nr_samples), 0, 1.)
+        self.df["layer" + str(self._nr_layers), "n"] = \
+            scale(gen(nr_samples), 1.33, 1.54)
+        self.df["layer" + str(self._nr_layers), "g"] = \
+            scale(gen(nr_samples), 0.8, 0.95)
+        self._nr_layers += 1
+
+    def create_parameters(self, nr_samples):
+        """Create generic three layer batch with a total diameter of 2mm.
+        saO2 is the same in all layers, but all other parameters vary randomly
+        within each layer"""
+        saO2 = np.random.random_sample(size=nr_samples)
+
+        # create three layers with random samples
+        self.append_one_layer(saO2, nr_samples)
+        self.append_one_layer(saO2, nr_samples)
+        self.append_one_layer(saO2, nr_samples)
+
+        # "normalize" d to 2mm
+        # first extract all layers from df
+        self.df
+
+        layers = [l for l in self.df.columns.levels[0] if "layer" in l]
+        # summarize all ds
+        sum_d = 0
+        for l in layers:
+            sum_d += self.df[l, "d"]
+        for l in layers:
+            self.df[l, "d"] = self.df[l, "d"] / sum_d * 2000. * 10 ** -6
+            self.df[l, "d"] = np.clip(self.df[l, "d"], 25 * 10 ** -6, np.inf)
+
+
+
+class GenericBatch(AbstractBatch):
+    """generic n-layer batch with each layer having the same oxygenation """
 
     def __init__(self):
         super(GenericBatch, self).__init__()

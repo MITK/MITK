@@ -20,6 +20,12 @@ def fold_by_sliding_average(df, window_size):
     df.dropna(axis="columns", inplace=True)
 
 
+def switch_reflectances(df, new_wavelengths, new_reflectances):
+    df.drop(df["reflectances"].columns, axis=1, level=1, inplace=True)
+    for i, nw in enumerate(new_wavelengths):
+        df["reflectances", nw] = new_reflectances[:, i]
+
+
 def interpolate_wavelengths(df, new_wavelengths):
     """ interpolate image data to fit new_wavelengths. Current implementation
     performs simple linear interpolation. Neither existing nor new _wavelengths
@@ -33,7 +39,5 @@ def interpolate_wavelengths(df, new_wavelengths):
     new_reflectances = interpolator(new_wavelengths)
     # build a new dataframe out of this information and set the original df
     # to the new information. This seems hacky, can't it be done easier?
-    df.drop(df["reflectances"].columns, axis=1, level=1, inplace=True)
-    for i, nw in enumerate(new_wavelengths):
-        df["reflectances", nw] = new_reflectances[:, i]
+    switch_reflectances(df, new_wavelengths, new_reflectances)
 

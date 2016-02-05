@@ -10,8 +10,8 @@ import os
 from mc.sim import MciWrapper, SimWrapper, \
                    get_total_reflectance, get_diffuse_reflectance
 
-class Test(unittest.TestCase):
 
+class Test(unittest.TestCase):
 
     def setUp(self):
         self.mci_filename = "temp.mci"
@@ -64,7 +64,6 @@ class Test(unittest.TestCase):
                                                         self.mco_filename)),
                         "mco file was created")
 
-
     def test_mci_wrapper_book_example(self):
         """see if our result matches the one from
         Biomedical Optics
@@ -90,7 +89,6 @@ class Test(unittest.TestCase):
             self.assertAlmostEqual(refl, 0.09734, 3,
                                    "correct reflectance determined " + \
                                    "according to book table 3.1")
-
 
     def test_mci_wrapper_book_example_2(self):
         """see if our result matches the one from

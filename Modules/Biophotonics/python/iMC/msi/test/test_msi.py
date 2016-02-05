@@ -31,7 +31,7 @@ class TestMsi(unittest.TestCase):
     def test_properties_not_shared(self):
         msi1 = Msi()
         msi2 = Msi()
-        msi1.add_property({"integration time":np.array([1, 2, 3])})
+        msi1.add_property({"integration time": np.array([1, 2, 3])})
 
         self.assertTrue('integration time' not in msi2.get_properties())
 

@@ -7,7 +7,8 @@ import unittest
 
 from mc.usuag import UsgJacques
 
-class test_us(unittest.TestCase):
+
+class TestUs(unittest.TestCase):
 
     def setUp(self):
         self.usg = UsgJacques()

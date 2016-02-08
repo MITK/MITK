@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 
 #include "mitkIGTHardwareException.h"
-#include "mitkNDITrackingDevice.h"
 
 namespace mitk
 {

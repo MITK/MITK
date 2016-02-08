@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkFastMutexLock.h"
 #include <vector>
 
-#include "mitkTrackingTypes.h"
 #include "mitkNDIProtocol.h"
 #include "mitkNDIPassiveTool.h"
 #include "mitkSerialCommunication.h"

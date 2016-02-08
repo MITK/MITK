@@ -24,12 +24,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::TrackingDeviceTypeCollection::TrackingDeviceTypeCollection()
-  : m_TrackingDeviceTypeInformations()
+  : m_ServiceRegistration()
+  , m_TrackingDeviceTypeInformations()
 {
 }
 
 mitk::TrackingDeviceTypeCollection::~TrackingDeviceTypeCollection()
 {
+  std::vector<TrackingDeviceTypeInformation*>::iterator iter = m_TrackingDeviceTypeInformations.begin();
+
+  for (; iter != m_TrackingDeviceTypeInformations.end(); iter++)
+  {
+    delete (*iter);
+  }
+
+  m_TrackingDeviceTypeInformations.clear();
 }
 
 void mitk::TrackingDeviceTypeCollection::RegisterAsMicroservice()

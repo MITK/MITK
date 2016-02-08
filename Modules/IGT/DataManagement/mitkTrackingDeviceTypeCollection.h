@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkIGTExports.h>
 
-#include "mitkTrackingTypes.h"
 #include "mitkTrackingDeviceTypeInformation.h"
 
 // Microservices

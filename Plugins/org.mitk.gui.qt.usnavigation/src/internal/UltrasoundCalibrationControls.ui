@@ -32,15 +32,15 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="m_Config">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>315</width>
-        <height>824</height>
+        <width>200</width>
+        <height>86</height>
        </rect>
       </property>
       <attribute name="label">
@@ -94,7 +94,7 @@
         </rect>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="m_Spacing">
         <attribute name="title">
@@ -230,9 +230,9 @@ p, li { white-space: pre-wrap; }
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>130</y>
-           <width>241</width>
-           <height>16</height>
+           <y>115</y>
+           <width>291</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="font">
@@ -305,19 +305,6 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; text-decoration: underline;&quot;&gt;Step 2: Calibrate (perform landmark transformation)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
-        <widget class="QPushButton" name="m_CalibBtnStopCalibration">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>810</y>
-           <width>584</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Stop Calibration Process</string>
-         </property>
-        </widget>
         <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
@@ -371,22 +358,6 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-        <widget class="QmitkToolTrackingStatusWidget" name="m_CalibTrackingStatus" native="true">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>137</y>
-           <width>0</width>
-           <height>0</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>40</verstretch>
-          </sizepolicy>
          </property>
         </widget>
         <widget class="QPushButton" name="m_CalibBtnCalibrate">
@@ -448,19 +419,6 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; text-decoration: underline;&quot;&gt;Step 3: Save calibration to hard disc&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
-        <widget class="QPushButton" name="m_CalibBtnRestartCalibration">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>839</y>
-           <width>584</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Restart Current Calibration</string>
-         </property>
-        </widget>
         <widget class="Line" name="line_3">
          <property name="geometry">
           <rect>
@@ -472,6 +430,48 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="m_CalibBtnStopCalibration">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>660</y>
+           <width>301</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Stop Calibration Process</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="m_CalibBtnRestartCalibration">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>690</y>
+           <width>301</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Restart Current Calibration</string>
+         </property>
+        </widget>
+        <widget class="QmitkToolTrackingStatusWidget" name="m_CalibTrackingStatus" native="true">
+         <property name="geometry">
+          <rect>
+           <x>99</x>
+           <y>119</y>
+           <width>211</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>40</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </widget>
@@ -976,8 +976,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>281</width>
-            <height>312</height>
+            <width>179</width>
+            <height>82</height>
            </rect>
           </property>
           <attribute name="label">

@@ -17,15 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#define MBILOG_ENABLE_DEBUG
 #define ENABLE_TIMING
 
+#include <itkTimeProbesCollectorBase.h>
+#include <gdcmUIDs.h>
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkGantryTiltInformation.h"
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMGDCMTagScanner.h"
 
-#include <itkTimeProbesCollectorBase.h>
+itk::MutexLock::Pointer mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex = itk::MutexLock::New();
 
-#include <gdcmUIDs.h>
 
 mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPlacesForOrientation )
 : DICOMFileReader()
@@ -33,8 +34,6 @@ mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPl
 , m_DecimalPlacesForOrientation( decimalPlacesForOrientation )
 {
   this->EnsureMandatorySortersArePresent( decimalPlacesForOrientation );
-
-  m_LocaleMutex = itk::MutexLock::New();
 }
 
 
@@ -120,7 +119,7 @@ bool mitk::DICOMITKSeriesGDCMReader::GetFixTiltByShearing() const
   return m_FixTiltByShearing;
 }
 
-void mitk::DICOMITKSeriesGDCMReader::SetAcceptTwoSlicesGroups( bool accept )
+void mitk::DICOMITKSeriesGDCMReader::SetAcceptTwoSlicesGroups( bool accept ) const
 {
   m_EquiDistantBlocksSorter->SetAcceptTwoSlicesGroups( accept );
 }
@@ -132,7 +131,7 @@ bool mitk::DICOMITKSeriesGDCMReader::GetAcceptTwoSlicesGroups() const
 
 
 mitk::DICOMGDCMImageFrameList
-  mitk::DICOMITKSeriesGDCMReader::FromDICOMDatasetList( const DICOMDatasetList& input ) const
+  mitk::DICOMITKSeriesGDCMReader::FromDICOMDatasetList( const DICOMDatasetList& input )
 {
   DICOMGDCMImageFrameList output;
   output.reserve( input.size() );
@@ -148,7 +147,7 @@ mitk::DICOMGDCMImageFrameList
 }
 
 mitk::DICOMDatasetList
-  mitk::DICOMITKSeriesGDCMReader::ToDICOMDatasetList( const DICOMGDCMImageFrameList& input ) const
+  mitk::DICOMITKSeriesGDCMReader::ToDICOMDatasetList( const DICOMGDCMImageFrameList& input )
 {
   DICOMDatasetList output;
   output.reserve( input.size() );
@@ -164,7 +163,7 @@ mitk::DICOMDatasetList
 }
 
 mitk::DICOMImageFrameList
-  mitk::DICOMITKSeriesGDCMReader::ToDICOMImageFrameList( const DICOMGDCMImageFrameList& input ) const
+  mitk::DICOMITKSeriesGDCMReader::ToDICOMImageFrameList( const DICOMGDCMImageFrameList& input )
 {
   DICOMImageFrameList output;
   output.reserve( input.size() );
@@ -193,14 +192,14 @@ void mitk::DICOMITKSeriesGDCMReader::InternalPrintConfiguration( std::ostream& o
 }
 
 
-std::string mitk::DICOMITKSeriesGDCMReader::GetActiveLocale() const
+std::string mitk::DICOMITKSeriesGDCMReader::GetActiveLocale()
 {
   return setlocale( LC_NUMERIC, nullptr );
 }
 
 void mitk::DICOMITKSeriesGDCMReader::PushLocale() const
 {
-  m_LocaleMutex->Lock();
+  s_LocaleMutex->Lock();
 
   std::string currentCLocale = setlocale( LC_NUMERIC, nullptr );
   m_ReplacedCLocales.push( currentCLocale );
@@ -211,12 +210,12 @@ void mitk::DICOMITKSeriesGDCMReader::PushLocale() const
   std::locale l( "C" );
   std::cin.imbue( l );
 
-  m_LocaleMutex->Unlock();
+  s_LocaleMutex->Unlock();
 }
 
 void mitk::DICOMITKSeriesGDCMReader::PopLocale() const
 {
-  m_LocaleMutex->Lock();
+  s_LocaleMutex->Lock();
 
   if ( !m_ReplacedCLocales.empty() )
   {
@@ -238,7 +237,7 @@ void mitk::DICOMITKSeriesGDCMReader::PopLocale() const
     MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
   }
 
-  m_LocaleMutex->Unlock();
+  s_LocaleMutex->Unlock();
 }
 
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList
@@ -449,7 +448,7 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
 }
 
 mitk::ReaderImplementationLevel
-  mitk::DICOMITKSeriesGDCMReader::GetReaderImplementationLevel( const std::string sopClassUID ) const
+  mitk::DICOMITKSeriesGDCMReader::GetReaderImplementationLevel( const std::string sopClassUID )
 {
   if ( sopClassUID.empty() )
   {
@@ -599,13 +598,13 @@ void mitk::DICOMITKSeriesGDCMReader::EnsureMandatorySortersArePresent(
   }
 }
 
-void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffsetToAdaptive( double fractionOfInterSliceDistance )
+void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffsetToAdaptive( double fractionOfInterSliceDistance ) const
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
   m_EquiDistantBlocksSorter->SetToleratedOriginOffsetToAdaptive( fractionOfInterSliceDistance );
 }
 
-void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffset( double millimeters )
+void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffset( double millimeters ) const
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
   m_EquiDistantBlocksSorter->SetToleratedOriginOffset( millimeters );

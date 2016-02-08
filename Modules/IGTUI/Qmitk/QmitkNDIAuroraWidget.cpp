@@ -15,20 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkNDIAuroraWidget.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
-#include <mitkNDITrackingDevice.h>
 
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QSettings>
+#include "mitkNDITrackingDevice.h"
 #include "mitkNDIAuroraTypeInformation.h"
+
+#include <QScrollBar>
+#include <QSettings>
 
 const std::string QmitkNDIAuroraWidget::VIEW_ID = "org.mitk.views.NDIAuroraWidget";
 
 QmitkNDIAuroraWidget::QmitkNDIAuroraWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkNDIAbstractDeviceWidget(parent, f)
+  , m_Controls(nullptr)
 {
-  m_Controls = NULL;
 }
 
 void QmitkNDIAuroraWidget::Initialize()
@@ -40,6 +39,7 @@ void QmitkNDIAuroraWidget::Initialize()
 
 QmitkNDIAuroraWidget::~QmitkNDIAuroraWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkNDIAuroraWidget::CreateQtPartControl(QWidget *parent)

@@ -49,8 +49,6 @@ namespace mitk
   }
 
   NDIPolarisTypeInformation::NDIPolarisTypeInformation()
-    //: m_DeviceName("Polaris")
-    //, m_Widget(nullptr)
   {
     m_DeviceName = NDIPolarisTypeInformation::GetTrackingDeviceName();
     m_TrackingDeviceData.push_back(GetDeviceDataPolarisOldModel());

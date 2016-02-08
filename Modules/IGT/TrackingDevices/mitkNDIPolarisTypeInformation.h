@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef NDIPOLARISTYPEINFORMATION_H_INCLUDED
 #define NDIPOLARISTYPEINFORMATION_H_INCLUDED
 
-#include <MitkIGTExports.h>
-
 #include "mitkTrackingDeviceTypeInformation.h"
 
 namespace mitk

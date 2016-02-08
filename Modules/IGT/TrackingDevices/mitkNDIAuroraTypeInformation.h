@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkNDIAuroraTypeInformation_h
 #define mitkNDIAuroraTypeInformation_h
 
-#include <MitkIGTExports.h>
-
 #include "mitkTrackingDeviceTypeInformation.h"
 
 namespace mitk

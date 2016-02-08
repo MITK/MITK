@@ -15,21 +15,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkNPOptitrackWidget.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
+
+#include "mitkOptitrackTrackingDevice.h"
+#include "mitkNPOptitrackTrackingTypeInformation.h"
 
 #include <QFileDialog>
-#include <QMessageBox>
+#include <QScrollBar>
 #include <Poco/Path.h>
-
-#include <mitkOptitrackTrackingDevice.h>
-#include "mitkNPOptitrackTrackingTypeInformation.h"
 
 const std::string QmitkNPOptitrackWidget::VIEW_ID = "org.mitk.views.NPOptitrackWidget";
 
 QmitkNPOptitrackWidget::QmitkNPOptitrackWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkAbstractTrackingDeviceWidget(parent, f)
+  , m_Controls(nullptr)
 {
-  m_Controls = NULL;
 }
 
 void QmitkNPOptitrackWidget::Initialize()
@@ -41,6 +40,7 @@ void QmitkNPOptitrackWidget::Initialize()
 
 QmitkNPOptitrackWidget::~QmitkNPOptitrackWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkNPOptitrackWidget::CreateQtPartControl(QWidget *parent)

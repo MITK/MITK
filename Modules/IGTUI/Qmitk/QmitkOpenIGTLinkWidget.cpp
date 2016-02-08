@@ -15,19 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkOpenIGTLinkWidget.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
 
-#include <QFileDialog>
-#include <QMessageBox>
-
-#include <mitkOpenIGTLinkTrackingDevice.h>
+#include "mitkOpenIGTLinkTrackingDevice.h"
 
 const std::string QmitkOpenIGTLinkWidget::VIEW_ID = "org.mitk.views.OpenIGTLinkWidget";
 
 QmitkOpenIGTLinkWidget::QmitkOpenIGTLinkWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkAbstractTrackingDeviceWidget(parent, f)
+  , m_Controls(nullptr)
 {
-  m_Controls = NULL;
 }
 
 void QmitkOpenIGTLinkWidget::Initialize()
@@ -38,6 +34,7 @@ void QmitkOpenIGTLinkWidget::Initialize()
 
 QmitkOpenIGTLinkWidget::~QmitkOpenIGTLinkWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkOpenIGTLinkWidget::CreateQtPartControl(QWidget *parent)

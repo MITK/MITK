@@ -15,26 +15,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTrackingDeviceWidgetCollection.h"
-#include "mitkUIDGenerator.h"
 
 //Microservices
 #include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usServiceProperties.h>
 #include <usModuleContext.h>
 
 mitk::TrackingDeviceWidgetCollection::TrackingDeviceWidgetCollection()
-  : m_TrackingDeviceWidgets()
+  : m_ServiceRegistration()
+  , m_TrackingDeviceWidgets()
 {
 }
 
 mitk::TrackingDeviceWidgetCollection::~TrackingDeviceWidgetCollection()
 {
+  for (auto& item : m_TrackingDeviceWidgets)
+  {
+    delete item.second;
+  }
 }
 
 void mitk::TrackingDeviceWidgetCollection::RegisterAsMicroservice()
 {
-  // Get Context
   us::ModuleContext* context = us::GetModuleContext();
 
   m_ServiceRegistration = context->RegisterService(this);
@@ -42,7 +43,7 @@ void mitk::TrackingDeviceWidgetCollection::RegisterAsMicroservice()
 
 void mitk::TrackingDeviceWidgetCollection::UnRegisterMicroservice()
 {
-  if (m_ServiceRegistration != NULL) m_ServiceRegistration.Unregister();
+  if (m_ServiceRegistration != nullptr) m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
 }
 
@@ -51,7 +52,7 @@ void mitk::TrackingDeviceWidgetCollection::RegisterTrackingDeviceWidget(Tracking
   if (widget != nullptr)
   {
     //Don't add widget, if it is already included
-    for (int i = 0; i < m_TrackingDeviceWidgets.size(); i++)
+    for (unsigned int i = 0; i < m_TrackingDeviceWidgets.size(); i++)
     {
       if (m_TrackingDeviceWidgets.at(i).first == type)
         return;
@@ -62,7 +63,7 @@ void mitk::TrackingDeviceWidgetCollection::RegisterTrackingDeviceWidget(Tracking
 
 QmitkAbstractTrackingDeviceWidget* mitk::TrackingDeviceWidgetCollection::GetTrackingDeviceWidgetClone(TrackingDeviceType type)
 {
-  for (int i = 0; i < m_TrackingDeviceWidgets.size(); i++)
+  for (unsigned int i = 0; i < m_TrackingDeviceWidgets.size(); i++)
   {
     if (m_TrackingDeviceWidgets.at(i).first == type)
     {

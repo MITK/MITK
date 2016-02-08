@@ -17,12 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNDIPolarisWidget_H
 #define QmitkNDIPolarisWidget_H
 
-#include "MitkIGTUIExports.h"
 #include "ui_QmitkNDIPolarisWidget.h"
-
 #include "QmitkNDIAbstractDeviceWidget.h"
 
-//itk headers
 
 /** Documentation:
 *   \brief Implementation of a configuration widget for NDI Polaris Devices.

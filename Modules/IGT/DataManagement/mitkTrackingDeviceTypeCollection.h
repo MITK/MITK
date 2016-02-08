@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkIGTExports.h>
 
-#include "mitkTrackingTypes.h"
 #include "mitkTrackingDeviceTypeInformation.h"
 
 // Microservices
@@ -78,8 +77,6 @@ namespace mitk {
     TrackingDeviceData GetDeviceDataByName(const std::string& modelName);
 
   private:
-
-    std::string m_Name;
 
     us::ServiceRegistration<TrackingDeviceTypeCollection> m_ServiceRegistration;
 

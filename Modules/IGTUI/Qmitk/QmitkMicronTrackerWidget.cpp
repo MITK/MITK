@@ -15,10 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMicronTrackerWidget.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
 
 #include <QFileDialog>
-#include <QMessageBox>
+#include <QScrollBar>
 
 #include <mitkClaronTrackingDevice.h>
 
@@ -30,8 +29,8 @@ const std::string QmitkMicronTrackerWidget::VIEW_ID = "org.mitk.views.NDIMicronT
 
 QmitkMicronTrackerWidget::QmitkMicronTrackerWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkAbstractTrackingDeviceWidget(parent, f)
+  , m_Controls(nullptr)
 {
-  m_Controls = NULL;
 }
 
 void QmitkMicronTrackerWidget::Initialize()
@@ -44,6 +43,7 @@ void QmitkMicronTrackerWidget::Initialize()
 
 QmitkMicronTrackerWidget::~QmitkMicronTrackerWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkMicronTrackerWidget::CreateQtPartControl(QWidget *parent)

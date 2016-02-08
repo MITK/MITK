@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkIGTUIExports.h"
 #include "mitkTrackingDevice.h"
 
-#include <qscrollbar.h>
-#include <qthread.h>
-
 #include <mitkIPersistenceService.h>
 
 #include "QmitkTrackingDeviceConfigurationWidgetConnectionWorker.h"

@@ -17,13 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkOpenIGTLinkWidget_H
 #define QmitkOpenIGTLinkWidget_H
 
-#include <QWidget>
-#include "MitkIGTUIExports.h"
 #include "ui_QmitkOpenIGTLinkWidget.h"
-
 #include "QmitkAbstractTrackingDeviceWidget.h"
 
-//itk headers
 
 /** Documentation:
 *   \brief Implementation of a configuration widget to use an Open IGT Link connection to track any device.

@@ -119,13 +119,16 @@ class GenericTissue(AbstractTissue):
                     "cm^-1; b_mie: " + "%.3f" % self.usgs[i].b_mie + \
                     "; d: " + "%.0f" % (self.ds[i] * 10 ** 6) + "um" + \
                     "; n: " + "%.2f" % (self.ns[i]) + \
-                    "; g: " + "%.2f" % (self.usgs[i].g) + "\n"
+                    "; g: " + "%.2f" % self.usgs[i].g + "\n"
             model_string += layer_string
         return model_string
 
     def __init__(self, nr_layers=3):
-        uas = [Ua()] * nr_layers
-        usgs = [UsgJacques()] * nr_layers
+        uas = []
+        usgs = []
+        for i in range(nr_layers):
+            uas.append(Ua())
+            usgs.append(UsgJacques())
         ds = np.ones(nr_layers, dtype=float) * 500.*10 ** -6
         ns = np.ones(nr_layers, dtype=float) * 1.38
         super(GenericTissue, self).__init__(ns, uas, usgs, ds)

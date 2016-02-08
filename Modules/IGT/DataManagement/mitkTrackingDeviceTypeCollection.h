@@ -79,8 +79,6 @@ namespace mitk {
 
   private:
 
-    std::string m_Name;
-
     us::ServiceRegistration<TrackingDeviceTypeCollection> m_ServiceRegistration;
 
     std::vector<TrackingDeviceTypeInformation*> m_TrackingDeviceTypeInformations;

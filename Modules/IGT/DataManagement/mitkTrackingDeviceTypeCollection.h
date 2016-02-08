@@ -73,7 +73,7 @@ namespace mitk {
     TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType type);
 
     /**
-    * /brief Returns the device Data set matching the model name or the invalid device, if none was found
+    * /brief Returns the device Data set matching the model name or the invalid device, if none was found.
     */
     TrackingDeviceData GetDeviceDataByName(const std::string& modelName);
 

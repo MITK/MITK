@@ -25,10 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSettings>
 
 QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWidget *parent) :
-  QmitkUSAbstractNavigationStep(parent), m_CalibrationLoadedNecessary(true),
-  m_ListenerDeviceChanged(this, &QmitkUSNavigationStepCombinedModality::OnDevicePropertyChanged),
-  ui(new Ui::QmitkUSNavigationStepCombinedModality),
-  m_LastCalibrationFilename("")
+QmitkUSAbstractNavigationStep(parent), m_CalibrationLoadedNecessary(true),
+m_ListenerDeviceChanged(this, &QmitkUSNavigationStepCombinedModality::OnDevicePropertyChanged),
+ui(new Ui::QmitkUSNavigationStepCombinedModality),
+m_LastCalibrationFilename("")
 {
   ui->setupUi(this);
 
@@ -36,19 +36,17 @@ QmitkUSNavigationStepCombinedModality::QmitkUSNavigationStepCombinedModality(QWi
   ui->combinedModalityCreateWidget->setVisible(false);
   ui->combinedModalityEditWidget->setVisible(false);
 
-  connect( ui->combinedModalityListWidget, SIGNAL( ServiceSelectionChanged(us::ServiceReferenceU) ), this, SLOT(OnDeviceSelectionChanged()) );
-  connect( ui->combinedModalityListWidget, SIGNAL( ServiceModified(us::ServiceReferenceU) ), this, SLOT(OnDeviceSelectionChanged()) );
-  connect( ui->combinedModalityCreateWidget, SIGNAL(SignalAborted()), this, SLOT(OnCombinedModalityCreationExit()) );
-  connect( ui->combinedModalityCreateWidget, SIGNAL(SignalCreated()), this, SLOT(OnCombinedModalityCreationExit()) );
+  connect(ui->combinedModalityListWidget, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnDeviceSelectionChanged()));
+  connect(ui->combinedModalityListWidget, SIGNAL(ServiceModified(us::ServiceReferenceU)), this, SLOT(OnDeviceSelectionChanged()));
+  connect(ui->combinedModalityCreateWidget, SIGNAL(SignalAborted()), this, SLOT(OnCombinedModalityCreationExit()));
+  connect(ui->combinedModalityCreateWidget, SIGNAL(SignalCreated()), this, SLOT(OnCombinedModalityCreationExit()));
 
-  connect( ui->combinedModalityEditWidget, SIGNAL(SignalAborted()), this, SLOT(OnCombinedModalityEditExit()) );
-  connect( ui->combinedModalityEditWidget, SIGNAL(SignalSaved()), this, SLOT(OnCombinedModalityEditExit()) );
+  connect(ui->combinedModalityEditWidget, SIGNAL(SignalAborted()), this, SLOT(OnCombinedModalityEditExit()));
+  connect(ui->combinedModalityEditWidget, SIGNAL(SignalSaved()), this, SLOT(OnCombinedModalityEditExit()));
 
-
-
-  //std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
-  std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice))";
-  ui->combinedModalityListWidget->Initialize<mitk::USCombinedModality>(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, filter);
+  std::string filterOnlyCombinedModalities = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.USCombinedModality)(" + mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_CLASS + "=" + mitk::USCombinedModality::DeviceClassIdentifier + "))";
+  //std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "=" + "org.mitk.services.UltrasoundDevice))";
+  ui->combinedModalityListWidget->Initialize<mitk::USCombinedModality>(mitk::USCombinedModality::US_PROPKEY_DEVICENAME);
   ui->combinedModalityListWidget->SetAutomaticallySelectFirstEntry(true);
 
   //try to load UI settings
@@ -80,30 +78,30 @@ void QmitkUSNavigationStepCombinedModality::OnDeviceSelectionChanged()
   ui->combinedModalityDeleteButton->setEnabled(combinedModalitySelected);
   ui->combinedModalitEditButton->setEnabled(combinedModalitySelected);
 
-  if ( ! combinedModalitySelected || m_CombinedModality != combinedModality )
+  if (!combinedModalitySelected || m_CombinedModality != combinedModality)
   {
     emit SignalNoLongerReadyForNextStep();
 
-    if ( m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull() )
+    if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
     {
       m_CombinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_ListenerDeviceChanged);
     }
 
-    if ( combinedModalitySelected && combinedModality->GetUltrasoundDevice().IsNotNull() )
+    if (combinedModalitySelected && combinedModality->GetUltrasoundDevice().IsNotNull())
     {
       combinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_ListenerDeviceChanged);
     }
   }
   m_CombinedModality = combinedModality;
 
-  if ( combinedModalitySelected )
+  if (combinedModalitySelected)
   {
     bool calibrated = this->UpdateCalibrationState();
 
-    if ( ! m_CalibrationLoadedNecessary ) { emit SignalReadyForNextStep(); }
+    if (!m_CalibrationLoadedNecessary) { emit SignalReadyForNextStep(); }
     else
     {
-      if ( calibrated ) { emit SignalReadyForNextStep(); }
+      if (calibrated) { emit SignalReadyForNextStep(); }
       else { emit SignalNoLongerReadyForNextStep(); }
     }
 
@@ -122,10 +120,10 @@ void QmitkUSNavigationStepCombinedModality::OnDeviceSelectionChanged()
 
 void QmitkUSNavigationStepCombinedModality::OnLoadCalibration()
 {
-  QString filename = QFileDialog::getOpenFileName( QApplication::activeWindow(),
-                                                   "Load Calibration",
-                                                   m_LastCalibrationFilename.c_str(),
-                                                   "Calibration files *.cal" );
+  QString filename = QFileDialog::getOpenFileName(QApplication::activeWindow(),
+    "Load Calibration",
+    m_LastCalibrationFilename.c_str(),
+    "Calibration files *.cal");
   m_LastCalibrationFilename = filename.toStdString();
 
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
@@ -136,16 +134,16 @@ void QmitkUSNavigationStepCombinedModality::OnLoadCalibration()
     return;
   }
 
-  if ( filename.isEmpty() )
+  if (filename.isEmpty())
   {
     bool calibrated = this->UpdateCalibrationState();
-    if ( ! calibrated ) { emit SignalNoLongerReadyForNextStep(); }
+    if (!calibrated) { emit SignalNoLongerReadyForNextStep(); }
 
     return;
   }
 
   QFile file(filename);
-  if ( ! file.open(QIODevice::ReadOnly | QIODevice::Text) )
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
   {
     MITK_WARN << "Cannot open file '" << filename.toStdString() << "' for reading.";
     ui->calibrationLoadStateLabel->setText("Cannot open file '" + filename + "' for reading.");
@@ -155,7 +153,7 @@ void QmitkUSNavigationStepCombinedModality::OnLoadCalibration()
 
   QTextStream inStream(&file);
   m_LoadedCalibration = inStream.readAll().toStdString();
-  if ( m_LoadedCalibration.empty() )
+  if (m_LoadedCalibration.empty())
   {
     MITK_WARN << "Failed to load file. Unsupported format?";
     ui->calibrationLoadStateLabel->setText("Failed to load file. Unsupported format?");
@@ -167,7 +165,7 @@ void QmitkUSNavigationStepCombinedModality::OnLoadCalibration()
   {
     combinedModality->DeserializeCalibration(m_LoadedCalibration);
   }
-  catch ( const mitk::Exception& /*exception*/ )
+  catch (const mitk::Exception& /*exception*/)
   {
     MITK_WARN << "Failed to deserialize calibration. Unsuppoerted format?";
     ui->calibrationLoadStateLabel->setText("Failed to deserialize calibration. Unsuppoerted format?");
@@ -201,7 +199,7 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityEditExit()
 void QmitkUSNavigationStepCombinedModality::OnDeleteButtonClicked()
 {
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
-  if ( combinedModality.IsNotNull() )
+  if (combinedModality.IsNotNull())
   {
     combinedModality->UnregisterOnService();
   }
@@ -216,20 +214,20 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityEditButtonClicked(
 void QmitkUSNavigationStepCombinedModality::OnActivateButtonClicked()
 {
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
-  if ( combinedModality.IsNotNull() )
+  if (combinedModality.IsNotNull())
   {
-    if ( ! combinedModality->GetIsConnected() ) { combinedModality->Connect(); }
-    if ( ! combinedModality->GetIsActive() ) { combinedModality->Activate(); }
+    if (!combinedModality->GetIsConnected()) { combinedModality->Connect(); }
+    if (!combinedModality->GetIsActive()) { combinedModality->Activate(); }
   }
 }
 
 void QmitkUSNavigationStepCombinedModality::OnDisconnectButtonClicked()
 {
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
-  if ( combinedModality.IsNotNull() )
+  if (combinedModality.IsNotNull())
   {
-    if ( combinedModality->GetIsActive() ) { combinedModality->Deactivate(); }
-    if ( combinedModality->GetIsConnected() ) { combinedModality->Disconnect(); }
+    if (combinedModality->GetIsActive()) { combinedModality->Deactivate(); }
+    if (combinedModality->GetIsConnected()) { combinedModality->Disconnect(); }
   }
 }
 
@@ -246,12 +244,12 @@ bool QmitkUSNavigationStepCombinedModality::OnRestartStep()
 bool QmitkUSNavigationStepCombinedModality::OnFinishStep()
 {
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
-  if ( combinedModality.IsNotNull() )
+  if (combinedModality.IsNotNull())
   {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     // make sure that the combined modality is in connected state before using it
-    if ( combinedModality->GetDeviceState() < mitk::USDevice::State_Connected ) { combinedModality->Connect(); }
-    if ( combinedModality->GetDeviceState() < mitk::USDevice::State_Activated ) { combinedModality->Activate(); }
+    if (combinedModality->GetDeviceState() < mitk::USDevice::State_Connected) { combinedModality->Connect(); }
+    if (combinedModality->GetDeviceState() < mitk::USDevice::State_Activated) { combinedModality->Activate(); }
     QApplication::restoreOverrideCursor();
   }
 
@@ -322,10 +320,10 @@ void QmitkUSNavigationStepCombinedModality::CreateCombinedModalityResultAndSigna
   combinedModalityResult->SetName("CombinedModalityResult");
   combinedModalityResult->SetStringProperty("USNavigation::CombinedModality",
     std::string(combinedModality->GetDeviceManufacturer() + ": " + combinedModality->GetDeviceModel()
-    + " (" +combinedModality->GetDeviceComment() + ")").c_str());
+    + " (" + combinedModality->GetDeviceComment() + ")").c_str());
   combinedModalityResult->SetStringProperty("USNavigation::UltrasoundDevice",
     std::string(usDevice->GetDeviceManufacturer() + ": " + usDevice->GetDeviceModel()
-    + " (" +usDevice->GetDeviceComment() + ")").c_str());
+    + " (" + usDevice->GetDeviceComment() + ")").c_str());
   combinedModalityResult->SetStringProperty("USNavigation::TrackingDevice",
     combinedModality->GetNavigationDataSource()->GetName().c_str());
   combinedModalityResult->SetStringProperty("USNavigation::Calibration",
@@ -336,7 +334,7 @@ void QmitkUSNavigationStepCombinedModality::CreateCombinedModalityResultAndSigna
 
 bool QmitkUSNavigationStepCombinedModality::UpdateCalibrationState()
 {
-  if ( m_CombinedModality.IsNull() ) { return false; }
+  if (m_CombinedModality.IsNull()) { return false; }
 
   bool calibrated = m_CombinedModality->GetContainsAtLeastOneCalibration();
 
@@ -349,10 +347,9 @@ bool QmitkUSNavigationStepCombinedModality::UpdateCalibrationState()
 mitk::USCombinedModality::Pointer QmitkUSNavigationStepCombinedModality::GetSelectedCombinedModality()
 {
   // nothing more to do if no device is selected at the moment
-  if ( ! ui->combinedModalityListWidget->GetIsServiceSelected() ) { return 0; }
+  if (!ui->combinedModalityListWidget->GetIsServiceSelected()) { return 0; }
 
-  mitk::USCombinedModality::Pointer combinedModality =
-      dynamic_cast<mitk::USCombinedModality*>(ui->combinedModalityListWidget->GetSelectedService<mitk::USDevice>());
+  mitk::USCombinedModality::Pointer combinedModality = ui->combinedModalityListWidget->GetSelectedService<mitk::USCombinedModality>();
 
   if (combinedModality.IsNull())
   {
@@ -371,13 +368,13 @@ void QmitkUSNavigationStepCombinedModality::OnDevicePropertyChanged(const std::s
 {
   // property changes only matter if the navigation step is currently active
   // (being sensitive to them in other states may even be dangerous)
-  if ( this->GetNavigationStepState() < QmitkUSAbstractNavigationStep::State_Active ) { return; }
+  if (this->GetNavigationStepState() < QmitkUSAbstractNavigationStep::State_Active) { return; }
 
   // calibration state could have changed if the depth was changed
-  if ( key == mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH )
+  if (key == mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH)
   {
     bool calibrated = this->UpdateCalibrationState();
-    if ( calibrated ) { emit SignalReadyForNextStep(); }
+    if (calibrated) { emit SignalReadyForNextStep(); }
     else { emit SignalNoLongerReadyForNextStep(); }
   }
 }
@@ -385,10 +382,10 @@ void QmitkUSNavigationStepCombinedModality::OnDevicePropertyChanged(const std::s
 void QmitkUSNavigationStepCombinedModality::UpdateTrackingToolNames()
 {
   //check if everything is initialized
-  if ( m_CombinedModality.IsNull() ) {return;}
+  if (m_CombinedModality.IsNull()) { return; }
   mitk::NavigationDataSource::Pointer navigationDataSource = m_CombinedModality->GetNavigationDataSource();
-  if (navigationDataSource.IsNull() ) {return;}
-  if (GetDataStorage(false).IsNull()) {return;}
+  if (navigationDataSource.IsNull()) { return; }
+  if (GetDataStorage(false).IsNull()) { return; }
 
   // get the settings node
   mitk::DataNode::Pointer settingsNode = this->GetNamedDerivedNode(DATANAME_SETTINGS, DATANAME_BASENODE);
@@ -402,10 +399,10 @@ void QmitkUSNavigationStepCombinedModality::UpdateTrackingToolNames()
 
   // change the settings node only if the settings changed
   std::string oldProperty;
-  if ( ! settingsNode->GetStringProperty("settings.needle-names", oldProperty)
+  if (!settingsNode->GetStringProperty("settings.needle-names", oldProperty)
     || oldProperty != needleNames
-    || ! settingsNode->GetStringProperty("settings.reference-names", oldProperty)
-    || oldProperty != needleNames )
+    || !settingsNode->GetStringProperty("settings.reference-names", oldProperty)
+    || oldProperty != needleNames)
   {
     settingsNode->SetStringProperty("settings.needle-names", needleNames.c_str());
     settingsNode->SetStringProperty("settings.reference-names", needleNames.c_str());

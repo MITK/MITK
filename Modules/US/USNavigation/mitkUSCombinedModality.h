@@ -21,6 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include "mitkNavigationDataSource.h"
 
+// Microservices
+#include <mitkServiceInterface.h>
+#include <usServiceRegistration.h>
+
 namespace itk {
   template<class T> class SmartPointer;
 }
@@ -183,6 +187,15 @@ namespace mitk {
 
     void SetDelayCount(unsigned int delayCount);
 
+    void RegisterAsMicroservice();
+
+    /**
+    *\brief These Constants are used in conjunction with Microservices
+    */
+    static const std::string US_INTERFACE_NAME;
+    static const std::string US_PROPKEY_DEVICENAME;
+    static const std::string US_PROPKEY_CLASS;
+    static const std::string US_PROPKEY_ID;
   protected:
     USCombinedModality(USDevice::Pointer usDevice, itk::SmartPointer<NavigationDataSource> trackingDevice, std::string manufacturer = "", std::string model = "");
     virtual ~USCombinedModality();
@@ -252,4 +265,6 @@ namespace mitk {
     us::ServiceProperties                   m_ServiceProperties;
   };
 } // namespace mitk
+
+MITK_DECLARE_SERVICE_INTERFACE(mitk::USCombinedModality, "org.mitk.services.USCombinedModality")
 #endif // MITKUSCombinedModality_H_HEADER_INCLUDED_

@@ -17,12 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNDIAuroraWidget_H
 #define QmitkNDIAuroraWidget_H
 
-#include <QWidget>
-#include "MitkIGTUIExports.h"
 #include "ui_QmitkNDIAuroraWidget.h"
 #include "QmitkNDIAbstractDeviceWidget.h"
 
-//itk headers
 
 /** Documentation:
 *   \brief Implementation of a configuration widget for NDI Aurora Devices.

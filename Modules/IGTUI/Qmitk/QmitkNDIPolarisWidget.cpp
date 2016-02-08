@@ -15,22 +15,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkNDIPolarisWidget.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
 
-#include <QFileDialog>
-#include <QMessageBox>
-#include <mitkNDITrackingDevice.h>
-
+#include "mitkNDITrackingDevice.h"
 #include "mitkNDIPolarisTypeInformation.h"
 
+#include <QScrollBar>
 #include <QSettings>
 
 const std::string QmitkNDIPolarisWidget::VIEW_ID = "org.mitk.views.NDIPolarisWidget";
 
 QmitkNDIPolarisWidget::QmitkNDIPolarisWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkNDIAbstractDeviceWidget(parent, f)
+  , m_Controls(nullptr)
 {
-  m_Controls = NULL;
 }
 
 void QmitkNDIPolarisWidget::Initialize()

@@ -14,19 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef TRACKINGDEVICEWidgetCollection_H_INCLUDED
-#define TRACKINGDEVICEWidgetCollection_H_INCLUDED
+#ifndef TrackingDeviceWidgetCollection_H_INCLUDED
+#define TrackingDeviceWidgetCollection_H_INCLUDED
 
 #include <MitkIGTUIExports.h>
 
-#include "mitkTrackingTypes.h"
 #include "mitkTrackingDeviceTypeInformation.h"
+#include "QmitkAbstractTrackingDeviceWidget.h"
 
 // Microservices
 #include <mitkServiceInterface.h>
 #include <usServiceRegistration.h>
 
-#include "QmitkAbstractTrackingDeviceWidget.h"
 
 namespace mitk {
   /** Documentation:
@@ -60,12 +59,10 @@ namespace mitk {
 
   private:
 
-    std::string m_Name;
-
     us::ServiceRegistration<TrackingDeviceWidgetCollection> m_ServiceRegistration;
 
-    std::vector<std::pair <TrackingDeviceType, QmitkAbstractTrackingDeviceWidget*>> m_TrackingDeviceWidgets;
+    std::vector<std::pair<TrackingDeviceType, QmitkAbstractTrackingDeviceWidget*> > m_TrackingDeviceWidgets;
   };
 } // namespace mitk
 MITK_DECLARE_SERVICE_INTERFACE(mitk::TrackingDeviceWidgetCollection, "org.mitk.services.TrackingDeviceWidgetCollection")
-#endif //TRACKINGDEVICEWidgetCollection_H_INCLUDED
+#endif //TrackingDeviceWidgetCollection_H_INCLUDED

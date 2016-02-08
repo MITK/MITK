@@ -15,19 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkVirtualTrackerWidget.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
 
-#include <mitkVirtualTrackingDevice.h>
-
-#include <QFileDialog>
-#include <QMessageBox>
+#include "mitkVirtualTrackingDevice.h"
 
 const std::string QmitkVirtualTrackerWidget::VIEW_ID = "org.mitk.views.VirtualTrackerWidget";
 
 QmitkVirtualTrackerWidget::QmitkVirtualTrackerWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkAbstractTrackingDeviceWidget(parent, f)
+  , m_Controls(nullptr)
 {
-  m_Controls = NULL;
 }
 
 void QmitkVirtualTrackerWidget::Initialize()

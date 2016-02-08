@@ -16,38 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTrackingDeviceConfigurationWidget.h"
 
-#include <mitkSerialCommunication.h>
-#include <qscrollbar.h>
-#include <qmessagebox.h>
-#include <qfiledialog.h>
-#include <mitkIGTException.h>
-#include <QSettings>
-
-#include "QmitkAbstractTrackingDeviceWidget.h"
-
-//All Tracking devices, which should be available by default
-#include "mitkNDIAuroraTypeInformation.h"
 #include "mitkNDIPolarisTypeInformation.h"
-#include "mitkVirtualTrackerTypeInformation.h"
-#include "mitkMicronTrackerTypeInformation.h"
-#include "mitkNPOptitrackTrackingTypeInformation.h"
-#include "mitkOpenIGTLinkTypeInformation.h"
-//standard tracking devices, which always should be avaiable
-#include "QmitkNDIAuroraWidget.h"
-#include "QmitkNDIPolarisWidget.h"
-#include "QmitkMicronTrackerWidget.h"
-#include "QmitkNPOptitrackWidget.h"
-#include "QmitkVirtualTrackerWidget.h"
-#include "QmitkOpenIGTLinkWidget.h"
+
+#include <QSettings>
 
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
+  , m_Controls(nullptr)
+  , m_TrackingDevice(nullptr)
   , m_DeviceToWidgetIndexMap()
 {
   //initializations
-  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
 

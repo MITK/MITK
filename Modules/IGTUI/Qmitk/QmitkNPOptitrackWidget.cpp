@@ -41,6 +41,7 @@ void QmitkNPOptitrackWidget::Initialize()
 
 QmitkNPOptitrackWidget::~QmitkNPOptitrackWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkNPOptitrackWidget::CreateQtPartControl(QWidget *parent)

@@ -38,6 +38,7 @@ void QmitkOpenIGTLinkWidget::Initialize()
 
 QmitkOpenIGTLinkWidget::~QmitkOpenIGTLinkWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkOpenIGTLinkWidget::CreateQtPartControl(QWidget *parent)

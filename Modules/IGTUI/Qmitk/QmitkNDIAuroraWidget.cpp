@@ -40,6 +40,7 @@ void QmitkNDIAuroraWidget::Initialize()
 
 QmitkNDIAuroraWidget::~QmitkNDIAuroraWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkNDIAuroraWidget::CreateQtPartControl(QWidget *parent)

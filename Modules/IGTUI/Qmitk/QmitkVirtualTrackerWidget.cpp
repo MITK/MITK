@@ -39,6 +39,7 @@ void QmitkVirtualTrackerWidget::Initialize()
 
 QmitkVirtualTrackerWidget::~QmitkVirtualTrackerWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkVirtualTrackerWidget::CreateQtPartControl(QWidget *parent)

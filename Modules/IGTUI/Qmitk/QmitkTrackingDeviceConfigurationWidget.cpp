@@ -66,7 +66,7 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
 {
   StoreUISettings();
-  m_Controls = nullptr;
+  delete m_Controls;
   m_TrackingDevice = nullptr;
 }
 

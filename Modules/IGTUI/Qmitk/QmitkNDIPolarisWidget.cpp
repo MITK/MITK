@@ -42,6 +42,7 @@ void QmitkNDIPolarisWidget::Initialize()
 
 QmitkNDIPolarisWidget::~QmitkNDIPolarisWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkNDIPolarisWidget::CreateQtPartControl(QWidget *parent)

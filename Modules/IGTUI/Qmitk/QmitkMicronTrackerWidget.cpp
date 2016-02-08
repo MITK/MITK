@@ -44,6 +44,7 @@ void QmitkMicronTrackerWidget::Initialize()
 
 QmitkMicronTrackerWidget::~QmitkMicronTrackerWidget()
 {
+  delete m_Controls;
 }
 
 void QmitkMicronTrackerWidget::CreateQtPartControl(QWidget *parent)

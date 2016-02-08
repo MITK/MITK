@@ -59,6 +59,7 @@ m_LastCalibrationFilename("")
 
 QmitkUSNavigationStepCombinedModality::~QmitkUSNavigationStepCombinedModality()
 {
+  ui->combinedModalityListWidget->blockSignals(true);
   //save UI settings
   QSettings settings;
   settings.beginGroup(QString::fromStdString("QmitkUSNavigationStepCombinedModality"));
@@ -201,6 +202,7 @@ void QmitkUSNavigationStepCombinedModality::OnDeleteButtonClicked()
   mitk::USCombinedModality::Pointer combinedModality = this->GetSelectedCombinedModality();
   if (combinedModality.IsNotNull())
   {
+    combinedModality->RemoveAllObservers();
     combinedModality->UnregisterOnService();
   }
 }

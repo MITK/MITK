@@ -73,10 +73,19 @@ m_USDeviceChanged(this, &UltrasoundCalibration::OnUSDepthChanged)
 
 UltrasoundCalibration::~UltrasoundCalibration()
 {
+  m_Controls.m_CombinedModalityManagerWidget->blockSignals(true);
+  mitk::USCombinedModality::Pointer combinedModality;
+  combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
+  if (combinedModality.IsNotNull())
+  {
+    combinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_USDeviceChanged);
+  }
   m_Timer->stop();
   // Sleep(500); //This might be problematic... seems like sometimes some ressources are still in use at calling time.
 
   this->OnStopCalibrationProcess();
+
+  this->OnStopPlusCalibration();
 
   /*mitk::DataNode::Pointer node = this->GetDataStorage()->GetNamedNode("Tool Calibration Points");
   if (node.IsNotNull())this->GetDataStorage()->Remove(node);
@@ -105,9 +114,6 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   m_Controls.m_CombinedModalityManagerWidget->SetCalibrationLoadedNecessary(false);
 
   m_Timer = new QTimer(this);
-
-  m_Controls.m_ToolBox->setItemEnabled(1, false);
-  m_Controls.m_ToolBox->setItemEnabled(2, false);
 
   m_Controls.m_SpacingBtnFreeze->setEnabled(true);
   m_Controls.m_SpacingAddPoint->setEnabled(false);
@@ -199,6 +205,8 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
     this->GetDataStorage()->Add(m_VerificationReferencePointsDataNode);
   }
   m_Controls.m_ReferencePointsPointListWidget->SetPointSetNode(m_VerificationReferencePointsDataNode);
+
+  m_Controls.m_ToolBox->setCurrentIndex(0);
 }
 
 void UltrasoundCalibration::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
@@ -225,9 +233,7 @@ void UltrasoundCalibration::OnTabSwitch(int index)
 void UltrasoundCalibration::OnDeviceSelected()
 {
   mitk::USCombinedModality::Pointer combinedModality;
-
   combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
-
   if (combinedModality.IsNotNull())
   {
     //m_Tracker = m_CombinedModality->GetNavigationDataSource();
@@ -245,6 +251,12 @@ void UltrasoundCalibration::OnDeviceSelected()
 
 void UltrasoundCalibration::OnDeviceDeselected()
 {
+  mitk::USCombinedModality::Pointer combinedModality;
+  combinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
+  if (combinedModality.IsNotNull())
+  {
+    combinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_USDeviceChanged);
+  }
   m_Controls.m_StartCalibrationButton->setEnabled(false);
   m_Controls.m_StartPlusCalibrationButton->setEnabled(false);
   m_Controls.m_ToolBox->setCurrentIndex(0);
@@ -460,7 +472,6 @@ void UltrasoundCalibration::OnStopPlusCalibration()
   }
   m_Controls.m_GotCalibrationLabel->setText("");
   m_Controls.m_ConnectionStatus->setText("");
-  MITK_INFO << "Stopped all servers and clients";
   this->OnStopCalibrationProcess();
 }
 
@@ -543,7 +554,7 @@ void UltrasoundCalibration::OnGetPlusCalibration()
     }
     else
     {
-      MITK_INFO << " no connection ZONK!!";
+      MITK_INFO << " no connection";
       m_Controls.m_GotCalibrationLabel->setStyleSheet("QLabel { color : red; }");
       m_Controls.m_GotCalibrationLabel->setText("Something went wrong. Please try again");
     }
@@ -600,8 +611,6 @@ void UltrasoundCalibration::OnStopCalibrationProcess()
   m_WorldNode = 0;
 
   m_Controls.m_ToolBox->setCurrentIndex(0);
-  m_Controls.m_ToolBox->setItemEnabled(1, false);
-  m_Controls.m_ToolBox->setItemEnabled(2, false);
 }
 
 void UltrasoundCalibration::OnDeciveServiceEvent(const ctkServiceEvent event)
@@ -970,6 +979,10 @@ void UltrasoundCalibration::ClearTemporaryMembers()
   m_EvalPointsProjected->Clear();
 
   this->m_Controls.m_CalibPointList->clear();
+
+  m_SpacingPoints->Clear();
+  m_Controls.m_SpacingPointsList->clear();
+  m_SpacingPointsCount = 0;
 }
 
 vtkSmartPointer<vtkPolyData> UltrasoundCalibration::ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet)
@@ -1044,14 +1057,11 @@ void UltrasoundCalibration::OnAddSpacingPoint()
 {
   mitk::Point3D point = this->GetRenderWindowPart()->GetSelectedPosition();
 
-  MITK_INFO << "Got selected position";
   this->m_SpacingPoints->InsertPoint(m_SpacingPointsCount, point);
 
-  MITK_INFO << "Added point to Point Set";
   QString text = text.number(m_SpacingPointsCount + 1);
   text = "Point " + text;
 
-  MITK_INFO << " Point name: ";
   this->m_Controls.m_SpacingPointsList->addItem(text);
 
   m_SpacingPointsCount++;

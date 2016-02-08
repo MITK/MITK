@@ -67,8 +67,8 @@ namespace mitk {
     std::vector<TrackingDeviceData> GetDeviceDataForLine(TrackingDeviceType type);
 
     /**
-    * /brief Returns the first TracingDeviceData mathing a given line. Useful for backward compatibility
-    * with the old way to manage Devices
+    * /brief Returns the first TrackingDeviceData matching a given line. Useful for backward compatibility
+    * with the old way to manage devices.
     */
     TrackingDeviceData GetFirstCompatibleDeviceDataForLine(TrackingDeviceType type);
 

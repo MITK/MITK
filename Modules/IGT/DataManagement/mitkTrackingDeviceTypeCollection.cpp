@@ -15,14 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTrackingDeviceTypeCollection.h"
-#include "mitkUIDGenerator.h"
 
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 
 //Microservices
 #include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usServiceProperties.h>
 #include <usModuleContext.h>
 
 
@@ -37,7 +34,6 @@ mitk::TrackingDeviceTypeCollection::~TrackingDeviceTypeCollection()
 
 void mitk::TrackingDeviceTypeCollection::RegisterAsMicroservice()
 {
-  // Get Context
   us::ModuleContext* context = us::GetModuleContext();
 
   m_ServiceRegistration = context->RegisterService(this);
@@ -45,7 +41,7 @@ void mitk::TrackingDeviceTypeCollection::RegisterAsMicroservice()
 
 void mitk::TrackingDeviceTypeCollection::UnRegisterMicroservice()
 {
-  if (m_ServiceRegistration != NULL) m_ServiceRegistration.Unregister();
+  if (m_ServiceRegistration != nullptr) m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
 }
 

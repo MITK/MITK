@@ -63,7 +63,7 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
     m_DisplaySize(other.m_DisplaySize)
 {
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
-  for( int i=0; i<other.m_HelperPolyLinesToBePainted->Size(); ++i )
+  for( auto i=0; i<other.m_HelperPolyLinesToBePainted->Size(); ++i )
   {
     m_HelperPolyLinesToBePainted->InsertElement( i, other.m_HelperPolyLinesToBePainted->GetElement( i ) );
   }

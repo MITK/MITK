@@ -202,11 +202,12 @@
       <action name="select_figure" />
       <action name="select_point" />
     </transition>
-
+<!--
     <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonPressedAndMouseMove" target="FigurePlacedByDrag" >
       <condition name="figure_is_on_current_slice" />
       <action name="move_current_point" ID="90" />
     </transition>
+-->
 
     <transition event_class="MousePressEvent" event_variant="SecondaryButtonPressed" target="HoveringAfterPointRemovedGuardState" >
       <!-- remove the control-point under the cursor -->

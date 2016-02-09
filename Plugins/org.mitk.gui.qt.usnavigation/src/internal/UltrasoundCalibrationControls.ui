@@ -87,10 +87,10 @@
       <widget class="QTabWidget" name="tabWidget">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>-10</x>
          <y>0</y>
          <width>341</width>
-         <height>831</height>
+         <height>841</height>
         </rect>
        </property>
        <property name="currentIndex">
@@ -230,7 +230,7 @@ p, li { white-space: pre-wrap; }
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>115</y>
+           <y>120</y>
            <width>291</width>
            <height>31</height>
           </rect>
@@ -419,24 +419,11 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; text-decoration: underline;&quot;&gt;Step 3: Save calibration to hard disc&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
-        <widget class="Line" name="line_3">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>801</y>
-           <width>584</width>
-           <height>3</height>
-          </rect>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
         <widget class="QPushButton" name="m_CalibBtnStopCalibration">
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>660</y>
+           <y>680</y>
            <width>301</width>
            <height>23</height>
           </rect>
@@ -449,7 +436,7 @@ p, li { white-space: pre-wrap; }
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>690</y>
+           <y>710</y>
            <width>301</width>
            <height>23</height>
           </rect>
@@ -461,8 +448,8 @@ p, li { white-space: pre-wrap; }
         <widget class="QmitkToolTrackingStatusWidget" name="m_CalibTrackingStatus" native="true">
          <property name="geometry">
           <rect>
-           <x>99</x>
-           <y>119</y>
+           <x>100</x>
+           <y>120</y>
            <width>211</width>
            <height>31</height>
           </rect>
@@ -472,6 +459,19 @@ p, li { white-space: pre-wrap; }
            <horstretch>0</horstretch>
            <verstretch>40</verstretch>
           </sizepolicy>
+         </property>
+        </widget>
+        <widget class="Line" name="line_3">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>650</y>
+           <width>301</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </widget>
@@ -661,8 +661,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>315</width>
-        <height>824</height>
+        <width>100</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">

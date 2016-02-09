@@ -64,6 +64,7 @@ void QmitkUSCombinedModalityCreationWidget::OnCreation()
 
   mitk::USCombinedModality::Pointer combinedModality = mitk::USCombinedModality::New(
     usDevice, trackingDevice, vendor.toStdString(), name.toStdString());
+  combinedModality->Initialize();
   combinedModality->RegisterAsMicroservice(); // register as micro service
 
   emit SignalCreated();

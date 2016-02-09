@@ -894,7 +894,10 @@ void UltrasoundCalibration::Update()
     {
       m_Image->GetGeometry()->SetSpacing(m_Spacing);
     }
-    m_Node->SetData(m_Image);
+    if (m_Image.IsNotNull() && m_Image->IsInitialized())
+    {
+      m_Node->SetData(m_Image);
+    }
   }
 
   // Update Needle Projection

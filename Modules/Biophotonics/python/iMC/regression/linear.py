@@ -14,7 +14,7 @@ class LinearSaO2Unmixing(object):
     classdocs
     '''
 
-    def __init__(self, use_LCTF=False):
+    def __init__(self):
         # oxygenated haemoglobin extinction coefficients
         eHb02 = 0
         eHb = 0
@@ -71,17 +71,7 @@ class LinearSaO2Unmixing(object):
         self.lsq_solution_matrix = np.dot(np.linalg.inv(np.dot(self.H.T,
                                                                self.H)),
                                           self.H.T)
-        self.selected_features = np.arange(0, nr_total_wavelengths, 1)
 
-    def set_selected_features(self, selected_features):
-        """
-        Parameters:
-            selected_features: index array with indices
-            of selected features. Example np.array([0, 3, 19]) would select
-            the 1st, 4th, and 19th feature.
-            Will be initialized by default to all features.
-        """
-        self.selected_features = selected_features
 
     def fit(self, X, y, weights=None):
         """only implemented to fit to the standard sklearn framework."""

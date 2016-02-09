@@ -9,9 +9,9 @@ Created on Fri Aug  7 18:41:50 2015
 
 from setuptools import setup, find_packages
 
-setup(name='MultiSpectralImaging',
+setup(name='MITK-MSI',
       version='0.1',
-      description='Multi spectral imaging utilities',
+      description='Multi spectral imaging (MSI) utilities',
       author='Sebastian Wirkert',
       author_email='s.wirkert@dkfz-heidelberg.de',
       license='BSD',

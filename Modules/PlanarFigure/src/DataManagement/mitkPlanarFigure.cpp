@@ -51,7 +51,6 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
     m_SelectedControlPoint(other.m_SelectedControlPoint),
     m_PolyLines(other.m_PolyLines),
     m_HelperPolyLines(other.m_HelperPolyLines),
-    m_HelperPolyLinesToBePainted(other.m_HelperPolyLinesToBePainted->Clone()),
     m_PreviewControlPoint(other.m_PreviewControlPoint),
     m_PreviewControlPointVisible(other.m_PreviewControlPointVisible),
     m_FigurePlaced(other.m_FigurePlaced),
@@ -63,6 +62,12 @@ mitk::PlanarFigure::PlanarFigure(const Self& other)
     m_FeaturesMTime(other.m_FeaturesMTime),
     m_DisplaySize(other.m_DisplaySize)
 {
+  m_HelperPolyLinesToBePainted = BoolContainerType::New();
+  for( int i=0; i<other.m_HelperPolyLinesToBePainted->Size(); ++i )
+  {
+    m_HelperPolyLinesToBePainted->InsertElement( i, other.m_HelperPolyLinesToBePainted->GetElement( i ) );
+  }
+
 }
 
 

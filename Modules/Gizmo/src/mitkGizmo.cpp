@@ -50,6 +50,97 @@ namespace {
 const char* PROPERTY_KEY_ORIGINAL_OBJECT_OPACITY = "gizmo.originalObjectOpacity";
 }
 
+namespace mitk {
+
+//! Private object, removing the Gizmo from data storage along with its manipulated object.
+class GizmoRemover
+{
+public:
+  GizmoRemover()
+  :m_Storage(nullptr),
+   m_GizmoNode(nullptr),
+   m_ManipulatedNode(nullptr),
+   m_StorageObserverTag(0)
+  {
+  }
+
+  //! Tell the object about the storage that contains both the nodes
+  //! containing the gizmo and the manipulated object.
+  //!
+  //! The method sets up observation of
+  //! - removal of the manipulated node from storage
+  //! - destruction of storage itself
+  void UpdateStorageObservation(mitk::DataStorage* storage,
+                                mitk::DataNode* gizmo_node,
+                                mitk::DataNode* manipulated_node)
+  {
+    if (m_Storage != nullptr)
+    {
+      m_Storage->RemoveNodeEvent.RemoveListener(
+        mitk::MessageDelegate1<GizmoRemover, const mitk::DataNode*>(this,
+                                                                    &GizmoRemover::OnDataNodeHasBeenRemoved));
+      m_Storage->RemoveObserver(m_StorageObserverTag);
+    }
+
+    m_Storage = storage;
+    m_GizmoNode = gizmo_node;
+    m_ManipulatedNode = manipulated_node;
+
+    if (m_Storage != nullptr)
+    {
+      m_Storage->RemoveNodeEvent.AddListener(
+        mitk::MessageDelegate1<GizmoRemover, const mitk::DataNode*>(this,
+                                                                    &GizmoRemover::OnDataNodeHasBeenRemoved));
+
+      itk::SimpleMemberCommand<GizmoRemover>::Pointer command = itk::SimpleMemberCommand<GizmoRemover>::New();
+      command->SetCallbackFunction(this, &mitk::GizmoRemover::OnDataStorageDeleted);
+      m_StorageObserverTag = m_Storage->AddObserver(itk::ModifiedEvent(), command);
+    }
+  }
+
+  //! Callback notified on destruction of DataStorage
+  void OnDataStorageDeleted()
+  {
+    m_Storage = nullptr;
+  }
+
+  //! Callback notified on removal of _any_ object from data storage
+  void OnDataNodeHasBeenRemoved(const mitk::DataNode* node)
+  {
+    if (node == m_ManipulatedNode)
+    {
+      // m_Storage is still alive because it is the emitter
+      if (m_Storage->Exists(m_GizmoNode))
+      {
+        m_Storage->Remove(m_GizmoNode);
+        // normally, gizmo will be deleted here (unless somebody
+        // still holds a reference to it)
+      }
+    }
+  }
+
+  //! Clean up our observer registrations
+  ~GizmoRemover()
+  {
+    if (m_Storage)
+    {
+      m_Storage->RemoveNodeEvent.RemoveListener(
+        mitk::MessageDelegate1<GizmoRemover, const mitk::DataNode*>(this,
+                                                                    &GizmoRemover::OnDataNodeHasBeenRemoved));
+      m_Storage->RemoveObserver(m_StorageObserverTag);
+    }
+  }
+
+
+private:
+  mitk::DataStorage* m_Storage;
+  mitk::DataNode* m_GizmoNode;
+  mitk::DataNode* m_ManipulatedNode;
+  unsigned long m_StorageObserverTag;
+};
+
+} // namespace MITK
+
 bool mitk::Gizmo::HasGizmoAttached(DataNode* node, DataStorage* storage)
 {
   auto typeCondition = TNodePredicateDataType<Gizmo>::New();
@@ -69,7 +160,12 @@ bool mitk::Gizmo::RemoveGizmoFromNode(DataNode* node, DataStorage* storage)
 
   for (auto& gizmoChild : *gizmoChildren)
   {
-    storage->Remove(gizmoChild);
+    Gizmo* gizmo = dynamic_cast<Gizmo*>(gizmoChild->GetData());
+    if (gizmo)
+    {
+      storage->Remove(gizmoChild);
+      gizmo->m_GizmoRemover->UpdateStorageObservation(nullptr, nullptr, nullptr);
+    }
   }
 
   //--------------------------------------------------------------
@@ -131,6 +227,7 @@ mitk::DataNode::Pointer mitk::Gizmo::AddGizmoToNode(DataNode* node, DataStorage*
   if (storage)
   {
     storage->Add(gizmoNode, node);
+    gizmo->m_GizmoRemover->UpdateStorageObservation(storage, gizmoNode, node);
   }
 
   return gizmoNode;
@@ -140,7 +237,8 @@ mitk::Gizmo::Gizmo()
 : Surface(),
   m_AllowTranslation(true),
   m_AllowRotation(true),
-  m_AllowScaling(true)
+  m_AllowScaling(true),
+  m_GizmoRemover(std::make_unique<GizmoRemover>())
 {
   m_Center.Fill(0);
 

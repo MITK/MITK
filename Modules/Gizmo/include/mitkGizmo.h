@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 class DataStorage;
+class GizmoRemover;
 
 //! A geometry manipulation "gizmo".
 //!
@@ -182,6 +183,10 @@ private:
   BaseGeometry::Pointer m_FollowedGeometry;
   //! ITK tag for the observing of m_FollowedGeometry
   unsigned long m_FollowerTag;
+
+  //! Observes a data storage for removal of the manipulated object.
+  //! Removes gizmo together with the manipulated object
+  std::unique_ptr<GizmoRemover> m_GizmoRemover;
 };
 
 }

@@ -238,7 +238,7 @@ mitk::Gizmo::Gizmo()
   m_AllowTranslation(true),
   m_AllowRotation(true),
   m_AllowScaling(true),
-  m_GizmoRemover(std::make_unique<GizmoRemover>())
+  m_GizmoRemover(new GizmoRemover())
 {
   m_Center.Fill(0);
 

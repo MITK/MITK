@@ -8,6 +8,7 @@ import numpy as np
 from pandas import DataFrame
 import pandas as pd
 
+
 class AbstractBatch(object):
     """summarizes a batch of simulated mc spectra"""
 
@@ -83,6 +84,7 @@ class GenericBatch(AbstractBatch):
             self.df[l, "d"] = self.df[l, "d"] / sum_d * 2000. * 10 ** -6
             self.df[l, "d"] = np.clip(self.df[l, "d"], 25 * 10 ** -6, np.inf)
 
+        return self.df
 
 
 class GenericBatch(AbstractBatch):
@@ -142,6 +144,8 @@ class GenericBatch(AbstractBatch):
             self.df[l, "d"] = self.df[l, "d"] / sum_d * 2000. * 10 ** -6
             self.df[l, "d"] = np.clip(self.df[l, "d"], 25 * 10 ** -6, np.inf)
 
+        return self.df
+
 
 class LessGenericBatch(AbstractBatch):
     """less generic three layer batch. This only varies blood volume fraction
@@ -188,6 +192,8 @@ class LessGenericBatch(AbstractBatch):
         # mucosa
         self.append_one_layer(saO2, n * 1.38, (395.*10 ** -6, 603.*10 ** -6),
                               nr_samples)
+
+        return self.df
 
 
 class ColonMuscleBatch(GenericBatch):
@@ -237,6 +243,8 @@ class ColonMuscleBatch(GenericBatch):
         # mucosa
         self.append_one_layer(saO2, n * 1.38, (395.*10 ** -6, 603.*10 ** -6),
                               nr_samples)
+
+        return self.df
 
 
 class GenericMeanScatteringBatch(GenericBatch):
@@ -319,3 +327,5 @@ class VisualizationBatch(AbstractBatch):
         self.append_one_layer(0.04, 0.7, 18.9*100., 1.286, 500 * 10 ** -6,
                               1.36, 0.9,
                               nr_samples)
+
+        return self.df

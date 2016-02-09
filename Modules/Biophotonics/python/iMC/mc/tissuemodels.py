@@ -24,6 +24,9 @@ class AbstractTissue(object):
     def set_mco_filename(self, mco_filename):
         self._mci_wrapper.set_mco_filename(mco_filename)
 
+    def get_mco_filename(self):
+        return self._mci_wrapper.mco_filename
+
     def set_wavelength(self, wavelength):
         self.wavelength = wavelength
 
@@ -64,19 +67,22 @@ class GenericTissue(AbstractTissue):
     Initializes a 3-layer generic tissue model
     '''
 
-    def set_dataframe_element(self, df, element):
-        """take the element element of the batch and set the tissue to
-        resemble the structure specified by this"""
-        layers = [l for l in df.columns.levels[0] if "layer" in l]
+    def set_dataframe_row(self, df_row):
+        """take one example (one row) of a created batch and set the tissue to
+        resemble the structure specified by this row
+
+        Args:
+            df_row: one row of a dataframe created by a batch."""
+        layers = [l for l in df_row.index.levels[0] if "layer" in l]
         for i, l in enumerate(layers):
             self.set_layer(i,
-                           df[l, "vhb"][element],
-                           df[l, "sao2"][element],
-                           df[l, "a_mie"][element],
-                           df[l, "b_mie"][element],
-                           df[l, "d"][element],
-                           df[l, "n"][element],
-                           df[l, "g"][element])
+                           df_row[l, "vhb"],
+                           df_row[l, "sao2"],
+                           df_row[l, "a_mie"],
+                           df_row[l, "b_mie"],
+                           df_row[l, "d"],
+                           df_row[l, "n"],
+                           df_row[l, "g"])
 
     def set_layer(self, layer_nr=0,
                   bvf=None, saO2=None, a_mie=None, b_mie=None, d=None,

@@ -15,15 +15,17 @@ def fold_by_sliding_average(df, window_size):
     There will be some boundary effect on the edges."""
     # next line does the folding.
     df.reflectances = pd.rolling_mean(df.reflectances.T, window_size,
-                                           center=True).T
+                                      center=True).T
     # let's get rid of NaN columns which are created at the boundaries
     df.dropna(axis="columns", inplace=True)
+    return df
 
 
 def switch_reflectances(df, new_wavelengths, new_reflectances):
     df.drop(df["reflectances"].columns, axis=1, level=1, inplace=True)
     for i, nw in enumerate(new_wavelengths):
         df["reflectances", nw] = new_reflectances[:, i]
+    return df
 
 
 def interpolate_wavelengths(df, new_wavelengths):
@@ -40,4 +42,5 @@ def interpolate_wavelengths(df, new_wavelengths):
     # build a new dataframe out of this information and set the original df
     # to the new information. This seems hacky, can't it be done easier?
     switch_reflectances(df, new_wavelengths, new_reflectances)
+    return df
 

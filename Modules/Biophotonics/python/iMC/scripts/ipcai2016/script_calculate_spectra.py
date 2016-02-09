@@ -15,7 +15,8 @@ import luigi
 
 import scriptpaths as sp
 import mc.factories as mcfac
-from mc.sim import SimWrapper, get_diffuse_reflectance
+from mc.sim import SimWrapper
+from mc.create_spectrum import create_spectrum
 
 # parameter setting
 NR_BATCHES = 100
@@ -46,14 +47,14 @@ class CreateSpectraTask(luigi.Task):
     def run(self):
         start = time.time()
         # setup simulation wrapper
-        self.sim_wrapper = SimWrapper()
-        self.sim_wrapper.set_mci_filename(MCI_FILENAME)
-        self.sim_wrapper.set_mcml_executable(PATH_TO_MCML + EXEC_MCML)
+        sim_wrapper = SimWrapper()
+        sim_wrapper.set_mci_filename(MCI_FILENAME)
+        sim_wrapper.set_mcml_executable(os.path.join(PATH_TO_MCML, EXEC_MCML))
         # setup model
-        self.tissue_model = self.factory.create_tissue_model()
-        self.tissue_model.set_mci_filename(self.sim_wrapper.mci_filename)
-        self.tissue_model.set_mco_filename(MCO_FILENAME)
-        self.tissue_model.set_nr_photons(NR_PHOTONS)
+        tissue_model = self.factory.create_tissue_model()
+        tissue_model.set_mci_filename(sim_wrapper.mci_filename)
+        tissue_model.set_mco_filename(MCO_FILENAME)
+        tissue_model.set_nr_photons(NR_PHOTONS)
         # setup array in which data shall be stored
         batch = self.factory.create_batch_to_simulate()
         batch.create_parameters(self.nr_samples)
@@ -65,23 +66,19 @@ class CreateSpectraTask(luigi.Task):
 
         # for each instance of our tissue model
         for i in range(df.shape[0]):
-            self.tissue_model.set_dataframe_element(df, i)
+            # set the desired element in the dataframe to be simulated
+            tissue_model.set_dataframe_row(df.loc[i, :])
             logging.info("running simulation " + str(i) + " for\n" +
-                         str(self.tissue_model))
-            start = time.time()
-            # map the _wavelengths array to reflectance list
-            reflectances = map(self.wavelength_to_reflectance,
-                               WAVELENGHTS)
-            end = time.time()
+                         str(tissue_model))
+            reflectances = create_spectrum(tissue_model, sim_wrapper,
+                                           WAVELENGHTS)
             # store in dataframe
             for r, w in zip(reflectances, WAVELENGHTS):
                 df["reflectances", w][i] = r
-            # success!
-            logging.info("successfully ran simulation in " +
-                         "{:.2f}".format(end - start) + " seconds")
+
         # clean up temporarily created files
         os.remove(MCI_FILENAME)
-        created_mco_file = PATH_TO_MCML + "/" + MCO_FILENAME
+        created_mco_file = os.path.join(PATH_TO_MCML, MCO_FILENAME)
         if os.path.isfile(created_mco_file):
             os.remove(created_mco_file)
         # save the created output
@@ -91,17 +88,6 @@ class CreateSpectraTask(luigi.Task):
         end = time.time()
         logging.info("time for creating batch of mc data: %.f s" %
                      (end - start))
-
-    def wavelength_to_reflectance(self, wavelength):
-        """helper function to determine the reflectance for a given
-        wavelength using the current model and simulation """
-        self.tissue_model.set_wavelength(wavelength)
-        self.tissue_model.create_mci_file()
-        if os.path.isfile(PATH_TO_MCML + EXEC_MCML):
-            self.sim_wrapper.run_simulation()
-            return get_diffuse_reflectance(PATH_TO_MCML + MCO_FILENAME)
-        else:
-            raise IOError("path to gpumcml not valid")
 
 
 if __name__ == '__main__':

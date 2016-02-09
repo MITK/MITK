@@ -122,6 +122,9 @@ class MciWrapper(object):
                     "%.3f" % (layer[4] * 100.) + "\n")  # d
         f.write(repr(self.n_below) + " # n for medium below.\n")
         f.close()
+        if not os.path.isfile(self.mci_filename):
+            raise IOError("input file for monte carlo simulation not " +
+                          "succesfully created")
 
     def __init__(self):
         # set standard parameters

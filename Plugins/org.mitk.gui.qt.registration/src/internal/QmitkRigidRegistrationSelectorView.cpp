@@ -222,16 +222,6 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
     std::cout << std::endl;
 
-    // Fixed image geometry
-    //     mitk::Geometry3D::Pointer m_FixedGeometryCopy = m_FixedNode->GetData()->GetGeometry()->Clone();
-    //     std::cout << "Fixed Image Geometry (IndexToWorldTransform)"  << std::endl;
-    //     std::cout << m_FixedGeometryCopy->GetIndexToWorldTransform()->GetMatrix();
-    //     center = m_FixedGeometryCopy->GetIndexToWorldTransform()->GetCenter();
-    //     std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-    //     offset = m_FixedGeometryCopy->GetIndexToWorldTransform()->GetOffset();
-    //     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-    //     std::cout << std::endl;
-
     // Calculate the World to ITK-Physical transform for the moving image
     m_MovingGeometry = m_MovingNode->GetData()->GetGeometry();
 
@@ -257,27 +247,11 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     m_GeometryWorldToItkPhysicalTransform = mitk::BaseGeometry::TransformType::New();
     GetWorldToItkPhysicalTransform(m_MovingGeometry, m_GeometryWorldToItkPhysicalTransform.GetPointer());
 
-    //     std::cout << "Moving Image: World to ITK-physical transform" << std::endl;
-    //     std::cout << m_GeometryWorldToItkPhysicalTransform->GetMatrix();
-    //     center = m_GeometryWorldToItkPhysicalTransform->GetCenter();
-    //     std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-    //     offset = m_GeometryWorldToItkPhysicalTransform->GetOffset();
-    //     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-    //     std::cout << std::endl;
-
     // Calculate the ITK-Physical to World transform for the fixed image
     m_GeometryItkPhysicalToWorldTransform = mitk::BaseGeometry::TransformType::New();
     mitk::BaseGeometry::TransformType::Pointer fixedWorld2Phys = mitk::BaseGeometry::TransformType::New();
     GetWorldToItkPhysicalTransform(m_FixedNode->GetData()->GetGeometry(), fixedWorld2Phys.GetPointer());
     fixedWorld2Phys->GetInverse(m_GeometryItkPhysicalToWorldTransform);
-
-    //     std::cout << "Fixed Image: ITK-physical to World transform" << std::endl;
-    //     std::cout << m_GeometryItkPhysicalToWorldTransform->GetMatrix();
-    //     center = m_GeometryItkPhysicalToWorldTransform->GetCenter();
-    //     std::cout << "center " << center[0] << " " << center[1] << " " << center[2]  << std::endl;
-    //     offset = m_GeometryItkPhysicalToWorldTransform->GetOffset();
-    //     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl;
-    //     std::cout << std::endl;
 
     // init callback
     itk::ReceptorMemberCommand<QmitkRigidRegistrationSelectorView>::Pointer command = itk::ReceptorMemberCommand<QmitkRigidRegistrationSelectorView>::New();
@@ -287,6 +261,8 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     std::vector<std::string> presets;
     // init registration method
     mitk::ImageRegistrationMethod::Pointer registration = mitk::ImageRegistrationMethod::New();
+
+    registration->SetNumberOfLevels(3);
 
     registration->SetObserver(m_Observer);
     registration->SetInterpolator(m_Controls.m_InterpolatorBox->currentIndex());

@@ -269,6 +269,60 @@ public:
     MITK_TEST_CONDITION( isImageForLevelWindow1 && !isImageForLevelWindow2 && !isImageForLevelWindow3, "Testing exclusive imageForLevelWindow property for node 3.");
   }
 
+  static void TestImageForLevelWindowOnVisibilityChange( std::string testImageFile )
+  {
+    mitk::LevelWindowManager::Pointer manager = mitk::LevelWindowManager::New();
+    mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+    manager->SetDataStorage(ds);
+
+    //add multiple objects to the data storage => multiple observers should be created
+    mitk::DataNode::Pointer node3 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
+    mitk::DataNode::Pointer node2 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
+    mitk::DataNode::Pointer node1 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
+
+    //manager->SetAutoTopMostImage( true, node1 );
+    node3->SetIntProperty( "layer" , 1 );
+    node2->SetIntProperty( "layer" , 2 );
+    node1->SetIntProperty( "layer" , 3 );
+
+    manager->SetAutoTopMostImage( false );
+
+    bool isImageForLevelWindow1, isImageForLevelWindow2, isImageForLevelWindow3;
+    node1->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow1 );
+    node2->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow2 );
+    node3->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow3 );
+
+    MITK_TEST_CONDITION( isImageForLevelWindow1 && !isImageForLevelWindow2 && !isImageForLevelWindow3, "Testing initial imageForLevelWindow setting.");
+
+    node1->SetVisibility( false );
+    node1->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow1 );
+    node2->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow2 );
+    node3->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow3 );
+
+    MITK_TEST_CONDITION( !isImageForLevelWindow1 && isImageForLevelWindow2 && !isImageForLevelWindow3, "Testing exclusive imageForLevelWindow property for node 2.");
+
+    node2->SetVisibility( false );
+    node1->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow1 );
+    node2->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow2 );
+    node3->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow3 );
+
+    MITK_TEST_CONDITION( !isImageForLevelWindow1 && !isImageForLevelWindow2 && isImageForLevelWindow3, "Testing exclusive imageForLevelWindow property for node 3.");
+
+    node3->SetVisibility( false );
+    node1->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow1 );
+    node2->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow2 );
+    node3->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow3 );
+
+    MITK_TEST_CONDITION( !isImageForLevelWindow1 && !isImageForLevelWindow2 && isImageForLevelWindow3, "Testing exclusive imageForLevelWindow property for node 3.");
+
+    node1->SetVisibility( true );
+    node1->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow1 );
+    node2->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow2 );
+    node3->GetBoolProperty( "imageForLevelWindow", isImageForLevelWindow3 );
+
+    MITK_TEST_CONDITION( isImageForLevelWindow1 && !isImageForLevelWindow2 && !isImageForLevelWindow3, "Testing exclusive imageForLevelWindow property for node 3.");
+  }
+
 };
 
 int mitkLevelWindowManagerTest(int argc, char* args[])
@@ -285,6 +339,7 @@ int mitkLevelWindowManagerTest(int argc, char* args[])
   mitkLevelWindowManagerTestClass::TestRemoveObserver(testImage);
   mitkLevelWindowManagerTestClass::TestLevelWindowSliderVisibility(testImage);
   mitkLevelWindowManagerTestClass::TestSetLevelWindowProperty( testImage );
+  mitkLevelWindowManagerTestClass::TestImageForLevelWindowOnVisibilityChange( testImage );
 
   MITK_TEST_END();
 }

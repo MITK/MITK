@@ -126,7 +126,12 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
   if (m_ThresholdFeedbackNode.IsNotNull())
   {
     m_CurrentThresholdValue = value;
-    m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.001) ) );
+    // Bug 19250: The range of 0.01 is rather random. It was 0.001 before and probably due to rounding error propagation in VTK code
+    // it leads to strange banding effects on floating point images with a huge range (like -40000 - 40000). 0.01 lowers this effect
+    // enough to work with our images. Might not work on images with really huge ranges, though. Anyways, still seems to be low enough
+    // to work for floating point images with a range between 0 and 1. A better solution might be to dynamically calculate the value
+    // based on the value range of the current image (as big as possible, as small as necessary).
+    m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.01) ) );
     RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

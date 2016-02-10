@@ -135,7 +135,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.tar.bz2
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.7z
     URL_MD5 7ce7f5a4e396484da8da6b60d4ed7661
     # We use in-source builds for Boost
     BINARY_DIR ${ep_prefix}/src/${proj}

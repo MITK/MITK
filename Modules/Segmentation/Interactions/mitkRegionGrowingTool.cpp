@@ -387,6 +387,7 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
                     // Perform region growing
                     AccessFixedDimensionByItk_3(m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, thresholds, resultImage);
                     resultImage->SetGeometry(workingSliceGeometry);
+                    mitk::IOUtil::Save(resultImage, "/home/jenspetersen/Desktop/resultImage.nrrd");
 
                     // Extract contour
                     if (resultImage.IsNotNull())
@@ -394,14 +395,17 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
                         mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
                         contourExtractor->SetInput(resultImage);
                         contourExtractor->Update();
-                        ContourModel::Pointer resultContour = contourExtractor->GetOutput();
+                        ContourModel::Pointer resultContour = ContourModel::New();
+                        resultContour = contourExtractor->GetOutput();
 //                        resultContour = FeedbackContourTool::BackProjectContourFrom2DSlice(workingSliceGeometry, resultContour);
 
                         // Show contour
                         if (resultContour.IsNotNull())
                         {
-                            FeedbackContourTool::SetFeedbackContour(resultContour);
+                            ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
+                            FeedbackContourTool::SetFeedbackContour(resultContourWorld);
                             FeedbackContourTool::SetFeedbackContourVisible(true);
+                            mitk::IOUtil::Save(resultContourWorld, "/home/jenspetersen/Desktop/resultContour.cnt");
 //                            mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
                             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
                         }
@@ -652,7 +656,7 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction*, InteractionEv
                 }
             }
 
-            FeedbackContourTool::SetFeedbackContourVisible(false);
+            //FeedbackContourTool::SetFeedbackContourVisible(false);
             mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
         }
     }

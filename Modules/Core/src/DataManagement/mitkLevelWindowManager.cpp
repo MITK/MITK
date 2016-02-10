@@ -409,7 +409,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
 
     bool visible = node->IsVisible(NULL);
 
-    if ( node->IsVisible(NULL) /*&& highestVisible.IsNull()*/ )
+    if ( node->IsVisible(NULL) )
     {
       int layer = -1;
       node->GetIntProperty( "layer", layer );
@@ -427,13 +427,9 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
     {
       return;
     }
-    /*else
-    {
-      former = node;
-    }*/
   }
 
-  if ( /*former && */highestVisible )
+  if ( highestVisible )
   {
     mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( highestVisible->GetProperty( "levelwindow" ) );
 

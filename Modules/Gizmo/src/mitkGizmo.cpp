@@ -293,7 +293,12 @@ vtkSmartPointer<vtkPolyData> BuildAxis(const mitk::Point3D& center,
                                        char vertexValueRing,
                                        char vertexValueScale)
 {
-  const double shaftRadius = 1;
+  // Define all sizes relative to absolute size (thus that the gizmo will appear
+  // in the same relative size for huge (size >> 1) and tiny (size << 1) objects).
+  // This means that the gizmo will appear very different when a scene contains _both_
+  // huge and tiny objects at the same time, but when the users zooms in on his
+  // object of interest, the gizmo will always have the same relative size.
+  const double shaftRadius = halflength * 0.02;
   const double arrowHeight = shaftRadius * 6;
   const int tubeSides = 15;
 
@@ -453,7 +458,7 @@ vtkSmartPointer<vtkPolyData> mitk::Gizmo::BuildGizmo()
 
   auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
   sphereSource->SetCenter(m_Center[0], m_Center[1], m_Center[2]);
-  sphereSource->SetRadius(longestAxis * 0.05);
+  sphereSource->SetRadius(longestAxis * 0.06);
   sphereSource->Update();
   AssignScalarValueTo( sphereSource->GetOutput(), MoveFreely );
 

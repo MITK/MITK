@@ -369,6 +369,23 @@ void mitk::LevelWindowManager::RecaluclateLevelWindowForSelectedComponent(const 
 
 void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible property of a image has changed
 {
+  std::vector< itk::Command* > commandVec;
+  std::vector< bool > hasObserverVec;
+  std::vector< mitk::BaseProperty* > propertyVec;
+  for ( ObserverToPropertyMap::const_iterator it = m_PropObserverToNode.begin(); it != m_PropObserverToNode.end(); ++it )
+  {
+    unsigned long idx = ((*it).first).first;
+    mitk::DataNode::Pointer node = ((*it).first).second;
+
+    itk::Command* cmd = node->GetCommand( idx );
+    commandVec.push_back( cmd );
+
+    bool hasObserver = ((*it).second)->HasObserver( itk::ModifiedEvent() );
+    hasObserverVec.push_back( hasObserver );
+
+    propertyVec.push_back( (*it).second );
+  }
+
   if (m_AutoTopMost)
   {
     SetAutoTopMostImage(true);
@@ -389,50 +406,71 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
       continue;
     }
 
-    mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( node->GetProperty( "levelwindow" ) );
-    if ( lvlProp.IsNull() )
-    {
-      continue;
-    }
+    bool visible = node->IsVisible(NULL);
 
     if ( node->IsVisible(NULL) && firstVisible.IsNull() )
     {
       firstVisible = node;
     }
 
+    /*typedef itk::ReceptorMemberCommand<LevelWindowManager> CommandType;
+    CommandType::Pointer command = dynamic_cast< CommandType* >( node->GetProperty("visible")->GetCommand( 0 ) );*/
+
+    /*mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( node->GetProperty( "levelwindow" ) );
+    if ( lvlProp.IsNull() )
+    {
+      continue;
+    }*/
+
     bool prop = false;
     node->GetBoolProperty( "imageForLevelWindow", prop );
 
-    if ( prop )
+    if ( prop && visible )
+    {
+      return;
+    }
+    else
     {
       former = node;
-
-      if ( node->IsVisible(NULL) )
-      {
-        mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( node->GetProperty( "levelwindow" ) );
-
-        m_LevelWindowProperty = lvlProp;
-        m_CurrentImage = dynamic_cast<mitk::Image*>(node->GetData());
-
-        Modified();
-
-        return;
-      }
     }
   }
 
-  if ( firstVisible.IsNotNull() )
+  if ( former && firstVisible )
   {
     mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( firstVisible->GetProperty( "levelwindow" ) );
+
     this->SetLevelWindowProperty( lvlProp );
+
+    return;
   }
-  else if ( former.IsNotNull() )
+  else
   {
-    mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( former->GetProperty( "levelwindow" ) );
-    this->SetLevelWindowProperty( lvlProp );
+    Modified();
   }
 
-  Modified();
+  //if ( firstVisible.IsNotNull() )
+  //{
+  //  mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( firstVisible->GetProperty( "levelwindow" ) );
+
+  //  /*m_LevelWindowProperty = lvlProp;
+  //  m_CurrentImage = dynamic_cast<mitk::Image*>(firstVisible->GetData());
+
+  //  firstVisible->SetBoolProperty( "imageForLevelWindow", true );
+  //  former->SetBoolProperty( "imageForLevelWindow", false );*/
+  //  this->SetLevelWindowProperty( lvlProp );
+  //}
+  //else if ( former.IsNotNull() )
+  //{
+  //  mitk::LevelWindowProperty::Pointer lvlProp = dynamic_cast< mitk::LevelWindowProperty* >( former->GetProperty( "levelwindow" ) );
+
+  //  /*m_LevelWindowProperty = lvlProp;
+  //  m_CurrentImage = dynamic_cast<mitk::Image*>(former->GetData());*/
+  //  this->SetLevelWindowProperty( lvlProp );
+  //}
+  //else
+  //{
+  //  Modified();
+  //}
 }
 
 
@@ -529,14 +567,14 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
     /* register listener for changes in visible property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command->SetCallbackFunction(this, &LevelWindowManager::Update);
-    unsigned long idx = it->Value()->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command );
-    m_PropObserverToNode[PropDataPair(idx, it->Value())] = it->Value()->GetProperty("visible");
+    unsigned long visIdx = it->Value()->GetProperty("visible")->AddObserver( itk::ModifiedEvent(), command );
+    m_PropObserverToNode[PropDataPair(visIdx, it->Value())] = it->Value()->GetProperty("visible");
 
     /* register listener for changes in layer property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command2 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command2->SetCallbackFunction(this, &LevelWindowManager::Update);
-    idx = it->Value()->GetProperty("layer")->AddObserver( itk::ModifiedEvent(), command2 );
-    m_PropObserverToNode2[PropDataPair(idx, it->Value())] = it->Value()->GetProperty("layer");
+    unsigned long layerIdx = it->Value()->GetProperty("layer")->AddObserver( itk::ModifiedEvent(), command2 );
+    m_PropObserverToNode2[PropDataPair(layerIdx, it->Value())] = it->Value()->GetProperty("layer");
 
     /* register listener for changes in layer property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command3 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
@@ -544,8 +582,8 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
     mitk::BaseProperty::Pointer imageRenderingMode = it->Value()->GetProperty("Image Rendering.Mode");
     if( imageRenderingMode.IsNotNull() )
     {
-      unsigned long idx = imageRenderingMode->AddObserver( itk::ModifiedEvent(), command3 );
-      m_PropObserverToNode3[PropDataPair(idx, it->Value())] = imageRenderingMode.GetPointer();
+      unsigned long rendIdx = imageRenderingMode->AddObserver( itk::ModifiedEvent(), command3 );
+      m_PropObserverToNode3[PropDataPair(rendIdx, it->Value())] = imageRenderingMode.GetPointer();
     }
 
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command4 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
@@ -553,8 +591,8 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
     mitk::BaseProperty::Pointer displayedImageComponent = it->Value()->GetProperty("Image.Displayed Component");
     if( displayedImageComponent.IsNotNull() )
     {
-      unsigned long idx = displayedImageComponent->AddObserver( itk::ModifiedEvent(), command4 );
-      m_PropObserverToNode4[PropDataPair(idx, it->Value())] = displayedImageComponent.GetPointer();
+      unsigned long dispIdx = displayedImageComponent->AddObserver( itk::ModifiedEvent(), command4 );
+      m_PropObserverToNode4[PropDataPair(dispIdx, it->Value())] = displayedImageComponent.GetPointer();
     }
 
   }

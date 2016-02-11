@@ -71,6 +71,17 @@ namespace mitk
     itkSetMacro(StandardizeTime, bool);
 
     /**
+    * \brief If set to false, invalid navigationDatas will also be used. If set to true, the recorder
+    * will record only valid data. Standard is false.
+    */
+    itkSetMacro(RecordOnlyValidData, bool);
+
+    /**
+    * \brief Returns whether to use valid data only.
+    */
+    itkGetMacro(RecordOnlyValidData, bool);
+
+    /**
     * \brief Starts recording NavigationData into the NAvigationDataSet
     */
     virtual void StartRecording();
@@ -115,6 +126,8 @@ namespace mitk
     bool m_StandardizedTimeInitialized; //< set to true the first time start recording is called.
 
     int m_RecordCountLimit; ///< limits the number of frames, recording will be stopped if the limit is reached. -1 disables the limit
+
+    bool m_RecordOnlyValidData; //< indicates whether only valid data is recorded
   };
 }
 #endif // #define _MITK_POINT_SET_SOURCE_H

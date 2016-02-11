@@ -96,6 +96,8 @@ void QmitkStoreSCPLauncher::OnReadyProcessOutput()
         if(output.contains("I: storing DICOM file: "))
         {
             output.replace("I: storing DICOM file: ","");
+            output.replace("\\", "/"); // cannot handle backslashes
+            output.replace("\r", ""); // cannot handle carriage return
             importList += output;
         }
     }

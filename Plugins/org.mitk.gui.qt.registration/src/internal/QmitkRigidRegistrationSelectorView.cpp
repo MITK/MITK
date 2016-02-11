@@ -280,7 +280,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->SetFixedImage(dynamic_cast<mitk::Image*>(m_FixedNode->GetData()));
     dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->SetMovingImage(dynamic_cast<mitk::Image*>(m_MovingNode->GetData()));
     registration->SetOptimizerScales(dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->GetScales());
-    registration->SetTransform(dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->GetTransform());
+    registration->SetTransform(dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->GetTransform() );
 
     dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget())->SetMovingImage(dynamic_cast<mitk::Image*>(m_MovingNode->GetData()));
     registration->SetMetric(dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget())->GetMetric());

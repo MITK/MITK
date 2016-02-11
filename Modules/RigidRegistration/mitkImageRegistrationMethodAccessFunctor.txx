@@ -60,7 +60,8 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixe
   typedef typename itk::LinearInterpolateImageFunction<MovingImageType, double> InterpolatorType;
   typedef itk::NearestNeighborInterpolateImageFunction<MovingImageType, double> InterpolatorType2;
   typedef typename itk::ImageRegistrationMethod<FixedImageType, MovingImageType> RegistrationType;
-  typedef typename itk::MatrixOffsetTransformBase< double, VImageDimension, VImageDimension > TransformType;
+  typedef typename itk::Transform< double, VImageDimension, VImageDimension > TransformType;
+  typedef typename itk::MatrixOffsetTransformBase< double, VImageDimension, VImageDimension > MatrixTransformType;
   typedef typename TransformType::Pointer                TransformPointer;
   typedef typename itk::ImageToImageMetric<FixedImageType, MovingImageType>    MetricType;
   typedef typename MetricType::Pointer                MetricPointer;
@@ -69,16 +70,24 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixe
   typename FixedImageType::Pointer fixedImage = FixedImageType::New();
   typename MovingImageType::ConstPointer movingImage = itkImage1;
   mitk::CastToItkImage(method->m_ReferenceImage, fixedImage);
+
+
   // the metric
   MetricPointer metric = dynamic_cast<MetricType*>(method->m_Metric.GetPointer());
   if(movingImageMask.IsNotNull())
     metric->SetMovingImageMask(movingImageMask);
   if(fixedImageMask.IsNotNull())
     metric->SetFixedImageMask(fixedImageMask);
+
   // the transform
   TransformPointer transform = dynamic_cast<TransformType*>(method->m_Transform.GetPointer());
+  if( transform.IsNull() )
+    mitkThrow() << "Failed to retrieve registration transform, dynamic cast failed";
+
   // the optimizer
   typename OptimizerType::Pointer optimizer = dynamic_cast<OptimizerType*>(method->m_Optimizer.GetPointer());
+
+
   // optimizer scales
   if (method->m_OptimizerScales.Size() != 0)
   {
@@ -100,8 +109,15 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixe
 
   // set initial position to identity by first setting the transformation to identity
   // and then using its parameters
-  transform->SetIdentity();
+
   typename TransformType::ParametersType identityParameters = transform->GetParameters();
+  // the SetIdentity avialable only for a transform subset (of type matrix offset)
+  MatrixTransformType* matrix_transform = dynamic_cast< MatrixTransformType* >( method->m_Transform.GetPointer() );
+  if( matrix_transform != nullptr)
+  {
+    matrix_transform->SetIdentity();
+    identityParameters = matrix_transform->GetParameters();
+  }
 
   registration->SetInitialTransformParameters( identityParameters );
   optimizer->SetInitialPosition( identityParameters );

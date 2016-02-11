@@ -20,7 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   ImageRegistrationMethod::ImageRegistrationMethod()
-  : m_Interpolator(0)
+  : m_Interpolator(0),
+    m_MultiResolutionScales(1)
   {
     m_ReferenceImage = Image::New();
     m_OptimizerScales.clear();
@@ -73,6 +74,8 @@ namespace mitk {
   void ImageRegistrationMethod::SetTransform(itk::Object::Pointer transform)
   {
     m_Transform = transform;
+
+    MITK_INFO("Image.Registration.Method") << "Transform : " << m_Transform;
   }
 
   void ImageRegistrationMethod::SetMetric(itk::Object::Pointer metric)
@@ -88,6 +91,11 @@ namespace mitk {
   void ImageRegistrationMethod::SetOptimizerScales(itk::Array<double> scales)
   {
     m_OptimizerScales = scales;
+  }
+
+  void ImageRegistrationMethod::SetNumberOfLevels(unsigned int levels)
+  {
+    m_MultiResolutionScales = levels;
   }
 
 } // end namespace

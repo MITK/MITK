@@ -666,7 +666,14 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       mitk::ImageWriteAccessor imAccess(diffImage);
 
       // Set all pixels to zero
-      mitk::PixelType pixelType( mitk::MakeScalarPixelType<unsigned char>()  );
+      mitk::PixelType pixelType (mitk::MakeScalarPixelType<mitk::Tool::DefaultSegmentationDataType>());
+
+      // For legacy purpose support former pixel type of segmentations (before multilabel)
+      if (m_Segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR)
+      {
+        pixelType = mitk::MakeScalarPixelType<unsigned char>();
+      }
+
       memset( imAccess.GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
     }
 

@@ -51,6 +51,19 @@ class MITKSEGMENTATION_EXPORT ShapeBasedInterpolationAlgorithm : public Segmenta
                                Image::Pointer resultImage,
                                unsigned int timeStep,
                                Image::ConstPointer referenceImage) override;
+
+  private:
+
+    typedef itk::Image<mitk::ScalarType, 2> DistanceFilterImageType;
+
+    template < typename TPixel, unsigned int VImageDimension >
+    void ComputeDistanceMap(const itk::Image<TPixel, VImageDimension>*, mitk::Image::Pointer &result);
+
+    template <typename TPixel, unsigned int VImageDimension >
+    void InterpolateIntermediateSlice(itk::Image <TPixel, VImageDimension>* result,
+                                      const mitk::Image::Pointer &lowerDistanceImage,
+                                      const mitk::Image::Pointer &upperDistanceImage,
+                                      float ratio);
 };
 
 } // namespace

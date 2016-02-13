@@ -212,7 +212,8 @@ public:
         , m_ParentNode(NULL)
         , m_SignalModelString("")
         , m_ArtifactModelString("")
-        , m_OutputPath("")
+        , m_OutputPath("/tmp/")
+        , m_OutputPrefix("fiberfox")
         , m_CheckOutputVolumeFractionsBox(false)
         , m_CheckAdvancedSignalOptionsBox(false)
         , m_CheckAddNoiseBox(false)
@@ -233,6 +234,7 @@ public:
     string              m_SignalModelString;                ///< Appendet to the name of the result node
     string              m_ArtifactModelString;              ///< Appendet to the name of the result node
     string              m_OutputPath;                       ///< Image is automatically saved to the specified folder after simulation is finished.
+    string              m_OutputPrefix;  /** Prefix for filename of output files and logfile. */
     string              m_AfterSimulationMessage;           ///< Store messages that are displayed after the simulation has finished (e.g. warnings, automatic parameter adjustments etc.)
 
     /** member variables that store the check-state of GUI checkboxes */

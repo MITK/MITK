@@ -1048,12 +1048,14 @@ void UltrasoundCalibration::OnFreezeClicked()
     m_Controls.m_SpacingPointsList->clear();
     m_SpacingPointsCount = 0;
     m_Controls.m_SpacingAddPoint->setEnabled(false);
+    m_CombinedModality->SetIsFreezed(false);
   }
   else
   {
+    m_CombinedModality->SetIsFreezed(true);
     m_Controls.m_SpacingAddPoint->setEnabled(true);
   }
-  SwitchFreeze();
+  //SwitchFreeze();
 }
 
 void UltrasoundCalibration::OnAddSpacingPoint()
@@ -1073,7 +1075,7 @@ void UltrasoundCalibration::OnAddSpacingPoint()
   {
     m_Controls.m_SpacingAddPoint->setEnabled(false);
     m_Controls.m_CalculateSpacing->setEnabled(true);
-    m_Controls.m_SpacingAddPoint->setEnabled(false);
+    m_Controls.m_SpacingBtnFreeze->setEnabled(false);
   }
 }
 
@@ -1105,7 +1107,7 @@ void UltrasoundCalibration::OnCalculateSpacing()
   m_SpacingPoints->Clear();
   m_Controls.m_SpacingPointsList->clear();
   m_SpacingPointsCount = 0;
-  SwitchFreeze();
+  m_CombinedModality->SetIsFreezed(false);
 }
 
 void UltrasoundCalibration::OnUSDepthChanged(const std::string& key, const std::string&)

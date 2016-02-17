@@ -7,5 +7,12 @@
           class="QmitkIGTTrackingSemiAutomaticMeasurementView"
           icon="resources/icon.xpm" />
   </extension>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.igttrackingdataevaluation"
+          name="IGT Tracking Data Evaluation"
+          class="QmitkIGTTrackingDataEvaluationView" 
+          icon="resources/icon-eval.xpm" />
+  </extension>
 
 </plugin>

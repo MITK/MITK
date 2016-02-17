@@ -4,21 +4,25 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkIGTTrackingSemiAutomaticMeasurementView.cpp
+  QmitkIGTTrackingDataEvaluationView.cpp
   mitkPluginActivator.cpp
 
 )
 
 SET(UI_FILES
   src/internal/QmitkIGTTrackingSemiAutomaticMeasurementViewControls.ui
+  src/internal/QmitkIGTTrackingDataEvaluationViewControls.ui
 )
 
 SET(MOC_H_FILES
   src/internal/QmitkIGTTrackingSemiAutomaticMeasurementView.h
+  src/internal/QmitkIGTTrackingDataEvaluationView.h
   src/internal/mitkPluginActivator.h
 )
 
 SET(CACHED_RESOURCE_FILES
   resources/icon.xpm
+  resources/icon-eval.xpm
   plugin.xml
 )
 

@@ -82,7 +82,7 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
 
     virtual void OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual bool OnMousePressedInside ( StateMachineAction*, InteractionEvent* interactionEvent, mitkIpPicDescriptor* workingPicSlice, int initialWorkingOffset);
-    virtual void OnMousePressedOutside ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnMousePressedOutside ( StateMachineAction*, InteractionEvent* interactionEvent);
     virtual void OnMouseMoved   ( StateMachineAction*, InteractionEvent* interactionEvent );
     virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent );
 
@@ -104,6 +104,9 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
     Image::Pointer m_WorkingSlice;
 
     ScalarType m_SeedValue;
+    itk::Index<3> m_SeedPoint;
+    ScalarType m_Thresholds[2];
+    ScalarType m_InitialThresholds[2];
     ScalarType m_LowerThreshold;
     ScalarType m_UpperThreshold;
     ScalarType m_InitialLowerThreshold;
@@ -111,6 +114,7 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
 
     Point2I m_LastScreenPosition;
     int m_ScreenYDifference;
+    int m_ScreenXDifference;
 
   private:
 

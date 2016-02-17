@@ -184,7 +184,7 @@ function(usFunctionEmbedResources)
     add_custom_command(
       TARGET ${US_RESOURCE_TARGET}
       POST_BUILD
-      COMMAND ${resource_compiler} --append $<TARGET_FILE:${US_RESOURCE_TARGET}> ${US_RESOURCE_MODULE_NAME} ${_zip_archive}
+      COMMAND ${resource_compiler} --append $<TARGET_FILE:${US_RESOURCE_TARGET}> ${_zip_archive}
       WORKING_DIRECTORY ${US_RESOURCE_WORKING_DIRECTORY}
       COMMENT "Appending zipped resources to ${US_RESOURCE_TARGET}"
       VERBATIM

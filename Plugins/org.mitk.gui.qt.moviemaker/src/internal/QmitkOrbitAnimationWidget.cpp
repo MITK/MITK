@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkOrbitAnimationItem.h"
 #include "QmitkOrbitAnimationWidget.h"
-#include <limits>
 #include <ui_QmitkOrbitAnimationWidget.h>
 
 QmitkOrbitAnimationWidget::QmitkOrbitAnimationWidget(QWidget* parent)
@@ -25,19 +24,8 @@ QmitkOrbitAnimationWidget::QmitkOrbitAnimationWidget(QWidget* parent)
 {
   m_Ui->setupUi(this);
 
-  m_Ui->orbitLineEdit->setValidator(new QIntValidator(0, std::numeric_limits<int>::max(), this));
-
-  this->connect(m_Ui->startAngleSlider, SIGNAL(valueChanged(int)),
-    m_Ui->startAngleSpinBox, SLOT(setValue(int)));
-
-  this->connect(m_Ui->startAngleSpinBox, SIGNAL(valueChanged(int)),
-    m_Ui->startAngleSlider, SLOT(setValue(int)));
-
-  this->connect(m_Ui->startAngleSpinBox, SIGNAL(valueChanged(int)),
-    this, SLOT(OnStartAngleChanged(int)));
-
-  this->connect(m_Ui->orbitLineEdit, SIGNAL(editingFinished()),
-    this, SLOT(OnOrbitEditingFinished()));
+  this->connect(m_Ui->orbitSpinBox, SIGNAL(valueChanged(int)),
+    this, SLOT(OnOrbitChanged(int)));
 
   this->connect(m_Ui->reverseCheckBox, SIGNAL(clicked(bool)),
     this, SLOT(OnReverseChanged(bool)));
@@ -54,29 +42,18 @@ void QmitkOrbitAnimationWidget::SetAnimationItem(QmitkAnimationItem* orbitAnimat
   if (m_AnimationItem == nullptr)
     return;
 
-  m_Ui->startAngleSlider->setValue(m_AnimationItem->GetStartAngle());
-  m_Ui->orbitLineEdit->setText(QString("%1").arg(m_AnimationItem->GetOrbit()));
+  m_Ui->orbitSpinBox->setValue(m_AnimationItem->GetOrbit());
   m_Ui->reverseCheckBox->setChecked(m_AnimationItem->GetReverse());
 }
 
-void QmitkOrbitAnimationWidget::OnStartAngleChanged(int angle)
+
+void QmitkOrbitAnimationWidget::OnOrbitChanged(int orbit)
 {
   if (m_AnimationItem == nullptr)
     return;
 
-  if (m_AnimationItem->GetStartAngle() != angle)
-    m_AnimationItem->SetStartAngle(angle);
-}
-
-void QmitkOrbitAnimationWidget::OnOrbitEditingFinished()
-{
-  if (m_AnimationItem == nullptr)
-    return;
-
-  int angle = m_Ui->orbitLineEdit->text().toInt();
-
-  if (m_AnimationItem->GetOrbit() != angle)
-    m_AnimationItem->SetOrbit(angle);
+  if (m_AnimationItem->GetOrbit() != m_Ui->orbitSpinBox->value())
+    m_AnimationItem->SetOrbit(m_Ui->orbitSpinBox->value());
 }
 
 void QmitkOrbitAnimationWidget::OnReverseChanged(bool reverse)

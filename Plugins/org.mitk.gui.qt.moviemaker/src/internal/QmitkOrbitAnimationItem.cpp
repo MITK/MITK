@@ -17,26 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkOrbitAnimationItem.h"
 #include <mitkBaseRenderer.h>
 
-QmitkOrbitAnimationItem::QmitkOrbitAnimationItem(int startAngle, int orbit, bool reverse, double duration, double delay, bool startWithPrevious)
+QmitkOrbitAnimationItem::QmitkOrbitAnimationItem(int orbit, bool reverse, double duration, double delay, bool startWithPrevious)
   : QmitkAnimationItem("Orbit", duration, delay, startWithPrevious)
 {
-  this->SetStartAngle(startAngle);
   this->SetOrbit(orbit);
   this->SetReverse(reverse);
 }
 
 QmitkOrbitAnimationItem::~QmitkOrbitAnimationItem()
 {
-}
-
-int QmitkOrbitAnimationItem::GetStartAngle() const
-{
-  return this->data(StartAngleRole).toInt();
-}
-
-void QmitkOrbitAnimationItem::SetStartAngle(int angle)
-{
-  this->setData(angle, StartAngleRole);
 }
 
 int QmitkOrbitAnimationItem::GetOrbit() const
@@ -72,8 +61,8 @@ void QmitkOrbitAnimationItem::Animate(double s)
     return;
 
   int newPos = this->GetReverse()
-    ? this->GetStartAngle() - this->GetOrbit() * s
-    : this->GetStartAngle() + this->GetOrbit() * s;
+    ? 180 - this->GetOrbit() * s
+    : 180 + this->GetOrbit() * s;
 
   while (newPos < 0)
     newPos += 360;

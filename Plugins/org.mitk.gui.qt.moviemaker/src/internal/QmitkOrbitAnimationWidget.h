@@ -37,8 +37,7 @@ public:
   void SetAnimationItem(QmitkAnimationItem* orbitAnimationItem) override;
 
 private slots:
-  void OnStartAngleChanged(int angle);
-  void OnOrbitEditingFinished();
+  void OnOrbitChanged(int orbit);
   void OnReverseChanged(bool reverse);
 
 private:

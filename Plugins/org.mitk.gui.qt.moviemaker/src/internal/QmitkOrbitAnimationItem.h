@@ -22,11 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkOrbitAnimationItem : public QmitkAnimationItem
 {
 public:
-  explicit QmitkOrbitAnimationItem(int startAngle = 180, int orbit = 360, bool reverse = false, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
+  explicit QmitkOrbitAnimationItem(int orbit = 360, bool reverse = false, double duration = 2.0, double delay = 0.0, bool startWithPrevious = false);
   virtual ~QmitkOrbitAnimationItem();
-
-  int GetStartAngle() const;
-  void SetStartAngle(int angle);
 
   int GetOrbit() const;
   void SetOrbit(int angle);

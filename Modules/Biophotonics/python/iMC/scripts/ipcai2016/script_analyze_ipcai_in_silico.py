@@ -22,13 +22,14 @@ import tasks_mc
 from regression.preprocessing import preprocess, preprocess2
 from regression.linear import LinearSaO2Unmixing
 
-import scriptpaths as sp
+import commons
 
-FINALS_FOLDER = "in_silico"
-in_silico_results_path = os.path.join(sp.RESULTS_FOLDER,
-                                      FINALS_FOLDER)
+sc = commons.ScriptCommons()
 
-sp.RECORDED_WAVELENGTHS = np.arange(470, 680, 10) * 10 ** -9
+sc.add_dir("IN_SILICO_RESULTS_PATH", os.path.join(sc.get_dir("RESULTS_FOLDER"),
+                                     "in_silico"))
+
+sc.other["RECORDED_WAVELENGTHS"] = np.arange(470, 680, 10) * 10 ** -9
 
 w_standard = 10.  # for this evaluation we add 10% noise
 
@@ -64,7 +65,7 @@ class TrainingSamplePlot(luigi.Task):
                tasks_mc.CameraBatch(self.which_test)
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(in_silico_results_path,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("IN_SILICO_RESULTS_PATH"),
                                               "sample_plot_train_" +
                                               self.which_train +
                                               "_test_" + self.which_test +
@@ -134,7 +135,7 @@ class VhbPlot(luigi.Task):
                tasks_mc.CameraBatch(self.which_test)
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(in_silico_results_path,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("IN_SILICO_RESULTS_PATH"),
                                               "vhb_noise_plot_train_" +
                                               self.which_train +
                                               "_test_" + self.which_test +
@@ -178,7 +179,7 @@ class NoisePlot(luigi.Task):
                tasks_mc.CameraBatch(self.which_test)
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(in_silico_results_path,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("IN_SILICO_RESULTS_PATH"),
                                               "noise_plot_train_" +
                                               self.which_train +
                                               "_test_" + self.which_test +
@@ -207,7 +208,7 @@ class WrongNoisePlot(luigi.Task):
                tasks_mc.CameraBatch(self.which_test)
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(in_silico_results_path,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("IN_SILICO_RESULTS_PATH"),
                                               str(self.train_snr) +
                                               "_wrong_noise_plot_train_" +
                                               self.which_train +
@@ -302,7 +303,11 @@ def standard_plotting(df, color_palette=None, xytext_position=None):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename=os.path.join(sp.LOG_FOLDER,
+
+    sc.set_root("/media/wirkert/data/Data/2016_02_02_IPCAI/")
+    sc.create_folders()
+
+    logging.basicConfig(filename=os.path.join(sc.get_full_dir("LOG_FOLDER"),
                                               "in_silico_plots_" +
                                               str(datetime.datetime.now()) +
                                               '.log'),
@@ -312,9 +317,6 @@ if __name__ == '__main__':
     logger = logging.getLogger()
     logger.addHandler(ch)
     luigi.interface.setup_interface_logging()
-
-    # create a folder for the results if necessary
-    sp.create_folder_if_necessary(in_silico_results_path)
 
     train = "ipcai_revision_colon_mean_scattering_train"
     test = "ipcai_revision_colon_mean_scattering_test"

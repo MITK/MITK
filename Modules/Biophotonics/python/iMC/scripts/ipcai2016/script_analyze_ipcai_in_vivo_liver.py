@@ -11,7 +11,6 @@ import ImageEnhance
 import logging
 import datetime
 
-import matplotlib.pyplot as plt
 import SimpleITK as sitk
 import matplotlib
 
@@ -19,17 +18,14 @@ from msi.io.nrrdreader import NrrdReader
 import msi.normalize as norm
 from regression.estimation import estimate_image
 from tasks_common import *
+import commons
 
+sc = commons.ScriptCommons()
 
-import sklearn.datasets
-sklearn.datasets.get_data_home(data_home=None)
+sc.add_dir("LIVER_DATA",
+           os.path.join(sc.get_dir("DATA_FOLDER"), "liver_images"))
+sc.add_dir("LIVER_RESULTS", os.path.join(sc.get_dir("RESULTS_FOLDER"), "liver"))
 
-FINALS_FOLDER = "liver"
-liver_results_path = os.path.join(sp.RESULTS_FOLDER, FINALS_FOLDER)
-data_folder = sp.LIVER_FOLDER
-
-sp.RECORDED_WAVELENGTHS = \
-        np.array([580, 470, 660, 560, 480, 511, 600, 700]) * 10 ** -9
 
 font = {'family' : 'normal',
         'size'   : 30}
@@ -39,14 +35,14 @@ matplotlib.rc('font', **font)
 class ResultsFile(luigi.Task):
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(liver_results_path,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("LIVER_RESULTS"),
                                               "results.csv"))
 
 
 class OxyAndVhbOverTimeTask(luigi.Task):
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(liver_results_path,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("LIVER_RESULTS"),
                                               "liver_oxy_over_time.pdf"))
 
     def requires(self):
@@ -122,12 +118,13 @@ class IPCAICreateOxyImageTask(luigi.Task):
 
     def requires(self):
         return IPCAITrainRegressor(df_prefix=self.df_prefix), \
-               Flatfield(flatfield_folder=sp.FLAT_FOLDER), \
-               SingleMultispectralImage(image=self.image_name), \
-               Dark(dark_folder=sp.DARK_FOLDER)
+               Flatfield(flatfield_folder=sc.get_full_dir("FLAT_FOLDER")), \
+               SingleMultispectralImage(image=os.path.join(
+                       sc.get_full_dir("LIVER_DATA"), self.image_name)), \
+               Dark(dark_folder=sc.get_full_dir("DARK_FOLDER"))
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(liver_results_path,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("LIVER_RESULTS"),
                                               self.image_name + "_" +
                                               self.df_prefix +
                                               "_oxy_summary" + ".png"))
@@ -139,7 +136,7 @@ class IPCAICreateOxyImageTask(luigi.Task):
         flat = nrrd_reader.read(self.input()[1].path)
         dark = nrrd_reader.read(self.input()[3].path)
         # read the msi
-        nr_filters = len(sp.RECORDED_WAVELENGTHS)
+        nr_filters = len(sc.other["RECORDED_WAVELENGTHS"])
         msi, segmentation = tiff_ring_reader.read(self.input()[2].path,
                                                   nr_filters)
 
@@ -237,7 +234,8 @@ class IPCAICreateOxyImageTask(luigi.Task):
                                                  "blood volume fraction mean [%]",
                                                  "time to estimate"])
 
-        results_file = os.path.join(liver_results_path, "results.csv")
+        results_file = os.path.join(sc.get_full_dir("LIVER_RESULTS"),
+                                    "results.csv")
         if os.path.isfile(results_file):
             df_results = pd.read_csv(results_file, index_col=0)
             df_results = pd.concat((df_results, df_image_results)).reset_index(
@@ -254,8 +252,12 @@ class IPCAICreateOxyImageTask(luigi.Task):
 
 if __name__ == '__main__':
 
+    # create a folder for the results if necessary
+    sc.set_root("/media/wirkert/data/Data/2016_02_02_IPCAI/")
+    sc.create_folders()
+
     # root folder there the data lies
-    logging.basicConfig(filename=os.path.join(sp.LOG_FOLDER,
+    logging.basicConfig(filename=os.path.join(sc.get_full_dir("LOG_FOLDER"),
                                  "liver" +
                                  str(datetime.datetime.now()) +
                                  '.log'), level=logging.INFO)
@@ -268,10 +270,7 @@ if __name__ == '__main__':
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)
 
-    # create a folder for the results if necessary
-    sp.create_folder_if_necessary(liver_results_path)
-
-    onlyfiles = get_image_files_from_folder(sp.LIVER_FOLDER)
+    onlyfiles = get_image_files_from_folder(sc.get_full_dir("LIVER_DATA"))
 
     first_invivo_image_files = filter(lambda image_name: "0 2014" in image_name,
                                       onlyfiles)

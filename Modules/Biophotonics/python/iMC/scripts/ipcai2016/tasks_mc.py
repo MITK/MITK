@@ -14,19 +14,18 @@ import luigi
 from scipy.interpolate import interp1d
 from sklearn.preprocessing import normalize
 
-import scriptpaths as sp
+import commons
 import mc.dfmanipulations as dfmani
 from msi.io.spectrometerreader import SpectrometerReader
-from msi.io.msireader import MsiReader
-from msi.normalize import NormalizeMean
-import msi.msimanipulations as msimani
+
+sc = commons.ScriptCommons()
 
 
 class SpectrometerFile(luigi.Task):
     input_file = luigi.Parameter()
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sp.SPECTROMETER_FOLDER,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("SPECTROMETER_FOLDER"),
                                               self.input_file))
 
 
@@ -37,7 +36,7 @@ class FilterTransmission(luigi.Task):
         return SpectrometerFile(self.input_file)
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sp.INTERMEDIATES_FOLDER,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"),
             "processed_transmission" + self.input_file))
 
     def run(self):
@@ -66,17 +65,17 @@ class JoinBatches(luigi.Task):
     df_prefix = luigi.Parameter()
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sp.INTERMEDIATES_FOLDER,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"),
                                               self.df_prefix + "_" +
                                               "all" + ".txt"))
 
     def run(self):
         # get all files in the search path
-        files = [f for f in os.listdir(sp.MC_DATA_FOLDER)
-                 if os.path.isfile(os.path.join(sp.MC_DATA_FOLDER, f))]
+        files = [f for f in os.listdir(sc.get_full_dir("MC_DATA_FOLDER"))
+                 if os.path.isfile(os.path.join(sc.get_full_dir("MC_DATA_FOLDER"), f))]
         # from these get only those who start with correct batch prefix
-        df_file_names = [os.path.join(sp.MC_DATA_FOLDER, f) for f in files
-                         if f.startswith(self.df_prefix)]
+        df_file_names = [os.path.join(sc.get_full_dir("MC_DATA_FOLDER"), f)
+                         for f in files if f.startswith(self.df_prefix)]
         # load these files
         dfs = [pd.read_csv(f, header=[0, 1]) for f in df_file_names]
         # now join them to one batch
@@ -94,7 +93,7 @@ class CameraBatch(luigi.Task):
         return JoinBatches(self.df_prefix)
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sp.INTERMEDIATES_FOLDER,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"),
                                               self.df_prefix +
                                               "_all_virtual_camera.txt"))
 
@@ -103,7 +102,7 @@ class CameraBatch(luigi.Task):
         df = pd.read_csv(self.input().path, header=[0, 1])
         # camera batch creation:
         dfmani.fold_by_sliding_average(df, 6)
-        dfmani.interpolate_wavelengths(df, sp.RECORDED_WAVELENGTHS)
+        dfmani.interpolate_wavelengths(df, sc.other["RECORDED_WAVELENGTHS"])
         # write it
         df.to_csv(self.output().path, index=False)
 
@@ -118,14 +117,14 @@ class SpectroCamBatch(luigi.Task):
     def requires(self):
         # all wavelengths must have been measured for transmission and stored in
         # wavelength.txt files (e.g. 470.txt)
-        filenames = ((sp.RECORDED_WAVELENGTHS * 10**9).astype(int)).astype(str)
+        filenames = ((sc.ohter["RECORDED_WAVELENGTHS"] * 10**9).astype(int)).astype(str)
         filenames = map(lambda name: FilterTransmission(name + ".txt"),
                         filenames)
 
         return JoinBatches(self.df_prefix), filenames
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sp.INTERMEDIATES_FOLDER,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"),
                                               self.df_prefix +
                                               "_all_spectrocam.txt"))
 
@@ -148,7 +147,7 @@ class SpectroCamBatch(luigi.Task):
                                         interpolated_filter)
             new_reflectances.append(folded_reflectance)
         new_reflectances = np.array(new_reflectances).T
-        dfmani.switch_reflectances(df, sp.RECORDED_WAVELENGTHS,
+        dfmani.switch_reflectances(df, sc.other["RECORDED_WAVELENGTHS"],
                                    new_reflectances)
         # write it
         df.to_csv(self.output().path, index=False)

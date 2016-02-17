@@ -13,7 +13,7 @@ import time
 import numpy as np
 import luigi
 
-import scriptpaths as sp
+import commons
 import mc.factories as mcfac
 from mc.sim import SimWrapper
 from mc.create_spectrum import create_spectrum
@@ -33,6 +33,9 @@ PATH_TO_MCML = "/home/wirkert/workspace/monteCarlo/gpumcml/fast-gpumcml/"
 EXEC_MCML = "gpumcml.sm_20"
 
 
+sc = commons.ScriptCommons()
+
+
 class CreateSpectraTask(luigi.Task):
     df_prefix = luigi.Parameter()
     batch_nr = luigi.IntParameter()
@@ -40,7 +43,7 @@ class CreateSpectraTask(luigi.Task):
     factory = luigi.Parameter()
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sp.MC_DATA_FOLDER,
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("MC_DATA_FOLDER"),
                                               self.df_prefix + "_" +
                                               str(self.batch_nr) + ".txt"))
 
@@ -91,7 +94,12 @@ class CreateSpectraTask(luigi.Task):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename=os.path.join(sp.LOG_FOLDER,
+
+    # create a folder for the results if necessary
+    sc.set_root("/media/wirkert/data/Data/2016_02_02_IPCAI/")
+    sc.create_folders()
+
+    logging.basicConfig(filename=os.path.join(sc.get_full_dir("LOG_FOLDER"),
                                  "calculate_spectra" +
                                  str(datetime.datetime.now()) +
                                  '.log'),
@@ -101,9 +109,6 @@ if __name__ == '__main__':
     logger = logging.getLogger()
     logger.addHandler(ch)
     luigi.interface.setup_interface_logging()
-
-    # create a folder for the results if necessary
-    sp.create_folder_if_necessary(sp.INTERMEDIATES_FOLDER)
 
     sch = luigi.scheduler.CentralPlannerScheduler()
     w = luigi.worker.Worker(scheduler=sch)

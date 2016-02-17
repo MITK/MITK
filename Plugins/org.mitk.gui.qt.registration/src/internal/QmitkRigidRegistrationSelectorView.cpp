@@ -167,7 +167,7 @@ m_MovingGeometry(nullptr), m_ImageGeometry(nullptr)
   m_Preset = new mitk::RigidRegistrationPreset();
   m_Preset->LoadPreset();
 
-  this->DoLoadRigidRegistrationPreset("Affine3DMutualInformation_LinearInterp");
+  this->DoLoadRigidRegistrationPreset("Affine3D_MattesMutualInf_LinearInterp");
 }
 
 QmitkRigidRegistrationSelectorView::~QmitkRigidRegistrationSelectorView()
@@ -277,15 +277,18 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       registration->SetFixedMask(fmimage);
     }
 
-    dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->SetFixedImage(dynamic_cast<mitk::Image*>(m_FixedNode->GetData()));
-    dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->SetMovingImage(dynamic_cast<mitk::Image*>(m_MovingNode->GetData()));
-    registration->SetOptimizerScales(dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->GetScales());
-    registration->SetTransform(dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->GetTransform() );
+    QmitkRigidRegistrationTransformsGUIBase* current_transform = dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget());
+    QmitkRigidRegistrationMetricsGUIBase* current_metric = dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget());
 
-    dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget())->SetMovingImage(dynamic_cast<mitk::Image*>(m_MovingNode->GetData()));
-    registration->SetMetric(dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget())->GetMetric());
+    current_transform->SetFixedImage( dynamic_cast<mitk::Image*>( m_FixedNode->GetData()) );
+    current_transform->SetMovingImage( dynamic_cast<mitk::Image*>( m_MovingNode->GetData()) );
+    registration->SetOptimizerScales( current_transform->GetScales() );
+    registration->SetTransform( current_transform->GetTransform() );
 
-    registration->SetOptimizer(dynamic_cast<QmitkRigidRegistrationOptimizerGUIBase*>(m_Controls.m_OptimizerWidgetStack->currentWidget())->GetOptimizer());
+    current_metric->SetMovingImage( dynamic_cast<mitk::Image*>( m_MovingNode->GetData()) );
+    registration->SetMetric( current_metric->GetMetric() );
+
+    registration->SetOptimizer( dynamic_cast<QmitkRigidRegistrationOptimizerGUIBase*>(m_Controls.m_OptimizerWidgetStack->currentWidget())->GetOptimizer() );
 
     double time(0.0);
     double tstart(0.0);
@@ -297,7 +300,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     }
     catch (itk::ExceptionObject e)
     {
-      MITK_INFO << "Caught exception: "<<e.GetDescription();
+      MITK_INFO("Qmitk.RigidRegistration.Selector") << "Caught exception: "<<e.GetDescription();
       QMessageBox::information( this, "Registration exception", e.GetDescription());
       mitk::ProgressBar::GetInstance()->Progress(20);
     }
@@ -532,6 +535,12 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
 {
   itk::Array<double> transformValues;
   transformValues = m_Preset->getTransformValues(presetName);
+
+  if( transformValues.size() == 0 )
+  {
+    MITK_ERROR("RigidRegistration.Selector.View") << "Failed to load preset : " << presetName;
+    return;
+  }
 
   m_Controls.m_TransformGroup->setChecked(true);
   m_Controls.m_TransformFrame->setVisible(true);

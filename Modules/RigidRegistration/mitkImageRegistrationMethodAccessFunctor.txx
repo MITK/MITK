@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 
 #include <itkLinearInterpolateImageFunction.h>
+#include <itkMultiResolutionImageRegistrationMethod.h>
 
 namespace mitk {
 
@@ -27,6 +28,9 @@ template<typename TPixel, unsigned int VImageDimension>
 void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixel, VImageDimension>* itkImage1,
                                                           ImageRegistrationMethod* method)
 {
+
+
+
   //convert mitk masks to itk masks
   typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
   typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
@@ -43,6 +47,7 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixe
     movingImageMask = ImageMaskType::New();
     movingImageMask->SetImage(maskImageCaster->GetOutput());
   }
+
   typename ImageMaskType::Pointer fixedImageMask;
   if(method->m_FixedMask.IsNotNull())
   {
@@ -54,12 +59,14 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixe
     fixedImageMask = ImageMaskType::New();
     fixedImageMask->SetImage(maskImageCaster->GetOutput());
   }
+
   // typedefs
   typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
   typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
   typedef typename itk::LinearInterpolateImageFunction<MovingImageType, double> InterpolatorType;
   typedef itk::NearestNeighborInterpolateImageFunction<MovingImageType, double> InterpolatorType2;
-  typedef typename itk::ImageRegistrationMethod<FixedImageType, MovingImageType> RegistrationType;
+  //typedef typename itk::ImageRegistrationMethod<FixedImageType, MovingImageType> RegistrationType;
+  typedef typename itk::MultiResolutionImageRegistrationMethod< FixedImageType, MovingImageType > RegistrationType;
   typedef typename itk::Transform< double, VImageDimension, VImageDimension > TransformType;
   typedef typename itk::MatrixOffsetTransformBase< double, VImageDimension, VImageDimension > MatrixTransformType;
   typedef typename TransformType::Pointer                TransformPointer;
@@ -100,6 +107,7 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixe
   }
   // the registration method
   typename RegistrationType::Pointer registration = RegistrationType::New();
+  registration->SetNumberOfLevels( method->m_MultiResolutionScales );
   registration->SetMetric(metric);
   registration->SetOptimizer(optimizer);
   registration->SetTransform(transform);
@@ -132,15 +140,30 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixe
     typename InterpolatorType2::Pointer interpolator = InterpolatorType2::New();
     registration->SetInterpolator(interpolator);
   }
+
+
   // registering command observer with the optimizer
+  unsigned int pyramid_observer_tag = 0;
   if (method->m_Observer.IsNotNull())
   {
     method->m_Observer->AddStepsToDo(20);
-    optimizer->AddObserver(itk::AnyEvent(), method->m_Observer);
-    registration->AddObserver(itk::AnyEvent(), method->m_Observer);
-    transform->AddObserver(itk::AnyEvent(), method->m_Observer);
+    optimizer->AddObserver(itk::IterationEvent(), method->m_Observer);
+    //registration->AddObserver(itk::IterationEvent(), method->m_Observer);
+    transform->AddObserver(itk::IterationEvent(), method->m_Observer);
+
+    typename mitk::RigidRegistrationPyramidObserver<RegistrationType>::Pointer pyramid_observer =
+        mitk::RigidRegistrationPyramidObserver<RegistrationType>::New();
+
+    pyramid_observer_tag = registration->AddObserver( itk::IterationEvent(), pyramid_observer );
   }
+
   registration->Update();
+
+  if( pyramid_observer_tag )
+  {
+    registration->RemoveObserver( pyramid_observer_tag );
+  }
+
   if (method->m_Observer.IsNotNull())
   {
     optimizer->RemoveAllObservers();
@@ -148,6 +171,7 @@ void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixe
     transform->RemoveAllObservers();
     method->m_Observer->SetRemainingProgress(15);
   }
+
   if (method->m_Observer.IsNotNull())
   {
     method->m_Observer->SetRemainingProgress(5);

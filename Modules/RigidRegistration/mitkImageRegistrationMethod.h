@@ -74,6 +74,8 @@ namespace mitk
 
     void SetOptimizer(itk::Object::Pointer optimizer);
 
+    void SetNumberOfLevels( unsigned int levels );
+
   protected:
     ImageRegistrationMethod();
     virtual ~ImageRegistrationMethod();
@@ -86,13 +88,15 @@ namespace mitk
     Image::Pointer m_FixedMask;
     Image::Pointer m_MovingMask;
 
-    virtual void GenerateOutputInformation() override{};
+    virtual void GenerateOutputInformation() override {}
 
   private:
     itk::Object::Pointer m_Transform;
     itk::Object::Pointer m_Metric;
     itk::Object::Pointer m_Optimizer;
     itk::Array<double> m_OptimizerScales;
+
+    unsigned int m_MultiResolutionScales;
   };
 }
 

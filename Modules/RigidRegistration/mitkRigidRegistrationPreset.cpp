@@ -95,6 +95,7 @@ namespace mitk {
       std::string transform = ReadXMLStringAttribut( "TRANSFORM", atts );
       double trans = atof(transform.c_str());
       transformValues[0] = trans;
+      MITK_DEBUG("RigidRegistration.Preset.StartElement ") << "Name tag: " << m_Name;
       transformValues = this->loadTransformValues(transformValues, trans, atts);
       m_TransformValues[m_Name] = transformValues;
     }
@@ -498,6 +499,8 @@ namespace mitk {
       double useMo = atof(useMoments.c_str());
       transformValues[11] = useMo;
     }
+
+    MITK_DEBUG("RigidRegistration.Preset.LoadValue ") << transformValues;
     return transformValues;
   }
 

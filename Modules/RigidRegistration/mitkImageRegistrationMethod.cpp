@@ -90,7 +90,8 @@ namespace mitk {
 
   void ImageRegistrationMethod::SetOptimizerScales(itk::Array<double> scales)
   {
-    m_OptimizerScales = scales;
+    m_OptimizerScales.set_size( scales.size() );
+    m_OptimizerScales.copy_in( scales.data_block() );
   }
 
   void ImageRegistrationMethod::SetNumberOfLevels(unsigned int levels)

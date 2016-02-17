@@ -372,7 +372,10 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation" );
 
   //add it to the undo controller
-  UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
+  UndoStackItem::IncCurrObjectEventId();
+  UndoStackItem::IncCurrGroupEventId();
+  UndoStackItem::ExecuteIncrement();
+  UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
 
   //clear the pointers as the operation are stored in the undocontroller and also deleted from there
   undoOperation = NULL;

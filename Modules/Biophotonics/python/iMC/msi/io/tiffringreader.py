@@ -15,15 +15,21 @@ from msi.io.reader import Reader
 from msi.msi import Msi
 
 
+
 class TiffRingReader(Reader):
     '''
     TODO SW: document and test
     '''
 
+    # static member to globally set resizing for all images read by the reader
+    # 1.0 for no resizing
+    RESIZE_FACTOR = 1.0
+
     def __init__(self):
         pass
 
-    def read(self, fileToRead, n, resize_factor=0.5, segmentation=None):
+    def read(self, fileToRead, n, resize_factor=None,
+             segmentation=None):
         """ read the msi from pngs.
         The fileToRead is the first file to read,
         then n files will be read to one msi from a
@@ -34,6 +40,9 @@ class TiffRingReader(Reader):
             tiff files + _seg.tiff. If this fails, no segmentation will be
             assumed
         """
+
+        if resize_factor is None:
+            resize_factor = TiffRingReader.RESIZE_FACTOR
 
         path, file_name = os.path.split(fileToRead)
         files = os.listdir(path)

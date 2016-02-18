@@ -163,11 +163,11 @@ small corrective changes. The following figure shows the usage of this tool:
 <br>
 \imageMacro{QmitkSegmentation_IMGIconFill.png,"Fill Tool",3.81}
 
-Left-click inside a segmentation with holes to completely fill all holes.
+Left-click inside a segmentation with holes to completely fill all holes (left-click outside a segmentation).
 
 \imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase Tool",3.79}
 
-This tool removes a connected part of pixels that form a segmentation. You may use it to remove so called islands (see picture) or to clear a whole slice at once (hold CTRL while clicking).
+This tool removes a connected part of pixels that form a segmentation. You may use it to remove so called islands (see picture) or to clear a whole slice at once (left-click outside a segmentation).
 
 \imageMacro{QmitkSegmentation_IMGIconLiveWire.png,"LiveWire Tool",3.01}
 

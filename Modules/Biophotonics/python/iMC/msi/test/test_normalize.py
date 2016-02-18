@@ -51,3 +51,24 @@ class TestNormalize(unittest.TestCase):
                                 desired_matrix,
                                 "msi correctly normalized by mean")
 
+    def test_normalizeMean_with_masked_elemnets(self):
+        original_shape = self.specialmsi.get_image().shape  # shape should stay
+        # set mask so it masks the special value
+        mask = np.zeros_like(self.specialmsi.get_image())
+        mask [2, 2, :] = 1
+        mask = mask.astype(bool)
+        masked_msi_image = np.ma.MaskedArray(self.specialmsi.get_image(),
+                                             mask=mask)
+        self.specialmsi.set_image(masked_msi_image)
+        desired_matrix = masked_msi_image / 15.0
+        # the same after normalization
+        mean_normalizer = norm.NormalizeMean()
+        mean_normalizer.normalize(self.specialmsi)
+
+        self.assertEqual(self.specialmsi.get_image().shape, original_shape,
+                         "shape not changed by normalization")
+        np.testing.assert_equal(self.specialmsi.get_image(),
+                                desired_matrix,
+                                "msi correctly normalized by mean")
+        np.testing.assert_equal(mask, self.specialmsi.get_image().mask)
+

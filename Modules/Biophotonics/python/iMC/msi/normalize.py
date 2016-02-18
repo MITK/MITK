@@ -39,8 +39,14 @@ class NormalizeMean(Normalize):
     def normalize(self, msi, norm="l1"):
         original_shape = msi.get_image().shape
         collapsed_image = collapse_image(msi.get_image())
+        # temporarily save mask, since scipy normalizer removes mask
+        is_masked_array = isinstance(msi.get_image(), np.ma.MaskedArray)
+        if is_masked_array:
+            mask = msi.get_image().mask
         normalizer = Normalizer(norm=norm)
         normalized_image = normalizer.transform(collapsed_image)
+        if is_masked_array:
+            normalized_image = np.ma.MaskedArray(normalized_image, mask=mask)
         msi.set_image(np.reshape(normalized_image, original_shape))
 
 

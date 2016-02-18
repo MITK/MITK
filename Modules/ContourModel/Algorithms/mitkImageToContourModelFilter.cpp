@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 
 #include <itkContourExtractor2DImageFilter.h>
+#include <itkConstantPadImageFilter.h>
 
 
 
@@ -106,8 +107,23 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
   typedef itk::PolyLineParametricPath<2> PolyLineParametricPath2D;
   typedef PolyLineParametricPath2D::VertexListType ContourPath;
 
+  typedef itk::ConstantPadImageFilter<ImageType, ImageType> PadFilterType;
+  typename PadFilterType::Pointer padFilter = PadFilterType::New();
+  typename ImageType::SizeType lowerExtendRegion;
+  lowerExtendRegion[0] = 1;
+  lowerExtendRegion[1] = 1;
+
+  typename ImageType::SizeType upperExtendRegion;
+  upperExtendRegion[0] = 1;
+  upperExtendRegion[1] = 1;
+
+  padFilter->SetInput(sliceImage);
+  padFilter->SetConstant(0);
+  padFilter->SetPadLowerBound(lowerExtendRegion);
+  padFilter->SetPadUpperBound(upperExtendRegion);
+
   typename ContourExtractor::Pointer contourExtractor = ContourExtractor::New();
-  contourExtractor->SetInput(sliceImage);
+  contourExtractor->SetInput(padFilter->GetOutput());
   contourExtractor->SetContourValue(0.5);
 
   contourExtractor->Update();
@@ -123,6 +139,9 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
     mitk::Point3D currentWorldPoint;
 
     mitk::ContourModel::Pointer contour = this->GetOutput(i);
+
+    if (contour.IsNull())
+      contour = mitk::ContourModel::New();
 
     for (unsigned int j = 0; j < currentPath->Size(); j++)
     {

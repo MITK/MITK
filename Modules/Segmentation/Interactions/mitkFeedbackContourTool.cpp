@@ -85,6 +85,7 @@ mitk::ContourModel* mitk::FeedbackContourTool::GetFeedbackContour()
 void mitk::FeedbackContourTool::SetFeedbackContour(ContourModel::Pointer contour)
 {
   m_FeedbackContour = contour;
+  m_FeedbackContourNode->SetData(m_FeedbackContour);
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)

@@ -295,7 +295,8 @@ void QmitkRigidRegistrationView::PresetSelectionChanged()
   {
     // reset preset view
     this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(false);
-    this->m_Controls.m_RigidRegistrationPresetBox->currentIndexChanged(0);
+    // THE QT5 solution : this->m_Controls.m_RigidRegistrationPresetBox->currentIndexChanged(0);
+    this->m_Controls.m_RigidRegistrationPresetBox->setCurrentIndex(0);
     this->m_PresetNotLoaded = true;
 
     // disable calculate button

@@ -25,8 +25,7 @@ class SpectrometerFile(luigi.Task):
     input_file = luigi.Parameter()
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sc.get_full_dir("SPECTROMETER_FOLDER"),
-                                              self.input_file))
+        return luigi.LocalTarget(self.input_file)
 
 
 class FilterTransmission(luigi.Task):
@@ -37,7 +36,7 @@ class FilterTransmission(luigi.Task):
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"),
-            "processed_transmission" + self.input_file))
+            "processed_transmission" + os.path.split(self.input_file)[1]))
 
     def run(self):
         reader = SpectrometerReader()
@@ -48,7 +47,8 @@ class FilterTransmission(luigi.Task):
         fi_image[wavelengths < 450 * 10 ** -9] = 0.0
         fi_image[wavelengths > 720 * 10 ** -9] = 0.0
         # filter elements farther away than +- 30nm
-        name_to_float = float(os.path.splitext(self.input_file)[0])
+        file_name = os.path.split(self.input_file)[1]
+        name_to_float = float(os.path.splitext(file_name)[0])
         fi_image[wavelengths < (name_to_float - 30) * 10 ** -9] = 0.0
         fi_image[wavelengths > (name_to_float + 30) * 10 ** -9] = 0.0
         # elements < 0 are set to 0.
@@ -117,7 +117,7 @@ class SpectroCamBatch(luigi.Task):
     def requires(self):
         # all wavelengths must have been measured for transmission and stored in
         # wavelength.txt files (e.g. 470.txt)
-        filenames = ((sc.ohter["RECORDED_WAVELENGTHS"] * 10**9).astype(int)).astype(str)
+        filenames = ((sc.other["RECORDED_WAVELENGTHS"] * 10**9).astype(int)).astype(str)
         filenames = map(lambda name: FilterTransmission(name + ".txt"),
                         filenames)
 

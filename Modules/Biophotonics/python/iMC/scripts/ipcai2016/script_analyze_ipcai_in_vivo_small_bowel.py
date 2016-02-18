@@ -18,6 +18,9 @@ import msi.normalize as norm
 from regression.estimation import estimate_image
 from tasks_common import *
 import commons
+from msi.io.tiffringreader import TiffRingReader
+
+TiffRingReader.RESIZE_FACTOR = 0.5
 
 sc = commons.ScriptCommons()
 

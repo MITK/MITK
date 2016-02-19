@@ -42,7 +42,7 @@ void QmitkXnatUploadFromDataStorageDialog::SetDataStorage(mitk::DataStorage *ds)
 
 void QmitkXnatUploadFromDataStorageDialog::OnUpload()
 {
-  this->done(UPLOAD);
+  this->done(QDialog::Accepted);
 }
 
 void QmitkXnatUploadFromDataStorageDialog::OnUploadSceneChecked()
@@ -51,7 +51,7 @@ void QmitkXnatUploadFromDataStorageDialog::OnUploadSceneChecked()
 
 void QmitkXnatUploadFromDataStorageDialog::OnCancel()
 {
-  this->done(CANCEL);
+  this->done(QDialog::Rejected);
 }
 
 void QmitkXnatUploadFromDataStorageDialog::OnMITKProjectFileNameEntered(const QString& /*text*/)

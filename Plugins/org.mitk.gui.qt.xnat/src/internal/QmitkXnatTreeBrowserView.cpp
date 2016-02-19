@@ -45,16 +45,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkXnatSubjectWidget.h>
 #include <QmitkXnatExperimentWidget.h>
 #include <QmitkXnatCreateObjectDialog.h>
+#include <QTimer>
 
 // Qt
 #include <QAction>
+#include <QClipboard>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QInputDialog>
-#include <QlayoutItem>
+#include <QLayoutItem>
 #include <QMenu>
 #include <QMessageBox>
 
@@ -66,13 +68,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Poco
 #include <Poco/Zip/Decompress.h>
 
-const std::string QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
+const QString QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
 m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
 m_TreeModel(new QmitkXnatTreeModel()),
 m_Tracker(0),
-m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", ""))
+m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Download Path", ""))
 {
   m_DataStorageServiceTracker.open();
 
@@ -178,10 +180,10 @@ void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
   if(!index.isValid()) return;
 
   ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
+  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject) != nullptr;
+  enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
 
-  ctkXnatFile* selectedXnatFile = dynamic_cast<ctkXnatFile*>(selectedXnatObject);
-
-  if (selectedXnatFile != nullptr)
+  if (enableDownload)
   {
     this->InternalFileDownload(index, true);
   }
@@ -192,8 +194,7 @@ void QmitkXnatTreeBrowserView::OnUploadFromDataStorage()
   QmitkXnatUploadFromDataStorageDialog dialog;
   dialog.SetDataStorage(this->GetDataStorage());
   int result = dialog.exec();
-
-  if (result == QmitkXnatUploadFromDataStorageDialog::UPLOAD)
+  if (result == QDialog::Accepted)
   {
     QList<mitk::DataNode*> nodes;
     nodes << dialog.GetSelectedNode().GetPointer();
@@ -212,7 +213,8 @@ void QmitkXnatTreeBrowserView::OnXnatNodeSelected(const QModelIndex& index)
 
   ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
 
-  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject);
+  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject) != nullptr;
+  enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
   m_Controls.btnXnatDownload->setEnabled(enableDownload);
 
   bool enableCreateFolder = dynamic_cast<ctkXnatProject*>(selectedXnatObject) != nullptr;
@@ -227,11 +229,21 @@ void QmitkXnatTreeBrowserView::OnXnatNodeSelected(const QModelIndex& index)
 void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 {
   if (!index.isValid()) return;
-  ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(index.data(Qt::UserRole).value<ctkXnatObject*>());
-  if (file != NULL)
+
+  ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
+  bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject) != nullptr;
+  enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
+  if (enableDownload)
   {
-    // If the selected node is a file, so show it in MITK
-    InternalFileDownload(index, true);
+    QMessageBox msgBox;
+    QString msg ("Do you want to download "+selectedXnatObject->name()+"?");
+    msgBox.setWindowTitle("MITK XNAT upload");
+    msgBox.setText(msg);
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    int result = msgBox.exec();
+    if (result == QMessageBox::Ok)
+      InternalFileDownload(index, true);
   }
 }
 
@@ -251,6 +263,8 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
     m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
 
     connect(session, SIGNAL(progress(QUuid,double)), this, SLOT(OnProgress(QUuid,double)));
+    connect(session, SIGNAL(sessionTimedOut()), this, SLOT(sessionTimedOutMsg()));
+    connect(session, SIGNAL(sessionAboutToBeTimedOut()), this, SLOT(sessionTimesOutSoonMsg()));
   }
 }
 
@@ -274,58 +288,91 @@ void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
   m_Controls.progressBar->setValue(currentProgress);
 }
 
+void QmitkXnatTreeBrowserView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+{
+  QString downloadPath = prefs->Get("Download Path", "");
+  QDir downloadDir (downloadPath);
+  if (downloadPath.length() != 0 && downloadDir.exists())
+    m_DownloadPath = downloadPath;
+}
+
 void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bool loadData)
 {
-  QVariant variant = m_TreeModel->data(index, Qt::UserRole);
-  if (variant.isValid())
+  if (!index.isValid())
+    return;
+
+  ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
+  if (xnatObject != nullptr)
   {
-    ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(variant.value<ctkXnatObject*>());
-    if (file != NULL)
+    // The path to the downloaded file
+    QString filePath;
+    QDir downloadPath (m_DownloadPath);
+    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Server Address", "");
+    bool isDICOM (false);
+
+    // If a scan was selected, downloading the contained DICOM folder as ZIP
+    ctkXnatScan* scan = dynamic_cast<ctkXnatScan*>(xnatObject);
+
+    if (scan != nullptr)
     {
-      QDir downDir(m_DownloadPath);
-      QString filePath = m_DownloadPath + file->name();
+      isDICOM = true;
+
+      if (!scan->isFetched())
+        scan->fetch();
+
+      QList<ctkXnatObject*> children = scan->children();
+
+      foreach (ctkXnatObject* obj, children)
+      {
+        if (obj->name() == "DICOM")
+        {
+          QString folderName = obj->resourceUri();
+          folderName.replace("/","_");
+          downloadPath = m_DownloadPath + folderName;
+          this->InternalDICOMDownload(obj, downloadPath);
+          serverURL = obj->resourceUri();
+        }
+      }
+    }
+    else
+    {
+      ctkXnatFile* file = dynamic_cast<ctkXnatFile*>(xnatObject);
+
+      if (file == nullptr)
+      {
+        MITK_ERROR << "Selected XNAT object not downloadable!";
+        return;
+      }
+
+      filePath = m_DownloadPath + file->name();
 
       // Checking if the file exists already
-      if (downDir.exists(file->name()))
+      if (downloadPath.exists(file->name()))
       {
         MITK_INFO << "File '" << file->name().toStdString() << "' already exists!";
+        serverURL = file->parent()->resourceUri();
       }
       else
       {
         if (file->property("collection") == QString("DICOM"))
         {
+          isDICOM = true;
           ctkXnatObject* parent = file->parent();
-
-          filePath = m_DownloadPath + parent->property("label") + ".zip";
-
-          m_Controls.groupBox->setTitle("Downloading DICOM series...");
-          m_Controls.groupBox->show();
-          m_Controls.progressBar->setValue(0);
-
-          parent->download(filePath);
-
-          std::ifstream in(filePath.toStdString().c_str(), std::ios::binary);
-          poco_assert(in);
-
-          // decompress to XNAT_DOWNLOAD dir
-          Poco::Zip::Decompress dec(in, Poco::Path(m_DownloadPath.toStdString()));
-          dec.decompressAllFiles();
-
-          in.close();
-          QFile::remove(filePath);
+          QString folderName = parent->resourceUri();
+          folderName.replace("/","_");
+          downloadPath = m_DownloadPath + folderName;
+          this->InternalDICOMDownload(parent, downloadPath);
+          serverURL = parent->resourceUri();
         }
         else
         {
-          MITK_INFO << "Download started ...";
-
-          m_Controls.groupBox->setTitle("Downloading file...");
-          m_Controls.groupBox->show();
-          m_Controls.progressBar->setValue(0);
+          this->SetStatusInformation("Downloading file " + file->name());
 
           file->download(filePath);
+          serverURL = file->parent()->resourceUri();
 
           // Checking if the file exists now
-          if (downDir.exists(file->name()))
+          if (downloadPath.exists(file->name()))
           {
             MITK_INFO << "Download of " << file->name().toStdString() << " completed!";
             QMessageBox msgBox;
@@ -346,54 +393,94 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           }
         }
       }
-      if (downDir.exists(file->name()) || file->property("collection") == "DICOM")
-      {
-        if (loadData)
-        {
-          if (file->property("collection") == "DICOM")
-          {
-            // Search for the downloaded file an its file path
-            QDirIterator it(m_DownloadPath, QStringList() << file->name(), QDir::Files, QDirIterator::Subdirectories);
-            while (it.hasNext()) {
-              it.next();
-              filePath = it.filePath();
-            }
-          }
-
-          if (filePath.isEmpty())
-          {
-            MITK_INFO << "Decompressing failed!";
-            return;
-          }
-          else if (!QFile(filePath).exists())
-          {
-            MITK_INFO << "Decompressing failed!";
-            return;
-          }
-
-          mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
-          mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
-          QStringList list;
-          list << filePath;
-          try
-          {
-            QmitkIOUtil::Load(list, *dataStorage);
-          }
-          catch (const mitk::Exception& e)
-          {
-            MITK_INFO << e;
-            return;
-          }
-          mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
-            dsService->GetDataStorage()->GetDataStorage());
-        }
-      }
     }
-    else
+    if (loadData)
     {
-      MITK_INFO << "Selection was not a file!";
+      QFileInfoList fileList;
+      if (isDICOM)
+      {
+        fileList = downloadPath.entryInfoList(QDir::Files);
+      }
+      else
+      {
+        QFileInfo fileInfo(filePath);
+        fileList << fileInfo;
+      }
+
+      mitk::StringProperty::Pointer xnatURL = mitk::StringProperty::New(serverURL.toStdString());
+      this->InternalOpenFiles(fileList, xnatURL);
     }
   }
+}
+
+void QmitkXnatTreeBrowserView::InternalDICOMDownload(ctkXnatObject *obj, QDir &DICOMDirPath)
+{
+
+  QString filePath = m_DownloadPath + obj->property("label") + ".zip";
+
+  this->SetStatusInformation("Downloading DICOM series " + obj->parent()->name());
+  obj->download(filePath);
+
+  std::ifstream in(filePath.toStdString().c_str(), std::ios::binary);
+  poco_assert(in);
+
+  // decompress to XNAT_DOWNLOAD dir
+  Poco::Zip::Decompress dec(in, Poco::Path(DICOMDirPath.path().toStdString()), true);
+  dec.decompressAllFiles();
+
+  in.close();
+  QFile::remove(filePath);
+
+  // Checking if the file exists now
+  if (DICOMDirPath.exists())
+  {
+    MITK_INFO << "Download of DICOM series " << obj->parent()->name().toStdString() << " completed!";
+    QMessageBox msgBox;
+    msgBox.setText("Download of DICOM series " + obj->parent()->name() + " completed!");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
+    m_Controls.groupBox->hide();
+  }
+  else
+  {
+    MITK_INFO << "Download of DICOM series " << obj->parent()->name().toStdString() << " failed!";
+    QMessageBox msgBox;
+    msgBox.setText("Download of DICOM series " + obj->parent()->name() + " failed!");
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+    m_Controls.groupBox->hide();
+  }
+}
+
+void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList, mitk::StringProperty::Pointer xnatURL)
+{
+
+  if (fileList.isEmpty())
+  {
+    MITK_WARN << "No files available for laoding!";
+    return;
+  }
+
+  mitk::IDataStorageService* dsService = m_DataStorageServiceTracker.getService();
+  mitk::DataStorage::Pointer dataStorage = dsService->GetDataStorage()->GetDataStorage();
+  QStringList list;
+  list << fileList.at(0).absoluteFilePath();
+  try
+  {
+    mitk::DataStorage::SetOfObjects::Pointer nodes = QmitkIOUtil::Load(list, *dataStorage);
+    if (nodes->size() == 1)
+    {
+      mitk::DataNode* node = nodes->at(0);
+      node->SetProperty("xnat.url", xnatURL);
+    }
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_INFO << e;
+    return;
+  }
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(
+        dsService->GetDataStorage()->GetDataStorage());
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuDownloadFile()
@@ -479,6 +566,28 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
   }
 }
 
+void QmitkXnatTreeBrowserView::OnContextMenuCopyXNATUrlToClipboard()
+{
+  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  ctkXnatObject* currentXnatObject = m_TreeModel->xnatObject(index);
+  if (currentXnatObject != nullptr)
+  {
+    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Server Address", "");
+    serverURL.append(currentXnatObject->resourceUri());
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(serverURL);
+  }
+}
+
+void QmitkXnatTreeBrowserView::OnContextMenuRefreshItem()
+{
+  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  if (index.isValid())
+  {
+    this->m_TreeModel->refresh(index);
+  }
+}
+
 void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& droppedNodes, ctkXnatObject* parentObject, const QModelIndex& parentIndex)
 {
   if (parentObject == nullptr)
@@ -534,6 +643,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
       msgbox.setText("Could not upload file! File-type not supported");
       msgbox.setIcon(QMessageBox::Critical);
       msgbox.exec();
+      return;
     }
 
     xnatFile->setName(fileName);
@@ -555,9 +665,8 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     xnatFile->setLocalFilePath(fileName);
 
     this->InternalFileUpload(xnatFile);
-    MITK_INFO << "XNAT-OBJECT: "<<m_TreeModel->xnatObject(parentIndex)->name();
+    QFile::remove(fileName);
 
-//    m_TreeModel->addChildNode(parentIndex, xnatFile);
     m_TreeModel->refresh(parentIndex);
 
     // The filename for uploading
@@ -578,14 +687,23 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     //          mitk::IOUtil::SaveSurface(surface, dir.path().toStdString());
     //      }
 //    this->uploadFileToXnat(xnatFile, dir.path());
-
-    // TODO delete file!!!
   }
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
 {
   m_ContextMenu->clear();
+
+  QAction* actRefreshItem = new QAction("Refresh", m_ContextMenu);
+  m_ContextMenu->addAction(actRefreshItem);
+  connect(actRefreshItem, SIGNAL(triggered()), this, SLOT(OnContextMenuRefreshItem()));
+  m_ContextMenu->popup(QCursor::pos());
+
+  QAction* actGetXNATURL = new QAction("Copy XNAT URL to clipboard", m_ContextMenu);
+  m_ContextMenu->addAction(actGetXNATURL);
+  connect(actGetXNATURL, SIGNAL(triggered()), this, SLOT(OnContextMenuCopyXNATUrlToClipboard()));
+  m_ContextMenu->addSeparator();
+
   QModelIndex index = m_Controls.treeView->indexAt(pos);
 
   ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
@@ -827,4 +945,49 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
       UpdateSession(session);
     }
   }
+}
+
+void QmitkXnatTreeBrowserView::SetStatusInformation(const QString& text)
+{
+  m_Controls.groupBox->setTitle(text);
+  m_Controls.progressBar->setValue(0);
+  m_Controls.groupBox->show();
+}
+
+void QmitkXnatTreeBrowserView::sessionTimedOutMsg()
+{
+  ctkXnatSession* session = qobject_cast<ctkXnatSession*>(QObject::sender());
+
+  if (session == nullptr)
+    return;
+
+  ctkXnatDataModel* dataModel = session->dataModel();
+  m_TreeModel->removeDataModel(dataModel);
+  m_Controls.treeView->reset();
+  session->close();
+  m_Controls.labelError->show();
+  QMessageBox::warning(m_Controls.treeView, "Session Timeout", "The session timed out.");
+}
+
+void QmitkXnatTreeBrowserView::sessionTimesOutSoonMsg()
+{
+  ctkXnatSession* session = qobject_cast<ctkXnatSession*>(QObject::sender());
+
+  if (session == nullptr)
+    return;
+
+  QMessageBox msgBox;
+  msgBox.setIcon(QMessageBox::Warning);
+  msgBox.setWindowTitle("Session Timeout Soon");
+  msgBox.setText("The session will time out in 1 minute.\nDo you want to renew the session?");
+  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+  msgBox.setDefaultButton(QMessageBox::No);
+  msgBox.show();
+  QTimer* timer = new QTimer(this);
+  timer->start(60000);
+  this->connect(timer, SIGNAL(timeout()), &msgBox, SLOT(reject()));
+  if (msgBox.exec() == QMessageBox::Yes){
+    session->renew();
+  }
+  timer->stop();
 }

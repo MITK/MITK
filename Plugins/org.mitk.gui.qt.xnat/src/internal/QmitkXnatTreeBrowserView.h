@@ -35,7 +35,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIDataStorageService.h>
 #include <ctkServiceTracker.h>
 
+#include <berryIBerryPreferences.h>
+
 class QMenu;
+
 
 /*!
 \brief QmitkXnatTreeBrowserView
@@ -56,7 +59,7 @@ public:
   QmitkXnatTreeBrowserView();
   ~QmitkXnatTreeBrowserView();
 
-  static const std::string VIEW_ID;
+  static const QString VIEW_ID;
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
@@ -78,6 +81,8 @@ protected slots:
   void OnContextMenuUploadFile();
   void OnContextMenuCreateNewSubject();
   void OnContextMenuCreateNewExperiment();
+  void OnContextMenuCopyXNATUrlToClipboard();
+  void OnContextMenuRefreshItem();
 
   void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *, const QModelIndex &parentIndex);
 
@@ -86,6 +91,9 @@ protected slots:
   void itemSelected(const QModelIndex& index);
 
   void OnUploadFromDataStorage();
+
+  void sessionTimedOutMsg();
+  void sessionTimesOutSoonMsg();
 
 protected:
 
@@ -99,9 +107,17 @@ private slots:
   void OnCreateResourceFolder();
 
 private:
+
+  void OnPreferencesChanged(const berry::IBerryPreferences*) override;
+
   void InternalFileDownload(const QModelIndex& index, bool loadData);
+  void InternalDICOMDownload(ctkXnatObject* obj, QDir &DICOMDirPath);
   void InternalFileUpload(ctkXnatFile *file);
   ctkXnatResource* InternalAddResourceFolder(ctkXnatObject* parent);
+
+  void InternalOpenFiles(const QFileInfoList&, mitk::StringProperty::Pointer xnatURL);
+
+  void SetStatusInformation(const QString&);
 
   berry::QtSelectionProvider::Pointer m_SelectionProvider;
   void SetSelectionProvider() override;

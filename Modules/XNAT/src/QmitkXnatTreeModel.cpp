@@ -26,6 +26,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatResource.h>
 #include <ctkXnatResourceFolder.h>
 #include <ctkXnatSubject.h>
+#include <ctkXnatFile.h>
+#include <ctkXnatResourceCatalogXmlParser.h>
+#include <ctkXnatScan.h>
+#include <ctkXnatScanFolder.h>
 
 QmitkXnatTreeModel::QmitkXnatTreeModel ()
   : ctkXnatTreeModel()
@@ -51,7 +55,7 @@ QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
     }
     else if(dynamic_cast<ctkXnatProject*>(xnatObject))
     {
-      path = ":/xnat/project.ico";
+      path = ":/xnat/project.png";
     }
     else if(dynamic_cast<ctkXnatSubject*>(xnatObject))
     {
@@ -60,6 +64,26 @@ QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
     else if(dynamic_cast<ctkXnatExperiment*>(xnatObject))
     {
       path = ":/xnat/experiment.ico";
+    }
+    else if (dynamic_cast<ctkXnatResourceFolder*>(xnatObject))
+    {
+      path = ":/xnat/folder.ico";
+    }
+    else if (dynamic_cast<ctkXnatResource*>(xnatObject))
+    {
+      path = ":/xnat/resource.png";
+    }
+    else if (dynamic_cast<ctkXnatScanFolder*>(xnatObject))
+    {
+      path = ":/xnat/folder.ico";
+    }
+    else if (dynamic_cast<ctkXnatScan*>(xnatObject))
+    {
+      path = ":/xnat/scan.png";
+    }
+    else if (dynamic_cast<ctkXnatFile*>(xnatObject))
+    {
+      path = ":/xnat/file.png";
     }
     return QIcon(path);
   }
@@ -113,4 +137,87 @@ Qt::ItemFlags QmitkXnatTreeModel::flags(const QModelIndex &index) const
   }
   else
     return defaultFlags;
+}
+
+ctkXnatObject* QmitkXnatTreeModel::InternalGetXnatObjectFromUrl(const QString & xnatObjectType, const QString & url,
+                                                                ctkXnatObject* parent)
+{
+  // 1. Find project
+  int start = url.lastIndexOf(xnatObjectType);
+  if (start == -1)
+    return nullptr;
+
+  start += xnatObjectType.length();
+  int length = url.indexOf("/",start);
+  length -= start;
+
+  parent->fetch();
+  QList<ctkXnatObject*> children = parent->children();
+  foreach (ctkXnatObject* child, children)
+  {
+    if(url.indexOf(child->resourceUri()) != -1)
+    {
+      return child;
+    }
+  }
+  return nullptr;
+}
+
+ctkXnatObject* QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString& url)
+{
+  QModelIndex index = this->index(0,0,QModelIndex());
+  ctkXnatObject* currentXnatObject = nullptr;
+  currentXnatObject = this->xnatObject(index);
+  if (currentXnatObject != nullptr)
+  {
+    // 1. Find project
+    ctkXnatObject* project = nullptr;
+    project = this->InternalGetXnatObjectFromUrl("projects/", url, currentXnatObject);
+
+    // 2. Find subject
+    ctkXnatObject* subject = nullptr;
+    if (project != nullptr)
+    {
+      currentXnatObject = project;
+      subject = this->InternalGetXnatObjectFromUrl("subjects/", url, project);
+    }
+
+    // 3. Find experiment
+    ctkXnatObject* experiment = nullptr;
+    if (subject != nullptr)
+    {
+      currentXnatObject = subject;
+      experiment = this->InternalGetXnatObjectFromUrl("experiments/", url, subject);
+    }
+
+    // 4. Find scan
+    ctkXnatObject* scan = nullptr;
+    if (experiment != nullptr)
+    {
+      currentXnatObject = experiment;
+      scan = this->InternalGetXnatObjectFromUrl("scans/", url, experiment);
+    }
+
+    if (scan != nullptr)
+    {
+      scan->fetch();
+      QList<ctkXnatObject*> scans = scan->children();
+      foreach (ctkXnatObject* child, scans)
+      {
+        if (url.indexOf(child->resourceUri()) != -1)
+        {
+          return child;
+        }
+      }
+    }
+
+    currentXnatObject->fetch();
+    QList<ctkXnatObject*> bla = currentXnatObject->children();
+    foreach (ctkXnatObject* child, bla)
+    {
+      if (child->name() == "Resources")
+        return child;
+    }
+  }
+  return nullptr;
 }

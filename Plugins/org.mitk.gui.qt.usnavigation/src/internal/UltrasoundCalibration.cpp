@@ -432,13 +432,20 @@ void UltrasoundCalibration::OnStartPlusCalibration()
   {
     MITK_INFO << "Tracking Server could not open its connection";
   }
-
-  //Switch active tab to PLUS Calibration page
-  m_Controls.m_ToolBox->setItemEnabled(1, true);
-  m_Controls.m_ToolBox->setCurrentIndex(1);
-  m_Controls.m_GetCalibrationFromPLUS->setEnabled(true);
-  m_Controls.m_StartStreaming->setEnabled(false);
-  m_Controls.m_SavePlusCalibration->setEnabled(false);
+  if (m_USMessageProvider->IsCommunicating() && m_TrackingMessageProvider->IsCommunicating())
+  {
+    m_Controls.m_StartPlusCalibrationButton->setEnabled(false);
+    m_Controls.m_GetCalibrationFromPLUS->setEnabled(true);
+    m_Controls.m_StartStreaming->setEnabled(false);
+    m_Controls.m_SavePlusCalibration->setEnabled(false);
+    m_Controls.m_SetupStatus->setStyleSheet("QLabel { color : green; }");
+    m_Controls.m_SetupStatus->setText("Setup successfull you can now connect PLUS");
+  }
+  else
+  {
+    m_Controls.m_SetupStatus->setStyleSheet("QLabel { color : red; }");
+    m_Controls.m_SetupStatus->setText("Something went wrong. Please try again");
+  }
 }
 
 void UltrasoundCalibration::OnStopPlusCalibration()
@@ -472,7 +479,8 @@ void UltrasoundCalibration::OnStopPlusCalibration()
   }
   m_Controls.m_GotCalibrationLabel->setText("");
   m_Controls.m_ConnectionStatus->setText("");
-  this->OnStopCalibrationProcess();
+  m_Controls.m_SetupStatus->setText("");
+  m_Controls.m_StartPlusCalibrationButton->setEnabled(true);
 }
 
 void UltrasoundCalibration::OnNewConnection()

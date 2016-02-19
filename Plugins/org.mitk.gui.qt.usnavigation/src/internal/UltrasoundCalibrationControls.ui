@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>333</width>
+    <width>374</width>
     <height>923</height>
    </rect>
   </property>
@@ -39,8 +39,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>200</width>
-        <height>86</height>
+        <width>356</width>
+        <height>824</height>
        </rect>
       </property>
       <attribute name="label">
@@ -60,16 +60,6 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="m_StartPlusCalibrationButton">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Calibrate Selected Device with PLUS</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="m_SpatialCalibration">
@@ -77,7 +67,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>315</width>
+        <width>356</width>
         <height>824</height>
        </rect>
       </property>
@@ -87,14 +77,14 @@
       <widget class="QTabWidget" name="tabWidget">
        <property name="geometry">
         <rect>
-         <x>-10</x>
-         <y>0</y>
-         <width>341</width>
-         <height>841</height>
+         <x>0</x>
+         <y>10</y>
+         <width>351</width>
+         <height>831</height>
         </rect>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="m_Spacing">
         <attribute name="title">
@@ -485,7 +475,7 @@ p, li { white-space: pre-wrap; }
            <x>10</x>
            <y>10</y>
            <width>301</width>
-           <height>201</height>
+           <height>241</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -510,10 +500,11 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Start fCal with the EchoTrackCalibration Config file&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Connect fcal to MITK, once it connected successfully you can click the &amp;quot;Start Streaming&amp;quot; Button below&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Now follow the steps in fCal and don't forget to save the Calibration in the end&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. Finish fCal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Setup the Connection to PLUS&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Start fCal with the EchoTrackCalibration Config file&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Connect fcal to MITK, once it connected successfully you can click the &amp;quot;Start Streaming&amp;quot; Button below&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. Now follow the steps in fCal and don't forget to save the Calibration in the end&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;5. Finish fCal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -554,9 +545,9 @@ p, li { white-space: pre-wrap; }
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>230</y>
+           <y>270</y>
            <width>301</width>
-           <height>251</height>
+           <height>281</height>
           </rect>
          </property>
          <property name="title">
@@ -569,7 +560,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>30</y>
+            <y>90</y>
             <width>299</width>
             <height>23</height>
            </rect>
@@ -585,7 +576,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>90</y>
+            <y>140</y>
             <width>299</width>
             <height>23</height>
            </rect>
@@ -601,7 +592,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>150</y>
+            <y>180</y>
             <width>299</width>
             <height>23</height>
            </rect>
@@ -614,7 +605,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>210</y>
+            <y>220</y>
             <width>299</width>
             <height>23</height>
            </rect>
@@ -629,10 +620,10 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="geometry">
            <rect>
-            <x>6</x>
-            <y>10</y>
-            <width>331</width>
-            <height>20</height>
+            <x>0</x>
+            <y>60</y>
+            <width>291</width>
+            <height>21</height>
            </rect>
           </property>
           <property name="text">
@@ -642,10 +633,42 @@ p, li { white-space: pre-wrap; }
          <widget class="QLabel" name="m_GotCalibrationLabel">
           <property name="geometry">
            <rect>
-            <x>6</x>
+            <x>0</x>
             <y>120</y>
             <width>281</width>
-            <height>20</height>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="m_StartPlusCalibrationButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>30</y>
+            <width>301</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Setup PLUS Connection</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="m_SetupStatus">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>10</y>
+            <width>291</width>
+            <height>21</height>
            </rect>
           </property>
           <property name="text">
@@ -661,8 +684,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>356</width>
+        <height>824</height>
        </rect>
       </property>
       <attribute name="label">

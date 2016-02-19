@@ -69,5 +69,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.xnat:OFF
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
-  org.mitk.gui.qt.igttrackingsemiautomaticmeasurement:OFF
+  org.mitk.gui.qt.igt.app.hummelprotocolmeasurements:OFF
 )

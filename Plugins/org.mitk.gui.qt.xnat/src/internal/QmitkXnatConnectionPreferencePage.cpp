@@ -40,12 +40,10 @@ using namespace berry;
 QmitkXnatConnectionPreferencePage::QmitkXnatConnectionPreferencePage()
   : m_Control(0)
 {
-
 }
 
-void QmitkXnatConnectionPreferencePage::Init(berry::IWorkbench::Pointer )
+void QmitkXnatConnectionPreferencePage::Init(berry::IWorkbench::Pointer)
 {
-
 }
 
 void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
@@ -65,14 +63,14 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
     session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
       mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
-  catch(std::invalid_argument)
+  catch (std::invalid_argument)
   {
     session = 0;
   }
 
-  if(session != 0)
+  if (session != 0)
   {
-    if(session->isOpen())
+    if (session->isOpen())
     {
       m_Controls.testConnectionButton->setText("Disconnect");
     }
@@ -89,7 +87,7 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
   const QRegExpValidator *hostV = new QRegExpValidator(hostRx, parent);
   m_Controls.inHostAddress->setValidator(hostV);
 
-  connect( m_Controls.testConnectionButton, SIGNAL(clicked()), this, SLOT(ToggleConnection()) );
+  connect(m_Controls.testConnectionButton, SIGNAL(clicked()), this, SLOT(ToggleConnection()));
 
   connect(m_Controls.inHostAddress, SIGNAL(editingFinished()), this, SLOT(UrlChanged()));
   connect(m_Controls.inDownloadPath, SIGNAL(editingFinished()), this, SLOT(DownloadPathChanged()));
@@ -104,10 +102,10 @@ QWidget* QmitkXnatConnectionPreferencePage::GetQtControl() const
 
 bool QmitkXnatConnectionPreferencePage::PerformOk()
 {
-  if(!UserInformationEmpty())
+  if (!UserInformationEmpty())
   {
     IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
-    if(_XnatConnectionPreferencesNode.IsNotNull())
+    if (_XnatConnectionPreferencesNode.IsNotNull())
     {
       _XnatConnectionPreferencesNode->Put(m_Controls.hostAddressLabel->text(), m_Controls.inHostAddress->text());
       _XnatConnectionPreferencesNode->Put(m_Controls.portLabel->text(), m_Controls.inPort->text());
@@ -130,7 +128,6 @@ bool QmitkXnatConnectionPreferencePage::PerformOk()
 
 void QmitkXnatConnectionPreferencePage::PerformCancel()
 {
-
 }
 
 bool QmitkXnatConnectionPreferencePage::UserInformationEmpty()
@@ -138,23 +135,23 @@ bool QmitkXnatConnectionPreferencePage::UserInformationEmpty()
   // To check empty QLineEdits in the following
   QString errString;
 
-  if(m_Controls.inHostAddress->text().isEmpty())
+  if (m_Controls.inHostAddress->text().isEmpty())
   {
     errString += "Server Address is empty.\n";
   }
 
-  if(m_Controls.inUsername->text().isEmpty())
+  if (m_Controls.inUsername->text().isEmpty())
   {
     errString += "Username is empty.\n";
   }
 
-  if(m_Controls.inPassword->text().isEmpty())
+  if (m_Controls.inPassword->text().isEmpty())
   {
     errString += "Password is empty.\n";
   }
 
   // if something is empty
-  if(!errString.isEmpty())
+  if (!errString.isEmpty())
   {
     m_Controls.testConnectionLabel->setStyleSheet("QLabel { color: red; }");
     m_Controls.testConnectionLabel->setText("Connecting failed.\n" + errString);
@@ -169,7 +166,7 @@ bool QmitkXnatConnectionPreferencePage::UserInformationEmpty()
 void QmitkXnatConnectionPreferencePage::Update()
 {
   IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
-  if(_XnatConnectionPreferencesNode.IsNotNull())
+  if (_XnatConnectionPreferencesNode.IsNotNull())
   {
     m_Controls.inHostAddress->setText(_XnatConnectionPreferencesNode->Get(
       m_Controls.hostAddressLabel->text(), m_Controls.inHostAddress->text()));
@@ -189,15 +186,15 @@ void QmitkXnatConnectionPreferencePage::UrlChanged()
   m_Controls.inHostAddress->setStyleSheet("QLineEdit { background-color: white; }");
   QString str = m_Controls.inHostAddress->text();
 
-  while(str.endsWith("/"))
+  while (str.endsWith("/"))
   {
-    str = str.left(str.length()-1);
+    str = str.left(str.length() - 1);
   }
 
   m_Controls.inHostAddress->setText(str);
 
   QUrl url(m_Controls.inHostAddress->text());
-  if(!url.isValid())
+  if (!url.isValid())
   {
     m_Controls.inHostAddress->setStyleSheet("QLineEdit { background-color: red; }");
   }
@@ -207,15 +204,15 @@ void QmitkXnatConnectionPreferencePage::DownloadPathChanged()
 {
   m_Controls.inDownloadPath->setStyleSheet("QLineEdit { background-color: white; }");
   QString downloadPath = m_Controls.inDownloadPath->text();
-  if(!downloadPath.isEmpty())
+  if (!downloadPath.isEmpty())
   {
-    if (downloadPath.lastIndexOf("/") != downloadPath.size()-1)
+    if (downloadPath.lastIndexOf("/") != downloadPath.size() - 1)
     {
       downloadPath.append("/");
       m_Controls.inDownloadPath->setText(downloadPath);
     }
     QFileInfo path(m_Controls.inDownloadPath->text());
-    if(!path.isDir())
+    if (!path.isDir())
     {
       m_Controls.inDownloadPath->setStyleSheet("QLineEdit { background-color: red; }");
     }
@@ -231,9 +228,9 @@ void QmitkXnatConnectionPreferencePage::ToggleConnection()
     session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
       mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
-  catch(std::invalid_argument)
+  catch (std::invalid_argument)
   {
-    if(!UserInformationEmpty())
+    if (!UserInformationEmpty())
     {
       PerformOk();
 
@@ -243,13 +240,13 @@ void QmitkXnatConnectionPreferencePage::ToggleConnection()
     }
   }
 
-  if(session != 0 && session->isOpen())
+  if (session != 0 && session->isOpen())
   {
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
     m_Controls.testConnectionButton->setText("Connect");
     m_Controls.testConnectionLabel->clear();
   }
-  else if(session != 0 && !session->isOpen())
+  else if (session != 0 && !session->isOpen())
   {
     m_Controls.testConnectionButton->setEnabled(false);
 
@@ -261,14 +258,14 @@ void QmitkXnatConnectionPreferencePage::ToggleConnection()
       m_Controls.testConnectionLabel->setStyleSheet("QLabel { color: green; }");
       m_Controls.testConnectionLabel->setText("Connecting successful.");
     }
-    catch(const ctkXnatAuthenticationException& auth)
+    catch (const ctkXnatAuthenticationException& auth)
     {
       m_Controls.testConnectionLabel->setStyleSheet("QLabel { color: red; }");
       m_Controls.testConnectionLabel->setText("Connecting failed:\nAuthentication error.");
       MITK_INFO << auth.message().toStdString();
       mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
     }
-    catch(const ctkException& e)
+    catch (const ctkException& e)
     {
       m_Controls.testConnectionLabel->setStyleSheet("QLabel { color: red; }");
       m_Controls.testConnectionLabel->setText("Connecting failed:\nInvalid Server Adress");

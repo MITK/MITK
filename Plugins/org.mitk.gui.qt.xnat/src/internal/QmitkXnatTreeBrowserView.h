@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatSession.h"
 
 // ctkXnatWidget
-#include "ctkXnatTreeModel.h"
+#include "QmitkXnatTreeModel.h"
 
 // MitkXNAT Module
 #include "mitkXnatSessionTracker.h"
@@ -60,7 +60,7 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  protected slots:
+protected slots:
 
   /// \brief Opens or reuses the xnat editor with the activated node as root item.
   void OnActivatedNode(const QModelIndex& index);
@@ -71,10 +71,21 @@ public:
   /// \brief Cleans the tree model
   void CleanTreeModel(ctkXnatSession* session);
 
-  void NodeTableViewContextMenuRequested(const QPoint & pos);
-
+  void OnContextMenuRequested(const QPoint & pos);
   void OnContextMenuDownloadAndOpenFile();
   void OnContextMenuDownloadFile();
+  void OnContextMenuCreateResourceFolder();
+  void OnContextMenuUploadFile();
+  void OnContextMenuCreateNewSubject();
+  void OnContextMenuCreateNewExperiment();
+
+  void OnUploadResource(const QList<mitk::DataNode*>& , ctkXnatObject *, const QModelIndex &parentIndex);
+
+  void OnProgress(QUuid, double);
+
+  void itemSelected(const QModelIndex& index);
+
+  void OnUploadFromDataStorage();
 
 protected:
 
@@ -82,18 +93,26 @@ protected:
 
   Ui::QmitkXnatTreeBrowserViewControls m_Controls;
 
-private:
+private slots:
+  void OnXnatNodeSelected(const QModelIndex &index);
+  void OnDownloadSelectedXnatFile();
+  void OnCreateResourceFolder();
 
+private:
   void InternalFileDownload(const QModelIndex& index, bool loadData);
+  void InternalFileUpload(ctkXnatFile *file);
+  ctkXnatResource* InternalAddResourceFolder(ctkXnatObject* parent);
+
   berry::QtSelectionProvider::Pointer m_SelectionProvider;
   void SetSelectionProvider() override;
 
   ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
-  ctkXnatTreeModel* m_TreeModel;
+  QmitkXnatTreeModel* m_TreeModel;
+
   mitk::XnatSessionTracker* m_Tracker;
   QString m_DownloadPath;
 
-  QMenu* m_NodeMenu;
+  QMenu* m_ContextMenu;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

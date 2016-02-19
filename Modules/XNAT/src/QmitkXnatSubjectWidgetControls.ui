@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+  <class>QmitkXnatSubjectWidgetControls</class>
+  <widget class="QWidget" name="QmitkXnatSubjectWidgetControls">
+    <property name="enabled">
+      <bool>true</bool>
+    </property>
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>350</width>
+        <height>225</height>
+      </rect>
+    </property>
+    <property name="windowTitle">
+      <string>Qmitk Template</string>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="1">
+        <widget class="QLineEdit" name="labelLineEdit">
+          <property name="readOnly">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
+      <item row="5" column="0">
+        <widget class="QLabel" name="genderLabel">
+          <property name="text">
+            <string>Gender:</string>
+          </property>
+        </widget>
+      </item>
+      <item row="4" column="0">
+        <widget class="QLabel" name="birthdateLabel">
+          <property name="text">
+            <string>Birthdate:</string>
+          </property>
+        </widget>
+      </item>
+      <item row="6" column="0">
+        <widget class="QLabel" name="handednessLabel">
+          <property name="text">
+            <string>Handedness:</string>
+          </property>
+        </widget>
+      </item>
+      <item row="7" column="0">
+        <widget class="QLabel" name="heightLabel">
+          <property name="text">
+            <string>Height (inches):</string>
+          </property>
+        </widget>
+      </item>
+      <item row="8" column="0">
+        <widget class="QLabel" name="weightLabel">
+          <property name="text">
+            <string>Weight (lbs)</string>
+          </property>
+        </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+        <widget class="QLabel" name="columnLabel">
+          <property name="font">
+            <font>
+              <weight>75</weight>
+              <bold>true</bold>
+            </font>
+          </property>
+          <property name="text">
+            <string>Subject Information</string>
+          </property>
+          <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+        </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+        <widget class="QLabel" name="breadcrumbLabel">
+          <property name="font">
+            <font>
+              <italic>true</italic>
+            </font>
+          </property>
+          <property name="text">
+            <string />
+          </property>
+        </widget>
+      </item>
+      <item row="4" column="1">
+        <widget class="QLineEdit" name="birthdateLineEdit">
+          <property name="readOnly">
+            <bool>true</bool>
+          </property>
+          <property name="placeholderText">
+            <string>YYYY-MM-DD</string>
+          </property>
+        </widget>
+      </item>
+      <item row="5" column="1">
+        <widget class="QLineEdit" name="genderLineEdit">
+          <property name="readOnly">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
+      <item row="6" column="1">
+        <widget class="QLineEdit" name="handednessLineEdit">
+          <property name="readOnly">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
+      <item row="7" column="1">
+        <widget class="QLineEdit" name="heightLineEdit">
+          <property name="readOnly">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
+      <item row="8" column="1">
+        <widget class="QLineEdit" name="weightLineEdit">
+          <property name="readOnly">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
+      <item row="3" column="0">
+        <widget class="QLabel" name="labelLabel">
+          <property name="text">
+            <string>ID*:</string>
+          </property>
+        </widget>
+      </item>
+      <item row="9" column="0" colspan="2">
+        <widget class="QLabel" name="mandatoryLabel">
+          <property name="text">
+            <string>* mandatory field</string>
+          </property>
+        </widget>
+      </item>
+    </layout>
+  </widget>
+  <resources />
+  <connections />
+</ui>

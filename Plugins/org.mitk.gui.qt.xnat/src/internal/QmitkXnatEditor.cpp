@@ -278,10 +278,10 @@ void QmitkXnatEditor::SelectionChanged(const berry::IWorkbenchPart::Pointer& sou
 
 void QmitkXnatEditor::DownloadResource()
 {
-  if (!m_Controls.treeView->selectionModel()->hasSelection())
+  if (!m_Controls.listView->selectionModel()->hasSelection())
     return;
 
-  const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
+  const QModelIndex index = m_Controls.listView->selectionModel()->currentIndex();
   QVariant variant = m_ListModel->data(index, Qt::UserRole);
   if (variant.isValid())
   {
@@ -310,6 +310,14 @@ void QmitkXnatEditor::DownloadResource()
       InternalFileDownload(index);
     }
   }
+}
+
+void QmitkXnatEditor::DownloadFile()
+{
+  if (!m_Controls.listView->selectionModel()->hasSelection())
+    return;
+  const QModelIndex index = m_Controls.listView->selectionModel()->currentIndex();
+  InternalFileDownload(index);
 }
 
 void QmitkXnatEditor::ToHigherLevel()
@@ -542,7 +550,7 @@ void QmitkXnatEditor::CleanListModel(ctkXnatSession* session)
 {
   if (session != 0)
   {
-    m_Controls.treeView->setModel(0);
+    m_Controls.listView->setModel(0);
     m_ListModel->setRootObject(0);
     m_Controls.treeView->reset();
   }

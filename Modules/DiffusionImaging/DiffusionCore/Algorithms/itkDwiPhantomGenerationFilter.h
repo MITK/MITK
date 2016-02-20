@@ -97,7 +97,7 @@ public:
     itkGetMacro( SNRImage, ItkFloatImgType::Pointer)                            ///< contains local SNR values
     itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                ///< output vector field
 
-    protected:
+protected:
     DwiPhantomGenerationFilter();
     ~DwiPhantomGenerationFilter(){}
 
@@ -113,7 +113,7 @@ private:
     ItkDirectionImageContainer::Pointer             m_DirectionImageContainer;  ///< contains one vectorimage for each input ROI
     ItkUcharImgType::Pointer                        m_NumDirectionsImage;       ///< contains number of directions per voxel
     ItkFloatImgType::Pointer                        m_SNRImage;                 ///< contains local SNR values
-    mitk::FiberBundle::Pointer                     m_OutputFiberBundle;        ///< output vector field
+    mitk::FiberBundle::Pointer                      m_OutputFiberBundle;        ///< output vector field
 
     // signal regions
     std::vector< ItkUcharImgType::Pointer >         m_SignalRegions;    ///< binary images defining the regions for the signal generation
@@ -132,6 +132,7 @@ private:
     double                                          m_MaxBaseline;      ///< maximum value of the baseline image
     double                                          m_MeanBaseline;     ///< mean value of the baseline image
     double                                          m_NoiseVariance;    ///< variance of rician noise
+    bool m_AddNoiseFlag;  //* Checkbox flag to switch noise on and off. */
     float                                           m_GreyMatterAdc;    ///< ADC of isotropic diffusion tensor
     bool                                            m_SimulateBaseline; ///< generate baseline image values as the l2 norm of the corresponding tensor used for the diffusion signal generation
     TOutputScalarType                               m_DefaultBaseline;  ///< default value for baseline image

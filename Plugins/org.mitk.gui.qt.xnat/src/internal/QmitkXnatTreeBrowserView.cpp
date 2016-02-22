@@ -263,8 +263,8 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
     m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
 
     connect(session, SIGNAL(progress(QUuid,double)), this, SLOT(OnProgress(QUuid,double)));
-    connect(session, SIGNAL(sessionTimedOut()), this, SLOT(sessionTimedOutMsg()));
-    connect(session, SIGNAL(sessionAboutToBeTimedOut()), this, SLOT(sessionTimesOutSoonMsg()));
+    connect(session, SIGNAL(timedOut()), this, SLOT(sessionTimedOutMsg()));
+    connect(session, SIGNAL(aboutToTimeOut()), this, SLOT(sessionTimesOutSoonMsg()));
   }
 }
 

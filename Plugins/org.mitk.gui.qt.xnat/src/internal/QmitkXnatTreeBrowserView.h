@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKXNATTREEBROWSERVIEW_H
 #define QMITKXNATTREEBROWSERVIEW_H
 
-#include <berryQtSelectionProvider.h>
-
 #include <QmitkAbstractView.h>
 
 #include "ui_QmitkXnatTreeBrowserViewControls.h"
@@ -118,9 +116,6 @@ private:
   void InternalOpenFiles(const QFileInfoList&, mitk::StringProperty::Pointer xnatURL);
 
   void SetStatusInformation(const QString&);
-
-  berry::QtSelectionProvider::Pointer m_SelectionProvider;
-  void SetSelectionProvider() override;
 
   ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
   QmitkXnatTreeModel* m_TreeModel;

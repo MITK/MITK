@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 
 // Blueberry
-#include <berryIWorkbenchPage.h>
 #include <berryPlatform.h>
 
 // CTK XNAT Core
@@ -41,15 +40,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 // MITK XNAT
+#include <mitkDataStorage.h>
+#include <QmitkIOUtil.h>
 #include <QmitkXnatProjectWidget.h>
 #include <QmitkXnatSubjectWidget.h>
 #include <QmitkXnatExperimentWidget.h>
 #include <QmitkXnatCreateObjectDialog.h>
-#include <QTimer>
+#include <QmitkXnatUploadFromDataStorageDialog.h>
 
 // Qt
 #include <QAction>
 #include <QClipboard>
+#include <QDateTime>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -59,11 +61,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLayoutItem>
 #include <QMenu>
 #include <QMessageBox>
-
-// MITK
-#include <mitkDataStorage.h>
-#include <QmitkIOUtil.h>
-#include <QmitkXnatUploadFromDataStorageDialog.h>
+#include <QTimer>
 
 // Poco
 #include <Poco/Zip/Decompress.h>
@@ -112,8 +110,6 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   m_Controls.labelError->setText("Please use the 'Connect' button in the Preferences.");
   m_Controls.labelError->setStyleSheet("QLabel { color: red; }");
 
-  m_SelectionProvider = new berry::QtSelectionProvider();
-  this->SetSelectionProvider();
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -247,11 +243,6 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
   }
 }
 
-void QmitkXnatTreeBrowserView::SetSelectionProvider()
-{
-  GetSite()->SetSelectionProvider(m_SelectionProvider);
-}
-
 void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
 {
   if (session != 0 && session->isOpen())
@@ -260,7 +251,6 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
     // Fill model and show in the GUI
     m_TreeModel->addDataModel(session->dataModel());
     m_Controls.treeView->reset();
-    m_SelectionProvider->SetItemSelectionModel(m_Controls.treeView->selectionModel());
 
     connect(session, SIGNAL(progress(QUuid,double)), this, SLOT(OnProgress(QUuid,double)));
     connect(session, SIGNAL(timedOut()), this, SLOT(sessionTimedOutMsg()));

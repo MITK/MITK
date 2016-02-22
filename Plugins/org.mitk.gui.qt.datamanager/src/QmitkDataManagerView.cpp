@@ -254,10 +254,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       // check if the user specified an icon attribute
       if ( !cmIcon.isEmpty() )
       {
-        if (cmLabel == "Upload to XNAT")
-          contextMenuAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/xnat-icon.png"), cmLabel, parent);
-        else
-          contextMenuAction = new QAction( QIcon(cmIcon), cmLabel, parent);
+        contextMenuAction = new QAction( QIcon(cmIcon), cmLabel, parent);
       }
       else
       {

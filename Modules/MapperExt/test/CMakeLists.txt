@@ -6,5 +6,3 @@ if(MITK_ENABLE_RENDERING_TESTING) ### since the rendering test's do not run in u
   PROPERTY RUN_SERIAL TRUE)
 
 endif()
-
-#endif() # TARGET ${TESTDRIVER}

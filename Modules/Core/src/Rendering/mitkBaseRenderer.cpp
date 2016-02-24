@@ -259,7 +259,7 @@ void mitk::BaseRenderer::UnregisterLocalStorageHandler(mitk::BaseLocalStorageHan
 
 void mitk::BaseRenderer::SetDataStorage(DataStorage* storage)
 {
-  if (storage != NULL)
+  if (storage != m_DataStorage && storage != NULL )
   {
     m_DataStorage = storage;
     m_BindDispatcherInteractor->SetDataStorage(m_DataStorage);

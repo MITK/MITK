@@ -130,10 +130,10 @@ void mitk::SplineVtkMapper3D::ApplyAllProperties(BaseRenderer *renderer, vtkActo
   m_SplinesActor->GetProperty()->SetColor( rgba );
 
   float lineWidth;
-  if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
+  if (dynamic_cast<mitk::IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
     lineWidth = 1.0;
   else
-    lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("line width"))->GetValue();
+    lineWidth = dynamic_cast<mitk::IntProperty *>(this->GetDataNode()->GetProperty("line width"))->GetValue();
   m_SplinesActor->GetProperty()->SetLineWidth(lineWidth);
 
   m_SplineUpdateTime.Modified();

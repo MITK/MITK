@@ -40,7 +40,6 @@ set(MODULE_TESTSURFACES
 
 # pointset files
 set(MODULE_TESTPOINTSETS
-  pointSet.mps
 )
 
 

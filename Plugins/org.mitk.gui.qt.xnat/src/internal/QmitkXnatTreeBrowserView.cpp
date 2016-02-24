@@ -553,7 +553,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
   QString filename = QFileDialog::getOpenFileName(m_Controls.treeView, tr("Open File"), QDir::homePath());
   const QModelIndex index = m_Controls.treeView->selectionModel()->currentIndex();
   ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(m_TreeModel->xnatObject(index));
-  if (resource)
+  if (resource != nullptr && filename.length() != 0)
   {
     ctkXnatFile* file = new ctkXnatFile(resource);
     file->setLocalFilePath(filename);

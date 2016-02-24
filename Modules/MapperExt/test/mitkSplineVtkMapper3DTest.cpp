@@ -22,9 +22,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 #include <mitkSplineVtkMapper3D.h>
 
+#include <vtkDebugLeaks.h>
+
 class mitkSplineVtkMapper3DTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSplineVtkMapper3DTestSuite);
+
+  /// \todo Fix VTK memory leaks. Bug 19577.
+  vtkDebugLeaks::SetExitError(0);
+
   MITK_TEST(RenderSpline);
   MITK_TEST(RenderBlueSpline);
   MITK_TEST(RenderThickSpline);

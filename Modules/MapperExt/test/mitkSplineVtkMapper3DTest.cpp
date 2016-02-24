@@ -58,6 +58,10 @@ public:
   {
     m_RenderingTestHelper = mitk::RenderingTestHelper(640, 480);
 
+    // disables anti-aliasing which is enabled on several graphics cards and
+    // causes problems when doing a pixel-wise comparison to a reference image
+    m_RenderingTestHelper.GetVtkRenderWindow()->SetMultiSamples(0);
+
     m_PathToPointSet = GetTestDataFilePath("InteractionTestData/ReferenceData/PointSetDataInteractor_PointsAdd2d3d.mps");
 
     //Build a command line for the vtkTesting::Test method.

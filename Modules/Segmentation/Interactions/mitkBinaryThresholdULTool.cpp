@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryThresholdImageFilter.h>
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
+#include "mitkLabelSetImage.h"
 
 // us
 #include "usModule.h"
@@ -152,8 +153,26 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
     {
       mitk::Image* workingimage = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
 
-      if(workingimage)
-        m_ThresholdFeedbackNode->SetData( workingimage->Clone() );
+      if (workingimage)
+      {
+        m_ThresholdFeedbackNode->SetData(workingimage->Clone());
+
+        //Let's paint the feedback node green...
+        mitk::LabelSetImage::Pointer previewImage = dynamic_cast<mitk::LabelSetImage*> (m_ThresholdFeedbackNode->GetData());
+        previewImage->GetActiveLabelSet()->RemoveAllLabels();
+
+        itk::RGBPixel<float> pixel;
+        pixel[0] = 0.0f;
+        pixel[1] = 1.0f;
+        pixel[2] = 0.0f;
+
+        mitk::Label::Pointer label = mitk::Label::New();
+        label->SetColor(mitk::Color(pixel));
+        label->SetValue(1);
+        label->SetOpacity(0.3);
+        previewImage->GetActiveLabelSet()->AddLabel(label);
+        previewImage->GetActiveLabelSet()->SetActiveLabel(1);
+      }
       else
         m_ThresholdFeedbackNode->SetData( mitk::Image::New() );
 

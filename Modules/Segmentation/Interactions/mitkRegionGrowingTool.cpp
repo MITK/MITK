@@ -23,8 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkApplicationCursor.h"
 #include "mitkImageToContourModelFilter.h"
 #include "mitkRegionGrowingTool.xpm"
-#include "mitkOverwriteDirectedPlaneImageFilter.h"
-#include "mitkExtractDirectedPlaneImageFilterNew.h"
 
 // us
 #include <usModule.h>

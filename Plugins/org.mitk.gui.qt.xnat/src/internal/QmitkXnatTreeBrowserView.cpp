@@ -269,13 +269,16 @@ void QmitkXnatTreeBrowserView::CleanTreeModel(ctkXnatSession* session)
 
 void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
 {
-  unsigned int currentProgress = progress*100;
-  if (m_Controls.groupBox->isHidden())
+  if (progress > 0)
   {
-    m_Controls.groupBox->show();
-    m_Controls.progressBar->setValue(0);
+    unsigned int currentProgress = progress*100;
+    if (m_Controls.groupBox->isHidden())
+    {
+      m_Controls.groupBox->show();
+      m_Controls.progressBar->setValue(0);
+    }
+    m_Controls.progressBar->setValue(fabs(currentProgress));
   }
-  m_Controls.progressBar->setValue(currentProgress);
 }
 
 void QmitkXnatTreeBrowserView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
@@ -294,6 +297,8 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
   ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
   if (xnatObject != nullptr)
   {
+    m_Controls.progressBar->setMinimum(0);
+    m_Controls.progressBar->setMaximum(100);
     // The path to the downloaded file
     QString filePath;
     QDir downloadPath (m_DownloadPath);
@@ -409,6 +414,9 @@ void QmitkXnatTreeBrowserView::InternalDICOMDownload(ctkXnatObject *obj, QDir &D
   QString filePath = m_DownloadPath + obj->property("label") + ".zip";
 
   this->SetStatusInformation("Downloading DICOM series " + obj->parent()->name());
+  m_Controls.progressBar->setMinimum(0);
+  m_Controls.progressBar->setMaximum(0);
+  m_Controls.progressBar->show();
   obj->download(filePath);
 
   std::ifstream in(filePath.toStdString().c_str(), std::ios::binary);

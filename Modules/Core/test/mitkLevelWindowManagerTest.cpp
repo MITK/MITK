@@ -398,7 +398,7 @@ public:
 
       //all invisible?
       found = std::find( nodesVisible.begin(), nodesVisible.end(), true );
-      bool allInvisible = found == nodesVisible.end();
+      bool allInvisible = ( found == nodesVisible.end() );
 
       //which node shall get the level window now
       if ( !allInvisible && !nodesVisible[ ind ] )
@@ -434,8 +434,8 @@ public:
       validCount += hasLevelWindow == mustHaveLvlWindow ? 1 : 0;
 
       //test sensitivity
-      int falseran = -1;
-      while ( falseran == mustHaveLvlWindow )
+      int falseran = 0;
+      while ( falseran == 0 )
       {
         falseran = ranGen->GetIntegerVariate( 7 );
       }

@@ -52,9 +52,9 @@ mitk::RegionGrowingTool::RegionGrowingTool()
       m_MouseDistanceScaleFactor(0.5),
       m_FillFeedbackContour(true)
 {
-    m_SeedPoint = {{0, 0, 0}};
-    m_Thresholds = {{200, 200}};
-    m_InitialThresholds = {{200, 200}};
+    m_SeedPoint = {0, 0, 0};
+    m_Thresholds = {200, 200};
+    m_InitialThresholds = {200, 200};
 }
 
 mitk::RegionGrowingTool::~RegionGrowingTool()

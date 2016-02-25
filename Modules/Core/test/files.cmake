@@ -134,14 +134,14 @@ set(MODULE_SURFACE_TESTS
 )
 
 # list of images for which the tests are run
-set(MODULE_TESTIMAGES
+set(MODULE_TESTIMAGE
   US4DCyl.nrrd
   Pic3D.nrrd
   Pic2DplusT.nrrd
   BallBinary30x30x30.nrrd
   Png2D-bw.png
 )
-set(MODULE_TESTSURFACES
+set(MODULE_TESTSURFACE
   binary.stl
   ball.stl
 )

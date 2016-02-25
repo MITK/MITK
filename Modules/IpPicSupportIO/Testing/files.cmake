@@ -3,7 +3,7 @@ set(MODULE_IMAGE_TESTS
  mitkPicFileReaderTest.cpp
 )
 
-set(MODULE_TESTIMAGES
+set(MODULE_TESTIMAGE
   US4DCyl.pic.gz
   Pic3D.pic.gz
   Pic2DplusT.pic.gz

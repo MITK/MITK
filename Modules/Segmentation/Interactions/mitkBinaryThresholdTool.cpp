@@ -56,6 +56,7 @@ mitk::BinaryThresholdTool::BinaryThresholdTool()
   m_ThresholdFeedbackNode = DataNode::New();
   m_ThresholdFeedbackNode->SetProperty("name", StringProperty::New("Thresholding feedback"));
   m_ThresholdFeedbackNode->SetProperty("helper object", BoolProperty::New(true));
+  m_ThresholdFeedbackNode->SetFloatProperty("labelset.contour.width", 0.0);
 }
 
 mitk::BinaryThresholdTool::~BinaryThresholdTool()
@@ -105,7 +106,7 @@ void mitk::BinaryThresholdTool::Deactivated()
   {
     if (DataStorage* storage = m_ToolManager->GetDataStorage())
     {
-      //storage->Remove(m_ThresholdFeedbackNode);
+      storage->Remove(m_ThresholdFeedbackNode);
       RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -114,15 +115,6 @@ void mitk::BinaryThresholdTool::Deactivated()
     // don't care
   }
   m_ThresholdFeedbackNode->SetData(NULL);
-
-  /*
-  mitk::DataNode::Pointer segmentationNode = m_ToolManager->GetWorkingData(0);
-
-  if (segmentationNode.IsNotNull())
-  {
-    mitk::RenderingManager::GetInstance()->InitializeViews(segmentationNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-  }
-  */
 }
 
 void mitk::BinaryThresholdTool::SetThresholdValue(double value)
@@ -170,7 +162,7 @@ void mitk::BinaryThresholdTool::SetupPreviewNode()
         pixel[0] = 0.0f;
         pixel[1] = 1.0f;
         pixel[2] = 0.0f;
-
+        /*
         previewImage->GetActiveLabelSet()->RemoveAllLabels();
 
         mitk::Label::Pointer label = mitk::Label::New();
@@ -179,10 +171,10 @@ void mitk::BinaryThresholdTool::SetupPreviewNode()
         label->SetOpacity(0.3);
         previewImage->GetActiveLabelSet()->AddLabel(label);
         previewImage->GetActiveLabelSet()->SetActiveLabel(1);
-
+        */
         //TODO: Set contour width.
         //MITK_WARN << previewImage->GetActiveLabel()->GetColor();
-        //previewImage->GetActiveLabel()->SetColor(pixel);
+        previewImage->GetActiveLabel()->SetColor(pixel);
         //MITK_WARN << previewImage->GetActiveLabel()->GetColor();
       }
       else
@@ -350,7 +342,6 @@ void mitk::BinaryThresholdTool::UpdatePreview()
       timeSelector->SetTimeNr(timeStep);
       timeSelector->UpdateLargestPossibleRegion();
       Image::Pointer feedBackImage3D = timeSelector->GetOutput();
-
       AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentThresholdValue, timeStep));
     }
 

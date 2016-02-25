@@ -15,7 +15,6 @@ from msi.io.reader import Reader
 from msi.msi import Msi
 
 
-
 class TiffRingReader(Reader):
     '''
     TODO SW: document and test
@@ -30,7 +29,7 @@ class TiffRingReader(Reader):
 
     def read(self, fileToRead, n, resize_factor=None,
              segmentation=None):
-        """ read the msi from pngs.
+        """ read the msi from tiffs.
         The fileToRead is the first file to read,
         then n files will be read to one msi from a
         sorted file list

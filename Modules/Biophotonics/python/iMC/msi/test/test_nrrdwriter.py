@@ -14,6 +14,7 @@ from msi.io.nrrdreader import NrrdReader
 from msi.io.nrrdwriter import NrrdWriter
 from msi.test import helpers
 
+
 class TestNrrdWriter(unittest.TestCase):
 
     def setUp(self):

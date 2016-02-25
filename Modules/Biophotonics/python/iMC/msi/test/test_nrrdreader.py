@@ -9,6 +9,7 @@ import unittest
 from msi.io.nrrdreader import NrrdReader
 import numpy as np
 
+
 class TestNrrdReader(unittest.TestCase):
 
     def setUp(self):

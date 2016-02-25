@@ -139,6 +139,10 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
     mitk::Point3D currentWorldPoint;
 
     mitk::ContourModel::Pointer contour = this->GetOutput(i);
+    if (contour.IsNull())
+    {
+        contour = mitk::ContourModel::New();
+    }
 
     if (contour.IsNull())
       contour = mitk::ContourModel::New();

@@ -102,9 +102,12 @@ class Msi():
         """
         helper method to automatically add the basic properties:
         wavelength
-        to the msi if not added explicicly.
+        to the msi if not added explicicly. basic wavelengths will just be
+        integers from 0 to 1
         """
-        if self._image.size > 0 and "wavelengths" not in self._properties.keys():
+        if self._image.size > 0 and (
+                ("wavelengths" not in self._properties.keys() or
+                self._properties["wavelengths"].size == 0)):
             self._properties["wavelengths"] = np.arange(self._image.shape[-1])
         if self._image.size == 0 and "wavelengths" not in self._properties.keys():
             self._properties["wavelengths"] = np.array([])
@@ -116,8 +119,10 @@ class Msi():
         """
         # either both image and wavelength property are empty
         if self._image.size == 0 and len(self._properties["wavelengths"]) != 0:
-            raise RuntimeError("dimension of image and wavelength mismatch")
+            raise RuntimeError("dimension of image and wavelength mismatch: " +
+                               "image size is zero, but wavelengths are set")
         # or both are same
         elif self._image.shape[-1] != len(self._properties["wavelengths"]):
-            raise RuntimeError("dimension of image and wavelength mismatch")
+            raise RuntimeError("dimension of image and wavelength mismatch: " +
+                               "image size and wavelenths do not match")
 

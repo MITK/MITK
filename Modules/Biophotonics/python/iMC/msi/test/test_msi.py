@@ -35,7 +35,15 @@ class TestMsi(unittest.TestCase):
 
         self.assertTrue('integration time' not in msi2.get_properties())
 
+    def test_add_dummy_wavelengths_automatically(self):
+        msi_no_wavelengths_set = Msi()
+        msi_no_wavelengths_set.set_image(self.msi.get_image())
 
+        nr_wavelengths = msi_no_wavelengths_set.get_image().shape[-1]
+
+        np.testing.assert_equal(msi_no_wavelengths_set.get_wavelengths(),
+                                np.arange(nr_wavelengths),
+                                "correct dummy wavelength values set")
 
 
 

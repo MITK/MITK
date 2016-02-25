@@ -16,8 +16,30 @@ import imgmani
 from msi import Msi
 
 
+'''
+The msi manipulations module includes usefull convenience operations on msis.
+
+E.g. calculate_mean_spectrum to calculate the average spectrum on all the image
+data or interpolate_wavelengths to change to a different wavelenght set by
+simple interpolation.
+
+All methods take a msi and change it in place. They also return the same msi
+object for convenience (can e.g. be used to chain msi manipulations).
+'''
+
+
 def apply_segmentation(msi, segmentation):
-    """ TODO """
+    """ applies a segmentation to an msi.
+
+     If the msi has imaging data of n x m x nr_wavelengths the segmentation
+     has to be a numpy array of n x m size. pixelvalues with values different
+     than zero will be included in the segmentation.
+     By applying the segmentation, not segmented elements will be np.ma.masked.
+
+     Alternatively, one can input a msi with the mentioned n x m numpy array
+     in from of a msi as segmentation (for convenience to be able to use the
+     same reader for msis and segmentations)
+     """
     if (isinstance(segmentation, Msi)):
         # expects just an image, but if a Msi is passed it's also ok
         segmentation = segmentation.get_image()

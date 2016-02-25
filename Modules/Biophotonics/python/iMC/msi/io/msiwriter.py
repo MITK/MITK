@@ -11,7 +11,6 @@ from writer import Writer
 class MsiWriter(Writer):
     '''
     The MsiReader writing the Msi as a serialized python object.
-    This is the prefered way of writing an Msi.
     '''
 
     def __init__(self, msiToWrite):

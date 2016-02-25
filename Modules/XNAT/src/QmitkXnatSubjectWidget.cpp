@@ -19,9 +19,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatSubject.h>
 #include <iostream>
 
-QmitkXnatSubjectWidget::QmitkXnatSubjectWidget(Mode mode, QWidget* parent)
-  : m_Mode(mode)
-  , QWidget(parent)
+QmitkXnatSubjectWidget::QmitkXnatSubjectWidget(QWidget* parent)
+  : QWidget(parent)
+{
+  m_Mode = INFO;
+  Init();
+}
+
+QmitkXnatSubjectWidget::QmitkXnatSubjectWidget(Mode mode, QWidget *parent)
+  : QWidget(parent),
+    m_Mode(mode)
+{
+  Init();
+}
+
+QmitkXnatSubjectWidget::~QmitkXnatSubjectWidget()
+{
+}
+
+void QmitkXnatSubjectWidget::Init()
 {
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(this);
@@ -32,10 +48,6 @@ QmitkXnatSubjectWidget::QmitkXnatSubjectWidget(Mode mode, QWidget* parent)
     m_Controls.labelLabel->setText("ID:");
     m_Controls.mandatoryLabel->setVisible(false);
   }
-}
-
-QmitkXnatSubjectWidget::~QmitkXnatSubjectWidget()
-{
 }
 
 void QmitkXnatSubjectWidget::SetSubject(ctkXnatSubject* subject)

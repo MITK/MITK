@@ -20,9 +20,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QCompleter>
 
-QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(Mode mode, QWidget* parent)
+QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(QWidget* parent)
   : QWidget(parent)
-  , m_Mode(mode)
+{
+  m_Mode = INFO;
+}
+
+QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(Mode mode, QWidget *parent)
+  : QWidget(parent),
+    m_Mode(mode)
+{
+  Init();
+}
+
+QmitkXnatExperimentWidget::~QmitkXnatExperimentWidget()
+{
+}
+
+void QmitkXnatExperimentWidget::Init()
 {
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(this);
@@ -74,10 +89,6 @@ QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(Mode mode, QWidget* parent)
     m_Controls.modalityLineEdit->setCompleter(completer);
     m_Controls.modalityLineEdit->setPlaceholderText("xnat::");
   }
-}
-
-QmitkXnatExperimentWidget::~QmitkXnatExperimentWidget()
-{
 }
 
 void QmitkXnatExperimentWidget::SetExperiment(ctkXnatExperiment* experiment)

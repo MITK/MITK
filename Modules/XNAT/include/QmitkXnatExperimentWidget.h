@@ -39,6 +39,7 @@ public:
     CREATE
   };
 
+  QmitkXnatExperimentWidget(QWidget* parent = 0);
   QmitkXnatExperimentWidget(Mode mode, QWidget* parent = 0);
   ~QmitkXnatExperimentWidget();
 
@@ -49,6 +50,7 @@ protected:
   Ui::QmitkXnatExperimentWidgetControls m_Controls;
 
 private:
+  void Init();
   Mode m_Mode;
   ctkXnatExperiment* m_Experiment;
 };

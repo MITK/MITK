@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>284</height>
+    <height>332</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -149,11 +149,41 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="infoVerticalLayout"/>
+    <layout class="QVBoxLayout" name="infoVerticalLayout">
+     <item>
+      <widget class="QmitkXnatProjectWidget" name="wgtProjectInfo" native="true"/>
+     </item>
+     <item>
+      <widget class="QmitkXnatExperimentWidget" name="wgtExperimentInfo" native="true"/>
+     </item>
+     <item>
+      <widget class="QmitkXnatSubjectWidget" name="wgtSubjectInfo" native="true"/>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkXnatProjectWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkXnatProjectWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkXnatSubjectWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkXnatSubjectWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkXnatExperimentWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkXnatExperimentWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../resources/xnat.qrc"/>
  </resources>

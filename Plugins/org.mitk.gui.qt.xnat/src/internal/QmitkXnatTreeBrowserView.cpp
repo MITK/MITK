@@ -114,6 +114,9 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   m_Controls.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_Controls.groupBox->hide();
+  m_Controls.wgtExperimentInfo->hide();
+  m_Controls.wgtSubjectInfo->hide();
+  m_Controls.wgtProjectInfo->hide();
 
   m_Tracker = new mitk::XnatSessionTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext());
 
@@ -414,6 +417,9 @@ void QmitkXnatTreeBrowserView::InternalDICOMDownload(ctkXnatObject *obj, QDir &D
   QString filePath = m_DownloadPath + obj->property("label") + ".zip";
 
   this->SetStatusInformation("Downloading DICOM series " + obj->parent()->name());
+  // In case of DICOM zip download we do not know the total file size
+  // Because of that the dowload progres cannot be calculated
+  // Because of that we use the busy indicator of the progress bar by setting min and max to 0
   m_Controls.progressBar->setMinimum(0);
   m_Controls.progressBar->setMaximum(0);
   m_Controls.progressBar->show();
@@ -755,7 +761,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
   }
 
   ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(xnatObject);
-  if (project != NULL)
+  if (project != nullptr)
   {
     QAction* actCreateSubject = new QAction("Create new subject", m_ContextMenu);
     m_ContextMenu->addAction(actCreateSubject);
@@ -763,7 +769,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
     m_ContextMenu->popup(QCursor::pos());
   }
   ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(xnatObject);
-  if (subject != NULL)
+  if (subject != nullptr)
   {
     QAction* actCreateExperiment = new QAction("Create new experiment", m_ContextMenu);
     m_ContextMenu->addAction(actCreateExperiment);
@@ -776,11 +782,6 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
 
 void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
 {
-  QLayout* layout = m_Controls.infoVerticalLayout;
-  QLayoutItem *child;
-  while ((child = layout->takeAt(0)) != 0) {
-    delete child->widget();
-  }
 
   QVariant variant = m_TreeModel->data(index, Qt::UserRole);
   if (variant.isValid())
@@ -793,13 +794,15 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
     ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(object);
     ctkXnatExperiment* experiment = dynamic_cast<ctkXnatExperiment*>(object);
 
-    if (project != NULL)
+    if (project != nullptr)
     {
-      QmitkXnatProjectWidget* widget = new QmitkXnatProjectWidget(QmitkXnatProjectWidget::Mode::INFO);
-      widget->SetProject(project);
-      layout->addWidget(widget);
+      m_Controls.wgtExperimentInfo->hide();
+      m_Controls.wgtSubjectInfo->hide();
+
+      m_Controls.wgtProjectInfo->SetProject(project);
+      m_Controls.wgtProjectInfo->show();
     }
-    else if (subject != NULL)
+    else if (subject != nullptr)
     {
       QMap<QString, QString> paramMap;
       paramMap.insert("columns", "dob,gender,handedness,weight,height");
@@ -815,7 +818,6 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
         {
           it.next();
 
-          QString  str = it.key().toLatin1().data();
           QVariant var = it.value();
 
           // After CTK Change (subjectID = name) to (subjectID = ID)
@@ -841,12 +843,13 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
           subject->setProperty(str, var);
         }
       }
+      m_Controls.wgtExperimentInfo->hide();
+      m_Controls.wgtProjectInfo->hide();
 
-      QmitkXnatSubjectWidget* widget = new QmitkXnatSubjectWidget(QmitkXnatSubjectWidget::Mode::INFO);
-      widget->SetSubject(subject);
-      layout->addWidget(widget);
+      m_Controls.wgtSubjectInfo->SetSubject(subject);
+      m_Controls.wgtSubjectInfo->show();
     }
-    else if (experiment != NULL)
+    else if (experiment != nullptr)
     {
       QMap<QString, QString> paramMap;
       paramMap.insert("columns", "date,time,scanner,modality");
@@ -862,7 +865,6 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
         {
           it.next();
 
-          QString  str = it.key().toLatin1().data();
           QVariant var = it.value();
 
           if (var == experiment->property("URI"))
@@ -887,9 +889,11 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
         }
       }
 
-      QmitkXnatExperimentWidget* widget = new QmitkXnatExperimentWidget(QmitkXnatExperimentWidget::Mode::INFO);
-      widget->SetExperiment(experiment);
-      layout->addWidget(widget);
+      m_Controls.wgtSubjectInfo->hide();
+      m_Controls.wgtProjectInfo->hide();
+
+      m_Controls.wgtExperimentInfo->SetExperiment(experiment);
+      m_Controls.wgtExperimentInfo->show();
     }
   }
 }

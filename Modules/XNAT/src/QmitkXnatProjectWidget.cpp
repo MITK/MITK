@@ -18,9 +18,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkXnatProject.h>
 
+QmitkXnatProjectWidget::QmitkXnatProjectWidget(QWidget* parent)
+  : QWidget(parent)
+{
+  m_Mode = INFO;
+  Init();
+}
+
 QmitkXnatProjectWidget::QmitkXnatProjectWidget(Mode mode, QWidget* parent)
   : m_Mode(mode)
   , QWidget(parent)
+{
+  Init();
+}
+
+QmitkXnatProjectWidget::~QmitkXnatProjectWidget()
+{
+}
+
+void QmitkXnatProjectWidget::Init()
 {
   // Create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(this);
@@ -32,10 +48,6 @@ QmitkXnatProjectWidget::QmitkXnatProjectWidget(Mode mode, QWidget* parent)
     m_Controls.idLineEdit->setVisible(false);
     m_Controls.mandatoryLabel->setVisible(false);
   }
-}
-
-QmitkXnatProjectWidget::~QmitkXnatProjectWidget()
-{
 }
 
 void QmitkXnatProjectWidget::SetProject(ctkXnatProject* project)

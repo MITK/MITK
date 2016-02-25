@@ -38,6 +38,7 @@ public:
     CREATE
   };
 
+  QmitkXnatSubjectWidget(QWidget* parent = 0);
   QmitkXnatSubjectWidget(Mode mode, QWidget* parent = 0);
   ~QmitkXnatSubjectWidget();
 
@@ -48,6 +49,7 @@ protected:
   Ui::QmitkXnatSubjectWidgetControls m_Controls;
 
 private:
+  void Init();
   Mode m_Mode;
   ctkXnatSubject* m_Subject;
 };

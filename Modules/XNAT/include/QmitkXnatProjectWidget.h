@@ -39,7 +39,8 @@ public:
     CREATE
   };
 
-  QmitkXnatProjectWidget(Mode mode, QWidget* parent = 0);
+  QmitkXnatProjectWidget(QWidget* parent = 0);
+  QmitkXnatProjectWidget(Mode mode=INFO, QWidget* parent = 0);
   ~QmitkXnatProjectWidget();
 
   void SetProject(ctkXnatProject* project);
@@ -49,6 +50,8 @@ protected:
   Ui::QmitkXnatProjectWidgetControls m_Controls;
 
 private:
+
+  void Init();
   Mode m_Mode;
   ctkXnatProject* m_Project;
 };

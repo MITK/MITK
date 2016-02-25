@@ -57,17 +57,17 @@ macro(MITK_CREATE_MODULE_TESTS)
       endif()
     endforeach()
 
-    set(TEST_TYPES IMAGES SURFACES POINTSETS) # add other file types here
+    set(TEST_TYPES IMAGE SURFACE POINTSET) # add other file types here
 
     foreach(test_type ${TEST_TYPES})
        foreach(test_data ${MODULE_TEST${test_type}} ${ADDITIONAL_TEST_${test_type}})
          if(EXISTS ${test_data})
            set(TEST_DATA_FULL_PATH ${test_data})
-           else()
+          else()
              # todo: maybe search other paths as well
              # yes, please in mitk/Testing/Data, too
              set(TEST_DATA_FULL_PATH ${MITK_DATA_DIR}/${test_data})
-           endif()
+          endif()
 
            if(EXISTS ${TEST_DATA_FULL_PATH})
              foreach( test ${MODULE_${test_type}_TESTS})

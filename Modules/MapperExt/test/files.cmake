@@ -31,15 +31,15 @@ set(MODULE_POINTSET_TESTS
 )
 
 # image files
-set(MODULE_TESTIMAGES
+set(MODULE_TESTIMAGE
 )
 
 # surface files
-set(MODULE_TESTSURFACES
+set(MODULE_TESTSURFACE
 )
 
 # pointset files
-set(MODULE_TESTPOINTSETS
+set(MODULE_TESTPOINTSET
 )
 
 

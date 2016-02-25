@@ -88,7 +88,7 @@ class TiffRingReader(Reader):
         if do_resize(resize_factor):
             im_array= scipy.misc.imresize(im_array, resize_factor,
                                           interp="bilinear", mode="F")
-        return im_array
+        return im_array.astype('float')
 
 
 def to_segmentation(f):

@@ -84,11 +84,12 @@ class TiffReader(Reader):
         im = Image.open(f)
         im_array = np.array(im)
 
-        if do_resize(resize_factor):
-            im_array= scipy.misc.imresize(im_array, resize_factor,
-                                          interp="bilinear", mode="F")
-
         im_array >>= self.shift_bits
+
+        if do_resize(resize_factor):
+            im_array = scipy.misc.imresize(im_array, resize_factor,
+                                           interp="bilinear", mode="F")
+
         return im_array.astype('float')
 
 

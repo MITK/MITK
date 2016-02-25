@@ -46,15 +46,15 @@ MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, RegionGrowingTool, "Region growing tool
 mitk::RegionGrowingTool::RegionGrowingTool()
     :FeedbackContourTool("PressMoveRelease"),
       m_SeedValue(0),
-      m_SeedPoint({{0, 0, 0}}),
-      m_Thresholds({{200, 200}}),
-      m_InitialThresholds({{200, 200}}),
       m_ScreenYDifference(0),
       m_ScreenXDifference(0),
       m_VisibleWindow(0),
       m_MouseDistanceScaleFactor(0.5),
       m_FillFeedbackContour(true)
 {
+    m_SeedPoint = {{0, 0, 0}};
+    m_Thresholds = {{200, 200}};
+    m_InitialThresholds = {{200, 200}};
 }
 
 mitk::RegionGrowingTool::~RegionGrowingTool()

@@ -118,7 +118,9 @@ class SpectroCamBatch(luigi.Task):
         # all wavelengths must have been measured for transmission and stored in
         # wavelength.txt files (e.g. 470.txt)
         filenames = ((sc.other["RECORDED_WAVELENGTHS"] * 10**9).astype(int)).astype(str)
-        filenames = map(lambda name: FilterTransmission(name + ".txt"),
+        filenames = map(lambda name: FilterTransmission(os.path.join(sc.get_full_dir("FILTER_TRANSMISSIONS"),
+                                                                     name +
+                                                                     ".txt")),
                         filenames)
 
         return JoinBatches(self.df_prefix), filenames

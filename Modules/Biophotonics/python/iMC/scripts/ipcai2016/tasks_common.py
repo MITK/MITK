@@ -54,7 +54,7 @@ def plot_image(image, axis, title=None, cmap=None):
     axis.xaxis.set_visible(False)
     axis.yaxis.set_visible(False)
     if title is not None:
-        axis.set_title(title, size=10)
+        axis.set_title(title)
 
 
 class IPCAITrainRegressor(luigi.Task):

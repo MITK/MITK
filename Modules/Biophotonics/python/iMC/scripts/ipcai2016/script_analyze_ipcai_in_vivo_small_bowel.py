@@ -27,8 +27,13 @@ sc = commons.ScriptCommons()
 
 sc.add_dir("SMALL_BOWEL_DATA",
            os.path.join(sc.get_dir("DATA_FOLDER"), "small_bowel_images"))
+
 sc.add_dir("SMALL_BOWEL_RESULT", os.path.join(sc.get_dir("RESULTS_FOLDER"),
                                               "small_bowel"))
+
+sc.add_dir("FILTER_TRANSMISSIONS",
+           os.path.join(sc.get_dir("DATA_FOLDER"),
+                        "filter_transmissions"))
 
 font = {'family' : 'normal',
         'size'   : 25}

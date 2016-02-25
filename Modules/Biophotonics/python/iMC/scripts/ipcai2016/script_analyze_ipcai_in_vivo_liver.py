@@ -29,6 +29,9 @@ sc.add_dir("LIVER_DATA",
            os.path.join(sc.get_dir("DATA_FOLDER"), "liver_images"))
 sc.add_dir("LIVER_RESULTS", os.path.join(sc.get_dir("RESULTS_FOLDER"), "liver"))
 
+sc.add_dir("FILTER_TRANSMISSIONS",
+           os.path.join(sc.get_dir("DATA_FOLDER"),
+                        "filter_transmissions"))
 
 font = {'family' : 'normal',
         'size'   : 30}

@@ -51,39 +51,39 @@ QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
 
     if(dynamic_cast<ctkXnatDataModel*>(xnatObject))
     {
-      path = ":/xnat/server.ico";
+      path = ":/xnat-module/xnat-server.png";
     }
     else if(dynamic_cast<ctkXnatProject*>(xnatObject))
     {
-      path = ":/xnat/project.png";
+      path = ":/xnat-module/xnat-project.png";
     }
     else if(dynamic_cast<ctkXnatSubject*>(xnatObject))
     {
-      path = ":/xnat/subject.ico";
+      path = ":/xnat-module/xnat-subject.png";
     }
     else if(dynamic_cast<ctkXnatExperiment*>(xnatObject))
     {
-      path = ":/xnat/experiment.ico";
+      path = ":/xnat-module/xnat-experiment.png";
     }
     else if (dynamic_cast<ctkXnatResourceFolder*>(xnatObject))
     {
-      path = ":/xnat/folder.ico";
+      path = ":/xnat-module/xnat-folder.png";
     }
     else if (dynamic_cast<ctkXnatResource*>(xnatObject))
     {
-      path = ":/xnat/resource.png";
+      path = ":/xnat-module/xnat-resource.png";
     }
     else if (dynamic_cast<ctkXnatScanFolder*>(xnatObject))
     {
-      path = ":/xnat/folder.ico";
+      path = ":/xnat-module/xnat-folder.png";
     }
     else if (dynamic_cast<ctkXnatScan*>(xnatObject))
     {
-      path = ":/xnat/scan.png";
+      path = ":/xnat-module/xnat-scan.png";
     }
     else if (dynamic_cast<ctkXnatFile*>(xnatObject))
     {
-      path = ":/xnat/file.png";
+      path = ":/xnat-module/xnat-file.png";
     }
     return QIcon(path);
   }

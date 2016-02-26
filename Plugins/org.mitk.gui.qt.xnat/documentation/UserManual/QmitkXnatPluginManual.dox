@@ -1,0 +1,113 @@
+/**
+\page org_mitk_gui_qt_xnat The XNAT Plugin
+
+\imageMacro{xnat-docu-icon.png,"Icon of XNAT Plugin",1.00}
+
+\tableofcontents
+
+\section org_mitk_gui_qt_xnatOverview Overview
+This plug-in is allows the communication with a XNAT server from within MITK.
+
+The benefits of this plug-in are:
+<ul>
+<li>Browsing through the XNAT data hierarchy
+<li>Downloading data and visualize/process it in the MITK Workbench
+<li>Uploading data from within the MITK Workbench
+</ul>
+
+\imageMacro{QmitkXnat_IMGTreeBrowser.png,"The XNAT tree-browser plugin", 6.00}
+
+\section org_mitk_gui_qt_xnatConnection Connect to XNAT
+For communicating with XNAT you have to connect to your XNAT instance.
+
+\subsection org_mitk_gui_qt_xnatPreferences XNAT preferences
+In order to establish the connection to XNAT you have to specify the XNAT server address, username and password in the XNAT preference page.
+It is also possible to specify a network proxy if you are behind one (this could lead to connection errors).
+Via the download path you can tell MITK where to save the data that is uploaded or downloaded.
+A screenshot of the preference page can be seen below.
+
+\imageMacro{QmitkXnat_IMGPreferences.png,"The XNAT preference page", 10.00}
+
+\subsection org_mitk_gui_qt_xnatSessionHandling Session time-out handling
+Once you are connected to XNAT, MITK takes care about the session handling. A existing XNAT session times out after a certain period of inactivity, usually after 15 minutes.
+One minute before session time-out MITK asks you to renew the session:
+
+\imageMacro{QmitkXnat_IMGSessionAboutToTimeOut.png,"Notification that the session will time-out in a minute", 6.00}
+
+If you do not renew the session MITK notifies you if the session has expired:
+
+\imageMacro{QmitkXnat_IMGSessionExpired.png,"Notification that the session has expired", 6.00}
+
+\section org_mitk_gui_qt_xnatBrowsing Browse data
+Once you are connected to XNAT, MITK displays the XNAT data hierachy as a tree within the XNAT tree browser.
+You can browse through the data by expanding the tree items ( which ist also possible via double click).
+If you hover the mouse cursor over an item you will see a tool tip with detailed information.
+The following table gives an overview about the icons of the treeview and the related XNAT objects
+
+<table>
+<caption id="multi_row">XNAT Icon Overview</caption>
+<tr><th>Icon                     <th>XNAT object
+<tr><td>\imageMacro{xnat-server.png, "" ,0.50} <td>XNAT Server
+<tr><td>\imageMacro{xnat-project.png, "" ,0.50} <td>XNAT Project
+<tr><td>\imageMacro{xnat-subject.png, "" ,0.50} <td>XNAT Subject
+<tr><td>\imageMacro{xnat-experiment.png, "" ,0.50} <td>XNAT Experiment
+<tr><td>\imageMacro{xnat-folder-icon.png, "" ,0.50} <td>XNAT Scan top-level folder
+<tr><td>\imageMacro{xnat-scan.png, "" ,0.50} <td>XNAT Scan
+<tr><td>\imageMacro{xnat-folder-icon.png, "" ,0.50} <td>XNAT Resource top-level folder
+<tr><td>\imageMacro{xnat-resource.png, "" ,0.50} <td>XNAT Resource folder
+<tr><td>\imageMacro{xnat-file.png, "" ,0.50} <td>XNAT File
+</table>
+
+If you have selected a XNAT project, subject or experiment, MITK displays detailed information in a separate info area below the tree browser
+
+\section org_mitk_gui_qt_xnatDownload Download data
+MITK allows you to download your data from XNAT. You can either simply download the data to your file system or your can download it and open it immediately in the workbench.
+\subsection org_mitk_gui_qt_xnatDownload Download data to file system
+If you just want to download data, simply right-click on a XNAT file or scan on the tree brower and select "Download". The data will be stored in the specified download location.
+\subsection org_mitk_gui_qt_xnatDownload Download data and open it in MITK
+You can download and open data in three ways:
+<ul>
+<li>One is via right-click on a file or scan and selecting "Download and open".
+<li>You can also double-click on a file or scan. MITK will then ask you if you want to download and open the data.
+<li>The other one is via selecting a file or scan with left-click and then click on the download button above the tree view
+</ul>
+
+\imageMacro{QmitkXnat_IMGDownloadButton.png,"The XNAT dowload button", 16.00}
+
+\section org_mitk_gui_qt_xnatUpload Upload data
+You can also upload data to XNAT from within the workbench. Please note that it is currently only possible to upload files as resources. Uploading DICOMs is not yet available.
+
+\subsection org_mitk_gui_qt_xnatUpload1 Upload from file system
+If you just want to upload a local file, right-click on a resource and select "Upload". A file dialog will open, which allows you to select a file for upload.
+
+\subsection org_mitk_gui_qt_xnatUpload2 Upload via data manager
+If you want to upload data from within the MITK Workbench you can simply right-click on the data node in the data manager and select "Upload to XNAT".
+An "XNAT Upload dialog" will appear:
+
+\imageMacro{QmitkXnat_IMGUploadDialog.png,"The XNAT upload dialog", 16.00}
+
+You can then either select a existing resource folder if MITK is able to find ones or you can select the upload destination in a tree view.
+
+\subsection org_mitk_gui_qt_xnatUpload3 Upload via drag and drop
+Another way to upload the data is to drag the data node on the XNAT resource where you want to upload it to.
+
+\subsection org_mitk_gui_qt_xnatUpload4 Upload via XNAT Plugin
+Finally, if you select a data node and you select a XNAT resource, the upload button of the XNAT plugin will be enabled. If you click on that, the data will be uploaded.
+
+\imageMacro{QmitkXnat_IMGUploadButton.png,"The XNAT upload button", 16.00}
+
+\section org_mitk_gui_qt_xnatAddResourceFolder Create a resource folder
+You can also create new resources (i.e. folders to group your files in XNAT). Therefor you can either right-click on a project, subject, experiment or scan and enter the name
+of the folder in the appearing dialog. Or you simply select one of these items and click on the "Add folder button" above the tree browser.
+
+\imageMacro{QmitkXnat_IMGAddFolderButton.png,"The XNAT add folder button", 16.00}
+
+\subsection org_mitk_gui_qt_xnatCreateSubject Create a subject
+You can create subjects by right-clicking on a project and selecting "Create new subject".
+A dialog will appear where you have to enter the subject information.
+
+\subsection org_mitk_gui_qt_xnatCreateExperiment Create a experiment
+You can create experiments by right-clicking on a subject and selecting "Create new experiment".
+A dialog will appear where you have to enter the experiment information.
+
+*/

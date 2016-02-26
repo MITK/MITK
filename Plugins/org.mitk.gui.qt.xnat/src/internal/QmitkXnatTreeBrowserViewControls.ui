@@ -54,7 +54,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../resources/xnat.qrc">
-         <normaloff>:/xnat/xnat-upload.png</normaloff>:/xnat/xnat-upload.png</iconset>
+         <normaloff>:/xnat-plugin/xnat-upload.png</normaloff>:/xnat-plugin/xnat-upload.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -77,7 +77,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../resources/xnat.qrc">
-         <normaloff>:/xnat/xnat-download.png</normaloff>:/xnat/xnat-download.png</iconset>
+         <normaloff>:/xnat-plugin/xnat-download.png</normaloff>:/xnat-plugin/xnat-download.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -100,7 +100,7 @@
        </property>
        <property name="icon">
         <iconset resource="../../resources/xnat.qrc">
-         <normaloff>:/xnat/xnat-folder.png</normaloff>:/xnat/xnat-folder.png</iconset>
+         <normaloff>:/xnat-plugin/xnat-folder.png</normaloff>:/xnat-plugin/xnat-folder.png</iconset>
        </property>
        <property name="iconSize">
         <size>

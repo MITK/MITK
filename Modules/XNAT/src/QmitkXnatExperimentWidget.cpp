@@ -51,7 +51,7 @@ void QmitkXnatExperimentWidget::Init()
   if (m_Mode == Mode::CREATE)
   {
     // change modality to xsiType
-    m_Controls.modalityLabel->setText("XSI Type*:");
+    m_Controls.modalityLabel->setText("Type*:");
 
     // create list of all experiment session types
     QStringList xsiTypeList;
@@ -87,7 +87,7 @@ void QmitkXnatExperimentWidget::Init()
     // create completer for experiment sessions
     QCompleter* completer = new QCompleter(xsiTypeList, this);
     m_Controls.modalityLineEdit->setCompleter(completer);
-    m_Controls.modalityLineEdit->setPlaceholderText("xnat::");
+    m_Controls.modalityLineEdit->setPlaceholderText("Start with \"xnat::\"");
   }
 }
 

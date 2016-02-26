@@ -145,7 +145,7 @@ void QmitkXnatCreateObjectDialog::OnAcceptClicked()
       msgBox.exec();
       return;
     }
-    else if (experiment->property("xsiType").isEmpty())
+    else if (experiment->property("xsiType").isEmpty() || experiment->property("xsiType") == "xnat:experimentData")
     {
       QMessageBox msgBox;
       msgBox.setIcon(QMessageBox::Warning);

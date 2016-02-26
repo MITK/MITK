@@ -232,10 +232,6 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
         spinBox->setMinimum(0.0);
         spinBox->setMaximum(1.0);
       }
-      if (name == "ScalarsRangeMaximum" || name == "ScalarsRangeMinimum")
-      {
-        spinBox->setMaximum(5000);
-      }
 
       connect(spinBox, SIGNAL(editingFinished()), this, SLOT(OnSpinBoxEditingFinished()));
 

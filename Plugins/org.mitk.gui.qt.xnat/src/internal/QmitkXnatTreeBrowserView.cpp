@@ -280,7 +280,7 @@ void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
       m_Controls.groupBox->show();
       m_Controls.progressBar->setValue(0);
     }
-    m_Controls.progressBar->setValue(fabs(currentProgress));
+    m_Controls.progressBar->setValue(currentProgress);
   }
 }
 

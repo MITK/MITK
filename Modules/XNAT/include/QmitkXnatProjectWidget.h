@@ -39,8 +39,8 @@ public:
     CREATE
   };
 
-  QmitkXnatProjectWidget(QWidget* parent = 0);
-  QmitkXnatProjectWidget(Mode mode, QWidget* parent = 0);
+  QmitkXnatProjectWidget(QWidget* parent = nullptr);
+  QmitkXnatProjectWidget(Mode mode, QWidget* parent = nullptr);
   ~QmitkXnatProjectWidget();
 
   void SetProject(ctkXnatProject* project);

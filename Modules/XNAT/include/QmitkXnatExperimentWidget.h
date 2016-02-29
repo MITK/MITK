@@ -39,8 +39,8 @@ public:
     CREATE
   };
 
-  QmitkXnatExperimentWidget(QWidget* parent = 0);
-  QmitkXnatExperimentWidget(Mode mode, QWidget* parent = 0);
+  QmitkXnatExperimentWidget(QWidget* parent = nullptr);
+  QmitkXnatExperimentWidget(Mode mode, QWidget* parent = nullptr);
   ~QmitkXnatExperimentWidget();
 
   void SetExperiment(ctkXnatExperiment* experiment);

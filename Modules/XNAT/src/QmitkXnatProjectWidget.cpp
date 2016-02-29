@@ -26,8 +26,8 @@ QmitkXnatProjectWidget::QmitkXnatProjectWidget(QWidget* parent)
 }
 
 QmitkXnatProjectWidget::QmitkXnatProjectWidget(Mode mode, QWidget* parent)
-  : m_Mode(mode)
-  , QWidget(parent)
+  : QWidget(parent)
+  , m_Mode(mode)
 {
   Init();
 }

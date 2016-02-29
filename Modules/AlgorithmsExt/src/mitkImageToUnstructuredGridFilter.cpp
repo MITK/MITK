@@ -59,7 +59,12 @@ void mitk::ImageToUnstructuredGridFilter::SetInput(const mitk::Image* image)
 }
 
 
-const mitk::Image* mitk::ImageToUnstructuredGridFilter::GetInput(void)
+const mitk::Image* mitk::ImageToUnstructuredGridFilter::GetInput(void) const
+{
+  return this->GetInput();
+}
+
+mitk::Image* mitk::ImageToUnstructuredGridFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
   {
@@ -67,7 +72,7 @@ const mitk::Image* mitk::ImageToUnstructuredGridFilter::GetInput(void)
     return nullptr;
   }
 
-  return static_cast<const mitk::Image* >( this->ProcessObject::GetInput(0) );
+  return static_cast< mitk::Image* >( this->ProcessObject::GetInput(0) );
 }
 
 template<typename TPixel, unsigned int VImageDimension>

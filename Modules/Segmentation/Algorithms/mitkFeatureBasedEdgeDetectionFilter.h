@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSegmentationExports.h>
 #include <mitkImageToUnstructuredGridFilter.h>
 
-#include <itkBinaryContourImageFilter.h>
-
 namespace mitk
 {
 
@@ -45,9 +43,6 @@ public:
 
   itkFactorylessNewMacro(Self)
 
-  itkGetMacro(thresholdImage,mitk::Image::Pointer)
-  itkGetMacro(TestImage, mitk::Image::Pointer)
-
   /** Sets the segmentation for calculating the statistics within that */
   void SetSegmentationMask(mitk::Image::Pointer);
 
@@ -67,16 +62,13 @@ protected:
 
   /** Execute a thresholding filter with the given lower and upper bound */
   template <typename TPixel, unsigned int VImageDimension>
-  void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, double lower, double upper);
+  void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, double lower, double upper, mitk::Image::Pointer& result);
 
   template <typename TPixel, unsigned int VImageDimension>
-  void ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage);
+  void ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& result);
 
   template <typename TPixel, unsigned int VImageDimension>
-  void ThreadedOpening( itk::Image<TPixel, VImageDimension>* originalImage);
-
-  template <typename TPixel, unsigned int VImageDimension>
-  void ThreadedClosing( itk::Image<TPixel, VImageDimension>* originalImage);
+  void ThreadedClosing( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& result);
 
 private:
 
@@ -84,12 +76,6 @@ private:
 
   /** The used mask given by the segmentation*/
   mitk::Image::Pointer m_SegmentationMask;
-
-  /** The thesholded image */
-  mitk::Image::Pointer m_thresholdImage;
-
-  mitk::Image::Pointer m_TestImage;
-
 };
 
 }

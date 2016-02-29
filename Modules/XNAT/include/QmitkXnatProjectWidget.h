@@ -40,7 +40,7 @@ public:
   };
 
   QmitkXnatProjectWidget(QWidget* parent = 0);
-  QmitkXnatProjectWidget(Mode mode=INFO, QWidget* parent = 0);
+  QmitkXnatProjectWidget(Mode mode, QWidget* parent = 0);
   ~QmitkXnatProjectWidget();
 
   void SetProject(ctkXnatProject* project);

@@ -152,24 +152,25 @@ mitk::NodePredicateBase* QmitkDataStorageListModel::GetPredicate() const
 
 void QmitkDataStorageListModel::reset()
 {
-  if(m_DataStorage == nullptr)
-  {
-    return;
-  }
-
   mitk::DataStorage::SetOfObjects::ConstPointer modelNodes;
 
-  if ( m_NodePredicate )
-    modelNodes = m_DataStorage->GetSubset(m_NodePredicate);
-  else
-    modelNodes = m_DataStorage->GetAll();
+  if ( m_DataStorage != nullptr )
+  {
+    if ( m_NodePredicate != nullptr )
+      modelNodes = m_DataStorage->GetSubset(m_NodePredicate);
+    else
+      modelNodes = m_DataStorage->GetAll();
+  }
 
   ClearInternalNodeList();
 
   // add all filtered nodes to our list
-  for (auto& node : *modelNodes)
+  if (modelNodes != nullptr)
   {
+    for (auto& node : *modelNodes)
+    {
       AddNodeToInternalList(node);
+    }
   }
 }
 

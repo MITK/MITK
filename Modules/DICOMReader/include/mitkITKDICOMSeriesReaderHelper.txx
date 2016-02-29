@@ -145,9 +145,9 @@ mitk::ITKDICOMSeriesReaderHelper
 #ifdef MBILOG_ENABLE_DEBUG
     MITK_DEBUG << "Start loading timestep " << currentTimeStep;
     MITK_DEBUG_OUTPUT_FILELIST( *timestepsIter )
-    reader->SetFileNames( *timestepsIter );
 #endif // MBILOG_ENABLE_DEBUG
 
+    reader->SetFileNames( *timestepsIter );
     reader->Update();
     readVolume = reader->GetOutput();
 

@@ -38,8 +38,8 @@ public:
     CREATE
   };
 
-  QmitkXnatSubjectWidget(QWidget* parent = 0);
-  QmitkXnatSubjectWidget(Mode mode, QWidget* parent = 0);
+  QmitkXnatSubjectWidget(QWidget* parent = nullptr);
+  QmitkXnatSubjectWidget(Mode mode, QWidget* parent = nullptr);
   ~QmitkXnatSubjectWidget();
 
   void SetSubject(ctkXnatSubject* subject);

@@ -41,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //!   to be executed on event reception, though! They should not be virtual.
 //! - Is there any valid use case for sub-classing? Declare class final?
 //! - Is GetDataNodes needed? DataStorage or Qt model would yield the same result.
+
 class MITKQTWIDGETS_EXPORT QmitkDataStorageListModel: public QAbstractListModel
 {
 public:
@@ -105,10 +106,12 @@ public:
   //! Callback entry for observed DataNodes' ModifiedEvent().
   //!
   //! Emits signal dataChanged().
-  //!
-  //! \warning When sub-classing, call this class' method first! Otherwise the node
-  //!          removal will not be reflected in the Qt model!
   virtual void OnDataNodeModified(const itk::Object *caller, const itk::EventObject &event);
+
+  //! Callback entry for observed BaseDatas' ModifiedEvent().
+  //!
+  //! Emits signal dataChanged().
+  virtual void OnDataModified(const itk::Object *caller, const itk::EventObject & event);
 
   //! Callback entry for DataStorage's DeleteEvent().
   //!
@@ -128,8 +131,14 @@ protected:
 
   //! Internal helper: Clear complete model list
   void ClearInternalNodeList();
-
 private:
+
+  enum OBSERVER_TUPLE_NAMES
+  {
+      NODE = 0,
+      NODE_OBSERVER = 1,
+      DATA_OBSERVER = 2,
+  };
 
   //! Holds the predicate that defines what nodes are part of the model.
   mitk::NodePredicateBase::Pointer m_NodePredicate;
@@ -141,11 +150,14 @@ private:
   //! ITK observer tag for the storage's DeleteEvent()
   unsigned long m_DataStorageDeleteObserverTag;
 
-  //! List of the current model's DataNodes along with their ModifiedEvent observer tags.
-  std::vector<std::pair<mitk::DataNode*, unsigned long>> m_NodesAndObserverTags;
+  //! List of the current model's DataNodes along with their ModifiedEvent observer tags
+  //! - element 0 : node
+  //! - element 1 : node's ModifiedEvent observer.
+  //! - element 2 : node data's ModifiedEvent observer.
+  std::vector<std::tuple<mitk::DataNode*, unsigned long, unsigned long>> m_NodesAndObserverTags;
 
   //! Prevents infinite loops.
   bool m_BlockEvents;
 };
 
-#endif
+#endif /* QMITKDATASTORAGELISTMODEL_H_ */

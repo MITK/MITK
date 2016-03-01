@@ -2,6 +2,8 @@
 # Boost
 #-----------------------------------------------------------------------------
 
+include(mitkFunctionGetMSVCVersion)
+
 # Sanity checks
 if(DEFINED BOOST_ROOT AND NOT EXISTS ${BOOST_ROOT})
   message(FATAL_ERROR "BOOST_ROOT variable is defined but corresponds to non-existing directory")
@@ -45,16 +47,9 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     set(_shell_extension .bat)
     set(_boost_layout)
     if(MSVC)
-      if(MSVC_VERSION EQUAL 1600)
-        set(_boost_with_toolset "vc10")
-        set(_boost_toolset "msvc-10.0")
-      elseif(MSVC_VERSION EQUAL 1700)
-        set(_boost_with_toolset "vc11")
-        set(_boost_toolset "msvc-11.0")
-      elseif(MSVC_VERSION EQUAL 1800)
-        set(_boost_with_toolset "vc12")
-        set(_boost_toolset "msvc-12.0")
-      endif()
+      mitkFunctionGetMSVCVersion()
+      set(_boost_with_toolset "vc${VISUAL_STUDIO_VERSION_MAJOR}")
+      set(_boost_toolset "msvc-${VISUAL_STUDIO_VERSION_MAJOR}.0")
     endif()
     set(_install_lib_dir "--libdir=<INSTALL_DIR>/bin")
     set(WIN32_CMAKE_SCRIPT ${ep_prefix}/src/${proj}-cmake/MoveBoostLibsToLibDirForWindows.cmake)

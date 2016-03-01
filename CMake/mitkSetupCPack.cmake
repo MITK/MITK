@@ -23,6 +23,21 @@ if(NOT CPACK_GENERATOR)
   endif()
 endif(NOT CPACK_GENERATOR)
 
+# Set Redistributable information for windows
+if(${CMAKE_SYSTEM_NAME} MATCHES Windows)
+  include(mitkFunctionGetMSVCVersion)
+  mitkFunctionGetMSVCVersion()
+  set(CPACK_VISUAL_STUDIO_VERSION_MAJOR "${VISUAL_STUDIO_VERSION_MAJOR}")
+  set(CPACK_VISUAL_STUDIO_PRODUCT_NAME "${VISUAL_STUDIO_PRODUCT_NAME}")
+  set(CPACK_LIBRARY_ARCHITECTURE "${CMAKE_LIBRARY_ARCHITECTURE}")
+  set(CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE "" CACHE FILEPATH "Path to the appropriate Microsoft Visual Studio Redistributable")
+endif()
+
+if(EXISTS ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE} )
+  install(PROGRAMS ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE}
+          DESTINATION thirdpartyinstallers)
+endif()
+
 # On windows set default install directory appropriately for 32 and 64 bit
 # installers if not already set
 if(WIN32 AND NOT CPACK_NSIS_INSTALL_ROOT)

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDataStorageListModel_h
 #define QmitkDataStorageListModel_h
 
-//#include <MitkQtWidgetsExports.h>
+#include <MitkQtWidgetsExports.h>
 
 // MITK
 #include "mitkDataStorage.h"
@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //! - Is there any valid use case for sub-classing? Declare class final?
 //! - Is GetDataNodes needed? DataStorage or Qt model would yield the same result.
 
-class /*MITKQTWIDGETS_EXPORT*/ QmitkDataStorageListModel: public QAbstractListModel
+class MITKQTWIDGETS_EXPORT QmitkDataStorageListModel: public QAbstractListModel
 {
 public:
 

@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkCommand.h"
 
 QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage* dataStorage,
-                                                               mitk::NodePredicateBase::Pointer pred,
-                                                               QObject* parent)
+                                                     mitk::NodePredicateBase::Pointer pred,
+                                                     QObject* parent)
 :QAbstractListModel(parent),
  m_NodePredicate(nullptr),
  m_DataStorage(nullptr),

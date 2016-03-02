@@ -64,7 +64,6 @@ SurfaceStlIO::SurfaceStlIO()
 
 std::vector<itk::SmartPointer<BaseData> > SurfaceStlIO::Read()
 {
-  // Switch the current locale to "C", STL could be ASCII
   LocaleSwitch localeSwitch("C");
 
   Options options = this->GetReaderOptions();
@@ -125,7 +124,6 @@ std::vector<itk::SmartPointer<BaseData> > SurfaceStlIO::Read()
 
 void SurfaceStlIO::Write()
 {
-  // Switch the current locale to "C", STL could be ASCII
   LocaleSwitch localeSwitch("C");
 
   ValidateOutputLocation();

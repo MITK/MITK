@@ -742,6 +742,9 @@ bool mitk::NDITrackingDevice::StartTracking()
 
 void mitk::NDITrackingDevice::TrackTools()
 {
+  /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+
   if (this->GetState() != Tracking)
     return;
 
@@ -750,8 +753,7 @@ void mitk::NDITrackingDevice::TrackTools()
   if (returnvalue != NDIOKAY)
     return;
 
-  /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -788,6 +790,8 @@ void mitk::NDITrackingDevice::TrackTools()
 
 void mitk::NDITrackingDevice::TrackMarkerPositions()
 {
+  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+
   if (m_OperationMode == ToolTracking6D)
     return;
 
@@ -799,8 +803,6 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   returnvalue = m_DeviceProtocol->DSTART();   // Start Diagnostic Mode
   if (returnvalue != NDIOKAY)
     return;
-
-  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -834,6 +836,8 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
 
 void mitk::NDITrackingDevice::TrackToolsAndMarkers()
 {
+
+  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
   if (m_OperationMode != HybridTracking)
     return;
 
@@ -842,8 +846,6 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
   returnvalue = m_DeviceProtocol->TSTART();   // Start Diagnostic Mode
   if (returnvalue != NDIOKAY)
     return;
-
-  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking

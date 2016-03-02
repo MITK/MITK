@@ -787,7 +787,7 @@ Function RedistributablePage
 
     ClearErrors
     File "@CPACK_PACKAGE_FILE_NAME@\thirdpartyinstallers\vcredist_@CPACK_LIBRARY_ARCHITECTURE@.exe"
-    ExecWait '"$INSTDIR\thirdpartyinstallers\vcredist_@CPACK_LIBRARY_ARCHITECTURE@.exe /passive /norestart"'
+    ExecWait '"$INSTDIR\thirdpartyinstallers\vcredist_@CPACK_LIBRARY_ARCHITECTURE@.exe" /passive /norestart'
     IfErrors endInstallationMissingRedist
 
     Goto RedistInstalled

@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCallbackFromGUIThread.h"
 
-#include <chrono>
-
 //Microservices
 #include "usServiceReference.h"
 #include "usModuleContext.h"
@@ -43,9 +41,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::IGTLMessageProvider::IGTLMessageProvider()
   : mitk::IGTLDeviceSource()
 {
-  //setup measurements
-  this->m_Measurement = mitk::IGTLMeasurements::GetInstance();
-
   this->SetName("IGTLMessageProvider");
   //m_MultiThreader = itk::MultiThreader::New();
   m_StreamingTimeMutex = itk::FastMutexLock::New();
@@ -78,7 +73,6 @@ mitk::IGTLMessageProvider::~IGTLMessageProvider()
 
 void mitk::IGTLMessageProvider::Update()
 {
-  long long startTime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
   Superclass::Update();
 
@@ -93,7 +87,6 @@ void mitk::IGTLMessageProvider::Update()
       tdMsg->GetTrackingDataElement(0, trackingData);
       float x_pos, y_pos, z_pos;
       trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
-      m_Measurement->AddMeasurement(1, x_pos, startTime); //x value is used as index
     }
   }
 }

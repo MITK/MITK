@@ -26,9 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataToIGTLMessageFilter::NavigationDataToIGTLMessageFilter()
 {
-  //setup measurements
-  this->m_Measurement = mitk::IGTLMeasurements::GetInstance();
-
   mitk::IGTLMessage::Pointer output = mitk::IGTLMessage::New();
   this->SetNumberOfRequiredOutputs(1);
   this->SetNthOutput(0, output.GetPointer());
@@ -71,7 +68,6 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateData()
   tdMsg->GetTrackingDataElement(0,trackingData);
   float x_pos, y_pos, z_pos;
   trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
-  m_Measurement->AddMeasurement(2,x_pos); //x value is used as index
 }
 
 

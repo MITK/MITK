@@ -26,10 +26,10 @@ namespace itk
     : StatisticsImageFilter< TInputImage >()
   {
     /*
-    * add the Skewness,Kurtosis,Entropy,Uniformity,MPP, UPP to the other statistical calculated Values
-    * of the mitkStatisticsImageFilter as the 7th to the 12th Output
+    * add the Skewness,Kurtosis,Entropy,Uniformity,MPP, UPP, Median to the other statistical calculated Values
+    * of the mitkStatisticsImageFilter as the 7th to the 13th Output
     */
-    for ( int i = 7; i < 13; ++i )
+    for ( int i = 7; i < 14; ++i )
     {
       typename RealObjectType::Pointer output =
         static_cast< RealObjectType * >( this->MakeOutput(i).GetPointer() );
@@ -42,6 +42,7 @@ namespace itk
     this->GetUniformityOutput()->Set( 0.0 );
     this->GetUPPOutput()->Set( 0.0 );
     this->GetMPPOutput()->Set( 0.0 );
+    this->GetMedianOutput()->Set( 0.0 );
 
     this->m_HistogramCalculated = false;
     this->m_HistogramGenerator =  HistogramGeneratorType::New();
@@ -63,6 +64,11 @@ namespace itk
         return RealObjectType::New().GetPointer();
         break;
       }
+    case 13:
+    {
+      return RealObjectType::New().GetPointer();
+      break;
+    }
     default:
       {
         // might as well make an image
@@ -178,6 +184,23 @@ namespace itk
     return static_cast< const RealObjectType * >( this->ProcessObject::GetOutput(12) );
   }
 
+  template< class TInputImage >
+  typename ExtendedStatisticsImageFilter< TInputImage >::RealObjectType *
+    ExtendedStatisticsImageFilter< TInputImage >
+    ::GetMedianOutput()
+  {
+    return static_cast< RealObjectType * >( this->ProcessObject::GetOutput(13) );
+  }
+
+  template< class TInputImage >
+  const typename ExtendedStatisticsImageFilter< TInputImage >::RealObjectType *
+    ExtendedStatisticsImageFilter< TInputImage >
+    ::GetMedianOutput() const
+  {
+    return static_cast< const RealObjectType * >( this->ProcessObject::GetOutput(13) );
+  }
+
+
 
   template< class TInputImage >
   void
@@ -188,11 +211,11 @@ namespace itk
 
     ComputeSkewnessKurtosisAndMPP();
 
-    CalculteHistogram();
+    CalculateHistogram();
 
     if(m_HistogramCalculated == true)
     {
-      ComputeEntropyUniformityAndUPP();
+      ComputeEntropyUniformityMedianAndUPP();
     }
     else
     {
@@ -255,7 +278,7 @@ namespace itk
   template< class TInputImage >
   void
     ExtendedStatisticsImageFilter< TInputImage >
-    ::CalculteHistogram()
+    ::CalculateHistogram()
   {
     m_HistogramGenerator->SetInput( this->GetInput() );
     m_HistogramGenerator->SetMarginalScale( 100 );
@@ -271,35 +294,49 @@ namespace itk
   template< class TInputImage >
   void
     ExtendedStatisticsImageFilter< TInputImage >
-    ::ComputeEntropyUniformityAndUPP()
+    ::ComputeEntropyUniformityMedianAndUPP()
   {
     double baseChange = std::log10(2);
     RealType partialProbability( 0.0 );
     RealType uniformity( 0.0 );
     RealType entropy( 0.0 );
     RealType upp( 0.0 );
+    RealType median( 0.0 );
 
     const typename HistogramGeneratorType::HistogramType* histogramForEntropy = GetHistogram();
+
+    double cumulativeProbability = 0.0;
+    bool medianFound = false;
 
     for (int i = 0; i < histogramForEntropy->Size(); i++)
     {
       partialProbability = histogramForEntropy->GetFrequency(i,0) / double ( histogramForEntropy->GetTotalFrequency() ) ;
+      cumulativeProbability += double ( partialProbability );
 
       if( partialProbability != 0)
       {
         entropy -= partialProbability *( std::log10(partialProbability) / std::log10(2) ) ;
         uniformity += std::pow(partialProbability,2);
 
-
         if(histogramForEntropy->GetMeasurement(i,0) > 0)
         {
           upp += std::pow(partialProbability,2);
         }
       }
+
+      if( cumulativeProbability >= 0.5 && !medianFound )
+      {
+          RealType binMin = histogramForEntropy->GetBinMin( 0, i );
+          RealType binMax = histogramForEntropy->GetBinMax( 0, i );
+          median = ( binMin + binMax ) / 2.0;
+          medianFound = true;
+      }
+
     }
     this->GetEntropyOutput()->Set( entropy );
     this->GetUniformityOutput()->Set( uniformity );
     this->GetUPPOutput()->Set( upp );
+    this->GetMedianOutput()->Set( median );
 
   }
 }

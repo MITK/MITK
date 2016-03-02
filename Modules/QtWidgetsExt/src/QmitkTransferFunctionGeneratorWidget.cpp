@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionInitializer.h>
 #include <mitkUnstructuredGrid.h>
 #include <QFileDialog>
+#include <QFontMetrics>
 
 #include <mitkTransferFunctionPropertySerializer.h>
 
@@ -93,22 +94,21 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
 
   mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
 
-  std::string fileName;
-  std::string fileNameOutput;
-
   presetFileName = QFileDialog::getSaveFileName( this,"Choose a filename to save the transfer function", presetFileName, "Transferfunction (*.xml)" );
 
+  if( !presetFileName.endsWith(".xml") )
+     presetFileName.append(".xml");
 
-  fileName=presetFileName.toLocal8Bit().constData();
+  MITK_INFO << "Saving Transferfunction under path: " << presetFileName.toStdString();
 
-  MITK_INFO << "Saving Transferfunction under path: " << fileName;
-
-  fileNameOutput= ReduceFileName(fileName);
-
-  if ( mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( fileName.c_str(),  tf ))
-    m_InfoPreset->setText( QString( (std::string("saved ")+ fileNameOutput).c_str() ) );
-  else
-    m_InfoPreset->setText( QString( std::string("saving failed").c_str() ) );
+  if ( mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( presetFileName.toLatin1(),  tf ))
+  {
+    QFontMetrics metrics(m_InfoPreset->font());
+    QString text = metrics.elidedText(presetFileName, Qt::ElideMiddle, m_InfoPreset->width());
+    m_InfoPreset->setText( QString("saved ") + text);
+  } else {
+    m_InfoPreset->setText( QString("saving failed") );
+  }
 }
 
 
@@ -117,24 +117,20 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
   if(tfpToChange.IsNull())
     return;
 
-  std::string fileName;
-  std::string fileNameOutput;
-
   presetFileName = QFileDialog::getOpenFileName( this,"Choose a file to open the transfer function from",presetFileName, "Transferfunction (*.xml)"  );
 
-  fileName=presetFileName.toLocal8Bit().constData();
+  MITK_INFO << "Loading Transferfunction from path: " << presetFileName.toStdString();
 
-  MITK_INFO << "Loading Transferfunction from path: " << fileName;
-
-  fileNameOutput= ReduceFileName(fileName);
-
-  mitk::TransferFunction::Pointer tf = mitk::TransferFunctionPropertySerializer::DeserializeTransferFunction(fileName.c_str());
+  mitk::TransferFunction::Pointer tf = mitk::TransferFunctionPropertySerializer::DeserializeTransferFunction(presetFileName.toLatin1());
 
   if(tf.IsNotNull())
   {
     tfpToChange->SetValue( tf );
 
-    m_InfoPreset->setText( QString( (std::string("loaded ")+ fileNameOutput).c_str() ) );
+    QFontMetrics metrics(m_InfoPreset->font());
+    QString text = metrics.elidedText(presetFileName, Qt::ElideMiddle, m_InfoPreset->width());
+    m_InfoPreset->setText( QString("loaded ") + text);
+
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     emit SignalUpdateCanvas();
   }
@@ -310,54 +306,6 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy) // L
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalUpdateCanvas();
 
-}
-
-std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fileNameLong )
-{
-  if (fileNameLong.length()< 40)
-    return fileNameLong;
-
-  std::string fileNameShort;
-  std::string fileNameRevert;
-
-  for(unsigned int i=0; i< fileNameLong.length(); i++)
-  {
-    if(i<3)
-    {
-      char x= fileNameLong[i];
-      fileNameShort= fileNameShort+x;
-    }
-    if(i==3)
-    {
-      fileNameShort= fileNameShort+"...";
-      break;
-    }
-  }
-
-  unsigned int len( fileNameLong.length() );
-  for(unsigned int i=len-1; i <= len; i--)
-  {
-    std::string x=std::string("")+fileNameLong[i];
-
-    if ( x.compare("/")==0 || x.compare("\\")==0)
-    {
-      fileNameRevert= "/" + fileNameRevert;
-      break;
-    }
-
-    if (i>=fileNameLong.length()-24)
-    {
-      fileNameRevert= x+ fileNameRevert;
-    }
-    else
-    {
-      fileNameRevert= "/..." + fileNameRevert;
-      break;
-    }
-
-  }
-
-  return fileNameShort+fileNameRevert;
 }
 
 QmitkTransferFunctionGeneratorWidget::~QmitkTransferFunctionGeneratorWidget()

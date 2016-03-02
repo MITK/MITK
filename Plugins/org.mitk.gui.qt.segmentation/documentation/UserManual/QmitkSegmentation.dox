@@ -137,17 +137,19 @@ As the Add/Subtract tools, holding CTRL / CMD while drawing will invert the curr
 
 \imageMacro{QmitkSegmentation_IMGIconRegionGrowing.png,"Region Growing Tool",3.81}
 
-Click at one point in a 2D slice widget to add an image region to the segmentation with the region growing tool. Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it.
-When working on an image with a high range of grey values, the selection range can be influenced more strongly by moving the cursor at higher velocity.
+Click at one point in a 2D slice widget to add an image region to the segmentation with the region growing tool. Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it. Moving the mouse left and right will shift the range.
 
 Region Growing selects all pixels around the mouse cursor that have a similar gray value as the pixel below the mouse cursor.
 This enables you to quickly create segmentations of structures that have a good contrast to surrounding tissue, e.g. the lungs.
 The tool will select more or less pixels (corresponding to a changing gray value interval width) when you move the mouse up or down while holding down the left mouse button.
 
+\if THISISNOTIMPLEMENTEDATTHEMOMENT
 A common issue with region growing is the so called "leakage" which happens when the structure of interest is connected to other pixels, of similar gray values, through a narrow "bridge" at the border of the structure.
 The Region Growing tool comes with a "leakage detection/removal" feature. If leakage happens, you can left-click into the leakage region and the tool will try to automatically remove this region (see illustration below).
 
 \imageMacro{QmitkSegmentation_IMGLeakage.png,"Leakage correction feature of the Region Growing tool",11.28}
+\endif
+
 <br>
 \imageMacro{QmitkSegmentation_IMGIconCorrection.png,"Correction Tool",3.77}
 
@@ -163,11 +165,11 @@ small corrective changes. The following figure shows the usage of this tool:
 <br>
 \imageMacro{QmitkSegmentation_IMGIconFill.png,"Fill Tool",3.81}
 
-Left-click inside a segmentation with holes to completely fill all holes.
+Left-click inside a segmentation with holes to completely fill all holes (left-click outside a segmentation).
 
 \imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase Tool",3.79}
 
-This tool removes a connected part of pixels that form a segmentation. You may use it to remove so called islands (see picture) or to clear a whole slice at once (hold CTRL while clicking).
+This tool removes a connected part of pixels that form a segmentation. You may use it to remove so called islands (see picture) or to clear a whole slice at once (left-click outside a segmentation).
 
 \imageMacro{QmitkSegmentation_IMGIconLiveWire.png,"LiveWire Tool",3.01}
 

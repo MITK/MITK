@@ -16,11 +16,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDiffusionHeaderSiemensDICOMFileReader.h"
 #include "mitkDiffusionHeaderSiemensDICOMFileHelper.h"
+#include "mitkDiffusionHeaderDICOMFileReader.h"
 
 #include "gdcmScanner.h"
 #include "gdcmReader.h"
 
 #include <vnl/vnl_math.h>
+
+static bool GetTagFromHierarchy( std::vector< gdcm::Tag > hierarchy, const gdcm::Tag& t_tag, const gdcm::DataSet& dataset, gdcm::DataSet& target)
+{
+  if( hierarchy.empty() )
+    return false;
+
+  const gdcm::DataElement& de = dataset.GetDataElement( hierarchy.at(0) );
+  const auto seq = de.GetValueAsSQ();
+
+  // last level of hierarchy, retrieve the first apperance
+  if( hierarchy.size() == 1 )
+  {
+    gdcm::Item& item2 = seq->GetItem(1);
+    gdcm::DataSet& nestedds2 = item2.GetNestedDataSet();
+
+    const gdcm::DataElement& nde2 = nestedds2.GetDataElement( t_tag );
+
+    if( !nde2.IsEmpty() )
+    {
+      target = nestedds2;
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else
+  {
+    if( seq->FindDataElement( hierarchy.at(1) ) )
+    {
+      for( gdcm::SequenceOfItems::SizeType i=1; i< seq->GetNumberOfItems(); i++ )
+      {
+        gdcm::Item& item = seq->GetItem(i);
+        gdcm::DataSet &nestedds = item.GetNestedDataSet();
+
+        // recursive call
+        return GetTagFromHierarchy( std::vector< gdcm::Tag >( hierarchy.begin() + 1, hierarchy.end() ), t_tag, nestedds, target);
+      }
+    }
+
+    return false;
+  }
+
+}
 
 /**
  * @brief Extract b value from the siemens diffusion tag
@@ -131,6 +177,8 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
 
   MITK_INFO << " -- Analyzing: " << filename;
 
+  bool retVal = false;
+
   const gdcm::DataSet& dataset = gdcmReader.GetFile().GetDataSet();
 
   const gdcm::Tag t_sie_diffusion( 0x0029,0x1010 );
@@ -144,9 +192,56 @@ bool mitk::DiffusionHeaderSiemensDICOMFileReader
     this->ExtractSiemensDiffusionTagInformation( siemens_diffusionheader_str, values );
 
     m_HeaderInformationList.push_back( values );
+    retVal = true;
+  }
+  else
+  {
+    const gdcm::Tag t_sie_bvalue( 0x0018, 0x9087);
+    const gdcm::Tag t_sie_gradient( 0x0021, 0x1146);
+
+    std::vector< gdcm::Tag > bv_hierarchy;
+    bv_hierarchy.push_back( gdcm::Tag(0x5200,0x9230) );
+    bv_hierarchy.push_back( gdcm::Tag(0x0018,0x9117) );
+
+    gdcm::DataSet bvalueset;
+    GetTagFromHierarchy( bv_hierarchy, t_sie_bvalue, dataset, bvalueset );
+
+    DiffusionImageDICOMHeaderInformation values;
+    double dbvalue = 0;
+    if( mitk::RevealBinaryTagC( t_sie_bvalue, bvalueset, (char*) &dbvalue) )
+    {
+      MITK_INFO("siemens.dicom.diffusion.bvalue") << dbvalue;
+      values.b_value = std::ceil( dbvalue );
+
+      if( values.b_value == 0)
+        values.baseline = true;
+    }
+
+    if( !values.baseline )
+    {
+      std::vector< gdcm::Tag > g_hierarchy;
+      g_hierarchy.push_back( gdcm::Tag(0x5200,0x9230) );
+      g_hierarchy.push_back( gdcm::Tag(0x0021,0x11fe) );
+
+      GetTagFromHierarchy( g_hierarchy, t_sie_gradient, dataset, bvalueset );
+
+      double gr_dir_arr[3] = {1,0,-1};
+      if( mitk::RevealBinaryTagC( t_sie_gradient, bvalueset, (char*) &gr_dir_arr ) )
+      {
+        MITK_INFO("siemens.dicom.diffusion.gradient") << "(" << gr_dir_arr[0] <<"," << gr_dir_arr[1] <<"," <<gr_dir_arr[2] <<")";
+      }
+
+      values.g_vector.copy_in( &gr_dir_arr[0] );
+    }
+
+    if( 1 )
+    {
+      m_HeaderInformationList.push_back( values );
+      retVal = true;
+    }
   }
 
-  return true;
+  return retVal;
 
 
 }

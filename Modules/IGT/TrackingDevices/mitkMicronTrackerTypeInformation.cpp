@@ -27,7 +27,8 @@ namespace mitk
 
   TrackingDeviceData MicronTrackerTypeInformation::GetDeviceDataMicronTrackerH40()
   {
-    return{ MicronTrackerTypeInformation::GetTrackingDeviceName(), "Micron Tracker H40", "ClaronMicron.stl", "X" };
+    TrackingDeviceData data = { MicronTrackerTypeInformation::GetTrackingDeviceName(), "Micron Tracker H40", "ClaronMicron.stl", "X" };
+    return data;
   }
 
   MicronTrackerTypeInformation::MicronTrackerTypeInformation()

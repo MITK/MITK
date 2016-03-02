@@ -57,54 +57,34 @@ macro(MITK_CREATE_MODULE_TESTS)
       endif()
     endforeach()
 
-    foreach(image ${MODULE_TESTIMAGES} ${ADDITIONAL_TEST_IMAGES} )
-      if(EXISTS ${image})
-        set(IMAGE_FULL_PATH ${image})
-      else()
-        # todo: maybe search other paths as well
-        # yes, please in mitk/Testing/Data, too
-        set(IMAGE_FULL_PATH ${MITK_DATA_DIR}/${image})
-      endif()
+    set(TEST_TYPES IMAGE SURFACE POINTSET) # add other file types here
 
-      if(EXISTS ${IMAGE_FULL_PATH})
-        foreach( test ${MODULE_IMAGE_TESTS} )
-          get_filename_component(TName ${test} NAME_WE)
-          get_filename_component(ImageName ${IMAGE_FULL_PATH} NAME)
-          add_test(${TName}_${ImageName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${TName} ${IMAGE_FULL_PATH})
-          # Add labels for CDash subproject support
-          if(MODULE_SUBPROJECTS)
-            set_property(TEST ${TName}_${ImageName} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
+    foreach(test_type ${TEST_TYPES})
+       foreach(test_data ${MODULE_TEST${test_type}} ${ADDITIONAL_TEST_${test_type}})
+         if(EXISTS ${test_data})
+           set(TEST_DATA_FULL_PATH ${test_data})
+          else()
+             # todo: maybe search other paths as well
+             # yes, please in mitk/Testing/Data, too
+             set(TEST_DATA_FULL_PATH ${MITK_DATA_DIR}/${test_data})
           endif()
-        endforeach()
-      else()
-        message("!!!!! No such file: ${IMAGE_FULL_PATH} !!!!!")
-      endif()
+
+           if(EXISTS ${TEST_DATA_FULL_PATH})
+             foreach( test ${MODULE_${test_type}_TESTS})
+               get_filename_component(TName ${test} NAME_WE)
+               get_filename_component(DName ${TEST_DATA_FULL_PATH} NAME)
+               add_test(${TName}_${DName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${TName} ${TEST_DATA_FULL_PATH})
+               # Add labels for CDash subproject support
+               if(MODULE_SUBPROJECTS)
+                 set_property(TEST ${TName}_${DName} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
+               endif()
+             endforeach()
+           else()
+             message("!!!!! No such file: ${TEST_DATA_FULL_PATH} !!!!!")
+           endif()
+         endforeach()
     endforeach()
 
-    foreach(surface ${MODULE_TESTSURFACES} ${ADDITIONAL_TEST_SURFACES} )
-      if(EXISTS ${surface})
-        set(SURFACE_FULL_PATH ${surface})
-      else()
-        # todo: maybe search other paths as well
-        # yes, please in mitk/Testing/Data, too
-        set(SURFACE_FULL_PATH ${MITK_DATA_DIR}/${surface})
-      endif()
-
-      if(EXISTS ${SURFACE_FULL_PATH})
-        foreach( test ${MODULE_SURFACE_TESTS} )
-          get_filename_component(TName ${test} NAME_WE)
-          get_filename_component(SurfaceName ${SURFACE_FULL_PATH} NAME)
-          add_test(${TName}_${SurfaceName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${TName} ${SURFACE_FULL_PATH})
-          # Add labels for CDash subproject support
-          if(MODULE_SUBPROJECTS)
-            set_property(TEST ${TName}_${SurfaceName} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
-          endif()
-        endforeach()
-      else()
-        message("!!!!! No such surface file: ${SURFACE_FULL_PATH} !!!!!")
-      endif()
-    endforeach()
-
-  endif()
+ endif()
 
 endmacro()

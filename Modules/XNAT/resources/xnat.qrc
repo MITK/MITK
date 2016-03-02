@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/xnat-module">
+        <file>xnat-experiment.png</file>
+        <file>xnat-file.png</file>
+        <file>xnat-folder.png</file>
+        <file>xnat-scan.png</file>
+        <file>xnat-project.png</file>
+        <file>xnat-resource.png</file>
+        <file>xnat-server.png</file>
+        <file>xnat-subject.png</file>
+    </qresource>
+</RCC>

@@ -55,7 +55,26 @@ void mitk::FeedbackContourTool::SetFeedbackContourColor( float r, float g, float
 
 void mitk::FeedbackContourTool::SetFeedbackContourColorDefault()
 {
-  m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(0.0/255.0, 255.0/255.0, 0.0/255.0));
+    m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(0.0/255.0, 255.0/255.0, 0.0/255.0));
+}
+
+void mitk::FeedbackContourTool::Deactivated()
+{
+  Superclass::Deactivated();
+  DataStorage* storage = m_ToolManager->GetDataStorage();
+  if ( storage && m_FeedbackContourNode.IsNotNull())
+  {
+    storage->Remove( m_FeedbackContourNode );
+    m_FeedbackContour->Clear();
+    SetFeedbackContourVisible(false);
+  }
+}
+
+void mitk::FeedbackContourTool::Activated()
+{
+  Superclass::Activated();
+
+  SetFeedbackContourVisible(true);
 }
 
 mitk::ContourModel* mitk::FeedbackContourTool::GetFeedbackContour()
@@ -66,6 +85,7 @@ mitk::ContourModel* mitk::FeedbackContourTool::GetFeedbackContour()
 void mitk::FeedbackContourTool::SetFeedbackContour(ContourModel::Pointer contour)
 {
   m_FeedbackContour = contour;
+  m_FeedbackContourNode->SetData(m_FeedbackContour);
 }
 
 void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)

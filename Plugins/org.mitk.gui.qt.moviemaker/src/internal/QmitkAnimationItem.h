@@ -32,7 +32,6 @@ public:
     FromRole,
     ToRole,
     ReverseRole,
-    StartAngleRole,
     OrbitRole
   };
 

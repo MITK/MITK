@@ -70,48 +70,6 @@ namespace mitk {
       typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
       typedef OptimizerType * OptimizerPointer;
 
-      typedef itk::ExhaustiveOptimizer ExhaustiveOptimizerType;
-      typedef ExhaustiveOptimizerType * ExhaustiveOptimizerPointer;
-
-      typedef itk::GradientDescentOptimizer GradientDescentOptimizerType;
-      typedef GradientDescentOptimizerType * GradientDescentOptimizerPointer;
-
-      typedef itk::QuaternionRigidTransformGradientDescentOptimizer QuaternionRigidTransformGradientDescentOptimizerType;
-      typedef QuaternionRigidTransformGradientDescentOptimizerType * QuaternionRigidTransformGradientDescentOptimizerPointer;
-
-      typedef itk::LBFGSBOptimizer LBFGSBOptimizerType;
-      typedef LBFGSBOptimizerType * LBFGSBOptimizerPointer;
-
-      typedef itk::OnePlusOneEvolutionaryOptimizer OnePlusOneEvolutionaryOptimizerType;
-      typedef OnePlusOneEvolutionaryOptimizerType * OnePlusOneEvolutionaryOptimizerPointer;
-
-      typedef itk::PowellOptimizer PowellOptimizerType;
-      typedef PowellOptimizerType * PowellOptimizerPointer;
-
-      typedef itk::FRPROptimizer FRPROptimizerType;
-      typedef FRPROptimizerType * FRPROptimizerPointer;
-
-      typedef itk::RegularStepGradientDescentOptimizer RegularStepGradientDescentOptimizerType;
-      typedef RegularStepGradientDescentOptimizerType * RegularStepGradientDescentOptimizerPointer;
-
-      typedef itk::VersorRigid3DTransformOptimizer VersorRigid3DTransformOptimizerType;
-      typedef VersorRigid3DTransformOptimizerType * VersorRigid3DTransformOptimizerPointer;
-
-      typedef itk::VersorTransformOptimizer VersorTransformOptimizerType;
-      typedef VersorTransformOptimizerType * VersorTransformOptimizerPointer;
-
-      typedef itk::AmoebaOptimizer AmoebaOptimizerType;
-      typedef AmoebaOptimizerType * AmoebaOptimizerPointer;
-
-      typedef itk::ConjugateGradientOptimizer ConjugateGradientOptimizerType;
-      typedef ConjugateGradientOptimizerType * ConjugateGradientOptimizerPointer;
-
-      typedef itk::LBFGSOptimizer LBFGSOptimizerType;
-      typedef LBFGSOptimizerType * LBFGSOptimizerPointer;
-
-      typedef itk::SPSAOptimizer SPSAOptimizerType;
-      typedef SPSAOptimizerType * SPSAOptimizerPointer;
-
       /**
       * \brief Reacts on events from ITK optimizers.
       *
@@ -163,12 +121,70 @@ namespace mitk {
     protected:
       RigidRegistrationObserver();
 
+      void HandleOptimizationIterationEvent(OptimizerType *optimizer );
+
   private:
     double m_OptimizerValue;
     itk::Array<double> m_Params;
     bool m_StopOptimization;
 
   };
+
+  template < class RegistrationType >
+  class MITKRIGIDREGISTRATION_EXPORT RigidRegistrationPyramidObserver : public itk::Command
+  {
+  public:
+    typedef itk::RegularStepGradientDescentBaseOptimizer OptimizerType;
+
+    mitkClassMacroItkParent( RigidRegistrationPyramidObserver<RegistrationType>, itk::Command)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
+
+    void Execute(itk::Object *caller, const itk::EventObject & /*event*/) override
+    {
+      RegistrationType* registration = dynamic_cast< RegistrationType* >( caller );
+
+      if( registration == NULL)
+        return;
+
+      OptimizerType* optimizer = dynamic_cast< OptimizerType* >(registration->GetOptimizer());
+
+      if( optimizer == NULL)
+      {
+         MITK_WARN("Pyramid.Registration.Command") << "No step adaptation possible with given optimizer, cast failed! ";
+            return;
+      }
+
+
+      MITK_DEBUG << "\t - Pyramid level " << registration->GetCurrentLevel();
+
+      if( registration->GetCurrentLevel() == 0 )
+      {
+        MITK_INFO("Pyramid.Registration.Command") << "First pyramid resolution level: ";
+        MITK_INFO("Pyramid.Registration.Command") << " Current settings: \n"
+                                                  << " Step length: (" << optimizer->GetMinimumStepLength()
+                                                  << "," << optimizer->GetMaximumStepLength() << "), Tolerance: "
+                                                  << optimizer->GetGradientMagnitudeTolerance() << " Iterations: "
+                                                  << optimizer->GetNumberOfIterations();
+            return;
+      }
+
+      optimizer->SetMaximumStepLength( optimizer->GetMaximumStepLength() * 0.25f );
+      optimizer->SetMinimumStepLength( optimizer->GetMinimumStepLength() * 0.1f );
+      optimizer->SetGradientMagnitudeTolerance( optimizer->GetGradientMagnitudeTolerance() * 0.1f );
+      optimizer->SetNumberOfIterations( optimizer->GetNumberOfIterations() * 1.5f );
+
+      MITK_INFO("Pyramid.Registration.Command") << " Current settings: \n"
+                                                << " Step length: (" << optimizer->GetMinimumStepLength()
+                                                << "," << optimizer->GetMaximumStepLength() << "), Tolerance: "
+                                                << optimizer->GetGradientMagnitudeTolerance() << " Iterations: "
+                                                << optimizer->GetNumberOfIterations();
+
+    }
+
+    void Execute(const itk::Object * /*object*/, const itk::EventObject & /*event*/) override {}
+  };
+
 
 } // namespace mitk
 

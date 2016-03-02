@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIGTLMessageFactory.h"
 #include "mitkIGTLMessageQueue.h"
 #include "mitkIGTLMessage.h"
-#include "mitkIGTLMeasurements.h"
 
 
 namespace mitk {
@@ -326,9 +325,6 @@ namespace mitk {
       */
       void SetState(IGTLDeviceState state);
 
-      /** Adds tracking measurements to the given message. */
-      void AddTrackingMeasurements(const int index, const igtl::MessageBase::Pointer msg, const long long timestamp);
-
       IGTLDevice();
       virtual ~IGTLDevice();
 
@@ -366,9 +362,6 @@ namespace mitk {
 
       /** A message factory that provides the New() method for all msg types */
       mitk::IGTLMessageFactory::Pointer m_MessageFactory;
-
-      /** Measurement class to calculate latency and frame count */
-      mitk::IGTLMeasurements* m_Measurement;
 
     private:
 

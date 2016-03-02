@@ -21,9 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkIGTUIExports.h"
 #include "mitkTrackingDevice.h"
 
-#include <qscrollbar.h>
-#include <qthread.h>
-
 #include <mitkIPersistenceService.h>
 
 #include "QmitkTrackingDeviceConfigurationWidgetConnectionWorker.h"
@@ -140,7 +137,7 @@ private:
   /**
   * \warning Don't touch this variable if you don't know what you are doing!
   */
-  bool isInitialized = false;
+  bool isInitialized;
 };
 
 #endif

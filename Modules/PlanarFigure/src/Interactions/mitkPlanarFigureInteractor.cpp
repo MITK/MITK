@@ -154,6 +154,9 @@ void mitk::PlanarFigureInteractor::FinalizeFigure( StateMachineAction*, Interact
   planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
   planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
 
+  // Shape might change when figure is finalized, e.g., smoothing of subdivision polygon
+  planarFigure->EvaluateFeatures();
+
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 }
 

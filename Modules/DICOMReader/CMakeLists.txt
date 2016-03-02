@@ -2,7 +2,7 @@ MITK_CREATE_MODULE(
   DEPENDS MitkCore
   PACKAGE_DEPENDS
     PUBLIC tinyxml
-    PRIVATE ITK|ITKIOGDCM
+    PRIVATE ITK|ITKIOGDCM DCMTK
 )
 
 add_subdirectory(test)

@@ -1,0 +1,16 @@
+<config>
+  <event_variant name="StartTranslationAlongAxis" class="InternalEvent" />
+  <event_variant name="StartRotationAroundAxis" class="InternalEvent" />
+  <event_variant name="ScaleEqually" class="InternalEvent" />
+  <event_variant name="MoveFreely" class="InternalEvent" />
+
+  <event_variant name="InteractionStartEvent" class="MousePressEvent">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant name="InteractionEndEvent" class="MouseReleaseEvent">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant name="InteractionMoveEvent" class="MouseMoveEvent">
+      <attribute name="ButtonState" value="LeftMouseButton"/>
+  </event_variant>
+</config>

@@ -230,6 +230,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    QmitkMITKIGTTrackingToolboxViewWorker* m_Worker;
 
   private:
+   ctkServiceReference m_DeviceTypeServiceReference;
    mitk::TrackingDeviceTypeCollection* m_DeviceTypeCollection;
 };
 

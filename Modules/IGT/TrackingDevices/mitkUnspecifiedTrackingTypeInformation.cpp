@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 
 #include "mitkIGTHardwareException.h"
-#include "mitkNDITrackingDevice.h"
 
 namespace mitk
 {
@@ -28,12 +27,14 @@ namespace mitk
 
   TrackingDeviceData UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified()
   {
-    return{ UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Unspecified System", "cube", "X" };
+    TrackingDeviceData data = { UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Unspecified System", "cube", "X" };
+    return data;
   }
   // Careful when changing the "invalid" device: The mitkTrackingTypeTest is using it's data.
   TrackingDeviceData UnspecifiedTrackingTypeInformation::GetDeviceDataInvalid()
   {
-    return{ UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Invalid Tracking System", "", "X" };
+    TrackingDeviceData data = { UnspecifiedTrackingTypeInformation::GetTrackingDeviceName(), "Invalid Tracking System", "", "X" };
+    return data;
   }
 
   UnspecifiedTrackingTypeInformation::UnspecifiedTrackingTypeInformation()

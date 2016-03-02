@@ -21,12 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThread>
 #include "MitkIGTUIExports.h"
 #include "ui_QmitkTrackingDeviceConfigurationWidgetControls.h"
-#include "mitkTrackingDevice.h"
-#include <mitkIPersistenceService.h>
 #include "mitkTrackingDeviceTypeCollection.h"
 #include "mitkTrackingDeviceWidgetCollection.h"
-
-//itk headers
 
 /** Documentation:
  *   \brief An object of this class offers an UI to configurate

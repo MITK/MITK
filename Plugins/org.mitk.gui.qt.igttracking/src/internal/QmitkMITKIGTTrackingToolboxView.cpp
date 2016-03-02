@@ -97,15 +97,17 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   if (pluginContext)
   {
     QString interfaceName = QString::fromStdString(us_service_interface_iid<mitk::TrackingDeviceTypeCollection>());
-    QList<ctkServiceReference> _ServiceReference = pluginContext->getServiceReferences(interfaceName);
+    QList<ctkServiceReference> serviceReference = pluginContext->getServiceReferences(interfaceName);
 
-    if (_ServiceReference.size() > 0)
+    if (serviceReference.size() > 0)
     {
-      m_DeviceTypeCollection = pluginContext->getService<mitk::TrackingDeviceTypeCollection>(_ServiceReference.at(0));
+      m_DeviceTypeServiceReference = serviceReference.at(0);
+      const ctkServiceReference& r = serviceReference.at(0);
+      m_DeviceTypeCollection = pluginContext->getService<mitk::TrackingDeviceTypeCollection>(r);
     }
     else
     {
-      MITK_INFO << "NO Tracking Device Collection!";
+      MITK_INFO << "No Tracking Device Collection!";
     }
 
   }
@@ -143,6 +145,7 @@ this->AutoSaveToolStorage();
 this->StoreUISettings();
 
 m_DeviceTypeCollection = nullptr;
+mitk::PluginActivator::GetContext()->ungetService(m_DeviceTypeServiceReference);
 
 }
 
@@ -1138,7 +1141,7 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
   if ( m_toolStorage.IsNotNull() ){
     m_toolStorage->UnLockStorage(); //only to be sure...
     m_toolStorage->UnRegisterMicroservice();
-    m_toolStorage = NULL;
+    m_toolStorage = nullptr;
   }
 
   //now: replace by the new one

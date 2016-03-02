@@ -41,11 +41,13 @@ void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer d
   // Set/Change Datastorage. This registers BDI to listen for events of DataStorage, to be informed when
   // a DataNode with a Interactor is added/modified/removed.
 
-  // clean up events from previous datastorage
-  UnRegisterDataStorageEvents();
-  m_DataStorage = dataStorage;
-  RegisterDataStorageEvents();
-
+  if (dataStorage != m_DataStorage)
+  {
+    // clean up events from previous datastorage
+    UnRegisterDataStorageEvents();
+    m_DataStorage = dataStorage;
+    RegisterDataStorageEvents();
+  }
 }
 
 mitk::BindDispatcherInteractor::~BindDispatcherInteractor()

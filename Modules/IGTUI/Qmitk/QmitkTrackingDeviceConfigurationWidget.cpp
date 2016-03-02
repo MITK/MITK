@@ -16,38 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTrackingDeviceConfigurationWidget.h"
 
-#include <mitkSerialCommunication.h>
-#include <qscrollbar.h>
-#include <qmessagebox.h>
-#include <qfiledialog.h>
-#include <mitkIGTException.h>
-#include <QSettings>
-
-#include "QmitkAbstractTrackingDeviceWidget.h"
-
-//All Tracking devices, which should be available by default
-#include "mitkNDIAuroraTypeInformation.h"
 #include "mitkNDIPolarisTypeInformation.h"
-#include "mitkVirtualTrackerTypeInformation.h"
-#include "mitkMicronTrackerTypeInformation.h"
-#include "mitkNPOptitrackTrackingTypeInformation.h"
-#include "mitkOpenIGTLinkTypeInformation.h"
-//standard tracking devices, which always should be avaiable
-#include "QmitkNDIAuroraWidget.h"
-#include "QmitkNDIPolarisWidget.h"
-#include "QmitkMicronTrackerWidget.h"
-#include "QmitkNPOptitrackWidget.h"
-#include "QmitkVirtualTrackerWidget.h"
-#include "QmitkOpenIGTLinkWidget.h"
+
+#include <QSettings>
 
 const std::string QmitkTrackingDeviceConfigurationWidget::VIEW_ID = "org.mitk.views.trackingdeviceconfigurationwidget";
 
 QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
+  , m_Controls(nullptr)
+  , m_TrackingDevice(nullptr)
   , m_DeviceToWidgetIndexMap()
 {
   //initializations
-  m_Controls = nullptr;
   CreateQtPartControl(this);
   CreateConnections();
 
@@ -66,7 +47,7 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
 {
   StoreUISettings();
-  m_Controls = nullptr;
+  delete m_Controls;
   m_TrackingDevice = nullptr;
 }
 
@@ -125,7 +106,7 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
 
   m_DeviceToWidgetIndexMap.clear();
 
-  // get tracking device type service
+  // get tracking device type service references
   us::ModuleContext* context = us::GetModuleContext();
   std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > deviceRefs =
     context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
@@ -133,26 +114,31 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
   if (deviceRefs.empty())
   {
     MITK_ERROR << "No tracking device type service found!";
+    return;
   }
 
-  mitk::TrackingDeviceTypeCollection* deviceTypeCollection =
-    context->GetService<mitk::TrackingDeviceTypeCollection>(deviceRefs.front());
-
-  // get tracking device configuration widget service
+  // get tracking device configuration widget service references
   std::vector<us::ServiceReference<mitk::TrackingDeviceWidgetCollection> > widgetRefs =
     context->GetServiceReferences<mitk::TrackingDeviceWidgetCollection>();
 
   if (widgetRefs.empty())
   {
     MITK_ERROR << "No tracking device configuration widget service found!";
+    return;
   }
 
+  const us::ServiceReference<mitk::TrackingDeviceTypeCollection>& deviceServiceReference = deviceRefs.front();
+  const us::ServiceReference<mitk::TrackingDeviceWidgetCollection>& widgetServiceReference = widgetRefs.front();
+
+  mitk::TrackingDeviceTypeCollection* deviceTypeCollection =
+    context->GetService<mitk::TrackingDeviceTypeCollection>(deviceServiceReference);
+
   mitk::TrackingDeviceWidgetCollection* deviceWidgetCollection =
-    context->GetService<mitk::TrackingDeviceWidgetCollection>(widgetRefs.front());
+    context->GetService<mitk::TrackingDeviceWidgetCollection>(widgetServiceReference);
 
   for (auto name : deviceTypeCollection->GetTrackingDeviceTypeNames())
   {
-    //if the device is not included yet, add name to comboBox and widget to stackedWidget
+    // if the device is not included yet, add name to comboBox and widget to stackedWidget
     if (m_Controls->m_TrackingDeviceChooser->findText(QString::fromStdString(name)) == -1)
     {
       m_Controls->m_TrackingDeviceChooser->addItem(QString::fromStdString(name));
@@ -172,6 +158,9 @@ void QmitkTrackingDeviceConfigurationWidget::RefreshTrackingDeviceCollection()
     m_Controls->m_TrackingDeviceChooser->setCurrentIndex(0);
     m_Controls->m_TrackingSystemWidget->setCurrentIndex(0);
   }
+
+  context->UngetService(deviceServiceReference);
+  context->UngetService(widgetServiceReference);
 }
 
 //######################### internal help methods #######################################

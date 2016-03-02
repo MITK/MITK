@@ -26,27 +26,29 @@ namespace mitk
   }
   TrackingDeviceData NDIPolarisTypeInformation::GetDeviceDataPolarisOldModel()
   {
-    return{ NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris (Old Model)", "NDIPolarisOldModel.stl", "0" };
+    TrackingDeviceData data = { NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris (Old Model)", "NDIPolarisOldModel.stl", "0" };
+    return data;
   }
   TrackingDeviceData NDIPolarisTypeInformation::GetDeviceDataPolarisSpectra()
   {
     //full hardware code of polaris spectra: 5-240000-153200-095000+057200+039800+056946+024303+029773+999999+99999924
-    return{ NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Spectra", "NDIPolarisSpectra.stl", "5-2" };
+    TrackingDeviceData data = { NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Spectra", "NDIPolarisSpectra.stl", "5-2" };
+    return data;
   }
 
   TrackingDeviceData NDIPolarisTypeInformation::GetDeviceDataSpectraExtendedPyramid()
   {
     //full hardware code of polaris spectra (extended pyramid): 5-300000-153200-095000+057200+039800+056946+024303+029773+999999+07350024
-    return{ NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Spectra (Extended Pyramid)", "NDIPolarisSpectraExtendedPyramid.stl", "5-3" };
+    TrackingDeviceData data = { NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Spectra (Extended Pyramid)", "NDIPolarisSpectraExtendedPyramid.stl", "5-3" };
+    return data;
   }
   TrackingDeviceData NDIPolarisTypeInformation::GetDeviceDataPolarisVicra()
   {
-    return{ NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Vicra", "NDIPolarisVicra.stl", "7" };
+    TrackingDeviceData data = { NDIPolarisTypeInformation::GetTrackingDeviceName(), "Polaris Vicra", "NDIPolarisVicra.stl", "7" };
+    return data;
   }
 
   NDIPolarisTypeInformation::NDIPolarisTypeInformation()
-    //: m_DeviceName("Polaris")
-    //, m_Widget(nullptr)
   {
     m_DeviceName = NDIPolarisTypeInformation::GetTrackingDeviceName();
     m_TrackingDeviceData.push_back(GetDeviceDataPolarisOldModel());

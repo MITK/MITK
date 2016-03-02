@@ -17,13 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkMicronTrackerWidget_H
 #define QmitkMicronTrackerWidget_H
 
-#include <QWidget>
-#include "MitkIGTUIExports.h"
 #include "ui_QmitkMicronTrackerWidget.h"
 
 #include "QmitkAbstractTrackingDeviceWidget.h"
 
-//itk headers
 
 /** Documentation:
  *   \brief Implementation of a configuration widget for Micron Tracking Devices.
@@ -54,6 +51,7 @@ private:
   void CreateConnections();
 
   void CreateQtPartControl(QWidget *parent);
+
 protected:
   virtual QmitkMicronTrackerWidget* Clone(QWidget* parent) const;
 

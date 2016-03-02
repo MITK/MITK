@@ -17,8 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkNPOptitrackTrackingTypeInformation_h
 #define mitkNPOptitrackTrackingTypeInformation_h
 
-#include <MitkIGTExports.h>
-
 #include "mitkTrackingDeviceTypeInformation.h"
 
 namespace mitk

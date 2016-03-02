@@ -80,10 +80,7 @@ class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWid
 
     QString presetFileName;
 
-    std::string ReduceFileName(std::string fileNameLong );
-
     double ScaleDelta(int d) const;
-
 };
 
 #endif

@@ -160,8 +160,8 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   if (contourIter == projectedContour->End())
     return false;
   itk::Index<2> previousIndex;
-  previousIndex[0] = (*contourIter)->Coordinates[0];
-  previousIndex[1] = (*contourIter)->Coordinates[1];
+  previousIndex[0] = std::max(0.0, (*contourIter)->Coordinates[0]);
+  previousIndex[1] = std::max(0.0, (*contourIter)->Coordinates[1]);
   ++contourIter;
 
   int currentColor = ( pic->GetPixel(previousIndex) == m_FillColor);
@@ -176,8 +176,8 @@ The algorithm is described in full length in Tobias Heimann's diploma thesis
   {
     // Get current point
     itk::Index<2> currentIndex;
-    currentIndex[0] = (*contourIter)->Coordinates[0] +0.5;
-    currentIndex[1] = (*contourIter)->Coordinates[1] +0.5;
+    currentIndex[0] = std::max(0.0, (*contourIter)->Coordinates[0] + 0.5);
+    currentIndex[1] = std::max(0.0, (*contourIter)->Coordinates[1] + 0.5);
 
     // Calculate length and slope
     double slopeX = currentIndex[0] - previousIndex[0];

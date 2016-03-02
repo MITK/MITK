@@ -202,10 +202,6 @@ namespace mitk {
     /** \brief flag to indicate if the provider is streaming */
     bool                                      m_IsStreaming;
 
-    /** Measurement class to calculate latency and frame count */
-    mitk::IGTLMeasurements* m_Measurement;
-
-
     unsigned long m_LostConnectionObserverTag;
   };
 

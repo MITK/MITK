@@ -15,20 +15,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkNDIAbstractDeviceWidget.h"
-#include "QmitkTrackingDeviceConfigurationWidget.h"
-#include <mitkNDITrackingDevice.h>
 
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QThread>
 
 const std::string QmitkNDIAbstractDeviceWidget::VIEW_ID = "org.mitk.views.NDIAbstractDeviceWidget";
 
 QmitkNDIAbstractDeviceWidget::QmitkNDIAbstractDeviceWidget(QWidget* parent, Qt::WindowFlags f)
   : QmitkAbstractTrackingDeviceWidget(parent, f)
+  , m_ScanPortsWorker(new QmitkTrackingDeviceConfigurationWidgetScanPortsWorker())
+  , m_ScanPortsWorkerThread(new QThread())
 {
-  //initialize worker thread
-  m_ScanPortsWorker = new QmitkTrackingDeviceConfigurationWidgetScanPortsWorker();
-  m_ScanPortsWorkerThread = new QThread();
 }
 
 void QmitkNDIAbstractDeviceWidget::InitializeNDIWidget()

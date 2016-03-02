@@ -17,13 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNPOptitrackWidget_H
 #define QmitkNPOptitrackWidget_H
 
-#include <QWidget>
-#include "MitkIGTUIExports.h"
 #include "ui_QmitkNPOptitrackWidget.h"
-
 #include "QmitkAbstractTrackingDeviceWidget.h"
 
-//itk headers
 
 /** Documentation:
 *   \brief Implementation of a configuration widget for NP Optitrack Tracking Devices.

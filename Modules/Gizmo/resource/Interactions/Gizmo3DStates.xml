@@ -1,0 +1,46 @@
+<statemachine NAME="GizmoInteractor3D">
+    <state name="start" startstate="true" >
+        <transition event_class="MousePressEvent" event_variant="InteractionStartEvent" target="decide_interaction">
+            <condition name="PickedHandle"/>
+            <action name="DecideInteraction"/>
+        </transition>
+    </state>
+    <state name="decide_interaction">
+        <transition event_class="InternalEvent" event_variant="StartTranslationAlongAxis" target="translation_along_axis"/>
+        <transition event_class="InternalEvent" event_variant="StartRotationAroundAxis" target="rotation_around_axis"/>
+        <transition event_class="InternalEvent" event_variant="MoveFreely" target="free_moving"/>
+        <transition event_class="InternalEvent" event_variant="ScaleEqually" target="equal_scaling"/>
+    </state>
+    <state name="translation_along_axis">
+        <transition event_class="MouseReleaseEvent" event_variant="InteractionEndEvent" target="start">
+            <action name ="FeedUndoStack"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="InteractionMoveEvent" target="translation_along_axis">
+            <action name ="MoveAlongAxis"/>
+        </transition>
+    </state>
+    <state name="equal_scaling">
+        <transition event_class="MouseReleaseEvent" event_variant="InteractionEndEvent" target="start">
+            <action name ="FeedUndoStack"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="InteractionMoveEvent" target="equal_scaling">
+            <action name ="ScaleEqually"/>
+        </transition>
+    </state>
+    <state name="rotation_around_axis">
+        <transition event_class="MouseReleaseEvent" event_variant="InteractionEndEvent" target="start">
+            <action name ="FeedUndoStack"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="InteractionMoveEvent" target="rotation_around_axis">
+            <action name ="RotateAroundAxis"/>
+        </transition>
+    </state>
+    <state name="free_moving">
+        <transition event_class="MouseReleaseEvent" event_variant="InteractionEndEvent" target="start">
+            <action name ="FeedUndoStack"/>
+        </transition>
+        <transition event_class="MouseMoveEvent" event_variant="InteractionMoveEvent" target="free_moving">
+            <action name ="MoveFreely"/>
+        </transition>
+    </state>
+</statemachine>

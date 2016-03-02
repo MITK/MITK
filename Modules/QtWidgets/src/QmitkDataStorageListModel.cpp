@@ -24,9 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 // itk
 #include "itkCommand.h"
 
-QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage::Pointer dataStorage
-                                                     , mitk::NodePredicateBase* pred, QObject* parent)
- : QAbstractListModel(parent), m_NodePredicate(nullptr), m_DataStorage(nullptr), m_BlockEvents(false)
+QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage* dataStorage,
+                                                     mitk::NodePredicateBase::Pointer pred,
+                                                     QObject* parent)
+:QAbstractListModel(parent),
+ m_NodePredicate(nullptr),
+ m_DataStorage(nullptr),
+ m_BlockEvents(false)
 {
   this->SetPredicate(pred);
   this->SetDataStorage(dataStorage);
@@ -34,54 +38,55 @@ QmitkDataStorageListModel::QmitkDataStorageListModel(mitk::DataStorage::Pointer 
 
 QmitkDataStorageListModel::~QmitkDataStorageListModel()
 {
-  // set data storage to 0 so that event listener get removed
+  // set data storage to nullptr so that the event listener gets removed
   this->SetDataStorage(nullptr);
-
-  if (m_NodePredicate) delete m_NodePredicate;
 }
 
 void QmitkDataStorageListModel::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
 {
-  if( m_DataStorage != dataStorage)
+  if( m_DataStorage == dataStorage)
   {
-    // remove old listeners
-    if(m_DataStorage != nullptr)
-    {
-      this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageListModel
-        , const mitk::DataNode*>( this, &QmitkDataStorageListModel::NodeAdded ) );
-
-      this->m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageListModel
-        , const mitk::DataNode*>( this, &QmitkDataStorageListModel::NodeRemoved ) );
-
-      // remove delete observer
-      m_DataStorage->RemoveObserver(m_DataStorageDeleteObserverTag);
-      // this is good coding style ! reset variables whenever they are not used anymore.
-      m_DataStorageDeleteObserverTag = 0;
-    }
-
-    m_DataStorage = dataStorage;
-
-    // remove event listeners
-    if(m_DataStorage != nullptr)
-    {
-      // subscribe for node added/removed events
-      this->m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageListModel
-        , const mitk::DataNode*>( this, &QmitkDataStorageListModel::NodeAdded ) );
-
-      this->m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageListModel
-        , const mitk::DataNode*>( this, &QmitkDataStorageListModel::NodeRemoved ) );
-
-      // add itk delete listener on datastorage
-      itk::MemberCommand<QmitkDataStorageListModel>::Pointer deleteCommand =
-        itk::MemberCommand<QmitkDataStorageListModel>::New();
-      deleteCommand->SetCallbackFunction(this, &QmitkDataStorageListModel::OnDelete);
-      // add observer
-      m_DataStorageDeleteObserverTag = m_DataStorage->AddObserver(itk::DeleteEvent(), deleteCommand);
-    }
-
-    // reset model
-    reset();
+    return;
   }
+
+  // remove old listeners
+  if(m_DataStorage != nullptr)
+  {
+    m_DataStorage->AddNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkDataStorageListModel, const mitk::DataNode*>(
+        this, &QmitkDataStorageListModel::OnDataStorageNodeAdded));
+
+    m_DataStorage->RemoveNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkDataStorageListModel, const mitk::DataNode*>(
+        this, &QmitkDataStorageListModel::OnDataStorageNodeRemoved));
+
+    m_DataStorage->RemoveObserver(m_DataStorageDeleteObserverTag);
+    m_DataStorageDeleteObserverTag = 0;
+  }
+
+  m_DataStorage = dataStorage;
+
+  if(m_DataStorage != nullptr)
+  {
+    // subscribe for node added/removed events
+    m_DataStorage->AddNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkDataStorageListModel, const mitk::DataNode*>(
+        this, &QmitkDataStorageListModel::OnDataStorageNodeAdded));
+
+    m_DataStorage->RemoveNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkDataStorageListModel, const mitk::DataNode*>(
+        this, &QmitkDataStorageListModel::OnDataStorageNodeRemoved));
+
+    // add ITK delete listener on data storage
+    itk::MemberCommand<QmitkDataStorageListModel>::Pointer deleteCommand =
+    itk::MemberCommand<QmitkDataStorageListModel>::New();
+    deleteCommand->SetCallbackFunction(this,
+                                         &QmitkDataStorageListModel::OnDataStorageDeleted);
+    m_DataStorageDeleteObserverTag = m_DataStorage->AddObserver(itk::DeleteEvent(), deleteCommand);
+  }
+
+  // reset/rebuild model
+  reset();
 }
 
 Qt::ItemFlags QmitkDataStorageListModel::flags(const QModelIndex&) const
@@ -91,40 +96,39 @@ Qt::ItemFlags QmitkDataStorageListModel::flags(const QModelIndex&) const
 
 QVariant QmitkDataStorageListModel::data(const QModelIndex& index, int role) const
 {
-  if(index.isValid())
+  if(role == Qt::DisplayRole && index.isValid())
   {
-    switch ( role )
-    {
-      case Qt::DisplayRole:
-      {
-        const mitk::DataNode* node = m_DataNodes.at(index.row());
-        std::string name = node->GetName();
-        return QVariant(QString::fromStdString(name));
-      }
-      break;
-
-    }
-  } // index.isValid()
-
-  return QVariant();
+    const mitk::DataNode* node = std::get<NODE>(m_NodesAndObserverTags.at(index.row()));
+    return QVariant(QString::fromStdString(node->GetName()));
+  }
+  else
+  {
+    return QVariant();
+  }
 }
 
 QVariant QmitkDataStorageListModel::headerData(int  /*section*/, Qt::Orientation  /*orientation*/, int  /*role*/) const
 {
-  return QVariant("Nodes");
+  return QVariant(tr("Nodes"));
 }
 
 int QmitkDataStorageListModel::rowCount(const QModelIndex&  /*parent*/) const
 {
-  return m_DataNodes.size();
+  return m_NodesAndObserverTags.size();
 }
 
 std::vector<mitk::DataNode*> QmitkDataStorageListModel::GetDataNodes() const
 {
-  return m_DataNodes;
+  auto size = m_NodesAndObserverTags.size();
+  std::vector<mitk::DataNode*> result(size);
+  for (int i = 0; i < size; ++i)
+  {
+    result[i] = std::get<NODE>(m_NodesAndObserverTags[i]);
+  }
+  return result;
 }
 
-mitk::DataStorage::Pointer QmitkDataStorageListModel::GetDataStorage() const
+mitk::DataStorage* QmitkDataStorageListModel::GetDataStorage() const
 {
   return m_DataStorage;
 }
@@ -133,8 +137,11 @@ mitk::DataStorage::Pointer QmitkDataStorageListModel::GetDataStorage() const
 void QmitkDataStorageListModel::SetPredicate(mitk::NodePredicateBase* pred)
 {
   m_NodePredicate = pred;
-  reset();
+
+  // in a prior implementation the call to beginResetModel() been after reset().
+  // Should this actually be the better order of calls, please document!
   QAbstractListModel::beginResetModel();
+  reset();
   QAbstractListModel::endResetModel();
 }
 
@@ -145,47 +152,86 @@ mitk::NodePredicateBase* QmitkDataStorageListModel::GetPredicate() const
 
 void QmitkDataStorageListModel::reset()
 {
-  if(m_DataStorage != nullptr)
+  mitk::DataStorage::SetOfObjects::ConstPointer modelNodes;
+
+  if ( m_DataStorage != nullptr )
   {
-    mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects;
-
-    if (m_NodePredicate)
-      setOfObjects = m_DataStorage->GetSubset(m_NodePredicate);
-    else
-      setOfObjects = m_DataStorage->GetAll();
-
-    // remove all observes
-    unsigned int i = 0;
-    for(auto it=m_DataNodes.begin()
-      ; it!=m_DataNodes.end()
-      ; ++it, ++i)
+    if ( m_NodePredicate != nullptr )
     {
-      (*it)->RemoveObserver(m_DataNodesModifiedObserversTags[i]);
+      modelNodes = m_DataStorage->GetSubset(m_NodePredicate);
+    }
+    else
+    {
+      modelNodes = m_DataStorage->GetAll();
+    }
+  }
+
+  ClearInternalNodeList();
+
+  // add all filtered nodes to our list
+  if (modelNodes != nullptr)
+  {
+    for (auto& node : *modelNodes)
+    {
+        AddNodeToInternalList(node);
+    }
+  }
+}
+
+void QmitkDataStorageListModel::AddNodeToInternalList(mitk::DataNode* node)
+{
+  if (m_DataStorage != nullptr)
+  {
+    itk::MemberCommand<QmitkDataStorageListModel>::Pointer nodeModifiedCommand;
+    // add modified observer
+    nodeModifiedCommand = itk::MemberCommand<QmitkDataStorageListModel>::New();
+    nodeModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageListModel::OnDataNodeModified);
+    unsigned long nodeObserverTag =  node->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
+
+    itk::MemberCommand<QmitkDataStorageListModel>::Pointer dataModifiedCommand;
+    unsigned long dataObserverTag = 0;
+    // add modified observer
+    if (node->GetData() != nullptr) {
+      dataModifiedCommand = itk::MemberCommand<QmitkDataStorageListModel>::New();
+      dataModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageListModel::OnDataModified);
+      unsigned long dataObserverTag =  node->GetData()->AddObserver(itk::ModifiedEvent(), dataModifiedCommand);
     }
 
-    // clear vector with nodes
-    m_DataNodesModifiedObserversTags.clear();
-    m_DataNodes.clear();
-    itk::MemberCommand<QmitkDataStorageListModel>::Pointer modifiedCommand;
-    // copy all selected nodes the vector
-    for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-      ; nodeIt != setOfObjects->End(); ++nodeIt, ++i)  // for each node
-    {
-      // add modified observer
-      modifiedCommand = itk::MemberCommand<QmitkDataStorageListModel>::New();
-      modifiedCommand->SetCallbackFunction(this, &QmitkDataStorageListModel::OnModified);
-      m_DataNodesModifiedObserversTags.push_back( m_DataStorage->AddObserver(itk::ModifiedEvent(), modifiedCommand) );
-      m_DataNodes.push_back( nodeIt.Value().GetPointer());
+    m_NodesAndObserverTags.push_back( std::make_tuple(node, nodeObserverTag, dataObserverTag) );
+  }
+}
 
-    } // for
-
-  } // m_DataStorage != 0
-
-} // reset()
-
-void QmitkDataStorageListModel::NodeAdded( const mitk::DataNode* node )
+void QmitkDataStorageListModel::ClearInternalNodeList()
 {
-  // garantuee no recursions when a new node event is thrown
+  for(auto& iter : m_NodesAndObserverTags)
+  {
+    std::get<NODE>(iter)->RemoveObserver(std::get<NODE_OBSERVER>(iter));
+  }
+  m_NodesAndObserverTags.clear();
+}
+
+void QmitkDataStorageListModel::RemoveNodeFromInternalList(mitk::DataNode* node)
+{
+  for(auto iter = m_NodesAndObserverTags.begin();
+      iter != m_NodesAndObserverTags.end();
+      ++iter)
+  {
+    if (std::get<NODE>(*iter) == node)
+    {
+      node->RemoveObserver(std::get<NODE_OBSERVER>(*iter));
+      if (node->GetData() != nullptr)
+      {
+        node->GetData()->RemoveObserver(std::get<DATA_OBSERVER>(*iter));
+      }
+      m_NodesAndObserverTags.erase(iter); // invalidate iter
+      break;
+    }
+  }
+}
+
+void QmitkDataStorageListModel::OnDataStorageNodeAdded( const mitk::DataNode* node )
+{
+  // guarantee no recursions when a new node event is thrown
   if(!m_BlockEvents)
   {
     m_BlockEvents = true;
@@ -197,9 +243,9 @@ void QmitkDataStorageListModel::NodeAdded( const mitk::DataNode* node )
 
     if(addNode)
     {
-      beginInsertRows(QModelIndex(), m_DataNodes.size(), m_DataNodes.size());
-      //reset();
-      m_DataNodes.push_back(const_cast<mitk::DataNode*>(node));
+      int newIndex = m_NodesAndObserverTags.size();
+      beginInsertRows(QModelIndex(), newIndex, newIndex);
+      AddNodeToInternalList(const_cast<mitk::DataNode*>(node));
       endInsertRows();
     }
 
@@ -207,68 +253,84 @@ void QmitkDataStorageListModel::NodeAdded( const mitk::DataNode* node )
   }
 }
 
-void QmitkDataStorageListModel::NodeRemoved( const mitk::DataNode* node )
+void QmitkDataStorageListModel::OnDataStorageNodeRemoved( const mitk::DataNode* node )
 {
-  // garantuee no recursions when a new node event is thrown
+  // guarantee no recursions when a new node event is thrown
   if(!m_BlockEvents)
   {
     m_BlockEvents = true;
 
-    int row = -1;
-    //bool removeNode = false;
-    // check if node is contained in current list, if yes: reset model
-    for (std::vector<mitk::DataNode*>::const_iterator nodeIt = m_DataNodes.begin()
-      ; nodeIt != m_DataNodes.end(); nodeIt++)  // for each node
+    int row = 0;
+    for(auto iter = m_NodesAndObserverTags.begin();
+        iter != m_NodesAndObserverTags.end();
+        ++iter, ++row)
     {
-      row++;
-      if( (*nodeIt) == node )
+      if (std::get<NODE>(*iter) == node)
       {
         // node found, remove it
         beginRemoveRows(QModelIndex(), row, row);
-        m_DataNodes.erase(std::find(m_DataNodes.begin(), m_DataNodes.end(), (*nodeIt)));
+        RemoveNodeFromInternalList(std::get<NODE>(*iter));
         endRemoveRows();
         break;
       }
     }
-
-    m_BlockEvents = false;
   }
+
+  m_BlockEvents = false;
 }
 
-void QmitkDataStorageListModel::OnModified( const itk::Object *caller, const itk::EventObject & /*event*/ )
+void QmitkDataStorageListModel::OnDataNodeModified( const itk::Object *caller, const itk::EventObject & /*event*/ )
 {
   if(m_BlockEvents) return;
 
   const mitk::DataNode* modifiedNode = dynamic_cast<const mitk::DataNode*>(caller);
   if(modifiedNode)
   {
-    int row = std::distance(std::find(m_DataNodes.begin(), m_DataNodes.end(), modifiedNode), m_DataNodes.end());
-    QModelIndex indexOfChangedProperty = index(row, 1);
-
-    emit dataChanged(indexOfChangedProperty, indexOfChangedProperty);
+    QModelIndex changedIndex = getIndex(modifiedNode);
+    if (changedIndex.isValid())
+    {
+      emit dataChanged(changedIndex, changedIndex);
+    }
   }
 }
 
-void QmitkDataStorageListModel::OnDelete( const itk::Object *caller, const itk::EventObject & /*event*/ )
+void QmitkDataStorageListModel::OnDataModified( const itk::Object *caller, const itk::EventObject & event )
+{
+  OnDataNodeModified(caller, event); // until different implementation
+}
+
+
+void QmitkDataStorageListModel::OnDataStorageDeleted( const itk::Object *caller, const itk::EventObject & /*event*/ )
 {
   if(m_BlockEvents) return;
 
-  const mitk::DataStorage* dataStorage = dynamic_cast<const mitk::DataStorage*>(caller);
-  if(dataStorage)
-  {
-    // set datastorage to 0 -> empty model
-    this->SetDataStorage(nullptr);
-  }
+  // set data storage to nullptr -> empty model
+  this->SetDataStorage(nullptr);
 }
 
 mitk::DataNode::Pointer QmitkDataStorageListModel::getNode( const QModelIndex &index ) const
 {
-  mitk::DataNode::Pointer node;
-
   if(index.isValid())
   {
-    node = m_DataNodes.at(index.row());
+    return std::get<NODE>(m_NodesAndObserverTags.at(index.row()));
   }
+  else
+  {
+    return nullptr;
+  }
+}
 
-  return node;
+QModelIndex QmitkDataStorageListModel::getIndex(const mitk::DataNode* node) const
+{
+  int row = 0;
+  for ( auto iter = m_NodesAndObserverTags.begin();
+       iter != m_NodesAndObserverTags.end();
+       ++iter, ++row )
+  {
+    if ( std::get<NODE>(*iter) == node )
+    {
+      return index(row);
+    }
+  }
+  return QModelIndex();
 }

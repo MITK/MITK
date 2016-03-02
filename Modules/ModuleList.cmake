@@ -14,6 +14,7 @@ set(mitk_modules
   AlgorithmsExt
   MapperExt
   DICOMReader
+  DICOMReaderServices
   DICOMTesting
   Qt4Qt5TestModule
   SceneSerializationBase
@@ -23,6 +24,7 @@ set(mitk_modules
   ImageStatistics
   LegacyAdaptors
   SceneSerialization
+  Gizmo
   GraphAlgorithms
   Multilabel
   ContourModel

@@ -106,8 +106,6 @@ void mitk::IGTLClient::Send()
   if ( curMessage.IsNull() )
     return;
 
-  AddTrackingMeasurements(4, curMessage, 0);
-
   if (!this->SendMessagePrivate(curMessage.GetPointer(), this->m_Socket) )
   {
     MITK_WARN("IGTLDevice") << "Could not send the message.";

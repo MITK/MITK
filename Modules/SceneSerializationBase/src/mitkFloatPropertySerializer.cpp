@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBasePropertySerializer.h"
 
 #include "mitkProperties.h"
+#include "mitkStringsToNumbers.h"
 
 namespace mitk
 {
@@ -37,7 +38,7 @@ class FloatPropertySerializer : public BasePropertySerializer
       if (const FloatProperty* prop = dynamic_cast<const FloatProperty*>(m_Property.GetPointer()))
       {
         auto  element = new TiXmlElement("float");
-        element->SetDoubleAttribute("value", static_cast<double>(prop->GetValue()));
+        element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()));
         return element;
       }
       else return nullptr;
@@ -47,10 +48,18 @@ class FloatPropertySerializer : public BasePropertySerializer
     {
       if (!element) return nullptr;
 
-      float f;
-      if ( element->QueryFloatAttribute( "value", &f ) == TIXML_SUCCESS )
+      std::string f_string;
+      if ( element->QueryStringAttribute( "value", &f_string) == TIXML_SUCCESS )
       {
-        return FloatProperty::New(f).GetPointer();
+          try
+          {
+            return FloatProperty::New(boost::lexical_cast<float>(f_string)).GetPointer();
+          }
+          catch ( boost::bad_lexical_cast& e )
+          {
+            MITK_ERROR << "Could not parse string as number: " << e.what();
+            return nullptr;
+          }
       }
       else
       {

@@ -38,7 +38,6 @@ You have to choose the render window which you want to record.
 
 The Orbit animation rotates the camera in the 3D window around the scene.
 Align the camera directly in the 3D window and enter the number of degrees for the orbitting.
-You usually do not need to adjust the "Start angle" setting - leave it at 180 degrees.
 If you are planning to have a specific view in the middle of your movie you can play the movie and pause it at the specific frame of interest.
 Adjust the camera in the 3D window and restart the animation.
 

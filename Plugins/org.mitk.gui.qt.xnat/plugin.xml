@@ -31,6 +31,10 @@
     <keyword id="org.mitk.gui.qt.application.XnatConnectionPreferencePageKeywords" label="xnat session connection login"></keyword>
   </extension>
 
+  <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
+    <contextMenuAction nodeDescriptorName="Unknown" label="Upload to XNAT" icon=":/xnat-plugin/xnat-icon.png" class="QmitkUploadToXNATAction" />
+  </extension>
+
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.views.xnat.treebrowser.ViewKeyword"  label="DICOM" />
     <keyword id="org.mitk.views.xnat.treebrowser.ViewKeyword"  label="WPACS" />

@@ -17,13 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNDIAbstractDeviceWidget_H
 #define QmitkNDIAbstractDeviceWidget_H
 
-#include <QWidget>
 #include "MitkIGTUIExports.h"
 #include "QmitkAbstractTrackingDeviceWidget.h"
-
 #include "QmitkTrackingDeviceConfigurationWidgetScanPortsWorker.h"
-
-//itk headers
 
 /** Documentation:
 *   \brief Abstract class of a configuration widget for NDI Devices.

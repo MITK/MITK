@@ -598,11 +598,6 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 {
   if (m_Segmentation && m_FeedbackNode->GetData())
   {
-    //making interpolation separately undoable
-    mitk::UndoStackItem::IncCurrObjectEventId();
-    mitk::UndoStackItem::IncCurrGroupEventId();
-    mitk::UndoStackItem::ExecuteIncrement();
-
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
@@ -643,11 +638,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
    */
   if (m_Segmentation)
   {
-    //making interpolation separately undoable
-    mitk::UndoStackItem::IncCurrObjectEventId();
-    mitk::UndoStackItem::IncCurrGroupEventId();
-    mitk::UndoStackItem::ExecuteIncrement();
-
     mitk::Image::Pointer image3D = m_Segmentation;
     unsigned int timeStep( slicer->GetTime()->GetPos() );
     if (m_Segmentation->GetDimension() == 4)
@@ -735,6 +725,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
         std::stringstream comment;
         comment << "Confirm all interpolations (" << totalChangedSlices << ")";
         mitk::OperationEvent* undoStackItem = new mitk::OperationEvent( mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment.str() );
+        mitk::OperationEvent::IncCurrGroupEventId();
+        mitk::OperationEvent::IncCurrObjectEventId();
         mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
 
         // acutally apply the changes here to the original image

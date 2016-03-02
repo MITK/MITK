@@ -85,7 +85,6 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
     myUndoController->SetOperationEvent(operationEvent);
     //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
     mitk::OperationEvent::IncCurrObjectEventId();
-    mitk::UndoStackItem::ExecuteIncrement();
   }
 
   //now 2 * 2 operation should have been instanciated
@@ -103,7 +102,6 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
     myUndoController->SetOperationEvent(operationEvent);
     //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
     mitk::OperationEvent::IncCurrObjectEventId();
-    mitk::UndoStackItem::ExecuteIncrement();
   }
 
   //2 operations should have been deleted, 4 should have been added
@@ -129,7 +127,6 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
     myUndoController->SetOperationEvent(operationEvent);
     //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
     mitk::OperationEvent::IncCurrObjectEventId();
-    mitk::UndoStackItem::ExecuteIncrement();
   }
   MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4,"checking added operations in UndoModel");
 

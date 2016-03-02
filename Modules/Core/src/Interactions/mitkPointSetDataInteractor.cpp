@@ -57,10 +57,6 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    // 1) Undo/Redo Supports Grouping of Operations that are undone as a set,
-    // this statement indicates that a new Operation starts here
-    mitk::OperationEvent::IncCurrObjectEventId();
-
     mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
 
     this->UnselectAll( timeStep, timeInMs);
@@ -89,6 +85,7 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
       // 4) Do and Undo Operations are combined in an Operation event which also contains the target of the operations (here m_PointSet)
       OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Add point");
       // 5) Store the Operation in the UndoController
+      OperationEvent::IncCurrObjectEventId();
       m_UndoController->SetOperationEvent(operationEvent);
     }
 
@@ -139,7 +136,8 @@ void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
       if (m_UndoEnabled)
       {
         PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT,timeInMs,point, index);
-        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp);
+        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Select Point");
+        OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent(operationEvent);
       }
 
@@ -171,8 +169,6 @@ void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionE
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    mitk::OperationEvent::IncCurrObjectEventId();
-
     mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
 
     //search the point in the list
@@ -189,6 +185,7 @@ void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionE
       {
         PointOperation* undoOp = new mitk::PointOperation(OpINSERT,timeInMs, itkPoint, position);
         OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Remove point");
+        mitk::OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent(operationEvent);
       }
       //execute the Operation
@@ -300,7 +297,8 @@ void mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction*, 
       if (m_UndoEnabled)  //write to UndoMechanism
       {
         PointOperation* undoOp = new mitk::PointOperation(OpSELECTPOINT,timeInMs, point, index);
-        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp);
+        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Unselect Point");
+        OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent(operationEvent);
       }
       //execute the Operation
@@ -347,8 +345,8 @@ void mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk:
           if ( m_UndoEnabled )
           {
             mitk::PointOperation* undoOp = new mitk::PointOperation(OpSELECTPOINT, timeInMs,  noPoint, position);
-            OperationEvent *operationEvent = new OperationEvent( m_PointSet, doOp, undoOp );
-
+            OperationEvent *operationEvent = new OperationEvent( m_PointSet, doOp, undoOp, "Unselect Point" );
+            OperationEvent::IncCurrObjectEventId();
             m_UndoController->SetOperationEvent( operationEvent );
           }
 
@@ -421,8 +419,6 @@ void mitk::PointSetDataInteractor::InitMove(StateMachineAction*, InteractionEven
   if (positionEvent == NULL)
     return;
 
-  mitk::OperationEvent::IncCurrObjectEventId();
-
   // start of the Movement is stored to calculate the undoKoordinate
   // in FinishMovement
   m_LastPoint = positionEvent->GetPositionInWorld();
@@ -476,6 +472,7 @@ void mitk::PointSetDataInteractor::FinishMove(StateMachineAction*, InteractionEv
           mitk::Point3D undoPoint = ( itkPoint - m_SumVec );
           PointOperation* undoOp = new mitk::PointOperation(OpMOVE,timeInMs, undoPoint, position);
           OperationEvent *operationEvent =  new OperationEvent(m_PointSet, doOp, undoOp, "Move point");
+          OperationEvent::IncCurrObjectEventId();
           m_UndoController->SetOperationEvent(operationEvent);
         }
         //execute the Operation
@@ -490,7 +487,6 @@ void mitk::PointSetDataInteractor::FinishMove(StateMachineAction*, InteractionEv
 
     // Update the display
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-    OperationEvent::IncCurrGroupEventId();
   }
   else
   {
@@ -594,8 +590,8 @@ void mitk::PointSetDataInteractor::UnselectAll(unsigned int timeStep, ScalarType
       {
         mitk::PointOperation *undoOp =
             new mitk::PointOperation(OpSELECTPOINT, timeInMs, noPoint, position);
-        OperationEvent *operationEvent = new OperationEvent( pointSet, doOp, undoOp );
-
+        OperationEvent *operationEvent = new OperationEvent( pointSet, doOp, undoOp, "Unselect Point" );
+        OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent( operationEvent );
       }
 
@@ -630,7 +626,8 @@ void mitk::PointSetDataInteractor::SelectPoint(int position, unsigned int timeSt
   {
     mitk::PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT,timeInMS, noPoint, position);
 
-    OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
+    OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp, "Select Point");
+    OperationEvent::IncCurrObjectEventId();
     m_UndoController->SetOperationEvent(operationEvent);
   }
 

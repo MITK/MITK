@@ -1186,9 +1186,6 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
       movingLandmarks = registration->GetTransformedTargetLandmarks();
       mitk::PointSet::PointDataIterator it;
       it = m_MovingLandmarks->GetPointSet()->GetPointData()->Begin();
-      //increase the eventId to encapsulate the coming operations
-      mitk::OperationEvent::IncCurrObjectEventId();
-      mitk::OperationEvent::ExecuteIncrement();
       for(pointId=0; pointId<movingLandmarks->Size();++pointId, ++it)
       {
         int position = it->Index();
@@ -1200,8 +1197,8 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
         //undo operation
         mitk::PointOperation* undoOp = new mitk::PointOperation(mitk::OpMOVE, undoPoint, position);
         mitk::OperationEvent* operationEvent = new mitk::OperationEvent(m_MovingLandmarks, doOp, undoOp, "Move point");
+        mitk::OperationEvent::IncCurrObjectEventId();
         mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(operationEvent);
-
         //execute the Operation
         m_MovingLandmarks->ExecuteOperation(doOp);
       }

@@ -376,7 +376,6 @@ void mitk::GizmoInteractor::FeedUndoStack(StateMachineAction*, InteractionEvent*
                                                         m_FinalUndoOperation.release(),
                                                         "Direct geometry manipulation");
     mitk::OperationEvent::IncCurrObjectEventId(); // save each modification individually
-    mitk::OperationEvent::ExecuteIncrement();
     m_UndoController->SetOperationEvent(operationEvent);
   }
 }

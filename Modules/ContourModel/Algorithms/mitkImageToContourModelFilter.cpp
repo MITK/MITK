@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::ImageToContourModelFilter::ImageToContourModelFilter()
-  : m_SliceGeometry(nullptr)
+  : m_SliceGeometry(nullptr),
+    m_ContourValue(0.5)
 {
 }
 
@@ -72,6 +73,19 @@ const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilte
   if (this->GetNumberOfInputs() < 1)
     return nullptr;
   return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(idx));
+}
+
+
+void mitk::ImageToContourModelFilter::SetContourValue(float contourValue)
+{
+    this->m_ContourValue = contourValue;
+    this->Modified();
+}
+
+
+float mitk::ImageToContourModelFilter::GetContourValue()
+{
+    return this->m_ContourValue;
 }
 
 
@@ -124,7 +138,7 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
 
   typename ContourExtractor::Pointer contourExtractor = ContourExtractor::New();
   contourExtractor->SetInput(padFilter->GetOutput());
-  contourExtractor->SetContourValue(0.5);
+  contourExtractor->SetContourValue(m_ContourValue);
 
   contourExtractor->Update();
 

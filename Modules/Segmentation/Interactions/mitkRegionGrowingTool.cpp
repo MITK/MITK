@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include "mitkImageAccessByItk.h"
 #include <itkConnectedThresholdImageFilter.h>
+#include <itkConnectedComponentImageFilter.h>
 #include <itkNeighborhoodIterator.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include "mitkITKImageImport.h"
@@ -50,11 +51,9 @@ mitk::RegionGrowingTool::RegionGrowingTool()
       m_ScreenXDifference(0),
       m_VisibleWindow(0),
       m_MouseDistanceScaleFactor(0.5),
-      m_FillFeedbackContour(true)
+      m_FillFeedbackContour(true),
+      m_ConnectedComponentValue(1)
 {
-//    m_SeedPoint = {0, 0, 0};
-//    m_Thresholds = {200, 200};
-//    m_InitialThresholds = {200, 200};
 }
 
 mitk::RegionGrowingTool::~RegionGrowingTool()
@@ -247,7 +246,15 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
         MITK_DEBUG << "Region growing result is empty.";
     }
 
-    outputImage = mitk::GrabItkImageMemory(resultImage);
+    // Can potentially have multiple regions, use connected component image filter to label disjunct regions
+    typedef itk::ConnectedComponentImageFilter<OutputImageType, OutputImageType> ConnectedComponentImageFilterType;
+    typename ConnectedComponentImageFilterType::Pointer connectedComponentFilter = ConnectedComponentImageFilterType::New();
+    connectedComponentFilter->SetInput(resultImage);
+    connectedComponentFilter->Update();
+    typename OutputImageType::Pointer resultImageCC = connectedComponentFilter->GetOutput();
+    m_ConnectedComponentValue = resultImageCC->GetPixel(seedIndex);
+
+    outputImage = mitk::GrabItkImageMemory(resultImageCC);
 
 }
 
@@ -406,10 +413,11 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction*, Interac
         resultImage->SetGeometry(workingSliceGeometry);
 
         // Extract contour
-        if (resultImage.IsNotNull())
+        if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
         {
             mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
             contourExtractor->SetInput(resultImage);
+            contourExtractor->SetContourValue(m_ConnectedComponentValue - 0.5);
             contourExtractor->Update();
             ContourModel::Pointer resultContour = ContourModel::New();
             resultContour = contourExtractor->GetOutput();
@@ -460,10 +468,11 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
         resultImage->SetGeometry(workingSliceGeometry);
 
         // Update the contour
-        if (resultImage.IsNotNull())
+        if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
         {
             mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
             contourExtractor->SetInput(resultImage);
+            contourExtractor->SetContourValue(m_ConnectedComponentValue - 0.5);
             contourExtractor->Update();
             ContourModel::Pointer resultContour = ContourModel::New();
             resultContour = contourExtractor->GetOutput();

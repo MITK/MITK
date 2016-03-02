@@ -146,6 +146,7 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
     ScalarType m_MouseDistanceScaleFactor;
     int m_PaintingPixelValue;
     bool m_FillFeedbackContour;
+    int m_ConnectedComponentValue;
 };
 
 } // namespace

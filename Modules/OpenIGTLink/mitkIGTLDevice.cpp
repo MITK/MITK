@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMutexLockHolder.h>
 #include <itksys/SystemTools.hxx>
 #include <cstring>
-#include <chrono>
 
 #include <igtlTransformMessage.h>
 #include <mitkIGTLMessageCommon.h>
@@ -63,9 +62,6 @@ mitk::IGTLDevice::IGTLDevice(bool ReadFully) :
   m_SendQueue      = mitk::IGTLMessageQueue::New();
   m_ReceiveQueue   = mitk::IGTLMessageQueue::New();
   m_CommandQueue   = mitk::IGTLMessageQueue::New();
-
-  //setup measurements
-  this->m_Measurement = mitk::IGTLMeasurements::GetInstance();
 }
 
 mitk::IGTLDevice::~IGTLDevice()
@@ -218,9 +214,6 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
          curMessage->GetPackBodySize(), m_ReadFully);
 
 
-      // measure the time
-      const long long timeStamp6 = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-
       if ( receiveCheck > 0 )
       {
         int c = curMessage->Unpack(1);
@@ -229,8 +222,6 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
           return IGTL_STATUS_CHECKSUM_ERROR;
         }
 
-        //save timestamp 6 now because we know the index
-        AddTrackingMeasurements(6, curMessage, timeStamp6);
         //check the type of the received message
         //if it is a command push it into the command queue
         //otherwise into the normal receive queue
@@ -243,7 +234,6 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
         }
         else
         {
-          AddTrackingMeasurements(7, curMessage, timeStamp6);
           this->m_ReceiveQueue->PushMessage(curMessage);
           this->InvokeEvent(MessageReceivedEvent());
         }
@@ -279,7 +269,6 @@ void mitk::IGTLDevice::SendMessage(const mitk::IGTLMessage* msg)
 
 void mitk::IGTLDevice::SendMessage(igtl::MessageBase::Pointer msg)
 {
-  AddTrackingMeasurements(3, msg, 0);
   //add the message to the queue
   m_SendQueue->PushMessage(msg);
 }
@@ -300,9 +289,6 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(igtl::MessageBase::Pointer msg
 
   // Pack (serialize) and send
   msg->Pack();
-
-  // measure the time
-  AddTrackingMeasurements(5, msg, 0);
 
   int sendSuccess = socket->Send(msg->GetPackPointer(), msg->GetPackSize());
 
@@ -472,15 +458,6 @@ igtl::MessageBase::Pointer mitk::IGTLDevice::GetNextMessage()
   //copy the next message into the given msg
   igtl::MessageBase::Pointer msg = this->m_ReceiveQueue->PullMessage();
 
-  if (msg.IsNotNull())
-  {
-    AddTrackingMeasurements(8, msg, 0);
-    unsigned int seconds = 0;
-    unsigned int frac = 0;
-    msg->GetTimeStamp(&seconds, &frac);
-    //std::cout << "8: s: " << seconds << " f: " << frac << std::endl;
-  }
-
   return msg;
 }
 
@@ -564,19 +541,4 @@ ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartConnecting(void* pInfoStruct
    }
    igtlDevice->m_ConnectThreadID = 0;  // erase thread id because thread will end.
    return ITK_THREAD_RETURN_VALUE;
-}
-
-void mitk::IGTLDevice::AddTrackingMeasurements(const int index, const igtl::MessageBase::Pointer msg, const long long timeStamp)
-{
-  //Apparently this is the only "elegant" way to do a class check.. or is it???
-  if (dynamic_cast<igtl::TrackingDataMessage*>(msg.GetPointer()) != nullptr)
-  {
-    igtl::TrackingDataMessage* tdMsg =
-      (igtl::TrackingDataMessage*)(msg.GetPointer());
-    igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
-    tdMsg->GetTrackingDataElement(0, trackingData);
-    float x_pos, y_pos, z_pos;
-    trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
-    m_Measurement->AddMeasurement(index, x_pos, timeStamp); //x value is used as index
-  }
 }

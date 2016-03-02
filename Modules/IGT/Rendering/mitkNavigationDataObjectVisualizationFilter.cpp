@@ -22,8 +22,7 @@ mitk::NavigationDataObjectVisualizationFilter::NavigationDataObjectVisualization
 : NavigationDataToNavigationDataFilter(),
 m_RepresentationList(), m_TransformPosition(), m_TransformOrientation(), m_RotationMode(RotationStandard)
 {
-  //setup measurements
-  this->m_Measurement = mitk::IGTLMeasurements::GetInstance();
+
 }
 
 
@@ -175,7 +174,6 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
     data->Modified();
     output->SetDataValid(true); // operation was successful, therefore data of output is valid.
   }
-  //m_Measurement->AddMeasurement(10);
 }
 
 

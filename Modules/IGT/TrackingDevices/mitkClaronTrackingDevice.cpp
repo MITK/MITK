@@ -131,8 +131,6 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   m_Device->StopTracking();
   m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
 
-  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
-
   if (m_Device->StartTracking())
   {
     mitk::IGTTimeStamp::GetInstance()->Start(this);

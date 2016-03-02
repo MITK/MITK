@@ -82,8 +82,6 @@ bool mitk::VirtualTrackingDevice::StartTracking()
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
 
-  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
-
   mitk::IGTTimeStamp::GetInstance()->Start(this);
 
   if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
@@ -105,10 +103,10 @@ bool mitk::VirtualTrackingDevice::StopTracking()
 
     m_TrackingFinishedMutex->Lock();
     this->SetState(Ready);
+    m_TrackingFinishedMutex->Unlock();
   }
 
   mitk::IGTTimeStamp::GetInstance()->Stop(this);
-  //
 
   return true;
 }

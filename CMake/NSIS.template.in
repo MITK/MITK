@@ -757,14 +757,15 @@ FunctionEnd
 Function RedistributablePage
   ; Check whether the appropriate redistributable for this installer has been installed
   StrCmp @CPACK_LIBRARY_ARCHITECTURE@ 'x64' 0 +3
-    ReadRegDword $1 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\@CPACK_VISUAL_STUDIO_VERSION_MAJOR@.0\RuntimeMinimum" "Install"
-  Goto done
+    SetRegView 64
+    Goto done
   StrCmp @CPACK_LIBRARY_ARCHITECTURE@ 'x86' 0 +3
-    ReadRegDword $1 HKLM "SOFTWARE\Wow6432Node\Microsoft\DevDiv\vc\Servicing\@CPACK_VISUAL_STUDIO_VERSION_MAJOR@.0\RuntimeMinimum" "Install"
-  Goto done
+    SetRegView 32
+    Goto done
   ; The following line should not be reached, use for debugging
   ; MessageBox MB_OK "Could not determine x86/x64 architecture during CPack installer configuration."
   done:
+  ReadRegDword $1 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\@CPACK_VISUAL_STUDIO_VERSION_MAJOR@.0\RuntimeMinimum" "Install"
 
   ; If installed show installed, else offer installation
   StrCmp $1 1 RedistInstalled

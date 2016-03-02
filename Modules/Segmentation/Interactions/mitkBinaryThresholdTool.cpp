@@ -162,20 +162,8 @@ void mitk::BinaryThresholdTool::SetupPreviewNode()
         pixel[0] = 0.0f;
         pixel[1] = 1.0f;
         pixel[2] = 0.0f;
-        /*
-        previewImage->GetActiveLabelSet()->RemoveAllLabels();
-
-        mitk::Label::Pointer label = mitk::Label::New();
-        label->SetColor(mitk::Color(pixel));
-        label->SetValue(1);
-        label->SetOpacity(0.3);
-        previewImage->GetActiveLabelSet()->AddLabel(label);
-        previewImage->GetActiveLabelSet()->SetActiveLabel(1);
-        */
-        //TODO: Set contour width.
-        //MITK_WARN << previewImage->GetActiveLabel()->GetColor();
         previewImage->GetActiveLabel()->SetColor(pixel);
-        //MITK_WARN << previewImage->GetActiveLabel()->GetColor();
+        previewImage->GetActiveLabelSet()->UpdateLookupTable(previewImage->GetActiveLabel()->GetValue());
       }
       else
         m_ThresholdFeedbackNode->SetData(mitk::Image::New());

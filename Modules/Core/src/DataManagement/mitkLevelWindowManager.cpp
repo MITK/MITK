@@ -491,7 +491,12 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
   }
   else if (numVisProbNodes == 1 )
   {
-    return;
+    mitk::LevelWindowProperty::Pointer newProp = dynamic_cast< mitk::LevelWindowProperty* >( visProbNodes[0]->GetProperty( "levelwindow" ) );
+    if ( newProp != m_LevelWindowProperty )
+    {
+      this->SetLevelWindowProperty( newProp );
+      return;
+    }
   }
   else if ( highestVisible )
   {

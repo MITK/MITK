@@ -37,6 +37,7 @@ namespace mitk
         mitk::Message1<mitk::DataNode*> ToggleNodePickEvent;
 
         static void SetEnabled(bool enabled);
+        static bool IsEnabled();
     protected:
         virtual void HandlePickOneEvent(InteractionEvent* interactionEvent) override;
         virtual void HandlePickAddEvent(InteractionEvent* interactionEvent) override;

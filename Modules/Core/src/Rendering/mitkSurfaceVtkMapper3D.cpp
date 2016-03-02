@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunctionProperty.h>
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyAliases.h>
+#include <mitkDataNodePickingEventObserver.h>
 
 //VTK
 #include <vtkActor.h>
@@ -144,7 +145,7 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
     // Color
     {
       mitk::ColorProperty::Pointer p;
-      if (node->IsSelected()) {
+      if (node->IsSelected() && mitk::DataNodePickingEventObserver::IsEnabled()) {
         node->GetProperty(p, "color.selected", renderer);
       }
       if (p.IsNull()) {

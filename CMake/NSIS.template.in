@@ -756,10 +756,10 @@ FunctionEnd
 
 Function RedistributablePage
   ; Check whether the appropriate redistributable for this installer has been installed
-  StrCmp @CPACK_LIBRARY_ARCHITECTURE@ 'x64' 0 +3
+  StrCmp '@CPACK_LIBRARY_ARCHITECTURE@' 'x64' 0 +3
     SetRegView 64
     Goto done
-  StrCmp @CPACK_LIBRARY_ARCHITECTURE@ 'x86' 0 +3
+  StrCmp '@CPACK_LIBRARY_ARCHITECTURE@' 'x86' 0 +3
     SetRegView 32
     Goto done
   ; The following line should not be reached, use for debugging

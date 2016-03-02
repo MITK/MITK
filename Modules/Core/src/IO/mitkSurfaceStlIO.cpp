@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurface.h"
 #include "mitkIOMimeTypes.h"
+#include "mitkLocaleSwitch.h"
 
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
@@ -63,6 +64,8 @@ SurfaceStlIO::SurfaceStlIO()
 
 std::vector<itk::SmartPointer<BaseData> > SurfaceStlIO::Read()
 {
+  LocaleSwitch localeSwitch("C");
+
   Options options = this->GetReaderOptions();
 
   mitk::Surface::Pointer output = mitk::Surface::New();
@@ -121,6 +124,8 @@ std::vector<itk::SmartPointer<BaseData> > SurfaceStlIO::Read()
 
 void SurfaceStlIO::Write()
 {
+  LocaleSwitch localeSwitch("C");
+
   ValidateOutputLocation();
 
   const Surface* input = dynamic_cast<const Surface*>(this->GetInput());

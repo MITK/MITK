@@ -1188,7 +1188,6 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
       it = m_MovingLandmarks->GetPointSet()->GetPointData()->Begin();
       //increase the eventId to encapsulate the coming operations
       mitk::OperationEvent::IncCurrObjectEventId();
-      mitk::OperationEvent::ExecuteIncrement();
       for(pointId=0; pointId<movingLandmarks->Size();++pointId, ++it)
       {
         int position = it->Index();

@@ -21,10 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 int mitk::UndoStackItem::m_CurrObjectEventId = 0;
 int mitk::UndoStackItem::m_CurrGroupEventId = 0;
 
-bool mitk::UndoStackItem::m_IncrObjectEventId = false;
-bool mitk::UndoStackItem::m_IncrGroupEventId = false;
-
-
 mitk::UndoStackItem::UndoStackItem(std::string description)
 : m_Reversed(false),
   m_Description(description)
@@ -36,21 +32,6 @@ mitk::UndoStackItem::UndoStackItem(std::string description)
 mitk::UndoStackItem::~UndoStackItem()
 {
   // nothing to do
-}
-
-void mitk::UndoStackItem::ExecuteIncrement()
-{
-  if (m_IncrObjectEventId)
-  {
-    ++m_CurrObjectEventId;
-    m_IncrObjectEventId = false;
-  }
-
-  if (m_IncrGroupEventId)
-  {
-    ++m_CurrGroupEventId;
-    m_IncrGroupEventId = false;
-  }
 }
 
 int mitk::UndoStackItem::GetCurrObjectEventId()
@@ -65,12 +46,12 @@ int mitk::UndoStackItem::GetCurrGroupEventId()
 
 void mitk::UndoStackItem::IncCurrObjectEventId()
 {
-  m_IncrObjectEventId = true;
+  ++m_CurrObjectEventId;
 }
 
 void mitk::UndoStackItem::IncCurrGroupEventId()
 {
-  m_IncrGroupEventId = true;
+  ++m_CurrGroupEventId;
 }
 
 int mitk::UndoStackItem::GetObjectEventId()

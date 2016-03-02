@@ -601,7 +601,6 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     //making interpolation separately undoable
     mitk::UndoStackItem::IncCurrObjectEventId();
     mitk::UndoStackItem::IncCurrGroupEventId();
-    mitk::UndoStackItem::ExecuteIncrement();
 
     //Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
     vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -646,7 +645,6 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     //making interpolation separately undoable
     mitk::UndoStackItem::IncCurrObjectEventId();
     mitk::UndoStackItem::IncCurrGroupEventId();
-    mitk::UndoStackItem::ExecuteIncrement();
 
     mitk::Image::Pointer image3D = m_Segmentation;
     unsigned int timeStep( slicer->GetTime()->GetPos() );

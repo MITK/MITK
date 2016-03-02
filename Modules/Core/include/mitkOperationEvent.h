@@ -33,11 +33,6 @@ namespace mitk {
 //## This basic entry includes a textual description of the item and a pair of IDs. Static
 //## member functions handle creation and incrementing of these IDs.
 //##
-//## The ObjectEventID is increased by the global EventMapper for most of the events (see
-//## code for details). Incrementation of the IDs is done in two steps. First the
-//## EventMapper sets a flag via (possibly multiple calls of) IncCurrObjectEventID(), then
-//## ExecuteIncrement() does the actual incementation.
-//##
 //## The GroupEventID is intended for logical grouping of several related Operations.
 //## Currently this is used only by PointSetDataInteractor. How this is done and when to use
 //## GroupEventIDs is still undocumented.
@@ -85,22 +80,18 @@ class MITKCORE_EXPORT UndoStackItem
     virtual void ReverseAndExecute();
 
     //##Documentation
-    //## @brief Sets the current ObjectEventId to be incremended when ExecuteIncrement is called
+    //## @brief Increases the current ObjectEventId
     //## For example if a button click generates operations the ObjectEventId has to be incremented to be able to undo the operations.
     //## Difference between ObjectEventId and GroupEventId: The ObjectEventId capsulates all operations caused by one event.
     //## A GroupEventId capsulates several ObjectEventIds so that several operations caused by several events can be undone with one Undo call.
     static void IncCurrObjectEventId();
 
     //##Documentation
-    //## @brief Sets the current GroupEventId to be incremended when ExecuteIncrement is called
+    //## @brief Increases the current GroupEventId
     //## For example if a button click generates operations the GroupEventId has to be incremented to be able to undo the operations.
     //## Difference between ObjectEventId and GroupEventId: The ObjectEventId capsulates all operations caused by one event.
     //## A GroupEventId capsulates several ObjectEventIds so that several operations caused by several events can be undone with one Undo call.
     static void IncCurrGroupEventId();
-
-    //##Documentation
-    //## @brief Executes the incrementation of objectEventId and groupEventId if they are set to be incremented
-    static void ExecuteIncrement();
 
   protected:
     //##Documentation
@@ -111,10 +102,6 @@ class MITKCORE_EXPORT UndoStackItem
     static int m_CurrObjectEventId;
 
     static int m_CurrGroupEventId;
-
-    static bool m_IncrObjectEventId;
-
-    static bool m_IncrGroupEventId;
 
     int m_ObjectEventId;
 

@@ -39,6 +39,11 @@ void DataNodePickingEventObserver::SetEnabled(bool enabled)
   m_Enabled = enabled;
 }
 
+bool DataNodePickingEventObserver::IsEnabled()
+{
+  return m_Enabled;
+}
+
   void DataNodePickingEventObserver::HandlePickOneEvent(InteractionEvent* interactionEvent)
 {
   if (m_Enabled)

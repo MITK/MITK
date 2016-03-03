@@ -37,6 +37,11 @@ You can create a Zip file (.zip) or an NSIS installer (needs an installation of 
 
 On some systems, it might still be necessary to install the Microsoft Visual C++ Redistributable Package to start the installed application successfully.
 
+\note It is possible to include the Microsoft Visual C++ Redistributable Package in the application installer.\n
+A CMake variable "CMAKE_(Your Visual Studio Version)_REDISTRIBUTABLE" will be created. It has to be set to the appropriate executable (vcredist_x86.exe or vcredist_x64.exe), which will then be part of both the NSIS installer and the ZIP Archive.\n
+In the case of the NSIS installer it will be automatically run if no appropriate redistributable is present on the target system.\n
+Please note that it is <b>not</b> possible to automatically check the provided redistributable matches the Visual Studio version used to build the installer.
+
 \subsection DeploymentPagePlatformMacOS MacOS
 
 You can create a drag'n drop disk image (.dmg) file for MacOS. The procedure is pretty much the same as for Linux.

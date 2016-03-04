@@ -61,7 +61,13 @@ void mitk::ImageToUnstructuredGridFilter::SetInput(const mitk::Image* image)
 
 const mitk::Image* mitk::ImageToUnstructuredGridFilter::GetInput(void) const
 {
-  return this->GetInput();
+  if (this->GetNumberOfInputs() < 1)
+  {
+    MITK_ERROR << "No input set" << std::endl;
+    return nullptr;
+  }
+
+  return static_cast<const mitk::Image* >(this->ProcessObject::GetInput(0));
 }
 
 mitk::Image* mitk::ImageToUnstructuredGridFilter::GetInput(void)

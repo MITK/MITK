@@ -56,7 +56,7 @@ void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
     CreateTemporaryDirectory();
     StartDicomDirectoryListener();
 
-    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
+    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(true);
 
     connect(m_Controls.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabChanged(int)));
 

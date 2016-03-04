@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <service/event/ctkEventConstants.h>
 #include <ctkDictionary.h>
 #include <mitkLogMacros.h>
-#include <mitkDicomSeriesReader.h>
 #include <mitkDataNode.h>
 #include <mitkIDataStorageService.h>
 #include <service/event/ctkEventAdmin.h>
@@ -28,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVector>
 #include "mitkImage.h"
 #include <mitkContourModelSet.h>
+
+#include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMEnums.h>
+#include <mitkStringProperty.h>
 
 #include <mitkRTDoseReader.h>
 #include <mitkRTStructureSetReader.h>
@@ -60,12 +63,10 @@ DicomEventHandler::~DicomEventHandler()
 void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 {
   QStringList listOfFilesForSeries;
-  mitk::DicomSeriesReader::StringContainer seriesToLoad;
-
   listOfFilesForSeries = ctkEvent.getProperty("FilesForSeries").toStringList();
 
-  if (!listOfFilesForSeries.isEmpty()){
-
+  if (!listOfFilesForSeries.isEmpty())
+  {
     //for rt data, if the modality tag isnt defined or is "CT" the image is handled like before
     if(ctkEvent.containsProperty("Modality") &&
        (ctkEvent.getProperty("Modality").toString().compare("RTDOSE",Qt::CaseInsensitive) == 0 ||
@@ -248,7 +249,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
     }
     else
     {
-
+      mitk::StringList seriesToLoad;
       QStringListIterator it(listOfFilesForSeries);
 
       while (it.hasNext())
@@ -256,21 +257,62 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
         seriesToLoad.push_back(it.next().toStdString());
       }
 
+      mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
 
-      mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(seriesToLoad);
-      if (node.IsNull())
+      selector->LoadBuiltIn3DConfigs();
+      selector->LoadBuiltIn3DnTConfigs();
+      selector->SetInputFiles(seriesToLoad);
+
+      mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
+
+      reader->SetInputFiles(seriesToLoad);
+      reader->AnalyzeInputFiles();
+      reader->LoadImages();
+
+      //Get Reference for default data storage.
+      ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+      mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+      mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+
+      for (unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i)
       {
-        MITK_ERROR << "Error loading series: " << ctkEvent.getProperty("SeriesName").toString().toStdString()
-                   << " id: " <<ctkEvent.getProperty("SeriesUID").toString().toStdString();
+          const mitk::DICOMImageBlockDescriptor& desc = reader->GetOutput(i);
+          mitk::BaseData::Pointer data = desc.GetMitkImage().GetPointer();
+
+          std::string nodeName = "Unnamed_DICOM";
+
+          std::string studyDescription = desc.GetPropertyAsString("studyDescription");
+          std::string seriesDescription = desc.GetPropertyAsString("seriesDescription");
+
+          if (!studyDescription.empty())
+          {
+              nodeName = studyDescription;
+          }
+
+          if (!seriesDescription.empty())
+          {
+              if (!studyDescription.empty())
+              {
+                  nodeName += "/";
+              }
+              nodeName += seriesDescription;
+          }
+
+          mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(nodeName);
+          data->SetProperty("name", nameProp);
+
+          mitk::DataNode::Pointer node = mitk::DataNode::New();
+          node->SetData(data);
+          nameProp = mitk::StringProperty::New(nodeName);
+          node->SetProperty("name", nameProp);
+
+          dataStorage->Add(node);
       }
-      else
-      {
-        //Get Reference for default data storage.
-        ctkServiceReference serviceReference =mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-        mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
-        mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
-        dataStorage->Add(node);
+      if (reader->GetNumberOfOutputs() < 1)
+      {
+          MITK_ERROR << "Error loading series: " << ctkEvent.getProperty("SeriesName").toString().toStdString()
+              << " id: " << ctkEvent.getProperty("SeriesUID").toString().toStdString();
       }
     }
   }

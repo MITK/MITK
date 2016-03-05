@@ -19,27 +19,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStdMultiWidget.h"
 #include "QmitkSelectableGLWidget.h"
 
-#include "mitkToolManager.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
-#include "mitkRenderingManager.h"
-#include "mitkOverwriteSliceImageFilter.h"
-#include "mitkProgressBar.h"
-#include "mitkOperationEvent.h"
-#include "mitkUndoController.h"
-#include "mitkInteractionConst.h"
 #include "mitkApplyDiffImageOperation.h"
-#include "mitkDiffImageApplier.h"
-#include "mitkSegTool2D.h"
+#include "mitkColorProperty.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkSurfaceToImageFilter.h"
-#include "mitkSliceNavigationController.h"
-#include <mitkVtkImageOverwrite.h>
+#include "mitkDiffImageApplier.h"
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageTimeSelector.h>
-#include <mitkImageWriteAccessor.h>
 #include <mitkImageReadAccessor.h>
+#include <mitkImageWriteAccessor.h>
+#include "mitkInteractionConst.h"
+#include "mitkLevelWindowProperty.h"
+#include "mitkOperationEvent.h"
+#include "mitkOverwriteSliceImageFilter.h"
+#include <mitkPlaneProposer.h>
+#include "mitkProgressBar.h"
+#include "mitkProperties.h"
+#include "mitkRenderingManager.h"
+#include "mitkSegTool2D.h"
+#include "mitkSliceNavigationController.h"
+#include "mitkSurfaceToImageFilter.h"
+#include "mitkToolManager.h"
+#include "mitkUndoController.h"
+#include <mitkUnstructuredGridClusteringFilter.h>
+#include <mitkVtkImageOverwrite.h>
 
 #include <itkCommand.h>
 
@@ -91,7 +93,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   m_EdgeDetector = mitk::FeatureBasedEdgeDetectionFilter::New();
   m_PointScorer = mitk::PointCloudScoringFilter::New();
-  m_PlaneSuggester = mitk::ClusteredPlaneSuggestionFilter::New();
 
   m_CmbInterpolation = new QComboBox(m_GroupBoxEnableExclusiveInterpolationMode);
   m_CmbInterpolation->addItem("Disabled");
@@ -873,19 +874,33 @@ void::QmitkSlicesInterpolator::RunPlaneSuggestion()
   mitk::ProgressBar::GetInstance()->Progress();
 
   double spacing = mitk::SurfaceInterpolationController::GetInstance()->GetDistanceImageSpacing();
-
-  m_PlaneSuggester->SetInput(scoredGrid);
-  m_PlaneSuggester->SetMinPts(4);
-  m_PlaneSuggester->SetEps(spacing);
-  m_PlaneSuggester->Update();
-
-  mitk::GeometryData::Pointer geoData = m_PlaneSuggester->GetGeoData();
-  mitk::PlaneGeometry::Pointer plane = dynamic_cast<mitk::PlaneGeometry*>(geoData->GetGeometry());
+  mitk::UnstructuredGridClusteringFilter::Pointer clusterFilter = mitk::UnstructuredGridClusteringFilter::New();
+  clusterFilter->SetInput(scoredGrid);
+  clusterFilter->SetMeshing(false);
+  clusterFilter->SetMinPts(4);
+  clusterFilter->Seteps(spacing);
+  clusterFilter->Update();
 
   mitk::ProgressBar::GetInstance()->Progress();
 
+  // Create plane suggestion
   mitk::BaseRenderer::Pointer br = mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
-  br->GetSliceNavigationController()->ReorientSlices(plane->GetOrigin(),plane->GetNormal());
+  mitk::PlaneProposer planeProposer;
+  std::vector <mitk::UnstructuredGrid::Pointer > grids = clusterFilter->GetAllClusters();
+
+  planeProposer.SetUnstructuredGrids(grids);
+  mitk::SliceNavigationController::Pointer snc = br->GetSliceNavigationController();
+  planeProposer.SetSliceNavigationController(snc);
+  planeProposer.SetUseDistances(true);
+  try
+  {
+    planeProposer.CreatePlaneInfo();
+  }
+  catch (mitk::Exception &e)
+  {
+    MITK_ERROR<< e.what();
+  }
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   m_FirstRun = false;

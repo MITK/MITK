@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFeatureBasedEdgeDetectionFilter.h"
 #include "mitkPointCloudScoringFilter.h"
-#include "mitkClusteredPlaneSuggestionFilter.h"
 
 #include <QWidget>
 #include <map>
@@ -248,7 +247,6 @@ private:
 
     mitk::FeatureBasedEdgeDetectionFilter::Pointer m_EdgeDetector;
     mitk::PointCloudScoringFilter::Pointer m_PointScorer;
-    mitk::ClusteredPlaneSuggestionFilter::Pointer m_PlaneSuggester;
 
     mitk::ToolManager::Pointer m_ToolManager;
     bool m_Initialized;

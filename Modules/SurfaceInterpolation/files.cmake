@@ -1,5 +1,4 @@
 set(CPP_FILES
-  mitkClusteredPlaneSuggestionFilter.cpp
   mitkComputeContourSetNormalsFilter.cpp
   mitkCreateDistanceImageFromSurfaceFilter.cpp
   mitkImageToPointCloudFilter.cpp

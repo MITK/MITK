@@ -151,7 +151,10 @@ mitk::PlaneProposer::PlaneInfo mitk::PlaneProposer::CreatePlaneByCentroids(const
 
     double tmpCenter[3];
     vtkCenterOfMass::ComputeCenterOfMass(tmpGrid->GetPoints(), NULL, tmpCenter);
-    std::array<double, 3> center { {tmpCenter[0], tmpCenter[1], tmpCenter[2]} };
+    std::array<double, 3> center;
+    center[0] = tmpCenter[0];
+    center[1] = tmpCenter[1];
+    center[2] = tmpCenter[2];
     m_Centroids[j] = center;
   }
 

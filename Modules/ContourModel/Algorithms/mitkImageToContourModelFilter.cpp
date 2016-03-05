@@ -131,6 +131,11 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
   upperExtendRegion[0] = 1;
   upperExtendRegion[1] = 1;
 
+  /*
+   * We need to pad here, since the ITK contour extractor fails if the
+   * segmentation touches more than one image edge.
+   * By padding the image for one row at each edge we overcome this issue
+   */
   padFilter->SetInput(sliceImage);
   padFilter->SetConstant(0);
   padFilter->SetPadLowerBound(lowerExtendRegion);

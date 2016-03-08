@@ -257,6 +257,39 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
         seriesToLoad.push_back(it.next().toStdString());
       }
 
+      //Get Reference for default data storage.
+      ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+      mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+      mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+
+      //special handling of Philips 3D US DICOM.
+      //Copied from DICOMSeriesReaderService
+      if (!seriesToLoad.empty() && mitk::DicomSeriesReader::IsPhilips3DDicom(seriesToLoad.front()))
+      {
+          MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
+          const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
+          setlocale(LC_NUMERIC, "C");
+          std::locale previousCppLocale(std::cin.getloc());
+          std::locale l("C");
+          std::cin.imbue(l);
+
+          mitk::DataNode::Pointer node = mitk::DataNode::New();
+          mitk::DicomSeriesReader::StringContainer stringvec;
+          stringvec.push_back(seriesToLoad.front());
+          if (mitk::DicomSeriesReader::LoadDicomSeries(stringvec, *node))
+          {
+              mitk::BaseData::Pointer data = node->GetData();
+              mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenameName(fileName));
+              data->GetPropertyList()->SetProperty("name", nameProp);
+              node->SetProperty("name", nameProp);
+              dataStorage->Add(node);
+          }
+          setlocale(LC_NUMERIC, previousCLocale);
+          std::cin.imbue(previousCppLocale);
+          return;
+      }
+
+      //Normal DICOM handling (It wasn't a Philips 3D US)
       mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
 
       selector->LoadBuiltIn3DConfigs();
@@ -268,11 +301,6 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       reader->SetInputFiles(seriesToLoad);
       reader->AnalyzeInputFiles();
       reader->LoadImages();
-
-      //Get Reference for default data storage.
-      ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-      mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
-      mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
       for (unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i)
       {

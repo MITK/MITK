@@ -263,7 +263,16 @@ unsigned int mitk::SurfaceInterpolationController::GetNumberOfContours()
 void mitk::SurfaceInterpolationController::Interpolate()
 {
   m_ReduceFilter->Update();
+
   m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
+  if (m_CurrentNumberOfReducedContours == 1)
+  {
+      vtkPolyData* tmp = m_ReduceFilter->GetOutput(0)->GetVtkPolyData();
+      if (tmp == nullptr)
+      {
+          m_CurrentNumberOfReducedContours = 0;
+      }
+  }
 
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput( m_SelectedSegmentation );
@@ -655,6 +664,14 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
       m_ReduceFilter->Update();
 
       m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
+      if (m_CurrentNumberOfReducedContours == 1)
+      {
+          vtkPolyData* tmp = m_ReduceFilter->GetOutput(0)->GetVtkPolyData();
+          if (tmp == nullptr)
+          {
+              m_CurrentNumberOfReducedContours = 0;
+          }
+      }
 
       for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
       {

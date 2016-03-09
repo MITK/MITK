@@ -36,6 +36,17 @@ mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
 {
 }
 
+void mitk::ReduceContourSetFilter::SetInput( unsigned int idx, const mitk::Surface* surface )
+{
+    this->SetNthInput( idx, const_cast<mitk::Surface*>( surface ) );
+    this->Modified();
+}
+
+void mitk::ReduceContourSetFilter::SetInput( const mitk::Surface* surface )
+{
+  this->SetInput( 0, const_cast<mitk::Surface*>( surface ) );
+}
+
 void mitk::ReduceContourSetFilter::GenerateData()
 {
   unsigned int numberOfInputs = this->GetNumberOfIndexedInputs();
@@ -106,15 +117,21 @@ void mitk::ReduceContourSetFilter::GenerateData()
       this->SetNumberOfIndexedOutputs(numberOfOutputs + 1);
       mitk::Surface::Pointer surface = mitk::Surface::New();
       this->SetNthOutput(numberOfOutputs, surface.GetPointer());
-
       surface->SetVtkPolyData(newPolyData);
       numberOfOutputs++;
     }
 
   }
+
 //  MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
   this->SetNumberOfIndexedOutputs(numberOfOutputs);
 
+  if (numberOfOutputs == 0)
+  {
+      mitk::Surface::Pointer tmp_output = mitk::Surface::New();
+      tmp_output->SetVtkPolyData(vtkPolyData::New());
+      this->SetNthOutput(0, tmp_output.GetPointer());
+  }
   //Setting progressbar
   if (this->m_UseProgressBar)
     mitk::ProgressBar::GetInstance()->Progress(this->m_ProgressStepSize);

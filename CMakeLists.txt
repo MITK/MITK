@@ -203,9 +203,9 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 if(APPLE)
   set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 
-  if(DESIRED_QT_VERSION STREQUAL 5)
-    message(FATAL_ERROR "MITK is not yet compatible with Qt 5 on OS X. Please use the latest Qt 4 version instead.")
-  endif()
+  # if(DESIRED_QT_VERSION STREQUAL 5)
+  #   message(FATAL_ERROR "MITK is not yet compatible with Qt 5 on OS X. Please use the latest Qt 4 version instead.")
+  # endif()
 else()
   set(DESIRED_QT_VERSION 5 CACHE STRING "Pick a version of Qt to use: 4 or 5")
 endif()

@@ -264,7 +264,6 @@ void mitk::SurfaceInterpolationController::Interpolate()
 {
   m_ReduceFilter->Update();
 
-  // Fix Bug 19525 part 2
   m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
   if (m_CurrentNumberOfReducedContours == 1)
   {
@@ -659,14 +658,11 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
       unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size();
       for ( unsigned int c = 0; c < numContours; ++c )
       {
-//          m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour->Modified();
-//          m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour->GetVtkPolyData()->Modified();
-          m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
+        m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
       }
 
       m_ReduceFilter->Update();
 
-      // Fix Bug 19525 part 2
       m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
       if (m_CurrentNumberOfReducedContours == 1)
       {

@@ -36,14 +36,12 @@ mitk::ReduceContourSetFilter::~ReduceContourSetFilter()
 {
 }
 
-// Fix Bug 19525 part 1
 void mitk::ReduceContourSetFilter::SetInput( unsigned int idx, const mitk::Surface* surface )
 {
     this->SetNthInput( idx, const_cast<mitk::Surface*>( surface ) );
     this->Modified();
 }
 
-// Fix Bug 19525 part 1
 void mitk::ReduceContourSetFilter::SetInput( const mitk::Surface* surface )
 {
   this->SetInput( 0, const_cast<mitk::Surface*>( surface ) );
@@ -128,7 +126,6 @@ void mitk::ReduceContourSetFilter::GenerateData()
 //  MITK_INFO<<"Points before: "<<numberOfPointsBefore<<" ##### Points after: "<<numberOfPointsAfter;
   this->SetNumberOfIndexedOutputs(numberOfOutputs);
 
-  // Fix Bug 19525 part 2
   if (numberOfOutputs == 0)
   {
       mitk::Surface::Pointer tmp_output = mitk::Surface::New();
@@ -491,10 +488,9 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection (vtkIdType* currentCell,
   return true;
 }
 
-// Fix Bug 19525 part 1
 void mitk::ReduceContourSetFilter::GenerateOutputInformation()
 {
-  //Superclass::GenerateOutputInformation();
+  Superclass::GenerateOutputInformation();
 }
 
 void mitk::ReduceContourSetFilter::Reset()

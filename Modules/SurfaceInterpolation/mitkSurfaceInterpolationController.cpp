@@ -263,7 +263,17 @@ unsigned int mitk::SurfaceInterpolationController::GetNumberOfContours()
 void mitk::SurfaceInterpolationController::Interpolate()
 {
   m_ReduceFilter->Update();
+
+  // Fix Bug 19525 part 2
   m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
+  if (m_CurrentNumberOfReducedContours == 1)
+  {
+      vtkPolyData* tmp = m_ReduceFilter->GetOutput(0)->GetVtkPolyData();
+      if (tmp == nullptr)
+      {
+          m_CurrentNumberOfReducedContours = 0;
+      }
+  }
 
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput( m_SelectedSegmentation );
@@ -649,12 +659,23 @@ void mitk::SurfaceInterpolationController::ReinitializeInterpolation()
       unsigned int numContours = m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep].size();
       for ( unsigned int c = 0; c < numContours; ++c )
       {
-        m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
+//          m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour->Modified();
+//          m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour->GetVtkPolyData()->Modified();
+          m_ReduceFilter->SetInput(c, m_ListOfInterpolationSessions[m_SelectedSegmentation][m_CurrentTimeStep][c].contour);
       }
 
       m_ReduceFilter->Update();
 
+      // Fix Bug 19525 part 2
       m_CurrentNumberOfReducedContours = m_ReduceFilter->GetNumberOfOutputs();
+      if (m_CurrentNumberOfReducedContours == 1)
+      {
+          vtkPolyData* tmp = m_ReduceFilter->GetOutput(0)->GetVtkPolyData();
+          if (tmp == nullptr)
+          {
+              m_CurrentNumberOfReducedContours = 0;
+          }
+      }
 
       for (unsigned int i = 0; i < m_CurrentNumberOfReducedContours; i++)
       {

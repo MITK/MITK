@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkAdaptiveThresholdIterator.h"
 #include "itkMinimumMaximumImageFilter.h"
 
+#include <mitkVector.h>
+
 namespace itk
 {
 
@@ -276,7 +278,7 @@ unsigned int itk::ConnectedAdaptiveThresholdImageFilter<TInputImage, TOutputImag
 template <class TInputImage, class TOutputImage>
 void itk::ConnectedAdaptiveThresholdImageFilter<TInputImage, TOutputImage>::SetParameterForFineSegmentation( TOutputImage * iteratorMaskForFineSegmentation ,unsigned int adjLowerTh, unsigned int adjUpperTh, itk::Index<3> seedPoint, bool discardLeafSegmentation)
 {
-  //just to make sure we´re in the right mode and the mask exsits
+  //just to make sure weÂ´re in the right mode and the mask exsits
   if(m_FineDetectionMode && iteratorMaskForFineSegmentation)
   {
     m_OutoutImageMaskFineSegmentation = iteratorMaskForFineSegmentation;

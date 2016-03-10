@@ -24,6 +24,7 @@ QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(QWidget* parent)
   : QWidget(parent)
 {
   m_Mode = INFO;
+  Init();
 }
 
 QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(Mode mode, QWidget *parent)

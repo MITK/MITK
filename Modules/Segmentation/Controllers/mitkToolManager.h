@@ -263,7 +263,7 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
     NodeTagMapType  m_ReferenceDataObserverTags;
 
     DataVectorType m_WorkingData;
-    NodeTagMapType  m_WorkingDataObserverTags;
+    NodeTagMapType m_WorkingDataObserverTags;
 
     DataVectorType m_RoiData;
     NodeTagMapType m_RoiDataObserverTags;

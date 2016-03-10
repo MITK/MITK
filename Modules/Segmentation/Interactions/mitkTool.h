@@ -40,7 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "usServiceRegistration.h"
 
-
 #include "mitkInteractionEventObserver.h"
 #include "mitkEventStateMachine.h"
 #include <mitkLabel.h>

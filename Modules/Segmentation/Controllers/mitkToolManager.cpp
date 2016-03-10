@@ -29,14 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 
 mitk::ToolManager::ToolManager(DataStorage* storage)
-  :m_ActiveTool(NULL),
+  :m_ActiveTool(nullptr),
     m_ActiveToolID(-1),
     m_RegisteredClients(0),
     m_DataStorage(storage)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
   this->InitializeTools();
-  //ActivateTool(0); // first one is default
 }
 
 mitk::ToolManager::~ToolManager()
@@ -44,7 +43,7 @@ mitk::ToolManager::~ToolManager()
   for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter)
     (*dataIter)->RemoveObserver(m_WorkingDataObserverTags[(*dataIter)]);
 
-  if(this->GetDataStorage() != NULL)
+  if(this->GetDataStorage() != nullptr)
     this->GetDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<ToolManager, const mitk::DataNode*>
                                                             ( this, &ToolManager::OnNodeRemoved ));
 
@@ -53,7 +52,7 @@ mitk::ToolManager::~ToolManager()
     m_ActiveTool->Deactivated();
     m_ActiveToolRegistration.Unregister();
 
-    m_ActiveTool = NULL;
+    m_ActiveTool = nullptr;
     m_ActiveToolID = -1; // no tool active
 
     ActiveToolChanged.Send();
@@ -121,9 +120,9 @@ mitk::Tool* mitk::ToolManager::GetToolById(int id)
   {
     return m_Tools.at(id);
   }
-  catch(std::exception&)
+  catch (const std::exception&)
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -138,26 +137,20 @@ bool mitk::ToolManager::ActivateTool(int id)
                                                          ( this, &ToolManager::OnNodeRemoved ) );
   }
 
-  //MITK_INFO << "ToolManager::ActivateTool("<<id<<")"<<std::endl;
-  //if( GetToolById(id) == NULL ) return false; // NO, invalid IDs are actually used here. Parameter -1 or anything that does not exists will deactivate all tools!
-
   if ( GetToolById( id ) == m_ActiveTool ) return true; // no change needed
 
   static int nextTool = -1;
   nextTool = id;
-  //MITK_INFO << "ToolManager::ActivateTool("<<id<<"): nextTool = "<<nextTool<<std::endl;
 
   static bool inActivateTool = false;
   if (inActivateTool)
   {
-    //MITK_INFO << "ToolManager::ActivateTool("<<id<<"): already inside ActivateTool somehow, returning now "<<std::endl;
     return true;
   }
   inActivateTool = true;
 
   while ( nextTool != m_ActiveToolID )
   {
-    //MITK_INFO <<"ToolManager::ActivateTool: nextTool = " << nextTool << " (active tool = " << m_ActiveToolID<<")"<<std::endl;
     if (m_ActiveTool)
     {
       m_ActiveTool->Deactivated();
@@ -180,7 +173,7 @@ bool mitk::ToolManager::ActivateTool(int id)
   }
 
   inActivateTool = false;
-  return (m_ActiveTool != NULL);
+  return (m_ActiveTool != nullptr);
 }
 
 void mitk::ToolManager::SetReferenceData(DataVectorType data)
@@ -193,7 +186,6 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
       NodeTagMapType::iterator searchIter = m_ReferenceDataObserverTags.find( *dataIter );
       if ( searchIter != m_ReferenceDataObserverTags.end() )
       {
-        //MITK_INFO << "Stopping observation of " << (void*)(*dataIter) << std::endl;
         (*dataIter)->RemoveObserver( searchIter->second );
       }
     }
@@ -205,9 +197,6 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
     m_ReferenceDataObserverTags.clear();
     for ( DataVectorType::iterator dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter )
     {
-
-
-      //MITK_INFO << "Observing " << (void*)(*dataIter) << std::endl;
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheReferenceDataDeleted );
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheReferenceDataDeletedConst );
@@ -225,20 +214,16 @@ void mitk::ToolManager::OnOneOfTheReferenceDataDeletedConst(const itk::Object* c
 
 void mitk::ToolManager::OnOneOfTheReferenceDataDeleted(itk::Object* caller, const itk::EventObject& itkNotUsed(e))
 {
-  //MITK_INFO << "Deleted: " << (void*)caller << " Removing from reference data list." << std::endl;
   DataVectorType v;
 
   for (DataVectorType::iterator dataIter = m_ReferenceData.begin(); dataIter != m_ReferenceData.end(); ++dataIter )
   {
-    //MITK_INFO << " In list: " << (void*)(*dataIter);
     if ( (void*)(*dataIter) != (void*)caller )
     {
       v.push_back( *dataIter );
-      //MITK_INFO << " kept" << std::endl;
     }
     else
     {
-      //MITK_INFO << " removed" << std::endl;
       m_ReferenceDataObserverTags.erase( *dataIter ); // no tag to remove anymore
     }
   }
@@ -247,7 +232,6 @@ void mitk::ToolManager::OnOneOfTheReferenceDataDeleted(itk::Object* caller, cons
 
 void mitk::ToolManager::SetReferenceData(DataNode* data)
 {
-  //MITK_INFO << "ToolManager::SetReferenceData(" << (void*)data << ")" << std::endl;
   DataVectorType v;
   if (data)
   {
@@ -266,7 +250,6 @@ void mitk::ToolManager::SetWorkingData(DataVectorType data)
       NodeTagMapType::iterator searchIter = m_WorkingDataObserverTags.find( *dataIter );
       if ( searchIter != m_WorkingDataObserverTags.end() )
       {
-        //MITK_INFO << "Stopping observation of " << (void*)(*dataIter) << std::endl;
         (*dataIter)->RemoveObserver( searchIter->second );
       }
     }
@@ -283,7 +266,6 @@ void mitk::ToolManager::SetWorkingData(DataVectorType data)
     m_WorkingDataObserverTags.clear();
     for ( DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter )
     {
-      //MITK_INFO << "Observing " << (void*)(*dataIter) << std::endl;
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheWorkingDataDeleted );
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheWorkingDataDeletedConst );
@@ -301,20 +283,16 @@ void mitk::ToolManager::OnOneOfTheWorkingDataDeletedConst(const itk::Object* cal
 
 void mitk::ToolManager::OnOneOfTheWorkingDataDeleted(itk::Object* caller, const itk::EventObject& itkNotUsed(e))
 {
-  //MITK_INFO << "Deleted: " << (void*)caller << " Removing from reference data list." << std::endl;
   DataVectorType v;
 
   for (DataVectorType::iterator dataIter = m_WorkingData.begin(); dataIter != m_WorkingData.end(); ++dataIter )
   {
-    //MITK_INFO << " In list: " << (void*)(*dataIter);
     if ( (void*)(*dataIter) != (void*)caller )
     {
       v.push_back( *dataIter );
-      //MITK_INFO << " kept" << std::endl;
     }
     else
     {
-      //MITK_INFO << " removed" << std::endl;
       m_WorkingDataObserverTags.erase( *dataIter ); // no tag to remove anymore
     }
   }
@@ -344,7 +322,6 @@ void mitk::ToolManager::SetRoiData(DataVectorType data)
       NodeTagMapType::iterator searchIter = m_RoiDataObserverTags.find( *dataIter );
       if ( searchIter != m_RoiDataObserverTags.end() )
       {
-        //MITK_INFO << "Stopping observation of " << (void*)(*dataIter) << std::endl;
         (*dataIter)->RemoveObserver( searchIter->second );
       }
     }
@@ -356,7 +333,6 @@ void mitk::ToolManager::SetRoiData(DataVectorType data)
     m_RoiDataObserverTags.clear();
     for ( DataVectorType::iterator dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter )
     {
-      //MITK_INFO << "Observing " << (void*)(*dataIter) << std::endl;
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheRoiDataDeleted );
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheRoiDataDeletedConst );
@@ -384,20 +360,16 @@ void mitk::ToolManager::OnOneOfTheRoiDataDeletedConst(const itk::Object* caller,
 
 void mitk::ToolManager::OnOneOfTheRoiDataDeleted(itk::Object* caller, const itk::EventObject& itkNotUsed(e))
 {
-  //MITK_INFO << "Deleted: " << (void*)caller << " Removing from roi data list." << std::endl;
   DataVectorType v;
 
   for (DataVectorType::iterator dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter )
   {
-    //MITK_INFO << " In list: " << (void*)(*dataIter);
     if ( (void*)(*dataIter) != (void*)caller )
     {
       v.push_back( *dataIter );
-      //MITK_INFO << " kept" << std::endl;
     }
     else
     {
-      //MITK_INFO << " removed" << std::endl;
       m_RoiDataObserverTags.erase( *dataIter ); // no tag to remove anymore
     }
   }
@@ -415,9 +387,9 @@ mitk::DataNode* mitk::ToolManager::GetReferenceData(int idx)
   {
     return m_ReferenceData.at(idx);
   }
-  catch(std::exception&)
+  catch (const std::exception&)
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -437,9 +409,9 @@ mitk::DataNode* mitk::ToolManager::GetRoiData(int idx)
   {
     return m_RoiData.at(idx);
   }
-  catch(std::exception&)
+  catch (const std::exception&)
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -451,7 +423,7 @@ mitk::DataStorage* mitk::ToolManager::GetDataStorage()
   }
   else
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -460,17 +432,15 @@ void mitk::ToolManager::SetDataStorage(DataStorage& storage)
   m_DataStorage = &storage;
 }
 
-
-
 mitk::DataNode* mitk::ToolManager::GetWorkingData(int idx)
 {
   try
   {
     return m_WorkingData.at(idx);
   }
-  catch(std::exception&)
+  catch (const std::exception&)
   {
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -530,12 +500,8 @@ int mitk::ToolManager::GetToolID( const Tool* tool )
 
 void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode* node)
 {
-  //check if the data of the node is typeof Image
-  /*if(dynamic_cast<mitk::Image*>(node->GetData()))
-  {*/
   //check all storage vectors
   OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode*>(node), itk::DeleteEvent());
   OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
   OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode*>(node),itk::DeleteEvent());
-  //}
 }

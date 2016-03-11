@@ -254,6 +254,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
 
 void QmitkControlVisualizationPropertiesView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {
+  m_MultiWidget = &stdMultiWidget;
 }
 
 

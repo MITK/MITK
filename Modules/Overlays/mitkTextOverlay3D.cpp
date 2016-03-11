@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkFollower.h>
 #include <vtkVectorText.h>
 #include <vtkTextActor3D.h>
+#include <vtkCamera.h>
+#include <vtkMath.h>
 
 
 mitk::TextOverlay3D::TextOverlay3D()
@@ -58,10 +60,32 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
   if(ls->IsGenerateDataRequired(renderer,this))
   {
-    ls->m_follower->SetPosition(
-      GetPosition3D(renderer)[0]+GetOffsetVector(renderer)[0],
-      GetPosition3D(renderer)[1]+GetOffsetVector(renderer)[1],
-      GetPosition3D(renderer)[2]+GetOffsetVector(renderer)[2]);
+    Point3D pos3d = GetPosition3D(renderer);
+    vtkRenderer* vtkRender = renderer->GetVtkRenderer();
+    if(vtkRender)
+    {
+      vtkCamera* camera = vtkRender->GetActiveCamera();
+      ls->m_follower->SetCamera(camera);
+      if (camera != nullptr)
+      {
+        // calculate the offset relative to the camera's view direction
+        Point3D offset = GetOffsetVector(renderer);
+
+        Vector3D viewUp;
+        camera->GetViewUp(viewUp.GetDataPointer());
+        Vector3D cameraDirection;
+        camera->GetDirectionOfProjection(cameraDirection.GetDataPointer());
+        Vector3D viewRight;
+        vtkMath::Cross(cameraDirection.GetDataPointer(),
+                       viewUp.GetDataPointer(),
+                       viewRight.GetDataPointer());
+
+        pos3d = pos3d + viewRight * offset[0]
+                      + viewUp * offset[1]
+                      + cameraDirection * offset[2];
+      }
+    }
+    ls->m_follower->SetPosition(pos3d.GetDataPointer());
     ls->m_textSource->SetText(GetText().c_str());
     float color[3] = {1,1,1};
     float opacity = 1.0;
@@ -70,9 +94,6 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     ls->m_follower->GetProperty()->SetColor(color[0], color[1], color[2]);
     ls->m_follower->GetProperty()->SetOpacity(opacity);
     ls->m_follower->SetScale(this->GetFontSize());
-    vtkRenderer* vtkRender = renderer->GetVtkRenderer();
-    if(vtkRender)
-      ls->m_follower->SetCamera(vtkRender->GetActiveCamera());
     ls->UpdateGenerateDataTime();
   }
 }

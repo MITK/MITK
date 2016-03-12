@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMFileReaderSelector.h>
 #include <mitkImage.h>
 #include <mitkDICOMFilesHelper.h>
+#include <mitkDICOMTagHelper.h>
 
 #include <mitkDicomSeriesReader.h>
 
@@ -70,6 +71,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
 
   mitk::DICOMFileReader::Pointer reader = this->GetReader(relevantFiles);
 
+  reader->SetAdditionalTagsOfInterest(mitk::GetDefaultDICOMTagsOfInterest());
   reader->SetInputFiles(relevantFiles);
   reader->AnalyzeInputFiles();
   reader->LoadImages();

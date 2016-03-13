@@ -620,6 +620,11 @@ void BaseApplication::initializeCppMicroServices()
 QCoreApplication* BaseApplication::getQApplication() const
 {
   QCoreApplication* qCoreApp = qApp;
+
+#ifdef Q_OS_OSX
+  qCoreApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+#endif
+
   if (!qCoreApp)
   {
     if (getSingleMode())

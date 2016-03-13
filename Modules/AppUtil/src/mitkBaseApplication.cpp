@@ -621,6 +621,7 @@ QCoreApplication* BaseApplication::getQApplication() const
 {
   QCoreApplication* qCoreApp = qApp;
 
+  // Needed to fix bug #18521, i.e. not responding GUI on Mac OS X with Qt5
 #ifdef Q_OS_OSX
   qCoreApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif

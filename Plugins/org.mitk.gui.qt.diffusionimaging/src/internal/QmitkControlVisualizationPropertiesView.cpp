@@ -101,119 +101,146 @@ void QmitkControlVisualizationPropertiesView::OnThickSlicesModeSelected( QAction
 {
   currentThickSlicesMode = action->data().toInt();
 
-  switch(currentThickSlicesMode)
+  switch( currentThickSlicesMode )
   {
-    default:
+    case 0: // toInt() returns 0 'otherwise'.
+    {
+      return; // dummy code/todo: implement stuff.
+      break;
+    }
     case 1:
+    {
       this->m_Controls->m_TSMenu->setText("MIP");
-    break;
+      break;
+    }
     case 2:
+    {
       this->m_Controls->m_TSMenu->setText("SUM");
-    break;
+      break;
+    }
     case 3:
+    {
       this->m_Controls->m_TSMenu->setText("WEIGH");
-    break;
+      break;
+    }
+    default:
+    {
+      return; // dummy code/todo: implement stuff.
+      break;
+    }
   }
 
-  mitk::DataNode* n;
-  n = this->m_MultiWidget->GetWidgetPlane1();
-  if(n){ n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
-  n = this->m_MultiWidget->GetWidgetPlane2();
-  if(n){ n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
-  n = this->m_MultiWidget->GetWidgetPlane3();
-  if(n){ n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
+  if( this->m_MultiWidget )
+  {
+    mitk::DataNode* n = nullptr;
+    n = this->m_MultiWidget->GetWidgetPlane1();
+    if(n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
 
-  mitk::BaseRenderer::Pointer renderer =
-      this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
-  if(renderer.IsNotNull())
-  {
-    renderer->SendUpdateSlice();
+    n = nullptr;
+    n = this->m_MultiWidget->GetWidgetPlane2();
+    if(n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
+
+    n = nullptr;
+    n = this->m_MultiWidget->GetWidgetPlane3();
+    if(n) { n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) ); }
+
+
+    mitk::BaseRenderer::Pointer renderer = nullptr;
+    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
+    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+
+    renderer = nullptr;
+    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow2()->GetRenderer();
+    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+
+    renderer = nullptr;
+    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow3()->GetRenderer();
+    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+
+    renderer->GetRenderingManager()->RequestUpdateAll();
   }
-  renderer = this->GetActiveStdMultiWidget()->GetRenderWindow2()->GetRenderer();
-  if(renderer.IsNotNull())
-  {
-    renderer->SendUpdateSlice();
-  }
-  renderer = this->GetActiveStdMultiWidget()->GetRenderWindow3()->GetRenderer();
-  if(renderer.IsNotNull())
-  {
-    renderer->SendUpdateSlice();
-  }
-  renderer->GetRenderingManager()->RequestUpdateAll();
 }
 
 
-void QmitkControlVisualizationPropertiesView::OnTSNumChanged(int num)
+void QmitkControlVisualizationPropertiesView::OnTSNumChanged( int num )
 {
-  if(num==0)
+  if( this->m_MultiWidget )
   {
-    mitk::DataNode* n;
-    n = this->m_MultiWidget->GetWidgetPlane1();
-    if(n)
+    if( num==0 )
     {
-      n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-      n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+      mitk::DataNode* n = nullptr;
+      n = this->m_MultiWidget->GetWidgetPlane1();
+      if(n)
+      {
+        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+      }
+
+      n = nullptr;
+      n = this->m_MultiWidget->GetWidgetPlane2();
+      if(n)
+      {
+        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+      }
+
+      n = nullptr;
+      n = this->m_MultiWidget->GetWidgetPlane3();
+      if(n)
+      {
+        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
+        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
+      }
+    }
+    else
+    {
+      mitk::DataNode* n = nullptr;
+      n = this->m_MultiWidget->GetWidgetPlane1();
+      if(n)
+      {
+        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
+      }
+
+      n = nullptr;
+      n = this->m_MultiWidget->GetWidgetPlane2();
+      if(n)
+      {
+        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
+      }
+
+      n = nullptr;
+      n = this->m_MultiWidget->GetWidgetPlane3();
+      if(n)
+      {
+        n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
+        n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+        n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
+      }
     }
 
-    n = this->m_MultiWidget->GetWidgetPlane2();
-    if(n)
-    {
-      n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-      n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
-    }
+    m_TSLabel->setText(QString::number( num*2 + 1 ));
 
-    n = this->m_MultiWidget->GetWidgetPlane3();
-    if(n)
-    {
-      n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
-      n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( false ) );
-    }
+    mitk::BaseRenderer::Pointer renderer = nullptr;
+    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
+    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+
+    renderer = nullptr;
+    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow2()->GetRenderer();
+    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+
+    renderer = nullptr;
+    renderer = this->GetActiveStdMultiWidget()->GetRenderWindow3()->GetRenderer();
+    if(renderer.IsNotNull()) { renderer->SendUpdateSlice(); }
+
+    renderer->GetRenderingManager()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
   }
-  else
-  {
-    mitk::DataNode* n;
-    n = this->m_MultiWidget->GetWidgetPlane1();
-    if(n)
-    {
-      n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-      n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-    }
-
-    n = this->m_MultiWidget->GetWidgetPlane2();
-    if(n)
-    {
-      n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-      n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-    }
-
-    n = this->m_MultiWidget->GetWidgetPlane3();
-    if(n)
-    {
-      n->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( currentThickSlicesMode ) );
-      n->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
-      n->SetProperty( "reslice.thickslices.showarea", mitk::BoolProperty::New( (num>0) ) );
-    }
-  }
-
-  m_TSLabel->setText(QString::number(num*2+1));
-
-  mitk::BaseRenderer::Pointer renderer = this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer();
-  if(renderer.IsNotNull())
-  { renderer->SendUpdateSlice(); }
-  renderer = this->GetActiveStdMultiWidget()->GetRenderWindow2()->GetRenderer();
-  if(renderer.IsNotNull())
-  { renderer->SendUpdateSlice(); }
-
-  renderer = this->GetActiveStdMultiWidget()->GetRenderWindow3()->GetRenderer();
-  if(renderer.IsNotNull())
-  { renderer->SendUpdateSlice(); }
-
-  renderer->GetRenderingManager()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 }
 
 
@@ -1135,6 +1162,11 @@ void QmitkControlVisualizationPropertiesView::OnTensorViewChanged()
     }
     mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
   }
+  else
+  {
+    MITK_DEBUG << "QmitkControlVisualizationPropertiesView::OnTensorViewChanged()"
+                  " was called but m_NodeUsedForOdfVisualization was Null.";
+  }
 }
 
 
@@ -1152,6 +1184,11 @@ void QmitkControlVisualizationPropertiesView::OnColourisationModeChanged()
     }
     mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
   }
+  else
+  {
+    MITK_DEBUG << "QmitkControlVisualizationPropertiesView::OnColourisationModeChanged()"
+                  " was called but m_NodeUsedForOdfVisualization was Null.";
+  }
 }
 
 
@@ -1168,5 +1205,10 @@ void QmitkControlVisualizationPropertiesView::OnRandomModeChanged()
       m_SelectedNode-> SetProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", mitk::BoolProperty::New( false ) );
     }
     mitk::RenderingManager::GetInstance()-> RequestUpdateAll();
+  }
+  else
+  {
+    MITK_DEBUG << "QmitkControlVisualizationPropertiesView::OnRandomModeChanged()"
+                  " was called but m_NodeUsedForOdfVisualization was Null.";
   }
 }

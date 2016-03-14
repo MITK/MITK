@@ -215,7 +215,6 @@ bool QmitkPropertyListPopup::AddMaterialPopup()
     m_MaterialEditor = new QmitkMaterialEditor( m_PopupMenu );
     m_MaterialEditor->setInline(true); // important to call this first :(
     m_MaterialEditor->Initialize( materialProperty );
-    // setting QDialog as menu item with Qt4 QWidgetAction
     QWidgetAction* materialEditorMenuItem = new QWidgetAction(materialPopup);
     materialEditorMenuItem->setDefaultWidget(m_MaterialEditor);
     materialPopup->addAction(materialEditorMenuItem);

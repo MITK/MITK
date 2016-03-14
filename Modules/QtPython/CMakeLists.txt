@@ -7,7 +7,7 @@ if(MITK_USE_Python)
   mitk_create_module(
     DEPENDS MitkCore MitkQtWidgets MitkPython
     PACKAGE_DEPENDS
-    PUBLIC Qt4|QtGui Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
+    PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
     )
 
   # temporarily disabled, bug-19153

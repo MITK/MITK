@@ -16,9 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "org_mitk_gui_qt_classificationsegmentation_Activator.h"
-
-#include <QtPlugin>
-
 #include "ClassificationSegmentation.h"
 
 namespace mitk {
@@ -34,7 +31,3 @@ void org_mitk_gui_qt_classificationsegmentation_Activator::stop(ctkPluginContext
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_classificationsegmentation, mitk::org_mitk_gui_qt_classificationsegmentation_Activator)
-#endif

@@ -94,8 +94,7 @@ set(ADDITIONAL_CMAKECACHE_OPTION "
 # Use the MITK_INITIAL_CACHE the pass variables to the MITK-Build.
 # add entries like this
 #MITK_USE_OpenCV:BOOL=OFF
-CMAKE_PREFIX_PATH:PATH=${QT5_INSTALL_PREFIX}
-DESIRED_QT_VERSION:STRING=5
+CMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}
 ")
 
 # List of test that should be explicitly disabled on this machine

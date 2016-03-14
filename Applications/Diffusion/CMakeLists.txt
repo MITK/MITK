@@ -64,11 +64,7 @@ set(_src_files
   MitkDiffusion.cpp
 )
 
-if(MITK_USE_Qt4)
-  qt4_add_resources(_src_files splashscreen.qrc)
-else()
-  qt5_add_resources(_src_files splashscreen.qrc)
-endif()
+qt5_add_resources(_src_files splashscreen.qrc)
 
 mitkFunctionCreateBlueBerryApplication(
   NAME ${DIFFUSIONAPP_NAME}

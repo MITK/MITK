@@ -20,63 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QDataStream>
 
-#if QT_VERSION < 0x050000
-
-#include <QDir>
-#include <stdlib.h> // mkdtemp
-#ifdef Q_OS_UNIX
-#include <unistd.h>
-#endif
-#ifdef Q_OS_WIN
-#include <windows.h>
-//#include <private/qfsfileengine_p.h>
-#endif
-
-bool createTemporaryDir(QString& path)
-{
-  QString baseName = QCoreApplication::applicationName();
-  if (baseName.isEmpty())
-  {
-    baseName = QLatin1String("mitk_temp");
-  }
-
-  QString templateName = QDir::tempPath() + QLatin1Char('/') + baseName + QLatin1String("-XXXXXX");
-  bool success = false;
-
-#ifdef Q_OS_WIN
-  QString buffer = templateName;
-  // Windows' mktemp believes 26 temp files per process ought to be enough for everyone (!)
-  // Let's add a few random chars then, before the XXXXXX template.
-  for (int i = 0 ; i < 4 ; ++i)
-    buffer += QChar((qrand() & 0xffff) % (26) + 'A');
-  if (!buffer.endsWith(QLatin1String("XXXXXX")))
-    buffer += QLatin1String("XXXXXX");
-  //QFileSystemEntry baseEntry(buffer);
-  //QFileSystemEntry::NativePath basePath = baseEntry.nativeFilePath();
-  QString basePath = QDir::toNativeSeparators(buffer);
-  wchar_t* array = (wchar_t*)basePath.utf16();
-  if (_wmktemp(array) && ::CreateDirectoryW(array, 0))
-  {
-    success = true;
-    //QFileSystemEntry entry(QString::fromWCharArray(array), QFileSystemEntry::FromNativePath());
-    //path = entry.filePath();
-    path = QDir::fromNativeSeparators(QString::fromUtf16((const ushort*)array));
-  }
-#else
-  QByteArray buffer = QFile::encodeName(templateName);
-  if (!buffer.endsWith("XXXXXX"))
-    buffer += "XXXXXX";
-  if (mkdtemp(buffer.data())) { // modifies buffer
-    success = true;
-    path = QFile::decodeName(buffer.constData());
-  }
-#endif
-
-  return success;
-}
-
-#else
-
 #include <QTemporaryDir>
 
 bool createTemporaryDir(QString& path)
@@ -98,8 +41,6 @@ bool createTemporaryDir(QString& path)
   }
   return false;
 }
-
-#endif
 
 QString handleNewAppInstance(QtSingleApplication* singleApp, int argc, char** argv, const QString& newInstanceArg)
 {

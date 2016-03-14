@@ -30,13 +30,12 @@ NativeTabItem::NativeTabItem(NativeTabFolder* _parent, int index, int flags) :
   parent(_parent), style(flags), showClose(true), closeButton(nullptr)
 {
   parent->GetTabFolder()->insertTab(index, this);
-#if QT_VERSION >= 0x040500
+
   if (this->GetShowClose())
   {
     parent->GetTabFolder()->setTabButton(index, QTabBar::RightSide, this->GetCloseButton());
     this->connect(this->GetCloseButton(), SIGNAL(clicked()), this, SLOT(CloseButtonClicked()));
   }
-#endif
 }
 
 void NativeTabItem::CloseButtonClicked()

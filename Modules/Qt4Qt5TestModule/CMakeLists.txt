@@ -1,8 +1,0 @@
-MITK_CREATE_MODULE(
-  PACKAGE_DEPENDS Qt4|QtCore Qt5|Core
-  SUBPROJECTS MITK-CoreUI
-  WARNINGS_AS_ERRORS
-)
-
-add_subdirectory(Testing)
-

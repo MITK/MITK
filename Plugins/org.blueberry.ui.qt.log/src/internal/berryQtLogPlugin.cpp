@@ -15,10 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "berryQtLogPlugin.h"
-
 #include "berryLogView.h"
-
-#include <QtPlugin>
 
 namespace berry {
 
@@ -67,7 +64,3 @@ ctkPluginContext *QtLogPlugin::GetContext() const
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_blueberry_ui_qt_log, berry::QtLogPlugin)
-#endif

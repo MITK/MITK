@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateIsDWI.h"
 #include <mitkDiffusionPropertyHelper.h>
 
-#include <QtPlugin>
-
 void
 mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 {
@@ -55,7 +53,3 @@ mitk::DiffusionImagingActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_diffusionimaging, mitk::DiffusionImagingActivator)
-#endif

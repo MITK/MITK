@@ -3,7 +3,7 @@ if(VTK_FOUND AND NOT VTK_BUILD_SHARED_LIBS)
   message(FATAL_ERROR "MITK only supports a VTK which was built with shared libraries. Turn on BUILD_SHARED_LIBS in your VTK config.")
 endif()
 
-if(MITK_USE_Qt5)
+if(MITK_USE_QT)
   find_package(Qt5Widgets REQUIRED QUIET)
 endif()
 

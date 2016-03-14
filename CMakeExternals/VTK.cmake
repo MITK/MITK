@@ -75,8 +75,7 @@ if(NOT DEFINED VTK_DIR)
 
   if(MITK_USE_QT)
     list(APPEND additional_cmake_args
-        -DVTK_QT_VERSION:STRING=${DESIRED_QT_VERSION}
-        -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+        -DVTK_QT_VERSION:STRING=5
         -DModule_vtkGUISupportQt:BOOL=ON
         -DModule_vtkGUISupportQtWebkit:BOOL=ON
         -DModule_vtkGUISupportQtSQL:BOOL=ON

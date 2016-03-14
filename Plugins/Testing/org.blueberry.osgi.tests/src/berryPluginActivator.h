@@ -27,6 +27,7 @@ class org_blueberry_osgi_tests_Activator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
+  Q_PLUGIN_METADATA(IID "org_blueberry_osgi_tests")
   Q_INTERFACES(ctkPluginActivator)
 
 public:

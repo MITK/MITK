@@ -33,9 +33,9 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
 
 
   # part for Qt widgets
-  if(TOOL_QT4GUI_FILES)
+  if(TOOL_QTGUI_FILES)
 
-    foreach( TOOL_GUI_FILE ${TOOL_QT4GUI_FILES})
+    foreach( TOOL_GUI_FILE ${TOOL_QTGUI_FILES})
 
       # construct tool name from file name
       string(REGEX REPLACE "^Qmitk(.+)GUI\\.c(pp|xx)$" "\\1" TOOL_NAME ${TOOL_GUI_FILE})
@@ -45,10 +45,10 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
       # source file names for this tool
       set( TOOL_GUI_CPPS ${TOOL_GUI_FILE} ${TOOL_GUI_CPPS} )
       set( TOOL_GUI_MOC_H ${TOOL_GUI_HEADER} ${TOOL_GUI_MOC_H} )
-    endforeach( TOOL_GUI_FILE ${TOOL_QT4GUI_FILES})
+    endforeach( TOOL_GUI_FILE ${TOOL_QTGUI_FILES})
 
     qt_wrap_cpp(${libraryname} TOOL_GUI_CPPS ${TOOL_GUI_MOC_H})
-  endif(TOOL_QT4GUI_FILES)
+  endif()
 
 
 
@@ -62,7 +62,7 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
   endif(TOOL_ADDITIONAL_MOC_H)
 
   # in any case (GUI or non-GUI), create a shared library
-  if(TOOL_FILES OR TOOL_QT4GUI_FILES)
+  if(TOOL_FILES OR TOOL_QTGUI_FILES)
     if(libraryname AND reallycreatelibrary)
       # configure one file with the itkLoad method
       configure_file( ${MITK_DIR}/ToolExtensionITKFactoryLoader.cpp.in
@@ -79,14 +79,14 @@ macro(MITK_GENERATE_TOOLS_LIBRARY)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
     add_library(${libraryname} SHARED ${TOOL_CPPS} ${TOOL_GUI_CPPS})
-    if(TOOL_QT4GUI_FILES)
+    if(TOOL_QTGUI_FILES)
       mitk_use_modules(TARGET ${libraryname} MODULES Qmitk)
     else()
       mitk_use_modules(TARGET ${libraryname} MODULES Mitk)
     endif()
 
     endif(libraryname AND reallycreatelibrary)
-  endif(TOOL_FILES OR TOOL_QT4GUI_FILES)
+  endif(TOOL_FILES OR TOOL_QTGUI_FILES)
 
 
 endmacro(MITK_GENERATE_TOOLS_LIBRARY)

@@ -13,12 +13,10 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include "mitkMovieMakerPluginActivator.h"
 
+#include "mitkMovieMakerPluginActivator.h"
 #include "QmitkMovieMakerView.h"
 #include "QmitkScreenshotMaker.h"
-
-#include <QtPlugin>
 
 namespace mitk {
 
@@ -34,7 +32,3 @@ namespace mitk {
   }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_moviemaker, mitk::MovieMakerPluginActivator)
-#endif

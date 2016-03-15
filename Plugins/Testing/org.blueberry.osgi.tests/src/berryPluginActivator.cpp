@@ -15,12 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <berryMacros.h>
-
 #include "berryPluginActivator.h"
-
 #include "berryOSGiCoreTestSuite.h"
-
-#include <QtPlugin>
 
 namespace berry {
 
@@ -37,5 +33,3 @@ void org_blueberry_osgi_tests_Activator::stop(ctkPluginContext* context)
 }
 
 }
-
-Q_EXPORT_PLUGIN2(org_blueberry_osgi_tests, berry::org_blueberry_osgi_tests_Activator)

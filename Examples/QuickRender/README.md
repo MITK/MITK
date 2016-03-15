@@ -37,7 +37,7 @@ Build Instructions
  - build MITK superbuild with
    - `MITK_BUILD_EXAMPLES` variable switched to `ON`
    - advanced option `MITK_USE_CTK` switched to `OFF`
-   - `MITK_USE_BLUEBERRY` and `MITK_USE_QT` switched to `OFF` (MITK_USE_QT finds Qt 4)
+   - `MITK_USE_BLUEBERRY` and `MITK_USE_QT` switched to `OFF` (MITK_USE_QT finds Qt 5)
 
 Open Issues
 ------------------

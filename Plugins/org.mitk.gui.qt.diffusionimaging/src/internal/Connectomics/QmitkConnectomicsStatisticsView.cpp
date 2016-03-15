@@ -246,11 +246,7 @@ void QmitkConnectomicsStatisticsView::OnSelectionChanged( std::vector<mitk::Data
                 GetProperty( mitk::connectomicsRenderingBalloonAllNodeLabelsName.c_str() )->
                 GetValueAsString().c_str();
             QStringList allNodesLabelList = allNodesLabel.simplified().split( "," );
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
             allNodesLabelList.sort( Qt::CaseInsensitive );
-#else
-            allNodesLabelList.sort();
-#endif
             m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::addItem( "no node chosen: -1" );
             m_Controls-> networkBalloonsNodeLabelsComboBox-> QComboBox::addItems( allNodesLabelList );
           }

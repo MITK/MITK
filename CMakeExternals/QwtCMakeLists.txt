@@ -165,24 +165,15 @@ foreach(_source ${QWT_SOURCES})
   list(APPEND _qwt_sources src/${_source})
 endforeach()
 
-if(DESIRED_QT_VERSION MATCHES 4)
-  find_package(Qt4 REQUIRED QtCore QtGui QtSvg QtOpenGL QtDesigner)
-  include(${QT_USE_FILE})
-  qt4_wrap_cpp(_qwt_sources ${_qwt_moc_headers})
+find_package(Qt5Svg REQUIRED)
+find_package(Qt5OpenGL REQUIRED)
+find_package(Qt5PrintSupport REQUIRED)
+find_package(Qt5Concurrent REQUIRED)
 
-  add_library(qwt SHARED ${_qwt_sources})
-  target_link_libraries(qwt PUBLIC ${QT_LIBRARIES})
-elseif(DESIRED_QT_VERSION MATCHES 5)
-  find_package(Qt5Svg REQUIRED)
-  find_package(Qt5OpenGL REQUIRED)
-  find_package(Qt5PrintSupport REQUIRED)
-  find_package(Qt5Concurrent REQUIRED)
+qt5_wrap_cpp(_qwt_sources ${_qwt_moc_headers})
 
-  qt5_wrap_cpp(_qwt_sources ${_qwt_moc_headers})
-
-  add_library(qwt SHARED ${_qwt_sources})
-  target_link_libraries(qwt PUBLIC Qt5::Svg Qt5::OpenGL Qt5::PrintSupport Qt5::Concurrent)
-endif()
+add_library(qwt SHARED ${_qwt_sources})
+target_link_libraries(qwt PUBLIC Qt5::Svg Qt5::OpenGL Qt5::PrintSupport Qt5::Concurrent)
 
 target_compile_definitions(qwt PUBLIC QWT_DLL PRIVATE QWT_MAKEDLL)
 set_target_properties(qwt PROPERTIES
@@ -203,27 +194,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
 
-if(DESIRED_QT_VERSION MATCHES 4)
-  qt4_wrap_cpp(_qwt_designer_sources
-    designer/qwt_designer_plugin.h
-    designer/qwt_designer_plotdialog.h
-  )
-  qt4_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
-  add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
-  target_link_libraries(qwt_designer_plugin qwt ${QT_LIBRARIES})
-elseif(DESIRED_QT_VERSION MATCHES 5)
-  find_package(Qt5Designer REQUIRED)
-  include_directories(${Qt5Designer_INCLUDE_DIRS})
-  qt5_wrap_cpp(_qwt_designer_sources
-    designer/qwt_designer_plugin.h
-    designer/qwt_designer_plotdialog.h
-  )
-  qt5_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
+find_package(Qt5Designer REQUIRED)
+include_directories(${Qt5Designer_INCLUDE_DIRS})
+qt5_wrap_cpp(_qwt_designer_sources
+  designer/qwt_designer_plugin.h
+  designer/qwt_designer_plotdialog.h
+)
+qt5_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
 
-  add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
-  target_link_libraries(qwt_designer_plugin qwt)
-  qt5_use_modules(qwt_designer_plugin Designer)
-endif()
+add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
+target_link_libraries(qwt_designer_plugin qwt)
+qt5_use_modules(qwt_designer_plugin Designer)
 
 set_target_properties(qwt_designer_plugin PROPERTIES
                       SOVERSION ${${PROJECT_NAME}_VERSION}

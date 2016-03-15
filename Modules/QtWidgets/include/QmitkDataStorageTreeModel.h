@@ -98,11 +98,7 @@ public:
   bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
   bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
   Qt::DropActions supportedDropActions() const override;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   Qt::DropActions supportedDragActions() const override;
-#else
-  Qt::DropActions supportedDragActions() const;
-#endif
   QStringList mimeTypes() const override;
   QMimeData * mimeData(const QModelIndexList & indexes) const override;
 

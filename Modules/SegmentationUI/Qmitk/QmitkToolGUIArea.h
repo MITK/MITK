@@ -34,11 +34,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolGUIArea : public QWidget
   Q_OBJECT
 
   public:
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  QmitkToolGUIArea( QWidget* parent = 0, Qt::WFlags f = 0 );
-#else
   QmitkToolGUIArea( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
-#endif
   virtual ~QmitkToolGUIArea();
 
   signals:

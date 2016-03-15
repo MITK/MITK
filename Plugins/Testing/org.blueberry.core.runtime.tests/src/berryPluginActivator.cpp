@@ -15,12 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <berryMacros.h>
-
 #include "berryPluginActivator.h"
-
 #include "berryCoreRuntimeTestSuite.h"
-
-#include <QtPlugin>
 
 namespace berry {
 
@@ -35,5 +31,3 @@ void org_blueberry_core_runtime_tests_Activator::stop(ctkPluginContext* context)
 }
 
 }
-
-Q_EXPORT_PLUGIN2(org_blueberry_core_runtime_tests, berry::org_blueberry_core_runtime_tests_Activator)

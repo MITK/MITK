@@ -375,7 +375,7 @@ void QmitkToolSelectionBox::RecreateButtons()
   delete l; // delete the list, not the objects
   */
 
-  // mmueller Qt4 impl
+  // mmueller Qt impl
   QList<QAbstractButton *> l = m_ToolButtonGroup->buttons();
   // remove all buttons that are there
   QList<QAbstractButton *>::iterator it;
@@ -388,7 +388,7 @@ void QmitkToolSelectionBox::RecreateButtons()
     //this->removeChild(btn);
     delete btn;
   }
-  // end mmueller Qt4 impl
+  // end mmueller Qt impl
 
   mitk::ToolManager::ToolVectorTypeConst allPossibleTools = m_ToolManager->GetTools();
   mitk::ToolManager::ToolVectorTypeConst allTools;
@@ -518,7 +518,7 @@ void QmitkToolSelectionBox::RecreateButtons()
       button->setTextLabel( label );              // a label
       QToolTip::add( button, tooltip );
       */
-      // mmueller Qt4
+      // mmueller Qt
       button->setText( label );              // a label
       button->setToolTip( tooltip );
       // mmueller

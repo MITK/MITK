@@ -64,12 +64,6 @@ if(MITK_USE_CTK)
       )
     endif()
 
-    set (ctk_qt_args -DCTK_QT_VERSION:STRING=${DESIRED_QT_VERSION})
-
-    if (DESIRED_QT_VERSION MATCHES "4")
-      list(APPEND ctk_qt_args -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE})
-    endif()
-
     FOREACH(type RUNTIME ARCHIVE LIBRARY)
       IF(DEFINED CTK_PLUGIN_${type}_OUTPUT_DIRECTORY)
         LIST(APPEND mitk_optional_cache_args -DCTK_PLUGIN_${type}_OUTPUT_DIRECTORY:PATH=${CTK_PLUGIN_${type}_OUTPUT_DIRECTORY})
@@ -88,11 +82,11 @@ if(MITK_USE_CTK)
       CMAKE_ARGS
         ${ep_common_args}
         ${ctk_optional_cache_args}
-        ${ctk_qt_args}
         # The CTK PluginFramework cannot cope with
         # a non-empty CMAKE_DEBUG_POSTFIX for the plugin
         # libraries yet.
         -DCMAKE_DEBUG_POSTFIX:STRING=
+        -DCTK_QT_VERSION:STRING=5
         -DGit_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
         -DCTK_LIB_CommandLineModules/Backend/LocalProcess:BOOL=ON

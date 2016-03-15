@@ -176,11 +176,7 @@ void InternalPlatform::InitializePluginPaths()
   {
     // Append a hash value of the absolute path of the executable to the data location.
     // This allows to start the same application from different build or install trees.
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     dataLocation = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + this->getOrganizationName() + "/" + this->getApplicationName() + '_';
-#else
-    dataLocation = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + '_';
-#endif
     dataLocation += QString::number(qHash(QCoreApplication::applicationDirPath())) + "/";
     m_UserPath.setPath(dataLocation);
   }

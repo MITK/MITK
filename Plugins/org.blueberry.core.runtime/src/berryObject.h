@@ -149,11 +149,7 @@ public:
   /** Gets the reference count on this object. */
   int GetReferenceCount() const
   {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     return m_ReferenceCount.load();
-#else
-    return m_ReferenceCount;
-#endif
   }
 
   /** Sets the reference count on this object. This is a dangerous

@@ -24,8 +24,8 @@ You need:
      clients available). We recomment using Git, but see below for a way how to
      get the current source code without using it.
   -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
-  -# <a href="http://qt.nokia.com">Qt</a> 5.x if you plan to develop Qt-based
-     applications (Qt 4 is still supported but may be dropped in near future)
+  -# <a href="http://qt.io">Qt</a> 5.x if you plan to develop Qt-based
+     applications
   -# If you are using <b>Mac OS X</b> you need an XCode installation as it
      provides the neccessary compilers and SDKs
 
@@ -89,6 +89,10 @@ CMake will present you a couple of options, these are the most important ones:
  - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also
    configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
  - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
+ - <tt><b>MITK_USE_SOFA</b></tt> Build MITK code which depends on SOFA (this will
+   download and build SOFA)
+ - <tt><b>CMAKE_PREFIX_PATH</b></tt> If Qt5 is not found automatically, set
+   this variable to the base directory of your Qt5 installation.
 
 If you are satisfied with the configuration of your MITK superbuild, generate
 the project files with CMake by pressing "Generate".

@@ -26,10 +26,8 @@ namespace mitk {
     public QObject, public ctkPluginActivator
   {
     Q_OBJECT
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
- Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_dosevisualization")
-#endif
-      Q_INTERFACES(ctkPluginActivator)
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_dosevisualization")
+    Q_INTERFACES(ctkPluginActivator)
 
   public:
 

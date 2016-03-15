@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginContext.h>
 
-#include <QtPlugin>
-
 namespace mitk
 {
   void CoreExtActivator::start(ctkPluginContext* context)
@@ -76,7 +74,3 @@ namespace mitk
   }
 
 } // end namespace mitk
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_core_ext, mitk::CoreExtActivator)
-#endif

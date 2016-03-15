@@ -46,9 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QToolBar>
 #include <QApplication>
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,0,0))
 #include <QMetaMethod>
-#endif
 
 namespace berry
 {

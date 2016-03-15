@@ -35,7 +35,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
 
       mitk_create_executable(${appname}
       DEPENDS MitkCore MitkCLCore ${dependencies_list}
-      PACKAGE_DEPENDS ITK Qt4|QtCore Qt5|Core Vigra
+      PACKAGE_DEPENDS ITK Qt5|Core Vigra
       CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
       )
 

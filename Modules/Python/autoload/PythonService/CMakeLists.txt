@@ -3,7 +3,7 @@ MITK_CREATE_MODULE( PythonService
     PRIVATE src/PythonService
   DEPENDS PUBLIC MitkPython
   PACKAGE_DEPENDS
-    PUBLIC Qt4|QtGui Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
+    PUBLIC Qt5|Widgets CTK|CTKScriptingPythonCore+CTKScriptingPythonWidgets
     PRIVATE VTK|vtkPython+vtkWrappingPythonCore ${OpenCV_DEP}
     AUTOLOAD_WITH MitkPython
 )

@@ -200,45 +200,19 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-if(APPLE)
-  set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-
-  # if(DESIRED_QT_VERSION STREQUAL 5)
-  #   message(FATAL_ERROR "MITK is not yet compatible with Qt 5 on OS X. Please use the latest Qt 4 version instead.")
-  # endif()
-else()
-  set(DESIRED_QT_VERSION 5 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-endif()
-
-env_option(MITK_USE_QT "Use the Qt Company's Qt library" ON)
-set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
+env_option(MITK_USE_QT "Use Qt library" ON)
 
 if(MITK_USE_QT)
-  # find the package at the very beginning, so that QT4_FOUND is available
-  if(DESIRED_QT_VERSION MATCHES 4)
-    set(MITK_QT4_MINIMUM_VERSION 4.7)
-    find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
-    set(MITK_USE_Qt4 TRUE)
-    set(MITK_USE_Qt5 FALSE)
-  endif()
-  if(DESIRED_QT_VERSION MATCHES 5)
-    set(MITK_QT5_MINIMUM_VERSION 5.0.0)
-    set(MITK_USE_Qt4 FALSE)
-    set(MITK_USE_Qt5 TRUE)
-    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
-    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebKitWidgets Xml XmlPatterns UiTools Help)
-    find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
-    if(Qt5_DIR)
-      get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
-      list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
-      if(_result LESS 0)
-        set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
-      endif()
+  set(MITK_QT5_MINIMUM_VERSION 5.0.0)
+  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebKitWidgets Xml XmlPatterns UiTools Help)
+  find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
+  if(Qt5_DIR)
+    get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
+    list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
+    if(_result LESS 0)
+      set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
     endif()
   endif()
-else()
-  set(MITK_USE_Qt4 FALSE)
-  set(MITK_USE_Qt5 FALSE)
 endif()
 
 # ------------------------------------------------------------------------
@@ -362,7 +336,7 @@ if(MITK_USE_SOFA)
 endif()
 
 # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
-if(MITK_USE_Qt5 AND MITK_USE_Python)
+if(MITK_USE_QT AND MITK_USE_Python)
   set(minimum_required_python_qt5_version "5.3.0")
   find_package(Qt5 COMPONENTS Core REQUIRED)
 
@@ -901,20 +875,16 @@ endif()
 
 # Qt support
 if(MITK_USE_QT)
-  if(DESIRED_QT_VERSION MATCHES 4)
-    find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
-  elseif(DESIRED_QT_VERSION MATCHES 5)
-    find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
-    get_target_property(_qmake_exec Qt5::qmake LOCATION)
-    execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
-      RESULT_VARIABLE _result
-      OUTPUT_VARIABLE QT_BINARY_DIR
-      ERROR_VARIABLE _error
-    )
-    string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
-    if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
-      message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
-    endif()
+  find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
+  get_target_property(_qmake_exec Qt5::qmake LOCATION)
+  execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
+    RESULT_VARIABLE _result
+     OUTPUT_VARIABLE QT_BINARY_DIR
+    ERROR_VARIABLE _error
+  )
+  string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
+  if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
+    message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
   endif()
 
   find_program(QT_HELPGENERATOR_EXECUTABLE

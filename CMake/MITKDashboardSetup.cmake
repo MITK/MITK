@@ -33,7 +33,7 @@ endif()
 
 if(MITK_USE_QT)
   if(NOT QT_QMAKE_EXECUTABLE)
-    find_program(QT_QMAKE_EXECUTABLE NAMES qmake qmake-qt4
+    find_program(QT_QMAKE_EXECUTABLE NAMES qmake qmake-qt5
                  HINTS ${QT_BINARY_DIR})
   endif()
 

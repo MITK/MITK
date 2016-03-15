@@ -5,6 +5,4 @@ mitk_create_plugin(
   EXPORTED_INCLUDE_SUFFIXES src
 )
 
-if(MITK_USE_Qt5)
-  target_link_libraries(${PLUGIN_TARGET} PUBLIC Qt5::Widgets)
-endif()
+target_link_libraries(${PLUGIN_TARGET} PUBLIC Qt5::Widgets)

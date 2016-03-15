@@ -12,7 +12,6 @@ To use the features of the different toolkits make sure they are enabled during 
 
 \section python_sec2 Build Instructions
 
-Currently MITK-Python is only supported with Qt4. Qt5 support is in an experimental stage.
 Have a look at \ref python_ssec3 on how to build MITK-Python with Qt5.
 The following CMake build options are available:
 <ul>

@@ -16,9 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "org_mitk_example_gui_regiongrowing_Activator.h"
-
-#include <QtPlugin>
-
 #include "QmitkRegionGrowingView.h"
 
 namespace mitk {
@@ -34,7 +31,3 @@ void org_mitk_example_gui_regiongrowing_Activator::stop(ctkPluginContext* contex
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_example_gui_regiongrowing, mitk::org_mitk_example_gui_regiongrowing_Activator)
-#endif

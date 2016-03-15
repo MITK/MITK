@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYLOGPLUGIN_H_
 
 #include <ctkPluginActivator.h>
-
 #include "berryQtPlatformLogModel.h"
 
 
@@ -27,9 +26,7 @@ namespace berry {
 class QtLogPlugin : public QObject, public ctkPluginActivator
 {
   Q_OBJECT
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   Q_PLUGIN_METADATA(IID "org_blueberry_ui_qt_log")
-#endif
   Q_INTERFACES(ctkPluginActivator)
 
 public:

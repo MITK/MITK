@@ -49,9 +49,7 @@ public:
 class HelpPluginActivator : public QObject, public ctkPluginActivator
 {
   Q_OBJECT
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    Q_PLUGIN_METADATA(IID "org_blueberry_ui_qt_help")
-#endif
+  Q_PLUGIN_METADATA(IID "org_blueberry_ui_qt_help")
   Q_INTERFACES(ctkPluginActivator)
 
 public:
@@ -74,12 +72,7 @@ private:
 
   static HelpPluginActivator* instance;
 
-  // bug-19229 no support for QScopedPointerDeleteLater in Qt4
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   QScopedPointer<QHelpEngineWrapper, QScopedPointerDeleteLater > helpEngine;
-#else
-  QScopedPointer<QHelpEngineWrapper> helpEngine;
-#endif
   QScopedPointer<QHelpEngineConfiguration> helpEngineConfiguration;
   QScopedPointer<HelpContextHandler> helpContextHandler;
 

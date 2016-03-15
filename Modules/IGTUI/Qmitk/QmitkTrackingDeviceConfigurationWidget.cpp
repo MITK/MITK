@@ -227,9 +227,9 @@ void QmitkTrackingDeviceConfigurationWidget::StoreUISettings()
     }
   }
 
-  if (this->GetPeristenceService()) // now save the settings using the persistence service
+  if (this->GetPersistenceService()) // now save the settings using the persistence service
   {
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(id);
     propList->Set("SelectedDevice", selectedDevice);
   }
   else // QSettings as a fallback if the persistence service is not available
@@ -263,9 +263,9 @@ void QmitkTrackingDeviceConfigurationWidget::LoadUISettings()
 
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
   std::string selectedDevice;
-  if (this->GetPeristenceService())
+  if (this->GetPersistenceService())
   {
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(id);
     if (propList.IsNull())
     {
       MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;

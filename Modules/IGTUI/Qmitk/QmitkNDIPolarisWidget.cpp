@@ -113,9 +113,9 @@ mitk::TrackingDevice::Pointer QmitkNDIPolarisWidget::ConstructTrackingDevice()
 void QmitkNDIPolarisWidget::StoreUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-  if (this->GetPeristenceService()) // now save the settings using the persistence service
+  if (this->GetPersistenceService()) // now save the settings using the persistence service
   {
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(id);
     propList->Set("PolarisPortWin", m_Controls->m_portSpinBoxPolaris->value());
     propList->Set("PortTypePolaris", m_Controls->portTypePolaris->currentIndex());
     propList->Set("PolarisFrameRate", GetPolarisFrameRate());
@@ -134,13 +134,13 @@ void QmitkNDIPolarisWidget::StoreUISettings()
 void QmitkNDIPolarisWidget::LoadUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-  if (this->GetPeristenceService())
+  if (this->GetPersistenceService())
   {
     int port = 0;
     int portType = 0;
     int polarisFrameRate = 0;
 
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(id);
     if (propList.IsNull())
     {
       MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;

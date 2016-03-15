@@ -22,7 +22,7 @@ private:
 
 You can then access a persistent property list by using a unique id, e.g. the name of your plugin. Variables can be added to this property list and will be available after restarting the application.
 \code
-mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList("org.mitk.myUniqueModule");
+mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList("org.mitk.myUniqueModule");
 //set a variable:
 propList->Set("deviceNumber", m_Controls->GrabbingDeviceNumber->value());
 //get a variable:
@@ -32,7 +32,7 @@ propList->Get("deviceNumber", deviceNumber);
 
 When a MITK scene with stored property list is loaded within MITK the list will change automatically. However a class can be informed by the service object by when the list is changed by adding it as observer to the service object.
 \code
-this->GetPeristenceService()->AddPropertyListReplacedObserver(this);
+this->GetPersistenceService()->AddPropertyListReplacedObserver(this);
 \endcode
 
 An example implementation for the use of the mitk::PersistenceService can be found in the module OpenCVVideoSupport (class QmitkOpenCVVideoControls) and in the corresponding unit test mitkPersistenceTest in the Persistence module.

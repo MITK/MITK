@@ -100,9 +100,9 @@ mitk::TrackingDevice::Pointer QmitkMicronTrackerWidget::ConstructTrackingDevice(
 void QmitkMicronTrackerWidget::StoreUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-  if (this->GetPeristenceService()) // now save the settings using the persistence service
+  if (this->GetPersistenceService()) // now save the settings using the persistence service
   {
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(id);
     propList->Set("MTCalibrationFile", m_MTCalibrationFile);
   }
   else // QSettings as a fallback if the persistence service is not available
@@ -118,9 +118,9 @@ void QmitkMicronTrackerWidget::LoadUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
 
-  if (this->GetPeristenceService())
+  if (this->GetPersistenceService())
   {
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(id);
     if (propList.IsNull())
     {
       MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;

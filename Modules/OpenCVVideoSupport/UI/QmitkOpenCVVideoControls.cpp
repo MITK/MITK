@@ -63,14 +63,14 @@ QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _Video
   this->SetRenderWindow(_RenderWindow);
   this->SetVideoBackground(_VideoBackground);
   d->FromPropertyList();
-  d->GetPeristenceService()->AddPropertyListReplacedObserver(this);
+  d->GetPersistenceService()->AddPropertyListReplacedObserver(this);
 }
 
 QmitkOpenCVVideoControls::~QmitkOpenCVVideoControls()
 {
   if(m_VideoSource != 0 && m_VideoSource->IsCapturingEnabled())
       this->Stop(); // emulate stop
-  d->GetPeristenceService()->RemovePropertyListReplacedObserver(this);
+  d->GetPersistenceService()->RemovePropertyListReplacedObserver(this);
   d->ToPropertyList();
 }
 
@@ -348,7 +348,7 @@ void QmitkOpenCVVideoControls::QObjectDestroyed( QObject * obj /*= 0 */ )
 
 void QmitkOpenCVVideoControlsPrivate::ToPropertyList()
 {
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(m_Id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(m_Id);
     propList->Set("deviceType", q->m_Controls->UseGrabbingDeviceButton->isChecked()? 0: 1);
     propList->Set("grabbingDeviceNumber", q->m_Controls->GrabbingDeviceNumber->value());
     propList->Set("updateRate", q->m_Controls->UpdateRate->value());
@@ -357,7 +357,7 @@ void QmitkOpenCVVideoControlsPrivate::ToPropertyList()
 
 void QmitkOpenCVVideoControlsPrivate::FromPropertyList()
 {
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(m_Id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(m_Id);
 
     bool repeatVideo = false;
     propList->Get("repeatVideo", repeatVideo);

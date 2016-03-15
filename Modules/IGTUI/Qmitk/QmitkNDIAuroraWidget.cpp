@@ -109,9 +109,9 @@ mitk::TrackingDevice::Pointer QmitkNDIAuroraWidget::ConstructTrackingDevice()
 void QmitkNDIAuroraWidget::StoreUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-  if (this->GetPeristenceService()) // now save the settings using the persistence service
+  if (this->GetPersistenceService()) // now save the settings using the persistence service
   {
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(id);
     propList->Set("AuroraPortWin", m_Controls->m_portSpinBoxAurora->value());
     propList->Set("PortTypeAurora", m_Controls->portTypeAurora->currentIndex());
   }
@@ -128,11 +128,11 @@ void QmitkNDIAuroraWidget::StoreUISettings()
 void QmitkNDIAuroraWidget::LoadUISettings()
 {
   std::string id = "org.mitk.modules.igt.ui.trackingdeviceconfigurationwidget";
-  if (this->GetPeristenceService())
+  if (this->GetPersistenceService())
   {
     int port = 0;
     int portType = 0;
-    mitk::PropertyList::Pointer propList = this->GetPeristenceService()->GetPropertyList(id);
+    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(id);
     if (propList.IsNull())
     {
       MITK_ERROR << "Property list for this UI (" << id << ") is not available, could not load UI settings!"; return;

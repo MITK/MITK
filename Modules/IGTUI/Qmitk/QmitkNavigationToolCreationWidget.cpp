@@ -107,13 +107,13 @@ void QmitkNavigationToolCreationWidget::Initialize(mitk::DataStorage* dataStorag
 
 void QmitkNavigationToolCreationWidget::SetTrackingDeviceType(mitk::TrackingDeviceType type, bool changeable)
 {
-}
   int index = m_Controls->m_TrackingDeviceTypeChooser->findText(QString::fromStdString(type));
 
   if (index >= 0)
   {
     m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(index);
   }
+}
 
 
 mitk::NavigationTool::Pointer QmitkNavigationToolCreationWidget::GetCreatedTool()

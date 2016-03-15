@@ -35,7 +35,7 @@ if(MITK_USE_CTK)
 endif()
 
 if(WIN32)
-  if(MITK_USE_Qt5)
+  if(MITK_USE_QT)
     get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
                  PROPERTY IMPORT_LOCATION)
     get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)

@@ -42,7 +42,7 @@ configure_file(src/application/solstice.ini
 add_executable(${OSGI_UI_APP} MACOSX_BUNDLE "src/application/berryMainUI.cpp")
 
 target_link_libraries(${OSGI_UI_APP} PRIVATE ${PROJECT_NAME} mbilog)
-if(MITK_USE_Qt5)
+if(MITK_USE_QT)
   target_link_libraries(${OSGI_UI_APP} PRIVATE Qt5::Widgets)
 endif()
 

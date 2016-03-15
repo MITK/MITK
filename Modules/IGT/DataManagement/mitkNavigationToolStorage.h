@@ -156,10 +156,15 @@ namespace mitk {
      *  tracking device is active and needs the storage to stay consistent.
      */
     void LockStorage();
+
     /** Unlocks the storage again. */
     void UnLockStorage();
+
     /** @return Returns true if the storage is locked at the moment, false if not. */
     bool isLocked();
+
+    /** Sets the properties which causes the microservice to emit an update signal. */
+    void UpdateMicroservice();
 
   protected:
     NavigationToolStorage();

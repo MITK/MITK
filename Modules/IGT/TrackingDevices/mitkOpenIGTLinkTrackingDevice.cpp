@@ -32,7 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
-mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDevice()
+mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDevice(), m_UpdateRate(60)
 {
   //set the type of this tracking device
   this->m_Data = mitk::OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection();
@@ -113,7 +113,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverTools(int waitingTime)
   std::string message = "STT_TDATA";
   igtl::MessageBase::Pointer sttMsg = msgFactory->CreateInstance(message);
   //TODO: Fix this to dynamically get this from GUI
-  ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(60);
+  ((igtl::StartTrackingDataMessage*)sttMsg.GetPointer())->SetResolution(m_UpdateRate);
   m_OpenIGTLinkClient->SendMessage(sttMsg);
 
   mitk::IGTLMessage::Pointer receivedMessage;

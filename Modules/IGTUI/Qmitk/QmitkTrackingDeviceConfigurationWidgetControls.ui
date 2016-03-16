@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>449</width>
+    <width>366</width>
     <height>536</height>
    </rect>
   </property>
@@ -62,13 +62,6 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QLabel" name="choose_tracking_device_label">
-             <property name="text">
-              <string>Choose tracking device:</string>
-             </property>
-            </widget>
-           </item>
            <item>
             <spacer name="horizontalSpacer">
              <property name="orientation">
@@ -165,7 +158,7 @@ p, li { white-space: pre-wrap; }
             <x>0</x>
             <y>0</y>
             <width>98</width>
-            <height>28</height>
+            <height>31</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">

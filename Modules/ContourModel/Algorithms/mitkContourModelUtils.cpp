@@ -164,7 +164,9 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       // polygonal data --> image stencil:
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-      pol2stenc->SetTolerance(0);
+
+      //Set a minimal tolerance, so that clipped pixels will be added to contour as well.
+      pol2stenc->SetTolerance(mitk::eps);
       pol2stenc->SetInputData(surface2D);
       pol2stenc->Update();
 

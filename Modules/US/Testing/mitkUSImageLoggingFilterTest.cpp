@@ -40,7 +40,7 @@ class mitkUSImageLoggingFilterTestSuite : public mitk::TestFixture
   MITK_TEST(TestSavingAfterMupltipleUpdateCalls);
   MITK_TEST(TestFilterWithEmptyImages);
   MITK_TEST(TestFilterWithInvalidPath);
-  MITK_TEST(TestJpgFileExtension);
+  //MITK_TEST(TestJpgFileExtension); //bug 19614
   CPPUNIT_TEST_SUITE_END();
 
 private:

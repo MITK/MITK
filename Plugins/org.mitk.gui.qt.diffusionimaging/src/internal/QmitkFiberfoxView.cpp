@@ -661,28 +661,38 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-y", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[1]));
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-z", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[2]));
 
-    if (parameters.m_Misc.m_MotionVolumesBox=="random")
+    if ( parameters.m_Misc.m_MotionVolumesBox=="random" )
     {
       for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
       {
         parameters.m_SignalGen.m_MotionVolumes.push_back(rand()%2);
       }
     }
-    else if (!parameters.m_Misc.m_MotionVolumesBox.empty())
+    else if ( !parameters.m_Misc.m_MotionVolumesBox.empty() )
     {
-      for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
+      for ( int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++ )
       {
         parameters.m_SignalGen.m_MotionVolumes.push_back(false);
       }
 
-      stringstream stream(parameters.m_Misc.m_MotionVolumesBox);
+      stringstream stream( parameters.m_Misc.m_MotionVolumesBox );
       int n;
-      while(stream >> n)
+      while( stream >> n )
       {
-        if (n<parameters.m_SignalGen.GetNumVolumes() && n>=0)
+        if ( n < parameters.m_SignalGen.GetNumVolumes() && n >= 0 )
         {
-          parameters.m_SignalGen.m_MotionVolumes[n]=true;
+          parameters.m_SignalGen.m_MotionVolumes[n] = true;
         }
+      }
+    }
+    else
+    {
+      //mdh/todo: bug-19481
+      MITK_WARN << "QmitkFiberfoxView.cpp: Unrecognised parameters.m_Misc.m_MotionVolumesBox: " << parameters.m_Misc.m_MotionVolumesBox;
+      parameters.m_Misc.m_MotionVolumesBox = "random"; // set default.
+      for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
+      {
+        parameters.m_SignalGen.m_MotionVolumes.push_back(rand()%2);
       }
     }
   }
@@ -700,12 +710,20 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
   parameters.m_SignalGen.m_DoDisablePartialVolume = m_Controls->m_EnforcePureFiberVoxelsBox->isChecked();
   parameters.m_SignalGen.m_AxonRadius = m_Controls->m_FiberRadius->value();
   parameters.m_SignalGen.m_SignalScale = m_Controls->m_SignalScaleBox->value();
-  double voxelVolume = parameters.m_SignalGen.m_ImageSpacing[0]*parameters.m_SignalGen.m_ImageSpacing[1]*parameters.m_SignalGen.m_ImageSpacing[2];
+
+  double voxelVolume = parameters.m_SignalGen.m_ImageSpacing[0]
+                       * parameters.m_SignalGen.m_ImageSpacing[1]
+                       * parameters.m_SignalGen.m_ImageSpacing[2];
+
   if ( parameters.m_SignalGen.m_SignalScale*voxelVolume > itk::NumericTraits<short>::max()*0.75 )
   {
     parameters.m_SignalGen.m_SignalScale = itk::NumericTraits<short>::max()*0.75/voxelVolume;
     m_Controls->m_SignalScaleBox->setValue(parameters.m_SignalGen.m_SignalScale);
-    QMessageBox::information( NULL, "Warning", "Maximum signal exceeding data type limits. Automatically adjusted to "+QString::number(parameters.m_SignalGen.m_SignalScale)+" to obtain a maximum  signal of 75% of the data type maximum. Relaxation and other effects that affect the signal intensities are not accounted for.");
+    QMessageBox::information( NULL, "Warning",
+                              "Maximum signal exceeding data type limits. Automatically adjusted to "
+                              + QString::number(parameters.m_SignalGen.m_SignalScale)
+                              + " to obtain a maximum  signal of 75% of the data type maximum."
+                                " Relaxation and other effects that affect the signal intensities are not accounted for.");
   }
 
   // Noise

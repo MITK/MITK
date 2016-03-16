@@ -22,7 +22,7 @@ namespace mitk
 {
   std::string OpenIGTLinkTypeInformation::GetTrackingDeviceName()
   {
-    return "Open IGT Link Tracking Device Connection";
+    return "Open IGT Link Connection";
   }
 
   TrackingDeviceData OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection(){

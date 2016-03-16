@@ -425,6 +425,7 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList* propertyList
     }
 
     m_PropertyModifiedTags.clear();
+    m_PropertyDeletedTags.clear();
   }
 
   m_PropertyList = propertyList;

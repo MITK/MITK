@@ -126,7 +126,6 @@ class MITKIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
 
     /** Initializes the tool landmark lists in the UI. */
     void InitializeUIToolLandmarkLists();
-
     void RefreshTrackingDeviceCollection();
 
 };

@@ -40,7 +40,7 @@ class mitkUSImageLoggingFilterTestSuite : public mitk::TestFixture
   MITK_TEST(TestSavingAfterMupltipleUpdateCalls);
   MITK_TEST(TestFilterWithEmptyImages);
   MITK_TEST(TestFilterWithInvalidPath);
-  MITK_TEST(TestJpgFileExtension);
+  //MITK_TEST(TestJpgFileExtension); //bug 19614
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -60,7 +60,7 @@ public:
     m_TemporaryTestDirectory = mitk::IOUtil::GetTempPath();
     m_RandomRestImage1 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
     m_RandomRestImage2 = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 100, 1, 0.2, 0.3, 0.4);
-    m_RandomSingleSliceImage = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(100, 100, 1, 1, 0.2, 0.3, 0.4);
+    m_RandomSingleSliceImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 0.2, 0.3, 0.4);
     m_RealTestImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
   }
 

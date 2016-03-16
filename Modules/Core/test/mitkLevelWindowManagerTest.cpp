@@ -229,7 +229,6 @@ public:
     mitk::DataNode::Pointer node2 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
     mitk::DataNode::Pointer node1 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
 
-    //manager->SetAutoTopMostImage( true, node1 );
     node3->SetIntProperty( "layer" , 1 );
     node2->SetIntProperty( "layer" , 2 );
     node1->SetIntProperty( "layer" , 3 );
@@ -281,7 +280,6 @@ public:
     mitk::DataNode::Pointer node2 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
     mitk::DataNode::Pointer node1 = mitk::IOUtil::Load( testImageFile, *ds )->GetElement(0);
 
-    //manager->SetAutoTopMostImage( true, node1 );
     node3->SetIntProperty( "layer" , 1 );
     node2->SetIntProperty( "layer" , 2 );
     node1->SetIntProperty( "layer" , 3 );
@@ -385,7 +383,6 @@ public:
     {
       //toggle node visibility
       int ran = ranGen->GetIntegerVariate( 2 );
-      //nodesVisible[ ran ] = !nodesVisible[ ran ];
       nodes[ ran ]->SetBoolProperty( "imageForLevelWindow", !nodesForLevelWindow[ ran ] );
 
       //one node must have the level window
@@ -399,20 +396,6 @@ public:
       //all invisible?
       found = std::find( nodesVisible.begin(), nodesVisible.end(), true );
       bool allInvisible = ( found == nodesVisible.end() );
-
-      //which node shall get the level window now
-      /*if ( !allInvisible && !nodesVisible[ ind ] )
-      {
-        int count = 0;
-        for ( std::vector< bool >::const_iterator it = nodesVisible.begin(); it != nodesVisible.end(); ++it, ++count )
-        {
-          if ( *it )
-          {
-            mustHaveLvlWindow = pow( 2, 2 - count );
-            break;
-          }
-        }
-      }*/
 
       if ( !nodesForLevelWindow[ ran ] )
       {

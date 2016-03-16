@@ -188,18 +188,15 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   NodeSetType::ConstPointer nodes = m_DataStorage->GetAll();
   NodeSetType::ConstIterator it = nodes->Begin();
   mitk::DataNode::Pointer propNode = 0;
-  mitk::DataNode::Pointer prevNode = 0;
   while ( it != nodes->End() )
   {
     bool foundPrev = false;
-    bool foundProp = false;
 
     mitk::DataNode::Pointer node = it.Value();
     mitk::LevelWindowProperty::Pointer prop = dynamic_cast< mitk::LevelWindowProperty* >( node->GetProperty( "levelwindow" ) );
     if ( prop == levelWindowProperty )
     {
       propNode = node;
-      foundProp = true;
     }
     else
     {
@@ -215,12 +212,6 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   {
     mitkThrow() << "No Image in DataStorage that belongs to LevelWindow property" << m_LevelWindowProperty;
   }
-
-  //remove imageForLevelWindow from old node
-  /*if ( prevNode.IsNotNull() )
-  {
-    prevNode->SetBoolProperty( "imageForLevelWindow", false );
-  }*/
 
   if (m_IsPropertyModifiedTagSet)  // remove listener for old property
   {
@@ -406,23 +397,6 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
     return;
   }
 
-  std::vector< itk::Command* > commandVec;
-  std::vector< bool > hasObserverVec;
-  std::vector< mitk::BaseProperty* > propertyVec;
-  for ( ObserverToPropertyMap::const_iterator it = m_PropObserverToNode.begin(); it != m_PropObserverToNode.end(); ++it )
-  {
-    unsigned long idx = ((*it).first).first;
-    mitk::DataNode::Pointer node = ((*it).first).second;
-
-    itk::Command* cmd = node->GetCommand( idx );
-    commandVec.push_back( cmd );
-
-    bool hasObserver = ((*it).second)->HasObserver( itk::ModifiedEvent() );
-    hasObserverVec.push_back( hasObserver );
-
-    propertyVec.push_back( (*it).second );
-  }
-
   if (m_AutoTopMost)
   {
     SetAutoTopMostImage(true);
@@ -431,7 +405,6 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
 
   int maxVisibleLayer = itk::NumericTraits<int>::min();
   mitk::DataNode::Pointer highestVisible = NULL;
-  //int highestLvlWin = itk::NumericTraits<int>::min();
   std::vector< mitk::DataNode::Pointer > visProbNodes;
 
   mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
@@ -465,10 +438,6 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
     if ( prop && visible )
     {
       visProbNodes.push_back( node );
-      /*if ( layer > highestLvlWin )
-      {
-        highestLvlWin = layer;
-      }*/
     }
   }
 

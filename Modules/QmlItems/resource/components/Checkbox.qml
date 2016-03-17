@@ -6,9 +6,9 @@ CheckBox
 {
     id: checkBox;
 
-    style: CheckBoxStyle 
+    style: CheckBoxStyle
     {
-        indicator: Rectangle 
+        indicator: Rectangle
         {
             implicitWidth: 16
             implicitHeight: 16
@@ -17,7 +17,7 @@ CheckBox
             border.color: "#282828"
             border.width: 1
 
-            VectorIcon 
+            VectorIcon
             {
                 visible: control.checked
                 anchors.centerIn: parent;
@@ -29,8 +29,8 @@ CheckBox
             }
         }
 
-        label: Label 
-        {   
+        label: Label
+        {
             verticalAlignment: Qt.AlignVCenter
             anchors.left: parent.left
             anchors.leftMargin: 5
@@ -38,7 +38,7 @@ CheckBox
             text: checkBox.text;
             font.weight: Font.Normal;
             font.pixelSize: 12;
-            color: checkBox.enabled ? "white" : "#666666";               
+            color: checkBox.enabled ? "white" : "#666666";
         }
     }
 }

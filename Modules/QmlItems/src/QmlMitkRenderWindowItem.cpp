@@ -1,17 +1,17 @@
 /*===================================================================
- 
+
  The Medical Imaging Interaction Toolkit (MITK)
- 
+
  Copyright (c) German Cancer Research Center,
  Division of Medical and Biological Informatics.
  All rights reserved.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without
  even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE.
- 
+
  See LICENSE.txt or http://www.mitk.org for details.
- 
+
  ===================================================================*/
 
 #include "QmlMitkRenderWindowItem.h"
@@ -31,7 +31,6 @@
 #include "mitkInteractionKeyEvent.h"
 #include "mitkInternalEvent.h"
 #include "mitkPlaneGeometryDataMapper2D.h"
-#include "mitkBaseRenderer.h"
 #include "mitkCameraController.h"
 
 #include "QmlMitkStdMultiItem.h"
@@ -57,10 +56,10 @@ QMap<vtkRenderWindow*, QmlMitkRenderWindowItem*>& QmlMitkRenderWindowItem::GetIn
 QmlMitkRenderWindowItem::QmlMitkRenderWindowItem(QQuickItem* parent, const QString& name, mitk::VtkPropRenderer* , mitk::RenderingManager* renderingManager) : QVTKQuickItem(parent)
 {
     instance = this;
-    
+
     mitk::RenderWindowBase::Initialize(renderingManager, name.toStdString().c_str());
     GetInstances()[QVTKQuickItem::GetRenderWindow()] = this;
-    
+
     this->m_annotation = vtkSmartPointer<vtkCornerAnnotation>::New();
     this->m_rectangle  = vtkSmartPointer<vtkMitkRectangleProp>::New();
 }
@@ -72,18 +71,18 @@ void QmlMitkRenderWindowItem::createPlaneNode()
     {
         mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()) );
     }
-    
+
     if (this->GetRenderer()->GetSliceNavigationController()->GetDefaultViewDirection() == mitk::SliceNavigationController::Original)
         return;
-    
+
     mitk::DataNode::Pointer		planeNode;
     mitk::IntProperty::Pointer  layer;
     mitk::PlaneGeometryDataMapper2D::Pointer mapper = mitk::PlaneGeometryDataMapper2D::New();
-    
+
     layer = mitk::IntProperty::New(1000);
-    
+
     planeNode = this->GetRenderer()->GetCurrentWorldPlaneGeometryNode();
-    
+
     planeNode->SetProperty("visible", mitk::BoolProperty::New(true));
     planeNode->SetProperty("name", mitk::StringProperty::New("plane"));
     planeNode->SetProperty("isPlane", mitk::BoolProperty::New(true));
@@ -91,7 +90,7 @@ void QmlMitkRenderWindowItem::createPlaneNode()
     planeNode->SetProperty("helper object", mitk::BoolProperty::New(true));
     planeNode->SetProperty("layer", layer);
     planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
-    
+
     switch (this->GetRenderer()->GetSliceNavigationController()->GetDefaultViewDirection())
     {
         case mitk::SliceNavigationController::Axial:
@@ -106,13 +105,13 @@ void QmlMitkRenderWindowItem::createPlaneNode()
         default:
             planeNode->SetColor(1.0, 1.0, 0.0);
     }
-    
+
 }
 
 void QmlMitkRenderWindowItem::setViewType(int viewType)
 {
     this->m_viewType = viewType;
-    
+
     emit this->viewTypeChanged();
 }
 
@@ -121,15 +120,15 @@ void QmlMitkRenderWindowItem::setDecorationProperties(std::string text, mitk::Co
     this->m_annotation->SetText(0, text.c_str());
     this->m_annotation->SetMaximumFontSize(12);
     this->m_annotation->GetTextProperty()->SetColor( color[0],color[1],color[2] );
-    
-    
+
+
     if(!this->GetRenderer()->GetVtkRenderer()->HasViewProp(this->m_annotation))
     {
         this->GetRenderer()->GetVtkRenderer()->AddViewProp(this->m_annotation);
     }
-    
+
     this->m_rectangle->SetColor(color[0],color[1],color[2]);
-    
+
     if(!this->GetRenderer()->GetVtkRenderer()->HasViewProp(this->m_rectangle))
     {
         this->GetRenderer()->GetVtkRenderer()->AddViewProp(this->m_rectangle);
@@ -165,7 +164,7 @@ void QmlMitkRenderWindowItem::setMultiItem(QmlMitkStdMultiItem* multiItem)
 {
     if(this->m_multiItem == multiItem)
         return;
-    
+
     this->m_multiItem = multiItem;
     this->m_multiItem->registerViewerItem(this);
 }
@@ -222,7 +221,7 @@ mitk::InteractionEvent::MouseButtons QmlMitkRenderWindowItem::GetEventButton(QMo
 mitk::InteractionEvent::MouseButtons QmlMitkRenderWindowItem::GetButtonState(QMouseEvent* me) const
 {
     mitk::InteractionEvent::MouseButtons buttonState = mitk::InteractionEvent::NoButton;
-    
+
     if (me->buttons() & Qt::LeftButton)
     {
         buttonState = buttonState | mitk::InteractionEvent::LeftMouseButton;
@@ -241,7 +240,7 @@ mitk::InteractionEvent::MouseButtons QmlMitkRenderWindowItem::GetButtonState(QMo
 mitk::InteractionEvent::ModifierKeys QmlMitkRenderWindowItem::GetModifiers(QInputEvent* me) const
 {
     mitk::InteractionEvent::ModifierKeys modifiers = mitk::InteractionEvent::NoKey;
-    
+
     if (me->modifiers() & Qt::ALT)
     {
         modifiers = modifiers | mitk::InteractionEvent::AltKey;
@@ -260,7 +259,7 @@ mitk::InteractionEvent::ModifierKeys QmlMitkRenderWindowItem::GetModifiers(QInpu
 mitk::InteractionEvent::MouseButtons QmlMitkRenderWindowItem::GetButtonState(QWheelEvent* we) const
 {
     mitk::InteractionEvent::MouseButtons buttonState = mitk::InteractionEvent::NoButton;
-    
+
     if (we->buttons() & Qt::LeftButton)
     {
         buttonState = buttonState | mitk::InteractionEvent::LeftMouseButton;
@@ -286,10 +285,10 @@ void QmlMitkRenderWindowItem::mousePressEvent(QMouseEvent* me)
 {
     mitk::Point2D mousePosition = GetMousePosition(me);
     mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
-    
+
     mitk::MousePressEvent::Pointer mPressEvent =
     mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
-    
+
     mitk::RenderWindowBase::HandleEvent(mPressEvent.GetPointer());
     QVTKQuickItem::mousePressEvent(me);
 }
@@ -298,10 +297,10 @@ void QmlMitkRenderWindowItem::mouseReleaseEvent(QMouseEvent* me)
 {
     mitk::Point2D mousePosition = GetMousePosition(me);
     mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
-    
+
     mitk::MouseReleaseEvent::Pointer mReleaseEvent =
     mitk::MouseReleaseEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
-    
+
     mitk::RenderWindowBase::HandleEvent(mReleaseEvent.GetPointer());
     QVTKQuickItem::mouseReleaseEvent(me);
 }
@@ -310,7 +309,7 @@ void QmlMitkRenderWindowItem::mouseMoveEvent(QMouseEvent* me)
 {
     mitk::Point2D mousePosition = GetMousePosition(me);
     mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
-    
+
     mitk::MouseMoveEvent::Pointer mMoveEvent =
     mitk::MouseMoveEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me));
 
@@ -321,25 +320,25 @@ void QmlMitkRenderWindowItem::mouseMoveEvent(QMouseEvent* me)
 void QmlMitkRenderWindowItem::wheelEvent(QWheelEvent *we)
 {
     mitk::Point2D mousePosition = GetMousePosition(we);
-    
+
     mitk::MouseWheelEvent::Pointer mWheelEvent =
     mitk::MouseWheelEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(we), GetModifiers(we), we->delta());
-    
+
     mitk::RenderWindowBase::HandleEvent(mWheelEvent.GetPointer());
     QVTKQuickItem::wheelEvent(we);
 }
 
 bool QmlMitkRenderWindowItem::prepareForRender()
 {
-    
+
     mitk::VtkPropRenderer *vPR = dynamic_cast<mitk::VtkPropRenderer*>(mitk::BaseRenderer::GetInstance(this->GetRenderWindow()));
     if (vPR)
     {
         vPR->PrepareRender();
     }
-    
+
     mitk::RenderWindowBase::GetRenderer()->ForceImmediateUpdate();
-    
+
     return true;
 }
 
@@ -367,5 +366,3 @@ vtkRenderWindowInteractor* QmlMitkRenderWindowItem::GetVtkRenderWindowInteractor
 {
     return QVTKQuickItem::GetInteractor();
 }
-
-

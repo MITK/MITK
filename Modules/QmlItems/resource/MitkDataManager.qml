@@ -26,8 +26,8 @@ Item
 	{
 		anchors.fill: parent
 		color: "#2E2E2E"
-		
-		ListView 
+
+		ListView
 		{
 			id: list
 
@@ -37,27 +37,27 @@ Item
 
 			delegate: Component
 			{
-				Rectangle 
+				Rectangle
 				{
 					id: listItem
 					width: parent.width
 					height: 30
 					color: "#aa333333"
-					
-					MouseArea 
+
+					MouseArea
 					{
 						anchors.fill: parent
 						onClicked: list.currentIndex = index
 					}
 
-					Row 
+					Row
 					{
 						anchors.fill: parent
 						anchors.leftMargin: 10
-						
+
 						spacing: 10
 						height: parent.height
-						
+
 						Mitk.Checkbox
 						{
 							id: cb
@@ -71,8 +71,8 @@ Item
 							}
 						}
 
-						Text 
-						{ 
+						Text
+						{
 							anchors.verticalCenter: parent.verticalCenter
 							text: model.display
 							color: "#ffffff"
@@ -93,7 +93,7 @@ Item
 					ListView.onAdd: list.currentIndex = index
 				}
 			}
-			
+
 			Mitk.DataToolbar
 			{
 				id: toolbar

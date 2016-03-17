@@ -1,8 +1,14 @@
+/*========================================================================
+ OpenView -- http://openview.kitware.com
+
+ Copyright 2012 Kitware, Inc.
+
+ Licensed under the BSD license. See LICENSE file for details.
+ ========================================================================*/
+
 #include "QVTKQuickItem.h"
 
 #include <QOpenGLContext>
-#include <QOpenGLFramebufferObject>
-#include <QOpenGLShaderProgram>
 #include <QQuickWindow>
 #include <QThread>
 #include <QSGSimpleRectNode>
@@ -15,23 +21,11 @@
 #include "vtkgl.h"
 #include "vtkOpenGLExtensionManager.h"
 #include "vtkRenderer.h"
-#include "vtkRendererCollection.h"
 
 #include "vtkCubeSource.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 
-
-#include <iostream>
-
-#include <QQuickFramebufferObject>
-#include <QOpenGLFramebufferObject>
-
-#include <vtkGenericOpenGLRenderWindow.h>
-#include <vtkObjectFactory.h>
-
-#include <vtkRendererCollection.h>
-#include <vtkCamera.h>
 #include <vtkFrameBufferObject2.h>
 
 #include "QVTKInternalOpenglRenderWindow.h"
@@ -42,18 +36,18 @@ QVTKQuickItem::QVTKQuickItem(QQuickItem* parent)
 {
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::LeftButton | Qt::MiddleButton | Qt::RightButton);
-    
+
     m_interactor = vtkSmartPointer<QVTKInteractor>::New();
     m_interactorAdapter = new QVTKInteractorAdapter(this);
     m_connect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    
+
     m_win = vtkInternalOpenGLRenderWindow::New();
     m_interactor->SetRenderWindow(m_win);
-    
+
     m_connect->Connect(m_win, vtkCommand::WindowIsCurrentEvent, this, SLOT(IsCurrent(vtkObject*, unsigned long, void*, void*)), NULL, 0.0, Qt::DirectConnection);
     m_connect->Connect(m_win, vtkCommand::WindowIsDirectEvent, this, SLOT(IsDirect(vtkObject*, unsigned long, void*, void*)), NULL, 0.0, Qt::DirectConnection);
     m_connect->Connect(m_win, vtkCommand::WindowSupportsOpenGLEvent, this, SLOT(SupportsOpenGL(vtkObject*, unsigned long, void*, void*)), NULL, 0.0, Qt::DirectConnection);
-    
+
     connect(this, SIGNAL(textureFollowsItemSizeChanged(bool)),
             this, SLOT(onTextureFollowsItemSizeChanged(bool)));
 }

@@ -5,7 +5,6 @@ set(CPP_FILES
   QmlMitkRenderingManager.cpp
   QmlMitkRenderingManagerFactory.cpp
   QmlMitkBigRenderLock.cpp
-  QmlMitkFourRenderWindowWidget.cpp
   QmlAxisOverlay.cpp
   QmlMitkStdMultiItem.cpp
   QmlMitkDatamanager.cpp
@@ -23,7 +22,6 @@ set(MOC_H_FILES
   include/QmlMitkRenderWindowItem.h
   include/QmlMitkRenderingManager.h
   include/QmlMitkBigRenderLock.h
-  include/QmlMitkFourRenderWindowWidget.h
   include/QmlMitkStdMultiItem.h
   include/QmlMitkDatamanager.h
   include/QmlMitkProperties.h

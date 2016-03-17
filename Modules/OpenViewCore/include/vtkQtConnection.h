@@ -99,4 +99,3 @@ class vtkQtConnection : public QObject
 };
 
 #endif
-

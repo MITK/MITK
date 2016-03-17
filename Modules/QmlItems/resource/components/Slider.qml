@@ -2,7 +2,7 @@ import QtQuick 2.5
 
 Item
 {
-    id: root 
+    id: root
 
     property real minimumValue: 0;
     property real maximumValue: 100;
@@ -146,4 +146,3 @@ Item
         }
     }
 }
-

@@ -2,18 +2,18 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 
-ComboBox 
+ComboBox
 {
     id: control;
 
     anchors.left: parent.left
     anchors.top: parent.top
     anchors.right: parent.right
-    
+
     height: 20
 
     style: ComboBoxStyle
-    { 
+    {
         background: Rectangle
         {
             id: compBackground;
@@ -38,8 +38,8 @@ ComboBox
             }
         }
 
-        label: Label 
-        {   
+        label: Label
+        {
             verticalAlignment: Qt.AlignVCenter
             anchors.left: parent.left
             anchors.leftMargin: 5
@@ -47,7 +47,7 @@ ComboBox
             text: control.currentText;
             font.weight: Font.Normal;
             font.pixelSize: 12;
-            color: control.enabled ? "white" : "#666666";               
+            color: control.enabled ? "white" : "#666666";
         }
 
     }

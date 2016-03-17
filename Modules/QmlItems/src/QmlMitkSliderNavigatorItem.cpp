@@ -79,14 +79,14 @@ void QmlMitkSliderNavigatorItem::Refetch()
 
         this->m_Min = 0;
         this->m_Max = m_Stepper->GetSteps()-1;
-        
+
         if(m_InverseDirection)
             this->m_Value = m_Stepper->GetSteps()-1-m_Stepper->GetPos();
         else
             this->m_Value = m_Stepper->GetPos();
-        
+
         m_InRefetch = false;
-        
+
         emit this->sync();
     }
 }
@@ -195,4 +195,3 @@ void QmlMitkSliderNavigatorItem::create()
 {
     qmlRegisterType<QmlMitkSliderNavigatorItem>("Mitk.Views", 1, 0, "SliderNavigator");
 }
-

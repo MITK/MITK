@@ -14,11 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#ifndef QmlMitkRenderingManagerFactory_h
-#define QmlMitkRenderingManagerFactory_h
-
-
+#ifndef __QmlMitkRenderingManagerFactory_h
+#define __QmlMitkRenderingManagerFactory_h
 
 #include "mitkRenderingManagerFactory.h"
 
@@ -35,13 +32,9 @@ class  QmlMitkRenderingManagerFactory : public mitk::RenderingManagerFactory
 public:
 
   QmlMitkRenderingManagerFactory();
-
   ~QmlMitkRenderingManagerFactory();
 
   virtual mitk::RenderingManager::Pointer CreateRenderingManager() const;
-
-private:
-
 };
 
 

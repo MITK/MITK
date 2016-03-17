@@ -16,7 +16,7 @@ Text
 
     signal clicked;
 
-    FontLoader 
+    FontLoader
     {
         id: fontLoader;
         source: "../../fonts/font-awesome/fontawesome-webfont.ttf";
@@ -24,7 +24,7 @@ Text
 
     textFormat:             Text.PlainText;
     style:                  Text.Normal;
-    color:                  !root.enabled ? root.disableColor : mouseArea.pressed ? Qt.darker(root.defaultColor, 1.5) : root.defaultColor 
+    color:                  !root.enabled ? root.disableColor : mouseArea.pressed ? Qt.darker(root.defaultColor, 1.5) : root.defaultColor
     font.family:            fontLoader.name;
     font.pixelSize:         root.pixelSize;
     verticalAlignment:      Text.AlignVCenter;
@@ -43,14 +43,14 @@ Text
         id: mouseArea;
 
         anchors.fill: parent;
-        
+
         hoverEnabled: true;
 
         onClicked:
         {
             root.clicked();
         }
-        
+
         onEntered:
         {
             if(root.toolArea)

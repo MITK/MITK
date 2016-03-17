@@ -96,6 +96,4 @@ class vtkEventQtSlotConnect : public vtkObject
     vtkEventQtSlotConnect(const vtkEventQtSlotConnect&);
     void operator=(const vtkEventQtSlotConnect&);
 };
-
 #endif
-

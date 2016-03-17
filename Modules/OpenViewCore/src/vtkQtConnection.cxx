@@ -148,4 +148,3 @@ void vtkQtConnection::PrintSelf(ostream& os, vtkIndent indent)
           this->QtSlot.toUtf8().data() << "\n";
     }
 }
-

@@ -19,7 +19,7 @@ SliderNavigator
   {
     anchors.fill: parent
     spacing: 5
-    
+
     Label
     {
       id: label

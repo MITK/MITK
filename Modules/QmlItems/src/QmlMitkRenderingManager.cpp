@@ -1,29 +1,26 @@
 /*===================================================================
- 
+
  The Medical Imaging Interaction Toolkit (MITK)
- 
+
  Copyright (c) German Cancer Research Center,
  Division of Medical and Biological Informatics.
  All rights reserved.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without
  even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE.
- 
+
  See LICENSE.txt or http://www.mitk.org for details.
- 
+
  ===================================================================*/
 
 #include "QmlMitkRenderingManager.h"
 #include "QmlMitkRenderWindowItem.h"
-
 #include "mitkGeometry3D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkSliceNavigationController.h"
-
 #include <QCoreApplication>
 #include <QTimer>
-
 
 QmlMitkRenderingManager
 ::QmlMitkRenderingManager()
@@ -73,10 +70,10 @@ QmlMitkRenderingManager
         // Directly process all pending rendering requests
         //this->ExecutePendingRequests();
         this->MyUpdateExecutePendingRequests();
-        
+
         return true;
     }
-    
+
     return false;
 }
 
@@ -85,7 +82,7 @@ QmlMitkRenderingManager
 void QmlMitkRenderingManager::MyUpdateExecutePendingRequests()
 {
     m_UpdatePending = false;
-    
+
     // Satisfy all pending update requests
     RenderWindowList::iterator it;
     int i = 0;
@@ -94,7 +91,7 @@ void QmlMitkRenderingManager::MyUpdateExecutePendingRequests()
         if ( it->second == RENDERING_REQUESTED )
         {
             vtkRenderWindow* renderWindow = it->first;
-            
+
             // If the renderWindow is not valid, we do not want to inadvertantly create
             // an entry in the m_RenderWindowList map. It is possible if the user is
             // regularly calling AddRenderer and RemoveRenderer for a rendering update
@@ -106,12 +103,12 @@ void QmlMitkRenderingManager::MyUpdateExecutePendingRequests()
             {
                 continue;
             }
-            
+
             // Erase potentially pending requests for this window
             m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
-            
+
             m_UpdatePending = false;
-            
+
             // Immediately repaint this window (implementation platform specific)
             // If the size is 0 it crahses
             int *size = renderWindow->GetSize();
@@ -126,5 +123,3 @@ void QmlMitkRenderingManager::MyUpdateExecutePendingRequests()
         }
     }
 }
-
-

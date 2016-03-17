@@ -76,7 +76,7 @@ TransferItem
     anchors.rightMargin: 10
     height: 20
     enabled: root.enabled
-  } 
+  }
 
   Mitk.Slider
   {
@@ -92,7 +92,7 @@ TransferItem
     minimumValue: root.min;
     maximumValue: root.max;
 
-    onValueLowerChangedByHandle: 
+    onValueLowerChangedByHandle:
     {
       root.currentMin = valueLower;
     }
@@ -107,7 +107,7 @@ TransferItem
   {
     target: colorItem;
 
-    onSync: 
+    onSync:
     {
       colorField.text = colorItem.greyValue.toFixed(2);
     }
@@ -118,7 +118,7 @@ TransferItem
   {
     target: opacityItem;
 
-    onSync: 
+    onSync:
     {
       grayField.text = opacityItem.greyValue.toFixed(2);
       opacityField.text = opacityItem.opacity.toFixed(2);

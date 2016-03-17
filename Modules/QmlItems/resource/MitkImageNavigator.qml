@@ -32,7 +32,7 @@ ImageNavigator
 
 		Mitk.Spinbox
 		{
-			id: worldCoordY	
+			id: worldCoordY
 			decimals: 2
 			borderColor: "#0250AB"
 

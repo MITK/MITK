@@ -25,7 +25,6 @@ set(MITK_PLUGINS
   org.mitk.core.jobs:OFF
   org.mitk.diffusionimaging:OFF
   org.mitk.simulation:OFF
-  org.mitk.gui.qml.extapplication:ON
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.coreapplication:OFF
   org.mitk.gui.qt.ext:OFF

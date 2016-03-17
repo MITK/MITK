@@ -1,4 +1,21 @@
-#pragma  once
+/*===================================================================
+
+ The Medical Imaging Interaction Toolkit (MITK)
+
+ Copyright (c) German Cancer Research Center,
+ Division of Medical and Biological Informatics.
+ All rights reserved.
+
+ This software is distributed WITHOUT ANY WARRANTY; without
+ even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ A PARTICULAR PURPOSE.
+
+ See LICENSE.txt or http://www.mitk.org for details.
+
+ ===================================================================*/
+
+#ifndef __QVTKFramebufferObjectRenderer_h
+#define __QVTKFramebufferObjectRenderer_h
 
 #include <QQuickFramebufferObject>
 #include <vtkFrameBufferObject2.h>
@@ -8,23 +25,24 @@
 
 class QVTKFramebufferObjectRenderer : public QQuickFramebufferObject::Renderer
 {
-	
 public:
-	bool m_neverRendered;
-	bool m_readyToRender;
-	vtkInternalOpenGLRenderWindow *m_vtkRenderWindow;
-	vtkFrameBufferObject2* m_vtkFBO;
+  bool m_neverRendered;
+  bool m_readyToRender;
+  vtkInternalOpenGLRenderWindow *m_vtkRenderWindow;
+  vtkFrameBufferObject2* m_vtkFBO;
 
-	QVTKQuickItem *m_vtkQuickItem;
+  QVTKQuickItem *m_vtkQuickItem;
 
 public:
-	QVTKFramebufferObjectRenderer(vtkInternalOpenGLRenderWindow *rw);
-	~QVTKFramebufferObjectRenderer();
+  QVTKFramebufferObjectRenderer(vtkInternalOpenGLRenderWindow *rw);
+  ~QVTKFramebufferObjectRenderer();
 
-	virtual void synchronize(QQuickFramebufferObject * item);
-	virtual void render();
+  virtual void synchronize(QQuickFramebufferObject * item);
+  virtual void render();
 
-	QOpenGLFramebufferObject *createFramebufferObject(const QSize &size);
+  QOpenGLFramebufferObject *createFramebufferObject(const QSize &size);
 
-	friend class vtkInternalOpenGLRenderWindow;
+  friend class vtkInternalOpenGLRenderWindow;
 };
+
+#endif

@@ -1,26 +1,24 @@
 /*===================================================================
- 
+
  The Medical Imaging Interaction Toolkit (MITK)
- 
+
  Copyright (c) German Cancer Research Center,
  Division of Medical and Biological Informatics.
  All rights reserved.
- 
+
  This software is distributed WITHOUT ANY WARRANTY; without
  even the implied warranty of MERCHANTABILITY or FITNESS FOR
  A PARTICULAR PURPOSE.
- 
+
  See LICENSE.txt or http://www.mitk.org for details.
- 
+
  ===================================================================*/
 
-#ifndef QmlMitkSliderNavigatorItem_H
-#define QmlMitkSliderNavigatorItem_H
+#ifndef __QmlMitkSliderNavigatorItem_h
+#define __QmlMitkSliderNavigatorItem_h
 
 #include "MitkQmlItemsExports.h"
-
 #include <mitkStepper.h>
-
 #include <QQuickItem>
 #include <QString>
 
@@ -35,21 +33,20 @@ private:
     double m_Min;
     double m_Max;
     double m_Value;
-    
+
 public:
-    
     QmlMitkSliderNavigatorItem(QQuickItem* parent = nullptr);
-    
+
     void setMin(double min);
     void setMax(double max);
     void setValue(double value);
-    
+
     double getMin();
     double getMax();
     double getValue();
-    
+
     QString GetLabelUnit();
-    
+
     /**
      * \brief Converts the passed value to a QString representation.
      *
@@ -57,20 +54,17 @@ public:
      * instead.
      */
     QString ClippedValueToString( float value );
-    
+
     /**
      * \brief Returns range-minimum (displayed as label left of slider if enabled)
      */
     QString GetMinValueLabel();
-    
     QString GetMaxValueLabel();
-    
+
     int GetPos();
-    
     static void create();
-    
-    public slots:
-    
+
+public slots:
     /**
      * \brief Updates the slider with the recent changes applied to the navigator.
      *
@@ -78,43 +72,32 @@ public:
      * mitk::Stepper is modified.
      */
     void Refetch();
-    
     void SetStepper( mitk::Stepper * stepper);
-    
     void ShowLabels( bool show );
-    
+
     /**
      * \brief En-/disables displaying of the unit label (range will be displayed
      * without unit if enabled).
      */
     void ShowLabelUnit( bool show );
-    
     void SetPos(int val);
-    
     void SetInverseDirection (bool inverseDirection);
-    
-    protected slots:
-    
+
+protected slots:
     /**
      * \brief Set range minimum and maximum (displayed as labels left and right
      * of slider if enabled)
      */
     void SetLabelValues( float min, float max );
-    
     void SetLabelValuesValid( bool minValid, bool maxValid );
-    
+
     /**
      * \brief Set range unit (e.g. mm or ms) which will be displayed below range
      * labels if enabled.
      */
     void SetLabelUnit( const char *unit );
-    
-    /**
-     * \brief Configure slider with labels according to range and unit settings
-     */
-    
+
 protected:
-    
     bool m_HasLabelUnit;
     bool m_MaxValueValid;
     bool m_MinValueValid;
@@ -124,9 +107,7 @@ protected:
     bool m_HasLabels;
     float m_MinValue;
     float m_MaxValue;
-    
     bool m_InverseDirection;
-    
 signals:
     void minChanged();
     void maxChanged();
@@ -135,4 +116,3 @@ signals:
 };
 
 #endif
-

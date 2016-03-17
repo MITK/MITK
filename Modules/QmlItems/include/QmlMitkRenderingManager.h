@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef QmlMitkRenderingManager_h
-#define QmlMitkRenderingManager_h
+#ifndef __QmlMitkRenderingManager_h
+#define __QmlMitkRenderingManager_h
 
 
 
@@ -54,7 +54,6 @@ protected:
   QmlMitkRenderingManager();
 
   virtual void GenerateRenderingRequestEvent();
-
   virtual void StartOrResetTimer();
 
   int pendingTimerCallbacks;
@@ -82,4 +81,4 @@ public:
   : QEvent( (QEvent::Type) RenderingRequest ) {};
 };
 
-#endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */
+#endif

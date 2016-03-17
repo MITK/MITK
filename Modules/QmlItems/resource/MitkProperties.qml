@@ -38,7 +38,7 @@ Item
 			anchors.left: parent.left
 			anchors.top: parent.top
 			anchors.right: parent.right
-			
+
 			height: 22
 
 			gradient: Gradient {
@@ -89,7 +89,7 @@ Item
 			anchors.topMargin: 7
 			checked: false
 			enabled: false
-			
+
 			text: "Level of Detail"
 
 			onCheckedChanged:
@@ -111,7 +111,7 @@ Item
 			currentIndex: 0
 			enabled: false
 
-			model: [ 
+			model: [
 			"CPU raycast",
 			"CPU MIP raycast",
 			"GPU slicing",
@@ -150,11 +150,11 @@ Item
 	{
 		target: properties;
 
-		onSync: 
+		onSync:
 		{
 			opt_mode.currentIndex = properties.mode;
 			opt_mode.enabled = properties.enabled;
-			
+
 			cb_lod.checked = properties.lod;
 			cb_lod.enabled = properties.enabled;
 

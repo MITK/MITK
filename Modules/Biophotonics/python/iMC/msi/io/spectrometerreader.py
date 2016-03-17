@@ -27,9 +27,14 @@ class SpectrometerReader(Reader):
                 transformed = "\n".join([transformed, line])
 
         for num, line in enumerate(transformed.splitlines(), 1):
-            if ">>>>>Begin Spectral Data<<<<<" in line:
+            if ">>>>>Begin" in line:
                 break
-        string_only_spectrum = "\n".join(transformed.splitlines()[num:])
+
+        for num_end, line in enumerate(transformed.splitlines(), 1):
+            if ">>>>>End" in line:
+                num_end -= 1
+                break
+        string_only_spectrum = "\n".join(transformed.splitlines()[num:num_end])
         data_vector = np.fromstring(string_only_spectrum,
                                     sep="\t").reshape(-1, 2)
         msi = Msi(data_vector[:, 1],

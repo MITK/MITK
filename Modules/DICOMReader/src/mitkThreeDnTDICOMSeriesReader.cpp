@@ -109,10 +109,10 @@ mitk::ThreeDnTDICOMSeriesReader
     const std::string currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient );
     const std::string currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient );
 
-    remainingBlocks.erase( remainingBlocks.cbegin() );
+    remainingBlocks.erase( remainingBlocks.begin() );
 
     // compare all other blocks against the first one
-    for (auto otherBlockIter = remainingBlocks.cbegin();
+    for (auto otherBlockIter = remainingBlocks.begin();
          otherBlockIter != remainingBlocks.cend();
          /*++otherBlockIter*/) // <-- inside loop
     {

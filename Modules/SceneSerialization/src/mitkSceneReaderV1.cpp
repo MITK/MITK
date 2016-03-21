@@ -245,7 +245,10 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlEleme
   if (dataElement)
   {
     const char* filename = dataElement->Attribute("file");
-    if ( filename )
+    if (strlen(filename) == 0) {
+      MITK_ERROR << "Error during attempt to read .mtk file. Empty filename found.'";
+      error = true;
+    } else if ( filename )
     {
       try
       {

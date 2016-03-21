@@ -184,6 +184,13 @@ public:
 
   void OnCalculateSpacing();
 
+signals:
+  /**
+  * \brief used for thread seperation, the worker thread must not call OnNewConnection directly.
+  * QT signals are thread safe and separate the threads
+  */
+  void NewConnectionSignal();
+
 protected:
 
   virtual void SetFocus();
@@ -203,6 +210,8 @@ protected:
    * \brief Clears all member attributes which are holding intermediate results for the calibration.
    */
   void ClearTemporaryMembers();
+
+  void OnPlusConnected();
 
   /**
   * \brief The combined modality used for imaging and tracking.

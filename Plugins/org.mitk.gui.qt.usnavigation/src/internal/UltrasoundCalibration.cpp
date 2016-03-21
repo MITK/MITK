@@ -169,6 +169,7 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   connect(&m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
   connect(m_Controls.m_StopPlusCalibration, SIGNAL(clicked()), this, SLOT(OnStopPlusCalibration()));
   connect(m_Controls.m_SavePlusCalibration, SIGNAL(clicked()), this, SLOT(OnSaveCalibration()));
+  connect(this, SIGNAL(NewConnectionSignal()), this, SLOT(OnNewConnection()));
 
   //Determine Spacing for Calibration of USVideoDevice
   connect(m_Controls.m_SpacingBtnFreeze, SIGNAL(clicked()), this, SLOT(OnFreezeClicked()));
@@ -409,7 +410,7 @@ void UltrasoundCalibration::OnStartPlusCalibration()
 
   CurCommandType::Pointer newConnectionCommand = CurCommandType::New();
   newConnectionCommand->SetCallbackFunction(
-    this, &UltrasoundCalibration::OnNewConnection);
+    this, &UltrasoundCalibration::OnPlusConnected);
   this->m_NewConnectionObserverTag = this->m_TrackingServer->AddObserver(
     mitk::NewClientConnectionEvent(), newConnectionCommand);
 
@@ -481,6 +482,11 @@ void UltrasoundCalibration::OnStopPlusCalibration()
   m_Controls.m_ConnectionStatus->setText("");
   m_Controls.m_SetupStatus->setText("");
   m_Controls.m_StartPlusCalibrationButton->setEnabled(true);
+}
+
+void UltrasoundCalibration::OnPlusConnected()
+{
+  emit NewConnectionSignal();
 }
 
 void UltrasoundCalibration::OnNewConnection()

@@ -285,7 +285,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     /// \brief See \ref DICOMITKSeriesGDCMReader_Internals
   static DICOMImageFrameList ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input);
 
-    typedef std::list<DICOMGDCMImageFrameList> SortingBlockList;
+    typedef std::vector<DICOMGDCMImageFrameList> SortingBlockList;
     /**
       \brief "Hook" for sub-classes, see \ref DICOMITKSeriesGDCMReader_Condensing
       \return REMAINING blocks
@@ -298,7 +298,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     /// \brief Sorting step as described in \ref DICOMITKSeriesGDCMReader_LoadingStrategy
   static SortingBlockList InternalExecuteSortingStep(
         unsigned int sortingStepIndex,
-        DICOMDatasetSorter::Pointer sorter,
+        const DICOMDatasetSorter::Pointer& sorter,
         const SortingBlockList& input);
 
     /// \brief Loads the mitk::Image by means of an itk::ImageSeriesReader

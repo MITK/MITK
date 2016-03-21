@@ -86,9 +86,9 @@ bool mitk::DICOMITKSeriesGDCMReader::operator==( const DICOMFileReader& other ) 
       if ( this->m_Sorter.size() != otherSelf->m_Sorter.size() )
         return false;
 
-      auto mySorterIter = this->m_Sorter.begin();
-      auto oSorterIter  = otherSelf->m_Sorter.begin();
-      for ( ; mySorterIter != this->m_Sorter.end() && oSorterIter != otherSelf->m_Sorter.end();
+      auto mySorterIter = this->m_Sorter.cbegin();
+      auto oSorterIter  = otherSelf->m_Sorter.cbegin();
+      for ( ; mySorterIter != this->m_Sorter.cend() && oSorterIter != otherSelf->m_Sorter.cend();
             ++mySorterIter, ++oSorterIter )
       {
         if ( !( **mySorterIter == **oSorterIter ) )
@@ -398,7 +398,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
 }
 
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader::InternalExecuteSortingStep(
-  unsigned int sortingStepIndex, DICOMDatasetSorter::Pointer sorter, const SortingBlockList& input )
+  unsigned int sortingStepIndex, const DICOMDatasetSorter::Pointer& sorter, const SortingBlockList& input )
 {
   SortingBlockList nextStepSorting; // we should not modify our input list while processing it
   std::stringstream ss;
@@ -418,6 +418,7 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
     const DICOMGDCMImageFrameList& gdcmInfoFrameList = *blockIter;
     const DICOMDatasetList datasetList               = ToDICOMDatasetList( gdcmInfoFrameList );
 
+#if defined( MBILOG_ENABLE_DEBUG )
     MITK_DEBUG << "--------------------------------------------------------------------------------";
     MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " ("
                << datasetList.size() << " datasets): ";
@@ -425,6 +426,7 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
     {
       MITK_DEBUG << "  INPUT     : " << ( *oi )->GetFilenameIfAvailable();
     }
+#endif
 
     sorter->SetInput( datasetList );
     sorter->Sort();

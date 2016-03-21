@@ -98,8 +98,8 @@ mitk::DICOMTagBasedSorter
 mitk::DICOMTagBasedSorter
 ::~DICOMTagBasedSorter()
 {
-  for(auto ti = m_TagValueProcessor.begin();
-      ti != m_TagValueProcessor.end();
+  for(auto ti = m_TagValueProcessor.cbegin();
+      ti != m_TagValueProcessor.cend();
       ++ti)
   {
     delete ti->second;
@@ -114,8 +114,8 @@ mitk::DICOMTagBasedSorter
 ,m_StrictSorting( other.m_StrictSorting )
 ,m_ExpectDistanceOne( other.m_ExpectDistanceOne )
 {
-  for(auto ti = other.m_TagValueProcessor.begin();
-      ti != other.m_TagValueProcessor.end();
+  for(auto ti = other.m_TagValueProcessor.cbegin();
+      ti != other.m_TagValueProcessor.cend();
       ++ti)
   {
     m_TagValueProcessor[ti->first] = ti->second->Clone();
@@ -134,8 +134,8 @@ mitk::DICOMTagBasedSorter
     m_StrictSorting = other.m_StrictSorting;
     m_ExpectDistanceOne = other.m_ExpectDistanceOne;
 
-    for(auto ti = other.m_TagValueProcessor.begin();
-        ti != other.m_TagValueProcessor.end();
+    for(auto ti = other.m_TagValueProcessor.cbegin();
+        ti != other.m_TagValueProcessor.cend();
         ++ti)
     {
       m_TagValueProcessor[ti->first] = ti->second->Clone();
@@ -157,12 +157,12 @@ mitk::DICOMTagBasedSorter
     if (this->m_DistinguishingTags.size() != otherSelf->m_DistinguishingTags.size())
       return false;
 
-    for (auto myTag = this->m_DistinguishingTags.begin();
-        myTag != this->m_DistinguishingTags.end();
+    for (auto myTag = this->m_DistinguishingTags.cbegin();
+        myTag != this->m_DistinguishingTags.cend();
         ++myTag)
     {
-      allTagsPresentAndEqual &= (std::find( otherSelf->m_DistinguishingTags.begin(), otherSelf->m_DistinguishingTags.end(), *myTag )
-                                 != otherSelf->m_DistinguishingTags.end()); // other contains this tags
+      allTagsPresentAndEqual &= (std::find( otherSelf->m_DistinguishingTags.cbegin(), otherSelf->m_DistinguishingTags.cend(), *myTag )
+                                 != otherSelf->m_DistinguishingTags.cend()); // other contains this tags
                                              // since size is equal, we don't need to check the inverse
     }
 
@@ -246,8 +246,8 @@ mitk::DICOMTagBasedSorter
 {
   DICOMTagList allTags = m_DistinguishingTags;
 
-  DICOMTagList sortingRelevantTags = m_SortCriterion->GetAllTagsOfInterest();
-  allTags.insert( allTags.end(), sortingRelevantTags.begin(), sortingRelevantTags.end() ); // append
+  const DICOMTagList sortingRelevantTags = m_SortCriterion->GetAllTagsOfInterest();
+  allTags.insert( allTags.end(), sortingRelevantTags.cbegin(), sortingRelevantTags.cend() ); // append
 
   return allTags;
 }
@@ -264,7 +264,7 @@ mitk::DICOMTagBasedSorter
 ::GetTagValueProcessorForDistinguishingTag(const DICOMTag& tag) const
 {
   auto loc = m_TagValueProcessor.find(tag);
-  if (loc != m_TagValueProcessor.end())
+  if (loc != m_TagValueProcessor.cend())
   {
     return loc->second;
   }
@@ -308,8 +308,8 @@ mitk::DICOMTagBasedSorter
   // 3. define output
   this->SetNumberOfOutputs(sortedGroups.size());
   unsigned int outputIndex(0);
-  for (auto groupIter = sortedGroups.begin();
-       groupIter != sortedGroups.end();
+  for (auto groupIter = sortedGroups.cbegin();
+       groupIter != sortedGroups.cend();
        ++outputIndex, ++groupIter)
   {
     this->SetOutput(outputIndex, groupIter->second);
@@ -324,12 +324,12 @@ mitk::DICOMTagBasedSorter
   assert(dataset);
   std::stringstream groupID;
   groupID << "g";
-  for (auto tagIter = m_DistinguishingTags.begin();
-       tagIter != m_DistinguishingTags.end();
+  for (auto tagIter = m_DistinguishingTags.cbegin();
+       tagIter != m_DistinguishingTags.cend();
        ++tagIter)
   {
     groupID << tagIter->GetGroup() << tagIter->GetElement(); // make group/element part of the id to cover empty tags
-    std::string rawTagValue = dataset->GetTagValueAsString(*tagIter);
+    const std::string rawTagValue = dataset->GetTagValueAsString(*tagIter);
     std::string processedTagValue;
     if ( m_TagValueProcessor[*tagIter] != nullptr )
     {
@@ -353,8 +353,8 @@ mitk::DICOMTagBasedSorter
 
   GroupIDToListType listForGroupID;
 
-  for (auto dsIter = input.begin();
-       dsIter != input.end();
+  for (auto dsIter = input.cbegin();
+       dsIter != input.cend();
        ++dsIter)
   {
     DICOMDatasetAccess* dataset = *dsIter;
@@ -400,26 +400,34 @@ mitk::DICOMTagBasedSorter
          ++groupIndex, ++gIter)
     {
       DICOMDatasetList& dsList = gIter->second;
+
+#ifdef MBILOG_ENABLE_DEBUG
       MITK_DEBUG << "   --------------------------------------------------------------------------------";
       MITK_DEBUG << "   DICOMTagBasedSorter before sorting group : " << groupIndex;
       for (auto oi = dsList.begin();
-           oi != dsList.end();
+           oi != dsList.cend();
            ++oi)
       {
         MITK_DEBUG << "     INPUT     : " << (*oi)->GetFilenameIfAvailable();
       }
+#endif // #ifdef MBILOG_ENABLE_DEBUG
+
 
       std::sort( dsList.begin(), dsList.end(), ParameterizedDatasetSort( m_SortCriterion ) );
 
+#ifdef MBILOG_ENABLE_DEBUG
       MITK_DEBUG << "   --------------------------------------------------------------------------------";
       MITK_DEBUG << "   DICOMTagBasedSorter after sorting group : " << groupIndex;
-      for (auto oi = dsList.begin();
-           oi != dsList.end();
+      for (auto oi = dsList.cbegin();
+           oi != dsList.cend();
            ++oi)
       {
         MITK_DEBUG << "     OUTPUT    : " << (*oi)->GetFilenameIfAvailable();
       }
       MITK_DEBUG << "   --------------------------------------------------------------------------------";
+
+#endif // MBILOG_ENABLE_DEBUG
+
     }
 
     GroupIDToListType consecutiveGroups;
@@ -439,8 +447,8 @@ mitk::DICOMTagBasedSorter
         unsigned int dsIndex(0);
         double constantDistance(0.0);
         bool constantDistanceInitialized(false);
-        for (auto dataset = dsList.begin();
-             dataset != dsList.end();
+        for (auto dataset = dsList.cbegin();
+             dataset != dsList.cend();
              ++dsIndex, ++dataset)
         {
           if (dsIndex >0) // ignore the first dataset, we cannot check any distances yet..
@@ -448,7 +456,7 @@ mitk::DICOMTagBasedSorter
             // for the second and every following dataset:
             // let the sorting criterion calculate a "distance"
             // if the distance is not 1, split off a new group!
-            double currentDistance = m_SortCriterion->NumericDistance(previousDS, *dataset);
+            const double currentDistance = m_SortCriterion->NumericDistance(previousDS, *dataset);
             if (constantDistanceInitialized)
             {
               if (fabs(currentDistance - constantDistance) < fabs(constantDistance * 0.01)) // ok, deviation of up to 1% of distance is tolerated
@@ -518,8 +526,8 @@ mitk::DICOMTagBasedSorter
       return list-2 as the sorted output
     */
     DICOMDatasetList firstSlices;
-    for (auto gIter = consecutiveGroups.begin();
-         gIter != consecutiveGroups.end();
+    for (auto gIter = consecutiveGroups.cbegin();
+         gIter != consecutiveGroups.cend();
          ++gIter)
     {
       assert(!gIter->second.empty());
@@ -530,12 +538,12 @@ mitk::DICOMTagBasedSorter
 
     GroupIDToListType sortedResultBlocks;
     unsigned int groupKeyValue(0);
-    for (auto firstSlice = firstSlices.begin();
-         firstSlice != firstSlices.end();
+    for (auto firstSlice = firstSlices.cbegin();
+         firstSlice != firstSlices.cend();
          ++firstSlice)
     {
-      for (auto gIter = consecutiveGroups.begin();
-           gIter != consecutiveGroups.end();
+      for (auto gIter = consecutiveGroups.cbegin();
+           gIter != consecutiveGroups.cend();
            ++groupKeyValue, ++gIter)
       {
         if (gIter->second.front() == *firstSlice)
@@ -550,22 +558,21 @@ mitk::DICOMTagBasedSorter
     groups = sortedResultBlocks;
   }
 
-  unsigned int groupIndex(0);
-  for (auto gIter = groups.begin();
-      gIter != groups.end();
-      ++groupIndex, ++gIter)
+#ifdef MBILOG_ENABLE_DEBUG
+  unsigned int groupIndex( 0 );
+  for ( auto gIter = groups.begin(); gIter != groups.end(); ++groupIndex, ++gIter )
   {
     DICOMDatasetList& dsList = gIter->second;
     MITK_DEBUG << "   --------------------------------------------------------------------------------";
     MITK_DEBUG << "   DICOMTagBasedSorter after sorting group : " << groupIndex;
-    for (auto oi = dsList.begin();
-        oi != dsList.end();
-        ++oi)
+    for ( auto oi = dsList.begin(); oi != dsList.end(); ++oi )
     {
-      MITK_DEBUG << "     OUTPUT    : " << (*oi)->GetFilenameIfAvailable();
+      MITK_DEBUG << "     OUTPUT    : " << ( *oi )->GetFilenameIfAvailable();
     }
     MITK_DEBUG << "   --------------------------------------------------------------------------------";
   }
+#endif // MBILOG_ENABLE_DEBUG
+
 
 
   return groups;

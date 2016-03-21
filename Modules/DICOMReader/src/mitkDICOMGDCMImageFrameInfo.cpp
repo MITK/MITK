@@ -25,7 +25,7 @@ mitk::DICOMGDCMImageFrameInfo
 }
 
 mitk::DICOMGDCMImageFrameInfo
-::DICOMGDCMImageFrameInfo(DICOMImageFrameInfo::Pointer frameinfo)
+::DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo)
 :itk::LightObject()
 ,m_FrameInfo(frameinfo)
 ,m_TagForValue()
@@ -33,7 +33,7 @@ mitk::DICOMGDCMImageFrameInfo
 }
 
 mitk::DICOMGDCMImageFrameInfo
-::DICOMGDCMImageFrameInfo(DICOMImageFrameInfo::Pointer frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping)
+::DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping)
 :itk::LightObject()
 ,m_FrameInfo(frameinfo)
 ,m_TagForValue(tagToValueMapping)

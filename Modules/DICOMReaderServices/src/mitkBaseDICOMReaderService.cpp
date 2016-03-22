@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkDICOMFilesHelper.h>
 
+#include <mitkDicomSeriesReader.h>
+
 #include <iostream>
 
 namespace mitk {
@@ -34,6 +36,36 @@ namespace mitk {
 std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
 {
   std::vector<BaseData::Pointer> result;
+
+  //special handling of Philips 3D US DICOM.
+  //Copied from DICOMSeriesReaderService
+
+  std::string fileName = this->GetLocalFileName();
+  if (DicomSeriesReader::IsPhilips3DDicom(fileName))
+  {
+      MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
+      const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
+      setlocale(LC_NUMERIC, "C");
+      std::locale previousCppLocale(std::cin.getloc());
+      std::locale l("C");
+      std::cin.imbue(l);
+
+      DataNode::Pointer node = DataNode::New();
+      mitk::DicomSeriesReader::StringContainer stringvec;
+      stringvec.push_back(fileName);
+      if (DicomSeriesReader::LoadDicomSeries(stringvec, *node))
+      {
+          BaseData::Pointer data = node->GetData();
+          StringProperty::Pointer nameProp = StringProperty::New(itksys::SystemTools::GetFilenameName(fileName));
+          data->GetPropertyList()->SetProperty("name", nameProp);
+          result.push_back(data);
+      }
+      setlocale(LC_NUMERIC, previousCLocale);
+      std::cin.imbue(previousCppLocale);
+      return result;
+  }
+
+  //Normal DICOM handling (It wasn't a Philips 3D US)
   mitk::StringList relevantFiles = this->GetRelevantFiles();
 
   mitk::DICOMFileReader::Pointer reader = this->GetReader(relevantFiles);

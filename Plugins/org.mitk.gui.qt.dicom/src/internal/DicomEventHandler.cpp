@@ -279,7 +279,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
           if (mitk::DicomSeriesReader::LoadDicomSeries(stringvec, *node))
           {
               mitk::BaseData::Pointer data = node->GetData();
-              mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenameName(fileName));
+              mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenameName(seriesToLoad.front()));
               data->GetPropertyList()->SetProperty("name", nameProp);
               node->SetProperty("name", nameProp);
               dataStorage->Add(node);

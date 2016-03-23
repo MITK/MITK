@@ -18,7 +18,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_gui_qt_igtlplugin_Activator.h
+  src/internal/org_mitk_gui_qt_openigtlink_Activator.h
   src/internal/OpenIGTLinkProviderExample.h
   src/internal/OpenIGTLinkExample.h
   src/internal/OpenIGTLinkManager.h

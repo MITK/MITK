@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSource.h"
 
 namespace mitk {
-
   /**Documentation
   *
   * \brief This filter creates IGTL messages from mitk::NavigaitionData objects
@@ -38,22 +37,22 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationDataToIGTLMessageFilter, IGTLMessageSource);
     itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      itkCloneMacro(Self)
 
-    /**Documentation
-    * \brief There are four different operation modes.
-    *
-    * - ModeSendQTransMsg: every input NavigationData is processed into one
-    * output message that contains a position and a orientation (quaternion).
-    * - ModeSendTransMsg: every input NavigationData is processed into one
-    * output message that contains a 4x4 transformation.
-    * - ModeSendQTDataMsg:all input NavigationData is processed into one single
-    * output message that contains a position and orientation (quaternion) for
-    * each navigation data.
-    * - ModeSendTDataMsg:all input NavigationData is processed into one single
-    * output message that contains a 4x4 transformation for
-    * each navigation data.
-    */
+      /**Documentation
+      * \brief There are four different operation modes.
+      *
+      * - ModeSendQTransMsg: every input NavigationData is processed into one
+      * output message that contains a position and a orientation (quaternion).
+      * - ModeSendTransMsg: every input NavigationData is processed into one
+      * output message that contains a 4x4 transformation.
+      * - ModeSendQTDataMsg:all input NavigationData is processed into one single
+      * output message that contains a position and orientation (quaternion) for
+      * each navigation data.
+      * - ModeSendTDataMsg:all input NavigationData is processed into one single
+      * output message that contains a 4x4 transformation for
+      * each navigation data.
+      */
     enum OperationMode
     {
       ModeSendQTransMsg,
@@ -131,7 +130,7 @@ namespace mitk {
     * \brief Generates the output
     *
     */
-//    virtual void GenerateData();
+    //    virtual void GenerateData();
 
     /**
     * \brief Generates the output for ModeSendQTDataMsg
@@ -161,9 +160,11 @@ namespace mitk {
     virtual void CreateOutputsForAllInputs();
 
     OperationMode m_OperationMode;  ///< Stores the mode. See enum OperationMode
-//    unsigned int m_RingBufferSize;  ///< Stores the ringbuffer size
+    //    unsigned int m_RingBufferSize;  ///< Stores the ringbuffer size
     unsigned int m_CurrentTimeStep; ///< Indicates the current timestamp
-//    unsigned int m_NumberForMean;   ///< Number of Navigation Data, which should be averaged
+    //    unsigned int m_NumberForMean;   ///< Number of Navigation Data, which should be averaged
+
+    /** Measurement class to calculate latency and frame count */
   };
 } // namespace mitk
 #endif // _MITKNAVIGATIONDATATOIGTLMessageFILTER_H__

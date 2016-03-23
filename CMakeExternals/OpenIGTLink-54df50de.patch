@@ -21,3 +21,16 @@ diff -burN OpenIGTLink-master/Source/CMakeLists.txt OpenIGTLink/Source/CMakeList
    igtlutil/igtl_types.h
    igtlutil/igtl_util.h
    igtlutil/igtl_capability.h
+
+diff -burN OpenIGTLink-master/Source/igtlSocket.cxx OpenIGTLink/Source/igtlSocket.cxx
+--- OpenIGTLink-master/Source/igtlSocket.cxx	2014-08-21 18:53:57.000000000 +0200
++++ OpenIGTLink/Source/igtlSocket.cxx	2015-02-05 00:34:34.086991641 +0100
+@@ -51,7 +51,7 @@
+ #define WSA_VERSION MAKEWORD(1,1)
+ #define igtlCloseSocketMacro(sock) (closesocket(sock))
+ #else
+-#define igtlCloseSocketMacro(sock) (shutdown(sock, 2))
++#define igtlCloseSocketMacro(sock) ({shutdown(sock, 2); close(sock);})
+ #endif
+
+ namespace igtl

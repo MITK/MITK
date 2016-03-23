@@ -32,10 +32,10 @@ mitk::NavigationDataToIGTLMessageFilter::NavigationDataToIGTLMessageFilter()
 
   this->SetNumberOfRequiredInputs(1);
 
-//  m_OperationMode = Mode3D;
+  //  m_OperationMode = Mode3D;
   m_CurrentTimeStep = 0;
-//  m_RingBufferSize = 50; //the default ring buffer size
-//  m_NumberForMean = 100;
+  //  m_RingBufferSize = 50; //the default ring buffer size
+  //  m_NumberForMean = 100;
 }
 
 mitk::NavigationDataToIGTLMessageFilter::~NavigationDataToIGTLMessageFilter()
@@ -62,14 +62,12 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateData()
     break;
   }
   igtl::MessageBase::Pointer curMessage = this->GetOutput()->GetMessage();
-  igtl::TrackingDataMessage* tdMsg =
+  if (dynamic_cast<igtl::TrackingDataMessage*>(curMessage.GetPointer()) != nullptr)
+  {
+    igtl::TrackingDataMessage* tdMsg =
       (igtl::TrackingDataMessage*)(curMessage.GetPointer());
-  igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
-  tdMsg->GetTrackingDataElement(0,trackingData);
-  float x_pos, y_pos, z_pos;
-  trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
-}
 
+}
 
 void mitk::NavigationDataToIGTLMessageFilter::SetInput(const NavigationData* nd)
 {
@@ -78,7 +76,6 @@ void mitk::NavigationDataToIGTLMessageFilter::SetInput(const NavigationData* nd)
   this->CreateOutputsForAllInputs();
 }
 
-
 void mitk::NavigationDataToIGTLMessageFilter::SetInput(unsigned int idx, const NavigationData* nd)
 {
   // Process object is not const-correct so the const_cast is required here
@@ -86,22 +83,19 @@ void mitk::NavigationDataToIGTLMessageFilter::SetInput(unsigned int idx, const N
   this->CreateOutputsForAllInputs();
 }
 
-
-const mitk::NavigationData* mitk::NavigationDataToIGTLMessageFilter::GetInput( void )
+const mitk::NavigationData* mitk::NavigationDataToIGTLMessageFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
 }
 
-
-const mitk::NavigationData* mitk::NavigationDataToIGTLMessageFilter::GetInput( unsigned int idx )
+const mitk::NavigationData* mitk::NavigationDataToIGTLMessageFilter::GetInput(unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
 }
-
 
 void mitk::NavigationDataToIGTLMessageFilter::CreateOutputsForAllInputs()
 {
@@ -146,22 +140,21 @@ void mitk::NavigationDataToIGTLMessageFilter::CreateOutputsForAllInputs()
   }
 }
 
-
 void ConvertAffineTransformationIntoIGTLMatrix(mitk::AffineTransform3D* trans,
-                                               igtl::Matrix4x4 igtlTransform)
+  igtl::Matrix4x4 igtlTransform)
 {
   const mitk::AffineTransform3D::MatrixType& matrix = trans->GetMatrix();
   mitk::Vector3D position = trans->GetOffset();
   //copy the data into a matrix type that igtl understands
-  for ( unsigned int r = 0; r < 3; r++ )
+  for (unsigned int r = 0; r < 3; r++)
   {
-    for ( unsigned int c = 0; c < 3; c++ )
+    for (unsigned int c = 0; c < 3; c++)
     {
-      igtlTransform[r][c] = matrix(r,c);
+      igtlTransform[r][c] = matrix(r, c);
     }
     igtlTransform[r][3] = position[r];
   }
-  for ( unsigned int c = 0; c < 3; c++ )
+  for (unsigned int c = 0; c < 3; c++)
   {
     igtlTransform[3][c] = 0.0;
   }
@@ -171,7 +164,7 @@ void ConvertAffineTransformationIntoIGTLMatrix(mitk::AffineTransform3D* trans,
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
 {
   // for each output message
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
@@ -203,7 +196,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTransMsg()
 void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
 {
   // for each output message
-  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs() ; ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfIndexedOutputs(); ++i)
   {
     mitk::IGTLMessage* output = this->GetOutput(i);
     assert(output);
@@ -243,7 +236,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
 
   //create a output igtl message
   igtl::QuaternionTrackingDataMessage::Pointer qtdMsg =
-      igtl::QuaternionTrackingDataMessage::New();
+    igtl::QuaternionTrackingDataMessage::New();
 
   mitk::NavigationData::PositionType pos;
   mitk::NavigationData::OrientationType ori;
@@ -259,7 +252,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendQTDataMsg()
 
     //insert the information into the tracking element
     igtl::QuaternionTrackingDataElement::Pointer tde =
-        igtl::QuaternionTrackingDataElement::New();
+      igtl::QuaternionTrackingDataElement::New();
     tde->SetPosition(pos[0], pos[1], pos[2]);
     tde->SetQuaternion(ori[0], ori[1], ori[2], ori[3]);
     tde->SetName(nd->GetName());
@@ -312,7 +305,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
     // a quadratic matrix is a rotation matrix exactly when determinant is 1
     // and transposed is inverse
     if (!Equal(1.0, vnl_det(rotationMatrix), 0.1)
-        || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
+      || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
     {
       //the rotation matrix is not valid! => invalidate the current element
       isValidData = false;
@@ -326,9 +319,9 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
     tde->SetPosition(position[0], position[1], position[2]);
     std::stringstream name;
     name << nd->GetName();
-    if (name.rdbuf()->in_avail() == 0 )
+    if (name.rdbuf()->in_avail() == 0)
     {
-       name << "TrackingTool" << index;
+      name << "TrackingTool" << index;
     }
     tde->SetName(name.str().c_str());
 
@@ -348,7 +341,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
   output->SetDataValid(isValidData);
 }
 
-void mitk::NavigationDataToIGTLMessageFilter::SetOperationMode( OperationMode mode )
+void mitk::NavigationDataToIGTLMessageFilter::SetOperationMode(OperationMode mode)
 {
   m_OperationMode = mode;
   this->Modified();
@@ -356,10 +349,10 @@ void mitk::NavigationDataToIGTLMessageFilter::SetOperationMode( OperationMode mo
 }
 
 void mitk::NavigationDataToIGTLMessageFilter::ConnectTo(
-    mitk::NavigationDataSource* UpstreamFilter)
+  mitk::NavigationDataSource* UpstreamFilter)
 {
   for (DataObjectPointerArraySizeType i = 0;
-       i < UpstreamFilter->GetNumberOfOutputs(); i++)
+    i < UpstreamFilter->GetNumberOfOutputs(); i++)
   {
     this->SetInput(i, UpstreamFilter->GetOutput(i));
   }

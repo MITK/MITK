@@ -37,11 +37,10 @@ mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDev
   //set the type of this tracking device
   this->m_Data = mitk::OpenIGTLinkTypeInformation::GetDeviceDataOpenIGTLinkTrackingDeviceConnection();
 
-  m_OpenIGTLinkClient = mitk::IGTLClient::New(false);
-  m_OpenIGTLinkClient->EnableInfiniteBufferingMode(m_OpenIGTLinkClient->GetReceiveQueue(), false);
+  m_OpenIGTLinkClient = mitk::IGTLClient::New(true);
   m_OpenIGTLinkClient->SetName("OpenIGTLink Tracking Device");
 
-  m_IGTLDeviceSource = mitk::IGTLDeviceSource::New();
+  m_IGTLDeviceSource = mitk::IGTLTransformDeviceSource::New();
   m_IGTLDeviceSource->SetIGTLDevice(m_OpenIGTLinkClient);
 }
 
@@ -230,7 +229,8 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform()
   bool condition = false;
   while (!condition)
   {
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    //TODO: Fix this.. :/
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
     m_IGTLDeviceSource->Update();
     igtl::TransformMessage::Pointer msg = dynamic_cast<igtl::TransformMessage*>(m_IGTLDeviceSource->GetOutput()->GetMessage().GetPointer());
     if (msg == nullptr || msg.IsNull())
@@ -254,7 +254,7 @@ bool mitk::OpenIGTLinkTrackingDevice::DiscoverToolsFromTransform()
 
     for (std::map<std::string, int>::iterator it = toolNameMap.begin(); it != toolNameMap.end(); ++it)
     {
-      if (it->second < 2)
+      if (it->second < 5)
       {
         condition = false;
         break;
@@ -281,18 +281,20 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
   }
 
   m_IGTLMsgToNavDataFilter->Update();
-  for (int i = 0; i < this->GetToolCount(); i++)
+
+  mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput();
+  const char* name = currentNavData->GetName();
+  MITK_WARN << name;
+
+  for (int i = 0; i < m_AllTools.size(); i++)
   {
-    mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput(i);
-    m_AllTools.at(i)->SetDataValid(currentNavData->IsDataValid());
-    m_AllTools.at(i)->SetPosition(currentNavData->GetPosition());
-    m_AllTools.at(i)->SetOrientation(currentNavData->GetOrientation());
-    m_AllTools.at(i)->SetIGTTimeStamp(currentNavData->GetIGTTimeStamp());
-
-    mitk::Point3D pos;
-    m_AllTools.at(i)->GetPosition(pos);
-
-    //MITK_INFO << "Updated Tool " << i << " Pos: " << pos;
+    if (strcmp(m_AllTools.at(i)->GetToolName(), name) == 0)
+    {
+      m_AllTools.at(i)->SetDataValid(currentNavData->IsDataValid());
+      m_AllTools.at(i)->SetPosition(currentNavData->GetPosition());
+      m_AllTools.at(i)->SetOrientation(currentNavData->GetOrientation());
+      m_AllTools.at(i)->SetIGTTimeStamp(currentNavData->GetIGTTimeStamp());
+    }
   }
 }
 

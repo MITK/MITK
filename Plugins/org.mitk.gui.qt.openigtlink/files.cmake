@@ -3,7 +3,7 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_gui_qt_igtlplugin_Activator.cpp
+  org_mitk_gui_qt_openigtlink_Activator.cpp
   OpenIGTLinkManager.cpp
   OpenIGTLinkExample.cpp
   OpenIGTLinkProviderExample.cpp

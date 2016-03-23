@@ -1,0 +1,6 @@
+/**
+\page org_openigtlinkplugin An extended OpenIGTLink example
+
+This class gives an extended OpenIGTLink example which can receive tracking and ultrasound data simultaneously. You can use PLUS or a second MITK instance as a server.
+
+*/

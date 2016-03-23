@@ -24,8 +24,6 @@ namespace mitk {
 
 void org_mitk_gui_qt_openigtlink_Activator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkProviderExample, context)
-  BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkExample, context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkManager, context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkMeasurements, context)
 }

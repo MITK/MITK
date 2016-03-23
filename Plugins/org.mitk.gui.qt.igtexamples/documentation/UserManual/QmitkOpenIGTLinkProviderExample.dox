@@ -1,0 +1,5 @@
+/**
+\page org_openigtlinkproviderexample OpenIGTLink server example
+
+This view shows how a simple OpenIGTLink provider is implemented. When active, the provider can be managed with the OpenIGTLink manager view. Here you can select the server to go online and connect with a client. This can be a second MITK instance or another OpenIGTLink application, e.g. fcal.exe from PLUS.
+*/

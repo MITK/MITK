@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "org_mitk_gui_qt_igtlplugin_Activator.h"
+#include "org_mitk_gui_qt_openigtlink_Activator.h"
 #include "OpenIGTLinkProviderExample.h"
 #include "OpenIGTLinkExample.h"
 #include "OpenIGTLinkManager.h"
@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-void org_mitk_gui_qt_igtlplugin_Activator::start(ctkPluginContext* context)
+void org_mitk_gui_qt_openigtlink_Activator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkProviderExample, context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkExample, context)
@@ -30,7 +30,7 @@ void org_mitk_gui_qt_igtlplugin_Activator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkMeasurements, context)
 }
 
-void org_mitk_gui_qt_igtlplugin_Activator::stop(ctkPluginContext* context)
+void org_mitk_gui_qt_openigtlink_Activator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }

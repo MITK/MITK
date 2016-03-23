@@ -1,4 +1,4 @@
-project(org_mitk_gui_qt_igtlplugin)
+project(org_mitk_gui_qt_openigtlink)
 
 mitk_create_plugin(
   DEPENDS

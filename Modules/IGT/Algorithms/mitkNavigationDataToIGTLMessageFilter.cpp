@@ -66,6 +66,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateData()
   {
     igtl::TrackingDataMessage* tdMsg =
       (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+  }
 
 }
 

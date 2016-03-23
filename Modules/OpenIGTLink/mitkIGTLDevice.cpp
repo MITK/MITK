@@ -468,11 +468,6 @@ igtl::TransformMessage::Pointer mitk::IGTLDevice::GetNextTransformMessage()
 igtl::TrackingDataMessage::Pointer mitk::IGTLDevice::GetNextTrackingDataMessage()
 {
   igtl::TrackingDataMessage::Pointer msg = this->m_MessageQueue->PullTrackingMessage();
-
-  if (msg.IsNotNull())
-  {
-    AddTrackingMeasurements(8, dynamic_cast<igtl::MessageBase*>(msg.GetPointer()), 0);
-  }
   return msg;
 }
 

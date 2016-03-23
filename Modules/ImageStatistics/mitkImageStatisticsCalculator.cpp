@@ -64,7 +64,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkImage.h"
 
-
 //#define DEBUG_HOTSPOTSEARCH
 
 #define _USE_MATH_DEFINES
@@ -1581,10 +1580,12 @@ namespace mitk
 
         vnl_vector<int> maxIndex;
         vnl_vector<int> minIndex;
-        maxIndex.set_size(VImageDimension);
-        minIndex.set_size(VImageDimension);
+        unsigned int imageDimension = m_Image->GetDimension();
+        unsigned int maxDimensionsToDisplay = 3; // we do not want to display the time step as part of the coordinates
+        maxIndex.set_size(std::min(imageDimension, maxDimensionsToDisplay));
+        minIndex.set_size(std::min(imageDimension, maxDimensionsToDisplay));
 
-        if (m_MaskingMode == MASKING_MODE_PLANARFIGURE && m_Image->GetDimension()==3)
+        if (m_MaskingMode == MASKING_MODE_PLANARFIGURE && imageDimension == 3)
         {
           maxIndex[m_PlanarFigureCoordinate0] = tempMaxIndex[0];
           maxIndex[m_PlanarFigureCoordinate1] = tempMaxIndex[1];

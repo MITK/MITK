@@ -5,18 +5,21 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   QmitkIGTTrackingLabView.cpp
   QmitkIGTTutorialView.cpp
+  OpenIGTLinkPlugin.cpp
   mitkPluginActivator.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkIGTTrackingLabViewControls.ui
   src/internal/QmitkIGTTutorialViewControls.ui
+  src/internal/OpenIGTLinkPluginControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/QmitkIGTTrackingLabView.h
   src/internal/QmitkIGTTutorialView.h
   src/internal/mitkPluginActivator.h
+  src/internal/OpenIGTLinkPlugin.h
 )
 
 set(QRC_FILES
@@ -29,6 +32,7 @@ set(CACHED_RESOURCE_FILES
   resources/start_rec.png
   resources/stop_rec.png
   resources/IGTTutorial.png
+  resources/icon.xpm
   plugin.xml
 )
 

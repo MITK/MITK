@@ -6,6 +6,7 @@ This plugin includes views with examples and help applications for IGT. The diff
 <ul>
 <li> \subpage org_igttrackinglab
 <li> \subpage org_imageguidedtherapytutorial
+<li> \subpage org_openigtlinkplugin
 </ul>
 
 */

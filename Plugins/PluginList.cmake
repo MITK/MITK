@@ -69,5 +69,4 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.xnat:OFF
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
-  org.mitk.oigtlPlugin:ON
 )

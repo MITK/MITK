@@ -15,8 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "org_mitk_gui_qt_openigtlink_Activator.h"
-#include "OpenIGTLinkProviderExample.h"
-#include "OpenIGTLinkExample.h"
 #include "OpenIGTLinkManager.h"
 #include "OpenIGTLinkMeasurements.h"
 

@@ -342,7 +342,19 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
         return;
       }
 
-      filePath = m_DownloadPath + file->name();
+      QString uriId = file->parent()->resourceUri();
+      uriId.replace("/data/archive/projects/", "");
+
+      QString folderName = m_DownloadPath + uriId + "/";
+      downloadPath = folderName;
+
+      QDir dir(downloadPath);
+      if (!dir.exists())
+      {
+        dir.mkpath(".");
+      }
+
+      filePath = folderName + file->name();
 
       // Checking if the file exists already
       if (downloadPath.exists(file->name()))

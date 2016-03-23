@@ -111,6 +111,9 @@ namespace mitk
 
     bool IsDeviceInstalled();
 
+    itkSetMacro(UpdateRate, int);               ///< Sets the update rate of the device in fps. Default value is 60 fps.
+    itkGetConstMacro(UpdateRate, int);          ///< Returns the update rate of the device in fps
+
   protected:
     OpenIGTLinkTrackingDevice();
     ~OpenIGTLinkTrackingDevice();
@@ -140,6 +143,8 @@ namespace mitk
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
 
     std::vector<OpenIGTLinkTrackingTool::Pointer> m_AllTools; ///< vector holding all tools
+
+    int m_UpdateRate; ///< holds the update rate in FPS (will be set automatically when the OpenIGTLink connection is established)
 
   private:
     enum TrackingMessageType

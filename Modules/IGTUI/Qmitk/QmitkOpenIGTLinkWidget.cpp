@@ -53,6 +53,7 @@ mitk::TrackingDevice::Pointer QmitkOpenIGTLinkWidget::ConstructTrackingDevice()
   mitk::OpenIGTLinkTrackingDevice::Pointer OIGTLDevice = mitk::OpenIGTLinkTrackingDevice::New();
   OIGTLDevice->SetPortNumber(m_Controls->m_OpenIGTLinkPort->text().toInt());
   OIGTLDevice->SetHostname(m_Controls->m_OpenIGTLinkHostname->text().toStdString());
+  OIGTLDevice->SetUpdateRate(m_Controls->m_UpdateRate->value());
   return static_cast<mitk::TrackingDevice::Pointer>(OIGTLDevice);
 }
 

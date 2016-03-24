@@ -120,6 +120,9 @@ static void TestModeQTransMsg()
   mitk::IGTLMessage::Pointer msg2 = m_NavigationDataToIGTLMessageFilter->GetOutput(2);
   mitk::IGTLMessage::Pointer msg3 = m_NavigationDataToIGTLMessageFilter->GetOutput(3);
 
+  MITK_INFO << "In: " << msg0->GetSource()->GetNumberOfIndexedInputs() << " Out: " << msg0->GetSource()->GetNumberOfIndexedOutputs();
+  MITK_INFO << msg0->GetMessage().GetPointer();
+
   msg0->Update();
 
   igtl::PositionMessage::Pointer igtlMsg0 =

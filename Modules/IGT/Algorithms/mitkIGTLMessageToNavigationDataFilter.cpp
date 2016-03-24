@@ -193,7 +193,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTransformData()
     //set the time stamp
     nd->SetIGTTimeStamp(input->GetTimeStamp());
     //set the name
-    //    nd->SetName(td->GetName());
+    nd->SetName(input->GetName());
 
     output->Graft(nd);
   }

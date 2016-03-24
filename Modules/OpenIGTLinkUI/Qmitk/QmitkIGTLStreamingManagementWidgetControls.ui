@@ -22,7 +22,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QLabel" name="label">
        <property name="enabled">
@@ -36,7 +36,7 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignRight">
+     <item>
       <widget class="QLabel" name="selectedSourceLabel">
        <property name="enabled">
         <bool>false</bool>

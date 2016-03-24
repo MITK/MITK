@@ -23,7 +23,13 @@ NDI tracking device and use real hardware to track. The code is written in the Q
 \li \subpage IGTTutorialStep3
 
 \section Step4 Step 4 - Tracking Lab
-The final step shows a variety of applications. To this point, for documentation a user manual is available.
+Step 4 shows a variety of navigation applications. To this point, for documentation a user manual is available.
 \li \subpage IGTTutorialStep4
+
+\section Step5 Step 5 - OpenIGTLink Tutorial
+Step 5 gives examples how to use OpenIGTLink in MITK. The first two simple examples include code to open a OpenIGTLink client and server for tracking data. The third, more advanced example shows you how to stream tracking and ultrasound data simultaneously from an external server.
+\li \subpage org_openigtlinkexample
+\li \subpage org_openigtlinkproviderexample
+\li \subpage org_openigtlinkplugin
 
 */

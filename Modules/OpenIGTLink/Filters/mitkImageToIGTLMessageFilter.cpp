@@ -40,7 +40,7 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     int dims = img->GetDimension();
     int chn = img->GetNumberOfChannels();
 
-    // MITK_INFO << "Sending image. Dimensions: " << dims << " Channels: " << chn << "\n";
+    MITK_INFO << "Sending image. Dimensions: " << dims << " Channels: " << chn << "\n";
 
     if (dims < 1)
     {

@@ -4,8 +4,11 @@
 This plugin includes views with examples and help applications for IGT. The different views are described on the pages below:
 
 <ul>
-<li> \subpage org_igttrackinglab
 <li> \subpage org_imageguidedtherapytutorial
+<li> \subpage org_igttrackinglab
+<li> \subpage org_openigtlinkexample
+<li> \subpage org_openigtlinkproviderexample
+<li> \subpage org_openigtlinkplugin
 </ul>
 
 */

@@ -42,7 +42,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itksys/SystemTools.hxx"
 
-
 //------------------------------------------------------------
 // Define message clone classes
 // igtlMessageHandlerClassMacro() defines a child class of
@@ -74,7 +73,7 @@ igtl::MessageBase::Pointer TransformMsgCloneHandler::Clone(igtl::MessageBase* or
   //copy all meta data
   copySuccess = clone_->Copy(original);
 
-  if ( !copySuccess )
+  if (!copySuccess)
     return nullptr;
 
   //copy all data that is important for this class
@@ -96,53 +95,52 @@ igtl::MessageBase::Pointer TransformMsgCloneHandler::Clone(igtl::MessageBase* or
   return igtl::MessageBase::Pointer(clone_.GetPointer());
 }
 
-
 mitk::IGTLMessageFactory::IGTLMessageFactory()
 {
   //create clone handlers
-//  mitk::IGTLMessageCloneHandler::Pointer tmch = ;
+  //  mitk::IGTLMessageCloneHandler::Pointer tmch = ;
 
   this->AddMessageNewMethod("NONE", nullptr);
 
   //OpenIGTLink Types V1
-  this->AddMessageNewMethod("IMAGE",      (PointerToMessageBaseNew)&igtl::ImageMessage::New);
-  this->AddMessageNewMethod("TRANSFORM",  (PointerToMessageBaseNew)&igtl::TransformMessage::New);
-  this->AddMessageNewMethod("POSITION",   (PointerToMessageBaseNew)&igtl::PositionMessage::New);
-  this->AddMessageNewMethod("STATUS",     (PointerToMessageBaseNew)&igtl::StatusMessage::New);
-  this->AddMessageNewMethod("CAPABILITY", (PointerToMessageBaseNew)&igtl::StatusMessage::New);
+  this->AddMessageNewMethod("IMAGE", (PointerToMessageBaseNew)&igtl::ImageMessage::New);
+  this->AddMessageNewMethod("TRANSFORM", (PointerToMessageBaseNew)&igtl::TransformMessage::New);
+  this->AddMessageNewMethod("POSITION", (PointerToMessageBaseNew)&igtl::PositionMessage::New);
+  this->AddMessageNewMethod("STATUS", (PointerToMessageBaseNew)&igtl::StatusMessage::New);
+  this->AddMessageNewMethod("CAPABILITY", (PointerToMessageBaseNew)&igtl::CapabilityMessage::New);
 
   this->AddMessageNewMethod("GET_IMAGE", (PointerToMessageBaseNew)&igtl::GetImageMessage::New);
   this->AddMessageNewMethod("GET_TRANS", (PointerToMessageBaseNew)&igtl::GetTransformMessage::New);
-//  this->AddMessageNewMethod("GET_POS", (PointerToMessageBaseNew)&igtl::GetPositionMessage::New); //not available???
+  //this->AddMessageNewMethod("GET_POS", (PointerToMessageBaseNew)&igtl::GetPositionMessage::New); //not available???
   this->AddMessageNewMethod("GET_STATUS", (PointerToMessageBaseNew)&igtl::GetStatusMessage::New);
   this->AddMessageNewMethod("GET_CAPABIL", (PointerToMessageBaseNew)&igtl::GetCapabilityMessage::New);
 
-//  //OpenIGTLink Types V2
-  this->AddMessageNewMethod("IMGMETA",    (PointerToMessageBaseNew)&igtl::ImageMetaMessage::New);
-  this->AddMessageNewMethod("LBMETA",     (PointerToMessageBaseNew)&igtl::LabelMetaMessage::New);
-  this->AddMessageNewMethod("COLORT",     (PointerToMessageBaseNew)&igtl::ColorTableMessage::New);
-  this->AddMessageNewMethod("POINT",      (PointerToMessageBaseNew)&igtl::PointMessage::New);
-  this->AddMessageNewMethod("TRAJ",       (PointerToMessageBaseNew)&igtl::TrajectoryMessage::New);
-  this->AddMessageNewMethod("TDATA",      (PointerToMessageBaseNew)&igtl::TrackingDataMessage::New);
-  this->AddMessageNewMethod("QTDATA",     (PointerToMessageBaseNew)&igtl::QuaternionTrackingDataMessage::New);
-  this->AddMessageNewMethod("SENSOR",     (PointerToMessageBaseNew)&igtl::SensorMessage::New);
-  this->AddMessageNewMethod("STRING",     (PointerToMessageBaseNew)&igtl::StringMessage::New);
-  this->AddMessageNewMethod("NDARRAY",    (PointerToMessageBaseNew)&igtl::NDArrayMessage::New);
-  this->AddMessageNewMethod("BIND",       (PointerToMessageBaseNew)&igtl::BindMessage::New);
-  this->AddMessageNewMethod("POLYDATA",   (PointerToMessageBaseNew)&igtl::PolyDataMessage::New);
+  //  //OpenIGTLink Types V2
+  this->AddMessageNewMethod("IMGMETA", (PointerToMessageBaseNew)&igtl::ImageMetaMessage::New);
+  this->AddMessageNewMethod("LBMETA", (PointerToMessageBaseNew)&igtl::LabelMetaMessage::New);
+  this->AddMessageNewMethod("COLORT", (PointerToMessageBaseNew)&igtl::ColorTableMessage::New);
+  this->AddMessageNewMethod("POINT", (PointerToMessageBaseNew)&igtl::PointMessage::New);
+  this->AddMessageNewMethod("TRAJ", (PointerToMessageBaseNew)&igtl::TrajectoryMessage::New);
+  this->AddMessageNewMethod("TDATA", (PointerToMessageBaseNew)&igtl::TrackingDataMessage::New);
+  this->AddMessageNewMethod("QTDATA", (PointerToMessageBaseNew)&igtl::QuaternionTrackingDataMessage::New);
+  this->AddMessageNewMethod("SENSOR", (PointerToMessageBaseNew)&igtl::SensorMessage::New);
+  this->AddMessageNewMethod("STRING", (PointerToMessageBaseNew)&igtl::StringMessage::New);
+  this->AddMessageNewMethod("NDARRAY", (PointerToMessageBaseNew)&igtl::NDArrayMessage::New);
+  this->AddMessageNewMethod("BIND", (PointerToMessageBaseNew)&igtl::BindMessage::New);
+  this->AddMessageNewMethod("POLYDATA", (PointerToMessageBaseNew)&igtl::PolyDataMessage::New);
 
-  this->AddMessageNewMethod("GET_IMGMETA",    (PointerToMessageBaseNew)&igtl::GetImageMetaMessage::New);
-  this->AddMessageNewMethod("GET_LBMETA",     (PointerToMessageBaseNew)&igtl::GetLabelMetaMessage::New);
-  this->AddMessageNewMethod("GET_COLORT",     (PointerToMessageBaseNew)&igtl::GetColorTableMessage::New);
-  this->AddMessageNewMethod("GET_POINT",      (PointerToMessageBaseNew)&igtl::GetPointMessage::New);
-  this->AddMessageNewMethod("GET_TRAJ",       (PointerToMessageBaseNew)&igtl::GetTrajectoryMessage::New);
-//  this->AddMessageNewMethod("GET_TDATA",      (PointerToMessageBaseNew)&igtl::GetTrackingDataMessage::New); //not available???
-//  this->AddMessageNewMethod("GET_QTDATA",     (PointerToMessageBaseNew)&igtl::GetQuaternionTrackingDataMessage::New);
-//  this->AddMessageNewMethod("GET_SENSOR",     (PointerToMessageBaseNew)&igtl::GetSensorMessage::New);
-//  this->AddMessageNewMethod("GET_STRING",     (PointerToMessageBaseNew)&igtl::GetStringMessage::New);
-//  this->AddMessageNewMethod("GET_NDARRAY",    (PointerToMessageBaseNew)&igtl::GetNDArrayMessage::New);
-  this->AddMessageNewMethod("GET_BIND",       (PointerToMessageBaseNew)&igtl::GetBindMessage::New);
-  this->AddMessageNewMethod("GET_POLYDATA",   (PointerToMessageBaseNew)&igtl::GetPolyDataMessage::New);
+  this->AddMessageNewMethod("GET_IMGMETA", (PointerToMessageBaseNew)&igtl::GetImageMetaMessage::New);
+  this->AddMessageNewMethod("GET_LBMETA", (PointerToMessageBaseNew)&igtl::GetLabelMetaMessage::New);
+  this->AddMessageNewMethod("GET_COLORT", (PointerToMessageBaseNew)&igtl::GetColorTableMessage::New);
+  this->AddMessageNewMethod("GET_POINT", (PointerToMessageBaseNew)&igtl::GetPointMessage::New);
+  this->AddMessageNewMethod("GET_TRAJ", (PointerToMessageBaseNew)&igtl::GetTrajectoryMessage::New);
+  //  this->AddMessageNewMethod("GET_TDATA",      (PointerToMessageBaseNew)&igtl::GetTrackingDataMessage::New); //not available???
+  //  this->AddMessageNewMethod("GET_QTDATA",     (PointerToMessageBaseNew)&igtl::GetQuaternionTrackingDataMessage::New); //not available???
+  //  this->AddMessageNewMethod("GET_SENSOR",     (PointerToMessageBaseNew)&igtl::GetSensorMessage::New); //not available???
+  //  this->AddMessageNewMethod("GET_STRING",     (PointerToMessageBaseNew)&igtl::GetStringMessage::New); //not available???
+  //  this->AddMessageNewMethod("GET_NDARRAY",    (PointerToMessageBaseNew)&igtl::GetNDArrayMessage::New); //not available???
+  this->AddMessageNewMethod("GET_BIND", (PointerToMessageBaseNew)&igtl::GetBindMessage::New);
+  this->AddMessageNewMethod("GET_POLYDATA", (PointerToMessageBaseNew)&igtl::GetPolyDataMessage::New);
 
   this->AddMessageNewMethod("RTS_BIND", (PointerToMessageBaseNew)&igtl::RTSBindMessage::New);
   this->AddMessageNewMethod("RTS_QTDATA", (PointerToMessageBaseNew)&igtl::RTSQuaternionTrackingDataMessage::New);
@@ -160,7 +158,7 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
   //todo: check if there are more STP messages
 
   //Own Types
-  this->AddMessageNewMethod("DUMMY",      (PointerToMessageBaseNew)&mitk::IGTLDummyMessage::New);
+  this->AddMessageNewMethod("DUMMY", (PointerToMessageBaseNew)&mitk::IGTLDummyMessage::New);
 }
 
 mitk::IGTLMessageFactory::~IGTLMessageFactory()
@@ -168,21 +166,21 @@ mitk::IGTLMessageFactory::~IGTLMessageFactory()
 }
 
 void mitk::IGTLMessageFactory::AddMessageType(std::string messageTypeName,
-           IGTLMessageFactory::PointerToMessageBaseNew messageTypeNewPointer,
-           mitk::IGTLMessageCloneHandler::Pointer cloneHandler)
+  IGTLMessageFactory::PointerToMessageBaseNew messageTypeNewPointer,
+  mitk::IGTLMessageCloneHandler::Pointer cloneHandler)
 {
   this->AddMessageNewMethod(messageTypeName, messageTypeNewPointer);
   this->AddMessageCloneHandler(messageTypeName, cloneHandler);
 }
 
 void mitk::IGTLMessageFactory::AddMessageNewMethod(std::string messageTypeName,
-           IGTLMessageFactory::PointerToMessageBaseNew messageTypeNewPointer )
+  IGTLMessageFactory::PointerToMessageBaseNew messageTypeNewPointer)
 {
   this->m_NewMethods[messageTypeName] = messageTypeNewPointer;
 }
 
 void mitk::IGTLMessageFactory::AddMessageCloneHandler(std::string msgTypeName,
-          mitk::IGTLMessageCloneHandler::Pointer cloneHandler )
+  mitk::IGTLMessageCloneHandler::Pointer cloneHandler)
 {
   this->m_CloneHandlers[msgTypeName] = cloneHandler;
 }
@@ -190,14 +188,14 @@ void mitk::IGTLMessageFactory::AddMessageCloneHandler(std::string msgTypeName,
 mitk::IGTLMessageCloneHandler::Pointer
 mitk::IGTLMessageFactory::GetCloneHandler(std::string messageTypeName)
 {
-  if ( this->m_CloneHandlers.find(messageTypeName) !=
-       this->m_CloneHandlers.end() )
+  if (this->m_CloneHandlers.find(messageTypeName) !=
+    this->m_CloneHandlers.end())
   {
     return m_CloneHandlers[messageTypeName];
   }
 
   MITK_ERROR("IGTLMessageFactory") << messageTypeName <<
-                              " message type is not registered to factory!";
+    " message type is not registered to factory!";
 
   mitkThrow() << messageTypeName << " message type is not registered to factory!";
 
@@ -213,13 +211,13 @@ mitk::IGTLMessageFactory::Clone(igtl::MessageBase::Pointer msg)
 mitk::IGTLMessageFactory::PointerToMessageBaseNew
 mitk::IGTLMessageFactory::GetMessageTypeNewPointer(std::string messageTypeName)
 {
-  if ( this->m_NewMethods.find(messageTypeName) != this->m_NewMethods.end() )
+  if (this->m_NewMethods.find(messageTypeName) != this->m_NewMethods.end())
   {
     return m_NewMethods[messageTypeName];
   }
 
   MITK_ERROR("IGTLMessageFactory") << messageTypeName <<
-                                   " message type is not registered to factory!";
+    " message type is not registered to factory!";
   return nullptr;
 }
 
@@ -227,8 +225,8 @@ igtl::MessageBase::Pointer
 mitk::IGTLMessageFactory::CreateInstance(std::string messageTypeName)
 {
   mitk::IGTLMessageFactory::PointerToMessageBaseNew newPointer =
-      this->GetMessageTypeNewPointer(messageTypeName);
-  if ( newPointer != nullptr )
+    this->GetMessageTypeNewPointer(messageTypeName);
+  if (newPointer != nullptr)
   {
     return newPointer();
   }
@@ -242,14 +240,14 @@ std::list<std::string>
 mitk::IGTLMessageFactory::GetAvailableMessageRequestTypes()
 {
   std::list<std::string> allGetMessages;
-  for ( std::map<std::string, PointerToMessageBaseNew>::const_iterator it =
-        this->m_NewMethods.begin();
-        it != this->m_NewMethods.end(); ++it)
+  for (std::map<std::string, PointerToMessageBaseNew>::const_iterator it =
+    this->m_NewMethods.begin();
+    it != this->m_NewMethods.end(); ++it)
   {
-    if ( it->first.find("GET_") != std::string::npos ||
-         it->first.find("STT_") != std::string::npos ||
-         it->first.find("STP_") != std::string::npos ||
-         it->first.find("RTS_") != std::string::npos)
+    if (it->first.find("GET_") != std::string::npos ||
+      it->first.find("STT_") != std::string::npos ||
+      it->first.find("STP_") != std::string::npos ||
+      it->first.find("RTS_") != std::string::npos)
     {
       allGetMessages.push_back(it->first);
     }
@@ -264,7 +262,7 @@ mitk::IGTLMessageFactory::CreateInstance(igtl::MessageHeader::Pointer msgHeader)
   std::string messageType;
 
   //check the header
-  if ( msgHeader.IsNull() )
+  if (msgHeader.IsNull())
   {
     messageType = "NONE";
   }
@@ -277,10 +275,10 @@ mitk::IGTLMessageFactory::CreateInstance(igtl::MessageHeader::Pointer msgHeader)
   messageType = itksys::SystemTools::UpperCase(messageType);
 
   //find the according new method
-  if ( this->m_NewMethods.find( messageType )
-       != this->m_NewMethods.end() )
+  if (this->m_NewMethods.find(messageType)
+    != this->m_NewMethods.end())
   {
-    if ( this->m_NewMethods[messageType] != nullptr)
+    if (this->m_NewMethods[messageType] != nullptr)
     {
       // Call tracker New() function if tracker not NULL
       return (*this->m_NewMethods[messageType])();
@@ -291,7 +289,7 @@ mitk::IGTLMessageFactory::CreateInstance(igtl::MessageHeader::Pointer msgHeader)
   else
   {
     MITK_ERROR("IGTLMessageFactory") << "Unknown IGT message type: "
-                                     << messageType;
+      << messageType;
     return nullptr;
   }
 }

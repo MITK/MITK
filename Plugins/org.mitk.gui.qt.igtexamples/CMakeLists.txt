@@ -5,5 +5,5 @@ project(org_mitk_gui_qt_igtexamples)
 mitk_create_plugin(
   EXPORT_DIRECTIVE IGTEXAMPLES_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkQtWidgetsExt MitkIGT MitkIGTUI
+  MODULE_DEPENDS MitkQtWidgetsExt MitkIGT MitkIGTUI MitkOpenIGTLink MitkOpenIGTLinkUI MitkUS
 )

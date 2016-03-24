@@ -14,28 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#ifndef org_mitk_gui_qt_igtlplugin_Activator_h
-#define org_mitk_gui_qt_igtlplugin_Activator_h
-
-#include <ctkPluginActivator.h>
+#include "org_mitk_gui_qt_openigtlink_Activator.h"
+#include "OpenIGTLinkManager.h"
 
 namespace mitk {
 
-class org_mitk_gui_qt_igtlplugin_Activator :
-  public QObject, public ctkPluginActivator
+void org_mitk_gui_qt_openigtlink_Activator::start(ctkPluginContext* context)
 {
-  Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_igtlplugin")
-  Q_INTERFACES(ctkPluginActivator)
-
-public:
-
-  void start(ctkPluginContext* context) override;
-  void stop(ctkPluginContext* context) override;
-
-}; // org_mitk_gui_qt_igtlplugin_Activator
-
+  BERRY_REGISTER_EXTENSION_CLASS(OpenIGTLinkManager, context)
 }
 
-#endif // org_mitk_gui_qt_igtlplugin_Activator_h
+void org_mitk_gui_qt_openigtlink_Activator::stop(ctkPluginContext* context)
+{
+  Q_UNUSED(context)
+}
+
+}

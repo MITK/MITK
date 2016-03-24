@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <igtlQuaternionTrackingDataMessage.h>
 #include <igtlTrackingDataMessage.h>
 #include <igtlTransformMessage.h>
+#include "mitkIGTLTransformDeviceSource.h"
 
 namespace mitk
 {
@@ -138,7 +139,7 @@ namespace mitk
     mitk::IGTLClient::Pointer m_OpenIGTLinkClient;
 
     //OpenIGTLink pipeline
-    mitk::IGTLDeviceSource::Pointer m_IGTLDeviceSource;
+    mitk::IGTLTransformDeviceSource::Pointer m_IGTLDeviceSource;
     mitk::IGTLMessageToNavigationDataFilter::Pointer m_IGTLMsgToNavDataFilter;
 
     std::vector<OpenIGTLinkTrackingTool::Pointer> m_AllTools; ///< vector holding all tools

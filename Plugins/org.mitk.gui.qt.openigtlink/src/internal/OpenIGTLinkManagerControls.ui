@@ -30,7 +30,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Select OpenIGTLink Device Source:</string>
+      <string>Select OpenIGTLink device source:</string>
      </property>
     </widget>
    </item>
@@ -47,7 +47,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Manage Device:</string>
+      <string>Manage device:</string>
      </property>
     </widget>
    </item>
@@ -64,7 +64,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Manage Streams:</string>
+      <string>Manage streams of selected device source:</string>
      </property>
     </widget>
    </item>

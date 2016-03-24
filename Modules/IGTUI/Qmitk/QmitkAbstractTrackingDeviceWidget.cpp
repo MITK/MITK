@@ -21,6 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkAbstractTrackingDeviceWidget::QmitkAbstractTrackingDeviceWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
   , isInitialized(false)
+  , m_TestConnectionWorker(NULL)
+  , m_TestConnectionWorkerThread(NULL)
+  , m_ErrorMessage("")
 {
 }
 

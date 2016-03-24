@@ -44,7 +44,9 @@ class mitkOpenIGTLinkClientServerTestSuite : public mitk::TestFixture
   //MITK_TEST(Test_JustIGTLImpl_OpenAndCloseAndThenReopenAndCloseServer_Successful);
   //MITK_TEST(Test_ConnectingOneClientAndOneServer_Successful);
   //MITK_TEST(Test_ConnectingMultipleClientsToOneServer_Successful);
+#ifdef _WIN32 //does only work under windows, see bug 19633
   MITK_TEST(Test_DisconnectionServerFirst_Successful);
+#endif
   //MITK_TEST(Test_SendingMessageFromServerToOneClient_Successful);
   //MITK_TEST(Test_SendingMessageFromServerToMultipleClients_Successful);
   CPPUNIT_TEST_SUITE_END();

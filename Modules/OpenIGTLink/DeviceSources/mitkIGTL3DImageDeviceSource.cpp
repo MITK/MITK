@@ -45,7 +45,7 @@ void mitk::IGTL3DImageDeviceSource::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextImage3dMessage();
+  igtl::MessageBase::Pointer msgIn = dynamic_cast<igtl::MessageBase*>(m_IGTLDevice->GetNextImage3dMessage().GetPointer());
   if (msgIn.IsNotNull())
   {
     assert(msgIn);

@@ -22,6 +22,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <igtlImageMessage.h>
 
+static unsigned int MIN_DIM = 1u;
+static unsigned int SMALL_DIM = 10u;
+static unsigned int MEDIUM_DIM = 300u;
+static unsigned int BIG_DIM = 3000u;
+
 class mitkOpenIGTLinkIGTLImageMessageFilterTestSuite : public mitk::TestFixture {
   CPPUNIT_TEST_SUITE(mitkOpenIGTLinkIGTLImageMessageFilterTestSuite);
   MITK_TEST(TestMinimumImage);
@@ -31,11 +36,6 @@ class mitkOpenIGTLinkIGTLImageMessageFilterTestSuite : public mitk::TestFixture 
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
-  unsigned int MIN_DIM = 1u;
-  unsigned int SMALL_DIM = 10u;
-  unsigned int MEDIUM_DIM = 300u;
-  unsigned int BIG_DIM = 3000u;
 
   mitk::ImageToIGTLMessageFilter::Pointer m_ImageToIGTLMessageFilter;
   mitk::Image::Pointer m_TestImage;

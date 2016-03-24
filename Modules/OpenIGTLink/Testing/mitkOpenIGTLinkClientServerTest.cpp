@@ -32,6 +32,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "igtlClientSocket.h"
 #include "igtlServerSocket.h"
 
+static int PORT = 35352;
+static const std::string HOSTNAME = "localhost";
+static const std::string SERVER_DEVICE_NAME = "Test Server";
+static const std::string CLIENT_ONE_DEVICE_NAME = "Test Client 1";
+static const std::string CLIENT_TWO_DEVICE_NAME = "Test Client 2";
+
 class mitkOpenIGTLinkClientServerTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkOpenIGTLinkClientServerTestSuite);
@@ -44,12 +50,6 @@ class mitkOpenIGTLinkClientServerTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  int PORT = 35352;
-  const std::string HOSTNAME = "localhost";
-  const std::string SERVER_DEVICE_NAME = "Test Server";
-  const std::string CLIENT_ONE_DEVICE_NAME = "Test Client 1";
-  const std::string CLIENT_TWO_DEVICE_NAME = "Test Client 2";
-
   std::string m_Message;
   mitk::IGTLServer::Pointer m_Server;
   mitk::IGTLClient::Pointer m_Client_One;

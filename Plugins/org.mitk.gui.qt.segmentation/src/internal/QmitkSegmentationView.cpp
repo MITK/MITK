@@ -1142,7 +1142,30 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    assert ( toolManager );
 
    toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
-   toolManager->InitializeTools();
+
+   toolManager->RegisterTool("AdaptiveRegionGrowingTool");
+   toolManager->RegisterTool("AddContourTool");
+   toolManager->RegisterTool("AutoCropImageFilter");
+   toolManager->RegisterTool("BinaryThresholdTool");
+   toolManager->RegisterTool("BinaryThresholdULTool");
+   toolManager->RegisterTool("CalculateGrayValueStatisticsTool");
+   toolManager->RegisterTool("CalculateVolumetryTool");
+   toolManager->RegisterTool("CorrectorTool2D");
+   toolManager->RegisterTool("CreateSurfaceTool");
+   toolManager->RegisterTool("DrawPaintbrushTool");
+   toolManager->RegisterTool("ErasePaintbrushTool");
+   toolManager->RegisterTool("EraseRegionTool");
+   toolManager->RegisterTool("FastMarchingTool");
+   toolManager->RegisterTool("FastMarchingTool3D");
+   toolManager->RegisterTool("FillRegionTool");
+   toolManager->RegisterTool("LiveWireTool2D");
+   toolManager->RegisterTool("OtsuTool3D");
+   toolManager->RegisterTool("PixelManipulationTool");
+   toolManager->RegisterTool("RegionGrow3DTool");
+   toolManager->RegisterTool("RegionGrowingTool");
+   toolManager->RegisterTool("SubtractContourTool");
+   toolManager->RegisterTool("WatershedTool");
+   toolManager->RegisterTool("PickingTool");
 
    // all part of open source MITK
    m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);

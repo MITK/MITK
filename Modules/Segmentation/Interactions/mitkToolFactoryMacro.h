@@ -48,7 +48,7 @@ class EXPORT_SPEC CLASS_NAME ## Factory : public ::itk::ObjectFactoryBase \
  \
     CLASS_NAME ## Factory() \
     { \
-      itk::ObjectFactoryBase::RegisterOverride("mitkTool", \
+      itk::ObjectFactoryBase::RegisterOverride(#CLASS_NAME, \
                               #CLASS_NAME, \
                               DESCRIPTION, \
                               1, \

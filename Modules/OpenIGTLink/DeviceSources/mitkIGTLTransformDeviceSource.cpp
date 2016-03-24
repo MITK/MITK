@@ -45,7 +45,7 @@ void mitk::IGTLTransformDeviceSource::GenerateData()
   /* update output with message from the device */
   IGTLMessage* msgOut = this->GetOutput();
   assert(msgOut);
-  igtl::MessageBase::Pointer msgIn = m_IGTLDevice->GetNextTransformMessage();
+  igtl::MessageBase::Pointer msgIn = dynamic_cast<igtl::MessageBase*>(m_IGTLDevice->GetNextTransformMessage().GetPointer());
   if (msgIn.IsNotNull())
   {
     assert(msgIn);

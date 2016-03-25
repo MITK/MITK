@@ -59,6 +59,7 @@ void mitk::PaintbrushTool::ConnectActionsAndFunctions()
 void mitk::PaintbrushTool::Activated()
 {
   Superclass::Activated();
+
   FeedbackContourTool::SetFeedbackContourVisible(true);
   SizeChanged.Send(m_Size);
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
@@ -73,6 +74,8 @@ void mitk::PaintbrushTool::Deactivated()
   m_WorkingSlice = nullptr;
   m_CurrentPlane = nullptr;
   m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
+
+  Superclass::Deactivated();
 }
 
 void mitk::PaintbrushTool::SetSize(int value)

@@ -28,9 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #pragma GCC visibility pop
 
 #include <vector>
-#include <map>
-
-#include "usServiceRegistration.h"
 
 
 namespace mitk
@@ -278,9 +275,6 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
     /// \brief Callback for NodeRemove events
     void OnNodeRemoved(const mitk::DataNode* node);
 
-  private:
-
-    std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
 };
 
 } // namespace

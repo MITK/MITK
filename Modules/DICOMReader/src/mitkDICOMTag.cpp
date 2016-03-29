@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/algorithm/string.hpp>
 
 #include "mitkLogMacros.h"
+#include "ofstd.h"
 
 mitk::DICOMTag
 ::DICOMTag(unsigned int group, unsigned int element)
@@ -142,11 +143,11 @@ void mitk::DICOMStringToOrientationVectors( const std::string& s,
       int i = 0;
       for ( ; i < 3; ++i )
       {
-        right[i] = stod( strs[i] );
+        right[i] = OFStandard::atof( strs[i].c_str() );
       }
       for ( ; i < 6; ++i )
       {
-        up[i - 3] = stod( strs[i] );
+        up[i - 3] = OFStandard::atof( strs[i].c_str() );
       }
       successful = true;
     }
@@ -175,8 +176,8 @@ mitk::DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarTyp
     boost::split( strs, s, boost::is_any_of( "\\" ) );
     if ( strs.size() > 1 )
     {
-      spacingY = stod( strs[0] );
-      spacingX = stod( strs[1] );
+      spacingY = OFStandard::atof( strs[0].c_str() );
+      spacingX = OFStandard::atof( strs[1].c_str() );
       successful = true;
     }
   }
@@ -188,8 +189,7 @@ mitk::DICOMStringToSpacing(const std::string& s, ScalarType& spacingX, ScalarTyp
 }
 
 
-mitk::Point3D
-mitk::DICOMStringToPoint3D(const std::string& s, bool& successful)
+mitk::Point3D mitk::DICOMStringToPoint3D( const std::string& s, bool& successful )
 {
   Point3D p;
   successful = true;
@@ -200,16 +200,17 @@ mitk::DICOMStringToPoint3D(const std::string& s, bool& successful)
     boost::split( strs, s, boost::is_any_of( "\\" ) );
     if ( strs.size() == 3 )
     {
-      for( int i=0; i<3; ++i )
+      for ( int i = 0; i < 3; ++i )
       {
-        p[i] = stod( strs[i] );
+        p[i] = OFStandard::atof( strs[i].c_str() );
       }
     }
   }
   catch ( const std::exception& /*e*/ )
   {
-    p.Fill(0.0);
+    p.Fill( 0.0 );
   }
+
 
   return p;
 }

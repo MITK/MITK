@@ -1,0 +1,58 @@
+/**
+\page org_mitk_gui_qt_matchpoint_algorithm_browser The MatchPoint Algorithm Browser View
+
+\imageMacro{map-icon-browser.png, "Icon of the MatchPoint Algorithm Browser", 3}
+
+\li \ref MAP_BROWSER_Introduction
+\li \ref MAP_BROWSER_Contact
+\li \ref MAP_BROWSER_Usage
+\li \ref MAP_BROWSER_Profile
+
+\section MAP_BROWSER_Introduction Introduction
+This view offers the user a way to search for available registration algorithms and select them for
+further usage by other views (e.g. MatchPoint Algorithm Control \ref org_mitk_gui_qt_algorithm_control).
+
+\section MAP_BROWSER_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at dipp@dkfz.de.
+
+\section MAP_BROWSER_Usage Usage
+\remark If you see no algorithms available by the browser, please check the search paths which can be configured at the MatchPoint preference page (Ctrl+P).
+<b>DIPP-User</b>: You should activate at least "scan installation directory" to see the algorithms delivered with the DIPP installer.
+
+The basic idea of the browser is that you can use this view as central place to search for suitable algorithms. If you select an algorithm you can see its profile in the lower part of the view.
+If a algorithm is selected all other views (e.g. \ref org_mitk_gui_qt_algorithm_control or \ref de_dkfz_dwi_gui_qt_crex) which use registration algorithms will be notified and allow to choose the selected algorithm for usage.
+\imageMacro{browser.png, "View of the browser with the list of available algorithm and the profile area",14}
+
+\remark You haven't found a fitting registration algorithm? Please have a look at the registration repository at our SBR share point (http://intracoop/sites/sbr/Lists/RegRepository/default.aspx)
+or contact us (dipp@dkfz.de).
+
+\section MAP_BROWSER_Profile Profile info
+In the following a short information about the different properties classified in the profile.\n
+
+<ul>
+<li><b>UID</b> Unique identifier for the registration algorithm (e.g. used in the library; may not be "human readable/understandable")</li>
+<li><b>Author</b> Name of the author(s) that has (have) developed the algorithm.</li>
+<li><b>Terms</b> Terms of usage for the algorithm.</li>
+<li><b>Data</b> type The type of date which is used by the algorithm to determine the registration. E.g. Image, point set, contour or surface</li>
+<li><b>Computation style</b> Specifies of the algorithm determines the registration by an iterative optimization process or analytically (e.g. closed form solution).
+Deterministic Specifies if the algorithm is deterministic (same input -> same output) or stochastic (e.g. by sampling the image while determining the registration). Results of stochastic algorithm may vary (slightly) because of their random aspect.
+Resolution style Defines if the algorithm uses a multi resolution/scale approach.</li>
+<li><b>Dim (Moving)</b> Number of dimensions of the frame of reference within which the data is defined that should be registered.</li>
+<li><b>Modality (Moving)</b> Modality of the moving entity (image). Thus the frame of reference where the registration should map from. E.g. CT, MRI, PET </li>
+<li><b>Dim (Target)</b> Number of dimensions of the frame of reference into which the data should be mapped. </li>
+<li><b>Modality (Target)</b> Modality of the target entity (image). Thus the frame of reference where the registration should map into. E.g. CT, MRI, PET </li>
+<li><b>Subject</b> Defines if the algorithm was developed to register data of the same subject (intrasubject), to register two subjects (intersubject) or to register onto an atlas. </li>
+<li><b>Object</b> Specifies for which "part" of the anatomy the algorithm was developed for. </li>
+<li><b>Transformation model</b> Specifies the type of transformation used by the algorithm. E.g.: affine, b-spline, non-rigid. </li>
+<li><b>Transformation domain</b> Defines it the transformation operates globally (e.g. Matrix) or locally (e.g. vector field). </li>
+<li><b>Optimization strategy</b> The used optimization strategy (if an optimizer is used). </li>
+<li><b>Metric</b> The cost function/metric that is used by the optimizer (if an optimizer is used). </li>
+<li><b>Citation/Reference</b> Reference to literature that contains information about the algorithm and should be used to cite the algorithm.</li>
+<li><b>Literature</b> Secondary literature regarding the algorithm or used concepts in the algorithm. Use the field "Citation/Reference" for the literature that should be cited when using the algorithm.</li>
+<li><b>Contact</b> Internal contact for questions regarding the algorithm. </li>
+</ul>
+
+*/
+

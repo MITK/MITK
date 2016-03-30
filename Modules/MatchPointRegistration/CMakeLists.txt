@@ -1,0 +1,9 @@
+MITK_CREATE_MODULE(
+  INCLUDE_DIRS Rendering IO Helper
+  DEPENDS MitkCore MitkSceneSerializationBase
+  PACKAGE_DEPENDS
+   PRIVATE ITK VTK
+   PUBLIC MatchPoint
+)
+
+ADD_SUBDIRECTORY(Testing)

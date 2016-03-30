@@ -51,6 +51,7 @@ mitk::Tool::Tool(const char* type)
 , m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
 , m_InteractorType( type )
 , m_DisplayInteractorConfigs()
+, m_EventConfig("DisplayConfigMITK.xml")
 {
 
 }
@@ -129,7 +130,7 @@ void mitk::Tool::Activated()
       // remember the original configuration
       m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
       // here the alternative configuration is loaded
-      displayInteractor->SetEventConfig("DisplayConfigMITK.xml");
+      displayInteractor->SetEventConfig( m_EventConfig.c_str() );
     }
   }
 }

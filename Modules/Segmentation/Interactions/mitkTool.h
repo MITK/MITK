@@ -211,6 +211,11 @@ namespace mitk
     */
     virtual void Deactivated();
 
+    /**
+    \brief Let subclasses change their event configuration.
+    */
+    std::string m_EventConfig;
+
     Tool(); // purposely hidden
     Tool( const char*); // purposely hidden
     virtual ~Tool();

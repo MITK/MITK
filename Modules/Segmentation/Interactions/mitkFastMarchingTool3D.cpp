@@ -230,7 +230,6 @@ void mitk::FastMarchingTool3D::Activated()
 
 void mitk::FastMarchingTool3D::Deactivated()
 {
-  Superclass::Deactivated();
   m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
   m_ToolManager->GetDataStorage()->Remove( this->m_SeedsAsPointSetNode );
   this->ClearSeeds();
@@ -254,6 +253,8 @@ void mitk::FastMarchingTool3D::Deactivated()
   m_SeedsAsPointSetNode = NULL;
   m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
   m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
+
+  Superclass::Deactivated();
 }
 
 void mitk::FastMarchingTool3D::Initialize()

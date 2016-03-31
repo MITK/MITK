@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSortByTag.h"
 
-#include "itkTimeProbe.h"
+#include "ofstd.h"
 
 mitk::DICOMSortByTag
 ::DICOMSortByTag(const DICOMTag& tag, DICOMSortCriterion::Pointer secondaryCriterion)
@@ -128,8 +128,8 @@ mitk::DICOMSortByTag
 
   try
   {
-    leftDouble = stod( leftString );
-    rightDouble = stod( rightString );
+    leftDouble = OFStandard::atof( leftString.c_str() );
+    rightDouble = OFStandard::atof( rightString.c_str() );
   }
   catch ( const std::exception& /*e*/ )
   {
@@ -162,8 +162,8 @@ mitk::DICOMSortByTag
 
   try
   {
-    fromDouble = stod( fromString );
-    toDouble = stod( toString );
+    fromDouble = OFStandard::atof( fromString.c_str() );
+    toDouble = OFStandard::atof( toString.c_str() );
   }
   catch ( const std::exception& /*e*/ )
   {

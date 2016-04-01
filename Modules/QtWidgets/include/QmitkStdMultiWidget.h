@@ -51,6 +51,10 @@ class MITKQTWIDGETS_EXPORT QmitkStdMultiWidget : public QWidget
 {
   Q_OBJECT
 
+private:
+
+  bool m_drawTextInStatusBar;
+
 public:
   QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti");
   virtual ~QmitkStdMultiWidget();
@@ -72,6 +76,14 @@ public:
 
   QmitkRenderWindow* GetRenderWindow4() const;
 
+  void setDisplayPositionText(bool draw = true);
+
+  /**
+  * \deprecatedSince{2015_05} GetLastLeftClickPosition is deprecated. Function will be removed and funtionality will move into mitk::DisplayInteractor.
+  */
+
+  const mitk::Point3D &
+  GetLastLeftClickPosition() const;
 
   const mitk::Point3D
   GetCrossPosition() const;

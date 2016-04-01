@@ -71,7 +71,8 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   mitkWidget3Container(NULL),
   mitkWidget4Container(NULL),
   m_PendingCrosshairPositionEvent(false),
-  m_CrosshairNavigationEnabled(false)
+  m_CrosshairNavigationEnabled(false),
+  m_drawTextInStatusBar(true)
 {
   /******************************************************
   * Use the global RenderingManager if none was specified
@@ -1713,8 +1714,16 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     stream << "No image information at this position!";
   }
 
-  statusText = stream.str();
-  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
+  if (m_drawTextInStatusBar)
+  {
+    statusText = stream.str();
+    mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
+  }
+}
+
+void QmitkStdMultiWidget::drawTextInStatusBar(bool draw)
+{
+  m_drawTextInStatusBar = draw;
 }
 
 void QmitkStdMultiWidget::EnableNavigationControllerEventListening()

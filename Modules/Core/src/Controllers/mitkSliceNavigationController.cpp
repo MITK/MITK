@@ -698,4 +698,39 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
   }
 }
 
+mitk::DataNode::Pointer SliceNavigationController::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition)
+{
+  mitk::DataNode::Pointer node;
+  int  maxlayer = -32768;
+  bool isHelper (false);
+  if(nodes.IsNotNull())
+  {
+    for (unsigned int x = 0; x < nodes->size(); x++)
+    {
+      nodes->at(x)->GetBoolProperty("helper object", isHelper);
+      if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
+      {
+        int layer = 0;
+        if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
+        if(layer > maxlayer)
+        {
+          if(static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(m_Renderer))
+          {
+            node = nodes->at(x);
+            maxlayer = layer;
+          }
+        }
+      }
+    }
+  }
+  return node;
+}
+// Relict from the old times, when automous decisions were accepted
+// behavior. Remains in here, because some RenderWindows do exist outside
+// of StdMultiWidgets.
+bool SliceNavigationController::ExecuteAction( Action* action, StateEvent const* stateEvent )
+{
+  return false;
+}
+
 } // namespace

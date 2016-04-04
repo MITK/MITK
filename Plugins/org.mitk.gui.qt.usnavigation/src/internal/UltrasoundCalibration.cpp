@@ -376,7 +376,7 @@ void UltrasoundCalibration::OnStartCalibrationProcess()
 
 void UltrasoundCalibration::OnStartPlusCalibration()
 {
-  if (m_CombinedModality.IsNull){
+  if (m_CombinedModality.IsNull()){
     m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
     if (m_CombinedModality.IsNull()) { return; } //something went wrong, there is no combined modality
   }

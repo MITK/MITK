@@ -242,10 +242,9 @@ protected:
   mitk::IGTLClient::Pointer m_TransformClient;
   mitk::IGTLDeviceSource::Pointer m_TransformDeviceSource;
 
-  QTimer m_StreamingTimer;
+  QTimer *m_StreamingTimer;
 
   unsigned long m_NewConnectionObserverTag;
-  unsigned long m_LostConnectionObserverTag;
 
   // Variables to determine if spacing was calibrated and needs to be applied to the incoming images
   mitk::Vector3D m_Spacing;

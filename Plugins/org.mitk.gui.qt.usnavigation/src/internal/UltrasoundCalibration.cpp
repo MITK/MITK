@@ -114,6 +114,7 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   m_Controls.m_CombinedModalityManagerWidget->SetCalibrationLoadedNecessary(false);
 
   m_Timer = new QTimer(this);
+  m_StreamingTimer = new QTimer(this);
 
   m_Controls.m_SpacingBtnFreeze->setEnabled(true);
   m_Controls.m_SpacingAddPoint->setEnabled(false);
@@ -166,7 +167,7 @@ void UltrasoundCalibration::CreateQtPartControl(QWidget *parent)
   // PLUS Calibration
   connect(m_Controls.m_GetCalibrationFromPLUS, SIGNAL(clicked()), this, SLOT(OnGetPlusCalibration()));
   connect(m_Controls.m_StartStreaming, SIGNAL(clicked()), this, SLOT(OnStartStreaming()));
-  connect(&m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
+  connect(m_StreamingTimer, SIGNAL(timeout()), this, SLOT(OnStreamingTimerTimeout()));
   connect(m_Controls.m_StopPlusCalibration, SIGNAL(clicked()), this, SLOT(OnStopPlusCalibration()));
   connect(m_Controls.m_SavePlusCalibration, SIGNAL(clicked()), this, SLOT(OnSaveCalibration()));
   connect(this, SIGNAL(NewConnectionSignal()), this, SLOT(OnNewConnection()));
@@ -375,8 +376,10 @@ void UltrasoundCalibration::OnStartCalibrationProcess()
 
 void UltrasoundCalibration::OnStartPlusCalibration()
 {
-  m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
-  if (m_CombinedModality.IsNull()) { return; } //something went wrong, there is no combined modality
+  if (m_CombinedModality.IsNull){
+    m_CombinedModality = m_Controls.m_CombinedModalityManagerWidget->GetSelectedCombinedModality();
+    if (m_CombinedModality.IsNull()) { return; } //something went wrong, there is no combined modality
+  }
 
   //setup server to send UltrasoundImages to PLUS
   mitk::IGTLServer::Pointer m_USServer = mitk::IGTLServer::New(true);
@@ -482,6 +485,8 @@ void UltrasoundCalibration::OnStopPlusCalibration()
   m_Controls.m_ConnectionStatus->setText("");
   m_Controls.m_SetupStatus->setText("");
   m_Controls.m_StartPlusCalibrationButton->setEnabled(true);
+  m_StreamingTimer->stop();
+  delete m_StreamingTimer;
 }
 
 void UltrasoundCalibration::OnPlusConnected()
@@ -509,7 +514,7 @@ void UltrasoundCalibration::OnStartStreaming()
   m_Controls.m_StartStreaming->setEnabled(false);
   m_Controls.m_ConnectionStatus->setText("");
   unsigned int interval = this->m_USMessageProvider->GetStreamingTime();
-  this->m_StreamingTimer.start((1.0 / 5.0 * 1000.0));
+  m_StreamingTimer->start((1.0 / 5.0 * 1000.0));
 }
 
 void UltrasoundCalibration::OnGetPlusCalibration()

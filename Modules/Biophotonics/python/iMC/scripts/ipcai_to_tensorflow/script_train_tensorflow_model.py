@@ -1,4 +1,12 @@
 
+import os
+
+import commons
+
+sc = commons.ScriptCommons()
+sc.set_root("/media/wirkert/data/Data/2016_02_02_IPCAI/")
+sc.create_folders()
+
 '''
 A Multilayer Perceptron implementation example using TensorFlow library.
 This example is using the MNIST database of handwritten digits (http://yann.lecun.com/exdb/mnist/)
@@ -8,7 +16,12 @@ Project: https://github.com/aymericdamien/TensorFlow-Examples/
 
 # Import MINST data
 import input_data
-mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+#mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+
+ipcai_dir = os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"))
+
+import input_ipcai_data
+ipcai = input_ipcai_data.read_data_sets(ipcai_dir)
 
 import tensorflow as tf
 
@@ -19,10 +32,10 @@ batch_size = 100
 display_step = 1
 
 # Network Parameters
-n_hidden_1 = 256 # 1st layer num features
-n_hidden_2 = 256 # 2nd layer num features
-n_input = 784 # MNIST data input (img shape: 28*28)
-n_classes = 10 # MNIST total classes (0-9 digits)
+n_hidden_1 = 21 # 1st layer num features
+n_hidden_2 = 21 # 2nd layer num features
+n_input = 21 # MNIST data input (img shape: 28*28)
+n_classes = 1 # MNIST total classes (0-9 digits)
 
 # tf Graph input
 
@@ -52,7 +65,9 @@ biases = {
 pred = multilayer_perceptron(x, weights, biases)
 
 # Define loss and optimizer
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y)) # Softmax loss
+
+#cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y)) # Softmax loss
+cost = -tf.reduce_mean(y*tf.log(pred)+(1-y)*tf.log(1-pred))
 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost) # Adam Optimizer
 
 # Initializing the variables
@@ -65,10 +80,10 @@ with tf.Session() as sess:
     # Training cycle
     for epoch in range(training_epochs):
         avg_cost = 0.
-        total_batch = int(mnist.train.num_examples/batch_size)
+        total_batch = int(ipcai.train.num_examples/batch_size)
         # Loop over all batches
         for i in range(total_batch):
-            batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+            batch_xs, batch_ys = ipcai.train.next_batch(batch_size)
             # Fit training using batch data
             sess.run(optimizer, feed_dict={x: batch_xs, y: batch_ys})
             # Compute average loss
@@ -80,8 +95,6 @@ with tf.Session() as sess:
     print "Optimization Finished!"
 
     # Test model
-    correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
-    # Calculate accuracy
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    print "Accuracy:", accuracy.eval({x: mnist.test.images, y: mnist.test.labels})
+    accuracy = tf.reduce_median(tf.cast(tf.abs(pred-y), "float"))
+    print "Median testing error:", accuracy.eval({x: mnist.test.images, y: mnist.test.labels})
 

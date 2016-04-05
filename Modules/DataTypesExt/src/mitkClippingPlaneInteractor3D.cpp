@@ -68,7 +68,7 @@ bool mitk::ClippingPlaneInteractor3D::CheckOverObject(const InteractionEvent* in
     return false;
 
   Point3D currentWorldPoint;
-  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentWorldPoint) == this->GetDataNode().GetPointer())
+  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentWorldPoint) == this->GetDataNode())
     return true;
 
   return false;

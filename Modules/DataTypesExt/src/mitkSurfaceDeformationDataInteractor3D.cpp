@@ -55,7 +55,7 @@ void mitk::SurfaceDeformationDataInteractor3D::ConnectActionsAndFunctions()
 
 void mitk::SurfaceDeformationDataInteractor3D::DataNodeChanged()
 {
-  if(this->GetDataNode().IsNotNull())
+  if(this->GetDataNode() != nullptr)
   {
     m_Surface = dynamic_cast<Surface*>(this->GetDataNode()->GetData());
 
@@ -75,7 +75,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const Interaction
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
   Point3D currentPickedPoint;
 
-  if(interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint) == this->GetDataNode().GetPointer())
+  if(interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint) == this->GetDataNode())
   {
     // Colorized surface at current picked position
     m_SurfaceColorizationCenter = currentPickedPoint;

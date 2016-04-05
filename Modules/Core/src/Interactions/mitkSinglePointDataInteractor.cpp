@@ -93,7 +93,7 @@ void mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachin
  */
 void mitk::SinglePointDataInteractor::DataNodeChanged()
 {
-  if (GetDataNode().IsNotNull())
+  if (GetDataNode() != nullptr)
   {
     PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
     if (points == NULL)

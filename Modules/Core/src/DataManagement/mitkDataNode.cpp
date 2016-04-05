@@ -87,7 +87,7 @@ void mitk::DataNode::SetData(mitk::BaseData* baseData)
 }
 
 
-mitk::DataNode::DataNode() : m_Data(NULL), m_PropertyListModifiedObserverTag(0)
+mitk::DataNode::DataNode() : m_PropertyListModifiedObserverTag(0)
 {
   m_Mappers.resize(10);
 
@@ -104,11 +104,10 @@ mitk::DataNode::DataNode() : m_Data(NULL), m_PropertyListModifiedObserverTag(0)
 mitk::DataNode::~DataNode()
 {
   if(m_PropertyList.IsNotNull())
-    // remove modified event listener
     m_PropertyList->RemoveObserver(m_PropertyListModifiedObserverTag);
 
   m_Mappers.clear();
-  m_Data = NULL;
+  m_Data = nullptr;
 }
 
 mitk::DataNode& mitk::DataNode::operator=(const DataNode& right)
@@ -565,14 +564,16 @@ bool mitk::DataNode::IsSelected(const mitk::BaseRenderer* renderer)
   return selected;
 }
 
-void mitk::DataNode::SetDataInteractor(const DataInteractor::Pointer& interactor)
+void mitk::DataNode::SetDataInteractor(const DataInteractor::Pointer interactor)
 {
-  m_DataInteractor = interactor;
-  Modified();
+  if (m_DataInteractor == interactor)
+    return;
 
-  // the interactor has changed, so we have ti invoke an InteractorChangedEvent
-  const mitk::DataNode::InteractorChangedEvent changedEvent;
-  InvokeEvent( changedEvent );
+  m_DataInteractor = interactor;
+  this->Modified();
+
+  mitk::DataNode::InteractorChangedEvent changedEvent;
+  this->InvokeEvent(changedEvent);
 }
 
 mitk::DataInteractor::Pointer mitk::DataNode::GetDataInteractor() const

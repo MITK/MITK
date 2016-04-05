@@ -288,7 +288,7 @@ void mitk::AffineBaseDataInteractor3D::DataNodeChanged()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::AffineBaseDataInteractor3D::SetDataNode(mitk::DataInteractor::NodeType node)
+void mitk::AffineBaseDataInteractor3D::SetDataNode(DataNode* node)
 {
   this->RestoreNodeProperties(); //if there was another node set, restore it's color
   DataInteractor::SetDataNode(node);
@@ -301,7 +301,7 @@ bool mitk::AffineBaseDataInteractor3D::CheckOverObject(const InteractionEvent* i
     return false;
 
   Point3D currentWorldPoint;
-  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentWorldPoint) == this->GetDataNode().GetPointer())
+  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentWorldPoint) == this->GetDataNode())
     return true;
 
   return false;

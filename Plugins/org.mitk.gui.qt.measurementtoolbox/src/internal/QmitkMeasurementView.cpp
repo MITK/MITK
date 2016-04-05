@@ -159,7 +159,11 @@ QmitkMeasurementView::QmitkMeasurementView()
 
 QmitkMeasurementView::~QmitkMeasurementView()
 {
-  this->RemoveAllInteractors();
+  auto planarFigures = this->GetAllPlanarFigures();
+
+  for (auto it = planarFigures->Begin(); it != planarFigures->End(); ++it)
+    this->NodeRemoved(it.Value());
+
   delete d;
 }
 
@@ -257,28 +261,29 @@ void QmitkMeasurementView::CreateConnections()
 void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
 {
   // add observer for selection in renderwindow
-  mitk::PlanarFigure::Pointer figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+  mitk::PlanarFigure::Pointer planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
 
   auto isPositionMarker = false;
   node->GetBoolProperty("isContourMarker", isPositionMarker);
 
-  if (figure && !isPositionMarker)
+  if (planarFigure.IsNotNull() && !isPositionMarker)
   {
-    mitk::PlanarFigureInteractor::Pointer figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
     auto nonConstNode = const_cast<mitk::DataNode*>(node);
+    mitk::PlanarFigureInteractor::Pointer interactor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
-    if (figureInteractor.IsNull())
+    if (interactor.IsNull())
     {
-      figureInteractor = mitk::PlanarFigureInteractor::New();
+      interactor = mitk::PlanarFigureInteractor::New();
       auto planarFigureModule = us::ModuleRegistry::GetModule("MitkPlanarFigure");
 
-      figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule);
-      figureInteractor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
-      figureInteractor->SetDataNode(nonConstNode);
+      interactor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule);
+      interactor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
     }
 
+    interactor->SetDataNode(nonConstNode);
+
     QmitkPlanarFigureData data;
-    data.m_Figure = figure;
+    data.m_Figure = planarFigure;
 
     typedef itk::SimpleMemberCommand<QmitkMeasurementView> SimpleCommandType;
     typedef itk::MemberCommand<QmitkMeasurementView> MemberCommandType;
@@ -286,22 +291,22 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
     // add observer for event when figure has been placed
     auto initializationCommand = SimpleCommandType::New();
     initializationCommand->SetCallbackFunction(this, &QmitkMeasurementView::PlanarFigureInitialized);
-    data.m_EndPlacementObserverTag = figure->AddObserver(mitk::EndPlacementPlanarFigureEvent(), initializationCommand);
+    data.m_EndPlacementObserverTag = planarFigure->AddObserver(mitk::EndPlacementPlanarFigureEvent(), initializationCommand);
 
     // add observer for event when figure is picked (selected)
     auto selectCommand = MemberCommandType::New();
     selectCommand->SetCallbackFunction(this, &QmitkMeasurementView::PlanarFigureSelected);
-    data.m_SelectObserverTag = figure->AddObserver(mitk::SelectPlanarFigureEvent(), selectCommand);
+    data.m_SelectObserverTag = planarFigure->AddObserver(mitk::SelectPlanarFigureEvent(), selectCommand);
 
     // add observer for event when interaction with figure starts
     auto startInteractionCommand = SimpleCommandType::New();
     startInteractionCommand->SetCallbackFunction(this, &QmitkMeasurementView::DisableCrosshairNavigation);
-    data.m_StartInteractionObserverTag = figure->AddObserver(mitk::StartInteractionPlanarFigureEvent(), startInteractionCommand);
+    data.m_StartInteractionObserverTag = planarFigure->AddObserver(mitk::StartInteractionPlanarFigureEvent(), startInteractionCommand);
 
     // add observer for event when interaction with figure starts
     auto endInteractionCommand = SimpleCommandType::New();
     endInteractionCommand->SetCallbackFunction(this, &QmitkMeasurementView::EnableCrosshairNavigation);
-    data.m_EndInteractionObserverTag = figure->AddObserver(mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand);
+    data.m_EndInteractionObserverTag = planarFigure->AddObserver(mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand);
 
     // adding to the map of tracked planarfigures
     d->m_DataNodeToPlanarFigureData[nonConstNode] = data;
@@ -373,10 +378,10 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
   {
     QmitkPlanarFigureData& data = it->second;
 
-    data.m_Figure->RemoveObserver( data.m_EndPlacementObserverTag );
-    data.m_Figure->RemoveObserver( data.m_SelectObserverTag );
-    data.m_Figure->RemoveObserver( data.m_StartInteractionObserverTag );
-    data.m_Figure->RemoveObserver( data.m_EndInteractionObserverTag );
+    data.m_Figure->RemoveObserver(data.m_EndPlacementObserverTag);
+    data.m_Figure->RemoveObserver(data.m_SelectObserverTag);
+    data.m_Figure->RemoveObserver(data.m_StartInteractionObserverTag);
+    data.m_Figure->RemoveObserver(data.m_EndInteractionObserverTag);
 
     isFigureFinished = data.m_Figure->GetPropertyList()->GetBoolProperty("initiallyplaced", isPlaced);
 
@@ -808,14 +813,6 @@ void QmitkMeasurementView::AddAllInteractors()
     this->NodeAdded(it.Value());
 }
 
-void QmitkMeasurementView::RemoveAllInteractors()
-{
-  auto planarFigures = this->GetAllPlanarFigures();
-
-  for (auto it = planarFigures->Begin(); it != planarFigures->End(); ++it)
-    this->NodeRemoved(it.Value());
-}
-
 mitk::DataNode::Pointer QmitkMeasurementView::DetectTopMostVisibleImage()
 {
   // get all images from the data storage which are not a segmentation
@@ -877,7 +874,6 @@ void QmitkMeasurementView::EnableCrosshairNavigation()
       {
         // here the regular configuration is loaded again
         displayInteractor->SetEventConfig(displayInteractorConfig.second);
-        MITK_INFO << "restore config";
       }
     }
   }

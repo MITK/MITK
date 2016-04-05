@@ -389,7 +389,7 @@ void mitk::PointSetDataInteractor::Abort(StateMachineAction*, InteractionEvent* 
  */
 void mitk::PointSetDataInteractor::DataNodeChanged()
 {
-  if (GetDataNode().IsNotNull())
+  if (GetDataNode() != nullptr)
   {
     PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
     if (points == NULL)

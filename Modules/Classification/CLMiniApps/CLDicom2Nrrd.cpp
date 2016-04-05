@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file",us::Any(),false);
 
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   if (parsedArgs.size()==0)
       return EXIT_FAILURE;
@@ -49,8 +49,8 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  std::string inputFolder = us::any_cast<string>(parsedArgs["input"]);
-  std::string outFileName = us::any_cast<string>(parsedArgs["output"]);
+  std::string inputFolder = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string outFileName = us::any_cast<std::string>(parsedArgs["output"]);
 
   //check if DICOMTags have been set as property for mitk::Image
   mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( inputFolder, true );

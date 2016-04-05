@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
                      "name of class that is to be learnt");
 
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   // Show a help message
   if (parsedArgs.size()==0 || parsedArgs.count("help") || parsedArgs.count("h")) {
     std::cout << parser.helpText();
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
   // Parse input parameters
   {
     if (parsedArgs.count("colIds") || parsedArgs.count("c")) {
-      std::istringstream ss(us::any_cast<string>(parsedArgs["colIds"]));
+      std::istringstream ss(us::any_cast<std::string>(parsedArgs["colIds"]));
       std::string token;
 
       while (std::getline(ss, token, ','))
@@ -106,19 +106,19 @@ int main(int argc, char* argv[])
     }
 
     if (parsedArgs.count("output") || parsedArgs.count("o")) {
-      outputFolder = us::any_cast<string>(parsedArgs["output"]);
+      outputFolder = us::any_cast<std::string>(parsedArgs["output"]);
     }
 
     if (parsedArgs.count("classmap") || parsedArgs.count("m")) {
-      classMap = us::any_cast<string>(parsedArgs["classmap"]);
+      classMap = us::any_cast<std::string>(parsedArgs["classmap"]);
     }
 
     if (parsedArgs.count("configName") || parsedArgs.count("n")) {
-      configName = us::any_cast<string>(parsedArgs["configName"]);
+      configName = us::any_cast<std::string>(parsedArgs["configName"]);
     }
 
     if (parsedArgs.count("features") || parsedArgs.count("b")) {
-      std::istringstream ss(us::any_cast<string>(parsedArgs["features"]));
+      std::istringstream ss(us::any_cast<std::string>(parsedArgs["features"]));
       std::string token;
 
       while (std::getline(ss, token, ','))
@@ -136,13 +136,13 @@ int main(int argc, char* argv[])
 
     if (parsedArgs.count("stats") || parsedArgs.count("s")) {
       useStatsFile = true;
-      experimentFS.open(us::any_cast<string>(parsedArgs["stats"]).c_str(),
+      experimentFS.open(us::any_cast<std::string>(parsedArgs["stats"]).c_str(),
           std::ios_base::app);
     }
 
 
     if (parsedArgs.count("testId") || parsedArgs.count("t")) {
-      std::istringstream ss(us::any_cast<string>(parsedArgs["testId"]));
+      std::istringstream ss(us::any_cast<std::string>(parsedArgs["testId"]));
       std::string token;
 
       while (std::getline(ss, token, ','))
@@ -155,11 +155,11 @@ int main(int argc, char* argv[])
     loadIds.push_back(classMap);
 
     if (parsedArgs.count("stats") || parsedArgs.count("s")) {
-      outputFile = us::any_cast<string>(parsedArgs["stats"]);
+      outputFile = us::any_cast<std::string>(parsedArgs["stats"]);
     }
 
     if (parsedArgs.count("loadFile") || parsedArgs.count("l")) {
-      xmlFile = us::any_cast<string>(parsedArgs["loadFile"]);
+      xmlFile = us::any_cast<std::string>(parsedArgs["loadFile"]);
     } else {
       MITK_ERROR << parser.helpText();
       return EXIT_FAILURE;

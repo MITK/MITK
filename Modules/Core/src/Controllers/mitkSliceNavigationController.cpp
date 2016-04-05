@@ -728,8 +728,57 @@ mitk::DataNode::Pointer SliceNavigationController::GetTopLayerNode(mitk::DataSto
 // Relict from the old times, when automous decisions were accepted
 // behavior. Remains in here, because some RenderWindows do exist outside
 // of StdMultiWidgets.
-bool SliceNavigationController::ExecuteAction( Action* action, StateEvent const* stateEvent )
+bool
+SliceNavigationController
+::ExecuteAction( Action* action, StateEvent const* stateEvent )
 {
+  bool ok = false;
+
+  const PositionEvent* posEvent = dynamic_cast< const PositionEvent * >(
+    stateEvent->GetEvent() );
+  if ( posEvent != NULL )
+  {
+    if ( m_CreatedWorldGeometry.IsNull() )
+    {
+      return true;
+    }
+    switch (action->GetActionId())
+    {
+    case AcMOVE:
+      {
+        BaseRenderer *baseRenderer = posEvent->GetSender();
+        if ( !baseRenderer )
+        {
+          baseRenderer = const_cast<BaseRenderer *>(
+            GlobalInteraction::GetInstance()->GetFocus() );
+        }
+        if ( baseRenderer )
+          if ( baseRenderer->GetMapperID() == 1 )
+          {
+            PointOperation doOp(OpMOVE, posEvent->GetWorldPosition());
+
+            this->ExecuteOperation( &doOp );
+
+            ok = true;
+            break;
+          }
+      }
+    default:
+      ok = true;
+      break;
+    }
+    return ok;
+  }
+
+  const DisplayPositionEvent *displPosEvent =
+    dynamic_cast< const DisplayPositionEvent * >( stateEvent->GetEvent() );
+
+  if ( displPosEvent != NULL )
+  {
+    return true;
+  }
+
+  ok = true;
   return false;
 }
 

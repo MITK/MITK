@@ -469,9 +469,9 @@ void mitk::SimulationInteractor::DataNodeChanged()
 {
   this->ResetToStartState();
 
-  NodeType dataNode = this->GetDataNode();
+  mitk::DataNode* dataNode = this->GetDataNode();
 
-  if (dataNode.IsNotNull())
+  if (dataNode != nullptr)
   {
     Simulation::Pointer simulation = dynamic_cast<Simulation*>(dataNode->GetData());
 

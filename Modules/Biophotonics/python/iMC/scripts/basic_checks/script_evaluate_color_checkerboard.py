@@ -99,9 +99,12 @@ class CheckColorCheckerBoards(luigi.Task):
         msi_spectrometer = nrrd_reader.read(self.input()[3].path)
 
         # correct by flatfield and dark image
-        msimani.image_correction(msi, flat, dark)
-        msimani.image_correction(msi2, flat, dark)
-        msimani.image_correction(msi_copy, flat, dark)
+        #msimani.image_correction(msi, flat, dark)
+        #msimani.image_correction(msi2, flat, dark)
+        #msimani.image_correction(msi_copy, flat, dark)
+        msimani.dark_correction(msi, dark)
+        msimani.dark_correction(msi2, dark)
+        msimani.dark_correction(msi_copy, dark)
 
         # create artificial rgb
         rgb_image = msi_copy.get_image()[:, :, [2, 3, 1]]
@@ -150,6 +153,13 @@ class CheckColorCheckerBoards(luigi.Task):
                     dpi=250, bbox_inches='tight')
 
 
+class CameraQEFile(luigi.Task):
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("DATA_FOLDER"),
+                                              "camera_quantum_efficiency.csv"))
+
+
 class SpectrometerToSpectrocam(luigi.Task):
 
     spectrometer_measurement = luigi.Parameter()
@@ -163,7 +173,7 @@ class SpectrometerToSpectrocam(luigi.Task):
                         filenames)
 
         return tasks_mc.SpectrometerFile(self.spectrometer_measurement), \
-               filenames
+               filenames, CameraQEFile()
 
     def output(self):
         return luigi.LocalTarget(os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"),
@@ -175,6 +185,29 @@ class SpectrometerToSpectrocam(luigi.Task):
         spectrometer_reader = SpectrometerReader()
         spectrometer_msi = spectrometer_reader.read(self.input()[0].path)
 
+        # the wavelengths recorded by the spectrometer
+        spectrometer_wavelengths = spectrometer_msi.get_wavelengths()
+
+        spectrometer_white = spectrometer_reader.read(os.path.join(
+                sc.get_full_dir("DATA_FOLDER"), "spectrometer_whitebalance",
+                "white_IL_1_OO_20ms.txt"))
+        spectrometer_dark = spectrometer_reader.read(os.path.join(
+                sc.get_full_dir("DATA_FOLDER"), "spectrometer_whitebalance",
+                "dark_1_OO_20ms.txt"))
+        msimani.dark_correction(spectrometer_white, spectrometer_dark)
+        white_interpolator = interp1d(spectrometer_white.get_wavelengths(),
+                                      spectrometer_white.get_image(),
+                                      bounds_error=False, fill_value=0.)
+        white_interpolated = white_interpolator(spectrometer_wavelengths)
+
+        camera_qe = pd.read_csv(self.input()[2].path)
+        camera_qe_interpolator = interp1d(camera_qe["wavelengths"] * 10**-9,
+                                          camera_qe["quantum efficiency"],
+                                          bounds_error=False,
+                                          fill_value=0.)
+        camera_qe_interpolated = \
+            camera_qe_interpolator(spectrometer_wavelengths)
+
         # camera batch creation:
         new_reflectances = []
         for band in self.input()[1]:
@@ -183,14 +216,17 @@ class SpectrometerToSpectrocam(luigi.Task):
                                     df_filter["reflectances"],
                                     assume_sorted=False, bounds_error=False)
             # use this to create new reflectances
-            interpolated_filter = interpolator(spectrometer_msi.
-                                               get_wavelengths())
-            # normalize band response
+            interpolated_filter = interpolator(spectrometer_wavelengths)
+            # if a wavelength cannot be interpolated, set it to 0
             interpolated_filter = np.nan_to_num(interpolated_filter)
-            normalize(interpolated_filter.reshape(1, -1), norm='l1', copy=False)
+            # account for cameras quantum efficiency
+            interpolated_filter *= camera_qe_interpolated * white_interpolated
+            # normalize band response
+            #normalize(interpolated_filter.reshape(1, -1), norm='l1', copy=False)
             folded_reflectance = np.dot(spectrometer_msi.get_image(),
                                         interpolated_filter)
             new_reflectances.append(folded_reflectance)
+            plt.plot(interpolated_filter)
         new_reflectances = np.array(new_reflectances).T
         spectrometer_msi.set_image(new_reflectances,
                                    wavelengths=sc.other["RECORDED_WAVELENGTHS"])

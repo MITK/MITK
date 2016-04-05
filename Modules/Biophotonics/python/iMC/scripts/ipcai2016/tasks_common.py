@@ -41,7 +41,9 @@ def get_image_files_from_folder(folder,
     return image_files
 
 
-def plot_image(image, axis, title=None, cmap=None):
+def plot_image(image, axis=None, title=None, cmap=None):
+    if axis is None:
+        axis = plt.gca()
     if cmap is None:
         im = axis.imshow(image, interpolation='nearest', alpha=1.0)
     else:

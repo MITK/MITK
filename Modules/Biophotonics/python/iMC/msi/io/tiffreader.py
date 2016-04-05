@@ -41,6 +41,9 @@ def sort_by_filter(s1, s2):
 
 class TiffReader(Reader):
     """
+    AAATTTEEENTION: Some big bug hiding somewhere here, ordering of files
+    is corrupted, no time now to fix. TODO SW
+
     Assumes bitdepth 16bit on a 12bit camera.
     TODO SW: document and test"""
 

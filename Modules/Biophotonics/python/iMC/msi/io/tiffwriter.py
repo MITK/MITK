@@ -13,12 +13,13 @@ class TiffWriter(Writer):
     The tiff write will store nr_wavelength tiff files for one msi
     """
 
-    def __init__(self, msi_to_write, convert_to_nm=True):
+    def __init__(self, msi_to_write, convert_to_nm=True, scale_to_16_bit=False):
         """
         initialize the write with a specific multi spectral image (class Msi)
         """
         self.msi_to_write = msi_to_write
         self.convert_to_nm = convert_to_nm
+        self.scale_to_16_bit = scale_to_16_bit
 
     def write(self, uri_prefix):
         """
@@ -33,6 +34,12 @@ class TiffWriter(Writer):
              write as string. Thus they can be automatically expanded to nm.
         """
         img_to_write = self.msi_to_write.get_image()
+
+        max_image_value = np.max(img_to_write)
+
+        if self.scale_to_16_bit:
+            img_to_write *= 2**16 / max_image_value
+
         nr_wavelengths = self.msi_to_write.get_wavelengths().size
         for wavelength_index in np.arange(nr_wavelengths):
             full_uri = self._build_full_uri(uri_prefix, wavelength_index)

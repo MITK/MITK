@@ -5,6 +5,7 @@ Created on Oct 26, 2015
 '''
 
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import Normalizer
 
 
@@ -35,7 +36,7 @@ def preprocess2(df, nr_samples=None, snr=None, movement_noise_sigma=None,
         y_temp = y
         for i in range(magnification - 1):
             X = np.vstack((X, X_temp))
-            y = np.vstack((y, y_temp))
+            y = pd.concat([y, y_temp])
 
     # add noise to reflectances
     camera_noise = 0.

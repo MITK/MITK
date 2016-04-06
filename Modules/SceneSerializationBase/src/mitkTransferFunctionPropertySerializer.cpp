@@ -91,6 +91,14 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
 
 bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const char * filename, TransferFunction::Pointer tf )
 {
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale(LC_ALL, nullptr);
+
+  //define own locale
+  std::locale C("C");
+  setlocale(LC_ALL, "C");
+
   TransferFunctionPropertySerializer::Pointer tfps=TransferFunctionPropertySerializer::New();
   tfps->SetProperty( TransferFunctionProperty::New( tf ) );
   TiXmlElement* s=tfps->Serialize();
@@ -98,6 +106,10 @@ bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const 
   if(!s)
   {
     MITK_ERROR << "cant serialize transfer function";
+
+    //switch back to old locale
+    setlocale(LC_ALL, oldLocale);
+
     return false;
   }
 
@@ -110,6 +122,9 @@ bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const 
 
   document.LinkEndChild(version);
   document.LinkEndChild(s);
+
+  //switch back to old locale
+  setlocale(LC_ALL, oldLocale);
 
   if ( !document.SaveFile( filename ) )
   {
@@ -124,12 +139,25 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
   if (!element)
     return nullptr;
 
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale(LC_ALL, nullptr);
+
+  //define own locale
+  std::locale C("C");
+  setlocale(LC_ALL, "C");
+
   TransferFunction::Pointer tf = TransferFunction::New();
 
   // deserialize scalar opacity function
   TiXmlElement* scalarOpacityPointlist = element->FirstChildElement("ScalarOpacity");
   if (scalarOpacityPointlist == nullptr)
+  {
+    //switch back to old locale
+    setlocale(LC_ALL, oldLocale);
+
     return nullptr;
+  }
 
   tf->ClearScalarOpacityPoints();
 
@@ -148,7 +176,12 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
 
     TiXmlElement* gradientOpacityPointlist = element->FirstChildElement("GradientOpacity");
     if (gradientOpacityPointlist == nullptr)
+    {
+      //switch back to old locale
+      setlocale(LC_ALL, oldLocale);
+
       return nullptr;
+    }
 
     tf->ClearGradientOpacityPoints();
 
@@ -165,10 +198,20 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
 
     TiXmlElement* rgbPointlist = element->FirstChildElement("Color");
     if (rgbPointlist == nullptr)
+    {
+      //switch back to old locale
+      setlocale(LC_ALL, oldLocale);
+
       return nullptr;
+    }
     vtkColorTransferFunction* ctf = tf->GetColorTransferFunction();
     if (ctf == nullptr)
+    {
+      //switch back to old locale
+      setlocale(LC_ALL, oldLocale);
+
       return nullptr;
+    }
 
     ctf->RemoveAllPoints();
 
@@ -193,8 +236,14 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
   catch ( boost::bad_lexical_cast& e )
   {
     MITK_ERROR << "Could not parse string as number: " << e.what();
+
+    //switch back to old locale
+    setlocale(LC_ALL, oldLocale);
+
     return nullptr;
   }
+  //switch back to old locale
+  setlocale(LC_ALL, oldLocale);
 
   return TransferFunctionProperty::New(tf).GetPointer();
 }

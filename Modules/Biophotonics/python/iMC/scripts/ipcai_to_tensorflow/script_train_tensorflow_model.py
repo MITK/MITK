@@ -26,16 +26,15 @@ ipcai = input_ipcai_data.read_data_sets(ipcai_dir)
 import tensorflow as tf
 
 # Parameters
-learning_rate = 0.001
-training_epochs = 1000
+learning_rate = 0.0001
+training_epochs = 300
 batch_size = 100
 display_step = 1
 
 # Network Parameters
-n_hidden_1 = 100 # 1st layer num features
-n_hidden_2 = 100 # 2nd layer num features
-n_input = 21 # MNIST data input (img shape: 28*28)
-n_classes = 1 # MNIST total classes (0-9 digits)
+n_hidden = 100 # hidden layers number of elements
+n_input = 21 # number of features (wavelengths)
+n_classes = 1 # number of outputs (one for oxygenation)
 
 # tf Graph input
 
@@ -55,22 +54,27 @@ def bias_variable(shape):
     return tf.Variable(initial)
 
 
+def add_fully_connected_layer(input, n_inputs, n_outputs):
+    w = weight_variable([n_inputs, n_outputs])
+    b = bias_variable([n_outputs])
+    # Hidden layer with RELU activation
+    new_layer = tf.nn.relu(tf.add(tf.matmul(input, w), b))
+    # Add dropout regularization
+    new_layer_with_dropout = tf.nn.dropout(new_layer, keep_prob)
+    return new_layer_with_dropout
+
+
 # Create model
 def multilayer_perceptron(_X):
-    w_l1 = weight_variable([n_input, n_hidden_1])
-    b_l1 = bias_variable([n_hidden_1])
-    layer_1 = tf.nn.relu(tf.add(tf.matmul(_X, w_l1), b_l1)) #Hidden layer with RELU activation
-    layer_1_drop = tf.nn.dropout(layer_1, keep_prob)
 
-    w_l2 = weight_variable([n_hidden_1, n_hidden_2])
-    b_l2 = bias_variable([n_hidden_2])
-    layer_2 = tf.nn.relu(tf.add(tf.matmul(layer_1_drop, w_l2), b_l2)) #Hidden layer with RELU activation
-    layer_2_drop = tf.nn.dropout(layer_2, keep_prob)
+    layer_1 = add_fully_connected_layer(_X, n_input, n_hidden)
+    layer_2 = add_fully_connected_layer(layer_1, n_hidden, n_hidden)
+    last_hidden_layer = add_fully_connected_layer(layer_2, n_hidden, n_hidden)
 
     # linear output layer
-    w_out = weight_variable([n_hidden_2, n_classes])
+    w_out = weight_variable([n_hidden, n_classes])
     b_out = bias_variable([n_classes])
-    return tf.matmul(layer_2_drop, w_out) + b_out
+    return tf.matmul(last_hidden_layer, w_out) + b_out
 
 
 # Construct model

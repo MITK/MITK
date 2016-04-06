@@ -44,28 +44,37 @@ y = tf.placeholder("float", [None, n_classes])
 
 keep_prob = tf.placeholder("float")
 
-# Create model
-def multilayer_perceptron(_X, _weights, _biases):
-    layer_1 = tf.nn.relu(tf.add(tf.matmul(_X, _weights['h1']), _biases['b1'])) #Hidden layer with RELU activation
-    layer_1_drop = tf.nn.dropout(layer_1, keep_prob)
-    layer_2 = tf.nn.relu(tf.add(tf.matmul(layer_1_drop, _weights['h2']), _biases['b2'])) #Hidden layer with RELU activation
-    layer_2_drop = tf.nn.dropout(layer_2, keep_prob)
-    return tf.matmul(layer_2_drop, _weights['out']) + _biases['out']
 
-# Store layers weight & bias
-weights = {
-    'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1])),
-    'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
-    'out': tf.Variable(tf.random_normal([n_hidden_2, n_classes]))
-}
-biases = {
-    'b1': tf.Variable(tf.random_normal([n_hidden_1])),
-    'b2': tf.Variable(tf.random_normal([n_hidden_2])),
-    'out': tf.Variable(tf.random_normal([n_classes]))
-}
+def weight_variable(shape):
+    initial = tf.truncated_normal(shape, stddev=0.1)
+    return tf.Variable(initial)
+
+
+def bias_variable(shape):
+    initial = tf.constant(0.1, shape=shape)
+    return tf.Variable(initial)
+
+
+# Create model
+def multilayer_perceptron(_X):
+    w_l1 = weight_variable([n_input, n_hidden_1])
+    b_l1 = bias_variable([n_hidden_1])
+    layer_1 = tf.nn.relu(tf.add(tf.matmul(_X, w_l1), b_l1)) #Hidden layer with RELU activation
+    layer_1_drop = tf.nn.dropout(layer_1, keep_prob)
+
+    w_l2 = weight_variable([n_hidden_1, n_hidden_2])
+    b_l2 = bias_variable([n_hidden_2])
+    layer_2 = tf.nn.relu(tf.add(tf.matmul(layer_1_drop, w_l2), b_l2)) #Hidden layer with RELU activation
+    layer_2_drop = tf.nn.dropout(layer_2, keep_prob)
+
+    # linear output layer
+    w_out = weight_variable([n_hidden_2, n_classes])
+    b_out = bias_variable([n_classes])
+    return tf.matmul(layer_2_drop, w_out) + b_out
+
 
 # Construct model
-pred = multilayer_perceptron(x, weights, biases)
+pred = multilayer_perceptron(x)
 
 # Define loss and optimizer
 

@@ -16,7 +16,6 @@ set(MITK_CONFIG_PLUGINS
   org.mitk.planarfigure
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.pointsetinteraction
-  org.mitk.gui.qt.registration
   org.mitk.gui.qt.remeshing
   org.mitk.gui.qt.viewnavigator
   org.mitk.gui.qt.imagecropper

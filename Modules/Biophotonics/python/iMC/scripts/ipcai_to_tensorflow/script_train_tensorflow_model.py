@@ -34,7 +34,7 @@ batch_size = 100
 display_step = 1
 
 # Network Parameters
-n_hidden = 50 # hidden layers number of elements
+n_hidden = 100 # hidden layers number of elements
 n_bands = 21 # number of features (wavelengths)
 n_classes = 1 # number of outputs (one for oxygenation)
 
@@ -145,7 +145,7 @@ with tf.Session() as sess:
             # Fit training using batch data
             x_image = np.reshape(batch_xs, [-1, n_bands, 1, 1])
             sess.run(optimizer, feed_dict={x: x_image, y: batch_ys,
-                                           keep_prob: 0.5})
+                                           keep_prob: 0.75})
             # Compute average loss
             avg_cost += sess.run(cost, feed_dict={x: x_image, y: batch_ys,
                                                   keep_prob: 1.0})/total_batch

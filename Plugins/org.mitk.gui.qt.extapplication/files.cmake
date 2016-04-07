@@ -32,6 +32,7 @@ set(CACHED_RESOURCE_FILES
   plugin.xml
   resources/icon_research.xpm
   resources/perspectives/eye.png
+  resources/perspectives/viewer_icon.png
 )
 
 set(QRC_FILES

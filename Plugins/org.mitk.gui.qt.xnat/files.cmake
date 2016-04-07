@@ -28,6 +28,7 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   plugin.xml
+  resources/xnat_treebrowser_icon.png
 )
 
 # list of Qt .qrc files which contain additional resources

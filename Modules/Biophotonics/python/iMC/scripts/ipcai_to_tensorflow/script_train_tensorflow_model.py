@@ -28,19 +28,19 @@ ipcai = input_ipcai_data.read_data_sets(ipcai_dir)
 import tensorflow as tf
 
 # Parameters
-learning_rate = 0.00001
-training_epochs = 2000
+learning_rate = 0.0001
+training_epochs = 300
 batch_size = 100
 display_step = 1
 
 # Network Parameters
-n_hidden = 100 # hidden layers number of elements
+n_hidden = 50 # hidden layers number of elements
 n_bands = 21 # number of features (wavelengths)
 n_classes = 1 # number of outputs (one for oxygenation)
 
 # tf Graph input
 
-x = tf.placeholder("float", [None, n_bands, 1, 1])
+x = tf.placeholder("float", [None, 21, 1, 1])
 y = tf.placeholder("float", [None, n_classes])
 
 keep_prob = tf.placeholder("float")
@@ -65,7 +65,7 @@ def max_pool_2x1(x):
                           strides=[1, 2, 1, 1], padding='SAME')
 
 
-def add_hidden_layer(input, n_inputs, n_outputs, kernel_size, padding='SAME'):
+def add_cnn_layer(input, n_inputs, n_outputs, kernel_size, padding='SAME'):
     #w = weight_variable([n_inputs, n_outputs])
     #b = bias_variable([n_outputs])
     W = weight_variable([kernel_size, 1, n_inputs, n_outputs])
@@ -79,28 +79,49 @@ def add_hidden_layer(input, n_inputs, n_outputs, kernel_size, padding='SAME'):
     return h_pool
 
 
-# Create model
-def multilayer_perceptron(_X):
+def add_fully_connected_layer(_X, n_inputs, n_outputs):
+    W = weight_variable([n_inputs, n_outputs])
+    b = bias_variable([n_outputs])
+    # Hidden layer with RELU activation
+    new_layer = tf.nn.relu(tf.add(tf.matmul(_X, W), b))
+    # Add dropout regularization
+    new_layer_with_dropout = tf.nn.dropout(new_layer, keep_prob)
+    return new_layer_with_dropout
+
+
+# this is my exemplary convolutional network
+def cnn(_X):
     # two convolutional layers
-    layer_1 = add_hidden_layer(_X, 1, 32, 6, padding='VALID')
-    layer_2 = add_hidden_layer(layer_1, 32, 64, 4)
+    layer_1 = add_cnn_layer(_X, 1, 32, 6, padding='VALID')
+    layer_2 = add_cnn_layer(layer_1, 32, 64, 4)
     # flatten last one to be able to apply it to fully connected layer
     final_number_of_dimensions = 4*64
     layer_2_flat = tf.reshape(layer_2, [-1, final_number_of_dimensions])
 
     # fully connected layer to bring information together
-    W_fc1 = weight_variable([final_number_of_dimensions, 100])
-    b_fc1 = bias_variable([100])
-    h_fc1 = tf.nn.relu(tf.matmul(layer_2_flat, W_fc1) + b_fc1)
-    # with dropout regularization
-    h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+    h_fc1_drop = add_fully_connected_layer(layer_2_flat,
+                                           final_number_of_dimensions,
+                                           100)
 
     # return linear output layer
     W_fc2 = weight_variable([100, n_classes])
     b_fc2 = bias_variable([n_classes])
     return tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
-# Construct model
+
+# and this is the simpler multilayer perceptron
+def multilayer_perceptron(_X):
+    flattend_input = tf.reshape(x, [-1, n_bands])
+    layer_1 = add_fully_connected_layer(flattend_input, n_bands, n_hidden)
+    layer_2 = add_fully_connected_layer(layer_1, n_hidden, n_hidden)
+    last_hidden_layer = add_fully_connected_layer(layer_2, n_hidden, n_hidden)
+
+    W_out = weight_variable([n_hidden, n_classes])
+    b_out = bias_variable([n_classes])
+    return tf.matmul(last_hidden_layer, W_out) + b_out
+
+
+# Construct the desired model
 pred = multilayer_perceptron(x)
 
 # Define loss and optimizer

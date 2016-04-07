@@ -71,8 +71,6 @@ mitk::SegTool2D::~SegTool2D()
 {
 }
 
-bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*)
-
 void mitk::SegTool2D::Activated()
 {
   AUTOPLAN_INFO << this->GetName() << ": Activated";
@@ -86,7 +84,6 @@ void mitk::SegTool2D::Deactivated()
 }
 
 bool mitk::SegTool2D::FilterEvents(InteractionEvent* interactionEvent, DataNode*dataNode)
-
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>( interactionEvent );
 

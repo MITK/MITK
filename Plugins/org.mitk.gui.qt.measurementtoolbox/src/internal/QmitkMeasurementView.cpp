@@ -751,36 +751,16 @@ void QmitkMeasurementView::OnDrawLineTriggered(bool)
      QString("Line%1").arg(++d->m_LineCounter));
 }
 
-void QmitkMeasurementView::OnDrawCommentTriggered(bool checked)
+void QmitkMeasurementView::OnDrawCommentTriggered(bool)
 {
-  Q_UNUSED(checked)
-
-  m_commentTextView.show();
-
-  mitk::PlanarComment::Pointer figure = mitk::PlanarComment::New();
-  QString qString = QString("Comment%1").arg(++d->m_CommentCounter);
-  this->AddFigureToDataStorage(figure, qString);
-
-  std::string comment = m_commentTextView.getText().toStdString();
-  figure->setText(comment);
-
-  MEASUREMENT_DEBUG << "PlanarComment initialized...";
-}
-
-void QmitkMeasurementView::OnDrawCommentTriggered(bool checked)
-{
-  Q_UNUSED(checked)
-
   showCommentTextView();
 
   mitk::PlanarComment::Pointer figure = mitk::PlanarComment::New();
   QString qString = QString("Comment%1").arg(++d->m_CommentCounter);
   this->AddFigureToDataStorage(figure, qString);
-
-  MEASUREMENT_DEBUG << "PlanarComment initialized...";
 }
 
-void QmitkMeasurementView::OnDrawPathTriggered(bool checked)
+void QmitkMeasurementView::OnDrawPathTriggered(bool)
 {
 
   auto propertyFilters = mitk::CoreServices::GetPropertyFilters();
@@ -820,25 +800,17 @@ void QmitkMeasurementView::OnDrawFourPointAngleTriggered(bool)
 
 void QmitkMeasurementView::OnDrawCircleTriggered(bool)
 {
-  Q_UNUSED(checked)
-
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
 
   QString qString = QString("Circle%1").arg(++d->m_CircleCounter);
   this->AddFigureToDataStorage(figure, qString);
-
-  MEASUREMENT_DEBUG << "PlanarCircle initialized...";
 }
 
 void QmitkMeasurementView::OnDrawEllipseTriggered(bool)
 {
-  Q_UNUSED(checked)
-
   mitk::PlanarEllipse::Pointer figure = mitk::PlanarEllipse::New();
   QString qString = QString("Ellipse%1").arg(++d->m_EllipseCounter);
   this->AddFigureToDataStorage(figure, qString);
-
-  MEASUREMENT_DEBUG << "PlanarEllipse initialized...";
 }
 
 void QmitkMeasurementView::OnDrawDoubleEllipseTriggered(bool)

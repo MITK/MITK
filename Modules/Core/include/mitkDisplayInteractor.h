@@ -87,8 +87,8 @@ namespace mitk
     virtual bool CheckSwivelPossible( const InteractionEvent* interactionEvent );
 
     bool IsOverObject(const InteractionEvent* interactionEvent);
-    bool SelectObject(StateMachineAction*, InteractionEvent* interactionEvent);
-    bool DeSelectObject(StateMachineAction*, InteractionEvent* interactionEvent);
+    void SelectObject(StateMachineAction*, InteractionEvent* interactionEvent);
+    void DeSelectObject(StateMachineAction*, InteractionEvent* interactionEvent);
 
     /**
      * \brief Initializes an interaction, saves the pointers start position for further reference.
@@ -148,11 +148,11 @@ namespace mitk
      */
     virtual void Rotate(StateMachineAction*, InteractionEvent* event);
     
-    virtual bool RotateBack(StateMachineAction*, InteractionEvent*);
-    virtual bool RotateUp(StateMachineAction*, InteractionEvent*);
-    virtual bool RotateDown(StateMachineAction*, InteractionEvent*);
-    virtual bool RotateClock(StateMachineAction*, InteractionEvent*);
-    virtual bool RotateBackClock(StateMachineAction*, InteractionEvent*);
+    virtual void RotateBack(StateMachineAction*, InteractionEvent*);
+    virtual void RotateUp(StateMachineAction*, InteractionEvent*);
+    virtual void RotateDown(StateMachineAction*, InteractionEvent*);
+    virtual void RotateClock(StateMachineAction*, InteractionEvent*);
+    virtual void RotateBackClock(StateMachineAction*, InteractionEvent*);
 
     virtual void Swivel(StateMachineAction*, InteractionEvent* event);
 

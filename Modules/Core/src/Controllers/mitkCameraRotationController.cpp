@@ -24,8 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
 
-mitk::CameraRotationController::CameraRotationController(const char * type)
-  : BaseController(type), m_LastStepperValue(180), m_ElevateLastStepperValue(90), m_Camera(NULL), m_RenderWindow(NULL)
+
+mitk::CameraRotationController::CameraRotationController()
+  : BaseController(), m_LastStepperValue(180), m_Camera(NULL), m_RenderWindow(NULL)
 {
   m_Slice->SetAutoRepeat(true);
   m_Slice->SetSteps(360);
@@ -36,7 +37,7 @@ mitk::CameraRotationController::CameraRotationController(const char * type)
   m_ElevationSlice->SetSteps(180);
   m_ElevationSlice->SetPos(90);
 
-  itk::SimpleMemberCommand<CameraRotationController>::Pointer sliceStepperChangedCommand;
+  itk::SimpleMemberCommand<CameraRotationController>::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
   sliceStepperChangedCommand = itk::SimpleMemberCommand<CameraRotationController>::New();
   sliceStepperChangedCommand->SetCallbackFunction(this, &CameraRotationController::RotateCamera);
 

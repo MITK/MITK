@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITK_MEASUREMENT_H__INCLUDED
 
 #include <QmitkAbstractView.h>
+#include "QmitkCommentTextView.h"
+
 #include <mitkEventConfig.h>
 #include <mitkILifecycleAwarePart.h>
 #include "usServiceRegistration.h"

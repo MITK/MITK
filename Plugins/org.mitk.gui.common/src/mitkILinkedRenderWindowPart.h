@@ -58,7 +58,7 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
    *        affects the positions in the linked windows. If <code>false</code>, linked navigation
    *        is disabled.
    */
-  virtual void EnableLinkedNavigation(bool enable) = 0;
+  //virtual void EnableLinkedNavigation(bool enable) = 0;
 
   /**
    * Get the enabled status of linked navigation.
@@ -66,7 +66,7 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
    * \return <code>true</code> if linked navigation is enabled; <code>false</code>
    *         otherwise.
    */
-  virtual bool IsLinkedNavigationEnabled() const = 0;
+  //virtual bool IsLinkedNavigationEnabled() const = 0;
 
   virtual void SetWindowPresetBeforeLoading() = 0;
   virtual void SetWindowPresetAfterLoading() = 0;

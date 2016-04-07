@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mbilogo.h>
 
+#include <QHBoxLayout>
+
 class QmitkStdMultiWidgetEditorPrivate
 {
 public:
@@ -556,4 +558,3 @@ void QmitkStdMultiWidgetEditor::RequestActivateMenuWidget(bool on)
     }
   }
 }
-

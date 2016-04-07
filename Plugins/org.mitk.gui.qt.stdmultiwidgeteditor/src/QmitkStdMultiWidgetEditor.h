@@ -95,11 +95,13 @@ public:
   virtual void SetWindowPresetBeforeLoading();
   virtual void SetWindowPresetAfterLoading();
 
+  //void EnableLinkedNavigation(bool enable) override;
+  //bool IsLinkedNavigationEnabled() const override;
+
   // -------------------  mitk::ILinkedRenderWindowPart  ----------------------
 
   void EnableSlicingPlanes(bool enable) override;
   bool IsSlicingPlanesEnabled() const override;
-
 
 protected:
 

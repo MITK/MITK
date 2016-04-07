@@ -49,7 +49,7 @@ public:
     return m_ElevationSlice;
   }
 
-  virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
+  //virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent) override;
 
 protected:
   CameraRotationController();

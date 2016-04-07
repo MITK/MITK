@@ -227,6 +227,11 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
   mitk::PointSet::PointsContainer::Iterator pointsIter;
   int ptIdx;
 
+  bool showEdge = false;
+  this->GetDataNode()->GetBoolProperty("show edge", showEdge);
+
+  itk::Point<float> lastPoint;
+
   m_NumberOfSelectedAdded = 0;
   m_NumberOfUnselectedAdded = 0;
   vtkSmartPointer<vtkPoints> localPoints = vtkSmartPointer<vtkPoints>::New();
@@ -244,6 +249,14 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
       vtkIdType cell[2] = { (ptIdx + 1) % nbPoints, ptIdx };
       m_PointConnections->InsertNextCell(2, cell);
     }
+
+    itk::Point<float> point1 = pointsIter->Value();
+    lastPoint = point1;
+
+    // show eget
+    if (showEdge) {
+      CreateEdgeObjectsBetweenPoints(currentPoint, lastPoint);
+    }
   }
 
   vtkSmartPointer<vtkLinearTransform> vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
@@ -257,8 +270,6 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
 
   //check if the list for the PointDataContainer is the same size as the PointsContainer. Is not, then the points were inserted manually and can not be visualized according to the PointData (selected/unselected)
   bool pointDataBroken = (itkPointSet->GetPointData()->Size() != itkPointSet->GetPoints()->Size());
-
-  itk::Point<float> lastPoint;
   
   //now add an object for each point in data
   mitk::PointSet::PointDataContainer::Iterator pointDataIter = itkPointSet->GetPointData()->Begin();
@@ -275,26 +286,12 @@ void mitk::PointSetVtkMapper3D::CreateVTKRenderObjects()
     else
       pointType = pointDataIter.Value().pointSpec;
 
-    bool showEdge = false;
-    this->GetDataNode()->GetBoolProperty("show edge", showEdge);
-
     switch (pointType)
     {
     case mitk::PTUNDEFINED:
     {
       vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
       sphere->SetRadius(m_PointSize/2.0f);
-      
-      if (j > 0) {
-        itk::Point<float> currentPoint = pointsIter->Value();
-        if (showEdge) {
-          CreateEdgeObjectsBetweenPoints(currentPoint, lastPoint);
-        }
-      }
-      
-      itk::Point<float> point1 = pointsIter->Value();
-      lastPoint = point1;
-      
       sphere->SetCenter(currentPoint);
       //sphere->SetCenter(pointsIter.Value()[0],pointsIter.Value()[1],pointsIter.Value()[2]);
 

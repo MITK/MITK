@@ -60,19 +60,15 @@ if(MITK_USE_CTK)
       ENDIF()
     ENDFOREACH()
 
-    set(CTK_PATCH_COMMAND ${CMAKE_COMMAND} -DTEMPLATE_FILE:FILEPATH=${MITK_SOURCE_DIR}/CMakeExternals/EmptyFileForPatching.dummy -P ${MITK_SOURCE_DIR}/CMakeExternals/PatchCTK.cmake)
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
-      URL_MD5 34b94d196546fa3b2e610a37da1a163d
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
       URL_MD5 2c04925496e6818706ccffa8a71afaae
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
-      PATCH_COMMAND ${CTK_PATCH_COMMAND}
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

@@ -85,7 +85,7 @@ def read_data_sets(dir, fake_data=False):
     df_train = pd.read_csv(os.path.join(dir, TRAIN_IMAGES), header=[0, 1])
     df_test = pd.read_csv(os.path.join(dir, TEST_IMAGES), header=[0, 1])
 
-    train_images, train_labels = preprocess(df_train, snr=10.)
+    train_images, train_labels = preprocess(df_train, snr=10., magnification=10)
     test_images, test_labels = preprocess(df_test, snr=10.)
 
     train_labels = train_labels.values

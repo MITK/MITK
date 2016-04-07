@@ -28,8 +28,8 @@ ipcai = input_ipcai_data.read_data_sets(ipcai_dir)
 import tensorflow as tf
 
 # Parameters
-learning_rate = 0.0001
-training_epochs = 300
+learning_rate = 0.00001
+training_epochs = 2000
 batch_size = 100
 display_step = 1
 
@@ -137,7 +137,7 @@ with tf.Session() as sess:
     # Test model
     accuracy = tf.reduce_mean(tf.cast(tf.abs(pred-y), "float"))
     x_test_image = np.reshape(ipcai.test.images, [-1, n_bands, 1, 1])
-    print "Median testing error:", accuracy.eval({x: ipcai.test.images,
+    print "Median testing error:", accuracy.eval({x: x_test_image,
                                                   y: ipcai.test.labels,
                                                   keep_prob:1.0})
 

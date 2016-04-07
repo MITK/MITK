@@ -31,7 +31,7 @@
       id="org.mitk.mitkworkbench.perspectives.editor"
       name="Viewer"
       class="QmitkEditorPerspective"
-      icon="resources/icon.png">
+      icon="resources/perspectives/viewer_icon.png">
     </perspective>
     <perspective
       id="org.mitk.mitkworkbench.perspectives.visualization"

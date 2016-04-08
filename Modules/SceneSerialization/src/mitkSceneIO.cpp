@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
 #include <mitkStandardFileLocations.h>
+#include <mitkLocaleSwitch.h>
 
 #include <itkObjectFactoryBase.h>
 
@@ -88,6 +89,8 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
                                                     DataStorage* pStorage,
                                                     bool clearStorageFirst )
 {
+  mitk::LocaleSwitch localeSwitch("C");
+
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
   if ( storage.IsNull() )
@@ -193,6 +196,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     MITK_ERROR << "No filename given. Not possible to save scene.";
     return false;
   }
+
+  mitk::LocaleSwitch localeSwitch("C");
 
   try
   {

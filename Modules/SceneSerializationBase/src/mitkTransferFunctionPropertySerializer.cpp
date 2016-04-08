@@ -92,7 +92,7 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
 
 bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const char * filename, TransferFunction::Pointer tf )
 {
-  mitk::LocaleSwitch("C");
+  mitk::LocaleSwitch localeSwitch("C");
 
   TransferFunctionPropertySerializer::Pointer tfps=TransferFunctionPropertySerializer::New();
   tfps->SetProperty( TransferFunctionProperty::New( tf ) );
@@ -128,7 +128,7 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
   if (!element)
     return nullptr;
 
-  mitk::LocaleSwitch("C");
+  mitk::LocaleSwitch localeSwitch("C");
 
   TransferFunction::Pointer tf = TransferFunction::New();
 

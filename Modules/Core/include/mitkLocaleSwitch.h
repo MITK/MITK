@@ -29,7 +29,7 @@ namespace mitk
 
   This helper class can be used to switch to a specific locale
   for a couple of operations. Once the class is destroyed, the previous
-  locale will be restored. This avoid calling or forgetting to call
+  locale will be restored. This avoids calling or forgetting to call
   setlocale() in multiple return locations.
 
   Typically this is used to switch to a "C" locale when parsing or
@@ -40,7 +40,7 @@ namespace mitk
 
   std::string toString(int number)
   {
-    mitk::LocaleSwitch("C"); // installs "C" locale until end of function
+    mitk::LocaleSwitch localeSwitch("C");// installs C locale until the end of the function
 
     std::stringstream parser;
     parser << number;

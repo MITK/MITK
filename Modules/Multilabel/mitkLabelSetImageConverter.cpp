@@ -14,143 +14,150 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkLabelSetImageConverter.h"
-
-// mitk includes
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
+#include <mitkLabelSetImageConverter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 
-// itk includes
-#include "itkImage.h"
-#include "itkVectorImage.h"
 #include <itkComposeImageFilter.h>
+#include <itkExtractImageFilter.h>
+#include <itkImageDuplicator.h>
 #include <itkVectorIndexSelectionCastImageFilter.h>
-#include "itkImageDuplicator.h"
 
-template < typename TPixel, unsigned int VImageDimension >
-void VectorOfMitkImagesToMitkVectorImage(const itk::Image<TPixel, VImageDimension>* /*source*/, mitk::Image::Pointer &output, mitk::LabelSetImage::ConstPointer input)
+template <typename TPixel, unsigned int VDimension>
+static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension>*, mitk::LabelSetImage::ConstPointer labelSetImage, mitk::Image::Pointer& image)
 {
-  typedef itk::ComposeImageFilter< itk::Image<TPixel, VImageDimension> > ComposeFilterType;
+  typedef itk::Image<TPixel, VDimension> ImageType;
+  typedef itk::ComposeImageFilter<ImageType> ComposeFilterType;
+  typedef itk::ImageDuplicator<ImageType> DuplicatorType;
 
-  unsigned int numberOfLayers = input->GetNumberOfLayers();
-  // 2015/07/01 At the time of writing MITK has problems with mitk::Images encapsulating itk::VectorImage
-  // if the vector length is less than 2, which might very well happen for segmentations.
-  if ( numberOfLayers > 1 )
-  { // if we have only one image we do not need to create a vector
-    typename ComposeFilterType::Pointer vectorImageComposer = ComposeFilterType::New();
+  auto numberOfLayers = labelSetImage->GetNumberOfLayers();
 
-    unsigned int activeLayer = input->GetActiveLayer();
-    for (unsigned int layer(0); layer < numberOfLayers; layer++)
+  if (numberOfLayers > 1)
+  {
+    auto vectorImageComposer = ComposeFilterType::New();
+    auto activeLayer = labelSetImage->GetActiveLayer();
+
+    for (decltype(numberOfLayers) layer = 0; layer < numberOfLayers; ++layer)
     {
-      typename itk::Image<TPixel, VImageDimension>::Pointer itkCurrentLayer;
-      // for the active layer use the current state not the saved one in the vector
-      if (layer == activeLayer)
-      {
-        mitk::CastToItkImage(dynamic_cast<const mitk::Image*>(input.GetPointer()), itkCurrentLayer);
-      }
-      else
-      {
-        mitk::CastToItkImage(input->GetLayerImage(layer), itkCurrentLayer);
-      }
+      auto layerImage = mitk::ImageToItkImage<TPixel, VDimension>(layer != activeLayer
+        ? labelSetImage->GetLayerImage(layer)
+        : labelSetImage);
 
-      vectorImageComposer->SetInput(layer, itkCurrentLayer);
+      vectorImageComposer->SetInput(layer, layerImage);
     }
 
-    try
-    {
-      vectorImageComposer->Update();
-    }
-    catch (const itk::ExceptionObject& e)
-    {
-      MITK_ERROR << "Caught exception while updating compose filter: " << e.what();
-    }
-
-    output = mitk::GrabItkImageMemory(vectorImageComposer->GetOutput());
+    vectorImageComposer->Update();
+    image = mitk::GrabItkImageMemory(vectorImageComposer->GetOutput());
   }
   else
   {
-    // we want the clone to be a mitk::Image, not a mitk::LabelSetImage
-    typename itk::Image<TPixel, VImageDimension>::Pointer itkCurrentLayer;
-    mitk::CastToItkImage(dynamic_cast<const mitk::Image*>(input.GetPointer()), itkCurrentLayer);
-    typedef itk::ImageDuplicator< itk::Image<TPixel, VImageDimension> > DuplicatorType;
-    typename DuplicatorType::Pointer duplicator = DuplicatorType::New();
-    duplicator->SetInputImage(itkCurrentLayer);
+    auto layerImage = mitk::ImageToItkImage<TPixel, VDimension>(labelSetImage);
+
+    auto duplicator = DuplicatorType::New();
+    duplicator->SetInputImage(layerImage);
     duplicator->Update();
 
-    output = mitk::GrabItkImageMemory(duplicator->GetOutput());
+    image = mitk::GrabItkImageMemory(duplicator->GetOutput());
+  }
+}
+#include <mitkIOUtil.h>
+mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPointer labelSetImage)
+{
+  Image::Pointer image;
+
+  if (labelSetImage->GetNumberOfLayers() > 1)
+    mitkThrow() << "Multi-layer label set images not yet supported!";
+
+  if (labelSetImage->GetNumberOfLayers() != 0)
+  {
+    if (labelSetImage->GetDimension() == 4)
+    {
+      // Multi-layer label set images not yet supported
+      // AccessByItk_2(labelSetImage3D, ::ConvertLabelSetImageToImage, labelSetImage, image);
+
+      auto layerImage = mitk::ImageToItkImage<unsigned short, 4>(labelSetImage);
+
+      auto duplicator = itk::ImageDuplicator<itk::Image<unsigned short, 4>>::New(); // TODO: Check why a simple clone isn't working!
+      duplicator->SetInputImage(layerImage);
+      duplicator->Update();
+
+      // GrabItkImageMemory doesn't support 4D images!
+      // image = mitk::GrabItkImageMemory(duplicator->GetOutput());
+
+      auto output = duplicator->GetOutput();
+
+      image = Image::New();
+      image->InitializeByItk(output);
+
+      for (unsigned int t = 0; t < labelSetImage->GetTimeSteps(); ++t)
+        image->SetImportVolume(output->GetBufferPointer(), t, 0);
+    }
+    else
+    {
+      // Multi-layer label set images not yet supported
+      // AccessByItk_2(labelSetImage->GetLayerImage(0), ::ConvertLabelSetImageToImage, labelSetImage, image);
+
+      auto layerImage = mitk::ImageToItkImage<unsigned short, 3>(labelSetImage);
+
+      auto duplicator = itk::ImageDuplicator<itk::Image<unsigned short, 3>>::New(); // TODO: Check why a simple clone isn't working!
+      duplicator->SetInputImage(layerImage);
+      duplicator->Update();
+
+      image = mitk::GrabItkImageMemory(duplicator->GetOutput());
+    }
+  }
+
+  return image;
+}
+
+template <typename TPixel, unsigned int VDimensions>
+static void ConvertImageToLabelSetImage(const itk::VectorImage<TPixel, VDimensions>* image, mitk::LabelSetImage::Pointer& labelSetImage)
+{
+  typedef itk::VectorImage<TPixel, VDimensions> VectorImageType;
+  typedef itk::Image<TPixel, VDimensions> ImageType;
+  typedef itk::VectorIndexSelectionCastImageFilter<VectorImageType, ImageType> VectorIndexSelectorType;
+
+  labelSetImage = mitk::LabelSetImage::New();
+
+  auto numberOfLayers = image->GetVectorLength();
+  for (decltype(numberOfLayers) layer = 0; layer < numberOfLayers; ++layer)
+  {
+    auto layerSelector = VectorIndexSelectorType::New();
+    layerSelector->SetInput(image);
+    layerSelector->SetIndex(layer);
+    layerSelector->Update();
+
+    mitk::Image::Pointer layerImage;
+    mitk::CastToMitkImage(layerSelector->GetOutput(), layerImage);
+
+    if (layer == 0)
+    {
+      labelSetImage->InitializeByLabeledImage(layerImage);
+    }
+    else
+    {
+      labelSetImage->AddLayer(layerImage);
+    }
   }
 }
 
-mitk::Image::Pointer mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(const mitk::LabelSetImage::ConstPointer input)
+mitk::LabelSetImage::Pointer mitk::ConvertImageToLabelSetImage(Image::Pointer image)
 {
-  unsigned int numberOfLayers = input->GetNumberOfLayers();
+  LabelSetImage::Pointer labelSetImage;
 
-  if (numberOfLayers == 0)
+  if (image.IsNotNull())
   {
-    mitkThrow() << "Tried to convert LabelSetImage without layers";
+    if (image->GetChannelDescriptor().GetPixelType().GetPixelType() == itk::ImageIOBase::VECTOR)
+    {
+      AccessVectorPixelTypeByItk_n(image, ::ConvertImageToLabelSetImage, (labelSetImage));
+    }
+    else
+    {
+      labelSetImage = mitk::LabelSetImage::New();
+      labelSetImage->InitializeByLabeledImage(image);
+    }
   }
 
-  mitk::Image::Pointer output;
-  AccessByItk_2(input->GetLayerImage(0), VectorOfMitkImagesToMitkVectorImage, output, input);
-
-  return output;
-}
-
-template<typename TPixel, unsigned int VDimensions>
-void MitkImageToMitkLabelSetImage(itk::VectorImage< TPixel, VDimensions> * source, mitk::LabelSetImage::Pointer &output)
-{
-  typedef itk::VectorImage< TPixel, VDimensions > VectorImageType;
-  typedef itk::Image< TPixel, VDimensions > ImageType;
-  typedef itk::VectorIndexSelectionCastImageFilter< VectorImageType, ImageType > VectorIndexSelectorType;
-
-  unsigned int numberOfComponents = source->GetVectorLength();
-
-  if (numberOfComponents < 1)
-  {
-    mitkThrow() << "At least one Component is required.";
-  }
-
-  typename VectorIndexSelectorType::Pointer vectorIndexSelector = VectorIndexSelectorType::New();
-
-  vectorIndexSelector->SetIndex(0);
-  vectorIndexSelector->SetInput(source);
-  vectorIndexSelector->Update();
-
-  mitk::Image::Pointer tempImage;
-  mitk::CastToMitkImage(vectorIndexSelector->GetOutput(), tempImage);
-
-  output = mitk::LabelSetImage::New();
-  output->InitializeByLabeledImage(tempImage);
-
-  for (unsigned int layer = 1; layer < numberOfComponents; ++layer)
-  {
-    typename VectorIndexSelectorType::Pointer vectorIndexSelectorLoop = VectorIndexSelectorType::New();
-    vectorIndexSelectorLoop->SetIndex(layer);
-    vectorIndexSelector->SetInput(source);
-    vectorIndexSelector->Update();
-
-    mitk::Image::Pointer loopImage;
-    mitk::CastToMitkImage(vectorIndexSelector->GetOutput(), loopImage);
-
-    output->AddLayer(loopImage);
-  }
-
-}
-
-mitk::LabelSetImage::Pointer mitk::LabelSetImageConverter::ConvertImageToLabelSetImage(const mitk::Image::Pointer input)
-{
-  mitk::LabelSetImage::Pointer output;
-
-  if (input->GetChannelDescriptor().GetPixelType().GetPixelType() == itk::ImageIOBase::VECTOR)
-  {
-    AccessVectorPixelTypeByItk_n(input, MitkImageToMitkLabelSetImage, (output));
-  }
-  else
-  {
-    output = mitk::LabelSetImage::New();
-    output->InitializeByLabeledImage( input );
-  }
-
-  return output;
+  return labelSetImage;
 }

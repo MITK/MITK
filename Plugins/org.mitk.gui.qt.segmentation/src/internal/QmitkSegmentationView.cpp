@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegmentationObjectFactory.h"
 #include "mitkPluginActivator.h"
 #include "mitkCameraController.h"
+#include "mitkLabelSetImage.h"
 
 #include "usModuleResource.h"
 #include "usModuleResourceStream.h"
@@ -68,6 +69,9 @@ QmitkSegmentationView::QmitkSegmentationView()
 
    m_IsNotABinaryImagePredicate = mitk::NodePredicateAnd::New( m_IsOfTypeImagePredicate, m_IsNotBinaryPredicate );
    m_IsABinaryImagePredicate = mitk::NodePredicateAnd::New( m_IsOfTypeImagePredicate, m_IsBinaryPredicate);
+
+   m_IsASegmentationImagePredicate = mitk::NodePredicateOr::New(m_IsABinaryImagePredicate, mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
+   m_IsAPatientImagePredicate = mitk::NodePredicateAnd::New(m_IsNotABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New()));
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -115,7 +119,7 @@ void QmitkSegmentationView::Activated()
 
       mitk::DataStorage::SetOfObjects::ConstPointer segmentations = this->GetDefaultDataStorage()->GetSubset( m_IsABinaryImagePredicate );
 
-      mitk::DataStorage::SetOfObjects::ConstPointer image = this->GetDefaultDataStorage()->GetSubset( m_IsNotABinaryImagePredicate );
+      mitk::DataStorage::SetOfObjects::ConstPointer image = this->GetDefaultDataStorage()->GetSubset(m_IsAPatientImagePredicate);
       if (!image->empty()) {
          OnSelectionChanged(*image->begin());
       }
@@ -594,7 +598,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
       mitk::DataNode* segNode = m_Controls->segImageSelector->GetSelectedNode();
       if (segNode)
       {
-         mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources( segNode, m_IsNotABinaryImagePredicate );
+        mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources(segNode, m_IsAPatientImagePredicate);
          bool isSourceNode(false);
 
          for (mitk::DataStorage::SetOfObjects::ConstIterator it = possibleParents->Begin(); it != possibleParents->End(); it++)
@@ -657,7 +661,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
    }
    else
    {
-      mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources( node, m_IsNotABinaryImagePredicate );
+     mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources(node, m_IsAPatientImagePredicate);
 
       if ( possibleParents->Size() == 1 )
       {
@@ -764,7 +768,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
             if (isASegmentation)
             {
                //If a segmentation is selected find a possible reference image:
-               mitk::DataStorage::SetOfObjects::ConstPointer sources = this->GetDataStorage()->GetSources(selectedNode, m_IsNotABinaryImagePredicate);
+              mitk::DataStorage::SetOfObjects::ConstPointer sources = this->GetDataStorage()->GetSources(selectedNode, m_IsAPatientImagePredicate);
                mitk::DataNode::Pointer refNode;
                if (sources->Size() != 0)
                {
@@ -774,7 +778,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
                   selectedNode->SetVisibility(true);
                   SetToolManagerSelection(refNode,selectedNode);
 
-                  mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
+                  mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
                   for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
                   {
                      mitk::DataNode* node = *iter;
@@ -782,7 +786,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
                         node->SetVisibility(false);
                   }
 
-                  mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
+                  mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = this->GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
                   for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherPatientImages->begin(); iter != otherPatientImages->end(); ++iter)
                   {
                      mitk::DataNode* node = *iter;
@@ -792,7 +796,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
                }
                else
                {
-                  mitk::DataStorage::SetOfObjects::ConstPointer possiblePatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
+                 mitk::DataStorage::SetOfObjects::ConstPointer possiblePatientImages = this->GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
 
                   for (mitk::DataStorage::SetOfObjects::ConstIterator it = possiblePatientImages->Begin(); it != possiblePatientImages->End(); it++)
                   {
@@ -803,7 +807,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
                         refNode->SetVisibility(true);
                         selectedNode->SetVisibility(true);
 
-                        mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsABinaryImagePredicate);
+                        mitk::DataStorage::SetOfObjects::ConstPointer otherSegmentations = this->GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
                         for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherSegmentations->begin(); iter != otherSegmentations->end(); ++iter)
                         {
                            mitk::DataNode* node = *iter;
@@ -811,7 +815,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
                               node->SetVisibility(false);
                         }
 
-                        mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = this->GetDataStorage()->GetSubset(m_IsNotABinaryImagePredicate);
+                        mitk::DataStorage::SetOfObjects::ConstPointer otherPatientImages = this->GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
                         for(mitk::DataStorage::SetOfObjects::const_iterator iter = otherPatientImages->begin(); iter != otherPatientImages->end(); ++iter)
                         {
                            mitk::DataNode* node = *iter;
@@ -1012,7 +1016,7 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
    if (referenceData.IsNotNull())
    {
       // iterate all images
-      mitk::DataStorage::SetOfObjects::ConstPointer allImages = this->GetDefaultDataStorage()->GetSubset( m_IsABinaryImagePredicate );
+     mitk::DataStorage::SetOfObjects::ConstPointer allImages = this->GetDefaultDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
 
       for ( mitk::DataStorage::SetOfObjects::const_iterator iter = allImages->begin(); iter != allImages->end(); ++iter)
 
@@ -1126,7 +1130,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->setupUi(parent);
 
    m_Controls->patImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-   m_Controls->patImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsNotABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
+   m_Controls->patImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsAPatientImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
 
    this->UpdateWarningLabel("Please load an image");
 
@@ -1134,7 +1138,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
       this->UpdateWarningLabel("Select or create a new segmentation");
 
    m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
-   m_Controls->segImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsABinaryImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
+   m_Controls->segImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsASegmentationImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
    if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
       this->UpdateWarningLabel("");
 

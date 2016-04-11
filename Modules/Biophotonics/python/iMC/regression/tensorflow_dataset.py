@@ -68,36 +68,16 @@ class DataSet(object):
         return self._images[start:end], self._labels[start:end]
 
 
-def read_data_sets(dir, fake_data=False):
+def read_data_set(dataframe_filename, fake_data=False):
 
-    class DataSets(object):
-        pass
-    data_sets = DataSets()
     if fake_data:
-        data_sets.train = DataSet([], [], fake_data=True)
-        data_sets.validation = DataSet([], [], fake_data=True)
-        data_sets.test = DataSet([], [], fake_data=True)
-        return data_sets
+        data_set = DataSet([], [], fake_data=True)
+        return data_set
 
-    TRAIN_IMAGES = "ipcai_revision_colon_mean_scattering_train_all_spectrocam.txt"
-    TEST_IMAGES = "ipcai_revision_colon_mean_scattering_test_all_spectrocam.txt"
+    df_data_set = pd.read_csv(os.path.join(dir, dataframe_filename),
+                              header=[0, 1])
 
-    df_train = pd.read_csv(os.path.join(dir, TRAIN_IMAGES), header=[0, 1])
-    df_test = pd.read_csv(os.path.join(dir, TEST_IMAGES), header=[0, 1])
-
-    train_images, train_labels = preprocess(df_train, snr=10.)
-    test_images, test_labels = preprocess(df_test, snr=10.)
-
-    train_labels = train_labels.values
-    test_labels = test_labels.values
-
-    VALIDATION_SIZE = 1
-
-    validation_images = train_images[:VALIDATION_SIZE]
-    validation_labels = train_labels[:VALIDATION_SIZE]
-    train_images = train_images[VALIDATION_SIZE:]
-    train_labels = train_labels[VALIDATION_SIZE:]
-    data_sets.train = DataSet(train_images, train_labels)
-    data_sets.validation = DataSet(validation_images, validation_labels)
-    data_sets.test = DataSet(test_images, test_labels)
-    return data_sets
+    data_set_images, data_set_labels = preprocess(df_data_set, snr=10.)
+    data_set_labels = data_set_labels.values
+    data_set = DataSet(data_set_images, data_set_labels)
+    return data_set

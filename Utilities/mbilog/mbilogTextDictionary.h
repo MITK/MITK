@@ -201,10 +201,15 @@ namespace mbilog {
 
         "switcher",           "swh",
 
+        "planarfigure",       "pfig",
         "planning",           "plan",
         "planner",            "plan",
         "plane",              "pln",
         "plan",               "plan",
+
+        "label",              "lbl",
+
+        "geometry",           "geom",
 
         "workbench",          "wrkbnc",
         "common",             "com",

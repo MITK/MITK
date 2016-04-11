@@ -59,11 +59,11 @@ void LabelSetImageIO::Write()
 {
   ValidateOutputLocation();
 
-  const LabelSetImage* input = static_cast<const LabelSetImage*>(this->GetInput());
+  auto input = dynamic_cast<const LabelSetImage*>(this->GetInput());
 
   mitk::LocaleSwitch localeSwitch("C");
 
-  mitk::Image::Pointer inputVector = mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(input);
+  mitk::Image::Pointer inputVector = mitk::ConvertLabelSetImageToImage(input);
 
   // image write
   if ( inputVector.IsNull() )
@@ -369,7 +369,7 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
 
   // end regular image loading
 
-  LabelSetImage::Pointer output = LabelSetImageConverter::ConvertImageToLabelSetImage(image);
+  LabelSetImage::Pointer output = ConvertImageToLabelSetImage(image);
 
   // get labels and add them as properties to the image
   char keybuffer[256];

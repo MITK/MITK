@@ -43,4 +43,3 @@ def interpolate_wavelengths(df, new_wavelengths):
     # to the new information. This seems hacky, can't it be done easier?
     switch_reflectances(df, new_wavelengths, new_reflectances)
     return df
-

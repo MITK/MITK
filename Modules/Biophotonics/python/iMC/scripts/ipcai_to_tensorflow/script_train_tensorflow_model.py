@@ -19,10 +19,13 @@ sc = commons.ScriptCommons()
 sc.set_root("/media/wirkert/data/Data/2016_02_02_IPCAI/")
 sc.create_folders()
 
-ipcai_dir = os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"))
+ipcai_dir = sc.get_full_dir("INTERMEDIATES_FOLDER")
 
 sc.add_dir("SMALL_BOWEL_DATA",
            os.path.join(sc.get_dir("DATA_FOLDER"), "small_bowel_images"))
+
+sc.add_dir("TENSORFLOW_DATA",
+           os.path.join(sc.get_dir("INTERMEDIATES_FOLDER"), "TensorflowModels"))
 
 sc.add_dir("SMALL_BOWEL_RESULT", os.path.join(sc.get_dir("RESULTS_FOLDER"),
                                               "small_bowel_tensorflow"))
@@ -31,9 +34,6 @@ sc.add_dir("FILTER_TRANSMISSIONS",
            os.path.join(sc.get_dir("DATA_FOLDER"),
                         "filter_transmissions"))
 
-
-import input_ipcai_data
-ipcai = input_ipcai_data.read_data_sets(ipcai_dir)
 
 
 def plot_image(image, axis):
@@ -44,9 +44,11 @@ def plot_image(image, axis):
 class TensorFlowCreateOxyImageTask(luigi.Task):
     image_name = luigi.Parameter()
     df_prefix = luigi.Parameter()
+    df_test_prefix = luigi.Parameter()
 
     def requires(self):
-        return TensorflowTrainRegressor(df_prefix=self.df_prefix), \
+        return TensorflowTrainRegressor(df_prefix=self.df_prefix,
+                                        df_test_prefix=self.df_test_prefix), \
                Flatfield(flatfield_folder=sc.get_full_dir("FLAT_FOLDER")), \
                SingleMultispectralImage(image=self.image_name), \
                Dark(dark_folder=sc.get_full_dir("DARK_FOLDER"))
@@ -102,7 +104,7 @@ class TensorFlowCreateOxyImageTask(luigi.Task):
         norm.standard_normalizer.normalize(msi, "l2")
         print "2"
         # estimate
-        path = "/media/wirkert/data/Data/2016_02_02_IPCAI/results/intermediate/TensorFlowModels"
+        path = sc.get_full_dir("TENSORFLOW_DATA")
         sitk_image, time = estimate_image_tensorflow(msi, path)
         image = sitk.GetArrayFromImage(sitk_image)
 
@@ -158,18 +160,20 @@ class TensorFlowCreateOxyImageTask(luigi.Task):
 
 class TensorflowTrainRegressor(luigi.Task):
     df_prefix = luigi.Parameter()
+    df_test_prefix = luigi.Parameter()
 
     def output(self):
-        return luigi.LocalTarget(os.path.join(sc.get_full_dir("INTERMEDIATES_FOLDER"),
-                                              "TensorFlowModels",
+        return luigi.LocalTarget(os.path.join(sc.get_full_dir("TENSORFLOW_DATA"),
                                               "model.ckpt"))
 
     def requires(self):
-        return tasks_mc.SpectroCamBatch(self.df_prefix)
+        return tasks_mc.SpectroCamBatch(self.df_prefix), \
+            tasks_mc.SpectroCamBatch(self.df_test_prefix)
 
     def run(self):
         # extract data from the batch
-        tensorflow_dataset = read_data_set(self.input().path)
+        tensorflow_dataset = read_data_set(self.input()[0].path)
+        test_dataset = read_data_set(self.input()[1].path)
 
         # train regressor
         # Construct the desired model
@@ -181,8 +185,6 @@ class TensorflowTrainRegressor(luigi.Task):
         keep_prob = tf.placeholder("float")
         pred, regularizers = multilayer_perceptron(x, nr_filters, 100, 1,
                                                    keep_prob)
-
-
         # define parameters
         learning_rate = 0.0001
         training_epochs = 300
@@ -207,7 +209,7 @@ class TensorflowTrainRegressor(luigi.Task):
             # Training cycle
             for epoch in range(training_epochs):
                 avg_cost = 0.
-                total_batch = int(ipcai.train.num_examples/batch_size)
+                total_batch = int(tensorflow_dataset.num_examples/batch_size)
                 # Loop over all batches
                 for i in range(total_batch):
                     batch_xs, batch_ys = tensorflow_dataset.next_batch(batch_size)
@@ -221,6 +223,13 @@ class TensorflowTrainRegressor(luigi.Task):
                 # Display logs per epoch step
                 if epoch % display_step == 0:
                     print "Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(avg_cost)
+
+            # Test model
+            accuracy = tf.reduce_mean(tf.cast(tf.abs(pred-y), "float"))
+            x_test_image = np.reshape(test_dataset.images, [-1, nr_filters, 1, 1])
+            print "Mean testing error:", accuracy.eval({x: x_test_image,
+                                                          y: test_dataset.labels,
+                                                          keep_prob:1.0})
 
             print "Optimization Finished!"
             saver.save(sess, self.output().path)
@@ -253,7 +262,8 @@ if __name__ == '__main__':
 
     for f in files:
         main_task = TensorFlowCreateOxyImageTask(image_name=f,
-                df_prefix="ipcai_revision_colon_mean_scattering_train")
+                df_prefix="ipcai_revision_colon_mean_scattering_train",
+                df_test_prefix="ipcai_revision_colon_mean_scattering_test")
         w.add(main_task)
     w.run()
 

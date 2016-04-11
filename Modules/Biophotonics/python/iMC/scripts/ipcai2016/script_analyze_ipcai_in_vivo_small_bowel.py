@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
     for f in files:
         main_task = IPCAICreateOxyImageTask(image_name=f,
-                df_prefix="ipcai_revision_colon_mean_scattering_train")
+                df_prefix="ipcai_revision_colon_mean_scattering_te")
         w.add(main_task)
     w.run()
 

@@ -90,8 +90,10 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPoint
       image = Image::New();
       image->InitializeByItk(output);
 
+      const auto numberOfVoxels = labelSetImage->GetDimension(0) * labelSetImage->GetDimension(1) * labelSetImage->GetDimension(2);
+
       for (unsigned int t = 0; t < labelSetImage->GetTimeSteps(); ++t)
-        image->SetImportVolume(output->GetBufferPointer(), t, 0);
+        image->SetImportVolume(output->GetBufferPointer() + t * numberOfVoxels, t, 0);
     }
     else
     {

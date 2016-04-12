@@ -394,6 +394,8 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
    {
       const mitk::DataNode* node = it->Value();
       node->GetBoolProperty("binary", isBinary);
+      mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+      isBinary = isBinary || labelSetImage.IsNotNull();
 
       if(isBinary)
       {
@@ -412,6 +414,8 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
    {
       const mitk::DataNode* node = it->Value();
       node->GetBoolProperty("binary", isBinary);
+      mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+      isBinary = isBinary || labelSetImage.IsNotNull();
 
       if(!isBinary)
       {
@@ -429,6 +433,8 @@ void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
    bool isBinary (false);
    bool isHelperObject (false);
    node->GetBoolProperty("binary", isBinary);
+   mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+   isBinary = isBinary || labelSetImage.IsNotNull();
    node->GetBoolProperty("helper object", isHelperObject);
    if (m_AutoSelectionEnabled)
    {
@@ -458,6 +464,8 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
    bool isHelperObject(false);
    node->GetBoolProperty("helper object", isHelperObject);
    node->GetBoolProperty("binary", isSeg);
+   mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+   isSeg = isSeg || labelSetImage.IsNotNull();
 
    mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
    if(isSeg && !isHelperObject && image)
@@ -764,6 +772,8 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
          {
             bool isASegmentation(false);
             selectedNode->GetBoolProperty("binary", isASegmentation);
+            mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(selectedNode->GetData());
+            isASegmentation = isASegmentation || labelSetImage.IsNotNull();
 
             if (isASegmentation)
             {

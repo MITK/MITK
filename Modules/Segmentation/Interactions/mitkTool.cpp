@@ -277,7 +277,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const 
 
   // visualization properties
   segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
-//  segmentationNode->SetProperty( "color", ColorProperty::New(color) );
+  segmentationNode->SetProperty( "color", ColorProperty::New(color) );
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
   lut->SetType(mitk::LookupTable::MULTILABEL);
   mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();

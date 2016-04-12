@@ -1,0 +1,51 @@
+<config>
+  <event_variant name="MovePointer" class="MouseMoveEvent" >
+  </event_variant>
+  <event_variant name="MovePointer" class="MouseMoveEvent" >
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="InitTranslation" class="MousePressEvent">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="ObjectTranslation" class="MouseMoveEvent">
+      <attribute name="ButtonState" value="LeftMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="EndTranslation" class="MouseReleaseEvent">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+
+  <event_variant name="ScaleRadius" class="MouseWheelEvent">
+        <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+
+  <event_variant name="InitRotation" class="MousePressEvent">
+      <attribute name="EventButton" value="MiddleMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="ObjectRotation" class="MouseMoveEvent" >
+      <attribute name="ButtonState" value="MiddleMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="EndRotation" class="MouseReleaseEvent">
+      <attribute name="EventButton" value="MiddleMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+
+  <event_variant name="InitDeformation" class="MousePressEvent">
+      <attribute name="EventButton" value="RightMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="ObjectDeformation" class="MouseMoveEvent" >
+      <attribute name="ButtonState" value="RightMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant name="EndDeformation" class="MouseReleaseEvent">
+      <attribute name="EventButton" value="RightMouseButton"/>
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+
+
+</config>

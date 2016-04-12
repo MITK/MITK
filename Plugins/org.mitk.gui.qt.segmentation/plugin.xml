@@ -47,6 +47,9 @@
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Autocrop" icon="" class="QmitkAutocropAction" />
   </extension>
 
   <extension point="org.blueberry.ui.keywords">

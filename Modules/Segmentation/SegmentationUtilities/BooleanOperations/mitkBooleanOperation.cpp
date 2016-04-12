@@ -22,15 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkNotImageFilter.h>
 #include <itkOrImageFilter.h>
 
-typedef itk::Image< mitk::Label::PixelType, 3> ImageType;
+typedef itk::Image<mitk::Label::PixelType, 3> ImageType;
 
 static mitk::Image::Pointer Get3DSegmentation(mitk::Image::Pointer segmentation, unsigned int time)
 {
   if (segmentation->GetDimension() != 4)
     return segmentation;
 
-  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-
+  auto imageTimeSelector = mitk::ImageTimeSelector::New();
   imageTimeSelector->SetInput(segmentation);
   imageTimeSelector->SetTimeNr(static_cast<int>(time));
 
@@ -46,10 +45,10 @@ static ImageType::Pointer CastTo3DItkImage(mitk::Image::Pointer segmentation, un
   return result;
 }
 
-mitk::BooleanOperation::BooleanOperation(Type type, mitk::Image::Pointer segmentation0, mitk::Image::Pointer segmentation1, unsigned int time)
+mitk::BooleanOperation::BooleanOperation(Type type, mitk::Image::Pointer segmentationA, mitk::Image::Pointer segmentationB, unsigned int time)
   : m_Type(type),
-    m_Segmentation0(segmentation0),
-    m_Segmentation1(segmentation1),
+    m_SegmentationA(segmentationA),
+    m_SegmentationB(segmentationB),
     m_Time(time)
 {
   this->ValidateSegmentations();
@@ -61,90 +60,88 @@ mitk::BooleanOperation::~BooleanOperation()
 
 mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetResult() const
 {
-  mitk::LabelSetImage::Pointer result;
-
   switch (m_Type)
   {
     case Difference:
-      result = this->GetDifference();
-      break;
+      return this->GetDifference();
 
     case Intersection:
-      result = this->GetIntersection();
-      break;
+      return this->GetIntersection();
 
     case Union:
-      result = this->GetUnion();
-      break;
+      return this->GetUnion();
 
     default:
       mitkThrow() << "Unknown boolean operation type '" << m_Type << "'!";
   }
-
-  return result;
 }
 
 mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetDifference() const
 {
-  ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
-  ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
+  auto input1 = CastTo3DItkImage(m_SegmentationA, m_Time);
+  auto input2 = CastTo3DItkImage(m_SegmentationB, m_Time);
 
-  itk::NotImageFilter<ImageType, ImageType>::Pointer notFilter = itk::NotImageFilter<ImageType, ImageType>::New();
+  auto notFilter = itk::NotImageFilter<ImageType, ImageType>::New();
   notFilter->SetInput(input2);
 
-  itk::AndImageFilter<ImageType, ImageType>::Pointer andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
+  auto andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
   andFilter->SetInput1(input1);
   andFilter->SetInput2(notFilter->GetOutput());
 
   andFilter->UpdateLargestPossibleRegion();
 
-  Image::Pointer tempResult = Image::New();
+  auto tempResult = Image::New();
   CastToMitkImage<ImageType>(andFilter->GetOutput(), tempResult);
 
   tempResult->DisconnectPipeline();
 
-  mitk::LabelSetImage::Pointer result = mitk::LabelSetImage::New();
-  result->InitializeByLabeledImage(tempResult );
+  auto result = mitk::LabelSetImage::New();
+  result->InitializeByLabeledImage(tempResult);
+
   return result;
 }
 
 mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetIntersection() const
 {
-  ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
-  ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
+  auto input1 = CastTo3DItkImage(m_SegmentationA, m_Time);
+  auto input2 = CastTo3DItkImage(m_SegmentationB, m_Time);
 
-  itk::AndImageFilter<ImageType, ImageType>::Pointer andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
+  auto andFilter = itk::AndImageFilter<ImageType, ImageType>::New();
   andFilter->SetInput1(input1);
   andFilter->SetInput2(input2);
 
   andFilter->UpdateLargestPossibleRegion();
 
-  Image::Pointer tempResult = Image::New();
+  auto tempResult = Image::New();
   CastToMitkImage<ImageType>(andFilter->GetOutput(), tempResult);
 
   tempResult->DisconnectPipeline();
-  mitk::LabelSetImage::Pointer result = mitk::LabelSetImage::New();
+
+  auto result = mitk::LabelSetImage::New();
   result->InitializeByLabeledImage(tempResult);
+
   return result;
 }
 
 mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetUnion() const
 {
-  ImageType::Pointer input1 = CastTo3DItkImage(m_Segmentation0, m_Time);
-  ImageType::Pointer input2 = CastTo3DItkImage(m_Segmentation1, m_Time);
+  auto input1 = CastTo3DItkImage(m_SegmentationA, m_Time);
+  auto input2 = CastTo3DItkImage(m_SegmentationB, m_Time);
 
-  itk::OrImageFilter<ImageType, ImageType>::Pointer orFilter = itk::OrImageFilter<ImageType, ImageType>::New();
+  auto orFilter = itk::OrImageFilter<ImageType, ImageType>::New();
   orFilter->SetInput1(input1);
   orFilter->SetInput2(input2);
 
   orFilter->UpdateLargestPossibleRegion();
 
-  Image::Pointer tempResult = Image::New();
+  auto tempResult = Image::New();
   CastToMitkImage<ImageType>(orFilter->GetOutput(), tempResult);
 
   tempResult->DisconnectPipeline();
-  mitk::LabelSetImage::Pointer result = mitk::LabelSetImage::New();
+
+  auto result = mitk::LabelSetImage::New();
   result->InitializeByLabeledImage(tempResult);
+
   return result;
 }
 
@@ -156,14 +153,12 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentat
   if (segmentation->GetImageDescriptor()->GetNumberOfChannels() != 1)
     mitkThrow() << "Segmentation has more than one channel!";
 
-  mitk::PixelType pixelType = segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType();
+  auto pixelType = segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType();
 
-  if (pixelType.GetPixelType() != itk::ImageIOBase::SCALAR || ( pixelType.GetComponentType() != itk::ImageIOBase::UCHAR && pixelType.GetComponentType() != itk::ImageIOBase::USHORT ) )
-  {
-    mitkThrow() << "Segmentation is not of a supported type. Supported are scalar images of type 'unsigned char' or 'unsigned short'.";
-  }
+  if (pixelType.GetPixelType() != itk::ImageIOBase::SCALAR || (pixelType.GetComponentType() != itk::ImageIOBase::UCHAR && pixelType.GetComponentType() != itk::ImageIOBase::USHORT))
+    mitkThrow() << "Segmentation is neither of type 'unsigned char' nor type 'unsigned short'!";
 
-  unsigned int dimension = segmentation->GetDimension();
+  auto dimension = segmentation->GetDimension();
 
   if (dimension > 4)
     mitkThrow() << "Segmentation has more than four dimensions!";
@@ -174,7 +169,7 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentat
       mitkThrow() << "Expected four-dimensional segmentation!";
 
     if (segmentation->GetDimension(3) < m_Time)
-      mitkThrow() << "Extend of fourth dimension of segmentation is less than specified time!";
+      mitkThrow() << "Extent of fourth dimension of segmentation is less than specified time!";
   }
   else if (dimension < 3)
   {
@@ -184,9 +179,9 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentat
 
 void mitk::BooleanOperation::ValidateSegmentations() const
 {
-  this->ValidateSegmentation(m_Segmentation0);
-  this->ValidateSegmentation(m_Segmentation1);
+  this->ValidateSegmentation(m_SegmentationA);
+  this->ValidateSegmentation(m_SegmentationB);
 
-  if (m_Segmentation0->GetDimension() != m_Segmentation1->GetDimension())
+  if (m_SegmentationA->GetDimension() != m_SegmentationB->GetDimension())
     mitkThrow() << "Segmentations have different dimensions!";
 }

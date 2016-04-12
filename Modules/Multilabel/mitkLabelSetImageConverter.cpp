@@ -61,7 +61,7 @@ static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension>*, m
     image = mitk::GrabItkImageMemory(duplicator->GetOutput());
   }
 }
-#include <mitkIOUtil.h>
+
 mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPointer labelSetImage)
 {
   Image::Pointer image;

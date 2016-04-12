@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static const char* const HelpText = "Select two different segmentations above";
 
-std::string GetPrefix(mitk::BooleanOperation::Type type)
+static std::string GetPrefix(mitk::BooleanOperation::Type type)
 {
   switch (type)
   {
@@ -42,11 +42,10 @@ std::string GetPrefix(mitk::BooleanOperation::Type type)
   }
 }
 
-void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent = nullptr)
+static void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent = nullptr)
 {
-  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+  auto dataNode = mitk::DataNode::New();
 
-  dataNode->SetBoolProperty("binary", true);
   dataNode->SetName(name);
   dataNode->SetData(segmentation);
 
@@ -58,8 +57,8 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::SliceNavigation
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox("<img width=16 height=16 src=\":/SegmentationUtilities/BooleanLabelA_32x32.png\"/>",QmitkDataSelectionWidget::SegmentationPredicate);
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox("<img width=16 height=16 src=\":/SegmentationUtilities/BooleanLabelB_32x32.png\"/>",QmitkDataSelectionWidget::SegmentationPredicate);
+  m_Controls.dataSelectionWidget->AddDataStorageComboBox("<img width=16 height=16 src=\":/SegmentationUtilities/BooleanLabelA_32x32.png\"/>", QmitkDataSelectionWidget::SegmentationPredicate);
+  m_Controls.dataSelectionWidget->AddDataStorageComboBox("<img width=16 height=16 src=\":/SegmentationUtilities/BooleanLabelB_32x32.png\"/>", QmitkDataSelectionWidget::SegmentationPredicate);
 
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
@@ -75,12 +74,12 @@ QmitkBooleanOperationsWidget::~QmitkBooleanOperationsWidget()
 
 void QmitkBooleanOperationsWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  auto dataSelectionWidget = m_Controls.dataSelectionWidget;
 
-  mitk::DataNode::Pointer node0 = dataSelectionWidget->GetSelection(0);
-  mitk::DataNode::Pointer node1 = dataSelectionWidget->GetSelection(1);
+  auto nodeA = dataSelectionWidget->GetSelection(0);
+  auto nodeB = dataSelectionWidget->GetSelection(1);
 
-  if (node0.IsNotNull() && node1.IsNotNull() && node0 != node1)
+  if (nodeA.IsNotNull() && nodeB.IsNotNull() && nodeA != nodeB)
   {
     dataSelectionWidget->SetHelpText("");
     this->EnableButtons();
@@ -116,21 +115,21 @@ void QmitkBooleanOperationsWidget::OnUnionButtonClicked()
 
 void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Type type)
 {
-  mitk::SliceNavigationController* timeNavigationController = this->GetTimeNavigationController();
+  auto timeNavigationController = this->GetTimeNavigationController();
   assert(timeNavigationController != nullptr);
 
-  mitk::Image::Pointer segmentation0 = static_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(0)->GetData());
-  mitk::Image::Pointer segmentation1 = static_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(1)->GetData());
+  mitk::Image::Pointer segmentationA = dynamic_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(0)->GetData());
+  mitk::Image::Pointer segmentationB = dynamic_cast<mitk::Image*>(m_Controls.dataSelectionWidget->GetSelection(1)->GetData());
   mitk::Image::Pointer result;
 
   try
   {
-    mitk::BooleanOperation booleanOperation(type, segmentation0, segmentation1, timeNavigationController->GetTime()->GetPos());
+    mitk::BooleanOperation booleanOperation(type, segmentationA, segmentationB, timeNavigationController->GetTime()->GetPos());
     result = booleanOperation.GetResult();
 
     assert(result.IsNotNull());
 
-    QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+    auto dataSelectionWidget = m_Controls.dataSelectionWidget;
 
     AddToDataStorage(
       dataSelectionWidget->GetDataStorage(),
@@ -138,7 +137,7 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
       GetPrefix(type) + dataSelectionWidget->GetSelection(1)->GetName(),
       dataSelectionWidget->GetSelection(0));
   }
-  catch (const mitk::Exception &exception)
+  catch (const mitk::Exception& exception)
   {
     MITK_ERROR << "Boolean operation failed: " << exception.GetDescription();
     QMessageBox::information(nullptr, "Boolean operation failed", exception.GetDescription());

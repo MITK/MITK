@@ -1,6 +1,9 @@
 <config>
   <event_variant name="MovePointer" class="MouseMoveEvent" >
   </event_variant>
+  <event_variant name="MovePointer" class="MouseMoveEvent" >
+      <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
   <event_variant name="InitTranslation" class="MousePressEvent">
       <attribute name="EventButton" value="LeftMouseButton"/>
       <attribute name="Modifiers" value="ctrl"/>

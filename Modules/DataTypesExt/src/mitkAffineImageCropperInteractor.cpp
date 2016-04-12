@@ -69,7 +69,6 @@ bool mitk::AffineImageCropperInteractor::CheckOverObject(const InteractionEvent*
   mitk::DataNode::Pointer dn = this->GetDataNode();
   if (dn.IsNull())
     return false;
-
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
   mitk::BoundingObject* object = dynamic_cast<mitk::BoundingObject*> (dn->GetData());
@@ -85,12 +84,9 @@ void mitk::AffineImageCropperInteractor::SelectObject(StateMachineAction*, Inter
     return;
 
   m_SelectedNode = dn;
-  dn->SetColor(1.0, 0.0, 0.0);
 
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 }
-
-
 
 void mitk::AffineImageCropperInteractor::Deselect()
 {
@@ -99,8 +95,7 @@ void mitk::AffineImageCropperInteractor::Deselect()
   if (dn.IsNull())
     return;
 
-  dn->SetColor(1.0,1.0,0.0);
-  dn = nullptr;
+  m_SelectedNode = dn;
 }
 
 void mitk::AffineImageCropperInteractor::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
@@ -115,17 +110,16 @@ void mitk::AffineImageCropperInteractor::ScaleRadius(StateMachineAction*, Intera
   if(wheelEvent == NULL)
     return;
 
-  mitk::DataNode::Pointer dn = this->GetDataNode();
-  if (dn.IsNull())
+  if (m_SelectedNode.IsNull())
     return;
 
-  double scale = (double) (wheelEvent->GetWheelDelta()) / 128.0;
+  double scale = (double) (wheelEvent->GetWheelDelta()) / 64.0;
   mitk::Point3D newScale;
   newScale[0] = newScale[1] = newScale[2] = scale;
 
   mitk::Point3D anchorPoint = wheelEvent->GetPositionInWorld();
   ScaleOperation* doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
-  dn->GetData()->GetGeometry()->ExecuteOperation(doOp);
+  m_SelectedNode->GetData()->GetGeometry()->ExecuteOperation(doOp);
 
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 }

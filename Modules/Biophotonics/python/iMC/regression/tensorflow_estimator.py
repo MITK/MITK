@@ -17,9 +17,9 @@ def conv2d(x, W, padding='SAME'):
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding=padding)
 
 
-def max_pool_2x1(x):
-    return tf.nn.max_pool(x, ksize=[1, 2, 1, 1],
-                          strides=[1, 2, 1, 1], padding='SAME')
+def max_pool1d(x, poolsize=2):
+    return tf.nn.max_pool(x, ksize=[1, poolsize, 1, 1],
+                          strides=[1, poolsize, 1, 1], padding='SAME')
 
 
 def add_cnn_layer(input, n_inputs, n_outputs, kernel_size, padding='SAME'):
@@ -32,7 +32,7 @@ def add_cnn_layer(input, n_inputs, n_outputs, kernel_size, padding='SAME'):
     h_conv = tf.nn.relu(conv2d(input, W, padding=padding) + b)
     # Add dropout regularization
     #new_layer_with_dropout = tf.nn.dropout(new_layer, keep_prob)
-    h_pool = max_pool_2x1(h_conv)
+    h_pool = max_pool1d(h_conv)
     return h_pool, W
 
 
@@ -48,21 +48,22 @@ def add_fully_connected_layer(_X, n_inputs, n_outputs, keep_prob):
 
 
 # this is my exemplary convolutional network
-def cnn(_X, n_classes):
+def cnn(_X, n_classes, keep_prob):
     # two convolutional layers
-    layer_1 = add_cnn_layer(_X, 1, 32, 6, padding='VALID')
-    layer_2 = add_cnn_layer(layer_1, 32, 64, 4)
+    layer_1, _ = add_cnn_layer(_X, 1, 32, 3, padding='VALID')
+    layer_2, _ = add_cnn_layer(layer_1, 32, 32, 2, padding='VALID')
     # flatten last one to be able to apply it to fully connected layer
-    final_number_of_dimensions = 4*64
+    final_number_of_dimensions = 1*32
     layer_2_flat = tf.reshape(layer_2, [-1, final_number_of_dimensions])
 
     # fully connected layer to bring information together
-    h_fc1_drop = add_fully_connected_layer(layer_2_flat,
+    fc_dim = 5
+    h_fc1_drop, _ = add_fully_connected_layer(layer_2_flat,
                                            final_number_of_dimensions,
-                                           100)
+                                           fc_dim, keep_prob)
 
     # return linear output layer
-    W_fc2 = weight_variable([100, n_classes])
+    W_fc2 = weight_variable([fc_dim, n_classes])
     b_fc2 = bias_variable([n_classes])
     return tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
@@ -84,3 +85,4 @@ def multilayer_perceptron(x, n_bands, n_hidden, n_classes, keep_prob):
               tf.nn.l2_loss(W_3) + tf.nn.l2_loss(W_out))
 
     return tf.matmul(last_hidden_layer, W_out) + b_out, regularizers
+

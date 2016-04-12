@@ -29,7 +29,7 @@ import tensorflow as tf
 import numpy as np
 import SimpleITK as sitk
 
-from regression.tensorflow_estimator import multilayer_perceptron
+from regression.tensorflow_estimator import multilayer_perceptron, cnn
 import msi.imgmani as imgmani
 
 
@@ -88,8 +88,9 @@ def estimate_image_tensorflow(msi, model_checkpoint_dir):
     x_test_image = np.reshape(msi.get_image(), [-1, nr_wavelengths, 1, 1])
 
     # Construct the desired model
-    pred, regularizers = multilayer_perceptron(x, nr_wavelengths, 100, 1,
-                                               keep_prob)
+    # pred, regularizers = multilayer_perceptron(x, nr_wavelengths, 100, 1,
+    #                                            keep_prob)
+    pred = cnn(x, 1, keep_prob)
 
     # Initializing the variables
     init = tf.initialize_all_variables()

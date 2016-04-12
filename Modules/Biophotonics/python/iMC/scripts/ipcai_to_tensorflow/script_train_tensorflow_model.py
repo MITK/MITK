@@ -7,7 +7,7 @@ import datetime
 import SimpleITK as sitk
 import tensorflow as tf
 
-from regression.tensorflow_estimator import multilayer_perceptron
+from regression.tensorflow_estimator import multilayer_perceptron, cnn
 from regression.tensorflow_dataset import read_data_set
 from ipcai2016.tasks_common import *
 import commons
@@ -183,8 +183,9 @@ class TensorflowTrainRegressor(luigi.Task):
         x = tf.placeholder("float", [None, nr_filters, 1, 1])
         # Construct the desired model
         keep_prob = tf.placeholder("float")
-        pred, regularizers = multilayer_perceptron(x, nr_filters, 100, 1,
-                                                   keep_prob)
+        # pred, regularizers = multilayer_perceptron(x, nr_filters, 100, 1,
+        #                                            keep_prob)
+        pred = cnn(x, 1, keep_prob)
         # define parameters
         learning_rate = 0.0001
         training_epochs = 300

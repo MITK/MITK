@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContourModel.h>
 #include <mitkContourModelSet.h>
 #include <mitkIDataStorageService.h>
-#include <mitkImage.h>
+#include <mitkLabelSetImage.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
@@ -38,38 +38,53 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget::Predicate predicate)
 {
+  auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto labelSetImageType = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
+  auto surfaceType = mitk::TNodePredicateDataType<mitk::Surface>::New();
+  auto contourModelType = mitk::TNodePredicateDataType<mitk::ContourModel>::New();
+  auto contourModelSetType = mitk::TNodePredicateDataType<mitk::ContourModelSet>::New();
+  auto nonLabelSetImageType = mitk::NodePredicateAnd::New(imageType, mitk::NodePredicateNot::New(labelSetImageType));
+  auto nonHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"));
+  auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  auto isSegmentation = mitk::NodePredicateProperty::New("segmentation", mitk::BoolProperty::New(true));
+  auto isBinaryOrSegmentation = mitk::NodePredicateOr::New(isBinary, isSegmentation);
+
+  mitk::NodePredicateBase::Pointer returnValue;
+
   switch(predicate)
   {
     case QmitkDataSelectionWidget::ImagePredicate:
-      return mitk::NodePredicateAnd::New(
-        mitk::TNodePredicateDataType<mitk::Image>::New(),
-        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true))),
-        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+      returnValue = mitk::NodePredicateAnd::New(
+        mitk::NodePredicateNot::New(isBinaryOrSegmentation),
+        nonLabelSetImageType).GetPointer();
+      break;
 
     case QmitkDataSelectionWidget::SegmentationPredicate:
-      return mitk::NodePredicateAnd::New(
-        mitk::TNodePredicateDataType<mitk::Image>::New(),
-        mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)),
-        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+      returnValue = mitk::NodePredicateOr::New(
+        mitk::NodePredicateAnd::New(imageType, isBinaryOrSegmentation),
+        labelSetImageType).GetPointer();
+      break;
 
     case QmitkDataSelectionWidget::SurfacePredicate:
-      return mitk::NodePredicateAnd::New(
-        mitk::TNodePredicateDataType<mitk::Surface>::New(),
-        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+      returnValue = surfaceType.GetPointer();
+      break;
 
     case QmitkDataSelectionWidget::ImageAndSegmentationPredicate:
-      return mitk::NodePredicateAnd::New(
-        mitk::TNodePredicateDataType<mitk::Image>::New(),
-        mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+      returnValue = imageType.GetPointer();
+      break;
+
     case QmitkDataSelectionWidget::ContourModelPredicate:
-      return mitk::NodePredicateAnd::New(
-            mitk::NodePredicateOr::New( mitk::TNodePredicateDataType<mitk::ContourModelSet>::New(),
-            mitk::TNodePredicateDataType<mitk::ContourModel>::New()),
-            mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer();
+      returnValue = mitk::NodePredicateOr::New(
+        contourModelSetType,
+        contourModelSetType).GetPointer();
+      break;
+
     default:
       assert(false && "Unknown predefined predicate!");
-      return NULL;
+      return nullptr;
   }
+
+  return mitk::NodePredicateAnd::New(returnValue, nonHelperObject).GetPointer();
 }
 
 QmitkDataSelectionWidget::QmitkDataSelectionWidget(QWidget* parent)

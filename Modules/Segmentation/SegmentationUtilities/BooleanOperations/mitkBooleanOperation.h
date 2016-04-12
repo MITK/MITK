@@ -43,11 +43,11 @@ namespace mitk
      * Throws an mitk::Exception when segmentations are somehow invalid.
      *
      * \param[in] type The type of the boolean operation.
-     * \param[in] segmentation1 The first operand of the boolean operation.
-     * \param[in] segmentation2 The second operand of the boolean operation.
+     * \param[in] segmentationA The first operand of the boolean operation.
+     * \param[in] segmentationB The second operand of the boolean operation.
      * \param[in] The time step at which the operation will be executed.
      */
-    BooleanOperation(Type type, Image::Pointer segmentation1, Image::Pointer segmentation2, unsigned int time = 0);
+    BooleanOperation(Type type, Image::Pointer segmentationA, Image::Pointer segmentationB, unsigned int time = 0);
     ~BooleanOperation();
 
     /* \brief Execute boolean operation and return resulting segmentation.
@@ -68,8 +68,8 @@ namespace mitk
     void ValidateSegmentations() const;
 
     Type m_Type;
-    Image::Pointer m_Segmentation0;
-    Image::Pointer m_Segmentation1;
+    Image::Pointer m_SegmentationA;
+    Image::Pointer m_SegmentationB;
     unsigned int m_Time;
   };
 }

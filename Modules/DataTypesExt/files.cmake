@@ -2,6 +2,7 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 
 set(CPP_FILES
   mitkAffineBaseDataInteractor3D.cpp
+  mitkAffineImageCropperInteractor.cpp
   mitkApplyDiffImageOperation.cpp
   mitkBoundingObject.cpp
   mitkBoundingObjectGroup.cpp
@@ -42,4 +43,5 @@ set(RESOURCE_FILES
   Interactions/ClippingPlaneTranslationConfig.xml
   Interactions/ClippingPlaneRotationConfig.xml
   Interactions/ClippingPlaneDeformationConfig.xml
+  Interactions/CropperDeformationConfig.xml
 )

@@ -391,6 +391,9 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
     d->m_DataNodeToPlanarFigureData.erase( it );
   }
 
+  if (nonConstNode != nullptr)
+    nonConstNode->SetDataInteractor(nullptr);
+
   auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
   auto nodes = this->GetDataStorage()->GetDerivations(node, isPlanarFigure);
 

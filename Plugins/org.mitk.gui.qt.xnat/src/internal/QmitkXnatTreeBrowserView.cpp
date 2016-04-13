@@ -62,6 +62,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 #include <QMessageBox>
 #include <QTimer>
+#include <QmitkPreferencesDialog.h>
 
 // Poco
 #include <Poco/Zip/Decompress.h>
@@ -69,10 +70,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 const QString QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
-m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
-m_TreeModel(new QmitkXnatTreeModel()),
-m_Tracker(0),
-m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Download Path", ""))
+  m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
+  m_TreeModel(new QmitkXnatTreeModel()),
+  m_Tracker(0),
+  m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Download Path", "")),
+  m_SilentMode(false)
 {
   m_DataStorageServiceTracker.open();
 
@@ -98,6 +100,65 @@ void QmitkXnatTreeBrowserView::SetFocus()
 {
 }
 
+void QmitkXnatTreeBrowserView::ToggleConnection()
+{
+  ctkXnatSession* session = 0;
+
+  try
+  {
+    session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+          mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+  }
+  catch (std::invalid_argument)
+  {
+    if (true)
+    {
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CreateXnatSession();
+      session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+            mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+    }
+  }
+
+  if (session != 0 && session->isOpen())
+  {
+    mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
+    m_Controls.btnXnatConnect->setToolTip("Connect");
+    m_Controls.btnXnatConnect->setIcon(QIcon(":/xnat-plugin/xnat-connect.png"));
+    CleanUp();
+  }
+  else if (session != 0 && !session->isOpen())
+  {
+    try
+    {
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->OpenXnatSession();
+      m_Controls.btnXnatConnect->setToolTip("Disconnect");
+      m_Controls.btnXnatConnect->setIcon(QIcon(":/xnat-plugin/xnat-disconnect.png"));
+    }
+    catch (const ctkXnatAuthenticationException& auth)
+    {
+      MITK_INFO << auth.message().toStdString();
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
+      QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+      _PreferencesDialog.SetSelectedPage("org.mitk.gui.qt.application.XnatConnectionPreferencePage");
+      _PreferencesDialog.exec();
+    }
+    catch (const ctkException& e)
+    {
+      MITK_INFO << e.message().toStdString();
+      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
+      QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+      _PreferencesDialog.SetSelectedPage("org.mitk.gui.qt.application.XnatConnectionPreferencePage");
+      _PreferencesDialog.exec();
+    }
+    catch (...)
+    {
+      QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+      _PreferencesDialog.SetSelectedPage("org.mitk.gui.qt.application.XnatConnectionPreferencePage");
+      _PreferencesDialog.exec();
+    }
+  }
+}
+
 void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 {
   // Create GUI widgets from the Qt Designer's .ui file
@@ -107,8 +168,6 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   m_Controls.treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   m_Controls.treeView->setAcceptDrops(true);
   m_Controls.treeView->setDropIndicatorShown(true);
-  m_Controls.labelError->setText("Please use the 'Connect' button in the Preferences.");
-  m_Controls.labelError->setStyleSheet("QLabel { color: red; }");
 
   m_Controls.treeView->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.treeView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -124,7 +183,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 
   connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), SLOT(itemSelected(const QModelIndex&)));
   connect(m_Controls.treeView, SIGNAL(customContextMenuRequested(const QPoint&)),
-    this, SLOT(OnContextMenuRequested(const QPoint&)));
+          this, SLOT(OnContextMenuRequested(const QPoint&)));
   connect(m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanTreeModel(ctkXnatSession*)));
   connect(m_Tracker, SIGNAL(Opened(ctkXnatSession*)), this, SLOT(UpdateSession(ctkXnatSession*)));
 
@@ -135,26 +194,18 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   try
   {
     session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+          mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
   catch (std::invalid_argument)
   {
     session = 0;
   }
 
-  if (session != 0)
-  {
-    m_Controls.labelError->setVisible(false);
-  }
-  else
-  {
-    m_Controls.labelError->setVisible(true);
-  }
-
   connect(m_Controls.treeView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnActivatedNode(const QModelIndex&)));
   connect(m_Controls.treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnXnatNodeSelected(const QModelIndex&)));
   connect(m_TreeModel, SIGNAL(ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&)), this, SLOT(OnUploadResource(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&)));
 
+  connect(m_Controls.btnXnatConnect, SIGNAL(clicked()), SLOT(ToggleConnection()));
   connect(m_Controls.btnXnatUpload, SIGNAL(clicked()), this, SLOT(OnUploadFromDataStorage()));
   connect(m_Controls.btnXnatDownload, SIGNAL(clicked()), this, SLOT(OnDownloadSelectedXnatFile()));
   connect(m_Controls.btnCreateXnatFolder, SIGNAL(clicked()), this, SLOT(OnCreateResourceFolder()));
@@ -234,15 +285,24 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
   enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
   if (enableDownload)
   {
-    QMessageBox msgBox;
-    QString msg ("Do you want to download "+selectedXnatObject->name()+"?");
-    msgBox.setWindowTitle("MITK XNAT upload");
-    msgBox.setText(msg);
-    msgBox.setIcon(QMessageBox::Question);
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    int result = msgBox.exec();
-    if (result == QMessageBox::Ok)
+    if(!m_SilentMode)
+    {
+      QMessageBox msgBox;
+      QString msg ("Do you want to download "+selectedXnatObject->name()+"?");
+      msgBox.setWindowTitle("MITK XNAT download");
+      msgBox.setText(msg);
+      msgBox.setIcon(QMessageBox::Question);
+      msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+      int result = msgBox.exec();
+      if (result == QMessageBox::Ok)
+      {
+        InternalFileDownload(index, true);
+      }
+    }
+    else
+    {
       InternalFileDownload(index, true);
+    }
   }
 }
 
@@ -250,7 +310,6 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
 {
   if (session != 0 && session->isOpen())
   {
-    m_Controls.labelError->setVisible(false);
     // Fill model and show in the GUI
     m_TreeModel->addDataModel(session->dataModel());
     m_Controls.treeView->reset();
@@ -290,6 +349,8 @@ void QmitkXnatTreeBrowserView::OnPreferencesChanged(const berry::IBerryPreferenc
   QDir downloadDir (downloadPath);
   if (downloadPath.length() != 0 && downloadDir.exists())
     m_DownloadPath = downloadPath;
+
+  m_SilentMode = prefs->GetBool("Silent Mode", false);
 }
 
 void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bool loadData)
@@ -385,10 +446,13 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           if (downloadPath.exists(file->name()))
           {
             MITK_INFO << "Download of " << file->name().toStdString() << " completed!";
-            QMessageBox msgBox;
-            msgBox.setText("Download of " + file->name() + " completed!");
-            msgBox.setIcon(QMessageBox::Information);
-            msgBox.exec();
+            if(!m_SilentMode)
+            {
+              QMessageBox msgBox;
+              msgBox.setText("Download of " + file->name() + " completed!");
+              msgBox.setIcon(QMessageBox::Information);
+              msgBox.exec();
+            }
             m_Controls.groupBox->hide();
           }
           else
@@ -526,7 +590,7 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
 {
   bool ok;
   QString folderName = QInputDialog::getText(m_Controls.treeView, tr("Create XNAT resource folder"),
-                                       tr("Folder name:"), QLineEdit::Normal, tr("data"), &ok);
+                                             tr("Folder name:"), QLineEdit::Normal, tr("data"), &ok);
   if (ok)
   {
     if (folderName.isEmpty())
@@ -549,11 +613,14 @@ void QmitkXnatTreeBrowserView::InternalFileUpload(ctkXnatFile* file)
   {
     file->save();
     MITK_INFO << "Upload of " << file->name().toStdString() << " completed!";
-    QMessageBox msgBox;
-    msgBox.setText("Upload of " + file->name() + " completed!");
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.show();
-    msgBox.exec();
+    if(!m_SilentMode)
+    {
+      QMessageBox msgBox;
+      msgBox.setText("Upload of " + file->name() + " completed!");
+      msgBox.setIcon(QMessageBox::Information);
+      msgBox.show();
+      msgBox.exec();
+    }
   }
   catch (ctkXnatException &e)
   {
@@ -610,6 +677,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     return;
 
   //1. If not dropped on a resource, create a new folder
+  //temporarily remove the annoying message box that upload was successfull..
   ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(parentObject);
   if (resource == nullptr)
   {
@@ -686,7 +754,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     m_TreeModel->refresh(parentIndex);
 
     // The filename for uploading
-//    QFileInfo fileInfo;
+    //    QFileInfo fileInfo;
     //      if (surface)
     //      {
     //        // Save surface
@@ -694,15 +762,15 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     //        xnatFile->setName(fileName);
     //        dir.setPath(dir.path().append("/" + fileName));
 
-//    QString origFile = QString::fromStdString(orignalFilePath->GetValueAsString());
-//    origFile.append("/" + fileName);
+    //    QString origFile = QString::fromStdString(orignalFilePath->GetValueAsString());
+    //    origFile.append("/" + fileName);
     //        origFile.append(".stl");
 
     //        fileInfo.setFile(origFile);
     //        if (!fileInfo.exists())
     //          mitk::IOUtil::SaveSurface(surface, dir.path().toStdString());
     //      }
-//    this->uploadFileToXnat(xnatFile, dir.path());
+    //    this->uploadFileToXnat(xnatFile, dir.path());
   }
 }
 
@@ -792,6 +860,16 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
   m_ContextMenu->popup(QCursor::pos());
 }
 
+void QmitkXnatTreeBrowserView::CleanUp()
+{
+  m_Controls.wgtExperimentInfo->hide();
+  m_Controls.wgtSubjectInfo->hide();
+  m_Controls.wgtProjectInfo->hide();
+  m_Controls.btnCreateXnatFolder->setEnabled(false);
+  m_Controls.btnXnatDownload->setEnabled(false);
+  m_Controls.btnXnatUpload->setEnabled(false);
+}
+
 void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
 {
 
@@ -799,7 +877,7 @@ void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
   if (variant.isValid())
   {
     ctkXnatSession *session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+          mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
 
     ctkXnatObject* object = variant.value<ctkXnatObject*>();
     ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(object);
@@ -926,11 +1004,13 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
 
       // Get xnat session from micro service
       ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+            mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
 
       // Update View
       m_TreeModel->removeDataModel(session->dataModel());
+
       UpdateSession(session);
+
     }
   }
 }
@@ -952,7 +1032,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
 
       // Get xnat session from micro service
       ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-        mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
+            mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
 
       // Update View
       m_TreeModel->removeDataModel(session->dataModel());
@@ -979,8 +1059,12 @@ void QmitkXnatTreeBrowserView::sessionTimedOutMsg()
   m_TreeModel->removeDataModel(dataModel);
   m_Controls.treeView->reset();
   session->close();
-  m_Controls.labelError->show();
   QMessageBox::warning(m_Controls.treeView, "Session Timeout", "The session timed out.");
+
+  m_Controls.btnXnatConnect->setToolTip("Connect");
+  m_Controls.btnXnatConnect->setIcon(QIcon(":/xnat-plugin/xnat-connect.png"));
+
+  CleanUp();
 }
 
 void QmitkXnatTreeBrowserView::sessionTimesOutSoonMsg()

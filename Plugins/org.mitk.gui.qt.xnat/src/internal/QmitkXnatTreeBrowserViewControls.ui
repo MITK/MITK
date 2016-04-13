@@ -21,22 +21,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="labelError">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>5</number>
-     </property>
-     <property name="indent">
-      <number>0</number>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="btnXnatUpload">
@@ -111,6 +95,32 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnXnatConnect">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string>Connect</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resources/xnat.qrc">
+         <normaloff>:/xnat-plugin/xnat-connect.png</normaloff>:/xnat-plugin/xnat-connect.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -122,6 +132,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QTreeView" name="treeView"/>
      </item>
     </layout>
    </item>
@@ -140,13 +157,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QTreeView" name="treeView"/>
-     </item>
-    </layout>
    </item>
    <item>
     <layout class="QVBoxLayout" name="infoVerticalLayout">

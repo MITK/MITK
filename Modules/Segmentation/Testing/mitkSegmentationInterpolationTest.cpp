@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 
 // other
-#include <mitkExtractSliceFilter.h>
 #include <mitkImage.h>
+#include <mitkImageWriteAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkSegmentationInterpolationController.h>
 
@@ -34,12 +34,12 @@ private:
 
   // Load data into these
   mitk::Image::Pointer m_ReferenceImage;
-  mitk::Image::Pointer m_AxialBase;
-  mitk::Surface::Pointer m_AxialFeedback;
-  mitk::Image::Pointer m_AxialInterpolated;
+  mitk::Image::Pointer m_InputImageAxial;
+  mitk::Image::Pointer m_FeedbackImageAxial;
+  mitk::Image::Pointer m_ResultImageAxial;
 
-  // Plane indices
-  int m_AxialPlaneIndex;
+  // Plane index (the slice to be interpolated)
+  int m_PlaneIndexAxial;
 
   mitk::SegmentationInterpolationController::Pointer m_InterpolationController;
 
@@ -47,36 +47,37 @@ public:
 
   void setUp() override
   {
-    m_AxialPlaneIndex = 22;
+    m_PlaneIndexAxial = 23;
 
     m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
-    m_AxialBase = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/AxialBase.nrrd"));
-    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialBase.nrrd]", m_AxialBase.IsNotNull());
-    m_AxialFeedback = mitk::IOUtil::LoadSurface(GetTestDataFilePath("SegmentationInterpolation/AxialFeedback.vtp"));
-    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialFeedback.nrrd]", m_AxialFeedback.IsNotNull());
-    m_AxialInterpolated = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/AxialInterpolated.nrrd"));
-    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [AxialInterpolated.nrrd]", m_AxialInterpolated.IsNotNull());
+    m_InputImageAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestInputAxial.nrrd"));
+    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestInputAxial.nrrd]", m_InputImageAxial.IsNotNull());
+//    m_FeedbackImageAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestFeedbackAxial.nrrd"));
+//    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestFeedbackAxial.nrrd]", m_FeedbackImageAxial.IsNotNull());
+    m_ResultImageAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestResultAxial.nrrd"));
+    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestResultAxial.nrrd]", m_ResultImageAxial.IsNotNull());
 
     m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();
-    m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
   }
 
   void tearDown() override
   {
     m_ReferenceImage = nullptr;
-    m_AxialBase = nullptr;
-    m_AxialFeedback = nullptr;
-    m_AxialInterpolated = nullptr;
+    m_InputImageAxial = nullptr;
+//    m_FeedbackImageAxial = nullptr;
+    m_ResultImageAxial = nullptr;
   }
 
   void Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue()
   {
-    // Create Interpolation from base segmentation
-    m_InterpolationController->SetSegmentationVolume(m_AxialBase);
-    mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(m_ReferenceImage->GetSlicedGeometry()->GetPlaneGeometry(m_AxialPlaneIndex));
-    mitk::Image::Pointer resultTestInterpolation = m_InterpolationController->Interpolate(0, m_AxialPlaneIndex, plane, 0);
-    MITK_ASSERT_EQUAL(resultTestInterpolation, m_AxialInterpolated, "The created interpolation should fit the reference interpolation.");
+    m_InterpolationController->SetSegmentationVolume(m_InputImageAxial);
+    m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
+
+    // read and write accessor to the input segmentation
+
+    mitk::IOUtil::Save(interpolationResult, "/home/jenspetersen/Desktop/interpolationtest.nrrd");
+    MITK_ASSERT_EQUAL(interpolationResult, m_ResultImageAxial, "The created interpolation should fit the reference interpolation.");
   }
 
 };

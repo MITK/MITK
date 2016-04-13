@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPoint4dPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
+#include <mitkLocaleSwitch.h>
 #include "mitkProperties.h"
 #include "mitkStringsToNumbers.h"
 
@@ -37,6 +37,8 @@ class Point4dPropertySerializer : public BasePropertySerializer
     {
       if (const Point4dProperty* prop = dynamic_cast<const Point4dProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("point");
         Point4D point = prop->GetValue();
         element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]));
@@ -51,6 +53,8 @@ class Point4dPropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return nullptr;
+
+      LocaleSwitch localeSwitch("C");
 
       std::string v_str[4];
       if ( element->QueryStringAttribute( "x", &v_str[0] ) != TIXML_SUCCESS ) return nullptr;

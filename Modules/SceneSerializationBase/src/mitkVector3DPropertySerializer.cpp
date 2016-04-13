@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkVector3DPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
+#include <mitkLocaleSwitch.h>
 #include "mitkProperties.h"
 #include "mitkStringsToNumbers.h"
 
@@ -37,6 +37,8 @@ class Vector3DPropertySerializer : public BasePropertySerializer
     {
       if (const Vector3DProperty* prop = dynamic_cast<const Vector3DProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("vector");
         Vector3D point = prop->GetValue();
         element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]));
@@ -50,6 +52,8 @@ class Vector3DPropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return nullptr;
+
+      LocaleSwitch localeSwitch("C");
 
       std::string v_str[3];
       if ( element->QueryStringAttribute( "x", &v_str[0] ) != TIXML_SUCCESS ) return nullptr;

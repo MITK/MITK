@@ -889,19 +889,19 @@ if(MITK_USE_QT)
   endif()
 
   find_program(QT_HELPGENERATOR_EXECUTABLE
-    NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+    NAMES qhelpgenerator qhelpgenerator-qt5 qhelpgenerator5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
 
   find_program(QT_COLLECTIONGENERATOR_EXECUTABLE
-    NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
+    NAMES qcollectiongenerator qcollectiongenerator-qt5 qcollectiongenerator5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
 
   find_program(QT_ASSISTANT_EXECUTABLE
-    NAMES assistant-qt4 assistant4 assistant
+    NAMES assistant assistant-qt5 assistant5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )

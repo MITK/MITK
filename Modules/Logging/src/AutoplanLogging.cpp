@@ -74,11 +74,11 @@ namespace Logger {
 
     if (Options::get().filelog) {
       boost::shared_ptr< file_sink > sink(new file_sink(
-        boost::log::keywords::file_name = "%Y%m%d_%H%M%S_%5N.xml",
+        boost::log::keywords::file_name = Options::get().logsPath + "/%Y%m%d_%H%M%S_%5N.xml",
         boost::log::keywords::rotation_size = 16384
         ));
       sink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(
-        boost::log::keywords::target = Options::get().logsPath,           /*< the target directory >*/
+        boost::log::keywords::target = Options::get().logsPath,     /*< the target directory >*/
         boost::log::keywords::max_size = 16 * 1024 * 1024,          /*< maximum total size of the stored files, in bytes >*/
         boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
         ));

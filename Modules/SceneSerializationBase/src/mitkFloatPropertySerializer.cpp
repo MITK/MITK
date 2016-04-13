@@ -36,10 +36,10 @@ class FloatPropertySerializer : public BasePropertySerializer
 
     virtual TiXmlElement* Serialize() override
     {
-      mitk::LocaleSwitch localeSwitch("C");
-
       if (const FloatProperty* prop = dynamic_cast<const FloatProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("float");
         element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()));
         return element;
@@ -51,7 +51,7 @@ class FloatPropertySerializer : public BasePropertySerializer
     {
       if (!element) return nullptr;
 
-      mitk::LocaleSwitch localeSwitch("C");
+      LocaleSwitch localeSwitch("C");
 
       std::string f_string;
       if ( element->QueryStringAttribute( "value", &f_string) == TIXML_SUCCESS )

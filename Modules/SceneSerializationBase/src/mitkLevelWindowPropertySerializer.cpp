@@ -18,9 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkLevelWindowPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
 #include "mitkLevelWindowProperty.h"
-
+#include <mitkLocaleSwitch.h>
 #include <boost/lexical_cast.hpp>
 
 namespace mitk
@@ -38,6 +37,8 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
     {
       if (const LevelWindowProperty* prop = dynamic_cast<const LevelWindowProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("LevelWindow");
 
         LevelWindow lw = prop->GetLevelWindow();
@@ -75,6 +76,8 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return nullptr;
+
+      LocaleSwitch localeSwitch("C");
 
       bool isFixed(false);
       if (element->Attribute("fixed"))

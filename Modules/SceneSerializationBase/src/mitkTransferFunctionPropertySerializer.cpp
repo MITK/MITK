@@ -32,6 +32,8 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
 {
   if (const TransferFunctionProperty* prop = dynamic_cast<const TransferFunctionProperty*>(mitk::BasePropertySerializer::m_Property.GetPointer()))
   {
+    LocaleSwitch localeSwitch("C");
+
     TransferFunction* transferfunction = prop->GetValue();
     if (!transferfunction)
       return nullptr;
@@ -92,8 +94,6 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
 
 bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const char * filename, TransferFunction::Pointer tf )
 {
-  mitk::LocaleSwitch localeSwitch("C");
-
   TransferFunctionPropertySerializer::Pointer tfps=TransferFunctionPropertySerializer::New();
   tfps->SetProperty( TransferFunctionProperty::New( tf ) );
   TiXmlElement* s=tfps->Serialize();

@@ -39,10 +39,10 @@ class DoublePropertySerializer : public BasePropertySerializer
 
     virtual TiXmlElement* Serialize() override
     {
-      mitk::LocaleSwitch localeSwitch("C");
-
       if (const DoubleProperty* prop = dynamic_cast<const DoubleProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("double");
         element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()));
         return element;
@@ -54,7 +54,7 @@ class DoublePropertySerializer : public BasePropertySerializer
     {
       if (!element) return nullptr;
 
-      mitk::LocaleSwitch localeSwitch("C");
+      LocaleSwitch localeSwitch("C");
 
       std::string d;
       if ( element->QueryStringAttribute( "value", &d ) == TIXML_SUCCESS )

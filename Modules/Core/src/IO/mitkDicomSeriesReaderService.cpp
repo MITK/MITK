@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 DicomSeriesReaderService::DicomSeriesReaderService()
-  : AbstractFileReader(CustomMimeType(IOMimeTypes::DICOM_MIMETYPE()), "Classic MITK DICOM Reader")
+  : AbstractFileReader(CustomMimeType(IOMimeTypes::DICOM_MIMETYPE()), "MITK DICOM Reader")
 {
   this->RegisterService();
 }

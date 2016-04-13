@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRegistrationHelper.h"
 
 //MatchPoint
-#include "mapModelBasedRegistrationKernel.h"
+#include "mapRegistrationKernel.h"
 
 namespace mitk
 {
@@ -65,15 +65,15 @@ namespace mitk
   {
     Affine3DTransformType::Pointer result = NULL;
 
-    typedef ::map::core::ModelBasedRegistrationKernel<3,3> ModelKernelType;
+    typedef ::map::core::RegistrationKernel<3,3> KernelType;
 
-    const ModelKernelType* pModelKernel = dynamic_cast<const ModelKernelType*>(&kernel);
+    const KernelType* pModelKernel = dynamic_cast<const KernelType*>(&kernel);
 
     if (pModelKernel)
       {
 
-        ModelKernelType::TransformType::MatrixType matrix;
-        ModelKernelType::TransformType::OutputVectorType offset;
+        KernelType::TransformType::MatrixType matrix;
+        KernelType::TransformType::OutputVectorType offset;
 
         if(pModelKernel->getAffineMatrixDecomposition(matrix,offset))
           {

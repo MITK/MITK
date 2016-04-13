@@ -432,18 +432,26 @@ void QmitkSegmentationView::NodeAdded(const mitk::DataNode *node)
 {
    bool isBinary (false);
    bool isHelperObject (false);
+   bool isImage (false);
    node->GetBoolProperty("binary", isBinary);
    mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
    isBinary = isBinary || labelSetImage.IsNotNull();
    node->GetBoolProperty("helper object", isHelperObject);
+
+   if( dynamic_cast<mitk::Image*>(node->GetData()) )
+   {
+     isImage = true;
+   }
+
    if (m_AutoSelectionEnabled)
    {
-      if (!isBinary && dynamic_cast<mitk::Image*>(node->GetData()))
+      if (!isBinary && isImage)
       {
          FireNodeSelected(const_cast<mitk::DataNode*>(node));
       }
    }
-   if (isBinary && !isHelperObject)
+
+   if (isImage && !isHelperObject)
    {
       itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
       command->SetCallbackFunction(this, &QmitkSegmentationView::OnWorkingNodeVisibilityChanged);
